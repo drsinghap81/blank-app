@@ -68,6 +68,10 @@ LEVEL_MAX_SHOWN = 3           # keep charts clean: 2-3 levels
 PATTERN_LEVEL_TOL = 0.006     # candle must reach within 0.6% of the level
 PATTERN_LOOKBACK_SIGNALS = 3  # scanner reports patterns completed in the last N bars
 
+# ---- Proximity scan & Gann ----
+NEAR_SCAN_PCT = 0.02          # "near a level" = last close within 2% of it
+GANN_CONFLUENCE_PCT = 0.01    # Gann odd square within 1% of a level = confluence
+
 
 @dataclass(frozen=True)
 class MarketConfig:
@@ -369,6 +373,27 @@ def select_levels(levels: list[Level], ref_price: float, k: int = LEVEL_MAX_SHOW
                               -lv.touches, dist(lv)))
     picks += rest[: max(0, k - len(picks))]
     return sorted(picks, key=lambda lv: -lv.price)
+
+
+def gann_odd_squares(price: float, count: int = 2) -> list[tuple[int, float]]:
+    """
+    Gann Square-of-Nine odd squares around a price (method agreed earlier):
+      take sqrt(price), find the odd integers on either side, square them.
+      e.g. 1,211 -> sqrt 34.8 -> 33² = 1,089 below, 35² = 1,225 above.
+    `count` = how many odd squares on EACH side (1 -> nearest pair).
+    Returns [(root, square), ...] from low to high.
+    """
+    if price <= 0:
+        return []
+    f = int(np.floor(np.sqrt(price)))
+    lo = f if f % 2 else f - 1
+    roots = [lo - 2 * k for k in range(count - 1, -1, -1)] + [lo + 2 * (k + 1) for k in range(count)]
+    return [(r, float(r * r)) for r in roots if r > 0]
+
+
+def nearest_gann(level: float) -> tuple[int, float]:
+    """Odd square closest to a given level."""
+    return min(gann_odd_squares(level, 1), key=lambda g: abs(g[1] - level))
 
 
 # =============================================================================
@@ -698,7 +723,8 @@ def render_header(market: MarketConfig) -> None:
 
 
 def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None = None,
-                      signals: list[dict] | None = None) -> go.Figure:
+                      signals: list[dict] | None = None,
+                      gann: list[tuple[int, float]] | None = None) -> go.Figure:
     """
     Candles + SMA + S/R lines + pattern markers on top, volume in the middle,
     RSI with 70/30 bands below.
@@ -731,6 +757,12 @@ def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None 
                       line=dict(color="#ef4444" if is_res else "#22c55e", width=1.3, dash="dash"),
                       annotation_text=lv.label(ref), annotation_position="top left",
                       annotation_font=dict(size=11, color="#fca5a5" if is_res else "#86efac"))
+
+    # ---- Gann odd-square lines (purple, dotted, labelled on the right) ----
+    for root, sq in gann or []:
+        fig.add_hline(y=sq, row=1, col=1, line=dict(color="#a78bfa", width=1.4, dash="dot"),
+                      annotation_text=f"Gann {root}² = {sq:,.0f}", annotation_position="bottom right",
+                      annotation_font=dict(size=11, color="#c4b5fd"))
 
     # ---- Pattern markers (only those inside the visible window) ----
     for s in signals or []:
@@ -765,9 +797,14 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
         st.warning(f"⚠️ Live data unavailable for **{ticker}** — showing a SYNTHETIC dataset "
                    f"so the terminal keeps working.\n\nReason: {msg}")
 
-    window = st.radio("Chart window", [60, 126], index=0, horizontal=True,
-                      format_func=lambda n: f"{n} bars" + (" (~6 months)" if n == 126 else ""),
-                      key="chart_window")
+    wcol, gcol = st.columns([3, 2])
+    with wcol:
+        window = st.radio("Chart window", [60, 126], index=0, horizontal=True,
+                          format_func=lambda n: f"{n} bars" + (" (~6 months)" if n == 126 else ""),
+                          key="chart_window")
+    with gcol:
+        show_gann = st.toggle("Gann odd squares", value=True, key="show_gann",
+                              help="√price → nearest odd numbers either side → squared.")
     full = add_indicators(raw)
     df = full.tail(window)
     last = df.iloc[-1]
@@ -803,7 +840,13 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
                f"(×{s['Tests']}{' flip' if s['Flip'] else ''}) · close {sym}{s['Close']:,.2f}")
         (st.error if s["Bias"] == "Bearish" else st.success)(msg)
 
-    st.plotly_chart(build_price_chart(df, ticker, shown_levels, chart_signals), width="stretch")
+    gann_lines = gann_odd_squares(float(last["Close"]), 1) if show_gann else None
+    st.plotly_chart(build_price_chart(df, ticker, shown_levels, chart_signals, gann_lines),
+                    width="stretch", key=f"analysis_chart_{ticker}")
+    if gann_lines:
+        st.caption(f"Gann: √{last['Close']:,.2f} = {np.sqrt(last['Close']):.2f} → "
+                   + " · ".join(f"{r}² = {sq:,.0f} ({(sq / last['Close'] - 1) * 100:+.1f}%)"
+                                for r, sq in gann_lines))
     if not live:
         st.caption("Levels and patterns above are computed on SYNTHETIC data — ignore them.")
 
@@ -813,6 +856,9 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
             lv_df = pd.DataFrame([{
                 "Level": round(lv.price, 2), "Role": lv.role(ref), "Tests": lv.touches,
                 "Flip": "yes" if lv.flip else "", "Distance %": round((lv.price / ref - 1) * 100, 2),
+                "Nearest Gann": f"{nearest_gann(lv.price)[0]}² = {nearest_gann(lv.price)[1]:,.0f}",
+                "Gann confluence": "✓" if abs(nearest_gann(lv.price)[1] / lv.price - 1)
+                                   <= GANN_CONFLUENCE_PCT else "",
                 "Last test": lv.last_touch.date(), "On chart": "✓" if lv in shown_levels else ""}
                 for lv in sorted(all_levels, key=lambda x: -x.price)])
             st.dataframe(lv_df, width="stretch", hide_index=True)
@@ -830,7 +876,9 @@ def render_scanner_tab(market: MarketConfig) -> None:
     st.markdown(f"#### Pattern scanner — {market.label} ({len(universe)} symbols)")
     st.caption(
         "Shooting star at resistance (bearish) and morning star at support (bullish), "
-        f"completed in the last {PATTERN_LOOKBACK_SIGNALS} sessions. Levels: 6 months of "
+        f"completed in the last {PATTERN_LOOKBACK_SIGNALS} sessions, plus every stock within "
+        f"{NEAR_SCAN_PCT:.0%} of a tested level with Gann odd-square confluence "
+        f"(odd square within {GANN_CONFLUENCE_PCT:.0%} of the level). Levels: 6 months of "
         "candle wicks, ≥2 tests, within 0.8%. Daily candles; the latest bar may still be forming "
         "during market hours, so confirm on the close.")
 
@@ -843,36 +891,68 @@ def render_scanner_tab(market: MarketConfig) -> None:
     if failed:
         st.caption(f"No data for: {', '.join(failed)}")
 
-    rows = []
+    pattern_rows, near_rows = [], []
     for tkr, frame in frames.items():
+        last_close = float(frame["Close"].iloc[-1])
+
+        # ---- 1. Candlestick patterns at tested levels ----
         for s in detect_signals(frame):
-            last_close = float(frame["Close"].iloc[-1])
-            rows.append({"Ticker": tkr, "Pattern": s["Pattern"], "Bias": s["Bias"],
-                         "Date": s["Date"].date(), "Level": round(s["Level"], 2),
-                         "Tests": s["Tests"], "Flip": "yes" if s["Flip"] else "",
-                         "Pattern close": round(s["Close"], 2), "Last close": round(last_close, 2),
-                         "Since signal %": round((last_close / s["Close"] - 1) * 100, 2)})
+            pattern_rows.append({"Ticker": tkr, "Pattern": s["Pattern"], "Bias": s["Bias"],
+                                 "Date": s["Date"].date(), "Level": round(s["Level"], 2),
+                                 "Tests": s["Tests"], "Flip": "yes" if s["Flip"] else "",
+                                 "Pattern close": round(s["Close"], 2), "Last close": round(last_close, 2),
+                                 "Since signal %": round((last_close / s["Close"] - 1) * 100, 2)})
 
-    c1, c2, c3 = st.columns(3)
+        # ---- 2. Price within NEAR_SCAN_PCT of a tested level (+ Gann confluence) ----
+        for lv in compute_levels(frame):
+            dist = lv.price / last_close - 1
+            if abs(dist) > NEAR_SCAN_PCT:
+                continue
+            g_root, g_sq = nearest_gann(lv.price)
+            near_rows.append({
+                "Ticker": tkr, "Last close": round(last_close, 2),
+                "Near": "Resistance" if dist > 0 else "Support",
+                "Level": round(lv.price, 2), "Tests": lv.touches, "Flip": "yes" if lv.flip else "",
+                "Distance %": round(dist * 100, 2),
+                "Nearest Gann": f"{g_root}² = {g_sq:,.0f}",
+                "Gann confluence": "✓" if abs(g_sq / lv.price - 1) <= GANN_CONFLUENCE_PCT else ""})
+
+    c1, c2, c3, c4 = st.columns(4)
     c1.metric("Scanned", f"{len(frames)}")
-    c2.metric("Shooting stars @ R", sum(r["Bias"] == "Bearish" for r in rows))
-    c3.metric("Morning stars @ S", sum(r["Bias"] == "Bullish" for r in rows))
+    c2.metric(f"Within {NEAR_SCAN_PCT:.0%} of a level", len({r['Ticker'] for r in near_rows}))
+    c3.metric("Shooting stars @ R", sum(r["Bias"] == "Bearish" for r in pattern_rows))
+    c4.metric("Morning stars @ S", sum(r["Bias"] == "Bullish" for r in pattern_rows))
 
-    if not rows:
-        st.info("No stock is showing either pattern at a tested level right now. "
+    st.markdown("##### Candlestick patterns at tested levels")
+    if pattern_rows:
+        hits = pd.DataFrame(pattern_rows).sort_values(["Date", "Bias"], ascending=[False, True])
+        st.dataframe(hits, width="stretch", hide_index=True)
+    else:
+        st.info("No shooting star at resistance or morning star at support right now. "
                 "That's normal — these are selective setups.")
-        return
 
-    hits = pd.DataFrame(rows).sort_values(["Date", "Bias"], ascending=[False, True])
-    st.dataframe(hits, width="stretch", hide_index=True)
+    st.markdown(f"##### Within {NEAR_SCAN_PCT:.0%} of support or resistance")
+    if near_rows:
+        near = pd.DataFrame(near_rows)
+        only_conf = st.toggle("Only Gann confluence", value=False, key=f"conf_{market.key}")
+        if only_conf:
+            near = near[near["Gann confluence"] == "✓"]
+        near = near.assign(_abs=near["Distance %"].abs()).sort_values("_abs").drop(columns="_abs")
+        st.dataframe(near, width="stretch", hide_index=True)
+    else:
+        st.info(f"No stock is within {NEAR_SCAN_PCT:.0%} of a tested level.")
 
-    # Quick chart of any hit, with its levels and markers
-    pick = st.selectbox("View chart", hits["Ticker"].unique().tolist(), key=f"scan_pick_{market.key}")
-    full = add_indicators(frames[pick])
-    view = full.tail(DISPLAY_BARS)
-    lv = select_levels(compute_levels(full), float(view["Close"].iloc[-1]))
-    st.plotly_chart(build_price_chart(view, pick, lv, detect_signals(full, last_n=DISPLAY_BARS)),
-                    width="stretch")
+    # Quick chart of any listed stock, with levels, Gann lines and pattern markers
+    listed = list(dict.fromkeys([r["Ticker"] for r in pattern_rows] + [r["Ticker"] for r in near_rows]))
+    if listed:
+        pick = st.selectbox("View chart", listed, key=f"scan_pick_{market.key}")
+        full = add_indicators(frames[pick])
+        view = full.tail(DISPLAY_BARS)
+        ref = float(view["Close"].iloc[-1])
+        st.plotly_chart(build_price_chart(view, pick, select_levels(compute_levels(full), ref),
+                                          detect_signals(full, last_n=DISPLAY_BARS),
+                                          gann_odd_squares(ref, 1)),
+                        width="stretch", key=f"scanner_chart_{pick}")
 
 
 def render_trading_tab(market: MarketConfig, ticker: str) -> None:
