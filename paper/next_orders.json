@@ -4,19 +4,16 @@
     "close": 55918.0,
     "prev_top": 55778.2,
     "prev_bottom": 55480.8,
-    "position": "LONG from 55,274.60 (2026-10-09)",
+    "position": "FLAT",
     "orders": [
-      "HOLD long. Stop: Sell below 55,456 \u2014 system point (exit & REVERSE)",
-      "Move SL to breakeven (55,275) once price reaches 56,380",
+      "No Buy trade as awaiting new top",
+      "Sell below -25 @ 55,456 (Prev Bottom 55,480.80); if triggers keep 1% SL at 56,010",
       "Gap > 2% beyond a level at the open: exit only, no new trade (let the market settle)"
     ],
     "lines": {
-      "Entry": 55274.6,
-      "Stop-loss (reverse)": 55455.8,
-      "Breakeven trigger": 56380.092
+      "Sell below": 55455.8,
+      "Sell SL (1st day)": 56010.358
     },
-    "open_pnl": 643.4,
-    "breakeven_active": "False",
     "futures_contract_expiry": "2026-10-27",
     "lot_size": 30,
     "spot_close": 55844.0
