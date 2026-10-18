@@ -33,11 +33,12 @@ MODES = {
 
 LOCAL = {"Bank Nifty FUTURES 2017 (NSE bhavcopy)": "data/banknifty_fut_near_2016-2018.csv",
          "Bank Nifty FUTURES 2007–2022 (NSE bhavcopy)": "data/banknifty_fut_near_2007-2022.csv"}
-SYMBOLS = {"Bank Nifty — live (^NSEBANK)": "^NSEBANK", "Nifty 50 — live (^NSEI)": "^NSEI",
+SYMBOLS = {"Bank Nifty FUTURES — NSE 2007→now": "FUT:BANKNIFTY", "Nifty FUTURES — NSE 2007→now": "FUT:NIFTY",
+           "Bank Nifty — live (^NSEBANK)": "^NSEBANK", "Nifty 50 — live (^NSEI)": "^NSEI",
            "Fin Nifty — live (NIFTY_FIN_SERVICE.NS)": "NIFTY_FIN_SERVICE.NS",
            "Bank Nifty FUTURES 2007–2022 (NSE bhavcopy)": "BNF_FUT_ALL",
            "Bank Nifty FUTURES 2017 (NSE bhavcopy)": "BNF_FUT"}
-DEFAULT_BUFFER = {"^NSEBANK": 25.0, "BNF_FUT_ALL": 25.0, "BNF_FUT": 25.0, "^NSEI": 10.0,
+DEFAULT_BUFFER = {"FUT:BANKNIFTY": 25.0, "FUT:NIFTY": 10.0, "^NSEBANK": 25.0, "BNF_FUT_ALL": 25.0, "BNF_FUT": 25.0, "^NSEI": 10.0,
                   "NIFTY_FIN_SERVICE.NS": 10.0}
 
 import os as _os, sys as _sys
@@ -87,6 +88,14 @@ def _next_session_panel(df: pd.DataFrame, tr: pd.DataFrame, lp, name: str) -> di
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_history(symbol: str) -> tuple[pd.DataFrame, str]:
+    if symbol.startswith("FUT:"):
+        import os
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "futures",
+                            symbol[4:].replace("&", "_") + ".csv")
+        if not os.path.exists(path):
+            return pd.DataFrame(), f"No futures file for {symbol[4:]}"
+        d = pd.read_csv(path, index_col=0, parse_dates=True)
+        return d[["Open", "High", "Low", "Close"]], ""
     if symbol in ("BNF_FUT", "BNF_FUT_ALL"):
         import os
         key = "Bank Nifty FUTURES 2017 (NSE bhavcopy)" if symbol == "BNF_FUT" else "Bank Nifty FUTURES 2007–2022 (NSE bhavcopy)"
@@ -228,9 +237,22 @@ def render_topbottom_tab(stocks: tuple[str, ...] | None = None) -> None:
     extra = ("AXISBANK.NS", "TATASTEEL.NS", "RELINFRA.NS", "SHRIRAMFIN.NS", "MANAPPURAM.NS")
     stock_list = sorted(set(stocks) | set(extra))
     stock_labels = {f"{s_.replace('.NS', '')} (stock)": s_ for s_ in stock_list}
-    group = c1.radio("Show", ["Indices", "Nifty 50 stocks", "Custom symbol"], horizontal=True, key="tb_group")
-    if group == "Indices":
-        choice = c1.selectbox("Instrument", list(SYMBOLS), key="tb_sym")
+    import os as __os
+    fut_dir = __os.path.join(__os.path.dirname(__os.path.abspath(__file__)), "data", "futures")
+    fut_syms = sorted(f[:-4].replace("M_M", "M&M") for f in (__os.listdir(fut_dir) if __os.path.isdir(fut_dir) else [])
+                      if f.endswith(".csv") and f[:-4] not in ("BANKNIFTY", "NIFTY", "FINNIFTY"))
+    group = c1.radio("Show", ["Indices", "Stock futures (NSE)", "Nifty 50 stocks", "Custom symbol"],
+                     horizontal=True, key="tb_group")
+    if group == "Stock futures (NSE)":
+        if not fut_syms:
+            st.info("Stock futures history is being built — check back shortly.")
+            return
+        choice = c1.selectbox(f"Stock futures ({len(fut_syms)})", [f"{s_} FUT" for s_ in fut_syms], key="tb_fut")
+        symbol = "FUT:" + choice[:-4]
+    elif group == "Indices":
+        avail = [k for k, v in SYMBOLS.items()
+                 if not v.startswith("FUT:") or __os.path.exists(__os.path.join(fut_dir, v[4:] + ".csv"))]
+        choice = c1.selectbox("Instrument", avail, key="tb_sym")
         symbol = SYMBOLS[choice]
     elif group == "Nifty 50 stocks":
         choice = c1.selectbox(f"Stock ({len(stock_labels)})", list(stock_labels), key="tb_stock")
@@ -240,7 +262,8 @@ def render_topbottom_tab(stocks: tuple[str, ...] | None = None) -> None:
         choice = symbol
     mode = c2.selectbox("Execution model", list(MODES), key="tb_mode",
                         help="\n\n".join(f"**{k}** — {v['help']}" for k, v in MODES.items()))
-    is_stock = not symbol.startswith("^") and symbol not in ("BNF_FUT", "BNF_FUT_ALL", "NIFTY_FIN_SERVICE.NS")
+    is_stock = not symbol.startswith("^") and symbol not in ("BNF_FUT", "BNF_FUT_ALL", "NIFTY_FIN_SERVICE.NS",
+                                                             "FUT:BANKNIFTY", "FUT:NIFTY", "FUT:FINNIFTY")
     kind = c3.radio("Rules", ["Index", "Stock"], index=1 if is_stock else 0, key=f"tb_kind_{is_stock}",
                     help="Stock = 1.5% entry-day SL, 3% max SL, 3% breakeven.")
 
@@ -325,7 +348,7 @@ def render_topbottom_tab(stocks: tuple[str, ...] | None = None) -> None:
             st.dataframe(g, width="stretch")
             st.bar_chart(g["Points"])
     with t2:
-        if symbol not in ("^NSEBANK", "BNF_FUT", "BNF_FUT_ALL"):
+        if symbol not in ("^NSEBANK", "BNF_FUT", "BNF_FUT_ALL", "FUT:BANKNIFTY"):
             st.info("The reference sheet is for Bank Nifty — choose Bank Nifty to validate.")
         else:
             st.caption("Near-month futures from NSE bhavcopies (Nov 2016–Jan 2018): should match the sheet "
