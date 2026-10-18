@@ -1,11 +1,15 @@
 [project]
-name = "blank-app-template"
+name = "trading-terminal"
 version = "0.1.0"
-description = "A simple Streamlit app template."
+description = "Global trading terminal (US/ASX/NSE) - Streamlit + yfinance paper trading"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "streamlit>=1.61.1",
+    "yfinance>=0.2.50",
+    "plotly>=5.20",
+    "pandas>=2.1",
+    "numpy>=1.26",
 ]
 
 [tool.uv]
