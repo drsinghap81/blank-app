@@ -3,8 +3,13 @@ import os
 import yfinance as yf
 
 os.makedirs("data", exist_ok=True)
-for sym, name in [("^NSEBANK", "banknifty"), ("^NSEI", "nifty"), ("RELIANCE.NS", "reliance"), ("MANAPPURAM.NS", "manappuram")]:
-    df = yf.download(sym, start="2005-01-01", interval="1d", auto_adjust=False, progress=False)
+for sym, name in [("^NSEBANK", "banknifty"), ("^NSEI", "nifty"), ("RELIANCE.NS", "reliance"), ("MANAPPURAM.NS", "manappuram"), ("AXISBANK.NS", "axisbank"), ("TATASTEEL.NS", "tatasteel"), ("RELINFRA.NS", "relinfra"), ("RELCAPITAL.NS", "relcap"), ("SRTRANSFIN.NS", "srtransfin"), ("SHRIRAMFIN.NS", "shriramfin")]:
+    try:
+        df = yf.download(sym, start="2005-01-01", interval="1d", auto_adjust=False, progress=False)
+    except Exception as e:
+        print(sym, "failed", e); continue
+    if df is None or df.empty:
+        print(sym, "empty"); continue
     if hasattr(df.columns, "levels"):
         df.columns = df.columns.get_level_values(0)
     df = df[["Open", "High", "Low", "Close"]].dropna().round(2)
