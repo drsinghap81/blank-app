@@ -1,0 +1,32 @@
+name: probe-nse
+on:
+  push:
+    paths: [".github/workflows/probe-nse.yml"]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p probe
+          python3 - <<'PY' > probe/out.txt 2>&1
+          import requests, io, zipfile
+          s=requests.Session(); s.headers.update({"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36","Referer":"https://www.nseindia.com/"})
+          try: print("home", s.get("https://www.nseindia.com", timeout=20).status_code)
+          except Exception as e: print("home err", e)
+          for d in ["20261016","20261015"]:
+              for u in [f"https://nsearchives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_{d}_F_0000.csv.zip",
+                        f"https://archives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_{d}_F_0000.csv.zip"]:
+                  try:
+                      r=s.get(u,timeout=30); print(u, r.status_code, len(r.content), r.content[:2])
+                      if r.content[:2]==b"PK":
+                          z=zipfile.ZipFile(io.BytesIO(r.content)); t=z.open(z.namelist()[0]).read().decode()
+                          lines=t.splitlines(); print(lines[0]); print([l for l in lines if ",BANKNIFTY," in l and ",IDF," in l][:3])
+                  except Exception as e: print(u, "err", e)
+          PY
+          cat probe/out.txt
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout -B probe-out; git add -f probe; git commit -m probe || exit 0; git push -f origin probe-out
