@@ -303,7 +303,8 @@ def next_orders(df: pd.DataFrame, t: pd.DataFrame, p: Params) -> dict:
     top, bot, last = T[-1], B[-1], c[-1]
     bt = (top * p.buffer_pct / 100) if p.buffer_pct is not None else p.buffer_pts
     bb = (bot * p.buffer_pct / 100) if p.buffer_pct is not None else p.buffer_pts
-    out = dict(date=df.index[-1], close=last, prev_top=top, prev_bottom=bot, position="FLAT", orders=[])
+    out = dict(date=df.index[-1], close=last, prev_top=top, prev_bottom=bot, position="FLAT", orders=[],
+               lines={})  # numeric levels for charting: name -> price
     used_top = used_bot = False
     if p.use_once and not t.empty:
         tol = 1e-6
@@ -328,6 +329,8 @@ def next_orders(df: pd.DataFrame, t: pd.DataFrame, p: Params) -> dict:
             if stop2 != stop:
                 stop, kind = stop2, "breakeven SL (exit only)"
         out["position"] = f"{'LONG' if side > 0 else 'SHORT'} from {ent:,.2f} ({pd.Timestamp(r.EntryDate).date()})"
+        out["lines"]["Entry"] = ent
+        out["lines"]["Stop-loss" + (" (reverse)" if stop == sysl else "")] = stop
         out["open_pnl"] = round((last - ent) * side, 2)
         out["breakeven_active"] = be_on
         word = "Sell" if side > 0 else "Buy"
@@ -337,17 +340,21 @@ def next_orders(df: pd.DataFrame, t: pd.DataFrame, p: Params) -> dict:
             # the opposite entry order still rests at the system point
             lvl, used = ((bot - bb), used_bot) if side > 0 else ((top + bt), used_top)
             if not used:
+                out["lines"]["Sell entry" if side > 0 else "Buy entry"] = lvl
                 out["orders"].append(f"Separate {'sell' if side > 0 else 'buy'}-stop entry at {lvl:,.0f} "
                                      f"(Prev {'Bottom' if side > 0 else 'Top'}); if it triggers keep "
                                      f"{p.day_sl_pct:g}% SL at {lvl * (1 + side * p.day_sl_pct / 100):,.0f}")
         if not be_on:
             be_px = ent * (1 + side * p.be_pct / 100)
+            out["lines"]["Breakeven trigger"] = be_px
             out["orders"].append(f"Move SL to breakeven ({ent:,.0f}) once price reaches {be_px:,.0f}")
     else:
         if np.isnan(top) or used_top:
             out["orders"].append("No Buy trade as awaiting new top")
         else:
             bl = top + bt
+            out["lines"]["Buy above"] = bl
+            out["lines"]["Buy SL (1st day)"] = bl * (1 - p.day_sl_pct / 100)
             out["orders"].append(f"Buy above +{bt:.4g} @ {bl:,.0f} (Prev Top {top:,.2f}); if triggers keep "
                                  f"{p.day_sl_pct:g}% SL at {bl * (1 - p.day_sl_pct / 100):,.0f}")
         if p.long_only:
@@ -356,6 +363,8 @@ def next_orders(df: pd.DataFrame, t: pd.DataFrame, p: Params) -> dict:
             out["orders"].append("No Sell trade as awaiting new bottom")
         else:
             sl = bot - bb
+            out["lines"]["Sell below"] = sl
+            out["lines"]["Sell SL (1st day)"] = sl * (1 + p.day_sl_pct / 100)
             out["orders"].append(f"Sell below -{bb:.4g} @ {sl:,.0f} (Prev Bottom {bot:,.2f}); if triggers keep "
                                  f"{p.day_sl_pct:g}% SL at {sl * (1 + p.day_sl_pct / 100):,.0f}")
     out["orders"].append(f"Gap > {p.gap_pct:g}% beyond a level at the open: exit only, no new trade "

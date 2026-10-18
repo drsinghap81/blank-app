@@ -45,7 +45,26 @@ _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 
 import topbottom_backtest as tbb  # noqa: E402  (single source of truth for the live rules)
 
 
-def _next_session_panel(df: pd.DataFrame, tr: pd.DataFrame, lp, name: str) -> None:
+LINE_STYLE = {  # name -> (colour, dash)
+    "Buy above": ("#00e676", "solid"), "Buy SL (1st day)": ("#00e676", "dot"),
+    "Sell below": ("#ff5252", "solid"), "Sell SL (1st day)": ("#ff5252", "dot"),
+    "Entry": ("#90caf9", "dash"), "Stop-loss": ("#ffb300", "solid"),
+    "Stop-loss (reverse)": ("#ffb300", "solid"), "Breakeven trigger": ("#b39ddb", "dot"),
+    "Buy entry": ("#00e676", "dash"), "Sell entry": ("#ff5252", "dash"),
+}
+
+
+def _add_level_lines(fig: go.Figure, lines: dict) -> None:
+    for name, y in lines.items():
+        if y is None or np.isnan(y):
+            continue
+        col, dash = LINE_STYLE.get(name, ("#bbbbbb", "dot"))
+        fig.add_hline(y=y, line=dict(color=col, dash=dash, width=1.6 if dash == "solid" else 1.1),
+                      annotation_text=f"{name}  {y:,.0f}", annotation_position="right",
+                      annotation_font=dict(color=col, size=11))
+
+
+def _next_session_panel(df: pd.DataFrame, tr: pd.DataFrame, lp, name: str) -> dict:
     o = tbb.next_orders(df, tr, lp)
     nxt = (df.index[-1] + pd.offsets.BDay(1)).date()
     st.markdown(f"##### 🧭 Next session ({nxt}) — {name}")
@@ -60,6 +79,7 @@ def _next_session_panel(df: pd.DataFrame, tr: pd.DataFrame, lp, name: str) -> No
         st.info(box)
     else:
         st.success(f"Open P/L: {o['open_pnl']:+,.0f} points" + ("  •  breakeven SL active" if o.get("breakeven_active") else "") + "\n\n" + box)
+    st.session_state["_tb_lines"] = o["lines"]
     st.caption("Levels come from the daily close line of the selected series. Live = Yahoo index (spot) data, "
                "updated after each close; your futures levels differ by the futures premium, so apply the same "
                "logic to the futures chart or add the premium. Not investment advice.")
@@ -220,13 +240,19 @@ def render_topbottom_tab() -> None:
         tr = run_tuned(df, buffer_pct=0.25, max_stop_pct=max_stop, long_only=True, swing_pct=swing)
     else:
         tr = run_topbottom(df, p)
+    st.session_state.setdefault("_tb_lines", {})
     if not m.get("live"):
+        st.session_state["_tb_lines"] = {}
         _status(df, tr, p)
 
     bars = st.radio("Chart window", {"3 months": 63, "6 months": 126, "1 year": 252, "3 years": 756}.keys(),
                     index=1, horizontal=True, key="tb_win")
     nb = {"3 months": 63, "6 months": 126, "1 year": 252, "3 years": 756}[bars]
-    st.plotly_chart(_chart(df, tr, p, nb), width="stretch")
+    fig = _chart(df, tr, p, nb)
+    fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
+    _add_level_lines(fig, st.session_state.get("_tb_lines", {}))
+    fig.update_layout(margin=dict(l=10, r=150, t=30, b=10))
+    st.plotly_chart(fig, width="stretch")
 
     s = _stats(tr)
     if s:
