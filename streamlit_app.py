@@ -39,7 +39,29 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from topbottom_tab import render_topbottom_tab
+import importlib as _importlib
+import os as _os
+import sys as _sys
+
+
+def _fresh(modname: str):
+    """Streamlit Cloud can keep an old copy of a helper module in memory after a
+    git update; reload it whenever its file has changed on disk."""
+    mod = _sys.modules.get(modname)
+    if mod is None:
+        mod = _importlib.import_module(modname)
+    else:
+        mt = _os.path.getmtime(mod.__file__)
+        if getattr(mod, "_loaded_mtime", None) not in (None, mt):
+            mod = _importlib.reload(mod)
+    mod._loaded_mtime = _os.path.getmtime(mod.__file__)
+    return mod
+
+
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "tools"))
+for _m in ("topbottom", "topbottom_backtest", "topbottom_tab"):
+    _fresh(_m)
+from topbottom_tab import render_topbottom_tab  # noqa: E402
 
 try:  # yfinance is optional at import time so the app still loads without it
     import yfinance as yf
@@ -1364,7 +1386,7 @@ def main() -> None:
         render_backtest_tab(market)
     with tab_tb:
         st.session_state["_nse_watchlist"] = tuple(MARKETS["India (NSE)"].watchlist)
-        render_topbottom_tab()
+        _sys.modules["topbottom_tab"].render_topbottom_tab()
     with tab2:
         render_trading_tab(market, ticker)
     with tab3:
