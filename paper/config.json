@@ -14,5 +14,6 @@
     "gap_pct": 2.0,
     "use_once": true
   },
-  "cost_pct_round_trip": 0.05
+  "cost_pct_round_trip": 0.05,
+  "join_existing_position": false
 }

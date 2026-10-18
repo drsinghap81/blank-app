@@ -75,6 +75,8 @@ class Params:
     swing_pct: float = 0.0      # optional glitch filter (0 = pure 1-day turns, as validated)
     cost_pts: float = 0.0       # round-trip cost per trade, in points
     lot: float = 1.0            # multiply points by lot size for rupee P&L
+    start_flat_on: str | None = None  # live: be flat from this date and wait for a FRESH signal
+                                      # (levels already traded stay used, e.g. "awaiting new top")
 
     @classmethod
     def for_stocks(cls, **kw):
@@ -150,7 +152,25 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
         if (side > 0 and c[i] <= stop) or (side < 0 and c[i] >= stop):
             close_pos(i, stop, "Entry-day SL")
 
+    sf = pd.Timestamp(p.start_flat_on) if p.start_flat_on else None
+    flat_done = False
     for i in range(1, n):
+        if sf is not None and not flat_done and idx[i] >= sf:
+            flat_done = True
+            if pos != 0:          # drop the position the system was holding: we start flat
+                trades.pop()
+                pos = 0
+            # a top/bottom that price has ALREADY broken is spent: wait for a fresh one
+            for lvl_arr, is_top in ((T, True), (B, False)):
+                v = lvl_arr[i - 1]
+                if np.isnan(v):
+                    continue
+                k = int(np.argmax(lvl_arr[:i] == v))  # bar on which this level was confirmed
+                seg_h, seg_l = h[k + 1:i], l[k + 1:i]
+                if is_top and len(seg_h) and seg_h.max() >= v + buf(v):
+                    used_T = v
+                if not is_top and len(seg_l) and seg_l.min() <= v - buf(v):
+                    used_B = v
         top, bot = T[i - 1], B[i - 1]
         buy_lvl = top + buf(top) if (not np.isnan(top) and (not p.use_once or top != used_T)) else np.nan
         sell_lvl = bot - buf(bot) if (not np.isnan(bot) and (not p.use_once or bot != used_B)) else np.nan
@@ -210,7 +230,10 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
             px = min(o[i], sell_lvl)
             open_pos(i, -1, px, "Sell below prev bottom")
             day_stop_check(i, -1, px)
-    return _finish(trades, c, idx, p)
+    out = _finish(trades, c, idx, p)
+    out.attrs["used_T"], out.attrs["used_B"] = used_T, used_B
+    out.attrs["flat_from"] = p.start_flat_on
+    return out
 
 
 # ============================================================================
@@ -306,13 +329,22 @@ def next_orders(df: pd.DataFrame, t: pd.DataFrame, p: Params) -> dict:
     out = dict(date=df.index[-1], close=last, prev_top=top, prev_bottom=bot, position="FLAT", orders=[],
                lines={})  # numeric levels for charting: name -> price
     used_top = used_bot = False
-    if p.use_once and not t.empty:
+    if p.use_once and "used_T" in t.attrs:
+        used_top = (not np.isnan(top)) and t.attrs["used_T"] == top
+        used_bot = (not np.isnan(bot)) and t.attrs["used_B"] == bot
+    elif p.use_once and not t.empty:
         tol = 1e-6
         used_top = any(abs(e - (top + bt)) < tol for e in t.loc[t.Side == "BUY", "Entry"]) or \
             any(abs(x - (top + bt)) < tol for x in t.loc[t.Side == "SELL", "Exit"])
         used_bot = any(abs(e - (bot - bb)) < tol for e in t.loc[t.Side == "SELL", "Entry"]) or \
             any(abs(x - (bot - bb)) < tol for x in t.loc[t.Side == "BUY", "Exit"])
     is_open = not t.empty and bool(t.iloc[-1]["Open"])
+    if p.start_flat_on and pd.Timestamp(p.start_flat_on) > df.index[-1]:
+        # paper account starts flat on the next session: re-run as if flat from now
+        is_open = False
+        tmp = run_live(pd.concat([df, df.iloc[[-1]].set_axis([pd.Timestamp(p.start_flat_on)])]), p)
+        used_top = (not np.isnan(top)) and tmp.attrs.get("used_T") == top
+        used_bot = (not np.isnan(bot)) and tmp.attrs.get("used_B") == bot
     if is_open:
         r = t.iloc[-1]
         side = 1 if r.Side == "BUY" else -1

@@ -40,6 +40,7 @@ IST = timezone(timedelta(hours=5, minutes=30))
 
 DEFAULT_CFG = {
     "start_date": "2026-10-19",          # paper trading starts on this session
+    "join_existing_position": False,     # False = start flat, wait for a fresh top/bottom break
     "backfill_start": "2026-03-02",      # history needed to warm up tops/bottoms
     "instruments": {
         "BANKNIFTY": {"buffer_pts": 25, "lots": 1},
@@ -145,8 +146,10 @@ def roll_adjustment(h: pd.DataFrame, side: int, entry_date, exit_date) -> float:
 
 def build_ledger(sym: str, h: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, dict, tbb.Params, pd.DataFrame]:
     inst, rules = cfg["instruments"][sym], cfg["rules"]
+    join = cfg.get("join_existing_position", False)
     p = tbb.Params(buffer_pts=inst["buffer_pts"], day_sl_pct=rules["day_sl_pct"], max_sl_pct=rules["max_sl_pct"],
-                   be_pct=rules["be_pct"], gap_pct=rules["gap_pct"], use_once=rules["use_once"])
+                   be_pct=rules["be_pct"], gap_pct=rules["gap_pct"], use_once=rules["use_once"],
+                   start_flat_on=None if join else cfg["start_date"])
     df = h.copy()
     df.index = pd.to_datetime(df["Date"])
     ohlc = df[["Open", "High", "Low", "Close"]]
@@ -158,7 +161,7 @@ def build_ledger(sym: str, h: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, di
         t["ExitDate"] = pd.to_datetime(t["ExitDate"])
         # a position already open on the start date is joined at that day's open
         carried = t[(t["EntryDate"] < start) & ((t["ExitDate"] >= start) | t["Open"])]
-        if len(carried) and start in ohlc.index:
+        if join and len(carried) and start in ohlc.index:
             r = carried.iloc[-1].copy()
             r["Entry"] = float(ohlc.loc[start, "Open"])
             r["EntryDate"] = start
