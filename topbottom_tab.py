@@ -22,12 +22,17 @@ MODES = {
                                          "(or at the open on a gap)."),
 }
 
-SYMBOLS = {"Bank Nifty (^NSEBANK)": "^NSEBANK", "Nifty 50 (^NSEI)": "^NSEI",
+LOCAL = {"Bank Nifty FUTURES 2017 (NSE bhavcopy)": "data/banknifty_fut_near_2016-2018.csv"}
+SYMBOLS = {"Bank Nifty FUTURES 2017 (NSE bhavcopy)": "BNF_FUT", "Bank Nifty (^NSEBANK)": "^NSEBANK", "Nifty 50 (^NSEI)": "^NSEI",
            "Fin Nifty (NIFTY_FIN_SERVICE.NS)": "NIFTY_FIN_SERVICE.NS"}
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_history(symbol: str) -> tuple[pd.DataFrame, str]:
+    if symbol == "BNF_FUT":
+        import os
+        path = os.path.join(os.path.dirname(__file__), LOCAL["Bank Nifty FUTURES 2017 (NSE bhavcopy)"])
+        return pd.read_csv(path, index_col=0, parse_dates=True), ""
     try:
         df = yf.download(symbol, period="max", interval="1d", auto_adjust=False, progress=False)
         if df is None or df.empty:
@@ -188,10 +193,13 @@ def render_topbottom_tab() -> None:
             st.dataframe(g, width="stretch")
             st.bar_chart(g["Points"])
     with t2:
-        if symbol != "^NSEBANK":
+        if symbol not in ("^NSEBANK", "BNF_FUT"):
             st.info("The reference sheet is for Bank Nifty — choose Bank Nifty to validate.")
         else:
-            st.caption("Sheet = Bank Nifty futures; here = Bank Nifty spot, so prices sit ~25–75 points "
+            st.caption("Near-month futures from NSE bhavcopies (Nov 2016–Jan 2018): should match the sheet "
+                       "to the point. Only differs on 10/11 May 2017, where two near-equal closes form the "
+                       "top and the sheet picked the later one." if symbol == "BNF_FUT" else
+                       "Sheet = Bank Nifty futures; here = Bank Nifty spot, so prices sit ~25–75 points "
                        "lower and a few borderline days can differ. Monthly P/L is booked by entry month, "
                        "as in the sheet.")
             st.markdown("**2017 trade log — sheet vs this run**")
