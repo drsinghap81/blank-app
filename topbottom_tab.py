@@ -185,6 +185,37 @@ def _ref_grid(tr: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows).set_index("Year")
 
 
+def _paper_panel() -> None:
+    import json
+    base = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "paper")
+    sp, lp_, op = (_os.path.join(base, f) for f in ("summary.json", "ledger.csv", "next_orders.json"))
+    if not _os.path.exists(sp):
+        st.info("Paper trading starts with the first evening run after the 19 Oct 2026 session "
+                "(GitHub job at ~7:10 pm IST). Results will appear here automatically.")
+        return
+    s = json.load(open(sp))
+    st.caption(f"Bank Nifty & Nifty near-month futures, 1 lot each, live rules, est. costs included. "
+               f"Started {s['start_date']} • updated {s['updated_ist']} IST • no real orders are placed.")
+    k = st.columns(4)
+    k[0].metric("Realised P&L", f"₹{s['realised_net']:,.0f}")
+    k[1].metric("Open P&L (MTM)", f"₹{s['open_mtm_net']:,.0f}")
+    k[2].metric("Trades", s["trades"], f"{s['winners']} W / {s['losers']} L", delta_color="off")
+    k[3].metric("Total", f"₹{s['realised_net'] + s['open_mtm_net']:,.0f}")
+    if _os.path.exists(op):
+        o = json.load(open(op))
+        for sym, v in o.items():
+            with st.container(border=True):
+                st.markdown(f"**{sym} FUT** ({v.get('futures_contract_expiry')} expiry, lot {v.get('lot_size')}) — "
+                            f"close {float(v['close']):,.2f} • {v['position']}")
+                st.markdown("\n".join(f"- {x}" for x in v["orders"]))
+    if _os.path.exists(lp_):
+        led = pd.read_csv(lp_)
+        if len(led):
+            cols = [c for c in ["Instrument", "EntryDate", "Side", "Entry", "ExitDate", "Exit", "Reason",
+                                "Points", "Qty", "Gross", "Costs", "Net", "Status"] if c in led]
+            st.dataframe(led[cols].iloc[::-1], width="stretch", hide_index=True)
+
+
 def render_topbottom_tab() -> None:
     st.markdown("#### Top Bottom System — closing-line tops & bottoms (stop-and-reverse)")
     st.caption("Tops/bottoms = turning points of the daily close. Buy when price is above the last top, "
@@ -260,7 +291,9 @@ def render_topbottom_tab() -> None:
         for col, (k, v) in zip(cols, s.items()):
             col.metric(k, v)
 
-    t1, t2, t3 = st.tabs(["📅 Yearly", "✅ Validate vs sheet", "📜 Trades"])
+    t0, t1, t2, t3 = st.tabs(["📒 Paper trading", "📅 Yearly", "✅ Validate vs sheet", "📜 Trades"])
+    with t0:
+        _paper_panel()
     with t1:
         if not tr.empty:
             y = tr.assign(Year=pd.to_datetime(tr["EntryDate"]).dt.year,

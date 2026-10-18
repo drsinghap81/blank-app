@@ -1,0 +1,22 @@
+{
+  "start_date": "2026-10-19",
+  "backfill_start": "2026-03-02",
+  "instruments": {
+    "BANKNIFTY": {
+      "buffer_pts": 25,
+      "lots": 1
+    },
+    "NIFTY": {
+      "buffer_pts": 10,
+      "lots": 1
+    }
+  },
+  "rules": {
+    "day_sl_pct": 1.0,
+    "max_sl_pct": 2.0,
+    "be_pct": 2.0,
+    "gap_pct": 2.0,
+    "use_once": true
+  },
+  "cost_pct_round_trip": 0.05
+}
