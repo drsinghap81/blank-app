@@ -10,7 +10,10 @@ try:
 except Exception as e:
     print("home", e)
 rows, miss = [], []
-for d in pd.bdate_range("2016-11-01", "2018-01-31"):
+import sys
+START, END, OUT = (sys.argv[1:4] if len(sys.argv) > 3 else ("2016-11-01", "2018-01-31", "data/banknifty_fut_2017.csv"))
+SYMS = {"BANKNIFTY", "NIFTY", "AXISBANK", "TATASTEEL", "RELCAPITAL", "RELINFRA", "SRTRANSFIN"}
+for d in pd.bdate_range(START, END):
     mon = d.strftime("%b").upper()
     fn = f"fo{d.strftime('%d')}{mon}{d.year}bhav.csv.zip"
     url = f"https://archives.nseindia.com/content/historical/DERIVATIVES/{d.year}/{mon}/{fn}"
@@ -25,11 +28,11 @@ for d in pd.bdate_range("2016-11-01", "2018-01-31"):
     z = zipfile.ZipFile(io.BytesIO(r.content))
     df = pd.read_csv(z.open(z.namelist()[0]))
     df.columns = [c.strip() for c in df.columns]
-    df = df[(df.INSTRUMENT == "FUTIDX") & (df.SYMBOL == "BANKNIFTY")]
-    df = df.assign(Date=d.date())[["Date", "EXPIRY_DT", "OPEN", "HIGH", "LOW", "CLOSE", "SETTLE_PR", "CONTRACTS", "OPEN_INT"]]
+    df = df[df.INSTRUMENT.isin(["FUTIDX", "FUTSTK"]) & df.SYMBOL.isin(SYMS)]
+    df = df.assign(Date=d.date())[["Date", "SYMBOL", "EXPIRY_DT", "OPEN", "HIGH", "LOW", "CLOSE", "SETTLE_PR", "CONTRACTS", "OPEN_INT"]]
     rows.append(df)
-    time.sleep(0.3)
+    time.sleep(0.15)
 os.makedirs("data", exist_ok=True)
 out = pd.concat(rows) if rows else pd.DataFrame()
-out.to_csv("data/banknifty_fut_2017.csv", index=False)
+out.to_csv(OUT, index=False)
 print("rows", len(out), "missing days", len(miss), miss[:15])
