@@ -303,7 +303,7 @@ def main():
     wa = whatsapp_message(orders_all, summary, led, cfg)
     open(os.path.join(PAPER, "whatsapp.txt"), "w").write(wa)
     if os.environ.get("SEND_TELEGRAM", "1") == "1":
-        telegram(text.replace("*", ""))
+        telegram(wa.replace("*", "").replace("_", ""))
         whatsapp(wa)
 
 
