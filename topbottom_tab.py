@@ -7,10 +7,15 @@ import plotly.graph_objects as go
 import streamlit as st
 import yfinance as yf
 
-from topbottom import (TBParams, run_tuned, compare_to_reference, confirmed_swings, match_2017,
+from topbottom import (TBParams, run_tuned, run_live, compare_to_reference, confirmed_swings, match_2017,
                        monthly_points, ref_monthly_series, run_topbottom, tune)
 
 MODES = {
+    "Live rules — stop orders ±buffer, 1% day SL, levels used once": dict(trigger="intraday", fill="level",
+        safety=True, live=True,
+        help="Exactly how the daily calls are traded: buy-stop at prev top + buffer, sell-stop at prev "
+             "bottom − buffer, 1% SL on entry day, then SL at the opposite system point (max 2%), "
+             "breakeven after +2%, each top/bottom triggers once, >2% gap = no new trade."),
     "Tuned — long only, 0.25% buffer, 2% stop": dict(trigger="intraday", fill="level", safety=True, tuned=True,
         help="Tradable version found by walk-forward testing (tuned on 2007–16, tested on 2017–26): "
              "buy-stop 0.25% above the last top, sell-stop 0.25% below the last bottom or 2% max "
@@ -171,7 +176,10 @@ def render_topbottom_tab() -> None:
         st.error(f"Could not load {symbol}. {err}")
         return
 
-    if m.get("tuned"):
+    if m.get("live"):
+        buf = st.number_input("Entry buffer (points beyond top/bottom)", 0.0, 500.0, 25.0, 5.0, key="tb_buf")
+        tr = run_live(df, buf_pts=buf, day_sl=day_stop, max_sl=max_stop, be=be, gap=gap)
+    elif m.get("tuned"):
         st.caption(f"Tuned mode uses: buffer 0.25%, max stop {max_stop}%, long only, glitch filter {swing}%.")
         tr = run_tuned(df, buffer_pct=0.25, max_stop_pct=max_stop, long_only=True, swing_pct=swing)
     else:

@@ -352,3 +352,78 @@ def run_tuned(df: pd.DataFrame, buffer_pct: float = 0.25, max_stop_pct: float = 
     sign = np.where(out["Side"] == "BUY", 1, -1)
     out["Points"] = (out["Exit"] - out["Entry"]) * sign
     return out
+
+
+# --------------------------------------------------------------------------
+# Live-call rules (as published daily): stop orders at prev top + buffer /
+# prev bottom - buffer, 1% SL on entry day, each top/bottom used once.
+# --------------------------------------------------------------------------
+def run_live(df, buf_pts=25.0, buf_pct=None, day_sl=1.0, max_sl=2.0, be=2.0, gap=2.0,
+             use_once=True, reverse=True, longonly=False):
+    """Live-style Top Bottom: stop orders at prev top + buf / prev bottom - buf (intraday),
+    1% SL on entry day, then SL = system point capped at max_sl%, breakeven after +be%.
+    Each top/bottom triggers at most once. Gap > gap% beyond the order -> exit only."""
+    o,h,l,c=(df[k].to_numpy(float) for k in ('Open','High','Low','Close'))
+    T,B,_=confirmed_swings(c,0.0); idx=df.index; n=len(c)
+    used_T=used_B=np.nan
+    pos=0; ent=0.0; ei=0; beon=False; tr=[]
+    def bf(x): return x*buf_pct/100 if buf_pct is not None else buf_pts
+    def close_pos(i,px,why):
+        nonlocal pos
+        tr[-1].update(xdate=idx[i],exit=px,why=why); pos=0
+    def open_pos(i,side,px):
+        nonlocal pos,ent,ei,beon
+        pos,ent,ei,beon=side,px,i,False
+        tr.append(dict(date=idx[i],side='BUY' if side>0 else 'SELL',entry=px))
+    for i in range(1,n):
+        top,bot=T[i-1],B[i-1]
+        buy_lvl = top+bf(top) if (not np.isnan(top) and (not use_once or top!=used_T)) else np.nan
+        sell_lvl= bot-bf(bot) if (not np.isnan(bot) and (not use_once or bot!=used_B)) else np.nan
+        # --- manage open position (stops from previous days) ---
+        if pos!=0 and i>ei:
+            prot = ent*(1-pos*max_sl/100)
+            if pos>0 and not np.isnan(bot): prot=max(prot, bot-bf(bot))
+            if pos<0 and not np.isnan(top): prot=min(prot, top+bf(top))
+            if beon: prot=max(prot,ent) if pos>0 else min(prot,ent)
+            if (pos>0 and l[i]<=prot) or (pos<0 and h[i]>=prot):
+                px=min(o[i],prot) if pos>0 else max(o[i],prot)
+                is_sys = (pos>0 and not np.isnan(sell_lvl) and abs(prot-sell_lvl)<1e-6) or \
+                         (pos<0 and not np.isnan(buy_lvl) and abs(prot-buy_lvl)<1e-6)
+                side=pos; close_pos(i,px,'system' if is_sys else ('BE' if beon else 'maxSL'))
+                if is_sys and reverse and not (longonly and side>0):
+                    lvl=sell_lvl if side>0 else buy_lvl
+                    gapped=abs(o[i]-lvl)/lvl*100>gap and ((side>0 and o[i]<lvl) or (side<0 and o[i]>lvl))
+                    if side>0: used_B=bot
+                    else: used_T=top
+                    if not gapped:
+                        open_pos(i,-side,px)
+                        if abs(c[i]-px)/px*100>=day_sl and ((-side>0 and c[i]<px) or (-side<0 and c[i]>px)):
+                            close_pos(i,px*(1-(-side)*day_sl/100),'daySL')
+                continue
+            fav=(h[i]-ent)/ent*100 if pos>0 else (ent-l[i])/ent*100
+            if be and fav>=be: beon=True
+            continue
+        if pos!=0: continue
+        # --- flat: resting entry orders ---
+        gl = not np.isnan(buy_lvl) and h[i]>=buy_lvl
+        gs = (not longonly) and not np.isnan(sell_lvl) and l[i]<=sell_lvl
+        if gl and gs:
+            gl = abs(o[i]-buy_lvl)<=abs(o[i]-sell_lvl); gs=not gl
+        if gl:
+            used_T=top
+            if o[i]>buy_lvl and (o[i]-buy_lvl)/buy_lvl*100>gap: continue
+            px=max(o[i],buy_lvl); open_pos(i,1,px)
+            if c[i]<=px*(1-day_sl/100): close_pos(i,px*(1-day_sl/100),'daySL')
+        elif gs:
+            used_B=bot
+            if o[i]<sell_lvl and (sell_lvl-o[i])/sell_lvl*100>gap: continue
+            px=min(o[i],sell_lvl); open_pos(i,-1,px)
+            if c[i]>=px*(1+day_sl/100): close_pos(i,px*(1+day_sl/100),'daySL')
+    t=pd.DataFrame(tr)
+    if t.empty: return t
+    if 'exit' not in t: t['exit']=np.nan
+    t['Open']=t['exit'].isna()
+    t['exit']=t['exit'].fillna(c[-1])
+    t['pts']=(t.exit-t.entry)*np.where(t.side=='BUY',1,-1)
+    return t.rename(columns={'date':'EntryDate','side':'Side','entry':'Entry','xdate':'ExitDate',
+                             'exit':'Exit','pts':'Points','why':'Reason'})
