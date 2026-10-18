@@ -216,7 +216,9 @@ def _paper_panel() -> None:
             st.dataframe(led[cols].iloc[::-1], width="stretch", hide_index=True)
 
 
-def render_topbottom_tab(stocks: tuple[str, ...] = ()) -> None:
+def render_topbottom_tab(stocks: tuple[str, ...] | None = None) -> None:
+    if stocks is None:
+        stocks = st.session_state.get("_nse_watchlist", ())
     st.markdown("#### Top Bottom System — closing-line tops & bottoms (stop-and-reverse)")
     st.caption("Tops/bottoms = turning points of the daily close. Buy when price is above the last top, "
                "sell when below the last bottom; the opposite point is the trailing stop. "

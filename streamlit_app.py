@@ -1363,7 +1363,8 @@ def main() -> None:
     with tab_bt:
         render_backtest_tab(market)
     with tab_tb:
-        render_topbottom_tab(MARKETS["India (NSE)"].watchlist)
+        st.session_state["_nse_watchlist"] = tuple(MARKETS["India (NSE)"].watchlist)
+        render_topbottom_tab()
     with tab2:
         render_trading_tab(market, ticker)
     with tab3:
