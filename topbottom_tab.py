@@ -216,18 +216,31 @@ def _paper_panel() -> None:
             st.dataframe(led[cols].iloc[::-1], width="stretch", hide_index=True)
 
 
-def render_topbottom_tab() -> None:
+def render_topbottom_tab(stocks: tuple[str, ...] = ()) -> None:
     st.markdown("#### Top Bottom System — closing-line tops & bottoms (stop-and-reverse)")
     st.caption("Tops/bottoms = turning points of the daily close. Buy when price is above the last top, "
                "sell when below the last bottom; the opposite point is the trailing stop. "
                "Results in index points per 1 unit (no lot size).")
 
     c1, c2, c3 = st.columns([2, 2, 1])
-    choice = c1.selectbox("Instrument", list(SYMBOLS) + ["Custom…"], key="tb_sym")
-    symbol = SYMBOLS.get(choice) or c1.text_input("Yahoo symbol", "^NSEBANK", key="tb_custom")
+    extra = ("AXISBANK.NS", "TATASTEEL.NS", "RELINFRA.NS", "SHRIRAMFIN.NS", "MANAPPURAM.NS")
+    stock_list = sorted(set(stocks) | set(extra))
+    stock_labels = {f"{s_.replace('.NS', '')} (stock)": s_ for s_ in stock_list}
+    group = c1.radio("Show", ["Indices", "Nifty 50 stocks", "Custom symbol"], horizontal=True, key="tb_group")
+    if group == "Indices":
+        choice = c1.selectbox("Instrument", list(SYMBOLS), key="tb_sym")
+        symbol = SYMBOLS[choice]
+    elif group == "Nifty 50 stocks":
+        choice = c1.selectbox(f"Stock ({len(stock_labels)})", list(stock_labels), key="tb_stock")
+        symbol = stock_labels[choice]
+    else:
+        symbol = c1.text_input("Yahoo symbol (NSE stocks end in .NS)", "RELIANCE.NS", key="tb_custom").strip()
+        choice = symbol
     mode = c2.selectbox("Execution model", list(MODES), key="tb_mode",
                         help="\n\n".join(f"**{k}** — {v['help']}" for k, v in MODES.items()))
-    kind = c3.radio("Type", ["Index", "Stock"], key="tb_kind", horizontal=False)
+    is_stock = not symbol.startswith("^") and symbol not in ("BNF_FUT", "BNF_FUT_ALL", "NIFTY_FIN_SERVICE.NS")
+    kind = c3.radio("Rules", ["Index", "Stock"], index=1 if is_stock else 0, key=f"tb_kind_{is_stock}",
+                    help="Stock = 1.5% entry-day SL, 3% max SL, 3% breakeven.")
 
     with st.expander("Fine-tune rules", expanded=False):
         m = MODES[mode]
@@ -258,12 +271,17 @@ def render_topbottom_tab() -> None:
         return
 
     if m.get("live"):
-        buf = st.number_input("Entry buffer (points beyond top/bottom)", 0.0, 500.0,
-                              DEFAULT_BUFFER.get(symbol, 25.0) if kind == "Index" else 0.0, 5.0,
-                              key=f"tb_buf_{symbol}_{kind}",
-                              help="Bank Nifty calls use +25 / -25. For stocks set a small value or 0.")
-        lp = tbb.Params(buffer_pts=buf, day_sl_pct=day_stop, max_sl_pct=max_stop, be_pct=be, gap_pct=gap,
-                        swing_pct=swing, cost_pts=cost)
+        if kind == "Index":
+            buf = st.number_input("Entry buffer (points beyond top/bottom)", 0.0, 500.0,
+                                  DEFAULT_BUFFER.get(symbol, 25.0), 5.0, key=f"tb_buf_{symbol}",
+                                  help="Bank Nifty calls use +25 / -25.")
+            buf_pct = None
+        else:
+            buf_pct = st.number_input("Entry buffer (% beyond top/bottom)", 0.0, 2.0, 0.1, 0.05,
+                                      key=f"tb_bufpct_{symbol}", help="For stocks a % buffer scales with price.")
+            buf = 0.0
+        lp = tbb.Params(buffer_pts=buf, buffer_pct=buf_pct, day_sl_pct=day_stop, max_sl_pct=max_stop, be_pct=be,
+                        gap_pct=gap, swing_pct=swing, cost_pts=cost)
         tr = tbb.run_live(df, lp)
         _next_session_panel(df, tr, lp, choice)
     elif m.get("tuned"):
