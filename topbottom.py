@@ -301,3 +301,54 @@ def tune(df: pd.DataFrame, base: TBParams, grid=(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7
                              near_2017=int((m17["Match"] != "❌").sum()),
                              **cmp_))
     return pd.DataFrame(rows)
+
+
+# --------------------------------------------------------------------------
+# Tuned, tradable variant (found by walk-forward test: tuned 2007-16, tested 2017-26)
+# --------------------------------------------------------------------------
+def run_tuned(df: pd.DataFrame, buffer_pct: float = 0.25, max_stop_pct: float = 2.0,
+              long_only: bool = True, swing_pct: float = 0.0) -> pd.DataFrame:
+    """Resting stop orders: buy-stop at last top * (1 + buffer), exit on a sell-stop at
+    last bottom * (1 - buffer) or the max stop, whichever is tighter. Fills at the stop
+    price, or at the open if the market gaps through it. Long-only by default."""
+    o, h, l, c = (df[k].to_numpy(float) for k in ("Open", "High", "Low", "Close"))
+    T, B, _ = confirmed_swings(c, swing_pct)
+    b = buffer_pct / 100
+    idx = df.index
+    trades, pos, ent, ent_i = [], 0, 0.0, 0
+    for i in range(1, len(c)):
+        top, bot = T[i - 1], B[i - 1]
+        if pos:
+            stop = bot * (1 - b) if pos > 0 else top * (1 + b)
+            if max_stop_pct:
+                ms = ent * (1 - pos * max_stop_pct / 100)
+                stop = ms if np.isnan(stop) else (max(stop, ms) if pos > 0 else min(stop, ms))
+            if (l[i] <= stop) if pos > 0 else (h[i] >= stop):
+                px = min(o[i], stop) if pos > 0 else max(o[i], stop)
+                trades[-1].update(ExitDate=idx[i], Exit=round(px, 2))
+                pos = 0
+            continue
+        lt, st_ = top * (1 + b), bot * (1 - b)
+        go_l = not np.isnan(top) and h[i] >= lt
+        go_s = (not long_only) and not np.isnan(bot) and l[i] <= st_
+        if go_l and go_s:
+            go_l = abs(o[i] - lt) <= abs(o[i] - st_)
+            go_s = not go_l
+        if go_l:
+            pos, ent, ent_i = 1, max(o[i], lt), i
+        elif go_s:
+            pos, ent, ent_i = -1, min(o[i], st_), i
+        else:
+            continue
+        trades.append(dict(EntryDate=idx[i], Side="BUY" if pos > 0 else "SELL", Entry=round(ent, 2),
+                           Signal="Stop order"))
+    out = pd.DataFrame(trades)
+    if out.empty:
+        return out
+    if "Exit" not in out:
+        out["Exit"] = np.nan
+    out["Open"] = out["Exit"].isna()
+    out["Exit"] = out["Exit"].fillna(round(c[-1], 2))
+    sign = np.where(out["Side"] == "BUY", 1, -1)
+    out["Points"] = (out["Exit"] - out["Entry"]) * sign
+    return out

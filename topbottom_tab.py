@@ -7,10 +7,14 @@ import plotly.graph_objects as go
 import streamlit as st
 import yfinance as yf
 
-from topbottom import (TBParams, compare_to_reference, confirmed_swings, match_2017,
+from topbottom import (TBParams, run_tuned, compare_to_reference, confirmed_swings, match_2017,
                        monthly_points, ref_monthly_series, run_topbottom, tune)
 
 MODES = {
+    "Tuned — long only, 0.25% buffer, 2% stop": dict(trigger="intraday", fill="level", safety=True, tuned=True,
+        help="Tradable version found by walk-forward testing (tuned on 2007–16, tested on 2017–26): "
+             "buy-stop 0.25% above the last top, sell-stop 0.25% below the last bottom or 2% max "
+             "stop, no shorts. Bank Nifty spot: profit factor ~1.7 in both periods."),
     "Sheet replication": dict(trigger="close", fill="level", safety=False,
                               help="Signal on the close, booked at the system point — exactly how the "
                                    "sheet was built. Not achievable live (the price is known only after "
@@ -167,7 +171,11 @@ def render_topbottom_tab() -> None:
         st.error(f"Could not load {symbol}. {err}")
         return
 
-    tr = run_topbottom(df, p)
+    if m.get("tuned"):
+        st.caption(f"Tuned mode uses: buffer 0.25%, max stop {max_stop}%, long only, glitch filter {swing}%.")
+        tr = run_tuned(df, buffer_pct=0.25, max_stop_pct=max_stop, long_only=True, swing_pct=swing)
+    else:
+        tr = run_topbottom(df, p)
     _status(df, tr, p)
 
     bars = st.radio("Chart window", {"3 months": 63, "6 months": 126, "1 year": 252, "3 years": 756}.keys(),
