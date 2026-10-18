@@ -33,8 +33,36 @@ MODES = {
 
 LOCAL = {"Bank Nifty FUTURES 2017 (NSE bhavcopy)": "data/banknifty_fut_near_2016-2018.csv",
          "Bank Nifty FUTURES 2007–2022 (NSE bhavcopy)": "data/banknifty_fut_near_2007-2022.csv"}
-SYMBOLS = {"Bank Nifty FUTURES 2007–2022 (NSE bhavcopy)": "BNF_FUT_ALL","Bank Nifty FUTURES 2017 (NSE bhavcopy)": "BNF_FUT", "Bank Nifty (^NSEBANK)": "^NSEBANK", "Nifty 50 (^NSEI)": "^NSEI",
-           "Fin Nifty (NIFTY_FIN_SERVICE.NS)": "NIFTY_FIN_SERVICE.NS"}
+SYMBOLS = {"Bank Nifty — live (^NSEBANK)": "^NSEBANK", "Nifty 50 — live (^NSEI)": "^NSEI",
+           "Fin Nifty — live (NIFTY_FIN_SERVICE.NS)": "NIFTY_FIN_SERVICE.NS",
+           "Bank Nifty FUTURES 2007–2022 (NSE bhavcopy)": "BNF_FUT_ALL",
+           "Bank Nifty FUTURES 2017 (NSE bhavcopy)": "BNF_FUT"}
+DEFAULT_BUFFER = {"^NSEBANK": 25.0, "BNF_FUT_ALL": 25.0, "BNF_FUT": 25.0, "^NSEI": 10.0,
+                  "NIFTY_FIN_SERVICE.NS": 10.0}
+
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "tools"))
+import topbottom_backtest as tbb  # noqa: E402  (single source of truth for the live rules)
+
+
+def _next_session_panel(df: pd.DataFrame, tr: pd.DataFrame, lp, name: str) -> None:
+    o = tbb.next_orders(df, tr, lp)
+    nxt = (df.index[-1] + pd.offsets.BDay(1)).date()
+    st.markdown(f"##### 🧭 Next session ({nxt}) — {name}")
+    c = st.columns(4)
+    c[0].metric("Last close", f"{o['close']:,.2f}", str(o['date'].date()), delta_color="off")
+    c[1].metric("Position", o["position"].split(" ")[0], o["position"].partition(" ")[2] or None,
+                delta_color="off")
+    c[2].metric("Prev top", f"{o['prev_top']:,.2f}")
+    c[3].metric("Prev bottom", f"{o['prev_bottom']:,.2f}")
+    box = "\n".join(f"- {x}" for x in o["orders"])
+    if o["position"] == "FLAT":
+        st.info(box)
+    else:
+        st.success(f"Open P/L: {o['open_pnl']:+,.0f} points" + ("  •  breakeven SL active" if o.get("breakeven_active") else "") + "\n\n" + box)
+    st.caption("Levels come from the daily close line of the selected series. Live = Yahoo index (spot) data, "
+               "updated after each close; your futures levels differ by the futures premium, so apply the same "
+               "logic to the futures chart or add the premium. Not investment advice.")
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -179,14 +207,21 @@ def render_topbottom_tab() -> None:
         return
 
     if m.get("live"):
-        buf = st.number_input("Entry buffer (points beyond top/bottom)", 0.0, 500.0, 25.0, 5.0, key="tb_buf")
-        tr = run_live(df, buf_pts=buf, day_sl=day_stop, max_sl=max_stop, be=be, gap=gap)
+        buf = st.number_input("Entry buffer (points beyond top/bottom)", 0.0, 500.0,
+                              DEFAULT_BUFFER.get(symbol, 25.0) if kind == "Index" else 0.0, 5.0,
+                              key=f"tb_buf_{symbol}_{kind}",
+                              help="Bank Nifty calls use +25 / -25. For stocks set a small value or 0.")
+        lp = tbb.Params(buffer_pts=buf, day_sl_pct=day_stop, max_sl_pct=max_stop, be_pct=be, gap_pct=gap,
+                        swing_pct=swing, cost_pts=cost)
+        tr = tbb.run_live(df, lp)
+        _next_session_panel(df, tr, lp, choice)
     elif m.get("tuned"):
         st.caption(f"Tuned mode uses: buffer 0.25%, max stop {max_stop}%, long only, glitch filter {swing}%.")
         tr = run_tuned(df, buffer_pct=0.25, max_stop_pct=max_stop, long_only=True, swing_pct=swing)
     else:
         tr = run_topbottom(df, p)
-    _status(df, tr, p)
+    if not m.get("live"):
+        _status(df, tr, p)
 
     bars = st.radio("Chart window", {"3 months": 63, "6 months": 126, "1 year": 252, "3 years": 756}.keys(),
                     index=1, horizontal=True, key="tb_win")

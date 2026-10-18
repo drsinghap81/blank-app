@@ -296,38 +296,80 @@ def monthly_table(t: pd.DataFrame) -> pd.DataFrame:
     return m
 
 
-def next_day_levels(df: pd.DataFrame, t: pd.DataFrame, p: Params, name: str) -> str:
-    """Levels for the next session, in the same format as the WhatsApp calls."""
+def next_orders(df: pd.DataFrame, t: pd.DataFrame, p: Params) -> dict:
+    """Position-aware orders for the NEXT session under the live rules."""
     c = df["Close"].to_numpy(float)
     T, B, _ = confirmed_swings(c, p.swing_pct)
     top, bot, last = T[-1], B[-1], c[-1]
-    b_top = (top * p.buffer_pct / 100) if p.buffer_pct is not None else p.buffer_pts
-    b_bot = (bot * p.buffer_pct / 100) if p.buffer_pct is not None else p.buffer_pts
+    bt = (top * p.buffer_pct / 100) if p.buffer_pct is not None else p.buffer_pts
+    bb = (bot * p.buffer_pct / 100) if p.buffer_pct is not None else p.buffer_pts
+    out = dict(date=df.index[-1], close=last, prev_top=top, prev_bottom=bot, position="FLAT", orders=[])
     used_top = used_bot = False
     if p.use_once and not t.empty:
-        since = t[pd.to_datetime(t["EntryDate"]) >= df.index[-30]]
-        used_top = any(abs(e - (top + b_top)) < 1e-6 or abs(e - top) < 1e-6 for e in since.loc[since.Side == "BUY", "Entry"])
-        used_bot = any(abs(e - (bot - b_bot)) < 1e-6 or abs(e - bot) < 1e-6 for e in since.loc[since.Side == "SELL", "Entry"])
-    lines = [f"TOP BOTTOM LEVELS after {df.index[-1].date()}", f"  {name} - Closing Price {last:,.2f}"]
-    pos = "FLAT"
-    if not t.empty and t.iloc[-1]["Open"]:
+        tol = 1e-6
+        used_top = any(abs(e - (top + bt)) < tol for e in t.loc[t.Side == "BUY", "Entry"]) or \
+            any(abs(x - (top + bt)) < tol for x in t.loc[t.Side == "SELL", "Exit"])
+        used_bot = any(abs(e - (bot - bb)) < tol for e in t.loc[t.Side == "SELL", "Entry"]) or \
+            any(abs(x - (bot - bb)) < tol for x in t.loc[t.Side == "BUY", "Exit"])
+    is_open = not t.empty and bool(t.iloc[-1]["Open"])
+    if is_open:
         r = t.iloc[-1]
-        pos = f"{'LONG' if r.Side == 'BUY' else 'SHORT'} from {r.Entry:,.2f} ({pd.Timestamp(r.EntryDate).date()})"
-    lines.append(f"  Current position: {pos}")
-    if np.isnan(top) or used_top:
-        lines.append("    No Buy trade as awaiting new top")
+        side = 1 if r.Side == "BUY" else -1
+        ent = float(r.Entry)
+        since = df.loc[pd.Timestamp(r.EntryDate):]
+        fav = ((since.High.max() - ent) / ent * 100) if side > 0 else ((ent - since.Low.min()) / ent * 100)
+        be_on = bool(p.be_pct) and fav >= p.be_pct
+        maxsl = ent * (1 - side * p.max_sl_pct / 100)
+        sysl = (bot - bb) if side > 0 else (top + bt)
+        stop = max(maxsl, sysl) if side > 0 else min(maxsl, sysl)
+        kind = "system point (exit & REVERSE)" if stop == sysl else f"max {p.max_sl_pct:g}% SL (exit only)"
+        if be_on:
+            stop2 = max(stop, ent) if side > 0 else min(stop, ent)
+            if stop2 != stop:
+                stop, kind = stop2, "breakeven SL (exit only)"
+        out["position"] = f"{'LONG' if side > 0 else 'SHORT'} from {ent:,.2f} ({pd.Timestamp(r.EntryDate).date()})"
+        out["open_pnl"] = round((last - ent) * side, 2)
+        out["breakeven_active"] = be_on
+        word = "Sell" if side > 0 else "Buy"
+        out["orders"].append(f"HOLD {'long' if side > 0 else 'short'}. Stop: {word} {'below' if side > 0 else 'above'} "
+                             f"{stop:,.0f} — {kind}")
+        if kind.endswith("(exit only)") and not (side > 0 and p.long_only):
+            # the opposite entry order still rests at the system point
+            lvl, used = ((bot - bb), used_bot) if side > 0 else ((top + bt), used_top)
+            if not used:
+                out["orders"].append(f"Separate {'sell' if side > 0 else 'buy'}-stop entry at {lvl:,.0f} "
+                                     f"(Prev {'Bottom' if side > 0 else 'Top'}); if it triggers keep "
+                                     f"{p.day_sl_pct:g}% SL at {lvl * (1 + side * p.day_sl_pct / 100):,.0f}")
+        if not be_on:
+            be_px = ent * (1 + side * p.be_pct / 100)
+            out["orders"].append(f"Move SL to breakeven ({ent:,.0f}) once price reaches {be_px:,.0f}")
     else:
-        bl = top + b_top
-        lines.append(f"    Buy above +{b_top:.4g} @ {bl:,.0f} (Prev Top {top:,.2f}); if triggers keep "
-                     f"{p.day_sl_pct:g}% SL at {bl * (1 - p.day_sl_pct / 100):,.0f}")
-    if p.long_only:
-        lines.append("    (long only — no sell trades)")
-    elif np.isnan(bot) or used_bot:
-        lines.append("    No Sell trade as awaiting new bottom")
-    else:
-        sl = bot - b_bot
-        lines.append(f"    Sell below -{b_bot:.4g} @ {sl:,.0f} (Prev Bottom {bot:,.2f}); if triggers keep "
-                     f"{p.day_sl_pct:g}% SL at {sl * (1 + p.day_sl_pct / 100):,.0f}")
+        if np.isnan(top) or used_top:
+            out["orders"].append("No Buy trade as awaiting new top")
+        else:
+            bl = top + bt
+            out["orders"].append(f"Buy above +{bt:.4g} @ {bl:,.0f} (Prev Top {top:,.2f}); if triggers keep "
+                                 f"{p.day_sl_pct:g}% SL at {bl * (1 - p.day_sl_pct / 100):,.0f}")
+        if p.long_only:
+            out["orders"].append("(long only — no sell trades)")
+        elif np.isnan(bot) or used_bot:
+            out["orders"].append("No Sell trade as awaiting new bottom")
+        else:
+            sl = bot - bb
+            out["orders"].append(f"Sell below -{bb:.4g} @ {sl:,.0f} (Prev Bottom {bot:,.2f}); if triggers keep "
+                                 f"{p.day_sl_pct:g}% SL at {sl * (1 + p.day_sl_pct / 100):,.0f}")
+    out["orders"].append(f"Gap > {p.gap_pct:g}% beyond a level at the open: exit only, no new trade "
+                         "(let the market settle)")
+    return out
+
+
+def next_day_levels(df: pd.DataFrame, t: pd.DataFrame, p: Params, name: str) -> str:
+    """Next-session orders, in the same style as the WhatsApp calls."""
+    o = next_orders(df, t, p)
+    lines = [f"TOP BOTTOM LEVELS for the session after {o['date'].date()}",
+             f"  {name} - Closing Price {o['close']:,.2f}",
+             f"  Position: {o['position']}"]
+    lines += [f"    {x}" for x in o["orders"]]
     return "\n".join(lines)
 
 
