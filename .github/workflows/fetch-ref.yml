@@ -1,0 +1,36 @@
+name: fetch-ref
+on:
+  push:
+    paths: [".github/workflows/fetch-ref.yml"]
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p ref
+          for u in table1_img.png table2_image.png Millionaire-Club-Big.png; do
+            curl -sSL -A "Mozilla/5.0" -o ref/$u "https://swaycharts.com/wp-content/uploads/2022/02/$u" || true
+          done
+          pip install -q youtube-transcript-api yt-dlp || true
+          python - <<'PY' || true
+          import json
+          from youtube_transcript_api import YouTubeTranscriptApi
+          for vid in ["AU_kmRsjS30"]:
+              try:
+                  t = YouTubeTranscriptApi().fetch(vid, languages=["hi", "en", "en-IN"])
+                  open(f"ref/{vid}.txt", "w").write("\n".join(s.text for s in t))
+              except Exception as e:
+                  open(f"ref/{vid}.err", "w").write(str(e))
+          PY
+          yt-dlp --flat-playlist -J "https://www.youtube.com/channel/UC78TX-Rd54pv1TNRU9Q-RRw/videos" > ref/channel.json 2> ref/channel.err || true
+          ls -la ref
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout -B ref-data
+          git add -f ref
+          git commit -m "reference material" || exit 0
+          git push -f origin ref-data
