@@ -3,7 +3,7 @@ import os
 import yfinance as yf
 
 os.makedirs("data", exist_ok=True)
-for sym, name in [("^NSEBANK", "banknifty"), ("^NSEI", "nifty")]:
+for sym, name in [("^NSEBANK", "banknifty"), ("^NSEI", "nifty"), ("RELIANCE.NS", "reliance"), ("MANAPPURAM.NS", "manappuram")]:
     df = yf.download(sym, start="2005-01-01", interval="1d", auto_adjust=False, progress=False)
     if hasattr(df.columns, "levels"):
         df.columns = df.columns.get_level_values(0)
