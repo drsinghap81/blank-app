@@ -50,11 +50,23 @@ except Exception:  # pragma: no cover - handled gracefully at runtime
 # =============================================================================
 
 STARTING_CASH = 100_000.0     # paper cash per market, in that market's currency
-DISPLAY_BARS = 60             # bars shown on the chart (spec: last 60 days)
-LOOKBACK_PERIOD = "6mo"       # fetch extra history so SMA/RSI are warmed up
+DISPLAY_BARS = 60             # default bars shown on the chart (spec: last 60 days)
+LOOKBACK_PERIOD = "1y"        # fetch extra history: warms up SMA/RSI and feeds S/R levels
 SMA_WINDOW = 20
 RSI_WINDOW = 14
 CACHE_TTL_SECONDS = 300       # re-fetch prices at most every 5 minutes
+
+# ---- Support / resistance engine (the rules agreed in our chart-reading work) ----
+LEVEL_LOOKBACK_BARS = 126     # ~6 months of daily bars
+LEVEL_PIVOT_WINDOW = 3        # a swing high/low must be the extreme of +/-3 bars
+LEVEL_CLUSTER_TOL = 0.008     # wick pivots within 0.8% are one level
+LEVEL_MIN_TOUCHES = 2         # a level needs >= 2 tests to count
+LEVEL_NEAR_PCT = 0.03         # "near price" window used to prioritise levels
+LEVEL_MAX_SHOWN = 3           # keep charts clean: 2-3 levels
+
+# ---- Pattern rules ----
+PATTERN_LEVEL_TOL = 0.006     # candle must reach within 0.6% of the level
+PATTERN_LOOKBACK_SIGNALS = 3  # scanner reports patterns completed in the last N bars
 
 
 @dataclass(frozen=True)
@@ -74,21 +86,34 @@ MARKETS: dict[str, MarketConfig] = {
     "United States (US)": MarketConfig(
         key="US", label="United States (US)", suffix="", currency="USD", symbol="$",
         benchmark="^GSPC", benchmark_name="S&P 500",
-        watchlist=("AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA",
-                   "JPM", "V", "AVGO", "SPY", "QQQ"),
+        # The watchlist doubles as the Scanner universe for each market.
+        watchlist=("AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "AVGO",
+                   "JPM", "V", "MA", "UNH", "XOM", "LLY", "COST", "HD", "NFLX", "AMD",
+                   "ORCL", "CRM", "SPY", "QQQ"),
     ),
     "Australia (ASX)": MarketConfig(
         key="ASX", label="Australia (ASX)", suffix=".AX", currency="AUD", symbol="A$",
         benchmark="^AXJO", benchmark_name="S&P/ASX 200",
         watchlist=("CBA.AX", "BHP.AX", "CSL.AX", "NAB.AX", "WBC.AX", "ANZ.AX",
-                   "WES.AX", "MQG.AX", "FMG.AX", "RIO.AX", "WDS.AX", "TLS.AX"),
+                   "WES.AX", "MQG.AX", "FMG.AX", "RIO.AX", "WDS.AX", "TLS.AX",
+                   "GMG.AX", "WOW.AX", "TCL.AX", "ALL.AX", "STO.AX", "QBE.AX",
+                   "REA.AX", "COL.AX"),
     ),
     "India (NSE)": MarketConfig(
         key="NSE", label="India (NSE)", suffix=".NS", currency="INR", symbol="₹",
         benchmark="^NSEI", benchmark_name="Nifty 50",
-        watchlist=("RELIANCE.NS", "HDFCBANK.NS", "ICICIBANK.NS", "TCS.NS", "INFY.NS",
-                   "BHARTIARTL.NS", "SBIN.NS", "LT.NS", "ITC.NS", "KOTAKBANK.NS",
-                   "AXISBANK.NS", "HCLTECH.NS"),
+        # Nifty 50 constituents (as of Oct 2026; edit here when the index rebalances)
+        watchlist=("RELIANCE.NS", "HDFCBANK.NS", "ICICIBANK.NS", "BHARTIARTL.NS", "TCS.NS",
+                   "SBIN.NS", "BAJFINANCE.NS", "LT.NS", "INFY.NS", "KOTAKBANK.NS",
+                   "HINDUNILVR.NS", "SUNPHARMA.NS", "ADANIPORTS.NS", "AXISBANK.NS",
+                   "TITAN.NS", "HCLTECH.NS", "ADANIENT.NS", "M&M.NS", "MARUTI.NS",
+                   "ITC.NS", "ULTRACEMCO.NS", "ETERNAL.NS", "NTPC.NS", "JSWSTEEL.NS",
+                   "BAJAJ-AUTO.NS", "APOLLOHOSP.NS", "ASIANPAINT.NS", "BAJAJFINSV.NS",
+                   "BEL.NS", "CIPLA.NS", "COALINDIA.NS", "DRREDDY.NS", "EICHERMOT.NS",
+                   "GRASIM.NS", "HDFCLIFE.NS", "HINDALCO.NS", "INDIGO.NS", "JIOFIN.NS",
+                   "MAXHEALTH.NS", "NESTLEIND.NS", "ONGC.NS", "POWERGRID.NS",
+                   "SBILIFE.NS", "SHRIRAMFIN.NS", "TATACONSUM.NS", "TMPV.NS",
+                   "TATASTEEL.NS", "TECHM.NS", "TRENT.NS", "WIPRO.NS"),
     ),
 }
 
@@ -259,6 +284,208 @@ def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # =============================================================================
+# 5b. SUPPORT / RESISTANCE ENGINE
+# -----------------------------------------------------------------------------
+# Rules (as agreed during manual chart reading):
+#   * levels come from candle WICKS: swing highs (High) and swing lows (Low)
+#   * ~6 months of history; pivots within 0.8% are clustered into one level
+#   * a level needs at least 2 tests
+#   * a level that has acted as BOTH support and resistance is a "flip"
+#     (role reversal) and gets priority when it sits near the current price
+#   * the chart shows only 2-3 levels: nearest above, nearest below, plus the
+#     most important remaining one
+# =============================================================================
+
+@dataclass
+class Level:
+    price: float          # average of the clustered wick pivots
+    touches: int          # number of tests
+    flip: bool            # acted as both support and resistance
+    kinds: str            # sequence of 'H'/'L' pivots, oldest first
+    last_touch: pd.Timestamp
+
+    def role(self, ref_price: float) -> str:
+        """'R' if the level is above the reference price, else 'S'."""
+        return "R" if self.price > ref_price else "S"
+
+    def label(self, ref_price: float) -> str:
+        tag = " flip" if self.flip else ""
+        return f"{self.role(ref_price)} {self.price:,.2f} ×{self.touches}{tag}"
+
+
+def _wick_pivots(df: pd.DataFrame, window: int = LEVEL_PIVOT_WINDOW) -> list[tuple[float, int, str]]:
+    """Swing highs/lows: a bar whose High (Low) is the max (min) of +/-window bars."""
+    highs, lows = df["High"].to_numpy(), df["Low"].to_numpy()
+    n, out = len(df), []
+    for i in range(n):
+        a, z = max(0, i - window), min(n, i + window + 1)
+        if highs[i] == highs[a:z].max():
+            out.append((float(highs[i]), i, "H"))
+        if lows[i] == lows[a:z].min():
+            out.append((float(lows[i]), i, "L"))
+    return out
+
+
+def compute_levels(df: pd.DataFrame, lookback: int = LEVEL_LOOKBACK_BARS) -> list[Level]:
+    """All levels with >= LEVEL_MIN_TOUCHES tests in the last `lookback` bars."""
+    hist = df.tail(lookback)
+    if len(hist) < 2 * LEVEL_PIVOT_WINDOW + 5:
+        return []
+    pivots = sorted(_wick_pivots(hist))
+    groups: list[list[tuple[float, int, str]]] = []
+    for p in pivots:
+        if groups and p[0] <= groups[-1][0][0] * (1 + LEVEL_CLUSTER_TOL):
+            groups[-1].append(p)
+        else:
+            groups.append([p])
+
+    levels = []
+    for g in groups:
+        if len(g) < LEVEL_MIN_TOUCHES:
+            continue
+        g_sorted = sorted(g, key=lambda p: p[1])
+        kinds = "".join(p[2] for p in g_sorted)
+        levels.append(Level(price=float(np.mean([p[0] for p in g])), touches=len(g),
+                            flip=("H" in kinds and "L" in kinds), kinds=kinds,
+                            last_touch=hist.index[g_sorted[-1][1]]))
+    return levels
+
+
+def select_levels(levels: list[Level], ref_price: float, k: int = LEVEL_MAX_SHOWN) -> list[Level]:
+    """
+    Pick the 2-3 levels worth drawing:
+      1. nearest resistance above price
+      2. nearest support below price
+      3. best remaining level: near-price flips first, then most tests, then closest
+    """
+    if not levels:
+        return []
+    dist = lambda lv: abs(lv.price / ref_price - 1)
+    above = sorted([lv for lv in levels if lv.price > ref_price], key=dist)
+    below = sorted([lv for lv in levels if lv.price <= ref_price], key=dist)
+    picks = [lst[0] for lst in (above, below) if lst]
+    rest = [lv for lv in levels if lv not in picks]
+    rest.sort(key=lambda lv: (not (lv.flip and dist(lv) <= LEVEL_NEAR_PCT),
+                              -lv.touches, dist(lv)))
+    picks += rest[: max(0, k - len(picks))]
+    return sorted(picks, key=lambda lv: -lv.price)
+
+
+# =============================================================================
+# 5c. CANDLESTICK PATTERNS AT LEVELS
+# =============================================================================
+
+def _is_shooting_star(o: float, h: float, l: float, c: float, avg_range: float) -> bool:
+    """
+    Bearish shooting star: small body near the low, long upper wick, tiny lower wick.
+      body  <= 35% of range
+      upper wick >= 2x body and >= 55% of range
+      lower wick <= 15% of range
+      range not tiny (>= 60% of the 14-bar average range)
+    """
+    rng = h - l
+    if rng <= 0 or rng < 0.6 * avg_range:
+        return False
+    body = abs(c - o)
+    upper = h - max(o, c)
+    lower = min(o, c) - l
+    return body <= 0.35 * rng and upper >= 2 * body and upper >= 0.55 * rng and lower <= 0.15 * rng
+
+
+def _is_morning_star(b1: pd.Series, b2: pd.Series, b3: pd.Series, avg_body: float) -> bool:
+    """
+    Bullish 3-candle morning star (adapted for equities, where true gaps are rare):
+      candle 1: strong bearish body (>= 60% of the 20-bar average body)
+      candle 2: small body (<= 50% of candle 1's body) sitting at/below candle 1's close
+      candle 3: bullish, closing above the midpoint of candle 1's body
+    """
+    body1 = b1["Open"] - b1["Close"]
+    if body1 <= 0 or body1 < 0.6 * avg_body:
+        return False
+    body2 = abs(b2["Close"] - b2["Open"])
+    if body2 > 0.5 * body1 or max(b2["Open"], b2["Close"]) > b1["Close"] + 0.25 * body1:
+        return False
+    midpoint1 = b1["Close"] + body1 / 2
+    return b3["Close"] > b3["Open"] and b3["Close"] >= midpoint1
+
+
+def detect_signals(df: pd.DataFrame, last_n: int = PATTERN_LOOKBACK_SIGNALS) -> list[dict]:
+    """
+    Scan the last `last_n` bars for:
+      * SHOOTING STAR AT RESISTANCE: after a rise, the candle's high reaches within
+        PATTERN_LEVEL_TOL of a tested level (or pokes through it) and closes below it
+      * MORNING STAR AT SUPPORT: after a fall, the 3-candle pattern's low reaches
+        within PATTERN_LEVEL_TOL of a tested level and candle 3 closes above it
+
+    Levels are computed ONLY from bars before the pattern starts, so a pattern
+    never "creates" the level it is being tested against.
+    """
+    signals = []
+    n = len(df)
+    if n < 40:
+        return signals
+    rng = (df["High"] - df["Low"])
+    body = (df["Close"] - df["Open"]).abs()
+
+    for i in range(max(25, n - last_n), n):
+        bar = df.iloc[i]
+        avg_range = float(rng.iloc[i - 14:i].mean())
+        avg_body = float(body.iloc[i - 20:i].mean())
+
+        # ---- Shooting star at resistance ----
+        rising = df["Close"].iloc[i - 1] > df["Close"].iloc[i - 5]
+        if rising and _is_shooting_star(bar["Open"], bar["High"], bar["Low"], bar["Close"], avg_range):
+            for lv in compute_levels(df.iloc[:i]):
+                if bar["High"] >= lv.price * (1 - PATTERN_LEVEL_TOL) and bar["Close"] < lv.price:
+                    signals.append({"Date": df.index[i], "Pattern": "Shooting star at resistance",
+                                    "Bias": "Bearish", "Level": lv.price, "Tests": lv.touches,
+                                    "Flip": lv.flip, "Close": float(bar["Close"]), "idx": i})
+                    break
+
+        # ---- Morning star at support ----
+        b1, b2 = df.iloc[i - 2], df.iloc[i - 1]
+        falling = b1["Close"] < df["Close"].iloc[i - 6]
+        if falling and _is_morning_star(b1, b2, bar, avg_body):
+            pattern_low = float(min(b1["Low"], b2["Low"], bar["Low"]))
+            for lv in sorted(compute_levels(df.iloc[:i - 2]), key=lambda x: -x.price):
+                if pattern_low <= lv.price * (1 + PATTERN_LEVEL_TOL) and bar["Close"] > lv.price:
+                    signals.append({"Date": df.index[i], "Pattern": "Morning star at support",
+                                    "Bias": "Bullish", "Level": lv.price, "Tests": lv.touches,
+                                    "Flip": lv.flip, "Close": float(bar["Close"]), "idx": i})
+                    break
+    return signals
+
+
+@st.cache_data(ttl=CACHE_TTL_SECONDS, show_spinner=False)
+def fetch_universe(tickers: tuple[str, ...], period: str = LOOKBACK_PERIOD) -> tuple[dict, list[str], str]:
+    """
+    Batch-download daily bars for a whole watchlist in ONE Yahoo request.
+
+    Returns ({ticker: frame}, [tickers that failed], error_message).
+    No synthetic fallback here: fake data would produce fake signals.
+    """
+    if yf is None:
+        return {}, list(tickers), "yfinance is not installed."
+    try:
+        raw = yf.download(list(tickers), period=period, interval="1d", group_by="ticker",
+                          auto_adjust=False, progress=False, threads=True)
+    except Exception as exc:
+        return {}, list(tickers), str(exc)
+    frames, failed = {}, []
+    for t in tickers:
+        try:
+            sub = raw[t] if isinstance(raw.columns, pd.MultiIndex) else raw
+            sub = _clean_yf_frame(sub.copy())
+            if len(sub) >= 40:
+                frames[t] = sub
+            else:
+                failed.append(t)
+        except Exception:
+            failed.append(t)
+    return frames, failed, ""
+
+
+# =============================================================================
 # 6. PAPER-TRADING ENGINE (st.session_state)
 # =============================================================================
 
@@ -421,6 +648,7 @@ def render_sidebar() -> tuple[MarketConfig, str]:
     st.sidebar.divider()
     if st.sidebar.button("🔄 Refresh prices", width="stretch"):
         fetch_ohlcv.clear()
+        fetch_universe.clear()
         st.rerun()
     if st.sidebar.button(f"♻️ Reset {market.key} paper book", width="stretch"):
         st.session_state.books[market.key] = {"cash": STARTING_CASH, "positions": {},
@@ -469,8 +697,12 @@ def render_header(market: MarketConfig) -> None:
     st.write("")
 
 
-def build_price_chart(df: pd.DataFrame, ticker: str) -> go.Figure:
-    """Candles + SMA on top, volume in the middle, RSI with 70/30 bands below."""
+def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None = None,
+                      signals: list[dict] | None = None) -> go.Figure:
+    """
+    Candles + SMA + S/R lines + pattern markers on top, volume in the middle,
+    RSI with 70/30 bands below.
+    """
     sma_col, rsi_col = f"SMA{SMA_WINDOW}", f"RSI{RSI_WINDOW}"
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.03,
                         row_heights=[0.62, 0.14, 0.24])
@@ -491,6 +723,31 @@ def build_price_chart(df: pd.DataFrame, ticker: str) -> go.Figure:
     for lvl, col in ((70, "#ef4444"), (30, "#22c55e")):
         fig.add_hline(y=lvl, line=dict(color=col, width=1, dash="dash"), row=3, col=1)
 
+    # ---- Horizontal support / resistance lines ----
+    ref = float(df["Close"].iloc[-1])
+    for lv in levels or []:
+        is_res = lv.price > ref
+        fig.add_hline(y=lv.price, row=1, col=1,
+                      line=dict(color="#ef4444" if is_res else "#22c55e", width=1.3, dash="dash"),
+                      annotation_text=lv.label(ref), annotation_position="top left",
+                      annotation_font=dict(size=11, color="#fca5a5" if is_res else "#86efac"))
+
+    # ---- Pattern markers (only those inside the visible window) ----
+    for s in signals or []:
+        if s["Date"] not in df.index:
+            continue
+        bar = df.loc[s["Date"]]
+        bearish = s["Bias"] == "Bearish"
+        fig.add_trace(go.Scatter(
+            x=[s["Date"]], y=[bar["High"] * 1.006 if bearish else bar["Low"] * 0.994],
+            mode="markers+text", showlegend=False,
+            marker=dict(symbol="triangle-down" if bearish else "triangle-up", size=13,
+                        color="#f87171" if bearish else "#4ade80"),
+            text=["SS" if bearish else "MS"], textfont=dict(size=10, color="#e5e7eb"),
+            textposition="top center" if bearish else "bottom center",
+            hovertext=f"{s['Pattern']} @ {s['Level']:,.2f} (×{s['Tests']})", hoverinfo="text"),
+            row=1, col=1)
+
     fig.update_layout(template="plotly_dark", height=640, paper_bgcolor="#0b0e14",
                       plot_bgcolor="#0f131b", margin=dict(l=10, r=10, t=30, b=10),
                       legend=dict(orientation="h", y=1.04, x=0), xaxis_rangeslider_visible=False,
@@ -508,8 +765,18 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
         st.warning(f"⚠️ Live data unavailable for **{ticker}** — showing a SYNTHETIC dataset "
                    f"so the terminal keeps working.\n\nReason: {msg}")
 
-    df = add_indicators(raw).tail(DISPLAY_BARS)
+    window = st.radio("Chart window", [60, 126], index=0, horizontal=True,
+                      format_func=lambda n: f"{n} bars" + (" (~6 months)" if n == 126 else ""),
+                      key="chart_window")
+    full = add_indicators(raw)
+    df = full.tail(window)
     last = df.iloc[-1]
+
+    # Levels use ~6 months of wick history, regardless of the chart window.
+    all_levels = compute_levels(full)
+    shown_levels = select_levels(all_levels, float(last["Close"]))
+    # Patterns anywhere in the visible window get a marker on the chart.
+    chart_signals = detect_signals(full, last_n=window)
     prev_close = df["Close"].iloc[-2]
     chg = (last["Close"] / prev_close - 1) * 100
     rsi_val = last[f"RSI{RSI_WINDOW}"]
@@ -526,14 +793,86 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
     k1.metric("Last close", f"{sym}{last['Close']:,.2f}", f"{chg:+.2f}%")
     k2.metric(f"SMA {SMA_WINDOW}", f"{sym}{sma_val:,.2f}", trend, delta_color="off")
     k3.metric(f"RSI {RSI_WINDOW}", f"{rsi_val:.1f}", rsi_state, delta_color="off")
-    k4.metric("60-day high", f"{sym}{df['High'].max():,.2f}")
-    k5.metric("60-day low", f"{sym}{df['Low'].min():,.2f}")
+    k4.metric(f"{window}-bar high", f"{sym}{df['High'].max():,.2f}")
+    k5.metric(f"{window}-bar low", f"{sym}{df['Low'].min():,.2f}")
 
-    st.plotly_chart(build_price_chart(df, ticker), width="stretch")
+    # Live pattern status for the most recent bars (same rules as the Scanner tab)
+    recent = [s for s in chart_signals if s["idx"] >= len(full) - PATTERN_LOOKBACK_SIGNALS]
+    for s in recent:
+        msg = (f"**{s['Pattern']}** on {s['Date']:%d %b %Y} at {sym}{s['Level']:,.2f} "
+               f"(×{s['Tests']}{' flip' if s['Flip'] else ''}) · close {sym}{s['Close']:,.2f}")
+        (st.error if s["Bias"] == "Bearish" else st.success)(msg)
 
-    with st.expander("Raw data (last 60 bars)"):
+    st.plotly_chart(build_price_chart(df, ticker, shown_levels, chart_signals), width="stretch")
+    if not live:
+        st.caption("Levels and patterns above are computed on SYNTHETIC data — ignore them.")
+
+    with st.expander("Support & resistance levels (6 months, wick-based, ≥2 tests)"):
+        if all_levels:
+            ref = float(last["Close"])
+            lv_df = pd.DataFrame([{
+                "Level": round(lv.price, 2), "Role": lv.role(ref), "Tests": lv.touches,
+                "Flip": "yes" if lv.flip else "", "Distance %": round((lv.price / ref - 1) * 100, 2),
+                "Last test": lv.last_touch.date(), "On chart": "✓" if lv in shown_levels else ""}
+                for lv in sorted(all_levels, key=lambda x: -x.price)])
+            st.dataframe(lv_df, width="stretch", hide_index=True)
+        else:
+            st.caption("No level with 2+ tests in the last 6 months.")
+
+    with st.expander(f"Raw data (last {window} bars)"):
         show = df[["Open", "High", "Low", "Close", "Volume", f"SMA{SMA_WINDOW}", f"RSI{RSI_WINDOW}"]]
         st.dataframe(show.iloc[::-1].round(2), width="stretch")
+
+
+def render_scanner_tab(market: MarketConfig) -> None:
+    """Tab: scan the whole watchlist for patterns at tested levels."""
+    universe = market.watchlist
+    st.markdown(f"#### Pattern scanner — {market.label} ({len(universe)} symbols)")
+    st.caption(
+        "Shooting star at resistance (bearish) and morning star at support (bullish), "
+        f"completed in the last {PATTERN_LOOKBACK_SIGNALS} sessions. Levels: 6 months of "
+        "candle wicks, ≥2 tests, within 0.8%. Daily candles; the latest bar may still be forming "
+        "during market hours, so confirm on the close.")
+
+    with st.spinner(f"Downloading {len(universe)} symbols…"):
+        frames, failed, err = fetch_universe(tuple(universe))
+    if not frames:
+        st.error("Live data unavailable, so the scanner can't run (it never uses synthetic data). "
+                 + (f"Reason: {err}" if err else ""))
+        return
+    if failed:
+        st.caption(f"No data for: {', '.join(failed)}")
+
+    rows = []
+    for tkr, frame in frames.items():
+        for s in detect_signals(frame):
+            last_close = float(frame["Close"].iloc[-1])
+            rows.append({"Ticker": tkr, "Pattern": s["Pattern"], "Bias": s["Bias"],
+                         "Date": s["Date"].date(), "Level": round(s["Level"], 2),
+                         "Tests": s["Tests"], "Flip": "yes" if s["Flip"] else "",
+                         "Pattern close": round(s["Close"], 2), "Last close": round(last_close, 2),
+                         "Since signal %": round((last_close / s["Close"] - 1) * 100, 2)})
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Scanned", f"{len(frames)}")
+    c2.metric("Shooting stars @ R", sum(r["Bias"] == "Bearish" for r in rows))
+    c3.metric("Morning stars @ S", sum(r["Bias"] == "Bullish" for r in rows))
+
+    if not rows:
+        st.info("No stock is showing either pattern at a tested level right now. "
+                "That's normal — these are selective setups.")
+        return
+
+    hits = pd.DataFrame(rows).sort_values(["Date", "Bias"], ascending=[False, True])
+    st.dataframe(hits, width="stretch", hide_index=True)
+
+    # Quick chart of any hit, with its levels and markers
+    pick = st.selectbox("View chart", hits["Ticker"].unique().tolist(), key=f"scan_pick_{market.key}")
+    full = add_indicators(frames[pick])
+    view = full.tail(DISPLAY_BARS)
+    lv = select_levels(compute_levels(full), float(view["Close"].iloc[-1]))
+    st.plotly_chart(build_price_chart(view, pick, lv, detect_signals(full, last_n=DISPLAY_BARS)),
+                    width="stretch")
 
 
 def render_trading_tab(market: MarketConfig, ticker: str) -> None:
@@ -639,10 +978,12 @@ def main() -> None:
 
     render_header(market)
 
-    tab1, tab2, tab3 = st.tabs(["📊 Market Analysis", "🧾 Order Execution (Paper)",
-                                "💼 Portfolio Tracker"])
+    tab1, tab_scan, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner",
+                                          "🧾 Order Execution (Paper)", "💼 Portfolio Tracker"])
     with tab1:
         render_analysis_tab(market, ticker)
+    with tab_scan:
+        render_scanner_tab(market)
     with tab2:
         render_trading_tab(market, ticker)
     with tab3:
