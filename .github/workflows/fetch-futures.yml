@@ -15,14 +15,14 @@ jobs:
         with: {python-version: "3.12"}
       - run: pip install pandas requests
       - run: |
-          python tools/fetch_bnf_futures.py 2007-09-01 2013-06-30 data/fut_2007_2013.csv 2>&1 | tee data_log.txt &
-          python tools/fetch_bnf_futures.py 2013-07-01 2019-02-28 data/fut_2013_2019.csv 2>&1 | tee data_log2.txt &
+          python tools/fetch_bnf_futures.py 2019-01-01 2020-08-31 data/fut_2019_2020.csv 2>&1 | tee data_log.txt &
+          python tools/fetch_bnf_futures.py 2020-09-01 2022-03-31 data/fut_2020_2022.csv 2>&1 | tee data_log2.txt &
           wait
       - run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
-          git checkout -B futures-all
+          git checkout -B futures-1922
           mkdir -p data && mv data_log*.txt data/
           git add -f data
           git commit -m "Bank Nifty futures 2017" || exit 0
-          git push -f origin futures-all
+          git push -f origin futures-1922
