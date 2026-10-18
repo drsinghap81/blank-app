@@ -4,11 +4,7 @@
   "instruments": {
     "BANKNIFTY": {
       "buffer_pts": 25,
-      "lots": 1
-    },
-    "NIFTY": {
-      "buffer_pts": 10,
-      "lots": 1
+      "lots": 2
     }
   },
   "rules": {

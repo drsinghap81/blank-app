@@ -203,7 +203,7 @@ def _paper_panel() -> None:
                 "(GitHub job at ~7:10 pm IST). Results will appear here automatically.")
         return
     s = json.load(open(sp))
-    st.caption(f"Bank Nifty & Nifty near-month futures, 1 lot each, live rules, est. costs included. "
+    st.caption(f"Bank Nifty near-month futures, 2 lots, live rules, est. costs included. "
                f"Started {s['start_date']} • updated {s['updated_ist']} IST • no real orders are placed.")
     k = st.columns(4)
     k[0].metric("Realised P&L", f"₹{s['realised_net']:,.0f}")
