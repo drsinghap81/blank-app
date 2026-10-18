@@ -7,10 +7,4 @@ Position: LONG from 55,274.60 (2026-10-09)
 • Move SL to breakeven (55,275) once price reaches 56,380
 • Gap > 2% beyond a level at the open: exit only, no new trade (let the market settle)
 (orders for 2026-10-19; levels on the near-month futures close line)
-
-*NIFTY FUT* (2026-10-27 expiry) — close 23,119.20 on 2026-10-16
-Position: LONG from 22,622.60 (2026-10-13)
-• HOLD long. Stop: Sell below 22,638 — system point (exit & REVERSE)
-• Gap > 2% beyond a level at the open: exit only, no new trade (let the market settle)
-(orders for 2026-10-19; levels on the near-month futures close line)
 Paper trading only — no orders placed.
