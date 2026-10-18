@@ -39,6 +39,8 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
+from topbottom_tab import render_topbottom_tab
+
 try:  # yfinance is optional at import time so the app still loads without it
     import yfinance as yf
 except Exception:  # pragma: no cover - handled gracefully at runtime
@@ -1351,14 +1353,17 @@ def main() -> None:
 
     render_header(market)
 
-    tab1, tab_scan, tab_bt, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner", "🧪 Backtest",
-                                                  "🧾 Order Execution (Paper)", "💼 Portfolio Tracker"])
+    tab1, tab_scan, tab_bt, tab_tb, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner", "🧪 Backtest",
+                                                          "📈 Top Bottom", "🧾 Order Execution (Paper)",
+                                                          "💼 Portfolio Tracker"])
     with tab1:
         render_analysis_tab(market, ticker)
     with tab_scan:
         render_scanner_tab(market)
     with tab_bt:
         render_backtest_tab(market)
+    with tab_tb:
+        render_topbottom_tab()
     with tab2:
         render_trading_tab(market, ticker)
     with tab3:
