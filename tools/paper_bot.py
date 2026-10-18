@@ -187,6 +187,53 @@ def build_ledger(sym: str, h: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, di
     return led, tbb.next_orders(ohlc, t, p), p, ohlc
 
 
+def whatsapp(text: str) -> None:
+    """WhatsApp alert via CallMeBot (free, personal) or TextMeBot (~US$1/month, sends from
+    your own WhatsApp to yourself). Repo secrets: WHATSAPP_PROVIDER (callmebot|textmebot),
+    WHATSAPP_PHONE (e.g. +61412345678), WHATSAPP_APIKEY."""
+    prov = (os.environ.get("WHATSAPP_PROVIDER") or "callmebot").lower()
+    phone, key = os.environ.get("WHATSAPP_PHONE"), os.environ.get("WHATSAPP_APIKEY")
+    if not phone or not key:
+        return
+    if prov == "textmebot":
+        url, params = "https://api.textmebot.com/send.php", {"recipient": phone, "apikey": key, "text": text}
+    else:
+        url, params = "https://api.callmebot.com/whatsapp.php", {"phone": phone, "apikey": key, "text": text}
+    try:
+        r = _sess().get(url, params=params, timeout=30)
+        print("whatsapp:", prov, r.status_code, r.text[:120].replace("\n", " "), file=sys.stderr)
+    except Exception as e:  # noqa: BLE001
+        print("whatsapp failed:", e, file=sys.stderr)
+
+
+def whatsapp_message(orders_all: dict, summary: dict, led: pd.DataFrame, cfg: dict) -> str:
+    """Same style as the daily Top Bottom calls."""
+    lines = []
+    for sym, o in orders_all.items():
+        nxt = (pd.Timestamp(o["date"]) + pd.offsets.BDay(1)).strftime("%d/%m/%Y")
+        lots = cfg["instruments"][sym]["lots"]
+        lot = o.get("lot_size") or 0
+        lines.append(f"*TOP BOTTOM LEVELS for {nxt}*")
+        lines.append("")
+        lines.append(f"*{sym} FUT ({pd.Timestamp(o['futures_contract_expiry']).strftime('%d-%b').upper()}) - "
+                     f"Closing Price {float(o['close']):,.2f}*")
+        lines.append(f"Position: {o['position']}  ({lots} lot{'s' if lots > 1 else ''} x {lot})")
+        for x in o["orders"]:
+            lines.append(f"    {x}")
+        lines.append("")
+    if len(led):
+        today = led[pd.to_datetime(led["ExitDate"]).dt.date == pd.Timestamp(list(orders_all.values())[0]["date"]).date()]
+        for _, r in today.iterrows():
+            if not bool(r["Open"]):
+                lines.append(f"Closed today: {r['Side']} {r['Entry']:,.0f} -> {r['Exit']:,.0f} "
+                             f"({r['Reason']}) = Rs {r['Net']:,.0f}")
+    lines.append(f"Paper P&L since {summary['start_date']}: realised Rs {summary['realised_net']:,.0f}, "
+                 f"open Rs {summary['open_mtm_net']:,.0f}, trades {summary['trades']} "
+                 f"(W {summary['winners']}/L {summary['losers']})")
+    lines.append("_Paper trading only - not investment advice_")
+    return "\n".join(lines)
+
+
 def telegram(text: str) -> None:
     tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
     if not tok or not chat:
@@ -251,8 +298,13 @@ def main():
     text = head + "\n" + "\n".join(report) + "Paper trading only — no orders placed."
     open(os.path.join(PAPER, "report.md"), "w").write(text)
     print(text)
+    for sym, o in orders_all.items():
+        o["date"] = hist[sym].iloc[-1]["Date"]
+    wa = whatsapp_message(orders_all, summary, led, cfg)
+    open(os.path.join(PAPER, "whatsapp.txt"), "w").write(wa)
     if os.environ.get("SEND_TELEGRAM", "1") == "1":
         telegram(text.replace("*", ""))
+        whatsapp(wa)
 
 
 if __name__ == "__main__":
