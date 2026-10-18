@@ -511,6 +511,204 @@ def fetch_universe(tickers: tuple[str, ...], period: str = LOOKBACK_PERIOD) -> t
 
 
 # =============================================================================
+# 5d. BACKTEST ENGINE — Morning star at tested support (long only)
+# -----------------------------------------------------------------------------
+# Design choices (all chosen to AVOID flattering the results):
+#   * no look-ahead: levels are built only from bars BEFORE the pattern starts
+#   * entry at the NEXT day's open after the 3rd candle closes
+#   * stop = lowest low of the 3-candle pattern (minus an optional buffer)
+#   * target = nearest tested resistance above entry at signal time; if none,
+#     a fixed R-multiple; plus a maximum holding period (time stop)
+#   * if stop and target are both inside one day's range, assume the STOP hit
+#     first (conservative)
+#   * round-trip costs deducted from every trade (STT, brokerage, slippage)
+#   * portfolio: N equal slots; signals beyond free slots are skipped
+# Known bias: the universe is TODAY's index members (survivorship bias), which
+# tends to make backtests look better than live trading.
+# =============================================================================
+
+@dataclass
+class BacktestParams:
+    min_tests: int = 2              # minimum tests of the support level
+    trend_filter: bool = False      # require close > 200-day SMA at signal
+    volume_filter: bool = False     # require candle-3 volume > 20-day average
+    gann_filter: bool = False       # require a Gann odd square within 1% of the level
+    target_mode: str = "Next resistance"   # or "Fixed R-multiple"
+    r_multiple: float = 2.0
+    max_hold: int = 15              # trading days
+    stop_buffer_pct: float = 0.2    # % below pattern low
+    cost_pct: float = 0.30          # round-trip costs, % of position
+    slots: int = 10                 # concurrent positions (each = 1/slots of equity)
+
+
+def find_morning_star_trades(df: pd.DataFrame, ticker: str, p: BacktestParams) -> list[dict]:
+    """Walk through history and simulate every qualifying morning-star trade for one stock."""
+    trades: list[dict] = []
+    n = len(df)
+    if n < LEVEL_LOOKBACK_BARS + 30:
+        return trades
+    o, h, l, c = (df[k].to_numpy() for k in ("Open", "High", "Low", "Close"))
+    vol = df["Volume"].to_numpy() if "Volume" in df else np.ones(n)
+    body = np.abs(c - o)
+    sma200 = pd.Series(c).rolling(200, min_periods=200).mean().to_numpy()
+    vol20 = pd.Series(vol).rolling(20, min_periods=20).mean().to_numpy()
+
+    i = LEVEL_LOOKBACK_BARS + 10
+    busy_until = -1
+    while i < n - 1:
+        if i <= busy_until:                       # one position per stock at a time
+            i += 1
+            continue
+        b1, b2, b3 = df.iloc[i - 2], df.iloc[i - 1], df.iloc[i]
+        avg_body = float(body[i - 20:i].mean())
+        falling = c[i - 2] < c[i - 6]
+        if not (falling and _is_morning_star(b1, b2, b3, avg_body)):
+            i += 1
+            continue
+        if p.trend_filter and not (sma200[i] == sma200[i] and c[i] > sma200[i]):
+            i += 1
+            continue
+        if p.volume_filter and not (vol20[i] == vol20[i] and vol[i] > vol20[i]):
+            i += 1
+            continue
+
+        pattern_low = float(min(l[i - 2], l[i - 1], l[i]))
+        levels = compute_levels(df.iloc[:i - 2])
+        support = None
+        for lv in sorted(levels, key=lambda x: -x.price):
+            if (lv.touches >= p.min_tests and pattern_low <= lv.price * (1 + PATTERN_LEVEL_TOL)
+                    and c[i] > lv.price):
+                support = lv
+                break
+        if support is None:
+            i += 1
+            continue
+        if p.gann_filter:
+            _, g_sq = nearest_gann(support.price)
+            if abs(g_sq / support.price - 1) > GANN_CONFLUENCE_PCT:
+                i += 1
+                continue
+
+        # ---- Trade plan (decided with information available at bar i) ----
+        entry_i = i + 1
+        entry = float(o[entry_i])
+        stop = pattern_low * (1 - p.stop_buffer_pct / 100)
+        if entry <= stop:                          # gapped below the stop: skip
+            i += 1
+            continue
+        risk = entry - stop
+        target = entry + p.r_multiple * risk
+        if p.target_mode == "Next resistance":
+            above = [lv.price for lv in levels if lv.price > entry * 1.003]
+            if above:
+                target = min(above)
+
+        # ---- Walk forward day by day ----
+        exit_i, exit_px, reason = None, None, None
+        last_i = min(n - 1, entry_i + p.max_hold - 1)
+        for j in range(entry_i, last_i + 1):
+            if l[j] <= stop:                       # stop first (conservative)
+                exit_i, exit_px, reason = j, min(stop, o[j]) if j > entry_i else stop, "Stop"
+                break
+            if h[j] >= target:
+                exit_i, exit_px, reason = j, max(target, o[j]) if j > entry_i else target, "Target"
+                break
+        if exit_i is None:
+            if last_i == n - 1 and last_i < entry_i + p.max_hold - 1:
+                exit_i, exit_px, reason = last_i, float(c[last_i]), "Open (marked)"
+            else:
+                exit_i, exit_px, reason = last_i, float(c[last_i]), "Time"
+
+        gross = exit_px / entry - 1
+        net = gross - p.cost_pct / 100
+        trades.append({
+            "Ticker": ticker, "Signal date": df.index[i].date(), "Entry date": df.index[entry_i].date(),
+            "Exit date": df.index[exit_i].date(), "Entry": round(entry, 2), "Stop": round(stop, 2),
+            "Target": round(target, 2), "Exit": round(float(exit_px), 2), "Exit reason": reason,
+            "Support": round(support.price, 2), "Tests": support.touches,
+            "Days": exit_i - entry_i + 1, "Net %": round(net * 100, 2),
+            "R": round((exit_px - entry) / risk, 2),
+            "_entry_ts": df.index[entry_i], "_exit_ts": df.index[exit_i],
+        })
+        busy_until = exit_i
+        i = exit_i + 1
+    return trades
+
+
+def simulate_portfolio(trades: list[dict], frames: dict, p: BacktestParams) -> tuple[pd.Series, pd.DataFrame]:
+    """
+    Run trades through an equal-slot portfolio and mark it to market daily.
+    Returns (equity_curve, taken_trades). Starting equity = 1.0.
+    """
+    if not trades:
+        return pd.Series(dtype=float), pd.DataFrame()
+    dates = sorted(set().union(*[f.index for f in frames.values()]))
+    cal = pd.DatetimeIndex(dates)
+    start = min(t["_entry_ts"] for t in trades)
+    cal = cal[cal >= start - pd.Timedelta(days=5)]
+
+    by_entry: dict = {}
+    for t in sorted(trades, key=lambda t: (t["_entry_ts"], t["Ticker"])):
+        by_entry.setdefault(t["_entry_ts"], []).append(t)
+
+    cash, equity_curve, open_pos, taken = 1.0, [], [], []
+    for day in cal:
+        # 1. close positions that exit today (at their exit price)
+        still = []
+        for pos in open_pos:
+            if pos["t"]["_exit_ts"] <= day:
+                cash += pos["alloc"] * (1 + pos["t"]["Net %"] / 100)
+            else:
+                still.append(pos)
+        open_pos = still
+        # 2. open new positions at today's open while slots are free
+        equity_now = cash + sum(
+            pos["alloc"] * float(frames[pos["t"]["Ticker"]]["Close"].asof(day)) / pos["t"]["Entry"]
+            for pos in open_pos)
+        for t in by_entry.get(day, []):
+            if len(open_pos) >= p.slots:
+                break
+            alloc = min(cash, equity_now / p.slots)
+            if alloc <= 0:
+                break
+            cash -= alloc
+            taken.append(t)
+            if t["_exit_ts"] <= day:                 # entered and exited the same day
+                cash += alloc * (1 + t["Net %"] / 100)
+            else:
+                open_pos.append({"t": t, "alloc": alloc})
+        # 3. mark to market at the close
+        mtm = cash + sum(
+            pos["alloc"] * float(frames[pos["t"]["Ticker"]]["Close"].asof(day)) / pos["t"]["Entry"]
+            for pos in open_pos)
+        equity_curve.append(mtm)
+    return pd.Series(equity_curve, index=cal), pd.DataFrame(taken)
+
+
+def backtest_stats(trades_df: pd.DataFrame, equity: pd.Series) -> dict:
+    """Headline metrics for the approval decision."""
+    if trades_df.empty or equity.empty:
+        return {}
+    r = trades_df["Net %"] / 100
+    wins, losses = r[r > 0], r[r <= 0]
+    years = max((equity.index[-1] - equity.index[0]).days / 365.25, 1e-9)
+    peak = equity.cummax()
+    return {
+        "Trades": len(r),
+        "Hit rate %": round(len(wins) / len(r) * 100, 1),
+        "Avg win %": round(wins.mean() * 100, 2) if len(wins) else 0.0,
+        "Avg loss %": round(losses.mean() * 100, 2) if len(losses) else 0.0,
+        "Profit factor": round(wins.sum() / -losses.sum(), 2) if losses.sum() < 0 else float("inf"),
+        "Expectancy % / trade": round(r.mean() * 100, 2),
+        "Avg R": round(trades_df["R"].mean(), 2),
+        "Avg days held": round(trades_df["Days"].mean(), 1),
+        "CAGR %": round((equity.iloc[-1] ** (1 / years) - 1) * 100, 2),
+        "Max drawdown %": round(((equity / peak) - 1).min() * 100, 2),
+        "Years": round(years, 1),
+    }
+
+
+# =============================================================================
 # 6. PAPER-TRADING ENGINE (st.session_state)
 # =============================================================================
 
@@ -955,6 +1153,101 @@ def render_scanner_tab(market: MarketConfig) -> None:
                         width="stretch", key=f"scanner_chart_{pick}")
 
 
+def render_backtest_tab(market: MarketConfig) -> None:
+    """Tab: backtest 'morning star at tested support' across the watchlist."""
+    st.markdown(f"#### Backtest — Morning star at tested support ({market.label})")
+    st.caption("Long only. Entry next day's open; stop below the pattern low; target the next tested "
+               "resistance (or an R-multiple); time stop. Costs deducted. Levels use only data "
+               "before each signal. Universe = today's watchlist (survivorship bias: live results "
+               "are usually worse).")
+
+    with st.form(key=f"bt_form_{market.key}"):
+        c1, c2, c3 = st.columns(3)
+        years = c1.selectbox("History", ["5y", "10y"], index=1)
+        min_tests = c1.selectbox("Min tests of support", [2, 3, 4], index=0)
+        target_mode = c2.selectbox("Target", ["Next resistance", "Fixed R-multiple"])
+        r_mult = c2.number_input("R-multiple (fallback / fixed)", 1.0, 5.0, 2.0, 0.5)
+        max_hold = c3.number_input("Max holding days", 3, 60, 15, 1)
+        slots = c3.number_input("Portfolio slots", 1, 20, 10, 1,
+                                help="Max open positions; each gets 1/slots of equity.")
+        f1, f2, f3, f4 = st.columns(4)
+        trend = f1.checkbox("Above 200-day SMA")
+        volf = f2.checkbox("Volume > 20-day avg")
+        gannf = f3.checkbox("Gann confluence")
+        cost = f4.number_input("Round-trip cost %", 0.0, 2.0, 0.30, 0.05)
+        run = st.form_submit_button("Run backtest", type="primary", width="stretch")
+
+    params = BacktestParams(min_tests=int(min_tests), trend_filter=trend, volume_filter=volf,
+                            gann_filter=gannf, target_mode=target_mode, r_multiple=float(r_mult),
+                            max_hold=int(max_hold), cost_pct=float(cost), slots=int(slots))
+    key = f"bt_result_{market.key}"
+    if run:
+        with st.spinner(f"Downloading {years} of daily data for {len(market.watchlist)} symbols…"):
+            frames, failed, err = fetch_universe(tuple(market.watchlist), period=years)
+        if not frames:
+            st.error("Live data unavailable — backtests never use synthetic data. "
+                     + (f"Reason: {err}" if err else ""))
+            return
+        with st.spinner("Simulating trades…"):
+            all_trades = []
+            for tkr, frame in frames.items():
+                all_trades += find_morning_star_trades(frame, tkr, params)
+            equity, taken = simulate_portfolio(all_trades, frames, params)
+        st.session_state[key] = {"params": params, "years": years, "failed": failed,
+                                 "signals": len(all_trades), "equity": equity, "taken": taken}
+
+    res = st.session_state.get(key)
+    if not res:
+        st.info("Set the options and tap **Run backtest**. 10 years × 50 stocks takes about a minute.")
+        return
+    if not run and res["params"] != params:
+        st.caption("Showing the last run; settings above have changed since — run again to update.")
+
+    taken, equity = res["taken"], res["equity"]
+    if taken.empty:
+        st.warning(f"No qualifying trades in {res['years']} with these filters.")
+        return
+    stats = backtest_stats(taken, equity)
+
+    # ---- Verdict against the approval thresholds ----
+    hit_ok = stats["Hit rate %"] >= 70
+    dd_ok = stats["Max drawdown %"] >= -10
+    pf_ok = stats["Profit factor"] > 1.3
+    st.markdown("##### Verdict vs your criteria")
+    v1, v2, v3 = st.columns(3)
+    v1.metric("Hit rate (target ≥ 70%)", f"{stats['Hit rate %']}%", "PASS" if hit_ok else "FAIL",
+              delta_color="normal" if hit_ok else "inverse")
+    v2.metric("Max drawdown (target ≤ 10%)", f"{stats['Max drawdown %']}%", "PASS" if dd_ok else "FAIL",
+              delta_color="normal" if dd_ok else "inverse")
+    v3.metric("Profit factor (want > 1.3)", f"{stats['Profit factor']}", "PASS" if pf_ok else "FAIL",
+              delta_color="normal" if pf_ok else "inverse")
+
+    m = st.columns(4)
+    m[0].metric("Trades taken", stats["Trades"], f"of {res['signals']} signals", delta_color="off")
+    m[1].metric("CAGR", f"{stats['CAGR %']}%")
+    m[2].metric("Expectancy / trade", f"{stats['Expectancy % / trade']}%")
+    m[3].metric("Avg win / loss", f"{stats['Avg win %']}% / {stats['Avg loss %']}%")
+    st.caption(f"Avg R {stats['Avg R']} · avg hold {stats['Avg days held']} days · {stats['Years']} years"
+               + (f" · no data for: {', '.join(res['failed'])}" if res["failed"] else ""))
+
+    fig = go.Figure(go.Scatter(x=equity.index, y=(equity - 1) * 100, mode="lines",
+                               line=dict(color="#60a5fa", width=1.8), name="Equity"))
+    dd = (equity / equity.cummax() - 1) * 100
+    fig.add_trace(go.Scatter(x=dd.index, y=dd, mode="lines", fill="tozeroy", name="Drawdown",
+                             line=dict(color="#ef4444", width=1), fillcolor="rgba(239,68,68,0.15)"))
+    fig.update_layout(template="plotly_dark", height=360, paper_bgcolor="#0b0e14", plot_bgcolor="#0f131b",
+                      margin=dict(l=10, r=10, t=30, b=10), yaxis_title="% (equity / drawdown)",
+                      legend=dict(orientation="h", y=1.08, x=0), hovermode="x unified")
+    st.plotly_chart(fig, width="stretch", key=f"bt_equity_{market.key}")
+
+    reasons = taken["Exit reason"].value_counts()
+    st.caption("Exits: " + " · ".join(f"{k} {v}" for k, v in reasons.items()))
+    show = taken.drop(columns=[c for c in taken.columns if c.startswith("_")])
+    st.dataframe(show.sort_values("Signal date", ascending=False), width="stretch", hide_index=True)
+    st.download_button("Download trades (CSV)", show.to_csv(index=False),
+                       file_name=f"morning_star_backtest_{market.key}.csv", mime="text/csv")
+
+
 def render_trading_tab(market: MarketConfig, ticker: str) -> None:
     """Tab 2: paper-trading ticket + working orders."""
     book = book_for(market)
@@ -1058,12 +1351,14 @@ def main() -> None:
 
     render_header(market)
 
-    tab1, tab_scan, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner",
-                                          "🧾 Order Execution (Paper)", "💼 Portfolio Tracker"])
+    tab1, tab_scan, tab_bt, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner", "🧪 Backtest",
+                                                  "🧾 Order Execution (Paper)", "💼 Portfolio Tracker"])
     with tab1:
         render_analysis_tab(market, ticker)
     with tab_scan:
         render_scanner_tab(market)
+    with tab_bt:
+        render_backtest_tab(market)
     with tab2:
         render_trading_tab(market, ticker)
     with tab3:
