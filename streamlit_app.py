@@ -50,10 +50,8 @@ def _fresh(modname: str):
     mod = _sys.modules.get(modname)
     if mod is None:
         mod = _importlib.import_module(modname)
-    else:
-        mt = _os.path.getmtime(mod.__file__)
-        if getattr(mod, "_loaded_mtime", None) not in (None, mt):
-            mod = _importlib.reload(mod)
+    elif getattr(mod, "_loaded_mtime", None) != _os.path.getmtime(mod.__file__):
+        mod = _importlib.reload(mod)  # also refreshes copies loaded before this check existed
     mod._loaded_mtime = _os.path.getmtime(mod.__file__)
     return mod
 
