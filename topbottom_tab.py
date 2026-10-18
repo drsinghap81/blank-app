@@ -31,16 +31,18 @@ MODES = {
                                          "(or at the open on a gap)."),
 }
 
-LOCAL = {"Bank Nifty FUTURES 2017 (NSE bhavcopy)": "data/banknifty_fut_near_2016-2018.csv"}
-SYMBOLS = {"Bank Nifty FUTURES 2017 (NSE bhavcopy)": "BNF_FUT", "Bank Nifty (^NSEBANK)": "^NSEBANK", "Nifty 50 (^NSEI)": "^NSEI",
+LOCAL = {"Bank Nifty FUTURES 2017 (NSE bhavcopy)": "data/banknifty_fut_near_2016-2018.csv",
+         "Bank Nifty FUTURES 2007–2022 (NSE bhavcopy)": "data/banknifty_fut_near_2007-2022.csv"}
+SYMBOLS = {"Bank Nifty FUTURES 2007–2022 (NSE bhavcopy)": "BNF_FUT_ALL","Bank Nifty FUTURES 2017 (NSE bhavcopy)": "BNF_FUT", "Bank Nifty (^NSEBANK)": "^NSEBANK", "Nifty 50 (^NSEI)": "^NSEI",
            "Fin Nifty (NIFTY_FIN_SERVICE.NS)": "NIFTY_FIN_SERVICE.NS"}
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_history(symbol: str) -> tuple[pd.DataFrame, str]:
-    if symbol == "BNF_FUT":
+    if symbol in ("BNF_FUT", "BNF_FUT_ALL"):
         import os
-        path = os.path.join(os.path.dirname(__file__), LOCAL["Bank Nifty FUTURES 2017 (NSE bhavcopy)"])
+        key = "Bank Nifty FUTURES 2017 (NSE bhavcopy)" if symbol == "BNF_FUT" else "Bank Nifty FUTURES 2007–2022 (NSE bhavcopy)"
+        path = os.path.join(os.path.dirname(__file__), LOCAL[key])
         return pd.read_csv(path, index_col=0, parse_dates=True), ""
     try:
         df = yf.download(symbol, period="max", interval="1d", auto_adjust=False, progress=False)
@@ -209,7 +211,7 @@ def render_topbottom_tab() -> None:
             st.dataframe(g, width="stretch")
             st.bar_chart(g["Points"])
     with t2:
-        if symbol not in ("^NSEBANK", "BNF_FUT"):
+        if symbol not in ("^NSEBANK", "BNF_FUT", "BNF_FUT_ALL"):
             st.info("The reference sheet is for Bank Nifty — choose Bank Nifty to validate.")
         else:
             st.caption("Near-month futures from NSE bhavcopies (Nov 2016–Jan 2018): should match the sheet "
