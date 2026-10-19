@@ -552,11 +552,21 @@ def fetch_universe(tickers: tuple[str, ...], period: str = LOOKBACK_PERIOD) -> t
     """
     if yf is None:
         return {}, list(tickers), "yfinance is not installed."
-    try:
-        raw = yf.download(list(tickers), period=period, interval="1d", group_by="ticker",
-                          auto_adjust=False, progress=False, threads=True)
-    except Exception as exc:
-        return {}, list(tickers), str(exc)
+    raws, last_err = [], ""
+    tick = list(tickers)
+    for k in range(0, len(tick), 100):          # Yahoo copes better with batches of ~100
+        chunk = tick[k:k + 100]
+        try:
+            r = yf.download(chunk, period=period, interval="1d", group_by="ticker",
+                            auto_adjust=False, progress=False, threads=True)
+            if len(chunk) == 1 and not isinstance(r.columns, pd.MultiIndex):
+                r = pd.concat({chunk[0]: r}, axis=1)
+            raws.append(r)
+        except Exception as exc:
+            last_err = str(exc)
+    if not raws:
+        return {}, list(tickers), last_err
+    raw = pd.concat(raws, axis=1) if len(raws) > 1 else raws[0]
     frames, failed = {}, []
     for t in tickers:
         try:
@@ -1129,9 +1139,50 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
         st.dataframe(show.iloc[::-1].round(2), width="stretch")
 
 
+NSE_UNIVERSES = {  # label -> default liquidity floor (₹ crore / day)
+    "Nifty 50 (watchlist)": 0.0,
+    "F&O stocks (~210, most liquid)": 0.0,
+    "Nifty 500 — liquid only (≥ ₹25 cr/day)": 25.0,
+    "Nifty 500 — all": 0.0,
+    "Nifty Next 50": 0.0,
+    "Nifty Midcap 150": 10.0,
+    "Nifty Smallcap 250": 5.0,
+}
+_UNIVERSE_FILES = {"F&O": "fno_stocks.csv", "Nifty 500": "nifty500.csv", "Next 50": "niftynext50.csv",
+                   "Midcap 150": "niftymidcap150.csv", "Smallcap 250": "niftysmallcap250.csv"}
+
+
+@st.cache_data(ttl=6 * 3600, show_spinner=False)
+def load_nse_universe(choice: str) -> list[str]:
+    """Yahoo tickers for the chosen NSE pool (lists refreshed weekly in data/universe/)."""
+    import os
+    if choice.startswith("Nifty 50 ("):
+        return []
+    key = next((k for k in _UNIVERSE_FILES if k in choice), None)
+    if key is None:
+        return []
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "universe", _UNIVERSE_FILES[key])
+    if not os.path.exists(p):
+        return []
+    df = pd.read_csv(p)
+    syms = df["Symbol"].astype(str).str.strip()
+    return [f"{x}.NS" for x in syms if x and x.upper() != "NAN"]
+
+
 def render_scanner_tab(market: MarketConfig) -> None:
     """Tab: scan the whole watchlist for patterns at tested levels."""
     universe = market.watchlist
+    liq_min = 0.0
+    if market.key == "NSE":
+        u1, u2 = st.columns([3, 2])
+        choice = u1.selectbox("Search pool", list(NSE_UNIVERSES), index=0, key="scan_universe",
+                              help="F&O stocks are NSE's most liquid names; Nifty 500 covers ~95% of market value.")
+        lst = load_nse_universe(choice)
+        if lst:
+            universe = tuple(lst)
+        liq_min = u2.number_input("Min avg daily traded value (₹ crore)", 0.0, 5000.0,
+                                  NSE_UNIVERSES[choice], 5.0, key=f"scan_liq_{choice}",
+                                  help="20-day average of close × volume. Skips thinly traded stocks.")
     st.markdown(f"#### Pattern scanner — {market.label} ({len(universe)} symbols)")
     st.caption(
         "Shooting star and pro gap-down at resistance (bearish), morning star and pro gap at support (bullish), "
@@ -1163,7 +1214,15 @@ def render_scanner_tab(market: MarketConfig) -> None:
                  + (f"Reason: {err}" if err else ""))
         return
     if failed:
-        st.caption(f"No data for: {', '.join(failed)}")
+        st.caption(f"No data for {len(failed)}: {', '.join(t.replace('.NS', '') for t in failed[:40])}"
+                   + (" …" if len(failed) > 40 else ""))
+    if liq_min > 0:
+        def _adv_cr(f):
+            v = (f["Close"] * f["Volume"]).tail(20).mean()
+            return float(v) / 1e7 if pd.notna(v) else 0.0
+        before = len(frames)
+        frames = {t: f for t, f in frames.items() if _adv_cr(f) >= liq_min}
+        st.caption(f"Liquidity filter: {len(frames)} of {before} stocks trade ≥ ₹{liq_min:,.0f} crore a day.")
 
     pattern_rows, near_rows = [], []
     for tkr, frame in frames.items():
@@ -1439,7 +1498,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · pro gap no-wick v6"
+APP_BUILD = "2026-10-19 · scanner pools v7"
 
 
 def main() -> None:
