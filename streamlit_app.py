@@ -1187,6 +1187,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
             st.session_state[pk] = labels[chosen]
             st.rerun()
         pick = st.session_state[pk]
+        st.caption(f"Showing **{pick.replace('.NS', '')}** — last close {float(frames[pick]['Close'].iloc[-1]):,.2f}")
         full = add_indicators(frames[pick])
         view = full.tail(DISPLAY_BARS)
         ref = float(view["Close"].iloc[-1])
@@ -1382,6 +1383,9 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
+APP_BUILD = "2026-10-19 · scanner chart picker v3"
+
+
 def main() -> None:
     configure_page()
     init_state()
@@ -1411,6 +1415,7 @@ def main() -> None:
     with tab3:
         render_portfolio_tab(market)
 
+    st.caption(f"Build {APP_BUILD}")
     st.caption("Simulation only — no orders are sent to any broker. Yahoo Finance data may be "
                "delayed and is for informational purposes.")
 
