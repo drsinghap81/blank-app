@@ -88,7 +88,8 @@ LEVEL_MAX_SHOWN = 3           # keep charts clean: 2-3 levels
 
 # ---- Pattern rules ----
 PATTERN_LEVEL_TOL = 0.006     # candle must reach within 0.6% of the level
-PATTERN_LOOKBACK_SIGNALS = 3  # scanner reports patterns completed in the last N bars
+PATTERN_LOOKBACK_SIGNALS = 1  # scanner reports patterns on the latest session only (user-selectable)
+SCAN_PERIOD = "6mo"           # scanner downloads 6 months: enough for the 6-month S/R levels
 
 # ---- Proximity scan & Gann ----
 NEAR_SCAN_PCT = 0.02          # "near a level" = last close within 2% of it
@@ -1186,7 +1187,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
     st.markdown(f"#### Pattern scanner — {market.label} ({len(universe)} symbols)")
     st.caption(
         "Shooting star and pro gap-down at resistance (bearish), morning star and pro gap at support (bullish), "
-        f"completed in the last {PATTERN_LOOKBACK_SIGNALS} sessions, plus every stock within "
+        "on the latest session (or last 3), plus every stock within "
         f"{NEAR_SCAN_PCT:.0%} of a tested level with Gann odd-square confluence "
         f"(odd square within {GANN_CONFLUENCE_PCT:.0%} of the level). Levels: 6 months of "
         "candle wicks, ≥2 tests, within 0.8%. Daily candles; the latest bar may still be forming "
@@ -1207,8 +1208,13 @@ def render_scanner_tab(market: MarketConfig) -> None:
     globals()["GAP_MIN_PCT"], globals()["GAP_SUPPORT_PCT"] = gap_min / 100, gap_sup / 100
     globals()["GAP_WICK_TOL"] = wick / 100
 
-    with st.spinner(f"Downloading {len(universe)} symbols…"):
-        frames, failed, err = fetch_universe(tuple(universe))
+    when = st.radio("Patterns formed on", ["Latest session", "Last 3 sessions"], horizontal=True,
+                    key="scan_when", help="Latest = the most recent daily candle (today's, while the market "
+                                          "is open — confirm on the close).")
+    scan_last_n = 1 if when == "Latest session" else 3
+
+    with st.spinner(f"Downloading {len(universe)} symbols (6 months)…"):
+        frames, failed, err = fetch_universe(tuple(universe), period=SCAN_PERIOD)
     if not frames:
         st.error("Live data unavailable, so the scanner can't run (it never uses synthetic data). "
                  + (f"Reason: {err}" if err else ""))
@@ -1229,7 +1235,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
         last_close = float(frame["Close"].iloc[-1])
 
         # ---- 1. Candlestick patterns at tested levels ----
-        for s in detect_signals(frame):
+        for s in detect_signals(frame, last_n=scan_last_n):
             pattern_rows.append({"Ticker": tkr, "Pattern": s["Pattern"], "Bias": s["Bias"],
                                  "Date": s["Date"].date(), "Level": round(s["Level"], 2),
                                  "Tests": s["Tests"], "Flip": "yes" if s["Flip"] else "",
@@ -1274,7 +1280,10 @@ def render_scanner_tab(market: MarketConfig) -> None:
     if st.session_state.get(ck) not in cats:
         st.session_state[ck] = next((k for k, v in cats.items() if len(v)), list(cats)[-1])
 
-    st.caption(f"Scanned {len(frames)} stocks. Tap a box to list those stocks.")
+    latest = max(f.index[-1] for f in frames.values())
+    st.caption(f"Scanned {len(frames)} stocks · latest session **{pd.Timestamp(latest).strftime('%a %d %b %Y')}**"
+               f" · patterns from {'that session' if scan_last_n == 1 else 'the last 3 sessions'}. "
+               "Tap a box to list those stocks.")
     cols = st.columns(len(cats))
     for col, (name, df_) in zip(cols, cats.items()):
         n = df_["Ticker"].nunique() if len(df_) else 0
@@ -1510,7 +1519,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · scanner layout v8"
+APP_BUILD = "2026-10-19 · scanner latest-session v9"
 
 
 def main() -> None:
