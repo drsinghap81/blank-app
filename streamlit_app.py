@@ -1250,71 +1250,78 @@ def render_scanner_tab(market: MarketConfig) -> None:
                 "Nearest Gann": f"{g_root}² = {g_sq:,.0f}",
                 "Gann confluence": "✓" if abs(g_sq / lv.price - 1) <= GANN_CONFLUENCE_PCT else ""})
 
-    c1, c2, c3, c4, c5, c6 = st.columns(6)
-    c1.metric("Scanned", f"{len(frames)}")
-    c2.metric(f"Within {NEAR_SCAN_PCT:.0%} of a level", len({r['Ticker'] for r in near_rows}))
-    c3.metric("Shooting stars @ R", sum(r["Pattern"].startswith("Shooting") for r in pattern_rows))
-    c4.metric("Morning stars @ S", sum(r["Pattern"].startswith("Morning") for r in pattern_rows))
-    c5.metric("Pro gaps @ S", sum(r["Pattern"].startswith("Pro gap at") for r in pattern_rows))
-    c6.metric("Gap-downs @ R", sum(r["Pattern"].startswith("Pro gap-down") for r in pattern_rows))
+    # ------------------------------------------------------------------
+    # Results: tap a category card -> its list (left, scrollable) -> chart (right)
+    # ------------------------------------------------------------------
+    near_df = pd.DataFrame(near_rows)
+    if len(near_df):
+        near_df = near_df.assign(_abs=near_df["Distance %"].abs()).sort_values("_abs").drop(columns="_abs")
+    pat_df = pd.DataFrame(pattern_rows)
+    if len(pat_df):
+        pat_df = pat_df.sort_values(["Date", "Ticker"], ascending=[False, True])
 
-    st.markdown("##### Candlestick patterns at tested levels")
-    if pattern_rows:
-        hits = pd.DataFrame(pattern_rows).sort_values(["Date", "Bias"], ascending=[False, True])
-        st.dataframe(hits, width="stretch", hide_index=True)
-    else:
-        st.info("No shooting star / gap-down at resistance or morning star / pro gap at support right now. "
-                "That's normal — these are selective setups.")
+    def _pat(prefix: str) -> pd.DataFrame:
+        return pat_df[pat_df["Pattern"].str.startswith(prefix)] if len(pat_df) else pat_df
 
-    st.markdown(f"##### Within {NEAR_SCAN_PCT:.0%} of support or resistance")
-    if near_rows:
-        near = pd.DataFrame(near_rows)
-        only_conf = st.toggle("Only Gann confluence", value=False, key=f"conf_{market.key}")
-        if only_conf:
-            near = near[near["Gann confluence"] == "✓"]
-        near = near.assign(_abs=near["Distance %"].abs()).sort_values("_abs").drop(columns="_abs")
-        st.dataframe(near, width="stretch", hide_index=True)
-    else:
-        st.info(f"No stock is within {NEAR_SCAN_PCT:.0%} of a tested level.")
+    cats = {
+        "🟢 Pro gap @ support": _pat("Pro gap at"),
+        "🔴 Gap-down @ resistance": _pat("Pro gap-down"),
+        "🟢 Morning star @ support": _pat("Morning"),
+        "🔴 Shooting star @ resistance": _pat("Shooting"),
+        f"📏 Within {NEAR_SCAN_PCT:.0%} of a level": near_df,
+    }
+    ck = f"scan_cat_{market.key}"
+    if st.session_state.get(ck) not in cats:
+        st.session_state[ck] = next((k for k, v in cats.items() if len(v)), list(cats)[-1])
 
-    # Quick chart of any listed stock, with levels, Gann lines and pattern markers
-    listed = list(dict.fromkeys([r["Ticker"] for r in pattern_rows] + [r["Ticker"] for r in near_rows]))
-    if listed:
-        pk = f"scan_pick_{market.key}"
-        if st.session_state.get(pk) not in listed:
-            st.session_state[pk] = listed[0]
+    st.caption(f"Scanned {len(frames)} stocks. Tap a box to list those stocks.")
+    cols = st.columns(len(cats))
+    for col, (name, df_) in zip(cols, cats.items()):
+        n = df_["Ticker"].nunique() if len(df_) else 0
+        col.button(f"{name}\n\n**{n}**", key=f"{ck}_{name}", width="stretch",
+                   type="primary" if st.session_state[ck] == name else "secondary",
+                   on_click=lambda nm=name: st.session_state.__setitem__(ck, nm))
 
-        def _step(d: int) -> None:
-            i = listed.index(st.session_state[pk])
-            st.session_state[pk] = listed[(i + d) % len(listed)]
+    cat = st.session_state[ck]
+    rows = cats[cat]
+    if cat.startswith("📏") and len(rows):
+        if st.toggle("Only Gann confluence", value=False, key=f"conf_{market.key}"):
+            rows = rows[rows["Gann confluence"] == "✓"]
 
-        st.markdown("##### Chart")
-        b1, b2, b3 = st.columns([1, 6, 1])
-        b1.button("◀", key=f"{pk}_prev", on_click=_step, args=(-1,), width="stretch")
-        b3.button("▶", key=f"{pk}_next", on_click=_step, args=(1,), width="stretch")
-        b2.markdown(f"<div style='text-align:center;font-size:1.15rem;padding-top:.35rem'><b>"
-                    f"{st.session_state[pk].replace('.NS', '')}</b> &nbsp;·&nbsp; "
-                    f"{listed.index(st.session_state[pk]) + 1} of {len(listed)}</div>", unsafe_allow_html=True)
-        labels = {t.replace(".NS", ""): t for t in listed}
-        if len(labels) <= 40:
-            chosen = st.pills("Tap a stock", list(labels), key=f"{pk}_pills_{st.session_state[pk]}",
-                              default=st.session_state[pk].replace(".NS", ""), label_visibility="collapsed")
-        else:  # big pools: searchable dropdown (type to filter); pattern hits are listed first
-            names = list(labels)
-            chosen = st.selectbox("Search a stock", names, index=names.index(st.session_state[pk].replace(".NS", "")),
-                                  key=f"{pk}_sel_{st.session_state[pk]}", label_visibility="collapsed")
-        if chosen and labels[chosen] != st.session_state[pk]:
-            st.session_state[pk] = labels[chosen]
-            st.rerun()
-        pick = st.session_state[pk]
-        st.caption(f"Showing **{pick.replace('.NS', '')}** — last close {float(frames[pick]['Close'].iloc[-1]):,.2f}")
-        full = add_indicators(frames[pick])
-        view = full.tail(DISPLAY_BARS)
-        ref = float(view["Close"].iloc[-1])
-        st.plotly_chart(build_price_chart(view, pick, select_levels(compute_levels(full), ref),
-                                          detect_signals(full, last_n=DISPLAY_BARS),
-                                          gann_odd_squares(ref, 1)),
-                        width="stretch", key=f"scanner_chart_{pick}")
+    left, right = st.columns([2, 3], gap="medium")
+    with left:
+        st.markdown(f"##### {cat} ({rows['Ticker'].nunique() if len(rows) else 0})")
+        if not len(rows):
+            st.info("Nothing in this list right now — these are selective setups. "
+                    "Try another box, a bigger search pool or looser Pro gap settings.")
+            pick = None
+        else:
+            def _label(r) -> str:
+                t = r["Ticker"].replace(".NS", "")
+                if "Pattern" in r:
+                    return f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  level {r['Level']:,.1f}  ·  {r['Last close']:,.1f}"
+                return f"{t}  ·  {r['Near'][:3]} {r['Level']:,.1f}  ·  {r['Distance %']:+.2f}%  {r['Gann confluence']}"
+            opts = list(range(len(rows)))
+            labels = [_label(r) for _, r in rows.iterrows()]
+            pk = f"scan_row_{market.key}_{cat}"
+            if st.session_state.get(pk, 0) >= len(opts):
+                st.session_state[pk] = 0
+            with st.container(height=520):
+                idx = st.radio("Stocks", opts, format_func=lambda i: labels[i], key=pk,
+                               label_visibility="collapsed")
+            pick = rows.iloc[idx]["Ticker"]
+            with st.expander("Table view / download"):
+                st.dataframe(rows, width="stretch", hide_index=True)
+    with right:
+        if pick:
+            full = add_indicators(frames[pick])
+            view = full.tail(DISPLAY_BARS)
+            ref = float(view["Close"].iloc[-1])
+            st.markdown(f"##### {pick.replace('.NS', '')} — last close {ref:,.2f}")
+            st.plotly_chart(build_price_chart(view, pick, select_levels(compute_levels(full), ref),
+                                              detect_signals(full, last_n=DISPLAY_BARS),
+                                              gann_odd_squares(ref, 1)),
+                            width="stretch", key=f"scanner_chart_{pick}")
 
 
 def render_backtest_tab(market: MarketConfig) -> None:
@@ -1503,7 +1510,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · scanner pools v7"
+APP_BUILD = "2026-10-19 · scanner layout v8"
 
 
 def main() -> None:
