@@ -1317,7 +1317,14 @@ def render_scanner_tab(market: MarketConfig) -> None:
         if st.toggle("Only Gann confluence", value=False, key=f"conf_{market.key}"):
             rows = rows[rows["Gann confluence"] == "✓"]
 
-    left, right = st.columns([2, 3], gap="medium")
+    with st.expander("Layout", expanded=False):
+        l1, l2, l3 = st.columns(3)
+        list_pct = l1.slider("List width (%)", 15, 60, 35, 5, key="scan_list_pct",
+                             help="Slide left for a narrower list and a wider chart.")
+        chart_h = l2.slider("Chart height (px)", 400, 1100, 640, 20, key="scan_chart_h")
+        bars = l3.select_slider("Chart window", [40, 60, 90, 126], value=DISPLAY_BARS, key="scan_bars",
+                                format_func=lambda b: f"{b} sessions")
+    left, right = st.columns([list_pct, 100 - list_pct], gap="medium")
     with left:
         st.markdown(f"##### {cat} — {rows['Ticker'].nunique() if len(rows) else 0} stocks")
         if not len(rows):
@@ -1338,7 +1345,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
             pk = f"scan_row_{market.key}_{cat}"
             if st.session_state.get(pk, 0) >= len(opts):
                 st.session_state[pk] = 0
-            with st.container(height=520):
+            with st.container(height=max(360, chart_h - 120)):
                 idx = st.radio("Stocks", opts, format_func=lambda i: labels[i], key=pk,
                                label_visibility="collapsed")
             pick = rows.iloc[idx]["Ticker"]
@@ -1347,13 +1354,27 @@ def render_scanner_tab(market: MarketConfig) -> None:
     with right:
         if pick:
             full = add_indicators(frames[pick])
-            view = full.tail(DISPLAY_BARS)
+            view = full.tail(bars)
             ref = float(view["Close"].iloc[-1])
-            st.markdown(f"##### {pick.replace('.NS', '')} — last close {ref:,.2f}")
-            st.plotly_chart(build_price_chart(view, pick, select_levels(compute_levels(full), ref),
-                                              detect_signals(full, last_n=DISPLAY_BARS),
-                                              gann_odd_squares(ref, 1)),
-                            width="stretch", key=f"scanner_chart_{pick}")
+            fig = build_price_chart(view, pick, select_levels(compute_levels(full), ref),
+                                    detect_signals(full, last_n=bars), gann_odd_squares(ref, 1))
+            fig.update_layout(height=chart_h)
+            h1, h2 = st.columns([4, 1])
+            h1.markdown(f"##### {pick.replace('.NS', '')} — last close {ref:,.2f}")
+            if h2.button("⛶ Full screen", key=f"scanner_fs_{pick}", width="stretch"):
+                _chart_fullscreen(fig, pick)
+            st.plotly_chart(fig, width="stretch", key=f"scanner_chart_{pick}")
+
+
+@st.dialog("Chart", width="large")
+def _chart_fullscreen(fig: go.Figure, ticker: str) -> None:
+    """Large pop-up view of a chart (press Esc or ✕ to close)."""
+    big = go.Figure(fig)
+    big.update_layout(height=820)
+    st.markdown(f"#### {ticker.replace('.NS', '')}")
+    st.plotly_chart(big, width="stretch", key=f"fs_chart_{ticker}")
+    st.caption("Tip: hover the chart and use the ⤢ icon (top-right of the chart) for true full screen; "
+               "drag on the chart to zoom, double-click to reset.")
 
 
 def render_backtest_tab(market: MarketConfig) -> None:
@@ -1542,7 +1563,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · clearer list labels v12"
+APP_BUILD = "2026-10-19 · chart full screen + layout v13"
 
 
 def main() -> None:
