@@ -94,6 +94,7 @@ PATTERN_LOOKBACK_SIGNALS = 3  # scanner reports patterns completed in the last N
 NEAR_SCAN_PCT = 0.02          # "near a level" = last close within 2% of it
 GAP_SUPPORT_PCT = 0.01        # pro-gap: red/green pair's low within 1% of a tested support
 GAP_MIN_PCT = 0.006           # pro-gap: green candle must open at least 0.6% above the red close
+GAP_WICK_TOL = 0.0005         # pro-gap: open = low (bullish) / open = high (bearish), within 0.05%
 GANN_CONFLUENCE_PCT = 0.01    # Gann odd square within 1% of a level = confluence
 
 
@@ -465,11 +466,12 @@ def detect_signals(df: pd.DataFrame, last_n: int = PATTERN_LOOKBACK_SIGNALS) -> 
         PATTERN_LEVEL_TOL of a tested level (or pokes through it) and closes below it
       * MORNING STAR AT SUPPORT: after a fall, the 3-candle pattern's low reaches
         within PATTERN_LEVEL_TOL of a tested level and candle 3 closes above it
-      * PRO GAP AT SUPPORT: a red candle followed by a green candle whose OPEN is at least
-        GAP_MIN_PCT above the red candle's close, with the pair's low within GAP_SUPPORT_PCT of a tested
+      * PRO GAP AT SUPPORT: a red candle followed by a green candle with no lower wick
+        (open = low, within GAP_WICK_TOL) whose OPEN is at least GAP_MIN_PCT above the red close, with the pair's low within GAP_SUPPORT_PCT of a tested
         support (support = a level at or below today's close)
-      * PRO GAP-DOWN AT RESISTANCE: the mirror — a green candle followed by a red candle
-        opening at least GAP_MIN_PCT below the green close, pair's high near resistance
+      * PRO GAP-DOWN AT RESISTANCE: the mirror — a green candle followed by a red candle with
+        no upper wick (open = high) opening at least GAP_MIN_PCT below the green close,
+        pair's high near resistance
 
     Levels are computed ONLY from bars before the pattern starts, so a pattern
     never "creates" the level it is being tested against.
@@ -511,7 +513,8 @@ def detect_signals(df: pd.DataFrame, last_n: int = PATTERN_LOOKBACK_SIGNALS) -> 
         prev = df.iloc[i - 1]
         red_prev = prev["Close"] < prev["Open"]
         green_now = bar["Close"] > bar["Open"]
-        if red_prev and green_now and bar["Open"] >= prev["Close"] * (1 + GAP_MIN_PCT):
+        no_low_wick = bar["Open"] - bar["Low"] <= bar["Open"] * GAP_WICK_TOL
+        if red_prev and green_now and no_low_wick and bar["Open"] >= prev["Close"] * (1 + GAP_MIN_PCT):
             pair_low = float(min(prev["Low"], bar["Low"]))
             supports = [lv for lv in compute_levels(df.iloc[:i - 1]) if lv.price <= bar["Close"]]
             for lv in sorted(supports, key=lambda x: -x.price):
@@ -525,7 +528,8 @@ def detect_signals(df: pd.DataFrame, last_n: int = PATTERN_LOOKBACK_SIGNALS) -> 
         # ---- Pro gap-down at resistance: green candle, then a red candle that OPENS below the green close ----
         green_prev = prev["Close"] > prev["Open"]
         red_now = bar["Close"] < bar["Open"]
-        if green_prev and red_now and bar["Open"] <= prev["Close"] * (1 - GAP_MIN_PCT):
+        no_high_wick = bar["High"] - bar["Open"] <= bar["Open"] * GAP_WICK_TOL
+        if green_prev and red_now and no_high_wick and bar["Open"] <= prev["Close"] * (1 - GAP_MIN_PCT):
             pair_high = float(max(prev["High"], bar["High"]))
             resist = [lv for lv in compute_levels(df.iloc[:i - 1]) if lv.price >= bar["Close"]]
             for lv in sorted(resist, key=lambda x: x.price):
@@ -1138,16 +1142,19 @@ def render_scanner_tab(market: MarketConfig) -> None:
         "during market hours, so confirm on the close.")
 
     with st.expander("Pro gap settings (both directions)", expanded=False):
-        g1, g2 = st.columns(2)
+        g1, g2, g3 = st.columns(3)
         gap_min = g1.number_input("Min gap (%) — up over red close / down below green close", 0.0, 5.0, GAP_MIN_PCT * 100, 0.1,
                                   key="pg_gap", help="Green candle's OPEN must be this far above the red candle's CLOSE.")
         gap_sup = g2.number_input("Max distance from support / resistance (%)", 0.2, 5.0, GAP_SUPPORT_PCT * 100, 0.1,
                                   key="pg_sup", help="Lowest low of the red/green pair must be this close to a tested support.")
-        st.caption("Backtest, all NSE stock futures 2019–2026, defaults 1% / 0.6%. 10 days later: "
-                   "pro gap at support +0.95% (56.7% up, 1,463 signals); gap-down at resistance +0.15% "
-                   "(52.9% up, 850 signals); any day +0.69% (54.1% up). Small edges — use with other "
-                   "confirmation; the bearish one only lags the market, it didn't fall on average.")
+        st.caption("Backtest, all NSE stock futures 2019–2026 (support/resistance 1%, gap 0.6%, no wick). "
+                   "Bullish pro gap, 10 days later: +1.14% avg, 60.9% up (151 signals; with 0.2% wick "
+                   "tolerance +1.50%, 61.9% up, 341 signals). Bearish gap-down, 5 days later: −0.37% avg, "
+                   "only 46.4% up (110 signals). Any day: +0.69%, 54.1% up over 10 days.")
+        wick = g3.number_input("No-wick tolerance (%)", 0.0, 1.0, GAP_WICK_TOL * 100, 0.01, format="%.2f",
+                               key="pg_wick", help="Open must equal the low (bullish) / high (bearish) within this %.")
     globals()["GAP_MIN_PCT"], globals()["GAP_SUPPORT_PCT"] = gap_min / 100, gap_sup / 100
+    globals()["GAP_WICK_TOL"] = wick / 100
 
     with st.spinner(f"Downloading {len(universe)} symbols…"):
         frames, failed, err = fetch_universe(tuple(universe))
@@ -1432,7 +1439,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · pro gap up/down scanner v5"
+APP_BUILD = "2026-10-19 · pro gap no-wick v6"
 
 
 def main() -> None:
