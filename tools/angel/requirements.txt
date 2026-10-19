@@ -1,0 +1,7 @@
+smartapi-python>=1.4
+pyotp
+logzero
+websocket-client
+requests
+pandas>=2.1
+numpy>=1.26

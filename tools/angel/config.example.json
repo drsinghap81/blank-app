@@ -1,0 +1,17 @@
+{
+  "symbol": "BANKNIFTY",
+  "lots": 2,
+  "dry_run": true,
+  "confirm_entries": true,
+  "confirm_reversals": true,
+  "no_reply": "skip",
+  "entry_day_sl": "intraday",
+  "buffer_pts": 25,
+  "day_sl_pct": 1.0,
+  "max_sl_pct": 2.0,
+  "be_pct": 2.0,
+  "gap_pct": 2.0,
+  "slippage_pct": 0.2,
+  "backstop_pct": 0.5,
+  "poll_seconds": 2
+}
