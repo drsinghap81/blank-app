@@ -1146,7 +1146,10 @@ def render_scanner_tab(market: MarketConfig) -> None:
     st.markdown("##### Candlestick patterns at tested levels")
     if pattern_rows:
         hits = pd.DataFrame(pattern_rows).sort_values(["Date", "Bias"], ascending=[False, True])
-        st.dataframe(hits, width="stretch", hide_index=True)
+        st.caption("Tap a row to show its chart below.")
+        ev = st.dataframe(hits, width="stretch", hide_index=True, on_select="rerun",
+                          selection_mode="single-row", key=f"scan_hits_{market.key}")
+        _scan_row_pick(ev, hits, market)
     else:
         st.info("No shooting star at resistance or morning star at support right now. "
                 "That's normal — these are selective setups.")
@@ -1158,14 +1161,20 @@ def render_scanner_tab(market: MarketConfig) -> None:
         if only_conf:
             near = near[near["Gann confluence"] == "✓"]
         near = near.assign(_abs=near["Distance %"].abs()).sort_values("_abs").drop(columns="_abs")
-        st.dataframe(near, width="stretch", hide_index=True)
+        st.caption("Tap a row to show its chart below.")
+        ev = st.dataframe(near, width="stretch", hide_index=True, on_select="rerun",
+                          selection_mode="single-row", key=f"scan_near_{market.key}_{only_conf}")
+        _scan_row_pick(ev, near, market)
     else:
         st.info(f"No stock is within {NEAR_SCAN_PCT:.0%} of a tested level.")
 
     # Quick chart of any listed stock, with levels, Gann lines and pattern markers
     listed = list(dict.fromkeys([r["Ticker"] for r in pattern_rows] + [r["Ticker"] for r in near_rows]))
     if listed:
-        pick = st.selectbox("View chart", listed, key=f"scan_pick_{market.key}")
+        pk = f"scan_pick_{market.key}"
+        if st.session_state.get(pk) not in listed:
+            st.session_state.pop(pk, None)
+        pick = st.selectbox("View chart", listed, key=pk)
         full = add_indicators(frames[pick])
         view = full.tail(DISPLAY_BARS)
         ref = float(view["Close"].iloc[-1])
@@ -1173,6 +1182,19 @@ def render_scanner_tab(market: MarketConfig) -> None:
                                           detect_signals(full, last_n=DISPLAY_BARS),
                                           gann_odd_squares(ref, 1)),
                         width="stretch", key=f"scanner_chart_{pick}")
+
+
+def _scan_row_pick(event, table: pd.DataFrame, market: MarketConfig) -> None:
+    """When a scanner table row is tapped, point the chart picker at that ticker
+    (only on a NEW tap, so the dropdown still works afterwards)."""
+    rows = getattr(getattr(event, "selection", None), "rows", None) or []
+    if not rows:
+        return
+    tkr = table.iloc[rows[0]]["Ticker"]
+    last_key = f"_scan_last_tap_{market.key}"
+    if st.session_state.get(last_key) != (tkr, rows[0], tuple(table.columns)):
+        st.session_state[last_key] = (tkr, rows[0], tuple(table.columns))
+        st.session_state[f"scan_pick_{market.key}"] = tkr
 
 
 def render_backtest_tab(market: MarketConfig) -> None:
