@@ -1274,7 +1274,8 @@ def render_scanner_tab(market: MarketConfig) -> None:
         "🔴 Gap-down @ resistance": _pat("Pro gap-down"),
         "🟢 Morning star @ support": _pat("Morning"),
         "🔴 Shooting star @ resistance": _pat("Shooting"),
-        f"📏 Within {NEAR_SCAN_PCT:.0%} of a level": near_df,
+        f"🟩 Near support (≤{NEAR_SCAN_PCT:.0%})": near_df[near_df["Near"] == "Support"] if len(near_df) else near_df,
+        f"🟥 Near resistance (≤{NEAR_SCAN_PCT:.0%})": near_df[near_df["Near"] == "Resistance"] if len(near_df) else near_df,
     }
     ck = f"scan_cat_{market.key}"
     if st.session_state.get(ck) not in cats:
@@ -1293,7 +1294,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
 
     cat = st.session_state[ck]
     rows = cats[cat]
-    if cat.startswith("📏") and len(rows):
+    if cat.startswith(("🟩", "🟥")) and len(rows):
         if st.toggle("Only Gann confluence", value=False, key=f"conf_{market.key}"):
             rows = rows[rows["Gann confluence"] == "✓"]
 
@@ -1309,7 +1310,8 @@ def render_scanner_tab(market: MarketConfig) -> None:
                 t = r["Ticker"].replace(".NS", "")
                 if "Pattern" in r:
                     return f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  level {r['Level']:,.1f}  ·  {r['Last close']:,.1f}"
-                return f"{t}  ·  {r['Near'][:3]} {r['Level']:,.1f}  ·  {r['Distance %']:+.2f}%  {r['Gann confluence']}"
+                return (f"{t}  ·  {r['Near'].lower()} {r['Level']:,.1f} (×{r['Tests']})  ·  close {r['Last close']:,.1f}"
+                        f"  ·  {r['Distance %']:+.2f}%  {'· Gann ✓' if r['Gann confluence'] else ''}")
             opts = list(range(len(rows)))
             labels = [_label(r) for _, r in rows.iterrows()]
             pk = f"scan_row_{market.key}_{cat}"
@@ -1519,7 +1521,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · scanner latest-session v9"
+APP_BUILD = "2026-10-19 · near support / resistance split v10"
 
 
 def main() -> None:
