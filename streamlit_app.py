@@ -1212,6 +1212,11 @@ def render_scanner_tab(market: MarketConfig) -> None:
                     key="scan_when", help="Latest = the most recent daily candle (today's, while the market "
                                           "is open — confirm on the close).")
     scan_last_n = 1 if when == "Latest session" else 3
+    t1, t2 = st.columns([2, 1])
+    sma_filter = t1.toggle(f"Trend filter: near support only if SMA{SMA_WINDOW} rising, near resistance only if falling",
+                           value=True, key="scan_sma_filter")
+    sma_days = int(t2.number_input("SMA slope over (sessions)", 1, 20, 5, 1, key="scan_sma_days",
+                                   help=f"Rising = SMA{SMA_WINDOW} today above its value this many sessions ago."))
 
     with st.spinner(f"Downloading {len(universe)} symbols (6 months)…"):
         frames, failed, err = fetch_universe(tuple(universe), period=SCAN_PERIOD)
@@ -1243,6 +1248,9 @@ def render_scanner_tab(market: MarketConfig) -> None:
                                  "Since signal %": round((last_close / s["Close"] - 1) * 100, 2)})
 
         # ---- 2. Price within NEAR_SCAN_PCT of a tested level (+ Gann confluence) ----
+        sma20 = frame["Close"].rolling(SMA_WINDOW).mean()
+        sma_slope = (float(sma20.iloc[-1] / sma20.iloc[-1 - sma_days] - 1) * 100
+                     if len(sma20.dropna()) > sma_days else float("nan"))
         for lv in compute_levels(frame):
             dist = lv.price / last_close - 1
             if abs(dist) > NEAR_SCAN_PCT:
@@ -1253,6 +1261,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
                 "Near": "Resistance" if dist > 0 else "Support",
                 "Level": round(lv.price, 2), "Tests": lv.touches, "Flip": "yes" if lv.flip else "",
                 "Distance %": round(dist * 100, 2),
+                f"SMA{SMA_WINDOW} {sma_days}d %": round(sma_slope, 2),
                 "Nearest Gann": f"{g_root}² = {g_sq:,.0f}",
                 "Gann confluence": "✓" if abs(g_sq / lv.price - 1) <= GANN_CONFLUENCE_PCT else ""})
 
@@ -1266,6 +1275,16 @@ def render_scanner_tab(market: MarketConfig) -> None:
     if len(pat_df):
         pat_df = pat_df.sort_values(["Date", "Ticker"], ascending=[False, True])
 
+    slope_col = f"SMA{SMA_WINDOW} {sma_days}d %"
+
+    def _near(side: str, sign: int) -> pd.DataFrame:
+        if not len(near_df):
+            return near_df
+        d = near_df[near_df["Near"] == side]
+        if sma_filter:
+            d = d[(d[slope_col] * sign) > 0]   # support: SMA rising; resistance: SMA falling
+        return d
+
     def _pat(prefix: str) -> pd.DataFrame:
         return pat_df[pat_df["Pattern"].str.startswith(prefix)] if len(pat_df) else pat_df
 
@@ -1274,8 +1293,8 @@ def render_scanner_tab(market: MarketConfig) -> None:
         "🔴 Gap-down @ resistance": _pat("Pro gap-down"),
         "🟢 Morning star @ support": _pat("Morning"),
         "🔴 Shooting star @ resistance": _pat("Shooting"),
-        f"🟩 Near support (≤{NEAR_SCAN_PCT:.0%})": near_df[near_df["Near"] == "Support"] if len(near_df) else near_df,
-        f"🟥 Near resistance (≤{NEAR_SCAN_PCT:.0%})": near_df[near_df["Near"] == "Resistance"] if len(near_df) else near_df,
+        f"🟩 Near support (≤{NEAR_SCAN_PCT:.0%}){' · SMA↑' if sma_filter else ''}": _near("Support", +1),
+        f"🟥 Near resistance (≤{NEAR_SCAN_PCT:.0%}){' · SMA↓' if sma_filter else ''}": _near("Resistance", -1),
     }
     ck = f"scan_cat_{market.key}"
     if st.session_state.get(ck) not in cats:
@@ -1294,7 +1313,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
 
     cat = st.session_state[ck]
     rows = cats[cat]
-    if cat.startswith(("🟩", "🟥")) and len(rows):
+    if cat.startswith(("🟩", "🟥")) and len(rows):  # noqa: SIM102
         if st.toggle("Only Gann confluence", value=False, key=f"conf_{market.key}"):
             rows = rows[rows["Gann confluence"] == "✓"]
 
@@ -1310,8 +1329,10 @@ def render_scanner_tab(market: MarketConfig) -> None:
                 t = r["Ticker"].replace(".NS", "")
                 if "Pattern" in r:
                     return f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  level {r['Level']:,.1f}  ·  {r['Last close']:,.1f}"
+                arrow = "↑" if r[slope_col] > 0 else "↓"
                 return (f"{t}  ·  {r['Near'].lower()} {r['Level']:,.1f} (×{r['Tests']})  ·  close {r['Last close']:,.1f}"
-                        f"  ·  {r['Distance %']:+.2f}%  {'· Gann ✓' if r['Gann confluence'] else ''}")
+                        f"  ·  {r['Distance %']:+.2f}%  ·  SMA{arrow}{abs(r[slope_col]):.1f}%"
+                        f"{'  · Gann ✓' if r['Gann confluence'] else ''}")
             opts = list(range(len(rows)))
             labels = [_label(r) for _, r in rows.iterrows()]
             pk = f"scan_row_{market.key}_{cat}"
@@ -1521,7 +1542,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · near support / resistance split v10"
+APP_BUILD = "2026-10-19 · SMA20 trend filter v11"
 
 
 def main() -> None:
