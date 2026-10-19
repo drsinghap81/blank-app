@@ -553,7 +553,8 @@ def ema_alerts(df: pd.DataFrame, last_n: int = 1, need_ema20_touch: bool = True)
            that pullback, at least one candle also reached EMA20 (low <= EMA20); the ALERT candle
            is the first one whose whole range sits above EMA9 (low > EMA9).
     SHORT: the mirror (EMA9 < EMA20, pullback up to EMA9/EMA20, alert candle high < EMA9).
-    Trigger = alert candle high (long) / low (short); stop = pullback low (long) / high (short)."""
+    Trigger = alert candle high (long) / low (short); stop = EMA 20 on the alert candle
+    (exit on a move below EMA 20 for longs / above it for shorts)."""
     out = []
     n = len(df)
     if n < EMA_SLOW + EMA_PULLBACK_MAX + 2:
@@ -579,7 +580,7 @@ def ema_alerts(df: pd.DataFrame, last_n: int = 1, need_ema20_touch: bool = True)
             if need_ema20_touch and not hit20:
                 continue
             trig = float(h.iloc[i] if side > 0 else l.iloc[i])
-            stop = float(min(l.iloc[k] for k in pb) if side > 0 else max(h.iloc[k] for k in pb))
+            stop = float(e20.iloc[i])  # SL just below EMA 20 (long) / above EMA 20 (short)
             out.append({"Ticker": None, "Date": df.index[i],
                         "Pattern": "EMA 9/20 long alert" if side > 0 else "EMA 9/20 short alert",
                         "Bias": "Bullish" if side > 0 else "Bearish", "Level": round(float(e9.iloc[i]), 2),
@@ -1395,7 +1396,8 @@ def render_scanner_tab(market: MarketConfig) -> None:
                 if "Trigger" in r:
                     act = "buy above" if r["Bias"] == "Bullish" else "sell below"
                     return (f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  {act} {r['Trigger']:,.1f}  ·  "
-                            f"SL {r['Stop']:,.1f} ({r['Risk %']:.1f}%)  ·  EMA9 {r['Level']:,.1f} / EMA20 {r['EMA20']:,.1f}")
+                            f"SL {'below' if r['Bias'] == 'Bullish' else 'above'} EMA20 {r['Stop']:,.1f} ({r['Risk %']:.1f}%)"
+                            f"  ·  EMA9 {r['Level']:,.1f}")
                 if "Pattern" in r:
                     return f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  level {r['Level']:,.1f}  ·  {r['Last close']:,.1f}"
                 trend = "rising" if r[slope_col] > 0 else "falling"
@@ -1434,7 +1436,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
                               annotation_text=f"Trigger {rr['Trigger']:,.1f}", annotation_position="right",
                               annotation_font=dict(color=col_, size=11))
                 fig.add_hline(y=rr["Stop"], line=dict(color="#fbbf24", dash="dot", width=1.2), row=1, col=1,
-                              annotation_text=f"SL {rr['Stop']:,.1f}", annotation_position="right",
+                              annotation_text=f"SL (EMA20) {rr['Stop']:,.1f}", annotation_position="right",
                               annotation_font=dict(color="#fbbf24", size=11))
             h1, h2 = st.columns([4, 1])
             h1.markdown(f"##### {pick.replace('.NS', '')} — last close {ref:,.2f}")
@@ -1640,7 +1642,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · EMA 9/20 alert scanner v14"
+APP_BUILD = "2026-10-19 · EMA alert SL at EMA20 v15"
 
 
 def main() -> None:
