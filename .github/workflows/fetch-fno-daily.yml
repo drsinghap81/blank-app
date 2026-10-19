@@ -1,0 +1,17 @@
+name: fetch-fno-daily
+on:
+  push:
+    paths: [".github/workflows/fetch-fno-daily.yml", "tools/fetch_fno_daily.py"]
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas && python tools/fetch_fno_daily.py | tee log.txt; mkdir -p fno_daily; mv log.txt fno_daily/_log.txt
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout -B fno-daily; git add -f fno_daily; git commit -m fno || exit 0; git push -f origin fno-daily
