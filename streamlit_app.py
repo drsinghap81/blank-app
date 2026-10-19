@@ -549,10 +549,10 @@ EMA_PULLBACK_MAX = 6   # pullback can last up to this many candles touching EMA 
 
 def ema_alerts(df: pd.DataFrame, last_n: int = 1, need_ema20_touch: bool = True) -> list[dict]:
     """EMA 9/20 pullback-and-release.
-    LONG : EMA9 > EMA20; the previous candle(s) touched EMA9 (low <= EMA9 <= high) and, during
+    LONG : EMA9 > EMA20 and BOTH EMAs rising on the alert candle; the previous candle(s) touched EMA9 (low <= EMA9 <= high) and, during
            that pullback, at least one candle also reached EMA20 (low <= EMA20); the ALERT candle
            is the first one whose whole range sits above EMA9 (low > EMA9).
-    SHORT: the mirror (EMA9 < EMA20, pullback up to EMA9/EMA20, alert candle high < EMA9).
+    SHORT: the mirror (EMA9 < EMA20, both EMAs falling, pullback up to EMA9/EMA20, alert candle high < EMA9).
     Trigger = alert candle high (long) / low (short); stop = EMA 20 on the alert candle
     (exit on a move below EMA 20 for longs / above it for shorts)."""
     out = []
@@ -565,6 +565,9 @@ def ema_alerts(df: pd.DataFrame, last_n: int = 1, need_ema20_touch: bool = True)
     for i in range(max(EMA_SLOW + EMA_PULLBACK_MAX, n - last_n), n):
         for side in (1, -1):
             if (e9.iloc[i] - e20.iloc[i]) * side <= 0:
+                continue
+            # both EMAs must be sloping in the trade direction on the alert candle
+            if (e9.iloc[i] - e9.iloc[i - 1]) * side <= 0 or (e20.iloc[i] - e20.iloc[i - 1]) * side <= 0:
                 continue
             clear = l.iloc[i] > e9.iloc[i] if side > 0 else h.iloc[i] < e9.iloc[i]
             if not clear:
@@ -1642,7 +1645,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · EMA alert SL at EMA20 v15"
+APP_BUILD = "2026-10-19 · EMA alert both EMAs sloping v16"
 
 
 def main() -> None:
