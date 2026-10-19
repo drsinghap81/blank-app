@@ -1,0 +1,18 @@
+name: fetch-intraday
+on:
+  push:
+    paths: [".github/workflows/fetch-intraday.yml", "tools/fetch_intraday.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas && python tools/fetch_intraday.py | tee intraday_log.txt; mkdir -p intraday; mv intraday_log.txt intraday/
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout -B intraday-data; git add -f intraday; git commit -m intraday || exit 0; git push -f origin intraday-data
