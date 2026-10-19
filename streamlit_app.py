@@ -1296,8 +1296,13 @@ def render_scanner_tab(market: MarketConfig) -> None:
                     f"{st.session_state[pk].replace('.NS', '')}</b> &nbsp;·&nbsp; "
                     f"{listed.index(st.session_state[pk]) + 1} of {len(listed)}</div>", unsafe_allow_html=True)
         labels = {t.replace(".NS", ""): t for t in listed}
-        chosen = st.pills("Tap a stock", list(labels), key=f"{pk}_pills_{st.session_state[pk]}",
-                          default=st.session_state[pk].replace(".NS", ""), label_visibility="collapsed")
+        if len(labels) <= 40:
+            chosen = st.pills("Tap a stock", list(labels), key=f"{pk}_pills_{st.session_state[pk]}",
+                              default=st.session_state[pk].replace(".NS", ""), label_visibility="collapsed")
+        else:  # big pools: searchable dropdown (type to filter); pattern hits are listed first
+            names = list(labels)
+            chosen = st.selectbox("Search a stock", names, index=names.index(st.session_state[pk].replace(".NS", "")),
+                                  key=f"{pk}_sel_{st.session_state[pk]}", label_visibility="collapsed")
         if chosen and labels[chosen] != st.session_state[pk]:
             st.session_state[pk] = labels[chosen]
             st.rerun()
