@@ -1043,12 +1043,21 @@ def render_header(market: MarketConfig) -> None:
     st.write("")
 
 
+# Plotly toolbar / gestures: scroll-wheel zoom; drag an END of the price axis to stretch it,
+# drag its middle to pan; double-click resets.
+CHART_CONFIG = {"scrollZoom": True, "displaylogo": False,
+                "modeBarButtonsToRemove": ["lasso2d", "select2d"]}
+
+
 def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None = None,
                       signals: list[dict] | None = None,
-                      gann: list[tuple[int, float]] | None = None) -> go.Figure:
+                      gann: list[tuple[int, float]] | None = None,
+                      price_zoom: float = 1.0) -> go.Figure:
     """
     Candles + SMA + S/R lines + pattern markers on top, volume in the middle,
     RSI with 70/30 bands below.
+    The price axis is on the RIGHT and fitted to the candles (lines far away never squash
+    the chart). price_zoom > 1 stretches the candles vertically around the last close.
     """
     sma_col, rsi_col = f"SMA{SMA_WINDOW}", f"RSI{RSI_WINDOW}"
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.03,
@@ -1070,20 +1079,36 @@ def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None 
     for lvl, col in ((70, "#ef4444"), (30, "#22c55e")):
         fig.add_hline(y=lvl, line=dict(color=col, width=1, dash="dash"), row=3, col=1)
 
-    # ---- Horizontal support / resistance lines ----
+    # ---- Price range: fitted to the candles, optionally stretched around the last close ----
     ref = float(df["Close"].iloc[-1])
+    lo, hi = float(df["Low"].min()), float(df["High"].max())
+    pad = (hi - lo) * 0.06 or hi * 0.01
+    y0, y1 = lo - pad, hi + pad
+    z = max(0.3, float(price_zoom or 1.0))
+    if abs(z - 1.0) > 1e-9:
+        half = (y1 - y0) / 2 / z
+        y0, y1 = ref - half, ref + half
+    in_view = lambda p: y0 <= p <= y1   # noqa: E731
+
+    # ---- Horizontal support / resistance lines (only those inside the view) ----
     for lv in levels or []:
+        if not in_view(lv.price):
+            continue
         is_res = lv.price > ref
         fig.add_hline(y=lv.price, row=1, col=1,
-                      line=dict(color="#ef4444" if is_res else "#22c55e", width=1.3, dash="dash"),
+                      line=dict(color="#ef4444" if is_res else "#22c55e", width=1.1, dash="dash"),
                       annotation_text=lv.label(ref), annotation_position="top left",
-                      annotation_font=dict(size=11, color="#fca5a5" if is_res else "#86efac"))
+                      annotation_font=dict(size=10, color="#fca5a5" if is_res else "#86efac"),
+                      annotation_bgcolor="rgba(15,19,27,0.75)")
 
-    # ---- Gann odd-square lines (purple, dotted, labelled on the right) ----
+    # ---- Gann odd-square lines: drawn only when they fall inside the view ----
     for root, sq in gann or []:
-        fig.add_hline(y=sq, row=1, col=1, line=dict(color="#a78bfa", width=1.4, dash="dot"),
-                      annotation_text=f"Gann {root}² = {sq:,.0f}", annotation_position="bottom right",
-                      annotation_font=dict(size=11, color="#c4b5fd"))
+        if not in_view(sq):
+            continue
+        fig.add_hline(y=sq, row=1, col=1, line=dict(color="#a78bfa", width=1.1, dash="dot"),
+                      annotation_text=f"Gann {root}² = {sq:,.0f}", annotation_position="bottom left",
+                      annotation_font=dict(size=10, color="#c4b5fd"),
+                      annotation_bgcolor="rgba(15,19,27,0.75)")
 
     # ---- Pattern markers (only those inside the visible window) ----
     for s in signals or []:
@@ -1105,7 +1130,8 @@ def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None 
                       plot_bgcolor="#0f131b", margin=dict(l=10, r=10, t=30, b=10),
                       legend=dict(orientation="h", y=1.04, x=0), xaxis_rangeslider_visible=False,
                       hovermode="x unified")
-    fig.update_yaxes(gridcolor="#1f2633")
+    fig.update_yaxes(gridcolor="#1f2633", side="right", fixedrange=False, ticks="outside")
+    fig.update_yaxes(range=[y0, y1], tickformat=",.2f" if ref < 1000 else ",.0f", row=1, col=1)
     fig.update_yaxes(range=[0, 100], row=3, col=1)
     fig.update_xaxes(gridcolor="#1f2633", rangebreaks=[dict(bounds=["sat", "mon"])])
     return fig
@@ -1118,14 +1144,19 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
         st.warning(f"⚠️ Live data unavailable for **{ticker}** — showing a SYNTHETIC dataset "
                    f"so the terminal keeps working.\n\nReason: {msg}")
 
-    wcol, gcol = st.columns([3, 2])
+    wcol, zcol, gcol = st.columns([3, 2, 2])
     with wcol:
         window = st.radio("Chart window", [60, 126], index=0, horizontal=True,
                           format_func=lambda n: f"{n} bars" + (" (~6 months)" if n == 126 else ""),
                           key="chart_window")
+    with zcol:
+        pzoom = st.slider("Price scale (stretch)", 0.5, 4.0, 1.0, 0.25, key="price_zoom",
+                          help="Above 1× stretches the candles vertically around the last close. "
+                               "You can also drag the top or bottom end of the price axis.")
     with gcol:
-        show_gann = st.toggle("Gann odd squares", value=True, key="show_gann",
-                              help="√price → nearest odd numbers either side → squared.")
+        show_gann = st.toggle("Gann odd squares", value=False, key="show_gann",
+                              help="√price → nearest odd numbers either side → squared. "
+                                   "Lines are drawn only when they fall inside the chart.")
     full = add_indicators(raw)
     df = full.tail(window)
     last = df.iloc[-1]
@@ -1162,8 +1193,8 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
         (st.error if s["Bias"] == "Bearish" else st.success)(msg)
 
     gann_lines = gann_odd_squares(float(last["Close"]), 1) if show_gann else None
-    st.plotly_chart(build_price_chart(df, ticker, shown_levels, chart_signals, gann_lines),
-                    width="stretch", key=f"analysis_chart_{ticker}")
+    st.plotly_chart(build_price_chart(df, ticker, shown_levels, chart_signals, gann_lines, pzoom),
+                    width="stretch", key=f"analysis_chart_{ticker}", config=CHART_CONFIG)
     if gann_lines:
         st.caption(f"Gann: √{last['Close']:,.2f} = {np.sqrt(last['Close']):.2f} → "
                    + " · ".join(f"{r}² = {sq:,.0f} ({(sq / last['Close'] - 1) * 100:+.1f}%)"
@@ -1386,6 +1417,11 @@ def render_scanner_tab(market: MarketConfig) -> None:
         chart_h = l2.slider("Chart height (px)", 400, 1100, 640, 20, key="scan_chart_h")
         bars = l3.select_slider("Chart window", [40, 60, 90, 126], value=DISPLAY_BARS, key="scan_bars",
                                 format_func=lambda b: f"{b} sessions")
+        l4, l5 = st.columns(2)
+        scan_zoom = l4.slider("Price scale (stretch)", 0.5, 4.0, 1.0, 0.25, key="scan_price_zoom",
+                              help="Above 1× stretches the candles around the last close. "
+                                   "You can also drag the top or bottom end of the price axis.")
+        scan_gann = l5.toggle("Gann odd squares", value=False, key="scan_gann")
     left, right = st.columns([list_pct, 100 - list_pct], gap="medium")
     with left:
         st.markdown(f"##### {cat} — {rows['Ticker'].nunique() if len(rows) else 0} stocks")
@@ -1424,7 +1460,8 @@ def render_scanner_tab(market: MarketConfig) -> None:
             view = full.tail(bars)
             ref = float(view["Close"].iloc[-1])
             fig = build_price_chart(view, pick, select_levels(compute_levels(full), ref),
-                                    detect_signals(full, last_n=bars), gann_odd_squares(ref, 1))
+                                    detect_signals(full, last_n=bars),
+                                    gann_odd_squares(ref, 1) if scan_gann else None, scan_zoom)
             fig.update_layout(height=chart_h)
             e9v = full["Close"].ewm(span=EMA_FAST, adjust=False).mean().tail(bars)
             e20v = full["Close"].ewm(span=EMA_SLOW, adjust=False).mean().tail(bars)
@@ -1436,16 +1473,18 @@ def render_scanner_tab(market: MarketConfig) -> None:
                 rr = rows.iloc[idx]
                 col_ = "#4ade80" if rr["Bias"] == "Bullish" else "#f87171"
                 fig.add_hline(y=rr["Trigger"], line=dict(color=col_, dash="dash", width=1.4), row=1, col=1,
-                              annotation_text=f"Trigger {rr['Trigger']:,.1f}", annotation_position="right",
+                              annotation_text=f"Trigger {rr['Trigger']:,.1f}", annotation_position="top right",
+                              annotation_bgcolor="rgba(15,19,27,0.75)",
                               annotation_font=dict(color=col_, size=11))
                 fig.add_hline(y=rr["Stop"], line=dict(color="#fbbf24", dash="dot", width=1.2), row=1, col=1,
-                              annotation_text=f"SL (EMA20) {rr['Stop']:,.1f}", annotation_position="right",
+                              annotation_text=f"SL (EMA20) {rr['Stop']:,.1f}", annotation_position="bottom right",
+                              annotation_bgcolor="rgba(15,19,27,0.75)",
                               annotation_font=dict(color="#fbbf24", size=11))
             h1, h2 = st.columns([4, 1])
             h1.markdown(f"##### {pick.replace('.NS', '')} — last close {ref:,.2f}")
             if h2.button("⛶ Full screen", key=f"scanner_fs_{pick}", width="stretch"):
                 _chart_fullscreen(fig, pick)
-            st.plotly_chart(fig, width="stretch", key=f"scanner_chart_{pick}")
+            st.plotly_chart(fig, width="stretch", key=f"scanner_chart_{pick}", config=CHART_CONFIG)
 
 
 @st.dialog("Chart", width="large")
@@ -1454,9 +1493,9 @@ def _chart_fullscreen(fig: go.Figure, ticker: str) -> None:
     big = go.Figure(fig)
     big.update_layout(height=820)
     st.markdown(f"#### {ticker.replace('.NS', '')}")
-    st.plotly_chart(big, width="stretch", key=f"fs_chart_{ticker}")
-    st.caption("Tip: hover the chart and use the ⤢ icon (top-right of the chart) for true full screen; "
-               "drag on the chart to zoom, double-click to reset.")
+    st.plotly_chart(big, width="stretch", key=f"fs_chart_{ticker}", config=CHART_CONFIG)
+    st.caption("Tip: drag the top or bottom end of the price axis (right) to stretch it, scroll to zoom, "
+               "double-click to reset.")
 
 
 def render_backtest_tab(market: MarketConfig) -> None:
@@ -1645,7 +1684,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · EMA alert both EMAs sloping v16"
+APP_BUILD = "2026-10-20 · cleaner charts: right price axis, stretch, Gann off v17"
 
 
 def main() -> None:
