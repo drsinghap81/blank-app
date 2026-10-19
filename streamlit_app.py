@@ -92,6 +92,8 @@ PATTERN_LOOKBACK_SIGNALS = 3  # scanner reports patterns completed in the last N
 
 # ---- Proximity scan & Gann ----
 NEAR_SCAN_PCT = 0.02          # "near a level" = last close within 2% of it
+GAP_SUPPORT_PCT = 0.01        # pro-gap: red/green pair's low within 1% of a tested support
+GAP_MIN_PCT = 0.006           # pro-gap: green candle must open at least 0.6% above the red close
 GANN_CONFLUENCE_PCT = 0.01    # Gann odd square within 1% of a level = confluence
 
 
@@ -463,6 +465,9 @@ def detect_signals(df: pd.DataFrame, last_n: int = PATTERN_LOOKBACK_SIGNALS) -> 
         PATTERN_LEVEL_TOL of a tested level (or pokes through it) and closes below it
       * MORNING STAR AT SUPPORT: after a fall, the 3-candle pattern's low reaches
         within PATTERN_LEVEL_TOL of a tested level and candle 3 closes above it
+      * PRO GAP AT SUPPORT: a red candle followed by a green candle whose OPEN is at least
+        GAP_MIN_PCT above the red candle's close, with the pair's low within GAP_SUPPORT_PCT of a tested
+        support (support = a level at or below today's close)
 
     Levels are computed ONLY from bars before the pattern starts, so a pattern
     never "creates" the level it is being tested against.
@@ -499,6 +504,20 @@ def detect_signals(df: pd.DataFrame, last_n: int = PATTERN_LOOKBACK_SIGNALS) -> 
                     signals.append({"Date": df.index[i], "Pattern": "Morning star at support",
                                     "Bias": "Bullish", "Level": lv.price, "Tests": lv.touches,
                                     "Flip": lv.flip, "Close": float(bar["Close"]), "idx": i})
+                    break
+        # ---- Pro gap at support: red candle, then a green candle that OPENS above the red close ----
+        prev = df.iloc[i - 1]
+        red_prev = prev["Close"] < prev["Open"]
+        green_now = bar["Close"] > bar["Open"]
+        if red_prev and green_now and bar["Open"] >= prev["Close"] * (1 + GAP_MIN_PCT):
+            pair_low = float(min(prev["Low"], bar["Low"]))
+            supports = [lv for lv in compute_levels(df.iloc[:i - 1]) if lv.price <= bar["Close"]]
+            for lv in sorted(supports, key=lambda x: -x.price):
+                if abs(pair_low / lv.price - 1) <= GAP_SUPPORT_PCT:
+                    gap_pct = (bar["Open"] / prev["Close"] - 1) * 100
+                    signals.append({"Date": df.index[i], "Pattern": f"Pro gap at support (+{gap_pct:.2f}% gap)",
+                                    "Bias": "Bullish", "Level": lv.price, "Tests": lv.touches,
+                                    "Flip": lv.flip, "Close": float(bar["Close"]), "idx": i, "Kind": "PG"})
                     break
     return signals
 
@@ -995,7 +1014,7 @@ def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None 
             mode="markers+text", showlegend=False,
             marker=dict(symbol="triangle-down" if bearish else "triangle-up", size=13,
                         color="#f87171" if bearish else "#4ade80"),
-            text=["SS" if bearish else "MS"], textfont=dict(size=10, color="#e5e7eb"),
+            text=["SS" if bearish else s.get("Kind", "MS")], textfont=dict(size=10, color="#e5e7eb"),
             textposition="top center" if bearish else "bottom center",
             hovertext=f"{s['Pattern']} @ {s['Level']:,.2f} (×{s['Tests']})", hoverinfo="text"),
             row=1, col=1)
@@ -1095,12 +1114,23 @@ def render_scanner_tab(market: MarketConfig) -> None:
     universe = market.watchlist
     st.markdown(f"#### Pattern scanner — {market.label} ({len(universe)} symbols)")
     st.caption(
-        "Shooting star at resistance (bearish) and morning star at support (bullish), "
+        "Shooting star at resistance (bearish), morning star at support and pro gap at support (bullish), "
         f"completed in the last {PATTERN_LOOKBACK_SIGNALS} sessions, plus every stock within "
         f"{NEAR_SCAN_PCT:.0%} of a tested level with Gann odd-square confluence "
         f"(odd square within {GANN_CONFLUENCE_PCT:.0%} of the level). Levels: 6 months of "
         "candle wicks, ≥2 tests, within 0.8%. Daily candles; the latest bar may still be forming "
         "during market hours, so confirm on the close.")
+
+    with st.expander("Pro gap settings", expanded=False):
+        g1, g2 = st.columns(2)
+        gap_min = g1.number_input("Min gap-up over red close (%)", 0.0, 5.0, GAP_MIN_PCT * 100, 0.1,
+                                  key="pg_gap", help="Green candle's OPEN must be this far above the red candle's CLOSE.")
+        gap_sup = g2.number_input("Max distance from support (%)", 0.2, 5.0, GAP_SUPPORT_PCT * 100, 0.1,
+                                  key="pg_sup", help="Lowest low of the red/green pair must be this close to a tested support.")
+        st.caption("Backtest of all NSE stock futures 2019–2026 with 1% / 0.6%: 1,463 signals, average "
+                   "10-day move +0.95% (56.7% up) vs +0.69% (54.1% up) on any day — a small edge, best "
+                   "used with other confirmation.")
+    globals()["GAP_MIN_PCT"], globals()["GAP_SUPPORT_PCT"] = gap_min / 100, gap_sup / 100
 
     with st.spinner(f"Downloading {len(universe)} symbols…"):
         frames, failed, err = fetch_universe(tuple(universe))
@@ -1137,18 +1167,19 @@ def render_scanner_tab(market: MarketConfig) -> None:
                 "Nearest Gann": f"{g_root}² = {g_sq:,.0f}",
                 "Gann confluence": "✓" if abs(g_sq / lv.price - 1) <= GANN_CONFLUENCE_PCT else ""})
 
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric("Scanned", f"{len(frames)}")
     c2.metric(f"Within {NEAR_SCAN_PCT:.0%} of a level", len({r['Ticker'] for r in near_rows}))
     c3.metric("Shooting stars @ R", sum(r["Bias"] == "Bearish" for r in pattern_rows))
-    c4.metric("Morning stars @ S", sum(r["Bias"] == "Bullish" for r in pattern_rows))
+    c4.metric("Morning stars @ S", sum(r["Pattern"].startswith("Morning") for r in pattern_rows))
+    c5.metric("Pro gaps @ S", sum(r["Pattern"].startswith("Pro gap") for r in pattern_rows))
 
     st.markdown("##### Candlestick patterns at tested levels")
     if pattern_rows:
         hits = pd.DataFrame(pattern_rows).sort_values(["Date", "Bias"], ascending=[False, True])
         st.dataframe(hits, width="stretch", hide_index=True)
     else:
-        st.info("No shooting star at resistance or morning star at support right now. "
+        st.info("No shooting star at resistance, morning star or pro gap at support right now. "
                 "That's normal — these are selective setups.")
 
     st.markdown(f"##### Within {NEAR_SCAN_PCT:.0%} of support or resistance")
@@ -1383,7 +1414,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · scanner chart picker v3"
+APP_BUILD = "2026-10-19 · pro gap scanner v4"
 
 
 def main() -> None:
