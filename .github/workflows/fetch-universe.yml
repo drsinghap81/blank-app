@@ -14,9 +14,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install -q pandas requests && python tools/fetch_universe_lists.py
+      - run: pip install -q pandas requests && (python tools/fetch_universe_lists.py 2>&1 | tee universe_log.txt) || true
       - run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          mkdir -p data/universe; cp universe_log.txt data/universe/_last_run_log.txt
           git add data/universe; git diff --cached --quiet && exit 0
           git commit -m "Update index constituent lists"
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
