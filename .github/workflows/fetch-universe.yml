@@ -1,0 +1,22 @@
+name: fetch-universe
+on:
+  push:
+    paths: [".github/workflows/fetch-universe.yml", "tools/fetch_universe_lists.py"]
+  schedule:
+    - cron: "0 3 * * 6"   # refresh lists every Saturday
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q pandas requests && python tools/fetch_universe_lists.py
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add data/universe; git diff --cached --quiet && exit 0
+          git commit -m "Update index constituent lists"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
