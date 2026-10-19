@@ -543,6 +543,53 @@ def detect_signals(df: pd.DataFrame, last_n: int = PATTERN_LOOKBACK_SIGNALS) -> 
     return signals
 
 
+EMA_FAST, EMA_SLOW = 9, 20
+EMA_PULLBACK_MAX = 6   # pullback can last up to this many candles touching EMA 9
+
+
+def ema_alerts(df: pd.DataFrame, last_n: int = 1, need_ema20_touch: bool = True) -> list[dict]:
+    """EMA 9/20 pullback-and-release.
+    LONG : EMA9 > EMA20; the previous candle(s) touched EMA9 (low <= EMA9 <= high) and, during
+           that pullback, at least one candle also reached EMA20 (low <= EMA20); the ALERT candle
+           is the first one whose whole range sits above EMA9 (low > EMA9).
+    SHORT: the mirror (EMA9 < EMA20, pullback up to EMA9/EMA20, alert candle high < EMA9).
+    Trigger = alert candle high (long) / low (short); stop = pullback low (long) / high (short)."""
+    out = []
+    n = len(df)
+    if n < EMA_SLOW + EMA_PULLBACK_MAX + 2:
+        return out
+    c, h, l = df["Close"], df["High"], df["Low"]
+    e9 = c.ewm(span=EMA_FAST, adjust=False).mean()
+    e20 = c.ewm(span=EMA_SLOW, adjust=False).mean()
+    for i in range(max(EMA_SLOW + EMA_PULLBACK_MAX, n - last_n), n):
+        for side in (1, -1):
+            if (e9.iloc[i] - e20.iloc[i]) * side <= 0:
+                continue
+            clear = l.iloc[i] > e9.iloc[i] if side > 0 else h.iloc[i] < e9.iloc[i]
+            if not clear:
+                continue
+            # pullback = consecutive candles just before i that touched EMA9
+            j = i - 1
+            while j >= i - EMA_PULLBACK_MAX and l.iloc[j] <= e9.iloc[j] <= h.iloc[j]:
+                j -= 1
+            if j == i - 1:
+                continue  # candle before the alert did not touch EMA9 -> not the "first" to leave
+            pb = range(j + 1, i)
+            hit20 = any((l.iloc[k] <= e20.iloc[k]) if side > 0 else (h.iloc[k] >= e20.iloc[k]) for k in pb)
+            if need_ema20_touch and not hit20:
+                continue
+            trig = float(h.iloc[i] if side > 0 else l.iloc[i])
+            stop = float(min(l.iloc[k] for k in pb) if side > 0 else max(h.iloc[k] for k in pb))
+            out.append({"Ticker": None, "Date": df.index[i],
+                        "Pattern": "EMA 9/20 long alert" if side > 0 else "EMA 9/20 short alert",
+                        "Bias": "Bullish" if side > 0 else "Bearish", "Level": round(float(e9.iloc[i]), 2),
+                        "EMA20": round(float(e20.iloc[i]), 2), "Trigger": round(trig, 2),
+                        "Stop": round(stop, 2), "Risk %": round(abs(trig - stop) / trig * 100, 2),
+                        "Pullback candles": len(pb), "Touched EMA20": "yes" if hit20 else "no",
+                        "Last close": round(float(c.iloc[-1]), 2)})
+    return out
+
+
 @st.cache_data(ttl=CACHE_TTL_SECONDS, show_spinner=False)
 def fetch_universe(tickers: tuple[str, ...], period: str = LOOKBACK_PERIOD) -> tuple[dict, list[str], str]:
     """
@@ -1215,6 +1262,8 @@ def render_scanner_tab(market: MarketConfig) -> None:
     t1, t2 = st.columns([2, 1])
     sma_filter = t1.toggle(f"Trend filter: near support only if SMA{SMA_WINDOW} rising, near resistance only if falling",
                            value=True, key="scan_sma_filter")
+    ema_need20 = st.toggle("EMA 9/20 alert: pullback must also touch EMA 20", value=True, key="scan_ema20",
+                           help="Off = a touch of EMA 9 alone is enough before the alert candle.")
     sma_days = int(t2.number_input("SMA slope over (sessions)", 1, 20, 5, 1, key="scan_sma_days",
                                    help=f"Rising = SMA{SMA_WINDOW} today above its value this many sessions ago."))
 
@@ -1235,7 +1284,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
         frames = {t: f for t, f in frames.items() if _adv_cr(f) >= liq_min}
         st.caption(f"Liquidity filter: {len(frames)} of {before} stocks trade ≥ ₹{liq_min:,.0f} crore a day.")
 
-    pattern_rows, near_rows = [], []
+    pattern_rows, near_rows, ema_rows = [], [], []
     for tkr, frame in frames.items():
         last_close = float(frame["Close"].iloc[-1])
 
@@ -1246,6 +1295,12 @@ def render_scanner_tab(market: MarketConfig) -> None:
                                  "Tests": s["Tests"], "Flip": "yes" if s["Flip"] else "",
                                  "Pattern close": round(s["Close"], 2), "Last close": round(last_close, 2),
                                  "Since signal %": round((last_close / s["Close"] - 1) * 100, 2)})
+
+        # ---- 1b. EMA 9/20 pullback-and-release alerts ----
+        for a in ema_alerts(frame, last_n=scan_last_n, need_ema20_touch=ema_need20):
+            a["Ticker"] = tkr
+            a["Date"] = a["Date"].date()
+            ema_rows.append(a)
 
         # ---- 2. Price within NEAR_SCAN_PCT of a tested level (+ Gann confluence) ----
         sma20 = frame["Close"].rolling(SMA_WINDOW).mean()
@@ -1288,7 +1343,10 @@ def render_scanner_tab(market: MarketConfig) -> None:
     def _pat(prefix: str) -> pd.DataFrame:
         return pat_df[pat_df["Pattern"].str.startswith(prefix)] if len(pat_df) else pat_df
 
+    ema_df = pd.DataFrame(ema_rows)
     cats = {
+        "🟢 EMA 9/20 long alert": ema_df[ema_df["Bias"] == "Bullish"] if len(ema_df) else ema_df,
+        "🔴 EMA 9/20 short alert": ema_df[ema_df["Bias"] == "Bearish"] if len(ema_df) else ema_df,
         "🟢 Pro gap @ support": _pat("Pro gap at"),
         "🔴 Gap-down @ resistance": _pat("Pro gap-down"),
         "🟢 Morning star @ support": _pat("Morning"),
@@ -1334,6 +1392,10 @@ def render_scanner_tab(market: MarketConfig) -> None:
         else:
             def _label(r) -> str:
                 t = r["Ticker"].replace(".NS", "")
+                if "Trigger" in r:
+                    act = "buy above" if r["Bias"] == "Bullish" else "sell below"
+                    return (f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  {act} {r['Trigger']:,.1f}  ·  "
+                            f"SL {r['Stop']:,.1f} ({r['Risk %']:.1f}%)  ·  EMA9 {r['Level']:,.1f} / EMA20 {r['EMA20']:,.1f}")
                 if "Pattern" in r:
                     return f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  level {r['Level']:,.1f}  ·  {r['Last close']:,.1f}"
                 trend = "rising" if r[slope_col] > 0 else "falling"
@@ -1359,6 +1421,21 @@ def render_scanner_tab(market: MarketConfig) -> None:
             fig = build_price_chart(view, pick, select_levels(compute_levels(full), ref),
                                     detect_signals(full, last_n=bars), gann_odd_squares(ref, 1))
             fig.update_layout(height=chart_h)
+            e9v = full["Close"].ewm(span=EMA_FAST, adjust=False).mean().tail(bars)
+            e20v = full["Close"].ewm(span=EMA_SLOW, adjust=False).mean().tail(bars)
+            fig.add_trace(go.Scatter(x=e9v.index, y=e9v, name=f"EMA {EMA_FAST}", line=dict(color="#f59e0b", width=1.6)),
+                          row=1, col=1)
+            fig.add_trace(go.Scatter(x=e20v.index, y=e20v, name=f"EMA {EMA_SLOW}", line=dict(color="#3b82f6", width=1.6)),
+                          row=1, col=1)
+            if len(rows) and "Trigger" in rows.columns:
+                rr = rows.iloc[idx]
+                col_ = "#4ade80" if rr["Bias"] == "Bullish" else "#f87171"
+                fig.add_hline(y=rr["Trigger"], line=dict(color=col_, dash="dash", width=1.4), row=1, col=1,
+                              annotation_text=f"Trigger {rr['Trigger']:,.1f}", annotation_position="right",
+                              annotation_font=dict(color=col_, size=11))
+                fig.add_hline(y=rr["Stop"], line=dict(color="#fbbf24", dash="dot", width=1.2), row=1, col=1,
+                              annotation_text=f"SL {rr['Stop']:,.1f}", annotation_position="right",
+                              annotation_font=dict(color="#fbbf24", size=11))
             h1, h2 = st.columns([4, 1])
             h1.markdown(f"##### {pick.replace('.NS', '')} — last close {ref:,.2f}")
             if h2.button("⛶ Full screen", key=f"scanner_fs_{pick}", width="stretch"):
@@ -1563,7 +1640,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · chart full screen + layout v13"
+APP_BUILD = "2026-10-19 · EMA 9/20 alert scanner v14"
 
 
 def main() -> None:
