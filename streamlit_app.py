@@ -1293,8 +1293,8 @@ def render_scanner_tab(market: MarketConfig) -> None:
         "🔴 Gap-down @ resistance": _pat("Pro gap-down"),
         "🟢 Morning star @ support": _pat("Morning"),
         "🔴 Shooting star @ resistance": _pat("Shooting"),
-        f"🟩 Near support (≤{NEAR_SCAN_PCT:.0%}){' · SMA↑' if sma_filter else ''}": _near("Support", +1),
-        f"🟥 Near resistance (≤{NEAR_SCAN_PCT:.0%}){' · SMA↓' if sma_filter else ''}": _near("Resistance", -1),
+        f"🟩 Near support (≤{NEAR_SCAN_PCT:.0%}){f' · SMA{SMA_WINDOW} rising' if sma_filter else ''}": _near("Support", +1),
+        f"🟥 Near resistance (≤{NEAR_SCAN_PCT:.0%}){f' · SMA{SMA_WINDOW} falling' if sma_filter else ''}": _near("Resistance", -1),
     }
     ck = f"scan_cat_{market.key}"
     if st.session_state.get(ck) not in cats:
@@ -1319,7 +1319,7 @@ def render_scanner_tab(market: MarketConfig) -> None:
 
     left, right = st.columns([2, 3], gap="medium")
     with left:
-        st.markdown(f"##### {cat} ({rows['Ticker'].nunique() if len(rows) else 0})")
+        st.markdown(f"##### {cat} — {rows['Ticker'].nunique() if len(rows) else 0} stocks")
         if not len(rows):
             st.info("Nothing in this list right now — these are selective setups. "
                     "Try another box, a bigger search pool or looser Pro gap settings.")
@@ -1329,9 +1329,9 @@ def render_scanner_tab(market: MarketConfig) -> None:
                 t = r["Ticker"].replace(".NS", "")
                 if "Pattern" in r:
                     return f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  level {r['Level']:,.1f}  ·  {r['Last close']:,.1f}"
-                arrow = "↑" if r[slope_col] > 0 else "↓"
-                return (f"{t}  ·  {r['Near'].lower()} {r['Level']:,.1f} (×{r['Tests']})  ·  close {r['Last close']:,.1f}"
-                        f"  ·  {r['Distance %']:+.2f}%  ·  SMA{arrow}{abs(r[slope_col]):.1f}%"
+                trend = "rising" if r[slope_col] > 0 else "falling"
+                return (f"{t}  ·  {r['Near'].lower()} {r['Level']:,.1f} ({r['Tests']} tests)  ·  close {r['Last close']:,.1f}"
+                        f"  ·  {abs(r['Distance %']):.2f}% away  ·  SMA{SMA_WINDOW} {trend} {abs(r[slope_col]):.1f}% in {sma_days}d"
                         f"{'  · Gann ✓' if r['Gann confluence'] else ''}")
             opts = list(range(len(rows)))
             labels = [_label(r) for _, r in rows.iterrows()]
@@ -1542,7 +1542,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-19 · SMA20 trend filter v11"
+APP_BUILD = "2026-10-19 · clearer list labels v12"
 
 
 def main() -> None:
