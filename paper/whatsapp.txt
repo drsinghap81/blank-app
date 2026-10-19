@@ -1,8 +1,8 @@
-*TOP BOTTOM LEVELS for 19/10/2026*
+*TOP BOTTOM LEVELS for 20/10/2026*
 
-*BANKNIFTY FUT (27-OCT) - Closing Price 55,918.00*
+*BANKNIFTY FUT (27-OCT) - Closing Price 55,576.40*
 Position: FLAT  (2 lots x 30)
-    No Buy trade as awaiting new top
+    Buy above +25 @ 55,943 (Prev Top 55,918.00); if triggers keep 1% SL at 55,384
     Sell below -25 @ 55,456 (Prev Bottom 55,480.80); if triggers keep 1% SL at 56,010
     Gap > 2% beyond a level at the open: exit only, no new trade (let the market settle)
 
