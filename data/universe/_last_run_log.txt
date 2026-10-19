@@ -1,0 +1,6 @@
+nifty500 501 https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv
+nifty50 50 https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv
+niftynext50 50 https://nsearchives.nseindia.com/content/indices/ind_niftynext50list.csv
+niftymidcap150 150 https://nsearchives.nseindia.com/content/indices/ind_niftymidcap150list.csv
+niftysmallcap250 251 https://nsearchives.nseindia.com/content/indices/ind_niftysmallcap250list.csv
+fno 213 2026-10-16
