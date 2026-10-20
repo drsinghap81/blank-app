@@ -178,9 +178,23 @@ def main():
     ap.add_argument("--strikes", type=int, default=10, help="strikes each side of ATM")
     ap.add_argument("--out", default=str(HERE / "out"))
     ap.add_argument("--probe", action="store_true")
+    ap.add_argument("--index-history", action="store_true", help="continuous 1-minute index candles, one file per month")
     a = ap.parse_args()
 
     b, lim = connect(), Limiter()
+    if a.index_history:
+        months = pd.period_range(a.frm, min(pd.Timestamp(a.to), pd.Timestamp.today()), freq="M")[::-1]
+        folder = Path(a.out) / "INDEX_1min" / a.symbol
+        folder.mkdir(parents=True, exist_ok=True)
+        for m in months:
+            f = folder / f"{m}.csv"
+            if f.exists() and m < pd.Period(pd.Timestamp.today(), "M"):
+                continue
+            df = fetch(b, lim, a.symbol, m.start_time.date(), m.end_time.date(), "cash")
+            (df if df is not None else pd.DataFrame()).to_csv(f, index=False)
+            log(f"{a.symbol} index {m}: {0 if df is None else len(df)} candles   (calls today {lim.calls})")
+        print("Done.")
+        return
     ex = pd.read_csv(HERE / "expiries.csv", parse_dates=["expiry", "window_start"])
 
     if a.probe:      # how far back does Breeze go? try one ATM call for a few old expiries
