@@ -72,11 +72,11 @@ def path(o, h, l, c, steps=60):
     return out
 
 
-def run(start, mode="close", end=None):
+def run(start, mode="close", end=None, **over):
     df = pd.read_csv(os.path.join(REPO, "data/futures/BANKNIFTY.csv"), index_col=0, parse_dates=True)[["Open", "High", "Low", "Close"]]
     if end:
         df = df.loc[:end]
-    cfg = dict(tl.DEFAULT_CFG, entry_day_sl=mode, dry_run=True)
+    cfg = dict(tl.DEFAULT_CFG, entry_day_sl=mode, dry_run=True, **over)
     st0 = tl.init_flat_state(df[df.index < start], cfg)
     st = st0
     br = FakeBroker()

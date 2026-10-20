@@ -41,7 +41,13 @@ DEFAULT_CFG = {
     "day_sl_pct": 1.0,
     "max_sl_pct": 2.0,
     "be_pct": 2.0,
-    "gap_pct": 2.0,
+    "gap_pct": 2.0,                  # open beyond a level by more than this %: no new trade
+    "glitch_pts": 0,                 # >0: a top/bottom closer than this many points to the last close
+    "glitch_buf_pct": 0.5,           #     gets a % buffer (Swaycharts: 1%, cut to 0.5% in 2023) instead of buffer_pts
+    "event_exit": False,             # exit a PROFITABLE position at the close before a major event, no entries on the day
+    "event_dates": ["2017-02-01", "2018-02-01", "2019-02-01", "2019-05-23", "2019-07-05", "2020-02-01",
+                    "2021-02-01", "2022-02-01", "2023-02-01", "2024-02-01", "2024-06-04", "2024-07-23",
+                    "2025-02-01", "2026-02-01"],   # Union Budgets + general-election results
     "use_once": True,
     "entry_day_sl": "intraday",      # "intraday" = real 1% stop all day; "close" = check at 15:20 only (backtest style)
     "confirm_entries": True,         # ask on Telegram before a NEW entry
@@ -98,20 +104,31 @@ def levels(hist: pd.DataFrame):
     return (None if np.isnan(t) else float(t)), (None if np.isnan(b) else float(b))
 
 
+def level_buffer(level: float, last_close: float, cfg: dict) -> float:
+    """points added beyond a top / bottom. A shallow ("glitch") level close to the last close
+    gets a percentage buffer when glitch_pts is set."""
+    g = cfg.get("glitch_pts") or 0
+    if g and abs(level - last_close) < g:
+        return level * cfg.get("glitch_buf_pct", 0.5) / 100
+    return cfg["buffer_pts"]
+
+
 def make_plan(hist: pd.DataFrame, st: State, cfg: dict) -> dict:
-    buf = cfg["buffer_pts"]
     top, bot = levels(hist)
-    buy_lvl = top + buf if top is not None and (not cfg["use_once"] or not same(top, st.used_T)) else None
-    sell_lvl = bot - buf if bot is not None and (not cfg["use_once"] or not same(bot, st.used_B)) else None
+    lc = float(hist["Close"].iloc[-1])
+    bt = level_buffer(top, lc, cfg) if top is not None else 0.0
+    bb = level_buffer(bot, lc, cfg) if bot is not None else 0.0
+    buy_lvl = top + bt if top is not None and (not cfg["use_once"] or not same(top, st.used_T)) else None
+    sell_lvl = bot - bb if bot is not None and (not cfg["use_once"] or not same(bot, st.used_B)) else None
     plan = dict(date=str(hist.index[-1].date()), top=top, bot=bot, buy_lvl=buy_lvl, sell_lvl=sell_lvl,
                 prot=None, prot_is_sys=False, reverse_lvl=None)
     if st.pos != 0:
         ent = st.entry
         prot = ent * (1 - st.pos * cfg["max_sl_pct"] / 100)
         if st.pos > 0 and bot is not None:
-            prot = max(prot, bot - buf)
+            prot = max(prot, bot - bb)
         if st.pos < 0 and top is not None:
-            prot = min(prot, top + buf)
+            prot = min(prot, top + bt)
         if st.be_on:
             prot = max(prot, ent) if st.pos > 0 else min(prot, ent)
         is_sys = (st.pos > 0 and sell_lvl is not None and abs(prot - sell_lvl) < EPS) or \
@@ -175,6 +192,14 @@ class TradingDay:
         self.rolled = False
         self.keys = {}
         self._since_entry = (float("-inf"), float("inf"))
+        ev = [pd.Timestamp(x).date() for x in cfg.get("event_dates", [])] if cfg.get("event_exit") else []
+        self.event_today = today in ev
+        # eve = the last weekday before an event (only weekends in between)
+        self.event_eve = any(e > today and all(pd.Timestamp(d).weekday() >= 5
+                                               for d in pd.date_range(today + timedelta(days=1), e - timedelta(days=1)))
+                             for e in ev)
+        if self.event_today:
+            self.done_for_day = True
 
     # ---- helpers
     def save(self):
@@ -389,8 +414,15 @@ class TradingDay:
 
     # ---- late in the day
     def before_close(self, q):
-        """15:20 IST: entry-day stop on the close (backtest-style mode) and expiry rollover."""
+        """15:20 IST: entry-day stop on the close (backtest-style mode), pre-event exit."""
         st, c = self.st, self.cfg
+        if st.pos != 0 and self.event_eve and not getattr(self, "_event_done", False):
+            self._event_done = True
+            if (q["ltp"] - st.entry) * st.pos > 0:
+                self.exit_position("Pre-event profit booking", q["ltp"])
+                self.done_for_day = True
+                self.save()
+                return
         if st.pos != 0 and self.entered_today and c["entry_day_sl"] == "close" and not self.close_checked:
             self.close_checked = True
             stop = st.entry * (1 - st.pos * c["day_sl_pct"] / 100)
