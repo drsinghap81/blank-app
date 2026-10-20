@@ -61,7 +61,7 @@ import pandas as pd
 # Union Budgets and general-election results (pre-event profit booking, Swaycharts rule since Feb 2020)
 EVENT_DATES = ("2017-02-01", "2018-02-01", "2019-02-01", "2019-05-23", "2019-07-05", "2020-02-01",
                "2021-02-01", "2022-02-01", "2023-02-01", "2024-02-01", "2024-06-04", "2024-07-23",
-               "2025-02-01", "2026-02-01")
+               "2025-02-01", "2026-02-01", "2027-02-01")
 
 
 _EV_CACHE: dict = {}

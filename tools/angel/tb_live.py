@@ -47,7 +47,7 @@ DEFAULT_CFG = {
     "event_exit": True,              # exit a PROFITABLE position at the close before a major event, no entries on the day
     "event_dates": ["2017-02-01", "2018-02-01", "2019-02-01", "2019-05-23", "2019-07-05", "2020-02-01",
                     "2021-02-01", "2022-02-01", "2023-02-01", "2024-02-01", "2024-06-04", "2024-07-23",
-                    "2025-02-01", "2026-02-01"],   # Union Budgets + general-election results
+                    "2025-02-01", "2026-02-01", "2027-02-01"],   # Union Budgets + general-election results
     "use_once": True,
     "entry_day_sl": "intraday",      # "intraday" = real 1% stop all day; "close" = check at 15:20 only (backtest style)
     "confirm_entries": True,         # ask on Telegram before a NEW entry
