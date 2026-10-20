@@ -1515,18 +1515,20 @@ def render_scanner_tab(market: MarketConfig) -> None:
                     "engulfing (its body covers the red body). **Entry:** next session, buy above the engulfing high. "
                     "**Stop:** below the lower of the two lows. **Exit:** keep the stop until Supertrend (10,3) turns up, "
                     "then exit on a daily close below Supertrend (purple dotted line). The 3R line is for reference.")
-        st.caption("Backtest, 213 NSE F&O stocks 2008–2026: +0.57R per trade, profit factor 1.96, 34% winners, "
-                   "average hold ~27 days, ~14 trades a year (fixed 3R target: +0.30R). Positive in 2008–17 and 2018–26. "
-                   "The mirror short (failed 52-week-high breakout + bearish engulfing) LOST money in every variant tested, "
-                   "so it is not scanned. Stops are wide (median ~6% of price): size by the stop distance. "
-                   "Survivorship check with the historical F&O list is in progress.")
+        st.caption("Honest backtest — every stock that was in F&O at the time, including ones later dropped or "
+                   "delisted (NSE bhavcopies 2009–2026): +0.12R per trade, profit factor 1.18, 29% winners, worst "
+                   "drawdown −41R, ~20 trades a year — a weak edge. On today's F&O list only it looked much better "
+                   "(+0.57R, PF 1.96) because companies that collapsed (DHFL, Jet, RCOM…) are missing; on those it lost "
+                   "(−0.09R). Treat as a watch-list idea, not a proven system. Stops are wide (median ~6%). "
+                   "The mirror short lost money in every variant and is not scanned.")
     with st.expander("⭐ Tested candle setups — what was tested and how", expanded=False):
         st.caption("Patterns and confluences from the 'Candlestick Pattern – Chart Examples' deck, backtested on 213 NSE "
                    "F&O stocks, daily, 2010–2026: enter at the next open, stop just beyond the pattern's low (long) / "
                    "high (short), target 1R or 2R, exit after 15 sessions. Patterns ALONE had no edge (47% hit 1R, "
                    "−0.08R per trade). Only combinations profitable in BOTH 2010–19 and 2020–26 are starred. "
                    "None reach a 70% hit rate at 1R; the best are 53–57% with +0.1 to +0.2R per trade. "
-                   "Hand-drawn trendlines are not included.")
+                   "Hand-drawn trendlines are not included. Caution: tested on today's F&O list — other stock "
+                   "strategies roughly halved when re-tested on the historical F&O list, so expect less.")
         if setups:
             st.dataframe(pd.DataFrame([{"Candle": x["pattern"], "Confluence": " + ".join(x["confluences"]),
                                         "Trades": x["n"], "Hit 1R %": x["hit1R"], "Avg R (1R target)": x["E1R"],
@@ -1844,7 +1846,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-20 · 52-week-low trap scanner + Supertrend exit v19"
+APP_BUILD = "2026-10-20 · honest (point-in-time) backtest notes v20"
 
 
 def main() -> None:
