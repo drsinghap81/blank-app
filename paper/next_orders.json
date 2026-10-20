@@ -8,7 +8,7 @@
     "orders": [
       "Buy above +25 @ 55,943 (Prev Top 55,918.00); if triggers keep 1% SL at 55,384",
       "Sell below -25 @ 55,456 (Prev Bottom 55,480.80); if triggers keep 1% SL at 56,010",
-      "Gap > 2% beyond a level at the open: exit only, no new trade (let the market settle)"
+      "Gap > 1% beyond a level at the open: exit only, no new trade (let the market settle)"
     ],
     "lines": {
       "Buy above": 55943.0,
