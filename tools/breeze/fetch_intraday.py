@@ -1,6 +1,6 @@
 """Download 1-minute history for expired NIFTY / BANKNIFTY options from ICICI Direct Breeze.
 
-Runs on YOUR computer. Keys stay in tools/breeze/.env (never commit it, never paste it in chat).
+Runs on YOUR computer. Keys stay in keys.txt (or .env) next to this script (never commit it, never paste it in chat).
 
   python fetch_intraday.py --probe                    # 1 test call: shows how far back data goes
   python fetch_intraday.py --symbol NIFTY --from 2024-01-01
@@ -25,8 +25,9 @@ PER_MIN = 90                                           # and ~100 calls/minute
 
 
 def load_env():
-    p = HERE / ".env"
-    if p.exists():
+    for p in (HERE / "keys.txt", HERE / ".env"):
+        if not p.exists():
+            continue
         for line in p.read_text().splitlines():
             if "=" in line and not line.strip().startswith("#"):
                 k, v = line.split("=", 1)
@@ -38,7 +39,7 @@ def connect():
     load_env()
     key, secret = os.environ.get("BREEZE_API_KEY"), os.environ.get("BREEZE_API_SECRET")
     if not key or not secret:
-        sys.exit("Put BREEZE_API_KEY and BREEZE_API_SECRET in tools/breeze/.env first (see .env.example).")
+        sys.exit("Open keys.txt in this folder and paste your BREEZE_API_KEY and BREEZE_API_SECRET after the = signs.")
     tok = os.environ.get("BREEZE_SESSION")
     if not tok:
         print("Open this link, log in, and copy the 'apisession' value from the address bar after login:")

@@ -168,3 +168,4 @@ tools/angel/config.json
 tools/angel/state/
 tools/breeze/.env
 tools/breeze/out/
+tools/breeze/keys.txt
