@@ -8,6 +8,7 @@ s = requests.Session()
 s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
                   "Referer": "https://www.nseindia.com/"})
 UND = ("NIFTY", "BANKNIFTY")
+MONTHLY = False
 COLS = ["Date", "SYMBOL", "INST", "EXPIRY", "STRIKE", "TYPE", "OPEN", "HIGH", "LOW", "CLOSE", "SETTLE", "OI", "VOL"]
 
 
@@ -55,7 +56,12 @@ def day(d):
             continue
         ref = float(f.CLOSE.iloc[0])
         o = g[g.INST == "OPT"]
-        ex = sorted(o.EXPIRY.unique())[:3]
+        ex = sorted(o.EXPIRY.unique())
+        if MONTHLY:      # last expiry of each calendar month, up to ~80 days out
+            m = pd.Series(ex); m = m.groupby(m.dt.to_period("M")).max()
+            ex = [e for e in m if (e - d).days <= 80]
+        else:
+            ex = ex[:3]
         o = o[o.EXPIRY.isin(ex) & (o.STRIKE.between(ref * 0.88, ref * 1.12))]
         out += [f.head(2), o]
     r = pd.concat(out)
@@ -65,6 +71,7 @@ def day(d):
 
 
 start, end, out = sys.argv[1:4]
+MONTHLY = len(sys.argv) > 4 and sys.argv[4] == "monthly"
 rows, miss = [], 0
 for d in pd.bdate_range(start, end):
     r = day(d)
