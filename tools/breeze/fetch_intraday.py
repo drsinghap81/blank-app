@@ -34,19 +34,85 @@ def load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 
+LOG = HERE / "breeze_log.txt"
+
+
+def log(*a):
+    msg = " ".join(str(x) for x in a)
+    print(msg)
+    with open(LOG, "a", encoding="utf-8") as f:
+        f.write(f"{datetime.now():%Y-%m-%d %H:%M:%S}  {msg}\n")
+
+
+def capture_session(url, timeout=300):
+    """Open the ICICI login page and catch the apisession token on http://127.0.0.1 (the app's redirect URL)."""
+    import webbrowser
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    from urllib.parse import urlparse, parse_qs
+    got = {}
+
+    class H(BaseHTTPRequestHandler):
+        def _grab(self, body=""):
+            q = parse_qs(urlparse(self.path).query)
+            q.update(parse_qs(body))
+            if q.get("apisession"):
+                got["tok"] = q["apisession"][0]
+            self.send_response(200); self.send_header("Content-Type", "text/html"); self.end_headers()
+            self.wfile.write(b"<h2>Logged in. You can close this tab and go back to the black window.</h2>")
+
+        def do_GET(self):
+            self._grab()
+
+        def do_POST(self):
+            n = int(self.headers.get("Content-Length") or 0)
+            self._grab(self.rfile.read(n).decode("utf-8", "ignore"))
+
+        def log_message(self, *a):
+            pass
+
+    try:
+        srv = HTTPServer(("127.0.0.1", 80), H)
+    except OSError as e:
+        log("Could not listen on http://127.0.0.1 (", e, ") - falling back to copy/paste.")
+        return None
+    srv.timeout = 5
+    log("Opening the ICICI login page in your browser. Log in there; this window continues by itself.")
+    webbrowser.open(url)
+    t0 = time.time()
+    while "tok" not in got and time.time() - t0 < timeout:
+        srv.handle_request()
+    srv.server_close()
+    return got.get("tok")
+
+
 def connect():
-    from breeze_connect import BreezeConnect
+    try:
+        from breeze_connect import BreezeConnect
+    except ImportError:
+        log("Installing breeze-connect (one time)...")
+        import subprocess
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "breeze-connect", "pandas"])
+        from breeze_connect import BreezeConnect
     load_env()
     key, secret = os.environ.get("BREEZE_API_KEY"), os.environ.get("BREEZE_API_SECRET")
+    log("Python", sys.version.split()[0], "| API key found:", bool(key), "| secret found:", bool(secret))
     if not key or not secret:
-        sys.exit("Open keys.txt in this folder and paste your BREEZE_API_KEY and BREEZE_API_SECRET after the = signs.")
-    tok = os.environ.get("BREEZE_SESSION")
+        log("STOP: open keys.txt in this folder and paste your API key and secret after the = signs, then save.")
+        raise SystemExit(1)
+    from urllib.parse import quote_plus
+    url = f"https://api.icicidirect.com/apiuser/login?api_key={quote_plus(key)}"
+    tok = os.environ.get("BREEZE_SESSION") or capture_session(url)
     if not tok:
-        print("Open this link, log in, and copy the 'apisession' value from the address bar after login:")
-        print(f"  https://api.icicidirect.com/apiuser/login?api_key={key}")
+        print("Open this link, log in, and copy the number after 'apisession=' in the address bar:")
+        print("  " + url)
         tok = input("apisession: ").strip()
     b = BreezeConnect(api_key=key)
-    b.generate_session(api_secret=secret, session_token=tok)
+    try:
+        b.generate_session(api_secret=secret, session_token=tok)
+    except Exception as e:
+        log("LOGIN FAILED:", repr(e)[:300])
+        raise SystemExit(1)
+    log("Logged in to Breeze OK.")
     return b
 
 
@@ -90,6 +156,8 @@ def fetch(b, lim, sym, start, end, product, expiry=None, right="", strike=""):
             except Exception as ex:          # network hiccup
                 r = {"Error": str(ex)}
                 time.sleep(3)
+        if r and r.get("Error") and not r.get("Success") and lim.calls <= 3:
+            log("Breeze reply:", str(r.get("Error"))[:200])
         if r and r.get("Success"):
             out += r["Success"]
         d = e + timedelta(days=1)
@@ -119,7 +187,7 @@ def main():
         for _, r in ex[ex.symbol == a.symbol].iloc[::40].iterrows():
             k = round(r.ref_price / r.strike_step) * r.strike_step
             df = fetch(b, lim, a.symbol, r.expiry.date(), r.expiry.date(), "options", r.expiry.date(), "call", k)
-            print(f"{a.symbol} {r.expiry.date()} CE{int(k)}:", "no data" if df is None else f"{len(df)} candles OK")
+            log(f"{a.symbol} {r.expiry.date()} CE{int(k)}:", "no data" if df is None else f"{len(df)} candles OK")
         return
 
     sel = ex[(ex.symbol == a.symbol) & (ex.expiry >= a.frm) & (ex.expiry <= a.to)].sort_values("expiry", ascending=False)
@@ -142,9 +210,15 @@ def main():
                 f.write_text("")            # empty marker: no data for this contract
             else:
                 df.to_csv(f, index=False); got += 1
-        print(f"{a.symbol} {e}: {got} new files   (calls today {lim.calls})")
+        log(f"{a.symbol} {e}: {got} new files   (calls today {lim.calls})")
     print("Done.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception:
+        import traceback
+        log("ERROR:", traceback.format_exc()[-1500:])
