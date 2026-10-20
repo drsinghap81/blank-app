@@ -89,7 +89,7 @@ LEVEL_MAX_SHOWN = 3           # keep charts clean: 2-3 levels
 # ---- Pattern rules ----
 PATTERN_LEVEL_TOL = 0.006     # candle must reach within 0.6% of the level
 PATTERN_LOOKBACK_SIGNALS = 1  # scanner reports patterns on the latest session only (user-selectable)
-SCAN_PERIOD = "1y"            # scanner downloads 1 year: 6-month S/R levels + 200-day average for candle confluence
+SCAN_PERIOD = "2y"            # scanner downloads 2 years: 52-week low/high + 200-day average + S/R levels
 
 # ---- Proximity scan & Gann ----
 NEAR_SCAN_PCT = 0.02          # "near a level" = last close within 2% of it
@@ -1252,6 +1252,50 @@ def load_nse_universe(choice: str) -> list[str]:
     return [f"{x}.NS" for x in syms if x and x.upper() != "NAN"]
 
 
+def supertrend(df: pd.DataFrame, n: int = 10, m: float = 3.0) -> tuple[pd.Series, pd.Series]:
+    """Supertrend line and direction (+1 up / -1 down), ATR = Wilder."""
+    h, l, c = (df[k].to_numpy(float) for k in ("High", "Low", "Close"))
+    pc = np.r_[c[0], c[:-1]]
+    tr = np.maximum(h - l, np.maximum(np.abs(h - pc), np.abs(l - pc)))
+    atr = pd.Series(tr).ewm(alpha=1 / n, adjust=False).mean().to_numpy()
+    mid = (h + l) / 2
+    ub, lb = mid + m * atr, mid - m * atr
+    fu, fl = ub.copy(), lb.copy()
+    st, d = np.zeros(len(c)), np.ones(len(c))
+    for i in range(1, len(c)):
+        fu[i] = ub[i] if (ub[i] < fu[i - 1] or c[i - 1] > fu[i - 1]) else fu[i - 1]
+        fl[i] = lb[i] if (lb[i] > fl[i - 1] or c[i - 1] < fl[i - 1]) else fl[i - 1]
+        d[i] = -1 if (d[i - 1] == 1 and c[i] < fl[i]) else (1 if (d[i - 1] == -1 and c[i] > fu[i]) else d[i - 1])
+        st[i] = fl[i] if d[i] == 1 else fu[i]
+    return pd.Series(st, index=df.index), pd.Series(d, index=df.index)
+
+
+def trap52_setups(df: pd.DataFrame, last_n: int = 1) -> list[dict]:
+    """Bear trap at the 52-week low: a red candle breaks the prior 52-week low, the next candle is a
+    green bullish engulfing (body). Buy next session above the engulfing high; stop below the lower
+    of the two lows; hold until Supertrend(10,3) has turned up, then exit on a close below it.
+    Backtest 2008-26 (213 F&O stocks): +0.57R per trade, PF 1.96, 34% win, ~14 trades a year."""
+    o, h, l, c = (df[k].to_numpy(float) for k in ("Open", "High", "Low", "Close"))
+    lo52 = pd.Series(l).rolling(252, min_periods=240).min().shift(1).to_numpy()
+    st, sd = supertrend(df)
+    out, n = [], len(c)
+    for t in range(max(1, n - last_n), n):
+        a = t - 1
+        if np.isnan(lo52[a]) or not (l[a] < lo52[a] and c[a] < o[a]):
+            continue
+        if not (c[t] > o[t] and o[t] <= c[a] and c[t] >= o[a]):
+            continue
+        trig, stop = h[t], min(l[a], l[t])
+        risk = trig - stop
+        if risk <= 0 or risk / trig > 0.15:
+            continue
+        out.append({"Date": df.index[t], "Pattern": "52-week-low trap + bullish engulfing", "Bias": "Bullish",
+                    "Buy above": round(trig, 2), "Stop": round(stop * 0.999, 2), "Target 3R": round(trig + 3 * risk, 2),
+                    "Risk %": round(risk / trig * 100, 2), "52w low": round(lo52[a], 2),
+                    "Supertrend": round(float(st.iloc[-1]), 2), "ST dir": "up" if sd.iloc[-1] > 0 else "down"})
+    return out
+
+
 def load_pattern_setups() -> list[dict]:
     """Backtested pattern + confluence setups (data/pattern_setups.json, from tools/pattern_backtest.py)."""
     p = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "pattern_setups.json")
@@ -1358,10 +1402,17 @@ def render_scanner_tab(market: MarketConfig) -> None:
         frames = {t: f for t, f in frames.items() if _adv_cr(f) >= liq_min}
         st.caption(f"Liquidity filter: {len(frames)} of {before} stocks trade ≥ ₹{liq_min:,.0f} crore a day.")
 
-    pattern_rows, near_rows, ema_rows, candle_rows = [], [], [], []
+    pattern_rows, near_rows, ema_rows, candle_rows, trap_rows = [], [], [], [], []
     setups = load_pattern_setups()
     for tkr, frame in frames.items():
         last_close = float(frame["Close"].iloc[-1])
+
+        # ---- 0a. 52-week-low bear trap + bullish engulfing (buy-stop above the engulfing high) ----
+        for a in trap52_setups(frame, last_n=scan_last_n):
+            a["Ticker"] = tkr
+            a["Date"] = a["Date"].date()
+            a["Last close"] = round(last_close, 2)
+            trap_rows.append(a)
 
         # ---- 0. Deck candle patterns + confluence (backtested setups flagged) ----
         try:
@@ -1435,7 +1486,9 @@ def render_scanner_tab(market: MarketConfig) -> None:
         d = cdf[cdf["Bias"] == bias]
         return d[d["Setup"] != ""] if tested else d[d["Tags"] >= 2]
 
+    trap_df = pd.DataFrame(trap_rows)
     cats = {
+        "🪤🟢 52-week-low trap (long)": trap_df,
         "⭐🟢 Tested candle setup (long)": _cdl("Bullish", True),
         "⭐🔴 Tested candle setup (short)": _cdl("Bearish", True),
         "🕯️🟢 Bullish candles + 2 confluences": _cdl("Bullish", False),
@@ -1457,6 +1510,16 @@ def render_scanner_tab(market: MarketConfig) -> None:
     st.caption(f"Scanned {len(frames)} stocks · latest session **{pd.Timestamp(latest).strftime('%a %d %b %Y')}**"
                f" · patterns from {'that session' if scan_last_n == 1 else 'the last 3 sessions'}. "
                "Tap a box to list those stocks.")
+    with st.expander("🪤 52-week-low trap — rules and backtest", expanded=False):
+        st.markdown("**Setup:** a red candle breaks the prior 52-week low, and the next candle is a green bullish "
+                    "engulfing (its body covers the red body). **Entry:** next session, buy above the engulfing high. "
+                    "**Stop:** below the lower of the two lows. **Exit:** keep the stop until Supertrend (10,3) turns up, "
+                    "then exit on a daily close below Supertrend (purple dotted line). The 3R line is for reference.")
+        st.caption("Backtest, 213 NSE F&O stocks 2008–2026: +0.57R per trade, profit factor 1.96, 34% winners, "
+                   "average hold ~27 days, ~14 trades a year (fixed 3R target: +0.30R). Positive in 2008–17 and 2018–26. "
+                   "The mirror short (failed 52-week-high breakout + bearish engulfing) LOST money in every variant tested, "
+                   "so it is not scanned. Stops are wide (median ~6% of price): size by the stop distance. "
+                   "Survivorship check with the historical F&O list is in progress.")
     with st.expander("⭐ Tested candle setups — what was tested and how", expanded=False):
         st.caption("Patterns and confluences from the 'Candlestick Pattern – Chart Examples' deck, backtested on 213 NSE "
                    "F&O stocks, daily, 2010–2026: enter at the next open, stop just beyond the pattern's low (long) / "
@@ -1505,6 +1568,9 @@ def render_scanner_tab(market: MarketConfig) -> None:
         else:
             def _label(r) -> str:
                 t = r["Ticker"].replace(".NS", "")
+                if "Buy above" in r:
+                    return (f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  buy above {r['Buy above']:,.1f}  ·  "
+                            f"SL {r['Stop']:,.1f} ({r['Risk %']:.1f}%)  ·  3R {r['Target 3R']:,.1f}  ·  Supertrend {r['ST dir']}")
                 if "Candle" in r:
                     tested = (f"  ·  ⭐ tested: {r['Hit 1R %']:.0f}% hit, {r['Avg R (1R)']:+.2f}R/trade ({r['Tested trades']:.0f})"
                               if r["Setup"] else "")
@@ -1547,6 +1613,16 @@ def render_scanner_tab(market: MarketConfig) -> None:
                           row=1, col=1)
             fig.add_trace(go.Scatter(x=e20v.index, y=e20v, name=f"EMA {EMA_SLOW}", line=dict(color="#3b82f6", width=1.6)),
                           row=1, col=1)
+            if len(rows) and "Buy above" in rows.columns:
+                rr = rows.iloc[idx]
+                stl, _ = supertrend(full)
+                stv = stl.tail(bars)
+                fig.add_trace(go.Scatter(x=stv.index, y=stv, name="Supertrend (10,3)", mode="lines",
+                                         line=dict(color="#a78bfa", width=1.6, dash="dot")), row=1, col=1)
+                for nm, col_, dash in (("Buy above", "#4ade80", "dash"), ("Stop", "#fbbf24", "dot"), ("Target 3R", "#60a5fa", "dash")):
+                    fig.add_hline(y=rr[nm], line=dict(color=col_, dash=dash, width=1.2), row=1, col=1,
+                                  annotation_text=f"{nm} {rr[nm]:,.1f}", annotation_position="top right",
+                                  annotation_font=dict(color=col_, size=11), annotation_bgcolor="rgba(15,19,27,0.75)")
             if len(rows) and "Candle" in rows.columns:
                 rr = rows.iloc[idx]
                 for nm, col_, dash in (("Stop", "#fbbf24", "dot"), ("Target 1R", "#60a5fa", "dash"), ("Target 2R", "#4ade80", "dash")):
@@ -1768,7 +1844,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-20 · deck candle patterns + confluence, tested setups v18"
+APP_BUILD = "2026-10-20 · 52-week-low trap scanner + Supertrend exit v19"
 
 
 def main() -> None:
