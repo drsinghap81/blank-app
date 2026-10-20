@@ -5,17 +5,18 @@ with the same rules as the backtest and the paper bot (`tools/topbottom_backtest
 
 **How it trades**
 - Watches the near-month future from 09:15 to 15:29 IST, every 2 seconds.
-- **Entries:** sell when price trades below the previous bottom − 25, buy when it trades above the previous top + 25. Each level is used once. If the market opens more than 2% beyond a level, no trade.
+- **Entries:** sell when price trades below the previous bottom − 25, buy when it trades above the previous top + 25. Each level is used once. If the market opens more than 1% beyond a level, no trade.
 - **Orders:** marketable LIMIT orders, re-priced until filled. SEBI's 2026 rules ban market and IOC orders for API algos, so the bot never uses them.
 - **Stops:**
   - Entry day: a real 1% stop.
   - After that: the system point (the opposite level), capped at 2% from entry. It moves to breakeven once the trade has been 2% in profit.
   - When the system-point stop hits, the bot exits and reverses (stop-and-reverse), unless the market opened more than 2% beyond it.
 - **Backstop:** while in a trade, a STOPLOSS_LIMIT order rests at the exchange 0.5% beyond the bot's stop. It protects you if the laptop or internet dies.
+- **Events:** on the last session before a Union Budget or general-election result, a position in profit is closed at about 15:20 IST, and no new trade is taken on the event day. Add future dates to `event_dates` in `config.json`.
 - **Expiry day:** an open position is rolled at 15:10 IST. New entries that day go into next month's contract.
 - **Approvals:** before the open, Telegram asks **Approve / Skip** for each entry and for a reversal. If you don't answer, the bot skips (configurable).
 
-**Checked:** replaying 2024–2026 through this exact code gives the same 147 trades as the backtest engine (`python tools/angel/sim_check.py 2024-01-01`).
+**Checked:** replaying history through this exact code gives the same trades as the backtest engine (2017–2026 with these rules: 488 of 488; `python tools/angel/sim_check.py 2017-01-01`). With realistic fills, the 1% gap rule and pre-event exit added about 4,700 points over 2017–2026 and cut the worst drawdown from about −9,000 to −6,300 points per lot.
 
 ---
 

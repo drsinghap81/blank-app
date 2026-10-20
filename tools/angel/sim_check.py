@@ -101,7 +101,9 @@ def run(start, mode="close", end=None, **over):
         day.before_close(dict(ltp=bar.Close, open=bar.Open, high=bar.High, low=bar.Low))
         day.end_of_day(dict(Open=bar.Open, High=bar.High, Low=bar.Low, Close=bar.Close))
     bot = pd.DataFrame(st.trades)
-    eng = tbb.run_live(df, tbb.Params(start_flat_on=str(pd.Timestamp(start).date())))
+    eng = tbb.run_live(df, tbb.Params(start_flat_on=str(pd.Timestamp(start).date()), gap_pct=cfg["gap_pct"],
+                                       event_exit=bool(cfg.get("event_exit")),
+                                       event_dates=tuple(cfg.get("event_dates") or ())))
     eng = eng[pd.to_datetime(eng.EntryDate) >= start].reset_index(drop=True)
     return bot, eng
 

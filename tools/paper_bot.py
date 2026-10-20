@@ -46,7 +46,8 @@ DEFAULT_CFG = {
         "BANKNIFTY": {"buffer_pts": 25, "lots": 1},
         "NIFTY": {"buffer_pts": 10, "lots": 1},
     },
-    "rules": {"day_sl_pct": 1.0, "max_sl_pct": 2.0, "be_pct": 2.0, "gap_pct": 2.0, "use_once": True},
+    "rules": {"day_sl_pct": 1.0, "max_sl_pct": 2.0, "be_pct": 2.0, "gap_pct": 1.0, "use_once": True,
+              "event_exit": True},
     "cost_pct_round_trip": 0.05,         # ESTIMATE: brokerage + STT + exchange + GST + slippage, % of entry value
 }
 
@@ -149,6 +150,7 @@ def build_ledger(sym: str, h: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, di
     join = cfg.get("join_existing_position", False)
     p = tbb.Params(buffer_pts=inst["buffer_pts"], day_sl_pct=rules["day_sl_pct"], max_sl_pct=rules["max_sl_pct"],
                    be_pct=rules["be_pct"], gap_pct=rules["gap_pct"], use_once=rules["use_once"],
+                   event_exit=bool(rules.get("event_exit", False)),
                    start_flat_on=None if join else cfg["start_date"])
     df = h.copy()
     df.index = pd.to_datetime(df["Date"])

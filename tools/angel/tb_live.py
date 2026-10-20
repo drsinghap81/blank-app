@@ -41,10 +41,10 @@ DEFAULT_CFG = {
     "day_sl_pct": 1.0,
     "max_sl_pct": 2.0,
     "be_pct": 2.0,
-    "gap_pct": 2.0,                  # open beyond a level by more than this %: no new trade
+    "gap_pct": 1.0,                  # open beyond a level by more than this %: no new trade (tested: 1% beats 2%)
     "glitch_pts": 0,                 # >0: a top/bottom closer than this many points to the last close
     "glitch_buf_pct": 0.5,           #     gets a % buffer (Swaycharts: 1%, cut to 0.5% in 2023) instead of buffer_pts
-    "event_exit": False,             # exit a PROFITABLE position at the close before a major event, no entries on the day
+    "event_exit": True,              # exit a PROFITABLE position at the close before a major event, no entries on the day
     "event_dates": ["2017-02-01", "2018-02-01", "2019-02-01", "2019-05-23", "2019-07-05", "2020-02-01",
                     "2021-02-01", "2022-02-01", "2023-02-01", "2024-02-01", "2024-06-04", "2024-07-23",
                     "2025-02-01", "2026-02-01"],   # Union Budgets + general-election results
@@ -195,9 +195,7 @@ class TradingDay:
         ev = [pd.Timestamp(x).date() for x in cfg.get("event_dates", [])] if cfg.get("event_exit") else []
         self.event_today = today in ev
         # eve = the last weekday before an event (only weekends in between)
-        self.event_eve = any(e > today and all(pd.Timestamp(d).weekday() >= 5
-                                               for d in pd.date_range(today + timedelta(days=1), e - timedelta(days=1)))
-                             for e in ev)
+        self.event_eve = any((pd.Timestamp(e) - pd.offsets.BDay(1)).date() == today for e in ev)
         if self.event_today:
             self.done_for_day = True
 

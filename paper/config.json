@@ -11,8 +11,9 @@
     "day_sl_pct": 1.0,
     "max_sl_pct": 2.0,
     "be_pct": 2.0,
-    "gap_pct": 2.0,
-    "use_once": true
+    "gap_pct": 1.0,
+    "use_once": true,
+    "event_exit": true
   },
   "cost_pct_round_trip": 0.05,
   "join_existing_position": false

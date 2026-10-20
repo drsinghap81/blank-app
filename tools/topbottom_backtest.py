@@ -58,6 +58,32 @@ import numpy as np
 import pandas as pd
 
 
+# Union Budgets and general-election results (pre-event profit booking, Swaycharts rule since Feb 2020)
+EVENT_DATES = ("2017-02-01", "2018-02-01", "2019-02-01", "2019-05-23", "2019-07-05", "2020-02-01",
+               "2021-02-01", "2022-02-01", "2023-02-01", "2024-02-01", "2024-06-04", "2024-07-23",
+               "2025-02-01", "2026-02-01")
+
+
+_EV_CACHE: dict = {}
+
+
+def _events(dates):
+    key = tuple(dates or EVENT_DATES)
+    if key not in _EV_CACHE:
+        ev = {pd.Timestamp(d).normalize() for d in key}
+        _EV_CACHE[key] = (ev, {e - pd.offsets.BDay(1) for e in ev})   # eve = previous weekday
+    return _EV_CACHE[key]
+
+
+def is_event_day(day, dates=()) -> bool:
+    return pd.Timestamp(day).normalize() in _events(dates)[0]
+
+
+def is_event_eve(day, dates=()) -> bool:
+    """True on the last weekday before an event (only weekend days in between)."""
+    return pd.Timestamp(day).normalize() in _events(dates)[1]
+
+
 # ============================================================================
 # 1. Parameters
 # ============================================================================
@@ -75,6 +101,8 @@ class Params:
     swing_pct: float = 0.0      # optional glitch filter (0 = pure 1-day turns, as validated)
     cost_pts: float = 0.0       # round-trip cost per trade, in points
     lot: float = 1.0            # multiply points by lot size for rupee P&L
+    event_exit: bool = False    # book a profitable position at the close before a major event; no entries on the day
+    event_dates: tuple = ()     # ISO dates; default list: EVENT_DATES
     start_flat_on: str | None = None  # live: be flat from this date and wait for a FRESH signal
                                       # (levels already traded stay used, e.g. "awaiting new top")
 
@@ -154,7 +182,8 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
 
     sf = pd.Timestamp(p.start_flat_on) if p.start_flat_on else None
     flat_done = False
-    for i in range(1, n):
+    def step(i):
+        nonlocal used_T, used_B, flat_done, pos, be_on
         if sf is not None and not flat_done and idx[i] >= sf:
             flat_done = True
             if pos != 0:          # drop the position the system was holding: we start flat
@@ -164,7 +193,7 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
             for lvl_arr, is_top in ((T, True), (B, False)):
                 v = lvl_arr[i - 1]
                 if np.isnan(v):
-                    continue
+                    return
                 k = int(np.argmax(lvl_arr[:i] == v))  # bar on which this level was confirmed
                 seg_h, seg_l = h[k + 1:i], l[k + 1:i]
                 if is_top and len(seg_h) and seg_h.max() >= v + buf(v):
@@ -202,15 +231,17 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
                     if not gapped:
                         open_pos(i, -side, px, "Reverse at system point")
                         day_stop_check(i, -side, px)
-                continue
+                return
             fav = (h[i] - ent) / ent * 100 if pos > 0 else (ent - l[i]) / ent * 100
             if p.be_pct and fav >= p.be_pct:
                 be_on = True
-            continue
+            return
         if pos != 0:
-            continue
+            return
 
         # ---- flat: resting buy-stop / sell-stop orders ----
+        if p.event_exit and is_event_day(idx[i], p.event_dates):
+            return  # no new trades on the event day itself
         go_l = not np.isnan(buy_lvl) and h[i] >= buy_lvl
         go_s = (not p.long_only) and not np.isnan(sell_lvl) and l[i] <= sell_lvl
         if go_l and go_s:  # both levels hit the same day: take the one nearer the open
@@ -219,17 +250,26 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
         if go_l:
             used_T = top
             if o[i] > buy_lvl and (o[i] - buy_lvl) / buy_lvl * 100 > p.gap_pct:
-                continue  # gap rule: no new position
+                return  # gap rule: no new position
             px = max(o[i], buy_lvl)
             open_pos(i, 1, px, "Buy above prev top")
             day_stop_check(i, 1, px)
         elif go_s:
             used_B = bot
             if o[i] < sell_lvl and (sell_lvl - o[i]) / sell_lvl * 100 > p.gap_pct:
-                continue
+                return
             px = min(o[i], sell_lvl)
             open_pos(i, -1, px, "Sell below prev bottom")
             day_stop_check(i, -1, px)
+    def eve_exit(i):
+        """Pre-event profit booking: on the last session before a listed event, a position in
+        profit is closed at the close."""
+        if pos != 0 and p.event_exit and is_event_eve(idx[i], p.event_dates) and (c[i] - ent) * pos > 0:
+            close_pos(i, c[i], "Pre-event profit booking")
+
+    for i in range(1, n):
+        step(i)
+        eve_exit(i)
     out = _finish(trades, c, idx, p)
     out.attrs["used_T"], out.attrs["used_B"] = used_T, used_B
     out.attrs["flat_from"] = p.start_flat_on
@@ -401,6 +441,12 @@ def next_orders(df: pd.DataFrame, t: pd.DataFrame, p: Params) -> dict:
                                  f"{p.day_sl_pct:g}% SL at {sl * (1 + p.day_sl_pct / 100):,.0f}")
     out["orders"].append(f"Gap > {p.gap_pct:g}% beyond a level at the open: exit only, no new trade "
                          "(let the market settle)")
+    if p.event_exit:
+        nxt = pd.Timestamp(df.index[-1]) + pd.offsets.BDay(1)
+        if is_event_day(nxt, p.event_dates):
+            out["orders"].append("EVENT DAY (Budget / election results): no new entries today; keep stops on any position")
+        elif is_event_eve(nxt, p.event_dates):
+            out["orders"].append("Event next session: if the position is in profit, BOOK IT at today's close")
     return out
 
 
