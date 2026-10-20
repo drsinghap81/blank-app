@@ -1,0 +1,281 @@
+{
+ "source": "tools/pattern_backtest.py on 213 NSE F&O stocks, daily, 2010-01 to 2026-10 (Yahoo adjusted)",
+ "trade": "enter next open; stop beyond pattern extreme; target 1R or 2R; 15-session time exit; 0.10% cost",
+ "selection": "positive avg R (>0.05) in BOTH 2010-19 and 2020-26, avg 1R result >= 0.08R, >= 99 trades",
+ "baseline_all_patterns": {
+  "hit1R": 47,
+  "E1R": -0.077
+ },
+ "setups": [
+  {
+   "pattern": "Evening star",
+   "confluences": [
+    "MA200",
+    "MA20"
+   ],
+   "n": 157,
+   "hit1R": 55,
+   "E1R": 0.212,
+   "E2R": 0.126,
+   "PF2R": 1.24,
+   "DD_pct_at_half_pct_risk": -3.2,
+   "E1R_2010_19": 0.188,
+   "E1R_2020_26": 0.242
+  },
+  {
+   "pattern": "Morning star",
+   "confluences": [
+    "MA200",
+    "Fib50"
+   ],
+   "n": 99,
+   "hit1R": 57,
+   "E1R": 0.206,
+   "E2R": 0.219,
+   "PF2R": 1.49,
+   "DD_pct_at_half_pct_risk": -2.5,
+   "E1R_2010_19": 0.097,
+   "E1R_2020_26": 0.367
+  },
+  {
+   "pattern": "Morning star",
+   "confluences": [
+    "Fib50",
+    "Support/Resistance"
+   ],
+   "n": 251,
+   "hit1R": 55,
+   "E1R": 0.14,
+   "E2R": 0.134,
+   "PF2R": 1.24,
+   "DD_pct_at_half_pct_risk": -3.8,
+   "E1R_2010_19": 0.089,
+   "E1R_2020_26": 0.188
+  },
+  {
+   "pattern": "Bullish engulfing",
+   "confluences": [
+    "MA20",
+    "Fib618"
+   ],
+   "n": 126,
+   "hit1R": 54,
+   "E1R": 0.138,
+   "E2R": 0.073,
+   "PF2R": 1.13,
+   "DD_pct_at_half_pct_risk": -4.4,
+   "E1R_2010_19": 0.151,
+   "E1R_2020_26": 0.115
+  },
+  {
+   "pattern": "Shooting star",
+   "confluences": [
+    "RSI extreme",
+    "Trend"
+   ],
+   "n": 103,
+   "hit1R": 56,
+   "E1R": 0.138,
+   "E2R": 0.245,
+   "PF2R": 1.43,
+   "DD_pct_at_half_pct_risk": -2.1,
+   "E1R_2010_19": 0.164,
+   "E1R_2020_26": 0.105
+  },
+  {
+   "pattern": "Evening star",
+   "confluences": [
+    "MA44",
+    "MA200"
+   ],
+   "n": 146,
+   "hit1R": 53,
+   "E1R": 0.136,
+   "E2R": 0.087,
+   "PF2R": 1.16,
+   "DD_pct_at_half_pct_risk": -2.7,
+   "E1R_2010_19": 0.059,
+   "E1R_2020_26": 0.27
+  },
+  {
+   "pattern": "Morning star",
+   "confluences": [
+    "MA20",
+    "Fib50"
+   ],
+   "n": 186,
+   "hit1R": 51,
+   "E1R": 0.129,
+   "E2R": 0.057,
+   "PF2R": 1.11,
+   "DD_pct_at_half_pct_risk": -4.3,
+   "E1R_2010_19": 0.104,
+   "E1R_2020_26": 0.157
+  },
+  {
+   "pattern": "Morning star",
+   "confluences": [
+    "MA44",
+    "MA20"
+   ],
+   "n": 431,
+   "hit1R": 53,
+   "E1R": 0.12,
+   "E2R": 0.069,
+   "PF2R": 1.13,
+   "DD_pct_at_half_pct_risk": -6.1,
+   "E1R_2010_19": 0.148,
+   "E1R_2020_26": 0.085
+  },
+  {
+   "pattern": "Morning star",
+   "confluences": [
+    "MA20",
+    "Support/Resistance"
+   ],
+   "n": 402,
+   "hit1R": 53,
+   "E1R": 0.116,
+   "E2R": 0.069,
+   "PF2R": 1.12,
+   "DD_pct_at_half_pct_risk": -13.1,
+   "E1R_2010_19": 0.112,
+   "E1R_2020_26": 0.12
+  },
+  {
+   "pattern": "Bullish engulfing",
+   "confluences": [
+    "Fib618",
+    "Volume spike"
+   ],
+   "n": 123,
+   "hit1R": 53,
+   "E1R": 0.115,
+   "E2R": 0.072,
+   "PF2R": 1.13,
+   "DD_pct_at_half_pct_risk": -4.7,
+   "E1R_2010_19": 0.149,
+   "E1R_2020_26": 0.06
+  },
+  {
+   "pattern": "Shooting star",
+   "confluences": [
+    "Fib50",
+    "Volume spike"
+   ],
+   "n": 161,
+   "hit1R": 56,
+   "E1R": 0.111,
+   "E2R": 0.159,
+   "PF2R": 1.26,
+   "DD_pct_at_half_pct_risk": -4.2,
+   "E1R_2010_19": 0.079,
+   "E1R_2020_26": 0.147
+  },
+  {
+   "pattern": "Morning star",
+   "confluences": [
+    "Support/Resistance",
+    "Volume spike"
+   ],
+   "n": 288,
+   "hit1R": 51,
+   "E1R": 0.11,
+   "E2R": 0.197,
+   "PF2R": 1.4,
+   "DD_pct_at_half_pct_risk": -7.8,
+   "E1R_2010_19": 0.083,
+   "E1R_2020_26": 0.138
+  },
+  {
+   "pattern": "Big green candle",
+   "confluences": [
+    "MA20",
+    "RSI 40/60"
+   ],
+   "n": 1494,
+   "hit1R": 52,
+   "E1R": 0.102,
+   "E2R": 0.134,
+   "PF2R": 1.26,
+   "DD_pct_at_half_pct_risk": -13.7,
+   "E1R_2010_19": 0.071,
+   "E1R_2020_26": 0.133
+  },
+  {
+   "pattern": "Hammer",
+   "confluences": [
+    "RSI 40/60",
+    "Volume spike"
+   ],
+   "n": 209,
+   "hit1R": 55,
+   "E1R": 0.097,
+   "E2R": 0.199,
+   "PF2R": 1.36,
+   "DD_pct_at_half_pct_risk": -5.5,
+   "E1R_2010_19": 0.09,
+   "E1R_2020_26": 0.103
+  },
+  {
+   "pattern": "Morning star",
+   "confluences": [
+    "MA20",
+    "RSI 40/60"
+   ],
+   "n": 138,
+   "hit1R": 52,
+   "E1R": 0.094,
+   "E2R": 0.029,
+   "PF2R": 1.05,
+   "DD_pct_at_half_pct_risk": -4.5,
+   "E1R_2010_19": 0.059,
+   "E1R_2020_26": 0.137
+  },
+  {
+   "pattern": "Big green candle",
+   "confluences": [
+    "MA44",
+    "MA20"
+   ],
+   "n": 2208,
+   "hit1R": 52,
+   "E1R": 0.085,
+   "E2R": 0.128,
+   "PF2R": 1.24,
+   "DD_pct_at_half_pct_risk": -27.3,
+   "E1R_2010_19": 0.054,
+   "E1R_2020_26": 0.119
+  },
+  {
+   "pattern": "Big green candle",
+   "confluences": [
+    "Fib618",
+    "Gap zone"
+   ],
+   "n": 448,
+   "hit1R": 51,
+   "E1R": 0.085,
+   "E2R": 0.099,
+   "PF2R": 1.18,
+   "DD_pct_at_half_pct_risk": -5.4,
+   "E1R_2010_19": 0.136,
+   "E1R_2020_26": 0.051
+  },
+  {
+   "pattern": "Hammer",
+   "confluences": [
+    "RSI extreme",
+    "Volume spike"
+   ],
+   "n": 255,
+   "hit1R": 52,
+   "E1R": 0.082,
+   "E2R": 0.135,
+   "PF2R": 1.22,
+   "DD_pct_at_half_pct_risk": -9.3,
+   "E1R_2010_19": 0.093,
+   "E1R_2020_26": 0.069
+  }
+ ]
+}

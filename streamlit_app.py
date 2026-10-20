@@ -57,7 +57,7 @@ def _fresh(modname: str):
 
 
 _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "tools"))
-for _m in ("topbottom", "topbottom_backtest", "topbottom_tab"):
+for _m in ("topbottom", "topbottom_backtest", "topbottom_tab", "patterns"):
     _fresh(_m)
 from topbottom_tab import render_topbottom_tab  # noqa: E402
 
@@ -89,7 +89,7 @@ LEVEL_MAX_SHOWN = 3           # keep charts clean: 2-3 levels
 # ---- Pattern rules ----
 PATTERN_LEVEL_TOL = 0.006     # candle must reach within 0.6% of the level
 PATTERN_LOOKBACK_SIGNALS = 1  # scanner reports patterns on the latest session only (user-selectable)
-SCAN_PERIOD = "6mo"           # scanner downloads 6 months: enough for the 6-month S/R levels
+SCAN_PERIOD = "1y"            # scanner downloads 1 year: 6-month S/R levels + 200-day average for candle confluence
 
 # ---- Proximity scan & Gann ----
 NEAR_SCAN_PCT = 0.02          # "near a level" = last close within 2% of it
@@ -1252,6 +1252,45 @@ def load_nse_universe(choice: str) -> list[str]:
     return [f"{x}.NS" for x in syms if x and x.upper() != "NAN"]
 
 
+def load_pattern_setups() -> list[dict]:
+    """Backtested pattern + confluence setups (data/pattern_setups.json, from tools/pattern_backtest.py)."""
+    p = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "pattern_setups.json")
+    try:
+        import json as _json
+        return _json.load(open(p))["setups"]
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def candle_rows_for(tkr: str, frame: pd.DataFrame, last_n: int, setups: list[dict]) -> list[dict]:
+    """Every deck pattern on the last `last_n` sessions with its confluence tags and the best
+    backtested setup it satisfies (if any)."""
+    pt = _sys.modules["patterns"]
+    sig = pt.detect(frame, last_n=last_n)
+    out = []
+    last_close = float(frame["Close"].iloc[-1])
+    for _, r in sig.iterrows():
+        tags = [k for k in pt.CONFLUENCES if bool(r[k])]
+        best = None
+        for su in setups:
+            if su["pattern"] == r["Pattern"] and set(su["confluences"]) <= set(tags):
+                if best is None or su["E1R"] > best["E1R"]:
+                    best = su
+        bull = r["Side"] > 0
+        stop = float(r["PLow"]) * 0.999 if bull else float(r["PHigh"]) * 1.001
+        risk = abs(last_close - stop)
+        out.append({"Ticker": tkr, "Date": pd.Timestamp(r["Date"]).date(), "Candle": r["Pattern"],
+                    "Bias": "Bullish" if bull else "Bearish", "Confluence": " + ".join(tags) or "—",
+                    "Tags": len(tags), "Setup": (" + ".join(best["confluences"]) if best else ""),
+                    "Hit 1R %": best["hit1R"] if best else None, "Avg R (1R)": best["E1R"] if best else None,
+                    "Tested trades": best["n"] if best else None,
+                    "Last close": round(last_close, 2), "Stop": round(stop, 2),
+                    "Target 1R": round(last_close + (risk if bull else -risk), 2),
+                    "Target 2R": round(last_close + (2 * risk if bull else -2 * risk), 2),
+                    "Risk %": round(risk / last_close * 100, 2), "RSI": r["RSI"]})
+    return out
+
+
 def render_scanner_tab(market: MarketConfig) -> None:
     """Tab: scan the whole watchlist for patterns at tested levels."""
     universe = market.watchlist
@@ -1319,9 +1358,16 @@ def render_scanner_tab(market: MarketConfig) -> None:
         frames = {t: f for t, f in frames.items() if _adv_cr(f) >= liq_min}
         st.caption(f"Liquidity filter: {len(frames)} of {before} stocks trade ≥ ₹{liq_min:,.0f} crore a day.")
 
-    pattern_rows, near_rows, ema_rows = [], [], []
+    pattern_rows, near_rows, ema_rows, candle_rows = [], [], [], []
+    setups = load_pattern_setups()
     for tkr, frame in frames.items():
         last_close = float(frame["Close"].iloc[-1])
+
+        # ---- 0. Deck candle patterns + confluence (backtested setups flagged) ----
+        try:
+            candle_rows.extend(candle_rows_for(tkr, frame, scan_last_n, setups))
+        except Exception:  # noqa: BLE001
+            pass
 
         # ---- 1. Candlestick patterns at tested levels ----
         for s in detect_signals(frame, last_n=scan_last_n):
@@ -1379,7 +1425,21 @@ def render_scanner_tab(market: MarketConfig) -> None:
         return pat_df[pat_df["Pattern"].str.startswith(prefix)] if len(pat_df) else pat_df
 
     ema_df = pd.DataFrame(ema_rows)
+    cdf = pd.DataFrame(candle_rows)
+    if len(cdf):
+        cdf = cdf.sort_values(["Avg R (1R)", "Tags"], ascending=[False, False], na_position="last")
+
+    def _cdl(bias: str, tested: bool) -> pd.DataFrame:
+        if not len(cdf):
+            return cdf
+        d = cdf[cdf["Bias"] == bias]
+        return d[d["Setup"] != ""] if tested else d[d["Tags"] >= 2]
+
     cats = {
+        "⭐🟢 Tested candle setup (long)": _cdl("Bullish", True),
+        "⭐🔴 Tested candle setup (short)": _cdl("Bearish", True),
+        "🕯️🟢 Bullish candles + 2 confluences": _cdl("Bullish", False),
+        "🕯️🔴 Bearish candles + 2 confluences": _cdl("Bearish", False),
         "🟢 EMA 9/20 long alert": ema_df[ema_df["Bias"] == "Bullish"] if len(ema_df) else ema_df,
         "🔴 EMA 9/20 short alert": ema_df[ema_df["Bias"] == "Bearish"] if len(ema_df) else ema_df,
         "🟢 Pro gap @ support": _pat("Pro gap at"),
@@ -1397,6 +1457,19 @@ def render_scanner_tab(market: MarketConfig) -> None:
     st.caption(f"Scanned {len(frames)} stocks · latest session **{pd.Timestamp(latest).strftime('%a %d %b %Y')}**"
                f" · patterns from {'that session' if scan_last_n == 1 else 'the last 3 sessions'}. "
                "Tap a box to list those stocks.")
+    with st.expander("⭐ Tested candle setups — what was tested and how", expanded=False):
+        st.caption("Patterns and confluences from the 'Candlestick Pattern – Chart Examples' deck, backtested on 213 NSE "
+                   "F&O stocks, daily, 2010–2026: enter at the next open, stop just beyond the pattern's low (long) / "
+                   "high (short), target 1R or 2R, exit after 15 sessions. Patterns ALONE had no edge (47% hit 1R, "
+                   "−0.08R per trade). Only combinations profitable in BOTH 2010–19 and 2020–26 are starred. "
+                   "None reach a 70% hit rate at 1R; the best are 53–57% with +0.1 to +0.2R per trade. "
+                   "Hand-drawn trendlines are not included.")
+        if setups:
+            st.dataframe(pd.DataFrame([{"Candle": x["pattern"], "Confluence": " + ".join(x["confluences"]),
+                                        "Trades": x["n"], "Hit 1R %": x["hit1R"], "Avg R (1R target)": x["E1R"],
+                                        "Avg R (2R target)": x["E2R"], "2010–19": x["E1R_2010_19"],
+                                        "2020–26": x["E1R_2020_26"]} for x in setups]),
+                         hide_index=True, width="stretch")
     cols = st.columns(len(cats))
     for col, (name, df_) in zip(cols, cats.items()):
         n = df_["Ticker"].nunique() if len(df_) else 0
@@ -1432,6 +1505,11 @@ def render_scanner_tab(market: MarketConfig) -> None:
         else:
             def _label(r) -> str:
                 t = r["Ticker"].replace(".NS", "")
+                if "Candle" in r:
+                    tested = (f"  ·  ⭐ tested: {r['Hit 1R %']:.0f}% hit, {r['Avg R (1R)']:+.2f}R/trade ({r['Tested trades']:.0f})"
+                              if r["Setup"] else "")
+                    return (f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  {r['Candle']}  ·  {r['Confluence']}"
+                            f"  ·  close {r['Last close']:,.1f}  ·  SL {r['Stop']:,.1f} ({r['Risk %']:.1f}%){tested}")
                 if "Trigger" in r:
                     act = "buy above" if r["Bias"] == "Bullish" else "sell below"
                     return (f"{t}  ·  {pd.Timestamp(r['Date']).strftime('%d %b')}  ·  {act} {r['Trigger']:,.1f}  ·  "
@@ -1469,6 +1547,12 @@ def render_scanner_tab(market: MarketConfig) -> None:
                           row=1, col=1)
             fig.add_trace(go.Scatter(x=e20v.index, y=e20v, name=f"EMA {EMA_SLOW}", line=dict(color="#3b82f6", width=1.6)),
                           row=1, col=1)
+            if len(rows) and "Candle" in rows.columns:
+                rr = rows.iloc[idx]
+                for nm, col_, dash in (("Stop", "#fbbf24", "dot"), ("Target 1R", "#60a5fa", "dash"), ("Target 2R", "#4ade80", "dash")):
+                    fig.add_hline(y=rr[nm], line=dict(color=col_, dash=dash, width=1.2), row=1, col=1,
+                                  annotation_text=f"{nm} {rr[nm]:,.1f}", annotation_position="top right",
+                                  annotation_font=dict(color=col_, size=11), annotation_bgcolor="rgba(15,19,27,0.75)")
             if len(rows) and "Trigger" in rows.columns:
                 rr = rows.iloc[idx]
                 col_ = "#4ade80" if rr["Bias"] == "Bullish" else "#f87171"
@@ -1684,7 +1768,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-20 · cleaner charts: right price axis, stretch, Gann off v17"
+APP_BUILD = "2026-10-20 · deck candle patterns + confluence, tested setups v18"
 
 
 def main() -> None:
