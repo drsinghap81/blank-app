@@ -1,1 +1,2 @@
-EntryDate,Side,Entry,ExitDate,Exit,Reason,Open
+Instrument,EntryDate,Side,Entry,Signal,ExitDate,Exit,Reason,Open,Points,Pct,PnL,RollAdj,Qty,Gross,Costs,Net,Status
+BANKNIFTY,2026-10-21,BUY,55943.0,Buy above prev top,2026-10-21,55383.57,Entry-day SL,False,-559.43,-1.0,-559.0,0.0,60,-33566.0,1678.0,-35244.0,Closed

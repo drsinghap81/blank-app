@@ -1,10 +1,10 @@
 {
-  "trades": 0,
-  "closed": 0,
+  "trades": 1,
+  "closed": 1,
   "winners": 0,
-  "losers": 0,
-  "realised_net": 0.0,
+  "losers": 1,
+  "realised_net": -35244.0,
   "open_mtm_net": 0.0,
-  "updated_ist": "2026-10-20 22:09",
+  "updated_ist": "2026-10-21 19:45",
   "start_date": "2026-10-19"
 }
