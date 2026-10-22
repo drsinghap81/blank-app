@@ -1,10 +1,15 @@
-"""Telegram: messages, Approve/Skip buttons, and commands (/status /stop /flat /help).
+"""Telegram: messages, Approve/Skip buttons, phone buttons (Status / Stop / Square off) and commands.
 Only messages from your own TELEGRAM_CHAT_ID are obeyed."""
 from __future__ import annotations
 
 import json
+import re
+import time
 
 import requests
+
+# persistent phone buttons -> commands
+KEYS = {"📊 Status": "/status", "⛔ Stop new trades": "/stop", "🔴 Square off": "/flat"}
 
 
 class Telegram:
@@ -13,6 +18,7 @@ class Telegram:
         self.offset = None
         self.answers = {}           # approval key -> True / False
         self.commands = []
+        self.texts = []             # plain text replies (e.g. the 6-digit login code)
 
     @property
     def on(self):
@@ -64,6 +70,51 @@ class Telegram:
                            text=cb["message"]["text"] + ("\n→ APPROVED ✅" if yes == "ok" else "\n→ SKIPPED ❌"))
                 continue
             m = u.get("message")
-            if m and str(m["chat"]["id"]) == self.chat and (m.get("text") or "").startswith("/"):
-                cmds.append(m["text"].split()[0].lower())
+            if not m or str(m["chat"]["id"]) != self.chat:
+                continue
+            t = (m.get("text") or "").strip()
+            if t in KEYS:
+                cmds.append(KEYS[t])
+            elif t.startswith("/"):
+                cmds.append(t.split()[0].lower())
+            elif t:
+                self.texts.append(t)
         return cmds
+
+    # phone controls ---------------------------------------------------------
+    def keyboard(self, text):
+        """show the always-visible Status / Stop / Square-off buttons under the chat."""
+        kb = {"keyboard": [[{"text": k} for k in KEYS]], "resize_keyboard": True, "is_persistent": True}
+        return self._call("sendMessage", chat_id=self.chat, text=text, reply_markup=json.dumps(kb))
+
+    def choose(self, key, text, options, deadline, extra_poll=None):
+        """inline buttons [(label, value)], wait until a press or the deadline (epoch seconds). Returns value or None."""
+        if not self.on:
+            return None
+        self.send(text, buttons=[(lbl, f"ok|{key}={val}") for lbl, val in options])
+        while time.time() < deadline:
+            for c in self.poll():
+                if extra_poll:
+                    extra_poll(c)
+            for k, v in list(self.answers.items()):
+                if k.startswith(key + "="):
+                    del self.answers[k]
+                    return k.split("=", 1)[1]
+            time.sleep(2)
+        return None
+
+    def wait_code(self, prompt, deadline, digits=6):
+        """ask for a numeric code (e.g. Angel TOTP) and return it, or None at the deadline."""
+        if not self.on:
+            return None
+        self.texts.clear()
+        self.send(prompt)
+        while time.time() < deadline:
+            self.poll()
+            while self.texts:
+                t = self.texts.pop(0).replace(" ", "")
+                if re.fullmatch(r"\d{%d}" % digits, t):
+                    return t
+                self.send(f"That isn't a {digits}-digit code — please send just the {digits} digits.")
+            time.sleep(2)
+        return None

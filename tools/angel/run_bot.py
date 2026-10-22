@@ -7,6 +7,11 @@ It waits for the open, trades until the close, records the day's bar and exits.
     python tools/angel/run_bot.py --check    # login + show today's plan, no trading
     python tools/angel/run_bot.py --init     # (re)start FLAT from today, waiting for fresh levels
 
+Cloud mode (deploy/setup.sh): a timer starts this at 08:30 IST on weekdays. It sends a Telegram message with
+▶️ Start / ⏸️ Skip buttons. Nothing trades unless you tap Start (an open position is still managed in one-tap mode).
+login_mode "onetap": the server holds the TOTP secret and logs in by itself after you tap Start.
+login_mode "code"  : after Start, reply with the 6-digit code from your authenticator (secret never stored).
+
 Settings: tools/angel/config.json (copy config.example.json)
 Secrets : tools/angel/.env        (copy .env.example)  — never commit or share this file.
 """
@@ -45,7 +50,18 @@ def log(msg):
         f.write(line + "\n")
 
 
-def load_env():
+CLOUD_DEFAULTS = {
+    "login_mode": "onetap",          # "onetap" or "code"
+    "morning_button": True,          # ask Start/Skip on Telegram each morning
+    "gate_deadline": "09:05",        # no tap by then = no trading today
+    "max_lots": 2,                   # hard cap whatever config says
+    "max_daily_loss_rs": 25000,      # square off and stop for the day beyond this loss (0 = off)
+    "max_entries_per_day": 3,
+    "heartbeat_minutes": 60,         # short "still running" message (0 = off)
+}
+
+
+def load_env(cfg=None):
     env = dict(os.environ)
     p = os.path.join(HERE, ".env")
     if os.path.exists(p):
@@ -54,7 +70,9 @@ def load_env():
             if line and not line.startswith("#") and "=" in line:
                 k, v = line.split("=", 1)
                 env.setdefault(k.strip(), v.strip().strip('"').strip("'"))
-    need = ["ANGEL_API_KEY", "ANGEL_CLIENT_CODE", "ANGEL_PIN", "ANGEL_TOTP_SECRET"]
+    need = ["ANGEL_API_KEY", "ANGEL_CLIENT_CODE", "ANGEL_PIN"]
+    if not cfg or cfg.get("login_mode", "onetap") != "code":
+        need.append("ANGEL_TOTP_SECRET")
     miss = [k for k in need if not env.get(k)]
     if miss:
         sys.exit(f"Missing in tools/angel/.env: {', '.join(miss)}")
@@ -63,6 +81,7 @@ def load_env():
 
 def load_cfg():
     cfg = dict(tl.DEFAULT_CFG)
+    cfg.update(CLOUD_DEFAULTS)
     p = os.path.join(HERE, "config.json")
     if os.path.exists(p):
         cfg.update(json.load(open(p)))
@@ -113,6 +132,50 @@ def load_history(br: AngelBroker, today: date, git_pull: bool) -> pd.DataFrame:
     return hist
 
 
+def morning_gate(cfg, tg, st, today) -> bool:
+    """Start / Skip buttons. Returns True to trade today."""
+    mode = "DRY RUN (no real orders)" if cfg.get("dry_run", True) else "LIVE"
+    held = f"OPEN {'LONG' if st.pos > 0 else 'SHORT'} {abs(st.qty)} qty {st.contract}" if st.pos else "flat"
+    deadline = at(cfg["gate_deadline"]).timestamp()
+    ans = tg.choose(f"gate{today}", f"☀️ Top Bottom — {today:%a %d %b}\nMode: {mode}, {st.lots or cfg['lots']} lots\n"
+                    f"Position: {held}\n\nStart trading today? (reply by {cfg['gate_deadline']} IST)",
+                    [("▶️ Start", "start"), ("⏸️ Skip today", "skip")], deadline)
+    if ans == "start":
+        tg.send("▶️ Starting.")
+        return True
+    if st.pos != 0 and ans is None and cfg["login_mode"] == "onetap":
+        tg.send("No reply, but a position is open — starting anyway to manage it (no new trades will be taken).")
+        return "manage"
+    msg = "⏸️ Skipped today." if ans == "skip" else "No reply — not trading today."
+    if st.pos != 0:
+        msg += " ⚠️ Your open position is protected only by the exchange stop order already placed."
+    tg.send(msg); log(msg)
+    return False
+
+
+def angel_login(br, cfg, tg, restarted=False):
+    if cfg["login_mode"] != "code":
+        br.login(); return True
+    for attempt in range(2):
+        code = tg.wait_code(("🔁 Bot restarted. " if restarted else "") +
+                            "🔐 Reply with the 6-digit code from your Angel authenticator app.", time.time() + 240)
+        if not code:
+            tg.send("No code received — not trading today."); return False
+        try:
+            br.login(totp=code); return True
+        except Exception as e:  # noqa: BLE001
+            log(f"login failed: {e}")
+            tg.send("❌ Login failed (code expired or wrong?). " + ("Send a fresh code." if attempt == 0 else "Not trading today."))
+    return False
+
+
+def pnl_today(st, today, ltp):
+    r = sum(t.get("PnL_fill", 0) or 0 for t in st.trades if t.get("ExitDate") == str(today))
+    if st.pos != 0 and st.trades and st.trades[-1].get("Fill"):
+        r += (ltp - st.trades[-1]["Fill"]) * st.qty
+    return r
+
+
 def reconcile(br: AngelBroker, st: tl.State, tg: Telegram) -> bool:
     if br.dry:
         return True
@@ -140,15 +203,28 @@ def main():
     global STATE, HIST
     args = set(sys.argv[1:])
     os.makedirs(STATE_DIR, exist_ok=True)
-    cfg, env = load_cfg(), load_env()
+    cfg = load_cfg(); env = load_env(cfg)
     if cfg.get("dry_run", True):          # dry-run keeps its own book so a pretend trade never leaks into live
         STATE = os.path.join(STATE_DIR, "state_dry.json")
     tg = Telegram(env.get("TELEGRAM_BOT_TOKEN"), env.get("TELEGRAM_CHAT_ID"), log)
     today = now().date()
     if today.weekday() >= 5 and "--check" not in args:
         log("weekend — nothing to do"); return
+    started = os.path.join(STATE_DIR, f"started_{today}")
+    restarted = os.path.exists(started)
+    manage_only = False
+    if cfg["morning_button"] and tg.on and "--check" not in args and not restarted:
+        wait_until(at("08:30"))
+        go = morning_gate(cfg, tg, tl.State.load(STATE), today)
+        if not go:
+            return
+        manage_only = go == "manage"
+        open(started, "w").write("manage" if manage_only else "start")
+    elif restarted:
+        manage_only = open(started).read() == "manage"
     br = AngelBroker(cfg, env, log, cache_dir=STATE_DIR)
-    br.login()
+    if not angel_login(br, cfg, tg, restarted):
+        return
     try:
         hist = load_history(br, today, git_pull="--no-pull" not in args)
         if "--init" in args or not os.path.exists(STATE):
@@ -157,6 +233,7 @@ def main():
             st.save(STATE)
             log(f"state initialised FLAT (spent levels: top {st.used_T}, bottom {st.used_B})")
         st = tl.State.load(STATE)
+        st.lots = min(int(st.lots or cfg["lots"]), int(cfg["lots"]), int(cfg["max_lots"]))
         if st.halted and "--resume" not in args:
             tg.send("Bot is HALTED from an earlier problem. Check Angel, then run with --resume."); log("halted"); return
         st.halted = False
@@ -170,7 +247,10 @@ def main():
         wait_until(at("08:55"), tg)
         day.start()
         mode = "DRY RUN (no real orders)" if br.dry else "LIVE"
-        tg.send(f"Bot running — {mode}. Commands: /status /stop /flat")
+        if manage_only:
+            day.done_for_day = True
+        tg.keyboard(f"Bot running — {mode}, {st.lots} lots" + (" (managing the open position only)" if manage_only else "")
+                    + ".\nUse the buttons below any time: 📊 Status · ⛔ Stop new trades · 🔴 Square off")
         wait_until(at("09:15") + timedelta(seconds=5), tg)
         ref = day.ref
         q = br.quote(ref)
@@ -184,6 +264,7 @@ def main():
         else:
             day.late_start(q)
         last_q, stopped = q, False
+        loss_hit, flat_key, next_beat = False, None, time.time() + 60 * cfg["heartbeat_minutes"]
         roll_t, close_t = at(cfg["roll_time"]), at(cfg["close_check_time"])
         while now() < at("15:29"):
             for cmd in tg.poll():
@@ -193,14 +274,36 @@ def main():
                 elif cmd == "/stop":
                     stopped = True; day.done_for_day = True
                     tg.send("Stopped: no new entries today. Open position + its stop stay. /flat to exit now.")
-                elif cmd == "/flat" and st.pos != 0:
-                    day.exit_position("Manual /flat", last_q["ltp"]); day.done_for_day = True; st.save(STATE)
+                elif cmd == "/flat":
+                    if st.pos == 0:
+                        tg.send("No open position.")
+                    else:
+                        flat_key = f"flat{int(time.time())}"
+                        tg.ask(flat_key, f"Square off {st.contract} ({st.qty:+d}) at market now?")
                 elif cmd == "/help":
                     tg.send("/status – plan and price\n/stop – no new entries today\n/flat – exit the position now")
             try:
                 last_q = br.quote(ref)
             except Exception as e:  # noqa: BLE001
                 log(f"quote error {e}"); time.sleep(5); continue
+            if flat_key and tg.get(flat_key) is not None:
+                if tg.get(flat_key) and st.pos != 0:
+                    day.exit_position("Manual square-off", last_q["ltp"]); day.done_for_day = True; st.save(STATE)
+                flat_key = None
+            # ---- hard limits
+            pl = pnl_today(st, today, last_q["ltp"])
+            if cfg["max_daily_loss_rs"] and not loss_hit and pl <= -abs(cfg["max_daily_loss_rs"]):
+                loss_hit = True
+                if st.pos != 0:
+                    day.exit_position("Daily loss limit", last_q["ltp"]); st.save(STATE)
+                day.done_for_day = True
+                tg.send(f"🛑 Daily loss limit hit (₹{pl:,.0f}). Squared off, no more trades today.")
+            if sum(1 for t in st.trades if t.get("EntryDate") == str(today)) >= cfg["max_entries_per_day"]:
+                day.done_for_day = True
+            if cfg["heartbeat_minutes"] and time.time() >= next_beat:
+                next_beat = time.time() + 60 * cfg["heartbeat_minutes"]
+                tg.send(f"💓 Running. BN {last_q['ltp']:,.0f} · "
+                        + (f"{'LONG' if st.pos > 0 else 'SHORT'} {abs(st.qty)} · P&L today ₹{pl:,.0f}" if st.pos else f"flat · P&L today ₹{pl:,.0f}"))
             day.tick(last_q)
             if now() >= roll_t:
                 day.roll()

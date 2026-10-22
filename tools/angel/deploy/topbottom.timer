@@ -1,0 +1,10 @@
+[Unit]
+Description=Start the Top Bottom bot on weekday mornings (IST)
+
+[Timer]
+OnCalendar=Mon..Fri 08:25 Asia/Kolkata
+Persistent=false
+Unit=topbottom.service
+
+[Install]
+WantedBy=timers.target

@@ -29,12 +29,15 @@ class AngelBroker:
         self._dry_n = 0
 
     # ------------------------------------------------------------ session
-    def login(self):
+    def login(self, totp: str | None = None):
+        """totp: a 6-digit code typed by you (code mode); otherwise generated from ANGEL_TOTP_SECRET."""
         from SmartApi import SmartConnect   # pip install smartapi-python
-        import pyotp
         e = self.env
+        if not totp:
+            import pyotp
+            totp = pyotp.TOTP(e["ANGEL_TOTP_SECRET"]).now()
         self.api = SmartConnect(api_key=e["ANGEL_API_KEY"])
-        r = self.api.generateSession(e["ANGEL_CLIENT_CODE"], e["ANGEL_PIN"], pyotp.TOTP(e["ANGEL_TOTP_SECRET"]).now())
+        r = self.api.generateSession(e["ANGEL_CLIENT_CODE"], e["ANGEL_PIN"], totp)
         if not r or not r.get("status"):
             raise RuntimeError(f"Angel login failed: {r}")
         self.log(f"Angel login OK ({e['ANGEL_CLIENT_CODE']}){' — DRY RUN, no orders will be sent' if self.dry else ''}")

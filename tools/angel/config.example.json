@@ -15,5 +15,12 @@
   "backstop_pct": 0.5,
   "poll_seconds": 2,
   "event_exit": true,
-  "glitch_pts": 0
+  "glitch_pts": 0,
+  "login_mode": "onetap",
+  "morning_button": true,
+  "gate_deadline": "09:05",
+  "max_lots": 2,
+  "max_daily_loss_rs": 25000,
+  "max_entries_per_day": 3,
+  "heartbeat_minutes": 60
 }

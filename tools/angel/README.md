@@ -79,3 +79,12 @@ Run `python tools/angel/run_bot.py` on weekdays before **08:55 IST**. Starting a
 - If the laptop is off on a day you hold a position, there is **no stop** that day (backstops are day orders). The paper bot's nightly Telegram message is a second check.
 
 Not investment advice. Futures trading can lose more than the margin deposited.
+
+## Cloud (AWS Lightsail Mumbai) — phone-button mode
+1. Ubuntu 24.04 server in Mumbai with a static IPv4; register that IP in your Angel SmartAPI app.
+2. In the Lightsail console: Connect using SSH, then run
+   `curl -fsSL https://raw.githubusercontent.com/drsinghap81/blank-app/main/tools/angel/deploy/setup.sh | sudo bash`
+   It installs everything, locks the server down, asks for your keys (stored only on the server, mode 600) and connects Telegram.
+3. `sudo tb check` tests the Angel login. The bot starts in DRY RUN; `sudo tb live` switches to real orders.
+Every weekday 08:25 IST: Telegram ▶️ Start / ⏸️ Skip. Buttons during the day: 📊 Status · ⛔ Stop new trades · 🔴 Square off.
+Hard limits (config.json): max_lots, max_daily_loss_rs, max_entries_per_day. login_mode "code" = type the 6-digit code after Start.

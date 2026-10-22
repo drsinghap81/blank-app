@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# helper:  sudo tb status|logs|check|live|dry|start|stop|update
+A=/home/bot/blank-app/tools/angel
+PY=/home/bot/venv/bin/python
+setcfg() { sudo -u bot $PY - "$A/config.json" "$1" <<'P'
+import json, sys
+p, v = sys.argv[1], sys.argv[2] == "true"
+c = json.load(open(p)); c["dry_run"] = v; json.dump(c, open(p, "w"), indent=2)
+print("dry_run =", v)
+P
+}
+case "$1" in
+  status) systemctl status topbottom.service --no-pager | head -12; systemctl list-timers topbottom.timer --no-pager | head -3 ;;
+  logs)   journalctl -u topbottom.service -n 80 --no-pager ;;
+  check)  cd /home/bot/blank-app && sudo -u bot $PY tools/angel/run_bot.py --check --no-pull ;;
+  live)   read -r -p "Switch to LIVE trading with real orders? type YES: " a; [ "$a" = "YES" ] && setcfg false ;;
+  dry)    setcfg true ;;
+  start)  systemctl start topbottom.service; echo "started (it will message you on Telegram)";;
+  stop)   systemctl stop topbottom.service; echo "stopped (exchange stop orders stay in place)";;
+  update) sudo -u bot git -C /home/bot/blank-app pull --ff-only && sudo -u bot /home/bot/venv/bin/pip install -q -r $A/requirements.txt && cp $A/deploy/topbottom.* /etc/systemd/system/ && systemctl daemon-reload && echo updated ;;
+  *) echo "usage: sudo tb status|logs|check|live|dry|start|stop|update" ;;
+esac
