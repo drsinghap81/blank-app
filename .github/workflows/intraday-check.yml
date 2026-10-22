@@ -1,0 +1,29 @@
+name: intraday-check
+on:
+  push:
+    paths: [".github/workflows/intraday-check.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas
+      - run: |
+          mkdir -p intraday
+          python - <<'PY'
+          import yfinance as yf
+          for t in ["^NSEBANK"]:
+              d = yf.download(t, period="7d", interval="5m", progress=False, auto_adjust=False)
+              d.columns = [c[0] if isinstance(c, tuple) else c for c in d.columns]
+              d.index = d.index.tz_convert("Asia/Kolkata")
+              d.to_csv("intraday/NSEBANK_5m.csv")
+              print(d.tail())
+          PY
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout -B intraday-data; git add -f intraday; git commit -m "intraday" || exit 0; git push -f origin intraday-data
