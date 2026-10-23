@@ -1,7 +1,7 @@
 {
   "BANKNIFTY": {
-    "date": "2026-10-22 00:00:00",
-    "close": 54961.4,
+    "date": "2026-10-23 00:00:00",
+    "close": 54242.2,
     "prev_top": 55918.0,
     "prev_bottom": 55480.8,
     "position": "FLAT",
@@ -13,6 +13,6 @@
     "lines": {},
     "futures_contract_expiry": "2026-10-27",
     "lot_size": 30,
-    "spot_close": 54925.7
+    "spot_close": 54287.35
   }
 }
