@@ -6,6 +6,13 @@ For each underlying, on its nearest expiry:
 Also the 2nd-highest strikes and the put/call OI ratio.
 Writes data/oi/oi_levels.json keyed by the app's Yahoo ticker (e.g. RELIANCE.NS, ^NSEI, ^NSEBANK).
 Runs nightly in GitHub Actions (paper-trade workflow) after NSE publishes the bhavcopy (about 7 pm IST).
+
+TRAPPED-WRITER ALERTS (Amritpal's rule, 24 Oct 2026):
+  trapped PUT writers  = the biggest put OI of the whole chain sits ABOVE the price (those puts are now in the money)
+                         -> writers under pressure, read as a BEARISH sign
+  trapped CALL writers = the biggest call OI sits BELOW the price -> short-covering fuel, a BULLISH sign
+Every night: data/oi/alerts.json (today's list + what is NEW vs yesterday), data/oi/history.csv (one row per
+underlying per day, for backtesting later) and a Telegram summary (indices + new alerts) when SEND_TELEGRAM=1.
 """
 import io
 import json
@@ -92,8 +99,100 @@ def main():
         ticker = INDEX_TICKERS.get(sym, f"{sym}.NS")
         out[ticker] = dict(symbol=sym, date=str(day), expiry=str(e.date()), underlying=under, **lv)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    prev = {}
+    if os.path.exists(OUT):
+        try:
+            old = json.load(open(OUT))
+            if old.get("date") != str(day):
+                prev = old.get("levels", {})
+            else:   # same day re-run: compare with the stored "previous" snapshot instead
+                prev = json.load(open(ALERTS)).get("prev_levels", {}) if os.path.exists(ALERTS) else {}
+        except Exception:  # noqa: BLE001
+            prev = {}
     json.dump(dict(date=str(day), levels=out), open(OUT, "w"), indent=1)
     print(f"OI levels for {len(out)} underlyings on {day}")
+    alerts(out, prev, day)
+
+
+ALERTS = os.path.join(os.path.dirname(OUT), "alerts.json")
+HIST = os.path.join(os.path.dirname(OUT), "history.csv")
+
+
+def flags(v):
+    u = v.get("underlying")
+    if not u:
+        return False, False
+    return v["support_any"] > u, v["resistance_any"] < u
+
+
+def alerts(out, prev, day):
+    rows, tp, tc = [], [], []
+    for t, v in out.items():
+        p_, c_ = flags(v)
+        u = v["underlying"]
+        rec = dict(ticker=t, symbol=v["symbol"], price=u, expiry=v["expiry"], pcr=v["pcr"],
+                   support=v["support"], resistance=v["resistance"],
+                   biggest_put=v["support_any"], biggest_call=v["resistance_any"])
+        if p_:
+            was = flags(prev[t])[0] if t in prev else False
+            tp.append(dict(rec, gap_pct=round((v["support_any"] / u - 1) * 100, 2), new=not was))
+        if c_:
+            was = flags(prev[t])[1] if t in prev else False
+            tc.append(dict(rec, gap_pct=round((1 - v["resistance_any"] / u) * 100, 2), new=not was))
+        rows.append(dict(date=str(day), **rec, trapped_puts=p_, trapped_calls=c_))
+    tp.sort(key=lambda r: -r["gap_pct"]); tc.sort(key=lambda r: -r["gap_pct"])
+    already_sent = False
+    if os.path.exists(ALERTS):
+        try:
+            a = json.load(open(ALERTS)); already_sent = a.get("date") == str(day) and a.get("sent", False)
+        except Exception:  # noqa: BLE001
+            pass
+    send = os.environ.get("SEND_TELEGRAM") == "1" and not already_sent
+    h = pd.DataFrame(rows)
+    if os.path.exists(HIST):
+        old = pd.read_csv(HIST)
+        old = old[old.date != str(day)]
+        h = pd.concat([old, h], ignore_index=True)
+    h.to_csv(HIST, index=False)
+    print(f"trapped put writers: {len(tp)} ({sum(r['new'] for r in tp)} new) | trapped call writers: {len(tc)} ({sum(r['new'] for r in tc)} new)")
+    if send:
+        telegram(summary(day, out, tp, tc))
+    json.dump(dict(date=str(day), trapped_puts=tp, trapped_calls=tc, prev_levels=prev, sent=already_sent or send),
+              open(ALERTS, "w"), indent=1)
+
+
+def summary(day, out, tp, tc):
+    L = [f"🧲 OI writer alerts — NSE close {day}"]
+    for t, name in (("^NSEI", "Nifty"), ("^NSEBANK", "Bank Nifty")):
+        v = out.get(t)
+        if not v:
+            continue
+        p_, c_ = flags(v)
+        tag = "🔴 put writers TRAPPED (bearish)" if p_ else "🟢 call writers TRAPPED (bullish)" if c_ else "no trapped writers"
+        L.append(f"{name} {v['underlying']:,.0f}: S {v['support']:,.0f} / R {v['resistance']:,.0f}, PCR {v['pcr']:.2f} — {tag}"
+                 + (f" (biggest put OI {v['support_any']:,.0f})" if p_ else f" (biggest call OI {v['resistance_any']:,.0f})" if c_ else ""))
+    n = len(out)
+    L.append(f"\nBreadth: {len(tp)}/{n} with trapped PUT writers (bearish), {len(tc)}/{n} with trapped CALL writers (bullish)")
+    new_p = [r for r in tp if r["new"]][:15]
+    new_c = [r for r in tc if r["new"]][:15]
+    if new_p:
+        L.append("\n🔴 NEW trapped put writers (bearish): " + ", ".join(f"{r['symbol']} ({r['biggest_put']:g} vs {r['price']:g})" for r in new_p))
+    if new_c:
+        L.append("\n🟢 NEW trapped call writers (bullish): " + ", ".join(f"{r['symbol']} ({r['biggest_call']:g} vs {r['price']:g})" for r in new_c))
+    if not new_p and not new_c:
+        L.append("\nNo new alerts today.")
+    L.append("Full list: app → 🧲 OI Alerts tab")
+    return "\n".join(L)
+
+
+def telegram(text):
+    tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
+    if not tok or not chat:
+        return
+    try:
+        s.post(f"https://api.telegram.org/bot{tok}/sendMessage", data={"chat_id": chat, "text": text[:4000]}, timeout=20)
+    except Exception as e:  # noqa: BLE001
+        print("telegram failed:", e, file=sys.stderr)
 
 
 if __name__ == "__main__":

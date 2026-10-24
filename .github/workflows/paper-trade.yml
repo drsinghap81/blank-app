@@ -31,7 +31,11 @@ jobs:
         run: python tools/paper_bot.py
       - name: Refresh stock/index futures history
         run: python tools/update_futures.py || true
-      - name: Option-OI support/resistance levels
+      - name: Option-OI levels + trapped-writer alerts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SEND_TELEGRAM: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && '1' || '0' }}
         run: python tools/fetch_oi.py || true
       - name: Commit paper results
         run: |

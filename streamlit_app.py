@@ -1930,7 +1930,61 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-24 · option-OI support/resistance zone v21"
+APP_BUILD = "2026-10-24 · OI zone + trapped-writer alerts v22"
+
+
+def render_oi_alerts_tab() -> None:
+    """Trapped option writers across all NSE F&O underlyings (nightly, from the F&O bhavcopy)."""
+    import json as _json
+    base = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "oi")
+    try:
+        a = _json.load(open(_os.path.join(base, "alerts.json"), encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        st.info("OI alerts appear after the first nightly NSE update (about 7 pm IST on trading days).")
+        return
+    lv = load_oi_levels()
+    tp, tc = pd.DataFrame(a.get("trapped_puts", [])), pd.DataFrame(a.get("trapped_calls", []))
+    st.markdown(f"#### 🧲 Trapped option writers — NSE close {a['date']}")
+    st.caption("**Trapped PUT writers** = the biggest put OI of the chain sits above the price (those puts are in the money): "
+               "a **bearish** sign. **Trapped CALL writers** = the biggest call OI sits below the price: short-covering fuel, "
+               "a **bullish** sign. Nearest expiry, updated every trading night. Telegram gets the indices and the new names.")
+    c = st.columns(4)
+    for col, (t, name) in zip(c[:2], (("^NSEI", "Nifty"), ("^NSEBANK", "Bank Nifty"))):
+        v = lv.get(t)
+        if not v:
+            continue
+        u = v["underlying"]
+        state = ("🔴 Put writers trapped" if v["support_any"] > u else "🟢 Call writers trapped" if v["resistance_any"] < u
+                 else "⚪ No trap")
+        col.metric(f"{name} {u:,.0f}", state, f"S {v['support']:,.0f} · R {v['resistance']:,.0f} · PCR {v['pcr']:.2f}",
+                   delta_color="off")
+    n = max(len(lv), 1)
+    c[2].metric("Trapped PUT writers (bearish)", f"{len(tp)} / {len(lv)}", f"{len(tp) / n:.0%} of F&O names", delta_color="off")
+    c[3].metric("Trapped CALL writers (bullish)", f"{len(tc)} / {len(lv)}", f"{len(tc) / n:.0%} of F&O names", delta_color="off")
+    new_only = st.toggle("Only names that are new today", value=False, key="oi_new_only")
+    cols = ["symbol", "price", "biggest_put", "biggest_call", "gap_pct", "support", "resistance", "pcr", "new"]
+    names = {"symbol": "Symbol", "price": "Price", "biggest_put": "Biggest put OI strike", "biggest_call": "Biggest call OI strike",
+             "gap_pct": "Trap depth %", "support": "Support (put OI ≤ price)", "resistance": "Resistance (call OI ≥ price)",
+             "pcr": "PCR", "new": "New today"}
+    left, right = st.columns(2)
+    for box, df_, title in ((left, tp, "🔴 Trapped put writers — bearish"), (right, tc, "🟢 Trapped call writers — bullish")):
+        with box:
+            st.markdown(f"##### {title}")
+            if df_.empty:
+                st.write("None today.")
+                continue
+            d = df_[df_.new] if new_only else df_
+            st.dataframe(d[[k for k in cols if k in d]].rename(columns=names), hide_index=True, width="stretch", height=420)
+    hp = _os.path.join(base, "history.csv")
+    if _os.path.exists(hp):
+        h = pd.read_csv(hp)
+        b = h.groupby("date").agg(puts=("trapped_puts", "mean"), calls=("trapped_calls", "mean")) * 100
+        if len(b) > 1:
+            st.markdown("##### Market breadth: % of F&O names with trapped writers")
+            st.line_chart(b.rename(columns={"puts": "Trapped put writers % (bearish)", "calls": "Trapped call writers % (bullish)"}))
+        else:
+            st.caption("Breadth history starts today and builds up every trading night.")
+    st.caption("Not yet backtested as a trading signal — the daily history is being recorded so it can be tested.")
 
 
 def main() -> None:
@@ -1945,13 +1999,15 @@ def main() -> None:
 
     render_header(market)
 
-    tab1, tab_scan, tab_bt, tab_tb, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner", "🧪 Backtest",
-                                                          "📈 Top Bottom", "🧾 Order Execution (Paper)",
-                                                          "💼 Portfolio Tracker"])
+    tab1, tab_scan, tab_oi, tab_bt, tab_tb, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner", "🧲 OI Alerts",
+                                                                  "🧪 Backtest", "📈 Top Bottom",
+                                                                  "🧾 Order Execution (Paper)", "💼 Portfolio Tracker"])
     with tab1:
         render_analysis_tab(market, ticker)
     with tab_scan:
         render_scanner_tab(market)
+    with tab_oi:
+        render_oi_alerts_tab()
     with tab_bt:
         render_backtest_tab(market)
     with tab_tb:
