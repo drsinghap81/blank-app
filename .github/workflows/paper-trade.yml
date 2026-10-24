@@ -5,7 +5,7 @@ on:
     - cron: "10 16 * * 1-5"   # 21:40 IST retry (idempotent)
   workflow_dispatch:
   push:
-    paths: [".github/workflows/paper-trade.yml", "tools/paper_bot.py", "tools/update_futures.py", "paper/config.json"]
+    paths: [".github/workflows/paper-trade.yml", "tools/paper_bot.py", "tools/update_futures.py", "tools/fetch_oi.py", "paper/config.json"]
 permissions:
   contents: write
 concurrency:
@@ -31,11 +31,13 @@ jobs:
         run: python tools/paper_bot.py
       - name: Refresh stock/index futures history
         run: python tools/update_futures.py || true
+      - name: Option-OI support/resistance levels
+        run: python tools/fetch_oi.py || true
       - name: Commit paper results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
-          git add paper data/futures
+          git add paper data/futures data/oi
           git diff --cached --quiet && exit 0
           git commit -m "Paper trade update $(date -u +%F)"
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done

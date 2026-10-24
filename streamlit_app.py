@@ -1049,10 +1049,68 @@ CHART_CONFIG = {"scrollZoom": True, "displaylogo": False,
                 "modeBarButtonsToRemove": ["lasso2d", "select2d"]}
 
 
+OI_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "oi", "oi_levels.json")
+
+
+@st.cache_data(ttl=1800, show_spinner=False)
+def load_oi_levels() -> dict:
+    """Nightly option-OI levels (max put OI = support, max call OI = resistance) from the NSE F&O bhavcopy."""
+    try:
+        import json as _json
+        with open(OI_PATH, encoding="utf-8") as f:
+            return _json.load(f).get("levels", {})
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def oi_for(ticker: str) -> dict | None:
+    return load_oi_levels().get(ticker)
+
+
+def _mix(t: float) -> str:
+    """0 = green (support) -> 0.5 = amber -> 1 = red (resistance)."""
+    g, a, r = (34, 197, 94), (234, 179, 8), (239, 68, 68)
+    c0, c1, u = (g, a, t * 2) if t <= 0.5 else (a, r, (t - 0.5) * 2)
+    return ",".join(str(int(c0[i] + (c1[i] - c0[i]) * u)) for i in range(3))
+
+
+def draw_oi_zone(fig, df, oi: dict, y0: float, y1: float, bands: int = 36, alpha: float = 0.24):
+    sup, res = float(oi["support"]), float(oi["resistance"])
+    lo, hi = min(sup, res), max(sup, res)
+    if hi <= lo:
+        return
+    x0, x1 = df.index[0], df.index[-1]
+    step = (hi - lo) / bands
+    for k in range(bands):
+        b0, b1 = lo + k * step, lo + (k + 1) * step
+        c0, c1 = max(b0, y0), min(b1, y1)
+        if c1 <= c0:
+            continue
+        mid = (b0 + b1) / 2
+        t = (mid - sup) / (res - sup)              # 0 at support, 1 at resistance (either orientation)
+        fig.add_shape(type="rect", x0=x0, x1=x1, y0=c0, y1=c1, line=dict(width=0), layer="below",
+                      fillcolor=f"rgba({_mix(min(max(t, 0), 1))},{alpha})", row=1, col=1)
+    fmt = lambda v: f"{v / 1e7:.2f} Cr" if v >= 1e7 else f"{v / 1e5:.1f} L"   # noqa: E731
+    for price, col, txt, pos in ((sup, "#22c55e", f"Put-OI support {sup:,.0f} · {fmt(oi['support_oi'])} OI", "bottom right"),
+                                 (res, "#ef4444", f"Call-OI resistance {res:,.0f} · {fmt(oi['resistance_oi'])} OI", "top right")):
+        if y0 <= price <= y1:
+            fig.add_hline(y=price, row=1, col=1, line=dict(color=col, width=2),
+                          annotation_text=txt, annotation_position=pos,
+                          annotation_font=dict(size=11, color=col), annotation_bgcolor="rgba(15,19,27,0.8)")
+
+
+def oi_caption(oi: dict) -> str:
+    nxt_s = f" (next {oi['support_2']:,.0f})" if oi.get("support_2") else ""
+    nxt_r = f" (next {oi['resistance_2']:,.0f})" if oi.get("resistance_2") else ""
+    return (f"Option OI (NSE close {oi['date']}, expiry {oi['expiry']}): put-OI support **{oi['support']:,.0f}**{nxt_s}"
+            f" · call-OI resistance **{oi['resistance']:,.0f}**{nxt_r} · PCR {oi['pcr']:.2f}. "
+            "Shading runs green at support → red at resistance.")
+
+
 def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None = None,
                       signals: list[dict] | None = None,
                       gann: list[tuple[int, float]] | None = None,
-                      price_zoom: float = 1.0) -> go.Figure:
+                      price_zoom: float = 1.0, oi: dict | None = None) -> go.Figure:
     """
     Candles + SMA + S/R lines + pattern markers on top, volume in the middle,
     RSI with 70/30 bands below.
@@ -1082,6 +1140,10 @@ def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None 
     # ---- Price range: fitted to the candles, optionally stretched around the last close ----
     ref = float(df["Close"].iloc[-1])
     lo, hi = float(df["Low"].min()), float(df["High"].max())
+    if oi:   # bring nearby OI levels (within 6% of the close) into view
+        for lvl in (float(oi["support"]), float(oi["resistance"])):
+            if abs(lvl / ref - 1) <= 0.06:
+                lo, hi = min(lo, lvl), max(hi, lvl)
     pad = (hi - lo) * 0.06 or hi * 0.01
     y0, y1 = lo - pad, hi + pad
     z = max(0.3, float(price_zoom or 1.0))
@@ -1089,6 +1151,10 @@ def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None 
         half = (y1 - y0) / 2 / z
         y0, y1 = ref - half, ref + half
     in_view = lambda p: y0 <= p <= y1   # noqa: E731
+
+    # ---- Option-OI zone: put-OI support (green) shading up to call-OI resistance (red) ----
+    if oi:
+        draw_oi_zone(fig, df, oi, y0, y1)
 
     # ---- Horizontal support / resistance lines (only those inside the view) ----
     for lv in levels or []:
@@ -1144,7 +1210,7 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
         st.warning(f"⚠️ Live data unavailable for **{ticker}** — showing a SYNTHETIC dataset "
                    f"so the terminal keeps working.\n\nReason: {msg}")
 
-    wcol, zcol, gcol = st.columns([3, 2, 2])
+    wcol, zcol, gcol, ocol = st.columns([3, 2, 2, 2])
     with wcol:
         window = st.radio("Chart window", [60, 126], index=0, horizontal=True,
                           format_func=lambda n: f"{n} bars" + (" (~6 months)" if n == 126 else ""),
@@ -1157,6 +1223,11 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
         show_gann = st.toggle("Gann odd squares", value=False, key="show_gann",
                               help="√price → nearest odd numbers either side → squared. "
                                    "Lines are drawn only when they fall inside the chart.")
+    with ocol:
+        show_oi = st.toggle("Option OI zone", value=True, key="show_oi",
+                            help="F&O stocks and indices: strike with the most put OI (support) and the most call OI "
+                                 "(resistance) on the nearest expiry, from last night's NSE bhavcopy. "
+                                 "The space between is shaded green → red.")
     full = add_indicators(raw)
     df = full.tail(window)
     last = df.iloc[-1]
@@ -1193,8 +1264,13 @@ def render_analysis_tab(market: MarketConfig, ticker: str) -> None:
         (st.error if s["Bias"] == "Bearish" else st.success)(msg)
 
     gann_lines = gann_odd_squares(float(last["Close"]), 1) if show_gann else None
-    st.plotly_chart(build_price_chart(df, ticker, shown_levels, chart_signals, gann_lines, pzoom),
+    oi = oi_for(ticker) if show_oi else None
+    st.plotly_chart(build_price_chart(df, ticker, shown_levels, chart_signals, gann_lines, pzoom, oi),
                     width="stretch", key=f"analysis_chart_{ticker}", config=CHART_CONFIG)
+    if oi:
+        st.caption(oi_caption(oi))
+    elif show_oi and market.key == "NSE":
+        st.caption("No option-OI levels for this symbol (not in F&O, or tonight's NSE data not loaded yet).")
     if gann_lines:
         st.caption(f"Gann: √{last['Close']:,.2f} = {np.sqrt(last['Close']):.2f} → "
                    + " · ".join(f"{r}² = {sq:,.0f} ({(sq / last['Close'] - 1) * 100:+.1f}%)"
@@ -1555,11 +1631,12 @@ def render_scanner_tab(market: MarketConfig) -> None:
         chart_h = l2.slider("Chart height (px)", 400, 1100, 640, 20, key="scan_chart_h")
         bars = l3.select_slider("Chart window", [40, 60, 90, 126], value=DISPLAY_BARS, key="scan_bars",
                                 format_func=lambda b: f"{b} sessions")
-        l4, l5 = st.columns(2)
+        l4, l5, l6 = st.columns(3)
         scan_zoom = l4.slider("Price scale (stretch)", 0.5, 4.0, 1.0, 0.25, key="scan_price_zoom",
                               help="Above 1× stretches the candles around the last close. "
                                    "You can also drag the top or bottom end of the price axis.")
         scan_gann = l5.toggle("Gann odd squares", value=False, key="scan_gann")
+        scan_oi = l6.toggle("Option OI zone", value=True, key="scan_oi")
     left, right = st.columns([list_pct, 100 - list_pct], gap="medium")
     with left:
         st.markdown(f"##### {cat} — {rows['Ticker'].nunique() if len(rows) else 0} stocks")
@@ -1607,7 +1684,8 @@ def render_scanner_tab(market: MarketConfig) -> None:
             ref = float(view["Close"].iloc[-1])
             fig = build_price_chart(view, pick, select_levels(compute_levels(full), ref),
                                     detect_signals(full, last_n=bars),
-                                    gann_odd_squares(ref, 1) if scan_gann else None, scan_zoom)
+                                    gann_odd_squares(ref, 1) if scan_gann else None, scan_zoom,
+                                    oi_for(pick) if scan_oi else None)
             fig.update_layout(height=chart_h)
             e9v = full["Close"].ewm(span=EMA_FAST, adjust=False).mean().tail(bars)
             e20v = full["Close"].ewm(span=EMA_SLOW, adjust=False).mean().tail(bars)
@@ -1846,7 +1924,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-20 · honest (point-in-time) backtest notes v20"
+APP_BUILD = "2026-10-24 · option-OI support/resistance zone v21"
 
 
 def main() -> None:
