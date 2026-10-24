@@ -5,7 +5,7 @@ For each underlying, on its nearest expiry:
   resistance = strike with the highest CALL open interest
 Also the 2nd-highest strikes and the put/call OI ratio.
 Writes data/oi/oi_levels.json keyed by the app's Yahoo ticker (e.g. RELIANCE.NS, ^NSEI, ^NSEBANK).
-Runs nightly in GitHub Actions (paper-trade workflow) after NSE publishes the bhavcopy.
+Runs nightly in GitHub Actions (paper-trade workflow) after NSE publishes the bhavcopy (about 7 pm IST).
 """
 import io
 import json
