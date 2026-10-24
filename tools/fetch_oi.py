@@ -49,6 +49,7 @@ def levels(g, under=None):
     if ce.empty or pe.empty or ce.max() <= 0 or pe.max() <= 0:
         return None
     any_s, any_r = float(pe.idxmax()), float(ce.idxmax())
+    pcr = round(float(pe.sum() / ce.sum()), 2)          # whole chain
     if under:
         pe_o, ce_o = pe[pe.index <= under], ce[ce.index >= under]
         pe = pe_o if len(pe_o) and pe_o.max() > 0 else pe
@@ -59,7 +60,7 @@ def levels(g, under=None):
         support_2=float(p2.index[1]) if len(p2) > 1 else None,
         resistance=float(c2.index[0]), resistance_oi=int(c2.iloc[0]),
         resistance_2=float(c2.index[1]) if len(c2) > 1 else None,
-        pcr=round(float(pe.sum() / ce.sum()), 2),
+        pcr=pcr,
     )
 
 
