@@ -1102,9 +1102,15 @@ def draw_oi_zone(fig, df, oi: dict, y0: float, y1: float, bands: int = 36, alpha
 def oi_caption(oi: dict) -> str:
     nxt_s = f" (next {oi['support_2']:,.0f})" if oi.get("support_2") else ""
     nxt_r = f" (next {oi['resistance_2']:,.0f})" if oi.get("resistance_2") else ""
+    trap = ""
+    if oi.get("support_any") and oi["support_any"] != oi["support"]:
+        trap += f" ⚠️ Biggest put OI overall is at {oi['support_any']:,.0f}, above the price — put writers trapped (bearish pressure)."
+    if oi.get("resistance_any") and oi["resistance_any"] != oi["resistance"]:
+        trap += f" ⚠️ Biggest call OI overall is at {oi['resistance_any']:,.0f}, below the price — call writers trapped (short-covering fuel)."
     return (f"Option OI (NSE close {oi['date']}, expiry {oi['expiry']}): put-OI support **{oi['support']:,.0f}**{nxt_s}"
             f" · call-OI resistance **{oi['resistance']:,.0f}**{nxt_r} · PCR {oi['pcr']:.2f}. "
-            "Shading runs green at support → red at resistance.")
+            "Support = biggest put OI at/below the price, resistance = biggest call OI at/above it. "
+            "Shading runs green at support → red at resistance." + trap)
 
 
 def build_price_chart(df: pd.DataFrame, ticker: str, levels: list[Level] | None = None,

@@ -40,13 +40,21 @@ def bhavcopy(d):
     return None
 
 
-def levels(g):
+def levels(g, under=None):
+    """support = biggest put OI at or below the price, resistance = biggest call OI at or above it
+    (out-of-the-money writing). After a sharp fall the biggest put OI often sits ABOVE the price
+    (puts written earlier, now in the money) — that is kept separately as *_any."""
     ce = g[g.OptnTp == "CE"].groupby("StrkPric").OpnIntrst.sum()
     pe = g[g.OptnTp == "PE"].groupby("StrkPric").OpnIntrst.sum()
     if ce.empty or pe.empty or ce.max() <= 0 or pe.max() <= 0:
         return None
+    any_s, any_r = float(pe.idxmax()), float(ce.idxmax())
+    if under:
+        pe_o, ce_o = pe[pe.index <= under], ce[ce.index >= under]
+        pe = pe_o if len(pe_o) and pe_o.max() > 0 else pe
+        ce = ce_o if len(ce_o) and ce_o.max() > 0 else ce
     c2, p2 = ce.nlargest(2), pe.nlargest(2)
-    return dict(
+    return dict(support_any=any_s, resistance_any=any_r,
         support=float(p2.index[0]), support_oi=int(p2.iloc[0]),
         support_2=float(p2.index[1]) if len(p2) > 1 else None,
         resistance=float(c2.index[0]), resistance_oi=int(c2.iloc[0]),
@@ -76,10 +84,10 @@ def main():
         if not exps:
             continue
         e = exps[0]
-        lv = levels(g[g.XpryDt == e])
+        under = float(g.UndrlygPric.dropna().iloc[0]) if "UndrlygPric" in g and g.UndrlygPric.notna().any() else None
+        lv = levels(g[g.XpryDt == e], under)
         if lv is None:
             continue
-        under = float(g.UndrlygPric.dropna().iloc[0]) if "UndrlygPric" in g and g.UndrlygPric.notna().any() else None
         ticker = INDEX_TICKERS.get(sym, f"{sym}.NS")
         out[ticker] = dict(symbol=sym, date=str(day), expiry=str(e.date()), underlying=under, **lv)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
