@@ -14,7 +14,7 @@
    "resistance": 1120.0,
    "resistance_oi": 689000,
    "resistance_2": 1100.0,
-   "pcr": 0.11
+   "pcr": 0.58
   },
   "ABB.NS": {
    "symbol": "ABB",
@@ -29,7 +29,7 @@
    "resistance": 7000.0,
    "resistance_oi": 198125,
    "resistance_2": 6800.0,
-   "pcr": 0.12
+   "pcr": 0.38
   },
   "ABCAPITAL.NS": {
    "symbol": "ABCAPITAL",
@@ -44,7 +44,7 @@
    "resistance": 400.0,
    "resistance_oi": 2396300,
    "resistance_2": 380.0,
-   "pcr": 0.12
+   "pcr": 0.55
   },
   "ADANIENSOL.NS": {
    "symbol": "ADANIENSOL",
@@ -59,7 +59,7 @@
    "resistance": 1300.0,
    "resistance_oi": 507600,
    "resistance_2": 1400.0,
-   "pcr": 0.19
+   "pcr": 0.72
   },
   "ADANIENT.NS": {
    "symbol": "ADANIENT",
@@ -74,7 +74,7 @@
    "resistance": 2700.0,
    "resistance_oi": 1188105,
    "resistance_2": 2900.0,
-   "pcr": 0.12
+   "pcr": 0.63
   },
   "ADANIGREEN.NS": {
    "symbol": "ADANIGREEN",
@@ -89,7 +89,7 @@
    "resistance": 1300.0,
    "resistance_oi": 1674600,
    "resistance_2": 1400.0,
-   "pcr": 0.13
+   "pcr": 0.62
   },
   "ADANIPORTS.NS": {
    "symbol": "ADANIPORTS",
@@ -104,7 +104,7 @@
    "resistance": 1800.0,
    "resistance_oi": 1188450,
    "resistance_2": 1760.0,
-   "pcr": 0.39
+   "pcr": 0.67
   },
   "ADANIPOWER.NS": {
    "symbol": "ADANIPOWER",
@@ -119,7 +119,7 @@
    "resistance": 200.0,
    "resistance_oi": 8871450,
    "resistance_2": 210.0,
-   "pcr": 0.17
+   "pcr": 0.52
   },
   "ALKEM.NS": {
    "symbol": "ALKEM",
@@ -134,7 +134,7 @@
    "resistance": 5500.0,
    "resistance_oi": 48125,
    "resistance_2": 5300.0,
-   "pcr": 0.27
+   "pcr": 1.31
   },
   "AMBER.NS": {
    "symbol": "AMBER",
@@ -149,7 +149,7 @@
    "resistance": 6500.0,
    "resistance_oi": 89200,
    "resistance_2": 6700.0,
-   "pcr": 0.12
+   "pcr": 0.65
   },
   "AMBUJACEM.NS": {
    "symbol": "AMBUJACEM",
@@ -164,7 +164,7 @@
    "resistance": 400.0,
    "resistance_oi": 1900800,
    "resistance_2": 380.0,
-   "pcr": 0.16
+   "pcr": 0.76
   },
   "ANANDRATHI.NS": {
    "symbol": "ANANDRATHI",
@@ -179,7 +179,7 @@
    "resistance": 2300.0,
    "resistance_oi": 108250,
    "resistance_2": 2240.0,
-   "pcr": 3.41
+   "pcr": 1.39
   },
   "ANGELONE.NS": {
    "symbol": "ANGELONE",
@@ -194,7 +194,7 @@
    "resistance": 310.0,
    "resistance_oi": 3862500,
    "resistance_2": 315.0,
-   "pcr": 0.21
+   "pcr": 0.55
   },
   "APLAPOLLO.NS": {
    "symbol": "APLAPOLLO",
@@ -209,7 +209,7 @@
    "resistance": 2200.0,
    "resistance_oi": 503650,
    "resistance_2": 2100.0,
-   "pcr": 0.16
+   "pcr": 0.6
   },
   "APOLLOHOSP.NS": {
    "symbol": "APOLLOHOSP",
@@ -224,7 +224,7 @@
    "resistance": 8000.0,
    "resistance_oi": 400625,
    "resistance_2": 9000.0,
-   "pcr": 0.39
+   "pcr": 0.69
   },
   "ASHOKLEY.NS": {
    "symbol": "ASHOKLEY",
@@ -239,7 +239,7 @@
    "resistance": 160.0,
    "resistance_oi": 9275000,
    "resistance_2": 150.0,
-   "pcr": 0.19
+   "pcr": 0.69
   },
   "ASIANPAINT.NS": {
    "symbol": "ASIANPAINT",
@@ -254,7 +254,7 @@
    "resistance": 2400.0,
    "resistance_oi": 578750,
    "resistance_2": 2500.0,
-   "pcr": 0.28
+   "pcr": 0.49
   },
   "ASTRAL.NS": {
    "symbol": "ASTRAL",
@@ -269,7 +269,7 @@
    "resistance": 1460.0,
    "resistance_oi": 496825,
    "resistance_2": 1500.0,
-   "pcr": 0.25
+   "pcr": 0.58
   },
   "ATHERENERG.NS": {
    "symbol": "ATHERENERG",
@@ -284,7 +284,7 @@
    "resistance": 1500.0,
    "resistance_oi": 543750,
    "resistance_2": 1600.0,
-   "pcr": 0.2
+   "pcr": 0.46
   },
   "AUBANK.NS": {
    "symbol": "AUBANK",
@@ -299,7 +299,7 @@
    "resistance": 1000.0,
    "resistance_oi": 1519000,
    "resistance_2": 1020.0,
-   "pcr": 0.24
+   "pcr": 0.71
   },
   "AUROPHARMA.NS": {
    "symbol": "AUROPHARMA",
@@ -314,7 +314,7 @@
    "resistance": 1800.0,
    "resistance_oi": 1447050,
    "resistance_2": 1700.0,
-   "pcr": 0.11
+   "pcr": 0.45
   },
   "AXISBANK.NS": {
    "symbol": "AXISBANK",
@@ -329,7 +329,7 @@
    "resistance": 1300.0,
    "resistance_oi": 4158750,
    "resistance_2": 1260.0,
-   "pcr": 0.26
+   "pcr": 0.48
   },
   "BAJAJ-AUTO.NS": {
    "symbol": "BAJAJ-AUTO",
@@ -344,7 +344,7 @@
    "resistance": 11000.0,
    "resistance_oi": 250350,
    "resistance_2": 10900.0,
-   "pcr": 0.34
+   "pcr": 0.65
   },
   "BAJAJFINSV.NS": {
    "symbol": "BAJAJFINSV",
@@ -359,7 +359,7 @@
    "resistance": 1900.0,
    "resistance_oi": 868200,
    "resistance_2": 1740.0,
-   "pcr": 0.19
+   "pcr": 0.62
   },
   "BAJAJHLDNG.NS": {
    "symbol": "BAJAJHLDNG",
@@ -374,7 +374,7 @@
    "resistance": 12000.0,
    "resistance_oi": 12075,
    "resistance_2": 11500.0,
-   "pcr": 0.79
+   "pcr": 0.69
   },
   "BAJFINANCE.NS": {
    "symbol": "BAJFINANCE",
@@ -389,7 +389,7 @@
    "resistance": 1000.0,
    "resistance_oi": 3748500,
    "resistance_2": 980.0,
-   "pcr": 0.18
+   "pcr": 0.55
   },
   "BANDHANBNK.NS": {
    "symbol": "BANDHANBNK",
@@ -404,7 +404,7 @@
    "resistance": 190.0,
    "resistance_oi": 5439600,
    "resistance_2": 200.0,
-   "pcr": 0.02
+   "pcr": 0.61
   },
   "BANKBARODA.NS": {
    "symbol": "BANKBARODA",
@@ -419,7 +419,7 @@
    "resistance": 240.0,
    "resistance_oi": 8271900,
    "resistance_2": 250.0,
-   "pcr": 0.62
+   "pcr": 0.88
   },
   "BANKINDIA.NS": {
    "symbol": "BANKINDIA",
@@ -434,7 +434,7 @@
    "resistance": 140.0,
    "resistance_oi": 3832400,
    "resistance_2": 135.0,
-   "pcr": 0.44
+   "pcr": 0.92
   },
   "^NSEBANK": {
    "symbol": "BANKNIFTY",
@@ -449,7 +449,7 @@
    "resistance": 56000.0,
    "resistance_oi": 1690530,
    "resistance_2": 55000.0,
-   "pcr": 0.56
+   "pcr": 0.87
   },
   "BDL.NS": {
    "symbol": "BDL",
@@ -464,7 +464,7 @@
    "resistance": 1100.0,
    "resistance_oi": 721650,
    "resistance_2": 1200.0,
-   "pcr": 0.1
+   "pcr": 0.73
   },
   "BEL.NS": {
    "symbol": "BEL",
@@ -479,7 +479,7 @@
    "resistance": 400.0,
    "resistance_oi": 5266800,
    "resistance_2": 390.0,
-   "pcr": 0.15
+   "pcr": 0.59
   },
   "BHARATFORG.NS": {
    "symbol": "BHARATFORG",
@@ -494,7 +494,7 @@
    "resistance": 2000.0,
    "resistance_oi": 249500,
    "resistance_2": 1840.0,
-   "pcr": 0.17
+   "pcr": 0.78
   },
   "BHARTIARTL.NS": {
    "symbol": "BHARTIARTL",
@@ -509,7 +509,7 @@
    "resistance": 1900.0,
    "resistance_oi": 3043325,
    "resistance_2": 1920.0,
-   "pcr": 1.38
+   "pcr": 0.72
   },
   "BHEL.NS": {
    "symbol": "BHEL",
@@ -524,7 +524,7 @@
    "resistance": 450.0,
    "resistance_oi": 7368375,
    "resistance_2": 460.0,
-   "pcr": 0.1
+   "pcr": 0.51
   },
   "BIOCON.NS": {
    "symbol": "BIOCON",
@@ -539,7 +539,7 @@
    "resistance": 355.0,
    "resistance_oi": 3315000,
    "resistance_2": 400.0,
-   "pcr": 0.04
+   "pcr": 0.64
   },
   "BLUESTARCO.NS": {
    "symbol": "BLUESTARCO",
@@ -554,7 +554,7 @@
    "resistance": 1620.0,
    "resistance_oi": 198575,
    "resistance_2": 1600.0,
-   "pcr": 0.31
+   "pcr": 0.55
   },
   "BOSCHLTD.NS": {
    "symbol": "BOSCHLTD",
@@ -569,7 +569,7 @@
    "resistance": 47000.0,
    "resistance_oi": 27450,
    "resistance_2": 50000.0,
-   "pcr": 0.51
+   "pcr": 0.62
   },
   "BPCL.NS": {
    "symbol": "BPCL",
@@ -584,7 +584,7 @@
    "resistance": 300.0,
    "resistance_oi": 2028325,
    "resistance_2": 290.0,
-   "pcr": 0.38
+   "pcr": 0.79
   },
   "BRITANNIA.NS": {
    "symbol": "BRITANNIA",
@@ -599,7 +599,7 @@
    "resistance": 5200.0,
    "resistance_oi": 223250,
    "resistance_2": 5100.0,
-   "pcr": 0.28
+   "pcr": 0.58
   },
   "BSE.NS": {
    "symbol": "BSE",
@@ -614,7 +614,7 @@
    "resistance": 3400.0,
    "resistance_oi": 1190200,
    "resistance_2": 3500.0,
-   "pcr": 0.56
+   "pcr": 0.62
   },
   "CAMS.NS": {
    "symbol": "CAMS",
@@ -629,7 +629,7 @@
    "resistance": 800.0,
    "resistance_oi": 595650,
    "resistance_2": 710.0,
-   "pcr": 0.17
+   "pcr": 0.51
   },
   "CANBK.NS": {
    "symbol": "CANBK",
@@ -644,7 +644,7 @@
    "resistance": 125.0,
    "resistance_oi": 13763250,
    "resistance_2": 120.0,
-   "pcr": 0.22
+   "pcr": 0.73
   },
   "CDSL.NS": {
    "symbol": "CDSL",
@@ -659,7 +659,7 @@
    "resistance": 1300.0,
    "resistance_oi": 808450,
    "resistance_2": 1400.0,
-   "pcr": 0.11
+   "pcr": 0.72
   },
   "CGPOWER.NS": {
    "symbol": "CGPOWER",
@@ -674,7 +674,7 @@
    "resistance": 900.0,
    "resistance_oi": 1606500,
    "resistance_2": 850.0,
-   "pcr": 0.26
+   "pcr": 0.57
   },
   "CHOLAFIN.NS": {
    "symbol": "CHOLAFIN",
@@ -689,7 +689,7 @@
    "resistance": 1700.0,
    "resistance_oi": 560000,
    "resistance_2": 1580.0,
-   "pcr": 0.22
+   "pcr": 0.74
   },
   "CIPLA.NS": {
    "symbol": "CIPLA",
@@ -704,7 +704,7 @@
    "resistance": 1450.0,
    "resistance_oi": 675750,
    "resistance_2": 1400.0,
-   "pcr": 0.5
+   "pcr": 0.69
   },
   "COALINDIA.NS": {
    "symbol": "COALINDIA",
@@ -719,7 +719,7 @@
    "resistance": 430.0,
    "resistance_oi": 4947750,
    "resistance_2": 420.0,
-   "pcr": 0.08
+   "pcr": 0.37
   },
   "COCHINSHIP.NS": {
    "symbol": "COCHINSHIP",
@@ -734,7 +734,7 @@
    "resistance": 1600.0,
    "resistance_oi": 588400,
    "resistance_2": 1300.0,
-   "pcr": 0.08
+   "pcr": 0.47
   },
   "COFORGE.NS": {
    "symbol": "COFORGE",
@@ -749,7 +749,7 @@
    "resistance": 2000.0,
    "resistance_oi": 1292000,
    "resistance_2": 2100.0,
-   "pcr": 0.64
+   "pcr": 0.57
   },
   "COLPAL.NS": {
    "symbol": "COLPAL",
@@ -764,7 +764,7 @@
    "resistance": 1900.0,
    "resistance_oi": 266750,
    "resistance_2": 1920.0,
-   "pcr": 0.2
+   "pcr": 0.85
   },
   "CONCOR.NS": {
    "symbol": "CONCOR",
@@ -779,7 +779,7 @@
    "resistance": 450.0,
    "resistance_oi": 861250,
    "resistance_2": 460.0,
-   "pcr": 0.07
+   "pcr": 0.71
   },
   "CROMPTON.NS": {
    "symbol": "CROMPTON",
@@ -794,7 +794,7 @@
    "resistance": 220.0,
    "resistance_oi": 3397000,
    "resistance_2": 210.0,
-   "pcr": 0.13
+   "pcr": 0.59
   },
   "CUMMINSIND.NS": {
    "symbol": "CUMMINSIND",
@@ -809,7 +809,7 @@
    "resistance": 5000.0,
    "resistance_oi": 174400,
    "resistance_2": 4800.0,
-   "pcr": 0.14
+   "pcr": 0.75
   },
   "DABUR.NS": {
    "symbol": "DABUR",
@@ -824,7 +824,7 @@
    "resistance": 400.0,
    "resistance_oi": 1576250,
    "resistance_2": 390.0,
-   "pcr": 0.31
+   "pcr": 0.67
   },
   "DELHIVERY.NS": {
    "symbol": "DELHIVERY",
@@ -839,7 +839,7 @@
    "resistance": 430.0,
    "resistance_oi": 2029350,
    "resistance_2": 410.0,
-   "pcr": 0.13
+   "pcr": 0.73
   },
   "DIVISLAB.NS": {
    "symbol": "DIVISLAB",
@@ -854,7 +854,7 @@
    "resistance": 9500.0,
    "resistance_oi": 325900,
    "resistance_2": 10000.0,
-   "pcr": 0.3
+   "pcr": 0.63
   },
   "DIXON.NS": {
    "symbol": "DIXON",
@@ -869,7 +869,7 @@
    "resistance": 13000.0,
    "resistance_oi": 259850,
    "resistance_2": 13500.0,
-   "pcr": 0.06
+   "pcr": 0.36
   },
   "DLF.NS": {
    "symbol": "DLF",
@@ -884,7 +884,7 @@
    "resistance": 680.0,
    "resistance_oi": 2087150,
    "resistance_2": 670.0,
-   "pcr": 0.45
+   "pcr": 0.73
   },
   "DMART.NS": {
    "symbol": "DMART",
@@ -899,7 +899,7 @@
    "resistance": 3600.0,
    "resistance_oi": 903750,
    "resistance_2": 3800.0,
-   "pcr": 0.07
+   "pcr": 0.44
   },
   "DRREDDY.NS": {
    "symbol": "DRREDDY",
@@ -914,7 +914,7 @@
    "resistance": 1300.0,
    "resistance_oi": 786875,
    "resistance_2": 1250.0,
-   "pcr": 0.7
+   "pcr": 0.71
   },
   "EICHERMOT.NS": {
    "symbol": "EICHERMOT",
@@ -929,7 +929,7 @@
    "resistance": 7500.0,
    "resistance_oi": 272400,
    "resistance_2": 7400.0,
-   "pcr": 0.54
+   "pcr": 0.79
   },
   "ENRIN.NS": {
    "symbol": "ENRIN",
@@ -944,7 +944,7 @@
    "resistance": 3000.0,
    "resistance_oi": 90475,
    "resistance_2": 3300.0,
-   "pcr": 0.09
+   "pcr": 0.63
   },
   "ETERNAL.NS": {
    "symbol": "ETERNAL",
@@ -959,7 +959,7 @@
    "resistance": 330.0,
    "resistance_oi": 9251375,
    "resistance_2": 320.0,
-   "pcr": 0.61
+   "pcr": 0.68
   },
   "FEDERALBNK.NS": {
    "symbol": "FEDERALBNK",
@@ -974,7 +974,7 @@
    "resistance": 350.0,
    "resistance_oi": 4580000,
    "resistance_2": 345.0,
-   "pcr": 1.03
+   "pcr": 0.86
   },
   "NIFTY_FIN_SERVICE.NS": {
    "symbol": "FINNIFTY",
@@ -989,7 +989,7 @@
    "resistance": 26000.0,
    "resistance_oi": 84660,
    "resistance_2": 25000.0,
-   "pcr": 0.48
+   "pcr": 0.73
   },
   "FORCEMOT.NS": {
    "symbol": "FORCEMOT",
@@ -1004,7 +1004,7 @@
    "resistance": 18000.0,
    "resistance_oi": 31775,
    "resistance_2": 17000.0,
-   "pcr": 0.18
+   "pcr": 0.54
   },
   "FORTIS.NS": {
    "symbol": "FORTIS",
@@ -1019,7 +1019,7 @@
    "resistance": 780.0,
    "resistance_oi": 682775,
    "resistance_2": 800.0,
-   "pcr": 0.14
+   "pcr": 0.72
   },
   "GAIL.NS": {
    "symbol": "GAIL",
@@ -1034,7 +1034,7 @@
    "resistance": 175.0,
    "resistance_oi": 3976000,
    "resistance_2": 180.0,
-   "pcr": 0.38
+   "pcr": 0.84
   },
   "GLENMARK.NS": {
    "symbol": "GLENMARK",
@@ -1049,7 +1049,7 @@
    "resistance": 2300.0,
    "resistance_oi": 247125,
    "resistance_2": 2200.0,
-   "pcr": 0.16
+   "pcr": 0.52
   },
   "GMRAIRPORT.NS": {
    "symbol": "GMRAIRPORT",
@@ -1064,7 +1064,7 @@
    "resistance": 91.0,
    "resistance_oi": 7986375,
    "resistance_2": 94.0,
-   "pcr": 0.08
+   "pcr": 0.86
   },
   "GODFRYPHLP.NS": {
    "symbol": "GODFRYPHLP",
@@ -1079,7 +1079,7 @@
    "resistance": 2100.0,
    "resistance_oi": 76450,
    "resistance_2": 2000.0,
-   "pcr": 0.19
+   "pcr": 0.71
   },
   "GODREJCP.NS": {
    "symbol": "GODREJCP",
@@ -1094,7 +1094,7 @@
    "resistance": 860.0,
    "resistance_oi": 536000,
    "resistance_2": 900.0,
-   "pcr": 0.46
+   "pcr": 0.92
   },
   "GODREJPROP.NS": {
    "symbol": "GODREJPROP",
@@ -1109,7 +1109,7 @@
    "resistance": 1700.0,
    "resistance_oi": 556075,
    "resistance_2": 1640.0,
-   "pcr": 0.22
+   "pcr": 0.84
   },
   "GRASIM.NS": {
    "symbol": "GRASIM",
@@ -1124,7 +1124,7 @@
    "resistance": 2900.0,
    "resistance_oi": 166750,
    "resistance_2": 2940.0,
-   "pcr": 0.58
+   "pcr": 1.01
   },
   "GVT&D.NS": {
    "symbol": "GVT&D",
@@ -1139,7 +1139,7 @@
    "resistance": 4000.0,
    "resistance_oi": 247000,
    "resistance_2": 4200.0,
-   "pcr": 0.1
+   "pcr": 0.65
   },
   "HAL.NS": {
    "symbol": "HAL",
@@ -1154,7 +1154,7 @@
    "resistance": 5000.0,
    "resistance_oi": 332100,
    "resistance_2": 5100.0,
-   "pcr": 0.45
+   "pcr": 0.66
   },
   "HAVELLS.NS": {
    "symbol": "HAVELLS",
@@ -1169,7 +1169,7 @@
    "resistance": 1100.0,
    "resistance_oi": 1019000,
    "resistance_2": 1060.0,
-   "pcr": 0.36
+   "pcr": 0.65
   },
   "HCLTECH.NS": {
    "symbol": "HCLTECH",
@@ -1184,7 +1184,7 @@
    "resistance": 1460.0,
    "resistance_oi": 611600,
    "resistance_2": 1450.0,
-   "pcr": 4.69
+   "pcr": 1.34
   },
   "HDFCAMC.NS": {
    "symbol": "HDFCAMC",
@@ -1199,7 +1199,7 @@
    "resistance": 2400.0,
    "resistance_oi": 213900,
    "resistance_2": 2300.0,
-   "pcr": 0.35
+   "pcr": 0.8
   },
   "HDFCBANK.NS": {
    "symbol": "HDFCBANK",
@@ -1214,7 +1214,7 @@
    "resistance": 750.0,
    "resistance_oi": 20986550,
    "resistance_2": 720.0,
-   "pcr": 0.2
+   "pcr": 0.5
   },
   "HDFCLIFE.NS": {
    "symbol": "HDFCLIFE",
@@ -1229,7 +1229,7 @@
    "resistance": 560.0,
    "resistance_oi": 2074600,
    "resistance_2": 530.0,
-   "pcr": 0.37
+   "pcr": 0.59
   },
   "HEROMOTOCO.NS": {
    "symbol": "HEROMOTOCO",
@@ -1244,7 +1244,7 @@
    "resistance": 5400.0,
    "resistance_oi": 226350,
    "resistance_2": 5500.0,
-   "pcr": 0.36
+   "pcr": 0.62
   },
   "HINDALCO.NS": {
    "symbol": "HINDALCO",
@@ -1259,7 +1259,7 @@
    "resistance": 960.0,
    "resistance_oi": 1519700,
    "resistance_2": 900.0,
-   "pcr": 0.18
+   "pcr": 0.77
   },
   "HINDPETRO.NS": {
    "symbol": "HINDPETRO",
@@ -1274,7 +1274,7 @@
    "resistance": 350.0,
    "resistance_oi": 1800225,
    "resistance_2": 345.0,
-   "pcr": 0.69
+   "pcr": 0.92
   },
   "HINDUNILVR.NS": {
    "symbol": "HINDUNILVR",
@@ -1289,7 +1289,7 @@
    "resistance": 1900.0,
    "resistance_oi": 1831500,
    "resistance_2": 2000.0,
-   "pcr": 0.16
+   "pcr": 0.55
   },
   "HINDZINC.NS": {
    "symbol": "HINDZINC",
@@ -1304,7 +1304,7 @@
    "resistance": 600.0,
    "resistance_oi": 2944900,
    "resistance_2": 550.0,
-   "pcr": 0.06
+   "pcr": 0.43
   },
   "HYUNDAI.NS": {
    "symbol": "HYUNDAI",
@@ -1319,7 +1319,7 @@
    "resistance": 2100.0,
    "resistance_oi": 616550,
    "resistance_2": 2000.0,
-   "pcr": 0.06
+   "pcr": 0.43
   },
   "ICICIBANK.NS": {
    "symbol": "ICICIBANK",
@@ -1334,7 +1334,7 @@
    "resistance": 1400.0,
    "resistance_oi": 4437300,
    "resistance_2": 1420.0,
-   "pcr": 0.98
+   "pcr": 0.63
   },
   "ICICIGI.NS": {
    "symbol": "ICICIGI",
@@ -1349,7 +1349,7 @@
    "resistance": 1800.0,
    "resistance_oi": 451425,
    "resistance_2": 1880.0,
-   "pcr": 0.31
+   "pcr": 0.64
   },
   "ICICILIFE.NS": {
    "symbol": "ICICILIFE",
@@ -1364,7 +1364,7 @@
    "resistance": 450.0,
    "resistance_oi": 813075,
    "resistance_2": 460.0,
-   "pcr": 0.13
+   "pcr": 0.63
   },
   "IDEA.NS": {
    "symbol": "IDEA",
@@ -1379,7 +1379,7 @@
    "resistance": 14.0,
    "resistance_oi": 329285325,
    "resistance_2": 13.0,
-   "pcr": 0.08
+   "pcr": 0.45
   },
   "IDFCFIRSTB.NS": {
    "symbol": "IDFCFIRSTB",
@@ -1394,7 +1394,7 @@
    "resistance": 80.0,
    "resistance_oi": 21694225,
    "resistance_2": 85.0,
-   "pcr": 0.15
+   "pcr": 0.56
   },
   "IEX.NS": {
    "symbol": "IEX",
@@ -1409,7 +1409,7 @@
    "resistance": 110.0,
    "resistance_oi": 2740500,
    "resistance_2": 120.0,
-   "pcr": 0.27
+   "pcr": 0.79
   },
   "INDHOTEL.NS": {
    "symbol": "INDHOTEL",
@@ -1424,7 +1424,7 @@
    "resistance": 800.0,
    "resistance_oi": 1436000,
    "resistance_2": 790.0,
-   "pcr": 1.19
+   "pcr": 0.78
   },
   "INDIANB.NS": {
    "symbol": "INDIANB",
@@ -1439,7 +1439,7 @@
    "resistance": 860.0,
    "resistance_oi": 876000,
    "resistance_2": 950.0,
-   "pcr": 0.43
+   "pcr": 0.59
   },
   "INDIGO.NS": {
    "symbol": "INDIGO",
@@ -1454,7 +1454,7 @@
    "resistance": 5100.0,
    "resistance_oi": 558000,
    "resistance_2": 5000.0,
-   "pcr": 0.13
+   "pcr": 0.41
   },
   "INDUSINDBK.NS": {
    "symbol": "INDUSINDBK",
@@ -1469,7 +1469,7 @@
    "resistance": 900.0,
    "resistance_oi": 1120700,
    "resistance_2": 880.0,
-   "pcr": 0.26
+   "pcr": 1.0
   },
   "INDUSTOWER.NS": {
    "symbol": "INDUSTOWER",
@@ -1484,7 +1484,7 @@
    "resistance": 380.0,
    "resistance_oi": 4494800,
    "resistance_2": 385.0,
-   "pcr": 0.5
+   "pcr": 0.59
   },
   "INFY.NS": {
    "symbol": "INFY",
@@ -1499,7 +1499,7 @@
    "resistance": 1200.0,
    "resistance_oi": 6736800,
    "resistance_2": 1180.0,
-   "pcr": 0.88
+   "pcr": 0.67
   },
   "INOXWIND.NS": {
    "symbol": "INOXWIND",
@@ -1514,7 +1514,7 @@
    "resistance": 70.0,
    "resistance_oi": 4505600,
    "resistance_2": 75.0,
-   "pcr": 0.06
+   "pcr": 0.58
   },
   "IOC.NS": {
    "symbol": "IOC",
@@ -1529,7 +1529,7 @@
    "resistance": 135.0,
    "resistance_oi": 4806750,
    "resistance_2": 140.0,
-   "pcr": 0.39
+   "pcr": 0.78
   },
   "IREDA.NS": {
    "symbol": "IREDA",
@@ -1544,7 +1544,7 @@
    "resistance": 115.0,
    "resistance_oi": 4674325,
    "resistance_2": 120.0,
-   "pcr": 0.13
+   "pcr": 0.55
   },
   "IRFC.NS": {
    "symbol": "IRFC",
@@ -1559,7 +1559,7 @@
    "resistance": 80.0,
    "resistance_oi": 9255050,
    "resistance_2": 90.0,
-   "pcr": 0.13
+   "pcr": 0.49
   },
   "ITC.NS": {
    "symbol": "ITC",
@@ -1574,7 +1574,7 @@
    "resistance": 270.0,
    "resistance_oi": 14365800,
    "resistance_2": 260.0,
-   "pcr": 0.29
+   "pcr": 0.58
   },
   "JINDALSTEL.NS": {
    "symbol": "JINDALSTEL",
@@ -1589,7 +1589,7 @@
    "resistance": 1060.0,
    "resistance_oi": 1055625,
    "resistance_2": 1100.0,
-   "pcr": 0.39
+   "pcr": 0.93
   },
   "JIOFIN.NS": {
    "symbol": "JIOFIN",
@@ -1604,7 +1604,7 @@
    "resistance": 220.0,
    "resistance_oi": 11639550,
    "resistance_2": 230.0,
-   "pcr": 0.12
+   "pcr": 0.65
   },
   "JSWENERGY.NS": {
    "symbol": "JSWENERGY",
@@ -1619,7 +1619,7 @@
    "resistance": 500.0,
    "resistance_oi": 1035225,
    "resistance_2": 510.0,
-   "pcr": 0.12
+   "pcr": 0.8
   },
   "JSWSTEEL.NS": {
    "symbol": "JSWSTEEL",
@@ -1634,7 +1634,7 @@
    "resistance": 1260.0,
    "resistance_oi": 936900,
    "resistance_2": 1220.0,
-   "pcr": 0.38
+   "pcr": 0.64
   },
   "JUBLFOOD.NS": {
    "symbol": "JUBLFOOD",
@@ -1649,7 +1649,7 @@
    "resistance": 430.0,
    "resistance_oi": 952500,
    "resistance_2": 420.0,
-   "pcr": 0.12
+   "pcr": 0.77
   },
   "KALYANKJIL.NS": {
    "symbol": "KALYANKJIL",
@@ -1664,7 +1664,7 @@
    "resistance": 570.0,
    "resistance_oi": 2613600,
    "resistance_2": 600.0,
-   "pcr": 0.21
+   "pcr": 0.5
   },
   "KAYNES.NS": {
    "symbol": "KAYNES",
@@ -1679,7 +1679,7 @@
    "resistance": 3600.0,
    "resistance_oi": 254550,
    "resistance_2": 3500.0,
-   "pcr": 0.31
+   "pcr": 0.96
   },
   "KEI.NS": {
    "symbol": "KEI",
@@ -1694,7 +1694,7 @@
    "resistance": 4000.0,
    "resistance_oi": 305550,
    "resistance_2": 4100.0,
-   "pcr": 0.13
+   "pcr": 0.62
   },
   "KFINTECH.NS": {
    "symbol": "KFINTECH",
@@ -1709,7 +1709,7 @@
    "resistance": 900.0,
    "resistance_oi": 613525,
    "resistance_2": 880.0,
-   "pcr": 0.24
+   "pcr": 0.86
   },
   "KOTAKBANK.NS": {
    "symbol": "KOTAKBANK",
@@ -1724,7 +1724,7 @@
    "resistance": 440.0,
    "resistance_oi": 8154000,
    "resistance_2": 435.0,
-   "pcr": 1.15
+   "pcr": 0.89
   },
   "KPITTECH.NS": {
    "symbol": "KPITTECH",
@@ -1739,7 +1739,7 @@
    "resistance": 550.0,
    "resistance_oi": 1958425,
    "resistance_2": 570.0,
-   "pcr": 0.62
+   "pcr": 0.56
   },
   "LAURUSLABS.NS": {
    "symbol": "LAURUSLABS",
@@ -1754,7 +1754,7 @@
    "resistance": 2100.0,
    "resistance_oi": 1212100,
    "resistance_2": 2000.0,
-   "pcr": 0.37
+   "pcr": 0.58
   },
   "LICHSGFIN.NS": {
    "symbol": "LICHSGFIN",
@@ -1769,7 +1769,7 @@
    "resistance": 510.0,
    "resistance_oi": 909000,
    "resistance_2": 530.0,
-   "pcr": 0.1
+   "pcr": 0.72
   },
   "LICI.NS": {
    "symbol": "LICI",
@@ -1784,7 +1784,7 @@
    "resistance": 400.0,
    "resistance_oi": 2580200,
    "resistance_2": 420.0,
-   "pcr": 0.37
+   "pcr": 0.67
   },
   "LODHA.NS": {
    "symbol": "LODHA",
@@ -1799,7 +1799,7 @@
    "resistance": 1100.0,
    "resistance_oi": 260000,
    "resistance_2": 1140.0,
-   "pcr": 0.19
+   "pcr": 0.98
   },
   "LT.NS": {
    "symbol": "LT",
@@ -1814,7 +1814,7 @@
    "resistance": 3700.0,
    "resistance_oi": 973350,
    "resistance_2": 3800.0,
-   "pcr": 0.32
+   "pcr": 0.68
   },
   "LTF.NS": {
    "symbol": "LTF",
@@ -1829,7 +1829,7 @@
    "resistance": 280.0,
    "resistance_oi": 6194250,
    "resistance_2": 295.0,
-   "pcr": 0.09
+   "pcr": 0.64
   },
   "LTM.NS": {
    "symbol": "LTM",
@@ -1844,7 +1844,7 @@
    "resistance": 4500.0,
    "resistance_oi": 225900,
    "resistance_2": 4400.0,
-   "pcr": 0.3
+   "pcr": 0.45
   },
   "LUPIN.NS": {
    "symbol": "LUPIN",
@@ -1859,7 +1859,7 @@
    "resistance": 2100.0,
    "resistance_oi": 412250,
    "resistance_2": 2200.0,
-   "pcr": 0.3
+   "pcr": 0.92
   },
   "M&M.NS": {
    "symbol": "M&M",
@@ -1874,7 +1874,7 @@
    "resistance": 2900.0,
    "resistance_oi": 1126200,
    "resistance_2": 3000.0,
-   "pcr": 0.36
+   "pcr": 0.53
   },
   "MAHABANK.NS": {
    "symbol": "MAHABANK",
@@ -1889,7 +1889,7 @@
    "resistance": 80.0,
    "resistance_oi": 4537000,
    "resistance_2": 85.0,
-   "pcr": 0.27
+   "pcr": 0.61
   },
   "MANAPPURAM.NS": {
    "symbol": "MANAPPURAM",
@@ -1904,7 +1904,7 @@
    "resistance": 310.0,
    "resistance_oi": 1908000,
    "resistance_2": 320.0,
-   "pcr": 0.07
+   "pcr": 0.66
   },
   "MANKIND.NS": {
    "symbol": "MANKIND",
@@ -1919,7 +1919,7 @@
    "resistance": 2600.0,
    "resistance_oi": 284000,
    "resistance_2": 2400.0,
-   "pcr": 0.1
+   "pcr": 0.45
   },
   "MARICO.NS": {
    "symbol": "MARICO",
@@ -1934,7 +1934,7 @@
    "resistance": 790.0,
    "resistance_oi": 948000,
    "resistance_2": 800.0,
-   "pcr": 0.2
+   "pcr": 0.63
   },
   "MARUTI.NS": {
    "symbol": "MARUTI",
@@ -1949,7 +1949,7 @@
    "resistance": 12000.0,
    "resistance_oi": 300250,
    "resistance_2": 12500.0,
-   "pcr": 0.24
+   "pcr": 0.48
   },
   "MAXHEALTH.NS": {
    "symbol": "MAXHEALTH",
@@ -1964,7 +1964,7 @@
    "resistance": 1000.0,
    "resistance_oi": 921375,
    "resistance_2": 900.0,
-   "pcr": 0.14
+   "pcr": 0.67
   },
   "MAZDOCK.NS": {
    "symbol": "MAZDOCK",
@@ -1979,7 +1979,7 @@
    "resistance": 2200.0,
    "resistance_oi": 278100,
    "resistance_2": 2100.0,
-   "pcr": 0.13
+   "pcr": 0.67
   },
   "MCX.NS": {
    "symbol": "MCX",
@@ -1994,7 +1994,7 @@
    "resistance": 3500.0,
    "resistance_oi": 886725,
    "resistance_2": 3300.0,
-   "pcr": 0.15
+   "pcr": 0.41
   },
   "MFSL.NS": {
    "symbol": "MFSL",
@@ -2009,7 +2009,7 @@
    "resistance": 1340.0,
    "resistance_oi": 292000,
    "resistance_2": 1440.0,
-   "pcr": 0.12
+   "pcr": 0.49
   },
   "NIFTY_MID_SELECT.NS": {
    "symbol": "MIDCPNIFTY",
@@ -2024,7 +2024,7 @@
    "resistance": 14500.0,
    "resistance_oi": 1245120,
    "resistance_2": 14000.0,
-   "pcr": 0.42
+   "pcr": 0.65
   },
   "MOTHERSON.NS": {
    "symbol": "MOTHERSON",
@@ -2039,7 +2039,7 @@
    "resistance": 170.0,
    "resistance_oi": 5430450,
    "resistance_2": 165.0,
-   "pcr": 0.23
+   "pcr": 0.59
   },
   "MOTILALOFS.NS": {
    "symbol": "MOTILALOFS",
@@ -2054,7 +2054,7 @@
    "resistance": 1020.0,
    "resistance_oi": 417725,
    "resistance_2": 1100.0,
-   "pcr": 0.13
+   "pcr": 0.39
   },
   "MPHASIS.NS": {
    "symbol": "MPHASIS",
@@ -2069,7 +2069,7 @@
    "resistance": 2600.0,
    "resistance_oi": 212300,
    "resistance_2": 2650.0,
-   "pcr": 1.06
+   "pcr": 0.84
   },
   "MUTHOOTFIN.NS": {
    "symbol": "MUTHOOTFIN",
@@ -2084,7 +2084,7 @@
    "resistance": 2800.0,
    "resistance_oi": 492250,
    "resistance_2": 2600.0,
-   "pcr": 0.1
+   "pcr": 0.64
   },
   "NAM-INDIA.NS": {
    "symbol": "NAM-INDIA",
@@ -2099,7 +2099,7 @@
    "resistance": 1040.0,
    "resistance_oi": 231875,
    "resistance_2": 1100.0,
-   "pcr": 0.36
+   "pcr": 0.73
   },
   "NATIONALUM.NS": {
    "symbol": "NATIONALUM",
@@ -2114,7 +2114,7 @@
    "resistance": 350.0,
    "resistance_oi": 5002500,
    "resistance_2": 330.0,
-   "pcr": 0.15
+   "pcr": 0.74
   },
   "NAUKRI.NS": {
    "symbol": "NAUKRI",
@@ -2129,7 +2129,7 @@
    "resistance": 1260.0,
    "resistance_oi": 534050,
    "resistance_2": 1240.0,
-   "pcr": 0.17
+   "pcr": 0.43
   },
   "NBCC.NS": {
    "symbol": "NBCC",
@@ -2144,7 +2144,7 @@
    "resistance": 73.0,
    "resistance_oi": 3958500,
    "resistance_2": 72.0,
-   "pcr": 0.03
+   "pcr": 0.45
   },
   "NESTLEIND.NS": {
    "symbol": "NESTLEIND",
@@ -2159,7 +2159,7 @@
    "resistance": 1400.0,
    "resistance_oi": 911500,
    "resistance_2": 1300.0,
-   "pcr": 0.06
+   "pcr": 0.4
   },
   "NHPC.NS": {
    "symbol": "NHPC",
@@ -2174,7 +2174,7 @@
    "resistance": 74.0,
    "resistance_oi": 3363800,
    "resistance_2": 80.0,
-   "pcr": 0.28
+   "pcr": 0.6
   },
   "^NSEI": {
    "symbol": "NIFTY",
@@ -2189,7 +2189,7 @@
    "resistance": 24000.0,
    "resistance_oi": 19551285,
    "resistance_2": 23500.0,
-   "pcr": 0.64
+   "pcr": 0.74
   },
   "NIFTYFPI.NS": {
    "symbol": "NIFTYFPI",
@@ -2204,7 +2204,7 @@
    "resistance": 1480.0,
    "resistance_oi": 18700,
    "resistance_2": 1580.0,
-   "pcr": 0.24
+   "pcr": 0.91
   },
   "^NSMIDCP": {
    "symbol": "NIFTYNXT50",
@@ -2219,7 +2219,7 @@
    "resistance": 73000.0,
    "resistance_oi": 1800,
    "resistance_2": 67000.0,
-   "pcr": 0.04
+   "pcr": 0.19
   },
   "NMDC.NS": {
    "symbol": "NMDC",
@@ -2234,7 +2234,7 @@
    "resistance": 80.0,
    "resistance_oi": 6837750,
    "resistance_2": 75.0,
-   "pcr": 0.06
+   "pcr": 0.59
   },
   "NTPC.NS": {
    "symbol": "NTPC",
@@ -2249,7 +2249,7 @@
    "resistance": 325.0,
    "resistance_oi": 9490500,
    "resistance_2": 330.0,
-   "pcr": 0.12
+   "pcr": 0.46
   },
   "NYKAA.NS": {
    "symbol": "NYKAA",
@@ -2264,7 +2264,7 @@
    "resistance": 350.0,
    "resistance_oi": 2746875,
    "resistance_2": 340.0,
-   "pcr": 0.22
+   "pcr": 0.45
   },
   "OBEROIRLTY.NS": {
    "symbol": "OBEROIRLTY",
@@ -2279,7 +2279,7 @@
    "resistance": 1800.0,
    "resistance_oi": 142100,
    "resistance_2": 1900.0,
-   "pcr": 0.16
+   "pcr": 0.64
   },
   "OFSS.NS": {
    "symbol": "OFSS",
@@ -2294,7 +2294,7 @@
    "resistance": 11000.0,
    "resistance_oi": 114600,
    "resistance_2": 10500.0,
-   "pcr": 0.41
+   "pcr": 0.87
   },
   "OIL.NS": {
    "symbol": "OIL",
@@ -2309,7 +2309,7 @@
    "resistance": 450.0,
    "resistance_oi": 413000,
    "resistance_2": 460.0,
-   "pcr": 0.43
+   "pcr": 0.7
   },
   "ONGC.NS": {
    "symbol": "ONGC",
@@ -2324,7 +2324,7 @@
    "resistance": 230.0,
    "resistance_oi": 6761250,
    "resistance_2": 240.0,
-   "pcr": 0.61
+   "pcr": 0.52
   },
   "PAGEIND.NS": {
    "symbol": "PAGEIND",
@@ -2339,7 +2339,7 @@
    "resistance": 40000.0,
    "resistance_oi": 12280,
    "resistance_2": 38000.0,
-   "pcr": 0.1
+   "pcr": 0.34
   },
   "PATANJALI.NS": {
    "symbol": "PATANJALI",
@@ -2354,7 +2354,7 @@
    "resistance": 400.0,
    "resistance_oi": 2168275,
    "resistance_2": 360.0,
-   "pcr": 0.11
+   "pcr": 0.35
   },
   "PAYTM.NS": {
    "symbol": "PAYTM",
@@ -2369,7 +2369,7 @@
    "resistance": 1700.0,
    "resistance_oi": 1330375,
    "resistance_2": 1800.0,
-   "pcr": 0.38
+   "pcr": 0.97
   },
   "PERSISTENT.NS": {
    "symbol": "PERSISTENT",
@@ -2384,7 +2384,7 @@
    "resistance": 5900.0,
    "resistance_oi": 324875,
    "resistance_2": 6000.0,
-   "pcr": 0.66
+   "pcr": 0.59
   },
   "PETRONET.NS": {
    "symbol": "PETRONET",
@@ -2399,7 +2399,7 @@
    "resistance": 290.0,
    "resistance_oi": 843600,
    "resistance_2": 310.0,
-   "pcr": 0.45
+   "pcr": 0.66
   },
   "PFC.NS": {
    "symbol": "PFC",
@@ -2414,7 +2414,7 @@
    "resistance": 350.0,
    "resistance_oi": 2272400,
    "resistance_2": 340.0,
-   "pcr": 0.24
+   "pcr": 0.89
   },
   "PGEL.NS": {
    "symbol": "PGEL",
@@ -2429,7 +2429,7 @@
    "resistance": 530.0,
    "resistance_oi": 955700,
    "resistance_2": 510.0,
-   "pcr": 0.16
+   "pcr": 0.45
   },
   "PHOENIXLTD.NS": {
    "symbol": "PHOENIXLTD",
@@ -2444,7 +2444,7 @@
    "resistance": 1980.0,
    "resistance_oi": 128450,
    "resistance_2": 2000.0,
-   "pcr": 0.71
+   "pcr": 0.87
   },
   "PIDILITIND.NS": {
    "symbol": "PIDILITIND",
@@ -2459,7 +2459,7 @@
    "resistance": 1500.0,
    "resistance_oi": 171500,
    "resistance_2": 1540.0,
-   "pcr": 1.21
+   "pcr": 1.17
   },
   "PIIND.NS": {
    "symbol": "PIIND",
@@ -2474,7 +2474,7 @@
    "resistance": 2300.0,
    "resistance_oi": 170100,
    "resistance_2": 2500.0,
-   "pcr": 0.17
+   "pcr": 0.69
   },
   "PNB.NS": {
    "symbol": "PNB",
@@ -2489,7 +2489,7 @@
    "resistance": 125.0,
    "resistance_oi": 16104000,
    "resistance_2": 124.0,
-   "pcr": 0.83
+   "pcr": 0.87
   },
   "PNBHOUSING.NS": {
    "symbol": "PNBHOUSING",
@@ -2504,7 +2504,7 @@
    "resistance": 1200.0,
    "resistance_oi": 191750,
    "resistance_2": 1160.0,
-   "pcr": 0.25
+   "pcr": 0.65
   },
   "POLICYBZR.NS": {
    "symbol": "POLICYBZR",
@@ -2519,7 +2519,7 @@
    "resistance": 1100.0,
    "resistance_oi": 2219350,
    "resistance_2": 1200.0,
-   "pcr": 0.29
+   "pcr": 0.55
   },
   "POLYCAB.NS": {
    "symbol": "POLYCAB",
@@ -2534,7 +2534,7 @@
    "resistance": 8000.0,
    "resistance_oi": 176750,
    "resistance_2": 8500.0,
-   "pcr": 0.12
+   "pcr": 0.6
   },
   "POWERGRID.NS": {
    "symbol": "POWERGRID",
@@ -2549,7 +2549,7 @@
    "resistance": 265.0,
    "resistance_oi": 3450400,
    "resistance_2": 270.0,
-   "pcr": 0.17
+   "pcr": 0.47
   },
   "POWERINDIA.NS": {
    "symbol": "POWERINDIA",
@@ -2564,7 +2564,7 @@
    "resistance": 30000.0,
    "resistance_oi": 67375,
    "resistance_2": 32000.0,
-   "pcr": 0.19
+   "pcr": 0.53
   },
   "PREMIERENE.NS": {
    "symbol": "PREMIERENE",
@@ -2579,7 +2579,7 @@
    "resistance": 900.0,
    "resistance_oi": 1334450,
    "resistance_2": 1000.0,
-   "pcr": 0.14
+   "pcr": 0.39
   },
   "PRESTIGE.NS": {
    "symbol": "PRESTIGE",
@@ -2594,7 +2594,7 @@
    "resistance": 1500.0,
    "resistance_oi": 342900,
    "resistance_2": 1540.0,
-   "pcr": 0.25
+   "pcr": 0.91
   },
   "RADICO.NS": {
    "symbol": "RADICO",
@@ -2609,7 +2609,7 @@
    "resistance": 5000.0,
    "resistance_oi": 190200,
    "resistance_2": 4600.0,
-   "pcr": 0.13
+   "pcr": 0.56
   },
   "RBLBANK.NS": {
    "symbol": "RBLBANK",
@@ -2624,7 +2624,7 @@
    "resistance": 400.0,
    "resistance_oi": 4876800,
    "resistance_2": 390.0,
-   "pcr": 0.06
+   "pcr": 0.47
   },
   "RECLTD.NS": {
    "symbol": "RECLTD",
@@ -2639,7 +2639,7 @@
    "resistance": 300.0,
    "resistance_oi": 1675800,
    "resistance_2": 320.0,
-   "pcr": 0.32
+   "pcr": 0.87
   },
   "RELIANCE.NS": {
    "symbol": "RELIANCE",
@@ -2654,7 +2654,7 @@
    "resistance": 1200.0,
    "resistance_oi": 9600500,
    "resistance_2": 1250.0,
-   "pcr": 0.33
+   "pcr": 0.56
   },
   "RVNL.NS": {
    "symbol": "RVNL",
@@ -2669,7 +2669,7 @@
    "resistance": 210.0,
    "resistance_oi": 1996225,
    "resistance_2": 220.0,
-   "pcr": 0.23
+   "pcr": 0.87
   },
   "SAGILITY.NS": {
    "symbol": "SAGILITY",
@@ -2684,7 +2684,7 @@
    "resistance": 50.0,
    "resistance_oi": 5772000,
    "resistance_2": 47.0,
-   "pcr": 0.42
+   "pcr": 0.51
   },
   "SAIL.NS": {
    "symbol": "SAIL",
@@ -2699,7 +2699,7 @@
    "resistance": 180.0,
    "resistance_oi": 3388700,
    "resistance_2": 175.0,
-   "pcr": 0.13
+   "pcr": 0.88
   },
   "SBICARD.NS": {
    "symbol": "SBICARD",
@@ -2714,7 +2714,7 @@
    "resistance": 600.0,
    "resistance_oi": 1044000,
    "resistance_2": 570.0,
-   "pcr": 0.26
+   "pcr": 0.86
   },
   "SBILIFE.NS": {
    "symbol": "SBILIFE",
@@ -2729,7 +2729,7 @@
    "resistance": 1800.0,
    "resistance_oi": 253500,
    "resistance_2": 1780.0,
-   "pcr": 0.25
+   "pcr": 0.64
   },
   "SBIN.NS": {
    "symbol": "SBIN",
@@ -2744,7 +2744,7 @@
    "resistance": 1000.0,
    "resistance_oi": 5308500,
    "resistance_2": 980.0,
-   "pcr": 0.4
+   "pcr": 0.75
   },
   "SHREECEM.NS": {
    "symbol": "SHREECEM",
@@ -2759,7 +2759,7 @@
    "resistance": 23000.0,
    "resistance_oi": 13350,
    "resistance_2": 24000.0,
-   "pcr": 1.59
+   "pcr": 1.06
   },
   "SHRIRAMFIN.NS": {
    "symbol": "SHRIRAMFIN",
@@ -2774,7 +2774,7 @@
    "resistance": 900.0,
    "resistance_oi": 2067450,
    "resistance_2": 1000.0,
-   "pcr": 0.13
+   "pcr": 0.56
   },
   "SIEMENS.NS": {
    "symbol": "SIEMENS",
@@ -2789,7 +2789,7 @@
    "resistance": 3500.0,
    "resistance_oi": 186550,
    "resistance_2": 3800.0,
-   "pcr": 0.16
+   "pcr": 0.8
   },
   "SOLARINDS.NS": {
    "symbol": "SOLARINDS",
@@ -2804,7 +2804,7 @@
    "resistance": 20000.0,
    "resistance_oi": 104600,
    "resistance_2": 21000.0,
-   "pcr": 0.16
+   "pcr": 0.47
   },
   "SONACOMS.NS": {
    "symbol": "SONACOMS",
@@ -2819,7 +2819,7 @@
    "resistance": 800.0,
    "resistance_oi": 813400,
    "resistance_2": 840.0,
-   "pcr": 0.23
+   "pcr": 0.68
   },
   "SRF.NS": {
    "symbol": "SRF",
@@ -2834,7 +2834,7 @@
    "resistance": 2500.0,
    "resistance_oi": 325400,
    "resistance_2": 2450.0,
-   "pcr": 0.39
+   "pcr": 0.77
   },
   "SUNPHARMA.NS": {
    "symbol": "SUNPHARMA",
@@ -2849,7 +2849,7 @@
    "resistance": 1760.0,
    "resistance_oi": 775950,
    "resistance_2": 1800.0,
-   "pcr": 0.39
+   "pcr": 0.76
   },
   "SUPREMEIND.NS": {
    "symbol": "SUPREMEIND",
@@ -2864,7 +2864,7 @@
    "resistance": 3600.0,
    "resistance_oi": 112175,
    "resistance_2": 3500.0,
-   "pcr": 0.4
+   "pcr": 1.06
   },
   "SUZLON.NS": {
    "symbol": "SUZLON",
@@ -2879,7 +2879,7 @@
    "resistance": 42.0,
    "resistance_oi": 26035000,
    "resistance_2": 45.0,
-   "pcr": 0.13
+   "pcr": 0.38
   },
   "SWIGGY.NS": {
    "symbol": "SWIGGY",
@@ -2894,7 +2894,7 @@
    "resistance": 260.0,
    "resistance_oi": 4529650,
    "resistance_2": 200.0,
-   "pcr": 0.12
+   "pcr": 0.44
   },
   "TATACONSUM.NS": {
    "symbol": "TATACONSUM",
@@ -2909,7 +2909,7 @@
    "resistance": 1000.0,
    "resistance_oi": 817850,
    "resistance_2": 1050.0,
-   "pcr": 0.5
+   "pcr": 0.58
   },
   "TATAELXSI.NS": {
    "symbol": "TATAELXSI",
@@ -2924,7 +2924,7 @@
    "resistance": 3900.0,
    "resistance_oi": 226125,
    "resistance_2": 4000.0,
-   "pcr": 1.45
+   "pcr": 0.97
   },
   "TATAPOWER.NS": {
    "symbol": "TATAPOWER",
@@ -2939,7 +2939,7 @@
    "resistance": 360.0,
    "resistance_oi": 3474200,
    "resistance_2": 370.0,
-   "pcr": 0.25
+   "pcr": 0.76
   },
   "TATASTEEL.NS": {
    "symbol": "TATASTEEL",
@@ -2954,7 +2954,7 @@
    "resistance": 200.0,
    "resistance_oi": 20077750,
    "resistance_2": 190.0,
-   "pcr": 0.11
+   "pcr": 0.54
   },
   "TCS.NS": {
    "symbol": "TCS",
@@ -2969,7 +2969,7 @@
    "resistance": 2600.0,
    "resistance_oi": 1106775,
    "resistance_2": 2560.0,
-   "pcr": 3.51
+   "pcr": 1.11
   },
   "TECHM.NS": {
    "symbol": "TECHM",
@@ -2984,7 +2984,7 @@
    "resistance": 1840.0,
    "resistance_oi": 1061400,
    "resistance_2": 1800.0,
-   "pcr": 2.53
+   "pcr": 1.02
   },
   "TIINDIA.NS": {
    "symbol": "TIINDIA",
@@ -2999,7 +2999,7 @@
    "resistance": 2200.0,
    "resistance_oi": 157400,
    "resistance_2": 2300.0,
-   "pcr": 0.11
+   "pcr": 0.53
   },
   "TITAN.NS": {
    "symbol": "TITAN",
@@ -3014,7 +3014,7 @@
    "resistance": 5000.0,
    "resistance_oi": 529900,
    "resistance_2": 4500.0,
-   "pcr": 0.16
+   "pcr": 0.52
   },
   "TMPV.NS": {
    "symbol": "TMPV",
@@ -3029,7 +3029,7 @@
    "resistance": 285.0,
    "resistance_oi": 9300800,
    "resistance_2": 300.0,
-   "pcr": 0.14
+   "pcr": 0.58
   },
   "TORNTPHARM.NS": {
    "symbol": "TORNTPHARM",
@@ -3044,7 +3044,7 @@
    "resistance": 5000.0,
    "resistance_oi": 113500,
    "resistance_2": 4700.0,
-   "pcr": 0.26
+   "pcr": 0.49
   },
   "TRENT.NS": {
    "symbol": "TRENT",
@@ -3059,7 +3059,7 @@
    "resistance": 2900.0,
    "resistance_oi": 671850,
    "resistance_2": 2950.0,
-   "pcr": 0.34
+   "pcr": 0.72
   },
   "TVSMOTOR.NS": {
    "symbol": "TVSMOTOR",
@@ -3074,7 +3074,7 @@
    "resistance": 4100.0,
    "resistance_oi": 239575,
    "resistance_2": 4200.0,
-   "pcr": 0.49
+   "pcr": 0.74
   },
   "UJJIVANSFB.NS": {
    "symbol": "UJJIVANSFB",
@@ -3089,7 +3089,7 @@
    "resistance": 70.0,
    "resistance_oi": 3360000,
    "resistance_2": 65.0,
-   "pcr": 0.17
+   "pcr": 0.49
   },
   "ULTRACEMCO.NS": {
    "symbol": "ULTRACEMCO",
@@ -3104,7 +3104,7 @@
    "resistance": 11500.0,
    "resistance_oi": 161100,
    "resistance_2": 11200.0,
-   "pcr": 0.58
+   "pcr": 0.52
   },
   "UNIONBANK.NS": {
    "symbol": "UNIONBANK",
@@ -3119,7 +3119,7 @@
    "resistance": 185.0,
    "resistance_oi": 4699350,
    "resistance_2": 190.0,
-   "pcr": 0.95
+   "pcr": 0.84
   },
   "UNITDSPR.NS": {
    "symbol": "UNITDSPR",
@@ -3134,7 +3134,7 @@
    "resistance": 1440.0,
    "resistance_oi": 257600,
    "resistance_2": 1400.0,
-   "pcr": 0.2
+   "pcr": 1.11
   },
   "UNOMINDA.NS": {
    "symbol": "UNOMINDA",
@@ -3149,7 +3149,7 @@
    "resistance": 1200.0,
    "resistance_oi": 209550,
    "resistance_2": 1300.0,
-   "pcr": 0.2
+   "pcr": 0.97
   },
   "UPL.NS": {
    "symbol": "UPL",
@@ -3164,7 +3164,7 @@
    "resistance": 520.0,
    "resistance_oi": 871265,
    "resistance_2": 560.0,
-   "pcr": 0.33
+   "pcr": 0.75
   },
   "VBL.NS": {
    "symbol": "VBL",
@@ -3179,7 +3179,7 @@
    "resistance": 410.0,
    "resistance_oi": 1807950,
    "resistance_2": 440.0,
-   "pcr": 0.08
+   "pcr": 0.58
   },
   "VEDL.NS": {
    "symbol": "VEDL",
@@ -3194,7 +3194,7 @@
    "resistance": 260.0,
    "resistance_oi": 5222150,
    "resistance_2": 250.0,
-   "pcr": 0.08
+   "pcr": 0.44
   },
   "VMM.NS": {
    "symbol": "VMM",
@@ -3209,7 +3209,7 @@
    "resistance": 100.0,
    "resistance_oi": 3084600,
    "resistance_2": 110.0,
-   "pcr": 0.1
+   "pcr": 0.53
   },
   "VOLTAS.NS": {
    "symbol": "VOLTAS",
@@ -3224,7 +3224,7 @@
    "resistance": 1040.0,
    "resistance_oi": 496125,
    "resistance_2": 1060.0,
-   "pcr": 0.1
+   "pcr": 0.66
   },
   "WAAREEENER.NS": {
    "symbol": "WAAREEENER",
@@ -3239,7 +3239,7 @@
    "resistance": 2400.0,
    "resistance_oi": 255850,
    "resistance_2": 2600.0,
-   "pcr": 0.34
+   "pcr": 0.79
   },
   "WIPRO.NS": {
    "symbol": "WIPRO",
@@ -3254,7 +3254,7 @@
    "resistance": 195.0,
    "resistance_oi": 6687000,
    "resistance_2": 200.0,
-   "pcr": 1.78
+   "pcr": 1.17
   },
   "YESBANK.NS": {
    "symbol": "YESBANK",
@@ -3269,7 +3269,7 @@
    "resistance": 21.0,
    "resistance_oi": 115723100,
    "resistance_2": 22.0,
-   "pcr": 0.07
+   "pcr": 0.4
   },
   "ZYDUSLIFE.NS": {
    "symbol": "ZYDUSLIFE",
@@ -3284,7 +3284,7 @@
    "resistance": 1200.0,
    "resistance_oi": 565200,
    "resistance_2": 1150.0,
-   "pcr": 0.22
+   "pcr": 0.5
   }
  }
 }
