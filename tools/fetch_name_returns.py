@@ -63,7 +63,8 @@ def bse_list():
             x = x[x.ISIN.astype(str).str.startswith("INE")]
             print("BSE bhavcopy", d, len(x))
             return pd.DataFrame({"isin": x.ISIN.str.strip(), "name": x.FinInstrmNm.astype(str).str.strip(),
-                                 "ticker": x.FinInstrmId.astype(str) + ".BO"})
+                                 "ticker": x.TckrSymb.astype(str).str.strip() + ".BO",
+                                 "code": x.FinInstrmId.astype(str)})
     print("no BSE bhavcopy")
     return pd.DataFrame(columns=["isin", "name", "ticker"])
 
@@ -74,7 +75,7 @@ def main():
     u = pd.concat([n, b[~b["isin"].isin(n["isin"])]]).drop_duplicates("isin")
     bse_names = b.set_index("isin").name.to_dict()
     u["bse_name"] = u["isin"].map(bse_names)
-    code = u.ticker.str.split(".").str[0]
+    code = u["code"].fillna("").astype(str)
     # BSE debt/other instruments have 7xxxxx-9xxxxx codes; keep equity scrips only
     u = u[u.ticker.str.endswith(".NS") | (code.str.len() == 6) & (code < "700000")]
     mode = sys.argv[1] if len(sys.argv) > 1 else "all"
@@ -103,7 +104,7 @@ def main():
     out = []
     for _, r in u.iterrows():
         sr = closes.get(r.ticker)
-        rec = dict(isin=r["isin"], name=r["name"], bse_name=r.bse_name, ticker=r.ticker)
+        rec = dict(isin=r["isin"], name=r["name"], bse_name=r.bse_name, ticker=r.ticker, code=r.get("code"))
         if sr is not None and len(sr) > 5:
             last = sr.index[-1]
             rec.update(last_date=last.date(), close=round(float(sr.iloc[-1]), 3), first_date=sr.index[0].date())
