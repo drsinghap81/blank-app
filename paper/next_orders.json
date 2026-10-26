@@ -1,18 +1,21 @@
 {
   "BANKNIFTY": {
-    "date": "2026-10-23 00:00:00",
-    "close": 54242.2,
+    "date": "2026-10-26 00:00:00",
+    "close": 54378.0,
     "prev_top": 55918.0,
-    "prev_bottom": 55480.8,
+    "prev_bottom": 54242.2,
     "position": "FLAT",
     "orders": [
       "No Buy trade as awaiting new top",
-      "No Sell trade as awaiting new bottom",
+      "Sell below -25 @ 54,217 (Prev Bottom 54,242.20); if triggers keep 1% SL at 54,759",
       "Gap > 1% beyond a level at the open: exit only, no new trade (let the market settle)"
     ],
-    "lines": {},
+    "lines": {
+      "Sell below": 54217.2,
+      "Sell SL (1st day)": 54759.371999999996
+    },
     "futures_contract_expiry": "2026-10-27",
     "lot_size": 30,
-    "spot_close": 54287.35
+    "spot_close": 54366.7
   }
 }
