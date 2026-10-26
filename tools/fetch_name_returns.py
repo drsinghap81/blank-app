@@ -70,9 +70,9 @@ def bse_list():
 def main():
     n, b = nse_lists(), bse_list()
     print("NSE", len(n), "BSE", len(b))
-    u = pd.concat([n, b[~b.isin.isin(n.isin)]]).drop_duplicates("isin")
+    u = pd.concat([n, b[~b["isin"].isin(n["isin"])]]).drop_duplicates("isin")
     bse_names = b.set_index("isin").name.to_dict()
-    u["bse_name"] = u.isin.map(bse_names)
+    u["bse_name"] = u["isin"].map(bse_names)
     tick = list(u.ticker)
     closes = {}
     for i in range(0, len(tick), 150):
@@ -92,7 +92,7 @@ def main():
     out = []
     for _, r in u.iterrows():
         sr = closes.get(r.ticker)
-        rec = dict(isin=r.isin, name=r["name"], bse_name=r.bse_name, ticker=r.ticker)
+        rec = dict(isin=r["isin"], name=r["name"], bse_name=r.bse_name, ticker=r.ticker)
         if sr is not None and len(sr) > 5:
             last = sr.index[-1]
             rec.update(last_date=last.date(), close=round(float(sr.iloc[-1]), 3), first_date=sr.index[0].date())
