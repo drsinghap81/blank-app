@@ -42,9 +42,11 @@ def nse_lists():
         if not b:
             print("missing", u); continue
         d = pd.read_csv(io.BytesIO(b))
-        d.columns = [c.strip() for c in d.columns]
-        rows.append(pd.DataFrame({"isin": d["ISIN NUMBER"].str.strip(), "name": d["NAME OF COMPANY"].str.strip(),
-                                  "ticker": d["SYMBOL"].str.strip() + ".NS"}))
+        d.columns = [c.strip().upper() for c in d.columns]
+        print(u, list(d.columns))
+        col = lambda key: next(c for c in d.columns if key in c)
+        rows.append(pd.DataFrame({"isin": d[col("ISIN")].astype(str).str.strip(), "name": d[col("NAME")].astype(str).str.strip(),
+                                  "ticker": d[col("SYMBOL")].astype(str).str.strip() + ".NS"}))
     return pd.concat(rows) if rows else pd.DataFrame(columns=["isin", "name", "ticker"])
 
 
