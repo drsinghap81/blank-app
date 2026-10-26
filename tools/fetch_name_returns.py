@@ -7,6 +7,7 @@ Output data/ret/returns.csv:
 """
 import io
 import os
+import sys
 import time
 import zipfile
 from datetime import date, timedelta
@@ -73,10 +74,20 @@ def main():
     u = pd.concat([n, b[~b["isin"].isin(n["isin"])]]).drop_duplicates("isin")
     bse_names = b.set_index("isin").name.to_dict()
     u["bse_name"] = u["isin"].map(bse_names)
+    code = u.ticker.str.split(".").str[0]
+    # BSE debt/other instruments have 7xxxxx-9xxxxx codes; keep equity scrips only
+    u = u[u.ticker.str.endswith(".NS") | (code.str.len() == 6) & (code < "700000")]
+    mode = sys.argv[1] if len(sys.argv) > 1 else "all"
+    if mode == "bse":
+        u = u[u.ticker.str.endswith(".BO")]
+    elif mode == "nse":
+        u = u[u.ticker.str.endswith(".NS")]
+    step, pause = (40, 25) if mode == "bse" else (150, 3)
     tick = list(u.ticker)
     closes = {}
-    for i in range(0, len(tick), 150):
-        chunk = tick[i:i + 150]
+    for i in range(0, len(tick), step):
+        chunk = tick[i:i + step]
+        time.sleep(pause)
         try:
             d = yf.download(chunk, start=(date.today() - timedelta(days=800)).isoformat(), auto_adjust=True,
                             progress=False, group_by="column", threads=True)
@@ -104,7 +115,7 @@ def main():
                 rec[f"q{q.year}{q.quarter * 3:02d}"] = round(float(p.iloc[-1]), 3) if len(p) and (q.end_time - p.index[-1]).days < 20 else None
         out.append(rec)
     df = pd.DataFrame(out)
-    df.to_csv(f"{OUT}/returns.csv", index=False)
+    df.to_csv(f"{OUT}/returns{'_bse' if mode == 'bse' else ''}.csv", index=False)
     print("rows", len(df), "with r2y", df.r2y.notna().sum() if "r2y" in df else 0)
 
 

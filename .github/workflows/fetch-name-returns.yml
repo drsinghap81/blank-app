@@ -8,12 +8,12 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install -q yfinance pandas requests && mkdir -p data/ret && (python tools/fetch_name_returns.py > data/ret/log.txt 2>&1 || true); tail -40 data/ret/log.txt
+      - run: pip install -q yfinance pandas requests && mkdir -p data/ret && (git fetch -q origin name-returns && git checkout origin/name-returns -- data/ret/returns.csv || true; python tools/fetch_name_returns.py bse > data/ret/log_bse.txt 2>&1 || true); tail -40 data/ret/log_bse.txt
       - run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
           git checkout -B name-returns; git add -f data/ret; git commit -m "name returns" || exit 0; git push -f origin name-returns
