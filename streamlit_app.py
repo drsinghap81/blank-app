@@ -2044,7 +2044,7 @@ def render_trend_scan_tab() -> None:
                "smooth 6-month staircase (R² ≥ 0.8), within 12% of the 52-week high, 3-month gain ≥ 15%, "
                "≥ ₹1 cr traded a day. **Watch**: a looser version that keeps stocks pulling back to EMA 21. "
                "**Entry trigger**: RSI(14) crosses above 60 on a bullish candle (green, closing in the top 40% of "
-               "its range) within 2% of EMA 21 and closing back above it; stop = lowest low of the last 3 sessions.")
+               "its range) within 2% of EMA 21, closing back above it (≤ 6% above), risk ≤ 10%; stop = lowest low of the last 3 sessions.")
     trend, watch = rows[rows.list == "trend"] if len(rows) else rows, rows[rows.list == "watch"] if len(rows) else rows
     fresh = trig[trig.days_ago == 0] if len(trig) else trig
     c = st.columns(4)

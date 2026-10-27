@@ -17,7 +17,8 @@ ENTRY TRIGGER (second layer, checked on each of the last 5 sessions for stocks o
   - RSI(14) crosses up through 60 on that day (previous close < 60, today >= 60)
   - bullish candle: green and closing in the top 40% of its range
   - near EMA21: the lowest low of the last 3 sessions is within 2% of EMA21 (or dipped below it),
-    and the close is back above EMA21
+    and the close is back above EMA21 but no more than 6% above it
+  - risk to the stop no more than 10%
   stop = lowest low of those 3 sessions.
 
 Writes data/scan/trend_scan.json (for the app), trend_scan.csv, watchlist.csv, triggers.csv, and
@@ -99,8 +100,9 @@ def metrics(o, h, l, c, v):
         rsi_cross = r.iloc[i - 1] < 60 <= r.iloc[i]
         bull = c.iloc[i] > o.iloc[i] and (c.iloc[i] - l.iloc[i]) / rng >= 0.6
         low3 = l.iloc[i - 2:i + 1].min()
-        near = low3 <= e21.iloc[i] * 1.02 and c.iloc[i] > e21.iloc[i]
-        if rsi_cross and bull and near:
+        near = low3 <= e21.iloc[i] * 1.02 and e21.iloc[i] < c.iloc[i] <= e21.iloc[i] * 1.06
+        risk = c.iloc[i] / low3 - 1
+        if rsi_cross and bull and near and risk <= 0.10:
             trig.append(dict(trigger_date=str(c.index[i].date()), trigger_close=round(c.iloc[i], 2),
                              trigger_rsi=round(r.iloc[i], 1), ema21_then=round(e21.iloc[i], 2),
                              stop=round(low3, 2), risk_pct=round((c.iloc[i] / low3 - 1) * 100, 1),
@@ -157,7 +159,10 @@ def main():
                   - np.maximum(p.dist21 - 5, 0) * 2).round(1)
     p = p.sort_values(["list", "score"], ascending=[True, False])
     tr = pd.DataFrame(trigs)
+    asof_all = df.last_date.max()
     if len(tr):
+        tr["days_ago"] = [int(np.busday_count(t, asof_all)) for t in tr.trigger_date]
+        tr = tr[tr.days_ago <= 4]
         tr = tr.merge(p[["symbol", "name", "list", "score", "r2", "above21_60d", "value_cr", "close", "rsi"]],
                       on="symbol", how="inner").sort_values(["days_ago", "score"], ascending=[True, False])
     p.to_csv(f"{OUT}/trend_scan.csv", index=False)
