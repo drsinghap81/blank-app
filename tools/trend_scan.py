@@ -75,7 +75,7 @@ def metrics(c, v):
                 r1m=round((last / c.iloc[-22] - 1) * 100, 1), r3m=round((last / c.iloc[-64] - 1) * 100, 1),
                 r6m=round((last / c.iloc[-127] - 1) * 100, 1),
                 slope_yr=round((np.exp(b * 250) - 1) * 100), r2=round(r2, 2), rsi=round(rs, 1), value_cr=round(val, 2),
-                stack=bool(last > e9.iloc[-1] > e21.iloc[-1]), e21_rising=bool(e21.iloc[-1] > e21.iloc[-11]),
+                stacked=bool(last > e9.iloc[-1] > e21.iloc[-1]), e21_rising=bool(e21.iloc[-1] > e21.iloc[-11]),
                 above50=bool(last > e50.iloc[-1]), last_date=c.index[-1].date())
 
 
@@ -103,7 +103,7 @@ def main():
         time.sleep(2)
     df = pd.DataFrame(out).merge(u, on="symbol", how="left")
     df.to_csv(f"{OUT}/all_metrics.csv", index=False)
-    p = df[df.stack & df.e21_rising & df.above50 & (df.above21_60d >= 85) & (df.off_high >= -12) & (df.r3m >= 15)
+    p = df[df["stacked"] & df.e21_rising & df.above50 & (df.above21_60d >= 85) & (df.off_high >= -12) & (df.r3m >= 15)
            & (df.r2 >= 0.80) & (df.value_cr >= 1)].copy()
     p["tag"] = np.where((p.dist21 > 8) | (p.rsi > 75), "extended",
                         np.where((p.dist21 <= 3) & p.rsi.between(45, 65), "pullback", "riding"))
