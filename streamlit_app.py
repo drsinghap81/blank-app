@@ -1930,7 +1930,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-27 · Trend scan + RSI-60 EMA21 trigger v23"
+APP_BUILD = "2026-10-28 · Early trend entries (EMA 9/21 + Supertrend) v24"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2000,6 +2000,26 @@ def load_trend_scan() -> dict:
         return {}
 
 
+def supertrend_line(df: pd.DataFrame, n: int = 10, m: float = 3.0) -> tuple[np.ndarray, np.ndarray]:
+    """Supertrend(10,3) direction (+1/-1) and line, same rules as tools/trend_scan.py."""
+    h, l, c = (df[k].to_numpy(dtype=float) for k in ("High", "Low", "Close"))
+    pc = np.roll(c, 1); pc[0] = c[0]
+    tr = np.maximum(h - l, np.maximum(np.abs(h - pc), np.abs(l - pc)))
+    atr = np.empty_like(c); atr[0] = tr[0]
+    for i in range(1, len(c)):
+        atr[i] = atr[i - 1] + (tr[i] - atr[i - 1]) / n
+    mid = (h + l) / 2
+    fu, fl = mid + m * atr, mid - m * atr
+    d = np.ones(len(c), dtype=int); line = fl.copy()
+    for i in range(1, len(c)):
+        ub, lb = mid[i] + m * atr[i], mid[i] - m * atr[i]
+        fu[i] = ub if (ub < fu[i - 1] or c[i - 1] > fu[i - 1]) else fu[i - 1]
+        fl[i] = lb if (lb > fl[i - 1] or c[i - 1] < fl[i - 1]) else fl[i - 1]
+        d[i] = (-1 if c[i] < fl[i] else 1) if d[i - 1] == 1 else (1 if c[i] > fu[i] else -1)
+        line[i] = fl[i] if d[i] == 1 else fu[i]
+    return d, line
+
+
 def trend_chart(sym: str, trig: dict | None = None) -> go.Figure | None:
     """Daily candles with EMA 9/21 and RSI(14) with the 60 line (the trend-scan view)."""
     df, live, _ = fetch_ohlcv(f"{sym}.NS", "1y")
@@ -2014,10 +2034,21 @@ def trend_chart(sym: str, trig: dict | None = None) -> go.Figure | None:
                                  name=sym, increasing_line_color="#22c55e", decreasing_line_color="#ef4444"), row=1, col=1)
     fig.add_trace(go.Scatter(x=df.index, y=df["E9"], name="EMA 9", line=dict(color="#f97316", width=1.6)), row=1, col=1)
     fig.add_trace(go.Scatter(x=df.index, y=df["E21"], name="EMA 21", line=dict(color="#3b82f6", width=1.6)), row=1, col=1)
+    sd, sl = supertrend_line(df)
+    fig.add_trace(go.Scatter(x=df.index, y=np.where(sd == 1, sl, np.nan), name="Supertrend (up)", mode="lines",
+                             line=dict(color="#16a34a", width=1.2, dash="dot")), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df.index, y=np.where(sd == -1, sl, np.nan), name="Supertrend (down)", mode="lines",
+                             line=dict(color="#dc2626", width=1.2, dash="dot")), row=1, col=1)
     fig.add_trace(go.Scatter(x=df.index, y=df["RSI"], name="RSI 14", line=dict(color="#8b5cf6", width=1.4)), row=2, col=1)
     for lvl, dash in ((60, "solid"), (40, "dot"), (70, "dot")):
         fig.add_hline(y=lvl, line=dict(color="#a78bfa" if lvl == 60 else "#9ca3af", width=1, dash=dash), row=2, col=1)
-    if trig:
+    if trig and "signal_date" in trig:
+        td = pd.Timestamp(trig["signal_date"])
+        fig.add_trace(go.Scatter(x=[td], y=[trig["signal_close"]], mode="markers", name="Early entry signal",
+                                 marker=dict(symbol="triangle-up", size=14, color="#2563eb")), row=1, col=1)
+        fig.add_hline(y=trig["stop"], line=dict(color="#ef4444", width=1, dash="dash"),
+                      annotation_text=f"initial stop {trig['stop']:g}", row=1, col=1)
+    elif trig:
         td = pd.Timestamp(trig["trigger_date"])
         fig.add_trace(go.Scatter(x=[td], y=[trig["trigger_close"]], mode="markers", name="Entry trigger",
                                  marker=dict(symbol="triangle-up", size=14, color="#16a34a")), row=1, col=1)
@@ -2053,7 +2084,27 @@ def render_trend_scan_tab() -> None:
     c[2].metric("Watchlist", len(watch))
     c[3].metric("Entry triggers today", len(fresh), f"{len(trig)} in the last 5 sessions", delta_color="off")
 
-    st.markdown("##### 🟢 Entry triggers (last 5 sessions)")
+    early = pd.DataFrame(d.get("early", []))
+    st.markdown("##### 🚀 Early trend entries — EMA 9 crosses above EMA 21")
+    st.caption("**Entry**: EMA 9 crosses above EMA 21 with Supertrend(10,3) green, close above a rising EMA 50, RSI ≥ 55, "
+               "≥ ₹1 cr/day, within 30% of the 52-week high → buy the next open. **Stop**: lowest low of the last 5 sessions "
+               "(skip if > 12% away). **Ride**: hold until Supertrend turns red, sell the next open. Backtest 2017–26 on all "
+               "NSE stocks incl. delisted, 1% risk per trade, 10–15 positions: about 22–25% a year, worst fall −26 to −27%, "
+               "37% of trades win; 2022–26 alone about 14% a year. Tighter exits (2 red closes under EMA 9 or a close under "
+               "EMA 21) tested much worse.")
+    if len(early):
+        show_all = st.toggle("Also show stopped / exited / skipped signals", value=False, key="ts_early_all")
+        e = early if show_all else early[early.status.str.startswith(("NEW", "open", "EXIT"))]
+        ecols = {"symbol": "Symbol", "name": "Company", "status": "Status", "signal_date": "Signal day",
+                 "signal_close": "Signal close", "entry": "Entry (next open)", "stop": "Initial stop", "risk_pct": "Risk %",
+                 "close": "Close now", "supertrend": "Supertrend (trail stop)", "gain_pct": "Gain %", "R": "R",
+                 "days": "Sessions", "value_cr": "₹ cr/day"}
+        st.dataframe(e[[k for k in ecols if k in e]].rename(columns=ecols), hide_index=True, width="stretch",
+                     height=min(38 * (len(e) + 1), 460))
+    else:
+        st.write("No early-entry signals in the last 60 sessions (appears after the next nightly run).")
+
+    st.markdown("##### 🟢 Pullback triggers (last 5 sessions) — RSI crosses 60 at EMA 21")
     if len(trig):
         tcols = {"symbol": "Symbol", "name": "Company", "trigger_date": "Trigger day", "trigger_close": "Trigger close",
                  "trigger_rsi": "RSI then", "stop": "Stop", "risk_pct": "Risk %", "close": "Close now",
@@ -2083,17 +2134,21 @@ def render_trend_scan_tab() -> None:
     show(trend, "Clear trends")
     show(watch, "Watchlist (pulling back toward EMA 21)")
 
-    names = list(trig.symbol) + [s for s in rows.symbol if s not in set(trig.symbol)] if len(rows) else []
+    live = early[early.status.str.startswith(("NEW", "open", "EXIT"))] if len(early) else early
+    names = list(dict.fromkeys(list(live.symbol if len(live) else []) + list(trig.symbol if len(trig) else [])
+                               + list(rows.symbol if len(rows) else [])))
     if names:
         sym = st.selectbox("Chart", names, key="ts_chart")
-        t = trig[trig.symbol == sym].iloc[0].to_dict() if len(trig) and (trig.symbol == sym).any() else None
+        t = (live[live.symbol == sym].iloc[0].to_dict() if len(live) and (live.symbol == sym).any()
+             else trig[trig.symbol == sym].iloc[0].to_dict() if len(trig) and (trig.symbol == sym).any() else None)
         fig = trend_chart(sym, t)
         if fig is None:
             st.warning("Could not load prices for this symbol right now.")
         else:
             st.plotly_chart(fig, width="stretch")
-    st.caption(f"Scanned {d.get('generated', '')} UTC from Yahoo daily data. The entry trigger is not yet backtested; "
-               "a trigger is a candidate, not a recommendation.")
+    st.caption(f"Scanned {d.get('generated', '')} UTC from Yahoo daily data. The pullback trigger with an EMA 21 exit lost its "
+               "edge after costs in backtests (5%/yr, −58% worst fall); prefer the early entries. "
+               "a signal is a candidate, not a recommendation.")
 
 
 def main() -> None:

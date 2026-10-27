@@ -110,6 +110,77 @@ def metrics(o, h, l, c, v):
     return m, trig
 
 
+def supertrend(h, l, c, n=10, m=3.0):
+    """Supertrend(10,3): direction (+1 up / -1 down) and the trailing line."""
+    h, l, c = (np.asarray(x, dtype=float) for x in (h, l, c))
+    pc = np.roll(c, 1); pc[0] = c[0]
+    tr = np.maximum(h - l, np.maximum(np.abs(h - pc), np.abs(l - pc)))
+    atr = np.empty_like(c); atr[0] = tr[0]
+    for i in range(1, len(c)):
+        atr[i] = atr[i - 1] + (tr[i] - atr[i - 1]) / n
+    mid = (h + l) / 2
+    fu, fl = mid + m * atr, mid - m * atr
+    d = np.ones(len(c), dtype=int); line = fl.copy()
+    for i in range(1, len(c)):
+        ub, lb = mid[i] + m * atr[i], mid[i] - m * atr[i]
+        fu[i] = ub if (ub < fu[i - 1] or c[i - 1] > fu[i - 1]) else fu[i - 1]
+        fl[i] = lb if (lb > fl[i - 1] or c[i - 1] < fl[i - 1]) else fl[i - 1]
+        d[i] = (-1 if c[i] < fl[i] else 1) if d[i - 1] == 1 else (1 if c[i] > fu[i] else -1)
+        line[i] = fl[i] if d[i] == 1 else fu[i]
+    return d, line
+
+
+def early(o, h, l, c, v):
+    """EARLY TREND ENTRY (backtested 2017-26 on all NSE stocks incl. delisted: ~22-25%/yr, max DD -26 to -27%,
+    10-15 positions at 1% risk; see project doc trend-scan.md):
+      signal : EMA9 crosses above EMA21 today with Supertrend(10,3) green, close > EMA50, EMA50 higher than
+               10 sessions ago, RSI(14) >= 55,
+               >= Rs 1 cr/day traded (20-day avg), >= 120 sessions listed, close within 30% of the 52-week high
+      entry  : next session's open;  initial stop = lowest low of the last 5 sessions (skip if > 12% away)
+      exit   : Supertrend(10,3) turns red (close below its line) -> sell next open
+    Returns the latest signal of the last 60 sessions, followed forward to today (open / stopped / exited)."""
+    if len(c) < 130:
+        return None
+    e9, e21, e50 = (c.ewm(span=n, adjust=False).mean() for n in (9, 21, 50))
+    r = rsi(c)
+    val = (c * v).rolling(20).mean() / 1e7
+    hi = c.rolling(250, min_periods=60).max()
+    sig = ((e9 > e21) & (e9.shift(1) <= e21.shift(1)) & (c > e50) & (e50 > e50.shift(10)) & (r >= 55)
+           & (val >= 1) & (c >= 0.7 * hi))
+    sd, line = supertrend(h.values, l.values, c.values)
+    sig = sig & (sd == 1)                        # Supertrend already green (else the exit would fire at once)
+    sig.iloc[:120] = False
+    idx = np.where(sig.values[-60:])[0]
+    if not len(idx):
+        return None
+    i = len(c) - 60 + idx[-1]
+    stop = float(l.iloc[i - 4:i + 1].min())
+    rec = dict(signal_date=str(c.index[i].date()), signal_close=round(float(c.iloc[i]), 2), stop=round(stop, 2),
+               rsi_signal=round(float(r.iloc[i]), 1), value_cr=round(float(val.iloc[-1]), 2),
+               supertrend=round(float(line[-1]), 2), st_up=bool(sd[-1] == 1), close=round(float(c.iloc[-1]), 2))
+    if i == len(c) - 1:
+        rec.update(status="NEW - buy next open", entry=None, days=0, gain_pct=None,
+                   risk_pct=round((c.iloc[i] / stop - 1) * 100, 1))
+        return rec
+    entry = float(o.iloc[i + 1])
+    rec.update(entry=round(entry, 2), risk_pct=round((entry / stop - 1) * 100, 1), days=len(c) - 1 - i)
+    if entry <= stop or entry / stop - 1 > 0.12:
+        rec.update(status="skipped (stop too far / gap below stop)", gain_pct=None)
+        return rec
+    status, exit_px = "open", None
+    for j in range(i + 1, len(c)):
+        if l.iloc[j] <= stop:
+            status, exit_px = f"stopped {c.index[j].date()}", min(float(o.iloc[j]), stop); break
+        if sd[j] == -1 and j < len(c) - 1:
+            status, exit_px = f"exited {c.index[j + 1].date()} (Supertrend red)", float(o.iloc[j + 1]); break
+        if sd[j] == -1:
+            status = "EXIT next open (Supertrend turned red)"
+    px = exit_px if exit_px is not None else float(c.iloc[-1])
+    rec.update(status=status, gain_pct=round((px / entry - 1) * 100, 1),
+               R=round((px - entry) / (entry - stop), 2))
+    return rec
+
+
 def telegram(text):
     tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
     if not tok or not chat or os.environ.get("SEND_TELEGRAM") != "1":
@@ -124,7 +195,7 @@ def main():
     u = nse_symbols()
     print("symbols", len(u), u.board.value_counts().to_dict(), flush=True)
     tick = [t + ".NS" for t in u.symbol]
-    out, trigs = [], []
+    out, trigs, earl = [], [], []
     for i in range(0, len(tick), 150):
         chunk = tick[i:i + 150]
         try:
@@ -140,6 +211,12 @@ def main():
             except Exception:  # noqa: BLE001
                 continue
             m, tg = metrics(o, h, l, c, v)
+            try:
+                ea = early(o, h, l, c, v)
+            except Exception as e:  # noqa: BLE001
+                ea = None
+            if ea:
+                earl.append(dict(symbol=t[:-3], **ea))
             if m:
                 out.append(dict(symbol=t[:-3], **m))
                 trigs += [dict(symbol=t[:-3], **x) for x in tg]
@@ -167,12 +244,20 @@ def main():
                       on="symbol", how="inner").sort_values(["days_ago", "score"], ascending=[True, False])
     p.to_csv(f"{OUT}/trend_scan.csv", index=False)
     tr.to_csv(f"{OUT}/triggers.csv", index=False)
+    E = pd.DataFrame(earl)
+    if len(E):
+        E = E.merge(u[["symbol", "name", "board"]], on="symbol", how="left")
+        E["order"] = np.select([E.status.str.startswith("NEW"), E.status.str.startswith("EXIT"), E.status == "open"],
+                               [0, 1, 2], 3)
+        E = E.sort_values(["order", "value_cr"], ascending=[True, False]).drop(columns="order")
+        E.to_csv(f"{OUT}/early.csv", index=False)
     asof = df.last_date.max()
     cols = ["symbol", "name", "board", "list", "tag", "score", "close", "ema9", "ema21", "dist21", "rsi", "r1m", "r3m",
             "r6m", "r2", "above21_60d", "off_high", "value_cr", "last_date"]
     json.dump(dict(asof=asof, generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
                    scanned=len(df), rows=p[cols].to_dict("records"),
-                   triggers=tr.to_dict("records") if len(tr) else []),
+                   triggers=tr.to_dict("records") if len(tr) else [],
+                   early=E.to_dict("records") if len(E) else []),
               open(f"{OUT}/trend_scan.json", "w"), indent=1, default=str)
     print("trend", int(strict.sum()), "watch", int((loose & ~strict).sum()), "triggers", len(tr))
     print(p.head(40).to_string(index=False))
@@ -180,8 +265,16 @@ def main():
         print(tr.to_string(index=False))
     fresh = tr[tr.days_ago == 0] if len(tr) else tr
     msg = [f"📈 Trend scan — NSE close {asof}: {int(strict.sum())} clear trends, {int((loose & ~strict).sum())} on watch"]
+    if len(E):
+        new = E[E.status.str.startswith("NEW")].head(12)
+        ex = E[E.status.str.startswith("EXIT")]
+        msg.append(f"\n🚀 EARLY TREND ENTRIES today ({len(E[E.status.str.startswith('NEW')])}) — EMA9 x EMA21 up, buy next open, "
+                   "stop = 5-day low, exit when Supertrend(10,3) turns red:")
+        msg += [f"{x.symbol} {x.signal_close:g} — stop {x.stop:g} ({x.risk_pct}% risk), ₹{x.value_cr:g} cr/day" for _, x in new.iterrows()] or ["none"]
+        if len(ex):
+            msg.append("\n🔻 Supertrend turned red (exit next open): " + ", ".join(ex.symbol.head(20)))
     if len(fresh):
-        msg.append("\n🟢 ENTRY TRIGGER today (RSI crossed 60 + bullish candle at EMA21):")
+        msg.append("\n🟢 Pullback trigger today (RSI crossed 60 + bullish candle at EMA21 — weaker in backtests):")
         for _, x in fresh.iterrows():
             msg.append(f"{x.symbol} {x.trigger_close:g} — stop {x.stop:g} ({x.risk_pct}% risk), {x.list}, RSI {x.trigger_rsi}")
     else:
