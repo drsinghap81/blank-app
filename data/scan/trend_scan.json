@@ -1,6 +1,6 @@
 {
  "asof": "2026-10-27",
- "generated": "2026-10-27T22:59+00:00",
+ "generated": "2026-10-27T23:31+00:00",
  "scanned": 2579,
  "rows": [
   {
@@ -1007,6 +1007,7 @@
  "early": [
   {
    "symbol": "MRPL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-26",
    "signal_close": 182.61,
    "stop": 159.0,
@@ -1026,6 +1027,7 @@
   },
   {
    "symbol": "ANTELOPUS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-26",
    "signal_close": 1188.8,
    "stop": 962.0,
@@ -1045,6 +1047,7 @@
   },
   {
    "symbol": "PNGSREVA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-05",
    "signal_close": 535.3,
    "stop": 490.05,
@@ -1064,6 +1067,7 @@
   },
   {
    "symbol": "WELSPUNLIV",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-12",
    "signal_close": 165.23,
    "stop": 159.0,
@@ -1083,6 +1087,7 @@
   },
   {
    "symbol": "MEESHO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 191.88,
    "stop": 173.5,
@@ -1102,6 +1107,7 @@
   },
   {
    "symbol": "INDHOTEL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-15",
    "signal_close": 741.45,
    "stop": 708.1,
@@ -1121,6 +1127,7 @@
   },
   {
    "symbol": "PERSISTENT",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-09",
    "signal_close": 5770.0,
    "stop": 5387.5,
@@ -1140,6 +1147,7 @@
   },
   {
    "symbol": "SSWL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-31",
    "signal_close": 304.39,
    "stop": 286.67,
@@ -1159,6 +1167,7 @@
   },
   {
    "symbol": "SOUTHBANK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 47.08,
    "stop": 44.86,
@@ -1178,6 +1187,7 @@
   },
   {
    "symbol": "GKSL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 134.57,
    "stop": 126.36,
@@ -1197,6 +1207,7 @@
   },
   {
    "symbol": "SHYAMMETL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-12",
    "signal_close": 1088.5,
    "stop": 1019.4,
@@ -1216,6 +1227,7 @@
   },
   {
    "symbol": "THELEELA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-31",
    "signal_close": 494.6,
    "stop": 463.1,
@@ -1235,6 +1247,7 @@
   },
   {
    "symbol": "JINDALPOLY",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-23",
    "signal_close": 739.35,
    "stop": 643.1,
@@ -1254,6 +1267,7 @@
   },
   {
    "symbol": "ECLERX",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-13",
    "signal_close": 1964.5,
    "stop": 1828.8,
@@ -1273,6 +1287,7 @@
   },
   {
    "symbol": "CRISIL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-22",
    "signal_close": 4777.2,
    "stop": 4381.9,
@@ -1292,6 +1307,7 @@
   },
   {
    "symbol": "PGIL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-22",
    "signal_close": 1194.9,
    "stop": 1102.0,
@@ -1311,6 +1327,7 @@
   },
   {
    "symbol": "BLUSPRING",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 132.59,
    "stop": 121.5,
@@ -1330,6 +1347,7 @@
   },
   {
    "symbol": "MBAPL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-22",
    "signal_close": 165.68,
    "stop": 152.16,
@@ -1349,6 +1367,7 @@
   },
   {
    "symbol": "ALGOQUANT",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-17",
    "signal_close": 70.13,
    "stop": 63.5,
@@ -1368,6 +1387,7 @@
   },
   {
    "symbol": "STOVEKRAFT",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-14",
    "signal_close": 850.8,
    "stop": 775.2,
@@ -1387,6 +1407,7 @@
   },
   {
    "symbol": "VENKEYS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 1694.8,
    "stop": 1532.2,
@@ -1406,6 +1427,7 @@
   },
   {
    "symbol": "KINGFA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-31",
    "signal_close": 5230.49,
    "stop": 4874.22,
@@ -1425,6 +1447,7 @@
   },
   {
    "symbol": "NITINSPIN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-14",
    "signal_close": 642.75,
    "stop": 591.4,
@@ -1444,6 +1467,7 @@
   },
   {
    "symbol": "SANGAMIND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-25",
    "signal_close": 619.9,
    "stop": 556.8,
@@ -1463,6 +1487,7 @@
   },
   {
    "symbol": "KRONOX",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-22",
    "signal_close": 182.27,
    "stop": 163.85,
@@ -1482,6 +1507,7 @@
   },
   {
    "symbol": "ICICIBANK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-26",
    "signal_close": 1430.0,
    "stop": 1403.3,
@@ -1501,6 +1527,7 @@
   },
   {
    "symbol": "SBIN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 1045.0,
    "stop": 1007.6,
@@ -1520,6 +1547,7 @@
   },
   {
    "symbol": "CUPID",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-30",
    "signal_close": 311.65,
    "stop": 261.4,
@@ -1539,6 +1567,7 @@
   },
   {
    "symbol": "TECHM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-28",
    "signal_close": 1627.44,
    "stop": 1549.19,
@@ -1558,6 +1587,7 @@
   },
   {
    "symbol": "BHEL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 452.0,
    "stop": 402.6,
@@ -1577,6 +1607,7 @@
   },
   {
    "symbol": "CHENNPETRO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-07",
    "signal_close": 1612.3,
    "stop": 1325.1,
@@ -1596,6 +1627,7 @@
   },
   {
    "symbol": "GROWW",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-25",
    "signal_close": 203.01,
    "stop": 193.5,
@@ -1615,6 +1647,7 @@
   },
   {
    "symbol": "AZAD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-29",
    "signal_close": 2914.2,
    "stop": 2667.9,
@@ -1634,6 +1667,7 @@
   },
   {
    "symbol": "HBLENGINE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-16",
    "signal_close": 833.15,
    "stop": 701.0,
@@ -1653,6 +1687,7 @@
   },
   {
    "symbol": "SUNPHARMA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-31",
    "signal_close": 1984.8,
    "stop": 1896.2,
@@ -1672,6 +1707,7 @@
   },
   {
    "symbol": "LICI",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-24",
    "signal_close": 421.85,
    "stop": 407.0,
@@ -1691,6 +1727,7 @@
   },
   {
    "symbol": "MOBIKWIK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 242.14,
    "stop": 191.0,
@@ -1710,6 +1747,7 @@
   },
   {
    "symbol": "TMCV",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-31",
    "signal_close": 436.8,
    "stop": 406.6,
@@ -1729,6 +1767,7 @@
   },
   {
    "symbol": "RBLBANK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-30",
    "signal_close": 377.07,
    "stop": 346.95,
@@ -1748,6 +1787,7 @@
   },
   {
    "symbol": "APARINDS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 15379.6,
    "stop": 13327.73,
@@ -1767,6 +1807,7 @@
   },
   {
    "symbol": "HFCL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-05",
    "signal_close": 250.27,
    "stop": 199.0,
@@ -1786,6 +1827,7 @@
   },
   {
    "symbol": "SHRINGARMS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 229.85,
    "stop": 216.41,
@@ -1805,6 +1847,7 @@
   },
   {
    "symbol": "SONACOMS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-22",
    "signal_close": 809.0,
    "stop": 759.05,
@@ -1824,6 +1867,7 @@
   },
   {
    "symbol": "ZYDUSLIFE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-21",
    "signal_close": 1161.0,
    "stop": 1086.0,
@@ -1843,6 +1887,7 @@
   },
   {
    "symbol": "IDBI",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-14",
    "signal_close": 90.39,
    "stop": 81.04,
@@ -1862,6 +1907,7 @@
   },
   {
    "symbol": "RAYMOND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 629.4,
    "stop": 577.5,
@@ -1881,6 +1927,7 @@
   },
   {
    "symbol": "AEQUS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 239.95,
    "stop": 215.0,
@@ -1900,6 +1947,7 @@
   },
   {
    "symbol": "NYKAA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-07",
    "signal_close": 341.25,
    "stop": 316.0,
@@ -1919,6 +1967,7 @@
   },
   {
    "symbol": "TORNTPHARM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-27",
    "signal_close": 4999.0,
    "stop": 4855.0,
@@ -1938,6 +1987,7 @@
   },
   {
    "symbol": "BPCL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-28",
    "signal_close": 319.25,
    "stop": 310.0,
@@ -1957,6 +2007,7 @@
   },
   {
    "symbol": "GRASIM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 3249.88,
    "stop": 3075.92,
@@ -1976,6 +2027,7 @@
   },
   {
    "symbol": "OMNI",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-01",
    "signal_close": 608.65,
    "stop": 519.05,
@@ -1995,6 +2047,7 @@
   },
   {
    "symbol": "AEGISLOG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-11",
    "signal_close": 1353.6,
    "stop": 1232.0,
@@ -2014,6 +2067,7 @@
   },
   {
    "symbol": "GAIL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-31",
    "signal_close": 176.99,
    "stop": 169.62,
@@ -2033,6 +2087,7 @@
   },
   {
    "symbol": "SHADOWFAX",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-31",
    "signal_close": 242.9,
    "stop": 202.72,
@@ -2052,6 +2107,7 @@
   },
   {
    "symbol": "CGCL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-26",
    "signal_close": 256.16,
    "stop": 216.84,
@@ -2071,6 +2127,7 @@
   },
   {
    "symbol": "JUSTDIAL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 693.55,
    "stop": 660.2,
@@ -2090,6 +2147,7 @@
   },
   {
    "symbol": "RITES",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 223.0,
    "stop": 209.52,
@@ -2109,6 +2167,7 @@
   },
   {
    "symbol": "CARTRADE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-12",
    "signal_close": 3191.3,
    "stop": 2814.6,
@@ -2128,6 +2187,7 @@
   },
   {
    "symbol": "AVALON",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-30",
    "signal_close": 1759.5,
    "stop": 1629.4,
@@ -2147,6 +2207,7 @@
   },
   {
    "symbol": "RRKABEL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 2789.7,
    "stop": 2440.3,
@@ -2166,6 +2227,7 @@
   },
   {
    "symbol": "URBANCO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 146.19,
    "stop": 128.7,
@@ -2185,6 +2247,7 @@
   },
   {
    "symbol": "PNBHOUSING",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-12",
    "signal_close": 1200.0,
    "stop": 1087.8,
@@ -2204,6 +2267,7 @@
   },
   {
    "symbol": "RAYMONDREL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 692.55,
    "stop": 641.1,
@@ -2223,6 +2287,7 @@
   },
   {
    "symbol": "BALRAMCHIN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-07",
    "signal_close": 706.6,
    "stop": 638.0,
@@ -2242,6 +2307,7 @@
   },
   {
    "symbol": "JSWINFRA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 348.25,
    "stop": 317.9,
@@ -2261,6 +2327,7 @@
   },
   {
    "symbol": "PAISALO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-04",
    "signal_close": 74.01,
    "stop": 65.03,
@@ -2280,6 +2347,7 @@
   },
   {
    "symbol": "SAGILITY",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-21",
    "signal_close": 43.35,
    "stop": 41.77,
@@ -2299,6 +2367,7 @@
   },
   {
    "symbol": "ANANTRAJ",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-04",
    "signal_close": 625.45,
    "stop": 571.35,
@@ -2318,6 +2387,7 @@
   },
   {
    "symbol": "PIRAMALFIN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-21",
    "signal_close": 2180.8,
    "stop": 2035.0,
@@ -2337,6 +2407,7 @@
   },
   {
    "symbol": "GOODLUCK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-12",
    "signal_close": 566.35,
    "stop": 482.75,
@@ -2356,6 +2427,7 @@
   },
   {
    "symbol": "PETRONET",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 297.5,
    "stop": 281.75,
@@ -2375,6 +2447,7 @@
   },
   {
    "symbol": "KAJARIACER",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-31",
    "signal_close": 1238.59,
    "stop": 1181.08,
@@ -2394,6 +2467,7 @@
   },
   {
    "symbol": "NHPC",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 80.28,
    "stop": 77.04,
@@ -2413,6 +2487,7 @@
   },
   {
    "symbol": "OBEROIRLTY",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-17",
    "signal_close": 1928.62,
    "stop": 1762.33,
@@ -2432,6 +2507,7 @@
   },
   {
    "symbol": "KRN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-11",
    "signal_close": 1287.7,
    "stop": 1190.0,
@@ -2451,6 +2527,7 @@
   },
   {
    "symbol": "KTKBANK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-22",
    "signal_close": 331.5,
    "stop": 309.85,
@@ -2470,6 +2547,7 @@
   },
   {
    "symbol": "MOTISONS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-13",
    "signal_close": 14.62,
    "stop": 13.51,
@@ -2489,6 +2567,7 @@
   },
   {
    "symbol": "DPABHUSHAN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-22",
    "signal_close": 1469.4,
    "stop": 1290.0,
@@ -2508,6 +2587,7 @@
   },
   {
    "symbol": "EMUDHRA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-15",
    "signal_close": 592.85,
    "stop": 489.0,
@@ -2527,6 +2607,7 @@
   },
   {
    "symbol": "IOLCP",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 163.41,
    "stop": 143.55,
@@ -2546,6 +2627,7 @@
   },
   {
    "symbol": "LANDMARK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-24",
    "signal_close": 540.04,
    "stop": 496.48,
@@ -2565,6 +2647,7 @@
   },
   {
    "symbol": "SHOPERSTOP",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-25",
    "signal_close": 423.55,
    "stop": 379.05,
@@ -2584,6 +2667,7 @@
   },
   {
    "symbol": "CUB",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-12",
    "signal_close": 231.17,
    "stop": 219.37,
@@ -2603,6 +2687,7 @@
   },
   {
    "symbol": "JINDALSAW",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 265.6,
    "stop": 253.0,
@@ -2622,6 +2707,7 @@
   },
   {
    "symbol": "AARTIPHARM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-10",
    "signal_close": 821.01,
    "stop": 676.36,
@@ -2641,6 +2727,7 @@
   },
   {
    "symbol": "IPCALAB",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-17",
    "signal_close": 1884.6,
    "stop": 1683.1,
@@ -2660,6 +2747,7 @@
   },
   {
    "symbol": "63MOONS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-14",
    "signal_close": 913.4,
    "stop": 759.15,
@@ -2679,6 +2767,7 @@
   },
   {
    "symbol": "ACMESOLAR",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 381.65,
    "stop": 347.8,
@@ -2698,6 +2787,7 @@
   },
   {
    "symbol": "INOXINDIA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-27",
    "signal_close": 2177.9,
    "stop": 1880.3,
@@ -2717,6 +2807,7 @@
   },
   {
    "symbol": "FLUOROCHEM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-14",
    "signal_close": 4632.1,
    "stop": 4408.0,
@@ -2736,6 +2827,7 @@
   },
   {
    "symbol": "ROLEXRINGS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 183.58,
    "stop": 168.0,
@@ -2755,6 +2847,7 @@
   },
   {
    "symbol": "CENTUM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 3698.6,
    "stop": 3408.35,
@@ -2774,6 +2867,7 @@
   },
   {
    "symbol": "JAMNAAUTO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 139.23,
    "stop": 128.28,
@@ -2793,6 +2887,7 @@
   },
   {
    "symbol": "ALKYLAMINE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 1921.2,
    "stop": 1771.4,
@@ -2812,6 +2907,7 @@
   },
   {
    "symbol": "YATHARTH",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 857.84,
    "stop": 814.72,
@@ -2831,6 +2927,7 @@
   },
   {
    "symbol": "BHARTIHEXA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-17",
    "signal_close": 1641.0,
    "stop": 1477.8,
@@ -2850,6 +2947,7 @@
   },
   {
    "symbol": "TBOTEK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 1710.6,
    "stop": 1600.0,
@@ -2869,6 +2967,7 @@
   },
   {
    "symbol": "WESTLIFE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-11",
    "signal_close": 569.6,
    "stop": 520.2,
@@ -2888,6 +2987,7 @@
   },
   {
    "symbol": "MIDHANI",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-08",
    "signal_close": 475.56,
    "stop": 410.91,
@@ -2907,6 +3007,7 @@
   },
   {
    "symbol": "PIXTRANS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-10",
    "signal_close": 1986.5,
    "stop": 1672.7,
@@ -2926,6 +3027,7 @@
   },
   {
    "symbol": "APOLLOTYRE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 436.6,
    "stop": 420.15,
@@ -2945,6 +3047,7 @@
   },
   {
    "symbol": "EPL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-12",
    "signal_close": 243.64,
    "stop": 223.62,
@@ -2964,6 +3067,7 @@
   },
   {
    "symbol": "ADVANCE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-12",
    "signal_close": 126.52,
    "stop": 111.81,
@@ -2983,6 +3087,7 @@
   },
   {
    "symbol": "DCBBANK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-21",
    "signal_close": 203.59,
    "stop": 180.0,
@@ -3002,6 +3107,7 @@
   },
   {
    "symbol": "JGCHEM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 611.3,
    "stop": 543.97,
@@ -3021,6 +3127,7 @@
   },
   {
    "symbol": "JINDRILL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-18",
    "signal_close": 650.1,
    "stop": 578.82,
@@ -3040,6 +3147,7 @@
   },
   {
    "symbol": "TATVA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-17",
    "signal_close": 1709.6,
    "stop": 1520.0,
@@ -3059,6 +3167,7 @@
   },
   {
    "symbol": "CAPLIPOINT",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-01",
    "signal_close": 2707.02,
    "stop": 2463.5,
@@ -3078,6 +3187,7 @@
   },
   {
    "symbol": "MEDANTA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 1499.4,
    "stop": 1380.1,
@@ -3097,6 +3207,7 @@
   },
   {
    "symbol": "FIVESTAR",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 549.7,
    "stop": 518.7,
@@ -3116,6 +3227,7 @@
   },
   {
    "symbol": "ROSSTECH",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 1063.96,
    "stop": 902.8,
@@ -3135,6 +3247,7 @@
   },
   {
    "symbol": "DIACABS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 368.3,
    "stop": 333.65,
@@ -3154,6 +3267,7 @@
   },
   {
    "symbol": "FILATEX",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-11",
    "signal_close": 87.11,
    "stop": 74.02,
@@ -3173,6 +3287,7 @@
   },
   {
    "symbol": "GNA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 558.55,
    "stop": 504.2,
@@ -3192,6 +3307,7 @@
   },
   {
    "symbol": "PARADEEP",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 156.76,
    "stop": 148.5,
@@ -3211,6 +3327,7 @@
   },
   {
    "symbol": "USHAMART",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-21",
    "signal_close": 533.9,
    "stop": 464.15,
@@ -3230,6 +3347,7 @@
   },
   {
    "symbol": "MAHLOG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-14",
    "signal_close": 421.5,
    "stop": 391.0,
@@ -3249,6 +3367,7 @@
   },
   {
    "symbol": "ABREL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-20",
    "signal_close": 1445.5,
    "stop": 1377.6,
@@ -3268,6 +3387,7 @@
   },
   {
    "symbol": "INDOBORAX",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 491.75,
    "stop": 457.4,
@@ -3287,6 +3407,7 @@
   },
   {
    "symbol": "ARVIND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-24",
    "signal_close": 565.7,
    "stop": 531.0,
@@ -3306,6 +3427,7 @@
   },
   {
    "symbol": "PARKHOSPS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 286.55,
    "stop": 271.2,
@@ -3325,6 +3447,7 @@
   },
   {
    "symbol": "AEGISVOPAK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-03",
    "signal_close": 286.85,
    "stop": 260.7,
@@ -3344,6 +3467,7 @@
   },
   {
    "symbol": "LXCHEM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-08",
    "signal_close": 184.52,
    "stop": 162.0,
@@ -3363,6 +3487,7 @@
   },
   {
    "symbol": "BLACKBUCK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-11",
    "signal_close": 628.15,
    "stop": 572.0,
@@ -3382,6 +3507,7 @@
   },
   {
    "symbol": "DALMIASUG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 453.0,
    "stop": 391.4,
@@ -3401,6 +3527,7 @@
   },
   {
    "symbol": "PARACABLES",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-07",
    "signal_close": 68.92,
    "stop": 64.02,
@@ -3420,6 +3547,7 @@
   },
   {
    "symbol": "NRBBEARING",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 433.8,
    "stop": 408.3,
@@ -3439,6 +3567,7 @@
   },
   {
    "symbol": "SHAREINDIA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-09",
    "signal_close": 189.46,
    "stop": 168.13,
@@ -3458,6 +3587,7 @@
   },
   {
    "symbol": "VINDHYATEL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 2383.0,
    "stop": 1855.0,
@@ -3477,6 +3607,7 @@
   },
   {
    "symbol": "PCBL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-08",
    "signal_close": 328.8,
    "stop": 310.7,
@@ -3496,6 +3627,7 @@
   },
   {
    "symbol": "NORTHARC",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-31",
    "signal_close": 311.65,
    "stop": 280.45,
@@ -3515,6 +3647,7 @@
   },
   {
    "symbol": "ITDC",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-12",
    "signal_close": 717.97,
    "stop": 664.3,
@@ -3534,6 +3667,7 @@
   },
   {
    "symbol": "BEPL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-14",
    "signal_close": 129.71,
    "stop": 119.34,
@@ -3553,6 +3687,7 @@
   },
   {
    "symbol": "KPIL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 1451.5,
    "stop": 1345.1,
@@ -3572,6 +3707,7 @@
   },
   {
    "symbol": "HOMEFIRST",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 1241.3,
    "stop": 1100.6,
@@ -3591,6 +3727,7 @@
   },
   {
    "symbol": "AVADHSUGAR",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-28",
    "signal_close": 808.4,
    "stop": 719.95,
@@ -3610,6 +3747,7 @@
   },
   {
    "symbol": "EMCURE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-08",
    "signal_close": 1925.8,
    "stop": 1834.83,
@@ -3629,6 +3767,7 @@
   },
   {
    "symbol": "UNIVCABLES",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 1649.2,
    "stop": 1400.0,
@@ -3648,6 +3787,7 @@
   },
   {
    "symbol": "IDEAFORGE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 887.1,
    "stop": 840.0,
@@ -3667,6 +3807,7 @@
   },
   {
    "symbol": "RISHABH",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 650.2,
    "stop": 597.0,
@@ -3686,6 +3827,7 @@
   },
   {
    "symbol": "ONWARDTEC",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-20",
    "signal_close": 292.25,
    "stop": 280.45,
@@ -3705,6 +3847,7 @@
   },
   {
    "symbol": "WELENT",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-21",
    "signal_close": 631.45,
    "stop": 557.5,
@@ -3724,6 +3867,7 @@
   },
   {
    "symbol": "MUFIN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-13",
    "signal_close": 137.53,
    "stop": 130.01,
@@ -3743,6 +3887,7 @@
   },
   {
    "symbol": "CCAVENUE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 174.3,
    "stop": 157.8,
@@ -3762,6 +3907,7 @@
   },
   {
    "symbol": "KOPRAN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-18",
    "signal_close": 201.51,
    "stop": 169.0,
@@ -3781,6 +3927,7 @@
   },
   {
    "symbol": "OAL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-27",
    "signal_close": 428.95,
    "stop": 332.15,
@@ -3800,6 +3947,7 @@
   },
   {
    "symbol": "SKFINDUS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-19",
    "signal_close": 2800.4,
    "stop": 2599.59,
@@ -3819,6 +3967,7 @@
   },
   {
    "symbol": "ORIENTHOT",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-20",
    "signal_close": 137.29,
    "stop": 119.12,
@@ -3838,6 +3987,7 @@
   },
   {
    "symbol": "UNICHEMLAB",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 573.2,
    "stop": 521.2,
@@ -3857,6 +4007,7 @@
   },
   {
    "symbol": "SAKAR",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-01",
    "signal_close": 965.75,
    "stop": 856.3,
@@ -3876,6 +4027,7 @@
   },
   {
    "symbol": "FINEORG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-05",
    "signal_close": 5210.0,
    "stop": 5034.5,
@@ -3895,6 +4047,7 @@
   },
   {
    "symbol": "SUBEXLTD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 12.85,
    "stop": 11.5,
@@ -3914,6 +4067,7 @@
   },
   {
    "symbol": "AIAENG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-06",
    "signal_close": 4777.44,
    "stop": 4443.3,
@@ -3933,6 +4087,7 @@
   },
   {
    "symbol": "ELGIEQUIP",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-14",
    "signal_close": 609.5,
    "stop": 569.45,
@@ -3952,6 +4107,7 @@
   },
   {
    "symbol": "HERITGFOOD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-14",
    "signal_close": 414.8,
    "stop": 380.5,
@@ -3971,6 +4127,7 @@
   },
   {
    "symbol": "MSTCLTD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-18",
    "signal_close": 693.47,
    "stop": 566.16,
@@ -3990,6 +4147,7 @@
   },
   {
    "symbol": "METROPOLIS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-27",
    "signal_close": 576.9,
    "stop": 539.05,
@@ -4009,6 +4167,7 @@
   },
   {
    "symbol": "KIRLOSBROS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 1984.9,
    "stop": 1796.5,
@@ -4028,6 +4187,7 @@
   },
   {
    "symbol": "ALIVUS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-31",
    "signal_close": 1155.87,
    "stop": 1085.92,
@@ -4047,6 +4207,7 @@
   },
   {
    "symbol": "CONCORDBIO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-30",
    "signal_close": 1330.0,
    "stop": 1238.0,
@@ -4066,6 +4227,7 @@
   },
   {
    "symbol": "PRUDENT",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 3501.6,
    "stop": 3190.2,
@@ -4085,6 +4247,7 @@
   },
   {
    "symbol": "PREMIERPOL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 96.72,
    "stop": 78.15,
@@ -4104,6 +4267,7 @@
   },
   {
    "symbol": "DIVGIITTS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-28",
    "signal_close": 1218.6,
    "stop": 1105.3,
@@ -4123,6 +4287,7 @@
   },
   {
    "symbol": "LOKESHMACH",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-30",
    "signal_close": 365.9,
    "stop": 319.0,
@@ -4142,6 +4307,7 @@
   },
   {
    "symbol": "INNOVACAP",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-11",
    "signal_close": 1018.9,
    "stop": 925.2,
@@ -4161,6 +4327,7 @@
   },
   {
    "symbol": "CHALET",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-24",
    "signal_close": 894.9,
    "stop": 839.55,
@@ -4180,6 +4347,7 @@
   },
   {
    "symbol": "DMCC",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 296.3,
    "stop": 258.55,
@@ -4199,6 +4367,7 @@
   },
   {
    "symbol": "MAWANASUG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-25",
    "signal_close": 149.64,
    "stop": 123.53,
@@ -4218,6 +4387,7 @@
   },
   {
    "symbol": "RHIM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 409.53,
    "stop": 380.77,
@@ -4237,6 +4407,7 @@
   },
   {
    "symbol": "MUKANDLTD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-22",
    "signal_close": 141.41,
    "stop": 129.91,
@@ -4256,6 +4427,7 @@
   },
   {
    "symbol": "JINDWORLD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-28",
    "signal_close": 37.86,
    "stop": 34.57,
@@ -4275,6 +4447,7 @@
   },
   {
    "symbol": "AGARWALEYE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-31",
    "signal_close": 513.2,
    "stop": 489.5,
@@ -4294,6 +4467,7 @@
   },
   {
    "symbol": "AVTNPL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-09",
    "signal_close": 94.78,
    "stop": 83.1,
@@ -4313,6 +4487,7 @@
   },
   {
    "symbol": "NPST",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-13",
    "signal_close": 1633.74,
    "stop": 1414.77,
@@ -4332,6 +4507,7 @@
   },
   {
    "symbol": "BUILDPRO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-06",
    "signal_close": 260.3,
    "stop": 243.8,
@@ -4351,6 +4527,7 @@
   },
   {
    "symbol": "RPGLIFE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-16",
    "signal_close": 2940.6,
    "stop": 2705.1,
@@ -4370,6 +4547,7 @@
   },
   {
    "symbol": "DREDGECORP",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-14",
    "signal_close": 1166.4,
    "stop": 1027.7,
@@ -4389,6 +4567,7 @@
   },
   {
    "symbol": "TVSELECT",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-06",
    "signal_close": 508.15,
    "stop": 477.5,
@@ -4408,6 +4587,7 @@
   },
   {
    "symbol": "CARYSIL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-30",
    "signal_close": 1185.93,
    "stop": 1091.37,
@@ -4427,6 +4607,7 @@
   },
   {
    "symbol": "ORCHPHARMA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-21",
    "signal_close": 1081.8,
    "stop": 950.2,
@@ -4446,6 +4627,7 @@
   },
   {
    "symbol": "SIS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-11",
    "signal_close": 437.55,
    "stop": 423.4,
@@ -4465,6 +4647,7 @@
   },
   {
    "symbol": "CRAMC",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-21",
    "signal_close": 262.33,
    "stop": 247.42,
@@ -4484,6 +4667,7 @@
   },
   {
    "symbol": "MAHSCOOTER",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-21",
    "signal_close": 13609.0,
    "stop": 12601.41,
@@ -4503,6 +4687,7 @@
   },
   {
    "symbol": "TRAVELFOOD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 1333.96,
    "stop": 1248.05,
@@ -4522,6 +4707,7 @@
   },
   {
    "symbol": "TALBROAUTO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-07",
    "signal_close": 431.23,
    "stop": 400.97,
@@ -4541,6 +4727,7 @@
   },
   {
    "symbol": "FOSECOIND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 5263.0,
    "stop": 4952.0,
@@ -4560,6 +4747,7 @@
   },
   {
    "symbol": "VERANDA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-20",
    "signal_close": 255.9,
    "stop": 226.1,
@@ -4579,6 +4767,7 @@
   },
   {
    "symbol": "5PAISA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-10",
    "signal_close": 384.4,
    "stop": 348.1,
@@ -4598,6 +4787,7 @@
   },
   {
    "symbol": "DIFFNKG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 404.58,
    "stop": 377.34,
@@ -4617,6 +4807,7 @@
   },
   {
    "symbol": "ALEMBICLTD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-31",
    "signal_close": 88.74,
    "stop": 85.7,
@@ -4636,6 +4827,7 @@
   },
   {
    "symbol": "FMGOETZE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-25",
    "signal_close": 452.29,
    "stop": 390.01,
@@ -4655,6 +4847,7 @@
   },
   {
    "symbol": "OMAXE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-13",
    "signal_close": 98.37,
    "stop": 80.8,
@@ -4674,6 +4867,7 @@
   },
   {
    "symbol": "DBOL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-30",
    "signal_close": 126.1,
    "stop": 112.0,
@@ -4693,6 +4887,7 @@
   },
   {
    "symbol": "AJAXENGG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-25",
    "signal_close": 607.75,
    "stop": 555.0,
@@ -4712,6 +4907,7 @@
   },
   {
    "symbol": "GIPCL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-11",
    "signal_close": 161.29,
    "stop": 154.34,
@@ -4731,6 +4927,7 @@
   },
   {
    "symbol": "CARRARO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 554.6,
    "stop": 506.95,
@@ -4750,6 +4947,7 @@
   },
   {
    "symbol": "VRLLOG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 293.6,
    "stop": 280.9,
@@ -4769,6 +4967,7 @@
   },
   {
    "symbol": "HARSHA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-17",
    "signal_close": 425.6,
    "stop": 395.45,
@@ -4788,6 +4987,7 @@
   },
   {
    "symbol": "CORONA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-09",
    "signal_close": 2197.2,
    "stop": 2041.8,
@@ -4807,6 +5007,7 @@
   },
   {
    "symbol": "SPECTRUM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-07",
    "signal_close": 2486.8,
    "stop": 2050.0,
@@ -4826,6 +5027,7 @@
   },
   {
    "symbol": "PDMJEPAPER",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-15",
    "signal_close": 97.98,
    "stop": 90.0,
@@ -4845,6 +5047,7 @@
   },
   {
    "symbol": "CERA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 6280.5,
    "stop": 6087.5,
@@ -4864,6 +5067,7 @@
   },
   {
    "symbol": "ARVSMART",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-07",
    "signal_close": 648.51,
    "stop": 588.66,
@@ -4883,6 +5087,7 @@
   },
   {
    "symbol": "HATSUN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-16",
    "signal_close": 1162.1,
    "stop": 1102.0,
@@ -4902,6 +5107,7 @@
   },
   {
    "symbol": "SINGERIND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-16",
    "signal_close": 90.09,
    "stop": 74.5,
@@ -4921,6 +5127,7 @@
   },
   {
    "symbol": "GARUDA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 184.44,
    "stop": 174.06,
@@ -4940,6 +5147,7 @@
   },
   {
    "symbol": "RAJRATAN",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-09",
    "signal_close": 520.85,
    "stop": 485.45,
@@ -4959,6 +5167,7 @@
   },
   {
    "symbol": "LGBBROSLTD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-19",
    "signal_close": 1720.8,
    "stop": 1653.1,
@@ -4978,6 +5187,7 @@
   },
   {
    "symbol": "BHARATSE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 231.87,
    "stop": 205.0,
@@ -4997,6 +5207,7 @@
   },
   {
    "symbol": "MPSLTD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-09",
    "signal_close": 2783.4,
    "stop": 2556.1,
@@ -5016,6 +5227,7 @@
   },
   {
    "symbol": "ANDHRAPAP",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-12",
    "signal_close": 71.34,
    "stop": 66.25,
@@ -5035,6 +5247,7 @@
   },
   {
    "symbol": "INGERRAND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-13",
    "signal_close": 4606.4,
    "stop": 4220.0,
@@ -5054,6 +5267,7 @@
   },
   {
    "symbol": "SHARDAMOTR",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-09",
    "signal_close": 890.12,
    "stop": 854.2,
@@ -5073,6 +5287,7 @@
   },
   {
    "symbol": "TARSONS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-24",
    "signal_close": 335.45,
    "stop": 303.55,
@@ -5092,6 +5307,7 @@
   },
   {
    "symbol": "MANCREDIT",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-31",
    "signal_close": 241.91,
    "stop": 218.5,
@@ -5111,6 +5327,7 @@
   },
   {
    "symbol": "MODISONLTD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-11",
    "signal_close": 304.58,
    "stop": 271.94,
@@ -5130,6 +5347,7 @@
   },
   {
    "symbol": "PDSL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-31",
    "signal_close": 363.55,
    "stop": 340.35,
@@ -5149,6 +5367,7 @@
   },
   {
    "symbol": "RAMCOIND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-10",
    "signal_close": 375.89,
    "stop": 325.91,
@@ -5168,6 +5387,7 @@
   },
   {
    "symbol": "BAJEL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-21",
    "signal_close": 191.78,
    "stop": 179.41,
@@ -5187,6 +5407,7 @@
   },
   {
    "symbol": "MOLDTKPAC",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-21",
    "signal_close": 352.92,
    "stop": 330.8,
@@ -5206,6 +5427,7 @@
   },
   {
    "symbol": "BHAGCHEM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 298.35,
    "stop": 261.0,
@@ -5225,6 +5447,7 @@
   },
   {
    "symbol": "BHAGYANGR",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-09",
    "signal_close": 411.65,
    "stop": 363.55,
@@ -5244,6 +5467,7 @@
   },
   {
    "symbol": "ANUP",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 2175.38,
    "stop": 2051.68,
@@ -5263,6 +5487,7 @@
   },
   {
    "symbol": "GOCLCORP",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-04",
    "signal_close": 399.17,
    "stop": 357.24,
@@ -5282,6 +5507,7 @@
   },
   {
    "symbol": "JAGSNPHARM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-25",
    "signal_close": 242.29,
    "stop": 221.44,
@@ -5301,6 +5527,7 @@
   },
   {
    "symbol": "IVALUE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-21",
    "signal_close": 286.8,
    "stop": 271.6,
@@ -5320,6 +5547,7 @@
   },
   {
    "symbol": "MAMATA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-08",
    "signal_close": 425.7,
    "stop": 398.2,
@@ -5339,6 +5567,7 @@
   },
   {
    "symbol": "IRISDOREME",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-16",
    "signal_close": 64.34,
    "stop": 57.1,
@@ -5358,6 +5587,7 @@
   },
   {
    "symbol": "ESAFSFB",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-28",
    "signal_close": 43.0,
    "stop": 38.5,
@@ -5377,6 +5607,7 @@
   },
   {
    "symbol": "SHREEPUSHK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-24",
    "signal_close": 425.15,
    "stop": 373.61,
@@ -5396,6 +5627,7 @@
   },
   {
    "symbol": "FAZE3Q",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-11",
    "signal_close": 603.35,
    "stop": 535.35,
@@ -5415,6 +5647,7 @@
   },
   {
    "symbol": "SPAL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-10",
    "signal_close": 1064.94,
    "stop": 960.83,
@@ -5434,6 +5667,7 @@
   },
   {
    "symbol": "HARIOMPIPE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 404.11,
    "stop": 380.26,
@@ -5453,6 +5687,7 @@
   },
   {
    "symbol": "IMAGICAA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 49.09,
    "stop": 45.21,
@@ -5472,6 +5707,7 @@
   },
   {
    "symbol": "DOLLAR",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 273.25,
    "stop": 259.05,
@@ -5491,6 +5727,7 @@
   },
   {
    "symbol": "AAREYDRUGS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-28",
    "signal_close": 89.01,
    "stop": 74.6,
@@ -5510,6 +5747,7 @@
   },
   {
    "symbol": "IKIO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-31",
    "signal_close": 215.48,
    "stop": 185.0,
@@ -5529,6 +5767,7 @@
   },
   {
    "symbol": "PATELRMART",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-17",
    "signal_close": 229.1,
    "stop": 212.5,
@@ -5548,6 +5787,7 @@
   },
   {
    "symbol": "SRM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 509.85,
    "stop": 491.55,
@@ -5567,6 +5807,7 @@
   },
   {
    "symbol": "EVEREADY",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 360.05,
    "stop": 338.85,
@@ -5586,6 +5827,7 @@
   },
   {
    "symbol": "DDEVPLSTIK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 282.51,
    "stop": 263.7,
@@ -5605,6 +5847,7 @@
   },
   {
    "symbol": "HEIDELBERG",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-14",
    "signal_close": 151.26,
    "stop": 145.49,
@@ -5624,6 +5867,7 @@
   },
   {
    "symbol": "GEOJITFSL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-23",
    "signal_close": 81.98,
    "stop": 76.9,
@@ -5643,6 +5887,7 @@
   },
   {
    "symbol": "VINYAS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-22",
    "signal_close": 1589.0,
    "stop": 1381.05,
@@ -5662,6 +5907,7 @@
   },
   {
    "symbol": "IGARASHI",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 467.15,
    "stop": 441.51,
@@ -5681,6 +5927,7 @@
   },
   {
    "symbol": "TVSSRICHAK",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-14",
    "signal_close": 4445.35,
    "stop": 3821.85,
@@ -5700,6 +5947,7 @@
   },
   {
    "symbol": "ZUARIIND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-20",
    "signal_close": 284.1,
    "stop": 251.47,
@@ -5719,6 +5967,7 @@
   },
   {
    "symbol": "KIRLOSIND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 3938.98,
    "stop": 3707.18,
@@ -5738,6 +5987,7 @@
   },
   {
    "symbol": "INDIANHUME",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-24",
    "signal_close": 396.3,
    "stop": 355.7,
@@ -5757,6 +6007,7 @@
   },
   {
    "symbol": "MWL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-15",
    "signal_close": 41.03,
    "stop": 37.2,
@@ -5776,6 +6027,7 @@
   },
   {
    "symbol": "20MICRONS",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-21",
    "signal_close": 220.12,
    "stop": 194.05,
@@ -5795,6 +6047,7 @@
   },
   {
    "symbol": "TPLPLASTEH",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-21",
    "signal_close": 81.03,
    "stop": 74.61,
@@ -5814,6 +6067,7 @@
   },
   {
    "symbol": "CENTENKA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-03",
    "signal_close": 616.65,
    "stop": 540.5,
@@ -5833,6 +6087,7 @@
   },
   {
    "symbol": "NIITLTD",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-25",
    "signal_close": 102.68,
    "stop": 90.66,
@@ -5852,6 +6107,7 @@
   },
   {
    "symbol": "EXPLEOSOL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-16",
    "signal_close": 896.65,
    "stop": 854.8,
@@ -5871,6 +6127,7 @@
   },
   {
    "symbol": "ELECTHERM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-24",
    "signal_close": 1054.4,
    "stop": 959.9,
@@ -5890,6 +6147,7 @@
   },
   {
    "symbol": "AMANTA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-19",
    "signal_close": 177.63,
    "stop": 150.01,
@@ -5909,6 +6167,7 @@
   },
   {
    "symbol": "BCLIND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-31",
    "signal_close": 36.35,
    "stop": 33.82,
@@ -5928,6 +6187,7 @@
   },
   {
    "symbol": "CLSEL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-24",
    "signal_close": 309.57,
    "stop": 274.08,
@@ -5947,6 +6207,7 @@
   },
   {
    "symbol": "JUBLCPL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-25",
    "signal_close": 2210.1,
    "stop": 2001.0,
@@ -5966,6 +6227,7 @@
   },
   {
    "symbol": "GREENLAM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 266.7,
    "stop": 245.3,
@@ -5985,6 +6247,7 @@
   },
   {
    "symbol": "NDRAUTO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-10",
    "signal_close": 848.2,
    "stop": 801.1,
@@ -6004,6 +6267,7 @@
   },
   {
    "symbol": "LAXMIINDIA",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-04",
    "signal_close": 132.6,
    "stop": 124.62,
@@ -6023,6 +6287,7 @@
   },
   {
    "symbol": "KRISHIVAL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-24",
    "signal_close": 408.16,
    "stop": 350.31,
@@ -6042,6 +6307,7 @@
   },
   {
    "symbol": "VISAKAIND",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-09-18",
    "signal_close": 97.36,
    "stop": 85.11,
@@ -6061,6 +6327,7 @@
   },
   {
    "symbol": "KANORICHEM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-15",
    "signal_close": 190.04,
    "stop": 157.23,
@@ -6080,6 +6347,7 @@
   },
   {
    "symbol": "AMBIKCO",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-03",
    "signal_close": 1738.26,
    "stop": 1626.96,
@@ -6099,6 +6367,7 @@
   },
   {
    "symbol": "KICL",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-07-31",
    "signal_close": 5488.43,
    "stop": 5290.29,
@@ -6118,6 +6387,7 @@
   },
   {
    "symbol": "PUNJABCHEM",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-19",
    "signal_close": 1156.3,
    "stop": 1074.1,
@@ -6136,26 +6406,8 @@
    "board": "main"
   },
   {
-   "symbol": "AGASTYAEN",
-   "signal_date": "2026-09-04",
-   "signal_close": 59.5,
-   "stop": 55.85,
-   "rsi_signal": 56.9,
-   "value_cr": 0.49,
-   "supertrend": 61.72,
-   "st_up": false,
-   "close": 52.1,
-   "entry": 60.69,
-   "risk_pct": 8.7,
-   "days": 33,
-   "status": "exited 2026-09-30 (Supertrend red)",
-   "gain_pct": 16.9,
-   "R": 2.12,
-   "name": "Agastya Energy and Infrastructure Limited",
-   "board": "main"
-  },
-  {
    "symbol": "IFGLEXPOR",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-04",
    "signal_close": 217.08,
    "stop": 193.0,
@@ -6175,6 +6427,7 @@
   },
   {
    "symbol": "LIBERTSHOE",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-05",
    "signal_close": 268.2,
    "stop": 258.55,
@@ -6194,6 +6447,7 @@
   },
   {
    "symbol": "ASIANHOTNR",
+   "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-06",
    "signal_close": 316.0,
    "stop": 298.65,
