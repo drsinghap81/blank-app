@@ -1,0 +1,19 @@
+name: trend-scan
+on:
+  push:
+    paths: [".github/workflows/trend-scan.yml", "tools/trend_scan.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas requests && mkdir -p data/scan && (python tools/trend_scan.py > data/scan/log.txt 2>&1 || true); tail -50 data/scan/log.txt
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout -B trend-scan; git add -f data/scan; git commit -m "trend scan" || exit 0; git push -f origin trend-scan
