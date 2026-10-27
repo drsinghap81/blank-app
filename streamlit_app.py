@@ -1930,7 +1930,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-28 · Early trend entries (EMA 9/21 + Supertrend) v24"
+APP_BUILD = "2026-10-28 · Trend entries + 52w base breakouts v25"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2085,7 +2085,7 @@ def render_trend_scan_tab() -> None:
     c[3].metric("Entry triggers today", len(fresh), f"{len(trig)} in the last 5 sessions", delta_color="off")
 
     early = pd.DataFrame(d.get("early", []))
-    st.markdown("##### 🚀 Early trend entries — EMA 9 crosses above EMA 21")
+    st.markdown("##### 🚀 Trend entries — EMA 9/21 cross and 52-week-high base breakouts")
     st.caption("**Entry**: EMA 9 crosses above EMA 21 with Supertrend(10,3) green, close above a rising EMA 50, RSI ≥ 55, "
                "≥ ₹1 cr/day, within 30% of the 52-week high → buy the next open. **Stop**: lowest low of the last 5 sessions "
                "(skip if > 12% away). **Ride**: hold until Supertrend turns red, sell the next open. Backtest 2017–26 on all "
@@ -2095,7 +2095,7 @@ def render_trend_scan_tab() -> None:
     if len(early):
         show_all = st.toggle("Also show stopped / exited / skipped signals", value=False, key="ts_early_all")
         e = early if show_all else early[early.status.str.startswith(("NEW", "open", "EXIT"))]
-        ecols = {"symbol": "Symbol", "name": "Company", "status": "Status", "signal_date": "Signal day",
+        ecols = {"symbol": "Symbol", "name": "Company", "setup": "Setup", "status": "Status", "signal_date": "Signal day",
                  "signal_close": "Signal close", "entry": "Entry (next open)", "stop": "Initial stop", "risk_pct": "Risk %",
                  "close": "Close now", "supertrend": "Supertrend (trail stop)", "gain_pct": "Gain %", "R": "R",
                  "days": "Sessions", "value_cr": "₹ cr/day"}

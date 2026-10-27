@@ -150,22 +150,30 @@ def early(o, h, l, c, v):
     sd, line = supertrend(h.values, l.values, c.values)
     sig = sig & (sd == 1)                        # Supertrend already green (else the exit would fire at once)
     sig.iloc[:120] = False
-    idx = np.where(sig.values[-60:])[0]
+    return follow(o, h, l, c, sig, sd, line, r, val, cap_stop=False)
+
+
+def follow(o, h, l, c, sig, sd, line, r, val, cap_stop=False, lookback=60):
+    """Take the latest signal of the last `lookback` sessions and follow it to today: entry next open, stop = 5-day low
+    (cap_stop: never more than 12% below the signal close; else skip if > 12% away), exit when Supertrend turns red."""
+    idx = np.where(sig.values[-lookback:])[0]
     if not len(idx):
         return None
-    i = len(c) - 60 + idx[-1]
+    i = len(c) - lookback + idx[-1]
     stop = float(l.iloc[i - 4:i + 1].min())
+    if cap_stop:
+        stop = max(stop, float(c.iloc[i]) * 0.88)
     rec = dict(signal_date=str(c.index[i].date()), signal_close=round(float(c.iloc[i]), 2), stop=round(stop, 2),
                rsi_signal=round(float(r.iloc[i]), 1), value_cr=round(float(val.iloc[-1]), 2),
                supertrend=round(float(line[-1]), 2), st_up=bool(sd[-1] == 1), close=round(float(c.iloc[-1]), 2))
     if i == len(c) - 1:
         rk = round((c.iloc[i] / stop - 1) * 100, 1)
-        rec.update(status="NEW - buy next open" if rk <= 12 else "NEW but stop > 12% away - skip unless it opens lower",
+        rec.update(status="NEW - buy next open" if (cap_stop or rk <= 12) else "NEW but stop > 12% away - skip unless it opens lower",
                    entry=None, days=0, gain_pct=None, risk_pct=rk)
         return rec
     entry = float(o.iloc[i + 1])
     rec.update(entry=round(entry, 2), risk_pct=round((entry / stop - 1) * 100, 1), days=len(c) - 1 - i)
-    if entry <= stop or entry / stop - 1 > 0.12:
+    if entry <= stop or (not cap_stop and entry / stop - 1 > 0.12):
         rec.update(status="skipped (stop too far / gap below stop)", gain_pct=None)
         return rec
     status, exit_px = "open", None
@@ -181,6 +189,27 @@ def early(o, h, l, c, v):
                R=round((px - entry) / (entry - stop), 2))
     return rec
 
+
+def base_breakout(o, h, l, c, v):
+    """FIRST 52-WEEK-HIGH BREAKOUT AFTER A 6-MONTH BASE (Chartink screen + Amritpal's base idea; backtested 2017-26 on
+    all NSE stocks incl. delisted: ~15%/yr, max DD -29%, 2022-26 ~17.6%/yr, 10 positions at 1% risk):
+      signal : today's high > highest close of the prior 240 sessions, close > previous close, close > 20,
+               20-day avg traded value >= Rs 2 cr, the previous 240-day closing high was >= 126 sessions ago,
+               Supertrend(10,3) green
+      entry  : next open; stop = 5-day low but never more than 12% below the signal close
+      exit   : Supertrend(10,3) turns red -> sell next open"""
+    if len(c) < 260:
+        return None
+    r = rsi(c)
+    val = (c * v).rolling(20).mean() / 1e7
+    pmax = c.shift(1).rolling(240, min_periods=240).max()
+    newhi = (c >= c.rolling(240, min_periods=240).max()).values
+    k = np.arange(len(c), dtype=float)
+    last = pd.Series(np.where(newhi, k, np.nan), index=c.index).ffill().shift(1)
+    age = pd.Series(k, index=c.index) - last
+    sd, line = supertrend(h.values, l.values, c.values)
+    sig = ((h > pmax) & (c > c.shift(1)) & (c > 20) & (val >= 2) & (age >= 126) & (sd == 1))
+    return follow(o, h, l, c, sig, sd, line, r, val, cap_stop=True)
 
 def telegram(text):
     tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
@@ -217,7 +246,13 @@ def main():
             except Exception as e:  # noqa: BLE001
                 ea = None
             if ea:
-                earl.append(dict(symbol=t[:-3], **ea))
+                earl.append(dict(symbol=t[:-3], setup="EMA 9/21 cross", **ea))
+            try:
+                bo = base_breakout(o, h, l, c, v)
+            except Exception:  # noqa: BLE001
+                bo = None
+            if bo:
+                earl.append(dict(symbol=t[:-3], setup="52w-high base breakout", **bo))
             if m:
                 out.append(dict(symbol=t[:-3], **m))
                 trigs += [dict(symbol=t[:-3], **x) for x in tg]
@@ -267,11 +302,12 @@ def main():
     fresh = tr[tr.days_ago == 0] if len(tr) else tr
     msg = [f"📈 Trend scan — NSE close {asof}: {int(strict.sum())} clear trends, {int((loose & ~strict).sum())} on watch"]
     if len(E):
-        new = E[E.status.str.startswith("NEW - buy")].head(12)
+        new = E[E.status.str.startswith("NEW - buy")].head(16)
         ex = E[E.status.str.startswith("EXIT")]
-        msg.append(f"\n🚀 EARLY TREND ENTRIES today ({len(new)}) — EMA9 x EMA21 up, buy next open, "
+        msg.append(f"\n🚀 TREND ENTRIES today ({len(new)}) — EMA 9/21 cross or first 52w high after a 6-month base, Supertrend green, buy next open, "
                    "stop = 5-day low, exit when Supertrend(10,3) turns red:")
-        msg += [f"{x.symbol} {x.signal_close:g} — stop {x.stop:g} ({x.risk_pct}% risk), ₹{x.value_cr:g} cr/day" for _, x in new.iterrows()] or ["none"]
+        msg += [f"{x.symbol} [{'cross' if x.setup.startswith('EMA') else 'base breakout'}] {x.signal_close:g} — stop {x.stop:g} "
+                f"({x.risk_pct}% risk), ₹{x.value_cr:g} cr/day" for _, x in new.iterrows()] or ["none"]
         if len(ex):
             msg.append("\n🔻 Supertrend turned red (exit next open): " + ", ".join(ex.symbol.head(20)))
     if len(fresh):
