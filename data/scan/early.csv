@@ -1,6 +1,6 @@
 symbol,signal_date,signal_close,stop,rsi_signal,value_cr,supertrend,st_up,close,entry,risk_pct,days,status,gain_pct,R,name,board
-MRPL,2026-10-26,182.61,159.0,59.9,341.74,158.17,True,182.61,,14.8,0,NEW - buy next open,,,Mangalore Refinery and Petrochemicals Limited,main
-ANTELOPUS,2026-10-26,1188.8,962.0,61.8,109.49,938.3,True,1188.8,,23.6,0,NEW - buy next open,,,Antelopus Selan Energy Limited,main
+MRPL,2026-10-26,182.61,159.0,59.9,341.74,158.17,True,182.61,,14.8,0,NEW but stop > 12% away - skip unless it opens lower,,,Mangalore Refinery and Petrochemicals Limited,main
+ANTELOPUS,2026-10-26,1188.8,962.0,61.8,109.49,938.3,True,1188.8,,23.6,0,NEW but stop > 12% away - skip unless it opens lower,,,Antelopus Selan Energy Limited,main
 PNGSREVA,2026-10-05,535.3,490.05,56.9,98.76,739.61,False,555.1,539.05,10.0,14,EXIT next open (Supertrend turned red),3.0,0.33,PNGS Reva Diamond Jewellery Limited,main
 WELSPUNLIV,2026-08-12,165.23,159.0,55.1,92.36,241.04,False,208.96,165.6,4.2,50,EXIT next open (Supertrend turned red),26.2,6.57,Welspun Living Limited,main
 MEESHO,2026-08-04,191.88,173.5,58.3,474.16,207.34,True,214.84,193.0,11.2,56,open,11.3,1.12,Meesho Limited,main
