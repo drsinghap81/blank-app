@@ -229,7 +229,7 @@ def main():
     for i in range(0, len(tick), 150):
         chunk = tick[i:i + 150]
         try:
-            d = yf.download(chunk, start=(date.today() - timedelta(days=420)).isoformat(), auto_adjust=True,
+            d = yf.download(chunk, start=(date.today() - timedelta(days=800)).isoformat(), auto_adjust=True,
                             progress=False, group_by="column", threads=True)
         except Exception as e:  # noqa: BLE001
             print("chunk fail", i, e); continue
