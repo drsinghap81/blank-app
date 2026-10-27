@@ -1,0 +1,24 @@
+name: fetch-cash-all
+on:
+  push:
+    paths: [".github/workflows/fetch-cash-all.yml", "tools/fetch_cash_all.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        year: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q pandas requests && mkdir -p cash && python tools/fetch_cash_all.py ${{ matrix.year }}-01-01 ${{ matrix.year }}-12-31 cash/cm_${{ matrix.year }}.csv.gz
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan cash-${{ matrix.year }}; git rm -rqf --cached . ; git add -f cash; git commit -qm "cash ${{ matrix.year }}"; git push -f origin cash-${{ matrix.year }}
