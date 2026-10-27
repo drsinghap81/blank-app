@@ -1930,7 +1930,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-24 · OI zone + trapped-writer alerts v22"
+APP_BUILD = "2026-10-27 · Trend scan + RSI-60 EMA21 trigger v23"
 
 
 def render_oi_alerts_tab() -> None:
@@ -1987,6 +1987,115 @@ def render_oi_alerts_tab() -> None:
     st.caption("Not yet backtested as a trading signal — the daily history is being recorded so it can be tested.")
 
 
+TREND_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan", "trend_scan.json")
+
+
+@st.cache_data(ttl=1800, show_spinner=False)
+def load_trend_scan() -> dict:
+    import json as _json
+    try:
+        with open(TREND_PATH, encoding="utf-8") as f:
+            return _json.load(f)
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def trend_chart(sym: str, trig: dict | None = None) -> go.Figure | None:
+    """Daily candles with EMA 9/21 and RSI(14) with the 60 line (the trend-scan view)."""
+    df, live, _ = fetch_ohlcv(f"{sym}.NS", "1y")
+    if not live:
+        return None
+    df = df.copy()
+    df["E9"] = df["Close"].ewm(span=9, adjust=False).mean()
+    df["E21"] = df["Close"].ewm(span=21, adjust=False).mean()
+    df["RSI"] = rsi_wilder(df["Close"], 14)
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.03, row_heights=[0.72, 0.28])
+    fig.add_trace(go.Candlestick(x=df.index, open=df["Open"], high=df["High"], low=df["Low"], close=df["Close"],
+                                 name=sym, increasing_line_color="#22c55e", decreasing_line_color="#ef4444"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df.index, y=df["E9"], name="EMA 9", line=dict(color="#f97316", width=1.6)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df.index, y=df["E21"], name="EMA 21", line=dict(color="#3b82f6", width=1.6)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df.index, y=df["RSI"], name="RSI 14", line=dict(color="#8b5cf6", width=1.4)), row=2, col=1)
+    for lvl, dash in ((60, "solid"), (40, "dot"), (70, "dot")):
+        fig.add_hline(y=lvl, line=dict(color="#a78bfa" if lvl == 60 else "#9ca3af", width=1, dash=dash), row=2, col=1)
+    if trig:
+        td = pd.Timestamp(trig["trigger_date"])
+        fig.add_trace(go.Scatter(x=[td], y=[trig["trigger_close"]], mode="markers", name="Entry trigger",
+                                 marker=dict(symbol="triangle-up", size=14, color="#16a34a")), row=1, col=1)
+        fig.add_hline(y=trig["stop"], line=dict(color="#ef4444", width=1, dash="dash"),
+                      annotation_text=f"stop {trig['stop']:g}", row=1, col=1)
+    fig.update_layout(height=560, margin=dict(l=10, r=10, t=30, b=10), xaxis_rangeslider_visible=False,
+                      legend=dict(orientation="h", y=1.04), title=f"{sym} · daily · EMA 9/21 · RSI 14")
+    fig.update_xaxes(range=[df.index[-130], df.index[-1] + pd.Timedelta(days=3)])
+    sub = df.iloc[-130:]
+    fig.update_yaxes(range=[sub["Low"].min() * 0.97, sub["High"].max() * 1.03], side="right", row=1, col=1)
+    fig.update_yaxes(range=[15, 90], side="right", row=2, col=1)
+    return fig
+
+
+def render_trend_scan_tab() -> None:
+    """NSE stocks in a clean 9/21-EMA uptrend + the RSI-60 / bullish-candle-at-EMA21 entry trigger (nightly scan)."""
+    d = load_trend_scan()
+    if not d:
+        st.info("The trend scan appears after the first nightly run (about 8 pm IST on trading days).")
+        return
+    rows, trig = pd.DataFrame(d.get("rows", [])), pd.DataFrame(d.get("triggers", []))
+    st.markdown(f"#### 📈 Trend scan — NSE close {d.get('asof')}")
+    st.caption("**Clear trend**: close > EMA 9 > EMA 21, EMA 21 rising, ≥ 85% of the last 60 closes above EMA 21, "
+               "smooth 6-month staircase (R² ≥ 0.8), within 12% of the 52-week high, 3-month gain ≥ 15%, "
+               "≥ ₹1 cr traded a day. **Watch**: a looser version that keeps stocks pulling back to EMA 21. "
+               "**Entry trigger**: RSI(14) crosses above 60 on a bullish candle (green, closing in the top 40% of "
+               "its range) within 2% of EMA 21 and closing back above it; stop = lowest low of the last 3 sessions.")
+    trend, watch = rows[rows.list == "trend"] if len(rows) else rows, rows[rows.list == "watch"] if len(rows) else rows
+    fresh = trig[trig.days_ago == 0] if len(trig) else trig
+    c = st.columns(4)
+    c[0].metric("Stocks scanned", f"{d.get('scanned', 0):,}")
+    c[1].metric("Clear trends", len(trend))
+    c[2].metric("Watchlist", len(watch))
+    c[3].metric("Entry triggers today", len(fresh), f"{len(trig)} in the last 5 sessions", delta_color="off")
+
+    st.markdown("##### 🟢 Entry triggers (last 5 sessions)")
+    if len(trig):
+        tcols = {"symbol": "Symbol", "name": "Company", "trigger_date": "Trigger day", "trigger_close": "Trigger close",
+                 "trigger_rsi": "RSI then", "stop": "Stop", "risk_pct": "Risk %", "close": "Close now",
+                 "move_since": "Move since %", "list": "List", "score": "Trend score", "value_cr": "₹ cr/day"}
+        st.dataframe(trig[[k for k in tcols if k in trig]].rename(columns=tcols), hide_index=True, width="stretch")
+    else:
+        st.write("No triggers in the last 5 sessions.")
+
+    left, right = st.columns([1, 1])
+    hide_ext = left.toggle("Hide extended (> 8% above EMA 21 or RSI > 75)", value=False, key="ts_hide_ext")
+    min_val = right.select_slider("Min ₹ cr traded a day", options=[1, 2, 5, 10, 25, 50], value=1, key="ts_minval")
+    cols = {"symbol": "Symbol", "name": "Company", "tag": "Status", "score": "Score", "close": "Close",
+            "dist21": "% vs EMA21", "rsi": "RSI", "r1m": "1M %", "r3m": "3M %", "r6m": "6M %", "r2": "Smoothness R²",
+            "above21_60d": "% days > EMA21", "off_high": "% off 52w high", "value_cr": "₹ cr/day", "board": "Board"}
+
+    def show(df_, title):
+        st.markdown(f"##### {title}")
+        if df_.empty:
+            st.write("None.")
+            return
+        x = df_[df_.value_cr >= min_val]
+        if hide_ext:
+            x = x[x.tag != "extended"]
+        st.dataframe(x[[k for k in cols if k in x]].rename(columns=cols), hide_index=True, width="stretch",
+                     height=min(38 * (len(x) + 1), 460))
+
+    show(trend, "Clear trends")
+    show(watch, "Watchlist (pulling back toward EMA 21)")
+
+    names = list(trig.symbol) + [s for s in rows.symbol if s not in set(trig.symbol)] if len(rows) else []
+    if names:
+        sym = st.selectbox("Chart", names, key="ts_chart")
+        t = trig[trig.symbol == sym].iloc[0].to_dict() if len(trig) and (trig.symbol == sym).any() else None
+        fig = trend_chart(sym, t)
+        if fig is None:
+            st.warning("Could not load prices for this symbol right now.")
+        else:
+            st.plotly_chart(fig, width="stretch")
+    st.caption(f"Scanned {d.get('generated', '')} UTC from Yahoo daily data. The entry trigger is not yet backtested; "
+               "a trigger is a candidate, not a recommendation.")
+
+
 def main() -> None:
     configure_page()
     init_state()
@@ -1999,13 +2108,16 @@ def main() -> None:
 
     render_header(market)
 
-    tab1, tab_scan, tab_oi, tab_bt, tab_tb, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner", "🧲 OI Alerts",
+    tab1, tab_scan, tab_trend, tab_oi, tab_bt, tab_tb, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner",
+                                                                             "📈 Trend scan", "🧲 OI Alerts",
                                                                   "🧪 Backtest", "📈 Top Bottom",
                                                                   "🧾 Order Execution (Paper)", "💼 Portfolio Tracker"])
     with tab1:
         render_analysis_tab(market, ticker)
     with tab_scan:
         render_scanner_tab(market)
+    with tab_trend:
+        render_trend_scan_tab()
     with tab_oi:
         render_oi_alerts_tab()
     with tab_bt:
