@@ -1,10 +1,10 @@
-*TOP BOTTOM LEVELS for 27/10/2026*
+*TOP BOTTOM LEVELS for 28/10/2026*
 
-*BANKNIFTY FUT (27-OCT) - Closing Price 54,378.00*
-Position: FLAT  (2 lots x 30)
-    No Buy trade as awaiting new top
-    Sell below -25 @ 54,217 (Prev Bottom 54,242.20); if triggers keep 1% SL at 54,759
+*BANKNIFTY FUT (27-OCT) - Closing Price 54,114.40*
+Position: SHORT from 54,217.20 (2026-10-27)  (2 lots x 30)
+    HOLD short. Stop: Buy above 54,403 — system point (exit & REVERSE)
+    Move SL to breakeven (54,217) once price reaches 53,133
     Gap > 1% beyond a level at the open: exit only, no new trade (let the market settle)
 
-Paper P&L since 2026-10-19: realised Rs -35,244, open Rs 0, trades 1 (W 0/L 1)
+Paper P&L since 2026-10-19: realised Rs -35,244, open Rs 4,541, trades 2 (W 0/L 1)
 _Paper trading only - not investment advice_
