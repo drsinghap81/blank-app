@@ -159,8 +159,9 @@ def early(o, h, l, c, v):
                rsi_signal=round(float(r.iloc[i]), 1), value_cr=round(float(val.iloc[-1]), 2),
                supertrend=round(float(line[-1]), 2), st_up=bool(sd[-1] == 1), close=round(float(c.iloc[-1]), 2))
     if i == len(c) - 1:
-        rec.update(status="NEW - buy next open", entry=None, days=0, gain_pct=None,
-                   risk_pct=round((c.iloc[i] / stop - 1) * 100, 1))
+        rk = round((c.iloc[i] / stop - 1) * 100, 1)
+        rec.update(status="NEW - buy next open" if rk <= 12 else "NEW but stop > 12% away - skip unless it opens lower",
+                   entry=None, days=0, gain_pct=None, risk_pct=rk)
         return rec
     entry = float(o.iloc[i + 1])
     rec.update(entry=round(entry, 2), risk_pct=round((entry / stop - 1) * 100, 1), days=len(c) - 1 - i)
@@ -266,9 +267,9 @@ def main():
     fresh = tr[tr.days_ago == 0] if len(tr) else tr
     msg = [f"📈 Trend scan — NSE close {asof}: {int(strict.sum())} clear trends, {int((loose & ~strict).sum())} on watch"]
     if len(E):
-        new = E[E.status.str.startswith("NEW")].head(12)
+        new = E[E.status.str.startswith("NEW - buy")].head(12)
         ex = E[E.status.str.startswith("EXIT")]
-        msg.append(f"\n🚀 EARLY TREND ENTRIES today ({len(E[E.status.str.startswith('NEW')])}) — EMA9 x EMA21 up, buy next open, "
+        msg.append(f"\n🚀 EARLY TREND ENTRIES today ({len(new)}) — EMA9 x EMA21 up, buy next open, "
                    "stop = 5-day low, exit when Supertrend(10,3) turns red:")
         msg += [f"{x.symbol} {x.signal_close:g} — stop {x.stop:g} ({x.risk_pct}% risk), ₹{x.value_cr:g} cr/day" for _, x in new.iterrows()] or ["none"]
         if len(ex):
