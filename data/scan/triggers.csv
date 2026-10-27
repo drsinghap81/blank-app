@@ -1,9 +1,5 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
 SHREEJISPG,2026-10-26,811.5,61.4,785.12,762.05,6.5,0,0.0,Shreeji Shipping Global Limited,trend,171.0,0.96,90,89.83,811.5,61.4
-DPABHUSHAN,2026-10-23,2186.0,61.2,2065.2,2038.8,7.2,0,0.0,D. P. Abhushan Limited,watch,145.9,0.8,75,57.1,2186.0,61.2
-OAL,2026-10-26,628.05,67.7,558.72,543.05,15.7,0,0.0,Oriental Aromatics Limited,watch,137.2,0.83,78,15.74,628.05,67.7
 COFORGE,2026-10-26,1993.0,64.1,1889.32,1812.2,10.0,0,0.0,Coforge Limited,watch,134.5,0.84,73,459.8,1993.0,64.1
-SSWL,2026-10-23,468.75,70.9,402.2,378.15,24.0,1,13.5,Steel Strips Wheels Limited,trend,121.3,0.95,87,190.48,532.25,78.6
+DPABHUSHAN,2026-10-23,2186.0,61.2,2065.2,2038.8,7.2,1,0.0,D. P. Abhushan Limited,watch,145.9,0.8,75,57.1,2186.0,61.2
 CUPID,2026-10-21,340.75,61.0,325.64,322.0,5.8,3,-7.8,Cupid Limited,watch,164.5,0.92,85,775.87,314.05,48.7
-RBZJEWEL,2026-10-19,209.28,64.6,189.44,187.75,11.5,3,-13.7,RBZ Jewellers Limited,watch,127.7,0.74,77,2.25,180.64,46.5
-HFCL,2026-10-19,268.81,62.0,246.55,238.0,12.9,4,-9.0,HFCL Limited,watch,127.9,0.73,72,214.17,244.63,49.9
