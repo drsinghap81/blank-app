@@ -4,8 +4,8 @@
  "currency": "A$",
  "value_label": "A$ m",
  "asof": "2026-10-28",
- "generated": "2026-10-28T22:32+00:00",
- "scanned": 1745,
+ "generated": "2026-10-28T22:40+00:00",
+ "scanned": 1744,
  "rows": [
   {
    "symbol": "ANN",
@@ -278,7 +278,7 @@
    "r2": 0.92,
    "above21_60d": 92,
    "off_high": 0.0,
-   "value_cr": 34.48,
+   "value_cr": 34.52,
    "last_date": "2026-10-28",
    "spark": [
     43.91,
@@ -767,7 +767,7 @@
    "symbol": "BVS",
    "name": "BRAVURA SOLUTIONS LIMITED.",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 144.0,
@@ -1355,7 +1355,7 @@
    "symbol": "EVT",
    "name": "EVT LIMITED",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 120.4,
@@ -1536,7 +1536,7 @@
    "score": 156.0,
    "r2": 0.92,
    "above21_60d": 92,
-   "value_cr": 34.48,
+   "value_cr": 34.52,
    "close": 55.75,
    "rsi": 63.3,
    "size": "Large"
@@ -1579,7 +1579,7 @@
    "value_cr": 2.33,
    "close": 3.45,
    "rsi": 68.8,
-   "size": "Small"
+   "size": "Mid"
   },
   {
    "symbol": "CCP",
@@ -1619,7 +1619,7 @@
    "value_cr": 2.33,
    "close": 3.45,
    "rsi": 68.8,
-   "size": "Small"
+   "size": "Mid"
   }
  ],
  "early": [
@@ -1630,7 +1630,7 @@
    "signal_close": 5.26,
    "stop": 4.63,
    "rsi_signal": 67.8,
-   "value_cr": 14.34,
+   "value_cr": 14.35,
    "supertrend": 4.58,
    "st_up": true,
    "close": 5.26,
@@ -2638,7 +2638,7 @@
    "R": 1.65,
    "name": "BRAVURA SOLUTIONS LIMITED.",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": [
     2.7,
     2.67,
@@ -2721,7 +2721,7 @@
    "R": 0.22,
    "name": "BRAVURA SOLUTIONS LIMITED.",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": [
     2.7,
     2.67,
@@ -3085,7 +3085,7 @@
    "signal_close": 19.97,
    "stop": 18.55,
    "rsi_signal": 61.1,
-   "value_cr": 49.09,
+   "value_cr": 49.12,
    "supertrend": 19.22,
    "st_up": true,
    "close": 19.76,
@@ -3239,7 +3239,7 @@
    "signal_close": 22.8,
    "stop": 21.2,
    "rsi_signal": 72.1,
-   "value_cr": 31.03,
+   "value_cr": 31.02,
    "supertrend": 19.31,
    "st_up": false,
    "close": 18.87,
@@ -3305,7 +3305,7 @@
    "signal_close": 6.62,
    "stop": 5.83,
    "rsi_signal": 78.6,
-   "value_cr": 25.48,
+   "value_cr": 25.52,
    "supertrend": 6.12,
    "st_up": false,
    "close": 5.89,
@@ -3393,7 +3393,7 @@
    "signal_close": 4.71,
    "stop": 3.96,
    "rsi_signal": 56.5,
-   "value_cr": 14.34,
+   "value_cr": 14.35,
    "supertrend": 4.58,
    "st_up": true,
    "close": 5.26,
@@ -3498,7 +3498,7 @@
    "signal_close": 29.23,
    "stop": 26.49,
    "rsi_signal": 58.9,
-   "value_cr": 10.99,
+   "value_cr": 10.98,
    "supertrend": 27.08,
    "st_up": true,
    "close": 29.24,
@@ -3889,7 +3889,7 @@
    "signal_close": 1.33,
    "stop": 1.17,
    "rsi_signal": 82.9,
-   "value_cr": 3.78,
+   "value_cr": 3.79,
    "supertrend": 1.29,
    "st_up": false,
    "close": 1.23,
@@ -4033,7 +4033,7 @@
    "R": null,
    "name": "ECHOIQ LIMITED",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -4055,7 +4055,7 @@
    "R": -1.05,
    "name": "DPM METALS INC.",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -4077,7 +4077,7 @@
    "R": 0.7,
    "name": "IPD GROUP LTD",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -4099,7 +4099,7 @@
    "R": null,
    "name": "LYCOPODIUM LIMITED",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -4121,7 +4121,7 @@
    "R": -1.0,
    "name": "ROX RESOURCES LIMITED",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -4143,7 +4143,7 @@
    "R": -1.01,
    "name": "EVT LIMITED",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": [
     14.17,
     14.2,
@@ -4226,7 +4226,7 @@
    "R": -1.0,
    "name": "ANDEAN SILVER LIMITED",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -4248,7 +4248,7 @@
    "R": null,
    "name": "SOLSTICE MINERALS LIMITED",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -4270,7 +4270,7 @@
    "R": null,
    "name": "AIC MINES LIMITED",
    "board": "ASX",
-   "size": "Small",
+   "size": "Mid",
    "spark": null
   },
   {
