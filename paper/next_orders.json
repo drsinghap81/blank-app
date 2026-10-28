@@ -1,24 +1,24 @@
 {
   "BANKNIFTY": {
-    "date": "2026-10-27 00:00:00",
-    "close": 54114.4,
+    "date": "2026-10-28 00:00:00",
+    "close": 54549.0,
     "prev_top": 54378.0,
-    "prev_bottom": 54242.2,
-    "position": "SHORT from 54,217.20 (2026-10-27)",
+    "prev_bottom": 54114.4,
+    "position": "LONG from 54,403.00 (2026-10-28)",
     "orders": [
-      "HOLD short. Stop: Buy above 54,403 \u2014 system point (exit & REVERSE)",
-      "Move SL to breakeven (54,217) once price reaches 53,133",
+      "HOLD long. Stop: Sell below 54,089 \u2014 system point (exit & REVERSE)",
+      "Move SL to breakeven (54,403) once price reaches 55,491",
       "Gap > 1% beyond a level at the open: exit only, no new trade (let the market settle)"
     ],
     "lines": {
-      "Entry": 54217.2,
-      "Stop-loss (reverse)": 54403.0,
-      "Breakeven trigger": 53132.856
+      "Entry": 54403.0,
+      "Stop-loss (reverse)": 54089.4,
+      "Breakeven trigger": 55491.06
     },
-    "open_pnl": 102.8,
+    "open_pnl": 146.0,
     "breakeven_active": "False",
-    "futures_contract_expiry": "2026-10-27",
+    "futures_contract_expiry": "2026-11-23",
     "lot_size": 30,
-    "spot_close": 53974.9
+    "spot_close": 54267.4
   }
 }
