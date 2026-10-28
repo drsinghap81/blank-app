@@ -1941,7 +1941,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-29 · Cleaner layout, proven tools first, downloads, phone app v28"
+APP_BUILD = "2026-10-29 · Trend scan for India, US and Australia v29"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2002,10 +2002,12 @@ TREND_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data",
 
 
 @st.cache_data(ttl=1800, show_spinner=False)
-def load_trend_scan() -> dict:
+def load_trend_scan(mkey: str = "NSE") -> dict:
     import json as _json
     try:
-        with open(TREND_PATH, encoding="utf-8") as f:
+        path = TREND_PATH if mkey == "NSE" else TREND_PATH.replace(_os.path.join("scan", "trend_scan.json"),
+                                                                   _os.path.join("scan", mkey.lower(), "trend_scan.json"))
+        with open(path, encoding="utf-8") as f:
             return _json.load(f)
     except Exception:  # noqa: BLE001
         return {}
@@ -2031,9 +2033,10 @@ def supertrend_line(df: pd.DataFrame, n: int = 10, m: float = 3.0) -> tuple[np.n
     return d, line
 
 
-def trend_chart(sym: str, trig: dict | None = None) -> go.Figure | None:
+def trend_chart(sym: str, trig: dict | None = None, mkey: str = "NSE") -> go.Figure | None:
     """Daily candles with EMA 9/21 and RSI(14) with the 60 line (the trend-scan view)."""
-    df, live, _ = fetch_ohlcv(f"{sym}.NS", "1y")
+    ticker = {"NSE": f"{sym}.NS", "ASX": f"{sym}.AX", "US": sym.replace(".", "-")}.get(mkey, sym)
+    df, live, _ = fetch_ohlcv(ticker, "1y")
     if not live:
         return None
     df = df.copy()
@@ -2074,20 +2077,23 @@ def trend_chart(sym: str, trig: dict | None = None) -> go.Figure | None:
     return fig
 
 
-def render_trend_scan_tab() -> None:
+def render_trend_scan_tab(market: MarketConfig | None = None) -> None:
     """NSE trend scanner (nightly): trend entries (EMA 9/21 cross, 52w-high base breakouts), pullback triggers, clear
     trends and watchlist. Click a stock in the list on the left and its chart opens on the right."""
-    d = load_trend_scan()
+    mkey = market.key if market is not None else "NSE"
+    d = load_trend_scan(mkey)
     if not d:
-        st.info("The trend scan appears after the first nightly run (about 8 pm IST on trading days).")
+        st.info(f"No trend scan for {market.label if market else 'this market'} yet — it runs every evening after the "
+                "market closes. Switch the market in the sidebar to see another one.")
         return
+    unit = d.get("value_label", "₹ cr")
     rows, trig = pd.DataFrame(d.get("rows", [])), pd.DataFrame(d.get("triggers", []))
     early = pd.DataFrame(d.get("early", []))
     trend = rows[rows.list == "trend"] if len(rows) else rows
     watch = rows[rows.list == "watch"] if len(rows) else rows
     live = early[early.status.str.startswith(("NEW", "open", "EXIT"))] if len(early) else early
     new = early[early.status.str.startswith("NEW - buy")] if len(early) else early
-    st.markdown(f"#### 📈 Trend scan — NSE close {d.get('asof')}")
+    st.markdown(f"#### 📈 Trend scan — {d.get('market_label', 'India (NSE)')} close {d.get('asof')}")
     c = st.columns(5)
     c[0].metric("Stocks scanned", f"{d.get('scanned', 0):,}")
     c[1].metric("New entries today", len(new))
@@ -2120,7 +2126,7 @@ def render_trend_scan_tab() -> None:
                              help="By rank of daily traded value: Large = top 100, Mid = 101–250, Small = 251–500, "
                                   "Micro = the rest. Backtests: small caps were the best single group.")
     kind = views[cat]
-    min_val = v2.select_slider("Min ₹ cr/day", options=[1, 2, 5, 10, 25, 50], value=1, key="ts_minval")
+    min_val = v2.select_slider(f"Min {unit}/day", options=[0, 1, 2, 5, 10, 25, 50], value=0, key="ts_minval")
     if kind == "early":
         opt = v3.selectbox("Show", ["New, open & exits", "Cross only", "Breakouts only", "All incl. closed"],
                            key="ts_early_show")
@@ -2182,7 +2188,7 @@ def render_trend_scan_tab() -> None:
         if pick is not None:
             sym = pick["symbol"]
             info = pick.to_dict() if kind in ("early", "trig") else None
-            fig = trend_chart(sym, info)
+            fig = trend_chart(sym, info, mkey)
             if fig is None:
                 st.warning(f"Could not load prices for {sym} right now — try again in a minute.")
             else:
@@ -2196,7 +2202,7 @@ def render_trend_scan_tab() -> None:
                 if kind == "early":
                     st.caption(f"{pick['setup']} · {pick['status']} · signal {pick['signal_date']} at {pick['signal_close']:,.2f}"
                                f" · initial stop {pick['stop']:,.2f} ({pick['risk_pct']}% risk) · Supertrend trail "
-                               f"{pick['supertrend']:,.2f} · ₹{pick['value_cr']:,.1f} cr/day")
+                               f"{pick['supertrend']:,.2f} · {pick['value_cr']:,.1f} {unit}/day")
     st.caption(f"Scanned {d.get('generated', '')} UTC from Yahoo daily data (updates every trading evening ~8 pm IST). "
                "Signals are candidates, not recommendations.")
 
@@ -2220,7 +2226,7 @@ def main() -> None:
     with tab_scan:
         render_scanner_tab(market)
     with tab_trend:
-        render_trend_scan_tab()
+        render_trend_scan_tab(market)
     with tab_oi:
         render_oi_alerts_tab()
     with tab_bt:
