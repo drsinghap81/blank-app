@@ -1,0 +1,24 @@
+name: trend-bt-global
+on:
+  push:
+    paths: [".github/workflows/trend-bt-global.yml", "tools/trend_bt_global.py", "tools/global_universe.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        market: [NSE, US, ASX]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas numpy requests lxml
+      - run: mkdir -p data/bt && (python tools/trend_bt_global.py ${{ matrix.market }} > data/bt/${{ matrix.market }}_log.txt 2>&1 || true); grep -v -i "warn\|delisted\|failed download\|^\[" data/bt/${{ matrix.market }}_log.txt | tail -30
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan bt-${{ matrix.market }}; git rm -rqf --cached .; git add -f data/bt; git commit -qm "bt ${{ matrix.market }}"; git push -f origin bt-${{ matrix.market }}
