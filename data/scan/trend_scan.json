@@ -1,7 +1,11 @@
 {
+ "market": "NSE",
+ "market_label": "India (NSE)",
+ "currency": "\u20b9",
+ "value_label": "\u20b9 cr",
  "asof": "2026-10-28",
- "generated": "2026-10-28T21:59+00:00",
- "scanned": 2580,
+ "generated": "2026-10-28T22:34+00:00",
+ "scanned": 2581,
  "rows": [
   {
    "symbol": "SHREEJISPG",
