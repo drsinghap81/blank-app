@@ -1930,7 +1930,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-28 · Trend entries + 52w base breakouts v25"
+APP_BUILD = "2026-10-28 · Trend entries fine-tuned v26"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2089,8 +2089,9 @@ def render_trend_scan_tab() -> None:
     st.caption("**Entry**: EMA 9 crosses above EMA 21 with Supertrend(10,3) green, close above a rising EMA 50, RSI ≥ 55, "
                "≥ ₹1 cr/day, within 30% of the 52-week high → buy the next open. **Stop**: lowest low of the last 5 sessions "
                "(skip if > 12% away). **Ride**: hold until Supertrend turns red, sell the next open. Backtest 2017–26 on all "
-               "NSE stocks incl. delisted, 1% risk per trade, 10–15 positions: about 22–25% a year, worst fall −26 to −27%, "
-               "37% of trades win; 2022–26 alone about 14% a year. Tighter exits (2 red closes under EMA 9 or a close under "
+               "NSE stocks incl. delisted, 1% risk per trade, **max 10 positions, ≤ 20% of capital each**: about 22–26% a "
+               "year, worst fall about −26%, 37% of trades win; 2022–26 alone about 14% a year. Fine-tuning (wider Supertrend, "
+               "tighter stops, partial profits, time stops, volume or market filters, more positions) did not beat these rules. Tighter exits (2 red closes under EMA 9 or a close under "
                "EMA 21) tested much worse.")
     if len(early):
         show_all = st.toggle("Also show stopped / exited / skipped signals", value=False, key="ts_early_all")
