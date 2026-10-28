@@ -159,6 +159,11 @@ def configure_page() -> None:
     st.markdown(
         """
         <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+        html, body, .stApp, [class*="css"], .stMarkdown, button, input, select, textarea {
+            font-family: Manrope, system-ui, -apple-system, "Segoe UI", sans-serif !important; }
+        .stApp { font-variant-numeric: tabular-nums; }
+        .block-container { padding-top: 2.8rem; max-width: 1500px; }
         /* ---- base dark surfaces ---- */
         .stApp { background-color: #0b0e14; color: #d7dce5; }
         section[data-testid="stSidebar"] { background-color: #11151d; border-right: 1px solid #1f2633; }
@@ -166,21 +171,24 @@ def configure_page() -> None:
         /* ---- metric cards ---- */
         .card { background:#121722; border:1px solid #1f2633; border-radius:10px;
                 padding:14px 16px; height:100%; }
-        .card .lbl { font-size:12px; color:#8a94a6; text-transform:uppercase; letter-spacing:.06em; }
+        .card .lbl { font-size:12.5px; color:#8a94a6; }
         .card .val { font-size:22px; font-weight:600; color:#f1f4f9; margin-top:4px;
                      font-variant-numeric: tabular-nums; }
         .card .sub { font-size:12px; margin-top:2px; }
         .up { color:#22c55e; } .down { color:#ef4444; } .flat { color:#8a94a6; }
         /* ---- mode badge ---- */
-        .mode-badge { display:inline-block; background:#3b2a05; color:#fbbf24;
-                      border:1px solid #f59e0b; border-radius:6px; padding:6px 12px;
-                      font-weight:700; font-size:13px; letter-spacing:.05em; }
+        .mode-badge { display:inline-block; background:#1b2230; color:#cbd5e1;
+                      border:1px solid #2b3445; border-radius:999px; padding:5px 12px;
+                      font-weight:600; font-size:12.5px; }
+        .app-link { display:inline-block; margin-left:8px; background:#E8A33D; color:#14213D !important;
+                    border-radius:999px; padding:5px 12px; font-weight:700; font-size:12.5px; text-decoration:none; }
         .data-badge-live { color:#22c55e; font-weight:600; }
         .data-badge-synth { color:#f59e0b; font-weight:600; }
         /* ---- tabs ---- */
         .stTabs [data-baseweb="tab-list"] { gap: 4px; }
-        .stTabs [data-baseweb="tab"] { background:#121722; border-radius:6px 6px 0 0;
-                                        padding:8px 16px; color:#a6b0c3; }
+        .stTabs [data-baseweb="tab"] { background:#121722; border-radius:999px;
+                                        padding:7px 15px; color:#a6b0c3; font-weight:600; }
+        .stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"] { display:none; }
         .stTabs [aria-selected="true"] { background:#1b2230 !important; color:#ffffff !important; }
         /* ---- tables ---- */
         div[data-testid="stDataFrame"] { border:1px solid #1f2633; border-radius:8px; }
@@ -1008,10 +1016,11 @@ def render_header(market: MarketConfig) -> None:
     left, right = st.columns([3, 2])
     with left:
         st.markdown("### 📈 Global Trading Terminal")
-        st.caption(f"{market.label} · prices in {market.currency} · data via Yahoo Finance (delayed)")
+        st.caption(f"{market.label}, prices in {market.currency}, delayed data from Yahoo Finance")
     with right:
         st.markdown('<div style="text-align:right;margin-top:10px;">'
-                    '<span class="mode-badge">MODE: INTERACTIVE DATA TERMINAL / SIMULATION</span></div>',
+                    '<span class="mode-badge">Paper trading only — no real orders</span>'
+                    f'<a class="app-link" href="{PHONE_APP_URL}" target="_blank">Open the phone app</a></div>',
                     unsafe_allow_html=True)
 
     book = book_for(market)
@@ -1042,6 +1051,8 @@ def render_header(market: MarketConfig) -> None:
                 unsafe_allow_html=True)
     st.write("")
 
+
+PHONE_APP_URL = "https://drsinghap81.github.io/blank-app/"
 
 # Plotly toolbar / gestures: scroll-wheel zoom; drag an END of the price axis to stretch it,
 # drag its middle to pan; double-click resets.
@@ -1930,7 +1941,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-28 · Trend scan: click a stock to open its chart v27"
+APP_BUILD = "2026-10-29 · Cleaner layout, proven tools first, downloads, phone app v28"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2103,8 +2114,11 @@ def render_trend_scan_tab() -> None:
 
     views = {"🚀 Trend entries (new / open / exit)": "early", "🟢 Pullback triggers": "trig",
              "📈 Clear trends": "trend", "👀 Watchlist": "watch"}
-    v1, v2, v3 = st.columns([3, 1.3, 1.3])
+    v1, v2, v3, v4 = st.columns([3, 1.1, 1.1, 1.3])
     cat = v1.radio("List", list(views), horizontal=True, key="ts_cat", label_visibility="collapsed")
+    size_pick = v4.selectbox("Company size", ["All sizes", "Large", "Mid", "Small", "Micro"], key="ts_size",
+                             help="By rank of daily traded value: Large = top 100, Mid = 101–250, Small = 251–500, "
+                                  "Micro = the rest. Backtests: small caps were the best single group.")
     kind = views[cat]
     min_val = v2.select_slider("Min ₹ cr/day", options=[1, 2, 5, 10, 25, 50], value=1, key="ts_minval")
     if kind == "early":
@@ -2125,6 +2139,8 @@ def render_trend_scan_tab() -> None:
             x = x[x.tag != "extended"]
     if len(x) and "value_cr" in x:
         x = x[x.value_cr >= min_val]
+    if len(x) and size_pick != "All sizes" and "size" in x:
+        x = x[x["size"] == size_pick]
     x = x.reset_index(drop=True)
 
     def label(r) -> str:
@@ -2134,7 +2150,7 @@ def render_trend_scan_tab() -> None:
             icon = "🚀" if str(r.get("setup", "")).startswith("EMA") else "🏔️"
             g = "" if pd.isna(r.get("gain_pct")) else f" · {r['gain_pct']:+.1f}%"
             return (f"{icon} {r['symbol']} · {st_}{g} · stop {r['stop']:,.1f} · trail {r['supertrend']:,.1f} · "
-                    f"signal {pd.Timestamp(r['signal_date']).strftime('%d %b')}")
+                    f"signal {pd.Timestamp(r['signal_date']).strftime('%d %b')}" + (f" · {r['size']}" if isinstance(r.get('size'), str) else ""))
         if kind == "trig":
             return (f"{r['symbol']} · {pd.Timestamp(r['trigger_date']).strftime('%d %b')} · close {r['trigger_close']:,.1f} · "
                     f"stop {r['stop']:,.1f} ({r['risk_pct']}%) · now {r['close']:,.1f}")
@@ -2156,8 +2172,12 @@ def render_trend_scan_tab() -> None:
                 idx = st.radio("Stocks", list(range(len(labels))), format_func=lambda i: labels[i], key=pk,
                                label_visibility="collapsed")
             pick = x.iloc[idx]
+            dl = x.drop(columns=[c_ for c_ in ("spark",) if c_ in x])
+            st.download_button(f"Download this list ({len(dl)} rows, CSV)", dl.to_csv(index=False).encode(),
+                               file_name=f"trend_scan_{kind}_{d.get('asof')}.csv", mime="text/csv",
+                               key=f"ts_dl_{kind}", width="stretch")
             with st.expander("Table view"):
-                st.dataframe(x, width="stretch", hide_index=True)
+                st.dataframe(dl, width="stretch", hide_index=True)
     with right:
         if pick is not None:
             sym = pick["symbol"]
@@ -2192,10 +2212,9 @@ def main() -> None:
 
     render_header(market)
 
-    tab1, tab_scan, tab_trend, tab_oi, tab_bt, tab_tb, tab2, tab3 = st.tabs(["📊 Market Analysis", "🎯 Scanner",
-                                                                             "📈 Trend scan", "🧲 OI Alerts",
-                                                                  "🧪 Backtest", "📈 Top Bottom",
-                                                                  "🧾 Order Execution (Paper)", "💼 Portfolio Tracker"])
+    tab_trend, tab_tb, tab_oi, tab_scan, tab1, tab_bt, tab2, tab3 = st.tabs(
+        ["📈 Trend scan", "🔁 Top Bottom", "🧲 OI alerts", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
+         "🧾 Paper orders", "💼 Portfolio"])
     with tab1:
         render_analysis_tab(market, ticker)
     with tab_scan:

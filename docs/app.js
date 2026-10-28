@@ -175,7 +175,8 @@ async function drawChart(r) {
   const LW = window.LightweightCharts;
   const base = { layout: { background: { color: '#fff' }, textColor: C.slate, fontFamily: 'Manrope, system-ui, sans-serif' },
     grid: { vertLines: { color: '#F1F4F8' }, horzLines: { color: '#F1F4F8' } }, rightPriceScale: { borderColor: C.line },
-    timeScale: { borderColor: C.line }, crosshair: { mode: 0 }, handleScroll: true, handleScale: true };
+    timeScale: { borderColor: C.line }, crosshair: { mode: 0 }, handleScroll: true, handleScale: true,
+    localization: { locale: 'en-IN' } };
   const ch = LW.createChart(box, { ...base, height: box.clientHeight, width: box.clientWidth });
   const T = c.t;
   const candles = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });

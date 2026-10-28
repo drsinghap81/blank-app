@@ -327,11 +327,23 @@ def main():
         E["spark"] = E.symbol.map(spark)
     cols = ["symbol", "name", "board", "size", "list", "tag", "score", "close", "ema9", "ema21", "dist21", "rsi", "r1m",
             "r3m", "r6m", "r2", "above21_60d", "off_high", "value_cr", "last_date", "spark"]
-    json.dump(dict(asof=asof, generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
-                   scanned=len(df), rows=p[cols].to_dict("records"),
-                   triggers=tr.to_dict("records") if len(tr) else [],
-                   early=E.to_dict("records") if len(E) else []),
-              open(f"{OUT}/trend_scan.json", "w"), indent=1, default=str)
+    def clean(o):   # strict JSON for the phone app: NaN/inf -> null
+        if isinstance(o, dict):
+            return {k: clean(v) for k, v in o.items()}
+        if isinstance(o, (list, tuple)):
+            return [clean(v) for v in o]
+        if isinstance(o, (float, np.floating)):
+            return None if not np.isfinite(o) else float(o)
+        if isinstance(o, (np.integer,)):
+            return int(o)
+        if isinstance(o, (np.bool_,)):
+            return bool(o)
+        return o
+    json.dump(clean(dict(asof=asof, generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
+                         scanned=len(df), rows=p[cols].to_dict("records"),
+                         triggers=tr.to_dict("records") if len(tr) else [],
+                         early=E.to_dict("records") if len(E) else [])),
+              open(f"{OUT}/trend_scan.json", "w"), indent=1, default=str, allow_nan=False)
     print("trend", int(strict.sum()), "watch", int((loose & ~strict).sum()), "triggers", len(tr))
     print(p.head(40).to_string(index=False))
     if len(tr):
