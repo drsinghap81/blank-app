@@ -1,0 +1,61 @@
+{
+ "market": "ASX",
+ "asof": "2026-10-28",
+ "variants": [
+  {
+   "variant": "base A$0.5m",
+   "signals": 2154,
+   "cagr": -1.9,
+   "cagr_min": -2.9,
+   "cagr_max": -1.7,
+   "maxdd": -34.5,
+   "cagr_22_26": -5.7,
+   "pf": 0.92,
+   "trades": 661.0
+  },
+  {
+   "variant": "A$2m, price>=A$0.50",
+   "signals": 1330,
+   "cagr": 0.4,
+   "cagr_min": 0.3,
+   "cagr_max": 0.9,
+   "maxdd": -31.1,
+   "cagr_22_26": -3.2,
+   "pf": 1.01,
+   "trades": 581.0
+  },
+  {
+   "variant": "A$5m, price>=A$1",
+   "signals": 901,
+   "cagr": 1.0,
+   "cagr_min": 0.4,
+   "cagr_max": 1.1,
+   "maxdd": -25.1,
+   "cagr_22_26": -0.6,
+   "pf": 1.05,
+   "trades": 441.0
+  },
+  {
+   "variant": "A$10m, price>=A$1",
+   "signals": 650,
+   "cagr": 3.0,
+   "cagr_min": 1.5,
+   "cagr_max": 3.6,
+   "maxdd": -29.9,
+   "cagr_22_26": -0.5,
+   "pf": 1.15,
+   "trades": 369.0
+  },
+  {
+   "variant": "A$20m, price>=A$2",
+   "signals": 396,
+   "cagr": -0.1,
+   "cagr_min": -0.1,
+   "cagr_max": 0.6,
+   "maxdd": -23.0,
+   "cagr_22_26": 0.5,
+   "pf": 0.99,
+   "trades": 268.0
+  }
+ ]
+}
