@@ -1941,7 +1941,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-29 · Trend scan for India, US and Australia v29"
+APP_BUILD = "2026-10-29 · US/ASX marked watch only v30"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2094,10 +2094,19 @@ def render_trend_scan_tab(market: MarketConfig | None = None) -> None:
     live = early[early.status.str.startswith(("NEW", "open", "EXIT"))] if len(early) else early
     new = early[early.status.str.startswith("NEW - buy")] if len(early) else early
     st.markdown(f"#### 📈 Trend scan — {d.get('market_label', 'India (NSE)')} close {d.get('asof')}")
+    _mk = d.get("market", "NSE")
+    if _mk == "US":
+        st.warning("**Watch only.** Tested 2017–2026 on US stocks, this system made about 4% a year against 15% for the "
+                   "S&P 500, and no liquidity or price filter fixed it. Use this list for ideas, not as a trading system.")
+    elif _mk == "ASX":
+        st.warning("**Watch only.** Tested 2017–2026 on Australian stocks, this system lost about 1% a year against 4.5% "
+                   "for the ASX 200, and no liquidity or price filter fixed it. Use this list for ideas, not as a trading system.")
+    st.caption("“Signals still running” are not your trades: each signal is followed as if bought at the next open until "
+               "its stop or a red Supertrend, so you can see whether a signal you missed is still alive.")
     c = st.columns(5)
     c[0].metric("Stocks scanned", f"{d.get('scanned', 0):,}")
     c[1].metric("New entries today", len(new))
-    c[2].metric("Open trend trades", int((live.status == "open").sum()) if len(live) else 0,
+    c[2].metric("Signals still running", int((live.status == "open").sum()) if len(live) else 0,
                 f"{int(live.status.str.startswith('EXIT').sum()) if len(live) else 0} to exit next open", delta_color="off")
     c[3].metric("Clear trends", len(trend))
     c[4].metric("Watchlist", len(watch))

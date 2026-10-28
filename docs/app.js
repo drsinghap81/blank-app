@@ -97,9 +97,16 @@ function renderTrends() {
   const exits = L.open.filter((e) => e.status.startsWith('EXIT')).length;
   $('#summary').innerHTML = `
     <div class="stat new"><b>${buys}</b><span>to buy at next open</span></div>
-    <div class="stat"><b>${L.open.length - exits}</b><span>open trend trades</span></div>
+    <div class="stat"><b>${L.open.length - exits}</b><span>signals still running</span></div>
     <div class="stat exit"><b>${exits}</b><span>to sell at next open</span></div>
     <div class="stat"><b>${L.trend.length}</b><span>clear trends</span></div>`;
+  const note = $('#mktnote');
+  const warn = { US: '<b>Watch only.</b> Tested 2017–2026 on US stocks this system made about 4% a year against 15% for the S&P 500, and no liquidity or price filter fixed it. Use the US list for ideas, not as a trading system.',
+    ASX: '<b>Watch only.</b> Tested 2017–2026 on Australian stocks this system lost about 1% a year against 4.5% for the ASX 200, and no liquidity or price filter fixed it. Use the list for ideas, not as a trading system.' }[state.mkt];
+  const track = 'Tracked signals are not your trades: each signal is followed as if bought at the next open, until its stop or a red Supertrend. Use it to see whether a signal you missed is still running.';
+  note.innerHTML = warn ? warn : (state.tab === 'open' ? track : '');
+  note.className = warn ? 'note warn' : 'note';
+  note.hidden = !note.innerHTML;
   document.querySelectorAll('.tabs button').forEach((b) => {
     b.setAttribute('aria-selected', b.dataset.tab === state.tab);
     b.innerHTML = `${b.textContent.replace(/\s*\d+$/, '').trim()}<span class="count">${L[b.dataset.tab].length}</span>`;
@@ -147,7 +154,7 @@ function rowHTML(r, i) {
 function renderList() {
   const L = filtered();
   const empty = { new: 'No new entry signals at the last close. New ones appear after the next evening scan.',
-    open: 'No open trend trades match these filters.', trend: 'No clear trends match these filters.', watch: 'Nothing on the watchlist matches these filters.' }[state.tab];
+    open: 'No tracked signals match these filters.', trend: 'No clear trends match these filters.', watch: 'Nothing on the watchlist matches these filters.' }[state.tab];
   $('#list').innerHTML = L.length ? L.map(rowHTML).join('') : `<li class="empty">${empty}</li>`;
   $('#list').querySelectorAll('.row').forEach((el) => {
     const open = () => select(L[+el.dataset.i]);
@@ -400,6 +407,7 @@ async function loadResults() {
         ${row('United States', R.US, 'surviving stocks only, ≥ $2 m traded a day')}
         ${row('Australia', R.ASX, 'surviving stocks only, ≥ A$0.5 m traded a day')}
       </tbody></table></div>
+    <p class="verdict"><b>Verdict:</b> trade it in India only. The US made about 4% a year (S&amp;P 500: 15%) and Australia about −1% (ASX 200: 4.5%), even with the flattering data. Tightening liquidity and price filters (US up to $100 m a day and $10 a share; ASX up to A$20 m and A$2) never lifted either above 7.2% a year. The US and Australian scans stay in the app as watch lists.</p>
     <p class="muted small">Median of 5 runs with a random choice of which signals fill the 10 positions; the small figures under each return show the range. Yahoo only has stocks that still trade, which flatters US and Australian results; compare the two India rows to see by how much.</p>
   </div>`;
 }

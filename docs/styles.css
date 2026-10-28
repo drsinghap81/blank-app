@@ -227,3 +227,7 @@ html, body { overflow-x: hidden; }
 .chart, .rsi { overflow: hidden; }
 .view[hidden] { display: none !important; }
 .more { display: block; width: 100%; margin-top: 8px; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 9px; font-weight: 700; cursor: pointer; }
+
+.note{margin:0 16px 10px;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid #E1E6EF;color:var(--slate,#5B6B82);font-size:13px;line-height:1.45}
+.note.warn{background:#FFF6E8;border-color:#F2D3A0;color:#7A4E0B}
+.verdict{margin:12px 0 4px;padding:10px 12px;border-radius:12px;background:#FFF6E8;border:1px solid #F2D3A0;color:#7A4E0B;font-size:13px;line-height:1.45}
