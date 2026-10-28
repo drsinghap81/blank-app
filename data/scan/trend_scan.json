@@ -1,7 +1,7 @@
 {
  "asof": "2026-10-28",
- "generated": "2026-10-28T21:48+00:00",
- "scanned": 2581,
+ "generated": "2026-10-28T21:59+00:00",
+ "scanned": 2580,
  "rows": [
   {
    "symbol": "SHREEJISPG",
@@ -4150,12 +4150,12 @@
    "supertrend": 1399.17,
    "st_up": true,
    "close": 1674.0,
-   "entry": NaN,
+   "entry": null,
    "risk_pct": 24.4,
    "days": 0,
    "status": "NEW but stop > 12% away - skip unless it opens lower",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Ather Energy Limited",
    "board": "main",
    "size": "Large",
@@ -4233,12 +4233,12 @@
    "supertrend": 345.19,
    "st_up": true,
    "close": 434.2,
-   "entry": NaN,
+   "entry": null,
    "risk_pct": 13.6,
    "days": 0,
    "status": "NEW - buy next open",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Mahindra Logistics Limited",
    "board": "main",
    "size": "Small",
@@ -4316,12 +4316,12 @@
    "supertrend": 528.4,
    "st_up": true,
    "close": 600.7,
-   "entry": NaN,
+   "entry": null,
    "risk_pct": 17.3,
    "days": 0,
    "status": "NEW but stop > 12% away - skip unless it opens lower",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "WESTLIFE FOODWORLD LIMITED",
    "board": "main",
    "size": "Small",
@@ -4399,12 +4399,12 @@
    "supertrend": 248.34,
    "st_up": true,
    "close": 287.2,
-   "entry": NaN,
+   "entry": null,
    "risk_pct": 15.3,
    "days": 0,
    "status": "NEW but stop > 12% away - skip unless it opens lower",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Emkay Global Financial Services Limited",
    "board": "main",
    "size": "Micro",
@@ -6732,7 +6732,7 @@
    "name": "ICICI Bank Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SBIN",
@@ -6754,7 +6754,7 @@
    "name": "State Bank of India",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BAJFINANCE",
@@ -6776,7 +6776,7 @@
    "name": "Bajaj Finance Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CUPID",
@@ -6793,8 +6793,8 @@
    "risk_pct": 19.9,
    "days": 17,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Cupid Limited",
    "board": "main",
    "size": "Large",
@@ -6959,12 +6959,12 @@
    "risk_pct": 12.1,
    "days": 14,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Bharat Heavy Electricals Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CHENNPETRO",
@@ -6981,8 +6981,8 @@
    "risk_pct": 21.1,
    "days": 13,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Chennai Petroleum Corporation Limited",
    "board": "main",
    "size": "Large",
@@ -7069,7 +7069,7 @@
    "name": "Billionbrains Garage Ventures Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "COFORGE",
@@ -7169,12 +7169,12 @@
    "risk_pct": 13.5,
    "days": 1,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Mangalore Refinery and Petrochemicals Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AZAD",
@@ -7196,7 +7196,7 @@
    "name": "Azad Engineering Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "HBLENGINE",
@@ -7213,12 +7213,12 @@
    "risk_pct": 18.0,
    "days": 6,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "HBL Engineering Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SUNPHARMA",
@@ -7240,7 +7240,7 @@
    "name": "Sun Pharmaceutical Industries Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SONACOMS",
@@ -7262,7 +7262,7 @@
    "name": "Sona BLW Precision Forgings Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "LICI",
@@ -7284,7 +7284,7 @@
    "name": "Life Insurance Corporation Of India",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MOBIKWIK",
@@ -7301,12 +7301,12 @@
    "risk_pct": 36.1,
    "days": 14,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "One Mobikwik Systems Limited",
    "board": "main",
    "size": "Large",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TMCV",
@@ -7328,7 +7328,7 @@
    "name": "Tata Motors Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "APARINDS",
@@ -7345,12 +7345,12 @@
    "risk_pct": 17.7,
    "days": 57,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Apar Industries Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "HFCL",
@@ -7367,8 +7367,8 @@
    "risk_pct": 32.1,
    "days": 15,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "HFCL Limited",
    "board": "main",
    "size": "Mid",
@@ -7455,7 +7455,7 @@
    "name": "Aequs Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SHRINGARMS",
@@ -7477,7 +7477,7 @@
    "name": "Shringar House of Mangalsutra Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ZYDUSLIFE",
@@ -7499,7 +7499,7 @@
    "name": "Zydus Lifesciences Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IDBI",
@@ -7521,7 +7521,7 @@
    "name": "IDBI Bank Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "NYKAA",
@@ -7543,7 +7543,7 @@
    "name": "FSN E-Commerce Ventures Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BPCL",
@@ -7565,7 +7565,7 @@
    "name": "Bharat Petroleum Corporation Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TORNTPHARM",
@@ -7587,7 +7587,7 @@
    "name": "Torrent Pharmaceuticals Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RAYMOND",
@@ -7609,7 +7609,7 @@
    "name": "Raymond Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AEGISLOG",
@@ -7631,7 +7631,7 @@
    "name": "Aegis Logistics Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IDFCFIRSTB",
@@ -7653,7 +7653,7 @@
    "name": "IDFC First Bank Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "OMNI",
@@ -7670,12 +7670,12 @@
    "risk_pct": 19.4,
    "days": 16,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Omnitech Engineering Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GAIL",
@@ -7697,7 +7697,7 @@
    "name": "GAIL (India) Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "APLAPOLLO",
@@ -7719,7 +7719,7 @@
    "name": "APL Apollo Tubes Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GRASIM",
@@ -7741,7 +7741,7 @@
    "name": "Grasim Industries Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CGCL",
@@ -7758,12 +7758,12 @@
    "risk_pct": 17.5,
    "days": 41,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Capri Global Capital Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SHADOWFAX",
@@ -7780,8 +7780,8 @@
    "risk_pct": 24.8,
    "days": 59,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Shadowfax Technologies Limited",
    "board": "main",
    "size": "Mid",
@@ -7868,7 +7868,7 @@
    "name": "IIFL Finance Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JUSTDIAL",
@@ -7890,7 +7890,7 @@
    "name": "Just Dial Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RITES",
@@ -7912,7 +7912,7 @@
    "name": "RITES Limited",
    "board": "main",
    "size": "Mid",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PNGSREVA",
@@ -7934,7 +7934,7 @@
    "name": "PNGS Reva Diamond Jewellery Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RRKABEL",
@@ -7951,12 +7951,12 @@
    "risk_pct": 14.1,
    "days": 14,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "R R Kabel Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "URBANCO",
@@ -7973,12 +7973,12 @@
    "risk_pct": 15.4,
    "days": 58,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Urban Company Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CARTRADE",
@@ -7995,12 +7995,12 @@
    "risk_pct": 12.8,
    "days": 10,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Cartrade Tech Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PNBHOUSING",
@@ -8022,7 +8022,7 @@
    "name": "PNB Housing Finance Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MOTILALOFS",
@@ -8044,7 +8044,7 @@
    "name": "Motilal Oswal Financial Services Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "WELSPUNLIV",
@@ -8066,7 +8066,7 @@
    "name": "Welspun Living Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SAGILITY",
@@ -8088,7 +8088,7 @@
    "name": "SAGILITY LIMITED",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PAISALO",
@@ -8105,12 +8105,12 @@
    "risk_pct": 14.2,
    "days": 34,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Paisalo Digital Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ANANTRAJ",
@@ -8132,7 +8132,7 @@
    "name": "Anant Raj Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JSWINFRA",
@@ -8154,7 +8154,7 @@
    "name": "JSW Infrastructure Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "M&MFIN",
@@ -8176,7 +8176,7 @@
    "name": "Mahindra & Mahindra Financial Services Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BALRAMCHIN",
@@ -8198,7 +8198,7 @@
    "name": "Balrampur Chini Mills Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KAJARIACER",
@@ -8220,7 +8220,7 @@
    "name": "Kajaria Ceramics Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PIRAMALFIN",
@@ -8242,7 +8242,7 @@
    "name": "Piramal Finance Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GOODLUCK",
@@ -8259,12 +8259,12 @@
    "risk_pct": 24.3,
    "days": 10,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Goodluck India Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PETRONET",
@@ -8286,7 +8286,7 @@
    "name": "Petronet LNG Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "NHPC",
@@ -8308,7 +8308,7 @@
    "name": "NHPC Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ANTELOPUS",
@@ -8325,12 +8325,12 @@
    "risk_pct": 18.4,
    "days": 1,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Antelopus Selan Energy Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RAYMONDREL",
@@ -8352,7 +8352,7 @@
    "name": "Raymond Realty Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KRN",
@@ -8374,7 +8374,7 @@
    "name": "KRN Heat Exchanger and Refrigeration Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KTKBANK",
@@ -8396,7 +8396,7 @@
    "name": "The Karnataka Bank Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "EMUDHRA",
@@ -8413,12 +8413,12 @@
    "risk_pct": 27.8,
    "days": 28,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "eMudhra Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DPABHUSHAN",
@@ -8435,8 +8435,8 @@
    "risk_pct": 13.3,
    "days": 23,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "D. P. Abhushan Limited",
    "board": "main",
    "size": "Small",
@@ -8523,7 +8523,7 @@
    "name": "Oberoi Realty Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "LANDMARK",
@@ -8545,7 +8545,7 @@
    "name": "Landmark Cars Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JINDALSAW",
@@ -8567,7 +8567,7 @@
    "name": "Jindal Saw Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CUB",
@@ -8589,7 +8589,7 @@
    "name": "City Union Bank Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IOLCP",
@@ -8606,12 +8606,12 @@
    "risk_pct": 13.5,
    "days": 56,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "IOL Chemicals and Pharmaceuticals Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AARTIPHARM",
@@ -8628,12 +8628,12 @@
    "risk_pct": 25.2,
    "days": 53,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Aarti Pharmalabs Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MOTISONS",
@@ -8655,7 +8655,7 @@
    "name": "Motisons Jewellers Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IPCALAB",
@@ -8677,7 +8677,7 @@
    "name": "IPCA Laboratories Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SHOPERSTOP",
@@ -8694,12 +8694,12 @@
    "risk_pct": 13.2,
    "days": 20,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Shoppers Stop Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "63MOONS",
@@ -8716,12 +8716,12 @@
    "risk_pct": 19.7,
    "days": 8,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "63 moons technologies limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "FLUOROCHEM",
@@ -8743,7 +8743,7 @@
    "name": "Gujarat Fluorochemicals Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ACMESOLAR",
@@ -8765,7 +8765,7 @@
    "name": "Acme Solar Holdings Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "INOXINDIA",
@@ -8782,12 +8782,12 @@
    "risk_pct": 15.7,
    "days": 40,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "INOX India Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BHARTIHEXA",
@@ -8809,7 +8809,7 @@
    "name": "Bharti Hexacom Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ALKYLAMINE",
@@ -8831,7 +8831,7 @@
    "name": "Alkyl Amines Chemicals Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CENTUM",
@@ -8853,7 +8853,7 @@
    "name": "Centum Electronics Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TI",
@@ -8875,7 +8875,7 @@
    "name": "Tilaknagar Industries Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TBOTEK",
@@ -8897,7 +8897,7 @@
    "name": "TBO Tek Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "YATHARTH",
@@ -8919,7 +8919,7 @@
    "name": "Yatharth Hospital & Trauma Care Services Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JAMNAAUTO",
@@ -8941,7 +8941,7 @@
    "name": "Jamna Auto Industries Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JAMNAAUTO",
@@ -8963,7 +8963,7 @@
    "name": "Jamna Auto Industries Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MAHLOG",
@@ -9068,7 +9068,7 @@
    "name": "Paramount Communications Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MIDHANI",
@@ -9085,12 +9085,12 @@
    "risk_pct": 15.0,
    "days": 32,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Mishra Dhatu Nigam Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ROLEXRINGS",
@@ -9112,7 +9112,7 @@
    "name": "Rolex Rings Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PRICOLLTD",
@@ -9134,7 +9134,7 @@
    "name": "Pricol Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PIXTRANS",
@@ -9151,12 +9151,12 @@
    "risk_pct": 23.6,
    "days": 53,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Pix Transmissions Limited",
    "board": "main",
    "size": "Small",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "APOLLOTYRE",
@@ -9178,7 +9178,7 @@
    "name": "Apollo Tyres Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ADVANCE",
@@ -9195,12 +9195,12 @@
    "risk_pct": 12.7,
    "days": 10,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Advance Agrolife Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "EPL",
@@ -9222,7 +9222,7 @@
    "name": "EPL Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "FIVESTAR",
@@ -9244,7 +9244,7 @@
    "name": "Five-Star Business Finance Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DCBBANK",
@@ -9261,12 +9261,12 @@
    "risk_pct": 14.2,
    "days": 44,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "DCB Bank Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DCBBANK",
@@ -9288,7 +9288,7 @@
    "name": "DCB Bank Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JINDRILL",
@@ -9310,7 +9310,7 @@
    "name": "Jindal Drilling And Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TATVA",
@@ -9327,12 +9327,12 @@
    "risk_pct": 12.6,
    "days": 26,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Tatva Chintan Pharma Chem Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JGCHEM",
@@ -9349,8 +9349,8 @@
    "risk_pct": 13.6,
    "days": 25,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "J.G.Chemicals Limited",
    "board": "main",
    "size": "Micro",
@@ -9437,7 +9437,7 @@
    "name": "Diamond Power Infrastructure Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MEDANTA",
@@ -9459,7 +9459,7 @@
    "name": "Global Health Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ROSSTECH",
@@ -9476,12 +9476,12 @@
    "risk_pct": 19.6,
    "days": 57,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Rossell Techsys Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CAPLIPOINT",
@@ -9503,7 +9503,7 @@
    "name": "Caplin Point Laboratories Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PARADEEP",
@@ -9525,7 +9525,7 @@
    "name": "Paradeep Phosphates Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GNA",
@@ -9542,12 +9542,12 @@
    "risk_pct": 12.9,
    "days": 25,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "GNA Axles Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "USHAMART",
@@ -9564,12 +9564,12 @@
    "risk_pct": 16.6,
    "days": 24,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Usha Martin Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ABREL",
@@ -9591,7 +9591,7 @@
    "name": "Aditya Birla Real Estate Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "INDOBORAX",
@@ -9613,7 +9613,7 @@
    "name": "Indo Borax & Chemicals Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ARVIND",
@@ -9635,7 +9635,7 @@
    "name": "Arvind Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "FILATEX",
@@ -9652,12 +9652,12 @@
    "risk_pct": 20.9,
    "days": 29,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Filatex India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AEGISVOPAK",
@@ -9679,7 +9679,7 @@
    "name": "Aegis Vopak Terminals Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PARKHOSPS",
@@ -9701,7 +9701,7 @@
    "name": "Park Medi World Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "LXCHEM",
@@ -9718,12 +9718,12 @@
    "risk_pct": 12.8,
    "days": 32,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Laxmi Organic Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "NRBBEARING",
@@ -9745,7 +9745,7 @@
    "name": "NRB Bearing Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BLACKBUCK",
@@ -9762,12 +9762,12 @@
    "risk_pct": 12.1,
    "days": 29,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "BLACKBUCK LIMITED",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PCBL",
@@ -9789,7 +9789,7 @@
    "name": "PCBL Chemical Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "VINDHYATEL",
@@ -9806,12 +9806,12 @@
    "risk_pct": 31.5,
    "days": 58,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Vindhya Telelinks Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DALMIASUG",
@@ -9828,12 +9828,12 @@
    "risk_pct": 15.7,
    "days": 14,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Dalmia Bharat Sugar and Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SHAREINDIA",
@@ -9850,12 +9850,12 @@
    "risk_pct": 13.9,
    "days": 31,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Share India Securities Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "NORTHARC",
@@ -9877,7 +9877,7 @@
    "name": "Northern Arc Capital Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BEPL",
@@ -9899,7 +9899,7 @@
    "name": "Bhansali Engineering Polymers Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ITDC",
@@ -9921,7 +9921,7 @@
    "name": "India Tourism Development Corporation Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "EMCURE",
@@ -9943,7 +9943,7 @@
    "name": "Emcure Pharmaceuticals Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KPIL",
@@ -9965,7 +9965,7 @@
    "name": "Kalpataru Projects International Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ENDURANCE",
@@ -9987,7 +9987,7 @@
    "name": "Endurance Technologies Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IDEAFORGE",
@@ -10009,7 +10009,7 @@
    "name": "Ideaforge Technology Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AVADHSUGAR",
@@ -10031,7 +10031,7 @@
    "name": "Avadh Sugar & Energy Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "UNIVCABLES",
@@ -10048,12 +10048,12 @@
    "risk_pct": 19.1,
    "days": 14,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Universal Cables Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "HOMEFIRST",
@@ -10070,12 +10070,12 @@
    "risk_pct": 13.6,
    "days": 25,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Home First Finance Company India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ONWARDTEC",
@@ -10097,7 +10097,7 @@
    "name": "Onward Technologies Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RISHABH",
@@ -10119,7 +10119,7 @@
    "name": "Rishabh Instruments Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MUFIN",
@@ -10141,7 +10141,7 @@
    "name": "Mufin Green Finance Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "VINCOFE",
@@ -10163,7 +10163,7 @@
    "name": "Vintage Coffee And Beverages Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "WELENT",
@@ -10180,12 +10180,12 @@
    "risk_pct": 13.3,
    "days": 44,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Welspun Enterprises Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ORIENTHOT",
@@ -10202,8 +10202,8 @@
    "risk_pct": 14.7,
    "days": 45,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Oriental Hotels Limited",
    "board": "main",
    "size": "Micro",
@@ -10285,8 +10285,8 @@
    "risk_pct": 28.0,
    "days": 40,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Oriental Aromatics Limited",
    "board": "main",
    "size": "Micro",
@@ -10373,7 +10373,7 @@
    "name": "Varroc Engineering Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CCAVENUE",
@@ -10395,7 +10395,7 @@
    "name": "AvenuesAI Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SKFINDUS",
@@ -10417,7 +10417,7 @@
    "name": "SKF India (Industrial) Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SAKAR",
@@ -10434,12 +10434,12 @@
    "risk_pct": 16.0,
    "days": 37,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Sakar Healthcare Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "UNICHEMLAB",
@@ -10461,7 +10461,7 @@
    "name": "Unichem Laboratories Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KOPRAN",
@@ -10478,8 +10478,8 @@
    "risk_pct": 19.5,
    "days": 47,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Kopran Limited",
    "board": "main",
    "size": "Micro",
@@ -10566,7 +10566,7 @@
    "name": "AIA Engineering Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "FINEORG",
@@ -10588,7 +10588,7 @@
    "name": "Fine Organic Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ASKAUTOLTD",
@@ -10610,7 +10610,7 @@
    "name": "ASK Automotive Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MSTCLTD",
@@ -10627,12 +10627,12 @@
    "risk_pct": 22.6,
    "days": 47,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Mstc Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ELGIEQUIP",
@@ -10654,7 +10654,7 @@
    "name": "Elgi Equipments Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "HERITGFOOD",
@@ -10676,7 +10676,7 @@
    "name": "Heritage Foods Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ALIVUS",
@@ -10698,7 +10698,7 @@
    "name": "Alivus Life Sciences Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KIRLOSBROS",
@@ -10720,7 +10720,7 @@
    "name": "Kirloskar Brothers Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "METROPOLIS",
@@ -10742,7 +10742,7 @@
    "name": "Metropolis Healthcare Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SUBEXLTD",
@@ -10759,12 +10759,12 @@
    "risk_pct": 13.0,
    "days": 58,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Subex Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "LOKESHMACH",
@@ -10781,12 +10781,12 @@
    "risk_pct": 14.8,
    "days": 17,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Lokesh Machines Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PREMIERPOL",
@@ -10803,12 +10803,12 @@
    "risk_pct": 25.4,
    "days": 22,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Premier Polyfilm Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DIVGIITTS",
@@ -10830,7 +10830,7 @@
    "name": "Divgi Torqtransfer Systems Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PRUDENT",
@@ -10852,7 +10852,7 @@
    "name": "Prudent Corporate Advisory Services Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "INNOVACAP",
@@ -10869,12 +10869,12 @@
    "risk_pct": 18.9,
    "days": 52,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Innova Captab Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CHALET",
@@ -10896,7 +10896,7 @@
    "name": "Chalet Hotels Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DMCC",
@@ -10913,12 +10913,12 @@
    "risk_pct": 15.6,
    "days": 22,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "DMCC SPECIALITY CHEMICALS LIMITED",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RHIM",
@@ -10940,7 +10940,7 @@
    "name": "RHI MAGNESITA INDIA LIMITED",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AVTNPL",
@@ -10957,8 +10957,8 @@
    "risk_pct": 15.5,
    "days": 11,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "AVT Natural Products Limited",
    "board": "main",
    "size": "Micro",
@@ -11045,7 +11045,7 @@
    "name": "Dr. Agarwal's Health Care Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MUKANDLTD",
@@ -11067,7 +11067,7 @@
    "name": "Mukand Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BUILDPRO",
@@ -11089,7 +11089,7 @@
    "name": "Shankara Buildpro Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MAWANASUG",
@@ -11106,12 +11106,12 @@
    "risk_pct": 21.4,
    "days": 20,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Mawana Sugars Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JINDWORLD",
@@ -11133,7 +11133,7 @@
    "name": "Jindal Worldwide Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TNPETRO",
@@ -11155,7 +11155,7 @@
    "name": "Tamilnadu PetroProducts Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "INDORAMA",
@@ -11177,7 +11177,7 @@
    "name": "Indo Rama Synthetics (India) Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TVSELECT",
@@ -11199,7 +11199,7 @@
    "name": "TVS Electronics Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BHARATSE",
@@ -11216,12 +11216,12 @@
    "risk_pct": 13.2,
    "days": 57,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Bharat Seats Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DREDGECORP",
@@ -11238,12 +11238,12 @@
    "risk_pct": 13.5,
    "days": 49,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Dredging Corporation of India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ORCHPHARMA",
@@ -11260,12 +11260,12 @@
    "risk_pct": 14.7,
    "days": 24,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Orchid Pharma Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SIS",
@@ -11287,7 +11287,7 @@
    "name": "SIS LIMITED",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SEJALLTD",
@@ -11309,7 +11309,7 @@
    "name": "Sejal Glass Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CRAMC",
@@ -11331,7 +11331,7 @@
    "name": "Canara Robeco Asset Management Company Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RPGLIFE",
@@ -11353,7 +11353,7 @@
    "name": "RPG Life Sciences Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BAJEL",
@@ -11375,7 +11375,7 @@
    "name": "Bajel Projects Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MAHSCOOTER",
@@ -11397,7 +11397,7 @@
    "name": "Maharashtra Scooters Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TRAVELFOOD",
@@ -11419,7 +11419,7 @@
    "name": "Travel Food Services Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "VSSL",
@@ -11441,7 +11441,7 @@
    "name": "Vardhman Special Steels Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TALBROAUTO",
@@ -11463,7 +11463,7 @@
    "name": "Talbros Automotive Components Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "FOSECOIND",
@@ -11485,7 +11485,7 @@
    "name": "Foseco India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "FOSECOIND",
@@ -11507,7 +11507,7 @@
    "name": "Foseco India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "5PAISA",
@@ -11529,7 +11529,7 @@
    "name": "5Paisa Capital Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "VERANDA",
@@ -11546,12 +11546,12 @@
    "risk_pct": 14.1,
    "days": 45,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Veranda Learning Solutions Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DIFFNKG",
@@ -11573,7 +11573,7 @@
    "name": "Diffusion Engineers Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PVP",
@@ -11595,7 +11595,7 @@
    "name": "PVP Ventures Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ALEMBICLTD",
@@ -11617,7 +11617,7 @@
    "name": "Alembic Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DBOL",
@@ -11634,12 +11634,12 @@
    "risk_pct": 12.6,
    "days": 17,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Dhampur Bio Organics Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "OMAXE",
@@ -11656,12 +11656,12 @@
    "risk_pct": 27.5,
    "days": 50,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Omaxe Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GIPCL",
@@ -11683,7 +11683,7 @@
    "name": "Gujarat Industries Power Company Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "FMGOETZE",
@@ -11700,12 +11700,12 @@
    "risk_pct": 16.0,
    "days": 42,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Federal-Mogul Goetze (India) Limited.",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CORONA",
@@ -11727,7 +11727,7 @@
    "name": "CORONA Remedies Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "HATSUN",
@@ -11749,7 +11749,7 @@
    "name": "Hatsun Agro Product Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "VRLLOG",
@@ -11771,7 +11771,7 @@
    "name": "VRL Logistics Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CARRARO",
@@ -11793,7 +11793,7 @@
    "name": "Carraro India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PDMJEPAPER",
@@ -11815,7 +11815,7 @@
    "name": "Pudumjee Paper Products Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SPECTRUM",
@@ -11832,8 +11832,8 @@
    "risk_pct": 27.4,
    "days": 33,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Spectrum Electrical Industries Limited",
    "board": "main",
    "size": "Micro",
@@ -11920,7 +11920,7 @@
    "name": "Harsha Engineers International Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RACLGEAR",
@@ -11942,7 +11942,7 @@
    "name": "RACL Geartech Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SINGERIND",
@@ -11959,12 +11959,12 @@
    "risk_pct": 20.8,
    "days": 7,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Singer India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MODISONLTD",
@@ -11981,12 +11981,12 @@
    "risk_pct": 17.6,
    "days": 52,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "MODISON LIMITED",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CERA",
@@ -12008,7 +12008,7 @@
    "name": "Cera Sanitaryware Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ARVSMART",
@@ -12030,7 +12030,7 @@
    "name": "Arvind SmartSpaces Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RAJRATAN",
@@ -12052,7 +12052,7 @@
    "name": "Rajratan Global Wire Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RAJRATAN",
@@ -12074,7 +12074,7 @@
    "name": "Rajratan Global Wire Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MPSLTD",
@@ -12096,7 +12096,7 @@
    "name": "MPS Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "LGBBROSLTD",
@@ -12118,7 +12118,7 @@
    "name": "LG Balakrishnan & Bros Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "INGERRAND",
@@ -12140,7 +12140,7 @@
    "name": "Ingersoll Rand (India) Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GARUDA",
@@ -12162,7 +12162,7 @@
    "name": "Garuda Construction and Engineering Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SHARDAMOTR",
@@ -12184,7 +12184,7 @@
    "name": "Sharda Motor Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ANDHRAPAP",
@@ -12206,7 +12206,7 @@
    "name": "ANDHRA PAPER LIMITED",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TARSONS",
@@ -12223,12 +12223,12 @@
    "risk_pct": 12.3,
    "days": 21,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Tarsons Products Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MANCREDIT",
@@ -12250,7 +12250,7 @@
    "name": "Mangal Credit and Fincorp Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PDSL",
@@ -12272,7 +12272,7 @@
    "name": "PDS Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RAMCOIND",
@@ -12289,12 +12289,12 @@
    "risk_pct": 14.1,
    "days": 53,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Ramco Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "RAMCOIND",
@@ -12316,7 +12316,7 @@
    "name": "Ramco Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AJAXENGG",
@@ -12338,7 +12338,7 @@
    "name": "Ajax Engineering Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MOLDTKPAC",
@@ -12360,7 +12360,7 @@
    "name": "Mold-Tek Packaging Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BHAGYANGR",
@@ -12377,12 +12377,12 @@
    "risk_pct": 14.4,
    "days": 31,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Bhagyanagar India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ANUP",
@@ -12404,7 +12404,7 @@
    "name": "The Anup Engineering Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BHAGCHEM",
@@ -12421,12 +12421,12 @@
    "risk_pct": 12.9,
    "days": 58,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Bhagiradha Chemicals & Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MAMATA",
@@ -12448,7 +12448,7 @@
    "name": "Mamata Machinery Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IVALUE",
@@ -12470,7 +12470,7 @@
    "name": "Ivalue Infosolutions Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GOCLCORP",
@@ -12487,12 +12487,12 @@
    "risk_pct": 12.1,
    "days": 34,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "GOCL Corporation Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IRISDOREME",
@@ -12509,12 +12509,12 @@
    "risk_pct": 12.7,
    "days": 6,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Iris Clothings Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "FAZE3Q",
@@ -12536,7 +12536,7 @@
    "name": "Faze Three Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ESAFSFB",
@@ -12558,7 +12558,7 @@
    "name": "ESAF Small Finance Bank Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "HARIOMPIPE",
@@ -12580,7 +12580,7 @@
    "name": "Hariom Pipe Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SHREEPUSHK",
@@ -12597,8 +12597,8 @@
    "risk_pct": 14.0,
    "days": 43,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Shree Pushkar Chemicals & Fertilisers Limited",
    "board": "main",
    "size": "Micro",
@@ -12685,7 +12685,7 @@
    "name": "S. P. Apparels Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JAGSNPHARM",
@@ -12707,7 +12707,7 @@
    "name": "Jagsonpal Pharmaceuticals Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DOLLAR",
@@ -12729,7 +12729,7 @@
    "name": "Dollar Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AAREYDRUGS",
@@ -12746,12 +12746,12 @@
    "risk_pct": 20.6,
    "days": 39,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Aarey Drugs & Pharmaceuticals Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IMAGICAA",
@@ -12773,7 +12773,7 @@
    "name": "Imagicaaworld Entertainment Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "SRM",
@@ -12795,7 +12795,7 @@
    "name": "SRM Contractors Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CENTENKA",
@@ -12812,12 +12812,12 @@
    "risk_pct": 14.7,
    "days": 35,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Century Enka Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PATELRMART",
@@ -12839,7 +12839,7 @@
    "name": "Patel Retail Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IKIO",
@@ -12856,12 +12856,12 @@
    "risk_pct": 16.5,
    "days": 38,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "IKIO Technologies Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "EVEREADY",
@@ -12883,7 +12883,7 @@
    "name": "Eveready Industries India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "DDEVPLSTIK",
@@ -12905,7 +12905,7 @@
    "name": "Ddev Plastiks Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "VINYAS",
@@ -12922,12 +12922,12 @@
    "risk_pct": 16.2,
    "days": 23,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Vinyas Innovative Technologies Limited",
    "board": "SME",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "HEIDELBERG",
@@ -12949,7 +12949,7 @@
    "name": "HeidelbergCement India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GEOJITFSL",
@@ -12971,7 +12971,7 @@
    "name": "Geojit Financial Services Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IGARASHI",
@@ -12993,7 +12993,7 @@
    "name": "Igarashi Motors India Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "20MICRONS",
@@ -13010,12 +13010,12 @@
    "risk_pct": 13.4,
    "days": 24,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "20 Microns Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KIRLOSIND",
@@ -13037,7 +13037,7 @@
    "name": "Kirloskar Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TVSSRICHAK",
@@ -13054,12 +13054,12 @@
    "risk_pct": 16.3,
    "days": 49,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "TVS Srichakra Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TVSSRICHAK",
@@ -13081,7 +13081,7 @@
    "name": "TVS Srichakra Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "INDIANHUME",
@@ -13103,7 +13103,7 @@
    "name": "Indian Hume Pipe Company Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "MWL",
@@ -13125,7 +13125,7 @@
    "name": "Mangalam Worldwide Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "TPLPLASTEH",
@@ -13147,7 +13147,7 @@
    "name": "TPL Plastech Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AMANTA",
@@ -13164,12 +13164,12 @@
    "risk_pct": 18.4,
    "days": 46,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Amanta Healthcare Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "NIITLTD",
@@ -13186,12 +13186,12 @@
    "risk_pct": 13.6,
    "days": 42,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "NIIT Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BCLIND",
@@ -13213,7 +13213,7 @@
    "name": "Bcl Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ZUARIIND",
@@ -13230,12 +13230,12 @@
    "risk_pct": 13.3,
    "days": 45,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "ZUARI INDUSTRIES LIMITED",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "EXPLEOSOL",
@@ -13257,7 +13257,7 @@
    "name": "Expleo Solutions Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "CLSEL",
@@ -13274,12 +13274,12 @@
    "risk_pct": 14.8,
    "days": 43,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Chaman Lal Setia Exports Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "JUBLCPL",
@@ -13296,12 +13296,12 @@
    "risk_pct": 12.1,
    "days": 20,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Jubilant Agri and Consumer Products Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ELECTHERM",
@@ -13323,7 +13323,7 @@
    "name": "Electrotherm (India) Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GREENLAM",
@@ -13345,7 +13345,7 @@
    "name": "Greenlam Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "NDRAUTO",
@@ -13367,7 +13367,7 @@
    "name": "Ndr Auto Components Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KRISHIVAL",
@@ -13384,12 +13384,12 @@
    "risk_pct": 16.7,
    "days": 43,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Krishival Foods Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "BIL",
@@ -13494,7 +13494,7 @@
    "name": "Laxmi India Finance Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KICL",
@@ -13516,7 +13516,7 @@
    "name": "Kalyani Investment Company Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AMBIKCO",
@@ -13538,7 +13538,7 @@
    "name": "Ambika Cotton Mills Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KANORICHEM",
@@ -13555,12 +13555,12 @@
    "risk_pct": 21.5,
    "days": 7,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Kanoria Chemicals & Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "GANDHITUBE",
@@ -13582,7 +13582,7 @@
    "name": "Gandhi Special Tubes Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "VISAKAIND",
@@ -13599,12 +13599,12 @@
    "risk_pct": 14.4,
    "days": 25,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "Visaka Industries Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ARIES",
@@ -13626,7 +13626,7 @@
    "name": "Aries Agro Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "PUNJABCHEM",
@@ -13648,7 +13648,7 @@
    "name": "Punjab Chemicals & Crop Protection Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "AGASTYAEN",
@@ -13670,7 +13670,7 @@
    "name": "Agastya Energy and Infrastructure Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "KANPRPLA",
@@ -13692,7 +13692,7 @@
    "name": "Kanpur Plastipack Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "IFGLEXPOR",
@@ -13709,12 +13709,12 @@
    "risk_pct": 13.9,
    "days": 57,
    "status": "skipped (stop too far / gap below stop)",
-   "gain_pct": NaN,
-   "R": NaN,
+   "gain_pct": null,
+   "R": null,
    "name": "IFGL Refractories Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "ASIANHOTNR",
@@ -13736,7 +13736,7 @@
    "name": "Asian Hotels (North) Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   },
   {
    "symbol": "LIBERTSHOE",
@@ -13758,7 +13758,7 @@
    "name": "Liberty Shoes Limited",
    "board": "main",
    "size": "Micro",
-   "spark": NaN
+   "spark": null
   }
  ]
 }
