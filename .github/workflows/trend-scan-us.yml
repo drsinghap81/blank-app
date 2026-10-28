@@ -1,0 +1,35 @@
+name: trend-scan-us
+on:
+  push:
+    paths: [".github/workflows/trend-scan-us.yml", "tools/trend_scan.py", "tools/global_universe.py"]
+  schedule:
+    - cron: "30 22 * * 1-5"   # ~6:30 pm New York, after the US close
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: trend-scan-us
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Scan
+        env:
+          SEND_TELEGRAM: "0"
+        run: |
+          pip install -q yfinance pandas requests lxml
+          mkdir -p data/scan/us
+          python tools/trend_scan.py US > /tmp/scan_log.txt 2>&1 || true
+          grep -v -i "warn\|inplace\|whatsnew\|delisted\|df.drop\|df.rename\|failed download" /tmp/scan_log.txt | tail -40
+      - name: Commit results to main
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          rm -f data/scan/us/all_metrics.csv
+          git add data/scan/us; git diff --cached --quiet && exit 0
+          git commit -m "Trend scan US $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 10; done

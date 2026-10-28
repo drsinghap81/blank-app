@@ -36,6 +36,10 @@ import requests
 import yfinance as yf
 
 OUT = "data/scan"
+MARKET = "NSE"
+VALUE_DIV = 1e7      # traded-value unit used by the filters (>= 1 unit/day); NSE: Rs 1 crore
+MIN_PRICE = 20.0     # base-breakout minimum price (NSE Rs 20; US $3; ASX A$0.50)
+DISP_MULT = 1.0      # converts filter units to the display unit (NSE: Rs cr, US: $ m, ASX: A$ m)
 os.makedirs(OUT, exist_ok=True)
 s = requests.Session()
 s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
@@ -79,7 +83,7 @@ def metrics(o, h, l, c, v):
     b, a = np.polyfit(x, y, 1)
     r2 = 1 - ((y - (a + b * x)) ** 2).sum() / ((y - y.mean()) ** 2).sum()
     hi52 = c.iloc[-250:].max()
-    val = (c * v).iloc[-20:].mean() / 1e7
+    val = (c * v).iloc[-20:].mean() / VALUE_DIV
     m = dict(close=round(last, 2), ema9=round(e9.iloc[-1], 2), ema21=round(e21.iloc[-1], 2),
              ema50=round(e50.iloc[-1], 2),
              above21_60d=round((c.iloc[-60:] > e21.iloc[-60:]).mean() * 100),
@@ -143,7 +147,7 @@ def early(o, h, l, c, v):
         return None
     e9, e21, e50 = (c.ewm(span=n, adjust=False).mean() for n in (9, 21, 50))
     r = rsi(c)
-    val = (c * v).rolling(20).mean() / 1e7
+    val = (c * v).rolling(20).mean() / VALUE_DIV
     hi = c.rolling(250, min_periods=60).max()
     sig = ((e9 > e21) & (e9.shift(1) <= e21.shift(1)) & (c > e50) & (e50 > e50.shift(10)) & (r >= 55)
            & (val >= 1) & (c >= 0.7 * hi))
@@ -201,14 +205,14 @@ def base_breakout(o, h, l, c, v):
     if len(c) < 260:
         return None
     r = rsi(c)
-    val = (c * v).rolling(20).mean() / 1e7
+    val = (c * v).rolling(20).mean() / VALUE_DIV
     pmax = c.shift(1).rolling(240, min_periods=240).max()
     newhi = (c >= c.rolling(240, min_periods=240).max()).values
     k = np.arange(len(c), dtype=float)
     last = pd.Series(np.where(newhi, k, np.nan), index=c.index).ffill().shift(1)
     age = pd.Series(k, index=c.index) - last
     sd, line = supertrend(h.values, l.values, c.values)
-    sig = ((h > pmax) & (c > c.shift(1)) & (c > 20) & (val >= 2) & (age >= 126) & (sd == 1))
+    sig = ((h > pmax) & (c > c.shift(1)) & (c > MIN_PRICE) & (val >= 2) & (age >= 126) & (sd == 1))
     return follow(o, h, l, c, sig, sd, line, r, val, cap_stop=True)
 
 def export_charts(frames, syms):
@@ -243,9 +247,23 @@ def telegram(text):
 
 
 def main():
-    u = nse_symbols()
-    print("symbols", len(u), u.board.value_counts().to_dict(), flush=True)
-    tick = [t + ".NS" for t in u.symbol]
+    global MARKET, VALUE_DIV, DISP_MULT, OUT, MIN_PRICE
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from global_universe import MARKETS, symbols
+    MARKET = sys.argv[1] if len(sys.argv) > 1 else "NSE"
+    cfg = MARKETS[MARKET]
+    VALUE_DIV, DISP_MULT = cfg["min_value"], cfg["min_value"] / cfg["value_unit"]
+    MIN_PRICE = {"NSE": 20.0, "US": 3.0, "ASX": 0.5}[MARKET]
+    if MARKET != "NSE":
+        OUT = f"data/scan/{MARKET.lower()}"
+    os.makedirs(OUT, exist_ok=True)
+    u = nse_symbols() if MARKET == "NSE" else symbols(MARKET)
+    if "ticker" not in u:
+        u["ticker"] = u.symbol + ".NS"
+    print(MARKET, "symbols", len(u), u.board.value_counts().to_dict(), flush=True)
+    tick = list(u.ticker)
+    tmap = dict(zip(u.ticker, u.symbol))
     out, trigs, earl, frames = [], [], [], {}
     for i in range(0, len(tick), 150):
         chunk = tick[i:i + 150]
@@ -262,22 +280,22 @@ def main():
             except Exception:  # noqa: BLE001
                 continue
             m, tg = metrics(o, h, l, c, v)
-            frames[t[:-3]] = (o.iloc[-260:], h.iloc[-260:], l.iloc[-260:], c.iloc[-260:])
+            frames[tmap[t]] = (o.iloc[-260:], h.iloc[-260:], l.iloc[-260:], c.iloc[-260:])
             try:
                 ea = early(o, h, l, c, v)
             except Exception as e:  # noqa: BLE001
                 ea = None
             if ea:
-                earl.append(dict(symbol=t[:-3], setup="EMA 9/21 cross", **ea))
+                earl.append(dict(symbol=tmap[t], setup="EMA 9/21 cross", **ea))
             try:
                 bo = base_breakout(o, h, l, c, v)
             except Exception:  # noqa: BLE001
                 bo = None
             if bo:
-                earl.append(dict(symbol=t[:-3], setup="52w-high base breakout", **bo))
+                earl.append(dict(symbol=tmap[t], setup="52w-high base breakout", **bo))
             if m:
-                out.append(dict(symbol=t[:-3], **m))
-                trigs += [dict(symbol=t[:-3], **x) for x in tg]
+                out.append(dict(symbol=tmap[t], **m))
+                trigs += [dict(symbol=tmap[t], **x) for x in tg]
         print(i, len(out), flush=True)
         time.sleep(2)
     df = pd.DataFrame(out).merge(u, on="symbol", how="left")
@@ -300,11 +318,16 @@ def main():
         tr = tr[tr.days_ago <= 4]
         tr = tr.merge(p[["symbol", "name", "list", "score", "r2", "above21_60d", "value_cr", "close", "rsi"]],
                       on="symbol", how="inner").sort_values(["days_ago", "score"], ascending=[True, False])
+    # traded value in the market's display unit (NSE Rs cr/day, US $ m/day, ASX A$ m/day)
+    p["value_cr"] = (p.value_cr * DISP_MULT).round(2)
+    if len(tr):
+        tr["value_cr"] = (tr.value_cr * DISP_MULT).round(2)
     p.to_csv(f"{OUT}/trend_scan.csv", index=False)
     tr.to_csv(f"{OUT}/triggers.csv", index=False)
     E = pd.DataFrame(earl)
     if len(E):
         E = E.merge(u[["symbol", "name", "board"]], on="symbol", how="left")
+        E["value_cr"] = (E.value_cr * DISP_MULT).round(2)
         E["order"] = np.select([E.status.str.startswith("NEW"), E.status.str.startswith("EXIT"), E.status == "open"],
                                [0, 1, 2], 3)
         E = E.sort_values(["order", "value_cr"], ascending=[True, False]).drop(columns="order")
@@ -339,7 +362,8 @@ def main():
         if isinstance(o, (np.bool_,)):
             return bool(o)
         return o
-    json.dump(clean(dict(asof=asof, generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
+    json.dump(clean(dict(market=MARKET, market_label=cfg["label"], currency=cfg["currency"], value_label=cfg["value_label"],
+                         asof=asof, generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
                          scanned=len(df), rows=p[cols].to_dict("records"),
                          triggers=tr.to_dict("records") if len(tr) else [],
                          early=E.to_dict("records") if len(E) else [])),
@@ -349,14 +373,14 @@ def main():
     if len(tr):
         print(tr.to_string(index=False))
     fresh = tr[tr.days_ago == 0] if len(tr) else tr
-    msg = [f"📈 Trend scan — NSE close {asof}: {int(strict.sum())} clear trends, {int((loose & ~strict).sum())} on watch"]
+    msg = [f"📈 Trend scan — {cfg['label']} close {asof}: {int(strict.sum())} clear trends, {int((loose & ~strict).sum())} on watch"]
     if len(E):
         new = E[E.status.str.startswith("NEW - buy")].head(16)
         ex = E[E.status.str.startswith("EXIT")]
         msg.append(f"\n🚀 TREND ENTRIES today ({len(new)}) — EMA 9/21 cross or first 52w high after a 6-month base, Supertrend green, buy next open, "
                    "stop = 5-day low, exit when Supertrend(10,3) turns red:")
         msg += [f"{x.symbol} [{'cross' if x.setup.startswith('EMA') else 'base breakout'}] {x.signal_close:g} — stop {x.stop:g} "
-                f"({x.risk_pct}% risk), ₹{x.value_cr:g} cr/day" for _, x in new.iterrows()] or ["none"]
+                f"({x.risk_pct}% risk), {x.value_cr:g} {cfg['value_label']}/day" for _, x in new.iterrows()] or ["none"]
         if len(ex):
             msg.append("\n🔻 Supertrend turned red (exit next open): " + ", ".join(ex.symbol.head(20)))
     if len(fresh):
