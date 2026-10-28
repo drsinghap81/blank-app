@@ -4,14 +4,14 @@
  "currency": "$",
  "value_label": "$ m",
  "asof": "2026-10-28",
- "generated": "2026-10-28T22:36+00:00",
+ "generated": "2026-10-28T22:46+00:00",
  "scanned": 5680,
  "rows": [
   {
    "symbol": "NTRA",
    "name": "Natera, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "list": "trend",
    "tag": "riding",
    "score": 173.2,
@@ -95,7 +95,7 @@
    "symbol": "VEEV",
    "name": "Veeva Systems Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "trend",
    "tag": "riding",
    "score": 173.0,
@@ -110,7 +110,7 @@
    "r2": 0.93,
    "above21_60d": 100,
    "off_high": -1.6,
-   "value_cr": 441.24,
+   "value_cr": 441.26,
    "last_date": "2026-10-28",
    "spark": [
     213.51,
@@ -179,7 +179,7 @@
    "symbol": "HAE",
    "name": "Haemonetics Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "at EMA21",
    "score": 169.0,
@@ -263,7 +263,7 @@
    "symbol": "CDNA",
    "name": "CareDx, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 168.2,
@@ -347,7 +347,7 @@
    "symbol": "PD",
    "name": "PagerDuty, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "extended",
    "score": 167.2,
@@ -431,7 +431,7 @@
    "symbol": "ATRC",
    "name": "AtriCure, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "riding",
    "score": 166.4,
@@ -515,7 +515,7 @@
    "symbol": "GTLB",
    "name": "GitLab Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "riding",
    "score": 165.9,
@@ -599,7 +599,7 @@
    "symbol": "ANF",
    "name": "Abercrombie & Fitch Company Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "riding",
    "score": 165.3,
@@ -683,7 +683,7 @@
    "symbol": "IOVA",
    "name": "Iovance Biotherapeutics, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 164.6,
@@ -767,7 +767,7 @@
    "symbol": "NSIT",
    "name": "Insight Enterprises, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "riding",
    "score": 164.2,
@@ -851,7 +851,7 @@
    "symbol": "MTW",
    "name": "Manitowoc Company, Inc. (The) Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "riding",
    "score": 164.0,
@@ -935,7 +935,7 @@
    "symbol": "HALO",
    "name": "Halozyme Therapeutics, Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "list": "trend",
    "tag": "extended",
    "score": 163.7,
@@ -1019,7 +1019,7 @@
    "symbol": "ELF",
    "name": "e.l.f. Beauty, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "riding",
    "score": 163.5,
@@ -1034,7 +1034,7 @@
    "r2": 0.91,
    "above21_60d": 85,
    "off_high": -6.3,
-   "value_cr": 137.5,
+   "value_cr": 137.52,
    "last_date": "2026-10-28",
    "spark": [
     86.37,
@@ -1103,7 +1103,7 @@
    "symbol": "ANDG",
    "name": "Andersen Group Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "riding",
    "score": 162.9,
@@ -1187,7 +1187,7 @@
    "symbol": "ILMN",
    "name": "Illumina, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "list": "trend",
    "tag": "riding",
    "score": 161.9,
@@ -1355,7 +1355,7 @@
    "symbol": "VREX",
    "name": "Varex Imaging Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "at EMA21",
    "score": 161.0,
@@ -1439,7 +1439,7 @@
    "symbol": "ECO",
    "name": "Okeanis Eco Tankers Corp. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 161.0,
@@ -1454,7 +1454,7 @@
    "r2": 0.9,
    "above21_60d": 100,
    "off_high": -0.2,
-   "value_cr": 81.68,
+   "value_cr": 81.74,
    "last_date": "2026-10-28",
    "spark": [
     55.56,
@@ -1523,7 +1523,7 @@
    "symbol": "RSKD",
    "name": "Riskified Ltd. Class A Ordinary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "riding",
    "score": 160.7,
@@ -1607,7 +1607,7 @@
    "symbol": "TEAM",
    "name": "Atlassian Corporation",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "list": "trend",
    "tag": "riding",
    "score": 160.5,
@@ -1691,7 +1691,7 @@
    "symbol": "ZETA",
    "name": "Zeta Global Holdings Corp. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "at EMA21",
    "score": 160.0,
@@ -1775,7 +1775,7 @@
    "symbol": "OPRT",
    "name": "Oportun Financial Corporation - common stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "extended",
    "score": 159.6,
@@ -1943,7 +1943,7 @@
    "symbol": "RVTY",
    "name": "Revvity, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "trend",
    "tag": "riding",
    "score": 158.3,
@@ -2027,7 +2027,7 @@
    "symbol": "AMPL",
    "name": "Amplitude, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "extended",
    "score": 157.9,
@@ -2111,7 +2111,7 @@
    "symbol": "RNG",
    "name": "RingCentral, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "riding",
    "score": 156.5,
@@ -2195,7 +2195,7 @@
    "symbol": "IQV",
    "name": "IQVIA Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "trend",
    "tag": "riding",
    "score": 155.6,
@@ -2279,7 +2279,7 @@
    "symbol": "HNGE",
    "name": "Hinge Health, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 154.9,
@@ -2363,7 +2363,7 @@
    "symbol": "GCT",
    "name": "GigaCloud Technology Inc - Class A Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "riding",
    "score": 154.8,
@@ -2531,7 +2531,7 @@
    "symbol": "CFFI",
    "name": "C&F Financial Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "riding",
    "score": 154.2,
@@ -2615,7 +2615,7 @@
    "symbol": "ESTC",
    "name": "Elastic N.V. Ordinary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 154.2,
@@ -2699,7 +2699,7 @@
    "symbol": "DOCU",
    "name": "DocuSign, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 154.0,
@@ -2783,7 +2783,7 @@
    "symbol": "RDVT",
    "name": "Red Violet, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "riding",
    "score": 152.2,
@@ -2867,7 +2867,7 @@
    "symbol": "VSTM",
    "name": "Verastem, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 152.0,
@@ -2951,7 +2951,7 @@
    "symbol": "BWIN",
    "name": "The Baldwin Insurance Group, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "at EMA21",
    "score": 151.5,
@@ -3035,7 +3035,7 @@
    "symbol": "ZBRA",
    "name": "Zebra Technologies Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "at EMA21",
    "score": 151.5,
@@ -3119,7 +3119,7 @@
    "symbol": "FRO",
    "name": "Frontline Plc Ordinary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "riding",
    "score": 151.2,
@@ -3287,7 +3287,7 @@
    "symbol": "CON",
    "name": "Concentra Group Holdings Parent, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "riding",
    "score": 149.4,
@@ -3371,7 +3371,7 @@
    "symbol": "A",
    "name": "Agilent Technologies, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "trend",
    "tag": "riding",
    "score": 147.9,
@@ -3386,7 +3386,7 @@
    "r2": 0.9,
    "above21_60d": 88,
    "off_high": 0.0,
-   "value_cr": 364.26,
+   "value_cr": 364.28,
    "last_date": "2026-10-28",
    "spark": [
     140.9,
@@ -3455,7 +3455,7 @@
    "symbol": "DHT",
    "name": "DHT Holdings, Inc.",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "at EMA21",
    "score": 147.4,
@@ -3539,7 +3539,7 @@
    "symbol": "AMPH",
    "name": "Amphastar Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "at EMA21",
    "score": 147.2,
@@ -3623,7 +3623,7 @@
    "symbol": "RCBC",
    "name": "River City Bank - Common stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "riding",
    "score": 146.2,
@@ -3707,7 +3707,7 @@
    "symbol": "EXPD",
    "name": "Expeditors International of Washington, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "at EMA21",
    "score": 143.4,
@@ -3791,7 +3791,7 @@
    "symbol": "IOSP",
    "name": "Innospec Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "at EMA21",
    "score": 143.0,
@@ -3875,7 +3875,7 @@
    "symbol": "BOX",
    "name": "Box, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 142.8,
@@ -3890,7 +3890,7 @@
    "r2": 0.89,
    "above21_60d": 85,
    "off_high": -0.9,
-   "value_cr": 104.24,
+   "value_cr": 104.26,
    "last_date": "2026-10-28",
    "spark": [
     32.0,
@@ -3959,7 +3959,7 @@
    "symbol": "CRL",
    "name": "Charles River Laboratories International, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "trend",
    "tag": "extended",
    "score": 141.9,
@@ -3974,7 +3974,7 @@
    "r2": 0.91,
    "above21_60d": 85,
    "off_high": 0.0,
-   "value_cr": 372.62,
+   "value_cr": 372.84,
    "last_date": "2026-10-28",
    "spark": [
     260.72,
@@ -4043,7 +4043,7 @@
    "symbol": "CAI",
    "name": "Caris Life Sciences, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 141.2,
@@ -4127,7 +4127,7 @@
    "symbol": "QGEN",
    "name": "Qiagen N.V. Common Shares",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "trend",
    "tag": "riding",
    "score": 141.1,
@@ -4211,7 +4211,7 @@
    "symbol": "WAT",
    "name": "Waters Corporation Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "trend",
    "tag": "riding",
    "score": 140.6,
@@ -4226,7 +4226,7 @@
    "r2": 0.9,
    "above21_60d": 93,
    "off_high": 0.0,
-   "value_cr": 402.52,
+   "value_cr": 402.5,
    "last_date": "2026-10-28",
    "spark": [
     400.0,
@@ -4295,7 +4295,7 @@
    "symbol": "CERT",
    "name": "Certara, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "extended",
    "score": 139.6,
@@ -4379,7 +4379,7 @@
    "symbol": "RCEL",
    "name": "Avita Medical, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "extended",
    "score": 139.6,
@@ -4463,7 +4463,7 @@
    "symbol": "SAIC",
    "name": "Science Applications International Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 133.6,
@@ -4547,7 +4547,7 @@
    "symbol": "CNNE",
    "name": "Cannae Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "riding",
    "score": 133.6,
@@ -4631,7 +4631,7 @@
    "symbol": "TAK",
    "name": "Takeda Pharmaceutical Company Limited American Depositary Shares (each representing 1/2 of a share of Common Stock)",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "riding",
    "score": 133.4,
@@ -4715,7 +4715,7 @@
    "symbol": "BUUU",
    "name": "BUUU Group Limited - Class A Ordinary Share",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "trend",
    "tag": "extended",
    "score": 125.6,
@@ -4799,7 +4799,7 @@
    "symbol": "NTSK",
    "name": "Netskope, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "trend",
    "tag": "extended",
    "score": 117.6,
@@ -4883,7 +4883,7 @@
    "symbol": "GMAB",
    "name": "Genmab A/S - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "list": "trend",
    "tag": "extended",
    "score": 80.2,
@@ -4967,7 +4967,7 @@
    "symbol": "AVTR",
    "name": "Avantor, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 173.0,
@@ -5051,7 +5051,7 @@
    "symbol": "KRT",
    "name": "Karat Packaging Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 171.5,
@@ -5135,7 +5135,7 @@
    "symbol": "MPC",
    "name": "Marathon Petroleum Corporation Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 168.0,
@@ -5219,7 +5219,7 @@
    "symbol": "DINO",
    "name": "HF Sinclair Corporation Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 166.0,
@@ -5234,7 +5234,7 @@
    "r2": 0.92,
    "above21_60d": 88,
    "off_high": -12.7,
-   "value_cr": 265.98,
+   "value_cr": 266.12,
    "last_date": "2026-10-28",
    "spark": [
     82.47,
@@ -5303,7 +5303,7 @@
    "symbol": "PSX",
    "name": "Phillips 66 Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 165.2,
@@ -5387,7 +5387,7 @@
    "symbol": "PAYS",
    "name": "Paysign, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 164.5,
@@ -5471,7 +5471,7 @@
    "symbol": "GIC",
    "name": "Global Industrial Company Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 163.1,
@@ -5555,7 +5555,7 @@
    "symbol": "DT",
    "name": "Dynatrace, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 161.2,
@@ -5570,7 +5570,7 @@
    "r2": 0.92,
    "above21_60d": 98,
    "off_high": -3.7,
-   "value_cr": 441.04,
+   "value_cr": 441.88,
    "last_date": "2026-10-28",
    "spark": [
     50.86,
@@ -5723,7 +5723,7 @@
    "symbol": "AII",
    "name": "American Integrity Insurance Group, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 159.2,
@@ -5807,7 +5807,7 @@
    "symbol": "IDT",
    "name": "IDT Corporation Class B Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 158.9,
@@ -5891,7 +5891,7 @@
    "symbol": "HRTG",
    "name": "Heritage Insurance Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 157.4,
@@ -6059,7 +6059,7 @@
    "symbol": "TBBB",
    "name": "BBB Foods Inc. Class A Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 155.3,
@@ -6227,7 +6227,7 @@
    "symbol": "PLSE",
    "name": "Pulse Biosciences, Inc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 154.5,
@@ -6311,7 +6311,7 @@
    "symbol": "HGTY",
    "name": "Hagerty, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 154.2,
@@ -6395,7 +6395,7 @@
    "symbol": "PAYC",
    "name": "Paycom Software, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 154.2,
@@ -6479,7 +6479,7 @@
    "symbol": "OKTA",
    "name": "Okta, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "list": "watch",
    "tag": "riding",
    "score": 154.0,
@@ -6563,7 +6563,7 @@
    "symbol": "HZO",
    "name": "MarineMax, Inc.  (FL) Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 153.6,
@@ -6815,7 +6815,7 @@
    "symbol": "NIQ",
    "name": "NIQ Global Intelligence plc Ordinary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 152.3,
@@ -6899,7 +6899,7 @@
    "symbol": "RIGL",
    "name": "Rigel Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 151.6,
@@ -6983,7 +6983,7 @@
    "symbol": "CVI",
    "name": "CVR Energy Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 151.0,
@@ -7067,7 +7067,7 @@
    "symbol": "ITGR",
    "name": "Integer Holdings Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 150.9,
@@ -7235,7 +7235,7 @@
    "symbol": "SPT",
    "name": "Sprout Social, Inc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 149.8,
@@ -7319,7 +7319,7 @@
    "symbol": "FIVN",
    "name": "Five9, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 148.8,
@@ -7403,7 +7403,7 @@
    "symbol": "DV",
    "name": "DoubleVerify Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 148.8,
@@ -7487,7 +7487,7 @@
    "symbol": "FRSH",
    "name": "Freshworks Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 148.4,
@@ -7571,7 +7571,7 @@
    "symbol": "AZTA",
    "name": "Azenta, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 147.6,
@@ -7655,7 +7655,7 @@
    "symbol": "HURN",
    "name": "Huron Consulting Group Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 147.4,
@@ -7739,7 +7739,7 @@
    "symbol": "CRSR",
    "name": "Corsair Gaming, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 146.6,
@@ -7823,7 +7823,7 @@
    "symbol": "MANH",
    "name": "Manhattan Associates, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 146.2,
@@ -7991,7 +7991,7 @@
    "symbol": "WK",
    "name": "Workiva Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 145.0,
@@ -8075,7 +8075,7 @@
    "symbol": "FET",
    "name": "Forum Energy Technologies, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 144.8,
@@ -8159,7 +8159,7 @@
    "symbol": "SLDE",
    "name": "Slide Insurance Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 144.7,
@@ -8243,7 +8243,7 @@
    "symbol": "QLYS",
    "name": "Qualys, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 144.0,
@@ -8327,7 +8327,7 @@
    "symbol": "GO",
    "name": "Grocery Outlet Holding Corp.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 143.5,
@@ -8411,7 +8411,7 @@
    "symbol": "SN",
    "name": "SharkNinja, Inc. Ordinary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 143.4,
@@ -8579,7 +8579,7 @@
    "symbol": "RGEN",
    "name": "Repligen Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 142.0,
@@ -8747,7 +8747,7 @@
    "symbol": "CRVL",
    "name": "CorVel Corp.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 141.9,
@@ -8831,7 +8831,7 @@
    "symbol": "RBRK",
    "name": "Rubrik, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "extended",
    "score": 141.8,
@@ -8846,7 +8846,7 @@
    "r2": 0.86,
    "above21_60d": 80,
    "off_high": 0.0,
-   "value_cr": 366.1,
+   "value_cr": 366.12,
    "last_date": "2026-10-28",
    "spark": [
     84.81,
@@ -8915,7 +8915,7 @@
    "symbol": "FOSL",
    "name": "Fossil Group, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 141.5,
@@ -8999,7 +8999,7 @@
    "symbol": "MTD",
    "name": "Mettler-Toledo International, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "extended",
    "score": 141.1,
@@ -9083,7 +9083,7 @@
    "symbol": "OSPN",
    "name": "OneSpan Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 140.5,
@@ -9167,7 +9167,7 @@
    "symbol": "HSTM",
    "name": "HealthStream, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 139.3,
@@ -9251,7 +9251,7 @@
    "symbol": "DHR",
    "name": "Danaher Corporation Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "list": "watch",
    "tag": "riding",
    "score": 139.2,
@@ -9266,7 +9266,7 @@
    "r2": 0.89,
    "above21_60d": 82,
    "off_high": -2.7,
-   "value_cr": 1041.76,
+   "value_cr": 1041.78,
    "last_date": "2026-10-28",
    "spark": [
     199.31,
@@ -9335,7 +9335,7 @@
    "symbol": "W",
    "name": "Wayfair Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 138.8,
@@ -9419,7 +9419,7 @@
    "symbol": "RGA",
    "name": "Reinsurance Group of America, Incorporated Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 138.6,
@@ -9587,7 +9587,7 @@
    "symbol": "WDAY",
    "name": "Workday, Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "riding",
    "score": 137.6,
@@ -9671,7 +9671,7 @@
    "symbol": "CBLL",
    "name": "CeriBell, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 137.2,
@@ -9755,7 +9755,7 @@
    "symbol": "WPP",
    "name": "WPP plc American Depositary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 137.0,
@@ -9839,7 +9839,7 @@
    "symbol": "VEON",
    "name": "VEON Ltd. - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "extended",
    "score": 136.8,
@@ -9923,7 +9923,7 @@
    "symbol": "BDX",
    "name": "Becton, Dickinson and Company Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 136.7,
@@ -10007,7 +10007,7 @@
    "symbol": "CRBG",
    "name": "Corebridge Financial Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 136.6,
@@ -10091,7 +10091,7 @@
    "symbol": "XERS",
    "name": "Xeris Biopharma Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 136.5,
@@ -10175,7 +10175,7 @@
    "symbol": "EQH",
    "name": "Equitable Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 136.1,
@@ -10259,7 +10259,7 @@
    "symbol": "BOW",
    "name": "Bowhead Specialty Holdings Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 135.3,
@@ -10343,7 +10343,7 @@
    "symbol": "MCK",
    "name": "McKesson Corporation Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 134.9,
@@ -10427,7 +10427,7 @@
    "symbol": "MMSI",
    "name": "Merit Medical Systems, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 134.7,
@@ -10511,7 +10511,7 @@
    "symbol": "PCTY",
    "name": "Paylocity Holding Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 134.4,
@@ -10595,7 +10595,7 @@
    "symbol": "APPN",
    "name": "Appian Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "extended",
    "score": 133.7,
@@ -10679,7 +10679,7 @@
    "symbol": "STLN",
    "name": "Starling Oncology, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 133.7,
@@ -10763,7 +10763,7 @@
    "symbol": "LFST",
    "name": "LifeStance Health Group, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 133.6,
@@ -10847,7 +10847,7 @@
    "symbol": "LQDT",
    "name": "Liquidity Services, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 133.5,
@@ -10931,7 +10931,7 @@
    "symbol": "MEDP",
    "name": "Medpace Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 133.3,
@@ -11015,7 +11015,7 @@
    "symbol": "LIFE",
    "name": "Ethos Technologies Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 132.9,
@@ -11099,7 +11099,7 @@
    "symbol": "BIIB",
    "name": "Biogen Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 132.7,
@@ -11183,7 +11183,7 @@
    "symbol": "OABI",
    "name": "OmniAb, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "extended",
    "score": 132.7,
@@ -11282,7 +11282,7 @@
    "r2": 0.85,
    "above21_60d": 78,
    "off_high": -1.1,
-   "value_cr": 1442.96,
+   "value_cr": 1443.04,
    "last_date": "2026-10-28",
    "spark": [
     244.7,
@@ -11351,7 +11351,7 @@
    "symbol": "DBX",
    "name": "Dropbox, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 132.0,
@@ -11519,7 +11519,7 @@
    "symbol": "HPQ",
    "name": "HP Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 132.0,
@@ -11603,7 +11603,7 @@
    "symbol": "MATX",
    "name": "Matson, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 131.7,
@@ -11687,7 +11687,7 @@
    "symbol": "SHEL",
    "name": "Shell PLC American Depositary Shares (each representing two (2) Ordinary Shares)",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 131.7,
@@ -11771,7 +11771,7 @@
    "symbol": "BWLP",
    "name": "BW LPG Limited Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 131.1,
@@ -11939,7 +11939,7 @@
    "symbol": "VRNS",
    "name": "Varonis Systems, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 128.4,
@@ -12023,7 +12023,7 @@
    "symbol": "NICE",
    "name": "NICE Ltd - American Depositary Shares each representing one Ordinary Share",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 128.0,
@@ -12107,7 +12107,7 @@
    "symbol": "GILD",
    "name": "Gilead Sciences, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "list": "watch",
    "tag": "riding",
    "score": 127.8,
@@ -12191,7 +12191,7 @@
    "symbol": "SIBN",
    "name": "SI-BONE, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 127.6,
@@ -12443,7 +12443,7 @@
    "symbol": "RNW",
    "name": "ReNew Energy Global plc - Class A Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "at EMA21",
    "score": 126.7,
@@ -12611,7 +12611,7 @@
    "symbol": "EHC",
    "name": "Encompass Health Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 126.2,
@@ -12695,7 +12695,7 @@
    "symbol": "EXPO",
    "name": "Exponent, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 125.8,
@@ -12779,7 +12779,7 @@
    "symbol": "HIPO",
    "name": "Hippo Holdings Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "riding",
    "score": 125.5,
@@ -12863,7 +12863,7 @@
    "symbol": "AVPT",
    "name": "AvePoint, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "extended",
    "score": 125.1,
@@ -13031,7 +13031,7 @@
    "symbol": "IOT",
    "name": "Samsara Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 121.8,
@@ -13115,7 +13115,7 @@
    "symbol": "OPCH",
    "name": "Option Care Health, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 120.1,
@@ -13199,7 +13199,7 @@
    "symbol": "EXLS",
    "name": "ExlService Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 120.0,
@@ -13283,7 +13283,7 @@
    "symbol": "IFF",
    "name": "International Flavors & Fragrances, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 120.0,
@@ -13367,7 +13367,7 @@
    "symbol": "EXEL",
    "name": "Exelixis, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 118.8,
@@ -13451,7 +13451,7 @@
    "symbol": "ONC",
    "name": "BeOne Medicines Ltd. - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "at EMA21",
    "score": 118.5,
@@ -13550,7 +13550,7 @@
    "r2": 0.7,
    "above21_60d": 82,
    "off_high": -1.7,
-   "value_cr": 1598.7,
+   "value_cr": 1598.78,
    "last_date": "2026-10-28",
    "spark": [
     184.8,
@@ -13619,7 +13619,7 @@
    "symbol": "CTKB",
    "name": "Cytek Biosciences, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "extended",
    "score": 117.4,
@@ -13703,7 +13703,7 @@
    "symbol": "FAST",
    "name": "Fastenal Company",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "at EMA21",
    "score": 116.5,
@@ -13787,7 +13787,7 @@
    "symbol": "GRAL",
    "name": "GRAIL, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 115.4,
@@ -13871,7 +13871,7 @@
    "symbol": "WST",
    "name": "West Pharmaceutical Services, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 114.7,
@@ -13955,7 +13955,7 @@
    "symbol": "COKE",
    "name": "Coca-Cola Consolidated, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 112.5,
@@ -14039,7 +14039,7 @@
    "symbol": "KNTK",
    "name": "Kinetik Holdings Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "riding",
    "score": 111.6,
@@ -14123,7 +14123,7 @@
    "symbol": "RMD",
    "name": "ResMed Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "list": "watch",
    "tag": "riding",
    "score": 111.4,
@@ -14207,7 +14207,7 @@
    "symbol": "DXC",
    "name": "DXC Technology Company Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 109.8,
@@ -14291,7 +14291,7 @@
    "symbol": "RPD",
    "name": "Rapid7, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "extended",
    "score": 108.6,
@@ -14375,7 +14375,7 @@
    "symbol": "JAKK",
    "name": "JAKKS Pacific, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "extended",
    "score": 107.5,
@@ -14459,7 +14459,7 @@
    "symbol": "FTRE",
    "name": "Fortrea Holdings Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "extended",
    "score": 106.7,
@@ -14543,7 +14543,7 @@
    "symbol": "KNSA",
    "name": "Kiniksa Pharmaceuticals International, plc - Class A Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "list": "watch",
    "tag": "extended",
    "score": 105.7,
@@ -14627,7 +14627,7 @@
    "symbol": "AMN",
    "name": "AMN Healthcare Services Inc",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "list": "watch",
    "tag": "extended",
    "score": 103.5,
@@ -14727,7 +14727,7 @@
    "value_cr": 7.94,
    "close": 23.15,
    "rsi": 60.6,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "IQV",
@@ -14747,7 +14747,7 @@
    "value_cr": 368.06,
    "close": 279.04,
    "rsi": 61.8,
-   "size": "Small"
+   "size": "Large"
   },
   {
    "symbol": "SMWB",
@@ -14787,7 +14787,7 @@
    "value_cr": 640.8,
    "close": 424.42,
    "rsi": 65.9,
-   "size": "Mid"
+   "size": "Large"
   },
   {
    "symbol": "TMO",
@@ -14827,7 +14827,7 @@
    "value_cr": 12.5,
    "close": 82.4,
    "rsi": 62.5,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "EXPD",
@@ -14847,7 +14847,7 @@
    "value_cr": 220.68,
    "close": 197.15,
    "rsi": 57.0,
-   "size": "Micro"
+   "size": "Mid"
   },
   {
    "symbol": "BMEZ",
@@ -14887,7 +14887,7 @@
    "value_cr": 9.58,
    "close": 6.87,
    "rsi": 54.0,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "MPC",
@@ -14907,7 +14907,7 @@
    "value_cr": 917.76,
    "close": 440.77,
    "rsi": 49.5,
-   "size": "Mid"
+   "size": "Large"
   },
   {
    "symbol": "DINO",
@@ -14924,10 +14924,10 @@
    "score": 166.0,
    "r2": 0.92,
    "above21_60d": 88,
-   "value_cr": 265.98,
+   "value_cr": 266.12,
    "close": 111.96,
    "rsi": 41.8,
-   "size": "Small"
+   "size": "Large"
   },
   {
    "symbol": "GCT",
@@ -14947,7 +14947,7 @@
    "value_cr": 36.62,
    "close": 60.63,
    "rsi": 65.8,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "RIGL",
@@ -14967,7 +14967,7 @@
    "value_cr": 10.14,
    "close": 50.74,
    "rsi": 62.9,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "A",
@@ -14984,10 +14984,10 @@
    "score": 147.9,
    "r2": 0.9,
    "above21_60d": 88,
-   "value_cr": 364.26,
+   "value_cr": 364.28,
    "close": 181.48,
    "rsi": 67.1,
-   "size": "Small"
+   "size": "Large"
   },
   {
    "symbol": "FAST",
@@ -15007,7 +15007,7 @@
    "value_cr": 418.88,
    "close": 51.45,
    "rsi": 52.6,
-   "size": "Small"
+   "size": "Large"
   },
   {
    "symbol": "HAE",
@@ -15027,7 +15027,7 @@
    "value_cr": 87.54,
    "close": 118.32,
    "rsi": 61.0,
-   "size": "Micro"
+   "size": "Mid"
   },
   {
    "symbol": "CAI",
@@ -15047,7 +15047,7 @@
    "value_cr": 109.6,
    "close": 35.45,
    "rsi": 71.1,
-   "size": "Micro"
+   "size": "Mid"
   },
   {
    "symbol": "DHR",
@@ -15064,10 +15064,10 @@
    "score": 139.2,
    "r2": 0.89,
    "above21_60d": 82,
-   "value_cr": 1041.76,
+   "value_cr": 1041.78,
    "close": 234.07,
    "rsi": 62.7,
-   "size": "Mid"
+   "size": "Large"
   },
   {
    "symbol": "LFST",
@@ -15087,7 +15087,7 @@
    "value_cr": 38.5,
    "close": 13.39,
    "rsi": 67.8,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "LQDT",
@@ -15107,7 +15107,7 @@
    "value_cr": 10.78,
    "close": 43.83,
    "rsi": 52.4,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "ANIK",
@@ -15147,7 +15147,7 @@
    "value_cr": 61.14,
    "close": 56.61,
    "rsi": 63.6,
-   "size": "Micro"
+   "size": "Mid"
   },
   {
    "symbol": "ATRC",
@@ -15167,7 +15167,7 @@
    "value_cr": 45.26,
    "close": 61.42,
    "rsi": 66.2,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "ACU",
@@ -15207,7 +15207,7 @@
    "value_cr": 9.24,
    "close": 25.8,
    "rsi": 51.1,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "EQH",
@@ -15227,7 +15227,7 @@
    "value_cr": 139.6,
    "close": 54.59,
    "rsi": 57.0,
-   "size": "Micro"
+   "size": "Mid"
   },
   {
    "symbol": "CNNE",
@@ -15247,7 +15247,7 @@
    "value_cr": 6.92,
    "close": 16.85,
    "rsi": 68.5,
-   "size": "Micro"
+   "size": "Small"
   },
   {
    "symbol": "BRBS",
@@ -15287,7 +15287,7 @@
    "value_cr": 876.9,
    "close": 159.2,
    "rsi": 62.7,
-   "size": "Mid"
+   "size": "Large"
   },
   {
    "symbol": "MDT",
@@ -15330,7 +15330,7 @@
    "R": null,
    "name": "Johnson Controls International plc Ordinary Share",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     153.22,
     154.12,
@@ -15413,7 +15413,7 @@
    "R": null,
    "name": "ICON plc - Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     163.51,
     161.17,
@@ -15484,7 +15484,7 @@
    "signal_close": 115.41,
    "stop": 109.68,
    "rsi_signal": 65.6,
-   "value_cr": 137.5,
+   "value_cr": 137.52,
    "supertrend": 103.13,
    "st_up": true,
    "close": 115.41,
@@ -15496,7 +15496,7 @@
    "R": null,
    "name": "e.l.f. Beauty, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     86.37,
     92.31,
@@ -15579,7 +15579,7 @@
    "R": null,
    "name": "Schrodinger, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     16.4,
     17.81,
@@ -15650,8 +15650,8 @@
    "signal_close": 13.32,
    "stop": 9.43,
    "rsi_signal": 64.5,
-   "value_cr": 42.0,
-   "supertrend": 8.63,
+   "value_cr": 42.02,
+   "supertrend": 8.56,
    "st_up": true,
    "close": 13.32,
    "entry": null,
@@ -15662,7 +15662,7 @@
    "R": null,
    "name": "Ginkgo Bioworks Holdings, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     9.37,
     8.5,
@@ -15745,7 +15745,7 @@
    "R": null,
    "name": "Prime Medicine, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     3.08,
     2.95,
@@ -15816,7 +15816,7 @@
    "signal_close": 25.0,
    "stop": 22.7,
    "rsi_signal": 55.7,
-   "value_cr": 16.4,
+   "value_cr": 16.78,
    "supertrend": 22.6,
    "st_up": true,
    "close": 25.0,
@@ -15828,7 +15828,7 @@
    "R": null,
    "name": "Enerflex Ltd Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     21.96,
     20.65,
@@ -15911,7 +15911,7 @@
    "R": null,
    "name": "Bausch + Lomb Corporation Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     16.76,
     16.35,
@@ -15994,7 +15994,7 @@
    "R": null,
    "name": "Castle Biosciences, Inc. - Common stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     30.4,
     30.47,
@@ -16077,7 +16077,7 @@
    "R": null,
    "name": "Stepan Company Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     63.85,
     63.56,
@@ -16160,7 +16160,7 @@
    "R": null,
    "name": "Rigel Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     40.48,
     39.22,
@@ -16243,7 +16243,7 @@
    "R": null,
    "name": "Precision Drilling Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     74.89,
     76.93,
@@ -16409,7 +16409,7 @@
    "R": 0.1,
    "name": "Intapp, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     36.96,
     36.36,
@@ -16729,7 +16729,7 @@
    "signal_close": 211.55,
    "stop": 201.96,
    "rsi_signal": 59.2,
-   "value_cr": 1598.7,
+   "value_cr": 1598.78,
    "supertrend": 217.92,
    "st_up": true,
    "close": 229.2,
@@ -16895,7 +16895,7 @@
    "signal_close": 89.79,
    "stop": 85.67,
    "rsi_signal": 63.0,
-   "value_cr": 1528.32,
+   "value_cr": 1528.34,
    "supertrend": 89.86,
    "st_up": true,
    "close": 91.73,
@@ -16978,7 +16978,7 @@
    "signal_close": 260.17,
    "stop": 245.26,
    "rsi_signal": 57.0,
-   "value_cr": 1442.96,
+   "value_cr": 1443.04,
    "supertrend": 268.17,
    "st_up": true,
    "close": 285.99,
@@ -17144,8 +17144,8 @@
    "signal_close": 212.12,
    "stop": 198.74,
    "rsi_signal": 57.7,
-   "value_cr": 1041.76,
-   "supertrend": 213.44,
+   "value_cr": 1041.78,
+   "supertrend": 213.46,
    "st_up": true,
    "close": 234.07,
    "entry": 212.26,
@@ -17156,7 +17156,7 @@
    "R": 1.61,
    "name": "Danaher Corporation Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     199.31,
     199.63,
@@ -17239,7 +17239,7 @@
    "R": 0.8,
    "name": "Gilead Sciences, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     131.02,
     130.13,
@@ -17322,7 +17322,7 @@
    "R": 0.24,
    "name": "Gilead Sciences, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     131.02,
     130.13,
@@ -17405,7 +17405,7 @@
    "R": 3.27,
    "name": "PTC Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     139.43,
     147.66,
@@ -17488,7 +17488,7 @@
    "R": 0.68,
    "name": "PTC Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     139.43,
     147.66,
@@ -17571,7 +17571,7 @@
    "R": 0.79,
    "name": "Pfizer, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     25.81,
     26.2,
@@ -17654,7 +17654,7 @@
    "R": -0.59,
    "name": "McKesson Corporation Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     876.3,
     870.45,
@@ -17737,7 +17737,7 @@
    "R": 1.56,
    "name": "HCA Healthcare, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     408.89,
     408.14,
@@ -17820,7 +17820,7 @@
    "R": -0.71,
    "name": "Airbnb, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     152.49,
     151.64,
@@ -17903,7 +17903,7 @@
    "R": 0.71,
    "name": "Altria Group, Inc.",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     67.36,
     66.68,
@@ -17974,7 +17974,7 @@
    "signal_close": 301.63,
    "stop": 279.02,
    "rsi_signal": 71.9,
-   "value_cr": 441.24,
+   "value_cr": 441.26,
    "supertrend": 293.51,
    "st_up": true,
    "close": 317.82,
@@ -17986,7 +17986,7 @@
    "R": 0.84,
    "name": "Veeva Systems Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     213.51,
     217.8,
@@ -18069,7 +18069,7 @@
    "R": 0.73,
    "name": "Keurig Dr Pepper Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     30.53,
     30.15,
@@ -18152,7 +18152,7 @@
    "R": -0.04,
    "name": "Devon Energy Corporation Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     41.82,
     42.83,
@@ -18235,7 +18235,7 @@
    "R": 0.63,
    "name": "Workday, Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     170.64,
     170.24,
@@ -18306,8 +18306,8 @@
    "signal_close": 285.11,
    "stop": 270.88,
    "rsi_signal": 57.0,
-   "value_cr": 372.62,
-   "supertrend": 326.78,
+   "value_cr": 372.84,
+   "supertrend": 326.67,
    "st_up": true,
    "close": 373.98,
    "entry": 283.85,
@@ -18318,7 +18318,7 @@
    "R": 6.95,
    "name": "Charles River Laboratories International, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     260.72,
     265.51,
@@ -18401,7 +18401,7 @@
    "R": 0.49,
    "name": "IQVIA Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     236.05,
     232.43,
@@ -18484,7 +18484,7 @@
    "R": 1.5,
    "name": "Mettler-Toledo International, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     1421.52,
     1421.24,
@@ -18567,7 +18567,7 @@
    "R": 0.37,
    "name": "MetLife, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     96.26,
     99.95,
@@ -18650,7 +18650,7 @@
    "R": 0.29,
    "name": "Nasdaq, Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     94.24,
     94.38,
@@ -18733,7 +18733,7 @@
    "R": -0.59,
    "name": "Fox Corporation",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     58.42,
     61.52,
@@ -18816,7 +18816,7 @@
    "R": 0.61,
    "name": "Hasbro, Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     90.48,
     91.01,
@@ -18899,7 +18899,7 @@
    "R": 2.36,
    "name": "Qiagen N.V. Common Shares",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     41.95,
     41.73,
@@ -18982,7 +18982,7 @@
    "R": 0.34,
    "name": "Range Resources Corporation Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     38.05,
     38.48,
@@ -19065,7 +19065,7 @@
    "R": -0.27,
    "name": "Consolidated Edison, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     107.44,
     108.06,
@@ -19136,7 +19136,7 @@
    "signal_close": 96.81,
    "stop": 89.89,
    "rsi_signal": 60.3,
-   "value_cr": 221.64,
+   "value_cr": 221.66,
    "supertrend": 97.78,
    "st_up": true,
    "close": 103.44,
@@ -19148,7 +19148,7 @@
    "R": 1.22,
    "name": "BJ's Wholesale Club Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     96.69,
     97.18,
@@ -19231,7 +19231,7 @@
    "R": 0.6,
    "name": "Expeditors International of Washington, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     181.41,
     178.56,
@@ -19314,7 +19314,7 @@
    "R": 0.75,
    "name": "SharkNinja, Inc. Ordinary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     182.11,
     179.93,
@@ -19397,7 +19397,7 @@
    "R": 1.92,
    "name": "Medpace Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     587.75,
     585.01,
@@ -19480,7 +19480,7 @@
    "R": 1.82,
    "name": "Medpace Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     587.75,
     585.01,
@@ -19552,7 +19552,7 @@
    "stop": 331.99,
    "rsi_signal": 67.3,
    "value_cr": 208.06,
-   "supertrend": 377.05,
+   "supertrend": 377.02,
    "st_up": true,
    "close": 403.64,
    "entry": 363.11,
@@ -19563,7 +19563,7 @@
    "R": 1.3,
    "name": "West Pharmaceutical Services, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     351.02,
     348.6,
@@ -19646,7 +19646,7 @@
    "R": 1.14,
    "name": "Permian Resources Corporation Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     19.66,
     20.15,
@@ -19718,7 +19718,7 @@
    "stop": 157.5,
    "rsi_signal": 79.9,
    "value_cr": 193.3,
-   "supertrend": 167.75,
+   "supertrend": 167.74,
    "st_up": true,
    "close": 180.66,
    "entry": 178.91,
@@ -19729,7 +19729,7 @@
    "R": 0.08,
    "name": "Allegion plc Ordinary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     167.98,
     168.1,
@@ -19812,7 +19812,7 @@
    "R": 1.13,
    "name": "Abercrombie & Fitch Company Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     109.45,
     110.48,
@@ -19895,7 +19895,7 @@
    "R": 2.93,
    "name": "ICON plc - Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     163.51,
     161.17,
@@ -19978,7 +19978,7 @@
    "R": 0.83,
    "name": "Corebridge Financial Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     33.35,
     33.77,
@@ -20061,7 +20061,7 @@
    "R": 0.89,
    "name": "Zebra Technologies Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     368.99,
     364.24,
@@ -20144,7 +20144,7 @@
    "R": 0.48,
    "name": "GoDaddy Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     91.77,
     90.35,
@@ -20215,8 +20215,8 @@
    "signal_close": 92.28,
    "stop": 89.12,
    "rsi_signal": 57.5,
-   "value_cr": 156.2,
-   "supertrend": 89.94,
+   "value_cr": 156.34,
+   "supertrend": 89.92,
    "st_up": true,
    "close": 94.54,
    "entry": 93.0,
@@ -20227,7 +20227,7 @@
    "R": 0.4,
    "name": "Bank Nova Scotia Halifax Pfd 3 Ordinary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     87.77,
     87.54,
@@ -20310,7 +20310,7 @@
    "R": -0.62,
    "name": "Oscar Health, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     30.11,
     26.54,
@@ -20393,7 +20393,7 @@
    "R": 0.03,
    "name": "BeOne Medicines Ltd. - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     327.53,
     329.8,
@@ -20476,7 +20476,7 @@
    "R": -0.26,
    "name": "BeOne Medicines Ltd. - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     327.53,
     329.8,
@@ -20559,7 +20559,7 @@
    "R": -0.43,
    "name": "Encompass Health Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     110.71,
     124.6,
@@ -20642,7 +20642,7 @@
    "R": 1.09,
    "name": "Trimble Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     58.58,
     58.55,
@@ -20725,7 +20725,7 @@
    "R": -0.52,
    "name": "Rexford Industrial Realty, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     36.61,
     36.08,
@@ -20808,7 +20808,7 @@
    "R": 2.1,
    "name": "Commvault Systems, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     133.17,
     133.36,
@@ -20891,7 +20891,7 @@
    "R": 0.39,
    "name": "Dropbox, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     35.0,
     34.54,
@@ -20974,7 +20974,7 @@
    "R": 0.4,
    "name": "Scorpio Tankers Inc. Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     73.63,
     75.95,
@@ -21057,7 +21057,7 @@
    "R": -0.09,
    "name": "Jackson Financial Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     133.69,
     132.48,
@@ -21140,7 +21140,7 @@
    "R": 1.23,
    "name": "Coca-Cola Consolidated, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     184.53,
     188.01,
@@ -21223,7 +21223,7 @@
    "R": -0.4,
    "name": "Kohl's Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     19.53,
     18.33,
@@ -21306,7 +21306,7 @@
    "R": 1.81,
    "name": "Signet Jewelers Limited Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     96.28,
     93.6,
@@ -21389,7 +21389,7 @@
    "R": 4.71,
    "name": "Haemonetics Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     83.6,
     85.02,
@@ -21472,7 +21472,7 @@
    "R": 1.23,
    "name": "Urban Outfitters, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     77.89,
     77.67,
@@ -21555,7 +21555,7 @@
    "R": 0.69,
    "name": "Urban Outfitters, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     77.89,
     77.67,
@@ -21620,89 +21620,6 @@
    ]
   },
   {
-   "symbol": "DDS",
-   "setup": "52w-high base breakout",
-   "signal_date": "2026-10-22",
-   "signal_close": 719.61,
-   "stop": 649.31,
-   "rsi_signal": 69.1,
-   "value_cr": 85.36,
-   "supertrend": 628.8,
-   "st_up": true,
-   "close": 656.6,
-   "entry": 706.62,
-   "risk_pct": 8.8,
-   "days": 4,
-   "status": "open",
-   "gain_pct": -7.1,
-   "R": -0.87,
-   "name": "Dillard's, Inc. Common Stock",
-   "board": "Other",
-   "size": "Micro",
-   "spark": [
-    616.28,
-    616.8,
-    611.87,
-    633.7,
-    645.75,
-    635.74,
-    613.54,
-    560.63,
-    579.42,
-    584.34,
-    615.6,
-    597.68,
-    621.35,
-    642.35,
-    637.02,
-    631.77,
-    630.43,
-    620.02,
-    625.69,
-    626.08,
-    636.38,
-    651.78,
-    656.4,
-    644.81,
-    623.38,
-    624.05,
-    650.28,
-    652.1,
-    643.05,
-    647.2,
-    633.98,
-    635.98,
-    638.83,
-    649.88,
-    645.37,
-    651.5,
-    663.78,
-    681.64,
-    677.22,
-    669.99,
-    646.35,
-    654.11,
-    695.35,
-    655.25,
-    649.38,
-    648.82,
-    642.24,
-    642.29,
-    642.02,
-    655.34,
-    670.22,
-    663.26,
-    666.67,
-    673.64,
-    686.7,
-    719.61,
-    695.68,
-    671.11,
-    665.6,
-    656.6
-   ]
-  },
-  {
    "symbol": "TGTX",
    "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-27",
@@ -21721,7 +21638,7 @@
    "R": 0.39,
    "name": "TG Therapeutics, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     49.88,
     49.55,
@@ -21804,7 +21721,7 @@
    "R": 7.41,
    "name": "TORM plc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     26.65,
     27.46,
@@ -21887,7 +21804,7 @@
    "R": -0.68,
    "name": "Academy Sports and Outdoors, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     47.73,
     47.21,
@@ -21970,7 +21887,7 @@
    "R": 1.31,
    "name": "FIGS, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     10.92,
     11.24,
@@ -22053,7 +21970,7 @@
    "R": 1.73,
    "name": "Silicon Laboratories, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     218.23,
     218.47,
@@ -22136,7 +22053,7 @@
    "R": 1.56,
    "name": "Park Hotels & Resorts Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     14.7,
     14.12,
@@ -22219,7 +22136,7 @@
    "R": 1.0,
    "name": "Genpact Limited Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     35.08,
     35.97,
@@ -22302,7 +22219,7 @@
    "R": -0.11,
    "name": "Arcutis Biotherapeutics, Inc. - Common stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     27.1,
     26.43,
@@ -22385,7 +22302,7 @@
    "R": 1.1,
    "name": "Tenaris S.A. American Depositary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     57.05,
     53.4,
@@ -22468,7 +22385,7 @@
    "R": -0.02,
    "name": "Murphy Oil Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     35.68,
     32.71,
@@ -22551,7 +22468,7 @@
    "R": 1.58,
    "name": "Five9, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     29.6,
     28.37,
@@ -22634,7 +22551,7 @@
    "R": -0.23,
    "name": "Huron Consulting Group Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     149.68,
     150.1,
@@ -22717,7 +22634,7 @@
    "R": 1.96,
    "name": "Globalstar, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     83.45,
     83.24,
@@ -22800,7 +22717,7 @@
    "R": 0.54,
    "name": "Toro Company (The) Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     98.53,
     97.84,
@@ -22883,7 +22800,7 @@
    "R": -0.08,
    "name": "LiveRamp Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     37.8,
     37.82,
@@ -22966,7 +22883,7 @@
    "R": 1.27,
    "name": "Science Applications International Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     119.96,
     123.93,
@@ -23049,7 +22966,7 @@
    "R": 1.31,
    "name": "Takeda Pharmaceutical Company Limited American Depositary Shares (each representing 1/2 of a share of Common Stock)",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     16.72,
     17.02,
@@ -23132,7 +23049,7 @@
    "R": 1.77,
    "name": "Northern Oil and Gas, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     19.39,
     19.89,
@@ -23215,7 +23132,7 @@
    "R": -0.65,
    "name": "Fox Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     51.94,
     55.1,
@@ -23298,7 +23215,7 @@
    "R": 4.01,
    "name": "CVR Energy Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     31.1,
     31.27,
@@ -23381,7 +23298,7 @@
    "R": 0.53,
    "name": "Appian Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     29.96,
     30.41,
@@ -23464,7 +23381,7 @@
    "R": 0.14,
    "name": "Sensient Technologies Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     130.23,
     128.5,
@@ -23547,7 +23464,7 @@
    "R": 5.19,
    "name": "AMN Healthcare Services Inc",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     32.8,
     30.8,
@@ -23630,7 +23547,7 @@
    "R": 3.7,
    "name": "AvePoint, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     13.4,
     12.79,
@@ -23713,7 +23630,7 @@
    "R": -0.07,
    "name": "ICU Medical, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     166.4,
     166.37,
@@ -23796,7 +23713,7 @@
    "R": -0.7,
    "name": "HCI Group, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     178.08,
     180.49,
@@ -23879,7 +23796,7 @@
    "R": 0.33,
    "name": "Methanex Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     51.79,
     54.22,
@@ -23962,7 +23879,7 @@
    "R": -0.07,
    "name": "Honda Motor Company, Ltd. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     30.6,
     30.73,
@@ -24045,7 +23962,7 @@
    "R": -0.9,
    "name": "Porch Group, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     15.76,
     15.44,
@@ -24128,7 +24045,7 @@
    "R": 0.53,
    "name": "Sturm, Ruger & Company, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     38.21,
     37.6,
@@ -24211,7 +24128,7 @@
    "R": 3.55,
    "name": "Central Bancompany, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     32.95,
     33.19,
@@ -24294,7 +24211,7 @@
    "R": 0.56,
    "name": "Xeris Biopharma Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     8.11,
     7.36,
@@ -24377,7 +24294,7 @@
    "R": -0.67,
    "name": "Ziff Davis, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     52.72,
     50.95,
@@ -24460,7 +24377,7 @@
    "R": 0.17,
    "name": "Sally Beauty Holdings, Inc. (Name to be changed from Sally Holdings, Inc.) Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     15.79,
     16.13,
@@ -24543,7 +24460,7 @@
    "R": 0.3,
    "name": "Sally Beauty Holdings, Inc. (Name to be changed from Sally Holdings, Inc.) Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     15.79,
     16.13,
@@ -24626,7 +24543,7 @@
    "R": 2.37,
    "name": "IDT Corporation Class B Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     65.97,
     66.11,
@@ -24709,7 +24626,7 @@
    "R": 0.32,
    "name": "Encore Capital Group Inc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     92.69,
     97.88,
@@ -24792,7 +24709,7 @@
    "R": 0.12,
    "name": "Insperity, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     50.52,
     50.66,
@@ -24875,7 +24792,7 @@
    "R": 0.78,
    "name": "ePlus inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     94.26,
     90.07,
@@ -24958,7 +24875,7 @@
    "R": -0.05,
    "name": "Vermilion Energy Inc. Common (Canada)",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     10.48,
     10.89,
@@ -25041,7 +24958,7 @@
    "R": 0.63,
    "name": "ABM Industries Incorporated Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     48.63,
     48.26,
@@ -25124,7 +25041,7 @@
    "R": -0.4,
    "name": "Wolverine World Wide, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     19.4,
     18.94,
@@ -25207,7 +25124,7 @@
    "R": 1.29,
    "name": "Freedom Holding Corp.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     149.5,
     147.48,
@@ -25290,7 +25207,7 @@
    "R": 0.13,
    "name": "Freedom Holding Corp.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     149.5,
     147.48,
@@ -25373,7 +25290,7 @@
    "R": 1.1,
    "name": "Esquire Financial Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     132.0,
     131.12,
@@ -25456,7 +25373,7 @@
    "R": 6.5,
    "name": "VEON Ltd. - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     54.52,
     55.88,
@@ -25539,7 +25456,7 @@
    "R": 0.01,
    "name": "National Presto Industries, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     139.57,
     137.74,
@@ -25622,7 +25539,7 @@
    "R": 0.8,
    "name": "Bowman Consulting Group Ltd.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     26.98,
     26.95,
@@ -25705,7 +25622,7 @@
    "R": 3.25,
    "name": "Eagle Bancorp, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     28.24,
     27.86,
@@ -25788,7 +25705,7 @@
    "R": 0.62,
    "name": "Forum Energy Technologies, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     75.52,
     75.23,
@@ -25871,7 +25788,7 @@
    "R": -0.04,
    "name": "Corsair Gaming, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     11.2,
     10.61,
@@ -25954,7 +25871,7 @@
    "R": 1.38,
    "name": "CryoPort, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     15.25,
     14.71,
@@ -26037,7 +25954,7 @@
    "R": -0.52,
    "name": "Edgewell Personal Care Company Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     29.04,
     27.97,
@@ -26120,7 +26037,7 @@
    "R": 0.97,
    "name": "Donnelley Financial Solutions, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     49.65,
     48.38,
@@ -26203,7 +26120,7 @@
    "R": 0.97,
    "name": "PrimeEnergy Resources Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     186.69,
     182.74,
@@ -26286,7 +26203,7 @@
    "R": -0.14,
    "name": "BW LPG Limited Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     20.05,
     20.76,
@@ -26369,7 +26286,7 @@
    "R": -0.5,
    "name": "Amerant Bancorp Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     29.47,
     29.1,
@@ -26452,7 +26369,7 @@
    "R": 2.56,
    "name": "OneSpan Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     16.17,
     16.12,
@@ -26535,7 +26452,7 @@
    "R": 0.97,
    "name": "SI-BONE, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     18.04,
     18.14,
@@ -26618,7 +26535,7 @@
    "R": 0.31,
    "name": "SI-BONE, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     18.04,
     18.14,
@@ -26701,7 +26618,7 @@
    "R": -0.14,
    "name": "Westamerica Bancorporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     60.11,
     59.67,
@@ -26784,7 +26701,7 @@
    "R": 0.74,
    "name": "SunCoke Energy, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     9.5,
     9.48,
@@ -26867,7 +26784,7 @@
    "R": 0.3,
    "name": "UNIVERSAL INSURANCE HOLDINGS INC Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     44.21,
     45.08,
@@ -26950,7 +26867,7 @@
    "R": 1.66,
    "name": "Stepan Company Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     63.85,
     63.56,
@@ -27033,7 +26950,7 @@
    "R": 0.01,
    "name": "Varex Imaging Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     12.39,
     12.25,
@@ -27116,7 +27033,7 @@
    "R": 0.53,
    "name": "Pelagos Insurance Capital Limited Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     25.4,
     25.39,
@@ -27199,7 +27116,7 @@
    "R": 0.8,
    "name": "Greif, Inc. Corporation Class B Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     110.63,
     110.04,
@@ -27282,7 +27199,7 @@
    "R": 0.47,
    "name": "WPP plc American Depositary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     20.2,
     25.44,
@@ -27365,7 +27282,7 @@
    "R": -0.21,
    "name": "Hippo Holdings Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     32.33,
     33.39,
@@ -27448,7 +27365,7 @@
    "R": 0.67,
    "name": "Capital Bancorp, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     37.4,
     37.68,
@@ -27531,7 +27448,7 @@
    "R": -0.02,
    "name": "Heritage Insurance Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     30.23,
     35.21,
@@ -27614,7 +27531,7 @@
    "R": -0.43,
    "name": "PRA Group, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     17.19,
     18.15,
@@ -27697,7 +27614,7 @@
    "R": 1.79,
    "name": "Cytek Biosciences, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     4.18,
     4.16,
@@ -27780,7 +27697,7 @@
    "R": 0.03,
    "name": "Great Southern Bancorp, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     81.22,
     80.98,
@@ -27863,7 +27780,7 @@
    "R": 2.21,
    "name": "Chatham Lodging Trust (REIT) Common Shares of Beneficial Interest",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     13.28,
     12.93,
@@ -27946,7 +27863,7 @@
    "R": 0.67,
    "name": "United Fire Group, Inc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     54.16,
     54.73,
@@ -28029,7 +27946,7 @@
    "R": -0.28,
    "name": "Red River Bancshares, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     100.76,
     100.52,
@@ -28112,7 +28029,7 @@
    "R": 0.25,
    "name": "Chemung Financial Corp",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     82.34,
     82.5,
@@ -28195,7 +28112,7 @@
    "R": 0.69,
    "name": "Bioventus Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     15.26,
     13.98,
@@ -28278,7 +28195,7 @@
    "R": 1.18,
    "name": "American Integrity Insurance Group, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     20.76,
     21.2,
@@ -28361,7 +28278,7 @@
    "R": 1.17,
    "name": "Gran Tierra Energy Inc. Common Stock",
    "board": "NYSE American",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     9.44,
     9.47,
@@ -28444,7 +28361,7 @@
    "R": 1.0,
    "name": "Hagerty, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     13.52,
     13.49,
@@ -28527,7 +28444,7 @@
    "R": -0.31,
    "name": "HBT Financial, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     35.86,
     36.0,
@@ -28610,7 +28527,7 @@
    "R": 0.04,
    "name": "Midland States Bancorp, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     33.9,
     33.43,
@@ -29953,7 +29870,7 @@
    "signal_close": 1230.18,
    "stop": 1107.57,
    "rsi_signal": 60.7,
-   "value_cr": 2772.12,
+   "value_cr": 2772.18,
    "supertrend": 1182.82,
    "st_up": true,
    "close": 1288.3,
@@ -30124,7 +30041,7 @@
    "signal_close": 210.61,
    "stop": 170.74,
    "rsi_signal": 70.0,
-   "value_cr": 1768.1,
+   "value_cr": 1768.7,
    "supertrend": 219.6,
    "st_up": true,
    "close": 243.4,
@@ -30146,7 +30063,7 @@
    "signal_close": 15.23,
    "stop": 13.37,
    "rsi_signal": 65.1,
-   "value_cr": 1358.32,
+   "value_cr": 1358.34,
    "supertrend": 14.69,
    "st_up": false,
    "close": 11.97,
@@ -30168,7 +30085,7 @@
    "signal_close": 89.27,
    "stop": 83.72,
    "rsi_signal": 62.3,
-   "value_cr": 1305.3,
+   "value_cr": 1305.32,
    "supertrend": 84.9,
    "st_up": false,
    "close": 83.67,
@@ -30191,7 +30108,7 @@
    "stop": 187.1,
    "rsi_signal": 73.6,
    "value_cr": 1163.24,
-   "supertrend": 297.43,
+   "supertrend": 297.44,
    "st_up": false,
    "close": 253.77,
    "entry": 244.5,
@@ -30224,7 +30141,7 @@
    "R": -0.52,
    "name": "MercadoLibre, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30246,7 +30163,7 @@
    "R": null,
    "name": "Cloudflare, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30256,7 +30173,7 @@
    "signal_close": 189.89,
    "stop": 182.71,
    "rsi_signal": 55.1,
-   "value_cr": 904.44,
+   "value_cr": 904.46,
    "supertrend": 189.65,
    "st_up": true,
    "close": 202.64,
@@ -30268,7 +30185,7 @@
    "R": -1.0,
    "name": "Philip Morris International Inc Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30290,7 +30207,7 @@
    "R": -1.0,
    "name": "American Airlines Group, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30300,8 +30217,8 @@
    "signal_close": 1176.8,
    "stop": 1120.25,
    "rsi_signal": 72.4,
-   "value_cr": 753.2,
-   "supertrend": 1076.6,
+   "value_cr": 753.22,
+   "supertrend": 1076.42,
    "st_up": true,
    "close": 1157.88,
    "entry": 1172.98,
@@ -30312,7 +30229,7 @@
    "R": -1.0,
    "name": "BlackRock, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30334,7 +30251,7 @@
    "R": 0.14,
    "name": "Fortinet, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30344,7 +30261,7 @@
    "signal_close": 645.93,
    "stop": 577.93,
    "rsi_signal": 62.4,
-   "value_cr": 697.78,
+   "value_cr": 697.8,
    "supertrend": 685.31,
    "st_up": false,
    "close": 640.67,
@@ -30356,7 +30273,7 @@
    "R": null,
    "name": "Deere & Company Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30366,7 +30283,7 @@
    "signal_close": 674.47,
    "stop": 615.74,
    "rsi_signal": 66.2,
-   "value_cr": 697.78,
+   "value_cr": 697.8,
    "supertrend": 685.31,
    "st_up": false,
    "close": 640.67,
@@ -30378,7 +30295,7 @@
    "R": -0.46,
    "name": "Deere & Company Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30400,7 +30317,7 @@
    "R": -1.0,
    "name": "Humana Inc. Common Stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30422,7 +30339,7 @@
    "R": null,
    "name": "MongoDB, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30444,7 +30361,7 @@
    "R": -1.0,
    "name": "MongoDB, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30466,7 +30383,7 @@
    "R": null,
    "name": "Okta, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": [
     147.04,
     143.51,
@@ -30549,7 +30466,7 @@
    "R": -1.0,
    "name": "Newmont Corporation",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30571,7 +30488,7 @@
    "R": null,
    "name": "Semtech Corporation",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30593,7 +30510,7 @@
    "R": -0.6,
    "name": "Everpure, Inc. Class A common stock",
    "board": "NYSE",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30615,7 +30532,7 @@
    "R": -3.28,
    "name": "XP Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30637,7 +30554,7 @@
    "R": -1.04,
    "name": "Regeneron Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Mid",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30659,7 +30576,7 @@
    "R": -1.0,
    "name": "Pacific Gas & Electric Co. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30681,7 +30598,7 @@
    "R": null,
    "name": "TE Connectivity plc Ordinary Shares",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30703,7 +30620,7 @@
    "R": null,
    "name": "argenx SE - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30713,7 +30630,7 @@
    "signal_close": 97.39,
    "stop": 92.33,
    "rsi_signal": 74.8,
-   "value_cr": 429.56,
+   "value_cr": 429.64,
    "supertrend": 90.38,
    "st_up": true,
    "close": 91.69,
@@ -30725,7 +30642,7 @@
    "R": -1.01,
    "name": "Colgate-Palmolive Company Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -30747,7 +30664,7 @@
    "R": null,
    "name": "HP Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     28.25,
     27.91,
@@ -30818,7 +30735,7 @@
    "signal_close": 84.81,
    "stop": 69.96,
    "rsi_signal": 63.4,
-   "value_cr": 366.1,
+   "value_cr": 366.12,
    "supertrend": 117.4,
    "st_up": true,
    "close": 136.0,
@@ -30830,7 +30747,7 @@
    "R": null,
    "name": "Rubrik, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     84.81,
     84.6,
@@ -30901,8 +30818,8 @@
    "signal_close": 156.07,
    "stop": 146.97,
    "rsi_signal": 78.2,
-   "value_cr": 364.26,
-   "supertrend": 164.69,
+   "value_cr": 364.28,
+   "supertrend": 164.57,
    "st_up": true,
    "close": 181.48,
    "entry": 156.27,
@@ -30913,7 +30830,7 @@
    "R": -1.0,
    "name": "Agilent Technologies, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     140.9,
     141.13,
@@ -30996,7 +30913,7 @@
    "R": -0.6,
    "name": "Maplebear Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31018,7 +30935,7 @@
    "R": null,
    "name": "CCC Intelligent Solutions Holdings Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31040,7 +30957,7 @@
    "R": -0.61,
    "name": "Guardant Health, Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31062,7 +30979,7 @@
    "R": -0.55,
    "name": "VeriSign, Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31084,7 +31001,7 @@
    "R": -2.29,
    "name": "Novartis AG Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31106,7 +31023,7 @@
    "R": -2.43,
    "name": "Novartis AG Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31128,7 +31045,7 @@
    "R": null,
    "name": "SentinelOne, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31150,7 +31067,7 @@
    "R": -1.0,
    "name": "Genmab A/S - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": [
     29.26,
     29.83,
@@ -31233,7 +31150,7 @@
    "R": -0.65,
    "name": "Dollar General Corporation Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31244,7 +31161,7 @@
    "stop": 78.41,
    "rsi_signal": 62.3,
    "value_cr": 271.4,
-   "supertrend": 79.79,
+   "supertrend": 79.77,
    "st_up": true,
    "close": 92.35,
    "entry": 87.0,
@@ -31255,7 +31172,7 @@
    "R": -1.0,
    "name": "Etsy, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31277,7 +31194,7 @@
    "R": null,
    "name": "Vaxcyte, Inc.",
    "board": "Nasdaq",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31299,7 +31216,7 @@
    "R": null,
    "name": "Best Buy Co., Inc. Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31321,7 +31238,7 @@
    "R": -2.34,
    "name": "Banco Bradesco Sa American Depositary Shares",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31332,7 +31249,7 @@
    "stop": 227.72,
    "rsi_signal": 64.6,
    "value_cr": 247.48,
-   "supertrend": 226.47,
+   "supertrend": 226.5,
    "st_up": true,
    "close": 245.62,
    "entry": 244.56,
@@ -31343,7 +31260,7 @@
    "R": -1.0,
    "name": "Quest Diagnostics Incorporated Common Stock",
    "board": "NYSE",
-   "size": "Small",
+   "size": "Large",
    "spark": null
   },
   {
@@ -31353,7 +31270,7 @@
    "signal_close": 5.94,
    "stop": 5.44,
    "rsi_signal": 55.8,
-   "value_cr": 245.96,
+   "value_cr": 245.98,
    "supertrend": 5.85,
    "st_up": true,
    "close": 6.71,
@@ -31365,7 +31282,7 @@
    "R": -1.0,
    "name": "Transocean Ltd (Switzerland) Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -31387,7 +31304,7 @@
    "R": null,
    "name": "Strive, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -31409,7 +31326,7 @@
    "R": -0.4,
    "name": "WESCO International, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -31431,7 +31348,7 @@
    "R": -1.0,
    "name": "Garmin Ltd. Common Stock (Switzerland)",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -31453,7 +31370,7 @@
    "R": -0.79,
    "name": "Repligen Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     158.59,
     159.44,
@@ -31536,7 +31453,7 @@
    "R": null,
    "name": "Roivant Sciences Ltd. - Common Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -31558,7 +31475,7 @@
    "R": null,
    "name": "Option Care Health, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     23.7,
     23.63,
@@ -31641,7 +31558,7 @@
    "R": -1.0,
    "name": "Incyte Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -31652,7 +31569,7 @@
    "stop": 96.49,
    "rsi_signal": 57.8,
    "value_cr": 206.36,
-   "supertrend": 100.12,
+   "supertrend": 100.42,
    "st_up": true,
    "close": 114.02,
    "entry": 103.82,
@@ -31663,7 +31580,7 @@
    "R": -1.0,
    "name": "Wayfair Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     107.57,
     104.07,
@@ -31746,7 +31663,7 @@
    "R": -1.18,
    "name": "Church & Dwight Company, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -31768,7 +31685,7 @@
    "R": null,
    "name": "Gartner, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -31790,7 +31707,7 @@
    "R": null,
    "name": "Hinge Health, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     80.79,
     80.08,
@@ -31873,7 +31790,7 @@
    "R": -1.0,
    "name": "Prudential Financial, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -31895,7 +31812,7 @@
    "R": null,
    "name": "Zeta Global Holdings Corp. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     27.07,
     25.56,
@@ -31978,7 +31895,7 @@
    "R": -1.0,
    "name": "Gen Digital Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32000,7 +31917,7 @@
    "R": -1.0,
    "name": "International Flavors & Fragrances, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     87.66,
     84.15,
@@ -32083,7 +32000,7 @@
    "R": -1.17,
    "name": "Jazz Pharmaceuticals plc - Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32105,7 +32022,7 @@
    "R": null,
    "name": "Samsara Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     38.73,
     38.22,
@@ -32188,7 +32105,7 @@
    "R": null,
    "name": "Iovance Biotherapeutics, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     4.34,
     6.21,
@@ -32260,7 +32177,7 @@
    "stop": 587.46,
    "rsi_signal": 80.3,
    "value_cr": 161.84,
-   "supertrend": 597.2,
+   "supertrend": 597.14,
    "st_up": true,
    "close": 666.26,
    "entry": 657.96,
@@ -32271,7 +32188,7 @@
    "R": -1.0,
    "name": "CACI International, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32293,7 +32210,7 @@
    "R": null,
    "name": "JFrog Ltd. - Ordinary shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32315,7 +32232,7 @@
    "R": null,
    "name": "Tenable Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32326,7 +32243,7 @@
    "stop": 321.25,
    "rsi_signal": 57.6,
    "value_cr": 158.8,
-   "supertrend": 354.32,
+   "supertrend": 354.31,
    "st_up": false,
    "close": 332.19,
    "entry": 332.96,
@@ -32337,7 +32254,7 @@
    "R": -1.0,
    "name": "RenaissanceRe Holdings Ltd. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32359,7 +32276,7 @@
    "R": -1.0,
    "name": "The Cheesecake Factory Incorporated",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32381,7 +32298,7 @@
    "R": null,
    "name": "Qualys, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     183.25,
     181.78,
@@ -32464,7 +32381,7 @@
    "R": -1.0,
    "name": "Willis Towers Watson Public Limited Company - Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32486,7 +32403,7 @@
    "R": -1.0,
    "name": "Clean Harbors, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32508,7 +32425,7 @@
    "R": -0.87,
    "name": "Principal Financial Group Inc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32530,7 +32447,7 @@
    "R": -1.0,
    "name": "Align Technology, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32552,7 +32469,7 @@
    "R": null,
    "name": "Kodiak Sciences Inc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32574,7 +32491,7 @@
    "R": -1.0,
    "name": "Booz Allen Hamilton Holding Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32596,7 +32513,7 @@
    "R": -0.78,
    "name": "Aramark Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32618,7 +32535,7 @@
    "R": null,
    "name": "Praxis Precision Medicines, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32640,7 +32557,7 @@
    "R": -0.44,
    "name": "GRAIL, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     74.18,
     63.4,
@@ -32723,7 +32640,7 @@
    "R": -1.0,
    "name": "MSC Industrial Direct Company, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32745,7 +32662,7 @@
    "R": null,
    "name": "Bruker Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32767,7 +32684,7 @@
    "R": -1.0,
    "name": "Encompass Health Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     110.71,
     124.6,
@@ -32838,7 +32755,7 @@
    "signal_close": 9.41,
    "stop": 7.96,
    "rsi_signal": 59.1,
-   "value_cr": 123.12,
+   "value_cr": 123.16,
    "supertrend": 7.94,
    "st_up": true,
    "close": 9.4,
@@ -32850,7 +32767,7 @@
    "R": null,
    "name": "BlackBerry Limited Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32872,7 +32789,7 @@
    "R": -1.0,
    "name": "Franklin Templeton, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32894,7 +32811,7 @@
    "R": -1.0,
    "name": "SS&C Technologies Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32916,7 +32833,7 @@
    "R": -0.61,
    "name": "Embraer S.A. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -32938,7 +32855,7 @@
    "R": -1.0,
    "name": "Commvault Systems, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     133.17,
     133.36,
@@ -33021,7 +32938,7 @@
    "R": -1.0,
    "name": "Arrow Electronics, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33043,7 +32960,7 @@
    "R": -1.0,
    "name": "Novavax, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33065,7 +32982,7 @@
    "R": null,
    "name": "Fluor Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33075,7 +32992,7 @@
    "signal_close": 35.34,
    "stop": 31.12,
    "rsi_signal": 61.5,
-   "value_cr": 104.24,
+   "value_cr": 104.26,
    "supertrend": 39.94,
    "st_up": true,
    "close": 42.8,
@@ -33087,7 +33004,7 @@
    "R": null,
    "name": "Box, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     32.0,
     31.85,
@@ -33170,7 +33087,7 @@
    "R": -1.0,
    "name": "Hess Midstream LP Class A Representing Limited Partner Interests",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33192,7 +33109,7 @@
    "R": -1.0,
    "name": "Abivax SA - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33214,7 +33131,7 @@
    "R": null,
    "name": "Kohl's Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     19.53,
     18.33,
@@ -33297,7 +33214,7 @@
    "R": null,
    "name": "Pacira BioSciences, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33319,7 +33236,7 @@
    "R": -1.0,
    "name": "News Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33341,7 +33258,7 @@
    "R": null,
    "name": "SailPoint, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33352,7 +33269,7 @@
    "stop": 327.51,
    "rsi_signal": 55.5,
    "value_cr": 92.58,
-   "supertrend": 333.12,
+   "supertrend": 333.01,
    "st_up": false,
    "close": 299.1,
    "entry": 336.81,
@@ -33363,7 +33280,7 @@
    "R": -1.0,
    "name": "Applied Industrial Technologies, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33385,7 +33302,7 @@
    "R": -0.56,
    "name": "Kymera Therapeutics, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33407,7 +33324,7 @@
    "R": -1.0,
    "name": "Primo Brands Corporation Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33429,7 +33346,7 @@
    "R": -1.02,
    "name": "AppFolio, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33451,7 +33368,7 @@
    "R": null,
    "name": "Haemonetics Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     83.6,
     85.02,
@@ -33534,7 +33451,7 @@
    "R": null,
    "name": "Gerdau S.A. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33556,7 +33473,29 @@
    "R": -1.0,
    "name": "BXP, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
+   "spark": null
+  },
+  {
+   "symbol": "DDS",
+   "setup": "52w-high base breakout",
+   "signal_date": "2026-10-22",
+   "signal_close": 719.61,
+   "stop": 649.31,
+   "rsi_signal": 69.1,
+   "value_cr": 85.36,
+   "supertrend": 628.8,
+   "st_up": true,
+   "close": 656.6,
+   "entry": 706.62,
+   "risk_pct": 8.8,
+   "days": 4,
+   "status": "stopped 2026-10-28",
+   "gain_pct": -8.3,
+   "R": -1.02,
+   "name": "Dillard's, Inc. Common Stock",
+   "board": "Other",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33578,7 +33517,7 @@
    "R": -1.0,
    "name": "SLM Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33600,7 +33539,7 @@
    "R": -0.64,
    "name": "Deutsche Bank AG Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33622,7 +33561,7 @@
    "R": null,
    "name": "Amneal Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33644,7 +33583,7 @@
    "R": null,
    "name": "Erasca, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33666,7 +33605,7 @@
    "R": -1.0,
    "name": "Geo Group Inc (The) REIT",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33688,7 +33627,7 @@
    "R": null,
    "name": "Trex Company, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33699,7 +33638,7 @@
    "stop": 80.79,
    "rsi_signal": 55.9,
    "value_cr": 73.52,
-   "supertrend": 89.06,
+   "supertrend": 89.23,
    "st_up": true,
    "close": 101.63,
    "entry": 87.4,
@@ -33710,7 +33649,7 @@
    "R": -1.05,
    "name": "Valaris Limited Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33732,7 +33671,7 @@
    "R": -1.0,
    "name": "Patterson-UTI Energy, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33754,7 +33693,7 @@
    "R": -0.56,
    "name": "Tarsus Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33776,7 +33715,7 @@
    "R": -1.0,
    "name": "Aura Minerals Inc. - Common Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33798,7 +33737,7 @@
    "R": null,
    "name": "DXC Technology Company Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     11.12,
     11.09,
@@ -33881,7 +33820,7 @@
    "R": -1.0,
    "name": "Ligand Pharmaceuticals Incorporated",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33903,7 +33842,7 @@
    "R": null,
    "name": "Par Pacific Holdings, Inc.  Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33914,7 +33853,7 @@
    "stop": 121.6,
    "rsi_signal": 60.1,
    "value_cr": 65.98,
-   "supertrend": 123.26,
+   "supertrend": 123.98,
    "st_up": true,
    "close": 132.47,
    "entry": 130.69,
@@ -33925,7 +33864,7 @@
    "R": -1.0,
    "name": "Ryman Hospitality Properties, Inc. (REIT)",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -33947,7 +33886,7 @@
    "R": null,
    "name": "Kiniksa Pharmaceuticals International, plc - Class A Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     78.08,
     76.51,
@@ -34030,7 +33969,7 @@
    "R": -0.88,
    "name": "Casella Waste Systems, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34052,7 +33991,7 @@
    "R": -1.0,
    "name": "Moelis & Company Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34074,7 +34013,7 @@
    "R": null,
    "name": "AMC Entertainment Holdings, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34096,7 +34035,7 @@
    "R": null,
    "name": "The Baldwin Insurance Group, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     28.77,
     28.6,
@@ -34179,7 +34118,7 @@
    "R": -1.0,
    "name": "Rhythm Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34201,7 +34140,7 @@
    "R": -1.15,
    "name": "Aegon Ltd. New York Registry Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34223,7 +34162,7 @@
    "R": -1.0,
    "name": "Manulife Financial Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34245,7 +34184,7 @@
    "R": -1.0,
    "name": "Nektar Therapeutics",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34267,7 +34206,7 @@
    "R": -0.73,
    "name": "Southwest Gas Holdings, Inc. Common Stock (DE)",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34289,7 +34228,7 @@
    "R": null,
    "name": "PagSeguro Digital Ltd. Class A Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34311,7 +34250,7 @@
    "R": -3.55,
    "name": "PagSeguro Digital Ltd. Class A Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34333,7 +34272,7 @@
    "R": -0.71,
    "name": "UGI Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34355,7 +34294,7 @@
    "R": -1.0,
    "name": "CG Oncology, Inc. - Common stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34377,7 +34316,7 @@
    "R": null,
    "name": "Sezzle Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34399,7 +34338,7 @@
    "R": -1.0,
    "name": "Edgewise Therapeutics, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34421,7 +34360,7 @@
    "R": -1.0,
    "name": "Takeda Pharmaceutical Company Limited American Depositary Shares (each representing 1/2 of a share of Common Stock)",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": [
     16.72,
     17.02,
@@ -34504,7 +34443,7 @@
    "R": null,
    "name": "Adaptive Biotechnologies Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34526,7 +34465,7 @@
    "R": -0.89,
    "name": "Cavco Industries, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34548,7 +34487,7 @@
    "R": -0.5,
    "name": "YPF Sociedad Anonima American Depositary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34570,7 +34509,7 @@
    "R": null,
    "name": "Biohaven Ltd. Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34581,7 +34520,7 @@
    "stop": 91.81,
    "rsi_signal": 56.8,
    "value_cr": 48.1,
-   "supertrend": 90.07,
+   "supertrend": 90.24,
    "st_up": false,
    "close": 85.06,
    "entry": 93.52,
@@ -34592,7 +34531,7 @@
    "R": -1.0,
    "name": "Donaldson Company, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34614,7 +34553,7 @@
    "R": -1.0,
    "name": "Artisan Partners Asset Management Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34636,7 +34575,7 @@
    "R": -1.0,
    "name": "Marex Group Limited - Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Mid",
    "spark": null
   },
   {
@@ -34658,7 +34597,7 @@
    "R": -1.01,
    "name": "Simmons First National Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -34680,7 +34619,7 @@
    "R": 2.33,
    "name": "AtriCure, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     39.34,
     39.49,
@@ -34763,7 +34702,7 @@
    "R": -1.31,
    "name": "Wendy's Company (The)",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -34785,7 +34724,7 @@
    "R": null,
    "name": "Fortrea Holdings Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     19.05,
     17.69,
@@ -34868,7 +34807,7 @@
    "R": -1.0,
    "name": "Ero Copper Corp. Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -34890,7 +34829,7 @@
    "R": null,
    "name": "Champion Homes, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -34912,7 +34851,7 @@
    "R": -1.0,
    "name": "NorthWestern Energy Group, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -34934,7 +34873,7 @@
    "R": -1.0,
    "name": "Iridium Communications Inc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -34956,7 +34895,7 @@
    "R": -1.0,
    "name": "First Interstate BancSystem, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -34978,7 +34917,7 @@
    "R": null,
    "name": "Standex International Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35000,7 +34939,7 @@
    "R": -1.0,
    "name": "Harmony Biosciences Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35022,7 +34961,7 @@
    "R": -1.0,
    "name": "Copa Holdings, S.A. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35044,7 +34983,7 @@
    "R": null,
    "name": "Absci Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35066,7 +35005,7 @@
    "R": null,
    "name": "Butterfly Network, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35088,7 +35027,7 @@
    "R": -1.0,
    "name": "Magnite, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35110,7 +35049,7 @@
    "R": -1.0,
    "name": "Blackstone Secured Lending Fund Common Shares of Beneficial Interest",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35132,7 +35071,7 @@
    "R": -1.01,
    "name": "Sotera Health Company",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35154,7 +35093,29 @@
    "R": -1.0,
    "name": "Sotera Health Company",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
+   "spark": null
+  },
+  {
+   "symbol": "AZZ",
+   "setup": "EMA 9/21 cross",
+   "signal_date": "2026-08-05",
+   "signal_close": 151.68,
+   "stop": 142.19,
+   "rsi_signal": 55.4,
+   "value_cr": 35.24,
+   "supertrend": 142.12,
+   "st_up": false,
+   "close": 136.9,
+   "entry": 153.46,
+   "risk_pct": 7.9,
+   "days": 59,
+   "status": "stopped 2026-08-20",
+   "gain_pct": -7.8,
+   "R": -1.06,
+   "name": "AZZ Inc.",
+   "board": "NYSE",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35176,29 +35137,7 @@
    "R": -1.0,
    "name": "Biglari Holdings Inc. Class B Common Stock",
    "board": "NYSE",
-   "size": "Micro",
-   "spark": null
-  },
-  {
-   "symbol": "AZZ",
-   "setup": "EMA 9/21 cross",
-   "signal_date": "2026-08-05",
-   "signal_close": 151.68,
-   "stop": 142.19,
-   "rsi_signal": 55.4,
-   "value_cr": 35.22,
-   "supertrend": 142.12,
-   "st_up": false,
-   "close": 136.9,
-   "entry": 153.46,
-   "risk_pct": 7.9,
-   "days": 59,
-   "status": "stopped 2026-08-20",
-   "gain_pct": -7.8,
-   "R": -1.06,
-   "name": "AZZ Inc.",
-   "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35220,7 +35159,7 @@
    "R": null,
    "name": "ClearOne, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35242,7 +35181,7 @@
    "R": -0.4,
    "name": "ACADIA Pharmaceuticals Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35264,7 +35203,7 @@
    "R": null,
    "name": "Astronics Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35286,7 +35225,7 @@
    "R": -1.02,
    "name": "DLocal Limited - Class A Common Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35308,7 +35247,7 @@
    "R": null,
    "name": "Griffon Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35330,7 +35269,7 @@
    "R": -1.0,
    "name": "Select Water Solutions, Inc. Class A common stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35352,7 +35291,7 @@
    "R": null,
    "name": "Perimeter Solutions, SA Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35374,7 +35313,7 @@
    "R": null,
    "name": "Trekor Metals Limited Common Shares",
    "board": "NYSE American",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35396,7 +35335,7 @@
    "R": -1.0,
    "name": "DXP Enterprises, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35418,7 +35357,7 @@
    "R": null,
    "name": "Nutex Health Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35440,7 +35379,7 @@
    "R": -1.0,
    "name": "News Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35462,7 +35401,7 @@
    "R": -1.0,
    "name": "IDEAYA Biosciences, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35484,7 +35423,7 @@
    "R": null,
    "name": "Aveanna Healthcare Holdings Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35506,7 +35445,7 @@
    "R": 0.18,
    "name": "Aveanna Healthcare Holdings Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35528,7 +35467,7 @@
    "R": null,
    "name": "Alkami Technology, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35550,7 +35489,7 @@
    "R": -1.15,
    "name": "COPT Defense Properties Common Shares of Beneficial Interest",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35572,7 +35511,7 @@
    "R": -1.0,
    "name": "First Financial Bancorp.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35594,7 +35533,7 @@
    "R": null,
    "name": "Daily Journal Corp. (S.C.)",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35616,7 +35555,7 @@
    "R": -1.0,
    "name": "Daily Journal Corp. (S.C.)",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35638,7 +35577,7 @@
    "R": -1.15,
    "name": "Ecopetrol S.A. American Depositary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35660,7 +35599,7 @@
    "R": -1.0,
    "name": "Spectrum Brands Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35682,7 +35621,7 @@
    "R": -0.8,
    "name": "Atlanta Braves Holdings, Inc. - Series C Common Stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35704,7 +35643,7 @@
    "R": -1.0,
    "name": "Ternium S.A. Ternium S.A. American Depositary Shares (each representing ten shares, USD1.00 par value)",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35726,7 +35665,7 @@
    "R": -1.0,
    "name": "Immunome, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35748,7 +35687,7 @@
    "R": -1.0,
    "name": "Eton Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35770,7 +35709,7 @@
    "R": null,
    "name": "Digital Turbine, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35792,7 +35731,7 @@
    "R": -1.0,
    "name": "Belite Bio, Inc - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35814,7 +35753,7 @@
    "R": null,
    "name": "Xeris Biopharma Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     8.11,
     7.36,
@@ -35897,7 +35836,7 @@
    "R": -1.0,
    "name": "Federal Agricultural Mortgage Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35919,7 +35858,7 @@
    "R": -1.0,
    "name": "Global Net Lease, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35941,7 +35880,7 @@
    "R": -1.0,
    "name": "HNI Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35963,7 +35902,7 @@
    "R": -1.0,
    "name": "TriNet Group, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -35985,7 +35924,7 @@
    "R": -1.0,
    "name": "Ellington Financial Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36007,7 +35946,7 @@
    "R": null,
    "name": "Flywire Corporation - Voting Common Stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36029,7 +35968,7 @@
    "R": -1.0,
    "name": "Oric Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36051,7 +35990,7 @@
    "R": -1.0,
    "name": "Oric Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36073,7 +36012,7 @@
    "R": null,
    "name": "Omada Health, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36095,7 +36034,7 @@
    "R": -1.0,
    "name": "LandBridge Corporation Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36117,7 +36056,7 @@
    "R": -1.0,
    "name": "LandBridge Corporation Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36139,7 +36078,7 @@
    "R": null,
    "name": "Frequency Electronics, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36161,7 +36100,7 @@
    "R": -1.0,
    "name": "Douglas Emmett, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36183,7 +36122,7 @@
    "R": null,
    "name": "Maravai LifeSciences Holdings, Inc. - Class A common stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36205,7 +36144,7 @@
    "R": null,
    "name": "Pulse Biosciences, Inc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     37.9,
     38.24,
@@ -36270,6 +36209,28 @@
    ]
   },
   {
+   "symbol": "DIN",
+   "setup": "EMA 9/21 cross",
+   "signal_date": "2026-08-24",
+   "signal_close": 35.87,
+   "stop": 32.52,
+   "rsi_signal": 55.6,
+   "value_cr": 19.04,
+   "supertrend": 29.33,
+   "st_up": true,
+   "close": 34.68,
+   "entry": 35.85,
+   "risk_pct": 10.2,
+   "days": 46,
+   "status": "stopped 2026-09-01",
+   "gain_pct": -9.9,
+   "R": -1.07,
+   "name": "Dine Brands Global, Inc. Common Stock",
+   "board": "NYSE",
+   "size": "Small",
+   "spark": null
+  },
+  {
    "symbol": "PHVS",
    "setup": "EMA 9/21 cross",
    "signal_date": "2026-08-07",
@@ -36288,29 +36249,7 @@
    "R": -0.61,
    "name": "Pharvaris N.V. - Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
-   "spark": null
-  },
-  {
-   "symbol": "DIN",
-   "setup": "EMA 9/21 cross",
-   "signal_date": "2026-08-24",
-   "signal_close": 35.87,
-   "stop": 32.52,
-   "rsi_signal": 55.6,
-   "value_cr": 18.94,
-   "supertrend": 29.33,
-   "st_up": true,
-   "close": 34.68,
-   "entry": 35.85,
-   "risk_pct": 10.2,
-   "days": 46,
-   "status": "stopped 2026-09-01",
-   "gain_pct": -9.9,
-   "R": -1.07,
-   "name": "Dine Brands Global, Inc. Common Stock",
-   "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36332,7 +36271,7 @@
    "R": null,
    "name": "JBDI Holdings Limited - Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36354,7 +36293,7 @@
    "R": null,
    "name": "JBDI Holdings Limited - Ordinary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36376,7 +36315,7 @@
    "R": -0.51,
    "name": "Omeros Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36398,7 +36337,7 @@
    "R": -1.0,
    "name": "Dime Commercial Bancshares, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36420,7 +36359,7 @@
    "R": -1.0,
    "name": "First Merchants Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36442,7 +36381,7 @@
    "R": -1.0,
    "name": "Hornbeck Offshore Services, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36464,7 +36403,7 @@
    "R": -1.0,
    "name": "Nuveen Quality Municipal Income Fund Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36486,7 +36425,7 @@
    "R": 0.02,
    "name": "Proto Labs, Inc. Common stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36508,7 +36447,7 @@
    "R": -1.01,
    "name": "Worthington Enterprises, Inc. Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36530,7 +36469,7 @@
    "R": -1.0,
    "name": "OneSpaWorld Holdings Limited - Common Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36552,7 +36491,7 @@
    "R": null,
    "name": "Professional Diversity Network, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36574,7 +36513,7 @@
    "R": -1.0,
    "name": "FirstService Corporation - Common Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36596,7 +36535,7 @@
    "R": -1.0,
    "name": "Kura Oncology, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36618,7 +36557,7 @@
    "R": -1.0,
    "name": "Guardian Pharmacy Services, Inc. Class A Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36640,7 +36579,7 @@
    "R": -1.0,
    "name": "OFG Bancorp Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36662,7 +36601,7 @@
    "R": -1.0,
    "name": "BancFirst Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36684,7 +36623,7 @@
    "R": -1.0,
    "name": "WaterBridge Infrastructure LLC Class A Shares Representing Limited Liability Company Interests",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36706,7 +36645,7 @@
    "R": -1.0,
    "name": "Investors Title Company",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36728,7 +36667,7 @@
    "R": null,
    "name": "MannKind Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36750,7 +36689,7 @@
    "R": null,
    "name": "CeriBell, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     18.29,
     18.25,
@@ -36833,7 +36772,7 @@
    "R": -1.0,
    "name": "AngioDynamics, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36855,7 +36794,7 @@
    "R": -1.0,
    "name": "West Fraser Timber Co. Ltd Common stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36877,7 +36816,7 @@
    "R": null,
    "name": "Kopin Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36899,7 +36838,7 @@
    "R": null,
    "name": "Contineum Therapeutics, Inc. - Common stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36921,7 +36860,7 @@
    "R": -1.0,
    "name": "Liberty Latin America Ltd.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36943,7 +36882,7 @@
    "R": -1.0,
    "name": "Global Ship Lease Inc New Class A Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36965,7 +36904,7 @@
    "R": null,
    "name": "Climb Bio, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -36987,7 +36926,7 @@
    "R": null,
    "name": "Geron Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37009,7 +36948,7 @@
    "R": -1.72,
    "name": "National Beverage Corp.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37031,7 +36970,7 @@
    "R": null,
    "name": "QuinStreet, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37053,7 +36992,7 @@
    "R": null,
    "name": "EverQuote, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37075,7 +37014,7 @@
    "R": -1.34,
    "name": "ORIX Corporation American Depositary Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37097,7 +37036,7 @@
    "R": -1.0,
    "name": "Payoneer Global Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37119,7 +37058,7 @@
    "R": -1.0,
    "name": "Genco Shipping & Trading Limited Ordinary Shares New (Marshall Islands)",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37141,7 +37080,7 @@
    "R": null,
    "name": "Transcat, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37163,7 +37102,7 @@
    "R": -1.0,
    "name": "Navient Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37185,7 +37124,7 @@
    "R": -1.0,
    "name": "Easterly Government Properties, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37207,7 +37146,7 @@
    "R": -1.0,
    "name": "Bank First Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37229,7 +37168,7 @@
    "R": -1.0,
    "name": "Mission Produce, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37251,7 +37190,7 @@
    "R": -1.29,
    "name": "Triple Flag Precious Metals Corp. Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37262,7 +37201,7 @@
    "stop": 11.9,
    "rsi_signal": 63.0,
    "value_cr": 10.82,
-   "supertrend": 11.9,
+   "supertrend": 11.89,
    "st_up": true,
    "close": 13.82,
    "entry": 13.94,
@@ -37273,7 +37212,7 @@
    "R": null,
    "name": "Wabash National Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37295,7 +37234,7 @@
    "R": null,
    "name": "Liquidity Services, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     37.54,
     42.01,
@@ -37378,7 +37317,7 @@
    "R": -1.0,
    "name": "Community Trust Bancorp, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37400,7 +37339,7 @@
    "R": -1.0,
    "name": "Freenome, Inc. - Common stock",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37422,7 +37361,7 @@
    "R": -1.0,
    "name": "Capitol Federal Financial, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37444,7 +37383,7 @@
    "R": -1.0,
    "name": "Tompkins Financial Corporation Common Stock",
    "board": "NYSE American",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37466,7 +37405,7 @@
    "R": null,
    "name": "ReNew Energy Global plc - Class A Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     6.11,
     6.23,
@@ -37549,7 +37488,7 @@
    "R": null,
    "name": "Methode Electronics, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37571,7 +37510,7 @@
    "R": null,
    "name": "Sprout Social, Inc",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     8.63,
     8.19,
@@ -37654,7 +37593,7 @@
    "R": null,
    "name": "XChange TEC.INC - American Depositary Shares",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37676,7 +37615,7 @@
    "R": -1.0,
    "name": "Origin Bancorp, Inc. Common Stock",
    "board": "Other",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37698,7 +37637,7 @@
    "R": null,
    "name": "3D Systems Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37720,7 +37659,7 @@
    "R": 0.38,
    "name": "UMH Properties, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37742,7 +37681,7 @@
    "R": null,
    "name": "Starling Oncology, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     5.03,
     4.99,
@@ -37825,7 +37764,7 @@
    "R": -1.0,
    "name": "Greenfire Resources Ltd. Common Shares",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37847,7 +37786,7 @@
    "R": null,
    "name": "Faeth Therapeutics, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37869,7 +37808,7 @@
    "R": null,
    "name": "Quanex Building Products Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37891,7 +37830,7 @@
    "R": -1.0,
    "name": "Quanex Building Products Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37913,7 +37852,7 @@
    "R": null,
    "name": "ChargePoint Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37935,7 +37874,7 @@
    "R": null,
    "name": "Chagee Holdings Limited - American Depositary Shares, each representing 1 Class A ordinary share",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37957,7 +37896,7 @@
    "R": -1.0,
    "name": "First Mid Bancshares, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -37979,7 +37918,7 @@
    "R": null,
    "name": "Xerox Holdings Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38001,7 +37940,7 @@
    "R": -1.0,
    "name": "Heritage Insurance Holdings, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     30.23,
     35.21,
@@ -38066,6 +38005,28 @@
    ]
   },
   {
+   "symbol": "CAAP",
+   "setup": "EMA 9/21 cross",
+   "signal_date": "2026-09-28",
+   "signal_close": 26.05,
+   "stop": 23.35,
+   "rsi_signal": 66.6,
+   "value_cr": 7.58,
+   "supertrend": 23.4,
+   "st_up": true,
+   "close": 23.61,
+   "entry": 26.09,
+   "risk_pct": 11.7,
+   "days": 22,
+   "status": "stopped 2026-10-26",
+   "gain_pct": -10.5,
+   "R": -1.0,
+   "name": "Corporacion America Airports SA Common Shares",
+   "board": "NYSE",
+   "size": "Small",
+   "spark": null
+  },
+  {
    "symbol": "GDYN",
    "setup": "EMA 9/21 cross",
    "signal_date": "2026-10-01",
@@ -38084,29 +38045,7 @@
    "R": null,
    "name": "Grid Dynamics Holdings, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
-   "spark": null
-  },
-  {
-   "symbol": "CAAP",
-   "setup": "EMA 9/21 cross",
-   "signal_date": "2026-09-28",
-   "signal_close": 26.05,
-   "stop": 23.35,
-   "rsi_signal": 66.6,
-   "value_cr": 7.4,
-   "supertrend": 23.4,
-   "st_up": true,
-   "close": 23.61,
-   "entry": 26.09,
-   "risk_pct": 11.7,
-   "days": 22,
-   "status": "stopped 2026-10-26",
-   "gain_pct": -10.5,
-   "R": -1.0,
-   "name": "Corporacion America Airports SA Common Shares",
-   "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38128,7 +38067,7 @@
    "R": -1.0,
    "name": "Mercantile Bank Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38150,7 +38089,7 @@
    "R": null,
    "name": "Permian Basin Royalty Trust Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38172,7 +38111,7 @@
    "R": -1.0,
    "name": "Ooma, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38194,7 +38133,7 @@
    "R": -1.0,
    "name": "Eupraxia Pharmaceuticals Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38216,7 +38155,7 @@
    "R": null,
    "name": "Agenus Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38238,7 +38177,7 @@
    "R": -1.0,
    "name": "Brandywine Realty Trust Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38260,7 +38199,7 @@
    "R": -1.0,
    "name": "Ironwood Pharmaceuticals, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38282,7 +38221,7 @@
    "R": -1.0,
    "name": "XMAX, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38304,7 +38243,7 @@
    "R": null,
    "name": "Editas Medicine, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38326,7 +38265,7 @@
    "R": -1.0,
    "name": "UNITIL Corporation Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38348,7 +38287,7 @@
    "R": -1.0,
    "name": "NB Bancorp, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38370,7 +38309,7 @@
    "R": -0.76,
    "name": "Dakota Gold Corp. Common Stock",
    "board": "NYSE American",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38392,7 +38331,7 @@
    "R": -1.0,
    "name": "Business First Bancshares, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38414,7 +38353,7 @@
    "R": -1.0,
    "name": "Columbus McKinnon Corporation",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38436,7 +38375,7 @@
    "R": -1.0,
    "name": "Gladstone Commercial Corporation - Real Estate Investment Trust",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38458,7 +38397,7 @@
    "R": -1.0,
    "name": "John Marshall Bancorp, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38480,7 +38419,7 @@
    "R": -1.0,
    "name": "SmartFinancial, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38502,7 +38441,7 @@
    "R": -0.62,
    "name": "KKR Real Estate Finance Trust Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38524,7 +38463,7 @@
    "R": -1.0,
    "name": "Ardent Health, Inc. Common Stock",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38546,7 +38485,7 @@
    "R": null,
    "name": "Fossil Group, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": [
     5.91,
     5.82,
@@ -38629,7 +38568,7 @@
    "R": -1.0,
    "name": "Flexsteel Industries, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38651,7 +38590,7 @@
    "R": null,
    "name": "Kelly Services, Inc.",
    "board": "Nasdaq",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -38673,7 +38612,7 @@
    "R": 0.16,
    "name": "BlackRock Science and Technology Term Trust Common Shares of Beneficial Interest",
    "board": "NYSE",
-   "size": "Micro",
+   "size": "Small",
    "spark": null
   },
   {
@@ -39390,7 +39329,7 @@
    "stop": 7.87,
    "rsi_signal": 64.6,
    "value_cr": 3.72,
-   "supertrend": 7.82,
+   "supertrend": 7.81,
    "st_up": true,
    "close": 9.1,
    "entry": 9.0,

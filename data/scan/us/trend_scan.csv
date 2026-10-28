@@ -1,6 +1,6 @@
 symbol,close,ema9,ema21,ema50,above21_60d,dist21,off_high,r1m,r3m,r6m,slope_yr,r2,rsi,value_cr,stacked,e21_rising,above50,last_date,ticker,name,board,list,tag,score
 NTRA,424.42,408.66,400.64,373.1,100,5.9,-0.3,2.4,57.4,117.9,451,0.95,65.9,640.8,True,True,True,2026-10-28,NTRA,"Natera, Inc.",Nasdaq,trend,riding,173.2
-VEEV,317.82,315.0,303.9,280.38,100,4.6,-1.6,14.1,57.7,100.9,429,0.93,67.1,441.24,True,True,True,2026-10-28,VEEV,Veeva Systems Inc. Class A Common Stock,NYSE,trend,riding,173.0
+VEEV,317.82,315.0,303.9,280.38,100,4.6,-1.6,14.1,57.7,100.9,429,0.93,67.1,441.26,True,True,True,2026-10-28,VEEV,Veeva Systems Inc. Class A Common Stock,NYSE,trend,riding,173.0
 HAE,118.32,118.24,115.46,108.11,92,2.5,-3.1,11.8,39.5,100.5,370,0.93,61.0,87.54,True,True,True,2026-10-28,HAE,Haemonetics Corporation Common Stock,NYSE,trend,at EMA21,169.0
 CDNA,72.13,69.2,66.23,59.18,100,8.9,0.0,12.7,89.3,246.8,1757,0.96,68.7,89.14,True,True,True,2026-10-28,CDNA,"CareDx, Inc.",Nasdaq,trend,extended,168.2
 PD,17.95,17.34,16.56,15.02,100,8.4,0.0,20.1,73.1,169.9,578,0.94,72.5,26.42,True,True,True,2026-10-28,PD,"PagerDuty, Inc. Common Stock",NYSE,trend,extended,167.2
@@ -11,12 +11,12 @@ IOVA,14.81,14.33,13.69,11.64,98,8.2,-0.3,2.5,215.8,347.4,2985,0.92,63.0,164.1,Tr
 NSIT,177.84,173.15,167.87,158.77,90,5.9,-0.5,14.3,39.2,141.7,301,0.91,66.2,56.72,True,True,True,2026-10-28,NSIT,"Insight Enterprises, Inc.",Nasdaq,trend,riding,164.2
 MTW,23.15,22.46,22.21,20.98,92,4.2,-1.5,4.7,67.4,77.9,465,0.88,60.6,7.94,True,True,True,2026-10-28,MTW,"Manitowoc Company, Inc. (The) Common Stock",NYSE,trend,riding,164.0
 HALO,130.03,125.18,119.95,111.69,95,8.4,0.0,16.6,56.1,106.2,348,0.93,78.6,255.66,True,True,True,2026-10-28,HALO,"Halozyme Therapeutics, Inc.",Nasdaq,trend,extended,163.7
-ELF,115.41,113.37,110.25,103.59,85,4.7,-6.3,13.5,40.3,88.9,499,0.91,65.6,137.5,True,True,True,2026-10-28,ELF,"e.l.f. Beauty, Inc. Common Stock",NYSE,trend,riding,163.5
+ELF,115.41,113.37,110.25,103.59,85,4.7,-6.3,13.5,40.3,88.9,499,0.91,65.6,137.52,True,True,True,2026-10-28,ELF,"e.l.f. Beauty, Inc. Common Stock",NYSE,trend,riding,163.5
 ANDG,62.93,61.94,59.6,55.78,90,5.6,-1.9,13.4,36.6,85.5,261,0.93,66.5,19.8,True,True,True,2026-10-28,ANDG,Andersen Group Inc. Class A Common Stock,NYSE,trend,riding,162.9
 ILMN,288.79,275.61,269.13,249.47,85,7.3,-1.7,6.2,40.8,139.9,321,0.94,63.7,644.8,True,True,True,2026-10-28,ILMN,"Illumina, Inc.",Nasdaq,trend,riding,161.9
 TOP,15.63,15.29,15.12,14.37,92,3.4,-6.6,4.7,49.9,290.8,1909,0.85,55.6,2.28,True,True,True,2026-10-28,TOP,TOP Financial Group Limited - Class A Ordinary Shares,Nasdaq,trend,riding,161.0
 VREX,18.45,18.43,18.41,17.7,100,0.2,-0.7,-0.1,66.7,67.3,526,0.81,62.5,9.86,True,True,True,2026-10-28,VREX,Varex Imaging Corporation,Nasdaq,trend,at EMA21,161.0
-ECO,99.04,93.84,90.49,81.78,100,9.5,-0.2,23.4,80.5,106.9,484,0.9,64.8,81.68,True,True,True,2026-10-28,ECO,Okeanis Eco Tankers Corp. Common Stock,NYSE,trend,extended,161.0
+ECO,99.04,93.84,90.49,81.78,100,9.5,-0.2,23.4,80.5,106.9,484,0.9,64.8,81.74,True,True,True,2026-10-28,ECO,Okeanis Eco Tankers Corp. Common Stock,NYSE,trend,extended,161.0
 RSKD,9.04,8.87,8.42,7.54,97,7.4,-2.0,17.3,72.5,104.5,301,0.87,66.8,17.18,True,True,True,2026-10-28,RSKD,Riskified Ltd. Class A Ordinary Shares,NYSE,trend,riding,160.7
 TEAM,220.12,219.09,210.39,189.94,95,4.6,-3.3,25.1,124.3,212.3,1109,0.83,61.7,483.16,True,True,True,2026-10-28,TEAM,Atlassian Corporation,Nasdaq,trend,riding,160.5
 ZETA,33.45,33.41,32.82,30.91,90,1.9,-1.9,15.5,56.5,87.8,350,0.85,56.1,191.18,True,True,True,2026-10-28,ZETA,Zeta Global Holdings Corp. Class A Common Stock,NYSE,trend,at EMA21,160.0
@@ -39,17 +39,17 @@ ZBRA,384.7,383.19,379.2,363.54,85,1.5,-1.6,2.3,33.3,78.5,260,0.83,57.0,170.12,Tr
 FRO,55.53,53.65,52.67,48.96,87,5.4,-6.2,13.5,51.6,70.5,235,0.85,60.6,237.18,True,True,True,2026-10-28,FRO,Frontline Plc Ordinary Shares,NYSE,trend,riding,151.2
 BSVN,59.03,58.08,56.91,54.94,95,3.7,0.0,6.8,18.7,37.3,95,0.93,69.3,2.48,True,True,True,2026-10-28,BSVN,Bank7 Corp. - Common stock,Nasdaq,trend,riding,150.0
 CON,40.59,39.45,38.19,36.24,88,6.3,0.0,14.9,28.6,82.1,160,0.92,71.8,47.14,True,True,True,2026-10-28,CON,"Concentra Group Holdings Parent, Inc. Common Stock",NYSE,trend,riding,149.4
-A,181.48,175.88,172.28,163.81,88,5.3,0.0,3.8,31.0,63.6,145,0.9,67.1,364.26,True,True,True,2026-10-28,A,"Agilent Technologies, Inc. Common Stock",NYSE,trend,riding,147.9
+A,181.48,175.88,172.28,163.81,88,5.3,0.0,3.8,31.0,63.6,145,0.9,67.1,364.28,True,True,True,2026-10-28,A,"Agilent Technologies, Inc. Common Stock",NYSE,trend,riding,147.9
 DHT,24.46,24.25,23.86,22.39,90,2.5,-8.0,9.1,40.7,48.0,184,0.84,57.0,128.82,True,True,True,2026-10-28,DHT,"DHT Holdings, Inc.",NYSE,trend,at EMA21,147.4
 AMPH,26.33,25.87,25.7,24.56,95,2.5,-10.4,-1.3,29.2,21.7,137,0.86,57.8,10.38,True,True,True,2026-10-28,AMPH,"Amphastar Pharmaceuticals, Inc.",Nasdaq,trend,at EMA21,147.2
 RCBC,58.93,56.23,54.89,52.71,90,7.4,0.0,14.2,22.9,44.1,110,0.95,73.9,5.36,True,True,True,2026-10-28,RCBC,River City Bank - Common stock,Nasdaq,trend,riding,146.2
 EXPD,197.15,196.9,194.94,190.28,90,1.1,-1.2,4.8,18.0,33.2,74,0.91,57.0,220.68,True,True,True,2026-10-28,EXPD,"Expeditors International of Washington, Inc. Common Stock",NYSE,trend,at EMA21,143.4
 IOSP,100.7,99.08,97.9,95.39,92,2.9,0.0,4.1,17.0,34.8,70,0.9,66.3,22.42,True,True,True,2026-10-28,IOSP,Innospec Inc.,Nasdaq,trend,at EMA21,143.0
-BOX,42.8,41.74,39.41,36.41,85,8.6,-0.9,30.7,37.7,73.6,185,0.89,79.4,104.24,True,True,True,2026-10-28,BOX,"Box, Inc. Class A Common Stock",NYSE,trend,extended,142.8
-CRL,373.98,343.3,322.85,298.86,85,15.8,0.0,26.4,59.4,128.3,387,0.91,80.2,372.62,True,True,True,2026-10-28,CRL,"Charles River Laboratories International, Inc. Common Stock",NYSE,trend,extended,141.9
+BOX,42.8,41.74,39.41,36.41,85,8.6,-0.9,30.7,37.7,73.6,185,0.89,79.4,104.26,True,True,True,2026-10-28,BOX,"Box, Inc. Class A Common Stock",NYSE,trend,extended,142.8
+CRL,373.98,343.3,322.85,298.86,85,15.8,0.0,26.4,59.4,128.3,387,0.91,80.2,372.84,True,True,True,2026-10-28,CRL,"Charles River Laboratories International, Inc. Common Stock",NYSE,trend,extended,141.9
 CAI,35.45,32.58,31.13,28.43,92,13.9,0.0,12.4,120.3,99.5,499,0.83,71.1,109.6,True,True,True,2026-10-28,CAI,"Caris Life Sciences, Inc.",Nasdaq,trend,extended,141.2
 QGEN,50.33,49.24,47.47,45.32,87,6.0,-8.8,13.4,21.4,51.1,106,0.89,73.1,272.76,True,True,True,2026-10-28,QGEN,Qiagen N.V. Common Shares,NYSE,trend,riding,141.1
-WAT,476.88,456.97,445.55,428.93,93,7.0,0.0,7.6,25.4,63.2,81,0.9,72.5,402.52,True,True,True,2026-10-28,WAT,Waters Corporation Common Stock,NYSE,trend,riding,140.6
+WAT,476.88,456.97,445.55,428.93,93,7.0,0.0,7.6,25.4,63.2,81,0.9,72.5,402.5,True,True,True,2026-10-28,WAT,Waters Corporation Common Stock,NYSE,trend,riding,140.6
 CERT,11.48,10.43,9.84,9.06,88,16.7,-1.9,24.0,47.6,94.6,377,0.89,74.7,25.94,True,True,True,2026-10-28,CERT,"Certara, Inc.",Nasdaq,trend,extended,139.6
 RCEL,16.5,15.14,13.96,11.94,98,18.2,0.0,38.0,267.5,290.1,2654,0.87,79.6,5.88,True,True,True,2026-10-28,RCEL,"Avita Medical, Inc.",Nasdaq,trend,extended,139.6
 SAIC,148.93,143.07,137.46,131.43,88,8.3,-0.4,16.5,29.1,57.5,112,0.85,75.4,57.22,True,True,True,2026-10-28,SAIC,Science Applications International Corporation,Nasdaq,trend,extended,133.6
@@ -61,11 +61,11 @@ GMAB,57.29,44.53,40.6,36.89,95,41.1,0.0,61.1,100.0,119.4,189,0.86,90.4,278.62,Tr
 AVTR,16.69,16.8,16.28,15.28,98,2.5,-3.5,9.5,20.4,112.6,451,0.94,60.2,171.34,False,True,True,2026-10-28,AVTR,"Avantor, Inc. Common Stock",NYSE,watch,at EMA21,173.0
 KRT,53.4,53.83,53.38,50.61,95,0.0,-2.3,1.3,34.1,92.8,532,0.94,52.7,8.72,False,True,True,2026-10-28,KRT,Karat Packaging Inc.,Nasdaq,watch,at EMA21,171.5
 MPC,440.77,455.66,448.47,415.36,88,-1.7,-9.1,12.4,40.7,83.5,371,0.94,49.5,917.76,False,True,True,2026-10-28,MPC,Marathon Petroleum Corporation Common Stock,NYSE,watch,at EMA21,168.0
-DINO,111.96,119.72,118.73,110.97,88,-5.7,-12.7,6.0,21.9,72.1,333,0.92,41.8,265.98,False,True,True,2026-10-28,DINO,HF Sinclair Corporation Common Stock,NYSE,watch,at EMA21,166.0
+DINO,111.96,119.72,118.73,110.97,88,-5.7,-12.7,6.0,21.9,72.1,333,0.92,41.8,266.12,False,True,True,2026-10-28,DINO,HF Sinclair Corporation Common Stock,NYSE,watch,at EMA21,166.0
 PSX,273.76,281.19,278.41,262.76,93,-1.7,-7.9,8.5,30.7,59.8,267,0.92,48.7,654.5,False,True,True,2026-10-28,PSX,Phillips 66 Common Stock,NYSE,watch,at EMA21,165.2
 PAYS,13.97,14.69,14.56,13.55,87,-4.0,-10.6,8.7,52.5,112.0,748,0.91,46.1,13.62,False,True,True,2026-10-28,PAYS,"Paysign, Inc.",Nasdaq,watch,at EMA21,164.5
 GIC,44.23,44.33,43.62,41.66,98,1.4,-1.5,4.4,26.5,38.0,171,0.97,61.0,6.14,False,True,True,2026-10-28,GIC,Global Industrial Company Common Stock,NYSE,watch,at EMA21,163.1
-DT,62.81,63.34,61.91,57.78,98,1.5,-3.7,9.2,42.4,72.6,202,0.92,57.0,441.04,False,True,True,2026-10-28,DT,"Dynatrace, Inc. Common Stock",NYSE,watch,at EMA21,161.2
+DT,62.81,63.34,61.91,57.78,98,1.5,-3.7,9.2,42.4,72.6,202,0.92,57.0,441.88,False,True,True,2026-10-28,DT,"Dynatrace, Inc. Common Stock",NYSE,watch,at EMA21,161.2
 MRNA,214.16,213.08,206.99,176.99,92,3.5,-12.9,5.3,269.8,368.4,4555,0.84,55.0,4180.1,True,True,True,2026-10-28,MRNA,"Moderna, Inc.",Nasdaq,watch,riding,160.0
 AII,28.0,28.41,27.67,26.1,88,1.2,-5.1,10.8,38.2,44.6,272,0.88,55.7,5.48,False,True,True,2026-10-28,AII,"American Integrity Insurance Group, Inc. Common Stock",NYSE,watch,at EMA21,159.2
 IDT,81.6,81.81,80.08,75.25,95,1.9,-3.4,8.1,23.9,61.7,174,0.94,58.9,21.72,False,True,True,2026-10-28,IDT,IDT Corporation Class B Common Stock,NYSE,watch,at EMA21,158.9
@@ -104,12 +104,12 @@ SHOP,168.22,168.93,165.09,154.67,82,1.9,-6.1,13.5,37.4,38.7,195,0.82,56.6,1310.5
 RGEN,184.69,179.2,178.51,173.98,70,3.5,-5.1,-5.1,28.6,63.3,210,0.86,55.9,240.42,True,True,True,2026-10-28,RGEN,Repligen Corporation,Nasdaq,watch,riding,142.0
 VNCE,11.41,11.66,11.36,9.96,72,0.4,-14.6,12.5,81.7,147.0,730,0.76,52.6,4.14,False,True,True,2026-10-28,VNCE,Vince Holding Corp.,Nasdaq,watch,at EMA21,142.0
 CRVL,81.58,81.87,79.43,74.8,97,2.7,-3.6,9.5,37.1,40.3,104,0.83,63.8,13.34,False,True,True,2026-10-28,CRVL,CorVel Corp.,Nasdaq,watch,at EMA21,141.9
-RBRK,136.0,127.42,121.37,111.02,80,12.1,0.0,18.5,90.0,153.4,326,0.86,70.1,366.1,True,True,True,2026-10-28,RBRK,"Rubrik, Inc. Class A Common Stock",NYSE,watch,extended,141.8
+RBRK,136.0,127.42,121.37,111.02,80,12.1,0.0,18.5,90.0,153.4,326,0.86,70.1,366.12,True,True,True,2026-10-28,RBRK,"Rubrik, Inc. Class A Common Stock",NYSE,watch,extended,141.8
 FOSL,6.65,6.67,6.62,6.15,77,0.5,-7.9,8.0,36.6,49.8,250,0.78,53.4,5.36,False,True,True,2026-10-28,FOSL,"Fossil Group, Inc.",Nasdaq,watch,at EMA21,141.5
 MTD,1698.47,1661.5,1606.06,1515.55,82,5.8,0.0,10.5,23.0,37.0,137,0.88,76.3,317.92,True,True,True,2026-10-28,MTD,"Mettler-Toledo International, Inc. Common Stock",NYSE,watch,extended,141.1
 OSPN,20.08,19.48,18.73,17.71,82,7.2,-2.5,12.7,31.3,78.0,139,0.9,67.0,11.38,True,True,True,2026-10-28,OSPN,OneSpan Inc.,Nasdaq,watch,riding,140.5
 HSTM,33.73,33.99,32.99,31.24,85,2.2,-4.1,13.4,19.8,59.4,98,0.87,60.8,6.2,False,True,True,2026-10-28,HSTM,"HealthStream, Inc.",Nasdaq,watch,at EMA21,139.3
-DHR,234.07,230.27,225.86,218.08,82,3.6,-2.7,3.7,19.5,31.4,92,0.89,62.7,1041.76,True,True,True,2026-10-28,DHR,Danaher Corporation Common Stock,NYSE,watch,riding,139.2
+DHR,234.07,230.27,225.86,218.08,82,3.6,-2.7,3.7,19.5,31.4,92,0.89,62.7,1041.78,True,True,True,2026-10-28,DHR,Danaher Corporation Common Stock,NYSE,watch,riding,139.2
 W,114.02,112.12,109.17,104.48,82,4.4,-4.2,11.8,27.0,55.6,208,0.77,62.9,206.36,True,True,True,2026-10-28,W,Wayfair Inc. Class A Common Stock,NYSE,watch,riding,138.8
 RGA,260.98,263.84,260.38,252.82,87,0.2,-4.1,3.2,10.1,26.6,81,0.87,53.8,118.16,False,True,True,2026-10-28,RGA,"Reinsurance Group of America, Incorporated Common Stock",NYSE,watch,at EMA21,138.6
 WCCB,63.35,62.04,61.15,59.19,83,3.6,-0.2,5.0,15.7,27.9,76,0.89,80.1,4.24,True,True,True,2026-10-28,WCCB,West Coast Community Bancorp,Nasdaq,watch,extended,138.1
@@ -133,7 +133,7 @@ MEDP,692.68,660.46,639.88,615.97,77,8.3,0.0,11.3,19.8,67.5,154,0.86,72.3,214.5,T
 LIFE,42.83,41.73,39.73,36.5,77,7.8,-3.1,26.5,111.3,142.3,706,0.7,64.3,53.36,True,True,True,2026-10-28,LIFE,Ethos Technologies Inc.,Nasdaq,watch,riding,132.9
 BIIB,244.05,244.8,237.19,227.25,90,2.9,-3.9,7.5,17.4,25.6,57,0.82,59.8,315.2,False,True,True,2026-10-28,BIIB,Biogen Inc.,Nasdaq,watch,at EMA21,132.7
 OABI,5.28,4.87,4.76,4.4,85,10.9,0.0,11.4,165.3,288.2,799,0.72,63.6,6.58,True,True,True,2026-10-28,OABI,"OmniAb, Inc.",Nasdaq,watch,extended,132.7
-ABBV,285.99,284.46,278.57,268.38,78,2.7,-1.1,9.3,11.8,42.1,87,0.85,65.7,1442.96,True,True,True,2026-10-28,ABBV,AbbVie Inc. Common Stock,NYSE,watch,at EMA21,132.7
+ABBV,285.99,284.46,278.57,268.38,78,2.7,-1.1,9.3,11.8,42.1,87,0.85,65.7,1443.04,True,True,True,2026-10-28,ABBV,AbbVie Inc. Common Stock,NYSE,watch,at EMA21,132.7
 DBX,36.51,36.69,35.93,34.82,78,1.6,-3.5,11.7,13.7,50.2,120,0.81,55.7,108.16,False,True,True,2026-10-28,DBX,"Dropbox, Inc.",Nasdaq,watch,at EMA21,132.0
 BMEZ,17.57,16.96,16.71,16.4,75,5.1,0.0,4.6,14.9,30.9,67,0.88,69.7,2.54,True,True,True,2026-10-28,BMEZ,BlackRock Health Sciences Term Trust Common Shares of Beneficial Interest,NYSE,watch,riding,132.0
 HPQ,32.45,32.56,32.02,31.04,73,1.3,-8.5,5.6,22.0,64.7,165,0.79,53.2,368.04,False,True,True,2026-10-28,HPQ,HP Inc. Common Stock,NYSE,watch,at EMA21,132.0
@@ -160,7 +160,7 @@ EXLS,40.72,40.68,39.12,37.03,73,4.1,-6.1,17.8,18.5,30.6,135,0.7,63.7,98.68,True,
 IFF,90.66,91.63,89.45,86.5,75,1.4,-3.7,6.3,14.6,32.9,55,0.77,58.6,178.16,False,True,True,2026-10-28,IFF,"International Flavors & Fragrances, Inc. Common Stock",NYSE,watch,at EMA21,120.0
 EXEL,66.28,64.4,62.3,59.51,82,6.4,0.0,13.0,18.4,48.3,56,0.75,75.5,134.12,True,True,True,2026-10-28,EXEL,"Exelixis, Inc.",Nasdaq,watch,extended,118.8
 ONC,373.36,372.21,367.99,358.96,73,1.5,-3.4,2.2,15.9,28.4,100,0.72,55.0,140.02,True,True,True,2026-10-28,ONC,BeOne Medicines Ltd. - American Depositary Shares,Nasdaq,watch,at EMA21,118.5
-CVX,229.2,226.96,220.98,212.2,82,3.7,-1.7,12.1,20.2,21.4,66,0.7,67.0,1598.7,True,True,True,2026-10-28,CVX,Chevron Corporation Common Stock,NYSE,watch,riding,117.6
+CVX,229.2,226.96,220.98,212.2,82,3.7,-1.7,12.1,20.2,21.4,66,0.7,67.0,1598.78,True,True,True,2026-10-28,CVX,Chevron Corporation Common Stock,NYSE,watch,riding,117.6
 CTKB,6.14,5.72,5.56,5.28,72,10.4,0.0,6.6,42.5,38.3,132,0.79,69.6,7.64,True,True,True,2026-10-28,CTKB,"Cytek Biosciences, Inc.",Nasdaq,watch,extended,117.4
 FAST,51.45,51.72,51.28,50.43,70,0.3,-2.4,3.0,10.3,18.4,45,0.77,52.6,418.88,False,True,True,2026-10-28,FAST,Fastenal Company,Nasdaq,watch,at EMA21,116.5
 GRAL,157.88,140.22,132.33,114.82,82,19.3,0.0,15.6,121.9,217.7,499,0.73,68.3,137.14,True,True,True,2026-10-28,GRAL,"GRAIL, Inc.",Nasdaq,watch,extended,115.4
