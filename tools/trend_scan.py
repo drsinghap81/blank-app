@@ -211,6 +211,27 @@ def base_breakout(o, h, l, c, v):
     sig = ((h > pmax) & (c > c.shift(1)) & (c > 20) & (val >= 2) & (age >= 126) & (sd == 1))
     return follow(o, h, l, c, sig, sd, line, r, val, cap_stop=True)
 
+def export_charts(frames, syms):
+    """Compact daily chart files for the phone app: data/scan/charts/<SYM>.json (last ~160 sessions with
+    EMA 9/21/50, Supertrend(10,3) line/direction and RSI(14))."""
+    import shutil
+    cdir = f"{OUT}/charts"
+    shutil.rmtree(cdir, ignore_errors=True)
+    os.makedirs(cdir, exist_ok=True)
+    for sym in syms:
+        if sym not in frames:
+            continue
+        o, h, l, c = frames[sym]
+        e9, e21, e50 = (c.ewm(span=n, adjust=False).mean() for n in (9, 21, 50))
+        sd, line = supertrend(h.values, l.values, c.values)
+        r = rsi(c)
+        n = min(160, len(c))
+        rd = lambda a: [None if not np.isfinite(x) else round(float(x), 2) for x in np.asarray(a)[-n:]]  # noqa: E731
+        json.dump(dict(t=[str(x.date()) for x in c.index[-n:]], o=rd(o), h=rd(h), l=rd(l), c=rd(c), e9=rd(e9),
+                       e21=rd(e21), e50=rd(e50), st=rd(line), sd=[int(x) for x in sd[-n:]], rsi=rd(r)),
+                  open(f"{cdir}/{sym}.json", "w"), separators=(",", ":"))
+
+
 def telegram(text):
     tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
     if not tok or not chat or os.environ.get("SEND_TELEGRAM") != "1":
@@ -225,7 +246,7 @@ def main():
     u = nse_symbols()
     print("symbols", len(u), u.board.value_counts().to_dict(), flush=True)
     tick = [t + ".NS" for t in u.symbol]
-    out, trigs, earl = [], [], []
+    out, trigs, earl, frames = [], [], [], {}
     for i in range(0, len(tick), 150):
         chunk = tick[i:i + 150]
         try:
@@ -241,6 +262,7 @@ def main():
             except Exception:  # noqa: BLE001
                 continue
             m, tg = metrics(o, h, l, c, v)
+            frames[t[:-3]] = (o.iloc[-260:], h.iloc[-260:], l.iloc[-260:], c.iloc[-260:])
             try:
                 ea = early(o, h, l, c, v)
             except Exception as e:  # noqa: BLE001
@@ -288,8 +310,23 @@ def main():
         E = E.sort_values(["order", "value_cr"], ascending=[True, False]).drop(columns="order")
         E.to_csv(f"{OUT}/early.csv", index=False)
     asof = df.last_date.max()
-    cols = ["symbol", "name", "board", "list", "tag", "score", "close", "ema9", "ema21", "dist21", "rsi", "r1m", "r3m",
-            "r6m", "r2", "above21_60d", "off_high", "value_cr", "last_date"]
+    # company-size bucket by rank of 20-day traded value among all scanned stocks (proxy for market-cap rank)
+    rk = df.set_index("symbol").value_cr.rank(ascending=False, method="first")
+    size = pd.cut(rk, [0, 100, 250, 500, 1e9], labels=["Large", "Mid", "Small", "Micro"]).astype(str).to_dict()
+    p["size"] = p.symbol.map(size)
+    if len(E):
+        E["size"] = E.symbol.map(size)
+    if len(tr):
+        tr["size"] = tr.symbol.map(size)
+    chart_syms = set(p.symbol) | (set(tr.symbol) if len(tr) else set()) | \
+        (set(E[E.status.str.startswith(("NEW", "open", "EXIT"))].symbol) if len(E) else set())
+    export_charts(frames, chart_syms)
+    spark = {k: [round(float(x), 2) for x in frames[k][3].iloc[-60:].values] for k in chart_syms if k in frames}
+    p["spark"] = p.symbol.map(spark)
+    if len(E):
+        E["spark"] = E.symbol.map(spark)
+    cols = ["symbol", "name", "board", "size", "list", "tag", "score", "close", "ema9", "ema21", "dist21", "rsi", "r1m",
+            "r3m", "r6m", "r2", "above21_60d", "off_high", "value_cr", "last_date", "spark"]
     json.dump(dict(asof=asof, generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
                    scanned=len(df), rows=p[cols].to_dict("records"),
                    triggers=tr.to_dict("records") if len(tr) else [],
