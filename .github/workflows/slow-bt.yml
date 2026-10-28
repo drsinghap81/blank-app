@@ -1,0 +1,24 @@
+name: slow-bt
+on:
+  push:
+    paths: [".github/workflows/slow-bt.yml", "tools/slow_bt.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        market: [US, ASX]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas numpy requests lxml
+      - run: mkdir -p data/slow && (python tools/slow_bt.py ${{ matrix.market }} > data/slow/${{ matrix.market }}_log.txt 2>&1 || true); grep -v -i "warn\|delisted\|failed download\|^\[" data/slow/${{ matrix.market }}_log.txt | tail -20
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan slow-${{ matrix.market }}; git rm -rqf --cached .; git add -f data/slow; git commit -qm "slow ${{ matrix.market }}"; git push -f origin slow-${{ matrix.market }}
