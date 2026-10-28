@@ -1930,7 +1930,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-28 · Trend entries fine-tuned v26"
+APP_BUILD = "2026-10-28 · Trend scan: click a stock to open its chart v27"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2064,93 +2064,121 @@ def trend_chart(sym: str, trig: dict | None = None) -> go.Figure | None:
 
 
 def render_trend_scan_tab() -> None:
-    """NSE stocks in a clean 9/21-EMA uptrend + the RSI-60 / bullish-candle-at-EMA21 entry trigger (nightly scan)."""
+    """NSE trend scanner (nightly): trend entries (EMA 9/21 cross, 52w-high base breakouts), pullback triggers, clear
+    trends and watchlist. Click a stock in the list on the left and its chart opens on the right."""
     d = load_trend_scan()
     if not d:
         st.info("The trend scan appears after the first nightly run (about 8 pm IST on trading days).")
         return
     rows, trig = pd.DataFrame(d.get("rows", [])), pd.DataFrame(d.get("triggers", []))
-    st.markdown(f"#### 📈 Trend scan — NSE close {d.get('asof')}")
-    st.caption("**Clear trend**: close > EMA 9 > EMA 21, EMA 21 rising, ≥ 85% of the last 60 closes above EMA 21, "
-               "smooth 6-month staircase (R² ≥ 0.8), within 12% of the 52-week high, 3-month gain ≥ 15%, "
-               "≥ ₹1 cr traded a day. **Watch**: a looser version that keeps stocks pulling back to EMA 21. "
-               "**Entry trigger**: RSI(14) crosses above 60 on a bullish candle (green, closing in the top 40% of "
-               "its range) within 2% of EMA 21, closing back above it (≤ 6% above), risk ≤ 10%; stop = lowest low of the last 3 sessions.")
-    trend, watch = rows[rows.list == "trend"] if len(rows) else rows, rows[rows.list == "watch"] if len(rows) else rows
-    fresh = trig[trig.days_ago == 0] if len(trig) else trig
-    c = st.columns(4)
-    c[0].metric("Stocks scanned", f"{d.get('scanned', 0):,}")
-    c[1].metric("Clear trends", len(trend))
-    c[2].metric("Watchlist", len(watch))
-    c[3].metric("Entry triggers today", len(fresh), f"{len(trig)} in the last 5 sessions", delta_color="off")
-
     early = pd.DataFrame(d.get("early", []))
-    st.markdown("##### 🚀 Trend entries — EMA 9/21 cross and 52-week-high base breakouts")
-    st.caption("**Entry**: EMA 9 crosses above EMA 21 with Supertrend(10,3) green, close above a rising EMA 50, RSI ≥ 55, "
-               "≥ ₹1 cr/day, within 30% of the 52-week high → buy the next open. **Stop**: lowest low of the last 5 sessions "
-               "(skip if > 12% away). **Ride**: hold until Supertrend turns red, sell the next open. Backtest 2017–26 on all "
-               "NSE stocks incl. delisted, 1% risk per trade, **max 10 positions, ≤ 20% of capital each**: about 22–26% a "
-               "year, worst fall about −26%, 37% of trades win; 2022–26 alone about 14% a year. Fine-tuning (wider Supertrend, "
-               "tighter stops, partial profits, time stops, volume or market filters, more positions) did not beat these rules. Tighter exits (2 red closes under EMA 9 or a close under "
-               "EMA 21) tested much worse.")
-    if len(early):
-        show_all = st.toggle("Also show stopped / exited / skipped signals", value=False, key="ts_early_all")
-        e = early if show_all else early[early.status.str.startswith(("NEW", "open", "EXIT"))]
-        ecols = {"symbol": "Symbol", "name": "Company", "setup": "Setup", "status": "Status", "signal_date": "Signal day",
-                 "signal_close": "Signal close", "entry": "Entry (next open)", "stop": "Initial stop", "risk_pct": "Risk %",
-                 "close": "Close now", "supertrend": "Supertrend (trail stop)", "gain_pct": "Gain %", "R": "R",
-                 "days": "Sessions", "value_cr": "₹ cr/day"}
-        st.dataframe(e[[k for k in ecols if k in e]].rename(columns=ecols), hide_index=True, width="stretch",
-                     height=min(38 * (len(e) + 1), 460))
-    else:
-        st.write("No early-entry signals in the last 60 sessions (appears after the next nightly run).")
-
-    st.markdown("##### 🟢 Pullback triggers (last 5 sessions) — RSI crosses 60 at EMA 21")
-    if len(trig):
-        tcols = {"symbol": "Symbol", "name": "Company", "trigger_date": "Trigger day", "trigger_close": "Trigger close",
-                 "trigger_rsi": "RSI then", "stop": "Stop", "risk_pct": "Risk %", "close": "Close now",
-                 "move_since": "Move since %", "list": "List", "score": "Trend score", "value_cr": "₹ cr/day"}
-        st.dataframe(trig[[k for k in tcols if k in trig]].rename(columns=tcols), hide_index=True, width="stretch")
-    else:
-        st.write("No triggers in the last 5 sessions.")
-
-    left, right = st.columns([1, 1])
-    hide_ext = left.toggle("Hide extended (> 8% above EMA 21 or RSI > 75)", value=False, key="ts_hide_ext")
-    min_val = right.select_slider("Min ₹ cr traded a day", options=[1, 2, 5, 10, 25, 50], value=1, key="ts_minval")
-    cols = {"symbol": "Symbol", "name": "Company", "tag": "Status", "score": "Score", "close": "Close",
-            "dist21": "% vs EMA21", "rsi": "RSI", "r1m": "1M %", "r3m": "3M %", "r6m": "6M %", "r2": "Smoothness R²",
-            "above21_60d": "% days > EMA21", "off_high": "% off 52w high", "value_cr": "₹ cr/day", "board": "Board"}
-
-    def show(df_, title):
-        st.markdown(f"##### {title}")
-        if df_.empty:
-            st.write("None.")
-            return
-        x = df_[df_.value_cr >= min_val]
-        if hide_ext:
-            x = x[x.tag != "extended"]
-        st.dataframe(x[[k for k in cols if k in x]].rename(columns=cols), hide_index=True, width="stretch",
-                     height=min(38 * (len(x) + 1), 460))
-
-    show(trend, "Clear trends")
-    show(watch, "Watchlist (pulling back toward EMA 21)")
-
+    trend = rows[rows.list == "trend"] if len(rows) else rows
+    watch = rows[rows.list == "watch"] if len(rows) else rows
     live = early[early.status.str.startswith(("NEW", "open", "EXIT"))] if len(early) else early
-    names = list(dict.fromkeys(list(live.symbol if len(live) else []) + list(trig.symbol if len(trig) else [])
-                               + list(rows.symbol if len(rows) else [])))
-    if names:
-        sym = st.selectbox("Chart", names, key="ts_chart")
-        t = (live[live.symbol == sym].iloc[0].to_dict() if len(live) and (live.symbol == sym).any()
-             else trig[trig.symbol == sym].iloc[0].to_dict() if len(trig) and (trig.symbol == sym).any() else None)
-        fig = trend_chart(sym, t)
-        if fig is None:
-            st.warning("Could not load prices for this symbol right now.")
-        else:
-            st.plotly_chart(fig, width="stretch")
-    st.caption(f"Scanned {d.get('generated', '')} UTC from Yahoo daily data. The pullback trigger with an EMA 21 exit lost its "
-               "edge after costs in backtests (5%/yr, −58% worst fall); prefer the early entries. "
-               "a signal is a candidate, not a recommendation.")
+    new = early[early.status.str.startswith("NEW - buy")] if len(early) else early
+    st.markdown(f"#### 📈 Trend scan — NSE close {d.get('asof')}")
+    c = st.columns(5)
+    c[0].metric("Stocks scanned", f"{d.get('scanned', 0):,}")
+    c[1].metric("New entries today", len(new))
+    c[2].metric("Open trend trades", int((live.status == "open").sum()) if len(live) else 0,
+                f"{int(live.status.str.startswith('EXIT').sum()) if len(live) else 0} to exit next open", delta_color="off")
+    c[3].metric("Clear trends", len(trend))
+    c[4].metric("Watchlist", len(watch))
 
+    with st.expander("Rules and backtest results"):
+        st.markdown(
+            "- **🚀 EMA 9/21 cross** (main system): EMA 9 crosses above EMA 21 with Supertrend(10,3) green, close above a "
+            "rising EMA 50, RSI ≥ 55, ≥ ₹1 cr/day, within 30% of the 52-week high → buy the next open. Stop = lowest low of "
+            "the last 5 sessions (skip if > 12% away). Hold until Supertrend turns red, sell the next open. 1% risk per trade, "
+            "max 10 positions, ≤ 20% of capital each. Backtest 2017–26 (all NSE incl. delisted): ~22–26%/yr, worst fall "
+            "~−26%, 2022–26 ~14%/yr; 37% of trades win.\n"
+            "- **🏔️ 52w-high base breakout**: today's high above the highest close of the prior 240 sessions, close up, "
+            "≥ ₹2 cr/day, previous 52-week closing high ≥ 6 months ago, Supertrend green. Stop = 5-day low capped at 12%; "
+            "same Supertrend exit. ~15%/yr, worst fall −29%, 2022–26 ~17.6%/yr. Run as a separate pot, not in the same slots.\n"
+            "- **🟢 Pullback trigger**: RSI(14) crosses 60 on a bullish candle at EMA 21 — weak in backtests (5%/yr with an "
+            "EMA 21 exit). Shown for reference.\n"
+            "- **📈 Clear trend / 👀 Watchlist**: close > EMA 9 > EMA 21, EMA 21 rising, ≥ 85% (watch: 70%) of the last 60 "
+            "closes above EMA 21, smooth 6-month staircase, near the 52-week high.\n"
+            "- Short versions of these setups on F&O stocks lost money in backtests and are not shown.")
+
+    views = {"🚀 Trend entries (new / open / exit)": "early", "🟢 Pullback triggers": "trig",
+             "📈 Clear trends": "trend", "👀 Watchlist": "watch"}
+    v1, v2, v3 = st.columns([3, 1.3, 1.3])
+    cat = v1.radio("List", list(views), horizontal=True, key="ts_cat", label_visibility="collapsed")
+    kind = views[cat]
+    min_val = v2.select_slider("Min ₹ cr/day", options=[1, 2, 5, 10, 25, 50], value=1, key="ts_minval")
+    if kind == "early":
+        opt = v3.selectbox("Show", ["New, open & exits", "Cross only", "Breakouts only", "All incl. closed"],
+                           key="ts_early_show")
+        x = early if opt == "All incl. closed" else live
+        if opt == "Cross only" and len(x):
+            x = x[x.setup.str.startswith("EMA")]
+        if opt == "Breakouts only" and len(x):
+            x = x[~x.setup.str.startswith("EMA")]
+    elif kind == "trig":
+        x = trig
+    else:
+        hide_ext = v3.toggle("Hide extended", value=False, key="ts_hide_ext",
+                             help="Hide stocks > 8% above EMA 21 or with RSI > 75")
+        x = trend if kind == "trend" else watch
+        if hide_ext and len(x):
+            x = x[x.tag != "extended"]
+    if len(x) and "value_cr" in x:
+        x = x[x.value_cr >= min_val]
+    x = x.reset_index(drop=True)
+
+    def label(r) -> str:
+        if kind == "early":
+            st_ = (r["status"].split(" (")[0].replace(" - buy next open", " → buy next open")
+                   .replace("NEW but stop > 12% away - skip unless it opens lower", "NEW, stop > 12% → skip"))
+            icon = "🚀" if str(r.get("setup", "")).startswith("EMA") else "🏔️"
+            g = "" if pd.isna(r.get("gain_pct")) else f" · {r['gain_pct']:+.1f}%"
+            return (f"{icon} {r['symbol']} · {st_}{g} · stop {r['stop']:,.1f} · trail {r['supertrend']:,.1f} · "
+                    f"signal {pd.Timestamp(r['signal_date']).strftime('%d %b')}")
+        if kind == "trig":
+            return (f"{r['symbol']} · {pd.Timestamp(r['trigger_date']).strftime('%d %b')} · close {r['trigger_close']:,.1f} · "
+                    f"stop {r['stop']:,.1f} ({r['risk_pct']}%) · now {r['close']:,.1f}")
+        return (f"{r['symbol']} · {r['tag']} · close {r['close']:,.1f} · {r['dist21']:+.1f}% vs EMA21 · RSI {r['rsi']:.0f} · "
+                f"3M {r['r3m']:+.0f}%")
+
+    left, right = st.columns([38, 62], gap="medium")
+    with left:
+        st.markdown(f"##### {cat.split(' (')[0]} — {len(x)} stocks")
+        if not len(x):
+            st.info("Nothing in this list right now.")
+            pick = None
+        else:
+            labels = [label(r) for _, r in x.iterrows()]
+            pk = f"ts_row_{kind}"
+            if st.session_state.get(pk, 0) >= len(labels):
+                st.session_state[pk] = 0
+            with st.container(height=560):
+                idx = st.radio("Stocks", list(range(len(labels))), format_func=lambda i: labels[i], key=pk,
+                               label_visibility="collapsed")
+            pick = x.iloc[idx]
+            with st.expander("Table view"):
+                st.dataframe(x, width="stretch", hide_index=True)
+    with right:
+        if pick is not None:
+            sym = pick["symbol"]
+            info = pick.to_dict() if kind in ("early", "trig") else None
+            fig = trend_chart(sym, info)
+            if fig is None:
+                st.warning(f"Could not load prices for {sym} right now — try again in a minute.")
+            else:
+                h1, h2 = st.columns([4, 1])
+                nm = pick.get("name") if isinstance(pick.get("name"), str) else ""
+                h1.markdown(f"##### {sym} {('— ' + nm) if nm else ''}")
+                if h2.button("⛶ Full screen", key=f"ts_fs_{sym}", width="stretch"):
+                    _chart_fullscreen(fig, sym)
+                fig.update_layout(height=560)
+                st.plotly_chart(fig, width="stretch", key=f"ts_chart_{kind}_{sym}", config=CHART_CONFIG)
+                if kind == "early":
+                    st.caption(f"{pick['setup']} · {pick['status']} · signal {pick['signal_date']} at {pick['signal_close']:,.2f}"
+                               f" · initial stop {pick['stop']:,.2f} ({pick['risk_pct']}% risk) · Supertrend trail "
+                               f"{pick['supertrend']:,.2f} · ₹{pick['value_cr']:,.1f} cr/day")
+    st.caption(f"Scanned {d.get('generated', '')} UTC from Yahoo daily data (updates every trading evening ~8 pm IST). "
+               "Signals are candidates, not recommendations.")
 
 def main() -> None:
     configure_page()
