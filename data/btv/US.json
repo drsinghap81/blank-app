@@ -1,0 +1,61 @@
+{
+ "market": "US",
+ "asof": "2026-10-28",
+ "variants": [
+  {
+   "variant": "base $2m",
+   "signals": 15713,
+   "cagr": 7.2,
+   "cagr_min": 4.2,
+   "cagr_max": 10.5,
+   "maxdd": -27.0,
+   "cagr_22_26": 1.1,
+   "pf": 1.24,
+   "trades": 747.0
+  },
+  {
+   "variant": "$10m",
+   "signals": 11089,
+   "cagr": 2.7,
+   "cagr_min": 2.4,
+   "cagr_max": 3.3,
+   "maxdd": -31.4,
+   "cagr_22_26": -5.0,
+   "pf": 1.1,
+   "trades": 720.0
+  },
+  {
+   "variant": "$25m, price>=$10",
+   "signals": 7669,
+   "cagr": 4.4,
+   "cagr_min": 3.5,
+   "cagr_max": 10.7,
+   "maxdd": -25.5,
+   "cagr_22_26": -1.5,
+   "pf": 1.12,
+   "trades": 660.0
+  },
+  {
+   "variant": "$50m, price>=$10",
+   "signals": 5473,
+   "cagr": 3.3,
+   "cagr_min": 3.2,
+   "cagr_max": 4.0,
+   "maxdd": -35.9,
+   "cagr_22_26": -5.0,
+   "pf": 1.07,
+   "trades": 672.0
+  },
+  {
+   "variant": "$100m, price>=$10",
+   "signals": 3478,
+   "cagr": 1.1,
+   "cagr_min": 0.8,
+   "cagr_max": 1.9,
+   "maxdd": -38.7,
+   "cagr_22_26": -3.4,
+   "pf": 1.04,
+   "trades": 621.0
+  }
+ ]
+}
