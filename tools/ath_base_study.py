@@ -26,6 +26,11 @@ def events_for(sym, w, minval):
     c, h = w.Close.values, w.High.values
     val = (w.Close * w.Volume).rolling(20, min_periods=8).mean().values / 5      # ~ per-day traded value
     sma = w.Close.rolling(30, min_periods=30).mean().values
+    sma50 = w.Close.rolling(50, min_periods=50).mean().values
+    _m = w.index.to_period("M")
+    monthend = pd.Series(_m).ne(pd.Series(_m).shift(-1)).values
+    _mc = w.Close.groupby(_m).last()
+    m10w = _mc.rolling(10, min_periods=10).mean().reindex(_m).values   # 10-month SMA of month-end closes (incl. current month)
     mon = w.index.to_period("M")
     mC = w.Close.groupby(mon).last(); mH = w.High.groupby(mon).max()
     best = mC.cummax(); isb = mC >= best
@@ -74,6 +79,22 @@ def events_for(sym, w, minval):
         else:
             e.update(exit_ret=round(c[ex] / entry - 1, 3), held_wk=ex - i, open=False,
                      max_in_trade=round(float(c[i:ex + 1].max() / entry), 2))
+        # looser exits: weekly close < 50-week SMA; monthly close < 10-month SMA; weekly close back > 15% below the old high
+        for tag, lvl in (("sma50", sma50), ("m10", m10w), ("base15", None)):
+            ex = None
+            for j in range(i + 1, n):
+                if tag == "base15":
+                    if c[j] < 0.85 * entry:
+                        ex = j; break
+                elif tag == "m10":
+                    if monthend[j] and not np.isnan(lvl[j]) and c[j] < lvl[j]:
+                        ex = j; break
+                elif not np.isnan(lvl[j]) and c[j] < lvl[j]:
+                    ex = j; break
+            j = ex if ex is not None else n - 1
+            e[f"{tag}_ret"] = round(c[j] / entry - 1, 3)
+            e[f"{tag}_wk"] = j - i
+            e[f"{tag}_max"] = round(float(c[i:j + 1].max() / entry), 2)
         out.append(e)
     return out
 
