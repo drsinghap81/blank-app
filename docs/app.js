@@ -461,8 +461,18 @@ function planATH(r, near) {
     <p><b>${near ? 'Buy-stop' : 'Initial buy'}: ${z.sh.toLocaleString('en-IN')} shares</b> at ${fmt(E, 2, 'en-IN')} = ${money(z.val, m)} (${fmt(z.pctCap, 1)}% of capital).</p>
     <p class="muted">30-week SMA ${fmt(smaE, 2, 'en-IN')} is ${fmt(z.dist, 1, 'en-IN')}% below the entry → 2% of capital at risk ≈ ${money(z.risk, m)}${z.pctCap >= 19.9 ? ' (capped at 20% of capital)' : ''}.</p>`;
   if (!near && r.status === 'open') {
-    const pnl = z.sh * (r.close - E);
-    html += `<p>Now ${fmt(r.close, 2, 'en-IN')}: <span class="${pnl >= 0 ? 'up' : 'down'}">${money(pnl, m)}</span> on those shares. Exit: a weekly close below the 30-week SMA, now ${fmt(r.sma30, 2, 'en-IN')}.</p>`;
+    const L = ((state.ath && state.ath.lp) || {})[r.symbol];
+    const P = L ? L.price : r.close;
+    const pnl = z.sh * (P - E);
+    const zn = sizeATH(P, r.sma30, C0);
+    const above = (P / E - 1) * 100;
+    html += `<p class="muted">The system's entry was the breakout on ${day(r.date)}; had you bought then, those shares would be <span class="${pnl >= 0 ? 'up' : 'down'}">${money(pnl, m)}</span> at ${fmt(P, 2, 'en-IN')}.</p>`;
+    if (zn && zn.sh) {
+      html += `<h4>If you buy now</h4><p><b>${zn.sh.toLocaleString('en-IN')} shares</b> at about ${fmt(P, 2, 'en-IN')}${L ? ' (live, ~15 min delayed)' : ''} = ${money(zn.val, m)} (${fmt(zn.pctCap, 1)}% of capital). The 30-week SMA ${fmt(r.sma30, 2, 'en-IN')} is ${fmt(zn.dist, 1, 'en-IN')}% below, so 2% of capital ≈ ${money(zn.risk, m)} is at risk${zn.pctCap >= 19.9 ? ' (capped at 20% of capital)' : ''}.</p>
+        <p class="muted">You'd be buying ${fmt(above, 1, 'en-IN')}% ${above >= 0 ? 'above' : 'below'} the breakout price. The backtest bought at the breakout, so a late entry has a wider gap to the SMA and less of the move left. Exit for everyone: a weekly close below the 30-week SMA.</p>`;
+    } else {
+      html += `<p class="muted">Price is at or below the 30-week SMA, so there is no new entry here. Exit: a weekly close below the SMA.</p>`;
+    }
     html += '<h4>Pyramid (one add)</h4>';
     if (r.add_status === 'added') {
       const a = sizeATH(r.add_price, r.add_sma ?? r.sma30, C0, z.sh);
@@ -470,7 +480,7 @@ function planATH(r, near) {
         : `<p class="muted">Add triggered ${day(r.add_date)}, but the position is already at the 20% cap — no add.</p>`;
     } else if (r.add_status === 'armed') {
       const a = sizeATH(r.add_level, r.sma30, C0, z.sh);
-      html += a && a.sh ? `<p class="status info">Armed: the week ending ${day(r.test_week)} tested the 30-week SMA and held. <b>Add ${a.sh.toLocaleString('en-IN')} shares</b> (${money(a.val, m)}) if price trades above ${fmt(r.add_level, 2, 'en-IN')}, the highest price since entry.</p>`
+      html += a && a.sh ? `<p class="status info">Armed: the week ending ${day(r.test_week)} tested the 30-week SMA and held. <b>Add ${a.sh.toLocaleString('en-IN')} shares</b> (on the system's ${z.sh.toLocaleString('en-IN')}-share position) (${money(a.val, m)}) if price trades above ${fmt(r.add_level, 2, 'en-IN')}, the highest price since entry.</p>`
         : '<p class="muted">Armed, but the position is already at the 20% cap — no add.</p>';
     } else {
       html += `<p class="muted">Not armed yet. It arms after a week whose low comes within 3% of the 30-week SMA (at or below ${fmt(r.sma30 * 1.03, 2, 'en-IN')} now) but closes above it. Then add when price makes a new high since entry, sized at 2% risk to the SMA, keeping the stock at most 20% of capital.</p>`;
