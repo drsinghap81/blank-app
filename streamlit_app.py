@@ -1941,7 +1941,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-29 · Position sizing and pyramid adds v33"
+APP_BUILD = "2026-10-29 · Risk per trade setting (1% default) v34"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2016,7 +2016,7 @@ def render_ath_tab() -> None:
     st.markdown(f"#### 🏔️ Monthly ATH breakout — NSE close {d.get('asof')}")
     st.caption("Buy when price trades above the high of the all-time-high closing month (that month ≥ 2 years old, stock above "
                "its 30-week SMA, ≥ ₹2 cr/day). Sell at the next open after a weekly close below the 30-week SMA. 10 stocks, "
-               "equal weight. Backtest 2017–Oct 2026, all NSE incl. delisted: 26.9%/yr, worst fall −30%; 50/50 with the "
+               "risk-sized (1% default: 22%/yr, worst fall −20.5%; 2%: 28.6%, −23.5%; equal weight 26.9%, −30%); 50/50 with the "
                "9/21 system 25.2%/yr, worst fall −22%. Tracked signals are the scanner following its own signals, not your trades.")
     T = pd.DataFrame(d.get("tracked") or []); B = pd.DataFrame(d.get("breakouts") or []); N = pd.DataFrame(d.get("near") or [])
     c = st.columns(4)
@@ -2033,13 +2033,16 @@ def render_ath_tab() -> None:
             "Near trigger": ["symbol", "name", "close", "trigger", "gap_pct", "base_months", "ath_month", "sma30", "size"],
             "Tracked signals": ["symbol", "name", "status", "date", "entry", "close", "ret", "peak", "weeks", "base_months",
                                 "exit_date", "size"]}[which]
-    capital = st.number_input("Your capital (₹) — sizes every row: 2% of capital at risk to the 30-week SMA, max 20% per stock",
-                              min_value=10_000, value=int(st.session_state.get("ath_cap", 2_000_000)), step=50_000, key="ath_cap")
+    cc1, cc2 = st.columns([3, 1])
+    capital = cc1.number_input("Your capital (₹) — sizes every row: risk % of capital to the 30-week SMA, max 20% per stock",
+                               min_value=10_000, value=int(st.session_state.get("ath_cap", 2_000_000)), step=50_000, key="ath_cap")
+    risk_ = cc2.number_input("Risk per trade (%)", min_value=0.25, max_value=3.0, value=float(st.session_state.get("ath_risk", 1.0)),
+                             step=0.25, key="ath_risk") / 100
 
     def _size(e, sma, held=0.0):
         if not e or not sma or not np.isfinite(e) or not np.isfinite(sma) or e <= sma:
             return 0
-        return max(0, int(min(0.02 * capital * e / (e - sma), 0.2 * capital - held * e) // e))
+        return max(0, int(min(risk_ * capital * e / (e - sma), 0.2 * capital - held * e) // e))
 
     df = df.copy()
     near = which == "Near trigger"

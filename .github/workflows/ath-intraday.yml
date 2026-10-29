@@ -23,6 +23,7 @@ jobs:
           WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
           CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
           ALERT_CAPITAL: ${{ vars.ALERT_CAPITAL }}
+          ALERT_RISK_PCT: ${{ vars.ALERT_RISK_PCT }}
           FORCE: ${{ github.event.inputs.force || '0' }}
         run: |
           pip install -q yfinance pandas requests

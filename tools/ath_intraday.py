@@ -21,12 +21,13 @@ PLAN = "data/scan/ath.json"
 OUT = "data/live"
 SENT = f"{OUT}/ath_sent.json"
 CAP = float(os.environ.get("ALERT_CAPITAL") or 2_000_000)
+RISK = float(os.environ.get("ALERT_RISK_PCT") or 1.0) / 100
 
 
 def shares(e, sma, held=0.0):
     if not e or not sma or e <= sma:
         return 0
-    return max(0, int(min(0.02 * CAP * e / (e - sma), 0.2 * CAP - held * e) // e))
+    return max(0, int(min(RISK * CAP * e / (e - sma), 0.2 * CAP - held * e) // e))
 
 
 def main():

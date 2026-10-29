@@ -9,7 +9,7 @@ const MKT = {
 };
 const C = { ink: '#14213D', rise: '#0E9F6E', fall: '#D64545', saffron: '#E8A33D', slate: '#5B6B82', line: '#E3E8F0',
   e9: '#F28C28', e21: '#3B6FE0', e50: '#A0AEC0', rsi: '#7C5CDB' };
-const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, style: {}, cap: {} };
+const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, style: {}, cap: {}, risk: {} };
 const $ = (s) => document.querySelector(s);
 const loc = () => MKT[state.mkt].loc;
 const fmt = (v, d = 2, l) => (v == null || Number.isNaN(v) ? '–' : Number(v).toLocaleString(l || loc(), { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -420,6 +420,16 @@ const CAP_DEF = { NSE: 2000000, US: 20000, ASX: 20000 };
 function getCap(m) { try { const v = JSON.parse(localStorage.getItem(CAP_KEY) || '{}'); return +v[m] || CAP_DEF[m]; } catch (e) { return CAP_DEF[m]; } }
 function setCap(m, v) { try { const o = JSON.parse(localStorage.getItem(CAP_KEY) || '{}'); o[m] = v; localStorage.setItem(CAP_KEY, JSON.stringify(o)); } catch (e) { /* storage unavailable */ } state.cap[m] = v; }
 const cap = (m) => state.cap[m] || getCap(m);
+const RISK_KEY = 'td_risk';
+const RISK_DEF = { ath: 1, t921: 1 };
+function getRisk(k) { try { const v = JSON.parse(localStorage.getItem(RISK_KEY) || '{}'); return +v[k] || RISK_DEF[k]; } catch (e) { return RISK_DEF[k]; } }
+function setRisk(k, v) { try { const o = JSON.parse(localStorage.getItem(RISK_KEY) || '{}'); o[k] = v; localStorage.setItem(RISK_KEY, JSON.stringify(o)); } catch (e) { /* storage unavailable */ } state.risk[k] = v; }
+const riskPct = (k) => state.risk[k] || getRisk(k);
+function riskInput(k, id) { return `<label class="capbox"><span>Risk per trade (%)</span><input id="${id}" type="number" inputmode="decimal" min="0.25" max="3" step="0.25" value="${riskPct(k)}" style="width:70px"></label>`; }
+function wireRisk(id, k, redraw) {
+  const el = $('#' + id); if (!el) return;
+  el.addEventListener('change', () => { if (!el.isConnected) return; const v = Math.min(3, Math.max(0.25, +el.value || 0)); if (v !== riskPct(k)) { setRisk(k, v); redraw(); } });
+}
 const curOf = (m) => MKT[m].cur;
 function capInput(m, id) {
   return `<label class="capbox"><span>Your capital (${curOf(m)})</span><input id="${id}" type="number" inputmode="numeric" min="0" step="10000" value="${cap(m)}"></label>`;
@@ -436,30 +446,30 @@ const money = (v, m) => `${v < 0 ? '−' : ''}${curOf(m)}${fmt(Math.abs(v), 0, M
 function size921(r, m) {
   const E = r.entry ?? r.signal_close; const stop = r.stop; const C0 = cap(m);
   if (!E || !stop || E <= stop) return null;
-  const val = Math.min(0.01 * C0 * E / (E - stop), 0.2 * C0); const sh = Math.floor(val / E);
+  const val = Math.min(riskPct('t921') / 100 * C0 * E / (E - stop), 0.2 * C0); const sh = Math.floor(val / E);
   return { sh, E, val: sh * E, pctCap: (sh * E) / C0 * 100, risk: sh * (E - stop) };
 }
 /* Monthly ATH: 2% of capital at risk to the 30-week SMA, max 20% of capital */
 function sizeATH(E, sma, C0, held = 0) {
   if (!E || !sma || E <= sma) return null;
-  const val = Math.min(0.02 * C0 * E / (E - sma), 0.2 * C0 - held * E); const sh = Math.max(0, Math.floor(val / E));
+  const val = Math.min(riskPct('ath') / 100 * C0 * E / (E - sma), 0.2 * C0 - held * E); const sh = Math.max(0, Math.floor(val / E));
   return { sh, E, val: sh * E, pctCap: (sh * E) / C0 * 100, risk: sh * (E - sma), dist: (E - sma) / E * 100 };
 }
 function plan921(r) {
   const m = state.mkt; const z = size921(r, m);
   if (!z) return '';
-  return `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput(m, 'cap921')}</div>
+  return `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput(m, 'cap921')}${riskInput('t921', 'risk921')}</div>
     <p><b>Buy ${z.sh.toLocaleString(MKT[m].loc)} shares</b> at about ${fmt(z.E)} = ${money(z.val, m)} (${fmt(z.pctCap, 1)}% of capital).</p>
-    <p class="muted">Rule: 1% of capital at risk to the initial stop ${fmt(r.stop)}, max 20% of capital in one stock, max 10 stocks. Loss if the stop is hit ≈ ${money(z.risk, m)}. No adds: pyramiding tested neutral on this system.</p></div>`;
+    <p class="muted">Rule: ${riskPct('t921')}% of capital at risk to the initial stop ${fmt(r.stop)}, max 20% of capital in one stock, max 10 stocks. Loss if the stop is hit ≈ ${money(z.risk, m)}. No adds: pyramiding tested neutral on this system.</p></div>`;
 }
 function planATH(r, near) {
   const m = 'NSE'; const C0 = cap(m);
   const E = near ? r.trigger : r.entry; const smaE = near ? r.sma30 : (r.sma_entry ?? r.sma30);
   const z = sizeATH(E, smaE, C0);
   if (!z) return '';
-  let html = `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput(m, 'capath')}</div>
+  let html = `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput(m, 'capath')}${riskInput('ath', 'riskath')}</div>
     <p><b>${near ? 'Buy-stop' : 'Initial buy'}: ${z.sh.toLocaleString('en-IN')} shares</b> at ${fmt(E, 2, 'en-IN')} = ${money(z.val, m)} (${fmt(z.pctCap, 1)}% of capital).</p>
-    <p class="muted">30-week SMA ${fmt(smaE, 2, 'en-IN')} is ${fmt(z.dist, 1, 'en-IN')}% below the entry → 2% of capital at risk ≈ ${money(z.risk, m)}${z.pctCap >= 19.9 ? ' (capped at 20% of capital)' : ''}.</p>`;
+    <p class="muted">30-week SMA ${fmt(smaE, 2, 'en-IN')} is ${fmt(z.dist, 1, 'en-IN')}% below the entry → ${riskPct('ath')}% of capital at risk ≈ ${money(z.risk, m)}${z.pctCap >= 19.9 ? ' (capped at 20% of capital)' : ''}.</p>`;
   if (!near && r.status === 'open') {
     const L = ((state.ath && state.ath.lp) || {})[r.symbol];
     const P = L ? L.price : r.close;
@@ -468,7 +478,7 @@ function planATH(r, near) {
     const above = (P / E - 1) * 100;
     html += `<p class="muted">The system's entry was the breakout on ${day(r.date)}; had you bought then, those shares would be <span class="${pnl >= 0 ? 'up' : 'down'}">${money(pnl, m)}</span> at ${fmt(P, 2, 'en-IN')}.</p>`;
     if (zn && zn.sh) {
-      html += `<h4>If you buy now</h4><p><b>${zn.sh.toLocaleString('en-IN')} shares</b> at about ${fmt(P, 2, 'en-IN')}${L ? ' (live, ~15 min delayed)' : ''} = ${money(zn.val, m)} (${fmt(zn.pctCap, 1)}% of capital). The 30-week SMA ${fmt(r.sma30, 2, 'en-IN')} is ${fmt(zn.dist, 1, 'en-IN')}% below, so 2% of capital ≈ ${money(zn.risk, m)} is at risk${zn.pctCap >= 19.9 ? ' (capped at 20% of capital)' : ''}.</p>
+      html += `<h4>If you buy now</h4><p><b>${zn.sh.toLocaleString('en-IN')} shares</b> at about ${fmt(P, 2, 'en-IN')}${L ? ' (live, ~15 min delayed)' : ''} = ${money(zn.val, m)} (${fmt(zn.pctCap, 1)}% of capital). The 30-week SMA ${fmt(r.sma30, 2, 'en-IN')} is ${fmt(zn.dist, 1, 'en-IN')}% below, so ${riskPct('ath')}% of capital ≈ ${money(zn.risk, m)} is at risk${zn.pctCap >= 19.9 ? ' (capped at 20% of capital)' : ''}.</p>
         <p class="muted">You'd be buying ${fmt(above, 1, 'en-IN')}% ${above >= 0 ? 'above' : 'below'} the breakout price. The backtest bought at the breakout, so a late entry has a wider gap to the SMA and less of the move left. Exit for everyone: a weekly close below the 30-week SMA.</p>`;
     } else {
       html += `<p class="muted">Price is at or below the 30-week SMA, so there is no new entry here. Exit: a weekly close below the SMA.</p>`;
@@ -483,7 +493,7 @@ function planATH(r, near) {
       html += a && a.sh ? `<p class="status info">Armed: the week ending ${day(r.test_week)} tested the 30-week SMA and held. <b>Add ${a.sh.toLocaleString('en-IN')} shares</b> (on the system's ${z.sh.toLocaleString('en-IN')}-share position) (${money(a.val, m)}) if price trades above ${fmt(r.add_level, 2, 'en-IN')}, the highest price since entry.</p>`
         : '<p class="muted">Armed, but the position is already at the 20% cap — no add.</p>';
     } else {
-      html += `<p class="muted">Not armed yet. It arms after a week whose low comes within 3% of the 30-week SMA (at or below ${fmt(r.sma30 * 1.03, 2, 'en-IN')} now) but closes above it. Then add when price makes a new high since entry, sized at 2% risk to the SMA, keeping the stock at most 20% of capital.</p>`;
+      html += `<p class="muted">Not armed yet. It arms after a week whose low comes within 3% of the 30-week SMA (at or below ${fmt(r.sma30 * 1.03, 2, 'en-IN')} now) but closes above it. Then add when price makes a new high since entry, sized at ${riskPct('ath')}% risk to the SMA, keeping the stock at most 20% of capital.</p>`;
     }
   }
   return html + '</div>';
@@ -598,10 +608,12 @@ function athSelect(r) {
   drawATH(r, 'm');
 }
 function wirePlanATH(r, near) {
-  wireCap('capath', 'NSE', () => { const p = document.querySelector('.plan'); if (p) p.outerHTML = planATH(r, near); wirePlanATH(r, near); athList(); });
+  const redo = () => { const p = document.querySelector('.plan'); if (p) p.outerHTML = planATH(r, near); wirePlanATH(r, near); athList(); };
+  wireCap('capath', 'NSE', redo); wireRisk('riskath', 'ath', redo);
 }
 function wirePlan921(r) {
-  wireCap('cap921', state.mkt, () => { const p = document.querySelector('.plan'); if (p) p.outerHTML = plan921(r); wirePlan921(r); renderList(); });
+  const redo = () => { const p = document.querySelector('.plan'); if (p) p.outerHTML = plan921(r); wirePlan921(r); renderList(); };
+  wireCap('cap921', state.mkt, redo); wireRisk('risk921', 't921', redo);
 }
 const athCache = {};
 async function drawATH(r, tf) {
