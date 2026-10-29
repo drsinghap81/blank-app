@@ -1,6 +1,8 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-KINGFA,2026-10-27,6820.5,62.2,6499.33,6231.0,9.5,1,0.0,Kingfa Science & Technology (India) Limited,watch,125.6,0.73,88,8.47,6820.5,62.2
-SHREEJISPG,2026-10-26,811.5,61.4,785.12,762.05,6.5,2,3.4,Shreeji Shipping Global Limited,trend,168.6,0.96,90,90.6,838.95,66.9
-MANOMAY,2026-10-26,246.32,61.5,239.45,233.91,5.3,2,0.7,Manomay Tex India Limited,trend,144.5,0.86,93,7.25,248.03,63.2
-COFORGE,2026-10-26,1993.0,64.1,1889.32,1812.2,10.0,2,0.2,Coforge Limited,watch,134.8,0.84,73,490.55,1997.0,64.5
-DPABHUSHAN,2026-10-23,2186.0,61.2,2065.2,2038.8,7.2,3,-4.8,D. P. Abhushan Limited,watch,148.5,0.81,75,57.9,2081.5,54.5
+THELEELA,2026-10-29,618.45,61.6,586.18,568.2,8.8,0,0.0,Leela Palaces Hotels & Resorts Limited,watch,143.7,0.9,83,42.57,618.45,61.6
+PNB,2026-10-29,122.22,60.9,118.62,119.42,2.3,0,0.0,Punjab National Bank,watch,127.2,0.8,85,227.9,122.22,60.9
+TFCILTD,2026-10-28,156.94,61.9,150.15,145.25,8.0,1,0.5,Tourism Finance Corporation of India Limited,trend,169.0,0.9,98,194.96,157.67,62.6
+KINGFA,2026-10-27,6820.5,62.2,6499.33,6231.0,9.5,2,-0.0,Kingfa Science & Technology (India) Limited,watch,125.7,0.73,88,8.16,6819.0,62.1
+SHREEJISPG,2026-10-26,811.5,61.4,785.12,762.05,6.5,3,2.8,Shreeji Shipping Global Limited,trend,170.8,0.96,90,88.04,834.2,65.2
+MANOMAY,2026-10-26,246.32,61.5,239.45,233.91,5.3,3,-0.5,Manomay Tex India Limited,trend,144.6,0.86,93,7.01,245.21,58.7
+COFORGE,2026-10-26,1993.0,64.1,1889.32,1812.2,10.0,3,-1.8,Coforge Limited,watch,134.8,0.84,73,490.85,1956.2,58.2
