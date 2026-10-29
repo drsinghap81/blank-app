@@ -1,0 +1,33 @@
+name: ath-scan
+on:
+  push:
+    paths: [".github/workflows/ath-scan.yml", "tools/ath_scan.py"]
+  schedule:
+    - cron: "0 15 * * 1-5"   # 20:30 IST on trading days
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Scan
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SEND_TELEGRAM: ${{ github.event_name == 'schedule' && '1' || '0' }}
+        run: |
+          pip install -q yfinance pandas requests
+          mkdir -p data/scan
+          python tools/ath_scan.py > /tmp/ath_log.txt 2>&1 || true
+          grep -v -i "warn\|delisted\|failed download\|^\[" /tmp/ath_log.txt | tail -30
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add data/scan/ath.json data/scan/ath_charts; git diff --cached --quiet && exit 0
+          git commit -qm "Monthly ATH scan $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
