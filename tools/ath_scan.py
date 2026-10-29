@@ -3,8 +3,8 @@
 System (backtest 2017-Oct 2026, all NSE incl. delisted: 26.9%/yr, worst fall -30%, 10 stocks equal weight):
   trigger : HIGH of the all-time-high closing month (highest monthly close of all completed months)
   entry   : price trades above the trigger during the month -> buy at the trigger (or the open if it gaps above)
-            base >= 24 months since that ATH month (>= 12 months shown as secondary), stock above its 30-week SMA
-            at the last completed week, >= Rs 2 cr/day traded
+            base >= 24 months since that ATH month (>= 12 months shown as secondary), stock above a RISING 30-week SMA
+            (higher than 4 weeks earlier) at the last completed week, >= Rs 2 cr/day traded
   exit    : weekly CLOSE below the 30-week SMA -> sell next open
   size    : risk 2% of capital to the 30-week SMA (shares = 2% x capital / (entry - SMA30)), max 20% of capital per stock
   add     : once, after a completed week whose low is within 3% of the SMA30 but closes above it, when price trades above
@@ -105,7 +105,8 @@ def analyse(sym, x, today):
     W["sma"] = W.c.rolling(30, min_periods=30).mean()
     last_complete = W.index[-1] if x.index[-1].weekday() == 4 or (today - x.index[-1].date()).days >= 3 else W.index[-2]
     Wc = W.loc[:last_complete]
-    above_prev = (W.c > W.sma).shift(1)                  # last completed week above SMA30 (for each week)
+    # last completed week: close above SMA30 AND the SMA30 higher than 4 weeks earlier (rising)
+    above_prev = ((W.c > W.sma) & (W.sma > W.sma.shift(4))).shift(1)
     # daily mapping
     d = pd.DataFrame({"o": x.Open, "h": x.High, "c": x.Close, "val": val20.values}, index=x.index)
     d["trig"] = trig_m.reindex(mon).values
@@ -151,7 +152,9 @@ def analyse(sym, x, today):
     if np.isfinite(t_now) and d.hist_ok.iloc[-1] and not cross[d.mon == cur_m].any():
         c = float(x.Close.iloc[-1])
         lastw = W.loc[last_complete]
+        sma4 = W.sma.shift(4).loc[last_complete]
         if c >= (1 - NEAR) * t_now and d.age.iloc[-1] >= BASE_MIN and np.isfinite(lastw.sma) and lastw.c > lastw.sma \
+                and np.isfinite(sma4) and lastw.sma > sma4 \
                 and val20.iloc[-1] >= MINVAL:
             near = dict(symbol=sym, trigger=t_now, close=c, gap_pct=(t_now / c - 1) * 100, ath_month=d.ath_month.iloc[-1],
                         base_months=int(d.age.iloc[-1]), depth=d.depth.iloc[-1], sma30=float(lastw.sma),
