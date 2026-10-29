@@ -1,0 +1,19 @@
+{
+"cash": 1850395.8153000828,
+"pos": {
+"ath:KOTAKBANK:2026-10-29": {
+"engine": "ATH",
+"symbol": "KOTAKBANK",
+"date": "2026-10-29",
+"sh": 325,
+"avg": 459.0573,
+"cost": 149604.18469991718,
+"last": 459.0,
+"stop_note": "weekly close < 30-wk SMA (397.6852)",
+"added": false
+}
+},
+"done": [],
+"trades": [],
+"tb_total": 0.0
+}

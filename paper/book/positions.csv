@@ -1,0 +1,2 @@
+engine,symbol,since,shares,avg,last,value,pnl,pnl_pct,exit_rule
+ATH,KOTAKBANK,2026-10-29,325,459.06,459.0,149175,-839,-0.3,weekly close < 30-wk SMA (397.6852)

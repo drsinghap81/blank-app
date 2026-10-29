@@ -1,0 +1,30 @@
+{
+ "asof": "2026-10-29",
+ "updated_ist": "2026-10-29 23:52",
+ "start": "2026-10-29",
+ "capital": 2000000,
+ "equity": 1999571,
+ "ret_pct": -0.02,
+ "cash": 1850396,
+ "invested_pct": 7.5,
+ "ath": {
+  "value": 149175,
+  "open": 1,
+  "realised": 0
+ },
+ "t921": {
+  "value": 0,
+  "open": 0,
+  "realised": 0
+ },
+ "tb": {
+  "pnl": 0,
+  "qty": 30
+ },
+ "closed_trades": 0,
+ "rules": {
+  "ath_risk_pct": 1.0,
+  "t921_risk_pct": 1.0,
+  "cap_pct": 20.0
+ }
+}
