@@ -1,0 +1,24 @@
+name: ath-base-study
+on:
+  push:
+    paths: [".github/workflows/ath-base-study.yml", "tools/ath_base_study.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        market: [NSE, US, ASX]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas numpy requests lxml
+      - run: mkdir -p data/study && (python tools/ath_base_study.py ${{ matrix.market }} > data/study/${{ matrix.market }}_log.txt 2>&1 || true); grep -v -i "warn\|delisted\|failed download\|^\[" data/study/${{ matrix.market }}_log.txt | tail -15
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan study-${{ matrix.market }}; git rm -rqf --cached .; git add -f data/study; git commit -qm "study ${{ matrix.market }}"; git push -f origin study-${{ matrix.market }}
