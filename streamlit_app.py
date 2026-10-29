@@ -1941,7 +1941,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-29 · US/ASX marked watch only v30"
+APP_BUILD = "2026-10-29 · Monthly ATH breakout tab v31"
 
 
 def render_oi_alerts_tab() -> None:
@@ -1999,6 +1999,72 @@ def render_oi_alerts_tab() -> None:
 
 
 TREND_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan", "trend_scan.json")
+
+
+ATH_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan", "ath.json")
+
+
+def render_ath_tab() -> None:
+    """Monthly all-time-high momentum system (NSE): breakouts, near-trigger list, tracked signals, monthly/weekly chart."""
+    import json as _json
+    try:
+        with open(ATH_PATH, encoding="utf-8") as f:
+            d = _json.load(f)
+    except Exception:  # noqa: BLE001
+        st.info("The monthly all-time-high scan appears after its first evening run (20:30 IST on trading days).")
+        return
+    st.markdown(f"#### 🏔️ Monthly ATH breakout — NSE close {d.get('asof')}")
+    st.caption("Buy when price trades above the high of the all-time-high closing month (that month ≥ 2 years old, stock above "
+               "its 30-week SMA, ≥ ₹2 cr/day). Sell at the next open after a weekly close below the 30-week SMA. 10 stocks, "
+               "equal weight. Backtest 2017–Oct 2026, all NSE incl. delisted: 26.9%/yr, worst fall −30%; 50/50 with the "
+               "9/21 system 25.2%/yr, worst fall −22%. Tracked signals are the scanner following its own signals, not your trades.")
+    T = pd.DataFrame(d.get("tracked") or []); B = pd.DataFrame(d.get("breakouts") or []); N = pd.DataFrame(d.get("near") or [])
+    c = st.columns(4)
+    c[0].metric("Breakouts, 2-yr base", int(B["main"].sum()) if len(B) else 0)
+    c[1].metric("Within 5% of trigger", len(N))
+    c[2].metric("Signals still running", int((T.status == "open").sum()) if len(T) else 0)
+    c[3].metric("Sell next open", int((T.status == "exit next open").sum()) if len(T) else 0)
+    which = st.radio("List", ["Breakouts", "Near trigger", "Tracked signals"], horizontal=True, key="ath_list")
+    df = {"Breakouts": B, "Near trigger": N, "Tracked signals": T}[which]
+    if not len(df):
+        st.info("Nothing in this list right now.")
+        return
+    cols = {"Breakouts": ["symbol", "name", "date", "entry", "close", "ret", "base_months", "ath_month", "sma30", "size"],
+            "Near trigger": ["symbol", "name", "close", "trigger", "gap_pct", "base_months", "ath_month", "sma30", "size"],
+            "Tracked signals": ["symbol", "name", "status", "date", "entry", "close", "ret", "peak", "weeks", "base_months",
+                                "exit_date", "size"]}[which]
+    show = df[[k for k in cols if k in df]].copy()
+    for k in ("ret", "peak"):
+        if k in show:
+            show[k] = (show[k] * 100).round(1)
+    left, right = st.columns([2, 3])
+    with left:
+        st.dataframe(show, hide_index=True, width="stretch", height=460)
+        st.download_button("Download CSV", show.to_csv(index=False).encode(), f"monthly_ath_{which.replace(' ', '_').lower()}_{d.get('asof')}.csv")
+    with right:
+        sym = st.selectbox("Chart", list(df.symbol), key="ath_sym")
+        tf = st.radio("Timeframe", ["Monthly", "Weekly + 30-week SMA"], horizontal=True, key="ath_tf")
+        r = df[df.symbol == sym].iloc[0]
+        try:
+            with open(_os.path.join(_os.path.dirname(ATH_PATH), "ath_charts", f"{sym}.json"), encoding="utf-8") as f:
+                ch = _json.load(f)
+        except Exception:  # noqa: BLE001
+            st.info("No chart data for this stock yet.")
+            return
+        b = ch["m" if tf == "Monthly" else "w"]
+        t = [x + "-01" for x in b["t"]] if tf == "Monthly" else b["t"]
+        fig = go.Figure(go.Candlestick(x=t, open=b["o"], high=b["h"], low=b["l"], close=b["c"], name=sym,
+                                       increasing_line_color="#0E9F6E", decreasing_line_color="#D64545"))
+        if tf != "Monthly":
+            fig.add_scatter(x=t, y=b["sma"], mode="lines", line=dict(color="#3B6FE0", width=2), name="30-week SMA")
+        trig = r.get("trigger") if pd.notna(r.get("trigger", np.nan)) else ch.get("trigger")
+        if trig:
+            fig.add_hline(y=float(trig), line_color="#E8A33D", line_width=2,
+                          annotation_text=f"ATH month high {float(trig):,.2f}", annotation_position="top left")
+        n = len(t)
+        fig.update_layout(height=470, margin=dict(l=10, r=10, t=10, b=10), xaxis_rangeslider_visible=False, showlegend=False,
+                          xaxis_range=[t[max(0, n - (140 if tf == "Monthly" else 156))], t[-1]])
+        st.plotly_chart(fig, width="stretch")
 
 
 @st.cache_data(ttl=1800, show_spinner=False)
@@ -2227,8 +2293,8 @@ def main() -> None:
 
     render_header(market)
 
-    tab_trend, tab_tb, tab_oi, tab_scan, tab1, tab_bt, tab2, tab3 = st.tabs(
-        ["📈 Trend scan", "🔁 Top Bottom", "🧲 OI alerts", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
+    tab_trend, tab_ath, tab_tb, tab_oi, tab_scan, tab1, tab_bt, tab2, tab3 = st.tabs(
+        ["📈 Trend scan", "🏔️ Monthly ATH", "🔁 Top Bottom", "🧲 OI alerts", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
          "🧾 Paper orders", "💼 Portfolio"])
     with tab1:
         render_analysis_tab(market, ticker)
@@ -2236,6 +2302,8 @@ def main() -> None:
         render_scanner_tab(market)
     with tab_trend:
         render_trend_scan_tab(market)
+    with tab_ath:
+        render_ath_tab()
     with tab_oi:
         render_oi_alerts_tab()
     with tab_bt:

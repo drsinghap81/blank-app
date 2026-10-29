@@ -39,6 +39,8 @@
 <nav class="views" aria-label="Sections">
   <button data-view="trends" aria-current="page">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-5 4 3 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Trends</button>
+  <button data-view="ath">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h11M4 20V14l4-4 4 3 4-7 4 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>ATH</button>
   <button data-view="tb">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V9m5 9V5m5 13v-6m5 6V8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Top Bottom</button>
   <button data-view="oi">
@@ -83,6 +85,8 @@
   </main>
 </section>
 
+<!-- MONTHLY ATH -->
+<section id="view-ath" class="view page" hidden></section>
 <!-- TOP BOTTOM -->
 <section id="view-tb" class="view page" hidden></section>
 <!-- OI ALERTS -->
@@ -110,6 +114,8 @@
   <p>The first new 52-week high after at least 6 months without one, with Supertrend green. Stop is the 5-day low, never more than 12% away. Same Supertrend exit.</p>
   <h3>Sizing</h3>
   <p>Risk 1% of capital per trade, at most 10 positions, each up to 20% of capital.</p>
+  <h3>Monthly all-time-high breakout</h3>
+  <p>On the monthly chart, find the month with the highest close ever. Buy when price trades above that month's high, if that month is at least 2 years old and the stock is above its 30-week average. Sell at the next open after a weekly close below the 30-week average. 10 stocks, equal weight. Backtest 2017–2026, all NSE stocks including delisted: 26.9% a year, worst fall −30%.</p>
   <h3>Top Bottom</h3>
   <p>Bank Nifty futures: buy above the last top, sell below the last bottom, always in the market, with a 1% stop on the entry day. Paper trading since 19 Oct 2026.</p>
   <h3>OI alerts</h3>

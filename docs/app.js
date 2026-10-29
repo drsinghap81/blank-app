@@ -9,7 +9,7 @@ const MKT = {
 };
 const C = { ink: '#14213D', rise: '#0E9F6E', fall: '#D64545', saffron: '#E8A33D', slate: '#5B6B82', line: '#E3E8F0',
   e9: '#F28C28', e21: '#3B6FE0', e50: '#A0AEC0', rsi: '#7C5CDB' };
-const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null };
+const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null };
 const $ = (s) => document.querySelector(s);
 const loc = () => MKT[state.mkt].loc;
 const fmt = (v, d = 2, l) => (v == null || Number.isNaN(v) ? '–' : Number(v).toLocaleString(l || loc(), { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -46,7 +46,7 @@ function show(view) {
   document.querySelectorAll('.views button').forEach((b) => (b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   document.querySelectorAll('.view').forEach((s) => (s.hidden = s.id !== `view-${view}`));
   window.scrollTo(0, 0);
-  ({ trends: loadTrends, tb: loadTB, oi: loadOI, results: loadResults })[view]();
+  ({ trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, results: loadResults })[view]();
 }
 
 /* ------------------------------------------------------------------ trends */
@@ -382,10 +382,128 @@ function oiList() {
   const m = $('#oimore'); if (m) m.addEventListener('click', () => { state.oi.all = true; oiList(); });
 }
 
+
+/* ------------------------------------------------------------------ Monthly ATH */
+async function loadATH() {
+  $('#title').textContent = 'Monthly ATH';
+  const el = $('#view-ath');
+  if (!state.ath) {
+    el.innerHTML = '<p class="muted pad">Loading…</p>';
+    const d = await getJSON(MAIN + 'data/scan/ath.json', 'ath');
+    state.ath = { d, tab: 'brk', q: '', all: false };
+  }
+  const { d } = state.ath;
+  if (!d) { el.innerHTML = '<p class="empty">The monthly all-time-high scan appears after its first evening run. Try again later.</p>'; $('#asof').textContent = ''; return; }
+  $('#asof').textContent = `NSE close ${longDay(d.asof)}, ${Number(d.scanned).toLocaleString('en-IN')} stocks, full price history`;
+  const T = d.tracked || [];
+  const brkMain = (d.breakouts || []).filter((r) => r.main).length;
+  const exits = T.filter((r) => r.status === 'exit next open').length;
+  const open = T.filter((r) => r.status === 'open').length;
+  const nearMain = (d.near || []).filter((r) => r.main).length;
+  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length]];
+  el.innerHTML = `
+    <section class="summary">
+      <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
+      <div class="stat"><b>${nearMain}</b><span>within 5% of the trigger</span></div>
+      <div class="stat"><b>${open}</b><span>signals still running</span></div>
+      <div class="stat exit"><b>${exits}</b><span>to sell at next open</span></div></section>
+    <div class="card">
+      <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
+      <p class="note small-note">${{ brk: 'Price went above the high of the all-time-high closing month this month or last, and the trade is still open. Bold rows have a base of 2 years or more (the tested system); the rest 1–2 years.',
+        near: 'Within 5% below the trigger this month, above the 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
+        tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.' }[state.ath.tab]}</p>
+      <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="athq" type="search" placeholder="Search symbol or company" value="${esc(state.ath.q)}" autocomplete="off"></label>
+      <ul class="list flat" id="athlist"></ul></div>`;
+  el.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => { state.ath.tab = b.dataset.t; state.ath.all = false; loadATH(); }));
+  $('#athq').addEventListener('input', (e) => { state.ath.q = e.target.value; athList(); });
+  athList();
+}
+function athRows() {
+  const { d, tab, q } = state.ath;
+  let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : (d.tracked || []);
+  if (tab === 'brk') L = L.slice().sort((a, b) => (b.main - a.main) || (a.date < b.date ? 1 : -1));
+  if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); }
+  return L;
+}
+const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` : `${m}-mo base`);
+function athList() {
+  const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
+  $('#athlist').innerHTML = (L.length ? L.map((r, i) => {
+    let chip, right;
+    if (tab === 'near') {
+      chip = `<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to go</span>`;
+      right = `<b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">trigger ${fmt(r.trigger, 2, 'en-IN')}</span>`;
+    } else {
+      const st = r.status === 'exit next open' ? '<span class="chip exit">Sell next open</span>' : r.status === 'exited' ? `<span class="chip">Exited ${day(r.exit_date)}</span>` : `<span class="chip open">Since ${day(r.date)}</span>`;
+      chip = `${st}<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span>`;
+      right = `<b>${fmt(r.close, 2, 'en-IN')}</b><span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>`;
+    }
+    if (r.size) chip += `<span class="chip">${esc(r.size)}</span>`;
+    return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
+      <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
+  }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.' }[tab]}</li>`)
+    + (all.length > L.length ? `<li><button class="more" id="athmore">Show all ${all.length}</button></li>` : '');
+  const m = $('#athmore'); if (m) m.addEventListener('click', () => { state.ath.all = true; athList(); });
+  $('#athlist').querySelectorAll('.row').forEach((el) => {
+    const open = () => athSelect(L[+el.dataset.i]);
+    el.addEventListener('click', open);
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  });
+}
+function athSelect(r) {
+  const near = state.ath.tab === 'near';
+  const st = near ? `<div class="status info">Not triggered yet. Buy if it trades above ${fmt(r.trigger, 2, 'en-IN')} this month (${fmt(r.gap_pct, 1, 'en-IN')}% above the last close).</div>`
+    : r.status === 'exit next open' ? '<div class="status exit">Weekly close below the 30-week SMA. Sell at the next open.</div>'
+      : r.status === 'exited' ? `<div class="status info">Exited ${day(r.exit_date)} at ${fmt(r.exit_price, 2, 'en-IN')} (${pct(r.ret * 100)}).</div>`
+        : `<div class="status open">Bought ${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}. Hold while the weekly close stays above the 30-week SMA, now ${fmt(r.sma30, 2, 'en-IN')}.</div>`;
+  const f = [['Trigger (ATH month high)', fmt(r.trigger, 2, 'en-IN')], ['ATH closing month', esc(r.ath_month || '–')], ['Base', baseTxt(r.base_months)],
+    ['Deepest fall in the base', pct((r.depth || 0) * 100)], ['30-week SMA', fmt(r.sma30, 2, 'en-IN')]];
+  if (!near) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}`], ['Best since entry', pct(r.peak * 100)], ['Weeks', r.weeks]);
+  f.push(['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]);
+  openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
+    ${st}
+    <div class="seg small" id="athtf"><button data-tf="m" aria-selected="true">Monthly</button><button data-tf="w" aria-selected="false">Weekly + 30 SMA</button></div>
+    <div class="chart" id="athc"></div>
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    <div class="links"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent('NSE:' + r.symbol)}" target="_blank" rel="noopener">Open in TradingView</a>
+      <a href="https://www.screener.in/company/${encodeURIComponent(r.symbol)}/" target="_blank" rel="noopener">Fundamentals on Screener</a></div>`);
+  $('#athtf').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    $('#athtf').querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', x === b)); drawATH(r, b.dataset.tf);
+  }));
+  drawATH(r, 'm');
+}
+const athCache = {};
+async function drawATH(r, tf) {
+  const box = $('#athc'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
+  let c = athCache[r.symbol];
+  if (!c) {
+    try { const res = await fetch(MAIN + `data/scan/ath_charts/${encodeURIComponent(r.symbol)}.json`); if (!res.ok) throw 0; c = athCache[r.symbol] = await res.json(); }
+    catch (e) { box.innerHTML = '<p class="muted pad">Chart data is not available for this stock yet.</p>'; return; }
+  }
+  box.innerHTML = '';
+  const b = c[tf]; const T = tf === 'm' ? b.t.map((t) => t + '-01') : b.t;
+  const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
+  const s = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
+  s.setData(T.map((t, i) => ({ time: t, open: b.o[i], high: b.h[i], low: b.l[i], close: b.c[i] })));
+  const trig = r.trigger ?? c.trigger;
+  if (trig) s.createPriceLine({ price: trig, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'ATH month high' });
+  if (tf === 'w') {
+    const l = ch.addLineSeries({ color: C.e21, lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    l.setData(T.map((t, i) => (b.sma[i] == null ? { time: t } : { time: t, value: b.sma[i] })));
+  }
+  if (r.date) {
+    const key = tf === 'm' ? r.date.slice(0, 7) + '-01' : T.find((t) => t >= r.date);
+    if (key && T.includes(key)) s.setMarkers([{ time: key, position: 'belowBar', color: C.saffron, shape: 'arrowUp', text: 'breakout' }]);
+  }
+  const n = T.length; ch.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - (tf === 'm' ? 140 : 156)), to: n + 2 });
+  new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
+}
+
 /* ------------------------------------------------------------------ Results */
 async function loadResults() {
   $('#title').textContent = 'Backtest results';
-  $('#asof').textContent = 'EMA 9/21 cross system, 1% risk, 10 positions, after costs';
+  $('#asof').textContent = 'India systems after costs, 2017 – Oct 2026';
   const el = $('#view-results');
   if (!state.res) {
     el.innerHTML = '<p class="muted pad">Loading…</p>';
@@ -403,6 +521,8 @@ async function loadResults() {
       <thead><tr><th>Market</th><th class="r">Return a year</th><th class="r">Worst fall</th><th class="r">2017–21</th><th class="r">2022–26</th><th class="r">Index</th></tr></thead>
       <tbody>
         <tr class="hl"><td><b>India, all NSE stocks</b><div class="co">includes delisted stocks — the honest test</div></td><td class="r">26.1%<div class="co">18–27%</div></td><td class="r">−26%</td><td class="r">36.3%</td><td class="r">14.5%</td><td class="r">11.0%<div class="co">Nifty 50</div></td></tr>
+        <tr class="hl"><td><b>India, monthly ATH breakout</b><div class="co">base ≥ 2 years, 10 stocks, exit on weekly close below the 30-week SMA</div></td><td class="r">26.9%<div class="co">26–29%</div></td><td class="r">−30%</td><td class="r">20.2%</td><td class="r">33.9%</td><td class="r">11.0%<div class="co">Nifty 50</div></td></tr>
+        <tr><td><b>India, both systems 50/50</b><div class="co">9/21 cross + monthly ATH, rebalanced monthly</div></td><td class="r">25.2%</td><td class="r">−22%</td><td class="r">27.2%</td><td class="r">24.2%</td><td class="r">11.0%</td></tr>
         ${row('India, same test on Yahoo data', R.NSE, 'surviving stocks only — shows the survivorship lift')}
         ${row('United States', R.US, 'surviving stocks only, ≥ $2 m traded a day')}
         ${row('Australia', R.ASX, 'surviving stocks only, ≥ A$0.5 m traded a day')}
@@ -429,6 +549,7 @@ function download() {
       : ['symbol', 'name', 'list', 'tag', 'close', 'dist21', 'rsi', 'r1m', 'r3m', 'r6m', 'off_high', 'value_cr', 'size'];
     return csvDownload(filtered(), cols, `trend-desk_${state.mkt}_${state.tab}_${state.data[state.mkt].asof}.csv`);
   }
+  if (state.view === 'ath' && state.ath && state.ath.d) return csvDownload(athRows(), ['symbol', 'name', 'status', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'depth', 'close', 'gap_pct', 'ret', 'peak', 'weeks', 'sma30', 'exit_date', 'exit_price', 'value_cr', 'size'], `monthly-ath_${state.ath.tab}_${state.ath.d.asof}.csv`);
   if (state.view === 'tb' && state.tb) return csvDownload(state.tb.ledger, Object.keys(state.tb.ledger[0] || {}), 'top-bottom_trades.csv');
   if (state.view === 'oi' && state.oi) return csvDownload(oiRows(), ['symbol', 'price', 'biggest_put', 'biggest_call', 'gap_pct', 'support', 'resistance', 'pcr', 'new'], `oi_${state.oi.side}_${state.oi.a.date}.csv`);
   toast('Nothing to download here');

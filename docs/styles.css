@@ -47,7 +47,7 @@ button, select, input { font: inherit; color: inherit; }
 
 /* summary strip */
 .summary {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px;
   background: var(--line); border-bottom: 1px solid var(--line);
 }
 .stat { background: var(--card); padding: 10px 14px; }
@@ -170,7 +170,7 @@ dialog .close { position: absolute; right: 10px; top: 10px; font-size: 18px; col
 /* ---- sections nav: bottom bar on phones, under the header on wide screens ---- */
 .views {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   background: var(--card); border-top: 1px solid var(--line);
   padding: 4px 4px calc(4px + var(--safe-bottom));
 }
@@ -231,3 +231,8 @@ html, body { overflow-x: hidden; }
 .note{margin:0 16px 10px;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid #E1E6EF;color:var(--slate,#5B6B82);font-size:13px;line-height:1.45}
 .note.warn{background:#FFF6E8;border-color:#F2D3A0;color:#7A4E0B}
 .verdict{margin:12px 0 4px;padding:10px 12px;border-radius:12px;background:#FFF6E8;border:1px solid #F2D3A0;color:#7A4E0B;font-size:13px;line-height:1.45}
+
+.row.main .sym{font-weight:800}
+.small-note{margin:8px 0}
+.seg.small{margin:10px 0 6px}
+.seg{flex-wrap:wrap}
