@@ -9,7 +9,7 @@ const MKT = {
 };
 const C = { ink: '#14213D', rise: '#0E9F6E', fall: '#D64545', saffron: '#E8A33D', slate: '#5B6B82', line: '#E3E8F0',
   e9: '#F28C28', e21: '#3B6FE0', e50: '#A0AEC0', rsi: '#7C5CDB' };
-const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, style: {} };
+const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, style: {}, cap: {} };
 const $ = (s) => document.querySelector(s);
 const loc = () => MKT[state.mkt].loc;
 const fmt = (v, d = 2, l) => (v == null || Number.isNaN(v) ? '–' : Number(v).toLocaleString(l || loc(), { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -134,7 +134,8 @@ function rowHTML(r, i) {
   const setup = r.setup ? `<span class="chip">${r.setup.startsWith('EMA') ? '9/21 cross' : 'Base breakout'}</span>` : '';
   if (t === 'new') {
     const buy = r.status.startsWith('NEW - buy');
-    chips = `<span class="chip ${buy ? 'new' : ''}">${buy ? 'Buy next open' : 'Stop too far, skip'}</span>${setup}${chips}`;
+    const z = buy ? size921(r, state.mkt) : null;
+    chips = `<span class="chip ${buy ? 'new' : ''}">${buy ? 'Buy next open' : 'Stop too far, skip'}</span>${z && z.sh ? `<span class="chip">${z.sh.toLocaleString(loc())} sh</span>` : ''}${setup}${chips}`;
     right = `<b>${fmt(r.signal_close)}</b><span class="muted">risk ${fmt(r.risk_pct, 1)}%</span>`;
   } else if (t === 'open') {
     const ex = r.status.startsWith('EXIT');
@@ -225,8 +226,9 @@ function select(r) {
     <div class="legend"><span><i style="background:${C.e9}"></i>9 EMA</span><span><i style="background:${C.e21}"></i>21 EMA</span>
       <span><i style="background:${C.e50}"></i>50 EMA</span><span><i style="background:${C.rise}"></i>Supertrend</span>
       ${trade ? `<span><i style="background:${C.fall}"></i>Initial stop</span>` : ''}<span><i style="background:${C.rsi}"></i>RSI with 55 line</span></div>
-    ${facts(r)}${links(r.symbol)}`);
+    ${(state.tab === 'new' || state.tab === 'open') ? plan921(r) : ''}${facts(r)}${links(r.symbol)}`);
   wireStyle('trst', 'trend', () => drawStock(r));
+  wirePlan921(r);
   drawStock(r);
 }
 
@@ -411,6 +413,72 @@ function oiList() {
 }
 
 
+
+/* ------------------------------------------------------------------ position sizing */
+const CAP_KEY = 'td_capital';
+const CAP_DEF = { NSE: 2000000, US: 20000, ASX: 20000 };
+function getCap(m) { try { const v = JSON.parse(localStorage.getItem(CAP_KEY) || '{}'); return +v[m] || CAP_DEF[m]; } catch (e) { return CAP_DEF[m]; } }
+function setCap(m, v) { try { const o = JSON.parse(localStorage.getItem(CAP_KEY) || '{}'); o[m] = v; localStorage.setItem(CAP_KEY, JSON.stringify(o)); } catch (e) { /* storage unavailable */ } state.cap[m] = v; }
+const cap = (m) => state.cap[m] || getCap(m);
+const curOf = (m) => MKT[m].cur;
+function capInput(m, id) {
+  return `<label class="capbox"><span>Your capital (${curOf(m)})</span><input id="${id}" type="number" inputmode="numeric" min="0" step="10000" value="${cap(m)}"></label>`;
+}
+function wireCap(id, m, redraw) {
+  const el = $('#' + id); if (!el) return;
+  el.addEventListener('change', () => {
+    if (!el.isConnected) return;
+    const v = Math.max(0, Math.round(+el.value || 0)); if (v && v !== cap(m)) { setCap(m, v); redraw(); }
+  });
+}
+const money = (v, m) => `${v < 0 ? '−' : ''}${curOf(m)}${fmt(Math.abs(v), 0, MKT[m].loc)}`;
+/* 9/21: 1% of capital at risk to the initial stop, max 20% of capital */
+function size921(r, m) {
+  const E = r.entry ?? r.signal_close; const stop = r.stop; const C0 = cap(m);
+  if (!E || !stop || E <= stop) return null;
+  const val = Math.min(0.01 * C0 * E / (E - stop), 0.2 * C0); const sh = Math.floor(val / E);
+  return { sh, E, val: sh * E, pctCap: (sh * E) / C0 * 100, risk: sh * (E - stop) };
+}
+/* Monthly ATH: 2% of capital at risk to the 30-week SMA, max 20% of capital */
+function sizeATH(E, sma, C0, held = 0) {
+  if (!E || !sma || E <= sma) return null;
+  const val = Math.min(0.02 * C0 * E / (E - sma), 0.2 * C0 - held * E); const sh = Math.max(0, Math.floor(val / E));
+  return { sh, E, val: sh * E, pctCap: (sh * E) / C0 * 100, risk: sh * (E - sma), dist: (E - sma) / E * 100 };
+}
+function plan921(r) {
+  const m = state.mkt; const z = size921(r, m);
+  if (!z) return '';
+  return `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput(m, 'cap921')}</div>
+    <p><b>Buy ${z.sh.toLocaleString(MKT[m].loc)} shares</b> at about ${fmt(z.E)} = ${money(z.val, m)} (${fmt(z.pctCap, 1)}% of capital).</p>
+    <p class="muted">Rule: 1% of capital at risk to the initial stop ${fmt(r.stop)}, max 20% of capital in one stock, max 10 stocks. Loss if the stop is hit ≈ ${money(z.risk, m)}. No adds: pyramiding tested neutral on this system.</p></div>`;
+}
+function planATH(r, near) {
+  const m = 'NSE'; const C0 = cap(m);
+  const E = near ? r.trigger : r.entry; const smaE = near ? r.sma30 : (r.sma_entry ?? r.sma30);
+  const z = sizeATH(E, smaE, C0);
+  if (!z) return '';
+  let html = `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput(m, 'capath')}</div>
+    <p><b>${near ? 'Buy-stop' : 'Initial buy'}: ${z.sh.toLocaleString('en-IN')} shares</b> at ${fmt(E, 2, 'en-IN')} = ${money(z.val, m)} (${fmt(z.pctCap, 1)}% of capital).</p>
+    <p class="muted">30-week SMA ${fmt(smaE, 2, 'en-IN')} is ${fmt(z.dist, 1, 'en-IN')}% below the entry → 2% of capital at risk ≈ ${money(z.risk, m)}${z.pctCap >= 19.9 ? ' (capped at 20% of capital)' : ''}.</p>`;
+  if (!near && r.status === 'open') {
+    const pnl = z.sh * (r.close - E);
+    html += `<p>Now ${fmt(r.close, 2, 'en-IN')}: <span class="${pnl >= 0 ? 'up' : 'down'}">${money(pnl, m)}</span> on those shares. Exit: a weekly close below the 30-week SMA, now ${fmt(r.sma30, 2, 'en-IN')}.</p>`;
+    html += '<h4>Pyramid (one add)</h4>';
+    if (r.add_status === 'added') {
+      const a = sizeATH(r.add_price, r.add_sma ?? r.sma30, C0, z.sh);
+      html += a && a.sh ? `<p class="status open">Add triggered ${day(r.add_date)} at ${fmt(r.add_price, 2, 'en-IN')}: <b>buy ${a.sh.toLocaleString('en-IN')} more</b> = ${money(a.val, m)}. Total ${(z.sh + a.sh).toLocaleString('en-IN')} shares, average ${fmt((z.val + a.val) / (z.sh + a.sh), 2, 'en-IN')}.</p>`
+        : `<p class="muted">Add triggered ${day(r.add_date)}, but the position is already at the 20% cap — no add.</p>`;
+    } else if (r.add_status === 'armed') {
+      const a = sizeATH(r.add_level, r.sma30, C0, z.sh);
+      html += a && a.sh ? `<p class="status info">Armed: the week ending ${day(r.test_week)} tested the 30-week SMA and held. <b>Add ${a.sh.toLocaleString('en-IN')} shares</b> (${money(a.val, m)}) if price trades above ${fmt(r.add_level, 2, 'en-IN')}, the highest price since entry.</p>`
+        : '<p class="muted">Armed, but the position is already at the 20% cap — no add.</p>';
+    } else {
+      html += `<p class="muted">Not armed yet. It arms after a week whose low comes within 3% of the 30-week SMA (at or below ${fmt(r.sma30 * 1.03, 2, 'en-IN')} now) but closes above it. Then add when price makes a new high since entry, sized at 2% risk to the SMA, keeping the stock at most 20% of capital.</p>`;
+    }
+  }
+  return html + '</div>';
+}
+
 /* ------------------------------------------------------------------ Monthly ATH */
 async function loadATH() {
   $('#title').textContent = 'Monthly ATH';
@@ -467,6 +535,11 @@ function athList() {
       chip = `${st}<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span>`;
       right = `<b>${fmt(r.close, 2, 'en-IN')}</b><span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>`;
     }
+    if (tab !== 'tracked' || r.status === 'open') {
+      const z = sizeATH(tab === 'near' ? r.trigger : r.entry, tab === 'near' ? r.sma30 : (r.sma_entry ?? r.sma30), cap('NSE'));
+      if (z && z.sh) chip += `<span class="chip">${z.sh.toLocaleString('en-IN')} sh</span>`;
+      if (r.add_status === 'armed' && r.status === 'open') chip += '<span class="chip open">Add armed</span>';
+    }
     if (r.size) chip += `<span class="chip">${esc(r.size)}</span>`;
     return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
       <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
@@ -491,6 +564,7 @@ function athSelect(r) {
   f.push(['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}
+    ${planATH(r, near)}
     <div class="seg-row"><div class="seg small" id="athtf"><button data-tf="m" aria-selected="true">Monthly</button><button data-tf="w" aria-selected="false">Weekly + 30 SMA</button></div>${styleSeg('ath', 'athst')}</div>
     <div class="chart" id="athc"></div>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
@@ -500,7 +574,14 @@ function athSelect(r) {
     $('#athtf').querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', x === b)); drawATH(r, b.dataset.tf);
   }));
   wireStyle('athst', 'ath', () => drawATH(r, $('#athtf [aria-selected="true"]').dataset.tf));
+  wirePlanATH(r, near);
   drawATH(r, 'm');
+}
+function wirePlanATH(r, near) {
+  wireCap('capath', 'NSE', () => { const p = document.querySelector('.plan'); if (p) p.outerHTML = planATH(r, near); wirePlanATH(r, near); athList(); });
+}
+function wirePlan921(r) {
+  wireCap('cap921', state.mkt, () => { const p = document.querySelector('.plan'); if (p) p.outerHTML = plan921(r); wirePlan921(r); renderList(); });
 }
 const athCache = {};
 async function drawATH(r, tf) {
@@ -577,7 +658,7 @@ function download() {
       : ['symbol', 'name', 'list', 'tag', 'close', 'dist21', 'rsi', 'r1m', 'r3m', 'r6m', 'off_high', 'value_cr', 'size'];
     return csvDownload(filtered(), cols, `trend-desk_${state.mkt}_${state.tab}_${state.data[state.mkt].asof}.csv`);
   }
-  if (state.view === 'ath' && state.ath && state.ath.d) return csvDownload(athRows(), ['symbol', 'name', 'status', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'depth', 'close', 'gap_pct', 'ret', 'peak', 'weeks', 'sma30', 'exit_date', 'exit_price', 'value_cr', 'size'], `monthly-ath_${state.ath.tab}_${state.ath.d.asof}.csv`);
+  if (state.view === 'ath' && state.ath && state.ath.d) return csvDownload(athRows().map((r) => { const n = state.ath.tab === 'near'; const z = sizeATH(n ? r.trigger : r.entry, n ? r.sma30 : (r.sma_entry ?? r.sma30), cap('NSE')); const a = r.add_status === 'armed' && z ? sizeATH(r.add_level, r.sma30, cap('NSE'), z.sh) : null; return { ...r, shares: z ? z.sh : '', value: z ? Math.round(z.val) : '', add_shares: a ? a.sh : '' }; }), ['symbol', 'name', 'status', 'shares', 'value', 'add_status', 'add_level', 'add_shares', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'depth', 'close', 'gap_pct', 'ret', 'peak', 'weeks', 'sma30', 'exit_date', 'exit_price', 'value_cr', 'size'], `monthly-ath_${state.ath.tab}_${state.ath.d.asof}.csv`);
   if (state.view === 'tb' && state.tb) return csvDownload(state.tb.ledger, Object.keys(state.tb.ledger[0] || {}), 'top-bottom_trades.csv');
   if (state.view === 'oi' && state.oi) return csvDownload(oiRows(), ['symbol', 'price', 'biggest_put', 'biggest_call', 'gap_pct', 'support', 'resistance', 'pcr', 'new'], `oi_${state.oi.side}_${state.oi.a.date}.csv`);
   toast('Nothing to download here');

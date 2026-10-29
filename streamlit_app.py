@@ -1941,7 +1941,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-29 · Close-line charts option v32"
+APP_BUILD = "2026-10-29 · Position sizing and pyramid adds v33"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2033,6 +2033,27 @@ def render_ath_tab() -> None:
             "Near trigger": ["symbol", "name", "close", "trigger", "gap_pct", "base_months", "ath_month", "sma30", "size"],
             "Tracked signals": ["symbol", "name", "status", "date", "entry", "close", "ret", "peak", "weeks", "base_months",
                                 "exit_date", "size"]}[which]
+    capital = st.number_input("Your capital (₹) — sizes every row: 2% of capital at risk to the 30-week SMA, max 20% per stock",
+                              min_value=10_000, value=int(st.session_state.get("ath_cap", 2_000_000)), step=50_000, key="ath_cap")
+
+    def _size(e, sma, held=0.0):
+        if not e or not sma or not np.isfinite(e) or not np.isfinite(sma) or e <= sma:
+            return 0
+        return max(0, int(min(0.02 * capital * e / (e - sma), 0.2 * capital - held * e) // e))
+
+    df = df.copy()
+    near = which == "Near trigger"
+    e_col = df["trigger"] if near else df["entry"]
+    s_col = df["sma30"] if near or "sma_entry" not in df else df["sma_entry"].fillna(df["sma30"])
+    df["shares"] = [_size(e, s_) for e, s_ in zip(e_col, s_col)]
+    df["value_₹"] = (df["shares"] * e_col).round(0)
+    if "add_status" in df:
+        df["add_shares"] = [(_size(r.add_level, r.sma30, r.shares) if r.add_status == "armed" else
+                             _size(r.add_price, r.add_sma if pd.notna(r.add_sma) else r.sma30, r.shares) if r.add_status == "added" else 0)
+                            if r.status == "open" else 0 for r in df.itertuples()]
+        cols = cols[:2] + ["shares", "value_₹", "add_status", "add_level", "add_shares"] + cols[2:]
+    else:
+        cols = cols[:2] + ["shares", "value_₹"] + cols[2:]
     show = df[[k for k in cols if k in df]].copy()
     for k in ("ret", "peak"):
         if k in show:
@@ -2046,6 +2067,16 @@ def render_ath_tab() -> None:
         tf = st.radio("Timeframe", ["Monthly", "Weekly + 30-week SMA"], horizontal=True, key="ath_tf")
         sty = st.radio("Chart type", ["Candles", "Close line"], horizontal=True, key="ath_style")
         r = df[df.symbol == sym].iloc[0]
+        if r.get("shares", 0):
+            msg = (f"**{'Buy-stop' if near else 'Initial buy'}: {int(r.shares):,} shares** at "
+                   f"{float(r.trigger if near else r.entry):,.2f} = ₹{float(r['value_₹']):,.0f}.")
+            if not near and r.get("status") == "open" and r.get("add_status") in ("armed", "added") and r.get("add_shares", 0):
+                msg += (f" **Add {int(r.add_shares):,} shares** "
+                        + (f"if price trades above {float(r.add_level):,.2f}." if r.add_status == "armed"
+                           else f"(triggered {str(r.add_date)[:10]} at {float(r.add_price):,.2f})."))
+            elif not near and r.get("status") == "open":
+                msg += " Add not armed yet (needs a week whose low comes within 3% of the 30-week SMA and closes above it)."
+            st.markdown(msg)
         try:
             with open(_os.path.join(_os.path.dirname(ATH_PATH), "ath_charts", f"{sym}.json"), encoding="utf-8") as f:
                 ch = _json.load(f)
@@ -2270,6 +2301,15 @@ def render_trend_scan_tab(market: MarketConfig | None = None) -> None:
         if pick is not None:
             sym = pick["symbol"]
             info = pick.to_dict() if kind in ("early", "trig") else None
+            if info and info.get("stop") and str(info.get("status", "")).startswith(("NEW - buy", "open")):
+                cap_ = st.number_input("Your capital — 1% of capital at risk to the initial stop, max 20% per stock",
+                                       min_value=1_000, value=int(st.session_state.get("ts_cap", 2_000_000 if mkey == "NSE" else 20_000)),
+                                       step=10_000, key="ts_cap")
+                e_ = float(info.get("entry") or info.get("signal_close") or 0); s_ = float(info["stop"])
+                if e_ > s_ > 0:
+                    sh_ = int(min(0.01 * cap_ * e_ / (e_ - s_), 0.2 * cap_) // e_)
+                    st.markdown(f"**Position: {sh_:,} shares** at about {e_:,.2f} = {sh_ * e_:,.0f} "
+                                f"({sh_ * e_ / cap_ * 100:.1f}% of capital); loss if the stop {s_:,.2f} is hit ≈ {sh_ * (e_ - s_):,.0f}.")
             sty = st.radio("Chart type", ["Candles", "Close line"], horizontal=True, key="ts_style")
             fig = trend_chart(sym, info, mkey, sty)
             if fig is None:

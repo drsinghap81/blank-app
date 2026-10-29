@@ -6,6 +6,9 @@ System (backtest 2017-Oct 2026, all NSE incl. delisted: 26.9%/yr, worst fall -30
             base >= 24 months since that ATH month (>= 12 months shown as secondary), stock above its 30-week SMA
             at the last completed week, >= Rs 2 cr/day traded
   exit    : weekly CLOSE below the 30-week SMA -> sell next open
+  size    : risk 2% of capital to the 30-week SMA (shares = 2% x capital / (entry - SMA30)), max 20% of capital per stock
+  add     : once, after a completed week whose low is within 3% of the SMA30 but closes above it, when price trades above
+            the highest high since entry; same 2% risk to the SMA30, total stock <= 20% of capital
 Lists written to data/scan/ath.json:
   breakouts : triggered this month or last month, still open
   near      : within 5% below the trigger, base >= 12 months, above the 30-week SMA
@@ -46,6 +49,31 @@ def clean(o):
     if isinstance(o, (pd.Timestamp, datetime)):
         return str(o.date())
     return o
+
+
+def add_state(x, W, Wc, dt, w_entry, exit_dt):
+    """One add: after a completed week whose LOW is within 3% of the 30-week SMA (or below) but CLOSES at/above it,
+    buy when price trades above the highest high since entry. Returns the add status for the app."""
+    end = exit_dt if exit_dt is not None else x.index[-1] + pd.Timedelta(days=1)
+    tested_week = None
+    for wk_, r in Wc[Wc.index > w_entry].iterrows():
+        if wk_.end_time >= end:
+            break
+        if np.isfinite(r.sma) and r.l <= r.sma * 1.03 and r.c >= r.sma:
+            tested_week = wk_
+            break
+    if tested_week is None:
+        return dict(add_status="none", add_level=None, add_date=None, add_price=None, add_sma=None, test_week=None)
+    since = x[(x.index >= dt) & (x.index <= tested_week.end_time)]
+    hh = float(since.High.max())
+    after = x[(x.index > tested_week.end_time) & (x.index < end)]
+    for d_, r in after.iterrows():
+        if r.High > hh:
+            sm = W.sma.shift(1).loc[d_.to_period("W-FRI")]
+            return dict(add_status="added", add_level=hh, add_date=d_, add_price=float(max(r.Open, hh)),
+                        add_sma=float(sm) if np.isfinite(sm) else None, test_week=str(tested_week.end_time.date()))
+    return dict(add_status="armed", add_level=hh, add_date=None, add_price=None, add_sma=None,
+                test_week=str(tested_week.end_time.date()))
 
 
 def analyse(sym, x, today):
@@ -108,10 +136,13 @@ def analyse(sym, x, today):
             status, exit_px, exit_dt = "open", None, None
         last = float(x.Close.iloc[-1])
         ret = (exit_px if exit_px else last) / entry - 1
+        sma_entry = float(W.sma.shift(1).loc[w_entry]) if np.isfinite(W.sma.shift(1).loc[w_entry]) else None
+        add = add_state(x, W, Wc, dt, w_entry, exit_dt)
         events.append(dict(symbol=sym, date=dt, entry=entry, trigger=r.trig, ath_month=r.ath_month, base_months=int(r.age),
                            depth=r.depth, status=status, exit_date=exit_dt, exit_price=exit_px, close=last,
                            ret=ret, peak=float(x.Close[x.index >= dt].max() / entry - 1),
                            weeks=int(((exit_dt or x.index[-1]) - dt).days / 7), main=bool(r.age >= BASE_MAIN),
+                           sma_entry=sma_entry, **add,
                            sma30=float(W.sma.loc[last_complete]) if np.isfinite(W.sma.loc[last_complete]) else None,
                            value_cr=float(r.val) / 1e7))
     # near trigger (current month, not crossed yet)
