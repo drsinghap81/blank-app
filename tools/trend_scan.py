@@ -277,6 +277,8 @@ def main():
                 c = d["Close"][t].dropna()
                 o, h, l = (d[f][t].reindex(c.index) for f in ("Open", "High", "Low"))
                 v = d["Volume"][t].reindex(c.index).fillna(0)
+                from adjust import fix_gaps
+                o, h, l, c, v = fix_gaps(o, h, l, c, v)
             except Exception:  # noqa: BLE001
                 continue
             m, tg = metrics(o, h, l, c, v)

@@ -649,14 +649,37 @@ async function loadResults() {
   if (!state.res) {
     el.innerHTML = '<p class="muted pad">Loading…</p>';
     const r = await Promise.all(['NSE', 'US', 'ASX'].map((m) => getJSON(REPO + `bt-${m}/data/bt/${m}.json`, `bt_${m}`)));
-    state.res = { NSE: r[0], US: r[1], ASX: r[2] };
+    const [bs, bh, bp, bt] = await Promise.all([getJSON(MAIN + 'paper/book/summary.json', 'book_s'), getText(MAIN + 'paper/book/history.csv'),
+      getText(MAIN + 'paper/book/positions.csv'), getText(MAIN + 'paper/book/trades.csv')]);
+    state.res = { NSE: r[0], US: r[1], ASX: r[2], book: { s: bs, h: parseCSV(bh), p: parseCSV(bp), t: parseCSV(bt) } };
   }
   const R = state.res;
+  const B = R.book || {};
+  const bookHTML = B.s ? `<div class="card">
+    <h3>My paper book — ATH + 9/21 + Top Bottom</h3>
+    <p class="muted small">Started ${day(B.s.start)} with ${money(B.s.capital, 'NSE')}. ATH at ${B.s.rules.ath_risk_pct}% risk; 9/21 at ${B.s.rules.t921_risk_pct}% risk on the cash ATH isn't using (15% kept free); Top Bottom ${B.s.tb.qty} units of Bank Nifty futures on pledged margin. Paper only, updated ${esc(B.s.updated_ist)} IST.</p>
+    <div class="facts">
+      <div class="fact"><span>Equity</span><b>${money(B.s.equity, 'NSE')}</b></div>
+      <div class="fact"><span>Return</span><b class="${B.s.ret_pct >= 0 ? 'up' : 'down'}">${pct(B.s.ret_pct)}</b></div>
+      <div class="fact"><span>Invested in stocks</span><b>${fmt(B.s.invested_pct, 0, 'en-IN')}%</b></div>
+      <div class="fact"><span>ATH</span><b>${B.s.ath.open} open · ${money(B.s.ath.value, 'NSE')}</b></div>
+      <div class="fact"><span>9/21</span><b>${B.s.t921.open} open · ${money(B.s.t921.value, 'NSE')}</b></div>
+      <div class="fact"><span>Top Bottom P&amp;L</span><b class="${B.s.tb.pnl >= 0 ? 'up' : 'down'}">${money(B.s.tb.pnl, 'NSE')}</b></div>
+    </div>
+    <div class="chart small-chart" id="bookc"></div>
+    <h4>Open positions</h4>
+    <div class="table-wrap"><table><thead><tr><th>Stock</th><th>System</th><th class="r">Shares</th><th class="r">Avg</th><th class="r">Last</th><th class="r">P&amp;L</th><th>Exit rule</th></tr></thead>
+      <tbody>${(B.p || []).map((x) => `<tr><td><b>${esc(x.symbol)}</b><div class="co">since ${day(x.since)}</div></td><td>${esc(x.engine)}</td><td class="r">${(+x.shares).toLocaleString('en-IN')}</td>
+        <td class="r">${fmt(+x.avg, 2, 'en-IN')}</td><td class="r">${fmt(+x.last, 2, 'en-IN')}</td><td class="r ${+x.pnl >= 0 ? 'up' : 'down'}">${money(+x.pnl, 'NSE')}</td><td class="co">${esc(x.exit_rule)}</td></tr>`).join('') || '<tr><td colspan="7" class="muted">No open positions yet — the book fills as new signals appear.</td></tr>'}</tbody></table></div>
+    ${(B.t || []).length ? `<h4>Closed trades</h4><div class="table-wrap"><table><thead><tr><th>Stock</th><th>System</th><th>In</th><th>Out</th><th class="r">P&amp;L</th><th>Why</th></tr></thead>
+      <tbody>${B.t.slice().reverse().map((x) => `<tr><td><b>${esc(x.symbol)}</b></td><td>${esc(x.engine)}</td><td>${day(x.entry_date)}</td><td>${day(x.exit_date)}</td><td class="r ${+x.pnl >= 0 ? 'up' : 'down'}">${money(+x.pnl, 'NSE')} (${pct(+x.ret_pct)})</td><td class="co">${esc(x.why)}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    <p class="muted small">Backtest of this mix 2017–2026 (rough, returns added): about 37% a year with Top Bottom at half size, 44% at full size, worst fall about −24%; 2022–26 33–35%.</p>
+  </div>` : '<div class="card"><h3>My paper book</h3><p class="muted">Starts with tonight\'s run (after 23:15 IST).</p></div>';
   const row = (name, m, note) => (m ? `<tr><td><b>${name}</b><div class="co">${note}</div></td><td class="r">${fmt(m.median.cagr, 1, 'en-GB')}%<div class="co">${fmt(m.range.cagr_min, 0, 'en-GB')}–${fmt(m.range.cagr_max, 0, 'en-GB')}%</div></td>
       <td class="r">${fmt(m.median.maxdd, 0, 'en-GB')}%</td><td class="r">${fmt(m.median.cagr_17_21, 1, 'en-GB')}%</td><td class="r">${fmt(m.median.cagr_22_26, 1, 'en-GB')}%</td>
       <td class="r">${fmt(m.benchmark.cagr, 1, 'en-GB')}%<div class="co">${esc(m.benchmark.name)}</div></td></tr>`
     : `<tr><td><b>${name}</b><div class="co">${note}</div></td><td colspan="5" class="muted">Test still running — check back shortly.</td></tr>`);
-  el.innerHTML = `<div class="card">
+  el.innerHTML = bookHTML + `<div class="card">
     <h3>Return a year, 2017 – Oct 2026</h3>
     <div class="table-wrap"><table>
       <thead><tr><th>Market</th><th class="r">Return a year</th><th class="r">Worst fall</th><th class="r">2017–21</th><th class="r">2022–26</th><th class="r">Index</th></tr></thead>
@@ -671,6 +694,11 @@ async function loadResults() {
     <p class="verdict"><b>Verdict:</b> trade it in India only. The US made about 4% a year (S&amp;P 500: 15%) and Australia about −1% (ASX 200: 4.5%), even with the flattering data. Tightening liquidity and price filters (US up to $100 m a day and $10 a share; ASX up to A$20 m and A$2) never lifted either above 7.2% a year. The US and Australian scans stay in the app as watch lists.</p>
     <p class="muted small">Median of 5 runs with a random choice of which signals fill the 10 positions; the small figures under each return show the range. Yahoo only has stocks that still trade, which flatters US and Australian results; compare the two India rows to see by how much.</p>
   </div>`;
+  if (B.h && B.h.length > 1) {
+    const box = $('#bookc'); const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
+    const l = ch.addLineSeries({ color: C.ink, lineWidth: 2 }); l.setData(B.h.map((x) => ({ time: x.date, value: +x.equity })));
+    ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
+  } else if ($('#bookc')) $('#bookc').remove();
 }
 
 /* ------------------------------------------------------------------ downloads + wiring */
@@ -691,6 +719,7 @@ function download() {
     return csvDownload(filtered(), cols, `trend-desk_${state.mkt}_${state.tab}_${state.data[state.mkt].asof}.csv`);
   }
   if (state.view === 'ath' && state.ath && state.ath.d) return csvDownload(athRows().map((r) => { const n = state.ath.tab === 'near'; const z = sizeATH(n ? r.trigger : r.entry, n ? r.sma30 : (r.sma_entry ?? r.sma30), cap('NSE')); const a = r.add_status === 'armed' && z ? sizeATH(r.add_level, r.sma30, cap('NSE'), z.sh) : null; return { ...r, shares: z ? z.sh : '', value: z ? Math.round(z.val) : '', add_shares: a ? a.sh : '' }; }), ['symbol', 'name', 'status', 'shares', 'value', 'add_status', 'add_level', 'add_shares', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'depth', 'close', 'gap_pct', 'ret', 'peak', 'weeks', 'sma30', 'exit_date', 'exit_price', 'value_cr', 'size'], `monthly-ath_${state.ath.tab}_${state.ath.d.asof}.csv`);
+  if (state.view === 'results' && state.res && state.res.book && state.res.book.p.length) return csvDownload(state.res.book.p, Object.keys(state.res.book.p[0]), 'paper-book_positions.csv');
   if (state.view === 'tb' && state.tb) return csvDownload(state.tb.ledger, Object.keys(state.tb.ledger[0] || {}), 'top-bottom_trades.csv');
   if (state.view === 'oi' && state.oi) return csvDownload(oiRows(), ['symbol', 'price', 'biggest_put', 'biggest_call', 'gap_pct', 'support', 'resistance', 'pcr', 'new'], `oi_${state.oi.side}_${state.oi.a.date}.csv`);
   toast('Nothing to download here');

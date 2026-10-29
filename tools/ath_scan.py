@@ -82,6 +82,9 @@ def analyse(sym, x, today):
     x = x[(x.Close > 0) & (x.High > 0)]
     if len(x) < 300:
         return [], None, None
+    from adjust import fix_gaps
+    o_, h_, l_, c_, v_ = fix_gaps(x.Open, x.High, x.Low, x.Close, x.Volume)
+    x = pd.DataFrame({"Open": o_, "High": h_, "Low": l_, "Close": c_, "Volume": v_}, index=x.index)
     val20 = (x.Close * x.Volume).rolling(20, min_periods=10).mean()
     mon = x.index.to_period("M")
     M = pd.DataFrame({"o": x.Open.groupby(mon).first(), "h": x.High.groupby(mon).max(), "l": x.Low.groupby(mon).min(),
