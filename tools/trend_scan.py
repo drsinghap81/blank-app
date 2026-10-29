@@ -237,13 +237,13 @@ def export_charts(frames, syms):
 
 
 def telegram(text):
-    tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
-    if not tok or not chat or os.environ.get("SEND_TELEGRAM") != "1":
+    """Evening alert to WhatsApp and/or Telegram (tools/notify.py), only on scheduled runs (SEND_TELEGRAM=1)."""
+    if os.environ.get("SEND_TELEGRAM") != "1":
         return
-    try:
-        s.post(f"https://api.telegram.org/bot{tok}/sendMessage", data={"chat_id": chat, "text": text[:4000]}, timeout=20)
-    except Exception as e:  # noqa: BLE001
-        print("telegram failed:", e)
+    import sys as _s
+    _s.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from notify import send
+    send(text)
 
 
 def main():

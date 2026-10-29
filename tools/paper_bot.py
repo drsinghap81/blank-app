@@ -237,14 +237,9 @@ def whatsapp_message(orders_all: dict, summary: dict, led: pd.DataFrame, cfg: di
 
 
 def telegram(text: str) -> None:
-    tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
-    if not tok or not chat:
-        return
-    try:
-        _sess().post(f"https://api.telegram.org/bot{tok}/sendMessage",
-                     data={"chat_id": chat, "text": text}, timeout=20)
-    except Exception as e:  # noqa: BLE001
-        print("telegram failed:", e, file=sys.stderr)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from notify import send
+    send(text)
 
 
 def main():

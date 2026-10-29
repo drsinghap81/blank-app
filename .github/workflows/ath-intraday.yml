@@ -1,0 +1,38 @@
+name: ath-intraday
+on:
+  schedule:
+    - cron: "*/15 3-10 * * 1-5"   # every 15 min; the script only acts 09:15-15:40 IST
+  workflow_dispatch:
+    inputs:
+      force: {description: "Run outside market hours (test)", default: "0"}
+permissions:
+  contents: write
+concurrency: {group: ath-intraday, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Check prices and alert
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          ALERT_CAPITAL: ${{ vars.ALERT_CAPITAL }}
+          FORCE: ${{ github.event.inputs.force || '0' }}
+        run: |
+          pip install -q yfinance pandas requests
+          mkdir -p data/live
+          git fetch -q origin live 2>/dev/null && git show origin/live:data/live/ath_sent.json > data/live/ath_sent.json 2>/dev/null || true
+          python tools/ath_intraday.py 2>&1 | grep -v -i "warn\|delisted\|failed download\|^\[" | tail -20
+      - name: Publish live prices to the 'live' branch
+        run: |
+          [ -f data/live/ath_live.json ] || exit 0
+          cp -r data/live /tmp/live
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan live-tmp; git rm -rqf --cached .; rm -rf data/live; mkdir -p data; cp -r /tmp/live data/live
+          git add -f data/live; git commit -qm "live $(date -u +%FT%H:%M)"; git push -qf origin HEAD:live

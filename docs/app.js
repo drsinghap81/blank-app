@@ -485,12 +485,16 @@ async function loadATH() {
   const el = $('#view-ath');
   if (!state.ath) {
     el.innerHTML = '<p class="muted pad">Loading…</p>';
-    const d = await getJSON(MAIN + 'data/scan/ath.json', 'ath');
-    state.ath = { d, tab: 'brk', q: '', all: false };
+    const [d, live] = await Promise.all([getJSON(MAIN + 'data/scan/ath.json', 'ath'), getJSON(REPO + 'live/data/live/ath_live.json', 'ath_live')]);
+    state.ath = { d, live, tab: 'brk', q: '', all: false };
   }
   const { d } = state.ath;
   if (!d) { el.innerHTML = '<p class="empty">The monthly all-time-high scan appears after its first evening run. Try again later.</p>'; $('#asof').textContent = ''; return; }
-  $('#asof').textContent = `NSE close ${longDay(d.asof)}, ${Number(d.scanned).toLocaleString('en-IN')} stocks, full price history`;
+  const lv = state.ath.live;
+  const todayIST = new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10);
+  state.ath.lp = lv && lv.time && lv.time.slice(0, 10) === todayIST ? lv.prices || {} : {};
+  $('#asof').textContent = Object.keys(state.ath.lp).length ? `Plan from ${longDay(d.asof)} · live prices ${lv.time.slice(11)} (about 15 min delayed)`
+    : `NSE close ${longDay(d.asof)}, ${Number(d.scanned).toLocaleString('en-IN')} stocks, full price history`;
   const T = d.tracked || [];
   const brkMain = (d.breakouts || []).filter((r) => r.main).length;
   const exits = T.filter((r) => r.status === 'exit next open').length;
@@ -529,11 +533,17 @@ function athList() {
     let chip, right;
     if (tab === 'near') {
       chip = `<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to go</span>`;
-      right = `<b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">trigger ${fmt(r.trigger, 2, 'en-IN')}</span>`;
+      const L = (state.ath.lp || {})[r.symbol];
+      right = `<b>${fmt(L ? L.price : r.close, 2, 'en-IN')}</b><span class="muted">trigger ${fmt(r.trigger, 2, 'en-IN')}</span>`;
+      if (L && L.high > r.trigger) chip = '<span class="chip new">Crossed today</span>' + chip;
     } else {
       const st = r.status === 'exit next open' ? '<span class="chip exit">Sell next open</span>' : r.status === 'exited' ? `<span class="chip">Exited ${day(r.exit_date)}</span>` : `<span class="chip open">Since ${day(r.date)}</span>`;
       chip = `${st}<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span>`;
-      right = `<b>${fmt(r.close, 2, 'en-IN')}</b><span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>`;
+      const L = (state.ath.lp || {})[r.symbol];
+      const px = L && r.status === 'open' ? L.price : null; const rr = px ? px / r.entry - 1 : r.ret;
+      right = `<b>${fmt(px ?? r.close, 2, 'en-IN')}</b><span class="${rr >= 0 ? 'up' : 'down'}">${pct(rr * 100)}</span>`;
+      if (L && L.event === 'add') chip = '<span class="chip new">Add triggered today</span>' + chip;
+      if (L && L.event === 'below_sma') chip = '<span class="chip exit">Below 30-wk SMA</span>' + chip;
     }
     if (tab !== 'tracked' || r.status === 'open') {
       const z = sizeATH(tab === 'near' ? r.trigger : r.entry, tab === 'near' ? r.sma30 : (r.sma_entry ?? r.sma30), cap('NSE'));

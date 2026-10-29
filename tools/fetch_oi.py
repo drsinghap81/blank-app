@@ -186,13 +186,9 @@ def summary(day, out, tp, tc):
 
 
 def telegram(text):
-    tok, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
-    if not tok or not chat:
-        return
-    try:
-        s.post(f"https://api.telegram.org/bot{tok}/sendMessage", data={"chat_id": chat, "text": text[:4000]}, timeout=20)
-    except Exception as e:  # noqa: BLE001
-        print("telegram failed:", e, file=sys.stderr)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from notify import send
+    send(text)
 
 
 if __name__ == "__main__":
