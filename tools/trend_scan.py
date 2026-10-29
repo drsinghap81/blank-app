@@ -274,7 +274,8 @@ def main():
             print("chunk fail", i, e); continue
         for t in chunk:
             try:
-                c = d["Close"][t].dropna()
+                from session import drop_partial
+                c = drop_partial(d["Close"][t].dropna())
                 o, h, l = (d[f][t].reindex(c.index) for f in ("Open", "High", "Low"))
                 v = d["Volume"][t].reindex(c.index).fillna(0)
                 from adjust import fix_gaps

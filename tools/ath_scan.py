@@ -78,7 +78,8 @@ def add_state(x, W, Wc, dt, w_entry, exit_dt):
 
 def analyse(sym, x, today):
     """x: daily OHLCV (DatetimeIndex). Returns (events, near_row or None, chart dict) ."""
-    x = x.dropna(subset=["Close"])
+    from session import drop_partial
+    x = drop_partial(x.dropna(subset=["Close"]))
     x = x[(x.Close > 0) & (x.High > 0)]
     if len(x) < 300:
         return [], None, None
