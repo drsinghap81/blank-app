@@ -236,3 +236,5 @@ html, body { overflow-x: hidden; }
 .small-note{margin:8px 0}
 .seg.small{margin:10px 0 6px}
 .seg{flex-wrap:wrap}
+.seg-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.seg-row .seg{margin:10px 0 6px}

@@ -134,14 +134,20 @@ def _stats(tr: pd.DataFrame) -> dict:
     }
 
 
-def _chart(df: pd.DataFrame, tr: pd.DataFrame, p: TBParams, bars: int) -> go.Figure:
+def _chart(df: pd.DataFrame, tr: pd.DataFrame, p: TBParams, bars: int, style: str = "Close line") -> go.Figure:
     c = df["Close"].to_numpy(float)
     _, _, piv = confirmed_swings(c, p.swing_pct)
     view = df.iloc[-bars:]
     start = view.index[0]
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=view.index, y=view["Close"], mode="lines", name="Close",
-                             line=dict(color="#e6e6e6", width=1.4)))
+    if style == "Candles" and {"Open", "High", "Low"} <= set(view.columns):
+        fig.add_trace(go.Candlestick(x=view.index, open=view["Open"], high=view["High"], low=view["Low"],
+                                     close=view["Close"], name="Price", increasing_line_color="#26a69a",
+                                     decreasing_line_color="#ef5350"))
+        fig.update_layout(xaxis_rangeslider_visible=False)
+    else:
+        fig.add_trace(go.Scatter(x=view.index, y=view["Close"], mode="lines", name="Close",
+                                 line=dict(color="#e6e6e6", width=1.8)))
     tops = [(df.index[pi], v) for ci, pi, k, v in piv if k == "T" and df.index[pi] >= start]
     bots = [(df.index[pi], v) for ci, pi, k, v in piv if k == "B" and df.index[pi] >= start]
     if tops:
@@ -322,7 +328,8 @@ def render_topbottom_tab(stocks: tuple[str, ...] | None = None) -> None:
     bars = st.radio("Chart window", {"3 months": 63, "6 months": 126, "1 year": 252, "3 years": 756}.keys(),
                     index=1, horizontal=True, key="tb_win")
     nb = {"3 months": 63, "6 months": 126, "1 year": 252, "3 years": 756}[bars]
-    fig = _chart(df, tr, p, nb)
+    style = st.radio("Chart type", ["Close line", "Candles"], horizontal=True, key="tb_style")
+    fig = _chart(df, tr, p, nb, style)
     fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
     _add_level_lines(fig, st.session_state.get("_tb_lines", {}))
     fig.update_layout(margin=dict(l=10, r=150, t=30, b=10))

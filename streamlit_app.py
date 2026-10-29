@@ -1941,7 +1941,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-29 · Monthly ATH breakout tab v31"
+APP_BUILD = "2026-10-29 · Close-line charts option v32"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2044,6 +2044,7 @@ def render_ath_tab() -> None:
     with right:
         sym = st.selectbox("Chart", list(df.symbol), key="ath_sym")
         tf = st.radio("Timeframe", ["Monthly", "Weekly + 30-week SMA"], horizontal=True, key="ath_tf")
+        sty = st.radio("Chart type", ["Candles", "Close line"], horizontal=True, key="ath_style")
         r = df[df.symbol == sym].iloc[0]
         try:
             with open(_os.path.join(_os.path.dirname(ATH_PATH), "ath_charts", f"{sym}.json"), encoding="utf-8") as f:
@@ -2053,7 +2054,9 @@ def render_ath_tab() -> None:
             return
         b = ch["m" if tf == "Monthly" else "w"]
         t = [x + "-01" for x in b["t"]] if tf == "Monthly" else b["t"]
-        fig = go.Figure(go.Candlestick(x=t, open=b["o"], high=b["h"], low=b["l"], close=b["c"], name=sym,
+        fig = go.Figure(go.Scatter(x=t, y=b["c"], mode="lines", name=sym, line=dict(color="#14213D", width=2))
+                        if sty == "Close line" else
+                        go.Candlestick(x=t, open=b["o"], high=b["h"], low=b["l"], close=b["c"], name=sym,
                                        increasing_line_color="#0E9F6E", decreasing_line_color="#D64545"))
         if tf != "Monthly":
             fig.add_scatter(x=t, y=b["sma"], mode="lines", line=dict(color="#3B6FE0", width=2), name="30-week SMA")
@@ -2099,7 +2102,7 @@ def supertrend_line(df: pd.DataFrame, n: int = 10, m: float = 3.0) -> tuple[np.n
     return d, line
 
 
-def trend_chart(sym: str, trig: dict | None = None, mkey: str = "NSE") -> go.Figure | None:
+def trend_chart(sym: str, trig: dict | None = None, mkey: str = "NSE", style: str = "Candles") -> go.Figure | None:
     """Daily candles with EMA 9/21 and RSI(14) with the 60 line (the trend-scan view)."""
     ticker = {"NSE": f"{sym}.NS", "ASX": f"{sym}.AX", "US": sym.replace(".", "-")}.get(mkey, sym)
     df, live, _ = fetch_ohlcv(ticker, "1y")
@@ -2110,8 +2113,12 @@ def trend_chart(sym: str, trig: dict | None = None, mkey: str = "NSE") -> go.Fig
     df["E21"] = df["Close"].ewm(span=21, adjust=False).mean()
     df["RSI"] = rsi_wilder(df["Close"], 14)
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.03, row_heights=[0.72, 0.28])
-    fig.add_trace(go.Candlestick(x=df.index, open=df["Open"], high=df["High"], low=df["Low"], close=df["Close"],
-                                 name=sym, increasing_line_color="#22c55e", decreasing_line_color="#ef4444"), row=1, col=1)
+    if style == "Close line":
+        fig.add_trace(go.Scatter(x=df.index, y=df["Close"], name=sym, mode="lines", line=dict(color="#e5e7eb", width=2)),
+                      row=1, col=1)
+    else:
+        fig.add_trace(go.Candlestick(x=df.index, open=df["Open"], high=df["High"], low=df["Low"], close=df["Close"],
+                                     name=sym, increasing_line_color="#22c55e", decreasing_line_color="#ef4444"), row=1, col=1)
     fig.add_trace(go.Scatter(x=df.index, y=df["E9"], name="EMA 9", line=dict(color="#f97316", width=1.6)), row=1, col=1)
     fig.add_trace(go.Scatter(x=df.index, y=df["E21"], name="EMA 21", line=dict(color="#3b82f6", width=1.6)), row=1, col=1)
     sd, sl = supertrend_line(df)
@@ -2263,7 +2270,8 @@ def render_trend_scan_tab(market: MarketConfig | None = None) -> None:
         if pick is not None:
             sym = pick["symbol"]
             info = pick.to_dict() if kind in ("early", "trig") else None
-            fig = trend_chart(sym, info, mkey)
+            sty = st.radio("Chart type", ["Candles", "Close line"], horizontal=True, key="ts_style")
+            fig = trend_chart(sym, info, mkey, sty)
             if fig is None:
                 st.warning(f"Could not load prices for {sym} right now — try again in a minute.")
             else:

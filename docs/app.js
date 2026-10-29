@@ -9,7 +9,7 @@ const MKT = {
 };
 const C = { ink: '#14213D', rise: '#0E9F6E', fall: '#D64545', saffron: '#E8A33D', slate: '#5B6B82', line: '#E3E8F0',
   e9: '#F28C28', e21: '#3B6FE0', e50: '#A0AEC0', rsi: '#7C5CDB' };
-const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null };
+const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, style: {} };
 const $ = (s) => document.querySelector(s);
 const loc = () => MKT[state.mkt].loc;
 const fmt = (v, d = 2, l) => (v == null || Number.isNaN(v) ? '–' : Number(v).toLocaleString(l || loc(), { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -220,12 +220,37 @@ function select(r) {
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div>
       <div class="d-price"><b>${fmt(r.close)}</b></div></div>
     ${statusBlock(r)}
+    ${styleSeg('trend', 'trst')}
     <div class="chart" id="cv"></div><div class="rsi" id="rv"></div>
     <div class="legend"><span><i style="background:${C.e9}"></i>9 EMA</span><span><i style="background:${C.e21}"></i>21 EMA</span>
       <span><i style="background:${C.e50}"></i>50 EMA</span><span><i style="background:${C.rise}"></i>Supertrend</span>
       ${trade ? `<span><i style="background:${C.fall}"></i>Initial stop</span>` : ''}<span><i style="background:${C.rsi}"></i>RSI with 55 line</span></div>
     ${facts(r)}${links(r.symbol)}`);
+  wireStyle('trst', 'trend', () => drawStock(r));
   drawStock(r);
+}
+
+
+/* candles or closing-price line, remembered per chart group */
+const STYLE_KEY = 'td_style';
+function getStyle(group) { try { const v = JSON.parse(localStorage.getItem(STYLE_KEY) || '{}'); return v[group] || (group === 'tb' ? 'line' : 'candle'); } catch (e) { return group === 'tb' ? 'line' : 'candle'; } }
+function setStyle(group, v) { try { const o = JSON.parse(localStorage.getItem(STYLE_KEY) || '{}'); o[group] = v; localStorage.setItem(STYLE_KEY, JSON.stringify(o)); } catch (e) { /* storage unavailable */ } state.style[group] = v; }
+const styleSeg = (group, id) => { const v = state.style[group] || getStyle(group);
+  return `<div class="seg small" id="${id}"><button data-st="candle" aria-selected="${v === 'candle'}">Candles</button><button data-st="line" aria-selected="${v === 'line'}">Close line</button></div>`; };
+function wireStyle(id, group, redraw) {
+  const el = $('#' + id); if (!el) return;
+  el.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    setStyle(group, b.dataset.st); el.querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', x === b)); redraw();
+  }));
+}
+function priceSeries(ch, rows, group) {
+  const v = state.style[group] || getStyle(group);
+  if (v === 'line') {
+    const s = ch.addLineSeries({ color: C.ink, lineWidth: 2, priceLineVisible: true, lastValueVisible: true });
+    s.setData(rows.map((r) => ({ time: r.time, value: r.close }))); return s;
+  }
+  const s = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
+  s.setData(rows); return s;
 }
 
 const chartBase = () => ({ layout: { background: { color: '#fff' }, textColor: C.slate, fontFamily: 'Manrope, system-ui, sans-serif' },
@@ -238,12 +263,11 @@ async function drawStock(r) {
   let c;
   try { const res = await fetch(MAIN + MKT[state.mkt].path + `charts/${encodeURIComponent(r.symbol)}.json`); if (!res.ok) throw 0; c = await res.json(); }
   catch (e) { box.innerHTML = '<p class="muted pad">Chart data is not available for this stock yet. It appears after the next evening scan.</p>'; return; }
-  box.innerHTML = '';
+  box.innerHTML = ''; rbox.innerHTML = '';
   const LW = window.LightweightCharts;
   const ch = LW.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
   const T = c.t;
-  const candles = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
-  candles.setData(T.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })));
+  const candles = priceSeries(ch, T.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'trend');
   const line = (key, color, w = 2) => { const s = ch.addLineSeries({ color, lineWidth: w, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
     s.setData(T.map((t, i) => (c[key][i] == null ? { time: t } : { time: t, value: c[key][i] }))); };
   line('e50', C.e50, 1); line('e21', C.e21); line('e9', C.e9);
@@ -289,6 +313,7 @@ async function loadTB() {
         <div class="d-price"><b>${fmt(o.close, 2, 'en-IN')}</b></div></div>
       <div class="status ${flat ? 'info' : long ? 'open' : 'exit'}">${esc(o.position)}</div>
       <ul class="orders">${(o.orders || []).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+      ${styleSeg('tb', 'tbst')}
       <div class="chart" id="tbc"></div>
       <div class="facts">
         <div class="fact"><span>Last top</span><b>${fmt(o.prev_top, 1, 'en-IN')}</b></div>
@@ -312,11 +337,14 @@ async function loadTB() {
           <td class="r ${+t.Net >= 0 ? 'up' : 'down'}">${fmt(+t.Net, 0, 'en-IN')}</td></tr>`).join('')}</tbody></table></div>
       <p class="muted small">Rules: buy above the last top, sell below the last bottom, always in the market; 1% stop on the entry day; skip if the open is more than 1% past the level. Paper trading only — no orders are placed.</p>
     </div>`;
+  wireStyle('tbst', 'tb', () => drawTB(o, ledger, hist));
+  drawTB(o, ledger, hist);
+}
+function drawTB(o, ledger, hist) {
   if (hist.length) {
-    const box = $('#tbc'); const LW = window.LightweightCharts;
+    const box = $('#tbc'); box.innerHTML = ''; const LW = window.LightweightCharts;
     const ch = LW.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
-    const s = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
-    s.setData(hist.map((h) => ({ time: h.Date, open: +h.Open, high: +h.High, low: +h.Low, close: +h.Close })));
+    const s = priceSeries(ch, hist.map((h) => ({ time: h.Date, open: +h.Open, high: +h.High, low: +h.Low, close: +h.Close })), 'tb');
     s.createPriceLine({ price: o.prev_top, color: C.rise, lineWidth: 1, lineStyle: 2, title: 'top' });
     s.createPriceLine({ price: o.prev_bottom, color: C.fall, lineWidth: 1, lineStyle: 2, title: 'bottom' });
     const marks = ledger.flatMap((t) => [{ time: t.EntryDate, position: t.Side === 'BUY' ? 'belowBar' : 'aboveBar', color: t.Side === 'BUY' ? C.rise : C.fall, shape: t.Side === 'BUY' ? 'arrowUp' : 'arrowDown', text: t.Side === 'BUY' ? 'buy' : 'sell' }])
@@ -463,7 +491,7 @@ function athSelect(r) {
   f.push(['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}
-    <div class="seg small" id="athtf"><button data-tf="m" aria-selected="true">Monthly</button><button data-tf="w" aria-selected="false">Weekly + 30 SMA</button></div>
+    <div class="seg-row"><div class="seg small" id="athtf"><button data-tf="m" aria-selected="true">Monthly</button><button data-tf="w" aria-selected="false">Weekly + 30 SMA</button></div>${styleSeg('ath', 'athst')}</div>
     <div class="chart" id="athc"></div>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
     <div class="links"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent('NSE:' + r.symbol)}" target="_blank" rel="noopener">Open in TradingView</a>
@@ -471,6 +499,7 @@ function athSelect(r) {
   $('#athtf').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
     $('#athtf').querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', x === b)); drawATH(r, b.dataset.tf);
   }));
+  wireStyle('athst', 'ath', () => drawATH(r, $('#athtf [aria-selected="true"]').dataset.tf));
   drawATH(r, 'm');
 }
 const athCache = {};
@@ -484,8 +513,7 @@ async function drawATH(r, tf) {
   box.innerHTML = '';
   const b = c[tf]; const T = tf === 'm' ? b.t.map((t) => t + '-01') : b.t;
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
-  const s = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
-  s.setData(T.map((t, i) => ({ time: t, open: b.o[i], high: b.h[i], low: b.l[i], close: b.c[i] })));
+  const s = priceSeries(ch, T.map((t, i) => ({ time: t, open: b.o[i], high: b.h[i], low: b.l[i], close: b.c[i] })), 'ath');
   const trig = r.trigger ?? c.trigger;
   if (trig) s.createPriceLine({ price: trig, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'ATH month high' });
   if (tf === 'w') {
