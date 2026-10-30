@@ -17,35 +17,40 @@ S.headers["User-Agent"] = "Mozilla/5.0 (trend-desk research)"
 
 
 def universe():
-    for url in ("https://portal.amfiindia.com/spages/NAVAll.txt", "https://www.amfiindia.com/spages/NAVAll.txt"):
+    txt = ""
+    for url in ("https://portal.amfiindia.com/spages/NAVAll.txt", "https://www.amfiindia.com/spages/NAVAll.txt",
+                "https://portal.amfiindia.com/spages/NAVOpen.txt"):
         try:
             r = S.get(url, timeout=60)
+            print("navall", url, r.status_code, len(r.text), repr(r.text[:300]), flush=True)
             if r.status_code == 200 and "Scheme Code" in r.text:
+                txt = r.text
                 break
         except Exception as e:  # noqa: BLE001
-            print("navall fail", url, e)
+            print("navall fail", url, e, flush=True)
     rows, cat, amc = [], "", ""
-    for ln in r.text.splitlines():
+    for ln in txt.splitlines():
         ln = ln.strip()
         if not ln:
             continue
         if ";" not in ln:
-            if "Schemes(" in ln or "Scheme(" in ln:
+            if "Scheme" in ln and "(" in ln:
                 cat = ln
             else:
                 amc = ln
             continue
         p = ln.split(";")
-        if len(p) < 6 or not p[0].isdigit():
+        if len(p) < 5 or not p[0].strip().isdigit():
             continue
         rows.append(dict(code=int(p[0]), name=p[3].strip(), category=cat, amc=amc))
+    print("parsed rows", len(rows), "sample cats", sorted({r["category"] for r in rows})[:40], flush=True)
     u = pd.DataFrame(rows)
-    keep_cat = u.category.str.contains(r"Open Ended Schemes\((Equity Scheme|Other Scheme - Index Funds)", regex=True)
+    keep_cat = u.category.str.contains(r"Open Ended Schemes\s*\(\s*(?:Equity Scheme|Other Scheme\s*-\s*Index Funds)", regex=True)
     n = u.name.str.lower()
     direct = n.str.contains("direct")
     growth = n.str.contains("growth") & ~n.str.contains(r"idcw|dividend|bonus|payout|reinvest", regex=True)
     u = u[keep_cat & direct & growth].copy()
-    u["category"] = u.category.str.extract(r"\((.*)\)")[0].str.replace("Equity Scheme - ", "", regex=False).str.replace("Other Scheme - ", "", regex=False)
+    u["category"] = u.category.str.extract(r"\((.*)\)")[0].str.strip().str.replace("Equity Scheme - ", "", regex=False).str.replace("Other Scheme - ", "", regex=False)
     return u.drop_duplicates("code")
 
 
