@@ -31,7 +31,7 @@ from trend_scan import nse_symbols, telegram  # noqa: E402
 OUT = "data/scan"
 CH = f"{OUT}/ath_charts"
 MINVAL = 2e7          # Rs 2 cr/day
-MIN_CLOSE = 30.0      # no penny stocks: skip stocks whose last close is below Rs 30 (30 Oct 2026)
+MIN_CLOSE = 100.0     # no penny stocks: skip stocks whose last close is below Rs 100 (30 Oct 2026)
 BASE_MAIN, BASE_MIN = 24, 12
 NEAR = 0.05
 

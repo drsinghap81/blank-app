@@ -39,7 +39,7 @@ OUT = "data/scan"
 MARKET = "NSE"
 VALUE_DIV = 1e7      # traded-value unit used by the filters (>= 1 unit/day); NSE: Rs 1 crore
 MIN_PRICE = 30.0     # no penny stocks: every list skips stocks whose last close is below 30 in the local currency
-                     # (NSE Rs 30, US $30, ASX A$30) - set 30 Oct 2026 at Amritpal's request
+                     # (NSE Rs 100, US $30, ASX A$30) - set 30 Oct 2026 at Amritpal's request
 DISP_MULT = 1.0      # converts filter units to the display unit (NSE: Rs cr, US: $ m, ASX: A$ m)
 os.makedirs(OUT, exist_ok=True)
 s = requests.Session()
@@ -198,7 +198,7 @@ def follow(o, h, l, c, sig, sd, line, r, val, cap_stop=False, lookback=60):
 def base_breakout(o, h, l, c, v):
     """FIRST 52-WEEK-HIGH BREAKOUT AFTER A 6-MONTH BASE (Chartink screen + Amritpal's base idea; backtested 2017-26 on
     all NSE stocks incl. delisted: ~15%/yr, max DD -29%, 2022-26 ~17.6%/yr, 10 positions at 1% risk):
-      signal : today's high > highest close of the prior 240 sessions, close > previous close, close > MIN_PRICE (30),
+      signal : today's high > highest close of the prior 240 sessions, close > previous close, close > MIN_PRICE (NSE 100, US/ASX 30),
                20-day avg traded value >= Rs 2 cr, the previous 240-day closing high was >= 126 sessions ago,
                Supertrend(10,3) green
       entry  : next open; stop = 5-day low but never more than 12% below the signal close
@@ -255,7 +255,7 @@ def main():
     MARKET = sys.argv[1] if len(sys.argv) > 1 else "NSE"
     cfg = MARKETS[MARKET]
     VALUE_DIV, DISP_MULT = cfg["min_value"], cfg["min_value"] / cfg["value_unit"]
-    MIN_PRICE = {"NSE": 30.0, "US": 30.0, "ASX": 30.0}[MARKET]
+    MIN_PRICE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0}[MARKET]
     if MARKET != "NSE":
         OUT = f"data/scan/{MARKET.lower()}"
     os.makedirs(OUT, exist_ok=True)
