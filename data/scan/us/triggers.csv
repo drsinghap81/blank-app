@@ -1,23 +1,17 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-LQDT,2026-10-29,45.29,60.6,43.84,43.72,3.6,0,0.0,"Liquidity Services, Inc.",trend,135.5,0.85,87,10.56,45.29,60.6
-MDT,2026-10-29,97.11,62.7,93.1,93.04,4.4,0,0.0,Medtronic plc. Ordinary Shares,watch,127.2,0.83,75,2807.18,97.11,62.7
-LTC,2026-10-29,44.32,60.6,42.91,41.76,6.1,0,0.0,"LTC Properties, Inc. Common Stock",watch,124.2,0.78,82,25.36,44.32,60.6
-FAST,2026-10-29,52.55,60.6,51.19,50.76,3.5,0,0.0,Fastenal Company,watch,116.5,0.77,70,418.0,52.55,60.6
-IQV,2026-10-28,279.04,61.8,269.49,266.61,4.7,1,-1.4,"IQVIA Holdings, Inc. Common Stock",trend,155.5,0.9,85,368.46,275.06,57.0
-NTRA,2026-10-27,410.82,60.4,398.26,395.33,3.9,2,6.1,"Natera, Inc.",trend,169.0,0.95,100,631.72,436.0,69.8
-TMO,2026-10-27,693.02,60.5,673.4,662.5,4.6,2,2.3,Thermo Fisher Scientific Inc Common Stock,trend,159.7,0.96,92,1604.06,709.18,65.4
-RDVT,2026-10-27,81.23,60.0,78.1,77.45,4.9,2,-0.9,"Red Violet, Inc.",trend,150.9,0.88,87,12.44,80.46,56.3
-EXPD,2026-10-27,199.64,63.6,194.72,193.69,3.1,2,-0.6,"Expeditors International of Washington, Inc. Common Stock",trend,143.3,0.91,90,223.34,198.39,59.3
-BIO,2026-10-27,380.99,60.4,367.41,352.46,8.1,2,0.9,"Bio-Rad Laboratories, Inc. Class A Common Stock",watch,124.6,0.77,70,83.66,384.4,62.0
-EMR,2026-10-27,166.27,64.2,160.56,156.8,6.0,2,2.7,Emerson Electric Company Common Stock,watch,110.3,0.7,72,448.96,170.74,70.3
-MPC,2026-10-26,470.64,65.0,450.57,448.38,5.0,3,-8.1,Marathon Petroleum Corporation Common Stock,watch,168.0,0.94,88,925.22,432.51,46.2
-DINO,2026-10-26,125.25,65.1,119.93,119.83,4.5,3,-10.7,HF Sinclair Corporation Common Stock,watch,166.0,0.92,88,267.9,111.89,41.7
-GCT,2026-10-26,59.4,62.4,56.88,57.16,3.9,3,2.1,GigaCloud Technology Inc - Class A Ordinary Shares,trend,157.5,0.81,93,36.78,60.62,65.8
-RIGL,2026-10-26,49.91,60.1,47.87,47.47,5.1,3,3.1,"Rigel Pharmaceuticals, Inc.",watch,149.4,0.86,83,10.0,51.45,65.2
-A,2026-10-26,175.96,61.0,170.74,169.89,3.6,3,2.9,"Agilent Technologies, Inc. Common Stock",trend,148.5,0.9,88,357.6,181.15,66.4
-FAST,2026-10-26,52.21,60.3,50.98,50.69,3.0,3,0.7,Fastenal Company,watch,116.5,0.77,70,418.0,52.55,60.6
-HAE,2026-10-23,118.51,63.7,114.25,115.49,2.6,4,1.1,Haemonetics Corporation Common Stock,trend,168.0,0.92,92,88.5,119.79,63.7
-CAI,2026-10-23,32.0,60.8,30.19,30.33,5.5,4,12.9,"Caris Life Sciences, Inc.",trend,141.2,0.84,92,110.2,36.14,72.7
-DHR,2026-10-23,230.5,60.0,223.48,217.55,6.0,4,2.8,Danaher Corporation Common Stock,watch,139.2,0.89,82,1017.62,236.98,65.2
-LQDT,2026-10-23,44.85,62.8,43.38,43.01,4.3,4,1.0,"Liquidity Services, Inc.",trend,135.5,0.85,87,10.56,45.29,60.6
-KNTK,2026-10-23,55.7,60.9,53.45,52.69,5.7,4,4.3,Kinetik Holdings Inc. Class A Common Stock,watch,110.5,0.71,75,61.46,58.09,68.2
+VEEV,2026-10-30,312.96,60.9,305.25,306.5,2.1,0,0.0,Veeva Systems Inc. Class A Common Stock,watch,173.0,0.93,100,462.2,312.96,60.9
+IFF,2026-10-30,93.02,66.0,89.88,90.07,3.3,0,0.0,"International Flavors & Fragrances, Inc. Common Stock",watch,123.3,0.8,75,189.2,93.02,66.0
+LQDT,2026-10-29,45.29,60.6,43.84,43.72,3.6,1,-1.5,"Liquidity Services, Inc.",watch,135.5,0.85,87,10.14,44.62,55.8
+MDT,2026-10-29,97.11,62.7,93.1,93.04,4.4,1,-0.6,Medtronic plc. Ordinary Shares,watch,127.1,0.83,75,2696.3,96.54,60.8
+LTC,2026-10-29,44.32,60.6,42.91,41.76,6.1,1,1.0,"LTC Properties, Inc. Common Stock",watch,124.8,0.78,83,25.66,44.75,62.7
+IQV,2026-10-28,279.04,61.8,269.49,266.61,4.7,2,-4.2,"IQVIA Holdings, Inc. Common Stock",watch,154.2,0.9,83,366.2,267.33,49.0
+NTRA,2026-10-27,410.82,60.4,398.26,395.33,3.9,3,0.8,"Natera, Inc.",trend,175.0,0.95,100,637.84,414.3,56.8
+TMO,2026-10-27,693.02,60.5,673.4,662.5,4.6,3,0.6,Thermo Fisher Scientific Inc Common Stock,trend,158.7,0.95,92,1622.28,697.0,59.2
+RDVT,2026-10-27,81.23,60.0,78.1,77.45,4.9,3,-1.5,"Red Violet, Inc.",trend,150.5,0.88,87,12.32,80.0,54.9
+EXPD,2026-10-27,199.64,63.6,194.72,193.69,3.1,3,-0.4,"Expeditors International of Washington, Inc. Common Stock",trend,143.3,0.91,90,223.9,198.85,60.1
+BIO,2026-10-27,380.99,60.4,367.41,352.46,8.1,3,-2.3,"Bio-Rad Laboratories, Inc. Class A Common Stock",watch,124.2,0.77,70,82.94,372.18,51.6
+MPC,2026-10-26,470.64,65.0,450.57,448.38,5.0,4,-5.5,Marathon Petroleum Corporation Common Stock,watch,168.0,0.94,88,925.72,444.73,51.4
+DINO,2026-10-26,125.25,65.1,119.93,119.83,4.5,4,-8.2,HF Sinclair Corporation Common Stock,watch,166.0,0.92,88,267.16,115.0,47.2
+GCT,2026-10-26,59.4,62.4,56.88,57.16,3.9,4,-1.7,GigaCloud Technology Inc - Class A Ordinary Shares,watch,158.5,0.82,93,38.24,58.38,55.1
+RIGL,2026-10-26,49.91,60.1,47.87,47.47,5.1,4,2.8,"Rigel Pharmaceuticals, Inc.",watch,150.3,0.86,83,10.0,51.31,64.4
+A,2026-10-26,175.96,61.0,170.74,169.89,3.6,4,-0.6,"Agilent Technologies, Inc. Common Stock",watch,148.3,0.9,88,362.52,174.87,55.0
