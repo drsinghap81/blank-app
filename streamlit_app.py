@@ -77,6 +77,7 @@ LOOKBACK_PERIOD = "1y"        # fetch extra history: warms up SMA/RSI and feeds 
 SMA_WINDOW = 20
 RSI_WINDOW = 14
 CACHE_TTL_SECONDS = 300       # re-fetch prices at most every 5 minutes
+MIN_PRICE = 30.0              # no penny stocks in any scan: last close >= 30 (Rs, $ or A$)
 
 # ---- Support / resistance engine (the rules agreed in our chart-reading work) ----
 LEVEL_LOOKBACK_BARS = 126     # ~6 months of daily bars
@@ -1495,6 +1496,12 @@ def render_scanner_tab(market: MarketConfig) -> None:
         frames = {t: f for t, f in frames.items() if _adv_cr(f) >= liq_min}
         st.caption(f"Liquidity filter: {len(frames)} of {before} stocks trade ≥ ₹{liq_min:,.0f} crore a day.")
 
+    # no penny stocks: skip anything whose last close is below 30 in the market's currency (Rs / $ / A$)
+    before = len(frames)
+    frames = {t: f for t, f in frames.items() if len(f) and float(f["Close"].iloc[-1]) >= MIN_PRICE}
+    if len(frames) < before:
+        st.caption(f"Price filter: {before - len(frames)} stocks under {MIN_PRICE:.0f} ({market.key}) skipped.")
+
     pattern_rows, near_rows, ema_rows, candle_rows, trap_rows = [], [], [], [], []
     setups = load_pattern_setups()
     for tkr, frame in frames.items():
@@ -1941,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-29 · Risk per trade setting (1% default) v34"
+APP_BUILD = "2026-10-30 · No penny stocks: price >= 30 v35"
 
 
 def render_oi_alerts_tab() -> None:

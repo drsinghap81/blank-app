@@ -31,6 +31,7 @@ from trend_scan import nse_symbols, telegram  # noqa: E402
 OUT = "data/scan"
 CH = f"{OUT}/ath_charts"
 MINVAL = 2e7          # Rs 2 cr/day
+MIN_CLOSE = 30.0      # no penny stocks: skip stocks whose last close is below Rs 30 (30 Oct 2026)
 BASE_MAIN, BASE_MIN = 24, 12
 NEAR = 0.05
 
@@ -199,6 +200,8 @@ def main():
                 x = pd.DataFrame({k: dd[k][t] for k in ("Open", "High", "Low", "Close", "Volume")}).dropna(subset=["Close"])
                 if len(x) and x.index.max() < pd.Timestamp(today) - pd.Timedelta(days=10):
                     continue
+                if not len(x) or float(x.Close.iloc[-1]) < MIN_CLOSE:
+                    continue
                 vals[sym] = float((x.Close * x.Volume).tail(20).mean())
                 ev, nr, ch = analyse(sym, x, today)
             except Exception as e:  # noqa: BLE001
@@ -237,7 +240,7 @@ def main():
         if s_ in keep:
             json.dump(clean(ch), open(f"{CH}/{s_}.json", "w"), separators=(",", ":"), allow_nan=False)
     out = dict(asof=str(today), generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(vals),
-               rules=dict(base_main=BASE_MAIN, base_min=BASE_MIN, near_pct=NEAR * 100, min_value_cr=MINVAL / 1e7),
+               rules=dict(base_main=BASE_MAIN, base_min=BASE_MIN, near_pct=NEAR * 100, min_value_cr=MINVAL / 1e7, min_close=MIN_CLOSE),
                breakouts=clean(brk.to_dict("records")) if len(brk) else [],
                near=clean(N.to_dict("records")) if len(N) else [],
                tracked=clean(E.to_dict("records")) if len(E) else [])
