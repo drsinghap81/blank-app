@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-30 · No penny stocks: Rs 100 / $30 / A$30 v36"
+APP_BUILD = "2026-10-30 · Top Bottom hourly re-entry level v37"
 
 
 def render_oi_alerts_tab() -> None:

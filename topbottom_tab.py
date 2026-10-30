@@ -223,12 +223,48 @@ def _paper_panel() -> None:
                 st.markdown(f"**{sym} FUT** ({v.get('futures_contract_expiry')} expiry, lot {v.get('lot_size')}) — "
                             f"close {float(v['close']):,.2f} • {v['position']}")
                 st.markdown("\n".join(f"- {x}" for x in v["orders"]))
+                if sym == "BANKNIFTY":
+                    _hourly_reentry(v)
     if _os.path.exists(lp_):
         led = pd.read_csv(lp_)
         if len(led):
             cols = [c for c in ["Instrument", "EntryDate", "Side", "Entry", "ExitDate", "Exit", "Reason",
                                 "Points", "Qty", "Gross", "Costs", "Net", "Status"] if c in led]
             st.dataframe(led[cols].iloc[::-1], width="stretch", hide_index=True)
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def _load_hourly() -> dict | None:
+    import json, urllib.request
+    try:
+        with urllib.request.urlopen("https://raw.githubusercontent.com/drsinghap81/blank-app/live/data/live/tb_hourly.json", timeout=8) as r:
+            return json.loads(r.read().decode())
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _hourly_reentry(v: dict) -> None:
+    """Missed the daily entry? Hourly re-entry level (tools/tb_hourly.py, every ~15 min in market hours)."""
+    h = _load_hourly()
+    if not h or not h.get("side") or h.get("state") == "flat" or h["side"] not in str(v.get("position", "")):
+        return
+    long_ = h["side"] == "LONG"
+    f = lambda x: f"{x:,.0f}" if x is not None else "-"
+    fut = lambda x: f" (futures ≈ {x:,.0f})" if x is not None else ""
+    st.markdown(f"**Missed the daily entry? Hourly re-entry ({'long' if long_ else 'short'})**")
+    if h["state"] == "waiting":
+        st.markdown(f"- {'Buy above' if long_ else 'Sell below'} **{f(h['level'])}** on the index{fut(h.get('level_fut'))}\n"
+                    f"- Stop {'below' if long_ else 'above'} {f(h['stop'])}{fut(h.get('stop_fut'))}, then move it to each new hourly "
+                    f"{'bottom − ' if long_ else 'top + '}{h['buffer']:.0f} pts\n"
+                    "- One attempt only. If the stop is hit, stay out until the next daily signal. Otherwise exit with the daily system.")
+    elif h["state"] == "entered":
+        st.markdown(f"- Triggered at {f(h['entered_at'])} ({str(h['entered_time'])[5:16]}); trailing hourly stop {f(h['stop'])}{fut(h.get('stop_fut'))}")
+    else:
+        st.markdown(f"- Re-entry used: exited at the hourly stop {f(h['stopped_at'])} ({str(h['stopped_time'])[5:16]}). "
+                    "Stay out until the next daily signal.")
+    st.caption(f"Last hourly top {f(h['hour_top'])}, bottom {f(h['hour_bottom'])}, index {f(h['last_index'])}. "
+               f"Index levels from 1-hour candles, futures ≈ index + basis at the last close. Updated {h['time']} (~15 min delayed). "
+               "Backtest Nov 2023 – Oct 2026, trades still open on day 2: chase next open −2,145 pts; hourly re-entry +6,129 pts, worst −549.")
 
 
 def render_topbottom_tab(stocks: tuple[str, ...] | None = None) -> None:

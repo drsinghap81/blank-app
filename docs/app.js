@@ -298,11 +298,12 @@ async function loadTB() {
   const el = $('#view-tb');
   if (!state.tb) {
     el.innerHTML = '<p class="muted pad">Loading…</p>';
-    const [orders, summary, ledger, hist] = await Promise.all([getJSON(MAIN + 'paper/next_orders.json', 'tb_orders'),
-      getJSON(MAIN + 'paper/summary.json', 'tb_summary'), getText(MAIN + 'paper/ledger.csv'), getText(MAIN + 'paper/history_BANKNIFTY.csv')]);
-    state.tb = { orders, summary, ledger: parseCSV(ledger), hist: parseCSV(hist), ledgerRaw: ledger };
+    const [orders, summary, ledger, hist, hourly] = await Promise.all([getJSON(MAIN + 'paper/next_orders.json', 'tb_orders'),
+      getJSON(MAIN + 'paper/summary.json', 'tb_summary'), getText(MAIN + 'paper/ledger.csv'), getText(MAIN + 'paper/history_BANKNIFTY.csv'),
+      getJSON(REPO + 'live/data/live/tb_hourly.json', 'tb_hourly')]);
+    state.tb = { orders, summary, ledger: parseCSV(ledger), hist: parseCSV(hist), ledgerRaw: ledger, hourly };
   }
-  const { orders, summary, ledger, hist } = state.tb;
+  const { orders, summary, ledger, hist, hourly } = state.tb;
   const o = orders && orders.BANKNIFTY;
   if (!o) { el.innerHTML = '<p class="empty">Top Bottom data is not available right now. Try again later.</p>'; $('#asof').textContent = ''; return; }
   $('#asof').textContent = `Bank Nifty futures, close ${longDay(o.date)}, paper trading`;
@@ -324,6 +325,7 @@ async function loadTB() {
         <div class="fact"><span>Open P&amp;L</span><b class="${o.open_pnl >= 0 ? 'up' : 'down'}">${fmt(o.open_pnl, 0, 'en-IN')} pts</b></div>
       </div>
     </div>
+    ${hourlyCard(hourly, o)}
     <div class="card">
       <h3>Paper results since ${day(summary.start_date)}</h3>
       <div class="facts">
@@ -341,6 +343,34 @@ async function loadTB() {
     </div>`;
   wireStyle('tbst', 'tb', () => drawTB(o, ledger, hist));
   drawTB(o, ledger, hist);
+}
+/* Missed the daily entry? Hourly re-entry level (tools/tb_hourly.py, refreshed every ~15 min in market hours). */
+function hourlyCard(h, o) {
+  if (!h || !h.side || h.state === 'flat' || !o || !new RegExp(h.side).test(o.position)) return '';
+  const long = h.side === 'LONG', word = long ? 'Buy above' : 'Sell below', n = (v) => fmt(v, 0, 'en-IN');
+  const fut = (v) => (v != null ? ` <span class="muted small">(futures ≈ ${n(v)})</span>` : '');
+  let body;
+  if (h.state === 'waiting') {
+    body = `<div class="status info">${word} ${n(h.level)} on the index${fut(h.level_fut)}</div>
+      <ul class="orders"><li>Stop: ${long ? 'below' : 'above'} ${n(h.stop)}${fut(h.stop_fut)}, then move it to each new hourly ${long ? 'bottom − ' : 'top + '}${h.buffer} pts</li>
+      <li>One attempt only. If the stop is hit, stay out until the next daily signal. Otherwise exit with the daily system.</li></ul>`;
+  } else if (h.state === 'entered') {
+    body = `<div class="status open">Hourly re-entry triggered at ${n(h.entered_at)} (${esc(String(h.entered_time).slice(5, 16))})</div>
+      <ul class="orders"><li>Trailing hourly stop: ${n(h.stop)}${fut(h.stop_fut)}</li><li>If it isn't hit, exit with the daily system.</li></ul>`;
+  } else {
+    body = `<div class="status exit">Re-entry used: exited at the hourly stop ${n(h.stopped_at)} (${esc(String(h.stopped_time).slice(5, 16))})</div>
+      <ul class="orders"><li>Stay out until the next daily signal.</li></ul>`;
+  }
+  return `<div class="card">
+      <h3>Missed the daily entry? Hourly re-entry (${long ? 'long' : 'short'})</h3>
+      ${body}
+      <div class="facts">
+        <div class="fact"><span>Last hourly top</span><b>${n(h.hour_top)}</b></div>
+        <div class="fact"><span>Last hourly bottom</span><b>${n(h.hour_bottom)}</b></div>
+        <div class="fact"><span>Bank Nifty index</span><b>${n(h.last_index)}</b></div>
+      </div>
+      <p class="muted small">Only if you missed the daily trigger (for example the open was more than 1% past it). Levels are on the Bank Nifty index from 1-hour candles, ${h.buffer} pts beyond the last hourly ${long ? 'top' : 'bottom'}; the futures figure adds the basis at the last close. Updated ${esc(h.time)}, about 15 min delayed. Backtest Nov 2023 – Oct 2026 on trades still open on day 2: chasing the next open −2,145 pts, hourly re-entry +6,129 pts, worst trade −549.</p>
+    </div>`;
 }
 function drawTB(o, ledger, hist) {
   if (hist.length) {

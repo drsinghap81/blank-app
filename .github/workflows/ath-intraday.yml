@@ -28,11 +28,13 @@ jobs:
         run: |
           pip install -q yfinance pandas requests
           mkdir -p data/live
-          git fetch -q origin live 2>/dev/null && git show origin/live:data/live/ath_sent.json > data/live/ath_sent.json 2>/dev/null || true
+          git fetch -q origin live 2>/dev/null || true
+          for f in ath_sent.json ath_live.json tb_hourly.json tb_hourly_sent.json; do git show origin/live:data/live/$f > data/live/$f 2>/dev/null || rm -f data/live/$f; done
           python tools/ath_intraday.py 2>&1 | grep -v -i "warn\|delisted\|failed download\|^\[" | tail -20
+          python tools/tb_hourly.py 2>&1 | grep -v -i "warn\|^\[" | tail -5 || true
       - name: Publish live prices to the 'live' branch
         run: |
-          [ -f data/live/ath_live.json ] || exit 0
+          [ -f data/live/ath_live.json ] || [ -f data/live/tb_hourly.json ] || exit 0
           cp -r data/live /tmp/live
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
           git checkout -q --orphan live-tmp; git rm -rqf --cached .; rm -rf data/live; mkdir -p data; cp -r /tmp/live data/live
