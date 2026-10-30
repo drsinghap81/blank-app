@@ -42,16 +42,18 @@ def universe():
         p = ln.split(";")
         if len(p) < 5 or not p[0].strip().isdigit():
             continue
-        rows.append(dict(code=int(p[0]), name=p[3].strip(), category=cat, amc=amc))
+        plan = p[4].strip() if len(p) >= 8 else ""
+        opt = p[5].strip() if len(p) >= 8 else ""
+        rows.append(dict(code=int(p[0]), name=p[3].strip(), plan=plan, option=opt, category=cat, amc=amc))
     print("parsed rows", len(rows), "sample cats", sorted({r["category"] for r in rows})[:40], flush=True)
     u = pd.DataFrame(rows)
     keep_cat = u.category.str.contains(r"Open Ended Schemes\s*\(\s*(?:Equity Scheme|Other Scheme\s*-\s*Index Funds)", regex=True)
-    n = u.name.str.lower()
+    n = (u.name + " " + u.plan + " " + u.option).str.lower()     # new AMFI layout has Plan / Option columns
     direct = n.str.contains("direct")
     growth = n.str.contains("growth") & ~n.str.contains(r"idcw|dividend|bonus|payout|reinvest", regex=True)
     u = u[keep_cat & direct & growth].copy()
     u["category"] = u.category.str.extract(r"\((.*)\)")[0].str.strip().str.replace("Equity Scheme - ", "", regex=False).str.replace("Other Scheme - ", "", regex=False)
-    return u.drop_duplicates("code")
+    return u.drop_duplicates("code")[["code", "name", "category", "amc"]]
 
 
 def hist(code):
