@@ -9,7 +9,7 @@ const MKT = {
 };
 const C = { ink: '#14213D', rise: '#0E9F6E', fall: '#D64545', saffron: '#E8A33D', slate: '#5B6B82', line: '#E3E8F0',
   e9: '#F28C28', e21: '#3B6FE0', e50: '#A0AEC0', rsi: '#7C5CDB' };
-const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, style: {}, cap: {}, risk: {} };
+const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, pf: null, style: {}, cap: {}, risk: {} };
 const $ = (s) => document.querySelector(s);
 const loc = () => MKT[state.mkt].loc;
 const fmt = (v, d = 2, l) => (v == null || Number.isNaN(v) ? '–' : Number(v).toLocaleString(l || loc(), { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -46,7 +46,7 @@ function show(view) {
   document.querySelectorAll('.views button').forEach((b) => (b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   document.querySelectorAll('.view').forEach((s) => (s.hidden = s.id !== `view-${view}`));
   window.scrollTo(0, 0);
-  ({ trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, results: loadResults })[view]();
+  ({ trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, results: loadResults, pf: loadPortfolio })[view]();
 }
 
 /* ------------------------------------------------------------------ trends */
@@ -731,6 +731,177 @@ async function loadResults() {
   } else if ($('#bookc')) $('#bookc').remove();
 }
 
+/* ------------------------------------------------------------------ portfolio (stored ONLY on this device) */
+/* Holdings never leave the phone: they live in localStorage. Prices come from a public file covering every NSE
+   stock (data/live/nse_prices.json, ~15 min delayed in market hours; data/scan/nse_close.json otherwise). */
+const PF_KEY = 'td_portfolio';
+function pfLoad() { try { const v = JSON.parse(localStorage.getItem(PF_KEY)); if (v && v.h) return { h: v.h, c: v.c || [] }; } catch (e) { /* none */ } return { h: [], c: [] }; }
+function pfSave(p) { try { localStorage.setItem(PF_KEY, JSON.stringify(p)); return true; } catch (e) { toast('Could not save on this device'); return false; } }
+const today = () => new Date().toISOString().slice(0, 10);
+const inr = (v, d = 0) => (v == null || Number.isNaN(v) ? '–' : `${v < 0 ? '−' : ''}₹${Math.abs(v).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d })}`);
+const sgn = (v) => (v > 0 ? 'up' : v < 0 ? 'down' : '');
+
+async function pfPrices() {
+  const [live, close, ath, scan] = await Promise.all([getJSON(REPO + 'live/data/live/nse_prices.json', 'pf_live'), getJSON(MAIN + 'data/scan/nse_close.json', 'pf_close'),
+    state.ath && state.ath.d ? state.ath.d : getJSON(MAIN + 'data/scan/ath.json', 'ath'), state.data.NSE || getJSON(MAIN + 'data/scan/trend_scan.json', 'td_NSE')]);
+  const px = {}; let src = '';
+  if (close && close.prices) { Object.assign(px, close.prices); src = `last close ${day(close.asof)}`; }
+  // live prices only if they are newer than the nightly close
+  if (live && live.prices && (!close || live.time.slice(0, 10) >= close.asof)) { Object.assign(px, live.prices); src = `${live.time}, ~15 min delayed`; }
+  const athOpen = Object.fromEntries(((ath && ath.tracked) || []).filter((r) => r.status === 'open').map((r) => [r.symbol, r]));
+  const early = Object.fromEntries(((scan && scan.early) || []).filter((r) => r.status !== 'closed').map((r) => [r.symbol, r]));
+  return { px, src, athOpen, early };
+}
+
+async function loadPortfolio() {
+  $('#title').textContent = 'My portfolio';
+  const el = $('#view-pf');
+  if (!state.pf) { el.innerHTML = '<p class="muted pad">Loading prices…</p>'; state.pf = await pfPrices(); }
+  renderPortfolio();
+}
+
+function renderPortfolio() {
+  const el = $('#view-pf'); const P = pfLoad(); const { px, src, athOpen, early } = state.pf;
+  $('#asof').textContent = P.h.length ? `Prices: ${src}` : 'Stored only on this device';
+  let inv = 0, val = 0, dayp = 0, missing = 0;
+  const rows = P.h.map((h, i) => {
+    const p = px[h.s]; const ltp = p ? p[0] : null; const prev = p ? p[1] : null;
+    const cost = h.q * h.a; const v = ltp != null ? h.q * ltp : cost;
+    if (ltp == null) missing++;
+    inv += cost; val += v; if (ltp != null && prev) dayp += h.q * (ltp - prev);
+    return { ...h, i, ltp, prev, cost, v, pl: v - cost, plp: cost ? (v / cost - 1) * 100 : 0, dch: ltp != null && prev ? (ltp / prev - 1) * 100 : null };
+  }).sort((a, b) => b.v - a.v);
+  const real = P.c.reduce((s, c) => s + c.q * (c.x - c.a), 0);
+  const unrl = val - inv;
+  const sys = (r) => {
+    const a = athOpen[r.s], e = early[r.s];
+    if (a && a.sma30) return `<div class="sysl ${r.ltp != null && r.ltp < a.sma30 ? 'down' : ''}">ATH · 30-week SMA ${fmt(a.sma30, 0, 'en-IN')}: exit on a weekly close below</div>`;
+    if (e && e.supertrend) return `<div class="sysl ${e.st_up === false ? 'down' : ''}">9/21 · Supertrend ${fmt(e.supertrend, 0, 'en-IN')}: ${e.st_up === false ? 'turned red, exit at the next open' : 'exit if it turns red'}</div>`;
+    return '';
+  };
+  el.innerHTML = `
+    <div class="card">
+      <div class="facts">
+        <div class="fact"><span>Current value</span><b>${inr(val)}</b></div>
+        <div class="fact"><span>Invested</span><b>${inr(inv)}</b></div>
+        <div class="fact"><span>Unrealised P&amp;L</span><b class="${sgn(unrl)}">${inr(unrl)} <small>${pct(inv ? unrl / inv * 100 : 0)}</small></b></div>
+        <div class="fact"><span>Today</span><b class="${sgn(dayp)}">${inr(dayp)}</b></div>
+        <div class="fact"><span>Realised P&amp;L</span><b class="${sgn(real)}">${inr(real)}</b></div>
+        <div class="fact"><span>Total P&amp;L</span><b class="${sgn(unrl + real)}">${inr(unrl + real)}</b></div>
+      </div>
+      ${missing ? `<p class="muted small">${missing} holding(s) have no price yet (check the NSE symbol); they are counted at cost.</p>` : ''}
+    </div>
+    <div class="card">
+      <div class="plan-head"><h3>Holdings (${P.h.length})</h3>
+        <div class="seg"><button id="pf-add">+ Add</button><button id="pf-imp">Import</button></div></div>
+      <div id="pf-form"></div>
+      ${rows.length ? `<ul class="pf-list">${rows.map((r) => `
+        <li class="pf-row" data-i="${r.i}">
+          <div><b>${esc(r.s)}</b>${r.t ? ` <span class="pill">${esc(r.t)}</span>` : ''}<div class="co">${fmt(r.q, 0, 'en-IN')} × ${fmt(r.a, 2, 'en-IN')}</div>${sys(r)}</div>
+          <div class="r"><b class="${sgn(r.pl)}">${inr(r.pl)} <small>${pct(r.plp)}</small></b>
+            <div class="co">LTP ${r.ltp != null ? fmt(r.ltp, 2, 'en-IN') : '–'} <span class="${sgn(r.dch)}">${r.dch != null ? pct(r.dch) : ''}</span></div></div>
+        </li>`).join('')}</ul>` : '<p class="empty">No holdings yet. Tap <b>Import</b> to paste or load your broker\'s holdings CSV, or <b>+ Add</b> one at a time.</p>'}
+    </div>
+    ${P.c.length ? `<div class="card"><h3>Closed trades</h3><div class="table-wrap"><table>
+      <thead><tr><th>Sold</th><th>Stock</th><th class="r">P&amp;L</th><th></th></tr></thead>
+      <tbody>${P.c.map((c, j) => ({ ...c, j })).reverse().map((c) => `<tr><td>${day(c.xd)}</td><td>${esc(c.s)}<div class="co">${fmt(c.q, 0, 'en-IN')} × ${fmt(c.a, 2, 'en-IN')} → ${fmt(c.x, 2, 'en-IN')}</div></td>
+        <td class="r ${sgn(c.q * (c.x - c.a))}">${inr(c.q * (c.x - c.a))}</td><td><button class="linkbtn" data-undo="${c.j}">undo</button></td></tr>`).join('')}</tbody></table></div></div>` : ''}
+    <p class="muted small pad">Your holdings are stored only in this app on this phone — never uploaded or shared. Use the download button to keep a backup (clearing Safari data erases them). Prices: every NSE stock, about 15 minutes delayed in market hours, otherwise the last close. P&amp;L is before brokerage and taxes.</p>`;
+  $('#pf-add').onclick = () => pfForm();
+  $('#pf-imp').onclick = () => pfImport();
+  el.querySelectorAll('.pf-row').forEach((li) => (li.onclick = () => pfForm(+li.dataset.i)));
+  el.querySelectorAll('[data-undo]').forEach((b) => (b.onclick = (ev) => { ev.stopPropagation(); pfUndo(+b.dataset.undo); }));
+}
+
+function pfForm(i) {
+  const P = pfLoad(); const h = i != null ? P.h[i] : { s: '', q: '', a: '', t: '' }; const box = $('#pf-form');
+  const ltp = i != null && state.pf.px[h.s] ? state.pf.px[h.s][0] : '';
+  box.innerHTML = `<div class="pf-form">
+    <label>NSE symbol<input id="f-s" value="${esc(h.s)}" placeholder="e.g. ADANIPORTS" autocapitalize="characters" ${i != null ? 'readonly' : ''}></label>
+    <label>Quantity<input id="f-q" type="number" inputmode="numeric" value="${h.q}"></label>
+    <label>Average price ₹<input id="f-a" type="number" inputmode="decimal" step="0.01" value="${h.a}"></label>
+    <label>System<select id="f-t">${['', 'ATH', '9/21', 'Top Bottom', 'Long term', 'Other'].map((t) => `<option ${t === (h.t || '') ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+    <div class="seg"><button id="f-save" aria-selected="true">${i != null ? 'Save' : 'Add'}</button><button id="f-cancel">Cancel</button>${i != null ? '<button id="f-del">Delete</button>' : ''}</div>
+    ${i != null ? `<h4>Record a sale</h4>
+    <label>Quantity sold<input id="f-sq" type="number" inputmode="numeric" value="${h.q}"></label>
+    <label>Sell price ₹<input id="f-sp" type="number" inputmode="decimal" step="0.01" value="${ltp}"></label>
+    <label>Date<input id="f-sd" type="date" value="${today()}"></label>
+    <div class="seg"><button id="f-sell">Record sale</button></div>` : ''}
+  </div>`;
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  $('#f-cancel').onclick = () => (box.innerHTML = '');
+  $('#f-save').onclick = () => {
+    const s = $('#f-s').value.trim().toUpperCase().replace(/\.NS$|^NSE:/g, ''), q = +$('#f-q').value, a = +$('#f-a').value, t = $('#f-t').value;
+    if (!s || !(q > 0) || !(a > 0)) return toast('Enter a symbol, quantity and price');
+    if (i != null) P.h[i] = { ...P.h[i], q, a, t };
+    else { const k = P.h.findIndex((x) => x.s === s); if (k >= 0) { const o = P.h[k]; P.h[k] = { ...o, a: (o.q * o.a + q * a) / (o.q + q), q: o.q + q }; toast(`Added to ${s}: new average ${fmt(P.h[k].a, 2, 'en-IN')}`); } else P.h.push({ s, q, a, t, d: today() }); }
+    if (!state.pf.px[s]) toast(`No price found for ${s} — check the NSE symbol`);
+    pfSave(P); renderPortfolio();
+  };
+  if (i != null) {
+    $('#f-del').onclick = () => { if (!$('#f-del').dataset.sure) { $('#f-del').dataset.sure = 1; $('#f-del').textContent = 'Tap again to delete'; return; } P.h.splice(i, 1); pfSave(P); renderPortfolio(); };
+    $('#f-sell').onclick = () => {
+      const q = Math.min(+$('#f-sq').value, h.q), x = +$('#f-sp').value, xd = $('#f-sd').value || today();
+      if (!(q > 0) || !(x > 0)) return toast('Enter the quantity and sell price');
+      P.c.push({ s: h.s, q, a: h.a, x, xd, t: h.t || '' });
+      if (q >= h.q) P.h.splice(i, 1); else P.h[i] = { ...h, q: h.q - q };
+      pfSave(P); toast(`Sale recorded: ${inr(q * (x - h.a))}`); renderPortfolio();
+    };
+  }
+}
+
+function pfUndo(j) {
+  const P = pfLoad(); const c = P.c[j]; if (!c) return;
+  const k = P.h.findIndex((x) => x.s === c.s);
+  if (k >= 0) { const o = P.h[k]; P.h[k] = { ...o, a: (o.q * o.a + c.q * c.a) / (o.q + c.q), q: o.q + c.q }; } else P.h.push({ s: c.s, q: c.q, a: c.a, t: c.t, d: c.xd });
+  P.c.splice(j, 1); pfSave(P); renderPortfolio();
+}
+
+/* broker CSV: needs a symbol column and quantity + average-price columns; header names vary by broker */
+function pfParse(text) {
+  const lines = String(text).trim().split(/\r?\n/).filter((l) => l.trim());
+  if (!lines.length) return [];
+  const delim = [',', '\t', ';'].sort((x, y) => lines[0].split(y).length - lines[0].split(x).length)[0];
+  const split = (l) => { const out = []; let cur = '', q = false;
+    for (let k = 0; k < l.length; k++) { const ch = l[k];
+      if (ch === '"') { if (q && l[k + 1] === '"') { cur += '"'; k++; } else q = !q; }
+      else if (ch === delim && !q) { out.push(cur.trim()); cur = ''; } else cur += ch; }
+    out.push(cur.trim()); return out; };
+  const head = split(lines[0]).map((h) => h.toLowerCase());
+  const find = (...keys) => head.findIndex((h) => keys.some((k) => h.includes(k)));
+  let si = find('symbol', 'scrip', 'instrument', 'stock', 'name'), qi = find('qty', 'quantity', 'shares', 'units'), ai = find('avg', 'average', 'buy price', 'atp', 'cost price', 'purchase');
+  let body = lines.slice(1);
+  if (si < 0 || qi < 0 || ai < 0) { si = 0; qi = 1; ai = 2; body = lines; }   // plain "SYMBOL, qty, avg" without a header
+  return body.map((l) => { const raw = split(l);
+    const s = String(raw[si] || '').toUpperCase().replace(/\.NS$|-EQ$|^NSE:/g, '').trim(); const q = +String(raw[qi] || '').replace(/,/g, ''); const a = +String(raw[ai] || '').replace(/[₹,]/g, '');
+    return s && q > 0 && a > 0 ? { s, q, a, t: '', d: today() } : null; }).filter(Boolean);
+}
+function pfImport() {
+  const box = $('#pf-form');
+  box.innerHTML = `<div class="pf-form">
+    <p class="muted small">Paste your broker's holdings export (CSV with symbol, quantity and average price columns), or one holding per line: <code>ADANIPORTS, 140, 1829.17</code></p>
+    <textarea id="f-txt" rows="7" placeholder="SYMBOL, QTY, AVG PRICE"></textarea>
+    <label class="filebtn">Or choose a CSV file<input id="f-file" type="file" accept=".csv,text/csv,text/plain"></label>
+    <div class="seg"><button id="f-rep" aria-selected="true">Replace my holdings</button><button id="f-addall">Add to them</button><button id="f-cancel">Cancel</button></div>
+  </div>`;
+  $('#f-cancel').onclick = () => (box.innerHTML = '');
+  $('#f-file').onchange = async (e) => { const f = e.target.files[0]; if (f) $('#f-txt').value = await f.text(); };
+  const go = (replace) => {
+    const rows = pfParse($('#f-txt').value); if (!rows.length) return toast('No holdings found — check the columns');
+    const P = pfLoad();
+    if (replace) P.h = rows; else rows.forEach((r) => { const k = P.h.findIndex((x) => x.s === r.s); if (k >= 0) { const o = P.h[k]; P.h[k] = { ...o, a: (o.q * o.a + r.q * r.a) / (o.q + r.q), q: o.q + r.q }; } else P.h.push(r); });
+    pfSave(P); const miss = rows.filter((r) => !state.pf.px[r.s]).map((r) => r.s);
+    toast(`Imported ${rows.length} holdings${miss.length ? ` · no price for ${miss.join(', ')}` : ''}`); renderPortfolio();
+  };
+  $('#f-rep').onclick = () => go(true); $('#f-addall').onclick = () => go(false);
+}
+function pfExport() {
+  const P = pfLoad();
+  const rows = [...P.h.map((h) => ({ type: 'holding', symbol: h.s, qty: h.q, avg_price: h.a, system: h.t || '', date: h.d || '', sell_price: '', sell_date: '' })),
+    ...P.c.map((c) => ({ type: 'sold', symbol: c.s, qty: c.q, avg_price: c.a, system: c.t || '', date: '', sell_price: c.x, sell_date: c.xd }))];
+  csvDownload(rows, ['type', 'symbol', 'qty', 'avg_price', 'system', 'date', 'sell_price', 'sell_date'], `my-portfolio_${today()}.csv`);
+}
+
 /* ------------------------------------------------------------------ downloads + wiring */
 function csvDownload(rows, cols, name) {
   if (!rows || !rows.length) { toast('Nothing to download here'); return; }
@@ -750,6 +921,7 @@ function download() {
   }
   if (state.view === 'ath' && state.ath && state.ath.d) return csvDownload(athRows().map((r) => { const n = state.ath.tab === 'near'; const z = sizeATH(n ? r.trigger : r.entry, n ? r.sma30 : (r.sma_entry ?? r.sma30), cap('NSE')); const a = r.add_status === 'armed' && z ? sizeATH(r.add_level, r.sma30, cap('NSE'), z.sh) : null; return { ...r, shares: z ? z.sh : '', value: z ? Math.round(z.val) : '', add_shares: a ? a.sh : '' }; }), ['symbol', 'name', 'status', 'shares', 'value', 'add_status', 'add_level', 'add_shares', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'depth', 'close', 'gap_pct', 'ret', 'peak', 'weeks', 'sma30', 'exit_date', 'exit_price', 'value_cr', 'size'], `monthly-ath_${state.ath.tab}_${state.ath.d.asof}.csv`);
   if (state.view === 'results' && state.res && state.res.book && state.res.book.p.length) return csvDownload(state.res.book.p, Object.keys(state.res.book.p[0]), 'paper-book_positions.csv');
+  if (state.view === 'pf') return pfExport();
   if (state.view === 'tb' && state.tb) return csvDownload(state.tb.ledger, Object.keys(state.tb.ledger[0] || {}), 'top-bottom_trades.csv');
   if (state.view === 'oi' && state.oi) return csvDownload(oiRows(), ['symbol', 'price', 'biggest_put', 'biggest_call', 'gap_pct', 'support', 'resistance', 'pcr', 'new'], `oi_${state.oi.side}_${state.oi.a.date}.csv`);
   toast('Nothing to download here');

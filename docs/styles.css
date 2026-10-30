@@ -47,7 +47,7 @@ button, select, input { font: inherit; color: inherit; }
 
 /* summary strip */
 .summary {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px;
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px;
   background: var(--line); border-bottom: 1px solid var(--line);
 }
 .stat { background: var(--card); padding: 10px 14px; }
@@ -170,13 +170,13 @@ dialog .close { position: absolute; right: 10px; top: 10px; font-size: 18px; col
 /* ---- sections nav: bottom bar on phones, under the header on wide screens ---- */
 .views {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(5, 1fr);
+  display: grid; grid-template-columns: repeat(6, 1fr);
   background: var(--card); border-top: 1px solid var(--line);
   padding: 4px 4px calc(4px + var(--safe-bottom));
 }
 .views button {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
-  border: 0; background: transparent; padding: 6px 2px; font-size: 11.5px; font-weight: 700; color: var(--slate); cursor: pointer;
+  border: 0; background: transparent; padding: 6px 1px; font-size: 10.5px; font-weight: 700; color: var(--slate); cursor: pointer;
 }
 .views svg { width: 22px; height: 22px; }
 .views button[aria-current="page"] { color: var(--ink); }
@@ -247,3 +247,20 @@ html, body { overflow-x: hidden; }
 .capbox{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--slate)}
 .capbox input{width:130px;padding:7px 9px;border:1px solid var(--line);border-radius:10px;font:inherit;font-weight:700;color:var(--ink)}
 .small-chart{height:200px}
+
+/* portfolio */
+.pf-list{list-style:none;margin:6px 0 0;padding:0}
+.pf-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 2px;border-top:1px solid var(--line);cursor:pointer}
+.pf-row .r{text-align:right}
+.pf-row small,.fact small{font-weight:600;font-size:12px}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:#EEF3FB;color:var(--slate)}
+.pf-form{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;display:grid;gap:8px}
+.pf-form label{display:grid;gap:4px;font-size:12.5px;color:var(--slate)}
+.pf-form input,.pf-form select,.pf-form textarea{padding:8px 10px;border:1px solid var(--line);border-radius:10px;font:inherit;font-weight:600;color:var(--ink);background:var(--card)}
+.pf-form textarea{font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.pf-form h4{margin:8px 0 0;font-size:14px}
+.filebtn input{font-size:13px}
+.linkbtn{border:0;background:none;color:var(--slate);text-decoration:underline;cursor:pointer;font-size:12px}
+.co.down,.down{color:var(--fall)}
+.sysl{font-size:12px;color:var(--slate);white-space:normal;line-height:1.35;margin-top:2px}
+.sysl.down{color:var(--fall)}
