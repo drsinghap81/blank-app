@@ -1,2 +1,6 @@
 engine,symbol,since,shares,avg,last,value,pnl,pnl_pct,exit_rule
 ATH,KOTAKBANK,2026-10-29,325,459.06,459.0,149175,-839,-0.3,weekly close < 30-wk SMA (397.6852)
+9/21,ADANIPORTS,2026-10-29,109,1871.0,1850.0,201650,-3404,-1.4,"stop 1687.9, then Supertrend red"
+9/21,LENSKART,2026-10-29,291,683.7,678.2,197356,-2690,-1.1,"stop 615.2, then Supertrend red"
+9/21,APLAPOLLO,2026-10-29,94,2205.0,2165.1,203519,-4880,-2.1,"stop 1994.1, then Supertrend red"
+9/21,GLAND,2026-10-29,66,3070.0,3095.9,204329,590,0.6,"stop 2769.8, then Supertrend red"

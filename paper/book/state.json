@@ -1,5 +1,5 @@
 {
-"cash": 1850395.8153000828,
+"cash": 1014409.5285043953,
 "pos": {
 "ath:KOTAKBANK:2026-10-29": {
 "engine": "ATH",
@@ -11,9 +11,76 @@
 "last": 459.0,
 "stop_note": "weekly close < 30-wk SMA (397.6852)",
 "added": false
+},
+"921:ADANIPORTS:2026-10-29": {
+"engine": "9/21",
+"symbol": "ADANIPORTS",
+"date": "2026-10-29",
+"sh": 109,
+"avg": 1871.0,
+"cost": 204500.21463562502,
+"last": 1850.0,
+"stop": 1687.9,
+"checked": "2026-10-30",
+"sell_next": false,
+"stop_note": "stop 1687.9, then Supertrend red"
+},
+"921:LENSKART:2026-10-29": {
+"engine": "9/21",
+"symbol": "LENSKART",
+"date": "2026-10-29",
+"sh": 291,
+"avg": 683.7,
+"cost": 199504.20396881254,
+"last": 678.2000122070312,
+"stop": 615.2,
+"checked": "2026-10-30",
+"sell_next": false,
+"stop_note": "stop 615.2, then Supertrend red"
+},
+"921:APLAPOLLO:2026-10-29": {
+"engine": "9/21",
+"symbol": "APLAPOLLO",
+"date": "2026-10-29",
+"sh": 94,
+"avg": 2205.0,
+"cost": 207840.38113125,
+"last": 2165.10009765625,
+"stop": 1994.1,
+"checked": "2026-10-30",
+"sell_next": false,
+"stop_note": "stop 1994.1, then Supertrend red"
+},
+"921:GLAND:2026-10-29": {
+"engine": "9/21",
+"symbol": "GLAND",
+"date": "2026-10-29",
+"sh": 66,
+"avg": 3070.0,
+"cost": 203177.5849125,
+"last": 3095.89990234375,
+"stop": 2769.8,
+"checked": "2026-10-30",
+"sell_next": false,
+"stop_note": "stop 2769.8, then Supertrend red"
 }
 },
-"done": [],
-"trades": [],
+"done": [
+"921:RPGLIFE:2026-10-29"
+],
+"trades": [
+{
+"engine": "9/21",
+"symbol": "RPGLIFE",
+"entry_date": "2026-10-29",
+"entry": 2812.0,
+"shares": 78,
+"exit_date": "2026-10-30",
+"exit": 2558.0,
+"pnl": -20964,
+"ret_pct": -9.5,
+"why": "stop"
+}
+],
 "tb_total": 0.0
 }
