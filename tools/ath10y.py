@@ -106,7 +106,12 @@ def summary(E):
 def main():
     os.makedirs(OUT, exist_ok=True)
     today = date.today()
-    u = symbols("NSE")
+    import json
+    try:
+        u = symbols("NSE")
+    except Exception as e:  # noqa: BLE001
+        print("NSE list unavailable, using data/scan/nse_close.json:", e, flush=True)
+        u = pd.DataFrame({"symbol": sorted(json.load(open("data/scan/nse_close.json"))["prices"])})
     tick = [s + ".NS" for s in u.symbol]
     print("symbols", len(tick), flush=True)
     events, cur = [], []
