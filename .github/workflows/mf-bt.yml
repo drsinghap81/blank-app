@@ -1,0 +1,21 @@
+name: mf-bt
+on:
+  push:
+    paths: [".github/workflows/mf-bt.yml", "tools/mf_ath_bt.py", "tools/mf_fetch.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q pandas numpy requests pyarrow
+      - run: mkdir -p data/mfbt && python tools/mf_fetch.py 2>&1 | tail -15 | tee data/mfbt/fetch_log.txt
+      - run: (python tools/mf_ath_bt.py > data/mfbt/log.txt 2>&1 || true); tail -60 data/mfbt/log.txt
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan mfbt; git rm -rqf --cached .; git add -f data/mfbt data/mf; git commit -qm "mf ath backtest"; git push -f origin mfbt
