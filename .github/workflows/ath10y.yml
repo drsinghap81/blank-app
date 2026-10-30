@@ -1,0 +1,20 @@
+name: ath10y
+on:
+  push:
+    paths: [".github/workflows/ath10y.yml", "tools/ath10y.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas numpy requests lxml
+      - run: mkdir -p data/study10 && (python tools/ath10y.py > data/study10/log.txt 2>&1 || true); grep -v -i "warn\|delisted\|failed download\|^\[\|possibly" data/study10/log.txt | tail -30
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan study-10y; git rm -rqf --cached .; git add -f data/study10; git commit -qm "10y base study"; git push -f origin study-10y
