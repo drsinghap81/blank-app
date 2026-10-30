@@ -265,7 +265,7 @@ def main():
     print(MARKET, "symbols", len(u), u.board.value_counts().to_dict(), flush=True)
     tick = list(u.ticker)
     tmap = dict(zip(u.ticker, u.symbol))
-    out, trigs, earl, frames, closes = [], [], [], {}, {}
+    out, trigs, earl, frames, closes, close_day = [], [], [], {}, {}, ""
     for i in range(0, len(tick), 150):
         chunk = tick[i:i + 150]
         try:
@@ -285,6 +285,7 @@ def main():
                 continue
             if len(c) >= 2:                                # every stock's close, for the app's portfolio view
                 closes[tmap[t]] = [round(float(c.iloc[-1]), 2), round(float(c.iloc[-2]), 2)]
+                close_day = max(close_day, str(c.index[-1].date()))
             if not len(c) or c.iloc[-1] < MIN_PRICE:      # penny-stock floor for every list
                 continue
             m, tg = metrics(o, h, l, c, v)
@@ -307,7 +308,7 @@ def main():
         print(i, len(out), flush=True)
         time.sleep(2)
     if MARKET == "NSE" and closes:
-        json.dump(dict(asof=str(date.today()), prices=closes), open(f"{OUT}/nse_close.json", "w"), separators=(",", ":"))
+        json.dump(dict(asof=close_day or str(date.today()), prices=closes), open(f"{OUT}/nse_close.json", "w"), separators=(",", ":"))
     df = pd.DataFrame(out).merge(u, on="symbol", how="left")
     df.to_csv(f"{OUT}/all_metrics.csv", index=False)
     base = df.e21_rising & df.above50 & (df.value_cr >= 1)
