@@ -46,7 +46,7 @@ function show(view) {
   document.querySelectorAll('.views button').forEach((b) => (b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   document.querySelectorAll('.view').forEach((s) => (s.hidden = s.id !== `view-${view}`));
   window.scrollTo(0, 0);
-  ({ trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, results: loadResults, pf: loadPortfolio })[view]();
+  ({ trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio })[view]();
 }
 
 /* ------------------------------------------------------------------ trends */
@@ -298,14 +298,12 @@ async function loadTB() {
   const el = $('#view-tb');
   if (!state.tb) {
     el.innerHTML = '<p class="muted pad">Loading…</p>';
-    const [orders, summary, ledger, hist, hourly, ratio, ratioLive, ratioPaper, ratioBt] = await Promise.all([getJSON(MAIN + 'paper/next_orders.json', 'tb_orders'),
+    const [orders, summary, ledger, hist, hourly] = await Promise.all([getJSON(MAIN + 'paper/next_orders.json', 'tb_orders'),
       getJSON(MAIN + 'paper/summary.json', 'tb_summary'), getText(MAIN + 'paper/ledger.csv'), getText(MAIN + 'paper/history_BANKNIFTY.csv'),
-      getJSON(REPO + 'live/data/live/tb_hourly.json', 'tb_hourly'), getJSON(MAIN + 'data/ratio/ratio_weekly.json', 'ratio_plan'),
-      getJSON(REPO + 'live/data/live/ratio_live.json', 'ratio_live'), getText(MAIN + 'data/ratio/paper.csv'), getText(MAIN + 'data/ratio/backtest.csv')]);
-    state.tb = { orders, summary, ledger: parseCSV(ledger), hist: parseCSV(hist), ledgerRaw: ledger, hourly,
-      ratio: { plan: ratio, live: ratioLive, paper: parseCSV(ratioPaper), bt: parseCSV(ratioBt) } };
+      getJSON(REPO + 'live/data/live/tb_hourly.json', 'tb_hourly')]);
+    state.tb = { orders, summary, ledger: parseCSV(ledger), hist: parseCSV(hist), ledgerRaw: ledger, hourly };
   }
-  const { orders, summary, ledger, hist, hourly, ratio } = state.tb;
+  const { orders, summary, ledger, hist, hourly } = state.tb;
   const o = orders && orders.BANKNIFTY;
   if (!o) { el.innerHTML = '<p class="empty">Top Bottom data is not available right now. Try again later.</p>'; $('#asof').textContent = ''; return; }
   $('#asof').textContent = `Bank Nifty futures, close ${longDay(o.date)}, paper trading`;
@@ -328,7 +326,6 @@ async function loadTB() {
       </div>
     </div>
     ${hourlyCard(hourly, o)}
-    ${ratioCard(ratio)}
     <div class="card">
       <h3>Paper results since ${day(summary.start_date)}</h3>
       <div class="facts">
@@ -346,6 +343,69 @@ async function loadTB() {
     </div>`;
   wireStyle('tbst', 'tb', () => drawTB(o, ledger, hist));
   drawTB(o, ledger, hist);
+}
+/* ------------------------------------------------------------------ Nifty weekly ratio (replaces the OI-alerts tab; OI stays reachable) */
+async function loadRatio() {
+  $('#title').textContent = 'Nifty weekly ratio';
+  const el = $('#view-ratio');
+  if (!state.ratio) {
+    el.innerHTML = '<p class="muted pad">Loading…</p>';
+    const [plan, live, paper, bt] = await Promise.all([getJSON(MAIN + 'data/ratio/ratio_weekly.json', 'ratio_plan'),
+      getJSON(REPO + 'live/data/live/ratio_live.json', 'ratio_live'), getText(MAIN + 'data/ratio/paper.csv'), getText(MAIN + 'data/ratio/backtest.csv')]);
+    state.ratio = { plan, live, paper: parseCSV(paper), bt: parseCSV(bt) };
+  }
+  const r = state.ratio;
+  if (!r.plan || !r.plan.legs) { el.innerHTML = '<p class="empty">No plan yet. It is published on each expiry evening (17:00 IST).</p>'; return; }
+  $('#asof').textContent = `Plan from the ${longDay(r.plan.asof)} close · expiry ${longDay(r.plan.expiry)}`;
+  el.innerHTML = ratioCard(r) + payoffCard(r) + `<div class="card"><button class="linkbtn" id="oi-archive">Open the old OI alerts page</button>
+    <p class="muted small">OI alerts were replaced here by the ratio system; the page still works.</p></div>`;
+  $('#oi-archive').onclick = () => show('oi');
+}
+function payoffLegs(p) {
+  if (p.entered && p.entered.legs) {
+    const L = {}; for (const [s, g] of Object.entries(p.entered.legs)) { const pr = g.prices || [0, 0, 0];
+      L[s] = { long: g.long, short2: g.short2, short4: g.short4, net: g.net ?? (pr[0] - 2 * pr[1] - 4 * pr[2]), be: g.breakeven_far }; }
+    return { L, src: 'paper position' };
+  }
+  const L = {}; for (const [s, g] of Object.entries(p.legs)) L[s] = { long: g.long, short2: g.short2, short4: g.short4, net: g.net_debit || 0, be: g.breakeven_far };
+  return { L, src: 'plan' };
+}
+function payoffCard(r) {
+  const p = r.plan, { L, src } = payoffLegs(p), lot = p.lot || 65;
+  const now = (r.live && r.live.expiry === p.expiry && r.live.nifty) || (p.paper_mtm && p.paper_mtm.future) || p.future;
+  const mid = (L.CE.long + L.PE.long) / 2, lo = mid * 0.95, hi = mid * 1.05, N = 160;
+  const pay = (S) => Object.entries(L).reduce((a, [s, g]) => { const sg = s === 'CE' ? 1 : -1, iv = (k) => Math.max(sg * (S - k), 0);
+    return a + iv(g.long) - 2 * iv(g.short2) - 4 * iv(g.short4) - g.net; }, 0) * lot;
+  const pts = Array.from({ length: N + 1 }, (_, i) => { const S = lo + (hi - lo) * i / N; return [S, pay(S)]; });
+  const ys = pts.map((q) => q[1]); let ymax = Math.max(...ys, 1), ymin = Math.min(...ys, -1);
+  ymin = Math.max(ymin, -2.5 * ymax);                          // keep the profit hump readable; losses are clipped
+  const W = 600, H = 260, pl = 54, pr = 10, pt = 14, pb = 30;
+  const X = (S) => pl + (S - lo) / (hi - lo) * (W - pl - pr), Y = (v) => pt + (ymax - Math.max(Math.min(v, ymax), ymin)) / (ymax - ymin) * (H - pt - pb);
+  const line = pts.map((q, i) => `${i ? 'L' : 'M'}${X(q[0]).toFixed(1)},${Y(q[1]).toFixed(1)}`).join('');
+  const area = `${line}L${X(hi).toFixed(1)},${Y(0).toFixed(1)}L${X(lo).toFixed(1)},${Y(0).toFixed(1)}Z`;
+  const vline = (S, col, dash, label, top) => (S > lo && S < hi ? `<line x1="${X(S)}" x2="${X(S)}" y1="${pt}" y2="${H - pb}" stroke="${col}" stroke-width="1.5" ${dash ? 'stroke-dasharray="4 3"' : ''}/>` +
+    (label ? `<text x="${X(S)}" y="${top ? pt + 10 : H - pb - 4}" fill="${col}" font-size="11" text-anchor="middle">${label}</text>` : '') : '');
+  const yt = [ymin, ymin / 2, 0, ymax / 2, ymax].map((v) => `<text x="${pl - 6}" y="${Y(v) + 4}" font-size="10" text-anchor="end" fill="${C.slate}">${v >= 0 ? '' : '−'}₹${fmt(Math.abs(v) / 1000, 0, 'en-IN')}k</text>`).join('');
+  const xt = [0, 0.25, 0.5, 0.75, 1].map((f) => { const S = lo + (hi - lo) * f; return `<text x="${X(S)}" y="${H - 10}" font-size="10" text-anchor="middle" fill="${C.slate}">${fmt(S, 0, 'en-IN')}</text>`; }).join('');
+  return `<div class="card">
+      <h3>Payoff at expiry (${src})</h3>
+      <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Payoff at expiry in rupees per set across Nifty levels">
+        <defs><clipPath id="pos"><rect x="0" y="0" width="${W}" height="${Y(0)}"/></clipPath><clipPath id="neg"><rect x="0" y="${Y(0)}" width="${W}" height="${H}"/></clipPath></defs>
+        <path d="${area}" fill="${C.rise}" fill-opacity=".18" clip-path="url(#pos)"/><path d="${area}" fill="${C.fall}" fill-opacity=".18" clip-path="url(#neg)"/>
+        <path d="${line}" fill="none" stroke="${C.rise}" stroke-width="2.5" clip-path="url(#pos)"/><path d="${line}" fill="none" stroke="${C.fall}" stroke-width="2.5" clip-path="url(#neg)"/>
+        <line x1="${pl}" x2="${W - pr}" y1="${Y(0)}" y2="${Y(0)}" stroke="${C.slate}" stroke-width="1"/>
+        ${vline(L.CE.long, C.e21, true)}${vline(L.PE.long, C.e21, true)}
+        ${vline(L.CE.be, C.fall, true, 'danger', false)}${vline(L.PE.be, C.fall, true, 'danger', false)}
+        ${vline(now, C.saffron, false, 'Nifty ' + fmt(now, 0, 'en-IN'), true)}
+        ${yt}${xt}
+      </svg>
+      <div class="facts">
+        <div class="fact"><span>Best case</span><b class="up">₹${fmt(Math.max(...ys), 0, 'en-IN')}</b></div>
+        <div class="fact"><span>At Nifty ${fmt(now, 0, 'en-IN')}</span><b class="${pay(now) >= 0 ? 'up' : 'down'}">₹${fmt(pay(now), 0, 'en-IN')}</b></div>
+        <div class="fact"><span>Danger beyond</span><b>${fmt(L.PE.be, 0, 'en-IN')} / ${fmt(L.CE.be, 0, 'en-IN')}</b></div>
+      </div>
+      <p class="muted small">₹ per set at expiry (lot ${lot}). Blue dashed = long strikes (shift triggers); red dashed = far breakevens, beyond which 5 net short options lose about ₹${fmt(5 * lot * 100 / 1000, 1, 'en-IN')}k per 100 Nifty points. Deep losses are clipped on the chart.</p>
+    </div>`;
 }
 /* Nifty weekly ratio system (Options Conclave 2022 structure): plan, live strikes, paper results, backtest by year. */
 function ratioCard(r) {

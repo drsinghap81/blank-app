@@ -23,6 +23,48 @@ def _f(x, d=0):
     return "-" if x is None else f"{x:,.{d}f}"
 
 
+def payoff_curve(legs: dict, lot: int, center: float, width: float = 0.05, n: int = 241):
+    """Expiry P&L in Rs per set for both ratios. legs[side] = dict(long, short2, short4, net) with net = entry value in pts
+    (long - 2 short2 - 4 short4; + = debit)."""
+    import numpy as np
+    x = np.linspace(center * (1 - width), center * (1 + width), n)
+    y = np.zeros_like(x)
+    for side, g in legs.items():
+        sg = 1 if side == "CE" else -1
+        iv = lambda k: np.maximum(sg * (x - k), 0)
+        y += iv(g["long"]) - 2 * iv(g["short2"]) - 4 * iv(g["short4"]) - (g.get("net") or 0)
+    return x, y * lot
+
+
+def payoff_chart(p: dict, live: dict | None):
+    import plotly.graph_objects as go
+    e = p.get("entered")
+    src = e["legs"] if e else {s: dict(long=g["long"], short2=g["short2"], short4=g["short4"], net=g.get("net_debit")) for s, g in p["legs"].items()}
+    if e and any(v.get("net") is None for v in src.values()):
+        for s, v in src.items():
+            pr = v.get("prices") or [0, 0, 0]
+            v["net"] = pr[0] - 2 * pr[1] - 4 * pr[2]
+    now = (live or {}).get("nifty") or (p.get("paper_mtm") or {}).get("future") or p["future"]
+    center = (src["CE"]["long"] + src["PE"]["long"]) / 2
+    x, y = payoff_curve(src, p.get("lot", 65), center)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=x, y=[v if v >= 0 else None for v in y], mode="lines", line=dict(color="#0E9F6E", width=3), fill="tozeroy",
+                             fillcolor="rgba(14,159,110,0.18)", name="profit", hovertemplate="Nifty %{x:,.0f}<br>₹%{y:,.0f}<extra></extra>"))
+    fig.add_trace(go.Scatter(x=x, y=[v if v < 0 else None for v in y], mode="lines", line=dict(color="#D64545", width=3), fill="tozeroy",
+                             fillcolor="rgba(214,69,69,0.18)", name="loss", hovertemplate="Nifty %{x:,.0f}<br>₹%{y:,.0f}<extra></extra>"))
+    fig.add_hline(y=0, line_color="#5B6B82", line_width=1)
+    fig.add_vline(x=now, line_color="#E8A33D", line_width=2, annotation_text=f"Nifty {now:,.0f}", annotation_position="top")
+    be = [g.get("breakeven_far") for g in (e["legs"] if e else p["legs"]).values()]
+    for b in [v for v in be if v]:
+        fig.add_vline(x=b, line_color="#D64545", line_dash="dash", line_width=1, annotation_text=f"danger {b:,.0f}", annotation_position="bottom")
+    for s in ("CE", "PE"):
+        fig.add_vline(x=src[s]["long"], line_color="#3B6FE0", line_dash="dot", line_width=1)
+    fig.update_layout(template="plotly_dark", height=340, paper_bgcolor="#0b0e14", plot_bgcolor="#0f131b", showlegend=False,
+                      margin=dict(l=10, r=10, t=30, b=10), xaxis_title="Nifty at expiry", yaxis_title="₹ per set",
+                      title=dict(text=f"Payoff at expiry {p['expiry']} ({'paper position' if e else 'plan'}; blue dotted = long strikes / shift triggers)", font=dict(size=13)))
+    return fig
+
+
 def render_ratio_tab() -> None:
     st.markdown("#### 🦋 Nifty weekly ratio (Options Conclave 2022 structure)")
     st.caption("Each weekly series, both sides, held to expiry: call side +1 call ~150 pts ITM, −2 calls ~1.44% OTM, −4 calls ~1.71% OTM; "
@@ -66,6 +108,7 @@ def render_ratio_tab() -> None:
                         f"call {e['legs']['CE']['long']:.0f}/{e['legs']['CE']['short2']:.0f}/{e['legs']['CE']['short4']:.0f}, "
                         f"put {e['legs']['PE']['long']:.0f}/{e['legs']['PE']['short2']:.0f}/{e['legs']['PE']['short4']:.0f}"
                         + (f" — marked {m['date']}: **{m['pts']:+,.0f} pts = ₹{m['rs']:+,.0f}** per set" if m else ""))
+        st.plotly_chart(payoff_chart(p, live), width="stretch", key="ratio_payoff")
         st.caption(f"Lot {p.get('lot', 65)}. Margin {p.get('margin', '')}. Updated {p.get('updated', '')}.")
 
     paper = _get("data/ratio/paper.csv")

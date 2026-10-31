@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-31 · Nifty weekly ratio system v38"
+APP_BUILD = "2026-10-31 · Nifty ratio tab replaces OI alerts, payoff chart v39"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2351,9 +2351,9 @@ def main() -> None:
 
     render_header(market)
 
-    tab_trend, tab_ath, tab_tb, tab_ratio, tab_oi, tab_scan, tab1, tab_bt, tab2, tab3 = st.tabs(
-        ["📈 Trend scan", "🏔️ Monthly ATH", "🔁 Top Bottom", "🦋 Nifty ratio", "🧲 OI alerts", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
-         "🧾 Paper orders", "💼 Portfolio"])
+    tab_trend, tab_ath, tab_tb, tab_ratio, tab_scan, tab1, tab_bt, tab2, tab3, tab_oi = st.tabs(
+        ["📈 Trend scan", "🏔️ Monthly ATH", "🔁 Top Bottom", "🦋 Nifty ratio", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
+         "🧾 Paper orders", "💼 Portfolio", "🗄️ OI alerts (archived)"])
     with tab1:
         render_analysis_tab(market, ticker)
     with tab_scan:
