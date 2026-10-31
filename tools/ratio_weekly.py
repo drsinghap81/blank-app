@@ -247,6 +247,7 @@ def main():
         paper.to_csv(f"{OUT}/paper.csv", index=False)
     plan["updated"] = now_ist.strftime("%Y-%m-%d %H:%M IST")
     plan["position"] = state.get("position")
+    plan["paper_start"] = state.get("paper_start", "2026-11-04")
     json.dump(plan, open(f"{OUT}/ratio_weekly.json", "w"), indent=1, default=str)
     json.dump(state, open(f"{OUT}/state.json", "w"), indent=1, default=str)
     for m_ in msgs:

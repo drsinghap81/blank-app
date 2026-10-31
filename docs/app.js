@@ -414,7 +414,8 @@ function ratioCard(r) {
   const trade = p.decision === 'TRADE';
   const leg = (s, t) => { const g = p.legs[s], pr = g.prices || [];
     return `<li><b>${s === 'CE' ? 'Call' : 'Put'} ratio:</b> buy 1 ${n(g.long)}${t} (${fmt(pr[0], 1, 'en-IN')}), sell 2 ${n(g.short2)}${t} (${fmt(pr[1], 1, 'en-IN')}), sell 4 ${n(g.short4)}${t} (${fmt(pr[2], 1, 'en-IN')}) · net ${fmt(g.net_debit, 1, 'en-IN')} · danger beyond ${n(g.breakeven_far)}</li>`; };
-  const pap = (r.paper || []).filter((x) => x.pnl_rs !== undefined);
+  const start = p.paper_start || '2026-11-04';
+  const pap = (r.paper || []).filter((x) => x.pnl_rs !== undefined && String(x.entry) >= start);
   const ptot = pap.reduce((a, x) => a + (+x.pnl_rs || 0), 0);
   const years = {}; (r.bt || []).filter((x) => x.decision === 'TRADE').forEach((x) => { const y = String(x.expiry).slice(0, 4); years[y] = (years[y] || 0) + (+x.pnl_rs || 0); });
   const m = p.paper_mtm, e = p.entered;
@@ -429,7 +430,7 @@ function ratioCard(r) {
       ${trade ? `<ul class="orders">${leg('CE', 'CE')}${leg('PE', 'PE')}
         <li>Enter on the first day after expiry, near the close; strikes re-centre on the live price${L ? ` (now Nifty ${n(L.nifty)}: call ${L.live_strikes.CE.join(' / ')}, put ${L.live_strikes.PE.join(' / ')})` : ''}. Hold to expiry.</li></ul>` : ''}
       ${e ? `<p class="small">Paper position from ${day(e.date)} at ${n(e.future)}${m ? ` — marked ${day(m.date)}: <b class="${m.rs >= 0 ? 'up' : 'down'}">₹${n(m.rs)}</b> per set` : ''}</p>` : ''}
-      ${pap.length ? `<p class="small">Paper results: <b class="${ptot >= 0 ? 'up' : 'down'}">₹${n(ptot)}</b> over ${pap.length} weeks.</p>` : ''}
+      <p class="small">Paper record (official from ${day(start)}): ${pap.length ? `<b class="${ptot >= 0 ? 'up' : 'down'}">₹${n(ptot)}</b> over ${pap.length} weeks.` : 'no completed week yet.'}</p>
       ${Object.keys(years).length ? `<div class="table-wrap"><table><thead><tr><th>Backtest year</th><th class="r">₹ per set</th></tr></thead><tbody>${Object.entries(years).map(([y, v]) => `<tr><td>${y}</td><td class="r ${v >= 0 ? 'up' : 'down'}">${n(v)}</td></tr>`).join('')}</tbody></table></div>` : ''}
       <p class="muted small">1 set = 1 + 2 + 4 lots per side (lot ${p.lot}). Net short ~5 calls and ~5 puts: a 4%+ week can cost ₹1–3.5 lakh per set; margin ≈ ₹8–10 lakh. Backtest Mar 2019 – Oct 2026 with the skip filter: ~₹2.5 lakh/yr per set, every year positive. Optional shift: when a side's long goes at/out of the money, re-set it 150 pts in the money. Paper tracking only — no orders are placed. Updated ${esc(p.updated || '')}.</p>
     </div>`;

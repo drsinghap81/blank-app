@@ -113,9 +113,14 @@ def render_ratio_tab() -> None:
 
     paper = _get("data/ratio/paper.csv")
     if paper is not None and len(paper):
-        st.markdown("**Paper results (live since Oct 2026)**")
-        st.metric("Total", f"₹{paper.pnl_rs.sum():+,.0f}", f"{len(paper)} weeks, {100 * (paper.pnl_rs > 0).mean():.0f}% won")
-        st.dataframe(paper.iloc[::-1], hide_index=True, width="stretch")
+        start = (p or {}).get("paper_start", "2026-11-04")
+        off = paper[paper.entry >= start]
+        st.markdown(f"**Paper record (official from the {start} entry)**")
+        if len(off):
+            st.metric("Total", f"₹{off.pnl_rs.sum():+,.0f}", f"{len(off)} weeks, {100 * (off.pnl_rs > 0).mean():.0f}% won")
+        else:
+            st.caption("No completed official paper week yet.")
+        st.dataframe(paper.assign(record=paper.entry.map(lambda d: "official" if d >= start else "dry run")).iloc[::-1], hide_index=True, width="stretch")
 
     bt = _get("data/ratio/backtest.csv")
     if bt is not None and len(bt):
