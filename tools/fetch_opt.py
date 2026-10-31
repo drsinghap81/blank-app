@@ -57,6 +57,13 @@ def day(d):
         ref = float(f.CLOSE.iloc[0])
         o = g[g.INST == "OPT"]
         ex = sorted(o.EXPIRY.unique())
+        if LONG:         # NIFTY only: every expiry 50-200 days out (quarterly / half-yearly), strikes +-25%
+            if u != "NIFTY":
+                continue
+            ex = [e for e in ex if 50 <= (e - d).days <= 200]
+            o = o[o.EXPIRY.isin(ex) & (o.STRIKE.between(ref * 0.75, ref * 1.25))]
+            out += [f.head(3), o]
+            continue
         if MONTHLY:      # last expiry of each calendar month, up to ~80 days out
             m = pd.Series(ex); m = m.groupby(m.dt.to_period("M")).max()
             ex = [e for e in m if (e - d).days <= 80]
@@ -64,6 +71,8 @@ def day(d):
             ex = ex[:3]
         o = o[o.EXPIRY.isin(ex) & (o.STRIKE.between(ref * 0.88, ref * 1.12))]
         out += [f.head(2), o]
+    if not out:
+        return None
     r = pd.concat(out)
     r.insert(0, "Date", d.date())
     r["EXPIRY"] = r.EXPIRY.dt.date
@@ -72,6 +81,7 @@ def day(d):
 
 start, end, out = sys.argv[1:4]
 MONTHLY = len(sys.argv) > 4 and sys.argv[4] == "monthly"
+LONG = len(sys.argv) > 4 and sys.argv[4] == "long"
 rows, miss = [], 0
 for d in pd.bdate_range(start, end):
     r = day(d)
