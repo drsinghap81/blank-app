@@ -384,12 +384,12 @@ function payoffCard(r) {
   const line = pts.map((q, i) => `${i ? 'L' : 'M'}${X(q[0]).toFixed(1)},${Y(q[1]).toFixed(1)}`).join('');
   const area = `${line}L${X(hi).toFixed(1)},${Y(0).toFixed(1)}L${X(lo).toFixed(1)},${Y(0).toFixed(1)}Z`;
   const vline = (S, col, dash, label, top) => (S > lo && S < hi ? `<line x1="${X(S)}" x2="${X(S)}" y1="${pt}" y2="${H - pb}" stroke="${col}" stroke-width="1.5" ${dash ? 'stroke-dasharray="4 3"' : ''}/>` +
-    (label ? `<text x="${X(S)}" y="${top ? pt + 10 : H - pb - 4}" fill="${col}" font-size="11" text-anchor="middle">${label}</text>` : '') : '');
+    (label ? `<text x="${X(S) + (top ? -4 : 4)}" y="${top ? pt + 10 : H - pb - 4}" fill="${col}" font-size="11" text-anchor="${top ? 'end' : 'start'}" paint-order="stroke" stroke="#fff" stroke-width="3">${label}</text>` : '') : '');
   const yt = [ymin, ymin / 2, 0, ymax / 2, ymax].map((v) => `<text x="${pl - 6}" y="${Y(v) + 4}" font-size="10" text-anchor="end" fill="${C.slate}">${v >= 0 ? '' : '−'}₹${fmt(Math.abs(v) / 1000, 0, 'en-IN')}k</text>`).join('');
-  const xt = [0, 0.25, 0.5, 0.75, 1].map((f) => { const S = lo + (hi - lo) * f; return `<text x="${X(S)}" y="${H - 10}" font-size="10" text-anchor="middle" fill="${C.slate}">${fmt(S, 0, 'en-IN')}</text>`; }).join('');
+  const xt = [0, 0.25, 0.5, 0.75, 1].map((f) => { const S = lo + (hi - lo) * f; return `<text x="${X(S)}" y="${H - 10}" font-size="10" text-anchor="${f === 0 ? 'start' : f === 1 ? 'end' : 'middle'}" fill="${C.slate}">${fmt(S, 0, 'en-IN')}</text>`; }).join('');
   return `<div class="card">
       <h3>Payoff at expiry (${src})</h3>
-      <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Payoff at expiry in rupees per set across Nifty levels">
+      <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;max-width:760px;margin:0 auto" role="img" aria-label="Payoff at expiry in rupees per set across Nifty levels">
         <defs><clipPath id="pos"><rect x="0" y="0" width="${W}" height="${Y(0)}"/></clipPath><clipPath id="neg"><rect x="0" y="${Y(0)}" width="${W}" height="${H}"/></clipPath></defs>
         <path d="${area}" fill="${C.rise}" fill-opacity=".18" clip-path="url(#pos)"/><path d="${area}" fill="${C.fall}" fill-opacity=".18" clip-path="url(#neg)"/>
         <path d="${line}" fill="none" stroke="${C.rise}" stroke-width="2.5" clip-path="url(#pos)"/><path d="${line}" fill="none" stroke="${C.fall}" stroke-width="2.5" clip-path="url(#neg)"/>
