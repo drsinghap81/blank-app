@@ -1,0 +1,114 @@
+{
+ "expiry": "2026-11-03",
+ "asof": "2026-10-27",
+ "future": 22776.7,
+ "days_to_expiry": 7,
+ "atm": 22800.0,
+ "straddle": 386.35,
+ "straddle_pct_of_future": 1.696,
+ "ivn": 0.006411,
+ "percentile": 67,
+ "skip_above_pct": 80,
+ "decision": "TRADE",
+ "legs": {
+  "CE": {
+   "long": 22650.0,
+   "short2": 23100.0,
+   "short4": 23150.0,
+   "prices": [
+    259.1,
+    64.25,
+    52.35
+   ],
+   "net_debit": -78.8,
+   "best_at": 23100.0,
+   "best_pts": 528.8,
+   "breakeven_far": 23246.0,
+   "breakeven_near": 22571.0,
+   "shift_trigger": 22650.0
+  },
+  "PE": {
+   "long": 22950.0,
+   "short2": 22450.0,
+   "short4": 22400.0,
+   "prices": [
+    291.15,
+    81.0,
+    70.7
+   ],
+   "net_debit": -153.65,
+   "best_at": 22450.0,
+   "best_pts": 653.7,
+   "breakeven_far": 22279.0,
+   "breakeven_near": 23104.0,
+   "shift_trigger": 22950.0
+  }
+ },
+ "lot": 65,
+ "margin": "Rs 8-10 lakh per set (estimate; check your broker)",
+ "late": false,
+ "entered": {
+  "date": "2026-10-28",
+  "future": 22778.0,
+  "legs": {
+   "CE": {
+    "long": 22650.0,
+    "short2": 23100.0,
+    "short4": 23150.0,
+    "prices": [
+     209.2,
+     41.3,
+     32.9
+    ]
+   },
+   "PE": {
+    "long": 22950.0,
+    "short2": 22450.0,
+    "short4": 22400.0,
+    "prices": [
+     320.3,
+     83.25,
+     70.85
+    ]
+   }
+  }
+ },
+ "paper_mtm": {
+  "date": "2026-10-30",
+  "pts": 140.3,
+  "rs": 9122,
+  "future": 23098.9
+ },
+ "updated": "2026-10-31 15:16 IST",
+ "position": {
+  "expiry": "2026-11-03",
+  "entry": "2026-10-28",
+  "future": 22778.0,
+  "legs": {
+   "CE": {
+    "long": 22650.0,
+    "short2": 23100.0,
+    "short4": 23150.0,
+    "entry_prices": [
+     209.2,
+     41.3,
+     32.9
+    ],
+    "entry_value": -5.0,
+    "entry_cost": 6.721072307692308
+   },
+   "PE": {
+    "long": 22950.0,
+    "short2": 22450.0,
+    "short4": 22400.0,
+    "entry_prices": [
+     320.3,
+     83.25,
+     70.85
+    ],
+    "entry_value": -129.59999999999997,
+    "entry_cost": 8.697832307692309
+   }
+  }
+ }
+}

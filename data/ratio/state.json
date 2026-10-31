@@ -1,1 +1,35 @@
-{"last_day": "2026-10-19"}
+{
+ "last_day": "2026-10-30",
+ "entry_pending": null,
+ "position": {
+  "expiry": "2026-11-03",
+  "entry": "2026-10-28",
+  "future": 22778.0,
+  "legs": {
+   "CE": {
+    "long": 22650.0,
+    "short2": 23100.0,
+    "short4": 23150.0,
+    "entry_prices": [
+     209.2,
+     41.3,
+     32.9
+    ],
+    "entry_value": -5.0,
+    "entry_cost": 6.721072307692308
+   },
+   "PE": {
+    "long": 22950.0,
+    "short2": 22450.0,
+    "short4": 22400.0,
+    "entry_prices": [
+     320.3,
+     83.25,
+     70.85
+    ],
+    "entry_value": -129.59999999999997,
+    "entry_cost": 8.697832307692309
+   }
+  }
+ }
+}
