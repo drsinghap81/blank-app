@@ -54,27 +54,41 @@ def main():
                               f"CALL: +1 {k['CE'][0]}CE, -2 {k['CE'][1]}CE, -4 {k['CE'][2]}CE\n"
                               f"PUT:  +1 {k['PE'][0]}PE, -2 {k['PE'][1]}PE, -4 {k['PE'][2]}PE\n"
                               f"Place both before the close. Lot {p.get('lot', 65)} per leg-lot."))
+    # current strikes per side: the entered/planned ones, replaced by the last shift we signalled
+    track = sent.get(key + "|legs") or {s: dict(long=g["long"], short2=g["short2"], short4=g["short4"],
+                                                be=(far_hi if s == "CE" else far_lo)) for s, g in (("CE", ce), ("PE", pe))}
     if p["decision"] == "TRADE" and not entry_day:
-        if nifty <= ce["long"] and "shift_CE" not in done:
-            msgs.append(("shift_CE", f"Nifty weekly ratio: Nifty {nifty:.0f} reached the CALL long strike {ce['long']:.0f} - shift rule: re-set the call side 150 pts ITM (optional)."))
-        if nifty >= pe["long"] and "shift_PE" not in done:
-            msgs.append(("shift_PE", f"Nifty weekly ratio: Nifty {nifty:.0f} reached the PUT long strike {pe['long']:.0f} - shift rule: re-set the put side 150 pts ITM (optional)."))
-        for side, lvl, beyond in (("hi", far_hi, nifty >= far_hi), ("lo", far_lo, nifty <= far_lo)):
+        for s in ("CE", "PE"):
+            t = track[s]
+            trig = nifty <= t["long"] if s == "CE" else nifty >= t["long"]
+            n = sum(1 for x in done if x.startswith(f"shift_{s}"))
+            if trig and n < 4:
+                k = strikes(nifty)[s]
+                lbl = "CALL" if s == "CE" else "PUT"
+                be = round((2 * k[1] + 4 * k[2] - k[0]) / 5)          # far breakeven of the new side at ~zero net premium
+                msgs.append((f"shift_{s}_{n + 1}",
+                             f"Nifty weekly ratio - SHIFT {lbl} side (#{n + 1} this week, optional rule): Nifty {nifty:.0f} reached the long {t['long']:.0f}{s}.\n"
+                             f"Close: +1 {t['long']:.0f}{s}, -2 {t['short2']:.0f}{s}, -4 {t['short4']:.0f}{s}\n"
+                             f"Open:  +1 {k[0]}{s}, -2 {k[1]}{s}, -4 {k[2]}{s}  (new danger level ~{be})"))
+                track[s] = dict(long=k[0], short2=k[1], short4=k[2], be=be)
+        for side, s in (("hi", "CE"), ("lo", "PE")):
+            lvl = track[s]["be"]; beyond = nifty >= lvl if side == "hi" else nifty <= lvl
             near = abs(nifty / lvl - 1) <= 0.003
-            if beyond and f"beyond_{side}" not in done:
-                msgs.append((f"beyond_{side}", f"Nifty weekly ratio DANGER: Nifty {nifty:.0f} is beyond the {'upper' if side == 'hi' else 'lower'} breakeven {lvl:.0f} - 5 net short options on that side. Decide: hold (system rule) or cut."))
-            elif near and f"near_{side}" not in done:
-                msgs.append((f"near_{side}", f"Nifty weekly ratio: Nifty {nifty:.0f} is within 0.3% of the {'upper' if side == 'hi' else 'lower'} breakeven {lvl:.0f}."))
+            if beyond and f"beyond_{side}_{int(lvl)}" not in done:
+                msgs.append((f"beyond_{side}_{int(lvl)}", f"Nifty weekly ratio DANGER: Nifty {nifty:.0f} is beyond the {'upper' if side == 'hi' else 'lower'} breakeven {lvl:.0f} - 5 net short options on that side. Decide: hold (system rule), shift, or cut."))
+            elif near and not beyond and f"near_{side}_{int(lvl)}" not in done:
+                msgs.append((f"near_{side}_{int(lvl)}", f"Nifty weekly ratio: Nifty {nifty:.0f} is within 0.3% of the {'upper' if side == 'hi' else 'lower'} breakeven {lvl:.0f}."))
     for tag, text in msgs:
         print(text)
-        if send(text) or force:
-            done.add(tag)
+        send(text)                                   # delivery is best-effort; never repeat the same signal
+        done.add(tag)
+    sent[key + "|legs"] = track
     sent[key] = sorted(done)
     os.makedirs("data/live", exist_ok=True)
     json.dump(sent, open(SENT, "w"))
     json.dump(dict(time=now.strftime("%Y-%m-%d %H:%M IST"), nifty=round(nifty, 1), expiry=p["expiry"], decision=p["decision"],
-                   entry_day=entry_day, live_strikes=strikes(nifty), far_breakevens=[far_lo, far_hi],
-                   long_strikes=dict(CE=ce["long"], PE=pe["long"]), alerts_sent=sorted(done)), open(OUT, "w"), indent=1)
+                   entry_day=entry_day, live_strikes=strikes(nifty), far_breakevens=[track["PE"]["be"], track["CE"]["be"]],
+                   long_strikes=dict(CE=track["CE"]["long"], PE=track["PE"]["long"]), current_legs=track, alerts_sent=sorted(done)), open(OUT, "w"), indent=1)
 
 
 if __name__ == "__main__":
