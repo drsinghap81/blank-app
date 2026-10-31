@@ -45,7 +45,7 @@ def main():
     key = p["expiry"]; done = set(sent.get(key, []))
     legs = (p.get("entered") or {}).get("legs") or p["legs"]
     ce, pe = legs["CE"], legs["PE"]
-    far_hi, far_lo = p["legs"]["CE"]["breakeven_far"], p["legs"]["PE"]["breakeven_far"]
+    far_hi, far_lo = ce.get("breakeven_far", p["legs"]["CE"]["breakeven_far"]), pe.get("breakeven_far", p["legs"]["PE"]["breakeven_far"])
     msgs = []
     entry_day = now.date().isoformat() > p["asof"] and not p.get("entered")
     if p["decision"] == "TRADE" and entry_day and mins >= 14 * 60 + 45 and "entry" not in done:

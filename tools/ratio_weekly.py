@@ -220,8 +220,13 @@ def main():
                 legs[typ] = dict(long=ks[0], short2=ks[1], short4=ks[2], entry_prices=pr, entry_value=v, entry_cost=cost)
             if ok:
                 state["position"] = dict(expiry=str(e_next.date()), entry=str(d.date()), future=round(day.F, 1), legs=legs)
+                def far_be(t, l):
+                    nv = l["entry_value"]
+                    a = N1 * l["short2"] + N2 * l["short4"] - l["long"]
+                    return round((a - nv) / (N1 + N2 - 1) if t == "CE" else (a + nv) / (N1 + N2 - 1), 0)
                 plan["entered"] = dict(date=str(d.date()), future=round(day.F, 1),
-                                       legs={t: dict(long=l["long"], short2=l["short2"], short4=l["short4"], prices=[round(x, 2) for x in l["entry_prices"]])
+                                       legs={t: dict(long=l["long"], short2=l["short2"], short4=l["short4"], prices=[round(x, 2) for x in l["entry_prices"]],
+                                                     net=round(l["entry_value"], 2), breakeven_far=far_be(t, l))
                                              for t, l in legs.items()})
             state["entry_pending"] = None
         # 4) mark to market
