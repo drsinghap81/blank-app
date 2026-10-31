@@ -298,12 +298,14 @@ async function loadTB() {
   const el = $('#view-tb');
   if (!state.tb) {
     el.innerHTML = '<p class="muted pad">Loading…</p>';
-    const [orders, summary, ledger, hist, hourly] = await Promise.all([getJSON(MAIN + 'paper/next_orders.json', 'tb_orders'),
+    const [orders, summary, ledger, hist, hourly, ratio, ratioLive, ratioPaper, ratioBt] = await Promise.all([getJSON(MAIN + 'paper/next_orders.json', 'tb_orders'),
       getJSON(MAIN + 'paper/summary.json', 'tb_summary'), getText(MAIN + 'paper/ledger.csv'), getText(MAIN + 'paper/history_BANKNIFTY.csv'),
-      getJSON(REPO + 'live/data/live/tb_hourly.json', 'tb_hourly')]);
-    state.tb = { orders, summary, ledger: parseCSV(ledger), hist: parseCSV(hist), ledgerRaw: ledger, hourly };
+      getJSON(REPO + 'live/data/live/tb_hourly.json', 'tb_hourly'), getJSON(MAIN + 'data/ratio/ratio_weekly.json', 'ratio_plan'),
+      getJSON(REPO + 'live/data/live/ratio_live.json', 'ratio_live'), getText(MAIN + 'data/ratio/paper.csv'), getText(MAIN + 'data/ratio/backtest.csv')]);
+    state.tb = { orders, summary, ledger: parseCSV(ledger), hist: parseCSV(hist), ledgerRaw: ledger, hourly,
+      ratio: { plan: ratio, live: ratioLive, paper: parseCSV(ratioPaper), bt: parseCSV(ratioBt) } };
   }
-  const { orders, summary, ledger, hist, hourly } = state.tb;
+  const { orders, summary, ledger, hist, hourly, ratio } = state.tb;
   const o = orders && orders.BANKNIFTY;
   if (!o) { el.innerHTML = '<p class="empty">Top Bottom data is not available right now. Try again later.</p>'; $('#asof').textContent = ''; return; }
   $('#asof').textContent = `Bank Nifty futures, close ${longDay(o.date)}, paper trading`;
@@ -326,6 +328,7 @@ async function loadTB() {
       </div>
     </div>
     ${hourlyCard(hourly, o)}
+    ${ratioCard(ratio)}
     <div class="card">
       <h3>Paper results since ${day(summary.start_date)}</h3>
       <div class="facts">
@@ -343,6 +346,33 @@ async function loadTB() {
     </div>`;
   wireStyle('tbst', 'tb', () => drawTB(o, ledger, hist));
   drawTB(o, ledger, hist);
+}
+/* Nifty weekly ratio system (Options Conclave 2022 structure): plan, live strikes, paper results, backtest by year. */
+function ratioCard(r) {
+  if (!r || !r.plan || !r.plan.legs) return '';
+  const p = r.plan, L = r.live && r.live.expiry === p.expiry ? r.live : null, n = (v) => fmt(v, 0, 'en-IN');
+  const trade = p.decision === 'TRADE';
+  const leg = (s, t) => { const g = p.legs[s], pr = g.prices || [];
+    return `<li><b>${s === 'CE' ? 'Call' : 'Put'} ratio:</b> buy 1 ${n(g.long)}${t} (${fmt(pr[0], 1, 'en-IN')}), sell 2 ${n(g.short2)}${t} (${fmt(pr[1], 1, 'en-IN')}), sell 4 ${n(g.short4)}${t} (${fmt(pr[2], 1, 'en-IN')}) · net ${fmt(g.net_debit, 1, 'en-IN')} · danger beyond ${n(g.breakeven_far)}</li>`; };
+  const pap = (r.paper || []).filter((x) => x.pnl_rs !== undefined);
+  const ptot = pap.reduce((a, x) => a + (+x.pnl_rs || 0), 0);
+  const years = {}; (r.bt || []).filter((x) => x.decision === 'TRADE').forEach((x) => { const y = String(x.expiry).slice(0, 4); years[y] = (years[y] || 0) + (+x.pnl_rs || 0); });
+  const m = p.paper_mtm, e = p.entered;
+  return `<div class="card">
+      <h3>🦋 Nifty weekly ratio — expiry ${day(p.expiry)}</h3>
+      <div class="status ${trade ? 'open' : 'exit'}">${trade ? 'TRADE this week' : 'SKIP this week (premium unusually high)'}</div>
+      <div class="facts">
+        <div class="fact"><span>ATM straddle</span><b>${n(p.straddle)} pts (${fmt(p.straddle_pct_of_future, 2)}%)</b></div>
+        <div class="fact"><span>Percentile (skip &gt; ${p.skip_above_pct})</span><b>${p.percentile ?? '–'}</b></div>
+        <div class="fact"><span>Plan from close</span><b>${day(p.asof)} · ${n(p.future)}</b></div>
+      </div>
+      ${trade ? `<ul class="orders">${leg('CE', 'CE')}${leg('PE', 'PE')}
+        <li>Enter on the first day after expiry, near the close; strikes re-centre on the live price${L ? ` (now Nifty ${n(L.nifty)}: call ${L.live_strikes.CE.join(' / ')}, put ${L.live_strikes.PE.join(' / ')})` : ''}. Hold to expiry.</li></ul>` : ''}
+      ${e ? `<p class="small">Paper position from ${day(e.date)} at ${n(e.future)}${m ? ` — marked ${day(m.date)}: <b class="${m.rs >= 0 ? 'up' : 'down'}">₹${n(m.rs)}</b> per set` : ''}</p>` : ''}
+      ${pap.length ? `<p class="small">Paper results: <b class="${ptot >= 0 ? 'up' : 'down'}">₹${n(ptot)}</b> over ${pap.length} weeks.</p>` : ''}
+      ${Object.keys(years).length ? `<div class="table-wrap"><table><thead><tr><th>Backtest year</th><th class="r">₹ per set</th></tr></thead><tbody>${Object.entries(years).map(([y, v]) => `<tr><td>${y}</td><td class="r ${v >= 0 ? 'up' : 'down'}">${n(v)}</td></tr>`).join('')}</tbody></table></div>` : ''}
+      <p class="muted small">1 set = 1 + 2 + 4 lots per side (lot ${p.lot}). Net short ~5 calls and ~5 puts: a 4%+ week can cost ₹1–3.5 lakh per set; margin ≈ ₹8–10 lakh. Backtest Mar 2019 – Oct 2026 with the skip filter: ~₹2.5 lakh/yr per set, every year positive. Optional shift: when a side's long goes at/out of the money, re-set it 150 pts in the money. Paper tracking only — no orders are placed. Updated ${esc(p.updated || '')}.</p>
+    </div>`;
 }
 /* Missed the daily entry? Hourly re-entry level (tools/tb_hourly.py, refreshed every ~15 min in market hours). */
 function hourlyCard(h, o) {

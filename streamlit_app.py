@@ -57,7 +57,7 @@ def _fresh(modname: str):
 
 
 _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "tools"))
-for _m in ("topbottom", "topbottom_backtest", "topbottom_tab", "patterns"):
+for _m in ("topbottom", "topbottom_backtest", "topbottom_tab", "patterns", "ratio_tab"):
     _fresh(_m)
 from topbottom_tab import render_topbottom_tab  # noqa: E402
 
@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-30 · Top Bottom hourly re-entry level v37"
+APP_BUILD = "2026-10-31 · Nifty weekly ratio system v38"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2351,8 +2351,8 @@ def main() -> None:
 
     render_header(market)
 
-    tab_trend, tab_ath, tab_tb, tab_oi, tab_scan, tab1, tab_bt, tab2, tab3 = st.tabs(
-        ["📈 Trend scan", "🏔️ Monthly ATH", "🔁 Top Bottom", "🧲 OI alerts", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
+    tab_trend, tab_ath, tab_tb, tab_ratio, tab_oi, tab_scan, tab1, tab_bt, tab2, tab3 = st.tabs(
+        ["📈 Trend scan", "🏔️ Monthly ATH", "🔁 Top Bottom", "🦋 Nifty ratio", "🧲 OI alerts", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
          "🧾 Paper orders", "💼 Portfolio"])
     with tab1:
         render_analysis_tab(market, ticker)
@@ -2369,6 +2369,8 @@ def main() -> None:
     with tab_tb:
         st.session_state["_nse_watchlist"] = tuple(MARKETS["India (NSE)"].watchlist)
         _sys.modules["topbottom_tab"].render_topbottom_tab()
+    with tab_ratio:
+        _sys.modules["ratio_tab"].render_ratio_tab()
     with tab2:
         render_trading_tab(market, ticker)
     with tab3:

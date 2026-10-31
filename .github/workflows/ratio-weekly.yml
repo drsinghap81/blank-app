@@ -1,0 +1,34 @@
+name: ratio-weekly
+on:
+  schedule:
+    - cron: "30 11 * * 1-5"   # 17:00 IST, after the NSE F&O bhavcopy is published
+  workflow_dispatch:
+    inputs:
+      alerts: {description: "Send Telegram/WhatsApp alerts (1/0)", default: "0"}
+permissions:
+  contents: write
+concurrency: {group: ratio-weekly, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Nifty weekly ratio - plan, paper trade, alerts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          SEND_ALERTS: ${{ github.event_name == 'schedule' && '1' || github.event.inputs.alerts || '0' }}
+        run: |
+          pip install -q pandas requests
+          python tools/ratio_weekly.py
+      - name: Commit to main (app reads data/ratio/*)
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add data/ratio; git diff --cached --quiet && exit 0
+          git commit -m "Nifty weekly ratio $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
