@@ -57,6 +57,13 @@ def day(d):
         ref = float(f.CLOSE.iloc[0])
         o = g[g.INST == "OPT"]
         ex = sorted(o.EXPIRY.unique())
+        if DEC:          # NIFTY December contracts only, 50-420 days out, strikes +-30%
+            if u != "NIFTY":
+                continue
+            ex = [e for e in ex if pd.Timestamp(e).month == 12 and 50 <= (e - d).days <= 420]
+            o = o[o.EXPIRY.isin(ex) & (o.STRIKE.between(ref * 0.70, ref * 1.30))]
+            out += [f.head(3), o]
+            continue
         if LONG:         # NIFTY only: every expiry 50-200 days out (quarterly / half-yearly), strikes +-25%
             if u != "NIFTY":
                 continue
@@ -82,6 +89,7 @@ def day(d):
 start, end, out = sys.argv[1:4]
 MONTHLY = len(sys.argv) > 4 and sys.argv[4] == "monthly"
 LONG = len(sys.argv) > 4 and sys.argv[4] == "long"
+DEC = len(sys.argv) > 4 and sys.argv[4] == "dec"
 rows, miss = [], 0
 for d in pd.bdate_range(start, end):
     r = day(d)
