@@ -1,0 +1,29 @@
+name: fetch-indices
+on:
+  push:
+    paths: [".github/workflows/fetch-indices.yml", "tools/fetch_indices.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  chunk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        part: ["2005-01-01:2008-12-31", "2009-01-01:2012-12-31", "2013-01-01:2016-12-31", "2017-01-01:2020-12-31",
+               "2021-01-01:2023-12-31", "2024-01-01:2026-12-31"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q pandas requests
+      - run: |
+          P="${{ matrix.part }}"; S=${P%%:*}; E=${P##*:}
+          mkdir -p idx && python tools/fetch_indices.py $S $E idx/idx_${S}.csv 2>&1 | tail -5
+          gzip -f idx/idx_${S}.csv
+          echo "TAG=${S}" >> $GITHUB_ENV
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout -B idx-$TAG; git add -f idx; git commit -m "indices $TAG" || exit 0; git push -f origin idx-$TAG
