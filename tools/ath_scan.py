@@ -25,6 +25,8 @@ from datetime import datetime, timedelta, timezone
 
 import numpy as np
 import pandas as pd
+
+SEC, BENCH = None, None
 import yfinance as yf
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -178,6 +180,13 @@ def analyse(sym, x, today):
 def main():
     os.makedirs(CH, exist_ok=True)
     today = (datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)).date()
+    global SEC, BENCH
+    try:
+        from sector_state import load_bench, stock_rs
+        SEC = json.load(open(f"{OUT}/sectors.json")); BENCH = load_bench()
+    except Exception:  # noqa: BLE001
+        SEC, BENCH = None, None
+        stock_rs = lambda *a_: {}  # noqa: E731
     u = nse_symbols()
     u = u[u.board == "main"] if "board" in u else u
     name = dict(zip(u.symbol, u.name)) if "name" in u else {}
@@ -206,6 +215,12 @@ def main():
                     continue
                 vals[sym] = float((x.Close * x.Volume).tail(20).mean())
                 ev, nr, ch = analyse(sym, x, today)
+                if ev or nr:
+                    rsd = stock_rs(sym, x.Close, SEC, BENCH)
+                    for e_ in ev:
+                        e_.update(rsd)
+                    if nr:
+                        nr.update(rsd)
             except Exception as e:  # noqa: BLE001
                 print("fail", sym, e); continue
             events += ev
@@ -220,7 +235,7 @@ def main():
     E = pd.DataFrame(events)
     N = pd.DataFrame(near)
     try:
-        from sector_state import tag_for
+        from sector_state import tag_for, stock_rs  # noqa: F401
         sec = json.load(open(f"{OUT}/sectors.json"))
     except Exception:  # noqa: BLE001
         sec = None
@@ -231,6 +246,9 @@ def main():
             if sec:
                 t = [tag_for(s_, sec) for s_ in df.symbol]
                 df["industry"], df["sector_index"], df["sector_tag"] = [x[0] for x in t], [x[1] for x in t], [x[2] for x in t]
+                ix_ = sec.get("indices") or {}
+                df["sector_rs"] = [(ix_.get(x[1]) or {}).get("rs_6m") if x[1] else None for x in t]
+                df["sector_rs_up"] = [(ix_.get(x[1]) or {}).get("rs_6m_up") if x[1] else None for x in t]
     cur = pd.Timestamp(today).to_period("M")
     if len(E):
         E["date"] = pd.to_datetime(E.date)

@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-11-01 · sector tags on ATH and IPO lists v41"
+APP_BUILD = "2026-11-01 · sector & stock RS tags v42"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2016,7 +2016,10 @@ SECTOR_TAG_HELP = ("Sector tag = the stock's sector index: leading (above a risi
                    "uptrend (above a rising 30-week SMA), mixed (beating Nifty 500 but not in an uptrend), weak (neither). "
                    "Backtest 2017–26: ATH breakouts won 54% of the time in up-trending sectors vs 40% otherwise, and 31% in weak sectors, "
                    "but average returns were not higher (some of the biggest winners lead before their sector turns) — a guide for "
-                   "confidence and size, not a filter. Blank = no industry label (only Nifty 500 / midcap / smallcap index members have one).")
+                   "confidence and size, not a filter. Blank = no industry label (Nifty Total Market / Microcap 250 members have one). "
+                   "sector_rs = 6-month RS of the sector index vs Nifty 50 (%); stock_rs = 1-year RS of the stock vs its sector index "
+                   "(rs_bench; Nifty 500 if it has no sector). Backtest: ATH breakouts with BOTH positive averaged ~+30% vs ~+17% for the "
+                   "rest; a negative 1-year stock RS won only 30% of the time.")
 
 
 def render_sector_strip(key: str = "ath") -> None:
@@ -2031,6 +2034,8 @@ def render_sector_strip(key: str = "ath") -> None:
     _nm = {"NIFTY IT": "IT", "NIFTY FMCG": "FMCG", "NIFTY INDIA CONSUMPTION": "Consumption", "NIFTY SERVICES SECTOR": "Services",
            "NIFTY FINANCIAL SERVICES": "Financials", "NIFTY PSU BANK": "PSU Bank", "NIFTY PSE": "PSE"}
     rows = [dict(sector=_nm.get(k, k.replace("NIFTY ", "").title()), tag=ix[k]["tag"], vs_nifty500_3m=round(ix[k]["vs_market_3m"] or 0, 1),
+                 rs_6m_vs_nifty50=None if ix[k].get("rs_6m") is None else round(ix[k]["rs_6m"], 1),
+                 rs_rising="yes" if ix[k].get("rs_6m_up") else "no",
                  ret_3m=round(ix[k]["ret_3m"] or 0, 1), from_high=round(ix[k]["from_high"] or 0, 1)) for k in used if k in ix]
     if not rows:
         return
@@ -2069,10 +2074,10 @@ def render_ath_tab() -> None:
     if not len(df):
         st.info("Nothing in this list right now.")
         return
-    cols = {"Breakouts": ["symbol", "name", "sector_tag", "date", "entry", "close", "ret", "base_months", "ath_month", "sma30", "size", "industry"],
-            "Near trigger": ["symbol", "name", "sector_tag", "close", "trigger", "gap_pct", "base_months", "ath_month", "sma30", "size", "industry"],
-            "Tracked signals": ["symbol", "name", "status", "sector_tag", "date", "entry", "close", "ret", "peak", "weeks", "base_months",
-                                "exit_date", "size", "industry"]}[which]
+    cols = {"Breakouts": ["symbol", "name", "sector_tag", "sector_rs", "stock_rs", "date", "entry", "close", "ret", "base_months", "ath_month", "sma30", "size", "industry", "rs_bench"],
+            "Near trigger": ["symbol", "name", "sector_tag", "sector_rs", "stock_rs", "close", "trigger", "gap_pct", "base_months", "ath_month", "sma30", "size", "industry", "rs_bench"],
+            "Tracked signals": ["symbol", "name", "status", "sector_tag", "sector_rs", "stock_rs", "date", "entry", "close", "ret", "peak", "weeks", "base_months",
+                                "exit_date", "size", "industry", "rs_bench"]}[which]
     cc1, cc2 = st.columns([3, 1])
     capital = cc1.number_input("Your capital (₹) — sizes every row: risk % of capital to the 30-week SMA, max 20% per stock",
                                min_value=10_000, value=int(st.session_state.get("ath_cap", 2_000_000)), step=50_000, key="ath_cap")
@@ -2101,6 +2106,9 @@ def render_ath_tab() -> None:
     for k in ("ret", "peak"):
         if k in show:
             show[k] = (show[k] * 100).round(1)
+    for k in ("sector_rs", "stock_rs"):
+        if k in show:
+            show[k] = pd.to_numeric(show[k], errors="coerce").round(1)
     left, right = st.columns([2, 3])
     with left:
         st.dataframe(show, hide_index=True, width="stretch", height=460)
@@ -2175,9 +2183,9 @@ def render_ipo_tab() -> None:
     if not len(df):
         st.info("Nothing in this list right now.")
         return
-    cols = {"Breakouts": ["symbol", "name", "status", "sector_tag", "signal_date", "entry", "close", "ret", "ath", "depth", "base_days", "age_months", "sma10"],
-            "Near high": ["symbol", "name", "sector_tag", "close", "ath", "gap_pct", "depth", "base_days", "age_months", "sma10"],
-            "Tracked signals": ["symbol", "name", "status", "sector_tag", "date", "entry", "close", "ret", "peak", "weeks", "exit_date", "age_months"]}[which]
+    cols = {"Breakouts": ["symbol", "name", "status", "sector_tag", "sector_rs", "stock_rs", "signal_date", "entry", "close", "ret", "ath", "depth", "base_days", "age_months", "sma10"],
+            "Near high": ["symbol", "name", "sector_tag", "sector_rs", "stock_rs", "close", "ath", "gap_pct", "depth", "base_days", "age_months", "sma10"],
+            "Tracked signals": ["symbol", "name", "status", "sector_tag", "sector_rs", "stock_rs", "date", "entry", "close", "ret", "peak", "weeks", "exit_date", "age_months"]}[which]
     cc1, cc2 = st.columns([3, 1])
     capital = cc1.number_input("Your capital (₹) — risk % of capital to the 10-week SMA, max 20% per stock",
                                min_value=10_000, value=int(st.session_state.get("ipo_cap", 2_000_000)), step=50_000, key="ipo_cap")
@@ -2198,6 +2206,9 @@ def render_ipo_tab() -> None:
     for k in ("ret", "peak", "depth"):
         if k in show:
             show[k] = (show[k] * 100).round(1)
+    for k in ("sector_rs", "stock_rs"):
+        if k in show:
+            show[k] = pd.to_numeric(show[k], errors="coerce").round(1)
     left, right = st.columns([2, 3])
     with left:
         st.dataframe(show, hide_index=True, width="stretch", height=460)

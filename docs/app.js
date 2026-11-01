@@ -684,7 +684,7 @@ function ipoItem(r) {
     right = `<b>${fmt(r.close, 2, 'en-IN')}</b>` + (r.entry ? `<span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>` : `<span class="muted">high ${fmt(r.ath, 2, 'en-IN')}</span>`);
   }
   if (r.status !== 'exit next open') { const z = sizeATH(r.kind === 'near' ? r.ath : (r.entry || r.close), r.sma10, cap('NSE')); if (z && z.sh) chip += `<span class="chip">${z.sh.toLocaleString('en-IN')} sh</span>`; }
-  chip += secChip(r) + `<span class="chip">listed ${r.age_months} mo ago</span>`;
+  chip += secChip(r) + rsChips(r) + `<span class="chip">listed ${r.age_months} mo ago</span>`;
   return { chip, right };
 }
 function ipoSelect(r) {
@@ -700,7 +700,7 @@ function ipoSelect(r) {
   const f = [['High since listing', `${fmt(r.ath, 2, 'en-IN')} (${day(r.ath_date)})`], ['Cup depth', pct(r.depth * 100)], ['Cup length', `${r.base_days} trading days`],
     ['Listed', `${day(r.listed)} (${r.age_months} months ago)`], ['10-week SMA', fmt(r.sma10, 2, 'en-IN')], ['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]];
   if (!near && r.entry) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}`], ['Best since entry', pct(r.peak * 100)]);
-  const sf = secFact(r); if (sf) f.push(sf);
+  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}${plan}
     <div class="seg-row"><div class="seg small" id="ipotf"><button data-tf="d" aria-selected="true">Daily</button><button data-tf="w" aria-selected="false">Weekly + 10 SMA</button></div></div>
@@ -749,6 +749,13 @@ const secName = (k) => ({ 'NIFTY IT': 'IT', 'NIFTY FMCG': 'FMCG', 'NIFTY INDIA C
   || k.replace('NIFTY ', '').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()));
 const SECTOR_TXT = { leading: 'Sector leading', uptrend: 'Sector uptrend', mixed: 'Sector mixed', weak: 'Sector weak' };
 const secChip = (r) => (r.sector_tag ? `<span class="chip ${r.sector_tag === 'leading' ? 'new' : r.sector_tag === 'weak' ? 'exit' : r.sector_tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.sector_tag]}</span>` : '');
+const rsChip = (lab, v) => (v == null ? '' : `<span class="chip ${v > 0 ? 'open' : 'exit'}">${lab} ${v > 0 ? '+' : ''}${Number(v).toFixed(0)}%</span>`);
+const rsChips = (r) => rsChip('Sector RS', r.sector_rs) + rsChip('Stock RS', r.stock_rs);
+function rsFact(r) {
+  if (r.stock_rs == null && r.sector_rs == null) return null;
+  const bn = r.rs_bench ? secName(r.rs_bench) : '';
+  return ['Relative strength', `${r.sector_rs != null ? `sector ${pct(r.sector_rs)} vs Nifty 50 (6 m${r.sector_rs_up ? ', rising' : ''}) · ` : ''}${r.stock_rs != null ? `stock ${pct(r.stock_rs)} vs ${esc(bn)} (1 y${r.stock_rs_up ? ', rising' : ''})` : ''}`];
+}
 function secFact(r) {
   const S = state.ath && state.ath.sec; if (!r.sector_index || !S || !S.indices[r.sector_index]) return null;
   const x = S.indices[r.sector_index];
@@ -758,7 +765,7 @@ function sectorStrip() {
   const S = state.ath && state.ath.sec; if (!S || !S.indices) return '';
   const names = [...new Set(Object.values(S.industries || {}))].filter((k) => S.indices[k]);
   const by = (t) => names.filter((k) => S.indices[k].tag === t).sort((a, b) => S.indices[b].vs_market_3m - S.indices[a].vs_market_3m).map(secName);
-  return `<p class="note small-note"><b>Sectors ${day(S.asof)}:</b> leading — ${by('leading').join(', ') || 'none'}; weak — ${by('weak').join(', ') || 'none'}. The tag on each stock is its sector: up-trending sectors raised the breakout win rate (54% vs 40%; weak sectors 31%) but not the average return — use it for confidence and size, not as a filter.</p>`;
+  return `<p class="note small-note"><b>Sectors ${day(S.asof)}:</b> leading — ${by('leading').join(', ') || 'none'}; weak — ${by('weak').join(', ') || 'none'}. The tag on each stock is its sector: up-trending sectors raised the breakout win rate (54% vs 40%; weak sectors 31%) but not the average return. RS chips: sector 6-month RS vs Nifty 50 and stock 1-year RS vs its sector (or Nifty 500); breakouts with both positive averaged ~+30% vs ~+17%, a negative stock RS won only 30% — use them for confidence and size, not as filters.</p>`;
 }
 const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` : `${m}-mo base`);
 function athList() {
@@ -789,7 +796,7 @@ function athList() {
       if (z && z.sh) chip += `<span class="chip">${z.sh.toLocaleString('en-IN')} sh</span>`;
       if (r.add_status === 'armed' && r.status === 'open') chip += '<span class="chip open">Add armed</span>';
     }
-    chip += secChip(r);
+    chip += secChip(r) + rsChips(r);
     if (r.size) chip += `<span class="chip">${esc(r.size)}</span>`;
     return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
       <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
@@ -812,7 +819,7 @@ function athSelect(r) {
     ['Deepest fall in the base', pct((r.depth || 0) * 100)], ['30-week SMA', fmt(r.sma30, 2, 'en-IN')]];
   if (!near) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}`], ['Best since entry', pct(r.peak * 100)], ['Weeks', r.weeks]);
   f.push(['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]);
-  const sf = secFact(r); if (sf) f.push(sf);
+  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}
     ${planATH(r, near)}

@@ -9,6 +9,11 @@ Tag per sector index (as of the last completed week / last close):
   mixed   : not in an uptrend but beating Nifty 500
 Backtest (project note claude/sector-indices.md): ATH breakouts win 54% when the sector is in an uptrend vs 40% when not,
 31% in 'weak' sectors; average returns are NOT higher, so this is a tag, not a filter.
+Relative strength (Amritpal, tested 1 Nov 2026): RS = (P/P[n])/(B/B[n]) - 1.
+  sector RS: 126 days vs Nifty 50 (rs_6m, rs_6m_up = higher than 20 days ago)
+  stock RS : 250 days vs its sector index, or Nifty 500 if the stock has no sector (computed in the scans via stock_rs)
+  ATH backtest: sector RS>0 AND stock RS>0 ~+30%/trade vs ~+17%; 1-year stock RS<0 -> 30% win, +3%. The July-2024
+  anchored length (~585 days) tested weaker and partly inverted.
 Writes data/scan/sectors.json: {asof, indices: {name: {...}}, industries: {industry: index}, symbols: {symbol: industry}}."""
 import glob
 import io
@@ -76,7 +81,19 @@ def load_hist(today):
     return H
 
 
-def state(c, mret):
+SEC_RS_N, STOCK_RS_N, RS_RISE = 126, 250, 20   # backtest: sector RS 3-6 m vs Nifty 50 and stock RS 1 y vs its sector work best
+
+
+def rs_now(a, b, n):
+    """RS = (a_t/a_t-n)/(b_t/b_t-n) - 1 on aligned daily closes; returns (rs_now, rs 20 days ago)."""
+    j = pd.concat([a, b], axis=1, join="inner").dropna()
+    if len(j) < n + RS_RISE + 1:
+        return np.nan, np.nan
+    r = (j.iloc[:, 0] / j.iloc[:, 0].shift(n)) / (j.iloc[:, 1] / j.iloc[:, 1].shift(n)) - 1
+    return float(r.iloc[-1]), float(r.iloc[-1 - RS_RISE])
+
+
+def state(c, mret, n50=None):
     c = c.dropna()
     if len(c) < 160:
         return None
@@ -89,8 +106,10 @@ def state(c, mret):
     rs = r3 - mret if np.isfinite(r3) and np.isfinite(mret) else np.nan
     beat = bool(rs > 0) if np.isfinite(rs) else False
     tag = "leading" if up and beat else "uptrend" if up else "mixed" if beat else "weak"
+    srs, srs0 = rs_now(c, n50, SEC_RS_N) if n50 is not None else (np.nan, np.nan)
     return dict(close=float(c.iloc[-1]), sma30=float(sma.iloc[-1]), up=up, ret_3m=r3 * 100, vs_market_3m=rs * 100,
-                from_high=float(c.iloc[-1] / c.max() - 1) * 100, tag=tag)
+                from_high=float(c.iloc[-1] / c.max() - 1) * 100, tag=tag,
+                rs_6m=srs * 100 if np.isfinite(srs) else None, rs_6m_up=bool(srs > srs0) if np.isfinite(srs) and np.isfinite(srs0) else None)
 
 
 def main():
@@ -100,8 +119,9 @@ def main():
     m = P[MARKET].dropna() if MARKET in P else pd.Series(dtype=float)
     mret = float(m.iloc[-1] / m.iloc[-64] - 1) if len(m) > 64 else np.nan
     idx = {}
+    n50 = P["NIFTY 50"].dropna() if "NIFTY 50" in P else None
     for name in P.columns:
-        st = state(P[name], mret)
+        st = state(P[name], mret, n50)
         if st:
             idx[name] = st
     sym = {}
@@ -118,7 +138,36 @@ def main():
     print("sectors", len(idx), "symbols with industry", len(sym))
     for k in sorted(set(INDUSTRY_INDEX.values())):
         if k in idx:
-            print(f"  {k:28s} {idx[k]['tag']:8s} vs market {idx[k]['vs_market_3m']:+.1f}%")
+            print(f"  {k:28s} {idx[k]['tag']:8s} vs market {idx[k]['vs_market_3m']:+.1f}%  RS 6m vs Nifty 50 {idx[k]['rs_6m'] if idx[k]['rs_6m'] is None else round(idx[k]['rs_6m'], 1)}")
+
+
+def load_bench():
+    """Daily closes of the sector indices + Nifty 500 from the cache (for stock RS in the scans)."""
+    try:
+        H = pd.read_csv(CACHE, parse_dates=["Date"])
+        return H.pivot_table(index="Date", columns="INDEX", values="CLOSE", aggfunc="last").sort_index()
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def stock_rs(symbol, close, sec, bench):
+    """1-year RS of a stock vs its sector index (Nifty 500 if it has none). Young stocks (IPOs) use what history they have
+    (>= 63 days). Returns dict(rs_bench, stock_rs, stock_rs_up) or {}."""
+    if bench is None or close is None or not len(close):
+        return {}
+    _, ix, _ = tag_for(symbol, sec) if sec else (None, None, None)
+    b = ix if ix and ix in bench else MARKET
+    if b not in bench:
+        return {}
+    c = close.copy(); ci = pd.to_datetime(c.index)
+    c.index = (ci.tz_localize(None) if ci.tz is not None else ci).normalize()
+    n = min(STOCK_RS_N, len(c.dropna()) - RS_RISE - 1)
+    if n < 63:
+        return {}
+    r, r0 = rs_now(c, bench[b], n)
+    if not np.isfinite(r):
+        return {}
+    return dict(rs_bench=b, stock_rs=r * 100, stock_rs_up=bool(r > r0) if np.isfinite(r0) else None, stock_rs_days=int(n))
 
 
 def tag_for(symbol, sec):
