@@ -1,6 +1,6 @@
 {
 "asof": "2026-11-01",
-"generated": "2026-11-01 03:14 UTC",
+"generated": "2026-11-01 04:51 UTC",
 "scanned": 744,
 "rules": {
 "max_age_months": 36,
@@ -33,6 +33,9 @@
 "value_cr": 590.2739,
 "name": "Ather Energy Limited",
 "listed": "2025-05-06",
+"industry": "Automobile and Auto Components",
+"sector_index": "NIFTY AUTO",
+"sector_tag": "weak",
 "age_months": 18
 },
 {
@@ -55,6 +58,9 @@
 "value_cr": 22.6118,
 "name": "Advance Agrolife Limited",
 "listed": "2025-10-08",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 13
 },
 {
@@ -77,6 +83,9 @@
 "value_cr": 126.3733,
 "name": "Shringar House of Mangalsutra Limited",
 "listed": "2025-09-17",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 13
 }
 ],
@@ -102,6 +111,9 @@
 "value_cr": 590.2739,
 "name": "Ather Energy Limited",
 "listed": "2025-05-06",
+"industry": "Automobile and Auto Components",
+"sector_index": "NIFTY AUTO",
+"sector_tag": "weak",
 "age_months": 18
 },
 {
@@ -124,6 +136,9 @@
 "value_cr": 64.885,
 "name": "Shanti Gold International Limited",
 "listed": "2025-08-01",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 15
 },
 {
@@ -146,6 +161,9 @@
 "value_cr": 6.2041,
 "name": "Gujarat Kidney And Super Speciality Limited",
 "listed": "2025-12-30",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 10
 },
 {
@@ -168,6 +186,9 @@
 "value_cr": 22.6118,
 "name": "Advance Agrolife Limited",
 "listed": "2025-10-08",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 13
 },
 {
@@ -190,6 +211,9 @@
 "value_cr": 126.3733,
 "name": "Shringar House of Mangalsutra Limited",
 "listed": "2025-09-17",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 13
 },
 {
@@ -212,6 +236,9 @@
 "value_cr": 53.7675,
 "name": "Allied Blenders and Distillers Limited",
 "listed": "2024-07-02",
+"industry": "Fast Moving Consumer Goods",
+"sector_index": "NIFTY FMCG",
+"sector_tag": "weak",
 "age_months": 28
 },
 {
@@ -234,6 +261,9 @@
 "value_cr": 38.9837,
 "name": "Kross Limited",
 "listed": "2024-09-16",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 25
 },
 {
@@ -256,6 +286,9 @@
 "value_cr": 23.9705,
 "name": "Leela Palaces Hotels & Resorts Limited",
 "listed": "2025-06-02",
+"industry": "Consumer Services",
+"sector_index": "NIFTY INDIA CONSUMPTION",
+"sector_tag": "weak",
 "age_months": 17
 },
 {
@@ -278,6 +311,9 @@
 "value_cr": 23.117,
 "name": "Shreeji Shipping Global Limited",
 "listed": "2025-08-26",
+"industry": "Services",
+"sector_index": "NIFTY SERVICES SECTOR",
+"sector_tag": "leading",
 "age_months": 14
 },
 {
@@ -300,6 +336,9 @@
 "value_cr": 123.0065,
 "name": "Aequs Limited",
 "listed": "2025-12-10",
+"industry": "Capital Goods",
+"sector_index": "NIFTY INFRASTRUCTURE",
+"sector_tag": "mixed",
 "age_months": 11
 },
 {
@@ -322,6 +361,9 @@
 "value_cr": 75.1885,
 "name": "SEDEMAC Mechatronics Limited",
 "listed": "2026-03-11",
+"industry": "Automobile and Auto Components",
+"sector_index": "NIFTY AUTO",
+"sector_tag": "weak",
 "age_months": 8
 },
 {
@@ -344,6 +386,9 @@
 "value_cr": 13.9158,
 "name": "Innova Captab Limited",
 "listed": "2023-12-29",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 34
 },
 {
@@ -366,6 +411,9 @@
 "value_cr": 51.836,
 "name": "OnEMI Technology Solutions Limited",
 "listed": "2026-05-08",
+"industry": "Financial Services",
+"sector_index": "NIFTY FINANCIAL SERVICES",
+"sector_tag": "mixed",
 "age_months": 6
 },
 {
@@ -388,6 +436,9 @@
 "value_cr": 52.1477,
 "name": "Entero Healthcare Solutions Limited",
 "listed": "2024-02-16",
+"industry": "Consumer Services",
+"sector_index": "NIFTY INDIA CONSUMPTION",
+"sector_tag": "weak",
 "age_months": 32
 },
 {
@@ -410,6 +461,9 @@
 "value_cr": 39.2058,
 "name": "Baazar Style Retail Limited",
 "listed": "2024-09-06",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 26
 },
 {
@@ -432,6 +486,9 @@
 "value_cr": 12.7982,
 "name": "KRN Heat Exchanger and Refrigeration Limited",
 "listed": "2024-10-03",
+"industry": "Capital Goods",
+"sector_index": "NIFTY INFRASTRUCTURE",
+"sector_tag": "mixed",
 "age_months": 25
 },
 {
@@ -454,6 +511,9 @@
 "value_cr": 80.6107,
 "name": "Anthem Biosciences Limited",
 "listed": "2025-07-21",
+"industry": "Healthcare",
+"sector_index": "NIFTY PHARMA",
+"sector_tag": "leading",
 "age_months": 15
 },
 {
@@ -476,6 +536,9 @@
 "value_cr": 14.5488,
 "name": "Amir Chand Jagdish Kumar (Exports) Limited",
 "listed": "2026-04-02",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 7
 },
 {
@@ -498,6 +561,9 @@
 "value_cr": 2.1892,
 "name": "Gaudium IVF and Women Health Limited",
 "listed": "2026-02-27",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 8
 },
 {
@@ -520,6 +586,9 @@
 "value_cr": 78.7215,
 "name": "Aegis Vopak Terminals Limited",
 "listed": "2025-06-02",
+"industry": "Oil Gas & Consumable Fuels",
+"sector_index": "NIFTY ENERGY",
+"sector_tag": "weak",
 "age_months": 17
 },
 {
@@ -542,6 +611,9 @@
 "value_cr": 148.2159,
 "name": "Azad Engineering Limited",
 "listed": "2023-12-28",
+"industry": "Capital Goods",
+"sector_index": "NIFTY INFRASTRUCTURE",
+"sector_tag": "mixed",
 "age_months": 34
 },
 {
@@ -564,6 +636,9 @@
 "value_cr": 38.6009,
 "name": "Aadhar Housing Finance Limited",
 "listed": "2024-05-15",
+"industry": "Financial Services",
+"sector_index": "NIFTY FINANCIAL SERVICES",
+"sector_tag": "mixed",
 "age_months": 30
 },
 {
@@ -586,6 +661,9 @@
 "value_cr": 19.7677,
 "name": "Standard Engineering Technology Limited",
 "listed": "2025-01-13",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 22
 },
 {
@@ -608,6 +686,9 @@
 "value_cr": 28.6695,
 "name": "GNG Electronics Limited",
 "listed": "2025-07-30",
+"industry": "Information Technology",
+"sector_index": "NIFTY IT",
+"sector_tag": "leading",
 "age_months": 15
 },
 {
@@ -630,6 +711,9 @@
 "value_cr": 11.5437,
 "name": "Nephrocare Health Services Limited",
 "listed": "2025-12-17",
+"industry": "Healthcare",
+"sector_index": "NIFTY PHARMA",
+"sector_tag": "leading",
 "age_months": 10
 },
 {
@@ -652,6 +736,9 @@
 "value_cr": 13.6754,
 "name": "Amagi Media Labs Limited",
 "listed": "2026-01-21",
+"industry": "Information Technology",
+"sector_index": "NIFTY IT",
+"sector_tag": "leading",
 "age_months": 9
 },
 {
@@ -674,6 +761,9 @@
 "value_cr": 175.8281,
 "name": "Piramal Finance Limited",
 "listed": "2025-11-07",
+"industry": "Financial Services",
+"sector_index": "NIFTY FINANCIAL SERVICES",
+"sector_tag": "mixed",
 "age_months": 12
 },
 {
@@ -696,6 +786,9 @@
 "value_cr": 48.6992,
 "name": "DEE Development Engineers Limited",
 "listed": "2024-06-26",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 28
 },
 {
@@ -718,6 +811,9 @@
 "value_cr": 8.7212,
 "name": "Rashi Peripherals Limited",
 "listed": "2024-02-14",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 33
 },
 {
@@ -740,6 +836,9 @@
 "value_cr": 27.8304,
 "name": "Clean Max Enviro Energy Solutions Limited",
 "listed": "2026-03-02",
+"industry": "Power",
+"sector_index": "NIFTY ENERGY",
+"sector_tag": "weak",
 "age_months": 8
 },
 {
@@ -762,6 +861,9 @@
 "value_cr": 17.3581,
 "name": "Senores Pharmaceuticals Limited",
 "listed": "2024-12-30",
+"industry": "Healthcare",
+"sector_index": "NIFTY PHARMA",
+"sector_tag": "leading",
 "age_months": 22
 },
 {
@@ -784,6 +886,9 @@
 "value_cr": 67.4102,
 "name": "Emmvee Photovoltaic Power Limited",
 "listed": "2025-11-18",
+"industry": "Capital Goods",
+"sector_index": "NIFTY INFRASTRUCTURE",
+"sector_tag": "mixed",
 "age_months": 11
 },
 {
@@ -791,7 +896,7 @@
 "signal_date": "2026-04-15",
 "date": "2026-04-16",
 "entry": 1124.0732,
-"ath": 1081.0606,
+"ath": 1081.0605,
 "ath_date": "2025-09-30",
 "base_days": 130,
 "depth": -0.45,
@@ -806,6 +911,9 @@
 "value_cr": 115.6984,
 "name": "Quality Power Electrical Equipments Limited",
 "listed": "2025-02-24",
+"industry": "Capital Goods",
+"sector_index": "NIFTY INFRASTRUCTURE",
+"sector_tag": "mixed",
 "age_months": 20
 },
 {
@@ -828,6 +936,9 @@
 "value_cr": 9.0635,
 "name": "Fujiyama Power Systems Limited",
 "listed": "2025-11-20",
+"industry": "Capital Goods",
+"sector_index": "NIFTY INFRASTRUCTURE",
+"sector_tag": "mixed",
 "age_months": 11
 },
 {
@@ -835,13 +946,13 @@
 "signal_date": "2026-04-09",
 "date": "2026-04-10",
 "entry": 3227.0717,
-"ath": 3146.2719,
+"ath": 3146.2717,
 "ath_date": "2026-02-25",
 "base_days": 26,
 "depth": -0.1574,
 "status": "exited",
 "exit_date": "2026-06-08",
-"exit_price": 3192.5841,
+"exit_price": 3192.5838,
 "close": 2706.8999,
 "ret": -0.0107,
 "peak": 0.0805,
@@ -850,6 +961,9 @@
 "value_cr": 157.8287,
 "name": "ICICI Prudential Asset Management Company Limited",
 "listed": "2025-12-19",
+"industry": "Financial Services",
+"sector_index": "NIFTY FINANCIAL SERVICES",
+"sector_tag": "mixed",
 "age_months": 10
 },
 {
@@ -872,6 +986,9 @@
 "value_cr": 7.8533,
 "name": "KSH International Limited",
 "listed": "2025-12-23",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 10
 },
 {
@@ -894,6 +1011,9 @@
 "value_cr": 77.5096,
 "name": "Sai Life Sciences Limited",
 "listed": "2024-12-18",
+"industry": "Healthcare",
+"sector_index": "NIFTY PHARMA",
+"sector_tag": "leading",
 "age_months": 22
 },
 {
@@ -901,7 +1021,7 @@
 "signal_date": "2026-02-13",
 "date": "2026-02-16",
 "entry": 1306.7153,
-"ath": 1288.3028,
+"ath": 1288.3029,
 "ath_date": "2024-07-04",
 "base_days": 401,
 "depth": -0.4164,
@@ -916,6 +1036,9 @@
 "value_cr": 9.0738,
 "name": "Happy Forgings Limited",
 "listed": "2023-12-27",
+"industry": "Capital Goods",
+"sector_index": "NIFTY INFRASTRUCTURE",
+"sector_tag": "mixed",
 "age_months": 34
 },
 {
@@ -938,6 +1061,9 @@
 "value_cr": 86.1164,
 "name": "Belrise Industries Limited",
 "listed": "2025-05-28",
+"industry": "Automobile and Auto Components",
+"sector_index": "NIFTY AUTO",
+"sector_tag": "weak",
 "age_months": 17
 },
 {
@@ -960,6 +1086,9 @@
 "value_cr": 16.8333,
 "name": "Rubicon Research Limited",
 "listed": "2025-10-16",
+"industry": "Healthcare",
+"sector_index": "NIFTY PHARMA",
+"sector_tag": "leading",
 "age_months": 13
 },
 {
@@ -982,6 +1111,9 @@
 "value_cr": 21.2733,
 "name": "Ivalue Infosolutions Limited",
 "listed": "2025-09-25",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 13
 },
 {
@@ -1004,6 +1136,9 @@
 "value_cr": 47.3132,
 "name": "Interarch Building Solutions Limited",
 "listed": "2024-08-26",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 26
 },
 {
@@ -1026,6 +1161,9 @@
 "value_cr": 50.4901,
 "name": "M & B Engineering Limited",
 "listed": "2025-08-06",
+"industry": null,
+"sector_index": null,
+"sector_tag": null,
 "age_months": 15
 }
 ]
