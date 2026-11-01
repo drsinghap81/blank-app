@@ -628,7 +628,8 @@ async function loadATH() {
     el.innerHTML = '<p class="muted pad">Loading…</p>';
     const [d, live, ipo] = await Promise.all([getJSON(MAIN + 'data/scan/ath.json', 'ath'), getJSON(REPO + 'live/data/live/ath_live.json', 'ath_live'),
       getJSON(MAIN + 'data/scan/ipo.json', 'ipo')]);
-    state.ath = { d, live, ipo, tab: 'brk', q: '', all: false };
+    const sec = await getJSON(MAIN + 'data/scan/sectors.json', 'sectors');
+    state.ath = { d, live, ipo, sec, tab: 'brk', q: '', all: false };
   }
   const { d } = state.ath;
   if (!d) { el.innerHTML = '<p class="empty">The monthly all-time-high scan appears after its first evening run. Try again later.</p>'; $('#asof').textContent = ''; return; }
@@ -656,6 +657,7 @@ async function loadATH() {
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
         ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>
+      ${sectorStrip()}
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="athq" type="search" placeholder="Search symbol or company" value="${esc(state.ath.q)}" autocomplete="off"></label>
       <ul class="list flat" id="athlist"></ul></div>`;
@@ -682,7 +684,7 @@ function ipoItem(r) {
     right = `<b>${fmt(r.close, 2, 'en-IN')}</b>` + (r.entry ? `<span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>` : `<span class="muted">high ${fmt(r.ath, 2, 'en-IN')}</span>`);
   }
   if (r.status !== 'exit next open') { const z = sizeATH(r.kind === 'near' ? r.ath : (r.entry || r.close), r.sma10, cap('NSE')); if (z && z.sh) chip += `<span class="chip">${z.sh.toLocaleString('en-IN')} sh</span>`; }
-  chip += `<span class="chip">listed ${r.age_months} mo ago</span>`;
+  chip += secChip(r) + `<span class="chip">listed ${r.age_months} mo ago</span>`;
   return { chip, right };
 }
 function ipoSelect(r) {
@@ -698,6 +700,7 @@ function ipoSelect(r) {
   const f = [['High since listing', `${fmt(r.ath, 2, 'en-IN')} (${day(r.ath_date)})`], ['Cup depth', pct(r.depth * 100)], ['Cup length', `${r.base_days} trading days`],
     ['Listed', `${day(r.listed)} (${r.age_months} months ago)`], ['10-week SMA', fmt(r.sma10, 2, 'en-IN')], ['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]];
   if (!near && r.entry) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}`], ['Best since entry', pct(r.peak * 100)]);
+  const sf = secFact(r); if (sf) f.push(sf);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}${plan}
     <div class="seg-row"><div class="seg small" id="ipotf"><button data-tf="d" aria-selected="true">Daily</button><button data-tf="w" aria-selected="false">Weekly + 10 SMA</button></div></div>
@@ -742,6 +745,21 @@ function athRows() {
   if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); }
   return L;
 }
+const secName = (k) => ({ 'NIFTY IT': 'IT', 'NIFTY FMCG': 'FMCG', 'NIFTY INDIA CONSUMPTION': 'Consumption', 'NIFTY SERVICES SECTOR': 'Services', 'NIFTY FINANCIAL SERVICES': 'Financials' }[k]
+  || k.replace('NIFTY ', '').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()));
+const SECTOR_TXT = { leading: 'Sector leading', uptrend: 'Sector uptrend', mixed: 'Sector mixed', weak: 'Sector weak' };
+const secChip = (r) => (r.sector_tag ? `<span class="chip ${r.sector_tag === 'leading' ? 'new' : r.sector_tag === 'weak' ? 'exit' : r.sector_tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.sector_tag]}</span>` : '');
+function secFact(r) {
+  const S = state.ath && state.ath.sec; if (!r.sector_index || !S || !S.indices[r.sector_index]) return null;
+  const x = S.indices[r.sector_index];
+  return [`Sector (${esc(r.industry || '')})`, `${esc(secName(r.sector_index))}: ${SECTOR_TXT[x.tag]} · ${pct(x.vs_market_3m)} vs Nifty 500 in 3 m`];
+}
+function sectorStrip() {
+  const S = state.ath && state.ath.sec; if (!S || !S.indices) return '';
+  const names = [...new Set(Object.values(S.industries || {}))].filter((k) => S.indices[k]);
+  const by = (t) => names.filter((k) => S.indices[k].tag === t).sort((a, b) => S.indices[b].vs_market_3m - S.indices[a].vs_market_3m).map(secName);
+  return `<p class="note small-note"><b>Sectors ${day(S.asof)}:</b> leading — ${by('leading').join(', ') || 'none'}; weak — ${by('weak').join(', ') || 'none'}. The tag on each stock is its sector: up-trending sectors raised the breakout win rate (54% vs 40%; weak sectors 31%) but not the average return — use it for confidence and size, not as a filter.</p>`;
+}
 const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` : `${m}-mo base`);
 function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
@@ -771,6 +789,7 @@ function athList() {
       if (z && z.sh) chip += `<span class="chip">${z.sh.toLocaleString('en-IN')} sh</span>`;
       if (r.add_status === 'armed' && r.status === 'open') chip += '<span class="chip open">Add armed</span>';
     }
+    chip += secChip(r);
     if (r.size) chip += `<span class="chip">${esc(r.size)}</span>`;
     return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
       <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
@@ -793,6 +812,7 @@ function athSelect(r) {
     ['Deepest fall in the base', pct((r.depth || 0) * 100)], ['30-week SMA', fmt(r.sma30, 2, 'en-IN')]];
   if (!near) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}`], ['Best since entry', pct(r.peak * 100)], ['Weeks', r.weeks]);
   f.push(['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]);
+  const sf = secFact(r); if (sf) f.push(sf);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}
     ${planATH(r, near)}

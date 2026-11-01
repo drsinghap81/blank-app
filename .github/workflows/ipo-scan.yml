@@ -25,6 +25,7 @@ jobs:
         run: |
           pip install -q yfinance pandas requests
           mkdir -p data/scan
+          python tools/sector_state.py > /dev/null 2>&1 || true
           python tools/ipo_scan.py > /tmp/ipo_log.txt 2>&1 || true
           grep -v -i "warn\|delisted\|failed download\|^\[" /tmp/ipo_log.txt | tail -30
       - name: Commit results

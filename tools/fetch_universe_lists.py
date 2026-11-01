@@ -8,7 +8,9 @@ s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple
                   "Referer": "https://www.nseindia.com/"})
 lists = {"nifty500": "ind_nifty500list.csv", "nifty50": "ind_nifty50list.csv",
          "niftynext50": "ind_niftynext50list.csv", "niftymidcap150": "ind_niftymidcap150list.csv",
-         "niftysmallcap250": "ind_niftysmallcap250list.csv"}
+         "niftysmallcap250": "ind_niftysmallcap250list.csv",
+         # wider lists: used for sector tags (industry per stock) on the ATH / IPO scans
+         "niftytotalmarket": "ind_niftytotalmarket_list.csv", "niftymicrocap250": "ind_niftymicrocap250_list.csv"}
 for name, fn in lists.items():
     for url in (f"https://nsearchives.nseindia.com/content/indices/{fn}",
                 f"https://archives.nseindia.com/content/indices/{fn}",

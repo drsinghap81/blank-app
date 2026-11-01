@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-11-01 · IPO ATH cup tab v40"
+APP_BUILD = "2026-11-01 · sector tags on ATH and IPO lists v41"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2011,6 +2011,38 @@ TREND_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data",
 ATH_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan", "ath.json")
 
 
+SECTOR_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan", "sectors.json")
+SECTOR_TAG_HELP = ("Sector tag = the stock's sector index: leading (above a rising 30-week SMA and beating Nifty 500 over 3 months), "
+                   "uptrend (above a rising 30-week SMA), mixed (beating Nifty 500 but not in an uptrend), weak (neither). "
+                   "Backtest 2017–26: ATH breakouts won 54% of the time in up-trending sectors vs 40% otherwise, and 31% in weak sectors, "
+                   "but average returns were not higher (some of the biggest winners lead before their sector turns) — a guide for "
+                   "confidence and size, not a filter. Blank = no industry label (only Nifty 500 / midcap / smallcap index members have one).")
+
+
+def render_sector_strip(key: str = "ath") -> None:
+    import json as _json
+    try:
+        with open(SECTOR_PATH, encoding="utf-8") as f:
+            sd = _json.load(f)
+    except Exception:  # noqa: BLE001
+        return
+    ix = sd.get("indices") or {}
+    used = sorted(set((sd.get("industries") or {}).values()) | {"NIFTY BANK", "NIFTY PSU BANK", "NIFTY PSE", "NIFTY INDIA DEFENCE"})
+    _nm = {"NIFTY IT": "IT", "NIFTY FMCG": "FMCG", "NIFTY INDIA CONSUMPTION": "Consumption", "NIFTY SERVICES SECTOR": "Services",
+           "NIFTY FINANCIAL SERVICES": "Financials", "NIFTY PSU BANK": "PSU Bank", "NIFTY PSE": "PSE"}
+    rows = [dict(sector=_nm.get(k, k.replace("NIFTY ", "").title()), tag=ix[k]["tag"], vs_nifty500_3m=round(ix[k]["vs_market_3m"] or 0, 1),
+                 ret_3m=round(ix[k]["ret_3m"] or 0, 1), from_high=round(ix[k]["from_high"] or 0, 1)) for k in used if k in ix]
+    if not rows:
+        return
+    order = {"leading": 0, "uptrend": 1, "mixed": 2, "weak": 3}
+    df_ = pd.DataFrame(rows).sort_values(["tag", "vs_nifty500_3m"], key=lambda c: c.map(order) if c.name == "tag" else -c)
+    lead = ", ".join(df_[df_.tag == "leading"].sector) or "none"
+    weak = ", ".join(df_[df_.tag == "weak"].sector) or "none"
+    with st.expander(f"Sectors ({sd.get('asof')}): leading — {lead}; weak — {weak}"):
+        st.caption(SECTOR_TAG_HELP)
+        st.dataframe(df_, hide_index=True, width="stretch", key=f"sectors_{key}")
+
+
 def render_ath_tab() -> None:
     """Monthly all-time-high momentum system (NSE): breakouts, near-trigger list, tracked signals, monthly/weekly chart."""
     import json as _json
@@ -2031,15 +2063,16 @@ def render_ath_tab() -> None:
     c[1].metric("Within 5% of trigger", len(N))
     c[2].metric("Signals still running", int((T.status == "open").sum()) if len(T) else 0)
     c[3].metric("Sell next open", int((T.status == "exit next open").sum()) if len(T) else 0)
+    render_sector_strip()
     which = st.radio("List", ["Breakouts", "Near trigger", "Tracked signals"], horizontal=True, key="ath_list")
     df = {"Breakouts": B, "Near trigger": N, "Tracked signals": T}[which]
     if not len(df):
         st.info("Nothing in this list right now.")
         return
-    cols = {"Breakouts": ["symbol", "name", "date", "entry", "close", "ret", "base_months", "ath_month", "sma30", "size"],
-            "Near trigger": ["symbol", "name", "close", "trigger", "gap_pct", "base_months", "ath_month", "sma30", "size"],
-            "Tracked signals": ["symbol", "name", "status", "date", "entry", "close", "ret", "peak", "weeks", "base_months",
-                                "exit_date", "size"]}[which]
+    cols = {"Breakouts": ["symbol", "name", "sector_tag", "date", "entry", "close", "ret", "base_months", "ath_month", "sma30", "size", "industry"],
+            "Near trigger": ["symbol", "name", "sector_tag", "close", "trigger", "gap_pct", "base_months", "ath_month", "sma30", "size", "industry"],
+            "Tracked signals": ["symbol", "name", "status", "sector_tag", "date", "entry", "close", "ret", "peak", "weeks", "base_months",
+                                "exit_date", "size", "industry"]}[which]
     cc1, cc2 = st.columns([3, 1])
     capital = cc1.number_input("Your capital (₹) — sizes every row: risk % of capital to the 30-week SMA, max 20% per stock",
                                min_value=10_000, value=int(st.session_state.get("ath_cap", 2_000_000)), step=50_000, key="ath_cap")
@@ -2136,14 +2169,15 @@ def render_ipo_tab() -> None:
     c[1].metric("Within 5% of post-listing high", len(N))
     c[2].metric("Signals still running", int((T.status == "open").sum()) if len(T) else 0)
     c[3].metric("Sell next open", int((T.status == "exit next open").sum()) if len(T) else 0)
+    render_sector_strip("ipo")
     which = st.radio("List", ["Breakouts", "Near high", "Tracked signals"], horizontal=True, key="ipo_list")
     df = {"Breakouts": B, "Near high": N, "Tracked signals": T}[which]
     if not len(df):
         st.info("Nothing in this list right now.")
         return
-    cols = {"Breakouts": ["symbol", "name", "status", "signal_date", "entry", "close", "ret", "ath", "depth", "base_days", "age_months", "sma10"],
-            "Near high": ["symbol", "name", "close", "ath", "gap_pct", "depth", "base_days", "age_months", "sma10"],
-            "Tracked signals": ["symbol", "name", "status", "date", "entry", "close", "ret", "peak", "weeks", "exit_date", "age_months"]}[which]
+    cols = {"Breakouts": ["symbol", "name", "status", "sector_tag", "signal_date", "entry", "close", "ret", "ath", "depth", "base_days", "age_months", "sma10"],
+            "Near high": ["symbol", "name", "sector_tag", "close", "ath", "gap_pct", "depth", "base_days", "age_months", "sma10"],
+            "Tracked signals": ["symbol", "name", "status", "sector_tag", "date", "entry", "close", "ret", "peak", "weeks", "exit_date", "age_months"]}[which]
     cc1, cc2 = st.columns([3, 1])
     capital = cc1.number_input("Your capital (₹) — risk % of capital to the 10-week SMA, max 20% per stock",
                                min_value=10_000, value=int(st.session_state.get("ipo_cap", 2_000_000)), step=50_000, key="ipo_cap")

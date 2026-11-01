@@ -13,6 +13,8 @@ Lists written to data/scan/ath.json:
   breakouts : triggered this month or last month, still open
   near      : within 5% below the trigger, base >= 12 months, above the 30-week SMA
   tracked   : every signal of the last 18 months followed with the exit rule (open / exit next open / exited)
+Sector tag (data/scan/sectors.json from tools/sector_state.py): leading / uptrend / mixed / weak for the stock's sector index;
+  backtest: breakouts in up-trending sectors won 54% vs 40%, 'weak' sectors 31%, but average returns were not higher -> a tag only.
 Charts: data/scan/ath_charts/SYM.json (monthly bars, full history; weekly bars, last 5 years, with the 30-week SMA).
 """
 import json
@@ -217,10 +219,18 @@ def main():
     size = pd.cut(rk, [0, 100, 250, 500, 1e9], labels=["Large", "Mid", "Small", "Micro"]).astype(str).to_dict()
     E = pd.DataFrame(events)
     N = pd.DataFrame(near)
+    try:
+        from sector_state import tag_for
+        sec = json.load(open(f"{OUT}/sectors.json"))
+    except Exception:  # noqa: BLE001
+        sec = None
     for df in (E, N):
         if len(df):
             df["name"] = df.symbol.map(name).fillna("")
             df["size"] = df.symbol.map(size)
+            if sec:
+                t = [tag_for(s_, sec) for s_ in df.symbol]
+                df["industry"], df["sector_index"], df["sector_tag"] = [x[0] for x in t], [x[1] for x in t], [x[2] for x in t]
     cur = pd.Timestamp(today).to_period("M")
     if len(E):
         E["date"] = pd.to_datetime(E.date)

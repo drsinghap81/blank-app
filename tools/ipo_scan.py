@@ -196,10 +196,18 @@ def main():
         print(a + len(chunk), "done;", len(events), "signals,", len(near), "near", flush=True)
         time.sleep(1)
     E = pd.DataFrame(events); N = pd.DataFrame(near)
+    try:
+        from sector_state import tag_for
+        sec = json.load(open(f"{OUT}/sectors.json"))
+    except Exception:  # noqa: BLE001
+        sec = None
     for df in (E, N):
         if len(df):
             df["name"] = df.symbol.map(name).fillna("")
             df["listed"] = df.symbol.map(listed)
+            if sec:
+                t = [tag_for(s_, sec) for s_ in df.symbol]
+                df["industry"], df["sector_index"], df["sector_tag"] = [x[0] for x in t], [x[1] for x in t], [x[2] for x in t]
             df["age_months"] = ((pd.Timestamp(today) - df.listed).dt.days / 30.44).round().astype(int)
     recent = pd.Timestamp(today) - pd.Timedelta(days=21)
     if len(E):
