@@ -626,8 +626,9 @@ async function loadATH() {
   const el = $('#view-ath');
   if (!state.ath) {
     el.innerHTML = '<p class="muted pad">Loading…</p>';
-    const [d, live] = await Promise.all([getJSON(MAIN + 'data/scan/ath.json', 'ath'), getJSON(REPO + 'live/data/live/ath_live.json', 'ath_live')]);
-    state.ath = { d, live, tab: 'brk', q: '', all: false };
+    const [d, live, ipo] = await Promise.all([getJSON(MAIN + 'data/scan/ath.json', 'ath'), getJSON(REPO + 'live/data/live/ath_live.json', 'ath_live'),
+      getJSON(MAIN + 'data/scan/ipo.json', 'ipo')]);
+    state.ath = { d, live, ipo, tab: 'brk', q: '', all: false };
   }
   const { d } = state.ath;
   if (!d) { el.innerHTML = '<p class="empty">The monthly all-time-high scan appears after its first evening run. Try again later.</p>'; $('#asof').textContent = ''; return; }
@@ -641,7 +642,8 @@ async function loadATH() {
   const exits = T.filter((r) => r.status === 'exit next open').length;
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
-  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length]];
+  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
+    ['ipo', 'IPO cups', ipoRows(true).length]];
   el.innerHTML = `
     <section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
@@ -652,7 +654,8 @@ async function loadATH() {
       <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
       <p class="note small-note">${{ brk: 'Price went above the high of the all-time-high closing month this month or last, and the trade is still open. Bold rows have a base of 2 years or more (the tested system); the rest 1–2 years.',
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
-        tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.' }[state.ath.tab]}</p>
+        tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
+        ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="athq" type="search" placeholder="Search symbol or company" value="${esc(state.ath.q)}" autocomplete="off"></label>
       <ul class="list flat" id="athlist"></ul></div>`;
@@ -660,8 +663,80 @@ async function loadATH() {
   $('#athq').addEventListener('input', (e) => { state.ath.q = e.target.value; athList(); });
   athList();
 }
+function ipoRows(countOnly) {
+  const p = state.ath && state.ath.ipo; if (!p) return [];
+  const live = (p.tracked || []).filter((r) => r.status !== 'exited').map((r) => ({ ...r, kind: 'sig' }));
+  const L = live.concat((p.near || []).map((r) => ({ ...r, kind: 'near' })));
+  if (countOnly) return L;
+  const q = (state.ath.q || '').toLowerCase();
+  return q ? L.filter((r) => r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)) : L;
+}
+function ipoItem(r) {
+  let chip, right;
+  if (r.kind === 'near') {
+    chip = `<span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to the high</span><span class="chip">cup ${pct(r.depth * 100)}</span>`;
+    right = `<b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">high ${fmt(r.ath, 2, 'en-IN')}</span>`;
+  } else {
+    const st = r.status === 'buy next open' ? '<span class="chip new">Buy next open</span>' : r.status === 'exit next open' ? '<span class="chip exit">Sell next open</span>' : `<span class="chip open">Since ${day(r.date)}</span>`;
+    chip = `${st}<span class="chip">cup ${pct(r.depth * 100)}</span>`;
+    right = `<b>${fmt(r.close, 2, 'en-IN')}</b>` + (r.entry ? `<span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>` : `<span class="muted">high ${fmt(r.ath, 2, 'en-IN')}</span>`);
+  }
+  if (r.status !== 'exit next open') { const z = sizeATH(r.kind === 'near' ? r.ath : (r.entry || r.close), r.sma10, cap('NSE')); if (z && z.sh) chip += `<span class="chip">${z.sh.toLocaleString('en-IN')} sh</span>`; }
+  chip += `<span class="chip">listed ${r.age_months} mo ago</span>`;
+  return { chip, right };
+}
+function ipoSelect(r) {
+  const near = r.kind === 'near';
+  const st = near ? `<div class="status info">Cup in place. A daily close above ${fmt(r.ath, 2, 'en-IN')} (the high since listing, ${fmt(r.gap_pct, 1, 'en-IN')}% away) is the signal; buy at the next open.</div>`
+    : r.status === 'buy next open' ? `<div class="status open">Closed above its post-listing high ${fmt(r.ath, 2, 'en-IN')} on ${day(r.signal_date)}. Buy at the next open.</div>`
+      : r.status === 'exit next open' ? '<div class="status exit">Weekly close below the 10-week SMA. Sell at the next open.</div>'
+        : `<div class="status open">Bought ${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}. Hold while the weekly close stays above the 10-week SMA, now ${fmt(r.sma10, 2, 'en-IN')}.</div>`;
+  const E = near ? r.ath : (r.entry || r.close); const z = sizeATH(E, r.sma10, cap('NSE'));
+  const plan = z && z.sh && r.status !== 'exit next open' ? `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput('NSE', 'capipo')}${riskInput('ath', 'riskipo')}</div>
+    <p><b>${near ? 'Buy-stop' : 'Buy'} ${z.sh.toLocaleString('en-IN')} shares</b> at about ${fmt(E, 2, 'en-IN')} = ${money(z.val, 'NSE')} (${fmt(z.pctCap, 1, 'en-IN')}% of capital).</p>
+    <p class="muted">${riskPct('ath')}% of capital at risk to the 10-week SMA (${fmt(r.sma10, 2, 'en-IN')}, ${fmt(z.dist, 1, 'en-IN')}% below), max 20% in one stock. Same risk setting as the ATH system.</p></div>` : '';
+  const f = [['High since listing', `${fmt(r.ath, 2, 'en-IN')} (${day(r.ath_date)})`], ['Cup depth', pct(r.depth * 100)], ['Cup length', `${r.base_days} trading days`],
+    ['Listed', `${day(r.listed)} (${r.age_months} months ago)`], ['10-week SMA', fmt(r.sma10, 2, 'en-IN')], ['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]];
+  if (!near && r.entry) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}`], ['Best since entry', pct(r.peak * 100)]);
+  openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
+    ${st}${plan}
+    <div class="seg-row"><div class="seg small" id="ipotf"><button data-tf="d" aria-selected="true">Daily</button><button data-tf="w" aria-selected="false">Weekly + 10 SMA</button></div></div>
+    <div class="chart" id="ipoc"></div>
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    <div class="links"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent('NSE:' + r.symbol)}" target="_blank" rel="noopener">Open in TradingView</a>
+      <a href="https://www.screener.in/company/${encodeURIComponent(r.symbol)}/" target="_blank" rel="noopener">Fundamentals on Screener</a></div>`);
+  $('#ipotf').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    $('#ipotf').querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', x === b)); drawIPO(r, b.dataset.tf);
+  }));
+  const redo = () => ipoSelect(r);
+  if ($('#capipo')) { wireCap('capipo', 'NSE', redo); wireRisk('riskipo', 'ath', redo); }
+  drawIPO(r, 'd');
+}
+const ipoCache = {};
+async function drawIPO(r, tf) {
+  const box = $('#ipoc'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
+  let c = ipoCache[r.symbol];
+  if (!c) {
+    try { const res = await fetch(MAIN + `data/scan/ipo_charts/${encodeURIComponent(r.symbol)}.json`); if (!res.ok) throw 0; c = ipoCache[r.symbol] = await res.json(); }
+    catch (e) { box.innerHTML = '<p class="muted pad">Chart data is not available for this stock yet.</p>'; return; }
+  }
+  box.innerHTML = '';
+  const b = c[tf]; const T = b.t;
+  const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
+  const s = priceSeries(ch, T.map((t, i) => ({ time: t, open: b.o[i], high: b.h[i], low: b.l[i], close: b.c[i] })), 'ath');
+  s.createPriceLine({ price: r.ath ?? c.ath, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'high since listing' });
+  if (tf === 'w') {
+    const l = ch.addLineSeries({ color: C.e21, lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    l.setData(T.map((t, i) => (b.sma[i] == null ? { time: t } : { time: t, value: b.sma[i] })));
+  }
+  const when = r.signal_date || null;
+  if (when) { const key = T.find((t) => t >= when); if (key) s.setMarkers([{ time: key, position: 'belowBar', color: C.saffron, shape: 'arrowUp', text: 'breakout' }]); }
+  ch.timeScale().fitContent();
+  new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
+}
 function athRows() {
   const { d, tab, q } = state.ath;
+  if (tab === 'ipo') return ipoRows();
   let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : (d.tracked || []);
   if (tab === 'brk') L = L.slice().sort((a, b) => (b.main - a.main) || (a.date < b.date ? 1 : -1));
   if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); }
@@ -672,6 +747,11 @@ function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   $('#athlist').innerHTML = (L.length ? L.map((r, i) => {
     let chip, right;
+    if (tab === 'ipo') {
+      ({ chip, right } = ipoItem(r));
+      return `<li class="row ${r.status === 'buy next open' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
+        <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
+    }
     if (tab === 'near') {
       chip = `<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to go</span>`;
       const L = (state.ath.lp || {})[r.symbol];
@@ -694,11 +774,11 @@ function athList() {
     if (r.size) chip += `<span class="chip">${esc(r.size)}</span>`;
     return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
       <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
-  }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.' }[tab]}</li>`)
+  }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.', ipo: state.ath.ipo ? 'No running IPO signals and nothing near its post-listing high.' : 'The first IPO scan runs tonight after 20:45 IST.' }[tab]}</li>`)
     + (all.length > L.length ? `<li><button class="more" id="athmore">Show all ${all.length}</button></li>` : '');
   const m = $('#athmore'); if (m) m.addEventListener('click', () => { state.ath.all = true; athList(); });
   $('#athlist').querySelectorAll('.row').forEach((el) => {
-    const open = () => athSelect(L[+el.dataset.i]);
+    const open = () => (tab === 'ipo' ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
     el.addEventListener('click', open);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   });

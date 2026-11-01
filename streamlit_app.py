@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-10-31 · Nifty ratio tab replaces OI alerts, payoff chart v39"
+APP_BUILD = "2026-11-01 · IPO ATH cup tab v40"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2109,6 +2109,90 @@ def render_ath_tab() -> None:
         fig.update_layout(height=470, margin=dict(l=10, r=10, t=10, b=10), xaxis_rangeslider_visible=False, showlegend=False,
                           xaxis_range=[t[max(0, n - (140 if tf == "Monthly" else 156))], t[-1]])
         st.plotly_chart(fig, width="stretch")
+
+
+IPO_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan", "ipo.json")
+
+
+def render_ipo_tab() -> None:
+    """IPO all-time-high cup: NSE mainboard IPOs listed in the last 3 years closing above their post-listing high."""
+    import json as _json
+    try:
+        with open(IPO_PATH, encoding="utf-8") as f:
+            d = _json.load(f)
+    except Exception:  # noqa: BLE001
+        st.info("The IPO scan appears after its first evening run (20:45 IST on trading days).")
+        return
+    st.markdown(f"#### 🚀 IPO ATH cup — NSE close {d.get('asof')}")
+    st.caption("IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after that high is at "
+               "least 20 trading days old and the stock has closed 15%+ below it (the cup). Buy at the next open; sell at the next "
+               "open after a weekly close below the 10-week SMA. ≥ ₹2 cr/day, price ≥ ₹100. Backtest 2017–Oct 2026 (every NSE IPO "
+               "since 2016, incl. delisted, 10 stocks): ~12%/yr, worst fall −27% (Nifty 11.2%, −38%). Weaker than the monthly ATH "
+               "system — use it as a small add-on for stocks too young for the 2-year base. Tracked signals are the scanner following "
+               "its own signals, not your trades.")
+    T = pd.DataFrame(d.get("tracked") or []); B = pd.DataFrame(d.get("breakouts") or []); N = pd.DataFrame(d.get("near") or [])
+    c = st.columns(4)
+    c[0].metric("Buy next open", int((T.status == "buy next open").sum()) if len(T) else 0)
+    c[1].metric("Within 5% of post-listing high", len(N))
+    c[2].metric("Signals still running", int((T.status == "open").sum()) if len(T) else 0)
+    c[3].metric("Sell next open", int((T.status == "exit next open").sum()) if len(T) else 0)
+    which = st.radio("List", ["Breakouts", "Near high", "Tracked signals"], horizontal=True, key="ipo_list")
+    df = {"Breakouts": B, "Near high": N, "Tracked signals": T}[which]
+    if not len(df):
+        st.info("Nothing in this list right now.")
+        return
+    cols = {"Breakouts": ["symbol", "name", "status", "signal_date", "entry", "close", "ret", "ath", "depth", "base_days", "age_months", "sma10"],
+            "Near high": ["symbol", "name", "close", "ath", "gap_pct", "depth", "base_days", "age_months", "sma10"],
+            "Tracked signals": ["symbol", "name", "status", "date", "entry", "close", "ret", "peak", "weeks", "exit_date", "age_months"]}[which]
+    cc1, cc2 = st.columns([3, 1])
+    capital = cc1.number_input("Your capital (₹) — risk % of capital to the 10-week SMA, max 20% per stock",
+                               min_value=10_000, value=int(st.session_state.get("ipo_cap", 2_000_000)), step=50_000, key="ipo_cap")
+    risk_ = cc2.number_input("Risk per trade (%)", min_value=0.25, max_value=3.0, value=float(st.session_state.get("ipo_risk", 1.0)),
+                             step=0.25, key="ipo_risk") / 100
+    df = df.copy()
+    px = df["ath"] if which == "Near high" else df["entry"].fillna(df["close"])
+
+    def _size(e, sma):
+        if not e or not sma or not np.isfinite(e) or not np.isfinite(sma) or e <= sma:
+            return 0
+        return max(0, int(min(risk_ * capital * e / (e - sma), 0.2 * capital) // e))
+    df["shares"] = [_size(e, s_) if (which != "Tracked signals" or st_ != "exited") else 0
+                    for e, s_, st_ in zip(px, df.get("sma10", pd.Series([np.nan] * len(df))), df.get("status", pd.Series([""] * len(df))))]
+    df["value_₹"] = (df["shares"] * px).round(0)
+    cols = cols[:2] + ["shares", "value_₹"] + cols[2:]
+    show = df[[k for k in cols if k in df]].copy()
+    for k in ("ret", "peak", "depth"):
+        if k in show:
+            show[k] = (show[k] * 100).round(1)
+    left, right = st.columns([2, 3])
+    with left:
+        st.dataframe(show, hide_index=True, width="stretch", height=460)
+        st.download_button("Download CSV", show.to_csv(index=False).encode(), f"ipo_cup_{which.replace(' ', '_').lower()}_{d.get('asof')}.csv")
+    with right:
+        sym = st.selectbox("Chart", list(df.symbol), key="ipo_sym")
+        tf = st.radio("Timeframe", ["Daily since listing", "Weekly + 10-week SMA"], horizontal=True, key="ipo_tf")
+        r = df[df.symbol == sym].iloc[0]
+        if r.get("shares", 0):
+            st.markdown(f"**{'Buy-stop' if which == 'Near high' else 'Buy'} {int(r.shares):,} shares** at about "
+                        f"{float(px[df.symbol == sym].iloc[0]):,.2f} = ₹{float(r['value_₹']):,.0f}; exit on a weekly close below the "
+                        f"10-week SMA (now {float(r.sma10):,.2f}).")
+        try:
+            with open(_os.path.join(_os.path.dirname(IPO_PATH), "ipo_charts", f"{sym}.json"), encoding="utf-8") as f:
+                ch = _json.load(f)
+        except Exception:  # noqa: BLE001
+            st.info("No chart data for this stock yet.")
+            return
+        b = ch["d" if tf.startswith("Daily") else "w"]
+        fig = go.Figure(go.Candlestick(x=b["t"], open=b["o"], high=b["h"], low=b["l"], close=b["c"], name=sym,
+                                       increasing_line_color="#0E9F6E", decreasing_line_color="#D64545"))
+        if not tf.startswith("Daily"):
+            fig.add_scatter(x=b["t"], y=b["sma"], mode="lines", line=dict(color="#3B6FE0", width=2), name="10-week SMA")
+        lvl = r.get("ath") if pd.notna(r.get("ath", np.nan)) else ch.get("ath")
+        if lvl:
+            fig.add_hline(y=float(lvl), line_color="#E8A33D", line_width=2,
+                          annotation_text=f"post-listing high {float(lvl):,.2f}", annotation_position="top left")
+        fig.update_layout(height=470, margin=dict(l=10, r=10, t=10, b=10), xaxis_rangeslider_visible=False, showlegend=False)
+        st.plotly_chart(fig, width="stretch", key="ipo_chart")
 
 
 @st.cache_data(ttl=1800, show_spinner=False)
@@ -2351,8 +2435,8 @@ def main() -> None:
 
     render_header(market)
 
-    tab_trend, tab_ath, tab_tb, tab_ratio, tab_scan, tab1, tab_bt, tab2, tab3, tab_oi = st.tabs(
-        ["📈 Trend scan", "🏔️ Monthly ATH", "🔁 Top Bottom", "🦋 Nifty ratio", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
+    tab_trend, tab_ath, tab_ipo, tab_tb, tab_ratio, tab_scan, tab1, tab_bt, tab2, tab3, tab_oi = st.tabs(
+        ["📈 Trend scan", "🏔️ Monthly ATH", "🚀 IPO cups", "🔁 Top Bottom", "🦋 Nifty ratio", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
          "🧾 Paper orders", "💼 Portfolio", "🗄️ OI alerts (archived)"])
     with tab1:
         render_analysis_tab(market, ticker)
@@ -2362,6 +2446,8 @@ def main() -> None:
         render_trend_scan_tab(market)
     with tab_ath:
         render_ath_tab()
+    with tab_ipo:
+        render_ipo_tab()
     with tab_oi:
         render_oi_alerts_tab()
     with tab_bt:
