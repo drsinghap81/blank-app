@@ -4,7 +4,8 @@ System (backtest 2017 - Oct 2026 on every NSE IPO since 2016, incl. delisted; 10
   setup   : the stock's all-time high SINCE LISTING (highest intraday high) was set at least 20 trading days ago and the
             stock has since closed at least 15% below it (the cup)
   signal  : a daily CLOSE above that all-time high (yesterday's close was at or below it) -> buy at the next open
-  filters : listed <= 36 months ago, last close >= Rs 100, >= Rs 2 cr/day traded (20-day average)
+  filters : listed <= 36 months ago with >= Rs 30 cr traded on the listing day (true IPOs, not SME/BSE migrations),
+            last close >= Rs 100, >= Rs 2 cr/day traded (20-day average)
   exit    : weekly CLOSE below the 10-week SMA -> sell at the next open
   results : IPOs listed <= 3 years, price >= 100: ~12%/yr, worst fall -27% (Nifty 11.2%, -38%); all IPO ages 14-16%, -24 to -30%.
             Buying every IPO at the listing-day close: median -2% after 12 months. Listing-PRICE cross: whipsaws (win 36%).
@@ -36,7 +37,9 @@ MAX_AGE_M = 36          # listed within the last 3 years
 BASE_DAYS = 20          # post-listing high at least 20 trading days old
 DEPTH = 0.15            # cup at least 15% deep (closing basis)
 NEAR = 0.05
-SMA_W = 10              # exit: weekly close below the 10-week SMA
+SMA_W = 10
+MIN_FIRST_DAY = 3e8     # listing-day turnover >= Rs 30 cr: true IPOs (the backtest filter); SME/BSE migrations and most
+                        # demerger listings trade far less on their first NSE day              # exit: weekly close below the 10-week SMA
 
 
 def clean(o):
@@ -180,6 +183,8 @@ def main():
                 if not len(x) or x.index.max() < pd.Timestamp(today) - pd.Timedelta(days=10):
                     continue
                 x = x[x.index >= listed[sym] - pd.Timedelta(days=3)]
+                if not len(x) or float(x.Close.iloc[0] * x.Volume.iloc[0]) < MIN_FIRST_DAY:
+                    continue
                 ev, nr, ch = analyse(sym, x, today)
             except Exception as e:  # noqa: BLE001
                 print("fail", sym, e); continue
@@ -216,7 +221,7 @@ def main():
             json.dump(clean(ch), open(f"{CH}/{s_}.json", "w"), separators=(",", ":"), allow_nan=False)
     out = dict(asof=str(today), generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(tick),
                rules=dict(max_age_months=MAX_AGE_M, base_days=BASE_DAYS, depth_pct=DEPTH * 100, near_pct=NEAR * 100,
-                          min_value_cr=MINVAL / 1e7, min_close=MIN_CLOSE, exit_sma_weeks=SMA_W),
+                          min_value_cr=MINVAL / 1e7, min_close=MIN_CLOSE, exit_sma_weeks=SMA_W, min_listing_day_cr=MIN_FIRST_DAY / 1e7),
                breakouts=clean(brk.to_dict("records")) if len(brk) else [],
                near=clean(N.to_dict("records")) if len(N) else [],
                tracked=clean(E.to_dict("records")) if len(E) else [])
