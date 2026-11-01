@@ -242,7 +242,7 @@ def main():
         brk = E
     if len(N):
         N = N.sort_values("gap_pct")
-    keep = set(E.symbol) | set(N.symbol) if len(E) or len(N) else set()
+    keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set())
     for f in os.listdir(CH):
         if f[:-5] not in keep:
             os.remove(os.path.join(CH, f))
