@@ -1,12 +1,9 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-LOTUSDEV,2026-10-30,245.98,60.8,234.86,234.6,4.9,0,0.0,Sri Lotus Developers and Realty Limited,watch,159.0,0.89,80,46.3,245.98,60.8
-ETERNAL,2026-10-30,343.65,62.2,325.52,323.8,6.1,0,0.0,ETERNAL LIMITED,watch,129.2,0.84,70,914.46,343.65,62.2
-RATNAVEER,2026-10-29,352.85,61.5,334.25,330.75,6.7,1,2.1,Ratnaveer Precision Engineering Limited,trend,162.0,0.87,98,146.18,360.25,64.1
-DIVISLAB,2026-10-29,9664.0,61.9,9295.54,9067.0,6.6,1,1.2,Divi's Laboratories Limited,watch,144.2,0.87,80,571.35,9780.0,64.4
-GLOBAL,2026-10-29,144.3,64.2,139.79,140.85,2.4,1,-0.4,Global Education Limited,watch,129.7,0.71,93,1.95,143.74,62.6
-PNB,2026-10-29,123.9,63.9,118.78,119.42,3.8,1,-0.8,Punjab National Bank,watch,128.2,0.81,85,246.12,122.85,60.8
-TFCILTD,2026-10-28,156.94,61.9,150.15,145.25,8.0,2,0.6,Tourism Finance Corporation of India Limited,trend,170.0,0.91,98,190.33,157.92,61.6
-KINGFA,2026-10-27,6820.5,62.2,6499.33,6231.0,9.5,3,-0.5,Kingfa Science & Technology (India) Limited,watch,128.2,0.75,88,7.39,6783.0,59.3
-SHREEJISPG,2026-10-26,811.5,61.4,785.12,762.05,6.5,4,3.9,Shreeji Shipping Global Limited,trend,170.8,0.96,90,97.23,843.3,66.4
-MANOMAY,2026-10-26,246.32,61.5,239.45,233.91,5.3,4,0.6,Manomay Tex India Limited,trend,147.1,0.88,93,7.07,247.79,61.9
-COFORGE,2026-10-26,1993.0,64.1,1889.32,1812.2,10.0,4,2.6,Coforge Limited,watch,132.1,0.84,73,536.46,2045.0,66.7
+LOTUSDEV,2026-10-30,245.98,60.8,234.86,234.6,4.9,1,0.8,Sri Lotus Developers and Realty Limited,watch,158.8,0.89,80,48.38,248.03,61.9
+ETERNAL,2026-10-30,343.65,62.2,325.52,323.8,6.1,1,0.1,ETERNAL LIMITED,watch,129.1,0.83,70,900.57,344.0,62.4
+RATNAVEER,2026-10-29,352.85,61.5,334.25,330.75,6.7,2,7.5,Ratnaveer Precision Engineering Limited,trend,154.2,0.88,98,142.69,379.2,69.8
+DIVISLAB,2026-10-29,9664.0,61.9,9295.54,9067.0,6.6,2,2.9,Divi's Laboratories Limited,watch,142.5,0.87,80,590.6,9945.5,67.6
+GLOBAL,2026-10-29,144.3,64.2,139.79,140.85,2.4,2,1.0,Global Education Limited,watch,132.2,0.73,93,1.6,145.7,65.7
+MBAPL,2026-10-29,174.0,61.8,165.58,159.62,9.0,2,6.8,Madhya Bharat Agro Products Limited,watch,129.5,0.82,70,15.48,185.83,71.4
+TFCILTD,2026-10-28,156.94,61.9,150.15,145.25,8.0,3,0.6,Tourism Finance Corporation of India Limited,trend,170.0,0.91,98,196.71,157.96,61.6
+KINGFA,2026-10-27,6820.5,62.2,6499.33,6231.0,9.5,4,-2.0,Kingfa Science & Technology (India) Limited,watch,129.4,0.76,88,7.03,6687.0,55.5
