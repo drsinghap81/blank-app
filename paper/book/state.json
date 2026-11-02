@@ -1,5 +1,5 @@
 {
-"cash": 1014409.5285043953,
+"cash": 861912.2769947894,
 "pos": {
 "ath:KOTAKBANK:2026-10-29": {
 "engine": "ATH",
@@ -8,8 +8,8 @@
 "sh": 325,
 "avg": 459.0573,
 "cost": 149604.18469991718,
-"last": 459.0,
-"stop_note": "weekly close < 30-wk SMA (397.6852)",
+"last": 458.35,
+"stop_note": "weekly close < 30-wk SMA (401.1591)",
 "added": false
 },
 "921:ADANIPORTS:2026-10-29": {
@@ -63,6 +63,17 @@
 "checked": "2026-10-30",
 "sell_next": false,
 "stop_note": "stop 2769.8, then Supertrend red"
+},
+"ath:ZYDUSLIFE:2026-10-30": {
+"engine": "ATH",
+"symbol": "ZYDUSLIFE",
+"date": "2026-10-30",
+"sh": 123,
+"avg": 1236.4126,
+"cost": 152497.2515096059,
+"last": 1240.5,
+"stop_note": "weekly close < 30-wk SMA (1089.803)",
+"added": false
 }
 },
 "done": [
