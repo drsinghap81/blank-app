@@ -1,5 +1,5 @@
 {
-"cash": 861912.2769947894,
+"cash": 295965.53635678935,
 "pos": {
 "ath:KOTAKBANK:2026-10-29": {
 "engine": "ATH",
@@ -8,7 +8,7 @@
 "sh": 325,
 "avg": 459.0573,
 "cost": 149604.18469991718,
-"last": 458.35,
+"last": 464.65,
 "stop_note": "weekly close < 30-wk SMA (401.1591)",
 "added": false
 },
@@ -19,9 +19,9 @@
 "sh": 109,
 "avg": 1871.0,
 "cost": 204500.21463562502,
-"last": 1850.0,
+"last": 1866.9000244140625,
 "stop": 1687.9,
-"checked": "2026-10-30",
+"checked": "2026-11-03",
 "sell_next": false,
 "stop_note": "stop 1687.9, then Supertrend red"
 },
@@ -32,9 +32,9 @@
 "sh": 291,
 "avg": 683.7,
 "cost": 199504.20396881254,
-"last": 678.2000122070312,
+"last": 671.0499877929688,
 "stop": 615.2,
-"checked": "2026-10-30",
+"checked": "2026-11-03",
 "sell_next": false,
 "stop_note": "stop 615.2, then Supertrend red"
 },
@@ -45,9 +45,9 @@
 "sh": 94,
 "avg": 2205.0,
 "cost": 207840.38113125,
-"last": 2165.10009765625,
+"last": 2152.800048828125,
 "stop": 1994.1,
-"checked": "2026-10-30",
+"checked": "2026-11-03",
 "sell_next": false,
 "stop_note": "stop 1994.1, then Supertrend red"
 },
@@ -58,9 +58,9 @@
 "sh": 66,
 "avg": 3070.0,
 "cost": 203177.5849125,
-"last": 3095.89990234375,
+"last": 3158.89990234375,
 "stop": 2769.8,
-"checked": "2026-10-30",
+"checked": "2026-11-03",
 "sell_next": false,
 "stop_note": "stop 2769.8, then Supertrend red"
 },
@@ -71,12 +71,52 @@
 "sh": 123,
 "avg": 1236.4126,
 "cost": 152497.2515096059,
-"last": 1240.5,
+"last": 1240.6,
 "stop_note": "weekly close < 30-wk SMA (1089.803)",
 "added": false
+},
+"921:PETRONET:2026-11-02": {
+"engine": "9/21",
+"symbol": "PETRONET",
+"date": "2026-11-02",
+"sh": 955,
+"avg": 303.9,
+"cost": 291023.1615459375,
+"last": 303.0,
+"stop": 283.25,
+"checked": "2026-11-03",
+"sell_next": false,
+"stop_note": "stop 283.25, then Supertrend red"
+},
+"921:STEELCAS:2026-11-02": {
+"engine": "9/21",
+"symbol": "STEELCAS",
+"date": "2026-11-02",
+"sh": 621,
+"avg": 363.0,
+"cost": 226043.335918125,
+"last": 369.1499938964844,
+"stop": 331.3,
+"checked": "2026-11-03",
+"sell_next": false,
+"stop_note": "stop 331.3, then Supertrend red"
+},
+"921:SANGAMIND:2026-11-02": {
+"engine": "9/21",
+"symbol": "SANGAMIND",
+"date": "2026-11-02",
+"sh": 78,
+"avg": 624.95,
+"cost": 48880.24317393751,
+"last": 623.5999755859375,
+"stop": 578.15,
+"checked": "2026-11-03",
+"sell_next": false,
+"stop_note": "stop 578.15, then Supertrend red"
 }
 },
 "done": [
+"921:BIL:2026-11-02",
 "921:RPGLIFE:2026-10-29"
 ],
 "trades": [
