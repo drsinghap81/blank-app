@@ -1,9 +1,11 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-LOTUSDEV,2026-10-30,245.98,60.8,234.86,234.6,4.9,1,0.8,Sri Lotus Developers and Realty Limited,watch,158.8,0.89,80,48.38,248.03,61.9
-ETERNAL,2026-10-30,343.65,62.2,325.52,323.8,6.1,1,0.1,ETERNAL LIMITED,watch,129.1,0.83,70,900.57,344.0,62.4
-RATNAVEER,2026-10-29,352.85,61.5,334.25,330.75,6.7,2,7.5,Ratnaveer Precision Engineering Limited,trend,154.2,0.88,98,142.69,379.2,69.8
-DIVISLAB,2026-10-29,9664.0,61.9,9295.54,9067.0,6.6,2,2.9,Divi's Laboratories Limited,watch,142.5,0.87,80,590.6,9945.5,67.6
-GLOBAL,2026-10-29,144.3,64.2,139.79,140.85,2.4,2,1.0,Global Education Limited,watch,132.2,0.73,93,1.6,145.7,65.7
-MBAPL,2026-10-29,174.0,61.8,165.58,159.62,9.0,2,6.8,Madhya Bharat Agro Products Limited,watch,129.5,0.82,70,15.48,185.83,71.4
-TFCILTD,2026-10-28,156.94,61.9,150.15,145.25,8.0,3,0.6,Tourism Finance Corporation of India Limited,trend,170.0,0.91,98,196.71,157.96,61.6
-KINGFA,2026-10-27,6820.5,62.2,6499.33,6231.0,9.5,4,-2.0,Kingfa Science & Technology (India) Limited,watch,129.4,0.76,88,7.03,6687.0,55.5
+PANACHE,2026-11-03,646.55,60.1,626.65,633.9,2.0,0,0.0,Panache Digilife Limited,trend,162.5,0.91,88,1.56,646.55,60.1
+GLAND,2026-11-03,3158.9,63.0,3007.93,3035.0,4.1,0,0.0,Gland Pharma Limited,trend,144.9,0.87,88,122.11,3158.9,63.0
+LOTUSDEV,2026-10-30,245.98,60.8,234.86,234.6,4.9,2,-1.7,Sri Lotus Developers and Realty Limited,watch,160.0,0.9,80,47.63,241.84,56.6
+SAILIFE,2026-10-30,1557.5,62.9,1478.59,1461.0,6.6,2,0.0,Sai Life Sciences Limited,watch,127.9,0.8,73,71.58,1558.2,61.9
+ETERNAL,2026-10-30,343.65,62.2,325.52,323.8,6.1,2,1.7,ETERNAL LIMITED,watch,127.0,0.83,70,886.84,349.45,65.0
+RATNAVEER,2026-10-29,352.85,61.5,334.25,330.75,6.7,3,7.5,Ratnaveer Precision Engineering Limited,trend,156.4,0.88,98,147.93,379.4,69.8
+DIVISLAB,2026-10-29,9664.0,61.9,9295.54,9067.0,6.6,3,4.1,Divi's Laboratories Limited,watch,142.6,0.88,80,599.27,10064.0,69.7
+GLOBAL,2026-10-29,144.3,64.2,139.79,140.85,2.4,3,-1.3,Global Education Limited,watch,135.6,0.75,95,1.47,142.44,57.1
+MBAPL,2026-10-29,174.0,61.8,165.58,159.62,9.0,3,5.8,Madhya Bharat Agro Products Limited,watch,133.5,0.82,70,15.99,184.03,68.5
+TFCILTD,2026-10-28,156.94,61.9,150.15,145.25,8.0,4,3.2,Tourism Finance Corporation of India Limited,trend,168.6,0.91,98,202.87,161.89,65.7
