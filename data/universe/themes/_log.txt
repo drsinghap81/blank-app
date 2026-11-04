@@ -1,0 +1,52 @@
+index pages found: 56
+ok NIFTY AI CATALYSTS: 48 from https://www.niftyindices.com/IndexConstituent/ind_niftyAICatalystslist.csv
+ok NIFTY INDIA CORPORATE GROUP INDEX - ADITYA BIRLA GROUP: 13 from https://www.niftyindices.com/IndexConstituent/ind_nifty_adityabirlalist.csv
+ok NIFTY CAPITAL MARKETS: 17 from https://www.niftyindices.com/IndexConstituent/ind_niftyCapitalMarkets_list.csv
+ok NIFTY COMMODITIES: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftycommoditieslist.csv
+ok NIFTY CONGLOMERATE 50: 50 from https://www.niftyindices.com/IndexConstituent/ind_niftyConglomerate50_list.csv
+ok NIFTY CORE HOUSING: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftyCoreHousing_list.csv
+ok NIFTY CPSE: 11 from https://www.niftyindices.com/IndexConstituent/ind_niftycpselist.csv
+ok NIFTY ENERGY: 40 from https://www.niftyindices.com/IndexConstituent/ind_niftyenergylist.csv
+MISSING NIFTY EV & NEW AGE AUTOMOTIVE
+ok NIFTY HOUSING: 50 from https://www.niftyindices.com/IndexConstituent/ind_niftyhousing_list.csv
+MISSING NIFTY100 ESG
+MISSING NIFTY100 ENHANCED ESG
+MISSING NIFTY100 ESG SECTOR LEADERS
+ok NIFTY INDIA CONSUMPTION: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftyconsumptionlist.csv
+ok NIFTY INDIA DEFENCE: 22 from https://www.niftyindices.com/IndexConstituent/ind_niftyindiadefence_list.csv
+ok NIFTY INDIA DEFENCE EQUAL WEIGHT: 22 from https://www.niftyindices.com/IndexConstituent/ind_niftyIndiaDefenceEqualWeight_list.csv
+ok NIFTY INDIA DIGITAL: 50 from https://www.niftyindices.com/IndexConstituent/ind_niftyindiadigital_list.csv
+MISSING NIFTY INDIA INFRASTRUCTURE & LOGISTICS
+ok NIFTY INDIA INTERNET: 23 from https://www.niftyindices.com/IndexConstituent/ind_niftyIndiaInternet_list.csv
+ok NIFTY INDIA MANUFACTURING: 77 from https://www.niftyindices.com/IndexConstituent/ind_niftyindiamanufacturing_list.csv
+ok NIFTY INDIA NEW AGE CONSUMPTION: 75 from https://www.niftyindices.com/IndexConstituent/ind_niftyIndiaNewAgeConsumption_list.csv
+ok NIFTY INDIA RAILWAYS PSU: 17 from https://www.niftyindices.com/IndexConstituent/ind_niftyIndiaRailwaysPSU_list.csv
+ok NIFTY INDIA TOURISM: 11 from https://www.niftyindices.com/IndexConstituent/ind_niftyindiatourism_list.csv
+ok NIFTY INDIA SELECT 5 CORPORATE GROUPS (MAATR): 40 from https://www.niftyindices.com/IndexConstituent/ind_niftyIndiaSelect5CorporateGroupsMAATR_list.csv
+ok NIFTY INFRASTRUCTURE: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftyinfralist.csv
+ok NIFTY INDIA CORPORATE GROUP INDEX - MAHINDRA GROUP: 9 from https://www.niftyindices.com/IndexConstituent/ind_nifty_mahindralist.csv
+ok NIFTY IPO: 122 from https://www.niftyindices.com/IndexConstituent/ind_niftyIPO_list.csv
+ok NIFTY MIDCAP LIQUID 15: 15 from https://www.niftyindices.com/IndexConstituent/ind_Nifty_Midcap_Liquid15.csv
+ok NIFTY MIDSMALL INDIA CONSUMPTION: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftymidsmallindiaconsumption_list.csv
+ok NIFTY MNC: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftymnclist.csv
+ok NIFTY MOBILITY: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftymobility_list.csv
+ok NIFTY PSE: 20 from https://www.niftyindices.com/IndexConstituent/ind_niftypselist.csv
+MISSING NIFTY REITS & INVITS
+ok NIFTY REITS & INVITS 90:10: 15 from https://www.niftyindices.com/IndexConstituent/ind_niftyreitsinvits9010list.csv
+ok NIFTY RURAL: 75 from https://www.niftyindices.com/IndexConstituent/ind_niftyrural_list.csv
+ok NIFTY NON-CYCLICAL CONSUMER: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftynon-cyclicalconsumer_list.csv
+ok NIFTY SERVICES SECTOR: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftyservicelist.csv
+MISSING NIFTY SHARIAH 25
+MISSING NIFTY SMALL FINANCE BANKS & MICROFINANCE INSTITUTIONS
+ok NIFTY SUGAR & ETHANOL: 17 from https://www.niftyindices.com/IndexConstituent/ind_niftysugarethanol_list.csv
+ok NIFTY INDIA CORPORATE GROUP INDEX - TATA GROUP: 23 from https://www.niftyindices.com/IndexConstituent/ind_nifty_tatalist.csv
+ok NIFTY INDIA CORPORATE GROUP INDEX - TATA GROUP 25% CAP: 10 from https://www.niftyindices.com/IndexConstituent/ind_nifty_tata25caplist.csv
+MISSING NIFTY TRANSPORTATION & LOGISTICS
+ok NIFTY100 LIQUID 15: 15 from https://www.niftyindices.com/IndexConstituent/ind_Nifty100_Liquid15.csv
+MISSING NIFTY50 SHARIAH
+MISSING NIFTY500 SHARIAH
+ok NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20: 75 from https://www.niftyindices.com/IndexConstituent/ind_nifty500MulticapIndiaManufacturing503020_list.csv
+ok NIFTY500 MULTICAP INFRASTRUCTURE 50:30:20: 75 from https://www.niftyindices.com/IndexConstituent/ind_nifty500MulticapInfrastructure503020_list.csv
+ok NIFTY500 AHIMSA: 336 from https://www.niftyindices.com/IndexConstituent/ind_nifty500Ahimsa_list.csv
+ok NIFTY SME EMERGE: 537 from https://www.niftyindices.com/IndexConstituent/ind_niftysmelist.csv
+ok NIFTY WAVES: 43 from https://www.niftyindices.com/IndexConstituent/ind_niftyWaves_list.csv
