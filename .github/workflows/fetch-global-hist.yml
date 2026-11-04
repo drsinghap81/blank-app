@@ -1,0 +1,31 @@
+name: fetch-global-hist
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {mkt: US, sh: 0, ns: 6}
+          - {mkt: US, sh: 1, ns: 6}
+          - {mkt: US, sh: 2, ns: 6}
+          - {mkt: US, sh: 3, ns: 6}
+          - {mkt: US, sh: 4, ns: 6}
+          - {mkt: US, sh: 5, ns: 6}
+          - {mkt: ASX, sh: 0, ns: 1}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: |
+          pip install -q yfinance pandas pyarrow requests lxml
+          python tools/fetch_global_hist.py ${{ matrix.mkt }} ${{ matrix.sh }} ${{ matrix.ns }} 2>&1 | grep -v -i "warn\|delisted\|failed download\|possibly" | tail -40
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          B=ghist-${{ matrix.mkt }}-${{ matrix.sh }}
+          git checkout --orphan $B; git rm -rq --cached . ; git add -f hist; git commit -qm "$B"; git push -f origin $B
