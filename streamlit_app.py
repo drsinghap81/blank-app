@@ -2128,7 +2128,7 @@ def render_topdown_tab() -> None:
     _mk_pick("td_mk")
     w, sd, ad, idd = _load(WORLD_PATH), _load(_mk_path("sectors.json")), _load(_mk_path("ath.json")), _load(_mk_path("ipo.json"))
     ix = sd.get("indices") or {}
-    st.markdown("#### 🧭 Top-down: world → India → sectors → themes → stocks")
+    st.markdown(f"#### 🧭 Top-down: world → {dict(NSE='India', US='US', ASX='Australia')[_CUR_MK['m']]} → sectors → themes → stocks")
     st.caption(TD_HELP)
     # 1 world
     wi = w.get("indices") or {}
@@ -2162,7 +2162,7 @@ def render_topdown_tab() -> None:
         return R.sort_values("rs_6m_vs_nifty50", ascending=False, na_position="last") if len(R) else R
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("**3 · Sectors** (by 6-month RS vs Nifty 50)")
+        st.markdown(f"**3 · Sectors** (by 6-month RS vs {dict(NSE='Nifty 50', US='S&P 500', ASX='ASX 200')[_CUR_MK['m']]})")
         st.dataframe(_tab(used), hide_index=True, width="stretch", key="td_sec")
     with c2:
         st.markdown("**4 · Themes**")
