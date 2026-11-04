@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-11-05 · top-down tab v44"
+APP_BUILD = "2026-11-05 · US/ASX market switch v45"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2008,6 +2008,31 @@ def render_oi_alerts_tab() -> None:
 TREND_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan", "trend_scan.json")
 
 
+_SCAN = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan")
+_CUR_MK = {"m": "NSE"}
+_MK_DIR = {"NSE": "", "US": "us", "ASX": "asx"}
+_MK_WATCH = {
+    "US": "**Watch only.** Backtested 2008–26 with the India rules on US stocks: the monthly-ATH system made 1–3% a year (worst fall "
+          "about −30%) while the S&P 500 made 9–13%; IPO cups 2–4%; none of the top-down levels improved it. Lists are for ideas.",
+    "ASX": "**Watch only.** Backtested 2008–26 with the India rules: with the A$30 price floor only ~2 signals a year. With an A$1 floor "
+           "the ATH system made 4–5% a year, worst fall −16% (ASX 200 2–5% price, ~6–9% with dividends); IPO cups ~1%; top-down levels "
+           "did not help. Lists are for ideas."}
+
+
+def _mk_path(name: str) -> str:
+    return _os.path.join(_SCAN, _MK_DIR[_CUR_MK["m"]], name)
+
+
+def _mk_pick(key: str) -> str:
+    """India / US / Australia switch for the ATH, IPO and Top-down tabs."""
+    lab = {"India": "NSE", "US": "US", "Australia": "ASX"}
+    m = lab[st.radio("Market", list(lab), horizontal=True, key=key, label_visibility="collapsed")]
+    _CUR_MK["m"] = m
+    if m != "NSE":
+        st.warning(_MK_WATCH[m])
+    return m
+
+
 ATH_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan", "ath.json")
 
 
@@ -2025,14 +2050,15 @@ SECTOR_TAG_HELP = ("Sector tag = the stock's sector index: leading (above a risi
 def render_sector_strip(key: str = "ath") -> None:
     import json as _json
     try:
-        with open(SECTOR_PATH, encoding="utf-8") as f:
+        with open(_mk_path("sectors.json"), encoding="utf-8") as f:
             sd = _json.load(f)
     except Exception:  # noqa: BLE001
         return
     ix = sd.get("indices") or {}
-    used = sorted(set((sd.get("industries") or {}).values()) | {"NIFTY BANK", "NIFTY PSU BANK", "NIFTY PSE", "NIFTY INDIA DEFENCE"})
+    used = sd.get("sectors") or sorted(set((sd.get("industries") or {}).values()) | {"NIFTY BANK", "NIFTY PSU BANK", "NIFTY PSE", "NIFTY INDIA DEFENCE"})
     _nm = {"NIFTY IT": "IT", "NIFTY FMCG": "FMCG", "NIFTY INDIA CONSUMPTION": "Consumption", "NIFTY SERVICES SECTOR": "Services",
            "NIFTY FINANCIAL SERVICES": "Financials", "NIFTY PSU BANK": "PSU Bank", "NIFTY PSE": "PSE"}
+    _nm = {**_nm, **(sd.get("names") or {})}
     rows = [dict(sector=_nm.get(k, k.replace("NIFTY ", "").title()), tag=ix[k]["tag"], vs_nifty500_3m=round(ix[k]["vs_market_3m"] or 0, 1),
                  rs_6m_vs_nifty50=None if ix[k].get("rs_6m") is None else round(ix[k]["rs_6m"], 1),
                  rs_rising="yes" if ix[k].get("rs_6m_up") else "no",
@@ -2048,7 +2074,8 @@ def render_sector_strip(key: str = "ath") -> None:
         st.dataframe(df_, hide_index=True, width="stretch", key=f"sectors_{key}")
     th = [k for k in (sd.get("thematic") or []) if k in ix]
     if th:
-        T_ = pd.DataFrame([dict(theme=k.replace("NIFTY ", "").replace("INDIA CORPORATE GROUP INDEX - ", "").title().replace("Esg", "ESG").replace("Ipo", "IPO")
+        _tn = sd.get("names") or {}
+        T_ = pd.DataFrame([dict(theme=_tn.get(k) or k.replace("NIFTY ", "").replace("INDIA CORPORATE GROUP INDEX - ", "").title().replace("Esg", "ESG").replace("Ipo", "IPO")
                                 .replace("Ev ", "EV ").replace("Cpse", "CPSE").replace("Pse", "PSE").replace("Mnc", "MNC").replace("Sme", "SME").replace("Psu", "PSU")
                                 .replace("Reits & Invits", "REITs & InvITs").replace("(Maatr)", "(MAATR)"),
                                 tag=ix[k]["tag"], rs_6m_vs_nifty50=None if ix[k].get("rs_6m") is None else round(ix[k]["rs_6m"], 1),
@@ -2076,6 +2103,13 @@ TD_HELP = ("Top-down funnel. Score (0–3) = sector RS > 0 + best theme RS > 0 +
 
 
 def _td_name(k: str) -> str:
+    try:
+        import json as _j
+        _n = _j.load(open(_mk_path("sectors.json"), encoding="utf-8")).get("names") or {}
+        if k in _n:
+            return _n[k]
+    except Exception:  # noqa: BLE001
+        pass
     return (k.replace("NIFTY ", "").replace("INDIA CORPORATE GROUP INDEX - ", "").title().replace("Esg", "ESG").replace("Ipo", "IPO")
             .replace("Fmcg", "FMCG").replace("It", "IT").replace("Cpse", "CPSE").replace("Pse", "PSE").replace("Mnc", "MNC")
             .replace("Psu", "PSU").replace("Ev ", "EV ")) if k else ""
@@ -2091,7 +2125,8 @@ def render_topdown_tab() -> None:
                 return _json.load(f)
         except Exception:  # noqa: BLE001
             return {}
-    w, sd, ad, idd = _load(WORLD_PATH), _load(SECTOR_PATH), _load(ATH_PATH), _load(IPO_PATH)
+    _mk_pick("td_mk")
+    w, sd, ad, idd = _load(WORLD_PATH), _load(_mk_path("sectors.json")), _load(_mk_path("ath.json")), _load(_mk_path("ipo.json"))
     ix = sd.get("indices") or {}
     st.markdown("#### 🧭 Top-down: world → India → sectors → themes → stocks")
     st.caption(TD_HELP)
@@ -2108,15 +2143,16 @@ def render_topdown_tab() -> None:
     else:
         st.info("World indices appear after the evening top-down data run (20:10 IST).")
     # 2 India
-    ind = [k for k in ("NIFTY 50", "NIFTY 500", "NIFTY MIDCAP 150", "NIFTY SMALLCAP 250", "NIFTY MICROCAP 250", "NIFTY BANK") if k in ix]
+    _nmx = sd.get("names") or {}
+    ind = sd.get("broad") or [k for k in ("NIFTY 50", "NIFTY 500", "NIFTY MIDCAP 150", "NIFTY SMALLCAP 250", "NIFTY MICROCAP 250", "NIFTY BANK") if k in ix]
     if ind:
-        st.markdown(f"**2 · India broad ({sd.get('asof')})**")
+        st.markdown(f"**2 · {dict(NSE='India', US='US', ASX='Australia')[_CUR_MK['m']]} broad ({sd.get('asof')})**")
         st.dataframe(pd.DataFrame([dict(index=_td_name(k), tag=ix[k]["tag"], ret_3m=round(ix[k].get("ret_3m") or 0, 1),
                                         rs_6m_vs_nifty50=None if ix[k].get("rs_6m") is None else round(ix[k]["rs_6m"], 1),
                                         from_high=round(ix[k].get("from_high") or 0, 1)) for k in ind]),
                      hide_index=True, width="stretch", key="td_india")
     # 3/4 sectors + themes
-    used = sorted(set((sd.get("industries") or {}).values()))
+    used = sd.get("sectors") or sorted(set((sd.get("industries") or {}).values()))
     th = set(sd.get("thematic") or [])
     def _tab(keys):
         R = pd.DataFrame([dict(index=_td_name(k), tag=ix[k]["tag"], rs_6m_vs_nifty50=None if ix[k].get("rs_6m") is None else round(ix[k]["rs_6m"], 1),
@@ -2159,8 +2195,9 @@ def render_topdown_tab() -> None:
 def render_ath_tab() -> None:
     """Monthly all-time-high momentum system (NSE): breakouts, near-trigger list, tracked signals, monthly/weekly chart."""
     import json as _json
+    _mk_pick("ath_mk")
     try:
-        with open(ATH_PATH, encoding="utf-8") as f:
+        with open(_mk_path("ath.json"), encoding="utf-8") as f:
             d = _json.load(f)
     except Exception:  # noqa: BLE001
         st.info("The monthly all-time-high scan appears after its first evening run (20:30 IST on trading days).")
@@ -2237,7 +2274,7 @@ def render_ath_tab() -> None:
                 msg += " Add not armed yet (needs a week whose low comes within 3% of the 30-week SMA and closes above it)."
             st.markdown(msg)
         try:
-            with open(_os.path.join(_os.path.dirname(ATH_PATH), "ath_charts", f"{sym}.json"), encoding="utf-8") as f:
+            with open(_mk_path(_os.path.join("ath_charts", f"{sym}.json")), encoding="utf-8") as f:
                 ch = _json.load(f)
         except Exception:  # noqa: BLE001
             st.info("No chart data for this stock yet.")
@@ -2266,8 +2303,9 @@ IPO_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "
 def render_ipo_tab() -> None:
     """IPO all-time-high cup: NSE mainboard IPOs listed in the last 3 years closing above their post-listing high."""
     import json as _json
+    _mk_pick("ipo_mk")
     try:
-        with open(IPO_PATH, encoding="utf-8") as f:
+        with open(_mk_path("ipo.json"), encoding="utf-8") as f:
             d = _json.load(f)
     except Exception:  # noqa: BLE001
         st.info("The IPO scan appears after its first evening run (20:45 IST on trading days).")
@@ -2330,7 +2368,7 @@ def render_ipo_tab() -> None:
                         f"{float(px[df.symbol == sym].iloc[0]):,.2f} = ₹{float(r['value_₹']):,.0f}; exit on a weekly close below the "
                         f"10-week SMA (now {float(r.sma10):,.2f}).")
         try:
-            with open(_os.path.join(_os.path.dirname(IPO_PATH), "ipo_charts", f"{sym}.json"), encoding="utf-8") as f:
+            with open(_mk_path(_os.path.join("ipo_charts", f"{sym}.json")), encoding="utf-8") as f:
                 ch = _json.load(f)
         except Exception:  # noqa: BLE001
             st.info("No chart data for this stock yet.")

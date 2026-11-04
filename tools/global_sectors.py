@@ -43,8 +43,7 @@ US_THEMES = [
     (r"retail|department|clothing|apparel|shoe|catalog|specialty stores|consumer specialties", "XRT", "Retail"),
     (r"industrial machinery|electrical products|engineering|pollution control|metal fabrications|electric utilities", "PAVE", "Infrastructure"),
 ]
-US_BROAD = {"^GSPC": "S&P 500", "^NDX": "Nasdaq 100", "^DJI": "Dow Jones", "RSP": "S&P 500 equal weight", "MDY": "S&P MidCap 400",
-            "^RUT": "Russell 2000"}
+US_BROAD = {"^GSPC": "S&P 500", "^NDX": "Nasdaq 100", "^DJI": "Dow", "RSP": "S&P 500 EW", "MDY": "MidCap 400", "^RUT": "Russell 2000"}
 
 ASX_SECTORS = {"^AXFJ": "Financials", "^AXMJ": "Materials", "^AXEJ": "Energy", "^AXIJ": "Info Tech", "^AXHJ": "Health Care",
                "^AXNJ": "Industrials", "^AXDJ": "Consumer Discretionary", "^AXSJ": "Consumer Staples", "^AXPJ": "A-REIT",
@@ -57,8 +56,7 @@ ASX_GROUP = [  # GICS industry group text -> sector index
     (r"food|beverage|household|staples", "^AXSJ"), (r"real estate|reit", "^AXPJ"),
     (r"telecom|media", "^AXTJ"), (r"utilit", "^AXUJ")]
 ASX_THEMES = [("^AXGD", "Gold (All Ords)"), ("^AXMM", "Metals & mining")]  # context only (no stock map)
-ASX_BROAD = {"^AXJO": "S&P/ASX 200", "^AXKO": "S&P/ASX 300", "^AORD": "All Ordinaries", "^AXSO": "Small Ordinaries",
-             "^ATLI": "S&P/ASX 20"}
+ASX_BROAD = {"^ATLI": "ASX 20", "^AXJO": "ASX 200", "^AXKO": "ASX 300", "^AORD": "All Ords", "^AXSO": "Small Ords"}
 
 CFG = {"US": dict(bench="^GSPC", market="^GSPC", sectors=US_SECTORS, themes={t: n for _, t, n in US_THEMES}, broad=US_BROAD),
        "ASX": dict(bench="^AXJO", market="^AXJO", sectors=ASX_SECTORS, themes=dict(ASX_THEMES), broad=ASX_BROAD)}
