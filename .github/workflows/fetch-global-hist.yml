@@ -21,16 +21,17 @@ jobs:
           - {mkt: US, sh: 4, ns: 6}
           - {mkt: US, sh: 5, ns: 6}
           - {mkt: ASX, sh: 0, ns: 1}
-    if: ${{ github.event.inputs.only == 'all' || github.event.inputs.only == matrix.mkt }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - env: {MINCLOSE: "${{ github.event.inputs.minclose }}"}
         run: |
+          O="${{ github.event.inputs.only }}"; if [ "$O" != "all" ] && [ "$O" != "${{ matrix.mkt }}" ]; then mkdir -p hist; touch hist/skip; exit 0; fi
           pip install -q yfinance pandas pyarrow requests lxml
           python tools/fetch_global_hist.py ${{ matrix.mkt }} ${{ matrix.sh }} ${{ matrix.ns }} 2>&1 | grep -v -i "warn\|delisted\|failed download\|possibly" | tail -40
       - run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          [ -f hist/skip ] && exit 0
           B=ghist-${{ matrix.mkt }}-${{ matrix.sh }}-p${{ github.event.inputs.minclose }}
           git checkout --orphan $B; git rm -rq --cached . ; git add -f hist; git commit -qm "$B"; git push -f origin $B
