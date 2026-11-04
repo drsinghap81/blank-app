@@ -16,6 +16,7 @@ from global_sectors import fetch_meta, index_tickers  # noqa: E402
 
 MKT, SH, NS = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 MINVAL = {"US": 5e6, "ASX": 1e6}[MKT]
+MINCLOSE = float(os.environ.get("MINCLOSE", "30"))
 os.makedirs("hist", exist_ok=True)
 
 
@@ -40,7 +41,7 @@ def frames(dd, tickers, sym_of, keep_all=False):
             continue
         if not keep_all:
             v = (x.Close * x.Volume).rolling(20).mean()
-            if not ((x.Close >= 30) & (v >= MINVAL)).any():
+            if not ((x.Close >= MINCLOSE) & (v >= MINVAL)).any():
                 continue
         x = x.astype("float32"); x["SYMBOL"] = sym_of[t]; x.index.name = "Date"
         out.append(x.reset_index())
