@@ -31,16 +31,18 @@ SEC, BENCH = None, None
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-OUT = "data/scan"
+MARKET = (sys.argv[1] if len(sys.argv) > 1 else "NSE").upper()   # NSE (default), US, ASX (added 5 Nov 2026)
+OUT = "data/scan" if MARKET == "NSE" else f"data/scan/{MARKET.lower()}"
 CH = f"{OUT}/ipo_charts"
-MINVAL = 2e7            # Rs 2 cr/day
-MIN_CLOSE = 100.0       # no penny stocks
+MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6}[MARKET]            # Rs 2 cr / $5 m / A$1 m a day
+UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6}[MARKET]
+MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0}[MARKET]     # no penny stocks
 MAX_AGE_M = 36          # listed within the last 3 years
 BASE_DAYS = 20          # post-listing high at least 20 trading days old
 DEPTH = 0.15            # cup at least 15% deep (closing basis)
 NEAR = 0.05
 SMA_W = 10
-MIN_FIRST_DAY = 3e8     # listing-day turnover >= Rs 30 cr: true IPOs (the backtest filter); SME/BSE migrations and most
+MIN_FIRST_DAY = {"NSE": 3e8, "US": 2.5e7, "ASX": 5e6}[MARKET]  # listing-day turnover (Rs 30 cr / $25 m / A$5 m) >= Rs 30 cr: true IPOs (the backtest filter); SME/BSE migrations and most
                         # demerger listings trade far less on their first NSE day              # exit: weekly close below the 10-week SMA
 
 
@@ -116,7 +118,7 @@ def analyse(sym, x, today, lookback_days=380):
                                ret=((exit_px or last) / ref - 1) if entry else 0.0,
                                peak=float(c[entry_i:].max() / entry - 1) if entry else 0.0,
                                weeks=int(((exit_dt or x.index[-1]) - (entry_dt or sig_dt)).days / 7), sma10=sma_now,
-                               value_cr=float(val20[i]) / 1e7))
+                               value_cr=float(val20[i]) / UNIT))
         if status in ("open", "exit next open", "buy next open"):
             break
         i = int(np.searchsorted(x.index, exit_dt)) if exit_dt is not None else n   # one position at a time per stock
@@ -128,7 +130,7 @@ def analyse(sym, x, today, lookback_days=380):
         sma_now = float(W.sma.loc[last_complete]) if np.isfinite(W.sma.loc[last_complete]) else None
         near = dict(symbol=sym, ath=float(lvl), ath_date=x.index[hi_i], close=last, gap_pct=(lvl / last - 1) * 100,
                     base_days=int(n - 1 - hi_i), depth=float(c[hi_i:].min() / lvl - 1), sma10=sma_now,
-                    value_cr=float(val20[-1]) / 1e7)
+                    value_cr=float(val20[-1]) / UNIT)
     Wt = W.tail(160)
     chart = dict(d=dict(t=[str(t.date()) for t in x.index], o=np.round(o, 2).tolist(), h=np.round(h, 2).tolist(),
                         l=np.round(l, 2).tolist(), c=np.round(c, 2).tolist()),
@@ -136,6 +138,24 @@ def analyse(sym, x, today, lookback_days=380):
                         l=Wt.l.round(2).tolist(), c=Wt.c.round(2).tolist(), sma=Wt.sma.round(2).tolist()),
                  ath=float(lvl), ath_date=str(x.index[hi_i].date()), listed=str(x.index[0].date()))
     return events, near, chart
+
+
+def listings_global(today):
+    """US / ASX: candidates from data/universe/<mkt>_meta.csv (US IPO year, ASX listing date); the exact listing day is the
+    first Yahoo bar."""
+    m = pd.read_csv(f"data/universe/{MARKET.lower()}_meta.csv")
+    from global_universe import symbols
+    u = symbols(MARKET)
+    tk = dict(zip(u.symbol, u.ticker))
+    if MARKET == "US":
+        yr = pd.to_numeric(m.listed, errors="coerce")
+        m = m[yr >= today.year - MAX_AGE_M // 12]
+        m["listed"] = pd.NaT
+    else:
+        m["listed"] = pd.to_datetime(m.listed, dayfirst=True, errors="coerce")
+        m = m[m.listed >= pd.Timestamp(today) - pd.DateOffset(months=MAX_AGE_M)]
+    m = m[m.symbol.isin(tk)]
+    return pd.DataFrame({"symbol": m.symbol, "name": m.name, "listed": m.listed, "ticker": m.symbol.map(tk)})
 
 
 def listings():
@@ -161,18 +181,24 @@ def main():
     import yfinance as yf
     from trend_scan import telegram
     os.makedirs(CH, exist_ok=True)
-    today = (datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)).date()
+    from zoneinfo import ZoneInfo
+    today = datetime.now(timezone.utc).astimezone(ZoneInfo({"NSE": "Asia/Kolkata", "US": "America/New_York", "ASX": "Australia/Sydney"}[MARKET])).date()
     global SEC, BENCH
     try:
         from sector_state import load_bench, stock_rs
-        SEC = json.load(open(f"{OUT}/sectors.json")); BENCH = load_bench()
+        SEC = json.load(open(f"{OUT}/sectors.json")); BENCH = load_bench(f"{OUT}/sector_hist.csv.gz")
     except Exception:  # noqa: BLE001
         SEC, BENCH = None, None
         stock_rs = lambda *a_: {}  # noqa: E731
-    L = listings()
-    L = L[L.listed >= pd.Timestamp(today) - pd.DateOffset(months=MAX_AGE_M)]
+    if MARKET == "NSE":
+        L = listings()
+        L = L[L.listed >= pd.Timestamp(today) - pd.DateOffset(months=MAX_AGE_M)]
+        L["ticker"] = L.symbol + ".NS"
+    else:
+        L = listings_global(today)
     name = dict(zip(L.symbol, L.name)); listed = dict(zip(L.symbol, L.listed))
-    tick = [s + ".NS" for s in L.symbol]
+    sym_of = dict(zip(L.ticker, L.symbol))
+    tick = list(L.ticker)
     print("recent listings", len(tick), flush=True)
     events, near, charts = [], [], {}
     for a in range(0, len(tick), 80):
@@ -186,12 +212,17 @@ def main():
         if dd is None or dd.empty:
             continue
         for t in chunk:
-            sym = t[:-3]
+            sym = sym_of.get(t, t)
             try:
                 x = pd.DataFrame({k: dd[k][t] for k in ("Open", "High", "Low", "Close", "Volume")}).dropna(subset=["Close"])
                 if not len(x) or x.index.max() < pd.Timestamp(today) - pd.Timedelta(days=10):
                     continue
-                x = x[x.index >= listed[sym] - pd.Timedelta(days=3)]
+                if pd.notna(listed.get(sym)):
+                    x = x[x.index >= listed[sym] - pd.Timedelta(days=3)]
+                if MARKET != "NSE" and (not len(x) or x.index[0] < pd.Timestamp(today) - pd.DateOffset(months=MAX_AGE_M)):
+                    continue      # Yahoo history older than 3 years: not a recent IPO
+                if MARKET != "NSE":
+                    listed[sym] = x.index[0]
                 if not len(x) or float(x.Close.iloc[0] * x.Volume.iloc[0]) < MIN_FIRST_DAY:
                     continue
                 ev, nr, ch = analyse(sym, x, today)
@@ -248,7 +279,7 @@ def main():
             json.dump(clean(ch), open(f"{CH}/{s_}.json", "w"), separators=(",", ":"), allow_nan=False)
     out = dict(asof=str(today), generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(tick),
                rules=dict(max_age_months=MAX_AGE_M, base_days=BASE_DAYS, depth_pct=DEPTH * 100, near_pct=NEAR * 100,
-                          min_value_cr=MINVAL / 1e7, min_close=MIN_CLOSE, exit_sma_weeks=SMA_W, min_listing_day_cr=MIN_FIRST_DAY / 1e7),
+                          min_value_cr=MINVAL / UNIT, min_close=MIN_CLOSE, exit_sma_weeks=SMA_W, min_listing_day_cr=MIN_FIRST_DAY / UNIT),
                breakouts=clean(brk.to_dict("records")) if len(brk) else [],
                near=clean(N.to_dict("records")) if len(N) else [],
                tracked=clean(E.to_dict("records")) if len(E) else [])
@@ -256,7 +287,7 @@ def main():
     print("breakouts", len(brk), "near", len(N), "tracked", len(E))
     new = E[E.status == "buy next open"] if len(E) else E
     ex = E[E.status == "exit next open"] if len(E) else E
-    msg = [f"IPO ATH cup scan {today}"]
+    msg = [f"IPO ATH cup scan {MARKET} {today}"]
     msg += [f"Buy next open: {r.symbol} closed above its post-listing high {r.ath:.2f} (cup {r.depth * 100:.0f}%)" for r in new.itertuples()] \
         or ["No new IPO breakouts today."]
     msg += [f"Sell next open (weekly close < 10-wk SMA): {', '.join(ex.symbol)}"] if len(ex) else []

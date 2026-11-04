@@ -1,0 +1,47 @@
+name: ath-global
+# US and ASX top-down data + monthly-ATH + IPO-cup scans (same rules as NSE). Outputs in data/scan/us and data/scan/asx.
+on:
+  schedule:
+    - cron: "45 22 * * 1-5"   # US: ~5:45-6:45 pm New York, after the close
+    - cron: "15 7 * * 1-5"    # ASX: ~5:15-6:15 pm Sydney, after the close
+  workflow_dispatch:
+    inputs:
+      market: {description: "US or ASX", default: "US"}
+permissions:
+  contents: write
+concurrency:
+  group: ath-global-${{ github.event.inputs.market || github.event.schedule }}
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Scan
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          SEND_TELEGRAM: "0"
+        run: |
+          M="${{ github.event.inputs.market }}"
+          if [ -z "$M" ]; then if [ "${{ github.event.schedule }}" = "15 7 * * 1-5" ]; then M=ASX; else M=US; fi; fi
+          echo "MKT=$M" >> $GITHUB_ENV
+          pip install -q yfinance pandas requests lxml
+          mkdir -p data/scan/$(echo $M | tr A-Z a-z)
+          python tools/global_state.py $M 2>&1 | grep -v -i "warn\|delisted\|failed download" | tail -30 || true
+          python tools/ath_scan.py $M > /tmp/ath_log.txt 2>&1 || true
+          grep -v -i "warn\|delisted\|failed download\|^\[\|possibly" /tmp/ath_log.txt | tail -20
+          python tools/ipo_scan.py $M > /tmp/ipo_log.txt 2>&1 || true
+          grep -v -i "warn\|delisted\|failed download\|^\[\|possibly" /tmp/ipo_log.txt | tail -20
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          m=$(echo $MKT | tr A-Z a-z)
+          git add data/scan/$m data/universe/${m}_meta.csv 2>/dev/null; git diff --cached --quiet && exit 0
+          git commit -qm "ATH / IPO / top-down scan $MKT $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 10; done

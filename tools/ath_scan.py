@@ -32,10 +32,13 @@ import yfinance as yf
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from trend_scan import nse_symbols, telegram  # noqa: E402
 
-OUT = "data/scan"
+# market: NSE (default), US or ASX (python ath_scan.py US). US/ASX added 5 Nov 2026 - same rules, own outputs.
+MARKET = (sys.argv[1] if len(sys.argv) > 1 else "NSE").upper()
+OUT = "data/scan" if MARKET == "NSE" else f"data/scan/{MARKET.lower()}"
 CH = f"{OUT}/ath_charts"
-MINVAL = 2e7          # Rs 2 cr/day
-MIN_CLOSE = 100.0     # no penny stocks: skip stocks whose last close is below Rs 100 (30 Oct 2026)
+MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6}[MARKET]          # Rs 2 cr / $5 m / A$1 m a day
+UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6}[MARKET]            # value_cr field = traded value in Rs cr / $ m / A$ m
+MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0}[MARKET]   # no penny stocks (30 Oct 2026)
 BASE_MAIN, BASE_MIN = 24, 12
 NEAR = 0.05
 
@@ -81,16 +84,17 @@ def add_state(x, W, Wc, dt, w_entry, exit_dt):
                 test_week=str(tested_week.end_time.date()))
 
 
-def analyse(sym, x, today):
+def analyse(sym, x, today, lookback_days=550):
     """x: daily OHLCV (DatetimeIndex). Returns (events, near_row or None, chart dict) ."""
     from session import drop_partial
-    x = drop_partial(x.dropna(subset=["Close"]))
+    x = drop_partial(x.dropna(subset=["Close"]), MARKET)
     x = x[(x.Close > 0) & (x.High > 0)]
     if len(x) < 300:
         return [], None, None
-    from adjust import fix_gaps
-    o_, h_, l_, c_, v_ = fix_gaps(x.Open, x.High, x.Low, x.Close, x.Volume)
-    x = pd.DataFrame({"Open": o_, "High": h_, "Low": l_, "Close": c_, "Volume": v_}, index=x.index)
+    if MARKET == "NSE":   # Yahoo NSE history misses some splits; US/ASX history is adjusted (and big gaps are real there)
+        from adjust import fix_gaps
+        o_, h_, l_, c_, v_ = fix_gaps(x.Open, x.High, x.Low, x.Close, x.Volume)
+        x = pd.DataFrame({"Open": o_, "High": h_, "Low": l_, "Close": c_, "Volume": v_}, index=x.index)
     val20 = (x.Close * x.Volume).rolling(20, min_periods=10).mean()
     mon = x.index.to_period("M")
     M = pd.DataFrame({"o": x.Open.groupby(mon).first(), "h": x.High.groupby(mon).max(), "l": x.Low.groupby(mon).min(),
@@ -128,7 +132,8 @@ def analyse(sym, x, today):
     cross = (d.h > d.trig) & (d.hist_ok == True)  # noqa: E712
     first = cross & (cross.groupby(d.mon).cumsum() == 1)
     ev = d[first & (d.above == True) & (d.val >= MINVAL) & (d.age >= BASE_MIN)]  # noqa: E712
-    ev = ev[ev.index >= pd.Timestamp(today) - pd.Timedelta(days=550)]
+    if lookback_days:
+        ev = ev[ev.index >= pd.Timestamp(today) - pd.Timedelta(days=lookback_days)]
     events = []
     for dt, r in ev.iterrows():
         entry = max(r.o, r.trig)
@@ -154,7 +159,7 @@ def analyse(sym, x, today):
                            weeks=int(((exit_dt or x.index[-1]) - dt).days / 7), main=bool(r.age >= BASE_MAIN),
                            sma_entry=sma_entry, **add,
                            sma30=float(W.sma.loc[last_complete]) if np.isfinite(W.sma.loc[last_complete]) else None,
-                           value_cr=float(r.val) / 1e7))
+                           value_cr=float(r.val) / UNIT))
     # near trigger (current month, not crossed yet)
     near = None
     t_now = d.trig.iloc[-1]
@@ -167,7 +172,7 @@ def analyse(sym, x, today):
                 and val20.iloc[-1] >= MINVAL:
             near = dict(symbol=sym, trigger=t_now, close=c, gap_pct=(t_now / c - 1) * 100, ath_month=d.ath_month.iloc[-1],
                         base_months=int(d.age.iloc[-1]), depth=d.depth.iloc[-1], sma30=float(lastw.sma),
-                        main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / 1e7)
+                        main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / UNIT)
     Mc = M.tail(240); Wt = W.tail(260)
     chart = dict(m=dict(t=[str(p) for p in Mc.index], o=Mc.o.round(2).tolist(), h=Mc.h.round(2).tolist(),
                         l=Mc.l.round(2).tolist(), c=Mc.c.round(2).tolist()),
@@ -179,18 +184,25 @@ def analyse(sym, x, today):
 
 def main():
     os.makedirs(CH, exist_ok=True)
-    today = (datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)).date()
+    from zoneinfo import ZoneInfo
+    today = datetime.now(timezone.utc).astimezone(ZoneInfo({"NSE": "Asia/Kolkata", "US": "America/New_York", "ASX": "Australia/Sydney"}[MARKET])).date()
     global SEC, BENCH
     try:
         from sector_state import load_bench, stock_rs
-        SEC = json.load(open(f"{OUT}/sectors.json")); BENCH = load_bench()
+        SEC = json.load(open(f"{OUT}/sectors.json")); BENCH = load_bench(f"{OUT}/sector_hist.csv.gz")
     except Exception:  # noqa: BLE001
         SEC, BENCH = None, None
         stock_rs = lambda *a_: {}  # noqa: E731
-    u = nse_symbols()
-    u = u[u.board == "main"] if "board" in u else u
+    if MARKET == "NSE":
+        u = nse_symbols()
+        u = u[u.board == "main"] if "board" in u else u
+        u["ticker"] = u.symbol + ".NS"
+    else:
+        from global_universe import symbols
+        u = symbols(MARKET)
     name = dict(zip(u.symbol, u.name)) if "name" in u else {}
-    tick = [s + ".NS" for s in u.symbol]
+    sym_of = dict(zip(u.ticker, u.symbol))
+    tick = list(u.ticker)
     print("symbols", len(tick), flush=True)
     events, near, charts, vals = [], [], {}, {}
     for a in range(0, len(tick), 80):
@@ -206,7 +218,7 @@ def main():
         if dd is None or dd.empty:
             continue
         for t in chunk:
-            sym = t[:-3]
+            sym = sym_of.get(t, t)
             try:
                 x = pd.DataFrame({k: dd[k][t] for k in ("Open", "High", "Low", "Close", "Volume")}).dropna(subset=["Close"])
                 if len(x) and x.index.max() < pd.Timestamp(today) - pd.Timedelta(days=10):
@@ -231,7 +243,7 @@ def main():
         print(a + len(chunk), "done;", len(events), "signals,", len(near), "near", flush=True)
         time.sleep(1)
     rk = pd.Series(vals).rank(ascending=False, method="first")
-    size = pd.cut(rk, [0, 100, 250, 500, 1e9], labels=["Large", "Mid", "Small", "Micro"]).astype(str).to_dict()
+    size = pd.cut(rk, {"NSE": [0, 100, 250, 500, 1e9], "US": [0, 500, 1500, 3000, 1e9], "ASX": [0, 100, 300, 600, 1e9]}[MARKET], labels=["Large", "Mid", "Small", "Micro"]).astype(str).to_dict()
     E = pd.DataFrame(events)
     N = pd.DataFrame(near)
     try:
@@ -268,8 +280,8 @@ def main():
     for s_, ch in charts.items():
         if s_ in keep:
             json.dump(clean(ch), open(f"{CH}/{s_}.json", "w"), separators=(",", ":"), allow_nan=False)
-    out = dict(asof=str(today), generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(vals),
-               rules=dict(base_main=BASE_MAIN, base_min=BASE_MIN, near_pct=NEAR * 100, min_value_cr=MINVAL / 1e7, min_close=MIN_CLOSE),
+    out = dict(market=MARKET, asof=str(today), generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(vals),
+               rules=dict(base_main=BASE_MAIN, base_min=BASE_MIN, near_pct=NEAR * 100, min_value_cr=MINVAL / UNIT, min_close=MIN_CLOSE),
                breakouts=clean(brk.to_dict("records")) if len(brk) else [],
                near=clean(N.to_dict("records")) if len(N) else [],
                tracked=clean(E.to_dict("records")) if len(E) else [])
@@ -277,7 +289,7 @@ def main():
     print("breakouts", len(brk), "near", len(N), "tracked", len(E))
     nb = brk[brk.main] if len(brk) else brk
     ex = E[E.status == "exit next open"] if len(E) else E
-    msg = [f"Monthly ATH scan {today}", f"New breakouts this/last month (base >= 2 y): {len(nb)}"]
+    msg = [f"Monthly ATH scan {MARKET} {today}", f"New breakouts this/last month (base >= 2 y): {len(nb)}"]
     msg += [f"  {r.symbol} above {r.trigger:.2f} (ATH {r.ath_month}, base {r.base_months} m)" for r in nb.head(10).itertuples()]
     msg += [f"Sell next open (weekly close < 30-wk SMA): {', '.join(ex.symbol.head(15))}" if len(ex) else "No exits."]
     msg += [f"Near trigger (<= 5%): {', '.join(N[N.main].symbol.head(15))}" if len(N) else ""]

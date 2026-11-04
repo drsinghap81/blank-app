@@ -4,8 +4,14 @@ from datetime import datetime, timedelta, timezone
 import pandas as pd
 
 
-def drop_partial(df):
-    now = datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)
-    if now.weekday() < 5 and (now.hour, now.minute) < (15, 45) and len(df) and pd.Timestamp(df.index[-1]).date() == now.date():
+CLOSE_AT = {"NSE": ("Asia/Kolkata", (15, 45)), "US": ("America/New_York", (16, 15)), "ASX": ("Australia/Sydney", (16, 20))}
+
+
+def drop_partial(df, market="NSE"):
+    """Drop the last bar if it is today's and that market has not closed yet (local exchange time)."""
+    from zoneinfo import ZoneInfo
+    tz, hm = CLOSE_AT.get(market, CLOSE_AT["NSE"])
+    now = datetime.now(timezone.utc).astimezone(ZoneInfo(tz))
+    if now.weekday() < 5 and (now.hour, now.minute) < hm and len(df) and pd.Timestamp(df.index[-1]).date() == now.date():
         return df.iloc[:-1]
     return df

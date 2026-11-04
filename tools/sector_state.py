@@ -174,22 +174,23 @@ def main():
             print(f"  {k:28s} {idx[k]['tag']:8s} vs market {idx[k]['vs_market_3m']:+.1f}%  RS 6m vs Nifty 50 {idx[k]['rs_6m'] if idx[k]['rs_6m'] is None else round(idx[k]['rs_6m'], 1)}")
 
 
-def load_bench():
+def load_bench(path=CACHE):
     """Daily closes of the sector indices + Nifty 500 from the cache (for stock RS in the scans)."""
     try:
-        H = pd.read_csv(CACHE, parse_dates=["Date"])
+        H = pd.read_csv(path, parse_dates=["Date"])
         return H.pivot_table(index="Date", columns="INDEX", values="CLOSE", aggfunc="last").sort_index()
     except Exception:  # noqa: BLE001
         return None
 
 
-def stock_rs(symbol, close, sec, bench):
+def stock_rs(symbol, close, sec, bench, market_ix=None):
     """1-year RS of a stock vs its sector index (Nifty 500 if it has none). Young stocks (IPOs) use what history they have
     (>= 63 days). Returns dict(rs_bench, stock_rs, stock_rs_up) or {}."""
     if bench is None or close is None or not len(close):
         return {}
     _, ix, _ = tag_for(symbol, sec) if sec else (None, None, None)
-    b = ix if ix and ix in bench else MARKET
+    market_ix = market_ix or (sec or {}).get("market") or MARKET
+    b = ix if ix and ix in bench else market_ix
     if b not in bench:
         return {}
     c = close.copy(); ci = pd.to_datetime(c.index)
