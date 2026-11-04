@@ -1,6 +1,6 @@
 {
 "asof": "2026-11-05",
-"generated": "2026-11-04 22:38 UTC",
+"generated": "2026-11-04 22:53 UTC",
 "scanned": 1742,
 "rules": {
 "base_main": 24,
@@ -45,7 +45,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MIDSMALL INDIA CONSUMPTION",
+"theme_rs": 0.1171,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "KOTAKBANK",
@@ -82,7 +86,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY SERVICES SECTOR",
+"theme_rs": 4.6934,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "SANATHAN",
@@ -119,7 +127,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "WSTCSTPAPR",
@@ -156,7 +168,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "LOKESHMACH",
@@ -193,7 +209,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ZIMLAB",
@@ -230,7 +250,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "OPTIEMUS",
@@ -267,7 +291,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 }
 ],
 "near": [
@@ -292,7 +320,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ICICIBANK",
@@ -315,7 +347,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY SERVICES SECTOR",
+"theme_rs": 4.6934,
+"td_score": 2,
+"aligned": false
 }
 ],
 "tracked": [
@@ -354,7 +390,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MIDSMALL INDIA CONSUMPTION",
+"theme_rs": 0.1171,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "KOTAKBANK",
@@ -391,7 +431,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY SERVICES SECTOR",
+"theme_rs": 4.6934,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "SANATHAN",
@@ -428,7 +472,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "WSTCSTPAPR",
@@ -465,7 +513,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "LOKESHMACH",
@@ -502,7 +554,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ZIMLAB",
@@ -539,7 +595,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "OPTIEMUS",
@@ -576,7 +636,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "AARTIPHARM",
@@ -613,7 +677,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "KRONOX",
@@ -650,7 +718,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "JSWINFRA",
@@ -687,7 +759,11 @@
 "sector_index": "NIFTY SERVICES SECTOR",
 "sector_tag": "leading",
 "sector_rs": 4.6934,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "NEOGEN",
@@ -724,13 +800,17 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "LALPATHLAB",
 "date": "2026-09-16",
-"entry": 1966.7285,
-"trigger": 1966.7285,
+"entry": 1966.7286,
+"trigger": 1966.7286,
 "ath_month": "2021-08",
 "base_months": 61,
 "depth": -0.5463,
@@ -761,7 +841,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MIDSMALL INDIA CONSUMPTION",
+"theme_rs": 0.1171,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "BIL",
@@ -798,7 +882,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "BODALCHEM",
@@ -835,7 +923,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ANTELOPUS",
@@ -872,7 +964,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "GUFICBIO",
@@ -909,7 +1005,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MMP",
@@ -946,7 +1046,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "INNOVACAP",
@@ -983,7 +1087,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "RAYMOND",
@@ -1020,7 +1128,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "BHAGERIA",
@@ -1057,7 +1169,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MOREPENLAB",
@@ -1094,7 +1210,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "COFORGE",
@@ -1131,7 +1251,11 @@
 "sector_index": "NIFTY IT",
 "sector_tag": "leading",
 "sector_rs": 10.4826,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": "NIFTY INDIA DIGITAL",
+"theme_rs": 15.7781,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "CGCL",
@@ -1168,7 +1292,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ENTERO",
@@ -1205,7 +1333,11 @@
 "sector_index": "NIFTY INDIA CONSUMPTION",
 "sector_tag": "weak",
 "sector_rs": 1.3776,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "ARIES",
@@ -1242,7 +1374,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "KABRAEXTRU",
@@ -1279,7 +1415,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "WELENT",
@@ -1316,7 +1456,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "RATNAVEER",
@@ -1353,7 +1497,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MAWANASUG",
@@ -1390,7 +1538,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "AVADHSUGAR",
@@ -1427,7 +1579,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ASIANENE",
@@ -1464,7 +1620,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "KANPRPLA",
@@ -1501,13 +1661,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "INDSWFTLAB",
 "date": "2026-08-11",
 "entry": 266.0,
-"trigger": 246.9683,
+"trigger": 246.9684,
 "ath_month": "2005-01",
 "base_months": 259,
 "depth": -0.9239,
@@ -1538,7 +1702,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MACPOWER",
@@ -1575,7 +1743,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "VSSL",
@@ -1612,7 +1784,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SOTL",
@@ -1649,7 +1825,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ALIVUS",
@@ -1686,7 +1866,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "KDDL",
@@ -1723,7 +1907,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "IOLCP",
@@ -1760,7 +1948,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ASKAUTOLTD",
@@ -1797,7 +1989,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "REDINGTON",
@@ -1834,13 +2030,17 @@
 "sector_index": "NIFTY SERVICES SECTOR",
 "sector_tag": "leading",
 "sector_rs": 4.6934,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "SONACOMS",
 "date": "2026-07-30",
-"entry": 758.9655,
-"trigger": 758.9655,
+"entry": 758.9656,
+"trigger": 758.9656,
 "ath_month": "2024-09",
 "base_months": 22,
 "depth": -0.4425,
@@ -1871,7 +2071,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MOBILITY",
+"theme_rs": 5.5436,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "DEEPINDS",
@@ -1908,7 +2112,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "GHCLTEXTIL",
@@ -1945,7 +2153,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "VADILALIND",
@@ -1982,7 +2194,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "E2E",
@@ -2019,7 +2235,11 @@
 "sector_index": "NIFTY IT",
 "sector_tag": "leading",
 "sector_rs": 10.4826,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "CNL",
@@ -2056,13 +2276,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SSWL",
 "date": "2026-07-22",
-"entry": 284.6382,
-"trigger": 284.6382,
+"entry": 284.6381,
+"trigger": 284.6381,
 "ath_month": "2024-01",
 "base_months": 30,
 "depth": -0.3848,
@@ -2093,7 +2317,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "RPGLIFE",
@@ -2130,7 +2358,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SHYAMMETL",
@@ -2167,7 +2399,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "GNA",
@@ -2204,7 +2440,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "UNIVASTU",
@@ -2241,7 +2481,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "DIVISLAB",
@@ -2278,7 +2522,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "RISHABH",
@@ -2315,7 +2563,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "BOSCHLTD",
@@ -2352,7 +2604,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MOBILITY",
+"theme_rs": 5.5436,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "IPCALAB",
@@ -2389,7 +2645,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MIDSMALL INDIA CONSUMPTION",
+"theme_rs": 0.1171,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "AJANTPHARM",
@@ -2426,7 +2686,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "AUROPHARMA",
@@ -2463,7 +2727,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "ICIL",
@@ -2500,7 +2768,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "AEROENTER",
@@ -2537,7 +2809,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "PANAMAPET",
@@ -2574,7 +2850,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "NUVAMA",
@@ -2611,13 +2891,17 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA NEW AGE CONSUMPTION",
+"theme_rs": 5.1126,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "MENONBE",
 "date": "2026-06-09",
-"entry": 160.0322,
-"trigger": 160.0322,
+"entry": 160.0323,
+"trigger": 160.0323,
 "ath_month": "2023-08",
 "base_months": 34,
 "depth": -0.4192,
@@ -2648,7 +2932,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "RUBYMILLS",
@@ -2685,13 +2973,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "YASHO",
 "date": "2026-06-04",
-"entry": 2424.9587,
-"trigger": 2424.9587,
+"entry": 2424.9589,
+"trigger": 2424.9589,
 "ath_month": "2024-02",
 "base_months": 28,
 "depth": -0.4158,
@@ -2722,7 +3014,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "CORDSCABLE",
@@ -2759,7 +3055,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MARINE",
@@ -2796,7 +3096,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MOTHERSON",
@@ -2833,7 +3137,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MOBILITY",
+"theme_rs": 5.5436,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "SBCL",
@@ -2870,7 +3178,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "UNIPARTS",
@@ -2907,7 +3219,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MODISONLTD",
@@ -2944,7 +3260,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "NRBBEARING",
@@ -2981,7 +3301,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "HFCL",
@@ -3018,7 +3342,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INFRASTRUCTURE 50:30:20",
+"theme_rs": -2.0735,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SHILPAMED",
@@ -3055,7 +3383,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "STLTECH",
@@ -3092,13 +3424,17 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA DIGITAL",
+"theme_rs": 15.7781,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "VIJAYA",
 "date": "2026-05-08",
 "entry": 1267.242,
-"trigger": 1245.7095,
+"trigger": 1245.7093,
 "ath_month": "2024-11",
 "base_months": 18,
 "depth": -0.2602,
@@ -3129,7 +3465,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "GRWRHITECH",
@@ -3166,7 +3506,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "GRANULES",
@@ -3203,7 +3547,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "WHEELS",
@@ -3240,7 +3588,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "KTKBANK",
@@ -3277,7 +3629,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "AZAD",
@@ -3314,7 +3670,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "RPTECH",
@@ -3351,7 +3711,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "INOXINDIA",
@@ -3388,7 +3752,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "AEROFLEX",
@@ -3425,7 +3793,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "AETHER",
@@ -3462,13 +3834,17 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "HAPPYFORGE",
 "date": "2026-02-13",
 "entry": 1292.7504,
-"trigger": 1288.3029,
+"trigger": 1288.3028,
 "ath_month": "2024-07",
 "base_months": 19,
 "depth": -0.3889,
@@ -3499,7 +3875,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "BLISSGVS",
@@ -3536,7 +3916,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SAKAR",
@@ -3573,7 +3957,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "TMB",
@@ -3610,7 +3998,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SANSERA",
@@ -3647,7 +4039,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INFRASTRUCTURE 50:30:20",
+"theme_rs": -2.0735,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "CUPID",
@@ -3684,7 +4080,11 @@
 "sector_index": "NIFTY FMCG",
 "sector_tag": "weak",
 "sector_rs": -10.0596,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "LAURUSLABS",
@@ -3721,7 +4121,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "NAVINFLUOR",
@@ -3758,7 +4162,11 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "AURUM",
@@ -3795,7 +4203,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "GRAPHITE",
@@ -3832,13 +4244,17 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SPLPETRO",
 "date": "2026-09-23",
-"entry": 884.0066,
-"trigger": 884.0066,
+"entry": 884.0065,
+"trigger": 884.0065,
 "ath_month": "2025-06",
 "base_months": 15,
 "depth": -0.3332,
@@ -3869,7 +4285,11 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "GANDHITUBE",
@@ -3906,7 +4326,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SHANTIGEAR",
@@ -3943,7 +4367,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "DCBBANK",
@@ -3980,7 +4408,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ARTEMISMED",
@@ -4017,7 +4449,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SKIPPER",
@@ -4054,7 +4490,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "WINDLAS",
@@ -4091,13 +4531,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "HEGAM",
 "date": "2026-09-01",
-"entry": 263.507,
-"trigger": 263.507,
+"entry": 263.5071,
+"trigger": 263.5071,
 "ath_month": "2018-07",
 "base_months": 98,
 "depth": -0.8778,
@@ -4128,13 +4572,17 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "OFSS",
 "date": "2026-08-28",
-"entry": 12262.5006,
-"trigger": 12262.5006,
+"entry": 12262.4996,
+"trigger": 12262.4996,
 "ath_month": "2024-12",
 "base_months": 20,
 "depth": -0.4484,
@@ -4165,7 +4613,11 @@
 "sector_index": "NIFTY IT",
 "sector_tag": "leading",
 "sector_rs": 10.4826,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": "NIFTY INDIA DIGITAL",
+"theme_rs": 15.7781,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "DCI",
@@ -4202,7 +4654,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MEDANTA",
@@ -4239,7 +4695,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MANGLMCEM",
@@ -4276,7 +4736,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "TRIVENI",
@@ -4313,7 +4777,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "ADOR",
@@ -4350,7 +4818,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "EPL",
@@ -4387,7 +4859,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "LMW",
@@ -4424,7 +4900,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "DIVGIITTS",
@@ -4461,7 +4941,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MMFL",
@@ -4498,7 +4982,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ENDURANCE",
@@ -4535,13 +5023,17 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "PIDILITIND",
 "date": "2026-08-06",
-"entry": 1683.738,
-"trigger": 1683.738,
+"entry": 1683.7379,
+"trigger": 1683.7379,
 "ath_month": "2024-09",
 "base_months": 23,
 "depth": -0.2297,
@@ -4572,7 +5064,11 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA MANUFACTURING",
+"theme_rs": -0.3039,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "RICOAUTO",
@@ -4609,7 +5105,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "BALRAMCHIN",
@@ -4646,7 +5146,11 @@
 "sector_index": "NIFTY FMCG",
 "sector_tag": "weak",
 "sector_rs": -10.0596,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "PRUDENT",
@@ -4683,13 +5187,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "APCOTEXIND",
 "date": "2026-07-29",
-"entry": 624.3218,
-"trigger": 624.3218,
+"entry": 624.3217,
+"trigger": 624.3217,
 "ath_month": "2022-05",
 "base_months": 50,
 "depth": -0.479,
@@ -4720,7 +5228,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "JLHL",
@@ -4757,7 +5269,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "SWARAJ",
@@ -4794,7 +5310,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "GODREJIND",
@@ -4831,7 +5351,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "SUNPHARMA",
@@ -4868,7 +5392,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "ADFFOODS",
@@ -4905,13 +5433,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "CAPLIPOINT",
 "date": "2026-06-30",
-"entry": 2624.5443,
-"trigger": 2624.5443,
+"entry": 2624.544,
+"trigger": 2624.544,
 "ath_month": "2024-12",
 "base_months": 18,
 "depth": -0.3966,
@@ -4942,7 +5474,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "DRREDDY",
@@ -4979,7 +5515,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "PHOENIXLTD",
@@ -5016,7 +5556,11 @@
 "sector_index": "NIFTY REALTY",
 "sector_tag": "mixed",
 "sector_rs": 8.3317,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA NEW AGE CONSUMPTION",
+"theme_rs": 5.1126,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "ZFCVINDIA",
@@ -5053,7 +5597,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "SPAL",
@@ -5090,13 +5638,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "TALBROAUTO",
 "date": "2026-06-24",
-"entry": 393.5048,
-"trigger": 393.5048,
+"entry": 393.5049,
+"trigger": 393.5049,
 "ath_month": "2024-07",
 "base_months": 23,
 "depth": -0.445,
@@ -5127,7 +5679,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "KPIL",
@@ -5164,13 +5720,17 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INFRASTRUCTURE 50:30:20",
+"theme_rs": -2.0735,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "LUPIN",
 "date": "2026-06-22",
 "entry": 2343.0113,
-"trigger": 2342.2436,
+"trigger": 2342.2434,
 "ath_month": "2024-12",
 "base_months": 18,
 "depth": -0.1915,
@@ -5201,7 +5761,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "WABAG",
@@ -5238,13 +5802,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "INGERRAND",
 "date": "2026-06-18",
-"entry": 4532.0599,
-"trigger": 4532.0599,
+"entry": 4532.0604,
+"trigger": 4532.0604,
 "ath_month": "2024-11",
 "base_months": 19,
 "depth": -0.2971,
@@ -5275,7 +5843,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "KIRLPNU",
@@ -5312,7 +5884,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "RATEGAIN",
@@ -5349,13 +5925,17 @@
 "sector_index": "NIFTY IT",
 "sector_tag": "leading",
 "sector_rs": 10.4826,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "GVPIL",
 "date": "2026-06-17",
 "entry": 1039.0228,
-"trigger": 1015.9117,
+"trigger": 1015.9118,
 "ath_month": "2018-01",
 "base_months": 101,
 "depth": -0.8925,
@@ -5386,7 +5966,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "PANACEABIO",
@@ -5423,7 +6007,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "JAYBARMARU",
@@ -5460,13 +6048,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "AIAENG",
 "date": "2026-06-05",
-"entry": 4735.6449,
-"trigger": 4735.6449,
+"entry": 4735.6444,
+"trigger": 4735.6444,
 "ath_month": "2024-07",
 "base_months": 23,
 "depth": -0.3363,
@@ -5497,7 +6089,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA MANUFACTURING",
+"theme_rs": -0.3039,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "HSCL",
@@ -5534,7 +6130,11 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "SKMEGGPROD",
@@ -5571,7 +6171,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "WOCKPHARMA",
@@ -5608,13 +6212,17 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "SASKEN",
 "date": "2026-05-29",
-"entry": 2214.0624,
-"trigger": 2214.0624,
+"entry": 2214.0626,
+"trigger": 2214.0626,
 "ath_month": "2024-11",
 "base_months": 18,
 "depth": -0.4846,
@@ -5645,13 +6253,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SANDHAR",
 "date": "2026-05-25",
-"entry": 649.9025,
-"trigger": 649.9025,
+"entry": 649.9024,
+"trigger": 649.9024,
 "ath_month": "2024-07",
 "base_months": 22,
 "depth": -0.4659,
@@ -5682,7 +6294,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "NGLFINE",
@@ -5719,7 +6335,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "DSSL",
@@ -5756,7 +6376,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ANGELONE",
@@ -5793,7 +6417,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA INTERNET",
+"theme_rs": 13.0069,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "MAYURUNIQ",
@@ -5830,7 +6458,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SAIL",
@@ -5867,7 +6499,11 @@
 "sector_index": "NIFTY METAL",
 "sector_tag": "weak",
 "sector_rs": -3.5881,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY HOUSING",
+"theme_rs": -3.5101,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "KRISHNADEF",
@@ -5904,7 +6540,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "PTC",
@@ -5941,7 +6581,11 @@
 "sector_index": "NIFTY ENERGY",
 "sector_tag": "weak",
 "sector_rs": -9.2691,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "STYLAMIND",
@@ -5978,7 +6622,11 @@
 "sector_index": "NIFTY INDIA CONSUMPTION",
 "sector_tag": "weak",
 "sector_rs": 1.3776,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "ARVIND",
@@ -6015,7 +6663,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "BBOX",
@@ -6052,13 +6704,17 @@
 "sector_index": "NIFTY IT",
 "sector_tag": "leading",
 "sector_rs": 10.4826,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": "NIFTY INDIA DIGITAL",
+"theme_rs": 15.7781,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "RRKABEL",
 "date": "2026-05-05",
-"entry": 1822.8951,
-"trigger": 1822.8951,
+"entry": 1822.895,
+"trigger": 1822.895,
 "ath_month": "2024-07",
 "base_months": 22,
 "depth": -0.5032,
@@ -6089,7 +6745,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "CESC",
@@ -6126,7 +6786,11 @@
 "sector_index": "NIFTY ENERGY",
 "sector_tag": "weak",
 "sector_rs": -9.2691,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INFRASTRUCTURE 50:30:20",
+"theme_rs": -2.0735,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "COALINDIA",
@@ -6163,13 +6827,17 @@
 "sector_index": "NIFTY ENERGY",
 "sector_tag": "weak",
 "sector_rs": -9.2691,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY COMMODITIES",
+"theme_rs": -7.5316,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ONGC",
 "date": "2026-04-29",
-"entry": 304.5956,
-"trigger": 304.5956,
+"entry": 304.5955,
+"trigger": 304.5955,
 "ath_month": "2024-07",
 "base_months": 21,
 "depth": -0.2903,
@@ -6200,7 +6868,11 @@
 "sector_index": "NIFTY ENERGY",
 "sector_tag": "weak",
 "sector_rs": -9.2691,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INFRASTRUCTURE",
+"theme_rs": -1.0338,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "BHEL",
@@ -6237,7 +6909,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "ADANIPORTS",
@@ -6274,7 +6950,11 @@
 "sector_index": "NIFTY SERVICES SECTOR",
 "sector_tag": "leading",
 "sector_rs": 4.6934,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": "NIFTY MOBILITY",
+"theme_rs": 5.5436,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "SOUTHWEST",
@@ -6311,13 +6991,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "BAJAJCON",
 "date": "2026-04-10",
-"entry": 432.1934,
-"trigger": 432.1934,
+"entry": 432.1933,
+"trigger": 432.1933,
 "ath_month": "2018-01",
 "base_months": 99,
 "depth": -0.7207,
@@ -6348,7 +7032,11 @@
 "sector_index": "NIFTY FMCG",
 "sector_tag": "weak",
 "sector_rs": -10.0596,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ZYDUSWELL",
@@ -6385,7 +7073,11 @@
 "sector_index": "NIFTY FMCG",
 "sector_tag": "weak",
 "sector_rs": -10.0596,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SMSPHARMA",
@@ -6422,7 +7114,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "KEI",
@@ -6459,7 +7155,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "JAMNAAUTO",
@@ -6496,7 +7196,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "BHARATFORG",
@@ -6533,7 +7237,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MOBILITY",
+"theme_rs": 5.5436,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "INDUSTOWER",
@@ -6570,7 +7278,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INFRASTRUCTURE",
+"theme_rs": -1.0338,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "IOC",
@@ -6607,13 +7319,17 @@
 "sector_index": "NIFTY ENERGY",
 "sector_tag": "weak",
 "sector_rs": -9.2691,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MOBILITY",
+"theme_rs": 5.5436,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "CANTABIL",
 "date": "2026-02-04",
-"entry": 312.2058,
-"trigger": 312.2058,
+"entry": 312.2057,
+"trigger": 312.2057,
 "ath_month": "2022-08",
 "base_months": 42,
 "depth": -0.4544,
@@ -6644,13 +7360,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "TECHM",
 "date": "2026-01-19",
-"entry": 1660.84,
-"trigger": 1660.84,
+"entry": 1660.8398,
+"trigger": 1660.8398,
 "ath_month": "2024-11",
 "base_months": 14,
 "depth": -0.1717,
@@ -6662,7 +7382,7 @@
 "peak": 0.0956,
 "weeks": 5,
 "main": false,
-"sma_entry": 1457.4908,
+"sma_entry": 1457.4909,
 "add_status": "armed",
 "add_level": 1792.221,
 "add_date": "NaT",
@@ -6681,7 +7401,11 @@
 "sector_index": "NIFTY IT",
 "sector_tag": "leading",
 "sector_rs": 10.4826,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": "NIFTY INDIA DIGITAL",
+"theme_rs": 15.7781,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "IIFL",
@@ -6718,7 +7442,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ORIENTTECH",
@@ -6755,7 +7483,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "CUBEXTUB",
@@ -6792,7 +7524,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "JKTYRE",
@@ -6829,7 +7565,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "JSL",
@@ -6866,7 +7606,11 @@
 "sector_index": "NIFTY METAL",
 "sector_tag": "weak",
 "sector_rs": -3.5881,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "CANFINHOME",
@@ -6903,7 +7647,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "RELIANCE",
@@ -6940,13 +7688,17 @@
 "sector_index": "NIFTY ENERGY",
 "sector_tag": "weak",
 "sector_rs": -9.2691,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MOBILITY",
+"theme_rs": 5.5436,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ANURAS",
 "date": "2025-11-21",
-"entry": 1229.761,
-"trigger": 1229.761,
+"entry": 1229.7608,
+"trigger": 1229.7608,
 "ath_month": "2023-05",
 "base_months": 30,
 "depth": -0.4568,
@@ -6977,13 +7729,17 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "M&MFIN",
 "date": "2025-11-20",
-"entry": 327.3213,
-"trigger": 327.3213,
+"entry": 327.3212,
+"trigger": 327.3212,
 "ath_month": "2024-09",
 "base_months": 14,
 "depth": -0.2308,
@@ -7014,7 +7770,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA CORPORATE GROUP INDEX - MAHINDRA GROUP",
+"theme_rs": 2.9085,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "MONTECARLO",
@@ -7051,7 +7811,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "UNIVCABLES",
@@ -7088,7 +7852,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "TITAN",
@@ -7125,7 +7893,11 @@
 "sector_index": "NIFTY INDIA CONSUMPTION",
 "sector_tag": "weak",
 "sector_rs": 1.3776,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA NEW AGE CONSUMPTION",
+"theme_rs": 5.1126,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "PARAGMILK",
@@ -7162,7 +7934,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "CARYSIL",
@@ -7199,7 +7975,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "NATIONALUM",
@@ -7236,7 +8016,11 @@
 "sector_index": "NIFTY METAL",
 "sector_tag": "weak",
 "sector_rs": -3.5881,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "NEULANDLAB",
@@ -7254,7 +8038,7 @@
 "peak": 0.4255,
 "weeks": 10,
 "main": false,
-"sma_entry": 13466.5437,
+"sma_entry": 13466.5436,
 "add_status": "armed",
 "add_level": 19710.5716,
 "add_date": "NaT",
@@ -7273,7 +8057,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 3,
+"aligned": true
 },
 {
 "symbol": "THANGAMAYL",
@@ -7310,13 +8098,17 @@
 "sector_index": "NIFTY INDIA CONSUMPTION",
 "sector_tag": "weak",
 "sector_rs": 1.3776,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 2,
+"aligned": true
 },
 {
 "symbol": "BPCL",
 "date": "2025-11-03",
-"entry": 346.0783,
-"trigger": 346.0783,
+"entry": 346.0784,
+"trigger": 346.0784,
 "ath_month": "2024-09",
 "base_months": 14,
 "depth": -0.3459,
@@ -7347,7 +8139,11 @@
 "sector_index": "NIFTY ENERGY",
 "sector_tag": "weak",
 "sector_rs": -9.2691,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MOBILITY",
+"theme_rs": 5.5436,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SBILIFE",
@@ -7384,7 +8180,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY SERVICES SECTOR",
+"theme_rs": 4.6934,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "PSPPROJECT",
@@ -7421,13 +8221,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "SHRIRAMFIN",
 "date": "2025-10-24",
-"entry": 704.8945,
-"trigger": 704.8945,
+"entry": 704.8947,
+"trigger": 704.8947,
 "ath_month": "2024-09",
 "base_months": 13,
 "depth": -0.2311,
@@ -7458,7 +8262,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY SERVICES SECTOR",
+"theme_rs": 4.6934,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "CUB",
@@ -7495,7 +8303,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY HOUSING",
+"theme_rs": -3.5101,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "TVSHLTD",
@@ -7532,13 +8344,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "CIPLA",
 "date": "2025-10-20",
-"entry": 1630.8159,
-"trigger": 1630.8159,
+"entry": 1630.8161,
+"trigger": 1630.8161,
 "ath_month": "2024-08",
 "base_months": 14,
 "depth": -0.1495,
@@ -7569,7 +8385,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "ADANIPOWER",
@@ -7606,7 +8426,11 @@
 "sector_index": "NIFTY ENERGY",
 "sector_tag": "weak",
 "sector_rs": -9.2691,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY SERVICES SECTOR",
+"theme_rs": 4.6934,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "GMBREW",
@@ -7643,7 +8467,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "LGBBROSLTD",
@@ -7680,7 +8508,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "VEDL",
@@ -7717,7 +8549,11 @@
 "sector_index": "NIFTY METAL",
 "sector_tag": "weak",
 "sector_rs": -3.5881,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA MANUFACTURING",
+"theme_rs": -0.3039,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "TATASTEEL",
@@ -7754,7 +8590,11 @@
 "sector_index": "NIFTY METAL",
 "sector_tag": "weak",
 "sector_rs": -3.5881,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "LT",
@@ -7791,7 +8631,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INFRASTRUCTURE",
+"theme_rs": -1.0338,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "PRECWIRE",
@@ -7828,7 +8672,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "INOXGREEN",
@@ -7865,7 +8713,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "KIOCL",
@@ -7902,7 +8754,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "SANDUMA",
@@ -7939,7 +8795,11 @@
 "sector_index": "NIFTY METAL",
 "sector_tag": "weak",
 "sector_rs": -3.5881,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "NAVNETEDUL",
@@ -7976,7 +8836,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "ZUARIIND",
@@ -8013,7 +8877,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "TATAINVEST",
@@ -8050,13 +8918,17 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA CORPORATE GROUP INDEX - TATA GROUP",
+"theme_rs": -0.3019,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "TVSELECT",
 "date": "2025-09-19",
 "entry": 526.95,
-"trigger": 525.9444,
+"trigger": 525.9443,
 "ath_month": "2018-04",
 "base_months": 89,
 "depth": -0.895,
@@ -8087,7 +8959,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "CANBK",
@@ -8124,7 +9000,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "HINDALCO",
@@ -8161,7 +9041,11 @@
 "sector_index": "NIFTY METAL",
 "sector_tag": "weak",
 "sector_rs": -3.5881,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "CUMMINSIND",
@@ -8198,7 +9082,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA MANUFACTURING",
+"theme_rs": -0.3039,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "RAMCOIND",
@@ -8235,7 +9123,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "GMDCLTD",
@@ -8272,13 +9164,17 @@
 "sector_index": "NIFTY METAL",
 "sector_tag": "weak",
 "sector_rs": -3.5881,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "BRITANNIA",
 "date": "2025-09-04",
-"entry": 6177.7064,
-"trigger": 6177.7064,
+"entry": 6177.7069,
+"trigger": 6177.7069,
 "ath_month": "2024-09",
 "base_months": 12,
 "depth": -0.275,
@@ -8309,7 +9205,11 @@
 "sector_index": "NIFTY FMCG",
 "sector_tag": "weak",
 "sector_rs": -10.0596,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA CONSUMPTION",
+"theme_rs": 1.3776,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "DALBHARAT",
@@ -8346,7 +9246,11 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY CORE HOUSING",
+"theme_rs": -1.9891,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "GPIL",
@@ -8383,7 +9287,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "PGHL",
@@ -8420,13 +9328,17 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "UNOMINDA",
 "date": "2025-08-18",
-"entry": 1186.612,
-"trigger": 1186.612,
+"entry": 1186.6117,
+"trigger": 1186.6117,
 "ath_month": "2024-08",
 "base_months": 12,
 "depth": -0.2959,
@@ -8457,7 +9369,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA MANUFACTURING",
+"theme_rs": -0.3039,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "INDNIPPON",
@@ -8494,7 +9410,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SCHNEIDER",
@@ -8531,7 +9451,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "THYROCARE",
@@ -8568,7 +9492,11 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 16.3217,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "GODREJAGRO",
@@ -8605,7 +9533,11 @@
 "sector_index": "NIFTY FMCG",
 "sector_tag": "weak",
 "sector_rs": -10.0596,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "STARCEMENT",
@@ -8642,7 +9574,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "ROHLTD",
@@ -8679,13 +9615,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "DATAMATICS",
 "date": "2025-07-22",
-"entry": 776.0553,
-"trigger": 776.0553,
+"entry": 776.0552,
+"trigger": 776.0552,
 "ath_month": "2023-12",
 "base_months": 19,
 "depth": -0.2643,
@@ -8716,7 +9656,11 @@
 "sector_index": "NIFTY IT",
 "sector_tag": "leading",
 "sector_rs": 10.4826,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "VENUSREM",
@@ -8753,7 +9697,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "SUDARCOLOR",
@@ -8790,7 +9738,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "SYRMA",
@@ -8827,7 +9779,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "INDOBORAX",
@@ -8864,13 +9820,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "RAMCOCEM",
 "date": "2025-07-11",
-"entry": 1117.1068,
-"trigger": 1117.1068,
+"entry": 1117.1069,
+"trigger": 1117.1069,
 "ath_month": "2021-07",
 "base_months": 48,
 "depth": -0.4175,
@@ -8901,7 +9861,11 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY CORE HOUSING",
+"theme_rs": -1.9891,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "MRF",
@@ -8919,7 +9883,7 @@
 "peak": 0.0749,
 "weeks": 26,
 "main": false,
-"sma_entry": 123904.7336,
+"sma_entry": 123904.7328,
 "add_status": "armed",
 "add_level": 163308.4863,
 "add_date": "NaT",
@@ -8938,7 +9902,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY MOBILITY",
+"theme_rs": 5.5436,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "SIRCA",
@@ -8975,7 +9943,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "CSBBANK",
@@ -9012,7 +9984,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "SMLMAH",
@@ -9049,7 +10025,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA CORPORATE GROUP INDEX - MAHINDRA GROUP",
+"theme_rs": 2.9085,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "JKLAKSHMI",
@@ -9086,13 +10066,17 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 0,
+"aligned": false
 },
 {
 "symbol": "PAGEIND",
 "date": "2025-06-27",
-"entry": 48762.2559,
-"trigger": 48762.2559,
+"entry": 48762.2638,
+"trigger": 48762.2638,
 "ath_month": "2022-08",
 "base_months": 34,
 "depth": -0.3203,
@@ -9104,9 +10088,9 @@
 "peak": -0.0058,
 "weeks": 7,
 "main": true,
-"sma_entry": 43708.0612,
+"sma_entry": 43708.0605,
 "add_status": "armed",
-"add_level": 49605.7673,
+"add_level": 49605.7633,
 "add_date": "NaT",
 "add_price": null,
 "add_sma": null,
@@ -9123,7 +10107,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": "NIFTY INDIA NEW AGE CONSUMPTION",
+"theme_rs": 5.1126,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "AUBANK",
@@ -9160,7 +10148,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "ABCAPITAL",
@@ -9197,7 +10189,11 @@
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "weak",
 "sector_rs": -0.2303,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA CORPORATE GROUP INDEX - ADITYA BIRLA GROUP",
+"theme_rs": 0.3269,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "MBAPL",
@@ -9234,7 +10230,11 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "INTELLECT",
@@ -9271,7 +10271,11 @@
 "sector_index": "NIFTY IT",
 "sector_tag": "leading",
 "sector_rs": 10.4826,
-"sector_rs_up": true
+"sector_rs_up": true,
+"theme": "NIFTY INDIA DIGITAL",
+"theme_rs": 15.7781,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "KILITCH",
@@ -9308,7 +10312,11 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"sector_rs_up": null
+"sector_rs_up": null,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "APLAPOLLO",
@@ -9345,7 +10353,11 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "mixed",
 "sector_rs": -1.0338,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+"theme_rs": 1.3751,
+"td_score": 2,
+"aligned": false
 },
 {
 "symbol": "PRIVISCL",
@@ -9357,7 +10369,7 @@
 "depth": -0.5387,
 "status": "exited",
 "exit_date": "2026-01-19",
-"exit_price": 2641.5312,
+"exit_price": 2641.5314,
 "close": 3266.3999,
 "ret": 0.1852,
 "peak": 0.6756,
@@ -9382,7 +10394,11 @@
 "sector_index": "NIFTY COMMODITIES",
 "sector_tag": "weak",
 "sector_rs": -7.5316,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": null,
+"theme_rs": null,
+"td_score": 1,
+"aligned": false
 },
 {
 "symbol": "FORCEMOT",
@@ -9419,7 +10435,11 @@
 "sector_index": "NIFTY AUTO",
 "sector_tag": "weak",
 "sector_rs": 1.4988,
-"sector_rs_up": false
+"sector_rs_up": false,
+"theme": "NIFTY INDIA NEW AGE CONSUMPTION",
+"theme_rs": 5.1126,
+"td_score": 3,
+"aligned": true
 }
 ]
 }
