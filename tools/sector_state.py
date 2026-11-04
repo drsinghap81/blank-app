@@ -1,7 +1,9 @@
 """Sector state for the ATH / IPO scans: is each stock's sector index in an uptrend and beating the market?
 
-Data: NSE daily ind_close_all_DDMMYYYY.csv (all NSE indices). A rolling cache of ~1.5 years lives in
-data/scan/sector_hist.csv.gz; each run downloads only the missing days.
+Data: NSE daily ind_close_all_DDMMYYYY.csv (all NSE indices). The cache data/scan/sector_hist.csv.gz keeps the
+full daily history (from Nov 2015, the start of NSE's archive) of the sector, thematic and benchmark indices; each run
+downloads only the missing days. Thematic indices (THEMATIC, the niftyindices.com list) get the same state plus
+monthly-ATH status; some have gaps in NSE's archive before 2024 and seven started in 2025-26.
 Tag per sector index (as of the last completed week / last close):
   leading : above a rising 30-week SMA (higher than 4 weeks earlier) AND 3-month return beats Nifty 500
   uptrend : above a rising 30-week SMA, not beating Nifty 500
@@ -41,6 +43,20 @@ INDUSTRY_INDEX = {
 EXTRA = ["NIFTY BANK", "NIFTY PSU BANK", "NIFTY PRIVATE BANK", "NIFTY PSE", "NIFTY CPSE", "NIFTY OIL & GAS", "NIFTY HEALTHCARE INDEX",
          "NIFTY CONSUMER DURABLES", "NIFTY INDIA DEFENCE", "NIFTY CAPITAL MARKETS", "NIFTY INDIA RAILWAYS PSU", "NIFTY CHEMICALS",
          "NIFTY 50", "NIFTY MIDCAP 150", "NIFTY SMALLCAP 250"]
+# every index on niftyindices.com "Thematic Indices" (names as in NSE's daily ind_close_all file), 5 Nov 2026
+THEMATIC = ["NIFTY AI CATALYSTS", "NIFTY INDIA CORPORATE GROUP INDEX - ADITYA BIRLA GROUP", "NIFTY CAPITAL MARKETS", "NIFTY COMMODITIES",
+            "NIFTY CONGLOMERATE 50", "NIFTY CORE HOUSING", "NIFTY CPSE", "NIFTY ENERGY", "NIFTY EV & NEW AGE AUTOMOTIVE", "NIFTY HOUSING",
+            "NIFTY100 ESG", "NIFTY100 ENHANCED ESG", "NIFTY100 ESG SECTOR LEADERS", "NIFTY INDIA CONSUMPTION", "NIFTY INDIA DEFENCE",
+            "NIFTY INDIA DEFENCE EQUAL WEIGHT", "NIFTY INDIA DIGITAL", "NIFTY INDIA INFRASTRUCTURE & LOGISTICS", "NIFTY INDIA INTERNET",
+            "NIFTY INDIA MANUFACTURING", "NIFTY INDIA NEW AGE CONSUMPTION", "NIFTY INDIA RAILWAYS PSU", "NIFTY INDIA TOURISM",
+            "NIFTY INDIA SELECT 5 CORPORATE GROUPS (MAATR)", "NIFTY INFRASTRUCTURE", "NIFTY INDIA CORPORATE GROUP INDEX - MAHINDRA GROUP",
+            "NIFTY IPO", "NIFTY MIDCAP LIQUID 15", "NIFTY MIDSMALL INDIA CONSUMPTION", "NIFTY MNC", "NIFTY MOBILITY", "NIFTY PSE",
+            "NIFTY REITS & INVITS", "NIFTY REITS & INVITS 90:10", "NIFTY RURAL", "NIFTY NON-CYCLICAL CONSUMER", "NIFTY SERVICES SECTOR",
+            "NIFTY SHARIAH 25", "NIFTY SMALL FINANCE BANKS & MICROFINANCE INSTITUTIONS", "NIFTY SUGAR & ETHANOL",
+            "NIFTY INDIA CORPORATE GROUP INDEX - TATA GROUP", "NIFTY INDIA CORPORATE GROUP INDEX - TATA GROUP 25% CAP",
+            "NIFTY TRANSPORTATION & LOGISTICS", "NIFTY100 LIQUID 15", "NIFTY50 SHARIAH", "NIFTY500 SHARIAH",
+            "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20", "NIFTY500 MULTICAP INFRASTRUCTURE 50:30:20", "NIFTY500 AHIMSA",
+            "NIFTY SME EMERGE", "NIFTY WAVES"]
 s = requests.Session()
 s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
                   "Referer": "https://www.nseindia.com/"})
@@ -73,8 +89,7 @@ def load_hist(today):
     H = pd.concat([have] + new) if new else have
     H["Date"] = pd.to_datetime(H.Date)
     H = H.drop_duplicates(["Date", "INDEX"]).sort_values(["INDEX", "Date"])
-    H = H[H.Date >= pd.Timestamp(today) - pd.Timedelta(days=560)]
-    keep = set(INDUSTRY_INDEX.values()) | set(EXTRA) | {MARKET}
+    keep = set(INDUSTRY_INDEX.values()) | set(EXTRA) | set(THEMATIC) | {MARKET}
     H = H[H.INDEX.isin(keep)]
     H.to_csv(CACHE, index=False)
     print("index history rows", len(H), "new days", len(new), flush=True)
@@ -95,7 +110,7 @@ def rs_now(a, b, n):
 
 def state(c, mret, n50=None):
     c = c.dropna()
-    if len(c) < 160:
+    if len(c) < 160:            # < ~8 months of data: too new for the 30-week SMA / 6-month RS
         return None
     wk = c.groupby(c.index.to_period("W-FRI")).last()
     if c.index[-1].weekday() != 4:           # current week not finished: use completed weeks only
@@ -107,8 +122,17 @@ def state(c, mret, n50=None):
     beat = bool(rs > 0) if np.isfinite(rs) else False
     tag = "leading" if up and beat else "uptrend" if up else "mixed" if beat else "weak"
     srs, srs0 = rs_now(c, n50, SEC_RS_N) if n50 is not None else (np.nan, np.nan)
+    # monthly ATH status on closes (the file has closes only): highest completed-month close and its age
+    mc = c.groupby(c.index.to_period("M")).last()
+    done = mc.iloc[:-1] if len(mc) > 1 else mc
+    best_m = done.idxmax() if len(done) else None
+    base_m = int((mc.index[-1] - best_m).n) if best_m is not None else None
+    ath_close = float(done.max()) if len(done) else np.nan
     return dict(close=float(c.iloc[-1]), sma30=float(sma.iloc[-1]), up=up, ret_3m=r3 * 100, vs_market_3m=rs * 100,
-                from_high=float(c.iloc[-1] / c.max() - 1) * 100, tag=tag,
+                from_high=float(c.iloc[-1] / c.max() - 1) * 100, tag=tag, since=str(c.index[0].date()),
+                years=round((c.index[-1] - c.index[0]).days / 365.25, 1),
+                ath_month=str(best_m) if best_m is not None else None, ath_month_close=ath_close, base_months=base_m,
+                above_ath_month=bool(c.iloc[-1] > ath_close) if np.isfinite(ath_close) else None,
                 rs_6m=srs * 100 if np.isfinite(srs) else None, rs_6m_up=bool(srs > srs0) if np.isfinite(srs) and np.isfinite(srs0) else None)
 
 
@@ -132,7 +156,8 @@ def main():
                 sym.update(dict(zip(u.Symbol.astype(str).str.strip(), u.Industry.astype(str).str.strip())))
         except Exception:  # noqa: BLE001
             pass
-    out = dict(asof=str(P.index[-1].date()) if len(P) else str(today), market=MARKET, indices=idx, industries=INDUSTRY_INDEX, symbols=sym)
+    out = dict(asof=str(P.index[-1].date()) if len(P) else str(today), market=MARKET, indices=idx, industries=INDUSTRY_INDEX, symbols=sym,
+               thematic=[k for k in THEMATIC if k in idx], thematic_new=[k for k in THEMATIC if k not in idx])
     fix = lambda v: {k: fix(x) for k, x in v.items()} if isinstance(v, dict) else (None if isinstance(v, float) and not np.isfinite(v) else v)  # noqa: E731
     json.dump(fix(out), open(OUT, "w"), indent=0, allow_nan=False)
     print("sectors", len(idx), "symbols with industry", len(sym))

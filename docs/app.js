@@ -644,7 +644,7 @@ async function loadATH() {
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
   const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
-    ['ipo', 'IPO cups', ipoRows(true).length]];
+    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Themes', themeRows(true).length]];
   el.innerHTML = `
     <section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
@@ -656,6 +656,7 @@ async function loadATH() {
       <p class="note small-note">${{ brk: 'Price went above the high of the all-time-high closing month this month or last, and the trade is still open. Bold rows have a base of 2 years or more (the tested system); the rest 1–2 years.',
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
+        themes: 'Every thematic index on niftyindices.com, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
         ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>
       ${sectorStrip()}
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -737,9 +738,37 @@ async function drawIPO(r, tf) {
   ch.timeScale().fitContent();
   new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
 }
+const themeName = (k) => k.replace('NIFTY ', '').replace('INDIA CORPORATE GROUP INDEX - ', '').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+  .replace(/\bEsg\b/g, 'ESG').replace(/\bIpo\b/g, 'IPO').replace(/\bEv\b/g, 'EV').replace(/\bCpse\b/g, 'CPSE').replace(/\bPse\b/g, 'PSE').replace(/\bMnc\b/g, 'MNC')
+  .replace(/\bSme\b/g, 'SME').replace(/\bPsu\b/g, 'PSU').replace('Reits & Invits', 'REITs & InvITs').replace('(Maatr)', '(MAATR)');
+function themeRows(countOnly) {
+  const S = state.ath && state.ath.sec; if (!S || !S.thematic) return [];
+  let L = S.thematic.filter((k) => S.indices[k]).map((k) => ({ ...S.indices[k], key: k, name: themeName(k) }))
+    .sort((a, b) => (b.rs_6m ?? -999) - (a.rs_6m ?? -999));
+  if (countOnly) return L;
+  const q = (state.ath.q || '').toLowerCase();
+  return q ? L.filter((r) => r.name.toLowerCase().includes(q)) : L;
+}
+function themeItem(r) {
+  const tg = `<span class="chip ${r.tag === 'leading' ? 'new' : r.tag === 'weak' ? 'exit' : r.tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.tag].replace('Sector ', '')}</span>`;
+  const rs = r.rs_6m == null ? '' : `<span class="chip ${r.rs_6m > 0 ? 'open' : 'exit'}">RS 6 m ${pct(r.rs_6m)}${r.rs_6m_up ? ' ↑' : ''}</span>`;
+  const ath = r.base_months != null && r.base_months >= 24 ? `<span class="chip">${(r.base_months / 12).toFixed(1)}-yr base</span>` : '';
+  return { chip: tg + rs + ath, right: `<b>${fmt(r.close, 0, 'en-IN')}</b><span class="${r.from_high >= -5 ? 'up' : 'muted'}">${pct(r.from_high)} from high</span>` };
+}
+function themeSelect(r) {
+  const f = [['Trend', SECTOR_TXT[r.tag].replace('Sector ', '')], ['6-month RS vs Nifty 50', `${pct(r.rs_6m)}${r.rs_6m_up ? ' (rising)' : ' (not rising)'}`],
+    ['3-month return vs Nifty 500', pct(r.vs_market_3m)], ['3-month return', pct(r.ret_3m)], ['30-week SMA', fmt(r.sma30, 0, 'en-IN')],
+    ['From its high', pct(r.from_high)], ['Highest monthly close', `${fmt(r.ath_month_close, 0, 'en-IN')} (${esc(r.ath_month || '–')}, ${r.base_months ?? '–'} months ago)`],
+    ['History', `since ${longDay(r.since)} (${r.years} y)`]];
+  openPanel(`<div class="d-head"><div><h2>${esc(r.name)}</h2><div class="co">NSE thematic index</div></div><div class="d-price"><b>${fmt(r.close, 0, 'en-IN')}</b></div></div>
+    <div class="status ${r.tag === 'leading' || r.tag === 'uptrend' ? 'open' : r.tag === 'weak' ? 'exit' : 'info'}">${r.above_ath_month ? 'Above its highest monthly close.' : `${pct(r.from_high)} from its high.`} ${r.tag === 'leading' ? 'In an uptrend and beating the market.' : r.tag === 'uptrend' ? 'In an uptrend.' : r.tag === 'mixed' ? 'Beating the market but not in an uptrend.' : 'Not in an uptrend and lagging the market.'}</div>
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    <div class="links"><a href="https://www.niftyindices.com/indices/equity/thematic-indices" target="_blank" rel="noopener">Index details on niftyindices.com</a></div>`);
+}
 function athRows() {
   const { d, tab, q } = state.ath;
   if (tab === 'ipo') return ipoRows();
+  if (tab === 'themes') return themeRows();
   let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : (d.tracked || []);
   if (tab === 'brk') L = L.slice().sort((a, b) => (b.main - a.main) || (a.date < b.date ? 1 : -1));
   if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); }
@@ -772,6 +801,10 @@ function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   $('#athlist').innerHTML = (L.length ? L.map((r, i) => {
     let chip, right;
+    if (tab === 'themes') {
+      ({ chip, right } = themeItem(r));
+      return `<li class="row" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.name)}</div><div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
+    }
     if (tab === 'ipo') {
       ({ chip, right } = ipoItem(r));
       return `<li class="row ${r.status === 'buy next open' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
@@ -800,11 +833,11 @@ function athList() {
     if (r.size) chip += `<span class="chip">${esc(r.size)}</span>`;
     return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
       <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
-  }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.', ipo: state.ath.ipo ? 'No running IPO signals and nothing near its post-listing high.' : 'The first IPO scan runs tonight after 20:45 IST.' }[tab]}</li>`)
+  }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.', themes: 'Thematic index data appears after tonight\'s scan.', ipo: state.ath.ipo ? 'No running IPO signals and nothing near its post-listing high.' : 'The first IPO scan runs tonight after 20:45 IST.' }[tab]}</li>`)
     + (all.length > L.length ? `<li><button class="more" id="athmore">Show all ${all.length}</button></li>` : '');
   const m = $('#athmore'); if (m) m.addEventListener('click', () => { state.ath.all = true; athList(); });
   $('#athlist').querySelectorAll('.row').forEach((el) => {
-    const open = () => (tab === 'ipo' ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
+    const open = () => (tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
     el.addEventListener('click', open);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   });

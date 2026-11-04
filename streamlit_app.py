@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-11-01 · sector & stock RS tags v42"
+APP_BUILD = "2026-11-05 · thematic indices panel v43"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2046,6 +2046,23 @@ def render_sector_strip(key: str = "ath") -> None:
     with st.expander(f"Sectors ({sd.get('asof')}): leading — {lead}; weak — {weak}"):
         st.caption(SECTOR_TAG_HELP)
         st.dataframe(df_, hide_index=True, width="stretch", key=f"sectors_{key}")
+    th = [k for k in (sd.get("thematic") or []) if k in ix]
+    if th:
+        T_ = pd.DataFrame([dict(theme=k.replace("NIFTY ", "").replace("INDIA CORPORATE GROUP INDEX - ", "").title().replace("Esg", "ESG").replace("Ipo", "IPO")
+                                .replace("Ev ", "EV ").replace("Cpse", "CPSE").replace("Pse", "PSE").replace("Mnc", "MNC").replace("Sme", "SME").replace("Psu", "PSU")
+                                .replace("Reits & Invits", "REITs & InvITs").replace("(Maatr)", "(MAATR)"),
+                                tag=ix[k]["tag"], rs_6m_vs_nifty50=None if ix[k].get("rs_6m") is None else round(ix[k]["rs_6m"], 1),
+                                rs_rising="yes" if ix[k].get("rs_6m_up") else "no", vs_nifty500_3m=round(ix[k]["vs_market_3m"] or 0, 1),
+                                from_high=round(ix[k]["from_high"] or 0, 1), ath_month=ix[k].get("ath_month"), base_months=ix[k].get("base_months"),
+                                above_ath_month="yes" if ix[k].get("above_ath_month") else "no", history_years=ix[k].get("years")) for k in th])
+        T_ = T_.sort_values("rs_6m_vs_nifty50", ascending=False, na_position="last")
+        lead_t = ", ".join(T_[T_.tag == "leading"].theme.head(6)) or "none"
+        with st.expander(f"Thematic indices ({len(T_)}): leading — {lead_t}"):
+            st.caption("Every index on niftyindices.com's thematic list, from NSE's daily index file (history from Nov 2015; some have gaps "
+                       "before 2024). Same tags as sectors; sorted by 6-month RS vs Nifty 50. ath_month = highest monthly close, base_months = "
+                       "months since then; a base of 24+ months that the index closes above is the index version of the ATH breakout. "
+                       "Too new to rate (under ~8 months of data): " + (", ".join(k.replace("NIFTY ", "").title() for k in sd.get("thematic_new") or []) or "none") + ".")
+            st.dataframe(T_, hide_index=True, width="stretch", key=f"themes_{key}")
 
 
 def render_ath_tab() -> None:
