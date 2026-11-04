@@ -1,11 +1,22 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-CRL,2026-11-03,351.87,60.9,333.17,337.37,4.3,0,0.0,"Charles River Laboratories International, Inc. Common Stock",trend,162.3,0.91,85,402.66,351.87,60.9
-RGA,2026-11-02,267.41,62.4,261.61,262.3,1.9,1,-1.0,"Reinsurance Group of America, Incorporated Common Stock",watch,139.6,0.88,87,122.04,264.7,57.2
-GFL,2026-11-02,45.98,62.3,44.07,43.76,5.1,1,-0.6,"GFL Environmental Inc. Subordinate voting shares, no par value",watch,132.4,0.84,83,211.06,45.7,60.4
-VEEV,2026-10-30,312.96,60.9,305.25,306.5,2.1,2,-3.1,Veeva Systems Inc. Class A Common Stock,watch,172.0,0.93,98,469.74,303.21,51.8
-LQDT,2026-10-29,45.29,60.6,43.84,43.72,3.6,3,-2.0,"Liquidity Services, Inc.",watch,134.2,0.84,87,9.86,44.38,54.1
-LTC,2026-10-29,44.32,60.6,42.91,41.76,6.1,3,3.3,"LTC Properties, Inc. Common Stock",trend,128.4,0.8,87,26.92,45.8,67.6
-MDT,2026-10-29,97.11,62.7,93.1,93.04,4.4,3,1.8,Medtronic plc. Ordinary Shares,watch,127.2,0.83,75,2354.34,98.88,64.8
-TEVA,2026-10-29,41.47,60.5,40.21,39.46,5.1,3,1.1,Teva Pharmaceutical Industries Limited Ordinary Shares,watch,120.7,0.7,88,281.76,41.91,59.5
-FRHC,2026-10-29,183.67,62.7,173.73,172.26,6.6,3,1.7,Freedom Holding Corp.,watch,113.1,0.71,72,17.5,186.83,64.9
-IQV,2026-10-28,279.04,61.8,269.49,266.61,4.7,4,-5.9,"IQVIA Holdings, Inc. Common Stock",watch,149.9,0.88,80,364.4,262.59,45.8
+IDT,2026-11-04,83.99,64.0,80.92,80.5,4.3,0,0.0,IDT Corporation Class B Common Stock,trend,159.1,0.94,95,16.4,83.99,64.0
+BSVN,2026-11-04,59.63,66.6,57.65,57.93,2.9,0,0.0,Bank7 Corp. - Common stock,trend,149.7,0.93,95,2.58,59.63,66.6
+RIGL,2026-11-04,51.29,60.1,49.22,46.88,9.4,0,0.0,"Rigel Pharmaceuticals, Inc.",watch,148.2,0.85,82,9.8,51.29,60.1
+BWIN,2026-11-04,32.14,62.3,31.88,31.9,0.8,0,0.0,"The Baldwin Insurance Group, Inc.",watch,146.2,0.77,93,54.84,32.14,62.3
+USPH,2026-11-04,89.18,61.6,85.89,84.26,5.8,0,0.0,"U.S. Physical Therapy, Inc. Common Stock",watch,143.1,0.9,82,14.44,89.18,61.6
+HMC,2026-11-04,35.22,66.9,33.77,33.99,3.6,0,0.0,"Honda Motor Company, Ltd. Common Stock",watch,139.5,0.89,83,27.48,35.22,66.9
+FMAO,2026-11-04,37.48,64.2,36.05,35.08,6.8,0,0.0,"Farmers & Merchants Bancorp, Inc.",watch,138.9,0.88,82,2.12,37.48,64.2
+ABBV,2026-11-04,294.83,66.1,283.31,283.32,4.1,0,0.0,AbbVie Inc. Common Stock,trend,135.8,0.85,85,1568.08,294.83,66.1
+LQDT,2026-11-04,46.76,65.6,44.26,44.0,6.3,0,0.0,"Liquidity Services, Inc.",watch,133.9,0.85,87,9.32,46.76,65.6
+PFE,2026-11-04,30.79,64.5,29.64,29.89,3.0,0,0.0,"Pfizer, Inc. Common Stock",watch,121.5,0.73,85,979.84,30.79,64.5
+CRL,2026-11-03,351.87,60.9,333.17,337.37,4.3,1,-7.3,"Charles River Laboratories International, Inc. Common Stock",watch,161.5,0.9,83,413.72,326.29,49.9
+RGA,2026-11-02,267.41,62.4,261.61,262.3,1.9,2,-0.3,"Reinsurance Group of America, Incorporated Common Stock",watch,139.6,0.88,87,126.2,266.65,59.8
+FMAO,2026-11-02,36.88,62.1,35.86,36.33,1.5,2,1.6,"Farmers & Merchants Bancorp, Inc.",watch,138.9,0.88,82,2.12,37.48,64.2
+VEEV,2026-10-30,312.96,60.9,305.25,306.5,2.1,3,-0.7,Veeva Systems Inc. Class A Common Stock,trend,172.0,0.93,98,476.34,310.63,57.3
+LQDT,2026-10-29,45.29,60.6,43.84,43.72,3.6,4,3.2,"Liquidity Services, Inc.",watch,133.9,0.85,87,9.32,46.76,65.6
+LTC,2026-10-29,44.32,60.6,42.91,41.76,6.1,4,4.5,"LTC Properties, Inc. Common Stock",trend,127.9,0.8,88,28.02,46.33,69.8
+TEVA,2026-10-29,41.47,60.5,40.21,39.46,5.1,4,0.9,Teva Pharmaceutical Industries Limited Ordinary Shares,watch,122.9,0.72,88,295.98,41.85,59.1
+WEYS,2026-10-29,52.49,64.0,50.74,50.51,3.9,4,23.1,"Weyco Group, Inc.",trend,120.5,0.93,93,2.04,64.59,81.7
+MDT,2026-10-29,97.11,62.7,93.1,93.04,4.4,4,8.1,Medtronic plc. Ordinary Shares,watch,117.1,0.83,75,2175.98,104.96,73.8
+FRHC,2026-10-29,183.67,62.7,173.73,172.26,6.6,4,1.7,Freedom Holding Corp.,watch,114.7,0.71,73,17.38,186.82,64.8
+HCA,2026-10-29,478.08,63.8,455.52,439.83,8.7,4,6.8,"HCA Healthcare, Inc. Common Stock",watch,113.3,0.73,90,662.52,510.7,70.3
