@@ -212,7 +212,7 @@ def main():
         time.sleep(1)
     E = pd.DataFrame(events); N = pd.DataFrame(near)
     try:
-        from sector_state import tag_for, stock_rs  # noqa: F401
+        from sector_state import tag_for, stock_rs, topdown  # noqa: F401
         sec = json.load(open(f"{OUT}/sectors.json"))
     except Exception:  # noqa: BLE001
         sec = None
@@ -226,6 +226,7 @@ def main():
                 ix_ = sec.get("indices") or {}
                 df["sector_rs"] = [(ix_.get(x[1]) or {}).get("rs_6m") if x[1] else None for x in t]
                 df["sector_rs_up"] = [(ix_.get(x[1]) or {}).get("rs_6m_up") if x[1] else None for x in t]
+                df = topdown(df, sec)
             df["age_months"] = ((pd.Timestamp(today) - df.listed).dt.days / 30.44).round().astype(int)
     recent = pd.Timestamp(today) - pd.Timedelta(days=21)
     if len(E):

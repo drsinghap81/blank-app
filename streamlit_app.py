@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-11-05 · thematic indices panel v43"
+APP_BUILD = "2026-11-05 · top-down tab v44"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2063,6 +2063,97 @@ def render_sector_strip(key: str = "ath") -> None:
                        "months since then; a base of 24+ months that the index closes above is the index version of the ATH breakout. "
                        "Too new to rate (under ~8 months of data): " + (", ".join(k.replace("NIFTY ", "").title() for k in sd.get("thematic_new") or []) or "none") + ".")
             st.dataframe(T_, hide_index=True, width="stretch", key=f"themes_{key}")
+
+
+WORLD_PATH = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "data", "scan", "world.json")
+TD_HELP = ("Top-down funnel. Score (0–3) = sector RS > 0 + best theme RS > 0 + stock RS > 0 (6-month RS vs Nifty 50 for sector and "
+           "theme; 1-year RS vs its sector, or Nifty 500, for the stock). Aligned = sector RS > 0 AND stock RS > 0. Backtest of 968 "
+           "ATH breakouts 2017–26: aligned won 54% and averaged +29% vs 48% / +15% for other sector-tagged stocks; stock RS < 0 won "
+           "only 29%. World risk-on and the Nifty 500 trend did NOT help (buying while the market was below its SMA did as well or "
+           "better, e.g. 2020), so they are shown as context, not scored. Themes added little beyond the sector (few samples). "
+           "For IPO cups no level helped clearly (262 trades). Theme and industry lists are today's, so the test has some "
+           "look-ahead. A guide for confidence and size, not a filter.")
+
+
+def _td_name(k: str) -> str:
+    return (k.replace("NIFTY ", "").replace("INDIA CORPORATE GROUP INDEX - ", "").title().replace("Esg", "ESG").replace("Ipo", "IPO")
+            .replace("Fmcg", "FMCG").replace("It", "IT").replace("Cpse", "CPSE").replace("Pse", "PSE").replace("Mnc", "MNC")
+            .replace("Psu", "PSU").replace("Ev ", "EV ")) if k else ""
+
+
+def render_topdown_tab() -> None:
+    """World -> India -> sectors -> themes -> stocks."""
+    import json as _json
+
+    def _load(p):
+        try:
+            with open(p, encoding="utf-8") as f:
+                return _json.load(f)
+        except Exception:  # noqa: BLE001
+            return {}
+    w, sd, ad, idd = _load(WORLD_PATH), _load(SECTOR_PATH), _load(ATH_PATH), _load(IPO_PATH)
+    ix = sd.get("indices") or {}
+    st.markdown("#### 🧭 Top-down: world → India → sectors → themes → stocks")
+    st.caption(TD_HELP)
+    # 1 world
+    wi = w.get("indices") or {}
+    if wi:
+        ro = w.get("risk_on")
+        st.markdown(f"**1 · World ({w.get('asof')})** — {'🟢 risk-on' if ro else '🔴 risk-off'} (S&P 500 and MSCI World above a rising 30-week SMA)")
+        W_ = pd.DataFrame([dict(index=v["name"], region=v["region"], tag=v["tag"], rs_6m_vs_world=None if v.get("rs_6m") is None else round(v["rs_6m"], 1),
+                                rs_rising="yes" if v.get("rs_6m_up") else "no", ret_3m=round(v.get("ret_3m") or 0, 1),
+                                from_high=round(v.get("from_high") or 0, 1), ath_breakout="yes" if v.get("ath_breakout") else "")
+                           for v in wi.values()]).sort_values("rs_6m_vs_world", ascending=False, na_position="last")
+        st.dataframe(W_, hide_index=True, width="stretch", key="td_world")
+    else:
+        st.info("World indices appear after the evening top-down data run (20:10 IST).")
+    # 2 India
+    ind = [k for k in ("NIFTY 50", "NIFTY 500", "NIFTY MIDCAP 150", "NIFTY SMALLCAP 250", "NIFTY MICROCAP 250", "NIFTY BANK") if k in ix]
+    if ind:
+        st.markdown(f"**2 · India broad ({sd.get('asof')})**")
+        st.dataframe(pd.DataFrame([dict(index=_td_name(k), tag=ix[k]["tag"], ret_3m=round(ix[k].get("ret_3m") or 0, 1),
+                                        rs_6m_vs_nifty50=None if ix[k].get("rs_6m") is None else round(ix[k]["rs_6m"], 1),
+                                        from_high=round(ix[k].get("from_high") or 0, 1)) for k in ind]),
+                     hide_index=True, width="stretch", key="td_india")
+    # 3/4 sectors + themes
+    used = sorted(set((sd.get("industries") or {}).values()))
+    th = set(sd.get("thematic") or [])
+    def _tab(keys):
+        R = pd.DataFrame([dict(index=_td_name(k), tag=ix[k]["tag"], rs_6m_vs_nifty50=None if ix[k].get("rs_6m") is None else round(ix[k]["rs_6m"], 1),
+                               rs_rising="yes" if ix[k].get("rs_6m_up") else "no", from_high=round(ix[k].get("from_high") or 0, 1),
+                               ath_base_months=ix[k].get("base_months"), above_ath_month="yes" if ix[k].get("above_ath_month") else "")
+                          for k in keys if k in ix])
+        return R.sort_values("rs_6m_vs_nifty50", ascending=False, na_position="last") if len(R) else R
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("**3 · Sectors** (by 6-month RS vs Nifty 50)")
+        st.dataframe(_tab(used), hide_index=True, width="stretch", key="td_sec")
+    with c2:
+        st.markdown("**4 · Themes**")
+        st.dataframe(_tab(th), hide_index=True, width="stretch", key="td_th")
+    # 5 stocks
+    rows = []
+    for src, lst in (("ATH breakout", ad.get("breakouts")), ("ATH near", ad.get("near")), ("IPO cup", [r for r in (idd.get("signals") or idd.get("tracked") or []) if r.get("status") in ("open", "buy next open")]),
+                     ("IPO near", idd.get("near"))):
+        for r in lst or []:
+            rows.append(dict(symbol=r.get("symbol"), setup=src, td_score=r.get("td_score"), aligned="✅" if r.get("aligned") else "",
+                             sector=_td_name(r.get("sector_index") or ""), sector_rs=r.get("sector_rs"), theme=_td_name(r.get("theme") or ""),
+                             theme_rs=r.get("theme_rs"), stock_rs=r.get("stock_rs"), rs_bench=_td_name(r.get("rs_bench") or ""),
+                             status=r.get("status") or (f"{r.get('gap_pct'):.1f}% to trigger" if r.get("gap_pct") is not None else "")))
+    st.markdown("**5 · Stocks** — current ATH / IPO setups ranked by top-down score")
+    if not rows:
+        st.info("No setups yet.")
+        return
+    S_ = pd.DataFrame(rows).drop_duplicates(["symbol", "setup"])
+    for c in ("sector_rs", "theme_rs", "stock_rs"):
+        S_[c] = pd.to_numeric(S_[c], errors="coerce").round(1)
+    if S_.td_score.isna().all():
+        st.caption("Scores appear after the next evening scan run.")
+    only = st.checkbox("Aligned only (sector RS > 0 and stock RS > 0)", value=False, key="td_only")
+    if only:
+        S_ = S_[S_.aligned == "✅"]
+    S_ = S_.sort_values(["td_score", "stock_rs"], ascending=False, na_position="last")
+    st.dataframe(S_, hide_index=True, width="stretch", key="td_stocks")
 
 
 def render_ath_tab() -> None:
@@ -2497,8 +2588,8 @@ def main() -> None:
 
     render_header(market)
 
-    tab_trend, tab_ath, tab_ipo, tab_tb, tab_ratio, tab_scan, tab1, tab_bt, tab2, tab3, tab_oi = st.tabs(
-        ["📈 Trend scan", "🏔️ Monthly ATH", "🚀 IPO cups", "🔁 Top Bottom", "🦋 Nifty ratio", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
+    tab_td, tab_trend, tab_ath, tab_ipo, tab_tb, tab_ratio, tab_scan, tab1, tab_bt, tab2, tab3, tab_oi = st.tabs(
+        ["🧭 Top-down", "📈 Trend scan", "🏔️ Monthly ATH", "🚀 IPO cups", "🔁 Top Bottom", "🦋 Nifty ratio", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
          "🧾 Paper orders", "💼 Portfolio", "🗄️ OI alerts (archived)"])
     with tab1:
         render_analysis_tab(market, ticker)
@@ -2510,6 +2601,8 @@ def main() -> None:
         render_ath_tab()
     with tab_ipo:
         render_ipo_tab()
+    with tab_td:
+        render_topdown_tab()
     with tab_oi:
         render_oi_alerts_tab()
     with tab_bt:

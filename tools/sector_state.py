@@ -156,7 +156,15 @@ def main():
                 sym.update(dict(zip(u.Symbol.astype(str).str.strip(), u.Industry.astype(str).str.strip())))
         except Exception:  # noqa: BLE001
             pass
+    themes = {}
+    try:
+        T = pd.read_csv("data/universe/themes.csv")
+        T = T[~T.Theme.isin(THEME_EXCLUDE)]
+        themes = T.groupby(T.Symbol.astype(str).str.strip()).Theme.apply(lambda v: sorted(set(v))).to_dict()
+    except Exception:  # noqa: BLE001
+        pass
     out = dict(asof=str(P.index[-1].date()) if len(P) else str(today), market=MARKET, indices=idx, industries=INDUSTRY_INDEX, symbols=sym,
+               themes=themes,
                thematic=[k for k in THEMATIC if k in idx], thematic_new=[k for k in THEMATIC if k not in idx])
     fix = lambda v: {k: fix(x) for k, x in v.items()} if isinstance(v, dict) else (None if isinstance(v, float) and not np.isfinite(v) else v)  # noqa: E731
     json.dump(fix(out), open(OUT, "w"), indent=0, allow_nan=False)
@@ -193,6 +201,28 @@ def stock_rs(symbol, close, sec, bench):
     if not np.isfinite(r):
         return {}
     return dict(rs_bench=b, stock_rs=r * 100, stock_rs_up=bool(r > r0) if np.isfinite(r0) else None, stock_rs_days=int(n))
+
+
+# themes that say nothing about the business (ownership group, ethics screen, liquidity, exchange board)
+THEME_EXCLUDE = {"NIFTY500 AHIMSA", "NIFTY SME EMERGE", "NIFTY MIDCAP LIQUID 15", "NIFTY100 LIQUID 15", "NIFTY CONGLOMERATE 50",
+                 "NIFTY INDIA SELECT 5 CORPORATE GROUPS (MAATR)"}
+
+
+def topdown(df, sec):
+    """Top-down columns for scan rows (needs sector_rs / stock_rs already set):
+    theme / theme_rs = member theme with the best 6-month RS vs Nifty 50; td_score = count of sector RS > 0, theme RS > 0,
+    stock RS > 0; aligned = sector RS > 0 AND stock RS > 0 (the pair that lifted ATH breakouts in the 2017-26 test)."""
+    ix = sec.get("indices") or {}; th = sec.get("themes") or {}
+    best = []
+    for s_ in df.symbol:
+        v = [(t, (ix.get(t) or {}).get("rs_6m")) for t in th.get(s_, []) if t not in THEME_EXCLUDE]
+        v = [x for x in v if x[1] is not None]
+        best.append(max(v, key=lambda x: x[1]) if v else (None, None))
+    df["theme"] = [b[0] for b in best]; df["theme_rs"] = [b[1] for b in best]
+    pos = lambda c: pd.to_numeric(df[c], errors="coerce").gt(0) if c in df else pd.Series(False, index=df.index)  # noqa: E731
+    df["td_score"] = pos("sector_rs").astype(int) + pos("theme_rs").astype(int) + pos("stock_rs").astype(int)
+    df["aligned"] = pos("sector_rs") & pos("stock_rs")
+    return df
 
 
 def tag_for(symbol, sec):

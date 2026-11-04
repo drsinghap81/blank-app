@@ -628,8 +628,8 @@ async function loadATH() {
     el.innerHTML = '<p class="muted pad">Loading…</p>';
     const [d, live, ipo] = await Promise.all([getJSON(MAIN + 'data/scan/ath.json', 'ath'), getJSON(REPO + 'live/data/live/ath_live.json', 'ath_live'),
       getJSON(MAIN + 'data/scan/ipo.json', 'ipo')]);
-    const sec = await getJSON(MAIN + 'data/scan/sectors.json', 'sectors');
-    state.ath = { d, live, ipo, sec, tab: 'brk', q: '', all: false };
+    const [sec, world] = await Promise.all([getJSON(MAIN + 'data/scan/sectors.json', 'sectors'), getJSON(MAIN + 'data/scan/world.json', 'world')]);
+    state.ath = { d, live, ipo, sec, world, tab: 'td', q: '', all: false };
   }
   const { d } = state.ath;
   if (!d) { el.innerHTML = '<p class="empty">The monthly all-time-high scan appears after its first evening run. Try again later.</p>'; $('#asof').textContent = ''; return; }
@@ -643,7 +643,7 @@ async function loadATH() {
   const exits = T.filter((r) => r.status === 'exit next open').length;
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
-  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
+  const tabs = [['td', 'Top-down', tdRows(true).length], ['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
     ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Themes', themeRows(true).length]];
   el.innerHTML = `
     <section class="summary">
@@ -653,12 +653,13 @@ async function loadATH() {
       <div class="stat exit"><b>${exits}</b><span>to sell at next open</span></div></section>
     <div class="card">
       <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
-      <p class="note small-note">${{ brk: 'Price went above the high of the all-time-high closing month this month or last, and the trade is still open. Bold rows have a base of 2 years or more (the tested system); the rest 1–2 years.',
+      <p class="note small-note">${{ td: 'Top-down: world → India → sectors → themes → stocks. Score 0–3 = sector RS > 0, best theme RS > 0, stock RS > 0. Aligned (sector and stock RS both positive) ATH breakouts won 54% and averaged +29% vs 48% / +15% (2017–26). World and Nifty trend did not help, so they are context only; IPO cups showed no clear lift. A guide for confidence and size, not a filter.',
+        brk: 'Price went above the high of the all-time-high closing month this month or last, and the trade is still open. Bold rows have a base of 2 years or more (the tested system); the rest 1–2 years.',
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
         themes: 'Every thematic index on niftyindices.com, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
         ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>
-      ${sectorStrip()}
+      ${state.ath.tab === 'td' ? topStrip() : sectorStrip()}
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="athq" type="search" placeholder="Search symbol or company" value="${esc(state.ath.q)}" autocomplete="off"></label>
       <ul class="list flat" id="athlist"></ul></div>`;
@@ -701,7 +702,7 @@ function ipoSelect(r) {
   const f = [['High since listing', `${fmt(r.ath, 2, 'en-IN')} (${day(r.ath_date)})`], ['Cup depth', pct(r.depth * 100)], ['Cup length', `${r.base_days} trading days`],
     ['Listed', `${day(r.listed)} (${r.age_months} months ago)`], ['10-week SMA', fmt(r.sma10, 2, 'en-IN')], ['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]];
   if (!near && r.entry) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}`], ['Best since entry', pct(r.peak * 100)]);
-  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf);
+  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf); if (r.td_score != null) f.push(['Top-down', `score ${r.td_score}/3${r.aligned ? ' · aligned' : ''}${r.theme ? ` · best theme ${esc(themeName(r.theme))} ${pct(r.theme_rs)}` : ''}`]);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}${plan}
     <div class="seg-row"><div class="seg small" id="ipotf"><button data-tf="d" aria-selected="true">Daily</button><button data-tf="w" aria-selected="false">Weekly + 10 SMA</button></div></div>
@@ -765,8 +766,46 @@ function themeSelect(r) {
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
     <div class="links"><a href="https://www.niftyindices.com/indices/equity/thematic-indices" target="_blank" rel="noopener">Index details on niftyindices.com</a></div>`);
 }
+function tdRows(countOnly) {
+  const A = state.ath; if (!A || !A.d) return [];
+  const ip = A.ipo || {};
+  let L = (A.d.breakouts || []).map((r) => ({ ...r, _src: 'ATH breakout' }))
+    .concat((A.d.near || []).map((r) => ({ ...r, _src: 'ATH near', _near: true })))
+    .concat((ip.tracked || []).filter((r) => r.status === 'open' || r.status === 'buy next open').map((r) => ({ ...r, kind: 'sig', _src: 'IPO cup', _ipo: true })))
+    .concat((ip.near || []).map((r) => ({ ...r, kind: 'near', _src: 'IPO near', _ipo: true })));
+  L.sort((a, b) => ((b.td_score ?? -1) - (a.td_score ?? -1)) || ((b.aligned ? 1 : 0) - (a.aligned ? 1 : 0)) || ((b.stock_rs ?? -999) - (a.stock_rs ?? -999)));
+  if (countOnly) return L.filter((r) => r.aligned);
+  const q = (A.q || '').toLowerCase();
+  return q ? L.filter((r) => r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)) : L;
+}
+function topStrip() {
+  const A = state.ath; const W = A.world; const S = A.sec; let h = '';
+  if (W && W.indices) {
+    const I = Object.values(W.indices); const by = (t) => I.filter((x) => x.tag === t).map((x) => x.name.replace(' (ETF)', ''));
+    h += `<p class="note small-note"><b>1 · World ${day(W.asof)}: ${W.risk_on ? '🟢 risk-on' : '🔴 risk-off'}</b> (S&P 500 and MSCI World above a rising 30-week SMA). Leading — ${by('leading').join(', ') || 'none'}; weak — ${by('weak').join(', ') || 'none'}.</p>`;
+  }
+  if (S && S.indices) {
+    const ix = S.indices; const t = (k) => (ix[k] ? `${k.replace('NIFTY', 'Nifty').replace('MIDCAP', 'Midcap').replace('SMALLCAP', 'Smallcap')} ${ix[k].tag}` : '');
+    h += `<p class="note small-note"><b>2 · India:</b> ${['NIFTY 50', 'NIFTY 500', 'NIFTY MIDCAP 150', 'NIFTY SMALLCAP 250'].map(t).filter(Boolean).join(' · ')}</p>`;
+    const NOT = ['NIFTY500 AHIMSA', 'NIFTY SME EMERGE', 'NIFTY MIDCAP LIQUID 15', 'NIFTY100 LIQUID 15', 'NIFTY CONGLOMERATE 50', 'NIFTY INDIA SELECT 5 CORPORATE GROUPS (MAATR)'];
+    const top = (keys, n, nm) => keys.filter((k) => ix[k] && ix[k].rs_6m != null && !NOT.includes(k) && !k.includes('CORPORATE GROUP')).sort((a, b) => ix[b].rs_6m - ix[a].rs_6m).slice(0, n)
+      .map((k) => `${nm(k)} ${pct(ix[k].rs_6m)}${ix[k].rs_6m_up ? '↑' : ''}`);
+    h += `<p class="note small-note"><b>3 · Sectors by RS 6 m:</b> ${top([...new Set(Object.values(S.industries || {}))], 5, secName).join(', ')}</p>`;
+    h += `<p class="note small-note"><b>4 · Themes:</b> ${top(S.thematic || [], 6, themeName).join(', ')} <span class="muted">(full list in Themes)</span></p>`;
+  }
+  return h;
+}
+function tdItem(r) {
+  const sc = r.td_score == null ? '' : `<span class="chip ${r.aligned ? 'new' : r.td_score === 0 ? 'exit' : ''}">${r.aligned ? '✓ aligned · ' : ''}score ${r.td_score}/3</span>`;
+  const th = r.theme ? rsChip(themeName(r.theme), r.theme_rs) : '';
+  const st = r._near ? `<span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to go</span>` : r.kind === 'near' ? `<span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to the high</span>`
+    : r.status === 'buy next open' ? '<span class="chip new">Buy next open</span>' : r.status === 'exit next open' ? '<span class="chip exit">Sell next open</span>' : `<span class="chip open">Since ${day(r.date)}</span>`;
+  const chip = `<span class="chip">${r._src}</span>${st}${sc}` + (r.sector_index ? rsChip(secName(r.sector_index), r.sector_rs) : '') + th + rsChip('Stock RS', r.stock_rs);
+  return { chip, right: `<b>${fmt(r.close, 2, 'en-IN')}</b>` + (r.ret != null && !r._near && r.kind !== 'near' ? `<span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>` : '') };
+}
 function athRows() {
   const { d, tab, q } = state.ath;
+  if (tab === 'td') return tdRows();
   if (tab === 'ipo') return ipoRows();
   if (tab === 'themes') return themeRows();
   let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : (d.tracked || []);
@@ -801,6 +840,11 @@ function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   $('#athlist').innerHTML = (L.length ? L.map((r, i) => {
     let chip, right;
+    if (tab === 'td') {
+      ({ chip, right } = tdItem(r));
+      return `<li class="row ${r.aligned ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
+        <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
+    }
     if (tab === 'themes') {
       ({ chip, right } = themeItem(r));
       return `<li class="row" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.name)}</div><div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
@@ -833,17 +877,17 @@ function athList() {
     if (r.size) chip += `<span class="chip">${esc(r.size)}</span>`;
     return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
       <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
-  }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.', themes: 'Thematic index data appears after tonight\'s scan.', ipo: state.ath.ipo ? 'No running IPO signals and nothing near its post-listing high.' : 'The first IPO scan runs tonight after 20:45 IST.' }[tab]}</li>`)
+  }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.', themes: 'Thematic index data appears after tonight\'s scan.', td: 'No ATH or IPO setups right now.', ipo: state.ath.ipo ? 'No running IPO signals and nothing near its post-listing high.' : 'The first IPO scan runs tonight after 20:45 IST.' }[tab]}</li>`)
     + (all.length > L.length ? `<li><button class="more" id="athmore">Show all ${all.length}</button></li>` : '');
   const m = $('#athmore'); if (m) m.addEventListener('click', () => { state.ath.all = true; athList(); });
   $('#athlist').querySelectorAll('.row').forEach((el) => {
-    const open = () => (tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
+    const open = () => (tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
     el.addEventListener('click', open);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   });
 }
 function athSelect(r) {
-  const near = state.ath.tab === 'near';
+  const near = state.ath.tab === 'near' || !!r._near;
   const st = near ? `<div class="status info">Not triggered yet. Buy if it trades above ${fmt(r.trigger, 2, 'en-IN')} this month (${fmt(r.gap_pct, 1, 'en-IN')}% above the last close).</div>`
     : r.status === 'exit next open' ? '<div class="status exit">Weekly close below the 30-week SMA. Sell at the next open.</div>'
       : r.status === 'exited' ? `<div class="status info">Exited ${day(r.exit_date)} at ${fmt(r.exit_price, 2, 'en-IN')} (${pct(r.ret * 100)}).</div>`
@@ -852,7 +896,7 @@ function athSelect(r) {
     ['Deepest fall in the base', pct((r.depth || 0) * 100)], ['30-week SMA', fmt(r.sma30, 2, 'en-IN')]];
   if (!near) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, 'en-IN')}`], ['Best since entry', pct(r.peak * 100)], ['Weeks', r.weeks]);
   f.push(['Traded a day', `₹${fmt(r.value_cr, 1, 'en-IN')} cr`]);
-  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf);
+  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf); if (r.td_score != null) f.push(['Top-down', `score ${r.td_score}/3${r.aligned ? ' · aligned' : ''}${r.theme ? ` · best theme ${esc(themeName(r.theme))} ${pct(r.theme_rs)}` : ''}`]);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}
     ${planATH(r, near)}
