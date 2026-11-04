@@ -1,0 +1,31 @@
+name: topdown-data
+on:
+  push:
+    paths: [".github/workflows/topdown-data.yml", "tools/world_state.py", "tools/fetch_themes.py"]
+  schedule:
+    - cron: "40 14 * * 1-5"   # 20:10 IST on trading days, before the ATH scan (20:30)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas requests
+      - name: World indices
+        run: python tools/world_state.py 2>&1 | grep -v -i "warn" | tail -25 || true
+      - name: Theme constituents (weekly on Mondays, or when the list is missing)
+        run: |
+          if [ "$(date -u +%u)" = "1" ] || [ ! -f data/universe/themes.csv ] || [ "${{ github.event_name }}" != "schedule" ]; then
+            python tools/fetch_themes.py 2>&1 | tail -70 || true
+          fi
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add data/scan/world.json data/scan/world_hist.csv.gz data/universe/themes.csv data/universe/themes 2>/dev/null; git diff --cached --quiet && exit 0
+          git commit -qm "Top-down data $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
