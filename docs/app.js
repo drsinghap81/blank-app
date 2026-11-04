@@ -223,7 +223,7 @@ function select(r) {
     ${statusBlock(r)}
     ${styleSeg('trend', 'trst')}
     <div class="chart" id="cv"></div><div class="rsi" id="rv"></div>
-    <div class="legend"><span><i style="background:${C.e9}"></i>9 EMA</span><span><i style="background:${C.e21}"></i>21 EMA</span>
+    <div class="tdlegend"><span><i style="background:${C.e9}"></i>9 EMA</span><span><i style="background:${C.e21}"></i>21 EMA</span>
       <span><i style="background:${C.e50}"></i>50 EMA</span><span><i style="background:${C.rise}"></i>Supertrend</span>
       ${trade ? `<span><i style="background:${C.fall}"></i>Initial stop</span>` : ''}<span><i style="background:${C.rsi}"></i>RSI with 55 line</span></div>
     ${(state.tab === 'new' || state.tab === 'open') ? plan921(r) : ''}${facts(r)}${links(r.symbol)}`);
@@ -653,13 +653,13 @@ async function loadATH() {
       <div class="stat exit"><b>${exits}</b><span>to sell at next open</span></div></section>
     <div class="card">
       <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
-      <p class="note small-note">${{ td: 'Top-down: world → India → sectors → themes → stocks. Score 0–3 = sector RS > 0, best theme RS > 0, stock RS > 0. Aligned (sector and stock RS both positive) ATH breakouts won 54% and averaged +29% vs 48% / +15% (2017–26). World and Nifty trend did not help, so they are context only; IPO cups showed no clear lift. A guide for confidence and size, not a filter.',
+      <details class="info"><summary>How this list works</summary><p>${{ td: 'Top-down: world → India → sectors → themes → stocks. Score 0–3 = sector RS > 0, best theme RS > 0, stock RS > 0. Aligned (sector and stock RS both positive) ATH breakouts won 54% and averaged +29% vs 48% / +15% (2017–26). World and Nifty trend did not help, so they are context only; IPO cups showed no clear lift. A guide for confidence and size, not a filter.',
         brk: 'Price went above the high of the all-time-high closing month this month or last, and the trade is still open. Bold rows have a base of 2 years or more (the tested system); the rest 1–2 years.',
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
         themes: 'Every thematic index on niftyindices.com, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
-        ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>
-      ${state.ath.tab === 'td' ? topStrip() : sectorStrip()}
+        ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>${state.ath.tab === 'td' ? '' : sectorStrip()}</details>
+      ${state.ath.tab === 'td' ? topStrip() : ''}
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="athq" type="search" placeholder="Search symbol or company" value="${esc(state.ath.q)}" autocomplete="off"></label>
       <ul class="list flat" id="athlist"></ul></div>`;
@@ -778,29 +778,42 @@ function tdRows(countOnly) {
   const q = (A.q || '').toLowerCase();
   return q ? L.filter((r) => r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)) : L;
 }
+const TAGC = { leading: 'lead', uptrend: 'up', mixed: 'mix', weak: 'weak' };
+const SHORT = { 'S&P 500': 'S&P 500', 'Nasdaq 100': 'Nasdaq', 'Dow Jones': 'Dow', 'Russell 2000': 'Russell', 'DAX': 'DAX', 'FTSE 100': 'FTSE', 'Euro Stoxx 50': 'Stoxx 50',
+  'Nikkei 225': 'Nikkei', 'Hang Seng': 'Hang Seng', 'Shanghai Composite': 'Shanghai', 'KOSPI': 'KOSPI', 'ASX 200': 'ASX 200', 'MSCI World (ETF)': 'MSCI World',
+  'MSCI Emerging Markets (ETF)': 'MSCI EM', 'Nifty 50': 'Nifty 50', 'Nifty 500': 'Nifty 500' };
+const tile = (name, x, extra) => `<div class="tile ${TAGC[x.tag] || ''}"><b>${esc(name)}${extra || ''}</b><span>${x.rs_6m == null ? '' : `${x.rs_6m > 0 ? '+' : ''}${x.rs_6m.toFixed(0)}%${x.rs_6m_up ? '↑' : ''}`}</span></div>`;
+function rsBars(keys, ix, nm, n) {
+  const L = keys.filter((k) => ix[k] && ix[k].rs_6m != null).sort((a, b) => ix[b].rs_6m - ix[a].rs_6m).slice(0, n || 99);
+  const mx = Math.max(10, ...L.map((k) => Math.abs(ix[k].rs_6m)));
+  return `<div class="tdbars">${L.map((k) => { const v = ix[k].rs_6m; const w = Math.abs(v) / mx * 50;
+    return `<div class="tdbar"><i class="dot ${TAGC[ix[k].tag]}"></i><span class="bn">${esc(nm(k))}</span><span class="bt"><em class="${v >= 0 ? 'pos' : 'neg'}" style="${v >= 0 ? 'left:50%' : `left:${50 - w}%`};width:${w}%"></em></span><span class="bv ${v >= 0 ? 'up' : 'down'}">${v > 0 ? '+' : ''}${v.toFixed(0)}%${ix[k].rs_6m_up ? '↑' : ''}${ix[k].above_ath_month ? ' ★' : ix[k].base_months >= 24 ? ' 2y' : ''}</span></div>`; }).join('')}</div>`;
+}
 function topStrip() {
   const A = state.ath; const W = A.world; const S = A.sec; let h = '';
+  const legend = '<div class="tdlegend"><span><i class="dot lead"></i>leading</span><span><i class="dot up"></i>uptrend</span><span><i class="dot mix"></i>mixed</span><span><i class="dot weak"></i>weak</span><span>↑ RS rising</span><span>★ ATH breakout</span><span>2y = 2-yr+ base</span></div>';
   if (W && W.indices) {
-    const I = Object.values(W.indices); const by = (t) => I.filter((x) => x.tag === t).map((x) => x.name.replace(' (ETF)', ''));
-    h += `<p class="note small-note"><b>1 · World ${day(W.asof)}: ${W.risk_on ? '🟢 risk-on' : '🔴 risk-off'}</b> (S&P 500 and MSCI World above a rising 30-week SMA). Leading — ${by('leading').join(', ') || 'none'}; weak — ${by('weak').join(', ') || 'none'}.</p>`;
+    const I = Object.entries(W.indices).filter(([t]) => t !== '^NSEI' && t !== '^CRSLDX');
+    h += `<div class="td-sec"><div class="td-h"><span>1 · World</span><span class="tdpill ${W.risk_on ? 'on' : 'off'}">${W.risk_on ? 'Risk-on' : 'Risk-off'}</span></div>
+      <div class="tiles">${I.map(([, x]) => tile(SHORT[x.name] || x.name, x, x.ath_breakout ? ' ★' : '')).join('')}</div><p class="cap">RS = 6-month return vs MSCI World · ${day(W.asof)}</p></div>`;
   }
   if (S && S.indices) {
-    const ix = S.indices; const t = (k) => (ix[k] ? `${k.replace('NIFTY', 'Nifty').replace('MIDCAP', 'Midcap').replace('SMALLCAP', 'Smallcap')} ${ix[k].tag}` : '');
-    h += `<p class="note small-note"><b>2 · India:</b> ${['NIFTY 50', 'NIFTY 500', 'NIFTY MIDCAP 150', 'NIFTY SMALLCAP 250'].map(t).filter(Boolean).join(' · ')}</p>`;
+    const ix = S.indices;
+    const ind = [['NIFTY 50', 'Nifty 50'], ['NIFTY 500', 'Nifty 500'], ['NIFTY MIDCAP 150', 'Midcap 150'], ['NIFTY SMALLCAP 250', 'Smallcap 250']].filter(([k]) => ix[k]);
+    h += `<div class="td-sec"><div class="td-h"><span>2 · India</span></div><div class="tiles">${ind.map(([k, n]) => tile(n, ix[k])).join('')}</div><p class="cap">RS = 6-month return vs Nifty 50</p></div>`;
     const NOT = ['NIFTY500 AHIMSA', 'NIFTY SME EMERGE', 'NIFTY MIDCAP LIQUID 15', 'NIFTY100 LIQUID 15', 'NIFTY CONGLOMERATE 50', 'NIFTY INDIA SELECT 5 CORPORATE GROUPS (MAATR)'];
-    const top = (keys, n, nm) => keys.filter((k) => ix[k] && ix[k].rs_6m != null && !NOT.includes(k) && !k.includes('CORPORATE GROUP')).sort((a, b) => ix[b].rs_6m - ix[a].rs_6m).slice(0, n)
-      .map((k) => `${nm(k)} ${pct(ix[k].rs_6m)}${ix[k].rs_6m_up ? '↑' : ''}`);
-    h += `<p class="note small-note"><b>3 · Sectors by RS 6 m:</b> ${top([...new Set(Object.values(S.industries || {}))], 5, secName).join(', ')}</p>`;
-    h += `<p class="note small-note"><b>4 · Themes:</b> ${top(S.thematic || [], 6, themeName).join(', ')} <span class="muted">(full list in Themes)</span></p>`;
+    h += `<div class="td-sec"><div class="td-h"><span>3 · Sectors</span><span class="cap">RS 6 m vs Nifty 50</span></div>${rsBars([...new Set(Object.values(S.industries || {}))], ix, secName)}</div>`;
+    h += `<div class="td-sec"><div class="td-h"><span>4 · Themes · top 10</span><span class="cap">all in Themes</span></div>${rsBars((S.thematic || []).filter((k) => !NOT.includes(k) && !k.includes('CORPORATE GROUP')), ix, themeName, 10)}</div>`;
   }
-  return h;
+  return h + legend + '<div class="td-h stocks"><span>5 · Stocks</span><span class="cap">● sector · theme · stock RS > 0</span></div>';
 }
 function tdItem(r) {
-  const sc = r.td_score == null ? '' : `<span class="chip ${r.aligned ? 'new' : r.td_score === 0 ? 'exit' : ''}">${r.aligned ? '✓ aligned · ' : ''}score ${r.td_score}/3</span>`;
-  const th = r.theme ? rsChip(themeName(r.theme), r.theme_rs) : '';
-  const st = r._near ? `<span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to go</span>` : r.kind === 'near' ? `<span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to the high</span>`
+  const dot = (v) => `<i class="sd ${v == null ? 'na' : v > 0 ? 'y' : 'n'}"></i>`;
+  const sc = `<span class="score ${r.aligned ? 'al' : ''}">${dot(r.sector_rs)}${dot(r.theme_rs)}${dot(r.stock_rs)}${r.aligned ? ' aligned' : ''}</span>`;
+  const st = r._near ? `<span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to go</span>` : r.kind === 'near' ? `<span class="chip">${fmt(r.gap_pct, 1, 'en-IN')}% to high</span>`
     : r.status === 'buy next open' ? '<span class="chip new">Buy next open</span>' : r.status === 'exit next open' ? '<span class="chip exit">Sell next open</span>' : `<span class="chip open">Since ${day(r.date)}</span>`;
-  const chip = `<span class="chip">${r._src}</span>${st}${sc}` + (r.sector_index ? rsChip(secName(r.sector_index), r.sector_rs) : '') + th + rsChip('Stock RS', r.stock_rs);
+  const sub = [r.sector_index ? secName(r.sector_index) : '', r.theme ? themeName(r.theme) : ''].filter(Boolean).join(' · ');
+  const chip = `${sc}<span class="chip">${r._src}</span>${st}` + (sub ? `<div class="co small">${esc(sub)}</div>` : '');
   return { chip, right: `<b>${fmt(r.close, 2, 'en-IN')}</b>` + (r.ret != null && !r._near && r.kind !== 'near' ? `<span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>` : '') };
 }
 function athRows() {
@@ -833,7 +846,7 @@ function sectorStrip() {
   const S = state.ath && state.ath.sec; if (!S || !S.indices) return '';
   const names = [...new Set(Object.values(S.industries || {}))].filter((k) => S.indices[k]);
   const by = (t) => names.filter((k) => S.indices[k].tag === t).sort((a, b) => S.indices[b].vs_market_3m - S.indices[a].vs_market_3m).map(secName);
-  return `<p class="note small-note"><b>Sectors ${day(S.asof)}:</b> leading — ${by('leading').join(', ') || 'none'}; weak — ${by('weak').join(', ') || 'none'}. The tag on each stock is its sector: up-trending sectors raised the breakout win rate (54% vs 40%; weak sectors 31%) but not the average return. RS chips: sector 6-month RS vs Nifty 50 and stock 1-year RS vs its sector (or Nifty 500); breakouts with both positive averaged ~+30% vs ~+17%, a negative stock RS won only 30% — use them for confidence and size, not as filters.</p>`;
+  return `<p><b>Sectors ${day(S.asof)}:</b> leading — ${by('leading').join(', ') || 'none'}; weak — ${by('weak').join(', ') || 'none'}. The tag on each stock is its sector: up-trending sectors raised the breakout win rate (54% vs 40%; weak sectors 31%) but not the average return. RS chips: sector 6-month RS vs Nifty 50 and stock 1-year RS vs its sector (or Nifty 500); breakouts with both positive averaged ~+30% vs ~+17%, a negative stock RS won only 30% — use them for confidence and size, not as filters.</p>`;
 }
 const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` : `${m}-mo base`);
 function athList() {
