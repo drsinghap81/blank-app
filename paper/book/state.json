@@ -1,5 +1,5 @@
 {
-"cash": 295965.53635678935,
+"cash": 98601.27046919949,
 "pos": {
 "ath:KOTAKBANK:2026-10-29": {
 "engine": "ATH",
@@ -8,7 +8,7 @@
 "sh": 325,
 "avg": 459.0573,
 "cost": 149604.18469991718,
-"last": 464.65,
+"last": 459.4,
 "stop_note": "weekly close < 30-wk SMA (401.1591)",
 "added": false
 },
@@ -71,7 +71,7 @@
 "sh": 123,
 "avg": 1236.4126,
 "cost": 152497.2515096059,
-"last": 1240.6,
+"last": 1188.1,
 "stop_note": "weekly close < 30-wk SMA (1089.803)",
 "added": false
 },
@@ -113,11 +113,35 @@
 "checked": "2026-11-03",
 "sell_next": false,
 "stop_note": "stop 578.15, then Supertrend red"
+},
+"ath:HEGAM:2026-11-04": {
+"engine": "ATH",
+"symbol": "HEGAM",
+"date": "2026-11-04",
+"sh": 465,
+"avg": 263.507,
+"cost": 122867.94432141562,
+"last": 288.18,
+"stop_note": "weekly close < 30-wk SMA (221.2229)",
+"added": false
+},
+"ath:SAREGAMA:2026-11-04": {
+"engine": "ATH",
+"symbol": "SAREGAMA",
+"date": "2026-11-04",
+"sh": 118,
+"avg": 629.5922,
+"cost": 74496.32156617424,
+"last": 636.8,
+"stop_note": "weekly close < 30-wk SMA (462.8467)",
+"added": false
 }
 },
 "done": [
 "921:BIL:2026-11-02",
-"921:RPGLIFE:2026-10-29"
+"921:MCX:2026-11-03",
+"921:RPGLIFE:2026-10-29",
+"921:SIMPLEXINF:2026-11-03"
 ],
 "trades": [
 {
