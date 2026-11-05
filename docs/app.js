@@ -85,7 +85,7 @@ async function lvApi(path, opt = {}) {
   return j;
 }
 function lvLocalSize(P) {
-  // no server: size from your capital setting (India) and risk %, 10 positions, 20% cap, ignore holdings
+  // no server: size from your capital setting (India) and risk %, 10 positions, 10% cap, ignore holdings
   const C0 = cap('NSE'); const risk = riskForBudget(lvBudget()) / 100;
   return (P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
     return { ...r, qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, skip: '' }; });
@@ -792,11 +792,11 @@ function planATH(r, near) {
     if (r.add_status === 'added') {
       const a = sizeATH(r.add_price, r.add_sma ?? r.sma30, C0, z.sh);
       html += a && a.sh ? `<p class="status open">Add triggered ${day(r.add_date)} at ${fmt(r.add_price, 2, AL())}: <b>buy ${a.sh.toLocaleString(AL())} more</b> = ${money(a.val, m)}. Total ${(z.sh + a.sh).toLocaleString(AL())} shares, average ${fmt((z.val + a.val) / (z.sh + a.sh), 2, AL())}.</p>`
-        : `<p class="muted">Add triggered ${day(r.add_date)}, but the position is already at the 20% cap — no add.</p>`;
+        : `<p class="muted">Add triggered ${day(r.add_date)}, but the position is already at the 10% cap — no add.</p>`;
     } else if (r.add_status === 'armed') {
       const a = sizeATH(r.add_level, r.sma30, C0, z.sh);
       html += a && a.sh ? `<p class="status info">Armed: the week ending ${day(r.test_week)} tested the 30-week SMA and held. <b>Add ${a.sh.toLocaleString(AL())} shares</b> (on the system's ${z.sh.toLocaleString(AL())}-share position) (${money(a.val, m)}) if price trades above ${fmt(r.add_level, 2, AL())}, the highest price since entry.</p>`
-        : '<p class="muted">Armed, but the position is already at the 20% cap — no add.</p>';
+        : '<p class="muted">Armed, but the position is already at the 10% cap — no add.</p>';
     } else {
       html += `<p class="muted">Not armed yet. It arms after a week whose low comes within 3% of the 30-week SMA (at or below ${fmt(r.sma30 * 1.03, 2, AL())} now) but closes above it. Then add when price makes a new high since entry, sized at ${riskPct('ath')}% risk to the SMA, keeping the stock at most 10% of capital.</p>`;
     }
