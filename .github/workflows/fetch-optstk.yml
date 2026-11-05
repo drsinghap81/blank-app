@@ -1,0 +1,27 @@
+name: fetch-optstk
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  chunk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        part: ["2016-12-15:2017-12-31", "2018-01-01:2018-12-31", "2019-01-01:2019-12-31", "2020-01-01:2020-12-31", "2021-01-01:2021-12-31",
+               "2022-01-01:2022-12-31", "2023-01-01:2023-12-31", "2024-01-01:2024-06-30", "2024-07-01:2025-06-30", "2025-07-01:2026-12-31"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q pandas requests
+      - run: |
+          P="${{ matrix.part }}"; S=${P%%:*}; E=${P##*:}
+          mkdir -p ostk && python tools/fetch_optstk.py $S $E ostk/ostk_${S}.csv 2>&1 | tail -3 | tee ostk/log_${S}.txt
+          gzip -f ostk/ostk_${S}.csv
+          echo "TAG=${S}" >> $GITHUB_ENV
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan ostk-$TAG; git rm -rq --cached . ; git add -f ostk; git commit -qm "ostk $TAG" || exit 0; git push -f origin ostk-$TAG
