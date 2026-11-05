@@ -2168,10 +2168,13 @@ def render_topdown_tab() -> None:
         st.markdown("**4 · Themes**")
         st.dataframe(_tab(th), hide_index=True, width="stretch", key="td_th")
     # index shortlist + chart
-    _sl_ord = {"breakout": 0, "near": 1, "trend": 2}
-    _sl_txt = {"breakout": "new high", "near": "within 5% of high", "trend": "uptrend, RS +"}
-    SL = sorted([k for k, v in ix.items() if v.get("shortlist")], key=lambda k: (_sl_ord[ix[k]["shortlist"]], -(ix[k].get("rs_6m") or 0)))
-    st.markdown(f"**Index shortlist ({len(SL)})** — in an uptrend (above a rising 30-week SMA) with 6-month RS > 0; new highs first")
+    _sl_ord = {"cup_breakout": 0, "new_high": 1, "breakout": 1, "cup_forming": 2, "near": 3, "trend": 4}
+    _sl_txt = {"cup_breakout": "cup breakout (2-yr+ base)", "new_high": "new high", "breakout": "new high",
+               "cup_forming": "cup forming (≤5% below a 2-yr+ high)", "near": "within 5% of high", "trend": "uptrend, RS +"}
+    SL = sorted([k for k, v in ix.items() if v.get("shortlist")],
+                key=lambda k: (_sl_ord[ix[k]["shortlist"]], ix[k]["tag"] != "leading", not ix[k].get("rs_6m_up"), -(ix[k].get("rs_6m") or 0)))
+    st.markdown(f"**Index shortlist ({len(SL)})** — in an uptrend with 6-month RS > 0. Order: cup breakout → new high → cup forming → "
+                "near high → uptrend; inside each, leading first, RS rising first, then RS")
     if SL:
         st.dataframe(pd.DataFrame([dict(index=_td_name(k), shortlist=_sl_txt[ix[k]["shortlist"]], tag=ix[k]["tag"],
                                         rs_6m=round(ix[k].get("rs_6m") or 0, 1), rs_rising="yes" if ix[k].get("rs_6m_up") else "no",

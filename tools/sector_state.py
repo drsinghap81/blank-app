@@ -128,11 +128,17 @@ def state(c, mret, n50=None):
     best_m = done.idxmax() if len(done) else None
     base_m = int((mc.index[-1] - best_m).n) if best_m is not None else None
     ath_close = float(done.max()) if len(done) else np.nan
+    # cup breakout last month: the last completed month set the high, and the high before it was >= 24 months older
+    brk_last_base = None
+    if len(done) >= 3 and best_m == done.index[-1]:
+        prev = done.iloc[:-1]
+        brk_last_base = int((done.index[-1] - prev.idxmax()).n) if done.iloc[-1] > prev.max() else None
     return dict(close=float(c.iloc[-1]), sma30=float(sma.iloc[-1]), up=up, ret_3m=r3 * 100, vs_market_3m=rs * 100,
                 from_high=float(c.iloc[-1] / c.max() - 1) * 100, tag=tag, since=str(c.index[0].date()),
                 years=round((c.index[-1] - c.index[0]).days / 365.25, 1),
                 ath_month=str(best_m) if best_m is not None else None, ath_month_close=ath_close, base_months=base_m,
                 above_ath_month=bool(c.iloc[-1] > ath_close) if np.isfinite(ath_close) else None,
+                brk_last_base=brk_last_base,
                 rs_6m=srs * 100 if np.isfinite(srs) else None, rs_6m_up=bool(srs > srs0) if np.isfinite(srs) and np.isfinite(srs0) else None)
 
 
@@ -234,15 +240,22 @@ def slug(k):
 
 
 def shortlist(st):
-    """Index shortlist (like the stock lists): in an uptrend (leading/uptrend) with 6-month RS > 0.
-    Group: breakout = closing above its highest completed-month close (base >= 24 months at the time it was set);
-    near = within 5% of its high; trend = the rest of the shortlist."""
+    """Index shortlist (like the stock lists): in an uptrend (leading/uptrend) with 6-month RS > 0. Groups, in order:
+    cup_breakout = above its highest completed-month close and that high is >= 24 months old (or the break happened last
+                   month after a >= 24-month base) - the index version of the monthly-ATH breakout;
+    new_high     = above its highest monthly close after a shorter base;
+    cup_forming  = within 5% of a high that is >= 24 months old (next breakout candidates);
+    near         = within 5% of its high;  trend = the rest.
+    Within a group the apps sort leading before uptrend, RS rising first, then by 6-month RS."""
     if not st or st.get("tag") not in ("leading", "uptrend") or (st.get("rs_6m") or -1) <= 0:
         return None
-    if st.get("above_ath_month") and (st.get("base_months") or 0) >= 1:
-        return "breakout"
+    base = st.get("base_months") or 0
+    if st.get("above_ath_month"):
+        return "cup_breakout" if base >= 24 else "new_high"
+    if (st.get("brk_last_base") or 0) >= 24:
+        return "cup_breakout"
     if (st.get("from_high") or -99) >= -5:
-        return "near"
+        return "cup_forming" if base >= 24 else "near"
     return "trend"
 
 
