@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-11-05 · US/ASX market switch v45"
+APP_BUILD = "2026-11-05 · index shortlist + charts v46"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2167,6 +2167,36 @@ def render_topdown_tab() -> None:
     with c2:
         st.markdown("**4 · Themes**")
         st.dataframe(_tab(th), hide_index=True, width="stretch", key="td_th")
+    # index shortlist + chart
+    _sl_ord = {"breakout": 0, "near": 1, "trend": 2}
+    _sl_txt = {"breakout": "new high", "near": "within 5% of high", "trend": "uptrend, RS +"}
+    SL = sorted([k for k, v in ix.items() if v.get("shortlist")], key=lambda k: (_sl_ord[ix[k]["shortlist"]], -(ix[k].get("rs_6m") or 0)))
+    st.markdown(f"**Index shortlist ({len(SL)})** — in an uptrend (above a rising 30-week SMA) with 6-month RS > 0; new highs first")
+    if SL:
+        st.dataframe(pd.DataFrame([dict(index=_td_name(k), shortlist=_sl_txt[ix[k]["shortlist"]], tag=ix[k]["tag"],
+                                        rs_6m=round(ix[k].get("rs_6m") or 0, 1), rs_rising="yes" if ix[k].get("rs_6m_up") else "no",
+                                        from_high=round(ix[k].get("from_high") or 0, 1)) for k in SL]), hide_index=True, width="stretch", key="td_sl")
+    allk = SL + sorted([k for k in ix if k not in SL], key=lambda k: -(ix[k].get("rs_6m") or -999))
+    if allk:
+        pick = st.selectbox("Index chart", allk, format_func=lambda k: f"{_td_name(k)}" + (f"  · {_sl_txt[ix[k]['shortlist']]}" if ix[k].get("shortlist") else ""), key="td_ixpick")
+        tfw = st.radio("Timeframe", ["Weekly + 30 SMA", "Monthly"], horizontal=True, key="td_ixtf", label_visibility="collapsed")
+        import json as _j2
+        import re as _re
+        slug = ix[pick].get("slug") or _re.sub(r"[^A-Za-z0-9]+", "_", pick).strip("_").lower()
+        try:
+            with open(_mk_path(_os.path.join("index_charts", slug + ".json")), encoding="utf-8") as f:
+                c = _j2.load(f)
+            b = c["w" if tfw.startswith("W") else "m"]
+            fig = go.Figure(go.Candlestick(x=b["t"], open=b["o"], high=b["h"], low=b["l"], close=b["c"], name=_td_name(pick)))
+            if tfw.startswith("W"):
+                fig.add_trace(go.Scatter(x=b["t"], y=b["sma"], name="30-week SMA", line=dict(color="#3B6FE0", width=2)))
+            if c.get("ath_month_close"):
+                fig.add_hline(y=c["ath_month_close"], line=dict(color="#E8A33D", width=2), annotation_text="highest month close")
+            fig.update_layout(height=420, margin=dict(l=10, r=10, t=30, b=10), xaxis_rangeslider_visible=False, showlegend=False,
+                              title=f"{_td_name(pick)} — {ix[pick]['tag']}, RS 6 m {ix[pick].get('rs_6m') or 0:+.1f}%, {ix[pick].get('from_high') or 0:+.1f}% from high")
+            st.plotly_chart(fig, width="stretch", key="td_ixchart")
+        except Exception:  # noqa: BLE001
+            st.caption("Index charts appear after the next evening scan.")
     # 5 stocks
     rows = []
     for src, lst in (("ATH breakout", ad.get("breakouts")), ("ATH near", ad.get("near")), ("IPO cup", [r for r in (idd.get("signals") or idd.get("tracked") or []) if r.get("status") in ("open", "buy next open")]),

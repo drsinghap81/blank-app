@@ -806,7 +806,7 @@ function themeSelect(r) {
     [`3-month return vs ${{ NSE: 'Nifty 500', US: 'S&P 500', ASX: 'ASX 200' }[AM()]}`, pct(r.vs_market_3m)], ['3-month return', pct(r.ret_3m)], ['30-week SMA', fmt(r.sma30, 0, AL())],
     ['From its high', pct(r.from_high)], ['Highest monthly close', `${fmt(r.ath_month_close, 0, AL())} (${esc(r.ath_month || '–')}, ${r.base_months ?? '–'} months ago)`],
     ['History', `since ${longDay(r.since)} (${r.years} y)`]];
-  openPanel(`<div class="d-head"><div><h2>${esc(r.name)}</h2><div class="co">${AM() === 'NSE' ? 'NSE thematic index' : MKT[AM()].name + ' index / ETF'}</div></div><div class="d-price"><b>${fmt(r.close, 0, AL())}</b></div></div>
+  openPanel(`<div class="d-head"><div><h2>${esc(r.name)}</h2><div class="co">${MKT[AM()].name} · ${(r.kind || 'Theme').toLowerCase()} index</div></div><div class="d-price"><b>${fmt(r.close, 0, AL())}</b></div></div>
     <div class="status ${r.tag === 'leading' || r.tag === 'uptrend' ? 'open' : r.tag === 'weak' ? 'exit' : 'info'}">${r.above_ath_month ? 'Above its highest monthly close.' : `${pct(r.from_high)} from its high.`} ${r.tag === 'leading' ? 'In an uptrend and beating the market.' : r.tag === 'uptrend' ? 'In an uptrend.' : r.tag === 'mixed' ? 'Beating the market but not in an uptrend.' : 'Not in an uptrend and lagging the market.'}</div>
     <div class="seg-row"><div class="seg small" id="ixtf"><button data-tf="w" aria-selected="true">Weekly + 30 SMA</button><button data-tf="m" aria-selected="false">Monthly</button></div></div>
     <div class="chart" id="ixc"></div>
