@@ -1407,8 +1407,11 @@ function pfUndo(j) {
 
 /* broker CSV: needs a symbol column and quantity + average-price columns; header names vary by broker */
 function pfParse(text) {
-  const lines = String(text).trim().split(/\r?\n/).filter((l) => l.trim());
+  let lines = String(text).replace(/^\uFEFF/, '').trim().split(/\r?\n/).filter((l) => l.trim());
   if (!lines.length) return [];
+  // broker exports often have title / client-info rows above the real header: start at the first row naming a symbol and a quantity
+  const hk = lines.slice(0, 25).findIndex((l) => /symbol|scrip|instrument|stock|name/i.test(l) && /qty|quantity|shares|units/i.test(l));
+  if (hk > 0) lines = lines.slice(hk);
   const delim = [',', '\t', ';'].sort((x, y) => lines[0].split(y).length - lines[0].split(x).length)[0];
   const split = (l) => { const out = []; let cur = '', q = false;
     for (let k = 0; k < l.length; k++) { const ch = l[k];
@@ -1429,11 +1432,26 @@ function pfImport() {
   box.innerHTML = `<div class="pf-form">
     <p class="muted small">Paste your broker's holdings export (CSV with symbol, quantity and average price columns), or one holding per line: <code>ADANIPORTS, 140, 1829.17</code></p>
     <textarea id="f-txt" rows="7" placeholder="SYMBOL, QTY, AVG PRICE"></textarea>
-    <label class="filebtn">Or choose a CSV file<input id="f-file" type="file" accept=".csv,text/csv,text/plain"></label>
+    <label class="filebtn">Or choose a file (CSV or Excel)<input id="f-file" type="file"></label>
+    <p class="muted small" id="f-info"></p>
     <div class="seg"><button id="f-rep" aria-selected="true">Replace my holdings</button><button id="f-addall">Add to them</button><button id="f-cancel">Cancel</button></div>
   </div>`;
   $('#f-cancel').onclick = () => (box.innerHTML = '');
-  $('#f-file').onchange = async (e) => { const f = e.target.files[0]; if (f) $('#f-txt').value = await f.text(); };
+  $('#f-file').onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const info = $('#f-info'); info.textContent = `Reading ${f.name}…`;
+    try {
+      let txt;
+      if (/\.xlsx?$/i.test(f.name) || /sheet|excel/i.test(f.type)) {
+        if (!window.XLSX) await new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
+        const wb = window.XLSX.read(await f.arrayBuffer(), { type: 'array' });
+        txt = window.XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);
+      } else txt = await f.text();
+      $('#f-txt').value = txt;
+      const n = pfParse(txt).length;
+      info.textContent = n ? `${f.name}: found ${n} holdings. Tap "Replace my holdings" or "Add to them".` : `${f.name}: no holdings found. It needs symbol, quantity and average-price columns — check the text above.`;
+    } catch (err) { info.textContent = `Could not read ${f.name}: ${err.message || err}`; }
+  };
   const go = (replace) => {
     const rows = pfParse($('#f-txt').value); if (!rows.length) return toast('No holdings found — check the columns');
     const P = pfLoad();
