@@ -1,2 +1,2 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-RHC,2026-11-02,55.75,60.5,54.9,54.63,2.1,1,-1.0,RAMSAY HEALTH CARE LIMITED,watch,154.6,0.91,92,37.28,55.22,55.2
+RHC,2026-11-02,55.75,60.5,54.9,54.63,2.1,2,-0.9,RAMSAY HEALTH CARE LIMITED,watch,154.6,0.91,92,36.61,55.25,55.4
