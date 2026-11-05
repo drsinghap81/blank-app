@@ -877,7 +877,8 @@ function tdRows(countOnly) {
     const ix = secOf(r.symbol); const x = ix && S.indices ? S.indices[ix] : null;
     if (!x || have.has(r.symbol) || !(x.tag === 'leading' || x.tag === 'uptrend') || !((x.rs_6m || 0) > 0)) return;
     const th = ((S.themes || {})[r.symbol] || []).map((t) => [t, S.indices && S.indices[t] ? S.indices[t].rs_6m : null]).filter((t) => t[1] != null).sort((a, b) => b[1] - a[1])[0];
-    L.push({ ...r, _src: r.list === 'trend' ? 'Clear trend' : 'Trend watchlist', _trend: true, sector_index: ix, sector_rs: x.rs_6m,
+    const runA = ((A.d && A.d.tracked) || []).some((x) => x.symbol === r.symbol && x.status === 'open');
+    L.push({ ...r, _src: (r.list === 'trend' ? 'Clear trend' : 'Trend watchlist') + (runA ? ' · ATH signal running' : ''), _trend: true, sector_index: ix, sector_rs: x.rs_6m,
       theme: th ? th[0] : null, theme_rs: th ? th[1] : null, stock_rs: null, td_score: null, aligned: false });
   });
   L.sort((a, b) => ((a._trend ? 1 : 0) - (b._trend ? 1 : 0)) || ((b.td_score ?? -1) - (a.td_score ?? -1)) || ((b.sector_rs ?? -99) - (a.sector_rs ?? -99)) || ((b.aligned ? 1 : 0) - (a.aligned ? 1 : 0)) || ((b.stock_rs ?? -999) - (a.stock_rs ?? -999)));
@@ -1013,9 +1014,13 @@ function athList() {
 }
 function trendFromATH(r) {
   // open the Trend-scan chart panel for a clear-trend stock listed on the Top-down screen
+  // a running monthly-ATH signal on this stock -> its ATH panel (monthly/weekly chart, plan); else the trend chart
+  const ath = ((state.ath.d && state.ath.d.tracked) || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
+  if (ath) { athSelect(ath); return; }
   state.mkt = AM(); if (state.ath.tr) state.data[AM()] = state.ath.tr;
   const row = ((state.ath.tr && state.ath.tr.rows) || []).find((x) => x.symbol === r.symbol) || r;
-  select(row);
+  const prevTab = state.tab; state.tab = row.list === 'watch' ? 'watch' : 'trend';
+  try { select(row); } finally { state.tab = prevTab; }
 }
 function athSelect(r) {
   const near = state.ath.tab === 'near' || !!r._near;
@@ -1064,7 +1069,7 @@ async function drawATH(r, tf) {
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
   const s = priceSeries(ch, T.map((t, i) => ({ time: t, open: b.o[i], high: b.h[i], low: b.l[i], close: b.c[i] })), 'ath');
   const trig = r.trigger ?? c.trigger;
-  if (trig) s.createPriceLine({ price: trig, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'ATH month high' });
+  if (trig) s.createPriceLine({ price: trig, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: r.kind === 'close' ? 'old ATH close' : 'ATH month high' });
   if (tf === 'w') {
     const l = ch.addLineSeries({ color: C.e21, lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
     l.setData(T.map((t, i) => (b.sma[i] == null ? { time: t } : { time: t, value: b.sma[i] })));
