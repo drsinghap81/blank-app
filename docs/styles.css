@@ -322,3 +322,6 @@ details.info p { margin: 6px 0; line-height: 1.45; }
 .lv-kpis div { background: #F4F6FA; border-radius: 8px; padding: 6px 8px; } .lv-kpis span { display: block; font-size: 11px; color: var(--slate); } .lv-kpis b { font-size: 14px; }
 .lv-form { display: grid; gap: 8px; margin-top: 8px; } .lv-form input { padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
 .lv-msg { font-size: 12.5px; margin-top: 8px; }
+
+.gbar { height: 8px; background: #EEF1F6; border-radius: 99px; margin-top: 8px; overflow: hidden; } .gbar i { display: block; height: 100%; border-radius: 99px; }
+.lv-sub select { margin-left: 4px; padding: 4px; border-radius: 6px; border: 1px solid var(--line); }

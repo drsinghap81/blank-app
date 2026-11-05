@@ -16,6 +16,17 @@ The server holds the broker keys. The repo and the phone app never do.
 - **Login and logging.** The app password is stored as a salted hash, and the app gets a 12-hour token. Login is blocked for 15 minutes after 5 wrong tries. Every order and dry run is logged in `var/orders.jsonl`.
 - **The Top Bottom futures bot (`tools/angel`) is separate** and stays dry-run.
 
+## Portfolio guard (the "portfolio stop-loss")
+The guard was tested on the ATH system, 2017–26:
+- **The worst fall has been about 20 × the risk per trade** (1% → −20%, 0.75% → −16%, 0.5% → −11%).
+- **Lowering risk beat every other drawdown rule.** Cutting size in a drawdown, in Turtle-style or stepped versions, did worse for the same fall. A hard "sell everything at −10%" stop sold near the lows and missed the rebound: 9% a year against 17%, with the same worst fall.
+
+So the guard works like this:
+- You set `DD_BUDGET_PCT`, the worst fall you can sit through. Risk per trade is then the budget ÷ 20 (15% → 0.75%).
+- One stock is capped at `MAX_POS_PCT=10`.
+- The server tracks your account's high-water mark. It warns at 75% and 100% of the budget, and it never sells for you.
+- After `STREAK=5` losing exits in a row, new buys pause for `PAUSE_DAYS=14` (2 weeks). Exits still go through.
+
 ## 1. AWS box (about US$5–10 a month)
 1. Sign in to <https://lightsail.aws.amazon.com>.
 2. **Create instance:**

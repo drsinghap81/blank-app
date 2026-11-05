@@ -56,3 +56,21 @@ def test_live_once(tmp_path):
     a = c.post("/api/order", headers=h, json=body); assert a.status_code == 200 and a.json()["sent"] is True
     b = c.post("/api/order", headers=h, json=body); assert b.status_code == 409     # once a day per row
     assert len(A.broker.placed) == 1
+
+
+def test_guard(tmp_path):
+    os.environ["DD_BUDGET_PCT"] = "10"; os.environ.pop("RISK_PCT", None)
+    A, c = client(tmp_path)
+    assert abs(A.RISK - 0.005) < 1e-9 and A.MAX_POS_PCT == 0.10
+    acc = A.broker.account()
+    g = A.guard(dict(acc, net=2_000_000)); assert g["status"] == "ok" and g["dd_pct"] == 0
+    g = A.guard(dict(acc, net=1_840_000)); assert g["status"] == "warn" and g["dd_pct"] == -8.0
+    g = A.guard(dict(acc, net=1_790_000)); assert g["status"] == "over"
+    J = {f"S{i}": dict(entry=100.0) for i in range(5)}; A.save_journal(J)
+    for i in range(5):
+        A.record_exit(f"S{i}", 90.0)
+    assert A.guard(acc)["status"] == "paused"
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]
+    P = c.get("/api/plan", headers={"Authorization": "Bearer " + tok}).json()
+    assert all(r["skip"] for r in P["rows"]) and P["guard"]["status"] == "paused"
+    os.environ.pop("DD_BUDGET_PCT", None)

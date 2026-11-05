@@ -36,8 +36,14 @@ os.makedirs(DATA, exist_ok=True)
 LIVE = ENV.get("LIVE_ORDERS", "0") == "1"
 PLAN_URL = ENV.get("PLAN_URL", "https://raw.githubusercontent.com/drsinghap81/blank-app/main/data/scan/trade_plan.json")
 CAPITAL = float(ENV.get("CAPITAL", "0") or 0)            # 0 -> use Angel's net value
-RISK = float(ENV.get("RISK_PCT", "1")) / 100
-MAX_POS_PCT = float(ENV.get("MAX_POS_PCT", "20")) / 100
+# Portfolio guard (5 Nov 2026 backtest, ATH system 2017-26): the worst fall has been ~20 x the risk per trade, and
+# lowering risk beat every drawdown rule (size cuts, hard portfolio stop-loss). So you set a DRAWDOWN BUDGET and the
+# risk per trade follows: risk = budget / 20. The guard warns at 75% and 100% of the budget (it does not sell or block:
+# hard stops lowered returns), and pauses new buys for PAUSE_DAYS after STREAK losing exits in a row.
+DD_BUDGET = float(ENV.get("DD_BUDGET_PCT", "15")) / 100
+RISK = float(ENV["RISK_PCT"]) / 100 if ENV.get("RISK_PCT") else DD_BUDGET / 20
+MAX_POS_PCT = float(ENV.get("MAX_POS_PCT", "10")) / 100     # 10%: caps a one-stock gap shock (cost ~0.3%/yr)
+STREAK, PAUSE_DAYS = int(ENV.get("STREAK", "5")), int(ENV.get("PAUSE_DAYS", "14"))
 MAX_POSITIONS = int(ENV.get("MAX_POSITIONS", "10"))
 MAX_ORDER_VALUE = float(ENV.get("MAX_ORDER_VALUE", "300000"))
 MAX_ORDERS_DAY = int(ENV.get("MAX_ORDERS_DAY", "10"))
@@ -148,8 +154,43 @@ def save_journal(j):
     json.dump(j, open(os.path.join(DATA, "journal.json"), "w"), indent=1)
 
 
+def guard(acc):
+    """High-water mark of account value, drawdown vs budget, losing-streak pause."""
+    p = os.path.join(DATA, "guard.json")
+    g = json.load(open(p)) if os.path.exists(p) else {}
+    nav = float(acc.get("net") or 0) + float(acc.get("holdings_value") or 0) if ENV.get("NAV_INCLUDES_HOLDINGS") == "1" else float(acc.get("net") or 0)
+    if nav > 0:
+        g["peak"] = max(float(g.get("peak") or 0), nav); g["nav"] = nav; g["t"] = ist_now().isoformat(timespec="minutes")
+        json.dump(g, open(p, "w"))
+    dd = (g["nav"] / g["peak"] - 1) if g.get("peak") else 0.0
+    used = -dd / DD_BUDGET if DD_BUDGET else 0
+    pause = g.get("pause_until")
+    paused = bool(pause and ist_now().date().isoformat() < pause)
+    status = "paused" if paused else "over" if used >= 1 else "warn" if used >= 0.75 else "ok"
+    msg = {"ok": "Within your drawdown budget.",
+           "warn": "75% of your drawdown budget used. Normal for this system in a losing stretch: keep following the rules; no new rules mid-drawdown.",
+           "over": "Drawdown is beyond your budget. The backtest's worst fall at this risk was about the budget; review: are all trades on plan? Consider lowering the budget's risk for new trades (not selling).",
+           "paused": f"{STREAK} losing exits in a row: new buys paused until {pause}. Exits still apply."}[status]
+    return dict(peak=g.get("peak"), nav=g.get("nav"), dd_pct=round(dd * 100, 1), budget_pct=DD_BUDGET * 100, used_pct=round(used * 100),
+                risk_pct=round(RISK * 100, 2), max_pos_pct=MAX_POS_PCT * 100, streak=g.get("streak", 0), streak_max=STREAK,
+                pause_until=pause, status=status, msg=msg)
+
+
+def record_exit(sym, sell_px):
+    """after a SELL: update the losing streak from the journal entry price; start a pause after STREAK losers."""
+    J = journal(); e = J.get(sym) or {}
+    p = os.path.join(DATA, "guard.json"); g = json.load(open(p)) if os.path.exists(p) else {}
+    if e.get("entry"):
+        g["streak"] = (g.get("streak", 0) + 1) if sell_px < e["entry"] else 0
+        if g["streak"] >= STREAK:
+            from datetime import timedelta
+            g["pause_until"] = (ist_now().date() + timedelta(days=PAUSE_DAYS)).isoformat(); g["streak"] = 0
+        json.dump(g, open(p, "w"))
+
+
 def sized(acc=None):
     P = plan(); acc = acc or broker.account()
+    G = guard(acc)
     held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
     for p in acc["positions"]:
         held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
@@ -182,7 +223,11 @@ def sized(acc=None):
             r["qty"], r["value"] = q, round(q * (r.get("trigger") or r["price"]), 0); r["note"] += " · cut to the cash left"
         left -= r["value"]; used += 1
     ex = [dict(e, qty=held.get(e["symbol"], 0)) for e in P.get("exits") or [] if held.get(e["symbol"], 0) > 0]
-    return dict(asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open,
+    if G["status"] == "paused":
+        for r in rows:
+            if not r["skip"]:
+                r["skip"] = "paused: losing streak (guard)"
+    return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open,
                 mode="LIVE" if LIVE else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held)
 
 
@@ -279,8 +324,10 @@ def order(body: Order, _=Depends(auth)):
         raise HTTPException(502, f"Angel rejected: {e}")
     log("order", order_id=oid, **rec)
     if side == "BUY":
-        J = journal(); J[sym] = dict(since=t.date().isoformat(), system=(row or {}).get("system"), stop=(row or {}).get("stop")); save_journal(J)
+        J = journal(); J[sym] = dict(since=t.date().isoformat(), system=(row or {}).get("system"), stop=(row or {}).get("stop"),
+                                     entry=float(p["price"]), qty=body.qty); save_journal(J)
     else:
+        record_exit(sym, float(p["price"]))
         J = journal(); J.pop(sym, None); save_journal(J)
     return dict(ok=True, mode="LIVE", sent=True, order_id=oid, order=p)
 
