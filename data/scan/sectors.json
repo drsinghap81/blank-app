@@ -17,7 +17,9 @@
 "base_months": 12,
 "above_ath_month": false,
 "rs_6m": 0.0,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_50"
 },
 "NIFTY 500": {
 "close": 22769.2,
@@ -34,7 +36,9 @@
 "base_months": 26,
 "above_ath_month": false,
 "rs_6m": 0.12960213101529394,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_500"
 },
 "NIFTY AUTO": {
 "close": 26504.8,
@@ -51,7 +55,9 @@
 "base_months": 3,
 "above_ath_month": false,
 "rs_6m": 1.4987969170825899,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_auto"
 },
 "NIFTY BANK": {
 "close": 55913.6,
@@ -68,7 +74,9 @@
 "base_months": 9,
 "above_ath_month": false,
 "rs_6m": 2.814145476519969,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_bank"
 },
 "NIFTY CAPITAL MARKETS": {
 "close": 5416.3,
@@ -85,7 +93,9 @@
 "base_months": 3,
 "above_ath_month": false,
 "rs_6m": 1.942557452376481,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_capital_markets"
 },
 "NIFTY CHEMICALS": {
 "close": 27833.7,
@@ -102,7 +112,9 @@
 "base_months": 17,
 "above_ath_month": false,
 "rs_6m": -2.9163424399244686,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_chemicals"
 },
 "NIFTY COMMODITIES": {
 "close": 9523.2,
@@ -119,7 +131,9 @@
 "base_months": 6,
 "above_ath_month": false,
 "rs_6m": -7.531572722092483,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_commodities"
 },
 "NIFTY CONGLOMERATE 50": {
 "close": 13998.55,
@@ -136,7 +150,9 @@
 "base_months": 3,
 "above_ath_month": false,
 "rs_6m": 0.31335536578855905,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_conglomerate_50"
 },
 "NIFTY CONSUMER DURABLES": {
 "close": 36521.45,
@@ -153,7 +169,9 @@
 "base_months": 26,
 "above_ath_month": false,
 "rs_6m": -1.1396959022224262,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_consumer_durables"
 },
 "NIFTY CORE HOUSING": {
 "close": 13964.75,
@@ -170,7 +188,9 @@
 "base_months": 25,
 "above_ath_month": false,
 "rs_6m": -1.9891155292461549,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_core_housing"
 },
 "NIFTY CPSE": {
 "close": 6273.75,
@@ -187,7 +207,9 @@
 "base_months": 28,
 "above_ath_month": false,
 "rs_6m": -14.985381137874255,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_cpse"
 },
 "NIFTY ENERGY": {
 "close": 37078.85,
@@ -204,7 +226,9 @@
 "base_months": 28,
 "above_ath_month": false,
 "rs_6m": -9.269141346354004,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_energy"
 },
 "NIFTY EV & NEW AGE AUTOMOTIVE": {
 "close": 2907.7,
@@ -221,7 +245,9 @@
 "base_months": 25,
 "above_ath_month": false,
 "rs_6m": 1.521051354574432,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_ev_new_age_automotive"
 },
 "NIFTY FINANCIAL SERVICES": {
 "close": 25580.6,
@@ -238,7 +264,9 @@
 "base_months": 12,
 "above_ath_month": false,
 "rs_6m": -0.23027070207327638,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_financial_services"
 },
 "NIFTY FMCG": {
 "close": 46264.05,
@@ -255,7 +283,9 @@
 "base_months": 26,
 "above_ath_month": false,
 "rs_6m": -10.059578100703536,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_fmcg"
 },
 "NIFTY HEALTHCARE INDEX": {
 "close": 16701.55,
@@ -272,7 +302,9 @@
 "base_months": 3,
 "above_ath_month": false,
 "rs_6m": 10.971180195928909,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": "near",
+"slug": "nifty_healthcare_index"
 },
 "NIFTY HOUSING": {
 "close": 11079.75,
@@ -289,7 +321,9 @@
 "base_months": 25,
 "above_ath_month": false,
 "rs_6m": -3.5101058079763936,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_housing"
 },
 "NIFTY INDIA CONSUMPTION": {
 "close": 11580.75,
@@ -306,7 +340,9 @@
 "base_months": 26,
 "above_ath_month": false,
 "rs_6m": 1.377629596625063,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_consumption"
 },
 "NIFTY INDIA CORPORATE GROUP INDEX - ADITYA BIRLA GROUP": {
 "close": 8921.83,
@@ -323,7 +359,9 @@
 "base_months": 2,
 "above_ath_month": false,
 "rs_6m": 0.3268570970918372,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_corporate_group_index_aditya_birla_group"
 },
 "NIFTY INDIA CORPORATE GROUP INDEX - MAHINDRA GROUP": {
 "close": 33781.01,
@@ -340,7 +378,9 @@
 "base_months": 10,
 "above_ath_month": false,
 "rs_6m": 2.908474069850886,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_corporate_group_index_mahindra_group"
 },
 "NIFTY INDIA CORPORATE GROUP INDEX - TATA GROUP": {
 "close": 14175.58,
@@ -357,7 +397,9 @@
 "base_months": 26,
 "above_ath_month": false,
 "rs_6m": -0.3018560339419496,
-"rs_6m_up": true
+"rs_6m_up": true,
+"shortlist": null,
+"slug": "nifty_india_corporate_group_index_tata_group"
 },
 "NIFTY INDIA CORPORATE GROUP INDEX - TATA GROUP 25% CAP": {
 "close": 13876.9,
@@ -374,7 +416,9 @@
 "base_months": 26,
 "above_ath_month": false,
 "rs_6m": -2.283303299679129,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_corporate_group_index_tata_group_25_cap"
 },
 "NIFTY INDIA DEFENCE": {
 "close": 9167.15,
@@ -391,7 +435,9 @@
 "base_months": 3,
 "above_ath_month": false,
 "rs_6m": 1.1170236109239617,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_defence"
 },
 "NIFTY INDIA DIGITAL": {
 "close": 8602.1,
@@ -408,7 +454,9 @@
 "base_months": 22,
 "above_ath_month": false,
 "rs_6m": 15.778084885781961,
-"rs_6m_up": true
+"rs_6m_up": true,
+"shortlist": "trend",
+"slug": "nifty_india_digital"
 },
 "NIFTY INDIA INFRASTRUCTURE & LOGISTICS": {
 "close": 11114.95,
@@ -425,7 +473,9 @@
 "base_months": 4,
 "above_ath_month": false,
 "rs_6m": -3.269022754739115,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_infrastructure_logistics"
 },
 "NIFTY INDIA INTERNET": {
 "close": 1320.0,
@@ -442,7 +492,9 @@
 "base_months": 2,
 "above_ath_month": false,
 "rs_6m": 13.006875858105694,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": "trend",
+"slug": "nifty_india_internet"
 },
 "NIFTY INDIA MANUFACTURING": {
 "close": 14901.5,
@@ -459,7 +511,9 @@
 "base_months": 2,
 "above_ath_month": false,
 "rs_6m": -0.3039161200407925,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_manufacturing"
 },
 "NIFTY INDIA NEW AGE CONSUMPTION": {
 "close": 11072.75,
@@ -476,7 +530,9 @@
 "base_months": 2,
 "above_ath_month": false,
 "rs_6m": 5.112560556764034,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_new_age_consumption"
 },
 "NIFTY INDIA RAILWAYS PSU": {
 "close": 2533.7,
@@ -493,7 +549,9 @@
 "base_months": 24,
 "above_ath_month": false,
 "rs_6m": -22.465913662697446,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_railways_psu"
 },
 "NIFTY INDIA SELECT 5 CORPORATE GROUPS (MAATR)": {
 "close": 35945.85,
@@ -510,7 +568,9 @@
 "base_months": 3,
 "above_ath_month": false,
 "rs_6m": -1.7722497470154086,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_select_5_corporate_groups_maatr"
 },
 "NIFTY INDIA TOURISM": {
 "close": 7613.45,
@@ -527,7 +587,9 @@
 "base_months": 16,
 "above_ath_month": false,
 "rs_6m": 7.833305749594777,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_india_tourism"
 },
 "NIFTY INFRASTRUCTURE": {
 "close": 9317.3,
@@ -544,7 +606,9 @@
 "base_months": 12,
 "above_ath_month": false,
 "rs_6m": -1.0338278618998942,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_infrastructure"
 },
 "NIFTY IPO": {
 "close": 2269.7,
@@ -561,7 +625,9 @@
 "base_months": 1,
 "above_ath_month": false,
 "rs_6m": 11.52893919192499,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": "trend",
+"slug": "nifty_ipo"
 },
 "NIFTY IT": {
 "close": 32061.9,
@@ -578,7 +644,9 @@
 "base_months": 23,
 "above_ath_month": false,
 "rs_6m": 10.482633175721467,
-"rs_6m_up": true
+"rs_6m_up": true,
+"shortlist": "trend",
+"slug": "nifty_it"
 },
 "NIFTY MEDIA": {
 "close": 1710.65,
@@ -595,7 +663,9 @@
 "base_months": 106,
 "above_ath_month": false,
 "rs_6m": 18.388509464068626,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": "trend",
+"slug": "nifty_media"
 },
 "NIFTY METAL": {
 "close": 12485.9,
@@ -612,7 +682,9 @@
 "base_months": 6,
 "above_ath_month": false,
 "rs_6m": -3.588074194461721,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_metal"
 },
 "NIFTY MIDCAP 150": {
 "close": 21867.3,
@@ -629,7 +701,9 @@
 "base_months": 3,
 "above_ath_month": false,
 "rs_6m": -1.113863456482056,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_midcap_150"
 },
 "NIFTY MIDCAP LIQUID 15": {
 "close": 15196.65,
@@ -646,7 +720,9 @@
 "base_months": 2,
 "above_ath_month": false,
 "rs_6m": -0.7067568727071261,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_midcap_liquid_15"
 },
 "NIFTY MIDSMALL INDIA CONSUMPTION": {
 "close": 17087.85,
@@ -663,7 +739,9 @@
 "base_months": 22,
 "above_ath_month": false,
 "rs_6m": 0.1170919512306634,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_midsmall_india_consumption"
 },
 "NIFTY MNC": {
 "close": 28416.15,
@@ -680,7 +758,9 @@
 "base_months": 3,
 "above_ath_month": false,
 "rs_6m": -7.384965268750465,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_mnc"
 },
 "NIFTY MOBILITY": {
 "close": 21576.8,
@@ -697,7 +777,9 @@
 "base_months": 2,
 "above_ath_month": false,
 "rs_6m": 5.543578555686413,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_mobility"
 },
 "NIFTY NON-CYCLICAL CONSUMER": {
 "close": 14361.2,
@@ -714,7 +796,9 @@
 "base_months": 25,
 "above_ath_month": false,
 "rs_6m": 0.09437854952969449,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_non_cyclical_consumer"
 },
 "NIFTY OIL & GAS": {
 "close": 11178.2,
@@ -731,7 +815,9 @@
 "base_months": 27,
 "above_ath_month": false,
 "rs_6m": -4.173168309775455,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_oil_gas"
 },
 "NIFTY PHARMA": {
 "close": 27333.45,
@@ -748,7 +834,9 @@
 "base_months": 3,
 "above_ath_month": true,
 "rs_6m": 16.32174255494181,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": "breakout",
+"slug": "nifty_pharma"
 },
 "NIFTY PRIVATE BANK": {
 "close": 27632.3,
@@ -765,7 +853,9 @@
 "base_months": 12,
 "above_ath_month": false,
 "rs_6m": 6.310058727954093,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_private_bank"
 },
 "NIFTY PSE": {
 "close": 9485.55,
@@ -782,7 +872,9 @@
 "base_months": 28,
 "above_ath_month": false,
 "rs_6m": -10.844151682931525,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_pse"
 },
 "NIFTY PSU BANK": {
 "close": 8302.3,
@@ -799,7 +891,9 @@
 "base_months": 9,
 "above_ath_month": false,
 "rs_6m": -1.3263363964347352,
-"rs_6m_up": true
+"rs_6m_up": true,
+"shortlist": null,
+"slug": "nifty_psu_bank"
 },
 "NIFTY REALTY": {
 "close": 865.4,
@@ -816,7 +910,9 @@
 "base_months": 29,
 "above_ath_month": false,
 "rs_6m": 8.331693307798105,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_realty"
 },
 "NIFTY REITS & INVITS": {
 "close": 1359.27,
@@ -833,7 +929,9 @@
 "base_months": 2,
 "above_ath_month": false,
 "rs_6m": 6.080719494407227,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_reits_invits"
 },
 "NIFTY RURAL": {
 "close": 14062.9,
@@ -850,7 +948,9 @@
 "base_months": 25,
 "above_ath_month": false,
 "rs_6m": -4.42868176618092,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_rural"
 },
 "NIFTY SERVICES SECTOR": {
 "close": 31409.6,
@@ -867,7 +967,9 @@
 "base_months": 12,
 "above_ath_month": false,
 "rs_6m": 4.693442167908235,
-"rs_6m_up": true
+"rs_6m_up": true,
+"shortlist": "trend",
+"slug": "nifty_services_sector"
 },
 "NIFTY SHARIAH 25": {
 "close": 7661.6,
@@ -884,7 +986,9 @@
 "base_months": 25,
 "above_ath_month": false,
 "rs_6m": 2.1508542611543335,
-"rs_6m_up": true
+"rs_6m_up": true,
+"shortlist": null,
+"slug": "nifty_shariah_25"
 },
 "NIFTY SMALLCAP 250": {
 "close": 17398.35,
@@ -901,7 +1005,9 @@
 "base_months": 26,
 "above_ath_month": false,
 "rs_6m": 3.0870151725217454,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_smallcap_250"
 },
 "NIFTY SME EMERGE": {
 "close": 14278.8,
@@ -918,7 +1024,9 @@
 "base_months": 22,
 "above_ath_month": false,
 "rs_6m": 7.712180137680291,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": "trend",
+"slug": "nifty_sme_emerge"
 },
 "NIFTY TRANSPORTATION & LOGISTICS": {
 "close": 23968.55,
@@ -935,7 +1043,9 @@
 "base_months": 2,
 "above_ath_month": false,
 "rs_6m": 5.548094743760612,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_transportation_logistics"
 },
 "NIFTY WAVES": {
 "close": 1811.65,
@@ -952,7 +1062,9 @@
 "base_months": 16,
 "above_ath_month": false,
 "rs_6m": -2.938681434064727,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty_waves"
 },
 "NIFTY100 ENHANCED ESG": {
 "close": 4783.35,
@@ -969,7 +1081,9 @@
 "base_months": 10,
 "above_ath_month": false,
 "rs_6m": 2.1572248153667983,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty100_enhanced_esg"
 },
 "NIFTY100 ESG": {
 "close": 4751.05,
@@ -986,7 +1100,9 @@
 "base_months": 25,
 "above_ath_month": false,
 "rs_6m": 2.1821486322657346,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty100_esg"
 },
 "NIFTY100 ESG SECTOR LEADERS": {
 "close": 3816.35,
@@ -1003,7 +1119,9 @@
 "base_months": 11,
 "above_ath_month": false,
 "rs_6m": -0.8775535152177105,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty100_esg_sector_leaders"
 },
 "NIFTY100 LIQUID 15": {
 "close": 7463.4,
@@ -1020,7 +1138,9 @@
 "base_months": 3,
 "above_ath_month": false,
 "rs_6m": 7.113381954352094,
-"rs_6m_up": true
+"rs_6m_up": true,
+"shortlist": "near",
+"slug": "nifty100_liquid_15"
 },
 "NIFTY50 SHARIAH": {
 "close": 4194.75,
@@ -1037,7 +1157,9 @@
 "base_months": 25,
 "above_ath_month": false,
 "rs_6m": 0.8371478400476695,
-"rs_6m_up": true
+"rs_6m_up": true,
+"shortlist": null,
+"slug": "nifty50_shariah"
 },
 "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20": {
 "close": 15571.1,
@@ -1054,7 +1176,9 @@
 "base_months": 2,
 "above_ath_month": false,
 "rs_6m": 1.375129163562483,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty500_multicap_india_manufacturing_50_30_20"
 },
 "NIFTY500 MULTICAP INFRASTRUCTURE 50:30:20": {
 "close": 13546.7,
@@ -1071,7 +1195,9 @@
 "base_months": 27,
 "above_ath_month": false,
 "rs_6m": -2.0734980166418726,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty500_multicap_infrastructure_50_30_20"
 },
 "NIFTY500 SHARIAH": {
 "close": 6603.55,
@@ -1088,7 +1214,9 @@
 "base_months": 25,
 "above_ath_month": false,
 "rs_6m": 0.9088461169538764,
-"rs_6m_up": false
+"rs_6m_up": false,
+"shortlist": null,
+"slug": "nifty500_shariah"
 }
 },
 "industries": {
