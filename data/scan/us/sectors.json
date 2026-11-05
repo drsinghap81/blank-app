@@ -19,7 +19,9 @@
 "above_ath_month": false,
 "rs_6m": -12.342215810205726,
 "rs_6m_up": true,
-"name": "Gold miners"
+"name": "Gold miners",
+"shortlist": null,
+"slug": "gdx"
 },
 "IAI": {
 "close": 185.91000366210938,
@@ -37,7 +39,9 @@
 "above_ath_month": false,
 "rs_6m": 0.3105762068377871,
 "rs_6m_up": true,
-"name": "Brokers & asset managers"
+"name": "Brokers & asset managers",
+"shortlist": null,
+"slug": "iai"
 },
 "IGV": {
 "close": 103.55999755859375,
@@ -55,29 +59,33 @@
 "above_ath_month": false,
 "rs_6m": 12.982572415255223,
 "rs_6m_up": false,
-"name": "Software & IT"
+"name": "Software & IT",
+"shortlist": "trend",
+"slug": "igv"
 },
 "IHI": {
 "close": 60.220001220703125,
-"sma30": 51.87620175679525,
+"sma30": 51.8762020111084,
 "up": true,
 "ret_3m": 11.46591301212776,
 "vs_market_3m": 11.742695821093285,
-"from_high": -8.154129986158809,
+"from_high": -8.154162048090285,
 "tag": "leading",
 "since": "2006-05-05",
 "years": 20.5,
 "ath_month": "2021-12",
-"ath_month_close": 64.40530395507812,
+"ath_month_close": 64.40534210205078,
 "base_months": 59,
 "above_ath_month": false,
 "rs_6m": 16.402831766378647,
 "rs_6m_up": true,
-"name": "Medical devices & care"
+"name": "Medical devices & care",
+"shortlist": "trend",
+"slug": "ihi"
 },
 "ITA": {
 "close": 212.83999633789062,
-"sma30": 226.87039998372396,
+"sma30": 226.87040100097656,
 "up": false,
 "ret_3m": -14.761901997479276,
 "vs_market_3m": -14.485119188513751,
@@ -91,11 +99,13 @@
 "above_ath_month": false,
 "rs_6m": -8.573827487364504,
 "rs_6m_up": true,
-"name": "Aerospace & defence"
+"name": "Aerospace & defence",
+"shortlist": null,
+"slug": "ita"
 },
 "ITB": {
 "close": 100.30000305175781,
-"sma30": 93.61970672607421,
+"sma30": 93.61970647176106,
 "up": false,
 "ret_3m": 2.718510186004064,
 "vs_market_3m": 2.9952929949695895,
@@ -104,12 +114,14 @@
 "since": "2006-05-05",
 "years": 20.5,
 "ath_month": "2024-09",
-"ath_month_close": 123.34467315673828,
+"ath_month_close": 123.34466552734375,
 "base_months": 26,
 "above_ath_month": false,
 "rs_6m": 1.8152682995136615,
 "rs_6m_up": true,
-"name": "Homebuilders & construction"
+"name": "Homebuilders & construction",
+"shortlist": null,
+"slug": "itb"
 },
 "IYT": {
 "close": 85.0199966430664,
@@ -127,7 +139,9 @@
 "above_ath_month": false,
 "rs_6m": 0.19857119091442055,
 "rs_6m_up": true,
-"name": "Transport"
+"name": "Transport",
+"shortlist": null,
+"slug": "iyt"
 },
 "JETS": {
 "close": 29.459999084472656,
@@ -145,7 +159,9 @@
 "above_ath_month": false,
 "rs_6m": 3.599356997618486,
 "rs_6m_up": true,
-"name": "Airlines"
+"name": "Airlines",
+"shortlist": null,
+"slug": "jets"
 },
 "KBE": {
 "close": 67.83000183105469,
@@ -163,7 +179,9 @@
 "above_ath_month": false,
 "rs_6m": 1.5061419814348165,
 "rs_6m_up": true,
-"name": "Banks"
+"name": "Banks",
+"shortlist": null,
+"slug": "kbe"
 },
 "KIE": {
 "close": 65.77999877929688,
@@ -181,7 +199,9 @@
 "above_ath_month": true,
 "rs_6m": 12.571897789264618,
 "rs_6m_up": true,
-"name": "Insurance"
+"name": "Insurance",
+"shortlist": "breakout",
+"slug": "kie"
 },
 "KRE": {
 "close": 74.12999725341797,
@@ -199,7 +219,9 @@
 "above_ath_month": false,
 "rs_6m": 1.5882634419096098,
 "rs_6m_up": true,
-"name": "Regional banks"
+"name": "Regional banks",
+"shortlist": "near",
+"slug": "kre"
 },
 "MDY": {
 "close": 680.2999877929688,
@@ -217,7 +239,9 @@
 "above_ath_month": false,
 "rs_6m": -3.8233899150652007,
 "rs_6m_up": true,
-"name": "S&P MidCap 400"
+"name": "MidCap 400",
+"shortlist": null,
+"slug": "mdy"
 },
 "PAVE": {
 "close": 53.90999984741211,
@@ -235,7 +259,9 @@
 "above_ath_month": false,
 "rs_6m": -11.341410910739658,
 "rs_6m_up": true,
-"name": "Infrastructure"
+"name": "Infrastructure",
+"shortlist": null,
+"slug": "pave"
 },
 "PEJ": {
 "close": 69.43000030517578,
@@ -253,7 +279,9 @@
 "above_ath_month": true,
 "rs_6m": 8.213787550841257,
 "rs_6m_up": true,
-"name": "Leisure"
+"name": "Leisure",
+"shortlist": "breakout",
+"slug": "pej"
 },
 "PPH": {
 "close": 122.11000061035156,
@@ -271,11 +299,13 @@
 "above_ath_month": true,
 "rs_6m": 15.078358675041192,
 "rs_6m_up": true,
-"name": "Pharma"
+"name": "Pharma",
+"shortlist": "breakout",
+"slug": "pph"
 },
 "RSP": {
 "close": 223.3300018310547,
-"sma30": 210.77310740152996,
+"sma30": 210.77310791015626,
 "up": true,
 "ret_3m": 2.5571825914739943,
 "vs_market_3m": 2.83396540043952,
@@ -287,9 +317,11 @@
 "ath_month_close": 218.5684051513672,
 "base_months": 3,
 "above_ath_month": true,
-"rs_6m": 5.232688417279618,
+"rs_6m": 5.232680518811517,
 "rs_6m_up": true,
-"name": "S&P 500 equal weight"
+"name": "S&P 500 EW",
+"shortlist": "breakout",
+"slug": "rsp"
 },
 "SMH": {
 "close": 504.2699890136719,
@@ -307,7 +339,9 @@
 "above_ath_month": false,
 "rs_6m": -12.133888456651654,
 "rs_6m_up": false,
-"name": "Semiconductors"
+"name": "Semiconductors",
+"shortlist": null,
+"slug": "smh"
 },
 "XBI": {
 "close": 159.10000610351562,
@@ -325,7 +359,9 @@
 "above_ath_month": false,
 "rs_6m": 10.804378285135918,
 "rs_6m_up": true,
-"name": "Biotech"
+"name": "Biotech",
+"shortlist": "trend",
+"slug": "xbi"
 },
 "XLB": {
 "close": 53.900001525878906,
@@ -343,7 +379,9 @@
 "above_ath_month": true,
 "rs_6m": -0.6607351994257327,
 "rs_6m_up": true,
-"name": "Materials"
+"name": "Materials",
+"shortlist": null,
+"slug": "xlb"
 },
 "XLC": {
 "close": 104.95999908447266,
@@ -359,13 +397,15 @@
 "ath_month_close": 118.9952621459961,
 "base_months": 10,
 "above_ath_month": false,
-"rs_6m": -13.815436670527948,
+"rs_6m": -13.81543103423154,
 "rs_6m_up": true,
-"name": "Communication Services"
+"name": "Communication Services",
+"shortlist": null,
+"slug": "xlc"
 },
 "XLE": {
 "close": 63.52000045776367,
-"sma30": 59.68586908976237,
+"sma30": 59.685868962605795,
 "up": true,
 "ret_3m": 9.865140391995197,
 "vs_market_3m": 10.141923200960722,
@@ -379,7 +419,9 @@
 "above_ath_month": false,
 "rs_6m": 8.1587534343454,
 "rs_6m_up": true,
-"name": "Energy"
+"name": "Energy",
+"shortlist": "trend",
+"slug": "xle"
 },
 "XLF": {
 "close": 59.20000076293945,
@@ -397,11 +439,13 @@
 "above_ath_month": true,
 "rs_6m": 10.164362796398718,
 "rs_6m_up": true,
-"name": "Financials"
+"name": "Financials",
+"shortlist": "breakout",
+"slug": "xlf"
 },
 "XLI": {
 "close": 169.4600067138672,
-"sma30": 174.666303507487,
+"sma30": 174.6663024902344,
 "up": false,
 "ret_3m": -8.034498249623734,
 "vs_market_3m": -7.757715440658208,
@@ -413,9 +457,11 @@
 "ath_month_close": 184.73350524902344,
 "base_months": 5,
 "above_ath_month": false,
-"rs_6m": -7.747671651717569,
+"rs_6m": -7.747679651460926,
 "rs_6m_up": true,
-"name": "Industrials"
+"name": "Industrials",
+"shortlist": null,
+"slug": "xli"
 },
 "XLK": {
 "close": 176.5,
@@ -433,11 +479,13 @@
 "above_ath_month": false,
 "rs_6m": -0.32765485689898455,
 "rs_6m_up": false,
-"name": "Technology"
+"name": "Technology",
+"shortlist": null,
+"slug": "xlk"
 },
 "XLP": {
 "close": 91.94000244140625,
-"sma30": 83.82385025024413,
+"sma30": 83.8238510131836,
 "up": true,
 "ret_3m": 8.735365639084524,
 "vs_market_3m": 9.01214844805005,
@@ -449,13 +497,15 @@
 "ath_month_close": 89.41999816894531,
 "base_months": 1,
 "above_ath_month": true,
-"rs_6m": 5.966225867650432,
+"rs_6m": 5.966235594878655,
 "rs_6m_up": true,
-"name": "Consumer Staples"
+"name": "Consumer Staples",
+"shortlist": "breakout",
+"slug": "xlp"
 },
 "XLRE": {
 "close": 45.119998931884766,
-"sma30": 43.49529507954915,
+"sma30": 43.495294825236,
 "up": false,
 "ret_3m": 1.5393579138066382,
 "vs_market_3m": 1.8161407227721638,
@@ -469,7 +519,9 @@
 "above_ath_month": true,
 "rs_6m": -1.7270762695449915,
 "rs_6m_up": true,
-"name": "Real Estate"
+"name": "Real Estate",
+"shortlist": null,
+"slug": "xlre"
 },
 "XLU": {
 "close": 43.61000061035156,
@@ -487,11 +539,13 @@
 "above_ath_month": false,
 "rs_6m": -7.348529985227604,
 "rs_6m_up": true,
-"name": "Utilities"
+"name": "Utilities",
+"shortlist": null,
+"slug": "xlu"
 },
 "XLV": {
 "close": 189.66000366210938,
-"sma30": 160.39240214029948,
+"sma30": 160.39240366617838,
 "up": true,
 "ret_3m": 15.771271794973064,
 "vs_market_3m": 16.04805460393859,
@@ -505,7 +559,9 @@
 "above_ath_month": true,
 "rs_6m": 25.983274138344825,
 "rs_6m_up": true,
-"name": "Health Care"
+"name": "Health Care",
+"shortlist": "breakout",
+"slug": "xlv"
 },
 "XLY": {
 "close": 122.33000183105469,
@@ -518,12 +574,14 @@
 "since": "1998-12-22",
 "years": 27.9,
 "ath_month": "2026-01",
-"ath_month_close": 120.42137145996094,
+"ath_month_close": 120.4213638305664,
 "base_months": 10,
 "above_ath_month": true,
 "rs_6m": -1.8310993252400376,
 "rs_6m_up": true,
-"name": "Consumer Discretionary"
+"name": "Consumer Discretionary",
+"shortlist": null,
+"slug": "xly"
 },
 "XME": {
 "close": 95.77999877929688,
@@ -541,7 +599,9 @@
 "above_ath_month": false,
 "rs_6m": -25.991203057156998,
 "rs_6m_up": false,
-"name": "Metals & mining"
+"name": "Metals & mining",
+"shortlist": null,
+"slug": "xme"
 },
 "XOP": {
 "close": 179.2899932861328,
@@ -549,7 +609,7 @@
 "up": true,
 "ret_3m": 7.755089501307277,
 "vs_market_3m": 8.031872310272803,
-"from_high": -32.76759642713441,
+"from_high": -32.767604121117714,
 "tag": "leading",
 "since": "2006-06-22",
 "years": 20.4,
@@ -559,7 +619,9 @@
 "above_ath_month": false,
 "rs_6m": 2.330516948372896,
 "rs_6m_up": true,
-"name": "Oil & gas"
+"name": "Oil & gas",
+"shortlist": "trend",
+"slug": "xop"
 },
 "XRT": {
 "close": 93.72000122070312,
@@ -567,17 +629,19 @@
 "up": true,
 "ret_3m": 4.527627765256947,
 "vs_market_3m": 4.804410574222473,
-"from_high": -2.7106312282097034,
+"from_high": -2.7106389334914827,
 "tag": "leading",
 "since": "2006-06-22",
 "years": 20.4,
 "ath_month": "2021-06",
-"ath_month_close": 89.7429428100586,
+"ath_month_close": 89.74295806884766,
 "base_months": 65,
 "above_ath_month": true,
 "rs_6m": 5.8968522757703035,
 "rs_6m_up": true,
-"name": "Retail"
+"name": "Retail",
+"shortlist": "breakout",
+"slug": "xrt"
 },
 "^DJI": {
 "close": 53356.12109375,
@@ -595,7 +659,9 @@
 "above_ath_month": true,
 "rs_6m": 2.4054281421272528,
 "rs_6m_up": true,
-"name": "Dow Jones"
+"name": "Dow",
+"shortlist": "breakout",
+"slug": "dji"
 },
 "^GSPC": {
 "close": 7688.6201171875,
@@ -613,7 +679,9 @@
 "above_ath_month": true,
 "rs_6m": 0.0,
 "rs_6m_up": false,
-"name": "S&P 500"
+"name": "S&P 500",
+"shortlist": null,
+"slug": "gspc"
 },
 "^NDX": {
 "close": 28437.166015625,
@@ -631,7 +699,9 @@
 "above_ath_month": false,
 "rs_6m": -4.750146629951468,
 "rs_6m_up": false,
-"name": "Nasdaq 100"
+"name": "Nasdaq 100",
+"shortlist": null,
+"slug": "ndx"
 },
 "^RUT": {
 "close": 2856.94970703125,
@@ -649,7 +719,9 @@
 "above_ath_month": false,
 "rs_6m": -5.197052645294509,
 "rs_6m_up": true,
-"name": "Russell 2000"
+"name": "Russell 2000",
+"shortlist": null,
+"slug": "rut"
 }
 },
 "industries": {
@@ -19843,9 +19915,9 @@
 "names": {
 "^GSPC": "S&P 500",
 "^NDX": "Nasdaq 100",
-"^DJI": "Dow Jones",
-"RSP": "S&P 500 equal weight",
-"MDY": "S&P MidCap 400",
+"^DJI": "Dow",
+"RSP": "S&P 500 EW",
+"MDY": "MidCap 400",
 "^RUT": "Russell 2000",
 "XLK": "Technology",
 "XLF": "Financials",
