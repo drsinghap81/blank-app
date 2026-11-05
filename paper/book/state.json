@@ -1,5 +1,5 @@
 {
-"cash": 98601.27046919949,
+"cash": 912.5280097251089,
 "pos": {
 "ath:KOTAKBANK:2026-10-29": {
 "engine": "ATH",
@@ -8,7 +8,7 @@
 "sh": 325,
 "avg": 459.0573,
 "cost": 149604.18469991718,
-"last": 459.4,
+"last": 467.0,
 "stop_note": "weekly close < 30-wk SMA (401.1591)",
 "added": false
 },
@@ -19,9 +19,9 @@
 "sh": 109,
 "avg": 1871.0,
 "cost": 204500.21463562502,
-"last": 1866.9000244140625,
+"last": 1884.5999755859375,
 "stop": 1687.9,
-"checked": "2026-11-03",
+"checked": "2026-11-05",
 "sell_next": false,
 "stop_note": "stop 1687.9, then Supertrend red"
 },
@@ -45,9 +45,9 @@
 "sh": 94,
 "avg": 2205.0,
 "cost": 207840.38113125,
-"last": 2152.800048828125,
+"last": 2194.199951171875,
 "stop": 1994.1,
-"checked": "2026-11-03",
+"checked": "2026-11-05",
 "sell_next": false,
 "stop_note": "stop 1994.1, then Supertrend red"
 },
@@ -58,9 +58,9 @@
 "sh": 66,
 "avg": 3070.0,
 "cost": 203177.5849125,
-"last": 3158.89990234375,
+"last": 3145.199951171875,
 "stop": 2769.8,
-"checked": "2026-11-03",
+"checked": "2026-11-05",
 "sell_next": false,
 "stop_note": "stop 2769.8, then Supertrend red"
 },
@@ -71,7 +71,7 @@
 "sh": 123,
 "avg": 1236.4126,
 "cost": 152497.2515096059,
-"last": 1188.1,
+"last": 1193.0,
 "stop_note": "weekly close < 30-wk SMA (1089.803)",
 "added": false
 },
@@ -82,9 +82,9 @@
 "sh": 955,
 "avg": 303.9,
 "cost": 291023.1615459375,
-"last": 303.0,
+"last": 317.0,
 "stop": 283.25,
-"checked": "2026-11-03",
+"checked": "2026-11-05",
 "sell_next": false,
 "stop_note": "stop 283.25, then Supertrend red"
 },
@@ -95,9 +95,9 @@
 "sh": 621,
 "avg": 363.0,
 "cost": 226043.335918125,
-"last": 369.1499938964844,
+"last": 367.54998779296875,
 "stop": 331.3,
-"checked": "2026-11-03",
+"checked": "2026-11-05",
 "sell_next": false,
 "stop_note": "stop 331.3, then Supertrend red"
 },
@@ -108,9 +108,9 @@
 "sh": 78,
 "avg": 624.95,
 "cost": 48880.24317393751,
-"last": 623.5999755859375,
+"last": 592.2999877929688,
 "stop": 578.15,
-"checked": "2026-11-03",
+"checked": "2026-11-05",
 "sell_next": false,
 "stop_note": "stop 578.15, then Supertrend red"
 },
@@ -121,7 +121,7 @@
 "sh": 465,
 "avg": 263.507,
 "cost": 122867.94432141562,
-"last": 288.18,
+"last": 295.42,
 "stop_note": "weekly close < 30-wk SMA (221.2229)",
 "added": false
 },
@@ -132,14 +132,27 @@
 "sh": 118,
 "avg": 629.5922,
 "cost": 74496.32156617424,
-"last": 636.8,
+"last": 632.05,
 "stop_note": "weekly close < 30-wk SMA (462.8467)",
+"added": false
+},
+"ath:ICICIBANK:2026-11-05": {
+"engine": "ATH",
+"symbol": "ICICIBANK",
+"date": "2026-11-05",
+"sh": 66,
+"avg": 1476.0705,
+"cost": 97688.74245947438,
+"last": 1500.0,
+"stop_note": "weekly close < 30-wk SMA (1352.1335)",
 "added": false
 }
 },
 "done": [
 "921:BIL:2026-11-02",
+"921:LALPATHLAB:2026-11-04",
 "921:MCX:2026-11-03",
+"921:PROTEAN:2026-11-04",
 "921:RPGLIFE:2026-10-29",
 "921:SIMPLEXINF:2026-11-03"
 ],
