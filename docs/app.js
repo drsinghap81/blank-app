@@ -120,6 +120,7 @@ async function loadLive() {
   const c = lvCfg(); let S = null; let err = '';
   if (c.url && c.token) { try { S = await lvApi('/api/plan'); } catch (e) { err = e.message; } }
   const rows = S ? S.rows : lvLocalSize(P);
+  state._lvGuardRisk = S && S.guard ? S.guard.risk_pct : +riskForBudget(lvBudget()).toFixed(2);
   const live = S && S.mode === 'LIVE';
   const head = S ? `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Angel One</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
       <div class="lv-kpis"><div><span>Capital</span><b>${money(S.capital, 'NSE')}</b></div><div><span>Cash</span><b>${money(S.cash, 'NSE')}</b></div><div><span>Free slots</span><b>${S.slots} of 10</b></div></div>
@@ -131,7 +132,7 @@ async function loadLive() {
   const list = rows.map((r, i) => {
     const E = r.trigger || r.price; const ord = r.kind === 'ATH_STOP' ? `buy-stop ${fmt(r.trigger, 2, 'en-IN')} (limit ${fmt(r.price, 2, 'en-IN')}), day order` : `limit ${fmt(r.price, 2, 'en-IN')}, ${r.when}`;
     const td = r.system === 'Monthly ATH' ? `<span class="score ${r.aligned ? 'al' : ''}"><i class="sd ${r.sector_rs == null ? 'na' : r.sector_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.theme_rs == null ? 'na' : r.theme_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.stock_rs == null ? 'na' : r.stock_rs > 0 ? 'y' : 'n'}"></i>${r.aligned ? ' aligned' : ''}</span>` : '';
-    return `<div class="lv-row"><div class="lv-rank">${r.rank}</div><div><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td}</div>
+    return `<div class="lv-row"><div class="lv-rank">${r.rank}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} (${fmt(r.pct_cap, 1)}%) · risk ${money(r.risk_amt, 'NSE')}`}</div>
       <div class="lv-sub">${ord} · stop ${fmt(r.stop, 2, 'en-IN')} (${fmt(r.risk_pct, 1)}% below) · exit: ${esc(r.exit_rule || '')}</div>
       <div class="lv-sub">${esc(r.note || '')}${r.sector ? ' · ' + esc(r.sector) : ''}</div></div>
@@ -140,7 +141,7 @@ async function loadLive() {
   const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span></div>
       <div class="lv-sub">${esc(e.system)}: ${esc(e.why)} · ${S ? `you hold ${e.qty}` : 'matched to your holdings once the server is connected'}</div></div>
       <div>${S && e.qty > 0 ? `<button class="lv-btn sell" data-x="${i}">Sell ${e.qty}</button>` : ''}</div></div>`).join('');
-  const watch = (P.watch || []).map((w) => `${esc(w.symbol)} (${fmt(w.price, 2, 'en-IN')})`).join(', ');
+  const watch = (P.watch || []).map((w, i) => `<a href="#" class="lv-w" data-w="${i}">${esc(w.symbol)}</a> (${fmt(w.price, 2, 'en-IN')})`).join(', ');
   el.innerHTML = `${head}${guardCard(S ? S.guard : null)}
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${rows.length} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
@@ -154,9 +155,41 @@ async function loadLive() {
     try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); lvSave({ token: j.token }); loadLive(); } catch (e) { alertMsg(e.message); }
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
+  el.querySelectorAll('.lv-w').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ ...P.watch[+a.dataset.w], kind: 'WATCH' }); }));
   const out = $('#lvout'); if (out) out.addEventListener('click', (e) => { e.preventDefault(); lvSave({ token: null }); loadLive(); });
   el.querySelectorAll('.lv-btn[data-i]').forEach((b) => b.addEventListener('click', () => lvSend(rows[+b.dataset.i], 'BUY', b)));
+  el.querySelectorAll('.lv-open[data-o]').forEach((b) => {
+    const go = () => lvOpen(rows[+b.dataset.o]);
+    b.addEventListener('click', go); b.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
   el.querySelectorAll('.lv-btn[data-x]').forEach((b) => b.addEventListener('click', () => lvSend(S.exits[+b.dataset.x], 'SELL', b)));
+}
+/* tap a Live row -> its chart: ATH rows open the ATH panel (monthly / weekly + 30 SMA), 9/21 rows the trend chart */
+async function lvOpen(r) {
+  state.athMkt = 'NSE'; state.athC = state.athC || {};
+  if (!state.athC.NSE) {
+    const [d, ipo, sec, world] = await Promise.all([getJSON(MAIN + 'data/scan/ath.json', 'ath'), getJSON(MAIN + 'data/scan/ipo.json', 'ipo'),
+      getJSON(MAIN + 'data/scan/sectors.json', 'sectors'), getJSON(MAIN + 'data/scan/world.json', 'world')]);
+    state.athC.NSE = { d, live: null, ipo, sec, world, tr: null, tab: 'td', q: '', all: false, lp: {} };
+  }
+  state.ath = state.athC.NSE; state.ath.lp = state.ath.lp || {};
+  const d = state.ath.d || {};
+  // the plan panel sizes with the same risk as the Live list
+  const G = state._lvGuardRisk; if (G) { state.risk.ath = G; state.risk.t921 = G; }
+  if (r.kind === 'T921') {
+    const tr = state.data.NSE || await getJSON(MAIN + 'data/scan/trend_scan.json', 'td_NSE'); state.data.NSE = tr; state.mkt = 'NSE';
+    const row = ((tr && tr.early) || []).find((x) => x.symbol === r.symbol) || ((tr && tr.rows) || []).find((x) => x.symbol === r.symbol);
+    if (!row) { alertMsg('Chart not available for ' + r.symbol); return; }
+    const prev = state.tab; state.tab = row.status ? 'new' : (row.list || 'trend');
+    try { select(row); } finally { state.tab = prev; }
+    return;
+  }
+  const near = (d.near || []).find((x) => x.symbol === r.symbol);
+  const run = (d.breakouts || []).concat(d.tracked || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
+  if ((r.kind === 'ATH_STOP' || r.kind === 'WATCH') && near) { athSelect({ ...near, _near: true }); return; }
+  if (run) { athSelect(run); return; }
+  if (near) { athSelect({ ...near, _near: true }); return; }
+  alertMsg('Chart not available for ' + r.symbol);
 }
 function alertMsg(t, ok) { const m = document.createElement('div'); m.className = 'status ' + (ok ? 'open' : 'exit'); m.style.margin = '10px 16px'; m.textContent = t; $('#view-live').prepend(m); setTimeout(() => m.remove(), 6000); }
 async function lvSend(r, side, btn) {
@@ -688,17 +721,19 @@ function wireCap(id, m, redraw) {
   });
 }
 const money = (v, m) => `${v < 0 ? '−' : ''}${curOf(m)}${fmt(Math.abs(v), 0, MKT[m].loc)}`;
-/* 9/21: 1% of capital at risk to the initial stop, max 20% of capital */
+/* max share of capital in one stock: 10% (portfolio guard; caps a one-stock gap shock) */
+const POS_CAP = 0.10;
+/* 9/21: 1% of capital at risk to the initial stop, max 10% of capital */
 function size921(r, m) {
   const E = r.entry ?? r.signal_close; const stop = r.stop; const C0 = cap(m);
   if (!E || !stop || E <= stop) return null;
-  const val = Math.min(riskPct('t921') / 100 * C0 * E / (E - stop), 0.2 * C0); const sh = Math.floor(val / E);
+  const val = Math.min(riskPct('t921') / 100 * C0 * E / (E - stop), POS_CAP * C0); const sh = Math.floor(val / E);
   return { sh, E, val: sh * E, pctCap: (sh * E) / C0 * 100, risk: sh * (E - stop) };
 }
-/* Monthly ATH: 2% of capital at risk to the 30-week SMA, max 20% of capital */
+/* Monthly ATH: risk % of capital to the 30-week SMA, max 10% of capital */
 function sizeATH(E, sma, C0, held = 0) {
   if (!E || !sma || E <= sma) return null;
-  const val = Math.min(riskPct('ath') / 100 * C0 * E / (E - sma), 0.2 * C0 - held * E); const sh = Math.max(0, Math.floor(val / E));
+  const val = Math.min(riskPct('ath') / 100 * C0 * E / (E - sma), POS_CAP * C0 - held * E); const sh = Math.max(0, Math.floor(val / E));
   return { sh, E, val: sh * E, pctCap: (sh * E) / C0 * 100, risk: sh * (E - sma), dist: (E - sma) / E * 100 };
 }
 function plan921(r) {
@@ -706,7 +741,7 @@ function plan921(r) {
   if (!z) return '';
   return `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput(m, 'cap921')}${riskInput('t921', 'risk921')}</div>
     <p><b>Buy ${z.sh.toLocaleString(MKT[m].loc)} shares</b> at about ${fmt(z.E)} = ${money(z.val, m)} (${fmt(z.pctCap, 1)}% of capital).</p>
-    <p class="muted">Rule: ${riskPct('t921')}% of capital at risk to the initial stop ${fmt(r.stop)}, max 20% of capital in one stock, max 10 stocks. Loss if the stop is hit ≈ ${money(z.risk, m)}. No adds: pyramiding tested neutral on this system.</p></div>`;
+    <p class="muted">Rule: ${riskPct('t921')}% of capital at risk to the initial stop ${fmt(r.stop)}, max 10% of capital in one stock, max 10 stocks. Loss if the stop is hit ≈ ${money(z.risk, m)}. No adds: pyramiding tested neutral on this system.</p></div>`;
 }
 /* market of the ATH section (India / US / Australia) */
 const AM = () => { if (!state.athMkt) { try { state.athMkt = localStorage.getItem('td_athmkt') || 'NSE'; } catch (e) { state.athMkt = 'NSE'; } } return state.athMkt; };
@@ -739,7 +774,7 @@ function planATH(r, near) {
   if (!z) return '';
   let html = `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput(m, 'capath')}${riskInput('ath', 'riskath')}</div>
     <p><b>${near ? 'Buy-stop' : 'Initial buy'}: ${z.sh.toLocaleString(AL())} shares</b> at ${fmt(E, 2, AL())} = ${money(z.val, m)} (${fmt(z.pctCap, 1)}% of capital).</p>
-    <p class="muted">30-week SMA ${fmt(smaE, 2, AL())} is ${fmt(z.dist, 1, AL())}% below the entry → ${riskPct('ath')}% of capital at risk ≈ ${money(z.risk, m)}${z.pctCap >= 19.9 ? ' (capped at 20% of capital)' : ''}.</p>`;
+    <p class="muted">30-week SMA ${fmt(smaE, 2, AL())} is ${fmt(z.dist, 1, AL())}% below the entry → ${riskPct('ath')}% of capital at risk ≈ ${money(z.risk, m)}${z.pctCap >= 9.9 ? ' (capped at 10% of capital)' : ''}.</p>`;
   if (!near && r.status === 'open') {
     const L = ((state.ath && state.ath.lp) || {})[r.symbol];
     const P = L ? L.price : r.close;
@@ -748,7 +783,7 @@ function planATH(r, near) {
     const above = (P / E - 1) * 100;
     html += `<p class="muted">The system's entry was the breakout on ${day(r.date)}; had you bought then, those shares would be <span class="${pnl >= 0 ? 'up' : 'down'}">${money(pnl, m)}</span> at ${fmt(P, 2, AL())}.</p>`;
     if (zn && zn.sh) {
-      html += `<h4>If you buy now</h4><p><b>${zn.sh.toLocaleString(AL())} shares</b> at about ${fmt(P, 2, AL())}${L ? ' (live, ~15 min delayed)' : ''} = ${money(zn.val, m)} (${fmt(zn.pctCap, 1)}% of capital). The 30-week SMA ${fmt(r.sma30, 2, AL())} is ${fmt(zn.dist, 1, AL())}% below, so ${riskPct('ath')}% of capital ≈ ${money(zn.risk, m)} is at risk${zn.pctCap >= 19.9 ? ' (capped at 20% of capital)' : ''}.</p>
+      html += `<h4>If you buy now</h4><p><b>${zn.sh.toLocaleString(AL())} shares</b> at about ${fmt(P, 2, AL())}${L ? ' (live, ~15 min delayed)' : ''} = ${money(zn.val, m)} (${fmt(zn.pctCap, 1)}% of capital). The 30-week SMA ${fmt(r.sma30, 2, AL())} is ${fmt(zn.dist, 1, AL())}% below, so ${riskPct('ath')}% of capital ≈ ${money(zn.risk, m)} is at risk${zn.pctCap >= 9.9 ? ' (capped at 10% of capital)' : ''}.</p>
         <p class="muted">You'd be buying ${fmt(above, 1, AL())}% ${above >= 0 ? 'above' : 'below'} the breakout price. The backtest bought at the breakout, so a late entry has a wider gap to the SMA and less of the move left. Exit for everyone: a weekly close below the 30-week SMA.</p>`;
     } else {
       html += `<p class="muted">Price is at or below the 30-week SMA, so there is no new entry here. Exit: a weekly close below the SMA.</p>`;
@@ -763,7 +798,7 @@ function planATH(r, near) {
       html += a && a.sh ? `<p class="status info">Armed: the week ending ${day(r.test_week)} tested the 30-week SMA and held. <b>Add ${a.sh.toLocaleString(AL())} shares</b> (on the system's ${z.sh.toLocaleString(AL())}-share position) (${money(a.val, m)}) if price trades above ${fmt(r.add_level, 2, AL())}, the highest price since entry.</p>`
         : '<p class="muted">Armed, but the position is already at the 20% cap — no add.</p>';
     } else {
-      html += `<p class="muted">Not armed yet. It arms after a week whose low comes within 3% of the 30-week SMA (at or below ${fmt(r.sma30 * 1.03, 2, AL())} now) but closes above it. Then add when price makes a new high since entry, sized at ${riskPct('ath')}% risk to the SMA, keeping the stock at most 20% of capital.</p>`;
+      html += `<p class="muted">Not armed yet. It arms after a week whose low comes within 3% of the 30-week SMA (at or below ${fmt(r.sma30 * 1.03, 2, AL())} now) but closes above it. Then add when price makes a new high since entry, sized at ${riskPct('ath')}% risk to the SMA, keeping the stock at most 10% of capital.</p>`;
     }
   }
   return html + '</div>';
@@ -859,7 +894,7 @@ function ipoSelect(r) {
   const E = near ? r.ath : (r.entry || r.close); const z = sizeATH(E, r.sma10, cap(AM()));
   const plan = z && z.sh && r.status !== 'exit next open' ? `<div class="card plan"><div class="plan-head"><h3>Position plan</h3>${capInput(AM(), 'capipo')}${riskInput('ath', 'riskipo')}</div>
     <p><b>${near ? 'Buy-stop' : 'Buy'} ${z.sh.toLocaleString(AL())} shares</b> at about ${fmt(E, 2, AL())} = ${money(z.val, AM())} (${fmt(z.pctCap, 1, AL())}% of capital).</p>
-    <p class="muted">${riskPct('ath')}% of capital at risk to the 10-week SMA (${fmt(r.sma10, 2, AL())}, ${fmt(z.dist, 1, AL())}% below), max 20% in one stock. Same risk setting as the ATH system.</p></div>` : '';
+    <p class="muted">${riskPct('ath')}% of capital at risk to the 10-week SMA (${fmt(r.sma10, 2, AL())}, ${fmt(z.dist, 1, AL())}% below), max 10% in one stock. Same risk setting as the ATH system.</p></div>` : '';
   const f = [['High since listing', `${fmt(r.ath, 2, AL())} (${day(r.ath_date)})`], ['Cup depth', pct(r.depth * 100)], ['Cup length', `${r.base_days} trading days`],
     ['Listed', `${day(r.listed)} (${r.age_months} months ago)`], ['10-week SMA', fmt(r.sma10, 2, AL())], ['Traded a day', valTxt(r.value_cr)]];
   if (!near && r.entry) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, AL())}`], ['Best since entry', pct(r.peak * 100)]);
