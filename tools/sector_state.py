@@ -147,6 +147,7 @@ def main():
     for name in P.columns:
         st = state(P[name], mret, n50)
         if st:
+            st["shortlist"] = shortlist(st); st["slug"] = slug(name)
             idx[name] = st
     sym = {}
     for f in glob.glob("data/universe/nifty*.csv") + glob.glob("data/universe/fno_stocks.csv"):
@@ -168,6 +169,7 @@ def main():
                thematic=[k for k in THEMATIC if k in idx], thematic_new=[k for k in THEMATIC if k not in idx])
     fix = lambda v: {k: fix(x) for k, x in v.items()} if isinstance(v, dict) else (None if isinstance(v, float) and not np.isfinite(v) else v)  # noqa: E731
     json.dump(fix(out), open(OUT, "w"), indent=0, allow_nan=False)
+    write_index_charts(P, idx, "data/scan/index_charts")
     print("sectors", len(idx), "symbols with industry", len(sym))
     for k in sorted(set(INDUSTRY_INDEX.values())):
         if k in idx:
@@ -224,6 +226,46 @@ def topdown(df, sec):
     df["td_score"] = pos("sector_rs").astype(int) + pos("theme_rs").astype(int) + pos("stock_rs").astype(int)
     df["aligned"] = pos("sector_rs") & pos("stock_rs")
     return df
+
+
+def slug(k):
+    import re
+    return re.sub(r"[^A-Za-z0-9]+", "_", k).strip("_").lower()
+
+
+def shortlist(st):
+    """Index shortlist (like the stock lists): in an uptrend (leading/uptrend) with 6-month RS > 0.
+    Group: breakout = closing above its highest completed-month close (base >= 24 months at the time it was set);
+    near = within 5% of its high; trend = the rest of the shortlist."""
+    if not st or st.get("tag") not in ("leading", "uptrend") or (st.get("rs_6m") or -1) <= 0:
+        return None
+    if st.get("above_ath_month") and (st.get("base_months") or 0) >= 1:
+        return "breakout"
+    if (st.get("from_high") or -99) >= -5:
+        return "near"
+    return "trend"
+
+
+def write_index_charts(P, idx, outdir):
+    """Chart JSON per index from daily closes: weekly bars (last 5 y) + 30-week SMA, monthly bars (full history).
+    Bars are built from closes only (open = first close, high/low = highest/lowest close of the period)."""
+    os.makedirs(outdir, exist_ok=True)
+    for f in os.listdir(outdir):
+        os.remove(os.path.join(outdir, f))
+    for k in idx:
+        c = P[k].dropna() if k in P else None
+        if c is None or len(c) < 160:
+            continue
+        def bars(per):
+            g = c.groupby(c.index.to_period(per))
+            return pd.DataFrame({"o": g.first(), "h": g.max(), "l": g.min(), "c": g.last()})
+        W = bars("W-FRI"); W["sma"] = W.c.rolling(30, min_periods=30).mean(); W = W.tail(260)
+        M = bars("M")
+        r = lambda v: [None if not np.isfinite(x) else round(float(x), 2) for x in v]  # noqa: E731
+        ch = dict(w=dict(t=[str(p.end_time.date()) for p in W.index], o=r(W.o), h=r(W.h), l=r(W.l), c=r(W.c), sma=r(W.sma)),
+                  m=dict(t=[str(p) for p in M.index], o=r(M.o), h=r(M.h), l=r(M.l), c=r(M.c)),
+                  ath_month_close=idx[k].get("ath_month_close"), ath_month=idx[k].get("ath_month"))
+        json.dump(ch, open(os.path.join(outdir, slug(k) + ".json"), "w"), separators=(",", ":"), allow_nan=False)
 
 
 def tag_for(symbol, sec):

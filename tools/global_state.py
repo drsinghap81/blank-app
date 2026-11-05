@@ -15,7 +15,7 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from global_sectors import CFG, US_SECTOR_OF, fetch_meta, index_tickers  # noqa: E402
-from sector_state import THEME_EXCLUDE, state  # noqa: E402,F401
+from sector_state import THEME_EXCLUDE, shortlist, slug, state, write_index_charts  # noqa: E402,F401
 
 MKT = sys.argv[1] if len(sys.argv) > 1 else "US"
 D = f"data/scan/{MKT.lower()}"
@@ -65,6 +65,7 @@ def main():
         st = state(P[k], mret, b)
         if st:
             st["name"] = {**c["broad"], **c["sectors"], **c["themes"]}.get(k, k)
+            st["shortlist"] = shortlist(st); st["slug"] = slug(k)
             idx[k] = st
     m = meta()
     m = m.dropna(subset=["symbol"])
@@ -81,6 +82,7 @@ def main():
                names={**c["broad"], **c["sectors"], **c["themes"]})
     fix = lambda v: {k: fix(x) for k, x in v.items()} if isinstance(v, dict) else (None if isinstance(v, float) and not np.isfinite(v) else v)  # noqa: E731
     json.dump(fix(out), open(f"{D}/sectors.json", "w"), indent=0, allow_nan=False)
+    write_index_charts(P, idx, f"{D}/index_charts")
     print(MKT, "indices", len(idx), "stocks with sector", len(symbols), "with theme", len(themes), "asof", out["asof"], today)
     for k in out["sectors"] + out["thematic"]:
         v = idx[k]; print(f"  {v['name']:28s} {v['tag']:8s} RS6m {v['rs_6m'] if v['rs_6m'] is None else round(v['rs_6m'], 1)}")

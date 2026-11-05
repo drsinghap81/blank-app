@@ -301,3 +301,5 @@ details.info p { margin: 6px 0; line-height: 1.45; }
 .co.small { font-size: 11.5px; width: 100%; margin-top: 2px; }
 .seg.mk { margin: 10px 16px 0; }
 .status.watch { margin: 10px 16px 0; font-size: 12.5px; }
+.ixsep { font-size: 11.5px; font-weight: 800; color: var(--slate); padding: 10px 4px 4px; border-top: 1px solid var(--line); list-style: none; }
+.tdbar[data-k] { cursor: pointer; }
