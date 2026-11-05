@@ -170,7 +170,7 @@ def main():
         themes = T.groupby(T.Symbol.astype(str).str.strip()).Theme.apply(lambda v: sorted(set(v))).to_dict()
     except Exception:  # noqa: BLE001
         pass
-    out = dict(asof=str(P.index[-1].date()) if len(P) else str(today), market=MARKET, indices=idx, industries=INDUSTRY_INDEX, symbols=sym,
+    out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(P.index[-1].date()) if len(P) else str(today), market=MARKET, indices=idx, industries=INDUSTRY_INDEX, symbols=sym,
                themes=themes,
                thematic=[k for k in THEMATIC if k in idx], thematic_new=[k for k in THEMATIC if k not in idx])
     fix = lambda v: {k: fix(x) for k, x in v.items()} if isinstance(v, dict) else (None if isinstance(v, float) and not np.isfinite(v) else v)  # noqa: E731

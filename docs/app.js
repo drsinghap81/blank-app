@@ -16,6 +16,29 @@ const fmt = (v, d = 2, l) => (v == null || Number.isNaN(v) ? '–' : Number(v).t
 const pct = (v) => (v == null || Number.isNaN(v) ? '–' : `${v > 0 ? '+' : ''}${Number(v).toFixed(1)}%`);
 const day = (s) => new Date(String(s).slice(0, 10) + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 const longDay = (s) => new Date(String(s).slice(0, 10) + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+/* 'updated' stamp from a scan file's generated time (UTC, ISO or 'YYYY-MM-DD HH:MM UTC'), shown in this device's time zone */
+function updTxt(g) {
+  if (!g) return '';
+  const t = new Date(String(g).replace(' UTC', 'Z').replace(' ', 'T').replace('+00:00', 'Z'));
+  if (Number.isNaN(t.getTime())) return '';
+  return ' · updated ' + t.toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+}
+/* market close of a trading day, e.g. 'Wed 4 Nov, 3:30 pm IST (9:00 pm your time)' */
+const CLOSE_AT = { NSE: ['Asia/Kolkata', 15, 30, 'IST'], US: ['America/New_York', 16, 0, 'New York'], ASX: ['Australia/Sydney', 16, 10, 'Sydney'] };
+function closeTxt(mk, d) {
+  if (!d) return '';
+  const [tz, hh, mm, lab] = CLOSE_AT[mk] || CLOSE_AT.NSE;
+  const [y, mo, da] = String(d).slice(0, 10).split('-').map(Number);
+  const guess = Date.UTC(y, mo - 1, da, hh, mm);
+  const p = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })
+    .formatToParts(new Date(guess)).reduce((o, x) => ((o[x.type] = x.value), o), {});
+  const off = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute) - guess;
+  const t = new Date(guess - off);
+  const exch = `${hh > 12 ? hh - 12 : hh}:${String(mm).padStart(2, '0')} pm ${lab}`;
+  const sameDay = t.toLocaleDateString('en-CA') === String(d).slice(0, 10);
+  const mine = t.toLocaleString('en-AU', sameDay ? { hour: 'numeric', minute: '2-digit' } : { weekday: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  return `${longDay(d).replace(/ \d{4}$/, '')}, ${exch} (${mine} your time)`;
+}
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2600); }
@@ -92,7 +115,7 @@ function filtered() {
 
 function renderTrends() {
   const d = state.data[state.mkt]; const L = lists();
-  $('#asof').textContent = `${MKT[state.mkt].name} close ${longDay(d.asof)}, ${Number(d.scanned).toLocaleString('en-IN')} stocks scanned`;
+  $('#asof').textContent = `Market data: ${MKT[state.mkt].name} close ${closeTxt(state.mkt, d.asof)} · ${Number(d.scanned).toLocaleString('en-IN')} stocks${updTxt(d.generated)}`;
   const buys = L.new.filter((e) => e.status.startsWith('NEW - buy')).length;
   const exits = L.open.filter((e) => e.status.startsWith('EXIT')).length;
   $('#summary').innerHTML = `
@@ -667,7 +690,7 @@ async function loadATH() {
   const todayIST = new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10);
   state.ath.lp = lv && lv.time && lv.time.slice(0, 10) === todayIST ? lv.prices || {} : {};
   $('#asof').textContent = Object.keys(state.ath.lp).length ? `Plan from ${longDay(d.asof)} · live prices ${lv.time.slice(11)} (about 15 min delayed)`
-    : `${MKT[mk].name} close ${longDay(d.asof)}, ${Number(d.scanned).toLocaleString(AL())} stocks, full price history`;
+    : `Market data: ${MKT[mk].name} close ${closeTxt(mk, state.ath.tab === 'ipo' && state.ath.ipo ? state.ath.ipo.asof : state.ath.tab === 'themes' && state.ath.sec ? state.ath.sec.asof : d.asof)} · ${Number(d.scanned).toLocaleString(AL())} stocks${updTxt(state.ath.tab === 'ipo' && state.ath.ipo ? state.ath.ipo.generated : state.ath.tab === 'themes' && state.ath.sec ? state.ath.sec.generated || d.generated : d.generated)}`;
   const T = d.tracked || [];
   const brkMain = (d.breakouts || []).filter((r) => r.main).length;
   const exits = T.filter((r) => r.status === 'exit next open').length;
@@ -868,13 +891,13 @@ function topStrip() {
   if (W && W.indices) {
     const I = Object.entries(W.indices).filter(([t]) => t !== '^NSEI' && t !== '^CRSLDX');
     h += `<div class="td-sec"><div class="td-h"><span>1 · World</span><span class="tdpill ${W.risk_on ? 'on' : 'off'}">${W.risk_on ? 'Risk-on' : 'Risk-off'}</span></div>
-      <div class="tiles">${I.map(([, x]) => tile(SHORT[x.name] || x.name, x, x.ath_breakout ? ' ★' : '')).join('')}</div><p class="cap">RS = 6-month return vs MSCI World · ${day(W.asof)}</p></div>`;
+      <div class="tiles">${I.map(([, x]) => tile(SHORT[x.name] || x.name, x, x.ath_breakout ? ' ★' : '')).join('')}</div><p class="cap">RS = 6-month return vs MSCI World · close ${day(W.asof)}${updTxt(W.generated)}</p></div>`;
   }
   if (S && S.indices) {
     const ix = S.indices; const mk = AM();
     const ind = mk === 'NSE' ? [['NIFTY 50', 'Nifty 50'], ['NIFTY 500', 'Nifty 500'], ['NIFTY MIDCAP 150', 'Midcap 150'], ['NIFTY SMALLCAP 250', 'Smallcap 250']].filter(([k]) => ix[k])
       : (S.broad || []).filter((k) => ix[k]).map((k) => [k, ixNames()[k] || k]);
-    h += `<div class="td-sec"><div class="td-h"><span>2 · ${MKT[mk].name}</span></div><div class="tiles">${ind.map(([k, n]) => tile(n, ix[k])).join('')}</div><p class="cap">RS = 6-month return vs ${BENCH_NM[mk]}</p></div>`;
+    h += `<div class="td-sec"><div class="td-h"><span>2 · ${MKT[mk].name}</span></div><div class="tiles">${ind.map(([k, n]) => tile(n, ix[k])).join('')}</div><p class="cap">RS = 6-month return vs ${BENCH_NM[mk]} · close ${day(S.asof)}${updTxt(S.generated)}</p></div>`;
     const NOT = ['NIFTY500 AHIMSA', 'NIFTY SME EMERGE', 'NIFTY MIDCAP LIQUID 15', 'NIFTY100 LIQUID 15', 'NIFTY CONGLOMERATE 50', 'NIFTY INDIA SELECT 5 CORPORATE GROUPS (MAATR)'];
     h += `<div class="td-sec"><div class="td-h"><span>3 · Sectors</span><span class="cap">RS 6 m vs ${BENCH_NM[mk]}</span></div>${rsBars(S.sectors || [...new Set(Object.values(S.industries || {}))], ix, secName)}</div>`;
     if ((S.thematic || []).length) h += `<div class="td-sec"><div class="td-h"><span>4 · ${mk === 'NSE' ? 'Themes' : mk === 'US' ? 'Industries' : 'Themes (context)'} · top 10</span><span class="cap">tap a bar for its chart</span></div>${rsBars((S.thematic || []).filter((k) => !NOT.includes(k) && !k.includes('CORPORATE GROUP')), ix, themeName, 10)}</div>`;

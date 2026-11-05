@@ -76,7 +76,7 @@ def main():
         symbols = {s: g for s, g, ix in zip(m.symbol, m.industry, m.sector_index) if isinstance(ix, str)}
         industries = {g: ix for g, ix in zip(m.industry, m.sector_index) if isinstance(ix, str)}
     themes = {s: [t] for s, t in zip(m.symbol, m.theme) if isinstance(t, str)}
-    out = dict(asof=str(P.index[-1].date()), market=c["market"], bench=c["bench"], indices=idx, industries=industries,
+    out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(P.index[-1].date()), market=c["market"], bench=c["bench"], indices=idx, industries=industries,
                symbols=symbols, themes=themes, broad=[k for k in c["broad"] if k in idx], sectors=[k for k in c["sectors"] if k in idx],
                thematic=[k for k in c["themes"] if k in idx], thematic_new=[k for k in c["themes"] if k not in idx],
                names={**c["broad"], **c["sectors"], **c["themes"]})

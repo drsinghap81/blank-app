@@ -28,6 +28,7 @@ import numpy as np
 import pandas as pd
 
 SEC, BENCH = None, None
+LAST_BAR = [None]
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -215,6 +216,11 @@ def main():
             sym = sym_of.get(t, t)
             try:
                 x = pd.DataFrame({k: dd[k][t] for k in ("Open", "High", "Low", "Close", "Volume")}).dropna(subset=["Close"])
+                if len(x):
+                    from session import drop_partial as _dp
+                    _xl = _dp(x, MARKET)
+                    if len(_xl):
+                        LAST_BAR[0] = max(LAST_BAR[0], _xl.index[-1].date()) if LAST_BAR[0] else _xl.index[-1].date()
                 if not len(x) or x.index.max() < pd.Timestamp(today) - pd.Timedelta(days=10):
                     continue
                 if pd.notna(listed.get(sym)):
@@ -277,7 +283,8 @@ def main():
     for s_, ch in charts.items():
         if s_ in keep:
             json.dump(clean(ch), open(f"{CH}/{s_}.json", "w"), separators=(",", ":"), allow_nan=False)
-    out = dict(asof=str(today), generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(tick),
+    data_asof = str(LAST_BAR[0]) if LAST_BAR[0] else str(today)   # last completed market close in the data
+    out = dict(market=MARKET, asof=data_asof, scan_date=str(today), generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(tick),
                rules=dict(max_age_months=MAX_AGE_M, base_days=BASE_DAYS, depth_pct=DEPTH * 100, near_pct=NEAR * 100,
                           min_value_cr=MINVAL / UNIT, min_close=MIN_CLOSE, exit_sma_weeks=SMA_W, min_listing_day_cr=MIN_FIRST_DAY / UNIT),
                breakouts=clean(brk.to_dict("records")) if len(brk) else [],

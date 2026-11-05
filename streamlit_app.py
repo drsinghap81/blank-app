@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-11-05 · index shortlist + charts v46"
+APP_BUILD = "2026-11-05 · market-data stamps v47"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2017,6 +2017,29 @@ _MK_WATCH = {
     "ASX": "**Watch only.** Backtested 2008–26 with the India rules: with the A$30 price floor only ~2 signals a year. With an A$1 floor "
            "the ATH system made 4–5% a year, worst fall −16% (ASX 200 2–5% price, ~6–9% with dividends); IPO cups ~1%; top-down levels "
            "did not help. Lists are for ideas."}
+
+
+def _mkt_stamp(mk: str, asof, generated=None) -> str:
+    """'Market data: NSE close Wed 4 Nov 2026, 3:30 pm IST (9:00 pm Melbourne) · updated 5 Nov 11:50 am Melbourne'."""
+    from datetime import datetime as _dt, timezone as _tz
+    from zoneinfo import ZoneInfo
+    tzs = {"NSE": ("Asia/Kolkata", 15, 30, "IST", "NSE"), "US": ("America/New_York", 16, 0, "New York", "US"),
+           "ASX": ("Australia/Sydney", 16, 10, "Sydney", "ASX")}
+    tz, hh, mm, lab, nm = tzs.get(mk, tzs["NSE"])
+    mel = ZoneInfo("Australia/Melbourne")
+    try:
+        d = _dt.strptime(str(asof)[:10], "%Y-%m-%d").replace(hour=hh, minute=mm, tzinfo=ZoneInfo(tz))
+        out = f"Market data: {nm} close {d:%a %-d %b %Y}, {d:%-I:%M %p} {lab} ({d.astimezone(mel):%a %-I:%M %p} Melbourne)"
+    except Exception:  # noqa: BLE001
+        out = f"Market data: {nm} close {asof}"
+    if generated:
+        try:
+            g = _dt.fromisoformat(str(generated).replace(" UTC", "+00:00").replace("Z", "+00:00"))
+            g = g if g.tzinfo else g.replace(tzinfo=_tz.utc)
+            out += f" · updated {g.astimezone(mel):%-d %b %-I:%M %p} Melbourne"
+        except Exception:  # noqa: BLE001
+            pass
+    return out.replace("AM", "am").replace("PM", "pm")
 
 
 def _mk_path(name: str) -> str:
@@ -2129,6 +2152,7 @@ def render_topdown_tab() -> None:
     w, sd, ad, idd = _load(WORLD_PATH), _load(_mk_path("sectors.json")), _load(_mk_path("ath.json")), _load(_mk_path("ipo.json"))
     ix = sd.get("indices") or {}
     st.markdown(f"#### 🧭 Top-down: world → {dict(NSE='India', US='US', ASX='Australia')[_CUR_MK['m']]} → sectors → themes → stocks")
+    st.caption(_mkt_stamp(_CUR_MK["m"], sd.get("asof"), sd.get("generated")) + (f" · world indices: US close {w.get('asof')}" if w.get("asof") else ""))
     st.caption(TD_HELP)
     # 1 world
     wi = w.get("indices") or {}
@@ -2235,7 +2259,8 @@ def render_ath_tab() -> None:
     except Exception:  # noqa: BLE001
         st.info("The monthly all-time-high scan appears after its first evening run (20:30 IST on trading days).")
         return
-    st.markdown(f"#### 🏔️ Monthly ATH breakout — NSE close {d.get('asof')}")
+    st.markdown(f"#### 🏔️ Monthly ATH breakout")
+    st.caption(_mkt_stamp(_CUR_MK["m"], d.get("asof"), d.get("generated")))
     st.caption("Buy when price trades above the high of the all-time-high closing month (that month ≥ 2 years old, stock above "
                "its 30-week SMA, ≥ ₹2 cr/day). Sell at the next open after a weekly close below the 30-week SMA. 10 stocks, "
                "risk-sized (1% default: 22%/yr, worst fall −20.5%; 2%: 28.6%, −23.5%; equal weight 26.9%, −30%); 50/50 with the "
@@ -2343,7 +2368,8 @@ def render_ipo_tab() -> None:
     except Exception:  # noqa: BLE001
         st.info("The IPO scan appears after its first evening run (20:45 IST on trading days).")
         return
-    st.markdown(f"#### 🚀 IPO ATH cup — NSE close {d.get('asof')}")
+    st.markdown(f"#### 🚀 IPO ATH cup")
+    st.caption(_mkt_stamp(_CUR_MK["m"], d.get("asof"), d.get("generated")))
     st.caption("IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after that high is at "
                "least 20 trading days old and the stock has closed 15%+ below it (the cup). Buy at the next open; sell at the next "
                "open after a weekly close below the 10-week SMA. ≥ ₹2 cr/day, price ≥ ₹100. Backtest 2017–Oct 2026 (every NSE IPO "
@@ -2515,8 +2541,9 @@ def render_trend_scan_tab(market: MarketConfig | None = None) -> None:
     watch = rows[rows.list == "watch"] if len(rows) else rows
     live = early[early.status.str.startswith(("NEW", "open", "EXIT"))] if len(early) else early
     new = early[early.status.str.startswith("NEW - buy")] if len(early) else early
-    st.markdown(f"#### 📈 Trend scan — {d.get('market_label', 'India (NSE)')} close {d.get('asof')}")
+    st.markdown(f"#### 📈 Trend scan — {d.get('market_label', 'India (NSE)')}")
     _mk = d.get("market", "NSE")
+    st.caption(_mkt_stamp(_mk if _mk in ("NSE", "US", "ASX") else "NSE", d.get("asof"), d.get("generated")))
     if _mk == "US":
         st.warning("**Watch only.** Tested 2017–2026 on US stocks, this system made about 4% a year against 15% for the "
                    "S&P 500, and no liquidity or price filter fixed it. Use this list for ideas, not as a trading system.")
