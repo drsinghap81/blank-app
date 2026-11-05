@@ -1,0 +1,25 @@
+name: yt-meta
+on:
+  workflow_dispatch:
+    inputs:
+      ids: {default: ""}
+      name: {default: "murarka-meta"}
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - uses: denoland/setup-deno@v2
+        with: {deno-version: v2.x}
+      - run: |
+          pip install -q -U "yt-dlp[default]"
+          python tools/yt_meta.py ytm ${{ github.event.inputs.ids }}
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          B=yt-${{ github.event.inputs.name }}
+          git checkout --orphan $B; git rm -rq --cached .; git add -f ytm; git commit -qm "$B"; git push -f origin $B
