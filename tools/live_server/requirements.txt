@@ -6,4 +6,4 @@ pyotp==2.9.0
 logzero==1.7.0
 websocket-client>=1.8
 # moomoo read-only (optional): futu-api
-futu-api==9.4.5408
+futu-api>=9.0
