@@ -36,12 +36,24 @@ os.makedirs(DATA, exist_ok=True)
 LIVE = ENV.get("LIVE_ORDERS", "0") == "1"
 PLAN_URL = ENV.get("PLAN_URL", "https://raw.githubusercontent.com/drsinghap81/blank-app/main/data/scan/trade_plan.json")
 CAPITAL = float(ENV.get("CAPITAL", "0") or 0)            # 0 -> use Angel's net value
-# Portfolio guard (5 Nov 2026 backtest, ATH system 2017-26): the worst fall has been ~20 x the risk per trade, and
-# lowering risk beat every drawdown rule (size cuts, hard portfolio stop-loss). So you set a DRAWDOWN BUDGET and the
-# risk per trade follows: risk = budget / 20. The guard warns at 75% and 100% of the budget (it does not sell or block:
+# Portfolio guard (ATH system 2017-26): lowering risk beat every drawdown rule (size cuts, hard portfolio stop-loss).
+# So you set a DRAWDOWN BUDGET and the risk per trade follows from a Monte Carlo of the system (95% of paths stay
+# within the budget; about budget / 30). The guard warns at 75% and 100% of the budget (it does not sell or block:
 # hard stops lowered returns), and pauses new buys for PAUSE_DAYS after STREAK losing exits in a row.
 DD_BUDGET = float(ENV.get("DD_BUDGET_PCT", "15")) / 100
-RISK = float(ENV["RISK_PCT"]) / 100 if ENV.get("RISK_PCT") else DD_BUDGET / 20
+# Monte Carlo (6 Nov 2026; ATH system 2017-26, 5 fill orders x 400 block-bootstrap 10-year paths, 13-week blocks):
+# risk per trade % -> max drawdown % that 95% of paths stayed within. Risk = the level whose 95% drawdown = your budget.
+MC95 = [(0.0, 0.0), (0.25, 8.6), (0.5, 16.4), (0.75, 23.3), (1.0, 28.9), (1.25, 33.4), (1.5, 38.5)]
+
+
+def risk_for_budget(b_pct):
+    for (r0, d0), (r1, d1) in zip(MC95, MC95[1:]):
+        if b_pct <= d1:
+            return (r0 + (r1 - r0) * (b_pct - d0) / (d1 - d0)) / 100
+    return MC95[-1][0] / 100
+
+
+RISK = float(ENV["RISK_PCT"]) / 100 if ENV.get("RISK_PCT") else risk_for_budget(DD_BUDGET * 100)
 MAX_POS_PCT = float(ENV.get("MAX_POS_PCT", "10")) / 100     # 10%: caps a one-stock gap shock (cost ~0.3%/yr)
 STREAK, PAUSE_DAYS = int(ENV.get("STREAK", "5")), int(ENV.get("PAUSE_DAYS", "14"))
 MAX_POSITIONS = int(ENV.get("MAX_POSITIONS", "10"))

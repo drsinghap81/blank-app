@@ -86,23 +86,29 @@ async function lvApi(path, opt = {}) {
 }
 function lvLocalSize(P) {
   // no server: size from your capital setting (India) and risk %, 10 positions, 20% cap, ignore holdings
-  const C0 = cap('NSE'); const risk = lvBudget() / 20 / 100;
+  const C0 = cap('NSE'); const risk = riskForBudget(lvBudget()) / 100;
   return (P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
     return { ...r, qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, skip: '' }; });
 }
-/* Portfolio guard: drawdown budget -> risk per trade = budget / 20 (worst fall in the ATH backtest ~ 20 x risk) */
+/* Portfolio guard: drawdown budget -> risk per trade from a Monte Carlo of the ATH system (95% of paths within the budget) */
 const lvBudget = () => +(lvCfg().budget || 15);
+/* Monte Carlo (ATH system 2017-26): risk per trade % -> max fall that 95% of 10-year paths stayed within */
+const MC95 = [[0, 0], [0.25, 8.6], [0.5, 16.4], [0.75, 23.3], [1.0, 28.9], [1.25, 33.4], [1.5, 38.5]];
+function riskForBudget(b) {
+  for (let i = 1; i < MC95.length; i++) { const [r0, d0] = MC95[i - 1]; const [r1, d1] = MC95[i]; if (b <= d1) return r0 + (r1 - r0) * (b - d0) / (d1 - d0); }
+  return 1.5;
+}
 function guardCard(G) {
-  const b = G ? G.budget_pct : lvBudget(); const risk = G ? G.risk_pct : b / 20;
+  const b = G ? G.budget_pct : lvBudget(); const risk = G ? G.risk_pct : +riskForBudget(b).toFixed(2);
   const used = G ? Math.max(0, Math.min(100, G.used_pct)) : 0;
   const col = !G ? 'var(--slate)' : G.status === 'ok' ? 'var(--rise)' : G.status === 'warn' ? 'var(--saffron)' : 'var(--fall)';
-  const opts = [5, 7.5, 10, 15, 20].map((v) => `<option value="${v}" ${v === b ? 'selected' : ''}>${v}% fall → ${(v / 20).toFixed(2)}% risk</option>`).join('');
+  const opts = [10, 15, 20, 25, 30].map((v) => `<option value="${v}" ${v === b ? 'selected' : ''}>${v}% fall → ${riskForBudget(v).toFixed(2)}% risk</option>`).join('');
   return `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Portfolio guard</b>
       ${G ? `<span class="lv-mode ${G.status === 'ok' ? '' : G.status === 'warn' ? 'dry' : 'live'}" style="${G.status === 'ok' ? 'background:var(--rise-soft);color:#0A7A55' : ''}">${{ ok: 'OK', warn: 'WATCH', over: 'OVER BUDGET', paused: 'PAUSED' }[G.status]}</span>` : ''}</div>
     ${G ? `<div class="lv-kpis"><div><span>From peak</span><b style="color:${col}">${pct(G.dd_pct)}</b></div><div><span>Budget</span><b>−${b}%</b></div><div><span>Risk / trade</span><b>${risk}%</b></div></div>
       <div class="gbar"><i style="width:${used}%;background:${col}"></i></div><p class="lv-sub">${esc(G.msg)} Losing exits in a row: ${G.streak} of ${G.streak_max} (then new buys pause 2 weeks).</p>`
     : `<label class="lv-sub" style="display:block;margin-top:6px">Worst fall you can sit through calmly: <select id="lvbud">${opts}</select></label>`}
-    <p class="lv-sub">Backtest: the worst fall has been about 20× the risk per trade, and simply sizing from your budget beat cutting size in a drawdown or a sell-everything portfolio stop (which sold near lows and missed the rebound). So the guard sets your risk from the budget, caps one stock at 10%, warns at 75% and 100% of the budget, and pauses new buys for 2 weeks after 5 losing exits in a row. It never sells for you. ${G ? 'Budget is set on the server (DD_BUDGET_PCT).' : ''}</p></div>`;
+    <p class="lv-sub">Risk per trade is set so that in 95% of 2,000 reshuffled 10-year histories of this system the fall stayed within your budget (about budget ÷ 30; the single historical worst was ~20× risk). Sizing from the budget beat cutting size in a drawdown or a sell-everything portfolio stop (which sold near lows and missed the rebound). The guard caps one stock at 10%, warns at 75% and 100% of the budget, and pauses new buys for 2 weeks after 5 losing exits in a row. It never sells for you. ${G ? 'Budget is set on the server (DD_BUDGET_PCT).' : ''}</p></div>`;
 }
 const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', T921: '9/21 trend entry' };
 async function loadLive() {
@@ -118,7 +124,7 @@ async function loadLive() {
   const head = S ? `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Angel One</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
       <div class="lv-kpis"><div><span>Capital</span><b>${money(S.capital, 'NSE')}</b></div><div><span>Cash</span><b>${money(S.cash, 'NSE')}</b></div><div><span>Free slots</span><b>${S.slots} of 10</b></div></div>
       <p class="lv-sub">${live ? 'Send places a real order after you confirm.' : 'Dry run: Send shows exactly what would go to Angel; nothing is sent. Set LIVE_ORDERS=1 on the server to go live.'} <a href="#" id="lvout">Disconnect</a></p></div>`
-    : `<div class="lv-card"><b>Connect your server</b><p class="lv-sub">${err ? `<span class="down">${esc(err)}</span> · ` : ''}Sizes below use your capital (${money(cap('NSE'), 'NSE')}) and ${(lvBudget() / 20).toFixed(2)}% risk from your guard budget; holdings and cash are not checked and there is no Send button until the AWS server is connected.</p>
+    : `<div class="lv-card"><b>Connect your server</b><p class="lv-sub">${err ? `<span class="down">${esc(err)}</span> · ` : ''}Sizes below use your capital (${money(cap('NSE'), 'NSE')}) and ${riskForBudget(lvBudget()).toFixed(2)}% risk from your guard budget; holdings and cash are not checked and there is no Send button until the AWS server is connected.</p>
       <div class="lv-form"><input id="lvurl" type="url" placeholder="https://your-server.sslip.io" value="${esc(c.url || '')}" autocomplete="off"><input id="lvpw" type="password" placeholder="App password" autocomplete="current-password"><button class="lv-btn" id="lvgo">Connect</button></div></div>`;
   const pend = rows.filter((r) => !r.skip && r.qty > 0);
   const tot = pend.reduce((a, r) => a + r.value, 0);
@@ -140,7 +146,7 @@ async function loadLive() {
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
-    <details class="info" style="margin:0 16px 80px"><summary>How these are picked and sized</summary><p>From the India systems that backtested well: monthly-ATH breakouts (this month or last, within −5%/+10% of the breakout price), buy-stops at ATH triggers within 5%, and 9/21 trend entries. Score = system (ATH 2-yr base 3, 1–2 yr 2, buy-stop 2, 9/21 3) + 2 if sector and stock RS are both positive + 1 if the theme RS is positive − 3 if the stock's 1-year RS is negative (ATH only; top-down did not help 9/21). The ranking combines tested pieces but is not itself a separately backtested system. Size: risk per trade = your drawdown budget ÷ 20 (guard card), at most 10% of capital in one stock, at most 10 positions, within the cash you have. US and Australia are excluded (no tested edge).</p></details>`;
+    <details class="info" style="margin:0 16px 80px"><summary>How these are picked and sized</summary><p>From the India systems that backtested well: monthly-ATH breakouts (this month or last, within −5%/+10% of the breakout price), buy-stops at ATH triggers within 5%, and 9/21 trend entries. Score = system (ATH 2-yr base 3, 1–2 yr 2, buy-stop 2, 9/21 3) + 2 if sector and stock RS are both positive + 1 if the theme RS is positive − 3 if the stock's 1-year RS is negative (ATH only; top-down did not help 9/21). The ranking combines tested pieces but is not itself a separately backtested system. Size: risk per trade from your drawdown budget (guard card, 95% Monte Carlo), at most 10% of capital in one stock, at most 10 positions, within the cash you have. US and Australia are excluded (no tested edge).</p></details>`;
   const go = $('#lvgo'); if (go) go.addEventListener('click', async () => {
     const url = $('#lvurl').value.trim(); const pw = $('#lvpw').value;
     if (!/^https:\/\//.test(url)) { alertMsg('Use the https:// address the setup script printed.'); return; }

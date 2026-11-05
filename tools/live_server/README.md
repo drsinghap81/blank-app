@@ -22,7 +22,7 @@ The guard was tested on the ATH system, 2017–26:
 - **Lowering risk beat every other drawdown rule.** Cutting size in a drawdown, in Turtle-style or stepped versions, did worse for the same fall. A hard "sell everything at −10%" stop sold near the lows and missed the rebound: 9% a year against 17%, with the same worst fall.
 
 So the guard works like this:
-- You set `DD_BUDGET_PCT`, the worst fall you can sit through. Risk per trade is then the budget ÷ 20 (15% → 0.75%).
+- You set `DD_BUDGET_PCT`, the worst fall you can sit through. Risk per trade is set from a Monte Carlo of the system (2,000 reshuffled 10-year histories): the level at which 95% of paths stayed within the budget (10% → 0.29%, 15% → 0.45%, 20% → 0.6%, 25% → 0.8%, 30% → 1.05%).
 - One stock is capped at `MAX_POS_PCT=10`.
 - The server tracks your account's high-water mark. It warns at 75% and 100% of the budget, and it never sells for you.
 - After `STREAK=5` losing exits in a row, new buys pause for `PAUSE_DAYS=14` (2 weeks). Exits still go through.

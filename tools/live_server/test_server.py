@@ -61,7 +61,7 @@ def test_live_once(tmp_path):
 def test_guard(tmp_path):
     os.environ["DD_BUDGET_PCT"] = "10"; os.environ.pop("RISK_PCT", None)
     A, c = client(tmp_path)
-    assert abs(A.RISK - 0.005) < 1e-9 and A.MAX_POS_PCT == 0.10
+    assert abs(A.RISK - 0.25 / 100 * (1 + (10 - 8.6) / (16.4 - 8.6))) < 1e-9 and A.MAX_POS_PCT == 0.10
     acc = A.broker.account()
     g = A.guard(dict(acc, net=2_000_000)); assert g["status"] == "ok" and g["dd_pct"] == 0
     g = A.guard(dict(acc, net=1_840_000)); assert g["status"] == "warn" and g["dd_pct"] == -8.0
