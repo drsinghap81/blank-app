@@ -10,6 +10,7 @@ ok NIFTY ENERGY: 40 from https://www.niftyindices.com/IndexConstituent/ind_nifty
 MISSING NIFTY EV & NEW AGE AUTOMOTIVE
 ok NIFTY HOUSING: 50 from https://www.niftyindices.com/IndexConstituent/ind_niftyhousing_list.csv
 MISSING NIFTY100 ESG
+err https://www.niftyindices.com/indices/equity/thematic-indices/nifty-100-enhanced-esg HTTPSConnectionPool(host='www.niftyindices.com', port=443): Read timed out. (read timeout=30)
 MISSING NIFTY100 ENHANCED ESG
 MISSING NIFTY100 ESG SECTOR LEADERS
 ok NIFTY INDIA CONSUMPTION: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftyconsumptionlist.csv
