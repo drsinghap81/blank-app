@@ -246,7 +246,7 @@ function select(r) {
     ${statusBlock(r)}
     ${styleSeg('trend', 'trst')}
     <div class="chart" id="cv"></div><div class="rsi" id="rv"></div>
-    <div class="tdlegend"><span><i style="background:${C.e9}"></i>9 EMA</span><span><i style="background:${C.e21}"></i>21 EMA</span>
+    <div class="legend"><span><i style="background:${C.e9}"></i>9 EMA</span><span><i style="background:${C.e21}"></i>21 EMA</span>
       <span><i style="background:${C.e50}"></i>50 EMA</span><span><i style="background:${C.rise}"></i>Supertrend</span>
       ${trade ? `<span><i style="background:${C.fall}"></i>Initial stop</span>` : ''}<span><i style="background:${C.rsi}"></i>RSI with 55 line</span></div>
     ${(state.tab === 'new' || state.tab === 'open') ? plan921(r) : ''}${facts(r)}${links(r.symbol)}`);
@@ -680,7 +680,8 @@ async function loadATH() {
     const [d, live, ipo, sec, world] = await Promise.all([getJSON(MAIN + AP() + 'ath.json', 'ath' + tag),
       mk === 'NSE' ? getJSON(REPO + 'live/data/live/ath_live.json', 'ath_live') : null, getJSON(MAIN + AP() + 'ipo.json', 'ipo' + tag),
       getJSON(MAIN + AP() + 'sectors.json', 'sectors' + tag), getJSON(MAIN + 'data/scan/world.json', 'world')]);
-    state.athC[mk] = { d, live, ipo, sec, world, tab: 'td', q: '', all: false };
+    const tr = state.data[mk] || await getJSON(MAIN + AP() + 'trend_scan.json', 'td_' + mk);
+    state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'td', q: '', all: false };
   }
   state.ath = state.athC[mk];
   const wireMk = () => el.querySelectorAll('.seg.mk button').forEach((b) => b.addEventListener('click', () => { state.athMkt = b.dataset.mk; try { localStorage.setItem('td_athmkt', b.dataset.mk); } catch (e) { /* */ } loadATH(); }));
@@ -869,7 +870,17 @@ function tdRows(countOnly) {
     .concat((A.d.near || []).map((r) => ({ ...r, _src: 'ATH near', _near: true })))
     .concat((ip.tracked || []).filter((r) => r.status === 'open' || r.status === 'buy next open').map((r) => ({ ...r, kind: 'sig', _src: 'IPO cup', _ipo: true })))
     .concat((ip.near || []).map((r) => ({ ...r, kind: 'near', _src: 'IPO near', _ipo: true })));
-  L.sort((a, b) => ((b.td_score ?? -1) - (a.td_score ?? -1)) || ((b.aligned ? 1 : 0) - (a.aligned ? 1 : 0)) || ((b.stock_rs ?? -999) - (a.stock_rs ?? -999)));
+  // clear-trend stocks (Trend scan) whose sector is in an uptrend with RS > 0, not already listed
+  const S = A.sec || {}; const have = new Set(L.map((r) => r.symbol));
+  const secOf = (sym) => { const ind = (S.symbols || {})[sym]; return ind ? (S.industries || {})[ind] : null; };
+  ((A.tr && A.tr.rows) || []).filter((r) => r.list === 'trend' || r.list === 'watch').forEach((r) => {
+    const ix = secOf(r.symbol); const x = ix && S.indices ? S.indices[ix] : null;
+    if (!x || have.has(r.symbol) || !(x.tag === 'leading' || x.tag === 'uptrend') || !((x.rs_6m || 0) > 0)) return;
+    const th = ((S.themes || {})[r.symbol] || []).map((t) => [t, S.indices && S.indices[t] ? S.indices[t].rs_6m : null]).filter((t) => t[1] != null).sort((a, b) => b[1] - a[1])[0];
+    L.push({ ...r, _src: r.list === 'trend' ? 'Clear trend' : 'Trend watchlist', _trend: true, sector_index: ix, sector_rs: x.rs_6m,
+      theme: th ? th[0] : null, theme_rs: th ? th[1] : null, stock_rs: null, td_score: null, aligned: false });
+  });
+  L.sort((a, b) => ((a._trend ? 1 : 0) - (b._trend ? 1 : 0)) || ((b.td_score ?? -1) - (a.td_score ?? -1)) || ((b.sector_rs ?? -99) - (a.sector_rs ?? -99)) || ((b.aligned ? 1 : 0) - (a.aligned ? 1 : 0)) || ((b.stock_rs ?? -999) - (a.stock_rs ?? -999)));
   if (countOnly) return L.filter((r) => r.aligned);
   const q = (A.q || '').toLowerCase();
   return q ? L.filter((r) => r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)) : L;
@@ -907,7 +918,7 @@ function topStrip() {
 function tdItem(r) {
   const dot = (v) => `<i class="sd ${v == null ? 'na' : v > 0 ? 'y' : 'n'}"></i>`;
   const sc = `<span class="score ${r.aligned ? 'al' : ''}">${dot(r.sector_rs)}${dot(r.theme_rs)}${dot(r.stock_rs)}${r.aligned ? ' aligned' : ''}</span>`;
-  const st = r._near ? `<span class="chip">${fmt(r.gap_pct, 1, AL())}% to go</span>` : r.kind === 'near' ? `<span class="chip">${fmt(r.gap_pct, 1, AL())}% to high</span>`
+  const st = r._trend ? `<span class="chip open">3 m ${pct(r.r3m)} · ${pct(r.off_high)} from high</span>` : r._near ? `<span class="chip">${fmt(r.gap_pct, 1, AL())}% to go</span>` : r.kind === 'near' ? `<span class="chip">${fmt(r.gap_pct, 1, AL())}% to high</span>`
     : r.status === 'buy next open' ? '<span class="chip new">Buy next open</span>' : r.status === 'exit next open' ? '<span class="chip exit">Sell next open</span>' : `<span class="chip open">Since ${day(r.date)}</span>`;
   const sub = [r.sector_index ? secName(r.sector_index) : '', r.theme ? themeName(r.theme) : ''].filter(Boolean).join(' · ');
   const chip = `${sc}<span class="chip">${r._src}</span>${st}` + (sub ? `<div class="co small">${esc(sub)}</div>` : '');
@@ -967,13 +978,13 @@ function athList() {
         <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
     }
     if (tab === 'near') {
-      chip = `<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">${fmt(r.gap_pct, 1, AL())}% to go</span>`;
+      chip = `<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">${fmt(r.gap_pct, 1, AL())}% to go${r.kind === 'close' ? ' (month close)' : ''}</span>`;
       const L = (state.ath.lp || {})[r.symbol];
       right = `<b>${fmt(L ? L.price : r.close, 2, AL())}</b><span class="muted">trigger ${fmt(r.trigger, 2, AL())}</span>`;
       if (L && L.high > r.trigger) chip = '<span class="chip new">Crossed today</span>' + chip;
     } else {
       const st = r.status === 'exit next open' ? '<span class="chip exit">Sell next open</span>' : r.status === 'exited' ? `<span class="chip">Exited ${day(r.exit_date)}</span>` : `<span class="chip open">Since ${day(r.date)}</span>`;
-      chip = `${st}<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span>`;
+      chip = `${st}<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span>` + (r.kind === 'close' ? '<span class="chip">Close breakout</span>' : '');
       const L = (state.ath.lp || {})[r.symbol];
       const px = L && r.status === 'open' ? L.price : null; const rr = px ? px / r.entry - 1 : r.ret;
       right = `<b>${fmt(px ?? r.close, 2, AL())}</b><span class="${rr >= 0 ? 'up' : 'down'}">${pct(rr * 100)}</span>`;
@@ -995,18 +1006,25 @@ function athList() {
   const m = $('#athmore'); if (m) m.addEventListener('click', () => { state.ath.all = true; athList(); });
   const ia = $('#ixall'); if (ia) ia.addEventListener('click', () => { state.ath.ixAll = true; athList(); });
   $('#athlist').querySelectorAll('.row').forEach((el) => {
-    const open = () => (tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
+    const open = () => (tab === 'td' && L[+el.dataset.i]._trend ? trendFromATH(L[+el.dataset.i]) : tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
     el.addEventListener('click', open);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   });
 }
+function trendFromATH(r) {
+  // open the Trend-scan chart panel for a clear-trend stock listed on the Top-down screen
+  state.mkt = AM(); if (state.ath.tr) state.data[AM()] = state.ath.tr;
+  const row = ((state.ath.tr && state.ath.tr.rows) || []).find((x) => x.symbol === r.symbol) || r;
+  select(row);
+}
 function athSelect(r) {
   const near = state.ath.tab === 'near' || !!r._near;
-  const st = near ? `<div class="status info">Not triggered yet. Buy if it trades above ${fmt(r.trigger, 2, AL())} this month (${fmt(r.gap_pct, 1, AL())}% above the last close).</div>`
+  const st = near && r.kind === 'close' ? `<div class="status info">Not triggered yet. Signal: a MONTH CLOSE above ${fmt(r.trigger, 2, AL())}, its old all-time-high close (${fmt(r.gap_pct, 1, AL())}% above the last close); buy at the next month's first open. The old high ${fmt(r.wick_high, 2, AL())} was a one-month spike.</div>`
+    : near ? `<div class="status info">Not triggered yet. Buy if it trades above ${fmt(r.trigger, 2, AL())} this month (${fmt(r.gap_pct, 1, AL())}% above the last close).</div>`
     : r.status === 'exit next open' ? '<div class="status exit">Weekly close below the 30-week SMA. Sell at the next open.</div>'
       : r.status === 'exited' ? `<div class="status info">Exited ${day(r.exit_date)} at ${fmt(r.exit_price, 2, AL())} (${pct(r.ret * 100)}).</div>`
         : `<div class="status open">Bought ${day(r.date)} at ${fmt(r.entry, 2, AL())}. Hold while the weekly close stays above the 30-week SMA, now ${fmt(r.sma30, 2, AL())}.</div>`;
-  const f = [['Trigger (ATH month high)', fmt(r.trigger, 2, AL())], ['ATH closing month', esc(r.ath_month || '–')], ['Base', baseTxt(r.base_months)],
+  const f = [[r.kind === 'close' ? 'Trigger (old ATH monthly close)' : 'Trigger (ATH month high)', fmt(r.trigger, 2, AL())], ['ATH closing month', esc(r.ath_month || '–')], ['Base', baseTxt(r.base_months)],
     ['Deepest fall in the base', pct((r.depth || 0) * 100)], ['30-week SMA', fmt(r.sma30, 2, AL())]];
   if (!near) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, AL())}`], ['Best since entry', pct(r.peak * 100)], ['Weeks', r.weeks]);
   f.push(['Traded a day', valTxt(r.value_cr)]);

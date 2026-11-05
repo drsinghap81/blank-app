@@ -133,11 +133,27 @@ def analyse(sym, x, today, lookback_days=550):
     cross = (d.h > d.trig) & (d.hist_ok == True)  # noqa: E712
     first = cross & (cross.groupby(d.mon).cumsum() == 1)
     ev = d[first & (d.above == True) & (d.val >= MINVAL) & (d.age >= BASE_MIN)]  # noqa: E712
+    sig = [(dt, max(r.o, r.trig), r.trig, r.age, r.ath_month, "high") for dt, r in ev.iterrows()]
+    # close breakout (5 Nov 2026): a completed month CLOSES above the old ATH close without trading above the trigger
+    # (the old ATH month had a long upper wick) after a base >= BASE_MIN -> buy the next month's first open.
+    # NSE 2017-26 backtest at 1% risk: 16.0-17.3%/yr vs 14.8-15.4% without (132 extra trades, avg +16.6%).
+    cbrk = isb & done & (M.h <= trig_m) & (age_m >= BASE_MIN) & (hist_ok == True)  # noqa: E712
+    for m_ in M.index[cbrk.fillna(False).values]:
+        nxt = d[d.mon == m_ + 1]
+        if not len(nxt):
+            continue
+        dt = nxt.index[0]; r = nxt.iloc[0]
+        if r.above == True and r.val >= MINVAL:  # noqa: E712
+            sig.append((dt, r.o, float(M.c.loc[m_]), float(age_m.loc[m_]), str(ath_month.loc[m_]), "close"))
     if lookback_days:
-        ev = ev[ev.index >= pd.Timestamp(today) - pd.Timedelta(days=lookback_days)]
+        sig = [x_ for x_ in sig if x_[0] >= pd.Timestamp(today) - pd.Timedelta(days=lookback_days)]
+    sig.sort(key=lambda x_: x_[0])
     events = []
-    for dt, r in ev.iterrows():
-        entry = max(r.o, r.trig)
+    busy = None
+    for dt, entry, trig_v, age_v, athm_v, kind in sig:
+        if busy is not None and dt <= busy:
+            continue
+        r = pd.Series(dict(trig=trig_v, age=age_v, ath_month=athm_v, depth=d.depth.loc[dt], val=d.val.loc[dt]))
         w_entry = dt.to_period("W-FRI")
         after = Wc[(Wc.index >= w_entry)]
         brk = after[after.c < after.sma]
@@ -154,7 +170,8 @@ def analyse(sym, x, today, lookback_days=550):
         ret = (exit_px if exit_px else last) / entry - 1
         sma_entry = float(W.sma.shift(1).loc[w_entry]) if np.isfinite(W.sma.shift(1).loc[w_entry]) else None
         add = add_state(x, W, Wc, dt, w_entry, exit_dt)
-        events.append(dict(symbol=sym, date=dt, entry=entry, trigger=r.trig, ath_month=r.ath_month, base_months=int(r.age),
+        busy = exit_dt if exit_dt is not None else x.index[-1] + pd.Timedelta(days=1)
+        events.append(dict(symbol=sym, date=dt, entry=entry, trigger=r.trig, ath_month=r.ath_month, base_months=int(r.age), kind=kind,
                            depth=r.depth, status=status, exit_date=exit_dt, exit_price=exit_px, close=last,
                            ret=ret, peak=float(x.Close[x.index >= dt].max() / entry - 1),
                            weeks=int(((exit_dt or x.index[-1]) - dt).days / 7), main=bool(r.age >= BASE_MAIN),
@@ -168,11 +185,19 @@ def analyse(sym, x, today, lookback_days=550):
         c = float(x.Close.iloc[-1])
         lastw = W.loc[last_complete]
         sma4 = W.sma.shift(4).loc[last_complete]
-        if c >= (1 - NEAR) * t_now and d.age.iloc[-1] >= BASE_MIN and np.isfinite(lastw.sma) and lastw.c > lastw.sma \
+        best_c = float(best.iloc[-2]) if len(best) > 1 and np.isfinite(best.iloc[-2]) else np.nan   # old ATH close
+        close_near = np.isfinite(best_c) and c < best_c and c >= (1 - NEAR) * best_c and c < (1 - NEAR) * t_now
+        if close_near and d.age.iloc[-1] >= BASE_MIN and np.isfinite(lastw.sma) and lastw.c > lastw.sma \
+                and np.isfinite(sma4) and lastw.sma > sma4 and val20.iloc[-1] >= MINVAL:
+            # within 5% of the old ATH CLOSE (trigger is a far-away wick high): a month close above it is the signal
+            near = dict(symbol=sym, trigger=best_c, close=c, gap_pct=(best_c / c - 1) * 100, ath_month=d.ath_month.iloc[-1],
+                        base_months=int(d.age.iloc[-1]), depth=d.depth.iloc[-1], sma30=float(lastw.sma), kind="close",
+                        wick_high=float(t_now), main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / UNIT)
+        elif c >= (1 - NEAR) * t_now and d.age.iloc[-1] >= BASE_MIN and np.isfinite(lastw.sma) and lastw.c > lastw.sma \
                 and np.isfinite(sma4) and lastw.sma > sma4 \
                 and val20.iloc[-1] >= MINVAL:
             near = dict(symbol=sym, trigger=t_now, close=c, gap_pct=(t_now / c - 1) * 100, ath_month=d.ath_month.iloc[-1],
-                        base_months=int(d.age.iloc[-1]), depth=d.depth.iloc[-1], sma30=float(lastw.sma),
+                        base_months=int(d.age.iloc[-1]), depth=d.depth.iloc[-1], sma30=float(lastw.sma), kind="high",
                         main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / UNIT)
     Mc = M.tail(240); Wt = W.tail(260)
     chart = dict(m=dict(t=[str(p) for p in Mc.index], o=Mc.o.round(2).tolist(), h=Mc.h.round(2).tolist(),

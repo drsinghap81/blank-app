@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-11-05 · market-data stamps v47"
+APP_BUILD = "2026-11-05 · close breakouts + trend stocks in top-down v48"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2233,7 +2233,23 @@ def render_topdown_tab() -> None:
                              sector=_td_name(r.get("sector_index") or ""), sector_rs=r.get("sector_rs"), theme=_td_name(r.get("theme") or ""),
                              theme_rs=r.get("theme_rs"), stock_rs=r.get("stock_rs"), rs_bench=_td_name(r.get("rs_bench") or ""),
                              status=r.get("status") or (f"{r.get('gap_pct'):.1f}% to trigger" if r.get("gap_pct") is not None else "")))
-    st.markdown("**5 · Stocks** — current ATH / IPO setups ranked by top-down score")
+    # clear-trend stocks (Trend scan) in sectors that are in an uptrend with RS > 0
+    tsd = _load(_mk_path("trend_scan.json"))
+    have = {r["symbol"] for r in rows}
+    for r in tsd.get("rows") or []:
+        if r.get("list") not in ("trend", "watch") or r["symbol"] in have:
+            continue
+        ind = (sd.get("symbols") or {}).get(r["symbol"]); ixk = (sd.get("industries") or {}).get(ind) if ind else None
+        x = ix.get(ixk) if ixk else None
+        if not x or x.get("tag") not in ("leading", "uptrend") or (x.get("rs_6m") or 0) <= 0:
+            continue
+        ths = [(t, (ix.get(t) or {}).get("rs_6m")) for t in (sd.get("themes") or {}).get(r["symbol"], [])]
+        ths = sorted([t for t in ths if t[1] is not None], key=lambda t: -t[1])
+        rows.append(dict(symbol=r["symbol"], setup="Clear trend" if r["list"] == "trend" else "Trend watchlist", td_score=None, aligned="",
+                         sector=_td_name(ixk), sector_rs=x.get("rs_6m"), theme=_td_name(ths[0][0]) if ths else "",
+                         theme_rs=ths[0][1] if ths else None, stock_rs=None, rs_bench="",
+                         status=f"3 m {r.get('r3m', 0):+.0f}%, {r.get('off_high', 0):+.1f}% from high"))
+    st.markdown("**5 · Stocks** — current ATH / IPO setups ranked by top-down score, then clear-trend stocks in up-trending sectors")
     if not rows:
         st.info("No setups yet.")
         return
@@ -2245,7 +2261,8 @@ def render_topdown_tab() -> None:
     only = st.checkbox("Aligned only (sector RS > 0 and stock RS > 0)", value=False, key="td_only")
     if only:
         S_ = S_[S_.aligned == "✅"]
-    S_ = S_.sort_values(["td_score", "stock_rs"], ascending=False, na_position="last")
+    S_["_t"] = S_.setup.isin(["Clear trend", "Trend watchlist"])
+    S_ = S_.sort_values(["_t", "td_score", "sector_rs", "stock_rs"], ascending=[True, False, False, False], na_position="last").drop(columns="_t")
     st.dataframe(S_, hide_index=True, width="stretch", key="td_stocks")
 
 
