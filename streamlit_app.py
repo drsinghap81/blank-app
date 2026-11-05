@@ -1948,7 +1948,7 @@ def render_portfolio_tab(market: MarketConfig) -> None:
 # 8. MAIN
 # =============================================================================
 
-APP_BUILD = "2026-11-05 · close breakouts + trend stocks in top-down v48"
+APP_BUILD = "2026-11-05 · live trades tab v49"
 
 
 def render_oi_alerts_tab() -> None:
@@ -2264,6 +2264,40 @@ def render_topdown_tab() -> None:
     S_["_t"] = S_.setup.isin(["Clear trend", "Trend watchlist"])
     S_ = S_.sort_values(["_t", "td_score", "sector_rs", "stock_rs"], ascending=[True, False, False, False], na_position="last").drop(columns="_t")
     st.dataframe(S_, hide_index=True, width="stretch", key="td_stocks")
+
+
+def render_live_tab() -> None:
+    """Top trades for the next session with sizing (orders are sent from the phone app via the AWS server)."""
+    import json as _json
+    try:
+        with open(_os.path.join(_SCAN, "trade_plan.json"), encoding="utf-8") as f:
+            P = _json.load(f)
+    except Exception:  # noqa: BLE001
+        st.info("The trade plan appears after the evening scans (about 21:15 IST).")
+        return
+    st.markdown("#### 🎯 Live trades — India, next session")
+    st.caption(_mkt_stamp("NSE", P.get("asof"), P.get("generated")))
+    c1, c2 = st.columns(2)
+    capital = c1.number_input("Capital (₹)", min_value=10000, value=2000000, step=50000, key="lv_cap")
+    risk = c2.number_input("Risk per trade (%)", min_value=0.25, max_value=3.0, value=1.0, step=0.25, key="lv_risk") / 100
+    rows = []
+    for r in P.get("top") or []:
+        E = r.get("trigger") or r["price"]; stop = r["stop"]
+        q = int(min(risk * capital / (E - stop), 0.2 * capital / E)) if stop and E > stop else 0
+        rows.append(dict(rank=r["rank"], symbol=r["symbol"], setup=r["kind"].replace("ATH_BRK", "ATH breakout").replace("ATH_STOP", "ATH buy-stop").replace("T921", "9/21 entry"),
+                         score=r["score"], aligned="✅" if r.get("aligned") else "", shares=q, value=round(q * E), pct_capital=round(q * E / capital * 100, 1),
+                         order=(f"buy-stop {r['trigger']:.2f}" if r["kind"] == "ATH_STOP" else f"limit {r['price']:.2f} next open"),
+                         stop=r["stop"], risk_pct=r.get("risk_pct"), risk_rs=round(q * (E - stop)) if stop else None, exit=r.get("exit_rule"), note=r.get("note")))
+    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch", key="lv_tab")
+    if P.get("exits"):
+        st.markdown("**Exits for the next open** (if you hold them)")
+        st.dataframe(pd.DataFrame(P["exits"]), hide_index=True, width="stretch", key="lv_ex")
+    if P.get("watch"):
+        st.caption("Watch — a month close above the old ATH close would trigger: " + ", ".join(f"{w['symbol']} ({w['price']:.2f})" for w in P["watch"]))
+    st.caption("Sizes here ignore your holdings and cash. To send orders, use the Live tab in the phone app connected to your AWS server: "
+               "it checks Angel funds and holdings, sizes within cash and free slots, and places one order per tap after a typed confirmation "
+               "(dry run until LIVE_ORDERS=1 on the server). Ranking: system points + top-down (ATH only); built from tested pieces, not a separately "
+               "backtested system. US/ASX excluded (no tested edge).")
 
 
 def render_ath_tab() -> None:
@@ -2703,8 +2737,8 @@ def main() -> None:
 
     render_header(market)
 
-    tab_td, tab_trend, tab_ath, tab_ipo, tab_tb, tab_ratio, tab_scan, tab1, tab_bt, tab2, tab3, tab_oi = st.tabs(
-        ["🧭 Top-down", "📈 Trend scan", "🏔️ Monthly ATH", "🚀 IPO cups", "🔁 Top Bottom", "🦋 Nifty ratio", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
+    tab_live, tab_td, tab_trend, tab_ath, tab_ipo, tab_tb, tab_ratio, tab_scan, tab1, tab_bt, tab2, tab3, tab_oi = st.tabs(
+        ["🎯 Live trades", "🧭 Top-down", "📈 Trend scan", "🏔️ Monthly ATH", "🚀 IPO cups", "🔁 Top Bottom", "🦋 Nifty ratio", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
          "🧾 Paper orders", "💼 Portfolio", "🗄️ OI alerts (archived)"])
     with tab1:
         render_analysis_tab(market, ticker)
@@ -2718,6 +2752,8 @@ def main() -> None:
         render_ipo_tab()
     with tab_td:
         render_topdown_tab()
+    with tab_live:
+        render_live_tab()
     with tab_oi:
         render_oi_alerts_tab()
     with tab_bt:

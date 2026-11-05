@@ -1,0 +1,14 @@
+[Unit]
+Description=Trend Desk live server (Angel orders on tap, dry run unless LIVE_ORDERS=1)
+After=network-online.target
+
+[Service]
+User=trenddesk
+WorkingDirectory=/opt/trenddesk/repo/tools/live_server
+EnvironmentFile=/opt/trenddesk/.env
+ExecStart=/opt/trenddesk/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

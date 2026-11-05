@@ -69,7 +69,88 @@ function show(view) {
   document.querySelectorAll('.views button').forEach((b) => (b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   document.querySelectorAll('.view').forEach((s) => (s.hidden = s.id !== `view-${view}`));
   window.scrollTo(0, 0);
-  ({ trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio })[view]();
+  ({ live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio })[view]();
+}
+
+/* ------------------------------------------------------------------ Live trades */
+const LV_KEY = 'td_live';
+function lvCfg() { try { return JSON.parse(localStorage.getItem(LV_KEY) || '{}'); } catch (e) { return {}; } }
+function lvSave(o) { try { localStorage.setItem(LV_KEY, JSON.stringify({ ...lvCfg(), ...o })); } catch (e) { /* storage off */ } }
+async function lvApi(path, opt = {}) {
+  const c = lvCfg(); if (!c.url) throw new Error('not connected');
+  const r = await fetch(c.url.replace(/\/$/, '') + path, { ...opt, headers: { 'Content-Type': 'application/json', ...(c.token ? { Authorization: 'Bearer ' + c.token } : {}), ...(opt.headers || {}) } });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { lvSave({ token: null }); }
+  if (!r.ok) throw new Error(j.detail || `server error ${r.status}`);
+  return j;
+}
+function lvLocalSize(P) {
+  // no server: size from your capital setting (India) and risk %, 10 positions, 20% cap, ignore holdings
+  const C0 = cap('NSE'); const risk = riskPct('ath') / 100;
+  return (P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.2 * C0 / E)) : 0;
+    return { ...r, qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, skip: '' }; });
+}
+const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', T921: '9/21 trend entry' };
+async function loadLive() {
+  $('#title').textContent = 'Live trades';
+  const el = $('#view-live'); el.innerHTML = '<p class="muted pad">Loading…</p>';
+  const P = await getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan');
+  if (!P) { el.innerHTML = '<p class="empty">The trade plan appears after the evening scans (about 21:15 IST).</p>'; return; }
+  $('#asof').textContent = `Market data: India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
+  const c = lvCfg(); let S = null; let err = '';
+  if (c.url && c.token) { try { S = await lvApi('/api/plan'); } catch (e) { err = e.message; } }
+  const rows = S ? S.rows : lvLocalSize(P);
+  const live = S && S.mode === 'LIVE';
+  const head = S ? `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Angel One</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
+      <div class="lv-kpis"><div><span>Capital</span><b>${money(S.capital, 'NSE')}</b></div><div><span>Cash</span><b>${money(S.cash, 'NSE')}</b></div><div><span>Free slots</span><b>${S.slots} of 10</b></div></div>
+      <p class="lv-sub">${live ? 'Send places a real order after you confirm.' : 'Dry run: Send shows exactly what would go to Angel; nothing is sent. Set LIVE_ORDERS=1 on the server to go live.'} <a href="#" id="lvout">Disconnect</a></p></div>`
+    : `<div class="lv-card"><b>Connect your server</b><p class="lv-sub">${err ? `<span class="down">${esc(err)}</span> · ` : ''}Sizes below use your capital (${money(cap('NSE'), 'NSE')}) and ${riskPct('ath')}% risk; holdings and cash are not checked and there is no Send button until the AWS server is connected.</p>
+      <div class="lv-form"><input id="lvurl" type="url" placeholder="https://your-server.sslip.io" value="${esc(c.url || '')}" autocomplete="off"><input id="lvpw" type="password" placeholder="App password" autocomplete="current-password"><button class="lv-btn" id="lvgo">Connect</button></div></div>`;
+  const pend = rows.filter((r) => !r.skip && r.qty > 0);
+  const tot = pend.reduce((a, r) => a + r.value, 0);
+  const list = rows.map((r, i) => {
+    const E = r.trigger || r.price; const ord = r.kind === 'ATH_STOP' ? `buy-stop ${fmt(r.trigger, 2, 'en-IN')} (limit ${fmt(r.price, 2, 'en-IN')}), day order` : `limit ${fmt(r.price, 2, 'en-IN')}, ${r.when}`;
+    const td = r.system === 'Monthly ATH' ? `<span class="score ${r.aligned ? 'al' : ''}"><i class="sd ${r.sector_rs == null ? 'na' : r.sector_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.theme_rs == null ? 'na' : r.theme_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.stock_rs == null ? 'na' : r.stock_rs > 0 ? 'y' : 'n'}"></i>${r.aligned ? ' aligned' : ''}</span>` : '';
+    return `<div class="lv-row"><div class="lv-rank">${r.rank}</div><div><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td}</div>
+      <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} (${fmt(r.pct_cap, 1)}%) · risk ${money(r.risk_amt, 'NSE')}`}</div>
+      <div class="lv-sub">${ord} · stop ${fmt(r.stop, 2, 'en-IN')} (${fmt(r.risk_pct, 1)}% below) · exit: ${esc(r.exit_rule || '')}</div>
+      <div class="lv-sub">${esc(r.note || '')}${r.sector ? ' · ' + esc(r.sector) : ''}</div></div>
+      <div>${S && !r.skip && r.qty > 0 ? `<button class="lv-btn" data-i="${i}">Send</button>` : ''}</div></div>`;
+  }).join('');
+  const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span></div>
+      <div class="lv-sub">${esc(e.system)}: ${esc(e.why)} · ${S ? `you hold ${e.qty}` : 'matched to your holdings once the server is connected'}</div></div>
+      <div>${S && e.qty > 0 ? `<button class="lv-btn sell" data-x="${i}">Sell ${e.qty}</button>` : ''}</div></div>`).join('');
+  const watch = (P.watch || []).map((w) => `${esc(w.symbol)} (${fmt(w.price, 2, 'en-IN')})`).join(', ');
+  el.innerHTML = `${head}
+    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${rows.length} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
+      ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
+    ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
+    ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
+    <details class="info" style="margin:0 16px 80px"><summary>How these are picked and sized</summary><p>From the India systems that backtested well: monthly-ATH breakouts (this month or last, within −5%/+10% of the breakout price), buy-stops at ATH triggers within 5%, and 9/21 trend entries. Score = system (ATH 2-yr base 3, 1–2 yr 2, buy-stop 2, 9/21 3) + 2 if sector and stock RS are both positive + 1 if the theme RS is positive − 3 if the stock's 1-year RS is negative (ATH only; top-down did not help 9/21). The ranking combines tested pieces but is not itself a separately backtested system. Size: ${riskPct('ath')}% of capital at risk to the stop, at most 20% of capital in one stock, at most 10 positions, within the cash you have. US and Australia are excluded (no tested edge).</p></details>`;
+  const go = $('#lvgo'); if (go) go.addEventListener('click', async () => {
+    const url = $('#lvurl').value.trim(); const pw = $('#lvpw').value;
+    if (!/^https:\/\//.test(url)) { alertMsg('Use the https:// address the setup script printed.'); return; }
+    lvSave({ url, token: null });
+    try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); lvSave({ token: j.token }); loadLive(); } catch (e) { alertMsg(e.message); }
+  });
+  const out = $('#lvout'); if (out) out.addEventListener('click', (e) => { e.preventDefault(); lvSave({ token: null }); loadLive(); });
+  el.querySelectorAll('.lv-btn[data-i]').forEach((b) => b.addEventListener('click', () => lvSend(rows[+b.dataset.i], 'BUY', b)));
+  el.querySelectorAll('.lv-btn[data-x]').forEach((b) => b.addEventListener('click', () => lvSend(S.exits[+b.dataset.x], 'SELL', b)));
+}
+function alertMsg(t, ok) { const m = document.createElement('div'); m.className = 'status ' + (ok ? 'open' : 'exit'); m.style.margin = '10px 16px'; m.textContent = t; $('#view-live').prepend(m); setTimeout(() => m.remove(), 6000); }
+async function lvSend(r, side, btn) {
+  const qty = r.qty; const conf = `${side} ${qty} ${r.symbol}`;
+  const px = side === 'BUY' ? (r.kind === 'ATH_STOP' ? `buy-stop at ${fmt(r.trigger, 2, 'en-IN')}` : `limit ${fmt(r.price, 2, 'en-IN')}`) : 'limit ~1% below the price';
+  // a typed confirmation, not a one-tap: the server also checks this exact text
+  const typed = window.prompt(`${conf} (${px}) on Angel One.\nType ${qty} to confirm:`);
+  if (typed === null) return;
+  if (String(typed).trim() !== String(qty)) { alertMsg('Not sent: the number did not match.'); return; }
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const j = await lvApi('/api/order', { method: 'POST', body: JSON.stringify({ id: r.id, qty, confirm: conf }) });
+    btn.textContent = j.sent ? 'Sent ✓' : 'Dry run ✓';
+    alertMsg(j.sent ? `Order placed: ${conf} (Angel id ${j.order_id}). Check it in the Angel app.` : `Dry run — would send: ${j.order.variety} ${j.order.ordertype} ${j.order.transactiontype} ${j.order.quantity} ${j.order.tradingsymbol} @ ${j.order.price}${j.order.triggerprice ? ' trigger ' + j.order.triggerprice : ''}`, true);
+  } catch (e) { btn.disabled = false; btn.textContent = side === 'BUY' ? 'Send' : `Sell ${qty}`; alertMsg('Not sent: ' + e.message); }
 }
 
 /* ------------------------------------------------------------------ trends */

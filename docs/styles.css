@@ -47,7 +47,7 @@ button, select, input { font: inherit; color: inherit; }
 
 /* summary strip */
 .summary {
-  display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
   background: var(--line); border-bottom: 1px solid var(--line);
 }
 .stat { background: var(--card); padding: 10px 14px; }
@@ -170,7 +170,7 @@ dialog .close { position: absolute; right: 10px; top: 10px; font-size: 18px; col
 /* ---- sections nav: bottom bar on phones, under the header on wide screens ---- */
 .views {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(6, 1fr);
+  display: grid; grid-template-columns: repeat(7, 1fr);
   background: var(--card); border-top: 1px solid var(--line);
   padding: 4px 4px calc(4px + var(--safe-bottom));
 }
@@ -303,3 +303,22 @@ details.info p { margin: 6px 0; line-height: 1.45; }
 .status.watch { margin: 10px 16px 0; font-size: 12.5px; }
 .ixsep { font-size: 11.5px; font-weight: 800; color: var(--slate); padding: 10px 4px 4px; border-top: 1px solid var(--line); list-style: none; }
 .tdbar[data-k] { cursor: pointer; }
+
+/* Live trades */
+.lv-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin: 10px 16px; }
+.lv-row { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line); }
+.lv-row:first-of-type { border-top: 0; }
+.lv-rank { font-weight: 800; font-size: 15px; color: var(--slate); }
+.lv-sym { font-weight: 800; font-size: 15px; }
+.lv-plan { font-size: 13px; margin-top: 3px; }
+.lv-plan b { font-size: 14px; }
+.lv-sub { font-size: 11.5px; color: var(--slate); margin-top: 2px; }
+.lv-btn { border: 0; border-radius: 9px; padding: 8px 12px; font-weight: 800; font-size: 13px; background: var(--rise); color: #fff; cursor: pointer; white-space: nowrap; }
+.lv-btn.sell { background: var(--fall); }
+.lv-btn[disabled] { background: #C9D1DE; cursor: default; }
+.lv-mode { display: inline-block; font-size: 11.5px; font-weight: 800; padding: 3px 8px; border-radius: 99px; }
+.lv-mode.dry { background: var(--saffron-soft); color: #9A5B07; } .lv-mode.live { background: var(--fall-soft); color: var(--fall); }
+.lv-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.lv-kpis div { background: #F4F6FA; border-radius: 8px; padding: 6px 8px; } .lv-kpis span { display: block; font-size: 11px; color: var(--slate); } .lv-kpis b { font-size: 14px; }
+.lv-form { display: grid; gap: 8px; margin-top: 8px; } .lv-form input { padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
+.lv-msg { font-size: 12.5px; margin-top: 8px; }

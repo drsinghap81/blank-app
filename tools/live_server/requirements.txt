@@ -1,0 +1,9 @@
+fastapi==0.115.6
+uvicorn==0.32.1
+requests>=2.31
+smartapi-python==1.5.5
+pyotp==2.9.0
+logzero==1.7.0
+websocket-client>=1.8
+# moomoo read-only (optional): futu-api
+futu-api==9.4.5408

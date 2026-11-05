@@ -1,0 +1,79 @@
+# Live trading server (AWS) — Angel One orders on tap, moomoo read-only
+
+The phone app's **Live** tab shows the top 8–10 India trades for the next session with final sizes. When the app is connected to this server, it also:
+- reads your Angel One cash, holdings and positions;
+- sizes each trade within your cash and free slots;
+- places one order per **Send**, after you type the quantity to confirm.
+
+The server holds the broker keys. The repo and the phone app never do.
+
+**Safety**
+- **Dry run by default.** `LIVE_ORDERS=0` means Send shows the exact Angel order and sends nothing. Turn it on yourself in `.env` only when you're ready.
+- **Only today's plan rows.** There are no free-form orders.
+- **Size limits.** Quantity can't exceed the plan size, and value is capped at `MAX_ORDER_VALUE`, 20% of capital and your cash. There are also `MAX_ORDERS_DAY` orders per day, and each row can be sent once a day.
+- **Sells only for exits** on stocks you hold, up to the quantity you hold.
+- **No market orders.** Buys are LIMIT orders: after-market (AMO) in the evening or early morning, or 1% above the live price during market hours, capped at the plan price + 3%. Buy-stops are STOPLOSS_LIMIT orders, sent between 09:15 and 15:30 IST. This follows SEBI's 2026 API rules.
+- **Login and logging.** The app password is stored as a salted hash, and the app gets a 12-hour token. Login is blocked for 15 minutes after 5 wrong tries. Every order and dry run is logged in `var/orders.jsonl`.
+- **The Top Bottom futures bot (`tools/angel`) is separate** and stays dry-run.
+
+## 1. AWS box (about US$5–10 a month)
+1. Sign in to <https://lightsail.aws.amazon.com>.
+2. **Create instance:**
+   - Region **Mumbai (ap-south-1)**.
+   - Linux/Unix, **Ubuntu 24.04**.
+   - The US$5 plan (1 GB) is enough. Pick US$10 (2 GB) if you'll also run moomoo OpenD.
+3. **Networking → Create static IP**, and attach it to the instance.
+4. **Networking → IPv4 firewall:** allow **HTTPS 443** and **HTTP 80** (needed for the free certificate). Keep SSH 22.
+5. Open the browser SSH console for the instance and run:
+   ```
+   curl -fsSL https://raw.githubusercontent.com/drsinghap81/blank-app/main/tools/live_server/deploy/setup.sh | sudo bash
+   ```
+   It prints your **server address** (`https://<ip-with-dashes>.sslip.io`) and the **static IP**.
+
+## 2. Angel SmartAPI
+1. Go to <https://smartapi.angelone.in> → **My Apps → Create App** (Trading APIs). Copy the **API key**.
+2. Register the **static IP** from step 1 as the app's primary IP. Orders from any other IP are rejected.
+3. Enable **TOTP** and copy the text secret behind the QR code.
+
+## 3. Fill in the server's `.env`
+In the SSH console, run:
+```
+cd /opt/trenddesk/repo/tools/live_server
+sudo /opt/trenddesk/venv/bin/python app.py hash      # type an app password -> copy the scrypt$... line
+sudo /opt/trenddesk/venv/bin/python app.py secret    # copy the long hex string
+sudo nano /opt/trenddesk/.env
+```
+Fill in these values:
+- `ANGEL_API_KEY`, `ANGEL_CLIENT_CODE`, `ANGEL_PIN` and `ANGEL_TOTP_SECRET`
+- `APP_PASSWORD_HASH`: the `scrypt$` line
+- `TOKEN_SECRET`: the hex string
+- `CAPITAL`: what the system sizes from, for example `2000000`
+
+Keep `LIVE_ORDERS=0` for now. Save the file, then run `sudo systemctl restart trenddesk`. Type the keys yourself in the console; don't paste them into chat or GitHub.
+
+## 4. Connect the phone app
+1. Open the **Live** tab.
+2. Enter the server address and your app password, then tap **Connect**.
+3. Check that the Angel card shows your cash and holdings and the **DRY RUN** badge.
+
+## 5. Dry-run week, then go live
+- **First:** tap **Send** on a few trades and compare the order it shows (variety, price, quantity) with what you'd place yourself.
+- **Going live:** set `LIVE_ORDERS=1` in `.env`, then run `sudo systemctl restart trenddesk`. The badge turns red: **LIVE ORDERS**.
+- **Every order:** check it in the Angel app. An after-market (AMO) order shows as "AMO" until the open.
+- **To stop at any time:** set `LIVE_ORDERS=0` and restart.
+
+## moomoo (optional, read-only)
+The Live list is India only (US/ASX backtests showed no edge). moomoo is only read, to show your account value and positions. To set it up:
+1. Install **moomoo OpenD** (command-line version for Ubuntu) from moomoo's OpenAPI download page.
+2. Log in once with your moomoo ID; its config holds a hashed password.
+3. Keep OpenD listening on `127.0.0.1:11111`.
+4. In `.env`, set `MOOMOO_ENABLED=1` and `MOOMOO_MARKETS=AU,US`.
+
+The server never unlocks trading on moomoo.
+
+## Files
+- `app.py`: the API.
+- `brokers.py`: Angel (equity delivery), moomoo (read-only) and a mock broker.
+- `test_server.py`: dry-run and guard tests (`python -m pytest tools/live_server/test_server.py`).
+- `deploy/setup.sh` and `deploy/trenddesk.service`: one-time install with HTTPS through Caddy (sslip.io hostname); the code updates every weekday at 08:00 IST.
+- The plan itself comes from `tools/trade_plan.py` (GitHub Actions, about 21:15 IST) → `data/scan/trade_plan.json`.

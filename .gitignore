@@ -169,3 +169,6 @@ tools/angel/state/
 tools/breeze/.env
 tools/breeze/out/
 tools/breeze/keys.txt
+
+tools/live_server/var/
+tools/live_server/.env

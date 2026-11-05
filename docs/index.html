@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=40">
+<link rel="stylesheet" href="styles.css?v=41">
 </head>
 <body>
 <header class="bar">
@@ -39,6 +39,8 @@
 <nav class="views" aria-label="Sections">
   <button data-view="trends" aria-current="page">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-5 4 3 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Trends</button>
+  <button data-view="live">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>Live</button>
   <button data-view="ath">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h11M4 20V14l4-4 4 3 4-7 4 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>ATH</button>
   <button data-view="tb">
@@ -88,6 +90,7 @@
 </section>
 
 <!-- MONTHLY ATH -->
+<section id="view-live" class="view page" hidden></section>
 <section id="view-ath" class="view page" hidden></section>
 <!-- TOP BOTTOM -->
 <section id="view-tb" class="view page" hidden></section>
@@ -130,6 +133,6 @@
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<script src="app.js?v=56"></script>
+<script src="app.js?v=57"></script>
 </body>
 </html>
