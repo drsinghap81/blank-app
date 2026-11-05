@@ -1,57 +1,58 @@
 symbol,close,ema9,ema21,ema50,above21_60d,dist21,off_high,r1m,r3m,r6m,slope_yr,r2,rsi,value_cr,stacked,e21_rising,above50,last_date,name,board,ticker,list,tag,score
-TFCILTD,160.89,157.85,153.8,143.11,98,4.6,-0.6,15.2,47.7,113.2,707,0.91,63.8,225.68,True,True,True,2026-11-04,Tourism Finance Corporation of India Limited,main,TFCILTD.NS,trend,riding,170.0
-SHREEJISPG,871.15,843.9,817.84,759.91,90,6.5,-0.3,11.7,31.9,106.6,338,0.96,67.2,101.64,True,True,True,2026-11-04,Shreeji Shipping Global Limited,main,SHREEJISPG.NS,trend,riding,168.0
-WSTCSTPAPR,829.7,815.28,799.4,744.74,98,3.8,-11.8,15.6,45.8,67.9,260,0.93,55.8,94.31,True,True,True,2026-11-04,West Coast Paper Mills Limited,main,WSTCSTPAPR.NS,trend,riding,168.0
-GCSL,784.5,760.48,732.27,670.17,92,7.1,0.0,15.1,54.4,110.4,331,0.95,81.0,28.35,True,True,True,2026-11-04,Gretex Corporate Services Limited,main,GCSL.NS,trend,extended,166.8
-PANACHE,659.45,648.91,629.63,580.83,88,4.7,-1.5,21.7,49.6,97.3,280,0.92,63.2,1.56,True,True,True,2026-11-04,Panache Digilife Limited,main,PANACHE.NS,trend,riding,164.0
-KMEW,3329.9,3212.85,3173.69,3024.04,87,4.9,-0.5,11.3,31.5,50.7,243,0.92,60.0,38.38,True,True,True,2026-11-04,Knowledge Marine & Engineering Works Limited,main,KMEW.NS,trend,riding,159.8
-RATNAVEER,380.5,362.0,347.34,317.54,98,9.5,0.0,12.1,81.8,112.5,608,0.89,70.2,158.29,True,True,True,2026-11-04,Ratnaveer Precision Engineering Limited,main,RATNAVEER.NS,trend,extended,159.0
-LAURUSLABS,2323.8,2247.29,2148.99,2019.26,97,8.1,-3.4,17.9,25.6,99.8,212,0.95,69.0,490.84,True,True,True,2026-11-04,Laurus Labs Limited,main,LAURUSLABS.NS,trend,extended,158.5
-NAZARA,421.05,404.42,398.0,381.3,95,5.8,0.0,9.1,20.5,58.4,145,0.92,65.2,72.4,True,True,True,2026-11-04,Nazara Technologies Limited,main,NAZARA.NS,trend,riding,152.4
-SAMBHV,165.7,162.2,160.26,150.81,90,3.4,-3.9,0.6,32.8,36.7,185,0.88,55.9,41.37,True,True,True,2026-11-04,Sambhv Steel Tubes Limited,main,SAMBHV.NS,trend,riding,151.5
-SSWL,536.9,499.15,462.58,408.42,87,16.1,0.0,31.1,70.8,153.4,557,0.95,71.1,200.77,True,True,True,2026-11-04,Steel Strips Wheels Limited,main,SSWL.NS,trend,extended,146.3
-GLAND,3159.0,3068.44,3021.66,2928.78,88,4.5,0.0,8.5,23.2,79.5,135,0.87,63.0,123.05,True,True,True,2026-11-04,Gland Pharma Limited,main,GLAND.NS,trend,riding,144.5
-PTCIL,24410.0,24220.6,24045.57,22996.08,85,1.5,-5.1,8.3,34.9,48.3,154,0.84,54.3,73.56,True,True,True,2026-11-04,PTC Industries Limited,main,PTCIL.NS,trend,at EMA21,141.9
-KROSS,287.05,282.5,275.77,255.82,88,4.1,-6.4,13.2,38.4,51.6,170,0.8,56.0,94.6,True,True,True,2026-11-04,Kross Limited,main,KROSS.NS,trend,riding,141.0
-PVRINOX,1577.3,1491.25,1426.29,1331.27,88,10.6,0.0,28.1,32.8,48.4,163,0.9,76.1,156.78,True,True,True,2026-11-04,PVR INOX Limited,main,PVRINOX.NS,trend,extended,139.1
-ESCONET,376.5,346.41,310.96,262.23,90,21.1,0.0,52.6,181.0,178.9,956,0.85,77.4,1.78,True,True,True,2026-11-03,Esconet Technologies Limited,SME,ESCONET.NS,trend,extended,127.8
-SHIVAUM,540.05,542.49,539.05,511.83,100,0.2,-3.5,-3.4,28.7,52.9,225,0.93,55.6,2.85,False,True,True,2026-11-04,Shiv Aum Steels Limited,main,SHIVAUM.NS,watch,at EMA21,165.5
-YUKEN,1117.2,1130.64,1125.41,1070.05,85,-0.7,-9.8,-1.0,56.5,48.3,318,0.89,49.9,1.7,False,True,True,2026-11-04,Yuken India Limited,main,YUKEN.NS,watch,at EMA21,161.5
-CUPID,336.5,330.6,325.73,304.06,80,3.3,-8.1,8.5,41.4,157.1,813,0.89,57.6,610.01,True,True,True,2026-11-04,Cupid Limited,main,CUPID.NS,watch,riding,159.0
-LOTUSDEV,231.2,239.97,236.1,220.07,78,-2.1,-6.8,-2.8,19.8,67.7,319,0.9,48.8,48.54,False,True,True,2026-11-04,Sri Lotus Developers and Realty Limited,main,LOTUSDEV.NS,watch,at EMA21,159.0
-OAL,565.85,582.92,572.52,526.8,73,-1.2,-10.1,9.9,48.9,85.1,393,0.86,50.5,15.87,False,True,True,2026-11-04,Oriental Aromatics Limited,main,OAL.NS,watch,at EMA21,152.5
-BHAGERIA,354.35,360.68,358.05,331.27,75,-1.0,-12.8,-2.8,67.0,116.9,583,0.83,50.1,8.85,False,True,True,2026-11-04,Bhageria Industries Limited,main,BHAGERIA.NS,watch,at EMA21,150.5
-BLUSPRING,155.37,150.57,149.72,141.04,73,3.8,-10.0,8.0,39.4,132.0,352,0.84,55.7,13.78,True,True,True,2026-11-04,Bluspring Enterprises Limited,main,BLUSPRING.NS,watch,riding,150.5
-MANOMAY,244.94,245.37,242.71,234.23,93,0.9,-5.3,3.3,14.8,48.5,130,0.89,56.8,6.37,False,True,True,2026-11-04,Manomay Tex India Limited,main,MANOMAY.NS,watch,at EMA21,148.5
-TCPLPACK,4525.0,4263.3,4179.57,4005.65,83,8.3,0.0,15.0,40.9,71.0,257,0.87,62.0,6.96,True,True,True,2026-11-04,TCPL Packaging Limited,main,TCPLPACK.NS,watch,extended,147.6
-SPECTRUM,4257.9,3990.14,3809.44,3386.23,75,11.8,0.0,10.9,66.8,267.5,902,0.93,76.6,5.78,True,True,True,2026-11-04,Spectrum Electrical Industries Limited,main,SPECTRUM.NS,watch,extended,146.9
-SANSERA,4430.8,4230.62,4199.75,4078.61,75,5.5,-5.0,3.3,26.4,75.5,212,0.88,60.1,76.82,True,True,True,2026-11-04,Sansera Engineering Limited,main,SANSERA.NS,watch,riding,145.7
-DIVISLAB,10037.5,9722.5,9508.42,9179.57,80,5.6,-0.3,9.2,19.8,51.5,176,0.88,68.6,603.91,True,True,True,2026-11-04,Divi's Laboratories Limited,main,DIVISLAB.NS,watch,riding,144.4
-SETL,417.6,392.25,385.38,371.38,78,8.4,-10.8,-2.9,51.6,202.0,1086,0.82,62.1,27.67,True,True,True,2026-11-04,Standard Engineering Technology Limited,main,SETL.NS,watch,extended,144.2
-NRAIL,669.4,687.28,680.68,638.76,82,-1.7,-13.5,1.2,39.0,35.3,219,0.79,49.3,4.51,False,True,True,2026-11-04,N R Agarwal Industries Limited,main,NRAIL.NS,watch,at EMA21,141.9
-SHADOWFAX,279.5,281.77,281.64,271.38,78,-0.8,-6.1,-3.3,12.6,64.0,147,0.88,49.6,134.37,False,True,True,2026-11-04,Shadowfax Technologies Limited,main,SHADOWFAX.NS,watch,at EMA21,141.7
-CHENNPETRO,1566.9,1516.68,1480.53,1419.94,75,5.8,-2.0,13.7,25.4,53.6,174,0.87,60.9,518.14,True,True,True,2026-11-04,Chennai Petroleum Corporation Limited,main,CHENNPETRO.NS,watch,riding,140.3
-MACPOWER,2204.0,2029.36,1981.37,1906.77,77,11.2,0.0,2.0,44.1,81.2,470,0.84,64.5,11.04,True,True,True,2026-11-04,Macpower CNC Machines Limited,main,MACPOWER.NS,watch,extended,140.1
-EBGNG,728.9,694.71,691.46,666.48,88,5.4,-0.3,4.8,43.4,61.9,201,0.76,58.1,77.67,True,True,True,2026-11-04,GNG Electronics Limited,main,EBGNG.NS,watch,riding,139.3
-LENSKART,689.7,671.15,666.1,653.96,80,3.5,-2.5,-0.4,21.5,36.1,129,0.86,58.3,282.28,True,True,True,2026-11-04,Lenskart Solutions Limited,main,LENSKART.NS,watch,riding,138.9
-THELEELA,663.45,635.06,610.96,577.71,83,8.6,-1.1,14.9,32.7,58.0,140,0.9,66.3,51.82,True,True,True,2026-11-04,Leela Palaces Hotels & Resorts Limited,main,THELEELA.NS,watch,extended,138.3
-GLOBAL,145.56,143.5,141.25,133.0,97,3.1,-0.1,4.6,41.6,42.8,135,0.76,62.2,1.37,True,True,True,2026-11-04,Global Education Limited,main,GLOBAL.NS,watch,riding,138.0
-COFORGE,2060.0,2017.47,1959.53,1879.89,73,5.1,-1.9,11.2,17.7,76.7,143,0.84,64.7,525.7,True,True,True,2026-11-04,Coforge Limited,main,COFORGE.NS,watch,riding,134.6
-MAHASTEEL,1431.6,1428.87,1356.34,1254.94,73,5.5,-6.7,22.7,33.2,65.9,253,0.72,59.6,1.05,True,True,True,2026-11-04,Mahamaya Steel Industries Limited,main,MAHASTEEL.NS,watch,riding,132.8
-KINGFA,6816.5,6729.65,6625.39,6340.82,88,2.9,-1.7,2.2,32.2,40.9,98,0.78,59.5,6.15,True,True,True,2026-11-04,Kingfa Science & Technology (India) Limited,main,KINGFA.NS,watch,at EMA21,131.8
-MBAPL,187.29,177.08,171.39,165.02,70,9.3,0.0,14.4,18.1,66.2,233,0.82,70.8,16.31,True,True,True,2026-11-04,Madhya Bharat Agro Products Limited,main,MBAPL.NS,watch,extended,131.7
-KRISHANA,240.29,224.84,212.95,198.35,77,12.8,0.0,29.3,32.6,89.7,221,0.85,74.7,24.68,True,True,True,2026-11-04,Krishana Phoschem Limited,main,KRISHANA.NS,watch,extended,130.0
-ETERNAL,344.5,337.3,330.61,323.42,70,4.2,-1.4,7.4,10.3,38.6,111,0.83,60.8,881.14,True,True,True,2026-11-04,ETERNAL LIMITED,main,ETERNAL.NS,watch,riding,129.1
-WELSPUNLIV,264.57,234.9,226.41,213.85,80,16.9,0.0,14.9,64.6,103.3,232,0.89,75.3,242.3,True,True,True,2026-11-04,Welspun Living Limited,main,WELSPUNLIV.NS,watch,extended,128.4
-SAILIFE,1546.1,1512.32,1496.09,1480.36,73,3.3,-7.7,2.3,13.2,43.0,112,0.8,59.3,71.93,True,True,True,2026-11-04,Sai Life Sciences Limited,main,SAILIFE.NS,watch,riding,127.7
-SHREEPUSHK,594.75,564.73,533.31,498.59,80,11.5,-4.5,20.3,41.5,52.5,152,0.82,63.5,8.45,True,True,True,2026-11-04,Shree Pushkar Chemicals & Fertilisers Limited,main,SHREEPUSHK.NS,watch,extended,124.2
-MAZDA,303.3,290.97,285.22,272.53,82,6.3,-5.4,7.2,36.0,46.5,108,0.72,58.6,1.67,True,True,True,2026-11-04,Mazda Limited,main,MAZDA.NS,watch,riding,121.2
-INDGN,617.1,603.67,597.41,586.14,77,3.3,-0.4,3.1,11.4,13.8,58,0.76,58.7,28.42,True,True,True,2026-11-04,Indegene Limited,main,INDGN.NS,watch,riding,120.3
-IPCALAB,1972.0,1942.83,1933.76,1911.93,72,2.0,-1.9,1.1,16.8,28.3,71,0.76,56.7,49.12,True,True,True,2026-11-04,IPCA Laboratories Limited,main,IPCALAB.NS,watch,at EMA21,119.1
-WESTLIFE,631.05,601.67,589.3,573.59,75,7.1,0.0,6.8,16.4,29.6,98,0.75,63.3,37.07,True,True,True,2026-11-04,WESTLIFE FOODWORLD LIMITED,main,WESTLIFE.NS,watch,riding,118.1
-ANANDRATHI,2296.0,2258.68,2217.69,2172.71,72,3.5,0.0,7.9,13.1,27.6,69,0.75,68.9,103.3,True,True,True,2026-11-04,Anand Rathi Wealth Limited,main,ANANDRATHI.NS,watch,riding,117.9
-ALICON,854.35,852.43,840.21,797.26,77,1.7,-11.0,0.6,23.5,18.9,92,0.7,56.1,3.03,True,True,True,2026-11-04,Alicon Castalloy Limited,main,ALICON.NS,watch,at EMA21,117.7
-APLAPOLLO,2199.8,2160.12,2148.57,2122.62,77,2.4,-3.2,4.8,15.0,18.1,67,0.72,55.8,138.2,True,True,True,2026-11-04,APL Apollo Tubes Limited,main,APLAPOLLO.NS,watch,at EMA21,117.2
-SHYAMMETL,1231.4,1183.12,1152.64,1107.12,70,6.8,0.0,20.7,21.1,38.7,60,0.79,67.5,52.63,True,True,True,2026-11-04,Shyam Metalics and Energy Limited,main,SHYAMMETL.NS,watch,riding,116.4
-ORIENTHOT,167.55,160.29,153.85,145.99,78,8.9,0.0,18.9,26.3,62.4,136,0.71,76.7,16.68,True,True,True,2026-11-04,Oriental Hotels Limited,main,ORIENTHOT.NS,watch,extended,115.8
-NAVINFLUOR,8785.0,8431.31,8345.05,8275.17,73,5.3,0.0,6.2,15.2,25.6,54,0.72,59.3,131.24,True,True,True,2026-11-04,Navin Fluorine International Limited,main,NAVINFLUOR.NS,watch,riding,113.3
+TFCILTD,161.25,158.53,154.48,143.82,98,4.4,-0.4,14.6,46.3,101.8,713,0.92,64.2,218.66,True,True,True,2026-11-05,Tourism Finance Corporation of India Limited,main,TFCILTD.NS,trend,riding,171.0
+SHREEJISPG,863.85,847.89,822.02,763.99,90,5.1,-1.1,8.5,30.5,102.7,336,0.96,64.7,97.63,True,True,True,2026-11-05,Shreeji Shipping Global Limited,main,SHREEJISPG.NS,trend,riding,170.8
+GCSL,782.75,764.94,736.85,674.58,92,6.2,-0.2,12.9,49.7,105.4,334,0.95,79.7,27.98,True,True,True,2026-11-05,Gretex Corporate Services Limited,main,GCSL.NS,trend,extended,168.6
+WSTCSTPAPR,831.65,818.55,802.33,748.15,98,3.7,-11.6,10.4,41.6,58.1,262,0.93,56.0,94.11,True,True,True,2026-11-05,West Coast Paper Mills Limited,main,WSTCSTPAPR.NS,trend,riding,168.2
+RATNAVEER,373.15,364.23,349.69,319.72,98,6.7,-1.9,11.3,83.6,104.3,624,0.89,65.2,154.2,True,True,True,2026-11-05,Ratnaveer Precision Engineering Limited,main,RATNAVEER.NS,trend,riding,164.6
+PANACHE,672.6,653.65,633.54,584.43,88,6.2,0.0,18.2,52.9,93.4,284,0.92,66.0,1.37,True,True,True,2026-11-05,Panache Digilife Limited,main,PANACHE.NS,trend,riding,162.0
+LAURUSLABS,2346.0,2267.03,2166.9,2032.08,97,8.3,-2.5,14.4,27.8,99.4,213,0.95,70.2,492.44,True,True,True,2026-11-05,Laurus Labs Limited,main,LAURUSLABS.NS,trend,extended,158.2
+NAZARA,417.6,407.05,399.78,382.72,95,4.5,-0.8,10.0,19.7,53.6,144,0.92,62.7,73.33,True,True,True,2026-11-05,Nazara Technologies Limited,main,NAZARA.NS,trend,riding,153.9
+SAMBHV,168.47,163.46,161.0,151.5,90,4.6,-2.3,3.9,39.0,38.8,190,0.89,57.8,45.67,True,True,True,2026-11-05,Sambhv Steel Tubes Limited,main,SAMBHV.NS,trend,riding,153.0
+SSWL,531.35,505.59,468.83,413.24,87,13.3,-1.0,25.5,67.2,149.4,569,0.95,69.2,200.54,True,True,True,2026-11-05,Steel Strips Wheels Limited,main,SSWL.NS,trend,extended,151.9
+MANOMAY,247.08,245.71,243.11,234.73,93,1.6,-4.5,2.9,15.4,40.7,130,0.89,59.8,6.3,True,True,True,2026-11-05,Manomay Tex India Limited,main,MANOMAY.NS,trend,at EMA21,148.5
+GLAND,3145.2,3083.79,3032.89,2937.26,88,3.7,-0.4,4.6,24.5,74.9,131,0.88,61.6,109.34,True,True,True,2026-11-05,Gland Pharma Limited,main,GLAND.NS,trend,riding,145.1
+PTCIL,24325.0,24241.48,24070.97,23048.2,85,1.1,-5.4,5.2,34.5,41.3,155,0.84,53.6,60.21,True,True,True,2026-11-05,PTC Industries Limited,main,PTCIL.NS,trend,at EMA21,142.0
+PVRINOX,1581.4,1509.28,1440.39,1341.08,88,9.8,0.0,26.6,36.1,47.9,169,0.9,76.4,132.7,True,True,True,2026-11-05,PVR INOX Limited,main,PVRINOX.NS,trend,extended,141.3
+KROSS,294.45,284.89,277.47,257.34,88,6.1,-3.9,16.3,43.7,50.8,176,0.81,58.4,93.87,True,True,True,2026-11-05,Kross Limited,main,KROSS.NS,trend,riding,140.4
+ESCONET,387.6,354.65,317.93,267.15,90,21.9,0.0,59.7,200.2,173.4,1020,0.86,79.1,1.86,True,True,True,2026-11-04,Esconet Technologies Limited,SME,ESCONET.NS,trend,extended,127.2
+SHIVAUM,540.05,542.0,539.14,512.93,100,0.2,-3.5,-2.3,27.1,53.7,223,0.93,55.6,3.14,False,True,True,2026-11-05,Shiv Aum Steels Limited,main,SHIVAUM.NS,watch,at EMA21,165.3
+YUKEN,1083.6,1121.23,1121.61,1070.58,83,-3.4,-12.5,-12.5,44.8,46.0,318,0.89,44.3,1.67,False,True,True,2026-11-05,Yuken India Limited,main,YUKEN.NS,watch,at EMA21,160.5
+CUPID,341.25,332.73,327.14,305.51,80,4.3,-6.8,5.3,35.4,169.8,791,0.89,59.6,548.54,True,True,True,2026-11-05,Cupid Limited,main,CUPID.NS,watch,riding,159.0
+LOTUSDEV,234.2,238.81,235.92,220.62,78,-0.7,-5.6,-4.3,21.8,63.5,321,0.9,50.8,50.02,False,True,True,2026-11-05,Sri Lotus Developers and Realty Limited,main,LOTUSDEV.NS,watch,at EMA21,159.0
+KMEW,3143.3,3198.94,3170.92,3028.72,85,-0.9,-6.0,-1.8,23.6,44.1,240,0.91,49.9,39.52,False,True,True,2026-11-05,Knowledge Marine & Engineering Works Limited,main,KMEW.NS,watch,at EMA21,157.5
+PRIZOR,1318.55,1274.75,1256.95,1181.28,77,4.9,-6.6,5.2,44.9,94.8,329,0.86,55.6,4.69,True,True,True,2026-11-04,Prizor Viztech Limited,SME,PRIZOR.NS,watch,riding,154.5
+OAL,546.3,575.6,570.13,527.57,72,-4.2,-13.2,6.8,45.2,76.7,393,0.86,46.5,15.94,False,True,True,2026-11-05,Oriental Aromatics Limited,main,OAL.NS,watch,at EMA21,152.0
+BHAGERIA,369.7,362.48,359.11,332.78,77,2.9,-9.0,-6.1,75.4,122.0,581,0.83,54.0,8.92,True,True,True,2026-11-05,Bhageria Industries Limited,main,BHAGERIA.NS,watch,at EMA21,151.5
+SPECTRUM,4246.7,4041.45,3849.19,3419.98,75,10.3,-0.3,8.4,68.9,267.3,906,0.93,75.7,6.18,True,True,True,2026-11-05,Spectrum Electrical Industries Limited,main,SPECTRUM.NS,watch,extended,149.9
+TCPLPACK,4558.6,4322.36,4214.02,4027.34,83,8.2,0.0,13.7,44.1,64.0,258,0.87,62.8,7.29,True,True,True,2026-11-05,TCPL Packaging Limited,main,TCPLPACK.NS,watch,extended,147.9
+SANSERA,4431.8,4270.86,4220.84,4092.46,75,5.0,-4.9,4.7,18.5,77.0,206,0.88,60.1,77.73,True,True,True,2026-11-05,Sansera Engineering Limited,main,SANSERA.NS,watch,riding,146.1
+DIVISLAB,10140.5,9806.1,9565.89,9217.25,80,6.0,0.0,6.2,20.9,51.9,178,0.88,70.6,626.12,True,True,True,2026-11-05,Divi's Laboratories Limited,main,DIVISLAB.NS,watch,riding,143.8
+NRAIL,674.7,684.77,680.14,640.17,80,-0.8,-12.9,2.5,38.9,35.7,224,0.8,50.3,4.63,False,True,True,2026-11-05,N R Agarwal Industries Limited,main,NRAIL.NS,watch,at EMA21,142.4
+SHADOWFAX,290.8,283.58,282.47,272.14,78,2.9,-2.3,1.0,19.4,73.8,142,0.88,55.5,133.3,True,True,True,2026-11-05,Shadowfax Technologies Limited,main,SHADOWFAX.NS,watch,at EMA21,141.2
+WELSPUNLIV,253.33,238.58,228.85,215.4,80,10.7,-4.2,6.5,57.6,90.7,234,0.89,66.1,245.32,True,True,True,2026-11-05,Welspun Living Limited,main,WELSPUNLIV.NS,watch,extended,141.0
+BLUSPRING,166.01,153.65,151.2,142.02,73,9.8,-3.9,14.9,42.8,148.3,343,0.84,62.1,14.26,True,True,True,2026-11-05,Bluspring Enterprises Limited,main,BLUSPRING.NS,watch,extended,140.9
+GLOBAL,144.48,143.69,141.54,133.45,98,2.1,-0.8,1.3,38.9,27.5,139,0.77,59.6,1.37,True,True,True,2026-11-05,Global Education Limited,main,GLOBAL.NS,watch,at EMA21,139.9
+EBGNG,729.55,701.68,694.93,668.95,88,5.0,-0.2,6.5,38.3,68.1,198,0.76,58.2,75.84,True,True,True,2026-11-05,GNG Electronics Limited,main,EBGNG.NS,watch,riding,139.8
+LENSKART,718.35,680.59,670.85,656.48,80,7.1,0.0,4.9,25.4,42.7,129,0.86,64.9,366.36,True,True,True,2026-11-05,Lenskart Solutions Limited,main,LENSKART.NS,watch,riding,134.7
+MACPOWER,2291.6,2081.81,2009.58,1921.86,77,14.0,0.0,9.6,49.4,92.9,476,0.84,68.0,11.63,True,True,True,2026-11-05,Macpower CNC Machines Limited,main,MACPOWER.NS,watch,extended,134.5
+COFORGE,2079.0,2029.78,1970.39,1887.7,73,5.5,-1.0,12.4,17.0,62.7,142,0.84,66.3,538.03,True,True,True,2026-11-05,Coforge Limited,main,COFORGE.NS,watch,riding,133.7
+SHREEPUSHK,574.55,566.69,537.06,501.57,80,7.0,-7.8,12.6,38.5,47.8,155,0.82,58.9,8.57,True,True,True,2026-11-05,Shree Pushkar Chemicals & Fertilisers Limited,main,SHREEPUSHK.NS,watch,riding,133.5
+MAHASTEEL,1445.8,1432.25,1364.47,1262.43,73,6.0,-5.8,26.9,34.3,76.3,257,0.73,60.7,1.06,True,True,True,2026-11-05,Mahamaya Steel Industries Limited,main,MAHASTEEL.NS,watch,riding,133.2
+KINGFA,6789.5,6741.62,6640.3,6358.42,88,2.2,-2.1,-2.1,31.9,36.1,100,0.79,58.3,5.95,True,True,True,2026-11-05,Kingfa Science & Technology (India) Limited,main,KINGFA.NS,watch,at EMA21,133.0
+THELEELA,689.75,646.0,618.12,582.11,83,11.6,0.0,18.4,37.3,62.1,142,0.9,70.4,52.83,True,True,True,2026-11-05,Leela Palaces Hotels & Resorts Limited,main,THELEELA.NS,watch,extended,132.5
+KRISHANA,245.47,228.97,215.91,200.19,77,13.7,0.0,26.8,37.3,85.0,228,0.86,76.6,25.43,True,True,True,2026-11-05,Krishana Phoschem Limited,main,KRISHANA.NS,watch,extended,129.9
+PNB,126.1,122.53,120.45,117.73,85,4.7,-2.0,12.7,11.1,17.8,47,0.81,64.9,269.5,True,True,True,2026-11-05,Punjab National Bank,main,PNB.NS,watch,riding,128.2
+MBAPL,194.24,180.51,173.47,166.16,70,12.0,0.0,16.3,23.8,70.0,233,0.82,74.9,18.21,True,True,True,2026-11-05,Madhya Bharat Agro Products Limited,main,MBAPL.NS,watch,extended,126.3
+SAILIFE,1594.5,1528.76,1505.04,1484.84,73,5.9,-4.8,2.3,14.4,47.7,111,0.79,65.5,71.16,True,True,True,2026-11-05,Sai Life Sciences Limited,main,SAILIFE.NS,watch,riding,124.8
+ETERNAL,358.3,341.5,333.13,324.79,70,7.6,0.0,8.9,15.5,39.9,111,0.83,67.2,908.52,True,True,True,2026-11-05,ETERNAL LIMITED,main,ETERNAL.NS,watch,riding,123.9
+INDGN,613.35,605.61,598.86,587.21,77,2.4,-1.0,2.9,13.5,15.6,59,0.77,57.0,28.68,True,True,True,2026-11-05,Indegene Limited,main,INDGN.NS,watch,at EMA21,121.4
+ARHAM,228.03,207.66,203.71,199.37,72,11.9,0.0,10.5,29.0,56.5,206,0.77,68.4,2.57,True,True,True,2026-11-05,Arham Technologies Limited,main,ARHAM.NS,watch,extended,119.8
+IPCALAB,1949.6,1944.18,1935.2,1913.41,73,0.7,-3.0,0.2,10.8,25.1,70,0.76,52.8,53.74,True,True,True,2026-11-05,IPCA Laboratories Limited,main,IPCALAB.NS,watch,at EMA21,119.5
+ALICON,857.25,853.39,841.76,799.62,77,1.8,-10.7,-1.1,19.9,18.5,94,0.71,56.7,2.48,True,True,True,2026-11-05,Alicon Castalloy Limited,main,ALICON.NS,watch,at EMA21,118.9
+APLAPOLLO,2194.2,2166.93,2152.72,2125.43,77,1.9,-3.4,2.0,13.0,15.0,68,0.73,55.1,142.42,True,True,True,2026-11-05,APL Apollo Tubes Limited,main,APLAPOLLO.NS,watch,at EMA21,118.3
+MAZDA,311.5,295.08,287.61,274.06,82,8.3,-2.8,9.9,39.1,47.3,108,0.72,61.2,1.96,True,True,True,2026-11-05,Mazda Limited,main,MAZDA.NS,watch,extended,117.2
+ANANDRATHI,2370.0,2280.94,2231.54,2180.45,72,6.2,0.0,10.9,16.5,31.5,69,0.75,76.3,109.87,True,True,True,2026-11-05,Anand Rathi Wealth Limited,main,ANANDRATHI.NS,watch,extended,115.5
+NAVINFLUOR,8845.0,8507.91,8383.59,8290.28,73,5.5,0.0,3.7,16.3,25.9,54,0.72,60.4,137.12,True,True,True,2026-11-05,Navin Fluorine International Limited,main,NAVINFLUOR.NS,watch,riding,112.9
+ORIENTHOT,172.71,162.78,155.56,147.04,80,11.0,0.0,20.3,31.5,63.4,136,0.71,80.1,17.04,True,True,True,2026-11-05,Oriental Hotels Limited,main,ORIENTHOT.NS,watch,extended,112.6
+SHYAMMETL,1270.0,1200.5,1163.31,1113.5,72,9.2,0.0,20.5,23.7,42.8,61,0.78,71.7,53.77,True,True,True,2026-11-05,Shyam Metalics and Energy Limited,main,SHYAMMETL.NS,watch,extended,111.7
+AUROPHARMA,1785.0,1691.94,1672.25,1656.48,70,6.7,0.0,5.4,10.6,20.3,41,0.72,68.0,170.47,True,True,True,2026-11-05,Aurobindo Pharma Limited,main,AUROPHARMA.NS,watch,riding,107.7
