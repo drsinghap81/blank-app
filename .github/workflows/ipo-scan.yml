@@ -31,7 +31,7 @@ jobs:
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
-          git checkout -- data/scan/sectors.json data/scan/sector_hist.csv.gz 2>/dev/null || true   # the ATH scan commits these
+          git checkout -- data/scan/sectors.json data/scan/sector_hist.csv.gz data/scan/index_charts 2>/dev/null || true; git clean -fdq data/scan/index_charts || true   # the ATH scan commits these
           git add data/scan/ipo.json data/scan/ipo_charts 2>/dev/null; git diff --cached --quiet && exit 0
           git commit -qm "IPO cup scan $(date -u +%F)"
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
