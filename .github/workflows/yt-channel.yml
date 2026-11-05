@@ -1,0 +1,26 @@
+name: yt-channel
+on:
+  workflow_dispatch:
+    inputs:
+      url: {default: "https://www.youtube.com/@NitinMurarkaNifty"}
+      kw: {default: "spread|hedge|strategy|butterfly|ratio|straddle|strangle|condor|expiry|bull|bear|weekly|data|PCR|OI|FII"}
+      max: {default: "40"}
+      name: {default: "murarka"}
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: |
+          pip install -q -U yt-dlp youtube-transcript-api
+          python tools/yt_channel.py "${{ github.event.inputs.url }}" yt "${{ github.event.inputs.kw }}" ${{ github.event.inputs.max }} 2>&1 | tail -5
+          ls yt | head -60
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          B=yt-${{ github.event.inputs.name }}
+          git checkout --orphan $B; git rm -rq --cached .; git add -f yt; git commit -qm "$B"; git push -f origin $B
