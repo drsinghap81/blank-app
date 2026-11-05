@@ -2737,8 +2737,8 @@ def main() -> None:
 
     render_header(market)
 
-    tab_live, tab_td, tab_trend, tab_ath, tab_ipo, tab_tb, tab_ratio, tab_scan, tab1, tab_bt, tab2, tab3, tab_oi = st.tabs(
-        ["🎯 Live trades", "🧭 Top-down", "📈 Trend scan", "🏔️ Monthly ATH", "🚀 IPO cups", "🔁 Top Bottom", "🦋 Nifty ratio", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
+    tab_live, tab_td, tab_trend, tab_ath, tab_ipo, tab_tb, tab_scan, tab1, tab_bt, tab2, tab3, tab_oi = st.tabs(
+        ["🎯 Live trades", "🧭 Top-down", "📈 Trend scan", "🏔️ Monthly ATH", "🚀 IPO cups", "🔁 Top Bottom", "🎯 Pattern scanner", "📊 Chart analysis", "🧪 Backtest",
          "🧾 Paper orders", "💼 Portfolio", "🗄️ OI alerts (archived)"])
     with tab1:
         render_analysis_tab(market, ticker)
@@ -2761,8 +2761,6 @@ def main() -> None:
     with tab_tb:
         st.session_state["_nse_watchlist"] = tuple(MARKETS["India (NSE)"].watchlist)
         _sys.modules["topbottom_tab"].render_topbottom_tab()
-    with tab_ratio:
-        _sys.modules["ratio_tab"].render_ratio_tab()
     with tab2:
         render_trading_tab(market, ticker)
     with tab3:
