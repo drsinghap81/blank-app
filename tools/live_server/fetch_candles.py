@@ -44,6 +44,7 @@ for n, sym in enumerate(syms, 1):
                 err = r.get("message") or "no data"
             except Exception as e:  # noqa: BLE001
                 err = str(e)[:80]
+            print(f"   retry {sym} {p['fromdate'][:10]} #{k + 1}: {err}", flush=True)
             time.sleep(min(20, 2.0 * (k + 1)))      # Angel answers bursts with empty bodies: back off
         else:
             log.append(f"{sym} {p['fromdate']}: {err}")
