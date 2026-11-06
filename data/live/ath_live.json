@@ -1,0 +1,621 @@
+{
+"time": "2026-11-06 14:56 IST",
+"delayed_min": 15,
+"prices": {
+"AARTIPHARM": {
+"price": 926.25,
+"high": 931.0,
+"low": 900.0
+},
+"AEROENTER": {
+"price": 120.0,
+"high": 128.09,
+"low": 118.62
+},
+"AEROFLEX": {
+"price": 483.85,
+"high": 517.0,
+"low": 465.95
+},
+"AETHER": {
+"price": 1564.2,
+"high": 1575.0,
+"low": 1526.9
+},
+"AGARWALEYE": {
+"price": 514.95,
+"high": 523.3,
+"low": 492.5
+},
+"AJANTPHARM": {
+"price": 3323.9,
+"high": 3339.5,
+"low": 3252.1
+},
+"ALIVUS": {
+"price": 1463.2,
+"high": 1523.2,
+"low": 1403.4
+},
+"ANTELOPUS": {
+"price": 889.2,
+"high": 899.95,
+"low": 865.4
+},
+"ARIES": {
+"price": 500.0,
+"high": 514.0,
+"low": 489.05
+},
+"ARROWGREEN": {
+"price": 721.6,
+"high": 764.0,
+"low": 704.15
+},
+"ASAHIINDIA": {
+"price": 1035.05,
+"high": 1039.7,
+"low": 995.55
+},
+"ASIANENE": {
+"price": 399.85,
+"high": 403.3,
+"low": 390.35
+},
+"ASKAUTOLTD": {
+"price": 614.1,
+"high": 630.15,
+"low": 603.25
+},
+"AUROPHARMA": {
+"price": 1790.8,
+"high": 1805.0,
+"low": 1776.0
+},
+"AVADHSUGAR": {
+"price": 831.8,
+"high": 883.05,
+"low": 822.05
+},
+"AZAD": {
+"price": 2425.9,
+"high": 2565.0,
+"low": 2401.2
+},
+"BHAGERIA": {
+"price": 360.9,
+"high": 375.7,
+"low": 359.15
+},
+"BIL": {
+"price": 1070.0,
+"high": 1138.0,
+"low": 1040.2
+},
+"BIRLACABLE": {
+"price": 351.1,
+"high": 363.9,
+"low": 340.8
+},
+"BLISSGVS": {
+"price": 613.5,
+"high": 635.8,
+"low": 613.0
+},
+"BODALCHEM": {
+"price": 153.78,
+"high": 159.6,
+"low": 153.72
+},
+"BOSCHLTD": {
+"price": 50680.0,
+"high": 52355.0,
+"low": 50320.0
+},
+"CGCL": {
+"price": 239.05,
+"high": 242.98,
+"low": 237.55
+},
+"CHENNPETRO": {
+"price": 1437.3,
+"high": 1474.1,
+"low": 1400.4
+},
+"CNL": {
+"price": 1327.8,
+"high": 1388.3,
+"low": 1300.2
+},
+"COFORGE": {
+"price": 2066.7,
+"high": 2127.9,
+"low": 2056.0
+},
+"CORDSCABLE": {
+"price": 309.5,
+"high": 311.0,
+"low": 284.9
+},
+"CUPID": {
+"price": 338.25,
+"high": 342.0,
+"low": 335.0
+},
+"CYIENTDLM": {
+"price": 771.0,
+"high": 795.35,
+"low": 760.5
+},
+"DEEPINDS": {
+"price": 638.15,
+"high": 650.9,
+"low": 621.65
+},
+"DIVISLAB": {
+"price": 10239.0,
+"high": 10280.0,
+"low": 10040.5
+},
+"DPABHUSHAN": {
+"price": 1963.1,
+"high": 2019.9,
+"low": 1950.2
+},
+"E2E": {
+"price": 491.45,
+"high": 500.85,
+"low": 486.9
+},
+"ENTERO": {
+"price": 1888.1,
+"high": 1936.6,
+"low": 1761.3
+},
+"FLUOROCHEM": {
+"price": 4597.0,
+"high": 4695.0,
+"low": 4584.8
+},
+"FOSECOIND": {
+"price": 5965.0,
+"high": 6007.0,
+"low": 5895.5
+},
+"GHCLTEXTIL": {
+"price": 127.05,
+"high": 129.57,
+"low": 125.0
+},
+"GLOBAL": {
+"price": 143.73,
+"high": 147.17,
+"low": 143.0
+},
+"GNA": {
+"price": 569.25,
+"high": 575.6,
+"low": 535.1
+},
+"GRANULES": {
+"price": 800.7,
+"high": 803.0,
+"low": 761.5
+},
+"GRWRHITECH": {
+"price": 7588.0,
+"high": 7645.5,
+"low": 7371.0
+},
+"GUFICBIO": {
+"price": 430.15,
+"high": 438.9,
+"low": 425.8
+},
+"HAL": {
+"price": 4965.3,
+"high": 4998.3,
+"low": 4828.0
+},
+"HAPPYFORGE": {
+"price": 1694.5,
+"high": 1900.4,
+"low": 1694.5
+},
+"HEGAM": {
+"price": 286.67,
+"high": 303.24,
+"low": 281.49
+},
+"HFCL": {
+"price": 210.66,
+"high": 210.66,
+"low": 210.66
+},
+"HONASA": {
+"price": 468.55,
+"high": 489.0,
+"low": 466.9
+},
+"ICICIBANK": {
+"price": 1559.9,
+"high": 1562.4,
+"low": 1504.6
+},
+"ICIL": {
+"price": 486.6,
+"high": 504.0,
+"low": 479.1
+},
+"INDHOTEL": {
+"price": 888.05,
+"high": 892.7,
+"low": 868.0
+},
+"INDSWFTLAB": {
+"price": 346.2,
+"high": 359.45,
+"low": 343.0
+},
+"INNOVACAP": {
+"price": 1020.4,
+"high": 1040.0,
+"low": 1011.6
+},
+"INOXINDIA": {
+"price": 1907.9,
+"high": 1970.9,
+"low": 1821.7
+},
+"IOLCP": {
+"price": 182.84,
+"high": 186.66,
+"low": 180.61
+},
+"IPCALAB": {
+"price": 1939.8,
+"high": 1995.0,
+"low": 1914.4
+},
+"JGCHEM": {
+"price": 576.7,
+"high": 581.15,
+"low": 563.05
+},
+"JSWINFRA": {
+"price": 337.8,
+"high": 346.75,
+"low": 335.35
+},
+"KABRAEXTRU": {
+"price": 765.35,
+"high": 768.9,
+"low": 711.5
+},
+"KANPRPLA": {
+"price": 247.9,
+"high": 251.98,
+"low": 244.1
+},
+"KDDL": {
+"price": 3968.9,
+"high": 3981.0,
+"low": 3900.1
+},
+"KOTAKBANK": {
+"price": 475.15,
+"high": 476.5,
+"low": 463.0
+},
+"KRONOX": {
+"price": 189.1,
+"high": 195.0,
+"low": 185.62
+},
+"KTKBANK": {
+"price": 318.6,
+"high": 323.65,
+"low": 316.6
+},
+"LALPATHLAB": {
+"price": 1962.5,
+"high": 2011.0,
+"low": 1935.0
+},
+"LAURUSLABS": {
+"price": 2329.0,
+"high": 2341.5,
+"low": 2309.1
+},
+"LOKESHMACH": {
+"price": 369.0,
+"high": 387.85,
+"low": 363.0
+},
+"MACPOWER": {
+"price": 2272.9,
+"high": 2331.6,
+"low": 2127.1
+},
+"MANAKCOAT": {
+"price": 157.04,
+"high": 157.04,
+"low": 149.17
+},
+"MARINE": {
+"price": 392.9,
+"high": 436.3,
+"low": 376.85
+},
+"MAWANASUG": {
+"price": 151.49,
+"high": 156.4,
+"low": 150.5
+},
+"MENONBE": {
+"price": 338.65,
+"high": 357.4,
+"low": 334.05
+},
+"MMP": {
+"price": 423.0,
+"high": 444.0,
+"low": 396.0
+},
+"MODISONLTD": {
+"price": 355.25,
+"high": 358.9,
+"low": 338.25
+},
+"MOTHERSON": {
+"price": 158.22,
+"high": 166.88,
+"low": 152.56
+},
+"NAVINFLUOR": {
+"price": 8937.0,
+"high": 8937.0,
+"low": 8665.5
+},
+"NAZARA": {
+"price": 412.45,
+"high": 419.55,
+"low": 411.0
+},
+"NELCAST": {
+"price": 158.07,
+"high": 165.14,
+"low": 156.49
+},
+"NEOGEN": {
+"price": 2535.0,
+"high": 2535.0,
+"low": 2343.2
+},
+"NITINSPIN": {
+"price": 657.5,
+"high": 667.0,
+"low": 642.55
+},
+"NRBBEARING": {
+"price": 439.7,
+"high": 449.45,
+"low": 429.05
+},
+"NUVAMA": {
+"price": 1838.8,
+"high": 1889.5,
+"low": 1799.7
+},
+"OPTIEMUS": {
+"price": 750.0,
+"high": 818.0,
+"low": 732.55
+},
+"ORIENTHOT": {
+"price": 175.38,
+"high": 177.0,
+"low": 172.0
+},
+"PANAMAPET": {
+"price": 439.8,
+"high": 446.2,
+"low": 438.0
+},
+"PARAS": {
+"price": 1242.2,
+"high": 1254.0,
+"low": 1215.2
+},
+"PERSISTENT": {
+"price": 6060.0,
+"high": 6240.0,
+"low": 6053.5
+},
+"POONAWALLA": {
+"price": 473.8,
+"high": 475.95,
+"low": 465.1
+},
+"RATNAVEER": {
+"price": 364.05,
+"high": 377.75,
+"low": 355.1
+},
+"RAYMOND": {
+"price": 1092.4,
+"high": 1134.6,
+"low": 1080.3
+},
+"REDINGTON": {
+"price": 327.15,
+"high": 353.35,
+"low": 321.2
+},
+"RISHABH": {
+"price": 621.5,
+"high": 648.0,
+"low": 613.55
+},
+"RML": {
+"price": 1261.5,
+"high": 1279.0,
+"low": 1250.1
+},
+"RPGLIFE": {
+"price": 2547.2,
+"high": 2580.0,
+"low": 2520.1
+},
+"RPTECH": {
+"price": 733.75,
+"high": 825.0,
+"low": 707.55
+},
+"RUBYMILLS": {
+"price": 476.35,
+"high": 483.8,
+"low": 474.5
+},
+"SAKAR": {
+"price": 976.45,
+"high": 1018.95,
+"low": 956.0
+},
+"SANATHAN": {
+"price": 555.0,
+"high": 587.0,
+"low": 553.0
+},
+"SANSERA": {
+"price": 4310.2,
+"high": 4520.9,
+"low": 4232.0
+},
+"SAREGAMA": {
+"price": 619.4,
+"high": 640.0,
+"low": 615.1
+},
+"SBCL": {
+"price": 1001.4,
+"high": 1004.9,
+"low": 927.3
+},
+"SHILPAMED": {
+"price": 935.4,
+"high": 969.8,
+"low": 901.85
+},
+"SHYAMMETL": {
+"price": 1295.0,
+"high": 1298.0,
+"low": 1247.0
+},
+"SONACOMS": {
+"price": 899.45,
+"high": 910.0,
+"low": 888.2
+},
+"SOTL": {
+"price": 681.0,
+"high": 683.0,
+"low": 655.0
+},
+"SPECTRUM": {
+"price": 4458.0,
+"high": 4458.0,
+"low": 4150.1
+},
+"SPORTKING": {
+"price": 192.6,
+"high": 195.02,
+"low": 188.88
+},
+"SSWL": {
+"price": 534.85,
+"high": 535.0,
+"low": 515.0
+},
+"STLTECH": {
+"price": 719.9,
+"high": 719.9,
+"low": 719.9
+},
+"SWANDEF": {
+"price": 2765.0,
+"high": 2799.0,
+"low": 2712.0
+},
+"TBZ": {
+"price": 599.95,
+"high": 614.0,
+"low": 578.0
+},
+"TMB": {
+"price": 826.25,
+"high": 826.5,
+"low": 807.05
+},
+"UNIPARTS": {
+"price": 703.15,
+"high": 714.75,
+"low": 681.1
+},
+"UNIVASTU": {
+"price": 143.9,
+"high": 143.9,
+"low": 138.2
+},
+"VADILALIND": {
+"price": 7134.5,
+"high": 7145.0,
+"low": 6946.5
+},
+"VIJAYA": {
+"price": 1468.0,
+"high": 1478.0,
+"low": 1424.0
+},
+"VSSL": {
+"price": 362.3,
+"high": 364.35,
+"low": 350.5
+},
+"WELENT": {
+"price": 680.75,
+"high": 741.9,
+"low": 678.2
+},
+"WELSPUNLIV": {
+"price": 240.8,
+"high": 257.18,
+"low": 239.88
+},
+"WHEELS": {
+"price": 2306.2,
+"high": 2400.0,
+"low": 2223.0
+},
+"WSTCSTPAPR": {
+"price": 753.75,
+"high": 825.0,
+"low": 719.45
+},
+"YASHO": {
+"price": 3469.0,
+"high": 3480.0,
+"low": 3240.6
+},
+"ZIMLAB": {
+"price": 133.14,
+"high": 135.63,
+"low": 131.66
+},
+"ZYDUSLIFE": {
+"price": 1198.0,
+"high": 1207.5,
+"low": 1190.0
+}
+}
+}
