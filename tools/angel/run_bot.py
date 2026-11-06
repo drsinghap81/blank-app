@@ -18,6 +18,7 @@ Secrets : tools/angel/.env        (copy .env.example)  — never commit or share
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
 import time
@@ -34,12 +35,13 @@ import json                                   # noqa: E402
 
 import tb_live as tl                          # noqa: E402
 from angel_broker import AngelBroker          # noqa: E402
-from notify import Telegram                   # noqa: E402
+from notify import AppChannel, Telegram       # noqa: E402
 
 IST = ZoneInfo("Asia/Kolkata")
-STATE_DIR = os.path.join(HERE, "state")
+STATE_DIR = os.environ.get("TB_STATE_DIR") or os.path.join(HERE, "state")
 STATE = os.path.join(STATE_DIR, "state.json")
 HIST = os.path.join(STATE_DIR, "history.csv")
+os.makedirs(STATE_DIR, exist_ok=True)
 LOGF = os.path.join(STATE_DIR, f"log_{datetime.now(ZoneInfo('Asia/Kolkata')).date()}.txt")
 
 
@@ -62,7 +64,7 @@ CLOUD_DEFAULTS = {
 
 
 def load_env(cfg=None):
-    env = dict(os.environ)
+    env = {k: re.sub(r"\s+#.*$", "", v).strip() for k, v in os.environ.items()}   # systemd keeps inline comments
     p = os.path.join(HERE, ".env")
     if os.path.exists(p):
         for line in open(p, encoding="utf-8"):
@@ -82,10 +84,47 @@ def load_env(cfg=None):
 def load_cfg():
     cfg = dict(tl.DEFAULT_CFG)
     cfg.update(CLOUD_DEFAULTS)
-    p = os.path.join(HERE, "config.json")
+    p = os.environ.get("TB_CONFIG") or os.path.join(HERE, "config.json")
     if os.path.exists(p):
         cfg.update(json.load(open(p)))
+    m = os.path.join(STATE_DIR, "mode.json")          # Dry run / Live switch set from the Trend Desk app
+    if os.path.exists(m):
+        try:
+            cfg["dry_run"] = not bool(json.load(open(m)).get("live"))
+        except Exception:  # noqa: BLE001
+            cfg["dry_run"] = True
     return cfg
+
+
+def app_status(tg, st, cfg, plan=None, running=True, q=None, note=""):
+    if not hasattr(tg, "status"):
+        return
+    tg.status(dict(running=running, mode="LIVE" if not cfg.get("dry_run", True) else "DRY RUN", lots=st.lots or cfg["lots"],
+                   pos=st.pos, qty=st.qty, contract=st.contract, entry=st.entry, entry_date=st.entry_date,
+                   plan=tl.describe_plan(plan, st, cfg) if plan else None,
+                   buy_lvl=(plan or {}).get("buy_lvl"), sell_lvl=(plan or {}).get("sell_lvl"), stop=(plan or {}).get("prot"),
+                   ltp=(q or {}).get("ltp"), high=(q or {}).get("high"), low=(q or {}).get("low"), note=note,
+                   trades=st.trades[-8:]))
+
+
+def ask_levels(tg, st, cfg, plan, when="today"):
+    """put the approvals for a plan in front of the user (app mode): one per LEVEL, valid until that level is used."""
+    keys = []
+    if st.pos == 0:
+        if plan.get("buy_lvl"):
+            k = f"BUY:{plan['buy_lvl']:.2f}"; keys.append(k)
+            tg.ask(k, f"BUY {st.lots or cfg['lots']} lot(s) {cfg['symbol']} FUT if it trades above {plan['buy_lvl']:,.2f} ({when})")
+        if plan.get("sell_lvl"):
+            k = f"SELL:{plan['sell_lvl']:.2f}"; keys.append(k)
+            tg.ask(k, f"SELL {st.lots or cfg['lots']} lot(s) {cfg['symbol']} FUT if it trades below {plan['sell_lvl']:,.2f} ({when})")
+    elif plan.get("prot_is_sys"):
+        side = "SELL" if st.pos > 0 else "BUY"
+        k = f"{side}:{plan['prot']:.2f}:REV"; keys.append(k)
+        tg.ask(k, f"At the system stop {plan['prot']:,.2f}: REVERSE — {side} {2 * (st.lots or cfg['lots'])} lots in one go "
+                  f"(exit + new {'short' if side == 'SELL' else 'long'}). Skip = exit only. ({when})")
+    if hasattr(tg, "prune"):
+        tg.prune(set(keys))
+    return keys
 
 
 def now():
@@ -206,7 +245,11 @@ def main():
     cfg = load_cfg(); env = load_env(cfg)
     if cfg.get("dry_run", True):          # dry-run keeps its own book so a pretend trade never leaks into live
         STATE = os.path.join(STATE_DIR, "state_dry.json")
-    tg = Telegram(env.get("TELEGRAM_BOT_TOKEN"), env.get("TELEGRAM_CHAT_ID"), log)
+    if (env.get("TB_CHANNEL") or cfg.get("channel")) == "app":
+        tg = AppChannel(os.path.join(STATE_DIR, "app"), log)
+        cfg["morning_button"] = False          # in the app, each LEVEL is approved instead of a morning Start
+    else:
+        tg = Telegram(env.get("TELEGRAM_BOT_TOKEN"), env.get("TELEGRAM_CHAT_ID"), log)
     today = now().date()
     if today.weekday() >= 5 and "--check" not in args:
         log("weekend — nothing to do"); return
@@ -241,11 +284,16 @@ def main():
             return
         day = tl.TradingDay(today, hist, st, cfg, br, tg, tg, log=log, state_path=STATE)
         if "--check" in args:
-            print(tl.describe_plan(day.plan, st, cfg)); return
+            print(tl.describe_plan(day.plan, st, cfg))
+            ask_levels(tg, st, cfg, day.plan, "next session"); app_status(tg, st, cfg, day.plan, running=False, note="checked")
+            return
         if now() >= at("15:30"):
             log("market already closed"); return
+        app_status(tg, st, cfg, day.plan, note="waiting for 08:55 IST")
         wait_until(at("08:55"), tg)
         day.start()
+        ask_levels(tg, st, cfg, day.plan, "today")
+        app_status(tg, st, cfg, day.plan, note="waiting for the open")
         mode = "DRY RUN (no real orders)" if br.dry else "LIVE"
         if manage_only:
             day.done_for_day = True
@@ -305,6 +353,8 @@ def main():
                 tg.send(f"💓 Running. BN {last_q['ltp']:,.0f} · "
                         + (f"{'LONG' if st.pos > 0 else 'SHORT'} {abs(st.qty)} · P&L today ₹{pl:,.0f}" if st.pos else f"flat · P&L today ₹{pl:,.0f}"))
             day.tick(last_q)
+            if hasattr(tg, "status") and int(time.time()) % 10 < cfg["poll_seconds"]:
+                app_status(tg, st, cfg, day.plan, q=last_q, note="stopped: no new entries" if stopped else "")
             if now() >= roll_t:
                 day.roll()
             if now() >= close_t:
@@ -325,6 +375,8 @@ def main():
         own.sort_index().to_csv(HIST, index_label="Date")
         tomorrow = tl.make_plan(new_hist, st, cfg)
         tg.send(f"Day closed. BN fut close {bar['Close']:,.2f}.\n\n" + tl.describe_plan(tomorrow, st, cfg))
+        ask_levels(tg, st, cfg, tomorrow, "next session")
+        app_status(tg, st, cfg, tomorrow, running=False, note="day closed")
         log("done")
     except Exception:  # noqa: BLE001
         err = traceback.format_exc()

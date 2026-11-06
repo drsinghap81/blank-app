@@ -664,6 +664,94 @@ def basket(body: Basket, _=Depends(auth)):
     return dict(mode="LIVE" if is_live() else "DRY RUN", results=out)
 
 
+# ------------------------------------------------------------------ Top Bottom bot (tools/angel/run_bot.py, TB_CHANNEL=app)
+TB_DIR = ENV.get("TB_STATE_DIR") or os.path.join(DATA, "tb")
+TB_APP = os.path.join(TB_DIR, "app")
+
+
+def _tbr(name, default):
+    try:
+        return json.load(open(os.path.join(TB_APP, name)))
+    except Exception:  # noqa: BLE001
+        return default
+
+
+def _tbw(name, obj):
+    os.makedirs(TB_APP, exist_ok=True)
+    tmp = os.path.join(TB_APP, name + ".tmp"); json.dump(obj, open(tmp, "w")); os.replace(tmp, os.path.join(TB_APP, name))
+
+
+def tb_live():
+    try:
+        return bool(json.load(open(os.path.join(TB_DIR, "mode.json"))).get("live"))
+    except Exception:  # noqa: BLE001
+        return False
+
+
+@app.get("/api/tb")
+def tb_state(_=Depends(auth)):
+    msgs = []
+    try:
+        with open(os.path.join(TB_APP, "messages.jsonl"), encoding="utf-8") as f:
+            msgs = [json.loads(x) for x in f.readlines()[-25:]]
+    except Exception:  # noqa: BLE001
+        pass
+    P = _tbr("pending.json", {}); A = _tbr("answers.json", {})
+    return dict(mode="LIVE" if tb_live() else "DRY RUN", status=_tbr("status.json", {}),
+                pending=[dict(key=k, **v) for k, v in P.items()], answers=A, messages=msgs[::-1])
+
+
+class TBAnswer(BaseModel):
+    key: str
+    value: bool | str
+    confirm: str = ""
+
+
+@app.post("/api/tb/answer")
+def tb_answer(body: TBAnswer, _=Depends(auth)):
+    P = _tbr("pending.json", {})
+    if body.key not in P:
+        raise HTTPException(404, "that approval is no longer pending")
+    if body.value is True and tb_live() and body.confirm.strip().upper() != "YES":
+        raise HTTPException(400, 'type YES to approve a live trade')
+    A = _tbr("answers.json", {}); A[body.key] = body.value; _tbw("answers.json", A)
+    if not P[body.key].get("options"):
+        P.pop(body.key); _tbw("pending.json", P)
+    log("tb_answer", key=body.key, value=body.value)
+    return dict(ok=True)
+
+
+class TBCmd(BaseModel):
+    cmd: str
+
+
+@app.post("/api/tb/cmd")
+def tb_cmd(body: TBCmd, _=Depends(auth)):
+    if body.cmd not in ("/status", "/stop", "/flat"):
+        raise HTTPException(400, "unknown command")
+    C = _tbr("commands.json", []); C.append(body.cmd); _tbw("commands.json", C)
+    log("tb_cmd", cmd=body.cmd)
+    return dict(ok=True, note="the bot picks this up within a few seconds while it runs (09:00-15:30 IST)")
+
+
+@app.post("/api/tb/mode")
+def tb_mode(body: Mode, request: Request, _=Depends(auth)):
+    """same safety as the equity switch: live needs the app password + LIVE; dry run is one tap. Applies from the bot's next start."""
+    if body.live:
+        ip = request.client.host if request.client else "?"
+        n, t0 = FAILS.get(ip, (0, 0))
+        if n >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if body.confirm.strip().upper() != "LIVE":
+            raise HTTPException(400, "type LIVE to confirm")
+        if not check_pw(body.password):
+            FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
+    os.makedirs(TB_DIR, exist_ok=True)
+    json.dump(dict(live=bool(body.live), at=time.time()), open(os.path.join(TB_DIR, "mode.json"), "w"))
+    log("tb_mode", live=body.live)
+    return dict(ok=True, mode="LIVE" if body.live else "DRY RUN")
+
+
 # ------------------------------------------------------------------ background: fills + stops every 2 minutes in market hours
 def _loop():
     while True:

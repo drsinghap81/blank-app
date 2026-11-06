@@ -232,18 +232,19 @@ class TradingDay:
         if not st.lots:
             st.lots = c["lots"]
         self.say(describe_plan(p, st, c))
-        d = str(self.today)
+        # approval keys name the LEVEL, not the day: an approval given the evening before (or on an earlier day for the
+        # same, still unused level) stays valid until that level is used
         if st.pos == 0:
             if p["buy_lvl"]:
-                self.keys["BUY"] = f"{d}:BUY"
+                self.keys["BUY"] = f"BUY:{p['buy_lvl']:.2f}"
                 if c["confirm_entries"]:
                     self.ap.ask(self.keys["BUY"], f"Approve BUY {st.lots} lots {c['symbol']} FUT above {p['buy_lvl']:,.2f} today?")
             if p["sell_lvl"]:
-                self.keys["SELL"] = f"{d}:SELL"
+                self.keys["SELL"] = f"SELL:{p['sell_lvl']:.2f}"
                 if c["confirm_entries"]:
                     self.ap.ask(self.keys["SELL"], f"Approve SELL {st.lots} lots {c['symbol']} FUT below {p['sell_lvl']:,.2f} today?")
         elif p["prot_is_sys"]:
-            self.keys["REV"] = f"{d}:REV"
+            self.keys["REV"] = f"{'SELL' if st.pos > 0 else 'BUY'}:{p['prot']:.2f}:REV"
             if c["confirm_reversals"]:
                 side = "SELL" if st.pos > 0 else "BUY"
                 self.ap.ask(self.keys["REV"], f"If the stop {p['prot']:,.2f} hits, also REVERSE ({side} {st.lots} lots)? "

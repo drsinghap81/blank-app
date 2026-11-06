@@ -76,13 +76,24 @@ class AngelEquity:
             raise ValueError(f"{symbol}: not found in Angel's NSE equity list")
         return ts, self.tokens[ts]
 
+    TOKEN_ERR = ("Invalid Token", "AG8001", "AG8002", "AG8003", "Token Expired", "token is invalid")
+
     def _call(self, fn, *a, tries=3):
-        """Angel sometimes answers a burst of calls with an empty / non-JSON body (rate limit): retry briefly."""
-        for k in range(tries):
+        """Angel sometimes answers a burst of calls with an empty / non-JSON body (rate limit): retry briefly.
+        If the session was replaced (e.g. the Top Bottom bot logged in with the same key), log in again once."""
+        name = getattr(fn, "__name__", None)
+        relogged = False
+        for k in range(tries + 1):
             try:
-                return fn(*a)
+                r = fn(*a)
+                if isinstance(r, dict) and r.get("status") is False and any(w in str(r.get("message")) + str(r.get("errorcode")) for w in self.TOKEN_ERR) \
+                        and not relogged and name:
+                    self.api = None; relogged = True; fn = getattr(self._session(), name); continue
+                return r
             except Exception as e:  # noqa: BLE001
-                if k == tries - 1 or not any(w in str(e) for w in ("JSON", "Expecting value", "parse", "rate", "Access denied")):
+                if any(w in str(e) for w in self.TOKEN_ERR) and not relogged and name:
+                    self.api = None; relogged = True; fn = getattr(self._session(), name); continue
+                if k >= tries - 1 or not any(w in str(e) for w in ("JSON", "Expecting value", "parse", "rate", "Access denied")):
                     raise
                 time.sleep(0.8 * (k + 1))
 

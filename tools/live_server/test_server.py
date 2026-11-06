@@ -176,3 +176,21 @@ def test_angel_reject_reason(tmp_path):
     assert j.status_code == 502 and "cautionary" in j.json()["detail"]
     j = c.post("/api/basket", headers=h, json={"items": [{"id": rs[1]["id"], "qty": rs[1]["qty"]}], "confirm": "BASKET 1"}).json()
     assert not j["results"][0]["ok"] and "cautionary" in j["results"][0]["error"]
+
+
+def test_tb_approvals(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    sys.path.insert(0, os.path.join(HERE, "..", "angel")); from notify import AppChannel
+    ch = AppChannel(A.TB_APP)
+    ch.ask("BUY:55123.00", "BUY 1 lot above 55,123.00")
+    j = c.get("/api/tb", headers=h).json(); assert j["mode"] == "DRY RUN" and j["pending"][0]["key"] == "BUY:55123.00"
+    assert ch.get("BUY:55123.00") is None
+    assert c.post("/api/tb/answer", headers=h, json={"key": "BUY:55123.00", "value": True}).json()["ok"]
+    assert ch.get("BUY:55123.00") is True and not c.get("/api/tb", headers=h).json()["pending"]
+    # live: approving needs YES
+    assert c.post("/api/tb/mode", headers=h, json={"live": True, "password": "pw", "confirm": "LIVE"}).json()["mode"] == "LIVE"
+    ch.ask("SELL:54000.00", "SELL 1 lot below 54,000.00")
+    assert c.post("/api/tb/answer", headers=h, json={"key": "SELL:54000.00", "value": True}).status_code == 400
+    assert c.post("/api/tb/answer", headers=h, json={"key": "SELL:54000.00", "value": True, "confirm": "yes"}).json()["ok"]
+    assert c.post("/api/tb/cmd", headers=h, json={"cmd": "/stop"}).json()["ok"] and ch.poll() == ["/stop"]

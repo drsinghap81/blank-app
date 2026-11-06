@@ -3,6 +3,7 @@ Only messages from your own TELEGRAM_CHAT_ID are obeyed."""
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 
@@ -118,3 +119,86 @@ class Telegram:
                 self.send(f"That isn't a {digits}-digit code — please send just the {digits} digits.")
             time.sleep(2)
         return None
+
+
+class AppChannel:
+    """Same interface as Telegram, but talks to the Trend Desk app through files that the live server
+    (tools/live_server/app.py, /api/tb/...) reads and writes:
+      messages.jsonl  bot -> app   (feed)
+      pending.json    bot -> app   (approvals / choices waiting for an answer)
+      answers.json    app -> bot   ({key: true | false | "value"})
+      commands.json   app -> bot   (["/status", "/stop", "/flat"])
+      status.json     bot -> app   (plan, position, last price)"""
+
+    def __init__(self, folder: str, log=print):
+        self.dir, self.log = folder, log
+        os.makedirs(folder, exist_ok=True)
+
+    on = True
+
+    def _p(self, name):
+        return os.path.join(self.dir, name)
+
+    def _read(self, name, default):
+        try:
+            with open(self._p(name), encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:  # noqa: BLE001
+            return default
+
+    def _write(self, name, obj):
+        tmp = self._p(name + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(obj, f)
+        os.replace(tmp, self._p(name))
+
+    def send(self, text, buttons=None):
+        with open(self._p("messages.jsonl"), "a", encoding="utf-8") as f:
+            f.write(json.dumps(dict(t=time.time(), text=text[:4000])) + "\n")
+
+    def ask(self, key, text, options=None):
+        P = self._read("pending.json", {})
+        if key not in P and self.get(key) is None:
+            P[key] = dict(text=text, t=time.time(), options=options)
+            self._write("pending.json", P)
+
+    def get(self, key):
+        return self._read("answers.json", {}).get(key)
+
+    def used(self, key):
+        """forget an answer once its level has been traded / replaced."""
+        A = self._read("answers.json", {}); A.pop(key, None); self._write("answers.json", A)
+        P = self._read("pending.json", {}); P.pop(key, None); self._write("pending.json", P)
+
+    def poll(self):
+        cmds = self._read("commands.json", [])
+        if cmds:
+            self._write("commands.json", [])
+        return cmds
+
+    def keyboard(self, text):
+        self.send(text)
+
+    def choose(self, key, text, options, deadline, extra_poll=None):
+        self.ask(key, text, options=[[lbl, val] for lbl, val in options])
+        while time.time() < deadline:
+            v = self.get(key)
+            if v is not None:
+                self.used(key); return v
+            time.sleep(2)
+        P = self._read("pending.json", {}); P.pop(key, None); self._write("pending.json", P)
+        return None
+
+    def wait_code(self, prompt, deadline, digits=6):
+        self.send(prompt + " (code login isn't supported in app mode; use login_mode onetap)")
+        return None
+
+    def status(self, d: dict):
+        self._write("status.json", dict(d, t=time.time()))
+
+    def prune(self, keep_keys):
+        """drop pending approvals for levels that no longer exist (keep_keys = today's keys)."""
+        P = self._read("pending.json", {})
+        P2 = {k: v for k, v in P.items() if k in keep_keys or v.get("options")}
+        if P2 != P:
+            self._write("pending.json", P2)
