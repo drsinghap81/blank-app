@@ -1077,12 +1077,12 @@ async function loadBottoms() {
 function supRows() {
   const P = state.sup; if (!P) return [];
   const f = state.supF || 'all'; const g = state.supG || 'all'; const q = (state.supQ || '').toLowerCase();
-  return (P.rows || []).filter((r) => (f === 'all' || r.status === f) && (g === 'all' || (g === 'gann' ? r.gann_match : r.level_kind === 'breakout retest'))
+  return (P.rows || []).filter((r) => (f === 'all' || r.status === f) && (g === 'all' || (g === 'gann' ? r.sq9_match : r.level_kind === 'breakout retest'))
     && (!q || r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)));
 }
 function supItem(r, i) {
   const st = r.status === 'touched' ? `<span class="chip new">At support ${r.days_ago === 0 ? 'today' : r.days_ago + 'd ago'}</span>` : `<span class="chip open">${fmt(r.above_pct, 1)}% above</span>`;
-  const chip = `${st}<span class="chip">${r.level_kind === 'breakout retest' ? 'Breakout retest' : 'Old swing low'}</span>${r.gann_match ? `<span class="chip open">Gann ${r.gann_deg}°</span>` : ''}<span class="chip">stop ${fmt(r.risk_pct, 0)}% below</span>${r.room_r != null ? `<span class="chip">room ${fmt(r.room_r, 1)}R</span>` : '<span class="chip">no resistance above</span>'}`;
+  const chip = `${st}<span class="chip">${r.level_kind === 'breakout retest' ? 'Breakout retest' : 'Old swing low'}</span>${r.sq9_match ? `<span class="chip open">On Sq9 ${fmt(r.sq9, 0, 'en-IN')}</span>` : ''}<span class="chip">stop ${fmt(r.risk_pct, 0)}% below</span>${r.room_r != null ? `<span class="chip">room ${fmt(r.room_r, 1)}R</span>` : '<span class="chip">no resistance above</span>'}`;
   return `<li class="row ${r.status === 'touched' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">level ${fmt(r.level, 2, 'en-IN')}</span></div></li>`;
 }
@@ -1093,19 +1093,19 @@ async function loadSupport() {
   const P = state.sup;
   if (!P) { el.innerHTML = botTabs('sup') + '<p class="empty">The support list appears after the next evening scan (about 21:10 IST).</p>'; botTabsWire(el); $('#asof').textContent = ''; return; }
   $('#asof').textContent = `Market data: India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
-  const R = P.rows || []; const nt = R.filter((r) => r.status === 'touched').length; const ng = R.filter((r) => r.gann_match).length;
+  const R = P.rows || []; const nt = R.filter((r) => r.status === 'touched').length; const ng = R.filter((r) => r.sq9_match).length;
   const nr = R.filter((r) => r.level_kind === 'breakout retest').length; const n3 = R.filter((r) => r.room_r != null && r.room_r >= 3).length;
   const seg = (id, cur, opts) => `<div class="seg" id="${id}">${opts.map(([k, n]) => `<button data-k="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
   el.innerHTML = `${botTabs('sup')}<section class="summary">
       <div class="stat new"><b>${nt}</b><span>first touch of an old level (last 5 days)</span></div>
       <div class="stat"><b>${R.length - nt}</b><span>0–5% above a level, not yet touched</span></div>
-      <div class="stat"><b>${ng}</b><span>level within 0.5% of a Gann level</span></div>
+      <div class="stat"><b>${ng}</b><span>support on a Square-of-9 number</span></div>
       <div class="stat"><b>${n3}</b><span>with 1:3 room to the next resistance</span></div></section>
-    <div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> 2016–26 backtest (3R target, stop 1 ATR below the level): breakout retests +0.20R a trade vs +0.09R for a random uptrend stock; old swing lows no edge. Gann confluence and 1:3 room did not help.</div>
+    <div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> 2016–26 backtest (3R target, stop 1 ATR below the level): breakout retests +0.20R a trade vs +0.09R for a random uptrend stock; old swing lows no edge. Square-of-9 numbers and 1:3 room did not help.</div>
     <div class="card">
       ${seg('supf', state.supF || 'all', [['all', `All ${R.length}`], ['touched', `At support ${nt}`], ['near', `Approaching ${R.length - nt}`]])}
-      ${seg('supg', state.supG || 'all', [['all', 'All levels'], ['retest', `Breakout retests ${nr}`], ['gann', `Gann match ${ng}`]])}
-      <details class="info"><summary>How levels are found</summary><p>Uptrend stocks only: close above the 50-day average, 50-day above the 200-day, 200-day rising over 20 days. Levels are old swings on the daily closing line (6%+ moves, last 3 years): old swing lows, and old swing highs the stock broke out of. A level counts once price has moved 8%+ above it. "At support" = the first return since then: the day's low within 3% of the level and the close at or above it, in the last 5 sessions, with the stock still within 8% of the level. "Approaching" = close 0–5% above a level not yet revisited. Stop = level − 1 ATR(14). Room = distance to the nearest swing high or 60-day high above, in R. Gann match = the level is within 0.5% of a Square-of-9 level (√swing ± k×0.25 for k = 1–8, i.e. 45°–360°) from the last 4 swings. Liquid stocks (₹2 cr+ a day, price ₹100+). Updated nightly.</p></details>
+      ${seg('supg', state.supG || 'all', [['all', 'All levels'], ['retest', `Breakout retests ${nr}`], ['gann', `On Square of 9 ${ng}`]])}
+      <details class="info"><summary>How levels are found</summary><p>Uptrend stocks only: close above the 50-day average, 50-day above the 200-day, 200-day rising over 20 days. Levels are old swings on the daily closing line (6%+ moves, last 3 years): old swing lows, and old swing highs the stock broke out of. A level counts once price has moved 8%+ above it. "At support" = the first return since then: the day's low within 3% of the level and the close at or above it, in the last 5 sessions, with the stock still within 8% of the level. "Approaching" = close 0–5% above a level not yet revisited. Stop = level − 1 ATR(14). Room = distance to the nearest swing high or 60-day high above, in R. Square of 9 = the numbers on the Gann wheel's cardinal and diagonal crosses (ring k: (2k+1)² − m·k for m = 0–7, e.g. 11 15 19 23 cardinal, 13 17 21 25 diagonal). "On Square of 9" = the support is within 15% of the gap between two wheel numbers (the gap is about 2–3% of the price at ₹1,000–2,000). Liquid stocks (₹2 cr+ a day, price ₹100+). Updated nightly.</p></details>
       <label class="search"><input id="supq" type="search" placeholder="Search symbol or company" value="${esc(state.supQ || '')}" autocomplete="off"></label>
       <ul class="list flat" id="suplist"></ul></div>`;
   const list = () => {
@@ -1122,14 +1122,16 @@ async function loadSupport() {
 function supSelect(r) {
   const st = r.status === 'touched' ? `<div class="status open">First return to the ${r.level_kind === 'breakout retest' ? 'old breakout level' : 'old swing low'} ${fmt(r.level, 2, AL())} on ${day(r.touch_date)} (low within 3%, close held). Now ${fmt(r.above_pct, 1)}% above it.</div>`
     : `<div class="status info">${fmt(r.above_pct, 1)}% above the ${r.level_kind === 'breakout retest' ? 'old breakout level' : 'old swing low'} ${fmt(r.level, 2, AL())}, not yet revisited.</div>`;
-  const g = r.gann != null ? `${fmt(r.gann, 2, AL())} — ${r.gann_deg}° ${r.gann_dir === 'up' ? 'above' : 'below'} the swing ${r.gann_from[2] === 'L' ? 'low' : 'high'} ${fmt(r.gann_from[1], 2, AL())} (${day(r.gann_from[0])}); ${fmt(Math.abs(r.gann_dist_pct), 2)}% from the level${r.gann_match ? ' · match' : ''}` : '–';
+  const sqn = (z) => `${fmt(z[0], 0, AL())} (${z[1]})`;
+  const g = r.sq9 != null ? `${fmt(r.sq9, 0, AL())} on the ${r.sq9_cross} cross, ${fmt(Math.abs(r.sq9_dist_pct), 2)}% ${r.sq9_dist_pct >= 0 ? 'below' : 'above'} the support${r.sq9_match ? ' · on the level' : ''} (wheel numbers here are ~${fmt(r.sq9_gap_pct, 1)}% apart)` : '–';
   const f = [['Level', `${fmt(r.level, 2, AL())} (${r.level_kind}, swing of ${day(r.level_date)})`], ['Stop (level − 1 ATR)', `${fmt(r.stop, 2, AL())} (${fmt(r.risk_pct, 1)}% below the close)`],
     ['Next resistance', r.resistance != null ? `${fmt(r.resistance, 2, AL())} · room ${fmt(r.room_r, 1)}R${r.room_r >= 3 ? ' (1:3 fits)' : ''}` : 'none above (blue sky)'],
-    ['3R target from the close', fmt(r.close + 3 * (r.close - r.stop), 2, AL())], ['Nearest Gann Square-of-9 level', g]];
+    ['3R target from the close', fmt(r.close + 3 * (r.close - r.stop), 2, AL())], ['Square of 9 at the support', g],
+    ['Square of 9 below the support', (r.sq9_below || []).map(sqn).join(' · ') || '–'], ['Square of 9 above the price', (r.sq9_above || []).map(sqn).join(' · ') || '–']];
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, AL())}</b></div></div>
-    ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: breakout retests +0.20R a trade vs +0.09R random; old swing lows, Gann confluence and 1:3 room added nothing. Not part of your tested systems.</div>
+    ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: breakout retests +0.20R a trade vs +0.09R random; old swing lows, Square-of-9 numbers and 1:3 room added nothing. Not part of your tested systems.</div>
     <div class="chart" id="supc"></div>
-    <p class="muted" style="margin:4px 16px">Daily candles · green = support level · purple dashed = Gann level · red = stop · gold = next resistance · blue / grey = 50 / 200-day average.</p>
+    <p class="muted" style="margin:4px 16px">Daily candles · green = support level · purple dashed = Square-of-9 numbers (nearest to the support, next below it, next two above the price) · red = stop · gold = next resistance · blue / grey = 50 / 200-day average.</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`);
   drawSup(r);
 }
@@ -1141,7 +1143,8 @@ async function drawSup(r) {
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
   const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath');
   s.createPriceLine({ price: r.level, color: '#0A7A55', lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'support' });
-  if (r.gann != null) s.createPriceLine({ price: r.gann, color: '#7C5CFC', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: `Gann ${r.gann_deg}°` });
+  [[r.sq9, r.sq9_cross]].concat(r.sq9_below || [], r.sq9_above || []).filter((z) => z && z[0] != null)
+    .forEach((z) => s.createPriceLine({ price: z[0], color: '#7C5CFC', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: `Sq9 ${z[1] === 'cardinal' ? 'card.' : 'diag.'}` }));
   s.createPriceLine({ price: r.stop, color: C.fall || '#C62828', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'stop' });
   if (r.resistance != null) s.createPriceLine({ price: r.resistance, color: C.saffron, lineWidth: 1, lineStyle: 0, axisLabelVisible: true, title: 'resistance' });
   const ma = (k, col) => { const l = ch.addLineSeries({ color: col, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });

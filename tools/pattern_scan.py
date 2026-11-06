@@ -109,18 +109,14 @@ def scan(x, sym, name, kind="stock"):
     return best
 
 
-def gann_near(level, piv, t):
-    """nearest Gann Square-of-9 level (sqrt(P) +- k*0.25, k=1..8 = 45..360 degrees) from the last 4 swings before t."""
-    best = None
-    for kind, i, pr, ci in [q for q in piv if q[3] <= t][-4:]:
-        sq = np.sqrt(pr)
-        for k in range(1, 9):
-            for sg in (1, -1):
-                g = (sq + sg * k * 0.25) ** 2
-                d = level / g - 1
-                if best is None or abs(d) < abs(best["dist_pct"]) / 100:
-                    best = dict(level=round(float(g), 2), deg=k * 45, dir="up" if sg > 0 else "down", from_kind=kind, from_price=round(float(pr), 2), from_i=i, dist_pct=float(d * 100))
-    return best
+def sq9_levels(price, span=2):
+    """Gann Square-of-9 wheel numbers around a price: ring k holds (2k+1)^2 - m*k, m = 0..7 on the crosses
+    (m odd = cardinal cross, m even = diagonal / ordinal cross; e.g. ring 2: 11 15 19 23 cardinal, 13 17 21 25 diagonal)."""
+    k0 = max(1, int(np.ceil((np.sqrt(price) - 1) / 2))); out = []
+    for k in range(max(1, k0 - span), k0 + span + 1):
+        for m in range(8):
+            out.append(((2 * k + 1) ** 2 - m * k, "cardinal" if m % 2 else "diagonal"))
+    return sorted(out)
 
 
 def support(x, sym, name):
@@ -163,15 +159,17 @@ def support(x, sym, name):
     if rh > E * 1.01:
         res.append(rh)
     nr = float(min(res)) if res else None
-    g = gann_near(lvl, piv, t)
+    W = sq9_levels(lvl, 3); g = min(W, key=lambda z: abs(lvl / z[0] - 1))
+    gap = float(np.median(np.diff([z[0] for z in W])) / lvl * 100)
+    up = [z for z in sq9_levels(E, 3) if z[0] > E][:2]; dn = [z for z in W if z[0] < min(lvl, g[0])][-1:]
     return dict(symbol=sym, name=name, status=status, touch_date=str(dts[t].date()) if status == "touched" else None,
                 days_ago=int(n - 1 - t) if status == "touched" else None, level=round(lvl, 2),
                 level_kind="breakout retest" if L["kind"] == "H" else "old swing low", level_date=str(dts[L["i"]].date()),
                 close=E, above_pct=float((E / lvl - 1) * 100), stop=round(stop, 2), risk_pct=float((1 - stop / E) * 100),
                 resistance=round(nr, 2) if nr else None, room_r=float((nr - E) / (E - stop)) if nr and E > stop else None,
-                gann=g["level"] if g else None, gann_deg=g["deg"] if g else None, gann_dir=g["dir"] if g else None,
-                gann_from=[str(dts[g["from_i"]].date()), g["from_price"], g["from_kind"]] if g else None,
-                gann_dist_pct=g["dist_pct"] if g else None, gann_match=bool(g and abs(g["dist_pct"]) <= 0.5))
+                sq9=g[0], sq9_cross=g[1], sq9_dist_pct=float((lvl / g[0] - 1) * 100), sq9_gap_pct=gap,
+                sq9_below=[[z[0], z[1]] for z in dn], sq9_above=[[z[0], z[1]] for z in up],
+                sq9_match=bool(abs(lvl / g[0] - 1) * 100 <= 0.15 * gap))
 
 
 def rsi(c, n=14):
@@ -260,17 +258,17 @@ def main():
                rows=rows)
     json.dump(out, open(f"{OUT}/patterns.json", "w"), indent=0)
     print("patterns", len(rows), {s: sum(r["status"] == s for r in rows) for s in order})
-    srows.sort(key=lambda r: (r["status"] != "touched", not r["gann_match"], r["days_ago"] if r["status"] == "touched" else r["above_pct"]))
+    srows.sort(key=lambda r: (r["status"] != "touched", not r["sq9_match"], r["days_ago"] if r["status"] == "touched" else r["above_pct"]))
     json.dump(dict(generated=out["generated"], asof=out["asof"], market="NSE",
                    rules="Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) "
                          "that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). "
-                         "'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Gann match = level within 0.5% of a "
-                         "Square-of-9 level (sqrt(swing) +- k*0.25, k = 1..8) from the last 4 swings.",
+                         "'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: numbers on the wheel's cardinal and "
+                         "diagonal crosses, ring k = (2k+1)^2 - m*k (m = 0..7); 'on Sq9' = the level is within 15% of the gap between two wheel numbers.",
                    backtest="2016-26, 16,908 first touches, 3R target vs stop (1 ATR below the level): breakout retests +0.20R per trade, "
                             "old swing lows +0.10R, random uptrend stock the same day +0.09R. Trades with 1:3 room to the next resistance: no better. "
-                            "Near a Gann level: no better (+0.20R vs +0.21R). Gann levels held as often as arbitrary levels. Watch only.",
+                            "On a Square-of-9 number: no better (breakout retests +0.22R on a number vs +0.19R midway; swing lows +0.09R vs +0.17R). Watch only.",
                    rows=srows), open(f"{OUT}/support.json", "w"), indent=0)
-    print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["gann_match"] for r in srows), "gann match")
+    print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["sq9_match"] for r in srows), "on a Square-of-9 number")
 
 
 if __name__ == "__main__":
