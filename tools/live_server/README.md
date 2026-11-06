@@ -8,7 +8,7 @@ The phone app's **Live** tab shows the top 8–10 India trades for the next sess
 The server holds the broker keys. The repo and the phone app never do.
 
 **Safety**
-- **Dry run by default.** `LIVE_ORDERS=0` means Send shows the exact Angel order and sends nothing. Turn it on yourself in `.env` only when you're ready.
+- **Dry run by default.** Send shows the exact Angel order and sends nothing. The **Dry run / Live orders** switch on the Angel card changes this: Live needs your app password again plus the word LIVE typed; Dry run is one tap. The mode is stored on the server (`var/mode.json`, overriding `LIVE_ORDERS` in `.env`); set `ALLOW_APP_LIVE=0` in `.env` to stop the app from turning live on.
 - **Only today's plan rows.** There are no free-form orders.
 - **Size limits.** Quantity can't exceed the plan size, and value is capped at `MAX_ORDER_VALUE`, 20% of capital and your cash. There are also `MAX_ORDERS_DAY` orders per day, and each row can be sent once a day.
 - **Sells only for exits** on stocks you hold, up to the quantity you hold.
@@ -66,9 +66,9 @@ Answers marked hidden show nothing while you type. Leave an answer blank to keep
 
 ## 5. Dry-run week, then go live
 - **First:** tap **Send** on a few trades and compare the order it shows (variety, price, quantity) with what you'd place yourself.
-- **Going live:** set `LIVE_ORDERS=1` in `.env`, then run `sudo systemctl restart trenddesk`. The badge turns red: **LIVE ORDERS**.
+- **Going live:** on the Angel card, tap **Live orders**, type your app password and `LIVE`, then tap **Turn on live**. The badge turns red: **LIVE ORDERS**.
 - **Every order:** check it in the Angel app. An after-market (AMO) order shows as "AMO" until the open.
-- **To stop at any time:** set `LIVE_ORDERS=0` and restart.
+- **To stop at any time:** tap **Dry run**. "Log out" only signs the phone out; it doesn't change the server's mode.
 
 ## moomoo (optional, read-only)
 The Live list is India only (US/ASX backtests showed no edge). moomoo is only read, to show your account value and positions. To set it up:

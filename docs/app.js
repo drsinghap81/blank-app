@@ -124,7 +124,9 @@ async function loadLive() {
   const live = S && S.mode === 'LIVE';
   const head = S ? `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Angel One</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
       <div class="lv-kpis"><div><span>Capital</span><b>${money(S.capital, 'NSE')}</b></div><div><span>Cash</span><b>${money(S.cash, 'NSE')}</b></div><div><span>Free slots</span><b>${S.slots} of 10</b></div></div>
-      <p class="lv-sub">${live ? 'Send places a real order after you confirm.' : 'Dry run: Send shows exactly what would go to Angel; nothing is sent. Set LIVE_ORDERS=1 on the server to go live.'} <a href="#" id="lvout">Disconnect</a></p></div>`
+      <div class="lv-seg" role="group" aria-label="Order mode"><button id="lvdry" class="${live ? '' : 'on'}" aria-pressed="${!live}">Dry run</button><button id="lvlive" class="${live ? 'on live' : ''}" aria-pressed="${live}">Live orders</button></div>
+      <div id="lvarm" class="lv-form" hidden><input id="lvmpw" type="password" placeholder="App password" autocomplete="current-password"><input id="lvmcf" placeholder="Type LIVE" autocomplete="off" autocapitalize="characters"><button class="lv-btn sell" id="lvmgo">Turn on live</button></div>
+      <p class="lv-sub">${live ? '<b class="down">Live:</b> Send places a real Angel order after you type the quantity. Tap Dry run to stop at any time.' : '<b>Dry run:</b> Send only shows the exact order that would go to Angel; nothing is sent.'} <a href="#" id="lvout">Log out</a> (logs this phone out; the server keeps its mode)</p></div>`
     : `<div class="lv-card"><b>Connect your server</b><p class="lv-sub">${err ? `<span class="down">${esc(err)}</span> · ` : ''}Sizes below use your capital (${money(cap('NSE'), 'NSE')}) and ${riskForBudget(lvBudget()).toFixed(2)}% risk from your guard budget; holdings and cash are not checked and there is no Send button until the AWS server is connected.</p>
       <div class="lv-form"><input id="lvurl" type="url" placeholder="https://your-server.sslip.io" value="${esc(c.url || '')}" autocomplete="off"><input id="lvpw" type="password" placeholder="App password" autocomplete="current-password"><button class="lv-btn" id="lvgo">Connect</button></div></div>`;
   const pend = rows.filter((r) => !r.skip && r.qty > 0);
@@ -156,6 +158,14 @@ async function loadLive() {
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-w').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ ...P.watch[+a.dataset.w], kind: 'WATCH' }); }));
+  const dry = $('#lvdry'); if (dry) dry.addEventListener('click', async () => {
+    if (!live) return;
+    try { await lvApi('/api/mode', { method: 'POST', body: JSON.stringify({ live: false }) }); alertMsg('Dry run: nothing will be sent.', true); loadLive(); } catch (e) { alertMsg(e.message); }
+  });
+  const lvl = $('#lvlive'); if (lvl) lvl.addEventListener('click', () => { if (!live) { const a = $('#lvarm'); a.hidden = !a.hidden; if (!a.hidden) $('#lvmpw').focus(); } });
+  const mgo = $('#lvmgo'); if (mgo) mgo.addEventListener('click', async () => {
+    try { await lvApi('/api/mode', { method: 'POST', body: JSON.stringify({ live: true, password: $('#lvmpw').value, confirm: $('#lvmcf').value }) }); alertMsg('Live orders on: Send now places real Angel orders.', true); loadLive(); } catch (e) { alertMsg(e.message); }
+  });
   const out = $('#lvout'); if (out) out.addEventListener('click', (e) => { e.preventDefault(); lvSave({ token: null }); loadLive(); });
   el.querySelectorAll('.lv-btn[data-i]').forEach((b) => b.addEventListener('click', () => lvSend(rows[+b.dataset.i], 'BUY', b)));
   el.querySelectorAll('.lv-open[data-o]').forEach((b) => {

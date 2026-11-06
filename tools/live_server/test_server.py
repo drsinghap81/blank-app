@@ -74,3 +74,16 @@ def test_guard(tmp_path):
     P = c.get("/api/plan", headers={"Authorization": "Bearer " + tok}).json()
     assert all(r["skip"] for r in P["rows"]) and P["guard"]["status"] == "paused"
     os.environ.pop("DD_BUDGET_PCT", None)
+
+
+def test_mode_switch(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    assert c.post("/api/mode", json={"live": True, "password": "pw", "confirm": "LIVE"}).status_code == 401   # needs token
+    assert c.post("/api/mode", headers=h, json={"live": True, "password": "pw", "confirm": "yes"}).status_code == 400
+    assert c.post("/api/mode", headers=h, json={"live": True, "password": "no", "confirm": "LIVE"}).status_code == 401
+    assert c.get("/api/health").json()["mode"] == "DRY RUN"
+    assert c.post("/api/mode", headers=h, json={"live": True, "password": "pw", "confirm": "live"}).json()["mode"] == "LIVE"
+    assert c.get("/api/health").json()["mode"] == "LIVE"
+    assert c.post("/api/mode", headers=h, json={"live": False}).json()["mode"] == "DRY RUN"   # one tap, no password
+    assert c.get("/api/health").json()["mode"] == "DRY RUN"

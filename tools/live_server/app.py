@@ -6,8 +6,9 @@
   GET  /api/plan              -> today's trade plan sized with your capital, cash, holdings and free slots
   POST /api/order {id, qty, confirm}  -> places ONE order for a plan row after you tapped Send and confirmed
   GET  /api/orders            -> today's orders (Angel order book + this server's log)
+  POST /api/mode {live, password, confirm} -> dry run (one tap) / live (password + type LIVE); stored in DATA_DIR/mode.json
 
-Guards on every order: LIVE_ORDERS=1 must be set on the server (default: dry run - shows the exact order, sends nothing);
+Guards on every order: the server must be in LIVE mode (default: dry run - shows the exact order, sends nothing);
 the row must be in today's plan (no free-form orders); quantity <= the plan size; order value <= MAX_ORDER_VALUE and 20% of
 capital and the cash available; MAX_ORDERS_DAY a day; each plan row once a day; sells only up to the quantity you hold;
 `confirm` must equal "<SIDE> <QTY> <SYMBOL>". Every request and order is logged to DATA_DIR/orders.jsonl.
@@ -35,7 +36,8 @@ from brokers import AngelEquity, MockBroker, MoomooRO, amo_window, ist_now, mark
 ENV = {k: re.sub(r"\s+#.*$", "", v).strip() for k, v in os.environ.items()}
 DATA = ENV.get("DATA_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "var"))
 os.makedirs(DATA, exist_ok=True)
-LIVE = ENV.get("LIVE_ORDERS", "0") == "1"
+LIVE_DEFAULT = ENV.get("LIVE_ORDERS", "0") == "1"   # used until the app's switch is first touched
+ALLOW_APP_LIVE = ENV.get("ALLOW_APP_LIVE", "1") == "1"  # 0 = the app can only switch to dry run
 PLAN_URL = ENV.get("PLAN_URL", "https://raw.githubusercontent.com/drsinghap81/blank-app/main/data/scan/trade_plan.json")
 CAPITAL = float(ENV.get("CAPITAL", "0") or 0)            # 0 -> use Angel's net value
 # Portfolio guard (ATH system 2017-26): lowering risk beat every drawdown rule (size cuts, hard portfolio stop-loss).
@@ -69,6 +71,19 @@ moomoo = MoomooRO(ENV)
 app = FastAPI(title="Trend Desk live server")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in ENV.get("ALLOW_ORIGIN", "https://drsinghap81.github.io").split(",")],
                    allow_methods=["GET", "POST"], allow_headers=["Authorization", "Content-Type"])
+
+
+def is_live() -> bool:
+    """Live/dry switch: var/mode.json (set from the app) overrides LIVE_ORDERS in .env."""
+    try:
+        return bool(json.load(open(os.path.join(DATA, "mode.json")))["live"])
+    except Exception:  # noqa: BLE001
+        return LIVE_DEFAULT
+
+
+def set_live(on: bool):
+    os.makedirs(DATA, exist_ok=True)
+    json.dump(dict(live=bool(on), at=time.time()), open(os.path.join(DATA, "mode.json"), "w"))
 
 
 def log(kind, **kw):
@@ -137,12 +152,38 @@ def login(body: Login, request: Request):
         FAILS[ip] = (n + 1, time.time()); log("login_fail", ip=ip)
         raise HTTPException(401, "wrong password")
     FAILS.pop(ip, None); log("login", ip=ip)
-    return dict(token=sign(int(time.time()) + 12 * 3600), live=LIVE)
+    return dict(token=sign(int(time.time()) + 12 * 3600), live=is_live())
+
+
+class Mode(BaseModel):
+    live: bool
+    password: str = ""
+    confirm: str = ""
+
+
+@app.post("/api/mode")
+def mode(body: Mode, request: Request, _=Depends(auth)):
+    """Dry run: one tap. Live: needs the app password again and the word LIVE typed."""
+    if body.live:
+        if not ALLOW_APP_LIVE:
+            raise HTTPException(403, "switching to live from the app is turned off on the server (ALLOW_APP_LIVE=0)")
+        ip = request.client.host if request.client else "?"
+        n, t0 = FAILS.get(ip, (0, 0))
+        if n >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if body.confirm.strip().upper() != "LIVE":
+            raise HTTPException(400, 'type LIVE to confirm')
+        if not check_pw(body.password):
+            FAILS[ip] = (n + 1, time.time()); log("mode_fail", ip=ip)
+            raise HTTPException(401, "wrong password")
+        FAILS.pop(ip, None)
+    set_live(body.live); log("mode", live=body.live)
+    return dict(ok=True, mode="LIVE" if body.live else "DRY RUN")
 
 
 @app.get("/api/health")
 def health():
-    return dict(ok=True, mode="LIVE" if LIVE else "DRY RUN", market_open=market_open(), amo=amo_window(), ist=ist_now().isoformat(timespec="minutes"))
+    return dict(ok=True, mode="LIVE" if is_live() else "DRY RUN", market_open=market_open(), amo=amo_window(), ist=ist_now().isoformat(timespec="minutes"))
 
 
 # ------------------------------------------------------------------ plan + sizing
@@ -242,7 +283,7 @@ def sized(acc=None):
             if not r["skip"]:
                 r["skip"] = "paused: losing streak (guard)"
     return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open,
-                mode="LIVE" if LIVE else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held)
+                mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held)
 
 
 @app.get("/api/plan")
@@ -273,7 +314,7 @@ def orders(_=Depends(auth)):
         book = broker.orders()
     except Exception as e:  # noqa: BLE001
         book = [dict(error=str(e))]
-    return dict(book=book, log=today_log(), mode="LIVE" if LIVE else "DRY RUN")
+    return dict(book=book, log=today_log(), mode="LIVE" if is_live() else "DRY RUN")
 
 
 class Order(BaseModel):
@@ -328,9 +369,9 @@ def order(body: Order, _=Depends(auth)):
     if body.confirm.strip().upper() != f"{side} {body.qty} {sym}".upper():
         raise HTTPException(400, f'confirm must be "{side} {body.qty} {sym}"')
     rec = dict(id=body.id, symbol=sym, side=side, qty=body.qty, params=p, ist_date=t.date().isoformat())
-    if not LIVE:
+    if not is_live():
         log("dry", **rec)
-        return dict(ok=True, mode="DRY RUN", sent=False, order=p, msg="Dry run: this is exactly what would be sent. Set LIVE_ORDERS=1 on the server to go live.")
+        return dict(ok=True, mode="DRY RUN", sent=False, order=p, msg="Dry run: this is exactly what would be sent. Switch to Live orders in the app to send for real.")
     try:
         oid = broker.place(p)
     except Exception as e:  # noqa: BLE001

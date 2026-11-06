@@ -326,3 +326,9 @@ details.info p { margin: 6px 0; line-height: 1.45; }
 .gbar { height: 8px; background: #EEF1F6; border-radius: 99px; margin-top: 8px; overflow: hidden; } .gbar i { display: block; height: 100%; border-radius: 99px; }
 .lv-sub select { margin-left: 4px; padding: 4px; border-radius: 6px; border: 1px solid var(--line); }
 .lv-open { cursor: pointer; } .lv-open:hover .lv-sym, .lv-open:focus .lv-sym { text-decoration: underline; }
+
+.lv-seg{display:flex;gap:0;margin:10px 0 4px;border:1px solid var(--line,#ddd);border-radius:10px;overflow:hidden;width:max-content}
+.lv-seg button{border:0;background:transparent;padding:8px 16px;font:inherit;font-weight:600;color:var(--muted,#666);cursor:pointer}
+.lv-seg button.on{background:#FFF3D6;color:#8A5A00}
+.lv-seg button.on.live{background:#C62828;color:#fff}
+.lv-form[hidden]{display:none}
