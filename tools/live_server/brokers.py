@@ -50,6 +50,10 @@ class AngelEquity:
         r = api.generateSession(e["ANGEL_CLIENT_CODE"], e["ANGEL_PIN"], pyotp.TOTP(e["ANGEL_TOTP_SECRET"]).now())
         if not r or not r.get("status"):
             raise RuntimeError(f"Angel login failed: {r.get('message') if isinstance(r, dict) else r}")
+        # smartapi-python 1.5.5 still points GTT at /gtt-service/... ("no Route matched"); Angel's live routes:
+        for k, v in {"api.gtt.create": "/rest/secure/angelbroking/gtt/v1/createRule", "api.gtt.modify": "/rest/secure/angelbroking/gtt/v1/modifyRule",
+                     "api.gtt.cancel": "/rest/secure/angelbroking/gtt/v1/cancelRule"}.items():
+            api._routes[k] = v
         self.api, self.day = api, date.today()
         self._load_tokens()
         self.log("Angel session OK")
@@ -172,7 +176,10 @@ class AngelEquity:
 
     def gtt_cancel(self, rule_id, symbol):
         api = self._session(); ts, t = self._ts(symbol)
-        return api.gttCancelRule(dict(id=str(rule_id), symboltoken=t["token"], exchange="NSE"))
+        r = self._call(api._postRequest, "api.gtt.cancel", dict(id=str(rule_id), symboltoken=str(t["token"]), exchange="NSE"), tries=2) or {}
+        if not r.get("status"):
+            raise RuntimeError(f"{r.get('message') or r} [{r.get('errorcode') or '?'}]")
+        return r
 
 
 class MoomooRO:

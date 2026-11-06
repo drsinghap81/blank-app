@@ -318,6 +318,24 @@ def sync(acc=None):
     return J
 
 
+def retry_protect():
+    """place any missing protective stop now (open trades still held, no GTT yet)."""
+    J = journal(); acc = broker.account(); held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
+    for p in acc["positions"]:
+        held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
+    done = []
+    for sym, e in J.items():
+        if not sym.startswith("_") and e.get("state") == "open" and not e.get("gtt_id") and held.get(sym, 0) > 0:
+            e["gtt_tries"] = 0; _protect(sym, e); done.append(dict(symbol=sym, gtt_id=e.get("gtt_id"), trigger=e.get("gtt_trigger"), error=e.get("gtt_error")))
+    save_journal(J)
+    return done
+
+
+@app.post("/api/protect")
+def protect_now(_=Depends(auth)):
+    return dict(results=retry_protect())
+
+
 def trades_view(J, acc):
     ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
     out = []

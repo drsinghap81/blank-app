@@ -150,7 +150,7 @@ async function loadLive() {
   const trades = S && S.trades ? S.trades.map((t) => { const [lab, cls] = ST[t.state] || [t.state, 'dry'];
     return `<div class="lv-row"><div class="lv-rank">${t.R == null ? '·' : (t.R >= 0 ? '+' : '') + fmt(t.R, 1) + 'R'}</div><div><div class="lv-sym">${esc(t.symbol)} <span class="lv-mode ${cls}" style="${cls === 'ok' ? 'background:var(--rise-soft);color:#0A7A55' : ''}">${lab}</span> <span class="chip">${esc(t.system || '')}</span></div>
       <div class="lv-sub">${t.qty} @ ${fmt(t.entry, 2, 'en-IN')}${t.ltp ? ` · now ${fmt(t.ltp, 2, 'en-IN')}` : ''} · plan stop ${fmt(t.stop, 2, 'en-IN')}${t.state === 'pending' && t.order_status ? ` · Angel: ${esc(t.order_status)}` : ''}</div>
-      <div class="lv-sub">${t.gtt_id ? `🛡 Stop on Angel at ${fmt(t.gtt_trigger, 2, 'en-IN')} (GTT ${esc(t.gtt_id)})` : t.gtt_error ? `<span class="down">Stop not placed: ${esc(t.gtt_error)} — set one in the Angel app</span>` : t.state === 'open' ? '<span class="down">No protective stop on Angel</span>' : 'Stop goes on Angel after the fill'}</div></div><div></div></div>`; }).join('') : '';
+      <div class="lv-sub">${t.gtt_id ? `🛡 Stop on Angel at ${fmt(t.gtt_trigger, 2, 'en-IN')} (GTT ${esc(t.gtt_id)})` : t.gtt_error ? `<span class="down">Stop not placed yet: ${esc(t.gtt_error)}</span> <button class="lv-btn sell" data-prot="1" style="padding:4px 10px;font-size:12px">Retry stop</button>` : t.state === 'open' ? '<span class="down">No protective stop on Angel</span>' : 'Stop goes on Angel after the fill'}</div></div><div></div></div>`; }).join('') : '';
   const recent = S && S.recent && S.recent.length ? `<p class="lv-sub">Recent: ${S.recent.map((r) => `${esc(r.symbol)} ${esc(r.state)}${r.exit ? ' @ ' + fmt(r.exit, 2, 'en-IN') : ''}${r.text ? ' (' + esc(r.text) + ')' : ''}`).join(' · ')}</p>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
   el.innerHTML = `${head}${guardCard(S ? S.guard : null)}${tradesCard}
@@ -177,6 +177,12 @@ async function loadLive() {
   const mgo = $('#lvmgo'); if (mgo) mgo.addEventListener('click', async () => {
     try { await lvApi('/api/mode', { method: 'POST', body: JSON.stringify({ live: true, password: $('#lvmpw').value, confirm: $('#lvmcf').value }) }); alertMsg('Live orders on: Send now places real Angel orders.', true); loadLive(); } catch (e) { alertMsg(e.message); }
   });
+  el.querySelectorAll('[data-prot]').forEach((b) => b.addEventListener('click', async () => {
+    b.disabled = true; b.textContent = '…';
+    try { const j = await lvApi('/api/protect', { method: 'POST' }); const r = j.results || [];
+      alertMsg(r.length ? r.map((x) => x.gtt_id ? `${x.symbol}: 🛡 stop placed on Angel at ${x.trigger}` : `${x.symbol}: still not placed (${x.error})`).join(' · ') : 'Nothing to protect.', r.every((x) => x.gtt_id)); loadLive();
+    } catch (e) { alertMsg(e.message); b.disabled = false; b.textContent = 'Retry stop'; }
+  }));
   const out = $('#lvout'); if (out) out.addEventListener('click', (e) => { e.preventDefault(); lvSave({ token: null }); loadLive(); });
   el.querySelectorAll('.lv-btn[data-i]').forEach((b) => b.addEventListener('click', () => lvSend(rows[+b.dataset.i], 'BUY', b)));
   const pick = () => [...el.querySelectorAll('input[data-b]:checked')].map((c) => { const i = +c.dataset.b; const r = rows[i];
