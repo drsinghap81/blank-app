@@ -436,18 +436,21 @@ def order(body: Order, _=Depends(auth)):
         if body.qty * E > min(MAX_ORDER_VALUE, MAX_POS_PCT * S["capital"], S["cash"]):
             raise HTTPException(400, "order value above the limits")
         side = "BUY"
-        if row["kind"] == "ATH_STOP":
-            if not market_open(t):
-                raise HTTPException(400, "buy-stop orders are sent during market hours (09:15-15:30 IST); AMO does not take them")
-            p = broker.params(row["symbol"], side, body.qty, row["price"], kind="SL", trigger=row["trigger"])
+        if market_open(t):
+            ltp = broker.ltp(row["symbol"])
+            st, lim, why = live_check(row, ltp)
+            if st in ("broken", "missed", "ran"):
+                raise HTTPException(400, f"not sent: {why}")
+            if row["kind"] == "ATH_STOP" and st == "wait":
+                p = broker.params(row["symbol"], side, body.qty, row["price"], kind="SL", trigger=row["trigger"])
+            else:                       # 9/21, breakouts, or a buy-stop already triggered: LIMIT near the live price, capped
+                p = broker.params(row["symbol"], side, body.qty, lim or row["price"])
         else:
-            if not (market_open(t) or amo):
+            if row["kind"] == "ATH_STOP":
+                raise HTTPException(400, "buy-stop orders are sent during market hours (09:15-15:30 IST); AMO does not take them")
+            if not amo:
                 raise HTTPException(400, "send between 15:45 and 08:57 IST (AMO) or during market hours")
-            price = row["price"]
-            if market_open(t):          # during the session: limit 1% above the live price, never above the plan price + 3%
-                ltp = broker.ltp(row["symbol"])
-                price = min(ltp * 1.01, row["ref"] * 1.03) if ltp else price
-            p = broker.params(row["symbol"], side, body.qty, price, amo=amo)
+            p = broker.params(row["symbol"], side, body.qty, row["price"], amo=True)
         sym = row["symbol"]
     else:
         if body.qty < 1 or body.qty > ex["qty"]:
@@ -498,6 +501,29 @@ def order(body: Order, _=Depends(auth)):
     return dict(ok=True, mode="LIVE", sent=True, order_id=oid, order=p, protect=prot)
 
 
+CHASE = float(ENV.get("CHASE_PCT", "3")) / 100     # how far past the trigger / plan close a buy may still be sent
+
+
+def live_check(r, ltp):
+    """In market hours, what a plan buy may do at this live price (matches the backtest: buy at the trigger / next open).
+    -> (state, limit_price or None, text). states: wait (buy-stop below trigger), triggered, ok, missed, ran, broken."""
+    if not ltp:
+        return "ok", None, ""
+    if r.get("stop") and ltp <= r["stop"]:
+        return "broken", None, f"below the plan stop ({r['stop']:.2f}) - the setup is invalid; can't send"
+    if r["kind"] == "ATH_STOP":
+        T = r["trigger"]
+        if ltp < T:
+            return "wait", None, f"{(T / ltp - 1) * 100:.1f}% below the trigger - the buy-stop waits on Angel"
+        if ltp <= T * (1 + CHASE):
+            return "triggered", round(min(ltp * 1.01, T * (1 + CHASE)), 2), f"triggered (+{(ltp / T - 1) * 100:.1f}% over the trigger) - buy now as a limit"
+        return "missed", None, f"{(ltp / T - 1) * 100:.1f}% above the trigger - ran too far past the tested entry; skip"
+    ref = r.get("ref") or r["price"]
+    if ltp > ref * (1 + CHASE):
+        return "ran", None, f"{(ltp / ref - 1) * 100:.1f}% above the plan close - more than {CHASE * 100:.0f}%; wait or skip"
+    return "ok", round(min(ltp * 1.01, ref * (1 + CHASE)), 2), ""
+
+
 @app.get("/api/quotes")
 def quotes(_=Depends(auth)):
     """Live prices for today's plan rows, exits and app trades, plus the limit price a buy sent now would get."""
@@ -513,15 +539,10 @@ def quotes(_=Depends(auth)):
         q = Q.get(r["symbol"])
         if not q or not q["ltp"]:
             continue
-        lim = min(q["ltp"] * 1.01, r["ref"] * 1.03) if r.get("ref") else None
-        note = ""
-        if r["kind"] == "ATH_STOP":
-            note = "already above the trigger - the buy-stop would fill at once" if q["ltp"] >= r["trigger"] else f"{(r['trigger'] / q['ltp'] - 1) * 100:.1f}% below the trigger"
-        elif lim and q["ltp"] * 1.01 > r["ref"] * 1.03:
-            note = "more than 2% above the plan price - the limit (plan +3%) may not fill"
+        st, lim, note = live_check(r, q["ltp"]) if market_open(t) else ("ok", None, "")
         out[r["id"]] = dict(symbol=r["symbol"], ltp=q["ltp"], chg_pct=round((q["ltp"] / q["prev"] - 1) * 100, 2) if q["prev"] else None,
                             vs_plan_pct=round((q["ltp"] / r["ref"] - 1) * 100, 2) if r.get("ref") else None,
-                            limit_now=round(lim, 2) if lim and r["kind"] != "ATH_STOP" else None, note=note)
+                            state=st, limit_now=lim, note=note, sendable=st in ("ok", "triggered", "wait"))
     return dict(market_open=market_open(t), ist=t.isoformat(timespec="seconds"), rows=out,
                 symbols={s: Q[s] for s in syms if s in Q})
 

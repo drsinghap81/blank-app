@@ -143,3 +143,22 @@ def test_quotes(tmp_path):
     assert c.get("/api/quotes").status_code == 401
     j = c.get("/api/quotes", headers=h).json()
     assert j["rows"] and all(v["ltp"] > 0 for v in j["rows"].values())
+
+
+def test_live_checks(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: True
+    r = dict(kind="ATH_STOP", trigger=100.0, price=101.0, stop=80.0, ref=96.0)
+    assert A.live_check(r, 95)[0] == "wait" and A.live_check(r, 102)[0] == "triggered" and A.live_check(r, 104)[0] == "missed"
+    assert A.live_check(r, 79)[0] == "broken"
+    b = dict(kind="ATH_BRK", price=101.0, ref=100.0, stop=80.0)
+    assert A.live_check(b, 102)[0] == "ok" and A.live_check(b, 102)[1] == 103.0 and A.live_check(b, 104)[0] == "ran"
+    P = c.get("/api/plan", headers=h).json()
+    row = next(x for x in P["rows"] if not x["skip"] and x["qty"] > 0 and x["kind"] != "ATH_STOP")
+    A.broker.ltp = lambda s: row["ref"] * 1.10            # ran away -> refused
+    j = c.post("/api/order", headers=h, json={"id": row["id"], "qty": row["qty"], "confirm": f"BUY {row['qty']} {row['symbol']}"})
+    assert j.status_code == 400 and "plan close" in j.json()["detail"]
+    A.broker.ltp = lambda s: row["ref"] * 1.01
+    j = c.post("/api/order", headers=h, json={"id": row["id"], "qty": row["qty"], "confirm": f"BUY {row['qty']} {row['symbol']}"}).json()
+    assert j["order"]["ordertype"] == "LIMIT" and j["order"]["variety"] == "NORMAL"

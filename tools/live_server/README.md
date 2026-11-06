@@ -19,6 +19,13 @@ The server holds the broker keys. The repo and the phone app never do.
   - The limit is `GTT_LIMIT_GAP_PCT=5`% below the trigger, so a fast fall still fills.
   - Selling from the app cancels the GTT first. If a holding disappears (the GTT fired, or you sold elsewhere), the trade is closed in the journal and counted for the losing-streak pause.
   - Set `PROTECT_STOPS=0` to turn this off.
+- **Live checks in market hours** (`CHASE_PCT=3`, matching the backtest's entries at the trigger / next open). The evening list stays the same; each buy is labelled from the live price and enforced by the server:
+  - **Waiting for trigger:** a buy-stop below its trigger goes to Angel as a STOPLOSS_LIMIT and waits there.
+  - **Triggered – buy now:** price is between the trigger and trigger +3%; sent as a LIMIT up to trigger +3%.
+  - **Missed – skip:** more than 3% past the trigger.
+  - **Ran away – wait:** a breakout or 9/21 trade more than 3% above the plan close.
+  - **Invalid – below stop:** price at or below the plan stop.
+  - Missed, ran-away and invalid trades can't be sent, and they drop out of the basket.
 - **No market orders.** Buys are LIMIT orders: after-market (AMO) in the evening or early morning, or 1% above the live price during market hours, capped at the plan price + 3%. Buy-stops are STOPLOSS_LIMIT orders, sent between 09:15 and 15:30 IST. This follows SEBI's 2026 API rules.
 - **Login and logging.** The app password is stored as a salted hash, and the app gets a 12-hour token. Login is blocked for 15 minutes after 5 wrong tries. Every order and dry run is logged in `var/orders.jsonl`.
 - **The Top Bottom futures bot (`tools/angel`) is separate** and stays dry-run.

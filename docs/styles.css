@@ -345,3 +345,8 @@ details.info p { margin: 6px 0; line-height: 1.45; }
 .lv-q{margin-top:4px;font-size:12.5px;color:var(--muted,#555)}
 .lv-live{font-weight:700}
 .lv-live.up{color:#0A7A55}.lv-live.down{color:var(--fall,#C62828)}
+
+.lv-st{display:inline-block;font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:99px;background:#EEF2FF;color:#3730A3;margin-right:4px}
+.lv-st.go{background:#DCFCE7;color:#0A7A55}.lv-st.no{background:var(--fall-soft,#FDECEC);color:var(--fall,#C62828)}
+.lv-row.lv-off .lv-open{opacity:.55}
+.lv-btn:disabled{opacity:.4;cursor:not-allowed}

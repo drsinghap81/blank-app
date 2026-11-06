@@ -252,10 +252,15 @@ async function lvQuotes(first) {
   document.querySelectorAll('.lv-q[data-q]').forEach((d) => {
     const q = state._lvQ[d.dataset.q]; if (!q) { d.textContent = ''; return; }
     const up = (q.chg_pct || 0) >= 0;
-    d.innerHTML = `<span class="lv-live ${up ? 'up' : 'down'}">${j.market_open ? '● Live' : 'Last'} ₹${fmt(q.ltp, 2, 'en-IN')} ${q.chg_pct == null ? '' : `(${up ? '+' : ''}${fmt(q.chg_pct, 2)}% today)`}</span>`
+    const LB = { triggered: ['Triggered – buy now', 'go'], missed: ['Missed – skip', 'no'], ran: ['Ran away – wait', 'no'], broken: ['Invalid – below stop', 'no'], wait: ['Waiting for trigger', ''] }[q.state];
+    d.innerHTML = (j.market_open && LB ? `<span class="lv-st ${LB[1]}">${LB[0]}</span> ` : '')
+      + `<span class="lv-live ${up ? 'up' : 'down'}">${j.market_open ? '● Live' : 'Last'} ₹${fmt(q.ltp, 2, 'en-IN')} ${q.chg_pct == null ? '' : `(${up ? '+' : ''}${fmt(q.chg_pct, 2)}% today)`}</span>`
       + (q.vs_plan_pct == null ? '' : ` · ${q.vs_plan_pct >= 0 ? '+' : ''}${fmt(q.vs_plan_pct, 1)}% vs plan close`)
       + (j.market_open && q.limit_now ? ` · limit if sent now ₹${fmt(q.limit_now, 2, 'en-IN')}` : '')
-      + (q.note ? ` · <span class="${/may not|at once/.test(q.note) ? 'down' : ''}">${esc(q.note)}</span>` : '');
+      + (q.note ? ` · <span class="${LB && LB[1] === 'no' ? 'down' : ''}">${esc(q.note)}</span>` : '');
+    const row = d.closest('.lv-row'); const off = j.market_open && q.sendable === false;
+    row.classList.toggle('lv-off', off);
+    row.querySelectorAll('.lv-btn[data-i], input[data-b]').forEach((x) => { x.disabled = off; if (off && x.type === 'checkbox' && x.checked) { x.checked = false; x.dispatchEvent(new Event('change')); } });
   });
   if (state._lvBkUpd) state._lvBkUpd();
   const t = $('#lvqt'); if (t) t.textContent = `${j.market_open ? 'Live prices' : 'Market closed – last prices'} · ${j.ist.slice(11, 19)} IST`;
@@ -266,7 +271,8 @@ async function lvBasket(B, btn) {
   B = B.filter((x) => x.q > 0);
   if (!B.length) { alertMsg('Basket is empty.'); return; }
   const lines = B.map((x) => { const L = state._lvQ && state._lvQ[x.r.id];
-    return `BUY ${x.q} ${x.r.symbol} (${x.r.kind === 'ATH_STOP' ? 'buy-stop ' + fmt(x.r.trigger, 2, 'en-IN') : 'limit ' + fmt((L && L.limit_now) || x.r.price, 2, 'en-IN')}${L ? ', now ' + fmt(L.ltp, 2, 'en-IN') : ''})`; }).join('\n');
+    const how = L && L.limit_now ? 'limit ' + fmt(L.limit_now, 2, 'en-IN') + (L.state === 'triggered' ? ' (triggered)' : '') : x.r.kind === 'ATH_STOP' ? 'buy-stop ' + fmt(x.r.trigger, 2, 'en-IN') : 'limit ' + fmt(x.r.price, 2, 'en-IN');
+    return `BUY ${x.q} ${x.r.symbol} (${how}${L ? ', now ' + fmt(L.ltp, 2, 'en-IN') : ''})`; }).join('\n');
   const tot = B.reduce((a, x) => a + x.v, 0);
   const typed = window.prompt(`${B.length} orders on Angel One, total ${money(tot, 'NSE')}:\n${lines}\n\nType ${B.length} to confirm:`);
   if (typed === null) return;
