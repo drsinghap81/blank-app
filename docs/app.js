@@ -64,12 +64,13 @@ function parseCSV(t) {
 }
 
 /* ------------------------------------------------------------------ views */
+document.addEventListener('click', (e) => { if (e.target && e.target.id === 'toresults') show('results'); });
 function show(view) {
   state.view = view;
   document.querySelectorAll('.views button').forEach((b) => (b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   document.querySelectorAll('.view').forEach((s) => (s.hidden = s.id !== `view-${view}`));
   window.scrollTo(0, 0);
-  ({ live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio })[view]();
+  ({ live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms })[view]();
 }
 
 /* ------------------------------------------------------------------ Live trades */
@@ -978,8 +979,7 @@ async function loadATH() {
       mk === 'NSE' ? getJSON(REPO + 'live/data/live/ath_live.json', 'ath_live') : null, getJSON(MAIN + AP() + 'ipo.json', 'ipo' + tag),
       getJSON(MAIN + AP() + 'sectors.json', 'sectors' + tag), getJSON(MAIN + 'data/scan/world.json', 'world')]);
     const tr = state.data[mk] || await getJSON(MAIN + AP() + 'trend_scan.json', 'td_' + mk);
-    const pat = mk === 'NSE' ? await getJSON(MAIN + 'data/scan/patterns.json', 'patterns') : null;
-    state.athC[mk] = { d, live, ipo, sec, world, tr, pat, tab: 'td', q: '', all: false };
+    state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'td', q: '', all: false };
   }
   state.ath = state.athC[mk];
   const wireMk = () => el.querySelectorAll('.seg.mk button').forEach((b) => b.addEventListener('click', () => { state.athMkt = b.dataset.mk; try { localStorage.setItem('td_athmkt', b.dataset.mk); } catch (e) { /* */ } loadATH(); }));
@@ -996,7 +996,7 @@ async function loadATH() {
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
   const tabs = [['td', 'Top-down', tdRows(true).length], ['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
-    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length]].concat(mk === 'NSE' ? [['pat', 'Bottoms', patRows(true).length]] : []);
+    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length]];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     <section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
@@ -1010,7 +1010,6 @@ async function loadATH() {
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
         themes: 'Shortlist = indices (broad, sector and thematic) in an uptrend (above a rising 30-week SMA) with 6-month RS vs Nifty 50 above zero, ordered: cup breakout (new monthly-close high after a base of 2+ years), new high (shorter base), cup forming (within 5% of a 2+-year-old high), within 5% of the high, then the rest; inside each group leading before uptrend, RS rising first, then by RS. Tap one for its weekly chart with the 30-week SMA, or monthly with the highest-month-close line. Below: the rest, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
-        pat: 'Bottom patterns after a fall of 20% or more: double bottom, tilted W (higher second low), triple bottom and inverse head & shoulders, found on daily closes with 6% swings. Breakout = a close above the neckline (the highest peak between the lows) within 60 days of the last low; forming = last low in place, price below the neckline. WATCH ONLY: in 2016–26 these did no better than a random stock (120 days +3.5% vs +7.4%), and in market downtrends +10.5% vs +13.6% for any stock. Updated nightly.',
         ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>${state.ath.tab === 'td' ? '' : sectorStrip()}</details>
       ${state.ath.tab === 'td' ? topStrip() : ''}
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -1026,14 +1025,52 @@ async function loadATH() {
   athList();
 }
 const PAT_NM = { DB: 'Double bottom', TW: 'Tilted W', TB: 'Triple bottom', IHS: 'Inverse H&S' };
-function patRows(countOnly) {
-  const P = state.ath && state.ath.pat; if (!P) return [];
-  const L = P.rows || []; if (countOnly) return L;
-  const q = (state.ath.q || '').toLowerCase();
-  return q ? L.filter((r) => r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)) : L;
+function patRows() {
+  const P = state.pat; if (!P) return [];
+  const f = state.patF || 'all'; const ty = state.patT || 'all'; const q = (state.patQ || '').toLowerCase();
+  return (P.rows || []).filter((r) => (f === 'all' || r.status === f) && (ty === 'all' || r.typ === ty)
+    && (!q || r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)));
+}
+function patItem(r, i) {
+  const st = r.status === 'breakout' ? `<span class="chip new">Broke neckline ${r.days_since === 0 ? 'today' : r.days_since + 'd ago'}</span>` : `<span class="chip open">${fmt(r.to_neck_pct, 1)}% to neckline</span>`;
+  const chip = `${st}<span class="chip">${PAT_NM[r.typ]}</span>${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fell ${fmt(r.fall_pct, 0)}%</span><span class="chip">stop ${fmt(r.stop_pct, 0)}% below</span>`;
+  return `<li class="row ${r.status === 'breakout' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.kind === 'index' ? r.name : r.symbol)}</div><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div>
+    <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">neck ${fmt(r.neck, 2, 'en-IN')}</span></div></li>`;
+}
+async function loadBottoms() {
+  $('#title').textContent = 'Bottom patterns';
+  const el = $('#view-bot');
+  if (!state.pat) { el.innerHTML = '<p class="muted pad">Loading…</p>'; state.pat = await getJSON(MAIN + 'data/scan/patterns.json', 'patterns'); }
+  const P = state.pat;
+  if (!P) { el.innerHTML = '<p class="empty">The pattern scan appears after its first evening run (about 21:10 IST).</p>'; $('#asof').textContent = ''; return; }
+  $('#asof').textContent = `Market data: India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
+  const R = P.rows || []; const nb = R.filter((r) => r.status === 'breakout').length; const nf = R.length - nb;
+  const cnt = (t) => R.filter((r) => r.typ === t).length;
+  const seg = (id, cur, opts) => `<div class="seg" id="${id}">${opts.map(([k, n]) => `<button data-k="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
+  el.innerHTML = `<section class="summary">
+      <div class="stat new"><b>${nb}</b><span>broke the neckline (last 10 days)</span></div>
+      <div class="stat"><b>${nf}</b><span>forming, within 20% of the neckline</span></div>
+      <div class="stat"><b>${P.regime ? (P.regime.down ? 'Down' : 'Up') : '–'}</b><span>market: Nifty 500 vs its 200-day</span></div>
+      <div class="stat"><b>${R.filter((r) => r.kind === 'index').length}</b><span>on indices (Nifty, Bank Nifty, sectors)</span></div></section>
+    <div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> In 2016–26 these patterns did no better than a random stock (120 days +3.5% vs +7.4%). Use them to spot charts, not as buy signals.</div>
+    <div class="card">
+      ${seg('patf', state.patF || 'all', [['all', `All ${R.length}`], ['breakout', `Breakouts ${nb}`], ['forming', `Forming ${nf}`]])}
+      ${seg('patt', state.patT || 'all', [['all', 'All types'], ['DB', `Double bottom ${cnt('DB')}`], ['TW', `Tilted W ${cnt('TW')}`], ['TB', `Triple bottom ${cnt('TB')}`], ['IHS', `Inverse H&S ${cnt('IHS')}`]])}
+      <details class="info"><summary>How patterns are found</summary><p>Daily closing line, swings of 6% or more, after a fall of 20%+ from the 1-year high (first low near the 1-year low). Double bottom: second low within ±3% of the first. Tilted W: second low 3–12% higher. Triple bottom: three lows within 4%. Inverse H&S: head at least 3% below both shoulders. Neckline = highest peak between the lows; a breakout is a close above it within 60 days of the last low. Stop = lowest low − 1%. Liquid stocks (₹2 cr+ a day, price ₹100+) plus Nifty, Bank Nifty and sector indices. Updated nightly.</p></details>
+      <label class="search"><input id="patq" type="search" placeholder="Search symbol or company" value="${esc(state.patQ || '')}" autocomplete="off"></label>
+      <ul class="list flat" id="patlist"></ul></div>`;
+  const list = () => {
+    const L = patRows();
+    $('#patlist').innerHTML = L.length ? L.map(patItem).join('') : '<li class="empty">No patterns match.</li>';
+    $('#patlist').querySelectorAll('.row').forEach((r) => { const go = () => patSelect(L[+r.dataset.i]); r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
+  };
+  el.querySelectorAll('#patf button').forEach((b) => b.addEventListener('click', () => { state.patF = b.dataset.k; loadBottoms(); }));
+  el.querySelectorAll('#patt button').forEach((b) => b.addEventListener('click', () => { state.patT = b.dataset.k; loadBottoms(); }));
+  $('#patq').addEventListener('input', (e) => { state.patQ = e.target.value; list(); });
+  list();
 }
 function patSelect(r) {
-  const P = state.ath.pat || {}; const rg = P.regime;
+  const P = state.pat || {}; const rg = P.regime;
   const st = r.status === 'breakout' ? `<div class="status open">${PAT_NM[r.typ]}: closed above the neckline ${fmt(r.neck, 2, AL())} on ${day(r.signal_date)}.</div>`
     : `<div class="status info">${PAT_NM[r.typ]} forming: ${fmt(r.to_neck_pct, 1)}% below the neckline ${fmt(r.neck, 2, AL())}. A daily close above it would complete the pattern.</div>`;
   const f = [['Pattern', PAT_NM[r.typ]], ['Lows', r.lows.map((x) => `${fmt(x[1], 2, AL())} (${day(x[0])})`).join(' · ')], ['Neckline (highest peak between the lows)', fmt(r.neck, 2, AL())],
@@ -1270,7 +1307,6 @@ function athRows() {
   if (tab === 'td') return tdRows();
   if (tab === 'ipo') return ipoRows();
   if (tab === 'themes') return themeRows();
-  if (tab === 'pat') return patRows();
   let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : (d.tracked || []);
   if (tab === 'brk') L = L.slice().sort((a, b) => (b.main - a.main) || (a.date < b.date ? 1 : -1));
   if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); }
@@ -1314,13 +1350,6 @@ function athList() {
       const sep = !r.shortlist && i > 0 && L[i - 1].shortlist ? '<li class="ixsep">Not shortlisted</li>' : '';
       return `${sep}<li class="row ${SL_ORD[r.shortlist] <= 1 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.name)}</div><div class="tags"><span class="chip">${r.kind}</span>${r.shortlist ? `<span class="chip ${SL_ORD[r.shortlist] <= 2 ? 'new' : 'open'}">${SL_TXT[r.shortlist]}</span>` : ''}${chip}</div></div><div></div><div class="num">${right}</div></li>`;
     }
-    if (tab === 'pat') {
-      const st = r.status === 'breakout' ? `<span class="chip new">Broke neckline ${r.days_since === 0 ? 'today' : r.days_since + 'd ago'}</span>` : `<span class="chip open">${fmt(r.to_neck_pct, 1)}% to neckline</span>`;
-      chip = `${st}<span class="chip">${PAT_NM[r.typ]}</span>${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fell ${fmt(r.fall_pct, 0)}%</span><span class="chip">stop ${fmt(r.stop_pct, 0)}% below</span>`;
-      right = `<b>${fmt(r.close, 2, AL())}</b><span class="muted">neck ${fmt(r.neck, 2, AL())}</span>`;
-      return `<li class="row ${r.status === 'breakout' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.kind === 'index' ? r.name : r.symbol)}</div><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div>
-        <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
-    }
     if (tab === 'ipo') {
       ({ chip, right } = ipoItem(r));
       return `<li class="row ${r.status === 'buy next open' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
@@ -1355,7 +1384,7 @@ function athList() {
   const m = $('#athmore'); if (m) m.addEventListener('click', () => { state.ath.all = true; athList(); });
   const ia = $('#ixall'); if (ia) ia.addEventListener('click', () => { state.ath.ixAll = true; athList(); });
   $('#athlist').querySelectorAll('.row').forEach((el) => {
-    const open = () => (tab === 'pat' ? patSelect(L[+el.dataset.i]) : tab === 'td' && L[+el.dataset.i]._trend ? trendFromATH(L[+el.dataset.i]) : tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
+    const open = () => (tab === 'td' && L[+el.dataset.i]._trend ? trendFromATH(L[+el.dataset.i]) : tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
     el.addEventListener('click', open);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   });
@@ -1538,7 +1567,7 @@ function renderPortfolio() {
     if (e && e.supertrend) return `<div class="sysl ${e.st_up === false ? 'down' : ''}">9/21 · Supertrend ${fmt(e.supertrend, 0, 'en-IN')}: ${e.st_up === false ? 'turned red, exit at the next open' : 'exit if it turns red'}</div>`;
     return '';
   };
-  el.innerHTML = `
+  el.innerHTML = `<div style="margin:10px 16px 0"><button class="more" id="toresults">📊 Backtest results & paper book →</button></div>
     <div class="card">
       <div class="facts">
         <div class="fact"><span>Current value</span><b>${inr(val)}</b></div>
