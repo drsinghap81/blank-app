@@ -1037,7 +1037,10 @@ function patItem(r, i) {
   return `<li class="row ${r.status === 'breakout' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.kind === 'index' ? r.name : r.symbol)}</div><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div>
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">neck ${fmt(r.neck, 2, 'en-IN')}</span></div></li>`;
 }
+const botTabs = (cur) => `<div class="seg" id="botm" style="margin:10px 16px 0"><button data-k="pat" aria-selected="${cur === 'pat'}">Bottom patterns</button><button data-k="sup" aria-selected="${cur === 'sup'}">At support</button></div>`;
+function botTabsWire(el) { el.querySelectorAll('#botm button').forEach((b) => b.addEventListener('click', () => { state.botM = b.dataset.k; loadBottoms(); })); }
 async function loadBottoms() {
+  if ((state.botM || 'pat') === 'sup') return loadSupport();
   $('#title').textContent = 'Bottom patterns';
   const el = $('#view-bot');
   if (!state.pat) { el.innerHTML = '<p class="muted pad">Loading…</p>'; state.pat = await getJSON(MAIN + 'data/scan/patterns.json', 'patterns'); }
@@ -1047,7 +1050,7 @@ async function loadBottoms() {
   const R = P.rows || []; const nb = R.filter((r) => r.status === 'breakout').length; const nf = R.length - nb;
   const cnt = (t) => R.filter((r) => r.typ === t).length;
   const seg = (id, cur, opts) => `<div class="seg" id="${id}">${opts.map(([k, n]) => `<button data-k="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
-  el.innerHTML = `<section class="summary">
+  el.innerHTML = `${botTabs('pat')}<section class="summary">
       <div class="stat new"><b>${nb}</b><span>broke the neckline (last 10 days)</span></div>
       <div class="stat"><b>${nf}</b><span>forming, within 20% of the neckline</span></div>
       <div class="stat"><b>${P.regime ? (P.regime.down ? 'Down' : 'Up') : '–'}</b><span>market: Nifty 500 vs its 200-day</span></div>
@@ -1067,7 +1070,89 @@ async function loadBottoms() {
   el.querySelectorAll('#patf button').forEach((b) => b.addEventListener('click', () => { state.patF = b.dataset.k; loadBottoms(); }));
   el.querySelectorAll('#patt button').forEach((b) => b.addEventListener('click', () => { state.patT = b.dataset.k; loadBottoms(); }));
   $('#patq').addEventListener('input', (e) => { state.patQ = e.target.value; list(); });
+  botTabsWire(el);
   list();
+}
+// ---- At support: first return to an old swing level in an uptrend, with the nearest Gann Square-of-9 level (watch only) ----
+function supRows() {
+  const P = state.sup; if (!P) return [];
+  const f = state.supF || 'all'; const g = state.supG || 'all'; const q = (state.supQ || '').toLowerCase();
+  return (P.rows || []).filter((r) => (f === 'all' || r.status === f) && (g === 'all' || (g === 'gann' ? r.gann_match : r.level_kind === 'breakout retest'))
+    && (!q || r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)));
+}
+function supItem(r, i) {
+  const st = r.status === 'touched' ? `<span class="chip new">At support ${r.days_ago === 0 ? 'today' : r.days_ago + 'd ago'}</span>` : `<span class="chip open">${fmt(r.above_pct, 1)}% above</span>`;
+  const chip = `${st}<span class="chip">${r.level_kind === 'breakout retest' ? 'Breakout retest' : 'Old swing low'}</span>${r.gann_match ? `<span class="chip open">Gann ${r.gann_deg}°</span>` : ''}<span class="chip">stop ${fmt(r.risk_pct, 0)}% below</span>${r.room_r != null ? `<span class="chip">room ${fmt(r.room_r, 1)}R</span>` : '<span class="chip">no resistance above</span>'}`;
+  return `<li class="row ${r.status === 'touched' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
+    <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">level ${fmt(r.level, 2, 'en-IN')}</span></div></li>`;
+}
+async function loadSupport() {
+  $('#title').textContent = 'At support';
+  const el = $('#view-bot');
+  if (!state.sup) { el.innerHTML = botTabs('sup') + '<p class="muted pad">Loading…</p>'; botTabsWire(el); state.sup = await getJSON(MAIN + 'data/scan/support.json', 'support'); }
+  const P = state.sup;
+  if (!P) { el.innerHTML = botTabs('sup') + '<p class="empty">The support list appears after the next evening scan (about 21:10 IST).</p>'; botTabsWire(el); $('#asof').textContent = ''; return; }
+  $('#asof').textContent = `Market data: India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
+  const R = P.rows || []; const nt = R.filter((r) => r.status === 'touched').length; const ng = R.filter((r) => r.gann_match).length;
+  const nr = R.filter((r) => r.level_kind === 'breakout retest').length; const n3 = R.filter((r) => r.room_r != null && r.room_r >= 3).length;
+  const seg = (id, cur, opts) => `<div class="seg" id="${id}">${opts.map(([k, n]) => `<button data-k="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
+  el.innerHTML = `${botTabs('sup')}<section class="summary">
+      <div class="stat new"><b>${nt}</b><span>first touch of an old level (last 5 days)</span></div>
+      <div class="stat"><b>${R.length - nt}</b><span>0–5% above a level, not yet touched</span></div>
+      <div class="stat"><b>${ng}</b><span>level within 0.5% of a Gann level</span></div>
+      <div class="stat"><b>${n3}</b><span>with 1:3 room to the next resistance</span></div></section>
+    <div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> 2016–26 backtest (3R target, stop 1 ATR below the level): breakout retests +0.20R a trade vs +0.09R for a random uptrend stock; old swing lows no edge. Gann confluence and 1:3 room did not help.</div>
+    <div class="card">
+      ${seg('supf', state.supF || 'all', [['all', `All ${R.length}`], ['touched', `At support ${nt}`], ['near', `Approaching ${R.length - nt}`]])}
+      ${seg('supg', state.supG || 'all', [['all', 'All levels'], ['retest', `Breakout retests ${nr}`], ['gann', `Gann match ${ng}`]])}
+      <details class="info"><summary>How levels are found</summary><p>Uptrend stocks only: close above the 50-day average, 50-day above the 200-day, 200-day rising over 20 days. Levels are old swings on the daily closing line (6%+ moves, last 3 years): old swing lows, and old swing highs the stock broke out of. A level counts once price has moved 8%+ above it. "At support" = the first return since then: the day's low within 3% of the level and the close at or above it, in the last 5 sessions, with the stock still within 8% of the level. "Approaching" = close 0–5% above a level not yet revisited. Stop = level − 1 ATR(14). Room = distance to the nearest swing high or 60-day high above, in R. Gann match = the level is within 0.5% of a Square-of-9 level (√swing ± k×0.25 for k = 1–8, i.e. 45°–360°) from the last 4 swings. Liquid stocks (₹2 cr+ a day, price ₹100+). Updated nightly.</p></details>
+      <label class="search"><input id="supq" type="search" placeholder="Search symbol or company" value="${esc(state.supQ || '')}" autocomplete="off"></label>
+      <ul class="list flat" id="suplist"></ul></div>`;
+  const list = () => {
+    const L = supRows();
+    $('#suplist').innerHTML = L.length ? L.map(supItem).join('') : '<li class="empty">No stocks match.</li>';
+    $('#suplist').querySelectorAll('.row').forEach((r) => { const go = () => supSelect(L[+r.dataset.i]); r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
+  };
+  el.querySelectorAll('#supf button').forEach((b) => b.addEventListener('click', () => { state.supF = b.dataset.k; loadSupport(); }));
+  el.querySelectorAll('#supg button').forEach((b) => b.addEventListener('click', () => { state.supG = b.dataset.k; loadSupport(); }));
+  $('#supq').addEventListener('input', (e) => { state.supQ = e.target.value; list(); });
+  botTabsWire(el);
+  list();
+}
+function supSelect(r) {
+  const st = r.status === 'touched' ? `<div class="status open">First return to the ${r.level_kind === 'breakout retest' ? 'old breakout level' : 'old swing low'} ${fmt(r.level, 2, AL())} on ${day(r.touch_date)} (low within 3%, close held). Now ${fmt(r.above_pct, 1)}% above it.</div>`
+    : `<div class="status info">${fmt(r.above_pct, 1)}% above the ${r.level_kind === 'breakout retest' ? 'old breakout level' : 'old swing low'} ${fmt(r.level, 2, AL())}, not yet revisited.</div>`;
+  const g = r.gann != null ? `${fmt(r.gann, 2, AL())} — ${r.gann_deg}° ${r.gann_dir === 'up' ? 'above' : 'below'} the swing ${r.gann_from[2] === 'L' ? 'low' : 'high'} ${fmt(r.gann_from[1], 2, AL())} (${day(r.gann_from[0])}); ${fmt(Math.abs(r.gann_dist_pct), 2)}% from the level${r.gann_match ? ' · match' : ''}` : '–';
+  const f = [['Level', `${fmt(r.level, 2, AL())} (${r.level_kind}, swing of ${day(r.level_date)})`], ['Stop (level − 1 ATR)', `${fmt(r.stop, 2, AL())} (${fmt(r.risk_pct, 1)}% below the close)`],
+    ['Next resistance', r.resistance != null ? `${fmt(r.resistance, 2, AL())} · room ${fmt(r.room_r, 1)}R${r.room_r >= 3 ? ' (1:3 fits)' : ''}` : 'none above (blue sky)'],
+    ['3R target from the close', fmt(r.close + 3 * (r.close - r.stop), 2, AL())], ['Nearest Gann Square-of-9 level', g]];
+  openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, AL())}</b></div></div>
+    ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: breakout retests +0.20R a trade vs +0.09R random; old swing lows, Gann confluence and 1:3 room added nothing. Not part of your tested systems.</div>
+    <div class="chart" id="supc"></div>
+    <p class="muted" style="margin:4px 16px">Daily candles · green = support level · purple dashed = Gann level · red = stop · gold = next resistance · blue / grey = 50 / 200-day average.</p>
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`);
+  drawSup(r);
+}
+async function drawSup(r) {
+  const box = $('#supc'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
+  let c; try { const res = await fetch(MAIN + `data/scan/pattern_charts/${encodeURIComponent(r.symbol.replace(/ /g, '_'))}.json`); if (!res.ok) throw 0; c = await res.json(); }
+  catch (e) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; }
+  box.innerHTML = '';
+  const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
+  const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath');
+  s.createPriceLine({ price: r.level, color: '#0A7A55', lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'support' });
+  if (r.gann != null) s.createPriceLine({ price: r.gann, color: '#7C5CFC', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: `Gann ${r.gann_deg}°` });
+  s.createPriceLine({ price: r.stop, color: C.fall || '#C62828', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'stop' });
+  if (r.resistance != null) s.createPriceLine({ price: r.resistance, color: C.saffron, lineWidth: 1, lineStyle: 0, axisLabelVisible: true, title: 'resistance' });
+  const ma = (k, col) => { const l = ch.addLineSeries({ color: col, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    l.setData(c.t.map((t, i) => (c[k][i] == null ? { time: t } : { time: t, value: c[k][i] }))); };
+  ma('sma50', '#3B82F6'); ma('sma200', '#9CA3AF');
+  const mk = [];
+  if (c.t.includes(r.level_date)) mk.push({ time: r.level_date, position: r.level_kind === 'breakout retest' ? 'aboveBar' : 'belowBar', color: '#0A7A55', shape: 'circle', text: 'swing' });
+  if (r.touch_date && c.t.includes(r.touch_date)) mk.push({ time: r.touch_date, position: 'belowBar', color: '#B45309', shape: 'arrowUp', text: 'touch' });
+  s.setMarkers(mk.sort((a, b) => (a.time < b.time ? -1 : 1)));
+  const n = c.t.length; ch.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 200), to: n + 3 });
+  new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
 }
 function patSelect(r) {
   const P = state.pat || {}; const rg = P.regime;

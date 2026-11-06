@@ -23,7 +23,7 @@ jobs:
       - name: Commit
         run: |
           git config user.name "pattern-scan bot"; git config user.email "actions@users.noreply.github.com"
-          git add data/scan/patterns.json data/scan/pattern_charts || true
+          git add data/scan/patterns.json data/scan/support.json data/scan/pattern_charts || true
           git diff --cached --quiet && exit 0
           git commit -qm "Pattern scan $(date -u +%F)"
           for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done

@@ -109,6 +109,71 @@ def scan(x, sym, name, kind="stock"):
     return best
 
 
+def gann_near(level, piv, t):
+    """nearest Gann Square-of-9 level (sqrt(P) +- k*0.25, k=1..8 = 45..360 degrees) from the last 4 swings before t."""
+    best = None
+    for kind, i, pr, ci in [q for q in piv if q[3] <= t][-4:]:
+        sq = np.sqrt(pr)
+        for k in range(1, 9):
+            for sg in (1, -1):
+                g = (sq + sg * k * 0.25) ** 2
+                d = level / g - 1
+                if best is None or abs(d) < abs(best["dist_pct"]) / 100:
+                    best = dict(level=round(float(g), 2), deg=k * 45, dir="up" if sg > 0 else "down", from_kind=kind, from_price=round(float(pr), 2), from_i=i, dist_pct=float(d * 100))
+    return best
+
+
+def support(x, sym, name):
+    """Uptrend stock at (or within 5% above) an old swing level it has not revisited since moving 8%+ away from it.
+    Backtest 2016-26 (scratchpad srt/): breakout retests +0.20R vs +0.09R random (1-ATR stop, 3R target); old swing lows none;
+    1:3 room and Gann confluence added nothing."""
+    c = x.Close.to_numpy(float); h = x.High.to_numpy(float); l = x.Low.to_numpy(float); n = len(c); dts = x.index
+    if n < 260:
+        return None
+    s50 = pd.Series(c).rolling(50).mean().to_numpy(); s200 = pd.Series(c).rolling(200).mean().to_numpy()
+    if not (c[-1] > s50[-1] > s200[-1] and s200[-1] > s200[-21]):
+        return None
+    tr = np.maximum(h - l, np.maximum(abs(h - np.roll(c, 1)), abs(l - np.roll(c, 1)))); atr = pd.Series(tr).rolling(14).mean().to_numpy()
+    piv = zigzag(c, THR); lv = []; pi = 0; touch = None
+    for t in range(n):
+        while pi < len(piv) and piv[pi][3] <= t:
+            k_, i_, pr, ci = piv[pi]; lv.append(dict(p=pr, kind=k_, i=i_, armed=False, used=False)); pi += 1
+        for L in lv:
+            if L["used"] or t - L["i"] > 750:
+                continue
+            if not L["armed"]:
+                L["armed"] = c[t] >= L["p"] * 1.08
+                continue
+            if l[t] <= L["p"] * 1.03 and c[t] >= L["p"]:
+                L["used"] = True
+                if t >= n - 5 and c[-1] <= L["p"] * 1.08 and (touch is None or L["p"] > touch[0]["p"] or t > touch[1]):
+                    touch = (L, t)
+            elif c[t] < L["p"] * 0.98:
+                L["used"] = True
+    if touch:
+        L, t = touch; status = "touched"
+    else:
+        near = [L for L in lv if L["armed"] and not L["used"] and n - 1 - L["i"] <= 750 and L["p"] <= c[-1] <= L["p"] * 1.05]
+        if not near:
+            return None
+        L = max(near, key=lambda z: z["p"]); t = n - 1; status = "near"
+    lvl = float(L["p"]); stop = lvl - float(atr[-1]); E = float(c[-1])
+    res = [q[2] for q in piv if q[0] == "H" and n - 1 - q[1] <= 750 and q[2] > E * 1.01]
+    rh = float(h[-61:].max())
+    if rh > E * 1.01:
+        res.append(rh)
+    nr = float(min(res)) if res else None
+    g = gann_near(lvl, piv, t)
+    return dict(symbol=sym, name=name, status=status, touch_date=str(dts[t].date()) if status == "touched" else None,
+                days_ago=int(n - 1 - t) if status == "touched" else None, level=round(lvl, 2),
+                level_kind="breakout retest" if L["kind"] == "H" else "old swing low", level_date=str(dts[L["i"]].date()),
+                close=E, above_pct=float((E / lvl - 1) * 100), stop=round(stop, 2), risk_pct=float((1 - stop / E) * 100),
+                resistance=round(nr, 2) if nr else None, room_r=float((nr - E) / (E - stop)) if nr and E > stop else None,
+                gann=g["level"] if g else None, gann_deg=g["deg"] if g else None, gann_dir=g["dir"] if g else None,
+                gann_from=[str(dts[g["from_i"]].date()), g["from_price"], g["from_kind"]] if g else None,
+                gann_dist_pct=g["dist_pct"] if g else None, gann_match=bool(g and abs(g["dist_pct"]) <= 0.5))
+
+
 def rsi(c, n=14):
     """Wilder RSI on closes."""
     c = np.asarray(c, float); d = np.diff(c, prepend=c[0])
@@ -145,12 +210,12 @@ def main():
     u = nse_symbols(); u = u[u.board == "main"] if "board" in u else u
     u["ticker"] = u.symbol + ".NS"; name = dict(zip(u.symbol, u.name)) if "name" in u else {}
     jobs = [(t, s, name.get(s, s), "stock") for t, s in zip(u.ticker, u.symbol)] + [(t, n_, n_, "index") for t, n_ in INDICES.items()]
-    rows, asof = [], None
+    rows, srows, asof = [], [], None
     for a in range(0, len(jobs), 80):
         chunk = jobs[a:a + 80]; dd = None
         for _ in range(3):
             try:
-                dd = yf.download([j[0] for j in chunk], period="2y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+                dd = yf.download([j[0] for j in chunk], period="3y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
                 break
             except Exception as e:  # noqa: BLE001
                 print("retry", a, e, flush=True); time.sleep(20)
@@ -167,8 +232,12 @@ def main():
                     if float(x.Close.iloc[-1]) < MIN_CLOSE or float((x.Close * x.Volume).tail(20).mean()) < MINVAL:
                         continue
                 r = scan(x, sym, nm, kind)
+                s_ = support(x, sym, nm) if kind == "stock" else None
                 if r:
                     rows.append(r)
+                if s_:
+                    srows.append(s_)
+                if r or s_:
                     json.dump(chart(x), open(f"{CH}/{sym.replace(' ', '_')}.json", "w"))
             except Exception as e:  # noqa: BLE001
                 print("fail", sym, e)
@@ -191,6 +260,17 @@ def main():
                rows=rows)
     json.dump(out, open(f"{OUT}/patterns.json", "w"), indent=0)
     print("patterns", len(rows), {s: sum(r["status"] == s for r in rows) for s in order})
+    srows.sort(key=lambda r: (r["status"] != "touched", not r["gann_match"], r["days_ago"] if r["status"] == "touched" else r["above_pct"]))
+    json.dump(dict(generated=out["generated"], asof=out["asof"], market="NSE",
+                   rules="Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) "
+                         "that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). "
+                         "'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Gann match = level within 0.5% of a "
+                         "Square-of-9 level (sqrt(swing) +- k*0.25, k = 1..8) from the last 4 swings.",
+                   backtest="2016-26, 16,908 first touches, 3R target vs stop (1 ATR below the level): breakout retests +0.20R per trade, "
+                            "old swing lows +0.10R, random uptrend stock the same day +0.09R. Trades with 1:3 room to the next resistance: no better. "
+                            "Near a Gann level: no better (+0.20R vs +0.21R). Gann levels held as often as arbitrary levels. Watch only.",
+                   rows=srows), open(f"{OUT}/support.json", "w"), indent=0)
+    print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["gann_match"] for r in srows), "gann match")
 
 
 if __name__ == "__main__":
