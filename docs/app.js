@@ -1033,7 +1033,7 @@ function patRows() {
 }
 function patItem(r, i) {
   const st = r.status === 'breakout' ? `<span class="chip new">Broke neckline ${r.days_since === 0 ? 'today' : r.days_since + 'd ago'}</span>` : `<span class="chip open">${fmt(r.to_neck_pct, 1)}% to neckline</span>`;
-  const chip = `${st}<span class="chip">${PAT_NM[r.typ]}</span>${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fell ${fmt(r.fall_pct, 0)}%</span><span class="chip">stop ${fmt(r.stop_pct, 0)}% below</span>`;
+  const chip = `${st}<span class="chip">${PAT_NM[r.typ]}</span>${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fell ${fmt(r.fall_pct, 0)}%</span><span class="chip">stop ${fmt(r.stop_pct, 0)}% below</span>${r.rsi_div > 0 ? '<span class="chip open">RSI divergence</span>' : ''}`;
   return `<li class="row ${r.status === 'breakout' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.kind === 'index' ? r.name : r.symbol)}</div><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div>
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">neck ${fmt(r.neck, 2, 'en-IN')}</span></div></li>`;
 }
@@ -1076,10 +1076,12 @@ function patSelect(r) {
   const f = [['Pattern', PAT_NM[r.typ]], ['Lows', r.lows.map((x) => `${fmt(x[1], 2, AL())} (${day(x[0])})`).join(' · ')], ['Neckline (highest peak between the lows)', fmt(r.neck, 2, AL())],
     ['Pattern stop (lowest low − 1%)', `${fmt(r.stop, 2, AL())} (${fmt(r.stop_pct, 1)}% below)`], ['Measured move', `${fmt(r.height_pct, 1)}% above the neckline = ${fmt(r.neck * (1 + r.height_pct / 100), 2, AL())}`],
     ['Fall before the pattern', `${fmt(r.fall_pct, 0)}% from the 1-year high`], ['Market', rg ? (rg.down ? 'Nifty 500 below its 200-day average (downtrend)' : 'Nifty 500 above its 200-day average') : '–']];
+  if (r.rsi_lows) f.splice(2, 0, ['RSI(14) at the lows', r.rsi_lows.map((v) => fmt(v, 0)).join(' → ') + (r.rsi_now != null ? ` · now ${fmt(r.rsi_now, 0)}` : '')],
+    ['RSI divergence', r.rsi_div > 0 ? `Bullish: a later low at or below an earlier one with RSI ${fmt(r.rsi_div, 0)} points higher` : (r.typ === 'TW' ? 'None (a tilted W has a higher low by design)' : 'None')]);
   openPanel(`<div class="d-head"><div><h2>${esc(r.kind === 'index' ? r.name : r.symbol)}</h2><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, AL())}</b></div></div>
     ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: no edge over a random stock. Not part of your tested systems.</div>
-    <div class="chart" id="patc"></div>
-    <p class="muted" style="margin:4px 16px">Daily candles · ● lows · gold line = neckline · red = pattern stop · blue = 50-day, grey = 200-day average</p>
+    <div class="chart" id="patc"></div><div class="rsi" id="patr"></div>
+    <p class="muted" style="margin:4px 16px">Daily candles · ● lows · gold = neckline · red = pattern stop · blue / grey = 50 / 200-day average · lower panel RSI(14) with 30 / 70${r.rsi_div > 0 ? ' · dashed purple = divergence (price low vs RSI low)' : ''}. RSI divergence did not improve the odds in the 2016–26 test (target first 67% vs 66% for a random stock).</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`);
   drawPat(r);
 }
@@ -1100,8 +1102,28 @@ async function drawPat(r) {
     .sort((a, b) => (a.time < b.time ? -1 : 1));
   s.setMarkers(mk);
   const first = c.t.indexOf(r.lows[0][0]); const n = c.t.length;
+  const rbox = $('#patr'); let rc = null;
+  if (c.rsi && rbox) {
+    rc = window.LightweightCharts.createChart(rbox, { ...chartBase(), height: rbox.clientHeight, width: rbox.clientWidth, timeScale: { visible: false } });
+    const rs = rc.addLineSeries({ color: C.rsi || '#7C5CFC', lineWidth: 2, priceLineVisible: false });
+    rs.setData(c.t.map((t, i) => (c.rsi[i] == null ? { time: t } : { time: t, value: c.rsi[i] })));
+    rs.createPriceLine({ price: 70, color: '#D0D6E0', lineWidth: 1, lineStyle: 3, axisLabelVisible: false });
+    rs.createPriceLine({ price: 30, color: '#D0D6E0', lineWidth: 1, lineStyle: 3, axisLabelVisible: false });
+    rs.setMarkers(r.lows.filter((x) => c.t.includes(x[0])).map((x) => ({ time: x[0], position: 'belowBar', color: '#0A7A55', shape: 'circle', text: '' })));
+    if (r.rsi_div > 0 && r.lows.length >= 2) {
+      // join the two lows that diverge most: lowest-price later low vs the earlier low
+      const L = r.lows; const a = L[0]; const b = L[L.length - 1];
+      const ia = c.t.indexOf(a[0]); const ib = c.t.indexOf(b[0]);
+      if (ia >= 0 && ib > ia) {
+        const dl = { color: '#7C5CFC', lineWidth: 2, lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false };
+        ch.addLineSeries(dl).setData([{ time: a[0], value: c.c[ia] }, { time: b[0], value: c.c[ib] }]);
+        rc.addLineSeries(dl).setData([{ time: a[0], value: c.rsi[ia] }, { time: b[0], value: c.rsi[ib] }]);
+      }
+    }
+    ch.timeScale().subscribeVisibleLogicalRangeChange((rg) => rg && rc.timeScale().setVisibleLogicalRange(rg));
+  }
   ch.timeScale().setVisibleLogicalRange({ from: Math.max(0, (first > 0 ? first : n - 200) - 40), to: n + 3 });
-  new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
+  new ResizeObserver(() => { ch.applyOptions({ width: box.clientWidth }); if (rc) rc.applyOptions({ width: rbox.clientWidth }); }).observe(box);
 }
 function ipoRows(countOnly) {
   const p = state.ath && state.ath.ipo; if (!p) return [];

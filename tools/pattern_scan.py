@@ -94,10 +94,12 @@ def scan(x, sym, name, kind="stock"):
                     continue
                 status = "forming"
             plow = float(min(lw[l_[1]] for l_ in lows))
+            rv = rsi(c); li = [l_[1] for l_ in lows]; dv = divergence(c, rv, li)
             row = dict(symbol=sym, name=name, kind=kind, typ=typ, status=status, close=float(c[-1]), neck=float(neck),
                        to_neck_pct=float((neck / c[-1] - 1) * 100), stop=round(plow * 0.99, 2), stop_pct=float((1 - plow * 0.99 / c[-1]) * 100),
                        height_pct=float((neck / min(l_[2] for l_ in lows) - 1) * 100), fall_pct=float((rmax[i1] / first[2] - 1) * 100),
                        lows=[[str(dts[l_[1]].date()), float(l_[2])] for l_ in lows], peaks=[[str(dts[p_[1]].date()), float(p_[2])] for p_ in peaks],
+                       rsi_lows=[round(float(rv[i_]), 1) for i_ in li], rsi_div=round(dv, 1), rsi_now=round(float(rv[-1]), 1),
                        signal_date=str(dts[sig].date()) if sig is not None else None,
                        days_since=int(n - 1 - sig) if sig is not None else None)
             if best is None or (row["status"] == "breakout") > (best["status"] == "breakout"):
@@ -107,12 +109,32 @@ def scan(x, sym, name, kind="stock"):
     return best
 
 
+def rsi(c, n=14):
+    """Wilder RSI on closes."""
+    c = np.asarray(c, float); d = np.diff(c, prepend=c[0])
+    au = pd.Series(np.where(d > 0, d, 0.0)).ewm(alpha=1 / n, adjust=False).mean().to_numpy()
+    ad = pd.Series(np.where(d < 0, -d, 0.0)).ewm(alpha=1 / n, adjust=False).mean().to_numpy()
+    return 100 - 100 / (1 + au / np.maximum(ad, 1e-12))
+
+
+def divergence(c, r, lows_i):
+    """bullish RSI divergence: a later low at or below an earlier low while RSI is 2+ points higher. Returns RSI gap or 0."""
+    best = 0.0
+    for a in range(len(lows_i)):
+        for b in range(a + 1, len(lows_i)):
+            ia, ib = lows_i[a], lows_i[b]
+            if c[ib] <= c[ia] and r[ib] > r[ia] + 2:
+                best = max(best, float(r[ib] - r[ia]))
+    return best
+
+
 def chart(x):
     t = x.tail(320)
     return dict(t=[str(d.date()) for d in t.index], o=[round(float(v), 2) for v in t.Open], h=[round(float(v), 2) for v in t.High],
                 l=[round(float(v), 2) for v in t.Low], c=[round(float(v), 2) for v in t.Close],
                 sma50=[None if np.isnan(v) else round(float(v), 2) for v in x.Close.rolling(50).mean().tail(320)],
-                sma200=[None if np.isnan(v) else round(float(v), 2) for v in x.Close.rolling(200).mean().tail(320)])
+                sma200=[None if np.isnan(v) else round(float(v), 2) for v in x.Close.rolling(200).mean().tail(320)],
+                rsi=[round(float(v), 1) for v in rsi(x.Close.to_numpy(float))[-320:]])
 
 
 def main():
@@ -164,7 +186,8 @@ def main():
                rules="zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; "
                      "breakout = close above the neckline within 60 days of the last low",
                backtest="2016-26, 3,994 signals: 120-day return +3.5% vs +7.4% for a random liquid stock; in market downtrends +10.5% "
-                        "vs +13.6% for any stock. No edge - watch only.",
+                        "vs +13.6% for any stock; target before stop 63% vs 63% for a random stock; with bullish RSI divergence "
+                        "66% vs 65%, 120d +4.7%. No edge - watch only.",
                rows=rows)
     json.dump(out, open(f"{OUT}/patterns.json", "w"), indent=0)
     print("patterns", len(rows), {s: sum(r["status"] == s for r in rows) for s in order})
