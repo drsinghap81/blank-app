@@ -103,7 +103,7 @@ def test_fill_protect_exit(tmp_path):
     assert t["state"] == "open" and t["gtt_id"] and abs(t["gtt_trigger"] - round(lv, 2)) < 0.02
     assert next(x for x in P2["rows"] if x["id"] == r["id"])["skip"] == "already held"
     # the stop fires on Angel's side: holding disappears -> recorded as stopped, streak counted
-    A.broker.hold[r["symbol"]] = 0
+    A.broker.hold[r["symbol"]] = 0; A._acc["d"] = None
     P3 = c.get("/api/plan", headers=h).json()
     assert not any(t["symbol"] == r["symbol"] for t in P3["trades"])
     assert P3["recent"][0]["symbol"] == r["symbol"] and "stopped" in P3["recent"][0]["state"]
@@ -162,3 +162,17 @@ def test_live_checks(tmp_path):
     A.broker.ltp = lambda s: row["ref"] * 1.01
     j = c.post("/api/order", headers=h, json={"id": row["id"], "qty": row["qty"], "confirm": f"BUY {row['qty']} {row['symbol']}"}).json()
     assert j["order"]["ordertype"] == "LIMIT" and j["order"]["variety"] == "NORMAL"
+
+
+def test_angel_reject_reason(tmp_path):
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
+    def bad(p): raise RuntimeError("The order cannot be processed as the token is categorised under cautionary listings by the exchange. [AB4036]")
+    A.broker.place = bad
+    P = c.get("/api/plan", headers=h).json()
+    rs = [r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] != "ATH_STOP"][:2]
+    j = c.post("/api/order", headers=h, json={"id": rs[0]["id"], "qty": rs[0]["qty"], "confirm": f"BUY {rs[0]['qty']} {rs[0]['symbol']}"})
+    assert j.status_code == 502 and "cautionary" in j.json()["detail"]
+    j = c.post("/api/basket", headers=h, json={"items": [{"id": rs[1]["id"], "qty": rs[1]["qty"]}], "confirm": "BASKET 1"}).json()
+    assert not j["results"][0]["ok"] and "cautionary" in j["results"][0]["error"]

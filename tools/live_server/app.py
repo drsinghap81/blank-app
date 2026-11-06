@@ -330,8 +330,29 @@ def trades_view(J, acc):
     return out, recent
 
 
+_acc = {"t": 0, "d": None}
+
+
+def account_cached(max_age=5):
+    """one Angel account read per few seconds (Angel rate-limits holdings / funds calls)."""
+    if _acc["d"] is None or time.time() - _acc["t"] > max_age:
+        _acc.update(d=broker.account(), t=time.time())
+    return _acc["d"]
+
+
+ANGEL_WHY = {"AB4036": "Angel doesn't take API orders for this stock: the exchange has it on its cautionary (surveillance) list. "
+                       "If you still want it, place it yourself in the Angel app.",
+             "AB1007": "Angel login session problem - try again in a minute.",
+             "AB4008": "price outside the allowed band for today."}
+
+
+def angel_msg(e):
+    m = str(e); code = re.search(r"\[(AB\d+)\]", m)
+    return ANGEL_WHY.get(code.group(1), m) if code else m
+
+
 def sized(acc=None):
-    P = plan(); acc = acc or broker.account()
+    P = plan(); acc = acc or account_cached()
     J = sync(acc)
     G = guard(acc)
     held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
@@ -416,7 +437,10 @@ class Order(BaseModel):
 
 @app.post("/api/order")
 def order(body: Order, _=Depends(auth)):
-    S = sized()
+    try:
+        S = sized()
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(502, f"couldn't read your Angel account: {angel_msg(ex)}")
     done = today_log()
     if any(r.get("id") == body.id and r.get("kind") == "order" for r in done):
         raise HTTPException(409, "already sent today")
@@ -484,7 +508,9 @@ def order(body: Order, _=Depends(auth)):
         oid = broker.place(p)
     except Exception as e:  # noqa: BLE001
         log("order_error", error=str(e), **rec)
-        raise HTTPException(502, f"Angel rejected: {e}")
+        _acc["d"] = None
+        raise HTTPException(502, f"Angel rejected {sym}: {angel_msg(e)}")
+    _acc["d"] = None
     log("order", order_id=oid, **rec)
     J = journal()
     if side == "BUY":
@@ -568,7 +594,11 @@ def basket(body: Basket, _=Depends(auth)):
         raise HTTPException(400, "same trade twice in the basket")
     if body.confirm.strip().upper() != f"BASKET {len(items)}":
         raise HTTPException(400, f'confirm must be "BASKET {len(items)}"')
-    S = sized(); rows = {r["id"]: r for r in S["rows"]}
+    try:
+        S = sized()
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(502, f"couldn't read your Angel account: {angel_msg(ex)}")
+    rows = {r["id"]: r for r in S["rows"]}
     out = []
     for i in items:
         r = rows.get(i.id)
@@ -580,6 +610,9 @@ def basket(body: Basket, _=Depends(auth)):
                             order=res.get("order"), protect=res.get("protect")))
         except HTTPException as ex:
             out.append(dict(id=i.id, symbol=r["symbol"], qty=i.qty, ok=False, error=ex.detail))
+        except Exception as ex:  # noqa: BLE001  (never let one item kill the basket)
+            out.append(dict(id=i.id, symbol=r["symbol"], qty=i.qty, ok=False, error=angel_msg(ex)))
+        time.sleep(0.4)
     log("basket", n=len(items), ok=sum(o["ok"] for o in out))
     return dict(mode="LIVE" if is_live() else "DRY RUN", results=out)
 

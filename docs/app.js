@@ -224,7 +224,19 @@ async function lvOpen(r) {
   if (near) { athSelect({ ...near, _near: true }); return; }
   alertMsg('Chart not available for ' + r.symbol);
 }
-function alertMsg(t, ok) { const m = document.createElement('div'); m.className = 'status ' + (ok ? 'open' : 'exit'); m.style.margin = '10px 16px'; m.textContent = t; $('#view-live').prepend(m); setTimeout(() => m.remove(), 6000); }
+/* result banner: fixed above the bottom bar, stays until tapped (errors) or 20 s (ok) */
+function alertMsg(t, ok) {
+  document.querySelectorAll('.lv-toast').forEach((x) => x.remove());
+  const m = document.createElement('div'); m.className = 'lv-toast ' + (ok ? 'ok' : 'bad'); m.setAttribute('role', 'alert');
+  m.innerHTML = `<div>${esc(t)}</div><button aria-label="Close">✕</button>`; m.querySelector('button').onclick = () => m.remove();
+  document.body.appendChild(m); if (ok) setTimeout(() => m.remove(), 20000);
+}
+function lvRowMsg(id, t, ok) {
+  const d = document.querySelector(`.lv-q[data-q="${CSS.escape(id)}"]`); if (!d) return;
+  const row = d.closest('.lv-row'); let r = row.querySelector('.lv-res');
+  if (!r) { r = document.createElement('div'); r.className = 'lv-res'; row.appendChild(r); }
+  r.className = 'lv-res ' + (ok ? 'ok' : 'bad'); r.textContent = t;
+}
 async function lvSend(r, side, btn) {
   const qty = r.qty; const conf = `${side} ${qty} ${r.symbol}`;
   const px = side === 'BUY' ? (r.kind === 'ATH_STOP' ? `buy-stop at ${fmt(r.trigger, 2, 'en-IN')}` : `limit ${fmt(r.price, 2, 'en-IN')}`) : 'limit ~1% below the price';
@@ -236,10 +248,11 @@ async function lvSend(r, side, btn) {
   try {
     const j = await lvApi('/api/order', { method: 'POST', body: JSON.stringify({ id: r.id, qty, confirm: conf }) });
     btn.textContent = j.sent ? 'Sent ✓' : 'Dry run ✓';
+    lvRowMsg(r.id, j.sent ? `Sent to Angel (order ${j.order_id}) at ${j.order.price}. Waiting for the fill — it shows as Filled in "Your trades".` : `Dry run: would send ${j.order.ordertype} ${j.order.transactiontype} ${j.order.quantity} @ ${j.order.price}. Nothing sent.`, true);
     const pr = j.protect ? ` Then, once filled: protective stop on Angel at ${fmt(j.protect.trigger, 2, 'en-IN')} (${j.protect.note}).` : '';
     alertMsg(j.sent ? `Order placed: ${conf} (Angel id ${j.order_id}). The app tracks the fill and then places the protective stop.${pr}` : `Dry run — would send: ${j.order.variety} ${j.order.ordertype} ${j.order.transactiontype} ${j.order.quantity} ${j.order.tradingsymbol} @ ${j.order.price}${j.order.triggerprice ? ' trigger ' + j.order.triggerprice : ''}.${pr}`, true);
     setTimeout(loadLive, 4000);
-  } catch (e) { btn.disabled = false; btn.textContent = side === 'BUY' ? 'Send' : `Sell ${qty}`; alertMsg('Not sent: ' + e.message); }
+  } catch (e) { btn.disabled = false; btn.textContent = side === 'BUY' ? 'Send' : `Sell ${qty}`; alertMsg('Not sent: ' + e.message); lvRowMsg(r.id, 'Not sent: ' + e.message, false); }
 }
 
 /* live prices on each plan row; refreshed every 15 s while the Live tab is open and the market is open */
@@ -284,6 +297,7 @@ async function lvBasket(B, btn) {
     const msg = (j.mode === 'LIVE' ? `Sent ${ok.length} of ${j.results.length}: ${ok.map((x) => x.symbol).join(', ')}.` : `Dry run — ${ok.length} of ${j.results.length} would be sent: ${ok.map((x) => `${x.qty} ${x.symbol} @ ${x.order.price}`).join(', ')}.`)
       + (bad.length ? ` Not sent: ${bad.map((x) => `${x.symbol || x.id} (${x.error})`).join('; ')}.` : '') + (j.mode === 'LIVE' ? ' Each gets its protective stop after the fill.' : '');
     alertMsg(msg, !bad.length);
+    j.results.forEach((x) => lvRowMsg(x.id, x.ok ? (x.sent ? `Sent to Angel (order ${x.order_id}). Waiting for the fill.` : `Dry run: would send ${x.qty} @ ${x.order.price}.`) : `Not sent: ${x.error}`, x.ok));
     setTimeout(loadLive, 4000);
   } catch (e) { alertMsg('Not sent: ' + e.message); }
   btn.disabled = false; btn.textContent = 'Send basket';

@@ -72,6 +72,16 @@ class AngelEquity:
             raise ValueError(f"{symbol}: not found in Angel's NSE equity list")
         return ts, self.tokens[ts]
 
+    def _call(self, fn, *a, tries=3):
+        """Angel sometimes answers a burst of calls with an empty / non-JSON body (rate limit): retry briefly."""
+        for k in range(tries):
+            try:
+                return fn(*a)
+            except Exception as e:  # noqa: BLE001
+                if k == tries - 1 or not any(w in str(e) for w in ("JSON", "Expecting value", "parse", "rate", "Access denied")):
+                    raise
+                time.sleep(0.8 * (k + 1))
+
     @staticmethod
     def _data(r):
         if isinstance(r, dict):
@@ -82,9 +92,9 @@ class AngelEquity:
 
     def account(self):
         api = self._session()
-        f = self._data(api.rmsLimit()) or {}
-        hold = self._data(api.holding()) or []
-        pos = self._data(api.position()) or []
+        f = self._data(self._call(api.rmsLimit)) or {}
+        hold = self._data(self._call(api.holding)) or []
+        pos = self._data(self._call(api.position)) or []
         H = [dict(symbol=str(h.get("tradingsymbol", "")).replace("-EQ", ""), qty=int(float(h.get("quantity") or 0)) + int(float(h.get("t1quantity") or 0)),
                   avg=float(h.get("averageprice") or 0), ltp=float(h.get("ltp") or 0), pnl=float(h.get("profitandloss") or 0)) for h in hold]
         P = [dict(symbol=str(p.get("tradingsymbol", "")).replace("-EQ", ""), qty=int(float(p.get("netqty") or 0)),
@@ -95,7 +105,7 @@ class AngelEquity:
 
     def ltp(self, symbol):
         api = self._session(); ts, t = self._ts(symbol)
-        d = self._data(api.ltpData("NSE", ts, t["token"])) or {}
+        d = self._data(self._call(api.ltpData, "NSE", ts, t["token"])) or {}
         return float(d.get("ltp") or 0)
 
     def quotes(self, symbols):
@@ -108,7 +118,7 @@ class AngelEquity:
         out = {}
         ids = list(tok)
         for i in range(0, len(ids), 50):
-            d = self._data(api.getMarketData("OHLC", {"NSE": ids[i:i + 50]})) or {}
+            d = self._data(self._call(api.getMarketData, "OHLC", {"NSE": ids[i:i + 50]})) or {}
             for q in d.get("fetched") or []:
                 sym = tok.get(str(q.get("symbolToken")))
                 if sym:
@@ -122,7 +132,7 @@ class AngelEquity:
                      qty=o.get("quantity"), price=o.get("price"), trigger=o.get("triggerprice"), status=o.get("status"),
                      avg=float(o.get("averageprice") or 0), filled=int(float(o.get("filledshares") or 0)),
                      variety=o.get("variety"), text=o.get("text"), time=o.get("updatetime"))
-                for o in (self._data(api.orderBook()) or [])]
+                for o in (self._data(self._call(api.orderBook)) or [])]
 
     def params(self, symbol, side, qty, price, kind="LIMIT", trigger=None, amo=False):
         ts, t = self._ts(symbol) if self.tokens else (f"{symbol}-EQ", dict(token="?", tick=0.05))
@@ -140,10 +150,11 @@ class AngelEquity:
         if p["tradingsymbol"] not in self.tokens:
             raise ValueError("unknown symbol")
         p["symboltoken"] = self.tokens[p["tradingsymbol"]]["token"]
-        oid = api.placeOrder(p)
-        if not oid:
-            raise RuntimeError("Angel did not return an order id")
-        return str(oid)
+        r = self._call(api.placeOrderFullResponse, dict(p), tries=1) or {}
+        d = r.get("data") or {}
+        if r.get("status") and d.get("orderid"):
+            return str(d["orderid"])
+        raise RuntimeError(f"{r.get('message') or 'no order id'} [{r.get('errorcode') or '?'}]")
 
 
     def gtt_stop(self, symbol, qty, trigger, limit):
