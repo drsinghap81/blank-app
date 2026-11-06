@@ -87,3 +87,35 @@ def test_mode_switch(tmp_path):
     assert c.get("/api/health").json()["mode"] == "LIVE"
     assert c.post("/api/mode", headers=h, json={"live": False}).json()["mode"] == "DRY RUN"   # one tap, no password
     assert c.get("/api/health").json()["mode"] == "DRY RUN"
+
+
+def test_fill_protect_exit(tmp_path):
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
+    P = c.get("/api/plan", headers=h).json()
+    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] != "ATH_STOP")
+    j = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"}).json()
+    lv = r["stop"] if r["kind"] == "T921" else r["stop"] * 0.85
+    assert abs(j["protect"]["trigger"] - round(lv, 2)) < 0.02
+    P2 = c.get("/api/plan", headers=h).json()                 # sync: mock fills at once -> open + GTT
+    t = next(t for t in P2["trades"] if t["symbol"] == r["symbol"])
+    assert t["state"] == "open" and t["gtt_id"] and abs(t["gtt_trigger"] - round(lv, 2)) < 0.02
+    assert next(x for x in P2["rows"] if x["id"] == r["id"])["skip"] == "already held"
+    # the stop fires on Angel's side: holding disappears -> recorded as stopped, streak counted
+    A.broker.hold[r["symbol"]] = 0
+    P3 = c.get("/api/plan", headers=h).json()
+    assert not any(t["symbol"] == r["symbol"] for t in P3["trades"])
+    assert P3["recent"][0]["symbol"] == r["symbol"] and "stopped" in P3["recent"][0]["state"]
+    assert P3["guard"]["streak"] == 1
+
+
+def test_dry_shows_protect(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
+    P = c.get("/api/plan", headers=h).json()
+    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] != "ATH_STOP")
+    j = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"}).json()
+    assert j["sent"] is False and j["protect"]["trigger"] < r["stop"] + 0.01
+    assert not getattr(A.broker, "gtts", None) and not A.broker.placed

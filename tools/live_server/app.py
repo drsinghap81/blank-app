@@ -63,6 +63,12 @@ STREAK, PAUSE_DAYS = int(ENV.get("STREAK", "5")), int(ENV.get("PAUSE_DAYS", "14"
 MAX_POSITIONS = int(ENV.get("MAX_POSITIONS", "10"))
 MAX_ORDER_VALUE = float(ENV.get("MAX_ORDER_VALUE", "300000"))
 MAX_ORDERS_DAY = int(ENV.get("MAX_ORDERS_DAY", "10"))
+# protective stop on Angel (GTT) after each filled buy. 9/21: at the plan stop (as backtested, intraday 5-day-low stop).
+# ATH: a safety net ATH_NET_PCT below the plan stop - the system itself exits on a WEEKLY close below the 30-week SMA;
+# a stop at the SMA would have hit 15% of trades (-5.5% each, most recovered); 15% below it hits ~1% (cost ~0.16%/trade).
+PROTECT = ENV.get("PROTECT_STOPS", "1") == "1"
+ATH_NET_PCT = float(ENV.get("ATH_NET_PCT", "15")) / 100
+GTT_LIMIT_GAP = float(ENV.get("GTT_LIMIT_GAP_PCT", "5")) / 100     # limit this far below the trigger so a fast fall still fills
 TOKEN_SECRET = ENV.get("TOKEN_SECRET", "")
 PW_HASH = ENV.get("APP_PASSWORD_HASH", "")               # scrypt$<salt hex>$<hash hex>  (make with: python app.py hash)
 
@@ -243,14 +249,95 @@ def record_exit(sym, sell_px):
         json.dump(g, open(p, "w"))
 
 
+def protect_level(kind, stop):
+    if not stop:
+        return None
+    return stop if kind == "T921" else stop * (1 - ATH_NET_PCT)
+
+
+def _protect(sym, e):
+    """place the GTT stop for a filled journal entry (live only)."""
+    trig = protect_level(e.get("kind"), e.get("stop"))
+    if not (PROTECT and trig and e.get("qty")):
+        return
+    try:
+        gid, gp = broker.gtt_stop(sym, e["qty"], trig, trig * (1 - GTT_LIMIT_GAP))
+        e.update(gtt_id=gid, gtt_trigger=round(trig, 2)); log("gtt", symbol=sym, gtt_id=gid, trigger=round(trig, 2), qty=e["qty"])
+    except Exception as ex:  # noqa: BLE001
+        e["gtt_error"] = str(ex)[:200]; log("gtt_error", symbol=sym, error=str(ex)[:200])
+
+
+def sync(acc=None):
+    """Match journal entries to Angel's order book and holdings:
+    pending buy -> filled (real price/qty, then the GTT stop) / rejected / cancelled;
+    exiting -> sold (record the exit, streak); open but no longer held -> the stop fired or it was sold elsewhere."""
+    J = journal()
+    if not J:
+        return J
+    try:
+        book = {str(o.get("id")): o for o in broker.orders()}
+    except Exception as ex:  # noqa: BLE001
+        log("sync_error", error=str(ex)[:200]); return J
+    acc = acc or broker.account()
+    held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
+    for p in acc["positions"]:
+        held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
+    today = ist_now().date().isoformat(); changed = False
+    for sym, e in list(J.items()):
+        st = e.get("state", "open")
+        o = book.get(str(e.get("order_id"))) if st in ("pending", "exiting") else None
+        stat = str((o or {}).get("status", "")).lower()
+        if st == "pending" and o:
+            if stat == "complete" or (stat in ("cancelled", "rejected") and (o.get("filled") or 0) > 0):
+                e.update(state="open", entry=float(o.get("avg") or e["entry"]), qty=int(o.get("filled") or e["qty"]), filled=today)
+                log("filled", symbol=sym, price=e["entry"], qty=e["qty"]); _protect(sym, e); changed = True
+            elif stat in ("rejected", "cancelled"):
+                log("not_filled", symbol=sym, status=stat, text=o.get("text")); J.pop(sym); changed = True
+                e2 = dict(e, state=stat, text=o.get("text"), ended=today); J.setdefault("_done", {})[f"{sym}:{today}"] = e2
+            else:
+                e["order_status"] = o.get("status")
+        elif st == "pending" and not o and e.get("since", today) < today and held.get(sym, 0) > 0:
+            e.update(state="open", filled=today); _protect(sym, e); changed = True      # filled yesterday; book rolled over
+        elif st == "exiting" and o and stat == "complete":
+            px = float(o.get("avg") or e.get("exit_px") or 0); record_exit(sym, px); log("sold", symbol=sym, price=px)
+            J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="sold", exit=px, ended=today); changed = True
+        elif st == "open" and held.get(sym, 0) <= 0 and (e.get("gtt_id") or e.get("filled", today) < today):
+            px = float(e.get("gtt_trigger") or 0) * (1 - GTT_LIMIT_GAP / 2) or e["entry"]
+            record_exit(sym, px); log("gone", symbol=sym, assumed_px=px)
+            J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="stopped or sold outside the app", exit=px, ended=today); changed = True
+    if changed:
+        d = J.get("_done") or {}
+        if len(d) > 200:
+            J["_done"] = dict(list(d.items())[-200:])
+        save_journal(J)
+    return J
+
+
+def trades_view(J, acc):
+    ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
+    out = []
+    for sym, e in J.items():
+        if sym.startswith("_"):
+            continue
+        px = ltp.get(sym); R = None
+        if px and e.get("stop") and e.get("entry") and e["entry"] > e["stop"]:
+            R = round((px - e["entry"]) / (e["entry"] - e["stop"]), 2)
+        out.append(dict(symbol=sym, system=e.get("system"), state=e.get("state", "open"), qty=e.get("qty"), entry=e.get("entry"),
+                        stop=e.get("stop"), ltp=px, R=R, since=e.get("since"), gtt_trigger=e.get("gtt_trigger"), gtt_id=e.get("gtt_id"),
+                        gtt_error=e.get("gtt_error"), order_status=e.get("order_status")))
+    done = sorted((J.get("_done") or {}).items(), key=lambda kv: kv[1].get("ended", ""), reverse=True)[:5]
+    recent = [dict(symbol=k.split(":")[0], state=v.get("state"), ended=v.get("ended"), entry=v.get("entry"), exit=v.get("exit"), text=v.get("text")) for k, v in done]
+    return out, recent
+
+
 def sized(acc=None):
     P = plan(); acc = acc or broker.account()
+    J = sync(acc)
     G = guard(acc)
     held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
     for p in acc["positions"]:
         held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
-    J = journal()
-    sys_open = [s for s in J if held.get(s, 0) > 0]                 # system positions still held
+    sys_open = [s for s in J if not s.startswith("_") and (held.get(s, 0) > 0 or J[s].get("state") == "pending")]
     cap = CAPITAL or acc["net"]
     slots = max(0, MAX_POSITIONS - len(sys_open))
     cash = acc["cash"]
@@ -260,6 +347,8 @@ def sized(acc=None):
         q = 0; why = ""
         if r["symbol"] in held:
             why = "already held"
+        elif r["symbol"] in J and J[r["symbol"]].get("state") == "pending":
+            why = "order sent - waiting for the fill"
         elif stop and E > stop:
             q = math.floor(min(RISK * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
         rows.append(dict(r, qty=max(0, q), value=round(max(0, q) * E, 0), risk_amt=round(max(0, q) * (E - stop), 0) if stop else None,
@@ -282,8 +371,10 @@ def sized(acc=None):
         for r in rows:
             if not r["skip"]:
                 r["skip"] = "paused: losing streak (guard)"
+    trades, recent = trades_view(J, acc)
     return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open,
-                mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held)
+                mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,
+                trades=trades, recent=recent, protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100))
 
 
 @app.get("/api/plan")
@@ -369,22 +460,61 @@ def order(body: Order, _=Depends(auth)):
     if body.confirm.strip().upper() != f"{side} {body.qty} {sym}".upper():
         raise HTTPException(400, f'confirm must be "{side} {body.qty} {sym}"')
     rec = dict(id=body.id, symbol=sym, side=side, qty=body.qty, params=p, ist_date=t.date().isoformat())
+    prot = None
+    if side == "BUY" and PROTECT:
+        lv = protect_level(row["kind"], row.get("stop"))
+        if lv:
+            prot = dict(trigger=round(lv, 2), limit=round(lv * (1 - GTT_LIMIT_GAP), 2),
+                        note="at the plan stop (as backtested)" if row["kind"] == "T921" else f"safety net {ATH_NET_PCT * 100:.0f}% below the plan stop; the system exit is a weekly close below the 30-week SMA")
     if not is_live():
         log("dry", **rec)
-        return dict(ok=True, mode="DRY RUN", sent=False, order=p, msg="Dry run: this is exactly what would be sent. Switch to Live orders in the app to send for real.")
+        return dict(ok=True, mode="DRY RUN", sent=False, order=p, protect=prot,
+                    msg="Dry run: this is exactly what would be sent. Switch to Live orders in the app to send for real.")
+    if side == "SELL":
+        J0 = journal(); e0 = J0.get(sym) or {}
+        if e0.get("gtt_id"):
+            try:
+                broker.gtt_cancel(e0["gtt_id"], sym); log("gtt_cancel", symbol=sym, gtt_id=e0["gtt_id"])
+            except Exception as ex:  # noqa: BLE001
+                log("gtt_cancel_error", symbol=sym, error=str(ex)[:200])
     try:
         oid = broker.place(p)
     except Exception as e:  # noqa: BLE001
         log("order_error", error=str(e), **rec)
         raise HTTPException(502, f"Angel rejected: {e}")
     log("order", order_id=oid, **rec)
+    J = journal()
     if side == "BUY":
-        J = journal(); J[sym] = dict(since=t.date().isoformat(), system=(row or {}).get("system"), stop=(row or {}).get("stop"),
-                                     entry=float(p["price"]), qty=body.qty); save_journal(J)
+        J[sym] = dict(since=t.date().isoformat(), system=row.get("system"), kind=row.get("kind"), stop=row.get("stop"),
+                      entry=float(p["price"]), qty=body.qty, order_id=str(oid), state="pending")
     else:
-        record_exit(sym, float(p["price"]))
-        J = journal(); J.pop(sym, None); save_journal(J)
-    return dict(ok=True, mode="LIVE", sent=True, order_id=oid, order=p)
+        e = J.get(sym) or dict(since=t.date().isoformat(), system=ex.get("system"), qty=body.qty)
+        e.update(state="exiting", order_id=str(oid), exit_px=float(p["price"]), gtt_id=None); J[sym] = e
+    save_journal(J)
+    try:
+        sync()
+    except Exception:  # noqa: BLE001
+        pass
+    return dict(ok=True, mode="LIVE", sent=True, order_id=oid, order=p, protect=prot)
+
+
+# ------------------------------------------------------------------ background: fills + stops every 2 minutes in market hours
+def _loop():
+    while True:
+        try:
+            t = ist_now()
+            if t.weekday() < 5 and (9, 0) <= (t.hour, t.minute) <= (16, 0) and any(not k.startswith("_") for k in journal()):
+                sync()
+        except Exception as ex:  # noqa: BLE001
+            log("loop_error", error=str(ex)[:200])
+        time.sleep(120)
+
+
+@app.on_event("startup")
+def _start():
+    if ENV.get("MOCK_BROKER") != "1":
+        import threading
+        threading.Thread(target=_loop, daemon=True).start()
 
 
 if __name__ == "__main__":

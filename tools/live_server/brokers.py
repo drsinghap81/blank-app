@@ -102,6 +102,7 @@ class AngelEquity:
         api = self._session()
         return [dict(id=o.get("orderid"), symbol=str(o.get("tradingsymbol", "")).replace("-EQ", ""), side=o.get("transactiontype"),
                      qty=o.get("quantity"), price=o.get("price"), trigger=o.get("triggerprice"), status=o.get("status"),
+                     avg=float(o.get("averageprice") or 0), filled=int(float(o.get("filledshares") or 0)),
                      variety=o.get("variety"), text=o.get("text"), time=o.get("updatetime"))
                 for o in (self._data(api.orderBook()) or [])]
 
@@ -125,6 +126,20 @@ class AngelEquity:
         if not oid:
             raise RuntimeError("Angel did not return an order id")
         return str(oid)
+
+
+    def gtt_stop(self, symbol, qty, trigger, limit):
+        """Angel GTT (good till triggered, 1 year): SELL `qty` when the price falls to `trigger`, as a LIMIT at `limit`.
+        Sits on Angel's side, so it works even if this server is down."""
+        api = self._session(); ts, t = self._ts(symbol); tick = t["tick"] or 0.05
+        rnd = lambda v: round(round(v / tick) * tick, 2)  # noqa: E731
+        p = dict(tradingsymbol=ts, symboltoken=t["token"], exchange="NSE", producttype="DELIVERY", transactiontype="SELL",
+                 price=rnd(limit), qty=int(qty), disclosedqty=int(qty), triggerprice=rnd(trigger), timeperiod=365)
+        return str(api.gttCreateRule(p)), p
+
+    def gtt_cancel(self, rule_id, symbol):
+        api = self._session(); ts, t = self._ts(symbol)
+        return api.gttCancelRule(dict(id=str(rule_id), symboltoken=t["token"], exchange="NSE"))
 
 
 class MoomooRO:
@@ -159,17 +174,30 @@ class MockBroker(AngelEquity):
     """Fake Angel account for tests and the demo mode (MOCK_BROKER=1)."""
 
     def __init__(self, *a, **k):
-        self.placed = []; self.tokens = {}
+        self.placed = []; self.tokens = {}; self.hold = {"RELIANCE": 10}
 
     def account(self):
-        return dict(broker="Angel One (mock)", cash=800000.0, net=2000000.0, holdings=[dict(symbol="RELIANCE", qty=10, avg=1400, ltp=1500, pnl=1000)],
-                    positions=[], holdings_value=15000.0)
+        H = [dict(symbol=s, qty=q, avg=100.0, ltp=100.0, pnl=0.0) for s, q in self.hold.items() if q > 0]
+        return dict(broker="Angel One (mock)", cash=800000.0, net=2000000.0, holdings=H, positions=[], holdings_value=sum(h["qty"] * 100 for h in H))
 
     def ltp(self, symbol):
         return 100.0
 
     def orders(self):
-        return [dict(id=o["id"], symbol=o["p"]["tradingsymbol"], status="open") for o in self.placed]
+        return [dict(id=o["id"], symbol=o["p"]["tradingsymbol"].replace("-EQ", ""), side=o["p"]["transactiontype"], status=o["status"],
+                     avg=float(o["p"]["price"]) if o["status"] == "complete" else 0.0,
+                     filled=int(o["p"]["quantity"]) if o["status"] == "complete" else 0, text=o.get("text", "")) for o in self.placed]
 
     def place(self, p):
-        oid = f"MOCK{len(self.placed) + 1}"; self.placed.append(dict(id=oid, p=p)); return oid
+        oid = f"MOCK{len(self.placed) + 1}"; self.placed.append(dict(id=oid, p=p, status="complete"))
+        sym = p["tradingsymbol"].replace("-EQ", ""); q = int(p["quantity"])
+        self.hold[sym] = self.hold.get(sym, 0) + (q if p["transactiontype"] == "BUY" else -q)
+        return oid
+
+    def gtt_stop(self, symbol, qty, trigger, limit):
+        self.gtts = getattr(self, "gtts", {}); gid = f"GTT{len(self.gtts) + 1}"
+        self.gtts[gid] = dict(symbol=symbol, qty=qty, trigger=round(trigger, 2), price=round(limit, 2), active=True)
+        return gid, self.gtts[gid]
+
+    def gtt_cancel(self, rule_id, symbol):
+        self.gtts[rule_id]["active"] = False; return {"status": True}

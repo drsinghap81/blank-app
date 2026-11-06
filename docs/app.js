@@ -144,7 +144,14 @@ async function loadLive() {
       <div class="lv-sub">${esc(e.system)}: ${esc(e.why)} · ${S ? `you hold ${e.qty}` : 'matched to your holdings once the server is connected'}</div></div>
       <div>${S && e.qty > 0 ? `<button class="lv-btn sell" data-x="${i}">Sell ${e.qty}</button>` : ''}</div></div>`).join('');
   const watch = (P.watch || []).map((w, i) => `<a href="#" class="lv-w" data-w="${i}">${esc(w.symbol)}</a> (${fmt(w.price, 2, 'en-IN')})`).join(', ');
-  el.innerHTML = `${head}${guardCard(S ? S.guard : null)}
+  const ST = { pending: ['Sent', 'dry'], open: ['Filled', 'ok'], exiting: ['Selling', 'dry'] };
+  const trades = S && S.trades ? S.trades.map((t) => { const [lab, cls] = ST[t.state] || [t.state, 'dry'];
+    return `<div class="lv-row"><div class="lv-rank">${t.R == null ? '·' : (t.R >= 0 ? '+' : '') + fmt(t.R, 1) + 'R'}</div><div><div class="lv-sym">${esc(t.symbol)} <span class="lv-mode ${cls}" style="${cls === 'ok' ? 'background:var(--rise-soft);color:#0A7A55' : ''}">${lab}</span> <span class="chip">${esc(t.system || '')}</span></div>
+      <div class="lv-sub">${t.qty} @ ${fmt(t.entry, 2, 'en-IN')}${t.ltp ? ` · now ${fmt(t.ltp, 2, 'en-IN')}` : ''} · plan stop ${fmt(t.stop, 2, 'en-IN')}${t.state === 'pending' && t.order_status ? ` · Angel: ${esc(t.order_status)}` : ''}</div>
+      <div class="lv-sub">${t.gtt_id ? `🛡 Stop on Angel at ${fmt(t.gtt_trigger, 2, 'en-IN')} (GTT ${esc(t.gtt_id)})` : t.gtt_error ? `<span class="down">Stop not placed: ${esc(t.gtt_error)} — set one in the Angel app</span>` : t.state === 'open' ? '<span class="down">No protective stop on Angel</span>' : 'Stop goes on Angel after the fill'}</div></div><div></div></div>`; }).join('') : '';
+  const recent = S && S.recent && S.recent.length ? `<p class="lv-sub">Recent: ${S.recent.map((r) => `${esc(r.symbol)} ${esc(r.state)}${r.exit ? ' @ ' + fmt(r.exit, 2, 'en-IN') : ''}${r.text ? ' (' + esc(r.text) + ')' : ''}`).join(' · ')}</p>` : '';
+  const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
+  el.innerHTML = `${head}${guardCard(S ? S.guard : null)}${tradesCard}
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${rows.length} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
@@ -213,7 +220,9 @@ async function lvSend(r, side, btn) {
   try {
     const j = await lvApi('/api/order', { method: 'POST', body: JSON.stringify({ id: r.id, qty, confirm: conf }) });
     btn.textContent = j.sent ? 'Sent ✓' : 'Dry run ✓';
-    alertMsg(j.sent ? `Order placed: ${conf} (Angel id ${j.order_id}). Check it in the Angel app.` : `Dry run — would send: ${j.order.variety} ${j.order.ordertype} ${j.order.transactiontype} ${j.order.quantity} ${j.order.tradingsymbol} @ ${j.order.price}${j.order.triggerprice ? ' trigger ' + j.order.triggerprice : ''}`, true);
+    const pr = j.protect ? ` Then, once filled: protective stop on Angel at ${fmt(j.protect.trigger, 2, 'en-IN')} (${j.protect.note}).` : '';
+    alertMsg(j.sent ? `Order placed: ${conf} (Angel id ${j.order_id}). The app tracks the fill and then places the protective stop.${pr}` : `Dry run — would send: ${j.order.variety} ${j.order.ordertype} ${j.order.transactiontype} ${j.order.quantity} ${j.order.tradingsymbol} @ ${j.order.price}${j.order.triggerprice ? ' trigger ' + j.order.triggerprice : ''}.${pr}`, true);
+    setTimeout(loadLive, 4000);
   } catch (e) { btn.disabled = false; btn.textContent = side === 'BUY' ? 'Send' : `Sell ${qty}`; alertMsg('Not sent: ' + e.message); }
 }
 

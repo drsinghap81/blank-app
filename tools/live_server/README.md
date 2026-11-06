@@ -12,6 +12,12 @@ The server holds the broker keys. The repo and the phone app never do.
 - **Only today's plan rows.** There are no free-form orders.
 - **Size limits.** Quantity can't exceed the plan size, and value is capped at `MAX_ORDER_VALUE`, 20% of capital and your cash. There are also `MAX_ORDERS_DAY` orders per day, and each row can be sent once a day.
 - **Sells only for exits** on stocks you hold, up to the quantity you hold.
+- **Fill tracking + protective stop.** Every 2 minutes in market hours (and whenever the app refreshes), the server matches your orders to Angel's order book. Each trade goes **Sent → Filled** (real price and quantity, written to the journal) **→ 🛡 GTT stop placed on Angel**, or Rejected/Cancelled with Angel's reason. The GTT sits on Angel's side for a year, so it works even if this server is down.
+  - **9/21 trades:** stop at the plan stop (the 5-day low), as backtested.
+  - **ATH trades:** a safety net `ATH_NET_PCT=15`% below the plan stop. The system's own exit is a weekly close below the 30-week SMA. A stop at the SMA would have sold 15% of trades on dips that mostly recovered (−5.5% each); at 15% below, it hits about 1% of trades and costs about 0.16% per trade.
+  - The limit is `GTT_LIMIT_GAP_PCT=5`% below the trigger, so a fast fall still fills.
+  - Selling from the app cancels the GTT first. If a holding disappears (the GTT fired, or you sold elsewhere), the trade is closed in the journal and counted for the losing-streak pause.
+  - Set `PROTECT_STOPS=0` to turn this off.
 - **No market orders.** Buys are LIMIT orders: after-market (AMO) in the evening or early morning, or 1% above the live price during market hours, capped at the plan price + 3%. Buy-stops are STOPLOSS_LIMIT orders, sent between 09:15 and 15:30 IST. This follows SEBI's 2026 API rules.
 - **Login and logging.** The app password is stored as a salted hash, and the app gets a 12-hour token. Login is blocked for 15 minutes after 5 wrong tries. Every order and dry run is logged in `var/orders.jsonl`.
 - **The Top Bottom futures bot (`tools/angel`) is separate** and stays dry-run.
