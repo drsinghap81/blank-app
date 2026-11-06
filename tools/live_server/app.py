@@ -386,7 +386,7 @@ def sized(acc=None):
     slots = max(0, MAX_POSITIONS - len(sys_open))
     cash = acc["cash"]
     rows = []
-    for r in P.get("top") or []:
+    for r in [dict(x, tier="top") for x in P.get("top") or []] + [dict(x, tier="more") for x in P.get("more") or []]:
         E = r.get("trigger") or r["price"]; stop = r["stop"]
         q = 0; why = ""
         if r["symbol"] in held:
@@ -583,7 +583,7 @@ def live_check(r, ltp):
 def quotes(_=Depends(auth)):
     """Live prices for today's plan rows, exits and app trades, plus the limit price a buy sent now would get."""
     P = plan(); t = ist_now()
-    rows = (P.get("top") or []); syms = sorted({r["symbol"] for r in rows} | {e["symbol"] for e in P.get("exits") or []}
+    rows = (P.get("top") or []) + (P.get("more") or []); syms = sorted({r["symbol"] for r in rows} | {e["symbol"] for e in P.get("exits") or []}
                                              | {k for k in journal() if not k.startswith("_")})
     try:
         Q = broker.quotes(syms)

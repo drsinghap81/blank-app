@@ -129,13 +129,16 @@ async function loadLive() {
       <p class="lv-sub">${live ? '<b class="down">Live:</b> Send places a real Angel order after you type the quantity. Tap Dry run to stop at any time.' : '<b>Dry run:</b> Send only shows the exact order that would go to Angel; nothing is sent.'} <a href="#" id="lvout">Log out</a> (logs this phone out; the server keeps its mode)</p></div>`
     : `<div class="lv-card"><b>Connect your server</b><p class="lv-sub">${err ? `<span class="down">${esc(err)}</span> · ` : ''}Sizes below use your capital (${money(cap('NSE'), 'NSE')}) and ${riskForBudget(lvBudget()).toFixed(2)}% risk from your guard budget; holdings and cash are not checked and there is no Send button until the AWS server is connected.</p>
       <div class="lv-form"><input id="lvurl" type="url" placeholder="https://your-server.sslip.io" value="${esc(c.url || '')}" autocomplete="off"><input id="lvpw" type="password" placeholder="App password" autocomplete="current-password"><button class="lv-btn" id="lvgo">Connect</button></div></div>`;
-  const pend = rows.filter((r) => !r.skip && r.qty > 0);
+  const pend = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0);
+  const nTop = rows.filter((r) => r.tier !== 'more').length; const nMore = rows.length - nTop;
   const tot = pend.reduce((a, r) => a + r.value, 0);
   const list = rows.map((r, i) => {
     const E = r.trigger || r.price; const ord = r.kind === 'ATH_STOP' ? `buy-stop ${fmt(r.trigger, 2, 'en-IN')} (limit ${fmt(r.price, 2, 'en-IN')}), day order` : `limit ${fmt(r.price, 2, 'en-IN')}, ${r.when}`;
     const td = r.system === 'Monthly ATH' ? `<span class="score ${r.aligned ? 'al' : ''}"><i class="sd ${r.sector_rs == null ? 'na' : r.sector_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.theme_rs == null ? 'na' : r.theme_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.stock_rs == null ? 'na' : r.stock_rs > 0 ? 'y' : 'n'}"></i>${r.aligned ? ' aligned' : ''}</span>` : '';
     const can = S && !r.skip && r.qty > 0;
-    return `<div class="lv-row"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td}</div>
+    const hdr = r.tier === 'more' && (i === 0 || rows[i - 1].tier !== 'more')
+      ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
+    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} (${fmt(r.pct_cap, 1)}%) · risk ${money(r.risk_amt, 'NSE')}`}</div>
       <div class="lv-sub">${ord} · stop ${fmt(r.stop, 2, 'en-IN')} (${fmt(r.risk_pct, 1)}% below) · exit: ${esc(r.exit_rule || '')}</div>
       <div class="lv-sub">${esc(r.note || '')}${r.sector ? ' · ' + esc(r.sector) : ''}</div>${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}</div>
@@ -154,7 +157,7 @@ async function loadLive() {
   const recent = S && S.recent && S.recent.length ? `<p class="lv-sub">Recent: ${S.recent.map((r) => `${esc(r.symbol)} ${esc(r.state)}${r.exit ? ' @ ' + fmt(r.exit, 2, 'en-IN') : ''}${r.text ? ' (' + esc(r.text) + ')' : ''}`).join(' · ')}</p>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
   el.innerHTML = `${head}${guardCard(S ? S.guard : null)}${tradesCard}
-    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${rows.length} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
+    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${nTop} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
@@ -199,6 +202,9 @@ async function loadLive() {
   el.querySelectorAll('input[data-bq]').forEach((c) => c.addEventListener('input', bkUpd));
   const bk = $('#lvbkgo'); if (bk) bk.addEventListener('click', () => lvBasket(pick(), bk));
   state._lvBkUpd = bkUpd;
+  state._lvMoreAll = false;
+  const ma = $('#lvmoreall'); if (ma) ma.addEventListener('click', () => { state._lvMoreAll = !state._lvMoreAll; lvMoreUpd(); });
+  lvMoreUpd();
   if (S) lvQuotes(true);
   el.querySelectorAll('.lv-open[data-o]').forEach((b) => {
     const go = () => lvOpen(rows[+b.dataset.o]);
@@ -285,8 +291,21 @@ async function lvQuotes(first) {
     row.querySelectorAll('.lv-btn[data-i], input[data-b]').forEach((x) => { x.disabled = off; if (off && x.type === 'checkbox' && x.checked) { x.checked = false; x.dispatchEvent(new Event('change')); } });
   });
   if (state._lvBkUpd) state._lvBkUpd();
+  lvMoreUpd();
   const t = $('#lvqt'); if (t) t.textContent = `${j.market_open ? 'Live prices' : 'Market closed – last prices'} · ${j.ist.slice(11, 19)} IST`;
   if (j.market_open) state._lvQT = setTimeout(() => lvQuotes(false), 15000);
+}
+
+/* show as many next-ranked trades as the top 10 has unavailable ones (held, skipped, or blocked by a live check) */
+function lvMoreUpd() {
+  const top = [...document.querySelectorAll('.lv-row')].filter((r) => r.querySelector('.lv-q, .lv-plan') && !r.classList.contains('lv-more') && r.querySelector('.lv-open'));
+  const bad = top.filter((r) => r.classList.contains('lv-off') || !r.querySelector('.lv-btn[data-i]')).length;
+  const more = [...document.querySelectorAll('.lv-row.lv-more')];
+  let shown = 0;
+  more.forEach((r) => { const ok = !r.classList.contains('lv-off') && r.querySelector('.lv-btn[data-i]');
+    const show = state._lvMoreAll || (ok && shown < bad); r.hidden = !show; if (show && ok) shown++; });
+  const t = $('#lvmoretxt'); if (t) t.textContent = state._lvMoreAll ? `all ${more.length} shown` : bad ? `${bad} of the top ${top.length} can't be bought now — showing the next ${shown} that can` : 'all of the top 10 are available';
+  const b = $('#lvmoreall'); if (b) b.textContent = state._lvMoreAll ? 'Show fewer' : `Show all ${more.length}`;
 }
 
 async function lvBasket(B, btn) {

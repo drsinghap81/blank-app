@@ -356,3 +356,7 @@ details.info p { margin: 6px 0; line-height: 1.45; }
 .lv-toast button{margin-left:auto;background:transparent;border:0;color:inherit;font-size:16px;cursor:pointer}
 .lv-res{grid-column:2/4;font-size:13px;font-weight:600;padding:6px 8px;border-radius:8px}
 .lv-res.ok{background:#DCFCE7;color:#065F46}.lv-res.bad{background:#FEE2E2;color:#991B1B}
+
+.lv-morehdr{margin-top:14px;padding-top:10px;border-top:2px dashed var(--line,#ddd);display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.lv-link{background:none;border:0;color:#4F46E5;font:inherit;font-weight:700;cursor:pointer;padding:0;margin-left:auto}
+.lv-row.lv-more[hidden]{display:none}
