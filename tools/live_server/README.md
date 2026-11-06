@@ -12,6 +12,7 @@ The server holds the broker keys. The repo and the phone app never do.
 - **Only today's plan rows.** There are no free-form orders.
 - **Size limits.** Quantity can't exceed the plan size, and value is capped at `MAX_ORDER_VALUE`, 20% of capital and your cash. There are also `MAX_ORDERS_DAY` orders per day, and each row can be sent once a day.
 - **Sells only for exits** on stocks you hold, up to the quantity you hold.
+- **Basket.** Tick several of the day's trades, adjust quantities (up to the plan size), and send them with one confirmation (type the number of orders). The server checks each one exactly like a single Send; one failing item doesn't block the others, and the result lists what went through and why anything didn't.
 - **Fill tracking + protective stop.** Every 2 minutes in market hours (and whenever the app refreshes), the server matches your orders to Angel's order book. Each trade goes **Sent → Filled** (real price and quantity, written to the journal) **→ 🛡 GTT stop placed on Angel**, or Rejected/Cancelled with Angel's reason. The GTT sits on Angel's side for a year, so it works even if this server is down.
   - **9/21 trades:** stop at the plan stop (the 5-day low), as backtested.
   - **ATH trades:** a safety net `ATH_NET_PCT=15`% below the plan stop. The system's own exit is a weekly close below the 30-week SMA. A stop at the SMA would have sold 15% of trades on dips that mostly recovered (−5.5% each); at 15% below, it hits about 1% of trades and costs about 0.16% per trade.

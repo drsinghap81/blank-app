@@ -332,3 +332,12 @@ details.info p { margin: 6px 0; line-height: 1.45; }
 .lv-seg button.on{background:#FFF3D6;color:#8A5A00}
 .lv-seg button.on.live{background:#C62828;color:#fff}
 .lv-form[hidden]{display:none}
+
+.lv-pick{display:block;margin-top:6px}
+.lv-pick input{width:20px;height:20px;accent-color:#4F46E5}
+.lv-bq{grid-column:2/4;font-size:13px}
+.lv-bq[hidden]{display:none}
+.lv-bq input{width:80px;padding:4px 6px;border:1px solid var(--line,#ddd);border-radius:8px;font:inherit}
+.lv-basket{position:fixed;left:16px;right:16px;bottom:76px;z-index:30;max-width:640px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;padding:12px 14px;border-radius:12px;background:#111827;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.lv-basket .lv-sub{color:#cbd5e1}
+.lv-basket[hidden]{display:none}

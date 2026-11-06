@@ -119,3 +119,19 @@ def test_dry_shows_protect(tmp_path):
     j = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"}).json()
     assert j["sent"] is False and j["protect"]["trigger"] < r["stop"] + 0.01
     assert not getattr(A.broker, "gtts", None) and not A.broker.placed
+
+
+def test_basket(tmp_path):
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
+    P = c.get("/api/plan", headers=h).json()
+    ok = [r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] != "ATH_STOP"][:3]
+    items = [{"id": r["id"], "qty": r["qty"]} for r in ok] + [{"id": "HACK-X", "qty": 1}]
+    assert c.post("/api/basket", headers=h, json={"items": items, "confirm": "BASKET 3"}).status_code == 400   # count must match
+    j = c.post("/api/basket", headers=h, json={"items": items, "confirm": f"BASKET {len(items)}"}).json()
+    res = {x["id"]: x for x in j["results"]}
+    assert all(res[r["id"]]["ok"] and res[r["id"]]["sent"] for r in ok) and not res["HACK-X"]["ok"]
+    assert len(A.broker.placed) == len(ok)
+    j2 = c.post("/api/basket", headers=h, json={"items": items[:1], "confirm": "BASKET 1"}).json()   # once a day per row
+    assert not j2["results"][0]["ok"]

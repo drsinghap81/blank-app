@@ -134,11 +134,13 @@ async function loadLive() {
   const list = rows.map((r, i) => {
     const E = r.trigger || r.price; const ord = r.kind === 'ATH_STOP' ? `buy-stop ${fmt(r.trigger, 2, 'en-IN')} (limit ${fmt(r.price, 2, 'en-IN')}), day order` : `limit ${fmt(r.price, 2, 'en-IN')}, ${r.when}`;
     const td = r.system === 'Monthly ATH' ? `<span class="score ${r.aligned ? 'al' : ''}"><i class="sd ${r.sector_rs == null ? 'na' : r.sector_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.theme_rs == null ? 'na' : r.theme_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.stock_rs == null ? 'na' : r.stock_rs > 0 ? 'y' : 'n'}"></i>${r.aligned ? ' aligned' : ''}</span>` : '';
-    return `<div class="lv-row"><div class="lv-rank">${r.rank}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td}</div>
+    const can = S && !r.skip && r.qty > 0;
+    return `<div class="lv-row"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} (${fmt(r.pct_cap, 1)}%) · risk ${money(r.risk_amt, 'NSE')}`}</div>
       <div class="lv-sub">${ord} · stop ${fmt(r.stop, 2, 'en-IN')} (${fmt(r.risk_pct, 1)}% below) · exit: ${esc(r.exit_rule || '')}</div>
       <div class="lv-sub">${esc(r.note || '')}${r.sector ? ' · ' + esc(r.sector) : ''}</div></div>
-      <div>${S && !r.skip && r.qty > 0 ? `<button class="lv-btn" data-i="${i}">Send</button>` : ''}</div></div>`;
+      <div>${can ? `<button class="lv-btn" data-i="${i}">Send</button>` : ''}</div>
+      ${can ? `<div class="lv-bq" hidden>Basket qty <input type="number" min="1" max="${r.qty}" value="${r.qty}" data-bq="${i}" inputmode="numeric"> of ${r.qty}</div>` : ''}</div>`;
   }).join('');
   const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span></div>
       <div class="lv-sub">${esc(e.system)}: ${esc(e.why)} · ${S ? `you hold ${e.qty}` : 'matched to your holdings once the server is connected'}</div></div>
@@ -153,7 +155,9 @@ async function loadLive() {
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
   el.innerHTML = `${head}${guardCard(S ? S.guard : null)}${tradesCard}
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${rows.length} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
-      ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
+      ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together.</p>' : ''}
+      ${list || '<p class="empty">No qualifying trades today.</p>'}
+      ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>How these are picked and sized</summary><p>From the India systems that backtested well: monthly-ATH breakouts (this month or last, within −5%/+10% of the breakout price), buy-stops at ATH triggers within 5%, and 9/21 trend entries. Score = system (ATH 2-yr base 3, 1–2 yr 2, buy-stop 2, 9/21 3) + 2 if sector and stock RS are both positive + 1 if the theme RS is positive − 3 if the stock's 1-year RS is negative (ATH only; top-down did not help 9/21). The ranking combines tested pieces but is not itself a separately backtested system. Size: risk per trade from your drawdown budget (guard card, 95% Monte Carlo), at most 10% of capital in one stock, at most 10 positions, within the cash you have. US and Australia are excluded (no tested edge).</p></details>`;
@@ -175,6 +179,15 @@ async function loadLive() {
   });
   const out = $('#lvout'); if (out) out.addEventListener('click', (e) => { e.preventDefault(); lvSave({ token: null }); loadLive(); });
   el.querySelectorAll('.lv-btn[data-i]').forEach((b) => b.addEventListener('click', () => lvSend(rows[+b.dataset.i], 'BUY', b)));
+  const pick = () => [...el.querySelectorAll('input[data-b]:checked')].map((c) => { const i = +c.dataset.b; const r = rows[i];
+    const q = Math.max(0, Math.min(r.qty, Math.floor(+el.querySelector(`input[data-bq="${i}"]`).value || 0))); const E = r.trigger || r.price;
+    return { r, q, v: q * E, risk: q * (E - r.stop) }; });
+  const bkUpd = () => { const B = pick(); const bar = $('#lvbk'); if (!bar) return; bar.hidden = !B.length;
+    $('#lvbkn').textContent = `${B.length} selected`;
+    $('#lvbkv').textContent = `${money(B.reduce((a, x) => a + x.v, 0), 'NSE')} · risk ${money(B.reduce((a, x) => a + x.risk, 0), 'NSE')} · ${S ? money(S.cash, 'NSE') + ' cash' : ''}`; };
+  el.querySelectorAll('input[data-b]').forEach((c) => c.addEventListener('change', () => { const q = el.querySelector(`input[data-bq="${c.dataset.b}"]`).parentElement; q.hidden = !c.checked; bkUpd(); }));
+  el.querySelectorAll('input[data-bq]').forEach((c) => c.addEventListener('input', bkUpd));
+  const bk = $('#lvbkgo'); if (bk) bk.addEventListener('click', () => lvBasket(pick(), bk));
   el.querySelectorAll('.lv-open[data-o]').forEach((b) => {
     const go = () => lvOpen(rows[+b.dataset.o]);
     b.addEventListener('click', go); b.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
@@ -224,6 +237,26 @@ async function lvSend(r, side, btn) {
     alertMsg(j.sent ? `Order placed: ${conf} (Angel id ${j.order_id}). The app tracks the fill and then places the protective stop.${pr}` : `Dry run — would send: ${j.order.variety} ${j.order.ordertype} ${j.order.transactiontype} ${j.order.quantity} ${j.order.tradingsymbol} @ ${j.order.price}${j.order.triggerprice ? ' trigger ' + j.order.triggerprice : ''}.${pr}`, true);
     setTimeout(loadLive, 4000);
   } catch (e) { btn.disabled = false; btn.textContent = side === 'BUY' ? 'Send' : `Sell ${qty}`; alertMsg('Not sent: ' + e.message); }
+}
+
+async function lvBasket(B, btn) {
+  B = B.filter((x) => x.q > 0);
+  if (!B.length) { alertMsg('Basket is empty.'); return; }
+  const lines = B.map((x) => `BUY ${x.q} ${x.r.symbol} (${x.r.kind === 'ATH_STOP' ? 'buy-stop ' + fmt(x.r.trigger, 2, 'en-IN') : 'limit ' + fmt(x.r.price, 2, 'en-IN')})`).join('\n');
+  const tot = B.reduce((a, x) => a + x.v, 0);
+  const typed = window.prompt(`${B.length} orders on Angel One, total ${money(tot, 'NSE')}:\n${lines}\n\nType ${B.length} to confirm:`);
+  if (typed === null) return;
+  if (String(typed).trim() !== String(B.length)) { alertMsg('Not sent: the number did not match.'); return; }
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const j = await lvApi('/api/basket', { method: 'POST', body: JSON.stringify({ items: B.map((x) => ({ id: x.r.id, qty: x.q })), confirm: `BASKET ${B.length}` }) });
+    const ok = j.results.filter((x) => x.ok); const bad = j.results.filter((x) => !x.ok);
+    const msg = (j.mode === 'LIVE' ? `Sent ${ok.length} of ${j.results.length}: ${ok.map((x) => x.symbol).join(', ')}.` : `Dry run — ${ok.length} of ${j.results.length} would be sent: ${ok.map((x) => `${x.qty} ${x.symbol} @ ${x.order.price}`).join(', ')}.`)
+      + (bad.length ? ` Not sent: ${bad.map((x) => `${x.symbol || x.id} (${x.error})`).join('; ')}.` : '') + (j.mode === 'LIVE' ? ' Each gets its protective stop after the fill.' : '');
+    alertMsg(msg, !bad.length);
+    setTimeout(loadLive, 4000);
+  } catch (e) { alertMsg('Not sent: ' + e.message); }
+  btn.disabled = false; btn.textContent = 'Send basket';
 }
 
 /* ------------------------------------------------------------------ trends */

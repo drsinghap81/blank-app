@@ -498,6 +498,43 @@ def order(body: Order, _=Depends(auth)):
     return dict(ok=True, mode="LIVE", sent=True, order_id=oid, order=p, protect=prot)
 
 
+class BasketItem(BaseModel):
+    id: str
+    qty: int
+
+
+class Basket(BaseModel):
+    items: list[BasketItem]
+    confirm: str
+
+
+@app.post("/api/basket")
+def basket(body: Basket, _=Depends(auth)):
+    """Several plan buys with ONE typed confirmation ("BASKET <n>"). Each item still goes through every check in /api/order
+    (in today's plan, qty <= plan, value/cash limits, once a day, daily order cap); one failing item doesn't stop the rest."""
+    items = [i for i in body.items if i.qty > 0]
+    if not items:
+        raise HTTPException(400, "basket is empty")
+    if len({i.id for i in items}) != len(items):
+        raise HTTPException(400, "same trade twice in the basket")
+    if body.confirm.strip().upper() != f"BASKET {len(items)}":
+        raise HTTPException(400, f'confirm must be "BASKET {len(items)}"')
+    S = sized(); rows = {r["id"]: r for r in S["rows"]}
+    out = []
+    for i in items:
+        r = rows.get(i.id)
+        if not r:
+            out.append(dict(id=i.id, ok=False, error="not in today's plan")); continue
+        try:
+            res = order(Order(id=i.id, qty=i.qty, confirm=f"BUY {i.qty} {r['symbol']}"), True)
+            out.append(dict(id=i.id, symbol=r["symbol"], qty=i.qty, ok=True, sent=res.get("sent"), order_id=res.get("order_id"),
+                            order=res.get("order"), protect=res.get("protect")))
+        except HTTPException as ex:
+            out.append(dict(id=i.id, symbol=r["symbol"], qty=i.qty, ok=False, error=ex.detail))
+    log("basket", n=len(items), ok=sum(o["ok"] for o in out))
+    return dict(mode="LIVE" if is_live() else "DRY RUN", results=out)
+
+
 # ------------------------------------------------------------------ background: fills + stops every 2 minutes in market hours
 def _loop():
     while True:
