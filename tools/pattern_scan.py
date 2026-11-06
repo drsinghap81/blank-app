@@ -109,14 +109,10 @@ def scan(x, sym, name, kind="stock"):
     return best
 
 
-def sq9_levels(price, span=2):
-    """Gann Square-of-9 wheel numbers around a price: ring k holds (2k+1)^2 - m*k, m = 0..7 on the crosses
-    (m odd = cardinal cross, m even = diagonal / ordinal cross; e.g. ring 2: 11 15 19 23 cardinal, 13 17 21 25 diagonal)."""
-    k0 = max(1, int(np.ceil((np.sqrt(price) - 1) / 2))); out = []
-    for k in range(max(1, k0 - span), k0 + span + 1):
-        for m in range(8):
-            out.append(((2 * k + 1) ** 2 - m * k, "cardinal" if m % 2 else "diagonal"))
-    return sorted(out)
+def sq9_levels(price, span=3):
+    """Gann Square-of-9 odd squares (1, 9, 25, 49, 81, 121 ...) around a price, e.g. Rs 50 -> 49 (7^2) below, 81 (9^2) above."""
+    r0 = int(np.sqrt(price)); r0 -= (r0 % 2 == 0)
+    return [(o * o, f"{o}\u00b2") for o in range(max(1, r0 - 2 * span), r0 + 2 * span + 1, 2)]
 
 
 def support(x, sym, name):
@@ -159,9 +155,9 @@ def support(x, sym, name):
     if rh > E * 1.01:
         res.append(rh)
     nr = float(min(res)) if res else None
-    W = sq9_levels(lvl, 3); g = min(W, key=lambda z: abs(lvl / z[0] - 1))
-    gap = float(np.median(np.diff([z[0] for z in W])) / lvl * 100)
-    up = [z for z in sq9_levels(E, 3) if z[0] > E][:2]; dn = [z for z in W if z[0] < min(lvl, g[0])][-1:]
+    W = sq9_levels(lvl); g = min(W, key=lambda z: abs(lvl / z[0] - 1))
+    gap = float(((int(np.sqrt(g[0])) + 2) ** 2 / g[0] - 1) * 100)
+    up = [z for z in sq9_levels(E) if z[0] > E][:1]; dn = [z for z in W if z[0] < min(lvl, g[0])][-1:]
     return dict(symbol=sym, name=name, status=status, touch_date=str(dts[t].date()) if status == "touched" else None,
                 days_ago=int(n - 1 - t) if status == "touched" else None, level=round(lvl, 2),
                 level_kind="breakout retest" if L["kind"] == "H" else "old swing low", level_date=str(dts[L["i"]].date()),
@@ -169,7 +165,7 @@ def support(x, sym, name):
                 resistance=round(nr, 2) if nr else None, room_r=float((nr - E) / (E - stop)) if nr and E > stop else None,
                 sq9=g[0], sq9_cross=g[1], sq9_dist_pct=float((lvl / g[0] - 1) * 100), sq9_gap_pct=gap,
                 sq9_below=[[z[0], z[1]] for z in dn], sq9_above=[[z[0], z[1]] for z in up],
-                sq9_match=bool(abs(lvl / g[0] - 1) * 100 <= 0.15 * gap))
+                sq9_match=bool(abs(lvl / g[0] - 1) <= 0.01))
 
 
 def rsi(c, n=14):
@@ -262,11 +258,11 @@ def main():
     json.dump(dict(generated=out["generated"], asof=out["asof"], market="NSE",
                    rules="Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) "
                          "that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). "
-                         "'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: numbers on the wheel's cardinal and "
-                         "diagonal crosses, ring k = (2k+1)^2 - m*k (m = 0..7); 'on Sq9' = the level is within 15% of the gap between two wheel numbers.",
+                         "'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares "
+                         "(1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
                    backtest="2016-26, 16,908 first touches, 3R target vs stop (1 ATR below the level): breakout retests +0.20R per trade, "
                             "old swing lows +0.10R, random uptrend stock the same day +0.09R. Trades with 1:3 room to the next resistance: no better. "
-                            "On a Square-of-9 number: no better (breakout retests +0.22R on a number vs +0.19R midway; swing lows +0.09R vs +0.17R). Watch only.",
+                            "Within 1% of an odd square: no better (breakout retests +0.15R vs +0.21R away from one; swing lows +0.04R vs +0.09R). Watch only.",
                    rows=srows), open(f"{OUT}/support.json", "w"), indent=0)
     print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["sq9_match"] for r in srows), "on a Square-of-9 number")
 

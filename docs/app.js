@@ -1099,13 +1099,13 @@ async function loadSupport() {
   el.innerHTML = `${botTabs('sup')}<section class="summary">
       <div class="stat new"><b>${nt}</b><span>first touch of an old level (last 5 days)</span></div>
       <div class="stat"><b>${R.length - nt}</b><span>0–5% above a level, not yet touched</span></div>
-      <div class="stat"><b>${ng}</b><span>support on a Square-of-9 number</span></div>
+      <div class="stat"><b>${ng}</b><span>support within 1% of an odd square (Sq9)</span></div>
       <div class="stat"><b>${n3}</b><span>with 1:3 room to the next resistance</span></div></section>
-    <div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> 2016–26 backtest (3R target, stop 1 ATR below the level): breakout retests +0.20R a trade vs +0.09R for a random uptrend stock; old swing lows no edge. Square-of-9 numbers and 1:3 room did not help.</div>
+    <div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> 2016–26 backtest (3R target, stop 1 ATR below the level): breakout retests +0.20R a trade vs +0.09R for a random uptrend stock; old swing lows no edge. odd squares (Square of 9) and 1:3 room did not help.</div>
     <div class="card">
       ${seg('supf', state.supF || 'all', [['all', `All ${R.length}`], ['touched', `At support ${nt}`], ['near', `Approaching ${R.length - nt}`]])}
       ${seg('supg', state.supG || 'all', [['all', 'All levels'], ['retest', `Breakout retests ${nr}`], ['gann', `On Square of 9 ${ng}`]])}
-      <details class="info"><summary>How levels are found</summary><p>Uptrend stocks only: close above the 50-day average, 50-day above the 200-day, 200-day rising over 20 days. Levels are old swings on the daily closing line (6%+ moves, last 3 years): old swing lows, and old swing highs the stock broke out of. A level counts once price has moved 8%+ above it. "At support" = the first return since then: the day's low within 3% of the level and the close at or above it, in the last 5 sessions, with the stock still within 8% of the level. "Approaching" = close 0–5% above a level not yet revisited. Stop = level − 1 ATR(14). Room = distance to the nearest swing high or 60-day high above, in R. Square of 9 = the numbers on the Gann wheel's cardinal and diagonal crosses (ring k: (2k+1)² − m·k for m = 0–7, e.g. 11 15 19 23 cardinal, 13 17 21 25 diagonal). "On Square of 9" = the support is within 15% of the gap between two wheel numbers (the gap is about 2–3% of the price at ₹1,000–2,000). Liquid stocks (₹2 cr+ a day, price ₹100+). Updated nightly.</p></details>
+      <details class="info"><summary>How levels are found</summary><p>Uptrend stocks only: close above the 50-day average, 50-day above the 200-day, 200-day rising over 20 days. Levels are old swings on the daily closing line (6%+ moves, last 3 years): old swing lows, and old swing highs the stock broke out of. A level counts once price has moved 8%+ above it. "At support" = the first return since then: the day's low within 3% of the level and the close at or above it, in the last 5 sessions, with the stock still within 8% of the level. "Approaching" = close 0–5% above a level not yet revisited. Stop = level − 1 ATR(14). Room = distance to the nearest swing high or 60-day high above, in R. Square of 9 = the odd squares 1, 9, 25, 49, 81, 121, 169 … (e.g. a ₹50 stock: 49 = 7² below, 81 = 9² above). "On Square of 9" = the support is within 1% of an odd square. Liquid stocks (₹2 cr+ a day, price ₹100+). Updated nightly.</p></details>
       <label class="search"><input id="supq" type="search" placeholder="Search symbol or company" value="${esc(state.supQ || '')}" autocomplete="off"></label>
       <ul class="list flat" id="suplist"></ul></div>`;
   const list = () => {
@@ -1123,15 +1123,15 @@ function supSelect(r) {
   const st = r.status === 'touched' ? `<div class="status open">First return to the ${r.level_kind === 'breakout retest' ? 'old breakout level' : 'old swing low'} ${fmt(r.level, 2, AL())} on ${day(r.touch_date)} (low within 3%, close held). Now ${fmt(r.above_pct, 1)}% above it.</div>`
     : `<div class="status info">${fmt(r.above_pct, 1)}% above the ${r.level_kind === 'breakout retest' ? 'old breakout level' : 'old swing low'} ${fmt(r.level, 2, AL())}, not yet revisited.</div>`;
   const sqn = (z) => `${fmt(z[0], 0, AL())} (${z[1]})`;
-  const g = r.sq9 != null ? `${fmt(r.sq9, 0, AL())} on the ${r.sq9_cross} cross, ${fmt(Math.abs(r.sq9_dist_pct), 2)}% ${r.sq9_dist_pct >= 0 ? 'below' : 'above'} the support${r.sq9_match ? ' · on the level' : ''} (wheel numbers here are ~${fmt(r.sq9_gap_pct, 1)}% apart)` : '–';
+  const g = r.sq9 != null ? `${fmt(r.sq9, 0, AL())} (${r.sq9_cross}), ${fmt(Math.abs(r.sq9_dist_pct), 1)}% ${r.sq9_dist_pct >= 0 ? 'below' : 'above'} the support${r.sq9_match ? ' · on the level' : ''} (next odd square is ${fmt(r.sq9_gap_pct, 0)}% higher)` : '–';
   const f = [['Level', `${fmt(r.level, 2, AL())} (${r.level_kind}, swing of ${day(r.level_date)})`], ['Stop (level − 1 ATR)', `${fmt(r.stop, 2, AL())} (${fmt(r.risk_pct, 1)}% below the close)`],
     ['Next resistance', r.resistance != null ? `${fmt(r.resistance, 2, AL())} · room ${fmt(r.room_r, 1)}R${r.room_r >= 3 ? ' (1:3 fits)' : ''}` : 'none above (blue sky)'],
     ['3R target from the close', fmt(r.close + 3 * (r.close - r.stop), 2, AL())], ['Square of 9 at the support', g],
     ['Square of 9 below the support', (r.sq9_below || []).map(sqn).join(' · ') || '–'], ['Square of 9 above the price', (r.sq9_above || []).map(sqn).join(' · ') || '–']];
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, AL())}</b></div></div>
-    ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: breakout retests +0.20R a trade vs +0.09R random; old swing lows, Square-of-9 numbers and 1:3 room added nothing. Not part of your tested systems.</div>
+    ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: breakout retests +0.20R a trade vs +0.09R random; old swing lows, odd squares (Square of 9) and 1:3 room added nothing. Not part of your tested systems.</div>
     <div class="chart" id="supc"></div>
-    <p class="muted" style="margin:4px 16px">Daily candles · green = support level · purple dashed = Square-of-9 numbers (nearest to the support, next below it, next two above the price) · red = stop · gold = next resistance · blue / grey = 50 / 200-day average.</p>
+    <p class="muted" style="margin:4px 16px">Daily candles · green = support level · purple dashed = Square-of-9 odd squares (nearest the support, next below it, next above the price) · red = stop · gold = next resistance · blue / grey = 50 / 200-day average.</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`);
   drawSup(r);
 }
@@ -1144,7 +1144,7 @@ async function drawSup(r) {
   const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath');
   s.createPriceLine({ price: r.level, color: '#0A7A55', lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'support' });
   [[r.sq9, r.sq9_cross]].concat(r.sq9_below || [], r.sq9_above || []).filter((z) => z && z[0] != null)
-    .forEach((z) => s.createPriceLine({ price: z[0], color: '#7C5CFC', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: `Sq9 ${z[1] === 'cardinal' ? 'card.' : 'diag.'}` }));
+    .forEach((z) => s.createPriceLine({ price: z[0], color: '#7C5CFC', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: `Sq9 ${z[1]}` }));
   s.createPriceLine({ price: r.stop, color: C.fall || '#C62828', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'stop' });
   if (r.resistance != null) s.createPriceLine({ price: r.resistance, color: C.saffron, lineWidth: 1, lineStyle: 0, axisLabelVisible: true, title: 'resistance' });
   const ma = (k, col) => { const l = ch.addLineSeries({ color: col, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
