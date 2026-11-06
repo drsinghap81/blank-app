@@ -46,21 +46,18 @@ So the guard works like this:
 2. Register the **static IP** from step 1 as the app's primary IP. Orders from any other IP are rejected.
 3. Enable **TOTP** and copy the text secret behind the QR code.
 
-## 3. Fill in the server's `.env`
-In the SSH console, run:
+## 3. Enter your password and Angel keys
+In the SSH console (use normal Chrome; **type** the command, because pasting can add hidden `^[[200~` characters), run:
 ```
-cd /opt/trenddesk/repo/tools/live_server
-sudo /opt/trenddesk/venv/bin/python app.py hash      # type an app password -> copy the scrypt$... line
-sudo /opt/trenddesk/venv/bin/python app.py secret    # copy the long hex string
-sudo nano /opt/trenddesk/.env
+sudo setkeys
 ```
-Fill in these values:
-- `ANGEL_API_KEY`, `ANGEL_CLIENT_CODE`, `ANGEL_PIN` and `ANGEL_TOTP_SECRET`
-- `APP_PASSWORD_HASH`: the `scrypt$` line
-- `TOKEN_SECRET`: the hex string
-- `CAPITAL`: what the system sizes from, for example `2000000`
+It asks for:
+- a new app password, twice
+- the Angel API key and client code
+- the PIN
+- the **TOTP secret**: the ~26–32 character text behind the QR code, not the 6-digit code
 
-Keep `LIVE_ORDERS=0` for now. Save the file, then run `sudo systemctl restart trenddesk`. Type the keys yourself in the console; don't paste them into chat or GitHub.
+Answers marked hidden show nothing while you type. Leave an answer blank to keep the current value. The script saves everything to `/opt/trenddesk/.env`, restarts the server, and leaves `LIVE_ORDERS=0`. Type the keys yourself; don't paste them into chat or GitHub.
 
 ## 4. Connect the phone app
 1. Open the **Live** tab.
