@@ -498,6 +498,34 @@ def order(body: Order, _=Depends(auth)):
     return dict(ok=True, mode="LIVE", sent=True, order_id=oid, order=p, protect=prot)
 
 
+@app.get("/api/quotes")
+def quotes(_=Depends(auth)):
+    """Live prices for today's plan rows, exits and app trades, plus the limit price a buy sent now would get."""
+    P = plan(); t = ist_now()
+    rows = (P.get("top") or []); syms = sorted({r["symbol"] for r in rows} | {e["symbol"] for e in P.get("exits") or []}
+                                             | {k for k in journal() if not k.startswith("_")})
+    try:
+        Q = broker.quotes(syms)
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(502, f"quotes: {ex}")
+    out = {}
+    for r in rows:
+        q = Q.get(r["symbol"])
+        if not q or not q["ltp"]:
+            continue
+        lim = min(q["ltp"] * 1.01, r["ref"] * 1.03) if r.get("ref") else None
+        note = ""
+        if r["kind"] == "ATH_STOP":
+            note = "already above the trigger - the buy-stop would fill at once" if q["ltp"] >= r["trigger"] else f"{(r['trigger'] / q['ltp'] - 1) * 100:.1f}% below the trigger"
+        elif lim and q["ltp"] * 1.01 > r["ref"] * 1.03:
+            note = "more than 2% above the plan price - the limit (plan +3%) may not fill"
+        out[r["id"]] = dict(symbol=r["symbol"], ltp=q["ltp"], chg_pct=round((q["ltp"] / q["prev"] - 1) * 100, 2) if q["prev"] else None,
+                            vs_plan_pct=round((q["ltp"] / r["ref"] - 1) * 100, 2) if r.get("ref") else None,
+                            limit_now=round(lim, 2) if lim and r["kind"] != "ATH_STOP" else None, note=note)
+    return dict(market_open=market_open(t), ist=t.isoformat(timespec="seconds"), rows=out,
+                symbols={s: Q[s] for s in syms if s in Q})
+
+
 class BasketItem(BaseModel):
     id: str
     qty: int

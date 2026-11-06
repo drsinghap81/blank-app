@@ -98,6 +98,24 @@ class AngelEquity:
         d = self._data(api.ltpData("NSE", ts, t["token"])) or {}
         return float(d.get("ltp") or 0)
 
+    def quotes(self, symbols):
+        """Live LTP + previous close for up to 50 NSE symbols in one call (Angel market-data 'OHLC' mode)."""
+        api = self._session(); tok = {}
+        for sym in symbols:
+            ts = f"{sym}-EQ"
+            if ts in self.tokens:
+                tok[self.tokens[ts]["token"]] = sym
+        out = {}
+        ids = list(tok)
+        for i in range(0, len(ids), 50):
+            d = self._data(api.getMarketData("OHLC", {"NSE": ids[i:i + 50]})) or {}
+            for q in d.get("fetched") or []:
+                sym = tok.get(str(q.get("symbolToken")))
+                if sym:
+                    out[sym] = dict(ltp=float(q.get("ltp") or 0), prev=float(q.get("close") or 0), high=float(q.get("high") or 0),
+                                    low=float(q.get("low") or 0), open=float(q.get("open") or 0))
+        return out
+
     def orders(self):
         api = self._session()
         return [dict(id=o.get("orderid"), symbol=str(o.get("tradingsymbol", "")).replace("-EQ", ""), side=o.get("transactiontype"),
@@ -182,6 +200,9 @@ class MockBroker(AngelEquity):
 
     def ltp(self, symbol):
         return 100.0
+
+    def quotes(self, symbols):
+        return {s: dict(ltp=100.0 + i, prev=99.0 + i, high=101.0 + i, low=98.0 + i, open=99.5 + i) for i, s in enumerate(symbols)}
 
     def orders(self):
         return [dict(id=o["id"], symbol=o["p"]["tradingsymbol"].replace("-EQ", ""), side=o["p"]["transactiontype"], status=o["status"],

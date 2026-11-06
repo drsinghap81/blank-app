@@ -138,7 +138,7 @@ async function loadLive() {
     return `<div class="lv-row"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} (${fmt(r.pct_cap, 1)}%) · risk ${money(r.risk_amt, 'NSE')}`}</div>
       <div class="lv-sub">${ord} · stop ${fmt(r.stop, 2, 'en-IN')} (${fmt(r.risk_pct, 1)}% below) · exit: ${esc(r.exit_rule || '')}</div>
-      <div class="lv-sub">${esc(r.note || '')}${r.sector ? ' · ' + esc(r.sector) : ''}</div></div>
+      <div class="lv-sub">${esc(r.note || '')}${r.sector ? ' · ' + esc(r.sector) : ''}</div>${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}</div>
       <div>${can ? `<button class="lv-btn" data-i="${i}">Send</button>` : ''}</div>
       ${can ? `<div class="lv-bq" hidden>Basket qty <input type="number" min="1" max="${r.qty}" value="${r.qty}" data-bq="${i}" inputmode="numeric"> of ${r.qty}</div>` : ''}</div>`;
   }).join('');
@@ -155,7 +155,7 @@ async function loadLive() {
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
   el.innerHTML = `${head}${guardCard(S ? S.guard : null)}${tradesCard}
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${rows.length} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
-      ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together.</p>' : ''}
+      ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
@@ -180,14 +180,17 @@ async function loadLive() {
   const out = $('#lvout'); if (out) out.addEventListener('click', (e) => { e.preventDefault(); lvSave({ token: null }); loadLive(); });
   el.querySelectorAll('.lv-btn[data-i]').forEach((b) => b.addEventListener('click', () => lvSend(rows[+b.dataset.i], 'BUY', b)));
   const pick = () => [...el.querySelectorAll('input[data-b]:checked')].map((c) => { const i = +c.dataset.b; const r = rows[i];
-    const q = Math.max(0, Math.min(r.qty, Math.floor(+el.querySelector(`input[data-bq="${i}"]`).value || 0))); const E = r.trigger || r.price;
-    return { r, q, v: q * E, risk: q * (E - r.stop) }; });
+    const q = Math.max(0, Math.min(r.qty, Math.floor(+el.querySelector(`input[data-bq="${i}"]`).value || 0)));
+    const L = state._lvQ && state._lvQ[r.id]; const E = r.trigger || (L && L.limit_now) || r.price;
+    return { r, q, v: q * E, risk: Math.max(0, q * (E - r.stop)) }; });
   const bkUpd = () => { const B = pick(); const bar = $('#lvbk'); if (!bar) return; bar.hidden = !B.length;
     $('#lvbkn').textContent = `${B.length} selected`;
     $('#lvbkv').textContent = `${money(B.reduce((a, x) => a + x.v, 0), 'NSE')} · risk ${money(B.reduce((a, x) => a + x.risk, 0), 'NSE')} · ${S ? money(S.cash, 'NSE') + ' cash' : ''}`; };
   el.querySelectorAll('input[data-b]').forEach((c) => c.addEventListener('change', () => { const q = el.querySelector(`input[data-bq="${c.dataset.b}"]`).parentElement; q.hidden = !c.checked; bkUpd(); }));
   el.querySelectorAll('input[data-bq]').forEach((c) => c.addEventListener('input', bkUpd));
   const bk = $('#lvbkgo'); if (bk) bk.addEventListener('click', () => lvBasket(pick(), bk));
+  state._lvBkUpd = bkUpd;
+  if (S) lvQuotes(true);
   el.querySelectorAll('.lv-open[data-o]').forEach((b) => {
     const go = () => lvOpen(rows[+b.dataset.o]);
     b.addEventListener('click', go); b.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
@@ -239,10 +242,31 @@ async function lvSend(r, side, btn) {
   } catch (e) { btn.disabled = false; btn.textContent = side === 'BUY' ? 'Send' : `Sell ${qty}`; alertMsg('Not sent: ' + e.message); }
 }
 
+/* live prices on each plan row; refreshed every 15 s while the Live tab is open and the market is open */
+async function lvQuotes(first) {
+  clearTimeout(state._lvQT);
+  if (state.view !== 'live') return;
+  let j;
+  try { j = await lvApi('/api/quotes'); } catch (e) { return; }
+  state._lvQ = j.rows || {};
+  document.querySelectorAll('.lv-q[data-q]').forEach((d) => {
+    const q = state._lvQ[d.dataset.q]; if (!q) { d.textContent = ''; return; }
+    const up = (q.chg_pct || 0) >= 0;
+    d.innerHTML = `<span class="lv-live ${up ? 'up' : 'down'}">${j.market_open ? '● Live' : 'Last'} ₹${fmt(q.ltp, 2, 'en-IN')} ${q.chg_pct == null ? '' : `(${up ? '+' : ''}${fmt(q.chg_pct, 2)}% today)`}</span>`
+      + (q.vs_plan_pct == null ? '' : ` · ${q.vs_plan_pct >= 0 ? '+' : ''}${fmt(q.vs_plan_pct, 1)}% vs plan close`)
+      + (j.market_open && q.limit_now ? ` · limit if sent now ₹${fmt(q.limit_now, 2, 'en-IN')}` : '')
+      + (q.note ? ` · <span class="${/may not|at once/.test(q.note) ? 'down' : ''}">${esc(q.note)}</span>` : '');
+  });
+  if (state._lvBkUpd) state._lvBkUpd();
+  const t = $('#lvqt'); if (t) t.textContent = `${j.market_open ? 'Live prices' : 'Market closed – last prices'} · ${j.ist.slice(11, 19)} IST`;
+  if (j.market_open) state._lvQT = setTimeout(() => lvQuotes(false), 15000);
+}
+
 async function lvBasket(B, btn) {
   B = B.filter((x) => x.q > 0);
   if (!B.length) { alertMsg('Basket is empty.'); return; }
-  const lines = B.map((x) => `BUY ${x.q} ${x.r.symbol} (${x.r.kind === 'ATH_STOP' ? 'buy-stop ' + fmt(x.r.trigger, 2, 'en-IN') : 'limit ' + fmt(x.r.price, 2, 'en-IN')})`).join('\n');
+  const lines = B.map((x) => { const L = state._lvQ && state._lvQ[x.r.id];
+    return `BUY ${x.q} ${x.r.symbol} (${x.r.kind === 'ATH_STOP' ? 'buy-stop ' + fmt(x.r.trigger, 2, 'en-IN') : 'limit ' + fmt((L && L.limit_now) || x.r.price, 2, 'en-IN')}${L ? ', now ' + fmt(L.ltp, 2, 'en-IN') : ''})`; }).join('\n');
   const tot = B.reduce((a, x) => a + x.v, 0);
   const typed = window.prompt(`${B.length} orders on Angel One, total ${money(tot, 'NSE')}:\n${lines}\n\nType ${B.length} to confirm:`);
   if (typed === null) return;

@@ -341,3 +341,7 @@ details.info p { margin: 6px 0; line-height: 1.45; }
 .lv-basket{position:fixed;left:16px;right:16px;bottom:76px;z-index:30;max-width:640px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;padding:12px 14px;border-radius:12px;background:#111827;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 .lv-basket .lv-sub{color:#cbd5e1}
 .lv-basket[hidden]{display:none}
+
+.lv-q{margin-top:4px;font-size:12.5px;color:var(--muted,#555)}
+.lv-live{font-weight:700}
+.lv-live.up{color:#0A7A55}.lv-live.down{color:var(--fall,#C62828)}

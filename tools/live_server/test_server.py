@@ -135,3 +135,11 @@ def test_basket(tmp_path):
     assert len(A.broker.placed) == len(ok)
     j2 = c.post("/api/basket", headers=h, json={"items": items[:1], "confirm": "BASKET 1"}).json()   # once a day per row
     assert not j2["results"][0]["ok"]
+
+
+def test_quotes(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    assert c.get("/api/quotes").status_code == 401
+    j = c.get("/api/quotes", headers=h).json()
+    assert j["rows"] and all(v["ltp"] > 0 for v in j["rows"].values())
