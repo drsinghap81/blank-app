@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-06T10:37+00:00",
+"generated": "2026-11-06T11:03+00:00",
 "asof": "2026-11-06",
 "market": "NSE",
 "regime": {
@@ -8,7 +8,7 @@
 "down": false
 },
 "rules": "zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
-"backtest": "2016-26, 3,994 signals: 120-day return +3.5% vs +7.4% for a random liquid stock; in market downtrends +10.5% vs +13.6% for any stock. No edge - watch only.",
+"backtest": "2016-26, 3,994 signals: 120-day return +3.5% vs +7.4% for a random liquid stock; in market downtrends +10.5% vs +13.6% for any stock; target before stop 63% vs 63% for a random stock; with bullish RSI divergence 66% vs 65%, 120d +4.7%. No edge - watch only.",
 "rows": [
 {
 "symbol": "NIFTY FIN SERVICE",
@@ -47,6 +47,13 @@
 26993.849609375
 ]
 ],
+"rsi_lows": [
+30.1,
+39.0,
+36.6
+],
+"rsi_div": 0.0,
+"rsi_now": 76.8,
 "signal_date": "2026-11-06",
 "days_since": 0
 },
@@ -79,6 +86,12 @@
 1121.0
 ]
 ],
+"rsi_lows": [
+22.8,
+34.1
+],
+"rsi_div": 11.3,
+"rsi_now": 62.1,
 "signal_date": "2026-11-06",
 "days_since": 0
 },
@@ -111,6 +124,12 @@
 560.0
 ]
 ],
+"rsi_lows": [
+41.8,
+36.4
+],
+"rsi_div": 0.0,
+"rsi_now": 65.3,
 "signal_date": "2026-11-06",
 "days_since": 0
 },
@@ -151,6 +170,13 @@
 145.00759887695312
 ]
 ],
+"rsi_lows": [
+33.5,
+40.4,
+31.5
+],
+"rsi_div": 0.0,
+"rsi_now": 75.1,
 "signal_date": "2026-11-06",
 "days_since": 0
 },
@@ -183,6 +209,12 @@
 1766.9000244140625
 ]
 ],
+"rsi_lows": [
+30.6,
+36.6
+],
+"rsi_div": 6.0,
+"rsi_now": 68.2,
 "signal_date": "2026-11-06",
 "days_since": 0
 },
@@ -215,6 +247,12 @@
 164.6199951171875
 ]
 ],
+"rsi_lows": [
+27.9,
+35.8
+],
+"rsi_div": 0.0,
+"rsi_now": 51.8,
 "signal_date": "2026-11-06",
 "days_since": 0
 },
@@ -247,6 +285,12 @@
 582.6500244140625
 ]
 ],
+"rsi_lows": [
+27.3,
+35.6
+],
+"rsi_div": 0.0,
+"rsi_now": 46.3,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -279,6 +323,12 @@
 196.19000244140625
 ]
 ],
+"rsi_lows": [
+12.0,
+34.1
+],
+"rsi_div": 0.0,
+"rsi_now": 47.6,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -311,6 +361,12 @@
 739.5
 ]
 ],
+"rsi_lows": [
+29.4,
+36.5
+],
+"rsi_div": 7.1,
+"rsi_now": 73.9,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -326,7 +382,7 @@
 "stop": 1198.39,
 "stop_pct": 23.72772598219084,
 "height_pct": 20.031677077664135,
-"fall_pct": 20.430601116806656,
+"fall_pct": 20.43061115263154,
 "lows": [
 [
 "2026-06-02",
@@ -343,6 +399,12 @@
 1460.0
 ]
 ],
+"rsi_lows": [
+38.9,
+22.9
+],
+"rsi_div": 0.0,
+"rsi_now": 79.7,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -375,6 +437,12 @@
 1164.0347900390625
 ]
 ],
+"rsi_lows": [
+29.9,
+36.2
+],
+"rsi_div": 0.0,
+"rsi_now": 64.2,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -407,6 +475,12 @@
 157.0800018310547
 ]
 ],
+"rsi_lows": [
+25.0,
+37.2
+],
+"rsi_div": 0.0,
+"rsi_now": 64.2,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -439,6 +513,12 @@
 5184.5
 ]
 ],
+"rsi_lows": [
+22.3,
+41.6
+],
+"rsi_div": 0.0,
+"rsi_now": 62.0,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -471,6 +551,12 @@
 409.45001220703125
 ]
 ],
+"rsi_lows": [
+31.6,
+38.6
+],
+"rsi_div": 0.0,
+"rsi_now": 70.3,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -503,6 +589,12 @@
 294.04998779296875
 ]
 ],
+"rsi_lows": [
+29.3,
+34.9
+],
+"rsi_div": 5.5,
+"rsi_now": 64.2,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -535,6 +627,12 @@
 188.9499969482422
 ]
 ],
+"rsi_lows": [
+15.6,
+23.7
+],
+"rsi_div": 0.0,
+"rsi_now": 37.0,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -567,6 +665,12 @@
 12190.0
 ]
 ],
+"rsi_lows": [
+31.3,
+33.4
+],
+"rsi_div": 2.1,
+"rsi_now": 76.6,
 "signal_date": "2026-11-05",
 "days_since": 1
 },
@@ -599,6 +703,12 @@
 785.9000244140625
 ]
 ],
+"rsi_lows": [
+31.5,
+46.1
+],
+"rsi_div": 0.0,
+"rsi_now": 59.9,
 "signal_date": "2026-11-04",
 "days_since": 2
 },
@@ -631,6 +741,12 @@
 331.75
 ]
 ],
+"rsi_lows": [
+32.2,
+41.8
+],
+"rsi_div": 0.0,
+"rsi_now": 64.7,
 "signal_date": "2026-11-04",
 "days_since": 2
 },
@@ -663,6 +779,12 @@
 214.27000427246094
 ]
 ],
+"rsi_lows": [
+20.9,
+30.1
+],
+"rsi_div": 9.2,
+"rsi_now": 50.2,
 "signal_date": "2026-11-04",
 "days_since": 2
 },
@@ -695,6 +817,12 @@
 164.77999877929688
 ]
 ],
+"rsi_lows": [
+23.8,
+36.5
+],
+"rsi_div": 0.0,
+"rsi_now": 49.7,
 "signal_date": "2026-11-04",
 "days_since": 2
 },
@@ -727,6 +855,12 @@
 1992.0999755859375
 ]
 ],
+"rsi_lows": [
+38.2,
+32.6
+],
+"rsi_div": 0.0,
+"rsi_now": 75.5,
 "signal_date": "2026-11-03",
 "days_since": 3
 },
@@ -759,6 +893,12 @@
 2415.0
 ]
 ],
+"rsi_lows": [
+25.6,
+39.7
+],
+"rsi_div": 0.0,
+"rsi_now": 73.1,
 "signal_date": "2026-11-03",
 "days_since": 3
 },
@@ -791,6 +931,12 @@
 113.41999816894531
 ]
 ],
+"rsi_lows": [
+31.5,
+42.9
+],
+"rsi_div": 0.0,
+"rsi_now": 64.9,
 "signal_date": "2026-11-03",
 "days_since": 3
 },
@@ -823,6 +969,12 @@
 172.00999450683594
 ]
 ],
+"rsi_lows": [
+26.2,
+45.9
+],
+"rsi_div": 0.0,
+"rsi_now": 65.9,
 "signal_date": "2026-11-02",
 "days_since": 4
 },
@@ -855,6 +1007,12 @@
 382.6000061035156
 ]
 ],
+"rsi_lows": [
+28.8,
+36.5
+],
+"rsi_div": 7.7,
+"rsi_now": 58.5,
 "signal_date": "2026-11-02",
 "days_since": 4
 },
@@ -887,6 +1045,12 @@
 1614.0
 ]
 ],
+"rsi_lows": [
+41.4,
+43.5
+],
+"rsi_div": 0.0,
+"rsi_now": 51.4,
 "signal_date": "2026-10-29",
 "days_since": 6
 },
@@ -927,6 +1091,13 @@
 320.608642578125
 ]
 ],
+"rsi_lows": [
+26.6,
+40.3,
+33.3
+],
+"rsi_div": 0.0,
+"rsi_now": 63.9,
 "signal_date": "2026-10-29",
 "days_since": 6
 },
@@ -959,6 +1130,12 @@
 444.7569885253906
 ]
 ],
+"rsi_lows": [
+21.5,
+34.1
+],
+"rsi_div": 0.0,
+"rsi_now": 52.7,
 "signal_date": "2026-10-29",
 "days_since": 6
 },
@@ -991,6 +1168,12 @@
 541.6500244140625
 ]
 ],
+"rsi_lows": [
+23.4,
+36.4
+],
+"rsi_div": 0.0,
+"rsi_now": 52.9,
 "signal_date": "2026-10-29",
 "days_since": 6
 },
@@ -1023,6 +1206,12 @@
 362.3999938964844
 ]
 ],
+"rsi_lows": [
+24.5,
+33.4
+],
+"rsi_div": 8.9,
+"rsi_now": 71.3,
 "signal_date": "2026-10-28",
 "days_since": 7
 },
@@ -1055,6 +1244,12 @@
 397.5
 ]
 ],
+"rsi_lows": [
+27.3,
+41.5
+],
+"rsi_div": 0.0,
+"rsi_now": 61.5,
 "signal_date": "2026-10-28",
 "days_since": 7
 },
@@ -1087,6 +1282,12 @@
 2508.60009765625
 ]
 ],
+"rsi_lows": [
+26.1,
+48.4
+],
+"rsi_div": 0.0,
+"rsi_now": 57.6,
 "signal_date": "2026-10-27",
 "days_since": 8
 },
@@ -1119,6 +1320,12 @@
 391.45001220703125
 ]
 ],
+"rsi_lows": [
+33.1,
+38.2
+],
+"rsi_div": 5.1,
+"rsi_now": 57.9,
 "signal_date": null,
 "days_since": null
 },
@@ -1151,6 +1358,12 @@
 317.8999938964844
 ]
 ],
+"rsi_lows": [
+27.2,
+42.0
+],
+"rsi_div": 0.0,
+"rsi_now": 63.9,
 "signal_date": null,
 "days_since": null
 },
@@ -1183,6 +1396,12 @@
 1187.0
 ]
 ],
+"rsi_lows": [
+26.7,
+37.3
+],
+"rsi_div": 0.0,
+"rsi_now": 52.7,
 "signal_date": null,
 "days_since": null
 },
@@ -1215,6 +1434,12 @@
 1099.199951171875
 ]
 ],
+"rsi_lows": [
+26.2,
+33.7
+],
+"rsi_div": 7.5,
+"rsi_now": 43.5,
 "signal_date": null,
 "days_since": null
 },
@@ -1230,7 +1455,7 @@
 "stop": 153.8,
 "stop_pct": 7.768212268377528,
 "height_pct": 8.826917855321215,
-"fall_pct": 189.86589860168598,
+"fall_pct": 189.8658793087415,
 "lows": [
 [
 "2026-10-26",
@@ -1247,6 +1472,12 @@
 170.13999938964844
 ]
 ],
+"rsi_lows": [
+12.9,
+22.2
+],
+"rsi_div": 9.3,
+"rsi_now": 35.1,
 "signal_date": null,
 "days_since": null
 },
@@ -1287,6 +1518,13 @@
 329.95001220703125
 ]
 ],
+"rsi_lows": [
+36.8,
+40.3,
+33.5
+],
+"rsi_div": 0.0,
+"rsi_now": 66.7,
 "signal_date": null,
 "days_since": null
 },
@@ -1319,6 +1557,12 @@
 27270.0
 ]
 ],
+"rsi_lows": [
+28.9,
+35.5
+],
+"rsi_div": 6.5,
+"rsi_now": 52.5,
 "signal_date": null,
 "days_since": null
 },
@@ -1351,6 +1595,12 @@
 1477.0
 ]
 ],
+"rsi_lows": [
+26.8,
+26.9
+],
+"rsi_div": 0.0,
+"rsi_now": 67.2,
 "signal_date": null,
 "days_since": null
 },
@@ -1366,7 +1616,7 @@
 "stop": 1964.26,
 "stop_pct": 18.495478181324565,
 "height_pct": 26.432293465631606,
-"fall_pct": 36.98421646614523,
+"fall_pct": 36.98420430878669,
 "lows": [
 [
 "2026-07-23",
@@ -1391,6 +1641,13 @@
 2265.300048828125
 ]
 ],
+"rsi_lows": [
+34.8,
+29.7,
+29.2
+],
+"rsi_div": 0.0,
+"rsi_now": 75.3,
 "signal_date": null,
 "days_since": null
 },
@@ -1423,6 +1680,12 @@
 1120.199951171875
 ]
 ],
+"rsi_lows": [
+17.8,
+31.1
+],
+"rsi_div": 13.3,
+"rsi_now": 45.3,
 "signal_date": null,
 "days_since": null
 },
@@ -1455,6 +1718,12 @@
 637.6500244140625
 ]
 ],
+"rsi_lows": [
+36.2,
+35.8
+],
+"rsi_div": 0.0,
+"rsi_now": 47.1,
 "signal_date": null,
 "days_since": null
 },
@@ -1487,6 +1756,12 @@
 302.95001220703125
 ]
 ],
+"rsi_lows": [
+35.9,
+36.3
+],
+"rsi_div": 0.0,
+"rsi_now": 52.5,
 "signal_date": null,
 "days_since": null
 },
@@ -1519,6 +1794,12 @@
 332.6722106933594
 ]
 ],
+"rsi_lows": [
+25.6,
+37.4
+],
+"rsi_div": 11.8,
+"rsi_now": 51.2,
 "signal_date": null,
 "days_since": null
 },
@@ -1551,6 +1832,12 @@
 256.1600036621094
 ]
 ],
+"rsi_lows": [
+32.8,
+35.4
+],
+"rsi_div": 2.6,
+"rsi_now": 49.2,
 "signal_date": null,
 "days_since": null
 },
@@ -1583,6 +1870,12 @@
 390.6499938964844
 ]
 ],
+"rsi_lows": [
+30.9,
+39.5
+],
+"rsi_div": 0.0,
+"rsi_now": 55.0,
 "signal_date": null,
 "days_since": null
 },
@@ -1615,6 +1908,12 @@
 1701.5
 ]
 ],
+"rsi_lows": [
+35.7,
+26.9
+],
+"rsi_div": 0.0,
+"rsi_now": 63.4,
 "signal_date": null,
 "days_since": null
 },
@@ -1630,7 +1929,7 @@
 "stop": 785.71,
 "stop_pct": 4.710019307258562,
 "height_pct": 11.84798334980368,
-"fall_pct": 57.833819110576925,
+"fall_pct": 57.83383413461538,
 "lows": [
 [
 "2026-10-05",
@@ -1647,6 +1946,12 @@
 900.5999755859375
 ]
 ],
+"rsi_lows": [
+19.2,
+31.7
+],
+"rsi_div": 12.6,
+"rsi_now": 41.6,
 "signal_date": null,
 "days_since": null
 },
@@ -1679,6 +1984,12 @@
 227.38999938964844
 ]
 ],
+"rsi_lows": [
+43.8,
+28.6
+],
+"rsi_div": 0.0,
+"rsi_now": 53.1,
 "signal_date": null,
 "days_since": null
 },
@@ -1719,6 +2030,13 @@
 681.8499755859375
 ]
 ],
+"rsi_lows": [
+20.1,
+28.8,
+29.9
+],
+"rsi_div": 9.8,
+"rsi_now": 45.0,
 "signal_date": null,
 "days_since": null
 },
@@ -1751,6 +2069,12 @@
 379.29998779296875
 ]
 ],
+"rsi_lows": [
+23.3,
+32.9
+],
+"rsi_div": 9.6,
+"rsi_now": 46.9,
 "signal_date": null,
 "days_since": null
 },
@@ -1783,6 +2107,12 @@
 1556.0
 ]
 ],
+"rsi_lows": [
+39.2,
+30.3
+],
+"rsi_div": 0.0,
+"rsi_now": 59.0,
 "signal_date": null,
 "days_since": null
 },
@@ -1815,6 +2145,12 @@
 2803.3720703125
 ]
 ],
+"rsi_lows": [
+28.2,
+35.0
+],
+"rsi_div": 0.0,
+"rsi_now": 68.8,
 "signal_date": null,
 "days_since": null
 },
@@ -1847,6 +2183,12 @@
 4821.630859375
 ]
 ],
+"rsi_lows": [
+29.8,
+31.7
+],
+"rsi_div": 0.0,
+"rsi_now": 58.6,
 "signal_date": null,
 "days_since": null
 },
@@ -1879,6 +2221,12 @@
 453.20001220703125
 ]
 ],
+"rsi_lows": [
+31.3,
+35.2
+],
+"rsi_div": 0.0,
+"rsi_now": 43.3,
 "signal_date": null,
 "days_since": null
 },
@@ -1919,6 +2267,13 @@
 676.0499877929688
 ]
 ],
+"rsi_lows": [
+35.0,
+35.7,
+29.9
+],
+"rsi_div": 0.0,
+"rsi_now": 47.9,
 "signal_date": null,
 "days_since": null
 },
@@ -1951,6 +2306,12 @@
 2105.0
 ]
 ],
+"rsi_lows": [
+31.9,
+30.7
+],
+"rsi_div": 0.0,
+"rsi_now": 68.6,
 "signal_date": null,
 "days_since": null
 },
@@ -1991,6 +2352,13 @@
 3607.16455078125
 ]
 ],
+"rsi_lows": [
+27.9,
+34.8,
+32.4
+],
+"rsi_div": 0.0,
+"rsi_now": 37.7,
 "signal_date": null,
 "days_since": null
 },
@@ -2006,7 +2374,7 @@
 "stop": 232.6,
 "stop_pct": 19.123611946294584,
 "height_pct": 38.702275135489,
-"fall_pct": 32.967665162340424,
+"fall_pct": 32.967652435922325,
 "lows": [
 [
 "2026-04-06",
@@ -2023,6 +2391,12 @@
 332.3999938964844
 ]
 ],
+"rsi_lows": [
+34.7,
+25.3
+],
+"rsi_div": 0.0,
+"rsi_now": 70.7,
 "signal_date": null,
 "days_since": null
 },
@@ -2055,6 +2429,12 @@
 1275.0
 ]
 ],
+"rsi_lows": [
+34.6,
+29.4
+],
+"rsi_div": 0.0,
+"rsi_now": 50.1,
 "signal_date": null,
 "days_since": null
 }
