@@ -27,6 +27,8 @@ out = os.path.join(DATA, "candles_15m"); os.makedirs(out, exist_ok=True)
 log = []
 for n, sym in enumerate(syms, 1):
     ts = f"{sym}-EQ"
+    if os.environ.get("SKIP_DONE") == "1" and os.path.exists(os.path.join(out, f"{sym}.csv.gz")) and sym in (os.environ.get("DONE_OK") or "").split(","):
+        continue
     if ts not in b.tokens:
         log.append(f"{sym}: not in scrip master"); continue
     tok = b.tokens[ts]["token"]; rows = []; t0 = start
@@ -34,17 +36,18 @@ for n, sym in enumerate(syms, 1):
         t1 = min(t0 + CHUNK, end)
         p = dict(exchange="NSE", symboltoken=str(tok), interval="FIFTEEN_MINUTE",
                  fromdate=t0.strftime("%Y-%m-%d 09:15"), todate=t1.strftime("%Y-%m-%d 15:30"))
-        for k in range(4):
+        for k in range(8):
             try:
                 r = api.getCandleData(p) or {}
-                if r.get("status") or r.get("data") is not None:
+                if r.get("status") and r.get("data") is not None:
                     rows += r.get("data") or []; break
-                time.sleep(1.5 * (k + 1))
+                err = r.get("message") or "no data"
             except Exception as e:  # noqa: BLE001
-                time.sleep(1.5 * (k + 1))
-                if k == 3:
-                    log.append(f"{sym} {p['fromdate']}: {str(e)[:80]}")
-        time.sleep(0.4)                 # stay under Angel's ~3 requests/second
+                err = str(e)[:80]
+            time.sleep(min(20, 2.0 * (k + 1)))      # Angel answers bursts with empty bodies: back off
+        else:
+            log.append(f"{sym} {p['fromdate']}: {err}")
+        time.sleep(1.0)                 # well under Angel's historical-data rate limit
         t0 = t1 + timedelta(days=1)
     seen = set(); rows = [r for r in rows if not (r[0] in seen or seen.add(r[0]))]
     with gzip.open(os.path.join(out, f"{sym}.csv.gz"), "wt", newline="") as f:
