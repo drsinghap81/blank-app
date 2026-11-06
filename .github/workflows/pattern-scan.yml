@@ -1,0 +1,29 @@
+name: pattern-scan
+on:
+  push:
+    paths: [".github/workflows/pattern-scan.yml", "tools/pattern_scan.py"]
+  schedule:
+    - cron: "40 15 * * 1-5"   # 21:10 IST on trading days (after the ATH scan refreshes sector_hist)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Scan
+        run: |
+          pip install -q yfinance pandas requests
+          python tools/pattern_scan.py > /tmp/pat.txt 2>&1 || true
+          grep -v -i "warn\|delisted\|failed download\|^\[" /tmp/pat.txt | tail -8
+      - name: Commit
+        run: |
+          git config user.name "pattern-scan bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/scan/patterns.json data/scan/pattern_charts || true
+          git diff --cached --quiet && exit 0
+          git commit -qm "Pattern scan $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done

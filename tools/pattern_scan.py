@@ -1,0 +1,174 @@
+"""Bottom-pattern scanner (NSE): double bottom, tilted W, triple bottom, inverse head & shoulders - after a fall.
+Independent of the ATH system. WATCH-ONLY: the 2016-26 backtest found no edge over random entries (see the app note).
+
+Rules (same as the backtest, scratchpad bottoms/find.py):
+  swings  : zigzag on daily CLOSES, 6% threshold (a low/peak is known once price moved 6% away from it)
+  fall    : 250-day high close >= 20% above the first low; first low within 5% of the 250-day low
+  DB  second low within +-3% of the first      TW  second low 3-12% higher (tilted W)
+  TB  three lows within 4% of their mean        IHS head >= 3% below both shoulders, shoulders within 6%
+  neckline = highest peak between the lows; breakout = first close above it within 60 days of the last low
+Status: 'breakout' (closed above the neckline in the last 10 sessions) or 'forming' (last low confirmed, close between
+the last low and the neckline). Liquid stocks only (20-day traded value >= Rs 2 cr), close >= Rs 100.
+Output: data/scan/patterns.json and data/scan/pattern_charts/SYM.json (daily bars, last 320 sessions)."""
+import json
+import os
+import sys
+import time
+from datetime import datetime, timezone
+
+import numpy as np
+import pandas as pd
+import yfinance as yf
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from trend_scan import nse_symbols  # noqa: E402
+
+OUT = "data/scan"; CH = f"{OUT}/pattern_charts"
+THR, FALL, MINVAL, MIN_CLOSE, RECENT = 0.06, 0.20, 2e7, 100.0, 10
+INDICES = {"^NSEI": "NIFTY 50", "^NSEBANK": "NIFTY BANK", "^CNXIT": "NIFTY IT", "^CNXAUTO": "NIFTY AUTO", "^CNXPHARMA": "NIFTY PHARMA",
+           "^CNXMETAL": "NIFTY METAL", "^CNXFMCG": "NIFTY FMCG", "^CNXREALTY": "NIFTY REALTY", "^CNXENERGY": "NIFTY ENERGY",
+           "NIFTY_FIN_SERVICE.NS": "NIFTY FIN SERVICE", "^NSEMDCP50": "NIFTY MIDCAP 50"}
+
+
+def zigzag(c, thr):
+    """pivots (kind, index, price, confirm_index) on closes."""
+    piv = []; hi = lo = c[0]; hi_i = lo_i = 0; mode = 0
+    for i in range(1, len(c)):
+        x = c[i]
+        if mode >= 0 and x > hi: hi, hi_i = x, i
+        if mode <= 0 and x < lo: lo, lo_i = x, i
+        if mode >= 0 and x <= hi * (1 - thr) and (mode == 1 or hi_i > 0):
+            piv.append(("H", hi_i, hi, i)); mode = -1; lo, lo_i = x, i
+        elif mode <= 0 and x >= lo * (1 + thr):
+            piv.append(("L", lo_i, lo, i)); mode = 1; hi, hi_i = x, i
+    return piv
+
+
+def patterns_at(piv, k):
+    """pattern candidates whose last low is pivot k."""
+    out = []
+    if k >= 2 and piv[k - 1][0] == "H" and piv[k - 2][0] == "L":
+        L1, P1, L2 = piv[k - 2], piv[k - 1], piv[k]; r = L2[2] / L1[2] - 1
+        typ = "DB" if -0.03 <= r <= 0.03 else ("TW" if 0.03 < r <= 0.12 else None)
+        if typ:
+            out.append((typ, [L1, L2], [P1], P1[2]))
+    if k >= 4 and [x[0] for x in piv[k - 4:k + 1]] == ["L", "H", "L", "H", "L"]:
+        L1, P1, M, P2, L3 = piv[k - 4:k + 1]; lows = np.array([L1[2], M[2], L3[2]]); neck = max(P1[2], P2[2])
+        if (np.abs(lows / lows.mean() - 1) <= 0.04).all():
+            out.append(("TB", [L1, M, L3], [P1, P2], neck))
+        elif M[2] < 0.97 * min(L1[2], L3[2]) and abs(L3[2] / L1[2] - 1) <= 0.06:
+            out.append(("IHS", [L1, M, L3], [P1, P2], neck))
+    return out
+
+
+def scan(x, sym, name, kind="stock"):
+    """latest pattern state for one series (DataFrame Open/High/Low/Close/Volume) or None."""
+    c = x.Close.to_numpy(float); lw = x.Low.to_numpy(float); n = len(c); dts = x.index
+    if n < 150:
+        return None
+    piv = zigzag(c, THR)
+    rmax = pd.Series(c).rolling(250, min_periods=120).max().shift(1).to_numpy()
+    rmin = pd.Series(c).rolling(250, min_periods=120).min().to_numpy()
+    best = None
+    for k in range(len(piv) - 1, max(-1, len(piv) - 4), -1):           # the latest few lows only
+        if piv[k][0] != "L":
+            continue
+        for typ, lows, peaks, neck in patterns_at(piv, k):
+            first = lows[0]; i1 = first[1]
+            if np.isnan(rmax[i1]) or rmax[i1] < first[2] * (1 + FALL) or first[2] > rmin[i1] * 1.05:
+                continue
+            last = lows[-1]; sig = None; broke = False
+            for j in range(last[3], min(n, last[1] + 60)):
+                if c[j] < last[2]:
+                    broke = True; break
+                if c[j] > neck:
+                    sig = j; break
+            if broke:
+                continue
+            if sig is not None:
+                if n - 1 - sig >= RECENT:
+                    continue
+                status = "breakout"
+            else:
+                if n - 1 > last[1] + 60 or c[-1] < last[2] or neck / c[-1] - 1 > 0.20:
+                    continue
+                status = "forming"
+            plow = float(min(lw[l_[1]] for l_ in lows))
+            row = dict(symbol=sym, name=name, kind=kind, typ=typ, status=status, close=float(c[-1]), neck=float(neck),
+                       to_neck_pct=float((neck / c[-1] - 1) * 100), stop=round(plow * 0.99, 2), stop_pct=float((1 - plow * 0.99 / c[-1]) * 100),
+                       height_pct=float((neck / min(l_[2] for l_ in lows) - 1) * 100), fall_pct=float((rmax[i1] / first[2] - 1) * 100),
+                       lows=[[str(dts[l_[1]].date()), float(l_[2])] for l_ in lows], peaks=[[str(dts[p_[1]].date()), float(p_[2])] for p_ in peaks],
+                       signal_date=str(dts[sig].date()) if sig is not None else None,
+                       days_since=int(n - 1 - sig) if sig is not None else None)
+            if best is None or (row["status"] == "breakout") > (best["status"] == "breakout"):
+                best = row
+        if best:
+            break
+    return best
+
+
+def chart(x):
+    t = x.tail(320)
+    return dict(t=[str(d.date()) for d in t.index], o=[round(float(v), 2) for v in t.Open], h=[round(float(v), 2) for v in t.High],
+                l=[round(float(v), 2) for v in t.Low], c=[round(float(v), 2) for v in t.Close],
+                sma50=[None if np.isnan(v) else round(float(v), 2) for v in x.Close.rolling(50).mean().tail(320)],
+                sma200=[None if np.isnan(v) else round(float(v), 2) for v in x.Close.rolling(200).mean().tail(320)])
+
+
+def main():
+    os.makedirs(CH, exist_ok=True)
+    for f in os.listdir(CH):
+        os.remove(os.path.join(CH, f))
+    from session import drop_partial
+    u = nse_symbols(); u = u[u.board == "main"] if "board" in u else u
+    u["ticker"] = u.symbol + ".NS"; name = dict(zip(u.symbol, u.name)) if "name" in u else {}
+    jobs = [(t, s, name.get(s, s), "stock") for t, s in zip(u.ticker, u.symbol)] + [(t, n_, n_, "index") for t, n_ in INDICES.items()]
+    rows, asof = [], None
+    for a in range(0, len(jobs), 80):
+        chunk = jobs[a:a + 80]; dd = None
+        for _ in range(3):
+            try:
+                dd = yf.download([j[0] for j in chunk], period="2y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+                break
+            except Exception as e:  # noqa: BLE001
+                print("retry", a, e, flush=True); time.sleep(20)
+        if dd is None or dd.empty:
+            continue
+        for t, sym, nm, kind in chunk:
+            try:
+                x = pd.DataFrame({k: dd[k][t] for k in ("Open", "High", "Low", "Close", "Volume")}).dropna(subset=["Close"])
+                x = drop_partial(x, "NSE")
+                if len(x) < 150:
+                    continue
+                asof = max(asof, x.index[-1].date()) if asof else x.index[-1].date()
+                if kind == "stock":
+                    if float(x.Close.iloc[-1]) < MIN_CLOSE or float((x.Close * x.Volume).tail(20).mean()) < MINVAL:
+                        continue
+                r = scan(x, sym, nm, kind)
+                if r:
+                    rows.append(r)
+                    json.dump(chart(x), open(f"{CH}/{sym.replace(' ', '_')}.json", "w"))
+            except Exception as e:  # noqa: BLE001
+                print("fail", sym, e)
+        print(a + len(chunk), "done;", len(rows), "patterns", flush=True)
+    regime = None
+    try:
+        h = pd.read_csv(f"{OUT}/sector_hist.csv.gz", index_col=0, parse_dates=True)
+        N = h[h.INDEX == "NIFTY 500"].CLOSE.sort_index(); regime = dict(nifty500=float(N.iloc[-1]), sma200=float(N.rolling(200).mean().iloc[-1]))
+        regime["down"] = regime["nifty500"] < regime["sma200"]
+    except Exception:  # noqa: BLE001
+        pass
+    order = {"breakout": 0, "forming": 1}
+    rows.sort(key=lambda r: (r["kind"] != "index", order[r["status"]], r["to_neck_pct"] if r["status"] == "forming" else r["days_since"]))
+    out = dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), asof=str(asof), market="NSE", regime=regime,
+               rules="zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; "
+                     "breakout = close above the neckline within 60 days of the last low",
+               backtest="2016-26, 3,994 signals: 120-day return +3.5% vs +7.4% for a random liquid stock; in market downtrends +10.5% "
+                        "vs +13.6% for any stock. No edge - watch only.",
+               rows=rows)
+    json.dump(out, open(f"{OUT}/patterns.json", "w"), indent=0)
+    print("patterns", len(rows), {s: sum(r["status"] == s for r in rows) for s in order})
+
+
+if __name__ == "__main__":
+    main()
