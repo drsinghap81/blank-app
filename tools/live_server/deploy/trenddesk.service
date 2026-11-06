@@ -4,9 +4,9 @@ After=network-online.target
 
 [Service]
 User=trenddesk
-WorkingDirectory=/opt/trenddesk/repo/tools/live_server
+WorkingDirectory=/opt/trenddesk/var
 EnvironmentFile=/opt/trenddesk/.env
-ExecStart=/opt/trenddesk/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000 --workers 1
+ExecStart=/opt/trenddesk/venv/bin/uvicorn app:app --app-dir /opt/trenddesk/repo/tools/live_server --host 127.0.0.1 --port 8000 --workers 1
 Restart=always
 RestartSec=5
 
