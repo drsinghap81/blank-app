@@ -262,9 +262,11 @@ def _protect(sym, e):
         return
     try:
         gid, gp = broker.gtt_stop(sym, e["qty"], trig, trig * (1 - GTT_LIMIT_GAP))
-        e.update(gtt_id=gid, gtt_trigger=round(trig, 2)); log("gtt", symbol=sym, gtt_id=gid, trigger=round(trig, 2), qty=e["qty"])
+        e.update(gtt_id=gid, gtt_trigger=round(trig, 2)); e.pop("gtt_error", None)
+        log("gtt", symbol=sym, gtt_id=gid, trigger=round(trig, 2), qty=e["qty"])
     except Exception as ex:  # noqa: BLE001
-        e["gtt_error"] = str(ex)[:200]; log("gtt_error", symbol=sym, error=str(ex)[:200])
+        e["gtt_error"] = str(ex)[:200]; e["gtt_tries"] = e.get("gtt_tries", 0) + 1; e["gtt_last"] = time.time()
+        log("gtt_error", symbol=sym, error=str(ex)[:200])
 
 
 def sync(acc=None):
@@ -298,6 +300,9 @@ def sync(acc=None):
                 e["order_status"] = o.get("status")
         elif st == "pending" and not o and e.get("since", today) < today and held.get(sym, 0) > 0:
             e.update(state="open", filled=today); _protect(sym, e); changed = True      # filled yesterday; book rolled over
+        elif st == "open" and held.get(sym, 0) > 0 and not e.get("gtt_id") and e.get("gtt_tries", 0) < 4 \
+                and time.time() - e.get("gtt_last", 0) > 600:
+            _protect(sym, e); changed = True                                          # retry a failed protective stop
         elif st == "exiting" and o and stat == "complete":
             px = float(o.get("avg") or e.get("exit_px") or 0); record_exit(sym, px); log("sold", symbol=sym, price=px)
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="sold", exit=px, ended=today); changed = True
@@ -374,18 +379,24 @@ def sized(acc=None):
             q = math.floor(min(RISK * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
         rows.append(dict(r, qty=max(0, q), value=round(max(0, q) * E, 0), risk_amt=round(max(0, q) * (E - stop), 0) if stop else None,
                          pct_cap=round(max(0, q) * E / cap * 100, 1) if cap else None, skip=why))
-    # fill slots in rank order and within cash (buy-stops reserve cash too)
+    # each row must fit your actual cash on its own (cut to cash, no token positions); rank order only adds a note
+    # when the row would use cash / a slot that the higher-ranked rows would need if you bought them too
     left, used = cash, 0
     for r in rows:
         if r["skip"] or r["qty"] <= 0:
             continue
-        if used >= slots:
+        if slots <= 0:
             r["skip"] = "no free slot (max %d positions)" % MAX_POSITIONS; continue
-        if r["value"] > left:
-            q = math.floor(left / (r.get("trigger") or r["price"]))
+        E = r.get("trigger") or r["price"]
+        if r["value"] > cash:
+            q = math.floor(cash / E)
             if q <= 0 or q < 0.25 * r["qty"]:            # don't open a token position
                 r["skip"] = "not enough cash"; continue
-            r["qty"], r["value"] = q, round(q * (r.get("trigger") or r["price"]), 0); r["note"] += " · cut to the cash left"
+            r["qty"], r["value"] = q, round(q * E, 0); r["note"] += " · cut to your cash"
+            r["risk_amt"] = round(q * (E - r["stop"]), 0); r["pct_cap"] = round(q * E / cap * 100, 1) if cap else None
+        if r["value"] > left or used >= slots:
+            r["note"] += " · uses cash or a slot the trades ranked above would need"
+            r["reserve"] = True
         left -= r["value"]; used += 1
     ex = [dict(e, qty=held.get(e["symbol"], 0)) for e in P.get("exits") or [] if held.get(e["symbol"], 0) > 0]
     if G["status"] == "paused":

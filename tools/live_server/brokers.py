@@ -162,9 +162,13 @@ class AngelEquity:
         Sits on Angel's side, so it works even if this server is down."""
         api = self._session(); ts, t = self._ts(symbol); tick = t["tick"] or 0.05
         rnd = lambda v: round(round(v / tick) * tick, 2)  # noqa: E731
-        p = dict(tradingsymbol=ts, symboltoken=t["token"], exchange="NSE", producttype="DELIVERY", transactiontype="SELL",
-                 price=rnd(limit), qty=int(qty), disclosedqty=int(qty), triggerprice=rnd(trigger), timeperiod=365)
-        return str(api.gttCreateRule(p)), p
+        p = dict(tradingsymbol=ts, symboltoken=str(t["token"]), exchange="NSE", producttype="DELIVERY", transactiontype="SELL",
+                 price=f"{rnd(limit):.2f}", qty=str(int(qty)), disclosedqty=str(int(qty)), triggerprice=f"{rnd(trigger):.2f}", timeperiod="365")
+        r = self._call(api._postRequest, "api.gtt.create", dict(p), tries=2) or {}
+        d = r.get("data") or {}
+        if r.get("status") and d.get("id"):
+            return str(d["id"]), p
+        raise RuntimeError(f"{r.get('message') or r} [{r.get('errorcode') or '?'}]")
 
     def gtt_cancel(self, rule_id, symbol):
         api = self._session(); ts, t = self._ts(symbol)

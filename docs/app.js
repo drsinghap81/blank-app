@@ -185,7 +185,10 @@ async function loadLive() {
     return { r, q, v: q * E, risk: Math.max(0, q * (E - r.stop)) }; });
   const bkUpd = () => { const B = pick(); const bar = $('#lvbk'); if (!bar) return; bar.hidden = !B.length;
     $('#lvbkn').textContent = `${B.length} selected`;
-    $('#lvbkv').textContent = `${money(B.reduce((a, x) => a + x.v, 0), 'NSE')} · risk ${money(B.reduce((a, x) => a + x.risk, 0), 'NSE')} · ${S ? money(S.cash, 'NSE') + ' cash' : ''}`; };
+    const tot = B.reduce((a, x) => a + x.v, 0); const over = S && tot > S.cash;
+    $('#lvbkv').innerHTML = `${money(tot, 'NSE')} · risk ${money(B.reduce((a, x) => a + x.risk, 0), 'NSE')} · ${S ? money(S.cash, 'NSE') + ' cash' : ''}`
+      + (over ? `<br><span style="color:#FCA5A5;font-weight:700">Over your cash by ${money(tot - S.cash, 'NSE')} – untick one or lower a quantity</span>` : '');
+    $('#lvbkgo').disabled = !!over; };
   el.querySelectorAll('input[data-b]').forEach((c) => c.addEventListener('change', () => { const q = el.querySelector(`input[data-bq="${c.dataset.b}"]`).parentElement; q.hidden = !c.checked; bkUpd(); }));
   el.querySelectorAll('input[data-bq]').forEach((c) => c.addEventListener('input', bkUpd));
   const bk = $('#lvbkgo'); if (bk) bk.addEventListener('click', () => lvBasket(pick(), bk));
