@@ -47,7 +47,7 @@
  "lot": 65,
  "margin": "Rs 8-10 lakh per set (estimate; check your broker)",
  "late": false,
- "updated": "2026-11-05 17:52 IST",
+ "updated": "2026-11-06 17:49 IST",
  "position": {
   "expiry": "2026-11-09",
   "entry": "2026-11-04",
@@ -111,9 +111,9 @@
   }
  },
  "paper_mtm": {
-  "date": "2026-11-04",
-  "pts": -14.4,
-  "rs": -933,
-  "future": 23970.7
+  "date": "2026-11-05",
+  "pts": -836.4,
+  "rs": -54363,
+  "future": 24588.0
  }
 }
