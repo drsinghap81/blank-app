@@ -187,6 +187,21 @@ def mode(body: Mode, request: Request, _=Depends(auth)):
     return dict(ok=True, mode="LIVE" if body.live else "DRY RUN")
 
 
+@app.get("/dl/{key}")
+def one_time_download(key: str):
+    """one-time link created by fetch_candles.py (2 hours, single use) - market data only, no account data."""
+    from fastapi.responses import FileResponse
+    f = os.path.join(DATA, "dl.json")
+    try:
+        d = json.load(open(f))
+    except Exception:  # noqa: BLE001
+        raise HTTPException(404, "no download")
+    if not hmac.compare_digest(str(d.get("key")), key) or time.time() > d.get("until", 0):
+        raise HTTPException(404, "no download")
+    os.remove(f)
+    return FileResponse(os.path.join(DATA, os.path.basename(d["file"])), filename=os.path.basename(d["file"]))
+
+
 @app.get("/api/health")
 def health():
     return dict(ok=True, mode="LIVE" if is_live() else "DRY RUN", market_open=market_open(), amo=amo_window(), ist=ist_now().isoformat(timespec="minutes"))
