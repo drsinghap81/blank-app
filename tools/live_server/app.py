@@ -20,6 +20,7 @@ import hmac
 import json
 import math
 import os
+import re
 import time
 from datetime import datetime, timezone
 
@@ -30,7 +31,8 @@ from pydantic import BaseModel
 
 from brokers import AngelEquity, MockBroker, MoomooRO, amo_window, ist_now, market_open
 
-ENV = dict(os.environ)
+# systemd's EnvironmentFile keeps inline "# comments" as part of the value, so strip them here
+ENV = {k: re.sub(r"\s+#.*$", "", v).strip() for k, v in os.environ.items()}
 DATA = ENV.get("DATA_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "var"))
 os.makedirs(DATA, exist_ok=True)
 LIVE = ENV.get("LIVE_ORDERS", "0") == "1"
