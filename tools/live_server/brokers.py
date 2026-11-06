@@ -105,7 +105,8 @@ class AngelEquity:
                   product=p.get("producttype"), ltp=float(p.get("ltp") or 0)) for p in pos if p.get("exchange") == "NSE"]
         cash = float(f.get("availablecash") or 0)
         return dict(broker="Angel One", cash=cash, net=float(f.get("net") or cash), holdings=H, positions=P,
-                    holdings_value=sum(h["qty"] * h["ltp"] for h in H))
+                    holdings_value=sum(h["qty"] * h["ltp"] for h in H),
+                    positions_value=sum(p["qty"] * p["ltp"] for p in P if str(p.get("product")).upper() in ("DELIVERY", "CNC") and p["qty"] > 0))
 
     def ltp(self, symbol):
         api = self._session(); ts, t = self._ts(symbol)

@@ -219,7 +219,10 @@ def guard(acc):
     """High-water mark of account value, drawdown vs budget, losing-streak pause."""
     p = os.path.join(DATA, "guard.json")
     g = json.load(open(p)) if os.path.exists(p) else {}
-    nav = float(acc.get("net") or 0) + float(acc.get("holdings_value") or 0) if ENV.get("NAV_INCLUDES_HOLDINGS") == "1" else float(acc.get("net") or 0)
+    # account value = cash + market value of holdings + today's delivery buys (buying a stock moves cash into shares; not a loss)
+    nav = float(acc.get("net") or 0) + float(acc.get("holdings_value") or 0) + float(acc.get("positions_value") or 0)
+    if g.get("basis") != "cash+holdings":                      # earlier versions measured cash only: restart the peak
+        g = {k: v for k, v in g.items() if k in ("streak", "pause_until")}; g["basis"] = "cash+holdings"
     if nav > 0:
         g["peak"] = max(float(g.get("peak") or 0), nav); g["nav"] = nav; g["t"] = ist_now().isoformat(timespec="minutes")
         json.dump(g, open(p, "w"))
@@ -228,10 +231,10 @@ def guard(acc):
     pause = g.get("pause_until")
     paused = bool(pause and ist_now().date().isoformat() < pause)
     status = "paused" if paused else "over" if used >= 1 else "warn" if used >= 0.75 else "ok"
-    msg = {"ok": "Within your drawdown budget.",
-           "warn": "75% of your drawdown budget used. Normal for this system in a losing stretch: keep following the rules; no new rules mid-drawdown.",
-           "over": "Drawdown is beyond your budget. The backtest's worst fall at this risk was about the budget; review: are all trades on plan? Consider lowering the budget's risk for new trades (not selling).",
-           "paused": f"{STREAK} losing exits in a row: new buys paused until {pause}. Exits still apply."}[status]
+    msg = {"ok": "On track.",
+           "warn": "3/4 of your limit used. Normal in a losing stretch - keep following the rules.",
+           "over": "Past your limit. Check every trade is on plan; consider a smaller budget for new trades. Never sells for you.",
+           "paused": f"{STREAK} losses in a row - new buys paused until {pause}."}[status]
     return dict(peak=g.get("peak"), nav=g.get("nav"), dd_pct=round(dd * 100, 1), budget_pct=DD_BUDGET * 100, used_pct=round(used * 100),
                 risk_pct=round(RISK * 100, 2), max_pos_pct=MAX_POS_PCT * 100, streak=g.get("streak", 0), streak_max=STREAK,
                 pause_until=pause, status=status, msg=msg)
