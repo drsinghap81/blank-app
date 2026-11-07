@@ -50,6 +50,69 @@ def rsi(c, n=14):
     v = pd.Series(np.where(d < 0, -d, 0.0)).ewm(alpha=1 / n, adjust=False).mean(); return float((100 - 100 / (1 + u / v.clip(lower=1e-12))).iloc[-1])
 
 
+def ath_state(x):
+    """Monthly ATH system on one series (daily OHLC; NAVs use the close for all four), same rules as tools/ath_scan.py:
+    trigger = HIGH of the highest-monthly-close completed month; base = months since that month (>= 12 listed, >= 24 = tested);
+    entry the first day the price trades above the trigger while the last completed week closed above a rising 30-week SMA
+    (higher than 4 weeks earlier), at max(open, trigger); exit at the next open after a weekly close below the 30-week SMA.
+    Returns the latest signal (last 18 months) or a 'near' state (within 5% below the trigger)."""
+    x = x.dropna(subset=["Close"]); last = x.index[-1]
+    if len(x) < 400:
+        return None
+    m = x.resample("ME").agg({"High": "max", "Close": "last"}).dropna()
+    w = x.Close.resample("W-FRI").last().dropna(); sma = w.rolling(30).mean()
+    cur_p = last.to_period("M"); done = m[m.index.to_period("M") < cur_p]
+    o, h, c = x.Open.to_numpy(float), x.High.to_numpy(float), x.Close.to_numpy(float); d = x.index
+    sig = None; pos = None; start = last - pd.DateOffset(months=18); after = -1
+    months = [p for p in m.index.to_period("M") if p.to_timestamp() >= start.to_period("M").to_timestamp()]
+    for p in months:
+        prev = m[m.index.to_period("M") < p]
+        if len(prev) < 13:
+            continue
+        a = int(np.argmax(prev.Close.to_numpy())); trig = float(prev.High.iloc[a]); base = len(prev) - a - 1 + 1
+        days = np.flatnonzero(d.to_period("M") == p)
+        for i in days:
+            if pos is not None:
+                break
+            if i <= after:
+                continue
+            if base >= 12 and h[i] > trig:
+                wk = w[w.index < d[i] - pd.Timedelta(days=d[i].weekday())]
+                if len(wk) < 35:
+                    break
+                s_now, s_4 = sma.loc[wk.index[-1]], sma.loc[wk.index[-5]]
+                if wk.iloc[-1] > s_now and s_now > s_4:
+                    pos = dict(i=i, entry=float(max(o[i], trig)), trigger=trig, ath_month=str(prev.index[a].to_period("M")), base_months=int(base))
+                break
+        if pos is not None:
+            # walk weekly closes after entry
+            for wd in w.index[w.index >= d[pos["i"]]]:
+                if wd > last:
+                    break
+                if w.loc[wd] < sma.loc[wd]:
+                    j = np.searchsorted(d, wd, side="right")
+                    if j < len(d):
+                        sig = dict(status="exited", date=str(d[pos["i"]].date()), exit_date=str(d[j].date()), exit_price=float(o[j]), **{k: v for k, v in pos.items() if k != "i"})
+                    else:
+                        sig = dict(status="exit next open", date=str(d[pos["i"]].date()), **{k: v for k, v in pos.items() if k != "i"})
+                    break
+            else:
+                sig = dict(status="breakout" if d[pos["i"]].to_period("M") >= cur_p - 1 else "open", date=str(d[pos["i"]].date()), **{k: v for k, v in pos.items() if k != "i"})
+            if sig and sig["status"] == "exited":
+                pos = None; after = int(np.searchsorted(d, pd.Timestamp(sig["exit_date"])))
+            else:
+                break
+    if sig and sig["status"] != "exited":
+        sig["ret"] = float(c[-1] / sig["entry"] - 1); sig["sma30"] = float(sma.iloc[-1]); return sig
+    # near: within 5% below the trigger, base >= 12, above a rising 30-week SMA
+    a = int(np.argmax(done.Close.to_numpy())); trig = float(done.High.iloc[a]); base = len(done) - a
+    if len(sma.dropna()) > 5 and base >= 12 and trig * 0.95 <= c[-1] <= trig and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5]:
+        return dict(status="near", trigger=trig, ath_month=str(done.index[a].to_period("M")), base_months=int(base), gap_pct=float((trig / c[-1] - 1) * 100), sma30=float(sma.iloc[-1]))
+    if sig:
+        sig["ret"] = float(sig["exit_price"] / sig["entry"] - 1); return sig
+    return None
+
+
 def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
     s = s.dropna(); s = s[s > 0]
     if len(s) < 260:
@@ -65,6 +128,10 @@ def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
     if s.index[0] <= last - pd.Timedelta(days=3 * 365):
         row["r3y_cagr"] = float(((c[-1] / s.loc[:last - pd.Timedelta(days=3 * 365)].iloc[-1]) ** (1 / 3) - 1) * 100)
     x = ohlc if ohlc is not None else pd.DataFrame({"Open": s, "High": s, "Low": s, "Close": s})
+    try:
+        row["ath"] = ath_state(x)
+    except Exception as e:  # noqa: BLE001
+        row["ath"] = None; print("ath fail", key, str(e)[:80])
     try:
         pr = P.scan(x.tail(750), key, name, "stock")
         if pr:
@@ -140,6 +207,8 @@ def main():
                 r[k] = round(v, 2)
     rows.sort(key=lambda r: -r["below_high_pct"])
     json.dump(dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), topup_pct=TOPUP,
+                   ath_note="Monthly ATH rules on ETFs and funds (2016-26 tests): Indian mutual funds 3-8%/yr vs 11-14% buy-and-hold (few signals, "
+                            "whipsaw exits and exit loads); US and ASX stocks showed no edge with these rules; ETFs not separately tested. Watch only.",
                    backtest_global="US/ASX SIP test 2005-26 (same rules): 20%-below top-up vs plain SIP: S&P 500 +0.2%/yr, Nasdaq 100 -0.5%, "
                                    "Russell 2000 +0.3%, ASX 200 +0.1%; 30% trigger: S&P -0.7%, Nasdaq -0.9%. Essentially no gain outside India.",
                    backtest="SIP test 2016-26 (same total money, 50% of each SIP kept in a liquid fund and deployed when the index is 20-30% "

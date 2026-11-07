@@ -979,6 +979,7 @@ async function loadATH() {
       mk === 'NSE' ? getJSON(REPO + 'live/data/live/ath_live.json', 'ath_live') : null, getJSON(MAIN + AP() + 'ipo.json', 'ipo' + tag),
       getJSON(MAIN + AP() + 'sectors.json', 'sectors' + tag), getJSON(MAIN + 'data/scan/world.json', 'world')]);
     const tr = state.data[mk] || await getJSON(MAIN + AP() + 'trend_scan.json', 'td_' + mk);
+    if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds');
     state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'td', q: '', all: false };
   }
   state.ath = state.athC[mk];
@@ -996,7 +997,7 @@ async function loadATH() {
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
   const tabs = [['td', 'Top-down', tdRows(true).length], ['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
-    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length]];
+    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length]];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     <section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
@@ -1010,6 +1011,7 @@ async function loadATH() {
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
         themes: 'Shortlist = indices (broad, sector and thematic) in an uptrend (above a rising 30-week SMA) with 6-month RS vs Nifty 50 above zero, ordered: cup breakout (new monthly-close high after a base of 2+ years), new high (shorter base), cup forming (within 5% of a 2+-year-old high), within 5% of the high, then the rest; inside each group leading before uptrend, RS rising first, then by RS. Tap one for its weekly chart with the 30-week SMA, or monthly with the highest-month-close line. Below: the rest, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
+        fund: `ETFs${mk === 'NSE' ? ' and mutual funds (AMFI NAVs)' : mk === 'US' ? ' listed in the US' : ' listed on the ASX, incl. global ones'} with the same monthly ATH rules: trigger = high of the highest-monthly-close month, base 12+ months (2+ years = tested version), buy when the price trades above it while above a rising 30-week SMA; sell at the next open after a weekly close below the 30-week SMA. Signals of the last 18 months plus "near" (within 5% below the trigger). ${(state.fund && state.fund.ath_note) || ''} Tap one for its chart.`,
         ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>${state.ath.tab === 'td' ? '' : sectorStrip()}</details>
       ${state.ath.tab === 'td' ? topStrip() : ''}
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -1140,6 +1142,7 @@ function fundSelect(r) {
     [(r.market || 'IN') === 'IN' ? 'Top-up level (20% below the high)' : '20% below the high', fmt(r.high * 0.8, 2, 'en-IN')], ['52-week low', fmt(r.low_52w, 2, 'en-IN')],
     ['200-day average', `${fmt(r.sma200, 2, 'en-IN')} · ${r.above_200 ? 'above' : 'below'}`], ['RSI(14)', fmt(r.rsi, 0)],
     ['Returns 1 m / 3 m / 1 y', `${pc(r.r1m)} / ${pc(r.r3m)} / ${pc(r.r1y)}`], ['3-year CAGR', pc(r.r3y_cagr)],
+    ...(r.ath ? [['Monthly ATH system', `${{ breakout: 'Breakout', open: 'In trade', 'exit next open': 'Sell at the next open', near: `Near: ${fmt(r.ath.gap_pct, 1)}% below the trigger`, exited: `Exited ${day(r.ath.exit_date)} at ${fmt(r.ath.exit_price, 2, 'en-IN')}` }[r.ath.status]} · trigger ${fmt(r.ath.trigger, 2, 'en-IN')} (ATH month ${esc(r.ath.ath_month)}, ${baseTxt(r.ath.base_months)})${r.ath.entry ? ` · entry ${fmt(r.ath.entry, 2, 'en-IN')} on ${day(r.ath.date)} · ${r.ath.ret >= 0 ? '+' : ''}${fmt(r.ath.ret * 100, 1)}%` : ''}${r.ath.sma30 ? ` · 30-week SMA ${fmt(r.ath.sma30, 2, 'en-IN')}` : ''}`]] : []),
     ['Bottom pattern', r.pattern ? `${PAT_NM[r.pattern.typ]}, ${r.pattern.status === 'breakout' ? `broke the neckline ${fmt(r.pattern.neck, 2, 'en-IN')}` : `${fmt(r.pattern.to_neck_pct, 1)}% below the neckline ${fmt(r.pattern.neck, 2, 'en-IN')}`}` : 'none'],
     ['Type', r.kind === 'fund' ? `Mutual fund · ${esc(r.category)} · AMFI code ${esc(r.key)}` : `${r.kind === 'debt' ? 'Bond/cash ETF' : 'ETF'} · ${{ IN: 'NSE (₹)', US: 'US-listed (US$)', AU: 'ASX (A$)' }[r.market || 'IN']}`]];
   openPanel(`<div class="d-head"><div><h2>${esc(r.kind === 'fund' ? r.name : (r.symbol || r.key))}</h2><div class="co">${esc(r.kind === 'fund' ? r.category : r.name)}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
@@ -1504,9 +1507,29 @@ function tdItem(r) {
   const chip = `${sc}<span class="chip">${r._src}</span>${st}` + (sub ? `<div class="co small">${esc(sub)}</div>` : '');
   return { chip, right: `<b>${fmt(r.close, 2, AL())}</b>` + (r.ret != null && !r._near && r.kind !== 'near' ? `<span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>` : '') };
 }
+const ATH_ST = { breakout: 0, 'exit next open': 1, open: 2, near: 3, exited: 4 };
+function fundAthRows(countOnly) {
+  const F = state.fund; if (!F) return [];
+  const m = { NSE: 'IN', US: 'US', ASX: 'AU' }[AM()];
+  let L = (F.rows || []).filter((r) => (r.market || 'IN') === m && r.ath && (countOnly ? r.ath.status !== 'exited' : true));
+  if (countOnly) return L;
+  const q = (state.ath.q || '').toLowerCase();
+  if (q) L = L.filter((r) => r.name.toLowerCase().includes(q) || r.key.toLowerCase().includes(q));
+  return L.sort((a, b) => (ATH_ST[a.ath.status] - ATH_ST[b.ath.status]) || ((b.ath.base_months >= 24) - (a.ath.base_months >= 24)) || ((a.ath.gap_pct || 0) - (b.ath.gap_pct || 0)));
+}
+function fundAthItem(r, i) {
+  const a = r.ath; const pc = (v) => `${v >= 0 ? '+' : ''}${fmt(v * 100, 1)}%`;
+  const st = { breakout: `<span class="chip new">Breakout ${day(a.date)}</span>`, open: `<span class="chip open">Since ${day(a.date)}</span>`, 'exit next open': '<span class="chip exit">Sell next open</span>',
+    near: `<span class="chip">${fmt(a.gap_pct, 1)}% to trigger</span>`, exited: `<span class="chip">Exited ${day(a.exit_date)}</span>` }[a.status];
+  const right = a.status === 'near' ? `<b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">trigger ${fmt(a.trigger, 2, 'en-IN')}</span>`
+    : `<b>${fmt(r.close, 2, 'en-IN')}</b><span class="${a.ret >= 0 ? 'up' : 'down'}">${pc(a.ret)}</span>`;
+  return `<li class="row ${a.base_months >= 24 && a.status !== 'exited' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(fundName(r))}</div>
+    <div class="tags">${st}<span class="chip">${baseTxt(a.base_months)}</span><span class="chip">${r.kind === 'fund' ? esc(r.category) : 'ETF'}</span></div></div><div></div><div class="num">${right}</div></li>`;
+}
 function athRows() {
   const { d, tab, q } = state.ath;
   if (tab === 'td') return tdRows();
+  if (tab === 'fund') return fundAthRows();
   if (tab === 'ipo') return ipoRows();
   if (tab === 'themes') return themeRows();
   let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : (d.tracked || []);
@@ -1540,6 +1563,13 @@ function sectorStrip() {
 const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` : `${m}-mo base`);
 function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
+  if (tab === 'fund') {
+    $('#athlist').innerHTML = (L.length ? L.map(fundAthItem).join('') : '<li class="empty">No ETF or fund signals in the last 18 months.</li>')
+      + (all.length > L.length ? '<li><button class="more" id="athall">Show all ' + all.length + '</button></li>' : '');
+    $('#athlist').querySelectorAll('.row').forEach((r) => { const go = () => fundSelect(L[+r.dataset.i]); r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
+    const b = $('#athall'); if (b) b.addEventListener('click', () => { state.ath.all = true; athList(); });
+    return;
+  }
   $('#athlist').innerHTML = (L.length ? L.map((r, i) => {
     let chip, right;
     if (tab === 'td') {
@@ -1961,6 +1991,7 @@ function download() {
       : ['symbol', 'name', 'list', 'tag', 'close', 'dist21', 'rsi', 'r1m', 'r3m', 'r6m', 'off_high', 'value_cr', 'size'];
     return csvDownload(filtered(), cols, `trend-desk_${state.mkt}_${state.tab}_${state.data[state.mkt].asof}.csv`);
   }
+  if (state.view === 'ath' && state.ath && state.ath.tab === 'fund') return csvDownload(fundAthRows().map((r) => ({ symbol: r.symbol || r.key, name: r.name, type: r.kind === 'fund' ? r.category : 'ETF', close: r.close, ...r.ath })), ['symbol', 'name', 'type', 'status', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'close', 'gap_pct', 'ret', 'sma30', 'exit_date', 'exit_price'], `monthly-ath_etfs-funds_${AM()}.csv`);
   if (state.view === 'ath' && state.ath && state.ath.d) return csvDownload(athRows().map((r) => { const n = state.ath.tab === 'near'; const z = sizeATH(n ? r.trigger : r.entry, n ? r.sma30 : (r.sma_entry ?? r.sma30), cap('NSE')); const a = r.add_status === 'armed' && z ? sizeATH(r.add_level, r.sma30, cap('NSE'), z.sh) : null; return { ...r, shares: z ? z.sh : '', value: z ? Math.round(z.val) : '', add_shares: a ? a.sh : '' }; }), ['symbol', 'name', 'status', 'shares', 'value', 'add_status', 'add_level', 'add_shares', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'depth', 'close', 'gap_pct', 'ret', 'peak', 'weeks', 'sma30', 'exit_date', 'exit_price', 'value_cr', 'size'], `monthly-ath_${state.ath.tab}_${state.ath.d.asof}.csv`);
   if (state.view === 'results' && state.res && state.res.book && state.res.book.p.length) return csvDownload(state.res.book.p, Object.keys(state.res.book.p[0]), 'paper-book_positions.csv');
   if (state.view === 'pf') return pfExport();
