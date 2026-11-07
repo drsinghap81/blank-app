@@ -1,0 +1,26 @@
+name: fetch-delivery
+on:
+  workflow_dispatch:
+    inputs:
+      years: {description: "JSON list of years", default: "[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026]"}
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        year: ${{ fromJSON(github.event.inputs.years) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: |
+          pip install -q requests
+          python tools/fetch_delivery.py ${{ matrix.year }} | tail -30
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          B=deliv-${{ matrix.year }}
+          git checkout --orphan $B; git rm -rq --cached . ; git add -f deliv; git commit -qm "$B"; git push -f origin $B
