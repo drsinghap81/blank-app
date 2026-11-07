@@ -376,6 +376,7 @@ async function loadTrends() {
     $('#list').innerHTML = '<li class="empty">Loading…</li>';
     state.data[state.mkt] = await getJSON(MAIN + MKT[state.mkt].path + 'trend_scan.json', `td_${state.mkt}`);
   }
+  if (state.gp[state.mkt] === undefined) loadGP(state.mkt).then(() => { if (state.view === 'trends') renderList(); });
   document.querySelectorAll('.markets button').forEach((b) => b.setAttribute('aria-selected', b.dataset.mkt === state.mkt));
   if (!state.data[state.mkt]) {
     $('#asof').textContent = `${MKT[state.mkt].name}: no scan yet`;
@@ -466,7 +467,7 @@ function rowHTML(r, i) {
     right = `<b>${fmt(r.close)}</b><span class="${r.r1m >= 0 ? 'up' : 'down'}">${pct(r.r1m)} 1M</span>`;
   }
   return `<li class="row" tabindex="0" data-i="${i}" ${state.selected === r.symbol ? 'aria-current="true"' : ''}>
-    <div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${chips}</div></div>
+    <div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${chips}${pulseChip(r.symbol, state.mkt)}</div></div>
     ${sparkSVG(r.spark, t === 'new')}
     <div class="num">${right}</div></li>`;
 }
@@ -980,6 +981,7 @@ async function loadATH() {
       getJSON(MAIN + AP() + 'sectors.json', 'sectors' + tag), getJSON(MAIN + 'data/scan/world.json', 'world')]);
     const tr = state.data[mk] || await getJSON(MAIN + AP() + 'trend_scan.json', 'td_' + mk);
     if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds');
+    await loadGP(mk);
     state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'td', q: '', all: false };
   }
   state.ath = state.athC[mk];
@@ -997,7 +999,7 @@ async function loadATH() {
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
   const tabs = [['td', 'Top-down', tdRows(true).length], ['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
-    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length]];
+    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length], ['pulse', 'Industry Pulse', (state.gp[mk] && state.gp[mk].groups_n) || 0]];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     <section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
@@ -1011,6 +1013,7 @@ async function loadATH() {
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
         themes: 'Shortlist = indices (broad, sector and thematic) in an uptrend (above a rising 30-week SMA) with 6-month RS vs Nifty 50 above zero, ordered: cup breakout (new monthly-close high after a base of 2+ years), new high (shorter base), cup forming (within 5% of a 2+-year-old high), within 5% of the high, then the rest; inside each group leading before uptrend, RS rising first, then by RS. Tap one for its weekly chart with the 30-week SMA, or monthly with the highest-month-close line. Below: the rest, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
+        pulse: `${(state.gp[mk] && state.gp[mk].rule) || ''} ${(state.gp[mk] && state.gp[mk].backtest) || ''} Tile size = number of liquid stocks; colour = Pulse; arrow = change in 1-month Pulse vs a month ago. Tap a group for its stocks. Our own computation of industry breadth (the idea behind RideWinners' Market Pulse), not their data.`,
         fund: `ETFs${mk === 'NSE' ? ' and mutual funds (AMFI NAVs)' : mk === 'US' ? ' listed in the US' : ' listed on the ASX, incl. global ones'} with the same monthly ATH rules: trigger = high of the highest-monthly-close month, base 12+ months (2+ years = tested version), buy when the price trades above it while above a rising 30-week SMA; sell at the next open after a weekly close below the 30-week SMA. Signals of the last 18 months plus "near" (within 5% below the trigger). "Cup + trend only" (default) keeps live signals whose base had a real cup — the monthly close fell 15%+ below the old high before coming back — and leaves out bond/cash ETFs and exited trades; diversified funds often just drift back to an old high without a cup. ${(state.fund && state.fund.ath_note) || ''} Tap one for its chart.`,
         ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>${state.ath.tab === 'td' ? '' : sectorStrip()}</details>
       ${state.ath.tab === 'td' ? topStrip() : ''}
@@ -1507,6 +1510,46 @@ function tdItem(r) {
   const chip = `${sc}<span class="chip">${r._src}</span>${st}` + (sub ? `<div class="co small">${esc(sub)}</div>` : '');
   return { chip, right: `<b>${fmt(r.close, 2, AL())}</b>` + (r.ret != null && !r._near && r.kind !== 'near' ? `<span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>` : '') };
 }
+function gpColor(p) { // 0 -> grey, 60+ -> deep green
+  const t = Math.max(0, Math.min(1, p / 60));
+  const lerp = (a, b) => Math.round(a + (b - a) * t);
+  return `rgb(${lerp(238, 10)},${lerp(241, 122)},${lerp(245, 85)})`;
+}
+function pulseView() {
+  const G = state.gp[AM()]; const box = $('#athlist');
+  if (!G) { box.innerHTML = '<li class="empty">Industry Pulse appears after its first nightly run.</li>'; return; }
+  const per = state.gpPer || 'p1m'; const q = (state.ath.q || '').toLowerCase();
+  const R = (G.rows || []).filter((r) => !q || r.group.toLowerCase().includes(q) || r.members.some((m) => m.symbol.toLowerCase().includes(q) || (m.name || '').toLowerCase().includes(q)))
+    .slice().sort((a, b) => b[per] - a[per]);
+  const mx = Math.max(...R.map((r) => r.n), 1);
+  const top = R.slice(0, 10);
+  const bars = top.map((r) => `<div class="gpbar" data-g="${esc(r.group)}"><span class="gpn">${esc(r.group)}</span><span class="gpb"><i style="width:${Math.min(100, r[per])}%;background:${gpColor(r[per])}"></i></span><b>${fmt(r[per], 0)}</b></div>`).join('');
+  const tiles = R.map((r) => {
+    const d = r.p1m - r.p1m_prev; const w = 64 + Math.round(110 * Math.sqrt(r.n / mx)); const dark = r[per] >= 30;
+    return `<button class="gptile" data-g="${esc(r.group)}" style="flex-basis:${w}px;background:${gpColor(r[per])};color:${dark ? '#fff' : 'var(--ink)'}">
+      <span class="gpt">${esc(r.group)}</span><span class="gpv">${fmt(r[per], 0)}<small>${d >= 3 ? ' ▲' : d <= -3 ? ' ▼' : ''}</small></span><span class="gpc">${r.n} stocks · ${r.trending_now} trending</span></button>`;
+  }).join('');
+  box.innerHTML = `<li style="list-style:none">
+    <div class="seg" id="gpper" style="margin:6px 0">${[['p1w', '1 week'], ['p1m', '1 month'], ['p1q', '1 quarter']].map(([k, n]) => `<button data-k="${k}" aria-selected="${per === k}">${n}</button>`).join('')}</div>
+    <div class="gpsum"><div><b>${fmt(G.market_pulse_1m, 0)}</b><span>market Pulse (1 m)</span></div><div><b>${G.groups_n}</b><span>industry groups</span></div><div><b>${G.stocks_n.toLocaleString(AL())}</b><span>liquid stocks</span></div><div><span>as of ${day(G.asof)}</span></div></div>
+    <h4 style="margin:10px 0 4px">Strongest 10 groups</h4><div class="gpbars">${bars}</div>
+    <h4 style="margin:14px 0 4px">All groups <span class="muted" style="font-weight:400">· size = stocks, colour = Pulse</span></h4>
+    <div class="gptiles">${tiles || '<p class="muted">Nothing matches.</p>'}</div></li>`;
+  box.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; pulseView(); }));
+  box.querySelectorAll('[data-g]').forEach((b) => b.addEventListener('click', () => gpSelect(R.find((r) => r.group === b.dataset.g))));
+}
+function gpSelect(r) {
+  if (!r) return; const mk = AM(); const tv = MKT[mk].tv;
+  const rows = r.members.map((m) => `<tr${m.trending ? ' class="gptr"' : ''}><td><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent((tv || '') + m.symbol)}" target="_blank" rel="noopener"><b>${esc(m.symbol)}</b></a><div class="muted" style="font-size:12px">${esc(m.name || '')}</div></td>
+    <td><span class="gpb sm"><i style="width:${Math.round(m.d1m / 21 * 100)}%;background:${gpColor(m.d1m / 21 * 60)}"></i></span><span class="muted" style="font-size:12px">${m.d1m}/21 d · ${m.d1w}/5</span></td>
+    <td class="${m.wrpi >= 100 ? 'up' : 'down'}">${fmt(m.wrpi, 0)}</td><td>${m.stage2 ? '✓' : '–'}</td><td>${fmt(m.from_high, 0)}%</td></tr>`).join('');
+  openPanel(`<div class="d-head"><div><h2>${esc(r.group)}</h2><div class="co">Industry Pulse · rank ${r.rank} of ${state.gp[mk].groups_n} · ${r.n} liquid stocks</div></div><div class="d-price"><b>${fmt(r.p1m, 0)}</b></div></div>
+    <div class="facts"><div class="fact"><span>Pulse 1 week / 1 month / 1 quarter</span><b>${fmt(r.p1w, 0)} / ${fmt(r.p1m, 0)} / ${fmt(r.p1q, 0)}</b></div>
+      <div class="fact"><span>1-month Pulse a month ago</span><b>${fmt(r.p1m_prev, 0)} (${r.p1m - r.p1m_prev >= 0 ? '+' : ''}${fmt(r.p1m - r.p1m_prev, 0)})</b></div>
+      <div class="fact"><span>Trending today</span><b>${r.trending_now} of ${r.n}</b></div></div>
+    <table class="mini gpt"><tr><th>Stock</th><th>Trending days (1 m · 1 w)</th><th>W. RPI</th><th>Stage 2</th><th>From 52w high</th></tr>${rows}</table>
+    <p class="muted" style="margin:8px 16px">W. RPI = average of 2-week, 3-month and 6-month performance vs the market × 100 (above 100 = beating it). Trending = W. RPI > 100, EMA 9 > EMA 21, Stage 2 (above a rising 150-day average). Tap a symbol for its TradingView chart. Backtest: a strong group is a tailwind, not a buy signal on its own.</p>`);
+}
 const ATH_ST = { breakout: 0, 'exit next open': 1, open: 2, near: 3, exited: 4 };
 function fundAthRows(countOnly) {
   const F = state.fund; if (!F) return [];
@@ -1531,6 +1574,7 @@ function athRows() {
   const { d, tab, q } = state.ath;
   if (tab === 'td') return tdRows();
   if (tab === 'fund') return fundAthRows();
+  if (tab === 'pulse') return ((state.gp[AM()] || {}).rows || []);
   if (tab === 'ipo') return ipoRows();
   if (tab === 'themes') return themeRows();
   let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : (d.tracked || []);
@@ -1544,7 +1588,15 @@ const secName = (k) => ixNames()[k] || ({ 'NIFTY IT': 'IT', 'NIFTY FMCG': 'FMCG'
 const SECTOR_TXT = { leading: 'Sector leading', uptrend: 'Sector uptrend', mixed: 'Sector mixed', weak: 'Sector weak' };
 const secChip = (r) => (r.sector_tag ? `<span class="chip ${r.sector_tag === 'leading' ? 'new' : r.sector_tag === 'weak' ? 'exit' : r.sector_tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.sector_tag]}</span>` : '');
 const rsChip = (lab, v) => (v == null ? '' : `<span class="chip ${v > 0 ? 'open' : 'exit'}">${lab} ${v > 0 ? '+' : ''}${Number(v).toFixed(0)}%</span>`);
-const rsChips = (r) => rsChip('Sector RS', r.sector_rs) + rsChip('Stock RS', r.stock_rs);
+// ---- Industry Pulse (our computation of group breadth): data/scan[/us|/asx]/group_pulse.json ----
+state.gp = state.gp || {};
+async function loadGP(mk) { if (state.gp[mk] === undefined) state.gp[mk] = await getJSON(MAIN + MKT[mk].path + 'group_pulse.json', 'gp_' + mk); return state.gp[mk]; }
+const gpCls = (p) => (p >= 45 ? 'new' : p >= 25 ? 'open' : p < 10 ? 'exit' : '');
+function pulseChip(sym, mk) {
+  const G = state.gp[mk || AM()]; const x = G && G.stock && G.stock[sym]; if (!x) return '';
+  return `<span class="chip ${gpCls(x[1])}" title="${esc(x[0])}: industry Pulse ${fmt(x[1], 0)}, rank ${x[2]} of ${x[3]}">Group ${fmt(x[1], 0)} · #${x[2]}/${x[3]}</span>`;
+}
+const rsChips = (r) => rsChip('Sector RS', r.sector_rs) + rsChip('Stock RS', r.stock_rs) + pulseChip(r.symbol);
 function rsFact(r) {
   if (r.stock_rs == null && r.sector_rs == null) return null;
   const bn = r.rs_bench ? secName(r.rs_bench) : '';
@@ -1564,6 +1616,7 @@ function sectorStrip() {
 const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` : `${m}-mo base`);
 function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
+  if (tab === 'pulse') { pulseView(); return; }
   if (tab === 'fund') {
     $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!state.athFundAll}">Cup + trend only</button><button data-k="1" aria-selected="${!!state.athFundAll}">Show all (incl. exited, shallow bases)</button></div></li>`
       + (L.length ? L.map(fundAthItem).join('') : `<li class="empty">${state.athFundAll ? 'No ETF or fund signals in the last 18 months.' : 'None right now with a real cup (15%+ dip during the base) and an uptrend.'}</li>`)
