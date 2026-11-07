@@ -16,6 +16,10 @@ def main(x=None):
         x.columns = [c.replace(".NS", "") for c in x.columns]
         from session import drop_partial  # noqa: E402
         x = drop_partial(x, "NSE")
+    print("rows per ETF:", x.notna().sum().to_dict(), flush=True)
+    miss = [s for s in ETF if s not in x or x[s].notna().sum() < 80]
+    if miss:
+        raise SystemExit(f"no price history for {miss}")
     x = x[list(ETF)].dropna(how="all").ffill().dropna()
     last = x.index[-1]
     me = x.groupby(x.index.to_period("M")).tail(1)
