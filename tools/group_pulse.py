@@ -28,7 +28,8 @@ def universe(mkt):
         u["group"] = u.group.replace({"Confectioners": "Sugar & Confectionery"})   # Yahoo labels Indian sugar mills 'Confectioners'
     else:
         u = pd.read_csv(f"data/universe/{'us' if mkt == 'US' else 'asx'}_meta.csv").rename(columns={"industry": "group"})
-    u = u.dropna(subset=["group"]); u = u[u.group.astype(str).str.len() > 0]
+    u = u.dropna(subset=["group", "symbol"]); u["symbol"] = u.symbol.astype(str); u["name"] = u.name.fillna(u.symbol).astype(str)
+    u = u[u.group.astype(str).str.len() > 0]
     return u.drop_duplicates("symbol")[["symbol", "name", "group"]]
 
 
