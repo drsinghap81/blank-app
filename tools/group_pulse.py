@@ -1,7 +1,9 @@
 """Industry Pulse (our own computation of the 'industry group breadth' idea): for each industry group, the share of its liquid
 stocks that are 'trending' over the last 1 week / 1 month / 1 quarter.
 trending(stock, day) = weighted RPI > 100 (mean of 2-week / 3-month / 6-month performance vs the market index x 100)
-                       AND EMA9 > EMA21 AND close > SMA150 AND SMA150 rising over 20 days (Stage 2).
+                       AND EMA9 > EMA21 AND close > SMA150 AND SMA150 rising over 20 days (Stage 2) AND close >= 75% of the 52-week high.
+India groups: Yahoo industries, with banks split into PSU / private large / private mid & small / small finance, autos into
+2W-3W-EV / PV & tractors / CV & buses, and a Dairy group (NSE_SPLIT).
 Backtest NSE 2017-26 (scratchpad pulse/): top 10% of groups by 1-month Pulse beat the bottom 10% by +2.9% over the next 3 months
 (+2.4% 2017-21, +3.4% 2022-26), better than plain group return (+1.8%); as a hard ATH filter it did not help.
 Usage: python tools/group_pulse.py NSE|US|ASX  -> data/scan[/us|/asx]/group_pulse.json"""
@@ -17,6 +19,17 @@ CFG = {"NSE": dict(out="data/scan/", bench="^NSEI", suf=".NS", minval=2e7, minpx
        "ASX": dict(out="data/scan/asx/", bench="^AXJO", suf=".AX", minval=1e6, minpx=1)}
 
 
+NSE_SPLIT = {
+    "Banks - PSU": ["SBIN", "BANKBARODA", "PNB", "CANBK", "UNIONBANK", "INDIANB", "BANKINDIA", "CENTRALBK", "IOB", "UCOBANK", "MAHABANK", "PSB", "IDBI"],
+    "Banks - Private Large": ["HDFCBANK", "ICICIBANK", "KOTAKBANK", "AXISBANK", "INDUSINDBK"],
+    "Banks - Small Finance & Payments": ["AUBANK", "EQUITASBNK", "UJJIVANSFB", "SURYODAY", "UTKARSHBNK", "ESAFSFB", "CAPITALSFB", "JSFB", "FINOPB"],
+    "Auto - 2W/3W/EV": ["HEROMOTOCO", "BAJAJ-AUTO", "EICHERMOT", "TVSMOTOR", "TVSHLTD", "OLAELEC", "ATHERENERG", "ATULAUTO", "MERCURYEV"],
+    "Auto - PV & Tractors": ["MARUTI", "M&M", "TMPV", "HYUNDAI", "ESCORTS", "VSTTILLERS"],
+    "Auto - CV & Buses": ["TMCV", "ASHOKLEY", "SMLMAH", "FORCEMOT", "OLECTRA"],
+    "Dairy": ["HATSUN", "DODLA", "PARAGMILK", "HERITGFOOD", "MILKYMIST", "MLKFOOD", "UMANGDAIRY", "VADILALIND"],
+}
+
+
 def universe(mkt):
     if mkt == "NSE":
         u = pd.read_csv("data/universe/nse_industry.csv").rename(columns={"basic_industry": "group"})
@@ -26,6 +39,17 @@ def universe(mkt):
             names = {}
         u["name"] = u.symbol.map(names).fillna(u.symbol)
         u["group"] = u.group.replace({"Confectioners": "Sugar & Confectionery"})   # Yahoo labels Indian sugar mills 'Confectioners'
+        # split Yahoo's broad groups the way Indian investors group them (private vs PSU banks, 2-wheelers vs cars, dairy)
+        ov = {}
+        for g, ss in NSE_SPLIT.items():
+            for x in ss:
+                ov[x] = g
+        add = [x for x in ov if x not in set(u.symbol)]
+        if add:
+            u = pd.concat([u, pd.DataFrame({"symbol": add, "name": add, "group": [ov[x] for x in add]})], ignore_index=True)
+        u["group"] = [ov.get(x, g) for x, g in zip(u.symbol, u.group)]
+        u.loc[u.group == "Banks - Regional", "group"] = "Banks - Private Mid & Small"
+        u.loc[u.group == "Auto Manufacturers", "group"] = "Auto - PV & Tractors"
     else:
         u = pd.read_csv(f"data/universe/{'us' if mkt == 'US' else 'asx'}_meta.csv").rename(columns={"industry": "group"})
     u = u.dropna(subset=["group", "symbol"]); u["symbol"] = u.symbol.astype(str); u["name"] = u.name.fillna(u.symbol).astype(str)
@@ -66,8 +90,8 @@ def main(mkt):
     r2, r3, r6 = rpi(10), rpi(63), rpi(126); w = (r2 + r3 + r6) / 3
     e9 = C.ewm(span=9, adjust=False).mean(); e21 = C.ewm(span=21, adjust=False).mean(); s150 = C.rolling(150).mean()
     st2 = (C > s150) & (s150 > s150.shift(20))
-    tr = (w > 100) & (e9 > e21) & st2 & liq
     hi52 = C.rolling(250, min_periods=120).max()
+    tr = (w > 100) & (e9 > e21) & st2 & (C >= 0.75 * hi52) & liq
     grp = dict(zip(u.symbol, u.group)); nm = dict(zip(u.symbol, u.name))
     L = liq.iloc[-1]; syms = [s for s in C.columns if L.get(s, False)]
     def share(wn, at=-1):
@@ -98,10 +122,10 @@ def main(mkt):
     out = dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), asof=str(C.index[-1].date()), market=mkt,
                groups_n=len(rows), stocks_n=len(syms), market_pulse_1m=mkt_share,
                rule="Trending day = weighted RPI > 100 (mean of 2-week, 3-month and 6-month performance vs the market index x 100), "
-                    "EMA 9 > EMA 21 and a Stage 2 uptrend (above a rising 150-day average). Pulse = share of a group's liquid stocks' days that "
+                    "EMA 9 > EMA 21, a Stage 2 uptrend (above a rising 150-day average) and within 25% of the 52-week high. Pulse = share of a group's liquid stocks' days that "
                     "were trending over the last 1 week / 1 month / 1 quarter. Groups with 3+ liquid stocks.",
                backtest="NSE 2017-26: the 10% of groups with the highest 1-month Pulse beat the lowest 10% by +2.9% over the next 3 months "
-                        "(+2.4% in 2017-21, +3.4% in 2022-26), better than plain group return (+1.8%); 1-week Pulse +1.0% over the next month. "
+                        "(+2.2% in 2017-21, +3.6% in 2022-26), better than plain group return (+1.8%); 1-week Pulse +1.2% over the next month. "
                         "Trending stocks in top-Pulse groups beat the average stock by +1.4% over 3 months. As a hard filter on ATH breakouts "
                         "it did not raise returns - use it as a tiebreaker / tailwind. US and ASX: not separately tested.",
                rows=rows, stock=stock)
