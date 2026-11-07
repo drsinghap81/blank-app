@@ -3,7 +3,7 @@ on:
   push:
     paths: [".github/workflows/fund-scan.yml", "tools/fund_scan.py"]
   schedule:
-    - cron: "45 17 * * 1-5"   # 23:15 IST, after AMFI publishes the day's NAVs
+    - cron: "30 21 * * 1-5"   # 03:00 IST / 08:30 AEDT: after AMFI NAVs (India) and the US close; ASX same day
   workflow_dispatch:
 permissions:
   contents: write

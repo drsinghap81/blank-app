@@ -1077,18 +1077,19 @@ async function loadBottoms() {
 // ---- ETFs & funds: distance from the high, top-up zone (20%+ below), 200-day average, bottom patterns (watch only) ----
 function fundRows() {
   const P = state.fund; if (!P) return [];
-  const k = state.fundK || 'all'; const z = state.fundZ || 'all'; const cat = state.fundC || ''; const q = (state.fundQ || '').toLowerCase();
-  return (P.rows || []).filter((r) => (k === 'all' || (k === 'etf' ? r.kind !== 'fund' : r.kind === 'fund'))
+  const k = state.fundK || 'all'; const z = state.fundZ || 'all'; const cat = state.fundC || ''; const q = (state.fundQ || '').toLowerCase(); const mk = state.fundM || 'IN';
+  return (P.rows || []).filter((r) => (r.market || 'IN') === mk && (mk !== 'IN' || k === 'all' || (k === 'etf' ? r.kind !== 'fund' : r.kind === 'fund'))
     && (z === 'all' || (z === 'topup' ? r.topup : z === 'mid' ? r.below_high_pct >= 10 && r.below_high_pct < 20 : z === 'pat' ? !!r.pattern : z === 'b200' ? !r.above_200 : true))
-    && (!cat || r.category === cat) && (!q || r.name.toLowerCase().includes(q) || r.key.toLowerCase().includes(q)));
+    && (mk !== 'IN' || !cat || r.category === cat) && (!q || r.name.toLowerCase().includes(q) || r.key.toLowerCase().includes(q)));
 }
-const fundName = (r) => (r.kind === 'fund' ? r.name : `${r.key} · ${r.name}`);
+const fundName = (r) => (r.kind === 'fund' ? r.name : `${r.symbol || r.key} · ${r.name}`);
+const FUND_MK = { IN: 'India', US: 'US', AU: 'Australia' };
 function fundItem(r, i) {
   const pc = (v) => (v == null ? '–' : `${v >= 0 ? '+' : ''}${fmt(v, 1)}%`);
-  const chip = `${r.topup ? '<span class="chip new">Top-up zone</span>' : ''}<span class="chip ${r.below_high_pct >= 10 ? 'open' : ''}">${r.below_high_pct < 0.5 ? 'at its high' : `${fmt(r.below_high_pct, 1)}% below high`}</span>`
+  const chip = `${r.topup ? `<span class="chip new">${(r.market || 'IN') === 'IN' ? 'Top-up zone' : '20%+ below high'}</span>` : ''}<span class="chip ${r.below_high_pct >= 10 ? 'open' : ''}">${r.below_high_pct < 0.5 ? 'at its high' : `${fmt(r.below_high_pct, 1)}% below high`}</span>`
     + `<span class="chip">${r.above_200 ? 'above' : 'below'} 200-day</span><span class="chip">RSI ${fmt(r.rsi, 0)}</span>`
     + (r.pattern ? `<span class="chip open">${PAT_NM[r.pattern.typ]} ${r.pattern.status === 'breakout' ? 'breakout' : 'forming'}</span>` : '')
-    + `<span class="chip">${r.kind === 'fund' ? esc(r.category) : r.kind === 'debt' ? 'Debt ETF' : 'ETF'}</span>`;
+    + `<span class="chip">${r.kind === 'fund' ? esc(r.category) : r.kind === 'debt' ? 'Bond/cash ETF' : 'ETF'}</span>`;
   return `<li class="row ${r.topup ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(fundName(r))}</div>
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${(r.r1y || 0) >= 0 ? 'up' : 'down'}">1y ${pc(r.r1y)}</span></div></li>`;
 }
@@ -1099,19 +1100,22 @@ async function loadFunds() {
   const P = state.fund;
   if (!P) { el.innerHTML = botTabs('fund') + '<p class="empty">ETFs and funds appear after the first evening scan (about 23:15 IST).</p>'; botTabsWire(el); $('#asof').textContent = ''; return; }
   $('#asof').textContent = `NAVs / prices${updTxt(P.generated)}`;
-  const R = P.rows || []; const ne = R.filter((r) => r.kind !== 'fund').length; const nt = R.filter((r) => r.topup).length;
+  const mk = state.fundM || 'IN'; const R = (P.rows || []).filter((r) => (r.market || 'IN') === mk); const ne = R.filter((r) => r.kind !== 'fund').length; const nt = R.filter((r) => r.topup).length;
   const cats = [...new Set(R.filter((r) => r.kind === 'fund').map((r) => r.category))].sort();
   const seg = (id, cur, opts) => `<div class="seg" id="${id}" style="flex-wrap:wrap">${opts.map(([k, n]) => `<button data-k="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
-  el.innerHTML = `${botTabs('fund')}<section class="summary">
-      <div class="stat new"><b>${nt}</b><span>in the top-up zone (${P.topup_pct}%+ below their high)</span></div>
+  const mseg = `<div class="seg" id="fundm" style="margin:10px 16px 0">${Object.entries(FUND_MK).map(([k, n]) => `<button data-k="${k}" aria-selected="${mk === k}">${n} ${(P.rows || []).filter((r) => (r.market || 'IN') === k).length}</button>`).join('')}</div>`;
+  const banner = mk === 'IN' ? `<b>For SIP top-ups, not trading signals.</b> In the 2016–26 SIP test, keeping part of each SIP in a liquid fund and adding it when an index fell 20–30% below its high beat a plain SIP by 0.2–1.7% a year (Nifty, Midcap, Smallcap). Shallower dips, the 200-day average and bottom patterns added nothing; for gold every rule did worse.`
+    : `<b>Watch list, not trading signals.</b> ${mk === 'US' ? 'US-listed ETFs (tradeable from Australia through moomoo and most brokers; prices in US$).' : 'ASX-listed ETFs, including global ones (world, US, Nasdaq, Asia, emerging markets, India, Europe, gold); prices in A$.'} In the 2005–26 SIP test the 20%-below top-up added almost nothing outside India: S&P 500 +0.2% a year, ASX 200 +0.1%, Russell 2000 +0.3%, Nasdaq 100 −0.5% (it recovers too fast). Shown for reference only.`;
+  el.innerHTML = `${botTabs('fund')}${mseg}<section class="summary">
+      <div class="stat new"><b>${nt}</b><span>${mk === 'IN' ? 'in the top-up zone' : ''} ${P.topup_pct}%+ below their high</span></div>
       <div class="stat"><b>${R.filter((r) => r.below_high_pct >= 10 && r.below_high_pct < 20).length}</b><span>10–20% below their high</span></div>
       <div class="stat"><b>${R.filter((r) => !r.above_200).length}</b><span>below their 200-day average</span></div>
-      <div class="stat"><b>${ne} / ${R.length - ne}</b><span>ETFs / mutual funds</span></div></section>
-    <div class="status exit watch" style="margin:10px 16px"><b>For SIP top-ups, not trading signals.</b> In the 2016–26 SIP test, keeping part of each SIP in a liquid fund and adding it when an index fell 20–30% below its high beat a plain SIP by 0.2–1.7% a year (Nifty, Midcap, Smallcap). Shallower dips, the 200-day average and bottom patterns added nothing; for gold every rule did worse.</div>
+      <div class="stat"><b>${mk === 'IN' ? `${ne} / ${R.length - ne}` : ne}</b><span>${mk === 'IN' ? 'ETFs / mutual funds' : 'ETFs'}</span></div></section>
+    <div class="status exit watch" style="margin:10px 16px">${banner}</div>
     <div class="card">
-      ${seg('fundk', state.fundK || 'all', [['all', `All ${R.length}`], ['etf', `ETFs ${ne}`], ['fund', `Funds ${R.length - ne}`]])}
-      ${seg('fundz', state.fundZ || 'all', [['all', 'Any level'], ['topup', `Top-up zone ${nt}`], ['mid', '10–20% below'], ['b200', 'Below 200-day'], ['pat', 'Bottom pattern']])}
-      ${(state.fundK || 'all') !== 'etf' ? `<label class="search"><select id="fundc"><option value="">All fund categories</option>${cats.map((c) => `<option ${state.fundC === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></label>` : ''}
+      ${mk === 'IN' ? seg('fundk', state.fundK || 'all', [['all', `All ${R.length}`], ['etf', `ETFs ${ne}`], ['fund', `Funds ${R.length - ne}`]]) : ''}
+      ${seg('fundz', state.fundZ || 'all', [['all', 'Any level'], ['topup', `${mk === 'IN' ? 'Top-up zone' : '20%+ below high'} ${nt}`], ['mid', '10–20% below'], ['b200', 'Below 200-day'], ['pat', 'Bottom pattern']])}
+      ${mk === 'IN' && (state.fundK || 'all') !== 'etf' ? `<label class="search"><select id="fundc"><option value="">All fund categories</option>${cats.map((c) => `<option ${state.fundC === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></label>` : ''}
       <details class="info"><summary>How to read this</summary><p>Below high = how far the latest price or NAV is under its all-time high (ETFs: Yahoo history; funds: AMFI NAV history). Top-up zone = ${P.topup_pct}%+ below the high (not shown for gold, silver, debt and international ETFs — international ETFs trade at a changing premium to the overseas index). 200-day = the price or NAV against its 200-day average. RSI(14) on daily closes. Bottom pattern = the same double bottom / tilted W / triple bottom / inverse H&S rules as the Bottom patterns list, on the closing line. Funds: open-ended equity and index funds, direct plan, growth option, with a NAV in the last 10 days and at least a year of history. Updated nightly.</p></details>
       <label class="search"><input id="fundq" type="search" placeholder="Search ETF, fund or AMC" value="${esc(state.fundQ || '')}" autocomplete="off"></label>
       <ul class="list flat" id="fundlist"></ul></div>`;
@@ -1121,6 +1125,7 @@ async function loadFunds() {
     $('#fundlist').querySelectorAll('.row').forEach((r) => { const go = () => fundSelect(S_[+r.dataset.i]); r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
   };
   el.querySelectorAll('#fundk button').forEach((b) => b.addEventListener('click', () => { state.fundK = b.dataset.k; loadFunds(); }));
+  el.querySelectorAll('#fundm button').forEach((b) => b.addEventListener('click', () => { state.fundM = b.dataset.k; state.fundC = ''; loadFunds(); }));
   el.querySelectorAll('#fundz button').forEach((b) => b.addEventListener('click', () => { state.fundZ = b.dataset.k; loadFunds(); }));
   if ($('#fundc')) $('#fundc').addEventListener('change', (e) => { state.fundC = e.target.value; list(); });
   $('#fundq').addEventListener('input', (e) => { state.fundQ = e.target.value; list(); });
@@ -1132,12 +1137,12 @@ function fundSelect(r) {
   const st = r.topup ? `<div class="status open">${fmt(r.below_high_pct, 1)}% below its high of ${fmt(r.high, 2, 'en-IN')} (${day(r.high_date)}): in the top-up zone.</div>`
     : `<div class="status info">${r.below_high_pct < 0.5 ? 'At its all-time high.' : `${fmt(r.below_high_pct, 1)}% below its high of ${fmt(r.high, 2, 'en-IN')} (${day(r.high_date)}).`}${r.kind !== 'fund' && ['GOLDBEES', 'SILVERBEES'].includes(r.key) ? ' Gold/silver: the dip top-up did worse than a plain SIP in the test.' : ''}${r.intl ? ' International ETF: its price includes a premium over the overseas index (India caps overseas investment), so a fall from the high can be the premium shrinking rather than the index falling. Not given a top-up flag.' : ''}</div>`;
   const f = [['Latest', `${fmt(r.close, 2, 'en-IN')} (${day(r.asof)})`], ['All-time high', `${fmt(r.high, 2, 'en-IN')} on ${day(r.high_date)}`],
-    ['Top-up level (20% below the high)', fmt(r.high * 0.8, 2, 'en-IN')], ['52-week low', fmt(r.low_52w, 2, 'en-IN')],
+    [(r.market || 'IN') === 'IN' ? 'Top-up level (20% below the high)' : '20% below the high', fmt(r.high * 0.8, 2, 'en-IN')], ['52-week low', fmt(r.low_52w, 2, 'en-IN')],
     ['200-day average', `${fmt(r.sma200, 2, 'en-IN')} · ${r.above_200 ? 'above' : 'below'}`], ['RSI(14)', fmt(r.rsi, 0)],
     ['Returns 1 m / 3 m / 1 y', `${pc(r.r1m)} / ${pc(r.r3m)} / ${pc(r.r1y)}`], ['3-year CAGR', pc(r.r3y_cagr)],
     ['Bottom pattern', r.pattern ? `${PAT_NM[r.pattern.typ]}, ${r.pattern.status === 'breakout' ? `broke the neckline ${fmt(r.pattern.neck, 2, 'en-IN')}` : `${fmt(r.pattern.to_neck_pct, 1)}% below the neckline ${fmt(r.pattern.neck, 2, 'en-IN')}`}` : 'none'],
-    ['Type', r.kind === 'fund' ? `Mutual fund · ${esc(r.category)} · AMFI code ${esc(r.key)}` : r.kind === 'debt' ? 'Debt ETF (NSE)' : 'ETF (NSE)']];
-  openPanel(`<div class="d-head"><div><h2>${esc(r.kind === 'fund' ? r.name : r.key)}</h2><div class="co">${esc(r.kind === 'fund' ? r.category : r.name)}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
+    ['Type', r.kind === 'fund' ? `Mutual fund · ${esc(r.category)} · AMFI code ${esc(r.key)}` : `${r.kind === 'debt' ? 'Bond/cash ETF' : 'ETF'} · ${{ IN: 'NSE (₹)', US: 'US-listed (US$)', AU: 'ASX (A$)' }[r.market || 'IN']}`]];
+  openPanel(`<div class="d-head"><div><h2>${esc(r.kind === 'fund' ? r.name : (r.symbol || r.key))}</h2><div class="co">${esc(r.kind === 'fund' ? r.category : r.name)}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}<div class="chart" id="fundc_"></div>
     <p class="muted" style="margin:4px 16px">Weekly closes, last 5 years · blue = 40-week average (≈ 200 days) · gold = all-time high · green dashed = top-up level (20% below the high)${r.pattern ? ' · grey = pattern neckline' : ''}.</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`);
