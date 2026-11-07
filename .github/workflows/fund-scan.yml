@@ -1,0 +1,26 @@
+name: fund-scan
+on:
+  push:
+    paths: [".github/workflows/fund-scan.yml", "tools/fund_scan.py"]
+  schedule:
+    - cron: "45 17 * * 1-5"   # 23:15 IST, after AMFI publishes the day's NAVs
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: |
+          pip install -q yfinance pandas requests pyarrow
+          python tools/fund_scan.py 2>&1 | grep -v -i "warn\|delisted\|failed download\|possibly\|navall\|sample cats" | tail -20
+      - run: |
+          git config user.name "fund-scan bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/scan/funds.json data/scan/fund_charts.json || true
+          git diff --cached --quiet && exit 0
+          git commit -qm "Fund scan $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done
