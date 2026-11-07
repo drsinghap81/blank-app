@@ -11,12 +11,21 @@ CASH = "LIQUIDBEES"; CASH_YR = 0.065; LOOK = 3; TOP = 2
 
 
 def main(x=None):
+    last_px = {}
     if x is None:
         x = yf.download([s + ".NS" for s in ETF], period="3y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)["Close"]
         x.columns = [c.replace(".NS", "") for c in x.columns]
         from session import drop_partial  # noqa: E402
         x = drop_partial(x, "NSE")
     print("rows per ETF:", x.notna().sum().to_dict(), flush=True)
+    last_px = {k: float(v.dropna().iloc[-1]) for k, v in x.items() if v.notna().any()}
+    if "MID150BEES" not in x or x["MID150BEES"].notna().sum() < 80:      # Yahoo history for MID150BEES is sparse:
+        try:                                                               # rank midcaps on the index it tracks
+            h = pd.read_csv("data/scan/sector_hist.csv.gz", index_col=0, parse_dates=True)
+            m = h[h.INDEX == "NIFTY MIDCAP 150"].CLOSE.sort_index()
+            x["MID150BEES"] = m.reindex(x.index).ffill(); print("MID150BEES ranked on NIFTY MIDCAP 150 index", flush=True)
+        except Exception as e:  # noqa: BLE001
+            print("midcap fallback failed", e)
     miss = [s for s in ETF if s not in x or x[s].notna().sum() < 80]
     if miss:
         raise SystemExit(f"no price history for {miss}")
@@ -53,7 +62,7 @@ def main(x=None):
                             buy=sorted(set(hold_now) - set(prev)), sell=sorted(set(prev) - set(hold_now))),
                provisional=dict(asof=str(last.date()), hold=hold_prov,
                                 ranks=[dict(sym=s, ret_3m_pct=round(v * 100, 2), beats_cash=bool(v > cash3)) for s, v in r_prov.items()]),
-               prices={s: round(float(x[s].iloc[-1]), 2) for s in ETF}, history=hist[-24:])
+               prices={s: round(last_px[s], 2) for s in ETF if s in last_px and not (s == "MID150BEES" and last_px[s] > 1000)}, history=hist[-24:])
     os.makedirs("data/scan", exist_ok=True); json.dump(out, open("data/scan/etf_rotation.json", "w"), indent=0)
     print("asof", last.date(), "hold", hold_now, "provisional", hold_prov, "ranks", {d['sym']: d['ret_3m_pct'] for d in out['current']['ranks']})
 
