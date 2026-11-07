@@ -1,0 +1,325 @@
+{
+"generated": "2026-11-07T03:30+00:00",
+"asof": "2026-11-06",
+"rule": "Each month-end: rank NIFTYBEES, MID150BEES, GOLDBEES, MON100 by 3-month return; hold the best 2 equally; a pick below cash (6.5%/yr, 1.6% over 3 months) is held as LIQUIDBEES instead. Trade at the next open.",
+"backtest": "2016-26 (indices/ETFs, 0.2% per switch): 17.7%/yr, worst month-end fall -12.8%, 5-7 switches a year; 2016-21 19.0%, 2021-26 16.1%. Nifty 50 11.6% / -29%; 25% each of the four, never rebalanced to picks: 18% / -16%.",
+"names": {
+"NIFTYBEES": "Nifty 50",
+"MID150BEES": "Midcap 150",
+"GOLDBEES": "Gold",
+"MON100": "US Nasdaq 100",
+"LIQUIDBEES": "Liquid (cash)"
+},
+"cash_3m_pct": 1.59,
+"current": {
+"month": "2026-11",
+"decided": "2026-10-30",
+"hold": [
+"LIQUIDBEES",
+"LIQUIDBEES"
+],
+"ranks": [
+{
+"sym": "GOLDBEES",
+"ret_3m_pct": -1.61,
+"beats_cash": false
+},
+{
+"sym": "NIFTYBEES",
+"ret_3m_pct": -5.24,
+"beats_cash": false
+},
+{
+"sym": "MON100",
+"ret_3m_pct": -6.63,
+"beats_cash": false
+},
+{
+"sym": "MID150BEES",
+"ret_3m_pct": -9.04,
+"beats_cash": false
+}
+],
+"buy": [],
+"sell": [
+"GOLDBEES"
+]
+},
+"provisional": {
+"asof": "2026-11-06",
+"hold": [
+"NIFTYBEES",
+"LIQUIDBEES"
+],
+"ranks": [
+{
+"sym": "NIFTYBEES",
+"ret_3m_pct": 1.63,
+"beats_cash": true
+},
+{
+"sym": "MID150BEES",
+"ret_3m_pct": -5.38,
+"beats_cash": false
+},
+{
+"sym": "GOLDBEES",
+"ret_3m_pct": -7.22,
+"beats_cash": false
+},
+{
+"sym": "MON100",
+"ret_3m_pct": -8.46,
+"beats_cash": false
+}
+]
+},
+"prices": {
+"NIFTYBEES": 279.36,
+"MID150BEES": 231.16,
+"GOLDBEES": 118.13,
+"MON100": 304.09
+},
+"history": [
+{
+"month": "2024-12",
+"decided": "2024-11-29",
+"hold": [
+"MON100",
+"GOLDBEES"
+],
+"ret_pct": 10.74,
+"partial": false
+},
+{
+"month": "2025-01",
+"decided": "2024-12-31",
+"hold": [
+"MON100",
+"LIQUIDBEES"
+],
+"ret_pct": -1.57,
+"partial": false
+},
+{
+"month": "2025-02",
+"decided": "2025-01-31",
+"hold": [
+"MON100",
+"GOLDBEES"
+],
+"ret_pct": -3.97,
+"partial": false
+},
+{
+"month": "2025-03",
+"decided": "2025-02-28",
+"hold": [
+"GOLDBEES",
+"MON100"
+],
+"ret_pct": 1.48,
+"partial": false
+},
+{
+"month": "2025-04",
+"decided": "2025-03-28",
+"hold": [
+"GOLDBEES",
+"LIQUIDBEES"
+],
+"ret_pct": 3.59,
+"partial": false
+},
+{
+"month": "2025-05",
+"decided": "2025-04-30",
+"hold": [
+"GOLDBEES",
+"NIFTYBEES"
+],
+"ret_pct": 1.35,
+"partial": false
+},
+{
+"month": "2025-06",
+"decided": "2025-05-30",
+"hold": [
+"MID150BEES",
+"NIFTYBEES"
+],
+"ret_pct": 3.58,
+"partial": false
+},
+{
+"month": "2025-07",
+"decided": "2025-06-30",
+"hold": [
+"MID150BEES",
+"NIFTYBEES"
+],
+"ret_pct": -2.69,
+"partial": false
+},
+{
+"month": "2025-08",
+"decided": "2025-07-31",
+"hold": [
+"MON100",
+"MID150BEES"
+],
+"ret_pct": -2.36,
+"partial": false
+},
+{
+"month": "2025-09",
+"decided": "2025-08-29",
+"hold": [
+"MON100",
+"GOLDBEES"
+],
+"ret_pct": 10.55,
+"partial": false
+},
+{
+"month": "2025-10",
+"decided": "2025-09-30",
+"hold": [
+"GOLDBEES",
+"MON100"
+],
+"ret_pct": 7.16,
+"partial": false
+},
+{
+"month": "2025-11",
+"decided": "2025-10-31",
+"hold": [
+"GOLDBEES",
+"MON100"
+],
+"ret_pct": -0.32,
+"partial": false
+},
+{
+"month": "2025-12",
+"decided": "2025-11-28",
+"hold": [
+"GOLDBEES",
+"MON100"
+],
+"ret_pct": 2.6,
+"partial": false
+},
+{
+"month": "2026-01",
+"decided": "2025-12-31",
+"hold": [
+"GOLDBEES",
+"NIFTYBEES"
+],
+"ret_pct": 8.09,
+"partial": false
+},
+{
+"month": "2026-02",
+"decided": "2026-01-30",
+"hold": [
+"GOLDBEES",
+"LIQUIDBEES"
+],
+"ret_pct": 0.45,
+"partial": false
+},
+{
+"month": "2026-03",
+"decided": "2026-02-27",
+"hold": [
+"GOLDBEES",
+"LIQUIDBEES"
+],
+"ret_pct": -3.69,
+"partial": false
+},
+{
+"month": "2026-04",
+"decided": "2026-03-30",
+"hold": [
+"GOLDBEES",
+"LIQUIDBEES"
+],
+"ret_pct": 1.19,
+"partial": false
+},
+{
+"month": "2026-05",
+"decided": "2026-04-30",
+"hold": [
+"MON100",
+"MID150BEES"
+],
+"ret_pct": 7.47,
+"partial": false
+},
+{
+"month": "2026-06",
+"decided": "2026-05-29",
+"hold": [
+"MON100",
+"MID150BEES"
+],
+"ret_pct": -1.09,
+"partial": false
+},
+{
+"month": "2026-07",
+"decided": "2026-06-30",
+"hold": [
+"MON100",
+"MID150BEES"
+],
+"ret_pct": -2.35,
+"partial": false
+},
+{
+"month": "2026-08",
+"decided": "2026-07-31",
+"hold": [
+"MID150BEES",
+"MON100"
+],
+"ret_pct": 5.29,
+"partial": false
+},
+{
+"month": "2026-09",
+"decided": "2026-08-31",
+"hold": [
+"MID150BEES",
+"NIFTYBEES"
+],
+"ret_pct": -6.52,
+"partial": false
+},
+{
+"month": "2026-10",
+"decided": "2026-09-30",
+"hold": [
+"GOLDBEES",
+"LIQUIDBEES"
+],
+"ret_pct": -2.35,
+"partial": false
+},
+{
+"month": "2026-11",
+"decided": "2026-10-30",
+"hold": [
+"LIQUIDBEES",
+"LIQUIDBEES"
+],
+"ret_pct": 0.53,
+"partial": true
+}
+]
+}
