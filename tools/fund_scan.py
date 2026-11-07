@@ -82,7 +82,8 @@ def ath_state(x):
                     break
                 s_now, s_4 = sma.loc[wk.index[-1]], sma.loc[wk.index[-5]]
                 if wk.iloc[-1] > s_now and s_now > s_4:
-                    pos = dict(i=i, entry=float(max(o[i], trig)), trigger=trig, ath_month=str(prev.index[a].to_period("M")), base_months=int(base))
+                    dep = float(prev.Close.iloc[a + 1:].min() / prev.Close.iloc[a] - 1) if a + 1 < len(prev) else 0.0
+                    pos = dict(i=i, entry=float(max(o[i], trig)), trigger=trig, ath_month=str(prev.index[a].to_period("M")), base_months=int(base), depth=round(dep, 4))
                 break
         if pos is not None:
             # walk weekly closes after entry
@@ -107,7 +108,9 @@ def ath_state(x):
     # near: within 5% below the trigger, base >= 12, above a rising 30-week SMA
     a = int(np.argmax(done.Close.to_numpy())); trig = float(done.High.iloc[a]); base = len(done) - a
     if len(sma.dropna()) > 5 and base >= 12 and trig * 0.95 <= c[-1] <= trig and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5]:
-        return dict(status="near", trigger=trig, ath_month=str(done.index[a].to_period("M")), base_months=int(base), gap_pct=float((trig / c[-1] - 1) * 100), sma30=float(sma.iloc[-1]))
+        dep = float(done.Close.iloc[a + 1:].min() / done.Close.iloc[a] - 1) if a + 1 < len(done) else 0.0
+        return dict(status="near", trigger=trig, ath_month=str(done.index[a].to_period("M")), base_months=int(base), depth=round(dep, 4),
+                    gap_pct=float((trig / c[-1] - 1) * 100), sma30=float(sma.iloc[-1]))
     if sig:
         sig["ret"] = float(sig["exit_price"] / sig["entry"] - 1); return sig
     return None
@@ -129,7 +132,7 @@ def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
         row["r3y_cagr"] = float(((c[-1] / s.loc[:last - pd.Timedelta(days=3 * 365)].iloc[-1]) ** (1 / 3) - 1) * 100)
     x = ohlc if ohlc is not None else pd.DataFrame({"Open": s, "High": s, "Low": s, "Close": s})
     try:
-        row["ath"] = ath_state(x)
+        row["ath"] = ath_state(x) if kind != "debt" else None      # bond / cash ETFs have no cup-and-trend breakouts
     except Exception as e:  # noqa: BLE001
         row["ath"] = None; print("ath fail", key, str(e)[:80])
     try:
