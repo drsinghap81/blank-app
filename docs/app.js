@@ -1013,7 +1013,7 @@ async function loadATH() {
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
         themes: 'Shortlist = indices (broad, sector and thematic) in an uptrend (above a rising 30-week SMA) with 6-month RS vs Nifty 50 above zero, ordered: cup breakout (new monthly-close high after a base of 2+ years), new high (shorter base), cup forming (within 5% of a 2+-year-old high), within 5% of the high, then the rest; inside each group leading before uptrend, RS rising first, then by RS. Tap one for its weekly chart with the 30-week SMA, or monthly with the highest-month-close line. Below: the rest, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
-        pulse: `${(state.gp[mk] && state.gp[mk].rule) || ''} ${(state.gp[mk] && state.gp[mk].backtest) || ''} Tile size = number of liquid stocks; colour = Pulse; arrow = change in 1-month Pulse vs a month ago. Tap a group for its stocks. Our own computation of industry breadth (the idea behind RideWinners' Market Pulse), not their data.`,
+        pulse: `${(state.gp[mk] && state.gp[mk].rule) || ''} ${(state.gp[mk] && state.gp[mk].backtest) || ''} Tile size = number of liquid stocks; colour = Pulse; bottom strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-but-bouncing, red weak); ↑/↓ = 1-month Pulse vs a month ago. Tap a group for its stocks. Our own computation of industry breadth (the idea behind RideWinners' Market Pulse), not their data.`,
         fund: `ETFs${mk === 'NSE' ? ' and mutual funds (AMFI NAVs)' : mk === 'US' ? ' listed in the US' : ' listed on the ASX, incl. global ones'} with the same monthly ATH rules: trigger = high of the highest-monthly-close month, base 12+ months (2+ years = tested version), buy when the price trades above it while above a rising 30-week SMA; sell at the next open after a weekly close below the 30-week SMA. Signals of the last 18 months plus "near" (within 5% below the trigger). "Cup + trend only" (default) keeps live signals whose base had a real cup — the monthly close fell 15%+ below the old high before coming back — and leaves out bond/cash ETFs and exited trades; diversified funds often just drift back to an old high without a cup. ${(state.fund && state.fund.ath_note) || ''} Tap one for its chart.`,
         ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>${state.ath.tab === 'td' ? '' : sectorStrip()}</details>
       ${state.ath.tab === 'td' ? topStrip() : ''}
@@ -1515,24 +1515,56 @@ function gpColor(p) { // 0 -> grey, 60+ -> deep green
   const lerp = (a, b) => Math.round(a + (b - a) * t);
   return `rgb(${lerp(238, 10)},${lerp(241, 122)},${lerp(245, 85)})`;
 }
+// quarter -> month -> week Pulse shift (backtest NSE 2017-26, next 3 months vs the average group:
+// strong & rising +1.7% (54% win), strong & steady +0.9%, strong & falling +0.4%, weak & rising -0.9%, weak -0.9..-1.2%)
+const GP_SHIFT = {
+  build: { t: 'Building — enter / add', c: '#0A7A55', note: 'strong group, Pulse rising quarter → month → week · backtest +1.7% vs other groups next 3 m, 54% win' },
+  hold: { t: 'Strong, steady — hold', c: '#3B82F6', note: 'strong group, no clear shift · +0.9% next 3 m' },
+  fade: { t: 'Fading — trail stops / book partly', c: '#E8A33D', note: 'strong group, Pulse falling quarter → month → week · only +0.4% next 3 m, 47% win' },
+  bounce: { t: 'Weak but bouncing — not yet', c: '#9CA3AF', note: 'weak group with a rising week · −0.9% next 3 m, 40% win (false dawns)' },
+  weak: { t: 'Weak — avoid', c: '#D64545', note: 'weak group · −0.9 to −1.2% next 3 m' },
+  mid: { t: 'Middle', c: '#CBD5E1', note: 'no clear signal' },
+};
+function gpShift(rows) {
+  const qs = rows.map((r) => r.p1q).sort((a, b) => a - b);
+  const qt = (p) => qs[Math.min(qs.length - 1, Math.floor(p * (qs.length - 1)))];
+  const hi = qt(0.6), lo = qt(0.4);
+  rows.forEach((r) => {
+    const up = r.p1w > r.p1m && r.p1m > r.p1q && r.p1w - r.p1q >= 10; const dn = r.p1w < r.p1m && r.p1m < r.p1q && r.p1q - r.p1w >= 10;
+    r.shift = r.p1q >= hi ? (up ? 'build' : dn ? 'fade' : 'hold') : r.p1q <= lo ? (up ? 'bounce' : 'weak') : 'mid';
+  });
+}
+function gpSlope(r, w = 86, h = 30) {
+  const v = [r.p1q, r.p1m, r.p1w]; const mx = Math.max(60, ...v); const y = (x) => h - 3 - (x / mx) * (h - 6);
+  const col = GP_SHIFT[r.shift || 'mid'].c; const pts = v.map((x, i) => `${4 + i * (w - 8) / 2},${y(x).toFixed(1)}`).join(' ');
+  return `<svg class="gpsl" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-label="Pulse quarter ${fmt(v[0], 0)}, month ${fmt(v[1], 0)}, week ${fmt(v[2], 0)}"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${v.map((x, i) => `<circle cx="${4 + i * (w - 8) / 2}" cy="${y(x).toFixed(1)}" r="${i === 2 ? 3.5 : 2.5}" fill="${col}"/>`).join('')}</svg>`;
+}
 function pulseView() {
   const G = state.gp[AM()]; const box = $('#athlist');
   if (!G) { box.innerHTML = '<li class="empty">Industry Pulse appears after its first nightly run.</li>'; return; }
   const per = state.gpPer || 'p1m'; const q = (state.ath.q || '').toLowerCase();
   const R = (G.rows || []).filter((r) => !q || r.group.toLowerCase().includes(q) || r.members.some((m) => m.symbol.toLowerCase().includes(q) || (m.name || '').toLowerCase().includes(q)))
     .slice().sort((a, b) => b[per] - a[per]);
+  gpShift(G.rows || []);
   const mx = Math.max(...R.map((r) => r.n), 1);
   const top = R.slice(0, 10);
+  const lane = (k) => { const L = R.filter((r) => r.shift === k).sort((a, b) => (b.p1w - b.p1q) - (a.p1w - a.p1q)); const S = GP_SHIFT[k];
+    return `<div class="gplane" style="border-top:4px solid ${S.c}"><div class="gplh"><b>${S.t}</b> <span class="muted">${L.length}</span></div><div class="muted gpln">${S.note}</div>
+      ${L.slice(0, k === 'weak' ? 6 : 12).map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)}</span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('') || '<div class="muted gpln">none now</div>'}
+      ${L.length > (k === 'weak' ? 6 : 12) ? `<div class="muted gpln">+${L.length - (k === 'weak' ? 6 : 12)} more in the tiles below</div>` : ''}</div>`; };
   const bars = top.map((r) => `<div class="gpbar" data-g="${esc(r.group)}"><span class="gpn">${esc(r.group)}</span><span class="gpb"><i style="width:${Math.min(100, r[per])}%;background:${gpColor(r[per])}"></i></span><b>${fmt(r[per], 0)}</b></div>`).join('');
   const tiles = R.map((r) => {
     const d = r.p1m - r.p1m_prev; const w = 64 + Math.round(110 * Math.sqrt(r.n / mx)); const dark = r[per] >= 30;
     return `<button class="gptile" data-g="${esc(r.group)}" style="flex-basis:${w}px;background:${gpColor(r[per])};color:${dark ? '#fff' : 'var(--ink)'}">
-      <span class="gpt">${esc(r.group)}</span><span class="gpv">${fmt(r[per], 0)}<small>${d >= 3 ? ' ▲' : d <= -3 ? ' ▼' : ''}</small></span><span class="gpc">${r.n} stocks · ${r.trending_now} trending</span></button>`;
+      <span class="gpt">${esc(r.group)}</span><span class="gpv">${fmt(r[per], 0)}<small>${r.shift === 'build' || r.shift === 'bounce' ? ' ▲' : r.shift === 'fade' ? ' ▼' : d >= 3 ? ' ↑' : d <= -3 ? ' ↓' : ''}</small></span><span class="gpc">${r.n} stocks · ${r.trending_now} trending</span><span class="gpstrip" style="background:${GP_SHIFT[r.shift || 'mid'].c}"></span></button>`;
   }).join('');
   box.innerHTML = `<li style="list-style:none">
     <div class="seg" id="gpper" style="margin:6px 0">${[['p1w', '1 week'], ['p1m', '1 month'], ['p1q', '1 quarter']].map(([k, n]) => `<button data-k="${k}" aria-selected="${per === k}">${n}</button>`).join('')}</div>
     <div class="gpsum"><div><b>${fmt(G.market_pulse_1m, 0)}</b><span>market Pulse (1 m)</span></div><div><b>${G.groups_n}</b><span>industry groups</span></div><div><b>${G.stocks_n.toLocaleString(AL())}</b><span>liquid stocks</span></div><div><span>as of ${day(G.asof)}</span></div></div>
-    <h4 style="margin:10px 0 4px">Strongest 10 groups</h4><div class="gpbars">${bars}</div>
+    <h4 style="margin:12px 0 2px">Momentum shift · quarter → month → week Pulse</h4>
+    <p class="muted" style="margin:0 0 6px;font-size:12.5px">Strong / weak = the group's quarter Pulse in the top / bottom 40%. Rising / falling = week > month > quarter (or the reverse) by 10+ points. Backtest 2017–26: building strength in strong groups was the best entry; a bounce in a weak group was not.</p>
+    <div class="gplanes">${['build', 'hold', 'fade', 'bounce', 'weak'].map(lane).join('')}</div>
+    <h4 style="margin:14px 0 4px">Strongest 10 groups (${{ p1w: '1 week', p1m: '1 month', p1q: '1 quarter' }[per]})</h4><div class="gpbars">${bars}</div>
     <h4 style="margin:14px 0 4px">All groups <span class="muted" style="font-weight:400">· size = stocks, colour = Pulse</span></h4>
     <div class="gptiles">${tiles || '<p class="muted">Nothing matches.</p>'}</div></li>`;
   box.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; pulseView(); }));
@@ -1544,6 +1576,7 @@ function gpSelect(r) {
     <td><span class="gpb sm"><i style="width:${Math.round(m.d1m / 21 * 100)}%;background:${gpColor(m.d1m / 21 * 60)}"></i></span><span class="muted" style="font-size:12px">${m.d1m}/21 d · ${m.d1w}/5</span></td>
     <td class="${m.wrpi >= 100 ? 'up' : 'down'}">${fmt(m.wrpi, 0)}</td><td>${m.stage2 ? '✓' : '–'}</td><td>${fmt(m.from_high, 0)}%</td></tr>`).join('');
   openPanel(`<div class="d-head"><div><h2>${esc(r.group)}</h2><div class="co">Industry Pulse · rank ${r.rank} of ${state.gp[mk].groups_n} · ${r.n} liquid stocks</div></div><div class="d-price"><b>${fmt(r.p1m, 0)}</b></div></div>
+    <div class="status info" style="border-left:5px solid ${GP_SHIFT[r.shift || 'mid'].c}"><b>${GP_SHIFT[r.shift || 'mid'].t}.</b> ${GP_SHIFT[r.shift || 'mid'].note}. ${gpSlope(r, 120, 36)}</div>
     <div class="facts"><div class="fact"><span>Pulse 1 week / 1 month / 1 quarter</span><b>${fmt(r.p1w, 0)} / ${fmt(r.p1m, 0)} / ${fmt(r.p1q, 0)}</b></div>
       <div class="fact"><span>1-month Pulse a month ago</span><b>${fmt(r.p1m_prev, 0)} (${r.p1m - r.p1m_prev >= 0 ? '+' : ''}${fmt(r.p1m - r.p1m_prev, 0)})</b></div>
       <div class="fact"><span>Trending today</span><b>${r.trending_now} of ${r.n}</b></div></div>
@@ -1594,7 +1627,10 @@ async function loadGP(mk) { if (state.gp[mk] === undefined) state.gp[mk] = await
 const gpCls = (p) => (p >= 45 ? 'new' : p >= 25 ? 'open' : p < 10 ? 'exit' : '');
 function pulseChip(sym, mk) {
   const G = state.gp[mk || AM()]; const x = G && G.stock && G.stock[sym]; if (!x) return '';
-  return `<span class="chip ${gpCls(x[1])}" title="${esc(x[0])}: industry Pulse ${fmt(x[1], 0)}, rank ${x[2]} of ${x[3]}">Group ${fmt(x[1], 0)} · #${x[2]}/${x[3]}</span>`;
+  if (G.rows && G.rows.length && G.rows[0].shift === undefined) gpShift(G.rows);
+  const gr = G.rows ? G.rows.find((r) => r.group === x[0]) : null; const sh = gr && gr.shift;
+  const arr = sh === 'build' ? ' ▲' : sh === 'fade' ? ' ▼' : sh === 'bounce' ? ' ↗' : '';
+  return `<span class="chip ${gpCls(x[1])}" title="${esc(x[0])}: industry Pulse ${fmt(x[1], 0)}, rank ${x[2]} of ${x[3]}${sh ? ' · ' + GP_SHIFT[sh].t : ''}">Group ${fmt(x[1], 0)}${arr} · #${x[2]}/${x[3]}</span>`;
 }
 const rsChips = (r) => rsChip('Sector RS', r.sector_rs) + rsChip('Stock RS', r.stock_rs) + pulseChip(r.symbol);
 function rsFact(r) {
