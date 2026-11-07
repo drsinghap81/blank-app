@@ -39,6 +39,19 @@ def nse(sym):
     return None
 
 
+def yahoo(sym):
+    import yfinance as yf
+    for k in range(3):
+        try:
+            i = yf.Ticker(sym + ".NS").info or {}
+            if i.get("industry"):
+                return ["", i.get("sector", ""), i.get("industry", ""), i.get("industry", "")]
+            return None
+        except Exception:  # noqa: BLE001
+            time.sleep(2 + 2 * k)
+    return None
+
+
 def main():
     lim = int(sys.argv[1]) if len(sys.argv) > 1 else 0
     warm(); syms = symbols(); print("symbols", len(syms), flush=True)
@@ -47,15 +60,18 @@ def main():
     os.makedirs("data/universe", exist_ok=True)
     out = open("data/universe/nse_industry.csv", "w", newline=""); w = csv.writer(out); w.writerow(["symbol", "macro", "sector", "industry", "basic_industry", "src"])
     ok = miss = 0
-    for i, s in enumerate(syms):
-        v = nse(s)
-        if v:
-            w.writerow([s, *v, "nse"]); ok += 1
-        else:
-            miss += 1
-        if i % 100 == 0:
-            print(i, "ok", ok, "miss", miss, flush=True); out.flush()
-        time.sleep(0.35)
+    use_nse = any(nse(s) for s in syms[:5])          # NSE blocks cloud IPs -> Yahoo industry instead
+    print("source", "nse" if use_nse else "yahoo", flush=True)
+    import concurrent.futures as cf
+    f = nse if use_nse else yahoo
+    with cf.ThreadPoolExecutor(1 if use_nse else 6) as ex:
+        for i, (s, v) in enumerate(zip(syms, ex.map(f, syms))):
+            if v:
+                w.writerow([s, *v, "nse" if use_nse else "yahoo"]); ok += 1
+            else:
+                miss += 1
+            if i % 200 == 0:
+                print(i, "ok", ok, "miss", miss, flush=True); out.flush()
     out.close(); print("done ok", ok, "miss", miss)
 
 
