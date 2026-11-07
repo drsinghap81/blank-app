@@ -1,0 +1,26 @@
+name: etf-rotation
+on:
+  push:
+    paths: [".github/workflows/etf-rotation.yml", "tools/etf_rotation.py"]
+  schedule:
+    - cron: "50 10 * * 1-5"   # 16:20 IST on trading days
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: |
+          pip install -q yfinance pandas
+          python tools/etf_rotation.py 2>&1 | grep -v -i "warn" | tail -5
+      - run: |
+          git config user.name "etf-rotation bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/scan/etf_rotation.json || true
+          git diff --cached --quiet && exit 0
+          git commit -qm "ETF rotation $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done

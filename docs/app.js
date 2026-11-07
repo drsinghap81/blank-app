@@ -1651,6 +1651,38 @@ async function pfPrices() {
   return { px, src, athOpen, early };
 }
 
+// ---- SIP · ETF rotation card (core 4: Nifty, Midcap 150, Gold, US Nasdaq; LIQUIDBEES as cash) ----
+const sipGet = () => { try { return +(localStorage.getItem('td.sipAmt') || 0) || 0; } catch (e) { return state.sipAmt || 0; } };
+const sipSet = (v) => { state.sipAmt = v; try { localStorage.setItem('td.sipAmt', String(v)); } catch (e) { /* private mode */ } };
+async function rotCard() {
+  const box = $('#rotcard'); if (!box) return;
+  if (state.rot === undefined) { box.innerHTML = '<p class="muted pad">Loading ETF rotation…</p>'; state.rot = await getJSON(MAIN + 'data/scan/etf_rotation.json', 'etf rotation'); }
+  const R = state.rot; if (!R) { box.innerHTML = '<div class="card"><p class="muted">ETF rotation appears after its first evening run (about 16:20 IST).</p></div>'; return; }
+  const N = R.names || {}; const cur = R.current || {}; const pv = R.provisional || {};
+  const w = {}; (cur.hold || []).forEach((s) => { w[s] = (w[s] || 0) + 1 / cur.hold.length; });
+  const amt = sipGet();
+  const hl = (H) => { const u = [...new Set(H || [])]; return u.length === 1 && (H || []).length > 1 ? `${esc(u[0])} (${u[0] === 'LIQUIDBEES' ? 'all cash' : 'all in'})` : u.map(esc).join(' + '); };
+  const mon = (m) => { if (!m) return ''; const [y, mm] = m.split('-'); return new Date(+y, +mm - 1, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); };
+  const holdRows = Object.entries(w).map(([s, f]) => {
+    const px = s === 'LIQUIDBEES' ? 1000 : (R.prices || {})[s];
+    const part = amt ? `${inr(amt * f)}${px ? ` ≈ ${Math.floor(amt * f / px).toLocaleString('en-IN')} units` : ''}` : `${fmt(f * 100, 0)}%`;
+    return `<div class="fact"><span>${esc(s)} · ${esc(N[s] || '')}</span><b>${part}</b></div>`;
+  }).join('');
+  const rk = (L) => (L || []).map((r) => `<span class="chip ${r.beats_cash ? 'open' : ''}">${esc(r.sym)} ${r.ret_3m_pct >= 0 ? '+' : ''}${fmt(r.ret_3m_pct, 1)}%</span>`).join('');
+  const same = JSON.stringify([...(pv.hold || [])].sort()) === JSON.stringify([...(cur.hold || [])].sort());
+  const hist = (R.history || []).slice(-12).reverse().map((h) => `<tr><td>${mon(h.month)}</td><td>${hl(h.hold)}</td><td class="${h.ret_pct >= 0 ? 'up' : 'down'}">${h.ret_pct >= 0 ? '+' : ''}${fmt(h.ret_pct, 1)}%${h.partial ? ' so far' : ''}</td></tr>`).join('');
+  box.innerHTML = `<div class="card">
+    <h3 style="margin:0 0 6px">SIP · ETF rotation</h3>
+    <div class="status info">Hold for ${mon(cur.month)} (decided on the ${day(cur.decided)} close): <b>${hl(cur.hold)}</b>${(cur.buy || []).length || (cur.sell || []).length ? ` · change at the start of the month: buy ${(cur.buy || []).map(esc).join(', ') || '–'}, sell ${(cur.sell || []).map(esc).join(', ') || '–'}` : ' · no change from last month'}</div>
+    <p class="muted" style="margin:8px 0 2px">Monthly SIP amount (₹), split across this month's holdings:</p><label class="search" style="margin:0 0 8px"><input id="sipamt" type="number" inputmode="numeric" min="0" step="500" placeholder="Monthly SIP amount (₹) to split" value="${amt || ''}"></label>
+    <div class="facts">${holdRows}</div>
+    <p class="muted" style="margin:8px 0 4px">3-month returns at the last month-end (cash ${fmt(R.cash_3m_pct, 1)}%; green = beats cash):</p><div class="tags">${rk(cur.ranks)}</div>
+    <p class="muted" style="margin:8px 0 4px">If the month ended today (${day(pv.asof)}): <b>${hl(pv.hold)}</b>${same ? ' — same as now' : ' — would change'}</p><div class="tags">${rk(pv.ranks)}</div>
+    <details class="info"><summary>How it works · backtest</summary><p>${esc(R.rule)} ${esc(R.backtest)} Cash = LIQUIDBEES (or any liquid fund). Switch only once a month, at the first open after the month-end close; ignore moves during the month.</p></details>
+    <details class="info"><summary>Last 12 months</summary><table class="mini"><tr><th>Month</th><th>Held</th><th>Return</th></tr>${hist}</table></details>
+  </div>`;
+  $('#sipamt').addEventListener('change', (e) => { sipSet(Math.max(0, +e.target.value || 0)); rotCard(); });
+}
 async function loadPortfolio() {
   $('#title').textContent = 'My portfolio';
   const el = $('#view-pf');
@@ -1678,6 +1710,7 @@ function renderPortfolio() {
     return '';
   };
   el.innerHTML = `<div style="margin:10px 16px 0"><button class="more" id="toresults">📊 Backtest results & paper book →</button></div>
+    <div id="rotcard"></div>
     <div class="card">
       <div class="facts">
         <div class="fact"><span>Current value</span><b>${inr(val)}</b></div>
@@ -1705,6 +1738,7 @@ function renderPortfolio() {
       <tbody>${P.c.map((c, j) => ({ ...c, j })).reverse().map((c) => `<tr><td>${day(c.xd)}</td><td>${esc(c.s)}<div class="co">${fmt(c.q, 0, 'en-IN')} × ${fmt(c.a, 2, 'en-IN')} → ${fmt(c.x, 2, 'en-IN')}</div></td>
         <td class="r ${sgn(c.q * (c.x - c.a))}">${inr(c.q * (c.x - c.a))}</td><td><button class="linkbtn" data-undo="${c.j}">undo</button></td></tr>`).join('')}</tbody></table></div></div>` : ''}
     <p class="muted small pad">Your holdings are stored only in this app on this phone — never uploaded or shared. Use the download button to keep a backup (clearing Safari data erases them). Prices: every NSE stock, about 15 minutes delayed in market hours, otherwise the last close. P&amp;L is before brokerage and taxes.</p>`;
+  rotCard();
   $('#pf-add').onclick = () => pfForm();
   $('#pf-imp').onclick = () => pfImport();
   el.querySelectorAll('.pf-row').forEach((li) => (li.onclick = () => pfForm(+li.dataset.i)));

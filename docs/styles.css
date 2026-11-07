@@ -368,3 +368,6 @@ details.info p { margin: 6px 0; line-height: 1.45; }
 .tb-ask{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px;margin-top:6px;border-radius:10px;background:#FFF7E6;font-size:13.5px}
 .tb-ask .lv-btn{padding:6px 12px;font-size:13px}
 .tb-msgs{margin:6px 0 0;padding-left:16px;font-size:12.5px;color:var(--muted,#555)}
+table.mini { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 6px; }
+table.mini th, table.mini td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); }
+table.mini td:last-child, table.mini th:last-child { text-align: right; white-space: nowrap; }
