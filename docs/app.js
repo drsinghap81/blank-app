@@ -2220,7 +2220,7 @@ async function loadMarkets() {
       <div class="tags">${m.trending ? '<span class="chip new">Trending</span>' : ''}<span class="chip">${m.d1m}/21 d trending</span><span class="chip ${m.wrpi >= 100 ? 'open' : 'exit'}">RPI ${fmt(m.wrpi, 0)}</span>${m.stage2 ? '<span class="chip">Stage 2</span>' : ''}${(S.map[m.symbol] || []).join('')}</div></div><div></div>
       <div class="num"><b>${fmt(m.close, 2, MKT[mk].loc)}</b><span class="muted">${fmt(m.from_high, 0)}% from high</span></div></li>`).join('')}</ul></div>`;
   mxWire(el);
-  el.querySelectorAll('.list .row').forEach((li) => { const go = () => mxStock(rows[+li.dataset.i], r, mk, S); li.addEventListener('click', go); li.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
+  el.querySelectorAll('.list .row').forEach((li) => { const go = () => { mxStock(rows[+li.dataset.i], r, mk, S); }; li.addEventListener('click', go); li.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
   mxChart(mk, 'groups', r.group, r.shift);
 }
 async function mxChart(mk, kind, key, shift) {
@@ -2240,17 +2240,71 @@ async function mxChart(mk, kind, key, shift) {
   ch.timeScale().subscribeVisibleLogicalRangeChange((rg) => rg && pc.timeScale().setVisibleLogicalRange(rg));
   new ResizeObserver(() => { ch.applyOptions({ width: box.clientWidth }); pc.applyOptions({ width: pb.clientWidth }); }).observe(box);
 }
-function mxStock(m, r, mk, S) {
+async function mxFund(mk) {
+  state.mxF = state.mxF || {}; state.mxW = state.mxW || {};
+  if (state.mxF[mk] === undefined) state.mxF[mk] = await getJSON(MAIN + MKT[mk].path + 'fundamentals.json', 'fund_' + mk);
+  if (state.mxW[mk] === undefined) state.mxW[mk] = await getJSON(MAIN + MKT[mk].path + 'stock_weekly.json', 'wk_' + mk);
+}
+function mxMoney(v, mk) { // India in crore, others in millions / billions
+  if (v == null) return '–';
+  if (mk === 'NSE') { const cr = v / 1e7; return `₹${fmt(cr, cr >= 100 ? 0 : 1, 'en-IN')} cr`; }
+  const c = MKT[mk].cur; return Math.abs(v) >= 1e9 ? `${c}${fmt(v / 1e9, 1, MKT[mk].loc)} bn` : `${c}${fmt(v / 1e6, 0, MKT[mk].loc)} m`;
+}
+function mxG(v) { // growth % cell, MarketSmith-style colours
+  if (v == null) return '<td class="muted">–</td>';
+  if (v >= 999) return '<td class="up"><b>turnaround</b></td>';
+  return `<td class="${v >= 25 ? 'up' : v < 0 ? 'down' : ''}">${v >= 25 ? '<b>' : ''}${v > 0 ? '+' : ''}${fmt(v, 0)}%${v >= 25 ? '</b>' : ''}</td>`;
+}
+async function mxStock(m, r, mk, S) {
+  await mxFund(mk);
+  const F = (state.mxF[mk] && state.mxF[mk].s && state.mxF[mk].s[m.symbol]) || null;
+  const yq = `https://finance.yahoo.com/quote/${encodeURIComponent((mk === 'US' ? m.symbol.replace('.', '-') : m.symbol) + ({ NSE: '.NS', US: '', ASX: '.AX' })[mk])}`;
   const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent((MKT[mk].tv || '') + m.symbol)}`;
+  const pct = (v, d = 1) => (v == null ? '–' : `${fmt(v, d)}%`);
+  let fund = '<p class="muted pad">Company fundamentals appear after the next nightly fundamentals run.</p>';
+  if (F) {
+    const q0 = F.q && F.q[0]; const ch = [
+      ['Latest quarter EPS up 25%+ vs a year ago', q0 && q0[2] != null ? q0[2] >= 25 : null],
+      ['Latest quarter sales up 20%+', q0 && q0[4] != null ? q0[4] >= 20 : null],
+      ['3-year EPS growth 25%+ a year', F.g3 != null ? F.g3 >= 25 : null],
+      ['Return on equity 17%+', F.roe != null ? F.roe >= 17 : null]];
+    const k = [['Market cap', mxMoney(F.mc, mk)], ['P/E', F.pe != null ? fmt(F.pe, 1) : '–'], ['Forward P/E', F.fpe != null ? fmt(F.fpe, 1) : '–'], ['Price / book', F.pb != null ? fmt(F.pb, 1) : '–'],
+      ['ROE', pct(F.roe)], ['ROCE', pct(F.roce)], ['Operating margin', pct(F.opm)], ['Net margin', pct(F.npm)],
+      ['Debt / equity', F.de != null ? fmt(F.de, 2) : '–'], ['Dividend yield', pct(F.dy, 2)],
+      [mk === 'NSE' ? 'Promoters / insiders' : 'Insiders', pct(F.ins)], ['Institutions', pct(F.inst)]];
+    const qt = (F.q || []).length ? `<h4 style="margin:14px 0 2px">Quarterly results</h4><table class="mini mxq"><tr><th>Quarter</th><th>EPS</th><th>vs yr ago</th><th>Sales</th><th>vs yr ago</th></tr>
+      ${F.q.map((x) => `<tr><td>${x[0]}</td><td>${x[1] != null ? fmt(x[1], 2) : '–'}</td>${mxG(x[2])}<td>${mxMoney(x[3], mk)}</td>${mxG(x[4])}</tr>`).join('')}</table>` : '';
+    const at = (F.a || []).length ? `<h4 style="margin:14px 0 2px">Annual results${F.g3 != null ? ` · 3-year EPS growth ${F.g3 > 0 ? '+' : ''}${fmt(F.g3, 0)}% a year` : ''}</h4><table class="mini mxq"><tr><th>Year to</th><th>EPS</th><th>growth</th><th>Sales</th><th>growth</th></tr>
+      ${F.a.map((x) => `<tr><td>${x[0]}</td><td>${x[1] != null ? fmt(x[1], 2) : '–'}</td>${mxG(x[2])}<td>${mxMoney(x[3], mk)}</td>${mxG(x[4])}</tr>`).join('')}</table>` : '';
+    fund = `${F.ab ? `<p class="mxab">${esc(F.ab)}${F.web ? ` <a href="${esc(F.web)}" target="_blank" rel="noopener">Website ›</a>` : ''}</p>` : ''}
+      <div class="mxkv">${k.map(([a, b]) => `<div><span>${a}</span><b>${b}</b></div>`).join('')}</div>
+      <h4 style="margin:14px 0 4px">Growth checklist <span class="muted" style="font-weight:400;font-size:12.5px">(CAN SLIM-style; not backtested)</span></h4>
+      <div class="mxck">${ch.map(([t, v]) => `<span class="chip ${v === true ? 'open' : v === false ? 'exit' : ''}">${v === true ? '✓' : v === false ? '✗' : '?'} ${t}</span>`).join('')}</div>
+      ${qt}${at}<p class="muted" style="font-size:12px;margin:6px 0 0">Source: Yahoo Finance, updated ${day(F.u)}. EPS ${mk === 'NSE' ? 'in ₹' : `in ${MKT[mk].cur}`}; ${mk === 'NSE' && (F.q || []).some((x) => x[1] == null) ? 'where Yahoo has no EPS the growth column uses net profit; ' : ''}green bold = 25%+ growth.</p>`;
+  }
   const f = [['Industry', `${esc(r.group)} · Pulse ${fmt(r.p1m, 0)} (rank ${r.rank}) · ${GP_SHIFT[r.shift || 'mid'].t}`], ['Sector', esc(r.sector || '')],
     ['Trending days', `${m.d1m} of the last 21 · ${m.d1w} of the last 5${m.trending ? ' · trending today' : ''}`],
     ['Weighted RPI (vs the market)', `${fmt(m.wrpi, 0)} · 2 w ${fmt(m.rpi2w, 0)} · 3 m ${fmt(m.rpi3m, 0)} · 6 m ${fmt(m.rpi6m, 0)}`],
     ['Stage 2 (above a rising 150-day)', m.stage2 ? 'yes' : 'no'], ['From 52-week high', `${fmt(m.from_high, 1)}%`]];
   openPanel(`<div class="d-head"><div><h2>${esc(m.symbol)}</h2><div class="co">${esc(m.name || '')}</div></div><div class="d-price"><b>${fmt(m.close, 2, MKT[mk].loc)}</b></div></div>
     <div class="tags" style="margin:8px 16px">${(S.map[m.symbol] || []).join('') || '<span class="chip">No signal in your systems today</span>'}</div>
-    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
-    <p style="margin:10px 16px"><a href="${tv}" target="_blank" rel="noopener">Open the chart on TradingView ›</a>${mk === 'NSE' ? ` · <a href="https://www.screener.in/company/${encodeURIComponent(m.symbol)}/" target="_blank" rel="noopener">Screener.in fundamentals ›</a>` : ''}</p>
-    <p class="muted" style="margin:6px 16px;font-size:12.5px">Signals come from your tested systems (ATH, 9/21, bottom patterns, support). Industry and sector strength are a tailwind, not a buy signal on their own.</p>`);
+    <div class="mxst">
+      <div class="mxcol"><div class="chart" id="mxsc" style="height:220px"></div><p class="muted" style="margin:2px 0 8px;font-size:12px">Weekly close, last ~14 months · dashed = 10-week average</p>
+        <h4 style="margin:6px 0 4px">Trend & strength</h4><div class="facts">${f.map(([a, b]) => `<div class="fact"><span>${a}</span><b>${b}</b></div>`).join('')}</div></div>
+      <div class="mxcol">${fund}</div></div>
+    <p style="margin:12px 16px"><a href="${tv}" target="_blank" rel="noopener">TradingView chart ›</a> · <a href="${yq}" target="_blank" rel="noopener">Yahoo Finance ›</a>${mk === 'NSE' ? ` · <a href="https://www.screener.in/company/${encodeURIComponent(m.symbol)}/" target="_blank" rel="noopener">Screener.in ›</a>` : ''}${mk === 'ASX' ? ` · <a href="https://www.marketindex.com.au/asx/${encodeURIComponent(m.symbol.toLowerCase())}" target="_blank" rel="noopener">Market Index ›</a>` : ''}</p>
+    <p class="muted" style="margin:6px 16px 16px;font-size:12.5px">Buy signals come from your tested systems (ATH, 9/21, bottom patterns, support). Industry strength and fundamentals are a tailwind, not a buy signal on their own.</p>`);
+  const W = state.mxW[mk]; const box = $('#mxsc'); const cl = W && W.s && W.s[m.symbol];
+  if (!box) return;
+  if (!cl) { box.innerHTML = '<p class="muted pad">Chart appears after the next nightly run.</p>'; box.style.height = 'auto'; return; }
+  const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 220, width: box.clientWidth });
+  const pts = W.t.map((t, i) => ({ time: t, value: cl[i] })).filter((p) => p.value != null);
+  const up = pts.length > 1 && pts[pts.length - 1].value >= pts[0].value;
+  ch.addAreaSeries({ lineColor: up ? '#0A7A55' : '#D64545', topColor: up ? '#0A7A5533' : '#D6454533', bottomColor: '#ffffff00', lineWidth: 2, priceLineVisible: false }).setData(pts);
+  const ma = pts.map((p, i) => (i < 9 ? null : { time: p.time, value: pts.slice(i - 9, i + 1).reduce((a, b) => a + b.value, 0) / 10 })).filter(Boolean);
+  ch.addLineSeries({ color: '#64748B', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false }).setData(ma);
+  ch.timeScale().fitContent();
+  new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
 }
 document.querySelectorAll('.views button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
 document.querySelectorAll('.markets button').forEach((b) => b.addEventListener('click', () => { state.mkt = b.dataset.mkt; state.selected = null; loadTrends(); }));

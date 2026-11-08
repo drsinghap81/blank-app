@@ -65,6 +65,8 @@ def quarters(q):
         else:
             ey = yoy(e, ep)
         s = g(rev, c); sp = g(rev, prev) if prev is not None else None
+        if e is None and s is None and ey is None:
+            continue
         out.append([c.strftime("%b %y"), e, ey, s, yoy(s, sp)])
     return out
 
