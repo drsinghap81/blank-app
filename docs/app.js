@@ -139,7 +139,7 @@ async function loadLiveG(mk) {
       ? `Exit: weekly close below the 30-week average (${fmt(r.stop, 2, L)} now) → this tab lists the sell. Safety net: <b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (15% under the plan stop, as on Angel)`
       : `<b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (the backtested 5-day-low stop); also sell when this tab lists a Supertrend exit`;
     return `<div class="lv-tk">1. ${buy}<br>2. After the fill: ${prot}</div>`; };
-  const list = rows.map((r) => `<div class="lv-row"><div class="lv-rank">${r.rank}</div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
+  const list = rows.map((r) => `<div class="lv-row"><div class="lv-rank">${r.rank}</div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}${r.group ? ' · ' + esc(r.group) : ''}</span></div>
       <div class="lv-plan">${r.qty ? `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}` : '<span class="muted">Too small for your capital at this risk</span>'}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty ? ticket(r) : ''}</div><div></div></div>`).join('');
   const held = new Set(Pp ? Object.keys(Pp.pos || {}) : []);
@@ -158,7 +158,7 @@ async function loadLiveG(mk) {
       <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>
     <div class="lv-card"><b>Paper record</b>${paper}</div>
     <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Top ${rows.length} for the next session</b>${capInput(mk, 'lvcapg')}</div>
-      <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk (your loss limit) and max 10% a stock. Holdings and cash are not checked.</p>
+      <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk (your loss limit) and max 10% a stock. Holdings and cash are not checked.</p><p class="lv-sub">Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
@@ -200,10 +200,10 @@ async function loadLive() {
     const can = S && !r.skip && r.qty > 0;
     const hdr = r.tier === 'more' && (i === 0 || rows[i - 1].tier !== 'more')
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
-    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td}</div>
+    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} (${fmt(r.pct_cap, 1)}%) · risk ${money(r.risk_amt, 'NSE')}`}</div>
       <div class="lv-sub">${ord} · stop ${fmt(r.stop, 2, 'en-IN')} (${fmt(r.risk_pct, 1)}% below) · exit: ${esc(r.exit_rule || '')}</div>
-      <div class="lv-sub">${esc(r.note || '')}${r.sector ? ' · ' + esc(r.sector) : ''}</div>${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}</div>
+      <div class="lv-sub">${esc(r.note || '')}${r.group ? ' · ' + esc(r.group) : r.sector ? ' · ' + esc(r.sector) : ''}</div>${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}</div>
       <div>${can ? `<button class="lv-btn" data-i="${i}">Send</button>` : ''}</div>
       ${can ? `<div class="lv-bq" hidden>Basket qty <input type="number" min="1" max="${r.qty}" value="${r.qty}" data-bq="${i}" inputmode="numeric"> of ${r.qty}</div>` : ''}</div>`;
   }).join('');
@@ -221,6 +221,7 @@ async function loadLive() {
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
   el.innerHTML = `${lvSeg()}${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${nTop} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
+      <p class="lv-sub">Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
       ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
@@ -1614,6 +1615,12 @@ const GP_SHIFT = {
   weak: { t: 'Weak — avoid', c: '#D64545', note: 'weak group · −0.9 to −1.2% next 3 m' },
   mid: { t: 'Middle', c: '#CBD5E1', note: 'no clear signal' },
 };
+const LANE_TXT = { build: 'Building', hold: 'Strong', mid: 'Middle', bounce: 'Weak, bouncing', fade: 'Fading', weak: 'Weak' };
+function laneChip(lane, extra = '') {
+  if (!lane) return '<span class="chip" title="Industry has fewer than 3 liquid stocks or no label">Industry n/a</span>';
+  const c = GP_SHIFT[lane].c; const dark = lane === 'build' || lane === 'weak' || lane === 'hold';
+  return `<span class="chip" style="background:${c}${dark ? '' : '33'};color:${dark ? '#fff' : 'var(--ink)'}" title="${esc(GP_SHIFT[lane].t)}: ${esc(GP_SHIFT[lane].note)}">${LANE_TXT[lane]}${extra}</span>`;
+}
 function gpShift(rows) {
   const qs = rows.map((r) => r.p1q).sort((a, b) => a - b);
   const qt = (p) => qs[Math.min(qs.length - 1, Math.floor(p * (qs.length - 1)))];
@@ -1740,8 +1747,7 @@ function pulseChip(sym, mk) {
   const G = state.gp[mk || AM()]; const x = G && G.stock && G.stock[sym]; if (!x) return '';
   if (G.rows && G.rows.length && G.rows[0].shift === undefined) gpShift(G.rows);
   const gr = G.rows ? G.rows.find((r) => r.group === x[0]) : null; const sh = gr && gr.shift;
-  const arr = sh === 'build' ? ' ▲' : sh === 'fade' ? ' ▼' : sh === 'bounce' ? ' ↗' : '';
-  return `<span class="chip ${gpCls(x[1])}" title="${esc(x[0])}: industry Pulse ${fmt(x[1], 0)}, rank ${x[2]} of ${x[3]}${sh ? ' · ' + GP_SHIFT[sh].t : ''}">Group ${fmt(x[1], 0)}${arr} · #${x[2]}/${x[3]}</span>`;
+  return sh ? laneChip(sh, ` industry · #${x[2]}/${x[3]}`) : `<span class="chip ${gpCls(x[1])}" title="${esc(x[0])}: industry Pulse ${fmt(x[1], 0)}, rank ${x[2]} of ${x[3]}">Group ${fmt(x[1], 0)} · #${x[2]}/${x[3]}</span>`;
 }
 const rsChips = (r) => rsChip('Sector RS', r.sector_rs) + rsChip('Stock RS', r.stock_rs) + pulseChip(r.symbol);
 function rsFact(r) {

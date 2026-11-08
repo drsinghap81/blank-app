@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-08 01:15 UTC",
+"generated": "2026-11-08 02:25 UTC",
 "market": "ASX",
 "watch_only": true,
 "asof": "2026-11-06",
@@ -36,6 +36,10 @@
 "stock_rs": null,
 "aligned": false,
 "td_score": null,
+"group": null,
+"lane": null,
+"group_pulse": null,
+"group_rank": null,
 "rank": 1,
 "risk_pct": 10.3
 },
@@ -62,6 +66,10 @@
 "stock_rs": null,
 "aligned": false,
 "td_score": null,
+"group": null,
+"lane": null,
+"group_pulse": null,
+"group_rank": null,
 "rank": 2,
 "risk_pct": 7.1
 }

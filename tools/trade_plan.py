@@ -45,9 +45,30 @@ def num(v):
         return None
 
 
+LANE_ORD = {"build": 0, "hold": 1, "mid": 2, None: 3, "bounce": 4, "fade": 5, "weak": 6}
+
+
+def lanes(G):
+    """Industry momentum-shift lane per group (same rule as the app): strong/weak = quarter Pulse top/bottom 40%;
+    rising = week > month > quarter by 10+ pts. Building beat other groups by +1.7% over 3 months (2017-26)."""
+    R = G.get("rows") or []
+    if not R:
+        return {}
+    qs = sorted(r["p1q"] for r in R)
+    qt = lambda f: qs[min(len(qs) - 1, int(f * (len(qs) - 1)))]  # noqa: E731
+    hi, lo = qt(0.6), qt(0.4); out = {}
+    for r in R:
+        up = r["p1w"] > r["p1m"] > r["p1q"] and r["p1w"] - r["p1q"] >= 10
+        dn = r["p1w"] < r["p1m"] < r["p1q"] and r["p1q"] - r["p1w"] >= 10
+        out[r["group"]] = (("build" if up else "fade" if dn else "hold") if r["p1q"] >= hi else
+                           (("bounce" if up else "weak") if r["p1q"] <= lo else "mid"), r["p1m"], r["rank"])
+    return out
+
+
 def main(mk="NSE"):
     D = DIR[mk]; OUT = D + "trade_plan.json"; india = mk == "NSE"
     ath, tr, sec = load(D + "ath.json"), load(D + "trend_scan.json"), load(D + "sectors.json")
+    G = load(D + "group_pulse.json"); LN = lanes(G); GS = G.get("stock") or {}
     ix = sec.get("indices") or {}
     names = sec.get("names") or {}
     secname = lambda k: names.get(k) or ((k or "").replace("NIFTY ", "").title() if india else (k or ""))  # noqa: E731
@@ -114,7 +135,10 @@ def main(mk="NSE"):
     for c in C:
         if c["symbol"] not in best or c["score"] > best[c["symbol"]]["score"]:
             best[c["symbol"]] = c
-    C = sorted(best.values(), key=lambda c: (-c["score"], -(c["stock_rs"] or -999), -(c["value_cr"] or 0)))
+    for c in best.values():   # industry lane (tag + tiebreak only: as a filter it cut ATH returns in the 2017-26 test)
+        g = GS.get(c["symbol"]); x = LN.get(g[0]) if g else None
+        c.update(group=g[0] if g else None, lane=x[0] if x else None, group_pulse=x[1] if x else None, group_rank=x[2] if x else None)
+    C = sorted(best.values(), key=lambda c: (-c["score"], LANE_ORD[c["lane"]], -(c["stock_rs"] or -999), -(c["value_cr"] or 0)))
     trades = [c for c in C if c["kind"] != "WATCH"]
     for i, c in enumerate(trades):
         c["rank"] = i + 1
