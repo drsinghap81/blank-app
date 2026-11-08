@@ -31,4 +31,4 @@ jobs:
           for d in data/scan data/scan/us data/scan/asx; do for f in $d/patterns.json $d/support.json; do [ -f "$f" ] && git add "$f"; done; [ -d $d/pattern_charts ] && git add -A $d/pattern_charts; done; true
           git diff --cached --quiet && exit 0
           git commit -qm "Pattern scan $(date -u +%F)"
-          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done
+          for i in 1 2 3 4 5; do git pull -q --rebase -X theirs origin main && git push -q && break; git rebase --abort 2>/dev/null; sleep $((i*7)); done
