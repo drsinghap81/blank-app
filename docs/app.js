@@ -9,7 +9,7 @@ const MKT = {
 };
 const C = { ink: '#14213D', rise: '#0E9F6E', fall: '#D64545', saffron: '#E8A33D', slate: '#5B6B82', line: '#E3E8F0',
   e9: '#F28C28', e21: '#3B6FE0', e50: '#A0AEC0', rsi: '#7C5CDB' };
-const state = { view: 'trends', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, pf: null, style: {}, cap: {}, risk: {} };
+const state = { view: 'mk', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, pf: null, style: {}, cap: {}, risk: {} };
 const $ = (s) => document.querySelector(s);
 const loc = () => MKT[state.mkt].loc;
 const fmt = (v, d = 2, l) => (v == null || Number.isNaN(v) ? '–' : Number(v).toLocaleString(l || loc(), { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -70,7 +70,7 @@ function show(view) {
   document.querySelectorAll('.views button').forEach((b) => (b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   document.querySelectorAll('.view').forEach((s) => (s.hidden = s.id !== `view-${view}`));
   window.scrollTo(0, 0);
-  ({ live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms })[view]();
+  ({ mk: loadMarkets, live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms })[view]();
 }
 
 /* ------------------------------------------------------------------ Live trades */
@@ -2114,6 +2114,144 @@ function download() {
   toast('Nothing to download here');
 }
 
+/* ------------------------------------------------------------------ Markets: top-down World > Market > Sector > Industry > Stock */
+const MX_IDX = { NSE: '^NSEI', US: '^GSPC', ASX: '^AXJO' };
+const MX_BENCH = { NSE: 'Nifty 50', US: 'S&P 500', ASX: 'ASX 200' };
+const MX_TAGC = { leading: '#0A7A55', uptrend: '#3B82F6', mixed: '#9CA3AF', weak: '#D64545' };
+state.mx = state.mx || { lvl: 'world' };
+async function mxSignals(mk) {
+  state.mxSig = state.mxSig || {};
+  if (state.mxSig[mk]) return state.mxSig[mk];
+  const tr = state.data[mk] || (state.data[mk] = await getJSON(MAIN + MKT[mk].path + 'trend_scan.json', 'td_' + mk));
+  const at = await getJSON(MAIN + MKT[mk].path + 'ath.json', 'ath_mx_' + mk);
+  let pat = null, sup = null;
+  if (mk === 'NSE') { pat = state.pat || (state.pat = await getJSON(MAIN + 'data/scan/patterns.json', 'patterns')); sup = state.sup || (state.sup = await getJSON(MAIN + 'data/scan/support.json', 'support')); }
+  const m = {}; const add = (sym, cls, txt) => { (m[sym] = m[sym] || []).push(`<span class="chip ${cls}">${txt}</span>`); };
+  if (at) {
+    (at.breakouts || []).forEach((r) => add(r.symbol, 'new', `ATH breakout${r.main ? ' (2-yr base)' : ''}`));
+    (at.near || []).forEach((r) => add(r.symbol, '', `ATH ${fmt(r.gap_pct, 1)}% to trigger`));
+    (at.tracked || []).filter((r) => r.status === 'open' || r.status === 'exit next open').forEach((r) => { if (!(at.breakouts || []).some((b) => b.symbol === r.symbol)) add(r.symbol, r.status === 'open' ? 'open' : 'exit', r.status === 'open' ? 'ATH in trade' : 'ATH sell next open'); });
+  }
+  if (tr) (tr.early || []).forEach((r) => { const st = r.status || ''; if (st.startsWith('NEW')) add(r.symbol, 'new', '9/21 buy'); else if (st === 'open') add(r.symbol, 'open', '9/21 in trade'); else if (st.startsWith('EXIT')) add(r.symbol, 'exit', '9/21 sell'); });
+  if (pat) (pat.rows || []).filter((r) => r.kind === 'stock').forEach((r) => add(r.symbol, r.status === 'breakout' ? 'open' : '', `${PAT_NM[r.typ]} ${r.status === 'breakout' ? 'breakout' : 'forming'}`));
+  if (sup) (sup.rows || []).forEach((r) => add(r.symbol, '', r.status === 'touched' ? 'At support' : 'Near support'));
+  state.mxSig[mk] = { map: m, n921: tr ? (tr.early || []).filter((r) => (r.status || '').startsWith('NEW')).length : 0, n921o: tr ? (tr.early || []).filter((r) => r.status === 'open').length : 0,
+    nbrk: at ? (at.breakouts || []).length : 0, nnear: at ? (at.near || []).length : 0 };
+  return state.mxSig[mk];
+}
+function mxCrumb() {
+  const x = state.mx; const parts = [['world', 'World']];
+  if (x.m) parts.push(['market', MKT[x.m].name]); if (x.sec) parts.push(['sector', x.sec]); if (x.grp) parts.push(['industry', x.grp]);
+  return `<nav class="mxcrumb">${parts.map(([l, n], i) => (i === parts.length - 1 ? `<b>${esc(n)}</b>` : `<a href="#" data-l="${l}">${esc(n)}</a> ›`)).join(' ')}</nav>`;
+}
+function mxGo(o) { Object.assign(state.mx, o); window.scrollTo(0, 0); loadMarkets(); }
+function mxWire(el) {
+  el.querySelectorAll('.mxcrumb a').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); const l = a.dataset.l;
+    mxGo(l === 'world' ? { lvl: 'world', m: null, sec: null, grp: null } : l === 'market' ? { lvl: 'market', sec: null, grp: null } : { lvl: 'sector', grp: null }); }));
+}
+function mxTiles(rows, key, onAttr) {
+  const per = state.gpPer || 'p1m'; const mx = Math.max(...rows.map((r) => r.n), 1);
+  return `<div class="gptiles">${rows.map((r) => { const w = 64 + Math.round(110 * Math.sqrt(r.n / mx)); const dark = r[per] >= 30;
+    return `<button class="gptile" ${onAttr}="${esc(r[key])}" style="flex-basis:${w}px;background:${gpColor(r[per])};color:${dark ? '#fff' : 'var(--ink)'}">
+      <span class="gpt">${esc(r[key])}</span><span class="gpv">${fmt(r[per], 0)}<small>${r.shift === 'build' || r.shift === 'bounce' ? ' ▲' : r.shift === 'fade' ? ' ▼' : ''}</small></span>
+      <span class="gpc">${r.n} stocks${r.rs3m != null ? ` · RS ${r.rs3m >= 0 ? '+' : ''}${fmt(r.rs3m, 0)}%` : ` · ${r.trending_now} trending`}</span><span class="gpstrip" style="background:${GP_SHIFT[r.shift || 'mid'].c}"></span></button>`; }).join('')}</div>`;
+}
+function mxPer() { const per = state.gpPer || 'p1m'; return `<div class="seg" id="gpper" style="margin:6px 0">${[['p1w', '1 week'], ['p1m', '1 month'], ['p1q', '1 quarter']].map(([k, n]) => `<button data-k="${k}" aria-selected="${per === k}">Pulse ${n}</button>`).join('')}</div>`; }
+async function loadMarkets() {
+  $('#title').textContent = 'Markets';
+  const el = $('#view-mk'); const x = state.mx;
+  if (!state.world) { el.innerHTML = '<p class="muted pad">Loading…</p>'; state.world = await getJSON(MAIN + 'data/scan/world.json', 'world'); }
+  const W = state.world;
+  if (x.lvl === 'world') {
+    await Promise.all(['NSE', 'US', 'ASX'].map(loadGP));
+    $('#asof').textContent = W ? `World indices · ${day(W.asof)}${updTxt(W.generated)}` : '';
+    const I = (W && W.indices) || {};
+    const card = (mk) => { const k = MX_IDX[mk]; const v = I[k] || {}; const G = state.gp[mk]; const ms = G && G.mstats;
+      return `<button class="mxcard" data-m="${mk}" style="border-top:5px solid ${MX_TAGC[v.tag] || '#CBD5E1'}"><span class="mxh">${MKT[mk].name}</span><span class="muted">${esc(v.name || MX_BENCH[mk])} · ${esc(v.tag || '')}${v.up ? ' · above rising 30-wk' : ''}</span>
+        <span class="mxv">${v.ret_3m != null ? `${v.ret_3m >= 0 ? '+' : ''}${fmt(v.ret_3m, 1)}% 3 m` : ''}</span><span class="muted">${v.from_high != null ? `${fmt(v.from_high, 1)}% from high` : ''}${ms ? ` · ${fmt(ms.above200, 0)}% of stocks above 200-day · Pulse ${fmt(ms.p1m, 0)}` : ''}</span><span class="mxgo">Open sectors ›</span></button>`; };
+    const others = Object.entries(I).filter(([k]) => !Object.values(MX_IDX).includes(k));
+    el.innerHTML = `${mxCrumb()}<div class="status ${W && W.risk_on ? 'open' : 'exit watch'}" style="margin:8px 16px"><b>World ${W && W.risk_on ? 'risk-on' : 'risk-off'}.</b> ${W ? esc(W.benchmark) : ''} — context only. Buy signals still come from your tested systems; industry strength is the tailwind (in the 2017–26 test, the top 10% of industries beat the bottom 10% by about 3% over the next 3 months).</div>
+      <div class="card"><h4 style="margin:0 0 8px">Your markets</h4><div class="mxcards">${['NSE', 'US', 'ASX'].map(card).join('')}</div>
+      <h4 style="margin:14px 0 6px">Other world indices · 3-month return</h4><div class="mxworld">${others.map(([k, v]) => `<div class="mxw" style="border-left:5px solid ${MX_TAGC[v.tag] || '#CBD5E1'}"><b>${esc(v.name)}</b><span class="muted">${esc(v.region)} · ${esc(v.tag)}</span><span class="${v.ret_3m >= 0 ? 'up' : 'down'}">${v.ret_3m >= 0 ? '+' : ''}${fmt(v.ret_3m, 1)}%</span></div>`).join('')}</div>
+      <p class="muted" style="margin:10px 0 0;font-size:12.5px">Colour = trend tag (green leading, blue uptrend, grey mixed, red weak) from each index's 30-week average and strength vs the MSCI World.</p></div>`;
+    mxWire(el); el.querySelectorAll('.mxcard').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'market', m: b.dataset.m, sec: null, grp: null })));
+    return;
+  }
+  const mk = x.m; const G = await loadGP(mk);
+  if (!G || !G.sectors) { el.innerHTML = mxCrumb() + '<p class="empty">This market\'s sector data appears after the next nightly run.</p>'; mxWire(el); return; }
+  $('#asof').textContent = `${MKT[mk].name} close ${day(G.asof)}${updTxt(G.generated)}`;
+  gpShift(G.rows); gpShift(G.sectors);
+  const S = await mxSignals(mk);
+  if (x.lvl === 'market') {
+    const ms = G.mstats || {}; const v = ((W && W.indices) || {})[MX_IDX[mk]] || {};
+    const secs = G.sectors.slice().sort((a, b) => b[state.gpPer || 'p1m'] - a[state.gpPer || 'p1m']);
+    el.innerHTML = `${mxCrumb()}<section class="summary">
+        <div class="stat ${ms.up ? 'new' : 'exit'}"><b>${ms.up ? 'Uptrend' : 'No uptrend'}</b><span>${MX_BENCH[mk]} ${ms.r3m >= 0 ? '+' : ''}${fmt(ms.r3m, 1)}% in 3 m · ${fmt(ms.from_high, 1)}% from 1-yr high</span></div>
+        <div class="stat"><b>${fmt(ms.above200, 0)}%</b><span>of liquid stocks above their 200-day (a month ago ${fmt(ms.above200_1m_ago, 0)}%)</span></div>
+        <div class="stat"><b>${fmt(ms.p1q, 0)} → ${fmt(ms.p1m, 0)} → ${fmt(ms.p1w, 0)}</b><span>market Pulse quarter → month → week</span></div>
+        <div class="stat"><b>${S.nbrk} · ${S.n921} · ${S.nnear}</b><span>ATH breakouts · 9/21 buys · ATH near trigger</span></div></section>
+      <div class="card"><h4 style="margin:0 0 4px">Sectors</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Colour = Pulse (share of the sector's stocks trending); strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-bouncing, red weak); RS = equal-weight 3-month return vs ${MX_BENCH[mk]}. Tap a sector for its industries.</p>
+        ${mxPer()}${mxTiles(secs, 'sector', 'data-s')}
+        <div class="mxlist">${secs.map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('')}</div></div>`;
+    mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
+    el.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'sector', sec: b.dataset.s, grp: null })));
+    return;
+  }
+  if (x.lvl === 'sector') {
+    const sr = G.sectors.find((r) => r.sector === x.sec) || {}; const per = state.gpPer || 'p1m';
+    const grs = G.rows.filter((r) => r.sector === x.sec).sort((a, b) => b[per] - a[per]);
+    el.innerHTML = `${mxCrumb()}<div class="card"><div class="status info" style="border-left:5px solid ${GP_SHIFT[sr.shift || 'mid'].c}"><b>${esc(x.sec)}: ${GP_SHIFT[sr.shift || 'mid'].t}.</b> Pulse ${fmt(sr.p1q, 0)} → ${fmt(sr.p1m, 0)} → ${fmt(sr.p1w, 0)} (quarter → month → week) · RS ${sr.rs3m >= 0 ? '+' : ''}${fmt(sr.rs3m, 1)}% 3 m · ${sr.n} stocks in ${sr.groups} industries · ${sr.trending_now} trending today. ${gpSlope(sr, 120, 36)}</div>
+      <div class="chart" id="mxc"></div><div class="rsi" id="mxcp"></div><p class="muted" style="margin:4px 0;font-size:12.5px">Last 12 months · dark = sector (equal weight) · grey = ${MX_BENCH[mk]} · lower = 1-month Pulse.</p>
+      <h4 style="margin:12px 0 4px">Industries in ${esc(x.sec)}</h4>${mxPer()}${mxTiles(grs, 'group', 'data-g')}
+      <div class="mxlist">${grs.map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('')}</div></div>`;
+    mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
+    el.querySelectorAll('[data-g]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'industry', grp: b.dataset.g })));
+    mxChart(mk, 'sectors', x.sec, sr.shift);
+    return;
+  }
+  // industry level: all liquid stocks with system chips
+  const r = G.rows.find((g) => g.group === x.grp); if (!r) { mxGo({ lvl: 'sector', grp: null }); return; }
+  const q = (state.mxQ || '').toLowerCase();
+  const rows = r.members.filter((m) => !q || m.symbol.toLowerCase().includes(q) || (m.name || '').toLowerCase().includes(q));
+  el.innerHTML = `${mxCrumb()}<div class="card"><div class="status info" style="border-left:5px solid ${GP_SHIFT[r.shift || 'mid'].c}"><b>${esc(r.group)}: ${GP_SHIFT[r.shift || 'mid'].t}.</b> ${GP_SHIFT[r.shift || 'mid'].note}. Pulse ${fmt(r.p1q, 0)} → ${fmt(r.p1m, 0)} → ${fmt(r.p1w, 0)} · rank ${r.rank} of ${G.groups_n} · ${r.trending_now} of ${r.n} trending today. ${gpSlope(r, 120, 36)}</div>
+    <div class="chart" id="mxc"></div><div class="rsi" id="mxcp"></div><p class="muted" style="margin:4px 0;font-size:12.5px">Last 12 months · dark = industry (equal weight) · grey = ${MX_BENCH[mk]} · lower = 1-month Pulse.</p>
+    <h4 style="margin:12px 0 4px">Stocks (${r.n} liquid)</h4>
+    <ul class="list flat">${rows.map((m, i) => `<li class="row mxrow" tabindex="0" data-i="${i}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}</div>
+      <div class="tags">${m.trending ? '<span class="chip new">Trending</span>' : ''}<span class="chip">${m.d1m}/21 d trending</span><span class="chip ${m.wrpi >= 100 ? 'open' : 'exit'}">RPI ${fmt(m.wrpi, 0)}</span>${m.stage2 ? '<span class="chip">Stage 2</span>' : ''}${(S.map[m.symbol] || []).join('')}</div></div><div></div>
+      <div class="num"><b>${fmt(m.close, 2, MKT[mk].loc)}</b><span class="muted">${fmt(m.from_high, 0)}% from high</span></div></li>`).join('')}</ul></div>`;
+  mxWire(el);
+  el.querySelectorAll('.list .row').forEach((li) => { const go = () => mxStock(rows[+li.dataset.i], r, mk, S); li.addEventListener('click', go); li.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
+  mxChart(mk, 'groups', r.group, r.shift);
+}
+async function mxChart(mk, kind, key, shift) {
+  state.gpCh = state.gpCh || {};
+  if (state.gpCh[mk] === undefined) state.gpCh[mk] = await getJSON(MAIN + MKT[mk].path + 'group_pulse_charts.json', 'gpc_' + mk);
+  const D = state.gpCh[mk]; const g = D && D[kind] && D[kind][key]; const box = $('#mxc'); const pb = $('#mxcp'); if (!box) return;
+  if (!g) { box.innerHTML = '<p class="muted pad">Chart appears after the next nightly run.</p>'; return; }
+  const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
+  ch.addLineSeries({ color: '#9CA3AF', lineWidth: 1, priceLineVisible: false, title: 'market' }).setData(D.t.map((t, i) => ({ time: t, value: D.market[i] })));
+  ch.addLineSeries({ color: C.ink, lineWidth: 2, priceLineVisible: false }).setData(D.t.map((t, i) => ({ time: t, value: g.idx[i] })));
+  const col = GP_SHIFT[shift || 'mid'].c;
+  const pc = window.LightweightCharts.createChart(pb, { ...chartBase(), height: pb.clientHeight, width: pb.clientWidth, timeScale: { visible: false } });
+  const ps = pc.addAreaSeries({ lineColor: col, topColor: col + '55', bottomColor: col + '08', lineWidth: 2, priceLineVisible: false });
+  ps.setData(D.t.map((t, i) => (g.pulse[i] == null ? { time: t } : { time: t, value: g.pulse[i] })));
+  [25, 45].forEach((v) => ps.createPriceLine({ price: v, color: '#CBD5E1', lineWidth: 1, lineStyle: 3, axisLabelVisible: false }));
+  ch.timeScale().fitContent(); pc.timeScale().fitContent();
+  ch.timeScale().subscribeVisibleLogicalRangeChange((rg) => rg && pc.timeScale().setVisibleLogicalRange(rg));
+  new ResizeObserver(() => { ch.applyOptions({ width: box.clientWidth }); pc.applyOptions({ width: pb.clientWidth }); }).observe(box);
+}
+function mxStock(m, r, mk, S) {
+  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent((MKT[mk].tv || '') + m.symbol)}`;
+  const f = [['Industry', `${esc(r.group)} · Pulse ${fmt(r.p1m, 0)} (rank ${r.rank}) · ${GP_SHIFT[r.shift || 'mid'].t}`], ['Sector', esc(r.sector || '')],
+    ['Trending days', `${m.d1m} of the last 21 · ${m.d1w} of the last 5${m.trending ? ' · trending today' : ''}`],
+    ['Weighted RPI (vs the market)', `${fmt(m.wrpi, 0)} · 2 w ${fmt(m.rpi2w, 0)} · 3 m ${fmt(m.rpi3m, 0)} · 6 m ${fmt(m.rpi6m, 0)}`],
+    ['Stage 2 (above a rising 150-day)', m.stage2 ? 'yes' : 'no'], ['From 52-week high', `${fmt(m.from_high, 1)}%`]];
+  openPanel(`<div class="d-head"><div><h2>${esc(m.symbol)}</h2><div class="co">${esc(m.name || '')}</div></div><div class="d-price"><b>${fmt(m.close, 2, MKT[mk].loc)}</b></div></div>
+    <div class="tags" style="margin:8px 16px">${(S.map[m.symbol] || []).join('') || '<span class="chip">No signal in your systems today</span>'}</div>
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    <p style="margin:10px 16px"><a href="${tv}" target="_blank" rel="noopener">Open the chart on TradingView ›</a>${mk === 'NSE' ? ` · <a href="https://www.screener.in/company/${encodeURIComponent(m.symbol)}/" target="_blank" rel="noopener">Screener.in fundamentals ›</a>` : ''}</p>
+    <p class="muted" style="margin:6px 16px;font-size:12.5px">Signals come from your tested systems (ATH, 9/21, bottom patterns, support). Industry and sector strength are a tailwind, not a buy signal on their own.</p>`);
+}
 document.querySelectorAll('.views button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
 document.querySelectorAll('.markets button').forEach((b) => b.addEventListener('click', () => { state.mkt = b.dataset.mkt; state.selected = null; loadTrends(); }));
 document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => { state.tab = b.dataset.tab; state.selected = null; renderTrends(); }));
@@ -2126,4 +2264,4 @@ $('#sheet-close').addEventListener('click', () => history.back());
 window.addEventListener('popstate', closeSheet);
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#sheet').hidden) history.back(); });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-show('trends');
+show('mk');

@@ -170,13 +170,13 @@ dialog .close { position: absolute; right: 10px; top: 10px; font-size: 18px; col
 /* ---- sections nav: bottom bar on phones, under the header on wide screens ---- */
 .views {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(6, 1fr);
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
   background: var(--card); border-top: 1px solid var(--line);
   padding: 4px 4px calc(4px + var(--safe-bottom));
 }
 .views button {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
-  border: 0; background: transparent; padding: 6px 1px; font-size: 10.5px; font-weight: 700; color: var(--slate); cursor: pointer;
+  border: 0; background: transparent; padding: 6px 1px; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; font-weight: 700; color: var(--slate); cursor: pointer;
 }
 .views svg { width: 22px; height: 22px; }
 .views button[aria-current="page"] { color: var(--ink); }
@@ -391,3 +391,12 @@ table.gpt td { vertical-align: top; } tr.gptr td:first-child { border-left: 3px 
 .gpsn { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .gpsv { font-size: 12px; white-space: nowrap; }
 .gptile { position: relative; overflow: hidden; } .gpstrip { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; }
 .status .gpsl { vertical-align: middle; margin-left: 6px; }
+.mxcrumb { margin: 10px 16px 0; font-size: 14px; } .mxcrumb a { color: var(--accent, #2563EB); text-decoration: none; }
+.mxcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.mxcard { text-align: left; background: var(--card, #fff); border: 1px solid var(--line, #E3E8F0); border-radius: 12px; padding: 10px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; }
+.mxcard .mxh { font-size: 18px; font-weight: 800; } .mxcard .mxv { font-size: 20px; font-weight: 700; } .mxcard .mxgo { color: var(--accent, #2563EB); font-weight: 600; font-size: 13px; margin-top: 4px; }
+.mxcard .muted { font-size: 12.5px; }
+.mxworld { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.mxw { display: flex; flex-direction: column; padding: 6px 8px; background: var(--card, #fff); border: 1px solid var(--line, #E3E8F0); border-radius: 8px; font-size: 13px; }
+.mxlist { margin-top: 10px; }
+.row.mxrow { grid-template-columns: minmax(0, 1fr) 0 auto; }

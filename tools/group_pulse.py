@@ -33,6 +33,7 @@ NSE_SPLIT = {
 def universe(mkt):
     if mkt == "NSE":
         u = pd.read_csv("data/universe/nse_industry.csv").rename(columns={"basic_industry": "group"})
+        u["sector"] = u["sector"].fillna("Other")
         try:
             nm = pd.read_csv("data/universe/niftytotalmarket.csv"); names = dict(zip(nm.Symbol, nm["Company Name"]))
         except Exception:  # noqa: BLE001
@@ -47,6 +48,9 @@ def universe(mkt):
         add = [x for x in ov if x not in set(u.symbol)]
         if add:
             u = pd.concat([u, pd.DataFrame({"symbol": add, "name": add, "group": [ov[x] for x in add]})], ignore_index=True)
+        secmap = {"Banks": "Financial Services", "Auto - ": "Consumer Cyclical", "Dairy": "Consumer Defensive"}
+        for x, g in ov.items():
+            u.loc[u.symbol == x, "sector"] = next(v for k, v in secmap.items() if g.startswith(k))
         u["group"] = [ov.get(x, g) for x, g in zip(u.symbol, u.group)]
         u.loc[u.group == "Banks - Regional", "group"] = "Banks - Private Mid & Small"
         u.loc[u.group == "Auto Manufacturers", "group"] = "Auto - PV & Tractors"
@@ -54,7 +58,10 @@ def universe(mkt):
         u = pd.read_csv(f"data/universe/{'us' if mkt == 'US' else 'asx'}_meta.csv").rename(columns={"industry": "group"})
     u = u.dropna(subset=["group", "symbol"]); u["symbol"] = u.symbol.astype(str); u["name"] = u.name.fillna(u.symbol).astype(str)
     u = u[u.group.astype(str).str.len() > 0]
-    return u.drop_duplicates("symbol")[["symbol", "name", "group"]]
+    if "sector" not in u:
+        u["sector"] = "Other"
+    u["sector"] = u.sector.fillna("Other").astype(str)
+    return u.drop_duplicates("symbol")[["symbol", "name", "group", "sector"]]
 
 
 def download(tickers):
@@ -124,7 +131,34 @@ def main(mkt):
         gi = (1 + ret[ss].iloc[-N:].mean(axis=1).fillna(0)).cumprod(); gi = gi / gi.iloc[0] * 100
         pp = (p21[ss].iloc[-N:].mean(axis=1) * 100)
         charts["groups"][g] = dict(idx=[round(float(v), 2) for v in gi], pulse=[None if np.isnan(v) else round(float(v), 1) for v in pp])
+    secof = dict(zip(u.symbol, u.sector))
+    for r in rows:
+        ss = [m["symbol"] for m in r["members"]]
+        r["sector"] = pd.Series([secof.get(x, "Other") for x in ss]).mode().iloc[0]
+    # sector aggregates (all liquid members of the sector's groups)
+    r3 = (C / C.shift(63)).div(B / B.shift(63), axis=0) - 1; r1 = (C / C.shift(21)).div(B / B.shift(21), axis=0) - 1
+    sectors = []
+    for sec in sorted({r["sector"] for r in rows}):
+        ss = [m["symbol"] for r in rows if r["sector"] == sec for m in r["members"]]
+        if len(ss) < 5:
+            continue
+        p = lambda ser: round(float(np.nanmean([ser[x] for x in ss])) * 100, 1)
+        gi = (1 + ret[ss].iloc[-N:].mean(axis=1).fillna(0)).cumprod(); gi = gi / gi.iloc[0] * 100
+        charts.setdefault("sectors", {})[sec] = dict(idx=[round(float(v), 2) for v in gi],
+                                                     pulse=[None if np.isnan(v) else round(float(v), 1) for v in (p21[ss].iloc[-N:].mean(axis=1) * 100)])
+        sectors.append(dict(sector=sec, n=len(ss), groups=sum(r["sector"] == sec for r in rows), p1w=p(s1w), p1m=p(s1m), p1q=p(s1q), p1m_prev=p(s1m_prev),
+                            rs1m=round(float(np.nanmean(r1[ss].iloc[-1])) * 100, 1), rs3m=round(float(np.nanmean(r3[ss].iloc[-1])) * 100, 1),
+                            trending_now=int(sum(bool(tr[x].iloc[-1]) for x in ss))))
+    sectors.sort(key=lambda r: -r["p1m"])
     json.dump(charts, open(cf["out"] + "group_pulse_charts.json", "w"), separators=(",", ":"))
+    s200 = C.rolling(200).mean(); s50 = C.rolling(50).mean(); bs = B.rolling(150).mean()
+    market = dict(index=cf["bench"], close=round(float(B.iloc[-1]), 2), up=bool(B.iloc[-1] > bs.iloc[-1] and bs.iloc[-1] > bs.iloc[-21]),
+                  r1m=round(float(B.iloc[-1] / B.iloc[-22] - 1) * 100, 1), r3m=round(float(B.iloc[-1] / B.iloc[-64] - 1) * 100, 1),
+                  from_high=round(float(B.iloc[-1] / B.iloc[-250:].max() - 1) * 100, 1),
+                  above200=round(float((C.iloc[-1] > s200.iloc[-1])[syms].mean()) * 100, 1), above50=round(float((C.iloc[-1] > s50.iloc[-1])[syms].mean()) * 100, 1),
+                  p1w=round(float(np.nanmean([s1w[x] for x in syms])) * 100, 1), p1m=round(float(np.nanmean([s1m[x] for x in syms])) * 100, 1),
+                  p1q=round(float(np.nanmean([s1q[x] for x in syms])) * 100, 1),
+                  above200_1m_ago=round(float((C.iloc[-22] > s200.iloc[-22])[syms].mean()) * 100, 1))
     rows.sort(key=lambda r: -r["p1m"])
     for i, r in enumerate(rows):
         r["rank"] = i + 1
@@ -139,7 +173,7 @@ def main(mkt):
                         "(+2.2% in 2017-21, +3.6% in 2022-26), better than plain group return (+1.8%); 1-week Pulse +1.2% over the next month. "
                         "Trending stocks in top-Pulse groups beat the average stock by +1.4% over 3 months. As a hard filter on ATH breakouts "
                         "it did not raise returns - use it as a tiebreaker / tailwind. US and ASX: not separately tested.",
-               rows=rows, stock=stock)
+               rows=rows, sectors=sectors, mstats=market, stock=stock)
     os.makedirs(cf["out"], exist_ok=True); json.dump(out, open(cf["out"] + "group_pulse.json", "w"), separators=(",", ":"))
     print(mkt, "groups", len(rows), "stocks", len(syms), "market pulse 1m", mkt_share, "top", [(r["group"], r["p1m"]) for r in rows[:5]])
 
