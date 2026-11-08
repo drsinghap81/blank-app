@@ -10,7 +10,6 @@ ok NIFTY ENERGY: 40 from https://www.niftyindices.com/IndexConstituent/ind_nifty
 MISSING NIFTY EV & NEW AGE AUTOMOTIVE
 ok NIFTY HOUSING: 50 from https://www.niftyindices.com/IndexConstituent/ind_niftyhousing_list.csv
 MISSING NIFTY100 ESG
-err https://www.niftyindices.com/indices/equity/thematic-indices/nifty-100-enhanced-esg HTTPSConnectionPool(host='www.niftyindices.com', port=443): Read timed out. (read timeout=30)
 MISSING NIFTY100 ENHANCED ESG
 MISSING NIFTY100 ESG SECTOR LEADERS
 ok NIFTY INDIA CONSUMPTION: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftyconsumptionlist.csv
@@ -26,7 +25,7 @@ ok NIFTY INDIA TOURISM: 11 from https://www.niftyindices.com/IndexConstituent/in
 ok NIFTY INDIA SELECT 5 CORPORATE GROUPS (MAATR): 40 from https://www.niftyindices.com/IndexConstituent/ind_niftyIndiaSelect5CorporateGroupsMAATR_list.csv
 ok NIFTY INFRASTRUCTURE: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftyinfralist.csv
 ok NIFTY INDIA CORPORATE GROUP INDEX - MAHINDRA GROUP: 9 from https://www.niftyindices.com/IndexConstituent/ind_nifty_mahindralist.csv
-ok NIFTY IPO: 122 from https://www.niftyindices.com/IndexConstituent/ind_niftyIPO_list.csv
+ok NIFTY IPO: 125 from https://www.niftyindices.com/IndexConstituent/ind_niftyIPO_list.csv
 ok NIFTY MIDCAP LIQUID 15: 15 from https://www.niftyindices.com/IndexConstituent/ind_Nifty_Midcap_Liquid15.csv
 ok NIFTY MIDSMALL INDIA CONSUMPTION: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftymidsmallindiaconsumption_list.csv
 ok NIFTY MNC: 30 from https://www.niftyindices.com/IndexConstituent/ind_niftymnclist.csv
@@ -49,5 +48,5 @@ MISSING NIFTY500 SHARIAH
 ok NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20: 75 from https://www.niftyindices.com/IndexConstituent/ind_nifty500MulticapIndiaManufacturing503020_list.csv
 ok NIFTY500 MULTICAP INFRASTRUCTURE 50:30:20: 75 from https://www.niftyindices.com/IndexConstituent/ind_nifty500MulticapInfrastructure503020_list.csv
 ok NIFTY500 AHIMSA: 336 from https://www.niftyindices.com/IndexConstituent/ind_nifty500Ahimsa_list.csv
-ok NIFTY SME EMERGE: 537 from https://www.niftyindices.com/IndexConstituent/ind_niftysmelist.csv
+ok NIFTY SME EMERGE: 536 from https://www.niftyindices.com/IndexConstituent/ind_niftysmelist.csv
 ok NIFTY WAVES: 43 from https://www.niftyindices.com/IndexConstituent/ind_niftyWaves_list.csv
