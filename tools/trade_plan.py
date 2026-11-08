@@ -138,7 +138,18 @@ def main(mk="NSE"):
     for c in best.values():   # industry lane (tag + tiebreak only: as a filter it cut ATH returns in the 2017-26 test)
         g = GS.get(c["symbol"]); x = LN.get(g[0]) if g else None
         c.update(group=g[0] if g else None, lane=x[0] if x else None, group_pulse=x[1] if x else None, group_rank=x[2] if x else None)
-    C = sorted(best.values(), key=lambda c: (-c["score"], LANE_ORD[c["lane"]], -(c["stock_rs"] or -999), -(c["value_cr"] or 0)))
+    if india:
+        C = sorted(best.values(), key=lambda c: (-c["score"], LANE_ORD[c["lane"]], -(c["stock_rs"] or -999), -(c["value_cr"] or 0)))
+    else:
+        # US / ASX (8 Nov 2026, Amritpal's choice): top-down order - number of levels passed (sector 6-month RS > 0,
+        # industry Building/Strong, stock 1-year RS > 0) first, then sector, industry lane, system score, stock RS.
+        # Not backtested as a ranking (top-down levels gave no lift as filters there); it only changes the order.
+        def lv(c):   # top-down checks passed: sector beats the index, industry Building/Strong, stock beats its sector
+            return ((c["sector_rs"] or 0) > 0) + (c["lane"] in ("build", "hold")) + ((c["stock_rs"] or 0) > 0)
+        for c in best.values():
+            c["td_levels"] = lv(c)
+        C = sorted(best.values(), key=lambda c: (-lv(c), -((c["sector_rs"] or 0) > 0), LANE_ORD[c["lane"]], -c["score"],
+                                                  -(c["stock_rs"] or -999), -(c["value_cr"] or 0)))
     # two sleeves (8 Nov 2026): ATH = momentum investing (wide 30-week stops, sized on capital);
     # 9/21 = swing on ATH's idle cash (5-day-low stop, Supertrend exit). Backtest 2017-26: ATH + 9/21 on idle cash 30.8%/yr, -24%.
     # India only: breakout retests at support join the swing sleeve when the industry is not Weak / Fading / Weak-bouncing.
@@ -218,9 +229,13 @@ def main(mk="NSE"):
     trades = [c for c in C if c["kind"] not in ("WATCH", "T921")]
     KORD = {"T921": 0, "RETEST": 1, "PATTERN": 2}
     swing = sorted([c for c in best.values() if c["kind"] in KORD],
-                   key=lambda c: ((LANE_ORD[c["lane"]], KORD[c["kind"]]) if india else (KORD[c["kind"]], LANE_ORD[c["lane"]]), -(c["value_cr"] or 0)))
-    swing = swing[:15] if india else ([c for c in swing if c["kind"] == "T921"] + [c for c in swing if c["kind"] == "RETEST"][:8]
-                                      + [c for c in swing if c["kind"] == "PATTERN"][:6])
+                   key=lambda c: (LANE_ORD[c["lane"]], KORD[c["kind"]], -(c["value_cr"] or 0)))
+    if india:
+        swing = swing[:15]
+    else:   # keep all 9/21, the best 8 retests and 6 patterns, then order the lot top-down (industry lane, then 9/21 > retest > pattern)
+        keep = {id(x) for x in [c for c in swing if c["kind"] == "T921"] + [c for c in swing if c["kind"] == "RETEST"][:8]
+                + [c for c in swing if c["kind"] == "PATTERN"][:6]}
+        swing = [c for c in swing if id(c) in keep]
     for L in (trades, swing):
         for i, c in enumerate(L):
             c["rank"] = i + 1
