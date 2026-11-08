@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency: {group: pattern-scan, cancel-in-progress: false}
 jobs:
   run:
     runs-on: ubuntu-latest
