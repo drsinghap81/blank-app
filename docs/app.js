@@ -147,11 +147,24 @@ async function lvPdf(mk, P, picked, exits, info) {
 }
 /* Swing sleeve: 9/21 trades on the cash ATH isn't using (15% of capital kept for new ATH breakouts). Own risk, default = loss-limit risk, max 1%. */
 const lvSR = (mk) => { try { const v = +localStorage.getItem('td.lvSR_' + mk); return v > 0 ? Math.min(1, v) : riskForBudget(lvBudget()); } catch (e) { return riskForBudget(lvBudget()); } };
-function lvSwingSize(rows, C0, idle, sr) {
+/* swing picks: all rows ticked by default (null), then whatever you tick; only ticked rows use idle cash */
+const swKey = (mk, asof) => `td.lvSw_${mk}_${asof}`;
+function lvSwSel(mk, asof) { try { const v = JSON.parse(localStorage.getItem(swKey(mk, asof)) || 'null'); return Array.isArray(v) ? new Set(v) : null; } catch (e) { return null; } }
+function lvSwWire(el, mk, asof, rows) {
+  el.querySelectorAll('input[data-w]').forEach((c) => c.addEventListener('change', () => {
+    const cur = lvSwSel(mk, asof) || new Set(rows.filter((r) => r.tier === 'swing').map((r) => r.id)); const id = rows[+c.dataset.w].id;
+    if (c.checked) cur.add(id); else cur.delete(id);
+    try { localStorage.setItem(swKey(mk, asof), JSON.stringify([...cur])); } catch (e) { /* private mode */ }
+    loadLive(); }));
+}
+function lvSwingSize(rows, C0, idle, sr, sel) {
   let left = idle;
   return rows.map((r) => { const E = r.trigger || r.price; let q = r.stop && E > r.stop ? Math.floor(Math.min(sr / 100 * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
-    let skip = ''; if (q * E > left) { const q2 = Math.floor(Math.max(0, left) / E); if (q2 < 0.25 * q || q2 <= 0) { skip = 'no idle cash left'; q = 0; } else q = q2; }
-    left -= q * E; return { ...r, tier: 'swing', qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, skip, picked: !skip && q > 0 }; });
+    const want = !sel || sel.has(r.id);
+    let skip = want ? '' : 'not picked';
+    if (want && q * E > left) { const q2 = Math.floor(Math.max(0, left) / E); if (q2 < 0.25 * q || q2 <= 0) { skip = 'no idle cash left'; q = 0; } else q = q2; }
+    if (want) left -= q * E;
+    return { ...r, tier: 'swing', qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, skip, want, picked: !skip && q > 0 }; });
 }
 function lvSwingHead(sr, idle, mk, nOpen) {
   const opts = [0.25, 0.5, 0.75, 1].concat([+riskForBudget(lvBudget()).toFixed(2)]).filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b);
@@ -169,7 +182,7 @@ function lvLocalSize(P) {
   const C0 = cap('NSE'); const n = lvN('NSE'); const risk = lvRiskN(n) / 100; const sel = lvSel('NSE', P.asof, P.top || [], n);
   return (P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
     return { ...r, qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, picked: sel.has(r.id), skip: sel.has(r.id) ? '' : 'not picked' }; })
-    .concat(lvSwingSize(P.swing || [], C0, lvIdle(P, C0), lvSR('NSE')));
+    .concat(lvSwingSize(P.swing || [], C0, lvIdle(P, C0), lvSR('NSE'), lvSwSel('NSE', P.asof)));
 }
 /* Portfolio guard: drawdown budget -> risk per trade from a Monte Carlo of the ATH system (95% of paths within the budget) */
 const lvBudget = () => +(lvCfg().budget || 15);
@@ -211,7 +224,7 @@ async function loadLiveG(mk) {
   const rows = (P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
     return { ...r, E, qty: q, value: q * E, risk_amt: q * (E - r.stop), off: !selG.has(r.id) }; });
   const idleG = Math.max(0, C0 * 0.85 - rows.filter((r) => !r.off).reduce((a, r) => a + r.value, 0)); const srG = lvSR(mk);
-  const swR = lvSwingSize(P.swing || [], C0, idleG, srG);
+  const swR = lvSwingSize(P.swing || [], C0, idleG, srG, lvSwSel(mk, P.asof));
   const tvp = mk === 'ASX' ? 'ASX:' : '';
   const ticket = (r) => {
     const net = r.system === 'Monthly ATH' ? r.stop * 0.85 : r.stop;
@@ -226,8 +239,8 @@ async function loadLiveG(mk) {
   const list = rows.map((r, i) => `<div class="lv-row${r.off ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.off ? '' : 'checked'} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}${r.group ? ' · ' + esc(r.group) : ''}</span></div>
       <div class="lv-plan">${r.off ? `<span class="muted">Not picked${r.qty ? ` (would be ${r.qty.toLocaleString(L)} shares)` : ''}</span>` : r.qty ? `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}` : '<span class="muted">Too small for your capital at this risk</span>'}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.off ? ticket(r) : ''}</div><div></div></div>`).join('');
-  const swList = swR.map((r) => `<div class="lv-row${r.skip ? ' lv-off' : ''}"><div class="lv-rank">S${r.rank}</div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${r.experimental ? ' <span class="chip exit">experimental</span>' : ''} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
-      <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}`}</div>
+  const swList = swR.map((r, i) => `<div class="lv-row${r.skip ? ' lv-off' : ''}"><div class="lv-rank">S${r.rank}<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${r.experimental ? ' <span class="chip exit">experimental</span>' : ''} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
+      <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}${r.skip === 'not picked' && r.qty ? ` (would be ${r.qty.toLocaleString(L)} shares)` : ''}</span>` : `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}`}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.skip ? ticket(r) : ''}</div><div></div></div>`).join('');
   const held = new Set(Pp ? Object.keys(Pp.pos || {}) : []);
   const exits = (P.exits || []).map((e) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell next open</span>${held.has(e.symbol) ? ' <span class="chip">in paper</span>' : ''}</div><div class="lv-sub">${esc(e.system)}: ${esc(e.why)} — only if you hold it. Cancel its GTC stop first.</div></div><div></div></div>`).join('');
@@ -256,6 +269,7 @@ async function loadLiveG(mk) {
   lvSelWire(el, mk, P.asof, rows, nP, selG);
   $('#lvpdf').addEventListener('click', () => { const pk = rows.filter((r) => !r.off && r.qty > 0).concat(swR.filter((r) => !r.skip && r.qty > 0)); if (!pk.length) { alertMsg('Nothing picked.'); return; } lvPdf(mk, P, pk, P.exits || [], { cap: C0, n: nP, risk: risk * 100, sr: srG }); });
   const srs = $('#lvsr'); if (srs) srs.addEventListener('change', () => { try { localStorage.setItem('td.lvSR_' + mk, srs.value); } catch (e) { /* private mode */ } loadLive(); });
+  lvSwWire(el, mk, P.asof, swR);
   if (Pp && Pp.equity && Pp.equity.length > 1 && $('#lvpc')) {
     const box = $('#lvpc'); const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 170, width: box.clientWidth });
     const e0 = Pp.equity[0][1]; const b0 = (Pp.equity.find((v) => v[2]) || [])[2];
@@ -278,7 +292,7 @@ async function loadLive() {
   // server not updated yet (no swing tier): show the published swing list sized locally, view-only until the server updates
   if (S && !rows.some((r) => r.tier === 'swing') && (P.swing || []).length) {
     const held = new Set(Object.keys(S.held || {}));
-    rows = rows.concat(lvSwingSize((P.swing || []).filter((r) => !held.has(r.symbol)), S.capital, Math.max(0, S.cash - 0.15 * S.capital), lvSR('NSE')).map((r) => ({ ...r, local: true })));
+    rows = rows.concat(lvSwingSize((P.swing || []).filter((r) => !held.has(r.symbol)), S.capital, Math.max(0, S.cash - 0.15 * S.capital), lvSR('NSE'), lvSwSel('NSE', P.asof)).map((r) => ({ ...r, local: true })));
   }
   const nP = S && S.picks ? S.picks : lvN('NSE'); const rP = S && S.risk_pct ? S.risk_pct : lvRiskN(nP);
   state._lvGuardRisk = S && S.guard ? S.guard.risk_pct : +rP.toFixed(2);
@@ -301,7 +315,7 @@ async function loadLive() {
     const can = S && !r.skip && r.qty > 0 && !r.local;
     const hdr = r.tier === 'more' && (i === 0 || rows[i - 1].tier !== 'more')
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
-    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
+    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${r.tier === 'swing' && (!S || r.local) ? `<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} (${fmt(r.pct_cap, 1)}%) · risk ${money(r.risk_amt, 'NSE')}`}</div>
       <div class="lv-sub">${ord} · stop ${fmt(r.stop, 2, 'en-IN')} (${fmt(r.risk_pct, 1)}% below) · exit: ${esc(r.exit_rule || '')}</div>
       <div class="lv-sub">${esc(r.note || '')}${r.group ? ' · ' + esc(r.group) : r.sector ? ' · ' + esc(r.sector) : ''}</div>${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}</div>
@@ -346,6 +360,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   lvSegWire(el);
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
+  lvSwWire(el, 'NSE', P.asof, rows);
   const srs = $('#lvsr'); if (srs) srs.addEventListener('change', async () => {
     try { localStorage.setItem('td.lvSR_NSE', srs.value); } catch (e) { /* private mode */ }
     if (S) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: nP, swing_risk: +srs.value }) }); } catch (e) { alertMsg(`Server not updated yet (${e.message}); it picks this up after its next update.`); } }
