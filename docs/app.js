@@ -272,7 +272,12 @@ async function loadLive() {
   $('#asof').textContent = `Market data: India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
   const c = lvCfg(); let S = null; let err = '';
   if (c.url && c.token) { try { S = await lvApi('/api/plan'); } catch (e) { err = e.message; } }
-  const rows = S ? S.rows : lvLocalSize(P);
+  let rows = S ? S.rows : lvLocalSize(P);
+  // server not updated yet (no swing tier): show the published swing list sized locally, view-only until the server updates
+  if (S && !rows.some((r) => r.tier === 'swing') && (P.swing || []).length) {
+    const held = new Set(Object.keys(S.held || {}));
+    rows = rows.concat(lvSwingSize((P.swing || []).filter((r) => !held.has(r.symbol)), S.capital, Math.max(0, S.cash - 0.15 * S.capital), lvSR('NSE')).map((r) => ({ ...r, local: true })));
+  }
   const nP = S && S.picks ? S.picks : lvN('NSE'); const rP = S && S.risk_pct ? S.risk_pct : lvRiskN(nP);
   state._lvGuardRisk = S && S.guard ? S.guard.risk_pct : +rP.toFixed(2);
   const live = S && S.mode === 'LIVE';
@@ -291,7 +296,7 @@ async function loadLive() {
   const rowHtml = (r, i) => {
     const E = r.trigger || r.price; const ord = r.kind === 'ATH_STOP' ? `buy-stop ${fmt(r.trigger, 2, 'en-IN')} (limit ${fmt(r.price, 2, 'en-IN')}), day order` : `limit ${fmt(r.price, 2, 'en-IN')}, ${r.when}`;
     const td = r.system === 'Monthly ATH' ? `<span class="score ${r.aligned ? 'al' : ''}"><i class="sd ${r.sector_rs == null ? 'na' : r.sector_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.theme_rs == null ? 'na' : r.theme_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.stock_rs == null ? 'na' : r.stock_rs > 0 ? 'y' : 'n'}"></i>${r.aligned ? ' aligned' : ''}</span>` : '';
-    const can = S && !r.skip && r.qty > 0;
+    const can = S && !r.skip && r.qty > 0 && !r.local;
     const hdr = r.tier === 'more' && (i === 0 || rows[i - 1].tier !== 'more')
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
     return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
@@ -323,7 +328,7 @@ async function loadLive() {
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Swing · 9/21 trend + breakout retests, on idle cash</b><span class="muted">${swPend.length} to buy · ${money(swPend.reduce((a, r) => a + r.value, 0), 'NSE')}</span></div>
-      ${lvSwingHead(srNow, idleNow, 'NSE', S && S.swing ? S.swing.open : null)}
+      ${lvSwingHead(srNow, S && !S.swing ? Math.max(0, S.cash - 0.15 * S.capital) : idleNow, 'NSE', S && S.swing ? S.swing.open : null)}${S && !S.swing && swRows.length ? '<p class="lv-sub"><b>View only until your server updates</b> (it updates itself at 08:00 IST on weekdays): sized here from your cash; place these in the Angel app, or Send them after the update.</p>' : ''}
       ${swList || '<p class="empty">No new swing signals for the next session.</p>'}</div>
     ${(P.pattern_watch || []).length ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
       <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}
