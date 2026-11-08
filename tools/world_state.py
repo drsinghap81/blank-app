@@ -102,7 +102,7 @@ def main():
         if st:
             out[t] = dict(name=name, region=region, **st)
     risk_on = bool(out.get("^GSPC", {}).get("up") and out.get("URTH", {}).get("up"))
-    res = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(max(g.index[-1] for g in G.values()).date()), benchmark="MSCI World (URTH)", risk_on=risk_on, indices=out)
+    res = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(pd.Series([g.index[-1].date() for g in G.values()]).mode().max()), benchmark="MSCI World (URTH)", risk_on=risk_on, indices=out)
     fix = lambda v: {k: fix(x) for k, x in v.items()} if isinstance(v, dict) else (None if isinstance(v, float) and not np.isfinite(v) else v)  # noqa: E731
     json.dump(fix(res), open(OUT, "w"), indent=0, allow_nan=False)
     print("world indices", len(out), "risk-on", risk_on)
