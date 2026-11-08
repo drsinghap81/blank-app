@@ -2186,7 +2186,7 @@ async function loadMarkets() {
     const ms = G.mstats || {}; const v = ((W && W.indices) || {})[MX_IDX[mk]] || {};
     const secs = G.sectors.slice().sort((a, b) => b[state.gpPer || 'p1m'] - a[state.gpPer || 'p1m']);
     el.innerHTML = `${mxCrumb()}<section class="summary">
-        <div class="stat ${ms.up ? 'new' : 'exit'}"><b>${ms.up ? 'Uptrend' : 'No uptrend'}</b><span>${MX_BENCH[mk]} ${ms.r3m >= 0 ? '+' : ''}${fmt(ms.r3m, 1)}% in 3 m · ${fmt(ms.from_high, 1)}% from 1-yr high</span></div>
+        <div class="stat ${ms.up ? 'new' : 'exit'}"><b>${ms.up ? 'Stage 2' : 'Not Stage 2'}</b><span>${MX_BENCH[mk]} ${ms.up ? 'above' : 'not above'} a rising 150-day · ${ms.r3m >= 0 ? '+' : ''}${fmt(ms.r3m, 1)}% in 3 m · ${fmt(ms.from_high, 1)}% from 1-yr high</span></div>
         <div class="stat"><b>${fmt(ms.above200, 0)}%</b><span>of liquid stocks above their 200-day (a month ago ${fmt(ms.above200_1m_ago, 0)}%)</span></div>
         <div class="stat"><b>${fmt(ms.p1q, 0)} → ${fmt(ms.p1m, 0)} → ${fmt(ms.p1w, 0)}</b><span>market Pulse quarter → month → week</span></div>
         <div class="stat"><b>${S.nbrk} · ${S.n921} · ${S.nnear}</b><span>ATH breakouts · 9/21 buys · ATH near trigger</span></div></section>
