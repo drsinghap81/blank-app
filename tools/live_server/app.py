@@ -67,11 +67,32 @@ MAX_POSITIONS = int(ENV.get("MAX_POSITIONS", "10"))
 MAX_RISK = float(ENV.get("MAX_RISK_PCT", "1")) / 100
 
 
+def _picks_cfg() -> dict:
+    try:
+        return json.load(open(os.path.join(DATA, "picks.json")))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
 def picks() -> int:
     try:
-        return max(3, min(MAX_POSITIONS, int(json.load(open(os.path.join(DATA, "picks.json")))["n"])))
+        return max(3, min(MAX_POSITIONS, int(_picks_cfg()["n"])))
     except Exception:  # noqa: BLE001
         return MAX_POSITIONS
+
+
+# Swing sleeve (8 Nov 2026): 9/21 trades run on the cash ATH isn't using, keeping SWING_RESERVE of capital free for new
+# ATH breakouts (as in the backtest: ATH + 9/21 on idle cash 30.8%/yr, -24% at 1% each). Own risk (default = the guard
+# risk, max MAX_RISK) and own slot count.
+SWING_RESERVE = float(ENV.get("SWING_RESERVE_PCT", "15")) / 100
+SWING_MAX = int(ENV.get("SWING_MAX", "10"))
+
+
+def swing_risk() -> float:
+    try:
+        return max(0.0025, min(MAX_RISK, float(_picks_cfg()["swing_risk"]) / 100))
+    except Exception:  # noqa: BLE001
+        return RISK
 
 
 def risk_now() -> float:
@@ -184,14 +205,16 @@ class Mode(BaseModel):
 
 class Picks(BaseModel):
     n: int
+    swing_risk: float | None = None
 
 
 @app.post("/api/picks")
 def set_picks(body: Picks, _=Depends(auth)):
     """How many positions the system book holds (3-10); risk per trade follows (see risk_now)."""
-    n = max(3, min(MAX_POSITIONS, int(body.n)))
-    json.dump(dict(n=n, at=time.time()), open(os.path.join(DATA, "picks.json"), "w")); log("picks", n=n)
-    return dict(picks=n, risk_pct=round(risk_now() * 100, 2))
+    n = max(3, min(MAX_POSITIONS, int(body.n))); cfg = _picks_cfg()
+    sr = cfg.get("swing_risk") if body.swing_risk is None else max(0.25, min(MAX_RISK * 100, float(body.swing_risk)))
+    json.dump(dict(n=n, swing_risk=sr, at=time.time()), open(os.path.join(DATA, "picks.json"), "w")); log("picks", n=n, swing_risk=sr)
+    return dict(picks=n, risk_pct=round(risk_now() * 100, 2), swing_risk_pct=round(swing_risk() * 100, 2))
 
 
 @app.post("/api/mode")
@@ -428,11 +451,14 @@ def sized(acc=None):
         held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
     sys_open = [s for s in J if not s.startswith("_") and (held.get(s, 0) > 0 or J[s].get("state") == "pending")]
     cap = CAPITAL or acc["net"]
-    N = picks(); RK = risk_now()
-    slots = max(0, N - len(sys_open))
+    N = picks(); RK = risk_now(); SR = swing_risk()
+    sw_open = [s for s in sys_open if J[s].get("system") == "9/21 trend"]
+    ath_open = [s for s in sys_open if s not in sw_open]
+    slots = max(0, N - len(ath_open)); sw_slots = max(0, SWING_MAX - len(sw_open))
     cash = acc["cash"]
     rows = []
-    for r in [dict(x, tier="top") for x in P.get("top") or []] + [dict(x, tier="more") for x in P.get("more") or []]:
+    for r in [dict(x, tier="top") for x in P.get("top") or []] + [dict(x, tier="more") for x in P.get("more") or []] + \
+            [dict(x, tier="swing") for x in P.get("swing") or []]:
         E = r.get("trigger") or r["price"]; stop = r["stop"]
         q = 0; why = ""
         if r["symbol"] in held:
@@ -440,24 +466,32 @@ def sized(acc=None):
         elif r["symbol"] in J and J[r["symbol"]].get("state") == "pending":
             why = "order sent - waiting for the fill"
         elif stop and E > stop:
-            q = math.floor(min(RK * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
+            q = math.floor(min((SR if r["tier"] == "swing" else RK) * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
         rows.append(dict(r, qty=max(0, q), value=round(max(0, q) * E, 0), risk_amt=round(max(0, q) * (E - stop), 0) if stop else None,
                          pct_cap=round(max(0, q) * E / cap * 100, 1) if cap else None, skip=why))
     # each row must fit your actual cash on its own (cut to cash, no token positions); rank order only adds a note
     # when the row would use cash / a slot that the higher-ranked rows would need if you bought them too
     left, used = cash, 0
+    sw_cash = max(0.0, cash - SWING_RESERVE * cap); sw_left, sw_used = sw_cash, 0
     for r in rows:
         if r["skip"] or r["qty"] <= 0:
             continue
-        if slots <= 0:
-            r["skip"] = "no free slot (you picked %d positions)" % N; continue
+        sw = r["tier"] == "swing"
+        if (sw_slots if sw else slots) <= 0:
+            r["skip"] = ("no free swing slot (max %d)" % SWING_MAX) if sw else ("no free slot (you picked %d positions)" % N); continue
         E = r.get("trigger") or r["price"]
-        if r["value"] > cash:
-            q = math.floor(cash / E)
+        avail = sw_cash if sw else cash
+        if r["value"] > avail:
+            q = math.floor(avail / E)
             if q <= 0 or q < 0.25 * r["qty"]:            # don't open a token position
-                r["skip"] = "not enough cash"; continue
+                r["skip"] = ("no idle cash (%d%% of capital kept for ATH breakouts)" % round(SWING_RESERVE * 100)) if sw else "not enough cash"; continue
             r["qty"], r["value"] = q, round(q * E, 0); r["note"] += " · cut to your cash"
             r["risk_amt"] = round(q * (E - r["stop"]), 0); r["pct_cap"] = round(q * E / cap * 100, 1) if cap else None
+        if sw:
+            if r["value"] > sw_left or sw_used >= sw_slots:
+                r["note"] += " · uses idle cash or a slot the swing trades above would need"; r["reserve"] = True
+            sw_left -= r["value"]; sw_used += 1
+            continue
         if r["value"] > left or used >= slots:
             r["note"] += " · uses cash or a slot the trades ranked above would need"
             r["reserve"] = True
@@ -469,6 +503,7 @@ def sized(acc=None):
                 r["skip"] = "paused: losing streak (guard)"
     trades, recent = trades_view(J, acc)
     return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open, picks=N, risk_pct=round(RK * 100, 2),
+                swing=dict(risk_pct=round(SR * 100, 2), slots=sw_slots, max=SWING_MAX, open=len(sw_open), idle_cash=round(sw_cash), reserve_pct=SWING_RESERVE * 100),
                 mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,
                 trades=trades, recent=recent, protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100))
 

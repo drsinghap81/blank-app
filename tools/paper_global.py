@@ -148,10 +148,10 @@ def main(mk):
     for e in P.get("exits") or []:
         if e["symbol"] in S["pos"] and S["pos"][e["symbol"]]["system"] == e["system"]:
             Q.append(dict(side="SELL", symbol=e["symbol"], date=asof, why=e.get("why")))
-    for r in P.get("top") or []:
+    for r in (P.get("top") or []) + (P.get("swing") or []):
         if r["symbol"] in S["pos"]:
             continue
-        Q.append(dict(side="BUY", symbol=r["symbol"], date=asof, kind=r["kind"], system=r["system"], rank=r.get("rank", 99),
+        Q.append(dict(side="BUY", symbol=r["symbol"], date=asof, kind=r["kind"], system=r["system"], rank=r.get("rank", 99) + (100 if r.get("kind") == "T921" else 0),
                       trigger=r.get("trigger"), limit=r["price"], stop=r["stop"]))
     S["queue"] = Q
     S["log"] = (events + S["log"])[:200]

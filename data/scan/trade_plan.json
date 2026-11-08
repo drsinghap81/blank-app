@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-08 02:26 UTC",
+"generated": "2026-11-08 02:55 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-06",
@@ -170,36 +170,6 @@
 "risk_pct": 9.3
 },
 {
-"id": "T921-PETRONET-2026-11-06",
-"symbol": "PETRONET",
-"name": "Petronet LNG Limited",
-"system": "9/21 trend",
-"kind": "T921",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 320.17,
-"ref": 317.0,
-"stop": 283.4,
-"exit_rule": "Supertrend(10,3) turns red -> sell next open",
-"note": "EMA 9/21 cross 2026-11-06, stop 11.9% below",
-"score": 3,
-"value_cr": 76.64,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": "Oil & Gas Refining & Marketing",
-"lane": "fade",
-"group_pulse": 25.0,
-"group_rank": 14,
-"rank": 6,
-"risk_pct": 13.0
-},
-{
 "id": "ATH-GLOBAL-2026-10-01",
 "symbol": "GLOBAL",
 "name": "Global Education Limited",
@@ -227,7 +197,7 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 7,
+"rank": 6,
 "risk_pct": 26.3
 },
 {
@@ -258,7 +228,7 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 8,
+"rank": 7,
 "risk_pct": 20.8
 },
 {
@@ -290,7 +260,7 @@
 "lane": "hold",
 "group_pulse": 15.5,
 "group_rank": 33,
-"rank": 9,
+"rank": 8,
 "risk_pct": 18.5
 },
 {
@@ -321,11 +291,9 @@
 "lane": "fade",
 "group_pulse": 33.0,
 "group_rank": 7,
-"rank": 10,
+"rank": 9,
 "risk_pct": 42.8
-}
-],
-"more": [
+},
 {
 "id": "ATH-ZYDUSLIFE-2026-10-30",
 "symbol": "ZYDUSLIFE",
@@ -354,9 +322,11 @@
 "lane": "hold",
 "group_pulse": 16.4,
 "group_rank": 30,
-"rank": 11,
+"rank": 10,
 "risk_pct": 10.1
-},
+}
+],
+"more": [
 {
 "id": "STOP-DRREDDY-1403.6302",
 "symbol": "DRREDDY",
@@ -386,8 +356,40 @@
 "lane": "hold",
 "group_pulse": 16.4,
 "group_rank": 30,
-"rank": 12,
+"rank": 11,
 "risk_pct": 12.8
+}
+],
+"swing": [
+{
+"id": "T921-PETRONET-2026-11-06",
+"symbol": "PETRONET",
+"name": "Petronet LNG Limited",
+"system": "9/21 trend",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 320.17,
+"ref": 317.0,
+"stop": 283.4,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-06, stop 11.9% below",
+"score": 3,
+"value_cr": 76.64,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Oil & Gas Refining & Marketing",
+"lane": "fade",
+"group_pulse": 25.0,
+"group_rank": 14,
+"rank": 1,
+"risk_pct": 13.0
 }
 ],
 "watch": [

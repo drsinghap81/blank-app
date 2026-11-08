@@ -209,3 +209,21 @@ def test_picks(tmp_path):
         E = r.get("trigger") or r["price"]
         assert r["qty"] * (E - r["stop"]) <= 0.01 * 2000000 + E and r["qty"] * E <= 0.1 * 2000000 + E
     assert c.post("/api/picks", headers=h, json={"n": 1}).json()["picks"] == 3
+
+
+def test_swing_sleeve(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    P = c.get("/api/plan", headers=h).json()
+    assert "swing" in P and P["swing"]["risk_pct"] == round(A.RISK * 100, 2)
+    sw = [r for r in P["rows"] if r["tier"] == "swing"]
+    assert all(r["kind"] == "T921" for r in sw)
+    assert not any(r["kind"] == "T921" for r in P["rows"] if r["tier"] != "swing")
+    j = c.post("/api/picks", headers=h, json={"n": 5, "swing_risk": 1.0}).json(); assert j["swing_risk_pct"] == 1.0 and j["picks"] == 5
+    P2 = c.get("/api/plan", headers=h).json(); assert P2["swing"]["risk_pct"] == 1.0
+    for r in P2["rows"]:
+        if r["tier"] == "swing" and r["qty"]:
+            E = r.get("trigger") or r["price"]
+            assert r["qty"] * (E - r["stop"]) <= 0.01 * 2000000 + E and r["qty"] * E <= P2["swing"]["idle_cash"] + E
+    assert c.post("/api/picks", headers=h, json={"n": 5, "swing_risk": 9}).json()["swing_risk_pct"] == 1.0   # capped at 1%
+    assert c.post("/api/picks", headers=h, json={"n": 6}).json()["swing_risk_pct"] == 1.0                    # kept when not sent

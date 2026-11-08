@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-08 02:25 UTC",
+"generated": "2026-11-08 02:55 UTC",
 "market": "ASX",
 "watch_only": true,
 "asof": "2026-11-06",
@@ -12,7 +12,9 @@
 "top": 10,
 "limit_buffer_pct": 1.0
 },
-"top": [
+"top": [],
+"more": [],
+"swing": [
 {
 "id": "T921-BRG-2026-11-05",
 "symbol": "BRG",
@@ -74,7 +76,6 @@
 "risk_pct": 7.1
 }
 ],
-"more": [],
 "watch": [],
 "exits": [
 {

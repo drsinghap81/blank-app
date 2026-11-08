@@ -124,12 +124,12 @@ async function lvPdf(mk, P, picked, exits, info) {
   doc.setFontSize(16); doc.text(`Trend Desk · ${MKT[mk].name} trade plan for the next session`, 40, 40);
   doc.setFontSize(10); doc.setTextColor(90);
   doc.text(`Plan from the ${day(P.asof)} close · made ${new Date().toLocaleString(L)} · broker: ${mk === 'NSE' ? 'Angel One' : 'moomoo (manual orders)'}`, 40, 58);
-  doc.text(`Capital ${m(info.cap)} · ${info.n} positions · risk ${info.risk.toFixed(2)}% of capital per trade · max 10% of capital a stock · picks: ${picked.length}`, 40, 72);
+  doc.text(`Capital ${m(info.cap)} · ${info.n} positions · ATH risk ${info.risk.toFixed(2)}%${info.sr != null ? ` · swing risk ${Number(info.sr).toFixed(2)}% (idle cash, 15% kept for ATH)` : ''} · max 10% of capital a stock · trades: ${picked.length}`, 40, 72);
   doc.setTextColor(0);
   const body = picked.map((r) => {
     const order = r.kind === 'ATH_STOP' ? `Stop-limit buy: trigger ${p(r.trigger)}, limit ${p(r.price)} (day)` : `Limit buy ${p(r.price)} (day, at the open)`;
     const prot = r.system === 'Monthly ATH' ? `Weekly close below 30-wk avg (${p(r.stop)}); safety stop ${p(r.stop * 0.85)}` : `Stop ${p(r.stop)} (GTC/GTT); exit when Supertrend turns red`;
-    return [r.rank, r.symbol, r.system, LANE_TXT[r.lane] || 'n/a', order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
+    return [r.tier === 'swing' ? `S${r.rank}` : r.rank, r.symbol, r.tier === 'swing' ? 'Swing 9/21' : 'Invest: ATH', LANE_TXT[r.lane] || 'n/a', order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
   });
   doc.autoTable({ startY: 86, head: [['#', 'Stock', 'System', 'Industry', 'Order', 'Qty', 'Value', '% cap', 'Stop (dist.)', 'Risk', 'Exit / protective stop']], body,
     styles: { fontSize: 8.5, cellPadding: 4, valign: 'middle' }, headStyles: { fillColor: [17, 24, 39] }, columnStyles: { 4: { cellWidth: 130 }, 10: { cellWidth: 165 } },
@@ -145,11 +145,31 @@ async function lvPdf(mk, P, picked, exits, info) {
   doc.text(doc.splitTextToSize(`Signals: monthly ATH breakout / buy-stop and 9/21 trend, ranked by score, then industry lane (Building first). Skip a limit buy if the stock opens above the limit. ${mk === 'NSE' ? '' : 'US/ASX: paper-trading phase — these systems did not beat the index in the 2008-26 backtest. '}Not investment advice; sizes ignore holdings and cash unless your server is connected.`, 760), 40, Math.min(y, 560));
   doc.save(`trade-plan_${mk}_${P.asof}.pdf`);
 }
+/* Swing sleeve: 9/21 trades on the cash ATH isn't using (15% of capital kept for new ATH breakouts). Own risk, default = loss-limit risk, max 1%. */
+const lvSR = (mk) => { try { const v = +localStorage.getItem('td.lvSR_' + mk); return v > 0 ? Math.min(1, v) : riskForBudget(lvBudget()); } catch (e) { return riskForBudget(lvBudget()); } };
+function lvSwingSize(rows, C0, idle, sr) {
+  let left = idle;
+  return rows.map((r) => { const E = r.trigger || r.price; let q = r.stop && E > r.stop ? Math.floor(Math.min(sr / 100 * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
+    let skip = ''; if (q * E > left) { const q2 = Math.floor(Math.max(0, left) / E); if (q2 < 0.25 * q || q2 <= 0) { skip = 'no idle cash left'; q = 0; } else q = q2; }
+    left -= q * E; return { ...r, tier: 'swing', qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, skip, picked: !skip && q > 0 }; });
+}
+function lvSwingHead(sr, idle, mk, nOpen) {
+  const opts = [0.25, 0.5, 0.75, 1].concat([+riskForBudget(lvBudget()).toFixed(2)]).filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b);
+  return `<p class="lv-sub">EMA 9/21 cross entries · stop = 5-day low (under the breakout candles, max 12%) · exit when price closes below Supertrend(10,3). Uses the cash the ATH sleeve isn't using, keeping 15% of capital free for new ATH breakouts. Backtest 2017–26: ATH + 9/21 on idle cash 30.8%/yr, worst fall −24% (both at 1%), vs ATH alone 17%, −20%.</p>
+    <label class="lv-sub lv-pick-n">Swing risk per trade <select id="lvsr">${opts.map((v) => `<option value="${v}" ${Math.abs(v - sr) < 0.005 ? 'selected' : ''}>${fmt(v, 2)}%${Math.abs(v - riskForBudget(lvBudget())) < 0.005 ? ' (your loss limit)' : ''}</option>`).join('')}</select>
+    <span>Idle cash for swing trades: <b>${money(idle, mk)}</b>${nOpen != null ? ` · ${nOpen} swing trade(s) open` : ''}.</span></label>`;
+}
+function lvIdle(P, C0) { // no broker link: capital minus your ATH picks, minus the 15% reserve
+  const n = lvN('NSE'); const risk = lvRiskN(n) / 100; const sel = lvSel('NSE', P.asof, P.top || [], n);
+  const used = (P.top || []).filter((r) => sel.has(r.id)).reduce((a, r) => { const E = r.trigger || r.price; return a + (r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) * E : 0); }, 0);
+  return Math.max(0, C0 * 0.85 - used);
+}
 function lvLocalSize(P) {
   // no server: size from your capital setting (India) and risk %, 10 positions, 10% cap, ignore holdings
   const C0 = cap('NSE'); const n = lvN('NSE'); const risk = lvRiskN(n) / 100; const sel = lvSel('NSE', P.asof, P.top || [], n);
   return (P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
-    return { ...r, qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, picked: sel.has(r.id), skip: sel.has(r.id) ? '' : 'not picked' }; });
+    return { ...r, qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, picked: sel.has(r.id), skip: sel.has(r.id) ? '' : 'not picked' }; })
+    .concat(lvSwingSize(P.swing || [], C0, lvIdle(P, C0), lvSR('NSE')));
 }
 /* Portfolio guard: drawdown budget -> risk per trade from a Monte Carlo of the ATH system (95% of paths within the budget) */
 const lvBudget = () => +(lvCfg().budget || 15);
@@ -190,6 +210,8 @@ async function loadLiveG(mk) {
   const selG = lvSel(mk, P.asof, P.top || [], nP);
   const rows = (P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
     return { ...r, E, qty: q, value: q * E, risk_amt: q * (E - r.stop), off: !selG.has(r.id) }; });
+  const idleG = Math.max(0, C0 * 0.85 - rows.filter((r) => !r.off).reduce((a, r) => a + r.value, 0)); const srG = lvSR(mk);
+  const swR = lvSwingSize(P.swing || [], C0, idleG, srG);
   const tvp = mk === 'ASX' ? 'ASX:' : '';
   const ticket = (r) => {
     const net = r.system === 'Monthly ATH' ? r.stop * 0.85 : r.stop;
@@ -203,6 +225,9 @@ async function loadLiveG(mk) {
   const list = rows.map((r, i) => `<div class="lv-row${r.off ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.off ? '' : 'checked'} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}${r.group ? ' · ' + esc(r.group) : ''}</span></div>
       <div class="lv-plan">${r.off ? `<span class="muted">Not picked${r.qty ? ` (would be ${r.qty.toLocaleString(L)} shares)` : ''}</span>` : r.qty ? `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}` : '<span class="muted">Too small for your capital at this risk</span>'}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.off ? ticket(r) : ''}</div><div></div></div>`).join('');
+  const swList = swR.map((r) => `<div class="lv-row${r.skip ? ' lv-off' : ''}"><div class="lv-rank">S${r.rank}</div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
+      <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}`}</div>
+      <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.skip ? ticket(r) : ''}</div><div></div></div>`).join('');
   const held = new Set(Pp ? Object.keys(Pp.pos || {}) : []);
   const exits = (P.exits || []).map((e) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell next open</span>${held.has(e.symbol) ? ' <span class="chip">in paper</span>' : ''}</div><div class="lv-sub">${esc(e.system)}: ${esc(e.why)} — only if you hold it. Cancel its GTC stop first.</div></div><div></div></div>`).join('');
   let paper = '<p class="lv-sub">Starts with the next run: from then each plan is paper-filled at the next open and tracked against the index.</p>';
@@ -218,15 +243,17 @@ async function loadLiveG(mk) {
   el.innerHTML = `${lvSeg()}<div class="lv-card" style="border-left:5px solid var(--fall)"><b>Paper-trading phase · you place orders yourself on moomoo</b>
       <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>
     <div class="lv-card"><b>Paper record</b>${paper}</div>
-    <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Top ${rows.length} for the next session</b>${capInput(mk, 'lvcapg')}</div>
+    <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Momentum investing · monthly ATH · top ${rows.length}</b>${capInput(mk, 'lvcapg')}</div>
       <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk and max 10% a stock. Holdings and cash are not checked.</p>${lvPicker(nP, risk * 100)}<div class="lv-pdfbar"><span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span><button class="lv-btn" id="lvpdf">Export PDF</button></div><p class="lv-sub">Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
+    <div class="lv-card"><b>Swing · 9/21 trend on idle cash</b>${lvSwingHead(srG, idleG, mk, null)}${swList || '<p class="empty">No new 9/21 signals for the next session.</p>'}</div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
   lvSegWire(el); wireCap('lvcapg', mk, () => loadLive());
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', () => { try { localStorage.setItem('td.lvN_' + mk, ns.value); localStorage.removeItem(selKey(mk, P.asof)); } catch (e) { /* private mode */ } loadLive(); });
   lvSelWire(el, mk, P.asof, rows, nP, selG);
-  $('#lvpdf').addEventListener('click', () => { const pk = rows.filter((r) => !r.off); if (!pk.length) { alertMsg('Nothing picked.'); return; } lvPdf(mk, P, pk, P.exits || [], { cap: C0, n: nP, risk: risk * 100 }); });
+  $('#lvpdf').addEventListener('click', () => { const pk = rows.filter((r) => !r.off).concat(swR.filter((r) => !r.skip && r.qty > 0)); if (!pk.length) { alertMsg('Nothing picked.'); return; } lvPdf(mk, P, pk, P.exits || [], { cap: C0, n: nP, risk: risk * 100, sr: srG }); });
+  const srs = $('#lvsr'); if (srs) srs.addEventListener('change', () => { try { localStorage.setItem('td.lvSR_' + mk, srs.value); } catch (e) { /* private mode */ } loadLive(); });
   if (Pp && Pp.equity && Pp.equity.length > 1 && $('#lvpc')) {
     const box = $('#lvpc'); const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 170, width: box.clientWidth });
     const e0 = Pp.equity[0][1]; const b0 = (Pp.equity.find((v) => v[2]) || [])[2];
@@ -256,22 +283,26 @@ async function loadLive() {
       <p class="lv-sub">${live ? '<b class="down">Real orders.</b>' : '<b>Practice:</b> nothing is sent.'} <a href="#" id="lvout" title="Signs this device out; the server keeps its mode">Log out</a></p></div>`
     : `<div class="lv-card"><b>Connect your server</b><p class="lv-sub">${err ? `<span class="down">${esc(err)}</span> · ` : ''}Sizes below use your capital (${money(cap('NSE'), 'NSE')}) and ${rP.toFixed(2)}% risk (${nP} positions, loss limit ${lvBudget()}%); holdings and cash are not checked and there is no Send button until the AWS server is connected.</p>
       <div class="lv-form"><input id="lvurl" type="url" placeholder="https://your-server.sslip.io" value="${esc(c.url || '')}" autocomplete="off"><input id="lvpw" type="password" placeholder="App password" autocomplete="current-password"><button class="lv-btn" id="lvgo">Connect</button></div></div>`;
-  const pend = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0);
-  const nTop = rows.filter((r) => r.tier !== 'more').length; const nMore = rows.length - nTop;
+  const pend = rows.filter((r) => r.tier !== 'more' && r.tier !== 'swing' && !r.skip && r.qty > 0);
+  const nTop = rows.filter((r) => r.tier !== 'more' && r.tier !== 'swing').length; const nMore = rows.filter((r) => r.tier === 'more').length;
+  const swRows = rows.filter((r) => r.tier === 'swing'); const swPend = swRows.filter((r) => !r.skip && r.qty > 0);
+  const srNow = S && S.swing ? S.swing.risk_pct : lvSR('NSE'); const idleNow = S && S.swing ? S.swing.idle_cash : lvIdle(P, cap('NSE'));
   const tot = pend.reduce((a, r) => a + r.value, 0);
-  const list = rows.map((r, i) => {
+  const rowHtml = (r, i) => {
     const E = r.trigger || r.price; const ord = r.kind === 'ATH_STOP' ? `buy-stop ${fmt(r.trigger, 2, 'en-IN')} (limit ${fmt(r.price, 2, 'en-IN')}), day order` : `limit ${fmt(r.price, 2, 'en-IN')}, ${r.when}`;
     const td = r.system === 'Monthly ATH' ? `<span class="score ${r.aligned ? 'al' : ''}"><i class="sd ${r.sector_rs == null ? 'na' : r.sector_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.theme_rs == null ? 'na' : r.theme_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.stock_rs == null ? 'na' : r.stock_rs > 0 ? 'y' : 'n'}"></i>${r.aligned ? ' aligned' : ''}</span>` : '';
     const can = S && !r.skip && r.qty > 0;
     const hdr = r.tier === 'more' && (i === 0 || rows[i - 1].tier !== 'more')
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
-    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${!S && r.tier !== 'more' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
+    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} (${fmt(r.pct_cap, 1)}%) · risk ${money(r.risk_amt, 'NSE')}`}</div>
       <div class="lv-sub">${ord} · stop ${fmt(r.stop, 2, 'en-IN')} (${fmt(r.risk_pct, 1)}% below) · exit: ${esc(r.exit_rule || '')}</div>
       <div class="lv-sub">${esc(r.note || '')}${r.group ? ' · ' + esc(r.group) : r.sector ? ' · ' + esc(r.sector) : ''}</div>${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}</div>
       <div>${can ? `<button class="lv-btn" data-i="${i}">Send</button>` : ''}</div>
       ${can ? `<div class="lv-bq" hidden>Basket qty <input type="number" min="1" max="${r.qty}" value="${r.qty}" data-bq="${i}" inputmode="numeric"> of ${r.qty}</div>` : ''}</div>`;
-  }).join('');
+  };
+  const list = rows.map((r, i) => (r.tier === 'swing' ? '' : rowHtml(r, i))).join('');
+  const swList = rows.map((r, i) => (r.tier === 'swing' ? rowHtml(r, i) : '')).join('');
   const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span></div>
       <div class="lv-sub">${esc(e.system)}: ${esc(e.why)} · ${S ? `you hold ${e.qty}` : 'matched to your holdings once the server is connected'}</div></div>
       <div>${S && e.qty > 0 ? `<button class="lv-btn sell" data-x="${i}">Sell ${e.qty}</button>` : ''}</div></div>`).join('');
@@ -285,12 +316,15 @@ async function loadLive() {
   const recent = S && S.recent && S.recent.length ? `<p class="lv-sub">Recent: ${S.recent.map((r) => `${esc(r.symbol)} ${esc(r.state)}${r.exit ? ' @ ' + fmt(r.exit, 2, 'en-IN') : ''}${r.text ? ' (' + esc(r.text) + ')' : ''}`).join(' · ')}</p>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
   el.innerHTML = `${lvSeg()}${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
-    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${nTop} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
+    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Momentum investing · monthly ATH · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       <p class="lv-sub">Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '<span class="lv-sub">Tick trades for the basket; the PDF takes your ticked trades, or the top ' + nP + ' if none.</span>' : `<span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>${S && S.picks == null ? '<p class="lv-sub"><b>Server update pending:</b> your server updates itself at 08:00 IST on weekdays; until then its sizes below still use 10 positions.</p>' : ''}
       ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
+    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Swing · 9/21 trend on idle cash</b><span class="muted">${swPend.length} to buy · ${money(swPend.reduce((a, r) => a + r.value, 0), 'NSE')}</span></div>
+      ${lvSwingHead(srNow, idleNow, 'NSE', S && S.swing ? S.swing.open : null)}
+      ${swList || '<p class="empty">No new 9/21 signals for the next session.</p>'}</div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>How these are picked and sized</summary><p>From the India systems that backtested well: monthly-ATH breakouts (this month or last, within −5%/+10% of the breakout price), buy-stops at ATH triggers within 5%, and 9/21 trend entries. Score = system (ATH 2-yr base 3, 1–2 yr 2, buy-stop 2, 9/21 3) + 2 if sector and stock RS are both positive + 1 if the theme RS is positive − 3 if the stock's 1-year RS is negative (ATH only; top-down did not help 9/21). The ranking combines tested pieces but is not itself a separately backtested system. Size: risk per trade from your drawdown budget (guard card, 95% Monte Carlo), at most 10% of capital in one stock, at most 10 positions, within the cash you have. US and Australia are excluded (no tested edge).</p></details>`;
@@ -303,11 +337,16 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   lvSegWire(el);
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
+  const srs = $('#lvsr'); if (srs) srs.addEventListener('change', async () => {
+    try { localStorage.setItem('td.lvSR_NSE', srs.value); } catch (e) { /* private mode */ }
+    if (S) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: nP, swing_risk: +srs.value }) }); } catch (e) { alertMsg(`Server not updated yet (${e.message}); it picks this up after its next update.`); } }
+    loadLive(); });
   const pdfb = $('#lvpdf'); if (pdfb) pdfb.addEventListener('click', () => {
     let pk = S ? [...el.querySelectorAll('input[data-b]:checked')].map((c) => rows[+c.dataset.b]) : rows.filter((r) => r.picked);
-    if (S && !pk.length) pk = rows.filter((r) => !r.skip && r.qty > 0).slice(0, nP);
+    if (S && !pk.length) pk = rows.filter((r) => r.tier !== 'swing' && !r.skip && r.qty > 0).slice(0, nP);
+    pk = pk.filter((r) => r.tier !== 'swing').concat(swPend);
     if (!pk.length) { alertMsg('Nothing picked.'); return; }
-    lvPdf('NSE', P, pk, S ? S.exits : (P.exits || []), { cap: S ? S.capital : cap('NSE'), n: nP, risk: rP });
+    lvPdf('NSE', P, pk, S ? S.exits : (P.exits || []), { cap: S ? S.capital : cap('NSE'), n: nP, risk: rP, sr: srNow });
   });
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', async () => {
     try { localStorage.setItem('td.lvN_NSE', ns.value); localStorage.removeItem(selKey('NSE', P.asof)); } catch (e) { /* private mode */ }
@@ -473,7 +512,7 @@ async function tbLoad() {
 
 /* show as many next-ranked trades as the top 10 has unavailable ones (held, skipped, or blocked by a live check) */
 function lvMoreUpd() {
-  const top = [...document.querySelectorAll('.lv-row')].filter((r) => r.querySelector('.lv-q, .lv-plan') && !r.classList.contains('lv-more') && r.querySelector('.lv-open'));
+  const top = [...document.querySelectorAll('.lv-row')].filter((r) => r.querySelector('.lv-q, .lv-plan') && !r.classList.contains('lv-more') && !r.classList.contains('lv-swing') && r.querySelector('.lv-open'));
   const bad = top.filter((r) => r.classList.contains('lv-off') || !r.querySelector('.lv-btn[data-i]')).length;
   const more = [...document.querySelectorAll('.lv-row.lv-more')];
   let shown = 0;

@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-08 02:25 UTC",
+"generated": "2026-11-08 02:55 UTC",
 "market": "US",
 "watch_only": true,
 "asof": "2026-11-06",
@@ -231,36 +231,6 @@
 "risk_pct": 12.3
 },
 {
-"id": "T921-ELF-2026-11-06",
-"symbol": "ELF",
-"name": "e.l.f. Beauty, Inc. Common Stock",
-"system": "9/21 trend",
-"kind": "T921",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 117.3,
-"ref": 116.14,
-"stop": 105.36,
-"exit_rule": "Supertrend(10,3) turns red -> sell next open",
-"note": "EMA 9/21 cross 2026-11-06, stop 10.2% below",
-"score": 3,
-"value_cr": 163.66,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": "Package Goods/Cosmetics",
-"lane": "mid",
-"group_pulse": 48.5,
-"group_rank": 11,
-"rank": 8,
-"risk_pct": 11.3
-},
-{
 "id": "ATH-TTC-2026-10-30",
 "symbol": "TTC",
 "name": "Toro Company (The) Common Stock",
@@ -288,7 +258,7 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 9,
+"rank": 8,
 "risk_pct": 11.1
 },
 {
@@ -319,11 +289,9 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 10,
+"rank": 9,
 "risk_pct": 17.5
-}
-],
-"more": [
+},
 {
 "id": "ATH-BBY-2026-10-22",
 "symbol": "BBY",
@@ -352,9 +320,11 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 11,
+"rank": 10,
 "risk_pct": 25.8
-},
+}
+],
+"more": [
 {
 "id": "ATH-UTL-2026-11-05",
 "symbol": "UTL",
@@ -383,7 +353,7 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 12,
+"rank": 11,
 "risk_pct": 8.2
 },
 {
@@ -414,7 +384,7 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 13,
+"rank": 12,
 "risk_pct": 16.4
 },
 {
@@ -445,7 +415,7 @@
 "lane": "bounce",
 "group_pulse": 10.7,
 "group_rank": 96,
-"rank": 14,
+"rank": 13,
 "risk_pct": 5.9
 },
 {
@@ -476,7 +446,7 @@
 "lane": "bounce",
 "group_pulse": 19.0,
 "group_rank": 73,
-"rank": 15,
+"rank": 14,
 "risk_pct": 10.6
 },
 {
@@ -507,7 +477,7 @@
 "lane": "weak",
 "group_pulse": 17.1,
 "group_rank": 76,
-"rank": 16,
+"rank": 15,
 "risk_pct": 14.9
 },
 {
@@ -538,7 +508,7 @@
 "lane": "weak",
 "group_pulse": 14.1,
 "group_rank": 84,
-"rank": 17,
+"rank": 16,
 "risk_pct": 10.3
 },
 {
@@ -569,7 +539,7 @@
 "lane": "weak",
 "group_pulse": 13.9,
 "group_rank": 86,
-"rank": 18,
+"rank": 17,
 "risk_pct": 22.2
 },
 {
@@ -600,7 +570,7 @@
 "lane": "weak",
 "group_pulse": 8.7,
 "group_rank": 101,
-"rank": 19,
+"rank": 18,
 "risk_pct": 26.1
 },
 {
@@ -631,7 +601,7 @@
 "lane": "build",
 "group_pulse": 45.4,
 "group_rank": 14,
-"rank": 20,
+"rank": 19,
 "risk_pct": 10.0
 },
 {
@@ -662,7 +632,7 @@
 "lane": "build",
 "group_pulse": 28.1,
 "group_rank": 51,
-"rank": 21,
+"rank": 20,
 "risk_pct": 8.5
 },
 {
@@ -693,7 +663,7 @@
 "lane": "build",
 "group_pulse": 45.4,
 "group_rank": 14,
-"rank": 22,
+"rank": 21,
 "risk_pct": 25.5
 },
 {
@@ -725,7 +695,7 @@
 "lane": "build",
 "group_pulse": 72.2,
 "group_rank": 3,
-"rank": 23,
+"rank": 22,
 "risk_pct": 28.9
 },
 {
@@ -756,7 +726,7 @@
 "lane": "build",
 "group_pulse": 50.6,
 "group_rank": 8,
-"rank": 24,
+"rank": 23,
 "risk_pct": 9.2
 },
 {
@@ -787,7 +757,7 @@
 "lane": "build",
 "group_pulse": 45.9,
 "group_rank": 13,
-"rank": 25,
+"rank": 24,
 "risk_pct": 12.4
 },
 {
@@ -818,7 +788,7 @@
 "lane": "hold",
 "group_pulse": 24.5,
 "group_rank": 66,
-"rank": 26,
+"rank": 25,
 "risk_pct": 68.8
 },
 {
@@ -850,7 +820,7 @@
 "lane": "hold",
 "group_pulse": 41.0,
 "group_rank": 26,
-"rank": 27,
+"rank": 26,
 "risk_pct": 13.0
 },
 {
@@ -882,7 +852,7 @@
 "lane": "hold",
 "group_pulse": 41.0,
 "group_rank": 26,
-"rank": 28,
+"rank": 27,
 "risk_pct": 17.9
 },
 {
@@ -913,7 +883,7 @@
 "lane": "hold",
 "group_pulse": 18.2,
 "group_rank": 74,
-"rank": 29,
+"rank": 28,
 "risk_pct": 19.9
 },
 {
@@ -944,8 +914,71 @@
 "lane": "hold",
 "group_pulse": 51.5,
 "group_rank": 7,
-"rank": 30,
+"rank": 29,
 "risk_pct": 17.5
+},
+{
+"id": "ATH-CHD-2026-10-30",
+"symbol": "CHD",
+"name": "Church & Dwight Company, Inc. Common Stock",
+"system": "Monthly ATH",
+"kind": "ATH_BRK",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 110.42,
+"ref": 109.33,
+"stop": 98.24,
+"exit_rule": "weekly close below the 30-week SMA",
+"note": "breakout 2026-10-30, base 20 m, -0.9% vs entry 110.30",
+"base_months": 20,
+"score": 2,
+"value_cr": 211.3342,
+"sector": "Consumer Discretionary",
+"sector_rs": -1.475,
+"theme": "",
+"theme_rs": null,
+"stock_rs": 26.8374,
+"aligned": false,
+"td_score": 1,
+"group": "Package Goods/Cosmetics",
+"lane": "mid",
+"group_pulse": 48.5,
+"group_rank": 11,
+"rank": 30,
+"risk_pct": 12.4
+}
+],
+"swing": [
+{
+"id": "T921-ELF-2026-11-06",
+"symbol": "ELF",
+"name": "e.l.f. Beauty, Inc. Common Stock",
+"system": "9/21 trend",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 117.3,
+"ref": 116.14,
+"stop": 105.36,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-06, stop 10.2% below",
+"score": 3,
+"value_cr": 163.66,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Package Goods/Cosmetics",
+"lane": "mid",
+"group_pulse": 48.5,
+"group_rank": 11,
+"rank": 1,
+"risk_pct": 11.3
 }
 ],
 "watch": [

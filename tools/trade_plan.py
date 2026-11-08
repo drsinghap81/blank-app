@@ -139,10 +139,14 @@ def main(mk="NSE"):
         g = GS.get(c["symbol"]); x = LN.get(g[0]) if g else None
         c.update(group=g[0] if g else None, lane=x[0] if x else None, group_pulse=x[1] if x else None, group_rank=x[2] if x else None)
     C = sorted(best.values(), key=lambda c: (-c["score"], LANE_ORD[c["lane"]], -(c["stock_rs"] or -999), -(c["value_cr"] or 0)))
-    trades = [c for c in C if c["kind"] != "WATCH"]
-    for i, c in enumerate(trades):
-        c["rank"] = i + 1
-        c["risk_pct"] = round((c.get("trigger") or c["price"]) / c["stop"] * 100 - 100, 1) if c["stop"] else None
+    # two sleeves (8 Nov 2026): ATH = momentum investing (wide 30-week stops, sized on capital);
+    # 9/21 = swing on ATH's idle cash (5-day-low stop, Supertrend exit). Backtest 2017-26: ATH + 9/21 on idle cash 30.8%/yr, -24%.
+    trades = [c for c in C if c["kind"] not in ("WATCH", "T921")]
+    swing = [c for c in C if c["kind"] == "T921"]
+    for L in (trades, swing):
+        for i, c in enumerate(L):
+            c["rank"] = i + 1
+            c["risk_pct"] = round((c.get("trigger") or c["price"]) / c["stop"] * 100 - 100, 1) if c["stop"] else None
     exits = []
     for r in ath.get("tracked") or []:
         if r.get("status") == "exit next open":
@@ -156,9 +160,9 @@ def main(mk="NSE"):
                asof=max(str(ath.get("asof") or ""), str(tr.get("asof") or "")),
                rules=dict(risk_pct=1.0, max_pos_pct=20.0, max_positions=10, max_late_pct=MAX_LATE * 100, max_below_pct=MAX_BELOW * 100, top=TOP,
                           limit_buffer_pct=1.0),
-               top=trades[:TOP], more=trades[TOP:30], watch=[c for c in C if c["kind"] == "WATCH"], exits=exits)
+               top=trades[:TOP], more=trades[TOP:30], swing=swing[:15], watch=[c for c in C if c["kind"] == "WATCH"], exits=exits)
     json.dump(out, open(OUT, "w"), indent=0, default=str)
-    print("trade plan:", len(trades), "candidates, top", [(c["symbol"], c["kind"], c["score"]) for c in trades[:TOP]], "exits", len(exits))
+    print("trade plan:", len(trades), "ATH +", len(swing), "swing, top", [(c["symbol"], c["kind"], c["score"]) for c in trades[:TOP]], "exits", len(exits))
 
 
 if __name__ == "__main__":
