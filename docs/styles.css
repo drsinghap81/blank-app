@@ -411,3 +411,4 @@ table.gpt td { vertical-align: top; } tr.gptr td:first-child { border-left: 3px 
 table.mxq td, table.mxq th { text-align: right; } table.mxq td:first-child, table.mxq th:first-child { text-align: left; }
 table.mxq td.up { color: #0A7A55; } table.mxq td.down { color: #D64545; }
 .lv-tk { font-size: 12.5px; background: #F5F7FB; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; margin-top: 6px; line-height: 1.5; }
+.lv-pick-n { display: block; margin: 6px 0 4px; } .lv-pick-n select { margin: 0 4px; font-weight: 700; } .lv-pick-n span { display: block; margin-top: 3px; }

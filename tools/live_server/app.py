@@ -61,6 +61,21 @@ RISK = float(ENV["RISK_PCT"]) / 100 if ENV.get("RISK_PCT") else risk_for_budget(
 MAX_POS_PCT = float(ENV.get("MAX_POS_PCT", "10")) / 100     # 10%: caps a one-stock gap shock (cost ~0.3%/yr)
 STREAK, PAUSE_DAYS = int(ENV.get("STREAK", "5")), int(ENV.get("PAUSE_DAYS", "14"))
 MAX_POSITIONS = int(ENV.get("MAX_POSITIONS", "10"))
+# "Pick N" (8 Nov 2026): you choose how many positions the system book holds (3-10). Risk per trade then rises so the total
+# initial risk stays at 10 x the guard risk, never above MAX_RISK_PCT (1%). Slots test, ATH 2017-26, 10% cap:
+# 5 x 1% = 11.7% CAGR / -12.5% max DD vs 10 x 0.5% = 9.0% / -10.7% (fewer, larger positions did slightly better per unit DD).
+MAX_RISK = float(ENV.get("MAX_RISK_PCT", "1")) / 100
+
+
+def picks() -> int:
+    try:
+        return max(3, min(MAX_POSITIONS, int(json.load(open(os.path.join(DATA, "picks.json")))["n"])))
+    except Exception:  # noqa: BLE001
+        return MAX_POSITIONS
+
+
+def risk_now() -> float:
+    return min(MAX_RISK, RISK * MAX_POSITIONS / picks())
 MAX_ORDER_VALUE = float(ENV.get("MAX_ORDER_VALUE", "300000"))
 MAX_ORDERS_DAY = int(ENV.get("MAX_ORDERS_DAY", "10"))
 # protective stop on Angel (GTT) after each filled buy. 9/21: at the plan stop (as backtested, intraday 5-day-low stop).
@@ -167,6 +182,18 @@ class Mode(BaseModel):
     confirm: str = ""
 
 
+class Picks(BaseModel):
+    n: int
+
+
+@app.post("/api/picks")
+def set_picks(body: Picks, _=Depends(auth)):
+    """How many positions the system book holds (3-10); risk per trade follows (see risk_now)."""
+    n = max(3, min(MAX_POSITIONS, int(body.n)))
+    json.dump(dict(n=n, at=time.time()), open(os.path.join(DATA, "picks.json"), "w")); log("picks", n=n)
+    return dict(picks=n, risk_pct=round(risk_now() * 100, 2))
+
+
 @app.post("/api/mode")
 def mode(body: Mode, request: Request, _=Depends(auth)):
     """Dry run: one tap. Live: needs the app password again and the word LIVE typed."""
@@ -251,7 +278,7 @@ def guard(acc):
            "over": "Past your limit. Check every trade is on plan; consider a smaller budget for new trades. Never sells for you.",
            "paused": f"{STREAK} losses in a row - new buys paused until {pause}."}[status]
     return dict(peak=g.get("peak"), nav=g.get("nav"), dd_pct=round(dd * 100, 1), budget_pct=DD_BUDGET * 100, used_pct=round(used * 100),
-                risk_pct=round(RISK * 100, 2), max_pos_pct=MAX_POS_PCT * 100, streak=g.get("streak", 0), streak_max=STREAK,
+                risk_pct=round(risk_now() * 100, 2), base_risk_pct=round(RISK * 100, 2), picks=picks(), max_pos_pct=MAX_POS_PCT * 100, streak=g.get("streak", 0), streak_max=STREAK,
                 pause_until=pause, status=status, msg=msg)
 
 
@@ -401,7 +428,8 @@ def sized(acc=None):
         held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
     sys_open = [s for s in J if not s.startswith("_") and (held.get(s, 0) > 0 or J[s].get("state") == "pending")]
     cap = CAPITAL or acc["net"]
-    slots = max(0, MAX_POSITIONS - len(sys_open))
+    N = picks(); RK = risk_now()
+    slots = max(0, N - len(sys_open))
     cash = acc["cash"]
     rows = []
     for r in [dict(x, tier="top") for x in P.get("top") or []] + [dict(x, tier="more") for x in P.get("more") or []]:
@@ -412,7 +440,7 @@ def sized(acc=None):
         elif r["symbol"] in J and J[r["symbol"]].get("state") == "pending":
             why = "order sent - waiting for the fill"
         elif stop and E > stop:
-            q = math.floor(min(RISK * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
+            q = math.floor(min(RK * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
         rows.append(dict(r, qty=max(0, q), value=round(max(0, q) * E, 0), risk_amt=round(max(0, q) * (E - stop), 0) if stop else None,
                          pct_cap=round(max(0, q) * E / cap * 100, 1) if cap else None, skip=why))
     # each row must fit your actual cash on its own (cut to cash, no token positions); rank order only adds a note
@@ -422,7 +450,7 @@ def sized(acc=None):
         if r["skip"] or r["qty"] <= 0:
             continue
         if slots <= 0:
-            r["skip"] = "no free slot (max %d positions)" % MAX_POSITIONS; continue
+            r["skip"] = "no free slot (you picked %d positions)" % N; continue
         E = r.get("trigger") or r["price"]
         if r["value"] > cash:
             q = math.floor(cash / E)
@@ -440,7 +468,7 @@ def sized(acc=None):
             if not r["skip"]:
                 r["skip"] = "paused: losing streak (guard)"
     trades, recent = trades_view(J, acc)
-    return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open,
+    return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open, picks=N, risk_pct=round(RK * 100, 2),
                 mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,
                 trades=trades, recent=recent, protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100))
 
