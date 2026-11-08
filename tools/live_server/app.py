@@ -206,6 +206,7 @@ class Mode(BaseModel):
 class Picks(BaseModel):
     n: int
     swing_risk: float | None = None
+    capital: float | None = None     # trading capital set in the app; 0 = use the account value; never above the account value
 
 
 @app.post("/api/picks")
@@ -213,8 +214,10 @@ def set_picks(body: Picks, _=Depends(auth)):
     """How many positions the system book holds (3-10); risk per trade follows (see risk_now)."""
     n = max(3, min(MAX_POSITIONS, int(body.n))); cfg = _picks_cfg()
     sr = cfg.get("swing_risk") if body.swing_risk is None else max(0.25, min(MAX_RISK * 100, float(body.swing_risk)))
-    json.dump(dict(n=n, swing_risk=sr, at=time.time()), open(os.path.join(DATA, "picks.json"), "w")); log("picks", n=n, swing_risk=sr)
-    return dict(picks=n, risk_pct=round(risk_now() * 100, 2), swing_risk_pct=round(swing_risk() * 100, 2))
+    capv = cfg.get("capital") if body.capital is None else max(0.0, float(body.capital))
+    json.dump(dict(n=n, swing_risk=sr, capital=capv, at=time.time()), open(os.path.join(DATA, "picks.json"), "w"))
+    log("picks", n=n, swing_risk=sr, capital=capv)
+    return dict(picks=n, risk_pct=round(risk_now() * 100, 2), swing_risk_pct=round(swing_risk() * 100, 2), capital=capv)
 
 
 @app.post("/api/mode")
@@ -450,7 +453,12 @@ def sized(acc=None):
     for p in acc["positions"]:
         held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
     sys_open = [s for s in J if not s.startswith("_") and (held.get(s, 0) > 0 or J[s].get("state") == "pending")]
-    cap = CAPITAL or acc["net"]
+    acct = CAPITAL or acc["net"]
+    try:
+        app_cap = float(_picks_cfg().get("capital") or 0)
+    except Exception:  # noqa: BLE001
+        app_cap = 0.0
+    cap = min(app_cap, acct) if app_cap > 0 and acct else acct      # capital set in the app, never above the account value
     N = picks(); RK = risk_now(); SR = swing_risk()
     sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Breakout retest")]
     ath_open = [s for s in sys_open if s not in sw_open]
@@ -502,7 +510,7 @@ def sized(acc=None):
             if not r["skip"]:
                 r["skip"] = "paused: losing streak (guard)"
     trades, recent = trades_view(J, acc)
-    return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open, picks=N, risk_pct=round(RK * 100, 2),
+    return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open, picks=N, risk_pct=round(RK * 100, 2), account_value=acct, capital_set=app_cap or None,
                 swing=dict(risk_pct=round(SR * 100, 2), slots=sw_slots, max=SWING_MAX, open=len(sw_open), idle_cash=round(sw_cash), reserve_pct=SWING_RESERVE * 100),
                 mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,
                 trades=trades, recent=recent, protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100))

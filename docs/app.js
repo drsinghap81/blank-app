@@ -292,6 +292,13 @@ async function loadLive() {
   const c = lvCfg(); let S = null; let err = '';
   if (c.url && c.token) { try { S = await lvApi('/api/plan'); } catch (e) { err = e.message; } }
   let rows = S ? S.rows : lvLocalSize(P);
+  // server not updated yet (no capital setting): scale its sizes down to the capital set here (smaller orders are always allowed)
+  let capSet = 0; try { capSet = +localStorage.getItem('td.lvCapSet') || 0; } catch (e) { /* */ }
+  if (S && S.account_value == null && capSet > 0 && capSet < S.capital) {
+    const k = capSet / S.capital;
+    rows = rows.map((r) => (r.qty > 0 ? { ...r, qty: Math.floor(r.qty * k), value: Math.floor(r.qty * k) * (r.trigger || r.price), risk_amt: Math.floor(r.qty * k) * ((r.trigger || r.price) - r.stop), pct_cap: Math.floor(r.qty * k) * (r.trigger || r.price) / capSet * 100 } : r));
+    S.capital = capSet;
+  }
   // server not updated yet (no swing tier): show the published swing list sized locally, view-only until the server updates
   if (S && !rows.some((r) => r.tier === 'swing') && (P.swing || []).length) {
     const held = new Set(Object.keys(S.held || {}));
@@ -341,6 +348,7 @@ async function loadLive() {
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
   el.innerHTML = `${lvSeg()}${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Momentum investing · monthly ATH · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
+      <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub">${S ? (S.account_value != null ? `Angel account value ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} (the server never sizes above the account value; 0 = full account).` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       <p class="lv-sub">Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '<span class="lv-sub">Tick trades for the basket; the PDF takes your ticked trades, or the top ' + nP + ' if none.</span>' : `<span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>${S && S.picks == null ? '<p class="lv-sub"><b>Server update pending:</b> your server updates itself at 08:00 IST on weekdays; until then its sizes below still use 10 positions.</p>' : ''}
       ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
@@ -375,6 +383,14 @@ async function loadLive() {
     if (!pk.length) { alertMsg('Nothing picked.'); return; }
     lvPdf('NSE', P, pk, S ? S.exits : (P.exits || []), { cap: S ? S.capital : cap('NSE'), n: nP, risk: rP, sr: srNow });
   });
+  const ci = $('#lvcapin'); if (ci) {
+    if (S) ci.value = S.capital_set || (S.account_value == null && capSet ? capSet : S.capital) || cap('NSE');
+    ci.addEventListener('change', async () => { if (!ci.isConnected) return; const v = Math.max(0, Math.round(+ci.value || 0));
+      if (v > 0) setCap('NSE', v);
+      try { localStorage.setItem('td.lvCapSet', String(v)); } catch (e) { /* */ }
+      if (S) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: nP, capital: v }) }); } catch (e) { alertMsg(`Server not updated yet (${e.message}); it uses this after its next update.`); } }
+      lvKeep(); });
+  }
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', async () => {
     try { localStorage.setItem('td.lvN_NSE', ns.value); localStorage.removeItem(selKey('NSE', P.asof)); } catch (e) { /* private mode */ }
     if (S) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: +ns.value }) }); } catch (e) { alertMsg(`Server not updated yet (${e.message}); it picks this up after its next update.`); } }
