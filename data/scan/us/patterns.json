@@ -1,0 +1,5479 @@
+{
+"generated": "2026-11-08T03:37+00:00",
+"asof": "2026-11-06",
+"market": "US",
+"regime": null,
+"rules": "zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
+"backtest": "2008-26, 17,432 signals: 120-day return +2.5% vs +5.0% for a random liquid stock the same day; target before stop 57% vs 58%. Worse than random - watch only.",
+"rows": [
+{
+"symbol": "HSAI",
+"name": "Hesai Group American Depositary Share",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 14.329999923706055,
+"neck": 13.829999923706055,
+"to_neck_pct": -3.4891835496303925,
+"stop": 11.88,
+"stop_pct": 17.096998860781788,
+"height_pct": 14.581609555769482,
+"fall_pct": 137.14991846241938,
+"lows": [
+[
+"2026-10-22",
+12.140000343322754
+],
+[
+"2026-11-03",
+12.069999694824219
+]
+],
+"peaks": [
+[
+"2026-10-28",
+13.829999923706055
+]
+],
+"rsi_lows": [
+32.0,
+36.7
+],
+"rsi_div": 4.8,
+"rsi_now": 52.6,
+"signal_date": "2026-11-06",
+"days_since": 0
+},
+{
+"symbol": "INSM",
+"name": "Insmed Incorporated Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 114.41000366210938,
+"neck": 112.58000183105469,
+"to_neck_pct": -1.5995120815302855,
+"stop": 92.03,
+"stop_pct": 19.56088091263053,
+"height_pct": 20.625736228791915,
+"fall_pct": 126.51880372273246,
+"lows": [
+[
+"2026-10-26",
+93.33000183105469
+],
+[
+"2026-11-03",
+104.44000244140625
+]
+],
+"peaks": [
+[
+"2026-10-30",
+112.58000183105469
+]
+],
+"rsi_lows": [
+28.2,
+50.2
+],
+"rsi_div": 0.0,
+"rsi_now": 60.9,
+"signal_date": "2026-11-06",
+"days_since": 0
+},
+{
+"symbol": "KRMN",
+"name": "Karman Holdings Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 45.61000061035156,
+"neck": 41.689998626708984,
+"to_neck_pct": -8.594610680081638,
+"stop": 29.2,
+"stop_pct": 35.96799033286642,
+"height_pct": 38.32116612791767,
+"fall_pct": 282.5149411088695,
+"lows": [
+[
+"2026-10-14",
+30.139999389648438
+],
+[
+"2026-11-05",
+32.09000015258789
+]
+],
+"peaks": [
+[
+"2026-10-29",
+41.689998626708984
+]
+],
+"rsi_lows": [
+32.4,
+39.5
+],
+"rsi_div": 0.0,
+"rsi_now": 64.2,
+"signal_date": "2026-11-06",
+"days_since": 0
+},
+{
+"symbol": "LI",
+"name": "Li Auto Inc. American Depositary Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 12.529999732971191,
+"neck": 11.930000305175781,
+"to_neck_pct": -4.788503117175525,
+"stop": 10.55,
+"stop_pct": 15.774939554324307,
+"height_pct": 11.599633053942737,
+"fall_pct": 132.8344281259175,
+"lows": [
+[
+"2026-10-02",
+10.6899995803833
+],
+[
+"2026-10-30",
+11.029999732971191
+]
+],
+"peaks": [
+[
+"2026-10-20",
+11.930000305175781
+]
+],
+"rsi_lows": [
+33.2,
+42.7
+],
+"rsi_div": 0.0,
+"rsi_now": 66.1,
+"signal_date": "2026-11-06",
+"days_since": 0
+},
+{
+"symbol": "PPTA",
+"name": "Perpetua Resources Corp. Common Shares",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 19.530000686645508,
+"neck": 18.549999237060547,
+"to_neck_pct": -5.0179283928805996,
+"stop": 15.63,
+"stop_pct": 19.958528353131967,
+"height_pct": 15.468400998398725,
+"fall_pct": 126.3990268345613,
+"lows": [
+[
+"2026-10-23",
+16.440000534057617
+],
+[
+"2026-11-03",
+16.065000534057617
+]
+],
+"peaks": [
+[
+"2026-10-28",
+18.549999237060547
+]
+],
+"rsi_lows": [
+28.2,
+33.1
+],
+"rsi_div": 4.9,
+"rsi_now": 54.4,
+"signal_date": "2026-11-06",
+"days_since": 0
+},
+{
+"symbol": "XPEV",
+"name": "XPeng Inc. American depositary shares each representing two ",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 10.239999771118164,
+"neck": 9.90999984741211,
+"to_neck_pct": -3.2226555769739096,
+"stop": 8.85,
+"stop_pct": 13.56836149994346,
+"height_pct": 9.623892579981263,
+"fall_pct": 204.77741127644805,
+"lows": [
+[
+"2026-10-19",
+9.210000038146973
+],
+[
+"2026-10-30",
+9.039999961853027
+]
+],
+"peaks": [
+[
+"2026-10-20",
+9.90999984741211
+]
+],
+"rsi_lows": [
+35.3,
+39.4
+],
+"rsi_div": 4.1,
+"rsi_now": 58.9,
+"signal_date": "2026-11-06",
+"days_since": 0
+},
+{
+"symbol": "HSY",
+"name": "The Hershey Company Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 178.0800018310547,
+"neck": 175.63999938964844,
+"to_neck_pct": -1.3701720666653427,
+"stop": 155.87,
+"stop_pct": 12.474393073702583,
+"height_pct": 11.439628646326327,
+"fall_pct": 47.60998725061909,
+"lows": [
+[
+"2026-09-30",
+157.61000061035156
+],
+[
+"2026-10-29",
+160.27999877929688
+]
+],
+"peaks": [
+[
+"2026-10-22",
+175.63999938964844
+]
+],
+"rsi_lows": [
+22.2,
+39.9
+],
+"rsi_div": 0.0,
+"rsi_now": 61.5,
+"signal_date": "2026-11-05",
+"days_since": 1
+},
+{
+"symbol": "JJSF",
+"name": "J & J Snack Foods Corp. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 89.83000183105469,
+"neck": 91.02837371826172,
+"to_neck_pct": 1.3340441531559,
+"stop": 70.26,
+"stop_pct": 21.782377199573887,
+"height_pct": 28.133276629927593,
+"fall_pct": 60.570084013398315,
+"lows": [
+[
+"2026-06-22",
+71.04194641113281
+],
+[
+"2026-09-30",
+76.44999694824219
+]
+],
+"peaks": [
+[
+"2026-08-07",
+91.02837371826172
+]
+],
+"rsi_lows": [
+37.8,
+31.6
+],
+"rsi_div": 0.0,
+"rsi_now": 66.5,
+"signal_date": "2026-11-05",
+"days_since": 1
+},
+{
+"symbol": "PDD",
+"name": "PDD Holdings Inc. American Depositary Shares",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 83.02999877929688,
+"neck": 82.41999816894531,
+"to_neck_pct": -0.7346749600382507,
+"stop": 73.97,
+"stop_pct": 10.908343615511583,
+"height_pct": 9.339348861820396,
+"fall_pct": 83.2449056988381,
+"lows": [
+[
+"2026-10-02",
+75.37999725341797
+],
+[
+"2026-10-28",
+77.47000122070312
+]
+],
+"peaks": [
+[
+"2026-10-15",
+82.41999816894531
+]
+],
+"rsi_lows": [
+33.4,
+40.8
+],
+"rsi_div": 0.0,
+"rsi_now": 58.2,
+"signal_date": "2026-11-05",
+"days_since": 1
+},
+{
+"symbol": "PRKS",
+"name": "United Parks & Resorts Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 39.9900016784668,
+"neck": 34.38999938964844,
+"to_neck_pct": -14.003506010938139,
+"stop": 29.6,
+"stop_pct": 25.97899879988236,
+"height_pct": 13.4609039775488,
+"fall_pct": 77.06862907024401,
+"lows": [
+[
+"2026-10-01",
+31.18000030517578
+],
+[
+"2026-10-23",
+30.309999465942383
+]
+],
+"peaks": [
+[
+"2026-10-05",
+34.38999938964844
+]
+],
+"rsi_lows": [
+21.4,
+33.4
+],
+"rsi_div": 12.0,
+"rsi_now": 71.0,
+"signal_date": "2026-11-05",
+"days_since": 1
+},
+{
+"symbol": "PRVA",
+"name": "Privia Health Group Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 24.420000076293945,
+"neck": 22.93000030517578,
+"to_neck_pct": -6.101555145221327,
+"stop": 18.79,
+"stop_pct": 23.074323018159724,
+"height_pct": 20.05235522100728,
+"fall_pct": 47.12041790706738,
+"lows": [
+[
+"2026-09-23",
+19.100000381469727
+],
+[
+"2026-11-02",
+21.280000686645508
+]
+],
+"peaks": [
+[
+"2026-10-20",
+22.93000030517578
+]
+],
+"rsi_lows": [
+22.5,
+46.5
+],
+"rsi_div": 0.0,
+"rsi_now": 72.6,
+"signal_date": "2026-11-05",
+"days_since": 1
+},
+{
+"symbol": "TM",
+"name": "Toyota Motor Corporation Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 216.19000244140625,
+"neck": 199.8699951171875,
+"to_neck_pct": -7.548918608593825,
+"stop": 164.44,
+"stop_pct": 23.937738014944433,
+"height_pct": 20.04203910942193,
+"fall_pct": 49.12311909077045,
+"lows": [
+[
+"2026-06-25",
+166.5
+],
+[
+"2026-10-02",
+181.49000549316406
+]
+],
+"peaks": [
+[
+"2026-09-03",
+199.8699951171875
+]
+],
+"rsi_lows": [
+30.6,
+35.2
+],
+"rsi_div": 0.0,
+"rsi_now": 73.5,
+"signal_date": "2026-11-05",
+"days_since": 1
+},
+{
+"symbol": "WM",
+"name": "Waste Management Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 236.25999450683594,
+"neck": 241.02000427246094,
+"to_neck_pct": 2.014733715524275,
+"stop": 199.43,
+"stop_pct": 15.590617517253014,
+"height_pct": 19.375934402471383,
+"fall_pct": 20.554012713995263,
+"lows": [
+[
+"2026-10-01",
+201.89999389648438
+],
+[
+"2026-10-28",
+225.14999389648438
+]
+],
+"peaks": [
+[
+"2026-10-26",
+241.02000427246094
+]
+],
+"rsi_lows": [
+24.7,
+53.2
+],
+"rsi_div": 0.0,
+"rsi_now": 58.8,
+"signal_date": "2026-11-05",
+"days_since": 1
+},
+{
+"symbol": "ALC",
+"name": "Alcon Inc. Ordinary Shares",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 74.94000244140625,
+"neck": 75.3499984741211,
+"to_neck_pct": 0.547099038374621,
+"stop": 61.22,
+"stop_pct": 18.312453830660434,
+"height_pct": 21.49306339563042,
+"fall_pct": 51.562054550908584,
+"lows": [
+[
+"2026-05-11",
+62.02000045776367
+],
+[
+"2026-10-07",
+63.0
+]
+],
+"peaks": [
+[
+"2026-08-11",
+75.3499984741211
+]
+],
+"rsi_lows": [
+22.8,
+30.8
+],
+"rsi_div": 0.0,
+"rsi_now": 65.7,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "ARE",
+"name": "Alexandria Real Estate Equities Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 44.79999923706055,
+"neck": 43.400001525878906,
+"to_neck_pct": -3.1249949442487934,
+"stop": 37.96,
+"stop_pct": 15.275444648528858,
+"height_pct": 8.74467975898301,
+"fall_pct": 80.79505124021786,
+"lows": [
+[
+"2026-10-19",
+40.630001068115234
+],
+[
+"2026-10-28",
+39.90999984741211
+]
+],
+"peaks": [
+[
+"2026-10-26",
+43.400001525878906
+]
+],
+"rsi_lows": [
+25.4,
+31.5
+],
+"rsi_div": 6.1,
+"rsi_now": 52.5,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "AWI",
+"name": "Armstrong World Industries Inc Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 171.22999572753906,
+"neck": 171.02667236328125,
+"to_neck_pct": -0.11874284256908618,
+"stop": 149.58,
+"stop_pct": 12.64489579818745,
+"height_pct": 10.317970639824114,
+"fall_pct": 28.00389832781489,
+"lows": [
+[
+"2026-09-16",
+157.58522033691406
+],
+[
+"2026-10-27",
+155.03065490722656
+]
+],
+"peaks": [
+[
+"2026-10-22",
+171.02667236328125
+]
+],
+"rsi_lows": [
+29.7,
+33.9
+],
+"rsi_div": 4.2,
+"rsi_now": 56.2,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "BIRK",
+"name": "Birkenstock Holding plc Ordinary Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 37.31999969482422,
+"neck": 35.88999938964844,
+"to_neck_pct": -3.83172646535177,
+"stop": 29.63,
+"stop_pct": 20.603696290401086,
+"height_pct": 19.593465897769804,
+"fall_pct": 63.17894317632844,
+"lows": [
+[
+"2026-09-15",
+30.010000228881836
+],
+[
+"2026-10-28",
+31.59000015258789
+]
+],
+"peaks": [
+[
+"2026-10-15",
+35.88999938964844
+]
+],
+"rsi_lows": [
+27.2,
+41.3
+],
+"rsi_div": 0.0,
+"rsi_now": 66.0,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "BLK",
+"name": "BlackRock Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 1178.8699951171875,
+"neck": 1176.80078125,
+"to_neck_pct": -0.17552519580259496,
+"stop": 932.95,
+"stop_pct": 20.860637511365788,
+"height_pct": 24.48718865054036,
+"fall_pct": 24.553497610391673,
+"lows": [
+[
+"2026-06-29",
+945.3187866210938
+],
+[
+"2026-09-16",
+1037.239990234375
+]
+],
+"peaks": [
+[
+"2026-08-13",
+1176.80078125
+]
+],
+"rsi_lows": [
+31.1,
+32.7
+],
+"rsi_div": 0.0,
+"rsi_now": 58.4,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "CDE",
+"name": "Coeur Mining Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 15.470000267028809,
+"neck": 14.420000076293945,
+"to_neck_pct": -6.7873314325192835,
+"stop": 12.58,
+"stop_pct": 18.662573881246647,
+"height_pct": 10.076333254855395,
+"fall_pct": 101.63230756500568,
+"lows": [
+[
+"2026-10-23",
+13.449999809265137
+],
+[
+"2026-10-30",
+13.100000381469727
+]
+],
+"peaks": [
+[
+"2026-10-28",
+14.420000076293945
+]
+],
+"rsi_lows": [
+23.8,
+28.1
+],
+"rsi_div": 4.4,
+"rsi_now": 51.1,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "CLBT",
+"name": "Cellebrite DI Ltd. Ordinary Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 12.449999809265137,
+"neck": 12.289999961853027,
+"to_neck_pct": -1.285139356331877,
+"stop": 10.22,
+"stop_pct": 17.89759062031805,
+"height_pct": 17.72031087957002,
+"fall_pct": 87.35632425403071,
+"lows": [
+[
+"2026-08-17",
+10.4399995803833
+],
+[
+"2026-09-25",
+10.789999961853027
+]
+],
+"peaks": [
+[
+"2026-08-27",
+12.289999961853027
+]
+],
+"rsi_lows": [
+26.0,
+36.2
+],
+"rsi_div": 0.0,
+"rsi_now": 61.9,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "CPNG",
+"name": "Coupang Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 16.290000915527344,
+"neck": 15.819999694824219,
+"to_neck_pct": -2.885212979055929,
+"stop": 13.27,
+"stop_pct": 18.533155372681144,
+"height_pct": 15.054543235085237,
+"fall_pct": 138.76364968039772,
+"lows": [
+[
+"2026-09-28",
+13.75
+],
+[
+"2026-10-26",
+13.75
+]
+],
+"peaks": [
+[
+"2026-10-09",
+15.819999694824219
+]
+],
+"rsi_lows": [
+30.3,
+39.1
+],
+"rsi_div": 8.8,
+"rsi_now": 63.5,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "DECK",
+"name": "Deckers Outdoor Corporation Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 86.70999908447266,
+"neck": 87.37000274658203,
+"to_neck_pct": 0.7611621140330094,
+"stop": 76.6,
+"stop_pct": 11.663817866615023,
+"height_pct": 12.720939670497966,
+"fall_pct": 56.031478658514075,
+"lows": [
+[
+"2026-09-15",
+77.51000213623047
+],
+[
+"2026-10-26",
+80.37000274658203
+]
+],
+"peaks": [
+[
+"2026-10-20",
+87.37000274658203
+]
+],
+"rsi_lows": [
+28.5,
+41.7
+],
+"rsi_div": 0.0,
+"rsi_now": 56.8,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "FSLR",
+"name": "First Solar Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 201.13999938964844,
+"neck": 186.60000610351562,
+"to_neck_pct": -7.228792547605578,
+"stop": 164.2,
+"stop_pct": 18.364621108426537,
+"height_pct": 10.972353777419318,
+"fall_pct": 84.91081219649874,
+"lows": [
+[
+"2026-10-01",
+172.11000061035156
+],
+[
+"2026-10-26",
+168.14999389648438
+]
+],
+"peaks": [
+[
+"2026-10-13",
+186.60000610351562
+]
+],
+"rsi_lows": [
+34.1,
+36.0
+],
+"rsi_div": 0.0,
+"rsi_now": 67.4,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "GIS",
+"name": "General Mills Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 35.5099983215332,
+"neck": 35.18000030517578,
+"to_neck_pct": -0.9293101434964313,
+"stop": 30.29,
+"stop_pct": 14.693402207607786,
+"height_pct": 13.194626467807247,
+"fall_pct": 51.39513376909293,
+"lows": [
+[
+"2026-10-01",
+31.079214096069336
+],
+[
+"2026-10-28",
+33.04999923706055
+]
+],
+"peaks": [
+[
+"2026-10-22",
+35.18000030517578
+]
+],
+"rsi_lows": [
+23.4,
+47.4
+],
+"rsi_div": 0.0,
+"rsi_now": 57.4,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "GRBK",
+"name": "Green Brick Partners Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 64.81999969482422,
+"neck": 64.94000244140625,
+"to_neck_pct": 0.18513228501544354,
+"stop": 58.53,
+"stop_pct": 9.70564761165934,
+"height_pct": 8.017304715827578,
+"fall_pct": 34.048565817837286,
+"lows": [
+[
+"2026-10-14",
+60.119998931884766
+],
+[
+"2026-10-30",
+60.86000061035156
+]
+],
+"peaks": [
+[
+"2026-10-22",
+64.94000244140625
+]
+],
+"rsi_lows": [
+27.0,
+38.9
+],
+"rsi_div": 0.0,
+"rsi_now": 51.6,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "HDB",
+"name": "HDFC Bank Limited Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 25.139999389648438,
+"neck": 23.84000015258789,
+"to_neck_pct": -5.1710392546621575,
+"stop": 21.15,
+"stop_pct": 15.885437081771691,
+"height_pct": 11.610484416533495,
+"fall_pct": 68.92321634957392,
+"lows": [
+[
+"2026-10-08",
+22.010000228881836
+],
+[
+"2026-10-27",
+21.360000610351562
+]
+],
+"peaks": [
+[
+"2026-10-16",
+23.84000015258789
+]
+],
+"rsi_lows": [
+42.2,
+36.5
+],
+"rsi_div": 0.0,
+"rsi_now": 70.3,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "IBN",
+"name": "ICICI Bank Limited Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 33.88999938964844,
+"neck": 30.579999923706055,
+"to_neck_pct": -9.766891488801289,
+"stop": 24.71,
+"stop_pct": 27.083475293820126,
+"height_pct": 22.122865631787313,
+"fall_pct": 35.2061697281564,
+"lows": [
+[
+"2026-05-19",
+25.040355682373047
+],
+[
+"2026-09-29",
+27.25
+]
+],
+"peaks": [
+[
+"2026-09-02",
+30.579999923706055
+]
+],
+"rsi_lows": [
+32.9,
+28.4
+],
+"rsi_div": 0.0,
+"rsi_now": 80.4,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "MDLN",
+"name": "Medline Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 39.63999938964844,
+"neck": 36.56999969482422,
+"to_neck_pct": -7.7447016702677285,
+"stop": 31.18,
+"stop_pct": 21.354439320329487,
+"height_pct": 15.581543616554928,
+"fall_pct": 57.99621568520597,
+"lows": [
+[
+"2026-09-18",
+31.639999389648438
+],
+[
+"2026-10-29",
+32.0
+]
+],
+"peaks": [
+[
+"2026-10-15",
+36.56999969482422
+]
+],
+"rsi_lows": [
+35.9,
+30.3
+],
+"rsi_div": 0.0,
+"rsi_now": 69.1,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "PIPR",
+"name": "Piper Sandler Companies Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 65.91999816894531,
+"neck": 68.72000122070312,
+"to_neck_pct": 4.247577563005578,
+"stop": 60.81,
+"stop_pct": 7.758191935294578,
+"height_pct": 8.305753182656893,
+"fall_pct": 45.410366128566906,
+"lows": [
+[
+"2026-10-19",
+63.45000076293945
+],
+[
+"2026-10-30",
+63.810001373291016
+]
+],
+"peaks": [
+[
+"2026-10-29",
+68.72000122070312
+]
+],
+"rsi_lows": [
+31.8,
+41.0
+],
+"rsi_div": 0.0,
+"rsi_now": 47.9,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "RYAAY",
+"name": "Ryanair Holdings plc American Depositary Shares",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 59.29999923706055,
+"neck": 56.0,
+"to_neck_pct": -5.564922899692304,
+"stop": 50.51,
+"stop_pct": 14.823269640753944,
+"height_pct": 9.097989484426549,
+"fall_pct": 39.98330638568564,
+"lows": [
+[
+"2026-09-15",
+51.95000076293945
+],
+[
+"2026-10-14",
+51.33000183105469
+]
+],
+"peaks": [
+[
+"2026-10-07",
+56.0
+]
+],
+"rsi_lows": [
+35.3,
+35.7
+],
+"rsi_div": 0.0,
+"rsi_now": 67.4,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "STE",
+"name": "STERIS plc (Ireland) Ordinary Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 252.3000030517578,
+"neck": 238.18325805664062,
+"to_neck_pct": -5.595221888372793,
+"stop": 195.43,
+"stop_pct": 22.539202721733254,
+"height_pct": 19.81444454755468,
+"fall_pct": 33.98871533874364,
+"lows": [
+[
+"2026-06-17",
+198.79344177246094
+],
+[
+"2026-09-18",
+205.0399932861328
+]
+],
+"peaks": [
+[
+"2026-08-10",
+238.18325805664062
+]
+],
+"rsi_lows": [
+32.0,
+25.5
+],
+"rsi_div": 0.0,
+"rsi_now": 73.1,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "SUI",
+"name": "Sun Communities Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 120.30000305175781,
+"neck": 120.23999786376953,
+"to_neck_pct": -0.04987962299757287,
+"stop": 108.67,
+"stop_pct": 9.665591089070357,
+"height_pct": 9.309088967063218,
+"fall_pct": 21.23458862304688,
+"lows": [
+[
+"2026-10-01",
+110.0
+],
+[
+"2026-10-28",
+110.18000030517578
+]
+],
+"peaks": [
+[
+"2026-10-23",
+120.23999786376953
+]
+],
+"rsi_lows": [
+31.5,
+38.8
+],
+"rsi_div": 0.0,
+"rsi_now": 57.5,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "SYK",
+"name": "Stryker Corporation Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 325.8699951171875,
+"neck": 311.75,
+"to_neck_pct": -4.333014800000146,
+"stop": 266.19,
+"stop_pct": 18.314125058565235,
+"height_pct": 15.935952442696944,
+"fall_pct": 42.86769266387971,
+"lows": [
+[
+"2026-09-24",
+268.8984680175781
+],
+[
+"2026-10-30",
+291.8599853515625
+]
+],
+"peaks": [
+[
+"2026-10-29",
+311.75
+]
+],
+"rsi_lows": [
+29.2,
+48.1
+],
+"rsi_div": 0.0,
+"rsi_now": 61.3,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "TSCO",
+"name": "Tractor Supply Company Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 36.349998474121094,
+"neck": 36.180049896240234,
+"to_neck_pct": -0.46753393401612886,
+"stop": 28.82,
+"stop_pct": 20.721282232952365,
+"height_pct": 24.080373466318818,
+"fall_pct": 109.80848188024149,
+"lows": [
+[
+"2026-07-22",
+29.158559799194336
+],
+[
+"2026-10-02",
+31.09000015258789
+]
+],
+"peaks": [
+[
+"2026-08-12",
+36.180049896240234
+]
+],
+"rsi_lows": [
+40.4,
+37.2
+],
+"rsi_div": 0.0,
+"rsi_now": 64.0,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "TTD",
+"name": "The Trade Desk Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 12.930000305175781,
+"neck": 13.15999984741211,
+"to_neck_pct": 1.7788053890784639,
+"stop": 12.0,
+"stop_pct": 7.201859214957151,
+"height_pct": 7.604254619667183,
+"fall_pct": 342.6001888322004,
+"lows": [
+[
+"2026-10-16",
+12.229999542236328
+],
+[
+"2026-10-30",
+12.289999961853027
+]
+],
+"peaks": [
+[
+"2026-10-22",
+13.15999984741211
+]
+],
+"rsi_lows": [
+42.8,
+43.8
+],
+"rsi_div": 0.0,
+"rsi_now": 51.5,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "UFPI",
+"name": "UFP Industries Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 79.91999816894531,
+"neck": 83.72000122070312,
+"to_neck_pct": 4.754758682207272,
+"stop": 73.28,
+"stop_pct": 8.308560616171,
+"height_pct": 12.814987540163303,
+"fall_pct": 53.907713008513646,
+"lows": [
+[
+"2026-10-09",
+74.20999908447266
+],
+[
+"2026-10-28",
+78.30000305175781
+]
+],
+"peaks": [
+[
+"2026-10-22",
+83.72000122070312
+]
+],
+"rsi_lows": [
+31.4,
+46.2
+],
+"rsi_div": 0.0,
+"rsi_now": 48.4,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "VKTX",
+"name": "Viking Therapeutics Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 26.84000015258789,
+"neck": 27.3700008392334,
+"to_neck_pct": 1.9746672266482967,
+"stop": 23.76,
+"stop_pct": 11.456970812023116,
+"height_pct": 13.052465403798564,
+"fall_pct": 65.41029526461561,
+"lows": [
+[
+"2026-10-14",
+25.469999313354492
+],
+[
+"2026-10-19",
+25.049999237060547
+],
+[
+"2026-10-26",
+24.209999084472656
+]
+],
+"peaks": [
+[
+"2026-10-15",
+27.3700008392334
+],
+[
+"2026-10-20",
+26.709999084472656
+]
+],
+"rsi_lows": [
+33.6,
+35.7,
+35.6
+],
+"rsi_div": 2.1,
+"rsi_now": 47.8,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "WRB",
+"name": "W.R. Berkley Corporation Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 75.2300033569336,
+"neck": 76.06116485595703,
+"to_neck_pct": 1.10482714599911,
+"stop": 62.07,
+"stop_pct": 17.49671371349304,
+"height_pct": 20.958176172662867,
+"fall_pct": 21.386016372534367,
+"lows": [
+[
+"2026-05-29",
+62.8822021484375
+],
+[
+"2026-09-25",
+66.81999969482422
+]
+],
+"peaks": [
+[
+"2026-07-28",
+76.06116485595703
+]
+],
+"rsi_lows": [
+34.5,
+33.8
+],
+"rsi_div": 0.0,
+"rsi_now": 57.7,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "YELP",
+"name": "Yelp Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 19.459999084472656,
+"neck": 20.700000762939453,
+"to_neck_pct": 6.372054145964512,
+"stop": 17.1,
+"stop_pct": 12.141309056750394,
+"height_pct": 17.680503600757568,
+"fall_pct": 92.32519350534243,
+"lows": [
+[
+"2026-09-28",
+17.59000015258789
+],
+[
+"2026-10-28",
+18.420000076293945
+]
+],
+"peaks": [
+[
+"2026-10-22",
+20.700000762939453
+]
+],
+"rsi_lows": [
+26.5,
+41.7
+],
+"rsi_div": 0.0,
+"rsi_now": 48.3,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "YUMC",
+"name": "Yum China Holdings Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 49.95000076293945,
+"neck": 49.21561813354492,
+"to_neck_pct": -1.470235471826875,
+"stop": 39.32,
+"stop_pct": 21.28558648544806,
+"height_pct": 23.245403246383354,
+"fall_pct": 42.48692922749014,
+"lows": [
+[
+"2026-06-25",
+39.93302536010742
+],
+[
+"2026-10-02",
+39.97999954223633
+]
+],
+"peaks": [
+[
+"2026-08-21",
+49.21561813354492
+]
+],
+"rsi_lows": [
+27.1,
+30.5
+],
+"rsi_div": 0.0,
+"rsi_now": 79.0,
+"signal_date": "2026-11-04",
+"days_since": 2
+},
+{
+"symbol": "PTCT",
+"name": "PTC Therapeutics Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 65.44000244140625,
+"neck": 64.45999908447266,
+"to_neck_pct": -1.4975600861431348,
+"stop": 58.39,
+"stop_pct": 10.772925781756415,
+"height_pct": 8.81160914602621,
+"fall_pct": 51.16475441341595,
+"lows": [
+[
+"2026-10-16",
+59.2400016784668
+],
+[
+"2026-10-30",
+59.970001220703125
+]
+],
+"peaks": [
+[
+"2026-10-29",
+64.45999908447266
+]
+],
+"rsi_lows": [
+34.1,
+41.5
+],
+"rsi_div": 0.0,
+"rsi_now": 53.3,
+"signal_date": "2026-11-03",
+"days_since": 3
+},
+{
+"symbol": "USLM",
+"name": "United States Lime & Minerals Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 118.0999984741211,
+"neck": 120.88999938964844,
+"to_neck_pct": 2.3624055474807726,
+"stop": 95.26,
+"stop_pct": 19.339780165708397,
+"height_pct": 24.064397975857798,
+"fall_pct": 42.96951963814113,
+"lows": [
+[
+"2026-07-08",
+97.44132995605469
+],
+[
+"2026-10-14",
+104.87999725341797
+]
+],
+"peaks": [
+[
+"2026-08-24",
+120.88999938964844
+]
+],
+"rsi_lows": [
+35.2,
+29.9
+],
+"rsi_div": 0.0,
+"rsi_now": 58.8,
+"signal_date": "2026-11-03",
+"days_since": 3
+},
+{
+"symbol": "AS",
+"name": "Amer Sports Inc. Ordinary Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 31.469999313354492,
+"neck": 30.309999465942383,
+"to_neck_pct": -3.686049802104241,
+"stop": 25.92,
+"stop_pct": 17.64156063668717,
+"height_pct": 15.378754997260602,
+"fall_pct": 59.72591683785853,
+"lows": [
+[
+"2026-09-17",
+26.270000457763672
+],
+[
+"2026-10-28",
+28.170000076293945
+]
+],
+"peaks": [
+[
+"2026-10-20",
+30.309999465942383
+]
+],
+"rsi_lows": [
+29.2,
+45.3
+],
+"rsi_div": 0.0,
+"rsi_now": 63.4,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "ATR",
+"name": "AptarGroup Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 142.5,
+"neck": 137.32443237304688,
+"to_neck_pct": -3.631977282072374,
+"stop": 109.45,
+"stop_pct": 23.190541960631204,
+"height_pct": 23.110593390665144,
+"fall_pct": 42.90703951840782,
+"lows": [
+[
+"2026-06-08",
+111.54558563232422
+],
+[
+"2026-10-12",
+118.94999694824219
+]
+],
+"peaks": [
+[
+"2026-07-28",
+137.32443237304688
+]
+],
+"rsi_lows": [
+34.1,
+32.6
+],
+"rsi_div": 0.0,
+"rsi_now": 70.0,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "CHTR",
+"name": "Charter Communications Inc. Class A Common Stock New",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 118.06999969482422,
+"neck": 111.7699966430664,
+"to_neck_pct": -5.335820333735453,
+"stop": 100.1,
+"stop_pct": 15.22071579319566,
+"height_pct": 9.385394704686512,
+"fall_pct": 159.80678305860542,
+"lows": [
+[
+"2026-10-12",
+102.4800033569336
+],
+[
+"2026-10-26",
+102.18000030517578
+]
+],
+"peaks": [
+[
+"2026-10-22",
+111.7699966430664
+]
+],
+"rsi_lows": [
+27.3,
+35.8
+],
+"rsi_div": 8.5,
+"rsi_now": 53.9,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "ERIE",
+"name": "Erie Indemnity Company Class A Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 273.07000732421875,
+"neck": 266.86236572265625,
+"to_neck_pct": -2.273278439617177,
+"stop": 206.21,
+"stop_pct": 24.484719600139947,
+"height_pct": 27.402067051058676,
+"fall_pct": 71.34862125813486,
+"lows": [
+[
+"2026-07-22",
+209.46470642089844
+],
+[
+"2026-09-24",
+217.5111083984375
+]
+],
+"peaks": [
+[
+"2026-08-24",
+266.86236572265625
+]
+],
+"rsi_lows": [
+38.2,
+29.1
+],
+"rsi_div": 0.0,
+"rsi_now": 63.4,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "FISV",
+"name": "Fiserv Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 62.880001068115234,
+"neck": 50.81999969482422,
+"to_neck_pct": -19.1793911711721,
+"stop": 43.43,
+"stop_pct": 30.929869267148014,
+"height_pct": 14.562666807008995,
+"fall_pct": 187.55634761832525,
+"lows": [
+[
+"2026-10-02",
+44.36000061035156
+],
+[
+"2026-10-27",
+47.400001525878906
+]
+],
+"peaks": [
+[
+"2026-10-22",
+50.81999969482422
+]
+],
+"rsi_lows": [
+29.2,
+48.1
+],
+"rsi_div": 0.0,
+"rsi_now": 82.4,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "FOUR",
+"name": "Shift4 Payments Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 43.959999084472656,
+"neck": 40.459999084472656,
+"to_neck_pct": -7.961783605305516,
+"stop": 34.92,
+"stop_pct": 20.57028848865613,
+"height_pct": 13.715562119950885,
+"fall_pct": 123.440123408345,
+"lows": [
+[
+"2026-10-01",
+35.58000183105469
+],
+[
+"2026-10-26",
+36.9900016784668
+]
+],
+"peaks": [
+[
+"2026-10-20",
+40.459999084472656
+]
+],
+"rsi_lows": [
+31.3,
+39.4
+],
+"rsi_div": 0.0,
+"rsi_now": 61.2,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "FSV",
+"name": "FirstService Corporation Common Shares",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 153.1199951171875,
+"neck": 150.85255432128906,
+"to_neck_pct": -1.480826063351881,
+"stop": 121.28,
+"stop_pct": 20.79113593346904,
+"height_pct": 19.03488085643028,
+"fall_pct": 58.78622964008087,
+"lows": [
+[
+"2026-06-22",
+129.9615936279297
+],
+[
+"2026-07-23",
+130.82998657226562
+],
+[
+"2026-09-24",
+126.72970581054688
+]
+],
+"peaks": [
+[
+"2026-07-16",
+150.85255432128906
+],
+[
+"2026-08-19",
+146.18360900878906
+]
+],
+"rsi_lows": [
+37.9,
+34.5,
+33.8
+],
+"rsi_div": 0.0,
+"rsi_now": 65.5,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "IDXX",
+"name": "IDEXX Laboratories Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 676.0399780273438,
+"neck": 595.760009765625,
+"to_neck_pct": -11.87503267128851,
+"stop": 495.6,
+"stop_pct": 26.690151232742455,
+"height_pct": 18.042400506469637,
+"fall_pct": 45.63482811341149,
+"lows": [
+[
+"2026-06-30",
+526.4400024414062
+],
+[
+"2026-07-23",
+539.3699951171875
+],
+[
+"2026-09-11",
+504.70001220703125
+]
+],
+"peaks": [
+[
+"2026-07-16",
+576.0700073242188
+],
+[
+"2026-08-10",
+595.760009765625
+]
+],
+"rsi_lows": [
+38.8,
+43.6,
+31.6
+],
+"rsi_div": 0.0,
+"rsi_now": 71.0,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "LPX",
+"name": "Louisiana-Pacific Corporation Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 75.36000061035156,
+"neck": 74.8499984741211,
+"to_neck_pct": -0.6767544215762866,
+"stop": 63.88,
+"stop_pct": 15.22731120741444,
+"height_pct": 15.956614927042656,
+"fall_pct": 50.891912227572725,
+"lows": [
+[
+"2026-09-30",
+64.55000305175781
+],
+[
+"2026-10-28",
+70.05999755859375
+]
+],
+"peaks": [
+[
+"2026-10-22",
+74.8499984741211
+]
+],
+"rsi_lows": [
+37.8,
+52.3
+],
+"rsi_div": 0.0,
+"rsi_now": 58.5,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "LVS",
+"name": "Las Vegas Sands Corp. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 40.72999954223633,
+"neck": 38.0090446472168,
+"to_neck_pct": -6.680468759146308,
+"stop": 34.63,
+"stop_pct": 14.966957529439451,
+"height_pct": 7.399099683003829,
+"fall_pct": 90.71022094786699,
+"lows": [
+[
+"2026-10-07",
+35.519412994384766
+],
+[
+"2026-10-23",
+35.39046859741211
+]
+],
+"peaks": [
+[
+"2026-10-15",
+38.0090446472168
+]
+],
+"rsi_lows": [
+19.1,
+30.5
+],
+"rsi_div": 11.5,
+"rsi_now": 66.3,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "NVR",
+"name": "NVR Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 6298.2900390625,
+"neck": 6110.6298828125,
+"to_neck_pct": -2.9795413530675274,
+"stop": 5560.61,
+"stop_pct": 11.712354419734151,
+"height_pct": 6.684274368135035,
+"fall_pct": 41.23635707064641,
+"lows": [
+[
+"2026-10-14",
+5733.1201171875
+],
+[
+"2026-10-26",
+5727.77001953125
+]
+],
+"peaks": [
+[
+"2026-10-22",
+6110.6298828125
+]
+],
+"rsi_lows": [
+33.0,
+40.2
+],
+"rsi_div": 7.2,
+"rsi_now": 56.4,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "NXT",
+"name": "Nextpower Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 104.90499877929688,
+"neck": 88.7699966430664,
+"to_neck_pct": -15.380584647044227,
+"stop": 75.36,
+"stop_pct": 28.1647170334953,
+"height_pct": 16.069551185523867,
+"fall_pct": 100.69292093419504,
+"lows": [
+[
+"2026-09-30",
+77.93000030517578
+],
+[
+"2026-10-26",
+76.4800033569336
+]
+],
+"peaks": [
+[
+"2026-10-13",
+88.7699966430664
+]
+],
+"rsi_lows": [
+37.7,
+40.2
+],
+"rsi_div": 2.5,
+"rsi_now": 67.2,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "SRAD",
+"name": "Sportradar Group AG Class A Ordinary Shares",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 13.539999961853027,
+"neck": 12.670000076293945,
+"to_neck_pct": -6.425405376736926,
+"stop": 11.28,
+"stop_pct": 16.720085881401094,
+"height_pct": 9.602072806101592,
+"fall_pct": 137.97577188837158,
+"lows": [
+[
+"2026-09-29",
+11.5600004196167
+],
+[
+"2026-10-14",
+11.630000114440918
+]
+],
+"peaks": [
+[
+"2026-10-12",
+12.670000076293945
+]
+],
+"rsi_lows": [
+36.8,
+39.8
+],
+"rsi_div": 0.0,
+"rsi_now": 57.7,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "STN",
+"name": "Stantec Inc Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 74.33999633789062,
+"neck": 75.23013305664062,
+"to_neck_pct": 1.197386013720192,
+"stop": 64.7,
+"stop_pct": 12.972152708589146,
+"height_pct": 12.988758719889958,
+"fall_pct": 69.55930373113146,
+"lows": [
+[
+"2026-07-23",
+66.58196258544922
+],
+[
+"2026-10-07",
+66.66999816894531
+]
+],
+"peaks": [
+[
+"2026-08-26",
+75.23013305664062
+]
+],
+"rsi_lows": [
+36.6,
+35.7
+],
+"rsi_div": 0.0,
+"rsi_now": 57.4,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "STZ",
+"name": "Constellation Brands Inc. Common Stock",
+"kind": "stock",
+"typ": "IHS",
+"status": "breakout",
+"close": 141.97000122070312,
+"neck": 138.08021545410156,
+"to_neck_pct": -2.739864572202544,
+"stop": 109.55,
+"stop_pct": 22.83436642790544,
+"height_pct": 23.419338520708234,
+"fall_pct": 32.42424396861205,
+"lows": [
+[
+"2026-07-23",
+127.24590301513672
+],
+[
+"2026-09-29",
+111.87891387939453
+],
+[
+"2026-10-28",
+128.77435302734375
+]
+],
+"peaks": [
+[
+"2026-08-14",
+138.08021545410156
+],
+[
+"2026-10-22",
+137.88180541992188
+]
+],
+"rsi_lows": [
+38.9,
+23.6,
+54.3
+],
+"rsi_div": 0.0,
+"rsi_now": 64.7,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "TMUS",
+"name": "T-Mobile US Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 162.00999450683594,
+"neck": 159.10000610351562,
+"to_neck_pct": -1.7961783235524553,
+"stop": 144.86,
+"stop_pct": 10.587733990161697,
+"height_pct": 8.571047763635576,
+"fall_pct": 51.65560118632,
+"lows": [
+[
+"2026-10-09",
+148.5800018310547
+],
+[
+"2026-10-23",
+146.5399932861328
+]
+],
+"peaks": [
+[
+"2026-10-16",
+159.10000610351562
+]
+],
+"rsi_lows": [
+29.2,
+35.5
+],
+"rsi_div": 6.3,
+"rsi_now": 54.1,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "WH",
+"name": "Wyndham Hotels & Resorts Inc. Common Stock ",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 77.3499984741211,
+"neck": 78.36000061035156,
+"to_neck_pct": 1.305755857989288,
+"stop": 66.2,
+"stop_pct": 14.413310891964514,
+"height_pct": 16.693966983980534,
+"fall_pct": 32.3415650881641,
+"lows": [
+[
+"2026-09-21",
+67.1500015258789
+],
+[
+"2026-10-23",
+72.41999816894531
+]
+],
+"peaks": [
+[
+"2026-10-21",
+78.36000061035156
+]
+],
+"rsi_lows": [
+34.3,
+46.9
+],
+"rsi_div": 0.0,
+"rsi_now": 56.0,
+"signal_date": "2026-11-02",
+"days_since": 4
+},
+{
+"symbol": "FIS",
+"name": "Fidelity National Information Services Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 28.729999542236328,
+"neck": 38.290000915527344,
+"to_neck_pct": 33.27532727328011,
+"stop": 31.78,
+"stop_pct": -10.612596574048627,
+"height_pct": 18.033300050764645,
+"fall_pct": 103.59632834196715,
+"lows": [
+[
+"2026-10-02",
+32.439998626708984
+],
+[
+"2026-10-27",
+35.61000061035156
+]
+],
+"peaks": [
+[
+"2026-10-22",
+38.290000915527344
+]
+],
+"rsi_lows": [
+23.5,
+47.1
+],
+"rsi_div": 0.0,
+"rsi_now": 30.1,
+"signal_date": "2026-10-30",
+"days_since": 5
+},
+{
+"symbol": "SBAC",
+"name": "SBA Communications Corporation Class A Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 189.4199981689453,
+"neck": 187.05999755859375,
+"to_neck_pct": -1.2459088972467725,
+"stop": 155.78,
+"stop_pct": 17.761320056849506,
+"height_pct": 18.377415834049415,
+"fall_pct": 39.780961740146935,
+"lows": [
+[
+"2026-10-01",
+158.02000427246094
+],
+[
+"2026-10-21",
+173.41000366210938
+]
+],
+"peaks": [
+[
+"2026-10-16",
+187.05999755859375
+]
+],
+"rsi_lows": [
+22.0,
+45.9
+],
+"rsi_div": 0.0,
+"rsi_now": 57.8,
+"signal_date": "2026-10-30",
+"days_since": 5
+},
+{
+"symbol": "SMPL",
+"name": "The Simply Good Foods Company Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 12.050000190734863,
+"neck": 11.1899995803833,
+"to_neck_pct": -7.136934412771289,
+"stop": 9.28,
+"stop_pct": 22.977179642401424,
+"height_pct": 18.663830522269652,
+"fall_pct": 169.77730340151248,
+"lows": [
+[
+"2026-09-24",
+9.430000305175781
+],
+[
+"2026-10-27",
+9.75
+]
+],
+"peaks": [
+[
+"2026-10-16",
+11.1899995803833
+]
+],
+"rsi_lows": [
+34.0,
+39.6
+],
+"rsi_div": 0.0,
+"rsi_now": 58.4,
+"signal_date": "2026-10-30",
+"days_since": 5
+},
+{
+"symbol": "ATMU",
+"name": "Atmus Filtration Technologies Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 50.599998474121094,
+"neck": 46.18000030517578,
+"to_neck_pct": -8.73517451034288,
+"stop": 40.34,
+"stop_pct": 20.271736726172428,
+"height_pct": 8.352889400538487,
+"fall_pct": 50.660341519968036,
+"lows": [
+[
+"2026-09-30",
+43.41999816894531
+],
+[
+"2026-10-08",
+42.619998931884766
+]
+],
+"peaks": [
+[
+"2026-10-05",
+46.18000030517578
+]
+],
+"rsi_lows": [
+32.3,
+34.9
+],
+"rsi_div": 2.6,
+"rsi_now": 69.3,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "BOOT",
+"name": "Boot Barn Holdings Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 130.9600067138672,
+"neck": 121.72000122070312,
+"to_neck_pct": -7.055593325794818,
+"stop": 109.42,
+"stop_pct": 16.444186635860135,
+"height_pct": 8.980211800567117,
+"fall_pct": 84.28140581496955,
+"lows": [
+[
+"2026-10-14",
+112.86000061035156
+],
+[
+"2026-10-27",
+111.69000244140625
+]
+],
+"peaks": [
+[
+"2026-10-16",
+121.72000122070312
+]
+],
+"rsi_lows": [
+27.5,
+35.1
+],
+"rsi_div": 7.6,
+"rsi_now": 53.0,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "CSR",
+"name": "D/B/A Centerspace Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 57.220001220703125,
+"neck": 57.80919647216797,
+"to_neck_pct": 1.0297015709459068,
+"stop": 50.89,
+"stop_pct": 11.054047123091525,
+"height_pct": 11.891581706299426,
+"fall_pct": 29.71823346623088,
+"lows": [
+[
+"2026-09-01",
+51.665367126464844
+],
+[
+"2026-09-23",
+54.31816482543945
+]
+],
+"peaks": [
+[
+"2026-09-14",
+57.80919647216797
+]
+],
+"rsi_lows": [
+35.8,
+47.8
+],
+"rsi_div": 0.0,
+"rsi_now": 51.8,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "EPAC",
+"name": "Enerpac Tool Group Corp. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 38.83000183105469,
+"neck": 37.6781120300293,
+"to_neck_pct": -2.9664943257977305,
+"stop": 32.45,
+"stop_pct": 16.441340010412464,
+"height_pct": 11.663714092877765,
+"fall_pct": 29.2684550935572,
+"lows": [
+[
+"2026-07-09",
+33.74248504638672
+],
+[
+"2026-09-14",
+34.45170211791992
+]
+],
+"peaks": [
+[
+"2026-08-07",
+37.6781120300293
+]
+],
+"rsi_lows": [
+43.5,
+32.9
+],
+"rsi_div": 0.0,
+"rsi_now": 55.6,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "ESAB",
+"name": "ESAB Corporation Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 82.83000183105469,
+"neck": 71.83000183105469,
+"to_neck_pct": -13.280212189825003,
+"stop": 63.08,
+"stop_pct": 23.84063767478387,
+"height_pct": 11.347077123584715,
+"fall_pct": 104.18034143879117,
+"lows": [
+[
+"2026-09-30",
+65.76219940185547
+],
+[
+"2026-10-19",
+64.51000213623047
+]
+],
+"peaks": [
+[
+"2026-10-06",
+71.83000183105469
+]
+],
+"rsi_lows": [
+37.3,
+40.1
+],
+"rsi_div": 2.8,
+"rsi_now": 71.4,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "FWRG",
+"name": "First Watch Restaurant Group Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 12.859999656677246,
+"neck": 12.359999656677246,
+"to_neck_pct": -3.8880249871576567,
+"stop": 10.0,
+"stop_pct": 22.24727337015683,
+"height_pct": 22.31568744773902,
+"fall_pct": 84.66106573699538,
+"lows": [
+[
+"2026-09-17",
+10.104999542236328
+],
+[
+"2026-10-23",
+10.890000343322754
+]
+],
+"peaks": [
+[
+"2026-10-15",
+12.359999656677246
+]
+],
+"rsi_lows": [
+29.5,
+45.1
+],
+"rsi_div": 0.0,
+"rsi_now": 59.7,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "GPI",
+"name": "Group 1 Automotive Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 261.3500061035156,
+"neck": 256.70001220703125,
+"to_neck_pct": -1.7792208868908976,
+"stop": 222.4,
+"stop_pct": 14.90205136271172,
+"height_pct": 14.16500121812434,
+"fall_pct": 86.06861911133483,
+"lows": [
+[
+"2026-09-30",
+240.44000244140625
+],
+[
+"2026-10-14",
+228.3699951171875
+],
+[
+"2026-10-21",
+224.85000610351562
+]
+],
+"peaks": [
+[
+"2026-10-01",
+256.70001220703125
+],
+[
+"2026-10-20",
+243.02000427246094
+]
+],
+"rsi_lows": [
+35.7,
+35.7,
+37.5
+],
+"rsi_div": 0.0,
+"rsi_now": 54.7,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "HHH",
+"name": "Howard Hughes Holdings Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 77.7300033569336,
+"neck": 74.87999725341797,
+"to_neck_pct": -3.666545710063196,
+"stop": 59.49,
+"stop_pct": 23.467004268750593,
+"height_pct": 24.344064655506624,
+"fall_pct": 49.2029170587785,
+"lows": [
+[
+"2026-09-18",
+60.220001220703125
+],
+[
+"2026-10-19",
+66.69999694824219
+]
+],
+"peaks": [
+[
+"2026-09-29",
+74.87999725341797
+]
+],
+"rsi_lows": [
+32.2,
+44.2
+],
+"rsi_div": 0.0,
+"rsi_now": 63.4,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "HLI",
+"name": "Houlihan Lokey Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 145.86000061035156,
+"neck": 137.82000732421875,
+"to_neck_pct": -5.512130297881146,
+"stop": 120.33,
+"stop_pct": 17.501158100471237,
+"height_pct": 12.284319567121859,
+"fall_pct": 67.50486292983643,
+"lows": [
+[
+"2026-08-10",
+122.74198913574219
+],
+[
+"2026-10-14",
+124.77999877929688
+]
+],
+"peaks": [
+[
+"2026-09-14",
+137.82000732421875
+]
+],
+"rsi_lows": [
+34.5,
+40.9
+],
+"rsi_div": 0.0,
+"rsi_now": 62.0,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "IR",
+"name": "Ingersoll Rand Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 82.98999786376953,
+"neck": 79.20999908447266,
+"to_neck_pct": -4.554764280753265,
+"stop": 70.24,
+"stop_pct": 15.36865706013193,
+"height_pct": 10.876254727789526,
+"fall_pct": 38.14035009778098,
+"lows": [
+[
+"2026-09-16",
+71.44000244140625
+],
+[
+"2026-10-23",
+73.4800033569336
+]
+],
+"peaks": [
+[
+"2026-10-06",
+79.20999908447266
+]
+],
+"rsi_lows": [
+27.0,
+37.0
+],
+"rsi_div": 0.0,
+"rsi_now": 62.1,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "PODD",
+"name": "Insulet Corporation Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 146.50999450683594,
+"neck": 151.50999450683594,
+"to_neck_pct": 3.4127364599462195,
+"stop": 125.14,
+"stop_pct": 14.58876103856419,
+"height_pct": 16.12630726548514,
+"fall_pct": 164.76063475007865,
+"lows": [
+[
+"2026-08-05",
+133.25999450683594
+],
+[
+"2026-09-11",
+131.9600067138672
+],
+[
+"2026-09-30",
+130.47000122070312
+]
+],
+"peaks": [
+[
+"2026-08-19",
+151.50999450683594
+],
+[
+"2026-09-17",
+141.5500030517578
+]
+],
+"rsi_lows": [
+30.3,
+32.8,
+32.9
+],
+"rsi_div": 2.5,
+"rsi_now": 49.6,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "QXO",
+"name": "QXO Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 11.5600004196167,
+"neck": 11.180000305175781,
+"to_neck_pct": -3.287198102485167,
+"stop": 9.94,
+"stop_pct": 14.017304485841276,
+"height_pct": 10.2564095329432,
+"fall_pct": 162.05227390855993,
+"lows": [
+[
+"2026-10-14",
+10.329999923706055
+],
+[
+"2026-10-19",
+10.140000343322754
+]
+],
+"peaks": [
+[
+"2026-10-15",
+11.180000305175781
+]
+],
+"rsi_lows": [
+33.0,
+35.7
+],
+"rsi_div": 2.7,
+"rsi_now": 51.3,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "RBA",
+"name": "RB Global Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 93.5199966430664,
+"neck": 88.22000122070312,
+"to_neck_pct": -5.667232263268285,
+"stop": 77.32,
+"stop_pct": 17.323565799002484,
+"height_pct": 10.537531536616118,
+"fall_pct": 47.16741178204338,
+"lows": [
+[
+"2026-10-07",
+80.4000015258789
+],
+[
+"2026-10-19",
+79.80999755859375
+]
+],
+"peaks": [
+[
+"2026-10-13",
+88.22000122070312
+]
+],
+"rsi_lows": [
+35.3,
+37.3
+],
+"rsi_div": 0.0,
+"rsi_now": 66.1,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "VNT",
+"name": "Vontier Corporation Common Stock ",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 42.22999954223633,
+"neck": 35.252845764160156,
+"to_neck_pct": -16.521794586092696,
+"stop": 28.07,
+"stop_pct": 33.51983472638299,
+"height_pct": 23.832927717911435,
+"fall_pct": 52.992415380207845,
+"lows": [
+[
+"2026-07-07",
+28.46807098388672
+],
+[
+"2026-09-24",
+30.90999984741211
+]
+],
+"peaks": [
+[
+"2026-08-06",
+35.252845764160156
+]
+],
+"rsi_lows": [
+41.5,
+39.9
+],
+"rsi_div": 0.0,
+"rsi_now": 87.9,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "WHR",
+"name": "Whirlpool Corporation Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 30.540000915527344,
+"neck": 28.799999237060547,
+"to_neck_pct": -5.69745129765904,
+"stop": 25.47,
+"stop_pct": 16.592341901787666,
+"height_pct": 8.884682065543847,
+"fall_pct": 246.22669336666507,
+"lows": [
+[
+"2026-10-19",
+26.459999084472656
+],
+[
+"2026-10-26",
+26.450000762939453
+]
+],
+"peaks": [
+[
+"2026-10-22",
+28.799999237060547
+]
+],
+"rsi_lows": [
+22.0,
+35.2
+],
+"rsi_div": 13.2,
+"rsi_now": 51.5,
+"signal_date": "2026-10-29",
+"days_since": 6
+},
+{
+"symbol": "GEHC",
+"name": "GE HealthCare Technologies Inc. Common Stock ",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 82.37999725341797,
+"neck": 74.7780990600586,
+"to_neck_pct": -9.227844679302866,
+"stop": 59.56,
+"stop_pct": 27.69528429854572,
+"height_pct": 23.50610737667269,
+"fall_pct": 45.31597255256023,
+"lows": [
+[
+"2026-07-24",
+60.54607391357422
+],
+[
+"2026-09-16",
+63.454444885253906
+]
+],
+"peaks": [
+[
+"2026-08-21",
+74.7780990600586
+]
+],
+"rsi_lows": [
+39.8,
+28.1
+],
+"rsi_div": 0.0,
+"rsi_now": 71.8,
+"signal_date": "2026-10-28",
+"days_since": 7
+},
+{
+"symbol": "MIR",
+"name": "Mirion Technologies Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 17.969999313354492,
+"neck": 16.6200008392334,
+"to_neck_pct": -7.512512663914439,
+"stop": 13.94,
+"stop_pct": 22.430715319449067,
+"height_pct": 17.70538933382808,
+"fall_pct": 110.6940526991516,
+"lows": [
+[
+"2026-09-30",
+14.119999885559082
+],
+[
+"2026-10-23",
+14.8100004196167
+]
+],
+"peaks": [
+[
+"2026-10-09",
+16.6200008392334
+]
+],
+"rsi_lows": [
+35.5,
+42.4
+],
+"rsi_div": 0.0,
+"rsi_now": 59.2,
+"signal_date": "2026-10-28",
+"days_since": 7
+},
+{
+"symbol": "EQT",
+"name": "EQT Corporation Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 49.400001525878906,
+"neck": 55.57529830932617,
+"to_neck_pct": 12.500600390087534,
+"stop": 47.16,
+"stop_pct": 4.526440910366714,
+"height_pct": 14.806425180747219,
+"fall_pct": 38.66759287708563,
+"lows": [
+[
+"2026-07-10",
+48.544654846191406
+],
+[
+"2026-09-30",
+48.40782928466797
+]
+],
+"peaks": [
+[
+"2026-09-02",
+55.57529830932617
+]
+],
+"rsi_lows": [
+30.4,
+29.6
+],
+"rsi_div": 0.0,
+"rsi_now": 34.3,
+"signal_date": "2026-10-27",
+"days_since": 8
+},
+{
+"symbol": "GPOR",
+"name": "Gulfport Energy Corporation Common Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 150.0,
+"neck": 168.1300048828125,
+"to_neck_pct": 12.086669921874993,
+"stop": 148.86,
+"stop_pct": 0.762399597167962,
+"height_pct": 11.729139856722725,
+"fall_pct": 47.853543201853356,
+"lows": [
+[
+"2026-09-30",
+150.47999572753906
+],
+[
+"2026-10-21",
+158.00999450683594
+]
+],
+"peaks": [
+[
+"2026-10-13",
+168.1300048828125
+]
+],
+"rsi_lows": [
+30.0,
+42.5
+],
+"rsi_div": 0.0,
+"rsi_now": 33.4,
+"signal_date": "2026-10-27",
+"days_since": 8
+},
+{
+"symbol": "PSN",
+"name": "Parsons Corporation Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 48.900001525878906,
+"neck": 49.279998779296875,
+"to_neck_pct": 0.7770904735388662,
+"stop": 35.9,
+"stop_pct": 26.590189737887403,
+"height_pct": 22.222220119765602,
+"fall_pct": 121.45337696267218,
+"lows": [
+[
+"2026-07-29",
+40.31999969482422
+],
+[
+"2026-10-02",
+40.790000915527344
+]
+],
+"peaks": [
+[
+"2026-08-27",
+49.279998779296875
+]
+],
+"rsi_lows": [
+28.7,
+30.3
+],
+"rsi_div": 0.0,
+"rsi_now": 53.5,
+"signal_date": "2026-10-26",
+"days_since": 9
+},
+{
+"symbol": "DOLE",
+"name": "Dole plc Ordinary Shares",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 13.880000114440918,
+"neck": 13.96987247467041,
+"to_neck_pct": 0.6474953853637722,
+"stop": 12.46,
+"stop_pct": 10.201008297584869,
+"height_pct": 10.52113999387807,
+"fall_pct": 25.22152725563247,
+"lows": [
+[
+"2026-08-18",
+12.837180137634277
+],
+[
+"2026-10-01",
+12.640000343322754
+]
+],
+"peaks": [
+[
+"2026-09-02",
+13.96987247467041
+]
+],
+"rsi_lows": [
+34.9,
+31.8
+],
+"rsi_div": 0.0,
+"rsi_now": 63.7,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "MIAX",
+"name": "Miami International Holdings Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 34.47999954223633,
+"neck": 34.9900016784668,
+"to_neck_pct": 1.4791245446675205,
+"stop": 28.96,
+"stop_pct": 16.016530207523736,
+"height_pct": 18.409484202570113,
+"fall_pct": 92.35195133711274,
+"lows": [
+[
+"2026-10-13",
+29.549999237060547
+],
+[
+"2026-10-29",
+31.440000534057617
+]
+],
+"peaks": [
+[
+"2026-10-22",
+34.9900016784668
+]
+],
+"rsi_lows": [
+24.5,
+40.0
+],
+"rsi_div": 0.0,
+"rsi_now": 53.1,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "MAIN",
+"name": "Main Street Capital Corporation Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 57.0099983215332,
+"neck": 58.084110260009766,
+"to_neck_pct": 1.8840764253642561,
+"stop": 46.55,
+"stop_pct": 18.34721956909697,
+"height_pct": 21.836930212706495,
+"fall_pct": 28.91477648761207,
+"lows": [
+[
+"2026-05-22",
+47.673648834228516
+],
+[
+"2026-10-19",
+52.90211868286133
+]
+],
+"peaks": [
+[
+"2026-08-13",
+58.084110260009766
+]
+],
+"rsi_lows": [
+35.7,
+37.6
+],
+"rsi_div": 0.0,
+"rsi_now": 63.4,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "DLB",
+"name": "Dolby Laboratories Common Stock",
+"kind": "stock",
+"typ": "IHS",
+"status": "forming",
+"close": 64.83000183105469,
+"neck": 66.12000274658203,
+"to_neck_pct": 1.9898208839929543,
+"stop": 47.5,
+"stop_pct": 26.730790899991085,
+"height_pct": 37.09656165530559,
+"fall_pct": 37.22025660488235,
+"lows": [
+[
+"2026-03-27",
+57.33294677734375
+],
+[
+"2026-07-14",
+48.228782653808594
+],
+[
+"2026-09-21",
+57.33000183105469
+]
+],
+"peaks": [
+[
+"2026-04-22",
+64.15006256103516
+],
+[
+"2026-08-25",
+66.12000274658203
+]
+],
+"rsi_lows": [
+29.8,
+30.1,
+37.1
+],
+"rsi_div": 7.3,
+"rsi_now": 65.8,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "TAC",
+"name": "TransAlta Corporation Ordinary Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 13.010000228881836,
+"neck": 13.34000015258789,
+"to_neck_pct": 2.536509745583748,
+"stop": 11.36,
+"stop_pct": 12.718677443601633,
+"height_pct": 15.698182667262529,
+"fall_pct": 52.01287733307991,
+"lows": [
+[
+"2026-09-25",
+11.529999732971191
+],
+[
+"2026-10-23",
+12.220000267028809
+]
+],
+"peaks": [
+[
+"2026-10-21",
+13.34000015258789
+]
+],
+"rsi_lows": [
+39.0,
+44.3
+],
+"rsi_div": 0.0,
+"rsi_now": 53.1,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "NXST",
+"name": "Nexstar Media Group Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 190.02000427246094,
+"neck": 194.99827575683594,
+"to_neck_pct": 2.6198670521219825,
+"stop": 151.42,
+"stop_pct": 20.314952685464014,
+"height_pct": 27.304469739827585,
+"fall_pct": 62.41039585856753,
+"lows": [
+[
+"2026-06-25",
+153.1747283935547
+],
+[
+"2026-09-18",
+156.52999877929688
+],
+[
+"2026-10-02",
+155.4199981689453
+]
+],
+"peaks": [
+[
+"2026-07-29",
+194.99827575683594
+],
+[
+"2026-09-22",
+167.52999877929688
+]
+],
+"rsi_lows": [
+23.3,
+27.7,
+32.1
+],
+"rsi_div": 4.5,
+"rsi_now": 76.0,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "CAE",
+"name": "CAE Inc. Common Shares",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 26.850000381469727,
+"neck": 27.68000030517578,
+"to_neck_pct": 3.091247344185777,
+"stop": 22.53,
+"stop_pct": 16.080447275734333,
+"height_pct": 19.56803784575225,
+"fall_pct": 47.02072306302403,
+"lows": [
+[
+"2026-05-22",
+23.15999984741211
+],
+[
+"2026-07-22",
+24.280000686645508
+],
+[
+"2026-10-07",
+23.149999618530273
+]
+],
+"peaks": [
+[
+"2026-07-06",
+26.670000076293945
+],
+[
+"2026-08-12",
+27.68000030517578
+]
+],
+"rsi_lows": [
+30.3,
+39.0,
+35.8
+],
+"rsi_div": 5.6,
+"rsi_now": 66.2,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "AMRC",
+"name": "Ameresco Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 21.610000610351562,
+"neck": 22.280000686645508,
+"to_neck_pct": 3.100416739335965,
+"stop": 17.91,
+"stop_pct": 17.12586929551846,
+"height_pct": 21.61572629796533,
+"fall_pct": 126.80130965722279,
+"lows": [
+[
+"2026-10-26",
+18.31999969482422
+],
+[
+"2026-11-05",
+19.149999618530273
+]
+],
+"peaks": [
+[
+"2026-11-03",
+22.280000686645508
+]
+],
+"rsi_lows": [
+34.3,
+42.9
+],
+"rsi_div": 0.0,
+"rsi_now": 53.7,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "PPC",
+"name": "Pilgrim's Pride Corporation Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 28.530000686645508,
+"neck": 29.43000030517578,
+"to_neck_pct": 3.154572719486648,
+"stop": 24.88,
+"stop_pct": 12.798112266417494,
+"height_pct": 16.78571196099805,
+"fall_pct": 73.65078173286857,
+"lows": [
+[
+"2026-10-01",
+25.200000762939453
+],
+[
+"2026-10-28",
+26.3799991607666
+]
+],
+"peaks": [
+[
+"2026-10-16",
+29.43000030517578
+]
+],
+"rsi_lows": [
+25.8,
+34.9
+],
+"rsi_div": 0.0,
+"rsi_now": 51.7,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "KLAR",
+"name": "Klarna Group plc Ordinary Shares",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 13.600000381469727,
+"neck": 14.0600004196167,
+"to_neck_pct": 3.382353126796467,
+"stop": 12.15,
+"stop_pct": 10.645225871444419,
+"height_pct": 13.754051862137896,
+"fall_pct": 241.9093810306303,
+"lows": [
+[
+"2026-09-29",
+12.359999656677246
+],
+[
+"2026-10-26",
+12.619999885559082
+]
+],
+"peaks": [
+[
+"2026-10-09",
+14.0600004196167
+]
+],
+"rsi_lows": [
+23.9,
+37.7
+],
+"rsi_div": 0.0,
+"rsi_now": 52.8,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "BANF",
+"name": "BancFirst Corporation Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 115.19999694824219,
+"neck": 119.45306396484375,
+"to_neck_pct": 3.691898549712991,
+"stop": 103.69,
+"stop_pct": 9.98906195134751,
+"height_pct": 13.462258121087656,
+"fall_pct": 26.147324364473423,
+"lows": [
+[
+"2026-05-15",
+105.81395721435547
+],
+[
+"2026-09-30",
+105.27999877929688
+]
+],
+"peaks": [
+[
+"2026-07-16",
+119.45306396484375
+]
+],
+"rsi_lows": [
+36.2,
+34.7
+],
+"rsi_div": 0.0,
+"rsi_now": 65.2,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "FIGR",
+"name": "Figure Technology Solutions Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 22.725000381469727,
+"neck": 23.59000015258789,
+"to_neck_pct": 3.8063795669877942,
+"stop": 19.34,
+"stop_pct": 14.875244965250168,
+"height_pct": 12.870816187348733,
+"fall_pct": 237.33456949722083,
+"lows": [
+[
+"2026-10-26",
+21.90999984741211
+],
+[
+"2026-10-30",
+21.579999923706055
+],
+[
+"2026-11-05",
+20.899999618530273
+]
+],
+"peaks": [
+[
+"2026-10-29",
+23.59000015258789
+],
+[
+"2026-11-04",
+23.020000457763672
+]
+],
+"rsi_lows": [
+27.4,
+30.8,
+32.5
+],
+"rsi_div": 5.1,
+"rsi_now": 40.9,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "ORLY",
+"name": "O'Reilly Automotive Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 89.88999938964844,
+"neck": 93.52999877929688,
+"to_neck_pct": 4.049393051912298,
+"stop": 81.76,
+"stop_pct": 9.039829870187399,
+"height_pct": 13.05450862339188,
+"fall_pct": 30.32756596133732,
+"lows": [
+[
+"2026-07-15",
+82.7300033569336
+],
+[
+"2026-09-21",
+82.87999725341797
+]
+],
+"peaks": [
+[
+"2026-08-07",
+93.52999877929688
+]
+],
+"rsi_lows": [
+37.8,
+34.8
+],
+"rsi_div": 0.0,
+"rsi_now": 52.8,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "MGEE",
+"name": "MGE Energy Inc",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 80.26000213623047,
+"neck": 83.67923736572266,
+"to_neck_pct": 4.2601982786999,
+"stop": 67.61,
+"stop_pct": 15.764890223129846,
+"height_pct": 22.17731052082288,
+"fall_pct": 26.21137764235919,
+"lows": [
+[
+"2026-03-18",
+71.52342987060547
+],
+[
+"2026-06-01",
+72.15508270263672
+],
+[
+"2026-09-24",
+68.48999786376953
+]
+],
+"peaks": [
+[
+"2026-04-09",
+80.06280517578125
+],
+[
+"2026-07-02",
+83.67923736572266
+]
+],
+"rsi_lows": [
+28.8,
+34.5,
+13.0
+],
+"rsi_div": 0.0,
+"rsi_now": 73.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "JBS",
+"name": "JBS N.V. Class A Common Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 12.479999542236328,
+"neck": 13.029999732971191,
+"to_neck_pct": 4.407052972025238,
+"stop": 10.5,
+"stop_pct": 15.834134251672827,
+"height_pct": 19.98158512794912,
+"fall_pct": 57.030683110963,
+"lows": [
+[
+"2026-10-01",
+10.859999656677246
+],
+[
+"2026-10-28",
+11.859999656677246
+]
+],
+"peaks": [
+[
+"2026-10-16",
+13.029999732971191
+]
+],
+"rsi_lows": [
+21.7,
+39.4
+],
+"rsi_div": 0.0,
+"rsi_now": 50.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "BAM",
+"name": "Brookfield Asset Management Inc Class A Limited Voting Share",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 52.95000076293945,
+"neck": 55.32197570800781,
+"to_neck_pct": 4.479650445498273,
+"stop": 42.75,
+"stop_pct": 19.257487321930945,
+"height_pct": 26.925703561148296,
+"fall_pct": 38.457760249861785,
+"lows": [
+[
+"2026-06-29",
+43.58610916137695
+],
+[
+"2026-07-23",
+45.269737243652344
+],
+[
+"2026-09-28",
+44.5
+]
+],
+"peaks": [
+[
+"2026-07-16",
+49.092559814453125
+],
+[
+"2026-08-13",
+55.32197570800781
+]
+],
+"rsi_lows": [
+35.7,
+44.1,
+29.6
+],
+"rsi_div": 0.0,
+"rsi_now": 68.7,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "MWH",
+"name": "SOLV Energy Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 25.639999389648438,
+"neck": 26.809999465942383,
+"to_neck_pct": 4.563182933484411,
+"stop": 20.1,
+"stop_pct": 21.61856582257313,
+"height_pct": 25.397570244717826,
+"fall_pct": 118.75585731354485,
+"lows": [
+[
+"2026-10-23",
+21.3799991607666
+],
+[
+"2026-11-05",
+23.81999969482422
+]
+],
+"peaks": [
+[
+"2026-11-03",
+26.809999465942383
+]
+],
+"rsi_lows": [
+29.5,
+47.5
+],
+"rsi_div": 0.0,
+"rsi_now": 54.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "AMH",
+"name": "American Homes 4 Rent Common Shares of Beneficial Interest",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 32.81999969482422,
+"neck": 34.44682312011719,
+"to_neck_pct": 4.956805120109498,
+"stop": 26.4,
+"stop_pct": 19.55421895868422,
+"height_pct": 28.409514447163197,
+"fall_pct": 38.17174996597799,
+"lows": [
+[
+"2026-03-20",
+26.825756072998047
+],
+[
+"2026-10-07",
+30.0
+]
+],
+"peaks": [
+[
+"2026-08-24",
+34.44682312011719
+]
+],
+"rsi_lows": [
+25.6,
+31.0
+],
+"rsi_div": 0.0,
+"rsi_now": 62.6,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "ITW",
+"name": "Illinois Tool Works Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 280.95001220703125,
+"neck": 295.4051818847656,
+"to_neck_pct": 5.145103772795845,
+"stop": 236.65,
+"stop_pct": 15.766832870628345,
+"height_pct": 21.68769596621751,
+"fall_pct": 21.116785007219985,
+"lows": [
+[
+"2026-06-01",
+242.75682067871094
+],
+[
+"2026-09-30",
+257.2799987792969
+]
+],
+"peaks": [
+[
+"2026-08-05",
+295.4051818847656
+]
+],
+"rsi_lows": [
+35.9,
+32.2
+],
+"rsi_div": 0.0,
+"rsi_now": 54.0,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "MKL",
+"name": "Markel Group Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 1939.0400390625,
+"neck": 2039.3499755859375,
+"to_neck_pct": 5.173175102249883,
+"stop": 1695.33,
+"stop_pct": 12.568826970699199,
+"height_pct": 19.089610425715286,
+"fall_pct": 25.15344607106198,
+"lows": [
+[
+"2026-05-04",
+1751.3699951171875
+],
+[
+"2026-09-30",
+1712.449951171875
+]
+],
+"peaks": [
+[
+"2026-07-28",
+2039.3499755859375
+]
+],
+"rsi_lows": [
+27.0,
+28.1
+],
+"rsi_div": 0.0,
+"rsi_now": 67.4,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "IMCR",
+"name": "Immunocore Holdings plc American Depositary Shares",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 30.989999771118164,
+"neck": 32.61000061035156,
+"to_neck_pct": 5.227495486280054,
+"stop": 27.37,
+"stop_pct": 11.685864293897874,
+"height_pct": 17.217832379841823,
+"fall_pct": 44.55427963239591,
+"lows": [
+[
+"2026-10-13",
+27.81999969482422
+],
+[
+"2026-11-05",
+28.399999618530273
+]
+],
+"peaks": [
+[
+"2026-10-28",
+32.61000061035156
+]
+],
+"rsi_lows": [
+22.3,
+37.0
+],
+"rsi_div": 0.0,
+"rsi_now": 51.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "EYE",
+"name": "National Vision Holdings Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 17.899999618530273,
+"neck": 18.8700008392334,
+"to_neck_pct": 5.419001348463537,
+"stop": 14.77,
+"stop_pct": 17.481562065285672,
+"height_pct": 22.056926213922235,
+"fall_pct": 85.86749763687331,
+"lows": [
+[
+"2026-09-15",
+15.850000381469727
+],
+[
+"2026-10-28",
+15.460000038146973
+]
+],
+"peaks": [
+[
+"2026-10-22",
+18.8700008392334
+]
+],
+"rsi_lows": [
+29.4,
+35.0
+],
+"rsi_div": 5.6,
+"rsi_now": 55.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "KT",
+"name": "KT Corporation Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 18.940000534057617,
+"neck": 19.969999313354492,
+"to_neck_pct": 5.438219378319165,
+"stop": 16.42,
+"stop_pct": 13.283528574730264,
+"height_pct": 19.01071809399728,
+"fall_pct": 42.1784506958673,
+"lows": [
+[
+"2026-07-01",
+17.260000228881836
+],
+[
+"2026-07-14",
+17.34000015258789
+],
+[
+"2026-10-28",
+16.780000686645508
+]
+],
+"peaks": [
+[
+"2026-07-09",
+18.68000030517578
+],
+[
+"2026-09-14",
+19.969999313354492
+]
+],
+"rsi_lows": [
+29.3,
+38.8,
+22.8
+],
+"rsi_div": 0.0,
+"rsi_now": 61.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "SHAK",
+"name": "Shake Shack Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 71.88999938964844,
+"neck": 75.81999969482422,
+"to_neck_pct": 5.466685684437023,
+"stop": 53.05,
+"stop_pct": 26.20100069342697,
+"height_pct": 40.01846271156424,
+"fall_pct": 162.28992571942794,
+"lows": [
+[
+"2026-06-23",
+54.150001525878906
+],
+[
+"2026-07-22",
+55.939998626708984
+],
+[
+"2026-09-18",
+54.880001068115234
+]
+],
+"peaks": [
+[
+"2026-07-13",
+62.18000030517578
+],
+[
+"2026-08-21",
+75.81999969482422
+]
+],
+"rsi_lows": [
+34.1,
+43.3,
+26.4
+],
+"rsi_div": 0.0,
+"rsi_now": 58.3,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "OLED",
+"name": "Universal Display Corporation Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 88.30999755859375,
+"neck": 93.43633270263672,
+"to_neck_pct": 5.804931814930292,
+"stop": 70.99,
+"stop_pct": 19.60944280796284,
+"height_pct": 28.170549721411973,
+"fall_pct": 92.89956999751925,
+"lows": [
+[
+"2026-07-13",
+77.43968200683594
+],
+[
+"2026-09-24",
+73.44000244140625
+],
+[
+"2026-10-08",
+72.9000015258789
+]
+],
+"peaks": [
+[
+"2026-08-11",
+93.43633270263672
+],
+[
+"2026-10-02",
+80.37000274658203
+]
+],
+"rsi_lows": [
+35.6,
+33.7,
+37.2
+],
+"rsi_div": 3.5,
+"rsi_now": 58.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "WTW",
+"name": "Willis Towers Watson Public Limited Company Ordinary Shares",
+"kind": "stock",
+"typ": "IHS",
+"status": "forming",
+"close": 328.8599853515625,
+"neck": 349.5831298828125,
+"to_neck_pct": 6.301509899143332,
+"stop": 236.57,
+"stop_pct": 28.06358413403561,
+"height_pct": 45.393487974436454,
+"fall_pct": 24.1552679118745,
+"lows": [
+[
+"2026-04-10",
+278.1954345703125
+],
+[
+"2026-05-13",
+240.4393310546875
+],
+[
+"2026-09-29",
+287.6099853515625
+]
+],
+"peaks": [
+[
+"2026-04-21",
+295.7725524902344
+],
+[
+"2026-08-24",
+349.5831298828125
+]
+],
+"rsi_lows": [
+39.6,
+26.3,
+26.5
+],
+"rsi_div": 0.0,
+"rsi_now": 59.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "GDS",
+"name": "GDS Holdings Limited ADS",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 22.350000381469727,
+"neck": 23.860000610351562,
+"to_neck_pct": 6.756153034045442,
+"stop": 21.45,
+"stop_pct": 4.012081837287895,
+"height_pct": 9.600367977220458,
+"fall_pct": 114.63415432604603,
+"lows": [
+[
+"2026-10-22",
+22.139999389648438
+],
+[
+"2026-11-02",
+21.770000457763672
+]
+],
+"peaks": [
+[
+"2026-10-28",
+23.860000610351562
+]
+],
+"rsi_lows": [
+28.0,
+31.4
+],
+"rsi_div": 3.4,
+"rsi_now": 38.1,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "WFC",
+"name": "Wells Fargo & Company Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 83.94000244140625,
+"neck": 89.75762939453125,
+"to_neck_pct": 6.930696668952274,
+"stop": 71.22,
+"stop_pct": 15.155488709380405,
+"height_pct": 23.683427854736493,
+"fall_pct": 29.901003526614666,
+"lows": [
+[
+"2026-05-15",
+72.5704574584961
+],
+[
+"2026-09-30",
+79.57801055908203
+]
+],
+"peaks": [
+[
+"2026-09-11",
+89.75762939453125
+]
+],
+"rsi_lows": [
+34.1,
+31.7
+],
+"rsi_div": 0.0,
+"rsi_now": 52.0,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "TIMB",
+"name": "TIM S.A. American Depositary Shares (Each representing 5 Com",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 18.1299991607666,
+"neck": 19.459999084472656,
+"to_neck_pct": 7.335907254668728,
+"stop": 15.78,
+"stop_pct": 12.958630363708146,
+"height_pct": 15.902311038447326,
+"fall_pct": 58.95987445144606,
+"lows": [
+[
+"2026-10-01",
+17.459999084472656
+],
+[
+"2026-10-09",
+17.979999542236328
+],
+[
+"2026-10-26",
+16.790000915527344
+]
+],
+"peaks": [
+[
+"2026-10-05",
+19.299999237060547
+],
+[
+"2026-10-22",
+19.459999084472656
+]
+],
+"rsi_lows": [
+33.2,
+44.0,
+33.7
+],
+"rsi_div": 0.0,
+"rsi_now": 48.6,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "WSO",
+"name": "Watsco Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 304.3399963378906,
+"neck": 327.0400085449219,
+"to_neck_pct": 7.458767326075932,
+"stop": 271.54,
+"stop_pct": 10.776986380419695,
+"height_pct": 18.143484988212055,
+"fall_pct": 61.831621687619645,
+"lows": [
+[
+"2026-10-09",
+276.8159484863281
+],
+[
+"2026-10-28",
+290.8299865722656
+]
+],
+"peaks": [
+[
+"2026-10-22",
+327.0400085449219
+]
+],
+"rsi_lows": [
+27.3,
+43.5
+],
+"rsi_div": 0.0,
+"rsi_now": 49.6,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "CRUS",
+"name": "Cirrus Logic Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 113.58000183105469,
+"neck": 122.20999908447266,
+"to_neck_pct": 7.598166150987318,
+"stop": 104.71,
+"stop_pct": 7.80745290672672,
+"height_pct": 14.93463460919462,
+"fall_pct": 64.91518101068516,
+"lows": [
+[
+"2026-08-28",
+108.4800033569336
+],
+[
+"2026-10-12",
+106.33000183105469
+]
+],
+"peaks": [
+[
+"2026-09-15",
+122.20999908447266
+]
+],
+"rsi_lows": [
+21.3,
+29.3
+],
+"rsi_div": 8.0,
+"rsi_now": 51.0,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "BSX",
+"name": "Boston Scientific Corporation Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 42.75,
+"neck": 46.0099983215332,
+"to_neck_pct": 7.625727067913934,
+"stop": 41.09,
+"stop_pct": 3.894736842105262,
+"height_pct": 10.654151744577135,
+"fall_pct": 152.47714943227254,
+"lows": [
+[
+"2026-10-07",
+41.58000183105469
+],
+[
+"2026-10-30",
+41.97999954223633
+]
+],
+"peaks": [
+[
+"2026-10-22",
+46.0099983215332
+]
+],
+"rsi_lows": [
+31.8,
+38.8
+],
+"rsi_div": 0.0,
+"rsi_now": 44.9,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "CTRI",
+"name": "Centuri Holdings Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 20.3700008392334,
+"neck": 21.979999542236328,
+"to_neck_pct": 7.903773375904888,
+"stop": 18.32,
+"stop_pct": 10.06407258524008,
+"height_pct": 17.855227838168062,
+"fall_pct": 119.1924483795638,
+"lows": [
+[
+"2026-09-15",
+19.06999969482422
+],
+[
+"2026-10-22",
+19.31999969482422
+],
+[
+"2026-11-05",
+18.649999618530273
+]
+],
+"peaks": [
+[
+"2026-10-06",
+21.200000762939453
+],
+[
+"2026-11-03",
+21.979999542236328
+]
+],
+"rsi_lows": [
+27.0,
+38.6,
+37.0
+],
+"rsi_div": 10.1,
+"rsi_now": 49.1,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "CAG",
+"name": "ConAgra Brands Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 15.239999771118164,
+"neck": 16.47895622253418,
+"to_neck_pct": 8.129635630073984,
+"stop": 12.4,
+"stop_pct": 18.60436454485318,
+"height_pct": 31.2090195770528,
+"fall_pct": 54.77510817123152,
+"lows": [
+[
+"2026-06-22",
+12.559316635131836
+],
+[
+"2026-07-09",
+13.067553520202637
+],
+[
+"2026-10-05",
+13.038837432861328
+]
+],
+"peaks": [
+[
+"2026-07-02",
+14.015610694885254
+],
+[
+"2026-08-24",
+16.47895622253418
+]
+],
+"rsi_lows": [
+38.9,
+46.1,
+24.1
+],
+"rsi_div": 0.0,
+"rsi_now": 59.7,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "SGI",
+"name": "Somnigroup International Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 64.16999816894531,
+"neck": 69.87000274658203,
+"to_neck_pct": 8.882662833540799,
+"stop": 60.01,
+"stop_pct": 6.476857324254626,
+"height_pct": 13.131484205726096,
+"fall_pct": 55.71621216432969,
+"lows": [
+[
+"2026-08-27",
+62.47999954223633
+],
+[
+"2026-10-07",
+61.7599983215332
+]
+],
+"peaks": [
+[
+"2026-09-04",
+69.87000274658203
+]
+],
+"rsi_lows": [
+37.4,
+41.3
+],
+"rsi_div": 3.9,
+"rsi_now": 49.2,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "DPZ",
+"name": "Domino's Pizza Inc Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 334.2799987792969,
+"neck": 365.37042236328125,
+"to_neck_pct": 9.300713084096701,
+"stop": 277.46,
+"stop_pct": 16.996508663535735,
+"height_pct": 29.890822976386634,
+"fall_pct": 68.30235109452592,
+"lows": [
+[
+"2026-06-23",
+281.2904052734375
+],
+[
+"2026-09-25",
+292.1400146484375
+]
+],
+"peaks": [
+[
+"2026-08-04",
+365.37042236328125
+]
+],
+"rsi_lows": [
+29.3,
+32.2
+],
+"rsi_div": 0.0,
+"rsi_now": 63.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "CMCSA",
+"name": "Comcast Corporation Class A Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 24.389999389648438,
+"neck": 26.783674240112305,
+"to_neck_pct": 9.814165274148333,
+"stop": 20.28,
+"stop_pct": 16.87084848628929,
+"height_pct": 29.640244133241133,
+"fall_pct": 46.14232877220841,
+"lows": [
+[
+"2026-06-22",
+21.682933807373047
+],
+[
+"2026-07-23",
+21.584489822387695
+],
+[
+"2026-10-09",
+20.65999984741211
+]
+],
+"peaks": [
+[
+"2026-06-30",
+23.849285125732422
+],
+[
+"2026-08-26",
+26.783674240112305
+]
+],
+"rsi_lows": [
+26.7,
+34.7,
+26.2
+],
+"rsi_div": 7.9,
+"rsi_now": 63.5,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "FMS",
+"name": "Fresenius Medical Care AG American Depositary Shares (Each r",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 23.399999618530273,
+"neck": 25.700000762939453,
+"to_neck_pct": 9.829064879932004,
+"stop": 19.05,
+"stop_pct": 18.582591655390036,
+"height_pct": 32.42285874789057,
+"fall_pct": 46.06240527765091,
+"lows": [
+[
+"2026-05-05",
+19.40752601623535
+],
+[
+"2026-10-07",
+20.690000534057617
+]
+],
+"peaks": [
+[
+"2026-07-30",
+25.700000762939453
+]
+],
+"rsi_lows": [
+26.1,
+28.8
+],
+"rsi_div": 0.0,
+"rsi_now": 58.2,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "TLK",
+"name": "PT Telekomunikasi Indonesia Tbk",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 11.119999885559082,
+"neck": 12.25,
+"to_neck_pct": 10.16187163732245,
+"stop": 10.05,
+"stop_pct": 9.635793833106144,
+"height_pct": 17.788465858916712,
+"fall_pct": 106.93853290573436,
+"lows": [
+[
+"2026-10-19",
+10.449999809265137
+],
+[
+"2026-11-03",
+10.399999618530273
+]
+],
+"peaks": [
+[
+"2026-10-26",
+12.25
+]
+],
+"rsi_lows": [
+15.6,
+28.5
+],
+"rsi_div": 12.9,
+"rsi_now": 40.0,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "MZTI",
+"name": "The Marzetti Company Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 104.93000030517578,
+"neck": 116.30584716796875,
+"to_neck_pct": 10.841367416094293,
+"stop": 96.82,
+"stop_pct": 7.727053521733018,
+"height_pct": 17.255614785041672,
+"fall_pct": 75.87967478646249,
+"lows": [
+[
+"2026-06-22",
+103.72635650634766
+],
+[
+"2026-07-15",
+104.46923828125
+],
+[
+"2026-09-30",
+99.19000244140625
+]
+],
+"peaks": [
+[
+"2026-07-01",
+115.04790496826172
+],
+[
+"2026-08-13",
+116.30584716796875
+]
+],
+"rsi_lows": [
+34.4,
+37.6,
+36.9
+],
+"rsi_div": 2.4,
+"rsi_now": 46.1,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "UDR",
+"name": "UDR Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 36.58000183105469,
+"neck": 40.59519958496094,
+"to_neck_pct": 10.976483195518982,
+"stop": 32.26,
+"stop_pct": 11.806077742539856,
+"height_pct": 24.351433359356278,
+"fall_pct": 29.15960150192227,
+"lows": [
+[
+"2026-03-27",
+32.64554214477539
+],
+[
+"2026-10-02",
+33.129188537597656
+]
+],
+"peaks": [
+[
+"2026-07-07",
+40.59519958496094
+]
+],
+"rsi_lows": [
+25.7,
+26.4
+],
+"rsi_div": 0.0,
+"rsi_now": 62.0,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "FTAI",
+"name": "FTAI Aviation Ltd. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 180.27000427246094,
+"neck": 200.74000549316406,
+"to_neck_pct": 11.355189846095893,
+"stop": 145.02,
+"stop_pct": 19.556669255364856,
+"height_pct": 30.03822753299663,
+"fall_pct": 99.72082059214027,
+"lows": [
+[
+"2026-10-23",
+154.3699951171875
+],
+[
+"2026-11-05",
+162.4499969482422
+]
+],
+"peaks": [
+[
+"2026-11-03",
+200.74000549316406
+]
+],
+"rsi_lows": [
+35.6,
+44.0
+],
+"rsi_div": 0.0,
+"rsi_now": 52.1,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "INVH",
+"name": "Invitation Homes Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 27.100000381469727,
+"neck": 30.24922752380371,
+"to_neck_pct": 11.620764199277822,
+"stop": 23.22,
+"stop_pct": 14.330154191370337,
+"height_pct": 28.248458686988933,
+"fall_pct": 41.15176353379568,
+"lows": [
+[
+"2026-03-20",
+23.58642578125
+],
+[
+"2026-10-07",
+25.860000610351562
+]
+],
+"peaks": [
+[
+"2026-06-29",
+30.24922752380371
+]
+],
+"rsi_lows": [
+32.5,
+27.3
+],
+"rsi_div": 0.0,
+"rsi_now": 51.0,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "NOC",
+"name": "Northrop Grumman Corporation Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 525.010009765625,
+"neck": 586.4727783203125,
+"to_neck_pct": 11.706970802733018,
+"stop": 468.24,
+"stop_pct": 10.813071655999861,
+"height_pct": 23.869553690886057,
+"fall_pct": 54.158026110882474,
+"lows": [
+[
+"2026-06-29",
+493.7743225097656
+],
+[
+"2026-07-21",
+509.97064208984375
+],
+[
+"2026-10-07",
+473.4599914550781
+]
+],
+"peaks": [
+[
+"2026-07-07",
+546.5542602539062
+],
+[
+"2026-08-18",
+586.4727783203125
+]
+],
+"rsi_lows": [
+29.5,
+40.3,
+27.5
+],
+"rsi_div": 0.0,
+"rsi_now": 47.6,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "BURL",
+"name": "Burlington Stores Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 246.75999450683594,
+"neck": 276.9700012207031,
+"to_neck_pct": 12.242667930935735,
+"stop": 224.58,
+"stop_pct": 8.987878488439938,
+"height_pct": 21.862901578795913,
+"fall_pct": 63.7583616862063,
+"lows": [
+[
+"2026-09-15",
+227.27999877929688
+],
+[
+"2026-10-28",
+234.02000427246094
+]
+],
+"peaks": [
+[
+"2026-10-09",
+276.9700012207031
+]
+],
+"rsi_lows": [
+16.7,
+29.7
+],
+"rsi_div": 0.0,
+"rsi_now": 45.3,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "AMP",
+"name": "Ameriprise Financial Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 501.489990234375,
+"neck": 570.6799926757812,
+"to_neck_pct": 13.796886037360355,
+"stop": 431.52,
+"stop_pct": 13.952533099909747,
+"height_pct": 30.149575629818127,
+"fall_pct": 23.204155645736723,
+"lows": [
+[
+"2026-05-28",
+438.4801025390625
+],
+[
+"2026-10-19",
+480.4100036621094
+]
+],
+"peaks": [
+[
+"2026-08-13",
+570.6799926757812
+]
+],
+"rsi_lows": [
+35.5,
+33.0
+],
+"rsi_div": 0.0,
+"rsi_now": 49.1,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "JD",
+"name": "JD.com Inc. American Depositary Shares",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 29.110000610351562,
+"neck": 33.470001220703125,
+"to_neck_pct": 14.977672686139144,
+"stop": 24.51,
+"stop_pct": 15.793886249949551,
+"height_pct": 32.870188610955786,
+"fall_pct": 38.64590364898728,
+"lows": [
+[
+"2026-06-25",
+25.190000534057617
+],
+[
+"2026-10-02",
+25.780000686645508
+],
+[
+"2026-10-26",
+25.239999771118164
+]
+],
+"peaks": [
+[
+"2026-08-10",
+33.470001220703125
+],
+[
+"2026-10-15",
+27.389999389648438
+]
+],
+"rsi_lows": [
+24.5,
+30.4,
+32.2
+],
+"rsi_div": 0.0,
+"rsi_now": 72.0,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "CSGP",
+"name": "CoStar Group Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 30.549999237060547,
+"neck": 35.45000076293945,
+"to_neck_pct": 16.03928526431733,
+"stop": 26.25,
+"stop_pct": 14.059570838430524,
+"height_pct": 31.539887789869205,
+"fall_pct": 214.656774215648,
+"lows": [
+[
+"2026-09-29",
+26.950000762939453
+],
+[
+"2026-10-28",
+27.540000915527344
+]
+],
+"peaks": [
+[
+"2026-10-22",
+35.45000076293945
+]
+],
+"rsi_lows": [
+31.7,
+38.3
+],
+"rsi_div": 0.0,
+"rsi_now": 48.7,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "MAA",
+"name": "Mid-America Apartment Communities Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 118.93000030517578,
+"neck": 138.70254516601562,
+"to_neck_pct": 16.625363499624356,
+"stop": 111.55,
+"stop_pct": 6.2035376773810995,
+"height_pct": 23.073825665102277,
+"fall_pct": 31.20989682710176,
+"lows": [
+[
+"2025-10-29",
+120.32467651367188
+],
+[
+"2026-03-27",
+116.18849182128906
+],
+[
+"2026-10-07",
+112.69865417480469
+]
+],
+"peaks": [
+[
+"2025-12-30",
+133.31190490722656
+],
+[
+"2026-07-02",
+138.70254516601562
+]
+],
+"rsi_lows": [
+22.7,
+26.6,
+25.3
+],
+"rsi_div": 3.9,
+"rsi_now": 51.0,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "CPT",
+"name": "Camden Property Trust Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 99.44000244140625,
+"neck": 116.31416320800781,
+"to_neck_pct": 16.96918780401724,
+"stop": 92.66,
+"stop_pct": 6.8155867105141095,
+"height_pct": 23.718057282593463,
+"fall_pct": 23.00700141144858,
+"lows": [
+[
+"2026-03-27",
+94.01551055908203
+],
+[
+"2026-10-07",
+95.80000305175781
+]
+],
+"peaks": [
+[
+"2026-07-07",
+116.31416320800781
+]
+],
+"rsi_lows": [
+28.0,
+31.3
+],
+"rsi_div": 0.0,
+"rsi_now": 46.8,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "CNS",
+"name": "Cohen & Steers Inc Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 73.19999694824219,
+"neck": 85.6500015258789,
+"to_neck_pct": 17.008203683997138,
+"stop": 59.03,
+"stop_pct": 19.353445511910106,
+"height_pct": 43.25897565323373,
+"fall_pct": 33.498754112150905,
+"lows": [
+[
+"2026-03-27",
+59.78683090209961
+],
+[
+"2026-10-14",
+66.38999938964844
+]
+],
+"peaks": [
+[
+"2026-08-13",
+85.6500015258789
+]
+],
+"rsi_lows": [
+35.7,
+19.0
+],
+"rsi_div": 0.0,
+"rsi_now": 52.1,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "NMIH",
+"name": "NMI Holdings Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 39.029998779296875,
+"neck": 45.709999084472656,
+"to_neck_pct": 17.11504103023218,
+"stop": 34.77,
+"stop_pct": 10.91775549578361,
+"height_pct": 29.051387485810665,
+"fall_pct": 21.823838951270535,
+"lows": [
+[
+"2026-06-03",
+35.41999816894531
+],
+[
+"2026-09-30",
+37.31999969482422
+]
+],
+"peaks": [
+[
+"2026-08-14",
+45.709999084472656
+]
+],
+"rsi_lows": [
+33.2,
+11.9
+],
+"rsi_div": 0.0,
+"rsi_now": 37.3,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "UBER",
+"name": "Uber Technologies Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 68.58999633789062,
+"neck": 80.3499984741211,
+"to_neck_pct": 17.14536049586284,
+"stop": 64.03,
+"stop_pct": 6.650741449493836,
+"height_pct": 23.141760113595545,
+"fall_pct": 51.804662978393324,
+"lows": [
+[
+"2026-07-24",
+65.94000244140625
+],
+[
+"2026-10-30",
+65.25
+]
+],
+"peaks": [
+[
+"2026-08-25",
+80.3499984741211
+]
+],
+"rsi_lows": [
+33.2,
+35.8
+],
+"rsi_div": 2.6,
+"rsi_now": 50.3,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "EXE",
+"name": "Expand Energy Corporation Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 84.5999984741211,
+"neck": 99.9800033569336,
+"to_neck_pct": 18.17967513027461,
+"stop": 82.53,
+"stop_pct": 2.4510613561149697,
+"height_pct": 18.896429671840753,
+"fall_pct": 39.7215483896709,
+"lows": [
+[
+"2026-07-20",
+86.43071746826172
+],
+[
+"2026-09-30",
+84.08999633789062
+]
+],
+"peaks": [
+[
+"2026-09-01",
+99.9800033569336
+]
+],
+"rsi_lows": [
+40.6,
+27.1
+],
+"rsi_div": 0.0,
+"rsi_now": 31.3,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "CRK",
+"name": "Comstock Resources Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 13.40999984741211,
+"neck": 16.020000457763672,
+"to_neck_pct": 19.46309202125194,
+"stop": 12.1,
+"stop_pct": 9.785231901451663,
+"height_pct": 30.03247446908517,
+"fall_pct": 121.08239568840608,
+"lows": [
+[
+"2026-07-28",
+12.380000114440918
+],
+[
+"2026-09-18",
+12.84000015258789
+],
+[
+"2026-09-30",
+12.319999694824219
+]
+],
+"peaks": [
+[
+"2026-09-01",
+16.020000457763672
+],
+[
+"2026-09-24",
+13.819999694824219
+]
+],
+"rsi_lows": [
+37.7,
+36.2,
+35.3
+],
+"rsi_div": 0.0,
+"rsi_now": 43.1,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "SF",
+"name": "Stifel Financial Corporation Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 71.3499984741211,
+"neck": 85.31937408447266,
+"to_neck_pct": 19.578662801819547,
+"stop": 65.32,
+"stop_pct": 8.45100950204487,
+"height_pct": 29.15437062920909,
+"fall_pct": 29.416094541818506,
+"lows": [
+[
+"2026-06-29",
+67.69387817382812
+],
+[
+"2026-10-19",
+66.05999755859375
+]
+],
+"peaks": [
+[
+"2026-08-13",
+85.31937408447266
+]
+],
+"rsi_lows": [
+31.9,
+23.3
+],
+"rsi_div": 0.0,
+"rsi_now": 55.5,
+"signal_date": null,
+"days_since": null
+}
+]
+}
