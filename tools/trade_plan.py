@@ -146,6 +146,47 @@ def main(mk="NSE"):
     # Weak +0.14R, Fading +0.09R, Weak bouncing +0.08R; random uptrend stock +0.09R. US/ASX retests were worse than random.
     # Bottom patterns lagged the average stock in EVERY lane (Building -2.4 pts over 120 days) -> watch list only.
     pat_watch = []
+    if not india:
+        # US / ASX (8 Nov 2026, Amritpal: "include all strategies"): breakout retests and bottom-pattern breakouts as EXPERIMENTAL
+        # swing rows. Backtest 2008-26 there: both did worse than a random stock the same day (patterns +2.5% vs +5.0% over 120 days;
+        # retests +0.19R vs +0.25R), so they rank after 9/21 and the paper record tracks them.
+        sup, pat = load(D + "support.json"), load(D + "patterns.json")
+        def lane_of(sym):
+            g = GS.get(sym); x = LN.get(g[0]) if g else None
+            return (g[0] if g else None, x[0] if x else None, x[1] if x else None, x[2] if x else None)
+        for r in sup.get("rows") or []:
+            if r.get("status") != "touched" or r.get("level_kind") != "breakout retest" or (r.get("days_ago") or 0) > 1 or r["symbol"] in best:
+                continue
+            close, stop = num(r.get("close")), num(r.get("stop"))
+            g, ln, gp, gr = lane_of(r["symbol"])
+            if not close or not stop or close <= stop or close < MINPX[mk] or ln in ("weak", "fade", "bounce"):
+                continue
+            E = round(close * 1.01, 2); tgt = round(E + 3 * (E - stop), 2)
+            best[r["symbol"]] = dict(id=f"RET-{r['symbol']}-{r.get('touch_date')}", symbol=r["symbol"], name=r.get("name", ""), system="Breakout retest",
+                                     kind="RETEST", order="LIMIT", when="next open", side="BUY", price=E, ref=close, stop=round(stop, 2), target=tgt,
+                                     exit_rule=f"3R target {tgt:.2f} or the stop, max 120 days", experimental=True,
+                                     note=f"retest of the old breakout level {r.get('level'):.2f} on {r.get('touch_date')} · experimental: worse than random in the {mk} backtest",
+                                     score=1, value_cr=None, sector=None, sector_rs=None, theme=None, theme_rs=None, stock_rs=None, aligned=False, td_score=None,
+                                     group=g, lane=ln, group_pulse=gp, group_rank=gr)
+        PN = {"DB": "double bottom", "TW": "tilted W", "TB": "triple bottom", "IHS": "inverse H&S"}
+        for r in pat.get("rows") or []:
+            if r.get("kind") != "stock" or r.get("status") != "breakout" or (r.get("days_since") or 0) > 3 or r["symbol"] in best:
+                continue
+            close, stop, neck = num(r.get("close")), num(r.get("stop")), num(r.get("neck"))
+            if not close or not stop or not neck or close <= stop or close < MINPX[mk]:
+                continue
+            E = round(close * 1.01, 2); tgt = round(neck * (1 + (r.get("height_pct") or 0) / 100), 2)
+            if (E - stop) / E > 0.20 or (tgt - E) < (E - stop):          # skip stops > 20% away and targets under 1R
+                continue
+            g, ln, gp, gr = lane_of(r["symbol"])
+            if ln in ("weak", "fade", "bounce"):
+                continue
+            best[r["symbol"]] = dict(id=f"PAT-{r['symbol']}-{r.get('signal_date')}", symbol=r["symbol"], name=r.get("name", ""), system="Bottom pattern",
+                                     kind="PATTERN", order="LIMIT", when="next open", side="BUY", price=E, ref=close, stop=round(stop, 2), target=tgt,
+                                     exit_rule=f"measured-move target {tgt:.2f} or the stop, max 120 days", experimental=True,
+                                     note=f"{PN.get(r.get('typ'), r.get('typ'))} broke the neckline {neck:.2f} on {r.get('signal_date')} · experimental: worse than random in the {mk} backtest",
+                                     score=0, value_cr=None, sector=None, sector_rs=None, theme=None, theme_rs=None, stock_rs=None, aligned=False, td_score=None,
+                                     group=g, lane=ln, group_pulse=gp, group_rank=gr)
     if india:
         sup, pat = load(D + "support.json"), load(D + "patterns.json")
         for r in sup.get("rows") or []:
@@ -175,8 +216,11 @@ def main(mk="NSE"):
                                   group_rank=x[2] if x else None))
         pat_watch.sort(key=lambda w: (LANE_ORD[w["lane"]], w.get("signal_date") or ""))
     trades = [c for c in C if c["kind"] not in ("WATCH", "T921")]
-    swing = sorted([c for c in best.values() if c["kind"] in ("T921", "RETEST")],
-                   key=lambda c: (LANE_ORD[c["lane"]], c["kind"] != "T921", -(c["value_cr"] or 0)))
+    KORD = {"T921": 0, "RETEST": 1, "PATTERN": 2}
+    swing = sorted([c for c in best.values() if c["kind"] in KORD],
+                   key=lambda c: ((LANE_ORD[c["lane"]], KORD[c["kind"]]) if india else (KORD[c["kind"]], LANE_ORD[c["lane"]]), -(c["value_cr"] or 0)))
+    swing = swing[:15] if india else ([c for c in swing if c["kind"] == "T921"] + [c for c in swing if c["kind"] == "RETEST"][:8]
+                                      + [c for c in swing if c["kind"] == "PATTERN"][:6])
     for L in (trades, swing):
         for i, c in enumerate(L):
             c["rank"] = i + 1
@@ -194,7 +238,7 @@ def main(mk="NSE"):
                asof=max(str(ath.get("asof") or ""), str(tr.get("asof") or "")),
                rules=dict(risk_pct=1.0, max_pos_pct=20.0, max_positions=10, max_late_pct=MAX_LATE * 100, max_below_pct=MAX_BELOW * 100, top=TOP,
                           limit_buffer_pct=1.0),
-               top=trades[:TOP], more=trades[TOP:30], swing=swing[:15], pattern_watch=pat_watch[:20], watch=[c for c in C if c["kind"] == "WATCH"], exits=exits)
+               top=trades[:TOP], more=trades[TOP:30], swing=swing, pattern_watch=pat_watch[:20], watch=[c for c in C if c["kind"] == "WATCH"], exits=exits)
     json.dump(out, open(OUT, "w"), indent=0, default=str)
     print("trade plan:", len(trades), "ATH +", len(swing), "swing, top", [(c["symbol"], c["kind"], c["score"]) for c in trades[:TOP]], "exits", len(exits))
 

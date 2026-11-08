@@ -128,8 +128,8 @@ async function lvPdf(mk, P, picked, exits, info) {
   doc.setTextColor(0);
   const body = picked.map((r) => {
     const order = r.kind === 'ATH_STOP' ? `Stop-limit buy: trigger ${p(r.trigger)}, limit ${p(r.price)} (day)` : `Limit buy ${p(r.price)} (day, at the open)`;
-    const prot = r.system === 'Monthly ATH' ? `Weekly close below 30-wk avg (${p(r.stop)}); safety stop ${p(r.stop * 0.85)}` : r.kind === 'RETEST' ? `Stop ${p(r.stop)} (GTT); target sell ${p(r.target)} (3R); exit after 120 days` : `Stop ${p(r.stop)} (GTC/GTT); exit when Supertrend turns red`;
-    return [r.tier === 'swing' ? `S${r.rank}` : r.rank, r.symbol, r.tier === 'swing' ? (r.kind === 'RETEST' ? 'Swing: retest' : 'Swing: 9/21') : 'Invest: ATH', LANE_TXT[r.lane] || 'n/a', order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
+    const prot = r.system === 'Monthly ATH' ? `Weekly close below 30-wk avg (${p(r.stop)}); safety stop ${p(r.stop * 0.85)}` : r.kind === 'RETEST' || r.kind === 'PATTERN' ? `Stop ${p(r.stop)} (GTC/GTT); target sell ${p(r.target)}${r.kind === 'RETEST' ? ' (3R)' : ' (measured move)'}; exit after 120 days${r.experimental ? '; EXPERIMENTAL' : ''}` : `Stop ${p(r.stop)} (GTC/GTT); exit when Supertrend turns red`;
+    return [r.tier === 'swing' ? `S${r.rank}` : r.rank, r.symbol, r.tier === 'swing' ? ({ RETEST: 'Swing: retest', PATTERN: 'Swing: pattern' }[r.kind] || 'Swing: 9/21') : 'Invest: ATH', LANE_TXT[r.lane] || 'n/a', order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
   });
   doc.autoTable({ startY: 86, head: [['#', 'Stock', 'System', 'Industry', 'Order', 'Qty', 'Value', '% cap', 'Stop (dist.)', 'Risk', 'Exit / protective stop']], body,
     styles: { fontSize: 8.5, cellPadding: 4, valign: 'middle' }, headStyles: { fillColor: [17, 24, 39] }, columnStyles: { 4: { cellWidth: 130 }, 10: { cellWidth: 165 } },
@@ -155,7 +155,7 @@ function lvSwingSize(rows, C0, idle, sr) {
 }
 function lvSwingHead(sr, idle, mk, nOpen) {
   const opts = [0.25, 0.5, 0.75, 1].concat([+riskForBudget(lvBudget()).toFixed(2)]).filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b);
-  return `<p class="lv-sub">Ranked by industry strength (Building first). <b>9/21 trend</b>: EMA 9/21 cross, stop = 5-day low (under the breakout candles, max 12%), exit when price closes below Supertrend(10,3).${mk === 'NSE' ? ' <b>Breakout retests</b> (India only): first return to an old breakout level, stop 1 ATR under it, 3R target — only in Building/Strong/Middle industries (+0.17 to +0.24R per trade vs +0.09R random, 2017–26; Weak/Fading ones were no better than random).' : ''} Uses the cash the ATH sleeve isn't using, keeping 15% of capital free for new ATH breakouts. Backtest 2017–26: ATH + 9/21 on idle cash 30.8%/yr, worst fall −24% (both at 1%), vs ATH alone 17%, −20%.</p>
+  return `<p class="lv-sub">${mk === 'NSE' ? 'Ranked by industry strength (Building first).' : 'Ranked by evidence (9/21, then retests, then patterns), then industry strength.'} <b>9/21 trend</b>: EMA 9/21 cross, stop = 5-day low (under the breakout candles, max 12%), exit when price closes below Supertrend(10,3).${mk !== 'NSE' ? ` <b>Breakout retests and bottom-pattern breakouts</b> (marked experimental, ranked after 9/21): in the ${mk === 'US' ? 'US' : 'ASX'} 2008–26 test both did worse than buying a random stock the same day — small sizes; the paper record tracks them. Stop + target sell, out after 120 days.` : ''}${mk === 'NSE' ? ' <b>Breakout retests</b> (India only): first return to an old breakout level, stop 1 ATR under it, 3R target — only in Building/Strong/Middle industries (+0.17 to +0.24R per trade vs +0.09R random, 2017–26; Weak/Fading ones were no better than random).' : ''} Uses the cash the ATH sleeve isn't using, keeping 15% of capital free for new ATH breakouts. Backtest 2017–26: ATH + 9/21 on idle cash 30.8%/yr, worst fall −24% (both at 1%), vs ATH alone 17%, −20%.</p>
     <label class="lv-sub lv-pick-n">Swing risk per trade <select id="lvsr">${opts.map((v) => `<option value="${v}" ${Math.abs(v - sr) < 0.005 ? 'selected' : ''}>${fmt(v, 2)}%${Math.abs(v - riskForBudget(lvBudget())) < 0.005 ? ' (your loss limit)' : ''}</option>`).join('')}</select>
     <span>Idle cash for swing trades: <b>${money(idle, mk)}</b>${nOpen != null ? ` · ${nOpen} swing trade(s) open` : ''}.</span></label>`;
 }
@@ -193,7 +193,7 @@ function guardCard(G) {
     : `<label class="lv-sub" style="display:block;margin-top:6px">Worst fall you can sit through: <select id="lvbud">${opts}</select></label>`}
     <details class="info"><summary>How it works</summary><p>Your account value (cash + shares) is compared with its highest point. Risk per trade is set so that in 95% of 2,000 simulated 10-year histories the fall stayed within your limit. It warns at 75% and 100% of the limit, pauses new buys for 2 weeks after ${G ? G.streak_max : 5} losses in a row, caps one stock at 10%, and never sells for you. The limit is DD_BUDGET_PCT on the server.</p></details></div>`;
 }
-const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', T921: '9/21 trend entry', RETEST: 'Breakout retest (support)' };
+const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', T921: '9/21 trend entry', RETEST: 'Breakout retest (support)', PATTERN: 'Bottom-pattern breakout' };
 function lvSeg() {
   return `<div class="seg" id="lvmk" style="margin:10px 16px 0">${[['NSE', 'India · Angel'], ['US', 'US · moomoo'], ['ASX', 'Australia · moomoo']].map(([k, n]) => `<button data-k="${k}" aria-selected="${state.lvMk === k}">${n}</button>`).join('')}</div>`;
 }
@@ -220,12 +220,13 @@ async function loadLiveG(mk) {
       : `<b>Limit</b> · Buy ${r.qty} · ${fmt(r.price, 2, L)} · Day, before the open (skip it if the open gaps above)`;
     const prot = r.system === 'Monthly ATH'
       ? `Exit: weekly close below the 30-week average (${fmt(r.stop, 2, L)} now) → this tab lists the sell. Safety net: <b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (15% under the plan stop, as on Angel)`
+      : r.target ? `<b>Stop</b> · Sell ${r.qty} · ${fmt(r.stop, 2, L)} · GTC, and <b>Limit</b> · Sell ${r.qty} · ${fmt(r.target, 2, L)} · GTC (target); sell anything left after 120 days`
       : `<b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (the backtested 5-day-low stop); also sell when this tab lists a Supertrend exit`;
     return `<div class="lv-tk">1. ${buy}<br>2. After the fill: ${prot}</div>`; };
   const list = rows.map((r, i) => `<div class="lv-row${r.off ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.off ? '' : 'checked'} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}${r.group ? ' · ' + esc(r.group) : ''}</span></div>
       <div class="lv-plan">${r.off ? `<span class="muted">Not picked${r.qty ? ` (would be ${r.qty.toLocaleString(L)} shares)` : ''}</span>` : r.qty ? `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}` : '<span class="muted">Too small for your capital at this risk</span>'}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.off ? ticket(r) : ''}</div><div></div></div>`).join('');
-  const swList = swR.map((r) => `<div class="lv-row${r.skip ? ' lv-off' : ''}"><div class="lv-rank">S${r.rank}</div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
+  const swList = swR.map((r) => `<div class="lv-row${r.skip ? ' lv-off' : ''}"><div class="lv-rank">S${r.rank}</div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${r.experimental ? ' <span class="chip exit">experimental</span>' : ''} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}`}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.skip ? ticket(r) : ''}</div><div></div></div>`).join('');
   const held = new Set(Pp ? Object.keys(Pp.pos || {}) : []);
@@ -235,6 +236,7 @@ async function loadLiveG(mk) {
     const st = Pp.stats; const pos = Object.entries(Pp.pos || {});
     paper = `<div class="lv-kpis"><div><span>Paper return</span><b class="${st.ret >= 0 ? 'up' : 'down'}">${pct(st.ret * 100)}</b></div><div><span>${MX_BENCH[mk]}</span><b>${st.bench_ret != null ? pct(st.bench_ret * 100) : '–'}</b></div><div><span>Worst fall</span><b>${pct(st.maxdd * 100)}</b></div></div>
       <div class="lv-kpis"><div><span>Closed trades</span><b>${st.closed}</b></div><div><span>Win rate</span><b>${st.win != null ? fmt(st.win * 100, 0) + '%' : '–'}</b></div><div><span>Avg per trade</span><b>${st.avgR != null ? fmt(st.avgR, 2) + 'R' : '–'}</b></div></div>
+      ${st.open_by_system || st.by_system ? `<p class="lv-sub">By strategy — ${[...new Set(Object.keys(st.open_by_system || {}).concat(Object.keys(st.by_system || {})))].map((k) => { const b = (st.by_system || {})[k]; return `<b>${esc(k)}</b>: ${(st.open_by_system || {})[k] || 0} open${b ? `, ${b.closed} closed, ${fmt(b.win * 100, 0)}% win, ${fmt(b.avgR, 2)}R avg` : ''}`; }).join(' · ')}</p>` : ''}
       ${Pp.equity.length > 1 ? '<div class="chart" id="lvpc" style="height:170px"></div>' : '<p class="lv-sub">The chart starts after the second day.</p>'}
       <p class="lv-sub">Since ${day(Pp.start)} · ${cur}${fmt(Pp.capital, 0, L)} start · ${esc(Pp.rules)}. Fills use the real next-day open from Yahoo; misses (gapped above the limit) are skipped, as you would.</p>
       ${pos.length ? `<table class="mini"><tr><th>Open (${pos.length})</th><th>Qty</th><th>Entry</th><th>Now</th></tr>${pos.map(([s, p]) => `<tr><td>${esc(s)} <span class="muted">${p.system === 'Monthly ATH' ? 'ATH' : '9/21'}</span></td><td>${p.qty}</td><td>${fmt(p.entry, 2, L)}</td><td class="${p.last >= p.entry ? 'up' : 'down'}">${fmt(p.last, 2, L)} (${pct((p.last / p.entry - 1) * 100)})</td></tr>`).join('')}</table>` : ''}
@@ -246,13 +248,13 @@ async function loadLiveG(mk) {
     <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Momentum investing · monthly ATH · top ${rows.length}</b>${capInput(mk, 'lvcapg')}</div>
       <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk and max 10% a stock. Holdings and cash are not checked.</p>${lvPicker(nP, risk * 100)}<div class="lv-pdfbar"><span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span><button class="lv-btn" id="lvpdf">Export PDF</button></div><p class="lv-sub">Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
-    <div class="lv-card"><b>Swing · 9/21 trend on idle cash</b>${lvSwingHead(srG, idleG, mk, null)}${swList || '<p class="empty">No new 9/21 signals for the next session.</p>'}</div>
+    <div class="lv-card"><b>Swing · 9/21, retests & patterns on idle cash</b>${lvSwingHead(srG, idleG, mk, null)}${swList || '<p class="empty">No new 9/21 signals for the next session.</p>'}</div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
   lvSegWire(el); wireCap('lvcapg', mk, () => loadLive());
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', () => { try { localStorage.setItem('td.lvN_' + mk, ns.value); localStorage.removeItem(selKey(mk, P.asof)); } catch (e) { /* private mode */ } loadLive(); });
   lvSelWire(el, mk, P.asof, rows, nP, selG);
-  $('#lvpdf').addEventListener('click', () => { const pk = rows.filter((r) => !r.off).concat(swR.filter((r) => !r.skip && r.qty > 0)); if (!pk.length) { alertMsg('Nothing picked.'); return; } lvPdf(mk, P, pk, P.exits || [], { cap: C0, n: nP, risk: risk * 100, sr: srG }); });
+  $('#lvpdf').addEventListener('click', () => { const pk = rows.filter((r) => !r.off && r.qty > 0).concat(swR.filter((r) => !r.skip && r.qty > 0)); if (!pk.length) { alertMsg('Nothing picked.'); return; } lvPdf(mk, P, pk, P.exits || [], { cap: C0, n: nP, risk: risk * 100, sr: srG }); });
   const srs = $('#lvsr'); if (srs) srs.addEventListener('change', () => { try { localStorage.setItem('td.lvSR_' + mk, srs.value); } catch (e) { /* private mode */ } loadLive(); });
   if (Pp && Pp.equity && Pp.equity.length > 1 && $('#lvpc')) {
     const box = $('#lvpc'); const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 170, width: box.clientWidth });
@@ -351,7 +353,7 @@ async function loadLive() {
   const pdfb = $('#lvpdf'); if (pdfb) pdfb.addEventListener('click', () => {
     let pk = S ? [...el.querySelectorAll('input[data-b]:checked')].map((c) => rows[+c.dataset.b]) : rows.filter((r) => r.picked);
     if (S && !pk.length) pk = rows.filter((r) => r.tier !== 'swing' && !r.skip && r.qty > 0).slice(0, nP);
-    pk = pk.filter((r) => r.tier !== 'swing').concat(swPend);
+    pk = pk.filter((r) => r.tier !== 'swing' && r.qty > 0).concat(swPend);
     if (!pk.length) { alertMsg('Nothing picked.'); return; }
     lvPdf('NSE', P, pk, S ? S.exits : (P.exits || []), { cap: S ? S.capital : cap('NSE'), n: nP, risk: rP, sr: srNow });
   });

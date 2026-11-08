@@ -25,7 +25,7 @@ DIR = {"US": "data/scan/us/", "ASX": "data/scan/asx/"}
 SUF = {"US": "", "ASX": ".AX"}
 BENCH = {"US": "^GSPC", "ASX": "^AXJO"}
 START = 100_000.0
-RISK, CAP, MAXPOS, COST = 0.01, 0.10, 10, 0.001
+RISK, CAP, MAXPOS, COST, RESERVE = 0.01, 0.10, 10, 0.001, 0.15
 
 
 def load(p, d):
@@ -67,7 +67,7 @@ def main(mk):
     if not asof:
         print("no plan"); return
     S = load(path, None) or {"market": mk, "start": asof, "capital": START, "cash": START, "pos": {}, "queue": [], "closed": [],
-                             "log": [], "equity": [], "rules": "1% risk to the stop, max 10% a stock, 10 positions, fills at the next open, 0.1% cost a side"}
+                             "log": [], "equity": [], "rules": "1% risk to the stop, max 10% a stock; ATH up to 10 positions, swing up to 10 more on idle cash (15% kept for ATH); fills at the next open, 0.1% cost a side"}
     if S["equity"] and S["equity"][-1][0] >= asof:
         print("already ran for", asof); return
     syms = {q["symbol"] for q in S["queue"]} | set(S["pos"])
@@ -107,18 +107,21 @@ def main(mk):
             events.append(f"{d} {s} missed: opened {o:.2f} above the limit {q['limit']:.2f}"); continue
         if fill <= q["stop"]:
             events.append(f"{d} {s} skipped: opened below the stop"); continue
-        if len(S["pos"]) >= MAXPOS:
-            events.append(f"{d} {s} skipped: 10 positions held"); continue
-        qty = math.floor(min(RISK * eq0 / (fill - q["stop"]), CAP * eq0 / fill, S["cash"] / (fill * (1 + COST))))
+        sw = q["system"] != "Monthly ATH"      # two sleeves, as in Live: ATH 10 slots; swing 10 slots on idle cash (15% kept for ATH)
+        if sum((p_["system"] != "Monthly ATH") == sw for p_ in S["pos"].values()) >= MAXPOS:
+            events.append(f"{d} {s} skipped: 10 {'swing' if sw else 'ATH'} positions held"); continue
+        avail = S["cash"] - (RESERVE * eq0 if sw else 0)
+        qty = math.floor(min(RISK * eq0 / (fill - q["stop"]), CAP * eq0 / fill, max(0, avail) / (fill * (1 + COST))))
         if qty <= 0:
             events.append(f"{d} {s} skipped: no cash"); continue
         cost = qty * fill * (1 + COST); S["cash"] -= cost
-        S["pos"][s] = dict(qty=qty, entry=round(fill * (1 + COST), 4), date=d, stop=q["stop"], stop0=q["stop"], system=q["system"], kind=q["kind"], last=fill)
+        S["pos"][s] = dict(qty=qty, entry=round(fill * (1 + COST), 4), date=d, stop=q["stop"], stop0=q["stop"], system=q["system"], kind=q["kind"], last=fill,
+                          target=q.get("target"))
         events.append(f"{d} BUY {qty} {s} @ {fill:.2f} ({q['system']}, stop {q['stop']:.2f})")
     # 2. 9/21 resting stops on every bar since entry (or the last run)
     last = S["equity"][-1][0] if S["equity"] else S["start"]
     for s, p in list(S["pos"].items()):
-        if p["system"] != "9/21 trend":
+        if p["system"] not in ("9/21 trend", "Breakout retest", "Bottom pattern"):
             continue
         X = B.get(ytk(s, mk))
         if X is None:
@@ -127,6 +130,21 @@ def main(mk):
             if d <= last or d < p["date"]:
                 continue
             if d > asof:
+                break
+            tg = p.get("target")
+            if tg and float(r["Low"]) > p["stop"] and float(r["High"]) >= tg:     # target sell (retests / patterns)
+                px = max(float(r["Open"]), tg) * (1 - COST)
+                S["cash"] += p["qty"] * px; del S["pos"][s]
+                S["closed"].append(dict(symbol=s, system=p["system"], entry_date=p["date"], entry=p["entry"], exit_date=d, exit=round(px, 4),
+                                        qty=p["qty"], ret=round(px / p["entry"] - 1, 4), R=round((px - p["entry"]) / (p["entry"] - p["stop0"]), 2), why="target hit"))
+                events.append(f"{d} TARGET {p['qty']} {s} @ {px:.2f}")
+                break
+            if tg and (pd.Timestamp(d) - pd.Timestamp(p["date"])).days > 174:            # ~120 sessions: time exit
+                px = float(r["Close"]) * (1 - COST)
+                S["cash"] += p["qty"] * px; del S["pos"][s]
+                S["closed"].append(dict(symbol=s, system=p["system"], entry_date=p["date"], entry=p["entry"], exit_date=d, exit=round(px, 4),
+                                        qty=p["qty"], ret=round(px / p["entry"] - 1, 4), R=round((px - p["entry"]) / (p["entry"] - p["stop0"]), 2), why="120-day time exit"))
+                events.append(f"{d} TIME {p['qty']} {s} @ {px:.2f}")
                 break
             if float(r["Low"]) <= p["stop"]:
                 px = min(float(r["Open"]), p["stop"]) * (1 - COST)
@@ -151,8 +169,8 @@ def main(mk):
     for r in (P.get("top") or []) + (P.get("swing") or []):
         if r["symbol"] in S["pos"]:
             continue
-        Q.append(dict(side="BUY", symbol=r["symbol"], date=asof, kind=r["kind"], system=r["system"], rank=r.get("rank", 99) + (100 if r.get("kind") == "T921" else 0),
-                      trigger=r.get("trigger"), limit=r["price"], stop=r["stop"]))
+        Q.append(dict(side="BUY", symbol=r["symbol"], date=asof, kind=r["kind"], system=r["system"], rank=r.get("rank", 99) + {"T921": 100, "RETEST": 200, "PATTERN": 300}.get(r.get("kind"), 0),
+                      trigger=r.get("trigger"), limit=r["price"], stop=r["stop"], target=r.get("target")))
     S["queue"] = Q
     S["log"] = (events + S["log"])[:200]
     S["generated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -163,6 +181,12 @@ def main(mk):
                       win=round(sum(x["ret"] > 0 for x in c) / len(c), 3) if c else None, avg=round(sum(x["ret"] for x in c) / len(c), 4) if c else None,
                       avgR=round(sum(x["R"] for x in c) / len(c), 2) if c else None, open=len(S["pos"]),
                       maxdd=round(min(0, min(v[1] / max(w[1] for w in S["equity"][:i + 1]) - 1 for i, v in enumerate(S["equity"]))), 4))
+    by = {}
+    for x in c:
+        by.setdefault(x["system"], []).append(x)
+    S["stats"]["by_system"] = {k: dict(closed=len(v), win=round(sum(y["ret"] > 0 for y in v) / len(v), 3), avgR=round(sum(y["R"] for y in v) / len(v), 2))
+                               for k, v in by.items()}
+    S["stats"]["open_by_system"] = {k: sum(p_["system"] == k for p_ in S["pos"].values()) for k in {p_["system"] for p_ in S["pos"].values()}}
     json.dump(S, open(path, "w"), separators=(",", ":"), default=str)
     print(mk, asof, "events", len(events), *events[:20], "stats", S["stats"], "queued", len(Q), sep="\n  ")
 
