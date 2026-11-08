@@ -70,7 +70,7 @@ def download(tickers):
         ch = tickers[a:a + 200]
         for k in range(3):
             try:
-                d = yf.download(ch, period="14mo", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+                d = yf.download(ch, period="3y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
                 for t in ch:
                     try:
                         out[t] = pd.DataFrame({"c": d["Close"][t], "v": d["Volume"][t]}).dropna()
@@ -176,11 +176,16 @@ def main(mkt):
                rows=rows, sectors=sectors, mstats=market, stock=stock)
     os.makedirs(cf["out"], exist_ok=True); json.dump(out, open(cf["out"] + "group_pulse.json", "w"), separators=(",", ":"))
     # weekly closes (last ~60 weeks) of every liquid stock, for the stock panel's mini chart
-    W = C[syms].resample("W-FRI").last().iloc[-62:]
+    # + weekly RSI(14, Wilder) on the full ~3-year weekly series, for the range-shift panel (40/60 bands)
+    Wf = C[syms].resample("W-FRI").last()
+    dW = Wf.diff(); au = dW.clip(lower=0).ewm(alpha=1 / 14, adjust=False).mean(); ad = (-dW.clip(upper=0)).ewm(alpha=1 / 14, adjust=False).mean()
+    RW = (100 - 100 / (1 + au / ad.replace(0, np.nan))).iloc[-62:]
+    W = Wf.iloc[-62:]
     if W.index[-1] > C.index[-1]:
         W.index = list(W.index[:-1]) + [C.index[-1]]
     json.dump({"t": [str(d.date()) for d in W.index],
-               "s": {s: [None if pd.isna(v) else float(f"{v:.4g}") for v in W[s]] for s in syms}},
+               "s": {s: [None if pd.isna(v) else float(f"{v:.4g}") for v in W[s]] for s in syms},
+               "r": {s: [None if pd.isna(v) else round(float(v), 1) for v in RW[s]] for s in syms}},
               open(cf["out"] + "stock_weekly.json", "w"), separators=(",", ":"))
     print(mkt, "groups", len(rows), "stocks", len(syms), "market pulse 1m", mkt_share, "top", [(r["group"], r["p1m"]) for r in rows[:5]])
 

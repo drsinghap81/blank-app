@@ -2534,6 +2534,22 @@ function mxG(v) { // growth % cell, MarketSmith-style colours
   if (v >= 999) return '<td class="up"><b>turnaround</b></td>';
   return `<td class="${v >= 25 ? 'up' : v < 0 ? 'down' : ''}">${v >= 25 ? '<b>' : ''}${v > 0 ? '+' : ''}${fmt(v, 0)}%${v >= 25 ? '</b>' : ''}</td>`;
 }
+/* weekly RSI range (chart-reading aid; as a system the long range shift made 8.3%/yr India, 4.3% US, 4.5% ASX - below the index) */
+function rangeState(rs, t) {
+  const v = rs.map((x) => (x == null ? NaN : x)); const n = v.length; if (n < 30 || isNaN(v[n - 1])) return null;
+  const marks = []; let lastUp = null, lastDn = null;
+  for (let k = 27; k < n; k++) {
+    const prev = v.slice(k - 26, k).filter((x) => !isNaN(x)); if (!prev.length) continue;
+    if (v[k] >= 60 && v[k - 1] < 60 && Math.min(...prev) <= 40) { marks.push({ time: t[k], position: 'belowBar', color: '#0A7A55', shape: 'arrowUp', text: 'shift up' }); lastUp = k; }
+    if (v[k] <= 40 && v[k - 1] > 40 && Math.max(...prev) >= 60) { marks.push({ time: t[k], position: 'aboveBar', color: '#D64545', shape: 'arrowDown', text: 'shift down' }); lastDn = k; }
+  }
+  const w13 = v.slice(n - 13).filter((x) => !isNaN(x)); const lo = Math.min(...w13), hi = Math.max(...w13);
+  let state = 'Neutral (between ranges)', cls = '';
+  if (lo >= 40 && hi >= 60) { state = 'Bull range (40–80)'; cls = 'open'; } else if (hi <= 60 && lo <= 40) { state = 'Bear range (20–60)'; cls = 'exit'; }
+  const recent = [lastUp, lastDn].filter((x) => x != null && x >= n - 4);
+  if (recent.length) { const k = Math.max(...recent); state = k === lastUp ? `Range shift UP (${day(t[k])})` : `Range shift DOWN (${day(t[k])})`; cls = k === lastUp ? 'new' : 'exit'; }
+  return { now: v[n - 1], state, cls, marks };
+}
 async function mxStock(m, r, mk, S) {
   await mxFund(mk);
   const F = (state.mxF[mk] && state.mxF[mk].s && state.mxF[mk].s[m.symbol]) || null;
@@ -2568,7 +2584,8 @@ async function mxStock(m, r, mk, S) {
   openPanel(`<div class="d-head"><div><h2>${esc(m.symbol)}</h2><div class="co">${esc(m.name || '')}</div></div><div class="d-price"><b>${fmt(m.close, 2, MKT[mk].loc)}</b></div></div>
     <div class="tags" style="margin:8px 16px">${(S.map[m.symbol] || []).join('') || '<span class="chip">No signal in your systems today</span>'}</div>
     <div class="mxst">
-      <div class="mxcol"><div class="chart" id="mxsc" style="height:220px"></div><p class="muted" style="margin:2px 0 8px;font-size:12px">Weekly close, last ~14 months · dashed = 10-week average</p>
+      <div class="mxcol"><div class="chart" id="mxsc" style="height:220px"></div><div id="mxrs" style="height:110px"></div><p class="muted" style="margin:2px 0 4px;font-size:12px">Weekly close, last ~14 months · dashed = 10-week average · lower panel: weekly RSI(14) with the 40 / 60 range lines; ▲ / ▼ = range shift up / down</p>
+        <div id="mxrsl" class="tags" style="margin:0 0 8px"></div>
         <h4 style="margin:6px 0 4px">Trend & strength</h4><div class="facts">${f.map(([a, b]) => `<div class="fact"><span>${a}</span><b>${b}</b></div>`).join('')}</div></div>
       <div class="mxcol">${fund}</div></div>
     <p style="margin:12px 16px"><a href="${tv}" target="_blank" rel="noopener">TradingView chart ›</a> · <a href="${yq}" target="_blank" rel="noopener">Yahoo Finance ›</a>${mk === 'NSE' ? ` · <a href="https://www.screener.in/company/${encodeURIComponent(m.symbol)}/" target="_blank" rel="noopener">Screener.in ›</a>` : ''}${mk === 'ASX' ? ` · <a href="https://www.marketindex.com.au/asx/${encodeURIComponent(m.symbol.toLowerCase())}" target="_blank" rel="noopener">Market Index ›</a>` : ''}</p>
@@ -2584,6 +2601,21 @@ async function mxStock(m, r, mk, S) {
   ch.addLineSeries({ color: '#64748B', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false }).setData(ma);
   ch.timeScale().fitContent();
   new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
+  const rb = $('#mxrs'); const rsv = W.r && W.r[m.symbol];
+  if (rb && rsv) {
+    const rc = window.LightweightCharts.createChart(rb, { ...chartBase(), height: 110, width: rb.clientWidth, timeScale: { visible: false } });
+    const rl = rc.addLineSeries({ color: '#7C3AED', lineWidth: 2, priceLineVisible: false });
+    rl.setData(W.t.map((t, i) => (rsv[i] == null ? { time: t } : { time: t, value: rsv[i] })));
+    [[60, '#0A7A55'], [40, '#D64545']].forEach(([v, c]) => rl.createPriceLine({ price: v, color: c, lineWidth: 1, lineStyle: 2, axisLabelVisible: true }));
+    const st = rangeState(rsv, W.t);
+    if (st) {
+      if (st.marks.length) rl.setMarkers(st.marks);
+      $('#mxrsl').innerHTML = `<span class="chip ${st.cls}">Weekly RSI ${fmt(st.now, 0)} · ${st.state}</span><span class="chip" title="Tested 2016–26: as a system, the long range shift made 8.3%/yr in India (Nifty 10.4%), 4.3% US, 4.5% ASX; the short side lost money">Chart aid, not a signal</span>`;
+    }
+    rc.timeScale().fitContent();
+    ch.timeScale().subscribeVisibleLogicalRangeChange((g) => g && rc.timeScale().setVisibleLogicalRange(g));
+    new ResizeObserver(() => rc.applyOptions({ width: rb.clientWidth })).observe(rb);
+  } else if (rb) { rb.style.height = '0'; }
 }
 document.querySelectorAll('.views button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
 document.querySelectorAll('.markets button').forEach((b) => b.addEventListener('click', () => { state.mkt = b.dataset.mkt; state.selected = null; loadTrends(); }));
