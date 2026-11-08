@@ -1,0 +1,35 @@
+name: global-plan
+# US / ASX trade plan + paper trading (manual orders on moomoo; nothing is sent to a broker)
+on:
+  schedule:
+    - cron: "40 0 * * 2-6"    # US: after the US scans (22:30-23:30 UTC)
+    - cron: "30 9 * * 1-5"    # ASX: after the ASX scans (07:15 UTC)
+  workflow_dispatch:
+    inputs:
+      market: {description: "US, ASX or both", default: "both"}
+permissions:
+  contents: write
+concurrency: {group: global-plan, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: plan and paper
+        run: |
+          pip install -q numpy pandas yfinance
+          M="${{ github.event.inputs.market }}"
+          if [ -z "$M" ]; then if [ "$(date -u +%H)" -lt 6 ]; then M=US; else M=ASX; fi; fi
+          [ "$M" = both ] && M="US ASX"
+          python tools/trade_plan.py $M
+          python tools/paper_global.py $M
+      - name: commit
+        run: |
+          git config user.name "global-plan bot"; git config user.email "actions@users.noreply.github.com"
+          for f in data/scan/us/trade_plan.json data/scan/asx/trade_plan.json data/scan/us/paper.json data/scan/asx/paper.json; do [ -f "$f" ] && git add "$f"; done; true
+          git diff --cached --quiet && exit 0
+          git commit -qm "US/ASX trade plan + paper $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done

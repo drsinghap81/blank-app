@@ -18,11 +18,13 @@ Exits: ATH signals with "exit next open" and 9/21 trades whose Supertrend turned
 Writes data/scan/trade_plan.json. Sizing is done in the apps / server from your capital: risk 1% to the stop, max 20% a stock,
 max 10 positions."""
 import json
+import sys
 from datetime import datetime, timezone
 
 import numpy as np
 
-OUT = "data/scan/trade_plan.json"
+DIR = {"NSE": "data/scan/", "US": "data/scan/us/", "ASX": "data/scan/asx/"}
+MINPX = {"NSE": 100, "US": 10, "ASX": 1}   # 9/21: no penny stocks
 MAX_LATE = 0.10        # skip ATH breakouts already > 10% above the entry
 MAX_BELOW = 0.05       # ... or > 5% back below it (failing breakout; not what the backtest bought)
 TOP = 10
@@ -43,10 +45,12 @@ def num(v):
         return None
 
 
-def main():
-    ath, tr, sec = load("data/scan/ath.json"), load("data/scan/trend_scan.json"), load("data/scan/sectors.json")
+def main(mk="NSE"):
+    D = DIR[mk]; OUT = D + "trade_plan.json"; india = mk == "NSE"
+    ath, tr, sec = load(D + "ath.json"), load(D + "trend_scan.json"), load(D + "sectors.json")
     ix = sec.get("indices") or {}
-    secname = lambda k: (k or "").replace("NIFTY ", "").title()  # noqa: E731
+    names = sec.get("names") or {}
+    secname = lambda k: names.get(k) or ((k or "").replace("NIFTY ", "").title() if india else (k or ""))  # noqa: E731
     C = []
 
     def td(r):
@@ -64,8 +68,9 @@ def main():
         if late > MAX_LATE or late < -MAX_BELOW:   # fresh breakouts only: near the price the backtest bought
             continue
         t = td(r)
-        sc = (3 if r.get("main") else 2) + (2 if t["aligned"] else 0) + (1 if (t["theme_rs"] or 0) > 0 else 0) \
-            - (3 if t["stock_rs"] is not None and t["stock_rs"] <= 0 else 0) - (1 if late > 0.05 else 0)
+        sc = (3 if r.get("main") else 2) - (1 if late > 0.05 else 0)
+        if india:
+            sc += (2 if t["aligned"] else 0) + (1 if (t["theme_rs"] or 0) > 0 else 0) - (3 if t["stock_rs"] is not None and t["stock_rs"] <= 0 else 0)
         C.append(dict(id=f"ATH-{r['symbol']}-{r.get('date')}", symbol=r["symbol"], name=r.get("name", ""), system="Monthly ATH",
                       kind="ATH_BRK", order="LIMIT", when="next open", side="BUY", price=round(close * 1.01, 2), ref=close,
                       stop=round(stop, 2), exit_rule="weekly close below the 30-week SMA",
@@ -83,8 +88,9 @@ def main():
                           note=f"signal = a month CLOSE above {trig:.2f} (old ATH close), then buy next month's open",
                           base_months=r.get("base_months"), score=-99, value_cr=num(r.get("value_cr")), **t))
             continue
-        sc = 2 + (1 if r.get("main") else 0) + (2 if t["aligned"] else 0) + (1 if (t["theme_rs"] or 0) > 0 else 0) \
-            - (3 if t["stock_rs"] is not None and t["stock_rs"] <= 0 else 0) - 1
+        sc = 2 + (1 if r.get("main") else 0) - 1
+        if india:
+            sc += (2 if t["aligned"] else 0) + (1 if (t["theme_rs"] or 0) > 0 else 0) - (3 if t["stock_rs"] is not None and t["stock_rs"] <= 0 else 0)
         C.append(dict(id=f"STOP-{r['symbol']}-{r.get('trigger')}", symbol=r["symbol"], name=r.get("name", ""), system="Monthly ATH",
                       kind="ATH_STOP", order="STOPLOSS_LIMIT", when="day order, re-place each morning", side="BUY",
                       trigger=round(trig, 2), price=round(trig * 1.01, 2), ref=close, stop=round(stop, 2),
@@ -95,7 +101,7 @@ def main():
         if not str(r.get("status", "")).startswith("NEW - buy"):
             continue
         close, stop = num(r.get("signal_close") or r.get("close")), num(r.get("stop"))
-        if not close or not stop or close <= stop or close < 100:
+        if not close or not stop or close <= stop or close < MINPX[mk] or (r.get("risk_pct") or 0) > 12:
             continue
         C.append(dict(id=f"T921-{r['symbol']}-{r.get('signal_date')}", symbol=r["symbol"], name=r.get("name", ""), system="9/21 trend",
                       kind="T921", order="LIMIT", when="next open", side="BUY", price=round(close * 1.01, 2), ref=close,
@@ -122,7 +128,7 @@ def main():
         if str(r.get("status", "")).startswith("EXIT"):
             exits.append(dict(id=f"EXIT-T921-{r['symbol']}", symbol=r["symbol"], system="9/21 trend", side="SELL", order="LIMIT",
                               when="next open", ref=num(r.get("close")), why="Supertrend turned red"))
-    out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), market="NSE",
+    out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), market=mk, watch_only=not india,
                asof=max(str(ath.get("asof") or ""), str(tr.get("asof") or "")),
                rules=dict(risk_pct=1.0, max_pos_pct=20.0, max_positions=10, max_late_pct=MAX_LATE * 100, max_below_pct=MAX_BELOW * 100, top=TOP,
                           limit_buffer_pct=1.0),
@@ -132,4 +138,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    for m in (sys.argv[1:] or ["NSE"]):
+        main(m)

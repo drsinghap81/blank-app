@@ -1,0 +1,83 @@
+{
+"generated": "2026-11-08 01:11 UTC",
+"market": "ASX",
+"watch_only": true,
+"asof": "2026-11-06",
+"rules": {
+"risk_pct": 1.0,
+"max_pos_pct": 20.0,
+"max_positions": 10,
+"max_late_pct": 10.0,
+"max_below_pct": 5.0,
+"top": 10,
+"limit_buffer_pct": 1.0
+},
+"top": [
+{
+"id": "T921-BRG-2026-11-05",
+"symbol": "BRG",
+"name": "BREVILLE GROUP LIMITED",
+"system": "9/21 trend",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 33.33,
+"ref": 33.0,
+"stop": 30.23,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-05, stop 9.2% below",
+"score": 3,
+"value_cr": 11.39,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"rank": 1,
+"risk_pct": 10.3
+},
+{
+"id": "T921-SNL-2026-11-05",
+"symbol": "SNL",
+"name": "SUPPLY NETWORK LIMITED",
+"system": "9/21 trend",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 36.13,
+"ref": 35.77,
+"stop": 33.75,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-05, stop 6.0% below",
+"score": 3,
+"value_cr": 0.88,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"rank": 2,
+"risk_pct": 7.1
+}
+],
+"more": [],
+"watch": [],
+"exits": [
+{
+"id": "EXIT-ATH-ALD",
+"symbol": "ALD",
+"system": "Monthly ATH",
+"side": "SELL",
+"order": "LIMIT",
+"when": "next open",
+"ref": 36.03,
+"why": "weekly close below the 30-week SMA"
+}
+]
+}

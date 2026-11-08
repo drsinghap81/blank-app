@@ -114,9 +114,68 @@ function guardCard(G) {
     <details class="info"><summary>How it works</summary><p>Your account value (cash + shares) is compared with its highest point. Risk per trade is set so that in 95% of 2,000 simulated 10-year histories the fall stayed within your limit. It warns at 75% and 100% of the limit, pauses new buys for 2 weeks after ${G ? G.streak_max : 5} losses in a row, caps one stock at 10%, and never sells for you. The limit is DD_BUDGET_PCT on the server.</p></details></div>`;
 }
 const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', T921: '9/21 trend entry' };
+function lvSeg() {
+  return `<div class="seg" id="lvmk" style="margin:10px 16px 0">${[['NSE', 'India · Angel'], ['US', 'US · moomoo'], ['ASX', 'Australia · moomoo']].map(([k, n]) => `<button data-k="${k}" aria-selected="${state.lvMk === k}">${n}</button>`).join('')}</div>`;
+}
+function lvSegWire(el) {
+  el.querySelectorAll('#lvmk button').forEach((b) => b.addEventListener('click', () => { state.lvMk = b.dataset.k; try { localStorage.setItem('td.lvMk', b.dataset.k); } catch (e) { /* private mode */ } loadLive(); }));
+}
+/* US / ASX: manual orders on moomoo + paper record (moomoo's API for Australian accounts cannot trade ASX shares; US automation waits for the paper record) */
+async function loadLiveG(mk) {
+  const el = $('#view-live');
+  const [P, Pp] = await Promise.all([getJSON(MAIN + MKT[mk].path + 'trade_plan.json', 'tp_' + mk), getJSON(MAIN + MKT[mk].path + 'paper.json', 'paper_' + mk)]);
+  if (!P) { el.innerHTML = lvSeg() + `<p class="empty">The ${MKT[mk].name} trade plan appears after its evening run.</p>`; lvSegWire(el); return; }
+  $('#asof').textContent = `Market data: ${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)}`;
+  const C0 = cap(mk); const risk = riskForBudget(lvBudget()) / 100; const L = MKT[mk].loc; const cur = MKT[mk].cur;
+  const rows = (P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
+    return { ...r, E, qty: q, value: q * E, risk_amt: q * (E - r.stop) }; });
+  const tvp = mk === 'ASX' ? 'ASX:' : '';
+  const ticket = (r) => {
+    const net = r.system === 'Monthly ATH' ? r.stop * 0.85 : r.stop;
+    const buy = r.kind === 'ATH_STOP'
+      ? `<b>Stop limit</b> · Buy ${r.qty} · trigger ${fmt(r.trigger, 2, L)} · limit ${fmt(r.price, 2, L)} · Day (re-place each morning while it shows here)`
+      : `<b>Limit</b> · Buy ${r.qty} · ${fmt(r.price, 2, L)} · Day, before the open (skip it if the open gaps above)`;
+    const prot = r.system === 'Monthly ATH'
+      ? `Exit: weekly close below the 30-week average (${fmt(r.stop, 2, L)} now) → this tab lists the sell. Safety net: <b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (15% under the plan stop, as on Angel)`
+      : `<b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (the backtested 5-day-low stop); also sell when this tab lists a Supertrend exit`;
+    return `<div class="lv-tk">1. ${buy}<br>2. After the fill: ${prot}</div>`; };
+  const list = rows.map((r) => `<div class="lv-row"><div class="lv-rank">${r.rank}</div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
+      <div class="lv-plan">${r.qty ? `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}` : '<span class="muted">Too small for your capital at this risk</span>'}</div>
+      <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty ? ticket(r) : ''}</div><div></div></div>`).join('');
+  const held = new Set(Pp ? Object.keys(Pp.pos || {}) : []);
+  const exits = (P.exits || []).map((e) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell next open</span>${held.has(e.symbol) ? ' <span class="chip">in paper</span>' : ''}</div><div class="lv-sub">${esc(e.system)}: ${esc(e.why)} — only if you hold it. Cancel its GTC stop first.</div></div><div></div></div>`).join('');
+  let paper = '<p class="lv-sub">Starts with the next run: from then each plan is paper-filled at the next open and tracked against the index.</p>';
+  if (Pp && Pp.stats) {
+    const st = Pp.stats; const pos = Object.entries(Pp.pos || {});
+    paper = `<div class="lv-kpis"><div><span>Paper return</span><b class="${st.ret >= 0 ? 'up' : 'down'}">${pct(st.ret * 100)}</b></div><div><span>${MX_BENCH[mk]}</span><b>${st.bench_ret != null ? pct(st.bench_ret * 100) : '–'}</b></div><div><span>Worst fall</span><b>${pct(st.maxdd * 100)}</b></div></div>
+      <div class="lv-kpis"><div><span>Closed trades</span><b>${st.closed}</b></div><div><span>Win rate</span><b>${st.win != null ? fmt(st.win * 100, 0) + '%' : '–'}</b></div><div><span>Avg per trade</span><b>${st.avgR != null ? fmt(st.avgR, 2) + 'R' : '–'}</b></div></div>
+      <div class="chart" id="lvpc" style="height:170px"></div>
+      <p class="lv-sub">Since ${day(Pp.start)} · ${cur}${fmt(Pp.capital, 0, L)} start · ${esc(Pp.rules)}. Fills use the real next-day open from Yahoo; misses (gapped above the limit) are skipped, as you would.</p>
+      ${pos.length ? `<table class="mini"><tr><th>Open (${pos.length})</th><th>Qty</th><th>Entry</th><th>Now</th></tr>${pos.map(([s, p]) => `<tr><td>${esc(s)} <span class="muted">${p.system === 'Monthly ATH' ? 'ATH' : '9/21'}</span></td><td>${p.qty}</td><td>${fmt(p.entry, 2, L)}</td><td class="${p.last >= p.entry ? 'up' : 'down'}">${fmt(p.last, 2, L)} (${pct((p.last / p.entry - 1) * 100)})</td></tr>`).join('')}</table>` : ''}
+      ${(Pp.log || []).length ? `<details style="margin-top:6px"><summary class="lv-sub">Paper fills and misses</summary><p class="lv-sub">${Pp.log.slice(0, 30).map(esc).join('<br>')}</p></details>` : ''}`;
+  }
+  el.innerHTML = `${lvSeg()}<div class="lv-card" style="border-left:5px solid var(--fall)"><b>Paper-trading phase · you place orders yourself on moomoo</b>
+      <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>
+    <div class="lv-card"><b>Paper record</b>${paper}</div>
+    <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Top ${rows.length} for the next session</b>${capInput(mk, 'lvcapg')}</div>
+      <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk (your loss limit) and max 10% a stock. Holdings and cash are not checked.</p>
+      ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
+    ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
+    <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
+  lvSegWire(el); wireCap('lvcapg', mk, () => loadLive());
+  if (Pp && Pp.equity && Pp.equity.length > 1 && $('#lvpc')) {
+    const box = $('#lvpc'); const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 170, width: box.clientWidth });
+    const e0 = Pp.equity[0][1]; const b0 = (Pp.equity.find((v) => v[2]) || [])[2];
+    ch.addLineSeries({ color: C.ink, lineWidth: 2, priceLineVisible: false, title: 'paper' }).setData(Pp.equity.map((v) => ({ time: v[0], value: v[1] / e0 * 100 })));
+    if (b0) ch.addLineSeries({ color: '#9CA3AF', lineWidth: 1, priceLineVisible: false, title: 'index' }).setData(Pp.equity.filter((v) => v[2]).map((v) => ({ time: v[0], value: v[2] / b0 * 100 })));
+    ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
+  }
+}
 async function loadLive() {
   $('#title').textContent = 'Live trades';
   const el = $('#view-live'); el.innerHTML = '<p class="muted pad">Loading…</p>';
+  if (!state.lvMk) { try { state.lvMk = localStorage.getItem('td.lvMk') || 'NSE'; } catch (e) { state.lvMk = 'NSE'; } }
+  if (state.lvMk !== 'NSE') { await loadLiveG(state.lvMk); return; }
   const P = await getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan');
   if (!P) { el.innerHTML = '<p class="empty">The trade plan appears after the evening scans (about 21:15 IST).</p>'; return; }
   $('#asof').textContent = `Market data: India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
@@ -160,7 +219,7 @@ async function loadLive() {
       <div class="lv-sub">${t.gtt_id ? `🛡 Stop on Angel at ${fmt(t.gtt_trigger, 2, 'en-IN')}` : t.gtt_error ? `<span class="down">Stop not placed yet: ${esc(t.gtt_error)}</span> <button class="lv-btn sell" data-prot="1" style="padding:4px 10px;font-size:12px">Retry stop</button>` : t.state === 'open' ? '<span class="down">No protective stop on Angel</span>' : 'Stop goes on Angel after the fill'}</div></div><div></div></div>`; }).join('') : '';
   const recent = S && S.recent && S.recent.length ? `<p class="lv-sub">Recent: ${S.recent.map((r) => `${esc(r.symbol)} ${esc(r.state)}${r.exit ? ' @ ' + fmt(r.exit, 2, 'en-IN') : ''}${r.text ? ' (' + esc(r.text) + ')' : ''}`).join(' · ')}</p>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
-  el.innerHTML = `${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
+  el.innerHTML = `${lvSeg()}${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Top ${nTop} trades for the next session</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
@@ -175,6 +234,7 @@ async function loadLive() {
     try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); lvSave({ token: j.token }); loadLive(); } catch (e) { alertMsg(e.message); }
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
+  lvSegWire(el);
   el.querySelectorAll('.lv-w').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ ...P.watch[+a.dataset.w], kind: 'WATCH' }); }));
   const dry = $('#lvdry'); if (dry) dry.addEventListener('click', async () => {
     if (!live) return;
