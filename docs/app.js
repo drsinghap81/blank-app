@@ -2413,6 +2413,9 @@ function mxCrumb() {
   if (x.m) parts.push(['market', MKT[x.m].name]); if (x.sec) parts.push(['sector', x.sec]); if (x.grp) parts.push(['industry', x.grp]);
   return `<nav class="mxcrumb">${parts.map(([l, n], i) => (i === parts.length - 1 ? `<b>${esc(n)}</b>` : `<a href="#" data-l="${l}">${esc(n)}</a> ›`)).join(' ')}</nav>`;
 }
+/* lists sorted by momentum lane, gaining strength first, then by the quarter -> week gain */
+const MX_LANE = { build: 0, hold: 1, mid: 2, bounce: 3, fade: 4, weak: 5 };
+const mxByLane = (rows) => rows.slice().sort((a, b) => (MX_LANE[a.shift || 'mid'] - MX_LANE[b.shift || 'mid']) || ((b.p1w - b.p1q) - (a.p1w - a.p1q)));
 function mxGo(o) { Object.assign(state.mx, o); window.scrollTo(0, 0); loadMarkets(); }
 function mxWire(el) {
   el.querySelectorAll('.mxcrumb a').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); const l = a.dataset.l;
@@ -2461,7 +2464,7 @@ async function loadMarkets() {
         <div class="stat"><b>${S.nbrk} · ${S.n921} · ${S.nnear}</b><span>ATH breakouts · 9/21 buys · ATH near trigger</span></div></section>
       <div class="card"><h4 style="margin:0 0 4px">Sectors</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Colour = Pulse (share of the sector's stocks trending); strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-bouncing, red weak); RS = equal-weight 3-month return vs ${MX_BENCH[mk]}. Tap a sector for its industries.</p>
         ${mxPer()}${mxTiles(secs, 'sector', 'data-s')}
-        <div class="mxlist">${secs.map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('')}</div></div>`;
+        <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('')}</div></div>`;
     const setups = []; G.rows.forEach((g) => g.members.forEach((m) => { const c = S.map[m.symbol]; if (c && c.some((x) => !x.includes('sell') && !x.includes('forming') && !x.includes('Near support'))) setups.push({ m, g, c }); }));
     setups.sort((a, b) => (b.g.p1m - a.g.p1m) || (b.m.wrpi - a.m.wrpi));
     el.insertAdjacentHTML('beforeend', `<div class="card"><h4 style="margin:0 0 4px">Signals ranked by industry strength</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Every stock with a live buy or in-trade signal from your systems, strongest industry (1-month Pulse) first. This replaces the old Top-down tab: in the 2017–26 test, ATH breakouts in strong sectors with strong stock RS won 54% vs 48%.</p>
@@ -2479,7 +2482,7 @@ async function loadMarkets() {
     el.innerHTML = `${mxCrumb()}<div class="card"><div class="status info" style="border-left:5px solid ${GP_SHIFT[sr.shift || 'mid'].c}"><b>${esc(x.sec)}: ${GP_SHIFT[sr.shift || 'mid'].t}.</b> Pulse ${fmt(sr.p1q, 0)} → ${fmt(sr.p1m, 0)} → ${fmt(sr.p1w, 0)} (quarter → month → week) · RS ${sr.rs3m >= 0 ? '+' : ''}${fmt(sr.rs3m, 1)}% 3 m · ${sr.n} stocks in ${sr.groups} industries · ${sr.trending_now} trending today. ${gpSlope(sr, 120, 36)}</div>
       <div class="chart" id="mxc"></div><div class="rsi" id="mxcp"></div><p class="muted" style="margin:4px 0;font-size:12.5px">Last 12 months · dark = sector (equal weight) · grey = ${MX_BENCH[mk]} · lower = 1-month Pulse.</p>
       <h4 style="margin:12px 0 4px">Industries in ${esc(x.sec)}</h4>${mxPer()}${mxTiles(grs, 'group', 'data-g')}
-      <div class="mxlist">${grs.map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('')}</div></div>`;
+      <div class="mxlist">${mxByLane(grs).map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('')}</div></div>`;
     mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
     el.querySelectorAll('[data-g]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'industry', grp: b.dataset.g })));
     mxChart(mk, 'sectors', x.sec, sr.shift);
