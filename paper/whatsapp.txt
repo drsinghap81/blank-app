@@ -1,11 +1,9 @@
-*TOP BOTTOM LEVELS for 29/10/2026*
+*TOP BOTTOM LEVELS for 09/11/2026*
 
-*BANKNIFTY FUT (23-NOV) - Closing Price 54,549.00*
+*BANKNIFTY FUT (23-NOV) - Closing Price 58,979.40*
 Position: LONG from 54,403.00 (2026-10-28)  (2 lots x 30)
-    HOLD long. Stop: Sell below 54,089 — system point (exit & REVERSE)
-    Move SL to breakeven (54,403) once price reaches 55,491
+    HOLD long. Stop: Sell below 54,798 — system point (exit & REVERSE)
     Gap > 1% beyond a level at the open: exit only, no new trade (let the market settle)
 
-Closed today: SELL 54,217 -> 54,403 (System point) = Rs 7,049
-Paper P&L since 2026-10-19: realised Rs -28,195, open Rs 7,128, trades 3 (W 1/L 1)
+Paper P&L since 2026-10-19: realised Rs -28,195, open Rs 272,952, trades 3 (W 1/L 1)
 _Paper trading only - not investment advice_
