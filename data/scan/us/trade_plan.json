@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-08 02:55 UTC",
+"generated": "2026-11-08 03:52 UTC",
 "market": "US",
 "watch_only": true,
 "asof": "2026-11-06",
@@ -981,6 +981,7 @@
 "risk_pct": 11.3
 }
 ],
+"pattern_watch": [],
 "watch": [
 {
 "id": "WATCH-CENTA",

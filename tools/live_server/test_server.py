@@ -217,7 +217,8 @@ def test_swing_sleeve(tmp_path):
     P = c.get("/api/plan", headers=h).json()
     assert "swing" in P and P["swing"]["risk_pct"] == round(A.RISK * 100, 2)
     sw = [r for r in P["rows"] if r["tier"] == "swing"]
-    assert all(r["kind"] == "T921" for r in sw)
+    assert all(r["kind"] in ("T921", "RETEST") for r in sw)
+    assert A.protect_level("RETEST", 100) == 100 and A.protect_level("T921", 100) == 100 and A.protect_level("ATH_BRK", 100) < 100
     assert not any(r["kind"] == "T921" for r in P["rows"] if r["tier"] != "swing")
     j = c.post("/api/picks", headers=h, json={"n": 5, "swing_risk": 1.0}).json(); assert j["swing_risk_pct"] == 1.0 and j["picks"] == 5
     P2 = c.get("/api/plan", headers=h).json(); assert P2["swing"]["risk_pct"] == 1.0

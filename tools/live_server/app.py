@@ -320,7 +320,7 @@ def record_exit(sym, sell_px):
 def protect_level(kind, stop):
     if not stop:
         return None
-    return stop if kind == "T921" else stop * (1 - ATH_NET_PCT)
+    return stop if kind in ("T921", "RETEST") else stop * (1 - ATH_NET_PCT)
 
 
 def _protect(sym, e):
@@ -452,7 +452,7 @@ def sized(acc=None):
     sys_open = [s for s in J if not s.startswith("_") and (held.get(s, 0) > 0 or J[s].get("state") == "pending")]
     cap = CAPITAL or acc["net"]
     N = picks(); RK = risk_now(); SR = swing_risk()
-    sw_open = [s for s in sys_open if J[s].get("system") == "9/21 trend"]
+    sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Breakout retest")]
     ath_open = [s for s in sys_open if s not in sw_open]
     slots = max(0, N - len(ath_open)); sw_slots = max(0, SWING_MAX - len(sw_open))
     cash = acc["cash"]
@@ -602,7 +602,7 @@ def order(body: Order, _=Depends(auth)):
         lv = protect_level(row["kind"], row.get("stop"))
         if lv:
             prot = dict(trigger=round(lv, 2), limit=round(lv * (1 - GTT_LIMIT_GAP), 2),
-                        note="at the plan stop (as backtested)" if row["kind"] == "T921" else f"safety net {ATH_NET_PCT * 100:.0f}% below the plan stop; the system exit is a weekly close below the 30-week SMA")
+                        note="at the plan stop (as backtested)" if row["kind"] in ("T921", "RETEST") else f"safety net {ATH_NET_PCT * 100:.0f}% below the plan stop; the system exit is a weekly close below the 30-week SMA")
     if not is_live():
         log("dry", **rec)
         return dict(ok=True, mode="DRY RUN", sent=False, order=p, protect=prot,
@@ -664,7 +664,7 @@ def live_check(r, ltp):
 def quotes(_=Depends(auth)):
     """Live prices for today's plan rows, exits and app trades, plus the limit price a buy sent now would get."""
     P = plan(); t = ist_now()
-    rows = (P.get("top") or []) + (P.get("more") or []); syms = sorted({r["symbol"] for r in rows} | {e["symbol"] for e in P.get("exits") or []}
+    rows = (P.get("top") or []) + (P.get("more") or []) + (P.get("swing") or []); syms = sorted({r["symbol"] for r in rows} | {e["symbol"] for e in P.get("exits") or []}
                                              | {k for k in journal() if not k.startswith("_")})
     try:
         Q = broker.quotes(syms)

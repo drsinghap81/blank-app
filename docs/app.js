@@ -128,8 +128,8 @@ async function lvPdf(mk, P, picked, exits, info) {
   doc.setTextColor(0);
   const body = picked.map((r) => {
     const order = r.kind === 'ATH_STOP' ? `Stop-limit buy: trigger ${p(r.trigger)}, limit ${p(r.price)} (day)` : `Limit buy ${p(r.price)} (day, at the open)`;
-    const prot = r.system === 'Monthly ATH' ? `Weekly close below 30-wk avg (${p(r.stop)}); safety stop ${p(r.stop * 0.85)}` : `Stop ${p(r.stop)} (GTC/GTT); exit when Supertrend turns red`;
-    return [r.tier === 'swing' ? `S${r.rank}` : r.rank, r.symbol, r.tier === 'swing' ? 'Swing 9/21' : 'Invest: ATH', LANE_TXT[r.lane] || 'n/a', order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
+    const prot = r.system === 'Monthly ATH' ? `Weekly close below 30-wk avg (${p(r.stop)}); safety stop ${p(r.stop * 0.85)}` : r.kind === 'RETEST' ? `Stop ${p(r.stop)} (GTT); target sell ${p(r.target)} (3R); exit after 120 days` : `Stop ${p(r.stop)} (GTC/GTT); exit when Supertrend turns red`;
+    return [r.tier === 'swing' ? `S${r.rank}` : r.rank, r.symbol, r.tier === 'swing' ? (r.kind === 'RETEST' ? 'Swing: retest' : 'Swing: 9/21') : 'Invest: ATH', LANE_TXT[r.lane] || 'n/a', order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
   });
   doc.autoTable({ startY: 86, head: [['#', 'Stock', 'System', 'Industry', 'Order', 'Qty', 'Value', '% cap', 'Stop (dist.)', 'Risk', 'Exit / protective stop']], body,
     styles: { fontSize: 8.5, cellPadding: 4, valign: 'middle' }, headStyles: { fillColor: [17, 24, 39] }, columnStyles: { 4: { cellWidth: 130 }, 10: { cellWidth: 165 } },
@@ -155,7 +155,7 @@ function lvSwingSize(rows, C0, idle, sr) {
 }
 function lvSwingHead(sr, idle, mk, nOpen) {
   const opts = [0.25, 0.5, 0.75, 1].concat([+riskForBudget(lvBudget()).toFixed(2)]).filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b);
-  return `<p class="lv-sub">EMA 9/21 cross entries · stop = 5-day low (under the breakout candles, max 12%) · exit when price closes below Supertrend(10,3). Uses the cash the ATH sleeve isn't using, keeping 15% of capital free for new ATH breakouts. Backtest 2017–26: ATH + 9/21 on idle cash 30.8%/yr, worst fall −24% (both at 1%), vs ATH alone 17%, −20%.</p>
+  return `<p class="lv-sub">Ranked by industry strength (Building first). <b>9/21 trend</b>: EMA 9/21 cross, stop = 5-day low (under the breakout candles, max 12%), exit when price closes below Supertrend(10,3).${mk === 'NSE' ? ' <b>Breakout retests</b> (India only): first return to an old breakout level, stop 1 ATR under it, 3R target — only in Building/Strong/Middle industries (+0.17 to +0.24R per trade vs +0.09R random, 2017–26; Weak/Fading ones were no better than random).' : ''} Uses the cash the ATH sleeve isn't using, keeping 15% of capital free for new ATH breakouts. Backtest 2017–26: ATH + 9/21 on idle cash 30.8%/yr, worst fall −24% (both at 1%), vs ATH alone 17%, −20%.</p>
     <label class="lv-sub lv-pick-n">Swing risk per trade <select id="lvsr">${opts.map((v) => `<option value="${v}" ${Math.abs(v - sr) < 0.005 ? 'selected' : ''}>${fmt(v, 2)}%${Math.abs(v - riskForBudget(lvBudget())) < 0.005 ? ' (your loss limit)' : ''}</option>`).join('')}</select>
     <span>Idle cash for swing trades: <b>${money(idle, mk)}</b>${nOpen != null ? ` · ${nOpen} swing trade(s) open` : ''}.</span></label>`;
 }
@@ -193,7 +193,7 @@ function guardCard(G) {
     : `<label class="lv-sub" style="display:block;margin-top:6px">Worst fall you can sit through: <select id="lvbud">${opts}</select></label>`}
     <details class="info"><summary>How it works</summary><p>Your account value (cash + shares) is compared with its highest point. Risk per trade is set so that in 95% of 2,000 simulated 10-year histories the fall stayed within your limit. It warns at 75% and 100% of the limit, pauses new buys for 2 weeks after ${G ? G.streak_max : 5} losses in a row, caps one stock at 10%, and never sells for you. The limit is DD_BUDGET_PCT on the server.</p></details></div>`;
 }
-const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', T921: '9/21 trend entry' };
+const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', T921: '9/21 trend entry', RETEST: 'Breakout retest (support)' };
 function lvSeg() {
   return `<div class="seg" id="lvmk" style="margin:10px 16px 0">${[['NSE', 'India · Angel'], ['US', 'US · moomoo'], ['ASX', 'Australia · moomoo']].map(([k, n]) => `<button data-k="${k}" aria-selected="${state.lvMk === k}">${n}</button>`).join('')}</div>`;
 }
@@ -322,9 +322,11 @@ async function loadLive() {
       ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
-    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Swing · 9/21 trend on idle cash</b><span class="muted">${swPend.length} to buy · ${money(swPend.reduce((a, r) => a + r.value, 0), 'NSE')}</span></div>
+    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Swing · 9/21 trend + breakout retests, on idle cash</b><span class="muted">${swPend.length} to buy · ${money(swPend.reduce((a, r) => a + r.value, 0), 'NSE')}</span></div>
       ${lvSwingHead(srNow, idleNow, 'NSE', S && S.swing ? S.swing.open : null)}
-      ${swList || '<p class="empty">No new 9/21 signals for the next session.</p>'}</div>
+      ${swList || '<p class="empty">No new swing signals for the next session.</p>'}</div>
+    ${(P.pattern_watch || []).length ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
+      <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>How these are picked and sized</summary><p>From the India systems that backtested well: monthly-ATH breakouts (this month or last, within −5%/+10% of the breakout price), buy-stops at ATH triggers within 5%, and 9/21 trend entries. Score = system (ATH 2-yr base 3, 1–2 yr 2, buy-stop 2, 9/21 3) + 2 if sector and stock RS are both positive + 1 if the theme RS is positive − 3 if the stock's 1-year RS is negative (ATH only; top-down did not help 9/21). The ranking combines tested pieces but is not itself a separately backtested system. Size: risk per trade from your drawdown budget (guard card, 95% Monte Carlo), at most 10% of capital in one stock, at most 10 positions, within the cash you have. US and Australia are excluded (no tested edge).</p></details>`;
