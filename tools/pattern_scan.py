@@ -24,6 +24,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from trend_scan import nse_symbols  # noqa: E402
 
 OUT = "data/scan"; CH = f"{OUT}/pattern_charts"
+# US / ASX (8 Nov 2026): same rules, watch-only. Backtest 2008-26 (scratchpad gbot/gb.py, gsr.py): bottom-pattern breakouts
+# +2.5% over 120 days vs +5.0% (US) / +4.8% (ASX) for a random stock the same day; breakout retests +0.19R vs +0.25R (US),
+# +0.13R vs +0.15R (ASX); old swing lows +0.11R vs +0.24R / +0.02R vs +0.10R. Worse than random in both.
+GLOBAL = {"US": dict(out="data/scan/us", suf="", minval=1e7, minpx=10.0, idx={"^GSPC": "S&P 500", "^NDX": "NASDAQ 100", "^RUT": "RUSSELL 2000"},
+                     bt_pat="2008-26, 17,432 signals: 120-day return +2.5% vs +5.0% for a random liquid stock the same day; target before stop 57% vs 58%. Worse than random - watch only.",
+                     bt_sup="2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.19R (30,963) vs +0.25R for a random uptrend stock; old swing lows +0.11R vs +0.24R. Worse than random - watch only."),
+          "ASX": dict(out="data/scan/asx", suf=".AX", minval=1e6, minpx=1.0, idx={"^AXJO": "ASX 200", "^AORD": "ALL ORDINARIES"},
+                      bt_pat="2008-26, 1,904 signals: 120-day return +2.5% vs +4.8% for a random liquid stock the same day; target before stop 60% vs 60%. Worse than random - watch only.",
+                      bt_sup="2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.13R (3,359) vs +0.15R for a random uptrend stock; old swing lows +0.02R vs +0.10R. Worse than random - watch only.")}
 THR, FALL, MINVAL, MIN_CLOSE, RECENT = 0.06, 0.20, 2e7, 100.0, 10
 INDICES = {"^NSEI": "NIFTY 50", "^NSEBANK": "NIFTY BANK", "^CNXIT": "NIFTY IT", "^CNXAUTO": "NIFTY AUTO", "^CNXPHARMA": "NIFTY PHARMA",
            "^CNXMETAL": "NIFTY METAL", "^CNXFMCG": "NIFTY FMCG", "^CNXREALTY": "NIFTY REALTY", "^CNXENERGY": "NIFTY ENERGY",
@@ -196,14 +205,25 @@ def chart(x):
                 rsi=[round(float(v), 1) for v in rsi(x.Close.to_numpy(float))[-320:]])
 
 
-def main():
+def main(mk="NSE"):
+    global OUT, CH, MINVAL, MIN_CLOSE
+    g = GLOBAL.get(mk)
+    if g:
+        OUT, MINVAL, MIN_CLOSE = g["out"], g["minval"], g["minpx"]
+    CH = f"{OUT}/pattern_charts"
     os.makedirs(CH, exist_ok=True)
     for f in os.listdir(CH):
         os.remove(os.path.join(CH, f))
     from session import drop_partial
-    u = nse_symbols(); u = u[u.board == "main"] if "board" in u else u
-    u["ticker"] = u.symbol + ".NS"; name = dict(zip(u.symbol, u.name)) if "name" in u else {}
-    jobs = [(t, s, name.get(s, s), "stock") for t, s in zip(u.ticker, u.symbol)] + [(t, n_, n_, "index") for t, n_ in INDICES.items()]
+    if g:   # liquid stocks of the Markets tab (group_pulse members) + the main indices
+        G = json.load(open(f"{OUT}/group_pulse.json"))
+        mem = {m["symbol"]: m.get("name") or m["symbol"] for r in G["rows"] for m in r["members"]}
+        tk = lambda s_: (s_.replace("/", "-").replace(".", "-") if mk == "US" else s_) + g["suf"]  # noqa: E731
+        jobs = [(tk(s_), s_, n_, "stock") for s_, n_ in sorted(mem.items())] + [(t, n_, n_, "index") for t, n_ in g["idx"].items()]
+    else:
+        u = nse_symbols(); u = u[u.board == "main"] if "board" in u else u
+        u["ticker"] = u.symbol + ".NS"; name = dict(zip(u.symbol, u.name)) if "name" in u else {}
+        jobs = [(t, s, name.get(s, s), "stock") for t, s in zip(u.ticker, u.symbol)] + [(t, n_, n_, "index") for t, n_ in INDICES.items()]
     rows, srows, asof = [], [], None
     for a in range(0, len(jobs), 80):
         chunk = jobs[a:a + 80]; dd = None
@@ -218,7 +238,7 @@ def main():
         for t, sym, nm, kind in chunk:
             try:
                 x = pd.DataFrame({k: dd[k][t] for k in ("Open", "High", "Low", "Close", "Volume")}).dropna(subset=["Close"])
-                x = drop_partial(x, "NSE")
+                x = drop_partial(x, mk)
                 if len(x) < 150:
                     continue
                 asof = max(asof, x.index[-1].date()) if asof else x.index[-1].date()
@@ -245,27 +265,28 @@ def main():
         pass
     order = {"breakout": 0, "forming": 1}
     rows.sort(key=lambda r: (r["kind"] != "index", order[r["status"]], r["to_neck_pct"] if r["status"] == "forming" else r["days_since"]))
-    out = dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), asof=str(asof), market="NSE", regime=regime,
+    out = dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), asof=str(asof), market=mk, regime=regime if mk == "NSE" else None,
                rules="zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; "
                      "breakout = close above the neckline within 60 days of the last low",
                backtest="2016-26, 3,994 signals: 120-day return +3.5% vs +7.4% for a random liquid stock; in market downtrends +10.5% "
                         "vs +13.6% for any stock; target before stop 63% vs 63% for a random stock; with bullish RSI divergence "
-                        "66% vs 65%, 120d +4.7%. No edge - watch only.",
+                        "66% vs 65%, 120d +4.7%. No edge - watch only." if not g else g["bt_pat"],
                rows=rows)
     json.dump(out, open(f"{OUT}/patterns.json", "w"), indent=0)
     print("patterns", len(rows), {s: sum(r["status"] == s for r in rows) for s in order})
     srows.sort(key=lambda r: (r["status"] != "touched", not r["sq9_match"], r["days_ago"] if r["status"] == "touched" else r["above_pct"]))
-    json.dump(dict(generated=out["generated"], asof=out["asof"], market="NSE",
+    json.dump(dict(generated=out["generated"], asof=out["asof"], market=mk,
                    rules="Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) "
                          "that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). "
                          "'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares "
                          "(1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
                    backtest="2016-26, 16,908 first touches, 3R target vs stop (1 ATR below the level): breakout retests +0.20R per trade, "
                             "old swing lows +0.10R, random uptrend stock the same day +0.09R. Trades with 1:3 room to the next resistance: no better. "
-                            "Within 1% of an odd square: no better (breakout retests +0.15R vs +0.21R away from one; swing lows +0.04R vs +0.09R). Watch only.",
+                            "Within 1% of an odd square: no better (breakout retests +0.15R vs +0.21R away from one; swing lows +0.04R vs +0.09R). Watch only." if not g else g["bt_sup"],
                    rows=srows), open(f"{OUT}/support.json", "w"), indent=0)
     print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["sq9_match"] for r in srows), "on a Square-of-9 number")
 
 
 if __name__ == "__main__":
-    main()
+    for m_ in sys.argv[1:] or ["NSE"]:
+        main(m_)

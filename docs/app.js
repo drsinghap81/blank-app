@@ -1232,20 +1232,32 @@ function patItem(r, i) {
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">neck ${fmt(r.neck, 2, 'en-IN')}</span></div></li>`;
 }
 const botTabs = (cur) => `<div class="seg" id="botm" style="margin:10px 16px 0;flex-wrap:wrap"><button data-k="pat" aria-selected="${cur === 'pat'}">Bottom patterns</button><button data-k="sup" aria-selected="${cur === 'sup'}">At support</button><button data-k="fund" aria-selected="${cur === 'fund'}">ETFs & funds</button></div>`;
-function botTabsWire(el) { el.querySelectorAll('#botm button').forEach((b) => b.addEventListener('click', () => { state.botM = b.dataset.k; loadBottoms(); })); }
+function botTabsWire(el) {
+  el.querySelectorAll('#botm button').forEach((b) => b.addEventListener('click', () => { state.botM = b.dataset.k; loadBottoms(); }));
+  el.querySelectorAll('#botmk button').forEach((b) => b.addEventListener('click', () => { state.botMk = b.dataset.k; try { localStorage.setItem('td.botMk', b.dataset.k); } catch (e) { /* */ } loadBottoms(); }));
+}
+const botMk = () => { if (!state.botMk) { try { state.botMk = localStorage.getItem('td.botMk') || 'NSE'; } catch (e) { state.botMk = 'NSE'; } } return state.botMk; };
+const botMkSeg = () => `<div class="seg" id="botmk" style="margin:8px 16px 0">${['NSE', 'US', 'ASX'].map((k) => `<button data-k="${k}" aria-selected="${botMk() === k}">${MKT[k].name}</button>`).join('')}</div>`;
+async function botData(kind) { // per-market cache of patterns.json / support.json
+  const mk = botMk(); const c = kind === 'pat' ? (state.patC = state.patC || {}) : (state.supC = state.supC || {});
+  if (c[mk] === undefined) c[mk] = await getJSON(MAIN + MKT[mk].path + (kind === 'pat' ? 'patterns.json' : 'support.json'), `${kind}_${mk}`);
+  if (kind === 'pat') state.pat = c[mk]; else state.sup = c[mk];
+  return c[mk];
+}
+const botWatch = (mk) => (mk === 'NSE' ? '' : `<div class="status exit watch" style="margin:8px 16px"><b>Watch only.</b> ${mk === 'US' ? 'US' : 'ASX'} backtest 2008–26: these setups did worse than buying a random stock the same day, so they are not in the Live lists.</div>`);
 async function loadBottoms() {
   if ((state.botM || 'pat') === 'sup') return loadSupport();
   if (state.botM === 'fund') return loadFunds();
   $('#title').textContent = 'Bottom patterns';
   const el = $('#view-bot');
-  if (!state.pat) { el.innerHTML = '<p class="muted pad">Loading…</p>'; state.pat = await getJSON(MAIN + 'data/scan/patterns.json', 'patterns'); }
-  const P = state.pat;
-  if (!P) { el.innerHTML = '<p class="empty">The pattern scan appears after its first evening run (about 21:10 IST).</p>'; $('#asof').textContent = ''; return; }
-  $('#asof').textContent = `Market data: India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
+  const bmk = botMk(); el.innerHTML = botTabs('pat') + botMkSeg() + '<p class="muted pad">Loading…</p>'; botTabsWire(el);
+  const P = await botData('pat');
+  if (!P) { el.innerHTML = botTabs('pat') + botMkSeg() + `<p class="empty">The ${MKT[bmk].name} pattern scan appears after its first evening run.</p>`; botTabsWire(el); $('#asof').textContent = ''; return; }
+  $('#asof').textContent = `Market data: ${MKT[bmk].name} close ${closeTxt(bmk, P.asof)}${updTxt(P.generated)}`;
   const R = P.rows || []; const nb = R.filter((r) => r.status === 'breakout').length; const nf = R.length - nb;
   const cnt = (t) => R.filter((r) => r.typ === t).length;
   const seg = (id, cur, opts) => `<div class="seg" id="${id}">${opts.map(([k, n]) => `<button data-k="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
-  el.innerHTML = `${botTabs('pat')}<section class="summary">
+  el.innerHTML = `${botTabs('pat')}${botMkSeg()}${botWatch(bmk)}<section class="summary">
       <div class="stat new"><b>${nb}</b><span>broke the neckline (last 10 days)</span></div>
       <div class="stat"><b>${nf}</b><span>forming, within 20% of the neckline</span></div>
       <div class="stat"><b>${P.regime ? (P.regime.down ? 'Down' : 'Up') : '–'}</b><span>market: Nifty 500 vs its 200-day</span></div>
@@ -1391,14 +1403,14 @@ function supItem(r, i) {
 async function loadSupport() {
   $('#title').textContent = 'At support';
   const el = $('#view-bot');
-  if (!state.sup) { el.innerHTML = botTabs('sup') + '<p class="muted pad">Loading…</p>'; botTabsWire(el); state.sup = await getJSON(MAIN + 'data/scan/support.json', 'support'); }
-  const P = state.sup;
-  if (!P) { el.innerHTML = botTabs('sup') + '<p class="empty">The support list appears after the next evening scan (about 21:10 IST).</p>'; botTabsWire(el); $('#asof').textContent = ''; return; }
-  $('#asof').textContent = `Market data: India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
+  const bmk = botMk(); el.innerHTML = botTabs('sup') + botMkSeg() + '<p class="muted pad">Loading…</p>'; botTabsWire(el);
+  const P = await botData('sup');
+  if (!P) { el.innerHTML = botTabs('sup') + botMkSeg() + `<p class="empty">The ${MKT[bmk].name} support list appears after its next evening scan.</p>`; botTabsWire(el); $('#asof').textContent = ''; return; }
+  $('#asof').textContent = `Market data: ${MKT[bmk].name} close ${closeTxt(bmk, P.asof)}${updTxt(P.generated)}`;
   const R = P.rows || []; const nt = R.filter((r) => r.status === 'touched').length; const ng = R.filter((r) => r.sq9_match).length;
   const nr = R.filter((r) => r.level_kind === 'breakout retest').length; const n3 = R.filter((r) => r.room_r != null && r.room_r >= 3).length;
   const seg = (id, cur, opts) => `<div class="seg" id="${id}">${opts.map(([k, n]) => `<button data-k="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
-  el.innerHTML = `${botTabs('sup')}<section class="summary">
+  el.innerHTML = `${botTabs('sup')}${botMkSeg()}${botWatch(bmk)}<section class="summary">
       <div class="stat new"><b>${nt}</b><span>first touch of an old level (last 5 days)</span></div>
       <div class="stat"><b>${R.length - nt}</b><span>0–5% above a level, not yet touched</span></div>
       <div class="stat"><b>${ng}</b><span>support within 1% of an odd square (Sq9)</span></div>
@@ -1435,12 +1447,12 @@ function supSelect(r) {
     <div class="chart" id="supc"></div>
     <p class="muted" style="margin:4px 16px">Daily candles · green = support level · purple dashed = Square-of-9 odd squares (nearest the support, next below it, next above the price) · red = stop · gold = next resistance · blue / grey = 50 / 200-day average.</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
-    ${swingPlan(r.close, r.stop, 'NSE', r.resistance != null && r.resistance > r.close ? r.resistance : r.close + 3 * (r.close - r.stop), r.resistance != null && r.resistance > r.close ? 'next resistance' : '3R, no resistance above')}`);
+    ${swingPlan(r.close, r.stop, botMk(), r.resistance != null && r.resistance > r.close ? r.resistance : r.close + 3 * (r.close - r.stop), r.resistance != null && r.resistance > r.close ? 'next resistance' : '3R, no resistance above')}`);
   drawSup(r);
 }
 async function drawSup(r) {
   const box = $('#supc'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
-  let c; try { const res = await fetch(MAIN + `data/scan/pattern_charts/${encodeURIComponent(r.symbol.replace(/ /g, '_'))}.json`); if (!res.ok) throw 0; c = await res.json(); }
+  let c; try { const res = await fetch(MAIN + MKT[botMk()].path + `pattern_charts/${encodeURIComponent(r.symbol.replace(/ /g, '_'))}.json`); if (!res.ok) throw 0; c = await res.json(); }
   catch (e) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; }
   box.innerHTML = '';
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
@@ -1474,12 +1486,12 @@ function patSelect(r) {
     <div class="chart" id="patc"></div><div class="rsi" id="patr"></div>
     <p class="muted" style="margin:4px 16px">Daily candles · ● lows · gold = neckline · red = pattern stop · blue / grey = 50 / 200-day average · lower panel RSI(14) with 30 / 70${r.rsi_div > 0 ? ' · dashed purple = divergence (price low vs RSI low)' : ''}. RSI divergence did not improve the odds in the 2016–26 test (target first 67% vs 66% for a random stock).</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
-    ${r.kind === 'index' ? '' : swingPlan(r.status === 'breakout' ? r.close : r.neck, r.stop, 'NSE', r.neck * (1 + r.height_pct / 100), 'measured move', r.status !== 'breakout')}`);
+    ${r.kind === 'index' ? '' : swingPlan(r.status === 'breakout' ? r.close : r.neck, r.stop, botMk(), r.neck * (1 + r.height_pct / 100), 'measured move', r.status !== 'breakout')}`);
   drawPat(r);
 }
 async function drawPat(r) {
   const box = $('#patc'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
-  let c; try { const res = await fetch(MAIN + `data/scan/pattern_charts/${encodeURIComponent(r.symbol.replace(/ /g, '_'))}.json`); if (!res.ok) throw 0; c = await res.json(); }
+  let c; try { const res = await fetch(MAIN + MKT[botMk()].path + `pattern_charts/${encodeURIComponent(r.symbol.replace(/ /g, '_'))}.json`); if (!res.ok) throw 0; c = await res.json(); }
   catch (e) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; }
   box.innerHTML = '';
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
@@ -2336,7 +2348,10 @@ async function mxSignals(mk) {
   const tr = state.data[mk] || (state.data[mk] = await getJSON(MAIN + MKT[mk].path + 'trend_scan.json', 'td_' + mk));
   const at = await getJSON(MAIN + MKT[mk].path + 'ath.json', 'ath_mx_' + mk);
   let pat = null, sup = null;
-  if (mk === 'NSE') { pat = state.pat || (state.pat = await getJSON(MAIN + 'data/scan/patterns.json', 'patterns')); sup = state.sup || (state.sup = await getJSON(MAIN + 'data/scan/support.json', 'support')); }
+  { state.patC = state.patC || {}; state.supC = state.supC || {};
+    if (state.patC[mk] === undefined) state.patC[mk] = await getJSON(MAIN + MKT[mk].path + 'patterns.json', 'pat_' + mk);
+    if (state.supC[mk] === undefined) state.supC[mk] = await getJSON(MAIN + MKT[mk].path + 'support.json', 'sup_' + mk);
+    pat = state.patC[mk]; sup = state.supC[mk]; }
   const m = {}; const add = (sym, cls, txt) => { (m[sym] = m[sym] || []).push(`<span class="chip ${cls}">${txt}</span>`); };
   if (at) {
     (at.breakouts || []).forEach((r) => add(r.symbol, 'new', `ATH breakout${r.main ? ' (2-yr base)' : ''}`));

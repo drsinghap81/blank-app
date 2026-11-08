@@ -4,6 +4,8 @@ on:
     paths: [".github/workflows/pattern-scan.yml", "tools/pattern_scan.py"]
   schedule:
     - cron: "40 15 * * 1-5"   # 21:10 IST on trading days (after the ATH scan refreshes sector_hist)
+    - cron: "15 22 * * 1-5"   # US after the close (group_pulse members from the previous night)
+    - cron: "40 7 * * 1-5"    # ASX after the close
   workflow_dispatch:
 permissions:
   contents: write
@@ -18,12 +20,14 @@ jobs:
       - name: Scan
         run: |
           pip install -q yfinance pandas requests
-          python tools/pattern_scan.py > /tmp/pat.txt 2>&1 || true
+          H=$(date -u +%H); M=NSE; [ "$H" = 22 ] && M=US; [ "$H" = 07 ] && M=ASX
+          [ "${{ github.event_name }}" = workflow_dispatch ] && M="NSE US ASX"
+          python tools/pattern_scan.py $M > /tmp/pat.txt 2>&1 || true
           grep -v -i "warn\|delisted\|failed download\|^\[" /tmp/pat.txt | tail -8
       - name: Commit
         run: |
           git config user.name "pattern-scan bot"; git config user.email "actions@users.noreply.github.com"
-          git add data/scan/patterns.json data/scan/support.json data/scan/pattern_charts || true
+          for d in data/scan data/scan/us data/scan/asx; do for f in $d/patterns.json $d/support.json; do [ -f "$f" ] && git add "$f"; done; [ -d $d/pattern_charts ] && git add -A $d/pattern_charts; done; true
           git diff --cached --quiet && exit 0
           git commit -qm "Pattern scan $(date -u +%F)"
           for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done
