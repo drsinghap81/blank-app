@@ -4,9 +4,12 @@ on:
     paths: [".github/workflows/topdown-data.yml", "tools/world_state.py", "tools/fetch_themes.py"]
   schedule:
     - cron: "40 14 * * 1-5"   # 20:10 IST on trading days, before the ATH scan (20:30)
+    - cron: "20 22 * * 1-5"   # after the US close: Europe + US closes in the World view (~9:20 am Melbourne)
+    - cron: "30 7 * * 1-5"    # after the Asia / ASX close (~6:30 pm Melbourne)
   workflow_dispatch:
 permissions:
   contents: write
+concurrency: {group: topdown-data, cancel-in-progress: false}
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -20,12 +23,13 @@ jobs:
         run: python tools/world_state.py 2>&1 | grep -v -i "warn" | tail -25 || true
       - name: Theme constituents (weekly on Mondays, or when the list is missing)
         run: |
-          if [ "$(date -u +%u)" = "1" ] || [ ! -f data/universe/themes.csv ] || [ "${{ github.event_name }}" != "schedule" ]; then
+          if { [ "$(date -u +%u)" = "1" ] && [ "$(date -u +%H)" = "14" ]; } || [ ! -f data/universe/themes.csv ] || [ "${{ github.event_name }}" != "schedule" ]; then
             python tools/fetch_themes.py 2>&1 | tail -70 || true
           fi
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
-          git add data/scan/world.json data/scan/world_hist.csv.gz data/universe/themes.csv data/universe/themes 2>/dev/null; git diff --cached --quiet && exit 0
+          for f in data/scan/world.json data/scan/world_hist.csv.gz data/universe/themes.csv data/universe/themes; do [ -e "$f" ] && git add "$f"; done; true
+          git diff --cached --quiet && exit 0
           git commit -qm "Top-down data $(date -u +%F)"
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
