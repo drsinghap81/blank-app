@@ -129,10 +129,10 @@ async function lvPdf(mk, P, picked, exits, info) {
   const body = picked.map((r) => {
     const order = r.kind === 'ATH_STOP' ? `Stop-limit buy: trigger ${p(r.trigger)}, limit ${p(r.price)} (day)` : `Limit buy ${p(r.price)} (day, at the open)`;
     const prot = r.system === 'Monthly ATH' ? `Weekly close below 30-wk avg (${p(r.stop)}); safety stop ${p(r.stop * 0.85)}` : r.kind === 'RETEST' || r.kind === 'PATTERN' ? `Stop ${p(r.stop)} (GTC/GTT); target sell ${p(r.target)}${r.kind === 'RETEST' ? ' (3R)' : ' (measured move)'}; exit after 120 days${r.experimental ? '; EXPERIMENTAL' : ''}` : `Stop ${p(r.stop)} (GTC/GTT); exit when Supertrend turns red`;
-    return [r.tier === 'swing' ? `S${r.rank}` : r.rank, r.symbol, r.tier === 'swing' ? ({ RETEST: 'Swing: retest', PATTERN: 'Swing: pattern' }[r.kind] || 'Swing: 9/21') : 'Invest: ATH', LANE_TXT[r.lane] || 'n/a', order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
+    return [r.tier === 'swing' ? `S${r.rank}` : r.rank, r.symbol, r.tier === 'swing' ? ({ RETEST: 'Swing: retest', PATTERN: 'Swing: pattern' }[r.kind] || 'Swing: 9/21') : 'Invest: ATH', `${r.group || 'n/a'}${r.lane ? ` (${LANE_TXT[r.lane]})` : ''}`, order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
   });
   doc.autoTable({ startY: 86, head: [['#', 'Stock', 'System', 'Industry', 'Order', 'Qty', 'Value', '% cap', 'Stop (dist.)', 'Risk', 'Exit / protective stop']], body,
-    styles: { fontSize: 8.5, cellPadding: 4, valign: 'middle' }, headStyles: { fillColor: [17, 24, 39] }, columnStyles: { 4: { cellWidth: 130 }, 10: { cellWidth: 165 } },
+    styles: { fontSize: 8.5, cellPadding: 4, valign: 'middle' }, headStyles: { fillColor: [17, 24, 39] }, columnStyles: { 3: { cellWidth: 105 }, 4: { cellWidth: 120 }, 10: { cellWidth: 150 } },
     foot: [['', 'Total', '', '', '', '', m(picked.reduce((a, r) => a + (r.value || 0), 0)), `${(picked.reduce((a, r) => a + (r.value || 0), 0) / info.cap * 100).toFixed(1)}%`, '', m(picked.reduce((a, r) => a + (r.risk_amt || 0), 0)), '']],
     footStyles: { fillColor: [241, 245, 249], textColor: 20, fontStyle: 'bold' } });
   let y = doc.lastAutoTable.finalY + 18;
