@@ -223,7 +223,7 @@ async function lvOpen(r) {
   if (!state.athC.NSE) {
     const [d, ipo, sec, world] = await Promise.all([getJSON(MAIN + 'data/scan/ath.json', 'ath'), getJSON(MAIN + 'data/scan/ipo.json', 'ipo'),
       getJSON(MAIN + 'data/scan/sectors.json', 'sectors'), getJSON(MAIN + 'data/scan/world.json', 'world')]);
-    state.athC.NSE = { d, live: null, ipo, sec, world, tr: null, tab: 'td', q: '', all: false, lp: {} };
+    state.athC.NSE = { d, live: null, ipo, sec, world, tr: null, tab: 'brk', q: '', all: false, lp: {} };
   }
   state.ath = state.athC.NSE; state.ath.lp = state.ath.lp || {};
   const d = state.ath.d || {};
@@ -892,6 +892,17 @@ function size921(r, m) {
   const val = Math.min(riskPct('t921') / 100 * C0 * E / (E - stop), POS_CAP * C0); const sh = Math.floor(val / E);
   return { sh, E, val: sh * E, pctCap: (sh * E) / C0 * 100, risk: sh * (E - stop) };
 }
+/* Swing setups with a fixed stop (bottom patterns, support): 1% of capital to the stop, max 10% of capital */
+function swingPlan(E, stop, m, tgt, tgtLbl, buyStop) {
+  const C0 = cap(m); if (!E || !stop || E <= stop || !C0) return '';
+  const val = Math.min(riskPct('t921') / 100 * C0 * E / (E - stop), POS_CAP * C0); const sh = Math.floor(val / E); if (!sh) return '';
+  const R = tgt ? (tgt - E) / (E - stop) : null; const L = MKT[m].loc;
+  return `<div class="card plan" style="margin:10px 16px"><h3 style="margin:0 0 6px">Position plan</h3>
+    <p><b>${buyStop ? 'Buy-stop' : 'Buy'} ${sh.toLocaleString(L)} shares</b> ${buyStop ? 'above' : 'at about'} ${fmt(E, 2, L)} = ${money(sh * E, m)} (${fmt(sh * E / C0 * 100, 1)}% of capital).</p>
+    <p>Stop-loss <b>${fmt(stop, 2, L)}</b> (${fmt((E - stop) / E * 100, 1)}% below) → ${riskPct('t921')}% of capital ≈ ${money(sh * (E - stop), m)} at risk${sh * E >= POS_CAP * C0 * 0.99 ? ' (size capped at 10% of capital)' : ''}.</p>
+    ${tgt ? `<p>Target <b>${fmt(tgt, 2, L)}</b> (${tgtLbl}) = ${fmt(R, 1)}R, ≈ ${money(sh * (tgt - E), m)}.${R < 2 ? ' Under 2R: thin reward for the risk.' : ''}</p>` : ''}
+    <p class="muted" style="font-size:12.5px">Capital ${money(C0, m)} and risk ${riskPct('t921')}% come from your 9/21 settings. Place the stop as a GTT / stop order after buying.</p></div>`;
+}
 /* Monthly ATH: risk % of capital to the 30-week SMA, max 10% of capital */
 function sizeATH(E, sma, C0, held = 0) {
   if (!E || !sma || E <= sma) return null;
@@ -982,9 +993,10 @@ async function loadATH() {
     const tr = state.data[mk] || await getJSON(MAIN + AP() + 'trend_scan.json', 'td_' + mk);
     if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds');
     await loadGP(mk);
-    state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'td', q: '', all: false };
+    state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'brk', q: '', all: false };
   }
   state.ath = state.athC[mk];
+  if (state.ath.tab === 'td' || state.ath.tab === 'pulse') state.ath.tab = 'brk';
   const wireMk = () => el.querySelectorAll('.seg.mk button').forEach((b) => b.addEventListener('click', () => { state.athMkt = b.dataset.mk; try { localStorage.setItem('td_athmkt', b.dataset.mk); } catch (e) { /* */ } loadATH(); }));
   const { d } = state.ath;
   if (!d) { el.innerHTML = mkSeg + `<p class="empty">The ${MKT[mk].name} monthly-ATH scan appears after its first evening run. Try again later.</p>`; $('#asof').textContent = ''; wireMk(); return; }
@@ -998,8 +1010,8 @@ async function loadATH() {
   const exits = T.filter((r) => r.status === 'exit next open').length;
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
-  const tabs = [['td', 'Top-down', tdRows(true).length], ['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
-    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length], ['pulse', 'Industry Pulse', (state.gp[mk] && state.gp[mk].groups_n) || 0]];
+  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
+    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length]];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     <section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
@@ -1151,8 +1163,23 @@ function fundSelect(r) {
   openPanel(`<div class="d-head"><div><h2>${esc(r.kind === 'fund' ? r.name : (r.symbol || r.key))}</h2><div class="co">${esc(r.kind === 'fund' ? r.category : r.name)}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}<div class="chart" id="fundc_"></div>
     <p class="muted" style="margin:4px 16px">Weekly closes, last 5 years · blue = 40-week average (≈ 200 days) · gold = all-time high · green dashed = top-up level (20% below the high)${r.pattern ? ' · grey = pattern neckline' : ''}.</p>
-    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`);
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>${fundPlan(r)}`);
   drawFund(r);
+}
+function fundPlan(r) {
+  const a = r.ath; if (!a || r.kind === 'debt' || !['breakout', 'open', 'near'].includes(a.status) || !a.sma30) return '';
+  const m = { IN: 'NSE', US: 'US', AU: 'ASX' }[r.market || 'IN']; const L = MKT[m].loc;
+  const E = a.status === 'near' ? a.trigger : r.close; const z = sizeATH(E, a.sma30, cap(m)); if (!z || !z.val) return '';
+  const fund = r.kind === 'fund';
+  const how = fund
+    ? `<p><b>Invest about ${money(z.val, m)}</b> as a lump sum ${a.status === 'near' ? `once the NAV closes a month above ${fmt(a.trigger, 2, L)}` : 'at the next NAV'} (${fmt(z.pctCap, 1)}% of capital).</p>
+       <p>Exit level: the 30-week average NAV ${fmt(a.sma30, 2, L)} (${fmt(z.dist, 1)}% below) → ${riskPct('ath')}% of capital ≈ ${money(z.risk, m)} at risk${z.pctCap >= 9.9 ? ' (capped at 10%)' : ''}.</p>
+       <p class="muted" style="font-size:12.5px">Mutual funds have no stop-loss or GTT orders: when this panel says <b>Sell at the next open</b>, redeem that day before the 3 pm cut-off and you get that day's NAV. Check the fund's exit load (often 1% within 1 year) and that short-term gains are taxed more than long-term — both eat into a trend system that exits often. A low-cost index ETF of the same index does the same job with a real stop order.</p>`
+    : `<p><b>${a.status === 'near' ? 'Buy-stop' : 'Buy'} ${z.sh.toLocaleString(L)} units</b> ${a.status === 'near' ? 'above' : 'at about'} ${fmt(E, 2, L)} = ${money(z.val, m)} (${fmt(z.pctCap, 1)}% of capital).</p>
+       <p>Stop: the 30-week average ${fmt(a.sma30, 2, L)} (${fmt(z.dist, 1)}% below), checked on the weekly close as for stocks → ${riskPct('ath')}% of capital ≈ ${money(z.risk, m)} at risk${z.pctCap >= 9.9 ? ' (capped at 10%)' : ''}. For a safety net, put a GTT a little under it.</p>
+       <p class="muted" style="font-size:12.5px">${r.intl ? 'International ETF: the price includes a premium over the index that can shrink suddenly — size smaller. ' : ''}ETFs trade like shares, so sizing, buy-stops and stop orders work the same way. Check the ETF trades enough each day.</p>`;
+  return `<div class="card plan" style="margin:10px 16px"><h3 style="margin:0 0 6px">Position plan · monthly ATH rules</h3>${how}
+    <p class="muted" style="font-size:12.5px">No fixed target: like stocks, the trade runs until the exit rule fires. Same sizing as stocks (risk ${riskPct('ath')}% to the 30-week average, max 10% of capital ${money(cap(m), m)}); the ATH system was tested on stocks, not separately on funds.</p></div>`;
 }
 async function drawFund(r) {
   const box = $('#fundc_'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
@@ -1230,7 +1257,8 @@ function supSelect(r) {
     ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: breakout retests +0.20R a trade vs +0.09R random; old swing lows, odd squares (Square of 9) and 1:3 room added nothing. Not part of your tested systems.</div>
     <div class="chart" id="supc"></div>
     <p class="muted" style="margin:4px 16px">Daily candles · green = support level · purple dashed = Square-of-9 odd squares (nearest the support, next below it, next above the price) · red = stop · gold = next resistance · blue / grey = 50 / 200-day average.</p>
-    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`);
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    ${swingPlan(r.close, r.stop, 'NSE', r.resistance != null && r.resistance > r.close ? r.resistance : r.close + 3 * (r.close - r.stop), r.resistance != null && r.resistance > r.close ? 'next resistance' : '3R, no resistance above')}`);
   drawSup(r);
 }
 async function drawSup(r) {
@@ -1268,7 +1296,8 @@ function patSelect(r) {
     ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: no edge over a random stock. Not part of your tested systems.</div>
     <div class="chart" id="patc"></div><div class="rsi" id="patr"></div>
     <p class="muted" style="margin:4px 16px">Daily candles · ● lows · gold = neckline · red = pattern stop · blue / grey = 50 / 200-day average · lower panel RSI(14) with 30 / 70${r.rsi_div > 0 ? ' · dashed purple = divergence (price low vs RSI low)' : ''}. RSI divergence did not improve the odds in the 2016–26 test (target first 67% vs 66% for a random stock).</p>
-    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`);
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    ${r.kind === 'index' ? '' : swingPlan(r.status === 'breakout' ? r.close : r.neck, r.stop, 'NSE', r.neck * (1 + r.height_pct / 100), 'measured move', r.status !== 'breakout')}`);
   drawPat(r);
 }
 async function drawPat(r) {
@@ -2193,6 +2222,13 @@ async function loadMarkets() {
       <div class="card"><h4 style="margin:0 0 4px">Sectors</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Colour = Pulse (share of the sector's stocks trending); strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-bouncing, red weak); RS = equal-weight 3-month return vs ${MX_BENCH[mk]}. Tap a sector for its industries.</p>
         ${mxPer()}${mxTiles(secs, 'sector', 'data-s')}
         <div class="mxlist">${secs.map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('')}</div></div>`;
+    const setups = []; G.rows.forEach((g) => g.members.forEach((m) => { const c = S.map[m.symbol]; if (c && c.some((x) => !x.includes('sell') && !x.includes('forming') && !x.includes('Near support'))) setups.push({ m, g, c }); }));
+    setups.sort((a, b) => (b.g.p1m - a.g.p1m) || (b.m.wrpi - a.m.wrpi));
+    el.insertAdjacentHTML('beforeend', `<div class="card"><h4 style="margin:0 0 4px">Signals ranked by industry strength</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Every stock with a live buy or in-trade signal from your systems, strongest industry (1-month Pulse) first. This replaces the old Top-down tab: in the 2017–26 test, ATH breakouts in strong sectors with strong stock RS won 54% vs 48%.</p>
+      <ul class="list flat">${setups.slice(0, state.mxAllSet ? 999 : 15).map((x, i) => `<li class="row mxrow" tabindex="0" data-k="${i}"><div><div class="sym">${esc(x.m.symbol)}</div><div class="co">${esc(x.g.group)} · Pulse ${fmt(x.g.p1m, 0)} · ${GP_SHIFT[x.g.shift || 'mid'].t.split(' —')[0]}</div><div class="tags">${x.c.join('')}<span class="chip ${x.m.wrpi >= 100 ? 'open' : 'exit'}">RPI ${fmt(x.m.wrpi, 0)}</span></div></div><div></div><div class="num"><b>${fmt(x.m.close, 2, MKT[mk].loc)}</b><span class="muted">${fmt(x.m.from_high, 0)}% from high</span></div></li>`).join('') || '<li class="empty">No live signals today.</li>'}
+      ${setups.length > 15 && !state.mxAllSet ? `<li><button class="more" id="mxallset">Show all ${setups.length}</button></li>` : ''}</ul></div>`);
+    el.querySelectorAll('[data-k]').forEach((li) => li.addEventListener('click', () => { const x = setups[+li.dataset.k]; mxStock(x.m, x.g, mk, S); }));
+    const ab = $('#mxallset'); if (ab) ab.addEventListener('click', () => { state.mxAllSet = true; loadMarkets(); });
     mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
     el.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'sector', sec: b.dataset.s, grp: null })));
     return;
