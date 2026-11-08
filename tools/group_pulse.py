@@ -175,6 +175,13 @@ def main(mkt):
                         "it did not raise returns - use it as a tiebreaker / tailwind. US and ASX: not separately tested.",
                rows=rows, sectors=sectors, mstats=market, stock=stock)
     os.makedirs(cf["out"], exist_ok=True); json.dump(out, open(cf["out"] + "group_pulse.json", "w"), separators=(",", ":"))
+    # weekly closes (last ~60 weeks) of every liquid stock, for the stock panel's mini chart
+    W = C[syms].resample("W-FRI").last().iloc[-62:]
+    if W.index[-1] > C.index[-1]:
+        W.index = list(W.index[:-1]) + [C.index[-1]]
+    json.dump({"t": [str(d.date()) for d in W.index],
+               "s": {s: [None if pd.isna(v) else float(f"{v:.4g}") for v in W[s]] for s in syms}},
+              open(cf["out"] + "stock_weekly.json", "w"), separators=(",", ":"))
     print(mkt, "groups", len(rows), "stocks", len(syms), "market pulse 1m", mkt_share, "top", [(r["group"], r["p1m"]) for r in rows[:5]])
 
 

@@ -1,0 +1,32 @@
+name: fundamentals
+on:
+  schedule:
+    - cron: "10 23 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      days: {description: "refresh entries older than N days", default: "6"}
+      limit: {description: "max stocks per market (0 = all)", default: "0"}
+permissions:
+  contents: write
+concurrency: {group: fundamentals, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        mk: [NSE, US, ASX]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: |
+          pip install -q yfinance pandas
+          python tools/fundamentals.py ${{ matrix.mk }} ${{ github.event.inputs.days || '6' }} ${{ github.event.inputs.limit || '0' }}
+      - run: |
+          git config user.name "fundamentals bot"; git config user.email "actions@users.noreply.github.com"
+          for f in data/scan/fundamentals.json data/scan/us/fundamentals.json data/scan/asx/fundamentals.json; do [ -f "$f" ] && git add "$f"; done; true
+          git diff --cached --quiet && exit 0
+          git commit -qm "Fundamentals ${{ matrix.mk }} $(date -u +%F)"
+          for i in 1 2 3 4 5 6; do git pull -q --rebase origin main && git push -q && break; sleep $((i*9)); done
