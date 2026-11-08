@@ -114,6 +114,17 @@ def main(mkt):
         p = lambda ser: round(float(np.nanmean([ser[s] for s in ss])) * 100, 1)
         rows.append(dict(group=g, n=len(ss), p1w=p(s1w), p1m=p(s1m), p1q=p(s1q), p1m_prev=p(s1m_prev),
                          trending_now=int(sum(m["trending"] for m in mem)), members=mem))
+    # charts: equal-weight group index (current liquid members, daily returns clipped at +-30%) vs the market, and 1-month Pulse history
+    N = 250; ret = C.pct_change().clip(-0.3, 0.3); p21 = tr.astype(float).rolling(21).mean()
+    dates = [str(d.date()) for d in C.index[-N:]]; bm = (B.iloc[-N:] / B.iloc[-N] * 100).round(2).tolist()
+    charts = dict(t=dates, market=bm, groups={})
+    for g, ss in groups.items():
+        if len(ss) < 3:
+            continue
+        gi = (1 + ret[ss].iloc[-N:].mean(axis=1).fillna(0)).cumprod(); gi = gi / gi.iloc[0] * 100
+        pp = (p21[ss].iloc[-N:].mean(axis=1) * 100)
+        charts["groups"][g] = dict(idx=[round(float(v), 2) for v in gi], pulse=[None if np.isnan(v) else round(float(v), 1) for v in pp])
+    json.dump(charts, open(cf["out"] + "group_pulse_charts.json", "w"), separators=(",", ":"))
     rows.sort(key=lambda r: -r["p1m"])
     for i, r in enumerate(rows):
         r["rank"] = i + 1

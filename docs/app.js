@@ -1580,8 +1580,30 @@ function gpSelect(r) {
     <div class="facts"><div class="fact"><span>Pulse 1 week / 1 month / 1 quarter</span><b>${fmt(r.p1w, 0)} / ${fmt(r.p1m, 0)} / ${fmt(r.p1q, 0)}</b></div>
       <div class="fact"><span>1-month Pulse a month ago</span><b>${fmt(r.p1m_prev, 0)} (${r.p1m - r.p1m_prev >= 0 ? '+' : ''}${fmt(r.p1m - r.p1m_prev, 0)})</b></div>
       <div class="fact"><span>Trending today</span><b>${r.trending_now} of ${r.n}</b></div></div>
+    <div class="chart" id="gpc"></div><div class="rsi" id="gpcp"></div>
+    <p class="muted" style="margin:4px 16px">Last 12 months · dark line = the group (its current liquid stocks, equal weight) · grey = ${esc({ NSE: 'Nifty 50', US: 'S&P 500', ASX: 'ASX 200' }[mk])}, both rebased to 100 · lower panel = the group's 1-month Pulse (dotted at 25 and 45).</p>
     <table class="mini gpt"><tr><th>Stock</th><th>Trending days (1 m · 1 w)</th><th>W. RPI</th><th>Stage 2</th><th>From 52w high</th></tr>${rows}</table>
     <p class="muted" style="margin:8px 16px">W. RPI = average of 2-week, 3-month and 6-month performance vs the market × 100 (above 100 = beating it). Trending = W. RPI > 100, EMA 9 > EMA 21, Stage 2 (above a rising 150-day average). Tap a symbol for its TradingView chart. Backtest: a strong group is a tailwind, not a buy signal on its own.</p>`);
+  drawGP(r);
+}
+async function drawGP(r) {
+  const mk = AM(); const box = $('#gpc'); const pb = $('#gpcp'); if (!box) return;
+  state.gpCh = state.gpCh || {};
+  if (state.gpCh[mk] === undefined) { box.innerHTML = '<p class="muted pad">Loading chart…</p>'; state.gpCh[mk] = await getJSON(MAIN + MKT[mk].path + 'group_pulse_charts.json', 'gpc_' + mk); }
+  const D = state.gpCh[mk]; const g = D && D.groups && D.groups[r.group];
+  if (!g) { box.innerHTML = '<p class="muted pad">Chart appears after the next nightly run.</p>'; if (pb) pb.innerHTML = ''; return; }
+  box.innerHTML = ''; pb.innerHTML = '';
+  const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
+  const col = GP_SHIFT[r.shift || 'mid'].c;
+  ch.addLineSeries({ color: '#9CA3AF', lineWidth: 1, priceLineVisible: false, lastValueVisible: true, title: 'market' }).setData(D.t.map((t, i) => ({ time: t, value: D.market[i] })));
+  ch.addLineSeries({ color: C.ink, lineWidth: 2, priceLineVisible: false, lastValueVisible: true, title: 'group' }).setData(D.t.map((t, i) => ({ time: t, value: g.idx[i] })));
+  const pc = window.LightweightCharts.createChart(pb, { ...chartBase(), height: pb.clientHeight, width: pb.clientWidth, timeScale: { visible: false } });
+  const ps = pc.addAreaSeries({ lineColor: col, topColor: col + '55', bottomColor: col + '08', lineWidth: 2, priceLineVisible: false });
+  ps.setData(D.t.map((t, i) => (g.pulse[i] == null ? { time: t } : { time: t, value: g.pulse[i] })));
+  [25, 45].forEach((v) => ps.createPriceLine({ price: v, color: '#CBD5E1', lineWidth: 1, lineStyle: 3, axisLabelVisible: false }));
+  ch.timeScale().fitContent(); pc.timeScale().fitContent();
+  ch.timeScale().subscribeVisibleLogicalRangeChange((rg) => rg && pc.timeScale().setVisibleLogicalRange(rg));
+  new ResizeObserver(() => { ch.applyOptions({ width: box.clientWidth }); pc.applyOptions({ width: pb.clientWidth }); }).observe(box);
 }
 const ATH_ST = { breakout: 0, 'exit next open': 1, open: 2, near: 3, exited: 4 };
 function fundAthRows(countOnly) {
