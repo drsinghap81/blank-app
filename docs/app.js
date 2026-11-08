@@ -106,9 +106,9 @@ function lvSelWire(el, mk, asof, rows, n, sel) {
     const id = rows[+c.dataset.s].id;
     if (c.checked && sel.size >= n) { c.checked = false; alertMsg(`You have ${n} picks already — untick one first, or raise "Positions to hold".`); return; }
     if (c.checked) sel.add(id); else sel.delete(id);
-    lvSelSave(mk, asof, sel); loadLive();
+    lvSelSave(mk, asof, sel); lvKeep();
   }));
-  const rs = el.querySelector('#lvselreset'); if (rs) rs.addEventListener('click', () => { try { localStorage.removeItem(selKey(mk, asof)); } catch (e) { /* */ } loadLive(); });
+  const rs = el.querySelector('#lvselreset'); if (rs) rs.addEventListener('click', (e) => { e.preventDefault(); try { localStorage.removeItem(selKey(mk, asof)); } catch (e) { /* */ } lvKeep(); });
 }
 function loadScript(src) {
   return new Promise((ok, bad) => { if (document.querySelector(`script[src="${src}"]`)) { ok(); return; } const t = document.createElement('script'); t.src = src; t.onload = ok; t.onerror = bad; document.head.appendChild(t); });
@@ -148,6 +148,9 @@ async function lvPdf(mk, P, picked, exits, info) {
 /* Swing sleeve: 9/21 trades on the cash ATH isn't using (15% of capital kept for new ATH breakouts). Own risk, default = loss-limit risk, max 1%. */
 const lvSR = (mk) => { try { const v = +localStorage.getItem('td.lvSR_' + mk); return v > 0 ? Math.min(1, v) : riskForBudget(lvBudget()); } catch (e) { return riskForBudget(lvBudget()); } };
 /* swing picks: all rows ticked by default (null), then whatever you tick; only ticked rows use idle cash */
+/* re-draw Live after a tick or setting change without jumping to the top (the page is rebuilt, so keep and restore the scroll) */
+async function lvKeep() { const y = window.scrollY; const v = $('#view-live'); if (v) v.style.minHeight = v.offsetHeight + 'px';
+  await loadLive(); window.scrollTo(0, y); if (v) v.style.minHeight = ''; }
 const swKey = (mk, asof) => `td.lvSw_${mk}_${asof}`;
 function lvSwSel(mk, asof) { try { const v = JSON.parse(localStorage.getItem(swKey(mk, asof)) || 'null'); return Array.isArray(v) ? new Set(v) : null; } catch (e) { return null; } }
 function lvSwWire(el, mk, asof, rows) {
@@ -155,7 +158,7 @@ function lvSwWire(el, mk, asof, rows) {
     const cur = lvSwSel(mk, asof) || new Set(rows.filter((r) => r.tier === 'swing').map((r) => r.id)); const id = rows[+c.dataset.w].id;
     if (c.checked) cur.add(id); else cur.delete(id);
     try { localStorage.setItem(swKey(mk, asof), JSON.stringify([...cur])); } catch (e) { /* private mode */ }
-    loadLive(); }));
+    lvKeep(); }));
 }
 function lvSwingSize(rows, C0, idle, sr, sel) {
   let left = idle;
@@ -265,10 +268,10 @@ async function loadLiveG(mk) {
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
   lvSegWire(el); wireCap('lvcapg', mk, () => loadLive());
-  const ns = $('#lvn'); if (ns) ns.addEventListener('change', () => { try { localStorage.setItem('td.lvN_' + mk, ns.value); localStorage.removeItem(selKey(mk, P.asof)); } catch (e) { /* private mode */ } loadLive(); });
+  const ns = $('#lvn'); if (ns) ns.addEventListener('change', () => { try { localStorage.setItem('td.lvN_' + mk, ns.value); localStorage.removeItem(selKey(mk, P.asof)); } catch (e) { /* private mode */ } lvKeep(); });
   lvSelWire(el, mk, P.asof, rows, nP, selG);
   $('#lvpdf').addEventListener('click', () => { const pk = rows.filter((r) => !r.off && r.qty > 0).concat(swR.filter((r) => !r.skip && r.qty > 0)); if (!pk.length) { alertMsg('Nothing picked.'); return; } lvPdf(mk, P, pk, P.exits || [], { cap: C0, n: nP, risk: risk * 100, sr: srG }); });
-  const srs = $('#lvsr'); if (srs) srs.addEventListener('change', () => { try { localStorage.setItem('td.lvSR_' + mk, srs.value); } catch (e) { /* private mode */ } loadLive(); });
+  const srs = $('#lvsr'); if (srs) srs.addEventListener('change', () => { try { localStorage.setItem('td.lvSR_' + mk, srs.value); } catch (e) { /* private mode */ } lvKeep(); });
   lvSwWire(el, mk, P.asof, swR);
   if (Pp && Pp.equity && Pp.equity.length > 1 && $('#lvpc')) {
     const box = $('#lvpc'); const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 170, width: box.clientWidth });
@@ -364,7 +367,7 @@ async function loadLive() {
   const srs = $('#lvsr'); if (srs) srs.addEventListener('change', async () => {
     try { localStorage.setItem('td.lvSR_NSE', srs.value); } catch (e) { /* private mode */ }
     if (S) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: nP, swing_risk: +srs.value }) }); } catch (e) { alertMsg(`Server not updated yet (${e.message}); it picks this up after its next update.`); } }
-    loadLive(); });
+    lvKeep(); });
   const pdfb = $('#lvpdf'); if (pdfb) pdfb.addEventListener('click', () => {
     let pk = S ? [...el.querySelectorAll('input[data-b]:checked')].map((c) => rows[+c.dataset.b]) : rows.filter((r) => r.picked);
     if (S && !pk.length) pk = rows.filter((r) => r.tier !== 'swing' && !r.skip && r.qty > 0).slice(0, nP);
@@ -375,7 +378,7 @@ async function loadLive() {
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', async () => {
     try { localStorage.setItem('td.lvN_NSE', ns.value); localStorage.removeItem(selKey('NSE', P.asof)); } catch (e) { /* private mode */ }
     if (S) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: +ns.value }) }); } catch (e) { alertMsg(`Server not updated yet (${e.message}); it picks this up after its next update.`); } }
-    loadLive(); });
+    lvKeep(); });
   el.querySelectorAll('.lv-w').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ ...P.watch[+a.dataset.w], kind: 'WATCH' }); }));
   const dry = $('#lvdry'); if (dry) dry.addEventListener('click', async () => {
     if (!live) return;
