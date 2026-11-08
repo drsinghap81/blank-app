@@ -1260,9 +1260,9 @@ async function loadBottoms() {
   el.innerHTML = `${botTabs('pat')}${botMkSeg()}${botWatch(bmk)}<section class="summary">
       <div class="stat new"><b>${nb}</b><span>broke the neckline (last 10 days)</span></div>
       <div class="stat"><b>${nf}</b><span>forming, within 20% of the neckline</span></div>
-      <div class="stat"><b>${P.regime ? (P.regime.down ? 'Down' : 'Up') : '–'}</b><span>market: Nifty 500 vs its 200-day</span></div>
-      <div class="stat"><b>${R.filter((r) => r.kind === 'index').length}</b><span>on indices (Nifty, Bank Nifty, sectors)</span></div></section>
-    <div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> In 2016–26 these patterns did no better than a random stock (120 days +3.5% vs +7.4%). Use them to spot charts, not as buy signals.</div>
+      ${bmk === 'NSE' ? `<div class="stat"><b>${P.regime ? (P.regime.down ? 'Down' : 'Up') : '–'}</b><span>market: Nifty 500 vs its 200-day</span></div>` : ''}
+      <div class="stat"><b>${R.filter((r) => r.kind === 'index').length}</b><span>on indices (${bmk === 'NSE' ? 'Nifty, Bank Nifty, sectors' : bmk === 'US' ? 'S&P 500, Nasdaq 100, Russell 2000' : 'ASX 200, All Ords'})</span></div></section>
+    ${bmk === 'NSE' ? '<div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> In 2016–26 these patterns did no better than a random stock (120 days +3.5% vs +7.4%). Use them to spot charts, not as buy signals.</div>' : ''}
     <div class="card">
       ${seg('patf', state.patF || 'all', [['all', `All ${R.length}`], ['breakout', `Breakouts ${nb}`], ['forming', `Forming ${nf}`]])}
       ${seg('patt', state.patT || 'all', [['all', 'All types'], ['DB', `Double bottom ${cnt('DB')}`], ['TW', `Tilted W ${cnt('TW')}`], ['TB', `Triple bottom ${cnt('TB')}`], ['IHS', `Inverse H&S ${cnt('IHS')}`]])}
@@ -1484,7 +1484,7 @@ function patSelect(r) {
   openPanel(`<div class="d-head"><div><h2>${esc(r.kind === 'index' ? r.name : r.symbol)}</h2><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, AL())}</b></div></div>
     ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: no edge over a random stock. Not part of your tested systems.</div>
     <div class="chart" id="patc"></div><div class="rsi" id="patr"></div>
-    <p class="muted" style="margin:4px 16px">Daily candles · ● lows · gold = neckline · red = pattern stop · blue / grey = 50 / 200-day average · lower panel RSI(14) with 30 / 70${r.rsi_div > 0 ? ' · dashed purple = divergence (price low vs RSI low)' : ''}. RSI divergence did not improve the odds in the 2016–26 test (target first 67% vs 66% for a random stock).</p>
+    <p class="muted" style="margin:4px 16px">Daily candles · ● lows · gold = neckline · red = pattern stop · blue / grey = 50 / 200-day average · lower panel RSI(14) with 30 / 70${r.rsi_div > 0 ? ' · dashed purple = divergence (price low vs RSI low)' : ''}. RSI divergence did not improve the odds in the India 2016–26 test (target first 67% vs 66% for a random stock).</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
     ${r.kind === 'index' ? '' : swingPlan(r.status === 'breakout' ? r.close : r.neck, r.stop, botMk(), r.neck * (1 + r.height_pct / 100), 'measured move', r.status !== 'breakout')}`);
   drawPat(r);
