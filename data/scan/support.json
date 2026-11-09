@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-08T03:34+00:00",
-"asof": "2026-11-06",
+"generated": "2026-11-09T08:52+00:00",
+"asof": "2026-11-08",
 "market": "NSE",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "2016-26, 16,908 first touches, 3R target vs stop (1 ATR below the level): breakout retests +0.20R per trade, old swing lows +0.10R, random uptrend stock the same day +0.09R. Trades with 1:3 room to the next resistance: no better. Within 1% of an odd square: no better (breakout retests +0.15R vs +0.21R away from one; swing lows +0.04R vs +0.09R). Watch only.",
@@ -679,7 +679,7 @@
 "stop": 540.99,
 "risk_pct": 9.145900659210692,
 "resistance": 603.71,
-"room_r": 0.15162273934938095,
+"room_r": 0.15162161860060722,
 "sq9": 529,
 "sq9_cross": "23\u00b2",
 "sq9_dist_pct": 7.473379903119093,
