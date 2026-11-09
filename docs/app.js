@@ -835,6 +835,12 @@ async function loadLive() {
 }
 /* tap a Live row -> its chart: ATH rows open the ATH panel (monthly / weekly + 30 SMA), 9/21 rows the trend chart */
 async function lvOpen(r) {
+  if (r.kind === 'PATTERN') {                      // bottom-pattern picks: the pattern chart from the Bottoms scan
+    state.botMk = 'NSE'; state.patC = state.patC || {};
+    if (state.patC.NSE === undefined) state.patC.NSE = await getJSON(MAIN + 'data/scan/patterns.json', 'pat_NSE');
+    state.pat = state.patC.NSE; const row = ((state.pat || {}).rows || []).find((x) => x.symbol === r.symbol);
+    if (row) { patSelect(row); return; }
+  }
   state.athMkt = 'NSE'; state.athC = state.athC || {};
   if (!state.athC.NSE) {
     const [d, ipo, sec, world] = await Promise.all([getJSON(MAIN + 'data/scan/ath.json', 'ath'), getJSON(MAIN + 'data/scan/ipo.json', 'ipo'),
