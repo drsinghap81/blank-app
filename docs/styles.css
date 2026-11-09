@@ -415,3 +415,5 @@ table.mxq td.up { color: #0A7A55; } table.mxq td.down { color: #D64545; }
 .lv-pdfbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0 6px; }
 .lv-row.lv-off > div:nth-child(2) { opacity: .55; }
 .lv-capline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0; } .lv-capline .lv-sub { flex: 1 1 200px; }
+.lv-bk select { padding: 3px 4px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: inherit; }
+.lv-bk td:first-child { width: 60%; }

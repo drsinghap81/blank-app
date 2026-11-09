@@ -148,6 +148,24 @@ def analyse(sym, x, today, lookback_days=550):
     if lookback_days:
         sig = [x_ for x_ in sig if x_[0] >= pd.Timestamp(today) - pd.Timedelta(days=lookback_days)]
     sig.sort(key=lambda x_: x_[0])
+    # Trend Following 9/21 (9 Nov 2026): cup 12-24 m breakouts are traded with a daily EMA 9/21 exit instead of the
+    # 30-week SMA. Initial stop = EMA21 on the day before entry (at least 4% under the entry); exit = first daily close
+    # with EMA9 below EMA21 -> sell next open. NSE 2017-26: 10.5%/yr alone, worst fall -15.6%; with Momentum in one account
+    # see tools/trade_plan.py.
+    e9 = x.Close.ewm(span=9, adjust=False, min_periods=21).mean(); e21 = x.Close.ewm(span=21, adjust=False, min_periods=21).mean()
+    below = e9 < e21
+
+    def tf_state(dt, entry):
+        prev = e21[e21.index < dt]
+        s0 = float(prev.iloc[-1]) if len(prev) and np.isfinite(prev.iloc[-1]) else entry * 0.96
+        s0 = min(s0, entry * 0.96)
+        hit = below[(below.index >= dt) & below]
+        if len(hit):
+            nx = x[x.index > hit.index[0]]
+            if len(nx):
+                return dict(tf_status="exited", tf_exit_date=nx.index[0], tf_exit_price=float(nx.Open.iloc[0]), tf_stop0=s0)
+            return dict(tf_status="exit next open", tf_exit_date=None, tf_exit_price=None, tf_stop0=s0)
+        return dict(tf_status="open", tf_exit_date=None, tf_exit_price=None, tf_stop0=s0)
     events = []
     busy = None
     for dt, entry, trig_v, age_v, athm_v, kind in sig:
@@ -175,7 +193,9 @@ def analyse(sym, x, today, lookback_days=550):
                            depth=r.depth, status=status, exit_date=exit_dt, exit_price=exit_px, close=last,
                            ret=ret, peak=float(x.Close[x.index >= dt].max() / entry - 1),
                            weeks=int(((exit_dt or x.index[-1]) - dt).days / 7), main=bool(r.age >= BASE_MAIN),
-                           sma_entry=sma_entry, **add,
+                           sma_entry=sma_entry, **add, **(tf_state(dt, entry) if r.age < BASE_MAIN else {}),
+                           ema9=float(e9.iloc[-1]) if np.isfinite(e9.iloc[-1]) else None,
+                           ema21=float(e21.iloc[-1]) if np.isfinite(e21.iloc[-1]) else None,
                            sma30=float(W.sma.loc[last_complete]) if np.isfinite(W.sma.loc[last_complete]) else None,
                            value_cr=float(r.val) / UNIT))
     # near trigger (current month, not crossed yet)
@@ -192,13 +212,15 @@ def analyse(sym, x, today, lookback_days=550):
             # within 5% of the old ATH CLOSE (trigger is a far-away wick high): a month close above it is the signal
             near = dict(symbol=sym, trigger=best_c, close=c, gap_pct=(best_c / c - 1) * 100, ath_month=d.ath_month.iloc[-1],
                         base_months=int(d.age.iloc[-1]), depth=d.depth.iloc[-1], sma30=float(lastw.sma), kind="close",
-                        wick_high=float(t_now), main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / UNIT)
+                        wick_high=float(t_now), main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / UNIT,
+                        ema21=float(e21.iloc[-1]) if np.isfinite(e21.iloc[-1]) else None, ema9=float(e9.iloc[-1]) if np.isfinite(e9.iloc[-1]) else None)
         elif c >= (1 - NEAR) * t_now and d.age.iloc[-1] >= BASE_MIN and np.isfinite(lastw.sma) and lastw.c > lastw.sma \
                 and np.isfinite(sma4) and lastw.sma > sma4 \
                 and val20.iloc[-1] >= MINVAL:
             near = dict(symbol=sym, trigger=t_now, close=c, gap_pct=(t_now / c - 1) * 100, ath_month=d.ath_month.iloc[-1],
                         base_months=int(d.age.iloc[-1]), depth=d.depth.iloc[-1], sma30=float(lastw.sma), kind="high",
-                        main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / UNIT)
+                        main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / UNIT,
+                        ema21=float(e21.iloc[-1]) if np.isfinite(e21.iloc[-1]) else None, ema9=float(e9.iloc[-1]) if np.isfinite(e9.iloc[-1]) else None)
     Mc = M.tail(240); Wt = W.tail(260)
     chart = dict(m=dict(t=[str(p) for p in Mc.index], o=Mc.o.round(2).tolist(), h=Mc.h.round(2).tolist(),
                         l=Mc.l.round(2).tolist(), c=Mc.c.round(2).tolist()),

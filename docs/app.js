@@ -124,14 +124,15 @@ async function lvPdf(mk, P, picked, exits, info) {
   doc.setFontSize(16); doc.text(`Trend Desk · ${MKT[mk].name} trade plan for the next session`, 40, 40);
   doc.setFontSize(10); doc.setTextColor(90);
   doc.text(`Plan from the ${day(P.asof)} close · made ${new Date().toLocaleString(L)} · broker: ${mk === 'NSE' ? 'Angel One' : 'moomoo (manual orders)'}`, 40, 58);
-  doc.text(`Capital ${m(info.cap)} · ${info.n} positions · ATH risk ${info.risk.toFixed(2)}%${info.sr != null ? ` · swing risk ${Number(info.sr).toFixed(2)}% (idle cash, 15% kept for ATH)` : ''} · max 10% of capital a stock · trades: ${picked.length}`, 40, 72);
+  doc.text(`Capital ${m(info.cap)} · ${info.n} Momentum positions at ${info.risk.toFixed(2)}% risk${info.sr != null ? ` · other systems ${Number(info.sr).toFixed(2)}% risk (15% cash kept for Momentum)` : ''} · max 10% of capital a stock · trades: ${picked.length}`, 40, 72);
+  if (info.al) doc.text(`Allocation (max share of capital): ${Object.entries(info.al).filter(([k, v]) => v > 0).map(([k, v]) => `${BK_NAME[k]} ${v}%`).join(' · ')}`, 40, 84);
   doc.setTextColor(0);
   const body = picked.map((r) => {
-    const order = r.kind === 'ATH_STOP' ? `Stop-limit buy: trigger ${p(r.trigger)}, limit ${p(r.price)} (day)` : `Limit buy ${p(r.price)} (day, at the open)`;
-    const prot = r.system === 'Monthly ATH' ? `Weekly close below 30-wk avg (${p(r.stop)}); safety stop ${p(r.stop * 0.85)}` : r.kind === 'RETEST' || r.kind === 'PATTERN' ? `Stop ${p(r.stop)} (GTC/GTT); target sell ${p(r.target)}${r.kind === 'RETEST' ? ' (3R)' : ' (measured move)'}; exit after 120 days${r.experimental ? '; EXPERIMENTAL' : ''}` : `Stop ${p(r.stop)} (GTC/GTT); exit when Supertrend turns red`;
-    return [r.tier === 'swing' ? `S${r.rank}` : r.rank, r.symbol, r.tier === 'swing' ? ({ RETEST: 'Swing: retest', PATTERN: 'Swing: pattern' }[r.kind] || 'Swing: 9/21') : 'Invest: ATH', `${r.group || 'n/a'}${r.lane ? ` (${LANE_TXT[r.lane]})` : ''}`, order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
+    const order = r.kind === 'ATH_STOP' || r.kind === 'TF_STOP' ? `Stop-limit buy: trigger ${p(r.trigger)}, limit ${p(r.price)} (day)` : `Limit buy ${p(r.price)} (day, at the open)`;
+    const prot = r.system === 'Monthly ATH' ? `Weekly close below 30-wk avg (${p(r.stop)}); safety stop ${p(r.stop * 0.85)}` : bkOf(r) === 'tf' && r.kind !== 'T921' ? `Daily close with EMA 9 below EMA 21 -> sell next open; safety stop ${p(r.stop * 0.85)}` : r.kind === 'RETEST' || r.kind === 'PATTERN' ? `Stop ${p(r.stop)} (GTC/GTT); target sell ${p(r.target)}${r.kind === 'RETEST' ? ' (3R)' : ' (measured move)'}; exit after 120 days${r.experimental ? '; EXPERIMENTAL' : ''}` : `Stop ${p(r.stop)} (GTC/GTT); exit when Supertrend turns red`;
+    return [r.tier === 'swing' ? `S${r.rank}` : r.rank, r.symbol, BK_NAME[bkOf(r)], `${r.group || 'n/a'}${r.lane ? ` (${LANE_TXT[r.lane]})` : ''}`, order, (r.qty || 0).toLocaleString(L), m(r.value || 0), `${((r.value || 0) / info.cap * 100).toFixed(1)}%`, `${p(r.stop)} (${(r.risk_pct ?? 0).toFixed(1)}%)`, m(r.risk_amt || 0), prot];
   });
-  doc.autoTable({ startY: 86, head: [['#', 'Stock', 'System', 'Industry', 'Order', 'Qty', 'Value', '% cap', 'Stop (dist.)', 'Risk', 'Exit / protective stop']], body,
+  doc.autoTable({ startY: info.al ? 96 : 86, head: [['#', 'Stock', 'System', 'Industry', 'Order', 'Qty', 'Value', '% cap', 'Stop (dist.)', 'Risk', 'Exit / protective stop']], body,
     styles: { fontSize: 8.5, cellPadding: 4, valign: 'middle' }, headStyles: { fillColor: [17, 24, 39] }, columnStyles: { 3: { cellWidth: 105 }, 4: { cellWidth: 120 }, 10: { cellWidth: 150 } },
     foot: [['', 'Total', '', '', '', '', m(picked.reduce((a, r) => a + (r.value || 0), 0)), `${(picked.reduce((a, r) => a + (r.value || 0), 0) / info.cap * 100).toFixed(1)}%`, '', m(picked.reduce((a, r) => a + (r.risk_amt || 0), 0)), '']],
     footStyles: { fillColor: [241, 245, 249], textColor: 20, fontStyle: 'bold' } });
@@ -142,7 +143,7 @@ async function lvPdf(mk, P, picked, exits, info) {
     y = doc.lastAutoTable.finalY + 18;
   }
   doc.setFontSize(8); doc.setTextColor(110);
-  doc.text(doc.splitTextToSize(`Signals: monthly ATH breakout / buy-stop and 9/21 trend, ranked by score, then industry lane (Building first). Skip a limit buy if the stock opens above the limit. ${mk === 'NSE' ? '' : 'US/ASX: paper-trading phase — these systems did not beat the index in the 2008-26 backtest. '}Not investment advice; sizes ignore holdings and cash unless your server is connected.`, 760), 40, Math.min(y, 560));
+  doc.text(doc.splitTextToSize(`Systems: Momentum Investing (cup 2+ yrs, 30-week SMA exit), Trend Following 9/21 (cup 1-2 yrs, daily EMA 9/21 exit), breakout retests${mk === 'NSE' ? '' : ' and bottom patterns'}; ranked within each system, industry lane breaks ties. Skip a limit buy if the stock opens above the limit. ${mk === 'NSE' ? '' : 'US/ASX: paper-trading phase — these systems did not beat the index in the 2008-26 backtest. '}Not investment advice; sizes ignore holdings and cash unless your server is connected.`, 760), 40, Math.min(y, 560));
   doc.save(`trade-plan_${mk}_${P.asof}.pdf`);
 }
 /* Swing sleeve: 9/21 trades on the cash ATH isn't using (15% of capital kept for new ATH breakouts). Own risk, default = loss-limit risk, max 1%. */
@@ -171,9 +172,8 @@ function lvSwingSize(rows, C0, idle, sr, sel) {
 }
 function lvSwingHead(sr, idle, mk, nOpen) {
   const opts = [0.25, 0.5, 0.75, 1].concat([+riskForBudget(lvBudget()).toFixed(2)]).filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b);
-  return `<p class="lv-sub">${mk === 'NSE' ? 'Ranked by industry strength (Building first).' : 'Ranked by evidence (9/21, then retests, then patterns), then industry strength.'} <b>9/21 trend</b>: EMA 9/21 cross, stop = 5-day low (under the breakout candles, max 12%), exit when price closes below Supertrend(10,3).${mk !== 'NSE' ? ` <b>Breakout retests and bottom-pattern breakouts</b> (marked experimental, ranked after 9/21): in the ${mk === 'US' ? 'US' : 'ASX'} 2008–26 test both did worse than buying a random stock the same day — small sizes; the paper record tracks them. Stop + target sell, out after 120 days.` : ''}${mk === 'NSE' ? ' <b>Breakout retests</b> (India only): first return to an old breakout level, stop 1 ATR under it, 3R target — only in Building/Strong/Middle industries (+0.17 to +0.24R per trade vs +0.09R random, 2017–26; Weak/Fading ones were no better than random).' : ''} Uses the cash the ATH sleeve isn't using, keeping 15% of capital free for new ATH breakouts. Backtest 2017–26: ATH + 9/21 on idle cash 30.8%/yr, worst fall −24% (both at 1%), vs ATH alone 17%, −20%.</p>
-    <label class="lv-sub lv-pick-n">Swing risk per trade <select id="lvsr">${opts.map((v) => `<option value="${v}" ${Math.abs(v - sr) < 0.005 ? 'selected' : ''}>${fmt(v, 2)}%${Math.abs(v - riskForBudget(lvBudget())) < 0.005 ? ' (your loss limit)' : ''}</option>`).join('')}</select>
-    <span>Idle cash for swing trades: <b>${money(idle, mk)}</b>${nOpen != null ? ` · ${nOpen} swing trade(s) open` : ''}.</span></label>`;
+  return `<label class="lv-sub lv-pick-n">Risk per trade (Trend 9/21, retests, patterns) <select id="lvsr">${opts.map((v) => `<option value="${v}" ${Math.abs(v - sr) < 0.005 ? 'selected' : ''}>${fmt(v, 2)}%${Math.abs(v - riskForBudget(lvBudget())) < 0.005 ? ' (your loss limit)' : ''}</option>`).join('')}</select>
+    <span>Cash these can use (capital minus Momentum picks, minus 15% kept for Momentum): <b>${money(idle, mk)}</b>${nOpen != null ? ` · ${nOpen} swing trade(s) open` : ''}. Each system is also held to its max % above.</span></label>`;
 }
 function lvIdle(P, C0) { // no broker link: capital minus your ATH picks, minus the 15% reserve
   const n = lvN('NSE'); const risk = lvRiskN(n) / 100; const sel = lvSel('NSE', P.asof, P.top || [], n);
@@ -209,7 +209,57 @@ function guardCard(G) {
     : `<label class="lv-sub" style="display:block;margin-top:6px">Worst fall you can sit through: <select id="lvbud">${opts}</select></label>`}
     <details class="info"><summary>How it works</summary><p>Your account value (cash + shares) is compared with its highest point. Risk per trade is set so that in 95% of 2,000 simulated 10-year histories the fall stayed within your limit. It warns at 75% and 100% of the limit, pauses new buys for 2 weeks after ${G ? G.streak_max : 5} losses in a row, caps one stock at 10%, and never sells for you. The limit is DD_BUDGET_PCT on the server.</p></details></div>`;
 }
-const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', T921: '9/21 trend entry', RETEST: 'Breakout retest (support)', PATTERN: 'Bottom-pattern breakout' };
+const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', TF_BRK: 'Cup breakout (1–2 yr cup)', TF_STOP: 'Buy-stop at the cup high', T921: '9/21 trend entry', RETEST: 'Breakout retest (support)', PATTERN: 'Bottom-pattern breakout' };
+/* Systems as capital buckets (9 Nov 2026): % = the most of your capital a system may hold; all share one cash pool,
+   Momentum first, swing buckets keep 15% in cash for Momentum. NSE one-account test 2017-26: Momentum <= 60% + Trend 9/21 <= 40%
+   23.1%/yr, worst fall -21.4%; Momentum alone 17.3%, -16.8%. */
+const BK_DEF = { mom: 60, tf: 40, rt: 15, pt: 0, s1: 0, s2: 0, s3: 0, wc: 0, tb: 15 };
+const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', rt: 'Breakout retest', pt: 'Bottom pattern', s1: 'System 1', s2: 'System 2', s3: 'System 3', wc: 'Wealth Creation', tb: 'Top Bottom' };
+const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : r.kind === 'PATTERN' ? 'pt' : 'tf');
+function lvAlloc(mk, P, S) {
+  if (S && S.buckets) return { ...BK_DEF, ...Object.fromEntries(S.buckets.map((b) => [b.key, b.pct])) };
+  let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc_' + mk) || '{}'); } catch (e) { /* private mode */ }
+  return { ...BK_DEF, ...Object.fromEntries((P.buckets || []).map((b) => [b.key, b.pct])), ...o };
+}
+/* cut picked rows (in rank order) to each bucket's room: pct x capital minus what the bucket already holds */
+function lvRoomCut(rows, al, C0, used = {}) {
+  const room = {}; return rows.map((r) => {
+    const b = bkOf(r); if (room[b] == null) room[b] = (al[b] ?? 0) / 100 * C0 - (used[b] || 0);
+    const pick = r.tier === 'swing' ? r.want !== false && !r.skip : !r.off && r.picked !== false;
+    if (!pick || !(r.qty > 0)) return r;
+    const E = r.trigger || r.price; let q = r.qty; let skip = r.skip || '';
+    if (q * E > room[b]) { const q2 = Math.floor(Math.max(0, room[b]) / E); if (q2 <= 0 || q2 < 0.25 * q) { q = 0; skip = `bucket full (${BK_NAME[b]} max ${al[b] ?? 0}% of capital)`; } else q = q2; }
+    room[b] -= q * E;
+    const x = { ...r, qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, skip };
+    if (!q) { if (r.tier === 'swing') x.picked = false; else { x.picked = false; } }
+    return x; });
+}
+function lvBucketCard(mk, P, al, inUse, S) {
+  const B = (P.buckets && P.buckets.length) ? P.buckets : Object.keys(BK_DEF).filter((k) => mk === 'NSE' || k !== 'tb').map((k) => ({ key: k, name: BK_NAME[k], status: ['s1', 's2', 's3', 'wc'].includes(k) ? 'pending' : 'active', rules: '', test: '' }));
+  const opts = [0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100];
+  const st = { active: '', watch: '<span class="chip">watch only</span>', pending: '<span class="chip">rules coming</span>' };
+  const rowsH = B.map((b) => { const v = al[b.key] ?? 0; const o = opts.includes(v) ? opts : opts.concat([v]).sort((a, c) => a - c);
+    return `<tr><td><b>${esc(b.name)}</b> ${st[b.status] || ''}${b.margin ? ' <span class="chip">margin</span>' : ''}</td>
+      <td><select data-al="${b.key}" aria-label="${esc(b.name)} max share">${o.map((x) => `<option value="${x}" ${x === v ? 'selected' : ''}>${x}%</option>`).join('')}</select></td>
+      <td class="muted">${b.margin ? 'own card' : inUse[b.key] ? money(inUse[b.key], mk) : '–'}</td></tr>`; }).join('');
+  const sum = B.filter((b) => !b.margin).reduce((a, b) => a + (al[b.key] ?? 0), 0);
+  return `<div class="lv-card"><b>Systems & allocation</b>
+    <p class="lv-sub">% = the most of your capital each system may hold. They share one cash pool, so the total can pass 100% (now ${sum}%): Momentum is usually about half invested and the others use the cash it isn't using, keeping 15% free for new Momentum breakouts. ${S && S.buckets ? 'Saved on your server.' : S ? 'Saved on this device; your server uses it after its next update (08:00 IST weekdays).' : 'Saved on this device.'}</p>
+    <table class="mini lv-bk"><tr><th>System</th><th>Max</th><th>${S && S.buckets ? 'Holding now' : 'This plan'}</th></tr>${rowsH}</table>
+    <p class="lv-sub">Tested on NSE 2017–26 in one account, 1% risk a trade: Momentum alone 17.3%/yr, worst fall −16.8%; <b>Momentum ≤ 60% + Trend 9/21 ≤ 40%: 23.1%/yr, −21.4%</b> (2022–26: 25.9%, −13.0%); 60 + 25: 20.6%, −20.4%.</p>
+    <details class="info"><summary>Rules and tests for each system</summary>${B.map((b) => `<p><b>${esc(b.name)}.</b> ${esc(b.rules || '')} <i>${esc(b.test || '')}</i></p>`).join('')}</details></div>`;
+}
+function lvBucketWire(el, mk, S) {
+  el.querySelectorAll('select[data-al]').forEach((x) => x.addEventListener('change', async () => {
+    let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc_' + mk) || '{}'); } catch (e) { /* */ }
+    o[x.dataset.al] = +x.value; try { localStorage.setItem('td.alloc_' + mk, JSON.stringify(o)); } catch (e) { /* private mode */ }
+    if (S) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: S.picks || lvN('NSE'), alloc: { [x.dataset.al]: +x.value } }) }); } catch (e) { alertMsg(`Saved here; your server takes it after its next update (${e.message}).`); } }
+    lvKeep(); }));
+}
+const BK_HEAD = {
+  tf: 'Monthly breakout after a 1–2 year cup (same trigger as Momentum). Stop for sizing = EMA 21 (at least 4% under the entry); exit when a daily close has EMA 9 below EMA 21 — this tab lists the sell for the next open. NSE 2017–26: 10.5%/yr alone, worst fall −15.6%; tested exits 5-day-low + Supertrend and weekly 9/21 did worse.',
+  rt: 'First return to an old breakout level, stop 1 ATR under it, 3R target, out after 120 days.',
+  pt: 'Bottom-pattern neckline breakouts: stop under the pattern, measured-move target, 120 days.' };
 function lvSeg() {
   return `<div class="seg" id="lvmk" style="margin:10px 16px 0">${[['NSE', 'India · Angel'], ['US', 'US · moomoo'], ['ASX', 'Australia · moomoo']].map(([k, n]) => `<button data-k="${k}" aria-selected="${state.lvMk === k}">${n}</button>`).join('')}</div>`;
 }
@@ -224,27 +274,34 @@ async function loadLiveG(mk) {
   $('#asof').textContent = `Market data: ${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)}`;
   const C0 = cap(mk); const nP = lvN(mk); const risk = lvRiskN(nP) / 100; const L = MKT[mk].loc; const cur = MKT[mk].cur;
   const selG = lvSel(mk, P.asof, P.top || [], nP);
-  const rows = (P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
-    return { ...r, E, qty: q, value: q * E, risk_amt: q * (E - r.stop), off: !selG.has(r.id) }; });
+  const alG = lvAlloc(mk, P, null);
+  const rows = lvRoomCut((P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
+    return { ...r, E, qty: q, value: q * E, risk_amt: q * (E - r.stop), off: !selG.has(r.id) }; }), alG, C0);
   const idleG = Math.max(0, C0 * 0.85 - rows.filter((r) => !r.off).reduce((a, r) => a + r.value, 0)); const srG = lvSR(mk);
-  const swR = lvSwingSize(P.swing || [], C0, idleG, srG, lvSwSel(mk, P.asof));
+  const swR = lvRoomCut(lvSwingSize(P.swing || [], C0, idleG, srG, lvSwSel(mk, P.asof)), alG, C0);
+  const inUseG = rows.concat(swR).reduce((a, r) => { if (!r.off && !r.skip && r.qty > 0 && r.want !== false) a[bkOf(r)] = (a[bkOf(r)] || 0) + r.value; return a; }, {});
   const tvp = mk === 'ASX' ? 'ASX:' : '';
   const ticket = (r) => {
-    const net = r.system === 'Monthly ATH' ? r.stop * 0.85 : r.stop;
-    const buy = r.kind === 'ATH_STOP'
+    const net = r.system === 'Monthly ATH' || bkOf(r) === 'tf' ? r.stop * 0.85 : r.stop;
+    const buy = r.kind === 'ATH_STOP' || r.kind === 'TF_STOP'
       ? `<b>Stop limit</b> · Buy ${r.qty} · trigger ${fmt(r.trigger, 2, L)} · limit ${fmt(r.price, 2, L)} · Day (re-place each morning while it shows here)`
       : `<b>Limit</b> · Buy ${r.qty} · ${fmt(r.price, 2, L)} · Day, before the open (skip it if the open gaps above)`;
     const prot = r.system === 'Monthly ATH'
       ? `Exit: weekly close below the 30-week average (${fmt(r.stop, 2, L)} now) → this tab lists the sell. Safety net: <b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (15% under the plan stop, as on Angel)`
+      : bkOf(r) === 'tf' ? `Exit: a daily close with EMA 9 below EMA 21 → this tab lists the sell for the next open. Safety net: <b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (15% under the EMA-21 stop)`
       : r.target ? `<b>Stop</b> · Sell ${r.qty} · ${fmt(r.stop, 2, L)} · GTC, and <b>Limit</b> · Sell ${r.qty} · ${fmt(r.target, 2, L)} · GTC (target); sell anything left after 120 days`
       : `<b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (the backtested 5-day-low stop); also sell when this tab lists a Supertrend exit`;
     return `<div class="lv-tk">1. ${buy}<br>2. After the fill: ${prot}</div>`; };
   const list = rows.map((r, i) => `<div class="lv-row${r.off ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.off ? '' : 'checked'} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}${r.td_levels != null ? ` <span class="chip ${r.td_levels === 3 ? 'open' : r.td_levels <= 1 ? 'exit' : ''}" title="Top-down checks passed: sector beats the index (6 m), industry Building/Strong, stock beats its sector (1 y)">Top-down ${r.td_levels}/3</span>` : ''} <span class="muted" style="font-size:12px">${esc(r.name || '')}${r.group ? ' · ' + esc(r.group) : ''}</span></div>
       <div class="lv-plan">${r.off ? `<span class="muted">Not picked${r.qty ? ` (would be ${r.qty.toLocaleString(L)} shares)` : ''}</span>` : r.qty ? `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}` : '<span class="muted">Too small for your capital at this risk</span>'}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.off ? ticket(r) : ''}</div><div></div></div>`).join('');
-  const swList = swR.map((r, i) => `<div class="lv-row${r.skip ? ' lv-off' : ''}"><div class="lv-rank">S${r.rank}<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${r.experimental ? ' <span class="chip exit">experimental</span>' : ''} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
+  const swRow = (r, i) => `<div class="lv-row${r.skip ? ' lv-off' : ''}"><div class="lv-rank">S${r.rank}<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${r.experimental ? ' <span class="chip exit">experimental</span>' : ''} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}${r.skip === 'not picked' && r.qty ? ` (would be ${r.qty.toLocaleString(L)} shares)` : ''}</span>` : `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}`}</div>
-      <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.skip ? ticket(r) : ''}</div><div></div></div>`).join('');
+      <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.skip ? ticket(r) : ''}</div><div></div></div>`;
+  const swCardG = (b) => { const L2 = swR.map((r, i) => (bkOf(r) === b ? swRow(r, i) : '')).join(''); if (!L2 && b !== 'tf') return '';
+    const pe = swR.filter((r) => bkOf(r) === b && !r.skip && r.qty > 0);
+    return `<div class="lv-card"><div style="display:flex;justify-content:space-between"><b>${BK_NAME[b]} · max ${alG[b] ?? 0}%</b><span class="muted">${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), mk)}</span></div>
+      <p class="lv-sub">${BK_HEAD[b]}${b !== 'tf' ? ` Experimental on ${MKT[mk].name}: worse than a random stock in the 2008–26 test.` : ` Not yet tested on ${MKT[mk].name} — the paper record tracks it.`}</p>${b === 'tf' ? lvSwingHead(srG, idleG, mk, null) : ''}${L2 || '<p class="empty">No new signals for the next session.</p>'}</div>`; };
   const held = new Set(Pp ? Object.keys(Pp.pos || {}) : []);
   const exits = (P.exits || []).map((e) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell next open</span>${held.has(e.symbol) ? ' <span class="chip">in paper</span>' : ''}</div><div class="lv-sub">${esc(e.system)}: ${esc(e.why)} — only if you hold it. Cancel its GTC stop first.</div></div><div></div></div>`).join('');
   let paper = '<p class="lv-sub">Starts with the next run: from then each plan is paper-filled at the next open and tracked against the index.</p>';
@@ -255,22 +312,24 @@ async function loadLiveG(mk) {
       ${st.open_by_system || st.by_system ? `<p class="lv-sub">By strategy — ${[...new Set(Object.keys(st.open_by_system || {}).concat(Object.keys(st.by_system || {})))].map((k) => { const b = (st.by_system || {})[k]; return `<b>${esc(k)}</b>: ${(st.open_by_system || {})[k] || 0} open${b ? `, ${b.closed} closed, ${fmt(b.win * 100, 0)}% win, ${fmt(b.avgR, 2)}R avg` : ''}`; }).join(' · ')}</p>` : ''}
       ${Pp.equity.length > 1 ? '<div class="chart" id="lvpc" style="height:170px"></div>' : '<p class="lv-sub">The chart starts after the second day.</p>'}
       <p class="lv-sub">Since ${day(Pp.start)} · ${cur}${fmt(Pp.capital, 0, L)} start · ${esc(Pp.rules)}. Fills use the real next-day open from Yahoo; misses (gapped above the limit) are skipped, as you would.</p>
-      ${pos.length ? `<table class="mini"><tr><th>Open (${pos.length})</th><th>Qty</th><th>Entry</th><th>Now</th></tr>${pos.map(([s, p]) => `<tr><td>${esc(s)} <span class="muted">${p.system === 'Monthly ATH' ? 'ATH' : '9/21'}</span></td><td>${p.qty}</td><td>${fmt(p.entry, 2, L)}</td><td class="${p.last >= p.entry ? 'up' : 'down'}">${fmt(p.last, 2, L)} (${pct((p.last / p.entry - 1) * 100)})</td></tr>`).join('')}</table>` : ''}
+      ${pos.length ? `<table class="mini"><tr><th>Open (${pos.length})</th><th>Qty</th><th>Entry</th><th>Now</th></tr>${pos.map(([s, p]) => `<tr><td>${esc(s)} <span class="muted">${({ 'Monthly ATH': 'Momentum', 'Trend 9/21': 'Trend 9/21', '9/21 trend': '9/21 (old)', 'Breakout retest': 'Retest', 'Bottom pattern': 'Pattern' })[p.system] || esc(p.system)}</span></td><td>${p.qty}</td><td>${fmt(p.entry, 2, L)}</td><td class="${p.last >= p.entry ? 'up' : 'down'}">${fmt(p.last, 2, L)} (${pct((p.last / p.entry - 1) * 100)})</td></tr>`).join('')}</table>` : ''}
       ${(Pp.log || []).length ? `<details style="margin-top:6px"><summary class="lv-sub">Paper fills and misses</summary><p class="lv-sub">${Pp.log.slice(0, 30).map(esc).join('<br>')}</p></details>` : ''}`;
   }
   el.innerHTML = `${lvSeg()}<div class="lv-card" style="border-left:5px solid var(--fall)"><b>Paper-trading phase · you place orders yourself on moomoo</b>
       <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>
     <div class="lv-card"><b>Paper record</b>${paper}</div>
-    <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Momentum investing · monthly ATH · top ${rows.length}</b>${capInput(mk, 'lvcapg')}</div>
+    ${lvBucketCard(mk, P, alG, inUseG, null)}
+    <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Momentum Investing · max ${alG.mom}% · top ${rows.length}</b>${capInput(mk, 'lvcapg')}</div>
       <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk and max 10% a stock. Holdings and cash are not checked.</p>${lvPicker(nP, risk * 100)}<div class="lv-pdfbar"><span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span><button class="lv-btn" id="lvpdf">Export PDF</button></div><p class="lv-sub">Top-down order: stocks passing all three checks first (sector beating the index over 6 months, industry Building/Strong, stock beating its sector over 1 year), then sector, industry lane and system score. Not backtested as a ranking — in the US/ASX tests these levels did not lift returns as filters.</p>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
-    <div class="lv-card"><b>Swing · 9/21, retests & patterns on idle cash</b>${lvSwingHead(srG, idleG, mk, null)}${swList || '<p class="empty">No new 9/21 signals for the next session.</p>'}</div>
+    ${swCardG('tf')}${swCardG('rt')}${swCardG('pt')}
+    <div class="lv-card"><b>Coming: System 1 · System 2 · System 3 · Wealth Creation</b><p class="lv-sub">Empty buckets (0%) until you give the rules; each is backtested before it can trade.</p></div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
-  lvSegWire(el); wireCap('lvcapg', mk, () => loadLive());
+  lvSegWire(el); lvBucketWire(el, mk, null); wireCap('lvcapg', mk, () => loadLive());
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', () => { try { localStorage.setItem('td.lvN_' + mk, ns.value); localStorage.removeItem(selKey(mk, P.asof)); } catch (e) { /* private mode */ } lvKeep(); });
   lvSelWire(el, mk, P.asof, rows, nP, selG);
-  $('#lvpdf').addEventListener('click', () => { const pk = rows.filter((r) => !r.off && r.qty > 0).concat(swR.filter((r) => !r.skip && r.qty > 0)); if (!pk.length) { alertMsg('Nothing picked.'); return; } lvPdf(mk, P, pk, P.exits || [], { cap: C0, n: nP, risk: risk * 100, sr: srG }); });
+  $('#lvpdf').addEventListener('click', () => { const pk = rows.filter((r) => !r.off && r.qty > 0).concat(swR.filter((r) => !r.skip && r.qty > 0)); if (!pk.length) { alertMsg('Nothing picked.'); return; } lvPdf(mk, P, pk, P.exits || [], { cap: C0, n: nP, risk: risk * 100, sr: srG, al: alG }); });
   const srs = $('#lvsr'); if (srs) srs.addEventListener('change', () => { try { localStorage.setItem('td.lvSR_' + mk, srs.value); } catch (e) { /* private mode */ } lvKeep(); });
   lvSwWire(el, mk, P.asof, swR);
   if (Pp && Pp.equity && Pp.equity.length > 1 && $('#lvpc')) {
@@ -304,6 +363,9 @@ async function loadLive() {
     const held = new Set(Object.keys(S.held || {}));
     rows = rows.concat(lvSwingSize((P.swing || []).filter((r) => !held.has(r.symbol)), S.capital, Math.max(0, S.cash - 0.15 * S.capital), lvSR('NSE'), lvSwSel('NSE', P.asof)).map((r) => ({ ...r, local: true })));
   }
+  const alN = lvAlloc('NSE', P, S); const C0n = S ? S.capital : cap('NSE');
+  if (!S || !S.buckets) rows = lvRoomCut(rows, alN, C0n);
+  const inUseN = S && S.buckets ? Object.fromEntries(S.buckets.map((b) => [b.key, b.used])) : rows.reduce((a, r) => { if (!r.skip && r.qty > 0 && r.tier !== 'more' && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))) a[bkOf(r)] = (a[bkOf(r)] || 0) + r.value; return a; }, {});
   const nP = S && S.picks ? S.picks : lvN('NSE'); const rP = S && S.risk_pct ? S.risk_pct : lvRiskN(nP);
   state._lvGuardRisk = S && S.guard ? S.guard.risk_pct : +rP.toFixed(2);
   const live = S && S.mode === 'LIVE';
@@ -320,7 +382,7 @@ async function loadLive() {
   const srNow = S && S.swing ? S.swing.risk_pct : lvSR('NSE'); const idleNow = S && S.swing ? S.swing.idle_cash : lvIdle(P, cap('NSE'));
   const tot = pend.reduce((a, r) => a + r.value, 0);
   const rowHtml = (r, i) => {
-    const E = r.trigger || r.price; const ord = r.kind === 'ATH_STOP' ? `buy-stop ${fmt(r.trigger, 2, 'en-IN')} (limit ${fmt(r.price, 2, 'en-IN')}), day order` : `limit ${fmt(r.price, 2, 'en-IN')}, ${r.when}`;
+    const E = r.trigger || r.price; const ord = (r.kind === 'ATH_STOP' || r.kind === 'TF_STOP') ? `buy-stop ${fmt(r.trigger, 2, 'en-IN')} (limit ${fmt(r.price, 2, 'en-IN')}), day order` : `limit ${fmt(r.price, 2, 'en-IN')}, ${r.when}`;
     const td = r.system === 'Monthly ATH' ? `<span class="score ${r.aligned ? 'al' : ''}"><i class="sd ${r.sector_rs == null ? 'na' : r.sector_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.theme_rs == null ? 'na' : r.theme_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.stock_rs == null ? 'na' : r.stock_rs > 0 ? 'y' : 'n'}"></i>${r.aligned ? ' aligned' : ''}</span>` : '';
     const can = S && !r.skip && r.qty > 0 && !r.local;
     const hdr = r.tier === 'more' && (i === 0 || rows[i - 1].tier !== 'more')
@@ -333,7 +395,11 @@ async function loadLive() {
       ${can ? `<div class="lv-bq" hidden>Basket qty <input type="number" min="1" max="${r.qty}" value="${r.qty}" data-bq="${i}" inputmode="numeric"> of ${r.qty}</div>` : ''}</div>`;
   };
   const list = rows.map((r, i) => (r.tier === 'swing' ? '' : rowHtml(r, i))).join('');
-  const swList = rows.map((r, i) => (r.tier === 'swing' ? rowHtml(r, i) : '')).join('');
+  const swCard = (b) => { const L = rows.map((r, i) => (r.tier === 'swing' && bkOf(r) === b ? rowHtml(r, i) : '')).join(''); const pe = rows.filter((r) => r.tier === 'swing' && bkOf(r) === b && !r.skip && r.qty > 0);
+    if (!L && b !== 'tf') return '';
+    return `<div class="lv-card"><div style="display:flex;justify-content:space-between"><b>${BK_NAME[b]} · max ${alN[b] ?? 0}%</b><span class="muted">${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), 'NSE')}</span></div>
+      <p class="lv-sub">${BK_HEAD[b]}</p>${b === 'tf' ? lvSwingHead(srNow, S && !S.swing ? Math.max(0, S.cash - 0.15 * S.capital) : idleNow, 'NSE', S && S.swing ? S.swing.open : null) + (S && !S.swing && swRows.length ? '<p class="lv-sub"><b>View only until your server updates</b> (it updates itself at 08:00 IST on weekdays): sized here from your cash; place these in the Angel app, or Send them after the update.</p>' : '') : ''}
+      ${L || '<p class="empty">No new signals for the next session.</p>'}</div>`; };
   const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span></div>
       <div class="lv-sub">${esc(e.system)}: ${esc(e.why)} · ${S ? `you hold ${e.qty}` : 'matched to your holdings once the server is connected'}</div></div>
       <div>${S && e.qty > 0 ? `<button class="lv-btn sell" data-x="${i}">Sell ${e.qty}</button>` : ''}</div></div>`).join('');
@@ -347,16 +413,16 @@ async function loadLive() {
   const recent = S && S.recent && S.recent.length ? `<p class="lv-sub">Recent: ${S.recent.map((r) => `${esc(r.symbol)} ${esc(r.state)}${r.exit ? ' @ ' + fmt(r.exit, 2, 'en-IN') : ''}${r.text ? ' (' + esc(r.text) + ')' : ''}`).join(' · ')}</p>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
   el.innerHTML = `${lvSeg()}${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
-    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Momentum investing · monthly ATH · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
+    ${lvBucketCard('NSE', P, alN, inUseN, S)}
+    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub">${S ? (S.account_value != null ? `Angel account value ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} (the server never sizes above the account value; 0 = full account).` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
-      <p class="lv-sub">Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
+      <p class="lv-sub">Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high; stop = weekly close below the 30-week SMA, raised every week. Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '<span class="lv-sub">Tick trades for the basket; the PDF takes your ticked trades, or the top ' + nP + ' if none.</span>' : `<span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>${S && S.picks == null ? '<p class="lv-sub"><b>Server update pending:</b> your server updates itself at 08:00 IST on weekdays; until then its sizes below still use 10 positions.</p>' : ''}
       ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
-    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Swing · 9/21 trend + breakout retests, on idle cash</b><span class="muted">${swPend.length} to buy · ${money(swPend.reduce((a, r) => a + r.value, 0), 'NSE')}</span></div>
-      ${lvSwingHead(srNow, S && !S.swing ? Math.max(0, S.cash - 0.15 * S.capital) : idleNow, 'NSE', S && S.swing ? S.swing.open : null)}${S && !S.swing && swRows.length ? '<p class="lv-sub"><b>View only until your server updates</b> (it updates itself at 08:00 IST on weekdays): sized here from your cash; place these in the Angel app, or Send them after the update.</p>' : ''}
-      ${swList || '<p class="empty">No new swing signals for the next session.</p>'}</div>
+    ${swCard('tf')}${swCard('rt')}${swCard('pt')}
+    <div class="lv-card"><b>Coming: System 1 · System 2 · System 3 · Wealth Creation</b><p class="lv-sub">Empty buckets (0%) until you give the rules; each is backtested before it can trade.</p></div>
     ${(P.pattern_watch || []).length ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
       <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
@@ -369,7 +435,7 @@ async function loadLive() {
     try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); lvSave({ token: j.token }); loadLive(); } catch (e) { alertMsg(e.message); }
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
-  lvSegWire(el);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S);
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
   lvSwWire(el, 'NSE', P.asof, rows);
   const srs = $('#lvsr'); if (srs) srs.addEventListener('change', async () => {
@@ -381,7 +447,7 @@ async function loadLive() {
     if (S && !pk.length) pk = rows.filter((r) => r.tier !== 'swing' && !r.skip && r.qty > 0).slice(0, nP);
     pk = pk.filter((r) => r.tier !== 'swing' && r.qty > 0).concat(swPend);
     if (!pk.length) { alertMsg('Nothing picked.'); return; }
-    lvPdf('NSE', P, pk, S ? S.exits : (P.exits || []), { cap: S ? S.capital : cap('NSE'), n: nP, risk: rP, sr: srNow });
+    lvPdf('NSE', P, pk, S ? S.exits : (P.exits || []), { cap: S ? S.capital : cap('NSE'), n: nP, risk: rP, sr: srNow, al: alN });
   });
   const ci = $('#lvcapin'); if (ci) {
     if (S) ci.value = S.capital_set || (S.account_value == null && capSet ? capSet : S.capital) || cap('NSE');
@@ -459,7 +525,7 @@ async function lvOpen(r) {
   }
   const near = (d.near || []).find((x) => x.symbol === r.symbol);
   const run = (d.breakouts || []).concat(d.tracked || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
-  if ((r.kind === 'ATH_STOP' || r.kind === 'WATCH') && near) { athSelect({ ...near, _near: true }); return; }
+  if ((r.kind === 'ATH_STOP' || r.kind === 'TF_STOP' || r.kind === 'WATCH') && near) { athSelect({ ...near, _near: true }); return; }
   if (run) { athSelect(run); return; }
   if (near) { athSelect({ ...near, _near: true }); return; }
   alertMsg('Chart not available for ' + r.symbol);
@@ -479,7 +545,7 @@ function lvRowMsg(id, t, ok) {
 }
 async function lvSend(r, side, btn) {
   const qty = r.qty; const conf = `${side} ${qty} ${r.symbol}`;
-  const px = side === 'BUY' ? (r.kind === 'ATH_STOP' ? `buy-stop at ${fmt(r.trigger, 2, 'en-IN')}` : `limit ${fmt(r.price, 2, 'en-IN')}`) : 'limit ~1% below the price';
+  const px = side === 'BUY' ? ((r.kind === 'ATH_STOP' || r.kind === 'TF_STOP') ? `buy-stop at ${fmt(r.trigger, 2, 'en-IN')}` : `limit ${fmt(r.price, 2, 'en-IN')}`) : 'limit ~1% below the price';
   // a typed confirmation, not a one-tap: the server also checks this exact text
   const typed = window.prompt(`${conf} (${px}) on Angel One.\nType ${qty} to confirm:`);
   if (typed === null) return;
@@ -569,7 +635,7 @@ async function lvBasket(B, btn) {
   B = B.filter((x) => x.q > 0);
   if (!B.length) { alertMsg('Basket is empty.'); return; }
   const lines = B.map((x) => { const L = state._lvQ && state._lvQ[x.r.id];
-    const how = L && L.limit_now ? 'limit ' + fmt(L.limit_now, 2, 'en-IN') + (L.state === 'triggered' ? ' (triggered)' : '') : x.r.kind === 'ATH_STOP' ? 'buy-stop ' + fmt(x.r.trigger, 2, 'en-IN') : 'limit ' + fmt(x.r.price, 2, 'en-IN');
+    const how = L && L.limit_now ? 'limit ' + fmt(L.limit_now, 2, 'en-IN') + (L.state === 'triggered' ? ' (triggered)' : '') : (x.r.kind === 'ATH_STOP' || x.r.kind === 'TF_STOP') ? 'buy-stop ' + fmt(x.r.trigger, 2, 'en-IN') : 'limit ' + fmt(x.r.price, 2, 'en-IN');
     return `BUY ${x.q} ${x.r.symbol} (${how}${L ? ', now ' + fmt(L.ltp, 2, 'en-IN') : ''})`; }).join('\n');
   const tot = B.reduce((a, x) => a + x.v, 0);
   const typed = window.prompt(`${B.length} orders on Angel One, total ${money(tot, 'NSE')}:\n${lines}\n\nType ${B.length} to confirm:`);

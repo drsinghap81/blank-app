@@ -26,6 +26,9 @@ SUF = {"US": "", "ASX": ".AX"}
 BENCH = {"US": "^GSPC", "ASX": "^AXJO"}
 START = 100_000.0
 RISK, CAP, MAXPOS, COST, RESERVE = 0.01, 0.10, 10, 0.001, 0.15
+# bucket caps (9 Nov 2026): the most of equity each system may hold (the Live tab's default allocation)
+RULES = "1% risk to the stop, max 10% a stock; buckets: Momentum <= 60%, Trend 9/21 <= 40%, retests <= 15%, patterns <= 5% of equity; 10 Momentum + 10 swing positions, swing keeps 15% cash for Momentum; Trend 9/21 exits on a daily EMA 9/21 cross; fills at the next open, 0.1% cost a side"
+BUCKET = {"Monthly ATH": 0.60, "Trend 9/21": 0.40, "Breakout retest": 0.15, "Bottom pattern": 0.05, "9/21 trend": 0.40}
 
 
 def load(p, d):
@@ -67,7 +70,8 @@ def main(mk):
     if not asof:
         print("no plan"); return
     S = load(path, None) or {"market": mk, "start": asof, "capital": START, "cash": START, "pos": {}, "queue": [], "closed": [],
-                             "log": [], "equity": [], "rules": "1% risk to the stop, max 10% a stock; ATH up to 10 positions, swing up to 10 more on idle cash (15% kept for ATH); fills at the next open, 0.1% cost a side"}
+                             "log": [], "equity": [], "rules": RULES}
+    S["rules"] = RULES
     if S["equity"] and S["equity"][-1][0] >= asof:
         print("already ran for", asof); return
     syms = {q["symbol"] for q in S["queue"]} | set(S["pos"])
@@ -97,7 +101,7 @@ def main(mk):
         if d is None:
             continue
         o, h = float(r["Open"]), float(r["High"])
-        if q["kind"] == "ATH_STOP":
+        if q["kind"] in ("ATH_STOP", "TF_STOP"):
             if h < q["trigger"]:
                 events.append(f"{d} {s} buy-stop {q['trigger']:.2f} not triggered"); continue
             fill = max(o, q["trigger"])
@@ -111,7 +115,10 @@ def main(mk):
         if sum((p_["system"] != "Monthly ATH") == sw for p_ in S["pos"].values()) >= MAXPOS:
             events.append(f"{d} {s} skipped: 10 {'swing' if sw else 'ATH'} positions held"); continue
         avail = S["cash"] - (RESERVE * eq0 if sw else 0)
-        qty = math.floor(min(RISK * eq0 / (fill - q["stop"]), CAP * eq0 / fill, max(0, avail) / (fill * (1 + COST))))
+        room = BUCKET.get(q["system"], 0.15) * eq0 - sum(p_["qty"] * p_["last"] for p_ in S["pos"].values() if p_["system"] == q["system"])
+        if room <= 0:
+            events.append(f"{d} {s} skipped: {q['system']} bucket full"); continue
+        qty = math.floor(min(RISK * eq0 / max(fill - q["stop"], 0.04 * fill), CAP * eq0 / fill, max(0, avail) / (fill * (1 + COST)), room / fill))
         if qty <= 0:
             events.append(f"{d} {s} skipped: no cash"); continue
         cost = qty * fill * (1 + COST); S["cash"] -= cost
@@ -169,7 +176,7 @@ def main(mk):
     for r in (P.get("top") or []) + (P.get("swing") or []):
         if r["symbol"] in S["pos"]:
             continue
-        Q.append(dict(side="BUY", symbol=r["symbol"], date=asof, kind=r["kind"], system=r["system"], rank=r.get("rank", 99) + {"T921": 100, "RETEST": 200, "PATTERN": 300}.get(r.get("kind"), 0),
+        Q.append(dict(side="BUY", symbol=r["symbol"], date=asof, kind=r["kind"], system=r["system"], rank=r.get("rank", 99) + {"T921": 100, "TF_BRK": 100, "TF_STOP": 100, "RETEST": 200, "PATTERN": 300}.get(r.get("kind"), 0),
                       trigger=r.get("trigger"), limit=r["price"], stop=r["stop"], target=r.get("target")))
     S["queue"] = Q
     S["log"] = (events + S["log"])[:200]

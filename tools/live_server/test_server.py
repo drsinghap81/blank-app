@@ -38,7 +38,7 @@ def test_flow(tmp_path):
     assert nf.status_code == 404
     A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
     ok = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"})
-    if r["kind"] == "ATH_STOP":
+    if r["kind"] in ("ATH_STOP", "TF_STOP"):
         assert ok.status_code == 400
     else:
         j = ok.json(); assert ok.status_code == 200 and j["sent"] is False and j["order"]["variety"] == "AMO", j
@@ -51,7 +51,7 @@ def test_live_once(tmp_path):
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
     P = c.get("/api/plan", headers=h).json()
-    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] != "ATH_STOP")
+    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] not in ("ATH_STOP", "TF_STOP"))
     body = {"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"}
     a = c.post("/api/order", headers=h, json=body); assert a.status_code == 200 and a.json()["sent"] is True
     b = c.post("/api/order", headers=h, json=body); assert b.status_code == 409     # once a day per row
@@ -94,7 +94,7 @@ def test_fill_protect_exit(tmp_path):
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
     P = c.get("/api/plan", headers=h).json()
-    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] != "ATH_STOP")
+    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] not in ("ATH_STOP", "TF_STOP"))
     j = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"}).json()
     lv = r["stop"] if r["kind"] == "T921" else r["stop"] * 0.85
     assert abs(j["protect"]["trigger"] - round(lv, 2)) < 0.02
@@ -115,7 +115,7 @@ def test_dry_shows_protect(tmp_path):
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
     P = c.get("/api/plan", headers=h).json()
-    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] != "ATH_STOP")
+    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] not in ("ATH_STOP", "TF_STOP"))
     j = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"}).json()
     assert j["sent"] is False and j["protect"]["trigger"] < r["stop"] + 0.01
     assert not getattr(A.broker, "gtts", None) and not A.broker.placed
@@ -126,7 +126,7 @@ def test_basket(tmp_path):
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
     P = c.get("/api/plan", headers=h).json()
-    ok = [r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] != "ATH_STOP"][:3]
+    ok = [r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] not in ("ATH_STOP", "TF_STOP")][:3]
     items = [{"id": r["id"], "qty": r["qty"]} for r in ok] + [{"id": "HACK-X", "qty": 1}]
     assert c.post("/api/basket", headers=h, json={"items": items, "confirm": "BASKET 3"}).status_code == 400   # count must match
     j = c.post("/api/basket", headers=h, json={"items": items, "confirm": f"BASKET {len(items)}"}).json()
@@ -155,7 +155,7 @@ def test_live_checks(tmp_path):
     b = dict(kind="ATH_BRK", price=101.0, ref=100.0, stop=80.0)
     assert A.live_check(b, 102)[0] == "ok" and A.live_check(b, 102)[1] == 103.0 and A.live_check(b, 104)[0] == "ran"
     P = c.get("/api/plan", headers=h).json()
-    row = next(x for x in P["rows"] if not x["skip"] and x["qty"] > 0 and x["kind"] != "ATH_STOP")
+    row = next(x for x in P["rows"] if not x["skip"] and x["qty"] > 0 and x["kind"] not in ("ATH_STOP", "TF_STOP"))
     A.broker.ltp = lambda s: row["ref"] * 1.10            # ran away -> refused
     j = c.post("/api/order", headers=h, json={"id": row["id"], "qty": row["qty"], "confirm": f"BUY {row['qty']} {row['symbol']}"})
     assert j.status_code == 400 and "plan close" in j.json()["detail"]
@@ -171,7 +171,7 @@ def test_angel_reject_reason(tmp_path):
     def bad(p): raise RuntimeError("The order cannot be processed as the token is categorised under cautionary listings by the exchange. [AB4036]")
     A.broker.place = bad
     P = c.get("/api/plan", headers=h).json()
-    rs = [r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] != "ATH_STOP"][:2]
+    rs = [r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] not in ("ATH_STOP", "TF_STOP")][:2]
     j = c.post("/api/order", headers=h, json={"id": rs[0]["id"], "qty": rs[0]["qty"], "confirm": f"BUY {rs[0]['qty']} {rs[0]['symbol']}"})
     assert j.status_code == 502 and "cautionary" in j.json()["detail"]
     j = c.post("/api/basket", headers=h, json={"items": [{"id": rs[1]["id"], "qty": rs[1]["qty"]}], "confirm": "BASKET 1"}).json()
@@ -217,7 +217,7 @@ def test_swing_sleeve(tmp_path):
     P = c.get("/api/plan", headers=h).json()
     assert "swing" in P and P["swing"]["risk_pct"] == round(A.RISK * 100, 2)
     sw = [r for r in P["rows"] if r["tier"] == "swing"]
-    assert all(r["kind"] in ("T921", "RETEST") for r in sw)
+    assert all(r["kind"] in ("T921", "RETEST", "TF_BRK", "TF_STOP") for r in sw)
     assert A.protect_level("RETEST", 100) == 100 and A.protect_level("T921", 100) == 100 and A.protect_level("ATH_BRK", 100) < 100
     assert not any(r["kind"] == "T921" for r in P["rows"] if r["tier"] != "swing")
     j = c.post("/api/picks", headers=h, json={"n": 5, "swing_risk": 1.0}).json(); assert j["swing_risk_pct"] == 1.0 and j["picks"] == 5
@@ -239,3 +239,20 @@ def test_capital_setting(tmp_path):
     a = {r["id"]: r["qty"] for r in P0["rows"]}; assert any(r["qty"] < a[r["id"]] for r in P1["rows"] if a[r["id"]] > 1)
     c.post("/api/picks", headers=h, json={"n": 10, "capital": 9e9}); assert c.get("/api/plan", headers=h).json()["capital"] == 2000000   # capped at the account
     c.post("/api/picks", headers=h, json={"n": 10, "capital": 0}); assert c.get("/api/plan", headers=h).json()["capital"] == 2000000
+
+
+def test_buckets(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    P = c.get("/api/plan", headers=h).json()
+    B = {b["key"]: b for b in P["buckets"]}; assert B["mom"]["pct"] == 60 and B["tf"]["pct"] == 40 and B["s1"]["pct"] == 0
+    assert all(r.get("bucket") in ("mom", "tf", "rt", "pt") for r in P["rows"])
+    j = c.post("/api/picks", headers=h, json={"alloc": {"tf": 1, "rt": 0, "bogus": 50}}).json()
+    assert j["alloc"]["tf"] == 1 and "bogus" not in j["alloc"] and j["picks"] == 10
+    P2 = c.get("/api/plan", headers=h).json()
+    tf = [r for r in P2["rows"] if r["bucket"] == "tf" and not r["skip"]]
+    assert sum(r["value"] for r in tf) <= 0.01 * 2000000 + max([r.get("trigger") or r["price"] for r in tf] or [0])
+    assert all(r["skip"] for r in P2["rows"] if r["bucket"] == "rt")
+    mom = [r for r in P2["rows"] if r["bucket"] == "mom" and not r["skip"]]
+    assert sum(r["value"] for r in mom) <= 0.60 * 2000000 + 1
+    assert A.protect_level("TF_BRK", 100) < 100           # Trend 9/21: safety net only, the system exits on the EMA cross

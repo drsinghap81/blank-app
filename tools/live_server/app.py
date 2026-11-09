@@ -95,6 +95,22 @@ def swing_risk() -> float:
         return RISK
 
 
+# Systems as buckets (9 Nov 2026): each may hold at most alloc% of capital; all share one cash pool (Momentum first,
+# swing buckets keep SWING_RESERVE in cash). NSE 2017-26 one-account test: Momentum <= 60% + Trend 9/21 <= 40% 23.1%/yr,
+# worst fall -21.4%, vs Momentum alone 17.3%, -16.8%. Top Bottom runs on pledge margin (its own bot), not this cash.
+BUCKETS = {"mom": 60, "tf": 40, "rt": 15, "pt": 0, "s1": 0, "s2": 0, "s3": 0, "wc": 0, "tb": 15}
+SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "tf", "Breakout retest": "rt", "Bottom pattern": "pt"}
+
+
+def alloc() -> dict:
+    a = dict(BUCKETS)
+    try:
+        a.update({k: float(v) for k, v in (_picks_cfg().get("alloc") or {}).items() if k in BUCKETS})
+    except Exception:  # noqa: BLE001
+        pass
+    return a
+
+
 def risk_now() -> float:
     return min(MAX_RISK, RISK * MAX_POSITIONS / picks())
 MAX_ORDER_VALUE = float(ENV.get("MAX_ORDER_VALUE", "300000"))
@@ -204,20 +220,26 @@ class Mode(BaseModel):
 
 
 class Picks(BaseModel):
-    n: int
+    n: int | None = None
     swing_risk: float | None = None
     capital: float | None = None     # trading capital set in the app; 0 = use the account value; never above the account value
+    alloc: dict | None = None        # bucket -> max % of capital it may hold (Live "Systems & allocation")
 
 
 @app.post("/api/picks")
 def set_picks(body: Picks, _=Depends(auth)):
     """How many positions the system book holds (3-10); risk per trade follows (see risk_now)."""
-    n = max(3, min(MAX_POSITIONS, int(body.n))); cfg = _picks_cfg()
+    cfg = _picks_cfg()
+    n = picks() if body.n is None else max(3, min(MAX_POSITIONS, int(body.n)))
     sr = cfg.get("swing_risk") if body.swing_risk is None else max(0.25, min(MAX_RISK * 100, float(body.swing_risk)))
     capv = cfg.get("capital") if body.capital is None else max(0.0, float(body.capital))
-    json.dump(dict(n=n, swing_risk=sr, capital=capv, at=time.time()), open(os.path.join(DATA, "picks.json"), "w"))
-    log("picks", n=n, swing_risk=sr, capital=capv)
-    return dict(picks=n, risk_pct=round(risk_now() * 100, 2), swing_risk_pct=round(swing_risk() * 100, 2), capital=capv)
+    al = dict(cfg.get("alloc") or {})
+    for k, v in (body.alloc or {}).items():
+        if k in BUCKETS:
+            al[k] = max(0.0, min(100.0, float(v)))
+    json.dump(dict(n=n, swing_risk=sr, capital=capv, alloc=al, at=time.time()), open(os.path.join(DATA, "picks.json"), "w"))
+    log("picks", n=n, swing_risk=sr, capital=capv, alloc=al)
+    return dict(picks=n, risk_pct=round(risk_now() * 100, 2), swing_risk_pct=round(swing_risk() * 100, 2), capital=capv, alloc=alloc())
 
 
 @app.post("/api/mode")
@@ -460,7 +482,13 @@ def sized(acc=None):
         app_cap = 0.0
     cap = min(app_cap, acct) if app_cap > 0 and acct else acct      # capital set in the app, never above the account value
     N = picks(); RK = risk_now(); SR = swing_risk()
-    sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Breakout retest")]
+    sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Trend 9/21", "Breakout retest", "Bottom pattern")]
+    AL = alloc(); ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
+    expo = {k: 0.0 for k in AL}
+    for s_ in sys_open:
+        b = SYS_BUCKET.get(J[s_].get("system"), "mom"); e_ = J[s_]
+        expo[b] = expo.get(b, 0.0) + (held.get(s_, 0) or e_.get("qty") or 0) * float(ltp.get(s_) or e_.get("entry") or 0)
+    room = {k: AL[k] / 100 * cap - expo.get(k, 0.0) for k in AL}
     ath_open = [s for s in sys_open if s not in sw_open]
     slots = max(0, N - len(ath_open)); sw_slots = max(0, SWING_MAX - len(sw_open))
     cash = acc["cash"]
@@ -485,6 +513,14 @@ def sized(acc=None):
         if r["skip"] or r["qty"] <= 0:
             continue
         sw = r["tier"] == "swing"
+        bk = r.get("bucket") or ("tf" if sw else "mom"); r["bucket"] = bk
+        E0 = r.get("trigger") or r["price"]
+        if r["value"] > room.get(bk, 0):
+            q = math.floor(max(0.0, room.get(bk, 0)) / E0)
+            if q <= 0 or q < 0.25 * r["qty"]:
+                r["skip"] = "bucket full (%s max %g%% of capital)" % (bk, AL.get(bk, 0)); continue
+            r["qty"], r["value"] = q, round(q * E0, 0); r["note"] = r.get("note", "") + " · cut to the bucket's room"
+            r["risk_amt"] = round(q * (E0 - r["stop"]), 0); r["pct_cap"] = round(q * E0 / cap * 100, 1) if cap else None
         if (sw_slots if sw else slots) <= 0:
             r["skip"] = ("no free swing slot (max %d)" % SWING_MAX) if sw else ("no free slot (you picked %d positions)" % N); continue
         E = r.get("trigger") or r["price"]
@@ -498,19 +534,22 @@ def sized(acc=None):
         if sw:
             if r["value"] > sw_left or sw_used >= sw_slots:
                 r["note"] += " · uses idle cash or a slot the swing trades above would need"; r["reserve"] = True
-            sw_left -= r["value"]; sw_used += 1
+            sw_left -= r["value"]; sw_used += 1; room[bk] = room.get(bk, 0) - r["value"]
             continue
         if r["value"] > left or used >= slots:
             r["note"] += " · uses cash or a slot the trades ranked above would need"
             r["reserve"] = True
-        left -= r["value"]; used += 1
-    ex = [dict(e, qty=held.get(e["symbol"], 0)) for e in P.get("exits") or [] if held.get(e["symbol"], 0) > 0]
+        left -= r["value"]; used += 1; room[bk] = room.get(bk, 0) - r["value"]
+    # an exit applies to the system the app bought the stock under (holdings bought elsewhere get every exit listed)
+    ex = [dict(e, qty=held.get(e["symbol"], 0)) for e in P.get("exits") or [] if held.get(e["symbol"], 0) > 0
+          and (e["symbol"] not in J or not J[e["symbol"]].get("system") or J[e["symbol"]]["system"] == e.get("system"))]
     if G["status"] == "paused":
         for r in rows:
             if not r["skip"]:
                 r["skip"] = "paused: losing streak (guard)"
     trades, recent = trades_view(J, acc)
     return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open, picks=N, risk_pct=round(RK * 100, 2), account_value=acct, capital_set=app_cap or None,
+                buckets=[dict(key=k, pct=AL[k], used=round(expo.get(k, 0.0)), room=round(max(0.0, room.get(k, 0.0)))) for k in AL],
                 swing=dict(risk_pct=round(SR * 100, 2), slots=sw_slots, max=SWING_MAX, open=len(sw_open), idle_cash=round(sw_cash), reserve_pct=SWING_RESERVE * 100),
                 mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,
                 trades=trades, recent=recent, protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100))
@@ -583,12 +622,12 @@ def order(body: Order, _=Depends(auth)):
             st, lim, why = live_check(row, ltp)
             if st in ("broken", "missed", "ran"):
                 raise HTTPException(400, f"not sent: {why}")
-            if row["kind"] == "ATH_STOP" and st == "wait":
+            if row["kind"] in ("ATH_STOP", "TF_STOP") and st == "wait":
                 p = broker.params(row["symbol"], side, body.qty, row["price"], kind="SL", trigger=row["trigger"])
             else:                       # 9/21, breakouts, or a buy-stop already triggered: LIMIT near the live price, capped
                 p = broker.params(row["symbol"], side, body.qty, lim or row["price"])
         else:
-            if row["kind"] == "ATH_STOP":
+            if row["kind"] in ("ATH_STOP", "TF_STOP"):
                 raise HTTPException(400, "buy-stop orders are sent during market hours (09:15-15:30 IST); AMO does not take them")
             if not amo:
                 raise HTTPException(400, "send between 15:45 and 08:57 IST (AMO) or during market hours")
@@ -655,7 +694,7 @@ def live_check(r, ltp):
         return "ok", None, ""
     if r.get("stop") and ltp <= r["stop"]:
         return "broken", None, f"below the plan stop ({r['stop']:.2f}) - the setup is invalid; can't send"
-    if r["kind"] == "ATH_STOP":
+    if r["kind"] in ("ATH_STOP", "TF_STOP"):
         T = r["trigger"]
         if ltp < T:
             return "wait", None, f"{(T / ltp - 1) * 100:.1f}% below the trigger - the buy-stop waits on Angel"
