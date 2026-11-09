@@ -282,13 +282,16 @@ function lvBucketCard(mk, P, al, inUse, S) {
       <td><select data-al="${b.key}" aria-label="${esc(b.name)} max share">${o.map((x) => `<option value="${x}" ${x === v ? 'selected' : ''}>${x}%</option>`).join('')}</select></td>
       <td class="muted">${b.margin ? 'futures notional' : inUse[b.key] ? money(inUse[b.key], mk) : '–'}</td></tr>`; }).join('');
   const sum = B.filter((b) => !b.margin).reduce((a, b) => a + (al[b.key] ?? 0), 0);
-  return `<div class="lv-card"><b>Systems & allocation</b>
+  const line = B.filter((b) => (al[b.key] ?? 0) > 0).map((b) => `${esc(b.name)} ${al[b.key]}%`).join(' · ') || 'all systems off';
+  let open = false; try { open = sessionStorage.getItem('td.bkopen') === '1'; } catch (e) { /* */ }
+  return `<details class="lv-card lv-bkfold" ${open ? 'open' : ''}><summary><span><b>Systems & allocation</b><span class="lv-sub">${line}</span></span><span class="lv-bkchg">Change</span></summary>
     <p class="lv-sub">% = the most of your capital each system may hold. They share one cash pool, so the total can pass 100% (now ${sum}%): Momentum is usually about half invested and the others use the cash it isn't using, keeping 15% free for new Momentum breakouts. ${S && S.buckets ? 'Saved on your server.' : S ? 'Saved on this device; your server uses it after its next update (08:00 IST weekdays).' : 'Saved on this device.'}</p>
     <table class="mini lv-bk"><tr><th>System</th><th>Max</th><th>${S && S.buckets ? 'Holding now' : 'This plan'}</th></tr>${rowsH}</table>
     <p class="lv-sub"><b>Optimised 9 Nov (NSE 2017–26, one account, every system simulated together, 1% risk a trade):</b> ${mk === 'NSE' ? '<b>Momentum ≤ 60% + Trend 9/21 ≤ 40% + Top Bottom 1× on pledge margin: 33.2%/yr, worst fall −15.9%</b> (2022–26: 29.6%; without 2020: 25.2%; only losing year 2018, −5%). Without Top Bottom: 23.1%, −21.4%.' : 'Momentum ≤ 60% + Trend 9/21 ≤ 40% (the India optimum; US/ASX not optimised — paper phase).'} Switched off because they added more drawdown than return: 9/21 any stock (+1.7 pts/yr, worst fall −28%), breakout retests (−1.3%/yr as a portfolio), bottom patterns, System 1. Systems 2 and 3 removed (no edge).</p>
-    <details class="info"><summary>Rules and tests for each system</summary>${B.map((b) => `<p><b>${esc(b.name)}.</b> ${esc(b.rules || '')} <i>${esc(b.test || '')}</i></p>`).join('')}</details></div>`;
+    <details class="info"><summary>Rules and tests for each system</summary>${B.map((b) => `<p><b>${esc(b.name)}.</b> ${esc(b.rules || '')} <i>${esc(b.test || '')}</i></p>`).join('')}</details></details>`;
 }
 function lvBucketWire(el, mk, S) {
+  el.querySelectorAll('.lv-bkfold').forEach((d) => d.addEventListener('toggle', () => { try { sessionStorage.setItem('td.bkopen', d.open ? '1' : '0'); } catch (e) { /* */ } }));
   el.querySelectorAll('select[data-al]').forEach((x) => x.addEventListener('change', async () => {
     let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc2_' + mk) || '{}'); } catch (e) { /* */ }
     o[x.dataset.al] = +x.value; try { localStorage.setItem('td.alloc2_' + mk, JSON.stringify(o)); } catch (e) { /* private mode */ }
@@ -402,7 +405,6 @@ async function loadLiveG(mk) {
       <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk and max 10% a stock. Holdings and cash are not checked.</p>${lvPicker(nP, risk * 100)}<div class="lv-pdfbar"><span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span><button class="lv-btn" id="lvpdf">Export PDF</button></div><p class="lv-sub">Top-down order: stocks passing all three checks first (sector beating the index over 6 months, industry Building/Strong, stock beating its sector over 1 year), then sector, industry lane and system score. Not backtested as a ranking — in the US/ASX tests these levels did not lift returns as filters.</p>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
     ${swCardG('tf')}${swCardG('t9')}${swCardG('rt')}${swCardG('pt')}
-    <div class="lv-card"><b>Coming: Wealth Creation</b><p class="lv-sub">Empty bucket (0%) until you give the rules; it is backtested before it can trade.</p></div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
   lvSegWire(el); lvBucketWire(el, mk, null); wireCap('lvcapg', mk, () => loadLive());
@@ -513,7 +515,6 @@ async function loadLive() {
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
     ${swCard('tf')}${swCard('t9')}${swCard('rt')}${swCard('pt')}
-    <div class="lv-card"><b>Coming: Wealth Creation</b><p class="lv-sub">Empty bucket (0%) until you give the rules; it is backtested before it can trade.</p></div>
     <div id="lvcurves"></div>
     ${(P.pattern_watch || []).length ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
       <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}

@@ -577,3 +577,9 @@ body.bg-first .views { display: none !important; }
 .lv-perf-big span { font-size: 16px; margin-left: 6px; }
 .lv-perf .facts { margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
 .lv-perf .fact small { display: block; color: var(--slate); font-size: 12px; }
+.lv-bkfold > summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.lv-bkfold > summary::-webkit-details-marker { display: none; }
+.lv-bkfold > summary > span:first-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lv-bkchg { flex: none; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--soft); color: var(--accent); }
+.lv-bkfold[open] .lv-bkchg { visibility: hidden; }
+.lv-bkfold[open] > summary { margin-bottom: 8px; }
