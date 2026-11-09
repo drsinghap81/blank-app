@@ -105,12 +105,19 @@ class AngelEquity:
             return r.get("data")
         return r
 
+    @staticmethod
+    def _hqty(h):
+        """Shares held. Angel's "quantity" already includes unsettled T1 shares on some responses and not on others, so
+        take the larger of quantity and settled + T1 (never quantity + T1, which counted recent buys twice)."""
+        q = int(float(h.get("quantity") or 0)); t1 = int(float(h.get("t1quantity") or 0)); rq = int(float(h.get("realisedquantity") or 0))
+        return max(q, rq + t1)
+
     def account(self):
         api = self._session()
         f = self._data(self._call(api.rmsLimit)) or {}
         hold = self._data(self._call(api.holding)) or []
         pos = self._data(self._call(api.position)) or []
-        H = [dict(symbol=str(h.get("tradingsymbol", "")).replace("-EQ", ""), qty=int(float(h.get("quantity") or 0)) + int(float(h.get("t1quantity") or 0)),
+        H = [dict(symbol=str(h.get("tradingsymbol", "")).replace("-EQ", ""), qty=self._hqty(h),
                   avg=float(h.get("averageprice") or 0), ltp=float(h.get("ltp") or 0), pnl=float(h.get("profitandloss") or 0),
                   close=float(h.get("close") or 0) or None) for h in hold]
         P = [dict(symbol=str(p.get("tradingsymbol", "")).replace("-EQ", ""), qty=int(float(p.get("netqty") or 0)),
