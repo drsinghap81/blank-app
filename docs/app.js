@@ -2597,6 +2597,12 @@ async function pfPrices() {
   if (close && close.prices) { Object.assign(px, close.prices); src = `last close ${day(close.asof)}`; }
   // live prices only if they are newer than the nightly close
   if (live && live.prices && (!close || live.time.slice(0, 10) >= close.asof)) { Object.assign(px, live.prices); src = `${live.time}, ~15 min delayed`; }
+  // connected to your server: your holdings use Angel One's own prices (the same numbers as the Angel app)
+  if (lvCfg().url) {
+    try { const j = await lvApi('/api/account'); const H = ((j.angel || {}).holdings || []).filter((h) => h.ltp > 0);
+      if (H.length) { H.forEach((h) => { px[h.symbol] = [h.ltp, h.close || null]; }); src = 'Angel One, live' + (H.some((h) => h.close) ? '' : ' (today\'s change after the server update)'); } }
+    catch (e) { /* server off: keep the scan prices */ }
+  }
   const athOpen = Object.fromEntries(((ath && ath.tracked) || []).filter((r) => r.status === 'open').map((r) => [r.symbol, r]));
   const early = Object.fromEntries(((scan && scan.early) || []).filter((r) => r.status !== 'closed').map((r) => [r.symbol, r]));
   return { px, src, athOpen, early };
@@ -2780,7 +2786,9 @@ function pfImport() {
       if (A.error) throw new Error(A.error);
       const H = (A.holdings || []).filter((h) => h.qty > 0 && h.avg > 0);
       if (!H.length) { info.textContent = 'Angel One returned no holdings.'; fa.disabled = false; return; }
-      $('#f-txt').value = H.map((h) => `${h.symbol}, ${h.qty}, ${(+h.avg).toFixed(2)}`).join('\n');
+      // Angel's average can be rounded to 2 decimals; its own P&L gives the exact one (ltp - P&L / qty) when they agree
+      const exact = (h) => { const x = h.ltp && h.pnl != null ? h.ltp - h.pnl / h.qty : null; return x && Math.abs(x / h.avg - 1) < 0.005 ? x : h.avg; };
+      $('#f-txt').value = H.map((h) => `${h.symbol}, ${h.qty}, ${+exact(h).toFixed(4)}`).join('\n');
       const tot = H.reduce((a, h) => a + h.qty * (h.ltp || h.avg), 0);
       info.textContent = `Angel One: ${H.length} holdings, about ${inr(tot)} at today's prices. Tap "Replace my holdings" (or "Add to them").`;
       H.forEach((h) => { if (h.ltp && state.pf && !state.pf.px[h.symbol]) state.pf.px[h.symbol] = [h.ltp, null]; });   // price for names outside the scans

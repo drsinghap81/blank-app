@@ -111,7 +111,8 @@ class AngelEquity:
         hold = self._data(self._call(api.holding)) or []
         pos = self._data(self._call(api.position)) or []
         H = [dict(symbol=str(h.get("tradingsymbol", "")).replace("-EQ", ""), qty=int(float(h.get("quantity") or 0)) + int(float(h.get("t1quantity") or 0)),
-                  avg=float(h.get("averageprice") or 0), ltp=float(h.get("ltp") or 0), pnl=float(h.get("profitandloss") or 0)) for h in hold]
+                  avg=float(h.get("averageprice") or 0), ltp=float(h.get("ltp") or 0), pnl=float(h.get("profitandloss") or 0),
+                  close=float(h.get("close") or 0) or None) for h in hold]
         P = [dict(symbol=str(p.get("tradingsymbol", "")).replace("-EQ", ""), qty=int(float(p.get("netqty") or 0)),
                   product=p.get("producttype"), ltp=float(p.get("ltp") or 0)) for p in pos if p.get("exchange") == "NSE"]
         cash = float(f.get("availablecash") or 0)
