@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-09 04:49 UTC",
+"generated": "2026-11-09 09:13 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-08",
@@ -69,10 +69,10 @@
 {
 "key": "wc",
 "name": "Wealth Creation",
-"status": "pending",
+"status": "sip",
 "pct": 0,
-"rules": "Rules to come from Amritpal.",
-"test": "Not tested yet."
+"rules": "ETF Pie funded by a monthly SIP, outside the systems' capital: Nifty 50, Midcap 150, Gold and US Nasdaq 100 ETFs at fixed weights (Equal, Balanced or Aggressive) rebalanced each quarter, or the monthly rotation (best 2 by 3-month return).",
+"test": "2016-26 monthly, price indices, 0.2% per switch: Equal 25% each 18.3%/yr, worst -15.7%; Balanced 30/20/30/20 17.6%, -14.7%; Aggressive 30/30/10/30 18.4%, -20.2%; rotation 17.7%, -12.8%; Nifty 50 11.6%, -29.3%."
 },
 {
 "key": "tb",
