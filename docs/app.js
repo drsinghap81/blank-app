@@ -8,7 +8,38 @@ const MKT = {
   ASX: { path: 'data/scan/asx/', name: 'Australia', exch: 'ASX', loc: 'en-AU', cur: 'A$', unit: 'A$ m', tv: 'ASX:', screener: false },
 };
 const C = { ink: '#14213D', rise: '#0E9F6E', fall: '#D64545', saffron: '#E8A33D', slate: '#5B6B82', line: '#E3E8F0',
-  e9: '#F28C28', e21: '#3B6FE0', e50: '#A0AEC0', rsi: '#7C5CDB' };
+  e9: '#F28C28', e21: '#3B6FE0', e50: '#A0AEC0', rsi: '#7C5CDB', card: '#FFFFFF', grid: '#F1F4F8' };
+/* Themes (9 Nov 2026): colours live in CSS variables per theme (styles.css); charts read them from here */
+const THEMES = {
+  auto: { name: 'Auto', desc: 'Midnight Neon at night, Clean Pop by day (follows your phone)', sw: ['#08090D', '#C6FF3D', '#FFFFFF', '#5B2EE8'] },
+  neon: { name: 'Midnight Neon', desc: 'Dark, electric lime', sw: ['#08090D', '#12141C', '#C6FF3D', '#3DDC97'], font: 'Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800', bar: '#08090D' },
+  pop: { name: 'Clean Pop', desc: 'Light, violet, friendly', sw: ['#F7F6FB', '#FFFFFF', '#5B2EE8', '#0F9D6B'], font: 'Plus+Jakarta+Sans:wght@400;500;600;700;800', bar: '#5B2EE8' },
+  bento: { name: 'Bento Bold', desc: 'Chunky tiles, cobalt and lime', sw: ['#EFF0F3', '#111216', '#2B4CFF', '#D7F34A'], font: 'Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700;800', bar: '#111216' },
+  terminal: { name: 'Terminal Pro', desc: 'Dark, dense, amber, monospace numbers', sw: ['#0B0E14', '#10141C', '#FFB020', '#3DDC97'], font: 'IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700', bar: '#0B0E14' },
+  classic: { name: 'Classic', desc: 'The original navy and white', sw: ['#F4F6FA', '#14213D', '#FFFFFF', '#0E9F6E'], bar: '#14213D' },
+};
+const themePick = () => { try { return localStorage.getItem('td.theme') || 'auto'; } catch (e) { return 'auto'; } };
+const themeNow = () => { const t = themePick(); return t === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'neon' : 'pop') : (THEMES[t] ? t : 'auto'); };
+function applyTheme(redraw) {
+  const t = themeNow(); const T = THEMES[t] || THEMES.classic; const root = document.documentElement;
+  if (t === 'classic') root.removeAttribute('data-theme'); else root.dataset.theme = t;
+  if (T.font && !document.getElementById('font-' + t)) { const l = document.createElement('link'); l.id = 'font-' + t; l.rel = 'stylesheet'; l.href = `https://fonts.googleapis.com/css2?family=${T.font}&display=swap`; document.head.appendChild(l); }
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', T.bar || '#14213D');
+  const v = (n) => getComputedStyle(root).getPropertyValue(n).trim();
+  Object.assign(C, { ink: v('--ink'), rise: v('--rise'), fall: v('--fall'), saffron: v('--saffron'), slate: v('--slate'), line: v('--line'), card: v('--card'), grid: v('--soft') || v('--line') });
+  if (redraw && state.view) show(state.view);
+}
+function themeSheet() {
+  const cur = themePick();
+  $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">Theme</h2><p class="muted" style="margin:0">Saved on this device. Charts and every tab follow it.</p>
+    <div class="th-grid">${Object.entries(THEMES).map(([k, T]) => `<button class="th-opt" data-th="${k}" aria-pressed="${k === cur}"><span class="th-sw">${T.sw.map((c) => `<i style="background:${c}"></i>`).join('')}</span><b>${T.name}</b><span>${T.desc}</span></button>`).join('')}</div>`;
+  $('#sheet-body').querySelectorAll('.th-opt').forEach((b) => b.addEventListener('click', () => {
+    try { localStorage.setItem('td.theme', b.dataset.th); } catch (e) { /* private mode */ }
+    applyTheme(false); $('#sheet-body').querySelectorAll('.th-opt').forEach((x) => x.setAttribute('aria-pressed', x === b)); }));
+  $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, ''); state._themeOpen = true;
+}
+applyTheme(false);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (themePick() === 'auto') applyTheme(true); });
 const state = { view: 'mk', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, pf: null, style: {}, cap: {}, risk: {} };
 const $ = (s) => document.querySelector(s);
 const loc = () => MKT[state.mkt].loc;
@@ -200,7 +231,7 @@ function guardCard(G) {
   const used = G ? Math.max(0, Math.min(100, G.used_pct)) : 0;
   const col = !G ? 'var(--slate)' : G.status === 'ok' ? 'var(--rise)' : G.status === 'warn' ? 'var(--saffron)' : 'var(--fall)';
   const opts = [10, 15, 20, 25, 30].map((v) => `<option value="${v}" ${v === b ? 'selected' : ''}>${v}% fall → ${riskForBudget(v).toFixed(2)}% risk</option>`).join('');
-  const badge = G ? { ok: ['On track', 'background:var(--rise-soft);color:#0A7A55'], warn: ['Watch', ''], over: ['Past limit', ''], paused: ['Buys paused', ''] }[G.status] : null;
+  const badge = G ? { ok: ['On track', 'background:var(--rise-soft);color:var(--rise-ink)'], warn: ['Watch', ''], over: ['Past limit', ''], paused: ['Buys paused', ''] }[G.status] : null;
   return `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Loss limit</b>
       ${badge ? `<span class="lv-mode ${G.status === 'ok' ? '' : G.status === 'warn' ? 'dry' : 'live'}" style="${badge[1]}">${badge[0]}</span>` : ''}</div>
     ${G ? `<div class="lv-kpis"><div><span>Below peak</span><b style="color:${col}">${pct(G.dd_pct)}</b></div><div><span>Your limit</span><b>−${b}%</b></div><div><span>Risk / trade</span><b>${risk}%</b></div></div>
@@ -280,7 +311,7 @@ async function lvCurveCard(box) {
   if (!D) { box.innerHTML = ''; return; }
   let sel; try { sel = JSON.parse(localStorage.getItem('td.curveSel') || 'null'); } catch (e) { sel = null; }
   if (!Array.isArray(sel)) sel = ['mix_tb', 'mix_tb_liq', 'mix_tb_rot', 'best_tb', 'nifty'];
-  const S = D.series; const col = Object.fromEntries(S.map((x, i) => [x.key, CURVE_COL[i % CURVE_COL.length]]));
+  const S = D.series; const col = Object.fromEntries(S.map((x, i) => [x.key, i === 0 ? C.ink : CURVE_COL[i % CURVE_COL.length]]));
   const grp = { mix: 'Mixes', one: 'Each strategy alone', bench: 'Benchmark' };
   const chips = Object.keys(grp).map((g) => `<div class="lv-sub" style="margin-top:6px"><b>${grp[g]}</b></div><div class="tags">${S.filter((x) => x.group === g).map((x) => `<button class="chip lv-cv" data-k="${x.key}" style="cursor:pointer;border:1px solid ${col[x.key]};${sel.includes(x.key) ? `background:${col[x.key]};color:#fff` : ''}" aria-pressed="${sel.includes(x.key)}">${esc(x.name)}</button>`).join('')}</div>`).join('');
   const sh = S.filter((x) => sel.includes(x.key)); const yrs = sh.length ? Object.keys(sh[0].years) : [];
@@ -447,7 +478,7 @@ async function loadLive() {
   const ST = { pending: ['Sent', 'dry'], open: ['Filled', 'ok'], exiting: ['Selling', 'dry'] };
   const trades = S && S.trades ? S.trades.map((t) => { const [lab, cls] = ST[t.state] || [t.state, 'dry'];
     const pnl = t.ltp && t.entry ? (t.ltp / t.entry - 1) * 100 : null;
-    return `<div class="lv-row lv-trade"><div><div class="lv-sym">${esc(t.symbol)} <span class="lv-mode ${cls}" style="${cls === 'ok' ? 'background:var(--rise-soft);color:#0A7A55' : ''}">${lab}</span> <span class="chip">${esc(t.system || '')}</span>${pnl == null ? '' : ` <b class="${pnl >= 0 ? 'up' : 'down'}" style="margin-left:auto">${pnl >= 0 ? '+' : ''}${fmt(pnl, 1)}%${t.R == null ? '' : ` · ${t.R >= 0 ? '+' : ''}${fmt(t.R, 2)}R`}</b>`}</div>
+    return `<div class="lv-row lv-trade"><div><div class="lv-sym">${esc(t.symbol)} <span class="lv-mode ${cls}" style="${cls === 'ok' ? 'background:var(--rise-soft);color:var(--rise-ink)' : ''}">${lab}</span> <span class="chip">${esc(t.system || '')}</span>${pnl == null ? '' : ` <b class="${pnl >= 0 ? 'up' : 'down'}" style="margin-left:auto">${pnl >= 0 ? '+' : ''}${fmt(pnl, 1)}%${t.R == null ? '' : ` · ${t.R >= 0 ? '+' : ''}${fmt(t.R, 2)}R`}</b>`}</div>
       <div class="lv-sub">${t.qty} @ ${fmt(t.entry, 2, 'en-IN')}${t.ltp ? ` · now ${fmt(t.ltp, 2, 'en-IN')}` : ''} · plan stop ${fmt(t.stop, 2, 'en-IN')}${t.state === 'pending' && t.order_status ? ` · Angel: ${esc(t.order_status)}` : ''}</div>
       <div class="lv-sub">${t.gtt_id ? `🛡 Stop on Angel at ${fmt(t.gtt_trigger, 2, 'en-IN')}${t.trail_at ? ` · raised ${day(t.trail_at)}${t.trail_prev ? ` from ${fmt(t.trail_prev, 2, 'en-IN')}` : ''} (${t.system === 'Monthly ATH' ? '30-wk SMA' : 'EMA 21'} ${fmt(t.trail_level, 2, 'en-IN')} − ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}%)` : ''}` : t.gtt_error ? `<span class="down">Stop not placed yet: ${esc(t.gtt_error)}</span> <button class="lv-btn sell" data-prot="1" style="padding:4px 10px;font-size:12px">Retry stop</button>` : t.state === 'open' ? '<span class="down">No protective stop on Angel</span>' : 'Stop goes on Angel after the fill'}</div></div><div></div></div>`; }).join('') : '';
   const recent = S && S.recent && S.recent.length ? `<p class="lv-sub">Recent: ${S.recent.map((r) => `${esc(r.symbol)} ${esc(r.state)}${r.exit ? ' @ ' + fmt(r.exit, 2, 'en-IN') : ''}${r.text ? ' (' + esc(r.text) + ')' : ''}`).join(' · ')}</p>` : '';
@@ -928,8 +959,8 @@ function priceSeries(ch, rows, group) {
   s.setData(rows); return s;
 }
 
-const chartBase = () => ({ layout: { background: { color: '#fff' }, textColor: C.slate, fontFamily: 'Manrope, system-ui, sans-serif' },
-  grid: { vertLines: { color: '#F1F4F8' }, horzLines: { color: '#F1F4F8' } }, rightPriceScale: { borderColor: C.line },
+const chartBase = () => ({ layout: { background: { color: C.card }, textColor: C.slate, fontFamily: getComputedStyle(document.body).fontFamily || 'Manrope, system-ui, sans-serif' },
+  grid: { vertLines: { color: C.grid }, horzLines: { color: C.grid } }, rightPriceScale: { borderColor: C.line },
   timeScale: { borderColor: C.line }, crosshair: { mode: 0 }, localization: { locale: 'en-GB' } });
 
 async function drawStock(r) {
@@ -2758,6 +2789,8 @@ $('#size').addEventListener('change', (e) => { state.size = e.target.value; rend
 $('#setup').addEventListener('change', (e) => { state.setup = e.target.value; renderList(); });
 $('#btn-download').addEventListener('click', download);
 $('#btn-info').addEventListener('click', () => $('#info').showModal());
+$('#btn-theme').addEventListener('click', themeSheet);
+window.addEventListener('popstate', () => { if (state._themeOpen) { state._themeOpen = false; show(state.view); } });
 $('#sheet-close').addEventListener('click', () => history.back());
 window.addEventListener('popstate', closeSheet);
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#sheet').hidden) history.back(); });
