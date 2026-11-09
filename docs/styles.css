@@ -189,7 +189,7 @@ body { padding-bottom: calc(64px + var(--safe-bottom)); }
   .views button[aria-current="page"] { background: #EEF3FB; }
   .views svg { width: 18px; height: 18px; }
   body { padding-bottom: 0; }
-  .detail { top: 120px; }
+  .detail { top: 120px; max-height: calc(100vh - 132px); overflow-y: auto; overscroll-behavior: contain; }
 }
 
 /* market switch */
@@ -222,7 +222,7 @@ tr.hl td { background: #F3F8F5; }
 .list.flat { border: 0; border-radius: 0; }
 .row.static { cursor: default; grid-template-columns: minmax(0, 1fr) 0 auto; }
 .row.static:hover { background: var(--card); }
-html, body { overflow-x: hidden; }
+html, body { overflow-x: clip; }   /* clip, not hidden: hidden made body a scroll box and broke the sticky chart panel */
 .page > *, .card, .grid2 > * { min-width: 0; }
 .chart, .rsi { overflow: hidden; }
 .view[hidden] { display: none !important; }

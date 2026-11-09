@@ -815,6 +815,22 @@ function renderList() {
   if (isWide() && !L.length) $('#detail').innerHTML = '<div class="detail-empty"><p>Nothing to show in this list.</p></div>';
 }
 const isWide = () => window.matchMedia('(min-width: 980px)').matches;
+/* ↓ / ↑ keys step through the visible list (wide screens: the chart follows); Enter opens a row on phones */
+document.addEventListener('keydown', (e) => {
+  if ((e.key !== 'ArrowDown' && e.key !== 'ArrowUp') || e.altKey || e.ctrlKey || e.metaKey) return;
+  const t = e.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if (!$('#sheet').hidden) return;
+  const view = document.querySelector('.view:not([hidden])') || document; const scope = view.contains(t) && t.closest && t.closest('.list') ? t.closest('.list') : null;
+  const lists = scope ? [scope] : [...view.querySelectorAll('.list'), ...(state.view === 'trends' ? [$('#list')] : [])].filter((l) => l && l.offsetParent);
+  const L = lists.find((l) => l.querySelector('.row[aria-current="true"]')) || lists.find((l) => l.contains(document.activeElement)) || lists[0];
+  if (!L) return;
+  const rows = [...L.querySelectorAll('.row')]; if (!rows.length) return;
+  const cur = rows.indexOf(document.activeElement && document.activeElement.classList.contains('row') ? document.activeElement : L.querySelector('.row[aria-current="true"]'));
+  const nx = rows[Math.max(0, Math.min(rows.length - 1, cur < 0 ? 0 : cur + (e.key === 'ArrowDown' ? 1 : -1)))];
+  e.preventDefault();
+  nx.focus({ preventScroll: true }); nx.scrollIntoView({ block: 'nearest' });
+  if (isWide() && state.view === 'trends' && nx !== rows[cur]) nx.click();
+});
 
 function statusBlock(r) {
   const t = state.tab;
@@ -855,7 +871,9 @@ function links(sym) {
 }
 
 function openPanel(html) {
-  if (isWide() && state.view === 'trends') { $('#detail').innerHTML = html; return; }
+  if (isWide() && state.view === 'trends') {   // keep the page where it is; the chart panel is fixed beside the list
+    const y = window.scrollY; const d = $('#detail'); d.style.minHeight = d.offsetHeight + 'px'; d.innerHTML = html; d.scrollTop = 0;
+    window.scrollTo(0, y); requestAnimationFrame(() => { window.scrollTo(0, y); d.style.minHeight = ''; }); return; }
   $('#sheet-body').innerHTML = html; $('#sheet').hidden = false; document.body.style.overflow = 'hidden';
   history.pushState({ sheet: 1 }, '');
 }
