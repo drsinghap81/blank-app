@@ -1,109 +1,10 @@
 {
-"generated": "2026-11-09T16:42+00:00",
+"generated": "2026-11-09T23:23+00:00",
 "asof": "2026-11-09",
 "market": "NSE",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "2016-26, 16,908 first touches, 3R target vs stop (1 ATR below the level): breakout retests +0.20R per trade, old swing lows +0.10R, random uptrend stock the same day +0.09R. Trades with 1:3 room to the next resistance: no better. Within 1% of an odd square: no better (breakout retests +0.15R vs +0.21R away from one; swing lows +0.04R vs +0.09R). Watch only.",
 "rows": [
-{
-"symbol": "DPABHUSHAN",
-"name": "D. P. Abhushan Limited",
-"status": "touched",
-"touch_date": "2026-11-09",
-"days_ago": 0,
-"level": 1838.1,
-"level_kind": "old swing low",
-"level_date": "2026-11-03",
-"close": 1880.800048828125,
-"above_pct": 2.3230549920755017,
-"stop": 1711.17,
-"risk_pct": 9.018961694367345,
-"resistance": 2001.9,
-"room_r": 0.7139123350646841,
-"sq9": 1849,
-"sq9_cross": "43\u00b2",
-"sq9_dist_pct": -0.5895091624695814,
-"sq9_gap_pct": 9.518658734451058,
-"sq9_below": [
-[
-1681,
-"41\u00b2"
-]
-],
-"sq9_above": [
-[
-2025,
-"45\u00b2"
-]
-],
-"sq9_match": true
-},
-{
-"symbol": "LOTUSDEV",
-"name": "Sri Lotus Developers and Realty Limited",
-"status": "touched",
-"touch_date": "2026-11-04",
-"days_ago": 3,
-"level": 225.5,
-"level_kind": "old swing low",
-"level_date": "2026-10-23",
-"close": 224.13999938964844,
-"above_pct": -0.6031044835261956,
-"stop": 213.05,
-"risk_pct": 4.9474813306724545,
-"resistance": 246.25,
-"room_r": 1.9938166761233513,
-"sq9": 225,
-"sq9_cross": "15\u00b2",
-"sq9_dist_pct": 0.22222222222221255,
-"sq9_gap_pct": 28.44444444444445,
-"sq9_below": [
-[
-169,
-"13\u00b2"
-]
-],
-"sq9_above": [
-[
-225,
-"15\u00b2"
-]
-],
-"sq9_match": true
-},
-{
-"symbol": "ACUTAAS",
-"name": "Acutaas Chemicals Limited",
-"status": "touched",
-"touch_date": "2026-11-03",
-"days_ago": 4,
-"level": 3692.04,
-"level_kind": "breakout retest",
-"level_date": "2026-07-03",
-"close": 3882.60009765625,
-"above_pct": 5.161424409537285,
-"stop": 3479.87,
-"risk_pct": 10.372586582461619,
-"resistance": 4045.3,
-"room_r": 0.40399658386320925,
-"sq9": 3721,
-"sq9_cross": "61\u00b2",
-"sq9_dist_pct": -0.7783302854575402,
-"sq9_gap_pct": 6.664875033593121,
-"sq9_below": [
-[
-3481,
-"59\u00b2"
-]
-],
-"sq9_above": [
-[
-3969,
-"63\u00b2"
-]
-],
-"sq9_match": true
-},
 {
 "symbol": "APOLLO",
 "name": "Apollo Micro Systems Limited",
@@ -136,6 +37,39 @@
 ]
 ],
 "sq9_match": false
+},
+{
+"symbol": "DPABHUSHAN",
+"name": "D. P. Abhushan Limited",
+"status": "touched",
+"touch_date": "2026-11-09",
+"days_ago": 0,
+"level": 1838.1,
+"level_kind": "old swing low",
+"level_date": "2026-11-03",
+"close": 1880.800048828125,
+"above_pct": 2.3230549920755017,
+"stop": 1711.17,
+"risk_pct": 9.018961694367345,
+"resistance": 2001.9,
+"room_r": 0.7139123350646841,
+"sq9": 1849,
+"sq9_cross": "43\u00b2",
+"sq9_dist_pct": -0.5895091624695814,
+"sq9_gap_pct": 9.518658734451058,
+"sq9_below": [
+[
+1681,
+"41\u00b2"
+]
+],
+"sq9_above": [
+[
+2025,
+"45\u00b2"
+]
+],
+"sq9_match": true
 },
 {
 "symbol": "MENONBE",
@@ -600,6 +534,39 @@
 "sq9_match": false
 },
 {
+"symbol": "LOTUSDEV",
+"name": "Sri Lotus Developers and Realty Limited",
+"status": "touched",
+"touch_date": "2026-11-04",
+"days_ago": 3,
+"level": 225.5,
+"level_kind": "old swing low",
+"level_date": "2026-10-23",
+"close": 224.13999938964844,
+"above_pct": -0.6031044835261956,
+"stop": 213.05,
+"risk_pct": 4.9474813306724545,
+"resistance": 246.25,
+"room_r": 1.9938166761233513,
+"sq9": 225,
+"sq9_cross": "15\u00b2",
+"sq9_dist_pct": 0.22222222222221255,
+"sq9_gap_pct": 28.44444444444445,
+"sq9_below": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_match": true
+},
+{
 "symbol": "NRAIL",
 "name": "N R Agarwal Industries Limited",
 "status": "touched",
@@ -631,6 +598,39 @@
 ]
 ],
 "sq9_match": false
+},
+{
+"symbol": "ACUTAAS",
+"name": "Acutaas Chemicals Limited",
+"status": "touched",
+"touch_date": "2026-11-03",
+"days_ago": 4,
+"level": 3692.04,
+"level_kind": "breakout retest",
+"level_date": "2026-07-03",
+"close": 3882.60009765625,
+"above_pct": 5.161424409537285,
+"stop": 3479.87,
+"risk_pct": 10.372586582461619,
+"resistance": 4045.3,
+"room_r": 0.40399658386320925,
+"sq9": 3721,
+"sq9_cross": "61\u00b2",
+"sq9_dist_pct": -0.7783302854575402,
+"sq9_gap_pct": 6.664875033593121,
+"sq9_below": [
+[
+3481,
+"59\u00b2"
+]
+],
+"sq9_above": [
+[
+3969,
+"63\u00b2"
+]
+],
+"sq9_match": true
 }
 ]
 }
