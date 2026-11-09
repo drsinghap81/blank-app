@@ -436,7 +436,7 @@ table.gpt td { vertical-align: top; } tr.gptr td:first-child { border-left: 3px 
 .gplanes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
 .gplane { background: var(--card, #fff); border: 1px solid var(--line, #E3E8F0); border-radius: 10px; padding: 8px 10px; }
 .gplh { font-size: 14px; margin-bottom: 2px; } .gpln { font-size: 12px; margin: 2px 0 6px; }
-.gpsr { display: grid; grid-template-columns: 86px 1fr auto; gap: 8px; align-items: center; padding: 3px 0; cursor: pointer; border-top: 1px dashed var(--line, #E3E8F0); }
+.gpsr { display: grid; grid-template-columns: 58px 1fr auto; gap: 10px; align-items: center; padding: 6px 0; cursor: pointer; border-top: 1px dashed var(--line, #E3E8F0); }
 .gpsn { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .gpsv { font-size: 12px; white-space: nowrap; }
 .gptile { position: relative; overflow: hidden; } .gpstrip { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; }
 .status .gpsl { vertical-align: middle; margin-left: 6px; }
@@ -486,3 +486,6 @@ h1, h2, h3, h4, .sym, .lv-sym, .d-head h2, .stat b, .mxh, .gpsum b { font-family
 .th-opt b { font-size: 14px; } .th-opt span { font-size: 12px; color: var(--slate); }
 :where(select, input:not([type="checkbox"]):not([type="radio"]), textarea) { background-color: var(--card); color: var(--ink); border-color: var(--line); }
 :where(dialog) { background: var(--card); color: var(--ink); }
+
+.gpsv b { font-size: 15px; font-family: var(--font-head); } .gpd { font-size: 11.5px; font-weight: 700; color: var(--slate); margin-left: 2px; }
+.gpd.up { color: var(--rise-ink); } .gpd.down { color: var(--fall); }

@@ -1935,11 +1935,13 @@ function tdItem(r) {
   const chip = `${sc}<span class="chip">${r._src}</span>${st}` + (sub ? `<div class="co small">${esc(sub)}</div>` : '');
   return { chip, right: `<b>${fmt(r.close, 2, AL())}</b>` + (r.ret != null && !r._near && r.kind !== 'near' ? `<span class="${r.ret >= 0 ? 'up' : 'down'}">${pct(r.ret * 100)}</span>` : '') };
 }
-function gpColor(p) { // 0 -> grey, 60+ -> deep green
+const isDarkTheme = () => ['neon', 'terminal'].includes(document.documentElement.dataset.theme);
+function gpColor(p) { // 0 -> grey, 60+ -> deep green (dark themes: slate -> emerald, always white text)
   const t = Math.max(0, Math.min(1, p / 60));
   const lerp = (a, b) => Math.round(a + (b - a) * t);
-  return `rgb(${lerp(238, 10)},${lerp(241, 122)},${lerp(245, 85)})`;
+  return isDarkTheme() ? `rgb(${lerp(36, 14)},${lerp(40, 150)},${lerp(52, 98)})` : `rgb(${lerp(238, 10)},${lerp(241, 122)},${lerp(245, 85)})`;
 }
+const gpInk = (dark) => (dark || isDarkTheme() ? '#fff' : '#111216');
 // quarter -> month -> week Pulse shift (backtest NSE 2017-26, next 3 months vs the average group:
 // strong & rising +1.7% (54% win), strong & steady +0.9%, strong & falling +0.4%, weak & rising -0.9%, weak -0.9..-1.2%)
 const GP_SHIFT = {
@@ -1965,11 +1967,16 @@ function gpShift(rows) {
     r.shift = r.p1q >= hi ? (up ? 'build' : dn ? 'fade' : 'hold') : r.p1q <= lo ? (up ? 'bounce' : 'weak') : 'mid';
   });
 }
-function gpSlope(r, w = 86, h = 30) {
-  const v = [r.p1q, r.p1m, r.p1w]; const mx = Math.max(60, ...v); const y = (x) => h - 3 - (x / mx) * (h - 6);
-  const col = GP_SHIFT[r.shift || 'mid'].c; const pts = v.map((x, i) => `${4 + i * (w - 8) / 2},${y(x).toFixed(1)}`).join(' ');
-  return `<svg class="gpsl" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-label="Pulse quarter ${fmt(v[0], 0)}, month ${fmt(v[1], 0)}, week ${fmt(v[2], 0)}"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${v.map((x, i) => `<circle cx="${4 + i * (w - 8) / 2}" cy="${y(x).toFixed(1)}" r="${i === 2 ? 3.5 : 2.5}" fill="${col}"/>`).join('')}</svg>`;
+/* Pulse bars (9 Nov 2026): quarter, month, week as three rising bars in the lane colour, the latest one solid */
+function gpSlope(r, w = 58, h = 32) {
+  const v = [r.p1q, r.p1m, r.p1w]; const mx = Math.max(60, ...v); const col = GP_SHIFT[r.shift || 'mid'].c;
+  const bw = 14, gap = 5, base = h - 1;
+  const bars = v.map((x, i) => { const bh = Math.max(4, (x / mx) * (h - 3)); const bx = 2 + i * (bw + gap);
+    return `<rect x="${bx}" y="${(base - bh).toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="4" fill="${col}" opacity="${[0.32, 0.6, 1][i]}"/>`; }).join('');
+  return `<svg class="gpsl" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="Pulse quarter ${fmt(v[0], 0)}, month ${fmt(v[1], 0)}, week ${fmt(v[2], 0)}"><title>Pulse: quarter ${fmt(v[0], 0)} → month ${fmt(v[1], 0)} → week ${fmt(v[2], 0)}</title>${bars}</svg>`;
 }
+const gpVal = (r) => { const d = Math.round(r.p1w - r.p1q);
+  return `<b>${fmt(r.p1w, 0)}</b> <span class="gpd ${d > 0 ? 'up' : d < 0 ? 'down' : ''}">${d > 0 ? '▲' : d < 0 ? '▼' : '•'}${Math.abs(d)}</span>`; };
 function pulseView() {
   const G = state.gp[AM()]; const box = $('#athlist');
   if (!G) { box.innerHTML = '<li class="empty">Industry Pulse appears after its first nightly run.</li>'; return; }
@@ -1981,12 +1988,12 @@ function pulseView() {
   const top = R.slice(0, 10);
   const lane = (k) => { const L = R.filter((r) => r.shift === k).sort((a, b) => (b.p1w - b.p1q) - (a.p1w - a.p1q)); const S = GP_SHIFT[k];
     return `<div class="gplane" style="border-top:4px solid ${S.c}"><div class="gplh"><b>${S.t}</b> <span class="muted">${L.length}</span></div><div class="muted gpln">${S.note}</div>
-      ${L.slice(0, k === 'weak' ? 6 : 12).map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)}</span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('') || '<div class="muted gpln">none now</div>'}
+      ${L.slice(0, k === 'weak' ? 6 : 12).map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)}</span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('') || '<div class="muted gpln">none now</div>'}
       ${L.length > (k === 'weak' ? 6 : 12) ? `<div class="muted gpln">+${L.length - (k === 'weak' ? 6 : 12)} more in the tiles below</div>` : ''}</div>`; };
   const bars = top.map((r) => `<div class="gpbar" data-g="${esc(r.group)}"><span class="gpn">${esc(r.group)}</span><span class="gpb"><i style="width:${Math.min(100, r[per])}%;background:${gpColor(r[per])}"></i></span><b>${fmt(r[per], 0)}</b></div>`).join('');
   const tiles = R.map((r) => {
     const d = r.p1m - r.p1m_prev; const w = 64 + Math.round(110 * Math.sqrt(r.n / mx)); const dark = r[per] >= 30;
-    return `<button class="gptile" data-g="${esc(r.group)}" style="flex-basis:${w}px;background:${gpColor(r[per])};color:${dark ? '#fff' : 'var(--ink)'}">
+    return `<button class="gptile" data-g="${esc(r.group)}" style="flex-basis:${w}px;background:${gpColor(r[per])};color:${gpInk(dark)}">
       <span class="gpt">${esc(r.group)}</span><span class="gpv">${fmt(r[per], 0)}<small>${r.shift === 'build' || r.shift === 'bounce' ? ' ▲' : r.shift === 'fade' ? ' ▼' : d >= 3 ? ' ↑' : d <= -3 ? ' ↓' : ''}</small></span><span class="gpc">${r.n} stocks · ${r.trending_now} trending</span><span class="gpstrip" style="background:${GP_SHIFT[r.shift || 'mid'].c}"></span></button>`;
   }).join('');
   box.innerHTML = `<li style="list-style:none">
@@ -2588,7 +2595,7 @@ function mxWire(el) {
 function mxTiles(rows, key, onAttr) {
   const per = state.gpPer || 'p1m'; const mx = Math.max(...rows.map((r) => r.n), 1);
   return `<div class="gptiles">${rows.map((r) => { const w = 64 + Math.round(110 * Math.sqrt(r.n / mx)); const dark = r[per] >= 30;
-    return `<button class="gptile" ${onAttr}="${esc(r[key])}" style="flex-basis:${w}px;background:${gpColor(r[per])};color:${dark ? '#fff' : 'var(--ink)'}">
+    return `<button class="gptile" ${onAttr}="${esc(r[key])}" style="flex-basis:${w}px;background:${gpColor(r[per])};color:${gpInk(dark)}">
       <span class="gpt">${esc(r[key])}</span><span class="gpv">${fmt(r[per], 0)}<small>${r.shift === 'build' || r.shift === 'bounce' ? ' ▲' : r.shift === 'fade' ? ' ▼' : ''}</small></span>
       <span class="gpc">${r.n} stocks${r.rs3m != null ? ` · RS ${r.rs3m >= 0 ? '+' : ''}${fmt(r.rs3m, 0)}%` : ` · ${r.trending_now} trending`}</span><span class="gpstrip" style="background:${GP_SHIFT[r.shift || 'mid'].c}"></span></button>`; }).join('')}</div>`;
 }
@@ -2628,7 +2635,7 @@ async function loadMarkets() {
         <div class="stat"><b>${S.nbrk} · ${S.n921} · ${S.nnear}</b><span>ATH breakouts · 9/21 buys · ATH near trigger</span></div></section>
       <div class="card"><h4 style="margin:0 0 4px">Sectors</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Colour = Pulse (share of the sector's stocks trending); strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-bouncing, red weak); RS = equal-weight 3-month return vs ${MX_BENCH[mk]}. Tap a sector for its industries.</p>
         ${mxPer()}${mxTiles(secs, 'sector', 'data-s')}
-        <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('')}</div></div>`;
+        <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div></div>`;
     const setups = []; G.rows.forEach((g) => g.members.forEach((m) => { const c = S.map[m.symbol]; if (c && c.some((x) => !x.includes('sell') && !x.includes('forming') && !x.includes('Near support'))) setups.push({ m, g, c }); }));
     setups.sort((a, b) => (b.g.p1m - a.g.p1m) || (b.m.wrpi - a.m.wrpi));
     el.insertAdjacentHTML('beforeend', `<div class="card"><h4 style="margin:0 0 4px">Signals ranked by industry strength</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Every stock with a live buy or in-trade signal from your systems, strongest industry (1-month Pulse) first. This replaces the old Top-down tab: in the 2017–26 test, ATH breakouts in strong sectors with strong stock RS won 54% vs 48%.</p>
@@ -2646,7 +2653,7 @@ async function loadMarkets() {
     el.innerHTML = `${mxCrumb()}<div class="card"><div class="status info" style="border-left:5px solid ${GP_SHIFT[sr.shift || 'mid'].c}"><b>${esc(x.sec)}: ${GP_SHIFT[sr.shift || 'mid'].t}.</b> Pulse ${fmt(sr.p1q, 0)} → ${fmt(sr.p1m, 0)} → ${fmt(sr.p1w, 0)} (quarter → month → week) · RS ${sr.rs3m >= 0 ? '+' : ''}${fmt(sr.rs3m, 1)}% 3 m · ${sr.n} stocks in ${sr.groups} industries · ${sr.trending_now} trending today. ${gpSlope(sr, 120, 36)}</div>
       <div class="chart" id="mxc"></div><div class="rsi" id="mxcp"></div><p class="muted" style="margin:4px 0;font-size:12.5px">Last 12 months · dark = sector (equal weight) · grey = ${MX_BENCH[mk]} · lower = 1-month Pulse.</p>
       <h4 style="margin:12px 0 4px">Industries in ${esc(x.sec)}</h4>${mxPer()}${mxTiles(grs, 'group', 'data-g')}
-      <div class="mxlist">${mxByLane(grs).map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv">${fmt(r.p1q, 0)}→${fmt(r.p1m, 0)}→<b>${fmt(r.p1w, 0)}</b></span></div>`).join('')}</div></div>`;
+      <div class="mxlist">${mxByLane(grs).map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div></div>`;
     mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
     el.querySelectorAll('[data-g]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'industry', grp: b.dataset.g })));
     mxChart(mk, 'sectors', x.sec, sr.shift);
