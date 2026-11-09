@@ -217,7 +217,7 @@ def test_swing_sleeve(tmp_path):
     P = c.get("/api/plan", headers=h).json()
     assert "swing" in P and P["swing"]["risk_pct"] == round(A.RISK * 100, 2)
     sw = [r for r in P["rows"] if r["tier"] == "swing"]
-    assert all(r["kind"] in ("T921", "RETEST", "TF_BRK", "TF_STOP", "PATTERN") for r in sw)
+    assert all(r["kind"] in ("T921", "RETEST", "TF_BRK", "TF_STOP", "PATTERN", "VCP", "VCP_STOP") for r in sw)
     assert A.protect_level("RETEST", 100) == 100 and A.protect_level("T921", 100) == 100 and A.protect_level("ATH_BRK", 100) < 100
     assert not any(r["kind"] == "T921" for r in P["rows"] if r["tier"] != "swing")
     j = c.post("/api/picks", headers=h, json={"n": 5, "swing_risk": 1.0}).json(); assert j["swing_risk_pct"] == 1.0 and j["picks"] == 5
@@ -408,3 +408,14 @@ def test_indices_fallback(tmp_path):
     A.yq = boom
     j = c.get("/api/indices", headers=h).json()
     assert [r["name"] for r in j["rows"]] == ["Nifty 50"] and j["rows"][0]["src"] == "angel" and "429" in j["errors"][0]
+
+
+def test_vcp_rows():
+    """VCP watch bucket (10 Nov 2026): buy-stop rows wait below the pivot, use the static stop, and sit outside the split."""
+    from app import live_check, protect_level, STOP_KINDS, BUCKETS
+    assert "VCP_STOP" in STOP_KINDS and BUCKETS["vcp"] == 0
+    r = dict(kind="VCP_STOP", trigger=100.0, price=101.0, stop=92.0, ref=97.0)
+    assert live_check(r, 98.0)[0] == "wait"
+    assert live_check(r, 100.5)[0] == "triggered"
+    assert live_check(r, 91.0)[0] == "broken"
+    assert protect_level("VCP_STOP", 92.0) == 92.0 and protect_level("VCP", 92.0) == 92.0

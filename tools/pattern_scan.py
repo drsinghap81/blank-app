@@ -196,12 +196,110 @@ def divergence(c, r, lows_i):
     return best
 
 
+# ------------------------------------------------------------------ VCP (10 Nov 2026, Amritpal: watch bucket for all markets)
+# Volatility contraction pattern, same rules as the NSE backtest (scratchpad vcp/real.py, combo/alloc_vcp.py):
+#   Stage 2: close > EMA 50/150/200, 50 > 150 > 200, EMA 200 rising 20 days, >= 30% above the 52-week low, within 25% of the high.
+#   swings: zigzag 6% on daily highs/lows, a swing counted only once confirmed. Base starts at the highest swing high of the last
+#   250 days (>= 20 days old). >= 2 contractions (swing high -> next swing low), each shallower than the one before, each low
+#   higher, the last <= 12%, average volume in the last contraction below its 20-day average (dry-up).
+#   Entry: buy-stop just above the last contraction's high (pivot) within 30 days, before price breaks the last low; breakout
+#   day volume >= 1.4x its 20-day average; skip if it opens > 3% above the pivot or the stop is > 10% away.
+#   Stop: the last contraction's low. Exit: a daily close below EMA 50 (sell next open).
+# NSE 2017-26: 221 trades, +4.9%/trade, 37% win; robust across 11 rule variants (+3.5..+6.1%). Added to Momentum + Trend in one
+# account it gave +1.1..1.6 pts/yr (24.2-24.7% vs 23.1%) with a similar worst fall, nothing extra in 2022-26 -> watch bucket.
+VCP_THR, VCP_BASE, VCP_LAST, VCP_RISK, VCP_VOL, VCP_WAIT = 0.06, 250, 0.12, 0.10, 1.4, 30
+
+
+def _zz_hl(h, l, thr):
+    out = []; mode = 1; ex, ei = h[0], 0
+    for i in range(1, len(h)):
+        if mode == 1:
+            if h[i] > ex: ex, ei = h[i], i
+            elif l[i] <= ex * (1 - thr): out.append((1, ei, ex, i)); mode = -1; ex, ei = l[i], i
+        else:
+            if l[i] < ex: ex, ei = l[i], i
+            elif h[i] >= ex * (1 + thr): out.append((-1, ei, ex, i)); mode = 1; ex, ei = h[i], i
+    return out
+
+
+def vcp(x, sym, name):
+    """-> row (status forming / breakout / exit) or None. Uses the last ~3 years of daily bars."""
+    if len(x) < 260:
+        return None
+    o, h, l, c = (x[k].to_numpy(float) for k in ("Open", "High", "Low", "Close")); n = len(c)
+    v = x.Volume.astype(float); vr = (v / v.rolling(20).mean()).to_numpy()
+    C = x.Close
+    e50, e150, e200 = (C.ewm(span=k, adjust=False, min_periods=k).mean().to_numpy() for k in (50, 150, 200))
+    lo52 = x.Low.rolling(252, min_periods=200).min().to_numpy(); hi52 = x.High.rolling(252, min_periods=200).max().to_numpy()
+    e200p = np.roll(e200, 20); e200p[:20] = np.nan
+    st2 = (c > e50) & (c > e150) & (c > e200) & (e50 > e150) & (e150 > e200) & (e200 > e200p) & (c >= lo52 * 1.3) & (c >= hi52 * 0.75)
+    Z = _zz_hl(h, l, VCP_THR); D = [str(d.date()) for d in x.index]
+    best = None
+    for k in range(len(Z) - 1, 2, -1):
+        if Z[k][0] != -1:
+            continue
+        ct = Z[k][3]
+        if ct < n - 1 - 260:
+            break
+        win = [z for z in Z[:k + 1] if z[1] >= ct - VCP_BASE]
+        hs = [i for i, z in enumerate(win) if z[0] == 1]
+        if not hs:
+            continue
+        b = max(hs, key=lambda i: win[i][2]); seq = win[b:]
+        if len(seq) < 4 or seq[-1][0] != -1 or ct - seq[0][1] < 20:
+            continue
+        pairs = [(seq[i], seq[i + 1]) for i in range(0, len(seq) - 1, 2)]
+        d = [1 - lo[2] / hi[2] for hi, lo in pairs]
+        if len(d) < 2 or d[0] > 0.35 or d[-1] > VCP_LAST or any(d[i + 1] >= d[i] for i in range(len(d) - 1)) \
+                or any(pairs[i + 1][1][2] <= pairs[i][1][2] for i in range(len(pairs) - 1)):
+            continue
+        a_, z_ = pairs[-1][0][1], pairs[-1][1][1]
+        dry = float(np.nanmean(vr[a_:z_ + 1]))
+        if not dry < 1.0:
+            continue
+        piv, stp = float(pairs[-1][0][2]), float(pairs[-1][1][2])
+        row = dict(symbol=sym, name=name, close=round(float(c[-1]), 2), pivot=round(piv, 2), stop=round(stp, 2),
+                   setup_date=D[ct], base_start=D[seq[0][1]], dry=round(dry, 2), ema50=round(float(e50[-1]), 2),
+                   contractions=[dict(h_date=D[hi[1]], h=round(float(hi[2]), 2), l_date=D[lo[1]], l=round(float(lo[2]), 2),
+                                      depth=round((1 - lo[2] / hi[2]) * 100, 1)) for hi, lo in pairs])
+        bo = None
+        for t in range(ct + 1, min(n, ct + VCP_WAIT + 1)):
+            if l[t] < stp:
+                bo = -1; break
+            if h[t] > piv:
+                bo = t; break
+        if bo == -1:
+            continue
+        if bo is None:                                   # still forming: a buy-stop above the pivot is live
+            if n - 1 > ct + VCP_WAIT or not st2[-1] or c[-1] <= stp or 1 - stp / piv > VCP_RISK:
+                continue
+            row.update(status="forming", to_pivot_pct=round((piv / c[-1] - 1) * 100, 1), risk_pct=round((1 - stp / piv) * 100, 1))
+            return row
+        e = max(o[bo], piv)
+        if not st2[bo - 1] or e > piv * 1.03 or 1 - stp / e > VCP_RISK or not (vr[bo] >= VCP_VOL):
+            continue
+        row.update(bo_date=D[bo], bo_vol=round(float(vr[bo]), 2), entry=round(float(e), 2), days_since=n - 1 - bo,
+                   risk_pct=round((1 - stp / e) * 100, 1), ret_pct=round((c[-1] / e - 1) * 100, 1))
+        # the tested exit: first daily close below EMA 50 after the breakout (or the stop)
+        out = next((t for t in range(bo, n) if l[t] <= stp or (t > bo and c[t] < e50[t])), None)
+        if out is None:
+            row["status"] = "breakout" if n - 1 - bo <= 3 else "holding"
+        elif out == n - 1:
+            row["status"] = "exit"; row["exit_why"] = "stop hit" if l[out] <= stp else "close below EMA 50"
+        else:
+            continue                                     # already exited earlier
+        return row
+    return best
+
+
 def chart(x):
     t = x.tail(320)
     return dict(t=[str(d.date()) for d in t.index], o=[round(float(v), 2) for v in t.Open], h=[round(float(v), 2) for v in t.High],
                 l=[round(float(v), 2) for v in t.Low], c=[round(float(v), 2) for v in t.Close],
                 sma50=[None if np.isnan(v) else round(float(v), 2) for v in x.Close.rolling(50).mean().tail(320)],
                 sma200=[None if np.isnan(v) else round(float(v), 2) for v in x.Close.rolling(200).mean().tail(320)],
+                ema50=[None if np.isnan(v) else round(float(v), 2) for v in x.Close.ewm(span=50, adjust=False, min_periods=50).mean().tail(320)],
+                v=[None if np.isnan(v) else int(v) for v in x.Volume.astype(float).tail(320)],
                 rsi=[round(float(v), 1) for v in rsi(x.Close.to_numpy(float))[-320:]])
 
 
@@ -224,7 +322,7 @@ def main(mk="NSE"):
         u = nse_symbols(); u = u[u.board == "main"] if "board" in u else u
         u["ticker"] = u.symbol + ".NS"; name = dict(zip(u.symbol, u.name)) if "name" in u else {}
         jobs = [(t, s, name.get(s, s), "stock") for t, s in zip(u.ticker, u.symbol)] + [(t, n_, n_, "index") for t, n_ in INDICES.items()]
-    rows, srows, asof = [], [], None
+    rows, srows, vrows, asof = [], [], [], None
     for a in range(0, len(jobs), 80):
         chunk = jobs[a:a + 80]; dd = None
         for _ in range(3):
@@ -247,11 +345,17 @@ def main(mk="NSE"):
                         continue
                 r = scan(x, sym, nm, kind)
                 s_ = support(x, sym, nm) if kind == "stock" else None
+                try:
+                    v_ = vcp(x, sym, nm) if kind == "stock" else None
+                except Exception as e:  # noqa: BLE001
+                    v_ = None; print("vcp fail", sym, e)
                 if r:
                     rows.append(r)
                 if s_:
                     srows.append(s_)
-                if r or s_:
+                if v_:
+                    vrows.append(v_)
+                if r or s_ or v_:
                     json.dump(chart(x), open(f"{CH}/{sym.replace(' ', '_')}.json", "w"))
             except Exception as e:  # noqa: BLE001
                 print("fail", sym, e)
@@ -284,6 +388,18 @@ def main(mk="NSE"):
                             "old swing lows +0.10R, random uptrend stock the same day +0.09R. Trades with 1:3 room to the next resistance: no better. "
                             "Within 1% of an odd square: no better (breakout retests +0.15R vs +0.21R away from one; swing lows +0.04R vs +0.09R). Watch only." if not g else g["bt_sup"],
                    rows=srows), open(f"{OUT}/support.json", "w"), indent=0)
+    VO = {"forming": 1, "breakout": 0, "exit": 2, "holding": 3}
+    vrows.sort(key=lambda r: (VO[r["status"]], r.get("to_pivot_pct") or 0, r.get("days_since") or 0))
+    json.dump(dict(generated=out["generated"], asof=out["asof"], market=mk,
+                   rules="Stage 2 uptrend (close > EMA 50/150/200 stacked, EMA 200 rising, >= 30% above the 52-week low, within 25% of the high). "
+                         "Base from the highest swing high of the last 250 days; >= 2 contractions (zigzag 6% on highs/lows), each shallower with a higher "
+                         "low, the last <= 12%, volume drying up in the last one. Buy-stop just above the last contraction's high (pivot) on 1.4x volume; "
+                         "stop = the last contraction's low (max 10% away); sell after a daily close below EMA 50.",
+                   backtest=("NSE 2017-26 (all stocks incl. delisted, costs): 221 trades, +4.9% a trade, 37% win; robust across 11 rule variants. "
+                             "Added to Momentum + Trend in one account: 24.2-24.7%/yr vs 23.1%, worst fall about the same, nothing extra in 2022-26. Watch bucket - your call.")
+                            if not g else "Not tested on this market yet - the NSE result (+4.9% a trade) may not carry over. Watch bucket - your call.",
+                   rows=vrows), open(f"{OUT}/vcp.json", "w"), indent=0)
+    print("vcp", len(vrows), {k: sum(r["status"] == k for r in vrows) for k in VO})
     print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["sq9_match"] for r in srows), "on a Square-of-9 number")
 
 

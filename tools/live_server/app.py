@@ -98,9 +98,10 @@ def swing_risk() -> float:
 # Systems as buckets (9 Nov 2026): each may hold at most alloc% of capital; all share one cash pool (Momentum first,
 # swing buckets keep SWING_RESERVE in cash). NSE 2017-26 one-account test: Momentum <= 60% + Trend 9/21 <= 40% 23.1%/yr,
 # worst fall -21.4%, vs Momentum alone 17.3%, -16.8%. Top Bottom runs on pledge margin (its own bot), not this cash.
-BUCKETS = {"mom": 60, "tf": 40, "t9": 0, "rt": 0, "pt": 0, "s1": 0, "wc": 0, "tb": 100}   # optimised 9 Nov (trade_plan.buckets)
+BUCKETS = {"mom": 60, "tf": 40, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "s1": 0, "wc": 0, "tb": 100}   # optimised 9 Nov (trade_plan.buckets)
 ALLOC_V = 2
-SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt"}
+SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt", "VCP": "vcp"}
+STOP_KINDS = ("ATH_STOP", "TF_STOP", "VCP_STOP")   # buy-stop rows (stop-limit day orders)
 
 
 def alloc() -> dict:
@@ -348,7 +349,7 @@ def record_exit(sym, sell_px):
 def protect_level(kind, stop):
     if not stop:
         return None
-    return stop if kind in ("T921", "RETEST", "PATTERN") else stop * (1 - ATH_NET_PCT)
+    return stop if kind in ("T921", "RETEST", "PATTERN", "VCP", "VCP_STOP") else stop * (1 - ATH_NET_PCT)
 
 
 def _protect(sym, e):
@@ -755,7 +756,7 @@ def sized(acc=None):
         app_cap = 0.0
     cap = min(app_cap, acct) if app_cap > 0 and acct else acct      # capital set in the app, never above the account value
     N = picks(); RK = risk_now(); SR = swing_risk()
-    sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Trend 9/21", "Breakout retest", "Bottom pattern")]
+    sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Trend 9/21", "Breakout retest", "Bottom pattern", "VCP")]
     AL = alloc(); ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
     expo = {k: 0.0 for k in AL}
     for s_ in sys_open:
@@ -907,12 +908,12 @@ def order(body: Order, _=Depends(auth)):
             st, lim, why = live_check(row, ltp)
             if st in ("broken", "missed", "ran"):
                 raise HTTPException(400, f"not sent: {why}")
-            if row["kind"] in ("ATH_STOP", "TF_STOP") and st == "wait":
+            if row["kind"] in STOP_KINDS and st == "wait":
                 p = broker.params(row["symbol"], side, body.qty, row["price"], kind="SL", trigger=row["trigger"])
             else:                       # 9/21, breakouts, or a buy-stop already triggered: LIMIT near the live price, capped
                 p = broker.params(row["symbol"], side, body.qty, lim or row["price"])
         else:
-            if row["kind"] in ("ATH_STOP", "TF_STOP"):
+            if row["kind"] in STOP_KINDS:
                 raise HTTPException(400, "buy-stop orders are sent during market hours (09:15-15:30 IST); AMO does not take them")
             if not amo:
                 raise HTTPException(400, "send between 15:45 and 08:57 IST (AMO) or during market hours")
@@ -992,7 +993,7 @@ def live_check(r, ltp):
         return "ok", None, ""
     if r.get("stop") and ltp <= r["stop"]:
         return "broken", None, f"below the plan stop ({r['stop']:.2f}) - the setup is invalid; can't send"
-    if r["kind"] in ("ATH_STOP", "TF_STOP"):
+    if r["kind"] in STOP_KINDS:
         T = r["trigger"]
         if ltp < T:
             return "wait", None, f"{(T / ltp - 1) * 100:.1f}% below the trigger - the buy-stop waits on Angel"

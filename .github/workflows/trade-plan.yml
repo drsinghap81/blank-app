@@ -2,7 +2,7 @@ name: trade-plan
 # Builds data/scan/trade_plan.json (Live tab) after the evening India scans.
 on:
   workflow_run:
-    workflows: ["ath-scan", "trend-scan"]
+    workflows: ["ath-scan", "trend-scan", "pattern-scan"]
     types: [completed]
   schedule:
     - cron: "45 15 * * 1-5"   # 21:15 IST fallback

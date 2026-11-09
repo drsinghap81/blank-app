@@ -64,6 +64,12 @@ def buckets(mk):
          dict(key="pt", name="Bottom pattern", system="Bottom pattern", status="off", pct=0,
               rules="Double/triple bottom, tilted W, inverse H&S neckline breakout; stop under the pattern, measured-move target, 120 days.",
               test="Off: lagged the average stock in every industry lane (NSE 2017-26) and a random stock in the US/ASX test."),
+         dict(key="vcp", name="VCP", system="VCP", status="watch", pct=0,
+              rules="Volatility contraction pattern in a Stage 2 uptrend: >= 2 shrinking pullbacks with higher lows, volume drying up; "
+                    "buy-stop above the last pullback's high on 1.4x volume; stop = that pullback's low (max 10%); sell after a daily close below EMA 50.",
+              test=("NSE 2017-26: +4.9% a trade (221 trades, 37% win), robust across rule variants; added to Momentum + Trend it gave "
+                    "24.2-24.7%/yr vs 23.1% with a similar worst fall and nothing extra in 2022-26, so it is a watch bucket - your call.") if india
+                   else "Not tested on this market (NSE: +4.9% a trade). Watch bucket - your call."),
          dict(key="s1", name="System 1", status="off", pct=0, rules="Weekly RSI system (rules kept privately).",
               test="Off on NSE: below the Nifty in every version tested; a US paper candidate."),
          dict(key="wc", name="Wealth Creation", status="sip", pct=0, rules="ETF Pie funded by a monthly SIP, outside the systems' capital: Nifty 50, Midcap 150, Gold and US Nasdaq 100 ETFs at fixed weights (Equal, Balanced or Aggressive) rebalanced each quarter, or the monthly rotation (best 2 by 3-month return).", test="2016-26 monthly, price indices, 0.2% per switch: Equal 25% each 18.3%/yr, worst -15.7%; Balanced 30/20/30/20 17.6%, -14.7%; Aggressive 30/30/10/30 18.4%, -20.2%; rotation 17.7%, -12.8%; Nifty 50 11.6%, -29.3%.")]
@@ -292,17 +298,45 @@ def main(mk="NSE"):
                                   stop=num(r.get("stop")), signal_date=r.get("signal_date"), group=g[0] if g else None, lane=x[0] if x else None,
                                   group_rank=x[2] if x else None))
         pat_watch.sort(key=lambda w: (LANE_ORD[w["lane"]], w.get("signal_date") or ""))
+    # VCP watch bucket (10 Nov 2026), all markets: forming setups within 5% of the pivot -> buy-stop; breakouts of the last
+    # 2 sessions still within 3% of the entry -> limit. Exits: tested rule (daily close below EMA 50) for anyone holding it.
+    vc = load(D + "vcp.json"); vexits = []
+    for r in vc.get("rows") or []:
+        sym, close, stop, piv = r["symbol"], num(r.get("close")), num(r.get("stop")), num(r.get("pivot"))
+        if not close or not stop or not piv or close < MINPX[mk]:
+            continue
+        if r.get("status") == "exit":
+            vexits.append(dict(id=f"EXIT-VCP-{sym}", symbol=sym, system="VCP", side="SELL", order="LIMIT", when="next open", ref=close,
+                               why=r.get("exit_why") or "daily close below EMA 50"))
+            continue
+        if sym in best:
+            continue
+        cs = " → ".join(f"{c['depth']:.0f}%" for c in r.get("contractions") or [])
+        base = dict(symbol=sym, name=r.get("name", ""), system="VCP", bucket="vcp", stop=round(stop, 2), experimental=True,
+                    exit_rule="sell after a daily close below EMA 50, or the stop", pivot=piv, contractions=r.get("contractions"),
+                    score=0, value_cr=None, sector=None, sector_rs=None, theme=None, theme_rs=None, stock_rs=None, aligned=False, td_score=None,
+                    group=None, lane=None, group_pulse=None, group_rank=None)
+        if r.get("status") == "forming" and (r.get("to_pivot_pct") or 99) <= 5:
+            T = round(piv * 1.001, 2)
+            best[sym] = dict(base, id=f"VCP-{sym}-{r.get('setup_date')}", kind="VCP_STOP", order="STOPLOSS_LIMIT", when="day order, re-place each morning",
+                             side="BUY", trigger=T, price=round(T * 1.01, 2), ref=close,
+                             note=f"VCP {cs}, pivot {piv:,.2f} ({r.get('to_pivot_pct')}% above the close); buy-stop needs 1.4x volume on the day as tested")
+        elif r.get("status") == "breakout" and (r.get("days_since") or 0) <= 1 and close <= num(r.get("entry")) * 1.03:
+            best[sym] = dict(base, id=f"VCP-{sym}-{r.get('bo_date')}", kind="VCP", order="LIMIT", when="next open", side="BUY",
+                             price=round(close * 1.01, 2), ref=close,
+                             note=f"VCP {cs} broke the pivot {piv:,.2f} on {r.get('bo_date')} on {r.get('bo_vol')}x volume")
     trades = [c for c in best.values() if c.get("bucket") == "mom"]
     trades.sort(key=lambda c: C.index(c))
-    KORD = {"TF_BRK": 0, "TF_STOP": 0, "T921": 1, "RETEST": 2, "PATTERN": 3}
+    KORD = {"TF_BRK": 0, "TF_STOP": 0, "T921": 1, "RETEST": 2, "PATTERN": 3, "VCP": 4, "VCP_STOP": 4}
     swing = sorted([c for c in best.values() if c["kind"] in KORD],
                    key=lambda c: (LANE_ORD[c["lane"]], KORD[c["kind"]], -(c["value_cr"] or 0)))
     if india:   # every Trend 9/21 signal, the best 8 retests
-        keep = {id(x) for x in [c for c in swing if c["bucket"] in ("tf", "t9")] + [c for c in swing if c["kind"] == "RETEST"][:8]}
+        keep = {id(x) for x in [c for c in swing if c["bucket"] in ("tf", "t9")] + [c for c in swing if c["kind"] == "RETEST"][:8]
+                + [c for c in swing if c["bucket"] == "vcp"][:12]}
         swing = [c for c in swing if id(c) in keep]
     else:   # keep all 9/21, the best 8 retests and 6 patterns, then order the lot top-down (industry lane, then 9/21 > retest > pattern)
         keep = {id(x) for x in [c for c in swing if c["kind"] in ("T921", "TF_BRK", "TF_STOP")] + [c for c in swing if c["kind"] == "RETEST"][:8]
-                + [c for c in swing if c["kind"] == "PATTERN"][:6]}
+                + [c for c in swing if c["kind"] == "PATTERN"][:6] + [c for c in swing if c["bucket"] == "vcp"][:12]}
         swing = [c for c in swing if id(c) in keep]
     seen = {}
     for L in (trades, swing):
@@ -310,7 +344,7 @@ def main(mk="NSE"):
             b = c.get("bucket") if L is swing else "mom"; seen[b] = seen.get(b, 0) + 1
             c["rank"] = seen[b]                          # rank within its system
             c["risk_pct"] = round((c.get("trigger") or c["price"]) / c["stop"] * 100 - 100, 1) if c["stop"] else None
-    exits = []
+    exits = list(vexits)
     for r in ath.get("tracked") or []:
         if r.get("status") == "exit next open":   # all bases: holdings bought as Monthly ATH before the 9 Nov split keep this exit
             exits.append(dict(id=f"EXIT-ATH-{r['symbol']}", symbol=r["symbol"], system="Monthly ATH", side="SELL", order="LIMIT",
