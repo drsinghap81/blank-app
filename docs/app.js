@@ -31,8 +31,14 @@ function applyTheme(redraw) {
 }
 function themeSheet() {
   const cur = themePick();
-  $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">Theme</h2><p class="muted" style="margin:0">Saved on this device. Charts and every tab follow it.</p>
+  const md = modeNow() === 'beginner' ? 'beginner' : 'pro';
+  $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 8px">Mode</h2><div class="seg" id="mdseg"><button data-md="beginner" aria-selected="${md === 'beginner'}">Beginner</button><button data-md="pro" aria-selected="${md === 'pro'}">Pro</button></div>
+    <p class="muted" style="margin:6px 0 16px;font-size:13px">Beginner: Today's picks in plain words, practice trades, proof. Pro: every tab and full detail. Same data and rules.</p>
+    <h2 style="margin:4px 0 2px">Theme</h2><p class="muted" style="margin:0">Saved on this device. Charts and every tab follow it.</p>
     <div class="th-grid">${Object.entries(THEMES).map(([k, T]) => `<button class="th-opt" data-th="${k}" aria-pressed="${k === cur}"><span class="th-sw">${T.sw.map((c) => `<i style="background:${c}"></i>`).join('')}</span><b>${T.name}</b><span>${T.desc}</span></button>`).join('')}</div>`;
+  $('#sheet-body').querySelectorAll('#mdseg button').forEach((b) => b.addEventListener('click', () => {
+    setMode(b.dataset.md); $('#sheet-body').querySelectorAll('#mdseg button').forEach((x) => x.setAttribute('aria-selected', x === b));
+    state.view = b.dataset.md === 'beginner' ? 'bg' : 'mk'; state.bgTab = 'today'; }));
   $('#sheet-body').querySelectorAll('.th-opt').forEach((b) => b.addEventListener('click', () => {
     try { localStorage.setItem('td.theme', b.dataset.th); } catch (e) { /* private mode */ }
     applyTheme(false); $('#sheet-body').querySelectorAll('.th-opt').forEach((x) => x.setAttribute('aria-pressed', x === b)); }));
@@ -98,10 +104,12 @@ function parseCSV(t) {
 document.addEventListener('click', (e) => { if (e.target && e.target.id === 'toresults') show('results'); });
 function show(view) {
   state.view = view;
-  document.querySelectorAll('.views button').forEach((b) => (b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
+  document.querySelectorAll('.views:not(.bg-nav) button').forEach((b) => (b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   document.querySelectorAll('.view').forEach((s) => (s.hidden = s.id !== `view-${view}`));
   window.scrollTo(0, 0);
-  ({ mk: loadMarkets, live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms })[view]();
+  if (view !== 'bg') document.body.classList.remove('bg-first');
+  if (view !== 'bg') bgNav(document.body.classList.contains('mode-bg') ? 'explore' : '');
+  ({ mk: loadMarkets, live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
 }
 
 /* ------------------------------------------------------------------ Live trades */
@@ -2799,7 +2807,7 @@ async function mxStock(m, r, mk, S) {
     new ResizeObserver(() => rc.applyOptions({ width: rb.clientWidth })).observe(rb);
   } else if (rb) { rb.style.height = '0'; }
 }
-document.querySelectorAll('.views button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
+document.querySelectorAll('.views:not(.bg-nav) button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
 document.querySelectorAll('.markets button').forEach((b) => b.addEventListener('click', () => { state.mkt = b.dataset.mkt; state.selected = null; loadTrends(); }));
 document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => { state.tab = b.dataset.tab; state.selected = null; renderTrends(); }));
 $('#q').addEventListener('input', (e) => { state.q = e.target.value; renderList(); });
@@ -2812,5 +2820,183 @@ window.addEventListener('popstate', () => { if (state._themeOpen) { state._theme
 $('#sheet-close').addEventListener('click', () => history.back());
 window.addEventListener('popstate', closeSheet);
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#sheet').hidden) history.back(); });
+
+/* ------------------------------------------------------------------ Beginner mode (9 Nov 2026)
+   A plain-language layer over the same nightly data: Today · My trades · Proof · Explore · Me. The Pro tabs are untouched;
+   Explore opens them. Practice trades live only on this device (localStorage td.practice); nothing is sent to a broker. */
+const MODE_KEY = 'td.mode';
+const modeNow = () => { try { return localStorage.getItem(MODE_KEY) || ''; } catch (e) { return ''; } };
+function setMode(m) { try { localStorage.setItem(MODE_KEY, m); } catch (e) { /* private mode */ } applyMode(); }
+function applyMode() { document.body.classList.toggle('mode-bg', modeNow() === 'beginner'); }
+const BG_PRO = { mk: 'Markets', trends: 'Trends', live: 'Live', ath: 'ATH', tb: 'Top Bottom', bot: 'Bottoms', pf: 'Portfolio' };
+function bgNav(tab) { document.querySelectorAll('#bgnav button').forEach((b) => (b.dataset.bg === tab ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'))); }
+function bgShow(tab) { state.bgTab = tab; document.body.classList.toggle('bg-first', tab === 'welcome'); show('bg'); }
+const bgPractice = () => { try { return JSON.parse(localStorage.getItem('td.practice') || '[]'); } catch (e) { return []; } };
+const bgPracticeSave = (L) => { try { localStorage.setItem('td.practice', JSON.stringify(L)); } catch (e) { toast('Could not save on this device'); } };
+const BG_LANE = { build: ['Strong sector', 'open'], hold: ['Strong sector', 'open'], mid: ['Average sector', ''], bounce: ['Weak sector', 'exit'], fade: ['Fading sector', 'new'], weak: ['Weak sector', 'exit'] };
+const bgWhy = (r) => ({ ATH_BRK: `broke out to an all-time high after ${r.base_months || 24}+ months`, ATH_STOP: `close to an all-time-high breakout (${r.base_months || 24}-month base)`,
+  TF_BRK: `broke out of a ${r.base_months || 12}-month base`, TF_STOP: `close to breaking out of a ${r.base_months || 12}-month base`, T921: 'a new uptrend just started' })[r.kind] || 'passes our rules';
+const bgName = (r) => (r.name || r.symbol).replace(/ Limited$| Ltd\.?$/i, '');
+
+async function loadBeginner() {
+  const el = $('#view-bg'); const tab = state.bgTab || 'today'; bgNav(tab === 'welcome' ? '' : tab);
+  $('#title').textContent = { welcome: 'Welcome', today: 'Today', trades: 'My trades', proof: 'Proof', explore: 'Explore', me: 'Me' }[tab] || 'Today';
+  if (tab === 'welcome') return bgWelcome(el);
+  if (tab === 'trades') return bgTrades(el);
+  if (tab === 'proof') return bgProof(el);
+  if (tab === 'explore') return bgExplore(el);
+  if (tab === 'me') return bgMe(el);
+  return bgToday(el);
+}
+
+function bgWelcome(el) {
+  $('#asof').textContent = 'Nightly scans of 1,500 Indian stocks';
+  el.innerHTML = `<div class="bg-wrap"><h2 class="bg-hero">Trade with a system, not a guess.</h2>
+    <p class="bg-lead">Every night we scan 1,500 Indian stocks and pick the few trades our tested rules like, with the exact buy price, stop and number of shares for your money.</p>
+    <div class="bg-steps"><div><b>1</b><span><strong>A few picks a day</strong>, not hundreds of tips</span></div>
+      <div><b>2</b><span><strong>Every trade has a stop</strong>, so you know your worst case before you buy</span></div>
+      <div><b>3</b><span><strong>Practise free first</strong>, go live when you're ready</span></div></div>
+    <label class="bg-l" for="bgcap">How much would you start with?</label>
+    <div class="bg-money"><span>₹</span><input id="bgcap" inputmode="numeric" value="${(cap('NSE') || 50000).toLocaleString('en-IN')}"></div>
+    <button class="bg-cta" id="bggo">I'm new · keep it simple</button>
+    <button class="bg-ghost" id="bgpro">I already trade · show me everything</button>
+    <p class="bg-fine">Not investment advice. Past results don't guarantee future returns.</p></div>`;
+  const save = () => { const v = Math.round(+String($('#bgcap').value).replace(/[^0-9]/g, '')); if (v > 0) setCap('NSE', v); };
+  $('#bggo').addEventListener('click', () => { save(); setMode('beginner'); bgShow('today'); });
+  $('#bgpro').addEventListener('click', () => { save(); setMode('pro'); show('mk'); });
+}
+
+function bgSize(r, C, risk) {
+  const E = r.trigger || r.price; if (!r.stop || !(E > r.stop)) return null;
+  const q = Math.floor(Math.min(risk * C / (E - r.stop), 0.1 * C / E));
+  return q > 0 ? { E, q, worst: q * (E - r.stop), value: q * E } : null;
+}
+function bgSentence(r, s) {
+  const buy = r.kind === 'ATH_STOP' || r.kind === 'TF_STOP' ? `Buy <b>${s.q} shares</b> if the price goes above <b>${inr(r.trigger, 2)}</b>.` : `Buy <b>${s.q} shares</b> at tomorrow's open (up to <b>${inr(r.price, 2)}</b>).`;
+  const out = r.system === 'Monthly ATH' ? `We'll tell you when to sell: a week that closes below its 30-week average (now ${inr(r.stop, 0)}).`
+    : r.bucket === 'tf' ? `We'll tell you when to sell: when its short-term trend turns down (9-day average below the 21-day).`
+      : `If it falls to <b>${inr(r.stop, 2)}</b>, sell.`;
+  return `${buy} ${out} Worst case about <b>−${inr(s.worst, 0)}</b>.`;
+}
+
+async function bgToday(el) {
+  el.innerHTML = '<p class="muted pad">Loading today…</p>';
+  const [P, G] = await Promise.all([getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan'), getJSON(MAIN + 'data/scan/group_pulse.json', 'gp_NSE')]);
+  if (!P) { el.innerHTML = '<p class="empty">Today\'s picks appear after the evening scan (about 9:15 pm IST).</p>'; return; }
+  $('#asof').textContent = `India close ${day(P.asof)}${updTxt(P.generated)}`;
+  const C = cap('NSE') || 50000; const risk = lvRiskN(lvN('NSE')) / 100; const al = lvAlloc('NSE', P, null);
+  const rows = (P.top || []).concat(P.swing || []).filter((r) => (al[bkOf(r)] ?? 0) > 0).map((r) => ({ r, s: bgSize(r, C, risk) })).filter((x) => x.s);
+  const ms = (G && G.mstats) || {}; const fh = Math.abs(ms.from_high || 0);
+  const mood = ms.up ? ['good', 'Healthy market', 'trending up'] : (ms.above200 || 0) >= 45 ? ['careful', 'Cautious market', 'not trending up yet'] : ['bad', 'Weak market', 'in a downtrend'];
+  const picks = rows.slice(0, 3); const held = new Set(bgPractice().filter((t) => !t.exit).map((t) => t.symbol));
+  el.innerHTML = `<div class="bg-wrap">
+    <div class="bg-mood"><i class="bg-dot ${mood[0]}"></i><div><b>${mood[1]}, ${rows.length ? `${rows.length} setup${rows.length > 1 ? 's' : ''}` : 'no new setups'}</b>
+      <span>The Nifty is ${fh < 1 ? 'near' : `${fmt(fh, 0)}% below`} its 1-year high and ${mood[2]}. ${mood[0] === 'good' ? 'Breakouts work best in markets like this.' : 'We only show the best-ranked trades.'}</span></div></div>
+    <div class="bg-h"><h3>Your picks</h3><span>sized for ${inr(C)}</span></div>
+    ${picks.map(({ r, s }, i) => { const ln = BG_LANE[r.lane] || ['', ''];
+      return `<div class="bg-pick"><div class="bg-pt"><div><b>${esc(bgName(r))}</b><span>${esc(r.symbol)} · ${bgWhy(r)}</span></div>${ln[0] ? `<span class="chip ${ln[1]}">${ln[0]}</span>` : ''}</div>
+        <p>${bgSentence(r, s)}</p>
+        <div class="bg-btns"><button class="bg-cta sm" data-pr="${i}" ${held.has(r.symbol) ? 'disabled' : ''}>${held.has(r.symbol) ? 'In practice' : 'Practise this trade'}</button><button class="bg-ghost sm" data-how="${i}">How to place it</button><button class="bg-ghost sm icon" data-ch="${i}" aria-label="Chart of ${esc(r.symbol)}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div></div>`; }).join('') || '<p class="bg-empty">No trade passes our rules for the next open. That\'s normal. Waiting is part of the system.</p>'}
+    ${rows.length > 3 ? `<button class="bg-link" id="bgmore">See ${rows.length - 3} more setups</button>` : ''}
+    <p class="bg-fine">Picks come from the same tested rules as Pro (Momentum and Trend 9/21). Not investment advice.</p></div>`;
+  el.querySelectorAll('[data-pr]').forEach((b) => b.addEventListener('click', () => {
+    const { r, s } = picks[+b.dataset.pr]; const L = bgPractice();
+    L.push({ symbol: r.symbol, name: bgName(r), kind: r.kind, system: r.system, bucket: bkOf(r), qty: s.q, trigger: r.trigger || null, price: r.price, stop: r.stop, date: P.asof, state: r.trigger ? 'waiting' : 'open', entry: r.trigger ? null : r.price });
+    bgPracticeSave(L); toast(`${r.symbol} added to your practice trades`); bgToday(el); }));
+  el.querySelectorAll('[data-how]').forEach((b) => b.addEventListener('click', () => bgHow(picks[+b.dataset.how])));
+  el.querySelectorAll('[data-ch]').forEach((b) => b.addEventListener('click', () => lvOpen(picks[+b.dataset.ch].r)));
+  const m = $('#bgmore'); if (m) m.addEventListener('click', () => { state.bgFrom = true; show('live'); bgNav('explore'); });
+}
+
+function bgHow({ r, s }) {
+  const stopOrder = r.kind === 'ATH_STOP' || r.kind === 'TF_STOP';
+  $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 6px">${esc(r.symbol)}: placing it in your broker app</h2>
+    <ol class="bg-ol"><li>Search <b>${esc(r.symbol)}</b> (NSE) and tap <b>Buy</b>, product <b>Delivery / CNC</b>.</li>
+      <li>${stopOrder ? `Order type <b>Stop-loss limit</b>: trigger <b>${fmt(r.trigger, 2, 'en-IN')}</b>, limit <b>${fmt(r.price, 2, 'en-IN')}</b>, quantity <b>${s.q}</b>, validity Day. Re-place it each morning while it shows here.` : `Order type <b>Limit</b>, price <b>${fmt(r.price, 2, 'en-IN')}</b>, quantity <b>${s.q}</b>. Place it before 9:15 am; if the stock opens higher, skip it.`}</li>
+      <li>After it fills, add a protective <b>stop-loss (GTT) sell</b> at <b>${fmt(r.system === 'Monthly ATH' || bkOf(r) === 'tf' ? r.stop * 0.85 : r.stop, 2, 'en-IN')}</b> for ${s.q} shares.</li>
+      <li>Then just check this app each evening: it tells you when to sell.</li></ol>
+    <p class="muted" style="font-size:13px">Total about ${inr(s.value)} · worst case about −${inr(s.worst)}. Connected to Angel One? Pro › Live can place it for you.</p>`;
+  $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+}
+
+async function bgTrades(el) {
+  el.innerHTML = '<p class="muted pad">Loading your trades…</p>';
+  const [pr, P] = await Promise.all([pfPrices(), getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan')]);
+  const px = pr.px; const exits = new Set(((P && P.exits) || []).map((e) => e.symbol)); const L = bgPractice(); let changed = false;
+  L.forEach((t) => { const p = (px[t.symbol] || [])[0];
+    if (t.state === 'waiting' && p && p >= t.trigger) { t.state = 'open'; t.entry = t.trigger; changed = true; }
+    if (t.state === 'open' && p && t.bucket !== 'mom' && t.bucket !== 'tf' && p <= t.stop) { t.state = 'closed'; t.exit = t.stop; t.why = 'hit the stop'; changed = true; } });
+  if (changed) bgPracticeSave(L);
+  const open = L.filter((t) => t.state !== 'closed'); const done = L.filter((t) => t.state === 'closed');
+  const pl = (t) => { const p = t.state === 'closed' ? t.exit : (px[t.symbol] || [])[0]; return t.entry && p ? (p / t.entry - 1) * 100 : null; };
+  const live = open.filter((t) => t.state === 'open' && pl(t) != null); const avg = live.length ? live.reduce((a, t) => a + pl(t), 0) / live.length : null;
+  const won = done.filter((t) => pl(t) > 0).length;
+  el.innerHTML = `<div class="bg-wrap"><div class="bg-seg"><span class="on">Practice</span><button id="bgreal">Real (Pro › Live)</button></div>
+    <div class="bg-sum"><span>${open.length} open · ${done.length} closed${done.length ? ` · ${won} won` : ''} · prices ${esc(pr.src)}</span>
+      <b class="${avg == null ? '' : avg >= 0 ? 'up' : 'down'}">${avg == null ? '–' : `${avg >= 0 ? '+' : ''}${fmt(avg, 1)}%`}</b><span>${avg == null ? 'Add a pick from Today to start practising.' : 'average on open trades'}</span></div>
+    ${open.map((t, i) => { const p = (px[t.symbol] || [])[0]; const g = pl(t); const sell = exits.has(t.symbol);
+      return `<div class="bg-trade ${sell ? 'sell' : ''}"><div><b>${esc(t.name || t.symbol)}</b><span>${t.state === 'waiting' ? `Waiting for ${inr(t.trigger, 2)} · now ${p ? inr(p, 2) : '–'}` : `${t.qty} shares · bought ${inr(t.entry, 2)} · now ${p ? inr(p, 2) : '–'}`}</span>
+        ${sell ? '<span class="bg-alert">Time to sell at the next open</span>' : `<span class="muted">Stop ${inr(t.stop, 2)}</span>`}</div>
+        <div class="bg-tr"><b class="${g == null ? '' : g >= 0 ? 'up' : 'down'}">${g == null ? '–' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`}</b><button class="bg-ghost sm" data-close="${L.indexOf(t)}">${sell ? 'Sell' : 'Close'}</button></div></div>`; }).join('')}
+    ${done.length ? `<h3 class="bg-h3">Closed</h3>${done.slice(-10).reverse().map((t) => `<div class="bg-trade done"><div><b>${esc(t.name || t.symbol)}</b><span>${esc(t.why || 'closed')}</span></div><b class="${pl(t) >= 0 ? 'up' : 'down'}">${pl(t) == null ? '–' : `${pl(t) >= 0 ? '+' : ''}${fmt(pl(t), 1)}%`}</b></div>`).join('')}` : ''}
+    <p class="bg-fine">Practice trades stay on this phone. We check them against the latest prices each time you open this tab.</p></div>`;
+  $('#bgreal').addEventListener('click', () => { show('live'); bgNav('trades'); });
+  el.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => {
+    const L2 = bgPractice(); const t = L2[+b.dataset.close]; const p = (px[t.symbol] || [])[0];
+    if (t.state === 'waiting') L2.splice(+b.dataset.close, 1); else Object.assign(t, { state: 'closed', exit: p || t.entry, why: exits.has(t.symbol) ? 'sold on the sell signal' : 'closed by you' });
+    bgPracticeSave(L2); bgTrades(el); }));
+}
+
+async function bgProof(el) {
+  $('#asof').textContent = 'Backtest, NSE 2017 to 2026';
+  el.innerHTML = '<p class="muted pad">Loading…</p>';
+  const D = await getJSON(MAIN + 'data/scan/alloc_curves.json', 'alloc curves');
+  const S = D && Object.fromEntries(D.series.map((x) => [x.key, x])); if (!S || !S.mix) { el.innerHTML = '<p class="empty">Results unavailable right now.</p>'; return; }
+  const a = S.mix, n = S.nifty; const yrs = Object.keys(a.years); const mx = Math.max(...yrs.map((y) => Math.max(Math.abs(a.years[y]), Math.abs(n.years[y]))));
+  const bar = (v, cls) => `<i class="${cls} ${v < 0 ? 'neg' : ''}" style="height:${Math.max(3, Math.abs(v) / mx * 70)}px" title="${fmt(v, 0)}%"></i>`;
+  const loss = yrs.filter((y) => a.years[y] < 0); const best = yrs.reduce((b, y) => (a.years[y] > a.years[b] ? y : b), yrs[0]);
+  el.innerHTML = `<div class="bg-wrap"><p class="bg-lead" style="margin-top:4px">If you had put <b>₹1 lakh</b> in at the start of 2017:</p>
+    <div class="bg-two"><div class="win"><span>Our stock systems</span><b>₹${fmt(a.v[a.v.length - 1] / 100, 1)} L</b><span>${fmt(a.cagr, 0)}%/yr · worst fall ${fmt(a.dd, 0)}%</span></div>
+      <div><span>Nifty 50</span><b>₹${fmt(n.v[n.v.length - 1] / 100, 1)} L</b><span>${fmt(n.cagr, 0)}%/yr · worst fall ${fmt(n.dd, 0)}%</span></div></div>
+    <div class="card"><div class="bg-h" style="margin:0 0 8px"><h3>Year by year</h3><span><i class="bg-key sys"></i>Systems <i class="bg-key nif"></i>Nifty</span></div>
+      <div class="bg-bars">${yrs.map((y) => `<div><div class="bg-pos">${a.years[y] >= 0 ? bar(a.years[y], 'sys') : ''}${n.years[y] >= 0 ? bar(n.years[y], 'nif') : ''}</div><div class="bg-negs">${a.years[y] < 0 ? bar(a.years[y], 'sys') : ''}${n.years[y] < 0 ? bar(n.years[y], 'nif') : ''}</div><span>'${y.slice(2)}</span></div>`).join('')}</div>
+      <p class="muted" style="font-size:12.5px;margin:8px 0 0">Lost money in ${loss.length} of ${yrs.length} years${loss.length ? ` (${loss.map((y) => `${y}, ${fmt(a.years[y], 0)}%`).join('; ')})` : ''}. Best: ${best}, +${fmt(a.years[best], 0)}%. ${yrs[yrs.length - 1]} is to October.</p></div>
+    <div class="card"><h3 style="margin:0 0 4px">How we test</h3><p class="muted" style="margin:0;font-size:13px">Every NSE stock since 2017, including ones later delisted, with brokerage and slippage, 1% risk a trade. These are simulated results, not real trades, and past results don't guarantee future returns. Pro adds Top Bottom (futures) on top: ${S.mix_tb ? fmt(S.mix_tb.cagr, 0) + '%/yr' : ''} in the same test.</p></div></div>`;
+}
+
+function bgExplore(el) {
+  $('#asof').textContent = 'Everything the Pro mode has';
+  const items = [['mk', 'Markets', 'World, sectors and industries: where the strength is'], ['trends', 'Trends', 'Every stock in a clear trend, with charts'],
+    ['live', 'Live (Pro trading)', 'All setups, sizing for your capital, and orders through Angel One'], ['ath', 'All-time highs', 'Stocks breaking out to new highs after long bases'],
+    ['bot', 'Bottoms', 'Bottom patterns and support levels (watch only)'], ['tb', 'Top Bottom', 'Bank Nifty futures system (needs futures margin)'], ['pf', 'Portfolio', 'Your holdings, SIP and ETF rotation']];
+  el.innerHTML = `<div class="bg-wrap"><p class="bg-lead" style="margin-top:4px">The full toolkit. Use it when you want the detail behind the picks.</p>
+    <div class="bg-explore">${items.map(([k, t, d]) => `<button data-v="${k}"><b>${t}</b><span>${d}</span></button>`).join('')}</div></div>`;
+  el.querySelectorAll('[data-v]').forEach((b) => b.addEventListener('click', () => { show(b.dataset.v); bgNav('explore'); }));
+}
+
+function bgMe(el) {
+  $('#asof').textContent = 'Your settings on this device';
+  const b = lvBudget();
+  el.innerHTML = `<div class="bg-wrap"><div class="card"><label class="bg-l" for="bgcap2">Money you trade with</label><div class="bg-money"><span>₹</span><input id="bgcap2" inputmode="numeric" value="${(cap('NSE') || 50000).toLocaleString('en-IN')}"></div>
+      <label class="bg-l" for="bgbud" style="margin-top:14px">How big a dip can you sit through?</label>
+      <select id="bgbud" class="bg-sel">${[10, 15, 20, 25].map((v) => `<option value="${v}" ${v === b ? 'selected' : ''}>${v}% fall (risk ${riskForBudget(v).toFixed(2)}% a trade)</option>`).join('')}</select>
+      <p class="muted" style="font-size:12.5px;margin:8px 0 0">Smaller = smaller positions and calmer swings. Changes the share counts on Today.</p></div>
+    <div class="card"><button class="bg-row" id="bgtheme"><b>Theme</b><span>${THEMES[themePick()] ? THEMES[themePick()].name : 'Auto'} ›</span></button>
+      <button class="bg-row" id="bgtopro"><b>Switch to Pro mode</b><span>All tabs, full detail ›</span></button>
+      <button class="bg-row" id="bgagain"><b>Show the welcome again</b><span>›</span></button></div>
+    <p class="bg-fine">Trend Desk shows the output of tested trading rules. It is not investment advice; you decide and place every trade.</p></div>`;
+  $('#bgcap2').addEventListener('change', (e) => { const v = Math.round(+String(e.target.value).replace(/[^0-9]/g, '')); if (v > 0) { setCap('NSE', v); toast('Saved'); } });
+  $('#bgbud').addEventListener('change', (e) => { lvSave({ budget: +e.target.value }); toast('Saved'); });
+  $('#bgtheme').addEventListener('click', themeSheet);
+  $('#bgtopro').addEventListener('click', () => { setMode('pro'); show('mk'); });
+  $('#bgagain').addEventListener('click', () => bgShow('welcome'));
+}
+
+document.querySelectorAll('#bgnav button').forEach((b) => b.addEventListener('click', () => bgShow(b.dataset.bg)));
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-show('mk');
+{ // first run: new devices see the welcome (Beginner or Pro); devices that already used the app stay in Pro
+  let used = false; try { used = Object.keys(localStorage).some((k) => /^td[._]/.test(k) && k !== 'td.theme'); } catch (e) { /* private mode */ }
+  if (!modeNow() && used) setMode('pro');
+  applyMode();
+  if (modeNow() === 'beginner') bgShow('today'); else if (!modeNow()) bgShow('welcome'); else show('mk');
+}
