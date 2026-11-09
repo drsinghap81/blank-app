@@ -2661,7 +2661,6 @@ function renderPortfolio() {
     return '';
   };
   el.innerHTML = `<div style="margin:10px 16px 0"><button class="more" id="toresults">📊 Backtest results & paper book →</button></div>
-    <div id="wccardpf"></div><div id="rotcard"></div>
     <div class="card">
       <div class="facts">
         <div class="fact"><span>Current value</span><b>${inr(val)}</b></div>
@@ -2688,6 +2687,7 @@ function renderPortfolio() {
       <thead><tr><th>Sold</th><th>Stock</th><th class="r">P&amp;L</th><th></th></tr></thead>
       <tbody>${P.c.map((c, j) => ({ ...c, j })).reverse().map((c) => `<tr><td>${day(c.xd)}</td><td>${esc(c.s)}<div class="co">${fmt(c.q, 0, 'en-IN')} × ${fmt(c.a, 2, 'en-IN')} → ${fmt(c.x, 2, 'en-IN')}</div></td>
         <td class="r ${sgn(c.q * (c.x - c.a))}">${inr(c.q * (c.x - c.a))}</td><td><button class="linkbtn" data-undo="${c.j}">undo</button></td></tr>`).join('')}</tbody></table></div></div>` : ''}
+    <details class="card pf-fold"><summary><b>Wealth Creation · ETF Pie &amp; ETF rotation</b><span class="muted">monthly SIP plans</span></summary><div id="wccardpf"></div><div id="rotcard"></div></details>
     <p class="muted small pad">Your holdings are stored only in this app on this phone — never uploaded or shared. Use the download button to keep a backup (clearing Safari data erases them). Prices: every NSE stock, about 15 minutes delayed in market hours, otherwise the last close. P&amp;L is before brokerage and taxes.</p>`;
   rotCard(); wcPie($("#wccardpf"), null);
   $('#pf-add').onclick = () => pfForm();

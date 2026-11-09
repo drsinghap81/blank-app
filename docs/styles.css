@@ -673,3 +673,8 @@ body.mode-bg .brand h1 { font-size: 22px; }
 .ad-btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; } .ad-btns .muted { font-size: 12px; }
 .lv-btn.ghost { background: var(--soft); color: var(--ink); }
 .ad-h { margin: 12px 0 2px; font-size: 13px; color: var(--slate); }
+.pf-fold > summary { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 8px; list-style: none; }
+.pf-fold > summary::-webkit-details-marker { display: none; }
+.pf-fold > summary::after { content: '›'; font-size: 20px; color: var(--slate); transition: transform .2s; }
+.pf-fold[open] > summary::after { transform: rotate(90deg); }
+.pf-fold[open] > summary { margin-bottom: 8px; }
