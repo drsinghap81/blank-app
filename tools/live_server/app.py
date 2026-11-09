@@ -1005,6 +1005,67 @@ def live_check(r, ltp):
     return "ok", round(min(ltp * 1.01, ref * (1 + CHASE)), 2), ""
 
 
+# ------------------------------------------------------------------ live prices for the US / ASX shortlists (10 Nov 2026)
+# Yahoo's public chart endpoint (no key; Nasdaq-listed US prices real time, others ~15 min delayed), only for the stocks the
+# plan shortlists (picks, near-trigger, sells), cached ~45 s. Uses requests (already installed), no new package.
+MKT_PLAN = {"US": "us/trade_plan.json", "ASX": "asx/trade_plan.json"}
+MKT_TZ = {"US": ("America/New_York", (9, 30), (16, 0)), "ASX": ("Australia/Sydney", (10, 0), (16, 0))}
+_mplan, _mq = {}, {}
+
+
+def mkt_plan(mk):
+    c = _mplan.get(mk)
+    if c and time.time() - c[0] < 300:
+        return c[1]
+    if ENV.get("PLAN_FILE"):
+        d = json.load(open(os.path.join(os.path.dirname(ENV["PLAN_FILE"]), MKT_PLAN[mk])))
+    else:
+        r = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/" + MKT_PLAN[mk], timeout=30); r.raise_for_status(); d = r.json()
+    _mplan[mk] = (time.time(), d)
+    return d
+
+
+def mkt_open(mk, t=None):
+    from zoneinfo import ZoneInfo
+    tz, a, b = MKT_TZ[mk]; t = (t or datetime.now(timezone.utc)).astimezone(ZoneInfo(tz))
+    return t.weekday() < 5 and a <= (t.hour, t.minute) < b
+
+
+def yq(sym, mk):
+    y = sym.replace(".", "-") + (".AX" if mk == "ASX" else "")
+    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{y}", params=dict(interval="1d", range="1d"),
+                     headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=10)
+    r.raise_for_status(); res = r.json()["chart"]["result"][0]; m = res["meta"]
+    op = ((res.get("indicators") or {}).get("quote") or [{}])[0].get("open") or [None]
+    return dict(ltp=m.get("regularMarketPrice"), prev=m.get("chartPreviousClose") or m.get("previousClose"), high=m.get("regularMarketDayHigh"),
+                low=m.get("regularMarketDayLow"), open=op[-1] if op else None, t=m.get("regularMarketTime"))
+
+
+@app.get("/api/quotes_mkt")
+def quotes_mkt(mk: str = "US", _=Depends(auth)):
+    if mk not in MKT_PLAN:
+        raise HTTPException(404, "market must be US or ASX")
+    c = _mq.get(mk)
+    if c and time.time() - c[0] < 45:
+        return c[1]
+    P = mkt_plan(mk)
+    syms = sorted({r["symbol"] for k in ("top", "more", "swing", "watch", "exits", "pattern_watch") for r in P.get(k) or [] if r.get("symbol")})[:60]
+    from concurrent.futures import ThreadPoolExecutor
+    out = {}
+    def one(sym):
+        try:
+            q = yq(sym, mk)
+            if q.get("ltp"):
+                out[sym] = q
+        except Exception:  # noqa: BLE001
+            pass
+    with ThreadPoolExecutor(8) as ex:
+        list(ex.map(one, syms))
+    res = dict(mk=mk, market_open=mkt_open(mk), symbols=out, source="Yahoo Finance (Nasdaq real time, others ~15 min delayed)")
+    _mq[mk] = (time.time(), res)
+    return res
+
+
 @app.get("/api/quotes")
 def quotes(_=Depends(auth)):
     """Live prices for today's plan rows, exits and app trades, plus the limit price a buy sent now would get."""

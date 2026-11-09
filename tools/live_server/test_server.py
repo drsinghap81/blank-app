@@ -376,3 +376,16 @@ def test_adopt(tmp_path):
     gid = e["gtt_id"]
     assert c.post("/api/adopt/release", headers=h, json={"symbol": "TITAN", "confirm": "RELEASE TITAN"}).json()["ok"]
     assert "TITAN" not in A.journal() and A.broker.hold["TITAN"] == 40
+
+
+def test_quotes_mkt(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    seen = []
+    A.yq = lambda sym, mk: (seen.append((sym, mk)) or dict(ltp=101.0, prev=100.0, high=102.0, low=99.0, open=100.5, t=0))
+    j = c.get("/api/quotes_mkt?mk=US", headers=h).json()
+    assert j["mk"] == "US" and j["symbols"] and all(v["ltp"] == 101.0 for v in j["symbols"].values()) and all(m == "US" for _, m in seen)
+    n = len(seen); c.get("/api/quotes_mkt?mk=US", headers=h); assert len(seen) == n                       # cached
+    assert c.get("/api/quotes_mkt?mk=XX", headers=h).status_code == 404
+    from datetime import datetime, timezone
+    assert A.mkt_open("US", datetime(2026, 11, 9, 15, 0, tzinfo=timezone.utc)) and not A.mkt_open("US", datetime(2026, 11, 9, 22, 0, tzinfo=timezone.utc))

@@ -109,7 +109,7 @@ function show(view) {
   window.scrollTo(0, 0);
   if (view !== 'bg') document.body.classList.remove('bg-first');
   if (view !== 'bg') bgNav(document.body.classList.contains('mode-bg') ? 'explore' : '');
-  setTimeout(liveTag, 1500); setTimeout(liveTag, 4000);
+  setTimeout(liveTag, 1500); setTimeout(liveTag, 4000); if (view === 'trends' || view === 'ath') setTimeout(livePoll, 800);
   ({ mk: loadMarkets, live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
 }
 
@@ -289,33 +289,51 @@ function pieEdit(box, S) {
    The stocks our systems shortlist (today's buys, near-trigger, sell signals, your open trades) are priced by your
    server from Angel every 15 s in market hours. Lists elsewhere in the app get a live tag on those rows, and the
    open daily chart grows today's candle. Only when this device is connected to your server; Indian stocks only. */
-const LIVE = { q: {}, open: false, at: null, t: null };
+const LIVE = { q: {}, open: false, at: null, t: null, qm: {}, om: {}, atm: {} };
+const LV_TZ = { NSE: 5.5, US: null, ASX: null };
+// market shown on screen: Trends uses its market switch, ATH its own; Beginner and Live are India
+const viewMk = () => (state.view === 'ath' ? AM() : state.view === 'trends' ? state.mkt : 'NSE');
+const liveQ = (mk) => (mk === 'NSE' ? LIVE.q : (LIVE.qm[mk] || {}));
+const liveOpen = (mk) => (mk === 'NSE' ? LIVE.open : !!LIVE.om[mk]);
 async function livePoll() {
   clearTimeout(LIVE.t);
-  if (!lvCfg().url || state.view === 'live') { LIVE.t = setTimeout(livePoll, 60000); return; }   // Live tab runs its own feed
-  try { const j = await lvApi('/api/quotes'); LIVE.q = j.symbols || {}; LIVE.open = !!j.market_open; LIVE.at = new Date(); liveTag(); liveBar(); } catch (e) { /* server off: keep end-of-day */ }
-  LIVE.t = setTimeout(livePoll, LIVE.open ? 15000 : 300000);
+  if (!lvCfg().url) { LIVE.t = setTimeout(livePoll, 60000); return; }
+  let wait = 300000;
+  if (state.view !== 'live') {          // the Live tab runs its own India feed
+    try { const j = await lvApi('/api/quotes'); LIVE.q = j.symbols || {}; LIVE.open = !!j.market_open; LIVE.at = new Date(); } catch (e) { /* server off: keep end-of-day */ }
+    if (LIVE.open) wait = 15000;
+  }
+  const mk = viewMk();
+  if (mk !== 'NSE' && (!LIVE.atm[mk] || Date.now() - LIVE.atm[mk] > (LIVE.om[mk] ? 55000 : 280000))) {
+    try { const j = await lvApi('/api/quotes_mkt?mk=' + mk); LIVE.qm[mk] = j.symbols || {}; LIVE.om[mk] = !!j.market_open; LIVE.atm[mk] = Date.now(); } catch (e) { /* older server */ }
+  }
+  if (mk !== 'NSE' && LIVE.om[mk]) wait = Math.min(wait, 60000);
+  liveTag(); liveBar();
+  LIVE.t = setTimeout(livePoll, wait);
 }
 function liveTag() {
-  if (!Object.keys(LIVE.q).length) return;
-  const nse = state.mkt === 'NSE' || state.view === 'bg';
+  const mk = state.view === 'bg' ? 'NSE' : viewMk(); const Q = liveQ(mk); const open = liveOpen(mk);
+  if (!Object.keys(Q).length) return;
+  const src = mk === 'NSE' ? 'your Angel account' : 'Yahoo Finance (Nasdaq real time, others ~15 min delayed)';
   document.querySelectorAll('.row, .bg-pick[data-sym]').forEach((row) => {
-    const sym = row.dataset.sym || (row.querySelector('.sym') || {}).textContent; const q = nse && sym && LIVE.q[sym.trim()];
+    if (row.closest('.view') && row.closest('.view').hidden) return;
+    const sym = row.dataset.sym || (row.querySelector('.sym') || {}).textContent; const q = sym && Q[sym.trim()];
     let tag = row.querySelector('.live-px');
     if (!q || !q.ltp) { if (tag) tag.remove(); return; }
     if (!tag) { tag = document.createElement('span'); tag.className = 'live-px'; (row.querySelector('.num') || row.querySelector('.bg-pt span') || row).appendChild(tag); }
     const ch = q.prev ? (q.ltp / q.prev - 1) * 100 : null;
     const cls = 'live-px ' + (ch == null ? '' : ch >= 0 ? 'up' : 'down'); if (tag.className !== cls) tag.className = cls;
-    const html = `<i class="${LIVE.open ? 'on' : ''}"></i>${fmt(q.ltp, 2, 'en-IN')}${ch == null ? '' : ` ${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%`}`; if (tag.innerHTML !== html) tag.innerHTML = html;
-    tag.title = LIVE.open ? 'Live price from your Angel account, updates every 15 s' : "Today's last price from your Angel account";
+    const html = `<i class="${open ? 'on' : ''}"></i>${fmt(q.ltp, 2, MKT[mk].loc)}${ch == null ? '' : ` ${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%`}`; if (tag.innerHTML !== html) tag.innerHTML = html;
+    tag.title = open ? `Live price from ${src}` : `Last price from ${src}`;
   });
 }
 function liveBar() {
   const P = state._ps; if (!P || !P.s || !P.rows || P.rows.length < 3) return;
-  const q = LIVE.q[(P.sym || '').trim()]; if (!q || !q.ltp || state.mkt !== 'NSE') return;
+  const mk = viewMk(); const q = liveQ(mk)[(P.sym || '').trim()]; if (!q || !q.ltp) return;
   const last = P.rows[P.rows.length - 1], prev = P.rows[P.rows.length - 2];
   if (typeof last.time !== 'string' || (new Date(last.time) - new Date(prev.time)) / 864e5 > 4) return;   // daily charts only
-  const now = new Date(Date.now() + 5.5 * 3600e3); const today = now.toISOString().slice(0, 10);
+  const today = mk === 'NSE' ? new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10)
+    : new Date((q.t ? q.t * 1000 : Date.now())).toLocaleDateString('en-CA', { timeZone: mk === 'US' ? 'America/New_York' : 'Australia/Sydney' });
   if (today < last.time) return;
   const same = today === last.time;
   const o = same ? last.open : (q.open || q.ltp), h = Math.max(same ? last.high : 0, q.high || q.ltp, q.ltp), l = Math.min(same ? last.low : Infinity, q.low || q.ltp, q.ltp);
@@ -1711,7 +1729,7 @@ async function loadATH() {
   }
   state.ath = state.athC[mk];
   if (state.ath.tab === 'td' || state.ath.tab === 'pulse') state.ath.tab = 'brk';
-  const wireMk = () => el.querySelectorAll('.seg.mk button').forEach((b) => b.addEventListener('click', () => { state.athMkt = b.dataset.mk; try { localStorage.setItem('td_athmkt', b.dataset.mk); } catch (e) { /* */ } loadATH(); }));
+  const wireMk = () => el.querySelectorAll('.seg.mk button').forEach((b) => b.addEventListener('click', () => { setTimeout(livePoll, 600); state.athMkt = b.dataset.mk; try { localStorage.setItem('td_athmkt', b.dataset.mk); } catch (e) { /* */ } loadATH(); }));
   const { d } = state.ath;
   if (!d) { el.innerHTML = mkSeg + `<p class="empty">The ${MKT[mk].name} monthly-ATH scan appears after its first evening run. Try again later.</p>`; $('#asof').textContent = ''; wireMk(); return; }
   const lv = state.ath.live;
@@ -3155,7 +3173,7 @@ async function mxStock(m, r, mk, S) {
   } else if (rb) { rb.style.height = '0'; }
 }
 document.querySelectorAll('.views:not(.bg-nav) button').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
-document.querySelectorAll('.markets button').forEach((b) => b.addEventListener('click', () => { state.mkt = b.dataset.mkt; state.selected = null; loadTrends(); }));
+document.querySelectorAll('.markets button').forEach((b) => b.addEventListener('click', () => { state.mkt = b.dataset.mkt; state.selected = null; loadTrends(); setTimeout(livePoll, 600); }));
 document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => { state.tab = b.dataset.tab; state.selected = null; renderTrends(); }));
 $('#q').addEventListener('input', (e) => { state.q = e.target.value; renderList(); });
 $('#size').addEventListener('change', (e) => { state.size = e.target.value; renderList(); });

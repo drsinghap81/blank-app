@@ -114,3 +114,9 @@ or no system. Nothing changes until you type `ADOPT <SYMBOL>`. In Live mode that
 the system), places the protective GTT (ATH_NET_PCT below the system level), joins the daily stop raise, and shows the
 system's Sell signal when its rule breaks (you place the sell). Return in the hero counts from the adoption-day price.
 Dry run changes nothing. `RELEASE <SYMBOL>` cancels the GTT and stops managing it; the shares are untouched.
+
+## Live prices for the US / ASX shortlists (`GET /api/quotes_mkt?mk=US|ASX`)
+For the stocks the US / ASX plans shortlist (picks, near-trigger, sells, pattern watch), the server fetches prices from Yahoo
+Finance's public chart endpoint (Nasdaq-listed US stocks real time, others about 15 minutes delayed), cached ~45 s, using
+`requests` (no new package). The app shows them as live tags on the US / ASX Trends and ATH lists and grows today's daily
+candle, refreshing about once a minute while that market is open. Personal use; a paid product would need a licensed feed.
