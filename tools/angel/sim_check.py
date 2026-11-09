@@ -72,8 +72,8 @@ def path(o, h, l, c, steps=60):
     return out
 
 
-def run(start, mode="close", end=None, **over):
-    df = pd.read_csv(os.path.join(REPO, "data/futures/BANKNIFTY.csv"), index_col=0, parse_dates=True)[["Open", "High", "Low", "Close"]]
+def run(start, mode="close", end=None, symbol="BANKNIFTY", **over):
+    df = pd.read_csv(os.path.join(REPO, f"data/futures/{symbol}.csv"), index_col=0, parse_dates=True)[["Open", "High", "Low", "Close"]]
     if end:
         df = df.loc[:end]
     cfg = dict(tl.DEFAULT_CFG, entry_day_sl=mode, dry_run=True, **over)
@@ -101,7 +101,8 @@ def run(start, mode="close", end=None, **over):
         day.before_close(dict(ltp=bar.Close, open=bar.Open, high=bar.High, low=bar.Low))
         day.end_of_day(dict(Open=bar.Open, High=bar.High, Low=bar.Low, Close=bar.Close))
     bot = pd.DataFrame(st.trades)
-    eng = tbb.run_live(df, tbb.Params(start_flat_on=str(pd.Timestamp(start).date()), gap_pct=cfg["gap_pct"],
+    eng = tbb.run_live(df, tbb.Params(start_flat_on=str(pd.Timestamp(start).date()), gap_pct=cfg["gap_pct"], buffer_pts=cfg["buffer_pts"],
+                                       long_only=bool(cfg.get("long_only")),
                                        event_exit=bool(cfg.get("event_exit")),
                                        event_dates=tuple(cfg.get("event_dates") or ())))
     eng = eng[pd.to_datetime(eng.EntryDate) >= start].reset_index(drop=True)
@@ -111,7 +112,9 @@ def run(start, mode="close", end=None, **over):
 if __name__ == "__main__":
     start = pd.Timestamp(sys.argv[1] if len(sys.argv) > 1 else "2024-01-01")
     mode = sys.argv[2] if len(sys.argv) > 2 else "close"
-    bot, eng = run(start, mode)
+    sym = sys.argv[3] if len(sys.argv) > 3 else "BANKNIFTY"
+    over = dict(buffer_pts=12, long_only=True) if sym == "NIFTY" else {}
+    bot, eng = run(start, mode, symbol=sym, **over)
     bot["EntryDate"] = pd.to_datetime(bot.EntryDate)
     eng["EntryDate"] = pd.to_datetime(eng.EntryDate)
     m = bot.merge(eng, on=["EntryDate", "Side"], how="outer", suffixes=("_bot", "_eng"), indicator=True)

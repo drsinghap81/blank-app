@@ -42,8 +42,42 @@ class AngelBroker:
             raise RuntimeError(f"Angel login failed: {r}")
         self.log(f"Angel login OK ({e['ANGEL_CLIENT_CODE']}){' — DRY RUN, no orders will be sent' if self.dry else ''}")
         self.load_contracts()
+        out = e.get("TB_SESSION_OUT")
+        if out:                       # let a second bot (Nifty) use THIS session instead of logging in again
+            import json
+            from datetime import datetime
+            from zoneinfo import ZoneInfo
+            d = dict(day=str(datetime.now(ZoneInfo("Asia/Kolkata")).date()), access_token=getattr(self.api, "access_token", None),
+                     refresh_token=getattr(self.api, "refresh_token", None), feed_token=getattr(self.api, "feed_token", None),
+                     userId=getattr(self.api, "userId", None))
+            tmp = out + ".tmp"
+            fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+            with os.fdopen(fd, "w") as f:
+                json.dump(d, f)
+            os.replace(tmp, out)
+
+    def attach(self, path: str) -> bool:
+        """Use the session another bot already opened today (no second login, so neither session is invalidated)."""
+        import json
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from SmartApi import SmartConnect
+        try:
+            d = json.load(open(path))
+        except Exception:   # noqa: BLE001
+            return False
+        if d.get("day") != str(datetime.now(ZoneInfo("Asia/Kolkata")).date()) or not d.get("access_token"):
+            return False
+        self.api = SmartConnect(api_key=self.env["ANGEL_API_KEY"], access_token=d["access_token"],
+                                refresh_token=d.get("refresh_token"), feed_token=d.get("feed_token"), userId=d.get("userId"))
+        self.shared = True
+        self.log(f"Angel session shared from the main bot{' — DRY RUN, no orders will be sent' if self.dry else ''}")
+        self.load_contracts()
+        return True
 
     def logout(self):
+        if getattr(self, "shared", False) or self.env.get("TB_SESSION_OUT"):
+            return                    # the session is shared with the other bot: let it expire at midnight
         try:
             self.api.terminateSession(self.env["ANGEL_CLIENT_CODE"])
         except Exception:   # noqa: BLE001

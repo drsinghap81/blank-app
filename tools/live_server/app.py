@@ -975,37 +975,48 @@ def basket(body: Basket, _=Depends(auth)):
 # ------------------------------------------------------------------ Top Bottom bot (tools/angel/run_bot.py, TB_CHANNEL=app)
 TB_DIR = ENV.get("TB_STATE_DIR") or os.path.join(DATA, "tb")
 TB_APP = os.path.join(TB_DIR, "app")
+TB_DIRS = {"bn": TB_DIR, "nifty": ENV.get("TB_NIFTY_DIR") or os.path.join(DATA, "tb_nifty")}   # Bank Nifty (buy+sell), Nifty (buy only)
 
 
-def _tbr(name, default):
+def _tbdir(inst):
+    if inst not in TB_DIRS:
+        raise HTTPException(404, "unknown Top Bottom instrument")
+    return TB_DIRS[inst]
+
+
+def _tbr(name, default, inst="bn"):
     try:
-        return json.load(open(os.path.join(TB_APP, name)))
+        return json.load(open(os.path.join(_tbdir(inst), "app", name)))
+    except HTTPException:
+        raise
     except Exception:  # noqa: BLE001
         return default
 
 
-def _tbw(name, obj):
-    os.makedirs(TB_APP, exist_ok=True)
-    tmp = os.path.join(TB_APP, name + ".tmp"); json.dump(obj, open(tmp, "w")); os.replace(tmp, os.path.join(TB_APP, name))
+def _tbw(name, obj, inst="bn"):
+    d = os.path.join(_tbdir(inst), "app"); os.makedirs(d, exist_ok=True)
+    tmp = os.path.join(d, name + ".tmp"); json.dump(obj, open(tmp, "w")); os.replace(tmp, os.path.join(d, name))
 
 
-def tb_live():
+def tb_live(inst="bn"):
     try:
-        return bool(json.load(open(os.path.join(TB_DIR, "mode.json"))).get("live"))
+        return bool(json.load(open(os.path.join(_tbdir(inst), "mode.json"))).get("live"))
+    except HTTPException:
+        raise
     except Exception:  # noqa: BLE001
         return False
 
 
 @app.get("/api/tb")
-def tb_state(_=Depends(auth)):
-    msgs = []
+def tb_state(inst: str = "bn", _=Depends(auth)):
+    d = _tbdir(inst); msgs = []
     try:
-        with open(os.path.join(TB_APP, "messages.jsonl"), encoding="utf-8") as f:
+        with open(os.path.join(d, "app", "messages.jsonl"), encoding="utf-8") as f:
             msgs = [json.loads(x) for x in f.readlines()[-25:]]
     except Exception:  # noqa: BLE001
         pass
-    P = _tbr("pending.json", {}); A = _tbr("answers.json", {})
-    return dict(mode="LIVE" if tb_live() else "DRY RUN", status=_tbr("status.json", {}),
+    P = _tbr("pending.json", {}, inst); A = _tbr("answers.json", {}, inst)
+    return dict(inst=inst, installed=os.path.isdir(d), mode="LIVE" if tb_live(inst) else "DRY RUN", status=_tbr("status.json", {}, inst),
                 pending=[dict(key=k, **v) for k, v in P.items()], answers=A, messages=msgs[::-1])
 
 
@@ -1016,16 +1027,16 @@ class TBAnswer(BaseModel):
 
 
 @app.post("/api/tb/answer")
-def tb_answer(body: TBAnswer, _=Depends(auth)):
-    P = _tbr("pending.json", {})
+def tb_answer(body: TBAnswer, inst: str = "bn", _=Depends(auth)):
+    P = _tbr("pending.json", {}, inst)
     if body.key not in P:
         raise HTTPException(404, "that approval is no longer pending")
-    if body.value is True and tb_live() and body.confirm.strip().upper() != "YES":
+    if body.value is True and tb_live(inst) and body.confirm.strip().upper() != "YES":
         raise HTTPException(400, 'type YES to approve a live trade')
-    A = _tbr("answers.json", {}); A[body.key] = body.value; _tbw("answers.json", A)
+    A = _tbr("answers.json", {}, inst); A[body.key] = body.value; _tbw("answers.json", A, inst)
     if not P[body.key].get("options"):
-        P.pop(body.key); _tbw("pending.json", P)
-    log("tb_answer", key=body.key, value=body.value)
+        P.pop(body.key); _tbw("pending.json", P, inst)
+    log("tb_answer", inst=inst, key=body.key, value=body.value)
     return dict(ok=True)
 
 
@@ -1034,17 +1045,18 @@ class TBCmd(BaseModel):
 
 
 @app.post("/api/tb/cmd")
-def tb_cmd(body: TBCmd, _=Depends(auth)):
+def tb_cmd(body: TBCmd, inst: str = "bn", _=Depends(auth)):
     if body.cmd not in ("/status", "/stop", "/flat"):
         raise HTTPException(400, "unknown command")
-    C = _tbr("commands.json", []); C.append(body.cmd); _tbw("commands.json", C)
-    log("tb_cmd", cmd=body.cmd)
+    C = _tbr("commands.json", [], inst); C.append(body.cmd); _tbw("commands.json", C, inst)
+    log("tb_cmd", inst=inst, cmd=body.cmd)
     return dict(ok=True, note="the bot picks this up within a few seconds while it runs (09:00-15:30 IST)")
 
 
 @app.post("/api/tb/mode")
-def tb_mode(body: Mode, request: Request, _=Depends(auth)):
+def tb_mode(body: Mode, request: Request, inst: str = "bn", _=Depends(auth)):
     """same safety as the equity switch: live needs the app password + LIVE; dry run is one tap. Applies from the bot's next start."""
+    d = _tbdir(inst)
     if body.live:
         ip = request.client.host if request.client else "?"
         n, t0 = FAILS.get(ip, (0, 0))
@@ -1054,9 +1066,9 @@ def tb_mode(body: Mode, request: Request, _=Depends(auth)):
             raise HTTPException(400, "type LIVE to confirm")
         if not check_pw(body.password):
             FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
-    os.makedirs(TB_DIR, exist_ok=True)
-    json.dump(dict(live=bool(body.live), at=time.time()), open(os.path.join(TB_DIR, "mode.json"), "w"))
-    log("tb_mode", live=body.live)
+    os.makedirs(d, exist_ok=True)
+    json.dump(dict(live=bool(body.live), at=time.time()), open(os.path.join(d, "mode.json"), "w"))
+    log("tb_mode", inst=inst, live=body.live)
     return dict(ok=True, mode="LIVE" if body.live else "DRY RUN")
 
 

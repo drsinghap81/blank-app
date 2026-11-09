@@ -321,3 +321,19 @@ def test_sip(tmp_path):
     assert r2["sent"] and r2["results"][0]["ok"]
     assert c.post("/api/sip", headers=h, json={"items": [{"symbol": "MON100", "qty": 5}], "confirm": "SIP 1"}).status_code == 409   # once a day
     assert "MON100" not in A.journal()                                                                                      # not a system trade
+
+
+def test_tb_nifty_instance(tmp_path):
+    os.environ["TB_NIFTY_DIR"] = str(tmp_path / "tbn")
+    A, c = client(tmp_path)
+    sys.path.insert(0, os.path.join(HERE, "..", "angel")); from notify import AppChannel
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    ch = AppChannel(str(tmp_path / "tbn" / "app"), lambda *a: None)
+    ch.ask("BUY:25100.00", "BUY 1 lot(s) NIFTY FUT if it trades above 25,100.00")
+    j = c.get("/api/tb?inst=nifty", headers=h).json(); assert j["inst"] == "nifty" and j["pending"][0]["key"] == "BUY:25100.00"
+    assert not c.get("/api/tb", headers=h).json()["pending"]                                         # Bank Nifty untouched
+    assert c.post("/api/tb/answer?inst=nifty", headers=h, json={"key": "BUY:25100.00", "value": True}).json()["ok"] and ch.get("BUY:25100.00") is True
+    assert c.post("/api/tb/mode?inst=nifty", headers=h, json={"live": True, "password": "pw", "confirm": "LIVE"}).json()["mode"] == "LIVE"
+    assert c.get("/api/tb", headers=h).json()["mode"] == "DRY RUN"                                   # separate switches
+    assert c.get("/api/tb?inst=xyz", headers=h).status_code == 404
+    os.environ.pop("TB_NIFTY_DIR")

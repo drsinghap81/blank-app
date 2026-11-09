@@ -715,7 +715,7 @@ async function loadLive() {
     ${PF.systems.map((x) => `<div class="fact"><span>${esc(x.system)} (${x.n})</span><b class="${x.pnl >= 0 ? 'up' : 'down'}">${x.pct == null ? '' : `${x.pct >= 0 ? '+' : ''}${fmt(x.pct, 1)}%`}</b><small>${rs(x.pnl)}</small></div>`).join('')}</div></div>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${perfHtml}${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}
     <p class="lv-sub">🛡 <b>Daily stop raise:</b> Momentum stops follow the 30-week SMA, Trend 9/21 stops follow EMA 21, ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}% below, and only ever move up (the system itself sells on the close — see "Exits for the next open"). ${trTxt} <button class="lv-link" id="lvtrail">Check stops now</button></p></div>` : '';
-  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
+  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
     ${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div>
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub">${S ? (S.account_value != null ? `Angel account value ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} (the server never sizes above the account value; 0 = full account).` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
@@ -801,7 +801,7 @@ async function loadLive() {
   el.querySelectorAll('input[data-bq]').forEach((c) => c.addEventListener('input', bkUpd));
   const bk = $('#lvbkgo'); if (bk) bk.addEventListener('click', () => lvBasket(pick(), bk));
   state._lvBkUpd = bkUpd;
-  if (S) tbLoad();
+  if (S) { tbLoad(); tbLoad('nifty'); }
   state._lvMoreAll = false;
   const ma = $('#lvmoreall'); if (ma) ma.addEventListener('click', () => { state._lvMoreAll = !state._lvMoreAll; lvMoreUpd(); });
   lvMoreUpd();
@@ -903,9 +903,12 @@ async function lvQuotes(first) {
 }
 
 /* Top Bottom (Bank Nifty futures) bot: approve each level here; the bot on the server trades only approved levels */
-async function tbLoad() {
-  const box = $('#tbcard'); if (!box) return;
-  let T; try { T = await lvApi('/api/tb'); } catch (e) { box.innerHTML = ''; return; }
+async function tbLoad(inst = 'bn') {
+  const bn = inst === 'bn', px = bn ? 'tb' : 'tn';
+  const box = $(bn ? '#tbcard' : '#tbcardn'); if (!box) return;
+  let T; try { T = await lvApi('/api/tb' + (bn ? '' : '?inst=' + inst)); } catch (e) { box.innerHTML = ''; return; }
+  if (!bn && T.inst !== inst) { box.innerHTML = ''; return; }          // server not updated yet
+  if (!bn && T.installed === false) { box.innerHTML = '<div class="lv-card"><b>Top Bottom · Nifty futures · buy only</b><p class="lv-sub">Not installed on your server yet: run <code>sudo bash /opt/trenddesk/repo/tools/live_server/deploy/tb_nifty_setup.sh</code> once. It starts in Dry run.</p></div>'; return; }
   const S = T.status || {}; const live = T.mode === 'LIVE'; const lots = S.lots || 1;
   const pos = S.pos ? `<b class="${S.pos > 0 ? 'up' : 'down'}">${S.pos > 0 ? 'LONG' : 'SHORT'} ${Math.abs(S.qty || 0)} qty</b> ${esc(S.contract || '')} @ ${fmt(S.entry, 2, 'en-IN')} · stop ${fmt(S.stop, 2, 'en-IN')}` : '<b>Flat</b>';
   const ap = (T.pending || []).filter((p) => !p.options);
@@ -913,25 +916,25 @@ async function tbLoad() {
     return `<div class="tb-lvl"><span>${side === 'BUY' ? '▲ Buy' : '▼ Sell'} ${lots} lot ${side === 'BUY' ? 'above' : 'below'} <b>${fmt(v, 2, 'en-IN')}</b></span>${a === true ? '<span class="lv-st go">Approved</span>' : a === false ? '<span class="lv-st no">Skipped</span>' : ''}</div>`; };
   const pend = ap.map((p) => `<div class="tb-ask"><div>${esc(p.text)}</div><div><button class="lv-btn" data-tbk="${esc(p.key)}" data-v="1">Approve</button> <button class="lv-btn sell" data-tbk="${esc(p.key)}" data-v="0">Skip</button></div></div>`).join('');
   const msgs = (T.messages || []).slice(0, 6).map((m) => `<li>${new Date(m.t * 1000).toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · ${esc(m.text.split('\n')[0])}</li>`).join('');
-  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Top Bottom · Bank Nifty futures</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
-    <div class="lv-seg" role="group" aria-label="Top Bottom mode"><button id="tbdry" class="${live ? '' : 'on'}">Dry run</button><button id="tblive" class="${live ? 'on live' : ''}">Live orders</button></div>
-    <div id="tbarm" class="lv-form" hidden><input id="tbpw" type="password" placeholder="App password"><input id="tbcf" placeholder="Type LIVE" autocapitalize="characters"><button class="lv-btn sell" id="tbgo">Turn on live</button></div>
-    <p class="lv-sub">${pos}${S.ltp ? ` · BN fut ${fmt(S.ltp, 2, 'en-IN')}` : ''} · ${S.running ? '● bot running' : 'bot idle (starts 08:25 IST on weekdays)'}${S.note ? ' · ' + esc(S.note) : ''}</p>
-    ${S.pos ? '' : lvl('BUY', S.buy_lvl) + lvl('SELL', S.sell_lvl)}
+  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Top Bottom · ${bn ? 'Bank Nifty futures' : 'Nifty futures · buy only'}</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
+    <div class="lv-seg" role="group" aria-label="Top Bottom mode"><button id="${px}dry" class="${live ? '' : 'on'}">Dry run</button><button id="${px}live" class="${live ? 'on live' : ''}">Live orders</button></div>
+    <div id="${px}arm" class="lv-form" hidden><input id="${px}pw" type="password" placeholder="App password"><input id="${px}cf" placeholder="Type LIVE" autocapitalize="characters"><button class="lv-btn sell" id="${px}go">Turn on live</button></div>
+    <p class="lv-sub">${pos}${S.ltp ? ` · ${bn ? 'BN' : 'Nifty'} fut ${fmt(S.ltp, 2, 'en-IN')}` : ''} · ${S.running ? '● bot running' : `bot idle (starts ${bn ? '08:25' : '08:27'} IST on weekdays)`}${S.note ? ' · ' + esc(S.note) : ''}</p>
+    ${S.pos ? '' : lvl('BUY', S.buy_lvl) + (bn ? lvl('SELL', S.sell_lvl) : '')}
     ${pend ? `<p class="lv-sub" style="margin-top:8px"><b>Needs your OK</b> — the bot trades only approved levels; no answer = no trade.</p>${pend}` : ''}
-    ${S.running ? `<div style="margin-top:8px"><button class="lv-btn sell" id="tbstop" style="font-size:12px">Stop new trades today</button> ${S.pos ? '<button class="lv-btn sell" id="tbflat" style="font-size:12px">Square off…</button>' : ''}</div>` : ''}
+    ${S.running ? `<div style="margin-top:8px"><button class="lv-btn sell" id="${px}stop" style="font-size:12px">Stop new trades today</button> ${S.pos ? '<button class="lv-btn sell" id="${px}flat" style="font-size:12px">Square off…</button>' : ''}</div>` : ''}
     ${msgs ? `<details class="info"><summary>Bot messages</summary><ul class="tb-msgs">${msgs}</ul></details>` : ''}</div>`;
   box.querySelectorAll('[data-tbk]').forEach((b) => b.addEventListener('click', async () => {
     const yes = b.dataset.v === '1'; let confirm = '';
     if (yes && live) { confirm = window.prompt('LIVE: approve this Top Bottom trade on Angel?\nType YES to confirm:') || ''; if (confirm.trim().toUpperCase() !== 'YES') { alertMsg('Not approved.'); return; } }
-    try { await lvApi('/api/tb/answer', { method: 'POST', body: JSON.stringify({ key: b.dataset.tbk, value: yes, confirm }) }); alertMsg(yes ? 'Approved — the bot will trade this level if it comes.' : 'Skipped — this level will not be traded.', true); tbLoad(); } catch (e) { alertMsg(e.message); }
+    try { await lvApi('/api/tb/answer' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ key: b.dataset.tbk, value: yes, confirm }) }); alertMsg(yes ? 'Approved — the bot will trade this level if it comes.' : 'Skipped — this level will not be traded.', true); tbLoad(inst); } catch (e) { alertMsg(e.message); }
   }));
-  const cmd = async (c, msg) => { try { await lvApi('/api/tb/cmd', { method: 'POST', body: JSON.stringify({ cmd: c }) }); alertMsg(msg, true); setTimeout(tbLoad, 4000); } catch (e) { alertMsg(e.message); } };
-  const st = $('#tbstop'); if (st) st.addEventListener('click', () => cmd('/stop', 'No new Top Bottom trades today; an open position keeps its stop.'));
-  const fl = $('#tbflat'); if (fl) fl.addEventListener('click', () => cmd('/flat', 'Square-off requested — approve it in this card.'));
-  const dry = $('#tbdry'); if (dry) dry.addEventListener('click', async () => { if (!live) return; try { await lvApi('/api/tb/mode', { method: 'POST', body: JSON.stringify({ live: false }) }); alertMsg('Top Bottom: dry run from the next start.', true); tbLoad(); } catch (e) { alertMsg(e.message); } });
-  const lv = $('#tblive'); if (lv) lv.addEventListener('click', () => { if (!live) { const a = $('#tbarm'); a.hidden = !a.hidden; } });
-  const go = $('#tbgo'); if (go) go.addEventListener('click', async () => { try { await lvApi('/api/tb/mode', { method: 'POST', body: JSON.stringify({ live: true, password: $('#tbpw').value, confirm: $('#tbcf').value }) }); alertMsg('Top Bottom: LIVE orders from the bot\'s next start (08:25 IST).', true); tbLoad(); } catch (e) { alertMsg(e.message); } });
+  const cmd = async (c, msg) => { try { await lvApi('/api/tb/cmd' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ cmd: c }) }); alertMsg(msg, true); setTimeout(() => tbLoad(inst), 4000); } catch (e) { alertMsg(e.message); } };
+  const st = box.querySelector('#' + px + 'stop'); if (st) st.addEventListener('click', () => cmd('/stop', 'No new Top Bottom trades today; an open position keeps its stop.'));
+  const fl = box.querySelector('#' + px + 'flat'); if (fl) fl.addEventListener('click', () => cmd('/flat', 'Square-off requested — approve it in this card.'));
+  const dry = box.querySelector('#' + px + 'dry'); if (dry) dry.addEventListener('click', async () => { if (!live) return; try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: false }) }); alertMsg(`Top Bottom ${bn ? 'Bank Nifty' : 'Nifty'}: dry run from the next start.`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } });
+  const lv = box.querySelector('#' + px + 'live'); if (lv) lv.addEventListener('click', () => { if (!live) { const a = box.querySelector('#' + px + 'arm'); a.hidden = !a.hidden; } });
+  const go = box.querySelector('#' + px + 'go'); if (go) go.addEventListener('click', async () => { try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: true, password: box.querySelector('#' + px + 'pw').value, confirm: box.querySelector('#' + px + 'cf').value }) }); alertMsg(`Top Bottom ${bn ? 'Bank Nifty' : 'Nifty'}: LIVE orders from the bot's next start (${bn ? '08:25' : '08:27'} IST).`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } });
 }
 
 /* show as many next-ranked trades as the top 10 has unavailable ones (held, skipped, or blocked by a live check) */

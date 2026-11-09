@@ -114,10 +114,10 @@ def ask_levels(tg, st, cfg, plan, when="today"):
         if plan.get("buy_lvl"):
             k = f"BUY:{plan['buy_lvl']:.2f}"; keys.append(k)
             tg.ask(k, f"BUY {st.lots or cfg['lots']} lot(s) {cfg['symbol']} FUT if it trades above {plan['buy_lvl']:,.2f} ({when})")
-        if plan.get("sell_lvl"):
+        if plan.get("sell_lvl") and not cfg.get("long_only"):
             k = f"SELL:{plan['sell_lvl']:.2f}"; keys.append(k)
             tg.ask(k, f"SELL {st.lots or cfg['lots']} lot(s) {cfg['symbol']} FUT if it trades below {plan['sell_lvl']:,.2f} ({when})")
-    elif plan.get("prot_is_sys"):
+    elif plan.get("prot_is_sys") and not (cfg.get("long_only") and st.pos > 0):
         side = "SELL" if st.pos > 0 else "BUY"
         k = f"{side}:{plan['prot']:.2f}:REV"; keys.append(k)
         tg.ask(k, f"At the system stop {plan['prot']:,.2f}: REVERSE — {side} {2 * (st.lots or cfg['lots'])} lots in one go "
@@ -193,6 +193,15 @@ def morning_gate(cfg, tg, st, today) -> bool:
 
 
 def angel_login(br, cfg, tg, restarted=False):
+    src = br.env.get("TB_SESSION_FROM")
+    if src:                                   # second bot (Nifty): reuse the main bot's session until 09:05 IST
+        while now() < at("09:05"):
+            if br.attach(src):
+                return True
+            time.sleep(15)
+        if br.attach(src):
+            return True
+        log("main bot session not found by 09:05 IST: logging in separately")
     if cfg["login_mode"] != "code":
         br.login(); return True
     for attempt in range(2):
@@ -350,7 +359,7 @@ def main():
                 day.done_for_day = True
             if cfg["heartbeat_minutes"] and time.time() >= next_beat:
                 next_beat = time.time() + 60 * cfg["heartbeat_minutes"]
-                tg.send(f"💓 Running. BN {last_q['ltp']:,.0f} · "
+                tg.send(f"💓 Running. {cfg['symbol']} {last_q['ltp']:,.0f} · "
                         + (f"{'LONG' if st.pos > 0 else 'SHORT'} {abs(st.qty)} · P&L today ₹{pl:,.0f}" if st.pos else f"flat · P&L today ₹{pl:,.0f}"))
             day.tick(last_q)
             if hasattr(tg, "status") and int(time.time()) % 10 < cfg["poll_seconds"]:
@@ -374,7 +383,7 @@ def main():
         own.loc[pd.Timestamp(today)] = [bar["Open"], bar["High"], bar["Low"], bar["Close"]]
         own.sort_index().to_csv(HIST, index_label="Date")
         tomorrow = tl.make_plan(new_hist, st, cfg)
-        tg.send(f"Day closed. BN fut close {bar['Close']:,.2f}.\n\n" + tl.describe_plan(tomorrow, st, cfg))
+        tg.send(f"Day closed. {cfg['symbol']} fut close {bar['Close']:,.2f}.\n\n" + tl.describe_plan(tomorrow, st, cfg))
         ask_levels(tg, st, cfg, tomorrow, "next session")
         app_status(tg, st, cfg, tomorrow, running=False, note="day closed")
         log("done")

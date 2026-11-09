@@ -37,7 +37,7 @@ Type=simple
 User=trenddesk
 WorkingDirectory=/opt/trenddesk/var/tb
 EnvironmentFile=/opt/trenddesk/.env
-Environment=TB_STATE_DIR=/opt/trenddesk/var/tb TB_CHANNEL=app TB_CONFIG=/opt/trenddesk/var/tb/config.json
+Environment=TB_STATE_DIR=/opt/trenddesk/var/tb TB_CHANNEL=app TB_CONFIG=/opt/trenddesk/var/tb/config.json TB_SESSION_OUT=/opt/trenddesk/var/tb/session.json
 ExecStart=/opt/trenddesk/venv/bin/python /opt/trenddesk/repo/tools/angel/run_bot.py --no-pull
 Restart=on-failure
 RestartSec=60

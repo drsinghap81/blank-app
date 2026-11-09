@@ -61,6 +61,7 @@ DEFAULT_CFG = {
     "next_month_on_expiry_day": True,
     "dry_run": True,                 # True = real prices, simulated orders (nothing sent to Angel)
     "start_date": None,
+    "long_only": False,              # buy only (Nifty): no short entries; a long stopped at the system point just exits
 }
 
 
@@ -164,12 +165,16 @@ def describe_plan(plan: dict, st: State, cfg: dict) -> str:
     if st.pos == 0:
         L.append("Position: FLAT")
         L.append(f"BUY {st.lots or cfg['lots']} lots above {f(plan['buy_lvl'])}" if plan["buy_lvl"] else "No buy: awaiting new top")
-        L.append(f"SELL {st.lots or cfg['lots']} lots below {f(plan['sell_lvl'])}" if plan["sell_lvl"] else "No sell: awaiting new bottom")
+        if cfg.get("long_only"):
+            L.append("No sells: buy only")
+        else:
+            L.append(f"SELL {st.lots or cfg['lots']} lots below {f(plan['sell_lvl'])}" if plan["sell_lvl"] else "No sell: awaiting new bottom")
         L.append(f"Entry-day stop {cfg['day_sl_pct']}% from entry ({cfg['entry_day_sl']})")
     else:
         side = "LONG" if st.pos > 0 else "SHORT"
         L.append(f"Position: {side} {st.lots} lots from {f(st.entry)} ({st.entry_date}) in {st.contract}")
-        L.append(f"Stop {f(plan['prot'])}" + (" = system point → reverse" if plan["prot_is_sys"] else (" (breakeven)" if st.be_on else "")))
+        L.append(f"Stop {f(plan['prot'])}" + ((" = system point → exit (buy only)" if cfg.get("long_only") and st.pos > 0 else " = system point → reverse")
+                                               if plan["prot_is_sys"] else (" (breakeven)" if st.be_on else "")))
     L.append(f"Open beyond a level by > {cfg['gap_pct']}%: no new trade")
     return "\n".join(L)
 
@@ -239,11 +244,11 @@ class TradingDay:
                 self.keys["BUY"] = f"BUY:{p['buy_lvl']:.2f}"
                 if c["confirm_entries"]:
                     self.ap.ask(self.keys["BUY"], f"Approve BUY {st.lots} lots {c['symbol']} FUT above {p['buy_lvl']:,.2f} today?")
-            if p["sell_lvl"]:
+            if p["sell_lvl"] and not c.get("long_only"):
                 self.keys["SELL"] = f"SELL:{p['sell_lvl']:.2f}"
                 if c["confirm_entries"]:
                     self.ap.ask(self.keys["SELL"], f"Approve SELL {st.lots} lots {c['symbol']} FUT below {p['sell_lvl']:,.2f} today?")
-        elif p["prot_is_sys"]:
+        elif p["prot_is_sys"] and not (c.get("long_only") and st.pos > 0):
             self.keys["REV"] = f"{'SELL' if st.pos > 0 else 'BUY'}:{p['prot']:.2f}:REV"
             if c["confirm_reversals"]:
                 side = "SELL" if st.pos > 0 else "BUY"
@@ -292,7 +297,9 @@ class TradingDay:
                 reason = "System point" if is_sys else ("Breakeven" if st.be_on else "Max SL")
                 ref_px = min(o, prot) if side > 0 else max(o, prot)          # backtest booking price
                 reverse = False
-                if is_sys:
+                if is_sys and c.get("long_only") and side > 0:
+                    pass                                                   # buy only: exit, no reversal (as run_live long_only)
+                elif is_sys:
                     lvl = p["reverse_lvl"]
                     if side > 0:
                         st.used_B = p["bot"]
@@ -327,7 +334,7 @@ class TradingDay:
         st, p, c = self.st, self.plan, self.cfg
         o = self.open_px
         go_l = p["buy_lvl"] is not None and hi >= p["buy_lvl"] and not same(p["top"], st.used_T)
-        go_s = p["sell_lvl"] is not None and lo <= p["sell_lvl"] and not same(p["bot"], st.used_B)
+        go_s = (not c.get("long_only")) and p["sell_lvl"] is not None and lo <= p["sell_lvl"] and not same(p["bot"], st.used_B)
         if go_l and go_s:
             go_l = abs(o - p["buy_lvl"]) <= abs(o - p["sell_lvl"])
             go_s = not go_l
