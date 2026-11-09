@@ -69,7 +69,9 @@ def buckets(mk):
                     "buy-stop above the last pullback's high on 1.4x volume; stop = that pullback's low (max 10%); sell after a daily close below EMA 50.",
               test=("NSE 2017-26: +4.9% a trade (221 trades, 37% win), robust across rule variants; added to Momentum + Trend it gave "
                     "24.2-24.7%/yr vs 23.1% with a similar worst fall and nothing extra in 2022-26, so it is a watch bucket - your call.") if india
-                   else "Not tested on this market (NSE: +4.9% a trade). Watch bucket - your call."),
+                   else ("US 2008-26: +2.0% a trade (396 trades, 36% win); alone 8.5-8.9%/yr in 2017-26 vs the S&P 500 13.3%, weak 2008-16. "
+                         "Weaker than NSE - watch bucket, your call." if mk == "US" else
+                         "ASX 2008-26: about 3 setups a year (56 trades, +1.8% a trade) - too few to trust. Watch bucket - your call.")),
          dict(key="s1", name="System 1", status="off", pct=0, rules="Weekly RSI system (rules kept privately).",
               test="Off on NSE: below the Nifty in every version tested; a US paper candidate."),
          dict(key="wc", name="Wealth Creation", status="sip", pct=0, rules="ETF Pie funded by a monthly SIP, outside the systems' capital: Nifty 50, Midcap 150, Gold and US Nasdaq 100 ETFs at fixed weights (Equal, Balanced or Aggressive) rebalanced each quarter, or the monthly rotation (best 2 by 3-month return).", test="2016-26 monthly, price indices, 0.2% per switch: Equal 25% each 18.3%/yr, worst -15.7%; Balanced 30/20/30/20 17.6%, -14.7%; Aggressive 30/30/10/30 18.4%, -20.2%; rotation 17.7%, -12.8%; Nifty 50 11.6%, -29.3%.")]

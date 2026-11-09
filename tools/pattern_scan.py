@@ -397,7 +397,10 @@ def main(mk="NSE"):
                          "stop = the last contraction's low (max 10% away); sell after a daily close below EMA 50.",
                    backtest=("NSE 2017-26 (all stocks incl. delisted, costs): 221 trades, +4.9% a trade, 37% win; robust across 11 rule variants. "
                              "Added to Momentum + Trend in one account: 24.2-24.7%/yr vs 23.1%, worst fall about the same, nothing extra in 2022-26. Watch bucket - your call.")
-                            if not g else "Not tested on this market yet - the NSE result (+4.9% a trade) may not carry over. Watch bucket - your call.",
+                            if mk != "ASX" and g else ("US 2008-26 (3,460 current stocks, so survivorship flatters it): 396 trades, +2.0% a trade, 36% win; "
+                                 "alone 8.5-8.9%/yr in 2017-26 (worst fall -14%) vs the S&P 500 13.3%/yr (-34%), weak in 2008-16 (1.3%/yr); "
+                                 "with 4% swings only +0.7% a trade. Weaker than NSE - watch bucket, your call.") if g else
+                            "ASX 2008-26: only about 3 setups a year (56 trades, +1.8% a trade); without the volume rule -0.3% a trade. Too few to trust - watch bucket, your call.",
                    rows=vrows), open(f"{OUT}/vcp.json", "w"), indent=0)
     print("vcp", len(vrows), {k: sum(r["status"] == k for r in vrows) for k in VO})
     print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["sq9_match"] for r in srows), "on a Square-of-9 number")
