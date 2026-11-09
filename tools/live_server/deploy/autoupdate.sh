@@ -27,7 +27,10 @@ Persistent=true
 WantedBy=timers.target
 UNIT
   systemctl daemon-reload && systemctl enable --now trenddesk-autoupdate.timer >/dev/null
-  bash "$0" --now
+  git -C "$R" fetch -q origin main && git -C "$R" merge -q --ff-only origin/main
+  $V/bin/pip install -q -r "$R/tools/live_server/requirements.txt" >/dev/null 2>&1
+  [ -f "$R/tools/angel/requirements.txt" ] && $V/bin/pip install -q -r "$R/tools/angel/requirements.txt" >/dev/null 2>&1
+  systemctl restart trenddesk
   echo "AUTOUPDATE__INSTALLED  next checks: every 15 min ($(systemctl is-active trenddesk-autoupdate.timer))"; exit 0
 fi
 mkdir -p "$(dirname "$LOG")"
