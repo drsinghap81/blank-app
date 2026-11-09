@@ -283,3 +283,15 @@ def test_trail(tmp_path):
     # systems with a tested static stop are not trailed
     J = A.journal(); J[r["symbol"]]["system"] = "9/21 trend"; A.save_journal(J)
     assert not any(y["symbol"] == r["symbol"] for y in c.post("/api/trail", headers=h).json()["results"])
+
+
+def test_perf():
+    import app as A
+    J = {"AAA": dict(state="open", qty=10, entry=100.0, system="Monthly ATH", since="2026-10-01"),
+         "BBB": dict(state="pending", qty=5, entry=50.0),
+         "_done": {"CCC:2026-10-20": dict(state="sold", qty=4, entry=200.0, exit=250.0, system="Trend 9/21", since="2026-09-15"),
+                   "DDD:2026-10-21": dict(state="rejected", qty=3, entry=10.0)}}
+    P = A.perf_view(J, {"holdings": [{"symbol": "AAA", "ltp": 110.0}]})
+    assert P["open"] == dict(n=1, cost=1000.0, value=1100.0, pnl=100.0)
+    assert P["closed"]["n"] == 1 and P["closed"]["pnl"] == 200.0 and P["closed"]["wins"] == 1
+    assert P["total_pnl"] == 300.0 and P["total_pct"] == 16.67 and P["since"] == "2026-09-15"

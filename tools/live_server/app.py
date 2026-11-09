@@ -532,6 +532,32 @@ def trades_view(J, acc):
     return out, recent
 
 
+def perf_view(J, acc):
+    """Return on everything sent from the app: open trades at today's price plus closed trades at their exit (before costs)."""
+    ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
+    o = dict(n=0, cost=0.0, value=0.0); c = dict(n=0, cost=0.0, pnl=0.0, wins=0); sysd = {}; first = None
+    def add(sy, cost, pnl):
+        d = sysd.setdefault(sy or "Other", dict(cost=0.0, pnl=0.0, n=0)); d["cost"] += cost; d["pnl"] += pnl; d["n"] += 1
+    for sym, e in J.items():
+        if sym.startswith("_") or e.get("state", "open") != "open" or not (e.get("qty") and e.get("entry")):
+            continue
+        q, en = e["qty"], e["entry"]; px = ltp.get(sym) or en
+        o["n"] += 1; o["cost"] += q * en; o["value"] += q * px; add(e.get("system"), q * en, q * (px - en))
+        first = min(first or e.get("since") or "9", e.get("since") or "9")
+    for k, e in (J.get("_done") or {}).items():
+        if not (e.get("exit") and e.get("entry") and e.get("qty")):
+            continue          # rejected or cancelled orders never filled
+        q, en = e["qty"], e["entry"]; pnl = q * (e["exit"] - en)
+        c["n"] += 1; c["cost"] += q * en; c["pnl"] += pnl; c["wins"] += pnl > 0; add(e.get("system"), q * en, pnl)
+        first = min(first or e.get("since") or "9", e.get("since") or "9")
+    o["pnl"] = o["value"] - o["cost"]; tot = o["pnl"] + c["pnl"]; cost = o["cost"] + c["cost"]
+    r2 = lambda x: round(x, 2)
+    return dict(open=dict(n=o["n"], cost=r2(o["cost"]), value=r2(o["value"]), pnl=r2(o["pnl"])),
+                closed=dict(n=c["n"], cost=r2(c["cost"]), pnl=r2(c["pnl"]), wins=c["wins"]),
+                total_pnl=r2(tot), total_pct=r2(tot / cost * 100) if cost else None, since=None if first == "9" else first,
+                systems=[dict(system=k, n=v["n"], pnl=r2(v["pnl"]), pct=r2(v["pnl"] / v["cost"] * 100) if v["cost"] else None) for k, v in sysd.items()])
+
+
 _acc = {"t": 0, "d": None}
 
 
@@ -638,7 +664,7 @@ def sized(acc=None):
                 buckets=[dict(key=k, pct=AL[k], used=round(expo.get(k, 0.0)), room=round(max(0.0, room.get(k, 0.0)))) for k in AL],
                 swing=dict(risk_pct=round(SR * 100, 2), slots=sw_slots, max=SWING_MAX, open=len(sw_open), idle_cash=round(sw_cash), reserve_pct=SWING_RESERVE * 100),
                 mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,
-                trades=trades, recent=recent, protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100, trail_gap_pct=TRAIL_GAP * 100),
+                trades=trades, recent=recent, perf=perf_view(J, acc), protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100, trail_gap_pct=TRAIL_GAP * 100),
                 trail=last_trail())
 
 

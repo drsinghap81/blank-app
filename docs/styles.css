@@ -572,3 +572,8 @@ body.mode-bg .views:not(.bg-nav) { display: none; }
 .bg-wrap { min-width: 0; width: 100%; box-sizing: border-box; }
 .bg-wrap > * { min-width: 0; }
 body.bg-first .views { display: none !important; }
+.lv-perf { margin: 10px 0 6px; padding: 12px; border-radius: 12px; background: var(--soft); }
+.lv-perf-big { font-family: var(--font-head); font-size: 30px; font-weight: 700; }
+.lv-perf-big span { font-size: 16px; margin-left: 6px; }
+.lv-perf .facts { margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.lv-perf .fact small { display: block; color: var(--slate); font-size: 12px; }
