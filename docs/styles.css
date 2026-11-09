@@ -707,3 +707,6 @@ details.bkd.fold:not([open]) { padding-top: 12px; padding-bottom: 12px; }
 .mxl span { font-size: 11.5px; color: var(--slate); } .mxl b { font-size: 15px; font-variant-numeric: tabular-nums; }
 .mxl em { font-style: normal; font-size: 12px; font-weight: 600; } .mxl.up em { color: var(--rise-ink); } .mxl.down em { color: var(--fall-ink); }
 .mxl em.muted { color: var(--slate); font-weight: 500; white-space: normal; max-width: 240px; }
+/* iPhone: no rubber-band bounce of the whole page, so the header and the tab bar stay put while lists scroll (10 Nov 2026) */
+html, body { overscroll-behavior: none; }
+html { height: 100%; }
