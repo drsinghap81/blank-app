@@ -417,3 +417,6 @@ table.mxq td.up { color: #0A7A55; } table.mxq td.down { color: #D64545; }
 .lv-capline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0; } .lv-capline .lv-sub { flex: 1 1 200px; }
 .lv-bk select { padding: 3px 4px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: inherit; }
 .lv-bk td:first-child { width: 60%; }
+.lv-card .fact { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 10px; margin-top: 6px; font-size: 12.5px; }
+.lv-card .fact span { flex: 1 1 220px; } .lv-card .fact b { text-align: right; }
+.lv-card table.mini td, .lv-card table.mini th { white-space: nowrap; } .lv-card table.mini td:first-child { white-space: normal; min-width: 170px; }

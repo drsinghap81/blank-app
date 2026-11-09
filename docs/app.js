@@ -256,6 +256,45 @@ function lvBucketWire(el, mk, S) {
     if (S) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: S.picks || lvN('NSE'), alloc: { [x.dataset.al]: +x.value } }) }); } catch (e) { alertMsg(`Saved here; your server takes it after its next update (${e.message}).`); } }
     lvKeep(); }));
 }
+/* Idle cash (9 Nov 2026): cash the stock systems aren't using, minus 15% kept free for new breakouts. Tested (NSE 2017-26,
+   default mix + Top Bottom 1x): idle cash in LIQUIDBEES 34.7%/yr, -15.7% vs 33.2%, -15.9% left in cash; in the ETF rotation
+   36.3%, -16.7%. Shown as options; the choice is yours. */
+async function lvIdleCard(box, idle, held) {
+  if (!box) return;
+  const R = state.rot === undefined ? (state.rot = await getJSON(MAIN + 'data/scan/etf_rotation.json', 'etf rotation')) : state.rot;
+  const cur = (R && R.current) || {}; const N = (R && R.names) || {};
+  const w = {}; (cur.hold || []).forEach((s) => { w[s] = (w[s] || 0) + 1 / cur.hold.length; });
+  const px = (s) => (s === 'LIQUIDBEES' ? 1000 : ((R && R.prices) || {})[s]);
+  const rot = Object.keys(w).length ? Object.entries(w).map(([s, f]) => `${esc(s)} ${inr(idle * f)}${px(s) ? ` (≈ ${Math.floor(idle * f / px(s)).toLocaleString('en-IN')} units)` : ''}`).join(' + ') : 'appears after the ETF rotation run';
+  box.innerHTML = `<div class="lv-card"><b>Idle cash · ${inr(idle)}</b>
+    <p class="lv-sub">Cash the stock systems are not using after this plan${held ? '' : ' (holdings not checked without the server)'}, keeping 15% of capital free for new breakouts. Your choice:</p>
+    <div class="fact"><span><b>A. LIQUIDBEES</b> — tested +1.5 pts/yr and a slightly smaller worst fall (34.7%, −15.7% vs 33.2%, −15.9%)</span><b>${inr(idle)} ≈ ${Math.floor(idle / 1000).toLocaleString('en-IN')} units</b></div>
+    <div class="fact"><span><b>B. ETF rotation (${esc(cur.month || 'this month')})</b> — tested +3.1 pts/yr, worst fall −16.7%</span><b>${rot}</b></div>
+    <p class="lv-sub">Sell LIQUIDBEES first when a new trade needs cash (same-day). ${(cur.hold || []).length ? `Rotation picks this month: ${[...new Set(cur.hold)].map((s) => esc(N[s] || s)).join(', ')}.` : ''} Charts of every option are at the bottom of this tab.</p></div>`;
+}
+/* Backtest charts: each system alone and the mixes (data/scan/alloc_curves.json); pick the lines to compare */
+const CURVE_COL = ['#14213D', '#0E9F6E', '#3B82F6', '#E8A33D', '#8B5CF6', '#D64545', '#0EA5E9', '#A16207', '#64748B', '#DB2777', '#16A34A', '#9CA3AF'];
+async function lvCurveCard(box) {
+  if (!box) return;
+  const D = state.curves === undefined ? (state.curves = await getJSON(MAIN + 'data/scan/alloc_curves.json', 'alloc curves')) : state.curves;
+  if (!D) { box.innerHTML = ''; return; }
+  let sel; try { sel = JSON.parse(localStorage.getItem('td.curveSel') || 'null'); } catch (e) { sel = null; }
+  if (!Array.isArray(sel)) sel = ['mix_tb', 'mix_tb_liq', 'mix_tb_rot', 'best_tb', 'nifty'];
+  const S = D.series; const col = Object.fromEntries(S.map((x, i) => [x.key, CURVE_COL[i % CURVE_COL.length]]));
+  const grp = { mix: 'Mixes', one: 'Each strategy alone', bench: 'Benchmark' };
+  const chips = Object.keys(grp).map((g) => `<div class="lv-sub" style="margin-top:6px"><b>${grp[g]}</b></div><div class="tags">${S.filter((x) => x.group === g).map((x) => `<button class="chip lv-cv" data-k="${x.key}" style="cursor:pointer;border:1px solid ${col[x.key]};${sel.includes(x.key) ? `background:${col[x.key]};color:#fff` : ''}" aria-pressed="${sel.includes(x.key)}">${esc(x.name)}</button>`).join('')}</div>`).join('');
+  const sh = S.filter((x) => sel.includes(x.key)); const yrs = sh.length ? Object.keys(sh[0].years) : [];
+  const tbl = sh.length ? `<div style="overflow-x:auto"><table class="mini"><tr><th>Strategy</th><th>Per yr</th><th>Worst fall</th><th>2022–26</th>${yrs.map((y) => `<th>${y.slice(2)}</th>`).join('')}</tr>${sh.map((x) => `<tr><td><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${col[x.key]}"></i> ${esc(x.name)}</td><td><b>${fmt(x.cagr, 1)}%</b></td><td class="down">${fmt(x.dd, 1)}%</td><td>${fmt(x.cagr22, 1)}%</td>${yrs.map((y) => `<td class="${x.years[y] >= 0 ? 'up' : 'down'}">${fmt(x.years[y], 0)}</td>`).join('')}</tr>`).join('')}</table></div>` : '<p class="lv-sub">Pick at least one line.</p>';
+  box.innerHTML = `<div class="lv-card"><b>Backtest charts · systems and mixes</b><p class="lv-sub">${esc(D.note)} ${esc(D.period)} (2026 = to October), 100 at the start, log scale. Tap a name to add or remove it.</p>${chips}
+    <div class="chart" id="lvcv" style="height:260px;margin-top:8px"></div>${tbl}</div>`;
+  box.querySelectorAll('.lv-cv').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.k; sel = sel.includes(k) ? sel.filter((x) => x !== k) : sel.concat([k]);
+    try { localStorage.setItem('td.curveSel', JSON.stringify(sel)); } catch (e) { /* private mode */ } lvCurveCard(box); }));
+  const el = box.querySelector('#lvcv'); if (!el || !window.LightweightCharts) return;
+  const ch = window.LightweightCharts.createChart(el, { ...chartBase(), height: 260, width: el.clientWidth, rightPriceScale: { mode: 1, borderColor: C.line } });
+  sh.forEach((x) => ch.addLineSeries({ color: col[x.key], lineWidth: x.group === 'mix' ? 2 : 1, priceLineVisible: false, lastValueVisible: false })
+    .setData(x.t.map((t, i) => ({ time: t + '-28', value: x.v[i] }))));
+  ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: el.clientWidth })).observe(el);
+}
 const BK_HEAD = {
   tf: 'Monthly breakout after a 1–2 year cup (same trigger as Momentum). Stop for sizing = EMA 21 (at least 4% under the entry); exit when a daily close has EMA 9 below EMA 21 — this tab lists the sell for the next open. NSE 2017–26: 10.5%/yr alone, worst fall −15.6%; tested exits 5-day-low + Supertrend and weekly 9/21 did worse.',
   t9: 'Daily EMA 9 crosses above EMA 21 on a stock in an uptrend; buy next open; stop = 5-day low (max 12%); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle. NSE 2017–26: 20–26%/yr alone, worst fall −24 to −26%.',
@@ -414,7 +453,7 @@ async function loadLive() {
   const recent = S && S.recent && S.recent.length ? `<p class="lv-sub">Recent: ${S.recent.map((r) => `${esc(r.symbol)} ${esc(r.state)}${r.exit ? ' @ ' + fmt(r.exit, 2, 'en-IN') : ''}${r.text ? ' (' + esc(r.text) + ')' : ''}`).join(' · ')}</p>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}</div>` : '';
   el.innerHTML = `${lvSeg()}${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
-    ${lvBucketCard('NSE', P, alN, inUseN, S)}
+    ${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div>
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub">${S ? (S.account_value != null ? `Angel account value ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} (the server never sizes above the account value; 0 = full account).` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       <p class="lv-sub">Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high; stop = weekly close below the 30-week SMA, raised every week. Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
@@ -424,6 +463,7 @@ async function loadLive() {
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
     ${swCard('tf')}${swCard('t9')}${swCard('rt')}${swCard('pt')}
     <div class="lv-card"><b>Coming: Wealth Creation</b><p class="lv-sub">Empty bucket (0%) until you give the rules; it is backtested before it can trade.</p></div>
+    <div id="lvcurves"></div>
     ${(P.pattern_watch || []).length ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
       <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
@@ -437,6 +477,8 @@ async function loadLive() {
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   lvSegWire(el); lvBucketWire(el, 'NSE', S);
+  { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
+    const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
   lvSwWire(el, 'NSE', P.asof, rows);
   const srs = $('#lvsr'); if (srs) srs.addEventListener('change', async () => {
