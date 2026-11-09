@@ -66,7 +66,7 @@ def buckets(mk):
               test="Off: lagged the average stock in every industry lane (NSE 2017-26) and a random stock in the US/ASX test."),
          dict(key="s1", name="System 1", status="off", pct=0, rules="Weekly RSI system (rules kept privately).",
               test="Off on NSE: below the Nifty in every version tested; a US paper candidate."),
-         dict(key="wc", name="Wealth Creation", status="pending", pct=0, rules="Rules to come from Amritpal.", test="Not tested yet.")]
+         dict(key="wc", name="Wealth Creation", status="sip", pct=0, rules="ETF Pie funded by a monthly SIP, outside the systems' capital: Nifty 50, Midcap 150, Gold and US Nasdaq 100 ETFs at fixed weights (Equal, Balanced or Aggressive) rebalanced each quarter, or the monthly rotation (best 2 by 3-month return).", test="2016-26 monthly, price indices, 0.2% per switch: Equal 25% each 18.3%/yr, worst -15.7%; Balanced 30/20/30/20 17.6%, -14.7%; Aggressive 30/30/10/30 18.4%, -20.2%; rotation 17.7%, -12.8%; Nifty 50 11.6%, -29.3%.")]
     if india:
         B.append(dict(key="tb", name="Top Bottom", system="Top Bottom", status="active", pct=100, margin=True,
                       rules="Bank Nifty futures on the Top Bottom rules (separate bot, its own card). Uses margin from pledged holdings, "

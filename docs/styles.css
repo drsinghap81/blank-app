@@ -656,3 +656,14 @@ body.mode-bg .brand h1 { font-size: 22px; }
 .t2-why { margin-top: 12px; } .t2-why summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--slate); }
 .t2-why p { font-size: 14px; line-height: 1.5; color: var(--slate); }
 .t2-alert { margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: var(--fall-soft, var(--soft)); color: var(--fall-ink); font-weight: 600; font-size: 14px; }
+/* Wealth Creation ETF Pie */
+.wc-top { display: flex; gap: 14px; align-items: center; margin: 10px 0; }
+.wc-top .hero-dn b { font-family: var(--font-head); font-size: 18px; }
+.wc-pre { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 6px; margin: 4px 0 10px; }
+.wc-pre button { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; text-align: left; }
+.wc-pre button small { font-size: 11.5px; color: var(--slate); }
+.wc-pre button[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.wc-sip { display: flex; align-items: center; gap: 10px; margin: 6px 0; } .wc-sip label { font-size: 13px; color: var(--slate); }
+.wc-sip input { width: 130px; height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-weight: 600; }
+.wc-reb { margin: 8px 0; padding: 10px 12px; border-radius: 12px; background: var(--soft); font-size: 13.5px; }
+@media (max-width: 380px) { .wc-top { flex-direction: column; align-items: stretch; } .wc-top .hero-dn { align-self: center; } }

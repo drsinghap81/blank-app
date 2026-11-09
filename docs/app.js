@@ -204,6 +204,70 @@ function splitSheet(mk, P, S) {
   draw(); $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
 }
 
+/* ------------------------------------------------------------------ Wealth Creation · ETF Pie (9 Nov 2026)
+   A fixed basket fed by a monthly SIP, outside the systems' capital. Tested 2016-26 on monthly price indices, 0.2% per
+   switch (scratchpad etf/): Equal 18.3%/yr -15.7%, Balanced 17.6% -14.7%, Aggressive 18.4% -20.2% (all rebalanced each
+   quarter), rotation 17.7% -12.8%; Nifty 50 11.6% -29.3%. Plan only: you place the ETF orders in Angel. */
+const PIE_ETF = ['NIFTYBEES', 'MID150BEES', 'GOLDBEES', 'MON100'];
+const PIE_NM = { NIFTYBEES: 'Nifty 50', MID150BEES: 'Midcap 150', GOLDBEES: 'Gold', MON100: 'US Nasdaq 100', LIQUIDBEES: 'Liquid (cash)' };
+const PIE_C = { NIFTYBEES: '#7C8CFF', MID150BEES: '#2BB3A3', GOLDBEES: '#F2A93B', MON100: '#F472B6', LIQUIDBEES: '#9CA3AF' };
+const PIE_PRE = {
+  equal: { name: 'Equal', w: { NIFTYBEES: 25, MID150BEES: 25, GOLDBEES: 25, MON100: 25 }, ret: 18.3, dd: -15.7 },
+  bal: { name: 'Balanced', w: { NIFTYBEES: 30, MID150BEES: 20, GOLDBEES: 30, MON100: 20 }, ret: 17.6, dd: -14.7 },
+  aggr: { name: 'Aggressive', w: { NIFTYBEES: 30, MID150BEES: 30, GOLDBEES: 10, MON100: 30 }, ret: 18.4, dd: -20.2 },
+  rot: { name: 'Rotation', w: null, ret: 17.7, dd: -12.8 } };
+const pieCfg = () => { try { return JSON.parse(localStorage.getItem('td.pie') || '{}'); } catch (e) { return {}; } };
+const pieSave = (o) => { try { localStorage.setItem('td.pie', JSON.stringify({ ...pieCfg(), ...o })); } catch (e) { /* private mode */ } };
+function pieTarget(R) {
+  const c = pieCfg(), m = c.mode || 'equal';
+  if (m === 'custom' && c.w) return c.w;
+  if (m === 'rot') { const h = ((R && (R.current || {}).hold) || ['LIQUIDBEES', 'LIQUIDBEES']); const w = {}; h.forEach((s) => (w[s] = (w[s] || 0) + 100 / h.length)); return w; }
+  return PIE_PRE[m].w;
+}
+async function wcPie(box, S) {
+  if (!box) return;
+  if (state.rot === undefined) state.rot = await getJSON(MAIN + 'data/scan/etf_rotation.json', 'etf rotation');
+  const R = state.rot || {}; const px = { ...(R.prices || {}), LIQUIDBEES: 1000 };
+  (S && S.holdings || []).forEach((h) => { if (h.ltp) px[h.symbol] = h.ltp; });
+  const c = pieCfg(), m = c.mode || 'equal', W = pieTarget(R), amt = sipGet() || 10000;
+  const syms = Object.keys(W).filter((k) => W[k] > 0);
+  // this month's SIP in whole units; leftover stays as cash
+  // what you hold (server connected). LIQUIDBEES is left out: the systems also park idle cash there.
+  const H = {}; (S && S.holdings || []).forEach((h) => { if (PIE_ETF.includes(h.symbol)) H[h.symbol] = h.value; });
+  const hv = Object.values(H).reduce((a, v) => a + v, 0);
+  // this month's SIP goes to the slices furthest below target first (so you rarely need to sell); whole units, rest as cash
+  const need = syms.map((k) => ({ k, n: Math.max(0, (hv + amt) * W[k] / 100 - (H[k] || 0)) })); const nt = need.reduce((a, x) => a + x.n, 0) || 1;
+  let left = amt; const buy = need.map(({ k, n }) => { const u = px[k] ? Math.floor((hv ? n / nt * amt : amt * W[k] / 100) / px[k]) : 0; left -= u * (px[k] || 0); return { k, u, v: u * (px[k] || 0) }; });
+  const after = { ...H }; buy.forEach((b) => { if (b.k !== 'LIQUIDBEES') after[b.k] = (after[b.k] || 0) + b.v; }); const av = Object.values(after).reduce((a, v) => a + v, 0);
+  const drift = hv > 0 ? PIE_ETF.map((k) => ({ k, now: (after[k] || 0) / av * 100, tgt: W[k] || 0 })) : [];
+  const off = drift.filter((d) => Math.abs(d.now - d.tgt) >= 5 && px[d.k]);
+  const reb = off.map((d) => ({ k: d.k, u: Math.round((d.tgt - d.now) / 100 * av / px[d.k]) })).filter((x) => x.u);
+  const pre = PIE_PRE[m] || null;
+  box.innerHTML = `<div class="lv-card wc"><div style="display:flex;justify-content:space-between;align-items:center"><b>Wealth Creation · ETF Pie</b><span class="chip">monthly SIP</span></div>
+    <div class="wc-top"><div class="hero-dn">${donut(syms.map((k) => ({ v: W[k], col: PIE_C[k] })), 120, 18)}<div><b>${pre ? fmt(pre.ret, 1) + '%' : 'Custom'}</b><span>${pre ? 'a year · tested' : 'not tested'}</span></div></div>
+      <div class="hero-leg">${syms.map((k) => `<div><i style="background:${PIE_C[k]}"></i><span><b>${PIE_NM[k] || k}</b><small>${k}${hv ? ` · you hold ${fmt((H[k] || 0) / hv * 100, 0)}%` : ''}</small></span><em>${fmt(W[k], 0)}%</em></div>`).join('')}</div></div>
+    <div class="wc-pre">${Object.entries(PIE_PRE).map(([k, p]) => `<button data-pm="${k}" aria-pressed="${m === k}"><b>${p.name}</b><small>${fmt(p.ret, 1)}% · worst ${fmt(p.dd, 1)}%</small></button>`).join('')}<button data-pm="custom" aria-pressed="${m === 'custom'}"><b>Custom</b><small>your weights</small></button></div>
+    ${m === 'rot' ? `<p class="lv-sub">Rotation holds the best 2 by 3-month return, cash (LIQUIDBEES) when neither beats cash. This month: ${[...new Set(syms)].map((k) => PIE_NM[k] || k).join(' + ')}.</p>` : ''}
+    <div class="wc-sip"><label for="wcamt">Monthly SIP ₹</label><input id="wcamt" inputmode="numeric" value="${amt.toLocaleString('en-IN')}"></div>
+    <table class="mini"><tr><th>This month's SIP</th><th class="r">Units</th><th class="r">≈ ₹</th></tr>${buy.map((b) => `<tr><td>${b.k}</td><td class="r"><b>${b.u}</b></td><td class="r">${fmt(b.v, 0, 'en-IN')}</td></tr>`).join('')}
+      <tr><td class="muted">Left as cash</td><td></td><td class="r muted">${fmt(left, 0, 'en-IN')}</td></tr></table>
+    ${hv ? (reb.length ? `<div class="wc-reb"><b>Still off after this SIP</b> (5+ points): ${reb.map((x) => `${x.u > 0 ? 'buy' : 'sell'} ${Math.abs(x.u)} ${x.k}`).join(' · ')}${m === 'rot' && reb.some((x) => x.u < 0) ? '; park the proceeds in LIQUIDBEES' : ''}. Or let the next SIPs close the gap.</div>` : `<p class="lv-sub">Your Pie (${money(hv, 'NSE')}) stays within 5 points of target with this SIP: nothing to sell.</p>`) : `<p class="lv-sub">Once you hold these ETFs in Angel, this card shows your actual slices and when to rebalance.</p>`}
+    <p class="lv-sub">Prices: last close${S ? ' or your Angel holdings' : ''}. ${hv ? 'The SIP goes to the lightest slices first. ' : ''}Place the ETF buys in Angel (Delivery). ${m !== 'rot' && m !== 'custom' ? 'Rebalance each quarter.' : m === 'rot' ? 'Switch at the first open of each month.' : ''} Funded by the SIP, outside the systems' capital.</p></div>`;
+  box.querySelectorAll('[data-pm]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.pm === 'custom') { pieEdit(box, S); return; } pieSave({ mode: b.dataset.pm }); wcPie(box, S); }));
+  const a = box.querySelector('#wcamt'); a.addEventListener('change', () => { const v = Math.round(+String(a.value).replace(/[^0-9]/g, '')); if (v > 0) { sipSet(v); wcPie(box, S); } });
+}
+function pieEdit(box, S) {
+  const c = pieCfg(); const W = { ...(c.w || PIE_PRE.equal.w) };
+  const draw = () => { const tot = PIE_ETF.reduce((a, k) => a + (W[k] || 0), 0);
+    $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">Your Pie</h2><p class="muted" style="margin:0 0 6px;font-size:13px">Weights must add to 100%. Custom weights are not backtested.</p>
+      <div class="sp-dn">${donut(PIE_ETF.map((k) => ({ v: W[k] || 0, col: PIE_C[k] })), 170, 20)}<div><b class="${tot === 100 ? '' : 'muted'}">${tot}%</b><span>total</span></div></div>
+      ${PIE_ETF.map((k) => `<div class="sp-row"><i style="background:${PIE_C[k]}"></i><span><b>${PIE_NM[k]}</b><small>${k}</small></span><button data-dn="${k}">−</button><b class="sp-v">${W[k] || 0}%</b><button data-up="${k}">+</button></div>`).join('')}
+      <div class="sp-foot"><button class="lv-btn" id="pesave" ${tot === 100 ? '' : 'disabled'}>${tot === 100 ? 'Save Pie' : `Total ${tot}% — make it 100`}</button></div>`;
+    $('#sheet-body').querySelectorAll('[data-up],[data-dn]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.up || b.dataset.dn; W[k] = Math.max(0, Math.min(100, (W[k] || 0) + (b.dataset.up ? 5 : -5))); draw(); }));
+    $('#pesave').addEventListener('click', () => { pieSave({ mode: 'custom', w: W }); closeSheet(); wcPie(box, S); toast('Pie saved'); }); };
+  draw(); $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+}
+
 /* ------------------------------------------------------------------ Live prices (9 Nov 2026)
    The stocks our systems shortlist (today's buys, near-trigger, sell signals, your open trades) are priced by your
    server from Angel every 15 s in market hours. Lists elsewhere in the app get a live tag on those rows, and the
@@ -403,9 +467,9 @@ function lvRoomCut(rows, al, C0, used = {}) {
     return x; });
 }
 function lvBucketCard(mk, P, al, inUse, S) {
-  const B = (P.buckets && P.buckets.length) ? P.buckets : Object.keys(BK_DEF).filter((k) => mk === 'NSE' || k !== 'tb').map((k) => ({ key: k, name: BK_NAME[k], status: k === 'wc' ? 'pending' : BK_DEF[k] > 0 ? 'active' : 'off', rules: '', test: '' }));
+  const B = (P.buckets && P.buckets.length) ? P.buckets : Object.keys(BK_DEF).filter((k) => mk === 'NSE' || k !== 'tb').map((k) => ({ key: k, name: BK_NAME[k], status: k === 'wc' ? 'sip' : BK_DEF[k] > 0 ? 'active' : 'off', rules: '', test: '' }));
   const opts = [0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100, 150, 200];
-  const st = { active: '', off: '<span class="chip">off</span>', watch: '<span class="chip">watch only</span>', pending: '<span class="chip">rules coming</span>' };
+  const st = { sip: '<span class="chip">monthly SIP</span>', active: '', off: '<span class="chip">off</span>', watch: '<span class="chip">watch only</span>', pending: '<span class="chip">rules coming</span>' };
   const rowsH = B.map((b) => { const v = al[b.key] ?? 0; const o = opts.includes(v) ? opts : opts.concat([v]).sort((a, c) => a - c);
     return `<tr><td><b>${esc(b.name)}</b> ${st[b.status] || ''}${b.margin ? ' <span class="chip">margin</span>' : ''}</td>
       <td><select data-al="${b.key}" aria-label="${esc(b.name)} max share">${o.map((x) => `<option value="${x}" ${x === v ? 'selected' : ''}>${x}%</option>`).join('')}</select></td>
@@ -643,7 +707,7 @@ async function loadLive() {
       ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
-    ${swCard('tf')}${swCard('t9')}${swCard('rt')}${swCard('pt')}
+    ${swCard('tf')}${swCard('t9')}${swCard('rt')}${swCard('pt')}<div id="wccard"></div>
     <div id="lvcurves"></div>
     ${(P.pattern_watch || []).length ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
       <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}
@@ -657,7 +721,7 @@ async function loadLive() {
     try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); lvSave({ token: j.token }); loadLive(); } catch (e) { alertMsg(e.message); }
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -2538,7 +2602,7 @@ function renderPortfolio() {
     return '';
   };
   el.innerHTML = `<div style="margin:10px 16px 0"><button class="more" id="toresults">📊 Backtest results & paper book →</button></div>
-    <div id="rotcard"></div>
+    <div id="wccardpf"></div><div id="rotcard"></div>
     <div class="card">
       <div class="facts">
         <div class="fact"><span>Current value</span><b>${inr(val)}</b></div>
@@ -2566,7 +2630,7 @@ function renderPortfolio() {
       <tbody>${P.c.map((c, j) => ({ ...c, j })).reverse().map((c) => `<tr><td>${day(c.xd)}</td><td>${esc(c.s)}<div class="co">${fmt(c.q, 0, 'en-IN')} × ${fmt(c.a, 2, 'en-IN')} → ${fmt(c.x, 2, 'en-IN')}</div></td>
         <td class="r ${sgn(c.q * (c.x - c.a))}">${inr(c.q * (c.x - c.a))}</td><td><button class="linkbtn" data-undo="${c.j}">undo</button></td></tr>`).join('')}</tbody></table></div></div>` : ''}
     <p class="muted small pad">Your holdings are stored only in this app on this phone — never uploaded or shared. Use the download button to keep a backup (clearing Safari data erases them). Prices: every NSE stock, about 15 minutes delayed in market hours, otherwise the last close. P&amp;L is before brokerage and taxes.</p>`;
-  rotCard();
+  rotCard(); wcPie($("#wccardpf"), null);
   $('#pf-add').onclick = () => pfForm();
   $('#pf-imp').onclick = () => pfImport();
   el.querySelectorAll('.pf-row').forEach((li) => (li.onclick = () => pfForm(+li.dataset.i)));
