@@ -389,3 +389,12 @@ def test_quotes_mkt(tmp_path):
     assert c.get("/api/quotes_mkt?mk=XX", headers=h).status_code == 404
     from datetime import datetime, timezone
     assert A.mkt_open("US", datetime(2026, 11, 9, 15, 0, tzinfo=timezone.utc)) and not A.mkt_open("US", datetime(2026, 11, 9, 22, 0, tzinfo=timezone.utc))
+
+
+def test_indices(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    seen = []
+    A.yq = lambda sym, mk: (seen.append((sym, mk)) or dict(ltp=25000.0, prev=24900.0, high=25100.0, low=24800.0, open=24950.0, t=0))
+    j = c.get("/api/indices", headers=h).json()
+    assert j["rows"][0]["name"] == "Nifty 50" and j["rows"][0]["grp"] == "IN" and ("^NSEI", "RAW") in seen and len(j["rows"]) == len(A.INDICES)

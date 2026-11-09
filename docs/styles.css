@@ -699,3 +699,10 @@ details.bkd[open] > summary.bk-sum { margin-bottom: 8px; padding-bottom: 8px; bo
 details.bkd > summary.bk-sum b { flex: 1; min-width: 0; }
 details.bkd.fold > summary.bk-sum > * { flex: 1; min-width: 0; }
 details.bkd.fold:not([open]) { padding-top: 12px; padding-bottom: 12px; }
+/* live indices strip on Markets */
+.mxlive { display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px 2px; scrollbar-width: none; }
+.mxlive::-webkit-scrollbar { display: none; }
+.mxlive:empty { display: none; }
+.mxl { flex: none; display: flex; flex-direction: column; gap: 1px; padding: 8px 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); min-width: 104px; }
+.mxl span { font-size: 11.5px; color: var(--slate); } .mxl b { font-size: 15px; font-variant-numeric: tabular-nums; }
+.mxl em { font-style: normal; font-size: 12px; font-weight: 600; } .mxl.up em { color: var(--rise-ink); } .mxl.down em { color: var(--fall-ink); }

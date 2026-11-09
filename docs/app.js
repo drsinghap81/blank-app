@@ -2952,10 +2952,23 @@ async function mxSignals(mk) {
     nbrk: at ? (at.breakouts || []).length : 0, nnear: at ? (at.near || []).length : 0 };
   return state.mxSig[mk];
 }
+/* live indices strip on Markets (10 Nov 2026): your server reads Yahoo every ~30 s; nightly numbers below stay as they are */
+async function mxLive(force) {
+  const box = document.getElementById('mxlive'); if (!box || !lvCfg().url) return;
+  const fresh = state.idx && Date.now() - state.idxAt < 28000;
+  if (!fresh || force) { try { state.idx = await lvApi('/api/indices'); state.idxAt = Date.now(); } catch (e) { box.innerHTML = ''; return; } }
+  const R = (state.idx && state.idx.rows) || []; if (!R.length) { box.innerHTML = ''; return; }
+  const dp = (v) => (v >= 1000 ? 0 : 2);
+  box.innerHTML = R.map((r) => { const ch = r.prev ? (r.ltp / r.prev - 1) * 100 : null;
+    return `<div class="mxl ${ch == null ? '' : ch >= 0 ? 'up' : 'down'}"><span>${esc(r.name)}</span><b>${fmt(r.ltp, dp(r.ltp), 'en-IN')}</b><em>${ch == null ? '' : `${ch >= 0 ? '▲' : '▼'} ${fmt(Math.abs(ch), 2)}%`}</em></div>`; }).join('');
+  box.title = 'Live from Yahoo Finance via your server (index levels; some markets ~15 min delayed). Updated ' + new Date((state.idx.at || 0) * 1000).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' });
+  clearTimeout(state._mxT); state._mxT = setTimeout(() => { if (state.view === 'mk') mxLive(true); }, 30000);
+}
 function mxCrumb() {
+  setTimeout(() => mxLive(false), 0);
   const x = state.mx; const parts = [['world', 'World']];
   if (x.m) parts.push(['market', MKT[x.m].name]); if (x.sec) parts.push(['sector', x.sec]); if (x.grp) parts.push(['industry', x.grp]);
-  return `<nav class="mxcrumb">${parts.map(([l, n], i) => (i === parts.length - 1 ? `<b>${esc(n)}</b>` : `<a href="#" data-l="${l}">${esc(n)}</a> ›`)).join(' ')}</nav>`;
+  return `<div class="mxlive" id="mxlive"></div><nav class="mxcrumb">${parts.map(([l, n], i) => (i === parts.length - 1 ? `<b>${esc(n)}</b>` : `<a href="#" data-l="${l}">${esc(n)}</a> ›`)).join(' ')}</nav>`;
 }
 /* lists sorted by momentum lane, gaining strength first, then by the quarter -> week gain */
 const MX_LANE = { build: 0, hold: 1, mid: 2, bounce: 3, fade: 4, weak: 5 };

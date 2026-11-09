@@ -1032,13 +1032,41 @@ def mkt_open(mk, t=None):
 
 
 def yq(sym, mk):
-    y = sym.replace(".", "-") + (".AX" if mk == "ASX" else "")
+    y = sym if mk == "RAW" else sym.replace(".", "-") + (".AX" if mk == "ASX" else "")
     r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{y}", params=dict(interval="1d", range="1d"),
                      headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=10)
     r.raise_for_status(); res = r.json()["chart"]["result"][0]; m = res["meta"]
     op = ((res.get("indicators") or {}).get("quote") or [{}])[0].get("open") or [None]
     return dict(ltp=m.get("regularMarketPrice"), prev=m.get("chartPreviousClose") or m.get("previousClose"), high=m.get("regularMarketDayHigh"),
                 low=m.get("regularMarketDayLow"), open=op[-1] if op else None, t=m.get("regularMarketTime"))
+
+
+INDICES = [("Nifty 50", "^NSEI", "IN"), ("Bank Nifty", "^NSEBANK", "IN"), ("Sensex", "^BSESN", "IN"), ("S&P 500", "^GSPC", "US"),
+           ("Nasdaq 100", "^NDX", "US"), ("Dow", "^DJI", "US"), ("ASX 200", "^AXJO", "AU"), ("Nikkei", "^N225", "W"),
+           ("Gold", "GC=F", "W"), ("Brent", "BZ=F", "W"), ("USD/INR", "INR=X", "W")]
+
+
+@app.get("/api/indices")
+def indices(_=Depends(auth)):
+    """live index levels for the Markets tab (Yahoo chart endpoint, cached ~30 s)."""
+    c = _mq.get("_idx")
+    if c and time.time() - c[0] < 30:
+        return c[1]
+    from concurrent.futures import ThreadPoolExecutor
+    out = {}
+    def one(it):
+        name, y, grp = it
+        try:
+            q = yq(y, "RAW")
+            if q.get("ltp"):
+                out[name] = dict(q, grp=grp)
+        except Exception:  # noqa: BLE001
+            pass
+    with ThreadPoolExecutor(6) as ex:
+        list(ex.map(one, INDICES))
+    res = dict(rows=[dict(name=n, **out[n]) for n, _, _ in INDICES if n in out], at=int(time.time()))
+    _mq["_idx"] = (time.time(), res)
+    return res
 
 
 @app.get("/api/quotes_mkt")
