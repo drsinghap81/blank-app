@@ -642,6 +642,11 @@ async function loadLive() {
   const c = lvCfg(); let S = null; let err = '';
   if (c.url && c.token) { try { S = await lvApi('/api/plan'); } catch (e) { err = e.message; } }
   let rows = S ? S.rows : lvLocalSize(P);
+  if (!rows.some((r) => r.kind === 'PATTERN')) rows = rows.concat((P.pattern_watch || []).filter((x) => x.close && x.stop && x.stop < x.close).map((x, k) => ({
+    ...x, id: `PAT-${x.symbol}-${x.signal_date || ''}`, system: 'Bottom pattern', bucket: 'pt', kind: 'PATTERN', tier: 'swing', price: x.close, ref: x.close, rank: k + 1,
+    risk_pct: (1 - x.stop / x.close) * 100, qty: 0, value: 0, local: true, exit_rule: 'pattern stop only (no tested exit)', when: 'next open',
+    note: `${PAT_NM[x.typ] || x.typ} broke its neckline ${fmt(x.neck, 2, 'en-IN')} on ${x.signal_date || ''}`,
+    skip: S ? 'Send arrives with your server\'s next update (08:00 IST weekdays)' : 'connect your server to size and send' })));
   // server not updated yet (no capital setting): scale its sizes down to the capital set here (smaller orders are always allowed)
   let capSet = 0; try { capSet = +localStorage.getItem('td.lvCapSet') || 0; } catch (e) { /* */ }
   if (S && S.account_value == null && capSet > 0 && capSet < S.capital) {
@@ -695,13 +700,15 @@ async function loadLive() {
   const grp = (f) => byStr(rows.map((r, i) => [r, i]).filter(([r]) => f(r)));
   const list = grp((r) => r.tier === 'top').map(([r, i], k) => rowHtml(r, i, false, k + 1)).join('')
     + grp((r) => r.tier === 'more').map(([r, i], k) => rowHtml(r, i, k === 0, k + 1)).join('');
+  const bkOpen = (k, dflt) => { let o = null; try { o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}')[k]; } catch (e) { /* */ } return (o ?? dflt) ? 'open' : ''; };
   const swCard = (b) => { const L = grp((r) => r.tier === 'swing' && bkOf(r) === b).map(([r, i], k) => rowHtml(r, i, false, k + 1)).join(''); const pe = rows.filter((r) => r.tier === 'swing' && bkOf(r) === b && !r.skip && r.qty > 0);
     if (!L && b !== 'tf') return '';
     const off = (alN[b] ?? 0) <= 0;
-    return `<div class="lv-card${off ? ' lv-offbk' : ''}"><div style="display:flex;justify-content:space-between"><b>${BK_NAME[b]} · ${off ? '0% · your call' : `max ${alN[b] ?? 0}%`}</b><span class="muted">${off ? `${pe.length} setup${pe.length === 1 ? '' : 's'}` : `${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), 'NSE')}`}</span></div>
+    const nL = rows.filter((r) => r.tier === 'swing' && bkOf(r) === b).length;
+    return `<details class="lv-card bkd${off ? ' lv-offbk' : ''}" data-bk="${b}" ${bkOpen(b, !off)}><summary class="bk-sum"><b>${BK_NAME[b]} · ${off ? '0% · your call' : `max ${alN[b] ?? 0}%`}</b><span class="muted">${off ? `${nL} setup${nL === 1 ? '' : 's'}` : `${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), 'NSE')}`}</span></summary>
       ${off ? `<p class="lv-sub lv-offnote">Switched off in your split: ${b === 'pt' ? 'bottom patterns showed no edge in the 2017–26 test' : b === 'rt' ? 'retests lost about 1.3%/yr in the full-account test' : 'not part of the tested mix'}. Sized at the swing risk from your cash so you can decide; protective stop at the plan stop.</p>` : ''}
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">${BK_HEAD[b]}</p></details>${b === 'tf' ? lvSwingHead(srNow, S && !S.swing ? Math.max(0, S.cash - 0.15 * S.capital) : idleNow, 'NSE', S && S.swing ? S.swing.open : null) + (S && !S.swing && swRows.length ? '<p class="lv-sub"><b>View only until your server updates</b> (it updates itself at 08:00 IST on weekdays): sized here from your cash; place these in the Angel app, or Send them after the update.</p>' : '') : ''}
-      ${L || '<p class="empty">No new signals for the next session.</p>'}</div>`; };
+      ${L || '<p class="empty">No new signals for the next session.</p>'}</details>`; };
   const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span></div>
       <div class="lv-sub">${esc(e.system)}: ${esc(e.why)} · ${S ? `you hold ${e.qty}` : 'matched to your holdings once the server is connected'}</div></div>
       <div>${S && e.qty > 0 ? `<button class="lv-btn sell" data-x="${i}">Sell ${e.qty}</button>` : ''}</div></div>`).join('');
@@ -728,17 +735,17 @@ async function loadLive() {
     <p class="lv-sub">🛡 <b>Daily stop raise:</b> Momentum stops follow the 30-week SMA, Trend 9/21 stops follow EMA 21, ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}% below, and only ever move up (the system itself sells on the close — see "Exits for the next open"). ${trTxt} <button class="lv-link" id="lvtrail">Check stops now</button></p></div>` : '';
   el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}
     ${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div>
-    <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
+    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', true)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '' : `<span class="lv-sub"><a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high; stop = weekly close below the 30-week SMA, raised every week. Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
         <p class="lv-sub">${S ? 'Tick trades for the basket and adjust quantities, then send them together; the PDF takes your ticked trades, or the top ' + nP + ' if none.' : `Tick up to ${nP} picks (top ${nP} by rank to start).`}</p><p class="lv-sub lv-pickhelp"></p></details>${S && S.picks == null ? '<p class="lv-sub"><b>Server update pending:</b> your server updates itself at 08:00 IST on weekdays; until then its sizes below still use 10 positions.</p>' : ''}
       ${S && pend.length ? '<p class="lv-sub"><span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
-      ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
+      ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</details>
     ${swCard('tf')}${swCard('t9')}${swCard('rt')}${swCard('pt')}<div id="wccard"></div>
     <div id="lvcurves"></div>
-    ${(P.pattern_watch || []).length && !rows.some((r) => r.kind === 'PATTERN') ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
+    ${false ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
       <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
@@ -751,6 +758,7 @@ async function loadLive() {
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
+  el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
   lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) adoptCard(false); wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }

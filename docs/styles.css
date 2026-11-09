@@ -690,3 +690,10 @@ body.mode-bg .brand h1 { font-size: 22px; }
 .strm.s1 i.on { background: #F2A93B; } .strm.s2 i.on { background: #84CC16; } .strm.s3 i.on { background: var(--rise); }
 .lv-offbk { border-style: dashed; }
 .lv-offnote { color: var(--warn-ink, var(--slate)); }
+/* collapsible bucket cards */
+details.bkd > summary.bk-sum { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+details.bkd > summary.bk-sum::-webkit-details-marker { display: none; }
+details.bkd > summary.bk-sum::after { content: '›'; font-size: 22px; line-height: 1; color: var(--slate); transition: transform .2s; flex: none; }
+details.bkd[open] > summary.bk-sum::after { transform: rotate(90deg); }
+details.bkd[open] > summary.bk-sum { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+details.bkd > summary.bk-sum b { flex: 1; min-width: 0; }
