@@ -1053,18 +1053,26 @@ def indices(_=Depends(auth)):
     if c and time.time() - c[0] < 30:
         return c[1]
     from concurrent.futures import ThreadPoolExecutor
-    out = {}
+    out, errs = {}, []
     def one(it):
         name, y, grp = it
         try:
             q = yq(y, "RAW")
             if q.get("ltp"):
-                out[name] = dict(q, grp=grp)
-        except Exception:  # noqa: BLE001
-            pass
+                out[name] = dict(q, grp=grp, src="yahoo")
+        except Exception as ex:  # noqa: BLE001
+            errs.append(f"{name}: {str(ex)[:80]}")
     with ThreadPoolExecutor(6) as ex:
         list(ex.map(one, INDICES))
-    res = dict(rows=[dict(name=n, **out[n]) for n, _, _ in INDICES if n in out], at=int(time.time()))
+    try:                                   # India from Angel when Yahoo didn't answer (Yahoo can refuse cloud servers)
+        for n, q in broker.index_quotes().items():
+            if n not in out:
+                out[n] = dict(q, grp="IN", src="angel")
+    except Exception as ex:  # noqa: BLE001
+        errs.append(f"Angel indices: {str(ex)[:80]}")
+    if errs:
+        log("indices_errors", n=len(errs), first=errs[0])
+    res = dict(rows=[dict(name=n, **out[n]) for n, _, _ in INDICES if n in out], at=int(time.time()), errors=errs[:3])
     _mq["_idx"] = (time.time(), res)
     return res
 

@@ -398,3 +398,13 @@ def test_indices(tmp_path):
     A.yq = lambda sym, mk: (seen.append((sym, mk)) or dict(ltp=25000.0, prev=24900.0, high=25100.0, low=24800.0, open=24950.0, t=0))
     j = c.get("/api/indices", headers=h).json()
     assert j["rows"][0]["name"] == "Nifty 50" and j["rows"][0]["grp"] == "IN" and ("^NSEI", "RAW") in seen and len(j["rows"]) == len(A.INDICES)
+
+
+def test_indices_fallback(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    def boom(sym, mk):
+        raise RuntimeError("429 Too Many Requests")
+    A.yq = boom
+    j = c.get("/api/indices", headers=h).json()
+    assert [r["name"] for r in j["rows"]] == ["Nifty 50"] and j["rows"][0]["src"] == "angel" and "429" in j["errors"][0]

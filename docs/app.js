@@ -2956,8 +2956,13 @@ async function mxSignals(mk) {
 async function mxLive(force) {
   const box = document.getElementById('mxlive'); if (!box || !lvCfg().url) return;
   const fresh = state.idx && Date.now() - state.idxAt < 28000;
-  if (!fresh || force) { try { state.idx = await lvApi('/api/indices'); state.idxAt = Date.now(); } catch (e) { box.innerHTML = ''; return; } }
-  const R = (state.idx && state.idx.rows) || []; if (!R.length) { box.innerHTML = ''; return; }
+  if (!fresh || force) { try { state.idx = await lvApi('/api/indices'); state.idxAt = Date.now(); state.idxErr = null; } catch (e) { state.idxErr = e.message; } }
+  const R = (state.idx && state.idx.rows) || [];
+  if (!R.length) {                      // say why instead of hiding the strip
+    const why = state.idxErr ? (/404|Not Found/i.test(state.idxErr) ? 'your server is still on the older version' : /log in|401/i.test(state.idxErr) ? 'sign in again in Live' : state.idxErr)
+      : ((state.idx && state.idx.errors) || [])[0] || 'no prices returned';
+    box.innerHTML = `<div class="mxl"><span>Live indices</span><b>–</b><em class="muted">unavailable: ${esc(String(why).slice(0, 90))}</em></div>`;
+    clearTimeout(state._mxT); state._mxT = setTimeout(() => { if (state.view === 'mk') mxLive(true); }, 60000); return; }
   const dp = (v) => (v >= 1000 ? 0 : 2);
   box.innerHTML = R.map((r) => { const ch = r.prev ? (r.ltp / r.prev - 1) * 100 : null;
     return `<div class="mxl ${ch == null ? '' : ch >= 0 ? 'up' : 'down'}"><span>${esc(r.name)}</span><b>${fmt(r.ltp, dp(r.ltp), 'en-IN')}</b><em>${ch == null ? '' : `${ch >= 0 ? '▲' : '▼'} ${fmt(Math.abs(ch), 2)}%`}</em></div>`; }).join('');

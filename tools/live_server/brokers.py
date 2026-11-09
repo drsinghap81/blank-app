@@ -132,6 +132,18 @@ class AngelEquity:
         d = self._data(self._call(api.ltpData, "NSE", ts, t["token"])) or {}
         return float(d.get("ltp") or 0)
 
+    def index_quotes(self):
+        """Nifty 50, Bank Nifty and Sensex from Angel (index tokens), as a backup to Yahoo for the Markets strip."""
+        api = self._session(); out = {}
+        d = self._data(self._call(api.getMarketData, "OHLC", {"NSE": ["99926000", "99926009"], "BSE": ["99919000"]})) or {}
+        names = {"99926000": "Nifty 50", "99926009": "Bank Nifty", "99919000": "Sensex"}
+        for q in d.get("fetched") or []:
+            n = names.get(str(q.get("symbolToken")))
+            if n and q.get("ltp"):
+                out[n] = dict(ltp=float(q["ltp"]), prev=float(q.get("close") or 0) or None, high=float(q.get("high") or 0), low=float(q.get("low") or 0),
+                              open=float(q.get("open") or 0), t=None)
+        return out
+
     def quotes(self, symbols):
         """Live LTP + previous close for up to 50 NSE symbols in one call (Angel market-data 'OHLC' mode)."""
         api = self._session(); tok = {}
@@ -270,6 +282,9 @@ class MockBroker(AngelEquity):
 
     def quotes(self, symbols):
         return {s: dict(ltp=100.0 + i, prev=99.0 + i, high=101.0 + i, low=98.0 + i, open=99.5 + i) for i, s in enumerate(symbols)}
+
+    def index_quotes(self):
+        return {"Nifty 50": dict(ltp=25000.0, prev=24900.0, high=25050.0, low=24880.0, open=24910.0, t=None)}
 
     def orders(self):
         return [dict(id=o["id"], symbol=o["p"]["tradingsymbol"].replace("-EQ", ""), side=o["p"]["transactiontype"], status=o["status"],
