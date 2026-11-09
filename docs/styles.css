@@ -697,3 +697,5 @@ details.bkd > summary.bk-sum::after { content: '›'; font-size: 22px; line-heig
 details.bkd[open] > summary.bk-sum::after { transform: rotate(90deg); }
 details.bkd[open] > summary.bk-sum { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
 details.bkd > summary.bk-sum b { flex: 1; min-width: 0; }
+details.bkd.fold > summary.bk-sum > * { flex: 1; min-width: 0; }
+details.bkd.fold:not([open]) { padding-top: 12px; padding-bottom: 12px; }

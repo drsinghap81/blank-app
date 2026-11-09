@@ -705,7 +705,7 @@ async function loadLive() {
     if (!L && b !== 'tf') return '';
     const off = (alN[b] ?? 0) <= 0;
     const nL = rows.filter((r) => r.tier === 'swing' && bkOf(r) === b).length;
-    return `<details class="lv-card bkd${off ? ' lv-offbk' : ''}" data-bk="${b}" ${bkOpen(b, !off)}><summary class="bk-sum"><b>${BK_NAME[b]} · ${off ? '0% · your call' : `max ${alN[b] ?? 0}%`}</b><span class="muted">${off ? `${nL} setup${nL === 1 ? '' : 's'}` : `${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), 'NSE')}`}</span></summary>
+    return `<details class="lv-card bkd${off ? ' lv-offbk' : ''}" data-bk="${b}" ${bkOpen(b, false)}><summary class="bk-sum"><b>${BK_NAME[b]} · ${off ? '0% · your call' : `max ${alN[b] ?? 0}%`}</b><span class="muted">${off ? `${nL} setup${nL === 1 ? '' : 's'}` : `${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), 'NSE')}`}</span></summary>
       ${off ? `<p class="lv-sub lv-offnote">Switched off in your split: ${b === 'pt' ? 'bottom patterns showed no edge in the 2017–26 test' : b === 'rt' ? 'retests lost about 1.3%/yr in the full-account test' : 'not part of the tested mix'}. Sized at the swing risk from your cash so you can decide; protective stop at the plan stop.</p>` : ''}
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">${BK_HEAD[b]}</p></details>${b === 'tf' ? lvSwingHead(srNow, S && !S.swing ? Math.max(0, S.cash - 0.15 * S.capital) : idleNow, 'NSE', S && S.swing ? S.swing.open : null) + (S && !S.swing && swRows.length ? '<p class="lv-sub"><b>View only until your server updates</b> (it updates itself at 08:00 IST on weekdays): sized here from your cash; place these in the Angel app, or Send them after the update.</p>' : '') : ''}
       ${L || '<p class="empty">No new signals for the next session.</p>'}</details>`; };
@@ -735,7 +735,7 @@ async function loadLive() {
     <p class="lv-sub">🛡 <b>Daily stop raise:</b> Momentum stops follow the 30-week SMA, Trend 9/21 stops follow EMA 21, ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}% below, and only ever move up (the system itself sells on the close — see "Exits for the next open"). ${trTxt} <button class="lv-link" id="lvtrail">Check stops now</button></p></div>` : '';
   el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}
     ${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div>
-    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', true)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
+    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '' : `<span class="lv-sub"><a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high; stop = weekly close below the 30-week SMA, raised every week. Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
@@ -922,6 +922,31 @@ async function lvQuotes(first) {
   const t = $('#lvqt'); if (t) t.textContent = `${j.market_open ? 'Live prices' : 'Market closed – last prices'} · ${j.ist.slice(11, 19)} IST`;
   if (j.market_open) state._lvQT = setTimeout(() => lvQuotes(false), 15000);
 }
+
+/* Fold every Live card to a one-line header (10 Nov 2026): less scrolling. The account summary (hero) and Sell signals stay
+   open; everything else opens on tap and remembers its state on this device. Cards that load later are folded as they arrive. */
+const FOLD_KEY = 'td.cardOpen';
+function lvFold(root) {
+  if (!root) return;
+  let st = {}; try { st = JSON.parse(localStorage.getItem(FOLD_KEY) || '{}'); } catch (e) { /* */ }
+  root.querySelectorAll('div.lv-card').forEach((c) => {
+    if (c.dataset.fold || c.classList.contains('hero') || c.closest('details.bkd, details.lv-bkfold')) return;
+    const h = c.firstElementChild; if (!h) return;
+    const title = (h.querySelector('b') || h).textContent.trim();
+    if (!title || /^Exits for the next open/.test(title)) { c.dataset.fold = 'skip'; return; }
+    const key = title.replace(/[\d,.₹%·()\-–]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
+    const d = document.createElement('details'); d.className = c.className + ' bkd fold'; d.dataset.fold = key;
+    if (c.id) d.id = c.id;
+    const sm = document.createElement('summary'); sm.className = 'bk-sum'; sm.appendChild(h);
+    d.appendChild(sm); while (c.firstChild) d.appendChild(c.firstChild);
+    if (st[key]) d.open = true;
+    d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem(FOLD_KEY) || '{}'); o[key] = d.open; localStorage.setItem(FOLD_KEY, JSON.stringify(o)); } catch (e) { /* */ } });
+    sm.addEventListener('click', (e) => { if (e.target.closest('button, input, select, a, label')) e.preventDefault(); });   // buttons in a header don't fold the card
+    c.replaceWith(d);
+  });
+}
+{ let ft = null; const v = document.getElementById('view-live');
+  if (v) new MutationObserver(() => { clearTimeout(ft); ft = setTimeout(() => lvFold(v), 60); }).observe(v, { childList: true, subtree: true }); }
 
 /* Adopt holdings (9 Nov 2026): stocks you hold in Angel but didn't buy through the app. The app SUGGESTS a system from the
    stock's own chart; nothing changes until you type ADOPT <SYMBOL>. Adopted = protective stop on Angel (Live), the daily
