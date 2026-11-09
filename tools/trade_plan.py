@@ -34,14 +34,16 @@ LEGACY_921 = True      # 9/21 on any trend stock (trend_scan.json): its own buck
 
 
 def buckets(mk):
-    """Live systems as capital buckets (Amritpal, 9 Nov 2026). pct = the most of your capital the bucket may hold; buckets share
-    one cash pool, Momentum first; the swing buckets leave 15% of capital in cash for new Momentum breakouts.
-    NSE one-account test 2017-26 (1% risk of total capital each, 10% max a stock, 10 positions a bucket, 3 random fill orders):
-      Momentum alone 17.3%/yr, worst fall -16.8% (49% invested on average)
-      Momentum <= 60% + Trend 9/21 <= 40%: 23.1%, -21.4% (2022-26: 25.9%, -13.0%)   <- default
-      Momentum <= 60% + Trend 9/21 <= 25%: 20.6%, -20.4%;  Trend 9/21 alone: 10.5%, -15.6%.
-      + 9/21 on any trend stock on the cash still idle (15% kept for Momentum): 27.4%, -23.2% (2022-26 27.4%, -16.8%)  <- default
-      (Momentum + that 9/21 without the cup 9/21: 26.3%, -20.2%)."""
+    """Live systems as capital buckets. pct = the most of your capital the bucket may hold; buckets share one cash pool,
+    Momentum first; the other stock buckets leave 15% of capital in cash for new Momentum breakouts.
+    Optimised 9 Nov 2026 (scratchpad combo/alloc.py: one NSE account 2017-26, every bucket simulated with real positions,
+    1% risk of total capital, 10% max a stock, 10 positions a bucket, 3 random fill orders; 80 cap combinations, then
+    Top Bottom added on pledge margin at realistic fills):
+      Momentum <= 60% + Trend 9/21 <= 40%                       23.1%/yr, worst fall -21.4% (2022-26 25.9%, -13.2%)
+      + Top Bottom 1x (Rs 20L notional per Rs 20L)  <- default 33.2%/yr, -15.9% (2022-26 29.6%, -15.9%; without 2020 25.2%)
+      + 9/21 any stock <= 40% (instead of off)                    36.2%, -23.3% at TB 1x / 24.8%, -28.0% without TB
+      Breakout retests in the portfolio: -1.3%/yr alone (slots fill with the weak clusters) -> off.
+    Systems 1-3 (tested 9 Nov) did not beat the Nifty or duplicated Momentum -> System 2/3 removed, System 1 off."""
     india = mk == "NSE"
     B = [dict(key="mom", name="Momentum Investing", system="Monthly ATH", status="active", pct=60,
               rules="Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high. "
@@ -50,31 +52,27 @@ def buckets(mk):
          dict(key="tf", name="Trend Following 9/21", system=TF_SYS, status="active", pct=40,
               rules="Same monthly breakout with a 1-2 year cup. Stop for sizing: EMA 21 (min 4% under the entry); "
                     "exit when a daily close has EMA 9 below EMA 21 (sell next open).",
-              test="NSE 2017-26 alone 10.5%/yr, worst fall -15.6%; with Momentum (60/40, one account) 23.1%/yr, -21.4%. "
-                   "Other exits tested worse: 5-day-low + Supertrend 11.5%/-20.6%, weekly 9/21 14.7%/-33.8%." if india else "Not tested on US/ASX yet (paper record tracks it)."),
-         dict(key="t9", name="9/21 Trend (any stock)", system="9/21 trend", status="active", pct=40,
-              rules="Daily EMA 9 crosses above EMA 21 on a stock in an uptrend (trend scan); buy next open; stop = 5-day low "
-                    "(max 12% away); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle.",
-              test="NSE 2017-26 alone 20-26%/yr, worst fall -24 to -26%; Momentum + Trend 9/21 + this on idle cash: 27.4%/yr, -23.2%." if india
-                   else "US/ASX: no edge over the index in the 2008-26 test (paper record tracks it)."),
-         dict(key="rt", name="Breakout retest", system="Breakout retest", status="active", pct=15,
-              rules="First return to an old breakout level; stop 1 ATR under it, 3R target, out after 120 days. "
-                    + ("Skipped in Weak/Fading industries." if india else "Experimental."),
-              test="NSE 2017-26: +0.17 to +0.24R a trade in Building/Strong/Middle industries vs +0.09R random." if india
-                   else "US/ASX 2008-26: worse than a random stock the same day (+0.19R vs +0.25R)."),
-         dict(key="pt", name="Bottom pattern", system="Bottom pattern", status="watch" if india else "active", pct=0 if india else 5,
+              test="NSE 2017-26 alone 10.5%/yr, worst fall -15.6%; with Momentum (60/40, one account) 23.1%/yr, -21.4%." if india
+                   else "Not tested on US/ASX yet (paper record tracks it)."),
+         dict(key="t9", name="9/21 Trend (any stock)", system="9/21 trend", status="off", pct=0,
+              rules="Daily EMA 9 crosses above EMA 21 on a stock in an uptrend; stop = 5-day low (max 12%); exit on Supertrend(10,3) red.",
+              test="Off: in the full one-account test it adds about 1.7 points a year but deepens the worst fall from -21% to -28% "
+                   "(with Top Bottom: 36.2%, -23.3% vs 33.2%, -15.9%). Alone 20.7%/yr, -22.9%."),
+         dict(key="rt", name="Breakout retest", system="Breakout retest", status="off", pct=0,
+              rules="First return to an old breakout level; stop 1 ATR under it, 3R target, out after 120 days.",
+              test="Off: +0.2R a trade on average, but as a 10-slot portfolio -1.3%/yr (the trades it can take cluster in falling markets)."),
+         dict(key="pt", name="Bottom pattern", system="Bottom pattern", status="off", pct=0,
               rules="Double/triple bottom, tilted W, inverse H&S neckline breakout; stop under the pattern, measured-move target, 120 days.",
-              test="Lagged the average stock in every industry lane on NSE 2017-26 (watch list only)." if india
-                   else "US/ASX 2008-26: +2.5% vs +5.0% for a random stock over 120 days (experimental)."),
-         dict(key="s1", name="System 1", status="pending", pct=0, rules="Rules to come from Amritpal.", test="Not tested yet."),
-         dict(key="s2", name="System 2", status="pending", pct=0, rules="Rules to come from Amritpal.", test="Not tested yet."),
-         dict(key="s3", name="System 3", status="pending", pct=0, rules="Rules to come from Amritpal.", test="Not tested yet."),
+              test="Off: lagged the average stock in every industry lane (NSE 2017-26) and a random stock in the US/ASX test."),
+         dict(key="s1", name="System 1", status="off", pct=0, rules="Weekly RSI system (rules kept privately).",
+              test="Off on NSE: below the Nifty in every version tested; a US paper candidate."),
          dict(key="wc", name="Wealth Creation", status="pending", pct=0, rules="Rules to come from Amritpal.", test="Not tested yet.")]
     if india:
-        B.append(dict(key="tb", name="Top Bottom", system="Top Bottom", status="active", pct=15, margin=True,
-                      rules="Index futures on the hourly Top Bottom rules (separate bot, its own card). Uses margin from pledged "
-                            "holdings, not cash; % = the capital its lots are sized on.",
-                      test="2017-26 with the stock book on pledge margin: see the Top Bottom tab (bot stays in DRY RUN until you switch it)."))
+        B.append(dict(key="tb", name="Top Bottom", system="Top Bottom", status="active", pct=100, margin=True,
+                      rules="Bank Nifty futures on the Top Bottom rules (separate bot, its own card). Uses margin from pledged holdings, "
+                            "not cash. % = futures notional as a share of capital: 100% = Rs 20L notional on Rs 20L (about 1 lot).",
+                      test="Alone 2017-26: about 8%/yr at realistic fills, worst fall -12.5%; moves against stocks (correlation -0.1 to -0.2), "
+                           "so it cuts the book's worst fall from -21% to -16%. Bot stays in DRY RUN until you switch it."))
     return B
 
 

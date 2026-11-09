@@ -27,8 +27,8 @@ BENCH = {"US": "^GSPC", "ASX": "^AXJO"}
 START = 100_000.0
 RISK, CAP, MAXPOS, COST, RESERVE = 0.01, 0.10, 10, 0.001, 0.15
 # bucket caps (9 Nov 2026): the most of equity each system may hold (the Live tab's default allocation)
-RULES = "1% risk to the stop, max 10% a stock; buckets: Momentum <= 60%, Trend 9/21 <= 40%, 9/21 any stock <= 40%, retests <= 15%, patterns <= 5% of equity; 10 Momentum + 10 swing positions, swing keeps 15% cash for Momentum; Trend 9/21 exits on a daily EMA 9/21 cross; fills at the next open, 0.1% cost a side"
-BUCKET = {"Monthly ATH": 0.60, "Trend 9/21": 0.40, "Breakout retest": 0.15, "Bottom pattern": 0.05, "9/21 trend": 0.40}
+RULES = "1% risk to the stop, max 10% a stock; buckets: Momentum <= 60%, Trend 9/21 <= 40% of equity (9/21 any stock, retests, patterns off since 9 Nov); 10 Momentum + 10 swing positions, swing keeps 15% cash for Momentum; Trend 9/21 exits on a daily EMA 9/21 cross; fills at the next open, 0.1% cost a side"
+BUCKET = {"Monthly ATH": 0.60, "Trend 9/21": 0.40, "Breakout retest": 0.0, "Bottom pattern": 0.0, "9/21 trend": 0.0}   # optimised 9 Nov
 
 
 def load(p, d):

@@ -245,14 +245,15 @@ def test_buckets(tmp_path):
     A, c = client(tmp_path)
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     P = c.get("/api/plan", headers=h).json()
-    B = {b["key"]: b for b in P["buckets"]}; assert B["mom"]["pct"] == 60 and B["tf"]["pct"] == 40 and B["t9"]["pct"] == 40 and B["s1"]["pct"] == 0
+    B = {b["key"]: b for b in P["buckets"]}; assert B["mom"]["pct"] == 60 and B["tf"]["pct"] == 40 and B["t9"]["pct"] == 0 and B["s1"]["pct"] == 0 and B["tb"]["pct"] == 100
     assert all(r.get("bucket") in ("mom", "tf", "t9", "rt", "pt") for r in P["rows"])
-    j = c.post("/api/picks", headers=h, json={"alloc": {"tf": 1, "rt": 0, "bogus": 50}}).json()
+    j = c.post("/api/picks", headers=h, json={"alloc": {"tf": 1, "rt": 0, "t9": 0, "bogus": 50}}).json()
     assert j["alloc"]["tf"] == 1 and "bogus" not in j["alloc"] and j["picks"] == 10
     P2 = c.get("/api/plan", headers=h).json()
     tf = [r for r in P2["rows"] if r["bucket"] == "tf" and not r["skip"]]
     assert sum(r["value"] for r in tf) <= 0.01 * 2000000 + max([r.get("trigger") or r["price"] for r in tf] or [0])
-    assert all(r["skip"] for r in P2["rows"] if r["bucket"] == "rt")
+    assert all(r["skip"] for r in P2["rows"] if r["bucket"] in ("rt", "t9"))
+    assert all("switched off" in r["skip"] or r["skip"] in ("already held",) for r in P["rows"] if r["bucket"] in ("rt", "t9") and r["skip"])
     mom = [r for r in P2["rows"] if r["bucket"] == "mom" and not r["skip"]]
     assert sum(r["value"] for r in mom) <= 0.60 * 2000000 + 1
     assert A.protect_level("TF_BRK", 100) < 100           # Trend 9/21: safety net only, the system exits on the EMA cross

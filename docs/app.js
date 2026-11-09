@@ -213,12 +213,12 @@ const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH t
 /* Systems as capital buckets (9 Nov 2026): % = the most of your capital a system may hold; all share one cash pool,
    Momentum first, swing buckets keep 15% in cash for Momentum. NSE one-account test 2017-26: Momentum <= 60% + Trend 9/21 <= 40%
    23.1%/yr, worst fall -21.4%; Momentum alone 17.3%, -16.8%. */
-const BK_DEF = { mom: 60, tf: 40, t9: 40, rt: 15, pt: 0, s1: 0, s2: 0, s3: 0, wc: 0, tb: 15 };
-const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', s1: 'System 1', s2: 'System 2', s3: 'System 3', wc: 'Wealth Creation', tb: 'Top Bottom' };
+const BK_DEF = { mom: 60, tf: 40, t9: 0, rt: 0, pt: 0, s1: 0, wc: 0, tb: 100 };   // optimised 9 Nov 2026
+const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', s1: 'System 1', wc: 'Wealth Creation', tb: 'Top Bottom' };
 const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : r.kind === 'PATTERN' ? 'pt' : r.kind === 'T921' ? 't9' : 'tf');
 function lvAlloc(mk, P, S) {
   if (S && S.buckets) return { ...BK_DEF, ...Object.fromEntries(S.buckets.map((b) => [b.key, b.pct])) };
-  let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc_' + mk) || '{}'); } catch (e) { /* private mode */ }
+  let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc2_' + mk) || '{}'); } catch (e) { /* private mode */ }
   return { ...BK_DEF, ...Object.fromEntries((P.buckets || []).map((b) => [b.key, b.pct])), ...o };
 }
 /* cut picked rows (in rank order) to each bucket's room: pct x capital minus what the bucket already holds */
@@ -228,31 +228,31 @@ function lvRoomCut(rows, al, C0, used = {}) {
     const pick = r.tier === 'swing' ? r.want !== false && !r.skip : !r.off && r.picked !== false;
     if (!pick || !(r.qty > 0)) return r;
     const E = r.trigger || r.price; let q = r.qty; let skip = r.skip || '';
-    if (q * E > room[b]) { const q2 = Math.floor(Math.max(0, room[b]) / E); if (q2 <= 0 || q2 < 0.25 * q) { q = 0; skip = `bucket full (${BK_NAME[b]} max ${al[b] ?? 0}% of capital)`; } else q = q2; }
+    if (q * E > room[b]) { const q2 = Math.floor(Math.max(0, room[b]) / E); if (q2 <= 0 || q2 < 0.25 * q) { q = 0; skip = (al[b] ?? 0) <= 0 ? `${BK_NAME[b]} is switched off (0%)` : `bucket full (${BK_NAME[b]} max ${al[b]}% of capital)`; } else q = q2; }
     room[b] -= q * E;
     const x = { ...r, qty: q, value: q * E, risk_amt: q * (E - r.stop), pct_cap: q * E / C0 * 100, skip };
     if (!q) { if (r.tier === 'swing') x.picked = false; else { x.picked = false; } }
     return x; });
 }
 function lvBucketCard(mk, P, al, inUse, S) {
-  const B = (P.buckets && P.buckets.length) ? P.buckets : Object.keys(BK_DEF).filter((k) => mk === 'NSE' || k !== 'tb').map((k) => ({ key: k, name: BK_NAME[k], status: ['s1', 's2', 's3', 'wc'].includes(k) ? 'pending' : 'active', rules: '', test: '' }));
-  const opts = [0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100];
-  const st = { active: '', watch: '<span class="chip">watch only</span>', pending: '<span class="chip">rules coming</span>' };
+  const B = (P.buckets && P.buckets.length) ? P.buckets : Object.keys(BK_DEF).filter((k) => mk === 'NSE' || k !== 'tb').map((k) => ({ key: k, name: BK_NAME[k], status: k === 'wc' ? 'pending' : BK_DEF[k] > 0 ? 'active' : 'off', rules: '', test: '' }));
+  const opts = [0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100, 150, 200];
+  const st = { active: '', off: '<span class="chip">off</span>', watch: '<span class="chip">watch only</span>', pending: '<span class="chip">rules coming</span>' };
   const rowsH = B.map((b) => { const v = al[b.key] ?? 0; const o = opts.includes(v) ? opts : opts.concat([v]).sort((a, c) => a - c);
     return `<tr><td><b>${esc(b.name)}</b> ${st[b.status] || ''}${b.margin ? ' <span class="chip">margin</span>' : ''}</td>
       <td><select data-al="${b.key}" aria-label="${esc(b.name)} max share">${o.map((x) => `<option value="${x}" ${x === v ? 'selected' : ''}>${x}%</option>`).join('')}</select></td>
-      <td class="muted">${b.margin ? 'own card' : inUse[b.key] ? money(inUse[b.key], mk) : '–'}</td></tr>`; }).join('');
+      <td class="muted">${b.margin ? 'futures notional' : inUse[b.key] ? money(inUse[b.key], mk) : '–'}</td></tr>`; }).join('');
   const sum = B.filter((b) => !b.margin).reduce((a, b) => a + (al[b.key] ?? 0), 0);
   return `<div class="lv-card"><b>Systems & allocation</b>
     <p class="lv-sub">% = the most of your capital each system may hold. They share one cash pool, so the total can pass 100% (now ${sum}%): Momentum is usually about half invested and the others use the cash it isn't using, keeping 15% free for new Momentum breakouts. ${S && S.buckets ? 'Saved on your server.' : S ? 'Saved on this device; your server uses it after its next update (08:00 IST weekdays).' : 'Saved on this device.'}</p>
     <table class="mini lv-bk"><tr><th>System</th><th>Max</th><th>${S && S.buckets ? 'Holding now' : 'This plan'}</th></tr>${rowsH}</table>
-    <p class="lv-sub">Tested on NSE 2017–26 in one account, 1% risk a trade: Momentum alone 17.3%/yr, worst fall −16.8%; <b>Momentum ≤ 60% + Trend 9/21 ≤ 40% + 9/21 any stock on the idle cash: 27.4%/yr, −23.2%</b> (2022–26: 27.4%, −16.8%); without the any-stock 9/21: 23.1%, −21.4%.</p>
+    <p class="lv-sub"><b>Optimised 9 Nov (NSE 2017–26, one account, every system simulated together, 1% risk a trade):</b> ${mk === 'NSE' ? '<b>Momentum ≤ 60% + Trend 9/21 ≤ 40% + Top Bottom 1× on pledge margin: 33.2%/yr, worst fall −15.9%</b> (2022–26: 29.6%; without 2020: 25.2%; only losing year 2018, −5%). Without Top Bottom: 23.1%, −21.4%.' : 'Momentum ≤ 60% + Trend 9/21 ≤ 40% (the India optimum; US/ASX not optimised — paper phase).'} Switched off because they added more drawdown than return: 9/21 any stock (+1.7 pts/yr, worst fall −28%), breakout retests (−1.3%/yr as a portfolio), bottom patterns, System 1. Systems 2 and 3 removed (no edge).</p>
     <details class="info"><summary>Rules and tests for each system</summary>${B.map((b) => `<p><b>${esc(b.name)}.</b> ${esc(b.rules || '')} <i>${esc(b.test || '')}</i></p>`).join('')}</details></div>`;
 }
 function lvBucketWire(el, mk, S) {
   el.querySelectorAll('select[data-al]').forEach((x) => x.addEventListener('change', async () => {
-    let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc_' + mk) || '{}'); } catch (e) { /* */ }
-    o[x.dataset.al] = +x.value; try { localStorage.setItem('td.alloc_' + mk, JSON.stringify(o)); } catch (e) { /* private mode */ }
+    let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc2_' + mk) || '{}'); } catch (e) { /* */ }
+    o[x.dataset.al] = +x.value; try { localStorage.setItem('td.alloc2_' + mk, JSON.stringify(o)); } catch (e) { /* private mode */ }
     if (S) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: S.picks || lvN('NSE'), alloc: { [x.dataset.al]: +x.value } }) }); } catch (e) { alertMsg(`Saved here; your server takes it after its next update (${e.message}).`); } }
     lvKeep(); }));
 }
@@ -299,7 +299,7 @@ async function loadLiveG(mk) {
   const swRow = (r, i) => `<div class="lv-row${r.skip ? ' lv-off' : ''}"><div class="lv-rank">S${r.rank}<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${r.experimental ? ' <span class="chip exit">experimental</span>' : ''} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}${r.skip === 'not picked' && r.qty ? ` (would be ${r.qty.toLocaleString(L)} shares)` : ''}</span>` : `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}`}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.skip ? ticket(r) : ''}</div><div></div></div>`;
-  const swCardG = (b) => { const L2 = swR.map((r, i) => (bkOf(r) === b ? swRow(r, i) : '')).join(''); if (!L2 && b !== 'tf') return '';
+  const swCardG = (b) => { const L2 = swR.map((r, i) => (bkOf(r) === b ? swRow(r, i) : '')).join(''); if ((!L2 && b !== 'tf') || (alG[b] ?? 0) <= 0) return '';
     const pe = swR.filter((r) => bkOf(r) === b && !r.skip && r.qty > 0);
     return `<div class="lv-card"><div style="display:flex;justify-content:space-between"><b>${BK_NAME[b]} · max ${alG[b] ?? 0}%</b><span class="muted">${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), mk)}</span></div>
       <p class="lv-sub">${BK_HEAD[b]}${b !== 'tf' ? ` Experimental on ${MKT[mk].name}: worse than a random stock in the 2008–26 test.` : ` Not yet tested on ${MKT[mk].name} — the paper record tracks it.`}</p>${b === 'tf' ? lvSwingHead(srG, idleG, mk, null) : ''}${L2 || '<p class="empty">No new signals for the next session.</p>'}</div>`; };
@@ -324,7 +324,7 @@ async function loadLiveG(mk) {
       <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk and max 10% a stock. Holdings and cash are not checked.</p>${lvPicker(nP, risk * 100)}<div class="lv-pdfbar"><span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span><button class="lv-btn" id="lvpdf">Export PDF</button></div><p class="lv-sub">Top-down order: stocks passing all three checks first (sector beating the index over 6 months, industry Building/Strong, stock beating its sector over 1 year), then sector, industry lane and system score. Not backtested as a ranking — in the US/ASX tests these levels did not lift returns as filters.</p>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
     ${swCardG('tf')}${swCardG('t9')}${swCardG('rt')}${swCardG('pt')}
-    <div class="lv-card"><b>Coming: System 1 · System 2 · System 3 · Wealth Creation</b><p class="lv-sub">Empty buckets (0%) until you give the rules; each is backtested before it can trade.</p></div>
+    <div class="lv-card"><b>Coming: Wealth Creation</b><p class="lv-sub">Empty bucket (0%) until you give the rules; it is backtested before it can trade.</p></div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
   lvSegWire(el); lvBucketWire(el, mk, null); wireCap('lvcapg', mk, () => loadLive());
@@ -397,7 +397,7 @@ async function loadLive() {
   };
   const list = rows.map((r, i) => (r.tier === 'swing' ? '' : rowHtml(r, i))).join('');
   const swCard = (b) => { const L = rows.map((r, i) => (r.tier === 'swing' && bkOf(r) === b ? rowHtml(r, i) : '')).join(''); const pe = rows.filter((r) => r.tier === 'swing' && bkOf(r) === b && !r.skip && r.qty > 0);
-    if (!L && b !== 'tf') return '';
+    if ((!L && b !== 'tf') || (alN[b] ?? 0) <= 0) return '';
     return `<div class="lv-card"><div style="display:flex;justify-content:space-between"><b>${BK_NAME[b]} · max ${alN[b] ?? 0}%</b><span class="muted">${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), 'NSE')}</span></div>
       <p class="lv-sub">${BK_HEAD[b]}</p>${b === 'tf' ? lvSwingHead(srNow, S && !S.swing ? Math.max(0, S.cash - 0.15 * S.capital) : idleNow, 'NSE', S && S.swing ? S.swing.open : null) + (S && !S.swing && swRows.length ? '<p class="lv-sub"><b>View only until your server updates</b> (it updates itself at 08:00 IST on weekdays): sized here from your cash; place these in the Angel app, or Send them after the update.</p>' : '') : ''}
       ${L || '<p class="empty">No new signals for the next session.</p>'}</div>`; };
@@ -423,7 +423,7 @@ async function loadLive() {
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
     ${swCard('tf')}${swCard('t9')}${swCard('rt')}${swCard('pt')}
-    <div class="lv-card"><b>Coming: System 1 · System 2 · System 3 · Wealth Creation</b><p class="lv-sub">Empty buckets (0%) until you give the rules; each is backtested before it can trade.</p></div>
+    <div class="lv-card"><b>Coming: Wealth Creation</b><p class="lv-sub">Empty bucket (0%) until you give the rules; it is backtested before it can trade.</p></div>
     ${(P.pattern_watch || []).length ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
       <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}

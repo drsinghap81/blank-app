@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-09 02:35 UTC",
+"generated": "2026-11-09 04:47 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-08",
@@ -29,58 +29,42 @@
 "status": "active",
 "pct": 40,
 "rules": "Same monthly breakout with a 1-2 year cup. Stop for sizing: EMA 21 (min 4% under the entry); exit when a daily close has EMA 9 below EMA 21 (sell next open).",
-"test": "NSE 2017-26 alone 10.5%/yr, worst fall -15.6%; with Momentum (60/40, one account) 23.1%/yr, -21.4%. Other exits tested worse: 5-day-low + Supertrend 11.5%/-20.6%, weekly 9/21 14.7%/-33.8%."
+"test": "NSE 2017-26 alone 10.5%/yr, worst fall -15.6%; with Momentum (60/40, one account) 23.1%/yr, -21.4%."
 },
 {
 "key": "t9",
 "name": "9/21 Trend (any stock)",
 "system": "9/21 trend",
-"status": "active",
-"pct": 40,
-"rules": "Daily EMA 9 crosses above EMA 21 on a stock in an uptrend (trend scan); buy next open; stop = 5-day low (max 12% away); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle.",
-"test": "NSE 2017-26 alone 20-26%/yr, worst fall -24 to -26%; Momentum + Trend 9/21 + this on idle cash: 27.4%/yr, -23.2%."
+"status": "off",
+"pct": 0,
+"rules": "Daily EMA 9 crosses above EMA 21 on a stock in an uptrend; stop = 5-day low (max 12%); exit on Supertrend(10,3) red.",
+"test": "Off: in the full one-account test it adds about 1.7 points a year but deepens the worst fall from -21% to -28% (with Top Bottom: 36.2%, -23.3% vs 33.2%, -15.9%). Alone 20.7%/yr, -22.9%."
 },
 {
 "key": "rt",
 "name": "Breakout retest",
 "system": "Breakout retest",
-"status": "active",
-"pct": 15,
-"rules": "First return to an old breakout level; stop 1 ATR under it, 3R target, out after 120 days. Skipped in Weak/Fading industries.",
-"test": "NSE 2017-26: +0.17 to +0.24R a trade in Building/Strong/Middle industries vs +0.09R random."
+"status": "off",
+"pct": 0,
+"rules": "First return to an old breakout level; stop 1 ATR under it, 3R target, out after 120 days.",
+"test": "Off: +0.2R a trade on average, but as a 10-slot portfolio -1.3%/yr (the trades it can take cluster in falling markets)."
 },
 {
 "key": "pt",
 "name": "Bottom pattern",
 "system": "Bottom pattern",
-"status": "watch",
+"status": "off",
 "pct": 0,
 "rules": "Double/triple bottom, tilted W, inverse H&S neckline breakout; stop under the pattern, measured-move target, 120 days.",
-"test": "Lagged the average stock in every industry lane on NSE 2017-26 (watch list only)."
+"test": "Off: lagged the average stock in every industry lane (NSE 2017-26) and a random stock in the US/ASX test."
 },
 {
 "key": "s1",
 "name": "System 1",
-"status": "pending",
+"status": "off",
 "pct": 0,
-"rules": "Rules to come from Amritpal.",
-"test": "Not tested yet."
-},
-{
-"key": "s2",
-"name": "System 2",
-"status": "pending",
-"pct": 0,
-"rules": "Rules to come from Amritpal.",
-"test": "Not tested yet."
-},
-{
-"key": "s3",
-"name": "System 3",
-"status": "pending",
-"pct": 0,
-"rules": "Rules to come from Amritpal.",
-"test": "Not tested yet."
+"rules": "Weekly RSI system (rules kept privately).",
+"test": "Off on NSE: below the Nifty in every version tested; a US paper candidate."
 },
 {
 "key": "wc",
@@ -95,10 +79,10 @@
 "name": "Top Bottom",
 "system": "Top Bottom",
 "status": "active",
-"pct": 15,
+"pct": 100,
 "margin": true,
-"rules": "Index futures on the hourly Top Bottom rules (separate bot, its own card). Uses margin from pledged holdings, not cash; % = the capital its lots are sized on.",
-"test": "2017-26 with the stock book on pledge margin: see the Top Bottom tab (bot stays in DRY RUN until you switch it)."
+"rules": "Bank Nifty futures on the Top Bottom rules (separate bot, its own card). Uses margin from pledged holdings, not cash. % = futures notional as a share of capital: 100% = Rs 20L notional on Rs 20L (about 1 lot).",
+"test": "Alone 2017-26: about 8%/yr at realistic fills, worst fall -12.5%; moves against stocks (correlation -0.1 to -0.2), so it cuts the book's worst fall from -21% to -16%. Bot stays in DRY RUN until you switch it."
 }
 ],
 "top": [

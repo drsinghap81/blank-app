@@ -98,14 +98,17 @@ def swing_risk() -> float:
 # Systems as buckets (9 Nov 2026): each may hold at most alloc% of capital; all share one cash pool (Momentum first,
 # swing buckets keep SWING_RESERVE in cash). NSE 2017-26 one-account test: Momentum <= 60% + Trend 9/21 <= 40% 23.1%/yr,
 # worst fall -21.4%, vs Momentum alone 17.3%, -16.8%. Top Bottom runs on pledge margin (its own bot), not this cash.
-BUCKETS = {"mom": 60, "tf": 40, "t9": 40, "rt": 15, "pt": 0, "s1": 0, "s2": 0, "s3": 0, "wc": 0, "tb": 15}
+BUCKETS = {"mom": 60, "tf": 40, "t9": 0, "rt": 0, "pt": 0, "s1": 0, "wc": 0, "tb": 100}   # optimised 9 Nov (trade_plan.buckets)
+ALLOC_V = 2
 SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt"}
 
 
 def alloc() -> dict:
     a = dict(BUCKETS)
     try:
-        a.update({k: float(v) for k, v in (_picks_cfg().get("alloc") or {}).items() if k in BUCKETS})
+        cfg = _picks_cfg()
+        if cfg.get("alloc_v") == ALLOC_V:          # settings saved before the 9 Nov optimisation are dropped
+            a.update({k: float(v) for k, v in (cfg.get("alloc") or {}).items() if k in BUCKETS})
     except Exception:  # noqa: BLE001
         pass
     return a
@@ -233,11 +236,11 @@ def set_picks(body: Picks, _=Depends(auth)):
     n = picks() if body.n is None else max(3, min(MAX_POSITIONS, int(body.n)))
     sr = cfg.get("swing_risk") if body.swing_risk is None else max(0.25, min(MAX_RISK * 100, float(body.swing_risk)))
     capv = cfg.get("capital") if body.capital is None else max(0.0, float(body.capital))
-    al = dict(cfg.get("alloc") or {})
+    al = dict(cfg.get("alloc") or {}) if cfg.get("alloc_v") == ALLOC_V else {}
     for k, v in (body.alloc or {}).items():
         if k in BUCKETS:
             al[k] = max(0.0, min(100.0, float(v)))
-    json.dump(dict(n=n, swing_risk=sr, capital=capv, alloc=al, at=time.time()), open(os.path.join(DATA, "picks.json"), "w"))
+    json.dump(dict(n=n, swing_risk=sr, capital=capv, alloc=al, alloc_v=ALLOC_V, at=time.time()), open(os.path.join(DATA, "picks.json"), "w"))
     log("picks", n=n, swing_risk=sr, capital=capv, alloc=al)
     return dict(picks=n, risk_pct=round(risk_now() * 100, 2), swing_risk_pct=round(swing_risk() * 100, 2), capital=capv, alloc=alloc())
 
@@ -518,7 +521,7 @@ def sized(acc=None):
         if r["value"] > room.get(bk, 0):
             q = math.floor(max(0.0, room.get(bk, 0)) / E0)
             if q <= 0 or q < 0.25 * r["qty"]:
-                r["skip"] = "bucket full (%s max %g%% of capital)" % (bk, AL.get(bk, 0)); continue
+                r["skip"] = ("system switched off (0%% in Systems & allocation)" if AL.get(bk, 0) <= 0 else "bucket full (%s max %g%% of capital)" % (bk, AL.get(bk, 0))); continue
             r["qty"], r["value"] = q, round(q * E0, 0); r["note"] = r.get("note", "") + " · cut to the bucket's room"
             r["risk_amt"] = round(q * (E0 - r["stop"]), 0); r["pct_cap"] = round(q * E0 / cap * 100, 1) if cap else None
         if (sw_slots if sw else slots) <= 0:

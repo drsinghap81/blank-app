@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-09 02:34 UTC",
+"generated": "2026-11-09 04:47 UTC",
 "market": "US",
 "watch_only": true,
 "asof": "2026-11-06",
@@ -35,52 +35,36 @@
 "key": "t9",
 "name": "9/21 Trend (any stock)",
 "system": "9/21 trend",
-"status": "active",
-"pct": 40,
-"rules": "Daily EMA 9 crosses above EMA 21 on a stock in an uptrend (trend scan); buy next open; stop = 5-day low (max 12% away); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle.",
-"test": "US/ASX: no edge over the index in the 2008-26 test (paper record tracks it)."
+"status": "off",
+"pct": 0,
+"rules": "Daily EMA 9 crosses above EMA 21 on a stock in an uptrend; stop = 5-day low (max 12%); exit on Supertrend(10,3) red.",
+"test": "Off: in the full one-account test it adds about 1.7 points a year but deepens the worst fall from -21% to -28% (with Top Bottom: 36.2%, -23.3% vs 33.2%, -15.9%). Alone 20.7%/yr, -22.9%."
 },
 {
 "key": "rt",
 "name": "Breakout retest",
 "system": "Breakout retest",
-"status": "active",
-"pct": 15,
-"rules": "First return to an old breakout level; stop 1 ATR under it, 3R target, out after 120 days. Experimental.",
-"test": "US/ASX 2008-26: worse than a random stock the same day (+0.19R vs +0.25R)."
+"status": "off",
+"pct": 0,
+"rules": "First return to an old breakout level; stop 1 ATR under it, 3R target, out after 120 days.",
+"test": "Off: +0.2R a trade on average, but as a 10-slot portfolio -1.3%/yr (the trades it can take cluster in falling markets)."
 },
 {
 "key": "pt",
 "name": "Bottom pattern",
 "system": "Bottom pattern",
-"status": "active",
-"pct": 5,
+"status": "off",
+"pct": 0,
 "rules": "Double/triple bottom, tilted W, inverse H&S neckline breakout; stop under the pattern, measured-move target, 120 days.",
-"test": "US/ASX 2008-26: +2.5% vs +5.0% for a random stock over 120 days (experimental)."
+"test": "Off: lagged the average stock in every industry lane (NSE 2017-26) and a random stock in the US/ASX test."
 },
 {
 "key": "s1",
 "name": "System 1",
-"status": "pending",
+"status": "off",
 "pct": 0,
-"rules": "Rules to come from Amritpal.",
-"test": "Not tested yet."
-},
-{
-"key": "s2",
-"name": "System 2",
-"status": "pending",
-"pct": 0,
-"rules": "Rules to come from Amritpal.",
-"test": "Not tested yet."
-},
-{
-"key": "s3",
-"name": "System 3",
-"status": "pending",
-"pct": 0,
-"rules": "Rules to come from Amritpal.",
-"test": "Not tested yet."
+"rules": "Weekly RSI system (rules kept privately).",
+"test": "Off on NSE: below the Nifty in every version tested; a US paper candidate."
 },
 {
 "key": "wc",
