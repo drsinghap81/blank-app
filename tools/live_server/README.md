@@ -98,7 +98,7 @@ The server never unlocks trading on moomoo.
 - `app.py`: the API.
 - `brokers.py`: Angel (equity delivery), moomoo (read-only) and a mock broker.
 - `test_server.py`: dry-run and guard tests (`python -m pytest tools/live_server/test_server.py`).
-- `deploy/setup.sh` and `deploy/trenddesk.service`: one-time install with HTTPS through Caddy (sslip.io hostname); the code updates every weekday at 08:00 IST.
+- `deploy/setup.sh` and `deploy/trenddesk.service`: one-time install with HTTPS through Caddy (sslip.io hostname); the code updates itself (deploy/autoupdate.sh: checks GitHub every 15 minutes, applies new code and packages outside Indian market hours, weekdays 09:00–15:35 IST excluded; log in /opt/trenddesk/var/autoupdate.log).
 - The plan itself comes from `tools/trade_plan.py` (GitHub Actions, about 21:15 IST) → `data/scan/trade_plan.json`.
 
 ## Wealth Creation SIP (`POST /api/sip`)
@@ -120,3 +120,9 @@ For the stocks the US / ASX plans shortlist (picks, near-trigger, sells, pattern
 Finance's public chart endpoint (Nasdaq-listed US stocks real time, others about 15 minutes delayed), cached ~45 s, using
 `requests` (no new package). The app shows them as live tags on the US / ASX Trends and ATH lists and grows today's daily
 candle, refreshing about once a minute while that market is open. Personal use; a paid product would need a licensed feed.
+
+## Auto-update
+`sudo bash /opt/trenddesk/repo/tools/live_server/deploy/autoupdate.sh --install` (once) replaces the old 08:00 IST cron with a
+systemd timer that checks GitHub every 15 minutes. New code is applied only outside Indian market hours (weekdays 09:00–15:35
+IST), with `pip install -r` for the server and bot requirements, then `systemctl restart trenddesk`. The Top Bottom bots aren't
+restarted; they run the new code from their next 08:25 / 08:27 IST start. Log: /opt/trenddesk/var/autoupdate.log.

@@ -31,7 +31,7 @@ EOF
 systemctl reload caddy || systemctl restart caddy
 ufw allow 22/tcp; ufw allow 80/tcp; ufw allow 443/tcp; ufw --force enable
 # daily code update at 08:00 IST (02:30 UTC)
-echo "30 2 * * 1-5 root git -C $APP/repo pull -q && systemctl restart trenddesk" > /etc/cron.d/trenddesk-update
+bash $APP/repo/tools/live_server/deploy/autoupdate.sh --install   # new code every 15 min, never during Indian market hours
 echo
 echo "Server address for the phone app:  https://$HOST"
 echo "Static IP to register in SmartAPI:  $IP"
