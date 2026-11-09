@@ -590,3 +590,46 @@ body.bg-first .views { display: none !important; }
 @keyframes livepulse { 50% { opacity: .3; } }
 .bg-pt .live-px { margin-left: 6px; }
 .num .live-px { display: flex; width: max-content; margin: 3px 0 0 auto; font-size: 11px; padding: 1px 6px; }
+/* Live hero + pie */
+.lv-card.hero { display: flex; flex-direction: column; gap: 4px; }
+.hero-big { font-family: var(--font-head); font-size: 36px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.hero-line { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; font-size: 13px; }
+.hero-badge { font-weight: 700; font-size: 14px; padding: 3px 10px; border-radius: 999px; background: var(--soft); }
+.hero-badge.up { background: var(--rise-soft); color: var(--rise-ink); } .hero-badge.down { background: var(--fall-soft, var(--soft)); color: var(--fall-ink); }
+.hero-rng { display: flex; gap: 4px; } .hero-rng button { border: 0; background: transparent; color: var(--slate); font-size: 12px; padding: 4px 10px; border-radius: 999px; cursor: pointer; }
+.hero-rng button[aria-pressed="true"] { background: var(--soft); color: var(--ink); font-weight: 600; }
+.hero-pie { display: flex; gap: 14px; align-items: center; margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+.hero-dn, .sp-dn { position: relative; flex: none; display: flex; justify-content: center; }
+.hero-dn > div, .sp-dn > div { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.hero-dn b { font-family: var(--font-head); font-size: 20px; } .hero-dn span, .sp-dn span { font-size: 11px; color: var(--slate); }
+.hero-leg { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.hero-leg > div { display: flex; align-items: center; gap: 8px; } .hero-leg i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.hero-leg span { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 13px; } .hero-leg small { font-size: 11.5px; color: var(--slate); }
+.hero-leg em { font-style: normal; font-weight: 700; font-size: 12.5px; }
+.hero-chg { margin-top: 12px; height: 44px; border: 0; border-radius: 14px; background: var(--soft); color: var(--ink); font-weight: 600; font-size: 14px; cursor: pointer; }
+@media (max-width: 380px) { .hero-pie { flex-direction: column; align-items: stretch; } .hero-dn { align-self: center; } }
+/* split sheet */
+.sp-dn { margin: 6px 0 10px; } .sp-dn b { font-family: var(--font-head); font-size: 28px; color: var(--accent); } .sp-dn b.muted { color: var(--slate); font-size: 22px; }
+.sp-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); margin-bottom: 8px; }
+.sp-row i { width: 12px; height: 12px; border-radius: 4px; flex: none; } .sp-row > span { flex: 1; min-width: 0; display: flex; flex-direction: column; } .sp-row small { font-size: 12px; color: var(--slate); }
+.sp-row button { width: 34px; height: 34px; border: 0; border-radius: 10px; background: var(--soft); color: var(--ink); font-size: 18px; cursor: pointer; }
+.sp-v { width: 48px; text-align: center; font-family: var(--font-head); font-size: 17px; }
+.sp-tb input { width: 22px; height: 22px; accent-color: var(--accent); }
+.sp-h { margin: 14px 0 8px; font-size: 13px; color: var(--slate); font-weight: 600; }
+.sp-mix { width: 100%; display: flex; justify-content: space-between; gap: 10px; text-align: left; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: var(--ink); margin-bottom: 8px; cursor: pointer; }
+.sp-mix span { display: flex; flex-direction: column; } .sp-mix span:last-child { align-items: flex-end; flex: none; } .sp-mix small { font-size: 11.5px; color: var(--slate); }
+.sp-mix.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.sp-foot { display: flex; gap: 8px; margin-top: 12px; } .sp-foot .lv-btn { flex: 1; height: 44px; }
+/* Beginner hero + pick tiles */
+.bg-hero { padding: 16px 18px; border-radius: 22px; background: linear-gradient(160deg, var(--rise-soft) 0%, var(--card) 75%); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 3px; }
+.bg-hero > span { font-size: 13px; color: var(--slate); } .bg-hero > b { font-family: var(--font-head); font-size: 34px; letter-spacing: -0.02em; }
+.bg-hero em { font-style: normal; font-size: 13.5px; color: var(--slate); } .bg-hero em i { font-style: normal; font-weight: 700; }
+.bg-hero em i.up { color: var(--rise-ink); } .bg-hero em i.down { color: var(--fall-ink); }
+.bg-mini { display: flex; align-items: center; gap: 12px; margin-top: 8px; } .bg-mini > div { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--slate); }
+.bg-mini span { display: flex; align-items: center; gap: 5px; } .bg-mini i { width: 8px; height: 8px; border-radius: 2px; } .bg-mini b { color: var(--ink); }
+.bg-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 4px 0; }
+.bg-tiles > div { padding: 8px 10px; border-radius: 12px; background: var(--soft); display: flex; flex-direction: column; min-width: 0; }
+.bg-tiles span { font-size: 11px; color: var(--slate); } .bg-tiles b { font-size: 15px; font-family: var(--font-head); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bg-tiles .risk { background: var(--fall-soft, var(--soft)); } .bg-tiles .risk b { color: var(--fall-ink); }
+.bg-why p { margin: 4px 0 8px; font-size: 14px; line-height: 1.5; color: var(--slate); }
+.bg-btns .why { flex: 0 0 auto; min-width: 72px; }

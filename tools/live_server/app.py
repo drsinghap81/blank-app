@@ -579,6 +579,23 @@ def angel_msg(e):
     return ANGEL_WHY.get(code.group(1), m) if code else m
 
 
+def equity_log(value):
+    """Account value (cash + holdings at today's price) once per day, for the app's equity curve; today's entry is overwritten."""
+    p = os.path.join(DATA, "equity.json")
+    try:
+        E = json.load(open(p))
+    except Exception:  # noqa: BLE001
+        E = {}
+    d = ist_now().date().isoformat()
+    if value and E.get(d) != value:
+        E[d] = value; E = dict(sorted(E.items())[-800:])
+        try:
+            json.dump(E, open(p, "w"))
+        except Exception:  # noqa: BLE001
+            pass
+    return sorted(E.items())
+
+
 def sized(acc=None):
     P = plan(); acc = acc or account_cached()
     J = sync(acc)
@@ -660,7 +677,9 @@ def sized(acc=None):
             if not r["skip"]:
                 r["skip"] = "paused: losing streak (guard)"
     trades, recent = trades_view(J, acc)
-    return dict(guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open, picks=N, risk_pct=round(RK * 100, 2), account_value=acct, capital_set=app_cap or None,
+    real = round(acc["cash"] + (acc.get("holdings_value") or 0) + (acc.get("positions_value") or 0), 2)
+    return dict(real_value=real, equity=equity_log(real), holdings=[dict(symbol=h["symbol"], qty=h["qty"], ltp=h.get("ltp"), avg=h.get("avg"),
+                value=round(h["qty"] * (h.get("ltp") or 0), 2)) for h in acc["holdings"] if h["qty"] > 0], guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open, picks=N, risk_pct=round(RK * 100, 2), account_value=acct, capital_set=app_cap or None,
                 buckets=[dict(key=k, pct=AL[k], used=round(expo.get(k, 0.0)), room=round(max(0.0, room.get(k, 0.0)))) for k in AL],
                 swing=dict(risk_pct=round(SR * 100, 2), slots=sw_slots, max=SWING_MAX, open=len(sw_open), idle_cash=round(sw_cash), reserve_pct=SWING_RESERVE * 100),
                 mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,

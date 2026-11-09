@@ -295,3 +295,11 @@ def test_perf():
     assert P["open"] == dict(n=1, cost=1000.0, value=1100.0, pnl=100.0)
     assert P["closed"]["n"] == 1 and P["closed"]["pnl"] == 200.0 and P["closed"]["wins"] == 1
     assert P["total_pnl"] == 300.0 and P["total_pct"] == 16.67 and P["since"] == "2026-09-15"
+
+
+def test_equity_log(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    P = c.get("/api/plan", headers=h).json()
+    assert P["real_value"] > 0 and P["equity"] and P["equity"][-1][1] == P["real_value"] and isinstance(P["holdings"], list)
+    assert A.equity_log(P["real_value"] + 5)[-1][1] == P["real_value"] + 5 and len(A.equity_log(1.0)) == 1   # one point a day

@@ -113,6 +113,97 @@ function show(view) {
   ({ mk: loadMarkets, live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
 }
 
+/* ------------------------------------------------------------------ Live hero + pie (9 Nov 2026)
+   Real numbers only: account value = cash + holdings at today's price (server real_value; older server: its
+   account value), return = trades sent from the app (perf), curve = one server snapshot a day, slices = what each
+   system holds now (buckets.used), idle ETFs from your holdings, the rest as other holdings and cash. */
+const PIE_COL = { mom: 'var(--accent)', tf: '#7C8CFF', t9: '#A78BFA', rt: '#F472B6', pt: '#FB923C', s1: '#38BDF8', wc: '#FACC15', idle: '#2BB3A3', other: '#F2A93B', cash: 'var(--mute-line)' };
+const BK_SYS = { mom: 'Monthly ATH', tf: 'Trend 9/21', t9: '9/21 trend', rt: 'Breakout retest', pt: 'Bottom pattern' };
+const BK_SHORT = { mom: 'Momentum', tf: 'Trend 9/21', t9: '9/21 any', rt: 'Retest', pt: 'Pattern', s1: 'Weekly RSI', wc: 'Wealth' };
+const lakh = (v) => (Math.abs(v) >= 1e7 ? `₹${fmt(v / 1e7, 2)} Cr` : Math.abs(v) >= 1e5 ? `₹${fmt(v / 1e5, 1)} L` : `₹${fmt(v, 0, 'en-IN')}`);
+const IDLE_ETF = new Set(['LIQUIDBEES', 'LIQUIDCASE', 'NIFTYBEES', 'MID150BEES', 'GOLDBEES', 'MON100', 'MAFANG', 'JUNIORBEES', 'BANKBEES']);
+function donut(slices, size, w) {
+  const tot = slices.reduce((a, x) => a + Math.max(0, x.v), 0) || 1, C = 2 * Math.PI * 44; let acc = 0;
+  return `<svg viewBox="0 0 120 120" width="${size}" height="${size}" aria-hidden="true">${slices.filter((x) => x.v > 0).map((x) => { const len = x.v / tot * C;
+    const g = `<circle cx="60" cy="60" r="44" fill="none" style="stroke:${x.col}" stroke-width="${w}" stroke-dasharray="${Math.max(0.5, len - 2.5).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-acc).toFixed(1)}" transform="rotate(-90 60 60)"/>`; acc += len; return g; }).join('')}</svg>`;
+}
+function curveSVG(E, up) {
+  if (!E || E.length < 2) return '';
+  const v = E.map((x) => x[1]), lo = Math.min(...v), hi = Math.max(...v), r = hi - lo || 1, W = 350, H = 64;
+  const pts = v.map((y, i) => [i * W / (v.length - 1), 4 + (hi - y) / r * (H - 8)]);
+  const line = pts.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' ');
+  const col = up ? 'var(--rise)' : 'var(--fall)';
+  return `<svg viewBox="0 0 350 70" width="100%" height="70" preserveAspectRatio="none" aria-label="Account value, one point a day"><path d="${line} L 350 70 L 0 70 Z" style="fill:${col};opacity:.12"/><path d="${line}" fill="none" style="stroke:${col}" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function lvHero(S, PF) {
+  if (!S) return '';
+  const real = S.real_value != null, val = real ? S.real_value : S.account_value;
+  const E = S.equity || [], rng = state.heroRng || '1M', days = { '1M': 31, '3M': 92, '1Y': 366, All: 1e5 }[rng];
+  const cut = new Date(Date.now() - days * 864e5).toISOString().slice(0, 10), Ev = E.filter((x) => x[0] >= cut);
+  const today = E.length >= 2 && E[E.length - 1][0] === new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10) ? E[E.length - 1][1] - E[E.length - 2][1] : null;
+  const rs = (v) => `${v >= 0 ? '+' : '−'}₹${fmt(Math.abs(v), 0, 'en-IN')}`;
+  const badge = PF && (PF.open.n + PF.closed.n) ? `<span class="hero-badge ${PF.total_pnl >= 0 ? 'up' : 'down'}">${rs(PF.total_pnl)}${PF.total_pct == null ? '' : ` · ${PF.total_pct >= 0 ? '+' : ''}${fmt(PF.total_pct, 1)}%`}</span><span class="muted">on app trades${PF.since ? ' since ' + day(PF.since) : ''}</span>` : '<span class="muted">No app trades filled yet</span>';
+  // slices
+  const B = (S.buckets || []).filter((b) => b.key !== 'tb' && b.used > 0);
+  const H = S.holdings || []; const idle = H.filter((h) => IDLE_ETF.has(h.symbol)).reduce((a, h) => a + h.value, 0);
+  const sysV = B.reduce((a, b) => a + b.used, 0), cash = Math.max(0, S.cash || 0);
+  const other = Math.max(0, (val || 0) - cash - sysV - idle);
+  const ret = (k) => { const x = PF && PF.systems.find((y) => y.system === BK_SYS[k]); return x && x.pct != null ? x : null; };
+  const sl = B.map((b) => ({ k: b.key, name: BK_SHORT[b.key] || BK_NAME[b.key], v: b.used, sub: `${lakh(b.used)} of max ${lakh(b.pct / 100 * S.capital)}`, r: ret(b.key) }));
+  if (idle > 0) sl.push({ k: 'idle', name: 'Idle cash in ETFs', v: idle, sub: lakh(idle) });
+  if (other > 0.01 * val) sl.push({ k: 'other', name: 'Other holdings', v: other, sub: `${lakh(other)} · not from the app` });
+  sl.push({ k: 'cash', name: 'Cash', v: cash, sub: lakh(cash) });
+  sl.forEach((x) => (x.col = PIE_COL[x.k] || '#999'));
+  const inSys = val ? Math.round(sysV / val * 100) : 0;
+  return `<div class="lv-card hero"><span class="muted">${real ? 'Your Angel account' : 'Account value (server update pending)'}</span>
+    <div class="hero-big">${money(val, 'NSE')}</div>
+    <div class="hero-line">${badge}${today == null ? '' : `<span class="muted">· today <b class="${today >= 0 ? 'up' : 'down'}">${rs(today)}</b></span>`}</div>
+    ${Ev.length >= 2 ? curveSVG(Ev, Ev[Ev.length - 1][1] >= Ev[0][1]) + `<div class="hero-rng">${['1M', '3M', '1Y', 'All'].map((k) => `<button data-rng="${k}" aria-pressed="${k === rng}">${k}</button>`).join('')}</div>`
+      : `<p class="lv-sub">Your value curve builds from here, one point each day${real ? '' : ' once your server takes today\'s update'}.</p>`}
+    <div class="hero-pie"><div class="hero-dn">${donut(sl, 128, 16)}<div><b>${inSys}%</b><span>in systems</span></div></div>
+      <div class="hero-leg">${sl.map((x) => `<div><i style="background:${x.col}"></i><span><b>${esc(x.name)}</b><small>${x.sub}</small></span>${x.r ? `<em class="${x.r.pnl >= 0 ? 'up' : 'down'}">${x.r.pct >= 0 ? '+' : ''}${fmt(x.r.pct, 1)}%</em>` : '<em></em>'}</div>`).join('')}</div></div>
+    <button class="hero-chg" id="lvsplit">Change the split <span class="muted">· ${Object.entries(lvAlloc('NSE', {}, S)).filter(([k, v]) => v > 0 && k !== 'tb').map(([k, v]) => `${BK_SHORT[k] || BK_NAME[k]} ${v}`).join(' · ')}</span></button></div>`;
+}
+function lvHeroWire(el, P, S) {
+  el.querySelectorAll('.hero-rng button').forEach((b) => b.addEventListener('click', () => { state.heroRng = b.dataset.rng; lvKeep(); }));
+  const c = el.querySelector('#lvsplit'); if (c) c.addEventListener('click', () => splitSheet('NSE', P, S));
+}
+/* Change the split: the same saved allocation as the table (td.alloc2_ + server /api/picks), drawn as a pie with steppers
+   and the mixes we actually tested; any other mix is shown as untested. */
+const SPLIT_MIX = [
+  { name: 'Recommended', sub: 'Momentum 60 + Trend 40 + Top Bottom 1×', a: { mom: 60, tf: 40, tb: 100 }, ret: 33.2, dd: -15.9 },
+  { name: 'No futures', sub: 'Momentum 60 + Trend 40', a: { mom: 60, tf: 40, tb: 0 }, ret: 23.1, dd: -21.4 },
+  { name: 'Momentum only', sub: 'one system, simplest', a: { mom: 100, tf: 0, tb: 0 }, ret: 17.3, dd: -16.8 }];
+function splitSheet(mk, P, S) {
+  const base = lvAlloc(mk, P || {}, S); const A = { ...base };
+  const keys = Object.keys(BK_DEF).filter((k) => k !== 'tb' && k !== 'wc' && (mk === 'NSE' || k !== 'tb'));
+  const shown = keys.filter((k) => (A[k] || 0) > 0 || k === 'mom' || k === 'tf');
+  const steps = [0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100];
+  const draw = () => {
+    const mix = SPLIT_MIX.find((m) => Object.entries(m.a).every(([k, v]) => (A[k] || 0) === v) && keys.every((k) => (A[k] || 0) === (m.a[k] || 0)));
+    const sl = shown.map((k) => ({ k, v: A[k] || 0, col: PIE_COL[k] })); const tot = sl.reduce((a, x) => a + x.v, 0);
+    $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">Your split</h2><p class="muted" style="margin:0 0 6px;font-size:13px">% = the most of your capital each system may hold. They share one cash pool.</p>
+      <div class="sp-dn">${donut(tot > 0 ? sl : [{ v: 1, col: 'var(--mute-line)' }], 180, 20)}<div>${mix ? `<b>${fmt(mix.ret, 1)}%</b><span>a year · tested</span>` : '<b class="muted">Custom</b><span>not tested as a mix</span>'}</div></div>
+      ${shown.map((k) => `<div class="sp-row"><i style="background:${PIE_COL[k]}"></i><span><b>${esc(BK_NAME[k])}</b></span><button data-dn="${k}" aria-label="Less ${esc(BK_NAME[k])}">−</button><b class="sp-v">${A[k] || 0}%</b><button data-up="${k}" aria-label="More ${esc(BK_NAME[k])}">+</button></div>`).join('')}
+      ${mk === 'NSE' ? `<label class="sp-row sp-tb"><span><b>Top Bottom futures</b><small>Bank Nifty on pledge margin · 1× = your capital</small></span><input type="checkbox" id="sptb" ${A.tb > 0 ? 'checked' : ''}></label>
+      <h3 class="sp-h">Tested mixes · NSE 2017–26</h3>${SPLIT_MIX.map((m, i) => `<button class="sp-mix ${mix === m ? 'on' : ''}" data-mix="${i}"><span><b>${m.name}</b><small>${m.sub}</small></span><span><b>${fmt(m.ret, 1)}%</b><small>worst ${fmt(m.dd, 1)}%</small></span></button>`).join('')}` : ''}
+      <div class="sp-foot"><button class="lv-btn" id="spsave">Save split</button><button class="lv-btn" id="spfull" style="background:var(--soft);color:var(--ink)">Rules &amp; full table</button></div>`;
+    const B = $('#sheet-body');
+    B.querySelectorAll('[data-up],[data-dn]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.up || b.dataset.dn, v = A[k] || 0;
+      const i = steps.findIndex((x) => x >= v); A[k] = b.dataset.up ? steps[Math.min(steps.length - 1, (steps[i] === v ? i : i - 1) + 1)] : steps[Math.max(0, (i < 0 ? steps.length : i) - 1)]; draw(); }));
+    const tb = B.querySelector('#sptb'); if (tb) tb.addEventListener('change', () => { A.tb = tb.checked ? 100 : 0; draw(); });
+    B.querySelectorAll('[data-mix]').forEach((b) => b.addEventListener('click', () => { const m = SPLIT_MIX[+b.dataset.mix]; keys.concat(['tb']).forEach((k) => (A[k] = m.a[k] || 0)); draw(); }));
+    B.querySelector('#spfull').addEventListener('click', () => { closeSheet(); try { sessionStorage.setItem('td.bkopen', '1'); } catch (e) { /* */ } lvKeep(); setTimeout(() => { const d = document.querySelector('.lv-bkfold'); if (d) d.scrollIntoView({ block: 'start' }); }, 600); });
+    B.querySelector('#spsave').addEventListener('click', async () => {
+      const ch = {}; Object.keys(A).forEach((k) => { if ((A[k] || 0) !== (base[k] || 0)) ch[k] = A[k] || 0; });
+      let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc2_' + mk) || '{}'); } catch (e) { /* */ }
+      Object.assign(o, ch); try { localStorage.setItem('td.alloc2_' + mk, JSON.stringify(o)); } catch (e) { /* private mode */ }
+      if (S && Object.keys(ch).length) { try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ n: S.picks || lvN(mk), alloc: ch }) }); } catch (e) { toast('Saved on this phone; your server takes it on the next refresh'); } }
+      closeSheet(); toast(Object.keys(ch).length ? 'Split saved' : 'No change'); lvKeep(); });
+  };
+  draw(); $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+}
+
 /* ------------------------------------------------------------------ Live prices (9 Nov 2026)
    The stocks our systems shortlist (today's buys, near-trigger, sell signals, your open trades) are priced by your
    server from Angel every 15 s in market hours. Lists elsewhere in the app get a live tag on those rows, and the
@@ -536,14 +627,14 @@ async function loadLive() {
     o.forEach((t) => { const c = t.qty * t.entry, v = t.qty * (t.ltp || t.entry); cost += c; val += v; const k = t.system || 'Other'; sy[k] = sy[k] || { system: k, n: 0, c: 0, pnl: 0 }; sy[k].n++; sy[k].c += c; sy[k].pnl += v - c; if (t.since && (!first || t.since < first)) first = t.since; });
     return { open: { n: o.length, cost, value: val, pnl: val - cost }, closed: { n: 0, pnl: 0, wins: 0, wait: true }, total_pnl: val - cost, total_pct: (val - cost) / cost * 100, since: first,
       systems: Object.values(sy).map((x) => ({ ...x, pct: x.pnl / x.c * 100 })) }; })()); const rs = (v) => `${v >= 0 ? '+' : '−'}₹${fmt(Math.abs(v), 0, 'en-IN')}`;
-  const perfHtml = PF && (PF.open.n + PF.closed.n) ? `<div class="lv-perf"><div class="lv-perf-big ${PF.total_pnl >= 0 ? 'up' : 'down'}">${PF.total_pct == null ? '' : `${PF.total_pct >= 0 ? '+' : ''}${fmt(PF.total_pct, 1)}%`} <span>${rs(PF.total_pnl)}</span></div>
+  const perfHtml = PF && (PF.open.n + PF.closed.n) ? `<div class="lv-perf">
     <div class="lv-sub">Live return on everything sent from the app${PF.since ? ` since ${day(PF.since)}` : ''} · before brokerage and taxes</div>
     <div class="facts"><div class="fact"><span>Open (${PF.open.n})</span><b class="${PF.open.pnl >= 0 ? 'up' : 'down'}">${rs(PF.open.pnl)}</b><small>${money(PF.open.cost, 'NSE')} → ${money(PF.open.value, 'NSE')}</small></div>
     <div class="fact"><span>Closed (${PF.closed.n})</span><b class="${PF.closed.pnl >= 0 ? 'up' : 'down'}">${rs(PF.closed.pnl)}</b><small>${PF.closed.wait ? 'shows after the server updates' : PF.closed.n ? `${PF.closed.wins} of ${PF.closed.n} won` : 'none yet'}</small></div>
     ${PF.systems.map((x) => `<div class="fact"><span>${esc(x.system)} (${x.n})</span><b class="${x.pnl >= 0 ? 'up' : 'down'}">${x.pct == null ? '' : `${x.pct >= 0 ? '+' : ''}${fmt(x.pct, 1)}%`}</b><small>${rs(x.pnl)}</small></div>`).join('')}</div></div>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${perfHtml}${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}
     <p class="lv-sub">🛡 <b>Daily stop raise:</b> Momentum stops follow the 30-week SMA, Trend 9/21 stops follow EMA 21, ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}% below, and only ever move up (the system itself sells on the close — see "Exits for the next open"). ${trTxt} <button class="lv-link" id="lvtrail">Check stops now</button></p></div>` : '';
-  el.innerHTML = `${lvSeg()}${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
+  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
     ${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div>
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub">${S ? (S.account_value != null ? `Angel account value ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} (the server never sizes above the account value; 0 = full account).` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
@@ -566,7 +657,7 @@ async function loadLive() {
     try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); lvSave({ token: j.token }); loadLive(); } catch (e) { alertMsg(e.message); }
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
-  lvSegWire(el); lvBucketWire(el, 'NSE', S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -2931,7 +3022,7 @@ function bgSentence(r, s) {
 
 async function bgToday(el) {
   el.innerHTML = '<p class="muted pad">Loading today…</p>';
-  const [P, G] = await Promise.all([getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan'), getJSON(MAIN + 'data/scan/group_pulse.json', 'gp_NSE')]);
+  const [P, G, pr] = await Promise.all([getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan'), getJSON(MAIN + 'data/scan/group_pulse.json', 'gp_NSE'), pfPrices().catch(() => ({ px: {} }))]);
   if (!P) { el.innerHTML = '<p class="empty">Today\'s picks appear after the evening scan (about 9:15 pm IST).</p>'; return; }
   $('#asof').textContent = `India close ${day(P.asof)}${updTxt(P.generated)}`;
   const C = cap('NSE') || 50000; const risk = lvRiskN(lvN('NSE')) / 100; const al = lvAlloc('NSE', P, null);
@@ -2942,11 +3033,13 @@ async function bgToday(el) {
   el.innerHTML = `<div class="bg-wrap">
     <div class="bg-mood"><i class="bg-dot ${mood[0]}"></i><div><b>${mood[1]}, ${rows.length ? `${rows.length} setup${rows.length > 1 ? 's' : ''}` : 'no new setups'}</b>
       <span>The Nifty is ${fh < 1 ? 'near' : `${fmt(fh, 0)}% below`} its 1-year high and ${mood[2]}. ${mood[0] === 'good' ? 'Breakouts work best in markets like this.' : 'We only show the best-ranked trades.'}</span></div></div>
-    <div class="bg-h"><h3>Your picks</h3><span>sized for ${inr(C)}</span></div>
-    ${picks.map(({ r, s }, i) => { const ln = BG_LANE[r.lane] || ['', ''];
-      return `<div class="bg-pick" data-sym="${esc(r.symbol)}"><div class="bg-pt"><div><b>${esc(bgName(r))}</b><span>${esc(r.symbol)} · ${bgWhy(r)}</span></div>${ln[0] ? `<span class="chip ${ln[1]}">${ln[0]}</span>` : ''}</div>
-        <p>${bgSentence(r, s)}</p>
-        <div class="bg-btns"><button class="bg-cta sm" data-pr="${i}" ${held.has(r.symbol) ? 'disabled' : ''}>${held.has(r.symbol) ? 'In practice' : 'Practise this trade'}</button><button class="bg-ghost sm" data-how="${i}">How to place it</button><button class="bg-ghost sm icon" data-ch="${i}" aria-label="Chart of ${esc(r.symbol)}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div></div>`; }).join('') || '<p class="bg-empty">No trade passes our rules for the next open. That\'s normal. Waiting is part of the system.</p>'}
+    ${bgHero(C, pr && pr.px || {})}
+    <div class="bg-h"><h3>Today's picks</h3><span>${picks.length} of ${rows.length}</span></div>
+    ${picks.map(({ r, s }, i) => { const ln = BG_LANE[r.lane] || ['', '']; const stopTxt = r.system === 'Monthly ATH' || bkOf(r) === 'tf' ? 'Sell below' : 'Stop';
+      return `<div class="bg-pick" data-sym="${esc(r.symbol)}"><div class="bg-pt"><div><b>${esc(bgName(r))}</b><span>${esc(r.symbol)}</span></div>${ln[0] ? `<span class="chip ${ln[1]}">${ln[0]}</span>` : ''}</div>
+        <div class="bg-tiles"><div><span>${r.trigger ? 'Buy above' : 'Buy up to'}</span><b>${inr(r.trigger || r.price, 1)}</b></div><div><span>${stopTxt}</span><b>${inr(r.stop, 1)}</b></div><div class="risk"><span>Worst case</span><b>−${inr(s.worst)}</b></div></div>
+        <div class="bg-why" id="bgwhy${i}" hidden><p>${esc(bgName(r))} ${bgWhy(r)}. ${bgSentence(r, s)}</p><div class="bg-btns"><button class="bg-ghost sm" data-how="${i}">How to place it</button><button class="bg-ghost sm" data-ch="${i}">Chart</button></div></div>
+        <div class="bg-btns"><button class="bg-cta sm" data-pr="${i}" ${held.has(r.symbol) ? 'disabled' : ''}>${held.has(r.symbol) ? 'In practice' : `Practise · ${s.q} shares`}</button><button class="bg-ghost sm why" data-why="${i}" aria-expanded="false" aria-controls="bgwhy${i}">Why?</button></div></div>`; }).join('') || '<p class="bg-empty">No trade passes our rules for the next open. That\'s normal. Waiting is part of the system.</p>'}
     ${rows.length > 3 ? `<button class="bg-link" id="bgmore">See ${rows.length - 3} more setups</button>` : ''}
     <p class="bg-fine">Picks come from the same tested rules as Pro (Momentum and Trend 9/21). Not investment advice.</p></div>`;
   el.querySelectorAll('[data-pr]').forEach((b) => b.addEventListener('click', () => {
@@ -2954,10 +3047,23 @@ async function bgToday(el) {
     L.push({ symbol: r.symbol, name: bgName(r), kind: r.kind, system: r.system, bucket: bkOf(r), qty: s.q, trigger: r.trigger || null, price: r.price, stop: r.stop, date: P.asof, state: r.trigger ? 'waiting' : 'open', entry: r.trigger ? null : r.price });
     bgPracticeSave(L); toast(`${r.symbol} added to your practice trades`); bgToday(el); }));
   el.querySelectorAll('[data-how]').forEach((b) => b.addEventListener('click', () => bgHow(picks[+b.dataset.how])));
+  el.querySelectorAll('[data-why]').forEach((b) => b.addEventListener('click', () => { const w = $('#bgwhy' + b.dataset.why); w.hidden = !w.hidden; b.setAttribute('aria-expanded', String(!w.hidden)); b.textContent = w.hidden ? 'Why?' : 'Hide'; }));
   el.querySelectorAll('[data-ch]').forEach((b) => b.addEventListener('click', () => lvOpen(picks[+b.dataset.ch].r)));
   const m = $('#bgmore'); if (m) m.addEventListener('click', () => { state.bgFrom = true; show('live'); bgNav('explore'); });
 }
 
+/* Beginner hero: practice money = your starting amount + profit or loss on practice trades (open at the latest price,
+   closed at their exit); the mini pie splits it into practice stocks and cash. Real money lives in Pro › Live. */
+function bgHero(C, px) {
+  const L = bgPractice(); let inv = 0, val = 0, done = 0;
+  L.forEach((t) => { if (!t.entry || !t.qty) return; if (t.state === 'closed') done += t.qty * ((t.exit || t.entry) - t.entry);
+    else if (t.state === 'open') { const p = (px[t.symbol] || [])[0] || t.entry; inv += t.qty * t.entry; val += t.qty * p; } });
+  const pnl = val - inv + done, tot = C + pnl, n = L.filter((t) => t.state !== 'waiting').length, w = L.filter((t) => t.state === 'waiting').length;
+  const sl = [{ v: val, col: 'var(--accent)', name: 'Stocks' }, { v: Math.max(0, tot - val), col: 'var(--mute-line)', name: 'Cash' }];
+  return `<div class="bg-hero"><span>Your practice money</span><b>${inr(tot)}</b>
+    <em>${n ? `<i class="${pnl >= 0 ? 'up' : 'down'}">${pnl >= 0 ? '+' : '−'}${inr(Math.abs(pnl))} (${pnl >= 0 ? '+' : ''}${fmt(pnl / C * 100, 1)}%)</i> on ${n} trade${n > 1 ? 's' : ''}` : 'Practise a pick below to start'}${w ? ` · ${w} waiting to trigger` : ''}</em>
+    ${n ? `<div class="bg-mini">${donut(sl, 46, 24)}<div>${sl.map((x) => `<span><i style="background:${x.col}"></i>${x.name} <b>${fmt(tot ? x.v / tot * 100 : 0, 0)}%</b></span>`).join('')}</div></div>` : ''}</div>`;
+}
 function bgHow({ r, s }) {
   const stopOrder = r.kind === 'ATH_STOP' || r.kind === 'TF_STOP';
   $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 6px">${esc(r.symbol)}: placing it in your broker app</h2>
