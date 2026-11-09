@@ -100,3 +100,9 @@ The server never unlocks trading on moomoo.
 - `test_server.py`: dry-run and guard tests (`python -m pytest tools/live_server/test_server.py`).
 - `deploy/setup.sh` and `deploy/trenddesk.service`: one-time install with HTTPS through Caddy (sslip.io hostname); the code updates every weekday at 08:00 IST.
 - The plan itself comes from `tools/trade_plan.py` (GitHub Actions, about 21:15 IST) → `data/scan/trade_plan.json`.
+
+## Wealth Creation SIP (`POST /api/sip`)
+The ETF Pie card's "Send SIP to Angel" places the month's ETF buys in one go: only NIFTYBEES, MID150BEES, GOLDBEES, MON100 or
+LIQUIDBEES; whole units; Delivery limit orders a hair (0.3%) above the live price (AMO outside market hours); total within your
+cash and `SIP_MAX` (env, default ₹2,00,000); each ETF once a day; typed confirmation "SIP <n>". Dry run shows the exact orders.
+SIP buys are logged in orders.jsonl but kept out of the systems' journal, so they get no stops, trailing or exit signals.

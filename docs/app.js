@@ -252,9 +252,26 @@ async function wcPie(box, S) {
     <table class="mini"><tr><th>This month's SIP</th><th class="r">Units</th><th class="r">≈ ₹</th></tr>${buy.map((b) => `<tr><td>${b.k}</td><td class="r"><b>${b.u}</b></td><td class="r">${fmt(b.v, 0, 'en-IN')}</td></tr>`).join('')}
       <tr><td class="muted">Left as cash</td><td></td><td class="r muted">${fmt(left, 0, 'en-IN')}</td></tr></table>
     ${hv ? (reb.length ? `<div class="wc-reb"><b>Still off after this SIP</b> (5+ points): ${reb.map((x) => `${x.u > 0 ? 'buy' : 'sell'} ${Math.abs(x.u)} ${x.k}`).join(' · ')}${m === 'rot' && reb.some((x) => x.u < 0) ? '; park the proceeds in LIQUIDBEES' : ''}. Or let the next SIPs close the gap.</div>` : `<p class="lv-sub">Your Pie (${money(hv, 'NSE')}) stays within 5 points of target with this SIP: nothing to sell.</p>`) : `<p class="lv-sub">Once you hold these ETFs in Angel, this card shows your actual slices and when to rebalance.</p>`}
+    ${S && buy.some((b) => b.u > 0) ? `<button class="lv-btn" id="wcsend" style="width:100%;height:44px;margin:6px 0">Send SIP to Angel · ${buy.filter((b) => b.u > 0).length} ETF${buy.filter((b) => b.u > 0).length > 1 ? 's' : ''}</button>` : ''}
     <p class="lv-sub">Prices: last close${S ? ' or your Angel holdings' : ''}. ${hv ? 'The SIP goes to the lightest slices first. ' : ''}Place the ETF buys in Angel (Delivery). ${m !== 'rot' && m !== 'custom' ? 'Rebalance each quarter.' : m === 'rot' ? 'Switch at the first open of each month.' : ''} Funded by the SIP, outside the systems' capital.</p></div>`;
   box.querySelectorAll('[data-pm]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.pm === 'custom') { pieEdit(box, S); return; } pieSave({ mode: b.dataset.pm }); wcPie(box, S); }));
+  const sb = box.querySelector('#wcsend'); if (sb) sb.addEventListener('click', () => wcSend(buy.filter((b) => b.u > 0), sb, () => wcPie(box, S)));
   const a = box.querySelector('#wcamt'); a.addEventListener('change', () => { const v = Math.round(+String(a.value).replace(/[^0-9]/g, '')); if (v > 0) { sipSet(v); wcPie(box, S); } });
+}
+async function wcSend(B, btn, done) {
+  const tot = B.reduce((a, b) => a + b.v, 0);
+  const typed = window.prompt(`SIP on Angel One, about ${money(tot, 'NSE')} (limit a hair above the live price, Delivery):\n${B.map((b) => `BUY ${b.u} ${b.k}`).join('\n')}\n\nType ${B.length} to confirm:`);
+  if (typed === null) return;
+  if (String(typed).trim() !== String(B.length)) { alertMsg('Not sent: the number did not match.'); return; }
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const j = await lvApi('/api/sip', { method: 'POST', body: JSON.stringify({ items: B.map((b) => ({ symbol: b.k, qty: b.u })), confirm: `SIP ${B.length}` }) });
+    if (j.mode !== 'LIVE') alertMsg(`Dry run, nothing sent: ${j.orders.map((o) => `${o.qty} ${o.symbol} @ ${o.params.price}`).join(', ')} (≈ ${money(j.total, 'NSE')}). Switch to Live orders to send for real.`, true);
+    else { const ok = j.results.filter((x) => x.ok), bad = j.results.filter((x) => !x.ok);
+      alertMsg(`Sent ${ok.length} of ${j.results.length}: ${ok.map((x) => `${x.qty} ${x.symbol}`).join(', ')}.${bad.length ? ` Not sent: ${bad.map((x) => `${x.symbol} (${x.error})`).join('; ')}.` : ''}`, !bad.length); }
+    setTimeout(done, 4000);
+  } catch (e) { alertMsg('Not sent: ' + e.message); }
+  btn.disabled = false; btn.textContent = 'Send SIP to Angel';
 }
 function pieEdit(box, S) {
   const c = pieCfg(); const W = { ...(c.w || PIE_PRE.equal.w) };

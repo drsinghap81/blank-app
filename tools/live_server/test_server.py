@@ -303,3 +303,21 @@ def test_equity_log(tmp_path):
     P = c.get("/api/plan", headers=h).json()
     assert P["real_value"] > 0 and P["equity"] and P["equity"][-1][1] == P["real_value"] and isinstance(P["holdings"], list)
     assert A.equity_log(P["real_value"] + 5)[-1][1] == P["real_value"] + 5 and len(A.equity_log(1.0)) == 1   # one point a day
+
+
+def test_sip(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: True; A.amo_window = lambda t=None: False
+    it = [{"symbol": "NIFTYBEES", "qty": 10}, {"symbol": "GOLDBEES", "qty": 20}]
+    assert c.post("/api/sip", headers=h, json={"items": [{"symbol": "RELIANCE", "qty": 1}], "confirm": "SIP 1"}).status_code == 400
+    assert c.post("/api/sip", headers=h, json={"items": it, "confirm": "SIP 3"}).status_code == 400
+    assert c.post("/api/sip", headers=h, json={"items": [{"symbol": "NIFTYBEES", "qty": 99999}], "confirm": "SIP 1"}).status_code == 400   # above cash / limit
+    r = c.post("/api/sip", headers=h, json={"items": it, "confirm": "SIP 2"}).json()
+    assert r["mode"] == "DRY RUN" and not r["sent"] and len(r["orders"]) == 2 and r["orders"][0]["params"]["producttype"] == "DELIVERY"
+    assert c.post("/api/sip", headers=h, json={"items": it, "confirm": "SIP 2"}).status_code == 200                          # dry runs can repeat
+    A.set_live(True)
+    r2 = c.post("/api/sip", headers=h, json={"items": [{"symbol": "MON100", "qty": 5}], "confirm": "SIP 1"}).json()
+    assert r2["sent"] and r2["results"][0]["ok"]
+    assert c.post("/api/sip", headers=h, json={"items": [{"symbol": "MON100", "qty": 5}], "confirm": "SIP 1"}).status_code == 409   # once a day
+    assert "MON100" not in A.journal()                                                                                      # not a system trade

@@ -160,7 +160,7 @@ def today_log():
                 r = json.loads(ln)
             except Exception:  # noqa: BLE001
                 continue
-            if r.get("kind") in ("order", "dry") and r.get("ist_date") == d:
+            if r.get("kind") in ("order", "dry", "sip") and r.get("ist_date") == d:
                 out.append(r)
     return out
 
@@ -870,6 +870,72 @@ class BasketItem(BaseModel):
 class Basket(BaseModel):
     items: list[BasketItem]
     confirm: str
+
+
+class SipItem(BaseModel):
+    symbol: str
+    qty: int
+
+
+class Sip(BaseModel):
+    items: list[SipItem]
+    confirm: str
+
+
+SIP_ETFS = ("NIFTYBEES", "MID150BEES", "GOLDBEES", "MON100", "LIQUIDBEES")
+SIP_MAX = float(ENV.get("SIP_MAX", "200000"))        # most one SIP send may spend
+
+
+@app.post("/api/sip")
+def sip(body: Sip, _=Depends(auth)):
+    """The Wealth Creation Pie's monthly ETF buys, with ONE typed confirmation ("SIP <n>"). Only the Pie's ETFs, whole units,
+    total within SIP_MAX and your cash, each ETF once a day. Kept out of the systems' journal (no stops, no trailing)."""
+    items = [i for i in body.items if i.qty > 0]
+    if not items:
+        raise HTTPException(400, "nothing to buy")
+    bad = [i.symbol for i in items if i.symbol not in SIP_ETFS]
+    if bad:
+        raise HTTPException(400, f"not a Pie ETF: {', '.join(bad)}")
+    if len({i.symbol for i in items}) != len(items):
+        raise HTTPException(400, "each ETF once")
+    if body.confirm.strip().upper() != f"SIP {len(items)}":
+        raise HTTPException(400, f'confirm must be "SIP {len(items)}"')
+    done = {r.get("symbol") for r in today_log() if r.get("kind") == "sip"}       # real buys only; dry runs can repeat
+    again = [i.symbol for i in items if i.symbol in done]
+    if again:
+        raise HTTPException(409, f"already sent today: {', '.join(again)}")
+    t = ist_now(); open_now = market_open(t); amo = amo_window(t) and not open_now
+    if not open_now and not amo:
+        raise HTTPException(400, "send during market hours or between 15:45 and 08:57 IST (AMO)")
+    try:
+        Q = broker.quotes([i.symbol for i in items]); acc = account_cached()
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(502, f"couldn't read prices or your account: {angel_msg(ex)}")
+    out, total = [], 0.0
+    for i in items:
+        q = Q.get(i.symbol) or {}; px = q.get("ltp") or q.get("prev")
+        if not px:
+            raise HTTPException(400, f"no price for {i.symbol}")
+        lim = px * 1.003                                  # marketable limit, a hair above the last price
+        total += i.qty * lim
+        out.append(dict(symbol=i.symbol, qty=i.qty, params=broker.params(i.symbol, "BUY", i.qty, lim, amo=amo)))
+    if total > min(SIP_MAX, acc["cash"]):
+        raise HTTPException(400, f"SIP total ₹{total:,.0f} is above your cash or the SIP limit (₹{SIP_MAX:,.0f})")
+    if not is_live():
+        for o in out:
+            log("sip_dry", symbol=o["symbol"], qty=o["qty"], params=o["params"])
+        return dict(ok=True, mode="DRY RUN", sent=False, total=round(total), orders=out,
+                    msg="Dry run: these are exactly the orders that would go to Angel. Switch to Live orders to send for real.")
+    res = []
+    for o in out:
+        try:
+            oid = broker.place(o["params"]); log("sip", order_id=oid, symbol=o["symbol"], qty=o["qty"], params=o["params"], ist_date=t.date().isoformat())
+            res.append(dict(symbol=o["symbol"], qty=o["qty"], ok=True, order_id=oid))
+        except Exception as e:  # noqa: BLE001
+            log("sip_error", symbol=o["symbol"], qty=o["qty"], error=str(e)[:200])
+            res.append(dict(symbol=o["symbol"], qty=o["qty"], ok=False, error=angel_msg(e)))
+    _acc["d"] = None
+    return dict(ok=any(r["ok"] for r in res), mode="LIVE", sent=True, total=round(total), results=res)
 
 
 @app.post("/api/basket")
