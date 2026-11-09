@@ -756,6 +756,12 @@ async function lvOpen(r) {
   if ((r.kind === 'ATH_STOP' || r.kind === 'TF_STOP' || r.kind === 'WATCH') && near) { athSelect({ ...near, _near: true }); return; }
   if (run) { athSelect(run); return; }
   if (near) { athSelect({ ...near, _near: true }); return; }
+  // retests are earlier breakouts, often already exited by the breakout system: still show that chart
+  const past = (d.tracked || []).concat(d.breakouts || []).filter((x) => x.symbol === r.symbol).pop();
+  if (past) { athSelect(past); return; }
+  const tr = state.data.NSE || await getJSON(MAIN + 'data/scan/trend_scan.json', 'td_NSE'); state.data.NSE = tr;
+  const row = tr && ((tr.rows || []).concat(tr.early || [])).find((x) => x.symbol === r.symbol);
+  if (row) { state.mkt = 'NSE'; const prev = state.tab; state.tab = row.status ? 'new' : (row.list || 'trend'); try { select(row); } finally { state.tab = prev; } return; }
   alertMsg('Chart not available for ' + r.symbol);
 }
 /* result banner: fixed above the bottom bar, stays until tapped (errors) or 20 s (ok) */
