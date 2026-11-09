@@ -342,11 +342,11 @@ def test_tb_nifty_instance(tmp_path):
 def test_adopt(tmp_path):
     A, c = client(tmp_path)
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
-    A.broker.hold.update({"TITAN": 40, "NIFTYBEES": 100})
+    A.broker.hold.update({"TITAN": 40, "NIFTYBEES": 100, "ITBEES": 3000})
     L = c.get("/api/adopt", headers=h).json()
     t = next(x for x in L["holdings"] if x["symbol"] == "TITAN")
     assert t["suggest"] == "Monthly ATH" and t["stop"] and t["protect"] < t["stop"]
-    assert not any(x["symbol"] == "NIFTYBEES" for x in L["holdings"])                     # ETFs stay with the Pie
+    assert not any(x["symbol"] in ("NIFTYBEES", "ITBEES") for x in L["holdings"])                     # ETFs stay with the Pie
     assert c.post("/api/adopt", headers=h, json={"symbol": "TITAN", "system": "Monthly ATH", "confirm": "ADOPT XYZ"}).status_code == 400
     d = c.post("/api/adopt", headers=h, json={"symbol": "TITAN", "system": "Monthly ATH", "confirm": "ADOPT TITAN"}).json()
     assert d["mode"] == "DRY RUN" and not d["adopted"] and "TITAN" not in A.journal()        # dry run changes nothing

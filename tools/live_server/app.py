@@ -515,6 +515,11 @@ PIE_ETFS = ("NIFTYBEES", "MID150BEES", "GOLDBEES", "MON100", "LIQUIDBEES", "LIQU
 _ADC = {}
 
 
+def is_etf(sym):
+    """ETFs (NIFTYBEES, ITBEES, MON100, ...ETF, ...IETF) are left out of the stock systems."""
+    return sym in PIE_ETFS or sym.endswith("BEES") or sym.endswith("ETF") or sym in ("MON100", "MAFANG", "MAHKTECH", "HNGSNGBEES")
+
+
 def _ema(c, n):
     if len(c) < n * 3:
         return None
@@ -552,7 +557,7 @@ def adopt_list(_=Depends(auth)):
     J = journal(); acc = account_cached(0); out = []
     for h in acc["holdings"]:
         sym = h["symbol"]
-        if h["qty"] <= 0 or sym in PIE_ETFS or (sym in J and J[sym].get("state") in ("open", "pending", "exiting")):
+        if h["qty"] <= 0 or is_etf(sym) or (sym in J and J[sym].get("state") in ("open", "pending", "exiting")):
             continue
         row = dict(symbol=sym, qty=h["qty"], avg=h.get("avg"), ltp=h.get("ltp"))
         try:
@@ -578,8 +583,8 @@ def adopt(body: Adopt, _=Depends(auth)):
         raise HTTPException(400, "system must be Momentum (Monthly ATH) or Trend 9/21")
     if body.confirm.strip().upper() != f"ADOPT {sym}":
         raise HTTPException(400, f'confirm must be "ADOPT {sym}"')
-    if sym in PIE_ETFS:
-        raise HTTPException(400, "ETFs belong to the Wealth Creation Pie, not the stock systems")
+    if is_etf(sym):
+        raise HTTPException(400, "ETFs are not managed by the stock systems")
     J = journal()
     if sym in J and J[sym].get("state") in ("open", "pending", "exiting"):
         raise HTTPException(409, "already managed by the app")
