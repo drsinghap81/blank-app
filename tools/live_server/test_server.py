@@ -245,8 +245,8 @@ def test_buckets(tmp_path):
     A, c = client(tmp_path)
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     P = c.get("/api/plan", headers=h).json()
-    B = {b["key"]: b for b in P["buckets"]}; assert B["mom"]["pct"] == 60 and B["tf"]["pct"] == 40 and B["s1"]["pct"] == 0
-    assert all(r.get("bucket") in ("mom", "tf", "rt", "pt") for r in P["rows"])
+    B = {b["key"]: b for b in P["buckets"]}; assert B["mom"]["pct"] == 60 and B["tf"]["pct"] == 40 and B["t9"]["pct"] == 40 and B["s1"]["pct"] == 0
+    assert all(r.get("bucket") in ("mom", "tf", "t9", "rt", "pt") for r in P["rows"])
     j = c.post("/api/picks", headers=h, json={"alloc": {"tf": 1, "rt": 0, "bogus": 50}}).json()
     assert j["alloc"]["tf"] == 1 and "bogus" not in j["alloc"] and j["picks"] == 10
     P2 = c.get("/api/plan", headers=h).json()

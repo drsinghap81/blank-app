@@ -27,7 +27,7 @@ BENCH = {"US": "^GSPC", "ASX": "^AXJO"}
 START = 100_000.0
 RISK, CAP, MAXPOS, COST, RESERVE = 0.01, 0.10, 10, 0.001, 0.15
 # bucket caps (9 Nov 2026): the most of equity each system may hold (the Live tab's default allocation)
-RULES = "1% risk to the stop, max 10% a stock; buckets: Momentum <= 60%, Trend 9/21 <= 40%, retests <= 15%, patterns <= 5% of equity; 10 Momentum + 10 swing positions, swing keeps 15% cash for Momentum; Trend 9/21 exits on a daily EMA 9/21 cross; fills at the next open, 0.1% cost a side"
+RULES = "1% risk to the stop, max 10% a stock; buckets: Momentum <= 60%, Trend 9/21 <= 40%, 9/21 any stock <= 40%, retests <= 15%, patterns <= 5% of equity; 10 Momentum + 10 swing positions, swing keeps 15% cash for Momentum; Trend 9/21 exits on a daily EMA 9/21 cross; fills at the next open, 0.1% cost a side"
 BUCKET = {"Monthly ATH": 0.60, "Trend 9/21": 0.40, "Breakout retest": 0.15, "Bottom pattern": 0.05, "9/21 trend": 0.40}
 
 
@@ -176,7 +176,7 @@ def main(mk):
     for r in (P.get("top") or []) + (P.get("swing") or []):
         if r["symbol"] in S["pos"]:
             continue
-        Q.append(dict(side="BUY", symbol=r["symbol"], date=asof, kind=r["kind"], system=r["system"], rank=r.get("rank", 99) + {"T921": 100, "TF_BRK": 100, "TF_STOP": 100, "RETEST": 200, "PATTERN": 300}.get(r.get("kind"), 0),
+        Q.append(dict(side="BUY", symbol=r["symbol"], date=asof, kind=r["kind"], system=r["system"], rank=r.get("rank", 99) + {"T921": 150, "TF_BRK": 100, "TF_STOP": 100, "RETEST": 200, "PATTERN": 300}.get(r.get("kind"), 0),
                       trigger=r.get("trigger"), limit=r["price"], stop=r["stop"], target=r.get("target")))
     S["queue"] = Q
     S["log"] = (events + S["log"])[:200]

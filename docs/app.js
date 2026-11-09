@@ -213,9 +213,9 @@ const KIND_TXT = { ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH t
 /* Systems as capital buckets (9 Nov 2026): % = the most of your capital a system may hold; all share one cash pool,
    Momentum first, swing buckets keep 15% in cash for Momentum. NSE one-account test 2017-26: Momentum <= 60% + Trend 9/21 <= 40%
    23.1%/yr, worst fall -21.4%; Momentum alone 17.3%, -16.8%. */
-const BK_DEF = { mom: 60, tf: 40, rt: 15, pt: 0, s1: 0, s2: 0, s3: 0, wc: 0, tb: 15 };
-const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', rt: 'Breakout retest', pt: 'Bottom pattern', s1: 'System 1', s2: 'System 2', s3: 'System 3', wc: 'Wealth Creation', tb: 'Top Bottom' };
-const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : r.kind === 'PATTERN' ? 'pt' : 'tf');
+const BK_DEF = { mom: 60, tf: 40, t9: 40, rt: 15, pt: 0, s1: 0, s2: 0, s3: 0, wc: 0, tb: 15 };
+const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', s1: 'System 1', s2: 'System 2', s3: 'System 3', wc: 'Wealth Creation', tb: 'Top Bottom' };
+const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : r.kind === 'PATTERN' ? 'pt' : r.kind === 'T921' ? 't9' : 'tf');
 function lvAlloc(mk, P, S) {
   if (S && S.buckets) return { ...BK_DEF, ...Object.fromEntries(S.buckets.map((b) => [b.key, b.pct])) };
   let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc_' + mk) || '{}'); } catch (e) { /* private mode */ }
@@ -246,7 +246,7 @@ function lvBucketCard(mk, P, al, inUse, S) {
   return `<div class="lv-card"><b>Systems & allocation</b>
     <p class="lv-sub">% = the most of your capital each system may hold. They share one cash pool, so the total can pass 100% (now ${sum}%): Momentum is usually about half invested and the others use the cash it isn't using, keeping 15% free for new Momentum breakouts. ${S && S.buckets ? 'Saved on your server.' : S ? 'Saved on this device; your server uses it after its next update (08:00 IST weekdays).' : 'Saved on this device.'}</p>
     <table class="mini lv-bk"><tr><th>System</th><th>Max</th><th>${S && S.buckets ? 'Holding now' : 'This plan'}</th></tr>${rowsH}</table>
-    <p class="lv-sub">Tested on NSE 2017–26 in one account, 1% risk a trade: Momentum alone 17.3%/yr, worst fall −16.8%; <b>Momentum ≤ 60% + Trend 9/21 ≤ 40%: 23.1%/yr, −21.4%</b> (2022–26: 25.9%, −13.0%); 60 + 25: 20.6%, −20.4%.</p>
+    <p class="lv-sub">Tested on NSE 2017–26 in one account, 1% risk a trade: Momentum alone 17.3%/yr, worst fall −16.8%; <b>Momentum ≤ 60% + Trend 9/21 ≤ 40% + 9/21 any stock on the idle cash: 27.4%/yr, −23.2%</b> (2022–26: 27.4%, −16.8%); without the any-stock 9/21: 23.1%, −21.4%.</p>
     <details class="info"><summary>Rules and tests for each system</summary>${B.map((b) => `<p><b>${esc(b.name)}.</b> ${esc(b.rules || '')} <i>${esc(b.test || '')}</i></p>`).join('')}</details></div>`;
 }
 function lvBucketWire(el, mk, S) {
@@ -258,6 +258,7 @@ function lvBucketWire(el, mk, S) {
 }
 const BK_HEAD = {
   tf: 'Monthly breakout after a 1–2 year cup (same trigger as Momentum). Stop for sizing = EMA 21 (at least 4% under the entry); exit when a daily close has EMA 9 below EMA 21 — this tab lists the sell for the next open. NSE 2017–26: 10.5%/yr alone, worst fall −15.6%; tested exits 5-day-low + Supertrend and weekly 9/21 did worse.',
+  t9: 'Daily EMA 9 crosses above EMA 21 on a stock in an uptrend; buy next open; stop = 5-day low (max 12%); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle. NSE 2017–26: 20–26%/yr alone, worst fall −24 to −26%.',
   rt: 'First return to an old breakout level, stop 1 ATR under it, 3R target, out after 120 days.',
   pt: 'Bottom-pattern neckline breakouts: stop under the pattern, measured-move target, 120 days.' };
 function lvSeg() {
@@ -322,7 +323,7 @@ async function loadLiveG(mk) {
     <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Momentum Investing · max ${alG.mom}% · top ${rows.length}</b>${capInput(mk, 'lvcapg')}</div>
       <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk and max 10% a stock. Holdings and cash are not checked.</p>${lvPicker(nP, risk * 100)}<div class="lv-pdfbar"><span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span><button class="lv-btn" id="lvpdf">Export PDF</button></div><p class="lv-sub">Top-down order: stocks passing all three checks first (sector beating the index over 6 months, industry Building/Strong, stock beating its sector over 1 year), then sector, industry lane and system score. Not backtested as a ranking — in the US/ASX tests these levels did not lift returns as filters.</p>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
-    ${swCardG('tf')}${swCardG('rt')}${swCardG('pt')}
+    ${swCardG('tf')}${swCardG('t9')}${swCardG('rt')}${swCardG('pt')}
     <div class="lv-card"><b>Coming: System 1 · System 2 · System 3 · Wealth Creation</b><p class="lv-sub">Empty buckets (0%) until you give the rules; each is backtested before it can trade.</p></div>
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
@@ -421,7 +422,7 @@ async function loadLive() {
       ${S && pend.length ? '<p class="lv-sub">Tick the trades you want, adjust quantities, then send them together. <span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</div>
-    ${swCard('tf')}${swCard('rt')}${swCard('pt')}
+    ${swCard('tf')}${swCard('t9')}${swCard('rt')}${swCard('pt')}
     <div class="lv-card"><b>Coming: System 1 · System 2 · System 3 · Wealth Creation</b><p class="lv-sub">Empty buckets (0%) until you give the rules; each is backtested before it can trade.</p></div>
     ${(P.pattern_watch || []).length ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
       <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}

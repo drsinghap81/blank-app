@@ -98,8 +98,8 @@ def swing_risk() -> float:
 # Systems as buckets (9 Nov 2026): each may hold at most alloc% of capital; all share one cash pool (Momentum first,
 # swing buckets keep SWING_RESERVE in cash). NSE 2017-26 one-account test: Momentum <= 60% + Trend 9/21 <= 40% 23.1%/yr,
 # worst fall -21.4%, vs Momentum alone 17.3%, -16.8%. Top Bottom runs on pledge margin (its own bot), not this cash.
-BUCKETS = {"mom": 60, "tf": 40, "rt": 15, "pt": 0, "s1": 0, "s2": 0, "s3": 0, "wc": 0, "tb": 15}
-SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "tf", "Breakout retest": "rt", "Bottom pattern": "pt"}
+BUCKETS = {"mom": 60, "tf": 40, "t9": 40, "rt": 15, "pt": 0, "s1": 0, "s2": 0, "s3": 0, "wc": 0, "tb": 15}
+SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt"}
 
 
 def alloc() -> dict:

@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-09 01:57 UTC",
+"generated": "2026-11-09 02:34 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-08",
@@ -30,6 +30,15 @@
 "pct": 40,
 "rules": "Same monthly breakout with a 1-2 year cup. Stop for sizing: EMA 21 (min 4% under the entry); exit when a daily close has EMA 9 below EMA 21 (sell next open).",
 "test": "NSE 2017-26 alone 10.5%/yr, worst fall -15.6%; with Momentum (60/40, one account) 23.1%/yr, -21.4%. Other exits tested worse: 5-day-low + Supertrend 11.5%/-20.6%, weekly 9/21 14.7%/-33.8%."
+},
+{
+"key": "t9",
+"name": "9/21 Trend (any stock)",
+"system": "9/21 trend",
+"status": "active",
+"pct": 40,
+"rules": "Daily EMA 9 crosses above EMA 21 on a stock in an uptrend (trend scan); buy next open; stop = 5-day low (max 12% away); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle.",
+"test": "NSE 2017-26 alone 20-26%/yr, worst fall -24 to -26%; Momentum + Trend 9/21 + this on idle cash: 27.4%/yr, -23.2%."
 },
 {
 "key": "rt",
@@ -578,6 +587,37 @@
 "group_rank": 10,
 "rank": 5,
 "risk_pct": 7.4
+},
+{
+"id": "T921-PETRONET-2026-11-06",
+"symbol": "PETRONET",
+"name": "Petronet LNG Limited",
+"system": "9/21 trend",
+"bucket": "t9",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 320.17,
+"ref": 317.0,
+"stop": 283.4,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-06, stop 11.9% below",
+"score": 3,
+"value_cr": 76.64,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Oil & Gas Refining & Marketing",
+"lane": "fade",
+"group_pulse": 24.2,
+"group_rank": 15,
+"rank": 1,
+"risk_pct": 13.0
 }
 ],
 "pattern_watch": [

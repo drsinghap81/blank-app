@@ -30,7 +30,7 @@ MAX_BELOW = 0.05       # ... or > 5% back below it (failing breakout; not what t
 TOP = 10
 BASE_MAIN = 24         # cup >= 24 months -> Momentum Investing; 12-24 months -> Trend Following 9/21
 TF_SYS = "Trend 9/21"
-LEGACY_921 = False     # the old 9/21 on any trend stock (trend_scan.json); its exits are still listed for open holdings
+LEGACY_921 = True      # 9/21 on any trend stock (trend_scan.json): its own bucket, on the cash the others leave idle
 
 
 def buckets(mk):
@@ -39,7 +39,9 @@ def buckets(mk):
     NSE one-account test 2017-26 (1% risk of total capital each, 10% max a stock, 10 positions a bucket, 3 random fill orders):
       Momentum alone 17.3%/yr, worst fall -16.8% (49% invested on average)
       Momentum <= 60% + Trend 9/21 <= 40%: 23.1%, -21.4% (2022-26: 25.9%, -13.0%)   <- default
-      Momentum <= 60% + Trend 9/21 <= 25%: 20.6%, -20.4%;  Trend 9/21 alone: 10.5%, -15.6%."""
+      Momentum <= 60% + Trend 9/21 <= 25%: 20.6%, -20.4%;  Trend 9/21 alone: 10.5%, -15.6%.
+      + 9/21 on any trend stock on the cash still idle (15% kept for Momentum): 27.4%, -23.2% (2022-26 27.4%, -16.8%)  <- default
+      (Momentum + that 9/21 without the cup 9/21: 26.3%, -20.2%)."""
     india = mk == "NSE"
     B = [dict(key="mom", name="Momentum Investing", system="Monthly ATH", status="active", pct=60,
               rules="Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high. "
@@ -50,6 +52,11 @@ def buckets(mk):
                     "exit when a daily close has EMA 9 below EMA 21 (sell next open).",
               test="NSE 2017-26 alone 10.5%/yr, worst fall -15.6%; with Momentum (60/40, one account) 23.1%/yr, -21.4%. "
                    "Other exits tested worse: 5-day-low + Supertrend 11.5%/-20.6%, weekly 9/21 14.7%/-33.8%." if india else "Not tested on US/ASX yet (paper record tracks it)."),
+         dict(key="t9", name="9/21 Trend (any stock)", system="9/21 trend", status="active", pct=40,
+              rules="Daily EMA 9 crosses above EMA 21 on a stock in an uptrend (trend scan); buy next open; stop = 5-day low "
+                    "(max 12% away); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle.",
+              test="NSE 2017-26 alone 20-26%/yr, worst fall -24 to -26%; Momentum + Trend 9/21 + this on idle cash: 27.4%/yr, -23.2%." if india
+                   else "US/ASX: no edge over the index in the 2008-26 test (paper record tracks it)."),
          dict(key="rt", name="Breakout retest", system="Breakout retest", status="active", pct=15,
               rules="First return to an old breakout level; stop 1 ATR under it, 3R target, out after 120 days. "
                     + ("Skipped in Weak/Fading industries." if india else "Experimental."),
@@ -185,7 +192,7 @@ def main(mk="NSE"):
         close, stop = num(r.get("signal_close") or r.get("close")), num(r.get("stop"))
         if not close or not stop or close <= stop or close < MINPX[mk] or (r.get("risk_pct") or 0) > 12:
             continue
-        C.append(dict(id=f"T921-{r['symbol']}-{r.get('signal_date')}", symbol=r["symbol"], name=r.get("name", ""), system="9/21 trend", bucket="tf",
+        C.append(dict(id=f"T921-{r['symbol']}-{r.get('signal_date')}", symbol=r["symbol"], name=r.get("name", ""), system="9/21 trend", bucket="t9",
                       kind="T921", order="LIMIT", when="next open", side="BUY", price=round(close * 1.01, 2), ref=close,
                       stop=round(stop, 2), exit_rule="Supertrend(10,3) turns red -> sell next open",
                       note=f"EMA 9/21 cross {r.get('signal_date')}, stop {r.get('risk_pct', 0):.1f}% below", score=3,
@@ -289,11 +296,11 @@ def main(mk="NSE"):
         pat_watch.sort(key=lambda w: (LANE_ORD[w["lane"]], w.get("signal_date") or ""))
     trades = [c for c in best.values() if c.get("bucket") == "mom"]
     trades.sort(key=lambda c: C.index(c))
-    KORD = {"TF_BRK": 0, "TF_STOP": 0, "T921": 0, "RETEST": 1, "PATTERN": 2}
+    KORD = {"TF_BRK": 0, "TF_STOP": 0, "T921": 1, "RETEST": 2, "PATTERN": 3}
     swing = sorted([c for c in best.values() if c["kind"] in KORD],
                    key=lambda c: (LANE_ORD[c["lane"]], KORD[c["kind"]], -(c["value_cr"] or 0)))
     if india:   # every Trend 9/21 signal, the best 8 retests
-        keep = {id(x) for x in [c for c in swing if c["bucket"] == "tf"] + [c for c in swing if c["kind"] == "RETEST"][:8]}
+        keep = {id(x) for x in [c for c in swing if c["bucket"] in ("tf", "t9")] + [c for c in swing if c["kind"] == "RETEST"][:8]}
         swing = [c for c in swing if id(c) in keep]
     else:   # keep all 9/21, the best 8 retests and 6 patterns, then order the lot top-down (industry lane, then 9/21 > retest > pattern)
         keep = {id(x) for x in [c for c in swing if c["kind"] in ("T921", "TF_BRK", "TF_STOP")] + [c for c in swing if c["kind"] == "RETEST"][:8]

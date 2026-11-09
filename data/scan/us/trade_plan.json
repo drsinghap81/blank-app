@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-09 01:52 UTC",
+"generated": "2026-11-09 02:34 UTC",
 "market": "US",
 "watch_only": true,
 "asof": "2026-11-06",
@@ -30,6 +30,15 @@
 "pct": 40,
 "rules": "Same monthly breakout with a 1-2 year cup. Stop for sizing: EMA 21 (min 4% under the entry); exit when a daily close has EMA 9 below EMA 21 (sell next open).",
 "test": "Not tested on US/ASX yet (paper record tracks it)."
+},
+{
+"key": "t9",
+"name": "9/21 Trend (any stock)",
+"system": "9/21 trend",
+"status": "active",
+"pct": 40,
+"rules": "Daily EMA 9 crosses above EMA 21 on a stock in an uptrend (trend scan); buy next open; stop = 5-day low (max 12% away); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle.",
+"test": "US/ASX: no edge over the index in the 2008-26 test (paper record tracks it)."
 },
 {
 "key": "rt",
@@ -1644,6 +1653,38 @@
 "td_levels": 2,
 "rank": 14,
 "risk_pct": 4.2
+},
+{
+"id": "T921-ELF-2026-11-06",
+"symbol": "ELF",
+"name": "e.l.f. Beauty, Inc. Common Stock",
+"system": "9/21 trend",
+"bucket": "t9",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 117.3,
+"ref": 116.14,
+"stop": 105.36,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-06, stop 10.2% below",
+"score": 3,
+"value_cr": 163.66,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Package Goods/Cosmetics",
+"lane": "mid",
+"group_pulse": 48.5,
+"group_rank": 11,
+"td_levels": 0,
+"rank": 1,
+"risk_pct": 11.3
 },
 {
 "id": "PAT-WM-2026-11-05",
