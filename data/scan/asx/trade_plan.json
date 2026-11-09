@@ -1,8 +1,8 @@
 {
-"generated": "2026-11-09 04:47 UTC",
+"generated": "2026-11-09 10:23 UTC",
 "market": "ASX",
 "watch_only": true,
-"asof": "2026-11-06",
+"asof": "2026-11-09",
 "rules": {
 "risk_pct": 1.0,
 "max_pos_pct": 20.0,
@@ -69,10 +69,10 @@
 {
 "key": "wc",
 "name": "Wealth Creation",
-"status": "pending",
+"status": "sip",
 "pct": 0,
-"rules": "Rules to come from Amritpal.",
-"test": "Not tested yet."
+"rules": "ETF Pie funded by a monthly SIP, outside the systems' capital: Nifty 50, Midcap 150, Gold and US Nasdaq 100 ETFs at fixed weights (Equal, Balanced or Aggressive) rebalanced each quarter, or the monthly rotation (best 2 by 3-month return).",
+"test": "2016-26 monthly, price indices, 0.2% per switch: Equal 25% each 18.3%/yr, worst -15.7%; Balanced 30/20/30/20 17.6%, -14.7%; Aggressive 30/30/10/30 18.4%, -20.2%; rotation 17.7%, -12.8%; Nifty 50 11.6%, -29.3%."
 }
 ],
 "top": [],
@@ -176,84 +176,9 @@
 "group_rank": 21,
 "rank": 3,
 "risk_pct": 6.6
-},
-{
-"id": "T921-BRG-2026-11-05",
-"symbol": "BRG",
-"name": "BREVILLE GROUP LIMITED",
-"system": "9/21 trend",
-"bucket": "t9",
-"kind": "T921",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 33.33,
-"ref": 33.0,
-"stop": 30.23,
-"exit_rule": "Supertrend(10,3) turns red -> sell next open",
-"note": "EMA 9/21 cross 2026-11-05, stop 9.2% below",
-"score": 3,
-"value_cr": 11.39,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": null,
-"lane": null,
-"group_pulse": null,
-"group_rank": null,
-"td_levels": 0,
-"rank": 1,
-"risk_pct": 10.3
-},
-{
-"id": "T921-SNL-2026-11-05",
-"symbol": "SNL",
-"name": "SUPPLY NETWORK LIMITED",
-"system": "9/21 trend",
-"bucket": "t9",
-"kind": "T921",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 36.13,
-"ref": 35.77,
-"stop": 33.75,
-"exit_rule": "Supertrend(10,3) turns red -> sell next open",
-"note": "EMA 9/21 cross 2026-11-05, stop 6.0% below",
-"score": 3,
-"value_cr": 0.88,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": null,
-"lane": null,
-"group_pulse": null,
-"group_rank": null,
-"td_levels": 0,
-"rank": 2,
-"risk_pct": 7.1
 }
 ],
 "pattern_watch": [],
 "watch": [],
-"exits": [
-{
-"id": "EXIT-ATH-ALD",
-"symbol": "ALD",
-"system": "Monthly ATH",
-"side": "SELL",
-"order": "LIMIT",
-"when": "next open",
-"ref": 36.03,
-"why": "weekly close below the 30-week SMA"
-}
-]
+"exits": []
 }
