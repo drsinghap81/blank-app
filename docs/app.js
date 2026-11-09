@@ -2643,7 +2643,7 @@ function renderPortfolio() {
           <div><b>${esc(r.s)}</b>${r.t ? ` <span class="pill">${esc(r.t)}</span>` : ''}<div class="co">${fmt(r.q, 0, 'en-IN')} × ${fmt(r.a, 2, 'en-IN')}</div>${sys(r)}</div>
           <div class="r"><b class="${sgn(r.pl)}">${inr(r.pl)} <small>${pct(r.plp)}</small></b>
             <div class="co">LTP ${r.ltp != null ? fmt(r.ltp, 2, 'en-IN') : '–'} <span class="${sgn(r.dch)}">${r.dch != null ? pct(r.dch) : ''}</span></div></div>
-        </li>`).join('')}</ul>` : '<p class="empty">No holdings yet. Tap <b>Import</b> to paste or load your broker\'s holdings CSV, or <b>+ Add</b> one at a time.</p>'}
+        </li>`).join('')}</ul>` : '<p class="empty">No holdings yet. Tap <b>Import</b> to load them from Angel One (when Live is connected), paste or load your broker\'s holdings CSV, or <b>+ Add</b> one at a time.</p>'}
     </div>
     ${P.c.length ? `<div class="card"><h3>Closed trades</h3><div class="table-wrap"><table>
       <thead><tr><th>Sold</th><th>Stock</th><th class="r">P&amp;L</th><th></th></tr></thead>
@@ -2728,11 +2728,26 @@ function pfImport() {
   box.innerHTML = `<div class="pf-form">
     <p class="muted small">Paste your broker's holdings export (CSV with symbol, quantity and average price columns), or one holding per line: <code>ADANIPORTS, 140, 1829.17</code></p>
     <textarea id="f-txt" rows="7" placeholder="SYMBOL, QTY, AVG PRICE"></textarea>
+    ${lvCfg().url ? '<button class="lv-btn" id="f-angel" style="margin:4px 0 8px">Load from Angel One</button>' : ''}
     <label class="filebtn">Or choose a file (CSV or Excel)<input id="f-file" type="file"></label>
     <p class="muted small" id="f-info"></p>
     <div class="seg"><button id="f-rep" aria-selected="true">Replace my holdings</button><button id="f-addall">Add to them</button><button id="f-cancel">Cancel</button></div>
   </div>`;
   $('#f-cancel').onclick = () => (box.innerHTML = '');
+  const fa = $('#f-angel'); if (fa) fa.onclick = async () => {
+    const info = $('#f-info'); info.textContent = 'Reading your Angel One holdings…'; fa.disabled = true;
+    try {
+      const j = await lvApi('/api/account'); const A = j.angel || {};
+      if (A.error) throw new Error(A.error);
+      const H = (A.holdings || []).filter((h) => h.qty > 0 && h.avg > 0);
+      if (!H.length) { info.textContent = 'Angel One returned no holdings.'; fa.disabled = false; return; }
+      $('#f-txt').value = H.map((h) => `${h.symbol}, ${h.qty}, ${(+h.avg).toFixed(2)}`).join('\n');
+      const tot = H.reduce((a, h) => a + h.qty * (h.ltp || h.avg), 0);
+      info.textContent = `Angel One: ${H.length} holdings, about ${inr(tot)} at today's prices. Tap "Replace my holdings" (or "Add to them").`;
+      H.forEach((h) => { if (h.ltp && state.pf && !state.pf.px[h.symbol]) state.pf.px[h.symbol] = [h.ltp, null]; });   // price for names outside the scans
+    } catch (err) { info.textContent = 'Could not read Angel One: ' + (err.message || err); }
+    fa.disabled = false;
+  };
   $('#f-file').onchange = async (e) => {
     const f = e.target.files[0]; if (!f) return;
     const info = $('#f-info'); info.textContent = `Reading ${f.name}…`;
