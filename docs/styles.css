@@ -684,3 +684,9 @@ body.mode-bg .brand h1 { font-size: 22px; }
 .lv-det > summary::-webkit-details-marker { display: none; } .lv-det > summary::before { content: '＋ '; } .lv-det[open] > summary::before { content: '－ '; }
 .lv-how { margin: 6px 0; }
 .lv-capnote { font-size: 12px; }
+/* strength meter inside a bucket (industry lane + sector RS + stock RS) */
+.strm { display: inline-flex; gap: 2px; vertical-align: middle; padding: 3px 5px; border-radius: 999px; background: var(--soft); }
+.strm i { width: 6px; height: 10px; border-radius: 2px; background: var(--mute-line); }
+.strm.s1 i.on { background: #F2A93B; } .strm.s2 i.on { background: #84CC16; } .strm.s3 i.on { background: var(--rise); }
+.lv-offbk { border-style: dashed; }
+.lv-offnote { color: var(--warn-ink, var(--slate)); }

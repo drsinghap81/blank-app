@@ -217,7 +217,7 @@ def test_swing_sleeve(tmp_path):
     P = c.get("/api/plan", headers=h).json()
     assert "swing" in P and P["swing"]["risk_pct"] == round(A.RISK * 100, 2)
     sw = [r for r in P["rows"] if r["tier"] == "swing"]
-    assert all(r["kind"] in ("T921", "RETEST", "TF_BRK", "TF_STOP") for r in sw)
+    assert all(r["kind"] in ("T921", "RETEST", "TF_BRK", "TF_STOP", "PATTERN") for r in sw)
     assert A.protect_level("RETEST", 100) == 100 and A.protect_level("T921", 100) == 100 and A.protect_level("ATH_BRK", 100) < 100
     assert not any(r["kind"] == "T921" for r in P["rows"] if r["tier"] != "swing")
     j = c.post("/api/picks", headers=h, json={"n": 5, "swing_risk": 1.0}).json(); assert j["swing_risk_pct"] == 1.0 and j["picks"] == 5
@@ -225,7 +225,8 @@ def test_swing_sleeve(tmp_path):
     for r in P2["rows"]:
         if r["tier"] == "swing" and r["qty"]:
             E = r.get("trigger") or r["price"]
-            assert r["qty"] * (E - r["stop"]) <= 0.01 * 2000000 + E and r["qty"] * E <= P2["swing"]["idle_cash"] + E
+            assert r["qty"] * (E - r["stop"]) <= 0.01 * 2000000 + E
+            assert r.get("outside") or r["qty"] * E <= P2["swing"]["idle_cash"] + E          # 0% buckets are sized against your cash
     assert c.post("/api/picks", headers=h, json={"n": 5, "swing_risk": 9}).json()["swing_risk_pct"] == 1.0   # capped at 1%
     assert c.post("/api/picks", headers=h, json={"n": 6}).json()["swing_risk_pct"] == 1.0                    # kept when not sent
 
@@ -252,8 +253,11 @@ def test_buckets(tmp_path):
     P2 = c.get("/api/plan", headers=h).json()
     tf = [r for r in P2["rows"] if r["bucket"] == "tf" and not r["skip"]]
     assert sum(r["value"] for r in tf) <= 0.01 * 2000000 + max([r.get("trigger") or r["price"] for r in tf] or [0])
-    assert all(r["skip"] for r in P2["rows"] if r["bucket"] in ("rt", "t9"))
-    assert all("switched off" in r["skip"] or r["skip"] in ("already held",) for r in P["rows"] if r["bucket"] in ("rt", "t9") and r["skip"])
+    # buckets at 0% are still sized (the user decides), flagged "outside your split", and use no system room
+    off = [r for r in P2["rows"] if r["bucket"] in ("rt", "t9", "pt")]
+    assert off and all(r["skip"] or (r.get("outside") and "your call" in r["note"]) for r in off)
+    assert any(r["kind"] == "PATTERN" and r["id"].startswith("PAT-") and r["qty"] > 0 for r in P2["rows"])
+    assert A.protect_level("PATTERN", 100) == 100
     mom = [r for r in P2["rows"] if r["bucket"] == "mom" and not r["skip"]]
     assert sum(r["value"] for r in mom) <= 0.60 * 2000000 + 1
     assert A.protect_level("TF_BRK", 100) < 100           # Trend 9/21: safety net only, the system exits on the EMA cross

@@ -348,7 +348,7 @@ def record_exit(sym, sell_px):
 def protect_level(kind, stop):
     if not stop:
         return None
-    return stop if kind in ("T921", "RETEST") else stop * (1 - ATH_NET_PCT)
+    return stop if kind in ("T921", "RETEST", "PATTERN") else stop * (1 - ATH_NET_PCT)
 
 
 def _protect(sym, e):
@@ -766,8 +766,7 @@ def sized(acc=None):
     slots = max(0, N - len(ath_open)); sw_slots = max(0, SWING_MAX - len(sw_open))
     cash = acc["cash"]
     rows = []
-    for r in [dict(x, tier="top") for x in P.get("top") or []] + [dict(x, tier="more") for x in P.get("more") or []] + \
-            [dict(x, tier="swing") for x in P.get("swing") or []]:
+    for r in plan_rows(P):
         E = r.get("trigger") or r["price"]; stop = r["stop"]
         q = 0; why = ""
         if r["symbol"] in held:
@@ -788,6 +787,14 @@ def sized(acc=None):
         sw = r["tier"] == "swing"
         bk = r.get("bucket") or ("tf" if sw else "mom"); r["bucket"] = bk
         E0 = r.get("trigger") or r["price"]
+        if AL.get(bk, 0) <= 0:
+            r["outside"] = True; r["note"] = (r.get("note") or "") + " · outside your split (0% in Systems & allocation): your call"
+            if r["value"] > cash:
+                q = math.floor(cash / E0)
+                if q <= 0 or q < 0.25 * r["qty"]:
+                    r["skip"] = "not enough cash"; continue
+                r["qty"], r["value"] = q, round(q * E0, 0); r["risk_amt"] = round(q * (E0 - r["stop"]), 0)
+            continue
         if r["value"] > room.get(bk, 0):
             q = math.floor(max(0.0, room.get(bk, 0)) / E0)
             if q <= 0 or q < 0.25 * r["qty"]:
@@ -965,6 +972,19 @@ def order(body: Order, _=Depends(auth)):
 CHASE = float(ENV.get("CHASE_PCT", "3")) / 100     # how far past the trigger / plan close a buy may still be sent
 
 
+def plan_rows(P):
+    """every buy the app can size: Momentum top/more, swing systems, and bottom-pattern breakouts (watch-only system: sized
+    so you can decide, protective stop at the pattern stop, no tested exit)."""
+    pat = [dict(x, id=f"PAT-{x['symbol']}-{x.get('signal_date', '')}", system="Bottom pattern", bucket="pt", kind="PATTERN", side="BUY", order="LIMIT",
+                when="next open", price=round(float(x["close"]), 2), ref=float(x["close"]), stop=float(x["stop"]),
+                exit_rule="pattern stop only (no tested exit; watch-only system)",
+                note=f"{x.get('typ', '')} broke its neckline {float(x.get('neck') or 0):,.2f} on {x.get('signal_date', '')}",
+                risk_pct=round((1 - float(x["stop"]) / float(x["close"])) * 100, 1))
+           for x in P.get("pattern_watch") or [] if x.get("close") and x.get("stop") and x["stop"] < x["close"]]
+    return [dict(x, tier="top") for x in P.get("top") or []] + [dict(x, tier="more") for x in P.get("more") or []] + \
+        [dict(x, tier="swing") for x in (P.get("swing") or []) + pat]
+
+
 def live_check(r, ltp):
     """In market hours, what a plan buy may do at this live price (matches the backtest: buy at the trigger / next open).
     -> (state, limit_price or None, text). states: wait (buy-stop below trigger), triggered, ok, missed, ran, broken."""
@@ -989,7 +1009,7 @@ def live_check(r, ltp):
 def quotes(_=Depends(auth)):
     """Live prices for today's plan rows, exits and app trades, plus the limit price a buy sent now would get."""
     P = plan(); t = ist_now()
-    rows = (P.get("top") or []) + (P.get("more") or []) + (P.get("swing") or []); syms = sorted({r["symbol"] for r in rows} | {e["symbol"] for e in P.get("exits") or []}
+    rows = plan_rows(P); syms = sorted({r["symbol"] for r in rows} | {e["symbol"] for e in P.get("exits") or []}
                                              | {k for k in journal() if not k.startswith("_")})
     try:
         Q = broker.quotes(syms)
