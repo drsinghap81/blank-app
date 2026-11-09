@@ -186,6 +186,31 @@ class AngelEquity:
             return str(d["id"]), p
         raise RuntimeError(f"{r.get('message') or r} [{r.get('errorcode') or '?'}]")
 
+    def gtt_modify(self, rule_id, symbol, qty, trigger, limit):
+        """Move an existing GTT stop to a new trigger / limit (used by the daily trail; only ever raised)."""
+        api = self._session(); ts, t = self._ts(symbol); tick = t["tick"] or 0.05
+        rnd = lambda v: round(round(v / tick) * tick, 2)  # noqa: E731
+        p = dict(id=str(rule_id), symboltoken=str(t["token"]), exchange="NSE", price=f"{rnd(limit):.2f}", qty=str(int(qty)),
+                 disclosedqty=str(int(qty)), triggerprice=f"{rnd(trigger):.2f}", timeperiod="365")
+        r = self._call(api._postRequest, "api.gtt.modify", dict(p), tries=2) or {}
+        if not r.get("status"):
+            raise RuntimeError(f"{r.get('message') or r} [{r.get('errorcode') or '?'}]")
+        return str((r.get("data") or {}).get("id") or rule_id), p
+
+    def daily_candles(self, symbol, days=420):
+        """Completed daily candles from Angel's historical API: list of (date 'YYYY-MM-DD', open, high, low, close)."""
+        api = self._session(); ts, t = self._ts(symbol); now = ist_now()
+        r = self._call(api.getCandleData, dict(exchange="NSE", symboltoken=str(t["token"]), interval="ONE_DAY",
+                                                fromdate=(now - timedelta(days=days)).strftime("%Y-%m-%d 09:15"),
+                                                todate=now.strftime("%Y-%m-%d %H:%M")), tries=2) or {}
+        rows = self._data(r) or []
+        out = [(str(x[0])[:10], float(x[1]), float(x[2]), float(x[3]), float(x[4])) for x in rows]
+        today = now.date().isoformat()
+        if out and out[-1][0] == today and (now.hour, now.minute) < (15, 35):
+            out = out[:-1]                                   # today's candle is not complete yet
+        time.sleep(0.4)                                      # Angel: ~3 historical calls a second
+        return out
+
     def gtt_cancel(self, rule_id, symbol):
         api = self._session(); ts, t = self._ts(symbol)
         r = self._call(api._postRequest, "api.gtt.cancel", dict(id=str(rule_id), symboltoken=str(t["token"]), exchange="NSE"), tries=2) or {}
@@ -256,3 +281,15 @@ class MockBroker(AngelEquity):
 
     def gtt_cancel(self, rule_id, symbol):
         self.gtts[rule_id]["active"] = False; return {"status": True}
+
+    def gtt_modify(self, rule_id, symbol, qty, trigger, limit):
+        self.gtts[rule_id].update(trigger=round(trigger, 2), price=round(limit, 2)); return rule_id, self.gtts[rule_id]
+
+    def daily_candles(self, symbol, days=420):
+        # steady uptrend 50 -> ~150 over 300 sessions (weekdays), so the averages rise under the price
+        out, d, px = [], date(2025, 8, 1), 50.0
+        while len(out) < 300:
+            if d.weekday() < 5:
+                px *= 1.0037; out.append((d.isoformat(), px * 0.995, px * 1.01, px * 0.99, px))
+            d += timedelta(days=1)
+        return out

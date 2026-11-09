@@ -257,3 +257,29 @@ def test_buckets(tmp_path):
     mom = [r for r in P2["rows"] if r["bucket"] == "mom" and not r["skip"]]
     assert sum(r["value"] for r in mom) <= 0.60 * 2000000 + 1
     assert A.protect_level("TF_BRK", 100) < 100           # Trend 9/21: safety net only, the system exits on the EMA cross
+
+
+def test_trail(tmp_path):
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
+    P = c.get("/api/plan", headers=h).json()
+    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] not in ("ATH_STOP", "TF_STOP"))
+    c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"})
+    c.get("/api/plan", headers=h)                                        # fill -> GTT placed
+    J = A.journal(); e = J[r["symbol"]]; e.update(system="Monthly ATH", gtt_trigger=10.0); A.save_journal(J)
+    res = c.post("/api/trail", headers=h).json()["results"]
+    x = next(x for x in res if x["symbol"] == r["symbol"])
+    assert x["result"] == "raised" and x["new"] > 10 and abs(x["new"] - x["level"] * 0.85) < 0.02 and x["level"] < x["close"]
+    g = A.broker.gtts[e["gtt_id"]]; assert abs(g["trigger"] - x["new"]) < 0.02          # moved on the broker
+    again = next(y for y in c.post("/api/trail", headers=h).json()["results"] if y["symbol"] == r["symbol"])
+    assert again["result"].startswith("unchanged")                       # never lowered / not moved twice
+    P2 = c.get("/api/plan", headers=h).json(); t = next(t for t in P2["trades"] if t["symbol"] == r["symbol"])
+    assert t["trail_prev"] == 10.0 and t["trail_at"] and P2["trail"]["results"]
+    # dry run: shows the new level, changes nothing on Angel
+    J = A.journal(); J[r["symbol"]]["gtt_trigger"] = 5.0; A.save_journal(J); A.set_live(False)
+    d = next(y for y in c.post("/api/trail", headers=h).json()["results"] if y["symbol"] == r["symbol"])
+    assert d["result"].startswith("dry run") and abs(A.broker.gtts[e["gtt_id"]]["trigger"] - x["new"]) < 0.02
+    # systems with a tested static stop are not trailed
+    J = A.journal(); J[r["symbol"]]["system"] = "9/21 trend"; A.save_journal(J)
+    assert not any(y["symbol"] == r["symbol"] for y in c.post("/api/trail", headers=h).json()["results"])

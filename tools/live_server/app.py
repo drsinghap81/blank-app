@@ -427,6 +427,88 @@ def retry_protect():
     return done
 
 
+# Daily trail (9 Nov 2026): the protective GTT follows the system's own level, only ever up.
+# Momentum (Monthly ATH): TRAIL_GAP below the 30-week SMA of completed weekly closes; Trend 9/21: TRAIL_GAP below the daily EMA 21.
+# The systems still EXIT on closes (weekly close < SMA30, daily EMA9 < EMA21: "Sell next open" in Live); the GTT is the crash guard.
+# Other systems keep their tested static stop (9/21 any stock: 5-day low; retests: 1 ATR). Runs 08:40-09:10 IST on weekdays,
+# or from the app (/api/trail). Dry run: computes and shows the new level, changes nothing on Angel.
+TRAIL_GAP = float(ENV.get("TRAIL_GAP_PCT", str(ATH_NET_PCT * 100))) / 100
+TRAIL_SYS = ("Monthly ATH", "Trend 9/21")
+
+
+def _weekly_sma30(c):
+    """c: [(date, o, h, l, close)] completed daily candles -> 30-week SMA of completed weekly (Friday) closes, or None."""
+    from datetime import date as _d, timedelta as _td
+    wk = {}
+    for d, *_x, cl in c:
+        dd = _d.fromisoformat(d); end = dd + _td(days=(4 - dd.weekday()) % 7)
+        wk[end] = cl                                     # last close of that week
+    today = ist_now().date()
+    ends = sorted(k for k in wk if k < today or (k == today and ist_now().hour >= 16))
+    if len(ends) < 30:
+        return None
+    return sum(wk[k] for k in ends[-30:]) / 30
+
+
+def _ema21(c):
+    if len(c) < 60:
+        return None
+    a = 2 / 22; e = c[0][4]
+    for x in c[1:]:
+        e = a * x[4] + (1 - a) * e
+    return e
+
+
+def trail(force=False):
+    today = ist_now().date().isoformat(); path = os.path.join(DATA, "trail.json")
+    J = journal(); acc = account_cached(0)
+    held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
+    live = is_live(); out = []
+    for sym, e in J.items():
+        if sym.startswith("_") or e.get("state") != "open" or held.get(sym, 0) <= 0 or e.get("system") not in TRAIL_SYS:
+            continue
+        cur = float(e.get("gtt_trigger") or 0)
+        try:
+            c = broker.daily_candles(sym)
+            lvl = _weekly_sma30(c) if e["system"] == "Monthly ATH" else _ema21(c)
+            if not lvl:
+                out.append(dict(symbol=sym, result="not enough history")); continue
+            guard = round(lvl * (1 - TRAIL_GAP), 2); last = c[-1][4]
+            r = dict(symbol=sym, system=e["system"], level=round(lvl, 2), level_name="30-wk SMA" if e["system"] == "Monthly ATH" else "EMA 21",
+                     close=round(last, 2), old=cur or None, new=guard)
+            if not e.get("gtt_id"):
+                r["result"] = "no stop on Angel yet (Retry stop first)"
+            elif guard <= cur * 1.002:
+                r["result"] = "unchanged (the stop only moves up)"; r["new"] = cur
+            elif guard >= last * 0.97:
+                r["result"] = "skipped: too close to the price"
+            elif not live:
+                r["result"] = "dry run: would raise"
+            else:
+                broker.gtt_modify(e["gtt_id"], sym, e.get("qty") or held[sym], guard, guard * (1 - GTT_LIMIT_GAP))
+                e.update(gtt_trigger=guard, trail_prev=cur or None, trail_level=round(lvl, 2), trail_at=today)
+                log("gtt_trail", symbol=sym, old=cur, new=guard, level=round(lvl, 2)); r["result"] = "raised"
+            out.append(r)
+        except Exception as ex:  # noqa: BLE001
+            out.append(dict(symbol=sym, result=f"error, stop left where it was: {str(ex)[:120]}"))
+            log("gtt_trail_error", symbol=sym, error=str(ex)[:200])
+    save_journal(J)
+    json.dump(dict(day=today, at=ist_now().strftime("%H:%M"), live=live, results=out), open(path, "w"))
+    return out
+
+
+def last_trail():
+    try:
+        return json.load(open(os.path.join(DATA, "trail.json")))
+    except Exception:  # noqa: BLE001
+        return None
+
+
+@app.post("/api/trail")
+def trail_now(_=Depends(auth)):
+    return dict(results=trail(force=True), gap_pct=TRAIL_GAP * 100)
+
+
 @app.post("/api/protect")
 def protect_now(_=Depends(auth)):
     return dict(results=retry_protect())
@@ -443,7 +525,8 @@ def trades_view(J, acc):
             R = round((px - e["entry"]) / (e["entry"] - e["stop"]), 2)
         out.append(dict(symbol=sym, system=e.get("system"), state=e.get("state", "open"), qty=e.get("qty"), entry=e.get("entry"),
                         stop=e.get("stop"), ltp=px, R=R, since=e.get("since"), gtt_trigger=e.get("gtt_trigger"), gtt_id=e.get("gtt_id"),
-                        gtt_error=e.get("gtt_error"), order_status=e.get("order_status")))
+                        gtt_error=e.get("gtt_error"), order_status=e.get("order_status"), trail_prev=e.get("trail_prev"),
+                        trail_level=e.get("trail_level"), trail_at=e.get("trail_at")))
     done = sorted((J.get("_done") or {}).items(), key=lambda kv: kv[1].get("ended", ""), reverse=True)[:5]
     recent = [dict(symbol=k.split(":")[0], state=v.get("state"), ended=v.get("ended"), entry=v.get("entry"), exit=v.get("exit"), text=v.get("text")) for k, v in done]
     return out, recent
@@ -555,7 +638,8 @@ def sized(acc=None):
                 buckets=[dict(key=k, pct=AL[k], used=round(expo.get(k, 0.0)), room=round(max(0.0, room.get(k, 0.0)))) for k in AL],
                 swing=dict(risk_pct=round(SR * 100, 2), slots=sw_slots, max=SWING_MAX, open=len(sw_open), idle_cash=round(sw_cash), reserve_pct=SWING_RESERVE * 100),
                 mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,
-                trades=trades, recent=recent, protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100))
+                trades=trades, recent=recent, protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100, trail_gap_pct=TRAIL_GAP * 100),
+                trail=last_trail())
 
 
 @app.get("/api/plan")
@@ -872,6 +956,9 @@ def _loop():
             t = ist_now()
             if t.weekday() < 5 and (9, 0) <= (t.hour, t.minute) <= (16, 0) and any(not k.startswith("_") for k in journal()):
                 sync()
+            if t.weekday() < 5 and (8, 40) <= (t.hour, t.minute) <= (9, 10) and (last_trail() or {}).get("day") != t.date().isoformat() \
+                    and any(not k.startswith("_") for k in journal()):
+                trail()
         except Exception as ex:  # noqa: BLE001
             log("loop_error", error=str(ex)[:200])
         time.sleep(120)
