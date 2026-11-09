@@ -1,16 +1,16 @@
 {
-"generated": "2026-11-06 23:23 UTC",
-"asof": "2026-11-06",
+"generated": "2026-11-09 23:23 UTC",
+"asof": "2026-11-09",
 "market": "^GSPC",
 "bench": "^GSPC",
 "indices": {
 "GDX": {
-"close": 87.5999984741211,
+"close": 91.45999908447266,
 "sma30": 86.93133265177408,
 "up": false,
-"ret_3m": -3.193722464221138,
-"vs_market_3m": 1.6591689127206655,
-"from_high": -24.378451965240945,
+"ret_3m": 1.48690223818424,
+"vs_market_3m": 3.793522788909265,
+"from_high": -21.046269012565055,
 "tag": "mixed",
 "since": "2006-05-22",
 "years": 20.5,
@@ -19,19 +19,19 @@
 "base_months": 9,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -7.112711490410262,
+"rs_6m": -7.992654281013234,
 "rs_6m_up": true,
 "name": "Gold miners",
 "shortlist": null,
 "slug": "gdx"
 },
 "IAI": {
-"close": 177.8000030517578,
+"close": 181.8300018310547,
 "sma30": 182.64946390787762,
 "up": false,
-"ret_3m": -5.283325760205226,
-"vs_market_3m": -0.43043438326342276,
-"from_high": -9.984251513510978,
+"ret_3m": -3.007659981784039,
+"vs_market_3m": -0.701039431059014,
+"from_high": -7.943962704222008,
 "tag": "weak",
 "since": "2006-05-05",
 "years": 20.5,
@@ -40,19 +40,19 @@
 "base_months": 3,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 1.0083644394603741,
+"rs_6m": 0.9318297859292723,
 "rs_6m_up": true,
 "name": "Brokers & asset managers",
 "shortlist": null,
 "slug": "iai"
 },
 "IGV": {
-"close": 98.87999725341797,
+"close": 101.45999908447266,
 "sma30": 97.86086298624674,
 "up": true,
-"ret_3m": -5.837543813074097,
-"vs_market_3m": -0.9846524361322939,
-"from_high": -16.038258943642226,
+"ret_3m": -2.367204703442527,
+"vs_market_3m": -0.06058415271750217,
+"from_high": -13.84750801644744,
 "tag": "uptrend",
 "since": "2001-07-17",
 "years": 25.3,
@@ -61,40 +61,40 @@
 "base_months": 13,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 8.82548092657589,
+"rs_6m": 9.864648219604955,
 "rs_6m_up": false,
 "name": "Software & IT",
 "shortlist": "trend",
 "slug": "igv"
 },
 "IHI": {
-"close": 57.59000015258789,
+"close": 58.56999969482422,
 "sma30": 52.026649220784506,
 "up": true,
-"ret_3m": 4.021798941128152,
-"vs_market_3m": 8.874690318069955,
-"from_high": -12.165344646142696,
+"ret_3m": 4.790320382317637,
+"vs_market_3m": 7.096940933042662,
+"from_high": -10.670666395932471,
 "tag": "leading",
 "since": "2006-05-05",
 "years": 20.5,
 "ath_month": "2021-12",
-"ath_month_close": 64.40531921386719,
+"ath_month_close": 64.40530395507812,
 "base_months": 59,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 18.22107564453519,
+"rs_6m": 21.31121134457581,
 "rs_6m_up": true,
 "name": "Medical devices & care",
 "shortlist": "trend",
 "slug": "ihi"
 },
 "ITA": {
-"close": 68.9800033569336,
+"close": 71.66999816894531,
 "sma30": 75.37598342895508,
 "up": false,
-"ret_3m": -17.50092980119591,
-"vs_market_3m": -12.648038424254104,
-"from_high": -18.18185355647778,
+"ret_3m": -14.545751430350496,
+"vs_market_3m": -12.23913087962547,
+"from_high": -14.991213099088373,
 "tag": "weak",
 "since": "2006-05-05",
 "years": 20.5,
@@ -103,61 +103,61 @@
 "base_months": 9,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -6.955278974508438,
+"rs_6m": -6.412367975314693,
 "rs_6m_up": true,
 "name": "Aerospace & defence",
 "shortlist": null,
 "slug": "ita"
 },
 "ITB": {
-"close": 96.52999877929688,
+"close": 99.44999694824219,
 "sma30": 93.72646153767904,
 "up": true,
-"ret_3m": -1.062018691772948,
-"vs_market_3m": 3.7908726851688557,
-"from_high": -23.094994340795527,
+"ret_3m": -0.2092182018993527,
+"vs_market_3m": 2.097402348825672,
+"from_high": -20.768640425656326,
 "tag": "leading",
 "since": "2006-05-05",
 "years": 20.5,
 "ath_month": "2024-09",
-"ath_month_close": 123.34467315673828,
+"ath_month_close": 123.34468078613281,
 "base_months": 26,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 5.157754220091082,
+"rs_6m": 7.804486362043739,
 "rs_6m_up": true,
 "name": "Homebuilders & construction",
 "shortlist": "trend",
 "slug": "itb"
 },
 "IYT": {
-"close": 80.95999908447266,
+"close": 83.70999908447266,
 "sma30": 83.40752792358398,
 "up": false,
-"ret_3m": -6.636031564437584,
-"vs_market_3m": -1.7831401874957797,
-"from_high": -9.851538967399943,
+"ret_3m": -3.542387711700312,
+"vs_market_3m": -1.2357671609752874,
+"from_high": -6.7894308813933435,
 "tag": "weak",
 "since": "2004-01-02",
-"years": 22.8,
+"years": 22.9,
 "ath_month": "2026-06",
 "ath_month_close": 86.55474853515625,
 "base_months": 5,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 0.9291012633672491,
+"rs_6m": 3.0754510532190693,
 "rs_6m_up": true,
 "name": "Transport",
 "shortlist": null,
 "slug": "iyt"
 },
 "JETS": {
-"close": 28.719999313354492,
+"close": 30.200000762939453,
 "sma30": 28.94199994405111,
 "up": false,
-"ret_3m": -8.651403226780053,
-"vs_market_3m": -3.7985118498382486,
-"from_high": -14.34536129154983,
+"ret_3m": -4.73186108485415,
+"vs_market_3m": -2.425240534129125,
+"from_high": -9.931399157740294,
 "tag": "weak",
 "since": "2015-04-30",
 "years": 11.5,
@@ -166,19 +166,19 @@
 "base_months": 5,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 4.8250551527442065,
+"rs_6m": 11.430271762135469,
 "rs_6m_up": true,
 "name": "Airlines",
 "shortlist": null,
 "slug": "jets"
 },
 "KBE": {
-"close": 65.91000366210938,
-"sma30": 66.04719263712565,
+"close": 67.12999725341797,
+"sma30": 66.04719276428223,
 "up": false,
-"ret_3m": -5.228612043520242,
-"vs_market_3m": -0.3757206665784385,
-"from_high": -7.516241211375341,
+"ret_3m": -4.254708855897227,
+"vs_market_3m": -1.948088305172202,
+"from_high": -5.804367645100362,
 "tag": "weak",
 "since": "2005-11-15",
 "years": 21.0,
@@ -187,19 +187,19 @@
 "base_months": 4,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 4.353536047588347,
+"rs_6m": 5.912358112938865,
 "rs_6m_up": true,
 "name": "Banks",
 "shortlist": null,
 "slug": "kbe"
 },
 "KIE": {
-"close": 64.27999877929688,
+"close": 64.8499984741211,
 "sma30": 60.795083618164064,
 "up": true,
-"ret_3m": 0.9417430486179379,
-"vs_market_3m": 5.7946344255597415,
-"from_high": -2.977441496384381,
+"ret_3m": 2.2370130116154296,
+"vs_market_3m": 4.543633562340455,
+"from_high": -2.1170987803242003,
 "tag": "leading",
 "since": "2005-11-15",
 "years": 21.0,
@@ -208,20 +208,20 @@
 "base_months": 4,
 "above_ath_month": true,
 "brk_last_base": null,
-"rs_6m": 15.139366909049446,
+"rs_6m": 14.095356878619448,
 "rs_6m_up": true,
 "name": "Insurance",
 "shortlist": "new_high",
 "slug": "kie"
 },
 "KRE": {
-"close": 72.19999694824219,
+"close": 73.44999694824219,
 "sma30": 72.11176528930665,
 "up": true,
-"ret_3m": -4.496633756411361,
-"vs_market_3m": 0.3562576205304424,
-"from_high": -6.8250832907173375,
-"tag": "leading",
+"ret_3m": -3.829800836611097,
+"vs_market_3m": -1.5231802858860721,
+"from_high": -5.211944082829345,
+"tag": "uptrend",
 "since": "2006-06-22",
 "years": 20.4,
 "ath_month": "2026-07",
@@ -229,19 +229,19 @@
 "base_months": 4,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 4.873830247920918,
+"rs_6m": 6.420276558634108,
 "rs_6m_up": true,
 "name": "Regional banks",
 "shortlist": "trend",
 "slug": "kre"
 },
 "MDY": {
-"close": 657.8200073242188,
+"close": 678.6099853515625,
 "sma30": 677.9369079589844,
 "up": false,
-"ret_3m": -6.730036140660056,
-"vs_market_3m": -1.8771447637182526,
-"from_high": -8.021926470438888,
+"ret_3m": -4.06320000276118,
+"vs_market_3m": -1.7565794520361555,
+"from_high": -5.1150186440028556,
 "tag": "weak",
 "since": "1995-05-04",
 "years": 31.5,
@@ -250,19 +250,19 @@
 "base_months": 5,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -1.8100153742386715,
+"rs_6m": -0.6058473182734336,
 "rs_6m_up": true,
 "name": "MidCap 400",
 "shortlist": null,
 "slug": "mdy"
 },
 "PAVE": {
-"close": 51.13999938964844,
+"close": 53.33000183105469,
 "sma30": 55.57530568440755,
 "up": false,
-"ret_3m": -12.281303501048058,
-"vs_market_3m": -7.428412124106254,
-"from_high": -14.602971368583862,
+"ret_3m": -9.148209305092792,
+"vs_market_3m": -6.841588754367766,
+"from_high": -10.945957222637336,
 "tag": "weak",
 "since": "2017-03-08",
 "years": 9.7,
@@ -271,82 +271,82 @@
 "base_months": 5,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -9.521136271411002,
+"rs_6m": -8.041029052308302,
 "rs_6m_up": true,
 "name": "Infrastructure",
 "shortlist": null,
 "slug": "pave"
 },
 "PEJ": {
-"close": 66.70999908447266,
-"sma30": 64.37867762247721,
+"close": 68.19999694824219,
+"sma30": 64.37867736816406,
 "up": true,
-"ret_3m": -0.4761743243070993,
-"vs_market_3m": 4.376717052634705,
-"from_high": -3.917616604850216,
+"ret_3m": 1.2637249231213898,
+"vs_market_3m": 3.5703454738464147,
+"from_high": -1.771573313448338,
 "tag": "leading",
 "since": "2005-06-23",
 "years": 21.4,
 "ath_month": "2026-07",
 "ath_month_close": 66.80937957763672,
 "base_months": 4,
-"above_ath_month": false,
+"above_ath_month": true,
 "brk_last_base": null,
-"rs_6m": 10.625972803546535,
+"rs_6m": 13.19538075393445,
 "rs_6m_up": true,
 "name": "Leisure",
-"shortlist": "near",
+"shortlist": "new_high",
 "slug": "pej"
 },
 "PPH": {
-"close": 118.83000183105469,
-"sma30": 109.02882741292318,
+"close": 121.25,
+"sma30": 108.7454828898112,
 "up": true,
-"ret_3m": 5.401813094447694,
-"vs_market_3m": 10.254704471389498,
-"from_high": -2.6861016811909,
+"ret_3m": 8.596730989996182,
+"vs_market_3m": 10.903351540721207,
+"from_high": -0.7042835198206143,
 "tag": "leading",
 "since": "2000-02-01",
 "years": 26.8,
 "ath_month": "2026-10",
 "ath_month_close": 119.33000183105469,
 "base_months": 1,
-"above_ath_month": false,
+"above_ath_month": true,
 "brk_last_base": 2,
-"rs_6m": 20.062761822299624,
+"rs_6m": 20.50115143882849,
 "rs_6m_up": true,
 "name": "Pharma",
-"shortlist": "near",
+"shortlist": "new_high",
 "slug": "pph"
 },
 "RSP": {
-"close": 216.0500030517578,
+"close": 220.9499969482422,
 "sma30": 211.46951599121093,
 "up": true,
-"ret_3m": -1.5247779812481155,
-"vs_market_3m": 3.328113395693688,
-"from_high": -3.2597495722066383,
+"ret_3m": 0.4941502786769636,
+"vs_market_3m": 2.8007708294019884,
+"from_high": -1.0656897252044661,
 "tag": "leading",
 "since": "2003-05-01",
 "years": 23.5,
 "ath_month": "2026-08",
 "ath_month_close": 218.5684051513672,
 "base_months": 3,
-"above_ath_month": false,
+"above_ath_month": true,
 "brk_last_base": null,
-"rs_6m": 6.983491704090183,
+"rs_6m": 7.160402067038718,
 "rs_6m_up": true,
 "name": "S&P 500 EW",
-"shortlist": "near",
+"shortlist": "new_high",
 "slug": "rsp"
 },
 "SMH": {
-"close": 463.9599914550781,
+"close": 487.4100036621094,
 "sma30": 566.259336344401,
 "up": false,
-"ret_3m": -18.51916662209342,
-"vs_market_3m": -13.666275245151615,
-"from_high": -30.639396917045158,
+"ret_3m": -14.926778159101772,
+"vs_market_3m": -12.620157608376747,
+"from_high": -27.133691643016544,
 "tag": "weak",
 "since": "2000-06-05",
 "years": 26.4,
@@ -355,61 +355,61 @@
 "base_months": 5,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -17.86138683216867,
+"rs_6m": -16.961517278510797,
 "rs_6m_up": false,
 "name": "Semiconductors",
 "shortlist": null,
 "slug": "smh"
 },
 "XBI": {
-"close": 152.2100067138672,
+"close": 156.89999389648438,
 "sma30": 148.31688537597657,
 "up": true,
-"ret_3m": -3.6828400369463,
-"vs_market_3m": 1.1700513399955037,
-"from_high": -11.937941149622876,
+"ret_3m": -0.7401868624795749,
+"vs_market_3m": 1.56643368824545,
+"from_high": -9.224511487745978,
 "tag": "leading",
 "since": "2006-02-06",
-"years": 20.7,
+"years": 20.8,
 "ath_month": "2026-08",
 "ath_month_close": 162.5,
 "base_months": 3,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 13.440169314646155,
+"rs_6m": 14.435657229333243,
 "rs_6m_up": true,
 "name": "Biotech",
 "shortlist": "trend",
 "slug": "xbi"
 },
 "XLB": {
-"close": 51.95000076293945,
+"close": 52.939998626708984,
 "sma30": 51.09991747538249,
 "up": true,
-"ret_3m": -1.8633409228940412,
-"vs_market_3m": 2.9895504540477624,
-"from_high": -3.617812073721749,
+"ret_3m": -0.10588360879266734,
+"vs_market_3m": 2.2007369419323575,
+"from_high": -1.7810813951628535,
 "tag": "leading",
 "since": "1998-12-22",
 "years": 27.9,
 "ath_month": "2026-10",
 "ath_month_close": 52.7400016784668,
 "base_months": 1,
-"above_ath_month": false,
+"above_ath_month": true,
 "brk_last_base": 8,
-"rs_6m": 1.8432564987741706,
+"rs_6m": 0.292982073955228,
 "rs_6m_up": true,
 "name": "Materials",
-"shortlist": "near",
+"shortlist": "new_high",
 "slug": "xlb"
 },
 "XLC": {
-"close": 104.79000091552734,
+"close": 107.36000061035156,
 "sma30": 110.92196197509766,
 "up": false,
-"ret_3m": -5.986441000019715,
-"vs_market_3m": -1.1335496230779118,
-"from_high": -11.937669596492185,
+"ret_3m": -3.1959749243145152,
+"vs_market_3m": -0.8893543735894904,
+"from_high": -9.777919999343466,
 "tag": "weak",
 "since": "2018-06-19",
 "years": 8.4,
@@ -418,19 +418,19 @@
 "base_months": 10,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -9.591038483774316,
+"rs_6m": -8.260101297126955,
 "rs_6m_up": true,
 "name": "Communication Services",
 "shortlist": null,
 "slug": "xlc"
 },
 "XLE": {
-"close": 61.619998931884766,
+"close": 61.939998626708984,
 "sma30": 59.866593805948895,
 "up": true,
-"ret_3m": 3.0014459329723797,
-"vs_market_3m": 7.854337309914183,
-"from_high": -11.996569714222394,
+"ret_3m": 2.2618955698223475,
+"vs_market_3m": 4.568516120547372,
+"from_high": -11.53955784594789,
 "tag": "leading",
 "since": "1998-12-22",
 "years": 27.9,
@@ -439,40 +439,40 @@
 "base_months": 1,
 "above_ath_month": false,
 "brk_last_base": 2,
-"rs_6m": 12.423853359847348,
+"rs_6m": 7.780135161193047,
 "rs_6m_up": true,
 "name": "Energy",
 "shortlist": "trend",
 "slug": "xle"
 },
 "XLF": {
-"close": 57.15999984741211,
+"close": 57.9900016784668,
 "sma30": 54.65674718221029,
 "up": true,
-"ret_3m": -0.7744402725629262,
-"vs_market_3m": 4.078451104378877,
-"from_high": -3.445947448035225,
+"ret_3m": 0.6838036155543348,
+"vs_market_3m": 2.9904241662793596,
+"from_high": -2.0439173460790605,
 "tag": "leading",
 "since": "1998-12-22",
 "years": 27.9,
 "ath_month": "2026-08",
 "ath_month_close": 57.506473541259766,
 "base_months": 3,
-"above_ath_month": false,
+"above_ath_month": true,
 "brk_last_base": null,
-"rs_6m": 12.676526615578387,
+"rs_6m": 12.03325851247734,
 "rs_6m_up": true,
 "name": "Financials",
-"shortlist": "near",
+"shortlist": "new_high",
 "slug": "xlf"
 },
 "XLI": {
-"close": 162.6699981689453,
-"sma30": 174.40062255859374,
+"close": 168.88999938964844,
+"sma30": 174.40062154134114,
 "up": false,
-"ret_3m": -11.642906670065889,
-"vs_market_3m": -6.790015293124085,
-"from_high": -12.547746759815714,
+"ret_3m": -8.807798761746122,
+"vs_market_3m": -6.501178211021097,
+"from_high": -9.203841134746183,
 "tag": "weak",
 "since": "1998-12-22",
 "years": 27.9,
@@ -481,19 +481,19 @@
 "base_months": 5,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -5.313120433118468,
+"rs_6m": -4.7772724056465705,
 "rs_6m_up": true,
 "name": "Industrials",
 "shortlist": null,
 "slug": "xli"
 },
 "XLK": {
-"close": 164.74000549316406,
-"sma30": 181.36309712727865,
+"close": 170.8800048828125,
+"sma30": 181.36309611002605,
 "up": false,
-"ret_3m": -11.479042851456178,
-"vs_market_3m": -6.626151474514375,
-"from_high": -18.445541835067292,
+"ret_3m": -8.066295947798352,
+"vs_market_3m": -5.759675397073327,
+"from_high": -15.405938176825495,
 "tag": "weak",
 "since": "1998-12-22",
 "years": 27.9,
@@ -502,19 +502,19 @@
 "base_months": 2,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -5.638698251204344,
+"rs_6m": -5.4570176853874,
 "rs_6m_up": false,
 "name": "Technology",
 "shortlist": null,
 "slug": "xlk"
 },
 "XLP": {
-"close": 90.08000183105469,
-"sma30": 84.11758600870768,
+"close": 90.88999938964844,
+"sma30": 84.11758677164714,
 "up": true,
-"ret_3m": 6.736245362989712,
-"vs_market_3m": 11.589136739931515,
-"from_high": -2.0230591265613107,
+"ret_3m": 8.026634119093657,
+"vs_market_3m": 10.33325466981868,
+"from_high": -1.1420524514636377,
 "tag": "leading",
 "since": "1998-12-22",
 "years": 27.9,
@@ -523,19 +523,19 @@
 "base_months": 1,
 "above_ath_month": true,
 "brk_last_base": 8,
-"rs_6m": 8.784439834569092,
+"rs_6m": 8.491897565156115,
 "rs_6m_up": true,
 "name": "Consumer Staples",
 "shortlist": "new_high",
 "slug": "xlp"
 },
 "XLRE": {
-"close": 44.0,
-"sma30": 43.55883763631185,
+"close": 44.63999938964844,
+"sma30": 43.558837763468425,
 "up": true,
-"ret_3m": -0.06675595763349085,
-"vs_market_3m": 4.786135419308312,
-"from_high": -3.56365152861875,
+"ret_3m": 2.122838625674195,
+"vs_market_3m": 4.42945917639922,
+"from_high": -2.1609423431276586,
 "tag": "leading",
 "since": "2015-10-08",
 "years": 11.1,
@@ -544,19 +544,19 @@
 "base_months": 4,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 1.087783237899398,
+"rs_6m": 0.035020211888481256,
 "rs_6m_up": true,
 "name": "Real Estate",
 "shortlist": "near",
 "slug": "xlre"
 },
 "XLU": {
-"close": 43.130001068115234,
-"sma30": 43.527503967285156,
+"close": 43.790000915527344,
+"sma30": 43.52750358581543,
 "up": false,
-"ret_3m": 0.7352894007561117,
-"vs_market_3m": 5.588180777697915,
-"from_high": -7.7513899988618125,
+"ret_3m": 1.1047080996866354,
+"vs_market_3m": 3.4113286504116602,
+"from_high": -6.339749214791901,
 "tag": "mixed",
 "since": "1998-12-22",
 "years": 27.9,
@@ -565,145 +565,145 @@
 "base_months": 9,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -1.933404848033593,
+"rs_6m": -3.439273932053255,
 "rs_6m_up": true,
 "name": "Utilities",
 "shortlist": null,
 "slug": "xlu"
 },
 "XLV": {
-"close": 184.8000030517578,
-"sma30": 161.68226979573566,
+"close": 188.3300018310547,
+"sma30": 161.68226877848306,
 "up": true,
-"ret_3m": 10.132540399487189,
-"vs_market_3m": 14.985431776428992,
-"from_high": -2.5624805001111084,
+"ret_3m": 12.523525981691218,
+"vs_market_3m": 14.830146532416244,
+"from_high": -0.7012558290487858,
 "tag": "leading",
 "since": "1998-12-22",
 "years": 27.9,
 "ath_month": "2026-10",
 "ath_month_close": 184.8699951171875,
 "base_months": 1,
-"above_ath_month": false,
+"above_ath_month": true,
 "brk_last_base": 2,
-"rs_6m": 30.241023448543068,
+"rs_6m": 30.338660511242253,
 "rs_6m_up": true,
 "name": "Health Care",
-"shortlist": "near",
+"shortlist": "new_high",
 "slug": "xlv"
 },
 "XLY": {
-"close": 117.58000183105469,
+"close": 121.01000213623047,
 "sma30": 115.62372283935547,
 "up": true,
-"ret_3m": -1.5300638972226221,
-"vs_market_3m": 3.3228274797191815,
-"from_high": -4.986360872701933,
+"ret_3m": 1.7079224078881294,
+"vs_market_3m": 4.014542958613154,
+"from_high": -2.2146581500675167,
 "tag": "leading",
 "since": "1998-12-22",
 "years": 27.9,
 "ath_month": "2026-01",
 "ath_month_close": 120.4213638305664,
 "base_months": 10,
-"above_ath_month": false,
+"above_ath_month": true,
 "brk_last_base": null,
-"rs_6m": -1.47500823277813,
+"rs_6m": -0.04898945450367842,
 "rs_6m_up": true,
 "name": "Consumer Discretionary",
 "shortlist": null,
 "slug": "xly"
 },
 "XME": {
-"close": 93.44999694824219,
-"sma30": 110.82297032674154,
+"close": 98.58000183105469,
+"sma30": 110.82296981811524,
 "up": false,
-"ret_3m": -20.44171629311915,
-"vs_market_3m": -15.588824916177346,
-"from_high": -29.551474557630407,
+"ret_3m": -16.28086075791896,
+"vs_market_3m": -13.974240207193933,
+"from_high": -25.68415201821438,
 "tag": "weak",
 "since": "2006-06-22",
 "years": 20.4,
 "ath_month": "2026-05",
-"ath_month_close": 125.04035949707031,
+"ath_month_close": 125.04035186767578,
 "base_months": 6,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -22.40037228280579,
+"rs_6m": -22.17665343608465,
 "rs_6m_up": false,
 "name": "Metals & mining",
 "shortlist": null,
 "slug": "xme"
 },
 "XOP": {
-"close": 173.77000427246094,
+"close": 174.14999389648438,
 "sma30": 175.5674809773763,
 "up": false,
-"ret_3m": -0.8339198036077855,
-"vs_market_3m": 4.018971573334018,
-"from_high": -34.83753601670622,
+"ret_3m": -1.9765733411971298,
+"vs_market_3m": 0.330047209527895,
+"from_high": -34.695050196794405,
 "tag": "mixed",
 "since": "2006-06-22",
 "years": 20.4,
 "ath_month": "2014-06",
-"ath_month_close": 262.93310546875,
+"ath_month_close": 262.9331970214844,
 "base_months": 149,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 6.467957156380955,
-"rs_6m_up": true,
+"rs_6m": 2.283152607500938,
+"rs_6m_up": false,
 "name": "Oil & gas",
 "shortlist": null,
 "slug": "xop"
 },
 "XRT": {
-"close": 89.5,
+"close": 92.77999877929688,
 "sma30": 86.04455795288087,
 "up": true,
-"ret_3m": -0.9944154540935446,
-"vs_market_3m": 3.858475922848259,
-"from_high": -7.091353055256555,
+"ret_3m": 3.733219075633487,
+"vs_market_3m": 6.039839626358512,
+"from_high": -3.686441704876531,
 "tag": "leading",
 "since": "2006-06-22",
 "years": 20.4,
 "ath_month": "2021-06",
-"ath_month_close": 89.74295806884766,
+"ath_month_close": 89.74292755126953,
 "base_months": 65,
-"above_ath_month": false,
+"above_ath_month": true,
 "brk_last_base": null,
-"rs_6m": 6.411222077328538,
+"rs_6m": 12.031219984362739,
 "rs_6m_up": true,
 "name": "Retail",
-"shortlist": "trend",
+"shortlist": "cup_breakout",
 "slug": "xrt"
 },
 "^DJI": {
-"close": 51285.73046875,
+"close": 52389.75,
 "sma30": 51692.03997395833,
 "up": false,
-"ret_3m": -4.9841614300226595,
-"vs_market_3m": -0.13127005308085637,
-"from_high": -5.636504442667578,
+"ret_3m": -2.6065315131807987,
+"vs_market_3m": -0.29991096245577387,
+"from_high": -3.6051569083705437,
 "tag": "weak",
 "since": "1992-01-02",
-"years": 34.8,
+"years": 34.9,
 "ath_month": "2026-08",
 "ath_month_close": 53185.8984375,
 "base_months": 3,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": 3.6888520318073548,
+"rs_6m": 3.488480413327033,
 "rs_6m_up": true,
 "name": "Dow",
 "shortlist": null,
 "slug": "dji"
 },
 "^GSPC": {
-"close": 7376.85986328125,
+"close": 7549.93994140625,
 "sma30": 7531.445719401042,
 "up": false,
-"ret_3m": -4.852891376941804,
+"ret_3m": -2.306620550725025,
 "vs_market_3m": 0.0,
-"from_high": -5.653846530939632,
+"from_high": -3.4402434646134017,
 "tag": "weak",
 "since": "1927-12-30",
 "years": 98.9,
@@ -719,12 +719,12 @@
 "slug": "gspc"
 },
 "^NDX": {
-"close": 26989.9921875,
-"sma30": 29167.186328125,
+"close": 27907.625,
+"sma30": 29167.186263020834,
 "up": false,
-"ret_3m": -8.884701552026787,
-"vs_market_3m": -4.031810175084982,
-"from_high": -13.561410074442692,
+"ret_3m": -5.479522917374203,
+"vs_market_3m": -3.1729023666491774,
+"from_high": -10.622584237410448,
 "tag": "weak",
 "since": "1985-10-01",
 "years": 41.1,
@@ -733,19 +733,19 @@
 "base_months": 2,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -7.4029392669886285,
+"rs_6m": -6.547644006997633,
 "rs_6m_up": false,
 "name": "Nasdaq 100",
 "shortlist": null,
 "slug": "ndx"
 },
 "^RUT": {
-"close": 2754.10546875,
-"sma30": 2891.9468587239585,
+"close": 2840.812255859375,
+"sma30": 2891.947013346354,
 "up": false,
-"ret_3m": -8.72587135000692,
-"vs_market_3m": -3.872979973065116,
-"from_high": -10.24352797621435,
+"ret_3m": -6.154624002869891,
+"vs_market_3m": -3.848003452144866,
+"from_high": -7.417748281224245,
 "tag": "weak",
 "since": "1987-09-10",
 "years": 39.2,
@@ -754,7 +754,7 @@
 "base_months": 5,
 "above_ath_month": false,
 "brk_last_base": null,
-"rs_6m": -3.4553450281535225,
+"rs_6m": -2.836100218220383,
 "rs_6m_up": true,
 "name": "Russell 2000",
 "shortlist": null,
@@ -780,6 +780,7 @@
 "AAC": "Industrials",
 "AACG": "Real Estate",
 "AACI": "Finance",
+"AACIW": "Finance",
 "AACP": "Finance",
 "AACPR": "Finance",
 "AACPU": "Finance",
@@ -831,7 +832,6 @@
 "ACET": "Health Care",
 "ACFN": "Consumer Discretionary",
 "ACGC": "Finance",
-"ACGCU": "Finance",
 "ACGCW": "Finance",
 "ACGL": "Finance",
 "ACGLN": "Finance",
@@ -851,7 +851,6 @@
 "ACNB": "Finance",
 "ACNT": "Industrials",
 "ACON": "Health Care",
-"ACONW": "Health Care",
 "ACP": "Finance",
 "ACR": "Real Estate",
 "ACRE": "Real Estate",
@@ -922,6 +921,8 @@
 "AES": "Industrials",
 "AESI": "Industrials",
 "AESP": "Finance",
+"AESPR": "Finance",
+"AESPW": "Finance",
 "AETR": "Industrials",
 "AEVA": "Consumer Discretionary",
 "AEYE": "Technology",
@@ -934,7 +935,6 @@
 "AFGE": "Finance",
 "AFL": "Finance",
 "AFRI": "Consumer Staples",
-"AFRIW": "Consumer Staples",
 "AFRM": "Finance",
 "AFYA": "Real Estate",
 "AG": "Basic Materials",
@@ -947,6 +947,8 @@
 "AGIG": "Energy",
 "AGIO": "Health Care",
 "AGL": "Health Care",
+"AGLT": "Industrials",
+"AGLTW": "Industrials",
 "AGM": "Finance",
 "AGMB": "Health Care",
 "AGMH": "Technology",
@@ -987,6 +989,7 @@
 "AIIR": "Consumer Discretionary",
 "AIM": "Health Care",
 "AIMD": "Technology",
+"AIMDW": "Technology",
 "AIN": "Consumer Discretionary",
 "AIO": "Finance",
 "AIOK": "Consumer Discretionary",
@@ -1050,12 +1053,11 @@
 "ALMU": "Technology",
 "ALNT": "Industrials",
 "ALNY": "Health Care",
-"ALOVU": "Finance",
 "ALOY": "Basic Materials",
 "ALP": "Finance",
 "ALPS": "Health Care",
 "ALPX": "Finance",
-"ALPXR": "Finance",
+"ALPXU": "Finance",
 "ALRM": "Technology",
 "ALRS": "Finance",
 "ALSN": "Consumer Discretionary",
@@ -1071,7 +1073,6 @@
 "ALZN": "Health Care",
 "AM": "Utilities",
 "AMAC": "Finance",
-"AMACW": "Finance",
 "AMAL": "Finance",
 "AMAN": "Finance",
 "AMAT": "Technology",
@@ -1163,6 +1164,7 @@
 "APLD": "Technology",
 "APLE": "Real Estate",
 "APLM": "Health Care",
+"APLMW": "Health Care",
 "APMC": "Finance",
 "APMD": "Health Care",
 "APO": "Finance",
@@ -1175,10 +1177,12 @@
 "APT": "Health Care",
 "APTV": "Consumer Discretionary",
 "APUR": "Finance",
+"APURR": "Finance",
 "APUS": "Health Care",
 "APVO": "Health Care",
 "APWC": "Industrials",
 "APXT": "Finance",
+"APXTU": "Finance",
 "APXTW": "Finance",
 "APYX": "Health Care",
 "AQB": "Consumer Staples",
@@ -1196,8 +1200,7 @@
 "ARCC": "Finance",
 "ARCIU": "Finance",
 "ARCL": "Finance",
-"ARCLU": "Finance",
-"ARCLW": "Finance",
+"ARCLR": "Finance",
 "ARCO": "Consumer Discretionary",
 "ARCT": "Health Care",
 "ARDC": "Finance",
@@ -1208,7 +1211,6 @@
 "ARES": "Finance",
 "ARGX": "Health Care",
 "ARHS": "Consumer Discretionary",
-"ARI": "Real Estate",
 "ARKO": "Consumer Staples",
 "ARKR": "Consumer Discretionary",
 "ARL": "Finance",
@@ -1240,6 +1242,7 @@
 "ASB": "Finance",
 "ASBA": "Finance",
 "ASBP": "Health Care",
+"ASBPW": "Health Care",
 "ASC": "Consumer Discretionary",
 "ASG": "Finance",
 "ASGI": "Finance",
@@ -1253,7 +1256,6 @@
 "ASND": "Health Care",
 "ASO": "Consumer Discretionary",
 "ASPC": "Finance",
-"ASPCR": "Finance",
 "ASPE": "Health Care",
 "ASPI": "Industrials",
 "ASPN": "Consumer Discretionary",
@@ -1291,7 +1293,8 @@
 "ATLCZ": "Finance",
 "ATLO": "Finance",
 "ATLQ": "Finance",
-"ATLQW": "Finance",
+"ATLQR": "Finance",
+"ATLQU": "Finance",
 "ATLX": "Industrials",
 "ATMU": "Consumer Discretionary",
 "ATNI": "Telecommunications",
@@ -1362,6 +1365,7 @@
 "AXIL": "Consumer Discretionary",
 "AXIN": "Finance",
 "AXINR": "Finance",
+"AXINU": "Finance",
 "AXNX": "Consumer Discretionary",
 "AXON": "Industrials",
 "AXP": "Finance",
@@ -1413,8 +1417,10 @@
 "BAX": "Health Care",
 "BB": "Technology",
 "BBAI": "Technology",
+"BBAI.WS": "Technology",
 "BBAR": "Finance",
 "BBCI": "Consumer Discretionary",
+"BBCIW": "Consumer Discretionary",
 "BBCP": "Consumer Discretionary",
 "BBD": "Finance",
 "BBDC": "Finance",
@@ -1440,10 +1446,12 @@
 "BCBP": "Finance",
 "BCC": "Consumer Discretionary",
 "BCCQ": "Finance",
+"BCCQU": "Finance",
 "BCCQW": "Finance",
 "BCDA": "Health Care",
 "BCE": "Telecommunications",
 "BCG": "Finance",
+"BCGWW": "Finance",
 "BCH": "Finance",
 "BCHT": "Industrials",
 "BCIC": "Finance",
@@ -1462,6 +1470,8 @@
 "BDAI": "Technology",
 "BDC": "Industrials",
 "BDCI": "Finance",
+"BDCIU": "Finance",
+"BDCIW": "Finance",
 "BDJ": "Finance",
 "BDL": "Consumer Discretionary",
 "BDMD": "Health Care",
@@ -1489,12 +1499,13 @@
 "BEPI": "Utilities",
 "BEPJ": "Utilities",
 "BESS": "Utilities",
+"BESS.WS": "Utilities",
 "BETA": "Industrials",
 "BETR": "Finance",
 "BETRW": "Finance",
 "BFAM": "Consumer Discretionary",
 "BFC": "Finance",
-"BFH": "Consumer Discretionary",
+"BFH": "Finance",
 "BFLY": "Health Care",
 "BFRG": "Health Care",
 "BFRGW": "Health Care",
@@ -1520,6 +1531,8 @@
 "BGY": "Finance",
 "BH": "Consumer Discretionary",
 "BHAV": "Finance",
+"BHAVR": "Finance",
+"BHAVU": "Finance",
 "BHB": "Finance",
 "BHC": "Health Care",
 "BHE": "Technology",
@@ -1599,6 +1612,7 @@
 "BLX": "Finance",
 "BLZE": "Technology",
 "BLZR": "Finance",
+"BLZRW": "Finance",
 "BMA": "Finance",
 "BMBL": "Technology",
 "BME": "Finance",
@@ -1671,6 +1685,7 @@
 "BRCB": "Consumer Discretionary",
 "BRCC": "Consumer Staples",
 "BREZ": "Finance",
+"BREZR": "Finance",
 "BRFH": "Consumer Staples",
 "BRIA": "Consumer Discretionary",
 "BRID": "Consumer Staples",
@@ -1679,6 +1694,7 @@
 "BRKR": "Industrials",
 "BRKRP": "Industrials",
 "BRLS": "Consumer Staples",
+"BRLSW": "Consumer Staples",
 "BRLT": "Consumer Discretionary",
 "BRN": "Energy",
 "BRNX": "Industrials",
@@ -1688,6 +1704,7 @@
 "BRSP": "Real Estate",
 "BRT": "Real Estate",
 "BRTM": "Finance",
+"BRTMW": "Finance",
 "BRTX": "Health Care",
 "BRUN": "Technology",
 "BRVE": "Health Care",
@@ -1695,6 +1712,8 @@
 "BRX": "Real Estate",
 "BRZE": "Technology",
 "BSAA": "Finance",
+"BSAAR": "Finance",
+"BSAAU": "Finance",
 "BSAC": "Finance",
 "BSBK": "Finance",
 "BSBR": "Finance",
@@ -1756,7 +1775,6 @@
 "BWIN": "Finance",
 "BWIV": "Finance",
 "BWLP": "Consumer Discretionary",
-"BWMN": "Consumer Discretionary",
 "BWMX": "Consumer Discretionary",
 "BWXT": "Industrials",
 "BX": "Finance",
@@ -1809,7 +1827,7 @@
 "CANG": "Finance",
 "CAPL": "Energy",
 "CAPR": "Health Care",
-"CAPS": "Health Care",
+"CAPS": "Consumer Discretionary",
 "CAR": "Consumer Discretionary",
 "CARE": "Finance",
 "CARG": "Technology",
@@ -1875,8 +1893,6 @@
 "CCSI": "Technology",
 "CCTG": "Consumer Discretionary",
 "CCU": "Consumer Staples",
-"CCXI": "Finance",
-"CCXIU": "Finance",
 "CCZ": "Telecommunications",
 "CD": "Finance",
 "CDE": "Basic Materials",
@@ -1890,8 +1906,10 @@
 "CDP": "Real Estate",
 "CDRE": "Health Care",
 "CDRO": "Consumer Discretionary",
+"CDROW": "Consumer Discretionary",
 "CDT": "Health Care",
 "CDTG": "Industrials",
+"CDTTW": "Health Care",
 "CDW": "Consumer Discretionary",
 "CDXS": "Industrials",
 "CDZI": "Utilities",
@@ -1931,6 +1949,8 @@
 "CGBD": "Finance",
 "CGC": "Health Care",
 "CGCF": "Finance",
+"CGCFU": "Finance",
+"CGCFW": "Finance",
 "CGEM": "Health Care",
 "CGEN": "Health Care",
 "CGNT": "Technology",
@@ -1942,12 +1962,14 @@
 "CHA": "Consumer Discretionary",
 "CHAD": "Finance",
 "CHAI": "Telecommunications",
+"CHARR": "Finance",
 "CHCI": "Finance",
 "CHCO": "Finance",
 "CHCT": "Real Estate",
 "CHD": "Consumer Discretionary",
 "CHDN": "Consumer Discretionary",
 "CHE": "Health Care",
+"CHECU": "Finance",
 "CHEF": "Consumer Discretionary",
 "CHGA": "Technology",
 "CHGG": "Real Estate",
@@ -1984,6 +2006,7 @@
 "CIEN": "Utilities",
 "CIFR": "Finance",
 "CIG": "Utilities",
+"CIG.C": "Utilities",
 "CIGI": "Finance",
 "CIGL": "Consumer Discretionary",
 "CII": "Finance",
@@ -2072,6 +2095,7 @@
 "CNA": "Finance",
 "CNC": "Health Care",
 "CNCK": "Finance",
+"CNCKW": "Finance",
 "CNDT": "Consumer Discretionary",
 "CNET": "Technology",
 "CNEY": "Industrials",
@@ -2129,6 +2153,7 @@
 "COOTW": "Consumer Staples",
 "COP": "Energy",
 "COPR": "Basic Materials",
+"COPR.WS": "Basic Materials",
 "COR": "Health Care",
 "CORT": "Health Care",
 "CORZ": "Finance",
@@ -2165,8 +2190,8 @@
 "CRACU": "Finance",
 "CRAI": "Consumer Discretionary",
 "CRAN": "Finance",
+"CRANR": "Finance",
 "CRAQ": "Finance",
-"CRAQU": "Finance",
 "CRBD": "Finance",
 "CRBG": "Finance",
 "CRBP": "Health Care",
@@ -2182,6 +2207,7 @@
 "CREX": "Technology",
 "CRF": "Finance",
 "CRGO": "Industrials",
+"CRGOW": "Industrials",
 "CRGY": "Energy",
 "CRH": "Industrials",
 "CRI": "Consumer Discretionary",
@@ -2260,7 +2286,6 @@
 "CUBE": "Real Estate",
 "CUBI": "Finance",
 "CUBWU": "Finance",
-"CUBWW": "Industrials",
 "CUE": "Health Care",
 "CULP": "Consumer Discretionary",
 "CUPR": "Health Care",
@@ -2323,6 +2348,8 @@
 "CZWI": "Finance",
 "D": "Utilities",
 "DAAQ": "Finance",
+"DAAQU": "Finance",
+"DAAQW": "Finance",
 "DAC": "Consumer Discretionary",
 "DAIC": "Technology",
 "DAICW": "Technology",
@@ -2340,6 +2367,7 @@
 "DAVI": "Health Care",
 "DB": "Finance",
 "DBCA": "Finance",
+"DBCAW": "Finance",
 "DBGI": "Consumer Discretionary",
 "DBI": "Consumer Discretionary",
 "DBVT": "Health Care",
@@ -2423,7 +2451,6 @@
 "DLY": "Finance",
 "DMA": "Finance",
 "DMAAR": "Finance",
-"DMAAU": "Finance",
 "DMAC": "Health Care",
 "DMB": "Finance",
 "DMC": "Consumer Staples",
@@ -2486,6 +2513,7 @@
 "DSU": "Finance",
 "DSWL": "Industrials",
 "DSX": "Consumer Discretionary",
+"DSX.WS": "Consumer Discretionary",
 "DSY": "Consumer Discretionary",
 "DSYWW": "Consumer Discretionary",
 "DT": "Technology",
@@ -2498,7 +2526,6 @@
 "DTIL": "Health Care",
 "DTK": "Utilities",
 "DTM": "Utilities",
-"DTSQU": "Finance",
 "DTSS": "Technology",
 "DTST": "Technology",
 "DTW": "Utilities",
@@ -2528,6 +2555,7 @@
 "DYAI": "Health Care",
 "DYN": "Health Care",
 "DYOR": "Finance",
+"DYORW": "Finance",
 "E": "Energy",
 "EAD": "Finance",
 "EAF": "Energy",
@@ -2643,9 +2671,11 @@
 "EMR": "Technology",
 "ENB": "Energy",
 "ENGN": "Health Care",
+"ENGNW": "Health Care",
 "ENGS": "Industrials",
 "ENHA": "Consumer Discretionary",
 "ENIC": "Utilities",
+"ENJ": "Utilities",
 "ENLT": "Utilities",
 "ENLV": "Health Care",
 "ENO": "Utilities",
@@ -2695,7 +2725,6 @@
 "ERIE": "Finance",
 "ERII": "Technology",
 "ERNA": "Health Care",
-"ERNAW": "Health Care",
 "ERO": "Basic Materials",
 "EROC": "Energy",
 "EROK": "Energy",
@@ -2752,6 +2781,7 @@
 "EVN": "Finance",
 "EVO": "Health Care",
 "EVOX": "Finance",
+"EVOXU": "Finance",
 "EVOXW": "Finance",
 "EVR": "Finance",
 "EVRG": "Utilities",
@@ -2781,6 +2811,7 @@
 "EXR": "Real Estate",
 "EXTR": "Telecommunications",
 "EXYN": "Technology",
+"EXYNW": "Technology",
 "EYE": "Health Care",
 "EYPT": "Industrials",
 "EZGO": "Consumer Discretionary",
@@ -2789,6 +2820,8 @@
 "F": "Industrials",
 "FA": "Technology",
 "FABC": "Consumer Discretionary",
+"FACTU": "Finance",
+"FACTW": "Finance",
 "FAF": "Finance",
 "FAMI": "Consumer Staples",
 "FANG": "Energy",
@@ -2810,6 +2843,7 @@
 "FBRT": "Real Estate",
 "FBYD": "Consumer Discretionary",
 "FBYDP": "Consumer Discretionary",
+"FBYDW": "Consumer Discretionary",
 "FC": "Consumer Discretionary",
 "FCAP": "Finance",
 "FCBC": "Finance",
@@ -2827,11 +2861,12 @@
 "FCNCP": "Finance",
 "FCPT": "Real Estate",
 "FCRS": "Finance",
+"FCRS.WS": "Finance",
 "FCUV": "Industrials",
 "FCX": "Basic Materials",
 "FDBC": "Finance",
 "FDMM": "Finance",
-"FDMMW": "Finance",
+"FDMMU": "Finance",
 "FDMT": "Health Care",
 "FDS": "Technology",
 "FDSB": "Finance",
@@ -2848,6 +2883,7 @@
 "FENC": "Health Care",
 "FENG": "Industrials",
 "FER": "Industrials",
+"FERAU": "Finance",
 "FET": "Consumer Discretionary",
 "FF": "Industrials",
 "FFA": "Finance",
@@ -2865,8 +2901,8 @@
 "FGCPP": "Finance",
 "FGI": "Industrials",
 "FGII": "Finance",
-"FGIIU": "Finance",
 "FGIIW": "Finance",
+"FGIWW": "Industrials",
 "FGL": "Consumer Discretionary",
 "FGN": "Finance",
 "FGSN": "Finance",
@@ -2921,6 +2957,8 @@
 "FLYW": "Consumer Discretionary",
 "FLYX": "Consumer Discretionary",
 "FMAC": "Finance",
+"FMACR": "Finance",
+"FMACU": "Finance",
 "FMAO": "Finance",
 "FMBH": "Finance",
 "FMC": "Industrials",
@@ -3022,6 +3060,7 @@
 "FTS": "Utilities",
 "FTV": "Industrials",
 "FTW": "Energy",
+"FTW.WS": "Energy",
 "FUBO": "Consumer Discretionary",
 "FUFU": "Finance",
 "FUFUW": "Finance",
@@ -3038,16 +3077,20 @@
 "FUSEW": "Technology",
 "FUTU": "Finance",
 "FVCB": "Finance",
+"FVNNR": "Finance",
 "FVR": "Real Estate",
 "FVRR": "Consumer Discretionary",
 "FWAC": "Finance",
 "FWACR": "Finance",
+"FWACW": "Finance",
 "FWDI": "Finance",
 "FWONA": "Industrials",
 "FWONK": "Industrials",
 "FWRD": "Industrials",
 "FWRG": "Consumer Discretionary",
 "FXAC": "Finance",
+"FXACU": "Finance",
+"FXACW": "Finance",
 "FXHO": "Technology",
 "FXNC": "Finance",
 "G": "Consumer Discretionary",
@@ -3081,6 +3124,7 @@
 "GCO": "Consumer Discretionary",
 "GCT": "Consumer Discretionary",
 "GCTS": "Technology",
+"GCTS.WS": "Technology",
 "GCV": "Finance",
 "GD": "Industrials",
 "GDC": "Industrials",
@@ -3130,6 +3174,7 @@
 "GGG": "Industrials",
 "GGN": "Finance",
 "GGR": "Industrials",
+"GGROW": "Industrials",
 "GGT": "Finance",
 "GGZ": "Finance",
 "GH": "Health Care",
@@ -3141,6 +3186,7 @@
 "GHY": "Finance",
 "GIB": "Consumer Discretionary",
 "GIBO": "Technology",
+"GIBOW": "Technology",
 "GIC": "Industrials",
 "GIFT": "Consumer Discretionary",
 "GIGM": "Technology",
@@ -3152,14 +3198,14 @@
 "GIS": "Consumer Staples",
 "GITS": "Technology",
 "GIW": "Finance",
+"GIWWU": "Finance",
 "GIX": "Finance",
 "GIXI": "Technology",
 "GIXXR": "Finance",
-"GIXXU": "Finance",
 "GJH": "Finance",
-"GJO": "Finance",
 "GJP": "Finance",
 "GJR": "Finance",
+"GJS": "Finance",
 "GJT": "Finance",
 "GKOS": "Health Care",
 "GL": "Finance",
@@ -3265,6 +3311,7 @@
 "GROV": "Consumer Discretionary",
 "GROW": "Finance",
 "GROY": "Basic Materials",
+"GROY.WS": "Basic Materials",
 "GRPN": "Consumer Discretionary",
 "GRRR": "Technology",
 "GRRRW": "Technology",
@@ -3277,6 +3324,8 @@
 "GSBC": "Finance",
 "GSBD": "Finance",
 "GSHD": "Finance",
+"GSHRU": "Finance",
+"GSHRW": "Finance",
 "GSIT": "Technology",
 "GSIW": "Finance",
 "GSK": "Health Care",
@@ -3293,6 +3342,7 @@
 "GTERA": "Finance",
 "GTERR": "Finance",
 "GTERU": "Finance",
+"GTERW": "Finance",
 "GTES": "Industrials",
 "GTIM": "Consumer Discretionary",
 "GTLB": "Technology",
@@ -3346,6 +3396,7 @@
 "HBT": "Finance",
 "HCA": "Health Care",
 "HCAC": "Finance",
+"HCACU": "Finance",
 "HCAI": "Consumer Discretionary",
 "HCAT": "Technology",
 "HCC": "Energy",
@@ -3426,6 +3477,7 @@
 "HOFT": "Consumer Discretionary",
 "HOG": "Consumer Discretionary",
 "HOLO": "Technology",
+"HOLOW": "Technology",
 "HOMB": "Finance",
 "HON": "Industrials",
 "HONA": "Industrials",
@@ -3529,6 +3581,7 @@
 "HZO": "Consumer Discretionary",
 "IA": "Technology",
 "IACO": "Finance",
+"IACOU": "Finance",
 "IACOW": "Finance",
 "IACQ": "Finance",
 "IACQU": "Finance",
@@ -3538,6 +3591,7 @@
 "IAM": "Health Care",
 "IART": "Health Care",
 "IAUX": "Basic Materials",
+"IAUX.WS": "Basic Materials",
 "IBAC": "Finance",
 "IBACR": "Finance",
 "IBCP": "Finance",
@@ -3574,6 +3628,7 @@
 "IDYA": "Health Care",
 "IE": "Basic Materials",
 "IEAG": "Finance",
+"IEAGR": "Finance",
 "IEP": "Energy",
 "IESC": "Industrials",
 "IEX": "Industrials",
@@ -3584,7 +3639,6 @@
 "IFS": "Finance",
 "IGA": "Finance",
 "IGAC": "Finance",
-"IGACU": "Finance",
 "IGC": "Health Care",
 "IGD": "Finance",
 "IGI": "Finance",
@@ -3633,6 +3687,7 @@
 "IMXI": "Consumer Discretionary",
 "INAB": "Health Care",
 "INBK": "Finance",
+"INBKZ": "Finance",
 "INBS": "Health Care",
 "INBX": "Health Care",
 "INCR": "Health Care",
@@ -3643,6 +3698,7 @@
 "INDP": "Health Care",
 "INEO": "Consumer Discretionary",
 "INFQ": "Technology",
+"INFQ.WS": "Technology",
 "INFU": "Health Care",
 "INFY": "Technology",
 "ING": "Finance",
@@ -3654,7 +3710,6 @@
 "INKT": "Health Care",
 "INLF": "Industrials",
 "INLX": "Technology",
-"INM": "Health Care",
 "INMB": "Health Care",
 "INMD": "Health Care",
 "INN": "Real Estate",
@@ -3696,6 +3751,7 @@
 "IPAR": "Consumer Discretionary",
 "IPDN": "Technology",
 "IPFX": "Finance",
+"IPFXU": "Finance",
 "IPFXW": "Finance",
 "IPGP": "Technology",
 "IPHA": "Health Care",
@@ -3710,6 +3766,7 @@
 "IPX": "Basic Materials",
 "IPXG": "Finance",
 "IPXGU": "Finance",
+"IPXGW": "Finance",
 "IQ": "Consumer Discretionary",
 "IQI": "Finance",
 "IQMX": "Technology",
@@ -3722,6 +3779,7 @@
 "IREN": "Finance",
 "IRHO": "Finance",
 "IRHOR": "Finance",
+"IRHOU": "Finance",
 "IRIX": "Health Care",
 "IRLA": "Health Care",
 "IRM": "Real Estate",
@@ -3734,6 +3792,7 @@
 "ISBA": "Finance",
 "ISD": "Finance",
 "ISNR": "Finance",
+"ISNRW": "Finance",
 "ISPC": "Health Care",
 "ISPR": "Health Care",
 "ISRG": "Health Care",
@@ -3774,7 +3833,6 @@
 "JBHT": "Industrials",
 "JBI": "Industrials",
 "JBIO": "Health Care",
-"JBK": "Finance",
 "JBL": "Technology",
 "JBLU": "Consumer Discretionary",
 "JBS": "Consumer Staples",
@@ -3850,6 +3908,7 @@
 "KBH": "Consumer Discretionary",
 "KBON": "Finance",
 "KBONU": "Finance",
+"KBONW": "Finance",
 "KBR": "Industrials",
 "KBSX": "Consumer Discretionary",
 "KC": "Technology",
@@ -3869,6 +3928,7 @@
 "KEY": "Finance",
 "KEYS": "Industrials",
 "KEYY": "Finance",
+"KEYYU": "Finance",
 "KF": "Finance",
 "KFFB": "Finance",
 "KFII": "Finance",
@@ -3882,6 +3942,7 @@
 "KHC": "Consumer Staples",
 "KIDS": "Health Care",
 "KIDZ": "Real Estate",
+"KIDZW": "Real Estate",
 "KIM": "Real Estate",
 "KINS": "Finance",
 "KIO": "Finance",
@@ -3987,6 +4048,7 @@
 "LARK": "Finance",
 "LASR": "Technology",
 "LATA": "Finance",
+"LATAW": "Finance",
 "LAUR": "Real Estate",
 "LAW": "Technology",
 "LAZ": "Finance",
@@ -4015,12 +4077,15 @@
 "LE": "Consumer Discretionary",
 "LEA": "Consumer Discretionary",
 "LECO": "Industrials",
+"LEDRU": "Finance",
+"LEDRW": "Finance",
 "LEDS": "Technology",
 "LEE": "Consumer Discretionary",
 "LEGH": "Consumer Discretionary",
 "LEGN": "Health Care",
 "LEGO": "Industrials",
 "LEN": "Consumer Discretionary",
+"LEN.B": "Consumer Discretionary",
 "LENZ": "Health Care",
 "LEO": "Finance",
 "LEU": "Industrials",
@@ -4063,6 +4128,7 @@
 "LILAP": "Telecommunications",
 "LIME": "Technology",
 "LIMN": "Health Care",
+"LIMNW": "Health Care",
 "LIN": "Basic Materials",
 "LINC": "Real Estate",
 "LIND": "Consumer Discretionary",
@@ -4116,10 +4182,8 @@
 "LOW": "Consumer Discretionary",
 "LPA": "Finance",
 "LPAAU": "Finance",
-"LPAAW": "Finance",
 "LPBBW": "Finance",
 "LPCN": "Health Care",
-"LPCVU": "Finance",
 "LPG": "Consumer Discretionary",
 "LPL": "Technology",
 "LPLA": "Finance",
@@ -4143,7 +4207,6 @@
 "LTC": "Real Estate",
 "LTGO": "Health Care",
 "LTGR": "Finance",
-"LTGRU": "Finance",
 "LTH": "Consumer Discretionary",
 "LTM": "Consumer Discretionary",
 "LTRN": "Health Care",
@@ -4152,6 +4215,7 @@
 "LUCD": "Health Care",
 "LUCK": "Consumer Discretionary",
 "LUCY": "Health Care",
+"LUCYW": "Health Care",
 "LUD": "Industrials",
 "LULU": "Consumer Discretionary",
 "LUMN": "Telecommunications",
@@ -4163,8 +4227,10 @@
 "LVO": "Consumer Discretionary",
 "LVS": "Consumer Discretionary",
 "LVWR": "Consumer Discretionary",
+"LVWR.WS": "Consumer Discretionary",
 "LW": "Consumer Staples",
 "LWAC": "Finance",
+"LWACU": "Finance",
 "LWAY": "Consumer Staples",
 "LWLG": "Industrials",
 "LX": "Finance",
@@ -4184,6 +4250,7 @@
 "LZ": "Technology",
 "LZB": "Consumer Discretionary",
 "LZM": "Basic Materials",
+"LZM.WS": "Basic Materials",
 "LZMH": "Technology",
 "M": "Consumer Discretionary",
 "MA": "Consumer Discretionary",
@@ -4191,6 +4258,7 @@
 "MAAS": "Finance",
 "MAC": "Real Estate",
 "MACIU": "Finance",
+"MACIW": "Finance",
 "MAGN": "Basic Materials",
 "MAIA": "Health Care",
 "MAIN": "Finance",
@@ -4236,13 +4304,13 @@
 "MBX": "Health Care",
 "MC": "Finance",
 "MCAH": "Finance",
-"MCAHR": "Finance",
 "MCAHU": "Finance",
 "MCB": "Finance",
 "MCBS": "Finance",
 "MCD": "Consumer Discretionary",
 "MCFT": "Industrials",
 "MCGA": "Utilities",
+"MCGAU": "Finance",
 "MCHB": "Finance",
 "MCHP": "Technology",
 "MCHPP": "Technology",
@@ -4293,6 +4361,7 @@
 "METCI": "Energy",
 "METCZ": "Energy",
 "MEVO": "Finance",
+"MEVOW": "Finance",
 "MF": "Technology",
 "MFA": "Real Estate",
 "MFAN": "Real Estate",
@@ -4352,14 +4421,20 @@
 "MITT": "Real Estate",
 "MIY": "Finance",
 "MKC": "Consumer Staples",
+"MKC.V": "Consumer Staples",
 "MKDW": "Technology",
+"MKDWW": "Technology",
 "MKL": "Finance",
 "MKLY": "Finance",
+"MKLYR": "Finance",
+"MKLYU": "Finance",
 "MKSI": "Industrials",
 "MKTW": "Technology",
 "MKTX": "Finance",
 "MKZR": "Real Estate",
 "MLAA": "Finance",
+"MLAAU": "Finance",
+"MLAAW": "Finance",
 "MLAB": "Industrials",
 "MLCI": "Finance",
 "MLCIL": "Finance",
@@ -4405,10 +4480,13 @@
 "MNYWW": "Consumer Discretionary",
 "MO": "Health Care",
 "MOB": "Industrials",
+"MOBBW": "Industrials",
 "MOBI": "Health Care",
 "MOBX": "Technology",
+"MOBXW": "Technology",
 "MOD": "Consumer Discretionary",
 "MODD": "Health Care",
+"MOG.B": "Industrials",
 "MOGU": "Consumer Discretionary",
 "MOH": "Health Care",
 "MOLN": "Health Care",
@@ -4455,6 +4533,7 @@
 "MS": "Finance",
 "MSA": "Health Care",
 "MSAI": "Technology",
+"MSAIW": "Technology",
 "MSB": "Industrials",
 "MSBI": "Finance",
 "MSBIP": "Finance",
@@ -4478,6 +4557,7 @@
 "MTA": "Basic Materials",
 "MTAKU": "Finance",
 "MTAL": "Basic Materials",
+"MTAL.WS": "Basic Materials",
 "MTB": "Finance",
 "MTC": "Technology",
 "MTCH": "Technology",
@@ -4510,6 +4590,7 @@
 "MUSA": "Consumer Discretionary",
 "MUX": "Basic Materials",
 "MUZE": "Finance",
+"MUZEU": "Finance",
 "MVBF": "Finance",
 "MVIS": "Technology",
 "MWA": "Industrials",
@@ -4535,6 +4616,7 @@
 "MYSE": "Telecommunications",
 "MYSZ": "Technology",
 "MYX": "Finance",
+"MYXXR": "Finance",
 "MYXXU": "Finance",
 "MZTI": "Consumer Staples",
 "NAAS": "Consumer Discretionary",
@@ -4549,6 +4631,7 @@
 "NAMM": "Basic Materials",
 "NAMMW": "Basic Materials",
 "NAMS": "Health Care",
+"NAMSW": "Health Care",
 "NAN": "Finance",
 "NANO": "Technology",
 "NANOW": "Technology",
@@ -4570,7 +4653,6 @@
 "NBP": "Health Care",
 "NBR": "Energy",
 "NBRG": "Finance",
-"NBRGU": "Finance",
 "NBTB": "Finance",
 "NBTX": "Health Care",
 "NBXG": "Finance",
@@ -4616,6 +4698,7 @@
 "NEWTG": "Finance",
 "NEWTH": "Finance",
 "NEWTI": "Finance",
+"NEWTO": "Finance",
 "NEWTP": "Finance",
 "NEXA": "Basic Materials",
 "NEXM": "Basic Materials",
@@ -4640,6 +4723,7 @@
 "NHC": "Health Care",
 "NHI": "Real Estate",
 "NHIV": "Finance",
+"NHIVW": "Finance",
 "NHP": "Real Estate",
 "NHS": "Finance",
 "NHTC": "Consumer Discretionary",
@@ -4657,6 +4741,7 @@
 "NIQ": "Technology",
 "NIU": "Industrials",
 "NIVF": "Health Care",
+"NIVFW": "Health Care",
 "NIXX": "Technology",
 "NJR": "Utilities",
 "NKE": "Consumer Discretionary",
@@ -4710,7 +4795,7 @@
 "NOW": "Technology",
 "NP": "Finance",
 "NPAC": "Finance",
-"NPACU": "Finance",
+"NPACW": "Finance",
 "NPB": "Finance",
 "NPCE": "Health Care",
 "NPCT": "Finance",
@@ -4721,6 +4806,7 @@
 "NPT": "Consumer Discretionary",
 "NPV": "Finance",
 "NPWR": "Energy",
+"NPWR.WS": "Energy",
 "NRC": "Health Care",
 "NRDS": "Technology",
 "NRDY": "Real Estate",
@@ -4738,6 +4824,7 @@
 "NRXP": "Health Care",
 "NRXS": "Health Care",
 "NSAI": "Finance",
+"NSAIR": "Finance",
 "NSAIW": "Finance",
 "NSC": "Industrials",
 "NSIT": "Consumer Discretionary",
@@ -4748,6 +4835,7 @@
 "NSRX": "Health Care",
 "NSSC": "Telecommunications",
 "NSTR": "Consumer Discretionary",
+"NSTR.WS": "Consumer Discretionary",
 "NSYS": "Technology",
 "NTAP": "Technology",
 "NTB": "Finance",
@@ -4781,6 +4869,7 @@
 "NUW": "Finance",
 "NUWE": "Health Care",
 "NVA": "Basic Materials",
+"NVA.WS": "Basic Materials",
 "NVAX": "Health Care",
 "NVCR": "Health Care",
 "NVCT": "Health Care",
@@ -4797,6 +4886,7 @@
 "NVT": "Industrials",
 "NVTS": "Technology",
 "NWAX": "Finance",
+"NWAX.WS": "Finance",
 "NWBI": "Finance",
 "NWCL": "Industrials",
 "NWCLW": "Industrials",
@@ -4812,7 +4902,6 @@
 "NWTG": "Consumer Discretionary",
 "NX": "Industrials",
 "NXAT": "Consumer Discretionary",
-"NXATW": "Consumer Discretionary",
 "NXB": "Industrials",
 "NXDR": "Technology",
 "NXDT": "Real Estate",
@@ -4842,6 +4931,7 @@
 "OACC": "Finance",
 "OBA": "Finance",
 "OBAI": "Consumer Discretionary",
+"OBAWW": "Finance",
 "OBDC": "Finance",
 "OBE": "Energy",
 "OBIO": "Health Care",
@@ -4856,7 +4946,10 @@
 "OCG": "Consumer Discretionary",
 "OCGN": "Health Care",
 "OCLT": "Finance",
+"OCLTR": "Finance",
+"OCLTU": "Finance",
 "OCS": "Health Care",
+"OCSAW": "Health Care",
 "OCSL": "Finance",
 "OCTV": "Technology",
 "OCUL": "Health Care",
@@ -4915,6 +5008,7 @@
 "ONBPO": "Finance",
 "ONBPP": "Finance",
 "ONC": "Health Care",
+"ONCHW": "Finance",
 "ONCO": "Health Care",
 "ONCY": "Health Care",
 "ONDS": "Technology",
@@ -4965,6 +5059,7 @@
 "ORI": "Finance",
 "ORIC": "Health Care",
 "ORIO": "Finance",
+"ORIQW": "Finance",
 "ORKA": "Health Care",
 "ORKT": "Technology",
 "ORLY": "Consumer Discretionary",
@@ -4985,6 +5080,7 @@
 "OSW": "Consumer Discretionary",
 "OTEX": "Technology",
 "OTGA": "Finance",
+"OTGAU": "Finance",
 "OTIS": "Technology",
 "OTLK": "Health Care",
 "OTLY": "Consumer Staples",
@@ -5012,8 +5108,10 @@
 "OXSQG": "Consumer Discretionary",
 "OXSQH": "Finance",
 "OXY": "Energy",
+"OXY.WS": "Energy",
 "OYSE": "Finance",
 "OYSER": "Finance",
+"OYSEU": "Finance",
 "OZ": "Finance",
 "OZK": "Finance",
 "OZKAP": "Finance",
@@ -5035,6 +5133,8 @@
 "PAL": "Consumer Discretionary",
 "PALI": "Health Care",
 "PALO": "Finance",
+"PALOU": "Finance",
+"PALOW": "Finance",
 "PAM": "Utilities",
 "PAMT": "Industrials",
 "PANL": "Consumer Discretionary",
@@ -5051,7 +5151,6 @@
 "PAVS": "Technology",
 "PAX": "Finance",
 "PAXG": "Finance",
-"PAXGR": "Finance",
 "PAXGU": "Finance",
 "PAXS": "Finance",
 "PAY": "Consumer Discretionary",
@@ -5088,6 +5187,7 @@
 "PCRX": "Health Care",
 "PCSA": "Health Care",
 "PCT": "Industrials",
+"PCTTU": "Industrials",
 "PCTTW": "Industrials",
 "PCTY": "Technology",
 "PCVX": "Health Care",
@@ -5111,6 +5211,7 @@
 "PEBO": "Finance",
 "PECE": "Finance",
 "PECER": "Finance",
+"PECEU": "Finance",
 "PECO": "Real Estate",
 "PED": "Energy",
 "PEG": "Utilities",
@@ -5192,7 +5293,7 @@
 "PLBY": "Consumer Discretionary",
 "PLCE": "Consumer Discretionary",
 "PLCI": "Finance",
-"PLCIU": "Finance",
+"PLCIR": "Finance",
 "PLD": "Real Estate",
 "PLG": "Basic Materials",
 "PLGO": "Finance",
@@ -5225,6 +5326,8 @@
 "PMO": "Finance",
 "PMT": "Real Estate",
 "PMTR": "Finance",
+"PMTRU": "Finance",
+"PMTRW": "Finance",
 "PMTS": "Consumer Discretionary",
 "PMTU": "Real Estate",
 "PMTV": "Real Estate",
@@ -5247,6 +5350,7 @@
 "POET": "Technology",
 "POM": "Consumer Discretionary",
 "PONO": "Finance",
+"PONOR": "Finance",
 "PONY": "Technology",
 "POOL": "Consumer Discretionary",
 "POR": "Utilities",
@@ -5320,6 +5424,7 @@
 "PSNYW": "Industrials",
 "PSO": "Consumer Discretionary",
 "PSQH": "Consumer Discretionary",
+"PSQH.WS": "Consumer Discretionary",
 "PSQL": "Technology",
 "PSQLW": "Technology",
 "PSTL": "Real Estate",
@@ -5337,6 +5442,7 @@
 "PTN": "Health Care",
 "PTON": "Consumer Discretionary",
 "PTOR": "Finance",
+"PTORW": "Finance",
 "PTRN": "Consumer Discretionary",
 "PTY": "Finance",
 "PUBM": "Technology",
@@ -5357,6 +5463,7 @@
 "PXS": "Consumer Discretionary",
 "PYPD": "Health Care",
 "PYPL": "Industrials",
+"PYT": "Finance",
 "PYXS": "Health Care",
 "PZG": "Basic Materials",
 "PZZA": "Consumer Discretionary",
@@ -5384,6 +5491,7 @@
 "QRED": "Finance",
 "QRHC": "Utilities",
 "QSEA": "Finance",
+"QSEAR": "Finance",
 "QSI": "Industrials",
 "QSR": "Consumer Discretionary",
 "QTEX": "Health Care",
@@ -5406,6 +5514,7 @@
 "RADX": "Health Care",
 "RAIL": "Industrials",
 "RAIN": "Technology",
+"RAINW": "Technology",
 "RAL": "Industrials",
 "RAND": "Finance",
 "RANG": "Finance",
@@ -5442,6 +5551,7 @@
 "RDACR": "Finance",
 "RDACU": "Finance",
 "RDAG": "Finance",
+"RDAGU": "Finance",
 "RDAGW": "Finance",
 "RDCM": "Technology",
 "RDDT": "Technology",
@@ -5491,6 +5601,8 @@
 "RF": "Finance",
 "RFAIR": "Technology",
 "RFAIU": "Technology",
+"RFAMR": "Finance",
+"RFAMU": "Finance",
 "RFI": "Finance",
 "RFIL": "Technology",
 "RFL": "Health Care",
@@ -5562,11 +5674,11 @@
 "RNAC": "Health Care",
 "RNAQ": "Finance",
 "RNAQU": "Finance",
+"RNAQW": "Finance",
 "RNAZ": "Health Care",
 "RNG": "Technology",
 "RNGR": "Energy",
 "RNGT": "Finance",
-"RNGTW": "Finance",
 "RNP": "Finance",
 "RNR": "Finance",
 "RNST": "Finance",
@@ -5580,7 +5692,6 @@
 "ROG": "Industrials",
 "ROIV": "Health Care",
 "ROK": "Industrials",
-"ROKU": "Telecommunications",
 "ROL": "Consumer Discretionary",
 "ROLR": "Consumer Discretionary",
 "ROMA": "Consumer Discretionary",
@@ -5619,6 +5730,7 @@
 "RTO": "Consumer Discretionary",
 "RTSN": "Health Care",
 "RTX": "Industrials",
+"RUBI": "Consumer Discretionary",
 "RUM": "Technology",
 "RUMBW": "Technology",
 "RUSHA": "Consumer Discretionary",
@@ -5665,16 +5777,20 @@
 "S": "Technology",
 "SA": "Basic Materials",
 "SAAQ": "Finance",
+"SAAQU": "Finance",
 "SAAQW": "Finance",
 "SABR": "Technology",
 "SABS": "Health Care",
 "SAC": "Finance",
+"SAC.WS": "Finance",
 "SACH": "Real Estate",
+"SAEN": "Health Care",
 "SAFE": "Real Estate",
 "SAFT": "Finance",
 "SAFX": "Industrials",
 "SAGT": "Technology",
 "SAGU": "Finance",
+"SAGU.WS": "Finance",
 "SAH": "Consumer Discretionary",
 "SAIA": "Industrials",
 "SAIC": "Technology",
@@ -5704,6 +5820,7 @@
 "SBAC": "Real Estate",
 "SBC": "Health Care",
 "SBCF": "Finance",
+"SBCWW": "Health Care",
 "SBET": "Technology",
 "SBFG": "Finance",
 "SBFM": "Health Care",
@@ -5719,7 +5836,9 @@
 "SBSW": "Basic Materials",
 "SBUX": "Consumer Discretionary",
 "SCAG": "Consumer Discretionary",
+"SCAGW": "Consumer Discretionary",
 "SCAT": "Finance",
+"SCATR": "Finance",
 "SCATU": "Finance",
 "SCATW": "Finance",
 "SCCD": "Real Estate",
@@ -5746,6 +5865,7 @@
 "SCZM": "Basic Materials",
 "SD": "Energy",
 "SDA": "Consumer Discretionary",
+"SDAWW": "Consumer Discretionary",
 "SDEV": "Health Care",
 "SDGR": "Health Care",
 "SDHC": "Consumer Discretionary",
@@ -5813,6 +5933,7 @@
 "SHIP": "Consumer Discretionary",
 "SHLS": "Technology",
 "SHMD": "Technology",
+"SHMDW": "Technology",
 "SHO": "Consumer Discretionary",
 "SHOE": "Consumer Discretionary",
 "SHOO": "Consumer Discretionary",
@@ -5858,6 +5979,7 @@
 "SKYD": "Industrials",
 "SKYE": "Health Care",
 "SKYH": "Finance",
+"SKYH.WS": "Finance",
 "SKYQ": "Industrials",
 "SKYW": "Consumer Discretionary",
 "SKYX": "Consumer Discretionary",
@@ -5878,6 +6000,7 @@
 "SLMT": "Consumer Discretionary",
 "SLN": "Health Care",
 "SLND": "Industrials",
+"SLND.WS": "Industrials",
 "SLNG": "Utilities",
 "SLNH": "Technology",
 "SLNHP": "Technology",
@@ -5942,6 +6065,7 @@
 "SOAR": "Consumer Discretionary",
 "SOBO": "Energy",
 "SOC": "Energy",
+"SOCAU": "Finance",
 "SOFI": "Finance",
 "SOGP": "Technology",
 "SOHU": "Technology",
@@ -5960,6 +6084,8 @@
 "SOR": "Finance",
 "SORA": "Industrials",
 "SORN": "Finance",
+"SORNU": "Finance",
+"SORNW": "Finance",
 "SOS": "Finance",
 "SOTK": "Technology",
 "SOUL": "Consumer Discretionary",
@@ -6020,12 +6146,14 @@
 "SRXH": "Consumer Staples",
 "SRZN": "Health Care",
 "SSAC": "Finance",
+"SSACR": "Finance",
 "SSACU": "Finance",
 "SSACW": "Finance",
 "SSB": "Finance",
 "SSBI": "Finance",
 "SSD": "Consumer Discretionary",
 "SSEA": "Finance",
+"SSEAR": "Finance",
 "SSEAU": "Finance",
 "SSII": "Health Care",
 "SSL": "Energy",
@@ -6108,6 +6236,7 @@
 "SVIAW": "Finance",
 "SVIV": "Finance",
 "SVIVU": "Finance",
+"SVIVW": "Finance",
 "SVM": "Basic Materials",
 "SVRA": "Health Care",
 "SVRE": "Technology",
@@ -6116,6 +6245,7 @@
 "SVV": "Consumer Discretionary",
 "SW": "Consumer Discretionary",
 "SWAG": "Consumer Discretionary",
+"SWAGW": "Consumer Discretionary",
 "SWBI": "Industrials",
 "SWIM": "Industrials",
 "SWK": "Consumer Discretionary",
@@ -6142,10 +6272,14 @@
 "SYRE": "Health Care",
 "SYY": "Consumer Discretionary",
 "SZZL": "Finance",
+"SZZLR": "Finance",
+"SZZLU": "Finance",
 "T": "Telecommunications",
 "TAC": "Utilities",
 "TACH": "Finance",
+"TACHW": "Finance",
 "TACO": "Finance",
+"TACOW": "Finance",
 "TACT": "Technology",
 "TAK": "Health Care",
 "TAL": "Real Estate",
@@ -6165,6 +6299,7 @@
 "TBBK": "Finance",
 "TBCH": "Telecommunications",
 "TBCV": "Finance",
+"TBCVU": "Finance",
 "TBI": "Consumer Discretionary",
 "TBLA": "Technology",
 "TBLD": "Finance",
@@ -6194,6 +6329,8 @@
 "TDUP": "Consumer Discretionary",
 "TDW": "Consumer Discretionary",
 "TDWD": "Finance",
+"TDWDR": "Finance",
+"TDWDU": "Finance",
 "TDY": "Industrials",
 "TE": "Technology",
 "TEAD": "Technology",
@@ -6265,12 +6402,12 @@
 "TLK": "Telecommunications",
 "TLN": "Utilities",
 "TLNC": "Finance",
-"TLNCU": "Finance",
 "TLPH": "Health Care",
 "TLRY": "Health Care",
 "TLS": "Technology",
 "TLSA": "Health Care",
 "TLSI": "Health Care",
+"TLSIW": "Health Care",
 "TLX": "Health Care",
 "TLYS": "Consumer Discretionary",
 "TM": "Industrials",
@@ -6283,6 +6420,7 @@
 "TMO": "Industrials",
 "TMP": "Finance",
 "TMQ": "Basic Materials",
+"TMTSU": "Finance",
 "TMUS": "Telecommunications",
 "TMUSI": "Telecommunications",
 "TMUSL": "Telecommunications",
@@ -6295,6 +6433,7 @@
 "TNL": "Consumer Discretionary",
 "TNMG": "Consumer Discretionary",
 "TNON": "Health Care",
+"TNONW": "Health Care",
 "TNXP": "Health Care",
 "TNYA": "Health Care",
 "TOL": "Consumer Discretionary",
@@ -6335,6 +6474,7 @@
 "TREX": "Basic Materials",
 "TRGP": "Utilities",
 "TRGS": "Finance",
+"TRGSR": "Finance",
 "TRI": "Consumer Discretionary",
 "TRIB": "Health Care",
 "TRIN": "Finance",
@@ -6413,6 +6553,7 @@
 "TWIN": "Industrials",
 "TWLO": "Technology",
 "TWLV": "Finance",
+"TWLVR": "Finance",
 "TWLVU": "Finance",
 "TWN": "Finance",
 "TWST": "Health Care",
@@ -6458,6 +6599,7 @@
 "UGI": "Utilities",
 "UGP": "Utilities",
 "UHAL": "Consumer Discretionary",
+"UHAL.B": "Consumer Discretionary",
 "UHS": "Health Care",
 "UHT": "Real Estate",
 "UI": "Technology",
@@ -6530,7 +6672,6 @@
 "UWMC": "Finance",
 "UXIN": "Consumer Discretionary",
 "UYSC": "Finance",
-"UYSCR": "Finance",
 "UZD": "Telecommunications",
 "UZE": "Telecommunications",
 "UZF": "Telecommunications",
@@ -6540,6 +6681,7 @@
 "VAC": "Finance",
 "VAI": "Consumer Discretionary",
 "VAL": "Energy",
+"VAL.WS": "Energy",
 "VALE": "Basic Materials",
 "VALN": "Health Care",
 "VALU": "Finance",
@@ -6576,6 +6718,7 @@
 "VFSWW": "Industrials",
 "VG": "Utilities",
 "VGAS": "Industrials",
+"VGASW": "Industrials",
 "VGI": "Finance",
 "VGM": "Finance",
 "VGNT": "Consumer Discretionary",
@@ -6725,6 +6868,7 @@
 "WELL": "Real Estate",
 "WEN": "Consumer Discretionary",
 "WENC": "Finance",
+"WENNW": "Finance",
 "WERN": "Industrials",
 "WES": "Utilities",
 "WEST": "Consumer Staples",
@@ -6747,6 +6891,7 @@
 "WHK": "Energy",
 "WHLR": "Real Estate",
 "WHLRD": "Real Estate",
+"WHLRL": "Real Estate",
 "WHLRP": "Real Estate",
 "WHR": "Consumer Discretionary",
 "WHWK": "Health Care",
@@ -6843,6 +6988,7 @@
 "XBIO": "Health Care",
 "XBIT": "Health Care",
 "XBP": "Technology",
+"XBPEW": "Technology",
 "XCBEU": "Finance",
 "XCUR": "Health Care",
 "XE": "Industrials",
@@ -6885,6 +7031,7 @@
 "XRXDW": "Technology",
 "XSLL": "Finance",
 "XSLLU": "Finance",
+"XSLLW": "Finance",
 "XTER": "Finance",
 "XTIA": "Technology",
 "XTLB": "Health Care",
@@ -6916,6 +7063,7 @@
 "YIBO": "Technology",
 "YICC": "Finance",
 "YICCU": "Finance",
+"YICCW": "Finance",
 "YJ": "Consumer Discretionary",
 "YMAT": "Consumer Discretionary",
 "YMM": "Technology",
@@ -6967,7 +7115,6 @@
 "ZNTL": "Health Care",
 "ZONE": "Consumer Discretionary",
 "ZOOZ": "Technology",
-"ZOOZW": "Technology",
 "ZS": "Technology",
 "ZSQR": "Finance",
 "ZSTK": "Health Care",
@@ -7134,9 +7281,6 @@
 "ACON": [
 "IHI"
 ],
-"ACONW": [
-"IHI"
-],
 "ACP": [
 "IAI"
 ],
@@ -7293,6 +7437,12 @@
 "AGL": [
 "XBI"
 ],
+"AGLT": [
+"PAVE"
+],
+"AGLTW": [
+"PAVE"
+],
 "AGM": [
 "IAI"
 ],
@@ -7348,6 +7498,9 @@
 "XBI"
 ],
 "AIMD": [
+"IGV"
+],
+"AIMDW": [
 "IGV"
 ],
 "AIO": [
@@ -7575,6 +7728,9 @@
 "AMPX": [
 "PAVE"
 ],
+"AMPX.WS": [
+"PAVE"
+],
 "AMPY": [
 "XOP"
 ],
@@ -7696,6 +7852,9 @@
 "IGV"
 ],
 "APLM": [
+"XBI"
+],
+"APLMW": [
 "XBI"
 ],
 "APMD": [
@@ -7852,6 +8011,9 @@
 "KBE"
 ],
 "ASBP": [
+"XBI"
+],
+"ASBPW": [
 "XBI"
 ],
 "ASC": [
@@ -8205,6 +8367,9 @@
 "BBAI": [
 "IGV"
 ],
+"BBAI.WS": [
+"IGV"
+],
 "BBAR": [
 "KRE"
 ],
@@ -8269,6 +8434,9 @@
 "XBI"
 ],
 "BCG": [
+"IAI"
+],
+"BCGWW": [
 "IAI"
 ],
 "BCH": [
@@ -8379,6 +8547,9 @@
 "BESS": [
 "PAVE"
 ],
+"BESS.WS": [
+"PAVE"
+],
 "BETA": [
 "ITA"
 ],
@@ -8390,6 +8561,9 @@
 ],
 "BFC": [
 "KBE"
+],
+"BFH": [
+"IAI"
 ],
 "BFLY": [
 "IHI"
@@ -9052,7 +9226,7 @@
 "XBI"
 ],
 "CAPS": [
-"XBI"
+"ITB"
 ],
 "CARE": [
 "KBE"
@@ -9219,7 +9393,13 @@
 "CDRO": [
 "PEJ"
 ],
+"CDROW": [
+"PEJ"
+],
 "CDT": [
+"XBI"
+],
+"CDTTW": [
 "XBI"
 ],
 "CDW": [
@@ -9408,6 +9588,9 @@
 "CIG": [
 "PAVE"
 ],
+"CIG.C": [
+"PAVE"
+],
 "CII": [
 "IAI"
 ],
@@ -9582,6 +9765,9 @@
 "CNCK": [
 "IAI"
 ],
+"CNCKW": [
+"IAI"
+],
 "CNET": [
 "IGV"
 ],
@@ -9700,6 +9886,9 @@
 "XOP"
 ],
 "COPR": [
+"XME"
+],
+"COPR.WS": [
 "XME"
 ],
 "COR": [
@@ -9977,9 +10166,6 @@
 ],
 "CUBI": [
 "KBE"
-],
-"CUBWW": [
-"PAVE"
 ],
 "CUE": [
 "XBI"
@@ -10428,6 +10614,9 @@
 "DSX": [
 "IYT"
 ],
+"DSX.WS": [
+"IYT"
+],
 "DT": [
 "IGV"
 ],
@@ -10767,6 +10956,9 @@
 "ENGN": [
 "XBI"
 ],
+"ENGNW": [
+"XBI"
+],
 "ENGS": [
 "ITB"
 ],
@@ -10900,9 +11092,6 @@
 "PAVE"
 ],
 "ERNA": [
-"XBI"
-],
-"ERNAW": [
 "XBI"
 ],
 "ERO": [
@@ -11079,6 +11268,9 @@
 "EXYN": [
 "IGV"
 ],
+"EXYNW": [
+"IGV"
+],
 "EYE": [
 "IHI"
 ],
@@ -11146,6 +11338,9 @@
 "PEJ"
 ],
 "FBYDP": [
+"PEJ"
+],
+"FBYDW": [
 "PEJ"
 ],
 "FCAP": [
@@ -11565,6 +11760,9 @@
 "FTW": [
 "XOP"
 ],
+"FTW.WS": [
+"XOP"
+],
 "FUBO": [
 "PEJ"
 ],
@@ -11710,6 +11908,9 @@
 "XRT"
 ],
 "GCTS": [
+"SMH"
+],
+"GCTS.WS": [
 "SMH"
 ],
 "GCV": [
@@ -11859,6 +12060,9 @@
 "GIBO": [
 "IGV"
 ],
+"GIBOW": [
+"IGV"
+],
 "GIC": [
 "PAVE"
 ],
@@ -11886,13 +12090,13 @@
 "GJH": [
 "IAI"
 ],
-"GJO": [
-"IAI"
-],
 "GJP": [
 "IAI"
 ],
 "GJR": [
+"IAI"
+],
+"GJS": [
 "IAI"
 ],
 "GJT": [
@@ -12115,6 +12319,9 @@
 "IAI"
 ],
 "GROY": [
+"GDX"
+],
+"GROY.WS": [
 "GDX"
 ],
 "GRRR": [
@@ -12453,6 +12660,9 @@
 "HOLO": [
 "IGV"
 ],
+"HOLOW": [
+"IGV"
+],
 "HOMB": [
 "KBE"
 ],
@@ -12705,6 +12915,9 @@
 "IAUX": [
 "GDX"
 ],
+"IAUX.WS": [
+"GDX"
+],
 "IBCP": [
 "KBE"
 ],
@@ -12909,6 +13122,9 @@
 "INBK": [
 "KBE"
 ],
+"INBKZ": [
+"KBE"
+],
 "INBS": [
 "IHI"
 ],
@@ -12934,6 +13150,9 @@
 "XBI"
 ],
 "INFQ": [
+"IGV"
+],
+"INFQ.WS": [
 "IGV"
 ],
 "INFU": [
@@ -12962,9 +13181,6 @@
 ],
 "INLX": [
 "IGV"
-],
-"INM": [
-"XBI"
 ],
 "INMB": [
 "XBI"
@@ -13184,9 +13400,6 @@
 ],
 "JBIO": [
 "XBI"
-],
-"JBK": [
-"IAI"
 ],
 "JBL": [
 "PAVE"
@@ -13698,6 +13911,9 @@
 "LEN": [
 "ITB"
 ],
+"LEN.B": [
+"ITB"
+],
 "LENZ": [
 "XBI"
 ],
@@ -13780,6 +13996,9 @@
 "IGV"
 ],
 "LIMN": [
+"XBI"
+],
+"LIMNW": [
 "XBI"
 ],
 "LIND": [
@@ -13947,6 +14166,9 @@
 "LUCY": [
 "IHI"
 ],
+"LUCYW": [
+"IHI"
+],
 "LUD": [
 "XME"
 ],
@@ -14005,6 +14227,9 @@
 "IGV"
 ],
 "LZM": [
+"XME"
+],
+"LZM.WS": [
 "XME"
 ],
 "LZMH": [
@@ -14472,14 +14697,23 @@
 "MOB": [
 "ITA"
 ],
+"MOBBW": [
+"ITA"
+],
 "MOBI": [
 "IHI"
 ],
 "MOBX": [
 "SMH"
 ],
+"MOBXW": [
+"SMH"
+],
 "MODD": [
 "IHI"
+],
+"MOG.B": [
+"ITA"
 ],
 "MOH": [
 "IHI"
@@ -14629,6 +14863,9 @@
 "GDX"
 ],
 "MTAL": [
+"XME"
+],
+"MTAL.WS": [
 "XME"
 ],
 "MTB": [
@@ -14791,6 +15028,9 @@
 "GDX"
 ],
 "NAMS": [
+"XBI"
+],
+"NAMSW": [
 "XBI"
 ],
 "NAN": [
@@ -14970,6 +15210,9 @@
 "NEWTI": [
 "KBE"
 ],
+"NEWTO": [
+"KBE"
+],
 "NEWTP": [
 "KBE"
 ],
@@ -15049,6 +15292,9 @@
 "IGV"
 ],
 "NIVF": [
+"XBI"
+],
+"NIVFW": [
 "XBI"
 ],
 "NIXX": [
@@ -15186,6 +15432,9 @@
 "NPWR": [
 "PAVE"
 ],
+"NPWR.WS": [
+"PAVE"
+],
 "NRC": [
 "XBI"
 ],
@@ -15312,6 +15561,9 @@
 "NVA": [
 "GDX"
 ],
+"NVA.WS": [
+"GDX"
+],
 "NVAX": [
 "XBI"
 ],
@@ -15384,9 +15636,6 @@
 "NXAT": [
 "PEJ"
 ],
-"NXATW": [
-"PEJ"
-],
 "NXB": [
 "IYT"
 ],
@@ -15454,6 +15703,9 @@
 "XBI"
 ],
 "OCS": [
+"XBI"
+],
+"OCSAW": [
 "XBI"
 ],
 "OCSL": [
@@ -15787,6 +16039,9 @@
 "XRT"
 ],
 "OXY": [
+"XOP"
+],
+"OXY.WS": [
 "XOP"
 ],
 "OZK": [
@@ -16560,6 +16815,9 @@
 "PYPD": [
 "IHI"
 ],
+"PYT": [
+"IAI"
+],
 "PYXS": [
 "XBI"
 ],
@@ -16666,6 +16924,9 @@
 "IYT"
 ],
 "RAIN": [
+"PAVE"
+],
+"RAINW": [
 "PAVE"
 ],
 "RAL": [
@@ -17103,6 +17364,9 @@
 "RTX": [
 "ITA"
 ],
+"RUBI": [
+"IYT"
+],
 "RUM": [
 "IGV"
 ],
@@ -17208,6 +17472,9 @@
 "SABS": [
 "XBI"
 ],
+"SAEN": [
+"XBI"
+],
 "SAFT": [
 "KIE"
 ],
@@ -17286,6 +17553,9 @@
 "SBCF": [
 "KBE"
 ],
+"SBCWW": [
+"IHI"
+],
 "SBET": [
 "IGV"
 ],
@@ -17320,6 +17590,9 @@
 "PEJ"
 ],
 "SCAG": [
+"ITB"
+],
+"SCAGW": [
 "ITB"
 ],
 "SCCO": [
@@ -17517,6 +17790,9 @@
 "SHMD": [
 "PAVE"
 ],
+"SHMDW": [
+"PAVE"
+],
 "SHO": [
 "PEJ"
 ],
@@ -17677,6 +17953,9 @@
 "XBI"
 ],
 "SLND": [
+"ITA"
+],
+"SLND.WS": [
 "ITA"
 ],
 "SLNH": [
@@ -18483,6 +18762,9 @@
 "TLSI": [
 "IHI"
 ],
+"TLSIW": [
+"IHI"
+],
 "TLX": [
 "XBI"
 ],
@@ -18529,6 +18811,9 @@
 "PEJ"
 ],
 "TNON": [
+"IHI"
+],
+"TNONW": [
 "IHI"
 ],
 "TNXP": [
@@ -19030,6 +19315,9 @@
 "KBE"
 ],
 "VAL": [
+"XOP"
+],
+"VAL.WS": [
 "XOP"
 ],
 "VALE": [
@@ -19629,6 +19917,9 @@
 "XBP": [
 "IGV"
 ],
+"XBPEW": [
+"IGV"
+],
 "XCH": [
 "PAVE"
 ],
@@ -19824,6 +20115,9 @@
 "ZEO": [
 "PAVE"
 ],
+"ZEOWW": [
+"PAVE"
+],
 "ZEPP": [
 "IGV"
 ],
@@ -19864,9 +20158,6 @@
 "XBI"
 ],
 "ZOOZ": [
-"PAVE"
-],
-"ZOOZW": [
 "PAVE"
 ],
 "ZS": [
