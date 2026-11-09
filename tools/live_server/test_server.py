@@ -337,3 +337,38 @@ def test_tb_nifty_instance(tmp_path):
     assert c.get("/api/tb", headers=h).json()["mode"] == "DRY RUN"                                   # separate switches
     assert c.get("/api/tb?inst=xyz", headers=h).status_code == 404
     os.environ.pop("TB_NIFTY_DIR")
+
+
+def test_adopt(tmp_path):
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.broker.hold.update({"TITAN": 40, "NIFTYBEES": 100})
+    L = c.get("/api/adopt", headers=h).json()
+    t = next(x for x in L["holdings"] if x["symbol"] == "TITAN")
+    assert t["suggest"] == "Monthly ATH" and t["stop"] and t["protect"] < t["stop"]
+    assert not any(x["symbol"] == "NIFTYBEES" for x in L["holdings"])                     # ETFs stay with the Pie
+    assert c.post("/api/adopt", headers=h, json={"symbol": "TITAN", "system": "Monthly ATH", "confirm": "ADOPT XYZ"}).status_code == 400
+    d = c.post("/api/adopt", headers=h, json={"symbol": "TITAN", "system": "Monthly ATH", "confirm": "ADOPT TITAN"}).json()
+    assert d["mode"] == "DRY RUN" and not d["adopted"] and "TITAN" not in A.journal()        # dry run changes nothing
+    A.set_live(True)
+    r = c.post("/api/adopt", headers=h, json={"symbol": "TITAN", "system": "Monthly ATH", "confirm": "ADOPT TITAN"}).json()
+    e = A.journal()["TITAN"]; assert r["adopted"] and e["adopted"] and e["qty"] == 40 and e["gtt_id"] in A.broker.gtts
+    assert c.post("/api/adopt", headers=h, json={"symbol": "TITAN", "system": "Monthly ATH", "confirm": "ADOPT TITAN"}).status_code == 409
+    assert c.post("/api/adopt", headers=h, json={"symbol": "NOTHELD", "system": "Monthly ATH", "confirm": "ADOPT NOTHELD"}).status_code == 404
+    assert not any(x["symbol"] == "TITAN" for x in c.get("/api/adopt", headers=h).json()["holdings"])
+    # trend breaks -> the app shows a Sell for it
+    from datetime import date, timedelta
+    def down(sym, days=420):
+        out, d, px = [], date(2025, 8, 1), 150.0
+        while len(out) < 300:
+            if d.weekday() < 5:
+                px *= 0.996; out.append((d.isoformat(), px, px * 1.01, px * 0.99, px))
+            d += timedelta(days=1)
+        return out
+    A.broker.daily_candles = down; A._ADC.clear()
+    P = c.get("/api/plan", headers=h).json(); x = next(x for x in P["exits"] if x["symbol"] == "TITAN")
+    assert x["id"] == "EXIT-ADOPT-TITAN" and x["qty"] == 40 and "30-week" in x["why"]
+    # release: stop cancelled, journal entry gone, shares untouched
+    gid = e["gtt_id"]
+    assert c.post("/api/adopt/release", headers=h, json={"symbol": "TITAN", "confirm": "RELEASE TITAN"}).json()["ok"]
+    assert "TITAN" not in A.journal() and A.broker.hold["TITAN"] == 40

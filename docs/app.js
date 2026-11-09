@@ -715,7 +715,7 @@ async function loadLive() {
     ${PF.systems.map((x) => `<div class="fact"><span>${esc(x.system)} (${x.n})</span><b class="${x.pnl >= 0 ? 'up' : 'down'}">${x.pct == null ? '' : `${x.pct >= 0 ? '+' : ''}${fmt(x.pct, 1)}%`}</b><small>${rs(x.pnl)}</small></div>`).join('')}</div></div>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${perfHtml}${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}
     <p class="lv-sub">🛡 <b>Daily stop raise:</b> Momentum stops follow the 30-week SMA, Trend 9/21 stops follow EMA 21, ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}% below, and only ever move up (the system itself sells on the close — see "Exits for the next open"). ${trTxt} <button class="lv-link" id="lvtrail">Check stops now</button></p></div>` : '';
-  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}
+  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}
     ${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div>
     <div class="lv-card"><div style="display:flex;justify-content:space-between"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></div>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub">${S ? (S.account_value != null ? `Angel account value ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} (the server never sizes above the account value; 0 = full account).` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
@@ -738,7 +738,7 @@ async function loadLive() {
     try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); lvSave({ token: j.token }); loadLive(); } catch (e) { alertMsg(e.message); }
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) adoptCard(false); wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -900,6 +900,45 @@ async function lvQuotes(first) {
   lvMoreUpd();
   const t = $('#lvqt'); if (t) t.textContent = `${j.market_open ? 'Live prices' : 'Market closed – last prices'} · ${j.ist.slice(11, 19)} IST`;
   if (j.market_open) state._lvQT = setTimeout(() => lvQuotes(false), 15000);
+}
+
+/* Adopt holdings (9 Nov 2026): stocks you hold in Angel but didn't buy through the app. The app SUGGESTS a system from the
+   stock's own chart; nothing changes until you type ADOPT <SYMBOL>. Adopted = protective stop on Angel (Live), the daily
+   stop raise and the system's sell signal. RELEASE <SYMBOL> hands it back (stop cancelled, shares untouched). */
+async function adoptCard(load) {
+  const box = $('#adoptcard'); if (!box) return;
+  if (!load && !state._adopt) {
+    box.innerHTML = `<div class="lv-card"><b>Your other Angel holdings</b><p class="lv-sub">Stocks you bought outside the app have no system stop or sell signal. Review them and decide, one by one, whether a system should look after them.</p>
+      <button class="lv-btn" id="adload">Review my holdings</button></div>`;
+    box.querySelector('#adload').addEventListener('click', () => adoptCard(true)); return;
+  }
+  if (load) { box.innerHTML = '<div class="lv-card"><b>Your other Angel holdings</b><p class="lv-sub">Reading each chart from Angel… (a few seconds per stock)</p></div>';
+    try { state._adopt = await lvApi('/api/adopt'); } catch (e) { box.innerHTML = /404|Not Found/i.test(e.message) ? '' : `<div class="lv-card"><b>Your other Angel holdings</b><p class="lv-sub">Couldn't read them: ${esc(e.message)}</p></div>`; return; } }
+  const A = state._adopt, live = A.mode === 'LIVE'; const SN = { 'Monthly ATH': 'Momentum', 'Trend 9/21': 'Trend 9/21' };
+  const rows = A.holdings.map((h, i) => `<div class="ad-row"><div class="ad-top"><b>${esc(h.symbol)}</b><span>${h.qty} × ${fmt(h.avg, 2, 'en-IN')}${h.ltp ? ` · now ${fmt(h.ltp, 2, 'en-IN')}` : ''}</span></div>
+      <p class="lv-sub">${h.suggest ? `<b>Suggestion: ${SN[h.suggest]}</b> — ` : '<b>No system fits now</b> — '}${esc(h.why || '')}</p>
+      <div class="ad-btns">${['Monthly ATH', 'Trend 9/21'].map((sy) => `<button class="lv-btn ${h.suggest === sy ? '' : 'ghost'}" data-ad="${i}" data-sy="${sy}">${SN[sy]}</button>`).join('')}<span class="muted">or leave it as it is</span></div></div>`).join('');
+  const ad = (A.adopted || []).map((a) => `<div class="ad-row"><div class="ad-top"><b>${esc(a.symbol)}</b><span>${SN[a.system] || esc(a.system)} since ${day(a.since)}</span></div><div class="ad-btns"><button class="lv-btn ghost" data-rel="${esc(a.symbol)}">Release</button></div></div>`).join('');
+  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Your other Angel holdings</b><button class="lv-btn ghost" id="adre" style="font-size:12px">Refresh</button></div>
+    <p class="lv-sub">The app only suggests. Nothing changes until you confirm a stock by typing ADOPT and its name.${live ? '' : ' <b>Dry run:</b> confirming shows what would happen and changes nothing.'}</p>
+    ${rows || '<p class="lv-sub">Every stock you hold is already managed by the app (ETFs stay with the Wealth Creation Pie).</p>'}
+    ${ad ? `<h4 class="ad-h">Adopted by you</h4>${ad}` : ''}</div>`;
+  box.querySelector('#adre').addEventListener('click', () => adoptCard(true));
+  box.querySelectorAll('[data-ad]').forEach((b) => b.addEventListener('click', async () => {
+    const h = A.holdings[+b.dataset.ad], sy = b.dataset.sy;
+    const lvl = sy === 'Monthly ATH' ? h.sma30 : h.ema21, net = lvl ? lvl * (1 - A.net_pct / 100) : null;
+    const rule = sy === 'Monthly ATH' ? 'it sells after a weekly close below the 30-week SMA' : 'it sells after a daily close with EMA 9 below EMA 21';
+    const t = window.prompt(`Hand ${h.symbol} (${h.qty} shares) to ${SN[sy]}?\n\n• ${rule} (now ${lvl ? fmt(lvl, 2, 'en-IN') : '–'}); the app shows Sell and you place it\n• protective stop on Angel at about ${net ? fmt(net, 2, 'en-IN') : '–'} (${A.net_pct}% below), raised daily, never lowered\n${sy !== h.suggest ? '\n⚠ This is not the app\'s suggestion for this stock.\n' : ''}\nType ADOPT ${h.symbol} to confirm:`);
+    if (t === null) return;
+    try { const j = await lvApi('/api/adopt', { method: 'POST', body: JSON.stringify({ symbol: h.symbol, system: sy, confirm: t }) });
+      alertMsg(j.adopted ? `${h.symbol} adopted into ${SN[sy]}${j.protect ? `; protective stop on Angel at ${fmt(j.protect, 2, 'en-IN')}` : ''}${j.gtt_error ? ` (stop not placed yet: ${j.gtt_error} — use Retry stop)` : ''}.` : j.msg, true);
+      if (j.adopted) { state._adopt = null; setTimeout(() => { loadLive(); }, 1500); } }
+    catch (e) { alertMsg('Not adopted: ' + e.message); } }));
+  box.querySelectorAll('[data-rel]').forEach((b) => b.addEventListener('click', async () => {
+    const sym = b.dataset.rel; const t = window.prompt(`Release ${sym}? Its protective stop on Angel is cancelled and the app stops managing it. Your shares stay as they are.\n\nType RELEASE ${sym} to confirm:`);
+    if (t === null) return;
+    try { await lvApi('/api/adopt/release', { method: 'POST', body: JSON.stringify({ symbol: sym, confirm: t }) }); alertMsg(`${sym} released.`, true); state._adopt = null; adoptCard(true); }
+    catch (e) { alertMsg('Not released: ' + e.message); } }));
 }
 
 /* Top Bottom (Bank Nifty futures) bot: approve each level here; the bot on the server trades only approved levels */

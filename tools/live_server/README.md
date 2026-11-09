@@ -106,3 +106,11 @@ The ETF Pie card's "Send SIP to Angel" places the month's ETF buys in one go: on
 LIQUIDBEES; whole units; Delivery limit orders a hair (0.3%) above the live price (AMO outside market hours); total within your
 cash and `SIP_MAX` (env, default ₹2,00,000); each ETF once a day; typed confirmation "SIP <n>". Dry run shows the exact orders.
 SIP buys are logged in orders.jsonl but kept out of the systems' journal, so they get no stops, trailing or exit signals.
+
+## Adopting holdings bought outside the app (`GET/POST /api/adopt`, `POST /api/adopt/release`)
+Live › "Your other Angel holdings" lists stocks you hold that the app doesn't manage (ETFs stay with the Wealth Creation Pie).
+For each, the app reads the chart from Angel and SUGGESTS Momentum (above its 30-week SMA), Trend 9/21 (EMA 9 above EMA 21)
+or no system. Nothing changes until you type `ADOPT <SYMBOL>`. In Live mode that creates a journal entry (your avg price, qty,
+the system), places the protective GTT (ATH_NET_PCT below the system level), joins the daily stop raise, and shows the
+system's Sell signal when its rule breaks (you place the sell). Return in the hero counts from the adoption-day price.
+Dry run changes nothing. `RELEASE <SYMBOL>` cancels the GTT and stops managing it; the shares are untouched.

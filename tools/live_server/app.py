@@ -436,8 +436,9 @@ TRAIL_GAP = float(ENV.get("TRAIL_GAP_PCT", str(ATH_NET_PCT * 100))) / 100
 TRAIL_SYS = ("Monthly ATH", "Trend 9/21")
 
 
-def _weekly_sma30(c):
-    """c: [(date, o, h, l, close)] completed daily candles -> 30-week SMA of completed weekly (Friday) closes, or None."""
+def _weekly_sma30(c, last=False):
+    """c: [(date, o, h, l, close)] completed daily candles -> 30-week SMA of completed weekly (Friday) closes, or None.
+    last=True: (sma, last completed weekly close)."""
     from datetime import date as _d, timedelta as _td
     wk = {}
     for d, *_x, cl in c:
@@ -446,8 +447,9 @@ def _weekly_sma30(c):
     today = ist_now().date()
     ends = sorted(k for k in wk if k < today or (k == today and ist_now().hour >= 16))
     if len(ends) < 30:
-        return None
-    return sum(wk[k] for k in ends[-30:]) / 30
+        return (None, None) if last else None
+    sma = sum(wk[k] for k in ends[-30:]) / 30
+    return (sma, wk[ends[-1]]) if last else sma
 
 
 def _ema21(c):
@@ -504,6 +506,143 @@ def last_trail():
         return None
 
 
+# ------------------------------------------------------------------ adopt holdings (9 Nov 2026)
+# Holdings bought outside the app can be handed to Momentum or Trend 9/21 - ONLY when you confirm each one ("ADOPT <SYM>").
+# The app suggests a system from the stock's own chart; you decide. Adopted = journal entry (system, your avg price, qty)
+# -> protective GTT (live), the daily stop raise, and the system's sell signal (weekly close < 30-wk SMA, or EMA 9 < EMA 21).
+# "RELEASE <SYM>" hands it back: GTT cancelled, the shares stay in your account untouched.
+PIE_ETFS = ("NIFTYBEES", "MID150BEES", "GOLDBEES", "MON100", "LIQUIDBEES", "LIQUIDCASE", "JUNIORBEES", "BANKBEES", "MAFANG")
+_ADC = {}
+
+
+def _ema(c, n):
+    if len(c) < n * 3:
+        return None
+    a = 2 / (n + 1); e = c[0][4]
+    for x in c[1:]:
+        e = a * x[4] + (1 - a) * e
+    return e
+
+
+def chart_read(sym):
+    """30-week SMA, EMA 9/21 and the last completed close, from Angel daily candles (cached for the IST day)."""
+    k = (sym, ist_now().date().isoformat())
+    if k not in _ADC:
+        c = broker.daily_candles(sym); sma, wkc = _weekly_sma30(c, last=True)
+        _ADC[k] = dict(close=round(c[-1][4], 2) if c else None, sma30=sma, week_close=wkc, ema9=_ema(c, 9), ema21=_ema(c, 21), n=len(c))
+    return _ADC[k]
+
+
+def adopt_suggest(sym):
+    r = chart_read(sym); cl, sma, e9, e21 = r["close"], r["sma30"], r["ema9"], r["ema21"]
+    if not cl or not sma:
+        return dict(suggest=None, why="not enough price history", **r)
+    if cl > sma:
+        return dict(suggest="Monthly ATH", stop=round(sma, 2), protect=round(sma * (1 - ATH_NET_PCT), 2),
+                    why=f"above its 30-week SMA {sma:,.2f}: Momentum holds it until a weekly close below", **r)
+    if e9 and e21 and e9 > e21:
+        return dict(suggest="Trend 9/21", stop=round(e21, 2), protect=round(e21 * (1 - ATH_NET_PCT), 2),
+                    why=f"below its 30-week SMA but EMA 9 is above EMA 21 ({e21:,.2f}): Trend 9/21 holds it until EMA 9 drops under",
+                    **r)
+    return dict(suggest=None, why="below its 30-week SMA and EMA 9 is under EMA 21: neither system would hold it now", **r)
+
+
+@app.get("/api/adopt")
+def adopt_list(_=Depends(auth)):
+    J = journal(); acc = account_cached(0); out = []
+    for h in acc["holdings"]:
+        sym = h["symbol"]
+        if h["qty"] <= 0 or sym in PIE_ETFS or (sym in J and J[sym].get("state") in ("open", "pending", "exiting")):
+            continue
+        row = dict(symbol=sym, qty=h["qty"], avg=h.get("avg"), ltp=h.get("ltp"))
+        try:
+            row.update(adopt_suggest(sym))
+        except Exception as ex:  # noqa: BLE001
+            row.update(suggest=None, why=f"couldn't read the chart: {angel_msg(ex)}")
+        out.append(row)
+    adopted = [dict(symbol=k, system=e.get("system"), qty=e.get("qty"), since=e.get("since")) for k, e in J.items()
+               if not k.startswith("_") and e.get("adopted") and e.get("state") == "open"]
+    return dict(mode="LIVE" if is_live() else "DRY RUN", holdings=out, adopted=adopted, net_pct=ATH_NET_PCT * 100)
+
+
+class Adopt(BaseModel):
+    symbol: str
+    system: str
+    confirm: str
+
+
+@app.post("/api/adopt")
+def adopt(body: Adopt, _=Depends(auth)):
+    sym = body.symbol.upper().strip()
+    if body.system not in ("Monthly ATH", "Trend 9/21"):
+        raise HTTPException(400, "system must be Momentum (Monthly ATH) or Trend 9/21")
+    if body.confirm.strip().upper() != f"ADOPT {sym}":
+        raise HTTPException(400, f'confirm must be "ADOPT {sym}"')
+    if sym in PIE_ETFS:
+        raise HTTPException(400, "ETFs belong to the Wealth Creation Pie, not the stock systems")
+    J = journal()
+    if sym in J and J[sym].get("state") in ("open", "pending", "exiting"):
+        raise HTTPException(409, "already managed by the app")
+    acc = account_cached(0); h = next((x for x in acc["holdings"] if x["symbol"] == sym and x["qty"] > 0), None)
+    if not h:
+        raise HTTPException(404, "not in your Angel holdings")
+    r = chart_read(sym)
+    lvl = r["sma30"] if body.system == "Monthly ATH" else r["ema21"]
+    if not lvl:
+        raise HTTPException(400, "not enough price history to set the system level")
+    e = dict(since=ist_now().date().isoformat(), system=body.system, kind="ADOPT", stop=round(lvl, 2), entry=float(h.get("avg") or h.get("ltp") or 0),
+             qty=int(h["qty"]), state="open", adopted=True, adopt_px=float(h.get("ltp") or 0) or None)
+    prot = round(protect_level("ADOPT", lvl), 2)
+    if not is_live():
+        log("adopt_dry", symbol=sym, system=body.system, stop=e["stop"], protect=prot)
+        return dict(ok=True, mode="DRY RUN", adopted=False, entry=e, protect=prot,
+                    msg="Dry run: nothing changed. In Live mode this hands it to the system and places the protective stop on Angel.")
+    J[sym] = e; _protect(sym, e); save_journal(J); log("adopt", symbol=sym, system=body.system, stop=e["stop"], gtt=e.get("gtt_id"))
+    return dict(ok=True, mode="LIVE", adopted=True, entry=e, protect=e.get("gtt_trigger"), gtt_error=e.get("gtt_error"))
+
+
+class Release(BaseModel):
+    symbol: str
+    confirm: str
+
+
+@app.post("/api/adopt/release")
+def adopt_release(body: Release, _=Depends(auth)):
+    sym = body.symbol.upper().strip()
+    if body.confirm.strip().upper() != f"RELEASE {sym}":
+        raise HTTPException(400, f'confirm must be "RELEASE {sym}"')
+    J = journal(); e = J.get(sym)
+    if not e or not e.get("adopted"):
+        raise HTTPException(404, "not an adopted holding")
+    if e.get("gtt_id"):
+        try:
+            broker.gtt_cancel(e["gtt_id"], sym); log("gtt_cancel", symbol=sym, gtt_id=e["gtt_id"])
+        except Exception as ex:  # noqa: BLE001
+            raise HTTPException(502, f"couldn't cancel the stop on Angel, nothing changed: {angel_msg(ex)}")
+    J.pop(sym); save_journal(J); log("adopt_release", symbol=sym)
+    return dict(ok=True, released=sym)
+
+
+def adopted_exits(J, held):
+    """sell signals for adopted holdings (the nightly plan only knows the scan's own stocks)."""
+    out = []
+    for sym, e in J.items():
+        if sym.startswith("_") or not e.get("adopted") or e.get("state") != "open" or held.get(sym, 0) <= 0:
+            continue
+        try:
+            r = chart_read(sym)
+        except Exception:  # noqa: BLE001
+            continue
+        cl = r["close"]
+        if e["system"] == "Monthly ATH" and r["sma30"] and r.get("week_close") and r["week_close"] < r["sma30"]:
+            out.append(dict(id=f"EXIT-ADOPT-{sym}", symbol=sym, system=e["system"], side="SELL", order="LIMIT", when="next open", ref=cl,
+                            why=f"week closed at {r['week_close']:,.2f}, below the 30-week SMA {r['sma30']:,.2f}"))
+        if e["system"] == "Trend 9/21" and r["ema9"] and r["ema21"] and r["ema9"] < r["ema21"]:
+            out.append(dict(id=f"EXIT-ADOPT-{sym}", symbol=sym, system=e["system"], side="SELL", order="LIMIT", when="next open", ref=cl,
+                            why="daily close with EMA 9 below EMA 21"))
+    return out
+
+
 @app.post("/api/trail")
 def trail_now(_=Depends(auth)):
     return dict(results=trail(force=True), gap_pct=TRAIL_GAP * 100)
@@ -541,13 +680,13 @@ def perf_view(J, acc):
     for sym, e in J.items():
         if sym.startswith("_") or e.get("state", "open") != "open" or not (e.get("qty") and e.get("entry")):
             continue
-        q, en = e["qty"], e["entry"]; px = ltp.get(sym) or en
+        q, en = e["qty"], e.get("adopt_px") or e["entry"]; px = ltp.get(sym) or en
         o["n"] += 1; o["cost"] += q * en; o["value"] += q * px; add(e.get("system"), q * en, q * (px - en))
         first = min(first or e.get("since") or "9", e.get("since") or "9")
     for k, e in (J.get("_done") or {}).items():
         if not (e.get("exit") and e.get("entry") and e.get("qty")):
             continue          # rejected or cancelled orders never filled
-        q, en = e["qty"], e["entry"]; pnl = q * (e["exit"] - en)
+        q, en = e["qty"], e.get("adopt_px") or e["entry"]; pnl = q * (e["exit"] - en)
         c["n"] += 1; c["cost"] += q * en; c["pnl"] += pnl; c["wins"] += pnl > 0; add(e.get("system"), q * en, pnl)
         first = min(first or e.get("since") or "9", e.get("since") or "9")
     o["pnl"] = o["value"] - o["cost"]; tot = o["pnl"] + c["pnl"]; cost = o["cost"] + c["cost"]
@@ -672,6 +811,8 @@ def sized(acc=None):
     # an exit applies to the system the app bought the stock under (holdings bought elsewhere get every exit listed)
     ex = [dict(e, qty=held.get(e["symbol"], 0)) for e in P.get("exits") or [] if held.get(e["symbol"], 0) > 0
           and (e["symbol"] not in J or not J[e["symbol"]].get("system") or J[e["symbol"]]["system"] == e.get("system"))]
+    have = {x["symbol"] for x in ex}
+    ex += [dict(x, qty=held.get(x["symbol"], 0)) for x in adopted_exits(J, held) if x["symbol"] not in have]
     if G["status"] == "paused":
         for r in rows:
             if not r["skip"]:
