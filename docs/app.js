@@ -2628,11 +2628,22 @@ async function loadMarkets() {
   if (x.lvl === 'market') {
     const ms = G.mstats || {}; const v = ((W && W.indices) || {})[MX_IDX[mk]] || {};
     const secs = G.sectors.slice().sort((a, b) => b[state.gpPer || 'p1m'] - a[state.gpPer || 'p1m']);
-    el.innerHTML = `${mxCrumb()}<section class="summary">
-        <div class="stat ${ms.up ? 'new' : 'exit'}"><b>${ms.up ? 'Stage 2' : 'Not Stage 2'}</b><span>${MX_BENCH[mk]} ${ms.up ? 'above' : 'not above'} a rising 150-day · ${ms.r3m >= 0 ? '+' : ''}${fmt(ms.r3m, 1)}% in 3 m · ${fmt(ms.from_high, 1)}% from 1-yr high</span></div>
-        <div class="stat"><b>${fmt(ms.above200, 0)}%</b><span>of liquid stocks above their 200-day (a month ago ${fmt(ms.above200_1m_ago, 0)}%)</span></div>
-        <div class="stat"><b>${fmt(ms.p1q, 0)} → ${fmt(ms.p1m, 0)} → ${fmt(ms.p1w, 0)}</b><span>market Pulse quarter → month → week</span></div>
-        <div class="stat"><b>${S.nbrk} · ${S.n921} · ${S.nnear}</b><span>ATH breakouts · 9/21 buys · ATH near trigger</span></div></section>
+    const bd = Math.round((ms.above200 || 0) - (ms.above200_1m_ago || 0)); const pd = Math.round((ms.p1w || 0) - (ms.p1q || 0));
+    const dl = (d, unit = '') => `<span class="gpd ${d > 0 ? 'up' : d < 0 ? 'down' : ''}">${d > 0 ? '▲' : d < 0 ? '▼' : '•'}${Math.abs(d)}${unit}</span>`;
+    const mshift = ms.p1w > ms.p1m && ms.p1m > ms.p1q ? 'build' : ms.p1w < ms.p1m && ms.p1m < ms.p1q ? 'fade' : 'hold';
+    el.innerHTML = `${mxCrumb()}<section class="mxkpis">
+        <div class="mxkpi" title="Stage 2 = ${MX_BENCH[mk]} above a rising 150-day average"><span class="mxk-l">Market trend · ${MX_BENCH[mk]}</span>
+          <b class="mxk-v ${ms.up ? 'up' : 'down'}">${ms.up ? 'Uptrend' : 'No uptrend'}</b>
+          <span class="mxk-tags"><span class="chip ${ms.r3m >= 0 ? 'open' : 'exit'}">${ms.r3m >= 0 ? '+' : ''}${fmt(ms.r3m, 1)}% 3 m</span><span class="chip">${fmt(ms.from_high, 1)}% from high</span></span></div>
+        <div class="mxkpi"><span class="mxk-l">Stocks above 200-day</span>
+          <b class="mxk-v">${fmt(ms.above200, 0)}% ${dl(bd, ' pts')}</b>
+          <span class="mxk-bar" title="Now ${fmt(ms.above200, 0)}%, a month ago ${fmt(ms.above200_1m_ago, 0)}%"><i style="width:${Math.max(0, Math.min(100, ms.above200 || 0))}%"></i><em style="left:${Math.max(0, Math.min(100, ms.above200_1m_ago || 0))}%"></em></span>
+          <span class="mxk-s">a month ago ${fmt(ms.above200_1m_ago, 0)}%</span></div>
+        <div class="mxkpi"><span class="mxk-l">Market Pulse</span>
+          <span class="mxk-row">${gpSlope({ ...ms, shift: mshift }, 58, 34)}<b class="mxk-v">${fmt(ms.p1w, 0)} ${dl(pd)}</b></span>
+          <span class="mxk-s">quarter ${fmt(ms.p1q, 0)} · month ${fmt(ms.p1m, 0)} · week ${fmt(ms.p1w, 0)}</span></div>
+        <div class="mxkpi"><span class="mxk-l">Signals today</span>
+          <span class="mxk-trio"><span title="ATH breakouts"><b>${S.nbrk}</b>ATH</span><span title="9/21 buys"><b>${S.n921}</b>9/21</span><span title="ATH near trigger"><b>${S.nnear}</b>Near ATH</span></span></div></section>
       <div class="card"><h4 style="margin:0 0 4px">Sectors</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Colour = Pulse (share of the sector's stocks trending); strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-bouncing, red weak); RS = equal-weight 3-month return vs ${MX_BENCH[mk]}. Tap a sector for its industries.</p>
         ${mxPer()}${mxTiles(secs, 'sector', 'data-s')}
         <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div></div>`;
