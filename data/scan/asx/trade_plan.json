@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-09 10:23 UTC",
+"generated": "2026-11-09 23:29 UTC",
 "market": "ASX",
 "watch_only": true,
 "asof": "2026-11-09",
@@ -59,6 +59,15 @@
 "test": "Off: lagged the average stock in every industry lane (NSE 2017-26) and a random stock in the US/ASX test."
 },
 {
+"key": "vcp",
+"name": "VCP",
+"system": "VCP",
+"status": "watch",
+"pct": 0,
+"rules": "Volatility contraction pattern in a Stage 2 uptrend: >= 2 shrinking pullbacks with higher lows, volume drying up; buy-stop above the last pullback's high on 1.4x volume; stop = that pullback's low (max 10%); sell after a daily close below EMA 50.",
+"test": "Not tested on this market (NSE: +4.9% a trade). Watch bucket - your call."
+},
+{
 "key": "s1",
 "name": "System 1",
 "status": "off",
@@ -79,39 +88,6 @@
 "more": [],
 "swing": [
 {
-"id": "PAT-ASL-2026-11-05",
-"symbol": "ASL",
-"name": "ANDEAN SILVER LIMITED",
-"system": "Bottom pattern",
-"bucket": "pt",
-"kind": "PATTERN",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 1.43,
-"ref": 1.4199999570846558,
-"stop": 1.23,
-"target": 1.64,
-"exit_rule": "measured-move target 1.64 or the stop, max 120 days",
-"experimental": true,
-"note": "double bottom broke the neckline 1.47 on 2026-11-05 \u00b7 experimental: worse than random in the ASX backtest",
-"score": 0,
-"value_cr": null,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": "Materials",
-"lane": "mid",
-"group_pulse": 9.5,
-"group_rank": 21,
-"rank": 1,
-"risk_pct": 16.3
-},
-{
 "id": "PAT-IGO-2026-11-05",
 "symbol": "IGO",
 "name": "IGO LIMITED",
@@ -121,8 +97,8 @@
 "order": "LIMIT",
 "when": "next open",
 "side": "BUY",
-"price": 5.01,
-"ref": 4.960000038146973,
+"price": 5.25,
+"ref": 5.199999809265137,
 "stop": 4.72,
 "target": 5.78,
 "exit_rule": "measured-move target 5.78 or the stop, max 120 days",
@@ -139,10 +115,10 @@
 "td_score": null,
 "group": "Materials",
 "lane": "mid",
-"group_pulse": 9.5,
+"group_pulse": 9.6,
 "group_rank": 21,
-"rank": 2,
-"risk_pct": 6.1
+"rank": 1,
+"risk_pct": 11.2
 },
 {
 "id": "PAT-IMD-2026-11-05",
@@ -154,8 +130,8 @@
 "order": "LIMIT",
 "when": "next open",
 "side": "BUY",
-"price": 3.23,
-"ref": 3.200000047683716,
+"price": 3.31,
+"ref": 3.2799999713897705,
 "stop": 3.03,
 "target": 3.6,
 "exit_rule": "measured-move target 3.60 or the stop, max 120 days",
@@ -172,10 +148,10 @@
 "td_score": null,
 "group": "Materials",
 "lane": "mid",
-"group_pulse": 9.5,
+"group_pulse": 9.6,
 "group_rank": 21,
-"rank": 3,
-"risk_pct": 6.6
+"rank": 2,
+"risk_pct": 9.2
 }
 ],
 "pattern_watch": [],
