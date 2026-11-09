@@ -274,7 +274,7 @@ def main(mk="NSE"):
                rows=rows)
     json.dump(out, open(f"{OUT}/patterns.json", "w"), indent=0)
     print("patterns", len(rows), {s: sum(r["status"] == s for r in rows) for s in order})
-    srows.sort(key=lambda r: (r["status"] != "touched", not r["sq9_match"], r["days_ago"] if r["status"] == "touched" else r["above_pct"]))
+    srows.sort(key=lambda r: (r["status"] != "touched", r["days_ago"] if r["status"] == "touched" else r["above_pct"]))
     json.dump(dict(generated=out["generated"], asof=out["asof"], market=mk,
                    rules="Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) "
                          "that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). "
