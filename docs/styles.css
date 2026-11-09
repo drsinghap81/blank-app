@@ -583,3 +583,10 @@ body.bg-first .views { display: none !important; }
 .lv-bkchg { flex: none; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--soft); color: var(--accent); }
 .lv-bkfold[open] .lv-bkchg { visibility: hidden; }
 .lv-bkfold[open] > summary { margin-bottom: 8px; }
+.live-px { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; padding: 2px 7px; border-radius: 999px; font-size: 11.5px; font-weight: 600; background: var(--soft); color: var(--slate); white-space: nowrap; }
+.live-px.up { color: var(--rise-ink); } .live-px.down { color: var(--fall-ink); }
+.live-px i { width: 6px; height: 6px; border-radius: 50%; background: var(--slate); }
+.live-px i.on { background: var(--rise); animation: livepulse 1.6s ease-in-out infinite; }
+@keyframes livepulse { 50% { opacity: .3; } }
+.bg-pt .live-px { margin-left: 6px; }
+.num .live-px { display: flex; width: max-content; margin: 3px 0 0 auto; font-size: 11px; padding: 1px 6px; }

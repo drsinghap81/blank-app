@@ -109,7 +109,45 @@ function show(view) {
   window.scrollTo(0, 0);
   if (view !== 'bg') document.body.classList.remove('bg-first');
   if (view !== 'bg') bgNav(document.body.classList.contains('mode-bg') ? 'explore' : '');
+  setTimeout(liveTag, 1500); setTimeout(liveTag, 4000);
   ({ mk: loadMarkets, live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
+}
+
+/* ------------------------------------------------------------------ Live prices (9 Nov 2026)
+   The stocks our systems shortlist (today's buys, near-trigger, sell signals, your open trades) are priced by your
+   server from Angel every 15 s in market hours. Lists elsewhere in the app get a live tag on those rows, and the
+   open daily chart grows today's candle. Only when this device is connected to your server; Indian stocks only. */
+const LIVE = { q: {}, open: false, at: null, t: null };
+async function livePoll() {
+  clearTimeout(LIVE.t);
+  if (!lvCfg().url || state.view === 'live') { LIVE.t = setTimeout(livePoll, 60000); return; }   // Live tab runs its own feed
+  try { const j = await lvApi('/api/quotes'); LIVE.q = j.symbols || {}; LIVE.open = !!j.market_open; LIVE.at = new Date(); liveTag(); liveBar(); } catch (e) { /* server off: keep end-of-day */ }
+  LIVE.t = setTimeout(livePoll, LIVE.open ? 15000 : 300000);
+}
+function liveTag() {
+  if (!Object.keys(LIVE.q).length) return;
+  const nse = state.mkt === 'NSE' || state.view === 'bg';
+  document.querySelectorAll('.row, .bg-pick[data-sym]').forEach((row) => {
+    const sym = row.dataset.sym || (row.querySelector('.sym') || {}).textContent; const q = nse && sym && LIVE.q[sym.trim()];
+    let tag = row.querySelector('.live-px');
+    if (!q || !q.ltp) { if (tag) tag.remove(); return; }
+    if (!tag) { tag = document.createElement('span'); tag.className = 'live-px'; (row.querySelector('.num') || row.querySelector('.bg-pt span') || row).appendChild(tag); }
+    const ch = q.prev ? (q.ltp / q.prev - 1) * 100 : null;
+    const cls = 'live-px ' + (ch == null ? '' : ch >= 0 ? 'up' : 'down'); if (tag.className !== cls) tag.className = cls;
+    const html = `<i class="${LIVE.open ? 'on' : ''}"></i>${fmt(q.ltp, 2, 'en-IN')}${ch == null ? '' : ` ${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%`}`; if (tag.innerHTML !== html) tag.innerHTML = html;
+    tag.title = LIVE.open ? 'Live price from your Angel account, updates every 15 s' : "Today's last price from your Angel account";
+  });
+}
+function liveBar() {
+  const P = state._ps; if (!P || !P.s || !P.rows || P.rows.length < 3) return;
+  const q = LIVE.q[(P.sym || '').trim()]; if (!q || !q.ltp || state.mkt !== 'NSE') return;
+  const last = P.rows[P.rows.length - 1], prev = P.rows[P.rows.length - 2];
+  if (typeof last.time !== 'string' || (new Date(last.time) - new Date(prev.time)) / 864e5 > 4) return;   // daily charts only
+  const now = new Date(Date.now() + 5.5 * 3600e3); const today = now.toISOString().slice(0, 10);
+  if (today < last.time) return;
+  const same = today === last.time;
+  const o = same ? last.open : (q.open || q.ltp), h = Math.max(same ? last.high : 0, q.high || q.ltp, q.ltp), l = Math.min(same ? last.low : Infinity, q.low || q.ltp, q.ltp);
+  try { P.s.update(P.line ? { time: today, value: q.ltp } : { time: today, open: o, high: h, low: l, close: q.ltp }); } catch (e) { /* series gone */ }
 }
 
 /* ------------------------------------------------------------------ Live trades */
@@ -970,12 +1008,13 @@ function wireStyle(id, group, redraw) {
 }
 function priceSeries(ch, rows, group) {
   const v = state.style[group] || getStyle(group);
+  state._ps = { sym: state.selected, rows, line: v === 'line', s: null };
   if (v === 'line') {
     const s = ch.addLineSeries({ color: C.ink, lineWidth: 2, priceLineVisible: true, lastValueVisible: true });
-    s.setData(rows.map((r) => ({ time: r.time, value: r.close }))); return s;
+    s.setData(rows.map((r) => ({ time: r.time, value: r.close }))); state._ps.s = s; liveBar(); return s;
   }
   const s = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
-  s.setData(rows); return s;
+  s.setData(rows); state._ps.s = s; liveBar(); return s;
 }
 
 const chartBase = () => ({ layout: { background: { color: C.card }, textColor: C.slate, fontFamily: getComputedStyle(document.body).fontFamily || 'Manrope, system-ui, sans-serif' },
@@ -2905,7 +2944,7 @@ async function bgToday(el) {
       <span>The Nifty is ${fh < 1 ? 'near' : `${fmt(fh, 0)}% below`} its 1-year high and ${mood[2]}. ${mood[0] === 'good' ? 'Breakouts work best in markets like this.' : 'We only show the best-ranked trades.'}</span></div></div>
     <div class="bg-h"><h3>Your picks</h3><span>sized for ${inr(C)}</span></div>
     ${picks.map(({ r, s }, i) => { const ln = BG_LANE[r.lane] || ['', ''];
-      return `<div class="bg-pick"><div class="bg-pt"><div><b>${esc(bgName(r))}</b><span>${esc(r.symbol)} · ${bgWhy(r)}</span></div>${ln[0] ? `<span class="chip ${ln[1]}">${ln[0]}</span>` : ''}</div>
+      return `<div class="bg-pick" data-sym="${esc(r.symbol)}"><div class="bg-pt"><div><b>${esc(bgName(r))}</b><span>${esc(r.symbol)} · ${bgWhy(r)}</span></div>${ln[0] ? `<span class="chip ${ln[1]}">${ln[0]}</span>` : ''}</div>
         <p>${bgSentence(r, s)}</p>
         <div class="bg-btns"><button class="bg-cta sm" data-pr="${i}" ${held.has(r.symbol) ? 'disabled' : ''}>${held.has(r.symbol) ? 'In practice' : 'Practise this trade'}</button><button class="bg-ghost sm" data-how="${i}">How to place it</button><button class="bg-ghost sm icon" data-ch="${i}" aria-label="Chart of ${esc(r.symbol)}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div></div>`; }).join('') || '<p class="bg-empty">No trade passes our rules for the next open. That\'s normal. Waiting is part of the system.</p>'}
     ${rows.length > 3 ? `<button class="bg-link" id="bgmore">See ${rows.length - 3} more setups</button>` : ''}
@@ -3011,3 +3050,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
   applyMode();
   if (modeNow() === 'beginner') bgShow('today'); else if (!modeNow()) bgShow('welcome'); else show('mk');
 }
+
+/* live prices: start the feed and re-tag rows whenever a list redraws */
+livePoll();
+{ let lt = null; new MutationObserver(() => { clearTimeout(lt); lt = setTimeout(liveTag, 250); }).observe(document.body, { childList: true, subtree: true }); }
