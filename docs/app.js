@@ -2999,15 +2999,15 @@ async function loadBeginner() {
 function bgWelcome(el) {
   $('#asof').textContent = 'Nightly scans of 1,500 Indian stocks';
   el.innerHTML = `<div class="bg-wrap"><h2 class="bg-hero">Trade with a system, not a guess.</h2>
-    <p class="bg-lead">Every night we scan 1,500 Indian stocks and pick the few trades our tested rules like, with the exact buy price, stop and number of shares for your money.</p>
-    <div class="bg-steps"><div><b>1</b><span><strong>A few picks a day</strong>, not hundreds of tips</span></div>
-      <div><b>2</b><span><strong>Every trade has a stop</strong>, so you know your worst case before you buy</span></div>
-      <div><b>3</b><span><strong>Practise free first</strong>, go live when you're ready</span></div></div>
-    <label class="bg-l" for="bgcap">How much would you start with?</label>
+    <p class="bg-lead">A few tested picks each day, sized for your money.</p>
+    <div class="bg-steps"><div><b>1</b><span><strong>Few picks</strong>, not tips</span></div>
+      <div><b>2</b><span><strong>Worst case known</strong> before you buy</span></div>
+      <div><b>3</b><span><strong>Practise free</strong> first</span></div></div>
+    <label class="bg-l" for="bgcap">Starting amount</label>
     <div class="bg-money"><span>₹</span><input id="bgcap" inputmode="numeric" value="${(cap('NSE') || 50000).toLocaleString('en-IN')}"></div>
     <button class="bg-cta" id="bggo">I'm new · keep it simple</button>
     <button class="bg-ghost" id="bgpro">I already trade · show me everything</button>
-    <p class="bg-fine">Not investment advice. Past results don't guarantee future returns.</p></div>`;
+    <p class="bg-fine">Not investment advice</p></div>`;
   const save = () => { const v = Math.round(+String($('#bgcap').value).replace(/[^0-9]/g, '')); if (v > 0) setCap('NSE', v); };
   $('#bggo').addEventListener('click', () => { save(); setMode('beginner'); bgShow('today'); });
   $('#bgpro').addEventListener('click', () => { save(); setMode('pro'); show('mk'); });
@@ -3029,33 +3029,43 @@ function bgSentence(r, s) {
 async function bgToday(el) {
   el.innerHTML = '<p class="muted pad">Loading today…</p>';
   const [P, G, pr] = await Promise.all([getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan'), getJSON(MAIN + 'data/scan/group_pulse.json', 'gp_NSE'), pfPrices().catch(() => ({ px: {} }))]);
-  if (!P) { el.innerHTML = '<p class="empty">Today\'s picks appear after the evening scan (about 9:15 pm IST).</p>'; return; }
-  $('#asof').textContent = `India close ${day(P.asof)}${updTxt(P.generated)}`;
+  if (!P) { el.innerHTML = '<p class="empty">Today\'s picks appear after the evening scan.</p>'; return; }
+  $('#asof').textContent = `India close ${day(P.asof)}`;
   const C = cap('NSE') || 50000; const risk = lvRiskN(lvN('NSE')) / 100; const al = lvAlloc('NSE', P, null);
   const rows = (P.top || []).concat(P.swing || []).filter((r) => (al[bkOf(r)] ?? 0) > 0).map((r) => ({ r, s: bgSize(r, C, risk) })).filter((x) => x.s);
-  const ms = (G && G.mstats) || {}; const fh = Math.abs(ms.from_high || 0);
-  const mood = ms.up ? ['good', 'Healthy market', 'trending up'] : (ms.above200 || 0) >= 45 ? ['careful', 'Cautious market', 'not trending up yet'] : ['bad', 'Weak market', 'in a downtrend'];
-  const picks = rows.slice(0, 3); const held = new Set(bgPractice().filter((t) => !t.exit).map((t) => t.symbol));
+  const ms = (G && G.mstats) || {};
+  const mood = ms.up ? ['good', 'Market trending up'] : (ms.above200 || 0) >= 45 ? ['careful', 'Market: cautious'] : ['bad', 'Market: weak'];
+  const picks = rows.slice(0, 8); const held = new Set(bgPractice().filter((t) => t.state !== 'closed').map((t) => t.symbol));
+  state._bgPicks = picks; state._bgAsof = P.asof;
   el.innerHTML = `<div class="bg-wrap">
-    <div class="bg-mood"><i class="bg-dot ${mood[0]}"></i><div><b>${mood[1]}, ${rows.length ? `${rows.length} setup${rows.length > 1 ? 's' : ''}` : 'no new setups'}</b>
-      <span>The Nifty is ${fh < 1 ? 'near' : `${fmt(fh, 0)}% below`} its 1-year high and ${mood[2]}. ${mood[0] === 'good' ? 'Breakouts work best in markets like this.' : 'We only show the best-ranked trades.'}</span></div></div>
     ${bgHero(C, pr && pr.px || {})}
-    <div class="bg-h"><h3>Today's picks</h3><span>${picks.length} of ${rows.length}</span></div>
-    ${picks.map(({ r, s }, i) => { const ln = BG_LANE[r.lane] || ['', '']; const stopTxt = r.system === 'Monthly ATH' || bkOf(r) === 'tf' ? 'Sell below' : 'Stop';
-      return `<div class="bg-pick" data-sym="${esc(r.symbol)}"><div class="bg-pt"><div><b>${esc(bgName(r))}</b><span>${esc(r.symbol)}</span></div>${ln[0] ? `<span class="chip ${ln[1]}">${ln[0]}</span>` : ''}</div>
-        <div class="bg-tiles"><div><span>${r.trigger ? 'Buy above' : 'Buy up to'}</span><b>${inr(r.trigger || r.price, 1)}</b></div><div><span>${stopTxt}</span><b>${inr(r.stop, 1)}</b></div><div class="risk"><span>Worst case</span><b>−${inr(s.worst)}</b></div></div>
-        <div class="bg-why" id="bgwhy${i}" hidden><p>${esc(bgName(r))} ${bgWhy(r)}. ${bgSentence(r, s)}</p><div class="bg-btns"><button class="bg-ghost sm" data-how="${i}">How to place it</button><button class="bg-ghost sm" data-ch="${i}">Chart</button></div></div>
-        <div class="bg-btns"><button class="bg-cta sm" data-pr="${i}" ${held.has(r.symbol) ? 'disabled' : ''}>${held.has(r.symbol) ? 'In practice' : `Practise · ${s.q} shares`}</button><button class="bg-ghost sm why" data-why="${i}" aria-expanded="false" aria-controls="bgwhy${i}">Why?</button></div></div>`; }).join('') || '<p class="bg-empty">No trade passes our rules for the next open. That\'s normal. Waiting is part of the system.</p>'}
-    ${rows.length > 3 ? `<button class="bg-link" id="bgmore">See ${rows.length - 3} more setups</button>` : ''}
-    <p class="bg-fine">Picks come from the same tested rules as Pro (Momentum and Trend 9/21). Not investment advice.</p></div>`;
-  el.querySelectorAll('[data-pr]').forEach((b) => b.addEventListener('click', () => {
-    const { r, s } = picks[+b.dataset.pr]; const L = bgPractice();
-    L.push({ symbol: r.symbol, name: bgName(r), kind: r.kind, system: r.system, bucket: bkOf(r), qty: s.q, trigger: r.trigger || null, price: r.price, stop: r.stop, date: P.asof, state: r.trigger ? 'waiting' : 'open', entry: r.trigger ? null : r.price });
-    bgPracticeSave(L); toast(`${r.symbol} added to your practice trades`); bgToday(el); }));
-  el.querySelectorAll('[data-how]').forEach((b) => b.addEventListener('click', () => bgHow(picks[+b.dataset.how])));
-  el.querySelectorAll('[data-why]').forEach((b) => b.addEventListener('click', () => { const w = $('#bgwhy' + b.dataset.why); w.hidden = !w.hidden; b.setAttribute('aria-expanded', String(!w.hidden)); b.textContent = w.hidden ? 'Why?' : 'Hide'; }));
-  el.querySelectorAll('[data-ch]').forEach((b) => b.addEventListener('click', () => lvOpen(picks[+b.dataset.ch].r)));
-  const m = $('#bgmore'); if (m) m.addEventListener('click', () => { state.bgFrom = true; show('live'); bgNav('explore'); });
+    <div class="t2-head"><h3>Today's picks</h3><span class="t2-mood ${mood[0]}"><i></i>${mood[1]}</span></div>
+    <div class="t2-list">${picks.map(({ r }, i) => t2Row({ sym: r.symbol, name: bgName(r), sub: held.has(r.symbol) ? 'In practice' : r.system === 'Monthly ATH' ? 'Momentum' : 'Trend', price: r.trigger || r.price,
+      right: r.trigger ? `Buy ≥ ${inr(r.trigger, 0)}` : `Buy at open`, i })).join('') || '<p class="bg-empty">No trade today. Waiting is part of the system.</p>'}</div>
+    <p class="bg-fine">Tested rules · not investment advice</p></div>`;
+  el.querySelectorAll('.t2-row').forEach((b) => b.addEventListener('click', () => bgPick(+b.dataset.i, el)));
+}
+const T2_COL = ['#7C8CFF', '#2BB3A3', '#F2A93B', '#F472B6', '#38BDF8', '#A78BFA', '#FB923C', '#84CC16'];
+function t2Row(o) {
+  const h = [...o.sym].reduce((a, c) => a + c.charCodeAt(0), 0); const ini = o.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+  return `<button class="t2-row" data-i="${o.i}" data-sym="${esc(o.sym)}"><span class="t2-av" style="background:${T2_COL[h % T2_COL.length]}">${esc(ini)}</span>
+    <span class="t2-nm"><b>${esc(o.name)}</b><small>${esc(o.sub)}</small></span>
+    <span class="t2-rt"><b>${o.top || inr(o.price, 2)}</b><small class="${o.cls || ''}">${o.right}</small></span></button>`;
+}
+function bgPick(i, el) {
+  const { r, s } = state._bgPicks[i]; const held = bgPractice().some((t) => t.symbol === r.symbol && t.state !== 'closed');
+  const stopTxt = r.system === 'Monthly ATH' || bkOf(r) === 'tf' ? 'Sell below' : 'Stop';
+  $('#sheet-body').innerHTML = `<div class="t2-sh"><b>${esc(bgName(r))}</b><span>${esc(r.symbol)} · ${r.system === 'Monthly ATH' ? 'Momentum' : 'Trend'}</span></div>
+    <div class="bg-tiles"><div><span>${r.trigger ? 'Buy above' : 'Buy up to'}</span><b>${inr(r.trigger || r.price, 1)}</b></div><div><span>${stopTxt}</span><b>${inr(r.stop, 1)}</b></div><div class="risk"><span>Worst case</span><b>−${inr(s.worst)}</b></div></div>
+    <button class="bg-cta" id="bgpr" ${held ? 'disabled' : ''}>${held ? 'In practice' : `Practise · ${s.q} shares`}</button>
+    <details class="t2-why"><summary>Why this stock?</summary><p>${esc(bgName(r))} ${bgWhy(r)}. ${bgSentence(r, s)}</p>
+      <div class="bg-btns"><button class="bg-ghost sm" id="bghow">How to place it</button><button class="bg-ghost sm" id="bgch">Chart</button></div></details>`;
+  $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+  const pr = $('#bgpr'); if (pr && !held) pr.addEventListener('click', () => { const L = bgPractice();
+    L.push({ symbol: r.symbol, name: bgName(r), kind: r.kind, system: r.system, bucket: bkOf(r), qty: s.q, trigger: r.trigger || null, price: r.price, stop: r.stop, date: state._bgAsof, state: r.trigger ? 'waiting' : 'open', entry: r.trigger ? null : r.price });
+    bgPracticeSave(L); closeSheet(); toast(`${r.symbol} added to practice`); bgToday(el); });
+  $('#bghow').addEventListener('click', () => bgHow({ r, s }));
+  $('#bgch').addEventListener('click', () => { closeSheet(); lvOpen(r); });
 }
 
 /* Beginner hero: practice money = your starting amount + profit or loss on practice trades (open at the latest price,
@@ -3066,8 +3076,8 @@ function bgHero(C, px) {
     else if (t.state === 'open') { const p = (px[t.symbol] || [])[0] || t.entry; inv += t.qty * t.entry; val += t.qty * p; } });
   const pnl = val - inv + done, tot = C + pnl, n = L.filter((t) => t.state !== 'waiting').length, w = L.filter((t) => t.state === 'waiting').length;
   const sl = [{ v: val, col: 'var(--accent)', name: 'Stocks' }, { v: Math.max(0, tot - val), col: 'var(--mute-line)', name: 'Cash' }];
-  return `<div class="bg-hero"><span>Your practice money</span><b>${inr(tot)}</b>
-    <em>${n ? `<i class="${pnl >= 0 ? 'up' : 'down'}">${pnl >= 0 ? '+' : '−'}${inr(Math.abs(pnl))} (${pnl >= 0 ? '+' : ''}${fmt(pnl / C * 100, 1)}%)</i> on ${n} trade${n > 1 ? 's' : ''}` : 'Practise a pick below to start'}${w ? ` · ${w} waiting to trigger` : ''}</em>
+  return `<div class="bg-hero"><span>Practice money</span><b>${inr(tot)}</b>
+    <em>${n ? `<i class="${pnl >= 0 ? 'up' : 'down'}">${pnl >= 0 ? '+' : '−'}${inr(Math.abs(pnl))} · ${pnl >= 0 ? '+' : ''}${fmt(pnl / C * 100, 1)}%</i>` : 'Tap a pick to practise'}${w ? ` · ${w} waiting` : ''}</em>
     ${n ? `<div class="bg-mini">${donut(sl, 46, 24)}<div>${sl.map((x) => `<span><i style="background:${x.col}"></i>${x.name} <b>${fmt(tot ? x.v / tot * 100 : 0, 0)}%</b></span>`).join('')}</div></div>` : ''}</div>`;
 }
 function bgHow({ r, s }) {
@@ -3093,20 +3103,26 @@ async function bgTrades(el) {
   const pl = (t) => { const p = t.state === 'closed' ? t.exit : (px[t.symbol] || [])[0]; return t.entry && p ? (p / t.entry - 1) * 100 : null; };
   const live = open.filter((t) => t.state === 'open' && pl(t) != null); const avg = live.length ? live.reduce((a, t) => a + pl(t), 0) / live.length : null;
   const won = done.filter((t) => pl(t) > 0).length;
-  el.innerHTML = `<div class="bg-wrap"><div class="bg-seg"><span class="on">Practice</span><button id="bgreal">Real (Pro › Live)</button></div>
-    <div class="bg-sum"><span>${open.length} open · ${done.length} closed${done.length ? ` · ${won} won` : ''} · prices ${esc(pr.src)}</span>
-      <b class="${avg == null ? '' : avg >= 0 ? 'up' : 'down'}">${avg == null ? '–' : `${avg >= 0 ? '+' : ''}${fmt(avg, 1)}%`}</b><span>${avg == null ? 'Add a pick from Today to start practising.' : 'average on open trades'}</span></div>
-    ${open.map((t, i) => { const p = (px[t.symbol] || [])[0]; const g = pl(t); const sell = exits.has(t.symbol);
-      return `<div class="bg-trade ${sell ? 'sell' : ''}"><div><b>${esc(t.name || t.symbol)}</b><span>${t.state === 'waiting' ? `Waiting for ${inr(t.trigger, 2)} · now ${p ? inr(p, 2) : '–'}` : `${t.qty} shares · bought ${inr(t.entry, 2)} · now ${p ? inr(p, 2) : '–'}`}</span>
-        ${sell ? '<span class="bg-alert">Time to sell at the next open</span>' : `<span class="muted">Stop ${inr(t.stop, 2)}</span>`}</div>
-        <div class="bg-tr"><b class="${g == null ? '' : g >= 0 ? 'up' : 'down'}">${g == null ? '–' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`}</b><button class="bg-ghost sm" data-close="${L.indexOf(t)}">${sell ? 'Sell' : 'Close'}</button></div></div>`; }).join('')}
-    ${done.length ? `<h3 class="bg-h3">Closed</h3>${done.slice(-10).reverse().map((t) => `<div class="bg-trade done"><div><b>${esc(t.name || t.symbol)}</b><span>${esc(t.why || 'closed')}</span></div><b class="${pl(t) >= 0 ? 'up' : 'down'}">${pl(t) == null ? '–' : `${pl(t) >= 0 ? '+' : ''}${fmt(pl(t), 1)}%`}</b></div>`).join('')}` : ''}
-    <p class="bg-fine">Practice trades stay on this phone. We check them against the latest prices each time you open this tab.</p></div>`;
+  const val = (t) => { const p = t.state === 'closed' ? t.exit : (px[t.symbol] || [])[0]; return p && t.qty ? p * t.qty : null; };
+  el.innerHTML = `<div class="bg-wrap"><div class="bg-seg"><span class="on">Practice</span><button id="bgreal">Real</button></div>
+    ${bgHero(cap('NSE') || 50000, px)}
+    <div class="t2-head"><h3>Open</h3><span class="muted">${open.length}</span></div>
+    <div class="t2-list">${open.map((t) => { const g = pl(t); const sell = exits.has(t.symbol); const v = val(t);
+      return t2Row({ sym: t.symbol, name: t.name || t.symbol, i: L.indexOf(t), sub: t.state === 'waiting' ? `Waiting · buy ≥ ${inr(t.trigger, 0)}` : `${t.qty} shares`,
+        top: t.state === 'waiting' ? '–' : v ? inr(v) : '–', right: sell ? 'Sell now' : g == null ? '' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`, cls: sell ? 'sellnow' : g == null ? '' : g >= 0 ? 'up' : 'down' }); }).join('') || '<p class="bg-empty">Nothing open. Practise a pick from Today.</p>'}</div>
+    ${done.length ? `<div class="t2-head"><h3>Closed</h3><span class="muted">${won} of ${done.length} won</span></div><div class="t2-list">${done.slice(-10).reverse().map((t) => { const g = pl(t);
+      return t2Row({ sym: t.symbol, name: t.name || t.symbol, i: L.indexOf(t), sub: t.why || 'closed', top: val(t) ? inr(val(t)) : '–', right: g == null ? '' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`, cls: g >= 0 ? 'up' : 'down' }); }).join('')}</div>` : ''}</div>`;
   $('#bgreal').addEventListener('click', () => { show('live'); bgNav('trades'); });
-  el.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => {
-    const L2 = bgPractice(); const t = L2[+b.dataset.close]; const p = (px[t.symbol] || [])[0];
-    if (t.state === 'waiting') L2.splice(+b.dataset.close, 1); else Object.assign(t, { state: 'closed', exit: p || t.entry, why: exits.has(t.symbol) ? 'sold on the sell signal' : 'closed by you' });
-    bgPracticeSave(L2); bgTrades(el); }));
+  el.querySelectorAll('.t2-row').forEach((b) => b.addEventListener('click', () => {
+    const L2 = bgPractice(); const t = L2[+b.dataset.i]; if (!t) return; const p = (px[t.symbol] || [])[0]; const g = pl(t); const sell = exits.has(t.symbol);
+    $('#sheet-body').innerHTML = `<div class="t2-sh"><b>${esc(t.name || t.symbol)}</b><span>${esc(t.symbol)} · ${t.state}</span></div>
+      <div class="bg-tiles"><div><span>${t.state === 'waiting' ? 'Buy above' : 'Bought'}</span><b>${inr(t.entry || t.trigger, 1)}</b></div><div><span>Now</span><b>${p ? inr(p, 1) : '–'}</b></div><div class="${g != null && g < 0 ? 'risk' : ''}"><span>${t.state === 'closed' ? 'Result' : 'Stop'}</span><b>${t.state === 'closed' ? (g == null ? '–' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`) : inr(t.stop, 1)}</b></div></div>
+      ${sell ? '<p class="t2-alert">Sell signal: the system sells at the next open.</p>' : ''}
+      ${t.state !== 'closed' ? `<button class="bg-cta" id="bgcl">${t.state === 'waiting' ? 'Remove' : sell ? 'Sell' : 'Close trade'}</button>` : ''}`;
+    $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+    const c = $('#bgcl'); if (c) c.addEventListener('click', () => { const i = +b.dataset.i;
+      if (t.state === 'waiting') L2.splice(i, 1); else Object.assign(t, { state: 'closed', exit: p || t.entry, why: sell ? 'sold on the sell signal' : 'closed by you' });
+      bgPracticeSave(L2); closeSheet(); bgTrades(el); }); }));
 }
 
 async function bgProof(el) {
@@ -3117,22 +3133,20 @@ async function bgProof(el) {
   const a = S.mix, n = S.nifty; const yrs = Object.keys(a.years); const mx = Math.max(...yrs.map((y) => Math.max(Math.abs(a.years[y]), Math.abs(n.years[y]))));
   const bar = (v, cls) => `<i class="${cls} ${v < 0 ? 'neg' : ''}" style="height:${Math.max(3, Math.abs(v) / mx * 70)}px" title="${fmt(v, 0)}%"></i>`;
   const loss = yrs.filter((y) => a.years[y] < 0); const best = yrs.reduce((b, y) => (a.years[y] > a.years[b] ? y : b), yrs[0]);
-  el.innerHTML = `<div class="bg-wrap"><p class="bg-lead" style="margin-top:4px">If you had put <b>₹1 lakh</b> in at the start of 2017:</p>
-    <div class="bg-two"><div class="win"><span>Our stock systems</span><b>₹${fmt(a.v[a.v.length - 1] / 100, 1)} L</b><span>${fmt(a.cagr, 0)}%/yr · worst fall ${fmt(a.dd, 0)}%</span></div>
-      <div><span>Nifty 50</span><b>₹${fmt(n.v[n.v.length - 1] / 100, 1)} L</b><span>${fmt(n.cagr, 0)}%/yr · worst fall ${fmt(n.dd, 0)}%</span></div></div>
+  el.innerHTML = `<div class="bg-wrap"><div class="t2-head" style="margin-top:4px"><h3>₹1 lakh in 2017 became</h3></div>
+    <div class="bg-two"><div class="win"><span>Our stock systems</span><b>₹${fmt(a.v[a.v.length - 1] / 100, 1)} L</b><span>${fmt(a.cagr, 0)}% a year</span></div>
+      <div><span>Nifty 50</span><b>₹${fmt(n.v[n.v.length - 1] / 100, 1)} L</b><span>${fmt(n.cagr, 0)}% a year</span></div></div>
     <div class="card"><div class="bg-h" style="margin:0 0 8px"><h3>Year by year</h3><span><i class="bg-key sys"></i>Systems <i class="bg-key nif"></i>Nifty</span></div>
       <div class="bg-bars">${yrs.map((y) => `<div><div class="bg-pos">${a.years[y] >= 0 ? bar(a.years[y], 'sys') : ''}${n.years[y] >= 0 ? bar(n.years[y], 'nif') : ''}</div><div class="bg-negs">${a.years[y] < 0 ? bar(a.years[y], 'sys') : ''}${n.years[y] < 0 ? bar(n.years[y], 'nif') : ''}</div><span>'${y.slice(2)}</span></div>`).join('')}</div>
-      <p class="muted" style="font-size:12.5px;margin:8px 0 0">Lost money in ${loss.length} of ${yrs.length} years${loss.length ? ` (${loss.map((y) => `${y}, ${fmt(a.years[y], 0)}%`).join('; ')})` : ''}. Best: ${best}, +${fmt(a.years[best], 0)}%. ${yrs[yrs.length - 1]} is to October.</p></div>
-    <div class="card"><h3 style="margin:0 0 4px">How we test</h3><p class="muted" style="margin:0;font-size:13px">Every NSE stock since 2017, including ones later delisted, with brokerage and slippage, 1% risk a trade. These are simulated results, not real trades, and past results don't guarantee future returns. Pro adds Top Bottom (futures) on top: ${S.mix_tb ? fmt(S.mix_tb.cagr, 0) + '%/yr' : ''} in the same test.</p></div></div>`;
+      <p class="muted" style="font-size:12.5px;margin:8px 0 0">Down years: ${loss.length} of ${yrs.length} · worst fall ${fmt(a.dd, 0)}% (Nifty ${fmt(n.dd, 0)}%)</p></div>
+    <details class="card t2-why"><summary>How we test</summary><p class="muted" style="margin:6px 0 0;font-size:13px">Every NSE stock since 2017, including ones later delisted, with brokerage and slippage, 1% risk a trade. These are simulated results, not real trades, and past results don't guarantee future returns. Pro adds Top Bottom (futures) on top: ${S.mix_tb ? fmt(S.mix_tb.cagr, 0) + '%/yr' : ''} in the same test.</p></details></div>`;
 }
 
 function bgExplore(el) {
   $('#asof').textContent = 'Everything the Pro mode has';
-  const items = [['mk', 'Markets', 'World, sectors and industries: where the strength is'], ['trends', 'Trends', 'Every stock in a clear trend, with charts'],
-    ['live', 'Live (Pro trading)', 'All setups, sizing for your capital, and orders through Angel One'], ['ath', 'All-time highs', 'Stocks breaking out to new highs after long bases'],
-    ['bot', 'Bottoms', 'Bottom patterns and support levels (watch only)'], ['tb', 'Top Bottom', 'Bank Nifty futures system (needs futures margin)'], ['pf', 'Portfolio', 'Your holdings, SIP and ETF rotation']];
-  el.innerHTML = `<div class="bg-wrap"><p class="bg-lead" style="margin-top:4px">The full toolkit. Use it when you want the detail behind the picks.</p>
-    <div class="bg-explore">${items.map(([k, t, d]) => `<button data-v="${k}"><b>${t}</b><span>${d}</span></button>`).join('')}</div></div>`;
+  const items = [['mk', 'Markets', 'Sectors & strength'], ['trends', 'Trends', 'Stocks in a trend'], ['live', 'Live trading', 'All setups · Angel One'], ['ath', 'All-time highs', 'New-high breakouts'],
+    ['bot', 'Bottoms', 'Patterns & support'], ['tb', 'Top Bottom', 'Bank Nifty futures'], ['pf', 'Portfolio', 'Holdings · SIP · ETFs']];
+  el.innerHTML = `<div class="bg-wrap"><div class="bg-explore">${items.map(([k, t, d]) => `<button data-v="${k}"><b>${t}</b><span>${d}</span></button>`).join('')}</div></div>`;
   el.querySelectorAll('[data-v]').forEach((b) => b.addEventListener('click', () => { show(b.dataset.v); bgNav('explore'); }));
 }
 
