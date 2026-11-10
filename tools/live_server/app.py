@@ -98,9 +98,9 @@ def swing_risk() -> float:
 # Systems as buckets (9 Nov 2026): each may hold at most alloc% of capital; all share one cash pool (Momentum first,
 # swing buckets keep SWING_RESERVE in cash). NSE 2017-26 one-account test: Momentum <= 60% + Trend 9/21 <= 40% 23.1%/yr,
 # worst fall -21.4%, vs Momentum alone 17.3%, -16.8%. Top Bottom runs on pledge margin (its own bot), not this cash.
-BUCKETS = {"mom": 60, "tf": 40, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "s1": 0, "wc": 0, "tb": 100}   # optimised 9 Nov (trade_plan.buckets)
+BUCKETS = {"mom": 60, "tf": 40, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "my": 0, "s1": 0, "wc": 0, "tb": 100}   # optimised 9 Nov (trade_plan.buckets)
 ALLOC_V = 2
-SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt", "VCP": "vcp"}
+SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt", "VCP": "vcp", "My pick": "my"}
 STOP_KINDS = ("ATH_STOP", "TF_STOP", "VCP_STOP")   # buy-stop rows (stop-limit day orders)
 
 
@@ -349,7 +349,7 @@ def record_exit(sym, sell_px):
 def protect_level(kind, stop):
     if not stop:
         return None
-    return stop if kind in ("T921", "RETEST", "PATTERN", "VCP", "VCP_STOP") else stop * (1 - ATH_NET_PCT)
+    return stop if kind in ("T921", "RETEST", "PATTERN", "VCP", "VCP_STOP", "MY_GTT") else stop * (1 - ATH_NET_PCT)
 
 
 def _protect(sym, e):
@@ -395,6 +395,10 @@ def sync(acc=None):
                 e2 = dict(e, state=stat, text=o.get("text"), ended=today); J.setdefault("_done", {})[f"{sym}:{today}"] = e2
             else:
                 e["order_status"] = o.get("status")
+        elif st == "pending" and e.get("kind") == "MY_GTT" and held.get(sym, 0) > 0:
+            e.update(state="open", qty=int(held[sym]), filled=today); log("filled", symbol=sym, gtt=True, qty=e["qty"])
+            _protect(sym, e); changed = True
+            mp = mypicks(); mp.pop(sym, None); _save_mypicks(mp)                          # done: the pick becomes an open trade
         elif st == "pending" and not o and e.get("since", today) < today and held.get(sym, 0) > 0:
             e.update(state="open", filled=today); _protect(sym, e); changed = True      # filled yesterday; book rolled over
         elif st == "open" and held.get(sym, 0) > 0 and not e.get("gtt_id") and e.get("gtt_tries", 0) < 4 \
@@ -756,7 +760,7 @@ def sized(acc=None):
         app_cap = 0.0
     cap = min(app_cap, acct) if app_cap > 0 and acct else acct      # capital set in the app, never above the account value
     N = picks(); RK = risk_now(); SR = swing_risk()
-    sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Trend 9/21", "Breakout retest", "Bottom pattern", "VCP")]
+    sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Trend 9/21", "Breakout retest", "Bottom pattern", "VCP", "My pick")]
     AL = alloc(); ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
     expo = {k: 0.0 for k in AL}
     for s_ in sys_open:
@@ -903,7 +907,13 @@ def order(body: Order, _=Depends(auth)):
         if body.qty * E > min(MAX_ORDER_VALUE, MAX_POS_PCT * S["capital"], S["cash"]):
             raise HTTPException(400, "order value above the limits")
         side = "BUY"
-        if market_open(t):
+        if row["kind"] == "MY_GTT":
+            if market_open(t):
+                ltp = broker.ltp(row["symbol"])
+                if ltp and ltp <= row["stop"]:
+                    raise HTTPException(400, f"not sent: the price {ltp:.2f} is at or below your stop {row['stop']:.2f}")
+            p = dict(gtt="BUY", symbol=row["symbol"], qty=body.qty, trigger=row["trigger"], limit=row["price"])
+        elif market_open(t):
             ltp = broker.ltp(row["symbol"])
             st, lim, why = live_check(row, ltp)
             if st in ("broken", "missed", "ran"):
@@ -947,6 +957,19 @@ def order(body: Order, _=Depends(auth)):
                 broker.gtt_cancel(e0["gtt_id"], sym); log("gtt_cancel", symbol=sym, gtt_id=e0["gtt_id"])
             except Exception as ex:  # noqa: BLE001
                 log("gtt_cancel_error", symbol=sym, error=str(ex)[:200])
+    if p.get("gtt") == "BUY":
+        try:
+            gid, gp = broker.gtt_buy(sym, body.qty, row["trigger"], row["price"])
+        except Exception as e:  # noqa: BLE001
+            log("order_error", error=str(e), **rec); _acc["d"] = None
+            raise HTTPException(502, f"Angel rejected the GTT for {sym}: {angel_msg(e)}")
+        log("gtt_buy", gtt_id=gid, **rec)
+        J = journal()
+        J[sym] = dict(since=t.date().isoformat(), system="My pick", kind="MY_GTT", stop=row.get("stop"), entry=float(row["trigger"]),
+                      qty=body.qty, order_id=None, gtt_buy_id=gid, state="pending")
+        save_journal(J)
+        return dict(ok=True, mode="LIVE", sent=True, gtt_id=gid, order=gp, protect=prot,
+                    msg="GTT buy placed on Angel (good for a year). When it fills, the protective GTT stop goes in at your stop.")
     try:
         oid = broker.place(p)
     except Exception as e:  # noqa: BLE001
@@ -982,8 +1005,77 @@ def plan_rows(P):
                 note=f"{x.get('typ', '')} broke its neckline {float(x.get('neck') or 0):,.2f} on {x.get('signal_date', '')}",
                 risk_pct=round((1 - float(x["stop"]) / float(x["close"])) * 100, 1))
            for x in P.get("pattern_watch") or [] if x.get("close") and x.get("stop") and x["stop"] < x["close"]]
+    mine = [dict(id=f"MY-{x['symbol']}", symbol=x["symbol"], name=x.get("name", ""), system="My pick", bucket="my", kind="MY_GTT", side="BUY",
+                 order="GTT", when="GTT buy, good for 1 year", trigger=float(x["trigger"]), price=round(float(x["trigger"]) * (1 + MY_LIMIT_GAP), 2),
+                 ref=float(x["trigger"]), stop=float(x["stop"]), exit_rule="protective GTT stop at your stop after the fill; the exit is your call",
+                 note=(x.get("note") or "") + (f" · pushed from {x['src']}" if x.get("src") else ""),
+                 risk_pct=round((1 - float(x["stop"]) / float(x["trigger"])) * 100, 1)) for x in mypicks().values()]
     return [dict(x, tier="top") for x in P.get("top") or []] + [dict(x, tier="more") for x in P.get("more") or []] + \
-        [dict(x, tier="swing") for x in (P.get("swing") or []) + pat]
+        [dict(x, tier="swing") for x in (P.get("swing") or []) + pat + mine]
+
+
+# ------------------------------------------------------------------ your own picks -> Live -> Angel GTT buy (10 Nov 2026)
+# Any stock panel in the app can push a stock here with a buy trigger and a stop. Live sizes it (outside the split, swing risk)
+# and Send places an Angel GTT BUY (trigger -> limit MY_LIMIT_GAP above), good for a year. When it fills the server places the
+# usual protective GTT stop at your stop. Removing the pick cancels a GTT that has not triggered yet.
+MY_LIMIT_GAP = float(ENV.get("MY_LIMIT_GAP_PCT", "0.5")) / 100
+MY_MAX = 30
+
+
+def mypicks() -> dict:
+    try:
+        return json.load(open(os.path.join(DATA, "mypicks.json")))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _save_mypicks(d):
+    json.dump(d, open(os.path.join(DATA, "mypicks.json"), "w"))
+
+
+class MyPick(BaseModel):
+    symbol: str
+    trigger: float
+    stop: float
+    note: str = ""
+    src: str = ""
+    name: str = ""
+
+
+@app.get("/api/mypicks")
+def get_mypicks(_=Depends(auth)):
+    return dict(rows=list(mypicks().values()))
+
+
+@app.post("/api/mypicks")
+def add_mypick(body: MyPick, _=Depends(auth)):
+    sym = body.symbol.strip().upper().replace(".NS", "")
+    if not sym or not body.trigger > 0 or not 0 < body.stop < body.trigger:
+        raise HTTPException(400, "stop must be below the buy trigger")
+    if body.stop < body.trigger * 0.6:
+        raise HTTPException(400, "stop more than 40% below the trigger - check the numbers")
+    d = mypicks()
+    if sym not in d and len(d) >= MY_MAX:
+        raise HTTPException(400, f"at most {MY_MAX} picks - remove some first")
+    d[sym] = dict(symbol=sym, trigger=round(body.trigger, 2), stop=round(body.stop, 2), note=body.note[:120], src=body.src[:40],
+                  name=body.name[:60], added=ist_now().date().isoformat())
+    _save_mypicks(d); log("mypick_add", **d[sym])
+    return dict(ok=True, rows=list(d.values()))
+
+
+@app.delete("/api/mypicks/{sym}")
+def del_mypick(sym: str, _=Depends(auth)):
+    sym = sym.upper(); d = mypicks(); J = journal(); e = J.get(sym) or {}
+    msg = "removed"
+    if e.get("kind") == "MY_GTT" and e.get("state") == "pending" and e.get("gtt_buy_id"):
+        if is_live():
+            try:
+                broker.gtt_cancel(e["gtt_buy_id"], sym); msg = "removed and its GTT buy cancelled on Angel"
+            except Exception as ex:  # noqa: BLE001
+                raise HTTPException(502, f"couldn't cancel the GTT buy on Angel: {angel_msg(ex)}")
+        J.pop(sym); save_journal(J)
+    d.pop(sym, None); _save_mypicks(d); log("mypick_del", symbol=sym)
+    return dict(ok=True, msg=msg, rows=list(d.values()))
 
 
 def live_check(r, ltp):

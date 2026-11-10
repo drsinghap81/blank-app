@@ -419,3 +419,36 @@ def test_vcp_rows():
     assert live_check(r, 100.5)[0] == "triggered"
     assert live_check(r, 91.0)[0] == "broken"
     assert protect_level("VCP_STOP", 92.0) == 92.0 and protect_level("VCP", 92.0) == 92.0
+
+
+def test_mypicks_gtt(tmp_path):
+    """Push a stock to Live -> sized row -> Send places an Angel GTT BUY -> once held, the protective GTT stop goes in."""
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False
+    assert c.post("/api/mypicks", headers=h, json={"symbol": "ZZTEST", "trigger": 100, "stop": 110}).status_code == 400
+    j = c.post("/api/mypicks", headers=h, json={"symbol": "zztest", "trigger": 100, "stop": 92, "src": "Bottoms"}).json()
+    assert j["ok"] and j["rows"][0]["symbol"] == "ZZTEST"
+    P = c.get("/api/plan", headers=h).json()
+    r = next(x for x in P["rows"] if x["id"] == "MY-ZZTEST")
+    assert r["kind"] == "MY_GTT" and r["bucket"] == "my" and r["qty"] > 0 and r["outside"]
+    q = r["qty"]
+    o = c.post("/api/order", headers=h, json={"id": r["id"], "qty": q, "confirm": f"BUY {q} ZZTEST"}).json()
+    assert o["sent"] and o["gtt_id"].startswith("GTTB") and A.broker.gtts[o["gtt_id"]]["side"] == "BUY"
+    assert A.journal()["ZZTEST"]["state"] == "pending"
+    A.broker.hold["ZZTEST"] = q; A._acc["d"] = None                       # the GTT triggered and filled
+    A.sync()
+    e = A.journal()["ZZTEST"]
+    assert e["state"] == "open" and e.get("gtt_id") and A.broker.gtts[e["gtt_id"]]["trigger"] == 92.0
+    assert "ZZTEST" not in A.mypicks()
+
+
+def test_mypicks_cancel(tmp_path):
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False
+    c.post("/api/mypicks", headers=h, json={"symbol": "ZZTWO", "trigger": 50, "stop": 46})
+    r = next(x for x in c.get("/api/plan", headers=h).json()["rows"] if x["id"] == "MY-ZZTWO")
+    o = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} ZZTWO"}).json()
+    j = c.delete("/api/mypicks/ZZTWO", headers=h).json()
+    assert "cancelled" in j["msg"] and not A.broker.gtts[o["gtt_id"]]["active"] and "ZZTWO" not in A.journal()

@@ -206,6 +206,19 @@ class AngelEquity:
             return str(d["id"]), p
         raise RuntimeError(f"{r.get('message') or r} [{r.get('errorcode') or '?'}]")
 
+    def gtt_buy(self, symbol, qty, trigger, limit):
+        """Angel GTT BUY (1 year): when the price reaches `trigger`, a LIMIT buy at `limit` goes in. Used for your own picks
+        pushed to Live (10 Nov 2026). Sits on Angel's side, so it works even if this server is down."""
+        api = self._session(); ts, t = self._ts(symbol); tick = t["tick"] or 0.05
+        rnd = lambda v: round(round(v / tick) * tick, 2)  # noqa: E731
+        p = dict(tradingsymbol=ts, symboltoken=str(t["token"]), exchange="NSE", producttype="DELIVERY", transactiontype="BUY",
+                 price=f"{rnd(limit):.2f}", qty=str(int(qty)), disclosedqty=str(int(qty)), triggerprice=f"{rnd(trigger):.2f}", timeperiod="365")
+        r = self._call(api._postRequest, "api.gtt.create", dict(p), tries=1) or {}
+        d = r.get("data") or {}
+        if r.get("status") and d.get("id"):
+            return str(d["id"]), p
+        raise RuntimeError(f"{r.get('message') or r} [{r.get('errorcode') or '?'}]")
+
     def gtt_modify(self, rule_id, symbol, qty, trigger, limit):
         """Move an existing GTT stop to a new trigger / limit (used by the daily trail; only ever raised)."""
         api = self._session(); ts, t = self._ts(symbol); tick = t["tick"] or 0.05
@@ -304,6 +317,11 @@ class MockBroker(AngelEquity):
 
     def gtt_cancel(self, rule_id, symbol):
         self.gtts[rule_id]["active"] = False; return {"status": True}
+
+    def gtt_buy(self, symbol, qty, trigger, limit):
+        self.gtts = getattr(self, "gtts", {}); gid = f"GTTB{len(self.gtts) + 1}"
+        self.gtts[gid] = dict(symbol=symbol, qty=qty, trigger=round(trigger, 2), price=round(limit, 2), side="BUY", active=True)
+        return gid, self.gtts[gid]
 
     def gtt_modify(self, rule_id, symbol, qty, trigger, limit):
         self.gtts[rule_id].update(trigger=round(trigger, 2), price=round(limit, 2)); return rule_id, self.gtts[rule_id]
