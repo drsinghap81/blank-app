@@ -125,7 +125,22 @@ class AngelEquity:
         cash = float(f.get("availablecash") or 0)
         return dict(broker="Angel One", cash=cash, net=float(f.get("net") or cash), holdings=H, positions=P,
                     holdings_value=sum(h["qty"] * h["ltp"] for h in H),
-                    positions_value=sum(p["qty"] * p["ltp"] for p in P if str(p.get("product")).upper() in ("DELIVERY", "CNC") and p["qty"] > 0))
+                    positions_value=self._pos_value(H, P))
+
+    @staticmethod
+    def _pos_value(H, P):
+        """Today's delivery buys (position book) not already in the holdings list. Angel sometimes lists a same-day CNC
+        buy in both; adding both doubled those shares in the account value (11 Nov 2026)."""
+        held = {}
+        for h in H:
+            held[h["symbol"]] = held.get(h["symbol"], 0) + h["qty"]
+        v = 0.0
+        for p in P:
+            if str(p.get("product")).upper() in ("DELIVERY", "CNC") and p["qty"] > 0:
+                extra = max(0, p["qty"] - held.get(p["symbol"], 0))
+                held[p["symbol"]] = max(0, held.get(p["symbol"], 0) - p["qty"])
+                v += extra * p["ltp"]
+        return v
 
     def ltp(self, symbol):
         api = self._session(); ts, t = self._ts(symbol)
