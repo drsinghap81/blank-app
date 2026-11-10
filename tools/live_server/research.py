@@ -204,6 +204,64 @@ def index_orb(D, mins, tgt, slip_pts, rnd=None):
     return R, Y
 
 
+def sweep_orb(D, mins, mode, tgt, slip_pts, rnd=None, back=10):
+    """Liquidity sweep around the opening range (Amritpal, 10 Nov 2026). A sweep = a 1-minute bar trades beyond one side of the
+    range, then within `back` bars price closes back inside it.
+    mode 'reverse' (A): after a sweep of one side, enter on the first close beyond the OTHER side; stop = the sweep extreme.
+    mode 'second' (B): after a sweep and the move back, enter on the next close beyond the SAME side; stop = the extreme of the
+    move in between. Exit 15:15 or at `tgt` R. One trade a day. rnd -> random direction, same entry and stop distance."""
+    R, Y = [], []
+    end_or = 9 * 60 + 15 + mins
+    for dd, bars in D:
+        if len(bars) < 200:
+            continue
+        hm = lambda b: int(b[0][:2]) * 60 + int(b[0][3:5])  # noqa: E731
+        orb = [b for b in bars if hm(b) < end_or]; rest = [b for b in bars if end_or <= hm(b) <= 15 * 60 + 15]
+        if not orb or len(rest) < 30:
+            continue
+        hi, lo = max(b[2] for b in orb), min(b[3] for b in orb)
+        if hi <= lo:
+            continue
+        sw = None                                   # (side swept: +1 high / -1 low, index where back inside, sweep extreme)
+        for i, b in enumerate(rest):
+            if b[2] > hi or b[3] < lo:
+                side = 1 if b[2] > hi else -1; ext = b[2] if side > 0 else b[3]
+                for j in range(i, min(len(rest), i + back)):
+                    ext = max(ext, rest[j][2]) if side > 0 else min(ext, rest[j][3])
+                    if lo <= rest[j][4] <= hi:
+                        sw = (side, j, ext); break
+                break                               # only the day's first poke counts
+        if not sw:
+            continue
+        side, j0, ext = sw; ent = None; mid_ext = None
+        for k in range(j0 + 1, len(rest)):
+            b = rest[k]
+            if mode == "reverse":
+                if (side > 0 and b[4] < lo) or (side < 0 and b[4] > hi):
+                    ent = (k, -side, b[4], ext * (1 + 0.0002 * side)); break
+            else:
+                x_ = b[3] if side > 0 else b[2]            # low of the pull-back (high-side sweep) / high of the bounce
+                mid_ext = x_ if mid_ext is None else (min(mid_ext, x_) if side > 0 else max(mid_ext, x_))
+                if (side > 0 and b[4] > hi) or (side < 0 and b[4] < lo):
+                    ent = (k, side, b[4], mid_ext); break
+        if not ent:
+            continue
+        k, d_, e, stop = ent
+        if rnd is not None:
+            dist = abs(e - stop); d_ = rnd.choice((1, -1)); stop = e - d_ * dist
+        risk = abs(e - stop)
+        if risk <= 0 or (d_ > 0 and stop >= e) or (d_ < 0 and stop <= e):
+            continue
+        T = e + d_ * tgt * risk if tgt else None; x = rest[-1][4]
+        for b in rest[k + 1:]:
+            if (d_ > 0 and b[3] <= stop) or (d_ < 0 and b[2] >= stop):
+                x = stop; break
+            if T is not None and ((d_ > 0 and b[2] >= T) or (d_ < 0 and b[3] <= T)):
+                x = T; break
+        R.append(((x - e) * d_ - (0.0002 * e + slip_pts)) / risk); Y.append(int(dd[:4]))
+    return R, Y
+
+
 def first_candle(D, slip_pts, tgt=10.0):
     R, Y = [], []
     for dd, bars in D:
@@ -284,6 +342,12 @@ def analyse(dirp):
                 r[k] = _stats(*index_orb(D, mins, tgt, slip))
                 r[k + "_random"] = _stats(*index_orb(D, mins, tgt, slip, rnd=random.Random(7)))
         r["first5_10R"] = _stats(*first_candle(D, slip))
+        for mins in (5, 15, 30):
+            for mode in ("reverse", "second"):
+                for tgt in (None, 2.0):
+                    k = f"sweep_{mode}{mins}_{'eod' if tgt is None else '2R'}"
+                    r[k] = _stats(*sweep_orb(D, mins, mode, tgt, slip))
+                    r[k + "_random"] = _stats(*sweep_orb(D, mins, mode, tgt, slip, rnd=random.Random(7)))
         out["index"][name] = r
     for top in (10, 20):
         for stopm in ("atr", "range"):
