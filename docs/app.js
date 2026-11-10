@@ -2846,6 +2846,7 @@ async function pfPrices() {
   // connected to your server: your holdings use Angel One's own prices (the same numbers as the Angel app)
   if (lvCfg().url) {
     try { const j = await lvApi('/api/account'); const H = ((j.angel || {}).holdings || []).filter((h) => h.ltp > 0);
+      state._angelH = ((j.angel || {}).holdings || []).filter((h) => h.qty > 0 && h.avg > 0);
       if (H.length) { H.forEach((h) => { px[h.symbol] = [h.ltp, h.close || null]; }); src = 'Angel One, live' + (H.some((h) => h.close) ? '' : ' (today\'s change after the server update)'); } }
     catch (e) { /* server off: keep the scan prices */ }
   }
@@ -2886,10 +2887,22 @@ async function rotCard() {
   </div>`;
   $('#sipamt').addEventListener('change', (e) => { sipSet(Math.max(0, +e.target.value || 0)); rotCard(); });
 }
+/* Angel holdings -> the phone's list, keeping your system tags. Angel's average can be rounded to 2 decimals; its own
+   P&L gives the exact one (ltp - P&L / qty) when they agree. */
+function pfFromAngel(H, P) {
+  const exact = (h) => { const x = h.ltp && h.pnl != null ? h.ltp - h.pnl / h.qty : null; return x && Math.abs(x / h.avg - 1) < 0.005 ? x : h.avg; };
+  const tag = Object.fromEntries(P.h.map((x) => [x.s, x.t]));
+  return H.map((h) => ({ s: h.symbol, q: h.qty, a: +exact(h).toFixed(4), t: tag[h.symbol] || '', d: today() }));
+}
 async function loadPortfolio() {
   $('#title').textContent = 'My portfolio';
   const el = $('#view-pf');
   if (!state.pf) { el.innerHTML = '<p class="muted pad">Loading prices…</p>'; state.pf = await pfPrices(); }
+  // connected to your server: the list always follows Angel (11 Nov 2026 — an older saved list had stocks twice)
+  if (state._angelH && state._angelH.length) {
+    const P = pfLoad(); const key = (L) => L.map((x) => `${x.s}:${x.q}`).sort().join('|'); const N = pfFromAngel(state._angelH, P);
+    if (key(N) !== key(P.h)) { P.h = N; pfSave(P); toast(`Matched to Angel One: ${N.length} holdings`); }
+  }
   renderPortfolio();
 }
 
@@ -3032,11 +3045,8 @@ function pfImport() {
       if (A.error) throw new Error(A.error);
       const H = (A.holdings || []).filter((h) => h.qty > 0 && h.avg > 0);
       if (!H.length) { info.textContent = 'Angel One returned no holdings.'; fa.disabled = false; return; }
-      // Angel's average can be rounded to 2 decimals; its own P&L gives the exact one (ltp - P&L / qty) when they agree
-      const exact = (h) => { const x = h.ltp && h.pnl != null ? h.ltp - h.pnl / h.qty : null; return x && Math.abs(x / h.avg - 1) < 0.005 ? x : h.avg; };
       // Angel is the true record: its holdings always REPLACE the list (no "add", so nothing can be counted twice)
-      const P = pfLoad(); const tag = Object.fromEntries(P.h.map((x) => [x.s, x.t]));
-      P.h = H.map((h) => ({ s: h.symbol, q: h.qty, a: +exact(h).toFixed(4), t: tag[h.symbol] || '', d: today() }));
+      const P = pfLoad(); P.h = pfFromAngel(H, P);
       H.forEach((h) => { if (h.ltp && state.pf) state.pf.px[h.symbol] = [h.ltp, h.close || (state.pf.px[h.symbol] || [])[1] || null]; });
       pfSave(P); const tot = H.reduce((a, h) => a + h.qty * (h.ltp || h.avg), 0);
       toast(`Synced with Angel One: ${H.length} holdings, about ${inr(tot)}`); renderPortfolio(); return;
