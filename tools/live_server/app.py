@@ -543,10 +543,35 @@ def chart_read(sym):
     return _ADC[k]
 
 
+_ATHS = {}
+
+
+def ath_scan_row(sym):
+    """The evening ATH scan's latest row for this stock (base length decides the system), cached for the IST day."""
+    k = ist_now().date().isoformat()
+    if _ATHS.get("day") != k:
+        try:
+            d = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/ath.json", timeout=30).json(); rows = {}
+            for x in d.get("tracked") or []:
+                if x["symbol"] not in rows or str(x.get("date")) > str(rows[x["symbol"]].get("date")):
+                    rows[x["symbol"]] = x
+            _ATHS.update(day=k, rows=rows)
+        except Exception as ex:  # noqa: BLE001
+            log("ath_scan_error", error=str(ex)[:160]); return None
+    return _ATHS.get("rows", {}).get(sym)
+
+
 def adopt_suggest(sym):
     r = chart_read(sym); cl, sma, e9, e21 = r["close"], r["sma30"], r["ema9"], r["ema21"]
     if not cl or not sma:
         return dict(suggest=None, why="not enough price history", **r)
+    a = ath_scan_row(sym)           # 11 Nov 2026: a scanned breakout's base length picks the system, as the backtests did
+    if a and a.get("status") == "open" and (a.get("base_months") or 0) >= 24 and cl > sma:
+        return dict(suggest="Monthly ATH", stop=round(sma, 2), protect=round(sma * (1 - ATH_NET_PCT), 2),
+                    why=f"Momentum breakout ({a.get('base_months')}-month base): held until a weekly close below the 30-week SMA {sma:,.2f}", **r)
+    if a and 12 <= (a.get("base_months") or 0) < 24 and a.get("tf_status") == "open" and e9 and e21 and e9 > e21:
+        return dict(suggest="Trend 9/21", stop=round(e21, 2), protect=round(e21 * (1 - ATH_NET_PCT), 2),
+                    why=f"Trend 9/21 breakout ({a.get('base_months')}-month base): held until EMA 9 closes below EMA 21 ({e21:,.2f})", **r)
     if cl > sma:
         return dict(suggest="Monthly ATH", stop=round(sma, 2), protect=round(sma * (1 - ATH_NET_PCT), 2),
                     why=f"above its 30-week SMA {sma:,.2f}: Momentum holds it until a weekly close below", **r)
