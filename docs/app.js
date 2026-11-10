@@ -3643,7 +3643,7 @@ function tdPick(i, el, beginner, back) {
   $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; if (!back) history.pushState({ sheet: 1 }, '');
   const calc = () => { const C = Math.round(+String($('#tdc').value).replace(/[^0-9]/g, '')); const s = tdQty(E, r.stop, C, +$('#tdr').value);
     $('#tdq').textContent = s ? s.q.toLocaleString(MKT[mk].loc) : '–';
-    $('#tdm').textContent = s ? `Max loss ${M(s.loss)} · ${M(s.value)} total${s.capped ? ' · capped at 10% of capital' : ''}` : ''; return { C, s }; };
+    $('#tdm').textContent = s ? `Max loss ${M(s.loss)} · Allocation ${M(s.value)} (${fmt(C ? s.value / C * 100 : 0, 1)}% of capital${s.capped ? ', the 10% cap' : ''})` : ''; return { C, s }; };
   calc();
   $('#tdc').addEventListener('input', calc);
   $('#tdc').addEventListener('change', () => { const { C } = calc(); if (C > 0) setCap(mk, C); });
