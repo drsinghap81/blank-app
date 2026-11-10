@@ -48,10 +48,13 @@ def universe():
     for f in ("nifty50.csv", "niftynext50.csv"):
         p = os.path.join(HERE, "..", "..", "data", "universe", f)
         try:
+            col = 0
             for i, line in enumerate(open(p)):
-                if i == 0:
+                cells = [c.strip().strip('"') for c in line.split(",")]
+                if i == 0:                       # NSE index files: Company Name,Industry,Symbol,... (11 Nov 2026 fix: was column 0)
+                    col = next((k for k, c in enumerate(cells) if c.lower() == "symbol"), 0)
                     continue
-                s = line.split(",")[0].strip().strip('"')
+                s = cells[col] if col < len(cells) else ""
                 if s and s not in out:
                     out.append(s)
         except Exception:  # noqa: BLE001
@@ -122,6 +125,10 @@ class Job:
         try:
             for name, tok in IDX.items():
                 self._fetch("idx_" + name, tok, "ONE_MINUTE", date(2016, 1, 1))
+            try:
+                self.b._session()                # loads Angel's symbol list before the stock lookups
+            except Exception:  # noqa: BLE001
+                pass
             for s in universe():
                 try:
                     _, t = self.b._ts(s)
