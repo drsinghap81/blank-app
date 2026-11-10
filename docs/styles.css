@@ -710,3 +710,13 @@ details.bkd.fold:not([open]) { padding-top: 12px; padding-bottom: 12px; }
 /* iPhone: no rubber-band bounce of the whole page, so the header and the tab bar stay put while lists scroll (10 Nov 2026) */
 html, body { overscroll-behavior: none; }
 html { height: 100%; }
+/* wide screens (10 Nov 2026): the chart sheet was full-width with a phone-height chart, so candles looked flattened.
+   Centre the sheet at a readable width and let the chart grow taller with the screen. */
+@media (min-width: 980px) {
+  .sheet-panel { left: 0; right: 0; margin: 0 auto; max-width: 1120px; box-shadow: 0 0 40px rgba(20, 33, 61, 0.18); }
+  .chart { height: clamp(330px, 46vh, 520px); }
+  .rsi { height: clamp(110px, 13vh, 150px); }
+}
+.tv-btn { display: inline-block; margin-top: 6px; padding: 5px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+  background: var(--soft); color: var(--ink, inherit); text-decoration: none; border: 1px solid var(--line); }
+.tv-btn:hover { background: var(--sel); }

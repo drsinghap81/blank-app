@@ -1260,11 +1260,31 @@ function links(sym) {
     <a href="${fund}" target="_blank" rel="noopener">${m.screener ? 'Fundamentals on Screener' : 'Company page on Yahoo'}</a></div>`;
 }
 
+/* every chart panel gets an "Open in TradingView" button (10 Nov 2026, Amritpal) - added here so no panel misses it */
+const TV_IDX = { 'NIFTY 50': 'NSE:NIFTY', 'NIFTY BANK': 'NSE:BANKNIFTY', 'NIFTY IT': 'NSE:CNXIT', 'NIFTY AUTO': 'NSE:CNXAUTO', 'NIFTY PHARMA': 'NSE:CNXPHARMA',
+  'NIFTY METAL': 'NSE:CNXMETAL', 'NIFTY FMCG': 'NSE:CNXFMCG', 'NIFTY REALTY': 'NSE:CNXREALTY', 'NIFTY ENERGY': 'NSE:CNXENERGY', 'NIFTY FIN SERVICE': 'NSE:CNXFINANCE',
+  'NIFTY MIDCAP 50': 'NSE:NIFTYMIDCAP50', 'S&P 500': 'SP:SPX', 'NASDAQ 100': 'NASDAQ:NDX', 'RUSSELL 2000': 'TVC:RUT', 'ASX 200': 'ASX:XJO', 'ALL ORDINARIES': 'ASX:XAO' };
+function panelMk() {
+  if (state._pMk) return state._pMk;
+  const v = state.view;
+  return v === 'live' ? (state.lvMk || 'NSE') : v === 'bot' ? botMk() : v === 'ath' ? AM() : v === 'trends' ? (state.mkt || 'NSE') : 'NSE';
+}
+function tvSym(sym, mk) {
+  const s = String(sym || '').trim(); if (TV_IDX[s.toUpperCase()]) return TV_IDX[s.toUpperCase()];
+  return mk === 'NSE' ? 'NSE:' + s.replace(/[-&]/g, '_') : mk === 'ASX' ? 'ASX:' + s : s.replace('-', '.');
+}
+function addTvLink(root) {
+  if (!root || root.querySelector('a[href*="tradingview.com"]')) return;
+  const h = root.querySelector('.d-head h2'); if (!h) return;
+  const a = document.createElement('a'); a.className = 'tv-btn'; a.target = '_blank'; a.rel = 'noopener';
+  a.href = 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(h.textContent, panelMk())); a.textContent = 'Open in TradingView ↗';
+  h.parentElement.appendChild(a);
+}
 function openPanel(html) {
   if (isWide() && state.view === 'trends') {   // keep the page where it is; the chart panel is fixed beside the list
-    const y = window.scrollY; const d = $('#detail'); d.style.minHeight = d.offsetHeight + 'px'; d.innerHTML = html; d.scrollTop = 0;
+    const y = window.scrollY; const d = $('#detail'); d.style.minHeight = d.offsetHeight + 'px'; d.innerHTML = html; addTvLink(d); d.scrollTop = 0;
     window.scrollTo(0, y); requestAnimationFrame(() => { window.scrollTo(0, y); d.style.minHeight = ''; }); return; }
-  $('#sheet-body').innerHTML = html; $('#sheet').hidden = false; document.body.style.overflow = 'hidden';
+  $('#sheet-body').innerHTML = html; addTvLink($('#sheet-body')); $('#sheet').hidden = false; document.body.style.overflow = 'hidden';
   history.pushState({ sheet: 1 }, '');
 }
 function closeSheet() { $('#sheet').hidden = true; document.body.style.overflow = ''; $('#sheet-body').innerHTML = ''; }
@@ -2029,6 +2049,7 @@ async function drawSup(r) {
 }
 /* VCP (10 Nov 2026): chart with the contractions, pivot, stop, EMA 50 and volume, from the nightly pattern scan */
 function vcpSelect(r, mk = 'NSE') {
+  state._pMk = mk; setTimeout(() => { state._pMk = null; }, 0);
   const L = MKT[mk].loc; const cs = r.contractions || [];
   const E = r.trigger || r.price; const stop = r.stop;
   const st = r.kind === 'VCP_STOP' ? `<div class="status info">Forming: ${fmt((r.pivot / r.ref - 1) * 100, 1)}% below the pivot ${fmt(r.pivot, 2, L)}. A buy-stop just above it fills only if the breakout comes — as tested, on 1.4× normal volume.</div>`
