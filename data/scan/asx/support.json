@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-09T23:28+00:00",
+"generated": "2026-11-10T01:01+00:00",
 "asof": "2026-11-09",
 "market": "ASX",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
@@ -34,39 +34,6 @@
 [
 289,
 "17\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "BVS",
-"name": "BRAVURA SOLUTIONS LIMITED.",
-"status": "touched",
-"touch_date": "2026-11-04",
-"days_ago": 3,
-"level": 3.19,
-"level_kind": "breakout retest",
-"level_date": "2025-10-10",
-"close": 3.4000000953674316,
-"above_pct": 6.623874461577106,
-"stop": 3.06,
-"risk_pct": 9.878342114983907,
-"resistance": 3.47,
-"room_r": 0.22330434151223713,
-"sq9": 9,
-"sq9_cross": "3\u00b2",
-"sq9_dist_pct": -64.56911828782823,
-"sq9_gap_pct": 177.77777777777777,
-"sq9_below": [
-[
-1,
-"1\u00b2"
-]
-],
-"sq9_above": [
-[
-9,
-"3\u00b2"
 ]
 ],
 "sq9_match": false
