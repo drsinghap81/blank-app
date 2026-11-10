@@ -3606,7 +3606,8 @@ async function tdRender(el, beginner) {
     <div id="tdrisk"></div>
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   wire();
-  el.querySelectorAll('.td-card').forEach((b) => b.addEventListener('click', () => tdPick(+b.dataset.i, el, beginner)));
+  state._tdEl = el; state._tdBg = beginner;
+  el.querySelectorAll('.td-card:not(.td-raise)').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
 }
 async function tdRiskCard(box) {
@@ -3626,7 +3627,7 @@ async function tdRiskCard(box) {
     <p class="muted td-rs">${pos.length ? `If every stop is hit: about −${inr(atRisk)} across ${pos.length} ${pos.length === 1 ? 'trade' : 'trades'} (${src}).` : `No open trades in ${src} yet.`} Under 6% keeps a bad week small.</p></div>
     ${raised.map((p) => `<div class="td-card td-raise"><span class="td-av" style="background:var(--rise)">↑</span><span class="td-nm"><b>Stop raised to ${inr(p.new_stop, 0)}</b><small>${esc(p.symbol)}${p.trail_prev ? ` · from ${inr(p.trail_prev, 0)}` : ''} · trailing stop, updated daily</small></span></div>`).join('')}`;
 }
-function tdPick(i, el, beginner) {
+function tdPick(i, el, beginner, back) {
   const r = state._tdRows[i], mk = state._tdMkNow; if (!r) return; const L = tdLabel(r); const E = r.trigger || r.price; const M = (v, d = 0) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
   const held = bgPractice().some((t) => t.symbol === r.symbol && t.state !== 'closed');
   $('#sheet-body').innerHTML = `<div class="t2-sh"><b>${esc(bgName(r))}</b><span>${esc(r.symbol)} · ${esc(L.t)}</span></div>
@@ -3636,9 +3637,9 @@ function tdPick(i, el, beginner) {
       <div><span>${isStopK(r.kind) ? 'Entry (buy above)' : 'Entry'}</span><b>${M(E, 2)}</b></div>
       <div><span>${r.system === 'Monthly ATH' || bkOf(r) === 'tf' ? 'Stop (sell below)' : 'Stop'}</span><b class="down">${M(r.stop, 2)}</b></div></div>
     <div class="td-qty"><span>Quantity for your risk</span><b id="tdq">–</b><em id="tdm"></em></div>
-    <div class="bg-btns"><button class="bg-cta" id="tdch">Chart</button>${mk === 'NSE' ? `<button class="bg-ghost" id="tdpr" ${held ? 'disabled' : ''}>${held ? 'In practice' : 'Practise'}</button>` : ''}</div>
+    <div class="bg-btns"><button class="bg-cta" id="tdch">Back to chart</button>${mk === 'NSE' ? `<button class="bg-ghost" id="tdpr" ${held ? 'disabled' : ''}>${held ? 'In practice' : 'Practise'}</button>` : ''}</div>
     <p class="bg-fine">The calculator uses your capital and risk. At most 10% of capital in one stock. Not investment advice.</p>`;
-  $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+  $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; if (!back) history.pushState({ sheet: 1 }, '');
   const calc = () => { const C = Math.round(+String($('#tdc').value).replace(/[^0-9]/g, '')); const s = tdQty(E, r.stop, C, +$('#tdr').value);
     $('#tdq').textContent = s ? s.q.toLocaleString(MKT[mk].loc) : '–';
     $('#tdm').textContent = s ? `Max loss ${M(s.loss)} · ${M(s.value)} total${s.capped ? ' · capped at 10% of capital' : ''}` : ''; return { C, s }; };
@@ -3646,10 +3647,53 @@ function tdPick(i, el, beginner) {
   $('#tdc').addEventListener('input', calc);
   $('#tdc').addEventListener('change', () => { const { C } = calc(); if (C > 0) setCap(mk, C); });
   $('#tdr').addEventListener('change', () => { try { localStorage.setItem('td.tdRisk_' + mk, $('#tdr').value); } catch (e) { /* */ } calc(); });
-  $('#tdch').addEventListener('click', () => { closeSheet(); lvOpen(r, mk); });
+  $('#tdch').addEventListener('click', () => tdChart(r, mk, true));
   const pr = $('#tdpr'); if (pr && !held) pr.addEventListener('click', () => { const { s } = calc(); if (!s || !s.q) { toast('Quantity is 0 at this capital'); return; }
     const Lp = bgPractice(); Lp.push({ symbol: r.symbol, name: bgName(r), kind: r.kind, system: r.system, bucket: bkOf(r), qty: s.q, trigger: r.trigger || null, price: r.price, stop: r.stop, date: state._tdAsof, state: r.trigger ? 'waiting' : 'open', entry: r.trigger ? null : r.price });
     bgPracticeSave(Lp); closeSheet(); toast(`${r.symbol} added to practice`); tdRender(el, beginner); });
+}
+
+/* Today › setup chart (11 Nov 2026): the promo chart — candles, the trend line the exit uses, buy and stop lines,
+   three tiles and one sentence. "Full detail" opens the existing panel with every number. */
+async function tdChartData(r, mk) {
+  const MP = MAIN + MKT[mk].path, f = encodeURIComponent(r.symbol.replace(/ /g, '_'));
+  const get = async (u) => { try { const x = await fetch(u); return x.ok ? await x.json() : null; } catch (e) { return null; } };
+  const fromW = (j) => (j && j.w && j.w.t ? { t: j.w.t, o: j.w.o, h: j.w.h, l: j.w.l, c: j.w.c, ma: j.w.sma, maName: '30-week SMA', tf: 'Weekly' } : null);
+  if (r.system === 'Monthly ATH' || bkOf(r) === 'mom') { const w = fromW(await get(MP + 'ath_charts/' + f + '.json')); if (w) return w; }
+  const d = await get(MP + 'charts/' + f + '.json'); if (d && d.t) return { ...d, ma: d.e21, maName: 'EMA 21', tf: 'Daily' };
+  const p = await get(MP + 'pattern_charts/' + f + '.json'); if (p && p.t) return { ...p, ma: p.ema50, maName: 'EMA 50', tf: 'Daily' };
+  return fromW(await get(MP + 'ath_charts/' + f + '.json'));
+}
+async function tdChart(r, mk, back) {
+  const L = tdLabel(r), E = r.trigger || r.price, M = (v, d = 2) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
+  const tv = 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(r.symbol, mk));
+  const risk = E > r.stop ? (1 - r.stop / E) * 100 : null;
+  const exit = r.exit_rule ? r.exit_rule.charAt(0).toUpperCase() + r.exit_rule.slice(1) : '';
+  $('#sheet-body').innerHTML = `<div class="tdc-h"><div class="t2-sh"><b>${esc(r.symbol)}</b><span>${esc(L.t)}</span></div><b class="tdc-px" id="tdcpx"></b></div>
+    <div class="tdc-chart" id="tdcv"><p class="muted pad">Loading chart…</p></div><p class="tdc-key" id="tdckey"></p>
+    <div class="bg-tiles"><div><span>${isStopK(r.kind) ? 'Buy above' : 'Entry'}</span><b>${M(E)}</b></div><div><span>Stop</span><b>${M(r.stop)}</b></div><div class="risk"><span>Risk to stop</span><b>${risk == null ? '–' : fmt(risk, 1) + '%'}</b></div></div>
+    ${exit ? `<p class="tdc-why">Exit: ${esc(exit)}.</p>` : ''}
+    <div class="bg-btns"><button class="bg-cta" id="tdcsize">Size it</button><a class="bg-ghost tdc-a" href="${tv}" target="_blank" rel="noopener">TradingView ↗</a></div>
+    <button class="bg-ghost sm tdc-full" id="tdcfull">Full detail</button>`;
+  $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; if (!back) history.pushState({ sheet: 1 }, '');
+  $('#tdcsize').addEventListener('click', () => tdPick(state._tdRows.indexOf(r), state._tdEl, state._tdBg, true));
+  $('#tdcfull').addEventListener('click', () => { closeSheet(); lvOpen(r, mk); });
+  const D = await tdChartData(r, mk); const box = $('#tdcv'); if (!box) return;
+  if (!D || !window.LightweightCharts) { box.innerHTML = `<p class="muted pad">Chart not in today's files. Open it in TradingView or Full detail.</p>`; return; }
+  const n = D.t.length, k0 = Math.max(0, n - (D.tf === 'Weekly' ? 104 : 150));
+  box.innerHTML = '';
+  const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight || 300, width: box.clientWidth, handleScroll: false, handleScale: false,
+    timeScale: { borderColor: C.line, fixLeftEdge: true, fixRightEdge: true }, grid: { vertLines: { visible: false }, horzLines: { color: C.grid } } });
+  const cs = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall, priceLineVisible: false });
+  const bars = []; for (let i = k0; i < n; i++) if (D.c[i] != null) bars.push({ time: D.t[i], open: D.o[i], high: D.h[i], low: D.l[i], close: D.c[i] });
+  cs.setData(bars);
+  if (D.ma) { const ma = ch.addLineSeries({ color: '#7C8CFF', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    ma.setData(D.t.slice(k0).map((t, i) => (D.ma[k0 + i] == null ? { time: t } : { time: t, value: D.ma[k0 + i] }))); }
+  cs.createPriceLine({ price: E, color: C.rise, lineWidth: 2, lineStyle: 2, axisLabelVisible: true, title: isStopK(r.kind) ? 'Buy above' : 'Entry' });
+  cs.createPriceLine({ price: r.stop, color: C.fall, lineWidth: 2, lineStyle: 2, axisLabelVisible: true, title: 'Stop' });
+  ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
+  const last = bars[bars.length - 1]; if (last) $('#tdcpx').textContent = M(last.close);
+  $('#tdckey').innerHTML = `${D.tf} candles · <i style="background:#7C8CFF"></i>${esc(D.maName)} · <i style="background:${C.rise}"></i>buy · <i style="background:${C.fall}"></i>stop`;
 }
 
 document.querySelectorAll('#bgnav button').forEach((b) => b.addEventListener('click', () => bgShow(b.dataset.bg)));

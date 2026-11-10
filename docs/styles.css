@@ -775,3 +775,10 @@ body.pub .owner-only { display: none !important; }
 .td-qty { background: var(--accent); color: var(--on-accent); border-radius: 20px; padding: 14px 18px; display: grid; grid-template-columns: 1fr; margin-bottom: 12px; }
 .td-qty span { font-weight: 700; opacity: .85; } .td-qty b { font: 800 48px/1.1 var(--font-head); } .td-qty em { font-style: normal; font-weight: 600; opacity: .9; font-size: 13.5px; }
 .td-wrap, .td-wrap *, .td-calc *, .td-qty { box-sizing: border-box; }
+/* Today › setup chart */
+.tdc-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; } .tdc-px { font: 800 24px var(--font-head); margin-top: 2px; }
+.tdc-chart { height: 300px; border-radius: 18px; overflow: hidden; background: var(--card); border: 1px solid var(--line); }
+.tdc-key { font-size: 12px; color: var(--slate); margin: 6px 2px 8px; } .tdc-key i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; vertical-align: middle; margin: 0 4px 0 6px; }
+.tdc-why { font-size: 13.5px; color: var(--slate); margin: 8px 2px 10px; }
+.tdc-a { display: grid; place-items: center; text-decoration: none; }
+.tdc-full { width: 100%; margin-top: 8px; }
