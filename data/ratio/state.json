@@ -1,36 +1,6 @@
 {
  "last_day": "2026-11-06",
- "entry_pending": null,
- "position": {
-  "expiry": "2026-11-09",
-  "entry": "2026-11-04",
-  "future": 23970.7,
-  "legs": {
-   "CE": {
-    "long": 23800.0,
-    "short2": 24300.0,
-    "short4": 24400.0,
-    "entry_prices": [
-     235.15,
-     45.9,
-     31.7
-    ],
-    "entry_value": 16.550000000000026,
-    "entry_cost": 6.894067307692309
-   },
-   "PE": {
-    "long": 24100.0,
-    "short2": 23650.0,
-    "short4": 23550.0,
-    "entry_prices": [
-     262.45,
-     61.3,
-     42.25
-    ],
-    "entry_value": -29.150000000000006,
-    "entry_cost": 7.465777307692308
-   }
-  }
- },
+ "entry_pending": "2026-11-17",
+ "position": null,
  "paper_start": "2026-11-04"
 }
