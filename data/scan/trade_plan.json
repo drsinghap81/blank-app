@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-10 16:31 UTC",
+"generated": "2026-11-10 22:53 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-09",
@@ -121,8 +121,8 @@
 "aligned": true,
 "td_score": 2,
 "group": "Entertainment",
-"lane": "hold",
-"group_pulse": 64.3,
+"lane": "build",
+"group_pulse": 69.0,
 "group_rank": 1,
 "rank": 1,
 "risk_pct": 38.5
@@ -186,7 +186,7 @@
 "td_score": 1,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 13.8,
+"group_pulse": 16.6,
 "group_rank": 31,
 "rank": 3,
 "risk_pct": 11.7
@@ -219,7 +219,7 @@
 "td_score": 1,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 13.8,
+"group_pulse": 16.6,
 "group_rank": 31,
 "rank": 4,
 "risk_pct": 12.8
@@ -251,7 +251,7 @@
 "td_score": 0,
 "group": "Electrical Equipment & Parts",
 "lane": "fade",
-"group_pulse": 10.2,
+"group_pulse": 12.3,
 "group_rank": 47,
 "rank": 5,
 "risk_pct": 30.2
@@ -259,6 +259,38 @@
 ],
 "more": [],
 "swing": [
+{
+"id": "RET-CNL-2026-11-06",
+"symbol": "CNL",
+"name": "Creative Newtech Limited",
+"system": "Breakout retest",
+"bucket": "rt",
+"kind": "RETEST",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 1352.19,
+"ref": 1338.800048828125,
+"stop": 1175.82,
+"target": 1881.3,
+"exit_rule": "3R target 1881.30 or the stop, max 120 days (as tested)",
+"note": "retest of the old breakout level 1279.02 on 2026-11-06, next resistance 1421.60",
+"score": 2,
+"value_cr": null,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Electronics & Computer Distribution",
+"lane": "build",
+"group_pulse": 55.6,
+"group_rank": 2,
+"rank": 1,
+"risk_pct": 15.0
+},
 {
 "id": "TF-INDHOTEL-2026-11-06",
 "symbol": "INDHOTEL",
@@ -286,7 +318,7 @@
 "td_score": 2,
 "group": "Lodging",
 "lane": "hold",
-"group_pulse": 28.6,
+"group_pulse": 31.0,
 "group_rank": 9,
 "rank": 1,
 "risk_pct": 11.3
@@ -319,7 +351,7 @@
 "td_score": 1,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 13.6,
+"group_pulse": 16.0,
 "group_rank": 32,
 "rank": 2,
 "risk_pct": 11.4
@@ -352,8 +384,8 @@
 "td_score": 1,
 "group": "Medical Instruments & Supplies",
 "lane": "hold",
-"group_pulse": 21.4,
-"group_rank": 14,
+"group_pulse": 26.2,
+"group_rank": 13,
 "rank": 3,
 "risk_pct": 11.4
 },
@@ -383,42 +415,10 @@
 "td_score": null,
 "group": "Textile Manufacturing",
 "lane": "hold",
-"group_pulse": 28.6,
+"group_pulse": 32.4,
 "group_rank": 8,
 "rank": 1,
 "risk_pct": 9.5
-},
-{
-"id": "RET-CNL-2026-11-06",
-"symbol": "CNL",
-"name": "Creative Newtech Limited",
-"system": "Breakout retest",
-"bucket": "rt",
-"kind": "RETEST",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 1352.19,
-"ref": 1338.800048828125,
-"stop": 1175.82,
-"target": 1881.3,
-"exit_rule": "3R target 1881.30 or the stop, max 120 days (as tested)",
-"note": "retest of the old breakout level 1279.02 on 2026-11-06, next resistance 1421.60",
-"score": 2,
-"value_cr": null,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": "Electronics & Computer Distribution",
-"lane": "hold",
-"group_pulse": 49.2,
-"group_rank": 2,
-"rank": 1,
-"risk_pct": 15.0
 },
 {
 "id": "RET-ICIL-2026-11-06",
@@ -447,10 +447,42 @@
 "td_score": null,
 "group": "Textile Manufacturing",
 "lane": "hold",
-"group_pulse": 28.6,
+"group_pulse": 32.4,
 "group_rank": 8,
 "rank": 2,
 "risk_pct": 14.3
+},
+{
+"id": "RET-SMSPHARMA-2026-11-06",
+"symbol": "SMSPHARMA",
+"name": "SMS Pharmaceuticals Limited",
+"system": "Breakout retest",
+"bucket": "rt",
+"kind": "RETEST",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 518.33,
+"ref": 513.2000122070312,
+"stop": 455.63,
+"target": 706.43,
+"exit_rule": "3R target 706.43 or the stop, max 120 days (as tested)",
+"note": "retest of the old breakout level 483.35 on 2026-11-06, next resistance 535.00",
+"score": 2,
+"value_cr": null,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Drug Manufacturers - General",
+"lane": "hold",
+"group_pulse": 23.2,
+"group_rank": 18,
+"rank": 3,
+"risk_pct": 13.8
 },
 {
 "id": "RET-WELSPUNLIV-2026-11-06",
@@ -479,9 +511,9 @@
 "td_score": null,
 "group": "Textile Manufacturing",
 "lane": "hold",
-"group_pulse": 28.6,
+"group_pulse": 32.4,
 "group_rank": 8,
-"rank": 3,
+"rank": 4,
 "risk_pct": 13.2
 },
 {
@@ -511,7 +543,7 @@
 "td_score": 3,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 26.7,
+"group_pulse": 29.5,
 "group_rank": 10,
 "rank": 4,
 "risk_pct": 12.4
@@ -543,7 +575,7 @@
 "td_score": 3,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 26.7,
+"group_pulse": 29.5,
 "group_rank": 10,
 "rank": 5,
 "risk_pct": 7.2
@@ -608,7 +640,7 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 4,
+"rank": 5,
 "risk_pct": 18.4
 },
 {
@@ -640,8 +672,39 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 5,
+"rank": 6,
 "risk_pct": 13.1
+},
+{
+"id": "T921-MAHLOG-2026-11-09",
+"symbol": "MAHLOG",
+"name": "Mahindra Logistics Limited",
+"system": "9/21 trend",
+"bucket": "t9",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 436.02,
+"ref": 431.7,
+"stop": 403.15,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-09, stop 7.1% below",
+"score": 3,
+"value_cr": 36.71,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Integrated Freight & Logistics",
+"lane": "bounce",
+"group_pulse": 23.1,
+"group_rank": 19,
+"rank": 3,
+"risk_pct": 8.2
 },
 {
 "id": "T921-SWANDEF-2026-11-09",
@@ -669,9 +732,9 @@
 "td_score": null,
 "group": "Aerospace & Defense",
 "lane": "fade",
-"group_pulse": 20.5,
-"group_rank": 17,
-"rank": 3,
+"group_pulse": 24.1,
+"group_rank": 16,
+"rank": 4,
 "risk_pct": 8.7
 },
 {
@@ -700,9 +763,9 @@
 "td_score": null,
 "group": "Banks - PSU",
 "lane": "weak",
-"group_pulse": 7.4,
-"group_rank": 57,
-"rank": 4,
+"group_pulse": 9.0,
+"group_rank": 54,
+"rank": 5,
 "risk_pct": 10.0
 },
 {
@@ -731,41 +794,10 @@
 "td_score": null,
 "group": "Banks - PSU",
 "lane": "weak",
-"group_pulse": 7.4,
-"group_rank": 57,
-"rank": 5,
-"risk_pct": 11.2
-},
-{
-"id": "T921-MAHLOG-2026-11-09",
-"symbol": "MAHLOG",
-"name": "Mahindra Logistics Limited",
-"system": "9/21 trend",
-"bucket": "t9",
-"kind": "T921",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 436.02,
-"ref": 431.7,
-"stop": 403.15,
-"exit_rule": "Supertrend(10,3) turns red -> sell next open",
-"note": "EMA 9/21 cross 2026-11-09, stop 7.1% below",
-"score": 3,
-"value_cr": 36.71,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": "Integrated Freight & Logistics",
-"lane": "weak",
-"group_pulse": 20.4,
-"group_rank": 18,
+"group_pulse": 9.0,
+"group_rank": 54,
 "rank": 6,
-"risk_pct": 8.2
+"risk_pct": 11.2
 }
 ],
 "pattern_watch": [
@@ -791,7 +823,7 @@
 "signal_date": "2026-10-28",
 "group": "Diagnostics & Research",
 "lane": "hold",
-"group_rank": 45
+"group_rank": 41
 },
 {
 "symbol": "LEMONTREE",
@@ -815,7 +847,7 @@
 "signal_date": "2026-11-05",
 "group": "Internet Retail",
 "lane": "hold",
-"group_rank": 16
+"group_rank": 17
 },
 {
 "symbol": "BLUESTARCO",
@@ -839,7 +871,7 @@
 "signal_date": "2026-11-03",
 "group": "Asset Management",
 "lane": "mid",
-"group_rank": 46
+"group_rank": 49
 },
 {
 "symbol": "FRACTAL",
@@ -851,7 +883,7 @@
 "signal_date": "2026-11-04",
 "group": "Software - Infrastructure",
 "lane": "mid",
-"group_rank": 41
+"group_rank": 43
 },
 {
 "symbol": "ZAGGLE",
@@ -863,7 +895,7 @@
 "signal_date": "2026-11-04",
 "group": "Software - Infrastructure",
 "lane": "mid",
-"group_rank": 41
+"group_rank": 43
 },
 {
 "symbol": "HDFCBANK",
@@ -950,6 +982,18 @@
 "group_rank": null
 },
 {
+"symbol": "BSOFT",
+"name": "BIRLASOFT LIMITED",
+"typ": "TB",
+"close": 332.29998779296875,
+"neck": 320.608642578125,
+"stop": 261.9,
+"signal_date": "2026-10-29",
+"group": "Information Technology Services",
+"lane": "bounce",
+"group_rank": 14
+},
+{
 "symbol": "ROUTE",
 "name": "ROUTE MOBILE LIMITED",
 "typ": "DB",
@@ -959,7 +1003,7 @@
 "signal_date": "2026-10-29",
 "group": "Telecom Services",
 "lane": "bounce",
-"group_rank": 38
+"group_rank": 37
 },
 {
 "symbol": "BHARTIARTL",
@@ -971,7 +1015,19 @@
 "signal_date": "2026-11-03",
 "group": "Telecom Services",
 "lane": "bounce",
-"group_rank": 38
+"group_rank": 37
+},
+{
+"symbol": "INFY",
+"name": "Infosys Limited",
+"typ": "DB",
+"close": 1154.0999755859375,
+"neck": 1164.0347900390625,
+"stop": 950.8,
+"signal_date": "2026-11-05",
+"group": "Information Technology Services",
+"lane": "bounce",
+"group_rank": 14
 },
 {
 "symbol": "BBL",
@@ -984,30 +1040,6 @@
 "group": "Electrical Equipment & Parts",
 "lane": "fade",
 "group_rank": 47
-},
-{
-"symbol": "IOC",
-"name": "Indian Oil Corporation Limited",
-"typ": "TB",
-"close": 146.85000610351562,
-"neck": 145.00759887695312,
-"stop": 124.1,
-"signal_date": "2026-11-06",
-"group": "Oil & Gas Refining & Marketing",
-"lane": "fade",
-"group_rank": 15
-},
-{
-"symbol": "ANURAS",
-"name": "Anupam Rasayan India Limited",
-"typ": "DB",
-"close": 1198.300048828125,
-"neck": 1187.0,
-"stop": 1066.72,
-"signal_date": "2026-11-09",
-"group": "Specialty Chemicals",
-"lane": "fade",
-"group_rank": 25
 }
 ],
 "watch": [
@@ -1036,8 +1068,8 @@
 "td_score": 1,
 "group": "Packaging & Containers",
 "lane": "mid",
-"group_pulse": 8.1,
-"group_rank": 52
+"group_pulse": 10.0,
+"group_rank": 50
 },
 {
 "id": "WATCH-PARAGMILK",
@@ -1064,8 +1096,8 @@
 "td_score": 1,
 "group": "Dairy",
 "lane": "mid",
-"group_pulse": 19.0,
-"group_rank": 22
+"group_pulse": 21.9,
+"group_rank": 21
 },
 {
 "id": "WATCH-POONAWALLA",
@@ -1092,7 +1124,7 @@
 "td_score": 1,
 "group": "Credit Services",
 "lane": "mid",
-"group_pulse": 9.9,
+"group_pulse": 11.6,
 "group_rank": 48
 },
 {
@@ -1176,7 +1208,7 @@
 "td_score": 2,
 "group": "Oil & Gas Refining & Marketing",
 "lane": "fade",
-"group_pulse": 21.0,
+"group_pulse": 24.2,
 "group_rank": 15
 },
 {
@@ -1204,8 +1236,8 @@
 "td_score": 1,
 "group": "Household & Personal Products",
 "lane": "weak",
-"group_pulse": 11.4,
-"group_rank": 43
+"group_pulse": 12.9,
+"group_rank": 44
 }
 ],
 "exits": []
