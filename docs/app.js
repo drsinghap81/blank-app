@@ -2851,8 +2851,9 @@ async function pfPrices() {
     catch (e) { /* server off: keep the scan prices */ }
   }
   const athOpen = Object.fromEntries(((ath && ath.tracked) || []).filter((r) => r.status === 'open').map((r) => [r.symbol, r]));
+  const athLast = {}; ((ath && ath.tracked) || []).forEach((r) => { if (!athLast[r.symbol] || String(r.date) > String(athLast[r.symbol].date)) athLast[r.symbol] = r; });
   const early = Object.fromEntries(((scan && scan.early) || []).filter((r) => r.status !== 'closed').map((r) => [r.symbol, r]));
-  return { px, src, athOpen, early };
+  return { px, src, athOpen, athLast, early };
 }
 
 // ---- SIP · ETF rotation card (core 4: Nifty, Midcap 150, Gold, US Nasdaq; LIQUIDBEES as cash) ----
@@ -2907,7 +2908,7 @@ async function loadPortfolio() {
 }
 
 function renderPortfolio() {
-  const el = $('#view-pf'); const P = pfLoad(); const { px, src, athOpen, early } = state.pf;
+  const el = $('#view-pf'); const P = pfLoad(); const { px, src, athOpen, early } = state.pf; const athLast = state.pf.athLast || {};
   $('#asof').textContent = P.h.length ? `Prices: ${src}` : 'Stored only on this device';
   let inv = 0, val = 0, dayp = 0, missing = 0;
   const rows = P.h.map((h, i) => {
@@ -2919,11 +2920,18 @@ function renderPortfolio() {
   }).sort((a, b) => b.v - a.v);
   const real = P.c.reduce((s, c) => s + c.q * (c.x - c.a), 0);
   const unrl = val - inv;
+  // which tested system the holding is in (11 Nov 2026): base >= 24 months = Momentum (weekly 30-week SMA exit);
+  // 12-24 months = Trend 9/21 (daily EMA 9 below EMA 21 exit); otherwise say why it is outside the systems
   const sys = (r) => {
-    const a = athOpen[r.s], e = early[r.s];
-    if (a && a.sma30) return `<div class="sysl ${r.ltp != null && r.ltp < a.sma30 ? 'down' : ''}">ATH · 30-week SMA ${fmt(a.sma30, 0, 'en-IN')}: exit on a weekly close below</div>`;
-    if (e && e.supertrend) return `<div class="sysl ${e.st_up === false ? 'down' : ''}">9/21 · Supertrend ${fmt(e.supertrend, 0, 'en-IN')}: ${e.st_up === false ? 'turned red, exit at the next open' : 'exit if it turns red'}</div>`;
-    return '';
+    const a = athOpen[r.s], L = athLast[r.s], e = early[r.s], line = (cls, t) => `<div class="sysl ${cls}">${t}</div>`;
+    if (a && (a.base_months || 0) >= 24 && a.sma30) return line(r.ltp != null && r.ltp < a.sma30 ? 'down' : '', `Momentum · 30-week SMA ${fmt(a.sma30, 0, 'en-IN')}: exit on a weekly close below`);
+    const tf = a && (a.base_months || 0) >= 12 ? a : L && (L.base_months || 0) >= 12 && (L.base_months || 0) < 24 ? L : null;
+    if (tf && tf.tf_status === 'open' && tf.ema9 && tf.ema21) return line(tf.ema9 < tf.ema21 ? 'down' : '', `Trend 9/21 · EMA 9 ${fmt(tf.ema9, 0, 'en-IN')} / EMA 21 ${fmt(tf.ema21, 0, 'en-IN')}: exit when 9 closes below 21`);
+    if (tf && tf.tf_status && tf.tf_status !== 'open') return line('down', `Trend 9/21 exited ${tf.tf_exit_date && tf.tf_exit_date !== 'NaT' ? day(tf.tf_exit_date) : ''} (EMA 9 below 21) · outside your systems now`);
+    if (e && e.supertrend) return line(e.st_up === false ? 'down' : 'muted', `Old 9/21 (off in your mix) · Supertrend ${fmt(e.supertrend, 0, 'en-IN')}${e.st_up === false ? ': turned red' : ''}`);
+    if (/BEES$|ETF$|IETF$/.test(r.s)) return line('muted', 'ETF · outside the stock systems');
+    if (r.ltp != null && r.ltp < 100) return line('muted', 'Not in a system · below your ₹100 floor');
+    return line('muted', 'Not in a system · no breakout signal');
   };
   el.innerHTML = `<div style="margin:10px 16px 0"><button class="more" id="toresults">📊 Backtest results & paper book →</button></div>
     <div class="card">

@@ -782,3 +782,4 @@ body.pub .owner-only { display: none !important; }
 .tdc-why { font-size: 13.5px; color: var(--slate); margin: 8px 2px 10px; }
 .tdc-a { display: grid; place-items: center; text-decoration: none; }
 .tdc-full { width: 100%; margin-top: 8px; }
+.sysl.muted{opacity:.8}
