@@ -230,6 +230,16 @@ def analyse(sym, x, today, lookback_days=550):
     return events, near, chart
 
 
+def daily_block(x, n=160):
+    """Last n daily bars with EMA 9/21/50 for the app's setup chart (Today tab)."""
+    c = x.Close
+    e = {k: c.ewm(span=k, adjust=False).mean() for k in (9, 21, 50)}
+    x = x.tail(n)
+    rd = lambda a: [None if not np.isfinite(v) else round(float(v), 2) for v in np.asarray(a, dtype=float)[-n:]]  # noqa: E731
+    return dict(t=[str(i.date()) for i in x.index], o=rd(x.Open), h=rd(x.High), l=rd(x.Low), c=rd(x.Close),
+                e9=rd(e[9]), e21=rd(e[21]), e50=rd(e[50]))
+
+
 def main():
     os.makedirs(CH, exist_ok=True)
     from zoneinfo import ZoneInfo
@@ -292,6 +302,7 @@ def main():
             if nr:
                 near.append(nr)
             if ev or nr:
+                ch["d"] = daily_block(x)                        # daily bars for the app's Today chart (11 Nov 2026)
                 charts[sym] = ch
         print(a + len(chunk), "done;", len(events), "signals,", len(near), "near", flush=True)
         time.sleep(1)

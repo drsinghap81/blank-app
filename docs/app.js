@@ -3659,10 +3659,12 @@ async function tdChartData(r, mk) {
   const MP = MAIN + MKT[mk].path, f = encodeURIComponent(r.symbol.replace(/ /g, '_'));
   const get = async (u) => { try { const x = await fetch(u); return x.ok ? await x.json() : null; } catch (e) { return null; } };
   const fromW = (j) => (j && j.w && j.w.t ? { t: j.w.t, o: j.w.o, h: j.w.h, l: j.w.l, c: j.w.c, ma: j.w.sma, maName: '30-week SMA', tf: 'Weekly' } : null);
-  if (r.system === 'Monthly ATH' || bkOf(r) === 'mom') { const w = fromW(await get(MP + 'ath_charts/' + f + '.json')); if (w) return w; }
+  const A = await get(MP + 'ath_charts/' + f + '.json');
+  if (r.system === 'Monthly ATH' || bkOf(r) === 'mom') { const w = fromW(A); if (w) return w; }
+  if (A && A.d && A.d.t) return { ...A.d, ma: A.d.e21, maName: 'EMA 21', tf: 'Daily' };
   const d = await get(MP + 'charts/' + f + '.json'); if (d && d.t) return { ...d, ma: d.e21, maName: 'EMA 21', tf: 'Daily' };
   const p = await get(MP + 'pattern_charts/' + f + '.json'); if (p && p.t) return { ...p, ma: p.ema50, maName: 'EMA 50', tf: 'Daily' };
-  return fromW(await get(MP + 'ath_charts/' + f + '.json'));
+  return fromW(A);
 }
 async function tdChart(r, mk, back) {
   const L = tdLabel(r), E = r.trigger || r.price, M = (v, d = 2) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
