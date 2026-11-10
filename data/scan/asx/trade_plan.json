@@ -1,8 +1,8 @@
 {
-"generated": "2026-11-10 01:02 UTC",
+"generated": "2026-11-10 10:26 UTC",
 "market": "ASX",
 "watch_only": true,
-"asof": "2026-11-09",
+"asof": "2026-11-10",
 "rules": {
 "risk_pct": 1.0,
 "max_pos_pct": 20.0,
