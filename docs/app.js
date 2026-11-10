@@ -48,10 +48,11 @@ function themeSheet() {
 applyTheme(false);
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (themePick() === 'auto') applyTheme(true); });
 /* Public edition (11 Nov 2026): third-party systems (Top Bottom, the course systems System 1 / Wealth Creation and the
-   weekly-RSI tag) show only on the owner's devices: open the app once with ?owner=1 (or connect the Live server). */
+   weekly-RSI tag) show only on the owner's devices: open the app once with ?owner=1, or save the Live server address once. */
 const OWNER_K = new Set(['tb', 's1', 'wc']);
 const isOwner = () => { try { if (/[?&]owner=1\b/.test(location.search)) localStorage.setItem('td.owner', '1'); if (/[?&]owner=0\b/.test(location.search)) localStorage.removeItem('td.owner');
-  if (localStorage.getItem('td.owner') === '1') return true; const c = JSON.parse(localStorage.getItem('td_live') || '{}'); return !!(c.url && c.token); } catch (e) { return false; } };
+  if (localStorage.getItem('td.owner') === '1') return true; const c = JSON.parse(localStorage.getItem('td_live') || '{}');
+  if (c.url) { localStorage.setItem('td.owner', '1'); return true; } return false; } catch (e) { return false; } };   // a saved server address = your device (sticky, survives an expired login)
 const ownK = (k) => !OWNER_K.has(k) || isOwner();
 const state = { view: 'today', mkt: 'NSE', tab: 'new', q: '', size: '', setup: '', data: {}, selected: null, tb: null, oi: null, res: null, ath: null, pf: null, style: {}, cap: {}, risk: {} };
 const $ = (s) => document.querySelector(s);
