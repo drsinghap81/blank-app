@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 import numpy as np
 
 DIR = {"NSE": "data/scan/", "US": "data/scan/us/", "ASX": "data/scan/asx/"}
-MINPX = {"NSE": 100, "US": 10, "ASX": 1}   # 9/21: no penny stocks
+MINPX = {"NSE": 100, "US": 10, "ASX": 20}   # no penny stocks (ASX A$20 floor, Amritpal 10 Nov 2026)
 MAX_LATE = 0.10        # skip ATH breakouts already > 10% above the entry
 MAX_BELOW = 0.05       # ... or > 5% back below it (failing breakout; not what the backtest bought)
 TOP = 10

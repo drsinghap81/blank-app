@@ -30,7 +30,7 @@ OUT = "data/scan"; CH = f"{OUT}/pattern_charts"
 GLOBAL = {"US": dict(out="data/scan/us", suf="", minval=1e7, minpx=10.0, idx={"^GSPC": "S&P 500", "^NDX": "NASDAQ 100", "^RUT": "RUSSELL 2000"},
                      bt_pat="2008-26, 17,432 signals: 120-day return +2.5% vs +5.0% for a random liquid stock the same day; target before stop 57% vs 58%. Worse than random - watch only.",
                      bt_sup="2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.19R (30,963) vs +0.25R for a random uptrend stock; old swing lows +0.11R vs +0.24R. Worse than random - watch only."),
-          "ASX": dict(out="data/scan/asx", suf=".AX", minval=1e6, minpx=1.0, idx={"^AXJO": "ASX 200", "^AORD": "ALL ORDINARIES"},
+          "ASX": dict(out="data/scan/asx", suf=".AX", minval=1e6, minpx=20.0, idx={"^AXJO": "ASX 200", "^AORD": "ALL ORDINARIES"},
                       bt_pat="2008-26, 1,904 signals: 120-day return +2.5% vs +4.8% for a random liquid stock the same day; target before stop 60% vs 60%. Worse than random - watch only.",
                       bt_sup="2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.13R (3,359) vs +0.15R for a random uptrend stock; old swing lows +0.02R vs +0.10R. Worse than random - watch only.")}
 THR, FALL, MINVAL, MIN_CLOSE, RECENT = 0.06, 0.20, 2e7, 100.0, 10

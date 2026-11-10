@@ -16,7 +16,7 @@ from session import drop_partial  # noqa: E402
 
 CFG = {"NSE": dict(out="data/scan/", bench="^NSEI", suf=".NS", minval=2e7, minpx=50),
        "US": dict(out="data/scan/us/", bench="^GSPC", suf="", minval=1e7, minpx=5),
-       "ASX": dict(out="data/scan/asx/", bench="^AXJO", suf=".AX", minval=1e6, minpx=1)}
+       "ASX": dict(out="data/scan/asx/", bench="^AXJO", suf=".AX", minval=1e6, minpx=20)}   # A$20 floor (10 Nov 2026)
 
 
 NSE_SPLIT = {
