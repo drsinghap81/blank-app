@@ -478,3 +478,21 @@ def test_research_orb(tmp_path):
     N = out["index"]["NIFTY"]
     assert N["days"] == 30 and N["orb15_eod"]["n"] > 0 and "orb15_eod_random" in N and N["first5_10R"]["n"] > 0
     assert out["stocks"]["top10_atr"]["n"] > 0
+
+
+def test_alerts(tmp_path):
+    """Alerts: recorded once per key, listed newest first, push key and subscription endpoints."""
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A._send_alert = lambda item, subs: None                       # no network in tests
+    assert A.alert("stop", "TCS", "Stop hit", key="stop:TCS:d") and not A.alert("stop", "TCS", "Stop hit", key="stop:TCS:d")
+    A.alert("raised", "INFY", "Stop raised to 1,500", key="raised:INFY:d")
+    j = c.get("/api/alerts", headers=h).json()
+    assert [x["symbol"] for x in j["items"]] == ["INFY", "TCS"] and j["push"] == 0
+    try:
+        import cryptography  # noqa: F401
+        k = c.get("/api/push/key", headers=h).json()["key"]; assert len(k) > 80
+    except ImportError:
+        pass
+    s = c.post("/api/push/subscribe", headers=h, json={"subscription": {"endpoint": "https://x.example/1", "keys": {"p256dh": "a", "auth": "b"}}}).json()
+    assert s["devices"] == 1 and c.get("/api/alerts").status_code in (401, 403)

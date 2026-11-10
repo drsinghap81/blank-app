@@ -783,3 +783,6 @@ body.pub .owner-only { display: none !important; }
 .tdc-a { display: grid; place-items: center; text-decoration: none; }
 .tdc-full { width: 100%; margin-top: 8px; }
 .sysl.muted{opacity:.8}
+.td-al { display: flex; flex-direction: column; gap: 8px; } .td-alh { display: flex; justify-content: space-between; align-items: center; gap: 8px; } .td-alh h3 { margin: 0; }
+.td-al .td-card { padding: 10px 12px; } .td-al .td-av { width: 36px; height: 36px; font-size: 16px; }
+.td-al .td-nm small { white-space: normal; }

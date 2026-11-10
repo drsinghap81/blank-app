@@ -3589,6 +3589,40 @@ function bgMe(el) {
   $('#bgagain').addEventListener('click', () => bgShow('welcome'));
 }
 
+/* Alerts (11 Nov 2026): the server's events — stop hit, buy filled, sold, sell signal, stop raised, stop not placed.
+   Shown on Today, toasted when new while the app is open, and pushed to this phone once you turn notifications on. */
+const AL_KIND = { stop: ['🛑', 'Stop hit'], sold: ['✅', 'Sold'], filled: ['🟢', 'Bought'], exit: ['↘', 'Sell signal'], raised: ['↑', 'Stop raised'], nostop: ['⚠️', 'No stop'], test: ['🔔', 'Test'] };
+const b64u = (s) => { const p = '='.repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...r].map((c) => c.charCodeAt(0))); };
+async function alPush(btn) {
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) { alertMsg('This browser cannot receive alerts. On iPhone: add Trend Desk to the Home Screen (Share › Add to Home Screen), open it from there, then try again.'); return; }
+    const perm = await Notification.requestPermission(); if (perm !== 'granted') { alertMsg('Notifications are blocked for Trend Desk. Allow them in Settings › Notifications.'); return; }
+    const reg = await navigator.serviceWorker.ready; const { key } = await lvApi('/api/push/key');
+    const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64u(key) });
+    const r = await lvApi('/api/push/subscribe', { method: 'POST', body: JSON.stringify({ subscription: sub.toJSON() }) });
+    try { localStorage.setItem('td.pushOn', '1'); } catch (e) { /* */ }
+    await lvApi('/api/push/test', { method: 'POST' }); toast(`Alerts on · ${r.devices} device${r.devices === 1 ? '' : 's'} · test sent`);
+    if (btn) btn.textContent = 'Alerts on ✓';
+  } catch (e) { alertMsg('Could not turn on alerts: ' + (e.message || e)); }
+}
+async function alCard(box) {
+  const c = lvCfg(); if (!box || !c.url || !c.token) { if (box) box.innerHTML = ''; return; }
+  let A; try { A = await lvApi('/api/alerts'); } catch (e) { box.innerHTML = ''; return; }
+  const wk = Date.now() - 7 * 864e5; const L = (A.items || []).filter((x) => new Date(x.t).getTime() >= wk && x.kind !== 'test').slice(0, 6);
+  let on = false; try { on = localStorage.getItem('td.pushOn') === '1' && Notification.permission === 'granted'; } catch (e) { /* */ }
+  box.innerHTML = `<div class="td-risk td-al"><div class="td-alh"><h3>Alerts</h3><button class="bg-ghost sm" id="alon">${on ? 'Alerts on ✓' : '🔔 Turn on phone alerts'}</button></div>
+    ${L.length ? L.map((x) => { const [ic, lab] = AL_KIND[x.kind] || ['•', x.kind]; return `<div class="td-card td-raise"><span class="td-av" style="background:${x.kind === 'stop' || x.kind === 'nostop' || x.kind === 'exit' ? 'var(--fall)' : 'var(--rise)'}">${ic}</span><span class="td-nm"><b>${esc(x.symbol || lab)}</b><small>${esc(x.text)}</small><small>${new Date(x.t).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</small></span></div>`; }).join('')
+      : '<p class="muted td-rs">No alerts this week. You will get one when a stop is hit, a buy fills, a stock is sold, a sell signal fires or a stop is raised.</p>'}</div>`;
+  $('#alon').addEventListener('click', (e) => alPush(e.target));
+}
+async function alPoll() {
+  const c = lvCfg(); if (!c.url || !c.token) return;
+  try { const A = await lvApi('/api/alerts'); const last = localStorage.getItem('td.alLast') || ''; const it = (A.items || [])[0];
+    if (it && it.id !== last) { if (last) { const n = (A.items || []).findIndex((x) => x.id === last); const fresh = (n < 0 ? A.items.slice(0, 3) : A.items.slice(0, n)).filter((x) => x.kind !== 'test');
+      fresh.reverse().forEach((x, k) => setTimeout(() => alertMsg(`${(AL_KIND[x.kind] || ['🔔'])[0]} ${x.symbol ? x.symbol + ': ' : ''}${x.text}`, x.kind !== 'stop' && x.kind !== 'nostop'), k * 400)); }
+      localStorage.setItem('td.alLast', it.id); } } catch (e) { /* server off */ }
+}
+setTimeout(alPoll, 3000); setInterval(alPoll, 120000);
 /* ------------------------------------------------------------------ Today (11 Nov 2026)
    The promo screen: stocks scanned → setups found → tap one for its chart and a size calculator (your own capital
    and risk, editable) → open risk to your stops, and stops raised this week. Setups are the output of the scans,
@@ -3631,7 +3665,7 @@ async function tdRender(el, beginner) {
   state._tdRows = rows; state._tdMkNow = mk; state._tdAsof = P.asof;
   const scanned = (A && A.scanned) || null; const n = rows.length;
   const held = new Set(bgPractice().filter((t) => t.state !== 'closed').map((t) => t.symbol));
-  el.innerHTML = `<div class="td-wrap">${seg}
+  el.innerHTML = `<div class="td-wrap">${seg}<div id="tdal"></div>
     <div class="td-hero"><span>Setups found</span><div class="td-big"><b>${n}</b>${scanned ? `<em>out of ${Number(scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>` : ''}</div>
       <div class="td-bar"><i style="width:100%"></i></div><small>Close ${day(P.asof)} · the scan runs every evening</small></div>
     ${beginner ? bgHero(cap('NSE') || 50000, {}) : ''}
@@ -3645,6 +3679,7 @@ async function tdRender(el, beginner) {
   state._tdEl = el; state._tdBg = beginner;
   el.querySelectorAll('.td-card:not(.td-raise)').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
+  if (!beginner) alCard($('#tdal'));
 }
 async function tdRiskCard(box) {
   if (!box) return;

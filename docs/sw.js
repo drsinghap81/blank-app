@@ -1,5 +1,5 @@
 /* App shell cached for offline start (network first); scan data always fetched fresh (falls back to the last copy in the page). */
-const SHELL = 'td-shell-v2';
+const SHELL = 'td-shell-v3';
 const FILES = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js'];
 self.addEventListener('install', (e) => e.waitUntil(caches.open(SHELL).then((c) => c.addAll(FILES)).then(() => self.skipWaiting())));
@@ -15,4 +15,13 @@ self.addEventListener('fetch', (e) => {
   const req = u.origin === location.origin ? new Request(e.request, { cache: 'no-cache' }) : e.request;   // revalidate, skip the 10-min HTTP cache
   e.respondWith(fetch(req).then((r) => { if (r.ok && u.origin === location.origin) { const cp = r.clone(); caches.open(SHELL).then((c) => c.put(e.request, cp)); } return r; })
     .catch(() => caches.match(e.request)));
+});
+/* phone alerts (11 Nov 2026): the server pushes stop hits, fills, sells, sell signals and stop raises */
+self.addEventListener('push', (e) => {
+  let d = {}; try { d = e.data ? e.data.json() : {}; } catch (x) { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Trend Desk', { body: d.body || '', tag: d.tag, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', data: { url: './' } }));
+});
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((cs) => { for (const c of cs) { if ('focus' in c) return c.focus(); } return self.clients.openWindow('./'); }));
 });

@@ -22,6 +22,7 @@ import json
 import math
 import os
 import re
+import threading
 import time
 from datetime import datetime, timezone
 
@@ -364,6 +365,8 @@ def _protect(sym, e):
     except Exception as ex:  # noqa: BLE001
         e["gtt_error"] = str(ex)[:200]; e["gtt_tries"] = e.get("gtt_tries", 0) + 1; e["gtt_last"] = time.time()
         log("gtt_error", symbol=sym, error=str(ex)[:200])
+        if e["gtt_tries"] >= 2:
+            alert("nostop", sym, f"Protective stop could NOT be placed on Angel ({str(ex)[:80]}). Place it in the Angel app.", key=f"nostop:{sym}:{ist_now().date()}")
 
 
 def sync(acc=None):
@@ -397,6 +400,7 @@ def sync(acc=None):
                 e["order_status"] = o.get("status")
         elif st == "pending" and e.get("kind") == "MY_GTT" and held.get(sym, 0) > 0:
             e.update(state="open", qty=int(held[sym]), filled=today); log("filled", symbol=sym, gtt=True, qty=e["qty"])
+            alert("filled", sym, f"Your GTT buy filled: {e['qty']} shares. Protective stop going on Angel now.", key=f"filled:{sym}:{today}")
             _protect(sym, e); changed = True
             mp = mypicks(); mp.pop(sym, None); _save_mypicks(mp)                          # done: the pick becomes an open trade
         elif st == "pending" and not o and e.get("since", today) < today and held.get(sym, 0) > 0:
@@ -406,10 +410,13 @@ def sync(acc=None):
             _protect(sym, e); changed = True                                          # retry a failed protective stop
         elif st == "exiting" and o and stat == "complete":
             px = float(o.get("avg") or e.get("exit_px") or 0); record_exit(sym, px); log("sold", symbol=sym, price=px)
+            alert("sold", sym, f"Sold {e.get('qty')} at ₹{px:,.2f}.", key=f"sold:{sym}:{today}")
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="sold", exit=px, ended=today); changed = True
         elif st == "open" and held.get(sym, 0) <= 0 and (e.get("gtt_id") or e.get("filled", today) < today):
             px = float(e.get("gtt_trigger") or 0) * (1 - GTT_LIMIT_GAP / 2) or e["entry"]
             record_exit(sym, px); log("gone", symbol=sym, assumed_px=px)
+            alert("stop", sym, f"Stop hit or sold outside the app: {e.get('qty')} shares gone from Angel"
+                  + (f" (stop ₹{e['gtt_trigger']:,.2f})" if e.get("gtt_trigger") else "") + ".", key=f"stop:{sym}:{today}")
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="stopped or sold outside the app", exit=px, ended=today); changed = True
     if changed:
         d = J.get("_done") or {}
@@ -495,6 +502,7 @@ def trail(force=False):
                 broker.gtt_modify(e["gtt_id"], sym, e.get("qty") or held[sym], guard, guard * (1 - GTT_LIMIT_GAP))
                 e.update(gtt_trigger=guard, trail_prev=cur or None, trail_level=round(lvl, 2), trail_at=today)
                 log("gtt_trail", symbol=sym, old=cur, new=guard, level=round(lvl, 2)); r["result"] = "raised"
+                alert("raised", sym, f"Stop raised to ₹{guard:,.2f}" + (f" from ₹{cur:,.2f}" if cur else "") + ".", key=f"raised:{sym}:{today}")
             out.append(r)
         except Exception as ex:  # noqa: BLE001
             out.append(dict(symbol=sym, result=f"error, stop left where it was: {str(ex)[:120]}"))
@@ -1463,10 +1471,132 @@ def _loop():
             if t.weekday() < 5 and (8, 40) <= (t.hour, t.minute) <= (9, 10) and (last_trail() or {}).get("day") != t.date().isoformat() \
                     and any(not k.startswith("_") for k in journal()):
                 trail()
+            if ((21, 45) <= (t.hour, t.minute) <= (22, 30) or (8, 30) <= (t.hour, t.minute) <= (8, 50)) and t.weekday() < 6 \
+                    and t.minute % 10 < 2:
+                exit_alerts()
         except Exception as ex:  # noqa: BLE001
             log("loop_error", error=str(ex)[:200])
         time.sleep(120)
 
+
+
+# ------------------------------------------------------------------ alerts (11 Nov 2026)
+# Every important event (stop hit, buy filled, sold, sell signal, stop raised, stop not placed) is written to
+# DATA/alerts.json for the app's bell, pushed to the phones that turned on notifications (Web Push, VAPID keys made on
+# this server and kept in DATA/vapid.json), and sent to WhatsApp / Telegram if those keys are in the server's env.
+def _alerts_path():
+    return os.path.join(DATA, "alerts.json")
+
+
+def alerts_load():
+    try:
+        return json.load(open(_alerts_path()))
+    except Exception:  # noqa: BLE001
+        return dict(items=[], seen=[], subs=[])
+
+
+def alert(kind, symbol, text, key=None):
+    """Record and send once (key = de-duplication key, e.g. 'exit:TCS:2026-11-10')."""
+    A = alerts_load(); key = key or f"{kind}:{symbol}:{datetime.now(timezone.utc).isoformat(timespec='minutes')}"
+    if key in A.get("seen", []):
+        return False
+    item = dict(id=key, t=datetime.now(timezone.utc).isoformat(timespec="seconds"), kind=kind, symbol=symbol, text=text)
+    A.setdefault("items", []).append(item); A["items"] = A["items"][-200:]
+    A.setdefault("seen", []).append(key); A["seen"] = A["seen"][-1000:]
+    json.dump(A, open(_alerts_path(), "w")); log("alert", akind=kind, symbol=symbol, text=text)
+    threading.Thread(target=_send_alert, args=(item, list(A.get("subs", []))), daemon=True).start()
+    return True
+
+
+def _vapid():
+    p = os.path.join(DATA, "vapid.json")
+    if os.path.exists(p):
+        return json.load(open(p))
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from cryptography.hazmat.primitives import serialization
+    import base64
+    k = ec.generate_private_key(ec.SECP256R1())
+    priv = k.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()).decode()
+    pub = k.public_key().public_bytes(serialization.Encoding.X962, serialization.PublicFormat.UncompressedPoint)
+    v = dict(private_pem=priv, public=base64.urlsafe_b64encode(pub).decode().rstrip("="))
+    json.dump(v, open(p, "w")); os.chmod(p, 0o600)
+    return v
+
+
+def _send_alert(item, subs):
+    body = json.dumps(dict(title=f"Trend Desk · {item['symbol']}" if item.get("symbol") else "Trend Desk", body=item["text"], tag=item["id"]))
+    dead = []
+    if subs:
+        try:
+            from pywebpush import webpush, WebPushException
+            from py_vapid import Vapid
+            v = _vapid(); vv = Vapid.from_pem(v["private_pem"].encode())
+            for sb in subs:
+                try:
+                    webpush(subscription_info=sb, data=body, vapid_private_key=vv, vapid_claims=dict(sub="mailto:alerts@trenddesk.app"), ttl=86400)
+                except WebPushException as ex:  # noqa: PERF203
+                    if getattr(ex, "response", None) is not None and ex.response.status_code in (404, 410):
+                        dead.append(sb.get("endpoint"))
+                    log("push_error", error=str(ex)[:160])
+        except Exception as ex:  # noqa: BLE001
+            log("push_error", error=str(ex)[:160])
+    if dead:
+        A = alerts_load(); A["subs"] = [x for x in A.get("subs", []) if x.get("endpoint") not in dead]; json.dump(A, open(_alerts_path(), "w"))
+    try:
+        import importlib.util as _iu         # tools/notify.py, loaded by path so it never shadows another "notify" module
+        sp = _iu.spec_from_file_location("td_notify", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "notify.py"))
+        nm = _iu.module_from_spec(sp); sp.loader.exec_module(nm); whatsapp, telegram = nm.whatsapp, nm.telegram
+        txt = f"Trend Desk · {item['symbol']}: {item['text']}" if item.get("symbol") else item["text"]
+        whatsapp(txt) or telegram(txt)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def exit_alerts():
+    """Evening / morning: the plan's sell signals for stocks you hold, once per stock per scan date."""
+    try:
+        P = plan(); acc = account_cached(600); held = {h["symbol"]: h["qty"] for h in acc.get("holdings", []) if h["qty"] > 0}
+    except Exception:  # noqa: BLE001
+        return
+    J = journal()
+    for e in (P.get("exits") or []) + adopted_exits(J, held):
+        sym = e.get("symbol")
+        if sym in J and J[sym].get("system") and e.get("system") and J[sym]["system"] != e.get("system"):
+            continue                                   # an exit for a different system than the one holding it
+        if held.get(sym, 0) > 0:
+            alert("exit", sym, f"Sell signal ({e.get('system') or 'system'}): {e.get('why') or 'exit rule met'}. Sell {held[sym]} at the next open.",
+                  key=f"exit:{sym}:{P.get('asof')}")
+
+
+class PushSub(BaseModel):
+    subscription: dict
+
+
+@app.get("/api/alerts")
+def alerts_list(_=Depends(auth)):
+    A = alerts_load()
+    return dict(items=list(reversed(A.get("items", [])))[:50], push=len(A.get("subs", [])))
+
+
+@app.get("/api/push/key")
+def push_key(_=Depends(auth)):
+    return dict(key=_vapid()["public"])
+
+
+@app.post("/api/push/subscribe")
+def push_subscribe(body: PushSub, _=Depends(auth)):
+    sb = body.subscription
+    if not sb.get("endpoint"):
+        raise HTTPException(400, "no endpoint")
+    A = alerts_load(); A["subs"] = [x for x in A.get("subs", []) if x.get("endpoint") != sb["endpoint"]] + [sb]
+    json.dump(A, open(_alerts_path(), "w"))
+    return dict(ok=True, devices=len(A["subs"]))
+
+
+@app.post("/api/push/test")
+def push_test(_=Depends(auth)):
+    alert("test", "", "Test alert: notifications are working.")
+    return dict(ok=True)
 
 # ------------------------------------------------------------------ research jobs (10 Nov 2026): ORB on Angel 1-minute history
 _rj = {}
