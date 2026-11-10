@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-10 15:20 UTC",
+"generated": "2026-11-10 15:39 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-09",
@@ -1020,7 +1020,7 @@
 "order": null,
 "when": "month close",
 "side": "BUY",
-"price": 4493.7856,
+"price": 4493.7861,
 "ref": 4471.0,
 "stop": 3373.95,
 "note": "signal = a month CLOSE above 4493.79 (old ATH close), then buy next month's open",
