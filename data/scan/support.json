@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-10T00:59+00:00",
+"generated": "2026-11-10T08:37+00:00",
 "asof": "2026-11-09",
 "market": "NSE",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
@@ -598,6 +598,39 @@
 ]
 ],
 "sq9_match": false
+},
+{
+"symbol": "ACUTAAS",
+"name": "Acutaas Chemicals Limited",
+"status": "touched",
+"touch_date": "2026-11-03",
+"days_ago": 4,
+"level": 3692.04,
+"level_kind": "breakout retest",
+"level_date": "2026-07-03",
+"close": 3882.60009765625,
+"above_pct": 5.161424409537285,
+"stop": 3479.87,
+"risk_pct": 10.372586582461619,
+"resistance": 4045.3,
+"room_r": 0.40399658386320925,
+"sq9": 3721,
+"sq9_cross": "61\u00b2",
+"sq9_dist_pct": -0.7783302854575402,
+"sq9_gap_pct": 6.664875033593121,
+"sq9_below": [
+[
+3481,
+"59\u00b2"
+]
+],
+"sq9_above": [
+[
+3969,
+"63\u00b2"
+]
+],
+"sq9_match": true
 }
 ]
 }
