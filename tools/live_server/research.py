@@ -1,0 +1,291 @@
+"""Intraday research on the server (10 Nov 2026): Opening Range Breakout (ORB) tests on Angel's own 1-minute / 5-minute history.
+
+Why on the server: only the server holds the Angel login, and the research sandbox can't reach it - so the server downloads the
+candles (outside market hours, ~2 requests a second, resumable) and runs the tests itself; the app shows the summary.
+
+Data (DATA/research/):
+  idx_NIFTY.csv.gz, idx_BANKNIFTY.csv.gz  - index 1-minute bars from 2016 (Angel tokens 99926000 / 99926009)
+  stk_<SYM>.csv.gz                        - Nifty 100 stocks, 5-minute bars from 2019 (data/universe/nifty50 + niftynext50)
+Tests (pure Python, no numpy/pandas):
+  A. Index ORB: range = first 5 / 15 / 30 minutes from 09:15. First 1-minute close beyond the range -> enter at that close in the
+     break direction; stop = the other side of the range; exit 15:15 close, or at a 1R / 2R target. One trade a day.
+     Control: the same entry time and stop distance in a RANDOM direction (seeded) - the edge is the difference.
+  B. First-candle rule (Zarattini & Aziz): direction of the first 5-minute candle, enter at the next bar's open, stop at the other
+     side of that candle, target 10R or exit 15:15.
+  C. Stocks in play: each day the 10 Nifty 100 stocks with the highest first-15-minute volume vs their own 14-day average
+     (relative volume >= 1). 15-minute range; green first candle -> buy-stop at the range high, red -> sell-stop at the low
+     (shorts = intraday); stop 10% of the 14-day ATR (paper) or the other side of the range; exit 15:20. Equal 1% risk per trade.
+Costs: index futures 0.02% of price + 1 pt (Nifty) / 3 pts (Bank Nifty) slippage round trip; stocks intraday 0.15% round trip
+(charges + slippage). Results in R (multiples of the risk) net of costs, by year and 2016-20 / 2021-23 / 2024-26."""
+import gzip
+import json
+import os
+import random
+import threading
+import time
+from datetime import date, datetime, timedelta
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+IDX = {"NIFTY": "99926000", "BANKNIFTY": "99926009"}
+CHUNK = {"ONE_MINUTE": 30, "FIVE_MINUTE": 100}
+
+
+def _ist():
+    return datetime.utcnow() + timedelta(hours=5, minutes=30)
+
+
+def _quiet():
+    """market hours (Mon-Fri 09:00-15:45 IST) are left to trading."""
+    t = _ist()
+    return t.weekday() >= 5 or not ((9, 0) <= (t.hour, t.minute) <= (15, 45))
+
+
+def universe():
+    out = []
+    for f in ("nifty50.csv", "niftynext50.csv"):
+        p = os.path.join(HERE, "..", "..", "data", "universe", f)
+        try:
+            for i, line in enumerate(open(p)):
+                if i == 0:
+                    continue
+                s = line.split(",")[0].strip().strip('"')
+                if s and s not in out:
+                    out.append(s)
+        except Exception:  # noqa: BLE001
+            pass
+    return out
+
+
+class Job:
+    def __init__(self, broker, data_dir, log=print):
+        self.b, self.dir, self.log = broker, os.path.join(data_dir, "research"), log
+        os.makedirs(self.dir, exist_ok=True)
+        self.state_p = os.path.join(self.dir, "orb_state.json")
+        self.st = self._load(self.state_p, dict(state="idle", done={}, errors=0, progress="", started=None, finished=None))
+        self.thread = None
+
+    @staticmethod
+    def _load(p, d):
+        try:
+            return json.load(open(p))
+        except Exception:  # noqa: BLE001
+            return d
+
+    def _save(self):
+        json.dump(self.st, open(self.state_p, "w"))
+
+    def status(self):
+        r = self._load(os.path.join(self.dir, "orb_results.json"), None)
+        return dict(self.st, results=r)
+
+    def start(self):
+        if self.thread and self.thread.is_alive():
+            return False
+        self.st.update(state="running", started=_ist().isoformat(timespec="minutes"), finished=None, errors=0); self._save()
+        self.thread = threading.Thread(target=self._run, daemon=True); self.thread.start()
+        return True
+
+    # ------------------------------------------------------------------ download
+    def _candles(self, token, interval, d0, d1):
+        api = self.b._session()
+        r = self.b._call(api.getCandleData, dict(exchange="NSE", symboltoken=str(token), interval=interval,
+                                                 fromdate=d0.strftime("%Y-%m-%d 09:15"), todate=d1.strftime("%Y-%m-%d 15:30")), tries=2) or {}
+        return self.b._data(r) or []
+
+    def _fetch(self, key, token, interval, start):
+        path = os.path.join(self.dir, key + ".csv.gz")
+        last = self.st["done"].get(key)
+        d = date.fromisoformat(last) + timedelta(days=1) if last else start
+        end = _ist().date() - timedelta(days=1)
+        while d <= end:
+            while not _quiet():
+                self.st["progress"] = f"paused for market hours ({key})"; self._save(); time.sleep(300)
+            d1 = min(end, d + timedelta(days=CHUNK[interval] - 1))
+            try:
+                rows = self._candles(token, interval, d, d1)
+            except Exception as ex:  # noqa: BLE001
+                self.st["errors"] += 1; self.log("research_fetch_error", key=key, error=str(ex)[:160]); time.sleep(5)
+                if self.st["errors"] > 200:
+                    raise
+                continue
+            if rows:
+                with gzip.open(path, "at") as f:
+                    for x in rows:
+                        f.write(f"{str(x[0])[:16]},{x[1]},{x[2]},{x[3]},{x[4]},{x[5] if len(x) > 5 else 0}\n")
+            self.st["done"][key] = d1.isoformat(); self.st["progress"] = f"{key} to {d1}"; self._save()
+            d = d1 + timedelta(days=1); time.sleep(0.5)
+
+    def _run(self):
+        try:
+            for name, tok in IDX.items():
+                self._fetch("idx_" + name, tok, "ONE_MINUTE", date(2016, 1, 1))
+            for s in universe():
+                try:
+                    _, t = self.b._ts(s)
+                except Exception:  # noqa: BLE001
+                    continue
+                self._fetch("stk_" + s, t["token"], "FIVE_MINUTE", date(2019, 1, 1))
+            self.st["progress"] = "analysing"; self._save()
+            res = analyse(self.dir)
+            json.dump(res, open(os.path.join(self.dir, "orb_results.json"), "w"))
+            self.st.update(state="done", finished=_ist().isoformat(timespec="minutes"), progress="done")
+        except Exception as ex:  # noqa: BLE001
+            self.st.update(state="error", progress=str(ex)[:200]); self.log("research_error", error=str(ex)[:200])
+        self._save()
+
+
+# ------------------------------------------------------------------ analysis
+def days(path):
+    """-> list of (date, [(hhmm, o, h, l, c, v), ...]) in time order, duplicates dropped."""
+    D = {}
+    try:
+        with gzip.open(path, "rt") as f:
+            for line in f:
+                p = line.strip().split(",")
+                if len(p) < 6:
+                    continue
+                ts = p[0]; dd, hm = ts[:10], ts[11:16]
+                D.setdefault(dd, {})[hm] = (hm, float(p[1]), float(p[2]), float(p[3]), float(p[4]), float(p[5] or 0))
+    except (OSError, EOFError):
+        pass
+    return [(k, [v[h] for h in sorted(v)]) for k, v in sorted(D.items())]
+
+
+def _stats(R, years):
+    if not R:
+        return dict(n=0)
+    w = [r for r in R if r > 0]; L = -sum(r for r in R if r <= 0)
+    by = {}
+    for y, r in zip(years, R):
+        by.setdefault(y, []).append(r)
+    per = lambda a, b: round(sum(sum(v) for y, v in by.items() if a <= y <= b) / max(1, sum(len(v) for y, v in by.items() if a <= y <= b)), 3)  # noqa: E731
+    return dict(n=len(R), win=round(100 * len(w) / len(R), 1), avgR=round(sum(R) / len(R), 3), pf=round(sum(w) / L, 2) if L else None,
+                sumR=round(sum(R), 1), y16_20=per(2016, 2020), y21_23=per(2021, 2023), y24_26=per(2024, 2026),
+                by_year={y: round(sum(v), 1) for y, v in sorted(by.items())})
+
+
+def index_orb(D, mins, tgt, slip_pts, rnd=None):
+    """D from days() of an index; returns (R list, years)."""
+    R, Y = [], []
+    end_or = (9 * 60 + 15 + mins)
+    for dd, bars in D:
+        if len(bars) < 200:
+            continue
+        hm = lambda b: int(b[0][:2]) * 60 + int(b[0][3:5])  # noqa: E731
+        orb = [b for b in bars if hm(b) < end_or]; rest = [b for b in bars if end_or <= hm(b) <= 15 * 60 + 15]
+        if not orb or not rest:
+            continue
+        hi, lo = max(b[2] for b in orb), min(b[3] for b in orb)
+        if hi <= lo:
+            continue
+        ent = None
+        for i, b in enumerate(rest):
+            if b[4] > hi or b[4] < lo:
+                side = 1 if b[4] > hi else -1
+                if rnd is not None:
+                    side = rnd.choice((1, -1))
+                e = b[4]; stop = lo if side > 0 else hi
+                if rnd is not None:
+                    stop = e - side * (hi - lo)
+                ent = (i, side, e, stop); break
+        if not ent:
+            continue
+        i, side, e, stop = ent; risk = abs(e - stop)
+        if risk <= 0:
+            continue
+        T = e + side * tgt * risk if tgt else None; x = rest[-1][4]
+        for b in rest[i + 1:]:
+            if (side > 0 and b[3] <= stop) or (side < 0 and b[2] >= stop):
+                x = stop; break
+            if T is not None and ((side > 0 and b[2] >= T) or (side < 0 and b[3] <= T)):
+                x = T; break
+        cost = 0.0002 * e + slip_pts
+        R.append(((x - e) * side - cost) / risk); Y.append(int(dd[:4]))
+    return R, Y
+
+
+def first_candle(D, slip_pts, tgt=10.0):
+    R, Y = [], []
+    for dd, bars in D:
+        five = [b for b in bars if b[0] < "09:20"]; rest = [b for b in bars if "09:20" <= b[0] <= "15:15"]
+        if len(five) < 3 or len(rest) < 100:
+            continue
+        o, c = five[0][1], five[-1][4]; hi, lo = max(b[2] for b in five), min(b[3] for b in five)
+        if c == o or hi <= lo:
+            continue
+        side = 1 if c > o else -1; e = rest[0][1]; stop = lo if side > 0 else hi; risk = (e - stop) * side
+        if risk <= 0:
+            continue
+        T = e + side * tgt * risk; x = rest[-1][4]
+        for b in rest:
+            if (side > 0 and b[3] <= stop) or (side < 0 and b[2] >= stop):
+                x = stop; break
+            if (side > 0 and b[2] >= T) or (side < 0 and b[3] <= T):
+                x = T; break
+        R.append(((x - e) * side - (0.0002 * e + slip_pts)) / risk); Y.append(int(dd[:4]))
+    return R, Y
+
+
+def stocks_in_play(dirp, top=10, stopm="atr"):
+    """5-minute stock bars -> per-day candidates with relative volume of the first 15 minutes."""
+    by_day = {}
+    for fn in sorted(os.listdir(dirp)):
+        if not fn.startswith("stk_"):
+            continue
+        D = days(os.path.join(dirp, fn)); vol_hist, tr_hist, prev_c = [], [], None
+        for dd, bars in D:
+            if len(bars) < 60:
+                prev_c = bars[-1][4] if bars else prev_c; continue
+            fst = [b for b in bars if b[0] < "09:30"]; rest = [b for b in bars if "09:30" <= b[0] <= "15:20"]
+            v15 = sum(b[5] for b in fst)
+            H, L_, C = max(b[2] for b in bars), min(b[3] for b in bars), bars[-1][4]
+            tr = max(H - L_, abs(H - prev_c), abs(L_ - prev_c)) if prev_c else H - L_
+            if len(vol_hist) >= 14 and len(tr_hist) >= 14 and fst and rest and v15 > 0:
+                rv = v15 / (sum(vol_hist[-14:]) / 14); atr = sum(tr_hist[-14:]) / 14
+                by_day.setdefault(dd, []).append((rv, fn[4:-7], fst, rest, atr))
+            vol_hist.append(v15); tr_hist.append(tr); prev_c = C
+    R, Y = [], []
+    for dd in sorted(by_day):
+        C_ = sorted([x for x in by_day[dd] if x[0] >= 1.0], key=lambda x: -x[0])[:top]
+        for rv, sym, fst, rest, atr in C_:
+            o, c = fst[0][1], fst[-1][4]; hi, lo = max(b[2] for b in fst), min(b[3] for b in fst)
+            if c == o or hi <= lo:
+                continue
+            side = 1 if c > o else -1; lvl = hi if side > 0 else lo; ent = None
+            for i, b in enumerate(rest):
+                if (side > 0 and b[2] >= lvl) or (side < 0 and b[3] <= lvl):
+                    ent = (i, max(b[1], lvl) if side > 0 else min(b[1], lvl)); break
+            if not ent:
+                continue
+            i, e = ent
+            stop = e - side * 0.1 * atr if stopm == "atr" else (lo if side > 0 else hi)
+            risk = abs(e - stop)
+            if risk <= 0:
+                continue
+            x = rest[-1][4]
+            for b in rest[i:]:
+                if (side > 0 and b[3] <= stop) or (side < 0 and b[2] >= stop):
+                    x = stop; break
+            cost = e * 0.0015                                  # intraday cash: ~0.05% charges + 0.05% slippage a side
+            R.append(((x - e) * side - cost) / risk); Y.append(int(dd[:4]))
+    return R, Y
+
+
+def analyse(dirp):
+    out = dict(generated=_ist().isoformat(timespec="minutes"), index={}, stocks={})
+    for name, slip in (("NIFTY", 1.0), ("BANKNIFTY", 3.0)):
+        D = days(os.path.join(dirp, f"idx_{name}.csv.gz"))
+        if not D:
+            continue
+        r = dict(first_day=D[0][0], last_day=D[-1][0], days=len(D))
+        for mins in (5, 15, 30):
+            for tgt in (None, 1.0, 2.0):
+                k = f"orb{mins}_{'eod' if tgt is None else str(int(tgt)) + 'R'}"
+                r[k] = _stats(*index_orb(D, mins, tgt, slip))
+                r[k + "_random"] = _stats(*index_orb(D, mins, tgt, slip, rnd=random.Random(7)))
+        r["first5_10R"] = _stats(*first_candle(D, slip))
+        out["index"][name] = r
+    for top in (10, 20):
+        for stopm in ("atr", "range"):
+            out["stocks"][f"top{top}_{stopm}"] = _stats(*stocks_in_play(dirp, top, stopm))
+    return out

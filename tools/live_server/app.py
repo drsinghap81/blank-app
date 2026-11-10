@@ -1443,11 +1443,39 @@ def _loop():
         time.sleep(120)
 
 
+# ------------------------------------------------------------------ research jobs (10 Nov 2026): ORB on Angel 1-minute history
+_rj = {}
+
+
+def research_job():
+    if "j" not in _rj:
+        import research
+        _rj["j"] = research.Job(broker, DATA, log=lambda ev, **kw: log(ev, **kw))
+    return _rj["j"]
+
+
+@app.get("/api/research/orb")
+def research_status(_=Depends(auth)):
+    return research_job().status()
+
+
+@app.post("/api/research/orb")
+def research_start(_=Depends(auth)):
+    return dict(started=research_job().start(), **research_job().status())
+
+
 @app.on_event("startup")
 def _start():
     if ENV.get("MOCK_BROKER") != "1":
         import threading
         threading.Thread(target=_loop, daemon=True).start()
+        if ENV.get("RESEARCH_AUTO", "1") == "1":          # the ORB download/test runs once (resumes after restarts), quiet hours only
+            try:
+                j = research_job()
+                if j.st.get("state") in ("idle", "running"):
+                    j.start()
+            except Exception as ex:  # noqa: BLE001
+                log("research_error", error=str(ex)[:200])
 
 
 if __name__ == "__main__":

@@ -452,3 +452,29 @@ def test_mypicks_cancel(tmp_path):
     o = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} ZZTWO"}).json()
     j = c.delete("/api/mypicks/ZZTWO", headers=h).json()
     assert "cancelled" in j["msg"] and not A.broker.gtts[o["gtt_id"]]["active"] and "ZZTWO" not in A.journal()
+
+
+def test_research_orb(tmp_path):
+    """ORB analysis on synthetic 1-minute / 5-minute bars: runs end to end and returns stats for every variant."""
+    import gzip, random as rnd, research
+    d = tmp_path / "research"; d.mkdir()
+    r = rnd.Random(1)
+    with gzip.open(d / "idx_NIFTY.csv.gz", "wt") as f:
+        px = 20000.0
+        for k in range(30):
+            day = f"2024-01-{k + 1:02d}"
+            for m in range(375):
+                t = 9 * 60 + 15 + m; o = px; px += r.gauss(0, 5)
+                f.write(f"{day}T{t // 60:02d}:{t % 60:02d},{o},{max(o, px) + 2},{min(o, px) - 2},{px},0\n")
+    for s in ("AAA", "BBB"):
+        with gzip.open(d / f"stk_{s}.csv.gz", "wt") as f:
+            px = 500.0
+            for k in range(30):
+                day = f"2024-02-{k + 1:02d}"
+                for m in range(75):
+                    t = 9 * 60 + 15 + 5 * m; o = px; px += r.gauss(0, 1)
+                    f.write(f"{day}T{t // 60:02d}:{t % 60:02d},{o},{max(o, px) + .3},{min(o, px) - .3},{px},{r.randint(1000, 9000)}\n")
+    out = research.analyse(str(d))
+    N = out["index"]["NIFTY"]
+    assert N["days"] == 30 and N["orb15_eod"]["n"] > 0 and "orb15_eod_random" in N and N["first5_10R"]["n"] > 0
+    assert out["stocks"]["top10_atr"]["n"] > 0
