@@ -1472,8 +1472,10 @@ def _start():
         if ENV.get("RESEARCH_AUTO", "1") == "1":          # the ORB download/test runs once (resumes after restarts), quiet hours only
             try:
                 j = research_job()
-                if j.st.get("state") in ("idle", "running"):
-                    j.start()
+                import research as _r
+                old = (j.status().get("results") or {}).get("version") != getattr(_r, "VERSION", 1)
+                if j.st.get("state") in ("idle", "running") or (j.st.get("state") == "done" and old):
+                    j.start()          # a new test version re-runs: new days are fetched, then every test is analysed again
             except Exception as ex:  # noqa: BLE001
                 log("research_error", error=str(ex)[:200])
 

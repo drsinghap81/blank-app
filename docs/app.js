@@ -775,7 +775,7 @@ async function loadLive() {
     ${PF.systems.map((x) => `<div class="fact"><span>${esc(x.system)} (${x.n})</span><b class="${x.pnl >= 0 ? 'up' : 'down'}">${x.pct == null ? '' : `${x.pct >= 0 ? '+' : ''}${fmt(x.pct, 1)}%`}</b><small>${rs(x.pnl)}</small></div>`).join('')}</div></div>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${perfHtml}${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}
     <p class="lv-sub">🛡 <b>Daily stop raise:</b> Momentum stops follow the 30-week SMA, Trend 9/21 stops follow EMA 21, ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}% below, and only ever move up (the system itself sells on the close — see "Exits for the next open"). ${trTxt} <button class="lv-link" id="lvtrail">Check stops now</button></p></div>` : '';
-  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}
+  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}${S ? '<div id="adoptcard"></div><div id="rescard"></div>' : ''}
     ${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div>
     <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
@@ -801,7 +801,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) adoptCard(false); wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { adoptCard(false); resCard(); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -1044,6 +1044,23 @@ async function adoptCard(load) {
     catch (e) { alertMsg('Not released: ' + e.message); } }));
 }
 
+/* Research card (11 Nov 2026, owner): the server's intraday tests (ORB, sweeps, SMA cross, base breakouts) — progress, a short
+   table in R per trade net of costs against a random-time control, and a Copy button to paste the full results into a chat. */
+async function resCard() {
+  const box = $('#rescard'); if (!box || !isOwner()) return;
+  let R; try { R = await lvApi('/api/research/orb'); } catch (e) { box.innerHTML = ''; return; }
+  const res = R.results || {}; const B = res.base || {};
+  const row = (lab, k) => { const a = B[k], r = B[k + '_random']; if (!a || !a.n) return '';
+    const c = (v) => `<b class="${v > 0 ? 'up' : 'down'}">${v > 0 ? '+' : ''}${fmt(v, 2)}R</b>`;
+    return `<tr><td>${lab}</td><td>${a.n}</td><td>${fmt(a.win, 0)}%</td><td>${c(a.avgR)}</td><td>${r && r.n ? c(r.avgR) : '–'}</td></tr>`; };
+  const L = [];
+  for (const tf of [5, 15]) for (const sd of ['long', 'short']) for (const [f, fn] of [['all', 'any day'], ['trend', 'with daily trend'], ['trend_inplay', 'trend + in play']]) L.push(row(`${tf}-min ${sd} · ${fn}`, `base${tf}_${sd}_${f}_2R`));
+  box.innerHTML = `<details class="lv-card"><summary><span><b>Research · intraday tests</b><span class="lv-sub">${esc(R.state || '')}${R.progress ? ' · ' + esc(R.progress) : ''}${res.generated ? ' · results ' + esc(res.generated) : ''}</span></span></summary>
+    ${L.join('') ? `<p class="lv-sub">Intraday base breakout, Nifty 100, 2019–26, 2R target or 15:15 exit, 0.15% costs. Random = the same trades at a random time that day.</p>
+      <table class="mini"><tr><th>Setup</th><th>Trades</th><th>Win</th><th>Per trade</th><th>Random</th></tr>${L.join('')}</table>` : '<p class="lv-sub">The base-breakout results appear when the server finishes (it downloads and tests outside market hours).</p>'}
+    <button class="lv-btn" id="rescopy" style="margin-top:8px">Copy all results</button></details>`;
+  $('#rescopy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(JSON.stringify(res)); toast('Copied: paste it into the chat'); } catch (e) { alertMsg('Copy is blocked in this browser'); } });
+}
 /* Top Bottom (Bank Nifty futures) bot: approve each level here; the bot on the server trades only approved levels */
 async function tbLoad(inst = 'bn') {
   if (!isOwner()) { const b0 = $(inst === 'bn' ? '#tbcard' : '#tbcardn'); if (b0) b0.innerHTML = ''; return; }

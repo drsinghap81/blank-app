@@ -16,7 +16,10 @@ Tests (pure Python, no numpy/pandas):
      (relative volume >= 1). 15-minute range; green first candle -> buy-stop at the range high, red -> sell-stop at the low
      (shorts = intraday); stop 10% of the 14-day ATR (paper) or the other side of the range; exit 15:20. Equal 1% risk per trade.
 Costs: index futures 0.02% of price + 1 pt (Nifty) / 3 pts (Bank Nifty) slippage round trip; stocks intraday 0.15% round trip
-(charges + slippage). Results in R (multiples of the risk) net of costs, by year and 2016-20 / 2021-23 / 2024-26."""
+(charges + slippage).
+  D. Intraday base breakout (11 Nov 2026): see intraday_base() - 5- and 15-minute tight bases broken on 2x volume, with daily-trend
+     and in-play filters and a random-time control.
+Results in R (multiples of the risk) net of costs, by year and 2016-20 / 2021-23 / 2024-26."""
 import gzip
 import json
 import os
@@ -397,8 +400,88 @@ def stocks_in_play(dirp, top=10, stopm="atr"):
     return R, Y
 
 
+
+# ------------------------------------------------------------------ intraday base breakout (11 Nov 2026)
+VERSION = 2
+BASE = {5: dict(n=8, w=0.006), 15: dict(n=6, w=0.010)}   # tight base: the last n bars within w of price
+VOLX, TGT, COST = 2.0, 2.0, 0.0015                        # breakout bar volume >= 2x the base's average; 2R target; 0.15% round trip
+
+
+def _agg(bars, k):
+    if k == 1:
+        return bars
+    out = []
+    for i in range(0, len(bars), k):
+        g = bars[i:i + k]
+        out.append((g[0][0], g[0][1], max(b[2] for b in g), min(b[3] for b in g), g[-1][4], sum(b[5] for b in g)))
+    return out
+
+
+def _sim(B, j, side, e, stop, tgt):
+    """Enter at B[j] open (e); stop first if both are touched in one bar; exit 15:15 close otherwise."""
+    risk = abs(e - stop); t = e + side * tgt * risk if tgt else None; x = B[-1][4]
+    for b in B[j:]:
+        if (side > 0 and b[3] <= stop) or (side < 0 and b[2] >= stop):
+            x = min(b[1], stop) if side > 0 else max(b[1], stop); break
+        if t is not None and ((side > 0 and b[2] >= t) or (side < 0 and b[3] <= t)):
+            x = max(b[1], t) if side > 0 else min(b[1], t); break
+        if b[0] >= "15:15":
+            x = b[4]; break
+    return ((x - e) * side - e * COST) / risk
+
+
+def intraday_base(dirp, rnd=None):
+    """Tight intraday base (5- or 15-minute bars, from 09:45) broken by a bar that CLOSES beyond it on 2x volume -> enter at the
+    next bar's open, stop = the other side of the base, exit 2R or 15:15 (and an exit-at-15:15-only version). First signal per stock,
+    side and day. Filters: trend = yesterday's daily close above (long) / below (short) its daily EMA 21; in play = first-15-minute
+    volume >= 2x its 14-day average. Control: the same trades at a random bar of the same day (same side, same stop distance)."""
+    acc = {}
+    rr = random.Random(11)
+    def put(k, r, y):
+        a = acc.setdefault(k, ([], [])); a[0].append(r); a[1].append(y)
+    for fn in sorted(os.listdir(dirp)):
+        if not fn.startswith("stk_"):
+            continue
+        D = days(os.path.join(dirp, fn)); ema = None; prev_c = None; v15h = []
+        for dd, bars in D:
+            if len(bars) < 60:
+                continue
+            y = int(dd[:4]); v15 = sum(b[5] for b in bars if b[0] < "09:30")
+            trend = 0 if ema is None or prev_c is None else (1 if prev_c > ema else -1)
+            inplay = len(v15h) >= 14 and v15 > 0 and v15 >= 2 * sum(v15h[-14:]) / 14
+            for tf, cfg in BASE.items():
+                B = _agg(bars, tf // 5); n, w = cfg["n"], cfg["w"]; done = set()
+                elig = [j for j in range(1, len(B)) if "09:45" <= B[j - 1][0] <= "14:30"]
+                for i in range(n, len(B) - 1):
+                    if B[i][0] < "09:45" or B[i][0] > "14:30":
+                        continue
+                    base = B[i - n:i]; bh = max(b[2] for b in base); bl = min(b[3] for b in base); c0 = base[-1][4]
+                    if (bh - bl) / c0 > w:
+                        continue
+                    va = sum(b[5] for b in base) / n
+                    if va <= 0 or B[i][5] < VOLX * va:
+                        continue
+                    side = 1 if B[i][4] > bh else -1 if B[i][4] < bl else 0
+                    if not side or side in done:
+                        continue
+                    e = B[i + 1][1]; stop = bl if side > 0 else bh
+                    if (e - stop) * side <= 0.002 * e:
+                        continue
+                    done.add(side); sd = 'long' if side > 0 else 'short'
+                    fl = ['all'] + (['trend'] if trend == side else []) + (['inplay'] if inplay else []) + (['trend_inplay'] if trend == side and inplay else [])
+                    j0 = rr.choice(elig) if elig else i + 1; e0 = B[j0][1]; d = abs(e - stop)
+                    for ex, tg in (('2R', TGT), ('eod', None)):
+                        r = _sim(B, i + 1, side, e, stop, tg)
+                        rc = _sim(B, j0, side, e0, e0 - side * d, tg) if d > 0 else None
+                        for f in fl:
+                            put(f"base{tf}_{sd}_{f}_{ex}", r, y)
+                            if rc is not None:
+                                put(f"base{tf}_{sd}_{f}_{ex}_random", rc, y)
+            c = bars[-1][4]; prev_c = c; ema = c if ema is None else ema + (c - ema) * 2 / 22; v15h.append(v15)
+    return {k: _stats(*v) for k, v in sorted(acc.items())}
+
 def analyse(dirp):
-    out = dict(generated=_ist().isoformat(timespec="minutes"), index={}, stocks={})
+    out = dict(generated=_ist().isoformat(timespec="minutes"), version=VERSION, index={}, stocks={})
     for name, slip in (("NIFTY", 1.0), ("BANKNIFTY", 3.0)):
         D = days(os.path.join(dirp, f"idx_{name}.csv.gz"))
         if not D:
@@ -426,4 +509,5 @@ def analyse(dirp):
     for top in (10, 20):
         for stopm in ("atr", "range"):
             out["stocks"][f"top{top}_{stopm}"] = _stats(*stocks_in_play(dirp, top, stopm))
+    out["base"] = intraday_base(dirp)
     return out
