@@ -262,6 +262,74 @@ def sweep_orb(D, mins, mode, tgt, slip_pts, rnd=None, back=10):
     return R, Y
 
 
+def agg5(D):
+    """1-minute day lists -> one continuous list of 5-minute bars (date, hhmm, o, h, l, c)."""
+    out = []
+    for dd, bars in D:
+        g = {}
+        for b in bars:
+            m = int(b[0][:2]) * 60 + int(b[0][3:5]); k = m - (m - 555) % 5          # buckets from 09:15
+            g.setdefault(k, []).append(b)
+        for k in sorted(g):
+            x = g[k]; out.append((dd, f"{k // 60:02d}:{k % 60:02d}", x[0][1], max(y[2] for y in x), min(y[3] for y in x), x[-1][4]))
+    return out
+
+
+def sma_cross(B, slip_pts, stopm="candle", exitm="cross", fast=20, slow=200, wait=12, rnd=None):
+    """Amritpal 10 Nov 2026: on 5-minute bars, SMA20 crosses below SMA200 -> the first candle (within `wait` bars) that CLOSES
+    below the crossing level is the signal; short on a break of its low (next bars, within `wait`). Mirror for longs.
+    Crossing level = the average of the two SMAs on the cross bar. Stop: 'candle' = signal candle high (low for longs) or
+    'sma' = SMA200 at entry. Exit: 'cross' = the opposite SMA cross (held overnight, futures) or 'eod' = 15:15 the same day;
+    the stop always applies. One position at a time."""
+    c = [b[5] for b in B]; n = len(c); R, Y = [], []
+    def sma(k, i):
+        return sum(c[i - k + 1:i + 1]) / k if i >= k - 1 else None
+    f = [sma(fast, i) for i in range(n)]; sl = [sma(slow, i) for i in range(n)]
+    i = slow + 1
+    while i < n - 2:
+        if f[i - 1] is None or sl[i - 1] is None:
+            i += 1; continue
+        up = f[i - 1] <= sl[i - 1] and f[i] > sl[i]; dn = f[i - 1] >= sl[i - 1] and f[i] < sl[i]
+        if not (up or dn):
+            i += 1; continue
+        side = 1 if up else -1; lvl = (f[i] + sl[i]) / 2; sig = None
+        for j in range(i, min(n - 1, i + wait)):
+            if (side > 0 and c[j] > lvl) or (side < 0 and c[j] < lvl):
+                sig = j; break
+        if sig is None:
+            i += 1; continue
+        trig = B[sig][3] if side > 0 else B[sig][4]; ent = None
+        for k in range(sig + 1, min(n, sig + 1 + wait)):
+            if exitm == "eod" and (B[k][0] != B[sig][0] or B[k][1] > "15:10"):
+                break
+            if (side > 0 and B[k][3] > trig) or (side < 0 and B[k][4] < trig):
+                e = max(B[k][2], trig) if side > 0 else min(B[k][2], trig); ent = (k, e); break
+        if ent is None:
+            i = sig + 1; continue
+        k, e = ent
+        d_ = side if rnd is None else rnd.choice((1, -1))
+        stop = (B[sig][4] if side > 0 else B[sig][3]) if stopm == "candle" else sl[k]
+        dist = abs(e - stop)
+        if rnd is not None or (d_ > 0 and stop >= e) or (d_ < 0 and stop <= e):
+            stop = e - d_ * dist
+        if dist <= 0:
+            i = k + 1; continue
+        x = None; m = k
+        while m < n - 1:
+            m += 1; b = B[m]
+            if (d_ > 0 and b[4] <= stop) or (d_ < 0 and b[3] >= stop):
+                x = min(b[2], stop) if d_ > 0 else max(b[2], stop); break
+            if exitm == "eod" and (b[0] != B[k][0] or b[1] >= "15:15"):
+                x = b[5] if b[0] == B[k][0] else B[m - 1][5]; break
+            if exitm == "cross" and f[m] is not None and ((side > 0 and f[m] < sl[m]) or (side < 0 and f[m] > sl[m])):
+                x = b[5]; break
+        if x is None:
+            x = c[-1]
+        R.append(((x - e) * d_ - (0.0002 * e + slip_pts)) / dist); Y.append(int(B[k][0][:4]))
+        i = m + 1
+    return R, Y
+
+
 def first_candle(D, slip_pts, tgt=10.0):
     R, Y = [], []
     for dd, bars in D:
@@ -342,6 +410,12 @@ def analyse(dirp):
                 r[k] = _stats(*index_orb(D, mins, tgt, slip))
                 r[k + "_random"] = _stats(*index_orb(D, mins, tgt, slip, rnd=random.Random(7)))
         r["first5_10R"] = _stats(*first_candle(D, slip))
+        B = agg5(D)
+        for stopm in ("candle", "sma"):
+            for exitm in ("cross", "eod"):
+                k = f"sma20x200_{stopm}_{exitm}"
+                r[k] = _stats(*sma_cross(B, slip, stopm, exitm))
+                r[k + "_random"] = _stats(*sma_cross(B, slip, stopm, exitm, rnd=random.Random(7)))
         for mins in (5, 15, 30):
             for mode in ("reverse", "second"):
                 for tgt in (None, 2.0):
