@@ -694,7 +694,7 @@ async function loadLive() {
       <div id="lvarm" class="lv-form" hidden><input id="lvmpw" type="password" placeholder="App password" autocomplete="current-password"><input id="lvmcf" placeholder="Type LIVE" autocomplete="off" autocapitalize="characters"><button class="lv-btn sell" id="lvmgo">Turn on live</button></div>
       <p class="lv-sub">${live ? '<b class="down">Real orders.</b>' : '<b>Practice:</b> nothing is sent.'} <a href="#" id="lvout" title="Signs this device out; the server keeps its mode">Log out</a></p></div>`
     : `<div class="lv-card"><b>Connect your server</b><p class="lv-sub">${err ? `<span class="down">${esc(err)}</span> · ` : ''}Sizes below use your capital (${money(cap('NSE'), 'NSE')}) and ${rP.toFixed(2)}% risk (${nP} positions, loss limit ${lvBudget()}%); holdings and cash are not checked and there is no Send button until the AWS server is connected.</p>
-      <div class="lv-form"><input id="lvurl" type="url" placeholder="https://your-server.sslip.io" value="${esc(c.url || '')}" autocomplete="off"><input id="lvpw" type="password" placeholder="App password" autocomplete="current-password"><button class="lv-btn" id="lvgo">Connect</button></div></div>`;
+      <form class="lv-form" id="lvform" action="#" autocomplete="on"><input id="lvurl" name="username" type="url" placeholder="https://your-server.sslip.io" value="${esc(c.url || '')}" autocomplete="username"><input id="lvpw" name="password" type="password" placeholder="App password" autocomplete="current-password"><button class="lv-btn" id="lvgo" type="submit">Connect</button></form></div>`;
   const pend = rows.filter((r) => r.tier !== 'more' && r.tier !== 'swing' && !r.skip && r.qty > 0);
   const nTop = rows.filter((r) => r.tier !== 'more' && r.tier !== 'swing').length; const nMore = rows.filter((r) => r.tier === 'more').length;
   const swRows = rows.filter((r) => r.tier === 'swing'); const swPend = swRows.filter((r) => !r.skip && r.qty > 0);
@@ -773,7 +773,7 @@ async function loadLive() {
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>How these are picked and sized</summary><p>From the India systems that backtested well: monthly-ATH breakouts (this month or last, within −5%/+10% of the breakout price), buy-stops at ATH triggers within 5%, and 9/21 trend entries. Score = system (ATH 2-yr base 3, 1–2 yr 2, buy-stop 2, 9/21 3) + 2 if sector and stock RS are both positive + 1 if the theme RS is positive − 3 if the stock's 1-year RS is negative (ATH only; top-down did not help 9/21). The ranking combines tested pieces but is not itself a separately backtested system. Size: risk per trade from your drawdown budget (guard card, 95% Monte Carlo), at most 10% of capital in one stock, at most 10 positions, within the cash you have. US and Australia are excluded (no tested edge).</p></details>`;
-  const go = $('#lvgo'); if (go) go.addEventListener('click', async () => {
+  const lf = $('#lvform'); if (lf) lf.addEventListener('submit', async (ev) => { ev.preventDefault();
     const url = $('#lvurl').value.trim(); const pw = $('#lvpw').value;
     if (!/^https:\/\//.test(url)) { alertMsg('Use the https:// address the setup script printed.'); return; }
     lvSave({ url, token: null });
@@ -3236,6 +3236,15 @@ document.querySelectorAll('.views:not(.bg-nav) button').forEach((b) => b.addEven
 document.querySelectorAll('.markets button').forEach((b) => b.addEventListener('click', () => { state.mkt = b.dataset.mkt; state.selected = null; loadTrends(); setTimeout(livePoll, 600); }));
 document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => { state.tab = b.dataset.tab; state.selected = null; renderTrends(); }));
 $('#q').addEventListener('input', (e) => { state.q = e.target.value; renderList(); });
+/* Browsers' password managers sometimes autofill the saved server address (the Live login) into a search box, which then
+   matches nothing. A search box never needs a web address: drop one as soon as it lands (input/change, and once after load). */
+const isUrlTxt = (v) => /^\s*https?:\/\//i.test(v || '');
+['input', 'change'].forEach((ev) => document.addEventListener(ev, (e) => {
+  const t = e.target; if (t && t.type === 'search' && isUrlTxt(t.value)) { t.value = ''; if (t.id === 'q') state.q = ''; }
+}, true));
+[800, 2500].forEach((ms) => setTimeout(() => document.querySelectorAll('input[type=search]').forEach((t) => {
+  if (isUrlTxt(t.value)) { t.value = ''; t.dispatchEvent(new Event('input', { bubbles: true })); }
+}), ms));
 $('#size').addEventListener('change', (e) => { state.size = e.target.value; renderList(); });
 $('#setup').addEventListener('change', (e) => { state.setup = e.target.value; renderList(); });
 $('#btn-download').addEventListener('click', download);
