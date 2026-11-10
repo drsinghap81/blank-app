@@ -1,317 +1,314 @@
 symbol,setup,signal_date,signal_close,stop,rsi_signal,value_cr,supertrend,st_up,close,entry,risk_pct,days,status,gain_pct,R,name,board
-TEM,52w-high base breakout,2026-11-09,84.44,74.31,61.9,479.54,62.03,True,84.44,,13.6,0,NEW - buy next open,,,"Tempus AI, Inc.",Nasdaq
-IQV,EMA 9/21 cross,2026-11-09,278.84,252.38,59.7,387.26,253.7,True,278.84,,10.5,0,NEW - buy next open,,,"IQVIA Holdings, Inc. Common Stock",NYSE
-FWONK,52w-high base breakout,2026-11-09,108.01,95.05,79.1,281.64,96.86,True,108.01,,13.6,0,NEW - buy next open,,,Liberty Media Corporation - Series C Common Stock,Nasdaq
-FROG,EMA 9/21 cross,2026-11-09,108.18,73.97,59.6,221.12,76.03,True,108.18,,46.2,0,NEW but stop > 12% away - skip unless it opens lower,,,JFrog Ltd. - Ordinary shares,Nasdaq
-LNC,EMA 9/21 cross,2026-11-09,42.98,38.55,59.6,83.54,38.91,True,42.98,,11.5,0,NEW - buy next open,,,Lincoln National Corporation Common Stock,NYSE
-VNT,52w-high base breakout,2026-11-09,43.88,38.61,89.7,58.88,37.85,True,43.88,,13.6,0,NEW - buy next open,,,Vontier Corporation Common Stock,NYSE
-ETON,EMA 9/21 cross,2026-11-09,64.35,47.03,69.5,26.24,48.44,True,64.35,,36.8,0,NEW but stop > 12% away - skip unless it opens lower,,,"Eton Pharmaceuticals, Inc.",Nasdaq
-NBN,EMA 9/21 cross,2026-11-09,134.33,124.78,58.7,16.74,121.3,True,134.33,,7.7,0,NEW - buy next open,,,Northeast Bank,Nasdaq
-JOE,52w-high base breakout,2026-11-09,75.13,67.07,68.0,16.72,65.44,True,75.13,,12.0,0,NEW - buy next open,,,St. Joe Company (The) Common Stock,NYSE
-MSFT,EMA 9/21 cross,2026-11-04,555.8,504.96,64.3,13818.9,502.47,True,545.18,554.94,9.9,3,open,-1.8,-0.2,Microsoft Corporation,Nasdaq
-MA,EMA 9/21 cross,2026-10-09,589.14,550.32,65.3,2265.58,620.49,True,655.81,592.86,7.7,21,open,10.6,1.48,Mastercard Incorporated Common Stock,NYSE
-PG,EMA 9/21 cross,2026-10-06,147.43,142.46,56.3,1755.68,158.2,True,168.32,147.7,3.7,24,open,14.0,3.93,Procter & Gamble Company (The) Common Stock,NYSE
-KO,EMA 9/21 cross,2026-10-12,89.79,85.67,63.0,1754.78,91.04,True,96.03,90.56,5.7,20,open,6.0,1.12,Coca-Cola Company (The) Common Stock,NYSE
-TMO,52w-high base breakout,2026-09-15,641.39,594.36,67.4,1675.46,646.03,True,721.63,642.0,8.0,39,open,12.4,1.67,Thermo Fisher Scientific Inc Common Stock,NYSE
-ABBV,EMA 9/21 cross,2026-09-14,260.17,245.26,57.0,1630.54,275.32,True,293.3,258.41,5.4,40,open,13.5,2.65,AbbVie Inc. Common Stock,NYSE
-MDT,52w-high base breakout,2026-11-04,104.96,95.17,73.8,1500.98,96.6,True,102.79,106.05,11.4,3,open,-3.1,-0.3,Medtronic plc. Ordinary Shares,NYSE
-GILD,EMA 9/21 cross,2026-10-09,151.17,142.6,59.4,1142.08,158.04,True,169.32,151.84,6.5,21,open,11.5,1.89,"Gilead Sciences, Inc.",Nasdaq
-GILD,52w-high base breakout,2026-10-14,153.54,144.65,61.3,1142.08,158.04,True,169.32,156.39,8.1,18,open,8.3,1.1,"Gilead Sciences, Inc.",Nasdaq
-DHR,EMA 9/21 cross,2026-09-17,212.12,198.74,57.7,1018.74,215.52,True,235.12,212.26,6.8,37,open,10.8,1.69,Danaher Corporation Common Stock,NYSE
-BLK,52w-high base breakout,2026-11-04,1224.37,1136.9,70.2,893.44,1114.55,True,1214.71,1235.78,8.7,3,open,-1.7,-0.21,"BlackRock, Inc. Common Stock",NYSE
-ABNB,EMA 9/21 cross,2026-10-15,174.28,162.16,61.9,779.76,171.21,True,190.29,175.43,8.2,17,open,8.5,1.12,"Airbnb, Inc.",Nasdaq
-MCK,52w-high base breakout,2026-10-15,998.64,925.0,74.9,756.92,1004.96,True,1059.37,1012.2,9.4,17,open,4.7,0.54,McKesson Corporation Common Stock,NYSE
-HCA,EMA 9/21 cross,2026-09-09,421.05,395.27,57.0,691.28,454.89,True,504.89,421.83,6.7,43,open,19.7,3.13,"HCA Healthcare, Inc. Common Stock",NYSE
-MO,EMA 9/21 cross,2026-10-07,69.38,65.78,57.3,665.22,73.28,True,75.81,70.0,6.4,23,open,8.3,1.38,"Altria Group, Inc.",NYSE
-KDP,EMA 9/21 cross,2026-10-12,32.75,30.5,61.4,648.86,33.89,True,36.94,33.06,8.4,20,open,11.7,1.52,Keurig Dr Pepper Inc.,Nasdaq
-TGT,EMA 9/21 cross,2026-11-04,163.1,148.81,61.1,611.68,146.44,True,165.9,165.44,11.2,3,open,0.3,0.03,Target Corporation Common Stock,NYSE
-U,52w-high base breakout,2026-11-06,51.49,45.31,72.1,568.52,43.9,True,51.43,52.15,15.1,1,open,-1.4,-0.11,Unity Software Inc. Common Stock,NYSE
-DUK,52w-high base breakout,2026-11-05,130.08,126.27,70.4,546.42,124.42,True,128.1,127.21,0.7,2,open,0.7,0.95,Duke Energy Corporation (Holding Company) Common Stock,NYSE
-ECL,52w-high base breakout,2026-11-02,308.38,283.99,76.9,517.62,290.89,True,306.74,307.6,8.3,5,open,-0.3,-0.04,Ecolab Inc. Common Stock,NYSE
-ROST,EMA 9/21 cross,2026-11-04,245.74,225.3,63.9,507.08,222.95,True,237.0,249.3,10.7,3,open,-4.9,-0.51,"Ross Stores, Inc.",Nasdaq
-VEEV,52w-high base breakout,2026-10-13,301.63,279.02,71.9,497.42,293.51,True,306.4,300.14,7.6,19,open,2.1,0.3,Veeva Systems Inc. Class A Common Stock,NYSE
-CL,52w-high base breakout,2026-11-02,97.43,90.47,66.6,492.5,92.45,True,97.94,96.76,7.0,5,open,1.2,0.19,Colgate-Palmolive Company Common Stock,NYSE
-WDAY,EMA 9/21 cross,2026-10-15,196.63,184.87,59.1,466.96,188.51,True,190.21,196.84,6.5,17,open,-3.4,-0.55,"Workday, Inc.",Nasdaq
-FOXA,EMA 9/21 cross,2026-11-03,67.1,62.1,58.0,448.08,61.8,True,67.69,68.25,9.9,4,open,-0.8,-0.09,Fox Corporation,Nasdaq
-PTC,EMA 9/21 cross,2026-10-01,146.47,133.67,58.7,427.58,190.49,True,195.87,148.03,10.7,27,open,32.3,3.33,PTC Inc.,Nasdaq
-PTC,52w-high base breakout,2026-10-27,194.62,193.1,78.8,427.58,190.49,True,195.87,194.21,0.6,9,open,0.9,1.5,PTC Inc.,Nasdaq
-NDAQ,52w-high base breakout,2026-10-22,103.3,92.86,74.0,375.56,101.62,True,108.5,102.7,10.6,12,open,5.6,0.59,"Nasdaq, Inc.",Nasdaq
-MTD,52w-high base breakout,2026-09-24,1519.15,1385.13,72.0,351.84,1599.73,True,1762.28,1510.39,9.0,32,open,16.7,2.01,"Mettler-Toledo International, Inc. Common Stock",NYSE
-NVS,52w-high base breakout,2026-11-04,164.98,158.93,70.5,337.44,153.23,True,163.69,163.24,2.7,3,open,0.3,0.1,Novartis AG Common Stock,NYSE
-MET,EMA 9/21 cross,2026-10-08,97.89,93.43,58.4,328.66,95.97,True,101.67,97.52,4.4,22,open,4.3,1.01,"MetLife, Inc. Common Stock",NYSE
-QGEN,EMA 9/21 cross,2026-09-17,44.38,41.74,59.4,317.74,48.59,True,50.55,44.3,6.1,37,open,14.1,2.44,Qiagen N.V. Common Shares,NYSE
-SN,EMA 9/21 cross,2026-09-28,181.99,165.3,60.6,311.96,202.48,True,229.51,184.05,11.3,30,open,24.7,2.42,"SharkNinja, Inc. Ordinary Shares",NYSE
-HAS,52w-high base breakout,2026-10-20,109.52,96.38,83.3,306.94,111.59,True,120.92,110.27,14.4,14,open,9.7,0.77,"Hasbro, Inc.",Nasdaq
-DLTR,52w-high base breakout,2026-11-04,147.0,129.36,73.2,284.34,125.67,True,137.23,144.57,11.8,3,open,-5.1,-0.48,"Dollar Tree, Inc.",Nasdaq
-ED,52w-high base breakout,2026-10-22,116.26,109.16,74.5,274.96,114.31,True,118.39,116.0,6.3,12,open,2.1,0.35,"Consolidated Edison, Inc. Common Stock",NYSE
-ICLR,EMA 9/21 cross,2026-10-15,175.13,159.72,59.5,247.3,182.11,True,207.59,173.58,8.7,17,open,19.6,2.45,ICON plc - Ordinary Shares,Nasdaq
-CPAY,EMA 9/21 cross,2026-11-02,409.29,391.01,56.4,233.96,417.33,True,457.97,407.95,4.3,5,open,12.3,2.95,"Corpay, Inc. Common Stock",NYSE
-ALLE,52w-high base breakout,2026-10-23,178.98,157.5,79.9,223.94,177.99,True,190.52,178.91,13.6,11,open,6.5,0.54,Allegion plc Ordinary Shares,NYSE
-MEDP,EMA 9/21 cross,2026-09-15,620.48,577.64,63.8,220.18,619.35,True,672.93,616.99,6.8,39,open,9.1,1.42,"Medpace Holdings, Inc.",Nasdaq
-MEDP,52w-high base breakout,2026-08-21,620.75,571.01,66.4,220.18,619.35,True,672.93,614.15,7.6,55,open,9.6,1.36,"Medpace Holdings, Inc.",Nasdaq
-BJ,EMA 9/21 cross,2026-09-28,96.81,89.89,60.3,210.08,103.45,True,109.8,95.98,6.8,30,open,14.4,2.27,"BJ's Wholesale Club Holdings, Inc. Common Stock",NYSE
-CRBG,EMA 9/21 cross,2026-09-02,33.3,31.73,59.4,189.92,32.91,True,35.89,33.69,6.2,47,open,6.5,1.13,Corebridge Financial Inc. Common Stock,NYSE
-GDDY,EMA 9/21 cross,2026-10-08,103.19,95.62,57.6,189.02,105.25,True,111.71,103.02,7.7,22,open,8.4,1.17,GoDaddy Inc. Class A Common Stock,NYSE
-ANF,52w-high base breakout,2026-08-26,147.75,130.02,79.1,182.58,149.37,True,152.81,144.7,11.3,52,open,5.6,0.55,Abercrombie & Fitch Company Common Stock,NYSE
-ONC,EMA 9/21 cross,2026-10-15,374.08,344.94,61.6,177.98,370.53,True,417.33,372.57,8.0,17,open,12.0,1.62,BeOne Medicines Ltd. - American Depositary Shares,Nasdaq
-ONC,52w-high base breakout,2026-10-20,384.5,344.94,65.6,177.98,370.53,True,417.33,383.51,11.2,14,open,8.8,0.88,BeOne Medicines Ltd. - American Depositary Shares,Nasdaq
-ELF,52w-high base breakout,2026-11-06,116.14,105.36,60.8,171.58,103.13,True,119.35,117.76,11.8,1,open,1.4,0.13,"e.l.f. Beauty, Inc. Common Stock",NYSE
-BALL,52w-high base breakout,2026-11-02,68.07,62.3,74.7,170.44,62.66,True,66.81,67.0,7.5,5,open,-0.3,-0.04,Ball Corporation Common Stock,NYSE
-WRB,52w-high base breakout,2026-11-04,76.71,72.14,65.7,167.54,73.04,True,75.92,77.67,7.7,3,open,-2.3,-0.32,W.R. Berkley Corporation Common Stock,NYSE
-EHC,EMA 9/21 cross,2026-10-29,131.49,120.95,64.4,164.06,128.82,True,141.15,134.53,11.2,7,open,4.9,0.49,Encompass Health Corporation Common Stock,NYSE
-DD,52w-high base breakout,2026-11-03,153.46,136.66,82.3,163.4,141.56,True,155.14,155.24,13.6,4,open,-0.1,-0.01,"DuPont de Nemours, Inc. Common Stock",NYSE
-J,52w-high base breakout,2026-10-30,154.62,144.1,72.3,153.56,147.24,True,156.39,155.07,7.6,6,open,0.9,0.12,Jacobs Solutions Inc. Common Stock,NYSE
-AVY,52w-high base breakout,2026-11-04,192.59,177.65,73.9,125.44,176.7,True,188.05,193.26,8.8,3,open,-2.7,-0.33,Avery Dennison Corporation Common Stock,NYSE
-CVLT,EMA 9/21 cross,2026-09-15,143.3,129.5,58.1,124.36,150.32,True,166.21,141.42,9.2,39,open,17.5,2.08,"Commvault Systems, Inc.",Nasdaq
-COKE,EMA 9/21 cross,2026-10-09,196.01,187.58,55.6,118.92,193.39,True,207.97,197.8,5.4,21,open,5.1,1.0,"Coca-Cola Consolidated, Inc.",Nasdaq
-JXN,EMA 9/21 cross,2026-10-27,135.06,127.91,57.0,113.04,128.21,True,135.51,135.18,5.7,9,open,0.2,0.05,Jackson Financial Inc. Class A Common Stock,NYSE
-TGTX,EMA 9/21 cross,2026-10-27,56.44,51.83,57.2,108.18,54.01,True,63.38,55.84,7.7,9,open,13.5,1.88,"TG Therapeutics, Inc.",Nasdaq
-BNS,EMA 9/21 cross,2026-10-20,92.28,89.12,57.5,107.56,91.22,True,93.34,93.0,4.4,14,open,0.4,0.09,Bank Nova Scotia Halifax Pfd 3 Ordinary Shares,NYSE
-REXR,EMA 9/21 cross,2026-10-23,38.71,35.73,61.1,104.58,35.87,True,38.7,38.65,8.2,11,open,0.1,0.02,"Rexford Industrial Realty, Inc. Common Stock",NYSE
-SIG,52w-high base breakout,2026-10-08,105.57,99.96,64.1,93.44,112.44,True,118.58,105.38,5.4,22,open,12.5,2.43,Signet Jewelers Limited Common Shares,NYSE
-ASO,52w-high base breakout,2026-10-22,61.78,57.55,80.9,90.06,61.02,True,71.18,60.97,5.9,12,open,16.7,2.99,"Academy Sports and Outdoors, Inc.",Nasdaq
-URBN,EMA 9/21 cross,2026-10-02,80.8,74.22,62.7,87.4,83.2,True,88.27,81.02,9.2,26,open,8.9,1.07,"Urban Outfitters, Inc.",Nasdaq
-URBN,52w-high base breakout,2026-08-26,82.95,73.0,65.7,87.4,83.2,True,88.27,82.7,13.3,52,open,6.7,0.57,"Urban Outfitters, Inc.",Nasdaq
-FCN,52w-high base breakout,2026-11-02,191.77,168.76,83.8,87.18,174.3,True,194.07,189.26,12.1,5,open,2.5,0.23,"FTI Consulting, Inc. Common Stock",NYSE
-SEIC,EMA 9/21 cross,2026-11-04,108.62,102.59,60.9,84.28,100.67,True,108.56,109.64,6.9,3,open,-1.0,-0.15,SEI Investments Company,Nasdaq
-GSAT,EMA 9/21 cross,2026-09-17,82.52,81.55,55.7,82.78,81.91,True,85.78,82.4,1.0,37,open,4.1,3.98,"Globalstar, Inc.",Nasdaq
-G,EMA 9/21 cross,2026-10-14,35.33,33.17,57.0,81.24,38.09,True,42.55,36.0,8.5,18,open,18.2,2.31,Genpact Limited Common Stock,NYSE
-TTC,52w-high base breakout,2026-10-15,100.82,95.35,65.6,68.94,102.14,True,107.91,101.46,6.4,17,open,6.4,1.06,Toro Company (The) Common Stock,NYSE
-SAIC,EMA 9/21 cross,2026-10-12,133.05,121.0,58.1,60.12,139.54,True,150.96,133.28,10.1,20,open,13.3,1.44,Science Applications International Corporation,Nasdaq
-BCPC,52w-high base breakout,2026-11-04,182.58,166.53,68.6,58.3,167.98,True,175.99,183.9,10.4,3,open,-4.3,-0.46,Balchem Corporation,Nasdaq
-APPN,52w-high base breakout,2026-10-21,48.73,42.88,71.5,56.14,44.33,True,51.15,48.81,13.8,13,open,4.8,0.39,Appian Corporation,Nasdaq
-MEOH,EMA 9/21 cross,2026-10-06,60.81,57.01,56.0,55.82,60.33,True,66.49,61.92,8.6,24,open,7.4,0.93,Methanex Corporation,Nasdaq
-WTM,52w-high base breakout,2026-11-04,2376.3,2198.8,78.9,53.7,2171.45,True,2256.2,2289.88,4.1,3,open,-1.5,-0.37,"White Mountains Insurance Group, Ltd. Common Stock",NYSE
-FOX,EMA 9/21 cross,2026-11-03,59.63,55.38,57.4,53.16,55.26,True,60.51,60.04,8.4,4,open,0.8,0.1,Fox Corporation,Nasdaq
-CBC,EMA 9/21 cross,2026-10-08,32.37,31.41,55.2,36.6,35.56,True,38.53,32.25,2.7,22,open,19.5,7.43,"Central Bancompany, Inc.",Nasdaq
-RGR,52w-high base breakout,2026-10-19,45.9,40.98,72.3,31.9,44.18,True,50.9,44.52,8.6,15,open,14.3,1.8,"Sturm, Ruger & Company, Inc. Common Stock",NYSE
-HMC,52w-high base breakout,2026-10-14,33.45,32.11,64.1,29.3,34.28,True,35.84,33.8,5.3,18,open,6.0,1.21,"Honda Motor Company, Ltd. Common Stock",NYSE
-ECPG,EMA 9/21 cross,2026-10-08,100.06,95.42,56.9,27.8,101.2,True,111.98,100.13,4.9,22,open,11.8,2.52,Encore Capital Group Inc,Nasdaq
-FWONA,52w-high base breakout,2026-11-05,99.72,87.75,79.2,24.94,91.16,True,102.83,98.6,12.4,2,open,4.3,0.39,Liberty Media Corporation - Series A Common Stock,Nasdaq
-DFIN,EMA 9/21 cross,2026-10-07,49.8,46.38,58.3,20.62,62.06,True,67.58,49.8,7.4,23,open,35.7,5.19,"Donnelley Financial Solutions, Inc. Common Stock",NYSE
-ABM,EMA 9/21 cross,2026-09-08,50.29,45.49,70.2,20.48,51.18,True,53.77,50.29,10.6,44,open,6.9,0.72,ABM Industries Incorporated Common Stock,NYSE
-FRHC,EMA 9/21 cross,2026-08-18,160.8,144.02,59.5,19.28,170.14,True,174.6,157.8,9.6,58,open,10.6,1.22,Freedom Holding Corp.,Nasdaq
-ESQ,EMA 9/21 cross,2026-10-22,123.19,116.35,58.7,18.58,118.66,True,133.43,122.29,5.1,12,open,9.1,1.88,"Esquire Financial Holdings, Inc.",Nasdaq
-EGBN,EMA 9/21 cross,2026-10-20,28.55,27.34,55.3,16.84,31.37,True,34.15,28.68,4.9,14,open,19.1,4.08,"Eagle Bancorp, Inc.",Nasdaq
-IDT,EMA 9/21 cross,2026-09-28,69.5,66.18,56.8,15.48,76.33,True,82.63,70.76,6.9,30,open,16.8,2.59,IDT Corporation Class B Common Stock,NYSE
-NWN,52w-high base breakout,2026-11-05,51.81,49.49,71.4,15.12,49.66,True,52.02,51.36,3.8,2,open,1.3,0.35,Northwest Natural Holding Company Common Stock,NYSE
-WFG,EMA 9/21 cross,2026-11-04,69.74,64.72,58.3,14.24,63.79,True,68.08,69.89,8.0,3,open,-2.6,-0.35,West Fraser Timber Co. Ltd Common stock,NYSE
-AMTB,EMA 9/21 cross,2026-10-22,29.66,28.45,57.4,13.48,27.99,True,30.11,30.85,8.4,12,open,-2.4,-0.31,Amerant Bancorp Inc. Class A Common Stock,NYSE
-UVE,EMA 9/21 cross,2026-10-07,45.25,41.79,64.2,11.64,44.94,True,46.47,45.02,7.7,23,open,3.2,0.45,UNIVERSAL INSURANCE HOLDINGS INC Common Stock,NYSE
-SCL,EMA 9/21 cross,2026-10-21,63.9,61.34,60.2,11.4,65.09,True,68.09,64.0,4.3,13,open,6.4,1.54,Stepan Company Common Stock,NYSE
-SCL,52w-high base breakout,2026-10-28,68.41,63.3,75.7,11.4,65.09,True,68.09,68.55,8.3,8,open,-0.7,-0.09,Stepan Company Common Stock,NYSE
-WABC,EMA 9/21 cross,2026-10-15,60.42,57.4,60.0,10.28,57.87,True,60.05,60.94,6.2,17,open,-1.5,-0.25,Westamerica Bancorporation,Nasdaq
-GSBC,EMA 9/21 cross,2026-10-23,80.93,76.0,63.3,6.46,78.15,True,81.95,81.34,7.0,11,open,0.7,0.11,"Great Southern Bancorp, Inc.",Nasdaq
-RRBI,EMA 9/21 cross,2026-10-22,102.73,99.48,56.1,6.44,100.28,True,105.16,102.15,2.7,12,open,2.9,1.13,"Red River Bancshares, Inc.",Nasdaq
-SMP,52w-high base breakout,2026-11-02,45.65,40.17,83.9,6.34,41.06,True,44.72,45.88,14.2,5,open,-2.5,-0.2,"Standard Motor Products, Inc. Common Stock",NYSE
-CBNK,EMA 9/21 cross,2026-09-30,39.31,35.52,72.6,6.24,40.74,True,42.75,39.09,10.1,28,open,9.4,1.03,"Capital Bancorp, Inc.",Nasdaq
-CHMG,EMA 9/21 cross,2026-10-23,83.88,79.48,62.4,5.78,81.96,True,86.29,84.55,6.4,11,open,2.1,0.34,Chemung Financial Corp,Nasdaq
-CAC,EMA 9/21 cross,2026-10-22,57.86,55.57,59.9,5.04,55.16,True,58.73,57.37,3.2,12,open,2.4,0.76,Camden National Corporation,Nasdaq
-BWFG,EMA 9/21 cross,2026-10-22,67.03,64.62,57.4,4.72,67.87,True,70.62,66.71,3.2,12,open,5.9,1.87,"Bankwell Financial Group, Inc.",Nasdaq
-HBT,EMA 9/21 cross,2026-10-23,36.24,34.92,56.0,4.36,35.06,True,37.47,37.08,6.2,11,open,1.1,0.18,"HBT Financial, Inc.",Nasdaq
-FRAF,EMA 9/21 cross,2026-10-22,63.19,61.28,55.0,3.98,66.14,True,70.26,63.19,3.1,12,open,11.2,3.7,Franklin Financial Services Corporation,Nasdaq
-ACNB,EMA 9/21 cross,2026-10-22,65.39,62.27,64.0,3.88,63.22,True,66.67,65.19,4.7,12,open,2.3,0.51,ACNB Corporation,Nasdaq
-PLBC,EMA 9/21 cross,2026-10-20,62.21,60.44,55.7,3.46,60.09,True,62.81,62.28,3.0,14,open,0.9,0.29,Plumas Bancorp,Nasdaq
-CZFS,EMA 9/21 cross,2026-10-21,81.57,78.29,57.7,3.2,79.77,True,86.18,81.15,3.7,13,open,6.2,1.76,"Citizens Financial Services, Inc.",Nasdaq
-ACU,EMA 9/21 cross,2026-10-20,63.58,60.29,58.8,2.5,64.12,True,69.24,63.63,5.5,14,open,8.8,1.68,Acme United Corporation. Common Stock,NYSE American
-MSFT,52w-high base breakout,2026-10-12,541.15,518.79,69.9,13818.9,502.47,True,545.18,544.64,5.0,20,stopped 2026-10-23,-4.9,-1.04,Microsoft Corporation,Nasdaq
-MRVL,EMA 9/21 cross,2026-09-09,234.96,201.06,55.5,5743.86,196.63,False,154.6,227.98,13.4,43,skipped (stop too far / gap below stop),,,"Marvell Technology, Inc.",Nasdaq
-PLTR,52w-high base breakout,2026-10-09,209.05,187.63,76.3,4880.24,191.28,False,169.2,208.9,11.3,21,stopped 2026-10-16,-10.2,-1.0,Palantir Technologies Inc.,Nasdaq
-NBIS,EMA 9/21 cross,2026-09-21,232.8,206.85,55.4,4117.4,173.75,False,141.45,233.24,12.8,35,skipped (stop too far / gap below stop),,,Nebius Group N.V. - Class A Ordinary Shares,Nasdaq
-CRWD,EMA 9/21 cross,2026-10-27,268.02,228.7,60.3,2374.96,267.25,False,228.58,270.46,18.3,9,skipped (stop too far / gap below stop),,,"CrowdStrike Holdings, Inc.",Nasdaq
-MA,52w-high base breakout,2026-08-24,598.95,562.33,73.4,2265.58,620.49,True,655.81,595.97,6.0,54,stopped 2026-09-10,-5.6,-1.0,Mastercard Incorporated Common Stock,NYSE
-PANW,EMA 9/21 cross,2026-09-15,375.09,327.05,58.0,2236.32,384.83,False,330.89,367.51,12.4,39,skipped (stop too far / gap below stop),,,"Palo Alto Networks, Inc.",Nasdaq
-HOOD,EMA 9/21 cross,2026-08-21,108.13,91.44,62.5,1855.24,96.3,False,83.32,106.86,16.9,55,skipped (stop too far / gap below stop),,,"Robinhood Markets, Inc.",Nasdaq
-CVX,EMA 9/21 cross,2026-10-08,211.55,201.96,59.2,1847.9,227.12,False,210.78,211.05,4.5,22,exited 2026-11-05 (Supertrend red),4.2,0.99,Chevron Corporation Common Stock,NYSE
-ACN,EMA 9/21 cross,2026-10-01,210.61,170.74,70.0,1579.12,235.24,True,254.37,209.34,22.6,27,skipped (stop too far / gap below stop),,,Accenture plc Class A Ordinary Shares (Ireland),NYSE
-SHOP,52w-high base breakout,2026-10-12,179.22,161.37,76.9,1496.5,168.96,False,152.06,175.8,8.9,20,stopped 2026-10-30,-8.2,-1.0,Shopify Inc. - Class A Subordinate Voting Shares,Nasdaq
-WFC,EMA 9/21 cross,2026-09-02,88.74,83.23,62.3,1311.06,80.24,True,85.49,89.27,7.3,47,stopped 2026-09-22,-6.8,-1.0,Wells Fargo & Company Common Stock,NYSE
-NET,EMA 9/21 cross,2026-09-09,314.18,269.3,58.6,1215.44,304.4,False,293.75,313.35,16.4,43,skipped (stop too far / gap below stop),,,"Cloudflare, Inc. Class A Common Stock",NYSE
-MELI,EMA 9/21 cross,2026-08-19,1908.65,1759.21,57.7,1151.28,1762.19,False,1532.68,1897.76,7.9,57,exited 2026-09-18 (Supertrend red),-3.8,-0.52,"MercadoLibre, Inc.",Nasdaq
-OKTA,EMA 9/21 cross,2026-08-27,172.91,127.6,70.4,1040.54,215.47,False,177.57,172.2,35.0,51,skipped (stop too far / gap below stop),,,"Okta, Inc.",Nasdaq
-PM,EMA 9/21 cross,2026-08-20,189.89,182.71,55.1,1031.52,213.73,False,193.12,189.35,3.6,56,stopped 2026-09-04,-3.5,-1.0,Philip Morris International Inc Common Stock,NYSE
-FTNT,EMA 9/21 cross,2026-09-14,170.18,152.0,59.9,931.16,147.7,False,122.47,168.67,11.0,40,exited 2026-10-19 (Supertrend red),1.4,0.14,"Fortinet, Inc.",Nasdaq
-REGN,52w-high base breakout,2026-08-18,810.24,783.69,78.7,830.0,872.96,True,919.96,817.17,4.3,58,stopped 2026-08-31,-4.3,-1.04,"Regeneron Pharmaceuticals, Inc.",Nasdaq
-NEM,52w-high base breakout,2026-08-21,131.31,115.59,75.9,805.22,110.81,True,125.16,133.12,15.2,55,stopped 2026-09-28,-13.2,-1.0,Newmont Corporation,NYSE
-DE,EMA 9/21 cross,2026-08-21,645.93,577.93,62.4,737.78,628.37,True,691.28,651.49,12.7,55,skipped (stop too far / gap below stop),,,Deere & Company Common Stock,NYSE
-DE,52w-high base breakout,2026-09-01,674.47,615.74,66.2,737.78,628.37,True,691.28,676.45,9.9,48,exited 2026-10-08 (Supertrend red),-4.1,-0.46,Deere & Company Common Stock,NYSE
-JCI,EMA 9/21 cross,2026-10-28,157.35,140.66,59.7,713.96,154.48,False,141.49,155.74,10.7,8,stopped 2026-11-04,-9.7,-1.0,Johnson Controls International plc Ordinary Share,NYSE
-HUM,EMA 9/21 cross,2026-10-05,403.21,375.43,59.0,605.92,380.02,True,423.22,404.16,7.7,25,stopped 2026-10-08,-7.1,-1.0,Humana Inc. Common Stock,NYSE
-MDB,EMA 9/21 cross,2026-09-22,427.69,372.0,59.3,567.18,378.32,False,327.37,429.34,15.4,34,skipped (stop too far / gap below stop),,,"MongoDB, Inc.",Nasdaq
-DVN,52w-high base breakout,2026-10-23,51.39,48.4,61.6,516.56,47.33,False,42.4,51.39,6.2,11,stopped 2026-11-03,-6.6,-1.13,Devon Energy Corporation Common Stock,NYSE
-XYZ,EMA 9/21 cross,2026-11-04,87.63,74.81,70.8,497.82,77.15,True,88.56,88.29,18.0,3,skipped (stop too far / gap below stop),,,"Block, Inc. Class A Common Stock,",NYSE
-SMTC,EMA 9/21 cross,2026-08-27,142.43,115.0,55.5,492.8,137.27,False,116.45,141.76,23.3,51,skipped (stop too far / gap below stop),,,Semtech Corporation,Nasdaq
-TEL,EMA 9/21 cross,2026-10-27,225.35,204.63,64.1,488.24,204.8,True,218.75,230.0,12.4,9,skipped (stop too far / gap below stop),,,TE Connectivity plc Ordinary Shares,NYSE
-CRL,EMA 9/21 cross,2026-09-22,285.11,270.88,57.0,438.36,375.57,False,353.34,283.85,4.8,34,exited 2026-11-05 (Supertrend red),16.3,3.57,"Charles River Laboratories International, Inc. Common Stock",NYSE
-ARGX,EMA 9/21 cross,2026-08-17,987.84,837.42,68.5,374.44,855.64,True,962.27,988.49,18.0,59,skipped (stop too far / gap below stop),,,argenx SE - American Depositary Shares,Nasdaq
-A,52w-high base breakout,2026-08-20,156.07,146.97,78.2,370.78,166.48,True,180.17,156.27,6.3,56,stopped 2026-09-08,-5.9,-1.0,"Agilent Technologies, Inc. Common Stock",NYSE
-GH,EMA 9/21 cross,2026-09-14,167.84,155.78,56.9,352.88,176.62,False,158.79,168.25,8.0,40,exited 2026-10-19 (Supertrend red),-4.5,-0.61,"Guardant Health, Inc.",Nasdaq
-NVS,EMA 9/21 cross,2026-09-01,161.25,151.69,58.7,337.44,153.23,True,163.69,160.8,6.0,48,stopped 2026-09-08,-13.0,-2.29,Novartis AG Common Stock,NYSE
-VRSN,EMA 9/21 cross,2026-08-24,290.79,271.1,57.9,336.02,291.05,True,305.84,289.03,6.6,54,exited 2026-09-29 (Supertrend red),-3.4,-0.55,"VeriSign, Inc.",Nasdaq
-ETSY,EMA 9/21 cross,2026-08-24,87.03,78.41,62.3,329.34,81.78,True,88.44,87.0,11.0,54,stopped 2026-09-04,-9.9,-1.0,"Etsy, Inc. Common Stock",NYSE
-RRC,52w-high base breakout,2026-10-26,53.56,47.13,84.9,319.04,55.14,False,48.85,53.67,13.9,10,exited 2026-11-09 (Supertrend red),-9.2,-0.76,Range Resources Corporation Common Stock,NYSE
-GMAB,52w-high base breakout,2026-09-28,35.36,34.36,66.0,318.0,49.23,True,55.8,34.94,1.7,30,stopped 2026-10-02,-1.7,-1.0,Genmab A/S - American Depositary Shares,Nasdaq
-GPN,EMA 9/21 cross,2026-10-30,96.84,80.85,72.1,310.86,87.2,True,97.77,97.43,20.5,6,skipped (stop too far / gap below stop),,,Global Payments Inc. Common Stock,NYSE
-WST,EMA 9/21 cross,2026-09-15,365.0,331.99,67.3,310.26,431.11,False,413.09,363.11,9.4,39,exited 2026-11-06 (Supertrend red),7.3,0.85,"West Pharmaceutical Services, Inc. Common Stock",NYSE
-DG,EMA 9/21 cross,2026-08-24,124.71,116.93,56.0,309.32,123.9,True,136.68,124.16,6.2,54,exited 2026-10-01 (Supertrend red),-3.8,-0.65,Dollar General Corporation Common Stock,NYSE
-ROIV,EMA 9/21 cross,2026-09-08,41.48,33.43,72.5,290.26,35.27,True,40.67,41.39,23.8,44,skipped (stop too far / gap below stop),,,Roivant Sciences Ltd. - Common Shares,Nasdaq
-GRMN,EMA 9/21 cross,2026-09-24,295.04,270.93,64.3,281.78,301.07,False,291.8,296.51,9.4,32,stopped 2026-10-08,-8.6,-1.0,Garmin Ltd. Common Stock (Switzerland),NYSE
-BBY,EMA 9/21 cross,2026-10-15,94.17,84.83,63.6,280.38,90.62,True,106.28,95.04,12.0,17,skipped (stop too far / gap below stop),,,"Best Buy Co., Inc. Common Stock",NYSE
-EXPD,EMA 9/21 cross,2026-10-02,192.47,184.32,58.0,274.28,205.53,False,189.59,192.36,4.4,26,exited 2026-11-09 (Supertrend red),-3.5,-0.83,"Expeditors International of Washington, Inc. Common Stock",NYSE
-WCC,EMA 9/21 cross,2026-09-22,362.08,330.72,58.0,269.3,354.83,False,316.47,360.0,8.9,34,exited 2026-10-19 (Supertrend red),-3.3,-0.4,"WESCO International, Inc. Common Stock",NYSE
-IT,EMA 9/21 cross,2026-09-14,197.07,166.01,59.2,266.0,225.08,False,191.02,192.45,15.9,40,skipped (stop too far / gap below stop),,,"Gartner, Inc. Common Stock",NYSE
-W,EMA 9/21 cross,2026-09-14,104.79,96.49,57.8,264.78,103.28,True,116.87,103.82,7.6,40,stopped 2026-09-24,-7.1,-1.0,Wayfair Inc. Class A Common Stock,NYSE
-W,52w-high base breakout,2026-10-29,120.12,110.47,70.6,264.78,103.28,True,116.87,118.59,7.4,7,stopped 2026-11-03,-6.8,-1.0,Wayfair Inc. Class A Common Stock,NYSE
-DGX,EMA 9/21 cross,2026-09-15,246.16,227.72,64.6,249.58,237.21,True,259.67,244.56,7.4,39,stopped 2026-09-22,-6.9,-1.0,Quest Diagnostics Incorporated Common Stock,NYSE
-ZBRA,EMA 9/21 cross,2026-09-22,361.61,338.67,59.4,248.14,372.92,False,326.71,362.99,7.2,34,stopped 2026-11-03,-14.2,-2.11,Zebra Technologies Corporation,Nasdaq
-RGEN,EMA 9/21 cross,2026-09-15,174.73,161.14,58.8,238.7,189.56,False,178.94,174.9,8.5,39,exited 2026-10-08 (Supertrend red),-6.2,-0.79,Repligen Corporation,Nasdaq
-IFF,EMA 9/21 cross,2026-09-22,85.79,82.7,57.6,234.68,92.08,False,84.43,85.17,3.0,34,stopped 2026-10-01,-2.9,-1.0,"International Flavors & Fragrances, Inc. Common Stock",NYSE
-CHD,EMA 9/21 cross,2026-08-24,102.53,96.27,58.7,232.52,104.88,True,111.31,102.09,6.0,54,stopped 2026-09-09,-6.7,-1.18,"Church & Dwight Company, Inc. Common Stock",NYSE
-PRU,EMA 9/21 cross,2026-09-03,123.2,116.61,61.0,230.92,115.4,True,122.05,122.07,4.7,46,stopped 2026-09-16,-4.5,-1.0,"Prudential Financial, Inc. Common Stock",NYSE
-INCY,EMA 9/21 cross,2026-09-17,127.62,119.97,57.7,221.62,109.32,True,121.89,127.85,6.6,37,stopped 2026-10-01,-6.2,-1.0,Incyte Corporation,Nasdaq
-WTW,52w-high base breakout,2026-08-24,349.58,326.69,72.2,195.58,313.59,True,327.01,347.32,6.3,54,stopped 2026-09-08,-5.9,-1.0,Willis Towers Watson Public Limited Company - Ordinary Shares,Nasdaq
-CLH,EMA 9/21 cross,2026-10-05,322.37,308.32,60.6,192.22,309.91,False,287.6,322.07,4.5,25,stopped 2026-10-28,-4.3,-1.0,"Clean Harbors, Inc. Common Stock",NYSE
-JAZZ,EMA 9/21 cross,2026-08-21,254.28,243.16,55.1,186.06,215.12,True,243.54,253.66,4.3,55,stopped 2026-08-31,-4.8,-1.17,Jazz Pharmaceuticals plc - Ordinary Shares,Nasdaq
-OSCR,EMA 9/21 cross,2026-11-04,35.19,29.62,64.2,184.46,29.69,True,32.14,34.31,15.9,3,skipped (stop too far / gap below stop),,,"Oscar Health, Inc. Class A Common Stock",NYSE
-SSNC,52w-high base breakout,2026-10-22,89.54,83.59,80.5,182.84,83.98,False,77.89,87.19,4.3,12,stopped 2026-10-23,-4.1,-1.0,"SS&C Technologies Holdings, Inc.",Nasdaq
-CAKE,EMA 9/21 cross,2026-09-29,107.35,101.74,57.4,179.72,116.43,False,110.96,107.35,5.5,29,stopped 2026-10-28,-6.7,-1.29,The Cheesecake Factory Incorporated,Nasdaq
-AMCR,52w-high base breakout,2026-11-02,49.02,45.08,79.6,177.44,49.5,False,45.14,48.41,7.4,5,stopped 2026-11-05,-6.9,-1.0,Amcor plc Ordinary Shares,NYSE
-TENB,EMA 9/21 cross,2026-08-28,37.67,31.97,57.2,176.58,52.17,False,43.67,37.21,16.4,50,skipped (stop too far / gap below stop),,,"Tenable Holdings, Inc.",Nasdaq
-RNR,EMA 9/21 cross,2026-10-09,331.38,321.25,57.6,175.38,354.32,False,348.6,332.96,3.6,21,stopped 2026-10-28,-3.5,-1.0,RenaissanceRe Holdings Ltd. Common Stock,NYSE
-BAH,EMA 9/21 cross,2026-09-11,75.9,71.14,56.5,173.76,79.96,True,86.7,78.0,9.6,41,stopped 2026-09-28,-8.8,-1.0,Booz Allen Hamilton Holding Corporation Common Stock,NYSE
-RYTM,52w-high base breakout,2026-08-19,115.73,113.66,60.6,172.5,93.87,True,113.94,114.51,0.7,57,stopped 2026-08-20,-0.7,-1.0,"Rhythm Pharmaceuticals, Inc.",Nasdaq
-RGLD,EMA 9/21 cross,2026-11-05,261.28,225.23,63.4,171.14,245.57,True,282.66,258.3,14.7,2,skipped (stop too far / gap below stop),,,"Royal Gold, Inc.",Nasdaq
-QLYS,EMA 9/21 cross,2026-09-16,183.06,149.13,56.4,170.2,232.66,False,202.46,180.82,21.2,38,skipped (stop too far / gap below stop),,,"Qualys, Inc.",Nasdaq
-ZETA,EMA 9/21 cross,2026-09-30,31.57,28.03,60.8,165.88,35.14,False,32.42,32.03,14.3,28,skipped (stop too far / gap below stop),,,Zeta Global Holdings Corp. Class A Common Stock,NYSE
-BTSG,EMA 9/21 cross,2026-10-30,66.89,58.03,67.3,164.66,60.75,True,69.15,67.5,16.3,6,skipped (stop too far / gap below stop),,,"BrightSpring Health Services, Inc.",Nasdaq
-EHC,52w-high base breakout,2026-10-14,126.56,121.43,63.5,164.06,128.82,True,141.15,128.74,6.0,18,stopped 2026-10-20,-5.7,-1.0,Encompass Health Corporation Common Stock,NYSE
-IOT,EMA 9/21 cross,2026-10-02,41.12,36.4,57.9,159.1,38.88,True,42.23,42.0,15.4,26,skipped (stop too far / gap below stop),,,Samsara Inc. Class A Common Stock,NYSE
-BRKR,EMA 9/21 cross,2026-09-17,63.0,51.5,61.7,153.4,53.46,True,66.54,63.32,23.0,37,skipped (stop too far / gap below stop),,,Bruker Corporation,Nasdaq
-PFG,EMA 9/21 cross,2026-09-03,118.51,107.83,68.6,147.56,107.48,True,115.39,117.03,8.5,46,exited 2026-10-07 (Supertrend red),-6.8,-0.87,Principal Financial Group Inc,Nasdaq
-UHS,EMA 9/21 cross,2026-11-04,196.46,170.32,64.8,145.24,174.74,True,197.16,200.0,17.4,3,skipped (stop too far / gap below stop),,,"Universal Health Services, Inc. Common Stock",NYSE
-TRMB,EMA 9/21 cross,2026-10-06,60.95,56.88,63.8,139.2,62.19,False,54.68,60.46,6.3,24,stopped 2026-11-04,-5.9,-1.0,Trimble Inc.,Nasdaq
-PCVX,EMA 9/21 cross,2026-10-05,73.82,55.84,76.6,136.7,70.65,False,67.53,73.35,31.4,25,skipped (stop too far / gap below stop),,,"Vaxcyte, Inc.",Nasdaq
-BEN,EMA 9/21 cross,2026-09-04,34.38,32.5,57.1,131.7,31.39,True,35.87,34.13,5.0,45,stopped 2026-09-16,-4.8,-1.0,"Franklin Templeton, Inc. Common Stock",NYSE
-MSM,EMA 9/21 cross,2026-08-17,124.6,117.72,55.6,129.44,125.73,False,119.26,124.71,5.9,59,stopped 2026-08-20,-5.6,-1.0,"MSC Industrial Direct Company, Inc. Common Stock",NYSE
-DBX,EMA 9/21 cross,2026-10-13,35.6,32.94,57.5,126.44,37.33,False,32.58,35.51,7.8,19,stopped 2026-11-09,-7.2,-1.0,"Dropbox, Inc.",Nasdaq
-CVLT,52w-high base breakout,2026-10-13,158.85,148.43,64.1,124.36,150.32,True,166.21,157.07,5.8,19,stopped 2026-10-16,-5.5,-1.0,"Commvault Systems, Inc.",Nasdaq
-BOX,EMA 9/21 cross,2026-10-05,35.34,31.12,61.5,122.82,40.65,True,41.65,35.72,14.8,25,skipped (stop too far / gap below stop),,,"Box, Inc. Class A Common Stock",NYSE
-NDSN,EMA 9/21 cross,2026-10-29,329.1,314.02,55.7,119.78,339.41,False,323.84,326.97,4.1,7,stopped 2026-11-05,-4.0,-1.0,Nordson Corporation,Nasdaq
-COKE,52w-high base breakout,2026-11-05,212.5,200.96,59.3,118.92,193.39,True,207.97,208.36,3.7,2,stopped 2026-11-09,-3.6,-1.0,"Coca-Cola Consolidated, Inc.",Nasdaq
-OPCH,EMA 9/21 cross,2026-10-06,31.0,22.29,83.7,115.38,30.85,True,31.69,31.03,39.2,24,skipped (stop too far / gap below stop),,,"Option Care Health, Inc.",Nasdaq
-ARW,EMA 9/21 cross,2026-08-17,220.36,203.35,56.4,107.44,216.17,False,191.84,215.6,6.0,59,stopped 2026-08-24,-5.7,-1.0,"Arrow Electronics, Inc. Common Stock",NYSE
-AIT,EMA 9/21 cross,2026-10-21,338.89,327.51,55.5,105.32,315.85,False,297.32,336.81,2.8,13,stopped 2026-10-22,-2.8,-1.0,"Applied Industrial Technologies, Inc. Common Stock",NYSE
-HURN,52w-high base breakout,2026-10-22,193.35,173.43,79.2,100.38,193.5,False,161.57,199.75,15.2,12,stopped 2026-11-04,-13.2,-1.0,Huron Consulting Group Inc.,Nasdaq
-STNG,EMA 9/21 cross,2026-10-26,87.13,79.54,57.9,99.0,92.07,False,79.62,86.11,8.3,10,exited 2026-11-06 (Supertrend red),-4.8,-0.63,Scorpio Tankers Inc. Common Shares,NYSE
-DB,52w-high base breakout,2026-08-25,39.04,37.53,65.8,96.92,33.22,True,36.57,40.53,8.0,53,exited 2026-09-16 (Supertrend red),-4.8,-0.64,Deutsche Bank AG Common Stock,NYSE
-BXP,EMA 9/21 cross,2026-08-25,71.31,65.93,63.1,95.32,60.71,True,66.19,70.99,7.7,53,stopped 2026-09-01,-7.1,-1.0,"BXP, Inc. Common Stock",NYSE
-APPF,EMA 9/21 cross,2026-10-16,212.13,198.62,55.3,93.56,201.76,True,229.49,210.75,6.1,16,stopped 2026-10-28,-5.9,-1.02,"AppFolio, Inc.",Nasdaq
-CVI,52w-high base breakout,2026-08-26,40.03,35.79,66.1,93.4,51.13,False,39.1,40.04,11.9,52,exited 2026-11-04 (Supertrend red),17.9,1.69,CVR Energy Inc. Common Stock,NYSE
-HESM,EMA 9/21 cross,2026-08-26,39.07,37.6,55.7,91.48,32.94,False,30.46,38.99,3.7,52,stopped 2026-09-24,-3.6,-1.0,Hess Midstream LP Class A Representing Limited Partner Interests,NYSE
-KNSA,EMA 9/21 cross,2026-10-27,89.2,70.67,65.1,88.44,81.14,True,98.76,87.88,24.3,9,skipped (stop too far / gap below stop),,,"Kiniksa Pharmaceuticals International, plc - Class A Ordinary Shares",Nasdaq
-HAE,EMA 9/21 cross,2026-10-08,119.47,101.32,76.6,84.96,114.18,True,118.21,119.81,18.2,22,skipped (stop too far / gap below stop),,,Haemonetics Corporation Common Stock,NYSE
-VAL,EMA 9/21 cross,2026-09-15,88.23,80.79,55.9,79.04,93.32,False,78.55,87.4,8.2,39,stopped 2026-09-22,-7.9,-1.05,Valaris Limited Common Shares,NYSE
-RHP,EMA 9/21 cross,2026-08-24,129.84,121.6,60.1,79.0,126.11,True,135.42,130.69,7.5,54,stopped 2026-09-01,-7.0,-1.0,"Ryman Hospitality Properties, Inc. (REIT)",NYSE
-TARS,52w-high base breakout,2026-09-02,82.76,72.83,78.5,74.8,78.99,False,70.84,82.76,13.6,47,exited 2026-09-23 (Supertrend red),-6.7,-0.56,"Tarsus Pharmaceuticals, Inc.",Nasdaq
-CGON,EMA 9/21 cross,2026-09-21,78.25,72.48,59.4,73.62,61.58,True,74.74,78.31,8.0,35,stopped 2026-09-23,-7.4,-1.0,"CG Oncology, Inc. - Common stock",Nasdaq
-PARR,EMA 9/21 cross,2026-10-01,86.21,74.23,62.1,71.62,81.71,False,68.61,85.31,14.9,27,skipped (stop too far / gap below stop),,,"Par Pacific Holdings, Inc.  Common Stock",NYSE
-SXT,EMA 9/21 cross,2026-10-07,132.0,127.76,55.6,71.14,128.2,False,121.68,131.13,2.6,23,stopped 2026-10-30,-14.6,-5.68,Sensient Technologies Corporation Common Stock,NYSE
-MUR,52w-high base breakout,2026-10-19,42.54,38.06,70.4,70.76,40.52,False,34.55,43.1,13.2,15,exited 2026-11-04 (Supertrend red),-10.5,-0.9,Murphy Oil Corporation Common Stock,NYSE
-GEO,EMA 9/21 cross,2026-10-05,32.34,30.15,57.0,70.52,30.19,False,30.14,32.2,6.8,25,stopped 2026-10-06,-6.4,-1.0,Geo Group Inc (The) REIT,NYSE
-EWTX,EMA 9/21 cross,2026-09-11,44.4,41.6,56.0,68.72,37.19,True,48.74,43.98,5.7,41,stopped 2026-09-23,-5.4,-1.0,"Edgewise Therapeutics, Inc.",Nasdaq
-CWST,EMA 9/21 cross,2026-08-20,93.05,88.39,55.2,68.2,89.15,True,99.02,93.62,5.9,56,exited 2026-09-18 (Supertrend red),-4.9,-0.88,"Casella Waste Systems, Inc.",Nasdaq
-MFC,EMA 9/21 cross,2026-09-03,44.59,41.91,63.1,67.26,46.11,False,44.22,44.37,5.9,46,stopped 2026-10-01,-5.5,-1.0,Manulife Financial Corporation Common Stock,NYSE
-AUGO,EMA 9/21 cross,2026-10-09,91.26,80.28,61.3,66.26,65.0,True,86.99,89.89,12.0,21,stopped 2026-10-22,-10.7,-1.0,Aura Minerals Inc. - Common Shares,Nasdaq
-TS,EMA 9/21 cross,2026-10-05,58.46,54.29,63.9,64.34,61.46,False,59.48,57.2,5.4,25,exited 2026-11-05 (Supertrend red),6.5,1.28,Tenaris S.A. American Depositary Shares,NYSE
-DDS,52w-high base breakout,2026-10-22,719.61,649.31,69.1,63.86,710.79,False,651.6,706.62,8.8,12,stopped 2026-10-28,-8.3,-1.02,"Dillard's, Inc. Common Stock",Other
-YPF,EMA 9/21 cross,2026-08-17,52.7,47.86,59.8,62.08,44.33,False,38.09,53.04,10.8,59,exited 2026-09-30 (Supertrend red),-4.9,-0.5,YPF Sociedad Anonima American Depositary Shares,NYSE
-WGS,52w-high base breakout,2026-09-15,94.64,83.28,70.2,60.48,78.83,False,65.72,94.23,13.1,39,exited 2026-09-24 (Supertrend red),-10.4,-0.89,GeneDx Holdings Corp.,Nasdaq
-ADPT,EMA 9/21 cross,2026-09-15,26.68,23.53,65.9,57.16,24.05,True,30.26,27.09,15.1,39,skipped (stop too far / gap below stop),,,Adaptive Biotechnologies Corporation,Nasdaq
-UGI,52w-high base breakout,2026-08-18,38.01,34.43,68.7,54.14,37.03,True,37.49,38.12,10.7,58,exited 2026-10-01 (Supertrend red),-6.9,-0.71,UGI Corporation Common Stock,NYSE
-MRX,EMA 9/21 cross,2026-10-05,75.21,68.0,57.7,50.4,72.91,False,67.91,75.98,11.7,25,stopped 2026-10-15,-10.5,-1.0,Marex Group Limited - Ordinary Shares,Nasdaq
-DCI,EMA 9/21 cross,2026-08-26,95.24,91.81,56.8,49.56,89.48,False,88.21,93.52,1.9,52,stopped 2026-08-27,-1.8,-1.0,"Donaldson Company, Inc. Common Stock",NYSE
-NWE,EMA 9/21 cross,2026-08-26,71.48,69.0,56.0,49.1,78.16,True,84.1,70.83,2.7,52,stopped 2026-08-31,-2.6,-1.0,"NorthWestern Energy Group, Inc.",Nasdaq
-SDGR,EMA 9/21 cross,2026-10-28,30.87,22.01,65.1,46.4,24.16,True,33.39,30.42,38.2,8,skipped (stop too far / gap below stop),,,"Schrodinger, Inc.",Nasdaq
-BWIN,EMA 9/21 cross,2026-09-14,32.0,27.74,60.1,46.38,31.64,True,32.15,32.0,15.4,40,skipped (stop too far / gap below stop),,,"The Baldwin Insurance Group, Inc.",Nasdaq
-ERO,52w-high base breakout,2026-08-21,39.42,34.69,72.6,46.3,34.11,False,31.32,39.54,14.0,55,stopped 2026-09-01,-12.3,-1.0,Ero Copper Corp. Common Shares,NYSE
-AMN,EMA 9/21 cross,2026-09-16,34.92,32.66,56.0,45.92,45.87,False,37.71,34.93,7.0,38,exited 2026-11-09 (Supertrend red),4.1,0.63,AMN Healthcare Services Inc,NYSE
-ICUI,EMA 9/21 cross,2026-10-22,168.33,159.02,58.9,45.44,154.68,True,178.85,166.92,5.0,12,stopped 2026-10-28,-4.7,-1.0,"ICU Medical, Inc.",Nasdaq
-HRMY,52w-high base breakout,2026-09-01,41.25,38.87,65.6,44.5,38.62,False,33.78,41.31,6.3,48,stopped 2026-09-30,-5.9,-1.0,"Harmony Biosciences Holdings, Inc.",Nasdaq
-CXT,52w-high base breakout,2026-10-29,60.22,55.97,74.9,43.96,55.51,True,59.65,59.98,7.2,7,stopped 2026-11-05,-6.7,-1.0,"Crane NXT, Co. Common Stock",NYSE
-PCRX,EMA 9/21 cross,2026-10-08,36.39,24.56,85.1,41.2,35.74,True,36.46,36.33,47.9,22,skipped (stop too far / gap below stop),,,"Pacira BioSciences, Inc.",Nasdaq
-IRDM,EMA 9/21 cross,2026-09-22,48.65,46.56,57.4,38.3,46.1,False,45.08,48.6,4.4,34,stopped 2026-10-13,-4.2,-1.0,Iridium Communications Inc,Nasdaq
-INTA,EMA 9/21 cross,2026-10-09,39.61,36.5,60.2,38.18,45.82,False,44.47,40.0,9.6,21,exited 2026-10-29 (Supertrend red),-2.2,-0.25,"Intapp, Inc.",Nasdaq
-HCI,52w-high base breakout,2026-10-20,204.28,191.72,72.9,37.12,206.77,False,186.25,203.36,6.1,14,stopped 2026-11-05,-5.7,-1.0,"HCI Group, Inc. Common Stock",NYSE
-IDYA,EMA 9/21 cross,2026-09-22,39.71,37.24,58.4,36.76,35.26,False,32.03,39.74,6.7,34,stopped 2026-09-23,-6.3,-1.0,"IDEAYA Biosciences, Inc.",Nasdaq
-UFPT,EMA 9/21 cross,2026-11-04,329.82,277.81,68.3,34.84,277.98,True,318.86,326.13,17.4,3,skipped (stop too far / gap below stop),,,"UFP Technologies, Inc.",Nasdaq
-BH,EMA 9/21 cross,2026-09-02,393.99,370.31,56.4,33.34,392.03,False,373.55,397.01,7.2,47,stopped 2026-09-08,-6.7,-1.0,Biglari Holdings Inc. Class B Common Stock,NYSE
-DXPE,EMA 9/21 cross,2026-10-02,193.98,179.81,58.5,32.86,173.79,False,156.54,194.1,7.9,26,stopped 2026-10-07,-7.4,-1.0,"DXP Enterprises, Inc.",Nasdaq
-TX,EMA 9/21 cross,2026-10-05,57.97,53.22,61.4,32.34,55.22,False,51.24,58.35,9.6,25,stopped 2026-10-26,-8.8,-1.0,"Ternium S.A. Ternium S.A. American Depositary Shares (each representing ten shares, USD1.00 par value)",NYSE
-LB,EMA 9/21 cross,2026-10-08,87.46,80.41,59.6,31.64,78.95,False,65.24,86.86,8.0,22,stopped 2026-10-15,-7.4,-1.0,LandBridge Corporation Class A Common Stock,NYSE
-LB,52w-high base breakout,2026-08-20,86.91,76.48,63.9,31.64,78.95,False,65.24,87.38,14.3,56,stopped 2026-10-22,-12.5,-1.0,LandBridge Corporation Class A Common Stock,NYSE
-CDP,EMA 9/21 cross,2026-08-24,37.11,36.15,56.9,31.24,34.82,False,33.46,37.16,2.8,54,stopped 2026-08-31,-3.1,-1.15,COPT Defense Properties Common Shares of Beneficial Interest,NYSE
-SPB,EMA 9/21 cross,2026-09-02,89.29,85.41,55.1,30.82,81.28,True,89.33,89.42,4.7,47,stopped 2026-09-09,-4.5,-1.0,"Spectrum Brands Holdings, Inc. Common Stock",NYSE
-HNI,EMA 9/21 cross,2026-10-13,47.72,45.61,56.0,28.22,45.8,True,49.75,46.85,2.7,19,stopped 2026-10-20,-2.6,-1.0,HNI Corporation Common Stock,NYSE
-NKTR,EMA 9/21 cross,2026-09-03,76.37,70.0,59.6,28.04,42.95,False,37.83,74.67,6.7,46,stopped 2026-09-11,-6.3,-1.0,Nektar Therapeutics,Nasdaq
-ZD,EMA 9/21 cross,2026-10-12,57.58,54.13,57.3,27.6,57.62,False,50.56,57.87,6.9,20,stopped 2026-10-30,-6.5,-1.0,"Ziff Davis, Inc.",Nasdaq
-PAY,EMA 9/21 cross,2026-11-02,35.05,31.17,61.6,26.94,30.0,True,34.21,33.74,8.2,5,stopped 2026-11-03,-7.6,-1.0,"Paymentus Holdings, Inc. Class A Common Stock",NYSE
-TNET,EMA 9/21 cross,2026-09-15,68.93,64.62,55.7,26.52,74.76,False,64.63,68.21,5.6,39,stopped 2026-09-24,-5.3,-1.0,"TriNet Group, Inc. Common Stock",NYSE
-DJCO,52w-high base breakout,2026-09-14,677.05,610.0,75.6,26.32,581.54,True,661.08,674.78,10.6,40,stopped 2026-10-16,-9.6,-1.0,Daily Journal Corp. (S.C.),Nasdaq
-AGM,EMA 9/21 cross,2026-09-04,226.16,215.46,59.2,24.66,204.53,False,181.57,227.1,5.4,45,stopped 2026-09-25,-5.1,-1.0,Federal Agricultural Mortgage Corporation Common Stock,NYSE
-PLUS,EMA 9/21 cross,2026-09-03,90.87,86.07,60.2,24.04,97.83,False,94.46,91.17,5.9,46,stopped 2026-11-05,-5.6,-1.0,ePlus inc.,Nasdaq
-BLTE,52w-high base breakout,2026-09-04,193.61,170.38,72.6,23.6,162.9,False,157.69,192.71,13.1,45,stopped 2026-09-15,-11.6,-1.0,"Belite Bio, Inc - American Depositary Shares",Nasdaq
-FSV,EMA 9/21 cross,2026-08-19,146.18,137.47,57.6,23.5,141.34,True,157.05,146.18,6.3,57,stopped 2026-09-02,-6.0,-1.0,FirstService Corporation - Common Shares,Nasdaq
-NSP,EMA 9/21 cross,2026-10-15,50.8,47.49,57.3,23.5,56.28,False,49.41,51.2,7.8,17,stopped 2026-10-29,-7.2,-1.0,"Insperity, Inc. Common Stock",NYSE
-DIN,EMA 9/21 cross,2026-08-24,35.87,32.52,55.6,22.86,31.12,True,37.22,35.85,10.2,54,stopped 2026-09-01,-9.9,-1.07,"Dine Brands Global, Inc. Common Stock",NYSE
-PRLB,EMA 9/21 cross,2026-09-17,86.42,77.88,60.7,21.58,80.38,False,69.09,86.99,11.7,37,exited 2026-10-16 (Supertrend red),0.2,0.02,"Proto Labs, Inc. Common stock",NYSE
-CNMD,EMA 9/21 cross,2026-11-04,53.66,43.5,68.6,20.94,45.54,True,51.94,54.4,25.1,3,skipped (stop too far / gap below stop),,,CONMED Corporation Common Stock,NYSE
-PLSE,EMA 9/21 cross,2026-10-09,53.81,47.31,59.3,20.5,46.21,True,58.17,53.53,13.1,21,skipped (stop too far / gap below stop),,,"Pulse Biosciences, Inc",Nasdaq
-OFG,EMA 9/21 cross,2026-09-02,52.34,51.11,55.5,17.88,49.65,True,51.17,52.65,3.0,47,stopped 2026-09-04,-2.9,-1.0,OFG Bancorp Common Stock,NYSE
-NPK,EMA 9/21 cross,2026-10-01,150.12,142.61,55.2,17.72,140.55,True,146.54,150.7,5.7,27,stopped 2026-11-05,-5.4,-1.0,"National Presto Industries, Inc. Common Stock",NYSE
-DCOM,EMA 9/21 cross,2026-09-04,40.98,39.09,58.7,17.08,40.2,True,42.59,40.78,4.3,45,stopped 2026-09-29,-4.1,-1.0,"Dime Commercial Bancshares, Inc. Common Stock",NYSE
-WOR,52w-high base breakout,2026-09-04,62.26,56.12,70.7,17.04,59.67,True,62.67,62.06,10.6,45,exited 2026-09-14 (Supertrend red),-9.7,-1.01,"Worthington Enterprises, Inc. Common Shares",NYSE
-VEON,52w-high base breakout,2026-08-21,59.38,55.0,69.8,15.7,87.12,False,76.73,59.37,7.9,55,exited 2026-11-04 (Supertrend red),33.4,4.53,VEON Ltd. - American Depositary Shares,Nasdaq
-FET,EMA 9/21 cross,2026-10-19,85.06,76.51,55.9,15.38,85.63,False,71.27,85.39,11.6,15,exited 2026-11-04 (Supertrend red),-11.0,-1.06,"Forum Energy Technologies, Inc. Common Stock",NYSE
-ITIC,EMA 9/21 cross,2026-10-08,298.63,287.5,57.3,14.96,286.45,False,259.84,300.54,4.5,22,stopped 2026-10-14,-4.3,-1.0,Investors Title Company,Nasdaq
-CSTL,EMA 9/21 cross,2026-10-28,36.68,32.69,62.3,14.46,32.37,True,34.38,37.57,14.9,8,skipped (stop too far / gap below stop),,,"Castle Biosciences, Inc. - Common stock",Nasdaq
-BFC,EMA 9/21 cross,2026-09-04,155.61,147.73,58.3,13.42,139.4,True,150.57,154.79,4.8,45,stopped 2026-10-01,-4.6,-1.0,Bank First Corporation,Nasdaq
-PDS,52w-high base breakout,2026-10-28,105.47,92.81,78.4,13.1,105.63,False,92.34,104.49,12.6,8,stopped 2026-11-04,-11.2,-1.0,Precision Drilling Corporation Common Stock,NYSE
-TFPM,EMA 9/21 cross,2026-09-22,33.73,31.39,55.1,12.82,28.96,True,32.97,32.82,4.6,34,stopped 2026-09-28,-5.6,-1.29,Triple Flag Precious Metals Corp. Common Shares,NYSE
-GSL,EMA 9/21 cross,2026-10-02,45.79,43.25,59.4,11.98,42.44,False,41.21,45.91,6.2,26,stopped 2026-10-14,-5.8,-1.0,Global Ship Lease Inc New Class A Common Shares,NYSE
-RIGL,52w-high base breakout,2026-10-29,51.45,47.47,65.2,11.64,48.73,False,42.05,51.8,9.1,7,stopped 2026-11-03,-8.4,-1.0,"Rigel Pharmaceuticals, Inc.",Nasdaq
-FIZZ,EMA 9/21 cross,2026-08-19,32.1,30.41,56.4,11.52,34.14,True,37.47,31.87,4.8,57,stopped 2026-09-11,-7.9,-1.72,National Beverage Corp.,Nasdaq
-TMP,EMA 9/21 cross,2026-09-25,98.83,95.78,55.9,11.42,95.31,True,100.76,98.34,2.7,31,stopped 2026-09-29,-2.6,-1.0,Tompkins Financial Corporation Common Stock,NYSE American
-HIPO,52w-high base breakout,2026-10-21,38.39,34.59,82.6,11.1,38.72,False,36.07,38.53,11.4,13,exited 2026-11-04 (Supertrend red),-7.3,-0.72,Hippo Holdings Inc. Common Stock,NYSE
-GEF.B,EMA 9/21 cross,2026-10-15,110.19,104.07,57.8,10.94,112.87,False,105.46,110.8,6.5,17,exited 2026-11-05 (Supertrend red),-3.5,-0.57,"Greif, Inc. Corporation Class B Common Stock",NYSE
-CTBI,EMA 9/21 cross,2026-09-04,77.05,74.36,57.9,9.96,75.79,False,70.22,76.89,3.4,45,stopped 2026-09-23,-3.3,-1.0,"Community Trust Bancorp, Inc.",Nasdaq
-PNRG,EMA 9/21 cross,2026-10-23,215.75,198.32,56.8,9.36,211.55,False,186.7,213.0,7.4,11,exited 2026-11-03 (Supertrend red),-4.8,-0.69,PrimeEnergy Resources Corporation,Nasdaq
-IX,EMA 9/21 cross,2026-09-03,41.19,38.82,61.6,8.98,36.7,False,34.13,40.33,3.9,46,stopped 2026-09-24,-5.0,-1.34,ORIX Corporation American Depositary Shares,NYSE
-HRTG,EMA 9/21 cross,2026-10-06,34.17,32.91,55.4,8.52,37.4,False,32.96,33.91,3.0,24,stopped 2026-10-07,-2.9,-1.0,"Heritage Insurance Holdings, Inc. Common Stock",NYSE
-OBK,EMA 9/21 cross,2026-09-02,53.82,52.43,56.3,8.08,50.18,True,53.78,54.21,3.4,47,stopped 2026-09-29,-3.3,-1.0,"Origin Bancorp, Inc. Common Stock",Other
-FMBH,EMA 9/21 cross,2026-09-04,51.33,49.36,59.1,7.74,48.34,True,51.5,51.24,3.8,45,stopped 2026-09-18,-3.7,-1.0,"First Mid Bancshares, Inc.",Nasdaq
-CLMB,52w-high base breakout,2026-10-05,33.73,30.83,72.6,7.72,36.85,True,41.57,33.85,9.8,25,stopped 2026-10-21,-8.9,-1.0,"Climb Global Solutions, Inc.",Nasdaq
-MBWM,EMA 9/21 cross,2026-09-02,60.6,58.11,57.4,7.48,57.57,True,61.63,61.11,5.2,47,stopped 2026-10-01,-4.9,-1.0,Mercantile Bank Corporation,Nasdaq
-UFCS,EMA 9/21 cross,2026-10-05,54.65,51.81,56.0,7.38,54.24,False,48.87,54.51,5.2,25,stopped 2026-11-04,-5.0,-1.0,"United Fire Group, Inc",Nasdaq
-SMBK,EMA 9/21 cross,2026-09-04,51.87,49.79,58.4,5.8,52.44,False,48.5,51.55,3.5,45,stopped 2026-09-28,-3.4,-1.0,"SmartFinancial, Inc. Common Stock",NYSE
-BFST,EMA 9/21 cross,2026-09-04,31.84,30.54,59.0,5.52,30.95,True,32.79,31.7,3.8,45,stopped 2026-09-18,-3.7,-1.0,"Business First Bancshares, Inc.",Nasdaq
-IBEX,EMA 9/21 cross,2026-11-06,49.52,41.5,68.9,5.36,43.39,True,50.28,49.52,19.3,1,skipped (stop too far / gap below stop),,,IBEX Limited - Common Share,Nasdaq
-IBEX,52w-high base breakout,2026-09-15,40.8,35.9,68.0,5.36,43.39,True,50.28,40.51,12.8,39,exited 2026-11-06 (Supertrend red),10.8,0.95,IBEX Limited - Common Share,Nasdaq
-FLXS,EMA 9/21 cross,2026-08-18,76.94,69.78,59.0,5.34,81.23,False,74.12,76.56,9.7,58,stopped 2026-10-27,-8.9,-1.0,"Flexsteel Industries, Inc.",Nasdaq
-MSBI,EMA 9/21 cross,2026-10-26,33.96,31.94,63.4,5.04,35.21,False,32.29,34.17,7.0,10,stopped 2026-11-05,-6.5,-1.0,"Midland States Bancorp, Inc.",Nasdaq
-CCNE,EMA 9/21 cross,2026-09-04,34.91,33.23,61.1,4.9,34.35,True,36.26,34.78,4.7,45,stopped 2026-09-29,-4.5,-1.0,CNB Financial Corporation,Nasdaq
-FISI,EMA 9/21 cross,2026-09-04,41.37,39.43,58.5,4.7,38.76,True,40.22,41.24,4.6,45,stopped 2026-09-29,-4.4,-1.0,"Financial Institutions, Inc.",Nasdaq
-PFIS,EMA 9/21 cross,2026-09-03,70.91,68.29,60.3,4.68,67.6,True,73.15,70.46,3.2,46,stopped 2026-09-29,-3.1,-1.0,Peoples Financial Services Corp.,Nasdaq
-VTMX,EMA 9/21 cross,2026-08-21,35.7,32.92,67.3,4.58,35.07,True,38.33,35.51,7.9,55,stopped 2026-09-14,-7.3,-1.0,"Corporacion Inmobiliaria Vesta, S.A.B de C.V. American Depositary Shares, each representing ten (10) Common Shares",NYSE
-NBTX,EMA 9/21 cross,2026-08-17,42.05,37.17,59.0,4.52,27.48,True,32.03,40.76,9.6,59,stopped 2026-09-09,-13.0,-1.48,Nanobiotix S.A. - ADSs,Nasdaq
-SPFI,EMA 9/21 cross,2026-09-04,45.43,42.5,64.2,4.42,41.52,True,43.08,45.52,7.1,45,exited 2026-09-25 (Supertrend red),-6.0,-0.9,"South Plains Financial, Inc.",Nasdaq
-ALRS,EMA 9/21 cross,2026-09-02,33.08,32.17,55.6,4.34,32.08,True,34.45,33.32,3.6,47,stopped 2026-09-10,-3.5,-1.0,Alerus Financial Corporation,Nasdaq
-ORRF,EMA 9/21 cross,2026-09-04,42.84,40.68,59.6,4.26,42.02,True,44.44,42.66,4.9,45,stopped 2026-09-28,-4.6,-1.0,"Orrstown Financial Services, Inc.",Nasdaq
-PBT,EMA 9/21 cross,2026-10-09,34.81,30.96,60.6,3.4,32.34,False,30.19,34.95,12.9,21,skipped (stop too far / gap below stop),,,Permian Basin Royalty Trust Common Stock,NYSE
-BHB,EMA 9/21 cross,2026-09-02,39.81,38.53,56.2,3.3,39.59,True,41.66,40.08,4.0,47,stopped 2026-09-25,-3.9,-1.0,"Bar Harbor Bankshares, Inc. Common Stock",NYSE American
-COFS,EMA 9/21 cross,2026-09-04,34.01,32.36,59.0,3.28,34.24,True,37.29,33.88,4.7,45,stopped 2026-09-23,-4.5,-1.0,"ChoiceOne Financial Services, Inc.",Nasdaq
-BATRA,EMA 9/21 cross,2026-09-21,57.34,54.75,60.1,3.02,53.09,True,57.5,57.63,5.3,35,exited 2026-10-15 (Supertrend red),-3.7,-0.74,"Atlanta Braves Holdings, Inc. - Series A Common Stock",Nasdaq
-VLGEA,EMA 9/21 cross,2026-10-23,45.09,42.44,55.8,2.76,45.8,False,41.63,45.28,6.7,11,stopped 2026-10-29,-6.3,-1.0,"Village Super Market, Inc.",Nasdaq
-UTMD,EMA 9/21 cross,2026-09-15,74.32,68.42,64.1,2.7,66.96,True,72.87,74.28,8.6,39,exited 2026-10-29 (Supertrend red),-6.9,-0.87,"Utah Medical Products, Inc.",Nasdaq
-PDEX,EMA 9/21 cross,2026-09-04,73.41,59.92,68.5,2.42,56.19,True,70.3,73.95,23.4,45,skipped (stop too far / gap below stop),,,"Pro-Dex, Inc.",Nasdaq
-EFSI,EMA 9/21 cross,2026-09-08,45.96,40.39,74.6,2.06,43.98,True,45.87,46.03,13.9,44,skipped (stop too far / gap below stop),,,Eagle Financial Services Inc,Nasdaq
-TJGC,EMA 9/21 cross,2026-08-24,6.1,3.65,72.7,0.18,29.87,True,31.89,6.24,71.0,53,skipped (stop too far / gap below stop),,,TJGC Group Limited - Class A Ordinary Shares,Nasdaq
+EMBJ,52w-high base breakout,2026-11-10,82.5,73.56,66.2,123.04,71.9,True,82.5,,12.2,0,NEW - buy next open,,,Embraer S.A. Common Stock,NYSE
+AAMI,EMA 9/21 cross,2026-11-10,97.57,87.94,63.2,43.54,85.68,True,97.57,,11.0,0,NEW - buy next open,,,Acadian Asset Management Inc. Common Stock,NYSE
+NATL,52w-high base breakout,2026-11-10,48.2,46.21,66.1,41.84,45.27,True,48.2,,4.3,0,NEW - buy next open,,,NCR Atleos Corporation Common Stock,NYSE
+FRHC,EMA 9/21 cross,2026-08-18,160.8,144.02,59.5,19.62,188.83,False,165.47,157.8,9.6,59,EXIT next open (Supertrend turned red),4.9,0.56,Freedom Holding Corp.,Nasdaq
+MSFT,EMA 9/21 cross,2026-11-04,555.8,504.96,64.3,13883.8,502.47,True,533.16,554.94,9.9,4,open,-3.9,-0.44,Microsoft Corporation,Nasdaq
+MA,EMA 9/21 cross,2026-10-09,589.14,550.32,65.3,2223.64,620.49,True,658.84,592.86,7.7,22,open,11.1,1.55,Mastercard Incorporated Common Stock,NYSE
+PG,EMA 9/21 cross,2026-10-06,147.43,142.46,56.3,1780.78,158.2,True,168.66,147.7,3.7,25,open,14.2,4.0,Procter & Gamble Company (The) Common Stock,NYSE
+KO,EMA 9/21 cross,2026-10-12,89.79,85.67,63.0,1767.94,91.04,True,96.91,90.56,5.7,21,open,7.0,1.3,Coca-Cola Company (The) Common Stock,NYSE
+TMO,52w-high base breakout,2026-09-15,641.39,594.36,67.4,1664.34,647.71,True,718.2,642.0,8.0,40,open,11.9,1.6,Thermo Fisher Scientific Inc Common Stock,NYSE
+ABBV,EMA 9/21 cross,2026-09-14,260.17,245.26,57.0,1594.82,275.32,True,293.89,258.41,5.4,41,open,13.7,2.7,AbbVie Inc. Common Stock,NYSE
+MDT,52w-high base breakout,2026-11-04,104.96,95.17,73.8,1410.74,96.6,True,101.59,106.05,11.4,4,open,-4.2,-0.41,Medtronic plc. Ordinary Shares,NYSE
+GILD,EMA 9/21 cross,2026-10-09,151.17,142.6,59.4,1143.46,158.04,True,170.87,151.84,6.5,22,open,12.5,2.06,"Gilead Sciences, Inc.",Nasdaq
+GILD,52w-high base breakout,2026-10-14,153.54,144.65,61.3,1143.46,158.04,True,170.87,156.39,8.1,19,open,9.3,1.23,"Gilead Sciences, Inc.",Nasdaq
+DHR,EMA 9/21 cross,2026-09-17,212.12,198.74,57.7,991.74,215.52,True,236.11,212.26,6.8,38,open,11.2,1.76,Danaher Corporation Common Stock,NYSE
+BLK,52w-high base breakout,2026-11-04,1224.37,1136.9,70.2,893.0,1114.55,True,1222.15,1235.78,8.7,4,open,-1.1,-0.14,"BlackRock, Inc. Common Stock",NYSE
+ABNB,EMA 9/21 cross,2026-10-15,174.28,162.16,61.9,801.48,171.21,True,186.9,175.43,8.2,18,open,6.5,0.86,"Airbnb, Inc.",Nasdaq
+MCK,52w-high base breakout,2026-10-15,998.64,925.0,74.9,753.7,1004.96,True,1082.59,1012.2,9.4,18,open,7.0,0.81,McKesson Corporation Common Stock,NYSE
+HCA,EMA 9/21 cross,2026-09-09,421.05,395.27,57.0,693.8,454.89,True,504.42,421.83,6.7,44,open,19.6,3.11,"HCA Healthcare, Inc. Common Stock",NYSE
+MO,EMA 9/21 cross,2026-10-07,69.38,65.78,57.3,664.16,73.28,True,76.34,70.0,6.4,24,open,9.1,1.5,"Altria Group, Inc.",NYSE
+KDP,EMA 9/21 cross,2026-10-12,32.75,30.5,61.4,661.7,33.91,True,37.59,33.06,8.4,21,open,13.7,1.77,Keurig Dr Pepper Inc.,Nasdaq
+TGT,EMA 9/21 cross,2026-11-04,163.1,148.81,61.1,612.72,146.44,True,161.78,165.44,11.2,4,open,-2.2,-0.22,Target Corporation Common Stock,NYSE
+FOXA,EMA 9/21 cross,2026-11-03,67.1,62.1,58.0,601.28,61.8,True,67.37,68.25,9.9,5,open,-1.3,-0.14,Fox Corporation,Nasdaq
+U,52w-high base breakout,2026-11-06,51.49,45.31,72.1,589.28,43.9,True,50.34,52.15,15.1,2,open,-3.5,-0.26,Unity Software Inc. Common Stock,NYSE
+DUK,52w-high base breakout,2026-11-05,130.08,126.27,70.4,561.5,124.42,True,128.94,127.21,0.7,3,open,1.4,1.84,Duke Energy Corporation (Holding Company) Common Stock,NYSE
+ECL,52w-high base breakout,2026-11-02,308.38,283.99,76.9,520.98,290.89,True,306.03,307.6,8.3,6,open,-0.5,-0.07,Ecolab Inc. Common Stock,NYSE
+ROST,EMA 9/21 cross,2026-11-04,245.74,225.3,63.9,507.64,222.95,True,238.95,249.3,10.7,4,open,-4.2,-0.43,"Ross Stores, Inc.",Nasdaq
+CL,52w-high base breakout,2026-11-02,97.43,90.47,66.6,497.12,92.45,True,98.09,96.76,7.0,6,open,1.4,0.21,Colgate-Palmolive Company Common Stock,NYSE
+TEM,52w-high base breakout,2026-11-09,84.44,74.31,61.9,485.42,62.03,True,80.54,82.37,10.9,1,open,-2.2,-0.23,"Tempus AI, Inc.",Nasdaq
+VEEV,52w-high base breakout,2026-10-13,301.63,279.02,71.9,479.88,293.51,True,305.55,300.14,7.6,20,open,1.8,0.26,Veeva Systems Inc. Class A Common Stock,NYSE
+WDAY,EMA 9/21 cross,2026-10-15,196.63,184.87,59.1,459.78,188.51,True,188.89,196.84,6.5,18,open,-4.0,-0.66,"Workday, Inc.",Nasdaq
+PTC,EMA 9/21 cross,2026-10-01,146.47,133.67,58.7,416.46,191.41,True,196.55,148.03,10.7,28,open,32.8,3.38,PTC Inc.,Nasdaq
+PTC,52w-high base breakout,2026-10-27,194.62,193.1,78.8,416.46,191.41,True,196.55,194.21,0.6,10,open,1.2,2.11,PTC Inc.,Nasdaq
+IQV,EMA 9/21 cross,2026-11-09,278.84,252.38,59.7,383.32,253.7,True,275.15,278.04,10.2,1,open,-1.0,-0.11,"IQVIA Holdings, Inc. Common Stock",NYSE
+NDAQ,52w-high base breakout,2026-10-22,103.3,92.86,74.0,381.22,101.62,True,110.02,102.7,10.6,13,open,7.1,0.74,"Nasdaq, Inc.",Nasdaq
+MTD,52w-high base breakout,2026-09-24,1519.15,1385.13,72.0,345.24,1599.73,True,1751.38,1510.39,9.0,33,open,16.0,1.92,"Mettler-Toledo International, Inc. Common Stock",NYSE
+NVS,52w-high base breakout,2026-11-04,164.98,158.93,70.5,340.5,153.35,True,163.26,163.24,2.7,4,open,0.0,0.0,Novartis AG Common Stock,NYSE
+MET,EMA 9/21 cross,2026-10-08,97.89,93.43,58.4,328.84,95.97,True,102.44,97.52,4.4,23,open,5.0,1.2,"MetLife, Inc. Common Stock",NYSE
+QGEN,EMA 9/21 cross,2026-09-17,44.38,41.74,59.4,327.92,48.59,True,50.51,44.3,6.1,38,open,14.0,2.43,Qiagen N.V. Common Shares,NYSE
+SN,EMA 9/21 cross,2026-09-28,181.99,165.3,60.6,316.96,202.48,True,226.5,184.05,11.3,31,open,23.1,2.26,"SharkNinja, Inc. Ordinary Shares",NYSE
+HAS,52w-high base breakout,2026-10-20,109.52,96.38,83.3,313.82,111.59,True,121.82,110.27,14.4,15,open,10.5,0.83,"Hasbro, Inc.",Nasdaq
+DLTR,52w-high base breakout,2026-11-04,147.0,129.36,73.2,286.22,125.67,True,140.83,144.57,11.8,4,open,-2.6,-0.25,"Dollar Tree, Inc.",Nasdaq
+FWONK,52w-high base breakout,2026-11-09,108.01,95.05,79.1,285.58,98.01,True,108.94,107.56,13.2,1,open,1.3,0.11,Liberty Media Corporation - Series C Common Stock,Nasdaq
+ED,52w-high base breakout,2026-10-22,116.26,109.16,74.5,278.7,114.31,True,119.28,116.0,6.3,13,open,2.8,0.48,"Consolidated Edison, Inc. Common Stock",NYSE
+ICLR,EMA 9/21 cross,2026-10-15,175.13,159.72,59.5,246.92,182.11,True,204.63,173.58,8.7,18,open,17.9,2.24,ICON plc - Ordinary Shares,Nasdaq
+CPAY,EMA 9/21 cross,2026-11-02,409.29,391.01,56.4,233.38,417.33,True,459.64,407.95,4.3,6,open,12.7,3.05,"Corpay, Inc. Common Stock",NYSE
+ALLE,52w-high base breakout,2026-10-23,178.98,157.5,79.9,223.88,177.99,True,189.49,178.91,13.6,12,open,5.9,0.49,Allegion plc Ordinary Shares,NYSE
+MEDP,EMA 9/21 cross,2026-09-15,620.48,577.64,63.8,220.92,619.35,True,664.54,616.99,6.8,40,open,7.7,1.21,"Medpace Holdings, Inc.",Nasdaq
+MEDP,52w-high base breakout,2026-08-21,620.75,571.01,66.4,220.92,619.35,True,664.54,614.15,7.6,56,open,8.2,1.17,"Medpace Holdings, Inc.",Nasdaq
+BJ,EMA 9/21 cross,2026-09-28,96.81,89.89,60.3,207.52,103.45,True,110.4,95.98,6.8,31,open,15.0,2.37,"BJ's Wholesale Club Holdings, Inc. Common Stock",NYSE
+GDDY,EMA 9/21 cross,2026-10-08,103.19,95.62,57.6,189.54,105.25,True,113.13,103.02,7.7,23,open,9.8,1.37,GoDaddy Inc. Class A Common Stock,NYSE
+ONC,EMA 9/21 cross,2026-10-15,374.08,344.94,61.6,185.52,373.0,True,424.0,372.57,8.0,18,open,13.8,1.86,BeOne Medicines Ltd. - American Depositary Shares,Nasdaq
+ONC,52w-high base breakout,2026-10-20,384.5,344.94,65.6,185.52,373.0,True,424.0,383.51,11.2,15,open,10.6,1.05,BeOne Medicines Ltd. - American Depositary Shares,Nasdaq
+CRBG,EMA 9/21 cross,2026-09-02,33.3,31.73,59.4,183.28,32.91,True,35.91,33.69,6.2,48,open,6.6,1.14,Corebridge Financial Inc. Common Stock,NYSE
+ANF,52w-high base breakout,2026-08-26,147.75,130.02,79.1,177.36,149.37,True,154.0,144.7,11.3,53,open,6.4,0.63,Abercrombie & Fitch Company Common Stock,NYSE
+ELF,52w-high base breakout,2026-11-06,116.14,105.36,60.8,173.74,103.13,True,118.51,117.76,11.8,2,open,0.6,0.06,"e.l.f. Beauty, Inc. Common Stock",NYSE
+BALL,52w-high base breakout,2026-11-02,68.07,62.3,74.7,169.68,62.66,True,66.79,67.0,7.5,6,open,-0.3,-0.04,Ball Corporation Common Stock,NYSE
+DD,52w-high base breakout,2026-11-03,153.46,136.66,82.3,168.6,141.56,True,156.88,155.24,13.6,5,open,1.1,0.09,"DuPont de Nemours, Inc. Common Stock",NYSE
+EHC,EMA 9/21 cross,2026-10-29,131.49,120.95,64.4,167.42,129.12,True,142.51,134.53,11.2,8,open,5.9,0.59,Encompass Health Corporation Common Stock,NYSE
+WRB,52w-high base breakout,2026-11-04,76.71,72.14,65.7,165.8,73.04,True,76.83,77.67,7.7,4,open,-1.1,-0.15,W.R. Berkley Corporation Common Stock,NYSE
+J,52w-high base breakout,2026-10-30,154.62,144.1,72.3,151.1,147.24,True,157.11,155.07,7.6,7,open,1.3,0.19,Jacobs Solutions Inc. Common Stock,NYSE
+CVLT,EMA 9/21 cross,2026-09-15,143.3,129.5,58.1,124.2,150.32,True,168.3,141.42,9.2,40,open,19.0,2.26,"Commvault Systems, Inc.",Nasdaq
+TGTX,EMA 9/21 cross,2026-10-27,56.44,51.83,57.2,124.06,54.39,True,64.26,55.84,7.7,10,open,15.1,2.1,"TG Therapeutics, Inc.",Nasdaq
+AVY,52w-high base breakout,2026-11-04,192.59,177.65,73.9,123.76,176.7,True,189.04,193.26,8.8,4,open,-2.2,-0.27,Avery Dennison Corporation Common Stock,NYSE
+COKE,EMA 9/21 cross,2026-10-09,196.01,187.58,55.6,119.98,193.39,True,214.28,197.8,5.4,22,open,8.3,1.61,"Coca-Cola Consolidated, Inc.",Nasdaq
+JXN,EMA 9/21 cross,2026-10-27,135.06,127.91,57.0,113.62,128.21,True,138.01,135.18,5.7,10,open,2.1,0.39,Jackson Financial Inc. Class A Common Stock,NYSE
+BNS,EMA 9/21 cross,2026-10-20,92.28,89.12,57.5,106.32,91.22,True,92.63,93.0,4.4,15,open,-0.4,-0.1,Bank Nova Scotia Halifax Pfd 3 Ordinary Shares,NYSE
+REXR,EMA 9/21 cross,2026-10-23,38.71,35.73,61.1,104.4,35.87,True,37.95,38.65,8.2,12,open,-1.8,-0.24,"Rexford Industrial Realty, Inc. Common Stock",NYSE
+SIG,52w-high base breakout,2026-10-08,105.57,99.96,64.1,93.0,112.44,True,120.34,105.38,5.4,23,open,14.2,2.76,Signet Jewelers Limited Common Shares,NYSE
+ASO,52w-high base breakout,2026-10-22,61.78,57.55,80.9,90.72,61.02,True,70.39,60.97,5.9,13,open,15.5,2.75,"Academy Sports and Outdoors, Inc.",Nasdaq
+FCN,52w-high base breakout,2026-11-02,191.77,168.76,83.8,88.66,174.3,True,197.34,189.26,12.1,6,open,4.3,0.39,"FTI Consulting, Inc. Common Stock",NYSE
+URBN,EMA 9/21 cross,2026-10-02,80.8,74.22,62.7,85.98,83.2,True,86.97,81.02,9.2,27,open,7.3,0.88,"Urban Outfitters, Inc.",Nasdaq
+URBN,52w-high base breakout,2026-08-26,82.95,73.0,65.7,85.98,83.2,True,86.97,82.7,13.3,53,open,5.2,0.44,"Urban Outfitters, Inc.",Nasdaq
+LNC,EMA 9/21 cross,2026-11-09,42.98,38.55,59.6,84.48,38.91,True,42.77,42.85,11.2,1,open,-0.2,-0.02,Lincoln National Corporation Common Stock,NYSE
+GSAT,EMA 9/21 cross,2026-09-17,82.52,81.55,55.7,83.58,82.02,True,86.39,82.4,1.0,38,open,4.8,4.69,"Globalstar, Inc.",Nasdaq
+G,EMA 9/21 cross,2026-10-14,35.33,33.17,57.0,83.36,38.09,True,43.07,36.0,8.5,19,open,19.6,2.5,Genpact Limited Common Stock,NYSE
+SEIC,EMA 9/21 cross,2026-11-04,108.62,102.59,60.9,82.46,101.24,True,110.37,109.64,6.9,4,open,0.7,0.1,SEI Investments Company,Nasdaq
+TTC,52w-high base breakout,2026-10-15,100.82,95.35,65.6,68.72,102.14,True,106.85,101.46,6.4,18,open,5.3,0.88,Toro Company (The) Common Stock,NYSE
+VNT,52w-high base breakout,2026-11-09,43.88,38.61,89.7,63.36,37.82,True,43.13,43.25,12.0,1,open,-0.3,-0.03,Vontier Corporation Common Stock,NYSE
+SAIC,EMA 9/21 cross,2026-10-12,133.05,121.0,58.1,59.92,139.54,True,152.53,133.28,10.1,21,open,14.4,1.57,Science Applications International Corporation,Nasdaq
+BCPC,52w-high base breakout,2026-11-04,182.58,166.53,68.6,58.26,167.98,True,173.54,183.9,10.4,4,open,-5.6,-0.6,Balchem Corporation,Nasdaq
+FOX,EMA 9/21 cross,2026-11-03,59.63,55.38,57.4,58.26,55.26,True,60.25,60.04,8.4,5,open,0.3,0.05,Fox Corporation,Nasdaq
+APPN,52w-high base breakout,2026-10-21,48.73,42.88,71.5,57.44,44.33,True,52.35,48.81,13.8,14,open,7.3,0.6,Appian Corporation,Nasdaq
+MEOH,EMA 9/21 cross,2026-10-06,60.81,57.01,56.0,56.54,60.33,True,68.07,61.92,8.6,25,open,9.9,1.25,Methanex Corporation,Nasdaq
+WTM,52w-high base breakout,2026-11-04,2376.3,2198.8,78.9,54.54,2171.45,True,2280.0,2289.88,4.1,4,open,-0.4,-0.11,"White Mountains Insurance Group, Ltd. Common Stock",NYSE
+CBC,EMA 9/21 cross,2026-10-08,32.37,31.41,55.2,36.4,35.67,True,38.57,32.25,2.7,23,open,19.6,7.48,"Central Bancompany, Inc.",Nasdaq
+RGR,52w-high base breakout,2026-10-19,45.9,40.98,72.3,30.98,44.71,True,52.01,44.52,8.6,16,open,16.8,2.12,"Sturm, Ruger & Company, Inc. Common Stock",NYSE
+HMC,52w-high base breakout,2026-10-14,33.45,32.11,64.1,29.14,34.28,True,34.88,33.8,5.3,19,open,3.2,0.64,"Honda Motor Company, Ltd. Common Stock",NYSE
+ECPG,EMA 9/21 cross,2026-10-08,100.06,95.42,56.9,28.32,101.2,True,108.02,100.13,4.9,23,open,7.9,1.68,Encore Capital Group Inc,Nasdaq
+FWONA,52w-high base breakout,2026-11-05,99.72,87.75,79.2,26.64,92.67,True,103.87,98.6,12.4,3,open,5.3,0.49,Liberty Media Corporation - Series A Common Stock,Nasdaq
+DFIN,EMA 9/21 cross,2026-10-07,49.8,46.38,58.3,20.82,62.06,True,68.02,49.8,7.4,24,open,36.6,5.32,"Donnelley Financial Solutions, Inc. Common Stock",NYSE
+ABM,EMA 9/21 cross,2026-09-08,50.29,45.49,70.2,20.66,51.18,True,54.79,50.29,10.6,45,open,8.9,0.94,ABM Industries Incorporated Common Stock,NYSE
+ESQ,EMA 9/21 cross,2026-10-22,123.19,116.35,58.7,19.02,120.02,True,131.84,122.29,5.1,13,open,7.8,1.61,"Esquire Financial Holdings, Inc.",Nasdaq
+JOE,52w-high base breakout,2026-11-09,75.13,67.07,68.0,17.16,66.04,True,72.91,74.5,11.1,1,open,-2.1,-0.21,St. Joe Company (The) Common Stock,NYSE
+NBN,EMA 9/21 cross,2026-11-09,134.33,124.77,58.7,16.88,121.29,True,133.09,134.11,7.5,1,open,-0.8,-0.11,Northeast Bank,Nasdaq
+EGBN,EMA 9/21 cross,2026-10-20,28.55,27.34,55.3,16.7,31.37,True,34.04,28.68,4.9,15,open,18.7,4.0,"Eagle Bancorp, Inc.",Nasdaq
+NWN,52w-high base breakout,2026-11-05,51.81,49.49,71.4,15.64,49.66,True,51.99,51.36,3.8,3,open,1.2,0.34,Northwest Natural Holding Company Common Stock,NYSE
+IDT,EMA 9/21 cross,2026-09-28,69.5,66.18,56.8,15.06,76.33,True,83.22,70.76,6.9,31,open,17.6,2.72,IDT Corporation Class B Common Stock,NYSE
+WFG,EMA 9/21 cross,2026-11-04,69.74,64.72,58.3,14.14,63.79,True,67.41,69.89,8.0,4,open,-3.5,-0.48,West Fraser Timber Co. Ltd Common stock,NYSE
+AMTB,EMA 9/21 cross,2026-10-22,29.66,28.45,57.4,13.48,27.99,True,30.23,30.85,8.4,13,open,-2.0,-0.26,Amerant Bancorp Inc. Class A Common Stock,NYSE
+UVE,EMA 9/21 cross,2026-10-07,45.25,41.79,64.2,11.62,44.94,True,48.16,45.02,7.7,24,open,7.0,0.97,UNIVERSAL INSURANCE HOLDINGS INC Common Stock,NYSE
+SCL,EMA 9/21 cross,2026-10-21,63.9,61.34,60.2,11.6,65.09,True,66.77,64.0,4.3,14,open,4.3,1.04,Stepan Company Common Stock,NYSE
+SCL,52w-high base breakout,2026-10-28,68.41,63.3,75.7,11.6,65.09,True,66.77,68.55,8.3,9,open,-2.6,-0.34,Stepan Company Common Stock,NYSE
+WABC,EMA 9/21 cross,2026-10-15,60.42,57.4,60.0,10.3,57.87,True,59.85,60.94,6.2,18,open,-1.8,-0.31,Westamerica Bancorporation,Nasdaq
+GSBC,EMA 9/21 cross,2026-10-23,80.93,76.0,63.3,6.54,78.15,True,81.72,81.34,7.0,12,open,0.5,0.07,"Great Southern Bancorp, Inc.",Nasdaq
+SMP,52w-high base breakout,2026-11-02,45.65,40.17,83.9,6.48,41.06,True,44.57,45.88,14.2,6,open,-2.9,-0.23,"Standard Motor Products, Inc. Common Stock",NYSE
+RRBI,EMA 9/21 cross,2026-10-22,102.73,99.48,56.1,6.38,100.28,True,104.77,102.15,2.7,13,open,2.6,0.98,"Red River Bancshares, Inc.",Nasdaq
+CBNK,EMA 9/21 cross,2026-09-30,39.18,35.4,72.6,6.12,40.61,True,42.4,38.96,10.1,29,open,8.8,0.97,"Capital Bancorp, Inc.",Nasdaq
+CHMG,EMA 9/21 cross,2026-10-23,83.88,79.48,62.4,5.64,81.96,True,86.29,84.55,6.4,12,open,2.1,0.34,Chemung Financial Corp,Nasdaq
+CAC,EMA 9/21 cross,2026-10-22,57.86,55.57,59.9,5.02,55.16,True,58.79,57.37,3.2,13,open,2.5,0.79,Camden National Corporation,Nasdaq
+BWFG,EMA 9/21 cross,2026-10-22,66.84,64.44,57.4,4.72,67.67,True,70.73,66.52,3.2,13,open,6.3,2.02,"Bankwell Financial Group, Inc.",Nasdaq
+HBT,EMA 9/21 cross,2026-10-23,36.0,34.68,56.0,4.34,34.83,True,37.53,36.83,6.2,12,open,1.9,0.33,"HBT Financial, Inc.",Nasdaq
+FRAF,EMA 9/21 cross,2026-10-22,63.19,61.28,55.0,3.98,66.14,True,70.18,63.19,3.1,13,open,11.1,3.66,Franklin Financial Services Corporation,Nasdaq
+ACNB,EMA 9/21 cross,2026-10-22,65.39,62.27,64.0,3.9,63.22,True,66.79,65.19,4.7,13,open,2.5,0.55,ACNB Corporation,Nasdaq
+PLBC,EMA 9/21 cross,2026-10-20,62.21,60.44,55.7,3.4,60.09,True,63.09,62.28,3.0,15,open,1.3,0.44,Plumas Bancorp,Nasdaq
+CZFS,EMA 9/21 cross,2026-10-21,81.57,78.29,57.7,3.22,79.77,True,86.34,81.15,3.7,14,open,6.4,1.81,"Citizens Financial Services, Inc.",Nasdaq
+ACU,EMA 9/21 cross,2026-10-20,63.58,60.29,58.8,2.6,64.12,True,70.28,63.63,5.5,15,open,10.5,1.99,Acme United Corporation. Common Stock,NYSE American
+MSFT,52w-high base breakout,2026-10-12,541.15,518.79,69.9,13883.8,502.47,True,533.16,544.64,5.0,21,stopped 2026-10-23,-4.9,-1.04,Microsoft Corporation,Nasdaq
+MRVL,EMA 9/21 cross,2026-09-09,234.96,201.06,55.5,5689.04,196.63,False,154.39,227.98,13.4,44,skipped (stop too far / gap below stop),,,"Marvell Technology, Inc.",Nasdaq
+PLTR,52w-high base breakout,2026-10-09,209.05,187.63,76.3,4853.76,191.28,False,168.82,208.9,11.3,22,stopped 2026-10-16,-10.2,-1.0,Palantir Technologies Inc.,Nasdaq
+NBIS,EMA 9/21 cross,2026-09-21,232.8,206.85,55.4,4069.58,173.75,False,134.0,233.24,12.8,36,skipped (stop too far / gap below stop),,,Nebius Group N.V. - Class A Ordinary Shares,Nasdaq
+CRWD,EMA 9/21 cross,2026-10-27,268.02,228.7,60.3,2362.34,267.25,False,225.76,270.46,18.3,10,skipped (stop too far / gap below stop),,,"CrowdStrike Holdings, Inc.",Nasdaq
+PANW,EMA 9/21 cross,2026-09-15,375.09,327.05,58.0,2239.46,383.59,False,326.36,367.51,12.4,40,skipped (stop too far / gap below stop),,,"Palo Alto Networks, Inc.",Nasdaq
+MA,52w-high base breakout,2026-08-24,598.95,562.33,73.4,2223.64,620.49,True,658.84,595.97,6.0,55,stopped 2026-09-10,-5.6,-1.0,Mastercard Incorporated Common Stock,NYSE
+CVX,EMA 9/21 cross,2026-10-08,211.55,201.96,59.2,1876.34,225.61,False,211.22,211.05,4.5,23,exited 2026-11-05 (Supertrend red),4.2,0.99,Chevron Corporation Common Stock,NYSE
+HOOD,EMA 9/21 cross,2026-08-21,108.13,91.44,62.5,1827.28,96.3,False,81.33,106.86,16.9,56,skipped (stop too far / gap below stop),,,"Robinhood Markets, Inc.",Nasdaq
+ACN,EMA 9/21 cross,2026-10-01,210.61,170.74,70.0,1564.44,235.24,True,258.51,209.34,22.6,28,skipped (stop too far / gap below stop),,,Accenture plc Class A Ordinary Shares (Ireland),NYSE
+SHOP,52w-high base breakout,2026-10-12,179.22,161.37,76.9,1482.28,168.96,False,146.61,175.8,8.9,21,stopped 2026-10-30,-8.2,-1.0,Shopify Inc. - Class A Subordinate Voting Shares,Nasdaq
+NET,EMA 9/21 cross,2026-09-09,314.18,269.3,58.6,1256.1,229.38,True,305.8,313.35,16.4,44,skipped (stop too far / gap below stop),,,"Cloudflare, Inc. Class A Common Stock",NYSE
+WFC,EMA 9/21 cross,2026-09-02,88.74,83.23,62.3,1244.94,80.24,True,85.76,89.27,7.3,48,stopped 2026-09-22,-6.8,-1.0,Wells Fargo & Company Common Stock,NYSE
+MELI,EMA 9/21 cross,2026-08-19,1908.65,1759.21,57.7,1174.52,1726.28,False,1490.24,1897.76,7.9,58,exited 2026-09-18 (Supertrend red),-3.8,-0.52,"MercadoLibre, Inc.",Nasdaq
+PM,EMA 9/21 cross,2026-08-20,189.89,182.71,55.1,1044.92,212.29,False,194.25,189.35,3.6,57,stopped 2026-09-04,-3.5,-1.0,Philip Morris International Inc Common Stock,NYSE
+OKTA,EMA 9/21 cross,2026-08-27,172.91,127.6,70.4,1036.78,215.47,False,178.36,172.2,35.0,52,skipped (stop too far / gap below stop),,,"Okta, Inc.",Nasdaq
+FTNT,EMA 9/21 cross,2026-09-14,170.18,152.0,59.9,939.32,147.47,False,123.57,168.67,11.0,41,exited 2026-10-19 (Supertrend red),1.4,0.14,"Fortinet, Inc.",Nasdaq
+REGN,52w-high base breakout,2026-08-18,810.24,783.69,78.7,830.06,872.96,True,916.06,817.17,4.3,59,stopped 2026-08-31,-4.3,-1.04,"Regeneron Pharmaceuticals, Inc.",Nasdaq
+NEM,52w-high base breakout,2026-08-21,131.31,115.59,75.9,815.96,110.82,True,119.96,133.12,15.2,56,stopped 2026-09-28,-13.2,-1.0,Newmont Corporation,NYSE
+DE,EMA 9/21 cross,2026-08-21,645.93,577.93,62.4,730.1,628.38,True,687.64,651.49,12.7,56,skipped (stop too far / gap below stop),,,Deere & Company Common Stock,NYSE
+DE,52w-high base breakout,2026-09-01,674.47,615.74,66.2,730.1,628.38,True,687.64,676.45,9.9,49,exited 2026-10-08 (Supertrend red),-4.1,-0.46,Deere & Company Common Stock,NYSE
+JCI,EMA 9/21 cross,2026-10-28,157.35,140.66,59.7,718.9,154.48,False,141.12,155.74,10.7,9,stopped 2026-11-04,-9.7,-1.0,Johnson Controls International plc Ordinary Share,NYSE
+HUM,EMA 9/21 cross,2026-10-05,403.21,375.43,59.0,611.84,380.02,True,438.06,404.16,7.7,26,stopped 2026-10-08,-7.1,-1.0,Humana Inc. Common Stock,NYSE
+MDB,EMA 9/21 cross,2026-09-22,427.69,372.0,59.3,530.32,378.32,False,331.98,429.34,15.4,35,skipped (stop too far / gap below stop),,,"MongoDB, Inc.",Nasdaq
+DVN,52w-high base breakout,2026-10-23,51.39,48.4,61.6,515.2,47.34,False,43.41,51.39,6.2,12,stopped 2026-11-03,-6.6,-1.13,Devon Energy Corporation Common Stock,NYSE
+XYZ,EMA 9/21 cross,2026-11-04,87.63,74.81,70.8,507.96,77.15,True,85.58,88.29,18.0,4,skipped (stop too far / gap below stop),,,"Block, Inc. Class A Common Stock,",NYSE
+TEL,EMA 9/21 cross,2026-10-27,225.35,204.63,64.1,482.82,204.8,True,217.76,230.0,12.4,10,skipped (stop too far / gap below stop),,,TE Connectivity plc Ordinary Shares,NYSE
+SMTC,EMA 9/21 cross,2026-08-27,142.43,115.0,55.5,479.12,137.27,False,113.49,141.76,23.3,52,skipped (stop too far / gap below stop),,,Semtech Corporation,Nasdaq
+CRL,EMA 9/21 cross,2026-09-22,285.11,270.88,57.0,441.32,375.57,False,345.8,283.85,4.8,35,exited 2026-11-05 (Supertrend red),16.3,3.57,"Charles River Laboratories International, Inc. Common Stock",NYSE
+A,52w-high base breakout,2026-08-20,156.07,146.97,78.2,372.72,166.48,True,177.88,156.27,6.3,57,stopped 2026-09-08,-5.9,-1.0,"Agilent Technologies, Inc. Common Stock",NYSE
+GH,EMA 9/21 cross,2026-09-14,167.84,155.78,56.9,361.24,176.62,False,155.35,168.25,8.0,41,exited 2026-10-19 (Supertrend red),-4.5,-0.61,"Guardant Health, Inc.",Nasdaq
+NVS,EMA 9/21 cross,2026-09-01,161.25,151.69,58.7,340.5,153.35,True,163.26,160.8,6.0,49,stopped 2026-09-08,-13.0,-2.29,Novartis AG Common Stock,NYSE
+ETSY,EMA 9/21 cross,2026-08-24,87.03,78.41,62.3,340.06,81.78,True,86.5,87.0,11.0,55,stopped 2026-09-04,-9.9,-1.0,"Etsy, Inc. Common Stock",NYSE
+VRSN,EMA 9/21 cross,2026-08-24,290.79,271.1,57.9,335.36,291.05,True,311.11,289.03,6.6,55,exited 2026-09-29 (Supertrend red),-3.4,-0.55,"VeriSign, Inc.",Nasdaq
+RRC,52w-high base breakout,2026-10-26,53.56,47.13,84.9,322.16,55.14,False,51.2,53.67,13.9,11,exited 2026-11-09 (Supertrend red),-9.2,-0.76,Range Resources Corporation Common Stock,NYSE
+GPN,EMA 9/21 cross,2026-10-30,96.84,80.85,72.1,321.2,88.38,True,101.59,97.43,20.5,7,skipped (stop too far / gap below stop),,,Global Payments Inc. Common Stock,NYSE
+GMAB,52w-high base breakout,2026-09-28,35.36,34.36,66.0,319.6,49.23,True,54.07,34.94,1.7,31,stopped 2026-10-02,-1.7,-1.0,Genmab A/S - American Depositary Shares,Nasdaq
+DG,EMA 9/21 cross,2026-08-24,124.71,116.93,56.0,311.52,123.9,True,137.31,124.16,6.2,55,exited 2026-10-01 (Supertrend red),-3.8,-0.65,Dollar General Corporation Common Stock,NYSE
+WST,EMA 9/21 cross,2026-09-15,365.0,331.99,67.3,309.68,431.11,False,412.55,363.11,9.4,40,exited 2026-11-06 (Supertrend red),7.3,0.85,"West Pharmaceutical Services, Inc. Common Stock",NYSE
+ROIV,EMA 9/21 cross,2026-09-08,41.48,33.43,72.5,301.52,35.63,True,41.19,41.39,23.8,45,skipped (stop too far / gap below stop),,,Roivant Sciences Ltd. - Common Shares,Nasdaq
+BBY,EMA 9/21 cross,2026-10-15,94.17,84.83,63.6,285.16,90.62,True,104.1,95.04,12.0,18,skipped (stop too far / gap below stop),,,"Best Buy Co., Inc. Common Stock",NYSE
+GRMN,EMA 9/21 cross,2026-09-24,295.04,270.93,64.3,280.16,301.07,False,288.66,296.51,9.4,33,stopped 2026-10-08,-8.6,-1.0,Garmin Ltd. Common Stock (Switzerland),NYSE
+EXPD,EMA 9/21 cross,2026-10-02,192.47,184.32,58.0,273.96,205.4,False,189.19,192.36,4.4,27,exited 2026-11-09 (Supertrend red),-3.5,-0.83,"Expeditors International of Washington, Inc. Common Stock",NYSE
+W,EMA 9/21 cross,2026-09-14,104.79,96.49,57.8,268.0,103.28,True,112.52,103.82,7.6,41,stopped 2026-09-24,-7.1,-1.0,Wayfair Inc. Class A Common Stock,NYSE
+W,52w-high base breakout,2026-10-29,120.12,110.47,70.6,268.0,103.28,True,112.52,118.59,7.4,8,stopped 2026-11-03,-6.8,-1.0,Wayfair Inc. Class A Common Stock,NYSE
+IT,EMA 9/21 cross,2026-09-14,197.07,166.01,59.2,266.2,221.8,False,188.92,192.45,15.9,41,skipped (stop too far / gap below stop),,,"Gartner, Inc. Common Stock",NYSE
+WCC,EMA 9/21 cross,2026-09-22,362.08,330.72,58.0,261.54,354.83,False,316.7,360.0,8.9,35,exited 2026-10-19 (Supertrend red),-3.3,-0.4,"WESCO International, Inc. Common Stock",NYSE
+ZBRA,EMA 9/21 cross,2026-09-22,361.61,338.67,59.4,251.24,365.73,False,321.38,362.99,7.2,35,stopped 2026-11-03,-14.2,-2.11,Zebra Technologies Corporation,Nasdaq
+DGX,EMA 9/21 cross,2026-09-15,246.16,227.72,64.6,247.28,237.54,True,258.44,244.56,7.4,40,stopped 2026-09-22,-6.9,-1.0,Quest Diagnostics Incorporated Common Stock,NYSE
+RGEN,EMA 9/21 cross,2026-09-15,174.73,161.14,58.8,233.56,189.56,False,173.98,174.9,8.5,40,exited 2026-10-08 (Supertrend red),-6.2,-0.79,Repligen Corporation,Nasdaq
+CHD,EMA 9/21 cross,2026-08-24,102.53,96.27,58.7,232.88,104.88,True,111.76,102.09,6.0,55,stopped 2026-09-09,-6.7,-1.18,"Church & Dwight Company, Inc. Common Stock",NYSE
+PRU,EMA 9/21 cross,2026-09-03,123.2,116.61,61.0,232.74,115.4,True,123.3,122.07,4.7,47,stopped 2026-09-16,-4.5,-1.0,"Prudential Financial, Inc. Common Stock",NYSE
+IFF,EMA 9/21 cross,2026-09-22,85.79,82.7,57.6,231.12,91.69,False,83.17,85.17,3.0,35,stopped 2026-10-01,-2.9,-1.0,"International Flavors & Fragrances, Inc. Common Stock",NYSE
+FROG,EMA 9/21 cross,2026-11-09,108.18,73.97,59.6,223.78,76.11,True,103.55,105.0,41.9,1,skipped (stop too far / gap below stop),,,JFrog Ltd. - Ordinary shares,Nasdaq
+INCY,EMA 9/21 cross,2026-09-17,127.62,119.97,57.7,218.38,109.32,True,120.3,127.85,6.6,38,stopped 2026-10-01,-6.2,-1.0,Incyte Corporation,Nasdaq
+CLH,EMA 9/21 cross,2026-10-05,322.37,308.32,60.6,195.0,309.91,False,290.04,322.07,4.5,26,stopped 2026-10-28,-4.3,-1.0,"Clean Harbors, Inc. Common Stock",NYSE
+WTW,52w-high base breakout,2026-08-24,349.58,326.69,72.2,193.88,313.59,True,332.87,347.32,6.3,55,stopped 2026-09-08,-5.9,-1.0,Willis Towers Watson Public Limited Company - Ordinary Shares,Nasdaq
+SSNC,52w-high base breakout,2026-10-22,89.54,83.59,80.5,185.62,83.98,False,78.82,87.19,4.3,13,stopped 2026-10-23,-4.1,-1.0,"SS&C Technologies Holdings, Inc.",Nasdaq
+JAZZ,EMA 9/21 cross,2026-08-21,254.28,243.16,55.1,184.6,219.74,True,245.43,253.66,4.3,56,stopped 2026-08-31,-4.8,-1.17,Jazz Pharmaceuticals plc - Ordinary Shares,Nasdaq
+OSCR,EMA 9/21 cross,2026-11-04,35.19,29.62,64.2,182.44,29.69,True,33.47,34.31,15.9,4,skipped (stop too far / gap below stop),,,"Oscar Health, Inc. Class A Common Stock",NYSE
+BAH,EMA 9/21 cross,2026-09-11,75.9,71.14,56.5,181.08,79.96,True,87.42,78.0,9.6,42,stopped 2026-09-28,-8.8,-1.0,Booz Allen Hamilton Holding Corporation Common Stock,NYSE
+ZETA,EMA 9/21 cross,2026-09-30,31.57,28.03,60.8,181.0,35.14,False,35.07,32.03,14.3,29,skipped (stop too far / gap below stop),,,Zeta Global Holdings Corp. Class A Common Stock,NYSE
+AMCR,52w-high base breakout,2026-11-02,49.02,45.08,79.6,180.54,49.31,False,45.19,48.41,7.4,6,stopped 2026-11-05,-6.9,-1.0,Amcor plc Ordinary Shares,NYSE
+RGLD,EMA 9/21 cross,2026-11-05,261.28,225.23,63.4,180.34,245.22,True,274.57,258.3,14.7,3,skipped (stop too far / gap below stop),,,"Royal Gold, Inc.",Nasdaq
+CAKE,EMA 9/21 cross,2026-09-29,107.35,101.74,57.4,177.04,116.43,False,108.8,107.35,5.5,30,stopped 2026-10-28,-6.7,-1.29,The Cheesecake Factory Incorporated,Nasdaq
+QLYS,EMA 9/21 cross,2026-09-16,183.06,149.13,56.4,177.02,220.36,False,175.11,180.82,21.2,39,skipped (stop too far / gap below stop),,,"Qualys, Inc.",Nasdaq
+TENB,EMA 9/21 cross,2026-08-28,37.67,31.97,57.2,175.98,50.42,False,41.96,37.21,16.4,51,skipped (stop too far / gap below stop),,,"Tenable Holdings, Inc.",Nasdaq
+RYTM,52w-high base breakout,2026-08-19,115.73,113.66,60.6,173.3,95.9,True,113.95,114.51,0.7,58,stopped 2026-08-20,-0.7,-1.0,"Rhythm Pharmaceuticals, Inc.",Nasdaq
+RNR,EMA 9/21 cross,2026-10-09,331.38,321.25,57.6,171.4,328.95,True,355.85,332.96,3.6,22,stopped 2026-10-28,-3.5,-1.0,RenaissanceRe Holdings Ltd. Common Stock,NYSE
+BTSG,EMA 9/21 cross,2026-10-30,66.89,58.03,67.3,171.02,61.13,True,72.49,67.5,16.3,7,skipped (stop too far / gap below stop),,,"BrightSpring Health Services, Inc.",Nasdaq
+EHC,52w-high base breakout,2026-10-14,126.56,121.43,63.5,167.42,129.12,True,142.51,128.74,6.0,19,stopped 2026-10-20,-5.7,-1.0,Encompass Health Corporation Common Stock,NYSE
+DBX,EMA 9/21 cross,2026-10-13,35.6,32.94,57.5,162.4,35.87,False,32.4,35.51,7.8,20,stopped 2026-11-09,-7.2,-1.0,"Dropbox, Inc.",Nasdaq
+IOT,EMA 9/21 cross,2026-10-02,41.12,36.4,57.9,158.92,38.88,True,41.45,42.0,15.4,27,skipped (stop too far / gap below stop),,,Samsara Inc. Class A Common Stock,NYSE
+BRKR,EMA 9/21 cross,2026-09-17,63.0,51.5,61.7,156.24,53.46,True,62.24,63.32,23.0,38,skipped (stop too far / gap below stop),,,Bruker Corporation,Nasdaq
+PFG,EMA 9/21 cross,2026-09-03,118.51,107.83,68.6,146.68,107.48,True,115.99,117.03,8.5,47,exited 2026-10-07 (Supertrend red),-6.8,-0.87,Principal Financial Group Inc,Nasdaq
+UHS,EMA 9/21 cross,2026-11-04,196.46,170.32,64.8,144.66,174.74,True,195.41,200.0,17.4,4,skipped (stop too far / gap below stop),,,"Universal Health Services, Inc. Common Stock",NYSE
+TRMB,EMA 9/21 cross,2026-10-06,60.95,56.88,63.8,142.2,61.7,False,54.75,60.46,6.3,25,stopped 2026-11-04,-5.9,-1.0,Trimble Inc.,Nasdaq
+BEN,EMA 9/21 cross,2026-09-04,34.38,32.5,57.1,132.42,32.32,True,36.29,34.13,5.0,46,stopped 2026-09-16,-4.8,-1.0,"Franklin Templeton, Inc. Common Stock",NYSE
+PCVX,EMA 9/21 cross,2026-10-05,73.82,55.84,76.6,132.06,70.65,False,66.36,73.35,31.4,26,skipped (stop too far / gap below stop),,,"Vaxcyte, Inc.",Nasdaq
+BOX,EMA 9/21 cross,2026-10-05,35.34,31.12,61.5,124.44,40.65,True,42.55,35.72,14.8,26,skipped (stop too far / gap below stop),,,"Box, Inc. Class A Common Stock",NYSE
+CVLT,52w-high base breakout,2026-10-13,158.85,148.43,64.1,124.2,150.32,True,168.3,157.07,5.8,20,stopped 2026-10-16,-5.5,-1.0,"Commvault Systems, Inc.",Nasdaq
+COKE,52w-high base breakout,2026-11-05,212.5,200.96,59.3,119.98,193.39,True,214.28,208.36,3.7,3,stopped 2026-11-09,-3.6,-1.0,"Coca-Cola Consolidated, Inc.",Nasdaq
+NDSN,EMA 9/21 cross,2026-10-29,329.1,314.02,55.7,119.8,339.41,False,325.1,326.97,4.1,8,stopped 2026-11-05,-4.0,-1.0,Nordson Corporation,Nasdaq
+OPCH,EMA 9/21 cross,2026-10-06,31.0,22.29,83.7,109.82,30.9,True,31.65,31.03,39.2,25,skipped (stop too far / gap below stop),,,"Option Care Health, Inc.",Nasdaq
+AIT,EMA 9/21 cross,2026-10-21,338.89,327.51,55.5,104.2,315.85,False,298.92,336.81,2.8,14,stopped 2026-10-22,-2.8,-1.0,"Applied Industrial Technologies, Inc. Common Stock",NYSE
+HURN,52w-high base breakout,2026-10-22,193.35,173.43,79.2,100.48,191.38,False,166.47,199.75,15.2,13,stopped 2026-11-04,-13.2,-1.0,Huron Consulting Group Inc.,Nasdaq
+DB,52w-high base breakout,2026-08-25,39.04,37.53,65.8,98.86,33.27,True,37.1,40.53,8.0,54,exited 2026-09-16 (Supertrend red),-4.8,-0.64,Deutsche Bank AG Common Stock,NYSE
+BXP,EMA 9/21 cross,2026-08-25,71.31,65.93,63.1,97.38,60.72,True,63.54,70.99,7.7,54,stopped 2026-09-01,-7.1,-1.0,"BXP, Inc. Common Stock",NYSE
+STNG,EMA 9/21 cross,2026-10-26,87.13,79.54,57.9,97.24,90.31,False,80.55,86.11,8.3,11,exited 2026-11-06 (Supertrend red),-4.8,-0.63,Scorpio Tankers Inc. Common Shares,NYSE
+CVI,52w-high base breakout,2026-08-26,40.03,35.79,66.1,95.66,49.76,False,38.71,40.04,11.9,53,exited 2026-11-04 (Supertrend red),17.9,1.69,CVR Energy Inc. Common Stock,NYSE
+APPF,EMA 9/21 cross,2026-10-16,212.13,198.62,55.3,92.56,201.76,True,224.76,210.75,6.1,17,stopped 2026-10-28,-5.9,-1.02,"AppFolio, Inc.",Nasdaq
+KNSA,EMA 9/21 cross,2026-10-27,89.2,70.67,65.1,89.2,81.14,True,95.02,87.88,24.3,10,skipped (stop too far / gap below stop),,,"Kiniksa Pharmaceuticals International, plc - Class A Ordinary Shares",Nasdaq
+HESM,EMA 9/21 cross,2026-08-26,39.07,37.6,55.7,89.12,32.94,False,30.46,38.99,3.7,53,stopped 2026-09-24,-3.6,-1.0,Hess Midstream LP Class A Representing Limited Partner Interests,NYSE
+HAE,EMA 9/21 cross,2026-10-08,119.47,101.32,76.6,84.74,114.18,True,122.36,119.81,18.2,23,skipped (stop too far / gap below stop),,,Haemonetics Corporation Common Stock,NYSE
+RHP,EMA 9/21 cross,2026-08-24,129.84,121.6,60.1,80.52,126.11,True,138.53,130.69,7.5,55,stopped 2026-09-01,-7.0,-1.0,"Ryman Hospitality Properties, Inc. (REIT)",NYSE
+VAL,EMA 9/21 cross,2026-09-15,88.23,80.79,55.9,78.06,91.92,False,78.92,87.4,8.2,40,stopped 2026-09-22,-7.9,-1.05,Valaris Limited Common Shares,NYSE
+GEO,EMA 9/21 cross,2026-10-05,32.34,30.15,57.0,74.14,26.06,True,31.94,32.2,6.8,26,stopped 2026-10-06,-6.4,-1.0,Geo Group Inc (The) REIT,NYSE
+CGON,EMA 9/21 cross,2026-09-21,78.25,72.48,59.4,72.9,61.58,True,72.64,78.31,8.0,36,stopped 2026-09-23,-7.4,-1.0,"CG Oncology, Inc. - Common stock",Nasdaq
+CWST,EMA 9/21 cross,2026-08-20,93.05,88.39,55.2,72.86,89.15,True,93.0,93.62,5.9,57,exited 2026-09-18 (Supertrend red),-4.9,-0.88,"Casella Waste Systems, Inc.",Nasdaq
+TARS,52w-high base breakout,2026-09-02,82.76,72.83,78.5,72.84,78.99,False,73.83,82.76,13.6,48,exited 2026-09-23 (Supertrend red),-6.7,-0.56,"Tarsus Pharmaceuticals, Inc.",Nasdaq
+EWTX,EMA 9/21 cross,2026-09-11,44.4,41.6,56.0,72.06,37.19,True,46.53,43.98,5.7,42,stopped 2026-09-23,-5.4,-1.0,"Edgewise Therapeutics, Inc.",Nasdaq
+SXT,EMA 9/21 cross,2026-10-07,131.55,127.32,55.6,70.5,127.76,False,121.09,130.68,2.6,24,stopped 2026-10-30,-14.6,-5.68,Sensient Technologies Corporation Common Stock,NYSE
+DDS,52w-high base breakout,2026-10-22,719.61,649.31,69.1,69.38,710.79,False,634.33,706.62,8.8,13,stopped 2026-10-28,-8.3,-1.02,"Dillard's, Inc. Common Stock",Other
+MUR,52w-high base breakout,2026-10-19,42.54,38.06,70.4,69.04,39.53,False,34.72,43.1,13.2,16,exited 2026-11-04 (Supertrend red),-10.5,-0.9,Murphy Oil Corporation Common Stock,NYSE
+PARR,EMA 9/21 cross,2026-10-01,86.21,74.23,62.1,68.52,79.6,False,67.04,85.31,14.9,28,skipped (stop too far / gap below stop),,,"Par Pacific Holdings, Inc.  Common Stock",NYSE
+WGS,52w-high base breakout,2026-09-15,94.64,83.28,70.2,68.16,75.52,False,54.83,94.23,13.1,40,exited 2026-09-24 (Supertrend red),-10.4,-0.89,GeneDx Holdings Corp.,Nasdaq
+TS,EMA 9/21 cross,2026-10-05,58.46,54.29,63.9,68.02,61.46,False,60.24,57.2,5.4,26,exited 2026-11-05 (Supertrend red),6.5,1.28,Tenaris S.A. American Depositary Shares,NYSE
+MFC,EMA 9/21 cross,2026-09-03,44.59,41.91,63.1,67.2,46.11,False,44.24,44.37,5.9,47,stopped 2026-10-01,-5.5,-1.0,Manulife Financial Corporation Common Stock,NYSE
+AUGO,EMA 9/21 cross,2026-10-09,91.26,80.28,61.3,64.42,65.0,True,81.31,89.89,12.0,22,stopped 2026-10-22,-10.7,-1.0,Aura Minerals Inc. - Common Shares,Nasdaq
+UGI,52w-high base breakout,2026-08-18,38.01,34.43,68.7,54.38,37.03,True,37.54,38.12,10.7,59,exited 2026-10-01 (Supertrend red),-6.9,-0.71,UGI Corporation Common Stock,NYSE
+MRX,EMA 9/21 cross,2026-10-05,75.21,68.0,57.7,51.42,72.91,False,69.26,75.98,11.7,26,stopped 2026-10-15,-10.5,-1.0,Marex Group Limited - Ordinary Shares,Nasdaq
+DCI,EMA 9/21 cross,2026-08-26,95.24,91.81,56.8,49.98,89.48,False,87.35,93.52,1.9,53,stopped 2026-08-27,-1.8,-1.0,"Donaldson Company, Inc. Common Stock",NYSE
+NWE,EMA 9/21 cross,2026-08-26,71.48,69.0,56.0,49.4,78.56,True,84.92,70.83,2.7,53,stopped 2026-08-31,-2.6,-1.0,"NorthWestern Energy Group, Inc.",Nasdaq
+ERO,52w-high base breakout,2026-08-21,39.42,34.69,72.6,48.3,34.11,False,30.67,39.54,14.0,56,stopped 2026-09-01,-12.3,-1.0,Ero Copper Corp. Common Shares,NYSE
+SDGR,EMA 9/21 cross,2026-10-28,30.87,22.01,65.1,47.6,25.36,True,32.41,30.42,38.2,9,skipped (stop too far / gap below stop),,,"Schrodinger, Inc.",Nasdaq
+AMN,EMA 9/21 cross,2026-09-16,34.92,32.66,56.0,46.58,45.91,False,37.81,34.93,7.0,39,exited 2026-11-09 (Supertrend red),4.1,0.63,AMN Healthcare Services Inc,NYSE
+ICUI,EMA 9/21 cross,2026-10-22,168.33,159.02,58.9,45.96,158.06,True,182.11,166.92,5.0,13,stopped 2026-10-28,-4.7,-1.0,"ICU Medical, Inc.",Nasdaq
+CXT,52w-high base breakout,2026-10-29,60.22,55.97,74.9,45.04,55.51,True,58.52,59.98,7.2,8,stopped 2026-11-05,-6.7,-1.0,"Crane NXT, Co. Common Stock",NYSE
+BWIN,EMA 9/21 cross,2026-09-14,32.0,27.74,60.1,44.34,31.67,True,32.18,32.0,15.4,41,skipped (stop too far / gap below stop),,,"The Baldwin Insurance Group, Inc.",Nasdaq
+HRMY,52w-high base breakout,2026-09-01,41.25,38.87,65.6,44.1,38.62,False,33.55,41.31,6.3,49,stopped 2026-09-30,-5.9,-1.0,"Harmony Biosciences Holdings, Inc.",Nasdaq
+PCRX,EMA 9/21 cross,2026-10-08,36.39,24.56,85.1,40.58,35.82,True,36.49,36.33,47.9,23,skipped (stop too far / gap below stop),,,"Pacira BioSciences, Inc.",Nasdaq
+INTA,EMA 9/21 cross,2026-10-09,39.61,36.5,60.2,38.06,45.82,False,45.4,40.0,9.6,22,exited 2026-10-29 (Supertrend red),-2.2,-0.25,"Intapp, Inc.",Nasdaq
+IRDM,EMA 9/21 cross,2026-09-22,48.65,46.56,57.4,38.02,40.74,True,46.13,48.6,4.4,35,stopped 2026-10-13,-4.2,-1.0,Iridium Communications Inc,Nasdaq
+HCI,52w-high base breakout,2026-10-20,204.28,191.72,72.9,36.9,206.33,False,188.53,203.36,6.1,15,stopped 2026-11-05,-5.7,-1.0,"HCI Group, Inc. Common Stock",NYSE
+IDYA,EMA 9/21 cross,2026-09-22,39.71,37.24,58.4,36.58,35.26,False,31.75,39.74,6.7,35,stopped 2026-09-23,-6.3,-1.0,"IDEAYA Biosciences, Inc.",Nasdaq
+UFPT,EMA 9/21 cross,2026-11-04,329.82,277.81,68.3,34.58,277.98,True,314.04,326.13,17.4,4,skipped (stop too far / gap below stop),,,"UFP Technologies, Inc.",Nasdaq
+BH,EMA 9/21 cross,2026-09-02,393.99,370.31,56.4,33.34,392.03,False,349.22,397.01,7.2,48,stopped 2026-09-08,-6.7,-1.0,Biglari Holdings Inc. Class B Common Stock,NYSE
+DXPE,EMA 9/21 cross,2026-10-02,193.98,179.81,58.5,32.78,173.79,False,155.4,194.1,7.9,27,stopped 2026-10-07,-7.4,-1.0,"DXP Enterprises, Inc.",Nasdaq
+LB,EMA 9/21 cross,2026-10-08,87.46,80.41,59.6,32.72,78.95,False,66.24,86.86,8.0,23,stopped 2026-10-15,-7.4,-1.0,LandBridge Corporation Class A Common Stock,NYSE
+LB,52w-high base breakout,2026-08-20,86.91,76.48,63.9,32.72,78.95,False,66.24,87.38,14.3,57,stopped 2026-10-22,-12.5,-1.0,LandBridge Corporation Class A Common Stock,NYSE
+TX,EMA 9/21 cross,2026-10-05,57.97,53.22,61.4,32.1,55.22,False,51.11,58.35,9.6,26,stopped 2026-10-26,-8.8,-1.0,"Ternium S.A. Ternium S.A. American Depositary Shares (each representing ten shares, USD1.00 par value)",NYSE
+CDP,EMA 9/21 cross,2026-08-24,37.11,36.15,56.9,31.36,34.82,False,32.81,37.16,2.8,55,stopped 2026-08-31,-3.1,-1.15,COPT Defense Properties Common Shares of Beneficial Interest,NYSE
+SPB,EMA 9/21 cross,2026-09-02,89.29,85.41,55.1,31.1,81.28,True,88.69,89.42,4.7,48,stopped 2026-09-09,-4.5,-1.0,"Spectrum Brands Holdings, Inc. Common Stock",NYSE
+ETON,EMA 9/21 cross,2026-11-09,64.35,47.03,69.5,28.76,53.52,True,67.54,63.63,35.3,1,skipped (stop too far / gap below stop),,,"Eton Pharmaceuticals, Inc.",Nasdaq
+HNI,EMA 9/21 cross,2026-10-13,47.72,45.61,56.0,28.1,45.8,True,49.28,46.85,2.7,20,stopped 2026-10-20,-2.6,-1.0,HNI Corporation Common Stock,NYSE
+ZD,EMA 9/21 cross,2026-10-12,57.58,54.13,57.3,27.68,57.62,False,51.14,57.87,6.9,21,stopped 2026-10-30,-6.5,-1.0,"Ziff Davis, Inc.",Nasdaq
+PAY,EMA 9/21 cross,2026-11-02,35.05,31.17,61.6,26.84,30.0,True,34.12,33.74,8.2,6,stopped 2026-11-03,-7.6,-1.0,"Paymentus Holdings, Inc. Class A Common Stock",NYSE
+TNET,EMA 9/21 cross,2026-09-15,68.93,64.62,55.7,26.24,74.76,False,66.3,68.21,5.6,40,stopped 2026-09-24,-5.3,-1.0,"TriNet Group, Inc. Common Stock",NYSE
+DJCO,52w-high base breakout,2026-09-14,677.05,610.0,75.6,25.84,587.96,True,670.49,674.78,10.6,41,stopped 2026-10-16,-9.6,-1.0,Daily Journal Corp. (S.C.),Nasdaq
+NKTR,EMA 9/21 cross,2026-09-03,76.37,70.0,59.6,25.08,42.95,False,37.78,74.67,6.7,47,stopped 2026-09-11,-6.3,-1.0,Nektar Therapeutics,Nasdaq
+AGM,EMA 9/21 cross,2026-09-04,226.16,215.46,59.2,24.8,201.27,False,173.58,227.1,5.4,46,stopped 2026-09-25,-5.1,-1.0,Federal Agricultural Mortgage Corporation Common Stock,NYSE
+FSV,EMA 9/21 cross,2026-08-19,146.18,137.47,57.6,23.94,141.8,True,155.0,146.18,6.3,58,stopped 2026-09-02,-6.0,-1.0,FirstService Corporation - Common Shares,Nasdaq
+NSP,EMA 9/21 cross,2026-10-15,50.8,47.49,57.3,23.9,56.28,False,50.87,51.2,7.8,18,stopped 2026-10-29,-7.2,-1.0,"Insperity, Inc. Common Stock",NYSE
+PLUS,EMA 9/21 cross,2026-09-03,90.87,86.07,60.2,23.88,97.83,False,96.61,91.17,5.9,47,stopped 2026-11-05,-5.6,-1.0,ePlus inc.,Nasdaq
+BLTE,52w-high base breakout,2026-09-04,193.61,170.38,72.6,23.22,162.9,False,156.52,192.71,13.1,46,stopped 2026-09-15,-11.6,-1.0,"Belite Bio, Inc - American Depositary Shares",Nasdaq
+DIN,EMA 9/21 cross,2026-08-24,35.87,32.52,55.6,22.82,31.31,True,36.76,35.85,10.2,55,stopped 2026-09-01,-9.9,-1.07,"Dine Brands Global, Inc. Common Stock",NYSE
+PRLB,EMA 9/21 cross,2026-09-17,86.42,77.88,60.7,22.1,80.38,False,67.93,86.99,11.7,38,exited 2026-10-16 (Supertrend red),0.2,0.02,"Proto Labs, Inc. Common stock",NYSE
+PLSE,EMA 9/21 cross,2026-10-09,53.81,47.31,59.3,20.76,46.21,True,55.12,53.53,13.1,22,skipped (stop too far / gap below stop),,,"Pulse Biosciences, Inc",Nasdaq
+CNMD,EMA 9/21 cross,2026-11-04,53.66,43.5,68.6,20.32,45.54,True,51.21,54.4,25.1,4,skipped (stop too far / gap below stop),,,CONMED Corporation Common Stock,NYSE
+NPK,EMA 9/21 cross,2026-10-01,150.12,142.61,55.2,17.9,140.55,True,145.6,150.7,5.7,28,stopped 2026-11-05,-5.4,-1.0,"National Presto Industries, Inc. Common Stock",NYSE
+OFG,EMA 9/21 cross,2026-09-02,52.34,51.11,55.5,17.84,49.65,True,51.18,52.65,3.0,48,stopped 2026-09-04,-2.9,-1.0,OFG Bancorp Common Stock,NYSE
+WOR,52w-high base breakout,2026-09-04,62.26,56.12,70.7,17.14,59.67,True,60.37,62.06,10.6,46,exited 2026-09-14 (Supertrend red),-9.7,-1.01,"Worthington Enterprises, Inc. Common Shares",NYSE
+DCOM,EMA 9/21 cross,2026-09-04,40.98,39.09,58.7,16.98,40.2,True,42.38,40.78,4.3,46,stopped 2026-09-29,-4.1,-1.0,"Dime Commercial Bancshares, Inc. Common Stock",NYSE
+VEON,52w-high base breakout,2026-08-21,59.38,55.0,69.8,15.24,87.12,False,75.51,59.37,7.9,56,exited 2026-11-04 (Supertrend red),33.4,4.53,VEON Ltd. - American Depositary Shares,Nasdaq
+FET,EMA 9/21 cross,2026-10-19,85.06,76.51,55.9,15.2,85.13,False,72.08,85.39,11.6,16,exited 2026-11-04 (Supertrend red),-11.0,-1.06,"Forum Energy Technologies, Inc. Common Stock",NYSE
+ITIC,EMA 9/21 cross,2026-10-08,298.63,287.5,57.3,15.06,286.45,False,270.43,300.54,4.5,23,stopped 2026-10-14,-4.3,-1.0,Investors Title Company,Nasdaq
+CSTL,EMA 9/21 cross,2026-10-28,36.68,32.69,62.3,14.76,32.37,True,34.42,37.57,14.9,9,skipped (stop too far / gap below stop),,,"Castle Biosciences, Inc. - Common stock",Nasdaq
+TFPM,EMA 9/21 cross,2026-09-22,33.73,31.39,55.1,13.38,28.96,True,32.15,32.82,4.6,35,stopped 2026-09-28,-5.6,-1.29,Triple Flag Precious Metals Corp. Common Shares,NYSE
+PDS,52w-high base breakout,2026-10-28,105.47,92.81,78.4,13.26,105.13,False,91.97,104.49,12.6,9,stopped 2026-11-04,-11.2,-1.0,Precision Drilling Corporation Common Stock,NYSE
+BFC,EMA 9/21 cross,2026-09-04,155.61,147.73,58.3,13.1,139.4,True,150.86,154.79,4.8,46,stopped 2026-10-01,-4.6,-1.0,Bank First Corporation,Nasdaq
+GSL,EMA 9/21 cross,2026-10-02,45.79,43.25,59.4,12.14,42.44,False,42.29,45.91,6.2,27,stopped 2026-10-14,-5.8,-1.0,Global Ship Lease Inc New Class A Common Shares,NYSE
+RIGL,52w-high base breakout,2026-10-29,51.45,47.47,65.2,11.86,48.73,False,43.91,51.8,9.1,8,stopped 2026-11-03,-8.4,-1.0,"Rigel Pharmaceuticals, Inc.",Nasdaq
+TMP,EMA 9/21 cross,2026-09-25,98.83,95.78,55.9,11.46,95.31,True,100.83,98.34,2.7,32,stopped 2026-09-29,-2.6,-1.0,Tompkins Financial Corporation Common Stock,NYSE American
+FIZZ,EMA 9/21 cross,2026-08-19,32.1,30.41,56.4,11.16,34.14,True,37.52,31.87,4.8,58,stopped 2026-09-11,-7.9,-1.72,National Beverage Corp.,Nasdaq
+GEF.B,EMA 9/21 cross,2026-10-15,110.19,104.07,57.8,11.0,112.87,False,102.63,110.8,6.5,18,exited 2026-11-05 (Supertrend red),-3.5,-0.57,"Greif, Inc. Corporation Class B Common Stock",NYSE
+HIPO,52w-high base breakout,2026-10-21,38.39,34.59,82.6,10.98,38.72,False,36.29,38.53,11.4,14,exited 2026-11-04 (Supertrend red),-7.3,-0.72,Hippo Holdings Inc. Common Stock,NYSE
+CTBI,EMA 9/21 cross,2026-09-04,77.05,74.36,57.9,9.9,75.79,False,70.09,76.89,3.4,46,stopped 2026-09-23,-3.3,-1.0,"Community Trust Bancorp, Inc.",Nasdaq
+PNRG,EMA 9/21 cross,2026-10-23,215.75,198.32,56.8,9.28,211.55,False,188.14,213.0,7.4,12,exited 2026-11-03 (Supertrend red),-4.8,-0.69,PrimeEnergy Resources Corporation,Nasdaq
+IX,EMA 9/21 cross,2026-09-03,41.19,38.82,61.6,9.16,35.41,False,32.7,40.33,3.9,47,stopped 2026-09-24,-5.0,-1.34,ORIX Corporation American Depositary Shares,NYSE
+HRTG,EMA 9/21 cross,2026-10-06,34.17,32.91,55.4,8.44,37.4,False,33.5,33.91,3.0,25,stopped 2026-10-07,-2.9,-1.0,"Heritage Insurance Holdings, Inc. Common Stock",NYSE
+CLMB,52w-high base breakout,2026-10-05,33.73,30.83,72.6,7.98,36.85,True,43.16,33.85,9.8,26,stopped 2026-10-21,-8.9,-1.0,"Climb Global Solutions, Inc.",Nasdaq
+OBK,EMA 9/21 cross,2026-09-02,53.82,52.43,56.3,7.88,50.18,True,54.24,54.21,3.4,48,stopped 2026-09-29,-3.3,-1.0,"Origin Bancorp, Inc. Common Stock",Other
+UFCS,EMA 9/21 cross,2026-10-05,54.65,51.81,56.0,7.82,54.24,False,51.51,54.51,5.2,26,stopped 2026-11-04,-5.0,-1.0,"United Fire Group, Inc",Nasdaq
+FMBH,EMA 9/21 cross,2026-09-04,51.33,49.36,59.1,7.64,48.34,True,51.24,51.24,3.8,46,stopped 2026-09-18,-3.7,-1.0,"First Mid Bancshares, Inc.",Nasdaq
+MBWM,EMA 9/21 cross,2026-09-02,60.6,58.11,57.4,7.56,57.57,True,61.36,61.11,5.2,48,stopped 2026-10-01,-4.9,-1.0,Mercantile Bank Corporation,Nasdaq
+IBEX,EMA 9/21 cross,2026-11-06,49.52,41.5,68.9,6.32,44.55,True,52.23,49.58,19.5,2,skipped (stop too far / gap below stop),,,IBEX Limited - Common Share,Nasdaq
+IBEX,52w-high base breakout,2026-09-15,40.8,35.9,68.0,6.32,44.55,True,52.23,40.51,12.8,40,exited 2026-11-06 (Supertrend red),10.8,0.95,IBEX Limited - Common Share,Nasdaq
+SMBK,EMA 9/21 cross,2026-09-04,51.87,49.79,58.4,5.8,52.3,False,48.1,51.55,3.5,46,stopped 2026-09-28,-3.4,-1.0,"SmartFinancial, Inc. Common Stock",NYSE
+BFST,EMA 9/21 cross,2026-09-04,31.84,30.54,59.0,5.46,30.95,True,32.73,31.7,3.8,46,stopped 2026-09-18,-3.7,-1.0,"Business First Bancshares, Inc.",Nasdaq
+FLXS,EMA 9/21 cross,2026-08-18,76.94,69.78,59.0,5.4,81.23,False,72.73,76.56,9.7,59,stopped 2026-10-27,-8.9,-1.0,"Flexsteel Industries, Inc.",Nasdaq
+CCNE,EMA 9/21 cross,2026-09-04,34.91,33.23,61.1,4.96,34.35,True,36.11,34.78,4.7,46,stopped 2026-09-29,-4.5,-1.0,CNB Financial Corporation,Nasdaq
+MSBI,EMA 9/21 cross,2026-10-26,33.96,31.94,63.4,4.94,35.21,False,32.44,34.17,7.0,11,stopped 2026-11-05,-6.5,-1.0,"Midland States Bancorp, Inc.",Nasdaq
+FISI,EMA 9/21 cross,2026-09-04,41.37,39.43,58.5,4.78,38.76,True,39.97,41.24,4.6,46,stopped 2026-09-29,-4.4,-1.0,"Financial Institutions, Inc.",Nasdaq
+PFIS,EMA 9/21 cross,2026-09-03,70.91,68.29,60.3,4.76,67.6,True,72.58,70.46,3.2,47,stopped 2026-09-29,-3.1,-1.0,Peoples Financial Services Corp.,Nasdaq
+VTMX,EMA 9/21 cross,2026-08-21,35.7,32.92,67.3,4.58,35.06,True,38.0,35.51,7.9,56,stopped 2026-09-14,-7.3,-1.0,"Corporacion Inmobiliaria Vesta, S.A.B de C.V. American Depositary Shares, each representing ten (10) Common Shares",NYSE
+ALRS,EMA 9/21 cross,2026-09-02,33.08,32.17,55.6,4.5,32.08,True,34.78,33.32,3.6,48,stopped 2026-09-10,-3.5,-1.0,Alerus Financial Corporation,Nasdaq
+SPFI,EMA 9/21 cross,2026-09-04,45.43,42.5,64.2,4.44,41.52,True,43.08,45.52,7.1,46,exited 2026-09-25 (Supertrend red),-6.0,-0.9,"South Plains Financial, Inc.",Nasdaq
+ORRF,EMA 9/21 cross,2026-09-04,42.84,40.68,59.6,4.34,42.02,True,44.32,42.66,4.9,46,stopped 2026-09-28,-4.6,-1.0,"Orrstown Financial Services, Inc.",Nasdaq
+PBT,EMA 9/21 cross,2026-10-09,34.81,30.96,60.6,3.52,32.34,False,30.63,34.95,12.9,22,skipped (stop too far / gap below stop),,,Permian Basin Royalty Trust Common Stock,NYSE
+BHB,EMA 9/21 cross,2026-09-02,39.81,38.53,56.2,3.26,39.59,True,41.33,40.08,4.0,48,stopped 2026-09-25,-3.9,-1.0,"Bar Harbor Bankshares, Inc. Common Stock",NYSE American
+COFS,EMA 9/21 cross,2026-09-04,34.01,32.36,59.0,3.22,34.24,True,36.74,33.88,4.7,46,stopped 2026-09-23,-4.5,-1.0,"ChoiceOne Financial Services, Inc.",Nasdaq
+BATRA,EMA 9/21 cross,2026-09-21,57.34,54.75,60.1,3.14,53.09,True,57.42,57.63,5.3,36,exited 2026-10-15 (Supertrend red),-3.7,-0.74,"Atlanta Braves Holdings, Inc. - Series A Common Stock",Nasdaq
+VLGEA,EMA 9/21 cross,2026-10-23,45.09,42.44,55.8,2.78,45.8,False,42.06,45.28,6.7,12,stopped 2026-10-29,-6.3,-1.0,"Village Super Market, Inc.",Nasdaq
+UTMD,EMA 9/21 cross,2026-09-15,74.32,68.42,64.1,2.64,67.17,True,72.86,74.28,8.6,40,exited 2026-10-29 (Supertrend red),-6.9,-0.87,"Utah Medical Products, Inc.",Nasdaq
+PDEX,EMA 9/21 cross,2026-09-04,73.41,59.92,68.5,2.46,58.43,True,69.86,73.95,23.4,46,skipped (stop too far / gap below stop),,,"Pro-Dex, Inc.",Nasdaq
+EFSI,EMA 9/21 cross,2026-09-08,45.96,40.39,74.6,2.06,43.98,True,45.89,46.03,13.9,45,skipped (stop too far / gap below stop),,,Eagle Financial Services Inc,Nasdaq
+TJGC,EMA 9/21 cross,2026-08-24,6.1,3.65,72.7,0.14,30.07,True,31.89,6.24,71.0,54,skipped (stop too far / gap below stop),,,TJGC Group Limited - Class A Ordinary Shares,Nasdaq
