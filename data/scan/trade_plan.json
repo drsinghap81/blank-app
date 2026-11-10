@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-10 12:49 UTC",
+"generated": "2026-11-10 15:20 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-09",
@@ -721,7 +721,7 @@
 "exit_rule": "Supertrend(10,3) turns red -> sell next open",
 "note": "EMA 9/21 cross 2026-11-09, stop 10.1% below",
 "score": 3,
-"value_cr": 296.44,
+"value_cr": 296.45,
 "sector": null,
 "sector_rs": null,
 "theme": null,
