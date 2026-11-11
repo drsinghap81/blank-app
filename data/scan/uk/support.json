@@ -1,25 +1,124 @@
 {
-"generated": "2026-11-11T03:19+00:00",
-"asof": "2026-11-10",
+"generated": "2026-11-11T17:58+00:00",
+"asof": "2026-11-11",
 "market": "UK",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "UK: not backtested yet - watch only.",
 "rows": [
 {
+"symbol": "AVON",
+"name": "Avon Technologies",
+"status": "touched",
+"touch_date": "2026-11-10",
+"days_ago": 1,
+"level": 2179.71,
+"level_kind": "breakout retest",
+"level_date": "2025-08-04",
+"close": 2285.0,
+"above_pct": 4.8302613688968155,
+"stop": 2035.45,
+"risk_pct": 10.921148912501955,
+"resistance": 2565.0,
+"room_r": 1.122027491781152,
+"sq9": 2209,
+"sq9_cross": "47\u00b2",
+"sq9_dist_pct": -1.325753221904713,
+"sq9_gap_pct": 8.691715708465363,
+"sq9_below": [
+[
+2025,
+"45\u00b2"
+]
+],
+"sq9_above": [
+[
+2401,
+"49\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "NCC",
+"name": "NCC Group",
+"status": "touched",
+"touch_date": "2026-11-10",
+"days_ago": 1,
+"level": 149.38,
+"level_kind": "breakout retest",
+"level_date": "2026-06-01",
+"close": 155.1999969482422,
+"above_pct": 3.8946233094961924,
+"stop": 141.8,
+"risk_pct": 8.63660540027713,
+"resistance": 157.74,
+"room_r": 0.18974659288479961,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": -11.608209553554916,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "SGE",
+"name": "Sage Group",
+"status": "touched",
+"touch_date": "2026-11-10",
+"days_ago": 1,
+"level": 1105.0,
+"level_kind": "breakout retest",
+"level_date": "2026-08-24",
+"close": 1160.0,
+"above_pct": 4.977375565610864,
+"stop": 1073.61,
+"risk_pct": 7.447278252963363,
+"resistance": 1174.73,
+"room_r": 0.17054122261881546,
+"sq9": 1089,
+"sq9_cross": "33\u00b2",
+"sq9_dist_pct": 1.469237832874204,
+"sq9_gap_pct": 12.488521579430678,
+"sq9_below": [
+[
+961,
+"31\u00b2"
+]
+],
+"sq9_above": [
+[
+1225,
+"35\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "ATG",
 "name": "Auction Technology Group",
 "status": "touched",
 "touch_date": "2026-11-09",
-"days_ago": 0,
+"days_ago": 2,
 "level": 465.5,
 "level_kind": "old swing low",
 "level_date": "2025-07-15",
-"close": 483.20001220703125,
-"above_pct": 3.8023656728316313,
-"stop": 447.01,
-"risk_pct": 7.490247214210932,
+"close": 479.20001220703125,
+"above_pct": 2.9430745879766462,
+"stop": 448.91,
+"risk_pct": 6.320120306796639,
 "resistance": 494.0,
-"room_r": 0.29840093271597135,
+"room_r": 0.4886739532413481,
 "sq9": 441,
 "sq9_cross": "21\u00b2",
 "sq9_dist_pct": 5.555555555555558,
@@ -39,34 +138,67 @@
 "sq9_match": false
 },
 {
-"symbol": "NCC",
-"name": "NCC Group",
+"symbol": "BYIT",
+"name": "Bytes Technology Group",
 "status": "touched",
-"touch_date": "2026-11-09",
-"days_ago": 0,
-"level": 152.15,
-"level_kind": "breakout retest",
-"level_date": "2025-07-28",
-"close": 158.60000610351562,
-"above_pct": 4.242423877730195,
-"stop": 145.21,
-"risk_pct": 8.440555116429016,
-"resistance": 164.11,
-"room_r": 0.41125955332724834,
-"sq9": 169,
-"sq9_cross": "13\u00b2",
-"sq9_dist_pct": -9.973162588988538,
-"sq9_gap_pct": 33.136094674556205,
+"touch_date": "2026-11-06",
+"days_ago": 3,
+"level": 427.97,
+"level_kind": "old swing low",
+"level_date": "2026-10-14",
+"close": 444.20001220703125,
+"above_pct": 3.7926056942388042,
+"stop": 408.22,
+"risk_pct": 8.100644873200569,
+"resistance": 462.03,
+"room_r": 0.49553084871014613,
+"sq9": 441,
+"sq9_cross": "21\u00b2",
+"sq9_dist_pct": -2.9549112125318855,
+"sq9_gap_pct": 19.95464852607709,
 "sq9_below": [
 [
-121,
-"11\u00b2"
+361,
+"19\u00b2"
 ]
 ],
 "sq9_above": [
 [
-169,
-"13\u00b2"
+529,
+"23\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "JAM",
+"name": "JPMorgan American Investment Trust",
+"status": "touched",
+"touch_date": "2026-11-05",
+"days_ago": 4,
+"level": 1145.89,
+"level_kind": "breakout retest",
+"level_date": "2025-10-29",
+"close": 1232.0,
+"above_pct": 7.515082406742191,
+"stop": 1122.19,
+"risk_pct": 8.912798823142543,
+"resistance": 1260.0,
+"room_r": 0.25499591293657586,
+"sq9": 1089,
+"sq9_cross": "33\u00b2",
+"sq9_dist_pct": 5.223667785812669,
+"sq9_gap_pct": 12.488521579430678,
+"sq9_below": [
+[
+961,
+"31\u00b2"
+]
+],
+"sq9_above": [
+[
+1369,
+"37\u00b2"
 ]
 ],
 "sq9_match": false
@@ -76,16 +208,16 @@
 "name": "Qinetiq",
 "status": "touched",
 "touch_date": "2026-11-05",
-"days_ago": 2,
+"days_ago": 4,
 "level": 504.0,
 "level_kind": "breakout retest",
 "level_date": "2026-09-21",
-"close": 532.0,
-"above_pct": 5.555555555555558,
-"stop": 486.36,
-"risk_pct": 8.57814211082254,
-"resistance": 549.37,
-"room_r": 0.3807284821228806,
+"close": 523.0,
+"above_pct": 3.7698412698412787,
+"stop": 485.23,
+"risk_pct": 7.22193401454414,
+"resistance": 529.82,
+"room_r": 0.18045347969581807,
 "sq9": 529,
 "sq9_cross": "23\u00b2",
 "sq9_dist_pct": -4.725897920604916,
@@ -98,74 +230,41 @@
 ],
 "sq9_above": [
 [
-625,
-"25\u00b2"
+529,
+"23\u00b2"
 ]
 ],
 "sq9_match": false
 },
 {
-"symbol": "BPT",
-"name": "Bridgepoint Group",
-"status": "touched",
-"touch_date": "2026-11-03",
-"days_ago": 4,
-"level": 386.0,
-"level_kind": "old swing low",
-"level_date": "2026-10-22",
-"close": 405.79998779296875,
-"above_pct": 5.129530516313152,
-"stop": 367.77,
-"risk_pct": 9.371223271453921,
-"resistance": 411.95,
-"room_r": 0.16164956010803147,
-"sq9": 361,
-"sq9_cross": "19\u00b2",
-"sq9_dist_pct": 6.9252077562326875,
-"sq9_gap_pct": 22.160664819944607,
-"sq9_below": [
-[
-289,
-"17\u00b2"
-]
-],
-"sq9_above": [
-[
-441,
-"21\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "SGE",
-"name": "Sage Group",
+"symbol": "DOM",
+"name": "Domino's Pizza",
 "status": "near",
 "touch_date": null,
 "days_ago": null,
-"level": 1105.0,
-"level_kind": "breakout retest",
-"level_date": "2026-08-24",
-"close": 1157.0,
-"above_pct": 4.705882352941182,
-"stop": 1073.36,
-"risk_pct": 7.228904730715213,
-"resistance": 1174.73,
-"room_r": 0.21201723377984313,
-"sq9": 1089,
-"sq9_cross": "33\u00b2",
-"sq9_dist_pct": 1.469237832874204,
-"sq9_gap_pct": 12.488521579430678,
+"level": 216.6,
+"level_kind": "old swing low",
+"level_date": "2026-10-22",
+"close": 226.8000030517578,
+"above_pct": 4.709139732603473,
+"stop": 210.52,
+"risk_pct": 7.1779092989179505,
+"resistance": 237.4,
+"room_r": 0.6511251460766757,
+"sq9": 225,
+"sq9_cross": "15\u00b2",
+"sq9_dist_pct": -3.733330620659725,
+"sq9_gap_pct": 28.44444444444445,
 "sq9_below": [
 [
-961,
-"31\u00b2"
+169,
+"13\u00b2"
 ]
 ],
 "sq9_above": [
 [
-1225,
-"35\u00b2"
+289,
+"17\u00b2"
 ]
 ],
 "sq9_match": false

@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-11T03:19+00:00",
-"asof": "2026-11-10",
+"generated": "2026-11-11T17:58+00:00",
+"asof": "2026-11-11",
 "market": "UK",
 "regime": null,
 "rules": "zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
@@ -12,11 +12,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 4394.0,
+"close": 4480.0,
 "neck": 4331.4501953125,
-"to_neck_pct": -1.423527644230771,
+"to_neck_pct": -3.315843854631695,
 "stop": 3783.78,
-"stop_pct": 13.887573964497047,
+"stop_pct": 15.540625000000007,
 "height_pct": 12.330139919929973,
 "fall_pct": 39.68471138951419,
 "lows": [
@@ -40,9 +40,9 @@
 32.3
 ],
 "rsi_div": 7.0,
-"rsi_now": 68.4,
+"rsi_now": 71.8,
 "signal_date": "2026-11-06",
-"days_since": 1
+"days_since": 3
 },
 {
 "symbol": "PSH",
@@ -50,11 +50,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 3926.0,
+"close": 3970.0,
 "neck": 3949.813720703125,
-"to_neck_pct": 0.6065644600897757,
+"to_neck_pct": -0.5084705112562982,
 "stop": 3546.38,
-"stop_pct": 9.66948502123265,
+"stop_pct": 10.670629267848708,
 "height_pct": 9.050627297159707,
 "fall_pct": 39.74647194472802,
 "lows": [
@@ -78,9 +78,9 @@
 31.3
 ],
 "rsi_div": 0.0,
-"rsi_now": 59.0,
+"rsi_now": 62.0,
 "signal_date": "2026-11-04",
-"days_since": 3
+"days_since": 5
 },
 {
 "symbol": "STJ",
@@ -88,11 +88,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 1141.5,
+"close": 1156.0,
 "neck": 1120.0,
-"to_neck_pct": -1.8834866403854567,
+"to_neck_pct": -3.114186851211076,
 "stop": 1001.38,
-"stop_pct": 12.274638633377133,
+"stop_pct": 13.375000000000004,
 "height_pct": 9.80392156862746,
 "fall_pct": 52.23217534083946,
 "lows": [
@@ -116,24 +116,28 @@
 40.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 60.3,
+"rsi_now": 62.7,
 "signal_date": "2026-11-04",
-"days_since": 3
+"days_since": 5
 },
 {
 "symbol": "IWG",
 "name": "International Workplace Group",
 "kind": "stock",
-"typ": "DB",
+"typ": "TB",
 "status": "breakout",
-"close": 211.39999389648438,
-"neck": 189.99623107910156,
-"to_neck_pct": -10.124769836967706,
+"close": 214.1999969482422,
+"neck": 202.7959747314453,
+"to_neck_pct": -5.324006713012452,
 "stop": 169.78,
-"stop_pct": 19.685428144743412,
-"height_pct": 10.784974390146672,
-"fall_pct": 44.826170849551296,
+"stop_pct": 20.735292988344124,
+"height_pct": 18.248381767606592,
+"fall_pct": 41.37792540535856,
 "lows": [
+[
+"2026-06-08",
+176.39649963378906
+],
 [
 "2026-08-18",
 172.1965789794922
@@ -145,56 +149,99 @@
 ],
 "peaks": [
 [
+"2026-07-28",
+202.7959747314453
+],
+[
 "2026-08-28",
 189.99623107910156
 ]
 ],
 "rsi_lows": [
+34.8,
 32.7,
 38.5
 ],
 "rsi_div": 5.8,
-"rsi_now": 71.2,
-"signal_date": "2026-10-28",
-"days_since": 8
+"rsi_now": 73.1,
+"signal_date": "2026-11-03",
+"days_since": 6
 },
 {
-"symbol": "XPS",
-"name": "XPS Pensions",
+"symbol": "MRO",
+"name": "Melrose Industries",
 "kind": "stock",
-"typ": "DB",
-"status": "breakout",
-"close": 348.0,
-"neck": 343.9053039550781,
-"to_neck_pct": -1.1766367945177825,
-"stop": 286.53,
-"stop_pct": 17.664917275438253,
-"height_pct": 17.206139310809633,
-"fall_pct": 39.98610469736115,
+"typ": "TW",
+"status": "forming",
+"close": 488.6000061035156,
+"neck": 490.0,
+"to_neck_pct": 0.2865316985255495,
+"stop": 427.48,
+"stop_pct": 12.508804221244318,
+"height_pct": 11.79557692149693,
+"fall_pct": 55.53259406941018,
 "lows": [
 [
-"2026-05-12",
-293.419189453125
+"2026-10-08",
+438.29998779296875
 ],
 [
-"2026-10-02",
-293.5
+"2026-10-23",
+452.6000061035156
 ]
 ],
 "peaks": [
 [
-"2026-08-07",
-343.9053039550781
+"2026-10-21",
+490.0
 ]
 ],
 "rsi_lows": [
-39.8,
-34.8
+31.7,
+40.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 64.6,
-"signal_date": "2026-10-27",
-"days_since": 9
+"rsi_now": 58.2,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "SPX",
+"name": "Spirax Group",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 7620.0,
+"neck": 7649.4736328125,
+"to_neck_pct": 0.38679308152886893,
+"stop": 6199.94,
+"stop_pct": 18.635934247715802,
+"height_pct": 21.428564231187465,
+"fall_pct": 26.328671683700968,
+"lows": [
+[
+"2026-07-08",
+6299.56689453125
+],
+[
+"2026-09-14",
+6719.53759765625
+]
+],
+"peaks": [
+[
+"2026-08-10",
+7649.4736328125
+]
+],
+"rsi_lows": [
+27.7,
+37.9
+],
+"rsi_div": 0.0,
+"rsi_now": 62.4,
+"signal_date": null,
+"days_since": null
 },
 {
 "symbol": "HWDN",
@@ -202,11 +249,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 852.0,
+"close": 853.0,
 "neck": 867.4429931640625,
-"to_neck_pct": 1.8125578831059252,
+"to_neck_pct": 1.6931996675336958,
 "stop": 708.3,
-"stop_pct": 16.866379159942436,
+"stop_pct": 16.963839442287167,
 "height_pct": 19.9032484901559,
 "fall_pct": 34.04341247333491,
 "lows": [
@@ -239,7 +286,7 @@
 26.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 68.3,
+"rsi_now": 67.7,
 "signal_date": null,
 "days_since": null
 },
@@ -249,11 +296,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 149.10000610351562,
+"close": 148.3000030517578,
 "neck": 152.7777862548828,
-"to_neck_pct": 2.466653253396789,
+"to_neck_pct": 3.019408705987825,
 "stop": 124.42,
-"stop_pct": 16.549367532284155,
+"stop_pct": 16.0991938352412,
 "height_pct": 20.314967991236088,
 "fall_pct": 26.894000819408003,
 "lows": [
@@ -277,45 +324,7 @@
 37.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 65.7,
-"signal_date": null,
-"days_since": null
-},
-{
-"symbol": "SPX",
-"name": "Spirax Group",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 7335.0,
-"neck": 7649.4736328125,
-"to_neck_pct": 4.2873024241649516,
-"stop": 6199.94,
-"stop_pct": 15.474549279835637,
-"height_pct": 21.428564231187465,
-"fall_pct": 26.328671683700968,
-"lows": [
-[
-"2026-07-08",
-6299.56689453125
-],
-[
-"2026-09-14",
-6719.53759765625
-]
-],
-"peaks": [
-[
-"2026-08-10",
-7649.4736328125
-]
-],
-"rsi_lows": [
-27.7,
-37.9
-],
-"rsi_div": 0.0,
-"rsi_now": 50.6,
+"rsi_now": 62.3,
 "signal_date": null,
 "days_since": null
 },
@@ -325,11 +334,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 2001.0,
+"close": 1984.0,
 "neck": 2130.0,
-"to_neck_pct": 6.446776611694149,
+"to_neck_pct": 7.358870967741926,
 "stop": 1739.73,
-"stop_pct": 13.05683300919338,
+"stop_pct": 12.31185627590522,
 "height_pct": 21.104909059714604,
 "fall_pct": 32.83319924242802,
 "lows": [
@@ -353,54 +362,7 @@
 25.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 59.6,
-"signal_date": null,
-"days_since": null
-},
-{
-"symbol": "MRO",
-"name": "Melrose Industries",
-"kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 479.70001220703125,
-"neck": 515.2000122070312,
-"to_neck_pct": 7.400458431649715,
-"stop": 405.78,
-"stop_pct": 15.40988805334912,
-"height_pct": 17.54506651968839,
-"fall_pct": 50.063104242350384,
-"lows": [
-[
-"2026-07-31",
-454.2751159667969
-],
-[
-"2026-08-24",
-462.0
-],
-[
-"2026-10-08",
-438.29998779296875
-]
-],
-"peaks": [
-[
-"2026-08-14",
-494.29998779296875
-],
-[
-"2026-08-28",
-515.2000122070312
-]
-],
-"rsi_lows": [
-39.6,
-39.5,
-31.7
-],
-"rsi_div": 0.0,
-"rsi_now": 54.1,
+"rsi_now": 56.3,
 "signal_date": null,
 "days_since": null
 },
@@ -410,11 +372,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 510.0,
+"close": 513.5,
 "neck": 568.8683471679688,
-"to_neck_pct": 11.542813170189948,
+"to_neck_pct": 10.78254083115262,
 "stop": 467.28,
-"stop_pct": 8.376470588235296,
+"stop_pct": 9.00097370983447,
 "height_pct": 20.115781215515895,
 "fall_pct": 32.84029504630232,
 "lows": [
@@ -438,7 +400,7 @@
 28.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 60.3,
+"rsi_now": 61.6,
 "signal_date": null,
 "days_since": null
 },
@@ -448,11 +410,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 751.5,
+"close": 755.5,
 "neck": 852.5,
-"to_neck_pct": 13.439787092481703,
+"to_neck_pct": 12.839179351422892,
 "stop": 678.15,
-"stop_pct": 9.76047904191617,
+"stop_pct": 10.238252812706817,
 "height_pct": 21.61198288159771,
 "fall_pct": 35.241207869475865,
 "lows": [
@@ -476,7 +438,7 @@
 22.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 58.3,
+"rsi_now": 59.6,
 "signal_date": null,
 "days_since": null
 }
