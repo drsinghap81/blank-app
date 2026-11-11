@@ -1223,30 +1223,45 @@ async function adoptCard(load) {
   if (load) { box.innerHTML = '<div class="lv-card"><b>Your other Angel holdings</b><p class="lv-sub">Reading each chart from Angel… (a few seconds per stock)</p></div>';
     try { state._adopt = await lvApi('/api/adopt'); } catch (e) { box.innerHTML = /404|Not Found/i.test(e.message) ? '' : `<div class="lv-card"><b>Your other Angel holdings</b><p class="lv-sub">Couldn't read them: ${esc(e.message)}</p></div>`; return; } }
   const A = state._adopt, live = A.mode === 'LIVE'; const SN = { 'Monthly ATH': 'Momentum', 'Trend 9/21': 'Trend 9/21' };
-  const rows = A.holdings.map((h, i) => `<div class="ad-row"><div class="ad-top"><b>${esc(h.symbol)}</b><span>${h.qty} × ${fmt(h.avg, 2, 'en-IN')}${h.ltp ? ` · now ${fmt(h.ltp, 2, 'en-IN')}` : ''}</span></div>
+  /* 11 Nov 2026: tick several and adopt them together with one confirmation (was one stock + a page reload at a time) */
+  const pick = A.holdings.map((h) => ({ on: !!h.suggest, sy: h.suggest || 'Monthly ATH' }));
+  const netOf = (h, sy) => { const lvl = sy === 'Monthly ATH' ? h.sma30 : h.ema21; return lvl ? lvl * (1 - A.net_pct / 100) : null; };
+  const rowHtml = (h, i) => `<div class="ad-row${pick[i].on ? ' ad-on' : ''}"><div class="ad-top"><label class="ad-ck"><input type="checkbox" data-adck="${i}" ${pick[i].on ? 'checked' : ''}><b>${esc(h.symbol)}</b></label><span>${h.qty} × ${fmt(h.avg, 2, 'en-IN')}${h.ltp ? ` · now ${fmt(h.ltp, 2, 'en-IN')}` : ''}</span></div>
       <p class="lv-sub">${h.suggest ? `<b>Suggestion: ${SN[h.suggest]}</b> — ` : '<b>No system fits now</b> — '}${esc(h.why || '')}</p>
-      <div class="ad-btns"><span class="muted">Let a system manage it:</span>${['Monthly ATH', 'Trend 9/21'].map((sy) => `<button class="lv-btn ${h.suggest === sy ? '' : 'ghost'}" data-ad="${i}" data-sy="${sy}">${SN[sy]}${h.suggest === sy ? ' ✓ suggested' : ''}</button>`).join('')}</div></div>`).join('');
+      <div class="ad-btns">${['Monthly ATH', 'Trend 9/21'].map((sy) => `<button class="ad-sy" aria-pressed="${pick[i].sy === sy}" data-ad="${i}" data-sy="${sy}">${SN[sy]}${h.suggest === sy ? ' ✓' : ''}</button>`).join('')}
+        <span class="muted">stop ≈ ${netOf(h, pick[i].sy) ? fmt(netOf(h, pick[i].sy), 2, 'en-IN') : '–'}</span></div></div>`;
   const ad = (A.adopted || []).map((a) => `<div class="ad-row"><div class="ad-top"><b>${esc(a.symbol)}</b><span>${SN[a.system] || esc(a.system)} since ${day(a.since)}</span></div><div class="ad-btns"><button class="lv-btn ghost" data-rel="${esc(a.symbol)}">Release</button></div></div>`).join('');
-  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Your other Angel holdings</b><button class="lv-btn ghost" id="adre" style="font-size:12px">Refresh</button></div>
-    <p class="lv-sub"><b>These are shares you already own in Angel. Adopting does not buy anything</b>: it hands the stock to a system, which places its stop GTT, raises it daily and tells you when to sell. Nothing changes until you type ADOPT and the stock's name.${live ? '' : ' <b>Dry run:</b> confirming shows what would happen and changes nothing.'}</p>
-    ${rows || '<p class="lv-sub">Every stock you hold is already managed by the app (ETFs stay with the Wealth Creation Pie).</p>'}
-    ${ad ? `<h4 class="ad-h">Adopted by you</h4>${ad}` : ''}</div>`;
-  box.querySelector('#adre').addEventListener('click', () => adoptCard(true));
-  box.querySelectorAll('[data-ad]').forEach((b) => b.addEventListener('click', async () => {
-    const h = A.holdings[+b.dataset.ad], sy = b.dataset.sy;
-    const lvl = sy === 'Monthly ATH' ? h.sma30 : h.ema21, net = lvl ? lvl * (1 - A.net_pct / 100) : null;
-    const rule = sy === 'Monthly ATH' ? 'it sells after a weekly close below the 30-week SMA' : 'it sells after a daily close with EMA 9 below EMA 21';
-    const t = window.prompt(`Hand ${h.symbol} (${h.qty} shares) to ${SN[sy]}?\n\n• ${rule} (now ${lvl ? fmt(lvl, 2, 'en-IN') : '–'}); the app shows Sell and you place it\n• protective stop on Angel at about ${net ? fmt(net, 2, 'en-IN') : '–'} (${A.net_pct}% below), raised daily, never lowered\n${sy !== h.suggest ? '\n⚠ This is not the app\'s suggestion for this stock.\n' : ''}\nType ADOPT ${h.symbol} to confirm:`);
-    if (t === null) return;
-    try { const j = await lvApi('/api/adopt', { method: 'POST', body: JSON.stringify({ symbol: h.symbol, system: sy, confirm: t }) });
-      alertMsg(j.adopted ? `${h.symbol} adopted into ${SN[sy]}${j.protect ? `; protective stop on Angel at ${fmt(j.protect, 2, 'en-IN')}` : ''}${j.gtt_error ? ` (stop not placed yet: ${j.gtt_error} — use Retry stop)` : ''}.` : j.msg, true);
-      if (j.adopted) { state._adopt = null; setTimeout(() => { loadLive(); }, 1500); } }
-    catch (e) { alertMsg('Not adopted: ' + e.message); } }));
-  box.querySelectorAll('[data-rel]').forEach((b) => b.addEventListener('click', async () => {
-    const sym = b.dataset.rel; const t = window.prompt(`Release ${sym}? Its protective stop on Angel is cancelled and the app stops managing it. Your shares stay as they are.\n\nType RELEASE ${sym} to confirm:`);
-    if (t === null) return;
-    try { await lvApi('/api/adopt/release', { method: 'POST', body: JSON.stringify({ symbol: sym, confirm: t }) }); alertMsg(`${sym} released.`, true); state._adopt = null; adoptCard(true); }
-    catch (e) { alertMsg('Not released: ' + e.message); } }));
+  const draw = () => {
+    const n = pick.filter((x) => x.on).length;
+    box.innerHTML = `<div class="lv-card" data-fold="skip"><div style="display:flex;justify-content:space-between;align-items:center"><b>Your other Angel holdings</b><button class="lv-btn ghost" id="adre" style="font-size:12px">Refresh</button></div>
+      <p class="lv-sub"><b>Shares you already own in Angel — adopting buys nothing.</b> Tick the ones a system should manage (the app's suggestions start ticked), choose the system, then adopt them together: each gets a stop GTT on Angel, raised daily, and a Sell signal when its system exits.${live ? '' : ' <b>Dry run:</b> shows what would happen and changes nothing.'}</p>
+      ${A.holdings.length ? A.holdings.map(rowHtml).join('') + `<div class="ad-go"><button class="lv-btn" id="adgo" ${n ? '' : 'disabled'}>Adopt ${n} selected</button></div>` : '<p class="lv-sub">Every stock you hold is already managed by the app (ETFs stay with the Wealth Creation Pie).</p>'}
+      ${ad ? `<h4 class="ad-h">Adopted by you</h4>${ad}` : ''}</div>`;
+    box.querySelector('#adre').addEventListener('click', () => adoptCard(true));
+    box.querySelectorAll('[data-adck]').forEach((c) => c.addEventListener('change', () => { pick[+c.dataset.adck].on = c.checked; draw(); }));
+    box.querySelectorAll('[data-ad]').forEach((b) => b.addEventListener('click', () => { const x = pick[+b.dataset.ad]; x.sy = b.dataset.sy; x.on = true; draw(); }));
+    const go = box.querySelector('#adgo'); if (go) go.addEventListener('click', async () => {
+      const L = A.holdings.map((h, i) => ({ h, ...pick[i] })).filter((x) => x.on);
+      const lines = L.map((x) => `• ${x.h.symbol} (${x.h.qty}) → ${SN[x.sy]}, stop ≈ ${netOf(x.h, x.sy) ? fmt(netOf(x.h, x.sy), 2, 'en-IN') : '–'}${x.sy !== x.h.suggest ? '  ⚠ not the suggestion' : ''}`).join('\n');
+      const t = window.prompt(`Adopt ${L.length} stock${L.length > 1 ? 's' : ''}?\n\n${lines}\n\nMomentum sells after a weekly close below the 30-week SMA; Trend 9/21 after EMA 9 closes below EMA 21. The stop GTT sits ${A.net_pct}% below that line as a crash guard.\n\nType ADOPT ${L.length} to confirm:`);
+      if (t === null) return;
+      if (t.trim().toUpperCase() !== `ADOPT ${L.length}`) { alertMsg(`Not adopted: type ADOPT ${L.length} exactly.`); return; }
+      go.disabled = true; const out = [];
+      for (const [k, x] of L.entries()) {
+        go.textContent = `Adopting ${k + 1} of ${L.length}…`;
+        try { const j = await lvApi('/api/adopt', { method: 'POST', body: JSON.stringify({ symbol: x.h.symbol, system: x.sy, confirm: `ADOPT ${x.h.symbol}` }), timeout: 60000 });
+          out.push(j.adopted ? `✓ ${x.h.symbol}${j.protect ? ` stop ${fmt(j.protect, 2, 'en-IN')}` : ''}${j.gtt_error ? ` (stop not placed: ${j.gtt_error})` : ''}` : `✗ ${x.h.symbol}: ${j.msg}`); }
+        catch (e) { out.push(`✗ ${x.h.symbol}: ${e.message}`); }
+      }
+      alertMsg(out.join(' · '), out.every((x) => x.startsWith('✓'))); state._adopt = null; setTimeout(() => { loadLive(); }, 1200);
+    });
+    box.querySelectorAll('[data-rel]').forEach((b) => b.addEventListener('click', async () => {
+      const sym = b.dataset.rel; const t = window.prompt(`Release ${sym}? Its protective stop on Angel is cancelled and the app stops managing it. Your shares stay as they are.\n\nType RELEASE ${sym} to confirm:`);
+      if (t === null) return;
+      try { await lvApi('/api/adopt/release', { method: 'POST', body: JSON.stringify({ symbol: sym, confirm: t }) }); alertMsg(`${sym} released.`, true); state._adopt = null; adoptCard(true); }
+      catch (e) { alertMsg('Not released: ' + e.message); } }));
+  };
+  draw();
 }
 
 /* Research card (11 Nov 2026, owner): the server's intraday tests (ORB, sweeps, SMA cross, base breakouts) — progress, a short

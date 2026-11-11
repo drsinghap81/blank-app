@@ -854,3 +854,8 @@ body.pub .owner-only { display: none !important; }
 .lv-tabs button { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 12.5px; gap: 4px; }
 .lv-tabs em { padding: 0 6px; font-size: 10.5px; }
 #lvmk { display: flex; } #lvmk button { flex: 1; }
+.ad-ck { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; } .ad-ck input { width: 18px; height: 18px; accent-color: var(--accent); }
+.ad-row:not(.ad-on) { opacity: .6; }
+.ad-go { position: sticky; bottom: 76px; margin-top: 10px; } .ad-go .lv-btn { width: 100%; padding: 12px; }
+.ad-sy { border: 1.5px solid var(--line); background: transparent; color: var(--slate); font: inherit; font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 999px; cursor: pointer; }
+.ad-sy[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
