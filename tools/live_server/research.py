@@ -91,6 +91,20 @@ class Job:
         self.thread = threading.Thread(target=self._run, daemon=True); self.thread.start()
         return True
 
+    def _analyse_proc(self):
+        """11 Nov 2026: the analysis ran in the server's own process and held Python's lock for hours, so every app request
+        waited (one took 32 s). It now runs as a separate, lowest-priority process; the server stays quick."""
+        import subprocess
+        import sys
+        here = os.path.dirname(os.path.abspath(__file__)); out = os.path.join(self.dir, "orb_results.tmp.json")
+        code = (f"import sys, json; sys.path.insert(0, {here!r}); import research; "
+                f"json.dump(research.analyse({self.dir!r}), open({out!r}, 'w'))")
+        cmd = [sys.executable, "-c", code]
+        if os.name == "posix":
+            cmd = ["nice", "-n", "19"] + cmd
+        subprocess.run(cmd, check=True, timeout=8 * 3600)
+        return json.load(open(out))
+
     # ------------------------------------------------------------------ download
     def _candles(self, token, interval, d0, d1):
         api = self.b._session()
@@ -136,7 +150,7 @@ class Job:
                     continue
                 self._fetch("stk_" + s, t["token"], "FIVE_MINUTE", date(2019, 1, 1))
             self.st["progress"] = "analysing"; self._save()
-            res = analyse(self.dir)
+            res = self._analyse_proc()
             json.dump(res, open(os.path.join(self.dir, "orb_results.json"), "w"))
             self.st.update(state="done", finished=_ist().isoformat(timespec="minutes"), progress="done")
         except Exception as ex:  # noqa: BLE001

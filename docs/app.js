@@ -174,7 +174,7 @@ function lvHero(S, PF, part = 'top') {
     ${S.value_parts ? (() => { const V = S.value_parts, R = V.rms || {};
       return `<details class="hero-parts"><summary>= Cash ${lakh(V.cash)} + Holdings ${lakh(V.holdings)}${V.todays_buys > 0 ? ` + Today's buys ${lakh(V.todays_buys)}` : ''}</summary>
         <p class="lv-sub">From Angel's Funds (RMS): available cash ${lakh(R.availablecash || 0)}${R.collateral ? ` · collateral from pledged shares ${lakh(R.collateral)}` : ''}${R.net ? ` · net margin ${lakh(R.net)}` : ''}${R.utiliseddebits ? ` · used ${lakh(R.utiliseddebits)}` : ''}. Holdings = shares × Angel's last price. If Angel's Funds screen shows a smaller cash figure, tell me which number it shows.</p></details>`; })() : ''}
-    <div class="hero-line">${badge}${today == null ? '' : `<span class="muted">today <b class="${today >= 0 ? 'up' : 'down'}">${rs(today)}</b></span>`}</div>
+    <div class="hero-line">${badge}${today == null ? '' : Math.abs(today) > 0.08 * E[E.length - 2][1] ? `<span class="muted">today: cash moved ${rs(today)} (money in/out or blocked by Angel, not a gain/loss)</span>` : `<span class="muted">today <b class="${today >= 0 ? 'up' : 'down'}">${rs(today)}</b></span>`}</div>
     ${Ev.length >= 2 ? curveSVG(Ev, Ev[Ev.length - 1][1] >= Ev[0][1]) + `<div class="hero-rng">${['1M', '3M', '1Y', 'All'].map((k) => `<button data-rng="${k}" aria-pressed="${k === rng}">${k}</button>`).join('')}</div>`
       : `<p class="lv-sub">Your value curve builds from here, one point each day${real ? '' : ' once your server takes today\'s update'}.</p>`}
     </div>`;
@@ -532,8 +532,14 @@ function liveBar() {
 const LV_KEY = 'td_live';
 function lvCfg() { try { return JSON.parse(localStorage.getItem(LV_KEY) || '{}'); } catch (e) { return {}; } }
 function lvSave(o) { try { localStorage.setItem(LV_KEY, JSON.stringify({ ...lvCfg(), ...o })); } catch (e) { /* storage off */ } }
+/* 11 Nov 2026: one /api/plan answer is shared for 60 s (Today's risk card and Live asked the server separately) */
+function lvPlan(fresh) {
+  const c = state._planC; if (!fresh && c && Date.now() - c.t < 60000) return c.p;
+  const p = lvApi('/api/plan', { timeout: 60000 }); state._planC = { t: Date.now(), p }; p.catch(() => { state._planC = null; }); return p;
+}
 async function lvApi(path, opt = {}) {
   const c = lvCfg(); if (!c.url) throw new Error('not connected');
+  if (opt.method && opt.method !== 'GET') state._planC = null;     // any change on the server: next /api/plan is fresh
   const ac = opt.timeout ? new AbortController() : null; if (ac) setTimeout(() => ac.abort(), opt.timeout);
   const r = await fetch(c.url.replace(/\/$/, '') + path, { ...opt, ...(ac ? { signal: ac.signal } : {}), headers: { 'Content-Type': 'application/json', ...(c.token ? { Authorization: 'Bearer ' + c.token } : {}), ...(opt.headers || {}) } });
   const j = await r.json().catch(() => ({}));
@@ -855,7 +861,7 @@ async function loadLive() {
   if (!P) { el.innerHTML = '<p class="empty">The trade plan appears after the evening scans (about 21:15 IST).</p>'; return; }
   $('#asof').textContent = `Market data: India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
   const c = lvCfg(); let S = null; let err = '';
-  if (c.url && c.token) { try { S = await lvApi('/api/plan'); } catch (e) { err = e.message; } }
+  if (c.url && c.token) { try { S = await lvPlan(!!state._lvFresh); } catch (e) { err = e.message; } state._lvFresh = false; }
   if (S && myLocal('NSE').length) {          // picks pushed before Live was connected move to the server
     for (const x of myLocal('NSE')) { try { await lvApi('/api/mypicks', { method: 'POST', body: JSON.stringify(x) }); } catch (e) { /* keep it local */ continue; } mySaveLocal('NSE', myLocal('NSE').filter((y) => y.symbol !== x.symbol)); }
     try { S = await lvApi('/api/plan'); } catch (e) { /* keep the first copy */ }
@@ -975,7 +981,7 @@ async function loadLive() {
   const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
   el.innerHTML = `${lvSeg()}${S ? '' : head}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
-    ${pane('home', `${lvHero(S, PF)}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
+    ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div>` : ''}${lvHero(S, PF)}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
     ${pane('buy', `    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '' : `<span class="lv-sub"><a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>
@@ -990,7 +996,8 @@ async function loadLive() {
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}`)}
     ${S && isOwner() ? pane('fut', '<div id="tbcard"></div><div id="tbcardn"></div>') : ''}
     ${pane('set', `${S ? head : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>${S ? '<div id="rescard"></div>' : ''}`)}`;
-  el.querySelectorAll('.lv-tabs [data-tab], .lv-need-i[data-go]').forEach((b) => b.addEventListener('click', () => {
+  { const o2 = $('#lvout2'); if (o2) o2.addEventListener('click', (e) => { e.preventDefault(); lvSave({ token: null }); state._planC = null; loadLive(); }); }
+  el.querySelectorAll('.lv-tabs [data-tab], .lv-need-i[data-go], .lv-conn [data-go]').forEach((b) => b.addEventListener('click', () => {
     const k = b.dataset.tab || b.dataset.go; state.lvTab = k; try { sessionStorage.setItem('td.lvTab', k); } catch (e) { /* */ }
     el.querySelectorAll('.lv-tabs [data-tab]').forEach((x) => x.setAttribute('aria-selected', x.dataset.tab === k));
     el.querySelectorAll('.lv-pane').forEach((p) => (p.hidden = p.dataset.pane !== k)); window.scrollTo(0, 0); }));
@@ -3911,7 +3918,7 @@ async function loadToday() { $('#title').textContent = 'Today'; return tdRender(
 async function tdRender(el, beginner) {
   const mk = beginner ? 'NSE' : tdMk(); const MP = MAIN + MKT[mk].path; const tag = mk === 'NSE' ? '' : '_' + mk;
   el.innerHTML = '<p class="muted pad">Loading today…</p>';
-  const [P, A] = await Promise.all([getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk), getJSON(MP + 'ath.json', 'ath' + tag)]);
+  const P = await getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk); const A = state['_athN' + tag] ? { scanned: state['_athN' + tag] } : null;   // 11 Nov 2026: ath.json (316 KB) no longer blocks Today
   const seg = beginner ? '' : `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
   const wire = () => el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender(el, beginner); }));
   if (!P) { el.innerHTML = `<div class="td-wrap">${seg}<p class="empty">Today's setups appear after the evening scan.</p></div>`; wire(); return; }
@@ -3941,6 +3948,8 @@ async function tdRender(el, beginner) {
   wire();
   state._tdEl = el; state._tdBg = beginner;
   el.querySelectorAll('.td-card:not(.td-raise)').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
+  if (!A) fetch(MP + 'ath.json', { cache: 'no-cache' }).then((r) => r.json()).then((j) => { if (!j || !j.scanned) return; state['_athN' + tag] = j.scanned;
+    const big = el.querySelector('.td-big'); if (big && !big.querySelector('em')) big.insertAdjacentHTML('beforeend', `<em>out of ${Number(j.scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>`); }).catch(() => {});
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (!beginner) alCard($('#tdal'));
   tdTrack($('#tdtrack'), mk); if (mk === 'US') tdPies($('#tdpies')); tdHeat($('#tdheat'), mk);
@@ -3950,7 +3959,7 @@ async function tdRender(el, beginner) {
    1.6-7 pts/yr). Breakouts from these industries reach the list above through Momentum / Trend when they qualify. */
 async function tdHeat(box, mk) {
   if (!box) return;
-  const G = await getJSON(MAIN + MKT[mk].path + 'group_pulse.json', 'gp_' + mk).catch(() => null);
+  const G = state['_gp' + mk] || (state['_gp' + mk] = await fetch(MAIN + MKT[mk].path + 'group_pulse.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null));
   const R = ((G && G.rows) || []).filter((g) => (g.p1w || 0) >= 30 && (g.p1w || 0) - (g.p1m_prev || 0) >= 20 && (g.n || 0) >= 3)
     .sort((a, b) => (b.p1w - (b.p1m_prev || 0)) - (a.p1w - (a.p1m_prev || 0))).slice(0, 6);
   if (!R.length) { box.innerHTML = ''; return; }
@@ -3962,7 +3971,7 @@ async function tdHeat(box, mk) {
 async function tdRiskCard(box) {
   if (!box) return;
   let S = null; const c = lvCfg();
-  if (c.url && c.token) { try { S = await Promise.race([lvApi('/api/plan'), new Promise((_, j) => setTimeout(() => j(new Error('slow')), 5000))]); } catch (e) { S = null; } }
+  if (c.url && c.token) { try { S = await Promise.race([lvPlan(), new Promise((_, j) => setTimeout(() => j(new Error('slow')), 20000))]); } catch (e) { S = null; } }
   let pos = [], C = cap('NSE') || 50000, src = 'practice';
   if (S && S.trades) { src = 'your account'; C = S.capital || C;
     pos = S.trades.filter((t) => t.state === 'open' && t.qty).map((t) => ({ symbol: t.symbol, qty: t.qty, entry: t.entry, now: t.ltp || t.entry, line: t.trail_level || t.stop, stop: t.gtt_trigger || t.stop, trail_at: t.trail_at, trail_prev: t.trail_prev, new_stop: t.gtt_trigger })); }

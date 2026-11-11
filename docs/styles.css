@@ -862,3 +862,5 @@ body.pub .owner-only { display: none !important; }
 .td-rings { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
 .td-rings .td-ring { width: 136px; height: 136px; margin: 6px 0 4px; } .td-rings .td-ring svg { width: 136px; height: 136px; }
 .td-rings .td-ring b { font-size: 26px; }
+.lv-conn { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 10px 16px 0; padding: 8px 12px; border-radius: 12px; background: var(--soft); font-size: 12.5px; }
+.lv-conn > span:nth-child(2) { flex: 1; } .lv-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--saffron); } .lv-dot.on { background: var(--rise); box-shadow: 0 0 0 3px color-mix(in srgb, var(--rise) 25%, transparent); }
