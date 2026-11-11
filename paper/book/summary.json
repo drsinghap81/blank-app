@@ -1,15 +1,15 @@
 {
- "asof": "2026-11-09",
- "updated_ist": "2026-11-10 23:53",
+ "asof": "2026-11-11",
+ "updated_ist": "2026-11-12 00:00",
  "start": "2026-10-29",
  "capital": 2000000,
- "equity": 2049829,
- "ret_pct": 2.49,
- "cash": 45884,
- "invested_pct": 97.8,
+ "equity": 2047060,
+ "ret_pct": 2.35,
+ "cash": 208,
+ "invested_pct": 100.0,
  "ath": {
-  "value": 621176,
-  "open": 5,
+  "value": 664084,
+  "open": 6,
   "realised": 0
  },
  "t921": {

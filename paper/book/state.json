@@ -1,5 +1,5 @@
 {
-"cash": 45884.29938916261,
+"cash": 207.9487310376062,
 "pos": {
 "ath:KOTAKBANK:2026-10-29": {
 "engine": "ATH",
@@ -8,7 +8,7 @@
 "sh": 325,
 "avg": 459.0573,
 "cost": 149604.18469991718,
-"last": 479.5,
+"last": 487.7,
 "stop_note": "weekly close < 30-wk SMA (404.6956)",
 "added": false
 },
@@ -71,7 +71,7 @@
 "sh": 123,
 "avg": 1236.4126,
 "cost": 152497.2515096059,
-"last": 1215.9,
+"last": 1199.5,
 "stop_note": "weekly close < 30-wk SMA (1099.2471)",
 "added": false
 },
@@ -108,7 +108,7 @@
 "sh": 465,
 "avg": 263.507,
 "cost": 122867.94432141562,
-"last": 289.18,
+"last": 289.34,
 "stop_note": "weekly close < 30-wk SMA (224.3863)",
 "added": false
 },
@@ -119,7 +119,7 @@
 "sh": 118,
 "avg": 629.5922,
 "cost": 74496.32156617424,
-"last": 647.8,
+"last": 629.95,
 "stop_note": "weekly close < 30-wk SMA (472.5183)",
 "added": false
 },
@@ -130,8 +130,19 @@
 "sh": 66,
 "avg": 1476.0705,
 "cost": 97688.74245947438,
-"last": 1589.0,
+"last": 1571.6,
 "stop_note": "weekly close < 30-wk SMA (1360.8119)",
+"added": false
+},
+"ath:AGARWALEYE:2026-11-11": {
+"engine": "ATH",
+"symbol": "AGARWALEYE",
+"date": "2026-11-11",
+"sh": 82,
+"avg": 555.5,
+"cost": 45676.350658125004,
+"last": 554.15,
+"stop_note": "weekly close < 30-wk SMA (482.05)",
 "added": false
 }
 },
@@ -146,7 +157,10 @@
 "921:PROTEAN:2026-11-04",
 "921:RPGLIFE:2026-10-29",
 "921:SANGAMIND:2026-11-02",
+"921:SANGAMIND:2026-11-09",
 "921:SIMPLEXINF:2026-11-03",
+"921:SWANDEF:2026-11-09",
+"ath:ASAHIINDIA:2026-11-11",
 "ath:INDHOTEL:2026-11-06"
 ],
 "trades": [
