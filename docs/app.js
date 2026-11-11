@@ -1319,7 +1319,7 @@ const TV_IDX = { 'NIFTY 50': 'NSE:NIFTY', 'NIFTY BANK': 'NSE:BANKNIFTY', 'NIFTY 
 function panelMk() {
   if (state._pMk) return state._pMk;
   const v = state.view;
-  return v === 'live' ? (state.lvMk || 'NSE') : v === 'bot' ? botMk() : v === 'ath' ? AM() : v === 'trends' ? (state.mkt || 'NSE') : 'NSE';
+  return v === 'today' ? (state._tdMkNow || 'NSE') : v === 'live' ? (state.lvMk || 'NSE') : v === 'bot' ? botMk() : v === 'ath' ? AM() : v === 'trends' ? (state.mkt || 'NSE') : 'NSE';
 }
 function tvSym(sym, mk) {
   const s = String(sym || '').trim(); if (TV_IDX[s.toUpperCase()]) return TV_IDX[s.toUpperCase()];
@@ -2626,12 +2626,12 @@ const rsChips = (r) => rsChip('Sector RS', r.sector_rs) + rsChip('Stock RS', r.s
 function rsFact(r) {
   if (r.stock_rs == null && r.sector_rs == null) return null;
   const bn = r.rs_bench ? secName(r.rs_bench) : '';
-  return ['Relative strength', `${r.sector_rs != null ? `sector ${pct(r.sector_rs)} vs Nifty 50 (6 m${r.sector_rs_up ? ', rising' : ''}) · ` : ''}${r.stock_rs != null ? `stock ${pct(r.stock_rs)} vs ${esc(bn)} (1 y${r.stock_rs_up ? ', rising' : ''})` : ''}`];
+  return ['Relative strength', `${r.sector_rs != null ? `sector ${pct(r.sector_rs)} vs ${BENCH_NM[AM()] || 'the market'} (6 m${r.sector_rs_up ? ', rising' : ''}) · ` : ''}${r.stock_rs != null ? `stock ${pct(r.stock_rs)} vs ${esc(bn)} (1 y${r.stock_rs_up ? ', rising' : ''})` : ''}`];
 }
 function secFact(r) {
   const S = state.ath && state.ath.sec; if (!r.sector_index || !S || !S.indices[r.sector_index]) return null;
   const x = S.indices[r.sector_index];
-  return [`Sector (${esc(r.industry || '')})`, `${esc(secName(r.sector_index))}: ${SECTOR_TXT[x.tag]} · ${pct(x.vs_market_3m)} vs Nifty 500 in 3 m`];
+  return [`Sector (${esc(r.industry || '')})`, `${esc(secName(r.sector_index))}: ${SECTOR_TXT[x.tag]} · ${pct(x.vs_market_3m)} vs ${AM() === 'NSE' ? 'Nifty 500' : BENCH_NM[AM()]} in 3 m`];
 }
 function sectorStrip() {
   const S = state.ath && state.ath.sec; if (!S || !S.indices || AM() !== 'NSE') return '';
