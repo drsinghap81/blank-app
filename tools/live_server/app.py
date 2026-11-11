@@ -761,21 +761,30 @@ def angel_msg(e):
     return ANGEL_WHY.get(code.group(1), m) if code else m
 
 
-def equity_log(value):
-    """Account value (cash + holdings at today's price) once per day, for the app's equity curve; today's entry is overwritten."""
+def equity_log(value, pledge=0.0):
+    """Account value (cash + holdings at today's price) once per day, for the app's equity curve; today's entry is overwritten.
+    11 Nov 2026: cash stopped counting the margin from pledged shares; days logged before that are lowered once by the
+    pledge margin so the curve and 'today' don't show a drop that never happened."""
     p = os.path.join(DATA, "equity.json")
     try:
         E = json.load(open(p))
     except Exception:  # noqa: BLE001
         E = {}
     d = ist_now().date().isoformat()
-    if value and E.get(d) != value:
-        E[d] = value; E = dict(sorted(E.items())[-800:])
+    if E.get("_basis") != "no-pledge":
+        E = {k: (round(v - pledge, 2) if k < d and pledge else v) for k, v in E.items() if not k.startswith("_")}
+        E["_basis"] = "no-pledge"; value = value or 0
         try:
             json.dump(E, open(p, "w"))
         except Exception:  # noqa: BLE001
             pass
-    return sorted(E.items())
+    if value and E.get(d) != value:
+        E[d] = value; E = dict(sorted(E.items())[-800:]); E["_basis"] = "no-pledge"
+        try:
+            json.dump(E, open(p, "w"))
+        except Exception:  # noqa: BLE001
+            pass
+    return sorted((k, v) for k, v in E.items() if not k.startswith("_"))
 
 
 def sized(acc=None):
@@ -871,7 +880,7 @@ def sized(acc=None):
     real = round(acc["cash"] + (acc.get("holdings_value") or 0) + (acc.get("positions_value") or 0), 2)
     brk = dict(cash=round(acc["cash"], 2), holdings=round(acc.get("holdings_value") or 0, 2), todays_buys=round(acc.get("positions_value") or 0, 2),
                rms=acc.get("rms"))                       # 11 Nov 2026: the parts of the account value, shown under the total in Live
-    return dict(real_value=real, value_parts=brk, equity=equity_log(real), holdings=[dict(symbol=h["symbol"], qty=h["qty"], ltp=h.get("ltp"), avg=h.get("avg"),
+    return dict(real_value=real, value_parts=brk, equity=equity_log(real, ((acc.get("rms") or {}).get("collateral") or 0)), holdings=[dict(symbol=h["symbol"], qty=h["qty"], ltp=h.get("ltp"), avg=h.get("avg"),
                 value=round(h["qty"] * (h.get("ltp") or 0), 2)) for h in acc["holdings"] if h["qty"] > 0], guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open, picks=N, risk_pct=round(RK * 100, 2), account_value=acct, capital_set=app_cap or None,
                 buckets=[dict(key=k, pct=AL[k], used=round(expo.get(k, 0.0)), room=round(max(0.0, room.get(k, 0.0)))) for k in AL],
                 swing=dict(risk_pct=round(SR * 100, 2), slots=sw_slots, max=SWING_MAX, open=len(sw_open), idle_cash=round(sw_cash), reserve_pct=SWING_RESERVE * 100),
