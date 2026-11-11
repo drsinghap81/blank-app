@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-11 02:58 UTC",
+"generated": "2026-11-11 03:11 UTC",
 "asof": "2026-11-10",
 "broker": "Trading 212 (Australia)",
 "note": "Rebalance on the first trading day after the month-end decision. FX fee 0.15% each way on Trading 212 AU. Pies have no stop-loss: the month-end check is the exit.",
@@ -81,5 +81,88 @@
 ],
 "record": []
 }
+],
+"uk": {
+"broker": "Trading 212 UK (ISA)",
+"note": "UK-listed UCITS twins of the same indices (US-listed ETFs can't be bought from a UK account). Search each fund by name in Trading 212 to confirm the line; GBP lines avoid the FX fee on purchase. Rebalance on the first trading day after the month-end decision.",
+"pies": [
+{
+"key": "rotation",
+"title": "US index rotation",
+"rule": "Each month-end: hold the best one of the S&P 500 / Nasdaq 100 / S&P MidCap 400 / Russell 2000 UCITS ETFs by 3-month return; GBP cash ETF if none is up.",
+"test": "2008-26 (US$, same signals): 11.1%/yr, worst fall -15.5%. In GBP the returns also move with GBP/USD.",
+"decided": "2026-10-31",
+"hold": [
+{
+"ticker": "VUAG",
+"name": "Vanguard S&P 500 UCITS (Acc)",
+"pct": 100.0,
+"us": "VOO"
+}
+],
+"changed": false,
+"before": [
+{
+"ticker": "VUAG",
+"pct": 100.0,
+"us": "VOO",
+"name": "Vanguard S&P 500 UCITS (Acc)"
+}
+],
+"provisional": [
+{
+"ticker": "CSH2",
+"pct": 100.0,
+"us": "SGOV",
+"name": "Amundi Smart Overnight Return GBP (cash)"
+}
+],
+"record": []
+},
+{
+"key": "sectors",
+"title": "US sector breakouts",
+"rule": "Up to 3 of the 10 US sectors + semiconductors, biotech and gold miners (the ones with UCITS twins) with a monthly cup breakout (12+ month base), rising 30-week SMA and 6-month RS > 0; each kept until a month-end close below its 30-week SMA. Empty slots: the S&P 500 while it is above its 10-month average, else the cash ETF.",
+"test": "2008-26 (US$): 9.8%/yr, worst fall -20.0%; 70% rotation + 30% this pie: 10.8%, -16.0%.",
+"decided": "2026-10-31",
+"hold": [
+{
+"ticker": "VUAG",
+"name": "Vanguard S&P 500 UCITS (Acc)",
+"pct": 66.7,
+"us": "VOO"
+},
+{
+"ticker": "BTEK",
+"name": "iShares Nasdaq US Biotechnology UCITS (close twin)",
+"pct": 33.3,
+"us": "XBI"
+}
+],
+"changed": true,
+"before": [
+{
+"ticker": "SMGB",
+"pct": 33.3,
+"us": "SMH",
+"name": "VanEck Semiconductor UCITS"
+},
+{
+"ticker": "BTEK",
+"pct": 33.3,
+"us": "XBI",
+"name": "iShares Nasdaq US Biotechnology UCITS (close twin)"
+},
+{
+"ticker": "VUAG",
+"pct": 33.3,
+"us": "VOO",
+"name": "Vanguard S&P 500 UCITS (Acc)"
+}
+],
+"provisional": null,
+"record": []
+}
 ]
+}
 }
