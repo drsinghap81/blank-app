@@ -3935,7 +3935,7 @@ async function tdRender(el, beginner) {
     ${rows.length > 12 ? `<p class="bg-fine">${rows.length - 12} more in Live</p>` : ''}
     ${MS.length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${MS.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${MS.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
-    ${mk === 'US' ? '<div id="tdpies"></div>' : ''}<div id="tdtrack"></div>
+    ${mk === 'US' ? '<div id="tdpies"></div>' : ''}<div id="tdheat"></div><div id="tdtrack"></div>
     <div id="tdrisk"></div>
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   wire();
@@ -3943,7 +3943,21 @@ async function tdRender(el, beginner) {
   el.querySelectorAll('.td-card:not(.td-raise)').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (!beginner) alCard($('#tdal'));
-  tdTrack($('#tdtrack'), mk); if (mk === 'US') tdPies($('#tdpies'));
+  tdTrack($('#tdtrack'), mk); if (mk === 'US') tdPies($('#tdpies')); tdHeat($('#tdheat'), mk);
+}
+/* Heating up (11 Nov 2026): industries whose 1-week pulse jumped well above last month's. Information only: strength by
+   itself is not a buy signal (Building-only cut ATH returns from 17% to 7%; swapping weak holdings for new breakouts lost
+   1.6-7 pts/yr). Breakouts from these industries reach the list above through Momentum / Trend when they qualify. */
+async function tdHeat(box, mk) {
+  if (!box) return;
+  const G = await getJSON(MAIN + MKT[mk].path + 'group_pulse.json', 'gp_' + mk).catch(() => null);
+  const R = ((G && G.rows) || []).filter((g) => (g.p1w || 0) >= 30 && (g.p1w || 0) - (g.p1m_prev || 0) >= 20 && (g.n || 0) >= 3)
+    .sort((a, b) => (b.p1w - (b.p1m_prev || 0)) - (a.p1w - (a.p1m_prev || 0))).slice(0, 6);
+  if (!R.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<details class="td-risk td-heat"><summary><span><b>Heating up this week (${R.length})</b><small>Industries getting stronger · watch, not a buy signal</small></span></summary>
+    ${R.map((g) => { const t = (g.members || []).filter((m) => m.trending).map((m) => m.symbol).slice(0, 5);
+      return `<div class="td-ml"><b>${esc(g.group)}</b><span>#${g.rank} of ${G.rows.length} · strong days this week ${fmt(g.p1w, 0)}% (last month ${fmt(g.p1m_prev || 0, 0)}%)</span>${t.length ? `<small>Trending: ${t.map(esc).join(', ')}</small>` : ''}</div>`; }).join('')}
+    <p class="bg-fine">When one of these stocks breaks out of a long base it appears above as Momentum or Trend. Tested: buying strength alone, or swapping weaker holdings for new names, lowered returns.</p></details>`;
 }
 async function tdRiskCard(box) {
   if (!box) return;
