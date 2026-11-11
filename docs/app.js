@@ -973,9 +973,9 @@ async function loadLive() {
   const needHtml = S ? `<div class="lv-card lv-need" data-fold="skip"><div class="lv-need-h"><b>Needs you today</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE' : 'DRY RUN'}</span></div>
       ${need.length ? need.map(([t, c, a, b]) => `<button class="lv-need-i ${c}" data-go="${t}"><b>${a}</b><span>${b}</span><i>›</i></button>`).join('') : '<p class="lv-sub">✓ Nothing to do — stops are in place and there are no new signals.</p>'}</div>` : '';
   const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
-  el.innerHTML = `${lvSeg()}
+  el.innerHTML = `${lvSeg()}${S ? '' : head}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
-    ${pane('home', `${S ? '' : head}${lvHero(S, PF)}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
+    ${pane('home', `${lvHero(S, PF)}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
     ${pane('buy', `    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '' : `<span class="lv-sub"><a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>
