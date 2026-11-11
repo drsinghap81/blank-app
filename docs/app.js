@@ -1915,6 +1915,10 @@ function drawTB(o, ledger, hist) {
     const s = priceSeries(ch, hist.map((h) => ({ time: h.Date, open: +h.Open, high: +h.High, low: +h.Low, close: +h.Close })), 'tb');
     s.createPriceLine({ price: o.prev_top, color: C.rise, lineWidth: 1, lineStyle: 2, title: 'top' });
     s.createPriceLine({ price: o.prev_bottom, color: C.fall, lineWidth: 1, lineStyle: 2, title: 'bottom' });
+    // 11 Nov 2026: the open position's own levels too — the stop / system point (exit & reverse) and the entry
+    Object.entries(o.lines || {}).forEach(([k, v]) => { if (!(v > 0)) return;
+      if (/stop|system/i.test(k)) s.createPriceLine({ price: +v, color: C.fall, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: /reverse/i.test(k) ? 'stop · reverse' : 'stop' });
+      else if (/entry/i.test(k)) s.createPriceLine({ price: +v, color: C.slate || '#5B6B82', lineWidth: 1, lineStyle: 3, axisLabelVisible: true, title: 'entry' }); });
     const marks = ledger.flatMap((t) => [{ time: t.EntryDate, position: t.Side === 'BUY' ? 'belowBar' : 'aboveBar', color: t.Side === 'BUY' ? C.rise : C.fall, shape: t.Side === 'BUY' ? 'arrowUp' : 'arrowDown', text: t.Side === 'BUY' ? 'buy' : 'sell' }])
       .filter((m) => hist.some((h) => h.Date === m.time)).sort((a, b) => (a.time < b.time ? -1 : 1));
     s.setMarkers(marks);
