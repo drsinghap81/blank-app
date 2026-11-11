@@ -122,9 +122,12 @@ class AngelEquity:
                   close=float(h.get("close") or 0) or None) for h in hold]
         P = [dict(symbol=str(p.get("tradingsymbol", "")).replace("-EQ", ""), qty=int(float(p.get("netqty") or 0)),
                   product=p.get("producttype"), ltp=float(p.get("ltp") or 0)) for p in pos if p.get("exchange") == "NSE"]
-        cash = float(f.get("availablecash") or 0)
+        avail = float(f.get("availablecash") or 0); coll = float(f.get("collateral") or 0)
+        # Angel's availablecash = ledger cash + margin from pledged shares (11 Nov 2026: Funds showed ledger 10.86 L + pledge
+        # 1.18 L = 12.04 L). Pledge margin can't buy delivery shares and those shares are already in holdings, so take it out.
+        cash = avail - coll if 0 < coll <= avail else avail
         return dict(broker="Angel One", cash=cash, net=float(f.get("net") or cash), holdings=H, positions=P,
-                    rms=dict(availablecash=cash, net=float(f.get("net") or 0), collateral=float(f.get("collateral") or 0),
+                    rms=dict(availablecash=avail, net=float(f.get("net") or 0), collateral=float(f.get("collateral") or 0),
                              utiliseddebits=float(f.get("utiliseddebits") or 0), m2munrealized=float(f.get("m2munrealized") or 0),
                              utilisedspan=float(f.get("utilisedspan") or 0), availablelimitmargin=float(f.get("availablelimitmargin") or 0)),
                     holdings_value=sum(h["qty"] * h["ltp"] for h in H),
