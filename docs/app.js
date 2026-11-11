@@ -4055,9 +4055,48 @@ async function tdHeat(box, mk) {
     .sort((a, b) => (b.p1w - (b.p1m_prev || 0)) - (a.p1w - (a.p1m_prev || 0))).slice(0, 6);
   if (!R.length) { box.innerHTML = ''; return; }
   box.innerHTML = `<details class="td-risk td-heat"><summary><span><b>Heating up this week (${R.length})</b><small>Industries getting stronger · watch, not a buy signal</small></span></summary>
-    ${R.map((g) => { const t = (g.members || []).filter((m) => m.trending).map((m) => m.symbol).slice(0, 5);
-      return `<div class="td-ml"><b>${esc(g.group)}</b><span>#${g.rank} of ${G.rows.length} · strong days this week ${fmt(g.p1w, 0)}% (last month ${fmt(g.p1m_prev || 0, 0)}%)</span>${t.length ? `<small>Trending: ${t.map(esc).join(', ')}</small>` : ''}</div>`; }).join('')}
-    <p class="bg-fine">When one of these stocks breaks out of a long base it appears above as Momentum or Trend. Tested: buying strength alone, or swapping weaker holdings for new names, lowered returns.</p></details>`;
+    ${R.map((g) => { const t = (g.members || []).filter((m) => m.trending).map((m) => m.symbol).slice(0, 6);
+      return `<div class="td-ml"><button class="td-hg" data-hg="${esc(g.group)}"><b>${esc(g.group)}</b> <span class="td-hgo">chart ›</span></button><span>#${g.rank} of ${G.rows.length} · strong days this week ${fmt(g.p1w, 0)}% (last month ${fmt(g.p1m_prev || 0, 0)}%)</span>${t.length ? `<small>Trending: ${t.map((x) => `<button class="td-hs" data-hs="${esc(x)}" data-hgg="${esc(g.group)}">${esc(x)}</button>`).join(' ')}</small>` : ''}</div>`; }).join('')}
+    <p class="bg-fine">Tap an industry or a stock for its chart. When one of these stocks breaks out of a long base it appears above as Momentum or Trend. Tested: buying strength alone, or swapping weaker holdings for new names, lowered returns.</p></details>`;
+  /* 12 Nov 2026: charts. Industry → the Trends industry panel (group vs index + Pulse); stock → candles if the scan has them, else weekly closes */
+  box.querySelectorAll('[data-hg]').forEach((b) => b.addEventListener('click', () => {
+    state.gp = state.gp || {}; state.gp[mk] = G; state.athMkt = mk; gpSelect(G.rows.find((r) => r.group === b.dataset.hg)); }));
+  box.querySelectorAll('[data-hs]').forEach((b) => b.addEventListener('click', () => tdHeatStock(b.dataset.hs, mk, G.rows.find((r) => r.group === b.dataset.hgg))));
+}
+async function tdHeatStock(sym, mk, g) {
+  const m = ((g && g.members) || []).find((x) => x.symbol === sym) || {};
+  const tv = 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(sym, mk));
+  $('#sheet-body').innerHTML = `<div class="tdc-h"><div class="t2-sh"><b>${esc(sym)}</b><span>${esc(m.name || '')}${g ? ' · ' + esc(g.group) : ''}</span></div><b class="tdc-px" id="tdcpx">${m.close ? fmt(m.close, 2, MKT[mk].loc) : ''}</b></div>
+    <div class="tdc-chart" id="tdcv"><p class="muted pad">Loading chart…</p></div><p class="tdc-key" id="tdckey"></p>
+    <div class="bg-tiles"><div><span>Beating market (W. RPI)</span><b class="${(m.wrpi || 0) >= 100 ? 'up' : 'down'}">${m.wrpi != null ? fmt(m.wrpi, 0) : '–'}</b></div><div><span>Trending days (1 m)</span><b>${m.d1m != null ? m.d1m + '/21' : '–'}</b></div><div><span>From 52-week high</span><b>${m.from_high != null ? fmt(m.from_high, 1) + '%' : '–'}</b></div></div>
+    <p class="tdc-why">Strength, not a buy signal: it becomes a trade only when it breaks out of a long base and shows up in your list.</p>
+    <div class="bg-btns"><a class="bg-ghost tdc-a" href="${tv}" target="_blank" rel="noopener">TradingView ↗</a></div>`;
+  $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+  const box = $('#tdcv'); let D = await tdChartData({ symbol: sym, system: '' }, mk);
+  if (!box.isConnected) return;
+  if (!window.LightweightCharts) { box.innerHTML = '<p class="muted pad">Chart library not loaded. Use TradingView.</p>'; return; }
+  const ch = () => { box.innerHTML = ''; return window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight || 300, width: box.clientWidth, handleScroll: false, handleScale: false,
+    timeScale: { borderColor: C.line, fixLeftEdge: true, fixRightEdge: true }, grid: { vertLines: { visible: false }, horzLines: { color: C.grid } } }); };
+  if (D && D.t) {
+    const n = D.t.length, k0 = Math.max(0, n - (D.tf === 'Weekly' ? 104 : 150)); const c = ch();
+    const cs = c.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall, priceLineVisible: false });
+    const bars = []; for (let i = k0; i < n; i++) if (D.c[i] != null) bars.push({ time: D.t[i], open: D.o[i], high: D.h[i], low: D.l[i], close: D.c[i] });
+    cs.setData(bars);
+    if (D.ma) c.addLineSeries({ color: '#7C8CFF', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(D.t.slice(k0).map((t, i) => (D.ma[k0 + i] == null ? { time: t } : { time: t, value: D.ma[k0 + i] })));
+    c.timeScale().fitContent(); new ResizeObserver(() => c.applyOptions({ width: box.clientWidth })).observe(box);
+    $('#tdckey').innerHTML = `${D.tf} candles · <i style="background:#7C8CFF"></i>${esc(D.maName)}`; return;
+  }
+  state.mxW = state.mxW || {};
+  if (state.mxW[mk] === undefined) state.mxW[mk] = await getJSON(MAIN + MKT[mk].path + 'stock_weekly.json', 'wk_' + mk);
+  const W = state.mxW[mk]; const v = W && W.s && W.s[sym];
+  if (!box.isConnected) return;
+  if (!v) { box.innerHTML = '<p class="muted pad">No chart in today\'s files. Open it in TradingView.</p>'; return; }
+  const c = ch(); const pts = W.t.map((t, i) => (v[i] == null ? null : { time: t, value: v[i] })).filter(Boolean);
+  c.addAreaSeries({ lineColor: C.ink, topColor: 'rgba(124,140,255,.25)', bottomColor: 'rgba(124,140,255,0)', lineWidth: 2, priceLineVisible: false }).setData(pts);
+  const ma = pts.map((p, i) => (i < 9 ? { time: p.time } : { time: p.time, value: pts.slice(i - 9, i + 1).reduce((a, x) => a + x.value, 0) / 10 }));
+  c.addLineSeries({ color: '#7C8CFF', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }).setData(ma);
+  c.timeScale().fitContent(); new ResizeObserver(() => c.applyOptions({ width: box.clientWidth })).observe(box);
+  $('#tdckey').innerHTML = `Weekly closes, last ${pts.length} weeks · <i style="background:#7C8CFF"></i>10-week average`;
 }
 /* 11 Nov 2026: the server can be slow; the card used to give up after a few seconds and fall back to the empty practice
    list, so the calm number vanished. Now: the last account copy (trades only) shows at once, then the fresh one replaces it. */
