@@ -26,7 +26,7 @@ PETRONET,EMA 9/21 cross,2026-11-02,294.3,277.0,59.4,77.51,292.89,True,320.45,297
 PETRONET,52w-high base breakout,2026-11-06,317.0,283.4,72.8,77.51,292.89,True,320.45,314.0,10.8,1,open,2.1,0.21,Petronet LNG Limited,main
 BLUESTARCO,EMA 9/21 cross,2026-10-28,1598.0,1480.1,56.7,65.41,1454.83,True,1577.5,1595.1,7.8,8,open,-1.1,-0.15,Blue Star Limited,main
 SHYAMMETL,EMA 9/21 cross,2026-10-12,1088.5,1019.4,56.7,61.23,1171.44,True,1320.5,1090.1,6.9,19,open,21.1,3.26,Shyam Metalics and Energy Limited,main
-LALPATHLAB,EMA 9/21 cross,2026-11-04,2029.4,1856.5,66.1,56.45,1798.83,True,2016.5,2049.0,10.4,3,open,-1.6,-0.17,Dr. Lal Path Labs Ltd.,main
+LALPATHLAB,EMA 9/21 cross,2026-11-04,2024.37,1851.9,66.1,56.31,1794.37,True,2011.5,2043.92,10.4,3,open,-1.6,-0.17,Dr. Lal Path Labs Ltd.,main
 IIFLCAPS,EMA 9/21 cross,2026-10-28,346.2,333.15,55.9,40.67,338.68,True,350.35,348.0,4.5,8,open,0.7,0.16,IIFL Capital Services Limited,main
 JINDALPOLY,EMA 9/21 cross,2026-10-23,739.35,643.1,61.7,37.42,598.63,True,686.2,718.0,11.6,11,open,-4.4,-0.42,Jindal Poly Films Limited,main
 PROTEAN,EMA 9/21 cross,2026-11-04,657.3,600.3,59.1,24.2,587.24,True,670.15,661.05,10.1,3,open,1.4,0.15,Protean eGov Technologies Limited,main
@@ -74,7 +74,7 @@ JUSTDIAL,EMA 9/21 cross,2026-09-23,693.55,660.2,55.9,112.06,759.93,False,677.95,
 PNBHOUSING,EMA 9/21 cross,2026-10-12,1200.0,1087.8,64.0,98.0,1182.78,False,1111.4,1205.0,10.8,19,stopped 2026-10-23,-9.7,-1.0,PNB Housing Finance Limited,main
 ANANTRAJ,EMA 9/21 cross,2026-09-04,625.45,571.35,57.8,91.1,510.2,False,449.55,622.0,8.9,43,exited 2026-09-17 (Supertrend red),-6.4,-0.79,Anant Raj Limited,main
 EBGNG,EMA 9/21 cross,2026-11-04,728.9,628.55,58.1,90.81,727.84,False,551.2,740.0,17.7,3,skipped (stop too far / gap below stop),,,GNG Electronics Limited,main
-BALRAMCHIN,EMA 9/21 cross,2026-10-07,706.6,638.0,58.4,87.64,584.42,True,658.4,704.45,10.4,22,stopped 2026-10-23,-9.4,-1.0,Balrampur Chini Mills Limited,main
+BALRAMCHIN,EMA 9/21 cross,2026-10-07,702.31,634.12,58.4,87.11,580.87,True,654.4,700.17,10.4,22,stopped 2026-10-23,-9.4,-1.0,Balrampur Chini Mills Limited,main
 MARSONS,EMA 9/21 cross,2026-10-30,148.62,116.71,69.3,84.64,128.68,True,154.04,152.0,30.2,6,skipped (stop too far / gap below stop),,,Marsons Limited,main
 GOODLUCK,EMA 9/21 cross,2026-10-12,566.35,482.75,67.9,81.49,589.5,False,555.35,600.0,24.3,19,skipped (stop too far / gap below stop),,,Goodluck India Limited,main
 PIRAMALFIN,EMA 9/21 cross,2026-08-21,2180.8,2035.0,63.1,70.87,1848.27,True,2070.7,2180.0,7.1,53,stopped 2026-09-24,-18.3,-2.75,Piramal Finance Limited,main
