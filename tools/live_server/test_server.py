@@ -537,3 +537,15 @@ def test_tb_auto(tmp_path, monkeypatch):
     app.tb_watch()
     A = json.load(open(d + "/app/answers.json")); P = json.load(open(d + "/app/pending.json"))
     assert A["BUY:58980.00"] is True and "BUY:58980.00" not in P and "SQ:x" in P and "SQ:x" not in A
+
+
+def test_health_and_admin(tmp_path, monkeypatch):
+    import app, os
+    h = app.health(); assert h["ok"] and "loop_age" in h and "uptime" in h
+    monkeypatch.setattr(app, "DATA", str(tmp_path)); monkeypatch.setattr(app, "check_pw", lambda p: p == "pw")
+    class R: client = None
+    import pytest
+    with pytest.raises(app.HTTPException):
+        app.admin(app.Admin(action="restart", password="pw", confirm="no"), R(), None)
+    r = app.admin(app.Admin(action="update", password="pw", confirm="UPDATE"), R(), None)
+    assert r["ok"] and os.path.exists(tmp_path / "cmd_update")

@@ -35,14 +35,37 @@ UNIT
 fi
 mkdir -p "$(dirname "$LOG")"
 log() { echo "$(date -u +%FT%TZ) $*" >> "$LOG"; }
+# 11 Nov 2026: install the watchdog (every minute) once, automatically
+if [ "$(id -u)" = 0 ] && [ ! -f /etc/systemd/system/trenddesk-watchdog.timer ]; then
+  cat > /etc/systemd/system/trenddesk-watchdog.service <<UNIT
+[Unit]
+Description=Trend Desk watchdog (restart a stuck server; app Update / Restart buttons)
+[Service]
+Type=oneshot
+ExecStart=/bin/bash $R/tools/live_server/deploy/watchdog.sh
+UNIT
+  cat > /etc/systemd/system/trenddesk-watchdog.timer <<UNIT
+[Unit]
+Description=Trend Desk watchdog every minute
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+AccuracySec=5s
+[Install]
+WantedBy=timers.target
+UNIT
+  systemctl daemon-reload && systemctl enable --now trenddesk-watchdog.timer >/dev/null && log "watchdog installed"
+fi
+status() { echo "{\"waiting\": $1, \"version\": \"$(git -C "$R" rev-parse --short HEAD)\", \"latest\": \"$(git -C "$R" rev-parse --short origin/main 2>/dev/null)\", \"at\": \"$(date -u +%FT%TZ)\"}" > $APP/var/update_status.json; chown trenddesk $APP/var/update_status.json 2>/dev/null; }
 git -C "$R" fetch -q origin main || { log "fetch failed"; exit 0; }
-[ "$(git -C "$R" rev-parse HEAD)" = "$(git -C "$R" rev-parse origin/main)" ] && exit 0
+[ "$(git -C "$R" rev-parse HEAD)" = "$(git -C "$R" rev-parse origin/main)" ] && { status false; exit 0; }
 if [ "${1:-}" != "--now" ]; then
   dow=$(TZ=Asia/Kolkata date +%u); hm=$(TZ=Asia/Kolkata date +%H%M)
-  if [ "$dow" -le 5 ] && [ "$hm" -ge 0900 ] && [ "$hm" -lt 1535 ]; then log "new code waiting for the close"; exit 0; fi
+  if [ "$dow" -le 5 ] && [ "$hm" -ge 0900 ] && [ "$hm" -lt 1535 ]; then log "new code waiting for the close"; status true; exit 0; fi
 fi
 old=$(git -C "$R" rev-parse --short HEAD)
 git -C "$R" merge -q --ff-only origin/main || { log "pull failed"; exit 0; }
 $V/bin/pip install -q -r "$R/tools/live_server/requirements.txt" >/dev/null 2>&1 || log "pip (server) failed"
 [ -f "$R/tools/angel/requirements.txt" ] && { $V/bin/pip install -q -r "$R/tools/angel/requirements.txt" >/dev/null 2>&1 || log "pip (bot) failed"; }
 systemctl restart trenddesk && log "updated $old -> $(git -C "$R" rev-parse --short HEAD), server restarted" || log "restart failed"
+status false

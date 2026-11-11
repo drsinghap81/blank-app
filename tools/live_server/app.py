@@ -283,9 +283,52 @@ def one_time_download(key: str):
     return FileResponse(os.path.join(DATA, os.path.basename(d["file"])), filename=os.path.basename(d["file"]))
 
 
+_HB = {"start": time.time(), "loop": time.time(), "tb": time.time()}     # 11 Nov 2026: heartbeats for the watchdog
+
+
 @app.get("/api/health")
 def health():
-    return dict(ok=True, mode="LIVE" if is_live() else "DRY RUN", market_open=market_open(), amo=amo_window(), ist=ist_now().isoformat(timespec="minutes"))
+    """Never touches Angel or the disk-heavy parts: the watchdog calls it every minute (10 s limit)."""
+    now = time.time(); up = {}
+    try:
+        up = json.load(open(os.path.join(DATA, "update_status.json")))
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        la = os.getloadavg()[0]
+        mem = {k: int(v.split()[0]) for k, v in (ln.split(":", 1) for ln in open("/proc/meminfo")) if k in ("MemTotal", "MemAvailable")}
+    except Exception:  # noqa: BLE001
+        la, mem = None, {}
+    return dict(ok=True, mode="LIVE" if is_live() else "DRY RUN", market_open=market_open(), amo=amo_window(), ist=ist_now().isoformat(timespec="minutes"),
+                uptime=int(now - _HB["start"]), loop_age=int(now - _HB["loop"]), tb_age=int(now - _HB["tb"]),
+                version=up.get("version"), latest=up.get("latest"), update_waiting=bool(up.get("waiting")), load=la,
+                mem_mb=round(mem.get("MemTotal", 0) / 1024), mem_free_mb=round(mem.get("MemAvailable", 0) / 1024))
+
+
+class Admin(BaseModel):
+    action: str
+    password: str = ""
+    confirm: str = ""
+
+
+@app.post("/api/admin")
+def admin(body: Admin, request: Request, _=Depends(auth)):
+    """App buttons (Settings -> Server): 'update' = pull the latest code now (even in market hours) and restart;
+    'restart' = restart the app server. Needs the app password + typing UPDATE / RESTART. The root watchdog acts within a minute."""
+    act = body.action.lower()
+    if act not in ("update", "restart"):
+        raise HTTPException(400, "unknown action")
+    ip = request.client.host if request.client else "?"
+    n, t0 = FAILS.get(ip, (0, 0))
+    if n >= 5 and time.time() - t0 < 900:
+        raise HTTPException(429, "too many attempts, wait 15 minutes")
+    if body.confirm.strip().upper() != act.upper():
+        raise HTTPException(400, f"type {act.upper()} to confirm")
+    if not check_pw(body.password):
+        FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
+    open(os.path.join(DATA, "cmd_" + act), "w").write(str(time.time())); log("admin", action=act)
+    return dict(ok=True, msg=f"{'Update' if act == 'update' else 'Restart'} requested: within about a minute the server "
+                f"{'pulls the latest code and ' if act == 'update' else ''}restarts (about 10 seconds offline). Your stops stay on Angel.")
 
 
 # ------------------------------------------------------------------ plan + sizing
@@ -1633,6 +1676,7 @@ def tb_watch():
 def _tb_loop():
     """Top Bottom approvals are checked every 5 s (a reversal prompt in market hours can't wait for the 2-minute loop)."""
     while True:
+        _HB["tb"] = time.time()
         try:
             tb_watch()
         except Exception as ex:  # noqa: BLE001
@@ -1643,6 +1687,7 @@ def _tb_loop():
 # ------------------------------------------------------------------ background: fills + stops every 2 minutes in market hours
 def _loop():
     while True:
+        _HB["loop"] = time.time()
         try:
             t = ist_now()
             if t.weekday() < 5 and (9, 0) <= (t.hour, t.minute) <= (16, 0) and any(not k.startswith("_") for k in journal()):

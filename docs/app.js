@@ -1002,7 +1002,7 @@ async function loadLive() {
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}`)}
     ${S && isOwner() ? pane('fut', '<div id="tbcard"></div><div id="tbcardn"></div>') : ''}
-    ${pane('set', `${S ? head : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
+    ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
     const sym = b.dataset.tgt, E = +b.dataset.e, St = +b.dataset.s, R = E - St;
     const sug = R > 0 ? `2R = ${fmt(E + 2 * R, 2, 'en-IN')} · 3R = ${fmt(E + 3 * R, 2, 'en-IN')}` : '';
@@ -1030,7 +1030,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); } wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); srvCard(); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -1286,6 +1286,32 @@ async function adoptCard(load) {
       catch (e) { alertMsg('Not released: ' + e.message); } }));
   };
   draw();
+}
+
+/* Server card (11 Nov 2026): is the server healthy, which code is it on, and Update / Restart buttons (the root watchdog
+   on the server acts on them within a minute). The watchdog also restarts a stuck server by itself. */
+async function srvCard() {
+  const box = $('#srvcard'); if (!box) return;
+  const t0 = performance.now(); let h = null, err = '';
+  try { h = await lvApi('/api/health', { timeout: 20000 }); } catch (e) { err = e.name === 'AbortError' ? 'no answer in 20 s' : e.message; }
+  const ms = Math.round(performance.now() - t0);
+  const st = !h ? ['down', 'var(--fall)', `Not answering (${esc(err)})`] : ms > 3000 || (h.loop_age || 0) > 300 ? ['slow', 'var(--saffron)', `Slow: ${(ms / 1000).toFixed(1)} s to answer`] : ['ok', 'var(--rise)', `Healthy · answered in ${ms} ms`];
+  const up = h && h.uptime != null ? (h.uptime > 86400 ? `${Math.floor(h.uptime / 86400)} d` : h.uptime > 3600 ? `${Math.floor(h.uptime / 3600)} h` : `${Math.floor(h.uptime / 60)} min`) : '–';
+  box.innerHTML = `<div class="lv-card" data-fold="skip"><div style="display:flex;justify-content:space-between;align-items:center"><b>Server</b><span class="lv-dot ${st[0] === 'ok' ? 'on' : ''}" style="background:${st[1]}"></span></div>
+    <p class="lv-sub"><b>${st[2]}</b>${h ? ` · running ${up}${h.version ? ` · code ${esc(h.version)}` : ''}${h.mem_mb ? ` · memory ${h.mem_free_mb} of ${h.mem_mb} MB free` : ''}${h.load != null ? ` · load ${fmt(h.load, 2)}` : ''}` : ''}</p>
+    ${h && h.update_waiting ? `<p class="lv-sub">🆕 New code ${h.latest ? '(' + esc(h.latest) + ') ' : ''}is waiting: it installs itself after 3:35 pm IST, or now with Update.</p>` : ''}
+    ${h && h.loop_age == null ? '<p class="lv-sub">The watchdog and these buttons start working after the server\'s next update.</p>' : ''}
+    <p class="lv-sub">A watchdog checks the server every minute and restarts it if it stops answering for ~3 minutes. Your stops are GTTs on Angel, so a restart (~10 s) never leaves a position unprotected.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="lv-btn" id="srvupd">Update now</button><button class="lv-btn ghost" id="srvrst">Restart</button><button class="lv-btn ghost" id="srvchk">Check again</button></div></div>`;
+  const act = async (a) => {
+    const pw = window.prompt(`${a === 'update' ? 'Pull the latest code now (even in market hours) and restart' : 'Restart the server'} — about 10 seconds offline.\n\nApp password:`);
+    if (pw === null) return;
+    const c = window.prompt(`Type ${a.toUpperCase()} to confirm:`); if (c === null) return;
+    try { const j = await lvApi('/api/admin', { method: 'POST', body: JSON.stringify({ action: a, password: pw, confirm: c }), timeout: 30000 }); alertMsg(j.msg, true); setTimeout(srvCard, 75000); }
+    catch (e) { alertMsg(/404/.test(e.message) ? 'Your server gets these buttons with its next update (after 3:35 pm IST).' : e.message); } };
+  box.querySelector('#srvupd').addEventListener('click', () => act('update'));
+  box.querySelector('#srvrst').addEventListener('click', () => act('restart'));
+  box.querySelector('#srvchk').addEventListener('click', srvCard);
 }
 
 /* Research card (11 Nov 2026, owner): the server's intraday tests (ORB, sweeps, SMA cross, base breakouts) — progress, a short
