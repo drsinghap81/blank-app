@@ -320,7 +320,7 @@ function lvPerf(box, S) {
   const E = (S && S.equity) || [];
   if (E.length < 3) { box.innerHTML = '<div class="lv-card"><b>Performance</b><p class="lv-sub">Your P/L calendar and the comparison with Nifty start after a few days of account values.</p></div>'; return; }
   const D = pfDays(E), months = [...new Set(D.map((x) => x.d.slice(0, 7)))];
-  const st = state.pf || (state.pf = { tab: 'cal', ym: months[months.length - 1], rng: '1M', sel: null, amt: false });
+  const st = state.perf || (state.perf = { tab: 'cal', ym: months[months.length - 1], rng: '1M', sel: null, amt: false });
   if (!months.includes(st.ym)) st.ym = months[months.length - 1];
   const draw = (B) => {
     const mi = months.indexOf(st.ym);
