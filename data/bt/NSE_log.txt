@@ -1,0 +1,326 @@
+NSE universe 3217
+NSE 200 downloaded, 160 liquid
+NSE 400 downloaded, 324 liquid
+NSE 600 downloaded, 495 liquid
+NSE 800 downloaded, 664 liquid
+NSE 1000 downloaded, 834 liquid
+NSE 1200 downloaded, 1013 liquid
+NSE 1400 downloaded, 1170 liquid
+NSE 1600 downloaded, 1335 liquid
+NSE 1800 downloaded, 1501 liquid
+NSE 2000 downloaded, 1673 liquid
+NSE 2200 downloaded, 1835 liquid
+NSE 2400 downloaded, 1999 liquid
+HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: VEEFIN.NS"}}}
+$VEEFIN.NS: possibly delisted; no timezone found
+
+1 Failed download:
+['VEEFIN.NS']: possibly delisted; no timezone found
+NSE 2600 downloaded, 2163 liquid
+$RTL.NS: possibly delisted; no timezone found
+$GREENASIA.NS: possibly delisted; no timezone found
+$SHREEDHAR.NS: possibly delisted; no timezone found
+$MMEL.NS: possibly delisted; no timezone found
+$KRMAYURVED.NS: possibly delisted; no timezone found
+$VIVIDEL.NS: possibly delisted; no timezone found
+$SHETHJI.NS: possibly delisted; no timezone found
+$EEPL.NS: possibly delisted; no timezone found
+$ASHWINI.NS: possibly delisted; no timezone found
+$VIJAYPD.NS: possibly delisted; no timezone found
+$ACCPL.NS: possibly delisted; no timezone found
+$VPFL.NS: possibly delisted; no timezone found
+$BMISL.NS: possibly delisted; no timezone found
+$AMCL.NS: possibly delisted; no timezone found
+$BIOPOL.NS: possibly delisted; no timezone found
+$PRIMECAB.NS: possibly delisted; no timezone found
+$GML.NS: possibly delisted; no timezone found
+$MADHURKNIT.NS: possibly delisted; no timezone found
+$KAYTEX.NS: possibly delisted; no timezone found
+$SHIVASHRIT.NS: possibly delisted; no timezone found
+$ARMOUR.NS: possibly delisted; no timezone found
+$HIMALAYAN.NS: possibly delisted; no timezone found
+$ASHUTOSH.NS: possibly delisted; no timezone found
+$SHYAMDHANI.NS: possibly delisted; no timezone found
+$UTKAL.NS: possibly delisted; no timezone found
+$CUDML.NS: possibly delisted; no timezone found
+$HGSINDIALT.NS: possibly delisted; no timezone found
+$CURRENT.NS: possibly delisted; no timezone found
+$FWSTC.NS: possibly delisted; no timezone found
+$SATTVAENGG.NS: possibly delisted; no timezone found
+$SILKY.NS: possibly delisted; no timezone found
+$INTEGRITY.NS: possibly delisted; no timezone found
+$HAPPY.NS: possibly delisted; no timezone found
+$SUMAX.NS: possibly delisted; no timezone found
+$JAYESH.NS: possibly delisted; no timezone found
+$MAYASHEEL.NS: possibly delisted; no timezone found
+$SPECTRAA.NS: possibly delisted; no timezone found
+$SHANTIINOR.NS: possibly delisted; no timezone found
+$GANGABATH.NS: possibly delisted; no timezone found
+$ARUNAYA.NS: possibly delisted; no timezone found
+$ADISOFT.NS: possibly delisted; no timezone found
+$METALIC.NS: possibly delisted; no timezone found
+$PROPSHOP.NS: possibly delisted; no timezone found
+$IWARE.NS: possibly delisted; no timezone found
+$TANKUP.NS: possibly delisted; no timezone found
+$SMARTEN.NS: possibly delisted; no timezone found
+$SIMCA.NS: possibly delisted; no timezone found
+$VALUE360.NS: possibly delisted; no timezone found
+$AVANA.NS: possibly delisted; no timezone found
+$ACTIVEINFR.NS: possibly delisted; no timezone found
+$ACETEC.NS: possibly delisted; no timezone found
+$VICTORYEV.NS: possibly delisted; no timezone found
+$MANILAM.NS: possibly delisted; no timezone found
+$BRANDMAN.NS: possibly delisted; no timezone found
+$ICELCO.NS: possibly delisted; no timezone found
+$MAXENGS.NS: possibly delisted; no timezone found
+$ATCENERGY.NS: possibly delisted; no timezone found
+$SHRIKANHA.NS: possibly delisted; no timezone found
+$PUSHPA.NS: possibly delisted; no timezone found
+$SHKSIL.NS: possibly delisted; no timezone found
+$SIDDHICOTS.NS: possibly delisted; no timezone found
+$VINOD.NS: possibly delisted; no timezone found
+$MGSL.NS: possibly delisted; no timezone found
+$CKKRETAIL.NS: possibly delisted; no timezone found
+$SPUNWEB.NS: possibly delisted; no timezone found
+$SHEEL.NS: possibly delisted; no timezone found
+$MARUSHIKA.NS: possibly delisted; no timezone found
+$PARTH.NS: possibly delisted; no timezone found
+$RNPL.NS: possibly delisted; no timezone found
+$AXIOMGAS.NS: possibly delisted; no timezone found
+$BLUEWATER.NS: possibly delisted; no timezone found
+$SACHEEROME.NS: possibly delisted; no timezone found
+$EPWINDIA.NS: possibly delisted; no timezone found
+$SPCON.NS: possibly delisted; no timezone found
+$BMLL.NS: possibly delisted; no timezone found
+$ETL.NS: possibly delisted; no timezone found
+$SAFEENTP.NS: possibly delisted; no timezone found
+$CEDAAR.NS: possibly delisted; no timezone found
+$TECHD.NS: possibly delisted; no timezone found
+$CSSL.NS: possibly delisted; no timezone found
+$SOCL.NS: possibly delisted; no timezone found
+$SELLOWRAP.NS: possibly delisted; no timezone found
+$COREIN.NS: possibly delisted; no timezone found
+$ECOLINE.NS: possibly delisted; no timezone found
+$AARADHYA.NS: possibly delisted; no timezone found
+$OPTIMYSTIX.NS: possibly delisted; no timezone found
+$MRIL.NS: possibly delisted; no timezone found
+$TEJA.NS: possibly delisted; no timezone found
+$PRAMODINI.NS: possibly delisted; no timezone found
+$PATILAUTOM.NS: possibly delisted; no timezone found
+$INVICTA.NS: possibly delisted; no timezone found
+$FASCINATE.NS: possibly delisted; no timezone found
+$SUNTECH.NS: possibly delisted; no timezone found
+$ANAWIL.NS: possibly delisted; no timezone found
+$CREDENT.NS: possibly delisted; no timezone found
+$AVIENCE.NS: possibly delisted; no timezone found
+$RFBL.NS: possibly delisted; no timezone found
+$MEDISTEP.NS: possibly delisted; no timezone found
+$SPEB.NS: possibly delisted; no timezone found
+$APSISAERO.NS: possibly delisted; no timezone found
+$DHARARAIL.NS: possibly delisted; no timezone found
+$DIVINEHIRA.NS: possibly delisted; no timezone found
+$URBAN-RE.NS: possibly delisted; no timezone found
+$MUNISH.NS: possibly delisted; no timezone found
+$QLINE.NS: possibly delisted; no timezone found
+$NEPTUNE.NS: possibly delisted; no timezone found
+$CONNPLEX.NS: possibly delisted; no timezone found
+$CURIS.NS: possibly delisted; no timezone found
+$SNEHAA.NS: possibly delisted; no timezone found
+$STUDIOLSD.NS: possibly delisted; no timezone found
+$SHRIAHIMSA.NS: possibly delisted; no timezone found
+$MOBILISE.NS: possibly delisted; no timezone found
+$PAPADMALJI.NS: possibly delisted; no timezone found
+$GREENLEAF.NS: possibly delisted; no timezone found
+$SAMAY.NS: possibly delisted; no timezone found
+$AMBAAUTO.NS: possibly delisted; no timezone found
+$KHERIAAUTO.NS: possibly delisted; no timezone found
+$ANONDITA.NS: possibly delisted; no timezone found
+$VMOBILE.NS: possibly delisted; no timezone found
+$GCHOTELS.NS: possibly delisted; no timezone found
+$MPEL.NS: possibly delisted; no timezone found
+$SKYTECH.NS: possibly delisted; no timezone found
+$NEOCHEM.NS: possibly delisted; no timezone found
+$RAVITA.NS: possibly delisted; no timezone found
+$OPTIVALUE.NS: possibly delisted; no timezone found
+$VIGOR.NS: possibly delisted; no timezone found
+$SAWALIYA.NS: possibly delisted; no timezone found
+$BHADORA.NS: possibly delisted; no timezone found
+$WHITEFORCE.NS: possibly delisted; no timezone found
+$FLYSBS.NS: possibly delisted; no timezone found
+$EVENTIONS.NS: possibly delisted; no timezone found
+$STRIDERS.NS: possibly delisted; no timezone found
+$JAINIK.NS: possibly delisted; no timezone found
+$SUBAHOTELS.NS: possibly delisted; no timezone found
+$VGINFOTECH.NS: possibly delisted; no timezone found
+$CLAYCRAFT.NS: possibly delisted; no timezone found
+$FINBUD.NS: possibly delisted; no timezone found
+$PROFX.NS: possibly delisted; no timezone found
+$JYOTIGLOBL.NS: possibly delisted; no timezone found
+$YAAP.NS: possibly delisted; no timezone found
+$ABH.NS: possibly delisted; no timezone found
+$INFLUX.NS: possibly delisted; no timezone found
+$NIKITA.NS: possibly delisted; no timezone found
+$LOANFRONT.NS: possibly delisted; no timezone found
+$TSC.NS: possibly delisted; no timezone found
+$QUALIANCE.NS: possibly delisted; no timezone found
+$NFPSAMPOOR.NS: possibly delisted; no timezone found
+$POOJALOGIS.NS: possibly delisted; no timezone found
+$AAKAAR.NS: possibly delisted; no timezone found
+$E2ERAIL.NS: possibly delisted; no timezone found
+$MONOLITH.NS: possibly delisted; no timezone found
+$RKFAL.NS: possibly delisted; no timezone found
+$GENXAI.NS: possibly delisted; no timezone found
+$NRVANDANA.NS: possibly delisted; no timezone found
+$SAVY.NS: possibly delisted; no timezone found
+$DCCL.NS: possibly delisted; no timezone found
+$ENCOMPAS.NS: possibly delisted; no timezone found
+$GURUNANAK.NS: possibly delisted; no timezone found
+$GJL.NS: possibly delisted; no timezone found
+$BAGDIGITAL.NS: possibly delisted; no timezone found
+$TAURIAN.NS: possibly delisted; no timezone found
+$RAPIDFLEET.NS: possibly delisted; no timezone found
+$CLASSICEIL.NS: possibly delisted; no timezone found
+$EXIMROUTES.NS: possibly delisted; no timezone found
+$ARCIIL.NS: possibly delisted; no timezone found
+$TEAMTECH.NS: possibly delisted; no timezone found
+
+166 Failed downloads:
+['RTL.NS', 'GREENASIA.NS', 'SHREEDHAR.NS', 'MMEL.NS', 'KRMAYURVED.NS', 'VIVIDEL.NS', 'SHETHJI.NS', 'EEPL.NS', 'ASHWINI.NS', 'VIJAYPD.NS', 'ACCPL.NS', 'VPFL.NS', 'BMISL.NS', 'AMCL.NS', 'BIOPOL.NS', 'PRIMECAB.NS', 'GML.NS', 'MADHURKNIT.NS', 'KAYTEX.NS', 'SHIVASHRIT.NS', 'ARMOUR.NS', 'HIMALAYAN.NS', 'ASHUTOSH.NS', 'SHYAMDHANI.NS', 'UTKAL.NS', 'CUDML.NS', 'HGSINDIALT.NS', 'CURRENT.NS', 'FWSTC.NS', 'SATTVAENGG.NS', 'SILKY.NS', 'INTEGRITY.NS', 'HAPPY.NS', 'SUMAX.NS', 'JAYESH.NS', 'MAYASHEEL.NS', 'SPECTRAA.NS', 'SHANTIINOR.NS', 'GANGABATH.NS', 'ARUNAYA.NS', 'ADISOFT.NS', 'METALIC.NS', 'PROPSHOP.NS', 'IWARE.NS', 'TANKUP.NS', 'SMARTEN.NS', 'SIMCA.NS', 'VALUE360.NS', 'AVANA.NS', 'ACTIVEINFR.NS', 'ACETEC.NS', 'VICTORYEV.NS', 'MANILAM.NS', 'BRANDMAN.NS', 'ICELCO.NS', 'MAXENGS.NS', 'ATCENERGY.NS', 'SHRIKANHA.NS', 'PUSHPA.NS', 'SHKSIL.NS', 'SIDDHICOTS.NS', 'VINOD.NS', 'MGSL.NS', 'CKKRETAIL.NS', 'SPUNWEB.NS', 'SHEEL.NS', 'MARUSHIKA.NS', 'PARTH.NS', 'RNPL.NS', 'AXIOMGAS.NS', 'BLUEWATER.NS', 'SACHEEROME.NS', 'EPWINDIA.NS', 'SPCON.NS', 'BMLL.NS', 'ETL.NS', 'SAFEENTP.NS', 'CEDAAR.NS', 'TECHD.NS', 'CSSL.NS', 'SOCL.NS', 'SELLOWRAP.NS', 'COREIN.NS', 'ECOLINE.NS', 'AARADHYA.NS', 'OPTIMYSTIX.NS', 'MRIL.NS', 'TEJA.NS', 'PRAMODINI.NS', 'PATILAUTOM.NS', 'INVICTA.NS', 'FASCINATE.NS', 'SUNTECH.NS', 'ANAWIL.NS', 'CREDENT.NS', 'AVIENCE.NS', 'RFBL.NS', 'MEDISTEP.NS', 'SPEB.NS', 'APSISAERO.NS', 'DHARARAIL.NS', 'DIVINEHIRA.NS', 'URBAN-RE.NS', 'MUNISH.NS', 'QLINE.NS', 'NEPTUNE.NS', 'CONNPLEX.NS', 'CURIS.NS', 'SNEHAA.NS', 'STUDIOLSD.NS', 'SHRIAHIMSA.NS', 'MOBILISE.NS', 'PAPADMALJI.NS', 'GREENLEAF.NS', 'SAMAY.NS', 'AMBAAUTO.NS', 'KHERIAAUTO.NS', 'ANONDITA.NS', 'VMOBILE.NS', 'GCHOTELS.NS', 'MPEL.NS', 'SKYTECH.NS', 'NEOCHEM.NS', 'RAVITA.NS', 'OPTIVALUE.NS', 'VIGOR.NS', 'SAWALIYA.NS', 'BHADORA.NS', 'WHITEFORCE.NS', 'FLYSBS.NS', 'EVENTIONS.NS', 'STRIDERS.NS', 'JAINIK.NS', 'SUBAHOTELS.NS', 'VGINFOTECH.NS', 'CLAYCRAFT.NS', 'FINBUD.NS', 'PROFX.NS', 'JYOTIGLOBL.NS', 'YAAP.NS', 'ABH.NS', 'INFLUX.NS', 'NIKITA.NS', 'LOANFRONT.NS', 'TSC.NS', 'QUALIANCE.NS', 'NFPSAMPOOR.NS', 'POOJALOGIS.NS', 'AAKAAR.NS', 'E2ERAIL.NS', 'MONOLITH.NS', 'RKFAL.NS', 'GENXAI.NS', 'NRVANDANA.NS', 'SAVY.NS', 'DCCL.NS', 'ENCOMPAS.NS', 'GURUNANAK.NS', 'GJL.NS', 'BAGDIGITAL.NS', 'TAURIAN.NS', 'RAPIDFLEET.NS', 'CLASSICEIL.NS', 'EXIMROUTES.NS', 'ARCIIL.NS', 'TEAMTECH.NS']: possibly delisted; no timezone found
+NSE 2800 downloaded, 2191 liquid
+$PRANIK.NS: possibly delisted; no timezone found
+$EXCELLENT.NS: possibly delisted; no timezone found
+$AKANKSHA.NS: possibly delisted; no timezone found
+$POSITRON.NS: possibly delisted; no timezone found
+$SATKARTAR.NS: possibly delisted; no timezone found
+$SPPPOLY.NS: possibly delisted; no timezone found
+$SSEGL.NS: possibly delisted; no timezone found
+$BALAJIPHOS.NS: possibly delisted; no timezone found
+$IDEALTECHO.NS: possibly delisted; no timezone found
+$BULKCORP.NS: possibly delisted; no timezone found
+$ITTL.NS: possibly delisted; no timezone found
+$AERON.NS: possibly delisted; no timezone found
+$TEJASCARGO.NS: possibly delisted; no timezone found
+$IPHL.NS: possibly delisted; no timezone found
+$KKJEWELS.NS: possibly delisted; no timezone found
+$DRSCARGO.NS: possibly delisted; no timezone found
+$JAYBEE.NS: possibly delisted; no timezone found
+$FORCAS.NS: possibly delisted; no timezone found
+$TROM.NS: possibly delisted; no timezone found
+$MACOBSTECH.NS: possibly delisted; no timezone found
+$DHARIWAL.NS: possibly delisted; no timezone found
+$AESTHETIK.NS: possibly delisted; no timezone found
+$NMSTEEL.NS: possibly delisted; no timezone found
+$DHANSA.NS: possibly delisted; no timezone found
+$C2C.NS: possibly delisted; no timezone found
+$EMAPARTNER.NS: possibly delisted; no timezone found
+$SFML.NS: possibly delisted; no timezone found
+$ABHAPOWER.NS: possibly delisted; no timezone found
+$TECHERA.NS: possibly delisted; no timezone found
+$MAXVOLT.NS: possibly delisted; no timezone found
+$APRAMEYA.NS: possibly delisted; no timezone found
+$PARAMATRIX.NS: possibly delisted; no timezone found
+$ANYA.NS: possibly delisted; no timezone found
+$APEXECO.NS: possibly delisted; no timezone found
+$DECCANTRAN.NS: possibly delisted; no timezone found
+$SUNLITE.NS: possibly delisted; no timezone found
+$LAKSHYA.NS: possibly delisted; no timezone found
+$ROYALARC.NS: possibly delisted; no timezone found
+$READYMIX.NS: possibly delisted; no timezone found
+$AUSL.NS: possibly delisted; no timezone found
+$VOLERCAR.NS: possibly delisted; no timezone found
+$OBSCP.NS: possibly delisted; no timezone found
+$ETML.NS: possibly delisted; no timezone found
+$GANESHIN.NS: possibly delisted; no timezone found
+$ONYX.NS: possibly delisted; no timezone found
+$REXPRO.NS: possibly delisted; no timezone found
+$UHTL.NS: possibly delisted; no timezone found
+$AVIANSH.NS: possibly delisted; no timezone found
+$UNILEX.NS: possibly delisted; no timezone found
+$PREMIUM.NS: possibly delisted; no timezone found
+$PSFL.NS: possibly delisted; no timezone found
+$MIEL.NS: possibly delisted; no timezone found
+$SHUBHSHREE.NS: possibly delisted; no timezone found
+$DELTIC.NS: possibly delisted; no timezone found
+$PURPLEUTED.NS: possibly delisted; no timezone found
+$WOL3D.NS: possibly delisted; no timezone found
+$VIESL.NS: possibly delisted; no timezone found
+$VDEAL.NS: possibly delisted; no timezone found
+$PARAMOUNT.NS: possibly delisted; no timezone found
+$BARFLEX.NS: possibly delisted; no timezone found
+$ESPRIT.NS: possibly delisted; no timezone found
+$NEELAM.NS: possibly delisted; no timezone found
+$SAJHOTELS.NS: possibly delisted; no timezone found
+$KATARIA.NS: possibly delisted; no timezone found
+$BOSS.NS: possibly delisted; no timezone found
+$CHAMUNDA.NS: possibly delisted; no timezone found
+$RAJINDLTD.NS: possibly delisted; no timezone found
+$ELGNZ.NS: possibly delisted; no timezone found
+$ENVIRO.NS: possibly delisted; no timezone found
+$INNOMET.NS: possibly delisted; no timezone found
+$ADDICTIVE.NS: possibly delisted; no timezone found
+$DANISH.NS: possibly delisted; no timezone found
+$THESL.NS: possibly delisted; no timezone found
+$CHANDAN.NS: possibly delisted; no timezone found
+$JEYYAM.NS: possibly delisted; no timezone found
+$PHOGLOBAL.NS: possibly delisted; no timezone found
+$UTSSAV.NS: possibly delisted; no timezone found
+$KEN.NS: possibly delisted; no timezone found
+$VLINFRA.NS: possibly delisted; no timezone found
+$GAJANAND.NS: possibly delisted; no timezone found
+$SATECH.NS: possibly delisted; no timezone found
+$QVCEL.NS: possibly delisted; no timezone found
+$BALCO.NS: possibly delisted; no timezone found
+$FORGEAUTO.NS: possibly delisted; no timezone found
+$HPTL.NS: possibly delisted; no timezone found
+$OSELDEVICE.NS: possibly delisted; no timezone found
+$ASHALOG.NS: possibly delisted; no timezone found
+$PPSL.NS: possibly delisted; no timezone found
+$RNFI.NS: possibly delisted; no timezone found
+$SAHASRA.NS: possibly delisted; no timezone found
+$IDENTICAL.NS: possibly delisted; no timezone found
+$PSRAJ.NS: possibly delisted; no timezone found
+$AGARWALTUF.NS: possibly delisted; no timezone found
+$USHAFIN.NS: possibly delisted; no timezone found
+$SDREAMS.NS: possibly delisted; no timezone found
+$HVAX.NS: possibly delisted; no timezone found
+$LAMOSAIC.NS: possibly delisted; no timezone found
+$RAJPUTANA.NS: possibly delisted; no timezone found
+$FRESHARA.NS: possibly delisted; no timezone found
+$NAMOEWASTE.NS: possibly delisted; no timezone found
+$RAPPID.NS: possibly delisted; no timezone found
+$BIKEWO.NS: possibly delisted; no timezone found
+$MYMUDRA.NS: possibly delisted; no timezone found
+$BRACEPORT.NS: possibly delisted; no timezone found
+$PELATRO.NS: possibly delisted; no timezone found
+$DIVYADHAN.NS: possibly delisted; no timezone found
+$CHETANA.NS: possibly delisted; no timezone found
+$KALANA.NS: possibly delisted; no timezone found
+
+108 Failed downloads:
+['PRANIK.NS', 'EXCELLENT.NS', 'AKANKSHA.NS', 'POSITRON.NS', 'SATKARTAR.NS', 'SPPPOLY.NS', 'SSEGL.NS', 'BALAJIPHOS.NS', 'IDEALTECHO.NS', 'BULKCORP.NS', 'ITTL.NS', 'AERON.NS', 'TEJASCARGO.NS', 'IPHL.NS', 'KKJEWELS.NS', 'DRSCARGO.NS', 'JAYBEE.NS', 'FORCAS.NS', 'TROM.NS', 'MACOBSTECH.NS', 'DHARIWAL.NS', 'AESTHETIK.NS', 'NMSTEEL.NS', 'DHANSA.NS', 'C2C.NS', 'EMAPARTNER.NS', 'SFML.NS', 'ABHAPOWER.NS', 'TECHERA.NS', 'MAXVOLT.NS', 'APRAMEYA.NS', 'PARAMATRIX.NS', 'ANYA.NS', 'APEXECO.NS', 'DECCANTRAN.NS', 'SUNLITE.NS', 'LAKSHYA.NS', 'ROYALARC.NS', 'READYMIX.NS', 'AUSL.NS', 'VOLERCAR.NS', 'OBSCP.NS', 'ETML.NS', 'GANESHIN.NS', 'ONYX.NS', 'REXPRO.NS', 'UHTL.NS', 'AVIANSH.NS', 'UNILEX.NS', 'PREMIUM.NS', 'PSFL.NS', 'MIEL.NS', 'SHUBHSHREE.NS', 'DELTIC.NS', 'PURPLEUTED.NS', 'WOL3D.NS', 'VIESL.NS', 'VDEAL.NS', 'PARAMOUNT.NS', 'BARFLEX.NS', 'ESPRIT.NS', 'NEELAM.NS', 'SAJHOTELS.NS', 'KATARIA.NS', 'BOSS.NS', 'CHAMUNDA.NS', 'RAJINDLTD.NS', 'ELGNZ.NS', 'ENVIRO.NS', 'INNOMET.NS', 'ADDICTIVE.NS', 'DANISH.NS', 'THESL.NS', 'CHANDAN.NS', 'JEYYAM.NS', 'PHOGLOBAL.NS', 'UTSSAV.NS', 'KEN.NS', 'VLINFRA.NS', 'GAJANAND.NS', 'SATECH.NS', 'QVCEL.NS', 'BALCO.NS', 'FORGEAUTO.NS', 'HPTL.NS', 'OSELDEVICE.NS', 'ASHALOG.NS', 'PPSL.NS', 'RNFI.NS', 'SAHASRA.NS', 'IDENTICAL.NS', 'PSRAJ.NS', 'AGARWALTUF.NS', 'USHAFIN.NS', 'SDREAMS.NS', 'HVAX.NS', 'LAMOSAIC.NS', 'RAJPUTANA.NS', 'FRESHARA.NS', 'NAMOEWASTE.NS', 'RAPPID.NS', 'BIKEWO.NS', 'MYMUDRA.NS', 'BRACEPORT.NS', 'PELATRO.NS', 'DIVYADHAN.NS', 'CHETANA.NS', 'KALANA.NS']: possibly delisted; no timezone found
+NSE 3000 downloaded, 2280 liquid
+$FOCE.NS: possibly delisted; no timezone found
+$ARVINDPORT.NS: possibly delisted; no timezone found
+$PARAMPARA.NS: possibly delisted; no timezone found
+$QFIL.NS: possibly delisted; no timezone found
+$VISDEM.NS: possibly delisted; no timezone found
+$AMBANIORGO.NS: possibly delisted; no timezone found
+$RICHA.NS: possibly delisted; no timezone found
+
+7 Failed downloads:
+['FOCE.NS', 'ARVINDPORT.NS', 'PARAMPARA.NS', 'QFIL.NS', 'VISDEM.NS', 'AMBANIORGO.NS', 'RICHA.NS']: possibly delisted; no timezone found
+NSE 3200 downloaded, 2415 liquid
+$ALCODIS.NS: possibly delisted; no timezone found
+$AVATAR.NS: possibly delisted; no timezone found
+$DIRL.NS: possibly delisted; no timezone found
+
+3 Failed downloads:
+['ALCODIS.NS', 'AVATAR.NS', 'DIRL.NS']: possibly delisted; no timezone found
+NSE 3217 downloaded, 2418 liquid
+signals 7521 rows 4779880
+{'seed': 0, 'cagr': np.float64(31.8), 'maxdd': np.float64(-26.6), 'cagr_17_21': np.float64(36.2), 'cagr_22_26': np.float64(26.8), 'dd_22_26': np.float64(-21.2), 'trades': 526, 'win': 37, 'pf': np.float64(2.2), 'years': {'2017': 41.4, '2018': -16.3, '2019': 8.9, '2020': 53.8, '2021': 138.1, '2022': 7.4, '2023': 81.0, '2024': 27.7, '2025': 0.3, '2026': 30.3}}
+{'seed': 1, 'cagr': np.float64(21.9), 'maxdd': np.float64(-24.0), 'cagr_17_21': np.float64(31.1), 'cagr_22_26': np.float64(12.9), 'dd_22_26': np.float64(-19.5), 'trades': 543, 'win': 37, 'pf': np.float64(1.8), 'years': {'2017': 38.1, '2018': -8.2, '2019': 5.9, '2020': 56.3, '2021': 85.6, '2022': -8.8, '2023': 43.0, '2024': 22.3, '2025': -1.8, '2026': 16.7}}
+{'seed': 2, 'cagr': np.float64(29.4), 'maxdd': np.float64(-23.0), 'cagr_17_21': np.float64(32.8), 'cagr_22_26': np.float64(25.6), 'dd_22_26': np.float64(-23.0), 'trades': 522, 'win': 37, 'pf': np.float64(2.22), 'years': {'2017': 39.0, '2018': -9.7, '2019': 5.8, '2020': 56.4, '2021': 100.2, '2022': 13.3, '2023': 53.7, '2024': 18.3, '2025': 8.0, '2026': 38.5}}
+{'seed': 3, 'cagr': np.float64(26.7), 'maxdd': np.float64(-24.3), 'cagr_17_21': np.float64(29.5), 'cagr_22_26': np.float64(23.0), 'dd_22_26': np.float64(-24.3), 'trades': 533, 'win': 36, 'pf': np.float64(2.03), 'years': {'2017': 29.0, '2018': -12.7, '2019': 9.4, '2020': 40.2, '2021': 112.8, '2022': 0.5, '2023': 61.5, '2024': 37.2, '2025': -0.9, '2026': 27.9}}
+{'seed': 4, 'cagr': np.float64(21.8), 'maxdd': np.float64(-24.5), 'cagr_17_21': np.float64(29.7), 'cagr_22_26': np.float64(13.5), 'dd_22_26': np.float64(-24.5), 'trades': 523, 'win': 38, 'pf': np.float64(1.73), 'years': {'2017': 45.0, '2018': -14.1, '2019': 5.5, '2020': 38.3, '2021': 104.3, '2022': 9.2, '2023': 27.9, '2024': 17.9, '2025': 0.3, '2026': 14.7}}
+{"cagr": 26.7, "maxdd": -24.3, "cagr_17_21": 31.1, "cagr_22_26": 23.0, "pf": 2.03, "trades": 526.0, "win": 37.0} {"name": "Nifty 50", "cagr": 12.0, "maxdd": -38.4, "cagr_22_26": 7.5}
