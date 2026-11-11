@@ -904,6 +904,12 @@ body.pub .owner-only { display: none !important; }
 .slt-lab .s small{color:var(--fall,#d64545)}.slt-lab .e small{color:#6d3fd6}.slt-lab .t small{color:var(--rise-ink,#1f9d6b)}
 .slt-foot{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-top:4px;color:var(--muted,#777)}
 .slt.ref .slt-rew{background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--rise,#1f9d6b) 40%,transparent) 0 6px,transparent 6px 10px)}
-.slt.ref .slt-dot.t{background:transparent;border:2px dashed var(--rise,#1f9d6b)}
+.slt.ref .slt-dot.t{background:var(--panel-2,#1c1c1c);border:2px solid var(--rise,#1f9d6b)}
 .slt.ref .slt-lab .t small{color:var(--muted,#888)}
 .slt-foot+.slt-foot{margin-top:2px;font-size:11px}
+.slt-top{position:relative;height:16px;margin:0 6px;font-size:12px;font-weight:600}
+.slt-top span{position:absolute;bottom:0;transform:translateX(-50%);white-space:nowrap}
+.slt-top small{color:#8b6cf0;font-weight:500;font-size:11px}
+.slt-bar{margin-top:6px}
+.slt-foot{flex-wrap:wrap}.slt-foot span{white-space:nowrap}
+.slt-foot span:only-child{white-space:normal}
