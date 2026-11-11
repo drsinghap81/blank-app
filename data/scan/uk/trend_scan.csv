@@ -1,0 +1,15 @@
+symbol,close,ema9,ema21,ema50,above21_60d,dist21,off_high,r1m,r3m,r6m,slope_yr,r2,rsi,value_cr,stacked,e21_rising,above50,last_date,ticker,name,board,list,tag,score
+HFG,739.0,732.64,723.7,697.28,100,2.1,-0.7,3.6,20.2,40.3,153,0.92,61.0,1.37,True,True,True,2026-11-09,HFG.L,Hilton Food Group,FTSE 250,trend,at EMA21,157.3
+KIE,321.6,313.78,308.92,294.31,85,4.1,0.0,8.4,28.8,58.6,194,0.93,62.3,3.4,True,True,True,2026-11-09,KIE.L,Kier Group,FTSE 250,trend,riding,154.9
+BME,279.6,278.91,274.09,260.2,90,2.0,-2.3,5.7,18.6,71.3,160,0.9,57.4,13.07,True,True,True,2026-11-09,BME.L,B&M,FTSE 250,trend,at EMA21,151.0
+JDW,977.5,1024.75,1010.97,944.98,82,-3.3,-9.3,-0.5,21.2,63.7,197,0.9,45.8,4.55,False,True,True,2026-11-09,JDW.L,Wetherspoons,FTSE 250,watch,at EMA21,150.7
+ONT,210.4,212.49,211.45,195.84,88,-0.5,-10.5,-1.4,61.8,74.6,361,0.72,51.0,4.6,False,True,True,2026-11-09,ONT.L,Oxford Nanopore Technologies,FTSE 250,watch,at EMA21,146.0
+COST,258.0,255.77,254.07,246.69,82,1.5,-2.1,7.1,18.1,31.2,94,0.9,54.9,3.13,True,True,True,2026-11-09,COST.L,Costain Group,FTSE 250,watch,at EMA21,140.4
+GFRD,716.0,703.64,695.01,671.15,72,3.0,-0.9,4.7,15.5,31.4,115,0.86,58.7,2.84,True,True,True,2026-11-09,GFRD.L,Galliford Try,FTSE 250,watch,at EMA21,133.5
+DOM,228.2,230.18,227.57,220.22,85,0.3,-3.9,1.1,14.1,20.5,64,0.84,52.6,2.32,False,True,True,2026-11-09,DOM.L,Domino's Pizza,FTSE 250,watch,at EMA21,132.9
+MAB,312.0,318.24,311.94,298.58,75,0.0,-5.6,8.7,11.4,24.3,85,0.86,53.2,2.87,False,True,True,2026-11-09,MAB.L,Mitchells & Butlers,FTSE 250,watch,at EMA21,132.0
+CRDA,3622.0,3632.48,3580.0,3455.77,75,1.2,-1.3,6.8,10.6,31.0,55,0.71,59.7,14.89,False,True,True,2026-11-09,CRDA.L,Croda International,FTSE 100,watch,at EMA21,114.0
+WIX,240.5,238.28,229.09,215.36,72,5.0,-5.6,19.7,20.9,37.8,68,0.7,70.6,1.34,True,True,True,2026-11-09,WIX.L,Wickes,FTSE 250,watch,riding,112.8
+PETS,268.2,255.39,243.19,228.36,75,10.3,0.0,26.7,28.7,51.6,87,0.77,83.7,3.44,True,True,True,2026-11-09,PETS.L,Pets at Home,FTSE 250,watch,extended,112.6
+KGF,380.6,368.43,355.51,338.2,73,7.1,0.0,19.7,17.8,35.0,67,0.72,70.8,19.72,True,True,True,2026-11-09,KGF.L,Kingfisher plc,FTSE 100,watch,riding,111.0
+FRAS,968.0,931.77,898.55,857.06,75,7.7,-1.4,15.4,21.2,44.7,53,0.73,73.5,3.0,True,True,True,2026-11-09,FRAS.L,Frasers Group,FTSE 250,watch,riding,110.4
