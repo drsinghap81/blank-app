@@ -15,7 +15,7 @@ from global_universe import symbols  # noqa: E402
 from global_sectors import fetch_meta, index_tickers  # noqa: E402
 
 MKT, SH, NS = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
-MINVAL = {"US": 5e6, "ASX": 1e6}[MKT]
+MINVAL = {"US": 5e6, "ASX": 1e6, "UK": 1e8}[MKT]   # UK in pence (GBP 1 m)
 MINCLOSE = float(os.environ.get("MINCLOSE", "30"))
 os.makedirs("hist", exist_ok=True)
 

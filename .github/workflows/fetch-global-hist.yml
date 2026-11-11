@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       minclose: {description: "min close ever (default 30)", default: "30"}
-      only: {description: "ASX to run only ASX", default: "all"}
+      only: {description: "ASX or UK to run only that market", default: "all"}
 permissions:
   contents: write
 jobs:
@@ -21,6 +21,7 @@ jobs:
           - {mkt: US, sh: 4, ns: 6}
           - {mkt: US, sh: 5, ns: 6}
           - {mkt: ASX, sh: 0, ns: 1}
+          - {mkt: UK, sh: 0, ns: 1}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
