@@ -535,7 +535,9 @@ function lvSave(o) { try { localStorage.setItem(LV_KEY, JSON.stringify({ ...lvCf
 /* 11 Nov 2026: one /api/plan answer is shared for 60 s (Today's risk card and Live asked the server separately) */
 function lvPlan(fresh) {
   const c = state._planC; if (!fresh && c && Date.now() - c.t < 60000) return c.p;
-  const p = lvApi('/api/plan', { timeout: 60000 }); state._planC = { t: Date.now(), p }; p.catch(() => { state._planC = null; }); return p;
+  const p = lvApi('/api/plan', { timeout: 60000 }); state._planC = { t: Date.now(), p }; p.catch(() => { state._planC = null; });
+  p.then((F) => { if (F && F.holdings) try { localStorage.setItem('td.heldSyms', JSON.stringify(F.holdings.filter((h) => h.qty > 0).map((h) => h.symbol))); } catch (e) { /* */ } }).catch(() => {});
+  return p;
 }
 async function lvApi(path, opt = {}) {
   const c = lvCfg(); if (!c.url) throw new Error('not connected');
@@ -4064,6 +4066,7 @@ async function tdHeat(box, mk) {
 function tdHeldSet() {
   const H = new Set(bgPractice().filter((t) => t.state !== 'closed').map((t) => t.symbol));
   try { const S = JSON.parse(localStorage.getItem('td.riskS') || 'null'); (S && S.trades || []).filter((t) => t.state !== 'closed' && t.qty).forEach((t) => H.add(t.symbol)); } catch (e) { /* */ }
+  try { (JSON.parse(localStorage.getItem('td.heldSyms') || '[]') || []).forEach((x) => H.add(x)); } catch (e) { /* */ }   // real Angel holdings
   return H;
 }
 function tdApplyHeld(mk) {
@@ -4085,7 +4088,7 @@ async function tdRiskCard(box, S0) {
     let cached = null; try { cached = JSON.parse(localStorage.getItem('td.riskS') || 'null'); } catch (e) { /* */ }
     if (cached && cached.trades) { S = cached; S._cached = true; }
     lvPlan().then((F) => { if (!F || !F.trades || !box.isConnected) return;
-      try { localStorage.setItem('td.riskS', JSON.stringify({ capital: F.capital, trades: F.trades, at: Date.now() })); } catch (e) { /* */ }
+      try { localStorage.setItem('td.riskS', JSON.stringify({ capital: F.capital, trades: F.trades, at: Date.now() })); localStorage.setItem('td.heldSyms', JSON.stringify((F.holdings || []).filter((h) => h.qty > 0).map((h) => h.symbol))); } catch (e) { /* */ }
       if (state._tdMkNow === 'NSE') tdApplyHeld('NSE');
       tdRiskCard(box, F); }).catch(() => {});
     if (!S) { box.innerHTML = '<div class="td-risk"><p class="muted td-rs">Loading your open risk and return from your server…</p></div>'; const m = $('#tdmini'); if (m) m.innerHTML = '<div class="td-mini"><span><small>Loading open risk and return…</small></span></div>'; return; }
