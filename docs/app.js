@@ -145,7 +145,7 @@ function curveSVG(E, up) {
   const col = up ? 'var(--rise)' : 'var(--fall)';
   return `<svg viewBox="0 0 350 70" width="100%" height="70" preserveAspectRatio="none" aria-label="Account value, one point a day"><path d="${line} L 350 70 L 0 70 Z" style="fill:${col};opacity:.12"/><path d="${line}" fill="none" style="stroke:${col}" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
 }
-function lvHero(S, PF) {
+function lvHero(S, PF, part = 'top') {
   if (!S) return '';
   const real = S.real_value != null, val = real ? S.real_value : S.account_value;
   const E = S.equity || [], rng = state.heroRng || '1M', days = { '1M': 31, '3M': 92, '1Y': 366, All: 1e5 }[rng];
@@ -165,17 +165,19 @@ function lvHero(S, PF) {
   sl.push({ k: 'cash', name: 'Cash', v: cash, sub: lakh(cash) });
   sl.forEach((x) => (x.col = PIE_COL[x.k] || '#999'));
   const inSys = val ? Math.round(sysV / val * 100) : 0;
+  const pieHtml = `<div class="hero-pie"><div class="hero-dn">${donut(sl, 128, 16)}<div><b>${inSys}%</b><span>in systems</span></div></div>
+      <div class="hero-leg">${sl.map((x) => `<div><i style="background:${x.col}"></i><span><b>${esc(x.name)}</b><small>${x.sub}</small></span>${x.r ? `<em class="${x.r.pnl >= 0 ? 'up' : 'down'}">${x.r.pct >= 0 ? '+' : ''}${fmt(x.r.pct, 1)}%</em>` : '<em></em>'}</div>`).join('')}</div></div>
+    <button class="hero-chg" id="lvsplit">Change the split <span class="muted">· ${Object.entries(lvAlloc('NSE', {}, S)).filter(([k, v]) => v > 0 && k !== 'tb' && ownK(k)).map(([k, v]) => `${BK_SHORT[k] || BK_NAME[k]} ${v}`).join(' · ')}</span></button>`;
+  if (part === 'pie') return `<div class="lv-card hero" data-fold="skip"><b>Where your money is</b>${pieHtml}</div>`;
   return `<div class="lv-card hero"><span class="muted">${real ? 'Your Angel account' : 'Account value (server update pending)'}</span>
     <div class="hero-big">${money(val, 'NSE')}</div>
     ${S.value_parts ? (() => { const V = S.value_parts, R = V.rms || {};
       return `<details class="hero-parts"><summary>= Cash ${lakh(V.cash)} + Holdings ${lakh(V.holdings)}${V.todays_buys > 0 ? ` + Today's buys ${lakh(V.todays_buys)}` : ''}</summary>
         <p class="lv-sub">From Angel's Funds (RMS): available cash ${lakh(R.availablecash || 0)}${R.collateral ? ` · collateral from pledged shares ${lakh(R.collateral)}` : ''}${R.net ? ` · net margin ${lakh(R.net)}` : ''}${R.utiliseddebits ? ` · used ${lakh(R.utiliseddebits)}` : ''}. Holdings = shares × Angel's last price. If Angel's Funds screen shows a smaller cash figure, tell me which number it shows.</p></details>`; })() : ''}
-    <div class="hero-line">${badge}${today == null ? '' : `<span class="muted">· today <b class="${today >= 0 ? 'up' : 'down'}">${rs(today)}</b></span>`}</div>
+    <div class="hero-line">${badge}${today == null ? '' : `<span class="muted">today <b class="${today >= 0 ? 'up' : 'down'}">${rs(today)}</b></span>`}</div>
     ${Ev.length >= 2 ? curveSVG(Ev, Ev[Ev.length - 1][1] >= Ev[0][1]) + `<div class="hero-rng">${['1M', '3M', '1Y', 'All'].map((k) => `<button data-rng="${k}" aria-pressed="${k === rng}">${k}</button>`).join('')}</div>`
       : `<p class="lv-sub">Your value curve builds from here, one point each day${real ? '' : ' once your server takes today\'s update'}.</p>`}
-    <div class="hero-pie"><div class="hero-dn">${donut(sl, 128, 16)}<div><b>${inSys}%</b><span>in systems</span></div></div>
-      <div class="hero-leg">${sl.map((x) => `<div><i style="background:${x.col}"></i><span><b>${esc(x.name)}</b><small>${x.sub}</small></span>${x.r ? `<em class="${x.r.pnl >= 0 ? 'up' : 'down'}">${x.r.pct >= 0 ? '+' : ''}${fmt(x.r.pct, 1)}%</em>` : '<em></em>'}</div>`).join('')}</div></div>
-    <button class="hero-chg" id="lvsplit">Change the split <span class="muted">· ${Object.entries(lvAlloc('NSE', {}, S)).filter(([k, v]) => v > 0 && k !== 'tb' && ownK(k)).map(([k, v]) => `${BK_SHORT[k] || BK_NAME[k]} ${v}`).join(' · ')}</span></button></div>`;
+    </div>`;
 }
 function lvHeroWire(el, P, S) {
   el.querySelectorAll('.hero-rng button').forEach((b) => b.addEventListener('click', () => { state.heroRng = b.dataset.rng; lvKeep(); }));
@@ -330,7 +332,7 @@ function lvPerf(box, S) {
       : `<div class="pf-share"><img id="pfimg" alt="Share card for ${PF_MON(st.ym)}"><label class="pf-amt"><input type="checkbox" id="pfamt" ${st.amt ? 'checked' : ''}> Show ₹ amount</label>
           <div class="sp-foot"><button class="lv-btn" id="pfshare">Share</button><button class="lv-btn" id="pfsave" style="background:var(--soft);color:var(--ink)">Save image</button></div>
           <p class="lv-sub">Month shown on the calendar. No account number or name on the card; ₹ only if you tick it.</p></div>`;
-    box.innerHTML = `<div class="lv-card pf"><div class="pf-top"><b>Performance</b><span class="muted">${S.real_value != null ? money(S.real_value, 'NSE') : ''}</span></div>
+    box.innerHTML = `<div class="lv-card pf" data-fold="skip"><div class="pf-top"><b>Performance</b><span class="muted">${S.real_value != null ? money(S.real_value, 'NSE') : ''}</span></div>
       <div class="pf-tabs" role="tablist">${[['cal', 'P/L calendar'], ['vs', 'You vs index'], ['share', 'Share card']].map(([k, l]) => `<button data-tab="${k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>${body}</div>`;
     box.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => { st.tab = b.dataset.tab; draw(B); }));
     box.querySelectorAll('[data-mv]').forEach((b) => b.addEventListener('click', () => { st.ym = months[mi + +b.dataset.mv] || st.ym; st.sel = null; draw(B); }));
@@ -378,7 +380,7 @@ function splitSheet(mk, P, S) {
       const i = steps.findIndex((x) => x >= v); A[k] = b.dataset.up ? steps[Math.min(steps.length - 1, (steps[i] === v ? i : i - 1) + 1)] : steps[Math.max(0, (i < 0 ? steps.length : i) - 1)]; draw(); }));
     const tb = B.querySelector('#sptb'); if (tb) tb.addEventListener('change', () => { A.tb = tb.checked ? 100 : 0; draw(); });
     B.querySelectorAll('[data-mix]').forEach((b) => b.addEventListener('click', () => { const m = SPLIT_MIX[+b.dataset.mix]; keys.concat(['tb']).forEach((k) => (A[k] = m.a[k] || 0)); draw(); }));
-    B.querySelector('#spfull').addEventListener('click', () => { closeSheet(); try { sessionStorage.setItem('td.bkopen', '1'); } catch (e) { /* */ } lvKeep(); setTimeout(() => { const d = document.querySelector('.lv-bkfold'); if (d) d.scrollIntoView({ block: 'start' }); }, 600); });
+    B.querySelector('#spfull').addEventListener('click', () => { closeSheet(); state.lvTab = 'set'; try { sessionStorage.setItem('td.bkopen', '1'); } catch (e) { /* */ } lvKeep(); setTimeout(() => { const d = document.querySelector('.lv-bkfold'); if (d) d.scrollIntoView({ block: 'start' }); }, 600); });
     B.querySelector('#spsave').addEventListener('click', async () => {
       const ch = {}; Object.keys(A).forEach((k) => { if ((A[k] || 0) !== (base[k] || 0)) ch[k] = A[k] || 0; });
       let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc2_' + mk) || '{}'); } catch (e) { /* */ }
@@ -762,7 +764,7 @@ const BK_HEAD = {
   my: 'Stocks you pushed here from any chart (Push to Live). Each is sized at the swing risk from your cash, outside your split. India: Send places an Angel GTT buy (good for a year) at your trigger; when it fills the server puts the protective GTT stop at your stop. US/ASX: place the stop-limit buy (GTC) on moomoo yourself. Untested — your call.',
   vcp: 'Volatility contraction pattern in a Stage 2 uptrend: 2+ shrinking pullbacks with higher lows and volume drying up. Buy-stop just above the last pullback\'s high (needs 1.4× volume on the day); stop = that pullback\'s low (max 10%); sell after a daily close below EMA 50 — this tab lists the sell. NSE 2017–26: +4.9% a trade (221 trades, 37% win); added to your mix +1 point a year, so a watch bucket: your call. Tap a row for the chart.' };
 function lvSeg() {
-  return `<div class="seg" id="lvmk" style="margin:10px 16px 0">${[['NSE', 'India · Angel'], ['US', 'US · moomoo'], ['ASX', 'Australia · moomoo']].map(([k, n]) => `<button data-k="${k}" aria-selected="${state.lvMk === k}">${n}</button>`).join('')}</div>`;
+  return `<div class="seg" id="lvmk" style="margin:10px 16px 0">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia']].map(([k, n]) => `<button data-k="${k}" aria-selected="${state.lvMk === k}">${n}</button>`).join('')}</div>`;
 }
 function lvSegWire(el) {
   el.querySelectorAll('#lvmk button').forEach((b) => b.addEventListener('click', () => { state.lvMk = b.dataset.k; try { localStorage.setItem('td.lvMk', b.dataset.k); } catch (e) { /* private mode */ } loadLive(); }));
@@ -953,9 +955,28 @@ async function loadLive() {
     ${PF.systems.map((x) => `<div class="fact"><span>${esc(x.system)} (${x.n})</span><b class="${x.pnl >= 0 ? 'up' : 'down'}">${x.pct == null ? '' : `${x.pct >= 0 ? '+' : ''}${fmt(x.pct, 1)}%`}</b><small>${rs(x.pnl)}</small></div>`).join('')}</div></div>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${perfHtml}${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}
     <p class="lv-sub">🛡 <b>Daily stop raise:</b> Momentum stops follow the 30-week SMA, Trend 9/21 stops follow EMA 21, ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}% below, and only ever move up (the system itself sells on the close — see "Exits for the next open"). ${trTxt} <button class="lv-link" id="lvtrail">Check stops now</button></p></div>` : '';
-  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${S ? '<div id="lvperf"></div>' : ''}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}${S ? '<div id="adoptcard"></div><div id="rescard"></div>' : ''}
-    ${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div>
-    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
+  /* 11 Nov 2026: Live in four tabs instead of one long page (Overview · Buy · Holdings · Settings, + Futures for the owner).
+     Every card is still rendered (hidden panes keep their ids, so the wiring below is unchanged); a "Needs you" strip on
+     Overview counts what to do today and jumps to the right tab. */
+  const nExit = S ? (S.exits || []).filter((e) => e.qty > 0).length : 0;
+  const nNoStop = S && S.trades ? S.trades.filter((t) => t.state === 'open' && !t.gtt_id).length : 0;
+  const nBuy = pend.length + swRows.filter((r) => !r.skip && r.qty > 0 && (alN[bkOf(r)] ?? 0) > 0).length;
+  const nHold = S && S.trades ? S.trades.filter((t) => t.state === 'open').length : 0;
+  const TABS = [['home', 'Home', ''], ['buy', 'Buy', nBuy || ''], ['hold', 'Holdings', nExit || nHold || ''], ...(S && isOwner() ? [['fut', 'Futures', '']] : []), ['set', 'Settings', '']];
+  let tab = state.lvTab; if (!tab) { try { tab = sessionStorage.getItem('td.lvTab'); } catch (e) { /* */ } }
+  if (!TABS.some((t) => t[0] === tab)) tab = S ? 'home' : 'set';
+  const need = [];
+  if (S && !live) need.push(['set', 'warn', 'Dry run', 'nothing is sent — turn on live orders in Settings']);
+  if (nExit) need.push(['hold', 'sell', `${nExit} to sell`, 'system exit signals for the next open']);
+  if (nNoStop) need.push(['hold', 'sell', `${nNoStop} without a stop`, 'no protective GTT on Angel yet']);
+  if (nBuy) need.push(['buy', 'buy', `${nBuy} to buy`, `${money(tot + swRows.filter((r) => !r.skip && r.qty > 0 && (alN[bkOf(r)] ?? 0) > 0).reduce((a, r) => a + r.value, 0), 'NSE')} in your split`]);
+  const needHtml = S ? `<div class="lv-card lv-need" data-fold="skip"><div class="lv-need-h"><b>Needs you today</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE' : 'DRY RUN'}</span></div>
+      ${need.length ? need.map(([t, c, a, b]) => `<button class="lv-need-i ${c}" data-go="${t}"><b>${a}</b><span>${b}</span><i>›</i></button>`).join('') : '<p class="lv-sub">✓ Nothing to do — stops are in place and there are no new signals.</p>'}</div>` : '';
+  const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
+  el.innerHTML = `${lvSeg()}
+    <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
+    ${pane('home', `${S ? '' : head}${lvHero(S, PF)}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
+    ${pane('buy', `    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '' : `<span class="lv-sub"><a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high; stop = weekly close below the 30-week SMA, raised every week. Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
@@ -964,12 +985,15 @@ async function loadLive() {
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</details>
     ${swCard('my')}${swCard('tf')}${swCard('vcp')}${swCard('t9')}${swCard('rt')}${swCard('pt')}<div id="wccard"></div>
-    <div id="lvcurves"></div>
-    ${false ? `<div class="lv-card"><b>Watch · bottom-pattern breakouts</b><p class="lv-sub">Not sized: in the 2017–26 test these lagged the average stock in every industry lane — even Building (−2.4 points over 120 days). Listed by industry strength so you can look at the charts in Bottoms.</p>
-      <div class="tags">${P.pattern_watch.map((w) => `<span class="chip" title="${esc(w.group || '')}">${esc(w.symbol)} · ${PAT_NM[w.typ] || w.typ}${w.lane ? ' · ' + LANE_TXT[w.lane] : ''}</span>`).join('')}</div></div>` : ''}
-    ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
-    <details class="info" style="margin:0 16px 80px"><summary>How these are picked and sized</summary><p>From the India systems that backtested well: monthly-ATH breakouts (this month or last, within −5%/+10% of the breakout price), buy-stops at ATH triggers within 5%, and 9/21 trend entries. Score = system (ATH 2-yr base 3, 1–2 yr 2, buy-stop 2, 9/21 3) + 2 if sector and stock RS are both positive + 1 if the theme RS is positive − 3 if the stock's 1-year RS is negative (ATH only; top-down did not help 9/21). The ranking combines tested pieces but is not itself a separately backtested system. Size: risk per trade from your drawdown budget (guard card, 95% Monte Carlo), at most 10% of capital in one stock, at most 10 positions, within the cash you have. US and Australia are excluded (no tested edge).</p></details>`;
+    <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
+    ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}`)}
+    ${S && isOwner() ? pane('fut', '<div id="tbcard"></div><div id="tbcardn"></div>') : ''}
+    ${pane('set', `${S ? head : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>${S ? '<div id="rescard"></div>' : ''}`)}`;
+  el.querySelectorAll('.lv-tabs [data-tab], .lv-need-i[data-go]').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.tab || b.dataset.go; state.lvTab = k; try { sessionStorage.setItem('td.lvTab', k); } catch (e) { /* */ }
+    el.querySelectorAll('.lv-tabs [data-tab]').forEach((x) => x.setAttribute('aria-selected', x.dataset.tab === k));
+    el.querySelectorAll('.lv-pane').forEach((p) => (p.hidden = p.dataset.pane !== k)); window.scrollTo(0, 0); }));
   const lf = $('#lvform'); if (lf) lf.addEventListener('submit', async (ev) => { ev.preventDefault();
     let url = $('#lvurl').value.trim().replace(/\/+$/, ''); const pw = $('#lvpw').value; const go = $('#lvgo');
     if (url && !/^https?:\/\//i.test(url) && /\./.test(url)) url = 'https://' + url;      // typed or autofilled without https://

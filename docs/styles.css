@@ -840,3 +840,17 @@ body.pub .owner-only { display: none !important; }
 .pf-verdict { margin: 6px 0; font-size: 13.5px; }
 .pf-share img { display: block; width: 100%; max-width: 420px; margin: 4px auto 8px; border-radius: 14px; box-shadow: 0 8px 28px rgba(0, 0, 0, .25); }
 .pf-amt { display: flex; align-items: center; gap: 6px; justify-content: center; font-size: 13px; margin-bottom: 6px; }
+/* Live tabs + Needs-you strip (11 Nov 2026) */
+.lv-tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 4px; margin: 10px 16px 0; padding: 4px; border-radius: 999px; background: var(--soft); overflow-x: auto; scrollbar-width: none; backdrop-filter: blur(8px); }
+.lv-tabs::-webkit-scrollbar { display: none; }
+.lv-tabs button { flex: 1 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; background: transparent; color: var(--slate); font: inherit; font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+.lv-tabs button[aria-selected="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 4px rgba(0, 0, 0, .14); }
+.lv-tabs em { font-style: normal; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--accent); color: var(--on-accent); }
+.lv-pane { padding-bottom: 80px; }
+.lv-need-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.lv-need-i { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; width: 100%; margin-top: 6px; padding: 10px 12px; border: 0; border-radius: 12px; background: var(--soft); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.lv-need-i b { font-size: 14px; } .lv-need-i span { font-size: 12.5px; color: var(--slate); } .lv-need-i i { font-style: normal; font-size: 20px; color: var(--slate); }
+.lv-need-i.sell { box-shadow: inset 3px 0 0 var(--fall); } .lv-need-i.buy { box-shadow: inset 3px 0 0 var(--rise); } .lv-need-i.warn { box-shadow: inset 3px 0 0 var(--saffron); }
+.lv-tabs button { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 12.5px; gap: 4px; }
+.lv-tabs em { padding: 0 6px; font-size: 10.5px; }
+#lvmk { display: flex; } #lvmk button { flex: 1; }
