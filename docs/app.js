@@ -1201,10 +1201,10 @@ async function adoptCard(load) {
   const A = state._adopt, live = A.mode === 'LIVE'; const SN = { 'Monthly ATH': 'Momentum', 'Trend 9/21': 'Trend 9/21' };
   const rows = A.holdings.map((h, i) => `<div class="ad-row"><div class="ad-top"><b>${esc(h.symbol)}</b><span>${h.qty} × ${fmt(h.avg, 2, 'en-IN')}${h.ltp ? ` · now ${fmt(h.ltp, 2, 'en-IN')}` : ''}</span></div>
       <p class="lv-sub">${h.suggest ? `<b>Suggestion: ${SN[h.suggest]}</b> — ` : '<b>No system fits now</b> — '}${esc(h.why || '')}</p>
-      <div class="ad-btns">${['Monthly ATH', 'Trend 9/21'].map((sy) => `<button class="lv-btn ${h.suggest === sy ? '' : 'ghost'}" data-ad="${i}" data-sy="${sy}">${SN[sy]}</button>`).join('')}<span class="muted">or leave it as it is</span></div></div>`).join('');
+      <div class="ad-btns"><span class="muted">Let a system manage it:</span>${['Monthly ATH', 'Trend 9/21'].map((sy) => `<button class="lv-btn ${h.suggest === sy ? '' : 'ghost'}" data-ad="${i}" data-sy="${sy}">${SN[sy]}${h.suggest === sy ? ' ✓ suggested' : ''}</button>`).join('')}</div></div>`).join('');
   const ad = (A.adopted || []).map((a) => `<div class="ad-row"><div class="ad-top"><b>${esc(a.symbol)}</b><span>${SN[a.system] || esc(a.system)} since ${day(a.since)}</span></div><div class="ad-btns"><button class="lv-btn ghost" data-rel="${esc(a.symbol)}">Release</button></div></div>`).join('');
   box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Your other Angel holdings</b><button class="lv-btn ghost" id="adre" style="font-size:12px">Refresh</button></div>
-    <p class="lv-sub">The app only suggests. Nothing changes until you confirm a stock by typing ADOPT and its name.${live ? '' : ' <b>Dry run:</b> confirming shows what would happen and changes nothing.'}</p>
+    <p class="lv-sub"><b>These are shares you already own in Angel. Adopting does not buy anything</b>: it hands the stock to a system, which places its stop GTT, raises it daily and tells you when to sell. Nothing changes until you type ADOPT and the stock's name.${live ? '' : ' <b>Dry run:</b> confirming shows what would happen and changes nothing.'}</p>
     ${rows || '<p class="lv-sub">Every stock you hold is already managed by the app (ETFs stay with the Wealth Creation Pie).</p>'}
     ${ad ? `<h4 class="ad-h">Adopted by you</h4>${ad}` : ''}</div>`;
   box.querySelector('#adre').addEventListener('click', () => adoptCard(true));
