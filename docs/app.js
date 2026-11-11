@@ -3838,9 +3838,18 @@ async function alCard(box) {
   let A; try { A = await lvApi('/api/alerts'); } catch (e) { box.innerHTML = ''; return; }
   const wk = Date.now() - 7 * 864e5; const L = (A.items || []).filter((x) => new Date(x.t).getTime() >= wk && x.kind !== 'test').slice(0, 6);
   let on = false; try { on = localStorage.getItem('td.pushOn') === '1' && Notification.permission === 'granted'; } catch (e) { /* */ }
-  box.innerHTML = `<div class="td-risk td-al"><div class="td-alh"><h3>Alerts</h3><button class="bg-ghost sm" id="alon">${on ? 'Alerts on ✓' : '🔔 Turn on phone alerts'}</button></div>
-    ${L.length ? L.map((x) => { const [ic, lab] = AL_KIND[x.kind] || ['•', x.kind]; return `<div class="td-card td-raise"><span class="td-av" style="background:${x.kind === 'stop' || x.kind === 'nostop' || x.kind === 'exit' ? 'var(--fall)' : 'var(--rise)'}">${ic}</span><span class="td-nm"><b>${esc(x.symbol || lab)}</b><small>${esc(x.text)}</small><small>${new Date(x.t).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</small></span></div>`; }).join('')
-      : '<p class="muted td-rs">No alerts this week. You will get one when a stop is hit, a buy fills, a stock is sold, a sell signal fires or a stop is raised.</p>'}</div>`;
+  /* 11 Nov 2026: one-line ticker (was a full card that pushed everything down); tap it for the list and the phone-alert switch */
+  const red = (x) => x.kind === 'stop' || x.kind === 'nostop' || x.kind === 'exit';
+  const when = (x) => new Date(x.t).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const item = (x) => { const [ic] = AL_KIND[x.kind] || ['•']; return `<span class="al-it ${red(x) ? 'down' : ''}">${ic} <b>${esc(x.symbol || '')}</b> ${esc(x.text)} <em>${when(x)}</em></span>`; };
+  const strip = L.map(item).join('<i class="al-sep">•</i>');
+  const secs = Math.max(18, L.reduce((a, x) => a + (x.text || '').length, 0) / 6);
+  box.innerHTML = `<details class="al-tick"><summary><span class="al-bell" aria-hidden="true">🔔</span>
+      <span class="al-mq" aria-label="Recent alerts">${L.length ? `<span class="al-track" style="animation-duration:${secs.toFixed(0)}s">${strip}<i class="al-sep">•</i>${strip}<i class="al-sep">•</i></span>` : '<span class="muted">No alerts this week</span>'}</span>
+      <span class="al-n">${L.length || ''}</span></summary>
+    <div class="al-list">${L.length ? L.map((x) => { const [ic, lab] = AL_KIND[x.kind] || ['•', x.kind]; return `<div class="td-card td-raise"><span class="td-av" style="background:${red(x) ? 'var(--fall)' : 'var(--rise)'}">${ic}</span><span class="td-nm"><b>${esc(x.symbol || lab)}</b><small>${esc(x.text)}</small><small>${when(x)}</small></span></div>`; }).join('')
+      : '<p class="muted td-rs">You get an alert when a stop is hit, a buy fills, a stock is sold, a sell signal fires or a stop is raised.</p>'}
+      <button class="bg-ghost sm" id="alon">${on ? 'Phone alerts on ✓' : '🔔 Turn on phone alerts'}</button></div></details>`;
   $('#alon').addEventListener('click', (e) => alPush(e.target));
 }
 async function alPoll() {
@@ -3931,7 +3940,7 @@ async function tdRender(el, beginner) {
   const held = new Set(bgPractice().filter((t) => t.state !== 'closed').map((t) => t.symbol));
   const Mz = (v, d = 0) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
   const MS = (P.missed || []);
-  el.innerHTML = `<div class="td-wrap">${seg}<div id="tdal"></div>
+  el.innerHTML = `<div class="td-wrap">${seg}<div id="tdal"></div><div id="tdmini"></div>
     <div class="td-hero"><span>Setups found</span><div class="td-big"><b>${n}</b>${scanned ? `<em>out of ${Number(scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>` : ''}</div>
       <div class="td-bar"><i style="width:100%"></i></div><small>Close ${day(P.asof)} · the scan runs every evening</small></div>
     ${beginner ? bgHero(cap('NSE') || 50000, {}) : ''}
@@ -3940,10 +3949,10 @@ async function tdRender(el, beginner) {
       return `<button class="td-card" data-i="${i}"><span class="td-av" style="background:${TD_COL[L.f]}">${TD_ICO[L.f]}</span><span class="td-nm"><b>${esc(r.symbol)}</b><small>${esc(L.t)}${held.has(r.symbol) ? ' · in practice' : bkOf(r) === 'vcp' ? ' · watch' : ''}</small>${Z ? `<small class="td-z ${Z.c}">${esc(Z.t)}</small>` : ''}</span><span class="td-go" aria-hidden="true">›</span></button>`; }).join('')
       || '<p class="bg-empty">No setup today. Waiting is part of the system.</p>'}</div>
     ${rows.length > 12 ? `<p class="bg-fine">${rows.length - 12} more in Live</p>` : ''}
+    <div id="tdrisk"></div>
     ${MS.length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${MS.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${MS.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
     ${mk === 'US' ? '<div id="tdpies"></div>' : ''}<div id="tdheat"></div><div id="tdtrack"></div>
-    <div id="tdrisk"></div>
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   wire();
   state._tdEl = el; state._tdBg = beginner;
@@ -3985,6 +3994,11 @@ async function tdRiskCard(box) {
   const cost = pos.reduce((a, p) => a + p.qty * (p.entry || p.now), 0), pnl = pos.reduce((a, p) => a + p.qty * (p.now - (p.entry || p.now)), 0), rp = cost ? pnl / cost * 100 : 0;
   const wk = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
   const raised = pos.filter((p) => p.trail_at && String(p.trail_at).slice(0, 10) >= wk && p.new_stop);
+  const mini = $('#tdmini'); if (mini && pos.length) {
+    const mr = (p, col) => `<svg viewBox="0 0 36 36" width="30" height="30" aria-hidden="true"><circle cx="18" cy="18" r="14" fill="none" style="stroke:var(--line)" stroke-width="5"/><circle cx="18" cy="18" r="14" fill="none" style="stroke:${col}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(Math.min(1, p / 20) * 88).toFixed(1)} 88" transform="rotate(-90 18 18)"/></svg>`;
+    mini.innerHTML = `<button class="td-mini" aria-label="Open risk and return, details below">${mr(pct, 'var(--saffron)')}<span><b>${fmt(pct, 1)}%</b><small>open risk</small></span>${mr(Math.abs(rp), rp >= 0 ? 'var(--rise)' : 'var(--fall)')}<span><b class="${rp >= 0 ? 'up' : 'down'}">${rp >= 0 ? '+' : '−'}${fmt(Math.abs(rp), 1)}%</b><small>return · ${pnl >= 0 ? '+' : '−'}${inr(Math.abs(pnl))}</small></span><i>›</i></button>`;
+    mini.querySelector('button').addEventListener('click', () => box.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }
   box.innerHTML = `<div class="td-risk"><h3>Your whole portfolio,<br><span>one calm number</span></h3>
     <div class="td-rings"><div class="td-ring">${tdRing(pct, 'var(--saffron)', 20)}<div><b>${fmt(pct, 1)}%</b><span>open risk</span></div></div>
       <div class="td-ring">${tdRing(Math.abs(rp), rp >= 0 ? 'var(--rise)' : 'var(--fall)', 20)}<div><b class="${rp >= 0 ? 'up' : 'down'}">${rp >= 0 ? '+' : '−'}${fmt(Math.abs(rp), 1)}%</b><span>return so far</span></div></div></div>
