@@ -1,0 +1,85 @@
+{
+"generated": "2026-11-11 02:58 UTC",
+"asof": "2026-11-10",
+"broker": "Trading 212 (Australia)",
+"note": "Rebalance on the first trading day after the month-end decision. FX fee 0.15% each way on Trading 212 AU. Pies have no stop-loss: the month-end check is the exit.",
+"pies": [
+{
+"key": "rotation",
+"title": "US index rotation",
+"rule": "Each month-end: hold the best one of VOO / QQQ / MDY / IWM by 3-month return; SGOV (cash) if none is up.",
+"test": "2008-26: 11.4%/yr, worst fall -15.2% (S&P 500: 9.1%, -47.5%). Price-only series; ETFs add dividends.",
+"decided": "2026-10-31",
+"hold": [
+{
+"ticker": "VOO",
+"name": "S&P 500",
+"pct": 100.0
+}
+],
+"changed": false,
+"before": [
+{
+"ticker": "VOO",
+"pct": 100.0
+}
+],
+"provisional": [
+{
+"ticker": "SGOV",
+"pct": 100.0
+}
+],
+"record": []
+},
+{
+"key": "sectors",
+"title": "US sector breakouts",
+"rule": "Up to 3 sector/industry ETFs with a monthly cup breakout (12+ month base), rising 30-week SMA and 6-month RS > 0; each kept until a month-end close below its 30-week SMA. Empty slots: VOO while the S&P 500 is above its 10-month average, else SGOV.",
+"test": "2008-26: 9.9%/yr, worst fall -21.9% (S&P 500: 9.1%, -47.5%).",
+"decided": "2026-10-31",
+"hold": [
+{
+"ticker": "VOO",
+"name": "S&P 500",
+"pct": 66.7
+},
+{
+"ticker": "XBI",
+"name": "Biotech",
+"pct": 33.3
+}
+],
+"changed": true,
+"before": [
+{
+"ticker": "SMH",
+"pct": 33.3
+},
+{
+"ticker": "XBI",
+"pct": 33.3
+},
+{
+"ticker": "VOO",
+"pct": 33.3
+}
+],
+"provisional": [
+{
+"ticker": "XBI",
+"pct": 33.3
+},
+{
+"ticker": "XRT",
+"pct": 33.3
+},
+{
+"ticker": "VOO",
+"pct": 33.3
+}
+],
+"record": []
+}
+]
+}
