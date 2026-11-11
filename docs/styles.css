@@ -885,3 +885,21 @@ body.pub .owner-only { display: none !important; }
 .lv-sendall { width: 100%; margin-top: 10px; padding: 12px; font-weight: 700; }
 .tb-auto { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 8px 10px; border-radius: 10px; background: var(--soft); }
 .tb-auto > span { display: flex; flex-direction: column; } .tb-auto small { font-size: 11.5px; color: var(--slate); }
+
+/* Angel-style stop / entry / target track */
+.slt{margin:8px 0 4px;padding:10px 12px 8px;border-radius:12px;background:var(--panel-2,rgba(127,127,127,.07))}
+.slt-bar{position:relative;height:4px;margin:8px 6px;border-radius:2px;background:var(--line,rgba(127,127,127,.3))}
+.slt-risk,.slt-rew{position:absolute;top:0;height:4px}
+.slt-risk{background:color-mix(in srgb,var(--fall,#d64545) 45%,transparent)}
+.slt-rew{background:color-mix(in srgb,var(--rise,#1f9d6b) 45%,transparent)}
+.slt-dot{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%);border:2px solid var(--bg,#fff)}
+.slt-dot.s{background:var(--fall,#d64545)}.slt-dot.e{background:#6d3fd6}.slt-dot.t{background:var(--rise,#1f9d6b)}
+.slt-dot.n{width:14px;height:14px;box-shadow:0 0 0 4px color-mix(in srgb,currentColor 22%,transparent)}
+.slt-dot.n.up{background:var(--rise,#1f9d6b);color:var(--rise,#1f9d6b)}.slt-dot.n.dn{background:var(--fall,#d64545);color:var(--fall,#d64545)}
+.slt-lab{position:relative;height:30px;margin:0 6px;font-size:12px;font-weight:600}
+.slt-lab span{position:absolute;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap;line-height:1.15}
+.slt-lab span:first-child{transform:none;left:0!important;text-align:left}
+.slt-lab span.t:last-child{transform:none;left:auto!important;right:0;text-align:right}
+.slt-lab small{display:block;font-weight:500;font-size:11px}
+.slt-lab .s small{color:var(--fall,#d64545)}.slt-lab .e small{color:#6d3fd6}.slt-lab .t small{color:var(--rise-ink,#1f9d6b)}
+.slt-foot{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-top:4px;color:var(--muted,#777)}

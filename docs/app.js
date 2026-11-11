@@ -677,6 +677,21 @@ const KIND_TXT = { MY_GTT: 'Your pick · GTT buy', VCP: 'VCP breakout', VCP_STOP
    Momentum first, swing buckets keep 15% in cash for Momentum. NSE one-account test 2017-26: Momentum <= 60% + Trend 9/21 <= 40%
    23.1%/yr, worst fall -21.4%; Momentum alone 17.3%, -16.8%. */
 const BK_DEF = { mom: 60, tf: 40, t9: 0, rt: 0, pt: 0, vcp: 0, my: 0, s1: 0, wc: 0, tb: 100 };   // optimised 9 Nov 2026
+// Angel-style track: stop ── entry ── now ── target, positioned to scale
+function slTrack(o) {
+  const { stop, entry, now, target } = o; if (!(stop > 0 && entry > 0) || stop >= entry) return '';
+  const hi = Math.max(entry, target || 0, now || 0) * 1.0001, lo = Math.min(stop, now || stop);
+  const P = (v) => Math.max(0, Math.min(100, ((v - lo) / (hi - lo)) * 100));
+  const f = (v) => fmt(v, 2, 'en-IN');
+  const nowUp = now && now >= entry;
+  const left = target ? Math.max(0, (target / (now || entry) - 1) * 100) : null;
+  const rr = target ? (target - entry) / (entry - stop) : null;
+  return `<div class="slt" aria-label="Stop ${f(stop)}, entry ${f(entry)}${target ? ', target ' + f(target) : ''}">
+    <div class="slt-bar"><i class="slt-risk" style="left:${P(stop)}%;width:${P(entry) - P(stop)}%"></i>${target ? `<i class="slt-rew" style="left:${P(entry)}%;width:${P(target) - P(entry)}%"></i>` : ''}
+      <b class="slt-dot s" style="left:${P(stop)}%"></b><b class="slt-dot e" style="left:${P(entry)}%"></b>${target ? `<b class="slt-dot t" style="left:${P(target)}%"></b>` : ''}${now ? `<b class="slt-dot n ${nowUp ? 'up' : 'dn'}" style="left:${P(now)}%" title="Now ${f(now)}"></b>` : ''}</div>
+    <div class="slt-lab"><span class="s" style="left:${P(stop)}%">${f(stop)}<small>Stop</small></span><span class="e" style="left:${P(entry)}%">${f(entry)}<small>${o.entryLab || 'Entry'}</small></span>${target ? `<span class="t" style="left:${P(target)}%">${f(target)}<small>Target${rr ? ' · ' + fmt(rr, 1) + 'R' : ''}</small></span>` : ''}</div>
+    ${now ? `<div class="slt-foot"><span>Now ${f(now)} · <b class="${nowUp ? 'up' : 'down'}">${nowUp ? '+' : ''}${fmt((now / entry - 1) * 100, 1)}%</b></span>${left != null ? `<span>Target ${left > 0 ? `<b class="up">▲ ${fmt(left, 1)}%</b> away` : '<b class="up">reached</b>'}</span>` : `<span>Stop ${fmt((1 - stop / now) * 100, 1)}% below</span>`}</div>` : ''}</div>`;
+}
 const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', vcp: 'VCP', my: 'My picks', s1: 'System 1', wc: 'Wealth Creation', tb: 'Top Bottom' };
 const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : r.kind === 'PATTERN' ? 'pt' : r.kind === 'T921' ? 't9' : 'tf');
 function lvAlloc(mk, P, S) {
@@ -919,6 +934,7 @@ async function loadLive() {
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
     return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${pos ?? r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${r.tier === 'swing' && (!S || r.local) ? `<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${strMeter(r)} ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} · stop ${fmt(r.stop, 2, 'en-IN')} <span class="muted">(−${fmt(r.risk_pct ?? (E > r.stop ? (1 - r.stop / E) * 100 : null), 0)}%)</span>`}</div>
+      ${r.skip ? '' : slTrack({ stop: r.stop, entry: E, now: r.ltp || r.close || null, target: r.target || null, entryLab: 'Buy at' })}
       ${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}
       <details class="lv-det"><summary>Details</summary><div class="lv-sub">${ord} · ${fmt(r.pct_cap, 1)}% of capital · risk ${money(r.risk_amt, 'NSE')} · exit: ${esc(r.exit_rule || '')}</div>
       <div class="lv-sub">${esc(r.note || '')}${r.group ? ' · ' + esc(r.group) : r.sector ? ' · ' + esc(r.sector) : ''}</div></details>${bkOf(r) === 'my' ? `<a href="#" class="lv-link my-rm" data-sym="${esc(r.symbol)}" data-mk="NSE">Remove</a>` : ''}</div>
@@ -946,6 +962,7 @@ async function loadLive() {
     const pnl = t.ltp && t.entry ? (t.ltp / t.entry - 1) * 100 : null;
     return `<div class="lv-row lv-trade"><div><div class="lv-sym">${esc(t.symbol)} <span class="lv-mode ${cls}" style="${cls === 'ok' ? 'background:var(--rise-soft);color:var(--rise-ink)' : ''}">${lab}</span> <span class="chip">${esc(t.system || '')}</span>${pnl == null ? '' : ` <b class="${pnl >= 0 ? 'up' : 'down'}" style="margin-left:auto">${pnl >= 0 ? '+' : ''}${fmt(pnl, 1)}%${t.R == null ? '' : ` · ${t.R >= 0 ? '+' : ''}${fmt(t.R, 2)}R`}</b>`}</div>
       <div class="lv-sub">${t.qty} @ ${fmt(t.entry, 2, 'en-IN')}${t.ltp ? ` · now ${fmt(t.ltp, 2, 'en-IN')}` : ''} · plan stop ${fmt(t.stop, 2, 'en-IN')}${t.state === 'pending' && t.order_status ? ` · Angel: ${esc(t.order_status)}` : ''}</div>
+      ${slTrack({ stop: t.gtt_trigger || t.stop, entry: t.entry, now: t.ltp, target: t.target })}
       <div class="lv-sub">${t.gtt_id ? `🛡 Stop on Angel at ${fmt(t.gtt_trigger, 2, 'en-IN')}${t.trail_at ? ` · raised ${day(t.trail_at)}${t.trail_prev ? ` from ${fmt(t.trail_prev, 2, 'en-IN')}` : ''} (${t.system === 'Monthly ATH' ? '30-wk SMA' : 'EMA 21'} ${fmt(t.trail_level, 2, 'en-IN')} − ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}%)` : ''}` : t.gtt_error ? `<span class="down">Stop not placed yet: ${esc(t.gtt_error)}</span> <button class="lv-btn sell" data-prot="1" style="padding:4px 10px;font-size:12px">Retry stop</button>` : t.state === 'open' ? '<span class="down">No protective stop on Angel</span>' : 'Stop goes on Angel after the fill'}</div>
       ${!['Monthly ATH', 'Trend 9/21'].includes(t.system) && t.state !== 'exiting' ? `<div class="lv-sub">🎯 ${t.target ? `Target ${fmt(t.target, 2, 'en-IN')}${t.entry && t.stop && t.entry > t.stop ? ` (${fmt((t.target - t.entry) / (t.entry - t.stop), 1)}R)` : ''} · ${t.oco ? 'in one GTT with the stop — whichever hits first' : t.oco_error ? '<span class="down">Angel refused stop + target; stop only</span>' : t.state === 'open' ? 'not on Angel yet' : 'goes on with the stop after the fill'}` : 'No target · stop only'}
         ${t.state === 'open' ? `<button class="lv-link" data-tgt="${esc(t.symbol)}" data-e="${t.entry || 0}" data-s="${t.stop || 0}" data-t="${t.target || 0}">${t.target ? 'Change' : 'Add target'}</button>` : ''}</div>` : ''}</div><div></div></div>`; }).join('') : '';
