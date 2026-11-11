@@ -181,6 +181,178 @@ function lvHeroWire(el, P, S) {
   el.querySelectorAll('.hero-rng button').forEach((b) => b.addEventListener('click', () => { state.heroRng = b.dataset.rng; lvKeep(); }));
   const c = el.querySelector('#lvsplit'); if (c) c.addEventListener('click', () => splitSheet('NSE', P, S));
 }
+/* ------------------------------------------------------------------ Performance (11 Nov 2026): P/L calendar, you vs the index, share card.
+   Built from the server's daily account value (S.equity: one point a day) and NSE daily index closes (data/scan/bench_daily.json).
+   Angel does not tell the server about deposits/withdrawals, so a day that moves the account more than 8% is shown as
+   "money in/out" and left out of the % returns. Returns are before tax; the share card shows % only unless you tick ₹. */
+let benchD = null;
+async function benchDaily() {
+  if (benchD) return benchD;
+  try { const r = await fetch(MAIN + 'data/scan/bench_daily.json', { cache: 'no-cache' }); if (r.ok) benchD = await r.json(); } catch (e) { /* offline */ }
+  return benchD || { t: [] };
+}
+const PF_FLOW = 8;
+function pfDays(E) {
+  const out = [];
+  for (let i = 1; i < E.length; i++) {
+    const p = E[i - 1][1], v = E[i][1], pl = v - p, pct = p ? pl / p * 100 : 0;
+    out.push({ d: E[i][0], v, pl, pct, flow: Math.abs(pct) > PF_FLOW });
+  }
+  return out;
+}
+const pfComp = (D) => (D.filter((x) => !x.flow).reduce((a, x) => a * (1 + x.pct / 100), 1) - 1) * 100;
+const pfSg = (v, d = 2) => (v == null ? '–' : `${v >= 0 ? '+' : '−'}${fmt(Math.abs(v), d)}%`);
+const pfK = (v) => { const a = Math.abs(v), s = v >= 0 ? '+' : '−'; return s + (a >= 1e5 ? fmt(a / 1e5, 2) + 'L' : a >= 1e3 ? fmt(a / 1e3, 1) + 'k' : fmt(a, 0)); };
+const pfRs = (v) => `${v >= 0 ? '+' : '−'}₹${fmt(Math.abs(v), 0, 'en-IN')}`;
+function pfIx(B, k, d) { // index of the last close on or before d
+  if (!B || !B.t || !B[k]) return -1; let j = -1;
+  for (let i = 0; i < B.t.length && B.t[i] <= d; i++) if (B[k][i]) j = i;
+  return j;
+}
+function pfBench(B, k, d0, d1) { const a = pfIx(B, k, d0), b = pfIx(B, k, d1); return a >= 0 && b > a ? (B[k][b] / B[k][a] - 1) * 100 : null; }
+const PF_MON = (ym) => new Date(ym + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+function pfMonth(D, ym) {
+  const M = D.filter((x) => x.d.startsWith(ym)), R = M.filter((x) => !x.flow);
+  const prev = D.filter((x) => x.d < ym + '-01'); const d0 = prev.length ? prev[prev.length - 1].d : (M[0] ? M[0].d : null);
+  return { M, R, pl: R.reduce((a, x) => a + x.pl, 0), pct: pfComp(M), d0, d1: M.length ? M[M.length - 1].d : null,
+    green: R.filter((x) => x.pl > 0).length, best: R.reduce((a, x) => (!a || x.pl > a.pl ? x : a), null), worst: R.reduce((a, x) => (!a || x.pl < a.pl ? x : a), null),
+    flows: M.filter((x) => x.flow) };
+}
+function pfCalHtml(D, B, ym, sel) {
+  const S = pfMonth(D, ym), by = {}; S.M.forEach((x) => (by[x.d] = x));
+  const [y, m] = ym.split('-').map(Number), n = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const mx = Math.max(0.6, ...S.R.map((x) => Math.abs(x.pct)));
+  const lead = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
+  let cells = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((w) => `<span class="pc-wk">${w}</span>`).join('') + '<i></i>'.repeat(lead > 4 ? 0 : lead);
+  for (let dd = 1; dd <= n; dd++) {
+    if ((new Date(Date.UTC(y, m - 1, dd)).getUTCDay() + 6) % 7 > 4) continue;
+    const ds = `${ym}-${String(dd).padStart(2, '0')}`, x = by[ds];
+    if (!x) { cells += `<span class="pc-d pc-0"><b>${dd}</b></span>`; continue; }
+    const a = x.flow ? 0 : Math.min(1, Math.abs(x.pct) / mx);
+    cells += `<button class="pc-d ${x.flow ? 'pc-flow' : x.pl >= 0 ? 'pc-up' : 'pc-dn'}${sel === ds ? ' pc-sel' : ''}" data-d="${ds}" style="--a:${(0.14 + a * 0.5).toFixed(2)}">
+      <b>${dd}</b><span>${x.flow ? 'in/out' : pfK(x.pl)}</span><small>${x.flow ? '' : pfSg(x.pct)}</small></button>`;
+  }
+  const n50 = S.d0 && S.d1 ? pfBench(B, 'n50', S.d0, S.d1) : null, n500 = S.d0 && S.d1 ? pfBench(B, 'n500', S.d0, S.d1) : null;
+  let det = '';
+  const X = sel && by[sel];
+  if (X) {
+    const j = pfIx(B, 'n50', sel), ix = j > 0 && B.t[j] === sel ? (B.n50[j] / B.n50[j - 1] - 1) * 100 : null;
+    det = `<div class="pf-det"><b>${new Date(sel + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}</b>
+      ${X.flow ? `<span>Account moved ${pfRs(X.pl)} — looks like money added or taken out, so it is left out of the %.</span>`
+        : `<span class="${X.pl >= 0 ? 'up' : 'down'}">${pfRs(X.pl)} · ${pfSg(X.pct)}</span>${ix == null ? '' : `<span class="muted">Nifty 50 ${pfSg(ix)}</span>`}<span class="muted">Account ${money(X.v, 'NSE')}</span>`}</div>`;
+  }
+  const stat = (l, v, s) => `<div><span>${l}</span><b>${v}</b>${s ? `<small>${s}</small>` : ''}</div>`;
+  return `<div class="pf-tot"><div><span class="muted">Month P/L · time-weighted %</span><b class="${S.pl >= 0 ? 'up' : 'down'}">${pfRs(S.pl)}</b></div><b class="${S.pct >= 0 ? 'up' : 'down'}">${pfSg(S.pct)}</b></div>
+    <div class="pc-grid">${cells}</div>${det}
+    <div class="pf-stats">${stat('Green days', `${S.green} of ${S.R.length}`)}${stat('Best day', S.best ? pfRs(S.best.pl) : '–', S.best ? day(S.best.d) : '')}${stat('Worst day', S.worst ? pfRs(S.worst.pl) : '–', S.worst ? day(S.worst.d) : '')}
+      ${stat('Nifty 50', pfSg(n50), n50 == null ? 'after tonight\'s data' : `you ${S.pct - n50 >= 0 ? 'ahead' : 'behind'} by ${fmt(Math.abs(S.pct - n50), 2)} pts`)}${stat('Nifty 500', pfSg(n500))}</div>
+    ${S.flows.length ? `<p class="lv-sub">${S.flows.length} day${S.flows.length > 1 ? 's' : ''} marked in/out: the account moved more than ${PF_FLOW}% — usually money added or withdrawn — so ${S.flows.length > 1 ? 'they are' : 'it is'} left out of the %.</p>` : ''}`;
+}
+function pfMonthsHtml(D, ym) {
+  const ms = [...new Set(D.map((x) => x.d.slice(0, 7)))];
+  if (ms.length < 2) return '';
+  return `<div class="pf-ms">${ms.map((k) => { const p = pfComp(D.filter((x) => x.d.startsWith(k)));
+    return `<button data-ym="${k}" aria-pressed="${k === ym}"><span>${new Date(k + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'short' })}</span><b class="${p >= 0 ? 'up' : 'down'}">${pfSg(p, 1)}</b></button>`; }).join('')}</div>`;
+}
+function pfVsHtml(D, B, rng) {
+  const days = { '1M': 31, '3M': 92, '1Y': 366, All: 1e5 }[rng];
+  const cut = new Date(Date.now() - days * 864e5).toISOString().slice(0, 10);
+  const R = D.filter((x) => x.d > cut); if (R.length < 2) return '<p class="lv-sub">Needs a few more days of account values for this range.</p>';
+  const all = D.filter((x) => x.d <= cut); const d0 = all.length ? all[all.length - 1].d : (D.indexOf(R[0]) > 0 ? D[D.indexOf(R[0]) - 1].d : R[0].d);
+  let c = 1; const you = [[d0, 0]].concat(R.map((x) => { if (!x.flow) c *= 1 + x.pct / 100; return [x.d, (c - 1) * 100]; }));
+  const ser = [{ k: 'you', nm: 'You', col: 'var(--accent)', w: 3, pts: you }];
+  [['n50', 'Nifty 50', 'var(--slate)'], ['n500', 'Nifty 500', 'var(--saffron)']].forEach(([k, nm, col]) => {
+    const a = pfIx(B, k, d0); if (a < 0) return;
+    const pts = []; for (let i = a; i < B.t.length; i++) if (B[k][i] && B.t[i] <= R[R.length - 1].d) pts.push([B.t[i], (B[k][i] / B[k][a] - 1) * 100]);
+    if (pts.length > 1) { pts[0][0] = d0; ser.push({ k, nm, col, w: 1.8, pts }); }
+  });
+  const t = (d) => new Date(d + 'T00:00:00').getTime(), T0 = t(d0), T1 = t(R[R.length - 1].d), vals = ser.flatMap((s) => s.pts.map((p) => p[1]));
+  const lo = Math.min(0, ...vals), hi = Math.max(0, ...vals), rr = hi - lo || 1, W = 340, H = 170, X = (d) => (t(d) - T0) / ((T1 - T0) || 1) * W, Y = (v) => 8 + (hi - v) / rr * (H - 16);
+  const path = (s) => s.pts.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join(' ');
+  const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" aria-label="Your return against Nifty 50 and Nifty 500">
+    <line x1="0" x2="${W}" y1="${Y(0).toFixed(1)}" y2="${Y(0).toFixed(1)}" style="stroke:var(--mute-line)" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>
+    ${ser.slice().reverse().map((s) => `<path d="${path(s)}" fill="none" style="stroke:${s.col}" stroke-width="${s.w}" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`).join('')}</svg>`;
+  const last = (s) => s.pts[s.pts.length - 1][1], yv = last(ser[0]);
+  const ix = ser.find((s) => s.k === 'n50');
+  return `${svg}<div class="pf-axis"><span>${day(d0)}</span><span>${day(R[R.length - 1].d)}</span></div>
+    <div class="pf-leg">${ser.map((s) => `<div><i style="background:${s.col}"></i><span>${s.nm}</span><b class="${last(s) >= 0 ? 'up' : 'down'}">${pfSg(last(s))}</b></div>`).join('')}</div>
+    ${ix ? `<p class="pf-verdict">${yv >= last(ix) ? '▲ Ahead of' : '▼ Behind'} the Nifty 50 by <b>${fmt(Math.abs(yv - last(ix)), 2)} pts</b> over ${rng === 'All' ? 'the whole record' : rng}.</p>` : '<p class="lv-sub">Index lines appear after tonight\'s data.</p>'}
+    <p class="lv-sub">Time-weighted: daily % changes chained, so money added or taken out does not count as a gain or loss. Index = price only.</p>`;
+}
+/* Share card: 1080×1350 picture of the month, % only by default (no account number, no ₹ unless ticked). */
+function pfShareCanvas(D, B, ym, showAmt) {
+  const S = pfMonth(D, ym), W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const F = (w, s) => `${w} ${s}px Manrope, system-ui, -apple-system, "Segoe UI", sans-serif`;
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#1C1338'); bg.addColorStop(1, '#0A0814'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  const glow = (x, y, r, col) => { const q = g.createRadialGradient(x, y, 0, x, y, r); q.addColorStop(0, col); q.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = q; g.fillRect(0, 0, W, H); };
+  glow(W * 0.9, 80, 640, 'rgba(124,92,255,.45)'); glow(80, H - 120, 560, 'rgba(34,211,170,.18)');
+  const rr = (x, y, w, h, r) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); };
+  const UP = '#2EE6A6', DN = '#FF5C7A';
+  g.fillStyle = '#fff'; g.font = F(800, 46); g.fillText('Trend Desk', 80, 120);
+  g.fillStyle = 'rgba(255,255,255,.6)'; g.font = F(600, 34); g.fillText(`${PF_MON(ym)} · P/L calendar`, 80, 180);
+  g.fillStyle = S.pct >= 0 ? UP : DN; g.font = F(800, 168); g.fillText(pfSg(S.pct), 72, 380);
+  const n50 = S.d0 && S.d1 ? pfBench(B, 'n50', S.d0, S.d1) : null, n500 = S.d0 && S.d1 ? pfBench(B, 'n500', S.d0, S.d1) : null;
+  g.font = F(600, 36); g.fillStyle = 'rgba(255,255,255,.75)';
+  g.fillText([showAmt ? pfRs(S.pl) : null, n50 != null ? `Nifty 50 ${pfSg(n50)}` : null, n500 != null ? `Nifty 500 ${pfSg(n500)}` : null].filter(Boolean).join('   ·   '), 80, 450);
+  const [y, m] = ym.split('-').map(Number), n = new Date(Date.UTC(y, m, 0)).getUTCDate(), by = {}; S.M.forEach((x) => (by[x.d] = x));
+  const gx = 80, gy = 540, cw = (W - 160 - 4 * 16) / 5, chh = 118;
+  g.font = F(700, 28); g.fillStyle = 'rgba(255,255,255,.5)';
+  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].forEach((w, i) => { g.textAlign = 'center'; g.fillText(w, gx + i * (cw + 16) + cw / 2, gy - 18); });
+  const mx = Math.max(0.6, ...S.R.map((x) => Math.abs(x.pct)));
+  for (let dd = 1; dd <= n; dd++) {
+    const wd = (new Date(Date.UTC(y, m - 1, dd)).getUTCDay() + 6) % 7; if (wd > 4) continue;
+    const ds = `${ym}-${String(dd).padStart(2, '0')}`, x = by[ds];
+    const firstWd = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7, lead = firstWd > 4 ? 0 : firstWd;
+    const idx = (() => { let k = lead; for (let q = 1; q < dd; q++) if ((new Date(Date.UTC(y, m - 1, q)).getUTCDay() + 6) % 7 <= 4) k++; return k; })();
+    const cx = gx + (idx % 5) * (cw + 16), cy = gy + Math.floor(idx / 5) * (chh + 14);
+    const a = x && !x.flow ? 0.18 + Math.min(1, Math.abs(x.pct) / mx) * 0.55 : 0;
+    rr(cx, cy, cw, chh, 18); g.fillStyle = x && !x.flow ? (x.pl >= 0 ? `rgba(46,230,166,${a})` : `rgba(255,92,122,${a})`) : 'rgba(255,255,255,.06)'; g.fill();
+    g.textAlign = 'left'; g.font = F(700, 26); g.fillStyle = 'rgba(255,255,255,.55)'; g.fillText(String(dd), cx + 16, cy + 36);
+    if (x) { g.textAlign = 'right'; g.font = F(800, 34); g.fillStyle = '#fff'; g.fillText(x.flow ? 'in/out' : pfSg(x.pct), cx + cw - 14, cy + chh - 22); }
+  }
+  g.textAlign = 'left'; g.font = F(600, 28); g.fillStyle = 'rgba(255,255,255,.45)';
+  g.fillText(`${S.green} green days of ${S.R.length} · time-weighted · before tax`, 80, H - 110);
+  g.fillText(showAmt ? 'Scanner app · not investment advice' : 'Returns only · no account details · not investment advice', 80, H - 64);
+  return c;
+}
+function lvPerf(box, S) {
+  if (!box) return;
+  const E = (S && S.equity) || [];
+  if (E.length < 3) { box.innerHTML = '<div class="lv-card"><b>Performance</b><p class="lv-sub">Your P/L calendar and the comparison with Nifty start after a few days of account values.</p></div>'; return; }
+  const D = pfDays(E), months = [...new Set(D.map((x) => x.d.slice(0, 7)))];
+  const st = state.pf || (state.pf = { tab: 'cal', ym: months[months.length - 1], rng: '1M', sel: null, amt: false });
+  if (!months.includes(st.ym)) st.ym = months[months.length - 1];
+  const draw = (B) => {
+    const mi = months.indexOf(st.ym);
+    const body = st.tab === 'cal' ? `<div class="pf-mh"><button data-mv="-1" ${mi <= 0 ? 'disabled' : ''} aria-label="Previous month">‹</button><b>${PF_MON(st.ym)}</b><button data-mv="1" ${mi >= months.length - 1 ? 'disabled' : ''} aria-label="Next month">›</button></div>
+        ${pfCalHtml(D, B, st.ym, st.sel)}${pfMonthsHtml(D, st.ym)}`
+      : st.tab === 'vs' ? `<div class="hero-rng pf-rng">${['1M', '3M', '1Y', 'All'].map((k) => `<button data-rng="${k}" aria-pressed="${k === st.rng}">${k}</button>`).join('')}</div>${pfVsHtml(D, B, st.rng)}`
+      : `<div class="pf-share"><img id="pfimg" alt="Share card for ${PF_MON(st.ym)}"><label class="pf-amt"><input type="checkbox" id="pfamt" ${st.amt ? 'checked' : ''}> Show ₹ amount</label>
+          <div class="sp-foot"><button class="lv-btn" id="pfshare">Share</button><button class="lv-btn" id="pfsave" style="background:var(--soft);color:var(--ink)">Save image</button></div>
+          <p class="lv-sub">Month shown on the calendar. No account number or name on the card; ₹ only if you tick it.</p></div>`;
+    box.innerHTML = `<div class="lv-card pf"><div class="pf-top"><b>Performance</b><span class="muted">${S.real_value != null ? money(S.real_value, 'NSE') : ''}</span></div>
+      <div class="pf-tabs" role="tablist">${[['cal', 'P/L calendar'], ['vs', 'You vs index'], ['share', 'Share card']].map(([k, l]) => `<button data-tab="${k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>${body}</div>`;
+    box.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => { st.tab = b.dataset.tab; draw(B); }));
+    box.querySelectorAll('[data-mv]').forEach((b) => b.addEventListener('click', () => { st.ym = months[mi + +b.dataset.mv] || st.ym; st.sel = null; draw(B); }));
+    box.querySelectorAll('[data-ym]').forEach((b) => b.addEventListener('click', () => { st.ym = b.dataset.ym; st.sel = null; draw(B); }));
+    box.querySelectorAll('.pc-d[data-d]').forEach((b) => b.addEventListener('click', () => { st.sel = st.sel === b.dataset.d ? null : b.dataset.d; draw(B); }));
+    box.querySelectorAll('[data-rng]').forEach((b) => b.addEventListener('click', () => { st.rng = b.dataset.rng; draw(B); }));
+    if (st.tab === 'share') {
+      const cv = pfShareCanvas(D, B, st.ym, st.amt); $('#pfimg').src = cv.toDataURL('image/png');
+      $('#pfamt').addEventListener('change', (e) => { st.amt = e.target.checked; draw(B); });
+      const blob = () => new Promise((res) => cv.toBlob(res, 'image/png')), name = `trend-desk-${st.ym}.png`;
+      const save = async () => { const b = await blob(), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); };
+      $('#pfsave').addEventListener('click', save);
+      $('#pfshare').addEventListener('click', async () => {
+        const f = new File([await blob()], name, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: 'My month on Trend Desk' }); } catch (e) { /* cancelled */ } }
+        else save();
+      });
+    }
+  };
+  draw(benchD || { t: [] });
+  benchDaily().then((B) => { if (B && B.t && B.t.length && box.isConnected) draw(B); });
+}
 /* Change the split: the same saved allocation as the table (td.alloc2_ + server /api/picks), drawn as a pie with steppers
    and the mixes we actually tested; any other mix is shown as untested. */
 const SPLIT_MIX = [
@@ -781,7 +953,7 @@ async function loadLive() {
     ${PF.systems.map((x) => `<div class="fact"><span>${esc(x.system)} (${x.n})</span><b class="${x.pnl >= 0 ? 'up' : 'down'}">${x.pct == null ? '' : `${x.pct >= 0 ? '+' : ''}${fmt(x.pct, 1)}%`}</b><small>${rs(x.pnl)}</small></div>`).join('')}</div></div>` : '';
   const tradesCard = S ? `<div class="lv-card"><b>Your trades from this app</b>${perfHtml}${trades || '<p class="lv-sub">None yet. After you Send in Live mode, each trade shows here: Sent → Filled at the real price → 🛡 protective stop placed on Angel.</p>'}${recent}
     <p class="lv-sub">🛡 <b>Daily stop raise:</b> Momentum stops follow the 30-week SMA, Trend 9/21 stops follow EMA 21, ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}% below, and only ever move up (the system itself sells on the close — see "Exits for the next open"). ${trTxt} <button class="lv-link" id="lvtrail">Check stops now</button></p></div>` : '';
-  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}${S ? '<div id="adoptcard"></div><div id="rescard"></div>' : ''}
+  el.innerHTML = `${lvSeg()}${lvHero(S, PF)}${S ? '<div id="lvperf"></div>' : ''}${head}${S ? '<div id="tbcard"></div><div id="tbcardn"></div>' : ''}${guardCard(S ? S.guard : null)}${tradesCard}${S ? '<div id="adoptcard"></div><div id="rescard"></div>' : ''}
     ${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div>
     <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
@@ -810,7 +982,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { adoptCard(false); resCard(); } wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); resCard(); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));

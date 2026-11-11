@@ -77,6 +77,24 @@ def day_file(d):
     return None
 
 
+BENCH_DAILY = {"NIFTY 50": "n50", "NIFTY 500": "n500", "NIFTY MIDCAP 150": "mid", "NIFTY SMALLCAP 250": "small"}
+
+
+def bench_daily(H, days=800):
+    """11 Nov 2026: small daily-close file for the app's 'You vs the index' chart and P/L calendar (Live)."""
+    try:
+        out = {"t": None}
+        for name, k in BENCH_DAILY.items():
+            x = H[H.INDEX == name].sort_values("Date").tail(days)
+            if out["t"] is None:
+                out["t"] = [d.strftime("%Y-%m-%d") for d in x.Date]
+            m = dict(zip(x.Date.dt.strftime("%Y-%m-%d"), x.CLOSE.round(2)))
+            out[k] = [m.get(d) for d in out["t"]]
+        json.dump(out, open("data/scan/bench_daily.json", "w"), separators=(",", ":"))
+    except Exception as e:  # noqa: BLE001
+        print("bench_daily", e)
+
+
 def load_hist(today):
     have = pd.read_csv(CACHE, parse_dates=["Date"]) if os.path.exists(CACHE) else pd.DataFrame(columns=["Date", "INDEX", "CLOSE"])
     start = (have.Date.max() + pd.Timedelta(days=1)) if len(have) else pd.Timestamp(today) - pd.Timedelta(days=560)
@@ -92,6 +110,7 @@ def load_hist(today):
     keep = set(INDUSTRY_INDEX.values()) | set(EXTRA) | set(THEMATIC) | {MARKET}
     H = H[H.INDEX.isin(keep)]
     H.to_csv(CACHE, index=False)
+    bench_daily(H)
     print("index history rows", len(H), "new days", len(new), flush=True)
     return H
 

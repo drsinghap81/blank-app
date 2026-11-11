@@ -31,6 +31,6 @@ jobs:
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
-          git add -A data/scan/ath.json data/scan/ath_charts data/scan/sectors.json data/scan/sector_hist.csv.gz data/scan/index_charts; git diff --cached --quiet && exit 0
+          git add -A data/scan/ath.json data/scan/ath_charts data/scan/sectors.json data/scan/sector_hist.csv.gz data/scan/bench_daily.json data/scan/index_charts; git diff --cached --quiet && exit 0
           git commit -qm "Monthly ATH scan $(date -u +%F)"
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
