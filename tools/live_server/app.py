@@ -1509,7 +1509,7 @@ def tb_state(inst: str = "bn", _=Depends(auth)):
     except Exception:  # noqa: BLE001
         pass
     P = _tbr("pending.json", {}, inst); A = _tbr("answers.json", {}, inst)
-    return dict(inst=inst, installed=os.path.isdir(d), mode="LIVE" if tb_live(inst) else "DRY RUN", status=_tbr("status.json", {}, inst),
+    return dict(inst=inst, installed=os.path.isdir(d), mode="LIVE" if tb_live(inst) else "DRY RUN", auto=tb_auto(inst), status=_tbr("status.json", {}, inst),
                 pending=[dict(key=k, **v) for k, v in P.items()], answers=A, messages=msgs[::-1])
 
 
@@ -1563,6 +1563,81 @@ def tb_mode(body: Mode, request: Request, inst: str = "bn", _=Depends(auth)):
     json.dump(dict(live=bool(body.live), at=time.time()), open(os.path.join(d, "mode.json"), "w"))
     log("tb_mode", inst=inst, live=body.live)
     return dict(ok=True, mode="LIVE" if body.live else "DRY RUN")
+
+
+class TBAuto(BaseModel):
+    on: bool
+    password: str = ""
+    confirm: str = ""
+
+
+def tb_auto(inst="bn"):
+    try:
+        return bool(json.load(open(os.path.join(_tbdir(inst), "auto.json"))).get("on"))
+    except HTTPException:
+        raise
+    except Exception:  # noqa: BLE001
+        return False
+
+
+@app.post("/api/tb/auto")
+def tb_auto_set(body: TBAuto, request: Request, inst: str = "bn", _=Depends(auth)):
+    """11 Nov 2026: auto-approve Top Bottom's entry / reversal levels (no tap needed). Turning it ON needs the app password +
+    typing AUTO; OFF is one tap. The bot's own limits stay: lots, max lots, daily loss cap, entries a day, its stops.
+    Orders reach Angel only when the bot is also in Live mode."""
+    d = _tbdir(inst)
+    if body.on:
+        ip = request.client.host if request.client else "?"
+        n, t0 = FAILS.get(ip, (0, 0))
+        if n >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if body.confirm.strip().upper() != "AUTO":
+            raise HTTPException(400, "type AUTO to confirm")
+        if not check_pw(body.password):
+            FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
+    os.makedirs(d, exist_ok=True)
+    json.dump(dict(on=bool(body.on), at=time.time()), open(os.path.join(d, "auto.json"), "w"))
+    log("tb_auto", inst=inst, on=body.on)
+    return dict(ok=True, auto=bool(body.on))
+
+
+TB_NAME = {"bn": "Bank Nifty", "nifty": "Nifty"}
+
+
+def tb_watch():
+    """Every pass of the loop: each new Top Bottom approval request -> a phone alert (push) once; with auto-approve on,
+    entry / reversal levels (keys BUY:… / SELL:…, yes-no questions) are answered YES at once and you are told."""
+    for inst, d in TB_DIRS.items():
+        if not os.path.isdir(d):
+            continue
+        P = _tbr("pending.json", {}, inst)
+        if not P:
+            continue
+        auto = tb_auto(inst); live = tb_live(inst); A = None
+        for k, v in P.items():
+            txt = str(v.get("text") or k).replace("\n", " ")[:160]
+            entry = (k.startswith("BUY:") or k.startswith("SELL:")) and not v.get("options")
+            if auto and entry:
+                A = A if A is not None else _tbr("answers.json", {}, inst)
+                if A.get(k) is None:
+                    A[k] = True; log("tb_auto_yes", inst=inst, key=k)
+                    alert("tb", TB_NAME[inst], f"Auto-approved {k.replace(':', ' ')} ({'LIVE orders' if live else 'dry run'}). {txt}", key=f"tbauto:{inst}:{k}")
+                continue
+            alert("tb", TB_NAME[inst], f"Approve? {txt} — open Live → Futures{' (LIVE orders)' if live else ' (dry run)'}", key=f"tbask:{inst}:{k}")
+        if A is not None:
+            _tbw("answers.json", A, inst)
+            P2 = {k: v for k, v in P.items() if not ((k.startswith("BUY:") or k.startswith("SELL:")) and not v.get("options") and A.get(k) is True)}
+            _tbw("pending.json", P2, inst)
+
+
+def _tb_loop():
+    """Top Bottom approvals are checked every 5 s (a reversal prompt in market hours can't wait for the 2-minute loop)."""
+    while True:
+        try:
+            tb_watch()
+        except Exception as ex:  # noqa: BLE001
+            log("tb_watch_error", error=str(ex)[:200])
+        time.sleep(5)
 
 
 # ------------------------------------------------------------------ background: fills + stops every 2 minutes in market hours
@@ -1750,6 +1825,7 @@ def _start():
     if ENV.get("MOCK_BROKER") != "1":
         import threading
         threading.Thread(target=_loop, daemon=True).start()
+        threading.Thread(target=_tb_loop, daemon=True).start()
         if ENV.get("RESEARCH_AUTO", "0") == "1":          # 11 Nov 2026: research test removed at Amritpal's request (off unless RESEARCH_AUTO=1)
             try:
                 j = research_job()

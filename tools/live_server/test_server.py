@@ -519,3 +519,21 @@ def test_target_oco(tmp_path, monkeypatch):
     import pytest
     with pytest.raises(app.HTTPException):
         app.set_target(app.Target(symbol="ZYD", target=1500, confirm="TARGET ZYD"), None)
+
+
+def test_tb_auto(tmp_path, monkeypatch):
+    import app, json, os
+    d = str(tmp_path / "tb"); os.makedirs(d + "/app")
+    monkeypatch.setitem(app.TB_DIRS, "bn", d); monkeypatch.setattr(app, "check_pw", lambda p: p == "pw")
+    json.dump({"BUY:58980.00": dict(text="Buy above 58980?", t=1, options=None), "SQ:x": dict(text="square off?", t=1, options=[["Yes", "y"]])}, open(d + "/app/pending.json", "w"))
+    sent = []; monkeypatch.setattr(app, "alert", lambda *a, **k: sent.append(a) or True)
+    app.tb_watch()                                    # auto off: only a prompt alert
+    assert json.load(open(d + "/app/pending.json")).get("BUY:58980.00") and len(sent) == 2
+    class R: client = None
+    import pytest
+    with pytest.raises(app.HTTPException):
+        app.tb_auto_set(app.TBAuto(on=True, password="pw", confirm="no"), R(), "bn", None)
+    app.tb_auto_set(app.TBAuto(on=True, password="pw", confirm="AUTO"), R(), "bn", None)
+    app.tb_watch()
+    A = json.load(open(d + "/app/answers.json")); P = json.load(open(d + "/app/pending.json"))
+    assert A["BUY:58980.00"] is True and "BUY:58980.00" not in P and "SQ:x" in P and "SQ:x" not in A

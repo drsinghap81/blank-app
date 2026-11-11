@@ -1323,6 +1323,9 @@ async function tbLoad(inst = 'bn') {
   box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Top Bottom · ${bn ? 'Bank Nifty futures' : 'Nifty futures · buy only'}</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
     <div class="lv-seg" role="group" aria-label="Top Bottom mode"><button id="${px}dry" class="${live ? '' : 'on'}">Dry run</button><button id="${px}live" class="${live ? 'on live' : ''}">Live orders</button></div>
     <div id="${px}arm" class="lv-form" hidden><input id="${px}pw" type="password" placeholder="App password"><input id="${px}cf" placeholder="Type LIVE" autocapitalize="characters"><button class="lv-btn sell" id="${px}go">Turn on live</button></div>
+    <div class="tb-auto"><span><b>Auto-approve levels</b><small>${T.auto ? (live ? 'ON · entries and reversals go to Angel automatically, within the bot\'s limits' : 'ON · approved automatically (dry run: logged only)') : 'OFF · you get a phone alert for each level and approve it here'}</small></span>
+      ${T.auto == null ? '<small class="muted">after your server updates</small>' : `<button class="ad-sy" aria-pressed="${!!T.auto}" id="${px}auto">${T.auto ? 'On' : 'Off'}</button>`}</div>
+    <div id="${px}autoarm" class="lv-form" hidden><input id="${px}apw" type="password" placeholder="App password"><input id="${px}acf" placeholder="Type AUTO" autocapitalize="characters"><button class="lv-btn sell" id="${px}ago">Turn on auto</button></div>
     <p class="lv-sub">${pos}${S.ltp ? ` · ${bn ? 'BN' : 'Nifty'} fut ${fmt(S.ltp, 2, 'en-IN')}` : ''} · ${S.running ? '● bot running' : `bot idle (starts ${bn ? '08:25' : '08:27'} IST on weekdays)`}${S.note ? ' · ' + esc(S.note) : ''}</p>
     ${S.pos ? '' : lvl('BUY', S.buy_lvl) + (bn ? lvl('SELL', S.sell_lvl) : '')}
     ${pend ? `<p class="lv-sub" style="margin-top:8px"><b>Needs your OK</b> — the bot trades only approved levels; no answer = no trade.</p>${pend}` : ''}
@@ -1333,6 +1336,13 @@ async function tbLoad(inst = 'bn') {
     if (yes && live) { confirm = window.prompt('LIVE: approve this Top Bottom trade on Angel?\nType YES to confirm:') || ''; if (confirm.trim().toUpperCase() !== 'YES') { alertMsg('Not approved.'); return; } }
     try { await lvApi('/api/tb/answer' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ key: b.dataset.tbk, value: yes, confirm }) }); alertMsg(yes ? 'Approved — the bot will trade this level if it comes.' : 'Skipped — this level will not be traded.', true); tbLoad(inst); } catch (e) { alertMsg(e.message); }
   }));
+  { const au = box.querySelector('#' + px + 'auto'); const q = bn ? '' : '?inst=' + inst;
+    if (au) au.addEventListener('click', async () => {
+      if (T.auto) { try { await lvApi('/api/tb/auto' + q, { method: 'POST', body: JSON.stringify({ on: false }) }); alertMsg('Auto-approve off: each level now waits for your OK (you get a phone alert).', true); tbLoad(inst); } catch (e) { alertMsg(e.message); } return; }
+      const a = box.querySelector('#' + px + 'autoarm'); a.hidden = !a.hidden; });
+    const ag = box.querySelector('#' + px + 'ago'); if (ag) ag.addEventListener('click', async () => {
+      try { await lvApi('/api/tb/auto' + q, { method: 'POST', body: JSON.stringify({ on: true, password: box.querySelector('#' + px + 'apw').value, confirm: box.querySelector('#' + px + 'acf').value }) });
+        alertMsg(`Auto-approve on: every Top Bottom ${bn ? 'Bank Nifty' : 'Nifty'} entry and reversal is approved automatically${live ? ' and sent to Angel' : ' (dry run until you switch to Live orders)'}. The bot's lots, stops and daily loss cap still apply.`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } }); }
   const cmd = async (c, msg) => { try { await lvApi('/api/tb/cmd' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ cmd: c }) }); alertMsg(msg, true); setTimeout(() => tbLoad(inst), 4000); } catch (e) { alertMsg(e.message); } };
   const st = box.querySelector('#' + px + 'stop'); if (st) st.addEventListener('click', () => cmd('/stop', 'No new Top Bottom trades today; an open position keeps its stop.'));
   const fl = box.querySelector('#' + px + 'flat'); if (fl) fl.addEventListener('click', () => cmd('/flat', 'Square-off requested — approve it in this card.'));
@@ -3836,7 +3846,7 @@ function bgMe(el) {
 
 /* Alerts (11 Nov 2026): the server's events — stop hit, buy filled, sold, sell signal, stop raised, stop not placed.
    Shown on Today, toasted when new while the app is open, and pushed to this phone once you turn notifications on. */
-const AL_KIND = { stop: ['🛑', 'Stop hit'], sold: ['✅', 'Sold'], filled: ['🟢', 'Bought'], exit: ['↘', 'Sell signal'], raised: ['↑', 'Stop raised'], nostop: ['⚠️', 'No stop'], pie: ['🥧', 'Pie'], test: ['🔔', 'Test'] };
+const AL_KIND = { stop: ['🛑', 'Stop hit'], sold: ['✅', 'Sold'], filled: ['🟢', 'Bought'], exit: ['↘', 'Sell signal'], raised: ['↑', 'Stop raised'], nostop: ['⚠️', 'No stop'], pie: ['🥧', 'Pie'], tb: ['🎯', 'Top Bottom'], test: ['🔔', 'Test'] };
 const b64u = (s) => { const p = '='.repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...r].map((c) => c.charCodeAt(0))); };
 async function alPush(btn) {
   try {
