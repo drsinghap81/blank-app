@@ -882,3 +882,4 @@ body.pub .owner-only { display: none !important; }
 .td-mini { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0 0 10px; padding: 8px 12px; border: 0; border-radius: 14px; background: var(--soft); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
 .td-mini > span { display: flex; flex-direction: column; margin-right: 10px; } .td-mini b { font-size: 15px; } .td-mini small { font-size: 11px; color: var(--slate); }
 .td-mini i { margin-left: auto; font-style: normal; font-size: 18px; color: var(--slate); }
+.lv-sendall { width: 100%; margin-top: 10px; padding: 12px; font-weight: 700; }

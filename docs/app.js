@@ -976,8 +976,13 @@ async function loadLive() {
   if (nExit) need.push(['hold', 'sell', `${nExit} to sell`, 'system exit signals for the next open']);
   if (nNoStop) need.push(['hold', 'sell', `${nNoStop} without a stop`, 'no protective GTT on Angel yet']);
   if (nBuy) need.push(['buy', 'buy', `${nBuy} to buy`, `${money(tot + swRows.filter((r) => !r.skip && r.qty > 0 && (alN[bkOf(r)] ?? 0) > 0).reduce((a, r) => a + r.value, 0), 'NSE')} in your split`]);
+  /* 11 Nov 2026: "Send all" — every buy in the tested systems of your split (Momentum, Trend 9/21), one confirmation; the
+     server re-checks each one (in today's plan, sizes, cash, once a day) and puts the protective stop on after each fill */
+  const sendAll = S ? rows.map((r, i) => [r, i]).filter(([r]) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && ['mom', 'tf'].includes(bkOf(r)) && (alN[bkOf(r)] ?? 0) > 0) : [];
   const needHtml = S ? `<div class="lv-card lv-need" data-fold="skip"><div class="lv-need-h"><b>Needs you today</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE' : 'DRY RUN'}</span></div>
-      ${need.length ? need.map(([t, c, a, b]) => `<button class="lv-need-i ${c}" data-go="${t}"><b>${a}</b><span>${b}</span><i>›</i></button>`).join('') : '<p class="lv-sub">✓ Nothing to do — stops are in place and there are no new signals.</p>'}</div>` : '';
+      ${need.length ? need.map(([t, c, a, b]) => `<button class="lv-need-i ${c}" data-go="${t}"><b>${a}</b><span>${b}</span><i>›</i></button>`).join('') : '<p class="lv-sub">✓ Nothing to do — stops are in place and there are no new signals.</p>'}
+      ${sendAll.length ? `<button class="lv-btn lv-sendall" id="lvsendall">Send all ${sendAll.length} tested buys · ${money(sendAll.reduce((a, [r]) => a + r.value, 0), 'NSE')}</button>
+        <p class="lv-sub">Momentum + Trend 9/21 only, sized by your server (1% risk, max 10% a stock, your cash). One confirmation; each gets its stop on Angel after it fills.${live ? '' : ' <b>Dry run:</b> shows what would be sent.'}</p>` : ''}</div>` : '';
   const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
   el.innerHTML = `${lvSeg()}${S ? '' : head}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
@@ -996,6 +1001,7 @@ async function loadLive() {
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}`)}
     ${S && isOwner() ? pane('fut', '<div id="tbcard"></div><div id="tbcardn"></div>') : ''}
     ${pane('set', `${S ? head : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
+  { const sa = $('#lvsendall'); if (sa) sa.addEventListener('click', () => lvBasket(sendAll.map(([r]) => ({ r, q: r.qty, v: r.value })), sa)); }
   { const o2 = $('#lvout2'); if (o2) o2.addEventListener('click', (e) => { e.preventDefault(); lvSave({ token: null }); state._planC = null; loadLive(); }); }
   el.querySelectorAll('.lv-tabs [data-tab], .lv-need-i[data-go], .lv-conn [data-go]').forEach((b) => b.addEventListener('click', () => {
     const k = b.dataset.tab || b.dataset.go; state.lvTab = k; try { sessionStorage.setItem('td.lvTab', k); } catch (e) { /* */ }
@@ -1346,7 +1352,7 @@ async function lvBasket(B, btn) {
   const typed = window.prompt(`${B.length} orders on Angel One, total ${money(tot, 'NSE')}:\n${lines}\n\nType ${B.length} to confirm:`);
   if (typed === null) return;
   if (String(typed).trim() !== String(B.length)) { alertMsg('Not sent: the number did not match.'); return; }
-  btn.disabled = true; btn.textContent = '…';
+  btn.dataset.label = btn.dataset.label || btn.textContent; btn.disabled = true; btn.textContent = '…';
   try {
     const j = await lvApi('/api/basket', { method: 'POST', body: JSON.stringify({ items: B.map((x) => ({ id: x.r.id, qty: x.q })), confirm: `BASKET ${B.length}` }) });
     const ok = j.results.filter((x) => x.ok); const bad = j.results.filter((x) => !x.ok);
@@ -1356,7 +1362,7 @@ async function lvBasket(B, btn) {
     j.results.forEach((x) => lvRowMsg(x.id, x.ok ? (x.sent ? `Sent to Angel (order ${x.order_id}). Waiting for the fill.` : `Dry run: would send ${x.qty} @ ${x.order.price}.`) : `Not sent: ${x.error}`, x.ok));
     setTimeout(loadLive, 4000);
   } catch (e) { alertMsg('Not sent: ' + e.message); }
-  btn.disabled = false; btn.textContent = 'Send basket';
+  btn.disabled = false; btn.textContent = btn.dataset.label || 'Send basket';
 }
 
 /* ------------------------------------------------------------------ trends */
