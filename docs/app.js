@@ -4021,11 +4021,12 @@ async function tdRender(el, beginner) {
     <div class="td-hero"><span>Setups found</span><div class="td-big"><b>${n}</b>${scanned ? `<em>out of ${Number(scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>` : ''}</div>
       <div class="td-bar"><i style="width:100%"></i></div><small>Close ${day(P.asof)} · the scan runs every evening</small></div>
     ${beginner ? bgHero(cap('NSE') || 50000, {}) : ''}
-    <div class="td-list">${rows.slice(0, 12).map((r, i) => { const L = tdLabel(r);
+    <div class="td-list" id="tdnew">${rows.slice(0, 30).map((r, i) => { const L = tdLabel(r);
       const Z = tdZone(r, Mz);
-      return `<button class="td-card" data-i="${i}"><span class="td-av" style="background:${TD_COL[L.f]}">${TD_ICO[L.f]}</span><span class="td-nm"><b>${esc(r.symbol)}</b><small>${esc(L.t)}${held.has(r.symbol) ? ' · in practice' : bkOf(r) === 'vcp' ? ' · watch' : ''}</small>${Z ? `<small class="td-z ${Z.c}">${esc(Z.t)}</small>` : ''}</span><span class="td-go" aria-hidden="true">›</span></button>`; }).join('')
+      return `<button class="td-card" data-i="${i}" data-sym="${esc(r.symbol)}"><span class="td-av" style="background:${TD_COL[L.f]}">${TD_ICO[L.f]}</span><span class="td-nm"><b>${esc(r.symbol)}</b><small>${esc(L.t)}${held.has(r.symbol) ? ' · in practice' : bkOf(r) === 'vcp' ? ' · watch' : ''}</small>${Z ? `<small class="td-z ${Z.c}">${esc(Z.t)}</small>` : ''}</span><span class="td-go" aria-hidden="true">›</span></button>`; }).join('')
       || '<p class="bg-empty">No setup today. Waiting is part of the system.</p>'}</div>
-    ${rows.length > 12 ? `<p class="bg-fine">${rows.length - 12} more in Live</p>` : ''}
+    <p class="bg-fine" id="tdmore"></p>
+    <details class="td-risk td-heldd" id="tdheld" hidden><summary><span><b>Already in your portfolio (<i id="tdheldn">0</i>)</b><small>Still on the list because the setup is valid · no new buy needed</small></span></summary><div class="td-list" id="tdheldl"></div></details>
     <div id="tdrisk"></div>
     ${MS.length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${MS.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${MS.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
@@ -4036,6 +4037,7 @@ async function tdRender(el, beginner) {
   el.querySelectorAll('.td-card:not(.td-raise)').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   if (!A) fetch(MP + 'ath.json', { cache: 'no-cache' }).then((r) => r.json()).then((j) => { if (!j || !j.scanned) return; state['_athN' + tag] = j.scanned;
     const big = el.querySelector('.td-big'); if (big && !big.querySelector('em')) big.insertAdjacentHTML('beforeend', `<em>out of ${Number(j.scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>`); }).catch(() => {});
+  tdApplyHeld(mk);
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (!beginner) alCard($('#tdal'));
   tdTrack($('#tdtrack'), mk); if (mk === 'US') tdPies($('#tdpies')); tdHeat($('#tdheat'), mk);
@@ -4056,6 +4058,26 @@ async function tdHeat(box, mk) {
 }
 /* 11 Nov 2026: the server can be slow; the card used to give up after a few seconds and fall back to the empty practice
    list, so the calm number vanished. Now: the last account copy (trades only) shows at once, then the fresh one replaces it. */
+/* 12 Nov 2026: Today showed stocks already held as if they were new buys. Held = open practice trades + the account's open
+   or pending trades (last copy from the server, refreshed when the risk card loads). New ones stay on top; held ones move
+   into a folded "Already in your portfolio" group. */
+function tdHeldSet() {
+  const H = new Set(bgPractice().filter((t) => t.state !== 'closed').map((t) => t.symbol));
+  try { const S = JSON.parse(localStorage.getItem('td.riskS') || 'null'); (S && S.trades || []).filter((t) => t.state !== 'closed' && t.qty).forEach((t) => H.add(t.symbol)); } catch (e) { /* */ }
+  return H;
+}
+function tdApplyHeld(mk) {
+  const nl = $('#tdnew'), hl = $('#tdheldl'), box = $('#tdheld'); if (!nl || !hl || !box) return;
+  const H = mk === 'NSE' ? tdHeldSet() : new Set();
+  [...nl.querySelectorAll('.td-card[data-sym]'), ...hl.querySelectorAll('.td-card[data-sym]')].sort((a, b) => a.dataset.i - b.dataset.i)
+    .forEach((c) => { const h = H.has(c.dataset.sym); c.classList.toggle('td-held', h); (h ? hl : nl).appendChild(c); });
+  const nn = nl.querySelectorAll('.td-card').length, nh = hl.querySelectorAll('.td-card').length;
+  nl.querySelectorAll('.td-card').forEach((c, k) => { c.hidden = k >= 12; });
+  if (!nn && !nl.querySelector('.bg-empty')) nl.insertAdjacentHTML('beforeend', '<p class="bg-empty">No new setup today. Waiting is part of the system.</p>');
+  if (nn) nl.querySelectorAll('.bg-empty').forEach((p) => p.remove());
+  box.hidden = !nh; $('#tdheldn').textContent = nh;
+  const extra = Math.max(0, (state._tdRows || []).length - nh - Math.min(nn, 12)); const m = $('#tdmore'); if (m) m.textContent = extra ? `${extra} more in Live` : '';
+}
 async function tdRiskCard(box, S0) {
   if (!box) return;
   let S = S0 || null; const c = lvCfg();
@@ -4064,6 +4086,7 @@ async function tdRiskCard(box, S0) {
     if (cached && cached.trades) { S = cached; S._cached = true; }
     lvPlan().then((F) => { if (!F || !F.trades || !box.isConnected) return;
       try { localStorage.setItem('td.riskS', JSON.stringify({ capital: F.capital, trades: F.trades, at: Date.now() })); } catch (e) { /* */ }
+      if (state._tdMkNow === 'NSE') tdApplyHeld('NSE');
       tdRiskCard(box, F); }).catch(() => {});
     if (!S) { box.innerHTML = '<div class="td-risk"><p class="muted td-rs">Loading your open risk and return from your server…</p></div>'; const m = $('#tdmini'); if (m) m.innerHTML = '<div class="td-mini"><span><small>Loading open risk and return…</small></span></div>'; return; }
   }

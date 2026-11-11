@@ -913,3 +913,5 @@ body.pub .owner-only { display: none !important; }
 .slt-bar{margin-top:6px}
 .slt-foot{flex-wrap:wrap}.slt-foot span{white-space:nowrap}
 .slt-foot span:only-child{white-space:normal}
+.td-card.td-held{opacity:.62}
+.td-heldd .td-list{margin-top:10px}
