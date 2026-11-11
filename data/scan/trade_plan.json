@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-11 03:21 UTC",
+"generated": "2026-11-11 03:22 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-09",
@@ -198,7 +198,7 @@
 "risk_pct": 11.7
 },
 {
-"id": "STOP-DRREDDY-1403.6301",
+"id": "STOP-DRREDDY-1403.6302",
 "symbol": "DRREDDY",
 "name": "Dr. Reddy's Laboratories Limited",
 "system": "Monthly ATH",
@@ -1066,7 +1066,7 @@
 "order": null,
 "when": "month close",
 "side": "BUY",
-"price": 4493.7861,
+"price": 4493.7856,
 "ref": 4471.0,
 "stop": 3373.95,
 "note": "signal = a month CLOSE above 4493.79 (old ATH close), then buy next month's open",
