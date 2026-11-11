@@ -355,7 +355,8 @@ function lvCfg() { try { return JSON.parse(localStorage.getItem(LV_KEY) || '{}')
 function lvSave(o) { try { localStorage.setItem(LV_KEY, JSON.stringify({ ...lvCfg(), ...o })); } catch (e) { /* storage off */ } }
 async function lvApi(path, opt = {}) {
   const c = lvCfg(); if (!c.url) throw new Error('not connected');
-  const r = await fetch(c.url.replace(/\/$/, '') + path, { ...opt, headers: { 'Content-Type': 'application/json', ...(c.token ? { Authorization: 'Bearer ' + c.token } : {}), ...(opt.headers || {}) } });
+  const ac = opt.timeout ? new AbortController() : null; if (ac) setTimeout(() => ac.abort(), opt.timeout);
+  const r = await fetch(c.url.replace(/\/$/, '') + path, { ...opt, ...(ac ? { signal: ac.signal } : {}), headers: { 'Content-Type': 'application/json', ...(c.token ? { Authorization: 'Bearer ' + c.token } : {}), ...(opt.headers || {}) } });
   const j = await r.json().catch(() => ({}));
   if (r.status === 401) { lvSave({ token: null }); }
   if (!r.ok) throw new Error(j.detail || `server error ${r.status}`);
@@ -713,7 +714,7 @@ async function loadLive() {
       <div id="lvarm" class="lv-form" hidden><input id="lvmpw" type="password" placeholder="App password" autocomplete="current-password"><input id="lvmcf" placeholder="Type LIVE" autocomplete="off" autocapitalize="characters"><button class="lv-btn sell" id="lvmgo">Turn on live</button></div>
       <p class="lv-sub">${live ? '<b class="down">Real orders.</b>' : '<b>Practice:</b> nothing is sent.'} <a href="#" id="lvout" title="Signs this device out; the server keeps its mode">Log out</a></p></div>`
     : `<div class="lv-card"><b>Connect your server</b><p class="lv-sub">${err ? `<span class="down">${esc(err)}</span> · ` : ''}Sizes below use your capital (${money(cap('NSE'), 'NSE')}) and ${rP.toFixed(2)}% risk (${nP} positions, loss limit ${lvBudget()}%); holdings and cash are not checked and there is no Send button until the AWS server is connected.</p>
-      <form class="lv-form" id="lvform" action="#" autocomplete="on"><input id="lvurl" name="username" type="url" placeholder="https://your-server.sslip.io" value="${esc(c.url || '')}" autocomplete="username"><input id="lvpw" name="password" type="password" placeholder="App password" autocomplete="current-password"><button class="lv-btn" id="lvgo" type="submit">Connect</button></form></div>`;
+      <form class="lv-form" id="lvform" action="#" autocomplete="on" novalidate><input id="lvurl" name="username" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="https://your-server.sslip.io" value="${esc(c.url || '')}" autocomplete="username"><input id="lvpw" name="password" type="password" placeholder="App password" autocomplete="current-password"><button class="lv-btn" id="lvgo" type="submit">Connect</button></form></div>`;
   const pend = rows.filter((r) => r.tier !== 'more' && r.tier !== 'swing' && !r.skip && r.qty > 0);
   const nTop = rows.filter((r) => r.tier !== 'more' && r.tier !== 'swing').length; const nMore = rows.filter((r) => r.tier === 'more').length;
   const swRows = rows.filter((r) => r.tier === 'swing'); const swPend = swRows.filter((r) => !r.skip && r.qty > 0);
@@ -793,10 +794,13 @@ async function loadLive() {
     ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>How these are picked and sized</summary><p>From the India systems that backtested well: monthly-ATH breakouts (this month or last, within −5%/+10% of the breakout price), buy-stops at ATH triggers within 5%, and 9/21 trend entries. Score = system (ATH 2-yr base 3, 1–2 yr 2, buy-stop 2, 9/21 3) + 2 if sector and stock RS are both positive + 1 if the theme RS is positive − 3 if the stock's 1-year RS is negative (ATH only; top-down did not help 9/21). The ranking combines tested pieces but is not itself a separately backtested system. Size: risk per trade from your drawdown budget (guard card, 95% Monte Carlo), at most 10% of capital in one stock, at most 10 positions, within the cash you have. US and Australia are excluded (no tested edge).</p></details>`;
   const lf = $('#lvform'); if (lf) lf.addEventListener('submit', async (ev) => { ev.preventDefault();
-    const url = $('#lvurl').value.trim(); const pw = $('#lvpw').value;
-    if (!/^https:\/\//.test(url)) { alertMsg('Use the https:// address the setup script printed.'); return; }
-    lvSave({ url, token: null });
-    try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); lvSave({ token: j.token }); loadLive(); } catch (e) { alertMsg(e.message); }
+    let url = $('#lvurl').value.trim().replace(/\/+$/, ''); const pw = $('#lvpw').value; const go = $('#lvgo');
+    if (url && !/^https?:\/\//i.test(url) && /\./.test(url)) url = 'https://' + url;      // typed or autofilled without https://
+    if (!/^https:\/\/[^\s/]+\.[^\s/]+/i.test(url)) { alertMsg('Server address missing or wrong: use the https:// address the setup script printed (yours ends in .sslip.io).'); return; }
+    if (!pw) { alertMsg('Enter your app password.'); return; }
+    lvSave({ url, token: null }); go.disabled = true; go.textContent = 'Connecting…';
+    try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }), timeout: 15000 }); lvSave({ token: j.token }); toast('Connected'); loadLive(); }
+    catch (e) { alertMsg(e.name === 'AbortError' ? 'The server did not answer in 15 seconds. Check your internet, then try again.' : /fetch|network|load/i.test(e.message) ? `Could not reach ${url}. Check the address and your internet.` : e.message); go.disabled = false; go.textContent = 'Connect'; }
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
