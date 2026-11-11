@@ -3866,8 +3866,8 @@ function tdQty(E, st, C, riskPct) {
   const byRisk = riskPct / 100 * C / (E - st), byCap = 0.1 * C / E, q = Math.floor(Math.min(byRisk, byCap));
   return { q, capped: byCap < byRisk, loss: q * (E - st), value: q * E };
 }
-function tdRing(p) {
-  const C = 2 * Math.PI * 52, f = Math.max(0, Math.min(1, p / 10)), col = p < 6 ? 'var(--rise)' : p < 10 ? 'var(--saffron)' : 'var(--fall)';
+function tdRing(p, col, full = 10) {
+  const C = 2 * Math.PI * 52, f = Math.max(0, Math.min(1, p / full)); col = col || (p < 6 ? 'var(--rise)' : p < 10 ? 'var(--saffron)' : 'var(--fall)');
   return `<svg viewBox="0 0 128 128" width="150" height="150" aria-hidden="true"><circle cx="64" cy="64" r="52" fill="none" style="stroke:var(--line)" stroke-width="13"/>
     <circle cx="64" cy="64" r="52" fill="none" style="stroke:${col}" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(f * C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 64 64)"/></svg>`;
 }
@@ -3951,15 +3951,21 @@ async function tdRiskCard(box) {
   if (c.url && c.token) { try { S = await Promise.race([lvApi('/api/plan'), new Promise((_, j) => setTimeout(() => j(new Error('slow')), 5000))]); } catch (e) { S = null; } }
   let pos = [], C = cap('NSE') || 50000, src = 'practice';
   if (S && S.trades) { src = 'your account'; C = S.capital || C;
-    pos = S.trades.filter((t) => t.state === 'open' && t.qty).map((t) => ({ symbol: t.symbol, qty: t.qty, now: t.ltp || t.entry, stop: t.gtt_trigger || t.stop, trail_at: t.trail_at, trail_prev: t.trail_prev, new_stop: t.gtt_trigger })); }
+    pos = S.trades.filter((t) => t.state === 'open' && t.qty).map((t) => ({ symbol: t.symbol, qty: t.qty, entry: t.entry, now: t.ltp || t.entry, line: t.trail_level || t.stop, stop: t.gtt_trigger || t.stop, trail_at: t.trail_at, trail_prev: t.trail_prev, new_stop: t.gtt_trigger })); }
   else { const px = (await pfPrices().catch(() => ({ px: {} }))).px || {};
-    pos = bgPractice().filter((t) => t.state === 'open' && t.qty && t.entry).map((t) => ({ symbol: t.symbol, qty: t.qty, now: (px[t.symbol] || [])[0] || t.entry, stop: t.stop })); }
-  const atRisk = pos.reduce((a, p) => a + p.qty * Math.max(0, p.now - p.stop), 0); const pct = C ? atRisk / C * 100 : 0;
+    pos = bgPractice().filter((t) => t.state === 'open' && t.qty && t.entry).map((t) => ({ symbol: t.symbol, qty: t.qty, entry: t.entry, now: (px[t.symbol] || [])[0] || t.entry, line: t.stop, stop: t.stop })); }
+  /* 11 Nov 2026: two numbers. "Open risk" = down to each system's own exit line (Momentum 30-week SMA, Trend EMA 21, others
+     their plan stop) — where the system actually sells, on a close. "Worst case" = down to the crash-guard GTTs (15% below
+     that line). Plus the open trades' return so far. No 6% rule: capping heat at 6% cut the tested return from 23% to 11%/yr. */
+  const atRisk = pos.reduce((a, p) => a + p.qty * Math.max(0, p.now - (p.line || p.stop)), 0); const pct = C ? atRisk / C * 100 : 0;
+  const worst = pos.reduce((a, p) => a + p.qty * Math.max(0, p.now - p.stop), 0);
+  const cost = pos.reduce((a, p) => a + p.qty * (p.entry || p.now), 0), pnl = pos.reduce((a, p) => a + p.qty * (p.now - (p.entry || p.now)), 0), rp = cost ? pnl / cost * 100 : 0;
   const wk = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
   const raised = pos.filter((p) => p.trail_at && String(p.trail_at).slice(0, 10) >= wk && p.new_stop);
   box.innerHTML = `<div class="td-risk"><h3>Your whole portfolio,<br><span>one calm number</span></h3>
-    <div class="td-ring">${tdRing(pct)}<div><b>${fmt(pct, 1)}%</b><span>open risk</span></div></div>
-    <p class="muted td-rs">${pos.length ? `If every stop is hit: about −${inr(atRisk)} across ${pos.length} ${pos.length === 1 ? 'trade' : 'trades'} (${src}).` : `No open trades in ${src} yet.`} Under 6% keeps a bad week small.</p></div>
+    <div class="td-rings"><div class="td-ring">${tdRing(pct, 'var(--saffron)', 20)}<div><b>${fmt(pct, 1)}%</b><span>open risk</span></div></div>
+      <div class="td-ring">${tdRing(Math.abs(rp), rp >= 0 ? 'var(--rise)' : 'var(--fall)', 20)}<div><b class="${rp >= 0 ? 'up' : 'down'}">${rp >= 0 ? '+' : '−'}${fmt(Math.abs(rp), 1)}%</b><span>return so far</span></div></div></div>
+    <p class="muted td-rs">${pos.length ? `<b>Open risk:</b> if every stock closed at its system's exit line, about −${inr(atRisk)} (${fmt(pct, 1)}% of ${src}) across ${pos.length} ${pos.length === 1 ? 'trade' : 'trades'}. Worst case, if prices gapped down to the crash-guard GTTs: −${inr(worst)} (${fmt(C ? worst / C * 100 : 0, 1)}%).<br><b>Return so far:</b> ${pnl >= 0 ? '+' : '−'}${inr(Math.abs(pnl))} on ${inr(cost)} in these trades, as of ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}.` : `No open trades in ${src} yet.`}</p></div>
     ${raised.map((p) => `<div class="td-card td-raise"><span class="td-av" style="background:var(--rise)">↑</span><span class="td-nm"><b>Stop raised to ${inr(p.new_stop, 0)}</b><small>${esc(p.symbol)}${p.trail_prev ? ` · from ${inr(p.trail_prev, 0)}` : ''} · trailing stop, updated daily</small></span></div>`).join('')}`;
 }
 function tdPick(i, el, beginner, back) {

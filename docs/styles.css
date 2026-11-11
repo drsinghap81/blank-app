@@ -859,3 +859,6 @@ body.pub .owner-only { display: none !important; }
 .ad-go { position: sticky; bottom: 76px; margin-top: 10px; } .ad-go .lv-btn { width: 100%; padding: 12px; }
 .ad-sy { border: 1.5px solid var(--line); background: transparent; color: var(--slate); font: inherit; font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 999px; cursor: pointer; }
 .ad-sy[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+.td-rings { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.td-rings .td-ring { width: 136px; height: 136px; margin: 6px 0 4px; } .td-rings .td-ring svg { width: 136px; height: 136px; }
+.td-rings .td-ring b { font-size: 26px; }
