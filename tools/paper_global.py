@@ -21,9 +21,9 @@ from datetime import date, datetime, timezone
 
 import pandas as pd
 
-DIR = {"US": "data/scan/us/", "ASX": "data/scan/asx/"}
-SUF = {"US": "", "ASX": ".AX"}
-BENCH = {"US": "^GSPC", "ASX": "^AXJO"}
+DIR = {"US": "data/scan/us/", "ASX": "data/scan/asx/", "UK": "data/scan/uk/"}
+SUF = {"US": "", "ASX": ".AX", "UK": ".L"}
+BENCH = {"US": "^GSPC", "ASX": "^AXJO", "UK": "^FTSE"}
 START = 100_000.0
 RISK, CAP, MAXPOS, COST, RESERVE = 0.01, 0.10, 10, 0.001, 0.15
 # bucket caps (9 Nov 2026): the most of equity each system may hold (the Live tab's default allocation)

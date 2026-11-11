@@ -37,9 +37,9 @@ from trend_scan import nse_symbols, telegram  # noqa: E402
 MARKET = (sys.argv[1] if len(sys.argv) > 1 else "NSE").upper()
 OUT = "data/scan" if MARKET == "NSE" else f"data/scan/{MARKET.lower()}"
 CH = f"{OUT}/ath_charts"
-MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6}[MARKET]          # Rs 2 cr / $5 m / A$1 m a day
-UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6}[MARKET]            # value_cr field = traded value in Rs cr / $ m / A$ m
-MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0}[MARKET]   # no penny stocks (30 Oct 2026)
+MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6, "UK": 1e8}[MARKET]          # Rs 2 cr / $5 m / A$1 m a day
+UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6, "UK": 1e8}[MARKET]            # value_cr field = traded value in Rs cr / $ m / A$ m
+MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0, "UK": 100.0}[MARKET]   # no penny stocks (30 Oct 2026)
 BASE_MAIN, BASE_MIN = 24, 12
 NEAR = 0.05
 
@@ -243,7 +243,7 @@ def daily_block(x, n=160):
 def main():
     os.makedirs(CH, exist_ok=True)
     from zoneinfo import ZoneInfo
-    today = datetime.now(timezone.utc).astimezone(ZoneInfo({"NSE": "Asia/Kolkata", "US": "America/New_York", "ASX": "Australia/Sydney"}[MARKET])).date()
+    today = datetime.now(timezone.utc).astimezone(ZoneInfo({"NSE": "Asia/Kolkata", "US": "America/New_York", "ASX": "Australia/Sydney", "UK": "Europe/London"}[MARKET])).date()
     global SEC, BENCH
     try:
         from sector_state import load_bench, stock_rs
@@ -307,7 +307,7 @@ def main():
         print(a + len(chunk), "done;", len(events), "signals,", len(near), "near", flush=True)
         time.sleep(1)
     rk = pd.Series(vals).rank(ascending=False, method="first")
-    size = pd.cut(rk, {"NSE": [0, 100, 250, 500, 1e9], "US": [0, 500, 1500, 3000, 1e9], "ASX": [0, 100, 300, 600, 1e9]}[MARKET], labels=["Large", "Mid", "Small", "Micro"]).astype(str).to_dict()
+    size = pd.cut(rk, {"NSE": [0, 100, 250, 500, 1e9], "US": [0, 500, 1500, 3000, 1e9], "ASX": [0, 100, 300, 600, 1e9], "UK": [0, 100, 200, 300, 1e9]}[MARKET], labels=["Large", "Mid", "Small", "Micro"]).astype(str).to_dict()
     E = pd.DataFrame(events)
     N = pd.DataFrame(near)
     try:

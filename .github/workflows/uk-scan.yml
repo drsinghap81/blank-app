@@ -1,0 +1,41 @@
+name: uk-scan
+# UK market (FTSE 350, LSE) — all evening scans in one job after the London close (11 Nov 2026). Watch-only until backtested.
+on:
+  schedule:
+    - cron: "10 17 * * 1-5"   # 17:10 UTC: after the 16:35 London close (winter); 18:10 BST in summer
+  workflow_dispatch:
+  push:
+    paths: [".github/workflows/uk-scan.yml"]
+permissions:
+  contents: write
+concurrency: {group: uk-scan, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Scans
+        env:
+          SEND_TELEGRAM: "0"
+        run: |
+          pip install -q numpy pandas yfinance requests lxml
+          mkdir -p data/scan/uk
+          F='warn\|inplace\|whatsnew\|delisted\|df.drop\|df.rename\|failed download\|possibly'
+          python tools/global_state.py UK 2>&1 | grep -v -i "$F" | tail -8 || true
+          python tools/group_pulse.py UK 2>&1 | grep -v -i "$F" | tail -5 || true
+          python tools/ath_scan.py UK 2>&1 | grep -v -i "$F" | tail -8 || true
+          python tools/trend_scan.py UK 2>&1 | grep -v -i "$F" | tail -8 || true
+          python tools/pattern_scan.py UK 2>&1 | grep -v -i "$F" | tail -5 || true
+          python tools/trade_plan.py UK 2>&1 | tail -3 || true
+          python tools/setup_log.py UK 2>&1 | tail -2 || true
+          python tools/paper_global.py UK 2>&1 | tail -3 || true
+      - name: Commit
+        run: |
+          git config user.name "uk-scan bot"; git config user.email "actions@users.noreply.github.com"
+          rm -f data/scan/uk/all_metrics.csv
+          git add data/scan/uk data/universe/uk_meta.csv 2>/dev/null; git diff --cached --quiet && exit 0
+          git commit -qm "UK scans $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull --rebase -q -X theirs origin main && git push -q origin HEAD:main && break; sleep $((i*8)); done

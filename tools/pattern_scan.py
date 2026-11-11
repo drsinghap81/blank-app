@@ -32,7 +32,9 @@ GLOBAL = {"US": dict(out="data/scan/us", suf="", minval=1e7, minpx=10.0, idx={"^
                      bt_sup="2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.19R (30,963) vs +0.25R for a random uptrend stock; old swing lows +0.11R vs +0.24R. Worse than random - watch only."),
           "ASX": dict(out="data/scan/asx", suf=".AX", minval=1e6, minpx=20.0, idx={"^AXJO": "ASX 200", "^AORD": "ALL ORDINARIES"},
                       bt_pat="2008-26, 1,904 signals: 120-day return +2.5% vs +4.8% for a random liquid stock the same day; target before stop 60% vs 60%. Worse than random - watch only.",
-                      bt_sup="2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.13R (3,359) vs +0.15R for a random uptrend stock; old swing lows +0.02R vs +0.10R. Worse than random - watch only.")}
+                      bt_sup="2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.13R (3,359) vs +0.15R for a random uptrend stock; old swing lows +0.02R vs +0.10R. Worse than random - watch only."),
+          "UK": dict(out="data/scan/uk", suf=".L", minval=1e8, minpx=100.0, idx={"^FTSE": "FTSE 100", "^FTMC": "FTSE 250"},
+                     bt_pat="UK: not backtested yet - watch only.", bt_sup="UK: not backtested yet - watch only.")}
 THR, FALL, MINVAL, MIN_CLOSE, RECENT = 0.06, 0.20, 2e7, 100.0, 10
 INDICES = {"^NSEI": "NIFTY 50", "^NSEBANK": "NIFTY BANK", "^CNXIT": "NIFTY IT", "^CNXAUTO": "NIFTY AUTO", "^CNXPHARMA": "NIFTY PHARMA",
            "^CNXMETAL": "NIFTY METAL", "^CNXFMCG": "NIFTY FMCG", "^CNXREALTY": "NIFTY REALTY", "^CNXENERGY": "NIFTY ENERGY",
@@ -395,12 +397,13 @@ def main(mk="NSE"):
                          "Base from the highest swing high of the last 250 days; >= 2 contractions (zigzag 6% on highs/lows), each shallower with a higher "
                          "low, the last <= 12%, volume drying up in the last one. Buy-stop just above the last contraction's high (pivot) on 1.4x volume; "
                          "stop = the last contraction's low (max 10% away); sell after a daily close below EMA 50.",
-                   backtest=("NSE 2017-26 (all stocks incl. delisted, costs): 221 trades, +4.9% a trade, 37% win; robust across 11 rule variants. "
-                             "Added to Momentum + Trend in one account: 24.2-24.7%/yr vs 23.1%, worst fall about the same, nothing extra in 2022-26. Watch bucket - your call.")
-                            if mk != "ASX" and g else ("US 2008-26 (3,460 current stocks, so survivorship flatters it): 396 trades, +2.0% a trade, 36% win; "
-                                 "alone 8.5-8.9%/yr in 2017-26 (worst fall -14%) vs the S&P 500 13.3%/yr (-34%), weak in 2008-16 (1.3%/yr); "
-                                 "with 4% swings only +0.7% a trade. Weaker than NSE - watch bucket, your call.") if g else
-                            "ASX 2008-26: only about 3 setups a year (56 trades, +1.8% a trade); without the volume rule -0.3% a trade. Too few to trust - watch bucket, your call.",
+                   backtest={"NSE": "NSE 2017-26 (all stocks incl. delisted, costs): 221 trades, +4.9% a trade, 37% win; robust across 11 rule variants. "
+                                    "Added to Momentum + Trend in one account: 24.2-24.7%/yr vs 23.1%, worst fall about the same, nothing extra in 2022-26. Watch bucket - your call.",
+                             "US": "US 2008-26 (3,460 current stocks, so survivorship flatters it): 396 trades, +2.0% a trade, 36% win; "
+                                   "alone 8.5-8.9%/yr in 2017-26 (worst fall -14%) vs the S&P 500 13.3%/yr (-34%), weak in 2008-16 (1.3%/yr); "
+                                   "with 4% swings only +0.7% a trade. Weaker than NSE - watch bucket, your call.",
+                             "ASX": "ASX 2008-26: only about 3 setups a year (56 trades, +1.8% a trade); without the volume rule -0.3% a trade. Too few to trust - watch bucket, your call.",
+                             "UK": "UK: not backtested yet - watch only."}.get(mk, ""),
                    rows=vrows), open(f"{OUT}/vcp.json", "w"), indent=0)
     print("vcp", len(vrows), {k: sum(r["status"] == k for r in vrows) for k in VO})
     print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["sq9_match"] for r in srows), "on a Square-of-9 number")

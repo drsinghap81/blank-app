@@ -16,7 +16,8 @@ from session import drop_partial  # noqa: E402
 
 CFG = {"NSE": dict(out="data/scan/", bench="^NSEI", suf=".NS", minval=2e7, minpx=50),
        "US": dict(out="data/scan/us/", bench="^GSPC", suf="", minval=1e7, minpx=5),
-       "ASX": dict(out="data/scan/asx/", bench="^AXJO", suf=".AX", minval=1e6, minpx=20)}   # A$20 floor (10 Nov 2026)
+       "ASX": dict(out="data/scan/asx/", bench="^AXJO", suf=".AX", minval=1e6, minpx=20),
+       "UK": dict(out="data/scan/uk/", bench="^FTSE", suf=".L", minval=1e8, minpx=100)}   # pence (GBP 1 m / GBP 1)   # A$20 floor (10 Nov 2026)
 
 
 NSE_SPLIT = {
@@ -55,7 +56,7 @@ def universe(mkt):
         u.loc[u.group == "Banks - Regional", "group"] = "Banks - Private Mid & Small"
         u.loc[u.group == "Auto Manufacturers", "group"] = "Auto - PV & Tractors"
     else:
-        u = pd.read_csv(f"data/universe/{'us' if mkt == 'US' else 'asx'}_meta.csv").rename(columns={"industry": "group"})
+        u = pd.read_csv(f"data/universe/{mkt.lower()}_meta.csv").rename(columns={"industry": "group"})
     u = u.dropna(subset=["group", "symbol"]); u["symbol"] = u.symbol.astype(str); u["name"] = u.name.fillna(u.symbol).astype(str)
     u = u[u.group.astype(str).str.len() > 0]
     if "sector" not in u:
@@ -90,7 +91,7 @@ def main(mkt):
     B = data.get(cf["bench"]); B = B.c if B is not None else None
     C = pd.DataFrame({s: data[t].c for s, t in tick.items() if t in data and len(data[t]) > 160})
     V = pd.DataFrame({s: data[t].v for s, t in tick.items() if t in data and len(data[t]) > 160}).reindex(C.index)
-    C = drop_partial(C.sort_index(), {"NSE": "NSE", "US": "US", "ASX": "ASX"}[mkt]); V = V.reindex(C.index)
+    C = drop_partial(C.sort_index(), {"NSE": "NSE", "US": "US", "ASX": "ASX", "UK": "UK"}[mkt]); V = V.reindex(C.index)
     B = B.reindex(C.index).ffill()
     liq = ((C * V).rolling(60, min_periods=40).median() >= cf["minval"]) & (C >= cf["minpx"])
     rpi = lambda k: 100 * (C / C.shift(k)).div(B / B.shift(k), axis=0)

@@ -6,6 +6,8 @@ const MKT = {
   NSE: { path: 'data/scan/', name: 'India', exch: 'NSE', loc: 'en-IN', cur: '₹', unit: '₹ cr', tv: 'NSE:', screener: true },
   US: { path: 'data/scan/us/', name: 'US', exch: 'US', loc: 'en-US', cur: '$', unit: '$ m', tv: '', screener: false },
   ASX: { path: 'data/scan/asx/', name: 'Australia', exch: 'ASX', loc: 'en-AU', cur: 'A$', unit: 'A$ m', tv: 'ASX:', screener: false },
+  // UK (11 Nov 2026): FTSE 350; LSE prices are in pence (GBX), capital and amounts in pounds
+  UK: { path: 'data/scan/uk/', name: 'UK', exch: 'LSE', loc: 'en-GB', cur: 'GBX ', unit: '£ m', tv: 'LSE:', screener: false, pence: true },
 };
 const C = { ink: '#14213D', rise: '#0E9F6E', fall: '#D64545', saffron: '#E8A33D', slate: '#5B6B82', line: '#E3E8F0',
   e9: '#F28C28', e21: '#3B6FE0', e50: '#A0AEC0', rsi: '#7C5CDB', card: '#FFFFFF', grid: '#F1F4F8' };
@@ -1192,7 +1194,7 @@ function renderTrends() {
     <div class="stat exit"><b>${exits}</b><span>to sell at next open</span></div>
     <div class="stat"><b>${L.trend.length}</b><span>clear trends</span></div>`;
   const note = $('#mktnote');
-  const warn = { US: '<b>Watch only.</b> Tested 2017–2026 on US stocks this system made about 4% a year against 15% for the S&P 500, and no liquidity or price filter fixed it. Use the US list for ideas, not as a trading system.',
+  const warn = { UK: '<b>Watch only.</b> UK (FTSE 350) is not backtested yet: use the list for ideas only. Prices are in pence (GBX).', US: '<b>Watch only.</b> Tested 2017–2026 on US stocks this system made about 4% a year against 15% for the S&P 500, and no liquidity or price filter fixed it. Use the US list for ideas, not as a trading system.',
     ASX: '<b>Watch only.</b> Tested 2017–2026 on Australian stocks this system lost about 1% a year against 4.5% for the ASX 200, and no liquidity or price filter fixed it. Use the list for ideas, not as a trading system.' }[state.mkt];
   const track = 'Tracked signals are not your trades: each signal is followed as if bought at the next open, until its stop or a red Supertrend. Use it to see whether a signal you missed is still running.';
   note.innerHTML = warn ? warn : (state.tab === 'open' ? track : '');
@@ -1323,7 +1325,7 @@ function panelMk() {
 }
 function tvSym(sym, mk) {
   const s = String(sym || '').trim(); if (TV_IDX[s.toUpperCase()]) return TV_IDX[s.toUpperCase()];
-  return mk === 'NSE' ? 'NSE:' + s.replace(/[-&]/g, '_') : mk === 'ASX' ? 'ASX:' + s : s.replace('-', '.');
+  return mk === 'NSE' ? 'NSE:' + s.replace(/[-&]/g, '_') : mk === 'ASX' ? 'ASX:' + s : mk === 'UK' ? 'LSE:' + s.replace('-', '.') : s.replace('-', '.');
 }
 const myKey = (mk) => 'td.mypicks_' + mk;
 function myLocal(mk) { try { return JSON.parse(localStorage.getItem(myKey(mk)) || '[]'); } catch (e) { return []; } }
@@ -1735,7 +1737,7 @@ function oiList() {
 
 /* ------------------------------------------------------------------ position sizing */
 const CAP_KEY = 'td_capital';
-const CAP_DEF = { NSE: 2000000, US: 20000, ASX: 20000 };
+const CAP_DEF = { NSE: 2000000, US: 20000, ASX: 20000, UK: 20000 };
 function getCap(m) { try { const v = JSON.parse(localStorage.getItem(CAP_KEY) || '{}'); return +v[m] || CAP_DEF[m]; } catch (e) { return CAP_DEF[m]; } }
 function setCap(m, v) { try { const o = JSON.parse(localStorage.getItem(CAP_KEY) || '{}'); o[m] = v; localStorage.setItem(CAP_KEY, JSON.stringify(o)); } catch (e) { /* storage unavailable */ } state.cap[m] = v; }
 const cap = (m) => state.cap[m] || getCap(m);
@@ -1797,6 +1799,7 @@ function plan921(r) {
 /* market of the ATH section (India / US / Australia) */
 const AM = () => { if (!state.athMkt) { try { state.athMkt = localStorage.getItem('td_athmkt') || 'NSE'; } catch (e) { state.athMkt = 'NSE'; } } return state.athMkt; };
 const WATCH = {
+  UK: 'UK (FTSE 350) runs the same India rules but has not been backtested yet, so nothing here is a tested signal. Prices are in pence (GBX); use the list for ideas only.',
   US: 'Backtested 2008–26 with the India rules on US stocks: the monthly-ATH system made 1–3% a year (worst fall about −30%) while the S&P 500 made 9–13%; IPO cups 2–4%; none of the top-down levels (world, market trend, sector, industry, stock RS) improved it. Use the lists for ideas, not as a system.',
   ASX: 'Backtested 2008–26 with the India rules: with the A$30 price floor there are only ~2 signals a year (too few to trade). With an A$1 floor the ATH system made 4–5% a year, worst fall −16% (ASX 200 2–5% price only, about 6–9% with dividends); IPO cups ~1%; the top-down levels did not help. Use the lists for ideas, not as a system.' };
 const NOTE_G = {
@@ -1809,11 +1812,11 @@ const NOTE_G = {
 const AL = () => MKT[AM()].loc;
 const AP = () => MKT[AM()].path;
 const valTxt = (v) => (AM() === 'NSE' ? `₹${fmt(v, 1, 'en-IN')} cr` : `${MKT[AM()].cur}${fmt(v, 1, AL())} m`);
-const BENCH_NM = { NSE: 'Nifty 50', US: 'S&P 500', ASX: 'ASX 200' };
+const BENCH_NM = { NSE: 'Nifty 50', US: 'S&P 500', ASX: 'ASX 200', UK: 'FTSE 100' };
 function athLinks(r) {
   const m = AM();
-  const tv = m === 'NSE' ? 'NSE:' + r.symbol : m === 'ASX' ? 'ASX:' + r.symbol : r.symbol.replace('.', '-');
-  const yh = m === 'US' ? r.symbol.replace('.', '-') : m === 'ASX' ? r.symbol + '.AX' : r.symbol + '.NS';
+  const tv = m === 'NSE' ? 'NSE:' + r.symbol : m === 'ASX' ? 'ASX:' + r.symbol : m === 'UK' ? 'LSE:' + r.symbol.replace('-', '.') : r.symbol.replace('.', '-');
+  const yh = m === 'US' ? r.symbol.replace('.', '-') : m === 'ASX' ? r.symbol + '.AX' : m === 'UK' ? r.symbol + '.L' : r.symbol + '.NS';
   return `<a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tv)}" target="_blank" rel="noopener">Open in TradingView</a>`
     + (m === 'NSE' ? `<a href="https://www.screener.in/company/${encodeURIComponent(r.symbol)}/" target="_blank" rel="noopener">Fundamentals on Screener</a>`
       : `<a href="https://finance.yahoo.com/quote/${encodeURIComponent(yh)}" target="_blank" rel="noopener">Yahoo Finance</a>`);
@@ -1861,7 +1864,7 @@ async function loadATH() {
   const el = $('#view-ath');
   state.athC = state.athC || {};
   const mk = AM();
-  const mkSeg = `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia']].map(([k, n]) => `<button data-mk="${k}" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
+  const mkSeg = `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-mk="${k}" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
   if (!state.athC[mk]) {
     el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>';
     const tag = mk === 'NSE' ? '' : '_' + mk;
@@ -1938,14 +1941,14 @@ function botTabsWire(el) {
   el.querySelectorAll('#botmk button').forEach((b) => b.addEventListener('click', () => { state.botMk = b.dataset.k; try { localStorage.setItem('td.botMk', b.dataset.k); } catch (e) { /* */ } loadBottoms(); }));
 }
 const botMk = () => { if (!state.botMk) { try { state.botMk = localStorage.getItem('td.botMk') || 'NSE'; } catch (e) { state.botMk = 'NSE'; } } return state.botMk; };
-const botMkSeg = () => `<div class="seg" id="botmk" style="margin:8px 16px 0">${['NSE', 'US', 'ASX'].map((k) => `<button data-k="${k}" aria-selected="${botMk() === k}">${MKT[k].name}</button>`).join('')}</div>`;
+const botMkSeg = () => `<div class="seg" id="botmk" style="margin:8px 16px 0">${['NSE', 'US', 'ASX', 'UK'].map((k) => `<button data-k="${k}" aria-selected="${botMk() === k}">${MKT[k].name}</button>`).join('')}</div>`;
 async function botData(kind) { // per-market cache of patterns.json / support.json
   const mk = botMk(); const c = kind === 'pat' ? (state.patC = state.patC || {}) : (state.supC = state.supC || {});
   if (c[mk] === undefined) c[mk] = await getJSON(MAIN + MKT[mk].path + (kind === 'pat' ? 'patterns.json' : 'support.json'), `${kind}_${mk}`);
   if (kind === 'pat') state.pat = c[mk]; else state.sup = c[mk];
   return c[mk];
 }
-const botWatch = (mk) => (mk === 'NSE' ? '' : `<div class="status exit watch" style="margin:8px 16px"><b>Watch only.</b> ${mk === 'US' ? 'US' : 'ASX'} backtest 2008–26: these setups did worse than buying a random stock the same day, so they are not in the Live lists.</div>`);
+const botWatch = (mk) => (mk === 'NSE' ? '' : `<div class="status exit watch" style="margin:8px 16px"><b>Watch only.</b> ${mk === 'UK' ? 'UK setups are not backtested yet, so they are not in the Live lists.' : `${mk === 'US' ? 'US' : 'ASX'} backtest 2008–26: these setups did worse than buying a random stock the same day, so they are not in the Live lists.`}</div>`);
 async function loadBottoms() {
   if ((state.botM || 'pat') === 'sup') return loadSupport();
   if (state.botM === 'fund') return loadFunds();
@@ -3126,8 +3129,8 @@ function download() {
 }
 
 /* ------------------------------------------------------------------ Markets: top-down World > Market > Sector > Industry > Stock */
-const MX_IDX = { NSE: '^NSEI', US: '^GSPC', ASX: '^AXJO' };
-const MX_BENCH = { NSE: 'Nifty 50', US: 'S&P 500', ASX: 'ASX 200' };
+const MX_IDX = { NSE: '^NSEI', US: '^GSPC', ASX: '^AXJO', UK: '^FTSE' };
+const MX_BENCH = { NSE: 'Nifty 50', US: 'S&P 500', ASX: 'ASX 200', UK: 'FTSE 100' };
 const MX_TAGC = { leading: '#0A7A55', uptrend: '#3B82F6', mixed: '#9CA3AF', weak: '#D64545' };
 state.mx = state.mx || { lvl: 'world' };
 async function mxSignals(mk) {
@@ -3198,7 +3201,7 @@ async function loadMarkets() {
   if (!state.world) { el.innerHTML = '<p class="muted pad">Loading…</p>'; state.world = await getJSON(MAIN + 'data/scan/world.json', 'world'); }
   const W = state.world;
   if (x.lvl === 'world') {
-    await Promise.all(['NSE', 'US', 'ASX'].map(loadGP));
+    await Promise.all(['NSE', 'US', 'ASX', 'UK'].map(loadGP));
     $('#asof').textContent = W ? `World indices · ${day(W.asof)}${updTxt(W.generated)}` : '';
     const I = (W && W.indices) || {};
     const card = (mk) => { const k = MX_IDX[mk]; const v = I[k] || {}; const G = state.gp[mk]; const ms = G && G.mstats;
@@ -3206,7 +3209,7 @@ async function loadMarkets() {
         <span class="mxv">${v.ret_3m != null ? `${v.ret_3m >= 0 ? '+' : ''}${fmt(v.ret_3m, 1)}% 3 m` : ''}</span><span class="muted">${v.from_high != null ? `${fmt(v.from_high, 1)}% from high` : ''}${ms ? ` · ${fmt(ms.above200, 0)}% of stocks above 200-day · Pulse ${fmt(ms.p1m, 0)}` : ''}</span><span class="mxgo">Open sectors ›</span></button>`; };
     const others = Object.entries(I).filter(([k]) => !Object.values(MX_IDX).includes(k));
     el.innerHTML = `${mxCrumb()}<div class="status ${W && W.risk_on ? 'open' : 'exit watch'}" style="margin:8px 16px"><b>World ${W && W.risk_on ? 'risk-on' : 'risk-off'}.</b> ${W ? esc(W.benchmark) : ''} — context only. Buy signals still come from your tested systems; industry strength is the tailwind (in the 2017–26 test, the top 10% of industries beat the bottom 10% by about 3% over the next 3 months).</div>
-      <div class="card"><h4 style="margin:0 0 8px">Your markets</h4><div class="mxcards">${['NSE', 'US', 'ASX'].map(card).join('')}</div>
+      <div class="card"><h4 style="margin:0 0 8px">Your markets</h4><div class="mxcards">${['NSE', 'US', 'ASX', 'UK'].map(card).join('')}</div>
       <h4 style="margin:14px 0 6px">Other world indices · 3-month return</h4><div class="mxworld">${others.map(([k, v]) => `<div class="mxw" style="border-left:5px solid ${MX_TAGC[v.tag] || '#CBD5E1'}"><b>${esc(v.name)}</b><span class="muted">${esc(v.region)} · ${esc(v.tag)}</span><span class="${v.ret_3m >= 0 ? 'up' : 'down'}">${v.ret_3m >= 0 ? '+' : ''}${fmt(v.ret_3m, 1)}%</span></div>`).join('')}</div>
       <p class="muted" style="margin:10px 0 0;font-size:12.5px">Colour = trend tag (green leading, blue uptrend, grey mixed, red weak) from each index's 30-week average and strength vs the MSCI World.</p></div>`;
     mxWire(el); el.querySelectorAll('.mxcard').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'market', m: b.dataset.m, sec: null, grp: null })));
@@ -3327,8 +3330,8 @@ function rangeState(rs, t) {
 async function mxStock(m, r, mk, S) {
   await mxFund(mk);
   const F = (state.mxF[mk] && state.mxF[mk].s && state.mxF[mk].s[m.symbol]) || null;
-  const yq = `https://finance.yahoo.com/quote/${encodeURIComponent((mk === 'US' ? m.symbol.replace('.', '-') : m.symbol) + ({ NSE: '.NS', US: '', ASX: '.AX' })[mk])}`;
-  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent((MKT[mk].tv || '') + m.symbol)}`;
+  const yq = `https://finance.yahoo.com/quote/${encodeURIComponent((mk === 'US' ? m.symbol.replace('.', '-') : m.symbol) + ({ NSE: '.NS', US: '', ASX: '.AX', UK: '.L' })[mk])}`;
+  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(m.symbol, mk))}`;
   const pct = (v, d = 1) => (v == null ? '–' : `${fmt(v, d)}%`);
   let fund = '<p class="muted pad">Company fundamentals appear after the next nightly fundamentals run.</p>';
   if (F) {
@@ -3698,7 +3701,7 @@ async function tdRender(el, beginner) {
   const mk = beginner ? 'NSE' : tdMk(); const MP = MAIN + MKT[mk].path; const tag = mk === 'NSE' ? '' : '_' + mk;
   el.innerHTML = '<p class="muted pad">Loading today…</p>';
   const [P, A] = await Promise.all([getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk), getJSON(MP + 'ath.json', 'ath' + tag)]);
-  const seg = beginner ? '' : `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
+  const seg = beginner ? '' : `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
   const wire = () => el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender(el, beginner); }));
   if (!P) { el.innerHTML = `<div class="td-wrap">${seg}<p class="empty">Today's setups appear after the evening scan.</p></div>`; wire(); return; }
   $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)}`;
@@ -3750,6 +3753,7 @@ async function tdRiskCard(box) {
 }
 function tdPick(i, el, beginner, back) {
   const r = state._tdRows[i], mk = state._tdMkNow; if (!r) return; const L = tdLabel(r); const E = r.trigger || r.price; const M = (v, d = 0) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
+  const PX = MKT[mk].pence ? 0.01 : 1; const Mm = (v, d = 0) => (MKT[mk].pence ? `£${fmt(v, d, 'en-GB')}` : M(v, d));   // UK: quotes in pence, money in pounds
   const held = bgPractice().some((t) => t.symbol === r.symbol && t.state !== 'closed');
   $('#sheet-body').innerHTML = `<div class="t2-sh"><b>${esc(bgName(r))}</b><span>${esc(r.symbol)} · ${esc(L.t)}</span></div>
     <div class="td-calc">
@@ -3761,9 +3765,9 @@ function tdPick(i, el, beginner, back) {
     <div class="bg-btns"><button class="bg-cta" id="tdch">Back to chart</button>${mk === 'NSE' ? `<button class="bg-ghost" id="tdpr" ${held ? 'disabled' : ''}>${held ? 'In practice' : 'Practise'}</button>` : ''}</div>
     <p class="bg-fine">The calculator uses your capital and risk. At most 10% of capital in one stock. Not investment advice.</p>`;
   $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; if (!back) history.pushState({ sheet: 1 }, '');
-  const calc = () => { const C = Math.round(+String($('#tdc').value).replace(/[^0-9]/g, '')); const s = tdQty(E, r.stop, C, +$('#tdr').value);
+  const calc = () => { const C = Math.round(+String($('#tdc').value).replace(/[^0-9]/g, '')); const s = tdQty(E * PX, r.stop * PX, C, +$('#tdr').value);
     $('#tdq').textContent = s ? s.q.toLocaleString(MKT[mk].loc) : '–';
-    $('#tdm').textContent = s ? `Max loss ${M(s.loss)} · Allocation ${M(s.value)} (${fmt(C ? s.value / C * 100 : 0, 1)}% of capital${s.capped ? ', the 10% cap' : ''})` : ''; return { C, s }; };
+    $('#tdm').textContent = s ? `Max loss ${Mm(s.loss)} · Allocation ${Mm(s.value)} (${fmt(C ? s.value / C * 100 : 0, 1)}% of capital${s.capped ? ', the 10% cap' : ''})` : ''; return { C, s }; };
   calc();
   $('#tdc').addEventListener('input', calc);
   $('#tdc').addEventListener('change', () => { const { C } = calc(); if (C > 0) setCap(mk, C); });

@@ -255,7 +255,7 @@ def main():
     MARKET = sys.argv[1] if len(sys.argv) > 1 else "NSE"
     cfg = MARKETS[MARKET]
     VALUE_DIV, DISP_MULT = cfg["min_value"], cfg["min_value"] / cfg["value_unit"]
-    MIN_PRICE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0}[MARKET]
+    MIN_PRICE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0, "UK": 100.0}[MARKET]   # UK in pence (= GBP 1)
     if MARKET != "NSE":
         OUT = f"data/scan/{MARKET.lower()}"
     os.makedirs(OUT, exist_ok=True)
@@ -346,7 +346,7 @@ def main():
     asof = df.last_date.max()
     # company-size bucket by rank of 20-day traded value among all scanned stocks (proxy for market-cap rank)
     rk = df.set_index("symbol").value_cr.rank(ascending=False, method="first")
-    cuts = {"NSE": [0, 100, 250, 500, 1e9], "US": [0, 500, 1500, 3000, 1e9], "ASX": [0, 100, 300, 600, 1e9]}[MARKET]
+    cuts = {"NSE": [0, 100, 250, 500, 1e9], "US": [0, 500, 1500, 3000, 1e9], "ASX": [0, 100, 300, 600, 1e9], "UK": [0, 100, 200, 300, 1e9]}[MARKET]
     size = pd.cut(rk, cuts, labels=["Large", "Mid", "Small", "Micro"]).astype(str).to_dict()
     p["size"] = p.symbol.map(size)
     if len(E):

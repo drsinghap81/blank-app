@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 import pandas as pd
 
 
-CLOSE_AT = {"NSE": ("Asia/Kolkata", (15, 45)), "US": ("America/New_York", (16, 15)), "ASX": ("Australia/Sydney", (16, 20))}
+CLOSE_AT = {"NSE": ("Asia/Kolkata", (15, 45)), "US": ("America/New_York", (16, 15)), "ASX": ("Australia/Sydney", (16, 20)), "UK": ("Europe/London", (16, 40))}
 
 
 def drop_partial(df, market="NSE"):

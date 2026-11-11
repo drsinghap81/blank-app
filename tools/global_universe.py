@@ -15,6 +15,10 @@ MARKETS = {
                cost=0.0004, slip=0.0005, benchmark="SPY", benchmark_name="S&P 500 (SPY)", tz_close_utc="21:00"),
     "ASX": dict(label="Australia (ASX)", currency="A$", min_value=5e5, value_unit=1e6, value_label="A$ m",
                 cost=0.0020, slip=0.0010, benchmark="^AXJO", benchmark_name="S&P/ASX 200", tz_close_utc="06:10"),
+    # UK (11 Nov 2026): FTSE 350. Yahoo .L prices are in PENCE, so value thresholds are in pence (1e8 = GBP 1 m);
+    # costs include 0.5% stamp duty on purchases.
+    "UK": dict(label="United Kingdom (LSE)", currency="p", min_value=1e8, value_unit=1e8, value_label="£ m",
+               cost=0.0060, slip=0.0010, benchmark="^FTSE", benchmark_name="FTSE 100", tz_close_utc="16:35"),
 }
 
 
@@ -107,5 +111,36 @@ def asx_symbols():
     raise RuntimeError("no ASX company list available")
 
 
+def uk_constituents():
+    """FTSE 100 + FTSE 250 from Wikipedia: symbol (Yahoo form without .L, e.g. BT-A), ticker (.L), name, sector (ICB), index."""
+    out = []
+    for url, ix in (("https://en.wikipedia.org/wiki/FTSE_100_Index", "FTSE 100"), ("https://en.wikipedia.org/wiki/FTSE_250_Index", "FTSE 250")):
+        r = _get(url)
+        if r is None:
+            continue
+        for t in pd.read_html(io.StringIO(r.text)):
+            cols = {str(c).lower(): c for c in t.columns}
+            tk = next((cols[c] for c in cols if "ticker" in c or "epic" in c), None)
+            nm = next((cols[c] for c in cols if "company" in c), None)
+            if tk is None or nm is None or len(t) < 50:
+                continue
+            sc = next((cols[c] for c in cols if "sector" in c or "industry" in c), None)
+            sym = t[tk].astype(str).str.strip().str.upper().str.rstrip(".").str.replace(".", "-", regex=False)
+            out.append(pd.DataFrame({"symbol": sym, "name": t[nm].astype(str).str.strip(), "sector": t[sc].astype(str).str.strip() if sc is not None else None, "index": ix}))
+            break
+    if not out:
+        raise RuntimeError("no UK constituent list available")
+    d = pd.concat(out).drop_duplicates("symbol")
+    d = d[d.symbol.str.match(r"^[A-Z0-9][A-Z0-9-]{0,5}$")]
+    d["ticker"] = d.symbol + ".L"
+    print("UK list", len(d))
+    return d
+
+
+def uk_symbols():
+    d = uk_constituents()
+    return pd.DataFrame({"symbol": d.symbol, "ticker": d.ticker, "name": d.name, "board": d["index"]})
+
+
 def symbols(market):
-    return {"NSE": nse_symbols, "US": us_symbols, "ASX": asx_symbols}[market]()
+    return {"NSE": nse_symbols, "US": us_symbols, "ASX": asx_symbols, "UK": uk_symbols}[market]()

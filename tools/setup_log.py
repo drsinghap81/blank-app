@@ -14,7 +14,7 @@ import os
 import sys
 from datetime import datetime, timezone
 
-DIR = {"NSE": "data/scan/", "US": "data/scan/us/", "ASX": "data/scan/asx/"}
+DIR = {"NSE": "data/scan/", "US": "data/scan/us/", "ASX": "data/scan/asx/", "UK": "data/scan/uk/"}
 STOPK = ("ATH_STOP", "TF_STOP", "VCP_STOP")
 HZ = (1, 5, 20, 60)
 MAX_DAYS, WAIT_DAYS = 120, 20

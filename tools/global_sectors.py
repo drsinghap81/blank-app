@@ -59,7 +59,9 @@ ASX_THEMES = [("^AXGD", "Gold (All Ords)"), ("^AXMM", "Metals & mining")]  # con
 ASX_BROAD = {"^ATLI": "ASX 20", "^AXJO": "ASX 200", "^AXKO": "ASX 300", "^AORD": "All Ords", "^AXSO": "Small Ords"}
 
 CFG = {"US": dict(bench="^GSPC", market="^GSPC", sectors=US_SECTORS, themes={t: n for _, t, n in US_THEMES}, broad=US_BROAD),
-       "ASX": dict(bench="^AXJO", market="^AXJO", sectors=ASX_SECTORS, themes=dict(ASX_THEMES), broad=ASX_BROAD)}
+       "ASX": dict(bench="^AXJO", market="^AXJO", sectors=ASX_SECTORS, themes=dict(ASX_THEMES), broad=ASX_BROAD),
+       # UK (11 Nov 2026): broad indices only - no reliable daily FTSE sector-index series on Yahoo, so no sector RS layer yet
+       "UK": dict(bench="^FTSE", market="^FTSE", sectors={}, themes={}, broad={"^FTSE": "FTSE 100", "^FTMC": "FTSE 250", "^FTAS": "FTSE All-Share"})}
 
 
 def index_tickers(market):
@@ -123,4 +125,8 @@ def fetch_meta(market):
         out["sector"] = out.sector_index.map(ASX_SECTORS)
         out["theme"] = None
         return out[["symbol", "name", "sector", "industry", "sector_index", "theme", "listed"]]
+    if market == "UK":
+        from global_universe import uk_constituents
+        d = uk_constituents()
+        return pd.DataFrame({"symbol": d.symbol, "name": d.name, "sector": d.sector, "industry": d.sector, "sector_index": None, "theme": None, "listed": None})
     raise ValueError(market)

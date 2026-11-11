@@ -23,8 +23,8 @@ from datetime import datetime, timezone
 
 import numpy as np
 
-DIR = {"NSE": "data/scan/", "US": "data/scan/us/", "ASX": "data/scan/asx/"}
-MINPX = {"NSE": 100, "US": 10, "ASX": 20}   # no penny stocks (ASX A$20 floor, Amritpal 10 Nov 2026)
+DIR = {"NSE": "data/scan/", "US": "data/scan/us/", "ASX": "data/scan/asx/", "UK": "data/scan/uk/"}
+MINPX = {"NSE": 100, "US": 10, "ASX": 20, "UK": 100}   # UK in pence   # no penny stocks (ASX A$20 floor, Amritpal 10 Nov 2026)
 MAX_LATE = 0.10        # skip ATH breakouts already > 10% above the entry
 MAX_BELOW = 0.05       # ... or > 5% back below it (failing breakout; not what the backtest bought)
 TOP = 10
@@ -48,12 +48,12 @@ def buckets(mk):
     B = [dict(key="mom", name="Momentum Investing", system="Monthly ATH", status="active", pct=60,
               rules="Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high. "
                     "Stop: weekly close below the 30-week SMA, raised every week until it triggers.",
-              test="NSE 2017-26 alone: 17.3%/yr, worst fall -16.8%." if india else "US/ASX 2008-26: did not beat the index (paper phase)."),
+              test="NSE 2017-26 alone: 17.3%/yr, worst fall -16.8%." if india else "US/ASX 2008-26: did not beat the index (paper phase)." if mk in ("US", "ASX") else "UK: not backtested yet (paper phase)."),
          dict(key="tf", name="Trend Following 9/21", system=TF_SYS, status="active", pct=40,
               rules="Same monthly breakout with a 1-2 year cup. Stop for sizing: EMA 21 (min 4% under the entry); "
                     "exit when a daily close has EMA 9 below EMA 21 (sell next open).",
               test="NSE 2017-26 alone 10.5%/yr, worst fall -15.6%; with Momentum (60/40, one account) 23.1%/yr, -21.4%." if india
-                   else "Not tested on US/ASX yet (paper record tracks it)."),
+                   else "Not tested on this market yet (paper record tracks it)."),
          dict(key="t9", name="9/21 Trend (any stock)", system="9/21 trend", status="off", pct=0,
               rules="Daily EMA 9 crosses above EMA 21 on a stock in an uptrend; stop = 5-day low (max 12%); exit on Supertrend(10,3) red.",
               test="Off: in the full one-account test it adds about 1.7 points a year but deepens the worst fall from -21% to -28% "
@@ -70,7 +70,7 @@ def buckets(mk):
               test=("NSE 2017-26: +4.9% a trade (221 trades, 37% win), robust across rule variants; added to Momentum + Trend it gave "
                     "24.2-24.7%/yr vs 23.1% with a similar worst fall and nothing extra in 2022-26, so it is a watch bucket - your call.") if india
                    else ("US 2008-26: +2.0% a trade (396 trades, 36% win); alone 8.5-8.9%/yr in 2017-26 vs the S&P 500 13.3%, weak 2008-16. "
-                         "Weaker than NSE - watch bucket, your call." if mk == "US" else
+                         "Weaker than NSE - watch bucket, your call." if mk == "US" else "UK: not backtested yet - watch only." if mk == "UK" else
                          "ASX 2008-26: about 3 setups a year (56 trades, +1.8% a trade) - too few to trust. Watch bucket - your call.")),
          dict(key="s1", name="System 1", status="off", pct=0, rules="Weekly RSI system (rules kept privately).",
               test="Off on NSE: below the Nifty in every version tested; a US paper candidate."),
