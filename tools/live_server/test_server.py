@@ -496,3 +496,12 @@ def test_alerts(tmp_path):
         pass
     s = c.post("/api/push/subscribe", headers=h, json={"subscription": {"endpoint": "https://x.example/1", "keys": {"p256dh": "a", "auth": "b"}}}).json()
     assert s["devices"] == 1 and c.get("/api/alerts").status_code in (401, 403)
+
+
+def test_held_map_same_day_buy_not_doubled():
+    import app
+    acc = dict(holdings=[dict(symbol="PFC", qty=265), dict(symbol="RECLTD", qty=297)],
+               positions=[dict(symbol="PFC", qty=265, product="DELIVERY", ltp=340), dict(symbol="RECLTD", qty=297, product="CNC", ltp=310),
+                          dict(symbol="NEW", qty=10, product="DELIVERY", ltp=100), dict(symbol="INTRA", qty=5, product="INTRADAY", ltp=50)])
+    h = app.held_map(acc)
+    assert h == {"PFC": 265, "RECLTD": 297, "NEW": 10, "INTRA": 5}

@@ -369,6 +369,22 @@ def _protect(sym, e):
             alert("nostop", sym, f"Protective stop could NOT be placed on Angel ({str(ex)[:80]}). Place it in the Angel app.", key=f"nostop:{sym}:{ist_now().date()}")
 
 
+def held_map(acc, held=None):
+    """Shares held per symbol. 11 Nov 2026: Angel lists a same-day delivery buy in BOTH the holdings (T1) and the position
+    book; adding the two doubled the quantity, and the protective GTT for PFC / RECLTD went on for twice the shares.
+    A delivery position now adds only what the holdings don't already show; intraday positions (net qty) still add."""
+    held = dict(held if held is not None else {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0})
+    base = dict(held)
+    for p in acc["positions"]:
+        q = p["qty"]
+        if str(p.get("product")).upper() in ("DELIVERY", "CNC") and q > 0:
+            extra = max(0, q - base.get(p["symbol"], 0)); base[p["symbol"]] = max(0, base.get(p["symbol"], 0) - q)
+            held[p["symbol"]] = held.get(p["symbol"], 0) + extra
+        else:
+            held[p["symbol"]] = held.get(p["symbol"], 0) + q
+    return held
+
+
 def sync(acc=None):
     """Match journal entries to Angel's order book and holdings:
     pending buy -> filled (real price/qty, then the GTT stop) / rejected / cancelled;
@@ -382,13 +398,23 @@ def sync(acc=None):
         log("sync_error", error=str(ex)[:200]); return J
     acc = acc or broker.account()
     held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
-    for p in acc["positions"]:
-        held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
+    held = held_map(acc, held)
     today = ist_now().date().isoformat(); changed = False
     for sym, e in list(J.items()):
         st = e.get("state", "open")
         o = book.get(str(e.get("order_id"))) if st in ("pending", "exiting") else None
         stat = str((o or {}).get("status", "")).lower()
+        if st == "open" and e.get("qty") and 0 < held.get(sym, 0) < e["qty"]:
+            # 11 Nov 2026: a stop sized for more shares than you hold (same-day buys were counted twice) -> resize it
+            old = e["qty"]; e["qty"] = int(held[sym]); changed = True; log("qty_fix", symbol=sym, old=old, new=e["qty"])
+            if e.get("gtt_id") and e.get("gtt_trigger"):
+                try:
+                    gid, _p = broker.gtt_modify(e["gtt_id"], sym, e["qty"], e["gtt_trigger"], e["gtt_trigger"] * (1 - GTT_LIMIT_GAP))
+                    e["gtt_id"] = gid; log("gtt_resized", symbol=sym, qty=e["qty"])
+                except Exception as ex:  # noqa: BLE001
+                    log("gtt_error", symbol=sym, error=str(ex)[:200])
+                    alert("nostop", sym, f"Stop GTT is for {old} shares but you hold {e['qty']}; resize failed ({str(ex)[:60]}). Edit it in Angel.",
+                          key=f"qtyfix:{sym}:{today}")
         if st == "pending" and o:
             if stat == "complete" or (stat in ("cancelled", "rejected") and (o.get("filled") or 0) > 0):
                 e.update(state="open", entry=float(o.get("avg") or e["entry"]), qty=int(o.get("filled") or e["qty"]), filled=today)
@@ -429,8 +455,7 @@ def sync(acc=None):
 def retry_protect():
     """place any missing protective stop now (open trades still held, no GTT yet)."""
     J = journal(); acc = broker.account(); held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
-    for p in acc["positions"]:
-        held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
+    held = held_map(acc, held)
     done = []
     for sym, e in J.items():
         if not sym.startswith("_") and e.get("state") == "open" and not e.get("gtt_id") and held.get(sym, 0) > 0:
@@ -792,8 +817,7 @@ def sized(acc=None):
     J = sync(acc)
     G = guard(acc)
     held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
-    for p in acc["positions"]:
-        held[p["symbol"]] = held.get(p["symbol"], 0) + p["qty"]
+    held = held_map(acc, held)
     sys_open = [s for s in J if not s.startswith("_") and (held.get(s, 0) > 0 or J[s].get("state") == "pending")]
     acct = CAPITAL or acc["net"]
     try:
