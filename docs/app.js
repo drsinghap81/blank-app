@@ -4195,6 +4195,22 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
   let back = null; try { back = sessionStorage.getItem('td.reopen'); sessionStorage.removeItem('td.reopen'); } catch (e) { /* */ }
   if (modeNow() === 'beginner') bgShow('today'); else if (!modeNow()) bgShow('welcome'); else show(back && document.getElementById('view-' + back) ? back : 'today');
 }
+/* 12 Nov 2026: new-version check. An app opened from the home screen resumes without reloading, so it never noticed
+   updates. On start and whenever it comes back to the screen, read the live index.html; if its app.js version is newer
+   than the one running, show a bar to load it (one tap, same tab). */
+const TD_VER = +((document.querySelector('script[src*="app.js?v="]') || {}).src || '').split('v=')[1] || 0;
+async function tdVerCheck() {
+  try {
+    const t = await fetch('index.html?ts=' + Date.now(), { cache: 'no-store' }).then((r) => r.text());
+    const v = +((t.match(/app\.js\?v=(\d+)/) || [])[1] || 0);
+    if (v > TD_VER && !document.getElementById('tdupd')) {
+      document.body.insertAdjacentHTML('beforeend', '<button id="tdupd" class="td-upd">New version ready · tap to update</button>');
+      document.getElementById('tdupd').addEventListener('click', () => { const b = document.getElementById('btn-refresh'); if (b) b.click(); else location.reload(); });
+    }
+  } catch (e) { /* offline */ }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') tdVerCheck(); });
+setTimeout(tdVerCheck, 4000);
 /* 12 Nov 2026: refresh button — fetch the newest app version and fresh data without closing the app; stays on the same tab */
 { const b = document.getElementById('btn-refresh');
   if (b) b.addEventListener('click', async () => {
