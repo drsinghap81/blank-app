@@ -3678,9 +3678,12 @@ async function tdTrack(box, mk) {
 }
 /* Trading 212 pies (US ETFs, Australian account) — month-end targets from tools/pies.py; the server alerts on a change */
 async function tdPies(box) {
-  if (!box) return; const D = await getJSON(MAIN + 'data/scan/us/pies.json', 'pies'); if (!D || !D.pies) { box.innerHTML = ''; return; }
+  if (!box) return; const D0 = await getJSON(MAIN + 'data/scan/us/pies.json', 'pies'); if (!D0 || !D0.pies) { box.innerHTML = ''; return; }
+  let ver = 'au'; try { ver = localStorage.getItem('td.pieVer') || 'au'; } catch (e) { /* */ }
+  const D = ver === 'uk' && D0.uk ? D0.uk : D0;
+  const seg = D0.uk ? `<div class="seg pie-seg" role="tablist" aria-label="Trading 212 account">${[['au', 'Trading 212 AU · US ETFs'], ['uk', 'Trading 212 UK ISA · UCITS']].map(([k, n]) => `<button data-piever="${k}" aria-selected="${k === ver}">${n}</button>`).join('')}</div>` : '';
   const chips = (L) => L.map((x) => `<span class="pie-h"><b>${esc(x.ticker)}</b> ${fmt(x.pct, x.pct % 1 ? 1 : 0)}%${x.name ? `<small>${esc(x.name)}</small>` : ''}</span>`).join('');
-  box.innerHTML = D.pies.map((p) => { const cum = (p.record || []).reduce((a, x) => a * (1 + x[1] / 100), 1);
+  box.innerHTML = seg + D.pies.map((p) => { const cum = (p.record || []).reduce((a, x) => a * (1 + x[1] / 100), 1);
     return `<details class="td-risk pie" ${p.changed ? 'open' : ''}><summary><span><b>🥧 ${esc(p.title)}</b><small>${esc(D.broker)} · decided ${day(p.decided)}${p.changed ? ' · <em class="pie-new">changed: rebalance</em>' : ' · no change'}</small></span></summary>
       <div class="pie-hold">${chips(p.hold)}</div>
       ${p.changed && p.before && p.before.length ? `<p class="muted td-rs">Was: ${p.before.map((x) => `${esc(x.ticker)} ${fmt(x.pct, 0)}%`).join(' · ')}</p>` : ''}
@@ -3688,6 +3691,7 @@ async function tdPies(box) {
       <p class="lv-sub">${esc(p.rule)}</p><p class="lv-sub"><b>Tested:</b> ${esc(p.test)}</p>
       <p class="lv-sub"><b>Live record:</b> ${p.record && p.record.length ? `${p.record.length} month${p.record.length > 1 ? 's' : ''}, ${cum >= 1 ? '+' : ''}${fmt((cum - 1) * 100, 1)}% · ${p.record.slice(-6).map((x) => `${day(x[0])} ${x[1] >= 0 ? '+' : ''}${fmt(x[1], 1)}%`).join(' · ')}` : 'starts after the first full month (from November 2026)'}</p></details>`; }).join('')
     + `<p class="bg-fine">${esc(D.note)}</p>`;
+  box.querySelectorAll('[data-piever]').forEach((b) => b.addEventListener('click', () => { try { localStorage.setItem('td.pieVer', b.dataset.piever); } catch (e) { /* */ } tdPies(box); }));
 }
 async function loadToday() { $('#title').textContent = 'Today'; return tdRender($('#view-today'), false); }
 async function tdRender(el, beginner) {

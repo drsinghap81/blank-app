@@ -803,3 +803,4 @@ body.pub .owner-only { display: none !important; }
 .pie-new { color: var(--saffron); font-style: normal; font-weight: 700; }
 .pie-hold { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 6px; }
 .pie-h { background: var(--soft); border-radius: 14px; padding: 8px 12px; display: flex; flex-direction: column; font-size: 15px; } .pie-h small { color: var(--slate); font-size: 11.5px; }
+.pie-seg { flex-wrap: wrap; margin: 4px 0 0; }

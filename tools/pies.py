@@ -25,6 +25,19 @@ ETF_NM = {"GDX": "Gold miners", "IAI": "Brokers & exchanges", "IGV": "Software",
           "XLK": "Technology", "XLP": "Consumer staples", "XLRE": "Real estate", "XLU": "Utilities", "XLV": "Health care",
           "XLY": "Consumer discretionary", "XME": "Metals & mining", "XOP": "Oil & gas", "XRT": "Retail"}
 SLOTS, BASE = 3, 12
+# UK (Trading 212 ISA) can't buy US-listed ETFs: UK-listed UCITS twins of the same indices. Sector pie limited to the sectors
+# and industries with a UCITS twin (retest 11 Nov 2026: 9.8%/yr, -20.0%; 70/30 with the rotation 10.8%, -16.0%).
+ETF_UK = ["XLB", "XLC", "XLE", "XLF", "XLI", "XLK", "XLP", "XLU", "XLV", "XLY", "SMH", "XBI", "GDX"]
+UCITS = {"VOO": ("VUAG", "Vanguard S&P 500 UCITS (Acc)"), "QQQ": ("EQQQ", "Invesco EQQQ Nasdaq-100 UCITS"),
+         "MDY": ("SPY4", "SPDR S&P 400 US Mid Cap UCITS"), "IWM": ("R2US", "SPDR Russell 2000 US Small Cap UCITS"),
+         "SGOV": ("CSH2", "Amundi Smart Overnight Return GBP (cash)"),
+         "XLB": ("SXLB", "SPDR US Materials Select Sector UCITS"), "XLC": ("SXLC", "SPDR US Communication Services Select Sector UCITS"),
+         "XLE": ("SXLE", "SPDR US Energy Select Sector UCITS"), "XLF": ("SXLF", "SPDR US Financials Select Sector UCITS"),
+         "XLI": ("SXLI", "SPDR US Industrials Select Sector UCITS"), "XLK": ("SXLK", "SPDR US Technology Select Sector UCITS"),
+         "XLP": ("SXLP", "SPDR US Consumer Staples Select Sector UCITS"), "XLU": ("SXLU", "SPDR US Utilities Select Sector UCITS"),
+         "XLV": ("SXLV", "SPDR US Health Care Select Sector UCITS"), "XLY": ("SXLY", "SPDR US Consumer Discretionary Select Sector UCITS"),
+         "SMH": ("SMGB", "VanEck Semiconductor UCITS"), "XBI": ("BTEK", "iShares Nasdaq US Biotechnology UCITS (close twin)"),
+         "GDX": ("GDGB", "VanEck Gold Miners UCITS")}
 COST = 0.0015
 
 
@@ -36,7 +49,8 @@ def load():
     return px[px.index >= "2004-01-01"]
 
 
-def decide(px):
+def decide(px, etf=None):
+    ETF_ = etf or ETF
     """Month-end targets for both pies, from 2007 to the last COMPLETED month (and a provisional view of this month)."""
     M = px.resample("ME").last(); lastday = px.index[-1]
     complete = pd.offsets.BMonthEnd().rollforward(lastday).normalize() == lastday.normalize()   # data reaches the month's last session
@@ -45,16 +59,16 @@ def decide(px):
     Ms = sma.resample("ME").last(); Mu = up.resample("ME").last()
 
     def run(M_):
-        m3 = M_[list(IDX)].pct_change(3); rs6 = M_[ETF].pct_change(6).sub(M_["^GSPC"].pct_change(6), axis=0)
-        hi = M_[ETF].cummax().shift(1); ma10 = M_["^GSPC"].rolling(10).mean()
-        last = pd.Series(np.nan, index=ETF); hold = []; rot, sec = {}, {}
+        m3 = M_[list(IDX)].pct_change(3); rs6 = M_[ETF_].pct_change(6).sub(M_["^GSPC"].pct_change(6), axis=0)
+        hi = M_[ETF_].cummax().shift(1); ma10 = M_["^GSPC"].rolling(10).mean()
+        last = pd.Series(np.nan, index=ETF_); hold = []; rot, sec = {}, {}
         for k, d in enumerate(M_.index):
             age = k - last
-            nh = M_[ETF].loc[d] >= M_[ETF].iloc[:k + 1].max(); last[nh.fillna(False)] = k
+            nh = M_[ETF_].loc[d] >= M_[ETF_].iloc[:k + 1].max(); last[nh.fillna(False)] = k
             s = m3.loc[d].dropna().sort_values(ascending=False)
             rot[d] = {IDX[s.index[0]]: 1.0} if len(s) and s.iloc[0] > 0 else {"SGOV": 1.0}
             hold = [e for e in hold if pd.notna(M_.loc[d, e]) and M_.loc[d, e] > Ms.loc[d, e]]
-            cand = [e for e in ETF if e not in hold and pd.notna(hi.loc[d, e]) and M_.loc[d, e] > hi.loc[d, e] and age[e] >= BASE
+            cand = [e for e in ETF_ if e not in hold and pd.notna(hi.loc[d, e]) and M_.loc[d, e] > hi.loc[d, e] and age[e] >= BASE
                     and bool(Mu.loc[d, e]) and M_.loc[d, e] > Ms.loc[d, e] and pd.notna(rs6.loc[d, e]) and rs6.loc[d, e] > 0]
             for e in sorted(cand, key=lambda e: -rs6.loc[d, e])[: max(0, SLOTS - len(hold))]:
                 hold.append(e)
@@ -96,13 +110,23 @@ def main():
                     changed=now != before, before=[dict(ticker=k, pct=round(v * 100, 1)) for k, v in before.items()],
                     provisional=[dict(ticker=k, pct=round(v * 100, 1)) for k, v in P[max(P)].items()] if P[max(P)] != now else None,
                     record=perf(M, W, start))
+    _, done_u, rot_u, sec_u, (prot_u, psec_u) = decide(px, ETF_UK)
+
+    def uk(card_):
+        tr = lambda L: [dict(x, ticker=UCITS.get(x["ticker"], (x["ticker"],))[0], us=x["ticker"], name=UCITS.get(x["ticker"], (None, x.get("name")))[1] or x.get("name")) for x in (L or [])]  # noqa: E731
+        return dict(card_, hold=tr(card_["hold"]), before=tr(card_["before"]), provisional=tr(card_["provisional"]) if card_["provisional"] else None)
+    uk_pies = [uk(card("rotation", "US index rotation", "Each month-end: hold the best one of the S&P 500 / Nasdaq 100 / S&P MidCap 400 / Russell 2000 UCITS ETFs by 3-month return; GBP cash ETF if none is up.",
+                       "2008-26 (US$, same signals): 11.1%/yr, worst fall -15.5%. In GBP the returns also move with GBP/USD.", rot_u, prot_u)),
+               uk(card("sectors", "US sector breakouts", f"Up to {SLOTS} of the 10 US sectors + semiconductors, biotech and gold miners (the ones with UCITS twins) with a monthly cup breakout ({BASE}+ month base), rising 30-week SMA and 6-month RS > 0; each kept until a month-end close below its 30-week SMA. Empty slots: the S&P 500 while it is above its 10-month average, else the cash ETF.",
+                       "2008-26 (US$): 9.8%/yr, worst fall -20.0%; 70% rotation + 30% this pie: 10.8%, -16.0%.", sec_u, psec_u))]
     out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(px.index[-1].date()), broker="Trading 212 (Australia)",
                note="Rebalance on the first trading day after the month-end decision. FX fee 0.15% each way on Trading 212 AU. "
                     "Pies have no stop-loss: the month-end check is the exit.",
                pies=[card("rotation", "US index rotation", "Each month-end: hold the best one of VOO / QQQ / MDY / IWM by 3-month return; SGOV (cash) if none is up.",
                           "2008-26: 11.4%/yr, worst fall -15.2% (S&P 500: 9.1%, -47.5%). Price-only series; ETFs add dividends.", rot, prot),
                      card("sectors", "US sector breakouts", f"Up to {SLOTS} sector/industry ETFs with a monthly cup breakout ({BASE}+ month base), rising 30-week SMA and 6-month RS > 0; each kept until a month-end close below its 30-week SMA. Empty slots: VOO while the S&P 500 is above its 10-month average, else SGOV.",
-                          "2008-26: 9.9%/yr, worst fall -21.9% (S&P 500: 9.1%, -47.5%).", sec, psec)])
+                          "2008-26: 9.9%/yr, worst fall -21.9% (S&P 500: 9.1%, -47.5%).", sec, psec)],
+               uk=dict(broker="Trading 212 UK (ISA)", note="UK-listed UCITS twins of the same indices (US-listed ETFs can't be bought from a UK account). Search each fund by name in Trading 212 to confirm the line; GBP lines avoid the FX fee on purchase. Rebalance on the first trading day after the month-end decision.", pies=uk_pies))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(out, open(OUT, "w"), indent=0)
     print("pies:", [(p["key"], p["hold"], p["changed"]) for p in out["pies"]])
