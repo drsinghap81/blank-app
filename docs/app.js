@@ -4192,7 +4192,17 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
   let used = false; try { used = Object.keys(localStorage).some((k) => /^td[._]/.test(k) && k !== 'td.theme'); } catch (e) { /* private mode */ }
   if (!modeNow() && used) setMode('pro');
   applyMode();
-  if (modeNow() === 'beginner') bgShow('today'); else if (!modeNow()) bgShow('welcome'); else show('today');
+  let back = null; try { back = sessionStorage.getItem('td.reopen'); sessionStorage.removeItem('td.reopen'); } catch (e) { /* */ }
+  if (modeNow() === 'beginner') bgShow('today'); else if (!modeNow()) bgShow('welcome'); else show(back && document.getElementById('view-' + back) ? back : 'today');
+}
+/* 12 Nov 2026: refresh button — fetch the newest app version and fresh data without closing the app; stays on the same tab */
+{ const b = document.getElementById('btn-refresh');
+  if (b) b.addEventListener('click', async () => {
+    b.classList.add('spin'); b.disabled = true;
+    try { sessionStorage.setItem('td.reopen', state.view || 'today'); } catch (e) { /* */ }
+    try { const r = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration() : null; if (r) await Promise.race([r.update(), new Promise((ok) => setTimeout(ok, 3000))]); } catch (e) { /* offline: reload anyway */ }
+    location.reload();
+  });
 }
 
 /* live prices: start the feed and re-tag rows whenever a list redraws */

@@ -915,3 +915,5 @@ body.pub .owner-only { display: none !important; }
 .slt-foot span:only-child{white-space:normal}
 .td-card.td-held{opacity:.62}
 .td-heldd .td-list{margin-top:10px}
+#btn-refresh.spin svg{animation:tdspin .8s linear infinite}
+@keyframes tdspin{to{transform:rotate(360deg)}}
