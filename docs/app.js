@@ -1799,7 +1799,7 @@ function plan921(r) {
 /* market of the ATH section (India / US / Australia) */
 const AM = () => { if (!state.athMkt) { try { state.athMkt = localStorage.getItem('td_athmkt') || 'NSE'; } catch (e) { state.athMkt = 'NSE'; } } return state.athMkt; };
 const WATCH = {
-  UK: 'UK (FTSE 350) runs the same India rules but has not been backtested yet, so nothing here is a tested signal. Prices are in pence (GBX); use the list for ideas only.',
+  UK: 'Backtested 2008–26 with the India rules on today’s FTSE 350 (survivorship flatters it): the monthly-ATH system made about 1% a year (worst fall −38%) and lost about 2% a year from 2017, while the FTSE 100 made 2.8% (4.2% from 2017) before dividends. No edge — ideas only. Prices in pence (GBX).',
   US: 'Backtested 2008–26 with the India rules on US stocks: the monthly-ATH system made 1–3% a year (worst fall about −30%) while the S&P 500 made 9–13%; IPO cups 2–4%; none of the top-down levels (world, market trend, sector, industry, stock RS) improved it. Use the lists for ideas, not as a system.',
   ASX: 'Backtested 2008–26 with the India rules: with the A$30 price floor there are only ~2 signals a year (too few to trade). With an A$1 floor the ATH system made 4–5% a year, worst fall −16% (ASX 200 2–5% price only, about 6–9% with dividends); IPO cups ~1%; the top-down levels did not help. Use the lists for ideas, not as a system.' };
 const NOTE_G = {

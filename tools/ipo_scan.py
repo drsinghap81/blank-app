@@ -35,15 +35,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 MARKET = (sys.argv[1] if len(sys.argv) > 1 else "NSE").upper()   # NSE (default), US, ASX (added 5 Nov 2026)
 OUT = "data/scan" if MARKET == "NSE" else f"data/scan/{MARKET.lower()}"
 CH = f"{OUT}/ipo_charts"
-MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6}[MARKET]            # Rs 2 cr / $5 m / A$1 m a day
-UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6}[MARKET]
-MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0}[MARKET]     # no penny stocks
+MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6, "UK": 1e8}[MARKET]            # Rs 2 cr / $5 m / A$1 m a day
+UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6, "UK": 1e8}[MARKET]
+MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0, "UK": 100.0}[MARKET]     # no penny stocks
 MAX_AGE_M = 36          # listed within the last 3 years
 BASE_DAYS = 20          # post-listing high at least 20 trading days old
 DEPTH = 0.15            # cup at least 15% deep (closing basis)
 NEAR = 0.05
 SMA_W = 10
-MIN_FIRST_DAY = {"NSE": 3e8, "US": 2.5e7, "ASX": 5e6}[MARKET]  # listing-day turnover (Rs 30 cr / $25 m / A$5 m) >= Rs 30 cr: true IPOs (the backtest filter); SME/BSE migrations and most
+MIN_FIRST_DAY = {"NSE": 3e8, "US": 2.5e7, "ASX": 5e6, "UK": 5e8}[MARKET]  # listing-day turnover (Rs 30 cr / $25 m / A$5 m) >= Rs 30 cr: true IPOs (the backtest filter); SME/BSE migrations and most
                         # demerger listings trade far less on their first NSE day              # exit: weekly close below the 10-week SMA
 
 
@@ -183,7 +183,7 @@ def main():
     from trend_scan import telegram
     os.makedirs(CH, exist_ok=True)
     from zoneinfo import ZoneInfo
-    today = datetime.now(timezone.utc).astimezone(ZoneInfo({"NSE": "Asia/Kolkata", "US": "America/New_York", "ASX": "Australia/Sydney"}[MARKET])).date()
+    today = datetime.now(timezone.utc).astimezone(ZoneInfo({"NSE": "Asia/Kolkata", "US": "America/New_York", "ASX": "Australia/Sydney", "UK": "Europe/London"}[MARKET])).date()
     global SEC, BENCH
     try:
         from sector_state import load_bench, stock_rs

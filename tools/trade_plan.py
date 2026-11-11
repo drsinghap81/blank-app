@@ -48,7 +48,7 @@ def buckets(mk):
     B = [dict(key="mom", name="Momentum Investing", system="Monthly ATH", status="active", pct=60,
               rules="Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high. "
                     "Stop: weekly close below the 30-week SMA, raised every week until it triggers.",
-              test="NSE 2017-26 alone: 17.3%/yr, worst fall -16.8%." if india else "US/ASX 2008-26: did not beat the index (paper phase)." if mk in ("US", "ASX") else "UK: not backtested yet (paper phase)."),
+              test="NSE 2017-26 alone: 17.3%/yr, worst fall -16.8%." if india else "US/ASX 2008-26: did not beat the index (paper phase)." if mk in ("US", "ASX") else "UK 2008-26: about 1%/yr vs the FTSE 100 2.8% (price) - no edge (paper phase)."),
          dict(key="tf", name="Trend Following 9/21", system=TF_SYS, status="active", pct=40,
               rules="Same monthly breakout with a 1-2 year cup. Stop for sizing: EMA 21 (min 4% under the entry); "
                     "exit when a daily close has EMA 9 below EMA 21 (sell next open).",
