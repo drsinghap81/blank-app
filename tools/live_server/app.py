@@ -1681,7 +1681,7 @@ def _start():
     if ENV.get("MOCK_BROKER") != "1":
         import threading
         threading.Thread(target=_loop, daemon=True).start()
-        if ENV.get("RESEARCH_AUTO", "1") == "1":          # the ORB download/test runs once (resumes after restarts), quiet hours only
+        if ENV.get("RESEARCH_AUTO", "0") == "1":          # 11 Nov 2026: research test removed at Amritpal's request (off unless RESEARCH_AUTO=1)
             try:
                 j = research_job()
                 import research as _r
