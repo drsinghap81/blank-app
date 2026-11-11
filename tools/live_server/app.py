@@ -869,7 +869,9 @@ def sized(acc=None):
                 r["skip"] = "paused: losing streak (guard)"
     trades, recent = trades_view(J, acc)
     real = round(acc["cash"] + (acc.get("holdings_value") or 0) + (acc.get("positions_value") or 0), 2)
-    return dict(real_value=real, equity=equity_log(real), holdings=[dict(symbol=h["symbol"], qty=h["qty"], ltp=h.get("ltp"), avg=h.get("avg"),
+    brk = dict(cash=round(acc["cash"], 2), holdings=round(acc.get("holdings_value") or 0, 2), todays_buys=round(acc.get("positions_value") or 0, 2),
+               rms=acc.get("rms"))                       # 11 Nov 2026: the parts of the account value, shown under the total in Live
+    return dict(real_value=real, value_parts=brk, equity=equity_log(real), holdings=[dict(symbol=h["symbol"], qty=h["qty"], ltp=h.get("ltp"), avg=h.get("avg"),
                 value=round(h["qty"] * (h.get("ltp") or 0), 2)) for h in acc["holdings"] if h["qty"] > 0], guard=G, asof=P.get("asof"), generated=P.get("generated"), capital=cap, cash=cash, slots=slots, sys_open=sys_open, picks=N, risk_pct=round(RK * 100, 2), account_value=acct, capital_set=app_cap or None,
                 buckets=[dict(key=k, pct=AL[k], used=round(expo.get(k, 0.0)), room=round(max(0.0, room.get(k, 0.0)))) for k in AL],
                 swing=dict(risk_pct=round(SR * 100, 2), slots=sw_slots, max=SWING_MAX, open=len(sw_open), idle_cash=round(sw_cash), reserve_pct=SWING_RESERVE * 100),

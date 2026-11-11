@@ -124,6 +124,9 @@ class AngelEquity:
                   product=p.get("producttype"), ltp=float(p.get("ltp") or 0)) for p in pos if p.get("exchange") == "NSE"]
         cash = float(f.get("availablecash") or 0)
         return dict(broker="Angel One", cash=cash, net=float(f.get("net") or cash), holdings=H, positions=P,
+                    rms=dict(availablecash=cash, net=float(f.get("net") or 0), collateral=float(f.get("collateral") or 0),
+                             utiliseddebits=float(f.get("utiliseddebits") or 0), m2munrealized=float(f.get("m2munrealized") or 0),
+                             utilisedspan=float(f.get("utilisedspan") or 0), availablelimitmargin=float(f.get("availablelimitmargin") or 0)),
                     holdings_value=sum(h["qty"] * h["ltp"] for h in H),
                     positions_value=self._pos_value(H, P))
 

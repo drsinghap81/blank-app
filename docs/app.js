@@ -165,6 +165,9 @@ function lvHero(S, PF) {
   const inSys = val ? Math.round(sysV / val * 100) : 0;
   return `<div class="lv-card hero"><span class="muted">${real ? 'Your Angel account' : 'Account value (server update pending)'}</span>
     <div class="hero-big">${money(val, 'NSE')}</div>
+    ${S.value_parts ? (() => { const V = S.value_parts, R = V.rms || {};
+      return `<details class="hero-parts"><summary>= Cash ${lakh(V.cash)} + Holdings ${lakh(V.holdings)}${V.todays_buys > 0 ? ` + Today's buys ${lakh(V.todays_buys)}` : ''}</summary>
+        <p class="lv-sub">From Angel's Funds (RMS): available cash ${lakh(R.availablecash || 0)}${R.collateral ? ` · collateral from pledged shares ${lakh(R.collateral)}` : ''}${R.net ? ` · net margin ${lakh(R.net)}` : ''}${R.utiliseddebits ? ` · used ${lakh(R.utiliseddebits)}` : ''}. Holdings = shares × Angel's last price. If Angel's Funds screen shows a smaller cash figure, tell me which number it shows.</p></details>`; })() : ''}
     <div class="hero-line">${badge}${today == null ? '' : `<span class="muted">· today <b class="${today >= 0 ? 'up' : 'down'}">${rs(today)}</b></span>`}</div>
     ${Ev.length >= 2 ? curveSVG(Ev, Ev[Ev.length - 1][1] >= Ev[0][1]) + `<div class="hero-rng">${['1M', '3M', '1Y', 'All'].map((k) => `<button data-rng="${k}" aria-pressed="${k === rng}">${k}</button>`).join('')}</div>`
       : `<p class="lv-sub">Your value curve builds from here, one point each day${real ? '' : ' once your server takes today\'s update'}.</p>`}
