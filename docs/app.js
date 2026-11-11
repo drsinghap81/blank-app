@@ -1000,8 +1000,8 @@ async function loadLive() {
     if (!/^https:\/\/[^\s/]+\.[^\s/]+/i.test(url)) { alertMsg('Server address missing or wrong: use the https:// address the setup script printed (yours ends in .sslip.io).'); return; }
     if (!pw) { alertMsg('Enter your app password.'); return; }
     lvSave({ url, token: null }); go.disabled = true; go.textContent = 'Connecting…';
-    try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }), timeout: 15000 }); lvSave({ token: j.token }); toast('Connected'); loadLive(); }
-    catch (e) { alertMsg(e.name === 'AbortError' ? 'The server did not answer in 15 seconds. Check your internet, then try again.' : /fetch|network|load/i.test(e.message) ? `Could not reach ${url}. Check the address and your internet.` : e.message); go.disabled = false; go.textContent = 'Connect'; }
+    try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }), timeout: 45000 }); lvSave({ token: j.token }); toast('Connected'); loadLive(); }
+    catch (e) { alertMsg(e.name === 'AbortError' ? 'The server did not answer in 45 seconds — it may be busy with a long test. Try again in a minute.' : /fetch|network|load/i.test(e.message) ? `Could not reach ${url}. Check the address and your internet.` : e.message); go.disabled = false; go.textContent = 'Connect'; }
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
