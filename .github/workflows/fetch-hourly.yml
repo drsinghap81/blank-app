@@ -6,11 +6,14 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install -q yfinance pandas && python tools/fetch_hourly.py
+      - run: |
+          pip install -q yfinance pandas pyarrow
+          python tools/fetch_hourly.py 2>&1 | grep -v -i "warn\|delisted\|failed download\|possibly" | tail -20
       - run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan hourly-data; git rm -rq --cached .; git add -f hourly; git commit -qm hourly; git push -f origin hourly-data
+          B=hourly-nse; git checkout --orphan $B; git rm -rq --cached . ; git add -f hist; git commit -qm "$B"; git push -f origin $B
