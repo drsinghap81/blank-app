@@ -228,6 +228,22 @@ class AngelEquity:
             return str(d["id"]), p
         raise RuntimeError(f"{r.get('message') or r} [{r.get('errorcode') or '?'}]")
 
+    def gtt_oco(self, symbol, qty, target, stop, stop_limit):
+        """11 Nov 2026: Angel GTT OCO (1 year): SELL `qty` at the target OR at the stop, whichever comes first; the other leg is
+        cancelled. Target leg: trigger `target`, LIMIT 0.5% below (fills in a fast move). Stop leg: trigger `stop`, LIMIT
+        `stop_limit`. SmartAPI: gttType=OCO with stoplosstriggerprice / stoplossprice. Raises if Angel refuses it."""
+        api = self._session(); ts, t = self._ts(symbol); tick = t["tick"] or 0.05
+        rnd = lambda v: round(round(v / tick) * tick, 2)  # noqa: E731
+        p = dict(tradingsymbol=ts, symboltoken=str(t["token"]), exchange="NSE", producttype="DELIVERY", transactiontype="SELL",
+                 gttType="OCO", price=f"{rnd(target * 0.995):.2f}", triggerprice=f"{rnd(target):.2f}",
+                 stoplossprice=f"{rnd(stop_limit):.2f}", stoplosstriggerprice=f"{rnd(stop):.2f}",
+                 qty=str(int(qty)), disclosedqty=str(int(qty)), timeperiod="365")
+        r = self._call(api._postRequest, "api.gtt.create", dict(p), tries=1) or {}
+        d = r.get("data") or {}
+        if r.get("status") and d.get("id"):
+            return str(d["id"]), p
+        raise RuntimeError(f"{r.get('message') or r} [{r.get('errorcode') or '?'}]")
+
     def gtt_buy(self, symbol, qty, trigger, limit):
         """Angel GTT BUY (1 year): when the price reaches `trigger`, a LIMIT buy at `limit` goes in. Used for your own picks
         pushed to Live (10 Nov 2026). Sits on Angel's side, so it works even if this server is down."""
@@ -339,6 +355,11 @@ class MockBroker(AngelEquity):
 
     def gtt_cancel(self, rule_id, symbol):
         self.gtts[rule_id]["active"] = False; return {"status": True}
+
+    def gtt_oco(self, symbol, qty, target, stop, stop_limit):
+        self.gtts = getattr(self, "gtts", {}); gid = f"GTTO{len(self.gtts) + 1}"
+        self.gtts[gid] = dict(symbol=symbol, qty=qty, target=round(target, 2), trigger=round(stop, 2), price=round(stop_limit, 2), oco=True, active=True)
+        return gid, self.gtts[gid]
 
     def gtt_buy(self, symbol, qty, trigger, limit):
         self.gtts = getattr(self, "gtts", {}); gid = f"GTTB{len(self.gtts) + 1}"

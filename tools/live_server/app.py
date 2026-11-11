@@ -125,7 +125,8 @@ MAX_ORDERS_DAY = int(ENV.get("MAX_ORDERS_DAY", "10"))
 # a stop at the SMA would have hit 15% of trades (-5.5% each, most recovered); 15% below it hits ~1% (cost ~0.16%/trade).
 PROTECT = ENV.get("PROTECT_STOPS", "1") == "1"
 ATH_NET_PCT = float(ENV.get("ATH_NET_PCT", "15")) / 100
-GTT_LIMIT_GAP = float(ENV.get("GTT_LIMIT_GAP_PCT", "5")) / 100     # limit this far below the trigger so a fast fall still fills
+GTT_LIMIT_GAP = float(ENV.get("GTT_LIMIT_GAP_PCT", "5")) / 100
+MY_TARGET_R = float(ENV.get("MY_TARGET_R", "2"))      # 11 Nov 2026: default target for your own picks = 2 x (entry - stop) above entry     # limit this far below the trigger so a fast fall still fills
 TOKEN_SECRET = ENV.get("TOKEN_SECRET", "")
 PW_HASH = ENV.get("APP_PASSWORD_HASH", "")               # scrypt$<salt hex>$<hash hex>  (make with: python app.py hash)
 
@@ -359,6 +360,17 @@ def _protect(sym, e):
     if not (PROTECT and trig and e.get("qty")):
         return
     try:
+        tgt = e.get("target")
+        if tgt and tgt > trig:                      # 11 Nov 2026: your own picks get stop + target in one Angel GTT (OCO)
+            try:
+                gid, gp = broker.gtt_oco(sym, e["qty"], tgt, trig, trig * (1 - GTT_LIMIT_GAP))
+                e.update(gtt_id=gid, gtt_trigger=round(trig, 2), oco=True); e.pop("gtt_error", None); e.pop("oco_error", None)
+                log("gtt_oco", symbol=sym, gtt_id=gid, trigger=round(trig, 2), target=round(tgt, 2), qty=e["qty"])
+                return
+            except Exception as ex:  # noqa: BLE001   Angel refused the two-leg GTT: the stop goes on alone, you get told
+                e["oco_error"] = str(ex)[:160]; e["oco"] = False; log("gtt_oco_error", symbol=sym, error=str(ex)[:200])
+                alert("nostop", sym, f"Angel refused the stop + target GTT ({str(ex)[:60]}); the stop is placed alone. Set the target in Angel if you want it.",
+                      key=f"oco:{sym}:{ist_now().date()}")
         gid, gp = broker.gtt_stop(sym, e["qty"], trig, trig * (1 - GTT_LIMIT_GAP))
         e.update(gtt_id=gid, gtt_trigger=round(trig, 2)); e.pop("gtt_error", None)
         log("gtt", symbol=sym, gtt_id=gid, trigger=round(trig, 2), qty=e["qty"])
@@ -407,7 +419,12 @@ def sync(acc=None):
         if st == "open" and e.get("qty") and 0 < held.get(sym, 0) < e["qty"]:
             # 11 Nov 2026: a stop sized for more shares than you hold (same-day buys were counted twice) -> resize it
             old = e["qty"]; e["qty"] = int(held[sym]); changed = True; log("qty_fix", symbol=sym, old=old, new=e["qty"])
-            if e.get("gtt_id") and e.get("gtt_trigger"):
+            if e.get("gtt_id") and e.get("oco"):
+                try:
+                    broker.gtt_cancel(e["gtt_id"], sym); e.pop("gtt_id", None); _protect(sym, e); log("gtt_resized", symbol=sym, qty=e["qty"], oco=True)
+                except Exception as ex:  # noqa: BLE001
+                    log("gtt_error", symbol=sym, error=str(ex)[:200])
+            elif e.get("gtt_id") and e.get("gtt_trigger"):
                 try:
                     gid, _p = broker.gtt_modify(e["gtt_id"], sym, e["qty"], e["gtt_trigger"], e["gtt_trigger"] * (1 - GTT_LIMIT_GAP))
                     e["gtt_id"] = gid; log("gtt_resized", symbol=sym, qty=e["qty"])
@@ -440,9 +457,20 @@ def sync(acc=None):
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="sold", exit=px, ended=today); changed = True
         elif st == "open" and held.get(sym, 0) <= 0 and (e.get("gtt_id") or e.get("filled", today) < today):
             px = float(e.get("gtt_trigger") or 0) * (1 - GTT_LIMIT_GAP / 2) or e["entry"]
-            record_exit(sym, px); log("gone", symbol=sym, assumed_px=px)
-            alert("stop", sym, f"Stop hit or sold outside the app: {e.get('qty')} shares gone from Angel"
-                  + (f" (stop ₹{e['gtt_trigger']:,.2f})" if e.get("gtt_trigger") else "") + ".", key=f"stop:{sym}:{today}")
+            hit_tgt = False
+            if e.get("oco") and e.get("target") and e.get("gtt_trigger"):      # which leg of the stop + target GTT filled?
+                try:
+                    lt = broker.ltp(sym); hit_tgt = bool(lt) and lt >= (e["target"] + e["gtt_trigger"]) / 2
+                except Exception:  # noqa: BLE001
+                    pass
+                if hit_tgt:
+                    px = e["target"] * 0.9975
+            record_exit(sym, px); log("gone", symbol=sym, assumed_px=px, target=hit_tgt)
+            if hit_tgt:
+                alert("sold", sym, f"Target hit: {e.get('qty')} shares sold near ₹{e['target']:,.2f} (your stop + target GTT).", key=f"stop:{sym}:{today}")
+            else:
+                alert("stop", sym, f"Stop hit or sold outside the app: {e.get('qty')} shares gone from Angel"
+                      + (f" (stop ₹{e['gtt_trigger']:,.2f})" if e.get("gtt_trigger") else "") + ".", key=f"stop:{sym}:{today}")
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="stopped or sold outside the app", exit=px, ended=today); changed = True
     if changed:
         d = J.get("_done") or {}
@@ -731,7 +759,7 @@ def trades_view(J, acc):
         if px and e.get("stop") and e.get("entry") and e["entry"] > e["stop"]:
             R = round((px - e["entry"]) / (e["entry"] - e["stop"]), 2)
         out.append(dict(symbol=sym, system=e.get("system"), state=e.get("state", "open"), qty=e.get("qty"), entry=e.get("entry"),
-                        stop=e.get("stop"), ltp=px, R=R, since=e.get("since"), gtt_trigger=e.get("gtt_trigger"), gtt_id=e.get("gtt_id"),
+                        stop=e.get("stop"), ltp=px, R=R, since=e.get("since"), gtt_trigger=e.get("gtt_trigger"), gtt_id=e.get("gtt_id"), target=e.get("target"), oco=bool(e.get("oco")), oco_error=e.get("oco_error"), kind=e.get("kind"),
                         gtt_error=e.get("gtt_error"), order_status=e.get("order_status"), trail_prev=e.get("trail_prev"),
                         trail_level=e.get("trail_level"), trail_at=e.get("trail_at")))
     done = sorted((J.get("_done") or {}).items(), key=lambda kv: kv[1].get("ended", ""), reverse=True)[:5]
@@ -1033,8 +1061,10 @@ def order(body: Order, _=Depends(auth)):
             raise HTTPException(502, f"Angel rejected the GTT for {sym}: {angel_msg(e)}")
         log("gtt_buy", gtt_id=gid, **rec)
         J = journal()
+        mp0 = mypicks().get(sym) or {}; R0 = float(row["trigger"]) - float(row.get("stop") or 0)
         J[sym] = dict(since=t.date().isoformat(), system="My pick", kind="MY_GTT", stop=row.get("stop"), entry=float(row["trigger"]),
-                      qty=body.qty, order_id=None, gtt_buy_id=gid, state="pending")
+                      qty=body.qty, order_id=None, gtt_buy_id=gid, state="pending",
+                      target=round(float(mp0.get("target") or (float(row["trigger"]) + MY_TARGET_R * R0)), 2))
         save_journal(J)
         return dict(ok=True, mode="LIVE", sent=True, gtt_id=gid, order=gp, protect=prot,
                     msg="GTT buy placed on Angel (good for a year). When it fills, the protective GTT stop goes in at your stop.")
@@ -1105,6 +1135,7 @@ class MyPick(BaseModel):
     symbol: str
     trigger: float
     stop: float
+    target: float | None = None
     note: str = ""
     src: str = ""
     name: str = ""
@@ -1113,6 +1144,41 @@ class MyPick(BaseModel):
 @app.get("/api/mypicks")
 def get_mypicks(_=Depends(auth)):
     return dict(rows=list(mypicks().values()))
+
+
+class Target(BaseModel):
+    symbol: str
+    target: float = 0          # 0 = remove the target (stop only)
+    confirm: str = ""
+
+
+@app.post("/api/target")
+def set_target(body: Target, _=Depends(auth)):
+    """Stop + target (OCO) for an open trade outside the tested systems (11 Nov 2026). Momentum / Trend keep stop-only:
+    their tests sell on the system's line, and a fixed target cut returns. The old GTT is cancelled and a new one placed."""
+    sym = body.symbol.strip().upper(); J = journal(); e = J.get(sym)
+    if not e or e.get("state") != "open":
+        raise HTTPException(400, f"{sym} is not an open trade in the app")
+    if e.get("system") in TRAIL_SYS:
+        raise HTTPException(400, f"{sym} is in {e.get('system')}: its tested exit is the system line, so no fixed target")
+    if body.confirm.strip().upper() != f"TARGET {sym}":
+        raise HTTPException(400, f'confirm must be "TARGET {sym}"')
+    trig = protect_level(e.get("kind"), e.get("stop")) or e.get("gtt_trigger")
+    if body.target and not body.target > (e.get("entry") or 0) * 1.005:
+        raise HTTPException(400, "target must be above your buy price")
+    e["target"] = round(body.target, 2) if body.target else None
+    if not is_live():
+        save_journal(J); return dict(ok=True, mode="DRY RUN", msg=f"Dry run: {sym} would get stop {trig:.2f}" + (f" + target {body.target:.2f}" if body.target else " only"))
+    if e.get("gtt_id"):
+        try:
+            broker.gtt_cancel(e["gtt_id"], sym); log("gtt_cancel", symbol=sym, gtt_id=e["gtt_id"])
+        except Exception as ex:  # noqa: BLE001
+            raise HTTPException(502, f"couldn't cancel the old GTT on Angel: {angel_msg(ex)}")
+        e.pop("gtt_id", None)
+    e["gtt_tries"] = 0; _protect(sym, e); save_journal(J)
+    return dict(ok=bool(e.get("gtt_id")), mode="LIVE", oco=bool(e.get("oco")), gtt_id=e.get("gtt_id"), error=e.get("oco_error") or e.get("gtt_error"),
+                msg=(f"{sym}: stop {trig:.2f} + target {body.target:.2f} on Angel (one GTT, whichever hits first)" if e.get("oco")
+                     else f"{sym}: stop {trig:.2f} on Angel" + (f" (target refused: {e.get('oco_error')})" if e.get("oco_error") else "")))
 
 
 @app.post("/api/mypicks")
@@ -1125,8 +1191,11 @@ def add_mypick(body: MyPick, _=Depends(auth)):
     d = mypicks()
     if sym not in d and len(d) >= MY_MAX:
         raise HTTPException(400, f"at most {MY_MAX} picks - remove some first")
+    if body.target is not None and not body.target > body.trigger:
+        raise HTTPException(400, "target must be above the buy trigger")
     d[sym] = dict(symbol=sym, trigger=round(body.trigger, 2), stop=round(body.stop, 2), note=body.note[:120], src=body.src[:40],
-                  name=body.name[:60], added=ist_now().date().isoformat())
+                  name=body.name[:60], added=ist_now().date().isoformat(),
+                  target=round(body.target if body.target else body.trigger + MY_TARGET_R * (body.trigger - body.stop), 2))
     _save_mypicks(d); log("mypick_add", **d[sym])
     return dict(ok=True, rows=list(d.values()))
 

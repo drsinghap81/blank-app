@@ -505,3 +505,17 @@ def test_held_map_same_day_buy_not_doubled():
                           dict(symbol="NEW", qty=10, product="DELIVERY", ltp=100), dict(symbol="INTRA", qty=5, product="INTRADAY", ltp=50)])
     h = app.held_map(acc)
     assert h == {"PFC": 265, "RECLTD": 297, "NEW": 10, "INTRA": 5}
+
+
+def test_target_oco(tmp_path, monkeypatch):
+    import app
+    monkeypatch.setattr(app, "is_live", lambda: True)
+    J = {"PFC": dict(state="open", system="My pick", kind="MY_GTT", entry=344.5, stop=310.2, qty=265, since="2026-11-11")}
+    monkeypatch.setattr(app, "journal", lambda: J); monkeypatch.setattr(app, "save_journal", lambda j: None)
+    r = app.set_target(app.Target(symbol="PFC", target=413.1, confirm="TARGET PFC"), None)
+    assert r["ok"] and r["oco"] and J["PFC"]["gtt_id"].startswith("GTTO")
+    g = app.broker.gtts[J["PFC"]["gtt_id"]]; assert g["target"] == 413.1 and g["trigger"] == 310.2 and g["qty"] == 265
+    J["ZYD"] = dict(state="open", system="Monthly ATH", kind="ATH_BRK", entry=1200, stop=1099, qty=81)
+    import pytest
+    with pytest.raises(app.HTTPException):
+        app.set_target(app.Target(symbol="ZYD", target=1500, confirm="TARGET ZYD"), None)
