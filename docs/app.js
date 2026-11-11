@@ -3598,7 +3598,7 @@ function bgMe(el) {
 
 /* Alerts (11 Nov 2026): the server's events — stop hit, buy filled, sold, sell signal, stop raised, stop not placed.
    Shown on Today, toasted when new while the app is open, and pushed to this phone once you turn notifications on. */
-const AL_KIND = { stop: ['🛑', 'Stop hit'], sold: ['✅', 'Sold'], filled: ['🟢', 'Bought'], exit: ['↘', 'Sell signal'], raised: ['↑', 'Stop raised'], nostop: ['⚠️', 'No stop'], test: ['🔔', 'Test'] };
+const AL_KIND = { stop: ['🛑', 'Stop hit'], sold: ['✅', 'Sold'], filled: ['🟢', 'Bought'], exit: ['↘', 'Sell signal'], raised: ['↑', 'Stop raised'], nostop: ['⚠️', 'No stop'], pie: ['🥧', 'Pie'], test: ['🔔', 'Test'] };
 const b64u = (s) => { const p = '='.repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...r].map((c) => c.charCodeAt(0))); };
 async function alPush(btn) {
   try {
@@ -3676,6 +3676,19 @@ async function tdTrack(box, mk) {
     <div class="td-tl">${last.map((r) => { const [lab, c] = ST[r.st] || [r.st, '']; return `<div><b>${esc(r.sym)}</b><span>${day(r.d)} · ${esc(r.sys || '')}</span><span class="${c}">${lab}</span><b class="${r.ret == null ? '' : r.ret >= 0 ? 'up' : 'down'}">${r.ret == null ? '–' : M(r.ret)}</b></div>`; }).join('')}</div>
     <p class="muted td-rs">Closing prices from the entry shown, before costs. The backtests expect about 40–45% winners, with a few big winners carrying the average.</p></details>`;
 }
+/* Trading 212 pies (US ETFs, Australian account) — month-end targets from tools/pies.py; the server alerts on a change */
+async function tdPies(box) {
+  if (!box) return; const D = await getJSON(MAIN + 'data/scan/us/pies.json', 'pies'); if (!D || !D.pies) { box.innerHTML = ''; return; }
+  const chips = (L) => L.map((x) => `<span class="pie-h"><b>${esc(x.ticker)}</b> ${fmt(x.pct, x.pct % 1 ? 1 : 0)}%${x.name ? `<small>${esc(x.name)}</small>` : ''}</span>`).join('');
+  box.innerHTML = D.pies.map((p) => { const cum = (p.record || []).reduce((a, x) => a * (1 + x[1] / 100), 1);
+    return `<details class="td-risk pie" ${p.changed ? 'open' : ''}><summary><span><b>🥧 ${esc(p.title)}</b><small>${esc(D.broker)} · decided ${day(p.decided)}${p.changed ? ' · <em class="pie-new">changed: rebalance</em>' : ' · no change'}</small></span></summary>
+      <div class="pie-hold">${chips(p.hold)}</div>
+      ${p.changed && p.before && p.before.length ? `<p class="muted td-rs">Was: ${p.before.map((x) => `${esc(x.ticker)} ${fmt(x.pct, 0)}%`).join(' · ')}</p>` : ''}
+      ${p.provisional ? `<p class="muted td-rs">If this month ended today: ${p.provisional.map((x) => `${esc(x.ticker)} ${fmt(x.pct, 0)}%`).join(' · ')} (decided only at month-end)</p>` : ''}
+      <p class="lv-sub">${esc(p.rule)}</p><p class="lv-sub"><b>Tested:</b> ${esc(p.test)}</p>
+      <p class="lv-sub"><b>Live record:</b> ${p.record && p.record.length ? `${p.record.length} month${p.record.length > 1 ? 's' : ''}, ${cum >= 1 ? '+' : ''}${fmt((cum - 1) * 100, 1)}% · ${p.record.slice(-6).map((x) => `${day(x[0])} ${x[1] >= 0 ? '+' : ''}${fmt(x[1], 1)}%`).join(' · ')}` : 'starts after the first full month (from November 2026)'}</p></details>`; }).join('')
+    + `<p class="bg-fine">${esc(D.note)}</p>`;
+}
 async function loadToday() { $('#title').textContent = 'Today'; return tdRender($('#view-today'), false); }
 async function tdRender(el, beginner) {
   const mk = beginner ? 'NSE' : tdMk(); const MP = MAIN + MKT[mk].path; const tag = mk === 'NSE' ? '' : '_' + mk;
@@ -3704,7 +3717,7 @@ async function tdRender(el, beginner) {
     ${rows.length > 12 ? `<p class="bg-fine">${rows.length - 12} more in Live</p>` : ''}
     ${MS.length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${MS.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${MS.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
-    <div id="tdtrack"></div>
+    ${mk === 'US' ? '<div id="tdpies"></div>' : ''}<div id="tdtrack"></div>
     <div id="tdrisk"></div>
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   wire();
@@ -3712,7 +3725,7 @@ async function tdRender(el, beginner) {
   el.querySelectorAll('.td-card:not(.td-raise)').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (!beginner) alCard($('#tdal'));
-  tdTrack($('#tdtrack'), mk);
+  tdTrack($('#tdtrack'), mk); if (mk === 'US') tdPies($('#tdpies'));
 }
 async function tdRiskCard(box) {
   if (!box) return;

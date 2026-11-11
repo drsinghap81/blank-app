@@ -798,3 +798,8 @@ body.pub .owner-only { display: none !important; }
 .td-ml { padding: 10px 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; font-size: 13px; } .td-ml span, .td-ml small { color: var(--slate); }
 .td-nm small.td-z { white-space: normal; }
 .hero-parts summary { font-size: 13px; color: var(--slate); cursor: pointer; margin: 2px 0 4px; } .hero-parts p { margin: 4px 0 6px; }
+/* Trading 212 pies */
+.pie summary { list-style: none; cursor: pointer; } .pie summary span { display: flex; flex-direction: column; gap: 2px; } .pie summary small { color: var(--slate); font-size: 12.5px; }
+.pie-new { color: var(--saffron); font-style: normal; font-weight: 700; }
+.pie-hold { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 6px; }
+.pie-h { background: var(--soft); border-radius: 14px; padding: 8px 12px; display: flex; flex-direction: column; font-size: 15px; } .pie-h small { color: var(--slate); font-size: 11.5px; }

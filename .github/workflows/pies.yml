@@ -1,0 +1,25 @@
+name: pies
+# Trading 212 (Australia) pies: month-end targets for the US index rotation and sector-breakout pies (tools/pies.py).
+on:
+  schedule:
+    - cron: "35 23 * * 1-5"   # after the US close
+  workflow_dispatch:
+  push:
+    paths: ["tools/pies.py", ".github/workflows/pies.yml"]
+permissions:
+  contents: write
+concurrency: {group: pies, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas yfinance && python tools/pies.py
+      - run: |
+          git config user.name "pies bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/scan/us/pies.json; git diff --cached --quiet && exit 0
+          git commit -qm "Pies $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done

@@ -1485,6 +1485,8 @@ def _loop():
             if ((21, 45) <= (t.hour, t.minute) <= (22, 30) or (8, 30) <= (t.hour, t.minute) <= (8, 50)) and t.weekday() < 6 \
                     and t.minute % 10 < 2:
                 exit_alerts()
+            if t.minute % 10 < 2:
+                pie_alerts()
         except Exception as ex:  # noqa: BLE001
             log("loop_error", error=str(ex)[:200])
         time.sleep(120)
@@ -1577,6 +1579,26 @@ def exit_alerts():
         if held.get(sym, 0) > 0:
             alert("exit", sym, f"Sell signal ({e.get('system') or 'system'}): {e.get('why') or 'exit rule met'}. Sell {held[sym]} at the next open.",
                   key=f"exit:{sym}:{P.get('asof')}")
+
+
+_PIES = {"t": 0}
+
+
+def pie_alerts():
+    """Trading 212 pies (US): one alert when a month-end decision changes what a pie should hold."""
+    if time.time() - _PIES["t"] < 3600:
+        return
+    _PIES["t"] = time.time()
+    try:
+        d = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/us/pies.json", timeout=30).json()
+    except Exception:  # noqa: BLE001
+        return
+    for p in d.get("pies") or []:
+        if p.get("changed"):
+            now = ", ".join(f"{x['ticker']} {x['pct']:g}%" for x in p.get("hold") or [])
+            was = ", ".join(f"{x['ticker']} {x['pct']:g}%" for x in p.get("before") or [])
+            alert("pie", "", f"Trading 212 · {p.get('title')}: now hold {now}" + (f" (was {was})" if was else "") + ". Rebalance at the next US session.",
+                  key=f"pie:{p.get('key')}:{p.get('decided')}")
 
 
 class PushSub(BaseModel):
