@@ -93,9 +93,10 @@ class AngelEquity:
             except Exception as e:  # noqa: BLE001
                 if any(w in str(e) for w in self.TOKEN_ERR) and not relogged and name:
                     self.api = None; relogged = True; fn = getattr(self._session(), name); continue
-                if k >= tries - 1 or not any(w in str(e) for w in ("JSON", "Expecting value", "parse", "rate", "Access denied")):
+                rate = any(w in str(e) for w in ("access rate", "Access denied"))
+                if k >= tries or not (rate or any(w in str(e) for w in ("JSON", "Expecting value", "parse"))):
                     raise
-                time.sleep(0.8 * (k + 1))
+                time.sleep((1.5 if rate else 0.8) * (k + 1))   # 11 Nov 2026: Angel's rate limit needs a longer pause
 
     @staticmethod
     def _data(r):
@@ -256,13 +257,13 @@ class AngelEquity:
         api = self._session(); ts, t = self._ts(symbol); now = ist_now()
         r = self._call(api.getCandleData, dict(exchange="NSE", symboltoken=str(t["token"]), interval="ONE_DAY",
                                                 fromdate=(now - timedelta(days=days)).strftime("%Y-%m-%d 09:15"),
-                                                todate=now.strftime("%Y-%m-%d %H:%M")), tries=2) or {}
+                                                todate=now.strftime("%Y-%m-%d %H:%M")), tries=4) or {}
         rows = self._data(r) or []
         out = [(str(x[0])[:10], float(x[1]), float(x[2]), float(x[3]), float(x[4])) for x in rows]
         today = now.date().isoformat()
         if out and out[-1][0] == today and (now.hour, now.minute) < (15, 35):
             out = out[:-1]                                   # today's candle is not complete yet
-        time.sleep(0.4)                                      # Angel: ~3 historical calls a second
+        time.sleep(0.6)                                      # Angel: ~3 historical calls a second (kept below it)
         return out
 
     def gtt_cancel(self, rule_id, symbol):
