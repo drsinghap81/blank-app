@@ -4023,7 +4023,7 @@ async function tdRender(el, beginner) {
     <div class="td-hero"><span>Setups found</span><div class="td-big"><b>${n}</b>${scanned ? `<em>out of ${Number(scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>` : ''}</div>
       <div class="td-bar"><i style="width:100%"></i></div><small>Close ${day(P.asof)} · the scan runs every evening</small></div>
     ${beginner ? bgHero(cap('NSE') || 50000, {}) : ''}
-    <div class="td-list" id="tdnew">${rows.slice(0, 30).map((r, i) => { const L = tdLabel(r);
+    <div class="td-list" id="tdnew">${rows.map((r, i) => { const L = tdLabel(r);
       const Z = tdZone(r, Mz);
       return `<button class="td-card" data-i="${i}" data-sym="${esc(r.symbol)}"><span class="td-av" style="background:${TD_COL[L.f]}">${TD_ICO[L.f]}</span><span class="td-nm"><b>${esc(r.symbol)}</b><small>${esc(L.t)}${held.has(r.symbol) ? ' · in practice' : bkOf(r) === 'vcp' ? ' · watch' : ''}</small>${Z ? `<small class="td-z ${Z.c}">${esc(Z.t)}</small>` : ''}</span><span class="td-go" aria-hidden="true">›</span></button>`; }).join('')
       || '<p class="bg-empty">No setup today. Waiting is part of the system.</p>'}</div>
@@ -4075,11 +4075,12 @@ function tdApplyHeld(mk) {
   [...nl.querySelectorAll('.td-card[data-sym]'), ...hl.querySelectorAll('.td-card[data-sym]')].sort((a, b) => a.dataset.i - b.dataset.i)
     .forEach((c) => { const h = H.has(c.dataset.sym); c.classList.toggle('td-held', h); (h ? hl : nl).appendChild(c); });
   const nn = nl.querySelectorAll('.td-card').length, nh = hl.querySelectorAll('.td-card').length;
-  nl.querySelectorAll('.td-card').forEach((c, k) => { c.hidden = k >= 12; });
+  // 12 Nov 2026: no 12-row cap — every active-bucket setup shows (switched-off buckets stay in Live only)
+
   if (!nn && !nl.querySelector('.bg-empty')) nl.insertAdjacentHTML('beforeend', '<p class="bg-empty">No new setup today. Waiting is part of the system.</p>');
   if (nn) nl.querySelectorAll('.bg-empty').forEach((p) => p.remove());
   box.hidden = !nh; $('#tdheldn').textContent = nh;
-  const extra = Math.max(0, (state._tdRows || []).length - nh - Math.min(nn, 12)); const m = $('#tdmore'); if (m) m.textContent = extra ? `${extra} more in Live` : '';
+  const m = $('#tdmore'); if (m) m.textContent = '';
 }
 async function tdRiskCard(box, S0) {
   if (!box) return;
