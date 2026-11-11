@@ -903,3 +903,7 @@ body.pub .owner-only { display: none !important; }
 .slt-lab small{display:block;font-weight:500;font-size:11px}
 .slt-lab .s small{color:var(--fall,#d64545)}.slt-lab .e small{color:#6d3fd6}.slt-lab .t small{color:var(--rise-ink,#1f9d6b)}
 .slt-foot{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-top:4px;color:var(--muted,#777)}
+.slt.ref .slt-rew{background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--rise,#1f9d6b) 40%,transparent) 0 6px,transparent 6px 10px)}
+.slt.ref .slt-dot.t{background:transparent;border:2px dashed var(--rise,#1f9d6b)}
+.slt.ref .slt-lab .t small{color:var(--muted,#888)}
+.slt-foot+.slt-foot{margin-top:2px;font-size:11px}

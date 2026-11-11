@@ -679,18 +679,19 @@ const KIND_TXT = { MY_GTT: 'Your pick · GTT buy', VCP: 'VCP breakout', VCP_STOP
 const BK_DEF = { mom: 60, tf: 40, t9: 0, rt: 0, pt: 0, vcp: 0, my: 0, s1: 0, wc: 0, tb: 100 };   // optimised 9 Nov 2026
 // Angel-style track: stop ── entry ── now ── target, positioned to scale
 function slTrack(o) {
-  const { stop, entry, now, target } = o; if (!(stop > 0 && entry > 0) || stop >= entry) return '';
+  const { stop, entry, now } = o; if (!(stop > 0 && entry > 0) || stop >= entry) return '';
+  const ref = !o.target; const target = o.target || entry + 2 * (entry - stop);   // no fixed target: show the 2R mark for scale only
   const hi = Math.max(entry, target || 0, now || 0) * 1.0001, lo = Math.min(stop, now || stop);
   const P = (v) => Math.max(0, Math.min(100, ((v - lo) / (hi - lo)) * 100));
   const f = (v) => fmt(v, 2, 'en-IN');
   const nowUp = now && now >= entry;
   const left = target ? Math.max(0, (target / (now || entry) - 1) * 100) : null;
   const rr = target ? (target - entry) / (entry - stop) : null;
-  return `<div class="slt" aria-label="Stop ${f(stop)}, entry ${f(entry)}${target ? ', target ' + f(target) : ''}">
+  return `<div class="slt${ref ? ' ref' : ''}" data-slt='${JSON.stringify({ stop, entry, target: o.target || null, entryLab: o.entryLab || null, exitTxt: o.exitTxt || null })}' aria-label="Stop ${f(stop)}, entry ${f(entry)}${target ? ', target ' + f(target) : ''}">
     <div class="slt-bar"><i class="slt-risk" style="left:${P(stop)}%;width:${P(entry) - P(stop)}%"></i>${target ? `<i class="slt-rew" style="left:${P(entry)}%;width:${P(target) - P(entry)}%"></i>` : ''}
       <b class="slt-dot s" style="left:${P(stop)}%"></b><b class="slt-dot e" style="left:${P(entry)}%"></b>${target ? `<b class="slt-dot t" style="left:${P(target)}%"></b>` : ''}${now ? `<b class="slt-dot n ${nowUp ? 'up' : 'dn'}" style="left:${P(now)}%" title="Now ${f(now)}"></b>` : ''}</div>
-    <div class="slt-lab"><span class="s" style="left:${P(stop)}%">${f(stop)}<small>Stop</small></span><span class="e" style="left:${P(entry)}%">${f(entry)}<small>${o.entryLab || 'Entry'}</small></span>${target ? `<span class="t" style="left:${P(target)}%">${f(target)}<small>Target${rr ? ' · ' + fmt(rr, 1) + 'R' : ''}</small></span>` : ''}</div>
-    ${now ? `<div class="slt-foot"><span>Now ${f(now)} · <b class="${nowUp ? 'up' : 'down'}">${nowUp ? '+' : ''}${fmt((now / entry - 1) * 100, 1)}%</b></span>${left != null ? `<span>Target ${left > 0 ? `<b class="up">▲ ${fmt(left, 1)}%</b> away` : '<b class="up">reached</b>'}</span>` : `<span>Stop ${fmt((1 - stop / now) * 100, 1)}% below</span>`}</div>` : ''}</div>`;
+    <div class="slt-lab"><span class="s" style="left:${P(stop)}%">${f(stop)}<small>Stop</small></span><span class="e" style="left:${P(entry)}%">${f(entry)}<small>${o.entryLab || 'Entry'}</small></span>${target ? `<span class="t" style="left:${P(target)}%">${f(target)}<small>${ref ? '2R mark' : 'Target' + (rr ? ' · ' + fmt(rr, 1) + 'R' : '')}</small></span>` : ''}</div>
+    ${now ? `<div class="slt-foot"><span>Now ${f(now)} · <b class="${nowUp ? 'up' : 'down'}">${nowUp ? '+' : ''}${fmt((now / entry - 1) * 100, 1)}%</b></span>${!ref ? `<span>Target ${left > 0 ? `<b class="up">▲ ${fmt(left, 1)}%</b> away` : '<b class="up">reached</b>'}</span>` : `<span>Stop ${fmt((1 - stop / now) * 100, 1)}% below</span>`}</div>` : ''}${ref ? `<div class="slt-foot"><span>No fixed target · exit as tested: ${esc(o.exitTxt || 'trailing stop')}</span></div>` : ''}</div>`;
 }
 const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', vcp: 'VCP', my: 'My picks', s1: 'System 1', wc: 'Wealth Creation', tb: 'Top Bottom' };
 const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : r.kind === 'PATTERN' ? 'pt' : r.kind === 'T921' ? 't9' : 'tf');
@@ -934,7 +935,7 @@ async function loadLive() {
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
     return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${pos ?? r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${r.tier === 'swing' && (!S || r.local) ? `<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${strMeter(r)} ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} · stop ${fmt(r.stop, 2, 'en-IN')} <span class="muted">(−${fmt(r.risk_pct ?? (E > r.stop ? (1 - r.stop / E) * 100 : null), 0)}%)</span>`}</div>
-      ${r.skip ? '' : slTrack({ stop: r.stop, entry: E, now: r.ltp || r.close || null, target: r.target || null, entryLab: 'Buy at' })}
+      ${r.skip ? '' : slTrack({ stop: r.stop, entry: E, now: r.ltp || null, target: r.target || (+((r.exit_rule || '').match(/R target ([\d.]+)/) || [])[1] || null), entryLab: 'Buy at', exitTxt: r.exit_rule || null })}
       ${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}
       <details class="lv-det"><summary>Details</summary><div class="lv-sub">${ord} · ${fmt(r.pct_cap, 1)}% of capital · risk ${money(r.risk_amt, 'NSE')} · exit: ${esc(r.exit_rule || '')}</div>
       <div class="lv-sub">${esc(r.note || '')}${r.group ? ' · ' + esc(r.group) : r.sector ? ' · ' + esc(r.sector) : ''}</div></details>${bkOf(r) === 'my' ? `<a href="#" class="lv-link my-rm" data-sym="${esc(r.symbol)}" data-mk="NSE">Remove</a>` : ''}</div>
@@ -1216,7 +1217,9 @@ async function lvQuotes(first) {
       + (q.vs_plan_pct == null ? '' : ` · ${q.vs_plan_pct >= 0 ? '+' : ''}${fmt(q.vs_plan_pct, 1)}% vs plan close`)
       + (j.market_open && q.limit_now ? ` · limit if sent now ₹${fmt(q.limit_now, 2, 'en-IN')}` : '')
       + (q.note ? ` · <span class="${LB && LB[1] === 'no' ? 'down' : ''}">${esc(q.note)}</span>` : '');
-    const row = d.closest('.lv-row'); const off = j.market_open && q.sendable === false;
+    const row = d.closest('.lv-row'); const tk = row && row.querySelector('.slt[data-slt]');
+    if (tk && q.ltp) { try { tk.outerHTML = slTrack({ ...JSON.parse(tk.dataset.slt), now: q.ltp }); } catch (e) { /* keep old */ } }
+    const off = j.market_open && q.sendable === false;
     row.classList.toggle('lv-off', off);
     row.querySelectorAll('.lv-btn[data-i], input[data-b]').forEach((x) => { x.disabled = off; if (off && x.type === 'checkbox' && x.checked) { x.checked = false; x.dispatchEvent(new Event('change')); } });
   });
