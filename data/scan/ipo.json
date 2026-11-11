@@ -1,9 +1,9 @@
 {
 "market": "NSE",
 "asof": "2026-11-09",
-"scan_date": "2026-11-10",
-"generated": "2026-11-10 16:00 UTC",
-"scanned": 751,
+"scan_date": "2026-11-11",
+"generated": "2026-11-11 03:23 UTC",
+"scanned": 748,
 "rules": {
 "max_age_months": 36,
 "base_days": 20,
@@ -456,7 +456,7 @@
 "theme_rs": null,
 "td_score": 2,
 "aligned": true,
-"age_months": 14
+"age_months": 15
 },
 {
 "symbol": "ADVANCE",
@@ -1226,7 +1226,7 @@
 "theme_rs": null,
 "td_score": 1,
 "aligned": false,
-"age_months": 28
+"age_months": 29
 },
 {
 "symbol": "RPTECH",
@@ -1408,7 +1408,7 @@
 "signal_date": "2026-04-15",
 "date": "2026-04-16",
 "entry": 1124.0732,
-"ath": 1081.0605,
+"ath": 1081.0606,
 "ath_date": "2025-09-30",
 "base_days": 130,
 "depth": -0.45,
@@ -1436,7 +1436,7 @@
 "theme_rs": null,
 "td_score": 1,
 "aligned": false,
-"age_months": 20
+"age_months": 21
 },
 {
 "symbol": "ICICIAMC",
@@ -1716,7 +1716,7 @@
 "theme_rs": null,
 "td_score": 0,
 "aligned": false,
-"age_months": 26
+"age_months": 27
 }
 ]
 }
