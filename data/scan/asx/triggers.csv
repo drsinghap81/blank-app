@@ -1,1 +1,2 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
+ANN,2026-11-10,46.33,60.5,45.32,45.11,2.7,0,0.0,ANSELL LIMITED,trend,168.0,0.95,93,32.16,46.33,60.5
