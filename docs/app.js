@@ -3977,10 +3977,19 @@ async function tdHeat(box, mk) {
       return `<div class="td-ml"><b>${esc(g.group)}</b><span>#${g.rank} of ${G.rows.length} · strong days this week ${fmt(g.p1w, 0)}% (last month ${fmt(g.p1m_prev || 0, 0)}%)</span>${t.length ? `<small>Trending: ${t.map(esc).join(', ')}</small>` : ''}</div>`; }).join('')}
     <p class="bg-fine">When one of these stocks breaks out of a long base it appears above as Momentum or Trend. Tested: buying strength alone, or swapping weaker holdings for new names, lowered returns.</p></details>`;
 }
-async function tdRiskCard(box) {
+/* 11 Nov 2026: the server can be slow; the card used to give up after a few seconds and fall back to the empty practice
+   list, so the calm number vanished. Now: the last account copy (trades only) shows at once, then the fresh one replaces it. */
+async function tdRiskCard(box, S0) {
   if (!box) return;
-  let S = null; const c = lvCfg();
-  if (c.url && c.token) { try { S = await Promise.race([lvPlan(), new Promise((_, j) => setTimeout(() => j(new Error('slow')), 20000))]); } catch (e) { S = null; } }
+  let S = S0 || null; const c = lvCfg();
+  if (!S0 && c.url && c.token) {
+    let cached = null; try { cached = JSON.parse(localStorage.getItem('td.riskS') || 'null'); } catch (e) { /* */ }
+    if (cached && cached.trades) { S = cached; S._cached = true; }
+    lvPlan().then((F) => { if (!F || !F.trades || !box.isConnected) return;
+      try { localStorage.setItem('td.riskS', JSON.stringify({ capital: F.capital, trades: F.trades, at: Date.now() })); } catch (e) { /* */ }
+      tdRiskCard(box, F); }).catch(() => {});
+    if (!S) { box.innerHTML = '<div class="td-risk"><p class="muted td-rs">Loading your open risk and return from your server…</p></div>'; const m = $('#tdmini'); if (m) m.innerHTML = '<div class="td-mini"><span><small>Loading open risk and return…</small></span></div>'; return; }
+  }
   let pos = [], C = cap('NSE') || 50000, src = 'practice';
   if (S && S.trades) { src = 'your account'; C = S.capital || C;
     pos = S.trades.filter((t) => t.state === 'open' && t.qty).map((t) => ({ symbol: t.symbol, qty: t.qty, entry: t.entry, now: t.ltp || t.entry, line: t.trail_level || t.stop, stop: t.gtt_trigger || t.stop, trail_at: t.trail_at, trail_prev: t.trail_prev, new_stop: t.gtt_trigger })); }
