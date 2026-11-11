@@ -126,7 +126,7 @@ def main(mk="NSE"):
     ix = sec.get("indices") or {}
     names = sec.get("names") or {}
     secname = lambda k: names.get(k) or ((k or "").replace("NIFTY ", "").title() if india else (k or ""))  # noqa: E731
-    C = []
+    C = []; missed = []
 
     def td(r):
         return dict(sector=secname(r.get("sector_index")), sector_rs=num(r.get("sector_rs")), theme=secname(r.get("theme")),
@@ -141,6 +141,11 @@ def main(mk="NSE"):
             continue
         late = close / entry - 1
         if late > MAX_LATE or late < -MAX_BELOW:   # fresh breakouts only: near the price the backtest bought
+            if (r.get("base_months") or 0) >= BASE_MAIN or r.get("tf_status", "open") == "open":   # Today's "missed" list (11 Nov 2026)
+                missed.append(dict(symbol=r["symbol"], name=r.get("name", ""), system="Monthly ATH" if (r.get("base_months") or 0) >= BASE_MAIN else TF_SYS,
+                                   date=r.get("date"), entry=round(entry, 2), ref=close, late_pct=round(late * 100, 1), base_months=r.get("base_months"),
+                                   why=(f"ran {late * 100:+.1f}% past the breakout entry: the tests bought within +{MAX_LATE * 100:.0f}%, so skip it"
+                                        if late > 0 else f"back {late * 100:.1f}% below the entry: a failing breakout, skip it")))
             continue
         t = td(r)
         sc = (3 if r.get("main") else 2) - (1 if late > 0.05 else 0)
@@ -155,14 +160,14 @@ def main(mk="NSE"):
                           exit_rule="daily close with EMA 9 below EMA 21 -> sell next open",
                           note=f"{'close ' if r.get('kind') == 'close' else ''}cup breakout {r.get('date')}, cup {r.get('base_months')} m, "
                                f"{late * 100:+.1f}% vs entry {entry:.2f}; stop = EMA 21 (min 4%)",
-                          base_months=r.get("base_months"), score=sc, value_cr=num(r.get("value_cr")), **t))
+                          base_months=r.get("base_months"), score=sc, value_cr=num(r.get("value_cr")), entry0=round(entry, 2), late_pct=round(late * 100, 1), **t))
             continue
         C.append(dict(id=f"ATH-{r['symbol']}-{r.get('date')}", symbol=r["symbol"], name=r.get("name", ""), system="Monthly ATH", bucket="mom",
                       kind="ATH_BRK", order="LIMIT", when="next open", side="BUY", price=round(close * 1.01, 2), ref=close,
                       stop=round(stop, 2), exit_rule="weekly close below the 30-week SMA",
                       note=f"{'close ' if r.get('kind') == 'close' else ''}breakout {r.get('date')}, base {r.get('base_months')} m, "
                            f"{late * 100:+.1f}% vs entry {entry:.2f}",
-                      base_months=r.get("base_months"), score=sc, value_cr=num(r.get("value_cr")), **t))
+                      base_months=r.get("base_months"), score=sc, value_cr=num(r.get("value_cr")), entry0=round(entry, 2), late_pct=round(late * 100, 1), **t))
     for r in ath.get("near") or []:
         trig, close, stop = num(r.get("trigger")), num(r.get("close")), num(r.get("sma30"))
         if not trig or not stop or trig <= stop:
@@ -362,7 +367,8 @@ def main(mk="NSE"):
                asof=max(str(ath.get("asof") or ""), str(tr.get("asof") or "")),
                rules=dict(risk_pct=1.0, max_pos_pct=20.0, max_positions=10, max_late_pct=MAX_LATE * 100, max_below_pct=MAX_BELOW * 100, top=TOP,
                           limit_buffer_pct=1.0),
-               buckets=buckets(mk), top=trades[:TOP], more=trades[TOP:30], swing=swing, pattern_watch=pat_watch[:20], watch=[c for c in C if c["kind"] == "WATCH"], exits=exits)
+               buckets=buckets(mk), top=trades[:TOP], more=trades[TOP:30], swing=swing, pattern_watch=pat_watch[:20], watch=[c for c in C if c["kind"] == "WATCH"], exits=exits,
+               missed=sorted(missed, key=lambda x: -abs(x["late_pct"]))[:15])
     json.dump(out, open(OUT, "w"), indent=0, default=str)
     print("trade plan:", len(trades), "ATH +", len(swing), "swing, top", [(c["symbol"], c["kind"], c["score"]) for c in trades[:TOP]], "exits", len(exits))
 

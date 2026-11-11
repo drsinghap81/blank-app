@@ -786,3 +786,14 @@ body.pub .owner-only { display: none !important; }
 .td-al { display: flex; flex-direction: column; gap: 8px; } .td-alh { display: flex; justify-content: space-between; align-items: center; gap: 8px; } .td-alh h3 { margin: 0; }
 .td-al .td-card { padding: 10px 12px; } .td-al .td-av { width: 36px; height: 36px; font-size: 16px; }
 .td-al .td-nm small { white-space: normal; }
+/* Today: buy zone, missed list, track record (11 Nov 2026) */
+.td-z { font-weight: 700; } .td-z.ok { color: var(--rise); } .td-z.warn { color: var(--saffron); } .td-z.wait { color: var(--focus); }
+.td-track summary, .td-miss summary { list-style: none; cursor: pointer; } .td-track summary span, .td-miss summary span { display: flex; flex-direction: column; gap: 2px; }
+.td-track summary small, .td-miss summary small { color: var(--slate); font-size: 12.5px; }
+.td-hz { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 12px 0 4px; }
+.td-hz > div { background: var(--soft); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; min-width: 0; }
+.td-hz span { font-size: 11px; color: var(--slate); } .td-hz b { font: 800 17px var(--font-head); } .td-hz small { font-size: 10.5px; color: var(--slate); }
+.td-tl > div { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px; }
+.td-tl > div span { color: var(--slate); } .td-tl .down { color: var(--fall); } .td-tl .up { color: var(--rise); }
+.td-ml { padding: 10px 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; font-size: 13px; } .td-ml span, .td-ml small { color: var(--slate); }
+.td-nm small.td-z { white-space: normal; }

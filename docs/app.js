@@ -3650,6 +3650,25 @@ function tdRing(p) {
   return `<svg viewBox="0 0 128 128" width="150" height="150" aria-hidden="true"><circle cx="64" cy="64" r="52" fill="none" style="stroke:var(--line)" stroke-width="13"/>
     <circle cx="64" cy="64" r="52" fill="none" style="stroke:${col}" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(f * C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 64 64)"/></svg>`;
 }
+/* buy zone (11 Nov 2026): the tests bought breakouts within -5% / +10% of the entry; buy-stops wait for their trigger */
+function tdZone(r, M) {
+  if (r.late_pct != null) return { t: `In buy zone · ${r.late_pct > 0 ? '+' : ''}${fmt(r.late_pct, 1)}% from entry ${M(r.entry0, 0)}`, c: r.late_pct > 7 ? 'warn' : 'ok' };
+  if (isStopK(r.kind)) return { t: 'Waiting for the trigger', c: 'wait' };
+  if (r.kind === 'T921') return { t: 'New signal · buy next open', c: 'ok' };
+  return null;
+}
+async function tdTrack(box, mk) {
+  if (!box) return; const L = await getJSON(MAIN + MKT[mk].path + 'setup_log.json', 'slog_' + mk); if (!L || !L.summary) { box.innerHTML = ''; return; }
+  const S = L.summary, M = (v) => (v == null ? '–' : `${v > 0 ? '+' : ''}${fmt(v, 1)}%`);
+  const cell = (lab, x) => `<div><span>${lab}</span><b class="${x && x.avg != null ? (x.avg >= 0 ? 'up' : 'down') : ''}">${x && x.n ? M(x.avg) : '–'}</b><small>${x && x.n ? `${x.n} · ${x.win}% up` : 'not yet'}</small></div>`;
+  const ST = { open: ['Open', ''], stop: ['Stopped', 'down'], exit: ['Sold (signal)', ''], done: ['Done', ''], waiting: ['Waiting', 'muted'], expired: ['Not triggered', 'muted'] };
+  const last = (L.rows || []).slice(-8).reverse();
+  box.innerHTML = `<details class="td-risk td-track"><summary><span><b>Track record of these setups</b><small>since ${day(L.since)} · ${S.shown} shown · ${S.entered} entered · ${S.open} open · ${S.stopped} stopped · ${S.exited} sold</small></span></summary>
+    <div class="td-hz">${cell('After 1 day', S.d1)}${cell('5 days', S.d5)}${cell('20 days', S.d20)}${cell('60 days', S.d60)}</div>
+    ${S.closed && S.closed.n ? `<p class="muted td-rs">Closed trades: ${S.closed.n} · average ${M(S.closed.avg)} · ${S.closed.win}% winners</p>` : ''}
+    <div class="td-tl">${last.map((r) => { const [lab, c] = ST[r.st] || [r.st, '']; return `<div><b>${esc(r.sym)}</b><span>${day(r.d)} · ${esc(r.sys || '')}</span><span class="${c}">${lab}</span><b class="${r.ret == null ? '' : r.ret >= 0 ? 'up' : 'down'}">${r.ret == null ? '–' : M(r.ret)}</b></div>`; }).join('')}</div>
+    <p class="muted td-rs">Closing prices from the entry shown, before costs. The backtests expect about 40–45% winners, with a few big winners carrying the average.</p></details>`;
+}
 async function loadToday() { $('#title').textContent = 'Today'; return tdRender($('#view-today'), false); }
 async function tdRender(el, beginner) {
   const mk = beginner ? 'NSE' : tdMk(); const MP = MAIN + MKT[mk].path; const tag = mk === 'NSE' ? '' : '_' + mk;
@@ -3665,14 +3684,20 @@ async function tdRender(el, beginner) {
   state._tdRows = rows; state._tdMkNow = mk; state._tdAsof = P.asof;
   const scanned = (A && A.scanned) || null; const n = rows.length;
   const held = new Set(bgPractice().filter((t) => t.state !== 'closed').map((t) => t.symbol));
+  const Mz = (v, d = 0) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
+  const MS = (P.missed || []);
   el.innerHTML = `<div class="td-wrap">${seg}<div id="tdal"></div>
     <div class="td-hero"><span>Setups found</span><div class="td-big"><b>${n}</b>${scanned ? `<em>out of ${Number(scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>` : ''}</div>
       <div class="td-bar"><i style="width:100%"></i></div><small>Close ${day(P.asof)} · the scan runs every evening</small></div>
     ${beginner ? bgHero(cap('NSE') || 50000, {}) : ''}
     <div class="td-list">${rows.slice(0, 12).map((r, i) => { const L = tdLabel(r);
-      return `<button class="td-card" data-i="${i}"><span class="td-av" style="background:${TD_COL[L.f]}">${TD_ICO[L.f]}</span><span class="td-nm"><b>${esc(r.symbol)}</b><small>${esc(L.t)}${held.has(r.symbol) ? ' · in practice' : bkOf(r) === 'vcp' ? ' · watch' : ''}</small></span><span class="td-go" aria-hidden="true">›</span></button>`; }).join('')
+      const Z = tdZone(r, Mz);
+      return `<button class="td-card" data-i="${i}"><span class="td-av" style="background:${TD_COL[L.f]}">${TD_ICO[L.f]}</span><span class="td-nm"><b>${esc(r.symbol)}</b><small>${esc(L.t)}${held.has(r.symbol) ? ' · in practice' : bkOf(r) === 'vcp' ? ' · watch' : ''}</small>${Z ? `<small class="td-z ${Z.c}">${esc(Z.t)}</small>` : ''}</span><span class="td-go" aria-hidden="true">›</span></button>`; }).join('')
       || '<p class="bg-empty">No setup today. Waiting is part of the system.</p>'}</div>
     ${rows.length > 12 ? `<p class="bg-fine">${rows.length - 12} more in Live</p>` : ''}
+    ${MS.length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${MS.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
+      ${MS.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
+    <div id="tdtrack"></div>
     <div id="tdrisk"></div>
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   wire();
@@ -3680,6 +3705,7 @@ async function tdRender(el, beginner) {
   el.querySelectorAll('.td-card:not(.td-raise)').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (!beginner) alCard($('#tdal'));
+  tdTrack($('#tdtrack'), mk);
 }
 async function tdRiskCard(box) {
   if (!box) return;

@@ -8,7 +8,7 @@ on:
     - cron: "45 15 * * 1-5"   # 21:15 IST fallback
   workflow_dispatch:
   push:
-    paths: ["tools/trade_plan.py", ".github/workflows/trade-plan.yml"]
+    paths: ["tools/trade_plan.py", "tools/setup_log.py", ".github/workflows/trade-plan.yml"]
 permissions:
   contents: write
 concurrency:
@@ -23,9 +23,9 @@ jobs:
         with: {ref: main}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install -q numpy && python tools/trade_plan.py
+      - run: pip install -q numpy && python tools/trade_plan.py && python tools/setup_log.py NSE
       - run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
-          git add data/scan/trade_plan.json; git diff --cached --quiet && exit 0
+          git add data/scan/trade_plan.json data/scan/setup_log.json; git diff --cached --quiet && exit 0
           git commit -qm "Trade plan $(date -u +%F)"
           for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 8; done

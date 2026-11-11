@@ -25,11 +25,12 @@ jobs:
           if [ -z "$M" ]; then if [ "$(date -u +%H)" -lt 6 ]; then M=US; else M=ASX; fi; fi
           [ "$M" = both ] && M="US ASX"
           python tools/trade_plan.py $M
+          python tools/setup_log.py $M
           python tools/paper_global.py $M
       - name: commit
         run: |
           git config user.name "global-plan bot"; git config user.email "actions@users.noreply.github.com"
-          for f in data/scan/us/trade_plan.json data/scan/asx/trade_plan.json data/scan/us/paper.json data/scan/asx/paper.json; do [ -f "$f" ] && git add "$f"; done; true
+          for f in data/scan/us/trade_plan.json data/scan/asx/trade_plan.json data/scan/us/paper.json data/scan/asx/paper.json data/scan/us/setup_log.json data/scan/asx/setup_log.json; do [ -f "$f" ] && git add "$f"; done; true
           git diff --cached --quiet && exit 0
           git commit -qm "US/ASX trade plan + paper $(date -u +%F)"
           for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done
