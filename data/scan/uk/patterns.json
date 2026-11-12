@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-11T17:58+00:00",
-"asof": "2026-11-11",
+"generated": "2026-11-12T17:56+00:00",
+"asof": "2026-11-12",
 "market": "UK",
 "regime": null,
 "rules": "zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
@@ -12,11 +12,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 4480.0,
+"close": 4552.0,
 "neck": 4331.4501953125,
-"to_neck_pct": -3.315843854631695,
+"to_neck_pct": -4.845118732150699,
 "stop": 3783.78,
-"stop_pct": 15.540625000000007,
+"stop_pct": 16.876537785588763,
 "height_pct": 12.330139919929973,
 "fall_pct": 39.68471138951419,
 "lows": [
@@ -40,9 +40,9 @@
 32.3
 ],
 "rsi_div": 7.0,
-"rsi_now": 71.8,
+"rsi_now": 74.4,
 "signal_date": "2026-11-06",
-"days_since": 3
+"days_since": 4
 },
 {
 "symbol": "PSH",
@@ -50,27 +50,27 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 3970.0,
-"neck": 3949.813720703125,
-"to_neck_pct": -0.5084705112562982,
-"stop": 3546.38,
-"stop_pct": 10.670629267848708,
-"height_pct": 9.050627297159707,
-"fall_pct": 39.74647194472802,
+"close": 3988.0,
+"neck": 3949.631103515625,
+"to_neck_pct": -0.9621087383243521,
+"stop": 3546.21,
+"stop_pct": 11.077932937972868,
+"height_pct": 9.05062788565385,
+"fall_pct": 39.746473625154444,
 "lows": [
 [
 "2026-07-23",
-3641.828369140625
+3641.659912109375
 ],
 [
 "2026-09-24",
-3622.0
+3621.83251953125
 ]
 ],
 "peaks": [
 [
 "2026-08-04",
-3949.813720703125
+3949.631103515625
 ]
 ],
 "rsi_lows": [
@@ -78,9 +78,9 @@
 31.3
 ],
 "rsi_div": 0.0,
-"rsi_now": 62.0,
+"rsi_now": 63.2,
 "signal_date": "2026-11-04",
-"days_since": 5
+"days_since": 6
 },
 {
 "symbol": "STJ",
@@ -88,11 +88,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 1156.0,
+"close": 1160.0,
 "neck": 1120.0,
-"to_neck_pct": -3.114186851211076,
+"to_neck_pct": -3.4482758620689613,
 "stop": 1001.38,
-"stop_pct": 13.375000000000004,
+"stop_pct": 13.67370689655173,
 "height_pct": 9.80392156862746,
 "fall_pct": 52.23217534083946,
 "lows": [
@@ -116,9 +116,9 @@
 40.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 62.7,
+"rsi_now": 63.4,
 "signal_date": "2026-11-04",
-"days_since": 5
+"days_since": 6
 },
 {
 "symbol": "IWG",
@@ -126,11 +126,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "breakout",
-"close": 214.1999969482422,
+"close": 219.8000030517578,
 "neck": 202.7959747314453,
-"to_neck_pct": -5.324006713012452,
+"to_neck_pct": -7.7361365260347315,
 "stop": 169.78,
-"stop_pct": 20.735292988344124,
+"stop_pct": 22.754778142555555,
 "height_pct": 18.248381767606592,
 "fall_pct": 41.37792540535856,
 "lows": [
@@ -163,9 +163,9 @@
 38.5
 ],
 "rsi_div": 5.8,
-"rsi_now": 73.1,
+"rsi_now": 76.5,
 "signal_date": "2026-11-03",
-"days_since": 6
+"days_since": 7
 },
 {
 "symbol": "MRO",
@@ -173,11 +173,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 488.6000061035156,
+"close": 489.3999938964844,
 "neck": 490.0,
-"to_neck_pct": 0.2865316985255495,
+"to_neck_pct": 0.12260034961146804,
 "stop": 427.48,
-"stop_pct": 12.508804221244318,
+"stop_pct": 12.651819933316544,
 "height_pct": 11.79557692149693,
 "fall_pct": 55.53259406941018,
 "lows": [
@@ -201,45 +201,7 @@
 40.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 58.2,
-"signal_date": null,
-"days_since": null
-},
-{
-"symbol": "SPX",
-"name": "Spirax Group",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 7620.0,
-"neck": 7649.4736328125,
-"to_neck_pct": 0.38679308152886893,
-"stop": 6199.94,
-"stop_pct": 18.635934247715802,
-"height_pct": 21.428564231187465,
-"fall_pct": 26.328671683700968,
-"lows": [
-[
-"2026-07-08",
-6299.56689453125
-],
-[
-"2026-09-14",
-6719.53759765625
-]
-],
-"peaks": [
-[
-"2026-08-10",
-7649.4736328125
-]
-],
-"rsi_lows": [
-27.7,
-37.9
-],
-"rsi_div": 0.0,
-"rsi_now": 62.4,
+"rsi_now": 58.6,
 "signal_date": null,
 "days_since": null
 },
@@ -249,11 +211,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 853.0,
+"close": 850.0,
 "neck": 867.4429931640625,
-"to_neck_pct": 1.6931996675336958,
+"to_neck_pct": 2.0521168428308867,
 "stop": 708.3,
-"stop_pct": 16.963839442287167,
+"stop_pct": 16.670770640318764,
 "height_pct": 19.9032484901559,
 "fall_pct": 34.04341247333491,
 "lows": [
@@ -286,7 +248,7 @@
 26.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 67.7,
+"rsi_now": 66.0,
 "signal_date": null,
 "days_since": null
 },
@@ -296,11 +258,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 148.3000030517578,
+"close": 148.89999389648438,
 "neck": 152.7777862548828,
-"to_neck_pct": 3.019408705987825,
+"to_neck_pct": 2.604293161418325,
 "stop": 124.42,
-"stop_pct": 16.0991938352412,
+"stop_pct": 16.43727118666829,
 "height_pct": 20.314967991236088,
 "fall_pct": 26.894000819408003,
 "lows": [
@@ -324,7 +286,45 @@
 37.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 62.3,
+"rsi_now": 63.8,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "SPX",
+"name": "Spirax Group",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 7450.0,
+"neck": 7649.4736328125,
+"to_neck_pct": 2.677498427013414,
+"stop": 6199.94,
+"stop_pct": 16.779304559408647,
+"height_pct": 21.428564231187465,
+"fall_pct": 26.328671683700968,
+"lows": [
+[
+"2026-07-08",
+6299.56689453125
+],
+[
+"2026-09-14",
+6719.53759765625
+]
+],
+"peaks": [
+[
+"2026-08-10",
+7649.4736328125
+]
+],
+"rsi_lows": [
+27.7,
+37.9
+],
+"rsi_div": 0.0,
+"rsi_now": 54.1,
 "signal_date": null,
 "days_since": null
 },
@@ -334,11 +334,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 1984.0,
+"close": 2006.0,
 "neck": 2130.0,
-"to_neck_pct": 7.358870967741926,
+"to_neck_pct": 6.181455633100708,
 "stop": 1739.73,
-"stop_pct": 12.31185627590522,
+"stop_pct": 13.273540803288109,
 "height_pct": 21.104909059714604,
 "fall_pct": 32.83319924242802,
 "lows": [
@@ -362,7 +362,7 @@
 25.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 56.3,
+"rsi_now": 59.0,
 "signal_date": null,
 "days_since": null
 },
@@ -372,11 +372,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 513.5,
+"close": 513.0,
 "neck": 568.8683471679688,
-"to_neck_pct": 10.78254083115262,
+"to_neck_pct": 10.890516017147899,
 "stop": 467.28,
-"stop_pct": 9.00097370983447,
+"stop_pct": 8.912280701754394,
 "height_pct": 20.115781215515895,
 "fall_pct": 32.84029504630232,
 "lows": [
@@ -400,7 +400,7 @@
 28.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 61.6,
+"rsi_now": 61.2,
 "signal_date": null,
 "days_since": null
 },
@@ -410,11 +410,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 755.5,
+"close": 757.5,
 "neck": 852.5,
-"to_neck_pct": 12.839179351422892,
+"to_neck_pct": 12.541254125412538,
 "stop": 678.15,
-"stop_pct": 10.238252812706817,
+"stop_pct": 10.475247524752474,
 "height_pct": 21.61198288159771,
 "fall_pct": 35.241207869475865,
 "lows": [
@@ -438,7 +438,7 @@
 22.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 59.6,
+"rsi_now": 60.5,
 "signal_date": null,
 "days_since": null
 }
