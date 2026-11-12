@@ -921,3 +921,7 @@ body.pub .owner-only { display: none !important; }
 .td-hg{all:unset;cursor:pointer;display:inline-flex;gap:6px;align-items:baseline}
 .td-hgo{font-size:12px;color:var(--accent-ink,#7C8CFF);font-weight:600}
 .td-hs{all:unset;cursor:pointer;display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:var(--panel-2,rgba(127,127,127,.12))}
+.man-t{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.man-t div{padding:10px 12px;border-radius:12px;background:var(--panel-2,rgba(127,127,127,.1));display:flex;flex-direction:column;gap:2px}
+.man-t span{font-size:12px;color:var(--muted,#888)}.man-t b{font-size:15px}
+.lv-btn.lv-man{background:transparent;border:1.5px solid currentColor;color:var(--saffron,#f2a93b)}

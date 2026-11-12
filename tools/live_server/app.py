@@ -24,7 +24,7 @@ import os
 import re
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -846,10 +846,46 @@ def account_cached(max_age=5):
     return _acc["d"]
 
 
-ANGEL_WHY = {"AB4036": "Angel doesn't take API orders for this stock: the exchange has it on its cautionary (surveillance) list. "
-                       "If you still want it, place it yourself in the Angel app.",
+ANGEL_WHY = {"AB4036": "this stock is on the exchange's surveillance (cautionary) list: every order needs your own consent tap in "
+                       "Angel's app or web, which no API can give. Place it in the Angel app (the app shows the exact order); once it "
+                       "fills, Sync adds it to your trades and puts the protective stop on.",
              "AB1007": "Angel login session problem - try again in a minute.",
              "AB4008": "price outside the allowed band for today."}
+
+
+SURV_DAYS = 30
+
+
+def surv_path():
+    return os.path.join(DATA, "surveillance.json")
+
+
+def surv_load():
+    """12 Nov 2026: stocks Angel refused with AB4036 (exchange surveillance list: each order needs your consent in
+    Angel's own app/web, which an API cannot give). Remembered for SURV_DAYS so the app marks them 'place in Angel'
+    up front instead of failing on Send; a fresh successful API order clears the mark."""
+    try:
+        D = json.load(open(surv_path()))
+    except Exception:  # noqa: BLE001
+        return {}
+    cut = (ist_now().date() - timedelta(days=SURV_DAYS)).isoformat()
+    return {k: v for k, v in D.items() if v >= cut}
+
+
+def surv_mark(sym, on=True):
+    D = surv_load()
+    if on:
+        D[sym] = ist_now().date().isoformat()
+    else:
+        D.pop(sym, None)
+    try:
+        json.dump(D, open(surv_path(), "w"))
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def is_surv_err(e):
+    return "AB4036" in str(e) or "cautionary" in str(e).lower()
 
 
 def angel_msg(e):
@@ -907,7 +943,7 @@ def sized(acc=None):
     ath_open = [s for s in sys_open if s not in sw_open]
     slots = max(0, N - len(ath_open)); sw_slots = max(0, SWING_MAX - len(sw_open))
     cash = acc["cash"]
-    rows = []
+    rows = []; SV = surv_load()
     for r in plan_rows(P):
         E = r.get("trigger") or r["price"]; stop = r["stop"]
         q = 0; why = ""
@@ -918,7 +954,7 @@ def sized(acc=None):
         elif stop and E > stop:
             q = math.floor(min((SR if r["tier"] == "swing" else RK) * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
         rows.append(dict(r, qty=max(0, q), value=round(max(0, q) * E, 0), risk_amt=round(max(0, q) * (E - stop), 0) if stop else None,
-                         pct_cap=round(max(0, q) * E / cap * 100, 1) if cap else None, skip=why))
+                         pct_cap=round(max(0, q) * E / cap * 100, 1) if cap else None, skip=why, surv=r["symbol"] in SV))
     # each row must fit your actual cash on its own (cut to cash, no token positions); rank order only adds a note
     # when the row would use cash / a slot that the higher-ranked rows would need if you bought them too
     left, used = cash, 0
@@ -1101,6 +1137,8 @@ def order(body: Order, _=Depends(auth)):
             gid, gp = broker.gtt_buy(sym, body.qty, row["trigger"], row["price"])
         except Exception as e:  # noqa: BLE001
             log("order_error", error=str(e), **rec); _acc["d"] = None
+            if is_surv_err(e):
+                surv_mark(sym)
             raise HTTPException(502, f"Angel rejected the GTT for {sym}: {angel_msg(e)}")
         log("gtt_buy", gtt_id=gid, **rec)
         J = journal()
@@ -1116,8 +1154,12 @@ def order(body: Order, _=Depends(auth)):
     except Exception as e:  # noqa: BLE001
         log("order_error", error=str(e), **rec)
         _acc["d"] = None
+        if is_surv_err(e):
+            surv_mark(sym)
         raise HTTPException(502, f"Angel rejected {sym}: {angel_msg(e)}")
     _acc["d"] = None
+    if sym in surv_load():
+        surv_mark(sym, False)
     log("order", order_id=oid, **rec)
     J = journal()
     if side == "BUY":

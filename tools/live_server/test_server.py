@@ -247,7 +247,7 @@ def test_buckets(tmp_path):
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     P = c.get("/api/plan", headers=h).json()
     B = {b["key"]: b for b in P["buckets"]}; assert B["mom"]["pct"] == 60 and B["tf"]["pct"] == 40 and B["t9"]["pct"] == 0 and B["s1"]["pct"] == 0 and B["tb"]["pct"] == 100
-    assert all(r.get("bucket") in ("mom", "tf", "t9", "rt", "pt") for r in P["rows"])
+    assert all(r.get("bucket") in ("mom", "tf", "t9", "rt", "pt", "vcp", "my") for r in P["rows"])
     j = c.post("/api/picks", headers=h, json={"alloc": {"tf": 1, "rt": 0, "t9": 0, "bogus": 50}}).json()
     assert j["alloc"]["tf"] == 1 and "bogus" not in j["alloc"] and j["picks"] == 10
     P2 = c.get("/api/plan", headers=h).json()
@@ -549,3 +549,25 @@ def test_health_and_admin(tmp_path, monkeypatch):
         app.admin(app.Admin(action="restart", password="pw", confirm="no"), R(), None)
     r = app.admin(app.Admin(action="update", password="pw", confirm="UPDATE"), R(), None)
     assert r["ok"] and os.path.exists(tmp_path / "cmd_update")
+
+
+def test_surveillance_mark(tmp_path):
+    """AB4036 (exchange surveillance list) marks the stock so the plan shows 'place in Angel'; a later API fill clears it."""
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
+    P = c.get("/api/plan", headers=h).json()
+    r = next(r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] not in ("ATH_STOP", "TF_STOP"))
+    assert r["surv"] is False
+    real = A.broker.place
+    def refuse(p):
+        raise RuntimeError("The order cannot be processed as the token is categorised under cautionary listings by the exchange [AB4036]")
+    A.broker.place = refuse
+    body = {"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"}
+    a = c.post("/api/order", headers=h, json=body)
+    assert a.status_code == 502 and "surveillance" in a.json()["detail"]
+    P2 = c.get("/api/plan", headers=h).json()
+    assert next(x for x in P2["rows"] if x["id"] == r["id"])["surv"] is True
+    A.broker.place = real
+    A.surv_mark(r["symbol"], False)
+    assert r["symbol"] not in A.surv_load()

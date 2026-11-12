@@ -933,16 +933,16 @@ async function loadLive() {
   const rowHtml = (r, i, first, pos) => {
     const E = r.trigger || r.price; const ord = r.kind === 'MY_GTT' ? `GTT buy: trigger ${fmt(r.trigger, 2, 'en-IN')}, limit ${fmt(r.price, 2, 'en-IN')}, good for a year` : isStopK(r.kind) ? `buy-stop ${fmt(r.trigger, 2, 'en-IN')} (limit ${fmt(r.price, 2, 'en-IN')}), day order` : `limit ${fmt(r.price, 2, 'en-IN')}, ${r.when}`;
     const td = r.system === 'Monthly ATH' ? `<span class="score ${r.aligned ? 'al' : ''}"><i class="sd ${r.sector_rs == null ? 'na' : r.sector_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.theme_rs == null ? 'na' : r.theme_rs > 0 ? 'y' : 'n'}"></i><i class="sd ${r.stock_rs == null ? 'na' : r.stock_rs > 0 ? 'y' : 'n'}"></i>${r.aligned ? ' aligned' : ''}</span>` : '';
-    const can = S && !r.skip && r.qty > 0 && !r.local;
+    const can = S && !r.skip && !r.surv && r.qty > 0 && !r.local;
     const hdr = r.tier === 'more' && (first ?? (i === 0 || rows[i - 1].tier !== 'more'))
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
-    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${pos ?? r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${r.tier === 'swing' && (!S || r.local) ? `<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${strMeter(r)} ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
+    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${pos ?? r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${r.tier === 'swing' && (!S || r.local) ? `<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${r.surv ? ' <span class="chip exit" title="Exchange surveillance list: Angel needs your consent in its own app">⚠ Surveillance · place in Angel</span>' : ''} ${strMeter(r)} ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} · stop ${fmt(r.stop, 2, 'en-IN')} <span class="muted">(−${fmt(r.risk_pct ?? (E > r.stop ? (1 - r.stop / E) * 100 : null), 0)}%)</span>`}</div>
       ${r.skip ? '' : slTrack({ stop: r.stop, entry: E, now: r.ltp || null, target: r.target || (+((r.exit_rule || '').match(/R target ([\d.]+)/) || [])[1] || null), entryLab: 'Buy at', exitTxt: r.exit_rule || null })}
       ${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}
       <details class="lv-det"><summary>Details</summary><div class="lv-sub">${ord} · ${fmt(r.pct_cap, 1)}% of capital · risk ${money(r.risk_amt, 'NSE')} · exit: ${esc(r.exit_rule || '')}</div>
       <div class="lv-sub">${esc(r.note || '')}${r.group ? ' · ' + esc(r.group) : r.sector ? ' · ' + esc(r.sector) : ''}</div></details>${bkOf(r) === 'my' ? `<a href="#" class="lv-link my-rm" data-sym="${esc(r.symbol)}" data-mk="NSE">Remove</a>` : ''}</div>
-      <div>${can ? `<button class="lv-btn" data-i="${i}">Send</button>` : ''}</div>
+      <div>${can ? `<button class="lv-btn" data-i="${i}">Send</button>` : S && r.surv && !r.skip && r.qty > 0 ? `<button class="lv-btn lv-man" data-man="${i}">Place in Angel</button>` : ''}</div>
       ${can ? `<div class="lv-bq" hidden>Basket qty <input type="number" min="1" max="${r.qty}" value="${r.qty}" data-bq="${i}" inputmode="numeric"> of ${r.qty}</div>` : ''}</div>`;
   };
   const grp = (f) => byStr(rows.map((r, i) => [r, i]).filter(([r]) => f(r)));
@@ -1001,7 +1001,7 @@ async function loadLive() {
   if (nBuy) need.push(['buy', 'buy', `${nBuy} to buy`, `${money(tot + swRows.filter((r) => !r.skip && r.qty > 0 && (alN[bkOf(r)] ?? 0) > 0).reduce((a, r) => a + r.value, 0), 'NSE')} in your split`]);
   /* 11 Nov 2026: "Send all" — every buy in the tested systems of your split (Momentum, Trend 9/21), one confirmation; the
      server re-checks each one (in today's plan, sizes, cash, once a day) and puts the protective stop on after each fill */
-  const sendAll = S ? rows.map((r, i) => [r, i]).filter(([r]) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && ['mom', 'tf'].includes(bkOf(r)) && (alN[bkOf(r)] ?? 0) > 0) : [];
+  const sendAll = S ? rows.map((r, i) => [r, i]).filter(([r]) => r.tier !== 'more' && !r.skip && !r.surv && r.qty > 0 && !r.local && ['mom', 'tf'].includes(bkOf(r)) && (alN[bkOf(r)] ?? 0) > 0) : [];
   const needHtml = S ? `<div class="lv-card lv-need" data-fold="skip"><div class="lv-need-h"><b>Needs you today</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE' : 'DRY RUN'}</span></div>
       ${need.length ? need.map(([t, c, a, b]) => `<button class="lv-need-i ${c}" data-go="${t}"><b>${a}</b><span>${b}</span><i>›</i></button>`).join('') : '<p class="lv-sub">✓ Nothing to do — stops are in place and there are no new signals.</p>'}
       ${sendAll.length ? `<button class="lv-btn lv-sendall" id="lvsendall">Send all ${sendAll.length} tested buys · ${money(sendAll.reduce((a, [r]) => a + r.value, 0), 'NSE')}</button>
@@ -1100,6 +1100,7 @@ async function loadLive() {
       alertMsg(r.length ? r.map((x) => `${x.symbol}: ${x.result}${x.new ? ' → ' + x.new : ''}`).join(' · ') : 'No Momentum / Trend 9/21 positions with a stop to raise.', true); lvKeep();
     } catch (e) { alertMsg(`Your server doesn't have the stop raise yet (${e.message}); it updates itself at 08:00 IST on weekdays.`); trb.disabled = false; trb.textContent = 'Check stops now'; } });
   el.querySelectorAll('.lv-btn[data-i]').forEach((b) => b.addEventListener('click', () => lvSend(rows[+b.dataset.i], 'BUY', b)));
+  el.querySelectorAll('[data-man]').forEach((b) => b.addEventListener('click', () => lvManual(rows[+b.dataset.man])));
   const pick = () => [...el.querySelectorAll('input[data-b]:checked')].map((c) => { const i = +c.dataset.b; const r = rows[i];
     const q = Math.max(0, Math.min(r.qty, Math.floor(+el.querySelector(`input[data-bq="${i}"]`).value || 0)));
     const L = state._lvQ && state._lvQ[r.id]; const E = r.trigger || (L && L.limit_now) || r.price;
@@ -1201,7 +1202,25 @@ async function lvSend(r, side, btn) {
     const pr = j.protect ? ` Then, once filled: protective stop on Angel at ${fmt(j.protect.trigger, 2, 'en-IN')} (${j.protect.note}).` : '';
     alertMsg(j.sent ? `Order placed: ${conf} (Angel id ${j.order_id}). The app tracks the fill and then places the protective stop.${pr}` : `Dry run — would send: ${j.order.variety} ${j.order.ordertype} ${j.order.transactiontype} ${j.order.quantity} ${j.order.tradingsymbol} @ ${j.order.price}${j.order.triggerprice ? ' trigger ' + j.order.triggerprice : ''}.${pr}`, true);
     setTimeout(loadLive, 4000);
-  } catch (e) { btn.disabled = false; btn.textContent = side === 'BUY' ? 'Send' : `Sell ${qty}`; alertMsg('Not sent: ' + e.message); lvRowMsg(r.id, 'Not sent: ' + e.message, false); }
+  } catch (e) { btn.disabled = false; btn.textContent = side === 'BUY' ? 'Send' : `Sell ${qty}`; lvRowMsg(r.id, 'Not sent: ' + e.message, false);
+    if (side === 'BUY' && /surveillance|cautionary|AB4036/i.test(e.message)) lvManual(r); else alertMsg('Not sent: ' + e.message); }
+}
+/* 12 Nov 2026: stocks on the exchange surveillance list (Angel AB4036). The exchange requires a consent tap per order in
+   Angel's own app/web; an API can't give it, so the app shows the exact order to place there. After the fill, Sync adds
+   it to your trades and puts the protective GTT stop on. */
+function lvManual(r) {
+  const stopK = isStopK(r.kind); const f = (v) => fmt(v, 2, 'en-IN');
+  const lines = [['Stock', `${r.symbol} (NSE)`], ['Side', 'BUY'], ['Quantity', String(r.qty)], ['Product', 'Delivery (CNC)'],
+    ['Order type', stopK ? 'Stop-loss limit (SL)' : 'Limit'], ...(stopK ? [['Trigger price', f(r.trigger)]] : []), ['Limit price', f(r.price)], ['Validity', 'Day']];
+  const txt = lines.map(([k, v]) => `${k}: ${v}`).join('\n');
+  $('#sheet-body').innerHTML = `<div class="t2-sh"><b>Place ${esc(r.symbol)} in the Angel app</b><span>Exchange surveillance list</span></div>
+    <p class="tdc-why">The exchange has ${esc(r.symbol)} on its surveillance (cautionary) list. Each order needs your consent tap in Angel's own app or web, which no API can do, so Trend Desk can't send it. Place this order there:</p>
+    <div class="man-t">${lines.map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div>
+    <p class="tdc-why">In Angel: search ${esc(r.symbol)} → Buy → set the fields above → accept the surveillance message → place.${stopK ? ' The trigger means it buys only if the price rises to the breakout level today.' : ''}</p>
+    <p class="tdc-why">After it fills: Live → Holdings → <b>Sync</b> (or Adopt). The app then puts the protective GTT stop on at ${f(r.stop)}${r.system === 'Monthly ATH' ? ' (safety net below; the system exit stays the weekly close under the 30-week SMA)' : ''}.</p>
+    <div class="bg-btns"><button class="bg-cta" id="mancp">Copy order details</button></div>`;
+  $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+  $('#mancp').addEventListener('click', async (ev) => { try { await navigator.clipboard.writeText(txt); ev.target.textContent = 'Copied ✓'; } catch (x) { ev.target.textContent = 'Copy failed'; } });
 }
 
 /* live prices on each plan row; refreshed every 15 s while the Live tab is open and the market is open */
