@@ -955,3 +955,10 @@ body.pub .owner-only { display: none !important; }
 #btn-download.spin svg{animation:tdspin .8s linear infinite}
 /* 13 Nov 2026: PDF capture - wrapped inline labels were painted over the stock name by the PDF renderer */
 .pdfmode .chip, .pdfmode .lv-mode, .pdfmode .score, .pdfmode .lane { display: inline-block; white-space: nowrap; }
+/* 13 Nov 2026: Today header tiles + list heading */
+.td-tts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 6px 0 14px; }
+.td-tt { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 3px; padding: 14px; border-radius: 18px; background: var(--soft); color: var(--ink); }
+.td-tt span { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--slate); }
+.td-tt b { font-size: 18px; line-height: 1.2; } .td-tt em { font-style: normal; font-size: 21px; font-weight: 800; color: var(--rise); }
+.td-tt small { font-size: 12.5px; color: var(--slate); }
+.td-lh { display: flex; flex-direction: column; gap: 2px; margin: 4px 2px 10px; } .td-lh b { font-size: 19px; } .td-lh small { font-size: 13px; color: var(--slate); }

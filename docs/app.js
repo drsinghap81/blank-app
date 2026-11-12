@@ -4173,6 +4173,19 @@ async function tdRender(el, beginner) {
   const al = lvAlloc(mk, P, null); const seen = new Set();
   const rows = (P.top || []).concat(P.swing || []).filter((r) => { const b = bkOf(r); if (!ownK(b) || seen.has(r.symbol)) return false;
     if (!((al[b] ?? 0) > 0 || b === 'vcp' || b === 'my')) return false; seen.add(r.symbol); return r.stop && (r.trigger || r.price) > r.stop; });
+  /* 13 Nov 2026: rank by what tested better per trade (ATH 2017-26): aligned = sector AND stock beating their benchmarks
+     (+29% vs +15% a trade), stock 1-year RS > 0 (48% vs 30% win), industry lane Building/Strong and top-Pulse industries
+     (+22% vs +8%). Being in two systems at once was NOT consistently better (ATH + fresh 9/21 cross: 2016-21 better,
+     2022-26 worse), so it is not scored. Order only matters when cash or slots are short. */
+  const evid = (r) => 3 * (r.aligned ? 1 : 0) + ((r.stock_rs || 0) > 0 ? 1 : 0) + ({ build: 1, hold: 1, fade: -1, weak: -1, bounce: -1 }[r.lane] || 0) + (r.group_rank && r.group_rank <= 16 ? 1 : 0);
+  { // the evidence above was tested on Momentum (ATH) trades only - for Trend 9/21 no tag helped, so Trend keeps its system order.
+    // Top 10 follows the 60/40 split: 6 Momentum by evidence + 4 Trend; anything else after.
+    const isM = (r) => bkOf(r) === 'mom'; const M = rows.filter(isM).sort((a, b) => evid(b) - evid(a) || (b.score || 0) - (a.score || 0) || (b.stock_rs || 0) - (a.stock_rs || 0));
+    const T = rows.filter((r) => !isM(r));
+    const held0 = (() => { try { return new Set(JSON.parse(localStorage.getItem('td.heldSyms') || '[]')); } catch (e) { return new Set(); } })();
+    const nm = (L) => L.filter((r) => !held0.has(r.symbol));
+    const topM = nm(M).slice(0, Math.max(6, 10 - nm(T).length)), topT = nm(T).slice(0, 10 - topM.length);
+    const first = [...topM, ...topT]; rows.splice(0, rows.length, ...first, ...rows.filter((r) => !first.includes(r)).sort((a, b) => (isM(b) - isM(a)) || (isM(a) ? evid(b) - evid(a) : 0))); }
   state._tdRows = rows; state._tdMkNow = mk; state._tdAsof = P.asof;
   const scanned = (A && A.scanned) || null; const n = rows.length;
   const held = new Set(bgPractice().filter((t) => t.state !== 'closed').map((t) => t.symbol));
@@ -4182,10 +4195,13 @@ async function tdRender(el, beginner) {
     <div class="td-hero"><span>Setups found</span><div class="td-big"><b>${n}</b>${scanned ? `<em>out of ${Number(scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>` : ''}</div>
       <div class="td-bar"><i style="width:100%"></i></div><small>Close ${day(P.asof)} · the scan runs every evening</small></div>
     ${beginner ? bgHero(cap('NSE') || 50000, {}) : ''}
+    <div id="tdtop"></div>
+    <div class="td-lh"><b>Top 10 to act on</b><small>Your 60/40 split: Momentum ranked by tested evidence (sector + stock aligned first), then Trend 9/21 in system order</small></div>
     <div class="td-list" id="tdnew">${rows.map((r, i) => { const L = tdLabel(r);
       const Z = tdZone(r, Mz);
       return `<button class="td-card" data-i="${i}" data-sym="${esc(r.symbol)}"><span class="td-av" style="background:${TD_COL[L.f]}">${TD_ICO[L.f]}</span><span class="td-nm"><b>${esc(r.symbol)}</b><small>${esc(L.t)}${held.has(r.symbol) ? ' · in practice' : bkOf(r) === 'vcp' ? ' · watch' : ''}</small>${Z ? `<small class="td-z ${Z.c}">${esc(Z.t)}</small>` : ''}</span><span class="td-go" aria-hidden="true">›</span></button>`; }).join('')
       || '<p class="bg-empty">No setup today. Waiting is part of the system.</p>'}</div>
+    <details class="td-risk td-heldd" id="tdrest" hidden><summary><span><b>More setups (<i id="tdrestn">0</i>)</b><small>Same systems, weaker evidence · take them too if cash allows</small></span></summary><div class="td-list" id="tdrestl"></div></details>
     <p class="bg-fine" id="tdmore"></p>
     <details class="td-risk td-heldd" id="tdheld" hidden><summary><span><b>Already in your portfolio (<i id="tdheldn">0</i>)</b><small>Still on the list because the setup is valid · no new buy needed</small></span></summary><div class="td-list" id="tdheldl"></div></details>
     <div id="tdrisk"></div>
@@ -4199,6 +4215,7 @@ async function tdRender(el, beginner) {
   if (!A) fetch(MP + 'ath.json', { cache: 'no-cache' }).then((r) => r.json()).then((j) => { if (!j || !j.scanned) return; state['_athN' + tag] = j.scanned;
     const big = el.querySelector('.td-big'); if (big && !big.querySelector('em')) big.insertAdjacentHTML('beforeend', `<em>out of ${Number(j.scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>`); }).catch(() => {});
   tdApplyHeld(mk);
+  tdTopTiles($('#tdtop'), mk);
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (!beginner) alCard($('#tdal'));
   tdTrack($('#tdtrack'), mk); if (mk === 'US') tdPies($('#tdpies')); tdHeat($('#tdheat'), mk);
@@ -4268,10 +4285,12 @@ function tdHeldSet() {
   return H;
 }
 function tdApplyHeld(mk) {
-  const nl = $('#tdnew'), hl = $('#tdheldl'), box = $('#tdheld'); if (!nl || !hl || !box) return;
+  const nl = $('#tdnew'), hl = $('#tdheldl'), box = $('#tdheld'), rl = $('#tdrestl'), rb = $('#tdrest'); if (!nl || !hl || !box) return;
   const H = mk === 'NSE' ? tdHeldSet() : new Set();
-  [...nl.querySelectorAll('.td-card[data-sym]'), ...hl.querySelectorAll('.td-card[data-sym]')].sort((a, b) => a.dataset.i - b.dataset.i)
-    .forEach((c) => { const h = H.has(c.dataset.sym); c.classList.toggle('td-held', h); (h ? hl : nl).appendChild(c); });
+  let kTop = 0;
+  [...nl.querySelectorAll('.td-card[data-sym]'), ...hl.querySelectorAll('.td-card[data-sym]'), ...(rl ? rl.querySelectorAll('.td-card[data-sym]') : [])].sort((a, b) => a.dataset.i - b.dataset.i)
+    .forEach((c) => { const h = H.has(c.dataset.sym); c.classList.toggle('td-held', h); (h ? hl : (kTop++ < 10 || !rl ? nl : rl)).appendChild(c); });
+  if (rb) { const nr = rl.querySelectorAll('.td-card').length; rb.hidden = !nr; $('#tdrestn').textContent = nr; }
   const nn = nl.querySelectorAll('.td-card').length, nh = hl.querySelectorAll('.td-card').length;
   // 12 Nov 2026: no 12-row cap — every active-bucket setup shows (switched-off buckets stay in Live only)
 
@@ -4279,6 +4298,25 @@ function tdApplyHeld(mk) {
   if (nn) nl.querySelectorAll('.bg-empty').forEach((p) => p.remove());
   box.hidden = !nh; $('#tdheldn').textContent = nh;
   const m = $('#tdmore'); if (m) m.textContent = '';
+}
+/* 13 Nov 2026: Today header - strongest sector (3-month return vs the index: sector momentum was the strongest rotation
+   signal tested, IC 0.11) and strongest industry (1-month Pulse: top 10% of industries beat the bottom 10% by +2.9% over
+   the next 3 months), plus the strongest official NSE theme. Context for the list below, not buy signals. */
+async function tdTopTiles(box, mk) {
+  if (!box) return;
+  const G = state['_gp' + mk] || (state['_gp' + mk] = await fetch(MAIN + MKT[mk].path + 'group_pulse.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+  if (!G || !box.isConnected) return;
+  const sec = (G.sectors || []).filter((x) => x.n >= 5 && x.rs3m != null).sort((a, b) => b.rs3m - a.rs3m)[0];
+  const ind = (G.rows || []).filter((x) => x.n >= 3).sort((a, b) => b.p1m - a.p1m)[0];
+  const th = (G.themes || []).filter((x) => x.n >= 3).sort((a, b) => b.p1m - a.p1m)[0];
+  const sg = (v) => `${v >= 0 ? '+' : '−'}${fmt(Math.abs(v), 1)}%`;
+  const tile = (lab, name, big, sub, attr) => `<button class="td-tt"${attr || ''}><span>${lab}</span><b>${esc(name)}</b><em>${big}</em><small>${sub}</small></button>`;
+  box.innerHTML = `<div class="td-tts">${sec ? tile('Top sector', sec.sector, `${sg(sec.rs3m)} vs index`, `3 months · Pulse ${fmt(sec.p1m, 0)} · ${sec.n} stocks`) : ''}
+    ${ind ? tile('Top industry', ind.group, `Pulse ${fmt(ind.p1m, 0)}`, `1 month · ${ind.trending_now} of ${ind.n} trending`, ` data-tti="${esc(ind.group)}"`) : ''}
+    ${th ? tile('Top NSE theme', th.group, `Pulse ${fmt(th.p1m, 0)}`, `1 month · ${th.n} stocks`, ` data-ttt="${esc(th.group)}"`) : ''}</div>`;
+  const open = (r) => { state.gp = state.gp || {}; state.gp[mk] = G; state.athMkt = mk; gpSelect(r); };
+  box.querySelectorAll('[data-tti]').forEach((b) => b.addEventListener('click', () => open(ind)));
+  box.querySelectorAll('[data-ttt]').forEach((b) => b.addEventListener('click', () => open(th)));
 }
 async function tdRiskCard(box, S0) {
   if (!box) return;
