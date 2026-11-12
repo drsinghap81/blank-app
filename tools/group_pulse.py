@@ -28,11 +28,6 @@ NSE_SPLIT = {
     "Auto - PV & Tractors": ["MARUTI", "M&M", "TMPV", "HYUNDAI", "ESCORTS", "VSTTILLERS"],
     "Auto - CV & Buses": ["TMCV", "ASHOKLEY", "SMLMAH", "FORCEMOT", "OLECTRA"],
     "Dairy": ["HATSUN", "DODLA", "PARAGMILK", "HERITGFOOD", "MILKYMIST", "MLKFOOD", "UMANGDAIRY", "VADILALIND"],
-    # 12 Nov 2026: Indian themes Yahoo scatters (rail PSUs sat in credit, telecom, travel and construction; HAL, MAZDOCK,
-    # RVNL, JWL were missing): grouped the way the NSE Defence / Railways PSU themes do
-    "Defence": ["HAL", "BEL", "BDL", "MAZDOCK", "COCHINSHIP", "GRSE", "DATAPATTNS", "SOLARINDS", "BEML", "ASTRAMICRO", "PARAS",
-                "MTARTECH", "ZENTEC", "DCXINDIA", "APOLLO", "NIBE"],
-    "Railways": ["IRFC", "RVNL", "IRCON", "RITES", "RAILTEL", "IRCTC", "TITAGARH", "TEXRAIL", "JWL", "HBLENGINE", "KERNEX", "CONCOR"],
 }
 
 
@@ -54,7 +49,7 @@ def universe(mkt):
         add = [x for x in ov if x not in set(u.symbol)]
         if add:
             u = pd.concat([u, pd.DataFrame({"symbol": add, "name": add, "group": [ov[x] for x in add]})], ignore_index=True)
-        secmap = {"Banks": "Financial Services", "Auto - ": "Consumer Cyclical", "Dairy": "Consumer Defensive", "Defence": "Industrials", "Railways": "Industrials"}
+        secmap = {"Banks": "Financial Services", "Auto - ": "Consumer Cyclical", "Dairy": "Consumer Defensive"}
         for x, g in ov.items():
             u.loc[u.symbol == x, "sector"] = next(v for k, v in secmap.items() if g.startswith(k))
         u["group"] = [ov.get(x, g) for x, g in zip(u.symbol, u.group)]
@@ -103,6 +98,10 @@ def download(tickers):
 def main(mkt):
     cf = CFG[mkt]; u = universe(mkt)
     tick = {s: (s.replace("/", "-").replace(".", "-") if mkt == "US" else s) + cf["suf"] for s in u.symbol}
+    if mkt == "NSE" and os.path.exists("data/universe/themes.csv"):     # theme constituents without an industry still get prices
+        for x in pd.read_csv("data/universe/themes.csv").Symbol.astype(str):
+            if x not in tick and not x.startswith("DUMMY"):
+                tick[x] = x + cf["suf"]
     data = download(list(tick.values()) + [cf["bench"]])
     B = data.get(cf["bench"]); B = B.c if B is not None else None
     C = pd.DataFrame({s: data[t].c for s, t in tick.items() if t in data and len(data[t]) > 160})
@@ -129,7 +128,8 @@ def main(mkt):
     s1w, s1m, s1q, s1m_prev = share(5), share(21), share(63), share(21, -22)
     groups = {}
     for s in syms:
-        groups.setdefault(grp[s], []).append(s)
+        if s in grp:
+            groups.setdefault(grp[s], []).append(s)
     rows = []
     for g, ss in groups.items():
         if len(ss) < 3:
@@ -185,6 +185,34 @@ def main(mkt):
     rows.sort(key=lambda r: -r["p1m"])
     for i, r in enumerate(rows):
         r["rank"] = i + 1
+    # 12 Nov 2026: NSE's official thematic indices (data/universe/themes.csv from niftyindices.com) as an overlay - a stock can
+    # sit in several themes (BEL: Defence and Railways PSU). Same Pulse maths on each theme's liquid constituents.
+    themes = []
+    if mkt == "NSE" and os.path.exists("data/universe/themes.csv"):
+        TH = pd.read_csv("data/universe/themes.csv")
+        skip = ("SME", "AHIMSA", "IPO", "CORPORATE GROUP", "LIQUID 15", "REITS", "ESG", "50:30:20", "EQUAL WEIGHT", "MAATR")
+        for th, gdf in TH.groupby("Theme"):
+            if any(k in th.upper() for k in skip):
+                continue
+            ss = [x for x in gdf.Symbol.astype(str) if x in L.index and L.get(x, False)]
+            if len(ss) < 3:
+                continue
+            mem = [dict(symbol=x, name=str(nm.get(x, x))[:60], close=round(float(C[x].iloc[-1]), 2), wrpi=round(float(w[x].iloc[-1]), 1),
+                        d1w=int(tr[x].iloc[-5:].sum()), d1m=int(tr[x].iloc[-21:].sum()), trending=bool(tr[x].iloc[-1]), stage2=bool(st2[x].iloc[-1]),
+                        from_high=round(float((C[x].iloc[-1] / hi52[x].iloc[-1] - 1) * 100), 1), group=grp.get(x)) for x in ss]
+            mem.sort(key=lambda m: (-m["d1m"], -(m["wrpi"] if np.isfinite(m["wrpi"]) else 0)))
+            p = lambda ser: round(float(np.nanmean([ser[x] for x in ss])) * 100, 1)  # noqa: E731
+            nm_ = th.replace("NIFTY INDIA ", "").replace("NIFTY ", "").title().replace("Psu", "PSU").replace("Cpse", "CPSE").replace("Pse", "PSE").replace("Mnc", "MNC").replace("Ev ", "EV ").replace("Ai ", "AI ")
+            themes.append(dict(group=nm_, index=th, theme=True, n=len(ss), listed=len(gdf), p1w=p(s1w), p1m=p(s1m), p1q=p(s1q), p1m_prev=p(s1m_prev),
+                               trending_now=int(sum(m["trending"] for m in mem)), members=mem,
+                               rs1m=round(float(np.nanmean(r1[ss].iloc[-1])) * 100, 1), rs3m=round(float(np.nanmean(r3[ss].iloc[-1])) * 100, 1)))
+            gi = (1 + ret[ss].iloc[-N:].mean(axis=1).fillna(0)).cumprod(); gi = gi / gi.iloc[0] * 100
+            charts.setdefault("themes", {})[nm_] = dict(idx=[round(float(v), 2) for v in gi],
+                                                       pulse=[None if np.isnan(v) else round(float(v), 1) for v in (p21[ss].iloc[-N:].mean(axis=1) * 100)])
+        themes.sort(key=lambda r: -r["p1m"])
+        for i, r in enumerate(themes):
+            r["rank"] = i + 1
+        json.dump(charts, open(cf["out"] + "group_pulse_charts.json", "w"), separators=(",", ":"))
     stock = {m["symbol"]: [r["group"], r["p1m"], r["rank"], len(rows)] for r in rows for m in r["members"]}
     mkt_share = round(float(np.nanmean([s1m[s] for s in syms])) * 100, 1)
     out = dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), asof=str(C.index[-1].date()), market=mkt,
@@ -196,7 +224,7 @@ def main(mkt):
                         "(+2.2% in 2017-21, +3.6% in 2022-26), better than plain group return (+1.8%); 1-week Pulse +1.2% over the next month. "
                         "Trending stocks in top-Pulse groups beat the average stock by +1.4% over 3 months. As a hard filter on ATH breakouts "
                         "it did not raise returns - use it as a tiebreaker / tailwind. US and ASX: not separately tested.",
-               rows=rows, sectors=sectors, mstats=market, stock=stock)
+               rows=rows, sectors=sectors, themes=themes, mstats=market, stock=stock)
     os.makedirs(cf["out"], exist_ok=True); json.dump(out, open(cf["out"] + "group_pulse.json", "w"), separators=(",", ":"))
     # weekly closes (last ~60 weeks) of every liquid stock, for the stock panel's mini chart
     # + weekly RSI(14, Wilder) on the full ~3-year weekly series, for the range-shift panel (40/60 bands)
@@ -210,6 +238,7 @@ def main(mkt):
                "s": {s: [None if pd.isna(v) else float(f"{v:.4g}") for v in W[s]] for s in syms},
                "r": {s: [None if pd.isna(v) else round(float(v), 1) for v in RW[s]] for s in syms}},
               open(cf["out"] + "stock_weekly.json", "w"), separators=(",", ":"))
+    print(mkt, "themes", [(t["group"], t["n"], t["p1m"]) for t in themes])
     print(mkt, "groups", len(rows), "stocks", len(syms), "market pulse 1m", mkt_share, "top", [(r["group"], r["p1m"]) for r in rows[:5]])
 
 

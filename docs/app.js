@@ -2876,17 +2876,20 @@ function pulseView() {
     <p class="muted" style="margin:0 0 6px;font-size:12.5px">Strong / weak = the group's quarter Pulse in the top / bottom 40%. Rising / falling = week > month > quarter (or the reverse) by 10+ points. Backtest 2017–26: building strength in strong groups was the best entry; a bounce in a weak group was not.</p>
     <div class="gplanes">${['build', 'hold', 'fade', 'bounce', 'weak'].map(lane).join('')}</div>
     <h4 style="margin:14px 0 4px">Strongest 10 groups (${{ p1w: '1 week', p1m: '1 month', p1q: '1 quarter' }[per]})</h4><div class="gpbars">${bars}</div>
+    ${(G.themes || []).length ? `<h4 style="margin:14px 0 4px">NSE themes <span class="muted" style="font-weight:400">· official Nifty theme indices (Defence, Railways PSU, CPSE, …) · a stock can be in several</span></h4>
+      <div class="gpbars">${(G.themes || []).filter((r) => !q || r.group.toLowerCase().includes(q) || r.members.some((m) => m.symbol.toLowerCase().includes(q))).slice().sort((a, b) => b[per] - a[per]).map((r) => `<div class="gpbar" data-th="${esc(r.group)}"><span class="gpn">${esc(r.group)} <small class="muted">${r.n}</small></span><span class="gpb"><i style="width:${Math.min(100, r[per])}%;background:${gpColor(r[per])}"></i></span><b>${fmt(r[per], 0)}</b></div>`).join('')}</div>` : ''}
     <h4 style="margin:14px 0 4px">All groups <span class="muted" style="font-weight:400">· size = stocks, colour = Pulse</span></h4>
     <div class="gptiles">${tiles || '<p class="muted">Nothing matches.</p>'}</div></li>`;
   box.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; pulseView(); }));
   box.querySelectorAll('[data-g]').forEach((b) => b.addEventListener('click', () => gpSelect(R.find((r) => r.group === b.dataset.g))));
+  box.querySelectorAll('[data-th]').forEach((b) => b.addEventListener('click', () => gpSelect((G.themes || []).find((r) => r.group === b.dataset.th))));
 }
 function gpSelect(r) {
   if (!r) return; const mk = AM(); const tv = MKT[mk].tv;
   const rows = r.members.map((m) => `<tr${m.trending ? ' class="gptr"' : ''}><td><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent((tv || '') + m.symbol)}" target="_blank" rel="noopener"><b>${esc(m.symbol)}</b></a><div class="muted" style="font-size:12px">${esc(m.name || '')}</div></td>
     <td><span class="gpb sm"><i style="width:${Math.round(m.d1m / 21 * 100)}%;background:${gpColor(m.d1m / 21 * 60)}"></i></span><span class="muted" style="font-size:12px">${m.d1m}/21 d · ${m.d1w}/5</span></td>
     <td class="${m.wrpi >= 100 ? 'up' : 'down'}">${fmt(m.wrpi, 0)}</td><td>${m.stage2 ? '✓' : '–'}</td><td>${fmt(m.from_high, 0)}%</td></tr>`).join('');
-  openPanel(`<div class="d-head"><div><h2>${esc(r.group)}</h2><div class="co">Industry Pulse · rank ${r.rank} of ${state.gp[mk].groups_n} · ${r.n} liquid stocks</div></div><div class="d-price"><b>${fmt(r.p1m, 0)}</b></div></div>
+  openPanel(`<div class="d-head"><div><h2>${esc(r.group)}</h2><div class="co">${r.theme ? `NSE theme (${esc(r.index)}) · rank ${r.rank} of ${(state.gp[mk].themes || []).length} themes · ${r.n} of ${r.listed} constituents liquid` : `Industry Pulse · rank ${r.rank} of ${state.gp[mk].groups_n}`}${r.theme ? '' : ` · ${r.n} liquid stocks`}</div></div><div class="d-price"><b>${fmt(r.p1m, 0)}</b></div></div>
     <div class="status info" style="border-left:5px solid ${GP_SHIFT[r.shift || 'mid'].c}"><b>${GP_SHIFT[r.shift || 'mid'].t}.</b> ${GP_SHIFT[r.shift || 'mid'].note}. ${gpSlope(r, 120, 36)}</div>
     <div class="facts"><div class="fact"><span>Pulse 1 week / 1 month / 1 quarter</span><b>${fmt(r.p1w, 0)} / ${fmt(r.p1m, 0)} / ${fmt(r.p1q, 0)}</b></div>
       <div class="fact"><span>1-month Pulse a month ago</span><b>${fmt(r.p1m_prev, 0)} (${r.p1m - r.p1m_prev >= 0 ? '+' : ''}${fmt(r.p1m - r.p1m_prev, 0)})</b></div>
@@ -2901,7 +2904,7 @@ async function drawGP(r) {
   const mk = AM(); const box = $('#gpc'); const pb = $('#gpcp'); if (!box) return;
   state.gpCh = state.gpCh || {};
   if (state.gpCh[mk] === undefined) { box.innerHTML = '<p class="muted pad">Loading chart…</p>'; state.gpCh[mk] = await getJSON(MAIN + MKT[mk].path + 'group_pulse_charts.json', 'gpc_' + mk); }
-  const D = state.gpCh[mk]; const g = D && D.groups && D.groups[r.group];
+  const D = state.gpCh[mk]; const g = D && ((r.theme ? D.themes : D.groups) || {})[r.group];
   if (!g) { box.innerHTML = '<p class="muted pad">Chart appears after the next nightly run.</p>'; if (pb) pb.innerHTML = ''; return; }
   box.innerHTML = ''; pb.innerHTML = '';
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
@@ -4161,17 +4164,17 @@ async function tdRender(el, beginner) {
 async function tdHeat(box, mk) {
   if (!box) return;
   const G = state['_gp' + mk] || (state['_gp' + mk] = await fetch(MAIN + MKT[mk].path + 'group_pulse.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null));
-  const R = ((G && G.rows) || []).filter((g) => (g.p1w || 0) >= 30 && (g.p1w || 0) - (g.p1m_prev || 0) >= 20 && (g.n || 0) >= 3)
+  const R = ((G && G.rows) || []).concat((G && G.themes) || []).filter((g) => (g.p1w || 0) >= 30 && (g.p1w || 0) - (g.p1m_prev || 0) >= 20 && (g.n || 0) >= 3)
     .sort((a, b) => (b.p1w - (b.p1m_prev || 0)) - (a.p1w - (a.p1m_prev || 0))).slice(0, 6);
   if (!R.length) { box.innerHTML = ''; return; }
   box.innerHTML = `<details class="td-risk td-heat"><summary><span><b>Heating up this week (${R.length})</b><small>Industries getting stronger · watch, not a buy signal</small></span></summary>
     ${R.map((g) => { const t = (g.members || []).filter((m) => m.trending).map((m) => m.symbol).slice(0, 6);
-      return `<div class="td-ml"><button class="td-hg" data-hg="${esc(g.group)}"><b>${esc(g.group)}</b> <span class="td-hgo">chart ›</span></button><span>#${g.rank} of ${G.rows.length} · strong days this week ${fmt(g.p1w, 0)}% (last month ${fmt(g.p1m_prev || 0, 0)}%)</span>${t.length ? `<small>Trending: ${t.map((x) => `<button class="td-hs" data-hs="${esc(x)}" data-hgg="${esc(g.group)}">${esc(x)}</button>`).join(' ')}</small>` : ''}</div>`; }).join('')}
+      return `<div class="td-ml"><button class="td-hg" data-hg="${esc(g.group)}"><b>${esc(g.group)}${g.theme ? ' <small class="muted">NSE theme</small>' : ''}</b> <span class="td-hgo">chart ›</span></button><span>#${g.rank} of ${g.theme ? (G.themes || []).length + ' themes' : G.rows.length} · strong days this week ${fmt(g.p1w, 0)}% (last month ${fmt(g.p1m_prev || 0, 0)}%)</span>${t.length ? `<small>Trending: ${t.map((x) => `<button class="td-hs" data-hs="${esc(x)}" data-hgg="${esc(g.group)}">${esc(x)}</button>`).join(' ')}</small>` : ''}</div>`; }).join('')}
     <p class="bg-fine">Tap an industry or a stock for its chart. When one of these stocks breaks out of a long base it appears above as Momentum or Trend. Tested: buying strength alone, or swapping weaker holdings for new names, lowered returns.</p></details>`;
   /* 12 Nov 2026: charts. Industry → the Trends industry panel (group vs index + Pulse); stock → candles if the scan has them, else weekly closes */
   box.querySelectorAll('[data-hg]').forEach((b) => b.addEventListener('click', () => {
-    state.gp = state.gp || {}; state.gp[mk] = G; state.athMkt = mk; gpSelect(G.rows.find((r) => r.group === b.dataset.hg)); }));
-  box.querySelectorAll('[data-hs]').forEach((b) => b.addEventListener('click', () => tdHeatStock(b.dataset.hs, mk, G.rows.find((r) => r.group === b.dataset.hgg))));
+    state.gp = state.gp || {}; state.gp[mk] = G; state.athMkt = mk; gpSelect(G.rows.concat(G.themes || []).find((r) => r.group === b.dataset.hg)); }));
+  box.querySelectorAll('[data-hs]').forEach((b) => b.addEventListener('click', () => tdHeatStock(b.dataset.hs, mk, G.rows.concat(G.themes || []).find((r) => r.group === b.dataset.hgg))));
 }
 async function tdHeatStock(sym, mk, g) {
   const m = ((g && g.members) || []).find((x) => x.symbol === sym) || {};
