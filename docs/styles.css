@@ -936,3 +936,4 @@ body.pub .owner-only { display: none !important; }
 .pie-in{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
 .pie-in label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted,#888)}
 .pie-in input{font:inherit;font-size:15px;padding:8px 10px;border-radius:10px;border:1px solid var(--line,#ccc);background:transparent;color:inherit;min-width:0}
+.pie-h.pie-x{outline:1.5px solid var(--fall,#d64545)}

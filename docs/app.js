@@ -4054,7 +4054,48 @@ async function tdPies(box) {
       ${per.length ? `<p class="lv-sub">${per.map(([n, a, v]) => `${esc(n)}: ${A(a)} → <b>${A(v)}</b>`).join(' · ')} · value in A$ includes the AUD/USD move${(D.pies[0].nav || []).length ? `, prices to ${day(D.pies[0].nav[D.pies[0].nav.length - 1][0])}` : ' (prices appear after the next nightly run)'}.</p>` : '<p class="lv-sub">Set the date you bought to start tracking.</p>'}
       ${D.pies.some((p) => p.provisional) ? '<p class="lv-sub">⚠ The month-end check may change these targets (see “If this month ended today” below). Rebalance only on the first trading day after month-end.</p>' : ''}</div>`;
   })();
-  box.innerHTML = seg + track + D.pies.map((p) => { const cum = (p.record || []).reduce((a, x) => a * (1 + x[1] / 100), 1);
+  /* 12 Nov 2026: "Pulse + ATH breakout" stock pie (experimental). From the US scans: stocks still in a Monthly-ATH trade
+     (above the 30-week SMA), aligned (sector, theme and stock beating their benchmarks), in the top 40% of industries by
+     quarter Pulse; strongest stock RS first, max 2 per industry and 3 per sector, 10 at 10%. Saved basket on this device;
+     exits = weekly close below the 30-week SMA (scan status 'exited'). US Monthly-ATH did not beat the index 2008-26. */
+  let atrk = '';
+  if (ver === 'au') {
+    const [AT, GP] = await Promise.all([getJSON(MAIN + 'data/scan/us/ath.json', 'ath_US'), getJSON(MAIN + 'data/scan/us/group_pulse.json', '_gpUSraw')]);
+    if (AT && GP) {
+      const N = GP.rows.length; const grp = {}; GP.rows.forEach((r) => (r.members || []).forEach((m) => { grp[m.symbol] = r; }));
+      const TR = {}; (AT.tracked || []).forEach((r) => { TR[r.symbol] = r; });
+      const q = (AT.tracked || []).filter((r) => r.status === 'open' && r.aligned && grp[r.symbol] && grp[r.symbol].rank <= 0.4 * N && r.close > r.sma30)
+        .sort((a, b) => (b.stock_rs || 0) - (a.stock_rs || 0));
+      const pick = []; const ci = {}, cs = {};
+      for (const r of q) { const gi = grp[r.symbol].group, se = r.industry || 'Other'; if ((ci[gi] || 0) >= 2 || (cs[se] || 0) >= 3) continue; pick.push(r); ci[gi] = (ci[gi] || 0) + 1; cs[se] = (cs[se] || 0) + 1; if (pick.length >= 10) break; }
+      let B = null; try { B = JSON.parse(localStorage.getItem('td.t212b') || 'null'); } catch (e) { /* */ }
+      const A = (v) => `A$${fmt(v, 0, 'en-AU')}`;
+      let held = '';
+      if (B && B.items) {
+        const fxNow = (() => { const nv = (D.pies[0] || {}).nav || []; return nv.length ? nv[nv.length - 1][2] : null; })();
+        const per = B.amt / B.items.length; let tot = 0;
+        const rows = B.items.map((x) => { const t = TR[x.sym] || {}; const ex = t.status === 'exited'; const px = ex ? (t.exit_price || t.close) : t.close;
+          const g = px && x.px0 ? px / x.px0 : 1; const v = per * g * (B.fx0 && fxNow ? B.fx0 / fxNow : 1); tot += v;
+          return `<span class="pie-h ${ex ? 'pie-x' : ''}"><b>${esc(x.sym)}</b> ${g >= 1 ? '+' : ''}${fmt((g - 1) * 100, 1)}%<small>${ex ? 'exit signal: weekly close below 30-wk avg — sell / replace' : 'holding'}</small></span>`; }).join('');
+        const outs = B.items.filter((x) => (TR[x.sym] || {}).status === 'exited').map((x) => x.sym);
+        const ins = pick.filter((r) => !B.items.some((x) => x.sym === r.symbol)).slice(0, outs.length).map((r) => r.symbol);
+        const pl = tot - B.amt;
+        held = `<div class="pie-trk-h"><b>Your breakout pie</b><span class="${pl >= 0 ? 'up' : 'down'}"><b class="pie-big">${A(tot)}</b> ${pl >= 0 ? '+' : '−'}${A(Math.abs(pl))} (${pl >= 0 ? '+' : ''}${fmt(pl / B.amt * 100, 1)}%)</span></div>
+          <div class="pie-hold">${rows}</div>
+          <p class="lv-sub">${outs.length ? `<b>Swap:</b> sell ${outs.map(esc).join(', ')}${ins.length ? ` → buy ${ins.map(esc).join(', ')}` : ''} (at month-end).` : 'No exits: hold all.'} Started ${day(B.start)} with ${A(B.amt)}; prices from the US scan (last close), A$ includes AUD/USD.</p>
+          <button class="lv-link" id="t2bclr">Stop tracking</button>`;
+      }
+      atrk = `<details class="td-risk pie" ${B ? 'open' : ''}><summary><span><b>🥧 Pulse + ATH breakout stocks</b><small>Experimental · 10 US stocks · ${q.length} qualify today</small></span></summary>
+        ${held}
+        <p class="lv-sub"><b>Today's 10</b> (10% each${T.amt ? ` · ${A((B ? B.amt : 1000) / 10)} each on ${A(B ? B.amt : 1000)}` : ''}):</p>
+        <div class="pie-hold">${pick.map((r) => `<span class="pie-h"><b>${esc(r.symbol)}</b> ${r.ret >= 0 ? '+' : ''}${fmt(r.ret * 100, 0)}%<small>${esc(grp[r.symbol].group)} · since ${day(r.date)}</small></span>`).join('')}</div>
+        <p class="lv-sub">Rule: still in a Monthly-ATH breakout (above its 30-week average), sector, theme and stock all beating their benchmarks, industry in the top 40% by quarter Pulse; strongest first, max 2 per industry and 3 per sector. Sell one on a weekly close below its 30-week average and refill from this list at month-end.</p>
+        <p class="lv-sub down"><b>Not proven:</b> US Monthly-ATH breakouts did not beat the S&amp;P 500 in the 2008–26 test, and a pie has no stop. Use a small amount and judge it on this live record.</p>
+        ${B ? '' : `<div class="pie-in" style="grid-template-columns:1fr auto"><label>Amount (A$)<input id="t2bamt" inputmode="numeric" value="1000"></label><button class="lv-btn" id="t2bgo" style="align-self:end">Track these 10</button></div>`}</details>`;
+      state._t212pick = pick;
+    }
+  }
+  box.innerHTML = seg + track + atrk + D.pies.map((p) => { const cum = (p.record || []).reduce((a, x) => a * (1 + x[1] / 100), 1);
     return `<details class="td-risk pie" ${p.changed ? 'open' : ''}><summary><span><b>🥧 ${esc(p.title)}</b><small>${esc(D.broker)} · decided ${day(p.decided)}${p.changed ? ' · <em class="pie-new">changed: rebalance</em>' : ' · no change'}</small></span></summary>
       <div class="pie-hold">${chips(p.hold)}</div>
       ${p.changed && p.before && p.before.length ? `<p class="muted td-rs">Was: ${p.before.map((x) => `${esc(x.ticker)} ${fmt(x.pct, 0)}%`).join(' · ')}</p>` : ''}
@@ -4066,6 +4107,11 @@ async function tdPies(box) {
   const sv = () => { const a = Math.max(0, +String($('#t2amt').value).replace(/[^\d.]/g, '') || 0), r = Math.min(100, Math.max(0, +$('#t2rot').value || 0));
     try { localStorage.setItem('td.t212', JSON.stringify({ amt: a, rot: r, start: $('#t2st').value })); } catch (e) { /* */ } tdPies(box); };
   ['#t2amt', '#t2rot', '#t2st'].forEach((q) => { const i = box.querySelector(q); if (i) i.addEventListener('change', sv); });
+  { const go = box.querySelector('#t2bgo'); if (go) go.addEventListener('click', () => { const amt = Math.max(0, +String($('#t2bamt').value).replace(/[^\d.]/g, '') || 0);
+      const nv = (D.pies[0] || {}).nav || []; const B = { amt, start: new Date().toISOString().slice(0, 10), fx0: nv.length ? nv[nv.length - 1][2] : null,
+        items: (state._t212pick || []).map((r) => ({ sym: r.symbol, px0: r.close })) };
+      try { localStorage.setItem('td.t212b', JSON.stringify(B)); } catch (e) { /* */ } tdPies(box); }); }
+  { const c = box.querySelector('#t2bclr'); if (c) c.addEventListener('click', () => { if (!window.confirm('Stop tracking the breakout pie on this device?')) return; try { localStorage.removeItem('td.t212b'); } catch (e) { /* */ } tdPies(box); }); }
 }
 async function loadToday() { $('#title').textContent = 'Today'; return tdRender($('#view-today'), false); }
 async function tdRender(el, beginner) {
