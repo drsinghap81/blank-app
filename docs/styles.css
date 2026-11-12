@@ -953,3 +953,5 @@ body.pub .owner-only { display: none !important; }
 .view .num b { font-size: 17px; } .view .num span { font-size: 13.5px; }
 .view .stat span { font-size: 13.5px; }
 #btn-download.spin svg{animation:tdspin .8s linear infinite}
+/* 13 Nov 2026: PDF capture - wrapped inline labels were painted over the stock name by the PDF renderer */
+.pdfmode .chip, .pdfmode .lv-mode, .pdfmode .score, .pdfmode .lane { display: inline-block; white-space: nowrap; }

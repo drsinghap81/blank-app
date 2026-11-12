@@ -908,6 +908,11 @@ async function loadLive() {
   }
   const alN = lvAlloc('NSE', P, S); const C0n = S ? S.capital : cap('NSE');
   if (!S || !S.buckets) rows = lvRoomCut(rows, alN, C0n);
+  /* 13 Nov 2026: one row per stock. A My pick that is also a system setup today (e.g. DRREDDY, GRAPHITE) shows once: the
+     tested system row keeps Send; the pick becomes a note without Send (counts and baskets skip it). Remove the pick if unwanted. */
+  { const sysRow = new Map(); rows.forEach((r) => { if (bkOf(r) !== 'my' && r.tier !== 'more' && !r.skip) sysRow.set(r.symbol, r); });
+    rows = rows.map((r) => { const d = bkOf(r) === 'my' && sysRow.get(r.symbol);
+      return d ? { ...r, skip: `Also a ${BK_NAME[bkOf(d)] || d.system} setup today — buy it there (tested stop ${fmt(d.stop, 2, 'en-IN')}); Remove this pick if you don't want your own stop` } : r; }); }
   const inUseN = S && S.buckets ? Object.fromEntries(S.buckets.map((b) => [b.key, b.used])) : rows.reduce((a, r) => { if (!r.skip && r.qty > 0 && r.tier !== 'more' && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))) a[bkOf(r)] = (a[bkOf(r)] || 0) + r.value; return a; }, {});
   const nP = S && S.picks ? S.picks : lvN('NSE'); const rP = S && S.risk_pct ? S.risk_pct : lvRiskN(nP);
   state._lvGuardRisk = S && S.guard ? S.guard.risk_pct : +rP.toFixed(2);
@@ -3761,6 +3766,7 @@ async function pagePdf() {
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
   } catch (e) { btn.disabled = false; btn.classList.remove('spin'); alertMsg('Could not load the PDF maker (are you offline?).'); return; }
   const closed = [...view.querySelectorAll('details:not([open])')]; closed.forEach((d) => { d.open = true; });
+  document.body.classList.add('pdfmode');
   await new Promise((r) => setTimeout(r, 400));
   try {
     const solid = (c) => c && !/rgba\(.*,\s*0\)$/.test(c) && c !== 'transparent';
@@ -3787,6 +3793,7 @@ async function pagePdf() {
       try { await navigator.share({ files: [file], title: name }); } catch (e) { /* cancelled */ }
     } else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); }
   } catch (e) { alertMsg('PDF failed: ' + e.message); }
+  document.body.classList.remove('pdfmode');
   closed.forEach((d) => { d.open = false; }); btn.disabled = false; btn.classList.remove('spin');
 }
 $('#btn-download').addEventListener('click', pagePdf);
