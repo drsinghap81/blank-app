@@ -937,3 +937,18 @@ body.pub .owner-only { display: none !important; }
 .pie-in label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted,#888)}
 .pie-in input{font:inherit;font-size:15px;padding:8px 10px;border-radius:10px;border:1px solid var(--line,#ccc);background:transparent;color:inherit;min-width:0}
 .pie-h.pie-x{outline:1.5px solid var(--fall,#d64545)}
+
+/* 12 Nov 2026: one type scale across tabs, matched to Today (names 18px, detail 13.5px, chips 12.5px) */
+.td-mini { padding: 12px 14px; gap: 12px; }
+.td-mini > span { margin-right: 14px; } .td-mini b { font-size: 21px; } .td-mini small { font-size: 12.5px; }
+.view .sym, .view .lv-sym { font-size: 18px; }
+.view .co, .view .lv-sub, .view .lv-plan, .view .muted, .view .status, .view summary, .view .lv-capnote, .view .tdc-why { font-size: 13.5px; }
+.view .chip, .view .lv-mode { font-size: 12.5px; }
+.view table th { font-size: 13px; } .view table td { font-size: 14.5px; }
+.view .lv-btn, .view .lv-link, .view .seg button { font-size: 14.5px; }
+.view .lv-rank { font-size: 16px; }
+.view h3 { font-size: 19px; } .view h4 { font-size: 16.5px; }
+.view .lv-row .lv-sub b, .view .lv-plan b { font-size: inherit; }
+.view .pie-h small, .view .bk-c small { font-size: 12.5px; }
+.view .num b { font-size: 17px; } .view .num span { font-size: 13.5px; }
+.view .stat span { font-size: 13.5px; }

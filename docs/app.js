@@ -4258,7 +4258,7 @@ async function tdRiskCard(box, S0) {
   const wk = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
   const raised = pos.filter((p) => p.trail_at && String(p.trail_at).slice(0, 10) >= wk && p.new_stop);
   const mini = $('#tdmini'); if (mini && pos.length) {
-    const mr = (p, col) => `<svg viewBox="0 0 36 36" width="30" height="30" aria-hidden="true"><circle cx="18" cy="18" r="14" fill="none" style="stroke:var(--line)" stroke-width="5"/><circle cx="18" cy="18" r="14" fill="none" style="stroke:${col}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(Math.min(1, p / 20) * 88).toFixed(1)} 88" transform="rotate(-90 18 18)"/></svg>`;
+    const mr = (p, col) => `<svg viewBox="0 0 36 36" width="54" height="54" aria-hidden="true"><circle cx="18" cy="18" r="14" fill="none" style="stroke:var(--line)" stroke-width="4.5"/><circle cx="18" cy="18" r="14" fill="none" style="stroke:${col}" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="${(Math.min(1, p / 20) * 88).toFixed(1)} 88" transform="rotate(-90 18 18)"/></svg>`;
     mini.innerHTML = `<button class="td-mini" aria-label="Open risk and return, details below">${mr(pct, 'var(--saffron)')}<span><b>${fmt(pct, 1)}%</b><small>open risk</small></span>${mr(Math.abs(rp), rp >= 0 ? 'var(--rise)' : 'var(--fall)')}<span><b class="${rp >= 0 ? 'up' : 'down'}">${rp >= 0 ? '+' : '−'}${fmt(Math.abs(rp), 1)}%</b><small>return · ${pnl >= 0 ? '+' : '−'}${inr(Math.abs(pnl))}</small></span><i>›</i></button>`;
     mini.querySelector('button').addEventListener('click', () => { const d = box.querySelector('details'); if (d) d.open = true; box.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   }
