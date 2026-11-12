@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-12 16:43 UTC",
+"generated": "2026-11-12 22:57 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-12",
@@ -124,7 +124,7 @@
 "td_score": 2,
 "group": "Entertainment",
 "lane": "build",
-"group_pulse": 73.8,
+"group_pulse": 71.4,
 "group_rank": 1,
 "rank": 1,
 "risk_pct": 37.3
@@ -157,9 +157,9 @@
 "aligned": true,
 "td_score": 2,
 "group": "Banks - Private Mid & Small",
-"lane": "hold",
-"group_pulse": 30.6,
-"group_rank": 11,
+"lane": "fade",
+"group_pulse": 28.6,
+"group_rank": 13,
 "rank": 2,
 "risk_pct": 18.6
 },
@@ -225,8 +225,8 @@
 "td_score": 2,
 "group": "Oil & Gas Refining & Marketing",
 "lane": "fade",
-"group_pulse": 22.6,
-"group_rank": 20,
+"group_pulse": 23.4,
+"group_rank": 19,
 "rank": 4,
 "risk_pct": 25.3
 },
@@ -292,8 +292,8 @@
 "td_score": 1,
 "group": "Electrical Equipment & Parts",
 "lane": "fade",
-"group_pulse": 10.2,
-"group_rank": 54,
+"group_pulse": 11.0,
+"group_rank": 51,
 "rank": 6,
 "risk_pct": 14.1
 },
@@ -326,8 +326,8 @@
 "td_score": 1,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 19.0,
-"group_rank": 25,
+"group_pulse": 17.7,
+"group_rank": 27,
 "rank": 7,
 "risk_pct": 10.8
 },
@@ -359,8 +359,8 @@
 "td_score": 1,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 19.0,
-"group_rank": 25,
+"group_pulse": 17.7,
+"group_rank": 27,
 "rank": 8,
 "risk_pct": 12.8
 },
@@ -393,8 +393,8 @@
 "td_score": 0,
 "group": "Electrical Equipment & Parts",
 "lane": "fade",
-"group_pulse": 10.2,
-"group_rank": 54,
+"group_pulse": 11.0,
+"group_rank": 51,
 "rank": 9,
 "risk_pct": 26.3
 }
@@ -430,7 +430,7 @@
 "td_score": 2,
 "group": "Lodging",
 "lane": "hold",
-"group_pulse": 36.9,
+"group_pulse": 36.3,
 "group_rank": 6,
 "rank": 1,
 "risk_pct": 8.5
@@ -464,8 +464,8 @@
 "td_score": 1,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 17.4,
-"group_rank": 30,
+"group_pulse": 16.0,
+"group_rank": 33,
 "rank": 2,
 "risk_pct": 13.2
 },
@@ -498,8 +498,8 @@
 "td_score": 1,
 "group": "Metal Fabrication",
 "lane": "hold",
-"group_pulse": 17.9,
-"group_rank": 28,
+"group_pulse": 16.7,
+"group_rank": 32,
 "rank": 3,
 "risk_pct": 22.2
 },
@@ -532,7 +532,7 @@
 "td_score": 1,
 "group": "Medical Instruments & Supplies",
 "lane": "hold",
-"group_pulse": 27.4,
+"group_pulse": 26.2,
 "group_rank": 15,
 "rank": 4,
 "risk_pct": 9.6
@@ -563,8 +563,8 @@
 "td_score": null,
 "group": "Drug Manufacturers - General",
 "lane": "hold",
-"group_pulse": 22.9,
-"group_rank": 18,
+"group_pulse": 21.9,
+"group_rank": 22,
 "rank": 1,
 "risk_pct": 12.7
 },
@@ -597,8 +597,8 @@
 "td_score": 3,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 35.2,
-"group_rank": 8,
+"group_pulse": 32.4,
+"group_rank": 9,
 "rank": 5,
 "risk_pct": 10.4
 },
@@ -631,8 +631,8 @@
 "td_score": 3,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 35.2,
-"group_rank": 8,
+"group_pulse": 32.4,
+"group_rank": 9,
 "rank": 6,
 "risk_pct": 8.1
 },
@@ -664,8 +664,8 @@
 "td_score": 2,
 "group": "Asset Management",
 "lane": "mid",
-"group_pulse": 13.7,
-"group_rank": 44,
+"group_pulse": 12.4,
+"group_rank": 47,
 "rank": 7,
 "risk_pct": 12.6
 },
@@ -697,8 +697,8 @@
 "td_score": 2,
 "group": "Credit Services",
 "lane": "mid",
-"group_pulse": 13.5,
-"group_rank": 45,
+"group_pulse": 12.3,
+"group_rank": 48,
 "rank": 8,
 "risk_pct": 11.7
 },
@@ -834,7 +834,7 @@
 "signal_date": "2026-10-29",
 "group": "Building Products & Equipment",
 "lane": "mid",
-"group_rank": 40
+"group_rank": 37
 },
 {
 "symbol": "HDFCAMC",
@@ -846,7 +846,7 @@
 "signal_date": "2026-11-03",
 "group": "Asset Management",
 "lane": "mid",
-"group_rank": 44
+"group_rank": 47
 },
 {
 "symbol": "FRACTAL",
@@ -858,7 +858,7 @@
 "signal_date": "2026-11-04",
 "group": "Software - Infrastructure",
 "lane": "mid",
-"group_rank": 43
+"group_rank": 44
 },
 {
 "symbol": "ZAGGLE",
@@ -870,7 +870,7 @@
 "signal_date": "2026-11-04",
 "group": "Software - Infrastructure",
 "lane": "mid",
-"group_rank": 43
+"group_rank": 44
 },
 {
 "symbol": "HDFCBANK",
@@ -882,7 +882,7 @@
 "signal_date": "2026-11-05",
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_rank": 8
+"group_rank": 9
 },
 {
 "symbol": "ICICIBANK",
@@ -894,7 +894,7 @@
 "signal_date": "2026-11-05",
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_rank": 8
+"group_rank": 9
 },
 {
 "symbol": "RECLTD",
@@ -906,7 +906,7 @@
 "signal_date": "2026-11-11",
 "group": "Credit Services",
 "lane": "mid",
-"group_rank": 45
+"group_rank": 48
 },
 {
 "symbol": "MARATHON",
@@ -945,6 +945,18 @@
 "group_rank": null
 },
 {
+"symbol": "BSOFT",
+"name": "BIRLASOFT LIMITED",
+"typ": "TB",
+"close": 327.79998779296875,
+"neck": 320.608642578125,
+"stop": 261.9,
+"signal_date": "2026-10-29",
+"group": "Information Technology Services",
+"lane": "bounce",
+"group_rank": 16
+},
+{
 "symbol": "ROUTE",
 "name": "ROUTE MOBILE LIMITED",
 "typ": "DB",
@@ -954,7 +966,7 @@
 "signal_date": "2026-10-29",
 "group": "Telecom Services",
 "lane": "bounce",
-"group_rank": 36
+"group_rank": 38
 },
 {
 "symbol": "BHARTIARTL",
@@ -966,7 +978,19 @@
 "signal_date": "2026-11-03",
 "group": "Telecom Services",
 "lane": "bounce",
-"group_rank": 36
+"group_rank": 38
+},
+{
+"symbol": "INFY",
+"name": "Infosys Limited",
+"typ": "DB",
+"close": 1151.199951171875,
+"neck": 1164.0347900390625,
+"stop": 950.8,
+"signal_date": "2026-11-05",
+"group": "Information Technology Services",
+"lane": "bounce",
+"group_rank": 16
 },
 {
 "symbol": "EMAMILTD",
@@ -978,7 +1002,7 @@
 "signal_date": "2026-11-09",
 "group": "Household & Personal Products",
 "lane": "bounce",
-"group_rank": 42
+"group_rank": 43
 },
 {
 "symbol": "ABREL",
@@ -990,7 +1014,7 @@
 "signal_date": "2026-11-12",
 "group": "Real Estate Services",
 "lane": "bounce",
-"group_rank": 35
+"group_rank": 41
 },
 {
 "symbol": "HAVELLS",
@@ -1002,7 +1026,7 @@
 "signal_date": "2026-11-06",
 "group": "Electrical Equipment & Parts",
 "lane": "fade",
-"group_rank": 54
+"group_rank": 51
 },
 {
 "symbol": "IOC",
@@ -1014,31 +1038,7 @@
 "signal_date": "2026-11-06",
 "group": "Oil & Gas Refining & Marketing",
 "lane": "fade",
-"group_rank": 20
-},
-{
-"symbol": "ANURAS",
-"name": "Anupam Rasayan India Limited",
-"typ": "DB",
-"close": 1201.800048828125,
-"neck": 1187.0,
-"stop": 1066.72,
-"signal_date": "2026-11-09",
-"group": "Specialty Chemicals",
-"lane": "fade",
-"group_rank": 37
-},
-{
-"symbol": "TIRUMALCHM",
-"name": "Thirumalai Chemicals Limited",
-"typ": "DB",
-"close": 125.20999908447266,
-"neck": 125.30000305175781,
-"stop": 112.12,
-"signal_date": "2026-11-11",
-"group": "Specialty Chemicals",
-"lane": "fade",
-"group_rank": 37
+"group_rank": 19
 }
 ],
 "watch": [
@@ -1095,7 +1095,7 @@
 "td_score": 1,
 "group": "Lodging",
 "lane": "hold",
-"group_pulse": 36.9,
+"group_pulse": 36.3,
 "group_rank": 6
 },
 {
@@ -1123,8 +1123,8 @@
 "td_score": 1,
 "group": "Packaging & Containers",
 "lane": "mid",
-"group_pulse": 11.4,
-"group_rank": 52
+"group_pulse": 10.5,
+"group_rank": 53
 },
 {
 "id": "WATCH-360ONE",
@@ -1151,8 +1151,8 @@
 "td_score": 3,
 "group": "Asset Management",
 "lane": "mid",
-"group_pulse": 13.7,
-"group_rank": 44
+"group_pulse": 12.4,
+"group_rank": 47
 },
 {
 "id": "WATCH-PARAGMILK",
@@ -1263,8 +1263,8 @@
 "td_score": 1,
 "group": "Household & Personal Products",
 "lane": "bounce",
-"group_pulse": 13.9,
-"group_rank": 42
+"group_pulse": 13.5,
+"group_rank": 43
 }
 ],
 "exits": [],
