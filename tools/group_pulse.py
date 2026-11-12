@@ -66,21 +66,32 @@ def universe(mkt):
 
 
 def download(tickers):
+    """12 Nov 2026: Yahoo rate limits return blank columns instead of raising. Download in chunks with a short pause, then
+    retry the tickers that came back empty (up to 3 more passes, longer waits)."""
     out = {}
-    for a in range(0, len(tickers), 200):
-        ch = tickers[a:a + 200]
-        for k in range(3):
+
+    def grab(ts):
+        for a in range(0, len(ts), 200):
+            ch = ts[a:a + 200]
             try:
                 d = yf.download(ch, period="3y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
                 for t in ch:
                     try:
-                        out[t] = pd.DataFrame({"c": d["Close"][t], "v": d["Volume"][t]}).dropna()
+                        x = pd.DataFrame({"c": d["Close"][t], "v": d["Volume"][t]}).dropna()
+                        if len(x):
+                            out[t] = x
                     except Exception:  # noqa: BLE001
                         pass
-                break
             except Exception as e:  # noqa: BLE001
-                print("retry", a, e, flush=True); time.sleep(15)
-        print(a + len(ch), "downloaded", flush=True)
+                print("chunk failed", a, e, flush=True)
+            time.sleep(3)
+    grab(list(tickers))
+    for k, wait in enumerate((60, 120, 240)):
+        miss = [t for t in tickers if t not in out]
+        if len(miss) < max(5, 0.02 * len(tickers)):
+            break
+        print(f"retry pass {k + 1}: {len(miss)} missing, waiting {wait}s", flush=True); time.sleep(wait); grab(miss)
+    print("downloaded", len(out), "of", len(tickers), flush=True)
     return out
 
 
@@ -102,6 +113,12 @@ def main(mkt):
     tr = (w > 100) & (e9 > e21) & st2 & (C >= 0.75 * hi52) & liq
     grp = dict(zip(u.symbol, u.group)); nm = dict(zip(u.symbol, u.name))
     L = liq.iloc[-1]; syms = [s for s in C.columns if L.get(s, False)]
+    try:                                     # 12 Nov 2026: never overwrite a good file with a rate-limited, half-empty run
+        prev_n = json.load(open(cf["out"] + "group_pulse.json")).get("stocks_n") or 0
+    except Exception:  # noqa: BLE001
+        prev_n = 0
+    if prev_n and len(syms) < 0.6 * prev_n:
+        raise RuntimeError(f"only {len(syms)} liquid stocks vs {prev_n} last run (download incomplete); keeping the previous files")
     def share(wn, at=-1):
         x = tr.astype(float).rolling(wn).mean().iloc[at]; return x
     s1w, s1m, s1q, s1m_prev = share(5), share(21), share(63), share(21, -22)
