@@ -47,7 +47,73 @@
  "lot": 65,
  "margin": "Rs 8-10 lakh per set (estimate; check your broker)",
  "late": false,
- "updated": "2026-11-11 17:54 IST",
- "position": null,
- "paper_start": "2026-11-04"
+ "updated": "2026-11-12 17:53 IST",
+ "position": {
+  "expiry": "2026-11-17",
+  "entry": "2026-11-11",
+  "future": 25214.2,
+  "legs": {
+   "CE": {
+    "long": 25050.0,
+    "short2": 25600.0,
+    "short4": 25650.0,
+    "entry_prices": [
+     298.15,
+     92.85,
+     81.85
+    ],
+    "entry_value": -214.95,
+    "entry_cost": 8.931817307692308
+   },
+   "PE": {
+    "long": 25350.0,
+    "short2": 24850.0,
+    "short4": 24800.0,
+    "entry_prices": [
+     319.7,
+     93.05,
+     79.3
+    ],
+    "entry_value": -183.6,
+    "entry_cost": 8.998792307692309
+   }
+  }
+ },
+ "paper_start": "2026-11-04",
+ "entered": {
+  "date": "2026-11-11",
+  "future": 25214.2,
+  "legs": {
+   "CE": {
+    "long": 25050.0,
+    "short2": 25600.0,
+    "short4": 25650.0,
+    "prices": [
+     298.15,
+     92.85,
+     81.85
+    ],
+    "net": -214.95,
+    "breakeven_far": 25793.0
+   },
+   "PE": {
+    "long": 25350.0,
+    "short2": 24850.0,
+    "short4": 24800.0,
+    "prices": [
+     319.7,
+     93.05,
+     79.3
+    ],
+    "net": -183.6,
+    "breakeven_far": 24673.0
+   }
+  }
+ },
+ "paper_mtm": {
+  "date": "2026-11-11",
+  "pts": -17.9,
+  "rs": -1165,
+  "future": 25214.2
+ }
 }
