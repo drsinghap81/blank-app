@@ -127,7 +127,9 @@ def main(mkt):
     grp = dict(zip(u.symbol, u.group)); nm = dict(zip(u.symbol, u.name))
     L = liq.iloc[-1]; syms = [s for s in C.columns if L.get(s, False)]
     try:                                     # 12 Nov 2026: never overwrite a good file with a rate-limited, half-empty run
-        prev_n = json.load(open(cf["out"] + "group_pulse.json")).get("stocks_n") or 0
+        prev = json.load(open(cf["out"] + "group_pulse.json"))
+        # compare only with a run made under the same price / liquidity floors (a floor change legitimately shrinks the list)
+        prev_n = (prev.get("stocks_n") or 0) if prev.get("floor") == [cf["minpx"], cf["minval"]] else 0
     except Exception:  # noqa: BLE001
         prev_n = 0
     if prev_n and len(syms) < 0.6 * prev_n:
@@ -226,7 +228,7 @@ def main(mkt):
     stock = {m["symbol"]: [r["group"], r["p1m"], r["rank"], len(rows)] for r in rows for m in r["members"]}
     mkt_share = round(float(np.nanmean([s1m[s] for s in syms])) * 100, 1)
     out = dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), asof=str(C.index[-1].date()), market=mkt,
-               groups_n=len(rows), stocks_n=len(syms), market_pulse_1m=mkt_share,
+               groups_n=len(rows), stocks_n=len(syms), market_pulse_1m=mkt_share, floor=[cf["minpx"], cf["minval"]],
                rule="Trending day = weighted RPI > 100 (mean of 2-week, 3-month and 6-month performance vs the market index x 100), "
                     "EMA 9 > EMA 21, a Stage 2 uptrend (above a rising 150-day average) and within 25% of the 52-week high. Pulse = share of a group's liquid stocks' days that "
                     "were trending over the last 1 week / 1 month / 1 quarter. Groups with 3+ liquid stocks.",
