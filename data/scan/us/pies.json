@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-11 03:11 UTC",
-"asof": "2026-11-10",
+"generated": "2026-11-12 00:26 UTC",
+"asof": "2026-11-11",
 "broker": "Trading 212 (Australia)",
 "note": "Rebalance on the first trading day after the month-end decision. FX fee 0.15% each way on Trading 212 AU. Pies have no stop-loss: the month-end check is the exit.",
 "pies": [
