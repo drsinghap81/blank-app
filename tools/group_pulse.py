@@ -31,6 +31,9 @@ NSE_SPLIT = {
 }
 
 
+THEME_SKIP = ("SME", "AHIMSA", "IPO", "CORPORATE GROUP", "LIQUID 15", "REITS", "ESG", "50:30:20", "EQUAL WEIGHT", "MAATR")
+
+
 def universe(mkt):
     if mkt == "NSE":
         u = pd.read_csv("data/universe/nse_industry.csv").rename(columns={"basic_industry": "group"})
@@ -99,14 +102,20 @@ def main(mkt):
     cf = CFG[mkt]; u = universe(mkt)
     tick = {s: (s.replace("/", "-").replace(".", "-") if mkt == "US" else s) + cf["suf"] for s in u.symbol}
     if mkt == "NSE" and os.path.exists("data/universe/themes.csv"):     # theme constituents without an industry still get prices
-        for x in pd.read_csv("data/universe/themes.csv").Symbol.astype(str):
+        TH0 = pd.read_csv("data/universe/themes.csv")
+        TH0 = TH0[~TH0.Theme.str.upper().str.contains("|".join(THEME_SKIP), regex=True)]
+        for x in TH0.Symbol.astype(str):
             if x not in tick and not x.startswith("DUMMY"):
                 tick[x] = x + cf["suf"]
     data = download(list(tick.values()) + [cf["bench"]])
     B = data.get(cf["bench"]); B = B.c if B is not None else None
     C = pd.DataFrame({s: data[t].c for s, t in tick.items() if t in data and len(data[t]) > 160})
     V = pd.DataFrame({s: data[t].v for s, t in tick.items() if t in data and len(data[t]) > 160}).reindex(C.index)
-    C = drop_partial(C.sort_index(), {"NSE": "NSE", "US": "US", "ASX": "ASX", "UK": "UK"}[mkt]); V = V.reindex(C.index)
+    C = C.sort_index()
+    # 12 Nov 2026: keep only real trading days - a few odd series (new listings, SME, REIT/InvIT lines) add dates where almost
+    # every stock is blank, which broke every 150/200-day average and zeroed the whole Pulse
+    cnt = C.notna().sum(axis=1); C = C[cnt >= 0.5 * cnt.rolling(20, min_periods=1).max()]
+    C = drop_partial(C, {"NSE": "NSE", "US": "US", "ASX": "ASX", "UK": "UK"}[mkt]); V = V.reindex(C.index)
     B = B.reindex(C.index).ffill()
     liq = ((C * V).rolling(60, min_periods=40).median() >= cf["minval"]) & (C >= cf["minpx"])
     rpi = lambda k: 100 * (C / C.shift(k)).div(B / B.shift(k), axis=0)
@@ -173,7 +182,6 @@ def main(mkt):
                             rs1m=round(float(np.nanmean(r1[ss].iloc[-1])) * 100, 1), rs3m=round(float(np.nanmean(r3[ss].iloc[-1])) * 100, 1),
                             trending_now=int(sum(bool(tr[x].iloc[-1]) for x in ss))))
     sectors.sort(key=lambda r: -r["p1m"])
-    json.dump(charts, open(cf["out"] + "group_pulse_charts.json", "w"), separators=(",", ":"))
     s200 = C.rolling(200).mean(); s50 = C.rolling(50).mean(); bs = B.rolling(150).mean()
     market = dict(index=cf["bench"], close=round(float(B.iloc[-1]), 2), up=bool(B.iloc[-1] > bs.iloc[-1] and bs.iloc[-1] > bs.iloc[-21]),
                   r1m=round(float(B.iloc[-1] / B.iloc[-22] - 1) * 100, 1), r3m=round(float(B.iloc[-1] / B.iloc[-64] - 1) * 100, 1),
@@ -182,6 +190,8 @@ def main(mkt):
                   p1w=round(float(np.nanmean([s1w[x] for x in syms])) * 100, 1), p1m=round(float(np.nanmean([s1m[x] for x in syms])) * 100, 1),
                   p1q=round(float(np.nanmean([s1q[x] for x in syms])) * 100, 1),
                   above200_1m_ago=round(float((C.iloc[-22] > s200.iloc[-22])[syms].mean()) * 100, 1))
+    if market["above200"] == 0 or (market["p1q"] == 0 and market["p1m"] == 0):
+        raise RuntimeError(f"market stats look broken (above 200-day {market['above200']}%, Pulse {market['p1m']}); keeping the previous files")
     rows.sort(key=lambda r: -r["p1m"])
     for i, r in enumerate(rows):
         r["rank"] = i + 1
@@ -190,7 +200,7 @@ def main(mkt):
     themes = []
     if mkt == "NSE" and os.path.exists("data/universe/themes.csv"):
         TH = pd.read_csv("data/universe/themes.csv")
-        skip = ("SME", "AHIMSA", "IPO", "CORPORATE GROUP", "LIQUID 15", "REITS", "ESG", "50:30:20", "EQUAL WEIGHT", "MAATR")
+        skip = THEME_SKIP
         for th, gdf in TH.groupby("Theme"):
             if any(k in th.upper() for k in skip):
                 continue
@@ -212,7 +222,7 @@ def main(mkt):
         themes.sort(key=lambda r: -r["p1m"])
         for i, r in enumerate(themes):
             r["rank"] = i + 1
-        json.dump(charts, open(cf["out"] + "group_pulse_charts.json", "w"), separators=(",", ":"))
+    json.dump(charts, open(cf["out"] + "group_pulse_charts.json", "w"), separators=(",", ":"))   # all checks passed
     stock = {m["symbol"]: [r["group"], r["p1m"], r["rank"], len(rows)] for r in rows for m in r["members"]}
     mkt_share = round(float(np.nanmean([s1m[s] for s in syms])) * 100, 1)
     out = dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), asof=str(C.index[-1].date()), market=mkt,
