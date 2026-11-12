@@ -1006,10 +1006,32 @@ async function loadLive() {
       ${need.length ? need.map(([t, c, a, b]) => `<button class="lv-need-i ${c}" data-go="${t}"><b>${a}</b><span>${b}</span><i>›</i></button>`).join('') : '<p class="lv-sub">✓ Nothing to do — stops are in place and there are no new signals.</p>'}
       ${sendAll.length ? `<button class="lv-btn lv-sendall" id="lvsendall">Send all ${sendAll.length} tested buys · ${money(sendAll.reduce((a, [r]) => a + r.value, 0), 'NSE')}</button>
         <p class="lv-sub">Momentum + Trend 9/21 only, sized by your server (1% risk, max 10% a stock, your cash). One confirmation; each gets its stop on Angel after it fills.${live ? '' : ' <b>Dry run:</b> shows what would be sent.'}</p>` : ''}</div>` : '';
+  /* 12 Nov 2026: "Your book" — positions per system in bold, against each system's slots and money limit, plus Angel
+     holdings that no system tracks and pending buys. From the server plan (trades, buckets, picks, swing). */
+  const bookHtml = (() => {
+    if (!S) return '';
+    const BKOF = { 'Monthly ATH': 'mom', 'Trend 9/21': 'tf', '9/21 trend': 't9', 'Breakout retest': 'rt', 'Bottom pattern': 'pt', VCP: 'vcp', 'My pick': 'my' };
+    const T = (S.trades || []); const open = T.filter((t) => t.state === 'open' || t.state === 'exiting'); const pendT = T.filter((t) => t.state === 'pending');
+    const cnt = {}; open.forEach((t) => { const k = BKOF[t.system] || 'my'; cnt[k] = (cnt[k] || 0) + 1; });
+    const B = {}; (S.buckets || []).forEach((b) => { B[b.key] = b; });
+    const cap = S.capital || 0; const swOpen = S.swing ? S.swing.open : null; const swMax = S.swing ? S.swing.max : null;
+    const tracked = new Set(T.map((t) => t.symbol)); const other = (S.holdings || []).filter((h) => h.qty > 0 && !tracked.has(h.symbol));
+    const NAME = { mom: 'Momentum', tf: 'Trend 9/21', t9: '9/21 any', rt: 'Retest', pt: 'Pattern', vcp: 'VCP', my: 'My picks' };
+    const keys = ['mom', 'tf', 'vcp', 'my', 't9', 'rt', 'pt'].filter((k) => k === 'mom' || k === 'tf' || cnt[k]);
+    const cell = (k) => { const b = B[k] || {}; const lim = b.pct != null && cap ? b.pct / 100 * cap : null; const used = b.used || 0;
+      const slot = k === 'mom' ? `of ${S.picks || 10} slots` : 'positions';
+      return `<div class="bk-c"><span>${NAME[k]}</span><b>${cnt[k] || 0}</b><small>${slot}</small><small>${money(used, 'NSE')}${lim ? ` of ${money(lim, 'NSE')} (${fmt(b.pct, 0)}%)` : ''}</small></div>`; };
+    return `<div class="lv-card bk-book"><div class="lv-need-h"><b>Your book</b><span class="muted">${open.length} open${pendT.length ? ` · ${pendT.length} pending` : ''}</span></div>
+      <div class="bk-g">${keys.map(cell).join('')}
+        <div class="bk-c"><span>Swing total</span><b>${swOpen ?? '–'}</b><small>of ${swMax ?? '–'} swing slots</small></div>
+        <div class="bk-c"><span>Not in a system</span><b>${other.length}</b><small>other Angel holdings</small><small>${money(other.reduce((a, h) => a + (h.value || 0), 0), 'NSE')}</small></div>
+        <div class="bk-c"><span>Free cash</span><b class="bk-sm">${money(S.cash || 0, 'NSE')}</b><small>${cap ? fmt((S.cash || 0) / cap * 100, 0) + '% of capital' : ''}</small></div></div>
+      ${other.length ? `<p class="lv-sub">Not in a system: ${other.map((h) => esc(h.symbol)).join(', ')} — Adopt them in Holdings to give them a system and a stop.</p>` : ''}</div>`;
+  })();
   const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
   el.innerHTML = `${lvSeg()}${S ? '' : head}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
-    ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div>` : ''}${lvHero(S, PF)}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
+    ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div>` : ''}${lvHero(S, PF)}${bookHtml}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
     ${pane('buy', `    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '' : `<span class="lv-sub"><a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>
