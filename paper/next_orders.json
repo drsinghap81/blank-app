@@ -1,7 +1,7 @@
 {
   "BANKNIFTY": {
-    "date": "2026-11-11 00:00:00",
-    "close": 60637.8,
+    "date": "2026-11-12 00:00:00",
+    "close": 61337.6,
     "prev_top": 55194.6,
     "prev_bottom": 54823.4,
     "position": "LONG from 54,403.00 (2026-10-28)",
@@ -13,10 +13,10 @@
       "Entry": 54403.0,
       "Stop-loss (reverse)": 54798.4
     },
-    "open_pnl": 6234.8,
+    "open_pnl": 6934.6,
     "breakeven_active": "True",
     "futures_contract_expiry": "2026-11-23",
     "lot_size": 30,
-    "spot_close": 60792.4
+    "spot_close": 61518.5
   }
 }
