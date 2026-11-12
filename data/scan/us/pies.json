@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-12 07:21 UTC",
-"asof": "2026-11-12",
+"generated": "2026-11-12 07:23 UTC",
+"asof": "2026-11-11",
 "broker": "Trading 212 (Australia)",
 "note": "Rebalance on the first trading day after the month-end decision. FX fee 0.15% each way on Trading 212 AU. Pies have no stop-loss: the month-end check is the exit.",
 "pies": [
@@ -71,11 +71,6 @@
 "2026-11-11",
 1.00359,
 0.68696
-],
-[
-"2026-11-12",
-1.00359,
-0.68273
 ]
 ]
 },
@@ -89,63 +84,84 @@
 {
 "ticker": "VOO",
 "name": "S&P 500",
-"pct": 100.0
+"pct": 66.7
+},
+{
+"ticker": "XBI",
+"name": "Biotech",
+"pct": 33.3
 }
 ],
-"changed": false,
+"changed": true,
 "before": [
 {
+"ticker": "SMH",
+"pct": 33.3
+},
+{
+"ticker": "XBI",
+"pct": 33.3
+},
+{
 "ticker": "VOO",
-"pct": 100.0
+"pct": 33.3
 }
 ],
-"provisional": null,
+"provisional": [
+{
+"ticker": "XBI",
+"pct": 33.3
+},
+{
+"ticker": "XRT",
+"pct": 33.3
+},
+{
+"ticker": "VOO",
+"pct": 33.3
+}
+],
 "record": [],
 "nav": [
 [
 "2026-11-02",
-0.99348,
+0.98677,
 0.70288
 ],
 [
 "2026-11-03",
-0.99667,
+0.99513,
 0.69999
 ],
 [
 "2026-11-04",
-1.01283,
+1.01471,
 0.69684
 ],
 [
 "2026-11-05",
-0.96855,
+0.96236,
 0.70043
 ],
 [
 "2026-11-06",
-0.97145,
+0.97242,
 0.69311
 ],
 [
 "2026-11-09",
-0.99427,
+0.99765,
 0.68687
 ],
 [
 "2026-11-10",
-0.99087,
+0.99145,
 0.69212
 ],
 [
 "2026-11-11",
-1.00359,
+1.0026,
 0.68696
-],
-[
-"2026-11-12",
-1.00359,
-0.68273
 ]
 ]
 }
@@ -226,11 +242,6 @@
 "2026-11-11",
 1.00359,
 0.68696
-],
-[
-"2026-11-12",
-1.00359,
-0.68273
 ]
 ]
 },
@@ -244,15 +255,33 @@
 {
 "ticker": "VUAG",
 "name": "Vanguard S&P 500 UCITS (Acc)",
-"pct": 100.0,
+"pct": 66.7,
 "us": "VOO"
+},
+{
+"ticker": "BTEK",
+"name": "iShares Nasdaq US Biotechnology UCITS (close twin)",
+"pct": 33.3,
+"us": "XBI"
 }
 ],
-"changed": false,
+"changed": true,
 "before": [
 {
+"ticker": "SMGB",
+"pct": 33.3,
+"us": "SMH",
+"name": "VanEck Semiconductor UCITS"
+},
+{
+"ticker": "BTEK",
+"pct": 33.3,
+"us": "XBI",
+"name": "iShares Nasdaq US Biotechnology UCITS (close twin)"
+},
+{
 "ticker": "VUAG",
-"pct": 100.0,
+"pct": 33.3,
 "us": "VOO",
 "name": "Vanguard S&P 500 UCITS (Acc)"
 }
@@ -262,48 +291,43 @@
 "nav": [
 [
 "2026-11-02",
-0.99348,
+0.98677,
 0.70288
 ],
 [
 "2026-11-03",
-0.99667,
+0.99513,
 0.69999
 ],
 [
 "2026-11-04",
-1.01283,
+1.01471,
 0.69684
 ],
 [
 "2026-11-05",
-0.96855,
+0.96236,
 0.70043
 ],
 [
 "2026-11-06",
-0.97145,
+0.97242,
 0.69311
 ],
 [
 "2026-11-09",
-0.99427,
+0.99765,
 0.68687
 ],
 [
 "2026-11-10",
-0.99087,
+0.99145,
 0.69212
 ],
 [
 "2026-11-11",
-1.00359,
+1.0026,
 0.68696
-],
-[
-"2026-11-12",
-1.00359,
-0.68273
 ]
 ]
 }
