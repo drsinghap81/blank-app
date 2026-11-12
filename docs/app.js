@@ -3757,7 +3757,7 @@ async function pagePdf() {
   const btn = $('#btn-download'); const view = document.querySelector('.view:not([hidden])'); if (!view) return;
   btn.disabled = true; btn.classList.add('spin');
   try {
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    await loadScript('https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.8/dist/html2canvas-pro.min.js');
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
   } catch (e) { btn.disabled = false; btn.classList.remove('spin'); alertMsg('Could not load the PDF maker (are you offline?).'); return; }
   const closed = [...view.querySelectorAll('details:not([open])')]; closed.forEach((d) => { d.open = true; });
