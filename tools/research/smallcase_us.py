@@ -8,8 +8,16 @@ import numpy as np, pandas as pd, requests, yfinance as yf
 
 H = {"User-Agent": "Mozilla/5.0"}
 sp = pd.read_html(io.StringIO(requests.get("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies", headers=H, timeout=30).text))[0]
-nd = [t for t in pd.read_html(io.StringIO(requests.get("https://en.wikipedia.org/wiki/Nasdaq-100", headers=H, timeout=30).text)) if "Ticker" in t.columns or "Symbol" in t.columns][0]
-U = sorted(set(sp["Symbol"].str.replace(".", "-", regex=False)) | set((nd.get("Ticker", nd.get("Symbol"))).str.replace(".", "-", regex=False)))
+ndq = set()
+try:
+    for t in pd.read_html(io.StringIO(requests.get("https://en.wikipedia.org/wiki/Nasdaq-100", headers=H, timeout=30).text)):
+        cols = [c for c in t.columns if str(c).strip().lower() in ("ticker", "symbol")]
+        if cols and len(t) >= 90:
+            ndq = set(t[cols[0]].astype(str).str.replace(".", "-", regex=False)); break
+except Exception as ex:  # noqa: BLE001
+    print("nasdaq list failed", ex)
+print("S&P", len(sp), "Nasdaq", len(ndq))
+U = sorted(set(sp["Symbol"].str.replace(".", "-", regex=False)) | ndq)
 SECT = dict(zip(sp["Symbol"].str.replace(".", "-", regex=False), sp["GICS Sector"]))
 BEN = ["SPY", "QQQ", "RSP", "BIL", "MTUM"]
 px = yf.download(U + BEN, start="2006-01-01", auto_adjust=True, progress=False, threads=True)["Close"]
