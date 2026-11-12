@@ -79,7 +79,21 @@ for k, f in tests.items():
 cur = rot(EQ + ["GLD", "SLV", "DBC", "TLT"])(M.index[-1])
 out = dict(generated=pd.Timestamp.utcnow().strftime("%Y-%m-%d %H:%M UTC"), months=len(M.loc["2008-01-31":]) - 1, last=str(M.index[-1].date()),
            note="US$ returns, monthly rebalance, 0.15% per unit traded, ETF prices with dividends. p1 = 2008-16, p2 = 2017-26.",
-           results=res, now_best1_of8=cur, m3_now={k: round(float(m3.iloc[-1][k]) * 100, 1) for k in EQ + ["GLD", "SLV", "DBC", "TLT", "BIL"] if pd.notna(m3.iloc[-1][k])})
+           results=res, instruments=inst, chart=out_inst, now_best1_of8=cur, m3_now={k: round(float(m3.iloc[-1][k]) * 100, 1) for k in EQ + ["GLD", "SLV", "DBC", "TLT", "BIL"] if pd.notna(m3.iloc[-1][k])})
+# per-instrument history (12 Nov 2026): growth, worst fall, yearly returns, month-end values for charts
+NM = {"SPY": "S&P 500", "QQQ": "Nasdaq 100", "MDY": "S&P MidCap 400", "IWM": "Russell 2000", "GLD": "Gold", "SLV": "Silver",
+      "DBC": "Broad commodities", "USO": "Crude oil", "TLT": "US 20y+ bonds", "IEF": "US 7-10y bonds", "BIL": "Cash (T-bills)"}
+inst = []
+for k in NM:
+    s = R[k].loc["2008-01-31":].dropna()
+    if not len(s):
+        continue
+    st = stats(s); yr = (1 + s).groupby(s.index.year).prod() - 1
+    eq = (1 + s).cumprod()
+    inst.append(dict(ticker=k, name=NM[k], **st, years={int(y): round(v * 100, 1) for y, v in yr.items()},
+                     growth=round(float(eq.iloc[-1]), 2), up_years=int((yr > 0).sum()), n_years=int(len(yr))))
+out_inst = dict(series={k: [round(float(v), 4) for v in (1 + R[k].loc["2008-01-31":].fillna(0)).cumprod()] for k in NM},
+                dates=[str(d.date()) for d in R.loc["2008-01-31":].index])
 os.makedirs("data/research", exist_ok=True)
 json.dump(out, open("data/research/pie_commod.json", "w"), indent=1)
 for r in res: print(r)
