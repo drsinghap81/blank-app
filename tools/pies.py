@@ -126,7 +126,9 @@ def nav(px, W, start):
 
 
 def main():
-    px = load(); M, done, rot, sec, (prot, psec) = decide(px)
+    pxa = load()                                      # all series (decisions use the same columns and calendar as before)
+    px = pxa[[c for c in sorted(set(list(IDX) + ETF)) if c in pxa.columns]].dropna(how="all")
+    M, done, rot, sec, (prot, psec) = decide(px)
     last = done.index[-1]; prev = done.index[-2]
     start = pd.Timestamp("2026-10-31")
     name = lambda k: NAME.get(k) or ETF_NM.get(k) or k  # noqa: E731
@@ -137,7 +139,7 @@ def main():
                     hold=[dict(ticker=k, name=name(k), pct=round(v * 100, 1)) for k, v in sorted(now.items(), key=lambda x: -x[1])],
                     changed=now != before, before=[dict(ticker=k, pct=round(v * 100, 1)) for k, v in before.items()],
                     provisional=[dict(ticker=k, pct=round(v * 100, 1)) for k, v in P[max(P)].items()] if P[max(P)] != now else None,
-                    record=perf(M, W, start), nav=nav(px, W, start))
+                    record=perf(M, W, start), nav=nav(pxa.loc[pxa.index.isin(px.index)], W, start))
     _, done_u, rot_u, sec_u, (prot_u, psec_u) = decide(px, ETF_UK)
 
     def uk(card_):
