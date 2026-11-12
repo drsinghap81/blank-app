@@ -3751,7 +3751,45 @@ const isUrlTxt = (v) => /^\s*https?:\/\//i.test(v || '');
 }), ms));
 $('#size').addEventListener('change', (e) => { state.size = e.target.value; renderList(); });
 $('#setup').addEventListener('change', (e) => { state.setup = e.target.value; renderList(); });
-$('#btn-download').addEventListener('click', download);
+/* 13 Nov 2026: the header download button saves the CURRENT page as a PDF, as shown (folded sections opened so the detail is
+   in it), multi-page A4. On a phone it opens the share sheet (Save to Files / send to an app); elsewhere it downloads. */
+async function pagePdf() {
+  const btn = $('#btn-download'); const view = document.querySelector('.view:not([hidden])'); if (!view) return;
+  btn.disabled = true; btn.classList.add('spin');
+  try {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  } catch (e) { btn.disabled = false; btn.classList.remove('spin'); alertMsg('Could not load the PDF maker (are you offline?).'); return; }
+  const closed = [...view.querySelectorAll('details:not([open])')]; closed.forEach((d) => { d.open = true; });
+  await new Promise((r) => setTimeout(r, 400));
+  try {
+    const solid = (c) => c && !/rgba\(.*,\s*0\)$/.test(c) && c !== 'transparent';
+    let bg = [document.querySelector('main'), document.body, document.documentElement].map((e) => e && getComputedStyle(e).backgroundColor).find(solid)
+      || (getComputedStyle(document.documentElement).getPropertyValue('--bg') || '').trim() || '#ffffff';
+    const m = bg.match(/\d+(\.\d+)?/g); if (/^rgb/.test(bg) && m) bg = '#' + m.slice(0, 3).map((x) => Math.round(+x).toString(16).padStart(2, '0')).join('');
+    const w = view.scrollWidth, h = view.scrollHeight; let sc = 2; while (w * sc * h * sc > 15e6 && sc > 0.6) sc -= 0.2;
+    const cv = await window.html2canvas(view, { scale: sc, backgroundColor: bg, useCORS: true, logging: false, windowWidth: document.documentElement.clientWidth });
+    const { jsPDF } = window.jspdf; const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+    const PW = pdf.internal.pageSize.getWidth(), PH = pdf.internal.pageSize.getHeight(), M = 18;
+    const title = `${$('#title').textContent || 'Trend Desk'} · ${($('#asof').textContent || '').trim()}`;
+    const iw = PW - 2 * M, k = iw / cv.width, sliceH = Math.floor((PH - 2 * M - 16) / k);
+    for (let y = 0, p = 0; y < cv.height; y += sliceH, p++) {
+      const part = document.createElement('canvas'); part.width = cv.width; part.height = Math.min(sliceH, cv.height - y);
+      const cx = part.getContext('2d'); cx.fillStyle = bg; cx.fillRect(0, 0, part.width, part.height); cx.drawImage(cv, 0, y, cv.width, part.height, 0, 0, cv.width, part.height);
+      if (p) pdf.addPage();
+      pdf.setFillColor(bg); pdf.rect(0, 0, PW, PH, 'F');
+      pdf.setFontSize(8); pdf.setTextColor(140); pdf.text(`${title} · page ${p + 1}`.replace(/[^\x20-\x7E·]/g, ''), M, M);
+      pdf.addImage(part.toDataURL('image/jpeg', 0.9), 'JPEG', M, M + 10, iw, part.height * k);
+    }
+    const name = `trend-desk_${state.view || 'page'}${state.view === 'live' && state.lvTab ? '-' + state.lvTab : ''}_${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.pdf`;
+    const blob = pdf.output('blob'); const file = new File([blob], name, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: name }); } catch (e) { /* cancelled */ }
+    } else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); }
+  } catch (e) { alertMsg('PDF failed: ' + e.message); }
+  closed.forEach((d) => { d.open = false; }); btn.disabled = false; btn.classList.remove('spin');
+}
+$('#btn-download').addEventListener('click', pagePdf);
 $('#btn-info').addEventListener('click', () => $('#info').showModal());
 $('#btn-theme').addEventListener('click', themeSheet);
 window.addEventListener('popstate', () => { if (state._themeOpen) { state._themeOpen = false; show(state.view); } });

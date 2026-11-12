@@ -18,7 +18,7 @@
 <script>/* theme before first paint (no flash): same rule as applyTheme() in app.js */
 try { var t = localStorage.getItem('td.theme') || 'aurora'; if (t === 'auto') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'neon' : 'pop'; if (t !== 'classic') document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
-<link rel="stylesheet" href="styles.css?v=125">
+<link rel="stylesheet" href="styles.css?v=126">
 </head>
 <body>
 <header class="bar">
@@ -33,7 +33,7 @@ try { var t = localStorage.getItem('td.theme') || 'aurora'; if (t === 'auto') t 
     <button class="icon-btn" id="btn-refresh" title="Refresh" aria-label="Refresh the app and its data">
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-    <button class="icon-btn" id="btn-download" title="Download this list as CSV" aria-label="Download this list as CSV">
+    <button class="icon-btn" id="btn-download" title="Save this page as a PDF" aria-label="Save this page as a PDF">
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 19h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
  <button class="icon-btn" id="btn-theme" title="Theme" aria-label="Choose a theme">
@@ -159,6 +159,6 @@ try { var t = localStorage.getItem('td.theme') || 'aurora'; if (t === 'auto') t 
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<script src="app.js?v=218"></script>
+<script src="app.js?v=219"></script>
 </body>
 </html>

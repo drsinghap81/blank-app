@@ -952,3 +952,4 @@ body.pub .owner-only { display: none !important; }
 .view .pie-h small, .view .bk-c small { font-size: 12.5px; }
 .view .num b { font-size: 17px; } .view .num span { font-size: 13.5px; }
 .view .stat span { font-size: 13.5px; }
+#btn-download.spin svg{animation:tdspin .8s linear infinite}
