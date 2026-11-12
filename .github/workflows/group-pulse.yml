@@ -5,6 +5,7 @@ on:
   schedule:
     - cron: "40 21 * * 1-5"   # after the US close; NSE and ASX use their latest close
   workflow_dispatch:
+concurrency: { group: group-pulse, cancel-in-progress: true }
 permissions:
   contents: write
 jobs:

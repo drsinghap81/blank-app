@@ -28,6 +28,11 @@ NSE_SPLIT = {
     "Auto - PV & Tractors": ["MARUTI", "M&M", "TMPV", "HYUNDAI", "ESCORTS", "VSTTILLERS"],
     "Auto - CV & Buses": ["TMCV", "ASHOKLEY", "SMLMAH", "FORCEMOT", "OLECTRA"],
     "Dairy": ["HATSUN", "DODLA", "PARAGMILK", "HERITGFOOD", "MILKYMIST", "MLKFOOD", "UMANGDAIRY", "VADILALIND"],
+    # 12 Nov 2026: Indian themes Yahoo scatters (rail PSUs sat in credit, telecom, travel and construction; HAL, MAZDOCK,
+    # RVNL, JWL were missing): grouped the way the NSE Defence / Railways PSU themes do
+    "Defence": ["HAL", "BEL", "BDL", "MAZDOCK", "COCHINSHIP", "GRSE", "DATAPATTNS", "SOLARINDS", "BEML", "ASTRAMICRO", "PARAS",
+                "MTARTECH", "ZENTEC", "DCXINDIA", "APOLLO", "NIBE"],
+    "Railways": ["IRFC", "RVNL", "IRCON", "RITES", "RAILTEL", "IRCTC", "TITAGARH", "TEXRAIL", "JWL", "HBLENGINE", "KERNEX", "CONCOR"],
 }
 
 
@@ -49,7 +54,7 @@ def universe(mkt):
         add = [x for x in ov if x not in set(u.symbol)]
         if add:
             u = pd.concat([u, pd.DataFrame({"symbol": add, "name": add, "group": [ov[x] for x in add]})], ignore_index=True)
-        secmap = {"Banks": "Financial Services", "Auto - ": "Consumer Cyclical", "Dairy": "Consumer Defensive"}
+        secmap = {"Banks": "Financial Services", "Auto - ": "Consumer Cyclical", "Dairy": "Consumer Defensive", "Defence": "Industrials", "Railways": "Industrials"}
         for x, g in ov.items():
             u.loc[u.symbol == x, "sector"] = next(v for k, v in secmap.items() if g.startswith(k))
         u["group"] = [ov.get(x, g) for x, g in zip(u.symbol, u.group)]
