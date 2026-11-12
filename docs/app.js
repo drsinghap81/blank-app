@@ -4034,7 +4034,27 @@ async function tdPies(box) {
   const D = ver === 'uk' && D0.uk ? D0.uk : D0;
   const seg = D0.uk ? `<div class="seg pie-seg" role="tablist" aria-label="Trading 212 account">${[['au', 'Trading 212 AU · US ETFs'], ['uk', 'Trading 212 UK ISA · UCITS']].map(([k, n]) => `<button data-piever="${k}" aria-selected="${k === ver}">${n}</button>`).join('')}</div>` : '';
   const chips = (L) => L.map((x) => `<span class="pie-h"><b>${esc(x.ticker)}</b> ${fmt(x.pct, x.pct % 1 ? 1 : 0)}%${x.name ? `<small>${esc(x.name)}</small>` : ''}</span>`).join('');
-  box.innerHTML = seg + D.pies.map((p) => { const cum = (p.record || []).reduce((a, x) => a * (1 + x[1] / 100), 1);
+  /* 12 Nov 2026: tracker for real money in the AU pies — amount in A$, split between the two pies (tested 70/30), start
+     date; shows the A$ to place in each ETF now and the value since the start (US$ pie value x AUD/USD), per device. */
+  let T = { amt: 3000, rot: 70, start: '' }; try { T = { ...T, ...JSON.parse(localStorage.getItem('td.t212') || '{}') }; } catch (e) { /* */ }
+  const track = (() => {
+    if (ver !== 'au') return '';
+    const P = Object.fromEntries(D.pies.map((p) => [p.key, p])); const share = { rotation: T.rot / 100, sectors: 1 - T.rot / 100 };
+    const buy = {}; Object.entries(share).forEach(([k, sh]) => ((P[k] && P[k].hold) || []).forEach((x) => { buy[x.ticker] = (buy[x.ticker] || 0) + T.amt * sh * x.pct / 100; }));
+    const atStart = (nv) => { if (!nv || !nv.length) return null; let r = null; for (const x of nv) { if (x[0] <= T.start) r = x; else break; } return r; };
+    let val = null; const per = [];
+    if (T.start) { val = 0; Object.entries(share).forEach(([k, sh]) => { const nv = P[k] && P[k].nav; const s0 = atStart(nv); const s1 = nv && nv.length ? nv[nv.length - 1] : null;
+      const a0 = T.amt * sh; let v = a0;
+      if (s0 && s1 && s1[0] > s0[0]) v = a0 * (s1[1] / s0[1]) * (s0[2] && s1[2] ? s0[2] / s1[2] : 1);
+      per.push([P[k] ? P[k].title : k, a0, v]); val += v; }); }
+    const A = (v) => `A$${fmt(v, 0, 'en-AU')}`; const pl = val == null ? null : val - T.amt;
+    return `<div class="td-risk pie-trk"><div class="pie-trk-h"><b>Your Trading 212 pie</b>${val != null ? `<span class="${pl >= 0 ? 'up' : 'down'}"><b class="pie-big">${A(val)}</b> ${pl >= 0 ? '+' : '−'}${A(Math.abs(pl))} (${pl >= 0 ? '+' : ''}${fmt(pl / T.amt * 100, 1)}%)</span>` : ''}</div>
+      <div class="pie-in"><label>Invested (A$)<input id="t2amt" inputmode="numeric" value="${T.amt}"></label><label>Index rotation %<input id="t2rot" inputmode="numeric" value="${T.rot}"></label><label>Started<input id="t2st" type="date" value="${T.start}"></label></div>
+      <p class="lv-sub"><b>Place now</b> (this month's targets): ${Object.entries(buy).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<b>${esc(k)}</b> ${A(v)}`).join(' · ')}. ${T.rot}% rotation / ${100 - T.rot}% sector pie — the tested 70/30 mix was 10.8%/yr, worst fall −16%.</p>
+      ${per.length ? `<p class="lv-sub">${per.map(([n, a, v]) => `${esc(n)}: ${A(a)} → <b>${A(v)}</b>`).join(' · ')} · value in A$ includes the AUD/USD move${(D.pies[0].nav || []).length ? `, prices to ${day(D.pies[0].nav[D.pies[0].nav.length - 1][0])}` : ' (prices appear after the next nightly run)'}.</p>` : '<p class="lv-sub">Set the date you bought to start tracking.</p>'}
+      ${D.pies.some((p) => p.provisional) ? '<p class="lv-sub">⚠ The month-end check may change these targets (see “If this month ended today” below). Rebalance only on the first trading day after month-end.</p>' : ''}</div>`;
+  })();
+  box.innerHTML = seg + track + D.pies.map((p) => { const cum = (p.record || []).reduce((a, x) => a * (1 + x[1] / 100), 1);
     return `<details class="td-risk pie" ${p.changed ? 'open' : ''}><summary><span><b>🥧 ${esc(p.title)}</b><small>${esc(D.broker)} · decided ${day(p.decided)}${p.changed ? ' · <em class="pie-new">changed: rebalance</em>' : ' · no change'}</small></span></summary>
       <div class="pie-hold">${chips(p.hold)}</div>
       ${p.changed && p.before && p.before.length ? `<p class="muted td-rs">Was: ${p.before.map((x) => `${esc(x.ticker)} ${fmt(x.pct, 0)}%`).join(' · ')}</p>` : ''}
@@ -4043,6 +4063,9 @@ async function tdPies(box) {
       <p class="lv-sub"><b>Live record:</b> ${p.record && p.record.length ? `${p.record.length} month${p.record.length > 1 ? 's' : ''}, ${cum >= 1 ? '+' : ''}${fmt((cum - 1) * 100, 1)}% · ${p.record.slice(-6).map((x) => `${day(x[0])} ${x[1] >= 0 ? '+' : ''}${fmt(x[1], 1)}%`).join(' · ')}` : 'starts after the first full month (from November 2026)'}</p></details>`; }).join('')
     + `<p class="bg-fine">${esc(D.note)}</p>`;
   box.querySelectorAll('[data-piever]').forEach((b) => b.addEventListener('click', () => { try { localStorage.setItem('td.pieVer', b.dataset.piever); } catch (e) { /* */ } tdPies(box); }));
+  const sv = () => { const a = Math.max(0, +String($('#t2amt').value).replace(/[^\d.]/g, '') || 0), r = Math.min(100, Math.max(0, +$('#t2rot').value || 0));
+    try { localStorage.setItem('td.t212', JSON.stringify({ amt: a, rot: r, start: $('#t2st').value })); } catch (e) { /* */ } tdPies(box); };
+  ['#t2amt', '#t2rot', '#t2st'].forEach((q) => { const i = box.querySelector(q); if (i) i.addEventListener('change', sv); });
 }
 async function loadToday() { $('#title').textContent = 'Today'; return tdRender($('#view-today'), false); }
 async function tdRender(el, beginner) {

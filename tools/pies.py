@@ -25,6 +25,8 @@ ETF_NM = {"GDX": "Gold miners", "IAI": "Brokers & exchanges", "IGV": "Software",
           "XLK": "Technology", "XLP": "Consumer staples", "XLRE": "Real estate", "XLU": "Utilities", "XLV": "Health care",
           "XLY": "Consumer discretionary", "XME": "Metals & mining", "XOP": "Oil & gas", "XRT": "Retail"}
 SLOTS, BASE = 3, 12
+LIVE_TICK = ["VOO", "QQQ", "IWM", "SGOV"]          # 12 Nov 2026: real ETF prices (total return) for the live tracker
+FX = "AUDUSD=X"
 # UK (Trading 212 ISA) can't buy US-listed ETFs: UK-listed UCITS twins of the same indices. Sector pie limited to the sectors
 # and industries with a UCITS twin (retest 11 Nov 2026: 9.8%/yr, -20.0%; 70/30 with the rotation 10.8%, -16.0%).
 ETF_UK = ["XLB", "XLC", "XLE", "XLF", "XLI", "XLK", "XLP", "XLU", "XLV", "XLY", "SMH", "XBI", "GDX"]
@@ -43,7 +45,7 @@ COST = 0.0015
 
 def load():
     import yfinance as yf
-    tick = sorted(set(list(IDX) + ETF))
+    tick = sorted(set(list(IDX) + ETF + list(LIVE_TICK) + [FX]))
     d = yf.download(tick, period="max", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
     px = d["Close"].dropna(how="all")
     return px[px.index >= "2004-01-01"]
@@ -97,6 +99,32 @@ def perf(M, W, start):
     return out
 
 
+def nav(px, W, start):
+    """12 Nov 2026: daily value of 1 unit put in at `start`, plus AUD/USD, for the app's tracker. Each month-end target is
+    traded at that month-end close; between rebalances the slices drift with their ETF prices (auto-adjusted, dividends
+    in). A ticker without a price earns cash (~4%/yr)."""
+    days = px.index[px.index > start]
+    dec = sorted(W)
+    if not len(days) or not dec:
+        return None
+    last = lambda col, t: (px[col].loc[:t].dropna().iloc[-1] if col in px.columns and len(px[col].loc[:t].dropna()) else None)  # noqa: E731
+    v, prev, cur, out = 1.0, {}, None, []
+    for t in days:
+        m_end = max([d for d in dec if d < t] or [None])
+        if m_end is None:
+            continue
+        if cur is None or cur[0] != m_end:
+            if cur is not None:
+                v = val
+            w = W[m_end]; v *= 1 - sum(abs(w.get(k, 0) - prev.get(k, 0)) for k in set(w) | set(prev)) * COST; prev = w
+            cur = (m_end, w, {k: last(k, m_end) for k in w})
+        _, w, p0 = cur
+        val = v * sum(x * ((last(k, t) / p0[k]) if p0.get(k) and last(k, t) else 1 + 0.04 * (t - cur[0]).days / 365) for k, x in w.items())
+        fx = last(FX, t)
+        out.append([str(t.date()), round(float(val), 5), round(float(fx), 5) if fx else None])
+    return out
+
+
 def main():
     px = load(); M, done, rot, sec, (prot, psec) = decide(px)
     last = done.index[-1]; prev = done.index[-2]
@@ -109,7 +137,7 @@ def main():
                     hold=[dict(ticker=k, name=name(k), pct=round(v * 100, 1)) for k, v in sorted(now.items(), key=lambda x: -x[1])],
                     changed=now != before, before=[dict(ticker=k, pct=round(v * 100, 1)) for k, v in before.items()],
                     provisional=[dict(ticker=k, pct=round(v * 100, 1)) for k, v in P[max(P)].items()] if P[max(P)] != now else None,
-                    record=perf(M, W, start))
+                    record=perf(M, W, start), nav=nav(px, W, start))
     _, done_u, rot_u, sec_u, (prot_u, psec_u) = decide(px, ETF_UK)
 
     def uk(card_):
