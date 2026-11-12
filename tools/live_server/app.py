@@ -440,6 +440,53 @@ def held_map(acc, held=None):
     return held
 
 
+TESTED_R = {"RETEST": 3.0}        # 12 Nov 2026: systems tested WITH a fixed target get it on Angel automatically (OCO)
+
+
+def auto_target(e, row=None):
+    """Tested target for a trade, or None. Breakout retest 3R; Bottom pattern its measured move (from the plan row);
+    your own picks MY_TARGET_R. Momentum / Trend 9/21 / 9/21 any / VCP: None (their tested exit is a trailing line)."""
+    if e.get("system") in TRAIL_SYS:
+        return None
+    entry, stop = float(e.get("entry") or 0), float(e.get("stop") or 0)
+    kind, sysn = e.get("kind"), e.get("system")
+    if row and row.get("target") and kind in ("RETEST", "PATTERN"):
+        return round(float(row["target"]), 2)
+    if not (entry > stop > 0):
+        return None
+    if kind == "RETEST" or sysn == "Breakout retest":
+        return round(entry + TESTED_R["RETEST"] * (entry - stop), 2)
+    if kind == "PATTERN" or sysn == "Bottom pattern":
+        return round(float(e["plan_target"]), 2) if e.get("plan_target") else None
+    if kind == "MY_GTT" or sysn == "My pick":
+        return round(entry + MY_TARGET_R * (entry - stop), 2)
+    return None
+
+
+def backfill_targets(J, acc):
+    """Open trades from a target-tested system that only have a stop GTT: cancel it and place stop + target (OCO), once.
+    Skipped if the price is already at/above the target (that is a decision for you, not an automatic sell)."""
+    if not (PROTECT and is_live()):
+        return False
+    ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}; today = ist_now().date().isoformat(); ch = False
+    for sym, e in J.items():
+        if sym.startswith("_") or e.get("state") != "open" or e.get("target") or e.get("auto_tgt") or not e.get("gtt_id") or e.get("oco"):
+            continue
+        t = auto_target(e)
+        if not t:
+            continue
+        e["auto_tgt"] = today; ch = True
+        if (ltp.get(sym) or 0) >= t:
+            log("auto_target_skip", symbol=sym, target=t, ltp=ltp.get(sym)); continue
+        e["target"] = t
+        try:
+            broker.gtt_cancel(e["gtt_id"], sym); log("gtt_cancel", symbol=sym, gtt_id=e["gtt_id"]); e.pop("gtt_id", None)
+        except Exception as ex:  # noqa: BLE001
+            log("auto_target_error", symbol=sym, error=str(ex)[:200]); continue
+        e["gtt_tries"] = 0; _protect(sym, e); log("auto_target", symbol=sym, target=t, oco=bool(e.get("oco")))
+    return ch
+
+
 def sync(acc=None):
     """Match journal entries to Angel's order book and holdings:
     pending buy -> filled (real price/qty, then the GTT stop) / rejected / cancelled;
@@ -515,6 +562,7 @@ def sync(acc=None):
                 alert("stop", sym, f"Stop hit or sold outside the app: {e.get('qty')} shares gone from Angel"
                       + (f" (stop ₹{e['gtt_trigger']:,.2f})" if e.get("gtt_trigger") else "") + ".", key=f"stop:{sym}:{today}")
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="stopped or sold outside the app", exit=px, ended=today); changed = True
+    changed = backfill_targets(J, acc) or changed
     if changed:
         d = J.get("_done") or {}
         if len(d) > 200:
@@ -1165,6 +1213,11 @@ def order(body: Order, _=Depends(auth)):
     if side == "BUY":
         J[sym] = dict(since=t.date().isoformat(), system=row.get("system"), kind=row.get("kind"), stop=row.get("stop"),
                       entry=float(p["price"]), qty=body.qty, order_id=str(oid), state="pending")
+        if row.get("kind") == "PATTERN" and row.get("target"):
+            J[sym]["plan_target"] = float(row["target"])
+        tg = auto_target(J[sym], row)
+        if tg:
+            J[sym]["target"] = tg
     else:
         e = J.get(sym) or dict(since=t.date().isoformat(), system=ex.get("system"), qty=body.qty)
         e.update(state="exiting", order_id=str(oid), exit_px=float(p["price"]), gtt_id=None); J[sym] = e

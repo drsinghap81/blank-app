@@ -571,3 +571,22 @@ def test_surveillance_mark(tmp_path):
     A.broker.place = real
     A.surv_mark(r["symbol"], False)
     assert r["symbol"] not in A.surv_load()
+
+
+def test_auto_target(tmp_path, monkeypatch):
+    """Retest gets 3R, My pick 2R, Momentum / Trend none; an open retest with a plain stop GTT is switched to stop + target once."""
+    import app
+    assert app.auto_target(dict(system="Breakout retest", kind="RETEST", entry=100, stop=90)) == 130
+    assert app.auto_target(dict(system="My pick", kind="MY_GTT", entry=100, stop=90)) == 120
+    assert app.auto_target(dict(system="Monthly ATH", kind="ATH_BRK", entry=100, stop=90)) is None
+    assert app.auto_target(dict(system="Trend 9/21", kind="TF_STOP", entry=100, stop=90)) is None
+    assert app.auto_target(dict(system="Bottom pattern", kind="PATTERN", entry=100, stop=90), dict(target=141.5)) == 141.5
+    monkeypatch.setattr(app, "is_live", lambda: True)
+    gid, _ = app.broker.gtt_stop("MENONBE", 50, 287.8, 286)
+    J = {"MENONBE": dict(state="open", system="Breakout retest", kind="RETEST", entry=330.0, stop=287.81, qty=50, gtt_id=gid, gtt_trigger=287.81),
+         "ZYD": dict(state="open", system="Monthly ATH", kind="ATH_BRK", entry=1200, stop=1099, qty=10, gtt_id="G2", gtt_trigger=934)}
+    acc = dict(holdings=[dict(symbol="MENONBE", qty=50, ltp=335.0), dict(symbol="ZYD", qty=10, ltp=1250)])
+    assert app.backfill_targets(J, acc)
+    m = J["MENONBE"]; assert m["target"] == round(330 + 3 * (330 - 287.81), 2) and m["oco"] and m["gtt_id"] != gid
+    assert "target" not in J["ZYD"] and J["ZYD"]["gtt_id"] == "G2"
+    assert not app.backfill_targets(J, acc)          # once only
