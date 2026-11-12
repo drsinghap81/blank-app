@@ -1,7 +1,6 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-RATNAVEER,2026-11-11,370.55,62.4,354.02,355.1,4.4,0,0.0,Ratnaveer Precision Engineering Limited,trend,170.0,0.91,98,144.09,370.55,62.4
-MEESHO,2026-11-09,238.48,62.0,226.51,226.61,5.2,2,4.1,Meesho Limited,watch,123.7,0.79,85,362.65,248.16,67.8
-LGEINDIA,2026-11-09,1793.8,63.3,1709.8,1700.0,5.5,2,-3.0,LG Electronics India Limited,watch,113.0,0.72,75,82.53,1740.6,54.5
-MAHASTEEL,2026-11-05,1445.8,60.7,1364.47,1371.0,5.5,4,5.3,Mahamaya Steel Industries Limited,watch,129.7,0.74,73,1.17,1523.1,66.3
-PNB,2026-11-05,126.1,64.9,120.45,120.09,5.0,4,9.8,Punjab National Bank,watch,112.2,0.79,85,348.27,138.48,78.6
-SAILIFE,2026-11-05,1594.5,65.5,1505.04,1504.0,6.0,4,20.3,Sai Life Sciences Limited,watch,96.0,0.79,73,305.74,1918.6,84.0
+AAREYDRUGS,2026-11-12,114.11,61.8,107.98,106.69,7.0,0,0.0,Aarey Drugs & Pharmaceuticals Limited,watch,126.3,0.72,87,2.17,114.11,61.8
+RATNAVEER,2026-11-11,370.55,62.4,354.02,355.1,4.4,1,0.6,Ratnaveer Precision Engineering Limited,trend,170.0,0.91,98,138.67,372.9,63.3
+SKYGOLD,2026-11-11,983.4,60.3,928.46,923.05,6.5,1,6.8,SKY GOLD AND DIAMONDS LIMITED,watch,147.4,0.91,80,205.76,1050.05,67.2
+MEESHO,2026-11-09,238.48,62.0,226.51,226.61,5.2,3,6.6,Meesho Limited,trend,122.1,0.8,85,371.88,254.11,70.7
+LGEINDIA,2026-11-09,1793.8,63.3,1709.8,1700.0,5.5,3,-3.6,LG Electronics India Limited,watch,113.1,0.72,75,84.07,1728.8,52.8
