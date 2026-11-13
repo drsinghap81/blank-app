@@ -1,6 +1,8 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-AAREYDRUGS,2026-11-12,114.11,61.8,107.98,106.69,7.0,0,0.0,Aarey Drugs & Pharmaceuticals Limited,watch,126.3,0.72,87,2.17,114.11,61.8
-RATNAVEER,2026-11-11,370.55,62.4,354.02,355.1,4.4,1,0.6,Ratnaveer Precision Engineering Limited,trend,170.0,0.91,98,138.67,372.9,63.3
-SKYGOLD,2026-11-11,983.4,60.3,928.46,923.05,6.5,1,6.8,SKY GOLD AND DIAMONDS LIMITED,watch,147.4,0.91,80,205.76,1050.05,67.2
-MEESHO,2026-11-09,238.48,62.0,226.51,226.61,5.2,3,6.6,Meesho Limited,trend,122.1,0.8,85,371.88,254.11,70.7
-LGEINDIA,2026-11-09,1793.8,63.3,1709.8,1700.0,5.5,3,-3.6,LG Electronics India Limited,watch,113.1,0.72,75,84.07,1728.8,52.8
+NAZARA,2026-11-13,425.4,64.5,405.7,407.9,4.3,0,0.0,Nazara Technologies Limited,trend,156.7,0.94,95,59.05,425.4,64.5
+APLAPOLLO,2026-11-13,2251.6,61.1,2175.12,2185.0,3.0,0,0.0,APL Apollo Tubes Limited,watch,120.6,0.75,77,157.01,2251.6,61.1
+AAREYDRUGS,2026-11-12,114.11,61.8,107.98,106.69,7.0,1,0.9,Aarey Drugs & Pharmaceuticals Limited,watch,127.1,0.73,87,2.18,115.15,63.1
+RATNAVEER,2026-11-11,370.55,62.4,354.02,355.1,4.4,2,-1.7,Ratnaveer Precision Engineering Limited,watch,171.0,0.92,98,132.52,364.35,57.6
+SKYGOLD,2026-11-11,983.4,60.3,928.46,923.05,6.5,2,3.9,SKY GOLD AND DIAMONDS LIMITED,watch,155.2,0.91,80,205.88,1022.1,62.3
+MEESHO,2026-11-09,238.48,62.0,226.51,226.61,5.2,4,7.8,Meesho Limited,trend,124.3,0.82,85,299.12,257.07,72.0
+LGEINDIA,2026-11-09,1793.8,63.3,1709.8,1700.0,5.5,4,-2.7,LG Electronics India Limited,watch,113.1,0.72,75,88.03,1745.4,55.0
