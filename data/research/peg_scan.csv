@@ -1,0 +1,72 @@
+Symbol,Price,50-DMA,% above,Trailing PE,Earnings growth (qtr YoY),PEG,PEG source,Sector
+IOC,146.17,134.41,8.75,4.1994166,1.736,0.02,PE / last-quarter YoY EPS growth,Energy
+MRPL,176.65,171.28,3.14,7.0932903,2.031,0.03,PE / last-quarter YoY EPS growth,Energy
+WELSPUNLIV,247.62,222.33,11.37,54.735226,12.846,0.04,PE / last-quarter YoY EPS growth,Consumer Cyclical
+JSWSTEEL,1352.1,1266.51,6.76,11.5907135,2.252,0.05,PE / last-quarter YoY EPS growth,Basic Materials
+GAIL,187.91,172.91,8.68,9.791666,1.393,0.07,PE / last-quarter YoY EPS growth,Utilities
+EIHOTEL,316.2,296.37,6.69,27.816343,2.463,0.11,PE / last-quarter YoY EPS growth,Consumer Cyclical
+DLF,769.3,675.74,13.85,41.14696,0.101,0.14,Yahoo,Real Estate
+MOTILALOFS,1216.8,1024.9,18.72,27.720974,1.961,0.14,PE / last-quarter YoY EPS growth,Financial Services
+PAYTM,1925.0,1708.61,12.66,147.18513,9.844,0.15,PE / last-quarter YoY EPS growth,Technology
+ENGINERSIN,307.55,281.36,9.31,19.577068,1.349,0.15,PE / last-quarter YoY EPS growth,Industrials
+PETRONET,335.0,287.86,16.38,10.487055,0.513,0.2,PE / last-quarter YoY EPS growth,Energy
+CLEANMAX,1305.3,1302.86,0.19,85.171295,4.31,0.2,PE / last-quarter YoY EPS growth,Utilities
+TARIL,315.8,298.96,5.63,31.014778,1.354,0.23,PE / last-quarter YoY EPS growth,Industrials
+BANKBARODA,276.15,238.06,16.0,7.162961,0.312,0.23,PE / last-quarter YoY EPS growth,Financial Services
+UNIONBANK,204.4,180.41,13.3,7.04372,0.293,0.24,PE / last-quarter YoY EPS growth,Financial Services
+PVRINOX,1652.6,1350.95,22.33,37.538883,1.492,0.25,PE / last-quarter YoY EPS growth,Communication Services
+ASAHIINDIA,1103.9,956.95,15.36,51.61553,1.955,0.26,PE / last-quarter YoY EPS growth,Consumer Cyclical
+PATANJALI,430.8,369.01,16.74,23.246824,0.861,0.27,PE / last-quarter YoY EPS growth,Consumer Defensive
+SHYAMMETL,1313.9,1128.2,16.46,27.020535,0.961,0.28,PE / last-quarter YoY EPS growth,Basic Materials
+MAHABANK,91.79,82.33,11.49,8.817307,0.281,0.31,PE / last-quarter YoY EPS growth,Financial Services
+KARURVYSYA,380.6,342.25,11.21,12.47303,0.37,0.34,PE / last-quarter YoY EPS growth,Financial Services
+NHPC,76.8,75.19,2.14,17.634884,0.51,0.35,PE / last-quarter YoY EPS growth,Utilities
+ACMESOLAR,419.1,417.48,0.39,35.843426,0.995,0.36,PE / last-quarter YoY EPS growth,Utilities
+NUVOCO,346.25,332.28,4.2,29.431032,0.775,0.38,PE / last-quarter YoY EPS growth,Basic Materials
+BSOFT,327.8,293.96,11.51,14.858123,0.368,0.4,PE / last-quarter YoY EPS growth,Technology
+LICHSGFIN,579.0,536.57,7.91,5.4585314,0.117,0.47,PE / last-quarter YoY EPS growth,Financial Services
+PNB,141.79,118.83,19.32,7.194458,0.15,0.48,PE / last-quarter YoY EPS growth,Financial Services
+ANGELONE,341.0,296.8,14.89,28.236246,0.572,0.49,PE / last-quarter YoY EPS growth,Financial Services
+MCX,3624.7,3286.71,10.28,64.17112,1.302,0.49,PE / last-quarter YoY EPS growth,Financial Services
+LTTS,4266.9,3604.41,18.38,33.313988,0.666,0.5,PE / last-quarter YoY EPS growth,Technology
+TATACOMM,1743.4,1711.59,1.86,45.85877,0.86,0.53,PE / last-quarter YoY EPS growth,Communication Services
+ICICIBANK,1590.0,1391.79,14.24,19.447378,0.221,0.53,Yahoo,Financial Services
+AXISBANK,1342.9,1247.49,7.65,13.889178,0.39,0.54,Yahoo,Financial Services
+TATACONSUM,1085.3,1000.63,8.46,62.842167,0.159,0.55,Yahoo,Consumer Defensive
+CPPLUS,4209.4,3884.42,8.37,82.49802,1.511,0.55,PE / last-quarter YoY EPS growth,Industrials
+LEMONTREE,120.41,109.09,10.38,37.526154,0.636,0.59,PE / last-quarter YoY EPS growth,Consumer Cyclical
+PTCIL,24100.0,23575.08,2.23,291.02963,4.657,0.62,PE / last-quarter YoY EPS growth,Industrials
+KPRMILL,1149.8,1111.43,3.45,38.092735,0.582,0.65,PE / last-quarter YoY EPS growth,Consumer Cyclical
+INDIANB,945.9,851.45,11.09,9.506268,0.14,0.68,PE / last-quarter YoY EPS growth,Financial Services
+IGIL,428.4,344.85,24.23,29.476158,0.43,0.69,PE / last-quarter YoY EPS growth,Basic Materials
+NAVINFLUOR,9969.0,8484.4,17.5,56.393776,0.806,0.7,PE / last-quarter YoY EPS growth,Basic Materials
+AUROPHARMA,1807.2,1679.98,7.57,26.404053,0.339,0.78,PE / last-quarter YoY EPS growth,Healthcare
+ITCHOTELS,175.39,161.46,8.63,38.75,0.5,0.78,PE / last-quarter YoY EPS growth,Consumer Cyclical
+LAURUSLABS,2400.0,2063.32,16.32,97.82082,1.26,0.78,PE / last-quarter YoY EPS growth,Healthcare
+COALINDIA,404.3,402.82,0.37,7.4529,0.495,0.87,Yahoo,Energy
+HDFCBANK,812.3,718.87,13.0,17.57377,0.213,0.89,Yahoo,Financial Services
+FSL,287.7,275.15,4.56,28.331713,0.303,0.94,PE / last-quarter YoY EPS growth,Technology
+KOTAKBANK,490.4,434.18,12.95,22.639017,0.262,0.94,Yahoo,Financial Services
+GLAND,3308.7,2998.03,10.36,44.484325,0.469,0.95,PE / last-quarter YoY EPS growth,Healthcare
+BOSCHLTD,50500.0,47128.7,7.15,52.843307,0.516,1.02,PE / last-quarter YoY EPS growth,Consumer Cyclical
+MARICO,902.0,813.26,10.91,57.840614,0.309,1.02,Yahoo,Consumer Defensive
+ACUTAAS,3996.1,3381.61,18.17,75.61026,0.728,1.04,PE / last-quarter YoY EPS growth,Basic Materials
+GROWW,221.66,194.62,13.89,52.558407,0.494,1.06,PE / last-quarter YoY EPS growth,Financial Services
+BEML,2125.5,2000.06,6.27,30.120583,-0.306,1.06,Yahoo,Industrials
+BSE,3909.1,3368.69,16.04,52.628975,0.448,1.17,PE / last-quarter YoY EPS growth,Financial Services
+ULTRACEMCO,12337.0,11141.62,10.73,40.462814,0.213,1.22,Yahoo,Basic Materials
+EMCURE,2314.4,1936.45,19.52,40.980392,0.334,1.23,PE / last-quarter YoY EPS growth,Healthcare
+BHARTIHEXA,1593.2,1556.51,2.36,42.303787,0.344,1.23,PE / last-quarter YoY EPS growth,Communication Services
+MANKIND,2638.6,2410.97,9.44,48.672565,0.389,1.25,PE / last-quarter YoY EPS growth,Healthcare
+DIVISLAB,11485.0,9546.8,20.3,90.28643,0.636,1.42,PE / last-quarter YoY EPS growth,Healthcare
+LENSKART,727.45,677.2,7.42,161.19733,1.131,1.43,PE / last-quarter YoY EPS growth,Healthcare
+NUVAMA,1886.2,1756.51,7.38,30.411457,0.192,1.58,PE / last-quarter YoY EPS growth,Financial Services
+BHARTIARTL,2096.0,1880.43,11.46,41.464855,0.26,1.59,PE / last-quarter YoY EPS growth,Communication Services
+NYKAA,360.3,338.94,6.3,326.07144,1.917,1.7,PE / last-quarter YoY EPS growth,Consumer Cyclical
+CEMPRO,1325.6,1232.43,7.56,36.170567,0.212,1.71,PE / last-quarter YoY EPS growth,Industrials
+GABRIEL,1641.2,1384.65,18.53,72.96522,0.414,1.76,PE / last-quarter YoY EPS growth,Consumer Cyclical
+ITC,284.05,265.45,7.01,18.911745,-0.188,1.78,Yahoo,Consumer Defensive
+TECHM,1774.0,1630.86,8.78,28.351011,0.325,1.86,Yahoo,Technology
+APLAPOLLO,2225.7,2164.25,2.84,47.743855,0.253,1.89,PE / last-quarter YoY EPS growth,Basic Materials
+WIPRO,196.2,176.27,11.31,15.286725,0.045,1.91,Yahoo,Technology
+SANSERA,4701.8,4214.86,11.55,76.497154,0.383,2.0,PE / last-quarter YoY EPS growth,Consumer Cyclical
