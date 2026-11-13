@@ -4076,6 +4076,22 @@ async function tdTrack(box, mk) {
     <div class="td-tl">${last.map((r) => { const [lab, c] = ST[r.st] || [r.st, '']; return `<div><b>${esc(r.sym)}</b><span>${day(r.d)} · ${esc(r.sys || '')}</span><span class="${c}">${lab}</span><b class="${r.ret == null ? '' : r.ret >= 0 ? 'up' : 'down'}">${r.ret == null ? '–' : M(r.ret)}</b></div>`; }).join('')}</div>
     <p class="muted td-rs">Closing prices from the entry shown, before costs. The backtests expect about 40–45% winners, with a few big winners carrying the average.</p></details>`;
 }
+/* US RSI(2) dip-buys (14 Nov 2026): the list the moomoo bot (tools/moomoo_rsi2) trades, from tools/rsi2_prep.py after each
+   US close. Signals = would have been bought at that close; watch = a small further drop near the close triggers a buy. */
+async function tdRsi2(box) {
+  if (!box) return; const D = await getJSON(MAIN + 'data/scan/us/rsi2.json', 'rsi2'); if (!D || !D.stocks) { box.innerHTML = ''; return; }
+  const S = D.stocks, $f = (v) => `$${fmt(v, 2, 'en-US')}`;
+  const row = (k, sig) => { const r = S[k]; if (!r) return '';
+    const drop = (r.buy_below / r.close - 1) * 100;
+    return `<div><b>${esc(k)} <small class="muted">${esc(r.name || '')}</small></b><b>${sig ? `RSI ${fmt(r.rsi2, 1)}` : `below ${$f(r.buy_below)}`}</b>
+      <span>${$f(r.close)} · stop ${$f(r.close - 3 * r.atr14)} · sell above ${$f(r.exit_above)}</span><span class="${sig ? 'up' : ''}">${sig ? 'Signal at the close' : `${fmt(drop, 1)}% away`}</span></div>`; };
+  box.innerHTML = `<details class="td-risk td-track"><summary><span><b>US dip-buys · RSI(2) <span class="pill">${D.signals.length}</span></b>
+    <small>S&amp;P 500 uptrends, oversold · as of ${day(D.asof)} close · the moomoo bot's list</small></span></summary>
+    <p class="muted td-rs">Buy ~10 min before the US close when price is above the 200-day average and RSI(2) is under 10; sell when price closes above the 5-day average, or after 7 days. Stop 3 ATR below entry. Backtest 2010–26: 11%/yr, −26% worst, 66% winners.</p>
+    <p class="td-rs"><b>Signals at the last close</b></p><div class="td-tl">${D.signals.length ? D.signals.map((k) => row(k, true)).join('') : '<p class="muted">None.</p>'}</div>
+    ${D.watch && D.watch.length ? `<p class="td-rs"><b>Close to a signal</b> · buy if it trades below the price shown near the close</p><div class="td-tl">${D.watch.slice(0, 10).map((k) => row(k, false)).join('')}</div>` : ''}
+    <p class="muted td-rs">Levels use the last close; the bot rechecks with live prices. Test in moomoo paper trading before real money.</p></details>`;
+}
 /* Trading 212 pies (US ETFs, Australian account) — month-end targets from tools/pies.py; the server alerts on a change */
 async function tdPies(box) {
   if (!box) return; const D0 = await getJSON(MAIN + 'data/scan/us/pies.json', 'pies'); if (!D0 || !D0.pies) { box.innerHTML = ''; return; }
@@ -4208,7 +4224,7 @@ async function tdRender(el, beginner) {
     <div id="tdrisk"></div>
     ${MS.length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${MS.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${MS.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
-    ${mk === 'US' ? '<div id="tdpies"></div>' : ''}<div id="tdheat"></div><div id="tdtrack"></div>
+    ${mk === 'US' ? '<div id="tdpies"></div><div id="tdrsi2"></div>' : ''}<div id="tdheat"></div><div id="tdtrack"></div>
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   wire();
   state._tdEl = el; state._tdBg = beginner;
@@ -4219,7 +4235,7 @@ async function tdRender(el, beginner) {
   tdTopTiles($('#tdtop'), mk);
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (!beginner) alCard($('#tdal'));
-  tdTrack($('#tdtrack'), mk); if (mk === 'US') tdPies($('#tdpies')); tdHeat($('#tdheat'), mk);
+  tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } tdHeat($('#tdheat'), mk);
 }
 /* Heating up (11 Nov 2026): industries whose 1-week pulse jumped well above last month's. Information only: strength by
    itself is not a buy signal (Building-only cut ATH returns from 17% to 7%; swapping weak holdings for new breakouts lost

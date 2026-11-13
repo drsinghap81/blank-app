@@ -172,3 +172,11 @@ tools/breeze/keys.txt
 
 tools/live_server/var/
 tools/live_server/.env
+
+# moomoo RSI2 bot: private config, state and journals stay on your machine
+tools/moomoo_rsi2/config.env
+tools/moomoo_rsi2/state_*.json
+tools/moomoo_rsi2/journal_*.csv
+tools/moomoo_rsi2/PAUSE
+tools/moomoo_rsi2/.lock_*
+tools/moomoo_rsi2/bot.log
