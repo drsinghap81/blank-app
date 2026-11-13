@@ -58,25 +58,36 @@ def pick(d, keys):
     return None
 
 
-def xbrl(url):
-    t = get(url, js=False)
-    if not t:
-        return None
+def parse_xbrl(t, qe=None):
+    """EPS / revenue / profit for the 3-month period ending qe, from any NSE XBRL (results or integrated filing):
+    contexts are read from the file; facts with segment/dimension members are skipped."""
+    ctx = {}
+    for m in re.finditer(r'<xbrli:context id="([^"]+)">(.*?)</xbrli:context>', t, re.S):
+        body = m.group(2)
+        if "xbrldi:" in body or "<xbrli:segment" in body:
+            continue
+        a, b = re.search(r"<xbrli:startDate>([^<]+)", body), re.search(r"<xbrli:endDate>([^<]+)", body)
+        if a and b:
+            ctx[m.group(1)] = (a.group(1).strip(), b.group(1).strip())
+    good = {k for k, (a, b) in ctx.items() if 80 <= (datetime.fromisoformat(b) - datetime.fromisoformat(a)).days <= 95 and (qe is None or b == qe)}
+    if not good and qe is None and "OneD" in ctx:
+        good = {"OneD"}
     def tag(names):
         for n in names:
-            m = re.search(rf'<in-bse-fin:{n} contextRef="OneD"[^>]*>([^<]+)<', t)
-            if m and f(m.group(1)) is not None:
-                return f(m.group(1))
+            for m in re.finditer(rf'<[\w-]+:{n} contextRef="([^"]+)"[^>]*>([^<]+)<', t):
+                if m.group(1) in good and f(m.group(2)) is not None:
+                    return f(m.group(2))
         return None
     eps = tag(["BasicEarningsLossPerShareFromContinuingOperations", "BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations",
-               "BasicEarningsPerShareAfterExtraordinaryItems", "BasicEarningsPerShareBeforeExtraordinaryItems"])
-    sales = tag(["RevenueFromOperations", "InterestEarned", "Income", "TotalIncome"])
-    npf = tag(["ProfitLossForPeriod", "ProfitLossForThePeriod", "NetProfitLossForThePeriod"])
-    if sales is not None:
-        sales /= 1e5                         # XBRL in rupees -> lakhs, the unit of the results-data endpoint
-    if npf is not None:
-        npf /= 1e5
-    return dict(eps=eps, sales=sales, np=npf, src="xbrl")
+               "BasicEarningsPerShareAfterExtraordinaryItems", "BasicEarningsPerShareBeforeExtraordinaryItems", "BasicEarningsLossPerShare"])
+    sales = tag(["RevenueFromOperations", "InterestEarned", "TotalIncome", "Income"])
+    npf = tag(["ProfitLossForPeriod", "ProfitLossForThePeriod", "NetProfitLossForThePeriod", "ProfitLossForPeriodFromContinuingOperations"])
+    return dict(eps=eps, sales=None if sales is None else sales / 1e5, np=None if npf is None else npf / 1e5, src="xbrl")   # rupees -> lakhs
+
+
+def xbrl(url, qe=None):
+    t = get(url, js=False)
+    return parse_xbrl(t, qe) if t else None
 
 
 def dt(s, fmt):
@@ -95,7 +106,7 @@ def one(sym):
         return dict(err="no quarters since 2014")
     cons = sum(x.get("consolidated") == "Consolidated" for x in L); per = {}
     for x in L:
-        per.setdefault(x["toDate"], []).append(x)
+        per.setdefault(dt(x["toDate"], "%d-%b-%Y"), []).append(x)
     use_c = cons >= 0.7 * len(per)
     Q = []
     for end, xs in per.items():
@@ -111,8 +122,24 @@ def one(sym):
         if (r["eps"] is None or r["sales"] is None) and str(x.get("xbrl", "")).startswith("http") and not x["xbrl"].endswith("/-"):
             r = xbrl(x["xbrl"]) or r
         bc = x.get("broadCastDate") or x.get("filingDate") or ""
-        Q.append(dict(end=dt(end, "%d-%b-%Y"), known=dt(bc[:11], "%d-%b-%Y") or dt(bc[:11], "%d-%b-%y"), cons=(x.get("consolidated") == "Consolidated"),
+        Q.append(dict(end=end, known=dt(bc[:11], "%d-%b-%Y") or dt(bc[:11], "%d-%b-%y"), cons=(x.get("consolidated") == "Consolidated"),
                       bank=x.get("bank") == "Y", **r))
+        time.sleep(0.6)
+    # results filed since 2025 (SEBI Integrated Filing - Financials): listing + XBRL
+    I = get("https://www.nseindia.com/api/integrated-filing-results", dict(index="equities", symbol=sym, type="Integrated Filing- Financials", size=100))
+    I = (I or {}).get("data") or []
+    have = {q["end"] for q in Q}; per2 = {}
+    for x in I:
+        e = dt((x.get("qe_Date") or "").title(), "%d-%b-%Y")
+        if e and e not in have and x.get("type_Sub", "Original") == "Original":
+            per2.setdefault(e, []).append(x)
+    for e, xs in per2.items():
+        xs = [x for x in xs if (x.get("consolidated") == "Consolidated") == use_c] or xs
+        x = sorted(xs, key=lambda x: x.get("broadcast_Date") or "")[0]
+        r = xbrl(x["xbrl"], e) if str(x.get("xbrl", "")).startswith("http") else None
+        bc = x.get("broadcast_Date") or ""
+        Q.append(dict(end=e, known=dt(bc[:11], "%d-%b-%Y"), cons=(x.get("consolidated") == "Consolidated"), bank=False,
+                      **(r or dict(eps=None, sales=None, np=None, src="none"))))
         time.sleep(0.6)
     Q.sort(key=lambda q: q["end"] or "")
     return dict(q=Q, cons=use_c)
