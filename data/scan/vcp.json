@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-13T08:39+00:00",
-"asof": "2026-11-12",
+"generated": "2026-11-13T16:30+00:00",
+"asof": "2026-11-13",
 "market": "NSE",
 "rules": "Stage 2 uptrend (close > EMA 50/150/200 stacked, EMA 200 rising, >= 30% above the 52-week low, within 25% of the high). Base from the highest swing high of the last 250 days; >= 2 contractions (zigzag 6% on highs/lows), each shallower with a higher low, the last <= 12%, volume drying up in the last one. Buy-stop just above the last contraction's high (pivot) on 1.4x volume; stop = the last contraction's low (max 10% away); sell after a daily close below EMA 50.",
 "backtest": "NSE 2017-26 (all stocks incl. delisted, costs): 221 trades, +4.9% a trade, 37% win; robust across 11 rule variants. Added to Momentum + Trend in one account: 24.2-24.7%/yr vs 23.1%, worst fall about the same, nothing extra in 2022-26. Watch bucket - your call.",
@@ -8,13 +8,13 @@
 {
 "symbol": "CUPID",
 "name": "Cupid Limited",
-"close": 384.8,
+"close": 377.8,
 "pivot": 352.85,
 "stop": 329.6,
 "setup_date": "2026-11-11",
 "base_start": "2026-10-12",
 "dry": 0.63,
-"ema50": 312.96,
+"ema50": 315.51,
 "contractions": [
 {
 "h_date": "2026-10-12",
@@ -34,21 +34,21 @@
 "bo_date": "2026-11-12",
 "bo_vol": 3.5,
 "entry": 360.0,
-"days_since": 0,
+"days_since": 1,
 "risk_pct": 8.4,
-"ret_pct": 6.9,
+"ret_pct": 4.9,
 "status": "breakout"
 },
 {
 "symbol": "ADANIPORTS",
 "name": "Adani Ports and Special Economic Zone Limited",
-"close": 1930.0,
+"close": 1903.3,
 "pivot": 1824.0,
 "stop": 1674.2,
 "setup_date": "2026-10-12",
 "base_start": "2026-07-03",
 "dry": 0.96,
-"ema50": 1796.82,
+"ema50": 1801.0,
 "contractions": [
 {
 "h_date": "2026-07-03",
@@ -68,21 +68,21 @@
 "bo_date": "2026-10-29",
 "bo_vol": 2.38,
 "entry": 1824.0,
-"days_since": 9,
+"days_since": 10,
 "risk_pct": 8.2,
-"ret_pct": 5.8,
+"ret_pct": 4.3,
 "status": "holding"
 },
 {
 "symbol": "COFORGE",
 "name": "Coforge Limited",
-"close": 2034.0,
+"close": 2028.0,
 "pivot": 1841.0,
 "stop": 1722.0,
 "setup_date": "2026-10-01",
 "base_start": "2026-08-31",
 "dry": 0.58,
-"ema50": 1910.64,
+"ema50": 1915.24,
 "contractions": [
 {
 "h_date": "2026-08-31",
@@ -102,9 +102,9 @@
 "bo_date": "2026-10-05",
 "bo_vol": 1.42,
 "entry": 1842.3,
-"days_since": 26,
+"days_since": 27,
 "risk_pct": 6.5,
-"ret_pct": 10.4,
+"ret_pct": 10.1,
 "status": "holding"
 }
 ]
