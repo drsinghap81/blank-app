@@ -10,7 +10,20 @@ for u in ("https://www.nseindia.com/", "https://www.nseindia.com/companies-listi
     try: S.get(u, timeout=20)
     except Exception as e: print("warm", e)
 rep = {}
-for sym in ("TCS", "CUPID", "COFORGE"):
+L = json.load(open(f"{OUT}/TCS_list.json")); old = [x for x in L if x["format"] == "Old" and x["consolidated"] == "Consolidated"][:3]
+for k, x in enumerate(old):
+    for name, prm in [("data", dict(index="equities", params=x["params"], seq_id=x["seqNumber"], industry=x.get("industry") or "-",
+                                   frOldNewFlag=x.get("oldNewFlag") or "O", ind=x.get("reInd") or "N", format=x["format"]))]:
+        try:
+            r = S.get("https://www.nseindia.com/api/corporates-financial-results-data", params=prm, timeout=30)
+            rep[f"old_{k}_{name}"] = dict(status=r.status_code, n=len(r.content), period=x["toDate"], bcast=x["broadCastDate"])
+            open(f"{OUT}/TCS_old_{k}.json", "w").write(r.text[:200000])
+        except Exception as e:
+            rep[f"old_{k}"] = dict(error=str(e)[:200])
+        time.sleep(1.5)
+import collections
+rep["new_format_from"] = min((x["toDate"] for x in L if x["format"] == "New"), key=lambda d: d[-4:] + d[3:6])
+for sym in ():
     for name, url, params in [
         ("list", "https://www.nseindia.com/api/corporates-financial-results", dict(index="equities", symbol=sym, period="Quarterly")),
         ("cmp", "https://www.nseindia.com/api/results-comparision", dict(symbol=sym)),
