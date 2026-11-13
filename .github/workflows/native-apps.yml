@@ -1,0 +1,93 @@
+# Trend Desk native apps (13 Nov 2026): Android APK, Windows/Mac/Linux desktop, iPhone build check.
+# All load the live app from GitHub Pages, so web updates reach them without a rebuild; rebuild only when apps/ changes.
+# Files are published on the GitHub release "apps-latest". Store signing switches on when these secrets exist:
+#   Android (Play internal testing): ANDROID_KEYSTORE_B64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+#   iPhone (TestFlight): APPLE_TEAM_ID + App Store Connect API key (ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8_B64) - see apps/README.md
+name: native-apps
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["apps/**", ".github/workflows/native-apps.yml"]
+permissions:
+  contents: write
+concurrency: { group: native-apps, cancel-in-progress: true }
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "17" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: Build debug APK (installable directly)
+        working-directory: apps/mobile
+        run: |
+          npm install --no-audit --no-fund
+          npx cap sync android
+          cd android && chmod +x gradlew && ./gradlew --no-daemon assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk ../TrendDesk-android.apk
+      - name: Signed Play bundle (only when the keystore secrets are set)
+        if: ${{ env.KS != '' }}
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KSP: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KA: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KAP: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        working-directory: apps/mobile/android
+        run: |
+          echo "$KS" | base64 -d > release.jks
+          ./gradlew --no-daemon bundleRelease -Pandroid.injected.signing.store.file=$PWD/release.jks \
+            -Pandroid.injected.signing.store.password="$KSP" -Pandroid.injected.signing.key.alias="$KA" -Pandroid.injected.signing.key.password="$KAP"
+          cp app/build/outputs/bundle/release/app-release.aab ../TrendDesk-play.aab
+      - uses: actions/upload-artifact@v4
+        with: { name: android, path: "apps/mobile/TrendDesk-*" }
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix: { os: [windows-latest, macos-latest, ubuntu-latest] }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: Build installer
+        working-directory: apps/desktop
+        env: { CSC_IDENTITY_AUTO_DISCOVERY: "false" }
+        run: |
+          npm install --no-audit --no-fund
+          npx electron-builder --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}
+          path: |
+            apps/desktop/dist/*.exe
+            apps/desktop/dist/*.dmg
+            apps/desktop/dist/*.AppImage
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: Build check (simulator, unsigned) - TestFlight upload is added once the Apple secrets exist
+        working-directory: apps/mobile
+        run: |
+          npm install --no-audit --no-fund
+          [ -d ios ] || npx cap add ios
+          npx capacitor-assets generate --ios --iconBackgroundColor '#111827' --splashBackgroundColor '#111827' || true
+          npx cap sync ios
+          cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build | tail -5
+  release:
+    needs: [android, desktop]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: out, merge-multiple: true }
+      - name: Publish on the "apps-latest" release
+        env: { GH_TOKEN: "${{ github.token }}", GH_REPO: "${{ github.repository }}" }
+        run: |
+          ls -la out
+          gh release view apps-latest >/dev/null 2>&1 || gh release create apps-latest --title "Trend Desk apps (latest)" --notes "Android APK and desktop installers, rebuilt automatically. Private use. The apps load the live Trend Desk, so web updates arrive without reinstalling."
+          gh release upload apps-latest out/* --clobber

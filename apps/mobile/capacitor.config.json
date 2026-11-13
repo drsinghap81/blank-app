@@ -1,0 +1,12 @@
+{
+  "appId": "com.trenddesk.app",
+  "appName": "Trend Desk",
+  "webDir": "www",
+  "server": {
+    "url": "https://drsinghap81.github.io/blank-app/",
+    "cleartext": false,
+    "allowNavigation": ["drsinghap81.github.io", "raw.githubusercontent.com", "*.sslip.io", "cdn.jsdelivr.net", "cdnjs.cloudflare.com", "unpkg.com", "www.tradingview.com"]
+  },
+  "android": { "backgroundColor": "#111827" },
+  "ios": { "backgroundColor": "#111827", "contentInset": "always" }
+}

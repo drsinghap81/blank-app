@@ -1,0 +1,18 @@
+{
+  "name": "trend-desk-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Trend Desk for Android and iPhone: a Capacitor shell that loads the live app (docs/ on GitHub Pages), so web updates reach the phone app without a new build.",
+  "scripts": {
+    "sync": "cap sync"
+  },
+  "dependencies": {
+    "@capacitor/android": "6.2.0",
+    "@capacitor/core": "6.2.0",
+    "@capacitor/ios": "6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "6.2.0"
+  }
+}
