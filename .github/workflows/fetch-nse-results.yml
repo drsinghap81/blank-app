@@ -1,0 +1,32 @@
+name: fetch-nse-results
+# Point-in-time quarterly results (EPS, sales, profit) from NSE for the Minervini fundamentals test (tools/fetch_nse_results.py).
+# Resumable: each shard keeps data/fundq/shard_<n>.json and commits progress; re-run until all symbols are done.
+on:
+  workflow_dispatch:
+    inputs:
+      minutes: {description: "time budget per shard (minutes)", default: "320"}
+  push:
+    branches: [main]
+    paths: ["tools/fetch_nse_results.py", ".github/workflows/fetch-nse-results.yml"]
+permissions:
+  contents: write
+concurrency: {group: fetch-nse-results, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q requests && python tools/fetch_nse_results.py ${{ matrix.shard }} 4 ${{ github.event.inputs.minutes || '4' }}
+      - if: always()
+        run: |
+          git config user.name "fundq bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/fundq/shard_${{ matrix.shard }}.json; git diff --cached --quiet && exit 0
+          git commit -qm "NSE results shard ${{ matrix.shard }}"
+          for i in 1 2 3 4 5 6; do git pull -q --rebase -X theirs origin main && git push -q && break; sleep $((i*9)); done
