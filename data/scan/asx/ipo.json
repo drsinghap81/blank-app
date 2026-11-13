@@ -1,8 +1,8 @@
 {
 "market": "ASX",
-"asof": "2026-11-12",
-"scan_date": "2026-11-12",
-"generated": "2026-11-12 08:28 UTC",
+"asof": "2026-11-13",
+"scan_date": "2026-11-13",
+"generated": "2026-11-13 08:27 UTC",
 "scanned": 127,
 "rules": {
 "max_age_months": 36,
