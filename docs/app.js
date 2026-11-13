@@ -912,7 +912,7 @@ async function loadLive() {
      tested system row keeps Send; the pick becomes a note without Send (counts and baskets skip it). Remove the pick if unwanted. */
   { const sysRow = new Map(); rows.forEach((r) => { if (bkOf(r) !== 'my' && r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && !r.surv) sysRow.set(r.symbol, r); });
     rows = rows.map((r) => { const d = bkOf(r) === 'my' && sysRow.get(r.symbol);
-      return d ? { ...r, skip: `Also a ${BK_NAME[bkOf(d)] || d.system} setup today — buy it there (tested stop ${fmt(d.stop, 2, 'en-IN')}); Remove this pick if you don't want your own stop` } : r; }); }
+      return d ? { ...r, dupOf: d.symbol, dupNote: `Also a ${BK_NAME[bkOf(d)] || d.system} setup today (tested stop ${fmt(d.stop, 2, 'en-IN')}, Send in that card). "Send mine" uses your trigger and stop instead — send only one.` } : r; }); }
   const inUseN = S && S.buckets ? Object.fromEntries(S.buckets.map((b) => [b.key, b.used])) : rows.reduce((a, r) => { if (!r.skip && r.qty > 0 && r.tier !== 'more' && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))) a[bkOf(r)] = (a[bkOf(r)] || 0) + r.value; return a; }, {});
   const nP = S && S.picks ? S.picks : lvN('NSE'); const rP = S && S.risk_pct ? S.risk_pct : lvRiskN(nP);
   state._lvGuardRisk = S && S.guard ? S.guard.risk_pct : +rP.toFixed(2);
@@ -942,12 +942,12 @@ async function loadLive() {
     const hdr = r.tier === 'more' && (first ?? (i === 0 || rows[i - 1].tier !== 'more'))
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
     return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${pos ?? r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${r.tier === 'swing' && (!S || r.local) ? `<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${r.surv ? ' <span class="chip exit" title="Exchange surveillance list: Angel needs your consent in its own app">⚠ Surveillance · place in Angel</span>' : ''} ${strMeter(r)} ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
-      <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} · stop ${fmt(r.stop, 2, 'en-IN')} <span class="muted">(−${fmt(r.risk_pct ?? (E > r.stop ? (1 - r.stop / E) * 100 : null), 0)}%)</span>`}</div>
+      ${r.dupNote ? `<div class="lv-sub">${esc(r.dupNote)}</div>` : ''}<div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} · stop ${fmt(r.stop, 2, 'en-IN')} <span class="muted">(−${fmt(r.risk_pct ?? (E > r.stop ? (1 - r.stop / E) * 100 : null), 0)}%)</span>`}</div>
       ${r.skip ? '' : slTrack({ stop: r.stop, entry: E, now: r.ltp || null, target: r.target || (+((r.exit_rule || '').match(/R target ([\d.]+)/) || [])[1] || null), entryLab: 'Buy at', exitTxt: r.exit_rule || null })}
       ${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}
       <details class="lv-det"><summary>Details</summary><div class="lv-sub">${ord} · ${fmt(r.pct_cap, 1)}% of capital · risk ${money(r.risk_amt, 'NSE')} · exit: ${esc(r.exit_rule || '')}</div>
       <div class="lv-sub">${esc(r.note || '')}${r.group ? ' · ' + esc(r.group) : r.sector ? ' · ' + esc(r.sector) : ''}</div></details>${bkOf(r) === 'my' ? `<a href="#" class="lv-link my-rm" data-sym="${esc(r.symbol)}" data-mk="NSE">Remove</a>` : ''}</div>
-      <div>${can ? `<button class="lv-btn" data-i="${i}">Send</button>` : S && r.surv && !r.skip && r.qty > 0 ? `<button class="lv-btn lv-man" data-man="${i}">Place in Angel</button>` : ''}</div>
+      <div>${can ? `<button class="lv-btn" data-i="${i}">${r.dupOf ? 'Send mine' : 'Send'}</button>` : S && r.surv && !r.skip && r.qty > 0 ? `<button class="lv-btn lv-man" data-man="${i}">Place in Angel</button>` : ''}</div>
       ${can ? `<div class="lv-bq" hidden>Basket qty <input type="number" min="1" max="${r.qty}" value="${r.qty}" data-bq="${i}" inputmode="numeric"> of ${r.qty}</div>` : ''}</div>`;
   };
   const grp = (f) => byStr(rows.map((r, i) => [r, i]).filter(([r]) => f(r)));
@@ -994,7 +994,7 @@ async function loadLive() {
      Overview counts what to do today and jumps to the right tab. */
   const nExit = S ? (S.exits || []).filter((e) => e.qty > 0).length : 0;
   const nNoStop = S && S.trades ? S.trades.filter((t) => t.state === 'open' && !t.gtt_id).length : 0;
-  const nBuy = pend.length + swRows.filter((r) => !r.skip && r.qty > 0 && (alN[bkOf(r)] ?? 0) > 0).length;
+  const nBuy = pend.length + swRows.filter((r) => !r.skip && !r.dupOf && r.qty > 0 && (alN[bkOf(r)] ?? 0) > 0).length;
   const nHold = S && S.trades ? S.trades.filter((t) => t.state === 'open').length : 0;
   const TABS = [['home', 'Home', ''], ['buy', 'Buy', nBuy || ''], ['hold', 'Holdings', nExit || nHold || ''], ...(S && isOwner() ? [['fut', 'Futures', '']] : []), ['set', 'Settings', '']];
   let tab = state.lvTab; if (!tab) { try { tab = sessionStorage.getItem('td.lvTab'); } catch (e) { /* */ } }
