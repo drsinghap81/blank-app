@@ -590,3 +590,23 @@ def test_auto_target(tmp_path, monkeypatch):
     m = J["MENONBE"]; assert m["target"] == round(330 + 3 * (330 - 287.81), 2) and m["oco"] and m["gtt_id"] != gid
     assert "target" not in J["ZYD"] and J["ZYD"]["gtt_id"] == "G2"
     assert not app.backfill_targets(J, acc)          # once only
+
+
+def test_buystop_gtt(tmp_path, monkeypatch):
+    """A buy-stop below its trigger goes on Angel as a GTT buy (not a day SL order); it is cancelled when the month changes."""
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    P = c.get("/api/plan", headers=h).json()
+    r = next((r for r in P["rows"] if not r["skip"] and r["qty"] > 0 and r["kind"] in ("ATH_STOP", "TF_STOP")), None)
+    if r is None:
+        raise AssertionError("no buy-stop row to test")
+    A.broker.ltp = lambda s: round(r["trigger"] * 0.98, 2)        # still below the trigger
+    A.market_open = lambda t=None: True
+    j = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} {r['symbol']}"})
+    assert j.status_code == 200, j.text
+    j = j.json(); assert j["gtt_id"] and not A.broker.placed
+    J = A.journal(); e = J[r["symbol"]]; assert e["state"] == "pending" and e["gtt_buy_id"] == j["gtt_id"] and e["kind"] == r["kind"]
+    e["gtt_month"] = "2000-01"; A.save_journal(J)
+    acc = A.broker.account()
+    J = A.journal(); assert A.gtt_buy_upkeep(J, acc) and r["symbol"] not in J
+    assert A.broker.gtts[j["gtt_id"]]["active"] is False

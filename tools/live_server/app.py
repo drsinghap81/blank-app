@@ -463,6 +463,43 @@ def auto_target(e, row=None):
     return None
 
 
+def gtt_buy_upkeep(J, acc):
+    """13 Nov 2026: system buy-stops placed as GTT buys stay valid only while the setup does. Cancel (and alert) when the month
+    has changed (the trigger is that month's high), the stock left the plan, or the price is at/below the plan stop."""
+    if not is_live():
+        return False
+    held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
+    try:
+        P = plan(); plan_syms = {r["symbol"] for r in plan_rows(P) if r.get("kind") in STOP_KINDS}
+    except Exception:  # noqa: BLE001
+        return False
+    month = ist_now().strftime("%Y-%m"); ch = False
+    for sym, e in list(J.items()):
+        if sym.startswith("_") or e.get("state") != "pending" or not e.get("gtt_buy_id") or e.get("kind") not in STOP_KINDS or held.get(sym, 0) > 0:
+            continue
+        why = None
+        if e.get("gtt_month") and e["gtt_month"] != month:
+            why = "the month ended without the breakout (the trigger was last month's high)"
+        elif sym not in plan_syms:
+            why = "the setup is no longer in the plan"
+        else:
+            try:
+                lt = broker.ltp(sym)
+            except Exception:  # noqa: BLE001
+                lt = None
+            if lt and e.get("stop") and lt <= float(e["stop"]):
+                why = f"the price {lt:.2f} fell to the plan stop {float(e['stop']):.2f}"
+        if not why:
+            continue
+        try:
+            broker.gtt_cancel(e["gtt_buy_id"], sym); log("gtt_buy_cancel", symbol=sym, gtt_id=e["gtt_buy_id"], why=why)
+        except Exception as ex:  # noqa: BLE001
+            log("gtt_buy_cancel_error", symbol=sym, error=str(ex)[:200]); continue
+        J.pop(sym); J.setdefault("_done", {})[f"{sym}:{ist_now().date()}"] = dict(e, state="cancelled", text=why, ended=ist_now().date().isoformat())
+        alert("exit", sym, f"GTT buy cancelled: {why}.", key=f"gttbuy:{sym}:{ist_now().date()}"); ch = True
+    return ch
+
+
 def backfill_targets(J, acc):
     """Open trades from a target-tested system that only have a stop GTT: cancel it and place stop + target (OCO), once.
     Skipped if the price is already at/above the target (that is a decision for you, not an automatic sell)."""
@@ -531,11 +568,12 @@ def sync(acc=None):
                 e2 = dict(e, state=stat, text=o.get("text"), ended=today); J.setdefault("_done", {})[f"{sym}:{today}"] = e2
             else:
                 e["order_status"] = o.get("status")
-        elif st == "pending" and e.get("kind") == "MY_GTT" and held.get(sym, 0) > 0:
+        elif st == "pending" and e.get("gtt_buy_id") and held.get(sym, 0) > 0:
             e.update(state="open", qty=int(held[sym]), filled=today); log("filled", symbol=sym, gtt=True, qty=e["qty"])
             alert("filled", sym, f"Your GTT buy filled: {e['qty']} shares. Protective stop going on Angel now.", key=f"filled:{sym}:{today}")
             _protect(sym, e); changed = True
-            mp = mypicks(); mp.pop(sym, None); _save_mypicks(mp)                          # done: the pick becomes an open trade
+            if e.get("kind") == "MY_GTT":
+                mp = mypicks(); mp.pop(sym, None); _save_mypicks(mp)                      # done: the pick becomes an open trade
         elif st == "pending" and not o and e.get("since", today) < today and held.get(sym, 0) > 0:
             e.update(state="open", filled=today); _protect(sym, e); changed = True      # filled yesterday; book rolled over
         elif st == "open" and held.get(sym, 0) > 0 and not e.get("gtt_id") and e.get("gtt_tries", 0) < 4 \
@@ -563,6 +601,7 @@ def sync(acc=None):
                       + (f" (stop ₹{e['gtt_trigger']:,.2f})" if e.get("gtt_trigger") else "") + ".", key=f"stop:{sym}:{today}")
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="stopped or sold outside the app", exit=px, ended=today); changed = True
     changed = backfill_targets(J, acc) or changed
+    changed = gtt_buy_upkeep(J, acc) or changed
     if changed:
         d = J.get("_done") or {}
         if len(d) > 200:
@@ -1136,18 +1175,23 @@ def order(body: Order, _=Depends(auth)):
                 if ltp and ltp <= row["stop"]:
                     raise HTTPException(400, f"not sent: the price {ltp:.2f} is at or below your stop {row['stop']:.2f}")
             p = dict(gtt="BUY", symbol=row["symbol"], qty=body.qty, trigger=row["trigger"], limit=row["price"])
+        elif row["kind"] in STOP_KINDS and (lambda l: not l or live_check(row, l)[0] == "wait")(broker.ltp(row["symbol"])):
+            # 13 Nov 2026: a buy-stop still below its trigger goes on Angel as a GTT buy (sits there until the price reaches the
+            # trigger, any day this month) instead of a day SL order that lapsed every evening. The server cancels it if the
+            # setup ends first (gtt_buy_upkeep). Above the trigger -> the branches below (limit now / missed).
+            ltp = broker.ltp(row["symbol"])
+            if ltp and row.get("stop") and ltp <= row["stop"]:
+                raise HTTPException(400, f"not sent: the price {ltp:.2f} is at or below the plan stop {row['stop']:.2f}")
+            p = dict(gtt="BUY", symbol=row["symbol"], qty=body.qty, trigger=row["trigger"], limit=row["price"])
         elif market_open(t):
             ltp = broker.ltp(row["symbol"])
             st, lim, why = live_check(row, ltp)
             if st in ("broken", "missed", "ran"):
                 raise HTTPException(400, f"not sent: {why}")
-            if row["kind"] in STOP_KINDS and st == "wait":
-                p = broker.params(row["symbol"], side, body.qty, row["price"], kind="SL", trigger=row["trigger"])
-            else:                       # 9/21, breakouts, or a buy-stop already triggered: LIMIT near the live price, capped
-                p = broker.params(row["symbol"], side, body.qty, lim or row["price"])
+            p = broker.params(row["symbol"], side, body.qty, lim or row["price"])   # 9/21, breakouts, or a buy-stop already triggered: LIMIT, capped
         else:
             if row["kind"] in STOP_KINDS:
-                raise HTTPException(400, "buy-stop orders are sent during market hours (09:15-15:30 IST); AMO does not take them")
+                raise HTTPException(400, "this buy-stop is already above its trigger - send it in market hours (it buys as a capped limit)")
             if not amo:
                 raise HTTPException(400, "send between 15:45 and 08:57 IST (AMO) or during market hours")
             p = broker.params(row["symbol"], side, body.qty, row["price"], amo=True)
@@ -1190,13 +1234,22 @@ def order(body: Order, _=Depends(auth)):
             raise HTTPException(502, f"Angel rejected the GTT for {sym}: {angel_msg(e)}")
         log("gtt_buy", gtt_id=gid, **rec)
         J = journal()
-        mp0 = mypicks().get(sym) or {}; R0 = float(row["trigger"]) - float(row.get("stop") or 0)
-        J[sym] = dict(since=t.date().isoformat(), system="My pick", kind="MY_GTT", stop=row.get("stop"), entry=float(row["trigger"]),
-                      qty=body.qty, order_id=None, gtt_buy_id=gid, state="pending",
-                      target=round(float(mp0.get("target") or (float(row["trigger"]) + MY_TARGET_R * R0)), 2))
+        if row["kind"] == "MY_GTT":
+            mp0 = mypicks().get(sym) or {}; R0 = float(row["trigger"]) - float(row.get("stop") or 0)
+            J[sym] = dict(since=t.date().isoformat(), system="My pick", kind="MY_GTT", stop=row.get("stop"), entry=float(row["trigger"]),
+                          qty=body.qty, order_id=None, gtt_buy_id=gid, state="pending",
+                          target=round(float(mp0.get("target") or (float(row["trigger"]) + MY_TARGET_R * R0)), 2))
+            msg = "GTT buy placed on Angel (good for a year). When it fills, the protective GTT stop goes in at your stop."
+        else:
+            J[sym] = dict(since=t.date().isoformat(), system=row.get("system"), kind=row.get("kind"), stop=row.get("stop"), entry=float(row["trigger"]),
+                          qty=body.qty, order_id=None, gtt_buy_id=gid, state="pending", gtt_month=t.strftime("%Y-%m"), plan_id=row.get("id"))
+            tg = auto_target(J[sym], row)
+            if tg:
+                J[sym]["target"] = tg
+            msg = (f"GTT buy placed on Angel at the trigger {float(row['trigger']):.2f}: it waits there until the price reaches it. "
+                   "The server cancels it if the setup ends first (month-end, off the plan, or below the stop). After the fill the protective stop goes on.")
         save_journal(J)
-        return dict(ok=True, mode="LIVE", sent=True, gtt_id=gid, order=gp, protect=prot,
-                    msg="GTT buy placed on Angel (good for a year). When it fills, the protective GTT stop goes in at your stop.")
+        return dict(ok=True, mode="LIVE", sent=True, gtt_id=gid, order=gp, protect=prot, msg=msg)
     try:
         oid = broker.place(p)
     except Exception as e:  # noqa: BLE001

@@ -1209,7 +1209,7 @@ function lvRowMsg(id, t, ok) {
 }
 async function lvSend(r, side, btn) {
   const qty = r.qty; const conf = `${side} ${qty} ${r.symbol}`;
-  const px = side === 'BUY' ? (r.kind === 'MY_GTT' ? `GTT buy, trigger ${fmt(r.trigger, 2, 'en-IN')}, limit ${fmt(r.price, 2, 'en-IN')}` : isStopK(r.kind) ? `buy-stop at ${fmt(r.trigger, 2, 'en-IN')}` : `limit ${fmt(r.price, 2, 'en-IN')}`) : 'limit ~1% below the price';
+  const px = side === 'BUY' ? (r.kind === 'MY_GTT' ? `GTT buy, trigger ${fmt(r.trigger, 2, 'en-IN')}, limit ${fmt(r.price, 2, 'en-IN')}` : isStopK(r.kind) ? `GTT buy at the trigger ${fmt(r.trigger, 2, 'en-IN')} (or a limit now if already above it)` : `limit ${fmt(r.price, 2, 'en-IN')}`) : 'limit ~1% below the price';
   // a typed confirmation, not a one-tap: the server also checks this exact text
   const typed = window.prompt(`${conf} (${px}) on Angel One.\nType ${qty} to confirm:`);
   if (typed === null) return;
@@ -1218,11 +1218,12 @@ async function lvSend(r, side, btn) {
   try {
     const j = await lvApi('/api/order', { method: 'POST', body: JSON.stringify({ id: r.id, qty, confirm: conf }) });
     btn.textContent = j.sent ? 'Sent ✓' : 'Dry run ✓';
-    if (r.kind === 'MY_GTT') {
+    if (r.kind === 'MY_GTT' || j.gtt_id || (j.order && j.order.gtt)) {
       const o = j.order || {}; const tp = o.triggerprice || o.trigger; const lp = o.price || o.limit;
       const pr = j.protect ? ` After the fill: protective GTT stop at ${fmt(j.protect.trigger, 2, 'en-IN')}.` : '';
-      lvRowMsg(r.id, j.sent ? `GTT buy placed on Angel (id ${j.gtt_id}): trigger ${tp}, limit ${lp}, good for a year.${pr}` : `Dry run: would place a GTT buy ${qty} ${r.symbol}, trigger ${tp}, limit ${lp}.${pr}`, true);
-      alertMsg(j.sent ? `GTT placed: BUY ${qty} ${r.symbol} when it reaches ${tp} (limit ${lp}). It shows in Angel → Orders → GTT.${pr}` : `Dry run — would place an Angel GTT buy: ${qty} ${r.symbol}, trigger ${tp}, limit ${lp}.${pr} Switch Live orders on to send for real.`);
+      const valid = r.kind === 'MY_GTT' ? 'good for a year' : 'waits until the price reaches it; the server cancels it if the setup ends (month-end, off the plan, below the stop)';
+      lvRowMsg(r.id, j.sent ? `GTT buy placed on Angel (id ${j.gtt_id}): trigger ${tp}, limit ${lp}, ${valid}.${pr}` : `Dry run: would place a GTT buy ${qty} ${r.symbol}, trigger ${tp}, limit ${lp}.${pr}`, true);
+      alertMsg(j.sent ? `GTT placed: BUY ${qty} ${r.symbol} when it reaches ${tp} (limit ${lp}), ${valid}. It shows in Angel → Orders → GTT.${pr}` : `Dry run — would place an Angel GTT buy: ${qty} ${r.symbol}, trigger ${tp}, limit ${lp}.${pr} Switch Live orders on to send for real.`);
       setTimeout(loadLive, 4000); return;
     }
     lvRowMsg(r.id, j.sent ? `Sent to Angel (order ${j.order_id}) at ${j.order.price}. Waiting for the fill — it shows as Filled in "Your trades".` : `Dry run: would send ${j.order.ordertype} ${j.order.transactiontype} ${j.order.quantity} @ ${j.order.price}. Nothing sent.`, true);
