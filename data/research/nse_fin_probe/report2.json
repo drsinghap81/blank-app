@@ -1,0 +1,42 @@
+{
+ "ifr": {
+  "status": 200,
+  "n": 15088,
+  "head": "{\"data\":[{\"attFileSize\":\"0 Bytes\",\"audited\":null,\"broadcast_Date\":\"29-Oct-2026 18:58:44\",\"cmName\":\"Tata Consultancy Services Limited\",\"consolidated\":null,\"creation_Date\":\"29-Oct-2026 18:59:02\",\"diff\":\"00:00:18\",\"ixbrl\":\"https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_GOVERNANCE_206648_29102026185902_iXBRL_WEB.html\",\"ixbrlFileSize\":\"69.54 KB\",\"pdf_attach\":\"https://nsearchives.nseindia.com/corporate/null\",\"qe_Date\":\"30-SEP-2026\",\"revised_Date\":null,\"revision_Remark\":null,\"seq_Id\":\"206648\",\"smName\":\"Tata Consultancy Services Limited\",\"symbol\":\"TCS\",\"type\":\"Integrated Filing- Governance\",\"type_Sub\":\"New\",\"xbrl\":\"https://nsearchives.nseindia.com/corporate/xbrl/INTEGRATED_FILING"
+ },
+ "ifr2": {
+  "status": 200,
+  "n": 10494,
+  "head": "{\"data\":[{\"attFileSize\":\"0 Bytes\",\"audited\":\"Audited\",\"broadcast_Date\":\"08-Oct-2026 22:07:33\",\"cmName\":\"Tata Consultancy Services Limited\",\"consolidated\":\"Consolidated\",\"creation_Date\":\"08-Oct-2026 22:08:10\",\"diff\":\"00:00:37\",\"ixbrl\":\"https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_200121_08102026220810_iXBRL_WEB.html\",\"ixbrlFileSize\":\"86.96 KB\",\"pdf_attach\":\"https://nsearchives.nseindia.com/corporate/null\",\"qe_Date\":\"30-SEP-2026\",\"revised_Date\":null,\"revision_Remark\":null,\"seq_Id\":\"200121\",\"smName\":\"Tata Consultancy Services Limited\",\"symbol\":\"TCS\",\"type\":\"Integrated Filing- Financials\",\"type_Sub\":\"Original\",\"xbrl\":\"https://nsearchives.nseindia.com/corporate/xbrl/IN"
+ },
+ "ifr3": {
+  "status": 200,
+  "n": 10494,
+  "head": "{\"data\":[{\"attFileSize\":\"0 Bytes\",\"audited\":\"Audited\",\"broadcast_Date\":\"08-Oct-2026 22:07:33\",\"cmName\":\"Tata Consultancy Services Limited\",\"consolidated\":\"Consolidated\",\"creation_Date\":\"08-Oct-2026 22:08:10\",\"diff\":\"00:00:37\",\"ixbrl\":\"https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_200121_08102026220810_iXBRL_WEB.html\",\"ixbrlFileSize\":\"86.96 KB\",\"pdf_attach\":\"https://nsearchives.nseindia.com/corporate/null\",\"qe_Date\":\"30-SEP-2026\",\"revised_Date\":null,\"revision_Remark\":null,\"seq_Id\":\"200121\",\"smName\":\"Tata Consultancy Services Limited\",\"symbol\":\"TCS\",\"type\":\"Integrated Filing- Financials\",\"type_Sub\":\"Original\",\"xbrl\":\"https://nsearchives.nseindia.com/corporate/xbrl/IN"
+ },
+ "cif": {
+  "status": 404,
+  "n": 272,
+  "head": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Resource not found</title>\n</head>\n<body style=\"background-color: #e8e8e8;\">\n  <div style=\"font-size: 32px; padding: 50px 25px; text-align: center;\">\n    Resource not found\n  </div>\n</body>\n</html>\n"
+ },
+ "cfr_all": {
+  "status": 200,
+  "n": 1517,
+  "head": "[{\"audited\":\"Audited\",\"bank\":\"N\",\"broadCastDate\":\"09-Jan-2025 21:39:43\",\"companyName\":\"Tata Consultancy Services Limited\",\"consolidated\":\"Consolidated\",\"cumulative\":\"Non-cumulative\",\"difference\":\"00:00:23\",\"exchdisstime\":\"09-Jan-2025 21:40:06\",\"filingDate\":\"09-Jan-2025 21:39\",\"financialYear\":\"01-Apr-2024 To 31-Mar-2025\",\"format\":\"New\",\"fromDate\":\"01-Oct-2024\",\"indAs\":\"Ind-AS New\",\"industry\":\"-\",\"isin\":\"INE467B01029\",\"oldNewFlag\":\"N\",\"params\":\"01-Oct-202431-Dec-2024Q3ANNCNETCS\",\"period\":\"Quarterly\",\"reInd\":\"N\",\"relatingTo\":\"Third Quarter\",\"resultDescription\":null,\"resultDetailedDataLink\":null,\"seqNumber\":\"1189599\",\"symbol\":\"TCS\",\"toDate\":\"31-Dec-2024\",\"xbrl\":\"https://nsearchives.nseindia.com/"
+ },
+ "cmp": {
+  "status": 200,
+  "n": 9131,
+  "head": "{\"resCmpData\":[{\"re_amt_grs_np_asst\":null,\"re_bal_rbi_oth_bnk_funds\":null,\"re_basic_eps\":null,\"re_basic_eps_for_cont_dic_opr\":\"32.71\",\"re_bsc_eps_bfr_exi\":null,\"re_cap_ade_rat\":null,\"re_cet_1_ret\":null,\"re_con_pro_loss\":\"1183200\",\"re_create_dt\":\"09-JAN-2025\",\"re_curr_tax\":\"363800\",\"re_debt_eqt_rat\":null,\"re_debt_rdmption\":null,\"re_debt_ser_cov\":null,\"re_deff_tax\":\"3900\",\"re_depr_und_exp\":\"112500\",\"re_desc_note_fin\":\"-\",\"re_desc_note_seg\":\"-\",\"re_dil_eps_bfr_exi\":null,\"re_dilut_eps_for_cont_dic_opr\":\"32.71\",\"re_diluted_eps\":null,\"re_excepn_items\":null,\"re_excepn_items_new\":\"0\",\"re_extraord_items\":null,\"re_face_val\":\"1\",\"re_face_value_debt\":null,\"re_from_dt\":\"01-OCT-2024\",\"re_goi_per_shhd\":nul"
+ },
+ "annc": {
+  "status": 200,
+  "n": 2,
+  "head": "[]"
+ },
+ "xbrl_if": {
+  "status": 404,
+  "n": 272,
+  "head": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Resource not found</title>\n</head>\n<body style=\"background-color: #e8e8e8;\">\n  <div style=\"font-size: 32px; padding: 50px 25px; text-align: center;\">\n    Resource not found\n  </div>\n</body>\n</html>\n"
+ }
+}
