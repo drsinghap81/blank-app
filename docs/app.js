@@ -1244,7 +1244,7 @@ function lvManual(r) {
     <p class="tdc-why">The exchange has ${esc(r.symbol)} on its surveillance (cautionary) list. Each order needs your consent tap in Angel's own app or web, which no API can do, so Trend Desk can't send it. Place this order there:</p>
     <div class="man-t">${lines.map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div>
     <p class="tdc-why">In Angel: search ${esc(r.symbol)} → Buy → set the fields above → accept the surveillance message → place.${stopK ? ' The trigger means it buys only if the price rises to the breakout level today.' : ''}</p>
-    <p class="tdc-why">After it fills: Live → Holdings → <b>Sync</b> (or Adopt). The app then puts the protective GTT stop on at ${f(r.stop)}${r.system === 'Monthly ATH' ? ' (safety net below; the system exit stays the weekly close under the 30-week SMA)' : ''}.</p>
+    <p class="tdc-why">After it fills: Live → Holdings → <b>Sync</b> (or Adopt). The app then tries to put the protective GTT stop on at ${r.system === 'Monthly ATH' ? `${f(r.stop * 0.85)} (15% below the system line ${f(r.stop)}; the system exit is a weekly close below that line)` : f(r.stop)}. Angel may refuse an automatic GTT for a surveillance stock — if Holdings then says "no stop on Angel", place that GTT sell yourself in Angel.</p>
     <div class="bg-btns"><button class="bg-cta" id="mancp">Copy order details</button></div>`;
   $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
   $('#mancp').addEventListener('click', async (ev) => { try { await navigator.clipboard.writeText(txt); ev.target.textContent = 'Copied ✓'; } catch (x) { ev.target.textContent = 'Copy failed'; } });
