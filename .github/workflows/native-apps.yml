@@ -50,6 +50,7 @@ jobs:
       matrix: { os: [windows-latest, macos-latest, ubuntu-latest] }
     runs-on: ${{ matrix.os }}
     steps:
+      - run: git config --global core.protectNTFS false   # Windows: data/ has CON.json (reserved name); sparse checkout skips it
       - uses: actions/checkout@v4
         with: { sparse-checkout: apps, sparse-checkout-cone-mode: true }   # only apps/ (data/ has CON.json, a reserved name on Windows)
       - uses: actions/setup-node@v4
