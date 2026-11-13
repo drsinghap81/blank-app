@@ -910,7 +910,7 @@ async function loadLive() {
   if (!S || !S.buckets) rows = lvRoomCut(rows, alN, C0n);
   /* 13 Nov 2026: one row per stock. A My pick that is also a system setup today (e.g. DRREDDY, GRAPHITE) shows once: the
      tested system row keeps Send; the pick becomes a note without Send (counts and baskets skip it). Remove the pick if unwanted. */
-  { const sysRow = new Map(); rows.forEach((r) => { if (bkOf(r) !== 'my' && r.tier !== 'more' && !r.skip) sysRow.set(r.symbol, r); });
+  { const sysRow = new Map(); rows.forEach((r) => { if (bkOf(r) !== 'my' && r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && !r.surv) sysRow.set(r.symbol, r); });
     rows = rows.map((r) => { const d = bkOf(r) === 'my' && sysRow.get(r.symbol);
       return d ? { ...r, skip: `Also a ${BK_NAME[bkOf(d)] || d.system} setup today — buy it there (tested stop ${fmt(d.stop, 2, 'en-IN')}); Remove this pick if you don't want your own stop` } : r; }); }
   const inUseN = S && S.buckets ? Object.fromEntries(S.buckets.map((b) => [b.key, b.used])) : rows.reduce((a, r) => { if (!r.skip && r.qty > 0 && r.tier !== 'more' && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))) a[bkOf(r)] = (a[bkOf(r)] || 0) + r.value; return a; }, {});
