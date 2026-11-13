@@ -73,11 +73,15 @@ def parse_xbrl(t, qe=None):
     if not good and qe is None and "OneD" in ctx:
         good = {"OneD"}
     def tag(names):
+        zero = None
         for n in names:
             for m in re.finditer(rf'<[\w-]+:{n} contextRef="([^"]+)"[^>]*>([^<]+)<', t):
-                if m.group(1) in good and f(m.group(2)) is not None:
-                    return f(m.group(2))
-        return None
+                v = f(m.group(2))
+                if m.group(1) in good and v is not None:
+                    if v != 0:
+                        return v
+                    zero = 0.0
+        return zero
     eps = tag(["BasicEarningsLossPerShareFromContinuingOperations", "BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations",
                "BasicEarningsPerShareAfterExtraordinaryItems", "BasicEarningsPerShareBeforeExtraordinaryItems", "BasicEarningsLossPerShare"])
     sales = tag(["RevenueFromOperations", "InterestEarned", "TotalIncome", "Income"])
