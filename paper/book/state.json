@@ -8,8 +8,8 @@
 "sh": 325,
 "avg": 459.0573,
 "cost": 149604.18469991718,
-"last": 490.4,
-"stop_note": "weekly close < 30-wk SMA (404.6956)",
+"last": 488.55,
+"stop_note": "weekly close < 30-wk SMA (408.216)",
 "added": false
 },
 "921:ADANIPORTS:2026-10-29": {
@@ -19,9 +19,9 @@
 "sh": 109,
 "avg": 1871.0,
 "cost": 204500.21463562502,
-"last": 1907.0,
+"last": 1903.300048828125,
 "stop": 1687.9,
-"checked": "2026-11-11",
+"checked": "2026-11-13",
 "sell_next": false,
 "stop_note": "stop 1687.9, then Supertrend red"
 },
@@ -32,9 +32,9 @@
 "sh": 291,
 "avg": 683.7,
 "cost": 199504.20396881254,
-"last": 723.0999755859375,
+"last": 727.0,
 "stop": 615.2,
-"checked": "2026-11-11",
+"checked": "2026-11-13",
 "sell_next": false,
 "stop_note": "stop 615.2, then Supertrend red"
 },
@@ -45,9 +45,9 @@
 "sh": 94,
 "avg": 2205.0,
 "cost": 207840.38113125,
-"last": 2198.0,
+"last": 2251.60009765625,
 "stop": 1994.1,
-"checked": "2026-11-11",
+"checked": "2026-11-13",
 "sell_next": false,
 "stop_note": "stop 1994.1, then Supertrend red"
 },
@@ -58,9 +58,9 @@
 "sh": 66,
 "avg": 3070.0,
 "cost": 203177.5849125,
-"last": 3263.89990234375,
+"last": 3334.10009765625,
 "stop": 2769.8,
-"checked": "2026-11-11",
+"checked": "2026-11-13",
 "sell_next": false,
 "stop_note": "stop 2769.8, then Supertrend red"
 },
@@ -71,8 +71,8 @@
 "sh": 123,
 "avg": 1236.4126,
 "cost": 152497.2515096059,
-"last": 1206.0,
-"stop_note": "weekly close < 30-wk SMA (1099.2471)",
+"last": 1189.9,
+"stop_note": "weekly close < 30-wk SMA (1107.4737)",
 "added": false
 },
 "921:PETRONET:2026-11-02": {
@@ -82,9 +82,9 @@
 "sh": 955,
 "avg": 303.9,
 "cost": 291023.1615459375,
-"last": 320.45001220703125,
+"last": 324.04998779296875,
 "stop": 283.25,
-"checked": "2026-11-09",
+"checked": "2026-11-13",
 "sell_next": false,
 "stop_note": "stop 283.25, then Supertrend red"
 },
@@ -95,9 +95,9 @@
 "sh": 621,
 "avg": 363.0,
 "cost": 226043.335918125,
-"last": 382.1000061035156,
+"last": 385.04998779296875,
 "stop": 331.3,
-"checked": "2026-11-11",
+"checked": "2026-11-13",
 "sell_next": false,
 "stop_note": "stop 331.3, then Supertrend red"
 },
@@ -108,8 +108,8 @@
 "sh": 465,
 "avg": 263.507,
 "cost": 122867.94432141562,
-"last": 280.65,
-"stop_note": "weekly close < 30-wk SMA (224.3863)",
+"last": 277.85,
+"stop_note": "weekly close < 30-wk SMA (226.1572)",
 "added": false
 },
 "ath:SAREGAMA:2026-11-04": {
@@ -119,8 +119,8 @@
 "sh": 118,
 "avg": 629.5922,
 "cost": 74496.32156617424,
-"last": 642.25,
-"stop_note": "weekly close < 30-wk SMA (472.5183)",
+"last": 653.45,
+"stop_note": "weekly close < 30-wk SMA (482.8367)",
 "added": false
 },
 "ath:ICICIBANK:2026-11-05": {
@@ -130,8 +130,8 @@
 "sh": 66,
 "avg": 1476.0705,
 "cost": 97688.74245947438,
-"last": 1590.0,
-"stop_note": "weekly close < 30-wk SMA (1360.8119)",
+"last": 1583.6,
+"stop_note": "weekly close < 30-wk SMA (1369.0806)",
 "added": false
 },
 "ath:AGARWALEYE:2026-11-11": {
@@ -141,8 +141,8 @@
 "sh": 82,
 "avg": 555.5,
 "cost": 45676.350658125004,
-"last": 551.25,
-"stop_note": "weekly close < 30-wk SMA (482.05)",
+"last": 550.8,
+"stop_note": "weekly close < 30-wk SMA (485.6083)",
 "added": false
 }
 },
@@ -151,6 +151,7 @@
 "921:BIL:2026-11-02",
 "921:KDDL:2026-11-05",
 "921:KODYTECH:2026-11-05",
+"921:KOPRAN:2026-11-12",
 "921:LALPATHLAB:2026-11-04",
 "921:LGEINDIA:2026-11-05",
 "921:MCX:2026-11-03",
@@ -163,6 +164,7 @@
 "921:SWANDEF:2026-11-09",
 "ath:ASAHIINDIA:2026-11-11",
 "ath:DCBBANK:2026-11-12",
+"ath:DRREDDY:2026-11-13",
 "ath:INDHOTEL:2026-11-06",
 "ath:MANAKCOAT:2026-11-12"
 ],
