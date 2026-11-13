@@ -4090,7 +4090,47 @@ async function tdRsi2(box) {
     <p class="muted td-rs">Buy ~10 min before the US close when price is above the 200-day average and RSI(2) is under 10; sell when price closes above the 5-day average, or after 7 days. Stop 3 ATR below entry. Backtest 2010–26: 11%/yr, −26% worst, 66% winners.</p>
     <p class="td-rs"><b>Signals at the last close</b></p><div class="td-tl">${D.signals.length ? D.signals.map((k) => row(k, true)).join('') : '<p class="muted">None.</p>'}</div>
     ${D.watch && D.watch.length ? `<p class="td-rs"><b>Close to a signal</b> · buy if it trades below the price shown near the close</p><div class="td-tl">${D.watch.slice(0, 10).map((k) => row(k, false)).join('')}</div>` : ''}
-    <p class="muted td-rs">Levels use the last close; the bot rechecks with live prices. Test in moomoo paper trading before real money.</p></details>`;
+    <p class="muted td-rs">Levels use the last close; the bot rechecks with live prices. Test in moomoo paper trading before real money.</p>
+    <div id="usplan"></div></details>`;
+  const c = lvCfg(); const up = box.querySelector('#usplan');
+  if (c.url && c.token) { box.querySelector('details').addEventListener('toggle', (e) => { if (e.target.open && !up.dataset.done) usPlanLoad(up); }, { once: false }); }
+  else up.innerHTML = '<p class="muted td-rs">Connect the server on the Live tab to send these orders to moomoo.</p>';
+}
+/* 14 Nov 2026: send RSI(2) orders to moomoo through the server (same as Angel: typed confirmation, Live switch, server
+   checks the live rules again). Paper account unless the server's .env says MOOMOO_ENV=REAL. */
+async function usPlanLoad(el) {
+  el.dataset.done = '1'; el.innerHTML = '<p class="muted td-rs">Loading live moomoo plan…</p>';
+  let P; try { P = await lvApi('/api/us/plan', { timeout: 30000 }); } catch (e) { el.dataset.done = ''; el.innerHTML = `<p class="down td-rs">Couldn't load the moomoo plan: ${esc(e.message)}</p>`; return; }
+  const $f = (v) => (v == null ? '–' : `${v < 0 ? '−' : ''}$${fmt(Math.abs(v), 2, 'en-US')}`);
+  const acct = P.env === 'REAL' ? '<b class="down">REAL money account</b>' : '<b>paper account</b>';
+  const buys = P.buys;
+  el.innerHTML = `<div class="td-risk"><p class="td-rs"><b>Send to moomoo</b> · ${P.mode === 'LIVE' ? `Live orders → ${acct}` : 'Dry run (nothing is sent)'} · New York ${esc(P.et.slice(11))} · slot ${$f(P.slot)}</p>
+    ${P.note ? `<p class="down td-rs">${esc(P.note)}</p>` : ''}
+    ${!P.us_open ? '<p class="muted td-rs">US market closed. Send between 15:45 and 15:58 New York time (7:45–7:58 am Melbourne in our summer).</p>' : ''}
+    <div class="td-tl">${buys.length ? buys.map((r) => `<div><b>${esc(r.symbol)} <small class="muted">RSI ${fmt(r.rsi, 1)}${r.live ? ' live' : ' at close'}</small></b>
+      ${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<button class="lv-btn" data-usb="${esc(r.id)}">Buy ${r.qty}</button>`}
+      <span>${$f(r.price)} · limit ${$f(r.limit)} · stop ${$f(r.stop)}</span><span></span></div>`).join('') : '<p class="muted">No buy signals right now.</p>'}</div>
+    ${P.sells.length ? `<p class="td-rs"><b>Held by this system</b> · realised ${$f(P.realized)}</p><div class="td-tl">${P.sells.map((r) => `<div><b>${esc(r.symbol)} <small class="muted">${r.qty} @ ${$f(r.entry)} · day ${r.days}${r.state !== 'open' ? ' · ' + esc(r.state) : ''}</small></b>
+      ${r.sell ? `<button class="lv-btn" data-uss="${esc(r.id)}">Sell ${r.qty}</button>` : `<span class="muted">${esc(r.why)}</span>`}
+      <span>now ${$f(r.price)} · stop ${$f(r.stop)}${r.sell ? ` · ${esc(r.why)}` : ''}</span><b class="${r.pnl == null ? '' : r.pnl >= 0 ? 'up' : 'down'}">${r.pnl == null ? '' : $f(r.pnl)}</b></div>`).join('')}</div>` : ''}
+    <p class="muted td-rs" id="usmsg"></p><button class="lv-link" id="usrel">Refresh</button></div>`;
+  el.querySelector('#usrel').addEventListener('click', () => usPlanLoad(el));
+  el.querySelectorAll('[data-usb]').forEach((b) => b.addEventListener('click', () => usSend(P.buys.find((r) => r.id === b.dataset.usb), 'BUY', b, el, P)));
+  el.querySelectorAll('[data-uss]').forEach((b) => b.addEventListener('click', () => usSend(P.sells.find((r) => r.id === b.dataset.uss), 'SELL', b, el, P)));
+}
+async function usSend(r, side, btn, el, P) {
+  const qty = r.qty; const conf = `${side} ${qty} ${r.symbol}`;
+  const how = side === 'BUY' ? `limit $${fmt(r.limit, 2, 'en-US')}, then a GTC stop at $${fmt(r.stop, 2, 'en-US')}` : 'market order (the stop is cancelled first)';
+  const where = P.mode !== 'LIVE' ? 'DRY RUN (nothing sent)' : P.env === 'REAL' ? 'moomoo REAL MONEY' : 'moomoo paper account';
+  const typed = window.prompt(`${conf} on ${where}\n${how}.\nType ${qty} to confirm:`);
+  if (typed === null) return;
+  if (String(typed).trim() !== String(qty)) { alertMsg('Not sent: the number did not match.'); return; }
+  btn.disabled = true; btn.textContent = '…'; const m = el.querySelector('#usmsg');
+  try {
+    const j = await lvApi('/api/us/order', { method: 'POST', body: JSON.stringify({ id: r.id, qty, confirm: conf }), timeout: 60000 });
+    btn.textContent = j.sent ? 'Sent ✓' : 'Dry run ✓'; m.className = 'up td-rs'; m.textContent = j.msg || '';
+    alertMsg(j.msg || 'Done', true); setTimeout(() => usPlanLoad(el), 3000);
+  } catch (e) { btn.disabled = false; btn.textContent = `${side === 'BUY' ? 'Buy' : 'Sell'} ${qty}`; m.className = 'down td-rs'; m.textContent = 'Not sent: ' + e.message; alertMsg('Not sent: ' + e.message); }
 }
 /* Trading 212 pies (US ETFs, Australian account) — month-end targets from tools/pies.py; the server alerts on a change */
 async function tdPies(box) {

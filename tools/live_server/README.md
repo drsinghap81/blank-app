@@ -1,4 +1,4 @@
-# Live trading server (AWS) — Angel One orders on tap, moomoo read-only
+# Live trading server (AWS) — Angel One orders on tap, moomoo account view + US RSI(2) orders
 
 The phone app's **Live** tab shows the top 8–10 India trades for the next session with final sizes. When the app is connected to this server, it also:
 - reads your Angel One cash, holdings and positions;
@@ -85,18 +85,32 @@ Answers marked hidden show nothing while you type. Leave an answer blank to keep
 - **Every order:** check it in the Angel app. An after-market (AMO) order shows as "AMO" until the open.
 - **To stop at any time:** tap **Dry run**. "Log out" only signs the phone out; it doesn't change the server's mode.
 
-## moomoo (optional, read-only)
-The Live list is India only (US/ASX backtests showed no edge). moomoo is only read, to show your account value and positions. To set it up:
-1. Install **moomoo OpenD** (command-line version for Ubuntu) from moomoo's OpenAPI download page.
-2. Log in once with your moomoo ID; its config holds a hashed password.
-3. Keep OpenD listening on `127.0.0.1:11111`.
-4. In `.env`, set `MOOMOO_ENABLED=1` and `MOOMOO_MARKETS=AU,US`.
+## moomoo (optional): account view + US RSI(2) orders from the app
+The server reads your moomoo account and, if you turn it on, sends the **US RSI(2) dip-buy** orders you tap in the app
+(US Today → "US dip-buys · RSI(2)" → Send to moomoo). Rules and tests: project notes `connors-rsi2-us-test.md`, `moomoo-rsi2-bot.md`.
+1. Install **moomoo OpenD** (command-line version for Ubuntu) from moomoo's OpenAPI download page; log in once with your moomoo ID
+   (you do this yourself; its config keeps a hashed password). Keep it listening on `127.0.0.1:11111`. Use the 2 GB server plan.
+2. In `.env`:
+   - `MOOMOO_ENABLED=1`, `MOOMOO_MARKETS=AU,US` — account view (read-only).
+   - `MOOMOO_TRADE=1` — allow US orders from the app.
+   - `MOOMOO_ENV=SIMULATE` — moomoo's **paper** account (default). Change to `REAL` only after paper testing, and then also set
+     `MOOMOO_TRADE_PWD=<your moomoo trading password>` (type it into `.env` on the server yourself; never send it anywhere).
+   - `US_RSI2_CAPITAL=10000` (USD for this system; 10 slots of capital/10), optional `MOOMOO_US_ACC_ID`, `US_MAX_ORDERS_DAY=12`.
+3. `sudo systemctl restart trenddesk`.
 
-The server never unlocks trading on moomoo.
+How orders work:
+- Same safety as Angel: nothing is sent unless **Live orders** is on; every order needs the typed quantity; the server re-checks
+  the rule with moomoo's live price (RSI(2) < 10 and above the 200-day average) and refuses outside US market hours.
+- Buy: limit at live price + 0.5%; after the fill a **GTC stop** at entry − 3 ATR(14) goes on at moomoo. If moomoo refuses
+  stop orders (paper account), the server checks the stop every 2 minutes and sells if it is hit.
+- Sell: the app shows Sell when price > 5-day average or after 7 trading days (and alerts you at 15:35–15:55 New York);
+  the stop is cancelled first, then a market sell.
+- The server sells only shares it bought for this system (`var/us_journal.json`) and won't buy a stock you already hold there.
+- Best time to send: 15:45–15:58 New York (7:45–7:58 am Melbourne in Australian summer, 5:45–5:58 am in winter).
 
 ## Files
 - `app.py`: the API.
-- `brokers.py`: Angel (equity delivery), moomoo (read-only) and a mock broker.
+- `brokers.py`: Angel (equity delivery), moomoo (account view + US orders) and mock brokers.
 - `test_server.py`: dry-run and guard tests (`python -m pytest tools/live_server/test_server.py`).
 - `deploy/setup.sh` and `deploy/trenddesk.service`: one-time install with HTTPS through Caddy (sslip.io hostname); the code updates itself (deploy/autoupdate.sh: checks GitHub every 15 minutes, applies new code and packages outside Indian market hours, weekdays 09:00–15:35 IST excluded; log in /opt/trenddesk/var/autoupdate.log).
 - The plan itself comes from `tools/trade_plan.py` (GitHub Actions, about 21:15 IST) → `data/scan/trade_plan.json`.

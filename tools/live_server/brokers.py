@@ -13,6 +13,9 @@ import time
 from datetime import date, datetime, timedelta, timezone
 
 import requests
+from zoneinfo import ZoneInfo
+
+ET_TZ = ZoneInfo("America/New_York")
 
 MASTER_URL = "https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json"
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -316,6 +319,153 @@ class MoomooRO:
             finally:
                 ctx.close()
         return out
+
+
+def _mm():
+    """moomoo SDK: `moomoo-api` (import moomoo) or `futu-api` (import futu) - same OpenD protocol."""
+    try:
+        import moomoo as m  # noqa: F401
+    except ImportError:
+        import futu as m  # noqa: F401
+    return m
+
+
+class MoomooTrade(MoomooRO):
+    """US orders on moomoo through OpenD (14 Nov 2026). MOOMOO_TRADE=1 turns it on. MOOMOO_ENV=SIMULATE (paper, default)
+    or REAL (needs MOOMOO_TRADE_PWD in the server's .env to unlock trading). Every call opens and closes its own context."""
+
+    def __init__(self, env: dict):
+        super().__init__(env)
+        self.trade_on = env.get("MOOMOO_TRADE", "0") == "1"
+        self.env_name = "REAL" if env.get("MOOMOO_ENV", "SIMULATE").upper() == "REAL" else "SIMULATE"
+        self.pwd = env.get("MOOMOO_TRADE_PWD", ""); self.acc = int(env.get("MOOMOO_US_ACC_ID", "0") or 0)
+        self.firm = env.get("MOOMOO_FIRM", "FUTUAU")
+
+    def _q(self):
+        m = _mm(); return m, m.OpenQuoteContext(host=self.host, port=self.port)
+
+    def _t(self):
+        m = _mm()
+        t = m.OpenSecTradeContext(filter_trdmarket=m.TrdMarket.US, host=self.host, port=self.port, security_firm=getattr(m.SecurityFirm, self.firm))
+        if self.env_name == "REAL":
+            ret, d = t.unlock_trade(password=self.pwd)
+            if ret != m.RET_OK:
+                t.close(); raise RuntimeError(f"moomoo unlock failed: {d}")
+        return m, t, getattr(m.TrdEnv, self.env_name)
+
+    @staticmethod
+    def code(sym):
+        return "US." + sym.replace("-", ".")
+
+    def snapshot(self, syms):
+        m, q = self._q(); out = {}
+        try:
+            for i in range(0, len(syms), 380):
+                ret, d = q.get_market_snapshot([self.code(s) for s in syms[i:i + 380]])
+                if ret != m.RET_OK:
+                    raise RuntimeError(f"moomoo snapshot: {d}")
+                for r in d.itertuples():
+                    out[r.code[3:].replace(".", "-")] = dict(last=float(r.last_price), low=float(r.low_price), open=float(r.open_price),
+                                                             prev=float(r.prev_close_price), ut=str(r.update_time))
+        finally:
+            q.close()
+        return out
+
+    def us_positions(self):
+        m, t, env = self._t()
+        try:
+            ret, d = t.position_list_query(trd_env=env, acc_id=self.acc, refresh_cache=True)
+            if ret != m.RET_OK:
+                raise RuntimeError(f"moomoo positions: {d}")
+            return {r.code[3:].replace(".", "-"): float(r.qty) for r in d.itertuples() if r.code.startswith("US.") and float(r.qty) > 0}
+        finally:
+            t.close()
+
+    def us_cash(self):
+        m, t, env = self._t()
+        try:
+            ret, d = t.accinfo_query(trd_env=env, acc_id=self.acc, refresh_cache=True, currency=m.Currency.USD)
+            if ret != m.RET_OK:
+                raise RuntimeError(f"moomoo account: {d}")
+            r = d.iloc[0]
+            for k in ("us_cash", "cash", "power"):
+                try:
+                    v = float(r[k])
+                    if v == v:
+                        return v
+                except (KeyError, TypeError, ValueError):
+                    pass
+            return 0.0
+        finally:
+            t.close()
+
+    def place(self, sym, side, qty, otype, price, aux=None, tif="DAY"):
+        m, t, env = self._t()
+        try:
+            ret, d = t.place_order(price=float(price), qty=float(qty), code=self.code(sym), trd_side=getattr(m.TrdSide, side),
+                                   order_type=getattr(m.OrderType, otype), trd_env=env, acc_id=self.acc,
+                                   time_in_force=getattr(m.TimeInForce, tif), aux_price=aux, remark="trenddesk-rsi2")
+            if ret != m.RET_OK:
+                raise RuntimeError(str(d))
+            return str(d["order_id"].iloc[0])
+        finally:
+            t.close()
+
+    def order(self, oid):
+        m, t, env = self._t()
+        try:
+            ret, d = t.order_list_query(order_id=oid, trd_env=env, acc_id=self.acc, refresh_cache=True)
+            if ret == m.RET_OK and d.empty:
+                ret, d = t.history_order_list_query(trd_env=env, acc_id=self.acc); d = d[d.order_id == oid] if ret == m.RET_OK else d
+            if ret != m.RET_OK or d.empty:
+                return dict(status="UNKNOWN", dealt=0.0, avg=0.0)
+            r = d.iloc[0]
+            return dict(status=str(r.order_status), dealt=float(r.dealt_qty or 0), avg=float(r.dealt_avg_price or 0))
+        finally:
+            t.close()
+
+    def cancel(self, oid):
+        m, t, env = self._t()
+        try:
+            ret, _ = t.modify_order(m.ModifyOrderOp.CANCEL, oid, 0, 0, trd_env=env, acc_id=self.acc)
+            return ret == m.RET_OK
+        finally:
+            t.close()
+
+
+class MockMoomoo:
+    """Fake moomoo for tests (MOCK_BROKER=1): fills limit/market orders at once, keeps stop orders open."""
+
+    def __init__(self, *a, **k):
+        self.enabled = self.trade_on = True; self.env_name = "SIMULATE"; self.px = {}; self.prev = {}; self.pos = {}; self.orders = {}; self.n = 0
+
+    def account(self):
+        return dict(broker="moomoo (mock)", enabled=True, accounts=[])
+
+    def snapshot(self, syms):
+        return {s: dict(last=self.px.get(s, 100.0), low=self.px.get(s, 100.0), open=self.px.get(s, 100.0), prev=self.prev.get(s, 100.0),
+                        ut=datetime.now(ET_TZ).strftime("%Y-%m-%d %H:%M:%S")) for s in syms}
+
+    def us_positions(self):
+        return {k: v for k, v in self.pos.items() if v > 0}
+
+    def us_cash(self):
+        return 1e6
+
+    def place(self, sym, side, qty, otype, price, aux=None, tif="DAY"):
+        self.n += 1; oid = f"MM{self.n}"
+        if otype == "STOP":
+            self.orders[oid] = dict(sym=sym, qty=qty, stop=aux, status="SUBMITTED", dealt=0.0, avg=0.0); return oid
+        px = self.px.get(sym, 100.0); self.pos[sym] = self.pos.get(sym, 0) + (qty if side == "BUY" else -qty)
+        self.orders[oid] = dict(sym=sym, qty=qty, status="FILLED_ALL", dealt=float(qty), avg=px); return oid
+
+    def order(self, oid):
+        o = self.orders.get(oid) or dict(status="UNKNOWN", dealt=0.0, avg=0.0); return dict(status=o["status"], dealt=o["dealt"], avg=o["avg"])
+
+    def cancel(self, oid):
+        if oid in self.orders and self.orders[oid]["status"] == "SUBMITTED":
+            self.orders[oid]["status"] = "CANCELLED_ALL"
+        return True
 
 
 class MockBroker(AngelEquity):

@@ -610,3 +610,40 @@ def test_buystop_gtt(tmp_path, monkeypatch):
     acc = A.broker.account()
     J = A.journal(); assert A.gtt_buy_upkeep(J, acc) and r["symbol"] not in J
     assert A.broker.gtts[j["gtt_id"]]["active"] is False
+
+
+def test_us_rsi2_orders(tmp_path, monkeypatch):
+    """US RSI(2) on moomoo: dry run sends nothing; live buys with a GTC stop; sell signal sells and closes the journal;
+    a stop filled at moomoo is recorded; holdings outside the system are never sold or bought."""
+    from datetime import datetime
+    A, c = client(tmp_path, live="0")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    s = dict(close=100.0, sum199=199 * 90.0, sum4=400.0, au=0.2, ad=3.0, atr14=2.0, liquid=True, above=90.0, exit_above=100.0,
+             buy_below=101.2, rsi2=8.0, name="Test")
+    A.rsi2_prep = lambda max_age=600: dict(asof="2026-11-13", signals=["AAA", "OUT"], watch=["BBB"], stocks={k: dict(s) for k in ("AAA", "BBB", "OUT")})
+    A.et_now = lambda: datetime(2026, 11, 16, 15, 50, tzinfo=A.ET_TZ)
+    M = A.moomoo; M.px.update(AAA=97.0, BBB=150.0, OUT=96.0); M.pos["OUT"] = 5
+    P = c.get("/api/us/plan", headers=h).json()
+    b = {r["symbol"]: r for r in P["buys"]}
+    assert set(b) == {"AAA", "OUT"} and b["OUT"]["skip"] and not b["AAA"]["skip"] and b["AAA"]["qty"] == 10     # 1000 / 97
+    body = {"id": "US-AAA", "qty": 10, "confirm": "BUY 10 AAA"}
+    j = c.post("/api/us/order", headers=h, json=body).json(); assert j["sent"] is False and not M.orders           # dry run
+    assert c.post("/api/us/order", headers=h, json={"id": "US-OUT", "qty": 5, "confirm": "BUY 5 OUT"}).status_code == 400
+    A.set_live(True)
+    assert c.post("/api/us/order", headers=h, json={**body, "confirm": "BUY 9 AAA"}).status_code == 400
+    j = c.post("/api/us/order", headers=h, json=body); assert j.status_code == 200, j.text
+    J = A.us_journal(); p = J["pos"]["AAA"]; assert p["state"] == "open" and p["qty"] == 10 and p["stop"] == 91.0
+    assert M.orders[p["stop_id"]]["status"] == "SUBMITTED" and M.orders[p["stop_id"]]["stop"] == 91.0
+    # next day: price above the 5-day average -> sell row; selling cancels the stop and closes the trade
+    A.et_now = lambda: datetime(2026, 11, 17, 15, 50, tzinfo=A.ET_TZ); M.px["AAA"] = 101.0
+    P = c.get("/api/us/plan", headers=h).json(); x = P["sells"][0]; assert x["sell"] and x["symbol"] == "AAA"
+    j = c.post("/api/us/order", headers=h, json={"id": "USX-AAA", "qty": 10, "confirm": "SELL 10 AAA"}); assert j.status_code == 200, j.text
+    J = A.us_journal(); assert J["pos"] == {} and round(J["realized"], 2) == 40.0 and M.orders[p["stop_id"]]["status"] == "CANCELLED_ALL"
+    assert M.pos["OUT"] == 5
+    # a new buy whose stop fills at moomoo is recorded by the sync
+    M.px["AAA"] = 97.0; A.et_now = lambda: datetime(2026, 11, 18, 15, 50, tzinfo=A.ET_TZ)
+    assert c.post("/api/us/order", headers=h, json=body).status_code == 200
+    p = A.us_journal()["pos"]["AAA"]; M.orders[p["stop_id"]].update(status="FILLED_ALL", dealt=10.0, avg=90.5); M.pos["AAA"] = 0
+    A.us_sync(); J = A.us_journal(); assert J["pos"] == {} and J["closed"][-1]["why"] == "stop" and J["closed"][-1]["exit"] == 90.5
+    A.et_now = lambda: datetime(2026, 11, 18, 17, 0, tzinfo=A.ET_TZ)
+    assert c.post("/api/us/order", headers=h, json=body).status_code == 400                                     # market closed

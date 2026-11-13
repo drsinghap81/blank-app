@@ -110,7 +110,10 @@ class Moomoo:
     """Thin wrapper over the moomoo SDK. paper -> TrdEnv.SIMULATE, live -> TrdEnv.REAL (after unlock)."""
 
     def __init__(self, trade=True):
-        import moomoo as m
+        try:
+            import moomoo as m
+        except ImportError:          # futu-api speaks the same OpenD protocol
+            import futu as m
         self.m = m
         host, port = C['OPEND_HOST'], int(C['OPEND_PORT'])
         self.q = m.OpenQuoteContext(host=host, port=port)

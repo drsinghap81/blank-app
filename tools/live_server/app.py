@@ -31,7 +31,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from brokers import AngelEquity, MockBroker, MoomooRO, amo_window, ist_now, market_open
+from brokers import ET_TZ, AngelEquity, MockBroker, MockMoomoo, MoomooTrade, amo_window, ist_now, market_open
 
 # systemd's EnvironmentFile keeps inline "# comments" as part of the value, so strip them here
 ENV = {k: re.sub(r"\s+#.*$", "", v).strip() for k, v in os.environ.items()}
@@ -131,7 +131,7 @@ TOKEN_SECRET = ENV.get("TOKEN_SECRET", "")
 PW_HASH = ENV.get("APP_PASSWORD_HASH", "")               # scrypt$<salt hex>$<hash hex>  (make with: python app.py hash)
 
 broker = MockBroker() if ENV.get("MOCK_BROKER") == "1" else AngelEquity(ENV, DATA)
-moomoo = MoomooRO(ENV)
+moomoo = MockMoomoo() if ENV.get("MOCK_BROKER") == "1" else MoomooTrade(ENV)
 app = FastAPI(title="Trend Desk live server")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in ENV.get("ALLOW_ORIGIN", "https://drsinghap81.github.io").split(",")],
                    allow_methods=["GET", "POST"], allow_headers=["Authorization", "Content-Type"])
@@ -1833,6 +1833,269 @@ def _tb_loop():
 
 
 # ------------------------------------------------------------------ background: fills + stops every 2 minutes in market hours
+# ------------------------------------------------------------------ US RSI(2) dip-buys on moomoo (14 Nov 2026)
+# Same rules as tools/moomoo_rsi2 (project note moomoo-rsi2-bot.md): S&P 500, 50-day avg volume > 2M, price > SMA200 and
+# RSI(2) < 10 -> buy near the US close; sell near the close when price > SMA5 or after 7 trading days; GTC stop at
+# entry - 3 ATR(14) on moomoo. Levels from data/scan/us/rsi2.json (GitHub job after each US close), live prices from OpenD.
+# Orders go out only from the app (typed confirmation), only when Live orders is on, and to moomoo's PAPER account unless
+# MOOMOO_ENV=REAL in .env. The server only ever sells shares it bought for this system (us_journal.json).
+RSI2_URL = ENV.get("RSI2_URL", "https://raw.githubusercontent.com/drsinghap81/blank-app/main/data/scan/us/rsi2.json")
+US_CAPITAL = float(ENV.get("US_RSI2_CAPITAL", "10000")); US_SLOTS = int(ENV.get("US_RSI2_SLOTS", "10"))
+US_MAX_ORDERS_DAY = int(ENV.get("US_MAX_ORDERS_DAY", "12")); US_LIMIT_BUF = float(ENV.get("US_LIMIT_BUFFER_PCT", "0.5")) / 100
+_rsi2 = dict(t=0, d=None)
+
+
+def et_now():
+    return datetime.now(ET_TZ)
+
+
+def us_open(t=None):
+    t = t or et_now(); return t.weekday() < 5 and (9, 30) <= (t.hour, t.minute) < (16, 0)
+
+
+def rsi2_prep(max_age=600):
+    if _rsi2["d"] is None or time.time() - _rsi2["t"] > max_age:
+        r = requests.get(RSI2_URL, params=dict(t=int(time.time())), timeout=30); r.raise_for_status(); _rsi2.update(t=time.time(), d=r.json())
+    return _rsi2["d"]
+
+
+def _usj_path():
+    return os.path.join(DATA, "us_journal.json")
+
+
+def us_journal():
+    try:
+        return json.load(open(_usj_path()))
+    except Exception:  # noqa: BLE001
+        return dict(pos={}, closed=[], realized=0.0)
+
+
+def save_us_journal(J):
+    tmp = _usj_path() + ".tmp"; json.dump(J, open(tmp, "w"), indent=1); os.replace(tmp, _usj_path())
+
+
+def _rsi_now(p, s):
+    au = (s["au"] + max(p - s["close"], 0)) / 2; ad = (s["ad"] + max(s["close"] - p, 0)) / 2
+    return 100.0 if ad == 0 else 100 - 100 / (1 + au / ad)
+
+
+def _us_days(since, t):
+    import numpy as np
+    return int(np.busday_count(since, t.date().isoformat()))
+
+
+def us_plan():
+    """Live buy and sell rows for the RSI(2) system."""
+    P = rsi2_prep(); ST = P["stocks"]; J = us_journal(); t = et_now()
+    note = None; snap = {}; outside = {}
+    if not (moomoo.enabled and moomoo.trade_on):
+        note = "moomoo trading is off on the server (MOOMOO_ENABLED=1 and MOOMOO_TRADE=1 in .env, with OpenD running)."
+    else:
+        try:
+            snap = moomoo.snapshot(sorted(set(P["signals"]) | set(P.get("watch", [])) | set(J["pos"])))
+            held = moomoo.us_positions(); outside = {k: v for k, v in held.items() if k not in J["pos"]}
+        except Exception as ex:  # noqa: BLE001
+            note = f"couldn't reach moomoo OpenD: {str(ex)[:160]}"
+    live = bool(snap) and us_open(t)
+    slot = (US_CAPITAL + J.get("realized", 0.0)) / US_SLOTS; free = US_SLOTS - len(J["pos"])
+    buys = []
+    for sym in list(dict.fromkeys(P["signals"] + P.get("watch", []))):
+        s = ST.get(sym); q = snap.get(sym)
+        if not s:
+            continue
+        px = q["last"] if q and live else s["close"]
+        r = _rsi_now(px, s) if live else s["rsi2"]
+        ok = px > s["above"] and r < 10
+        if not ok and not (sym in P["signals"] and not live):
+            continue
+        skip = ""
+        if sym in J["pos"]:
+            skip = "already held by this system"
+        elif sym in outside:
+            skip = "you hold it outside this system"
+        elif free <= 0:
+            skip = f"all {US_SLOTS} slots full"
+        elif not live:
+            skip = "send near the US close (15:45-15:58 New York) when prices are live"
+        elif q and abs(q["prev"] / s["close"] - 1) > 0.01:
+            skip = "moomoo's previous close doesn't match the data (split?) - skipped"
+        qty = math.floor(slot / px) if px > 0 else 0
+        buys.append(dict(id=f"US-{sym}", symbol=sym, name=s.get("name", ""), price=round(px, 2), rsi=round(r, 1), qty=qty,
+                         limit=round(px * (1 + US_LIMIT_BUF), 2), stop=round(px - 3 * s["atr14"], 2), sell_above=round(s["exit_above"], 2),
+                         live=live, skip=skip))
+    buys.sort(key=lambda b: b["rsi"])
+    sells = []
+    for sym, p in J["pos"].items():
+        s = ST.get(sym) or {}; q = snap.get(sym)
+        px = q["last"] if q else None; days = _us_days(p["date"], t)
+        why = ("price above the 5-day average" if px and s.get("exit_above") and px > s["exit_above"] else
+               f"{days} trading days held (limit 7)" if days >= 7 else "")
+        sells.append(dict(id=f"USX-{sym}", symbol=sym, qty=p["qty"], entry=p["entry"], stop=p["stop"], price=px, days=days,
+                          state=p.get("state", "open"), sell=bool(why) and p.get("state") == "open", why=why or "hold",
+                          pnl=round((px - p["entry"]) * p["qty"], 2) if px else None))
+    return dict(asof=P["asof"], et=t.strftime("%Y-%m-%d %H:%M"), us_open=us_open(t), live_prices=live, note=note,
+                env=getattr(moomoo, "env_name", "SIMULATE"), mode="LIVE" if is_live() else "DRY RUN", slot=round(slot, 2),
+                capital=US_CAPITAL, realized=round(J.get("realized", 0.0), 2), buys=buys, sells=sells, closed=J.get("closed", [])[-20:])
+
+
+class USOrder(BaseModel):
+    id: str
+    qty: int
+    confirm: str = ""
+
+
+@app.get("/api/us/plan")
+def us_plan_api(_=Depends(auth)):
+    try:
+        return us_plan()
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(502, f"couldn't build the US plan: {str(ex)[:200]}")
+
+
+def _wait(oid, secs=20):
+    o = moomoo.order(oid); t0 = time.time()
+    while o["status"] not in ("FILLED_ALL", "CANCELLED_ALL", "CANCELLED_PART", "FAILED", "DELETED", "DISABLED") and time.time() - t0 < secs:
+        time.sleep(2); o = moomoo.order(oid)
+    return o
+
+
+def _us_stop(sym, qty, stop):
+    try:
+        return moomoo.place(sym, "SELL", qty, "STOP", stop, aux=stop, tif="GTC")
+    except Exception as ex:  # noqa: BLE001
+        alert("stop_missing", sym, f"US {sym}: moomoo refused the protective stop at {stop:.2f} ({str(ex)[:120]}). "
+              "The server will sell at the next check if the price is at or below it.", key=f"usstop:{sym}:{et_now().date()}")
+        return None
+
+
+@app.post("/api/us/order")
+def us_order(body: USOrder, _=Depends(auth)):
+    P = us_plan(); t = et_now()
+    if P["note"]:
+        raise HTTPException(400, P["note"])
+    done = [r for r in today_log() if r.get("kind") in ("us_order", "us_dry")]
+    if len(done) >= US_MAX_ORDERS_DAY:
+        raise HTTPException(429, f"daily limit of {US_MAX_ORDERS_DAY} US orders reached")
+    row = next((r for r in P["buys"] if r["id"] == body.id), None); ex = next((r for r in P["sells"] if r["id"] == body.id), None)
+    if not row and not ex:
+        raise HTTPException(404, "not in the current US plan (the signal may have gone)")
+    if not us_open(t):
+        raise HTTPException(400, "the US market is closed; send between 15:45 and 15:58 New York time")
+    if row:
+        if row["skip"]:
+            raise HTTPException(400, row["skip"])
+        if body.qty < 1 or body.qty > row["qty"]:
+            raise HTTPException(400, f"quantity must be 1..{row['qty']}")
+        if body.qty * row["limit"] > min(P["slot"] * 1.05, moomoo.us_cash()):
+            raise HTTPException(400, "order value above the slot size or your USD cash")
+        side, sym, qty = "BUY", row["symbol"], body.qty
+    else:
+        if body.qty < 1 or body.qty > ex["qty"]:
+            raise HTTPException(400, f"this system holds {ex['qty']}")
+        side, sym, qty = "SELL", ex["symbol"], body.qty
+    if body.confirm.strip().upper() != f"{side} {qty} {sym}".upper():
+        raise HTTPException(400, f'confirm must be "{side} {qty} {sym}"')
+    rec = dict(id=body.id, symbol=sym, side=side, qty=qty, env=moomoo.env_name, et=t.isoformat(timespec="seconds"))
+    if not is_live():
+        log("us_dry", **rec, price=row["limit"] if row else ex["price"])
+        return dict(ok=True, mode="DRY RUN", sent=False, env=moomoo.env_name, side=side, qty=qty, symbol=sym,
+                    price=row["limit"] if row else ex["price"], stop=row["stop"] if row else None,
+                    msg="Dry run: nothing sent. Switch Live orders on to send to moomoo" + (" (paper account)." if moomoo.env_name == "SIMULATE" else "."))
+    J = us_journal()
+    try:
+        if side == "BUY":
+            oid = moomoo.place(sym, "BUY", qty, "NORMAL", row["limit"])
+            log("us_order", order_id=oid, price=row["limit"], **rec)
+            o = _wait(oid)
+            if o["dealt"] > 0:
+                fill = o["avg"] or row["price"]; st = round(fill - 3 * (rsi2_prep()["stocks"][sym]["atr14"]), 2)
+                sid = _us_stop(sym, o["dealt"], st)
+                J["pos"][sym] = dict(qty=o["dealt"], entry=fill, stop=st, stop_id=sid, date=t.date().isoformat(), buy_id=oid, state="open")
+                msg = f"Bought {o['dealt']:g} {sym} at {fill:.2f} on moomoo ({moomoo.env_name.lower()}). Stop {st:.2f} placed (GTC)." if sid else \
+                      f"Bought {o['dealt']:g} {sym} at {fill:.2f}. moomoo refused the stop order; the server watches {st:.2f} instead."
+            else:
+                J["pos"][sym] = dict(qty=qty, entry=row["limit"], stop=row["stop"], stop_id=None, date=t.date().isoformat(), buy_id=oid, state="pending")
+                msg = f"Buy order {oid} placed ({o['status']}); the server adds the stop when it fills."
+        else:
+            p = J["pos"][sym]
+            if p.get("stop_id"):
+                moomoo.cancel(p["stop_id"])
+            oid = moomoo.place(sym, "SELL", qty, "MARKET", ex["price"] or p["entry"]); log("us_order", order_id=oid, **rec)
+            o = _wait(oid)
+            if o["dealt"] > 0:
+                _us_close(J, sym, o["avg"] or ex["price"], o["dealt"], ex["why"])
+                msg = f"Sold {o['dealt']:g} {sym} at {o['avg'] or ex['price']:.2f}."
+            else:
+                p["state"] = "exiting"; p["sell_id"] = oid; msg = f"Sell order {oid} placed ({o['status']}); the server records the fill."
+            if sym in J["pos"] and p.get("state") != "exiting":      # partly sold: protect the rest
+                p["stop_id"] = _us_stop(sym, p["qty"], p["stop"])
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001
+        log("us_order_error", error=str(e)[:300], **rec); save_us_journal(J)
+        raise HTTPException(502, f"moomoo rejected {side} {sym}: {str(e)[:200]}")
+    save_us_journal(J)
+    return dict(ok=True, mode="LIVE", sent=True, env=moomoo.env_name, order_id=oid, msg=msg)
+
+
+def _us_close(J, sym, px, qty, why):
+    p = J["pos"][sym]; q = min(qty, p["qty"]); pnl = q * (px - p["entry"]); J["realized"] = J.get("realized", 0.0) + pnl; p["qty"] -= q
+    J.setdefault("closed", []).append(dict(sym=sym, entry=p["entry"], exit=round(px, 2), qty=q, pnl=round(pnl, 2), why=why,
+                                           opened=p["date"], closed=et_now().date().isoformat()))
+    if p["qty"] <= 1e-9:
+        del J["pos"][sym]
+    log("us_exit", symbol=sym, qty=q, price=px, pnl=round(pnl, 2), why=why)
+
+
+def us_sync():
+    """Pending buys -> add the stop; stopped-out or sold positions -> close in the journal; missing broker stop -> sell if hit;
+    near the close -> alert sell signals. Runs from the server loop during US hours."""
+    if not (moomoo.enabled and moomoo.trade_on):
+        return
+    J = us_journal()
+    if not J["pos"]:
+        return
+    t = et_now(); held = moomoo.us_positions(); changed = False
+    for sym, p in list(J["pos"].items()):
+        if p.get("state") == "pending":
+            o = moomoo.order(p["buy_id"])
+            if o["dealt"] > 0:
+                fill = o["avg"] or p["entry"]; st = round(fill - (p["entry"] - p["stop"]), 2)
+                p.update(qty=o["dealt"], entry=fill, stop=st, state="open", stop_id=_us_stop(sym, o["dealt"], st)); changed = True
+                alert("filled", sym, f"US {sym}: bought {o['dealt']:g} at {fill:.2f}; stop {st:.2f}.", key=f"usfill:{sym}:{p['buy_id']}")
+            elif o["status"] in ("CANCELLED_ALL", "FAILED", "DELETED", "DISABLED"):
+                del J["pos"][sym]; changed = True
+            continue
+        if p.get("state") == "exiting" and p.get("sell_id"):
+            o = moomoo.order(p["sell_id"])
+            if o["dealt"] > 0:
+                _us_close(J, sym, o["avg"], o["dealt"], "sold"); changed = True
+            continue
+        have = held.get(sym, 0)
+        if have < p["qty"] - 1e-9:      # stop filled at moomoo (or sold outside the app)
+            o = moomoo.order(p["stop_id"]) if p.get("stop_id") else dict(avg=0, status="")
+            px = o["avg"] or p["stop"]; _us_close(J, sym, px, p["qty"] - have, "stop" if p.get("stop_id") else "sold outside the app"); changed = True
+            alert("stop", sym, f"US {sym}: stop filled at {px:.2f}.", key=f"usstophit:{sym}:{p['date']}")
+            continue
+        if not p.get("stop_id") and us_open(t):
+            q = moomoo.snapshot([sym]).get(sym)
+            if q and q["last"] <= p["stop"]:
+                oid = moomoo.place(sym, "SELL", p["qty"], "MARKET", q["last"]); o = _wait(oid)
+                if o["dealt"] > 0:
+                    _us_close(J, sym, o["avg"] or q["last"], o["dealt"], "stop (server check)"); changed = True
+                    alert("stop", sym, f"US {sym}: sold {o['dealt']:g} at the stop check, {o['avg'] or q['last']:.2f}.", key=f"usstopsrv:{sym}:{t.date()}")
+    if changed:
+        save_us_journal(J)
+    if t.weekday() < 5 and (15, 35) <= (t.hour, t.minute) <= (15, 55):
+        try:
+            for r in us_plan()["sells"]:
+                if r["sell"]:
+                    alert("exit", r["symbol"], f"US {r['symbol']}: sell signal ({r['why']}). Send the sell from the app before 15:58 New York.",
+                          key=f"usexit:{r['symbol']}:{t.date()}")
+        except Exception as ex:  # noqa: BLE001
+            log("us_alert_error", error=str(ex)[:200])
+
+
 def _loop():
     while True:
         _HB["loop"] = time.time()
@@ -1848,6 +2111,8 @@ def _loop():
                 exit_alerts()
             if t.minute % 10 < 2:
                 pie_alerts()
+            if us_open(et_now()) or (et_now().weekday() < 5 and et_now().hour == 16 and et_now().minute < 15):
+                us_sync()
         except Exception as ex:  # noqa: BLE001
             log("loop_error", error=str(ex)[:200])
         time.sleep(120)
