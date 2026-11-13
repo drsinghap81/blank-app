@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { sparse-checkout: apps, sparse-checkout-cone-mode: true }   # only apps/ (data/ has CON.json, a reserved name on Windows)
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: "17" }
       - uses: actions/setup-node@v4
@@ -50,6 +51,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with: { sparse-checkout: apps, sparse-checkout-cone-mode: true }   # only apps/ (data/ has CON.json, a reserved name on Windows)
       - uses: actions/setup-node@v4
         with: { node-version: "20" }
       - name: Build installer
@@ -69,6 +71,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with: { sparse-checkout: apps, sparse-checkout-cone-mode: true }   # only apps/ (data/ has CON.json, a reserved name on Windows)
       - uses: actions/setup-node@v4
         with: { node-version: "20" }
       - name: Build check (simulator, unsigned) - TestFlight upload is added once the Apple secrets exist
