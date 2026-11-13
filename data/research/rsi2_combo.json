@@ -1,0 +1,127 @@
+{
+ "generated": "2026-11-13 20:53 UTC",
+ "corr": {
+  "RSI2": {
+   "RSI2": 1.0,
+   "RSI2 no stop": 0.97,
+   "Momentum20+filter": 0.44,
+   "MTUM": 0.54,
+   "SPY": 0.68,
+   "QQQ": 0.55
+  },
+  "RSI2 no stop": {
+   "RSI2": 0.97,
+   "RSI2 no stop": 1.0,
+   "Momentum20+filter": 0.43,
+   "MTUM": 0.54,
+   "SPY": 0.67,
+   "QQQ": 0.53
+  },
+  "Momentum20+filter": {
+   "RSI2": 0.44,
+   "RSI2 no stop": 0.43,
+   "Momentum20+filter": 1.0,
+   "MTUM": 0.67,
+   "SPY": 0.47,
+   "QQQ": 0.55
+  },
+  "MTUM": {
+   "RSI2": 0.54,
+   "RSI2 no stop": 0.54,
+   "Momentum20+filter": 0.67,
+   "MTUM": 1.0,
+   "SPY": 0.83,
+   "QQQ": 0.84
+  },
+  "SPY": {
+   "RSI2": 0.68,
+   "RSI2 no stop": 0.67,
+   "Momentum20+filter": 0.47,
+   "MTUM": 0.83,
+   "SPY": 1.0,
+   "QQQ": 0.91
+  },
+  "QQQ": {
+   "RSI2": 0.55,
+   "RSI2 no stop": 0.53,
+   "Momentum20+filter": 0.55,
+   "MTUM": 0.84,
+   "SPY": 0.91,
+   "QQQ": 1.0
+  }
+ },
+ "results": {
+  "RSI2": {
+   "cagr": 12.4,
+   "maxdd": -22.2,
+   "worst_year": -5.4,
+   "c22": 13.7
+  },
+  "RSI2 no stop": {
+   "cagr": 14.1,
+   "maxdd": -28.5,
+   "worst_year": -3.5,
+   "c22": 17.1
+  },
+  "Momentum20+filter": {
+   "cagr": 20.3,
+   "maxdd": -37.3,
+   "worst_year": -16.3,
+   "c22": 18.1
+  },
+  "MTUM": {
+   "cagr": 14.3,
+   "maxdd": -30.2,
+   "worst_year": -18.3,
+   "c22": 9.7
+  },
+  "SPY": {
+   "cagr": 14.0,
+   "maxdd": -23.9,
+   "worst_year": -18.2,
+   "c22": 11.3
+  },
+  "QQQ": {
+   "cagr": 19.1,
+   "maxdd": -32.6,
+   "worst_year": -32.6,
+   "c22": 12.2
+  },
+  "70% MTUM + 30% RSI2": {
+   "cagr": 14.0,
+   "maxdd": -20.9,
+   "worst_year": -8.8,
+   "c22": 11.4
+  },
+  "50% MTUM + 50% RSI2": {
+   "cagr": 13.7,
+   "maxdd": -18.0,
+   "worst_year": -2.7,
+   "c22": 12.3
+  },
+  "70% Momentum20+filter + 30% RSI2": {
+   "cagr": 18.5,
+   "maxdd": -25.5,
+   "worst_year": -7.3,
+   "c22": 17.8
+  },
+  "50% Momentum20+filter + 50% RSI2": {
+   "cagr": 17.0,
+   "maxdd": -21.9,
+   "worst_year": -0.9,
+   "c22": 17.1
+  },
+  "70% SPY + 30% RSI2": {
+   "cagr": 13.7,
+   "maxdd": -19.9,
+   "worst_year": -8.8,
+   "c22": 12.3
+  },
+  "50% SPY + 50% RSI2": {
+   "cagr": 13.4,
+   "maxdd": -20.2,
+   "worst_year": -4.1,
+   "c22": 12.8
+  }
+ }
+}
