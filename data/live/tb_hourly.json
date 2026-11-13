@@ -1,0 +1,21 @@
+{
+ "time": "2026-11-13 14:58 IST",
+ "buffer": 50.0,
+ "delayed_min": 15,
+ "state": "stopped",
+ "side": "LONG",
+ "daily_entry": "2026-10-28",
+ "daily_entry_price": 54403.0,
+ "last_index": 60998.2,
+ "hour_top": 60989.6,
+ "hour_bottom": 60864.4,
+ "level": null,
+ "stop": null,
+ "entered_at": 54382.3,
+ "entered_time": "2026-10-29 09:15:00",
+ "stopped_at": 54606.0,
+ "stopped_time": "2026-10-30 13:15:00",
+ "basis": -180.9,
+ "level_fut": null,
+ "stop_fut": null
+}
