@@ -102,7 +102,7 @@ def dt(s, fmt):
         return None
 
 
-def one(sym):
+def one(sym, have=(), cons_keep=None):
     L = get("https://www.nseindia.com/api/corporates-financial-results", dict(index="equities", symbol=sym, period="Quarterly"))
     if not L:
         return dict(err="no filings list")
@@ -112,9 +112,11 @@ def one(sym):
     cons = sum(x.get("consolidated") == "Consolidated" for x in L); per = {}
     for x in L:
         per.setdefault(dt(x["toDate"], "%d-%b-%Y"), []).append(x)
-    use_c = cons >= 0.7 * len(per)
+    use_c = cons >= 0.7 * len(per) if cons_keep is None else cons_keep
     Q = []
     for end, xs in per.items():
+        if end in have:
+            continue
         xs = [x for x in xs if (x.get("consolidated") == "Consolidated") == use_c] or xs
         x = sorted(xs, key=lambda x: x.get("broadCastDate") or "")[0]          # first filing of that quarter
         d = get("https://www.nseindia.com/api/corporates-financial-results-data",
@@ -133,7 +135,7 @@ def one(sym):
     # results filed since 2025 (SEBI Integrated Filing - Financials): listing + XBRL
     I = get("https://www.nseindia.com/api/integrated-filing-results", dict(index="equities", symbol=sym, type="Integrated Filing- Financials", size=100))
     I = (I or {}).get("data") or []
-    have = {q["end"] for q in Q}; per2 = {}
+    have = {q["end"] for q in Q} | set(have); per2 = {}
     for x in I:
         e = dt((x.get("qe_Date") or "").title(), "%d-%b-%Y")
         if e and e not in have and x.get("type_Sub", "Original") == "Original":
@@ -149,6 +151,32 @@ def one(sym):
     Q.sort(key=lambda q: q["end"] or "")
     return dict(q=Q, cons=use_c)
 
+
+UPD = os.environ.get("FUNDQ_UPDATE")   # path of an existing shard file: add quarters newer than what it holds
+if UPD:
+    OUT = UPD; R = json.load(open(OUT)); today = datetime.utcnow().date()
+    m = (today.month - 1) // 3 * 3; last_qe = (datetime(today.year, m, 1) if m else datetime(today.year - 1, 12, 1)).date()
+    last_qe = f"{last_qe.year}-{last_qe.month:02d}"          # month of the latest completed quarter end
+    old_cut = f"{today.year - 2}-{today.month:02d}"
+    warm(); n_new = n_try = 0
+    for s, v in R.items():
+        q = v.get("q") or []
+        if not q or (q[-1]["end"] or "")[:7] >= last_qe or (q[-1]["end"] or "") < old_cut:
+            continue                                         # up to date, or dead/delisted
+        if (time.time() - T0) / 60 > MAXMIN:
+            print("time budget reached"); break
+        n_try += 1
+        try:
+            r = one(s, have={x["end"] for x in q}, cons_keep=v.get("cons"))
+        except Exception as e:  # noqa: BLE001
+            r = dict(err=str(e)[:120])
+        add = [x for x in (r or {}).get("q", []) if x["end"] and x["end"] > q[-1]["end"]]
+        if add:
+            v["q"] = q + add; n_new += len(add)
+        if n_try % 50 == 0:
+            json.dump(R, open(OUT, "w"), separators=(",", ":")); print(n_try, s, flush=True)
+    json.dump(R, open(OUT, "w"), separators=(",", ":"))
+    print(f"{OUT}: checked {n_try}, added {n_new} quarters (latest quarter {last_qe})"); sys.exit(0)
 
 syms = [s for s in open(os.environ.get("FUNDQ_SYMS", "data/fundq/symbols.txt")).read().split() if s]
 mine = [s for i, s in enumerate(syms) if i % NSH == SHARD]

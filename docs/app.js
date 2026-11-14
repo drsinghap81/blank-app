@@ -4132,6 +4132,24 @@ async function usSend(r, side, btn, el, P) {
     alertMsg(j.msg || 'Done', true); setTimeout(() => usPlanLoad(el), 3000);
   } catch (e) { btn.disabled = false; btn.textContent = `${side === 'BUY' ? 'Buy' : 'Sell'} ${qty}`; m.className = 'down td-rs'; m.textContent = 'Not sent: ' + e.message; alertMsg('Not sent: ' + e.message); }
 }
+/* NSE growth + momentum (15 Nov 2026, tools/growth_mom.py): month-end list of 25. Test 2017-26 on all ~1,750 liquid NSE
+   stocks with point-in-time results: 24.7%/yr, -36% worst, vs 22.1% / -44% for the same ranking without the profit filter. */
+async function tdGrowthMom(box) {
+  if (!box) return; const D = await getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom'); if (!D || !D.picks) { box.innerHTML = ''; return; }
+  const B = D.backtest || {}, M = D.market || {}, pc = (v) => (v == null ? '–' : `${v > 0 ? '+' : ''}${fmt(v, 0)}%`);
+  const row = (r, i) => `<div><b>${i + 1}. ${esc(r.symbol)} <small class="muted">${esc(r.name || r.industry || '')}</small></b><b class="up">${pc(r.m12)} 12m</b>
+      <span>profit ${pc(r.g)} TTM · sales ${pc(r.sg)} · ${r.up4}/4 qtrs up${r.pe ? ` · P/E ${fmt(r.pe, 0)}` : ''}</span>
+      <span class="muted">₹${fmt(r.close, 2)} · ${pc(r.since)} since ${day(D.asof)} · ₹${fmt(r.val_cr, 0)} cr/day${D.added && D.added.includes(r.symbol) ? ' · <b class="up">new</b>' : ''}</span></div>`;
+  box.innerHTML = `<details class="td-risk td-track"><summary><span><b>Growth + momentum · monthly <span class="pill">${D.picks.length}</span></b>
+    <small>Profit up ≥20% and rising, strongest 12-month prices · list of ${day(D.asof)} · ${D.n_qualified} stocks qualified</small></span></summary>
+    <p class="muted td-rs">At each month-end, from NSE stocks trading over ₹5 cr a day: trailing-4-quarter net profit up at least 20% on the year before, and profit up year-on-year in at least 3 of the last 4 quarters. Rank by 12-month price return (skipping the latest month), hold the top 25 equally, swap at the next month-end. Only results announced before the month-end count.</p>
+    <p class="td-rs">Backtest ${esc(B.period || '')}: <b>${fmt(B.cagr, 1)}%/yr</b>, worst fall ${fmt(B.dd, 0)}% · same ranking without the profit filter ${fmt(B.mom_cagr, 1)}% / ${fmt(B.mom_dd, 0)}% · Nifty 50 ${fmt(B.nifty_cagr, 1)}% / ${fmt(B.nifty_dd, 0)}%. With cash when Nifty is below its 200-day average: ${fmt(B.filt_cagr, 1)}% / ${fmt(B.filt_dd, 0)}%.</p>
+    <p class="td-rs ${M.above ? 'up' : 'down'}">Market filter: Nifty ${M.above ? 'above' : 'below'} its 200-day average at the month-end${M.now_above !== M.above ? ` (now ${M.now_above ? 'above' : 'below'})` : ''}${M.above ? '' : ' · the filtered version holds cash this month'}.</p>
+    ${D.prev && D.prev.length ? `<p class="td-rs"><b>Changes vs ${day(D.prev_asof)}</b> · in: ${D.added.length ? D.added.map(esc).join(', ') : 'none'} · out: ${D.dropped.length ? D.dropped.map(esc).join(', ') : 'none'}</p>` : ''}
+    <div class="td-tl">${D.picks.map(row).join('')}</div>
+    ${D.reserve && D.reserve.length ? `<p class="td-rs"><b>Next in line</b> · use if a pick can't be bought</p><div class="td-tl">${D.reserve.slice(0, 10).map((r, i) => row(r, i + D.picks.length)).join('')}</div>` : ''}
+    <p class="muted td-rs">Returns came mostly in a few big years (2021 +103%, 2023 +150%) with losing years like 2018 (−27%) and 2022 (−15%). Many picks are small companies. Results update weekly; the list changes at month-end. Not investment advice.</p></details>`;
+}
 /* Trading 212 pies (US ETFs, Australian account) — month-end targets from tools/pies.py; the server alerts on a change */
 async function tdPies(box) {
   if (!box) return; const D0 = await getJSON(MAIN + 'data/scan/us/pies.json', 'pies'); if (!D0 || !D0.pies) { box.innerHTML = ''; return; }
@@ -4264,7 +4282,7 @@ async function tdRender(el, beginner) {
     <div id="tdrisk"></div>
     ${MS.length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${MS.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${MS.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
-    ${mk === 'US' ? '<div id="tdpies"></div><div id="tdrsi2"></div>' : ''}<div id="tdheat"></div><div id="tdtrack"></div>
+    ${mk === 'US' ? '<div id="tdpies"></div><div id="tdrsi2"></div>' : ''}${mk === 'NSE' ? '<div id="tdgm"></div>' : ''}<div id="tdheat"></div><div id="tdtrack"></div>
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   wire();
   state._tdEl = el; state._tdBg = beginner;
@@ -4275,7 +4293,7 @@ async function tdRender(el, beginner) {
   tdTopTiles($('#tdtop'), mk);
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (!beginner) alCard($('#tdal'));
-  tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } tdHeat($('#tdheat'), mk);
+  tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } if (mk === 'NSE') tdGrowthMom($('#tdgm')); tdHeat($('#tdheat'), mk);
 }
 /* Heating up (11 Nov 2026): industries whose 1-week pulse jumped well above last month's. Information only: strength by
    itself is not a buy signal (Building-only cut ATH returns from 17% to 7%; swapping weak holdings for new breakouts lost

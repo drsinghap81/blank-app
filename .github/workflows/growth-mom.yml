@@ -1,0 +1,49 @@
+name: growth-mom
+# NSE growth + momentum list (tools/growth_mom.py). Weekly: add newly announced quarterly results to data/fundq, then
+# rebuild the month-end list. The list itself only changes at month-end (the backtest rebalanced monthly).
+on:
+  schedule:
+    - cron: "17 2 * * 6"     # Saturday 07:47 IST, markets shut
+    - cron: "17 2 1 * *"     # 1st of the month: new month-end list
+  workflow_dispatch:
+  push:
+    paths: ["tools/growth_mom.py", ".github/workflows/growth-mom.yml"]
+permissions:
+  contents: write
+concurrency: {group: growth-mom, cancel-in-progress: false}
+jobs:
+  update:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        file: [shard_0, shard_1, shard_2, shard_3, shard_b0, shard_b1, shard_b2, shard_b3, shard_b4, shard_b5, shard_b6, shard_b7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q requests && python tools/fetch_nse_results.py 0 1 75
+        env: {FUNDQ_UPDATE: "data/fundq/${{ matrix.file }}.json"}
+      - run: |
+          git config user.name "results bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/fundq/${{ matrix.file }}.json; git diff --cached --quiet && exit 0
+          git commit -qm "NSE results update ${{ matrix.file }} $(date -u +%F) [skip ci]"
+          for i in 1 2 3 4 5 6 7 8; do git pull -q --rebase origin main && git push -q && break; sleep $((i*9)); done
+  scan:
+    needs: update
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas yfinance requests lxml && python tools/growth_mom.py
+      - run: |
+          git config user.name "growth-mom bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/scan/growth_mom.json; git diff --cached --quiet && exit 0
+          git commit -qm "Growth + momentum list $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done
