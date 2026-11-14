@@ -8,7 +8,8 @@ from datetime import datetime
 import requests
 
 SHARD, NSH = int(sys.argv[1]), int(sys.argv[2]); MAXMIN = float(sys.argv[3]) if len(sys.argv) > 3 else 320
-OUT = f"data/fundq/shard_{SHARD}.json"; T0 = time.time()
+TAG = os.environ.get("FUNDQ_TAG", "")   # second batch: FUNDQ_TAG=b, FUNDQ_SYMS=data/fundq/symbols2.txt
+OUT = f"data/fundq/shard_{TAG}{SHARD}.json"; T0 = time.time()
 S = requests.Session()
 S.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
                   "Accept": "application/json,text/plain,*/*", "Accept-Language": "en-US,en;q=0.9", "Referer": "https://www.nseindia.com/"})
@@ -149,7 +150,7 @@ def one(sym):
     return dict(q=Q, cons=use_c)
 
 
-syms = [s for s in open("data/fundq/symbols.txt").read().split() if s]
+syms = [s for s in open(os.environ.get("FUNDQ_SYMS", "data/fundq/symbols.txt")).read().split() if s]
 mine = [s for i, s in enumerate(syms) if i % NSH == SHARD]
 R = json.load(open(OUT)) if os.path.exists(OUT) else {}
 warm(); n0 = len(R)
