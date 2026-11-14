@@ -155,7 +155,7 @@ mine = [s for i, s in enumerate(syms) if i % NSH == SHARD]
 R = json.load(open(OUT)) if os.path.exists(OUT) else {}
 warm(); n0 = len(R)
 for k, s in enumerate(mine):
-    if s in R:
+    if s in R and not (os.environ.get("FUNDQ_RETRY") and R[s].get("err") == "no filings list"):
         continue
     if (time.time() - T0) / 60 > MAXMIN:
         print("time budget reached"); break
