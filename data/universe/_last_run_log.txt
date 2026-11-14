@@ -5,4 +5,4 @@ niftymidcap150 150 https://nsearchives.nseindia.com/content/indices/ind_niftymid
 niftysmallcap250 251 https://nsearchives.nseindia.com/content/indices/ind_niftysmallcap250list.csv
 niftytotalmarket 754 https://nsearchives.nseindia.com/content/indices/ind_niftytotalmarket_list.csv
 niftymicrocap250 253 https://nsearchives.nseindia.com/content/indices/ind_niftymicrocap250_list.csv
-fno 218 2026-11-06
+fno 218 2026-11-13
