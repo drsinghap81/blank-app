@@ -117,12 +117,12 @@ document.addEventListener('click', (e) => { if (e.target && e.target.id === 'tor
 /* 15 Nov 2026 layout: Investment (ETFs, funds, indices: monthly), Momentum investing (monthly ATH stocks), Trading (9/21, cup closes,
    IPO cups, patterns, support). Sub-pages light up their parent button. */
 const NAV_OF = { bot: 'trends', trd: 'trends' };
-const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 'fund', 'themes', 'top', 'pie'], trd: ['wclose', 'dclose', 'ipo'] };
+const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 'fund', 'themes', 'top', 'pie'], trd: ['wclose', 'dclose', 'ipo', 'short'] };
 const athGrp = () => (state.view === 'inv' ? 'inv' : state.view === 'trd' ? 'trd' : 'mom');
 const grpOfTab = (t) => (ATH_GRP.inv.includes(t) ? 'inv' : ATH_GRP.trd.includes(t) ? 'trd' : 'mom');
 state.athTabG = { mom: 'brk', inv: 'imc', trd: 'wclose' };
 function tradeStrip(cur) {
-  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
+  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
   return `<div class="seg trdstrip" style="margin:10px 16px 0;flex-wrap:wrap">${B.map(([k, n]) => `<button data-tk="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
 }
 function tradeStripWire(el) {
@@ -2288,6 +2288,24 @@ function wdListHtml(L, kind) {
 function wdListWire(root, L, kind) {
   root.querySelectorAll('.row[data-j]').forEach((el) => el.addEventListener('click', () => { const r = L[+el.dataset.j]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv) + '&interval=' + (kind === 'wclose' ? 'W' : 'D'), '_blank', 'noopener'); }));
 }
+/* Short watch (15 Nov 2026): reverse cup = the week / day CLOSED below its cup low (lowest low of 2 years / 1 year, 26+ weeks / 20+ days
+   old, 20% / 15%+ rally since; indices 10% / 8%), only under a falling 30-week SMA, room to the next older low >= the rally.
+   Watch only: shorting these on F&O stocks lost money in the 2016-26 test (as did H&S / double / triple tops). Use it to avoid buying. */
+const SHORT_NOTE = '<b>Watch only, not a short system.</b> Reverse cup: the week or day CLOSED below its cup low (the lowest low of 2 years / 1 year, at least 26 weeks / 20 days old, after a 20% / 15%+ rally; indices 10% / 8%), under a falling 30-week average, with room down to the next older low at least the rally height. Tested on F&O stocks 2016–26 as short futures: weekly −10%/trade, daily about break-even, 10–24% winners; H&S, double and triple tops also lost. Use it to avoid buying these, not to short them.';
+function shortItems(rows, g, tvf) { return rows.map((r) => ({ g, sym: r.symbol || '', name: r.symbol ? r.name : (r.index || r.name), z: r, close: r.close, tv: tvf(r) })); }
+function shortItemHtml(x, i, L) {
+  const r = x.z; const wk = r.kind === 'WS'; const sp = i === 0 || L[i - 1].g !== x.g ? `<li class="ixsep">${esc(x.g)}</li>` : '';
+  const chips = (r.sector_tag ? secChip(r) : '') + `<span class="chip exit">Closed ${fmt(r.below_pct, 1)}% below its ${r.base}-${wk ? 'wk' : 'day'} low ${fmt(r.old_low, 2, 'en-US')} (${day(r.low_date)})</span>`
+    + `<span class="chip">rallied ${fmt(r.rally * 100, 0)}% in between</span>${r.long_cup ? '<span class="chip new">Long reverse cup</span>' : ''}`
+    + `<span class="chip">${r.atl ? 'No older low below · new low' : `next support ${fmt(r.support, 2, 'en-US')} (${fmt(r.room_pct, 0)}% down)`}</span><span class="chip exit">Below a falling 30-wk SMA</span>`;
+  const g = r.low_p ? (x.close / r.low_p - 1) * 100 : null;
+  return `${sp}<li class="row" tabindex="0" data-j="${i}"><div><div class="sym">${esc(x.sym || x.name)}</div>${x.sym ? `<div class="co">${esc(x.name || '')}</div>` : ''}<div class="tags">${chips}</div></div><div></div>
+    <div class="num"><b>${fmt(x.close, x.close >= 1000 ? 0 : 2, 'en-US')}</b>${g == null ? '' : `<span class="muted">${g <= 0 ? `${fmt(-g, 1)}% below` : `${fmt(g, 1)}% above`} that ${wk ? 'week' : 'day'}'s low</span>`}</div></li>`;
+}
+function shortListRender(root, L) {
+  root.innerHTML = `<li class="status exit watch" style="list-style:none;margin:6px 0">${SHORT_NOTE}</li>` + (L.length ? L.map((x, i) => shortItemHtml(x, i, L)).join('') : '<li class="empty">Nothing closed below a reverse-cup low under a falling 30-week average.</li>');
+  root.querySelectorAll('.row[data-j]').forEach((el) => el.addEventListener('click', () => { const x = L[+el.dataset.j]; if (x.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(x.tv) + '&interval=' + (x.z.kind === 'WS' ? 'W' : 'D'), '_blank', 'noopener'); }));
+}
 function idxWdRows(kind) {
   const k = kind === 'wclose' ? 'week_close' : 'day_close'; const out = [];
   if (AM() === 'NSE' && state.idxMc) (state.idxMc[k] || []).forEach((r) => out.push({ g: 'NSE indices', name: r.index, z: r, close: r.close, tv: nseIdxTv(r.index) }));
@@ -2298,8 +2316,16 @@ function idxWdRows(kind) {
 }
 async function loadTrdWorld(el, mkSeg) {
   if (!state.assets) { el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>'; state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets'); }
-  const kind = state.athTabG.trd === 'dclose' ? 'dclose' : 'wclose';
   const A = ((state.assets && state.assets.rows) || []);
+  if (state.athTabG.trd === 'short') {
+    const L = ['wshort', 'dshort'].flatMap((k) => shortItems(A.filter((r) => r[k]).map((r) => ({ ...r[k], name: r.name, close: r.close, _key: r.key, _g: r.group === 'Crypto' ? 'Coins' : r.group })), '', (r) => tvOf(r._key))
+      .map((x) => ({ ...x, g: `${x.z._g} · ${k === 'wshort' ? 'week' : 'day'}` }))).sort((a, b) => (a.g < b.g ? -1 : a.g > b.g ? 1 : 0));
+    $('#asof').textContent = state.assets ? `Assets to ${day(A[0] && A[0].asof)}${updTxt(state.assets.generated)}` : '';
+    el.innerHTML = `${mkSeg}<div class="card"><ul class="list flat" id="athlist"></ul></div>`;
+    if (!A.some((r) => 'wshort' in r)) $('#athlist').innerHTML = '<li class="empty">The short watch list for coins, commodities and currencies appears after the next asset scan.</li>'; else shortListRender($('#athlist'), L);
+    wireAthMk(el); tradeStripWire(el); return;
+  }
+  const kind = state.athTabG.trd === 'dclose' ? 'dclose' : 'wclose';
   const has = A.some((r) => 'wclose' in r);
   const L = wdAssetItems(A.filter((r) => r[kind]).sort((a, b) => (a.group < b.group ? -1 : a.group > b.group ? 1 : 0)).map((r) => ({ g: r.group === 'Crypto' ? 'Coins' : r.group, name: r.name, z: r[kind], close: r.close, tv: tvOf(r.key) })), kind);
   $('#asof').textContent = state.assets ? `Assets to ${day(A[0] && A[0].asof)}${updTxt(state.assets.generated)}` : '';
@@ -2409,7 +2435,7 @@ async function loadATH() {
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
   const tabs = ({ mom: [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ...(mk === 'NSE' ? [['gm', 'Growth + momentum', 25]] : []), ['tracked', 'Tracked signals', T.length]],
-    trd: [['wclose', 'Week cup close', (d.week_close || []).length], ['dclose', 'Day cup close', (d.day_close || []).length], ['ipo', 'IPO cups', ipoRows(true).length]],
+    trd: [['wclose', 'Week cup close', (d.week_close || []).length], ['dclose', 'Day cup close', (d.day_close || []).length], ['ipo', 'IPO cups', ipoRows(true).length], ['short', 'Short watch', (d.week_short || []).length + (d.day_short || []).length]],
     inv: [['imc', INV_N.imc, invMcRows().length], ['fund', INV_N.fund, fundAthRows(true).length], ['themes', INV_N.themes, themeRows(true).length], ['top', INV_N.top, null], ['pie', INV_N.pie, null]] })[grp];
   el.innerHTML = `${mkSeg}${mk === 'NSE' || grp === 'inv' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     ${grp !== 'mom' ? '' : `<section class="summary">
@@ -2424,6 +2450,7 @@ async function loadATH() {
         wclose: `Stocks whose last completed WEEK closed above their cup high: the highest high of the last 2 years, at least ${(d.wd_rules || {}).week_min || 26} weeks old, with a fall of at least ${Math.abs(((d.wd_rules || {}).week_depth || -0.2) * 100)}% since. Kept only if the room up to the next older high is at least the cup depth (all-time-high cups always pass). Sorted by sector strength. India test 2017–26 (buy next open, weekly 30-SMA exit, 10 stocks): 9.0%/yr, worst fall −26% at 1% risk + add (equal weight 20.4% / −34%) vs 21.5% / −20% for the live Breakouts rule. Watch list only.`,
         dclose: `Stocks whose last DAY closed above their cup high: the highest high of the last year, at least ${(d.wd_rules || {}).day_min || 20} trading days old, with a fall of at least ${Math.abs(((d.wd_rules || {}).day_depth || -0.15) * 100)}% since. Kept only if the room up to the next older high is at least the cup depth (all-time-high cups always pass). Sorted by sector strength. India test 2017–26: all-time-high cups 12.7%/yr, −35% at 1% risk + add; with the room rule 11.3%, −40%; live Breakouts rule 21.5% / −20%. Watch list only.`,
         mclose: `Stocks whose last completed month (${(d.month_close || []).length ? mLab(d.month_close[0].month) : 'last month'}) CLOSED above their all-time HIGH (the highest price of all earlier months, wicks included, as on TradingView), after a base of 1+ years since that high (bold = 2+ years), ${mk === 'NSE' ? '₹2 cr+' : 'liquid stocks only, same floor as Breakouts,'} a day. Long cup = base of 3+ years with a 30%+ fall inside it. ${mk === 'NSE' ? '' : 'Not tested in this market. India result: '}Tested 2017–26 on all NSE stocks (buy at the next month's first open, sell after a weekly close below the 30-week SMA, 10 stocks, 1% risk + 1 add): 5.4%/yr, worst fall −25%; long cups 6.5% / −18%. The live Breakouts rule (buy when price crosses the ATH-month high during the month) did 21.5% / −20%. By the time a month closes above the high, the move has usually run, so this is a month-end check, NOT an entry.`,
+        short: 'Reverse cup closes under a falling 30-week average. Watch only: shorting them lost money in the 2016–26 F&O test.',
         imc: 'Investment first choice (the IHF type): ETFs and indices of the selected market whose last completed month CLOSED above their all-time high (highest price of earlier months, wicks included, as on TradingView) after a base of 1+ years (bold = 2+ years; long cup = 3+ years with a 30%+ fall). India, US, Australia and UK/Europe ETFs, India indices and world indices. Stop: weekly close below the 30-week SMA (the initial stop and the trail). A month-end check, not tested as a system for ETFs. Tap one for its monthly chart in TradingView.',
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
@@ -3280,6 +3307,14 @@ function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   if (tab === 'pulse') { pulseView(); return; }
   if (tab === 'gm') { $('#athlist').innerHTML = '<li><div id="athgm"></div></li>'; tdGrowthMom($('#athgm')).then(() => { const dd = document.querySelector('#athgm details'); if (dd) dd.open = true; }); return; }
+  if (tab === 'short') {
+    const d = state.ath.d || {}; const mk = AM(); const px = { NSE: 'NSE:', US: '', ASX: 'ASX:', UK: 'LSE:' }[mk];
+    const q = (state.ath.q || '').toLowerCase(); const f = (r) => !q || (r.symbol || r.index || '').toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q);
+    const L = [...shortItems((d.week_short || []).filter(f), 'Week closes', (r) => px + r.symbol), ...shortItems((d.day_short || []).filter(f), 'Day closes', (r) => px + r.symbol),
+      ...(mk === 'NSE' && state.idxMc ? [...shortItems((state.idxMc.week_short || []).filter(f), 'NSE indices · week', (r) => nseIdxTv(r.index)), ...shortItems((state.idxMc.day_short || []).filter(f), 'NSE indices · day', (r) => nseIdxTv(r.index))] : [])];
+    if (!('week_short' in d)) { $('#athlist').innerHTML = '<li class="empty">The short watch list appears after tonight\'s scan.</li>'; return; }
+    shortListRender($('#athlist'), L); return;
+  }
   if (tab === 'imc') {
     const W = all;
     $('#athlist').innerHTML = W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : `<li class="empty">${state.mcAll ? 'No ETF or index closed last month above an all-time high at least a year old.' : 'Loading…'}</li>`;

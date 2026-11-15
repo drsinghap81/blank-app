@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import numpy as np, pandas as pd, yfinance as yf
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fund_scan import mclose_state  # noqa: E402
-from cupclose import IX_DY_DEP, IX_WK_DEP, wd_closes  # noqa: E402
+from cupclose import IX_DY_DEP, IX_WK_DEP, wd_closes, wd_short  # noqa: E402
 
 A = {
     "Metals": {"GC=F": "Gold", "SI=F": "Silver", "PL=F": "Platinum", "PA=F": "Palladium", "HG=F": "Copper", "ALI=F": "Aluminium"},
@@ -56,6 +56,10 @@ def add_row(t, nm, grp, x):
         r["wclose"], r["dclose"] = wd_closes(x, IX_WK_DEP, IX_DY_DEP) if grp == "World indices" else wd_closes(x)        # weekly / daily cup closes (watch only), 15 Nov 2026
     except Exception as e:  # noqa: BLE001
         print("wd fail", t, e); r["wclose"] = r["dclose"] = None
+    try:   # reverse cup closes under a falling 30-week SMA (watch only)
+        r["wshort"], r["dshort"] = wd_short(x, -IX_WK_DEP, -IX_DY_DEP) if grp == "World indices" else wd_short(x)
+    except Exception as e:  # noqa: BLE001
+        print("short fail", t, e); r["wshort"] = r["dshort"] = None
     try:
         r["mclose"] = mclose_state(x)
     except Exception as e:  # noqa: BLE001

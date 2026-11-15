@@ -56,3 +56,55 @@ def wd_closes(x, wk_dep=WK_DEP, dy_dep=DY_DEP):
         a_, rim, age, dep, res, room = r
         dy = _row("D", str(x.index[-1].date()), float(x.Close.iloc[-1]), float(x.High.iloc[-1]), rim, str(x.index[a_].date()), age, dep, res, room, age >= 120 and dep <= -0.30)
     return wk, dy
+
+
+def cupclose_short(ll, cc, K, B, D):
+    """Reverse cup (15 Nov 2026): the close is BELOW the lowest low of the last K bars (signal bar excluded), that low is at least
+    B bars old, and price rallied at least D (e.g. 0.20) above it in between. Room: the next older trough below the close is at
+    least the rally height away (None = all-time low). Returns (a, rim, age, rally, support, room) or None. Watch only: shorting
+    these on F&O stocks lost money in the 2016-26 test."""
+    n_ = len(ll)
+    if n_ < B + 3:
+        return None
+    lo = max(0, n_ - 1 - K); win = ll[lo:n_ - 1]
+    if not np.isfinite(win).any():
+        return None
+    a_ = lo + int(np.nanargmin(win)); rim = float(ll[a_]); age = n_ - 1 - a_
+    if not (cc[-1] < rim and age >= B):
+        return None
+    seg = cc[a_ + 1:n_ - 1]; rally = float(np.nanmax(seg) / rim - 1) if len(seg) else 0.0
+    if rally < D:
+        return None
+    sup = None; c_ = float(cc[-1]); below = np.flatnonzero(ll[:a_] < c_)
+    if len(below):
+        j = int(below[-1]); lo_, hi_ = max(0, j - B), min(a_, j + B + 1)
+        sup = float(np.nanmin(ll[lo_:hi_]))
+    room = (1 - sup / c_) if sup else None
+    if room is not None and room < rally / (1 + rally):
+        return None
+    return a_, rim, age, rally, sup, room
+
+
+def wd_short(x, wk_dep=-WK_DEP, dy_dep=-DY_DEP):
+    """Weekly / daily reverse-cup closes for a daily OHLC frame (Low, Close). Only when the last completed week is below a falling
+    30-week SMA. Returns (week_row or None, day_row or None)."""
+    x = (x[["Low", "Close"]] if "Low" in x else x[["Close"]].assign(Low=x.Close)).copy(); x["Low"] = x.Low.where(x.Low.notna(), x.Close); x = x.dropna()
+    last = x.index[-1].normalize()
+    W = pd.DataFrame({"l": x.Low.resample("W-FRI").min(), "c": x.Close.resample("W-FRI").last()}).dropna()
+    if len(W) and W.index[-1].normalize() > last:
+        W = W.iloc[:-1]
+    if len(W) < 40:
+        return None, None
+    sma = W.c.rolling(30).mean()
+    if not (W.c.iloc[-1] < sma.iloc[-1] < sma.iloc[-5]):
+        return None, None
+    out = []
+    for kind, L, C, T, K, B, D, lc in (("WS", W.l, W.c, W.index, WK_K, WK_MIN, wk_dep, 52), ("DS", x.Low, x.Close, x.index, DY_K, DY_MIN, dy_dep, 120)):
+        r = cupclose_short(L.to_numpy(float), C.to_numpy(float), K, B, D)
+        if not r:
+            out.append(None); continue
+        a_, rim, age, rally, sup, room = r
+        out.append(dict(kind=kind, period=str(T[-1].date()), close_p=float(C.iloc[-1]), low_p=float(L.iloc[-1]), old_low=rim, low_date=str(T[a_].date()),
+                        base=int(age), rally=round(rally, 4), below_pct=round((1 - float(C.iloc[-1]) / rim) * 100, 2), support=sup,
+                        room_pct=None if room is None else round(room * 100, 2), atl=sup is None, long_cup=bool(age >= lc and rally >= 0.30)))
+    return out[0], out[1]

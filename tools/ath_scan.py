@@ -32,6 +32,7 @@ import yfinance as yf
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from trend_scan import nse_symbols, telegram  # noqa: E402
+from cupclose import wd_short  # noqa: E402
 
 # market: NSE (default), US or ASX (python ath_scan.py US). US/ASX added 5 Nov 2026 - same rules, own outputs.
 MARKET = (sys.argv[1] if len(sys.argv) > 1 else "NSE").upper()
@@ -42,6 +43,7 @@ UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6, "UK": 1e8}[MARKET]            # value
 MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0, "UK": 100.0}[MARKET]   # no penny stocks (30 Oct 2026)
 MCL_MIN = {"ASX": 1.0}.get(MARKET, MIN_CLOSE)   # 15 Nov 2026: month-close list only goes down to A$1 on the ASX (A$1 m/day still applies)
 BASE_MAIN, BASE_MIN = 24, 12
+WSHORT, DSHORT = [], []   # 15 Nov 2026: reverse cup closes under a falling 30-week SMA (watch only; shorts lost in tests)
 WCLOSE, DCLOSE = [], []   # 15 Nov 2026: week / day CLOSED above the all-time high (cup >= 26 weeks & 20% / >= 20 days & 15%)
 WK_MIN, WK_DEP, DY_MIN, DY_DEP, WK_K, DY_K = 26, -0.20, 20, -0.15, 104, 250
 MCLOSE = []   # month-end list (15 Nov 2026): last completed month CLOSED above the old all-time closing high
@@ -301,6 +303,12 @@ def analyse(sym, x, today, lookback_days=550):
                                long_cup=bool(age >= 120 and dep <= -0.30), sma_rising=bool(np.isfinite(sm) and np.isfinite(sm4) and sm > sm4 and float(Wc.c.iloc[-1]) > sm),
                                close=cc, value_cr=float(val20.iloc[-1]) / UNIT, first=str(x.index[0].date())))
             lists = True
+        if float(val20.iloc[-1]) >= MINVAL:
+            ws_, ds_ = wd_short(x.loc[:x.index[-1]])
+            for z_, L_ in ((ws_, WSHORT), (ds_, DSHORT)):
+                if z_:
+                    L_.append(dict(symbol=sym, close=float(x.Close.iloc[-1]), value_cr=float(val20.iloc[-1]) / UNIT, first=str(x.index[0].date()), **z_))
+                    lists = True
     except Exception as e:  # noqa: BLE001
         print("w/d close fail", sym, str(e)[:60])
     Mc = M.tail(240); Wt = W.tail(260)
@@ -396,7 +404,7 @@ def main():
                 near.append(nr)
             if ch and ch.get("mclose") and SEC:
                 rsd_ = stock_rs(sym, x.Close, SEC, BENCH)
-                for L_ in (MCLOSE, WCLOSE, DCLOSE):
+                for L_ in (MCLOSE, WCLOSE, DCLOSE, WSHORT, DSHORT):
                     if L_ and L_[-1]["symbol"] == sym:
                         L_[-1].update(rsd_)
             if ev or nr or (ch and ch.get("mclose")):
@@ -435,7 +443,7 @@ def main():
         brk = E
     if len(N):
         N = N.sort_values("gap_pct")
-    def tagsort(rows, base_col):
+    def tagsort(rows, base_col, weak_first=False):
         D_ = pd.DataFrame(rows)
         if not len(D_):
             return D_
@@ -448,9 +456,13 @@ def main():
         # 15 Nov 2026: strongest sectors first (leading > uptrend > mixed > weak > untagged), then sector RS, long cups, base
         D_["_o"] = D_.get("sector_tag", pd.Series(index=D_.index, dtype=object)).map({"leading": 0, "uptrend": 1, "mixed": 2, "weak": 3}).fillna(4)
         D_["_r"] = pd.to_numeric(D_.get("sector_rs", pd.Series(index=D_.index, dtype=float)), errors="coerce").fillna(-999)
+        if weak_first:   # short watch list: weakest sectors first
+            D_["_o"] = D_["_o"].where(D_["_o"] < 4, -1)
+            return D_.sort_values(["_o", "_r", "long_cup", base_col], ascending=[False, True, False, False]).drop(columns=["_o", "_r"])
         return D_.sort_values(["_o", "_r", "long_cup", base_col], ascending=[True, False, False, False]).drop(columns=["_o", "_r"])
     MC = tagsort(MCLOSE, "base_months"); WC = tagsort(WCLOSE, "base"); DC = tagsort(DCLOSE, "base")
-    keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set()) | (set(MC.symbol) if len(MC) else set()) | (set(WC.symbol) if len(WC) else set()) | (set(DC.symbol) if len(DC) else set())
+    WS_ = tagsort(WSHORT, "base", True); DS_ = tagsort(DSHORT, "base", True)
+    keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set()) | (set(MC.symbol) if len(MC) else set()) | (set(WC.symbol) if len(WC) else set()) | (set(DC.symbol) if len(DC) else set()) | (set(WS_.symbol) if len(WS_) else set()) | (set(DS_.symbol) if len(DS_) else set())
     for f in os.listdir(CH):
         if f[:-5] not in keep:
             os.remove(os.path.join(CH, f))
@@ -465,6 +477,7 @@ def main():
                tracked=clean(E.to_dict("records")) if len(E) else [],
                month_close=clean(MC.to_dict("records")) if len(MC) else [],
                week_close=clean(WC.to_dict("records")) if len(WC) else [], day_close=clean(DC.to_dict("records")) if len(DC) else [],
+               week_short=clean(WS_.to_dict("records")) if len(WS_) else [], day_short=clean(DS_.to_dict("records")) if len(DS_) else [],
                wd_rules=dict(week_min=WK_MIN, week_depth=WK_DEP, week_window=WK_K, day_min=DY_MIN, day_depth=DY_DEP, day_window=DY_K))
     json.dump(out, open(f"{OUT}/ath.json", "w"), indent=0, allow_nan=False)
     print("breakouts", len(brk), "near", len(N), "tracked", len(E))
