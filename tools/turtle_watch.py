@@ -55,6 +55,23 @@ def state(x):
     return out
 
 
+MCX = {"GC=F": [("Gold Petal", 1 / 31.1035, 1), ("Gold Guinea", 8 / 31.1035, 1), ("Gold Mini", 10 / 31.1035, 10)],
+       "SI=F": [("Silver Micro", 32.1507, 1), ("Silver Mini", 32.1507, 5)], "CL=F": [("Crude Oil Mini", 1, 10)], "HG=F": [("Copper", 2.20462, 2500)]}
+NSE_LOT = {"^NSEI": 65, "^NSEBANK": 30}
+
+
+def lots_text(r, usdinr):
+    """Lots per Rs 10 lakh of account at 1% risk (scale to your own account; no account size is stored in the repo)."""
+    N = r.get("entry_N") or r["N"]; risk = 1_000_000 * 0.01; out = []
+    for nm, conv, mult in MCX.get(r["key"], []):
+        per = 2 * N * usdinr * conv * mult; out.append(f"{nm} {int(risk // per)} (risk Rs {per:,.0f}/lot)")
+    if r["key"] in NSE_LOT:
+        per = 2 * N * NSE_LOT[r["key"]]; out.append(f"{r['name']} futures {int(risk // per)} lot (risk Rs {per:,.0f}/lot)")
+    if r.get("mult"):
+        per = 2 * N * r["mult"]; out.append(f"{r['contract']}: risk ${per:,.0f} per contract")
+    return ("Per Rs 10 L at 1%: " + "; ".join(out)) if out else ""
+
+
 def main():
     rows, fx = [], {}
     for t, nm, g, cur, (cname, mult), tv in MK:
@@ -92,6 +109,9 @@ def main():
         for r in news:
             if r["status"] == "in trade":
                 lines.append(f"BUY {r['name']}: broke the 20-day high, filled ~{r['entry']:.2f}. Fixed stop {r['fixed_stop']:.2f}, trailing stop {r['trail_stop']:.2f}.")
+                lt = lots_text(r, fx.get("USDINR=X", 85))
+                if lt:
+                    lines.append("  " + lt + ". Exact lots for your account: app > Trading > Turtle.")
             else:
                 z = r["trades"][-1]; lines.append(f"EXIT {r['name']}: stopped at ~{z['x']:.2f} ({z['R']:+.1f}R).")
         telegram("\n".join(lines))
