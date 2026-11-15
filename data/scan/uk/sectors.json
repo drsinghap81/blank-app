@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-15 02:30 UTC",
+"generated": "2026-11-15 02:48 UTC",
 "asof": "2026-11-13",
 "market": "^FTSE",
 "bench": "^FTSE",
@@ -12,7 +12,7 @@
 "vs_market_3m": -0.15925028388945606,
 "from_high": -0.009023565464971739,
 "tag": "uptrend",
-"since": "1980-02-11",
+"since": "1980-02-12",
 "years": 46.8,
 "ath_month": "2026-02",
 "ath_month_close": 5851.47998046875,
