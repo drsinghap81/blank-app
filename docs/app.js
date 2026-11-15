@@ -2930,12 +2930,24 @@ const ATH_ST = { breakout: 0, 'exit next open': 1, open: 2, near: 3, exited: 4 }
 function fundAthRows(countOnly) {
   const F = state.fund; if (!F) return [];
   const m = { NSE: 'IN', US: 'US', ASX: 'AU' }[AM()];
+  if (state.athFundMC && !countOnly) {
+    let M = (F.rows || []).filter((r) => (r.market || 'IN') === m && r.mclose);
+    const q0 = (state.ath.q || '').toLowerCase(); if (q0) M = M.filter((r) => r.name.toLowerCase().includes(q0) || r.key.toLowerCase().includes(q0));
+    return M.sort((a, b) => (b.mclose.long_cup - a.mclose.long_cup) || (b.mclose.base_months - a.mclose.base_months));
+  }
   const cupOK = (r) => r.kind !== 'debt' && r.ath.depth != null && r.ath.depth <= -0.15;
   let L = (F.rows || []).filter((r) => (r.market || 'IN') === m && r.ath && (state.athFundAll || (r.ath.status !== 'exited' && cupOK(r))));
   if (countOnly) return L.filter((r) => r.ath.status !== 'exited');
   const q = (state.ath.q || '').toLowerCase();
   if (q) L = L.filter((r) => r.name.toLowerCase().includes(q) || r.key.toLowerCase().includes(q));
   return L.sort((a, b) => (ATH_ST[a.ath.status] - ATH_ST[b.ath.status]) || ((b.ath.base_months >= 24) - (a.ath.base_months >= 24)) || ((a.ath.gap_pct || 0) - (b.ath.gap_pct || 0)));
+}
+function fundMcItem(r, i) {
+  const a = r.mclose; const sm = r.close / a.close_m - 1;
+  return `<li class="row ${a.base_months >= 24 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(fundName(r))}</div>
+    <div class="tags"><span class="chip">Closed ${pct(a.above_pct)} over old ATH</span>${a.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${a.base_months >= 24 ? 'new' : ''}">${baseTxt(a.base_months)}</span><span class="chip">fell ${fmt(Math.abs(a.depth * 100), 0)}% in base</span>
+    <span class="chip ${a.sma_rising ? 'open' : 'exit'}">${a.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span><span class="chip">${r.kind === 'fund' ? esc(r.category) : 'ETF'}</span></div></div><div></div>
+    <div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(a.month).split(' ')[0]}</span></div></li>`;
 }
 function fundAthItem(r, i) {
   const a = r.ath; const pc = (v) => `${v >= 0 ? '+' : ''}${fmt(v * 100, 1)}%`;
@@ -2996,10 +3008,13 @@ function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   if (tab === 'pulse') { pulseView(); return; }
   if (tab === 'fund') {
-    $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!state.athFundAll}">Cup + trend only</button><button data-k="1" aria-selected="${!!state.athFundAll}">Show all (incl. exited, shallow bases)</button></div></li>`
-      + (L.length ? L.map(fundAthItem).join('') : `<li class="empty">${state.athFundAll ? 'No ETF or fund signals in the last 18 months.' : 'None right now with a real cup (15%+ dip during the base) and an uptrend.'}</li>`)
+    const mcN = ((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU' }[AM()]) && r.mclose).length;
+    const MC = !!state.athFundMC;
+    $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!MC && !state.athFundAll}">Cup + trend only</button><button data-k="1" aria-selected="${!MC && !!state.athFundAll}">Show all (incl. exited, shallow bases)</button><button data-k="2" aria-selected="${MC}">Month close ${mcN}</button></div></li>`
+      + (MC ? '<li class="muted pad">Last completed month CLOSED above the old all-time-high monthly close after a base of 1+ years (bold = 2+ years). Long cup = base of 3+ years with a 30%+ fall inside it. Not tested for ETFs and funds (the ATH system itself did not beat buy-and-hold on mutual funds); a month-end check only.</li>' : '')
+      + (L.length ? L.map(MC ? fundMcItem : fundAthItem).join('') : `<li class="empty">${MC ? 'No ETF or fund closed last month above an all-time high that was at least a year old.' : state.athFundAll ? 'No ETF or fund signals in the last 18 months.' : 'None right now with a real cup (15%+ dip during the base) and an uptrend.'}</li>`)
       + (all.length > L.length ? '<li><button class="more" id="athall">Show all ' + all.length + '</button></li>' : '');
-    $('#athlist').querySelectorAll('#athfa button').forEach((b) => b.addEventListener('click', () => { state.athFundAll = b.dataset.k === '1'; loadATH(); }));
+    $('#athlist').querySelectorAll('#athfa button').forEach((b) => b.addEventListener('click', () => { state.athFundAll = b.dataset.k === '1'; state.athFundMC = b.dataset.k === '2'; loadATH(); }));
     $('#athlist').querySelectorAll('.row').forEach((r) => { const go = () => fundSelect(L[+r.dataset.i]); r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
     const b = $('#athall'); if (b) b.addEventListener('click', () => { state.ath.all = true; athList(); });
     return;

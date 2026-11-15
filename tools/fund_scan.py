@@ -116,6 +116,28 @@ def ath_state(x):
     return None
 
 
+def mclose_state(x):
+    """Month-end list (15 Nov 2026), same as tools/ath_scan.py: the last COMPLETED month closed above the old all-time-high
+    monthly close after a base >= 12 months. Long cup = base >= 36 months with a fall >= 30% inside it."""
+    x = x.dropna(subset=["Close"])
+    mc = x.Close.resample("ME").last().dropna()
+    lm = pd.Timestamp(datetime.now(timezone.utc).date()).to_period("M") - 1
+    per = mc.index.to_period("M")
+    if len(mc) < 14 or per[-1] < lm or lm not in set(per):
+        return None
+    i = list(per).index(lm); prior = mc.iloc[:i]
+    if len(prior) < 13 or mc.iloc[i] <= prior.max():
+        return None
+    a = int(np.argmax(prior.to_numpy())); base = i - a
+    if base < 12:
+        return None
+    old = float(prior.iloc[a]); dep = float(prior.iloc[a + 1:].min() / old - 1) if a + 1 < len(prior) else 0.0
+    w = x.Close.resample("W-FRI").last().dropna(); w = w[w.index <= mc.index[i]]; sma = w.rolling(30).mean()
+    rising = bool(len(sma.dropna()) > 5 and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5])
+    return dict(month=str(lm), close_m=float(mc.iloc[i]), old_ath=old, ath_month=str(per[a]), base_months=int(base), depth=round(dep, 4),
+                above_pct=round(float((mc.iloc[i] / old - 1) * 100), 2), sma_rising=rising, long_cup=bool(base >= 36 and dep <= -0.30))
+
+
 def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
     s = s.dropna(); s = s[s > 0]
     if len(s) < 260:
@@ -135,6 +157,10 @@ def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
         row["ath"] = ath_state(x) if kind != "debt" else None      # bond / cash ETFs have no cup-and-trend breakouts
     except Exception as e:  # noqa: BLE001
         row["ath"] = None; print("ath fail", key, str(e)[:80])
+    try:
+        row["mclose"] = mclose_state(x) if kind != "debt" else None
+    except Exception as e:  # noqa: BLE001
+        row["mclose"] = None; print("mclose fail", key, str(e)[:80])
     try:
         pr = P.scan(x.tail(750), key, name, "stock")
         if pr:
