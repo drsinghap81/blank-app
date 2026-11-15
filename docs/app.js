@@ -118,12 +118,12 @@ document.addEventListener('click', (e) => { if (e.target && e.target.id === 'tor
 /* 15 Nov 2026 layout: Investment (ETFs, funds, indices: monthly), Momentum investing (monthly ATH stocks), Trading (9/21, cup closes,
    IPO cups, patterns, support). Sub-pages light up their parent button. */
 const NAV_OF = { bot: 'trends', trd: 'trends' };
-const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 'fund', 'themes', 'top', 'pie'], trd: ['wclose', 'dclose', 'ipo', 'short'] };
+const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 'fund', 'themes', 'top', 'pie'], trd: ['wclose', 'dclose', 'ipo', 'short', 'turtle'] };
 const athGrp = () => (state.view === 'inv' ? 'inv' : state.view === 'trd' ? 'trd' : 'mom');
 const grpOfTab = (t) => (ATH_GRP.inv.includes(t) ? 'inv' : ATH_GRP.trd.includes(t) ? 'trd' : 'mom');
 state.athTabG = { mom: 'brk', inv: 'imc', trd: 'wclose' };
 function tradeStrip(cur) {
-  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
+  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['turtle', 'Turtle (futures)'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
   return `<div class="seg trdstrip" style="margin:10px 16px 0;flex-wrap:wrap">${B.map(([k, n]) => `<button data-tk="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
 }
 function tradeStripWire(el) {
@@ -2399,6 +2399,68 @@ function idxWdRows(kind) {
     out.push({ g: 'ETFs', sym: String(sy).replace(/^[A-Z]{2}:/, ''), name: r.name, z: r[kk], close: r.close, tv: r.market === 'UK' ? tvOf(String(sy).replace(/^UK:/, '')) : ({ IN: 'NSE:', US: '', AU: 'ASX:' }[r.market || 'IN'] || '') + String(sy).replace(/^[A-Z]{2}:/, '') }); });
   return out.map((x) => ({ g: x.g, sym: x.sym || '', name: x.name, a: x.z, wd: true, cur: '', close: x.close, tv: x.tv }));
 }
+/* Turtle 20/10 daily long, futures watch (16 Nov 2026). Tested 2010-26 on 22 markets: 24%/yr, -27% worst fall at 1% risk (with coins);
+   ~12%, -33% without coins; ~2.5x average leverage. Buy-stop above the 20-day high, fixed stop entry - 2N, trailing stop = 10-day low,
+   exit at the first hit (that is where profit is booked; no target). 1 unit, no adds. Sizing here; orders are yours. */
+function turSet() { let v = {}; try { v = JSON.parse(localStorage.getItem('td.tur') || '{}'); } catch (e) { /* */ } return { cur: v.cur || 'USD', acct: +v.acct || 10000, risk: +v.risk || 1, lotN: +v.lotN || 0, lotB: +v.lotB || 0 }; }
+function turSave(v) { try { localStorage.setItem('td.tur', JSON.stringify(v)); } catch (e) { /* */ } }
+function turSize(r, S, fx, N, px) {
+  const usdinr = fx['USDINR=X'] || 85, audusd = fx['AUDUSD=X'] || 0.65;
+  const toInstr = (amt) => (r.cur === 'USD' ? (S.cur === 'USD' ? amt : S.cur === 'AUD' ? amt * audusd : amt / usdinr) : (S.cur === 'INR' ? amt : S.cur === 'USD' ? amt * usdinr : amt * audusd * usdinr));
+  const risk = toInstr(S.acct * S.risk / 100); const sym = r.cur === 'USD' ? '$' : '₹';
+  if (!(N > 0)) return '';
+  if (r.mult) { const per = 2 * N * r.mult; const k = Math.floor(risk / per);
+    return `${k > 0 ? `<b>${k} × ${esc(r.contract)}</b>` : `<b>0</b> ${esc(r.contract)} (one contract risks ${sym}${fmt(per, 0, 'en-US')}; needs an account of about ${S.cur} ${fmt(S.acct * per / risk, 0, 'en-US')} at ${S.risk}%)`} · notional ≈ ${sym}${fmt(k * px * r.mult, 0, 'en-US')}`; }
+  const lot = r.key === '^NSEI' ? S.lotN : S.lotB; const units = risk / (2 * N);
+  return lot ? `<b>${Math.floor(units / lot)} lot${Math.floor(units / lot) === 1 ? '' : 's'}</b> of ${esc(r.contract)} (${fmt(units, 0, 'en-IN')} units ÷ lot ${lot}${Math.floor(units / lot) < 1 ? `; one lot needs an account of about ${S.cur} ${fmt(S.acct * lot / units, 0, 'en-US')} at ${S.risk}%` : ''})` : `${fmt(units, 0, 'en-IN')} index units ÷ your lot size (enter it above)`;
+}
+async function loadTurtle(el) {
+  $('#title').textContent = 'Trading · Turtle (futures)';
+  if (!state.turtle) { el.innerHTML = tradeStrip('turtle') + '<p class="muted pad">Loading…</p>'; tradeStripWire(el); state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); }
+  const D = state.turtle; const S = turSet();
+  if (!D) { el.innerHTML = tradeStrip('turtle') + '<p class="empty">The Turtle watch appears after its first run.</p>'; tradeStripWire(el); return; }
+  $('#asof').textContent = `Daily bars${updTxt(D.generated)}`;
+  const O = { 'exited today': 0, 'in trade': 1, flat: 2 };
+  const R = D.rows.slice().sort((a, b) => ((O[a.status] - O[b.status]) || (a.status === 'flat' ? a.dist_pct - b.dist_pct : 0)));
+  const nIn = R.filter((r) => r.status === 'in trade').length, nNew = R.filter((r) => r.status === 'in trade' && r.new).length, nEx = R.filter((r) => r.status === 'exited today').length;
+  const px = (v) => (v == null ? '–' : fmt(v, v >= 1000 ? 0 : 2, 'en-US'));
+  const row = (r) => {
+    const sz = turSize(r, S, D.fx || {}, r.status === 'in trade' ? r.entry_N : r.N, r.status === 'in trade' ? r.entry : r.buy_stop);
+    let st, line;
+    if (r.status === 'in trade') {
+      st = `<span class="chip ${r.new ? 'new' : 'open'}">${r.new ? 'BUY today' : 'Holding'} · since ${day(r.entry_date)} at ${px(r.entry)}</span><span class="chip ${r.open_R >= 0 ? 'open' : 'exit'}">${pct(r.open_pct)} · ${r.open_R >= 0 ? '+' : ''}${fmt(r.open_R, 1)}R</span>`;
+      line = `Sell-stop for next session <b>${px(r.stop)}</b> (${r.stop === r.trail_stop ? '10-day low trail' : 'fixed 2N stop'}; fixed ${px(r.fixed_stop)}, trail ${px(r.trail_stop)}) · size at entry: ${sz}`;
+    } else if (r.status === 'exited today') {
+      const z = r.trades[r.trades.length - 1];
+      st = `<span class="chip exit">EXIT today · stopped at ~${px(z.x)} · ${z.R >= 0 ? '+' : ''}${fmt(z.R, 1)}R</span>`;
+      line = `Next buy-stop ${px(r.buy_stop)} (${fmt(r.dist_pct, 1)}% above)`;
+    } else {
+      st = `<span class="chip">Waiting · ${fmt(r.dist_pct, 1)}% to the 20-day high</span>`;
+      line = `Buy-stop <b>${px(r.buy_stop)}</b> · if filled, fixed stop ${px(r.fixed_stop_if_filled)} · size ${sz}`;
+    }
+    const hist = (r.trades || []).slice().reverse().map((z) => `${day(z.entry)} → ${day(z.exit)}: ${z.R >= 0 ? '+' : ''}${fmt(z.R, 1)}R`).join(' · ');
+    return `<li class="row" style="cursor:default"><div><div class="sym">${esc(r.name)}</div><div class="co">${esc(r.group)} · ${esc(r.contract)} · close ${px(r.close)} (${day(r.date)})</div>
+      <div class="tags">${st}</div><div class="muted" style="font-size:13px;margin-top:4px">${line}</div>
+      ${hist ? `<details style="margin-top:4px"><summary class="muted" style="font-size:12px">Last trades</summary><div class="muted" style="font-size:12px">${hist}</div></details>` : ''}</div><div></div>
+      <div class="num"><a class="tv-btn" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.tv)}&interval=D" target="_blank" rel="noopener">Chart ↗</a></div></li>`;
+  };
+  el.innerHTML = `${tradeStrip('turtle')}
+    <section class="summary"><div class="stat new"><b>${nNew}</b><span>new buys today</span></div><div class="stat"><b>${nIn}</b><span>holding</span></div>
+      <div class="stat exit"><b>${nEx}</b><span>exits today</span></div><div class="stat"><b>${R.length - nIn - nEx}</b><span>waiting with a buy-stop</span></div></section>
+    <div class="status exit watch" style="margin:10px 16px"><b>Paper / watch.</b> Daily 20/10 long Turtle. Tested 2010–26: 24%/yr, −27% worst fall at 1% risk (≈12%, −33% without BTC/ETH), about 2.5× leverage. Profit is booked only when the trailing stop (10-day low) is hit; there is no target. Orders are yours to place.</div>
+    <div class="card pad" id="tursets" style="margin:10px 16px"><b>Sizing</b>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;align-items:center">
+        <label>Account <select id="tcur">${['USD', 'AUD', 'INR'].map((c) => `<option ${S.cur === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+        <label><input id="tacct" type="number" inputmode="decimal" value="${S.acct}" style="width:110px"></label>
+        <label>Risk % <input id="trisk" type="number" step="0.1" value="${S.risk}" style="width:64px"></label>
+        <label>Nifty lot <input id="tlotn" type="number" value="${S.lotN || ''}" placeholder="?" style="width:64px"></label>
+        <label>Bank Nifty lot <input id="tlotb" type="number" value="${S.lotB || ''}" placeholder="?" style="width:64px"></label></div>
+      <p class="muted" style="font-size:12px;margin:6px 0 0">One unit risks ${S.risk}% of the account at the 2N stop. US markets are sized in CME micro contracts; check your broker's contract specs and margin.</p></div>
+    <div class="card"><ul class="list flat">${R.map(row).join('')}</ul></div>`;
+  tradeStripWire(el);
+  const save = () => { turSave({ cur: $('#tcur').value, acct: +$('#tacct').value, risk: +$('#trisk').value, lotN: +$('#tlotn').value, lotB: +$('#tlotb').value }); loadTurtle(el); };
+  ['#tcur', '#tacct', '#trisk', '#tlotn', '#tlotb'].forEach((id) => $(id).addEventListener('change', save));
+}
 async function loadTrdWorld(el, mkSeg) {
   if (!state.assets) { el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>'; state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets'); }
   const A = ((state.assets && state.assets.rows) || []);
@@ -2499,6 +2561,7 @@ async function loadATH() {
   const mk = AM(); const wOn = grp === 'mom' && state.athWorld; const tOn = grp === 'trd' && state.trdWorld;
   const mkSeg = (grp === 'trd' ? tradeStrip(state.athTabG.trd) : '') + `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK'], ...(grp !== 'inv' ? [['WORLD', 'World & other assets']] : [])].map(([k, n]) => `<button data-mk="${k}" aria-selected="${wOn || tOn ? k === 'WORLD' : mk === k}">${n}</button>`).join('')}</div>`;
   if (wOn) { loadATHWorld(el, mkSeg); return; }
+  if (grp === 'trd' && state.athTabG.trd === 'turtle') { loadTurtle(el); return; }
   if (tOn) { loadTrdWorld(el, mkSeg); return; }
   if (!state.athC[mk]) {
     el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>';
