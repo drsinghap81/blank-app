@@ -1,0 +1,15 @@
+name: short-assets-bt
+# research only: long vs short trend systems on coins, commodities, currencies, world indices (prints results to the log)
+on:
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas yfinance && python tools/short_assets_bt.py 2>&1 | grep -v -i "warn\|possibly delisted\|failed download\|^\[" | tee result.txt
+      - uses: actions/upload-artifact@v4
+        with: {name: result, path: result.txt}
