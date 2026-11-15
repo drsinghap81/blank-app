@@ -2,7 +2,7 @@
 "market": "ASX",
 "asof": "2026-11-13",
 "scan_date": "2026-11-15",
-"generated": "2026-11-15 04:10 UTC",
+"generated": "2026-11-15 04:36 UTC",
 "scanned": 47,
 "rules": {
 "base_main": 24,
@@ -832,5 +832,46 @@
 "aligned": true
 }
 ],
-"month_close": []
+"month_close": [],
+"week_close": [
+{
+"symbol": "MPL",
+"kind": "W",
+"period": "2026-11-13",
+"close_p": 5.4,
+"high_p": 5.47,
+"old_ath": 5.31,
+"ath_date": "2025-07-04",
+"base": 71,
+"depth": -0.2072,
+"above_pct": 1.6949,
+"resistance": null,
+"room_pct": null,
+"ath": true,
+"long_cup": false,
+"sma_rising": true,
+"close": 5.4,
+"value_cr": 39.0496,
+"low_price": true,
+"rs_bench": "^AXFJ",
+"stock_rs": 2.0344,
+"stock_rs_up": false,
+"stock_rs_days": 250,
+"name": "MEDIBANK PRIVATE LIMITED",
+"size": null,
+"industry": "Insurance",
+"sector_index": "^AXFJ",
+"sector_tag": "leading",
+"sector_rs": 0.775
+}
+],
+"day_close": [],
+"wd_rules": {
+"week_min": 26,
+"week_depth": -0.2,
+"week_window": 104,
+"day_min": 20,
+"day_depth": -0.15,
+"day_window": 250
+}
 }
