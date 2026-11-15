@@ -3179,13 +3179,13 @@ function athList() {
       $('#athlist').innerHTML = seg + `<li class="muted pad">${md === 'W' ? 'Last completed week' : 'Last day'} CLOSED above the cup high (${md === 'W' ? 'highest high of the last 2 years, 26+ weeks old, 20%+ fall since' : 'highest high of the last year, 20+ days old, 15%+ fall since'}), with room to the next older high at least the cup depth (all-time highs always pass). India, US, Australia and UK stocks, strongest sectors first. Watch list only: India test ${md === 'W' ? '9.0' : '12.7'}%/yr at 1% risk vs 21.5% for the live Breakouts rule.</li>`
         + (W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : `<li class="empty">None ${md === 'W' ? 'last week' : 'on the last day'}.</li>`);
       $('#athlist').querySelectorAll('#allmd button').forEach((b) => b.addEventListener('click', () => { state.allMode = b.dataset.k; athList(); }));
-      $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv), '_blank', 'noopener'); }));
+      $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv) + '&interval=' + (md === 'W' ? 'W' : 'D'), '_blank', 'noopener'); }));
       return;
     }
     $('#athlist').innerHTML = seg + `<li class="muted pad">Every month-close list in one place${mo ? ` (${mLab(mo)})` : ''}: the last completed month CLOSED above the all-time high (highest price of earlier months, wicks included, as on TradingView) after a base of 1+ years. Within each market, strongest sectors first (leading, uptrend, mixed, weak; then 6-month sector RS). A month-end check, not an entry: in the India test, buying the next month's open after such a close made 5.4%/yr vs 21.5% for the live Breakouts rule. Tap a row for its TradingView chart.</li>`
       + (W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : '<li class="empty">Nothing closed last month above an all-time high at least a year old.</li>');
     $('#athlist').querySelectorAll('#allmd button').forEach((b) => b.addEventListener('click', () => { state.allMode = b.dataset.k; athList(); }));
-    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv), '_blank', 'noopener'); }));
+    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv) + '&interval=1M', '_blank', 'noopener'); }));
     return;
   }
   if (tab === 'world') {
@@ -3312,10 +3312,12 @@ function wdRight(px, r, cur) {
 }
 function mcloseSelect(r) {
   const tr = ((state.ath.d && state.ath.d.tracked) || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
-  if (tr) { athSelect(tr); return; }
-  athSelect({ ...r, _near: true, _mclose: true, kind: 'high', trigger: r.old_ath, gap_pct: (r.old_ath / r.close - 1) * 100, wick_high: r.wick_trigger });
+  const wd = r.kind === 'W' || r.kind === 'D';
+  if (tr && !wd) { athSelect(tr); return; }
+  athSelect({ ...r, _near: true, _mclose: true, kind: wd ? r.kind : 'high', trigger: r.old_ath, gap_pct: (r.old_ath / r.close - 1) * 100, wick_high: r.wick_trigger });
 }
 function athSelect(r) {
+  const tf0 = r.kind === 'W' ? 'w' : r.kind === 'D' ? 'd' : 'm';   // weekly list -> weekly chart, daily list -> daily chart
   const near = state.ath.tab === 'near' || !!r._near;
   const st = r._mclose && r.kind && (r.kind === 'W' || r.kind === 'D') ? `<div class="status info">${r.kind === 'W' ? 'Week to' : 'Day'} ${day(r.period)} closed at ${fmt(r.close_p, 2, AL())}, ${pct(r.above_pct)} above its ${r.base}-${r.kind === 'W' ? 'week' : 'day'} cup high ${fmt(r.old_ath, 2, AL())} (${day(r.ath_date)}); cup ${fmt(Math.abs(r.depth * 100), 0)}% deep; ${r.ath ? 'an all-time high, no resistance above.' : `next resistance ${fmt(r.resistance, 2, AL())}, ${fmt(r.room_pct, 0)}% away.`} A watch list, not an entry: in the India test these made ${r.kind === 'W' ? '9.0' : '12.7'}%/yr at 1% risk vs 21.5% for the live Breakouts rule.</div>`
     : r._mclose ? `<div class="status info">${mLab(r.month)} closed at ${fmt(r.close_m, 2, AL())}, ${pct(r.above_pct)} above its all-time high ${fmt(r.old_ath, 2, AL())} (${mLab(r.ath_month)}). A month-end check, not an entry: buying the next month's open after such a close made 5.4%/yr in the India test vs 21.5% for the live Breakouts rule.</div>`
@@ -3332,7 +3334,7 @@ function athSelect(r) {
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, AL())}</b></div></div>
     ${st}
     ${planATH(r, near)}
-    <div class="seg-row"><div class="seg small" id="athtf"><button data-tf="m" aria-selected="true">Monthly</button><button data-tf="w" aria-selected="false">Weekly + 30 SMA</button></div>${styleSeg('ath', 'athst')}</div>
+    <div class="seg-row"><div class="seg small" id="athtf">${[['m', 'Monthly'], ['w', 'Weekly + 30 SMA'], ['d', 'Daily']].map(([k, n]) => `<button data-tf="${k}" aria-selected="${k === tf0}">${n}</button>`).join('')}</div>${styleSeg('ath', 'athst')}</div>
     <div class="chart" id="athc"></div>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
     <div class="links">${athLinks(r)}</div>`);
@@ -3341,7 +3343,7 @@ function athSelect(r) {
   }));
   wireStyle('athst', 'ath', () => drawATH(r, $('#athtf [aria-selected="true"]').dataset.tf));
   wirePlanATH(r, near);
-  drawATH(r, 'm');
+  drawATH(r, tf0);
 }
 function wirePlanATH(r, near) {
   const redo = () => { const p = document.querySelector('.plan'); if (p) p.outerHTML = planATH(r, near); wirePlanATH(r, near); athList(); };
@@ -3360,11 +3362,18 @@ async function drawATH(r, tf) {
     catch (e) { box.innerHTML = '<p class="muted pad">Chart data is not available for this stock yet.</p>'; return; }
   }
   box.innerHTML = '';
-  const b = c[tf]; const T = tf === 'm' ? b.t.map((t) => t + '-01') : b.t;
+  const b = c[tf]; if (!b) { box.innerHTML = `<p class="muted pad">No ${tf === 'd' ? 'daily' : 'weekly'} bars saved for this stock yet.</p>`; return; }
+  const T = tf === 'm' ? b.t.map((t) => t + '-01') : b.t;
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
   const s = priceSeries(ch, T.map((t, i) => ({ time: t, open: b.o[i], high: b.h[i], low: b.l[i], close: b.c[i] })), 'ath');
   const trig = r.trigger ?? c.trigger;
-  if (trig) s.createPriceLine({ price: trig, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: r.kind === 'close' ? 'old ATH close' : 'ATH month high' });
+  const wd = r.kind === 'W' || r.kind === 'D';
+  if (trig) s.createPriceLine({ price: trig, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: wd ? 'cup high' : r.kind === 'close' ? 'old ATH close' : 'ATH month high' });
+  if (wd && r.resistance) s.createPriceLine({ price: r.resistance, color: C.down || '#C0392B', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'next resistance' });
+  if (tf === 'd' && b.e21) {
+    [['e21', C.e21], ['e50', C.ink || '#888']].forEach(([k, col]) => { if (!b[k]) return; const l = ch.addLineSeries({ color: col, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }); l.setData(T.map((t2, i) => (b[k][i] == null ? { time: t2 } : { time: t2, value: b[k][i] }))); });
+  }
+  if (wd && r.period && tf !== 'm') { const k2 = T.find((t2) => t2 >= r.period); if (k2) s.setMarkers([{ time: k2, position: 'belowBar', color: C.saffron, shape: 'arrowUp', text: r.kind === 'W' ? 'week close' : 'day close' }]); }
   if (tf === 'w') {
     const l = ch.addLineSeries({ color: C.e21, lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
     l.setData(T.map((t, i) => (b.sma[i] == null ? { time: t } : { time: t, value: b.sma[i] })));
@@ -3373,7 +3382,7 @@ async function drawATH(r, tf) {
     const key = tf === 'm' ? r.date.slice(0, 7) + '-01' : T.find((t) => t >= r.date);
     if (key && T.includes(key)) s.setMarkers([{ time: key, position: 'belowBar', color: C.saffron, shape: 'arrowUp', text: 'breakout' }]);
   }
-  const n = T.length; ch.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - (tf === 'm' ? 140 : 156)), to: n + 2 });
+  const n = T.length; ch.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - (tf === 'm' ? 140 : tf === 'd' ? 320 : 156)), to: n + 2 });
   new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
 }
 

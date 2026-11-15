@@ -310,7 +310,7 @@ def analyse(sym, x, today, lookback_days=550):
     return events, near, chart
 
 
-def daily_block(x, n=160):
+def daily_block(x, n=320):
     """Last n daily bars with EMA 9/21/50 for the app's setup chart (Today tab)."""
     c = x.Close
     e = {k: c.ewm(span=k, adjust=False).mean() for k in (9, 21, 50)}
