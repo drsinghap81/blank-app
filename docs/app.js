@@ -2341,7 +2341,7 @@ function fundRows() {
     && (mk !== 'IN' || !cat || r.category === cat) && (!q || r.name.toLowerCase().includes(q) || r.key.toLowerCase().includes(q)));
 }
 const fundName = (r) => (r.kind === 'fund' ? r.name : `${r.symbol || r.key} · ${r.name}`);
-const FUND_MK = { IN: 'India', US: 'US', AU: 'Australia' };
+const FUND_MK = { IN: 'India', US: 'US', AU: 'Australia', UK: 'UK & Europe' };
 function fundItem(r, i) {
   const pc = (v) => (v == null ? '–' : `${v >= 0 ? '+' : ''}${fmt(v, 1)}%`);
   const chip = `${r.topup ? `<span class="chip new">${(r.market || 'IN') === 'IN' ? 'Top-up zone' : '20%+ below high'}</span>` : ''}<span class="chip ${r.below_high_pct >= 10 ? 'open' : ''}">${r.below_high_pct < 0.5 ? 'at its high' : `${fmt(r.below_high_pct, 1)}% below high`}</span>`
@@ -2424,8 +2424,13 @@ function fundPlan(r) {
 }
 async function drawFund(r) {
   const box = $('#fundc_'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
-  if (!state.fundCh) { try { const res = await fetch(MAIN + 'data/scan/fund_charts.json'); if (!res.ok) throw 0; state.fundCh = await res.json(); } catch (e) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; } }
-  const c = state.fundCh[r.key]; if (!c) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; }
+  let c = null;
+  if (r.extra) { try { const res = await fetch(MAIN + 'data/scan/etf_charts/' + encodeURIComponent(r.key.replace(/[:/]/g, '_')) + '.json'); if (res.ok) c = await res.json(); } catch (e) { /* */ } }
+  else {
+    if (!state.fundCh) { try { const res = await fetch(MAIN + 'data/scan/fund_charts.json'); if (!res.ok) throw 0; state.fundCh = await res.json(); } catch (e) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; } }
+    c = state.fundCh[r.key];
+  }
+  if (!c) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; }
   box.innerHTML = '';
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
   const s = ch.addLineSeries({ color: C.ink || '#1F2937', lineWidth: 2, priceLineVisible: false });
@@ -2931,7 +2936,7 @@ async function drawGP(r) {
 const ATH_ST = { breakout: 0, 'exit next open': 1, open: 2, near: 3, exited: 4 };
 function fundAthRows(countOnly) {
   const F = state.fund; if (!F) return [];
-  const m = { NSE: 'IN', US: 'US', ASX: 'AU' }[AM()];
+  const m = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[AM()];
   if (state.athFundMC && !countOnly) {
     let M = (F.rows || []).filter((r) => (r.market || 'IN') === m && r.mclose);
     const q0 = (state.ath.q || '').toLowerCase(); if (q0) M = M.filter((r) => r.name.toLowerCase().includes(q0) || r.key.toLowerCase().includes(q0));
@@ -3037,7 +3042,7 @@ function athList() {
     return;
   }
   if (tab === 'fund') {
-    const mcN = ((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU' }[AM()]) && r.mclose).length;
+    const mcN = ((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[AM()]) && r.mclose).length;
     const MC = !!state.athFundMC;
     $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!MC && !state.athFundAll}">Cup + trend only</button><button data-k="1" aria-selected="${!MC && !!state.athFundAll}">Show all (incl. exited, shallow bases)</button><button data-k="2" aria-selected="${MC}">Month close ${mcN}</button></div></li>`
       + (MC ? '<li class="muted pad">Last completed month CLOSED above the old all-time-high monthly close after a base of 1+ years (bold = 2+ years). Long cup = base of 3+ years with a 30%+ fall inside it. Not tested for ETFs and funds (the ATH system itself did not beat buy-and-hold on mutual funds); a month-end check only.</li>' : '')

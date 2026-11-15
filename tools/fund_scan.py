@@ -170,6 +170,107 @@ def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
     w = s.resample("W-FRI").last().dropna().tail(260)
     return row, dict(t=[str(d.date()) for d in w.index], c=[round(float(v), 4) for v in w])
 
+# 15 Nov 2026: all liquid ETFs (NSE list, US listings) + UK/European UCITS ETFs, for the month-close and ATH lists.
+# Charts for these go to data/scan/etf_charts/<key>.json (one small file each) to keep fund_charts.json light.
+UCITS_ETFS = {"VUSA.L": "S&P 500 (Vanguard, dist)", "VUAG.L": "S&P 500 (Vanguard, acc)", "CSPX.L": "S&P 500 (iShares, acc)", "IUSA.L": "S&P 500 (iShares, dist)",
+              "SWDA.L": "MSCI World (iShares)", "VWRL.L": "FTSE All-World (Vanguard, dist)", "VWRP.L": "FTSE All-World (Vanguard, acc)", "VEVE.L": "Developed world (Vanguard)",
+              "VHVG.L": "Developed world (Vanguard, acc)", "EQQQ.L": "Nasdaq 100 (Invesco)", "CNDX.L": "Nasdaq 100 (iShares)", "ISF.L": "FTSE 100 (iShares)",
+              "VUKE.L": "FTSE 100 (Vanguard)", "VMID.L": "FTSE 250 (Vanguard)", "CUKX.L": "FTSE 100 (iShares, acc)", "VFEM.L": "Emerging markets (Vanguard)",
+              "EMIM.L": "Emerging markets IMI (iShares)", "VJPN.L": "Japan (Vanguard)", "VERX.L": "Europe ex-UK (Vanguard)", "VAPX.L": "Asia Pacific ex-Japan (Vanguard)",
+              "IGLT.L": "UK gilts (iShares)", "INXG.L": "UK index-linked gilts", "SGLN.L": "Gold (iShares)", "PHAU.L": "Gold (WisdomTree)", "SSLN.L": "Silver (iShares)",
+              "IITU.L": "US technology (iShares)", "INRG.L": "Clean energy (iShares)", "RBOT.L": "Robotics & automation (iShares)", "WTAI.L": "AI & innovation (WisdomTree)",
+              "SMGB.L": "Semiconductors (VanEck)", "GDGB.L": "Gold miners (VanEck)", "SPY4.L": "S&P 400 mid cap (SPDR)", "R2US.L": "Russell 2000 (SPDR)",
+              "SXLK.L": "US technology (SPDR)", "SXLF.L": "US financials (SPDR)", "SXLV.L": "US health care (SPDR)", "SXLE.L": "US energy (SPDR)", "SXLI.L": "US industrials (SPDR)",
+              "SXLY.L": "US consumer discretionary (SPDR)", "SXLP.L": "US consumer staples (SPDR)", "SXLU.L": "US utilities (SPDR)", "SXLB.L": "US materials (SPDR)",
+              "SXLC.L": "US communication services (SPDR)", "BTEK.L": "US biotech (iShares)", "NDIA.L": "India (iShares)", "FRIN.L": "India (Franklin)",
+              "HMCH.L": "China (HSBC)", "IAPD.L": "Asia Pacific dividend (iShares)", "VGOV.L": "UK gilts (Vanguard)", "CSH2.L": "GBP cash (Lyxor/Amundi)",
+              "ERNS.L": "GBP ultrashort bond (iShares)", "VAGS.L": "Global aggregate bonds (Vanguard)", "XDWT.L": "World IT (Xtrackers)", "HEAL.L": "Healthcare innovation (iShares)",
+              "ISPY.L": "Cybersecurity (L&G)", "DFNS.L": "Defence (VanEck)", "NATO.L": "Defence (HANetf)", "COPX.L": "Copper miners (Global X)", "URNM.L": "Uranium miners (Sprott)",
+              "EUNL.DE": "MSCI World (iShares, Xetra)", "SXR8.DE": "S&P 500 (iShares, Xetra)", "VWCE.DE": "FTSE All-World (Vanguard, Xetra)", "EXS1.DE": "DAX (iShares)",
+              "SXRV.DE": "Nasdaq 100 (iShares, Xetra)", "IS3N.DE": "EM IMI (iShares, Xetra)", "EXSA.DE": "Stoxx Europe 600 (iShares)", "4GLD.DE": "Gold (Xetra-Gold)"}
+EXTRA_DEBT = r"(?i)gilt|treasur|bond|cash|liquid|g-?sec|sdl|bharat bond|money market|ultrashort|aggregate|t-?bill|overnight|floating|income|duration|govt|government|corporate"
+
+
+def _hist(tick, period):
+    try:
+        return yf.download(tick, period=period, interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+    except Exception as e:  # noqa: BLE001
+        print("download fail", period, len(tick), str(e)[:60]); return None
+
+
+def extra_etfs(rows, have):
+    import io, re
+    H = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36", "Referer": "https://www.nseindia.com/"}
+    lists = []
+    try:   # India: NSE's ETF list
+        r = requests.get("https://nsearchives.nseindia.com/content/equities/eq_etfseclist.csv", headers=H, timeout=30)
+        d = pd.read_csv(io.StringIO(r.content.decode("utf-8", "ignore"))); d.columns = [c.strip().lower() for c in d.columns]
+        sc = next(c for c in d.columns if "symbol" in c); nc = next((c for c in d.columns if "underlying" in c), next(c for c in d.columns if "name" in c))
+        L = {str(s).strip(): str(n).strip() for s, n in zip(d[sc], d[nc]) if str(s).strip() not in ETFS}
+        lists.append(("IN", {k + ".NS": v for k, v in L.items()}, 5e6, "NSE")); print("NSE ETF list", len(L))
+    except Exception as e:  # noqa: BLE001
+        print("NSE ETF list fail", str(e)[:80])
+    try:   # US: every listed ETF (nasdaqtrader directories)
+        U = {}
+        for u, sc in (("https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt", "Symbol"), ("https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt", "ACT Symbol")):
+            r = requests.get(u, timeout=30); d = pd.read_csv(io.StringIO(r.text), sep="|")
+            d = d[(d["ETF"] == "Y") & (d["Test Issue"] == "N")]
+            U.update({str(s): str(n) for s, n in zip(d[sc], d["Security Name"]) if isinstance(s, str) and re.fullmatch(r"[A-Z]{1,5}", s) and s not in US_ETFS})
+        lists.append(("US", U, 1e7, "US")); print("US ETF list", len(U))
+    except Exception as e:  # noqa: BLE001
+        print("US ETF list fail", str(e)[:80])
+    lists.append(("UK", UCITS_ETFS, 0, "UK"))
+    from session import drop_partial
+    os.makedirs(f"{OUT}/etf_charts", exist_ok=True); keep = set()
+    for mkt, L, minval, ses in lists:
+        tick = list(L); ok = []
+        if minval:   # liquidity screen on the last 3 months, then full history for the liquid ones
+            for a in range(0, len(tick), 200):
+                dd = _hist(tick[a:a + 200], "3mo")
+                if dd is None or dd.empty:
+                    continue
+                for t in tick[a:a + 200]:
+                    try:
+                        v = float((dd["Close"][t] * dd["Volume"][t]).tail(60).mean())
+                        if v >= minval:
+                            ok.append(t)
+                    except Exception:  # noqa: BLE001
+                        pass
+        else:
+            ok = tick
+        print(mkt, "liquid ETFs", len(ok), "of", len(tick), flush=True); n1 = len(rows)
+        for a in range(0, len(ok), 100):
+            dd = _hist(ok[a:a + 100], "max")
+            if dd is None or dd.empty:
+                continue
+            for t in ok[a:a + 100]:
+                try:
+                    x = pd.DataFrame({c: dd[c][t] for c in ("Open", "High", "Low", "Close")}).dropna(subset=["Close"])
+                    if not len(x):
+                        continue
+                    x = drop_partial(x, ses)
+                    j = np.flatnonzero(np.abs(np.diff(np.log(x.Close.to_numpy()))) > 0.4)
+                    if len(j):
+                        x = x.iloc[j[-1] + 1:]
+                    sym = t[:-3] if mkt == "IN" else t
+                    key = sym if mkt == "IN" else f"{mkt}:{sym}"
+                    if key in have:
+                        continue
+                    nm = L[t]
+                    kind = "debt" if re.search(EXTRA_DEBT, nm) else "etf"
+                    r, ch = metrics(x.Close, key, nm, kind, "ETF", x, market=mkt, no_topup={key})
+                    if r:
+                        r["symbol"] = sym; r["extra"] = True; rows.append(r); have.add(key)
+                        fn = key.replace(":", "_").replace("/", "_"); keep.add(fn + ".json")
+                        json.dump(ch, open(f"{OUT}/etf_charts/{fn}.json", "w"), separators=(",", ":"))
+                except Exception as e:  # noqa: BLE001
+                    print("fail", mkt, t, str(e)[:60])
+        print(mkt, "extra ETFs", len(rows) - n1, flush=True)
+    if keep:
+        for f in os.listdir(f"{OUT}/etf_charts"):
+            if f not in keep:
+                os.remove(f"{OUT}/etf_charts/{f}")
+
 
 def main():
     os.makedirs(OUT, exist_ok=True); rows, charts = [], {}
@@ -215,6 +316,10 @@ def main():
             except Exception as e:  # noqa: BLE001
                 print("fail", mkt, k, str(e)[:60])
         print(mkt, "etfs", len(rows) - n1, flush=True)
+    try:
+        extra_etfs(rows, {r["key"] for r in rows})
+    except Exception as e:  # noqa: BLE001
+        print("extra ETFs fail", str(e)[:120])
     # mutual funds (equity + index, direct growth)
     u = universe(); print("funds in universe", len(u), flush=True); n0 = len(rows)
     def one(r):
