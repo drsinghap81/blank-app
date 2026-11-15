@@ -2299,7 +2299,7 @@ function shortItemHtml(x, i, L) {
     + `<span class="chip">rallied ${fmt(r.rally * 100, 0)}% in between</span>${r.long_cup ? '<span class="chip new">Big base</span>' : ''}`
     + `<span class="chip">${r.atl ? 'No older low below · new low' : `next support ${fmt(r.support, 2, 'en-US')} (${fmt(r.room_pct, 0)}% down)`}</span><span class="chip exit">Below a falling 30-wk SMA</span>`;
   const g = r.low_p ? (x.close / r.low_p - 1) * 100 : null;
-  const fo = x.fno ? `<span class="chip new">${x.lot ? `F&O · lot ${x.lot.toLocaleString('en-IN')} ≈ ${lakh(x.lot * x.close)}` : esc(x.ven || 'F&O')}</span>${x.oi && x.oi.opt_liq ? `<span class="chip ${x.oi.opt_liq === 'liquid' ? 'open' : x.oi.opt_liq === 'thin' ? 'exit' : ''}">Options ${x.oi.opt_liq} · ${fmt(x.oi.atm_trades, 0, 'en-IN')} trades near the money · ₹${fmt(x.oi.opt_value_cr, 1)} cr premium</span>` : ''}${x.oi ? `<span class="chip">OI: call wall ${fmt(x.oi.resistance, 0, 'en-IN')} · put wall ${fmt(x.oi.support, 0, 'en-IN')} · PCR ${fmt(x.oi.pcr, 2)}</span>` : ''}` : '';
+  const fo = x.fno ? `<span class="chip new">${x.lot ? `F&O · lot ${x.lot.toLocaleString('en-IN')} ≈ ${lakh(x.lot * x.close)}` : esc(x.ven || 'F&O')}</span>${x.oi && x.oi.opt_liq ? `<span class="chip ${x.oi.opt_liq === 'liquid' ? 'open' : x.oi.opt_liq === 'thin' ? 'exit' : ''}">Options ${x.oi.opt_liq} · ${fmt(x.oi.atm_trades, 0, 'en-IN')} trades near the money</span>` : ''}${x.oi ? `<span class="chip">OI: call wall ${fmt(x.oi.resistance, 0, 'en-IN')} · put wall ${fmt(x.oi.support, 0, 'en-IN')} · PCR ${fmt(x.oi.pcr, 2)}</span>` : ''}` : '';
   return `${sp}<li class="row" tabindex="0" data-j="${i}"><div><div class="sym">${esc(x.sym || x.name)}</div>${x.sym ? `<div class="co">${esc(x.name || '')}</div>` : ''}<div class="tags">${fo}${chips}</div></div><div></div>
     <div class="num"><b>${fmt(x.close, x.close >= 1000 ? 0 : 2, 'en-US')}</b>${g == null ? '' : `<span class="muted">${g <= 0 ? `${fmt(-g, 1)}% below` : `${fmt(g, 1)}% above`} that ${wk ? 'week' : 'day'}'s low</span>`}</div></li>`;
 }
@@ -2335,7 +2335,7 @@ async function shortSelect(x) {
     f.push(['F&O lot', `${x.lot.toLocaleString('en-IN')} shares ≈ ${lakh(x.lot * x.close)} a future`],
       ['If it climbs back to the broken support', `${pct((r.old_low / x.close - 1) * 100)} · ${per(r.old_low - x.close)}`],
       ...(r.support ? [['Down to the next support', `${pct((r.support / x.close - 1) * 100)} · ${per(r.support - x.close)}`]] : []));
-    if (x.oi && x.oi.opt_liq) f.push(['Option liquidity (nearest expiry)', `${x.oi.opt_liq} · ${fmt(x.oi.atm_trades, 0, 'en-IN')} trades within 5% of the price · ₹${fmt(x.oi.opt_value_cr, 1)} cr premium traded`]);
+    if (x.oi && x.oi.opt_liq) f.push(['Option liquidity (nearest expiry)', `${x.oi.opt_liq} · ${fmt(x.oi.atm_trades, 0, 'en-IN')} trades within 5% of the price in a day (liquid 10,000+, fair 3,000+) · ₹${fmt(x.oi.opt_value_cr, 0, 'en-IN')} cr notional`]);
     if (x.oi) f.push([`Options OI (${day(x.oi.date)}, expiry ${day(x.oi.expiry)})`, `call wall ${fmt(x.oi.resistance, 0, 'en-IN')}${x.oi.resistance_2 ? ` / ${fmt(x.oi.resistance_2, 0, 'en-IN')}` : ''} · put wall ${fmt(x.oi.support, 0, 'en-IN')}${x.oi.support_2 ? ` / ${fmt(x.oi.support_2, 0, 'en-IN')}` : ''} · PCR ${fmt(x.oi.pcr, 2)}`]);
   }
   openPanel(`<div class="d-head no-push"><div><h2>${esc(x.sym || x.name)}</h2><div class="co">${esc(x.sym ? x.name || '' : x.g)}</div></div><div class="d-price"><b>${fmt(x.close, x.close >= 1000 ? 0 : 2, 'en-US')}</b></div></div>

@@ -72,16 +72,16 @@ def levels(g, under=None):
 
 
 def liquidity(g, under):
-    """Option liquidity on the nearest expiry (15 Nov 2026, for the short-watch hedge view): premium traded (Rs cr), trades and OI
-    in strikes within 5% of the price. Grade: liquid = 1,000+ near-the-money trades and Rs 10 cr+ premium in the day; fair = 200+
-    trades; thin = less. Judgement thresholds, not a test."""
+    """Option liquidity on the nearest expiry (15 Nov 2026, for the short-watch hedge view): notional turnover (Rs cr, TtlTrfVal is
+    contract value, not premium), trades and OI in strikes within 5% of the price. Grade by near-the-money trades in the day:
+    liquid >= 10,000 (about the top half of F&O stocks), fair 3,000-10,000, thin < 3,000 (bottom ~10%). Judgement, not a test."""
     try:
         g = g[g.OptnTp.isin(["CE", "PE"])]
         val = float(pd.to_numeric(g.get("TtlTrfVal"), errors="coerce").fillna(0).sum()) / 1e7
         near = g[(g.StrkPric >= under * 0.95) & (g.StrkPric <= under * 1.05)] if under else g
         trades = int(pd.to_numeric(near.get("TtlNbOfTxsExctd"), errors="coerce").fillna(0).sum()) if "TtlNbOfTxsExctd" in near else None
         oi = int(pd.to_numeric(near.OpnIntrst, errors="coerce").fillna(0).sum())
-        grade = None if trades is None else ("liquid" if trades >= 1000 and val >= 10 else "fair" if trades >= 200 else "thin")
+        grade = None if trades is None else ("liquid" if trades >= 10000 else "fair" if trades >= 3000 else "thin")
         return dict(opt_value_cr=round(val, 2), atm_trades=trades, atm_oi=oi, opt_liq=grade)
     except Exception:  # noqa: BLE001
         return {}
