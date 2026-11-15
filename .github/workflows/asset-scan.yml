@@ -1,0 +1,25 @@
+name: asset-scan
+# Commodities, currencies, crypto, bonds and world indices: month-close ATH check (tools/asset_scan.py -> data/scan/assets.json)
+on:
+  schedule:
+    - cron: "50 22 * * *"    # after the US close, daily (crypto trades on weekends)
+  workflow_dispatch:
+  push:
+    paths: ["tools/asset_scan.py", ".github/workflows/asset-scan.yml"]
+permissions:
+  contents: write
+concurrency: {group: asset-scan, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas yfinance requests lxml && python tools/asset_scan.py 2>&1 | grep -v -i "warn\|possibly delisted" | tail -15
+      - run: |
+          git config user.name "asset-scan bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/scan/assets.json; git diff --cached --quiet && exit 0
+          git commit -qm "Asset scan $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done
