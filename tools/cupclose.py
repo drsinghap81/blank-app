@@ -58,7 +58,7 @@ def wd_closes(x, wk_dep=WK_DEP, dy_dep=DY_DEP):
     return wk, dy
 
 
-def cupclose_short(ll, cc, K, B, D, piv=3):
+def cupclose_short(ll, cc, K, B, D, piv=3, level_only=False):
     """Support break (15 Nov 2026): support = the nearest swing low under the previous close (a low that is the lowest within +-piv
     bars, at least B bars old, followed by a rally of at least D off it, and not closed below since). Signal: this bar CLOSES below it.
     Returns (a, level, age, rally, next_support, room) or None. Watch only: shorting breakdowns lost money on F&O stocks in 2016-26."""
@@ -80,6 +80,8 @@ def cupclose_short(ll, cc, K, B, D, piv=3):
             continue
         if best is None or v > best[1]:
             best = (j, float(v), rally)
+    if level_only:
+        return best
     if best is None or not (cc[-1] < best[1]):
         return None
     a_, lev, rally = best; age = n_ - 1 - a_
@@ -118,3 +120,15 @@ def wd_short(x, wk_dep=SH_WK_UP, dy_dep=SH_DY_UP):
                         base=int(age), rally=round(rally, 4), below_pct=round((1 - float(C.iloc[-1]) / rim) * 100, 2), support=sup,
                         room_pct=None if room is None else round(room * 100, 2), atl=sup is None, long_cup=bool(age >= lc and rally >= 0.20)))
     return out[0], out[1]
+
+
+def weekly_support(x):
+    """Nearest weekly swing-low support under the previous close (same rules as the support break), for 'how far to support'."""
+    x = (x[["Low", "Close"]] if "Low" in x else x[["Close"]].assign(Low=x.Close)).dropna()
+    W = pd.DataFrame({"l": x.Low.resample("W-FRI").min(), "c": x.Close.resample("W-FRI").last()}).dropna()
+    if W.index[-1].normalize() > x.index[-1].normalize():
+        W = W.iloc[:-1]
+    b = cupclose_short(W.l.to_numpy(float), W.c.to_numpy(float), SH_WK_K, SH_WK_MIN, SH_WK_UP, 3, True)
+    if not b:
+        return None
+    return dict(level=b[1], date=str(W.index[b[0]].date()), rally=round(b[2], 4), dist_pct=round((float(W.c.iloc[-1]) / b[1] - 1) * 100, 2))
