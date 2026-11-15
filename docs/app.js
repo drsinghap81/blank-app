@@ -90,9 +90,11 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2600); }
 
+const fresh = (url) => (url.startsWith(REPO) ? url + (url.includes('?') ? '&' : '?') + 't=' + Date.now() : url);   // GitHub's raw CDN caches ~5 min
 async function getJSON(url, key) {
   try {
-    const r = await fetch(url, { cache: 'no-cache' });
+    const r = await fetch(fresh(url), { cache: 'no-cache' });
+    state.loadedAt = state.loadedAt || {}; state.loadedAt[key] = new Date();
     if (!r.ok) throw new Error(r.status);
     const j = await r.json();
     try { localStorage.setItem(key, JSON.stringify(j)); } catch (e) { /* storage unavailable */ }
@@ -2216,10 +2218,11 @@ async function loadATHWorld(el, mkSeg) {
   if (!state.assets || !state.worldMC) {
     el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>';
     const [a, ...w] = await Promise.all([getJSON(MAIN + 'data/scan/assets.json', 'assets'), ...WORLD_MK.map((k) => getJSON(MAIN + `data/scan/world/${k}.json`, 'world_' + k).catch(() => null))]);
-    state.assets = a; state.worldMC = w.filter(Boolean);
+    state.assets = a; state.worldMC = w.filter(Boolean); state.athWAt = new Date();
   }
   state.athW = state.athW || { tab: 'world', q: '', all: true, d: {} }; state.ath = state.athW;
-  const g = (state.worldMC || [])[0]; $('#asof').textContent = `Month closes to ${g ? mLab(g.month) : 'last month'} · Yahoo data · information only`;
+  const g = (state.worldMC || [])[0]; state.athWAt = state.athWAt || new Date();
+  $('#asof').textContent = `Month closes to ${g ? mLab(g.month) : 'last month'}${updTxt(g && g.generated)} · refreshed ${state.athWAt.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })}`;
   const tabs = [['world', 'World stocks', worldRows().length], ['assets', 'Commodities & more', assetRows(true).length]];
   el.innerHTML = `${mkSeg}<div class="card">
       <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
@@ -2276,7 +2279,7 @@ async function loadATH() {
     const tr = state.data[mk] || await getJSON(MAIN + AP() + 'trend_scan.json', 'td_' + mk);
     if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds');
     await loadGP(mk);
-    state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'brk', q: '', all: false };
+    state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'brk', q: '', all: false, at: new Date() };
   }
   state.ath = state.athC[mk];
   if (state.ath.tab === 'td' || state.ath.tab === 'pulse') state.ath.tab = 'brk';
@@ -2288,6 +2291,7 @@ async function loadATH() {
   state.ath.lp = lv && lv.time && lv.time.slice(0, 10) === todayIST ? lv.prices || {} : {};
   $('#asof').textContent = Object.keys(state.ath.lp).length ? `Plan from ${longDay(d.asof)} · live prices ${lv.time.slice(11)} (about 15 min delayed)`
     : `Market data: ${MKT[mk].name} close ${closeTxt(mk, state.ath.tab === 'ipo' && state.ath.ipo ? state.ath.ipo.asof : state.ath.tab === 'themes' && state.ath.sec ? state.ath.sec.asof : d.asof)} · ${Number(d.scanned).toLocaleString(AL())} stocks${updTxt(state.ath.tab === 'ipo' && state.ath.ipo ? state.ath.ipo.generated : state.ath.tab === 'themes' && state.ath.sec ? state.ath.sec.generated || d.generated : d.generated)}`;
+  if (state.ath.at) $('#asof').textContent += ` · refreshed ${state.ath.at.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })}`;
   const T = d.tracked || [];
   const brkMain = (d.breakouts || []).filter((r) => r.main).length;
   const exits = T.filter((r) => r.status === 'exit next open').length;
