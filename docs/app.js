@@ -3130,6 +3130,7 @@ function athRows() {
   let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : tab === 'mclose' ? (d.month_close || []) : (d.tracked || []);
   if (tab === 'brk') L = L.slice().sort((a, b) => (b.main - a.main) || (a.date < b.date ? 1 : -1));
   if (tab === 'mclose') L = L.slice().sort(secSort);
+  if ((tab === 'wclose' || tab === 'dclose' || tab === 'mclose') && !(state.sysMap && state.sysMap[AM()])) sysMap(AM()).then(() => athList());
   if (tab === 'wclose' || tab === 'dclose') { L = (tab === 'wclose' ? d.week_close : d.day_close) || []; if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); } L = L.slice().sort(secSort); }
   if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); }
   return L;
@@ -3235,7 +3236,7 @@ function athList() {
     }
     if (tab === 'wclose' || tab === 'dclose') {
       const Lp = (state.ath.lp || {})[r.symbol]; const px = Lp ? Lp.price : r.close;
-      chip = secChip(r) + rsChip('Sector RS', r.sector_rs) + wdChips(r) + (r.low_price ? '<span class="chip exit">Under the A$30 price floor</span>' : '') + (r.size ? `<span class="chip">${esc(r.size)}</span>` : '');
+      chip = alsoIn(r.symbol, tab === 'wclose' ? 'wk' : 'dy') + secChip(r) + rsChip('Sector RS', r.sector_rs) + wdChips(r) + (r.low_price ? '<span class="chip exit">Under the A$30 price floor</span>' : '') + (r.size ? `<span class="chip">${esc(r.size)}</span>` : '');
       return `<li class="row ${r.ath ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
         <div class="tags">${chip}</div></div><div></div><div class="num">${wdRight(px, r)}</div></li>`;
     }
@@ -3246,7 +3247,7 @@ function athList() {
       const Lp = (state.ath.lp || {})[r.symbol]; const px = Lp ? Lp.price : r.close; const sm = px / r.close_m - 1;
       chip = `<span class="chip">Closed ${pct(r.above_pct)} over old ATH</span>` + chip;
       right = `<b>${fmt(px, 2, AL())}</b><span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(r.month).split(' ')[0]}</span>${hiGap(px, r)}`;
-      chip = secChip(r) + rsChip('Sector RS', r.sector_rs) + chip + (r.size ? `<span class="chip">${esc(r.size)}</span>` : '');
+      chip = alsoIn(r.symbol, 'mo') + secChip(r) + rsChip('Sector RS', r.sector_rs) + chip + (r.size ? `<span class="chip">${esc(r.size)}</span>` : '');
       return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
         <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
     }
@@ -4400,6 +4401,55 @@ async function usSend(r, side, btn, el, P) {
 }
 /* NSE growth + momentum (15 Nov 2026, tools/growth_mom.py): month-end list of 25. Test 2017-26 on all ~1,750 liquid NSE
    stocks with point-in-time results: 24.7%/yr, -36% worst, vs 22.1% / -44% for the same ranking without the profit filter. */
+/* 15 Nov 2026: one table of the stocks that show up in 2+ systems or lists (Amritpal: highlight overlaps, good readability).
+   Being in two systems was NOT consistently better in the ATH + 9/21 test (2016-21 yes, 2022-26 no), so this is a view, not a score. */
+const MXC = [['ath', 'ATH', 'Momentum (monthly ATH system)'], ['t921', '9/21', 'Trend 9/21 system'], ['vcp', 'VCP', 'VCP setup'], ['ipo', 'IPO', 'IPO cup'],
+  ['gm', 'G+M', 'Growth + momentum list'], ['mo', 'M', 'Month closed above the all-time high'], ['wk', 'W', 'Week cup close'], ['dy', 'D', 'Day cup close']];
+async function sysMap(mk) {
+  state.sysMap = state.sysMap || {}; if (state.sysMap[mk]) return state.sysMap[mk];
+  const P = MAIN + MKT[mk].path;
+  const [at, tr, vcp, ipo, gm] = await Promise.all([getJSON(P + 'ath.json', 'ath_mx_' + mk), state.data[mk] || getJSON(P + 'trend_scan.json', 'td_' + mk),
+    mk === 'NSE' ? getJSON(P + 'vcp.json', 'vcp') : null, getJSON(P + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'NSE' ? getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom') : null]);
+  const M = {}; const meta = {};
+  const put = (sym, k, lvl, txt, r) => { M[sym] = M[sym] || {}; const o = M[sym][k]; if (!o || lvl < o.lvl) M[sym][k] = { lvl, txt }; if (r && !meta[sym]) meta[sym] = r; };
+  // lvl 0 = buy / breakout now, 1 = in a trade or on the list, 2 = near / watch
+  if (at) {
+    (at.breakouts || []).forEach((r) => put(r.symbol, 'ath', 0, 'Buy', r));
+    (at.tracked || []).filter((r) => r.status === 'open').forEach((r) => put(r.symbol, 'ath', 1, 'Open', r));
+    (at.near || []).forEach((r) => put(r.symbol, 'ath', 2, 'Near', r));
+    (at.month_close || []).forEach((r) => put(r.symbol, 'mo', 1, '✓', r));
+    (at.week_close || []).forEach((r) => put(r.symbol, 'wk', 1, '✓', r));
+    (at.day_close || []).forEach((r) => put(r.symbol, 'dy', 1, '✓', r));
+  }
+  if (tr) (tr.early || []).forEach((r) => { const s = r.status || ''; if (s.startsWith('NEW')) put(r.symbol, 't921', 0, 'Buy', r); else if (s === 'open') put(r.symbol, 't921', 1, 'Open', r); });
+  if (vcp) (vcp.rows || []).forEach((r) => put(r.symbol, 'vcp', 2, 'Setup', r));
+  if (ipo) { (ipo.breakouts || []).filter((r) => r.status === 'open').forEach((r) => put(r.symbol, 'ipo', 0, 'Buy', r)); (ipo.near || []).forEach((r) => put(r.symbol, 'ipo', 2, 'Near', r)); }
+  if (gm) (gm.picks || []).forEach((r) => put(r.symbol, 'gm', 1, '✓', r));
+  return (state.sysMap[mk] = { M, meta, cols: MXC.filter(([k]) => Object.values(M).some((o) => o[k])) });
+}
+/* "Also in" chips for a stock (used on the Week / Day / Month close lists) */
+function alsoIn(sym, skip) {
+  const S = state.sysMap && state.sysMap[AM()]; const o = S && S.M[sym]; if (!o) return '';
+  const ks = MXC.filter(([k]) => o[k] && k !== skip);
+  return ks.length ? `<span class="chip new" title="${ks.map(([k, , d]) => `${d}: ${o[k].txt}`).join(' · ')}">Also: ${ks.map(([k, n]) => `${n}${o[k].txt === '✓' ? '' : ' ' + o[k].txt.toLowerCase()}`).join(', ')}</span>` : '';
+}
+async function tdMatrix(box, mk) {
+  if (!box) return; const S = await sysMap(mk); const { M, meta } = S;
+  const rows = Object.entries(M).filter(([, o]) => Object.keys(o).length >= 2).map(([sym, o]) => ({ sym, o, n: Object.keys(o).length, buy: Object.values(o).some((x) => x.lvl === 0), r: meta[sym] || {} }));
+  if (!rows.length) { box.innerHTML = ''; return; }
+  rows.sort((a, b) => (b.n - a.n) || (b.buy - a.buy) || ((SEC_O[a.r.sector_tag] ?? 4) - (SEC_O[b.r.sector_tag] ?? 4)) || (a.sym < b.sym ? -1 : 1));
+  const cols = S.cols.filter(([k]) => rows.some((x) => x.o[k]));
+  const cell = (x) => (!x ? '<td></td>' : `<td><span class="mxd ${x.lvl === 0 ? 'buy' : x.lvl === 1 ? 'on' : 'watch'}">${x.txt}</span></td>`);
+  const all = !!state.mxAll; const show = all ? rows : rows.slice(0, 12);
+  box.innerHTML = `<details class="td-risk td-track" open><summary><span><b>Stocks in 2+ systems or lists <span class="pill">${rows.length}</span></b>
+    <small>${esc(MKT[mk].name)} · one row per stock · tap a name for its chart</small></span></summary>
+    <div class="mxwrap"><table class="mxt"><thead><tr><th>Stock</th>${cols.map(([, n, d]) => `<th title="${esc(d)}">${n}</th>`).join('')}</tr></thead>
+    <tbody>${show.map((x) => `<tr><th><a href="#" data-mxs="${esc(x.sym)}">${esc(x.sym)}</a>${x.r.sector_tag ? `<small class="mxtag ${x.r.sector_tag}">${esc(SECTOR_TXT[x.r.sector_tag] || '').replace('Sector ', '')}</small>` : ''}</th>${cols.map(([k]) => cell(x.o[k])).join('')}</tr>`).join('')}</tbody></table></div>
+    ${rows.length > 12 ? `<button class="more" id="mxall">${all ? 'Show the top 12' : `Show all ${rows.length}`}</button>` : ''}
+    <p class="muted td-rs"><span class="mxd buy">Buy</span> signal now · <span class="mxd on">Open</span> the system's trade is still running · <span class="mxd on">✓</span> on the list · <span class="mxd watch">Near</span>/<span class="mxd watch">Setup</span> watch. Most lists first, then buy signals, then sector strength. Columns: ${cols.map(([, n, d]) => `${n} = ${d}`).join('; ')}. A stock in several lists was not consistently better in our tests, so this is for reading the overlap, not a ranking.</p></details>`;
+  const mb = box.querySelector('#mxall'); if (mb) mb.addEventListener('click', () => { state.mxAll = !all; tdMatrix(box, mk); });
+  box.querySelectorAll('[data-mxs]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(MKT[mk].tv + a.dataset.mxs), '_blank', 'noopener'); }));
+}
 async function tdGrowthMom(box) {
   if (!box) return; const D = await getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom'); if (!D || !D.picks) { box.innerHTML = ''; return; }
   const B = D.backtest || {}, M = D.market || {}, pc = (v) => (v == null ? '–' : `${v > 0 ? '+' : ''}${fmt(v, 0)}%`);
@@ -4548,7 +4598,7 @@ async function tdRender(el, beginner) {
     <div id="tdrisk"></div>
     ${MS.length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${MS.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${MS.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
-    ${mk === 'US' ? '<div id="tdpies"></div><div id="tdrsi2"></div>' : ''}${mk === 'NSE' ? '<div id="tdgm"></div>' : ''}<div id="tdheat"></div><div id="tdtrack"></div>
+    <div id="tdmx"></div>${mk === 'US' ? '<div id="tdpies"></div><div id="tdrsi2"></div>' : ''}${mk === 'NSE' ? '<div id="tdgm"></div>' : ''}<div id="tdheat"></div><div id="tdtrack"></div>
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   wire();
   state._tdEl = el; state._tdBg = beginner;
@@ -4559,7 +4609,7 @@ async function tdRender(el, beginner) {
   tdTopTiles($('#tdtop'), mk);
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (!beginner) alCard($('#tdal'));
-  tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } if (mk === 'NSE') tdGrowthMom($('#tdgm')); tdHeat($('#tdheat'), mk);
+  tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } if (mk === 'NSE') tdGrowthMom($('#tdgm')); tdMatrix($('#tdmx'), mk); tdHeat($('#tdheat'), mk);
 }
 /* Heating up (11 Nov 2026): industries whose 1-week pulse jumped well above last month's. Information only: strength by
    itself is not a buy signal (Building-only cut ATH returns from 17% to 7%; swapping weak holdings for new breakouts lost
