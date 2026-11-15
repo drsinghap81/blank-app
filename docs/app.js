@@ -2227,6 +2227,7 @@ async function loadATHWorld(el, mkSeg) {
     state.mcAll = { NSE: n, US: u, ASX: a, UK: k, IDX: await getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose').catch(() => null) };
   }
   state.athW = state.athW || { tab: 'all', q: '', all: true, d: {} }; state.ath = state.athW;
+  if (state.athTabNext) { state.ath.tab = state.athTabNext; state.athTabNext = null; }
   const g = (state.worldMC || [])[0]; state.athWAt = state.athWAt || new Date();
   $('#asof').textContent = `Month closes to ${g ? mLab(g.month) : 'last month'}${updTxt(g && g.generated)} · refreshed ${state.athWAt.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })}`;
   const tabs = [['all', 'All month closes', allMcRows().length], ['world', 'World stocks', worldRows().length], ['assets', 'Commodities & more', assetRows(true).length]];
@@ -2297,6 +2298,7 @@ async function loadATH() {
     state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'brk', q: '', all: false, at: new Date() };
   }
   state.ath = state.athC[mk];
+  if (state.athTabNext) { state.ath.tab = state.athTabNext; state.athTabNext = null; }
   if (state.ath.tab === 'td' || state.ath.tab === 'pulse') state.ath.tab = 'brk';
   const wireMk = () => wireAthMk(el);
   const { d } = state.ath;
@@ -2312,7 +2314,7 @@ async function loadATH() {
   const exits = T.filter((r) => r.status === 'exit next open').length;
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
-  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ...(d.week_close ? [['wclose', 'Week close', d.week_close.length], ['dclose', 'Day close', (d.day_close || []).length]] : []), ['tracked', 'Tracked signals', T.length],
+  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ...(d.week_close ? [['wclose', 'Week close', d.week_close.length], ['dclose', 'Day close', (d.day_close || []).length]] : []), ...(mk === 'NSE' ? [['gm', 'Growth + momentum', 25]] : []), ['tracked', 'Tracked signals', T.length],
     ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length]];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     <section class="summary">
@@ -3172,6 +3174,7 @@ const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` 
 function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   if (tab === 'pulse') { pulseView(); return; }
+  if (tab === 'gm') { $('#athlist').innerHTML = '<li><div id="athgm"></div></li>'; tdGrowthMom($('#athgm')).then(() => { const dd = document.querySelector('#athgm details'); if (dd) dd.open = true; }); return; }
   if (tab === 'all') {
     const W = all; const mo = ((state.mcAll && state.mcAll.NSE && state.mcAll.NSE.month_close || [])[0] || {}).month || ((state.worldMC || [])[0] || {}).month;
     const md = state.allMode || 'M';
@@ -4562,7 +4565,166 @@ async function tdPies(box) {
       try { localStorage.setItem('td.t212b', JSON.stringify(B)); } catch (e) { /* */ } tdPies(box); }); }
   { const c = box.querySelector('#t2bclr'); if (c) c.addEventListener('click', () => { if (!window.confirm('Stop tracking the breakout pie on this device?')) return; try { localStorage.removeItem('td.t212b'); } catch (e) { /* */ } tdPies(box); }); }
 }
-async function loadToday() { $('#title').textContent = 'Today'; return tdRender($('#view-today'), false); }
+async function loadToday() { $('#title').textContent = 'Today'; return state.todayV1 ? tdRender($('#view-today'), false) : tdRender2($('#view-today')); }
+
+/* ===================================================================== Today v2 (15 Nov 2026)
+   Consolidated landing (Amritpal): sells for what you hold, "in both" (a live system + a close list), then three sections
+   - Investment (monthly charts: ETFs, funds, indices), Momentum investing (monthly: Monthly ATH system + month closes,
+   growth + momentum, commodities/coins) and Trading (weekly/daily: Trend 9/21 + week/day cup closes, VCP, IPO cups,
+   patterns, RSI(2), Top Bottom). Only Momentum ATH and Trend 9/21 are act-on (tested); every other list is watch-only.
+   The old layout stays reachable: state.todayV1 = true (More menu) or /v1/. */
+const MKT_OPEN = { NSE: ['Asia/Kolkata', 9, 15, 'NSE', 6.25], US: ['America/New_York', 9, 30, 'NYSE', 6.5], ASX: ['Australia/Sydney', 10, 0, 'ASX', 6], UK: ['Europe/London', 8, 0, 'LSE', 8.5] };
+function mktClock(mk) {
+  const [tz, h, m, ex, len] = MKT_OPEN[mk]; const now = new Date();
+  const parts = (d) => Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23' }).formatToParts(d).map((x) => [x.type, x.value]));
+  const p = parts(now); const mins = (+p.hour) * 60 + (+p.minute); const openM = h * 60 + m, closeM = openM + len * 60;
+  const wk = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].includes(p.weekday);
+  let state_, wait;
+  if (wk && mins >= openM && mins < closeM) { state_ = 'open'; wait = closeM - mins; }
+  else { let add = 0; let wd = p.weekday; const order = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; let i = order.indexOf(wd);
+    if (wk && mins < openM) add = openM - mins; else { add = 24 * 60 - mins + openM; i = (i + 1) % 7; while (order[i] === 'Sat' || order[i] === 'Sun') { add += 24 * 60; i = (i + 1) % 7; } }
+    state_ = 'closed'; wait = add; }
+  const hh = Math.floor(wait / 60), mm = wait % 60; const txt = hh >= 24 ? `${Math.floor(hh / 24)}d ${hh % 24}h` : `${hh}h ${String(mm).padStart(2, '0')}m`;
+  const openLocal = new Date(now.getTime() + (state_ === 'open' ? -(mins - openM) : wait) * 60000);
+  return { open: state_ === 'open', txt, ex, at: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} ${tz.split('/')[1].replace('_', ' ')}`,
+    local: openLocal.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }), dayNum: new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' }),
+    month: new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) };
+}
+function t2Shares(entry, stop, mk) {
+  if (!entry || !stop || entry <= stop) return null;
+  const C = cap(mk) || 0; const r = (riskPct('ath') || 1) / 100; if (!C) return null;
+  const q = Math.floor(Math.min(r * C / (entry - stop), 0.2 * C / entry)); return q > 0 ? { q, val: q * entry } : null;
+}
+function t2Watch(rows) {
+  return `<div class="t2-watch">${rows.map((w, i) => `<button class="t2-wr" data-w="${i}"><span class="t2-n">${w.n ?? '–'}</span><span class="t2-wt"><b>${esc(w.name)}</b><small>${esc(w.sub || '')}</small></span><span aria-hidden="true">›</span></button>`).join('')}</div>`;
+}
+function goAth(mk, tab, world) {
+  state.athMkt = mk === 'WORLD' ? (state.athMkt || 'NSE') : mk; state.athWorld = !!world; state.athTabNext = tab;
+  try { if (mk !== 'WORLD') localStorage.setItem('td_athmkt', mk); } catch (e) { /* */ }
+  show('ath');
+}
+async function tdRender2(el) {
+  const mk = tdMk(); const MP = MAIN + MKT[mk].path;
+  el.innerHTML = '<p class="muted pad">Loading today…</p>';
+  const [P, at, sec, wl, fund, assets, idx, gm, vcp, ipo, rsi2, pat] = await Promise.all([
+    getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk), getJSON(MP + 'ath.json', mk === 'NSE' ? 'ath' : 'ath_' + mk),
+    getJSON(MP + 'sectors.json', mk === 'NSE' ? 'sectors' : 'sectors_' + mk), getJSON(MAIN + 'data/scan/world.json', 'world'),
+    state.fund || getJSON(MAIN + 'data/scan/funds.json', 'funds'), state.assets || getJSON(MAIN + 'data/scan/assets.json', 'assets'),
+    mk === 'NSE' ? getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose') : null, mk === 'NSE' ? getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom') : null,
+    mk === 'NSE' ? getJSON(MP + 'vcp.json', 'vcp') : null, getJSON(MP + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'US' ? getJSON(MP + 'rsi2.json', 'rsi2') : null,
+    getJSON(MP + 'patterns.json', 'pat_' + mk)]);
+  if (fund) state.fund = fund; if (assets) state.assets = assets;
+  const seg = `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
+  if (!P) { el.innerHTML = `<div class="td-wrap">${seg}<p class="empty">Today's plan appears after the evening scan.</p></div>`; el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); })); return; }
+  const S = await sysMap(mk);
+  const H = mk === 'NSE' ? tdHeldSet() : new Set(); const knowHeld = H.size > 0;
+  const Mz = (v, d = 0) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
+  const clk = mktClock(mk);
+  // ---- buys (act on): the existing ranked list, split by system; held stocks fold away
+  const al = lvAlloc(mk, P, null); const seen = new Set();
+  const rows = (P.top || []).concat(P.swing || []).filter((r) => { const b = bkOf(r); if (!ownK(b) || seen.has(r.symbol)) return false;
+    if (!((al[b] ?? 0) > 0)) return false; seen.add(r.symbol); return r.stop && (r.trigger || r.price) > r.stop; });
+  const evid = (r) => 3 * (r.aligned ? 1 : 0) + ((r.stock_rs || 0) > 0 ? 1 : 0) + ({ build: 1, hold: 1, fade: -1, weak: -1, bounce: -1 }[r.lane] || 0) + (r.group_rank && r.group_rank <= 16 ? 1 : 0);
+  const closeK = (sym) => { const o = S.M[sym] || {}; return ['mo', 'wk', 'dy'].filter((k) => o[k]); };
+  const both = (r) => closeK(r.symbol).length > 0;
+  const mom = rows.filter((r) => bkOf(r) === 'mom' && !H.has(r.symbol)).sort((a, b) => (both(b) - both(a)) || evid(b) - evid(a) || (b.score || 0) - (a.score || 0));
+  const trd = rows.filter((r) => bkOf(r) !== 'mom' && !H.has(r.symbol)).sort((a, b) => both(b) - both(a));
+  const topM = mom.slice(0, 6), restM = mom.slice(6), topT = trd.slice(0, 4), restT = trd.slice(4);
+  state._tdRows = [...topM, ...topT, ...restM, ...restT]; state._tdMkNow = mk; state._tdAsof = P.asof;
+  const bothRows = [...mom, ...trd].filter(both);
+  // ---- sells and adds: only what you hold
+  const sells = (P.exits || []).filter((e) => H.has(e.symbol));
+  const adds = ((at && at.tracked) || []).filter((r) => r.status === 'open' && r.add_status === 'armed' && H.has(r.symbol));
+  const nBuy = topM.length + topT.length;
+  // ---- market light
+  const wi = wl && wl.indices && wl.indices[MX_IDX[mk]];
+  const lead = sec && sec.indices ? [...new Set(Object.values(sec.industries || {}))].filter((k) => sec.indices[k] && sec.indices[k].tag === 'leading') : [];
+  const ok = wi ? wi.up : true;
+  const light = wi ? `<div class="t2-light ${ok ? 'ok' : 'warn'}"><i></i><div><b>${ok ? 'Market OK to buy' : 'Market below its 30-week average: be choosy'}</b>
+    <span>${esc(MX_BENCH[mk])} ${fmt(wi.close, 0, MKT[mk].loc)} · ${fmt(Math.abs(wi.from_high), 1)}% below its high · ${wi.up ? 'above' : 'below'} a ${wi.up ? 'rising ' : ''}30-week average.${lead.length ? ` ${lead.length} sectors leading: ${lead.map(secName).slice(0, 7).join(', ')}.` : ''}</span></div></div>` : '';
+  // ---- card for an act-on buy (existing plan numbers; shares from your capital and risk %)
+  const card = (r, i) => { const L = tdLabel(r); const e = r.trigger || r.price; const z = t2Shares(e, r.stop, mk); const ck = closeK(r.symbol);
+    const tg = r.aligned ? '<span class="t2-tag al">Aligned</span>' : ''; const bt = ck.length ? '<span class="t2-tag both">In both</span>' : '';
+    const also = Object.entries(S.M[r.symbol] || {}).filter(([k]) => k !== (bkOf(r) === 'mom' ? 'ath' : 't921')).map(([k, x]) => `<span class="t2-chip">${({ ath: 'Momentum', t921: '9/21', vcp: 'VCP', ipo: 'IPO cup', gm: 'G+M', mo: 'Month close', wk: 'Week cup close', dy: 'Day cup close' })[k]}${x.txt === '✓' ? '' : ' ' + x.txt.toLowerCase()}</span>`).join('');
+    return `<button class="t2-card${ck.length ? ' both' : ''}" data-i="${i}"><span class="t2-ch"><span><b>${esc(r.name || r.symbol)}</b><small>${esc(r.symbol)} · ${esc(L.t)}</small></span>${bt || tg}</span>
+      <span class="t2-line">${r.trigger ? 'Buy if price goes above' : 'Buy at about'} <b>${Mz(e, 2)}</b> · stop <b>${Mz(r.stop, 2)}</b>${z ? ` · <b>${z.q.toLocaleString(MKT[mk].loc)} sh</b> ≈ ${mk === 'NSE' ? lakh(z.val) : Mz(z.val)}` : ''}</span>
+      ${also ? `<span class="t2-chips">${also}</span>` : ''}</button>`; };
+  const idxOf = (r) => state._tdRows.indexOf(r);
+  // ---- watch: close lists as cards (see only)
+  const wdCards = [...((at && at.week_close) || []), ...((at && at.day_close) || [])].map((r) => ({ r, live: Object.keys(S.M[r.symbol] || {}).filter((k) => ['ath', 't921', 'vcp', 'ipo'].includes(k)) }))
+    .sort((a, b) => (b.live.length - a.live.length) || ((SEC_O[a.r.sector_tag] ?? 4) - (SEC_O[b.r.sector_tag] ?? 4)));
+  const wdCard = ({ r, live }) => `<div class="t2-wcard${live.length ? ' both' : ''}"><span class="t2-ch"><span><b>${esc(r.name || r.symbol)}</b><small>${esc(r.symbol)} · ${r.kind === 'W' ? 'week' : 'day'} to ${day(r.period)} closed ${pct(r.above_pct)} over its ${r.base}-${r.kind === 'W' ? 'wk' : 'day'} cup high ${Mz(r.old_ath, 2)} · cup ${fmt(Math.abs(r.depth * 100), 0)}%</small></span>${live.length ? '<span class="t2-tag both">In both</span>' : `<span class="t2-tag">${r.kind === 'W' ? 'Week' : 'Day'}</span>`}</span>
+    <span class="t2-line">${r.kind === 'W' ? 'Week' : 'Day'} high to watch <b>${Mz(r.high_p, 2)}</b> · ${r.ath ? 'no older high above' : `next resistance ${Mz(r.resistance, 2)} (${fmt(r.room_pct, 0)}% room)`} · measured move ${Mz(r.old_ath * (1 - r.depth), 2)}</span>
+    ${live.length ? `<span class="t2-chips">${live.map((k) => { const x = S.M[r.symbol][k]; return `<span class="t2-chip">${k === 'ath' ? 'Momentum ' + x.txt.toLowerCase() : k === 't921' ? '9/21 ' + x.txt.toLowerCase() : k === 'vcp' ? 'VCP setup' : 'IPO cup'}</span>`; }).join('')}<span class="t2-chip strong">Trade with that system's rules</span></span>` : ''}</div>`;
+  // investment first choice: ETF/fund/index month close above ATH (this market)
+  const fm = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[mk];
+  const invFirst = ((fund && fund.rows) || []).filter((r) => (r.market || 'IN') === fm && r.mclose).map((r) => ({ name: fundName(r), a: r.mclose, close: r.close }))
+    .concat(mk === 'NSE' ? ((idx && idx.rows) || []).map((r) => ({ name: r.index, a: r, close: r.close })) : []);
+  const invCard = (x) => `<div class="t2-wcard inv"><span class="t2-ch"><span><b>${esc(x.name)}</b><small>${mLab(x.a.month)} closed ${fmt(x.a.close_m, 2)} above its all-time high ${fmt(x.a.old_ath, 2)} (${mLab(x.a.ath_month)}) · ${baseTxt(x.a.base_months)} cup, fell ${fmt(Math.abs(x.a.depth * 100), 0)}%</small></span><span class="t2-tag inv">Watch first</span></span>
+    <span class="t2-line">${mLab(x.a.month).split(' ')[0]} high to watch <b>${x.a.high_m ? fmt(x.a.high_m, 2) : '–'}</b> · now ${fmt(x.close, 2)} · no tested system for ETFs yet</span></div>`;
+  const fundsMk = ((fund && fund.rows) || []).filter((r) => (r.market || 'IN') === fm);
+  const invRows = [
+    { n: fundsMk.filter((r) => r.ath && (r.ath.status === 'breakout' || r.ath.status === 'open')).length, name: 'ETFs & funds at a monthly ATH breakout', sub: `${fundsMk.filter((r) => r.ath && r.ath.status === 'near').length} more within 5% of the high`, go: () => goAth(mk, 'fund') },
+    { n: fundsMk.filter((r) => r.topup).length, name: 'In the top-up zone (20%+ below the high)', sub: 'Funds and ETFs for SIP top-ups', go: () => show('pf') },
+    ...(mk === 'NSE' ? [{ n: (idx && idx.rows || []).length, name: 'Index month close above ATH', sub: idx && idx.indices ? `nearest: ${idx.indices.filter((r) => r.below_pct >= 0 && !/G-SEC|BOND|RATE|ARBITRAGE|LIQUID/.test(r.index)).slice(0, 2).map((r) => `${r.index} ${fmt(r.below_pct, 1)}% below`).join(', ')}` : '', go: () => goAth('WORLD', 'all', true) },
+      { n: sec && sec.indices ? Object.values(sec.indices).filter((x) => x.shortlist).length : null, name: 'Index cups (sectors and themes)', sub: 'Near or at their highs, in an uptrend', go: () => goAth(mk, 'themes') }] : []),
+    { n: null, name: 'Wealth creation: ETF pie and rotation', sub: 'Monthly SIP plans in Portfolio', go: () => show('pf') }];
+  const momRows = [
+    { n: ((at && at.near) || []).length, name: 'Near trigger', sub: 'Momentum stocks within 5% of their trigger', go: () => goAth(mk, 'near') },
+    { n: ((at && at.month_close) || []).length, name: 'Month close above ATH', sub: ((at && at.month_close) || []).slice(0, 4).map((r) => r.symbol).join(', ') || 'none last month', go: () => goAth(mk, 'mclose') },
+    ...(mk === 'NSE' ? [{ n: gm ? gm.picks.length : null, name: 'Growth + momentum (monthly list)', sub: gm ? `Profit up 20%+, best 12-month price · list of ${day(gm.asof)}` : '', go: () => goAth(mk, 'gm') }] : []),
+    { n: ((assets && assets.rows) || []).filter((r) => r.mclose && /Metals|Energy|Agri|Crypto|rupees/.test(r.group)).length, name: 'Commodities & coins: month close above ATH', sub: 'Gold, oil, Bitcoin… with their distance from the high', go: () => goAth('WORLD', 'assets', true) },
+    { n: null, name: 'Other markets: month close above ATH', sub: 'US, UK, Australia, Japan, Taiwan, Europe, Korea, Canada', go: () => goAth('WORLD', 'all', true) }];
+  const trdRows = [
+    ...(mk === 'NSE' ? [{ n: vcp ? (vcp.rows || []).length : null, name: 'VCP setups', sub: 'Tightening bases, pivot buy points', go: () => show('trends') }] : []),
+    { n: ipo ? ((ipo.breakouts || []).filter((r) => r.status === 'open').length + (ipo.near || []).length) : null, name: 'IPO cups', sub: 'First base after listing', go: () => goAth(mk, 'ipo') },
+    { n: pat ? (pat.rows || []).filter((r) => r.kind === 'stock').length : null, name: 'Chart patterns', sub: 'Double bottoms, inverse H&S… (tested: watch only)', go: () => show('bot') },
+    ...(mk === 'NSE' ? [{ n: null, name: 'Top Bottom · Bank Nifty futures', sub: 'On pledged holdings · dry run until you switch', go: () => show('tb') }] : [])];
+  const tiles = `<div class="t2-tiles"><div class="t2-tile sell"><b>${knowHeld ? sells.length : '–'}</b><span>to sell</span></div><div class="t2-tile both"><b>${bothRows.length}</b><span>in both</span></div>
+    <div class="t2-tile buy"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div></div>`;
+  el.innerHTML = `<div class="td-wrap t2">
+    <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
+      <div class="t2-date"><div><b>${esc(clk.dayNum)}</b><span>${esc(clk.month)}</span></div>
+        <div class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small><b>${clk.txt}</b><small>${esc(clk.at)} · ${esc(clk.local)} your time</small></div></div>
+      ${tiles}
+      <small class="t2-sub">Plan from the ${day(P.asof)} close${updTxt(P.generated)} · “to sell” and “to add” count only what you hold${knowHeld ? '' : ' (add holdings in Portfolio or connect your server in Live)'}</small></div>
+    ${light}
+    <div class="t2-h"><h2>Sell at the open</h2><small>do these first</small></div>
+    <div class="t2-box">${!knowHeld ? '<p class="t2-empty">Your holdings are not known yet: add them in Portfolio, or connect your server in Live to read your Angel holdings.</p>'
+      : sells.length ? sells.map((e) => `<div class="t2-sell"><span><b>${esc(e.symbol)}</b><small>${esc(e.system === 'Monthly ATH' ? 'Momentum' : e.system)} · ${esc(e.why)}</small></span><span class="t2-red">Sell</span></div>`).join('')
+      : '<p class="t2-empty">No sells today. Nothing you hold has an exit signal.</p>'}</div>
+    ${bothRows.length ? `<div class="t2-strip"><b>In both: a live system and a close list</b><span>${bothRows.map((r) => `${esc(r.name || r.symbol)} (${bkOf(r) === 'mom' ? 'Momentum' : '9/21'} + ${closeK(r.symbol).map((k) => ({ mo: 'month close', wk: 'week cup close', dy: 'day cup close' })[k]).join(' + ')})`).join(' · ')}. Trade them with the live system's own entry, stop and exit.</span></div>` : ''}
+    <section class="t2-sec inv"><div class="t2-band"><span><b>Investment</b><small>ETFs, mutual funds, indices · hold for years</small></span><em>Monthly charts</em></div>
+      ${invFirst.length ? `<div class="t2-lbl"><b>Watch first · month closed above its all-time high</b><small>see only · no tested system yet</small></div>${invFirst.map(invCard).join('')}` : ''}
+      <div class="t2-lbl"><b>Watch</b><small>monthly charts</small></div>${t2Watch(invRows)}${mk === 'US' ? '<div id="tdpies"></div>' : ''}</section>
+    <section class="t2-sec mom"><div class="t2-band"><span><b>Momentum investing</b><small>Stocks, single commodities and coins at all-time highs</small></span><em>Monthly charts</em></div>
+      <div class="t2-lbl"><b>Act on · Monthly ATH system</b><small>21.5%/yr · worst −20% (2017–26, 1% risk)</small></div>
+      <div class="t2-list">${topM.map((r) => card(r, idxOf(r))).join('') || '<p class="t2-empty">No new Momentum buy today. Waiting is part of the system.</p>'}</div>
+      ${restM.length ? `<details class="t2-more"><summary>${restM.length} more Momentum setups (weaker rank)</summary><div class="t2-list">${restM.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
+      ${knowHeld && adds.length ? `<div class="t2-lbl"><b>Add to winners you hold</b><small>dip to the 30-week average held</small></div><div class="t2-adds">${adds.map((r) => `<span>${esc(r.symbol)} <b>&gt; ${Mz(r.add_level, 2)}</b></span>`).join('')}</div>` : ''}
+      <div class="t2-lbl"><b>Watch</b><small>monthly charts, no action</small></div>${t2Watch(momRows)}</section>
+    <section class="t2-sec trd"><div class="t2-band"><span><b>Trading</b><small>Swing trades held days to weeks</small></span><em>Weekly + daily charts</em></div>
+      <div class="t2-lbl"><b>Act on · Trend 9/21 system</b><small>24.2%/yr · worst −31% (2017–26)</small></div>
+      <div class="t2-list">${topT.map((r) => card(r, idxOf(r))).join('') || '<p class="t2-empty">No new 9/21 buy today.</p>'}</div>
+      ${restT.length ? `<details class="t2-more"><summary>${restT.length} more 9/21 setups</summary><div class="t2-list">${restT.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
+      ${wdCards.length ? `<div class="t2-lbl"><b>Watch · week and day cup closes</b><small>see only · in a live system first</small></div>${wdCards.map(wdCard).join('')}` : ''}
+      <div class="t2-lbl"><b>Watch</b><small>weekly and daily charts, no action</small></div>${t2Watch(trdRows)}${mk === 'US' ? '<div id="tdrsi2"></div>' : ''}</section>
+    <div id="tdmx"></div>
+    ${(P.missed || []).length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${P.missed.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
+      ${P.missed.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
+    <div class="t2-h"><h2>Is it working?</h2></div><div id="tdtrack"></div>
+    <p class="t2-row"><button class="lv-link" id="t2live">Review and send orders in Live ›</button> <button class="lv-link" id="t2old">Old Today layout</button></p>
+    <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
+  $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)} · refreshed ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); }));
+  el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
+  const W = [...el.querySelectorAll('.t2-sec')]; [invRows, momRows, trdRows].forEach((L, k) => W[k].querySelectorAll('.t2-wr').forEach((b) => b.addEventListener('click', () => L[+b.dataset.w].go())));
+  $('#t2live').addEventListener('click', () => show('live'));
+  $('#t2old').addEventListener('click', () => { state.todayV1 = true; tdRender(el, false); });
+  tdMatrix($('#tdmx'), mk); tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); }
+  clearTimeout(state._t2clk); state._t2clk = setTimeout(() => { if (state.view === 'today' && !state.todayV1) { const c = el.querySelector('.t2-clock b'); if (c) { const k = mktClock(mk); c.textContent = k.txt; } } }, 60000);
+}
+
 async function tdRender(el, beginner) {
   const mk = beginner ? 'NSE' : tdMk(); const MP = MAIN + MKT[mk].path; const tag = mk === 'NSE' ? '' : '_' + mk;
   el.innerHTML = '<p class="muted pad">Loading today…</p>';
