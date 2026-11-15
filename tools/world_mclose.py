@@ -79,16 +79,28 @@ def lst_sme():
 
 
 def lst_jp():
-    r = get("https://www.jpx.co.jp/english/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_e.xls")
-    if r is None:     # the file's path changes: find the link on the list page
-        pg = get("https://www.jpx.co.jp/english/markets/statistics-equities/misc/01.html")
-        m = re.search(r'href="([^"]+data_e\.xls)"', pg.text) if pg is not None else None
-        r = get("https://www.jpx.co.jp" + m.group(1)) if m else None
+    r = None
+    for u in ("https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xls",
+              "https://www.jpx.co.jp/english/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_e.xls"):
+        r = get(u)
+        if r is not None:
+            break
+    if r is None:     # the file's path changes: find the link on the list pages
+        for pgu in ("https://www.jpx.co.jp/markets/statistics-equities/misc/01.html", "https://www.jpx.co.jp/english/markets/statistics-equities/misc/01.html"):
+            pg = get(pgu); m = re.search(r'href="([^"]+\.xlsx?)"', pg.text) if pg is not None else None
+            if m:
+                r = get("https://www.jpx.co.jp" + m.group(1) if m.group(1).startswith("/") else m.group(1))
+                if r is not None:
+                    break
     if r is None:
         raise RuntimeError("JPX list unavailable")
-    d = pd.read_excel(io.BytesIO(r.content))
-    d = d[d["Section/Products"].astype(str).str.contains("Prime|Standard|Growth", regex=True) & d["Section/Products"].astype(str).str.contains("Domestic")]
-    return {f"{c}.T": (str(c), str(n)) for c, n in zip(d["Local Code"], d["Name (English)"])}
+    d = pd.read_excel(io.BytesIO(r.content)); cols = [str(c) for c in d.columns]
+    if "Local Code" in cols:
+        seg, code, name, ok = "Section/Products", "Local Code", "Name (English)", r"(Prime|Standard|Growth).*Domestic|Domestic.*(Prime|Standard|Growth)"
+    else:
+        seg, code, name, ok = "市場・商品区分", "コード", "銘柄名", r"(プライム|スタンダード|グロース).*内国株式"
+    d = d[d[seg].astype(str).str.contains(ok, regex=True)]
+    return {f"{c}.T": (str(c), str(n)) for c, n in zip(d[code], d[name])}
 
 
 def lst_hk():
@@ -226,7 +238,7 @@ def main():
                 liq[t] = val
         time.sleep(1)
     print(M, "liquid", len(liq), flush=True)
-    rows = []; ok = list(liq)
+    rows = []; ok = list(liq); n_hist = n_cur = 0
     india = M in ("BSE", "SME")
     if india:
         from adjust import fix_gaps
@@ -257,6 +269,7 @@ def main():
                     wc = col(dw, "Close", t) if dw is not None else None
                     w = wc.dropna() if wc is not None else pd.Series(dtype=float); w = w[w.index <= me]
                     last = float(c.iloc[-1])
+                n_hist += int(len(mc.dropna()) >= 14); n_cur += int(len(mc.dropna()) > 0 and mc.dropna().index[-1] == lm)
                 r = check(mc, w, lm)
                 if r:
                     sym, nm = L[t]
@@ -268,8 +281,8 @@ def main():
     rows.sort(key=lambda r: (-r["long_cup"], -r["base_months"]))
     os.makedirs("data/scan/world", exist_ok=True)
     json.dump(dict(market=M, name=NAME[M], month=str(lm), generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
-                   listed=len(L), liquid=len(liq), rows=rows), open(f"data/scan/world/{M}.json", "w"), separators=(",", ":"))
-    print(M, "month-close rows", len(rows), [r["symbol"] for r in rows[:15]])
+                   listed=len(L), liquid=len(liq), with_history=n_hist, with_last_month=n_cur, rows=rows), open(f"data/scan/world/{M}.json", "w"), separators=(",", ":"))
+    print(M, "history >= 14 months", n_hist, "last month present", n_cur, "month-close rows", len(rows), [r["symbol"] for r in rows[:15]])
 
 
 if __name__ == "__main__":

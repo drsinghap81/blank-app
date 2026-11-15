@@ -15,6 +15,7 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
         market: [BSE, SME, JP, HK, CA, EU, KR, TW]
     steps:
