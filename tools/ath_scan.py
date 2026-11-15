@@ -381,8 +381,13 @@ def main():
         MC["name"] = MC.symbol.map(name).fillna(""); MC["size"] = MC.symbol.map(size)
         if sec:
             t_ = [tag_for(s_, sec) for s_ in MC.symbol]
-            MC["industry"], MC["sector_tag"] = [x[0] for x in t_], [x[2] for x in t_]
-        MC = MC.sort_values(["long_cup", "main", "base_months"], ascending=False)
+            MC["industry"], MC["sector_index"], MC["sector_tag"] = [x[0] for x in t_], [x[1] for x in t_], [x[2] for x in t_]
+            ix_ = sec.get("indices") or {}
+            MC["sector_rs"] = [(ix_.get(x[1]) or {}).get("rs_6m") if x[1] else None for x in t_]
+        # 15 Nov 2026: strongest sectors first (leading > uptrend > mixed > weak > untagged), then sector RS, long cups, base
+        MC["_o"] = MC.get("sector_tag", pd.Series(index=MC.index, dtype=object)).map({"leading": 0, "uptrend": 1, "mixed": 2, "weak": 3}).fillna(4)
+        MC["_r"] = pd.to_numeric(MC.get("sector_rs", pd.Series(index=MC.index, dtype=float)), errors="coerce").fillna(-999)
+        MC = MC.sort_values(["_o", "_r", "long_cup", "base_months"], ascending=[True, False, False, False]).drop(columns=["_o", "_r"])
     keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set()) | (set(MC.symbol) if len(MC) else set())
     for f in os.listdir(CH):
         if f[:-5] not in keep:

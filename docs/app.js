@@ -3047,11 +3047,14 @@ function assetItem(r, i, L) {
 /* 15 Nov 2026: month-close check for stocks outside the main scans (tools/world_mclose.py) */
 const WORLD_MK = ['BSE', 'SME', 'JP', 'HK', 'CA', 'EU', 'KR', 'TW'];
 /* every month-close list in one place: India/US/Australia/UK stocks, ETFs & funds, world stocks, other assets */
+/* sector strength order: leading > uptrend > mixed > weak > untagged, then 6-month sector RS, long cups, base */
+const SEC_O = { leading: 0, uptrend: 1, mixed: 2, weak: 3 };
+const secSort = (a, b) => ((SEC_O[a.sector_tag] ?? 4) - (SEC_O[b.sector_tag] ?? 4)) || ((b.sector_rs ?? -999) - (a.sector_rs ?? -999)) || ((b.long_cup ? 1 : 0) - (a.long_cup ? 1 : 0)) || (b.base_months - a.base_months);
 function allMcRows() {
   const out = []; const q = ((state.ath && state.ath.q) || '').toLowerCase();
   const S = state.mcAll || {};
   [['NSE', 'India stocks', 'NSE:'], ['US', 'US stocks', ''], ['ASX', 'Australia stocks', 'ASX:'], ['UK', 'UK stocks', 'LSE:']].forEach(([m, g, tv]) => {
-    ((S[m] && S[m].month_close) || []).forEach((r) => out.push({ g, sym: r.symbol, name: r.name, a: r, cur: MKT[m].cur, close: r.close, tv: tv + r.symbol }));
+    ((S[m] && S[m].month_close) || []).slice().sort(secSort).forEach((r) => out.push({ g, sym: r.symbol, name: r.name, a: r, cur: MKT[m].cur, close: r.close, tv: tv + r.symbol, sec: r }));
   });
   ((S.IDX && S.IDX.rows) || []).forEach((r) => out.push({ g: 'India indices', sym: r.index, name: `data from ${String(r.since).slice(0, 4)}`, a: r, cur: '', close: r.close, tv: nseIdxTv(r.index) }));
   const FM = { IN: ['India ETFs & funds', 'NSE:', '₹'], US: ['US ETFs', '', '$'], AU: ['Australia ETFs', 'ASX:', 'A$'], UK: ['UK & Europe ETFs', '', ''] };
@@ -3065,7 +3068,7 @@ function allMcRows() {
 }
 function allMcItem(r, i, L) {
   const a = r.a; const sep = i === 0 || L[i - 1].g !== r.g ? `<li class="ixsep">${esc(r.g)}</li>` : '';
-  const chip = `<span class="chip">Closed ${pct(a.above_pct)} over ATH ${fmt(a.old_ath, 2, 'en-US')} (${mLab(a.ath_month)})</span>${a.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${a.base_months >= 24 ? 'new' : ''}">${baseTxt(a.base_months)}</span>`
+  const chip = (r.sec ? secChip(r.sec) + (r.sec.industry ? `<span class="chip">${esc(r.sec.industry)}</span>` : '') + rsChip('Sector RS', r.sec.sector_rs) : '') + `<span class="chip">Closed ${pct(a.above_pct)} over ATH ${fmt(a.old_ath, 2, 'en-US')} (${mLab(a.ath_month)})</span>${a.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${a.base_months >= 24 ? 'new' : ''}">${baseTxt(a.base_months)}</span>`
     + (a.depth != null ? `<span class="chip">fell ${fmt(Math.abs(a.depth * 100), 0)}% in base</span>` : '') + (a.sma_rising == null ? '' : `<span class="chip ${a.sma_rising ? 'open' : 'exit'}">${a.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>`);
   const sm = r.close && a.close_m ? r.close / a.close_m - 1 : null;
   return `${sep}<li class="row ${a.base_months >= 24 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.sym || r.name)}</div>${r.sym ? `<div class="co">${esc(r.name || '')}</div>` : ''}<div class="tags">${chip}</div></div><div></div>
@@ -3113,6 +3116,7 @@ function athRows() {
   if (tab === 'themes') return themeRows();
   let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : tab === 'mclose' ? (d.month_close || []) : (d.tracked || []);
   if (tab === 'brk') L = L.slice().sort((a, b) => (b.main - a.main) || (a.date < b.date ? 1 : -1));
+  if (tab === 'mclose') L = L.slice().sort(secSort);
   if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); }
   return L;
 }
@@ -3155,7 +3159,7 @@ function athList() {
   if (tab === 'pulse') { pulseView(); return; }
   if (tab === 'all') {
     const W = all; const mo = ((state.mcAll && state.mcAll.NSE && state.mcAll.NSE.month_close || [])[0] || {}).month || ((state.worldMC || [])[0] || {}).month;
-    $('#athlist').innerHTML = `<li class="muted pad">Every month-close list in one place${mo ? ` (${mLab(mo)})` : ''}: the last completed month CLOSED above the all-time high (highest price of earlier months, wicks included, as on TradingView) after a base of 1+ years. Long cups first in each list where marked. A month-end check, not an entry: in the India test, buying the next month's open after such a close made 5.4%/yr vs 21.5% for the live Breakouts rule. Tap a row for its TradingView chart.</li>`
+    $('#athlist').innerHTML = `<li class="muted pad">Every month-close list in one place${mo ? ` (${mLab(mo)})` : ''}: the last completed month CLOSED above the all-time high (highest price of earlier months, wicks included, as on TradingView) after a base of 1+ years. Within each market, strongest sectors first (leading, uptrend, mixed, weak; then 6-month sector RS). A month-end check, not an entry: in the India test, buying the next month's open after such a close made 5.4%/yr vs 21.5% for the live Breakouts rule. Tap a row for its TradingView chart.</li>`
       + (W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : '<li class="empty">Nothing closed last month above an all-time high at least a year old.</li>');
     $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv), '_blank', 'noopener'); }));
     return;
@@ -3212,7 +3216,7 @@ function athList() {
       const Lp = (state.ath.lp || {})[r.symbol]; const px = Lp ? Lp.price : r.close; const sm = px / r.close_m - 1;
       chip = `<span class="chip">Closed ${pct(r.above_pct)} over old ATH</span>` + chip;
       right = `<b>${fmt(px, 2, AL())}</b><span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(r.month).split(' ')[0]}</span>${hiGap(px, r)}`;
-      chip += secChip(r) + (r.size ? `<span class="chip">${esc(r.size)}</span>` : '');
+      chip = secChip(r) + rsChip('Sector RS', r.sector_rs) + chip + (r.size ? `<span class="chip">${esc(r.size)}</span>` : '');
       return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
         <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
     }
