@@ -61,6 +61,50 @@ def add_row(t, nm, grp, x):
     rows.append(r)
 
 
+import io, requests
+_FR = {}
+
+
+def fred(sid):
+    """Daily FRED series (H.10 noon exchange rates), cached."""
+    if sid not in _FR:
+        try:
+            r = requests.get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={sid}", timeout=30)
+            d = pd.read_csv(io.StringIO(r.text)); d.columns = ["Date", "v"]; d = d[pd.to_numeric(d.v, errors="coerce").notna()]
+            _FR[sid] = pd.Series(d.v.astype(float).values, index=pd.to_datetime(d.Date))
+        except Exception as e:  # noqa: BLE001
+            print("FRED fail", sid, str(e)[:60]); _FR[sid] = None
+    return _FR[sid]
+
+
+# 15 Nov 2026: Yahoo's FX history starts ~2003, so older highs were missed (USD/CAD 1.62 in 2002). Older history from the
+# Fed's daily rates (FRED); crosses from two legs. AED is pegged at 3.6725 per US$.
+FXF = {"USDCAD=X": ("DEXCAUS",), "USDINR=X": ("DEXINUS",), "USDJPY=X": ("DEXJPUS",), "EURUSD=X": ("DEXUSEU",), "GBPUSD=X": ("DEXUSUK",),
+       "AUDUSD=X": ("DEXUSAL",), "USDCHF=X": ("DEXSZUS",), "USDSGD=X": ("DEXSIUS",), "USDKRW=X": ("DEXKOUS",), "USDTWD=X": ("DEXTAUS",),
+       "USDBRL=X": ("DEXBZUS",), "USDMXN=X": ("DEXMXUS",), "USDZAR=X": ("DEXSFUS",), "USDCNY=X": ("DEXCHUS",), "NZDUSD=X": ("DEXUSNZ",),
+       "EURINR=X": ("DEXUSEU", "*", "DEXINUS"), "GBPINR=X": ("DEXUSUK", "*", "DEXINUS"), "JPYINR=X": ("DEXINUS", "/", "DEXJPUS"),
+       "AUDINR=X": ("DEXUSAL", "*", "DEXINUS"), "SGDINR=X": ("DEXINUS", "/", "DEXSIUS"), "AEDINR=X": ("DEXINUS", "/", 3.6725),
+       "EURGBP=X": ("DEXUSEU", "/", "DEXUSUK"), "EURJPY=X": ("DEXUSEU", "*", "DEXJPUS"), "GBPJPY=X": ("DEXUSUK", "*", "DEXJPUS"),
+       "AUDJPY=X": ("DEXUSAL", "*", "DEXJPUS"), "EURAUD=X": ("DEXUSEU", "/", "DEXUSAL"), "GBPAUD=X": ("DEXUSUK", "/", "DEXUSAL"),
+       "AUDNZD=X": ("DEXUSAL", "/", "DEXUSNZ")}
+
+
+def fx_hist(t):
+    spec = FXF.get(t)
+    if not spec:
+        return None
+    a = fred(spec[0])
+    if a is None or len(spec) == 1:
+        return a
+    b = spec[2] if isinstance(spec[2], float) else fred(spec[2])
+    if b is None:
+        return None
+    if isinstance(b, float):
+        return a / b if spec[1] == "/" else a * b
+    j = pd.concat([a, b], axis=1, join="inner").dropna()
+    return j.iloc[:, 0] * j.iloc[:, 1] if spec[1] == "*" else j.iloc[:, 0] / j.iloc[:, 1]
+
+
 for grp, D in A.items():
     for t, nm in D.items():
         x = None
@@ -77,10 +121,18 @@ for grp, D in A.items():
         x = x[["Open", "High", "Low", "Close"]].dropna(subset=["Close"]); x = x[x.Close > 0]
         if len(x) < 400:
             continue
+        if grp == "Currencies":
+            # Yahoo FX highs have bad spikes (USD/KRW 21,353): cap the day's high at 3% above its open/close
+            x = x.assign(High=np.minimum(x.High, np.maximum(x.Open, x.Close) * 1.03))
+            h = fx_hist(t)
+            if h is not None and len(h):
+                old = h[h.index < x.index[0]]
+                if len(old):
+                    x = pd.concat([pd.DataFrame({"Open": old, "High": old, "Low": old, "Close": old}), x])
+                    nm_from = str(old.index[0].date()); print(t, "history from", nm_from)
         RAW[t] = x
         add_row(t, nm, grp, x)
         time.sleep(0.5)
-import io, requests
 for sid, nm in FRED.items():
     try:
         r = requests.get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={sid}", timeout=30)
