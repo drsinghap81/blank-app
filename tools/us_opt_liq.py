@@ -36,7 +36,10 @@ for s in sorted(syms):
             if a_ > 0 and b > 0:
                 sp.append((a_ - b) / ((a_ + b) / 2) * 100)
         spr = round(max(sp), 1) if sp else None
-        g = "liquid" if spr is not None and spr <= 3 and oi >= 10000 else "fair" if spr is not None and spr <= 8 and oi >= 1000 else "thin"
+        if spr is None or spr > 40:     # weekend / stale quotes (bid 0 or absurd spread): grade on open interest alone
+            spr = None; g = "liquid" if oi >= 20000 else "fair" if oi >= 2000 else "thin"
+        else:
+            g = "liquid" if spr <= 3 and oi >= 10000 else "fair" if spr <= 8 and oi >= 1000 else "thin"
         out[s] = dict(grade=g, expiry=e, atm_spread_pct=spr, chain_oi=oi, chain_vol=vol, price=round(float(px), 2))
         time.sleep(0.5)
     except Exception as ex:  # noqa: BLE001

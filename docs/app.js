@@ -3417,7 +3417,7 @@ function athList() {
       const VEN = { NSE: 'NSE F&O', US: 'US options (check the chain in moomoo)', ASX: 'ASX options likely: check the ASX list', UK: 'ICE stock options likely: not in an ISA' }[mk];
       const ASX_OPT = new Set(['BHP', 'CBA', 'CSL', 'WBC', 'NAB', 'ANZ', 'RIO', 'FMG', 'WES', 'WOW', 'TLS', 'MQG', 'WDS', 'STO', 'TCL', 'QBE', 'NST', 'WTC', 'XRO', 'GMG', 'COL', 'ALL', 'S32', 'MIN', 'PLS', 'RMD', 'SUN', 'ORG', 'BXB', 'REA', 'IAG', 'EVN', 'LYC', 'NEM']);
       L.forEach((x) => { x.fno = isF(x); x.ven = VEN; if (mk === 'NSE' && x.fno && x.src === 'stock') { x.lot = F[x.sym]; x.oi = (state.fno.oi || {})[x.sym + '.NS']; }
-        if (mk === 'US' && x.fno) { const u = (state.usOpt || {})[x.sym]; x.liq = u ? { g: u.grade, txt: u.grade === 'none' ? 'no listed options' : `ATM spread ${u.atm_spread_pct ?? '–'}% · chain OI ${fmt(u.chain_oi, 0, 'en-US')} · ${day(u.expiry)} expiry` } : null; }
+        if (mk === 'US' && x.fno) { const u = (state.usOpt || {})[x.sym]; x.liq = u ? { g: u.grade, txt: u.grade === 'none' ? 'no listed options' : `${u.atm_spread_pct == null ? 'spread n/a (quotes stale), graded on OI' : `ATM spread ${u.atm_spread_pct}%`} · chain OI ${fmt(u.chain_oi, 0, 'en-US')} · ${day(u.expiry)} expiry` } : null; }
         if (mk === 'ASX' && x.src === 'stock') { x.fno = ASX_OPT.has(x.sym) || x.fno; x.liq = { g: ASX_OPT.has(x.sym) ? 'fair' : 'thin', txt: ASX_OPT.has(x.sym) ? 'large-cap ASX options: usually tradeable, check the spread' : 'ASX options here are usually thin' }; }
         if (mk === 'UK' && x.fno) x.liq = { g: 'thin', txt: 'ICE stock options are thin for retail; not in an ISA' }; });
       const nF = L.filter((x) => x.fno).length; const fo = state.shortFno !== false;
