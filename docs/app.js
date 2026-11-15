@@ -2409,11 +2409,16 @@ async function loadTrdWorld(el, mkSeg) {
     // deep futures markets (15 Nov 2026): the main contracts; the rest trade but with thinner books
     const DEEP = new Set(['GC=F', 'SI=F', 'CL=F', 'BZ=F', 'NG=F', 'HG=F', 'ZC=F', 'ZW=F', 'ZS=F', 'BTC-USD', 'ETH-USD', 'EURUSD=X', 'GBPUSD=X', 'USDJPY=X', 'AUDUSD=X', 'USDCAD=X', 'USDCHF=X', 'DX-Y.NYB',
       'USDINR=X', 'GC=F:INR', 'SI=F:INR', 'CL=F:INR', 'NG=F:INR', '^GSPC', '^NDX', '^DJI', '^RUT', '^NSEI', '^NSEBANK', '^GDAXI', '^FTSE', '^N225', '^HSI', '^STOXX50E']);
-    const L = ['wshort', 'dshort'].flatMap((k) => shortItems(A.filter((r) => r[k]).map((r) => ({ ...r[k], name: r.name, close: r.close, _key: r.key, _g: r.group === 'Crypto' ? 'Coins' : r.group, _ven: ven(r) })), '', (r) => tvOf(r._key), 'asset')
+    const allA = state.shortAllA === true;
+    const L = ['wshort', 'dshort'].flatMap((k) => shortItems(A.filter((r) => r[k] && (allA || (DEEP.has(r.key) && r.close >= 1))).map((r) => ({ ...r[k], name: r.name, close: r.close, _key: r.key, _g: r.group === 'Crypto' ? 'Coins' : r.group, _ven: ven(r) })), '', (r) => tvOf(r._key), 'asset')
       .map((x) => ({ ...x, fno: true, ven: x.z._ven, liq: DEEP.has(x.z._key) ? { g: 'liquid', txt: 'deep futures market' } : { g: 'fair', txt: 'futures trade, thinner book: check before using' }, g: `${x.z._g} · ${k === 'wshort' ? 'week' : 'day'}` }))).sort((a, b) => (a.g < b.g ? -1 : a.g > b.g ? 1 : 0));
     $('#asof').textContent = state.assets ? `Assets to ${day(A[0] && A[0].asof)}${updTxt(state.assets.generated)}` : '';
+    const nAll = A.filter((r) => r.wshort || r.dshort).length;
     el.innerHTML = `${mkSeg}<div class="card"><ul class="list flat" id="athlist"></ul></div>`;
-    if (!A.some((r) => 'wshort' in r)) $('#athlist').innerHTML = '<li class="empty">The short watch list for coins, commodities and currencies appears after the next asset scan.</li>'; else shortListRender($('#athlist'), L);
+    if (!A.some((r) => 'wshort' in r)) $('#athlist').innerHTML = '<li class="empty">The short watch list for coins, commodities and currencies appears after the next asset scan.</li>'; else {
+      shortListRender($('#athlist'), L, `<li><div class="seg" id="shaa" style="margin:6px 0"><button data-k="0" aria-selected="${!allA}">Liquid futures only (no penny coins)</button><button data-k="1" aria-selected="${allA}">All ${nAll}</button></div></li>`);
+      $('#athlist').querySelectorAll('#shaa button').forEach((b) => b.addEventListener('click', () => { state.shortAllA = b.dataset.k === '1'; loadATH(); }));
+    }
     wireAthMk(el); tradeStripWire(el); return;
   }
   const kind = state.athTabG.trd === 'dclose' ? 'dclose' : 'wclose';
@@ -3421,7 +3426,8 @@ function athList() {
       L.forEach((x) => { x.fno = isF(x); x.ven = VEN; if (mk === 'NSE' && x.fno && x.src === 'stock') { x.lot = F[x.sym]; x.oi = (state.fno.oi || {})[x.sym + '.NS']; }
         if (mk === 'US' && x.fno) { const u = (state.usOpt || {})[x.sym]; x.liq = u ? { g: u.grade, txt: u.grade === 'none' ? 'no listed options' : `${u.atm_spread_pct == null ? 'spread n/a (quotes stale), graded on OI' : `ATM spread ${u.atm_spread_pct}%`} · chain OI ${fmt(u.chain_oi, 0, 'en-US')} · ${day(u.expiry)} expiry` } : null; }
         if (mk === 'ASX' && x.src === 'stock') { x.fno = ASX_OPT.has(x.sym) || x.fno; x.liq = { g: ASX_OPT.has(x.sym) ? 'fair' : 'thin', txt: ASX_OPT.has(x.sym) ? 'large-cap ASX options: usually tradeable, check the spread' : 'ASX options here are usually thin' }; }
-        if (mk === 'UK' && x.fno) x.liq = { g: 'thin', txt: 'ICE stock options are thin for retail; not in an ISA' }; });
+        if (mk === 'UK' && x.fno) x.liq = { g: 'thin', txt: 'ICE stock options are thin for retail; not in an ISA' };
+        if (mk !== 'NSE' && x.liq && (x.liq.g === 'thin' || x.liq.g === 'none')) x.fno = false; });   // F&O only = tradeable derivatives, not thin ones
       const nF = L.filter((x) => x.fno).length; const fo = state.shortFno !== false;
       L2 = fo ? L.filter((x) => x.fno).map((x) => ({ ...x, g: x.g.replace('Week closes', 'F&O stocks · week').replace('Day closes', 'F&O stocks · day') })) : L;
       shortListRender($('#athlist'), L2, `<li><div class="seg" id="shfo" style="margin:6px 0"><button data-k="1" aria-selected="${fo}">F&O only ${mk !== 'NSE' || state.fno ? nF : '…'}</button><button data-k="0" aria-selected="${!fo}">All ${L.length}</button></div></li>`);

@@ -391,6 +391,9 @@ def main():
                     for L_ in (MCLOSE, WCLOSE, DCLOSE):
                         if L_ and L_[-1]["symbol"] == sym:
                             L_[-1]["low_price"] = True
+                    for L_ in (WSHORT, DSHORT):            # no penny stocks on the short watch (15 Nov 2026)
+                        if L_ and L_[-1]["symbol"] == sym:
+                            L_.pop()
                 if ev or nr:
                     rsd = stock_rs(sym, x.Close, SEC, BENCH)
                     for e_ in ev:
