@@ -2402,7 +2402,7 @@ function idxWdRows(kind) {
 /* Turtle 20/10 daily long, futures watch (16 Nov 2026). Tested 2010-26 on 22 markets: 24%/yr, -27% worst fall at 1% risk (with coins);
    ~12%, -33% without coins; ~2.5x average leverage. Buy-stop above the 20-day high, fixed stop entry - 2N, trailing stop = 10-day low,
    exit at the first hit (that is where profit is booked; no target). 1 unit, no adds. Sizing here; orders are yours. */
-function turSet() { let v = {}; try { v = JSON.parse(localStorage.getItem('td.tur') || '{}'); } catch (e) { /* */ } return { cur: v.cur || 'USD', acct: +v.acct || 10000, risk: +v.risk || 1, lotN: +v.lotN || 0, lotB: +v.lotB || 0 }; }
+function turSet() { let v = {}; try { v = JSON.parse(localStorage.getItem('td.tur') || '{}'); } catch (e) { /* */ } return { cur: v.cur || 'USD', acct: +v.acct || 10000, risk: +v.risk || 1, lotN: +v.lotN || 65, lotB: +v.lotB || 30 }; }   // NSE lots from Jan 2026 (65 / 30)
 function turSave(v) { try { localStorage.setItem('td.tur', JSON.stringify(v)); } catch (e) { /* */ } }
 function turSize(r, S, fx, N, px) {
   const usdinr = fx['USDINR=X'] || 85, audusd = fx['AUDUSD=X'] || 0.65;
@@ -2453,7 +2453,7 @@ async function loadTurtle(el) {
         <label>Account <select id="tcur">${['USD', 'AUD', 'INR'].map((c) => `<option ${S.cur === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
         <label><input id="tacct" type="number" inputmode="decimal" value="${S.acct}" style="width:110px"></label>
         <label>Risk % <input id="trisk" type="number" step="0.1" value="${S.risk}" style="width:64px"></label>
-        <label>Nifty lot <input id="tlotn" type="number" value="${S.lotN || ''}" placeholder="?" style="width:64px"></label>
+        <label>Nifty lot <input id="tlotn" type="number" value="${S.lotN || ''}" placeholder="65" style="width:64px"></label>
         <label>Bank Nifty lot <input id="tlotb" type="number" value="${S.lotB || ''}" placeholder="?" style="width:64px"></label></div>
       <p class="muted" style="font-size:12px;margin:6px 0 0">One unit risks ${S.risk}% of the account at the 2N stop. US markets are sized in CME micro contracts; check your broker's contract specs and margin.</p></div>
     <div class="card"><ul class="list flat">${R.map(row).join('')}</ul></div>`;
