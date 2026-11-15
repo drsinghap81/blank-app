@@ -2964,7 +2964,7 @@ function assetItem(r, i, L) {
   const chips = (m ? `<span class="chip new">Closed ${pct(m.above_pct)} over old ATH</span>${m.long_cup ? '<span class="chip new">Long cup</span>' : ''}` : '')
     + `<span class="chip">${esc(r.group)}</span><span class="chip ${r.base_months >= 24 ? 'new' : ''}">${r.base_months >= 12 ? baseTxt(r.base_months) : `high ${mLab(r.ath_month)}`}</span>`
     + (r.depth != null && r.base_months >= 12 ? `<span class="chip">fell ${fmt(Math.abs(r.depth * 100), 0)}% in base</span>` : '')
-    + `<span class="chip ${r.sma_rising ? 'open' : 'exit'}">${r.sma_rising ? 'Above rising 30-wk SMA' : 'No rising 30-wk SMA'}</span>`;
+    + (r.sma_rising == null ? `<span class="chip">monthly data to ${mLab(r.asof)}</span>` : `<span class="chip ${r.sma_rising ? 'open' : 'exit'}">${r.sma_rising ? 'Above rising 30-wk SMA' : 'No rising 30-wk SMA'}</span>`);
   const right = `<b>${n(r.close)}</b><span class="${r.below_ath_pct <= 0 ? 'up' : 'muted'}">${pct(-r.below_ath_pct)} vs ATH</span>`;
   return `${sep}<li class="row ${r._st === 0 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.name)}</div><div class="co">ATH close ${n(r.ath_close)} (${mLab(r.ath_month)})</div><div class="tags">${chips}</div></div><div></div><div class="num">${right}</div></li>`;
 }
@@ -3038,7 +3038,7 @@ function athList() {
     const A = all;
     $('#athlist').innerHTML = (state.assets ? `<li class="muted pad">Monthly closes to ${state.assets.month ? mLab(state.assets.month) : 'last month'} · Yahoo data · ${A.length} assets. Same month-close check as the stock list. Commodity prices are front-month futures (not roll-adjusted), so very old highs are approximate. "In rupees" = global price × US$/₹, close to MCX but without Indian import duty, which has changed over the years. Not tested as a trading system; information only.</li>` : '')
       + (A.length ? A.map((r, i) => assetItem(r, i, A)).join('') : '<li class="empty">The asset scan appears after its first run.</li>');
-    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => window.open(`https://finance.yahoo.com/quote/${encodeURIComponent(A[+el.dataset.i].key.split(':')[0])}`, '_blank', 'noopener')));
+    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => window.open(A[+el.dataset.i].key.startsWith('FRED:') ? `https://fred.stlouisfed.org/series/${A[+el.dataset.i].key.slice(5)}` : `https://finance.yahoo.com/quote/${encodeURIComponent(A[+el.dataset.i].key.split(':')[0])}`, '_blank', 'noopener')));
     return;
   }
   if (tab === 'fund') {

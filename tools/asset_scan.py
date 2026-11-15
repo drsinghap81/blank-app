@@ -14,8 +14,17 @@ A = {
     "Agriculture": {"ZC=F": "Corn", "ZW=F": "Wheat", "ZS=F": "Soybeans", "ZM=F": "Soybean meal", "ZL=F": "Soybean oil", "KC=F": "Coffee",
                     "CC=F": "Cocoa", "SB=F": "Sugar", "CT=F": "Cotton", "OJ=F": "Orange juice", "LE=F": "Live cattle", "HE=F": "Lean hogs"},
     "Currencies": {"DX-Y.NYB": "US dollar index", "USDINR=X": "US dollar in rupees", "EURUSD=X": "Euro in US$", "GBPUSD=X": "Pound in US$",
-                   "AUDUSD=X": "Australian dollar in US$", "USDJPY=X": "US dollar in yen", "USDCNY=X": "US dollar in yuan", "AUDINR=X": "Australian dollar in rupees"},
-    "Crypto": {"BTC-USD": "Bitcoin", "ETH-USD": "Ether", "SOL-USD": "Solana", "XRP-USD": "XRP"},
+                   "AUDUSD=X": "Australian dollar in US$", "USDJPY=X": "US dollar in yen", "USDCNY=X": "US dollar in yuan", "AUDINR=X": "Australian dollar in rupees",
+                   "EURINR=X": "Euro in rupees", "GBPINR=X": "Pound in rupees", "JPYINR=X": "Yen in rupees", "SGDINR=X": "Singapore dollar in rupees",
+                   "AEDINR=X": "UAE dirham in rupees", "NZDUSD=X": "NZ dollar in US$", "USDCAD=X": "US dollar in Canadian $", "USDCHF=X": "US dollar in Swiss franc",
+                   "USDSGD=X": "US dollar in Singapore $", "USDHKD=X": "US dollar in HK$", "USDKRW=X": "US dollar in won", "USDTWD=X": "US dollar in Taiwan $",
+                   "USDBRL=X": "US dollar in real", "USDMXN=X": "US dollar in peso", "USDZAR=X": "US dollar in rand", "USDTRY=X": "US dollar in lira",
+                   "EURGBP=X": "Euro in pounds", "EURJPY=X": "Euro in yen", "GBPJPY=X": "Pound in yen", "AUDJPY=X": "Australian dollar in yen",
+                   "EURAUD=X": "Euro in Australian $", "GBPAUD=X": "Pound in Australian $", "AUDNZD=X": "Australian $ in NZ $"},
+    "Crypto": {"BTC-USD": "Bitcoin", "ETH-USD": "Ether", "SOL-USD": "Solana", "XRP-USD": "XRP", "BNB-USD": "BNB", "ADA-USD": "Cardano",
+               "DOGE-USD": "Dogecoin", "TRX-USD": "Tron", "AVAX-USD": "Avalanche", "LINK-USD": "Chainlink", "DOT-USD": "Polkadot", "LTC-USD": "Litecoin",
+               "BCH-USD": "Bitcoin Cash", "XLM-USD": "Stellar", "SHIB-USD": "Shiba Inu", "TON11419-USD": "Toncoin", "HBAR-USD": "Hedera",
+               "SUI20947-USD": "Sui", "NEAR-USD": "NEAR", "UNI7083-USD": "Uniswap", "ATOM-USD": "Cosmos", "XMR-USD": "Monero", "ETC-USD": "Ethereum Classic"},
     "Bonds": {"^TNX": "US 10-year yield", "^TYX": "US 30-year yield", "^FVX": "US 5-year yield"},
     "World indices": {"^GSPC": "S&P 500", "^NDX": "Nasdaq 100", "^DJI": "Dow Jones", "^RUT": "Russell 2000", "^NSEI": "Nifty 50", "^BSESN": "Sensex",
                       "^NSEBANK": "Nifty Bank", "^AXJO": "ASX 200", "^FTSE": "FTSE 100", "^GDAXI": "DAX", "^FCHI": "CAC 40", "^STOXX50E": "Euro Stoxx 50",
@@ -23,6 +32,9 @@ A = {
 }
 INR = {"GC=F": "Gold in rupees", "SI=F": "Silver in rupees", "HG=F": "Copper in rupees", "ALI=F": "Aluminium in rupees",
        "CL=F": "Crude oil in rupees", "NG=F": "Natural gas in rupees"}   # ~MCX: global futures x US$/Rs (excludes Indian duties/premiums)
+# 10-year government bond yields, monthly (OECD via FRED); published with a lag of a month or two
+FRED = {"INDIRLTLT01STM": "India 10-year G-sec yield", "IRLTLT01GBM156N": "UK 10-year gilt yield", "IRLTLT01DEM156N": "Germany 10-year yield",
+        "IRLTLT01JPM156N": "Japan 10-year yield", "IRLTLT01AUM156N": "Australia 10-year yield", "IRLTLT01CAM156N": "Canada 10-year yield"}
 RAW = {}
 rows = []
 
@@ -67,6 +79,21 @@ for grp, D in A.items():
         RAW[t] = x
         add_row(t, nm, grp, x)
         time.sleep(0.5)
+import io, requests
+for sid, nm in FRED.items():
+    try:
+        r = requests.get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={sid}", timeout=30)
+        d = pd.read_csv(io.StringIO(r.text)); d.columns = ["Date", "v"]
+        d = d[pd.to_numeric(d.v, errors="coerce").notna()]
+        s = pd.Series(d.v.astype(float).values, index=pd.to_datetime(d.Date) + pd.offsets.MonthEnd(0))
+        x = pd.DataFrame({"Open": s, "High": s, "Low": s, "Close": s})
+        n0 = len(rows); add_row("FRED:" + sid, nm, "Bonds", x)
+        if len(rows) > n0:
+            rows[-1]["sma_rising"] = None; rows[-1]["monthly"] = True
+            if rows[-1]["mclose"]:
+                rows[-1]["mclose"]["sma_rising"] = None
+    except Exception as e:  # noqa: BLE001
+        print("FRED fail", sid, str(e)[:80])
 fx = RAW.get("USDINR=X")
 if fx is not None:
     f = fx.Close
