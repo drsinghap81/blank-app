@@ -52,11 +52,17 @@ def add_row(t, nm, grp, x):
     r = dict(key=t, name=nm, group=grp, close=float(x.Close.iloc[-1]), asof=str(x.index[-1].date()), first=str(x.index[0].date()),
              ath_close=old, ath_month=str(per[per <= lm][a]), base_months=int(len(done) - 1 - a), below_ath_pct=round((1 - float(x.Close.iloc[-1]) / old) * 100, 2),
              sma_rising=bool(len(sma.dropna()) > 5 and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5]), mclose=None)
+    coarse = x.Close.tail(250).nunique() < 60      # 15 Nov 2026: price on a coarse tick (Shiba Inu on Yahoo moves 0.000004 -> 0.000005): no level checks
+    r["coarse_ticks"] = bool(coarse)
     try:
+        if coarse:
+            raise ValueError("coarse ticks")
         r["wclose"], r["dclose"] = wd_closes(x, IX_WK_DEP, IX_DY_DEP) if grp == "World indices" else wd_closes(x)        # weekly / daily cup closes (watch only), 15 Nov 2026
     except Exception as e:  # noqa: BLE001
         print("wd fail", t, e); r["wclose"] = r["dclose"] = None
     try:   # reverse cup closes under a falling 30-week SMA (watch only)
+        if coarse:
+            raise ValueError("coarse ticks")
         r["wshort"], r["dshort"] = wd_short(x)
     except Exception as e:  # noqa: BLE001
         print("short fail", t, e); r["wshort"] = r["dshort"] = None

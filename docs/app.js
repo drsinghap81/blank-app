@@ -2292,16 +2292,17 @@ function wdListWire(root, L, kind) {
    old, 20% / 15%+ rally since; indices 10% / 8%), only under a falling 30-week SMA, room to the next older low >= the rally.
    Watch only: shorting these on F&O stocks lost money in the 2016-26 test (as did H&S / double / triple tops). Use it to avoid buying. */
 const SHORT_NOTE = '<b>Watch only, not a short system.</b> Support break: the week or day CLOSED below the nearest swing low (a 10% / 8%+ rally off it first; the break stays listed for 4 weeks / 5 days while price stays below), under a falling 30-week average. Next support = the next older low below. Shorting breakdowns of 52-week lows, reverse cups and H&S / double / triple tops all lost money on F&O stocks in 2016–26; only coins in bear years paid. Use it to avoid buying, not to short.';
+const pxf = (v) => (v == null ? '–' : Math.abs(v) >= 1000 ? fmt(v, 0, 'en-US') : Math.abs(v) >= 1 ? fmt(v, 2, 'en-US') : Number(v).toPrecision(4));   // tiny prices (coins) keep 4 significant digits
 function shortItems(rows, g, tvf, src = 'stock') { return rows.map((r) => ({ g, sym: r.symbol || '', name: r.symbol ? r.name : (r.index || r.name), z: r, close: r.close, tv: tvf(r), src, key: r._key || r.key, mk: AM() })); }
 function shortItemHtml(x, i, L) {
   const r = x.z; const wk = r.kind === 'WS'; const sp = i === 0 || L[i - 1].g !== x.g ? `<li class="ixsep">${esc(x.g)}</li>` : '';
-  const chips = (r.sector_tag ? secChip(r) : '') + `<span class="chip exit">Broke support ${fmt(r.old_low, 2, 'en-US')} (swing low of ${day(r.low_date)})${r.broke && r.broke !== r.period ? ` on ${day(r.broke)}` : ' this ' + (wk ? 'week' : 'day')} · now ${fmt(r.below_pct, 1)}% below</span>`
+  const chips = (r.sector_tag ? secChip(r) : '') + `<span class="chip exit">Broke support ${pxf(r.old_low)} (swing low of ${day(r.low_date)})${r.broke && r.broke !== r.period ? ` on ${day(r.broke)}` : ' this ' + (wk ? 'week' : 'day')} · now ${fmt(r.below_pct, 1)}% below</span>`
     + `<span class="chip">rallied ${fmt(r.rally * 100, 0)}% in between</span>${r.long_cup ? '<span class="chip new">Big base</span>' : ''}`
-    + `<span class="chip">${r.atl ? 'No older low below · new low' : `next support ${fmt(r.support, 2, 'en-US')} (${fmt(r.room_pct, 0)}% down)`}</span><span class="chip exit">Below a falling 30-wk SMA</span>`;
+    + `<span class="chip">${r.atl ? 'No older low below · new low' : `next support ${pxf(r.support)} (${fmt(r.room_pct, 0)}% down)`}</span><span class="chip exit">Below a falling 30-wk SMA</span>`;
   const g = r.low_p ? (x.close / r.low_p - 1) * 100 : null;
   const fo = x.fno ? `<span class="chip new">${x.lot ? `F&O · lot ${x.lot.toLocaleString('en-IN')} ≈ ${lakh(x.lot * x.close)}` : esc(x.ven || 'F&O')}</span>${x.liq ? `<span class="chip ${x.liq.g === 'liquid' ? 'open' : x.liq.g === 'thin' || x.liq.g === 'none' ? 'exit' : ''}">${x.liq.g === 'none' ? 'No options' : `${x.src === 'asset' ? 'Futures' : 'Options'} ${x.liq.g}`} · ${esc(x.liq.txt)}</span>` : ''}${x.oi && x.oi.opt_liq ? `<span class="chip ${x.oi.opt_liq === 'liquid' ? 'open' : x.oi.opt_liq === 'thin' ? 'exit' : ''}">Options ${x.oi.opt_liq} · ${fmt(x.oi.atm_trades, 0, 'en-IN')} trades near the money</span>` : ''}${x.oi ? `<span class="chip">OI: call wall ${fmt(x.oi.resistance, 0, 'en-IN')} · put wall ${fmt(x.oi.support, 0, 'en-IN')} · PCR ${fmt(x.oi.pcr, 2)}</span>` : ''}` : '';
   return `${sp}<li class="row" tabindex="0" data-j="${i}"><div><div class="sym">${esc(x.sym || x.name)}</div>${x.sym ? `<div class="co">${esc(x.name || '')}</div>` : ''}<div class="tags">${fo}${chips}</div></div><div></div>
-    <div class="num"><b>${fmt(x.close, x.close >= 1000 ? 0 : 2, 'en-US')}</b>${g == null ? '' : `<span class="muted">${g <= 0 ? `${fmt(-g, 1)}% below` : `${fmt(g, 1)}% above`} that ${wk ? 'week' : 'day'}'s low</span>`}</div></li>`;
+    <div class="num"><b>${pxf(x.close)}</b>${g == null ? '' : `<span class="muted">${g <= 0 ? `${fmt(-g, 1)}% below` : `${fmt(g, 1)}% above`} that ${wk ? 'week' : 'day'}'s low</span>`}</div></li>`;
 }
 /* Short watch panel (15 Nov 2026): price (weekly / daily) with the broken support, the next support and the 30-week SMA, plus RSI(14)
    with the 40 / 60 lines (downtrend: RSI tends to stall near 60). For information; the decision is the user's. */
@@ -2328,8 +2329,8 @@ async function shortData(x) {
 }
 async function shortSelect(x) {
   const r = x.z; const wk = r.kind === 'WS';
-  const f = [['Broken support', `${fmt(r.old_low, 2, 'en-US')} · swing low of ${day(r.low_date)}`], ['Broke', r.broke ? day(r.broke) : '–'], ['Now', `${fmt(r.below_pct, 1)}% below it`],
-    ['Rally off that low first', pct(r.rally * 100)], ['Next support below', r.atl ? 'none (new low)' : `${fmt(r.support, 2, 'en-US')} · ${fmt(r.room_pct, 0)}% down`], ['Trend', 'below a falling 30-week SMA']];
+  const f = [['Broken support', `${pxf(r.old_low)} · swing low of ${day(r.low_date)}`], ['Broke', r.broke ? day(r.broke) : '–'], ['Now', `${fmt(r.below_pct, 1)}% below it`],
+    ['Rally off that low first', pct(r.rally * 100)], ['Next support below', r.atl ? 'none (new low)' : `${pxf(r.support)} · ${fmt(r.room_pct, 0)}% down`], ['Trend', 'below a falling 30-week SMA']];
   if (x.liq) f.push([x.src === 'asset' ? 'Futures liquidity' : 'Option liquidity', `${x.liq.g === 'none' ? 'none' : x.liq.g} · ${esc(x.liq.txt)}`]);
   if (x.fno && x.lot) {
     const per = (a) => `₹${fmt(Math.abs(a) * x.lot, 0, 'en-IN')} a lot`;
@@ -2339,7 +2340,7 @@ async function shortSelect(x) {
     if (x.oi && x.oi.opt_liq) f.push(['Option liquidity (nearest expiry)', `${x.oi.opt_liq} · ${fmt(x.oi.atm_trades, 0, 'en-IN')} trades within 5% of the price in a day (liquid 10,000+, fair 3,000+) · ₹${fmt(x.oi.opt_value_cr, 0, 'en-IN')} cr notional`]);
     if (x.oi) f.push([`Options OI (${day(x.oi.date)}, expiry ${day(x.oi.expiry)})`, `call wall ${fmt(x.oi.resistance, 0, 'en-IN')}${x.oi.resistance_2 ? ` / ${fmt(x.oi.resistance_2, 0, 'en-IN')}` : ''} · put wall ${fmt(x.oi.support, 0, 'en-IN')}${x.oi.support_2 ? ` / ${fmt(x.oi.support_2, 0, 'en-IN')}` : ''} · PCR ${fmt(x.oi.pcr, 2)}`]);
   }
-  openPanel(`<div class="d-head no-push"><div><h2>${esc(x.sym || x.name)}</h2><div class="co">${esc(x.sym ? x.name || '' : x.g)}</div></div><div class="d-price"><b>${fmt(x.close, x.close >= 1000 ? 0 : 2, 'en-US')}</b></div></div>
+  openPanel(`<div class="d-head no-push"><div><h2>${esc(x.sym || x.name)}</h2><div class="co">${esc(x.sym ? x.name || '' : x.g)}</div></div><div class="d-price"><b>${pxf(x.close)}</b></div></div>
     <div class="status exit watch">Support break, ${wk ? 'weekly' : 'daily'}. Watch only: shorting breakdowns lost money in the 2016–26 tests; your call.</div>
     <div class="seg-row"><div class="seg small" id="shtf"><button data-tf="w" aria-selected="${wk}">Weekly + 30 SMA</button><button data-tf="d" aria-selected="${!wk}">Daily</button></div></div>
     <div class="chart" id="shc" style="height:280px"></div><p id="shrange" style="margin:4px 16px 0;font-size:13px"></p><div class="chart" id="shr" style="height:120px;margin-top:2px"></div>
@@ -2358,6 +2359,7 @@ async function shortSelect(x) {
     else s = priceSeries(ch, T.slice(k0).map((t, i) => ({ time: t, open: b.o[k0 + i], high: b.h[k0 + i], low: b.l[k0 + i], close: b.c[k0 + i] })), 'ath');
     if (isW) { const sm = smaArr(b.c, 30); const l = ch.addLineSeries({ color: C.e21, lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
       l.setData(T.slice(k0).map((t, i) => (sm[k0 + i] == null ? { time: t } : { time: t, value: sm[k0 + i] }))); }
+    if (x.close < 1) { const pr = Math.min(10, Math.max(4, 3 - Math.floor(Math.log10(x.close)))); s.applyOptions({ priceFormat: { type: 'price', precision: pr, minMove: Math.pow(10, -pr) } }); }
     s.createPriceLine({ price: r.old_low, color: C.fall || '#C0392B', lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'broken support' });
     if (r.support) s.createPriceLine({ price: r.support, color: C.slate || '#888', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'next support' });
     ch.timeScale().fitContent();
