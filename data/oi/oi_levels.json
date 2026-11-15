@@ -14,7 +14,11 @@
    "resistance": 1200.0,
    "resistance_oi": 143500,
    "resistance_2": 1240.0,
-   "pcr": 0.85
+   "pcr": 0.85,
+   "opt_value_cr": 321.94,
+   "atm_trades": 3021,
+   "atm_oi": 1307000,
+   "opt_liq": "liquid"
   },
   "ABB.NS": {
    "symbol": "ABB",
@@ -29,7 +33,11 @@
    "resistance": 7500.0,
    "resistance_oi": 260625,
    "resistance_2": 7200.0,
-   "pcr": 0.6
+   "pcr": 0.6,
+   "opt_value_cr": 9604.9,
+   "atm_trades": 44929,
+   "atm_oi": 1480500,
+   "opt_liq": "liquid"
   },
   "ABCAPITAL.NS": {
    "symbol": "ABCAPITAL",
@@ -44,7 +52,11 @@
    "resistance": 420.0,
    "resistance_oi": 1737550,
    "resistance_2": 415.0,
-   "pcr": 0.89
+   "pcr": 0.89,
+   "opt_value_cr": 1291.42,
+   "atm_trades": 11776,
+   "atm_oi": 13390450,
+   "opt_liq": "liquid"
   },
   "ADANIENSOL.NS": {
    "symbol": "ADANIENSOL",
@@ -59,7 +71,11 @@
    "resistance": 1520.0,
    "resistance_oi": 541350,
    "resistance_2": 1500.0,
-   "pcr": 0.69
+   "pcr": 0.69,
+   "opt_value_cr": 1699.07,
+   "atm_trades": 10892,
+   "atm_oi": 3200175,
+   "opt_liq": "liquid"
   },
   "ADANIENT.NS": {
    "symbol": "ADANIENT",
@@ -74,7 +90,11 @@
    "resistance": 2800.0,
    "resistance_oi": 934416,
    "resistance_2": 3000.0,
-   "pcr": 0.74
+   "pcr": 0.74,
+   "opt_value_cr": 4139.03,
+   "atm_trades": 22495,
+   "atm_oi": 5195526,
+   "opt_liq": "liquid"
   },
   "ADANIGREEN.NS": {
    "symbol": "ADANIGREEN",
@@ -89,7 +109,11 @@
    "resistance": 1460.0,
    "resistance_oi": 1105200,
    "resistance_2": 1500.0,
-   "pcr": 0.58
+   "pcr": 0.58,
+   "opt_value_cr": 2497.88,
+   "atm_trades": 13243,
+   "atm_oi": 5403000,
+   "opt_liq": "liquid"
   },
   "ADANIPORTS.NS": {
    "symbol": "ADANIPORTS",
@@ -104,7 +128,11 @@
    "resistance": 1960.0,
    "resistance_oi": 994650,
    "resistance_2": 2000.0,
-   "pcr": 0.69
+   "pcr": 0.69,
+   "opt_value_cr": 2190.88,
+   "atm_trades": 13552,
+   "atm_oi": 9280075,
+   "opt_liq": "liquid"
   },
   "ADANIPOWER.NS": {
    "symbol": "ADANIPOWER",
@@ -119,7 +147,11 @@
    "resistance": 210.0,
    "resistance_oi": 6883450,
    "resistance_2": 220.0,
-   "pcr": 0.73
+   "pcr": 0.73,
+   "opt_value_cr": 875.76,
+   "atm_trades": 5818,
+   "atm_oi": 33338050,
+   "opt_liq": "liquid"
   },
   "ALKEM.NS": {
    "symbol": "ALKEM",
@@ -134,7 +166,11 @@
    "resistance": 5200.0,
    "resistance_oi": 137125,
    "resistance_2": 5400.0,
-   "pcr": 0.42
+   "pcr": 0.42,
+   "opt_value_cr": 2911.29,
+   "atm_trades": 21183,
+   "atm_oi": 759250,
+   "opt_liq": "liquid"
   },
   "AMBER.NS": {
    "symbol": "AMBER",
@@ -149,7 +185,11 @@
    "resistance": 7000.0,
    "resistance_oi": 221600,
    "resistance_2": 6800.0,
-   "pcr": 1.02
+   "pcr": 1.02,
+   "opt_value_cr": 25266.96,
+   "atm_trades": 161342,
+   "atm_oi": 1107400,
+   "opt_liq": "liquid"
   },
   "AMBUJACEM.NS": {
    "symbol": "AMBUJACEM",
@@ -164,7 +204,11 @@
    "resistance": 400.0,
    "resistance_oi": 1753200,
    "resistance_2": 420.0,
-   "pcr": 0.58
+   "pcr": 0.58,
+   "opt_value_cr": 383.89,
+   "atm_trades": 4670,
+   "atm_oi": 7885200,
+   "opt_liq": "liquid"
   },
   "ANANDRATHI.NS": {
    "symbol": "ANANDRATHI",
@@ -179,7 +223,11 @@
    "resistance": 2500.0,
    "resistance_oi": 283750,
    "resistance_2": 2400.0,
-   "pcr": 1.1
+   "pcr": 1.1,
+   "opt_value_cr": 560.53,
+   "atm_trades": 4518,
+   "atm_oi": 1500000,
+   "opt_liq": "liquid"
   },
   "ANGELONE.NS": {
    "symbol": "ANGELONE",
@@ -194,7 +242,11 @@
    "resistance": 350.0,
    "resistance_oi": 7680000,
    "resistance_2": 360.0,
-   "pcr": 0.63
+   "pcr": 0.63,
+   "opt_value_cr": 6015.15,
+   "atm_trades": 36123,
+   "atm_oi": 20292500,
+   "opt_liq": "liquid"
   },
   "APLAPOLLO.NS": {
    "symbol": "APLAPOLLO",
@@ -209,7 +261,11 @@
    "resistance": 2300.0,
    "resistance_oi": 1114400,
    "resistance_2": 2260.0,
-   "pcr": 0.65
+   "pcr": 0.65,
+   "opt_value_cr": 4201.89,
+   "atm_trades": 36471,
+   "atm_oi": 5420800,
+   "opt_liq": "liquid"
   },
   "APOLLOHOSP.NS": {
    "symbol": "APOLLOHOSP",
@@ -224,7 +280,11 @@
    "resistance": 8600.0,
    "resistance_oi": 266625,
    "resistance_2": 9000.0,
-   "pcr": 0.57
+   "pcr": 0.57,
+   "opt_value_cr": 5207.09,
+   "atm_trades": 30012,
+   "atm_oi": 1897000,
+   "opt_liq": "liquid"
   },
   "ASHOKLEY.NS": {
    "symbol": "ASHOKLEY",
@@ -239,7 +299,11 @@
    "resistance": 180.0,
    "resistance_oi": 16995000,
    "resistance_2": 175.0,
-   "pcr": 0.67
+   "pcr": 0.67,
+   "opt_value_cr": 4083.78,
+   "atm_trades": 18892,
+   "atm_oi": 55040000,
+   "opt_liq": "liquid"
   },
   "ASIANPAINT.NS": {
    "symbol": "ASIANPAINT",
@@ -254,7 +318,11 @@
    "resistance": 2600.0,
    "resistance_oi": 553250,
    "resistance_2": 2560.0,
-   "pcr": 0.8
+   "pcr": 0.8,
+   "opt_value_cr": 3464.68,
+   "atm_trades": 34853,
+   "atm_oi": 4554750,
+   "opt_liq": "liquid"
   },
   "ASTRAL.NS": {
    "symbol": "ASTRAL",
@@ -269,7 +337,11 @@
    "resistance": 1400.0,
    "resistance_oi": 841075,
    "resistance_2": 1300.0,
-   "pcr": 0.9
+   "pcr": 0.9,
+   "opt_value_cr": 2047.52,
+   "atm_trades": 7997,
+   "atm_oi": 2970325,
+   "opt_liq": "liquid"
   },
   "ATHERENERG.NS": {
    "symbol": "ATHERENERG",
@@ -284,7 +356,11 @@
    "resistance": 2000.0,
    "resistance_oi": 309000,
    "resistance_2": 1960.0,
-   "pcr": 1.02
+   "pcr": 1.02,
+   "opt_value_cr": 2454.27,
+   "atm_trades": 18573,
+   "atm_oi": 1920375,
+   "opt_liq": "liquid"
   },
   "AUBANK.NS": {
    "symbol": "AUBANK",
@@ -299,7 +375,11 @@
    "resistance": 1000.0,
    "resistance_oi": 867000,
    "resistance_2": 980.0,
-   "pcr": 0.8
+   "pcr": 0.8,
+   "opt_value_cr": 1495.2,
+   "atm_trades": 15680,
+   "atm_oi": 6699500,
+   "opt_liq": "liquid"
   },
   "AUROPHARMA.NS": {
    "symbol": "AUROPHARMA",
@@ -314,7 +394,11 @@
    "resistance": 1840.0,
    "resistance_oi": 618200,
    "resistance_2": 1900.0,
-   "pcr": 0.6
+   "pcr": 0.6,
+   "opt_value_cr": 2591.95,
+   "atm_trades": 17142,
+   "atm_oi": 4019400,
+   "opt_liq": "liquid"
   },
   "AXISBANK.NS": {
    "symbol": "AXISBANK",
@@ -329,7 +413,11 @@
    "resistance": 1350.0,
    "resistance_oi": 2241250,
    "resistance_2": 1340.0,
-   "pcr": 0.87
+   "pcr": 0.87,
+   "opt_value_cr": 4884.39,
+   "atm_trades": 33855,
+   "atm_oi": 18841875,
+   "opt_liq": "liquid"
   },
   "BAJAJ-AUTO.NS": {
    "symbol": "BAJAJ-AUTO",
@@ -344,7 +432,11 @@
    "resistance": 11000.0,
    "resistance_oi": 246075,
    "resistance_2": 11200.0,
-   "pcr": 0.64
+   "pcr": 0.64,
+   "opt_value_cr": 3952.78,
+   "atm_trades": 30910,
+   "atm_oi": 1557900,
+   "opt_liq": "liquid"
   },
   "BAJAJFINSV.NS": {
    "symbol": "BAJAJFINSV",
@@ -359,7 +451,11 @@
    "resistance": 1880.0,
    "resistance_oi": 1072500,
    "resistance_2": 1900.0,
-   "pcr": 0.67
+   "pcr": 0.67,
+   "opt_value_cr": 1612.8,
+   "atm_trades": 16270,
+   "atm_oi": 5689500,
+   "opt_liq": "liquid"
   },
   "BAJFINANCE.NS": {
    "symbol": "BAJFINANCE",
@@ -374,7 +470,11 @@
    "resistance": 1120.0,
    "resistance_oi": 1698750,
    "resistance_2": 1200.0,
-   "pcr": 0.94
+   "pcr": 0.94,
+   "opt_value_cr": 7223.19,
+   "atm_trades": 50369,
+   "atm_oi": 15813000,
+   "opt_liq": "liquid"
   },
   "BANDHANBNK.NS": {
    "symbol": "BANDHANBNK",
@@ -389,7 +489,11 @@
    "resistance": 180.0,
    "resistance_oi": 5972400,
    "resistance_2": 175.0,
-   "pcr": 0.62
+   "pcr": 0.62,
+   "opt_value_cr": 1082.17,
+   "atm_trades": 8162,
+   "atm_oi": 28090800,
+   "opt_liq": "liquid"
   },
   "BANKBARODA.NS": {
    "symbol": "BANKBARODA",
@@ -404,7 +508,11 @@
    "resistance": 280.0,
    "resistance_oi": 3357900,
    "resistance_2": 275.0,
-   "pcr": 1.09
+   "pcr": 1.09,
+   "opt_value_cr": 1774.78,
+   "atm_trades": 9898,
+   "atm_oi": 29715075,
+   "opt_liq": "liquid"
   },
   "BANKINDIA.NS": {
    "symbol": "BANKINDIA",
@@ -419,7 +527,11 @@
    "resistance": 160.0,
    "resistance_oi": 5023200,
    "resistance_2": 155.0,
-   "pcr": 0.71
+   "pcr": 0.71,
+   "opt_value_cr": 1517.96,
+   "atm_trades": 10775,
+   "atm_oi": 17227600,
+   "opt_liq": "liquid"
   },
   "^NSEBANK": {
    "symbol": "BANKNIFTY",
@@ -434,7 +546,11 @@
    "resistance": 62000.0,
    "resistance_oi": 797190,
    "resistance_2": 65000.0,
-   "pcr": 1.24
+   "pcr": 1.24,
+   "opt_value_cr": 644325.91,
+   "atm_trades": 1818033,
+   "atm_oi": 17614770,
+   "opt_liq": "liquid"
   },
   "BDL.NS": {
    "symbol": "BDL",
@@ -449,7 +565,11 @@
    "resistance": 1200.0,
    "resistance_oi": 2034475,
    "resistance_2": 1100.0,
-   "pcr": 0.54
+   "pcr": 0.54,
+   "opt_value_cr": 2770.03,
+   "atm_trades": 22143,
+   "atm_oi": 4140350,
+   "opt_liq": "liquid"
   },
   "BEL.NS": {
    "symbol": "BEL",
@@ -464,7 +584,11 @@
    "resistance": 410.0,
    "resistance_oi": 6428175,
    "resistance_2": 420.0,
-   "pcr": 0.69
+   "pcr": 0.69,
+   "opt_value_cr": 3394.24,
+   "atm_trades": 28892,
+   "atm_oi": 36432975,
+   "opt_liq": "liquid"
   },
   "BHARATFORG.NS": {
    "symbol": "BHARATFORG",
@@ -479,7 +603,11 @@
    "resistance": 1800.0,
    "resistance_oi": 1270500,
    "resistance_2": 1840.0,
-   "pcr": 0.46
+   "pcr": 0.46,
+   "opt_value_cr": 2443.58,
+   "atm_trades": 13206,
+   "atm_oi": 5063000,
+   "opt_liq": "liquid"
   },
   "BHARTIARTL.NS": {
    "symbol": "BHARTIARTL",
@@ -494,7 +622,11 @@
    "resistance": 2120.0,
    "resistance_oi": 3736825,
    "resistance_2": 2200.0,
-   "pcr": 0.67
+   "pcr": 0.67,
+   "opt_value_cr": 15852.75,
+   "atm_trades": 94032,
+   "atm_oi": 24330925,
+   "opt_liq": "liquid"
   },
   "BHEL.NS": {
    "symbol": "BHEL",
@@ -509,7 +641,11 @@
    "resistance": 450.0,
    "resistance_oi": 6347250,
    "resistance_2": 440.0,
-   "pcr": 0.65
+   "pcr": 0.65,
+   "opt_value_cr": 5467.89,
+   "atm_trades": 23402,
+   "atm_oi": 28523250,
+   "opt_liq": "liquid"
   },
   "BIOCON.NS": {
    "symbol": "BIOCON",
@@ -524,7 +660,11 @@
    "resistance": 380.0,
    "resistance_oi": 5502500,
    "resistance_2": 370.0,
-   "pcr": 0.84
+   "pcr": 0.84,
+   "opt_value_cr": 1164.33,
+   "atm_trades": 6204,
+   "atm_oi": 23375000,
+   "opt_liq": "liquid"
   },
   "BLUESTARCO.NS": {
    "symbol": "BLUESTARCO",
@@ -539,7 +679,11 @@
    "resistance": 1600.0,
    "resistance_oi": 214175,
    "resistance_2": 1700.0,
-   "pcr": 0.62
+   "pcr": 0.62,
+   "opt_value_cr": 1174.5,
+   "atm_trades": 11382,
+   "atm_oi": 1015950,
+   "opt_liq": "liquid"
   },
   "BOSCHLTD.NS": {
    "symbol": "BOSCHLTD",
@@ -554,7 +698,11 @@
    "resistance": 55000.0,
    "resistance_oi": 44875,
    "resistance_2": 51000.0,
-   "pcr": 0.61
+   "pcr": 0.61,
+   "opt_value_cr": 3520.94,
+   "atm_trades": 9250,
+   "atm_oi": 211375,
+   "opt_liq": "liquid"
   },
   "BPCL.NS": {
    "symbol": "BPCL",
@@ -569,7 +717,11 @@
    "resistance": 330.0,
    "resistance_oi": 13509000,
    "resistance_2": 320.0,
-   "pcr": 0.47
+   "pcr": 0.47,
+   "opt_value_cr": 1390.46,
+   "atm_trades": 6987,
+   "atm_oi": 12762450,
+   "opt_liq": "liquid"
   },
   "BRITANNIA.NS": {
    "symbol": "BRITANNIA",
@@ -584,7 +736,11 @@
    "resistance": 5000.0,
    "resistance_oi": 263000,
    "resistance_2": 5100.0,
-   "pcr": 0.51
+   "pcr": 0.51,
+   "opt_value_cr": 1207.98,
+   "atm_trades": 8555,
+   "atm_oi": 932125,
+   "opt_liq": "liquid"
   },
   "BSE.NS": {
    "symbol": "BSE",
@@ -599,7 +755,11 @@
    "resistance": 4000.0,
    "resistance_oi": 1082400,
    "resistance_2": 3950.0,
-   "pcr": 0.89
+   "pcr": 0.89,
+   "opt_value_cr": 8575.3,
+   "atm_trades": 64781,
+   "atm_oi": 5241400,
+   "opt_liq": "liquid"
   },
   "CAMS.NS": {
    "symbol": "CAMS",
@@ -614,7 +774,11 @@
    "resistance": 800.0,
    "resistance_oi": 1033725,
    "resistance_2": 750.0,
-   "pcr": 0.57
+   "pcr": 0.57,
+   "opt_value_cr": 948.34,
+   "atm_trades": 8694,
+   "atm_oi": 4078800,
+   "opt_liq": "liquid"
   },
   "CANBK.NS": {
    "symbol": "CANBK",
@@ -629,7 +793,11 @@
    "resistance": 135.0,
    "resistance_oi": 10192500,
    "resistance_2": 140.0,
-   "pcr": 0.87
+   "pcr": 0.87,
+   "opt_value_cr": 2439.39,
+   "atm_trades": 13308,
+   "atm_oi": 68161500,
+   "opt_liq": "liquid"
   },
   "CDSL.NS": {
    "symbol": "CDSL",
@@ -644,7 +812,11 @@
    "resistance": 1500.0,
    "resistance_oi": 822225,
    "resistance_2": 1480.0,
-   "pcr": 0.85
+   "pcr": 0.85,
+   "opt_value_cr": 4294.2,
+   "atm_trades": 33977,
+   "atm_oi": 5826350,
+   "opt_liq": "liquid"
   },
   "CGPOWER.NS": {
    "symbol": "CGPOWER",
@@ -659,7 +831,11 @@
    "resistance": 900.0,
    "resistance_oi": 3392350,
    "resistance_2": 870.0,
-   "pcr": 0.77
+   "pcr": 0.77,
+   "opt_value_cr": 3526.96,
+   "atm_trades": 19636,
+   "atm_oi": 8811950,
+   "opt_liq": "liquid"
   },
   "CHOLAFIN.NS": {
    "symbol": "CHOLAFIN",
@@ -674,7 +850,11 @@
    "resistance": 1880.0,
    "resistance_oi": 281875,
    "resistance_2": 1860.0,
-   "pcr": 1.1
+   "pcr": 1.1,
+   "opt_value_cr": 1825.64,
+   "atm_trades": 11310,
+   "atm_oi": 2941875,
+   "opt_liq": "liquid"
   },
   "CIPLA.NS": {
    "symbol": "CIPLA",
@@ -689,7 +869,11 @@
    "resistance": 1400.0,
    "resistance_oi": 774350,
    "resistance_2": 1480.0,
-   "pcr": 0.75
+   "pcr": 0.75,
+   "opt_value_cr": 1123.0,
+   "atm_trades": 12908,
+   "atm_oi": 4529650,
+   "opt_liq": "liquid"
   },
   "COALINDIA.NS": {
    "symbol": "COALINDIA",
@@ -704,7 +888,11 @@
    "resistance": 410.0,
    "resistance_oi": 3946050,
    "resistance_2": 419.75,
-   "pcr": 0.61
+   "pcr": 0.61,
+   "opt_value_cr": 1413.14,
+   "atm_trades": 15918,
+   "atm_oi": 36397350,
+   "opt_liq": "liquid"
   },
   "COCHINSHIP.NS": {
    "symbol": "COCHINSHIP",
@@ -719,7 +907,11 @@
    "resistance": 1200.0,
    "resistance_oi": 1285200,
    "resistance_2": 1300.0,
-   "pcr": 0.44
+   "pcr": 0.44,
+   "opt_value_cr": 898.12,
+   "atm_trades": 6487,
+   "atm_oi": 4210000,
+   "opt_liq": "liquid"
   },
   "COFORGE.NS": {
    "symbol": "COFORGE",
@@ -734,7 +926,11 @@
    "resistance": 2100.0,
    "resistance_oi": 1534725,
    "resistance_2": 2200.0,
-   "pcr": 0.64
+   "pcr": 0.64,
+   "opt_value_cr": 3272.63,
+   "atm_trades": 20635,
+   "atm_oi": 7590975,
+   "opt_liq": "liquid"
   },
   "COLPAL.NS": {
    "symbol": "COLPAL",
@@ -749,7 +945,11 @@
    "resistance": 1800.0,
    "resistance_oi": 352000,
    "resistance_2": 1900.0,
-   "pcr": 0.91
+   "pcr": 0.91,
+   "opt_value_cr": 340.88,
+   "atm_trades": 2596,
+   "atm_oi": 1331550,
+   "opt_liq": "liquid"
   },
   "CONCOR.NS": {
    "symbol": "CONCOR",
@@ -764,7 +964,11 @@
    "resistance": 450.0,
    "resistance_oi": 1117500,
    "resistance_2": 460.0,
-   "pcr": 0.64
+   "pcr": 0.64,
+   "opt_value_cr": 429.39,
+   "atm_trades": 3995,
+   "atm_oi": 8646250,
+   "opt_liq": "liquid"
   },
   "COROMANDEL.NS": {
    "symbol": "COROMANDEL",
@@ -779,7 +983,11 @@
    "resistance": 2000.0,
    "resistance_oi": 148800,
    "resistance_2": 2240.0,
-   "pcr": 0.57
+   "pcr": 0.57,
+   "opt_value_cr": 449.8,
+   "atm_trades": 3083,
+   "atm_oi": 706200,
+   "opt_liq": "liquid"
   },
   "CROMPTON.NS": {
    "symbol": "CROMPTON",
@@ -794,7 +1002,11 @@
    "resistance": 220.0,
    "resistance_oi": 3280900,
    "resistance_2": 230.0,
-   "pcr": 0.71
+   "pcr": 0.71,
+   "opt_value_cr": 381.37,
+   "atm_trades": 4255,
+   "atm_oi": 13613800,
+   "opt_liq": "liquid"
   },
   "CUB.NS": {
    "symbol": "CUB",
@@ -809,7 +1021,11 @@
    "resistance": 240.0,
    "resistance_oi": 802125,
    "resistance_2": 250.0,
-   "pcr": 0.56
+   "pcr": 0.56,
+   "opt_value_cr": 116.65,
+   "atm_trades": 1086,
+   "atm_oi": 2636550,
+   "opt_liq": "liquid"
   },
   "CUMMINSIND.NS": {
    "symbol": "CUMMINSIND",
@@ -824,7 +1040,11 @@
    "resistance": 4800.0,
    "resistance_oi": 457600,
    "resistance_2": 4500.0,
-   "pcr": 0.76
+   "pcr": 0.76,
+   "opt_value_cr": 6714.64,
+   "atm_trades": 65993,
+   "atm_oi": 2212800,
+   "opt_liq": "liquid"
   },
   "DABUR.NS": {
    "symbol": "DABUR",
@@ -839,7 +1059,11 @@
    "resistance": 400.0,
    "resistance_oi": 3303750,
    "resistance_2": 390.0,
-   "pcr": 0.58
+   "pcr": 0.58,
+   "opt_value_cr": 677.27,
+   "atm_trades": 5034,
+   "atm_oi": 8978750,
+   "opt_liq": "liquid"
   },
   "DATAPATTNS.NS": {
    "symbol": "DATAPATTNS",
@@ -854,7 +1078,11 @@
    "resistance": 4300.0,
    "resistance_oi": 97250,
    "resistance_2": 4800.0,
-   "pcr": 0.64
+   "pcr": 0.64,
+   "opt_value_cr": 1101.21,
+   "atm_trades": 8852,
+   "atm_oi": 371875,
+   "opt_liq": "liquid"
   },
   "DELHIVERY.NS": {
    "symbol": "DELHIVERY",
@@ -869,7 +1097,11 @@
    "resistance": 460.0,
    "resistance_oi": 991850,
    "resistance_2": 440.0,
-   "pcr": 0.67
+   "pcr": 0.67,
+   "opt_value_cr": 407.68,
+   "atm_trades": 2951,
+   "atm_oi": 9107175,
+   "opt_liq": "liquid"
   },
   "DIVISLAB.NS": {
    "symbol": "DIVISLAB",
@@ -884,7 +1116,11 @@
    "resistance": 12000.0,
    "resistance_oi": 552700,
    "resistance_2": 11500.0,
-   "pcr": 0.7
+   "pcr": 0.7,
+   "opt_value_cr": 12603.63,
+   "atm_trades": 64977,
+   "atm_oi": 2431000,
+   "opt_liq": "liquid"
   },
   "DIXON.NS": {
    "symbol": "DIXON",
@@ -899,7 +1135,11 @@
    "resistance": 13000.0,
    "resistance_oi": 233500,
    "resistance_2": 14000.0,
-   "pcr": 1.03
+   "pcr": 1.03,
+   "opt_value_cr": 4681.47,
+   "atm_trades": 28099,
+   "atm_oi": 970100,
+   "opt_liq": "liquid"
   },
   "DLF.NS": {
    "symbol": "DLF",
@@ -914,7 +1154,11 @@
    "resistance": 760.0,
    "resistance_oi": 975650,
    "resistance_2": 780.0,
-   "pcr": 0.91
+   "pcr": 0.91,
+   "opt_value_cr": 2259.21,
+   "atm_trades": 18652,
+   "atm_oi": 7704500,
+   "opt_liq": "liquid"
   },
   "DMART.NS": {
    "symbol": "DMART",
@@ -929,7 +1173,11 @@
    "resistance": 3500.0,
    "resistance_oi": 335850,
    "resistance_2": 3600.0,
-   "pcr": 0.6
+   "pcr": 0.6,
+   "opt_value_cr": 774.26,
+   "atm_trades": 8697,
+   "atm_oi": 1539000,
+   "opt_liq": "liquid"
   },
   "DRREDDY.NS": {
    "symbol": "DRREDDY",
@@ -944,7 +1192,11 @@
    "resistance": 1400.0,
    "resistance_oi": 1293750,
    "resistance_2": 1380.0,
-   "pcr": 0.76
+   "pcr": 0.76,
+   "opt_value_cr": 3464.91,
+   "atm_trades": 25265,
+   "atm_oi": 9303750,
+   "opt_liq": "liquid"
   },
   "EICHERMOT.NS": {
    "symbol": "EICHERMOT",
@@ -959,7 +1211,11 @@
    "resistance": 8000.0,
    "resistance_oi": 486600,
    "resistance_2": 7800.0,
-   "pcr": 0.62
+   "pcr": 0.62,
+   "opt_value_cr": 9603.31,
+   "atm_trades": 65947,
+   "atm_oi": 2153500,
+   "opt_liq": "liquid"
   },
   "ENRIN.NS": {
    "symbol": "ENRIN",
@@ -974,7 +1230,11 @@
    "resistance": 3200.0,
    "resistance_oi": 120400,
    "resistance_2": 3400.0,
-   "pcr": 0.48
+   "pcr": 0.48,
+   "opt_value_cr": 2802.19,
+   "atm_trades": 23918,
+   "atm_oi": 404775,
+   "opt_liq": "liquid"
   },
   "ETERNAL.NS": {
    "symbol": "ETERNAL",
@@ -989,7 +1249,11 @@
    "resistance": 370.0,
    "resistance_oi": 6930650,
    "resistance_2": 400.0,
-   "pcr": 1.0
+   "pcr": 1.0,
+   "opt_value_cr": 2886.84,
+   "atm_trades": 16035,
+   "atm_oi": 48609125,
+   "opt_liq": "liquid"
   },
   "FEDERALBNK.NS": {
    "symbol": "FEDERALBNK",
@@ -1004,7 +1268,11 @@
    "resistance": 370.0,
    "resistance_oi": 3330000,
    "resistance_2": 365.0,
-   "pcr": 0.66
+   "pcr": 0.66,
+   "opt_value_cr": 2218.54,
+   "atm_trades": 10404,
+   "atm_oi": 23815000,
+   "opt_liq": "liquid"
   },
   "NIFTY_FIN_SERVICE.NS": {
    "symbol": "FINNIFTY",
@@ -1019,7 +1287,11 @@
    "resistance": 28500.0,
    "resistance_oi": 93060,
    "resistance_2": 29000.0,
-   "pcr": 1.16
+   "pcr": 1.16,
+   "opt_value_cr": 8283.05,
+   "atm_trades": 29299,
+   "atm_oi": 819600,
+   "opt_liq": "liquid"
   },
   "FORCEMOT.NS": {
    "symbol": "FORCEMOT",
@@ -1034,7 +1306,11 @@
    "resistance": 20000.0,
    "resistance_oi": 43700,
    "resistance_2": 21000.0,
-   "pcr": 0.77
+   "pcr": 0.77,
+   "opt_value_cr": 736.01,
+   "atm_trades": 3040,
+   "atm_oi": 112150,
+   "opt_liq": "liquid"
   },
   "FORTIS.NS": {
    "symbol": "FORTIS",
@@ -1049,7 +1325,11 @@
    "resistance": 800.0,
    "resistance_oi": 746325,
    "resistance_2": 820.0,
-   "pcr": 0.5
+   "pcr": 0.5,
+   "opt_value_cr": 541.37,
+   "atm_trades": 5011,
+   "atm_oi": 3756425,
+   "opt_liq": "liquid"
   },
   "GAIL.NS": {
    "symbol": "GAIL",
@@ -1064,7 +1344,11 @@
    "resistance": 190.0,
    "resistance_oi": 3567750,
    "resistance_2": 200.0,
-   "pcr": 1.02
+   "pcr": 1.02,
+   "opt_value_cr": 653.37,
+   "atm_trades": 5622,
+   "atm_oi": 20746200,
+   "opt_liq": "liquid"
   },
   "GLENMARK.NS": {
    "symbol": "GLENMARK",
@@ -1079,7 +1363,11 @@
    "resistance": 2700.0,
    "resistance_oi": 400125,
    "resistance_2": 2740.0,
-   "pcr": 0.77
+   "pcr": 0.77,
+   "opt_value_cr": 999.69,
+   "atm_trades": 6168,
+   "atm_oi": 2450625,
+   "opt_liq": "liquid"
   },
   "GMRAIRPORT.NS": {
    "symbol": "GMRAIRPORT",
@@ -1094,7 +1382,11 @@
    "resistance": 100.0,
    "resistance_oi": 5217300,
    "resistance_2": 105.0,
-   "pcr": 0.85
+   "pcr": 0.85,
+   "opt_value_cr": 264.1,
+   "atm_trades": 2055,
+   "atm_oi": 27474525,
+   "opt_liq": "liquid"
   },
   "GODFRYPHLP.NS": {
    "symbol": "GODFRYPHLP",
@@ -1109,7 +1401,11 @@
    "resistance": 1900.0,
    "resistance_oi": 254100,
    "resistance_2": 2000.0,
-   "pcr": 0.51
+   "pcr": 0.51,
+   "opt_value_cr": 309.9,
+   "atm_trades": 2399,
+   "atm_oi": 816475,
+   "opt_liq": "liquid"
   },
   "GODREJCP.NS": {
    "symbol": "GODREJCP",
@@ -1124,7 +1420,11 @@
    "resistance": 900.0,
    "resistance_oi": 639000,
    "resistance_2": 880.0,
-   "pcr": 0.77
+   "pcr": 0.77,
+   "opt_value_cr": 372.57,
+   "atm_trades": 5322,
+   "atm_oi": 3829500,
+   "opt_liq": "liquid"
   },
   "GODREJPROP.NS": {
    "symbol": "GODREJPROP",
@@ -1139,7 +1439,11 @@
    "resistance": 1900.0,
    "resistance_oi": 483275,
    "resistance_2": 1960.0,
-   "pcr": 1.05
+   "pcr": 1.05,
+   "opt_value_cr": 1747.19,
+   "atm_trades": 13840,
+   "atm_oi": 2514200,
+   "opt_liq": "liquid"
   },
   "GRASIM.NS": {
    "symbol": "GRASIM",
@@ -1154,7 +1458,11 @@
    "resistance": 3100.0,
    "resistance_oi": 625000,
    "resistance_2": 3200.0,
-   "pcr": 0.63
+   "pcr": 0.63,
+   "opt_value_cr": 13178.31,
+   "atm_trades": 93523,
+   "atm_oi": 4038000,
+   "opt_liq": "liquid"
   },
   "GVT&D.NS": {
    "symbol": "GVT&D",
@@ -1169,7 +1477,11 @@
    "resistance": 5000.0,
    "resistance_oi": 506625,
    "resistance_2": 4800.0,
-   "pcr": 0.66
+   "pcr": 0.66,
+   "opt_value_cr": 7440.61,
+   "atm_trades": 58425,
+   "atm_oi": 1031250,
+   "opt_liq": "liquid"
   },
   "HAL.NS": {
    "symbol": "HAL",
@@ -1184,7 +1496,11 @@
    "resistance": 5000.0,
    "resistance_oi": 1375050,
    "resistance_2": 5200.0,
-   "pcr": 0.35
+   "pcr": 0.35,
+   "opt_value_cr": 9561.66,
+   "atm_trades": 59383,
+   "atm_oi": 4828650,
+   "opt_liq": "liquid"
   },
   "HAVELLS.NS": {
    "symbol": "HAVELLS",
@@ -1199,7 +1515,11 @@
    "resistance": 1180.0,
    "resistance_oi": 411000,
    "resistance_2": 1200.0,
-   "pcr": 0.68
+   "pcr": 0.68,
+   "opt_value_cr": 857.86,
+   "atm_trades": 8558,
+   "atm_oi": 3403000,
+   "opt_liq": "liquid"
   },
   "HCLTECH.NS": {
    "symbol": "HCLTECH",
@@ -1214,7 +1534,11 @@
    "resistance": 1400.0,
    "resistance_oi": 1074400,
    "resistance_2": 1460.0,
-   "pcr": 0.58
+   "pcr": 0.58,
+   "opt_value_cr": 2157.45,
+   "atm_trades": 17763,
+   "atm_oi": 5372400,
+   "opt_liq": "liquid"
   },
   "HDFCAMC.NS": {
    "symbol": "HDFCAMC",
@@ -1229,7 +1553,11 @@
    "resistance": 2700.0,
    "resistance_oi": 162900,
    "resistance_2": 2800.0,
-   "pcr": 1.04
+   "pcr": 1.04,
+   "opt_value_cr": 1029.58,
+   "atm_trades": 5945,
+   "atm_oi": 1164000,
+   "opt_liq": "liquid"
   },
   "HDFCBANK.NS": {
    "symbol": "HDFCBANK",
@@ -1244,7 +1572,11 @@
    "resistance": 820.0,
    "resistance_oi": 9150050,
    "resistance_2": 810.0,
-   "pcr": 0.91
+   "pcr": 0.91,
+   "opt_value_cr": 17303.84,
+   "atm_trades": 138902,
+   "atm_oi": 81435250,
+   "opt_liq": "liquid"
   },
   "HDFCLIFE.NS": {
    "symbol": "HDFCLIFE",
@@ -1259,7 +1591,11 @@
    "resistance": 600.0,
    "resistance_oi": 2145000,
    "resistance_2": 620.0,
-   "pcr": 0.62
+   "pcr": 0.62,
+   "opt_value_cr": 1904.43,
+   "atm_trades": 18049,
+   "atm_oi": 13808300,
+   "opt_liq": "liquid"
   },
   "HEROMOTOCO.NS": {
    "symbol": "HEROMOTOCO",
@@ -1274,7 +1610,11 @@
    "resistance": 5500.0,
    "resistance_oi": 318150,
    "resistance_2": 5400.0,
-   "pcr": 0.68
+   "pcr": 0.68,
+   "opt_value_cr": 2560.71,
+   "atm_trades": 19924,
+   "atm_oi": 2075700,
+   "opt_liq": "liquid"
   },
   "HINDALCO.NS": {
    "symbol": "HINDALCO",
@@ -1289,7 +1629,11 @@
    "resistance": 970.0,
    "resistance_oi": 3395000,
    "resistance_2": 1000.0,
-   "pcr": 0.54
+   "pcr": 0.54,
+   "opt_value_cr": 6066.41,
+   "atm_trades": 50810,
+   "atm_oi": 19841500,
+   "opt_liq": "liquid"
   },
   "HINDPETRO.NS": {
    "symbol": "HINDPETRO",
@@ -1304,7 +1648,11 @@
    "resistance": 400.0,
    "resistance_oi": 3410100,
    "resistance_2": 410.0,
-   "pcr": 0.74
+   "pcr": 0.74,
+   "opt_value_cr": 937.87,
+   "atm_trades": 5673,
+   "atm_oi": 12984300,
+   "opt_liq": "liquid"
   },
   "HINDUNILVR.NS": {
    "symbol": "HINDUNILVR",
@@ -1319,7 +1667,11 @@
    "resistance": 2000.0,
    "resistance_oi": 1499400,
    "resistance_2": 2100.0,
-   "pcr": 0.55
+   "pcr": 0.55,
+   "opt_value_cr": 2877.98,
+   "atm_trades": 29269,
+   "atm_oi": 8410800,
+   "opt_liq": "liquid"
   },
   "HINDZINC.NS": {
    "symbol": "HINDZINC",
@@ -1334,7 +1686,11 @@
    "resistance": 600.0,
    "resistance_oi": 2011450,
    "resistance_2": 570.0,
-   "pcr": 0.89
+   "pcr": 0.89,
+   "opt_value_cr": 1572.79,
+   "atm_trades": 10485,
+   "atm_oi": 15114050,
+   "opt_liq": "liquid"
   },
   "HYUNDAI.NS": {
    "symbol": "HYUNDAI",
@@ -1349,7 +1705,11 @@
    "resistance": 2200.0,
    "resistance_oi": 696575,
    "resistance_2": 2300.0,
-   "pcr": 0.65
+   "pcr": 0.65,
+   "opt_value_cr": 1207.09,
+   "atm_trades": 6454,
+   "atm_oi": 1656325,
+   "opt_liq": "liquid"
   },
   "ICICIBANK.NS": {
    "symbol": "ICICIBANK",
@@ -1364,7 +1724,11 @@
    "resistance": 1600.0,
    "resistance_oi": 7095200,
    "resistance_2": 1590.0,
-   "pcr": 0.86
+   "pcr": 0.86,
+   "opt_value_cr": 15207.12,
+   "atm_trades": 78641,
+   "atm_oi": 36495200,
+   "opt_liq": "liquid"
   },
   "ICICIGI.NS": {
    "symbol": "ICICIGI",
@@ -1379,7 +1743,11 @@
    "resistance": 1700.0,
    "resistance_oi": 186225,
    "resistance_2": 1800.0,
-   "pcr": 0.49
+   "pcr": 0.49,
+   "opt_value_cr": 341.06,
+   "atm_trades": 2129,
+   "atm_oi": 831675,
+   "opt_liq": "liquid"
   },
   "ICICILIFE.NS": {
    "symbol": "ICICILIFE",
@@ -1394,7 +1762,11 @@
    "resistance": 500.0,
    "resistance_oi": 1088725,
    "resistance_2": 470.0,
-   "pcr": 0.56
+   "pcr": 0.56,
+   "opt_value_cr": 527.47,
+   "atm_trades": 4983,
+   "atm_oi": 3436375,
+   "opt_liq": "liquid"
   },
   "IDEA.NS": {
    "symbol": "IDEA",
@@ -1409,7 +1781,11 @@
    "resistance": 14.0,
    "resistance_oi": 438284700,
    "resistance_2": 13.0,
-   "pcr": 0.55
+   "pcr": 0.55,
+   "opt_value_cr": 3324.25,
+   "atm_trades": 10213,
+   "atm_oi": 930461550,
+   "opt_liq": "liquid"
   },
   "IDFCFIRSTB.NS": {
    "symbol": "IDFCFIRSTB",
@@ -1424,7 +1800,11 @@
    "resistance": 85.0,
    "resistance_oi": 39075575,
    "resistance_2": 80.0,
-   "pcr": 0.58
+   "pcr": 0.58,
+   "opt_value_cr": 1468.03,
+   "atm_trades": 8629,
+   "atm_oi": 67883725,
+   "opt_liq": "liquid"
   },
   "IEX.NS": {
    "symbol": "IEX",
@@ -1439,7 +1819,11 @@
    "resistance": 120.0,
    "resistance_oi": 3423450,
    "resistance_2": 118.0,
-   "pcr": 0.64
+   "pcr": 0.64,
+   "opt_value_cr": 441.73,
+   "atm_trades": 4314,
+   "atm_oi": 14555100,
+   "opt_liq": "liquid"
   },
   "INDHOTEL.NS": {
    "symbol": "INDHOTEL",
@@ -1454,7 +1838,11 @@
    "resistance": 900.0,
    "resistance_oi": 1236000,
    "resistance_2": 910.0,
-   "pcr": 1.03
+   "pcr": 1.03,
+   "opt_value_cr": 1790.41,
+   "atm_trades": 12383,
+   "atm_oi": 5815000,
+   "opt_liq": "liquid"
   },
   "INDIANB.NS": {
    "symbol": "INDIANB",
@@ -1469,7 +1857,11 @@
    "resistance": 950.0,
    "resistance_oi": 987000,
    "resistance_2": 960.0,
-   "pcr": 0.7
+   "pcr": 0.7,
+   "opt_value_cr": 634.32,
+   "atm_trades": 3912,
+   "atm_oi": 5203000,
+   "opt_liq": "liquid"
   },
   "INDIGO.NS": {
    "symbol": "INDIGO",
@@ -1484,7 +1876,11 @@
    "resistance": 5700.0,
    "resistance_oi": 359400,
    "resistance_2": 5750.0,
-   "pcr": 0.93
+   "pcr": 0.93,
+   "opt_value_cr": 4260.62,
+   "atm_trades": 28285,
+   "atm_oi": 3474300,
+   "opt_liq": "liquid"
   },
   "INDUSINDBK.NS": {
    "symbol": "INDUSINDBK",
@@ -1499,7 +1895,11 @@
    "resistance": 950.0,
    "resistance_oi": 4225900,
    "resistance_2": 920.0,
-   "pcr": 0.59
+   "pcr": 0.59,
+   "opt_value_cr": 1880.29,
+   "atm_trades": 16812,
+   "atm_oi": 13635300,
+   "opt_liq": "liquid"
   },
   "INDUSTOWER.NS": {
    "symbol": "INDUSTOWER",
@@ -1514,7 +1914,11 @@
    "resistance": 400.0,
    "resistance_oi": 4877300,
    "resistance_2": 420.0,
-   "pcr": 0.67
+   "pcr": 0.67,
+   "opt_value_cr": 2130.48,
+   "atm_trades": 19744,
+   "atm_oi": 18210400,
+   "opt_liq": "liquid"
   },
   "INFY.NS": {
    "symbol": "INFY",
@@ -1529,7 +1933,11 @@
    "resistance": 1200.0,
    "resistance_oi": 3310400,
    "resistance_2": 1154.0,
-   "pcr": 0.7
+   "pcr": 0.7,
+   "opt_value_cr": 3941.28,
+   "atm_trades": 43879,
+   "atm_oi": 25649600,
+   "opt_liq": "liquid"
   },
   "INOXWIND.NS": {
    "symbol": "INOXWIND",
@@ -1544,7 +1952,11 @@
    "resistance": 70.0,
    "resistance_oi": 10016000,
    "resistance_2": 65.0,
-   "pcr": 0.53
+   "pcr": 0.53,
+   "opt_value_cr": 673.04,
+   "atm_trades": 4794,
+   "atm_oi": 17971200,
+   "opt_liq": "liquid"
   },
   "IOC.NS": {
    "symbol": "IOC",
@@ -1559,7 +1971,11 @@
    "resistance": 150.0,
    "resistance_oi": 10442250,
    "resistance_2": 147.0,
-   "pcr": 0.95
+   "pcr": 0.95,
+   "opt_value_cr": 1135.26,
+   "atm_trades": 8023,
+   "atm_oi": 56735250,
+   "opt_liq": "liquid"
   },
   "IREDA.NS": {
    "symbol": "IREDA",
@@ -1574,7 +1990,11 @@
    "resistance": 120.0,
    "resistance_oi": 3511400,
    "resistance_2": 130.0,
-   "pcr": 0.65
+   "pcr": 0.65,
+   "opt_value_cr": 373.66,
+   "atm_trades": 2543,
+   "atm_oi": 20176975,
+   "opt_liq": "liquid"
   },
   "IRFC.NS": {
    "symbol": "IRFC",
@@ -1589,7 +2009,11 @@
    "resistance": 90.0,
    "resistance_oi": 18624025,
    "resistance_2": 100.0,
-   "pcr": 0.57
+   "pcr": 0.57,
+   "opt_value_cr": 1081.42,
+   "atm_trades": 7413,
+   "atm_oi": 39054575,
+   "opt_liq": "liquid"
   },
   "ITC.NS": {
    "symbol": "ITC",
@@ -1604,7 +2028,11 @@
    "resistance": 290.0,
    "resistance_oi": 15073050,
    "resistance_2": 285.0,
-   "pcr": 0.68
+   "pcr": 0.68,
+   "opt_value_cr": 4119.31,
+   "atm_trades": 33551,
+   "atm_oi": 90712575,
+   "opt_liq": "liquid"
   },
   "JINDALSTEL.NS": {
    "symbol": "JINDALSTEL",
@@ -1619,7 +2047,11 @@
    "resistance": 1180.0,
    "resistance_oi": 781250,
    "resistance_2": 1200.0,
-   "pcr": 0.79
+   "pcr": 0.79,
+   "opt_value_cr": 601.49,
+   "atm_trades": 5423,
+   "atm_oi": 3860625,
+   "opt_liq": "liquid"
   },
   "JIOFIN.NS": {
    "symbol": "JIOFIN",
@@ -1634,7 +2066,11 @@
    "resistance": 230.0,
    "resistance_oi": 9498700,
    "resistance_2": 240.0,
-   "pcr": 0.84
+   "pcr": 0.84,
+   "opt_value_cr": 1909.22,
+   "atm_trades": 16443,
+   "atm_oi": 50597850,
+   "opt_liq": "liquid"
   },
   "JSWENERGY.NS": {
    "symbol": "JSWENERGY",
@@ -1649,7 +2085,11 @@
    "resistance": 520.0,
    "resistance_oi": 1004050,
    "resistance_2": 530.0,
-   "pcr": 0.87
+   "pcr": 0.87,
+   "opt_value_cr": 353.94,
+   "atm_trades": 3656,
+   "atm_oi": 6704775,
+   "opt_liq": "liquid"
   },
   "JSWSTEEL.NS": {
    "symbol": "JSWSTEEL",
@@ -1664,7 +2104,11 @@
    "resistance": 1380.0,
    "resistance_oi": 1425600,
    "resistance_2": 1360.0,
-   "pcr": 0.67
+   "pcr": 0.67,
+   "opt_value_cr": 1517.94,
+   "atm_trades": 12191,
+   "atm_oi": 6986925,
+   "opt_liq": "liquid"
   },
   "JUBLFOOD.NS": {
    "symbol": "JUBLFOOD",
@@ -1679,7 +2123,11 @@
    "resistance": 460.0,
    "resistance_oi": 1633750,
    "resistance_2": 450.0,
-   "pcr": 0.54
+   "pcr": 0.54,
+   "opt_value_cr": 1904.65,
+   "atm_trades": 16479,
+   "atm_oi": 5971250,
+   "opt_liq": "liquid"
   },
   "KALYANKJIL.NS": {
    "symbol": "KALYANKJIL",
@@ -1694,7 +2142,11 @@
    "resistance": 700.0,
    "resistance_oi": 4159350,
    "resistance_2": 720.0,
-   "pcr": 0.79
+   "pcr": 0.79,
+   "opt_value_cr": 10253.71,
+   "atm_trades": 50830,
+   "atm_oi": 18153450,
+   "opt_liq": "liquid"
   },
   "KARURVYSYA.NS": {
    "symbol": "KARURVYSYA",
@@ -1709,7 +2161,11 @@
    "resistance": 400.0,
    "resistance_oi": 344100,
    "resistance_2": 390.0,
-   "pcr": 0.72
+   "pcr": 0.72,
+   "opt_value_cr": 49.04,
+   "atm_trades": 462,
+   "atm_oi": 1212100,
+   "opt_liq": "fair"
   },
   "KAYNES.NS": {
    "symbol": "KAYNES",
@@ -1724,7 +2180,11 @@
    "resistance": 3500.0,
    "resistance_oi": 109350,
    "resistance_2": 3600.0,
-   "pcr": 0.92
+   "pcr": 0.92,
+   "opt_value_cr": 13.36,
+   "atm_trades": 75,
+   "atm_oi": 357450,
+   "opt_liq": "thin"
   },
   "KEI.NS": {
    "symbol": "KEI",
@@ -1739,7 +2199,11 @@
    "resistance": 4200.0,
    "resistance_oi": 203175,
    "resistance_2": 4500.0,
-   "pcr": 0.59
+   "pcr": 0.59,
+   "opt_value_cr": 1424.09,
+   "atm_trades": 8868,
+   "atm_oi": 894425,
+   "opt_liq": "liquid"
   },
   "KFINTECH.NS": {
    "symbol": "KFINTECH",
@@ -1754,7 +2218,11 @@
    "resistance": 1020.0,
    "resistance_oi": 465750,
    "resistance_2": 960.0,
-   "pcr": 0.57
+   "pcr": 0.57,
+   "opt_value_cr": 347.08,
+   "atm_trades": 2141,
+   "atm_oi": 802125,
+   "opt_liq": "liquid"
   },
   "KOTAKBANK.NS": {
    "symbol": "KOTAKBANK",
@@ -1769,7 +2237,11 @@
    "resistance": 500.0,
    "resistance_oi": 5396000,
    "resistance_2": 490.0,
-   "pcr": 0.95
+   "pcr": 0.95,
+   "opt_value_cr": 4858.49,
+   "atm_trades": 23843,
+   "atm_oi": 50652000,
+   "opt_liq": "liquid"
   },
   "KPITTECH.NS": {
    "symbol": "KPITTECH",
@@ -1784,7 +2256,11 @@
    "resistance": 600.0,
    "resistance_oi": 2377700,
    "resistance_2": 560.0,
-   "pcr": 0.38
+   "pcr": 0.38,
+   "opt_value_cr": 922.68,
+   "atm_trades": 7873,
+   "atm_oi": 4691850,
+   "opt_liq": "liquid"
   },
   "LAURUSLABS.NS": {
    "symbol": "LAURUSLABS",
@@ -1799,7 +2275,11 @@
    "resistance": 2500.0,
    "resistance_oi": 1509175,
    "resistance_2": 2440.0,
-   "pcr": 0.79
+   "pcr": 0.79,
+   "opt_value_cr": 8118.52,
+   "atm_trades": 45666,
+   "atm_oi": 8920325,
+   "opt_liq": "liquid"
   },
   "LICHSGFIN.NS": {
    "symbol": "LICHSGFIN",
@@ -1814,7 +2294,11 @@
    "resistance": 620.0,
    "resistance_oi": 898000,
    "resistance_2": 600.0,
-   "pcr": 0.7
+   "pcr": 0.7,
+   "opt_value_cr": 1641.53,
+   "atm_trades": 13441,
+   "atm_oi": 6460000,
+   "opt_liq": "liquid"
   },
   "LICI.NS": {
    "symbol": "LICI",
@@ -1829,7 +2313,11 @@
    "resistance": 405.0,
    "resistance_oi": 6315400,
    "resistance_2": 400.0,
-   "pcr": 0.56
+   "pcr": 0.56,
+   "opt_value_cr": 1202.61,
+   "atm_trades": 10322,
+   "atm_oi": 27479200,
+   "opt_liq": "liquid"
   },
   "LODHA.NS": {
    "symbol": "LODHA",
@@ -1844,7 +2332,11 @@
    "resistance": 1280.0,
    "resistance_oi": 216875,
    "resistance_2": 1240.0,
-   "pcr": 0.86
+   "pcr": 0.86,
+   "opt_value_cr": 1214.94,
+   "atm_trades": 8354,
+   "atm_oi": 2009375,
+   "opt_liq": "liquid"
   },
   "LT.NS": {
    "symbol": "LT",
@@ -1859,7 +2351,11 @@
    "resistance": 4200.0,
    "resistance_oi": 676375,
    "resistance_2": 4250.0,
-   "pcr": 0.83
+   "pcr": 0.83,
+   "opt_value_cr": 5495.82,
+   "atm_trades": 50052,
+   "atm_oi": 5490450,
+   "opt_liq": "liquid"
   },
   "LTF.NS": {
    "symbol": "LTF",
@@ -1874,7 +2370,11 @@
    "resistance": 280.0,
    "resistance_oi": 3195000,
    "resistance_2": 290.0,
-   "pcr": 0.68
+   "pcr": 0.68,
+   "opt_value_cr": 990.79,
+   "atm_trades": 8182,
+   "atm_oi": 16393500,
+   "opt_liq": "liquid"
   },
   "LTM.NS": {
    "symbol": "LTM",
@@ -1889,7 +2389,11 @@
    "resistance": 4500.0,
    "resistance_oi": 294000,
    "resistance_2": 4400.0,
-   "pcr": 0.46
+   "pcr": 0.46,
+   "opt_value_cr": 820.15,
+   "atm_trades": 4872,
+   "atm_oi": 1000650,
+   "opt_liq": "liquid"
   },
   "LUPIN.NS": {
    "symbol": "LUPIN",
@@ -1904,7 +2408,11 @@
    "resistance": 2060.0,
    "resistance_oi": 966025,
    "resistance_2": 2100.0,
-   "pcr": 0.49
+   "pcr": 0.49,
+   "opt_value_cr": 1885.1,
+   "atm_trades": 13602,
+   "atm_oi": 4485450,
+   "opt_liq": "liquid"
   },
   "M&M.NS": {
    "symbol": "M&M",
@@ -1919,7 +2427,11 @@
    "resistance": 3500.0,
    "resistance_oi": 802600,
    "resistance_2": 3350.0,
-   "pcr": 0.74
+   "pcr": 0.74,
+   "opt_value_cr": 5589.71,
+   "atm_trades": 43883,
+   "atm_oi": 4673800,
+   "opt_liq": "liquid"
   },
   "MAHABANK.NS": {
    "symbol": "MAHABANK",
@@ -1934,7 +2446,11 @@
    "resistance": 96.0,
    "resistance_oi": 1527500,
    "resistance_2": 95.0,
-   "pcr": 0.75
+   "pcr": 0.75,
+   "opt_value_cr": 308.82,
+   "atm_trades": 2550,
+   "atm_oi": 14365000,
+   "opt_liq": "liquid"
   },
   "MANAPPURAM.NS": {
    "symbol": "MANAPPURAM",
@@ -1949,7 +2465,11 @@
    "resistance": 320.0,
    "resistance_oi": 11517000,
    "resistance_2": 330.0,
-   "pcr": 0.39
+   "pcr": 0.39,
+   "opt_value_cr": 10657.1,
+   "atm_trades": 40837,
+   "atm_oi": 30216000,
+   "opt_liq": "liquid"
   },
   "MANKIND.NS": {
    "symbol": "MANKIND",
@@ -1964,7 +2484,11 @@
    "resistance": 2700.0,
    "resistance_oi": 605750,
    "resistance_2": 2660.0,
-   "pcr": 0.64
+   "pcr": 0.64,
+   "opt_value_cr": 1502.26,
+   "atm_trades": 15092,
+   "atm_oi": 2020250,
+   "opt_liq": "liquid"
   },
   "MARICO.NS": {
    "symbol": "MARICO",
@@ -1979,7 +2503,11 @@
    "resistance": 900.0,
    "resistance_oi": 1086000,
    "resistance_2": 910.0,
-   "pcr": 1.08
+   "pcr": 1.08,
+   "opt_value_cr": 1066.02,
+   "atm_trades": 6605,
+   "atm_oi": 8762400,
+   "opt_liq": "liquid"
   },
   "MARUTI.NS": {
    "symbol": "MARUTI",
@@ -1994,7 +2522,11 @@
    "resistance": 13000.0,
    "resistance_oi": 198150,
    "resistance_2": 13100.0,
-   "pcr": 0.93
+   "pcr": 0.93,
+   "opt_value_cr": 5984.9,
+   "atm_trades": 54634,
+   "atm_oi": 2040600,
+   "opt_liq": "liquid"
   },
   "MAXHEALTH.NS": {
    "symbol": "MAXHEALTH",
@@ -2009,7 +2541,11 @@
    "resistance": 960.0,
    "resistance_oi": 678825,
    "resistance_2": 950.0,
-   "pcr": 0.65
+   "pcr": 0.65,
+   "opt_value_cr": 1023.13,
+   "atm_trades": 12594,
+   "atm_oi": 3771600,
+   "opt_liq": "liquid"
   },
   "MAZDOCK.NS": {
    "symbol": "MAZDOCK",
@@ -2024,7 +2560,11 @@
    "resistance": 2000.0,
    "resistance_oi": 744525,
    "resistance_2": 1900.0,
-   "pcr": 0.58
+   "pcr": 0.58,
+   "opt_value_cr": 751.18,
+   "atm_trades": 9710,
+   "atm_oi": 1960200,
+   "opt_liq": "liquid"
   },
   "MCX.NS": {
    "symbol": "MCX",
@@ -2039,7 +2579,11 @@
    "resistance": 3800.0,
    "resistance_oi": 557775,
    "resistance_2": 4000.0,
-   "pcr": 0.75
+   "pcr": 0.75,
+   "opt_value_cr": 17139.03,
+   "atm_trades": 123325,
+   "atm_oi": 3676500,
+   "opt_liq": "liquid"
   },
   "MFSL.NS": {
    "symbol": "MFSL",
@@ -2054,7 +2598,11 @@
    "resistance": 1500.0,
    "resistance_oi": 410000,
    "resistance_2": 1420.0,
-   "pcr": 0.55
+   "pcr": 0.55,
+   "opt_value_cr": 1510.7,
+   "atm_trades": 13396,
+   "atm_oi": 900800,
+   "opt_liq": "liquid"
   },
   "NIFTY_MID_SELECT.NS": {
    "symbol": "MIDCPNIFTY",
@@ -2069,7 +2617,11 @@
    "resistance": 15000.0,
    "resistance_oi": 1032600,
    "resistance_2": 14500.0,
-   "pcr": 1.07
+   "pcr": 1.07,
+   "opt_value_cr": 76327.81,
+   "atm_trades": 277468,
+   "atm_oi": 9386160,
+   "opt_liq": "liquid"
   },
   "MOTHERSON.NS": {
    "symbol": "MOTHERSON",
@@ -2084,7 +2636,11 @@
    "resistance": 170.0,
    "resistance_oi": 12945750,
    "resistance_2": 180.0,
-   "pcr": 0.56
+   "pcr": 0.56,
+   "opt_value_cr": 1155.1,
+   "atm_trades": 5435,
+   "atm_oi": 43197600,
+   "opt_liq": "liquid"
   },
   "MOTILALOFS.NS": {
    "symbol": "MOTILALOFS",
@@ -2099,7 +2655,11 @@
    "resistance": 1220.0,
    "resistance_oi": 500650,
    "resistance_2": 1320.0,
-   "pcr": 1.0
+   "pcr": 1.0,
+   "opt_value_cr": 2231.69,
+   "atm_trades": 12880,
+   "atm_oi": 3546400,
+   "opt_liq": "liquid"
   },
   "MPHASIS.NS": {
    "symbol": "MPHASIS",
@@ -2114,7 +2674,11 @@
    "resistance": 2700.0,
    "resistance_oi": 829675,
    "resistance_2": 2600.0,
-   "pcr": 0.43
+   "pcr": 0.43,
+   "opt_value_cr": 1781.25,
+   "atm_trades": 14692,
+   "atm_oi": 1836450,
+   "opt_liq": "liquid"
   },
   "MUTHOOTFIN.NS": {
    "symbol": "MUTHOOTFIN",
@@ -2129,7 +2693,11 @@
    "resistance": 2900.0,
    "resistance_oi": 440550,
    "resistance_2": 3000.0,
-   "pcr": 1.05
+   "pcr": 1.05,
+   "opt_value_cr": 3908.63,
+   "atm_trades": 25669,
+   "atm_oi": 3710850,
+   "opt_liq": "liquid"
   },
   "NAM-INDIA.NS": {
    "symbol": "NAM-INDIA",
@@ -2144,7 +2712,11 @@
    "resistance": 1140.0,
    "resistance_oi": 199375,
    "resistance_2": 1180.0,
-   "pcr": 1.31
+   "pcr": 1.31,
+   "opt_value_cr": 342.15,
+   "atm_trades": 2519,
+   "atm_oi": 1343750,
+   "opt_liq": "liquid"
   },
   "NATIONALUM.NS": {
    "symbol": "NATIONALUM",
@@ -2159,7 +2731,11 @@
    "resistance": 330.0,
    "resistance_oi": 2591250,
    "resistance_2": 340.0,
-   "pcr": 0.7
+   "pcr": 0.7,
+   "opt_value_cr": 1867.57,
+   "atm_trades": 15004,
+   "atm_oi": 13203750,
+   "opt_liq": "liquid"
   },
   "NAUKRI.NS": {
    "symbol": "NAUKRI",
@@ -2174,7 +2750,11 @@
    "resistance": 1200.0,
    "resistance_oi": 645150,
    "resistance_2": 1300.0,
-   "pcr": 0.44
+   "pcr": 0.44,
+   "opt_value_cr": 495.96,
+   "atm_trades": 4486,
+   "atm_oi": 3294500,
+   "opt_liq": "liquid"
   },
   "NAVINFLUOR.NS": {
    "symbol": "NAVINFLUOR",
@@ -2189,7 +2769,11 @@
    "resistance": 10200.0,
    "resistance_oi": 63375,
    "resistance_2": 10400.0,
-   "pcr": 0.44
+   "pcr": 0.44,
+   "opt_value_cr": 1512.5,
+   "atm_trades": 9253,
+   "atm_oi": 323250,
+   "opt_liq": "liquid"
   },
   "NBCC.NS": {
    "symbol": "NBCC",
@@ -2204,7 +2788,11 @@
    "resistance": 85.0,
    "resistance_oi": 4556500,
    "resistance_2": 80.0,
-   "pcr": 0.42
+   "pcr": 0.42,
+   "opt_value_cr": 295.08,
+   "atm_trades": 1942,
+   "atm_oi": 15411500,
+   "opt_liq": "liquid"
   },
   "NESTLEIND.NS": {
    "symbol": "NESTLEIND",
@@ -2219,7 +2807,11 @@
    "resistance": 1300.0,
    "resistance_oi": 579000,
    "resistance_2": 1280.0,
-   "pcr": 0.69
+   "pcr": 0.69,
+   "opt_value_cr": 789.73,
+   "atm_trades": 7219,
+   "atm_oi": 4320000,
+   "opt_liq": "liquid"
   },
   "NHPC.NS": {
    "symbol": "NHPC",
@@ -2234,7 +2826,11 @@
    "resistance": 80.0,
    "resistance_oi": 6651150,
    "resistance_2": 85.0,
-   "pcr": 0.57
+   "pcr": 0.57,
+   "opt_value_cr": 433.66,
+   "atm_trades": 2623,
+   "atm_oi": 24443150,
+   "opt_liq": "liquid"
   },
   "^NSEI": {
    "symbol": "NIFTY",
@@ -2249,7 +2845,11 @@
    "resistance": 26000.0,
    "resistance_oi": 14737060,
    "resistance_2": 26500.0,
-   "pcr": 0.83
+   "pcr": 0.83,
+   "opt_value_cr": 16385830.76,
+   "atm_trades": 39505451,
+   "atm_oi": 259783550,
+   "opt_liq": "liquid"
   },
   "NIFTYFPI.NS": {
    "symbol": "NIFTYFPI",
@@ -2264,7 +2864,11 @@
    "resistance": 1600.0,
    "resistance_oi": 4400,
    "resistance_2": 1700.0,
-   "pcr": 0.75
+   "pcr": 0.75,
+   "opt_value_cr": 22.57,
+   "atm_trades": 3,
+   "atm_oi": 83600,
+   "opt_liq": "thin"
   },
   "^NSMIDCP": {
    "symbol": "NIFTYNXT50",
@@ -2279,7 +2883,11 @@
    "resistance": 74000.0,
    "resistance_oi": 1025,
    "resistance_2": 74200.0,
-   "pcr": 0.41
+   "pcr": 0.41,
+   "opt_value_cr": 64.21,
+   "atm_trades": 164,
+   "atm_oi": 3075,
+   "opt_liq": "thin"
   },
   "NMDC.NS": {
    "symbol": "NMDC",
@@ -2294,7 +2902,11 @@
    "resistance": 70.0,
    "resistance_oi": 14303250,
    "resistance_2": 75.0,
-   "pcr": 0.52
+   "pcr": 0.52,
+   "opt_value_cr": 1619.84,
+   "atm_trades": 17262,
+   "atm_oi": 54695250,
+   "opt_liq": "liquid"
   },
   "NTPC.NS": {
    "symbol": "NTPC",
@@ -2309,7 +2921,11 @@
    "resistance": 325.0,
    "resistance_oi": 4086000,
    "resistance_2": 320.0,
-   "pcr": 0.63
+   "pcr": 0.63,
+   "opt_value_cr": 1644.84,
+   "atm_trades": 15861,
+   "atm_oi": 31435500,
+   "opt_liq": "liquid"
   },
   "NYKAA.NS": {
    "symbol": "NYKAA",
@@ -2324,7 +2940,11 @@
    "resistance": 370.0,
    "resistance_oi": 2618750,
    "resistance_2": 380.0,
-   "pcr": 0.59
+   "pcr": 0.59,
+   "opt_value_cr": 2101.56,
+   "atm_trades": 12064,
+   "atm_oi": 20503125,
+   "opt_liq": "liquid"
   },
   "OBEROIRLTY.NS": {
    "symbol": "OBEROIRLTY",
@@ -2339,7 +2959,11 @@
    "resistance": 1800.0,
    "resistance_oi": 238700,
    "resistance_2": 1900.0,
-   "pcr": 0.92
+   "pcr": 0.92,
+   "opt_value_cr": 505.37,
+   "atm_trades": 4300,
+   "atm_oi": 1285900,
+   "opt_liq": "liquid"
   },
   "OFSS.NS": {
    "symbol": "OFSS",
@@ -2354,7 +2978,11 @@
    "resistance": 10000.0,
    "resistance_oi": 90950,
    "resistance_2": 11000.0,
-   "pcr": 0.63
+   "pcr": 0.63,
+   "opt_value_cr": 1170.69,
+   "atm_trades": 9343,
+   "atm_oi": 316450,
+   "opt_liq": "liquid"
   },
   "OIL.NS": {
    "symbol": "OIL",
@@ -2369,7 +2997,11 @@
    "resistance": 450.0,
    "resistance_oi": 1089200,
    "resistance_2": 460.0,
-   "pcr": 0.72
+   "pcr": 0.72,
+   "opt_value_cr": 1363.12,
+   "atm_trades": 12551,
+   "atm_oi": 7970200,
+   "opt_liq": "liquid"
   },
   "ONGC.NS": {
    "symbol": "ONGC",
@@ -2384,7 +3016,11 @@
    "resistance": 227.0,
    "resistance_oi": 12057750,
    "resistance_2": 232.0,
-   "pcr": 0.47
+   "pcr": 0.47,
+   "opt_value_cr": 1915.46,
+   "atm_trades": 22342,
+   "atm_oi": 50361750,
+   "opt_liq": "liquid"
   },
   "PAGEIND.NS": {
    "symbol": "PAGEIND",
@@ -2399,7 +3035,11 @@
    "resistance": 35000.0,
    "resistance_oi": 68400,
    "resistance_2": 36000.0,
-   "pcr": 0.39
+   "pcr": 0.39,
+   "opt_value_cr": 15196.82,
+   "atm_trades": 65213,
+   "atm_oi": 183180,
+   "opt_liq": "liquid"
   },
   "PATANJALI.NS": {
    "symbol": "PATANJALI",
@@ -2414,7 +3054,11 @@
    "resistance": 430.0,
    "resistance_oi": 1486725,
    "resistance_2": 450.0,
-   "pcr": 0.94
+   "pcr": 0.94,
+   "opt_value_cr": 1101.34,
+   "atm_trades": 10528,
+   "atm_oi": 9612650,
+   "opt_liq": "liquid"
   },
   "PAYTM.NS": {
    "symbol": "PAYTM",
@@ -2429,7 +3073,11 @@
    "resistance": 2000.0,
    "resistance_oi": 1814675,
    "resistance_2": 1940.0,
-   "pcr": 0.82
+   "pcr": 0.82,
+   "opt_value_cr": 15852.02,
+   "atm_trades": 60751,
+   "atm_oi": 10416800,
+   "opt_liq": "liquid"
   },
   "PERSISTENT.NS": {
    "symbol": "PERSISTENT",
@@ -2444,7 +3092,11 @@
    "resistance": 6200.0,
    "resistance_oi": 217000,
    "resistance_2": 6100.0,
-   "pcr": 0.57
+   "pcr": 0.57,
+   "opt_value_cr": 3228.31,
+   "atm_trades": 28348,
+   "atm_oi": 1543375,
+   "opt_liq": "liquid"
   },
   "PETRONET.NS": {
    "symbol": "PETRONET",
@@ -2459,7 +3111,11 @@
    "resistance": 330.0,
    "resistance_oi": 351500,
    "resistance_2": 335.0,
-   "pcr": 0.87
+   "pcr": 0.87,
+   "opt_value_cr": 380.68,
+   "atm_trades": 3667,
+   "atm_oi": 5842500,
+   "opt_liq": "liquid"
   },
   "PFC.NS": {
    "symbol": "PFC",
@@ -2474,7 +3130,11 @@
    "resistance": 350.0,
    "resistance_oi": 6446700,
    "resistance_2": 360.0,
-   "pcr": 0.6
+   "pcr": 0.6,
+   "opt_value_cr": 1547.51,
+   "atm_trades": 13738,
+   "atm_oi": 30113200,
+   "opt_liq": "liquid"
   },
   "PGEL.NS": {
    "symbol": "PGEL",
@@ -2489,7 +3149,11 @@
    "resistance": 600.0,
    "resistance_oi": 912000,
    "resistance_2": 580.0,
-   "pcr": 0.78
+   "pcr": 0.78,
+   "opt_value_cr": 765.42,
+   "atm_trades": 4159,
+   "atm_oi": 3670800,
+   "opt_liq": "liquid"
   },
   "PHOENIXLTD.NS": {
    "symbol": "PHOENIXLTD",
@@ -2504,7 +3168,11 @@
    "resistance": 2300.0,
    "resistance_oi": 307300,
    "resistance_2": 2400.0,
-   "pcr": 0.61
+   "pcr": 0.61,
+   "opt_value_cr": 670.35,
+   "atm_trades": 5141,
+   "atm_oi": 735700,
+   "opt_liq": "liquid"
   },
   "PIDILITIND.NS": {
    "symbol": "PIDILITIND",
@@ -2519,7 +3187,11 @@
    "resistance": 1600.0,
    "resistance_oi": 345500,
    "resistance_2": 1580.0,
-   "pcr": 0.9
+   "pcr": 0.9,
+   "opt_value_cr": 680.56,
+   "atm_trades": 5374,
+   "atm_oi": 1942500,
+   "opt_liq": "liquid"
   },
   "PIIND.NS": {
    "symbol": "PIIND",
@@ -2534,7 +3206,11 @@
    "resistance": 2000.0,
    "resistance_oi": 1074150,
    "resistance_2": 1900.0,
-   "pcr": 0.47
+   "pcr": 0.47,
+   "opt_value_cr": 1378.99,
+   "atm_trades": 15930,
+   "atm_oi": 2753450,
+   "opt_liq": "liquid"
   },
   "PNB.NS": {
    "symbol": "PNB",
@@ -2549,7 +3225,11 @@
    "resistance": 145.0,
    "resistance_oi": 12064000,
    "resistance_2": 155.0,
-   "pcr": 1.07
+   "pcr": 1.07,
+   "opt_value_cr": 6967.17,
+   "atm_trades": 33957,
+   "atm_oi": 67496000,
+   "opt_liq": "liquid"
   },
   "PNBHOUSING.NS": {
    "symbol": "PNBHOUSING",
@@ -2564,7 +3244,11 @@
    "resistance": 1200.0,
    "resistance_oi": 445900,
    "resistance_2": 1160.0,
-   "pcr": 0.71
+   "pcr": 0.71,
+   "opt_value_cr": 354.37,
+   "atm_trades": 2256,
+   "atm_oi": 2176850,
+   "opt_liq": "liquid"
   },
   "POLICYBZR.NS": {
    "symbol": "POLICYBZR",
@@ -2579,7 +3263,11 @@
    "resistance": 1200.0,
    "resistance_oi": 1513400,
    "resistance_2": 1120.0,
-   "pcr": 0.65
+   "pcr": 0.65,
+   "opt_value_cr": 10896.45,
+   "atm_trades": 103584,
+   "atm_oi": 5093550,
+   "opt_liq": "liquid"
   },
   "POLYCAB.NS": {
    "symbol": "POLYCAB",
@@ -2594,7 +3282,11 @@
    "resistance": 8200.0,
    "resistance_oi": 214375,
    "resistance_2": 8000.0,
-   "pcr": 0.54
+   "pcr": 0.54,
+   "opt_value_cr": 4468.98,
+   "atm_trades": 22665,
+   "atm_oi": 1155000,
+   "opt_liq": "liquid"
   },
   "POWERGRID.NS": {
    "symbol": "POWERGRID",
@@ -2609,7 +3301,11 @@
    "resistance": 270.0,
    "resistance_oi": 4056500,
    "resistance_2": 265.0,
-   "pcr": 0.65
+   "pcr": 0.65,
+   "opt_value_cr": 804.52,
+   "atm_trades": 7650,
+   "atm_oi": 29429100,
+   "opt_liq": "liquid"
   },
   "POWERINDIA.NS": {
    "symbol": "POWERINDIA",
@@ -2624,7 +3320,11 @@
    "resistance": 32000.0,
    "resistance_oi": 77950,
    "resistance_2": 35000.0,
-   "pcr": 0.95
+   "pcr": 0.95,
+   "opt_value_cr": 37262.87,
+   "atm_trades": 155207,
+   "atm_oi": 409825,
+   "opt_liq": "liquid"
   },
   "PREMIERENE.NS": {
    "symbol": "PREMIERENE",
@@ -2639,7 +3339,11 @@
    "resistance": 900.0,
    "resistance_oi": 1823900,
    "resistance_2": 1000.0,
-   "pcr": 0.31
+   "pcr": 0.31,
+   "opt_value_cr": 684.28,
+   "atm_trades": 6839,
+   "atm_oi": 4872400,
+   "opt_liq": "liquid"
   },
   "PRESTIGE.NS": {
    "symbol": "PRESTIGE",
@@ -2654,7 +3358,11 @@
    "resistance": 1800.0,
    "resistance_oi": 191700,
    "resistance_2": 1700.0,
-   "pcr": 0.59
+   "pcr": 0.59,
+   "opt_value_cr": 685.15,
+   "atm_trades": 4770,
+   "atm_oi": 1163250,
+   "opt_liq": "liquid"
   },
   "RADICO.NS": {
    "symbol": "RADICO",
@@ -2669,7 +3377,11 @@
    "resistance": 4700.0,
    "resistance_oi": 154500,
    "resistance_2": 4800.0,
-   "pcr": 0.48
+   "pcr": 0.48,
+   "opt_value_cr": 1578.5,
+   "atm_trades": 13119,
+   "atm_oi": 793950,
+   "opt_liq": "liquid"
   },
   "RBLBANK.NS": {
    "symbol": "RBLBANK",
@@ -2684,7 +3396,11 @@
    "resistance": 400.0,
    "resistance_oi": 3219450,
    "resistance_2": 390.0,
-   "pcr": 0.59
+   "pcr": 0.59,
+   "opt_value_cr": 969.28,
+   "atm_trades": 4657,
+   "atm_oi": 19462750,
+   "opt_liq": "liquid"
   },
   "RECLTD.NS": {
    "symbol": "RECLTD",
@@ -2699,7 +3415,11 @@
    "resistance": 310.0,
    "resistance_oi": 2964150,
    "resistance_2": 330.0,
-   "pcr": 0.72
+   "pcr": 0.72,
+   "opt_value_cr": 867.76,
+   "atm_trades": 7991,
+   "atm_oi": 14664825,
+   "opt_liq": "liquid"
   },
   "RELIANCE.NS": {
    "symbol": "RELIANCE",
@@ -2714,7 +3434,11 @@
    "resistance": 1350.0,
    "resistance_oi": 14491500,
    "resistance_2": 1400.0,
-   "pcr": 0.77
+   "pcr": 0.77,
+   "opt_value_cr": 34172.11,
+   "atm_trades": 256784,
+   "atm_oi": 90946000,
+   "opt_liq": "liquid"
   },
   "RVNL.NS": {
    "symbol": "RVNL",
@@ -2729,7 +3453,11 @@
    "resistance": 220.0,
    "resistance_oi": 5006925,
    "resistance_2": 210.0,
-   "pcr": 0.51
+   "pcr": 0.51,
+   "opt_value_cr": 2009.98,
+   "atm_trades": 14332,
+   "atm_oi": 13020700,
+   "opt_liq": "liquid"
   },
   "SAGILITY.NS": {
    "symbol": "SAGILITY",
@@ -2744,7 +3472,11 @@
    "resistance": 50.0,
    "resistance_oi": 11520000,
    "resistance_2": 45.0,
-   "pcr": 0.52
+   "pcr": 0.52,
+   "opt_value_cr": 197.1,
+   "atm_trades": 1367,
+   "atm_oi": 43956000,
+   "opt_liq": "liquid"
   },
   "SAIL.NS": {
    "symbol": "SAIL",
@@ -2759,7 +3491,11 @@
    "resistance": 180.0,
    "resistance_oi": 2603800,
    "resistance_2": 185.0,
-   "pcr": 0.56
+   "pcr": 0.56,
+   "opt_value_cr": 547.22,
+   "atm_trades": 3810,
+   "atm_oi": 13409100,
+   "opt_liq": "liquid"
   },
   "SBICARD.NS": {
    "symbol": "SBICARD",
@@ -2774,7 +3510,11 @@
    "resistance": 600.0,
    "resistance_oi": 1232000,
    "resistance_2": 620.0,
-   "pcr": 0.83
+   "pcr": 0.83,
+   "opt_value_cr": 662.92,
+   "atm_trades": 5114,
+   "atm_oi": 4276800,
+   "opt_liq": "liquid"
   },
   "SBILIFE.NS": {
    "symbol": "SBILIFE",
@@ -2789,7 +3529,11 @@
    "resistance": 1800.0,
    "resistance_oi": 481875,
    "resistance_2": 1840.0,
-   "pcr": 0.55
+   "pcr": 0.55,
+   "opt_value_cr": 1364.87,
+   "atm_trades": 11518,
+   "atm_oi": 2265750,
+   "opt_liq": "liquid"
   },
   "SBIN.NS": {
    "symbol": "SBIN",
@@ -2804,7 +3548,11 @@
    "resistance": 1100.0,
    "resistance_oi": 6467250,
    "resistance_2": 1080.0,
-   "pcr": 0.84
+   "pcr": 0.84,
+   "opt_value_cr": 24528.0,
+   "atm_trades": 152752,
+   "atm_oi": 47866500,
+   "opt_liq": "liquid"
   },
   "SHREECEM.NS": {
    "symbol": "SHREECEM",
@@ -2819,7 +3567,11 @@
    "resistance": 25000.0,
    "resistance_oi": 8325,
    "resistance_2": 28000.0,
-   "pcr": 0.97
+   "pcr": 0.97,
+   "opt_value_cr": 879.37,
+   "atm_trades": 2190,
+   "atm_oi": 56325,
+   "opt_liq": "liquid"
   },
   "SHRIRAMFIN.NS": {
    "symbol": "SHRIRAMFIN",
@@ -2834,7 +3586,11 @@
    "resistance": 1000.0,
    "resistance_oi": 2171400,
    "resistance_2": 980.0,
-   "pcr": 0.82
+   "pcr": 0.82,
+   "opt_value_cr": 3826.92,
+   "atm_trades": 23470,
+   "atm_oi": 8667450,
+   "opt_liq": "liquid"
   },
   "SIEMENS.NS": {
    "symbol": "SIEMENS",
@@ -2849,7 +3605,11 @@
    "resistance": 3700.0,
    "resistance_oi": 213675,
    "resistance_2": 4000.0,
-   "pcr": 0.78
+   "pcr": 0.78,
+   "opt_value_cr": 1995.19,
+   "atm_trades": 17257,
+   "atm_oi": 1285550,
+   "opt_liq": "liquid"
   },
   "SOLARINDS.NS": {
    "symbol": "SOLARINDS",
@@ -2864,7 +3624,11 @@
    "resistance": 21000.0,
    "resistance_oi": 137600,
    "resistance_2": 20000.0,
-   "pcr": 0.47
+   "pcr": 0.47,
+   "opt_value_cr": 2520.63,
+   "atm_trades": 20433,
+   "atm_oi": 537475,
+   "opt_liq": "liquid"
   },
   "SONACOMS.NS": {
    "symbol": "SONACOMS",
@@ -2879,7 +3643,11 @@
    "resistance": 930.0,
    "resistance_oi": 481425,
    "resistance_2": 960.0,
-   "pcr": 1.04
+   "pcr": 1.04,
+   "opt_value_cr": 790.12,
+   "atm_trades": 4605,
+   "atm_oi": 4543525,
+   "opt_liq": "liquid"
   },
   "SRF.NS": {
    "symbol": "SRF",
@@ -2894,7 +3662,11 @@
    "resistance": 2500.0,
    "resistance_oi": 245000,
    "resistance_2": 2600.0,
-   "pcr": 0.87
+   "pcr": 0.87,
+   "opt_value_cr": 492.76,
+   "atm_trades": 4467,
+   "atm_oi": 1160800,
+   "opt_liq": "liquid"
   },
   "SUNPHARMA.NS": {
    "symbol": "SUNPHARMA",
@@ -2909,7 +3681,11 @@
    "resistance": 1920.0,
    "resistance_oi": 1314250,
    "resistance_2": 1900.0,
-   "pcr": 0.58
+   "pcr": 0.58,
+   "opt_value_cr": 5792.41,
+   "atm_trades": 50805,
+   "atm_oi": 10931550,
+   "opt_liq": "liquid"
   },
   "SUPREMEIND.NS": {
    "symbol": "SUPREMEIND",
@@ -2924,7 +3700,11 @@
    "resistance": 3500.0,
    "resistance_oi": 192150,
    "resistance_2": 3600.0,
-   "pcr": 0.74
+   "pcr": 0.74,
+   "opt_value_cr": 318.69,
+   "atm_trades": 2500,
+   "atm_oi": 505225,
+   "opt_liq": "liquid"
   },
   "SUZLON.NS": {
    "symbol": "SUZLON",
@@ -2939,7 +3719,11 @@
    "resistance": 40.0,
    "resistance_oi": 34112200,
    "resistance_2": 50.0,
-   "pcr": 0.57
+   "pcr": 0.57,
+   "opt_value_cr": 1020.71,
+   "atm_trades": 7279,
+   "atm_oi": 118592600,
+   "opt_liq": "liquid"
   },
   "SWIGGY.NS": {
    "symbol": "SWIGGY",
@@ -2954,7 +3738,11 @@
    "resistance": 200.0,
    "resistance_oi": 10537550,
    "resistance_2": 190.0,
-   "pcr": 0.49
+   "pcr": 0.49,
+   "opt_value_cr": 1600.99,
+   "atm_trades": 16686,
+   "atm_oi": 28070325,
+   "opt_liq": "liquid"
   },
   "SYRMA.NS": {
    "symbol": "SYRMA",
@@ -2969,7 +3757,11 @@
    "resistance": 1600.0,
    "resistance_oi": 305500,
    "resistance_2": 1700.0,
-   "pcr": 0.37
+   "pcr": 0.37,
+   "opt_value_cr": 300.33,
+   "atm_trades": 2170,
+   "atm_oi": 1018875,
+   "opt_liq": "liquid"
   },
   "TATACONSUM.NS": {
    "symbol": "TATACONSUM",
@@ -2984,7 +3776,11 @@
    "resistance": 1100.0,
    "resistance_oi": 301400,
    "resistance_2": 1080.0,
-   "pcr": 0.95
+   "pcr": 0.95,
+   "opt_value_cr": 536.88,
+   "atm_trades": 6403,
+   "atm_oi": 2620200,
+   "opt_liq": "liquid"
   },
   "TATAELXSI.NS": {
    "symbol": "TATAELXSI",
@@ -2999,7 +3795,11 @@
    "resistance": 4000.0,
    "resistance_oi": 184375,
    "resistance_2": 3900.0,
-   "pcr": 0.59
+   "pcr": 0.59,
+   "opt_value_cr": 674.04,
+   "atm_trades": 8745,
+   "atm_oi": 775750,
+   "opt_liq": "liquid"
   },
   "TATAPOWER.NS": {
    "symbol": "TATAPOWER",
@@ -3014,7 +3814,11 @@
    "resistance": 370.0,
    "resistance_oi": 10370400,
    "resistance_2": 380.0,
-   "pcr": 0.43
+   "pcr": 0.43,
+   "opt_value_cr": 4143.95,
+   "atm_trades": 25117,
+   "atm_oi": 33848800,
+   "opt_liq": "liquid"
   },
   "TATASTEEL.NS": {
    "symbol": "TATASTEEL",
@@ -3029,7 +3833,11 @@
    "resistance": 190.0,
    "resistance_oi": 20146500,
    "resistance_2": 200.0,
-   "pcr": 0.74
+   "pcr": 0.74,
+   "opt_value_cr": 3203.57,
+   "atm_trades": 31318,
+   "atm_oi": 93409250,
+   "opt_liq": "liquid"
   },
   "TCS.NS": {
    "symbol": "TCS",
@@ -3044,7 +3852,11 @@
    "resistance": 2500.0,
    "resistance_oi": 2084400,
    "resistance_2": 2600.0,
-   "pcr": 0.71
+   "pcr": 0.71,
+   "opt_value_cr": 6508.99,
+   "atm_trades": 59611,
+   "atm_oi": 11465325,
+   "opt_liq": "liquid"
   },
   "TECHM.NS": {
    "symbol": "TECHM",
@@ -3059,7 +3871,11 @@
    "resistance": 1800.0,
    "resistance_oi": 1021800,
    "resistance_2": 1840.0,
-   "pcr": 0.83
+   "pcr": 0.83,
+   "opt_value_cr": 2065.54,
+   "atm_trades": 11359,
+   "atm_oi": 5962200,
+   "opt_liq": "liquid"
   },
   "TIINDIA.NS": {
    "symbol": "TIINDIA",
@@ -3074,7 +3890,11 @@
    "resistance": 2300.0,
    "resistance_oi": 254400,
    "resistance_2": 2500.0,
-   "pcr": 0.65
+   "pcr": 0.65,
+   "opt_value_cr": 608.36,
+   "atm_trades": 5645,
+   "atm_oi": 816000,
+   "opt_liq": "liquid"
   },
   "TITAN.NS": {
    "symbol": "TITAN",
@@ -3089,7 +3909,11 @@
    "resistance": 5000.0,
    "resistance_oi": 830900,
    "resistance_2": 5200.0,
-   "pcr": 0.62
+   "pcr": 0.62,
+   "opt_value_cr": 5228.33,
+   "atm_trades": 35498,
+   "atm_oi": 3841425,
+   "opt_liq": "liquid"
   },
   "TMPV.NS": {
    "symbol": "TMPV",
@@ -3104,7 +3928,11 @@
    "resistance": 300.0,
    "resistance_oi": 11379200,
    "resistance_2": 320.0,
-   "pcr": 0.61
+   "pcr": 0.61,
+   "opt_value_cr": 3677.04,
+   "atm_trades": 27118,
+   "atm_oi": 38241600,
+   "opt_liq": "liquid"
   },
   "TORNTPHARM.NS": {
    "symbol": "TORNTPHARM",
@@ -3119,7 +3947,11 @@
    "resistance": 4800.0,
    "resistance_oi": 111500,
    "resistance_2": 4700.0,
-   "pcr": 0.52
+   "pcr": 0.52,
+   "opt_value_cr": 410.7,
+   "atm_trades": 4633,
+   "atm_oi": 681750,
+   "opt_liq": "liquid"
   },
   "TRENT.NS": {
    "symbol": "TRENT",
@@ -3134,7 +3966,11 @@
    "resistance": 3400.0,
    "resistance_oi": 801675,
    "resistance_2": 3200.0,
-   "pcr": 0.64
+   "pcr": 0.64,
+   "opt_value_cr": 3040.33,
+   "atm_trades": 20387,
+   "atm_oi": 2674575,
+   "opt_liq": "liquid"
   },
   "TVSMOTOR.NS": {
    "symbol": "TVSMOTOR",
@@ -3149,7 +3985,11 @@
    "resistance": 4500.0,
    "resistance_oi": 284900,
    "resistance_2": 4600.0,
-   "pcr": 0.75
+   "pcr": 0.75,
+   "opt_value_cr": 2692.1,
+   "atm_trades": 24085,
+   "atm_oi": 1804950,
+   "opt_liq": "liquid"
   },
   "UJJIVANSFB.NS": {
    "symbol": "UJJIVANSFB",
@@ -3164,7 +4004,11 @@
    "resistance": 62.0,
    "resistance_oi": 2872000,
    "resistance_2": 65.0,
-   "pcr": 0.77
+   "pcr": 0.77,
+   "opt_value_cr": 125.1,
+   "atm_trades": 864,
+   "atm_oi": 18424000,
+   "opt_liq": "fair"
   },
   "ULTRACEMCO.NS": {
    "symbol": "ULTRACEMCO",
@@ -3179,7 +4023,11 @@
    "resistance": 12500.0,
    "resistance_oi": 69150,
    "resistance_2": 13000.0,
-   "pcr": 0.96
+   "pcr": 0.96,
+   "opt_value_cr": 1521.33,
+   "atm_trades": 12388,
+   "atm_oi": 733600,
+   "opt_liq": "liquid"
   },
   "UNIONBANK.NS": {
    "symbol": "UNIONBANK",
@@ -3194,7 +4042,11 @@
    "resistance": 205.0,
    "resistance_oi": 5681700,
    "resistance_2": 210.0,
-   "pcr": 0.76
+   "pcr": 0.76,
+   "opt_value_cr": 1897.78,
+   "atm_trades": 11769,
+   "atm_oi": 27005775,
+   "opt_liq": "liquid"
   },
   "UNITDSPR.NS": {
    "symbol": "UNITDSPR",
@@ -3209,7 +4061,11 @@
    "resistance": 1440.0,
    "resistance_oi": 244400,
    "resistance_2": 1600.0,
-   "pcr": 1.15
+   "pcr": 1.15,
+   "opt_value_cr": 322.69,
+   "atm_trades": 3378,
+   "atm_oi": 1658400,
+   "opt_liq": "liquid"
   },
   "UNOMINDA.NS": {
    "symbol": "UNOMINDA",
@@ -3224,7 +4080,11 @@
    "resistance": 1400.0,
    "resistance_oi": 259600,
    "resistance_2": 1420.0,
-   "pcr": 0.94
+   "pcr": 0.94,
+   "opt_value_cr": 968.64,
+   "atm_trades": 6841,
+   "atm_oi": 1595550,
+   "opt_liq": "liquid"
   },
   "UPL.NS": {
    "symbol": "UPL",
@@ -3239,7 +4099,11 @@
    "resistance": 560.0,
    "resistance_oi": 3338720,
    "resistance_2": 600.0,
-   "pcr": 0.56
+   "pcr": 0.56,
+   "opt_value_cr": 2218.19,
+   "atm_trades": 18067,
+   "atm_oi": 14552700,
+   "opt_liq": "liquid"
   },
   "VBL.NS": {
    "symbol": "VBL",
@@ -3254,7 +4118,11 @@
    "resistance": 440.0,
    "resistance_oi": 1147500,
    "resistance_2": 470.0,
-   "pcr": 0.57
+   "pcr": 0.57,
+   "opt_value_cr": 516.05,
+   "atm_trades": 5412,
+   "atm_oi": 10302000,
+   "opt_liq": "liquid"
   },
   "VEDL.NS": {
    "symbol": "VEDL",
@@ -3269,7 +4137,11 @@
    "resistance": 270.0,
    "resistance_oi": 2811750,
    "resistance_2": 260.0,
-   "pcr": 0.79
+   "pcr": 0.79,
+   "opt_value_cr": 928.18,
+   "atm_trades": 12584,
+   "atm_oi": 16870500,
+   "opt_liq": "liquid"
   },
   "VMM.NS": {
    "symbol": "VMM",
@@ -3284,7 +4156,11 @@
    "resistance": 100.0,
    "resistance_oi": 2429850,
    "resistance_2": 99.0,
-   "pcr": 0.59
+   "pcr": 0.59,
+   "opt_value_cr": 212.87,
+   "atm_trades": 2277,
+   "atm_oi": 11252000,
+   "opt_liq": "liquid"
   },
   "VOLTAS.NS": {
    "symbol": "VOLTAS",
@@ -3299,7 +4175,11 @@
    "resistance": 1200.0,
    "resistance_oi": 567375,
    "resistance_2": 1140.0,
-   "pcr": 0.94
+   "pcr": 0.94,
+   "opt_value_cr": 1815.86,
+   "atm_trades": 19917,
+   "atm_oi": 2843625,
+   "opt_liq": "liquid"
   },
   "WAAREEENER.NS": {
    "symbol": "WAAREEENER",
@@ -3314,7 +4194,11 @@
    "resistance": 2640.0,
    "resistance_oi": 418250,
    "resistance_2": 2600.0,
-   "pcr": 0.53
+   "pcr": 0.53,
+   "opt_value_cr": 2129.63,
+   "atm_trades": 25222,
+   "atm_oi": 2173675,
+   "opt_liq": "liquid"
   },
   "WIPRO.NS": {
    "symbol": "WIPRO",
@@ -3329,7 +4213,11 @@
    "resistance": 200.0,
    "resistance_oi": 9186000,
    "resistance_2": 205.0,
-   "pcr": 0.79
+   "pcr": 0.79,
+   "opt_value_cr": 1476.31,
+   "atm_trades": 12637,
+   "atm_oi": 44490000,
+   "opt_liq": "liquid"
   },
   "YESBANK.NS": {
    "symbol": "YESBANK",
@@ -3344,7 +4232,11 @@
    "resistance": 22.0,
    "resistance_oi": 107606000,
    "resistance_2": 20.0,
-   "pcr": 0.52
+   "pcr": 0.52,
+   "opt_value_cr": 931.64,
+   "atm_trades": 4885,
+   "atm_oi": 206721700,
+   "opt_liq": "liquid"
   },
   "ZYDUSLIFE.NS": {
    "symbol": "ZYDUSLIFE",
@@ -3359,7 +4251,11 @@
    "resistance": 1200.0,
    "resistance_oi": 765450,
    "resistance_2": 1300.0,
-   "pcr": 0.71
+   "pcr": 0.71,
+   "opt_value_cr": 914.35,
+   "atm_trades": 9008,
+   "atm_oi": 3727350,
+   "opt_liq": "liquid"
   }
  }
 }
