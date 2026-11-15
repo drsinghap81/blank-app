@@ -3013,11 +3013,11 @@ function assetRows(countOnly) {
   if (countOnly) return A.rows.filter((r) => st(r) < 2);
   const q = (state.ath.q || '').toLowerCase();
   const L = A.rows.filter((r) => !q || r.name.toLowerCase().includes(q) || r.group.toLowerCase().includes(q) || r.key.toLowerCase().includes(q));
-  return L.map((r) => ({ ...r, _st: st(r) })).sort((a, b) => (a._st - b._st) || ((b.mclose ? b.mclose.long_cup : 0) - (a.mclose ? a.mclose.long_cup : 0)) || (a.group < b.group ? -1 : a.group > b.group ? 1 : a.below_ath_pct - b.below_ath_pct));
+  return L.map((r) => ({ ...r, _st: st(r) })).filter((r) => r._st < 2 || state.assetsAll || q).sort((a, b) => (a._st - b._st) || ((b.mclose ? b.mclose.long_cup : 0) - (a.mclose ? a.mclose.long_cup : 0)) || (a.group < b.group ? -1 : a.group > b.group ? 1 : a.below_ath_pct - b.below_ath_pct));
 }
 function assetItem(r, i, L) {
   const m = r.mclose; const n = (v) => fmt(v, v >= 1000 ? 0 : v >= 10 ? 2 : 4, 'en-US');
-  const sep = i === 0 || L[i - 1]._st !== r._st ? `<li class="ixsep">${['Closed last month above an all-time high at least a year old', 'Within 5% of an all-time-high close at least a year old', 'The rest'][r._st]}</li>` : '';
+  const sep = i === 0 || L[i - 1]._st !== r._st ? `<li class="ixsep">${['Closed last month above an all-time high at least a year old', 'Within 5% of an all-time-high close at least a year old', 'All other assets: NOT near their high'][r._st]}</li>` : '';
   const chips = (m ? `<span class="chip new">Closed ${pct(m.above_pct)} over old ATH</span>${m.long_cup ? '<span class="chip new">Long cup</span>' : ''}` : '')
     + `<span class="chip">${esc(r.group)}</span><span class="chip ${r.base_months >= 24 ? 'new' : ''}">${r.base_months >= 12 ? baseTxt(r.base_months) : `high ${mLab(r.ath_month)}`}</span>`
     + (r.depth != null && r.base_months >= 12 ? `<span class="chip">fell ${fmt(Math.abs(r.depth * 100), 0)}% in base</span>` : '')
@@ -3118,7 +3118,9 @@ function athList() {
   if (tab === 'assets') {
     const A = all;
     $('#athlist').innerHTML = (state.assets ? `<li class="muted pad">Monthly closes to ${state.assets.month ? mLab(state.assets.month) : 'last month'} · Yahoo data · ${A.length} assets. Same month-close check as the stock list. Commodity prices are front-month futures (not roll-adjusted), so very old highs are approximate. "In rupees" = global price × US$/₹, close to MCX but without Indian import duty, which has changed over the years. Not tested as a trading system; information only.</li>` : '')
-      + (A.length ? A.map((r, i) => assetItem(r, i, A)).join('') : '<li class="empty">The asset scan appears after its first run.</li>');
+      + (A.length ? A.map((r, i) => assetItem(r, i, A)).join('') : `<li class="empty">${state.assets ? 'No asset closed last month above an all-time high at least a year old, and none is within 5% of one.' : 'The asset scan appears after its first run.'}</li>`)
+      + (state.assets ? `<li><button class="more" id="assetall">${state.assetsAll ? 'Show only the qualifying ones' : `Show all ${state.assets.rows.length} assets with their distance from the high`}</button></li>` : '');
+    const ab = $('#assetall'); if (ab) ab.addEventListener('click', () => { state.assetsAll = !state.assetsAll; athList(); });
     $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => tvOpen(A[+el.dataset.i].key)));
     return;
   }

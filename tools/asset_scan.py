@@ -17,7 +17,7 @@ A = {
                    "AUDUSD=X": "Australian dollar in US$", "USDJPY=X": "US dollar in yen", "USDCNY=X": "US dollar in yuan", "AUDINR=X": "Australian dollar in rupees",
                    "EURINR=X": "Euro in rupees", "GBPINR=X": "Pound in rupees", "JPYINR=X": "Yen in rupees", "SGDINR=X": "Singapore dollar in rupees",
                    "AEDINR=X": "UAE dirham in rupees", "NZDUSD=X": "NZ dollar in US$", "USDCAD=X": "US dollar in Canadian $", "USDCHF=X": "US dollar in Swiss franc",
-                   "USDSGD=X": "US dollar in Singapore $", "USDHKD=X": "US dollar in HK$", "USDKRW=X": "US dollar in won", "USDTWD=X": "US dollar in Taiwan $",
+                   "USDSGD=X": "US dollar in Singapore $", "USDKRW=X": "US dollar in won", "USDTWD=X": "US dollar in Taiwan $",
                    "USDBRL=X": "US dollar in real", "USDMXN=X": "US dollar in peso", "USDZAR=X": "US dollar in rand", "USDTRY=X": "US dollar in lira",
                    "EURGBP=X": "Euro in pounds", "EURJPY=X": "Euro in yen", "GBPJPY=X": "Pound in yen", "AUDJPY=X": "Australian dollar in yen",
                    "EURAUD=X": "Euro in Australian $", "GBPAUD=X": "Pound in Australian $", "AUDNZD=X": "Australian $ in NZ $"},
