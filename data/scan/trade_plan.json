@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-15 01:01 UTC",
+"generated": "2026-11-15 02:33 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-13",
@@ -638,38 +638,6 @@
 "risk_pct": 5.3
 },
 {
-"id": "RET-MATRIMONY-2026-11-13",
-"symbol": "MATRIMONY",
-"name": "Matrimony.Com Limited",
-"system": "Breakout retest",
-"bucket": "rt",
-"kind": "RETEST",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 567.97,
-"ref": 562.3499755859375,
-"stop": 522.32,
-"target": 704.92,
-"exit_rule": "3R target 704.92 or the stop, max 120 days (as tested)",
-"note": "retest of the old breakout level 550.75 on 2026-11-13, next resistance 607.35",
-"score": 2,
-"value_cr": null,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": null,
-"lane": null,
-"group_pulse": null,
-"group_rank": null,
-"rank": 1,
-"risk_pct": 8.7
-},
-{
 "id": "RET-ENTERO-2026-11-12",
 "symbol": "ENTERO",
 "name": "Entero Healthcare Solutions Limited",
@@ -698,7 +666,7 @@
 "lane": null,
 "group_pulse": null,
 "group_rank": null,
-"rank": 2,
+"rank": 1,
 "risk_pct": 10.8
 }
 ],
@@ -716,6 +684,18 @@
 "group_rank": 6
 },
 {
+"symbol": "APOLLOTYRE",
+"name": "Apollo Tyres Limited",
+"typ": "DB",
+"close": 420.79998779296875,
+"neck": 416.75,
+"stop": 374.42,
+"signal_date": "2026-11-05",
+"group": "Auto Parts",
+"lane": "hold",
+"group_rank": 30
+},
+{
 "symbol": "SWIGGY",
 "name": "Swiggy Limited",
 "typ": "DB",
@@ -726,18 +706,6 @@
 "group": "Internet Retail",
 "lane": "hold",
 "group_rank": 10
-},
-{
-"symbol": "GPPL",
-"name": "Gujarat Pipavav Port Limited",
-"typ": "TW",
-"close": 173.58999633789062,
-"neck": 172.42930603027344,
-"stop": 138.64,
-"signal_date": "2026-11-13",
-"group": "Marine Shipping",
-"lane": "hold",
-"group_rank": 3
 },
 {
 "symbol": "HDFCAMC",
@@ -792,24 +760,12 @@
 "name": "ICICI Bank Limited",
 "typ": "TW",
 "close": 1583.5999755859375,
-"neck": 1460.0,
-"stop": 1198.39,
+"neck": 1463.0999755859375,
+"stop": 1208.49,
 "signal_date": "2026-11-05",
 "group": "Banks - Private Large",
 "lane": "mid",
 "group_rank": 8
-},
-{
-"symbol": "RECLTD",
-"name": "REC Limited",
-"typ": "DB",
-"close": 301.8500061035156,
-"neck": 308.1150207519531,
-"stop": 277.49,
-"signal_date": "2026-11-11",
-"group": "Credit Services",
-"lane": "mid",
-"group_rank": 45
 },
 {
 "symbol": "MARATHON",
@@ -864,8 +820,8 @@
 "name": "Emami Limited",
 "typ": "DB",
 "close": 408.1000061035156,
-"neck": 386.7069091796875,
-"stop": 349.15,
+"neck": 391.45001220703125,
+"stop": 353.43,
 "signal_date": "2026-11-09",
 "group": "Household & Personal Products",
 "lane": "bounce",
@@ -896,18 +852,6 @@
 "group_rank": 54
 },
 {
-"symbol": "IOC",
-"name": "Indian Oil Corporation Limited",
-"typ": "TB",
-"close": 144.0399932861328,
-"neck": 145.00759887695312,
-"stop": 124.1,
-"signal_date": "2026-11-06",
-"group": "Oil & Gas Refining & Marketing",
-"lane": "fade",
-"group_rank": 20
-},
-{
 "symbol": "ANURAS",
 "name": "Anupam Rasayan India Limited",
 "typ": "DB",
@@ -918,6 +862,18 @@
 "group": "Specialty Chemicals",
 "lane": "fade",
 "group_rank": 37
+},
+{
+"symbol": "IOC",
+"name": "Indian Oil Corporation Limited",
+"typ": "TB",
+"close": 144.0399932861328,
+"neck": 146.3000030517578,
+"stop": 124.1,
+"signal_date": "2026-11-09",
+"group": "Oil & Gas Refining & Marketing",
+"lane": "fade",
+"group_rank": 20
 },
 {
 "symbol": "TIRUMALCHM",
@@ -936,12 +892,24 @@
 "name": "Ganesh Consumer Products Limited",
 "typ": "TW",
 "close": 180.0399932861328,
-"neck": 168.61837768554688,
-"stop": 140.48,
+"neck": 172.00999450683594,
+"stop": 143.3,
 "signal_date": "2026-11-02",
 "group": "Packaged Foods",
 "lane": "weak",
 "group_rank": 60
+},
+{
+"symbol": "INDIACEM",
+"name": "The India Cements Limited",
+"typ": "DB",
+"close": 348.79998779296875,
+"neck": 331.75,
+"stop": 283.63,
+"signal_date": "2026-11-04",
+"group": "Building Materials",
+"lane": "weak",
+"group_rank": 65
 }
 ],
 "watch": [
