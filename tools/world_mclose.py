@@ -242,10 +242,9 @@ def main():
     india = M in ("BSE", "SME")
     if india:
         from adjust import fix_gaps
-    for a in range(0, len(ok), 50):              # 2) history for the liquid ones
-        ch = ok[a:a + 50]
-        dd = dl(ch, period="max", interval="1d") if india else dl(ch, period="max", interval="1mo")
-        dw = None if india else dl(ch, period="2y", interval="1wk")
+    for a in range(0, len(ok), 40):              # 2) history for the liquid ones
+        ch = ok[a:a + 40]
+        dd = dl(ch, period="max", interval="1d")     # daily for every market: Yahoo's monthly bars can be wrong
         if dd is None or dd.empty:
             continue
         for t in ch:
@@ -265,9 +264,10 @@ def main():
                     if c is None:
                         continue
                     c = c.dropna(); c = c[c > 0]
-                    mc = pd.Series(c.values, index=c.index.to_period("M")); mc = mc[~mc.index.duplicated(keep="last")]; mc = mc[mc.index <= lm]
-                    wc = col(dw, "Close", t) if dw is not None else None
-                    w = wc.dropna() if wc is not None else pd.Series(dtype=float); w = w[w.index <= me]
+                    if len(c) < 300:
+                        continue
+                    mc = c.groupby(c.index.to_period("M")).last(); mc = mc[mc.index <= lm]
+                    w = c[c.index <= me].resample("W-FRI").last().dropna()
                     last = float(c.iloc[-1])
                 n_hist += int(len(mc.dropna()) >= 14); n_cur += int(len(mc.dropna()) > 0 and mc.dropna().index[-1] == lm)
                 m_ = mc.dropna()
