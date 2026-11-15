@@ -21,7 +21,33 @@ A = {
                       "^NSEBANK": "Nifty Bank", "^AXJO": "ASX 200", "^FTSE": "FTSE 100", "^GDAXI": "DAX", "^FCHI": "CAC 40", "^STOXX50E": "Euro Stoxx 50",
                       "^N225": "Nikkei 225", "^HSI": "Hang Seng", "000001.SS": "Shanghai Composite", "^KS11": "KOSPI", "^TWII": "Taiwan", "^BVSP": "Brazil Bovespa"},
 }
+INR = {"GC=F": "Gold in rupees", "SI=F": "Silver in rupees", "HG=F": "Copper in rupees", "ALI=F": "Aluminium in rupees",
+       "CL=F": "Crude oil in rupees", "NG=F": "Natural gas in rupees"}   # ~MCX: global futures x US$/Rs (excludes Indian duties/premiums)
+RAW = {}
 rows = []
+
+
+def add_row(t, nm, grp, x):
+    mc = x.Close.resample("ME").last().dropna(); per = mc.index.to_period("M")
+    lm = pd.Timestamp(datetime.now(timezone.utc).date()).to_period("M") - 1
+    done = mc[per <= lm]
+    if len(done) < 14:
+        return
+    a = int(np.argmax(done.to_numpy())); old = float(done.iloc[a])
+    w = x.Close.resample("W-FRI").last().dropna(); sma = w.rolling(30).mean()
+    r = dict(key=t, name=nm, group=grp, close=float(x.Close.iloc[-1]), asof=str(x.index[-1].date()), first=str(x.index[0].date()),
+             ath_close=old, ath_month=str(per[per <= lm][a]), base_months=int(len(done) - 1 - a), below_ath_pct=round((1 - float(x.Close.iloc[-1]) / old) * 100, 2),
+             sma_rising=bool(len(sma.dropna()) > 5 and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5]), mclose=None)
+    try:
+        r["mclose"] = mclose_state(x)
+    except Exception as e:  # noqa: BLE001
+        print("mclose fail", t, e)
+    if r["mclose"]:                                  # the breakout month is the new ATH: report the OLD high it cleared
+        r.update(ath_close=r["mclose"]["old_ath"], ath_month=r["mclose"]["ath_month"], base_months=r["mclose"]["base_months"])
+    r["depth"] = r["mclose"]["depth"] if r["mclose"] else (round(float(done.iloc[a + 1:].min() / old - 1), 4) if a + 1 < len(done) else None)
+    rows.append(r)
+
+
 for grp, D in A.items():
     for t, nm in D.items():
         x = None
@@ -38,25 +64,18 @@ for grp, D in A.items():
         x = x[["Open", "High", "Low", "Close"]].dropna(subset=["Close"]); x = x[x.Close > 0]
         if len(x) < 400:
             continue
-        mc = x.Close.resample("ME").last().dropna(); per = mc.index.to_period("M")
-        lm = pd.Timestamp(datetime.now(timezone.utc).date()).to_period("M") - 1
-        done = mc[per <= lm]
-        if len(done) < 14:
-            continue
-        a = int(np.argmax(done.to_numpy())); old = float(done.iloc[a])
-        w = x.Close.resample("W-FRI").last().dropna(); sma = w.rolling(30).mean()
-        r = dict(key=t, name=nm, group=grp, close=float(x.Close.iloc[-1]), asof=str(x.index[-1].date()), first=str(x.index[0].date()),
-                 ath_close=old, ath_month=str(per[per <= lm][a]), base_months=int(len(done) - 1 - a), below_ath_pct=round((1 - float(x.Close.iloc[-1]) / old) * 100, 2),
-                 sma_rising=bool(len(sma.dropna()) > 5 and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5]), mclose=None)
-        try:
-            r["mclose"] = mclose_state(x)
-        except Exception as e:  # noqa: BLE001
-            print("mclose fail", t, e)
-        if r["mclose"]:                                  # the breakout month is the new ATH: report the OLD high it cleared
-            r.update(ath_close=r["mclose"]["old_ath"], ath_month=r["mclose"]["ath_month"], base_months=r["mclose"]["base_months"])
-        r["depth"] = r["mclose"]["depth"] if r["mclose"] else (round(float(done.iloc[a + 1:].min() / old - 1), 4) if a + 1 < len(done) else None)
-        rows.append(r)
+        RAW[t] = x
+        add_row(t, nm, grp, x)
         time.sleep(0.5)
+fx = RAW.get("USDINR=X")
+if fx is not None:
+    f = fx.Close
+    for t, nm in INR.items():
+        if t in RAW:
+            x = RAW[t]; k = f.reindex(x.index, method="ffill")
+            xi = x[["Open", "High", "Low", "Close"]].mul(k, axis=0).dropna()
+            if len(xi) >= 400:
+                add_row(t + ":INR", nm, "In rupees (≈MCX)", xi)
 os.makedirs("data/scan", exist_ok=True)
 json.dump(dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
                month=str(pd.Timestamp(datetime.now(timezone.utc).date()).to_period("M") - 1), rows=rows),

@@ -3036,9 +3036,9 @@ function athList() {
   if (tab === 'pulse') { pulseView(); return; }
   if (tab === 'assets') {
     const A = all;
-    $('#athlist').innerHTML = (state.assets ? `<li class="muted pad">Monthly closes to ${state.assets.month ? mLab(state.assets.month) : 'last month'} · Yahoo data · ${A.length} assets. Same month-close check as the stock list. Commodity prices are front-month futures (not roll-adjusted), so very old highs are approximate. Not tested as a trading system; information only.</li>` : '')
+    $('#athlist').innerHTML = (state.assets ? `<li class="muted pad">Monthly closes to ${state.assets.month ? mLab(state.assets.month) : 'last month'} · Yahoo data · ${A.length} assets. Same month-close check as the stock list. Commodity prices are front-month futures (not roll-adjusted), so very old highs are approximate. "In rupees" = global price × US$/₹, close to MCX but without Indian import duty, which has changed over the years. Not tested as a trading system; information only.</li>` : '')
       + (A.length ? A.map((r, i) => assetItem(r, i, A)).join('') : '<li class="empty">The asset scan appears after its first run.</li>');
-    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => window.open(`https://finance.yahoo.com/quote/${encodeURIComponent(A[+el.dataset.i].key)}`, '_blank', 'noopener')));
+    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => window.open(`https://finance.yahoo.com/quote/${encodeURIComponent(A[+el.dataset.i].key.split(':')[0])}`, '_blank', 'noopener')));
     return;
   }
   if (tab === 'fund') {
