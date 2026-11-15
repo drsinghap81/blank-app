@@ -3276,6 +3276,7 @@ function sectorStrip() {
 }
 const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` : `${m}-mo base`);
 function athList() {
+  if (!$('#athlist')) return;
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   if (tab === 'pulse') { pulseView(); return; }
   if (tab === 'gm') { $('#athlist').innerHTML = '<li><div id="athgm"></div></li>'; tdGrowthMom($('#athgm')).then(() => { const dd = document.querySelector('#athgm details'); if (dd) dd.open = true; }); return; }
@@ -4806,14 +4807,14 @@ async function tdRender2(el) {
   // ---- watch: close lists as cards (see only)
   const wdCards = [...((at && at.week_close) || []), ...((at && at.day_close) || [])].map((r) => ({ r, live: Object.keys(S.M[r.symbol] || {}).filter((k) => ['ath', 't921', 'vcp', 'ipo'].includes(k)) }))
     .sort((a, b) => (b.live.length - a.live.length) || ((SEC_O[a.r.sector_tag] ?? 4) - (SEC_O[b.r.sector_tag] ?? 4)));
-  const wdCard = ({ r, live }) => `<div class="t2-wcard${live.length ? ' both' : ''}"><span class="t2-ch"><span><b>${esc(r.name || r.symbol)}</b><small>${esc(r.symbol)} · ${r.kind === 'W' ? 'week' : 'day'} to ${day(r.period)} closed ${pct(r.above_pct)} over its ${r.base}-${r.kind === 'W' ? 'wk' : 'day'} cup high ${Mz(r.old_ath, 2)} · cup ${fmt(Math.abs(r.depth * 100), 0)}%</small></span>${live.length ? '<span class="t2-tag both">In both</span>' : `<span class="t2-tag">${r.kind === 'W' ? 'Week' : 'Day'}</span>`}</span>
+  const wdCard = ({ r, live }, i) => `<div class="t2-wcard${live.length ? ' both' : ''}" role="button" tabindex="0" data-wd="${i}"><span class="t2-ch"><span><b>${esc(r.name || r.symbol)}</b><small>${esc(r.symbol)} · ${r.kind === 'W' ? 'week' : 'day'} to ${day(r.period)} closed ${pct(r.above_pct)} over its ${r.base}-${r.kind === 'W' ? 'wk' : 'day'} cup high ${Mz(r.old_ath, 2)} · cup ${fmt(Math.abs(r.depth * 100), 0)}%</small></span>${live.length ? '<span class="t2-tag both">In both</span>' : `<span class="t2-tag">${r.kind === 'W' ? 'Week' : 'Day'}</span>`}</span>
     <span class="t2-line">${r.kind === 'W' ? 'Week' : 'Day'} high to watch <b>${Mz(r.high_p, 2)}</b> · ${r.ath ? 'no older high above' : `next resistance ${Mz(r.resistance, 2)} (${fmt(r.room_pct, 0)}% room)`} · measured move ${Mz(r.old_ath * (1 - r.depth), 2)}</span>
     ${live.length ? `<span class="t2-chips">${live.map((k) => { const x = S.M[r.symbol][k]; return `<span class="t2-chip">${k === 'ath' ? 'Momentum ' + x.txt.toLowerCase() : k === 't921' ? '9/21 ' + x.txt.toLowerCase() : k === 'vcp' ? 'VCP setup' : 'IPO cup'}</span>`; }).join('')}<span class="t2-chip strong">Trade with that system's rules</span></span>` : ''}</div>`;
   // investment first choice: ETF/fund/index month close above ATH (this market)
   const fm = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[mk];
-  const invFirst = ((fund && fund.rows) || []).filter((r) => (r.market || 'IN') === fm && r.mclose).map((r) => ({ name: fundName(r), a: r.mclose, close: r.close }))
-    .concat(mk === 'NSE' ? ((idx && idx.rows) || []).map((r) => ({ name: r.index, a: r, close: r.close })) : []);
-  const invCard = (x) => `<div class="t2-wcard inv"><span class="t2-ch"><span><b>${esc(x.name)}</b><small>${mLab(x.a.month)} closed ${fmt(x.a.close_m, 2)} above its all-time high ${fmt(x.a.old_ath, 2)} (${mLab(x.a.ath_month)}) · ${baseTxt(x.a.base_months)} cup, fell ${fmt(Math.abs(x.a.depth * 100), 0)}%</small></span><span class="t2-tag inv">Watch first</span></span>
+  const invFirst = ((fund && fund.rows) || []).filter((r) => (r.market || 'IN') === fm && r.mclose).map((r) => ({ name: fundName(r), a: r.mclose, close: r.close, row: r }))
+    .concat(mk === 'NSE' ? ((idx && idx.rows) || []).map((r) => ({ name: r.index, a: r, close: r.close, tv: nseIdxTv(r.index) })) : []);
+  const invCard = (x, i) => `<div class="t2-wcard inv" role="button" tabindex="0" data-iv="${i}"><span class="t2-ch"><span><b>${esc(x.name)}</b><small>${mLab(x.a.month)} closed ${fmt(x.a.close_m, 2)} above its all-time high ${fmt(x.a.old_ath, 2)} (${mLab(x.a.ath_month)}) · ${baseTxt(x.a.base_months)} cup, fell ${fmt(Math.abs(x.a.depth * 100), 0)}%</small></span><span class="t2-tag inv">Watch first</span></span>
     <span class="t2-line">${mLab(x.a.month).split(' ')[0]} high to watch <b>${x.a.high_m ? fmt(x.a.high_m, 2) : '–'}</b> · now ${fmt(x.close, 2)} · no tested system for ETFs yet</span></div>`;
   const fundsMk = ((fund && fund.rows) || []).filter((r) => (r.market || 'IN') === fm);
   const invRows = [
@@ -4873,6 +4874,11 @@ async function tdRender2(el) {
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   const W = [...el.querySelectorAll('.t2-sec')]; [invRows, momRows, trdRows].forEach((L, k) => W[k].querySelectorAll('.t2-wr').forEach((b) => b.addEventListener('click', () => L[+b.dataset.w].go())));
   $('#t2live').addEventListener('click', () => show('live'));
+  // 15 Nov 2026: close-list cards open their chart (stocks: the ATH panel with weekly/daily chart; ETFs/funds: fund panel; indices: TradingView)
+  el.querySelectorAll('.t2-wcard[data-wd]').forEach((b) => b.addEventListener('click', () => { const r = wdCards[+b.dataset.wd].r;
+    state.athMkt = mk; state.athWorld = false; state.ath = (state.athC && state.athC[mk]) || { tab: 'wclose', d: at, q: '', all: false }; mcloseSelect(r); }));
+  el.querySelectorAll('.t2-wcard[data-iv]').forEach((b) => b.addEventListener('click', () => { const x = invFirst[+b.dataset.iv];
+    if (x.row) fundSelect(x.row); else if (x.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(x.tv) + '&interval=1M', '_blank', 'noopener'); }));
   el.querySelectorAll('.t2-td[data-go]').forEach((b) => b.addEventListener('click', () => { const g = b.dataset.go; if (g === 'inv') { state.athMkt = mk; state.athTabG.inv = 'themes'; } if (g === 'ath') { state.athMkt = mk; state.athWorld = false; } show(g); }));
   $('#t2old').addEventListener('click', () => { state.todayV1 = true; tdRender(el, false); });
   tdMatrix($('#tdmx'), mk); tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); }

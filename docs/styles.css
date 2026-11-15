@@ -1057,3 +1057,4 @@ body.pub .owner-only { display: none !important; }
 .t2-td.warn{border-color:var(--saffron);box-shadow:inset 3px 0 0 var(--saffron)}
 .t2-td:not(:last-child)::after{content:'›';position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.5;z-index:1}
 @media (max-width:420px){.t2-tdr{grid-template-columns:repeat(2,1fr)}.t2-td:nth-child(2)::after{content:''}}
+.t2-wcard[role=button]{cursor:pointer}
