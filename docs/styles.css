@@ -1064,3 +1064,12 @@ body.pub .owner-only { display: none !important; }
 .t2-list>.t2-card,.t2-hs>.t2-wcard{flex:0 0 min(84%,340px);scroll-snap-align:start;margin-bottom:0}
 .t2-list>.t2-empty{flex:1}
 @media (min-width:900px){.t2-list,.t2-hs{flex-wrap:wrap;overflow-x:visible}.t2-list>.t2-card,.t2-hs>.t2-wcard{flex:0 0 calc(50% - 5px)}}
+/* 15 Nov 2026: rows without a sparkline give the text the full width (chips were squeezed into a narrow column).
+   Phones: price and its note move under the chips, so chips use the whole row. */
+.row:has(> div:nth-child(2):empty) { grid-template-columns: minmax(0, 1fr) auto; }
+.row > div:nth-child(2):empty { display: none; }
+@media (max-width: 640px) {
+  .row:has(> div:nth-child(2):empty) { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .row:has(> div:nth-child(2):empty) > .num { text-align: left; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+  .row:has(> div:nth-child(2):empty) > .num > * { display: inline !important; margin: 0; }
+}
