@@ -2219,6 +2219,7 @@ async function loadATH() {
     const tr = state.data[mk] || await getJSON(MAIN + AP() + 'trend_scan.json', 'td_' + mk);
     if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds');
     if (!state.assets) state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets');
+    if (!state.worldMC) state.worldMC = (await Promise.all(WORLD_MK.map((k) => getJSON(MAIN + `data/scan/world/${k}.json`, 'world_' + k).catch(() => null)))).filter(Boolean);
     await loadGP(mk);
     state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'brk', q: '', all: false };
   }
@@ -2238,7 +2239,7 @@ async function loadATH() {
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
   const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ['tracked', 'Tracked signals', T.length],
-    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length], ['assets', 'Commodities & more', assetRows(true).length]];
+    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length], ['assets', 'Commodities & more', assetRows(true).length], ['world', 'World stocks', worldRows().length]];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     <section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
@@ -2255,6 +2256,7 @@ async function loadATH() {
         themes: 'Shortlist = indices (broad, sector and thematic) in an uptrend (above a rising 30-week SMA) with 6-month RS vs Nifty 50 above zero, ordered: cup breakout (new monthly-close high after a base of 2+ years), new high (shorter base), cup forming (within 5% of a 2+-year-old high), within 5% of the high, then the rest; inside each group leading before uptrend, RS rising first, then by RS. Tap one for its weekly chart with the 30-week SMA, or monthly with the highest-month-close line. Below: the rest, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
         pulse: `${(state.gp[mk] && state.gp[mk].rule) || ''} ${(state.gp[mk] && state.gp[mk].backtest) || ''} Tile size = number of liquid stocks; colour = Pulse; bottom strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-but-bouncing, red weak); ↑/↓ = 1-month Pulse vs a month ago. Tap a group for its stocks. Our own computation of industry breadth (the idea behind RideWinners' Market Pulse), not their data.`,
         fund: `ETFs${mk === 'NSE' ? ' and mutual funds (AMFI NAVs)' : mk === 'US' ? ' listed in the US' : ' listed on the ASX, incl. global ones'} with the same monthly ATH rules: trigger = high of the highest-monthly-close month, base 12+ months (2+ years = tested version), buy when the price trades above it while above a rising 30-week SMA; sell at the next open after a weekly close below the 30-week SMA. Signals of the last 18 months plus "near" (within 5% below the trigger). "Cup + trend only" (default) keeps live signals whose base had a real cup — the monthly close fell 15%+ below the old high before coming back — and leaves out bond/cash ETFs and exited trades; diversified funds often just drift back to an old high without a cup. ${(state.fund && state.fund.ath_note) || ''} Tap one for its chart.`,
+        world: 'Japan, Hong Kong, Canada, Europe (ex-UK, index members), South Korea, Taiwan, and Indian stocks outside the NSE scan (BSE-only and NSE SME): the same month-close check as the Month close tab. Tap one to open it on Yahoo Finance.',
         assets: 'Commodities, currencies, crypto, US bond yields and world indices. Top: assets whose last completed month closed above their old all-time-high monthly close after a base of 1+ years (long cup = 3+ years with a 30%+ fall). Then those within 5% of such a high. Tap one to open it on Yahoo Finance.',
         ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>${state.ath.tab === 'td' ? '' : sectorStrip()}</details>
       ${state.ath.tab === 'td' ? topStrip() : ''}
@@ -2968,6 +2970,22 @@ function assetItem(r, i, L) {
   const right = `<b>${n(r.close)}</b><span class="${r.below_ath_pct <= 0 ? 'up' : 'muted'}">${pct(-r.below_ath_pct)} vs ATH</span>`;
   return `${sep}<li class="row ${r._st === 0 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.name)}</div><div class="co">ATH close ${n(r.ath_close)} (${mLab(r.ath_month)})</div><div class="tags">${chips}</div></div><div></div><div class="num">${right}</div></li>`;
 }
+/* 15 Nov 2026: month-close check for stocks outside the main scans (tools/world_mclose.py) */
+const WORLD_MK = ['BSE', 'SME', 'JP', 'HK', 'CA', 'EU', 'KR', 'TW'];
+function worldRows() {
+  const W = state.worldMC || []; const q = ((state.ath && state.ath.q) || '').toLowerCase();
+  return W.flatMap((m) => (m.rows || []).map((r) => ({ ...r, _mk: m.name })))
+    .filter((r) => !q || r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q) || r._mk.toLowerCase().includes(q))
+    .sort((a, b) => (WORLD_MK.indexOf(a.market) - WORLD_MK.indexOf(b.market)) || (b.long_cup - a.long_cup) || (b.base_months - a.base_months));
+}
+function worldItem(r, i, L) {
+  const sep = i === 0 || L[i - 1].market !== r.market ? `<li class="ixsep">${esc(r._mk)}</li>` : '';
+  const n = (v) => fmt(v, v >= 1000 ? 0 : 2, 'en-US');
+  const chip = `<span class="chip">Closed ${pct(r.above_pct)} over old ATH</span>${r.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${r.base_months >= 24 ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">fell ${fmt(Math.abs(r.depth * 100), 0)}% in base</span>`
+    + `<span class="chip ${r.sma_rising ? 'open' : 'exit'}">${r.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>`;
+  return `${sep}<li class="row ${r.base_months >= 24 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${chip}</div></div><div></div>
+    <div class="num"><b>${esc(r.cur)}${n(r.close)}</b><span class="${r.since_pct >= 0 ? 'up' : 'down'}">${pct(r.since_pct)} since ${mLab(r.month).split(' ')[0]}</span></div></li>`;
+}
 function fundMcItem(r, i) {
   const a = r.mclose; const sm = r.close / a.close_m - 1;
   return `<li class="row ${a.base_months >= 24 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(fundName(r))}</div>
@@ -2989,6 +3007,7 @@ function athRows() {
   if (tab === 'td') return tdRows();
   if (tab === 'fund') return fundAthRows();
   if (tab === 'assets') return assetRows();
+  if (tab === 'world') return worldRows();
   if (tab === 'pulse') return ((state.gp[AM()] || {}).rows || []);
   if (tab === 'ipo') return ipoRows();
   if (tab === 'themes') return themeRows();
@@ -3034,6 +3053,13 @@ const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` 
 function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   if (tab === 'pulse') { pulseView(); return; }
+  if (tab === 'world') {
+    const W = all; const S = state.worldMC || [];
+    $('#athlist').innerHTML = `<li class="muted pad">Stocks the main scans don't cover whose last completed month CLOSED above their old all-time-high monthly close after a base of 1+ years (bold = 2+ years; long cup = 3+ years with a 30%+ fall). Liquid stocks only (about US$1 m a day; India ₹2 cr). Not tested in these markets; information only. Scanned: ${S.map((m) => `${esc(m.name)} ${Number(m.liquid).toLocaleString()} of ${Number(m.listed).toLocaleString()}`).join(' · ') || 'first run pending'}.</li>`
+      + (W.length ? W.map((r, i) => worldItem(r, i, W)).join('') : '<li class="empty">None last month, or the first scan has not run yet.</li>');
+    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => window.open(`https://finance.yahoo.com/quote/${encodeURIComponent(W[+el.dataset.i].ticker)}`, '_blank', 'noopener')));
+    return;
+  }
   if (tab === 'assets') {
     const A = all;
     $('#athlist').innerHTML = (state.assets ? `<li class="muted pad">Monthly closes to ${state.assets.month ? mLab(state.assets.month) : 'last month'} · Yahoo data · ${A.length} assets. Same month-close check as the stock list. Commodity prices are front-month futures (not roll-adjusted), so very old highs are approximate. "In rupees" = global price × US$/₹, close to MCX but without Indian import duty, which has changed over the years. Not tested as a trading system; information only.</li>` : '')
