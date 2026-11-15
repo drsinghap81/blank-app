@@ -28,6 +28,7 @@ def get(url, **kw):
             r = requests.get(url, headers={**UA, **kw.pop("headers", {})}, timeout=60, **kw)
             if r.status_code == 200:
                 return r
+            print("HTTP", r.status_code, url[:90])
         except Exception as e:  # noqa: BLE001
             print("get fail", url[:80], str(e)[:60])
         time.sleep(3 + 5 * k)
@@ -45,13 +46,29 @@ def lst_bse():
     if r is not None:
         d = pd.read_csv(io.StringIO(r.text)); d.columns = [c.strip() for c in d.columns]; nse = set(d["ISIN NUMBER"].astype(str).str.strip())
     print("NSE ISINs", len(nse))
+    out = {}
     r = get("https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?Group=&Scripcode=&industry=&segment=Equity&status=Active",
-            headers={"Referer": "https://www.bseindia.com/", "Origin": "https://www.bseindia.com"})
-    d = pd.DataFrame(r.json()) if r is not None else pd.DataFrame()
-    if not len(d) or not nse:
+            headers={"Referer": "https://www.bseindia.com/", "Origin": "https://www.bseindia.com", "Accept": "application/json, text/plain, */*"})
+    try:
+        d = pd.DataFrame(r.json()) if r is not None else pd.DataFrame()
+        d = d[~d["ISIN_NUMBER"].astype(str).str.strip().isin(nse)]
+        out = {f"{c}.BO": (str(s).strip(), str(n).strip().title()) for c, s, n in zip(d["SCRIP_CD"], d["scrip_id"], d["Scrip_Name"])}
+    except Exception as e:  # noqa: BLE001
+        print("BSE API list fail", str(e)[:60])
+    if not out:   # fallback: the latest BSE equity bhavcopy (every traded scrip with its ISIN)
+        for k in range(1, 10):
+            dt = (pd.Timestamp.now(tz="Asia/Kolkata") - pd.Timedelta(days=k)).strftime("%Y%m%d")
+            r = get(f"https://www.bseindia.com/download/BhavCopy/Equity/BhavCopy_BSE_CM_0_0_0_{dt}_F_0000.CSV", headers={"Referer": "https://www.bseindia.com/"})
+            if r is None or b"ISIN" not in r.content[:2000]:
+                continue
+            d = pd.read_csv(io.StringIO(r.text)); d = d[~d["ISIN"].astype(str).str.strip().isin(nse)]
+            if "SctySrs" in d:
+                d = d[~d["SctySrs"].astype(str).str.strip().isin(["F", "G", "IF", "IT", "MF", "DB"])]
+            out = {f"{c}.BO": (str(s).strip(), str(n).strip().title()) for c, s, n in zip(d["FinInstrmId"], d["TckrSymb"], d["FinInstrmNm"])}
+            print("BSE list from bhavcopy", dt, len(out)); break
+    if not out or not nse:
         raise RuntimeError("BSE or NSE list unavailable")
-    d = d[~d["ISIN_NUMBER"].astype(str).str.strip().isin(nse)]
-    return {f"{c}.BO": (str(s).strip(), str(n).strip().title()) for c, s, n in zip(d["SCRIP_CD"], d["scrip_id"], d["Scrip_Name"])}
+    return out
 
 
 def lst_sme():
@@ -63,6 +80,12 @@ def lst_sme():
 
 def lst_jp():
     r = get("https://www.jpx.co.jp/english/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_e.xls")
+    if r is None:     # the file's path changes: find the link on the list page
+        pg = get("https://www.jpx.co.jp/english/markets/statistics-equities/misc/01.html")
+        m = re.search(r'href="([^"]+data_e\.xls)"', pg.text) if pg is not None else None
+        r = get("https://www.jpx.co.jp" + m.group(1)) if m else None
+    if r is None:
+        raise RuntimeError("JPX list unavailable")
     d = pd.read_excel(io.BytesIO(r.content))
     d = d[d["Section/Products"].astype(str).str.contains("Prime|Standard|Growth", regex=True) & d["Section/Products"].astype(str).str.contains("Domestic")]
     return {f"{c}.T": (str(c), str(n)) for c, n in zip(d["Local Code"], d["Name (English)"])}
