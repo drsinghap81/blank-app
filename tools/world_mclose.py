@@ -269,6 +269,8 @@ def main():
                     mc = c.groupby(c.index.to_period("M")).last(); mc = mc[mc.index <= lm]
                     w = c[c.index <= me].resample("W-FRI").last().dropna()
                     last = float(c.iloc[-1])
+                if t in os.environ.get("WM_DEBUG", "2480.TW").split(","):
+                    print("DEBUG", t, "top monthly closes:", mc.sort_values().tail(5).round(2).to_dict(), "last", mc.tail(3).round(2).to_dict())
                 n_hist += int(len(mc.dropna()) >= 14); n_cur += int(len(mc.dropna()) > 0 and mc.dropna().index[-1] == lm)
                 m_ = mc.dropna()
                 n_new += int(len(m_) >= 14 and m_.index[-1] == lm and m_.iloc[-1] > m_.iloc[:-1].max())   # new closing high, any base
