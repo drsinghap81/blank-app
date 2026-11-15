@@ -2290,7 +2290,7 @@ async function loadATHWorld(el, mkSeg) {
   if (state.athTabNext) { state.ath.tab = state.athTabNext; state.athTabNext = null; }
   const g = (state.worldMC || [])[0]; state.athWAt = state.athWAt || new Date();
   $('#asof').textContent = `Month closes to ${g ? mLab(g.month) : 'last month'}${updTxt(g && g.generated)} · refreshed ${state.athWAt.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })}`;
-  const tabs = [['all', 'All month closes', allMcRows().length], ['world', 'World stocks', worldRows().length], ['assets', 'Commodities & more', assetRows(true).length]];
+  const tabs = [['all', 'All month closes', allMcRows().length], ['world', 'World stocks', worldRows().length], ['assets', 'Commodities & coins', assetRows(true).length]];
   el.innerHTML = `${mkSeg}<div class="card">
       <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -2380,7 +2380,7 @@ async function loadATH() {
   const tabs = ({ mom: [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ...(mk === 'NSE' ? [['gm', 'Growth + momentum', 25]] : []), ['tracked', 'Tracked signals', T.length]],
     trd: [['wclose', 'Week cup close', (d.week_close || []).length], ['dclose', 'Day cup close', (d.day_close || []).length], ['ipo', 'IPO cups', ipoRows(true).length]],
     inv: [['imc', INV_N.imc, invMcRows().length], ['fund', INV_N.fund, fundAthRows(true).length], ['themes', INV_N.themes, themeRows(true).length], ['top', INV_N.top, null], ['pie', INV_N.pie, null]] })[grp];
-  el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
+  el.innerHTML = `${mkSeg}${mk === 'NSE' || grp === 'inv' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     ${grp !== 'mom' ? '' : `<section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
       <div class="stat"><b>${nearMain}</b><span>within 5% of the trigger</span></div>
@@ -3105,7 +3105,9 @@ function assetRows(countOnly) {
   const st = (r) => (r.mclose ? 0 : r.base_months >= 12 && r.below_ath_pct >= 0 && r.below_ath_pct <= 5 ? 1 : 2);
   if (countOnly) return A.rows.filter((r) => st(r) < 2);
   const q = (state.ath.q || '').toLowerCase();
-  const L = A.rows.filter((r) => !q || r.name.toLowerCase().includes(q) || r.group.toLowerCase().includes(q) || r.key.toLowerCase().includes(q));
+  const ag = state.assetG || '';
+  const L = A.rows.filter((r) => (!ag || r.group === ag) && (!q || r.name.toLowerCase().includes(q) || r.group.toLowerCase().includes(q) || r.key.toLowerCase().includes(q)));
+  if (ag) return L.map((r) => ({ ...r, _st: st(r) })).sort((a, b) => (a._st - b._st) || a.below_ath_pct - b.below_ath_pct); // a chosen group: every asset in it, nearest the high first
   return L.map((r) => ({ ...r, _st: st(r) })).filter((r) => r._st < 2 || state.assetsAll || q).sort((a, b) => (a._st - b._st) || ((b.mclose ? b.mclose.long_cup : 0) - (a.mclose ? a.mclose.long_cup : 0)) || (a.group < b.group ? -1 : a.group > b.group ? 1 : a.below_ath_pct - b.below_ath_pct));
 }
 function assetItem(r, i, L) {
@@ -3279,10 +3281,12 @@ function athList() {
   }
   if (tab === 'assets') {
     const A = all;
-    $('#athlist').innerHTML = (state.assets ? `<li class="muted pad">Monthly closes to ${state.assets.month ? mLab(state.assets.month) : 'last month'} · Yahoo data · ${A.length} assets. Same month-close check as the stock list. Commodity prices are front-month futures (not roll-adjusted), so very old highs are approximate. "In rupees" = global price × US$/₹, close to MCX but without Indian import duty, which has changed over the years. Not tested as a trading system; information only.</li>` : '')
+    const AG = [['', 'Qualifying'], ['Crypto', 'Coins'], ['Metals', 'Metals'], ['Energy', 'Energy'], ['Agriculture', 'Agri'], ['In rupees (≈MCX)', 'In rupees'], ['Currencies', 'Currencies'], ['Bonds', 'Bond yields']];
+    $('#athlist').innerHTML = `<li><div class="seg" id="assetg" style="margin:6px 0;flex-wrap:wrap">${AG.map(([k, n]) => `<button data-k="${k}" aria-selected="${(state.assetG || '') === k}">${n}${k ? ' ' + ((state.assets && state.assets.rows) || []).filter((r) => r.group === k).length : ''}</button>`).join('')}</div></li>` + (state.assets ? `<li class="muted pad">Monthly closes to ${state.assets.month ? mLab(state.assets.month) : 'last month'} · Yahoo data · ${A.length} assets. Same month-close check as the stock list. Commodity prices are front-month futures (not roll-adjusted), so very old highs are approximate. "In rupees" = global price × US$/₹, close to MCX but without Indian import duty, which has changed over the years. Not tested as a trading system; information only.</li>` : '')
       + (A.length ? A.map((r, i) => assetItem(r, i, A)).join('') : `<li class="empty">${state.assets ? 'No asset closed last month above an all-time high at least a year old, and none is within 5% of one.' : 'The asset scan appears after its first run.'}</li>`)
       + (state.assets ? `<li><button class="more" id="assetall">${state.assetsAll ? 'Show only the qualifying ones' : `Show all ${state.assets.rows.length} assets with their distance from the high`}</button></li>` : '');
     const ab = $('#assetall'); if (ab) ab.addEventListener('click', () => { state.assetsAll = !state.assetsAll; athList(); });
+    $('#athlist').querySelectorAll('#assetg button').forEach((b) => b.addEventListener('click', () => { state.assetG = b.dataset.k; athList(); }));
     $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => tvOpen(A[+el.dataset.i].key)));
     return;
   }
