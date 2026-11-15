@@ -114,15 +114,53 @@ function parseCSV(t) {
 
 /* ------------------------------------------------------------------ views */
 document.addEventListener('click', (e) => { if (e.target && e.target.id === 'toresults') show('results'); });
+/* 15 Nov 2026 layout: Investment (ETFs, funds, indices: monthly), Momentum investing (monthly ATH stocks), Trading (9/21, cup closes,
+   IPO cups, patterns, support). Sub-pages light up their parent button. */
+const NAV_OF = { bot: 'trends', trd: 'trends' };
+const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 'fund', 'themes', 'top', 'pie'], trd: ['wclose', 'dclose', 'ipo'] };
+const athGrp = () => (state.view === 'inv' ? 'inv' : state.view === 'trd' ? 'trd' : 'mom');
+const grpOfTab = (t) => (ATH_GRP.inv.includes(t) ? 'inv' : ATH_GRP.trd.includes(t) ? 'trd' : 'mom');
+state.athTabG = { mom: 'brk', inv: 'imc', trd: 'wclose' };
+function tradeStrip(cur) {
+  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
+  return `<div class="seg trdstrip" style="margin:10px 16px 0;flex-wrap:wrap">${B.map(([k, n]) => `<button data-tk="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
+}
+function tradeStripWire(el) {
+  el.querySelectorAll('.trdstrip button').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.tk;
+    if (k === 't921') show('trends');
+    else if (k === 'pat' || k === 'sup') { state.botM = k; show('bot'); }
+    else { state.athTabG.trd = k; if (state.view === 'trd') loadATH(); else show('trd'); }
+  }));
+}
+function loadInvest() {
+  const t = state.athTabG.inv;
+  if (t === 'top') return loadFunds();
+  if (t === 'pie') {
+    $('#title').textContent = 'Investment'; $('#asof').textContent = '';
+    const el = $('#view-inv');
+    el.innerHTML = `${invStrip('pie')}<div class="card pad"><h3 style="margin:0 0 6px">Wealth creation: ETF pie and rotation</h3>
+      <p class="muted">The monthly SIP plans (ETF pie, rotation, top-ups) work on your holdings, which stay on this device, so they live in Portfolio.</p>
+      <button class="more" id="topf">Open Portfolio · wealth creation</button></div>`;
+    invStripWire(el); $('#topf').addEventListener('click', () => show('pf'));
+    return;
+  }
+  return loadATH();
+}
+const INV_N = { imc: 'Month close', fund: 'ETF & fund signals', themes: 'Indices', top: 'Top-up zone', pie: 'Wealth pies' };
+const invStrip = (cur, cnt = {}) => `<div class="seg invstrip" role="tablist" style="flex-wrap:wrap">${ATH_GRP.inv.map((k) => `<button data-t="${k}" aria-selected="${cur === k}">${INV_N[k]}${cnt[k] != null ? ' ' + cnt[k] : ''}</button>`).join('')}</div>`;
+function invStripWire(el) { el.querySelectorAll('.invstrip button').forEach((b) => b.addEventListener('click', () => { state.athTabG.inv = b.dataset.t; state.ath && (state.ath.all = false); loadInvest(); })); }
 function show(view) {
   state.view = view;
-  document.querySelectorAll('.views:not(.bg-nav) button').forEach((b) => (b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
+  const navv = NAV_OF[view] || view;
+  document.querySelectorAll('.views:not(.bg-nav) button').forEach((b) => (b.dataset.view === navv ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
+  ['ath', 'inv', 'trd'].forEach((k) => { if (k !== view) { const s = document.getElementById('view-' + k); if (s) s.innerHTML = ''; } }); // one #athlist at a time
   document.querySelectorAll('.view').forEach((s) => (s.hidden = s.id !== `view-${view}`));
   window.scrollTo(0, 0);
   if (view !== 'bg') document.body.classList.remove('bg-first');
   if (view !== 'bg') bgNav(document.body.classList.contains('mode-bg') ? 'explore' : '');
-  setTimeout(liveTag, 1500); setTimeout(liveTag, 4000); if (view === 'trends' || view === 'ath') setTimeout(livePoll, 800);
-  ({ today: loadToday, mk: loadMarkets, live: loadLive, trends: loadTrends, ath: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
+  setTimeout(liveTag, 1500); setTimeout(liveTag, 4000); if (view === 'trends' || view === 'ath' || view === 'trd') setTimeout(livePoll, 800);
+  ({ today: loadToday, mk: loadMarkets, live: loadLive, trends: loadTrends, ath: loadATH, inv: loadInvest, trd: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
 }
 
 /* ------------------------------------------------------------------ Live hero + pie (9 Nov 2026)
@@ -482,7 +520,7 @@ function pieEdit(box, S) {
 const LIVE = { q: {}, open: false, at: null, t: null, qm: {}, om: {}, atm: {} };
 const LV_TZ = { NSE: 5.5, US: null, ASX: null };
 // market shown on screen: Trends uses its market switch, ATH its own; Beginner and Live are India
-const viewMk = () => (state.view === 'ath' ? AM() : state.view === 'trends' ? state.mkt : 'NSE');
+const viewMk = () => (['ath', 'inv', 'trd'].includes(state.view) ? AM() : state.view === 'trends' ? state.mkt : 'NSE');
 const liveQ = (mk) => (mk === 'NSE' ? LIVE.q : (LIVE.qm[mk] || {}));
 const liveOpen = (mk) => (mk === 'NSE' ? LIVE.open : !!LIVE.om[mk]);
 async function livePoll() {
@@ -1492,7 +1530,8 @@ async function lvBasket(B, btn) {
 
 /* ------------------------------------------------------------------ trends */
 async function loadTrends() {
-  $('#title').textContent = 'Trend Desk';
+  $('#title').textContent = 'Trading';
+  const ts = $('#trdstrip'); if (ts && !ts.firstChild) { ts.innerHTML = tradeStrip('t921'); tradeStripWire(ts); }
   if (!state.data[state.mkt]) {
     $('#asof').textContent = 'Loading the latest scan…';
     $('#list').innerHTML = '<li class="empty">Loading…</li>';
@@ -2220,18 +2259,30 @@ function wireAthMk(el) {
 }
 /* 15 Nov 2026: one place for everything outside the four stock markets: World stocks (Japan, HK, Canada, Europe, Korea,
    Taiwan, BSE-only, NSE SME) and Commodities & more. Month-close ATH check only. */
+async function loadMcAll() {
+  const [n, u, a, k, f, as] = await Promise.all([...['NSE', 'US', 'ASX', 'UK'].map((m) => (state.athC && state.athC[m] && state.athC[m].d) || getJSON(MAIN + MKT[m].path + 'ath.json', m === 'NSE' ? 'ath' : 'ath_' + m)),
+    state.fund || getJSON(MAIN + 'data/scan/funds.json', 'funds'), state.assets || getJSON(MAIN + 'data/scan/assets.json', 'assets')]);
+  if (!state.fund) state.fund = f; if (!state.assets) state.assets = as;
+  state.mcAll = { NSE: n, US: u, ASX: a, UK: k, IDX: await getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose').catch(() => null) };
+}
+/* Investment month close: ETFs (all markets), India indices, world indices (allMcRows groups) */
+const INV_G = /ETFs|indices/i;
+function invMcRows() {
+  if (!state.mcAll) return [];
+  const save = state.allMode; state.allMode = 'M'; const L = allMcRows(); state.allMode = save;
+  const q = ((state.ath && state.ath.q) || '').toLowerCase();
+  const W = ((state.assets && state.assets.rows) || []).filter((r) => r.mclose && r.group === 'World indices' && (!q || r.name.toLowerCase().includes(q)))
+    .map((r) => ({ g: 'World indices', sym: '', name: r.name, a: r.mclose, cur: '', close: r.close, tv: tvOf(r.key) }));
+  return L.filter((r) => INV_G.test(r.g)).concat(W);
+}
 async function loadATHWorld(el, mkSeg) {
   if (!state.assets || !state.worldMC) {
     el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>';
     const [a, ...w] = await Promise.all([getJSON(MAIN + 'data/scan/assets.json', 'assets'), ...WORLD_MK.map((k) => getJSON(MAIN + `data/scan/world/${k}.json`, 'world_' + k).catch(() => null))]);
     state.assets = a; state.worldMC = w.filter(Boolean); state.athWAt = new Date();
   }
-  if (!state.mcAll) {
-    const [n, u, a, k, f] = await Promise.all([...['NSE', 'US', 'ASX', 'UK'].map((m) => (state.athC && state.athC[m] && state.athC[m].d) || getJSON(MAIN + MKT[m].path + 'ath.json', m === 'NSE' ? 'ath' : 'ath_' + m)),
-      state.fund || getJSON(MAIN + 'data/scan/funds.json', 'funds')]);
-    if (!state.fund) state.fund = f;
-    state.mcAll = { NSE: n, US: u, ASX: a, UK: k, IDX: await getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose').catch(() => null) };
-  }
+  if (!state.mcAll) await loadMcAll();
+
   state.athW = state.athW || { tab: 'all', q: '', all: true, d: {} }; state.ath = state.athW;
   if (state.athTabNext) { state.ath.tab = state.athTabNext; state.athTabNext = null; }
   const g = (state.worldMC || [])[0]; state.athWAt = state.athWAt || new Date();
@@ -2286,12 +2337,13 @@ const NSE_IDX_TV = { 'NIFTY 50': 'NIFTY', 'NIFTY BANK': 'BANKNIFTY', 'NIFTY IT':
 const nseIdxTv = (n) => 'NSE:' + (NSE_IDX_TV[n] || n.replace(/&/g, 'AND').replace(/[^A-Z0-9]+/g, '_'));
 const tvOpen = (key, sym) => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvOf(key, sym)), '_blank', 'noopener');
 async function loadATH() {
-  $('#title').textContent = 'Monthly ATH';
-  const el = $('#view-ath');
+  const grp = athGrp();
+  $('#title').textContent = { mom: 'Momentum investing', inv: 'Investment', trd: 'Trading · cup closes' }[grp];
+  const el = $(grp === 'mom' ? '#view-ath' : '#view-' + state.view);
   state.athC = state.athC || {};
-  const mk = AM();
-  const mkSeg = `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK'], ['WORLD', 'World & other assets']].map(([k, n]) => `<button data-mk="${k}" aria-selected="${state.athWorld ? k === 'WORLD' : mk === k}">${n}</button>`).join('')}</div>`;
-  if (state.athWorld) { loadATHWorld(el, mkSeg); return; }
+  const mk = AM(); const wOn = grp === 'mom' && state.athWorld;
+  const mkSeg = (grp === 'trd' ? tradeStrip(state.athTabG.trd) : '') + `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK'], ...(grp === 'mom' ? [['WORLD', 'World & other assets']] : [])].map(([k, n]) => `<button data-mk="${k}" aria-selected="${wOn ? k === 'WORLD' : mk === k}">${n}</button>`).join('')}</div>`;
+  if (wOn) { loadATHWorld(el, mkSeg); return; }
   if (!state.athC[mk]) {
     el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>';
     const tag = mk === 'NSE' ? '' : '_' + mk;
@@ -2304,9 +2356,11 @@ async function loadATH() {
     state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'brk', q: '', all: false, at: new Date() };
   }
   state.ath = state.athC[mk];
-  if (state.athTabNext) { state.ath.tab = state.athTabNext; state.athTabNext = null; }
-  if (state.ath.tab === 'td' || state.ath.tab === 'pulse') state.ath.tab = 'brk';
-  const wireMk = () => wireAthMk(el);
+  if (state.athTabNext) { const g = grpOfTab(state.athTabNext); if (g === grp) state.athTabG[g] = state.athTabNext; state.athTabNext = null; }
+  if (!ATH_GRP[grp].includes(state.athTabG[grp])) state.athTabG[grp] = ATH_GRP[grp][0];
+  state.ath.tab = state.athTabG[grp];
+  if (grp === 'inv' && !state.mcAll) await loadMcAll();
+  const wireMk = () => { wireAthMk(el); if (grp === 'trd') tradeStripWire(el); };
   const { d } = state.ath;
   if (!d) { el.innerHTML = mkSeg + `<p class="empty">The ${MKT[mk].name} monthly-ATH scan appears after its first evening run. Try again later.</p>`; $('#asof').textContent = ''; wireMk(); return; }
   const lv = state.ath.live;
@@ -2320,21 +2374,23 @@ async function loadATH() {
   const exits = T.filter((r) => r.status === 'exit next open').length;
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
-  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ...(d.week_close ? [['wclose', 'Week close', d.week_close.length], ['dclose', 'Day close', (d.day_close || []).length]] : []), ...(mk === 'NSE' ? [['gm', 'Growth + momentum', 25]] : []), ['tracked', 'Tracked signals', T.length],
-    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length]];
+  const tabs = ({ mom: [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ...(mk === 'NSE' ? [['gm', 'Growth + momentum', 25]] : []), ['tracked', 'Tracked signals', T.length]],
+    trd: [['wclose', 'Week cup close', (d.week_close || []).length], ['dclose', 'Day cup close', (d.day_close || []).length], ['ipo', 'IPO cups', ipoRows(true).length]],
+    inv: [['imc', INV_N.imc, invMcRows().length], ['fund', INV_N.fund, fundAthRows(true).length], ['themes', INV_N.themes, themeRows(true).length], ['top', INV_N.top, null], ['pie', INV_N.pie, null]] })[grp];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
-    <section class="summary">
+    ${grp !== 'mom' ? '' : `<section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
       <div class="stat"><b>${nearMain}</b><span>within 5% of the trigger</span></div>
       <div class="stat"><b>${open}</b><span>signals still running</span></div>
-      <div class="stat exit"><b>${exits}</b><span>system exits at next open (not your holdings)</span></div></section>
+      <div class="stat exit"><b>${exits}</b><span>system exits at next open (not your holdings)</span></div></section>`}
     <div class="card">
-      <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
+      <div class="seg ${grp === 'inv' ? 'invstrip' : ''}" role="tablist" style="flex-wrap:wrap${grp === 'trd' ? ';display:none' : ''}">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n}${c == null ? '' : ' ' + c}</button>`).join('')}</div>
       <details class="info"><summary>How this list works</summary><p>${mk !== 'NSE' ? NOTE_G[state.ath.tab] || '' : { td: 'Top-down: world → India → sectors → themes → stocks. Score 0–3 = sector RS > 0, best theme RS > 0, stock RS > 0. Aligned (sector and stock RS both positive) ATH breakouts won 54% and averaged +29% vs 48% / +15% (2017–26). World and Nifty trend did not help, so they are context only; IPO cups showed no clear lift. A guide for confidence and size, not a filter.',
         brk: 'Price went above the high of the all-time-high closing month this month or last, and the trade is still open. Bold rows have a base of 2 years or more (the tested system); the rest 1–2 years.',
         wclose: `Stocks whose last completed WEEK closed above their cup high: the highest high of the last 2 years, at least ${(d.wd_rules || {}).week_min || 26} weeks old, with a fall of at least ${Math.abs(((d.wd_rules || {}).week_depth || -0.2) * 100)}% since. Kept only if the room up to the next older high is at least the cup depth (all-time-high cups always pass). Sorted by sector strength. India test 2017–26 (buy next open, weekly 30-SMA exit, 10 stocks): 9.0%/yr, worst fall −26% at 1% risk + add (equal weight 20.4% / −34%) vs 21.5% / −20% for the live Breakouts rule. Watch list only.`,
         dclose: `Stocks whose last DAY closed above their cup high: the highest high of the last year, at least ${(d.wd_rules || {}).day_min || 20} trading days old, with a fall of at least ${Math.abs(((d.wd_rules || {}).day_depth || -0.15) * 100)}% since. Kept only if the room up to the next older high is at least the cup depth (all-time-high cups always pass). Sorted by sector strength. India test 2017–26: all-time-high cups 12.7%/yr, −35% at 1% risk + add; with the room rule 11.3%, −40%; live Breakouts rule 21.5% / −20%. Watch list only.`,
         mclose: `Stocks whose last completed month (${(d.month_close || []).length ? mLab(d.month_close[0].month) : 'last month'}) CLOSED above their all-time HIGH (the highest price of all earlier months, wicks included, as on TradingView), after a base of 1+ years since that high (bold = 2+ years), ${mk === 'NSE' ? '₹2 cr+' : 'liquid stocks only, same floor as Breakouts,'} a day. Long cup = base of 3+ years with a 30%+ fall inside it. ${mk === 'NSE' ? '' : 'Not tested in this market. India result: '}Tested 2017–26 on all NSE stocks (buy at the next month's first open, sell after a weekly close below the 30-week SMA, 10 stocks, 1% risk + 1 add): 5.4%/yr, worst fall −25%; long cups 6.5% / −18%. The live Breakouts rule (buy when price crosses the ATH-month high during the month) did 21.5% / −20%. By the time a month closes above the high, the move has usually run, so this is a month-end check, NOT an entry.`,
+        imc: 'Investment first choice (the IHF type): ETFs and indices whose last completed month CLOSED above their all-time high (highest price of earlier months, wicks included, as on TradingView) after a base of 1+ years (bold = 2+ years; long cup = 3+ years with a 30%+ fall). India, US, Australia and UK/Europe ETFs, India indices and world indices. Stop: weekly close below the 30-week SMA (the initial stop and the trail). A month-end check, not tested as a system for ETFs. Tap one for its monthly chart in TradingView.',
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
         themes: 'Shortlist = indices (broad, sector and thematic) in an uptrend (above a rising 30-week SMA) with 6-month RS vs Nifty 50 above zero, ordered: cup breakout (new monthly-close high after a base of 2+ years), new high (shorter base), cup forming (within 5% of a 2+-year-old high), within 5% of the high, then the rest; inside each group leading before uptrend, RS rising first, then by RS. Tap one for its weekly chart with the 30-week SMA, or monthly with the highest-month-close line. Below: the rest, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
@@ -2347,7 +2403,7 @@ async function loadATH() {
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="athq" type="search" placeholder="Search symbol or company" value="${esc(state.ath.q)}" autocomplete="off"></label>
       <ul class="list flat" id="athlist"></ul></div>`;
-  el.querySelectorAll('.seg:not(.mk) button').forEach((b) => b.addEventListener('click', () => { state.ath.tab = b.dataset.t; state.ath.all = false; loadATH(); }));
+  el.querySelectorAll('.seg:not(.mk):not(.trdstrip) button').forEach((b) => b.addEventListener('click', () => { state.athTabG[grp] = b.dataset.t; state.ath.all = false; if (grp === 'inv') loadInvest(); else loadATH(); }));
   wireMk();
   el.querySelectorAll('.tdbar[data-k]').forEach((b) => b.addEventListener('click', () => {
     const k = b.dataset.k; const S = state.ath.sec; const x = S.indices[k];
@@ -2369,8 +2425,9 @@ function patItem(r, i) {
   return `<li class="row ${r.status === 'breakout' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.kind === 'index' ? r.name : r.symbol)}</div><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div>
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">neck ${fmt(r.neck, 2, 'en-IN')}</span></div></li>`;
 }
-const botTabs = (cur) => `<div class="seg" id="botm" style="margin:10px 16px 0;flex-wrap:wrap"><button data-k="pat" aria-selected="${cur === 'pat'}">Bottom patterns</button><button data-k="sup" aria-selected="${cur === 'sup'}">At support</button><button data-k="fund" aria-selected="${cur === 'fund'}">ETFs & funds</button></div>`;
+const botTabs = (cur) => (cur === 'fund' ? invStrip('top') : tradeStrip(cur)); // 15 Nov 2026: patterns/support sit under Trading, ETFs & funds under Investment
 function botTabsWire(el) {
+  tradeStripWire(el); invStripWire(el);
   el.querySelectorAll('#botm button').forEach((b) => b.addEventListener('click', () => { state.botM = b.dataset.k; loadBottoms(); }));
   el.querySelectorAll('#botmk button').forEach((b) => b.addEventListener('click', () => { state.botMk = b.dataset.k; try { localStorage.setItem('td.botMk', b.dataset.k); } catch (e) { /* */ } loadBottoms(); }));
 }
@@ -2385,7 +2442,7 @@ async function botData(kind) { // per-market cache of patterns.json / support.js
 const botWatch = (mk) => (mk === 'NSE' ? '' : `<div class="status exit watch" style="margin:8px 16px"><b>Watch only.</b> ${mk === 'UK' ? 'UK setups are not backtested yet, so they are not in the Live lists.' : `${mk === 'US' ? 'US' : 'ASX'} backtest 2008–26: these setups did worse than buying a random stock the same day, so they are not in the Live lists.`}</div>`);
 async function loadBottoms() {
   if ((state.botM || 'pat') === 'sup') return loadSupport();
-  if (state.botM === 'fund') return loadFunds();
+  if (state.botM === 'fund') { state.botM = 'pat'; state.athTabG.inv = 'top'; return show('inv'); }
   $('#title').textContent = 'Bottom patterns';
   const el = $('#view-bot');
   const bmk = botMk(); el.innerHTML = botTabs('pat') + botMkSeg() + '<p class="muted pad">Loading…</p>'; botTabsWire(el);
@@ -2438,8 +2495,8 @@ function fundItem(r, i) {
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${(r.r1y || 0) >= 0 ? 'up' : 'down'}">1y ${pc(r.r1y)}</span></div></li>`;
 }
 async function loadFunds() {
-  $('#title').textContent = 'ETFs & funds';
-  const el = $('#view-bot');
+  $('#title').textContent = 'Investment · top-up zone';
+  const el = $('#view-inv');
   if (!state.fund) { el.innerHTML = botTabs('fund') + '<p class="muted pad">Loading…</p>'; botTabsWire(el); state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds'); }
   const P = state.fund;
   if (!P) { el.innerHTML = botTabs('fund') + '<p class="empty">ETFs and funds appear after the first evening scan (about 23:15 IST).</p>'; botTabsWire(el); $('#asof').textContent = ''; return; }
@@ -3037,7 +3094,8 @@ function fundAthRows(countOnly) {
 }
 /* 15 Nov 2026: commodities, currencies, crypto, bonds, world indices (tools/asset_scan.py): month-close ATH check */
 function assetRows(countOnly) {
-  const A = state.assets; if (!A || !A.rows) return [];
+  const A0 = state.assets; if (!A0 || !A0.rows) return [];
+  const A = { ...A0, rows: A0.rows.filter((r) => r.group !== 'World indices') }; // world indices sit under Investment (15 Nov 2026)
   const st = (r) => (r.mclose ? 0 : r.base_months >= 12 && r.below_ath_pct >= 0 && r.below_ath_pct <= 5 ? 1 : 2);
   if (countOnly) return A.rows.filter((r) => st(r) < 2);
   const q = (state.ath.q || '').toLowerCase();
@@ -3079,8 +3137,8 @@ function allMcRows() {
     out.push({ g, sym: r.kind === 'fund' ? '' : s, name: r.name, a: r.mclose, cur, close: r.close, tv: r.kind === 'fund' ? null : (r.market === 'UK' ? tvOf(s) : tv + s) });
   });
   (state.worldMC || []).forEach((m) => (m.rows || []).forEach((r) => out.push({ g: m.name, sym: r.symbol, name: r.name, a: r, cur: r.cur, close: r.close, tv: tvOf(r.ticker, r.symbol) })));
-  ((state.assets && state.assets.rows) || []).filter((r) => r.mclose).forEach((r) => out.push({ g: 'Commodities & other assets', sym: '', name: r.name, a: r.mclose, cur: '', close: r.close, tv: tvOf(r.key) }));
-  return out.filter((r) => !q || (r.sym || '').toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q) || r.g.toLowerCase().includes(q));
+  ((state.assets && state.assets.rows) || []).filter((r) => r.mclose && r.group !== 'World indices').forEach((r) => out.push({ g: 'Commodities & other assets', sym: '', name: r.name, a: r.mclose, cur: '', close: r.close, tv: tvOf(r.key) }));
+  return out.filter((r) => (state.view !== 'ath' || !INV_G.test(r.g)) && (!q || (r.sym || '').toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q) || r.g.toLowerCase().includes(q)));
 }
 function allMcItem(r, i, L) {
   const a = r.a;
@@ -3132,6 +3190,7 @@ function athRows() {
   if (tab === 'assets') return assetRows();
   if (tab === 'world') return worldRows();
   if (tab === 'all') return allMcRows();
+  if (tab === 'imc') return invMcRows();
   if (tab === 'pulse') return ((state.gp[AM()] || {}).rows || []);
   if (tab === 'ipo') return ipoRows();
   if (tab === 'themes') return themeRows();
@@ -3181,10 +3240,17 @@ function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   if (tab === 'pulse') { pulseView(); return; }
   if (tab === 'gm') { $('#athlist').innerHTML = '<li><div id="athgm"></div></li>'; tdGrowthMom($('#athgm')).then(() => { const dd = document.querySelector('#athgm details'); if (dd) dd.open = true; }); return; }
+  if (tab === 'imc') {
+    const W = all;
+    $('#athlist').innerHTML = W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : `<li class="empty">${state.mcAll ? 'No ETF or index closed last month above an all-time high at least a year old.' : 'Loading…'}</li>`;
+    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv) + '&interval=1M', '_blank', 'noopener'); }));
+    return;
+  }
   if (tab === 'all') {
     const W = all; const mo = ((state.mcAll && state.mcAll.NSE && state.mcAll.NSE.month_close || [])[0] || {}).month || ((state.worldMC || [])[0] || {}).month;
-    const md = state.allMode || 'M';
-    const seg = `<li><div class="seg" id="allmd" style="margin:6px 0">${[['M', 'Month close'], ['W', 'Week close'], ['D', 'Day close']].map(([k, n]) => `<button data-k="${k}" aria-selected="${md === k}">${n}</button>`).join('')}</div></li>`;
+    const md = 'M'; // 15 Nov 2026: Momentum is monthly only; week/day cup closes live under Trading, ETFs and indices under Investment
+    const seg = `<li><div class="seg" id="allgo" style="margin:6px 0;flex-wrap:wrap"><button aria-selected="true">Month close · stocks, commodities, coins</button><button data-go="wclose">Week cup closes → Trading</button><button data-go="dclose">Day cup closes → Trading</button><button data-go="imc">ETFs & indices → Investment</button></div></li>`;
+    setTimeout(() => document.querySelectorAll('#allgo button[data-go]').forEach((b) => b.addEventListener('click', () => goAth(AM(), b.dataset.go))), 0);
     if (md !== 'M') {
       $('#athlist').innerHTML = seg + `<li class="muted pad">${md === 'W' ? 'Last completed week' : 'Last day'} CLOSED above the cup high (${md === 'W' ? 'highest high of the last 2 years, 26+ weeks old, 20%+ fall since' : 'highest high of the last year, 20+ days old, 15%+ fall since'}), with room to the next older high at least the cup depth (all-time highs always pass). India, US, Australia and UK stocks, strongest sectors first. Watch list only: India test ${md === 'W' ? '9.0' : '12.7'}%/yr at 1% risk vs 21.5% for the live Breakouts rule.</li>`
         + (W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : `<li class="empty">None ${md === 'W' ? 'last week' : 'on the last day'}.</li>`);
@@ -3216,8 +3282,8 @@ function athList() {
   }
   if (tab === 'fund') {
     const mcN = ((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[AM()]) && r.mclose).length;
-    const MC = !!state.athFundMC;
-    $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!MC && !state.athFundAll}">Cup + trend only</button><button data-k="1" aria-selected="${!MC && !!state.athFundAll}">Show all (incl. exited, shallow bases)</button><button data-k="2" aria-selected="${MC}">Month close ${mcN}</button></div></li>`
+    const MC = !!state.athFundMC && state.view !== 'inv'; // Investment has its own Month close tab
+    $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!MC && !state.athFundAll}">Cup + trend only</button><button data-k="1" aria-selected="${!MC && !!state.athFundAll}">Show all (incl. exited, shallow bases)</button>${state.view === 'inv' ? '' : `<button data-k="2" aria-selected="${MC}">Month close ${mcN}</button>`}</div></li>`
       + (MC ? '<li class="muted pad">Last completed month CLOSED above the all-time high (highest price of earlier months, wicks included) after a base of 1+ years (bold = 2+ years). Long cup = base of 3+ years with a 30%+ fall inside it. Not tested for ETFs and funds (the ATH system itself did not beat buy-and-hold on mutual funds); a month-end check only.</li>' : '')
       + (L.length ? L.map(MC ? fundMcItem : fundAthItem).join('') : `<li class="empty">${MC ? 'No ETF or fund closed last month above an all-time high that was at least a year old.' : state.athFundAll ? 'No ETF or fund signals in the last 18 months.' : 'None right now with a real cup (15%+ dip during the base) and an uptrend.'}</li>`)
       + (all.length > L.length ? '<li><button class="more" id="athall">Show all ' + all.length + '</button></li>' : '');
@@ -3744,8 +3810,8 @@ function download() {
       : ['symbol', 'name', 'list', 'tag', 'close', 'dist21', 'rsi', 'r1m', 'r3m', 'r6m', 'off_high', 'value_cr', 'size'];
     return csvDownload(filtered(), cols, `trend-desk_${state.mkt}_${state.tab}_${state.data[state.mkt].asof}.csv`);
   }
-  if (state.view === 'ath' && state.ath && state.ath.tab === 'fund') return csvDownload(fundAthRows().map((r) => ({ symbol: r.symbol || r.key, name: r.name, type: r.kind === 'fund' ? r.category : 'ETF', close: r.close, ...r.ath })), ['symbol', 'name', 'type', 'status', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'close', 'gap_pct', 'ret', 'sma30', 'exit_date', 'exit_price'], `monthly-ath_etfs-funds_${AM()}.csv`);
-  if (state.view === 'ath' && state.ath && state.ath.d) return csvDownload(athRows().map((r) => { const n = state.ath.tab === 'near'; const z = sizeATH(n ? r.trigger : r.entry, n ? r.sma30 : (r.sma_entry ?? r.sma30), cap('NSE')); const a = r.add_status === 'armed' && z ? sizeATH(r.add_level, r.sma30, cap('NSE'), z.sh) : null; return { ...r, shares: z ? z.sh : '', value: z ? Math.round(z.val) : '', add_shares: a ? a.sh : '' }; }), ['symbol', 'name', 'status', 'shares', 'value', 'add_status', 'add_level', 'add_shares', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'depth', 'close', 'gap_pct', 'ret', 'peak', 'weeks', 'sma30', 'exit_date', 'exit_price', 'value_cr', 'size'], `monthly-ath_${state.ath.tab}_${state.ath.d.asof}.csv`);
+  if (['ath', 'inv'].includes(state.view) && state.ath && state.ath.tab === 'fund') return csvDownload(fundAthRows().map((r) => ({ symbol: r.symbol || r.key, name: r.name, type: r.kind === 'fund' ? r.category : 'ETF', close: r.close, ...r.ath })), ['symbol', 'name', 'type', 'status', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'close', 'gap_pct', 'ret', 'sma30', 'exit_date', 'exit_price'], `monthly-ath_etfs-funds_${AM()}.csv`);
+  if (['ath', 'trd'].includes(state.view) && state.ath && state.ath.d) return csvDownload(athRows().map((r) => { const n = state.ath.tab === 'near'; const z = sizeATH(n ? r.trigger : r.entry, n ? r.sma30 : (r.sma_entry ?? r.sma30), cap('NSE')); const a = r.add_status === 'armed' && z ? sizeATH(r.add_level, r.sma30, cap('NSE'), z.sh) : null; return { ...r, shares: z ? z.sh : '', value: z ? Math.round(z.val) : '', add_shares: a ? a.sh : '' }; }), ['symbol', 'name', 'status', 'shares', 'value', 'add_status', 'add_level', 'add_shares', 'date', 'entry', 'trigger', 'ath_month', 'base_months', 'depth', 'close', 'gap_pct', 'ret', 'peak', 'weeks', 'sma30', 'exit_date', 'exit_price', 'value_cr', 'size'], `monthly-ath_${state.ath.tab}_${state.ath.d.asof}.csv`);
   if (state.view === 'results' && state.res && state.res.book && state.res.book.p.length) return csvDownload(state.res.book.p, Object.keys(state.res.book.p[0]), 'paper-book_positions.csv');
   if (state.view === 'pf') return pfExport();
   if (state.view === 'tb' && state.tb) return csvDownload(state.tb.ledger, Object.keys(state.tb.ledger[0] || {}), 'top-bottom_trades.csv');
@@ -4607,7 +4673,8 @@ function t2Watch(rows) {
 function goAth(mk, tab, world) {
   state.athMkt = mk === 'WORLD' ? (state.athMkt || 'NSE') : mk; state.athWorld = !!world; state.athTabNext = tab;
   try { if (mk !== 'WORLD') localStorage.setItem('td_athmkt', mk); } catch (e) { /* */ }
-  show('ath');
+  const g = world ? 'mom' : grpOfTab(tab || 'brk'); if (tab && !world) { state.athTabG[g] = tab; state.athTabNext = null; }
+  show(g === 'inv' ? 'inv' : g === 'trd' ? 'trd' : 'ath');
 }
 async function tdRender2(el) {
   const mk = tdMk(); const MP = MAIN + MKT[mk].path;
