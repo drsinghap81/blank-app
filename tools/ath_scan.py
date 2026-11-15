@@ -268,8 +268,12 @@ def analyse(sym, x, today, lookback_days=550):
         seg = cc[a_ + 1:n_ - 1]; dep = float(np.nanmin(seg) / rim - 1) if len(seg) else 0.0
         if dep > D:
             return None
-        res = float(np.nanmax(hh[:a_])) if a_ > 0 else np.nan
-        res = res if np.isfinite(res) and res > rim else None
+        # next resistance = the nearest older peak above today's close: walk back from the rim to the first bar trading above
+        # the close, then take the local peak around it (+/- B bars). None = nothing older above the close.
+        res = None; c_ = float(cc[-1]); above = np.flatnonzero(hh[:a_] > c_)
+        if len(above):
+            j = int(above[-1]); lo_, hi_ = max(0, j - B), min(a_, j + B + 1)
+            res = float(np.nanmax(hh[lo_:hi_]))
         room = (res / cc[-1] - 1) if res else None
         if room is not None and room < -dep:
             return None

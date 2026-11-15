@@ -3301,7 +3301,7 @@ const mLab = (s) => new Date(String(s).slice(0, 7) + '-01T00:00:00').toLocaleDat
 /* weekly / daily cup closes (tools/ath_scan.py week_close / day_close) */
 const wdUnit = (r) => (r.kind === 'W' ? 'wk' : 'd');
 function wdChips(r) {
-  const room = r.ath ? '<span class="chip new">At all-time high · no resistance above</span>'
+  const room = r.ath ? '<span class="chip new">No older high above · open sky</span>'
     : `<span class="chip ${r.room_pct >= 2 * Math.abs(r.depth * 100) ? 'open' : ''}">Room ${fmt(r.room_pct, 0)}% to ${fmt(r.resistance, 2, 'en-US')} (cup ${fmt(Math.abs(r.depth * 100), 0)}%)</span>`;
   return `<span class="chip">Closed ${pct(r.above_pct)} over cup high ${fmt(r.old_ath, 2, 'en-US')} (${day(r.ath_date)})</span>${room}${r.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip">${r.base} ${wdUnit(r)} cup</span>`
     + (r.ath ? `<span class="chip">fell ${fmt(Math.abs(r.depth * 100), 0)}% in cup</span>` : '') + `<span class="chip ${r.sma_rising ? 'open' : 'exit'}">${r.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>`;
@@ -3319,14 +3319,18 @@ function mcloseSelect(r) {
 function athSelect(r) {
   const tf0 = r.kind === 'W' ? 'w' : r.kind === 'D' ? 'd' : 'm';   // weekly list -> weekly chart, daily list -> daily chart
   const near = state.ath.tab === 'near' || !!r._near;
-  const st = r._mclose && r.kind && (r.kind === 'W' || r.kind === 'D') ? `<div class="status info">${r.kind === 'W' ? 'Week to' : 'Day'} ${day(r.period)} closed at ${fmt(r.close_p, 2, AL())}, ${pct(r.above_pct)} above its ${r.base}-${r.kind === 'W' ? 'week' : 'day'} cup high ${fmt(r.old_ath, 2, AL())} (${day(r.ath_date)}); cup ${fmt(Math.abs(r.depth * 100), 0)}% deep; ${r.ath ? 'an all-time high, no resistance above.' : `next resistance ${fmt(r.resistance, 2, AL())}, ${fmt(r.room_pct, 0)}% away.`} A watch list, not an entry: in the India test these made ${r.kind === 'W' ? '9.0' : '12.7'}%/yr at 1% risk vs 21.5% for the live Breakouts rule.</div>`
+  const st = r._mclose && r.kind && (r.kind === 'W' || r.kind === 'D') ? `<div class="status info">${r.kind === 'W' ? 'Week to' : 'Day'} ${day(r.period)} closed at ${fmt(r.close_p, 2, AL())}, ${pct(r.above_pct)} above its ${r.base}-${r.kind === 'W' ? 'week' : 'day'} cup high ${fmt(r.old_ath, 2, AL())} (${day(r.ath_date)}); cup ${fmt(Math.abs(r.depth * 100), 0)}% deep; ${r.ath ? 'no older high above it.' : `next resistance (nearest older high above) ${fmt(r.resistance, 2, AL())}, ${fmt(r.room_pct, 0)}% away.`} A watch list, not an entry: in the India test these made ${r.kind === 'W' ? '9.0' : '12.7'}%/yr at 1% risk vs 21.5% for the live Breakouts rule.</div>`
     : r._mclose ? `<div class="status info">${mLab(r.month)} closed at ${fmt(r.close_m, 2, AL())}, ${pct(r.above_pct)} above its all-time high ${fmt(r.old_ath, 2, AL())} (${mLab(r.ath_month)}). A month-end check, not an entry: buying the next month's open after such a close made 5.4%/yr in the India test vs 21.5% for the live Breakouts rule.</div>`
     : near && r.kind === 'close' ? `<div class="status info">Not triggered yet. Signal: a MONTH CLOSE above ${fmt(r.trigger, 2, AL())}, its old all-time-high close (${fmt(r.gap_pct, 1, AL())}% above the last close); buy at the next month's first open. The old high ${fmt(r.wick_high, 2, AL())} was a one-month spike.</div>`
     : near ? `<div class="status info">Not triggered yet. Buy if it trades above ${fmt(r.trigger, 2, AL())} this month (${fmt(r.gap_pct, 1, AL())}% above the last close).</div>`
     : r.status === 'exit next open' ? '<div class="status exit">Weekly close below the 30-week SMA. Sell at the next open.</div>'
       : r.status === 'exited' ? `<div class="status info">Exited ${day(r.exit_date)} at ${fmt(r.exit_price, 2, AL())} (${pct(r.ret * 100)}).</div>`
         : `<div class="status open">Bought ${day(r.date)} at ${fmt(r.entry, 2, AL())}. Hold while the weekly close stays above the 30-week SMA, now ${fmt(r.sma30, 2, AL())}.</div>`;
-  const f = [[r.kind === 'close' ? 'Trigger (old ATH monthly close)' : 'Trigger (ATH month high)', fmt(r.trigger, 2, AL())], ['ATH closing month', esc(r.ath_month || '–')], ['Base', baseTxt(r.base_months)],
+  const wdk = r.kind === 'W' || r.kind === 'D';
+  const f = wdk ? [['Cup high', `${fmt(r.old_ath, 2, AL())} (${day(r.ath_date)})`], ['Cup length', `${r.base} ${r.kind === 'W' ? 'weeks' : 'trading days'}`],
+    ['Cup depth', pct((r.depth || 0) * 100)], ['Next resistance', r.ath ? 'none (above every older high)' : `${fmt(r.resistance, 2, AL())} · ${fmt(r.room_pct, 0)}% room`],
+    [r.kind === 'W' ? 'Breakout week close / high' : 'Breakout day close / high', `${fmt(r.close_p, 2, AL())} / ${fmt(r.high_p, 2, AL())}`]]
+    : [[r.kind === 'close' ? 'Trigger (old ATH monthly close)' : 'Trigger (ATH month high)', fmt(r.trigger, 2, AL())], ['ATH closing month', esc(r.ath_month || '–')], ['Base', baseTxt(r.base_months)],
     ['Deepest fall in the base', pct((r.depth || 0) * 100)], ['30-week SMA', fmt(r.sma30, 2, AL())]];
   if (!near) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, AL())}`], ['Best since entry', pct(r.peak * 100)], ['Weeks', r.weeks]);
   f.push(['Traded a day', valTxt(r.value_cr)]);
