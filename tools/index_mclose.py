@@ -60,6 +60,17 @@ def load(today):
 def main():
     today = (datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)).date()
     H, left = load(today)
+    # NSE renamed its indices in Nov 2015 (CNX -> Nifty): join the old history to the current name
+    REN = {"S&P CNX NIFTY": "NIFTY 50", "CNX NIFTY": "NIFTY 50", "CNX BANK": "NIFTY BANK", "CNX NIFTY JUNIOR": "NIFTY NEXT 50", "S&P CNX 500": "NIFTY 500",
+           "CNX MIDCAP": "NIFTY MIDCAP 100", "CNX SMALLCAP": "NIFTY SMALLCAP 100", "CNX FINANCE": "NIFTY FINANCIAL SERVICES", "CNX SERVICE SECTOR": "NIFTY SERVICES SECTOR",
+           "CNX CONSUMPTION": "NIFTY INDIA CONSUMPTION", "CNX HIGH BETA": "NIFTY HIGH BETA 50", "CNX LOW VOLATILITY": "NIFTY LOW VOLATILITY 50", "CNX ALPHA INDEX": "NIFTY ALPHA 50",
+           "CNX DIVIDEND OPPORTUNITIES": "NIFTY DIVIDEND OPPORTUNITIES 50", "CPSE": "NIFTY CPSE", "S&P CNX 500 SHARIAH": "NIFTY500 SHARIAH", "CNX 500 SHARIAH": "NIFTY500 SHARIAH"}
+    names = set(H.INDEX)
+    for o in set(H.INDEX):
+        if o not in REN and o.startswith("CNX ") and "NIFTY " + o[4:] in names:
+            REN[o] = "NIFTY " + o[4:]
+    REN = {o: n for o, n in REN.items() if n in names}
+    H = H.assign(INDEX=H.INDEX.replace(REN)).sort_values(["INDEX", "Date"]).drop_duplicates(["Date", "INDEX"], keep="last")
     lm = pd.Timestamp(today).to_period("M") - 1
     rows, dist = [], []
     first = H.Date.min()
