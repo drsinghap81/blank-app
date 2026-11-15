@@ -2807,6 +2807,7 @@ function ipoSelect(r) {
     <div class="seg-row"><div class="seg small" id="ipotf"><button data-tf="d" aria-selected="true">Daily</button><button data-tf="w" aria-selected="false">Weekly + 10 SMA</button></div></div>
     <div class="chart" id="ipoc"></div>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    <div id="seasn"></div>
     <div class="links">${athLinks(r)}</div>`);
   $('#ipotf').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
     $('#ipotf').querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', x === b)); drawIPO(r, b.dataset.tf);
@@ -2876,6 +2877,7 @@ function themeSelect(r) {
     <div class="seg-row"><div class="seg small" id="ixtf"><button data-tf="w" aria-selected="true">Weekly + 30 SMA</button><button data-tf="m" aria-selected="false">Monthly</button></div></div>
     <div class="chart" id="ixc"></div>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    <div id="seasn"></div>
     <div class="links">${AM() === 'NSE' ? '<a href="https://www.niftyindices.com/indices/equity/thematic-indices" target="_blank" rel="noopener">Index details on niftyindices.com</a>'
       : `<a href="https://finance.yahoo.com/quote/${encodeURIComponent(r.key)}" target="_blank" rel="noopener">Yahoo Finance</a>`}</div>`);
   $('#ixtf').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
@@ -2891,6 +2893,7 @@ async function drawIX(r, tf) {
     try { const res = await fetch(MAIN + AP() + `index_charts/${encodeURIComponent(sl)}.json`); if (!res.ok) throw 0; c = ixCache[key] = await res.json(); }
     catch (e) { box.innerHTML = '<p class="muted pad">The chart appears after tonight\'s scan.</p>'; return; }
   }
+  { const sn = $('#seasn'); if (sn && !sn.firstChild) sn.innerHTML = seasonHtml(c.m, r.name); }
   box.innerHTML = '';
   const b = c[tf]; const T = tf === 'm' ? b.t.map((t) => t + '-01') : b.t;
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
@@ -3418,6 +3421,7 @@ function athSelect(r) {
     <div class="seg-row"><div class="seg small" id="athtf">${[['m', 'Monthly'], ['w', 'Weekly + 30 SMA'], ['d', 'Daily']].map(([k, n]) => `<button data-tf="${k}" aria-selected="${k === tf0}">${n}</button>`).join('')}</div>${styleSeg('ath', 'athst')}</div>
     <div class="chart" id="athc"></div>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    <div id="seasn"></div>
     <div class="links">${athLinks(r)}</div>`);
   $('#athtf').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
     $('#athtf').querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', x === b)); drawATH(r, b.dataset.tf);
@@ -3434,6 +3438,29 @@ function wirePlan921(r) {
   const redo = () => { const p = document.querySelector('.plan'); if (p) p.outerHTML = plan921(r); wirePlan921(r); renderList(); };
   wireCap('cap921', state.mkt, redo); wireRisk('risk921', 't921', redo);
 }
+/* Seasonality (15 Nov 2026): monthly range % = (month high / month low − 1), last 10 calendar years from the saved monthly bars.
+   Gold = at least 1.3x its own average month. Context only: in the 2015-26 NSE test a stock's big-range months did not repeat
+   the next year (correlation 0.02); market-wide, Feb-Mar ranges run a little wider. */
+const MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function seasonHtml(m, name) {
+  if (!m || !m.t || !m.h || !m.l) return '';
+  const nowY = new Date().getFullYear(); const Y0 = nowY - 10; const G = {};
+  m.t.forEach((t, i) => { const y = +t.slice(0, 4), mo = +t.slice(5, 7) - 1; if (y < Y0 || !(m.l[i] > 0) || !(m.h[i] > 0)) return; (G[y] = G[y] || Array(12).fill(null))[mo] = (m.h[i] / m.l[i] - 1) * 100; });
+  const yrs = Object.keys(G).map(Number).sort(); if (yrs.length < 3) return '';
+  const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+  const avgM = MON3.map((_, k) => mean(yrs.map((y) => G[y][k]).filter((x) => x != null)));
+  const avg = mean(yrs.flatMap((y) => G[y].filter((x) => x != null)));
+  const rk = avgM.map((v, k) => [v, k]).filter((x) => x[0] != null).sort((a, b) => b[0] - a[0]);
+  const top = rk.slice(0, 2), low = rk[rk.length - 1];
+  const cell = (v) => (v == null ? '<td></td>' : `<td${v >= avg * 1.3 ? ' class="hot"' : ''}>${fmt(v, 1)}</td>`);
+  return `<div class="card season" style="margin:10px 16px"><h3 style="margin:0 0 4px">Seasonality</h3>
+    <p style="margin:0 0 6px">${esc(name || '')} moves most in <b>${MON3[top[0][1]]}</b> (avg ${fmt(top[0][0], 1)}%) and <b>${MON3[top[1][1]]}</b> (${fmt(top[1][0], 1)}%), least in <b>${MON3[low[1]]}</b> (${fmt(low[0], 1)}%). Average month ${fmt(avg, 1)}% high to low, ${yrs[0]}–${yrs[yrs.length - 1]}.</p>
+    <div class="season-bars">${avgM.map((v, k) => `<div title="${MON3[k]} ${v == null ? '' : fmt(v, 1) + '%'}"><i style="height:${v == null ? 0 : Math.round(v / rk[0][0] * 100)}%" class="${v != null && v >= avg * 1.3 ? 'hot' : ''}"></i><span>${MON3[k][0]}</span></div>`).join('')}</div>
+    <details><summary>Year by month (range %)</summary><div class="season-wrap"><table class="season-t"><thead><tr><th></th>${MON3.map((x) => `<th>${x}</th>`).join('')}<th>Avg</th></tr></thead><tbody>
+      ${yrs.slice().reverse().map((y) => `<tr><th>${y}</th>${G[y].map(cell).join('')}<td class="avg">${fmt(mean(G[y].filter((x) => x != null)), 1)}</td></tr>`).join('')}
+      <tr class="avgrow"><th>Avg</th>${avgM.map((v) => `<td>${v == null ? '' : fmt(v, 1)}</td>`).join('')}<td>${fmt(avg, 1)}</td></tr></tbody></table></div></details>
+    <p class="muted" style="font-size:12px;margin:6px 0 0">Range = month high ÷ month low − 1. Gold = 1.3× its average month or more. Context only: in our 2015–26 NSE test a stock's big-range months did not repeat the next year; across the market Feb–Mar (Budget, year-end) run a little wider and December narrower.</p></div>`;
+}
 const athCache = {};
 async function drawATH(r, tf) {
   const box = $('#athc'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
@@ -3442,6 +3469,7 @@ async function drawATH(r, tf) {
     try { const res = await fetch(MAIN + AP() + `ath_charts/${encodeURIComponent(r.symbol)}.json`); if (!res.ok) throw 0; c = athCache[AM() + r.symbol] = await res.json(); }
     catch (e) { box.innerHTML = '<p class="muted pad">Chart data is not available for this stock yet.</p>'; return; }
   }
+  { const sn = $('#seasn'); if (sn && !sn.firstChild) sn.innerHTML = seasonHtml(c.m, r.symbol); }
   box.innerHTML = '';
   const b = c[tf]; if (!b) { box.innerHTML = `<p class="muted pad">No ${tf === 'd' ? 'daily' : 'weekly'} bars saved for this stock yet.</p>`; return; }
   const T = tf === 'm' ? b.t.map((t) => t + '-01') : b.t;

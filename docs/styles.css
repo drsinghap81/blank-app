@@ -1034,3 +1034,15 @@ body.pub .owner-only { display: none !important; }
 .t2-n{min-width:36px;height:30px;padding:0 6px;box-sizing:border-box;border-radius:9px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
 .t2-wt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.t2-wt b{font-size:14.5px}.t2-wt small{font-size:12px;color:var(--muted)}
 .t2-row{display:flex;gap:14px;flex-wrap:wrap;margin:16px 2px}
+
+/* Seasonality card (15 Nov 2026) */
+.season-bars{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;height:84px;align-items:end;margin:4px 0 6px}
+.season-bars>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.season-bars i{display:block;width:100%;background:var(--mute-line);border-radius:3px 3px 0 0;min-height:2px}
+.season-bars i.hot{background:var(--saffron)}
+.season-bars span{font-size:11px;opacity:.7;margin-top:2px}
+.season-wrap{overflow-x:auto;margin-top:6px}
+.season-t{border-collapse:collapse;font-size:11.5px;font-variant-numeric:tabular-nums;width:100%}
+.season-t th,.season-t td{padding:3px 4px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.season-t td.hot{background:rgba(232,163,61,.35);font-weight:600}
+.season-t td.avg,.season-t .avgrow td{font-weight:600}
