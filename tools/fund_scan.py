@@ -8,6 +8,7 @@ import numpy as np, pandas as pd, requests, yfinance as yf
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mf_fetch import universe, hist  # noqa: E402
 import pattern_scan as P  # noqa: E402
+from cupclose import IX_DY_DEP, IX_WK_DEP, wd_closes  # noqa: E402
 
 OUT = "data/scan"
 ETFS = {"NIFTYBEES": "Nifty 50", "SETFNIF50": "Nifty 50 (SBI)", "JUNIORBEES": "Nifty Next 50", "MID150BEES": "Nifty Midcap 150",
@@ -163,6 +164,10 @@ def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
         row["mclose"] = mclose_state(x) if kind != "debt" else None
     except Exception as e:  # noqa: BLE001
         row["mclose"] = None; print("mclose fail", key, str(e)[:80])
+    try:   # week / day cup closes for ETFs only (mutual funds trade once a day at NAV with exit loads: not for swing trades); index-style cups
+        row["wclose"], row["dclose"] = wd_closes(x, IX_WK_DEP, IX_DY_DEP) if kind == "etf" else (None, None)
+    except Exception as e:  # noqa: BLE001
+        row["wclose"] = row["dclose"] = None; print("wd fail", key, str(e)[:80])
     try:
         pr = P.scan(x.tail(750), key, name, "stock")
         if pr:

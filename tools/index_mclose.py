@@ -6,6 +6,8 @@ Output data/scan/index_mclose.json: the month-close rows plus each index's dista
 import io, json, os, sys, time
 from datetime import datetime, timezone, timedelta
 import numpy as np, pandas as pd, requests
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from cupclose import IX_DY_DEP, IX_WK_DEP, wd_closes  # noqa: E402
 
 CACHE = "data/scan/index_hl.csv.gz"; OUT = "data/scan/index_mclose.json"; START = "2005-01-01"
 MAXMIN = float(sys.argv[1]) if len(sys.argv) > 1 else 80
@@ -72,7 +74,7 @@ def main():
     REN = {o: n for o, n in REN.items() if n in names}
     H = H.assign(INDEX=H.INDEX.replace(REN)).sort_values(["INDEX", "Date"]).drop_duplicates(["Date", "INDEX"], keep="last")
     lm = pd.Timestamp(today).to_period("M") - 1
-    rows, dist = [], []
+    rows, dist, wrows, drows = [], [], [], []
     first = H.Date.min()
     for name, g in H.groupby("INDEX"):
         g = g.set_index("Date").sort_index()
@@ -89,6 +91,13 @@ def main():
         allh = float(mh.max())
         w = g.CLOSE[g.index <= lm.to_timestamp(how="end")].resample("W-FRI").last().dropna(); sma = w.rolling(30).mean()
         rising = bool(len(sma.dropna()) > 5 and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5])
+        try:
+            wk, dy = wd_closes(g.rename(columns={"HIGH": "High", "CLOSE": "Close"}), IX_WK_DEP, IX_DY_DEP)
+            for z, L in ((wk, wrows), (dy, drows)):
+                if z:
+                    L.append(dict(index=name, close=last, since=str(g.index[0].date()), sma_rising=rising, **z))
+        except Exception as e:  # noqa: BLE001
+            print("wd fail", name, e)
         dist.append(dict(index=name, close=last, ath=allh, below_pct=round((1 - last / allh) * 100, 2), since=str(g.index[0].date())))
         if c > old and base >= 12:
             dep = float(mc.iloc[a + 1:i].min() / old - 1) if a + 1 < i else 0.0
@@ -97,8 +106,8 @@ def main():
                              since=str(g.index[0].date())))
     rows.sort(key=lambda r: (-r["long_cup"], -r["base_months"]))
     json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), month=str(lm), history_from=str(first.date()) if len(H) else None,
-                   backfill_left=left, rows=rows, indices=sorted(dist, key=lambda r: r["below_pct"])), open(OUT, "w"), separators=(",", ":"))
-    print("indices", len(dist), "month-close rows", len(rows), [r["index"] for r in rows])
+                   backfill_left=left, rows=rows, week_close=wrows, day_close=drows, indices=sorted(dist, key=lambda r: r["below_pct"])), open(OUT, "w"), separators=(",", ":"))
+    print("indices", len(dist), "month-close rows", len(rows), "week", [r["index"] for r in wrows], "day", [r["index"] for r in drows])
 
 
 if __name__ == "__main__":

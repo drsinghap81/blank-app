@@ -2253,8 +2253,9 @@ function planATH(r, near) {
 /* ------------------------------------------------------------------ Monthly ATH */
 function wireAthMk(el) {
   el.querySelectorAll('.seg.mk button').forEach((b) => b.addEventListener('click', () => {
-    if (b.dataset.mk === 'WORLD') { state.athWorld = true; loadATH(); return; }
-    state.athWorld = false; setTimeout(livePoll, 600); state.athMkt = b.dataset.mk; try { localStorage.setItem('td_athmkt', b.dataset.mk); } catch (e) { /* */ } loadATH();
+    const tr = athGrp() === 'trd';
+    if (b.dataset.mk === 'WORLD') { if (tr) state.trdWorld = true; else state.athWorld = true; loadATH(); return; }
+    if (tr) state.trdWorld = false; else state.athWorld = false; setTimeout(livePoll, 600); state.athMkt = b.dataset.mk; try { localStorage.setItem('td_athmkt', b.dataset.mk); } catch (e) { /* */ } loadATH();
   }));
 }
 /* 15 Nov 2026: one place for everything outside the four stock markets: World stocks (Japan, HK, Canada, Europe, Korea,
@@ -2277,6 +2278,34 @@ function invMcRows() {
   const W = ((state.assets && state.assets.rows) || []).filter((r) => r.mclose && r.group === 'World indices' && (IXM[r.key] || 'US') === mk && (!q || r.name.toLowerCase().includes(q)))
     .map((r) => ({ g: mk === 'US' && !['^GSPC', '^NDX', '^DJI', '^RUT'].includes(r.key) ? 'World indices (Asia, Brazil)' : 'World indices', sym: '', name: r.name, a: r.mclose, cur: '', close: r.close, tv: tvOf(r.key) }));
   return L.filter((r) => G.includes(r.g)).concat(W);
+}
+/* 15 Nov 2026: week / day cup closes for indices and other assets (watch only). NSE indices: index_mclose.json; world indices,
+   commodities, coins, currencies: assets.json. Index cups need only a 10% (week) / 8% (day) fall; other assets use the stock rules. */
+const wdAssetItems = (rows, kind) => rows.map((x) => ({ g: x.g, sym: x.sym || '', name: x.name, a: x.z, wd: true, cur: '', close: x.close, tv: x.tv }));
+function wdListHtml(L, kind) {
+  return L.map((r, i) => allMcItem(r, i, L)).join('').replace(/data-i="/g, 'data-j="');
+}
+function wdListWire(root, L, kind) {
+  root.querySelectorAll('.row[data-j]').forEach((el) => el.addEventListener('click', () => { const r = L[+el.dataset.j]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv) + '&interval=' + (kind === 'wclose' ? 'W' : 'D'), '_blank', 'noopener'); }));
+}
+function idxWdRows(kind) {
+  const k = kind === 'wclose' ? 'week_close' : 'day_close'; const out = [];
+  if (AM() === 'NSE' && state.idxMc) (state.idxMc[k] || []).forEach((r) => out.push({ g: 'NSE indices', name: r.index, z: r, close: r.close, tv: nseIdxTv(r.index) }));
+  const fm = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[AM()]; const kk = kind === 'wclose' ? 'wclose' : 'dclose';
+  ((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === fm && r[kk]).forEach((r) => { const sy = r.symbol || r.key;
+    out.push({ g: 'ETFs', sym: String(sy).replace(/^[A-Z]{2}:/, ''), name: r.name, z: r[kk], close: r.close, tv: r.market === 'UK' ? tvOf(String(sy).replace(/^UK:/, '')) : ({ IN: 'NSE:', US: '', AU: 'ASX:' }[r.market || 'IN'] || '') + String(sy).replace(/^[A-Z]{2}:/, '') }); });
+  return out.map((x) => ({ g: x.g, sym: x.sym || '', name: x.name, a: x.z, wd: true, cur: '', close: x.close, tv: x.tv }));
+}
+async function loadTrdWorld(el, mkSeg) {
+  if (!state.assets) { el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>'; state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets'); }
+  const kind = state.athTabG.trd === 'dclose' ? 'dclose' : 'wclose';
+  const A = ((state.assets && state.assets.rows) || []);
+  const has = A.some((r) => 'wclose' in r);
+  const L = wdAssetItems(A.filter((r) => r[kind]).sort((a, b) => (a.group < b.group ? -1 : a.group > b.group ? 1 : 0)).map((r) => ({ g: r.group === 'Crypto' ? 'Coins' : r.group, name: r.name, z: r[kind], close: r.close, tv: tvOf(r.key) })), kind);
+  $('#asof').textContent = state.assets ? `Assets to ${day(A[0] && A[0].asof)}${updTxt(state.assets.generated)}` : '';
+  el.innerHTML = `${mkSeg}<div class="card"><ul class="list flat" id="athlist"><li class="muted pad">${kind === 'wclose' ? 'Last completed week' : 'Last day'} CLOSED above its cup high: world indices (cup ${kind === 'wclose' ? '10' : '8'}%+ deep), commodities, coins and currencies (same rules as stocks: ${kind === 'wclose' ? '2-year high, 26+ weeks old, 20%+ fall' : '1-year high, 20+ days old, 15%+ fall'}), with room to the next older high at least the cup depth. Watch only, not tested. Tap one for its ${kind === 'wclose' ? 'weekly' : 'daily'} chart in TradingView.</li>
+    ${!has ? '<li class="empty">This list appears after the next asset scan (it runs nightly).</li>' : L.length ? wdListHtml(L, kind) : `<li class="empty">None ${kind === 'wclose' ? 'last week' : 'on the last day'}.</li>`}</ul></div>`;
+  wireAthMk(el); tradeStripWire(el); wdListWire(el, L, kind);
 }
 async function loadATHWorld(el, mkSeg) {
   if (!state.assets || !state.worldMC) {
@@ -2344,9 +2373,10 @@ async function loadATH() {
   $('#title').textContent = { mom: 'Momentum investing', inv: 'Investment', trd: 'Trading · cup closes' }[grp];
   const el = $(grp === 'mom' ? '#view-ath' : '#view-' + state.view);
   state.athC = state.athC || {};
-  const mk = AM(); const wOn = grp === 'mom' && state.athWorld;
-  const mkSeg = (grp === 'trd' ? tradeStrip(state.athTabG.trd) : '') + `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK'], ...(grp === 'mom' ? [['WORLD', 'World & other assets']] : [])].map(([k, n]) => `<button data-mk="${k}" aria-selected="${wOn ? k === 'WORLD' : mk === k}">${n}</button>`).join('')}</div>`;
+  const mk = AM(); const wOn = grp === 'mom' && state.athWorld; const tOn = grp === 'trd' && state.trdWorld;
+  const mkSeg = (grp === 'trd' ? tradeStrip(state.athTabG.trd) : '') + `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK'], ...(grp !== 'inv' ? [['WORLD', 'World & other assets']] : [])].map(([k, n]) => `<button data-mk="${k}" aria-selected="${wOn || tOn ? k === 'WORLD' : mk === k}">${n}</button>`).join('')}</div>`;
   if (wOn) { loadATHWorld(el, mkSeg); return; }
+  if (tOn) { loadTrdWorld(el, mkSeg); return; }
   if (!state.athC[mk]) {
     el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>';
     const tag = mk === 'NSE' ? '' : '_' + mk;
@@ -2355,6 +2385,7 @@ async function loadATH() {
       getJSON(MAIN + AP() + 'sectors.json', 'sectors' + tag), getJSON(MAIN + 'data/scan/world.json', 'world')]);
     const tr = state.data[mk] || await getJSON(MAIN + AP() + 'trend_scan.json', 'td_' + mk);
     if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds');
+    if (mk === 'NSE' && !state.idxMc) state.idxMc = await getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose').catch(() => null);
     await loadGP(mk);
     state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'brk', q: '', all: false, at: new Date() };
   }
@@ -3362,9 +3393,14 @@ function athList() {
   }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.', mclose: 'No stock closed last month above an all-time high that was at least a year old.', themes: 'Thematic index data appears after tonight\'s scan.', td: 'No ATH or IPO setups right now.', ipo: state.ath.ipo ? 'No running IPO signals and nothing near its post-listing high.' : 'The first IPO scan runs tonight after 20:45 IST.' }[tab]}</li>`)
     + (all.length > L.length ? `<li><button class="more" id="athmore">Show all ${all.length}</button></li>` : '')
     + (tab === 'themes' && !state.ath.ixAll && !state.ath.q ? `<li><button class="more" id="ixall">Show all indices (${Object.keys(state.ath.sec.indices || {}).length})</button></li>` : '');
+  if (tab === 'wclose' || tab === 'dclose') {
+    const IL = idxWdRows(tab); const has = ((state.fund && state.fund.rows) || []).some((r) => 'wclose' in r);
+    $('#athlist').insertAdjacentHTML('beforeend', `<li class="muted pad">${AM() === 'NSE' ? 'Indices and ETFs' : 'ETFs'} below use index-style cups: ${tab === 'wclose' ? '10' : '8'}%+ deep (an index rarely falls 20%). Watch only, not tested. Tap one for its TradingView chart.${has ? '' : ' ETF lists appear after the next fund scan (nightly).'}</li>` + (IL.length ? wdListHtml(IL, tab) : `<li class="empty">No ${AM() === 'NSE' ? 'index or ETF' : 'ETF'} ${tab === 'wclose' ? 'week' : 'day'} closed above its cup high.</li>`));
+    wdListWire($('#athlist'), IL, tab);
+  }
   const m = $('#athmore'); if (m) m.addEventListener('click', () => { state.ath.all = true; athList(); });
   const ia = $('#ixall'); if (ia) ia.addEventListener('click', () => { state.ath.ixAll = true; athList(); });
-  $('#athlist').querySelectorAll('.row').forEach((el) => {
+  $('#athlist').querySelectorAll('.row[data-i]').forEach((el) => {
     const open = () => (tab === 'mclose' || tab === 'wclose' || tab === 'dclose' ? mcloseSelect(L[+el.dataset.i]) : tab === 'td' && L[+el.dataset.i]._trend ? trendFromATH(L[+el.dataset.i]) : tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
     el.addEventListener('click', open);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
