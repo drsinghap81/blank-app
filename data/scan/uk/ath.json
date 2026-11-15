@@ -2,7 +2,7 @@
 "market": "UK",
 "asof": "2026-11-13",
 "scan_date": "2026-11-15",
-"generated": "2026-11-15 04:09 UTC",
+"generated": "2026-11-15 04:34 UTC",
 "scanned": 322,
 "rules": {
 "base_main": 24,
@@ -3679,5 +3679,15 @@
 "aligned": false
 }
 ],
-"month_close": []
+"month_close": [],
+"week_close": [],
+"day_close": [],
+"wd_rules": {
+"week_min": 26,
+"week_depth": -0.2,
+"week_window": 104,
+"day_min": 20,
+"day_depth": -0.15,
+"day_window": 250
+}
 }
