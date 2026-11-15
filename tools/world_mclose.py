@@ -238,7 +238,7 @@ def main():
                 liq[t] = val
         time.sleep(1)
     print(M, "liquid", len(liq), flush=True)
-    rows = []; ok = list(liq); n_hist = n_cur = 0
+    rows = []; ok = list(liq); n_hist = n_cur = n_new = 0
     india = M in ("BSE", "SME")
     if india:
         from adjust import fix_gaps
@@ -270,6 +270,8 @@ def main():
                     w = wc.dropna() if wc is not None else pd.Series(dtype=float); w = w[w.index <= me]
                     last = float(c.iloc[-1])
                 n_hist += int(len(mc.dropna()) >= 14); n_cur += int(len(mc.dropna()) > 0 and mc.dropna().index[-1] == lm)
+                m_ = mc.dropna()
+                n_new += int(len(m_) >= 14 and m_.index[-1] == lm and m_.iloc[-1] > m_.iloc[:-1].max())   # new closing high, any base
                 r = check(mc, w, lm)
                 if r:
                     sym, nm = L[t]
@@ -279,10 +281,20 @@ def main():
                 print("fail", t, str(e)[:60])
         time.sleep(1)
     rows.sort(key=lambda r: (-r["long_cup"], -r["base_months"]))
+    if M in ("JP", "KR", "TW"):     # English names from Yahoo (the exchange lists are in the local language)
+        for r in rows:
+            try:
+                inf = yf.Ticker(r["ticker"]).info
+                en = inf.get("longName") or inf.get("shortName")
+                if en:
+                    r["local_name"] = r["name"]; r["name"] = en
+            except Exception:  # noqa: BLE001
+                pass
+            time.sleep(0.5)
     os.makedirs("data/scan/world", exist_ok=True)
     json.dump(dict(market=M, name=NAME[M], month=str(lm), generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
-                   listed=len(L), liquid=len(liq), with_history=n_hist, with_last_month=n_cur, rows=rows), open(f"data/scan/world/{M}.json", "w"), separators=(",", ":"))
-    print(M, "history >= 14 months", n_hist, "last month present", n_cur, "month-close rows", len(rows), [r["symbol"] for r in rows[:15]])
+                   listed=len(L), liquid=len(liq), with_history=n_hist, with_last_month=n_cur, new_high_any_base=n_new, rows=rows), open(f"data/scan/world/{M}.json", "w"), separators=(",", ":"))
+    print(M, "history >= 14 months", n_hist, "last month present", n_cur, "new closing high (any base)", n_new, "month-close rows", len(rows), [r["symbol"] for r in rows[:15]])
 
 
 if __name__ == "__main__":
