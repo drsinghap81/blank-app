@@ -1773,7 +1773,7 @@ function pushForm(root, sym, mk) {
 function addTvLink(root) {
   if (!root) return;
   if (root.querySelector('a[href*="tradingview.com"]')) { addPushBtn(root); return; }
-  const h = root.querySelector('.d-head h2'); if (!h || root.querySelector('.d-head.no-push')) return;   // short-watch panel: no buy button
+  const h = root.querySelector('.d-head h2'); if (!h) return;
   const a = document.createElement('a'); a.className = 'tv-btn'; a.target = '_blank'; a.rel = 'noopener';
   a.href = 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(h.textContent, panelMk())); a.textContent = 'Open in TradingView ↗';
   h.parentElement.appendChild(a);
@@ -1781,7 +1781,7 @@ function addTvLink(root) {
 }
 /* "Push to Live" on every stock panel (not index charts) */
 function addPushBtn(root) {
-  if (!root || root.querySelector('.push-btn')) return;
+  if (!root || root.querySelector('.push-btn') || root.querySelector('.d-head.no-push')) return;   // short-watch panel: no buy button
   const h = root.querySelector('.d-head h2'); if (!h) return;
   const sym = h.textContent.trim(); const co = ((root.querySelector('.d-head .co') || {}).textContent || '').trim();
   if (!sym || /\s/.test(sym) || /^index$/i.test(co) || TV_IDX[sym.toUpperCase()]) return;
@@ -2332,8 +2332,8 @@ async function shortSelect(x) {
   openPanel(`<div class="d-head no-push"><div><h2>${esc(x.sym || x.name)}</h2><div class="co">${esc(x.sym ? x.name || '' : x.g)}</div></div><div class="d-price"><b>${fmt(x.close, x.close >= 1000 ? 0 : 2, 'en-US')}</b></div></div>
     <div class="status exit watch">Support break, ${wk ? 'weekly' : 'daily'}. Watch only: shorting breakdowns lost money in the 2016–26 tests; your call.</div>
     <div class="seg-row"><div class="seg small" id="shtf"><button data-tf="w" aria-selected="${wk}">Weekly + 30 SMA</button><button data-tf="d" aria-selected="${!wk}">Daily</button></div></div>
-    <div class="chart" id="shc" style="height:280px"></div><div class="chart" id="shr" style="height:120px;margin-top:4px"></div>
-    <p class="muted" style="margin:4px 16px;font-size:12px">Red = broken support · grey dashed = next support · blue = 30-week SMA · RSI(14) with 40 / 60 lines: in a downtrend RSI often stalls near 60.</p>
+    <div class="chart" id="shc" style="height:280px"></div><p id="shrange" style="margin:4px 16px 0;font-size:13px"></p><div class="chart" id="shr" style="height:120px;margin-top:2px"></div>
+    <p class="muted" style="margin:4px 16px;font-size:12px">Red = broken support · grey dashed = next support · blue = 30-week SMA · RSI(14) with 40 / 60 lines: in a downtrend RSI often stalls near 60. Arrows = range shift (RSI above 65 → bull range, below 35 → bear range).</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
     ${x.tv ? `<div class="links"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(x.tv)}&interval=${wk ? 'W' : 'D'}" target="_blank" rel="noopener">Open in TradingView</a></div>` : ''}`);
   const D = await shortData(x);
@@ -2355,6 +2355,13 @@ async function shortSelect(x) {
     const rl = rc.addLineSeries({ color: '#8E7CF0', lineWidth: 2, priceLineVisible: false, lastValueVisible: true });
     rl.setData(T.slice(k0).map((t, i) => (R[k0 + i] == null ? { time: t } : { time: t, value: R[k0 + i] })));
     [[60, 'resistance in downtrend'], [40, '']].forEach(([v, ti]) => rl.createPriceLine({ price: v, color: C.slate || '#888', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: ti }));
+    // range shift: RSI above 65 = bull range (support near 40), below 35 = bear range (resistance near 60); mark each switch
+    let st = null; const mk2 = [];
+    for (let i = 0; i < n; i++) { const v = R[i]; if (v == null) continue; const ns = v >= 65 ? 'bull' : v <= 35 ? 'bear' : st;
+      if (ns !== st && st !== null && i >= k0) mk2.push({ time: T[i], position: ns === 'bull' ? 'belowBar' : 'aboveBar', color: ns === 'bull' ? (C.rise || '#0E9F6E') : (C.fall || '#C0392B'), shape: ns === 'bull' ? 'arrowUp' : 'arrowDown', text: ns === 'bull' ? 'bull range' : 'bear range' });
+      st = ns; }
+    rl.setMarkers(mk2); s.setMarkers(mk2.map((m) => ({ ...m, text: m.text.replace(' range', '') })));
+    const lab = $('#shrange'); if (lab) lab.innerHTML = st ? `${tf === 'd' && D.d ? 'Daily' : 'Weekly'} RSI range: <b class="${st === 'bull' ? 'up' : 'down'}">${st === 'bull' ? 'bullish (support near 40)' : 'bearish (resistance near 60)'}</b>${mk2.length ? ` since ${day(mk2[mk2.length - 1].time)}` : ''}` : '';
     rc.timeScale().fitContent();
     ch.timeScale().subscribeVisibleLogicalRangeChange((rg) => { if (rg) rc.timeScale().setVisibleLogicalRange(rg); });
     new ResizeObserver(() => { ch.applyOptions({ width: box.clientWidth }); rc.applyOptions({ width: rb.clientWidth }); }).observe(box);
