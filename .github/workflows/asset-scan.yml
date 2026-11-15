@@ -20,6 +20,6 @@ jobs:
       - run: pip install -q numpy pandas yfinance requests lxml && python tools/asset_scan.py 2>&1 | grep -v -i "warn\|possibly delisted" | tail -15
       - run: |
           git config user.name "asset-scan bot"; git config user.email "actions@users.noreply.github.com"
-          git add data/scan/assets.json; git diff --cached --quiet && exit 0
+          git add data/scan/assets.json data/scan/asset_charts; git diff --cached --quiet && exit 0
           git commit -qm "Asset scan $(date -u +%F)"
           for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done

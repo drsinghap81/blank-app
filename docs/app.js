@@ -1773,7 +1773,7 @@ function pushForm(root, sym, mk) {
 function addTvLink(root) {
   if (!root) return;
   if (root.querySelector('a[href*="tradingview.com"]')) { addPushBtn(root); return; }
-  const h = root.querySelector('.d-head h2'); if (!h) return;
+  const h = root.querySelector('.d-head h2'); if (!h || root.querySelector('.d-head.no-push')) return;   // short-watch panel: no buy button
   const a = document.createElement('a'); a.className = 'tv-btn'; a.target = '_blank'; a.rel = 'noopener';
   a.href = 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(h.textContent, panelMk())); a.textContent = 'Open in TradingView ↗';
   h.parentElement.appendChild(a);
@@ -2292,7 +2292,7 @@ function wdListWire(root, L, kind) {
    old, 20% / 15%+ rally since; indices 10% / 8%), only under a falling 30-week SMA, room to the next older low >= the rally.
    Watch only: shorting these on F&O stocks lost money in the 2016-26 test (as did H&S / double / triple tops). Use it to avoid buying. */
 const SHORT_NOTE = '<b>Watch only, not a short system.</b> Support break: the week or day CLOSED below the nearest swing low (a 10% / 8%+ rally off it first; the break stays listed for 4 weeks / 5 days while price stays below), under a falling 30-week average. Next support = the next older low below. Shorting breakdowns of 52-week lows, reverse cups and H&S / double / triple tops all lost money on F&O stocks in 2016–26; only coins in bear years paid. Use it to avoid buying, not to short.';
-function shortItems(rows, g, tvf) { return rows.map((r) => ({ g, sym: r.symbol || '', name: r.symbol ? r.name : (r.index || r.name), z: r, close: r.close, tv: tvf(r) })); }
+function shortItems(rows, g, tvf, src = 'stock') { return rows.map((r) => ({ g, sym: r.symbol || '', name: r.symbol ? r.name : (r.index || r.name), z: r, close: r.close, tv: tvf(r), src, key: r._key || r.key, mk: AM() })); }
 function shortItemHtml(x, i, L) {
   const r = x.z; const wk = r.kind === 'WS'; const sp = i === 0 || L[i - 1].g !== x.g ? `<li class="ixsep">${esc(x.g)}</li>` : '';
   const chips = (r.sector_tag ? secChip(r) : '') + `<span class="chip exit">Broke support ${fmt(r.old_low, 2, 'en-US')} (swing low of ${day(r.low_date)})${r.broke && r.broke !== r.period ? ` on ${day(r.broke)}` : ' this ' + (wk ? 'week' : 'day')} · now ${fmt(r.below_pct, 1)}% below</span>`
@@ -2302,9 +2302,69 @@ function shortItemHtml(x, i, L) {
   return `${sp}<li class="row" tabindex="0" data-j="${i}"><div><div class="sym">${esc(x.sym || x.name)}</div>${x.sym ? `<div class="co">${esc(x.name || '')}</div>` : ''}<div class="tags">${chips}</div></div><div></div>
     <div class="num"><b>${fmt(x.close, x.close >= 1000 ? 0 : 2, 'en-US')}</b>${g == null ? '' : `<span class="muted">${g <= 0 ? `${fmt(-g, 1)}% below` : `${fmt(g, 1)}% above`} that ${wk ? 'week' : 'day'}'s low</span>`}</div></li>`;
 }
+/* Short watch panel (15 Nov 2026): price (weekly / daily) with the broken support, the next support and the 30-week SMA, plus RSI(14)
+   with the 40 / 60 lines (downtrend: RSI tends to stall near 60). For information; the decision is the user's. */
+function rsiArr(c, n = 14) {
+  const out = Array(c.length).fill(null); let ag = 0, al = 0;
+  for (let i = 1; i < c.length; i++) {
+    const d = c[i] - c[i - 1], g = Math.max(d, 0), l = Math.max(-d, 0);
+    if (i <= n) { ag += g / n; al += l / n; if (i === n) out[i] = al === 0 ? 100 : 100 - 100 / (1 + ag / al); continue; }
+    ag = (ag * (n - 1) + g) / n; al = (al * (n - 1) + l) / n; out[i] = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
+  }
+  return out;
+}
+const smaArr = (c, n) => c.map((_, i) => (i + 1 < n ? null : c.slice(i + 1 - n, i + 1).reduce((a, b) => a + b, 0) / n));
+async function shortData(x) {
+  const mk = x.mk || AM(); const get = async (u) => { try { const r = await fetch(u); return r.ok ? await r.json() : null; } catch (e) { return null; } };
+  if (x.src === 'stock') { const j = await get(MAIN + MKT[mk].path + 'ath_charts/' + encodeURIComponent(x.sym) + '.json'); if (!j) return null;
+    return { w: j.w && { t: j.w.t, o: j.w.o, h: j.w.h, l: j.w.l, c: j.w.c }, d: j.d && { t: j.d.t, o: j.d.o, h: j.d.h, l: j.d.l, c: j.d.c } }; }
+  if (x.src === 'index') { const sl = String(x.name).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, ''); const j = await get(MAIN + 'data/scan/index_charts/' + sl + '.json'); if (!j) return null;
+    return { w: j.w && { t: j.w.t, o: j.w.o, h: j.w.h, l: j.w.l, c: j.w.c } }; }
+  if (x.src === 'asset') { const j = await get(MAIN + 'data/scan/asset_charts/' + encodeURIComponent(String(x.key).replace(/[:/=^]/g, '_')) + '.json'); return j && j.w ? j : null; }
+  if (x.src === 'etf') { const j = await get(MAIN + 'data/scan/etf_charts/' + encodeURIComponent(String(x.key).replace(/[:/]/g, '_')) + '.json'); if (!j || !j.t) return null;
+    return { w: { t: j.t, c: j.c, line: true } }; }
+  return null;
+}
+async function shortSelect(x) {
+  const r = x.z; const wk = r.kind === 'WS';
+  const f = [['Broken support', `${fmt(r.old_low, 2, 'en-US')} · swing low of ${day(r.low_date)}`], ['Broke', r.broke ? day(r.broke) : '–'], ['Now', `${fmt(r.below_pct, 1)}% below it`],
+    ['Rally off that low first', pct(r.rally * 100)], ['Next support below', r.atl ? 'none (new low)' : `${fmt(r.support, 2, 'en-US')} · ${fmt(r.room_pct, 0)}% down`], ['Trend', 'below a falling 30-week SMA']];
+  openPanel(`<div class="d-head no-push"><div><h2>${esc(x.sym || x.name)}</h2><div class="co">${esc(x.sym ? x.name || '' : x.g)}</div></div><div class="d-price"><b>${fmt(x.close, x.close >= 1000 ? 0 : 2, 'en-US')}</b></div></div>
+    <div class="status exit watch">Support break, ${wk ? 'weekly' : 'daily'}. Watch only: shorting breakdowns lost money in the 2016–26 tests; your call.</div>
+    <div class="seg-row"><div class="seg small" id="shtf"><button data-tf="w" aria-selected="${wk}">Weekly + 30 SMA</button><button data-tf="d" aria-selected="${!wk}">Daily</button></div></div>
+    <div class="chart" id="shc" style="height:280px"></div><div class="chart" id="shr" style="height:120px;margin-top:4px"></div>
+    <p class="muted" style="margin:4px 16px;font-size:12px">Red = broken support · grey dashed = next support · blue = 30-week SMA · RSI(14) with 40 / 60 lines: in a downtrend RSI often stalls near 60.</p>
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    ${x.tv ? `<div class="links"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(x.tv)}&interval=${wk ? 'W' : 'D'}" target="_blank" rel="noopener">Open in TradingView</a></div>` : ''}`);
+  const D = await shortData(x);
+  const draw = (tf) => {
+    const box = $('#shc'), rb = $('#shr'); if (!box) return; box.innerHTML = ''; rb.innerHTML = '';
+    const b = D && (D[tf] || D.w || D.d);
+    if (!b) { box.innerHTML = `<p class="muted pad">No saved chart for this one${x.tv ? ': use TradingView below' : ''}.</p>`; return; }
+    const isW = b === D.w; const T = b.t; const n = T.length, k0 = Math.max(0, n - (isW ? 156 : 250));
+    const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
+    let s;
+    if (b.line || !b.o) { s = ch.addLineSeries({ color: C.ink || '#888', lineWidth: 2, priceLineVisible: false }); s.setData(T.slice(k0).map((t, i) => ({ time: t, value: b.c[k0 + i] }))); }
+    else s = priceSeries(ch, T.slice(k0).map((t, i) => ({ time: t, open: b.o[k0 + i], high: b.h[k0 + i], low: b.l[k0 + i], close: b.c[k0 + i] })), 'ath');
+    if (isW) { const sm = smaArr(b.c, 30); const l = ch.addLineSeries({ color: C.e21, lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+      l.setData(T.slice(k0).map((t, i) => (sm[k0 + i] == null ? { time: t } : { time: t, value: sm[k0 + i] }))); }
+    s.createPriceLine({ price: r.old_low, color: C.fall || '#C0392B', lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'broken support' });
+    if (r.support) s.createPriceLine({ price: r.support, color: C.slate || '#888', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'next support' });
+    ch.timeScale().fitContent();
+    const R = rsiArr(b.c); const rc = window.LightweightCharts.createChart(rb, { ...chartBase(), height: rb.clientHeight, width: rb.clientWidth, rightPriceScale: { scaleMargins: { top: 0.05, bottom: 0.05 } } });
+    const rl = rc.addLineSeries({ color: '#8E7CF0', lineWidth: 2, priceLineVisible: false, lastValueVisible: true });
+    rl.setData(T.slice(k0).map((t, i) => (R[k0 + i] == null ? { time: t } : { time: t, value: R[k0 + i] })));
+    [[60, 'resistance in downtrend'], [40, '']].forEach(([v, ti]) => rl.createPriceLine({ price: v, color: C.slate || '#888', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: ti }));
+    rc.timeScale().fitContent();
+    ch.timeScale().subscribeVisibleLogicalRangeChange((rg) => { if (rg) rc.timeScale().setVisibleLogicalRange(rg); });
+    new ResizeObserver(() => { ch.applyOptions({ width: box.clientWidth }); rc.applyOptions({ width: rb.clientWidth }); }).observe(box);
+  };
+  $('#shtf').querySelectorAll('button').forEach((bt) => bt.addEventListener('click', () => { $('#shtf').querySelectorAll('button').forEach((y) => y.setAttribute('aria-selected', y === bt)); draw(bt.dataset.tf); }));
+  draw(wk ? 'w' : 'd');
+}
 function shortListRender(root, L) {
   root.innerHTML = `<li class="status exit watch" style="list-style:none;margin:6px 0">${SHORT_NOTE}</li>` + (L.length ? L.map((x, i) => shortItemHtml(x, i, L)).join('') : '<li class="empty">Nothing closed below a reverse-cup low under a falling 30-week average.</li>');
-  root.querySelectorAll('.row[data-j]').forEach((el) => el.addEventListener('click', () => { const x = L[+el.dataset.j]; if (x.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(x.tv) + '&interval=' + (x.z.kind === 'WS' ? 'W' : 'D'), '_blank', 'noopener'); }));
+  root.querySelectorAll('.row[data-j]').forEach((el) => el.addEventListener('click', () => shortSelect(L[+el.dataset.j])));
 }
 function idxWdRows(kind) {
   const k = kind === 'wclose' ? 'week_close' : 'day_close'; const out = [];
@@ -2318,7 +2378,7 @@ async function loadTrdWorld(el, mkSeg) {
   if (!state.assets) { el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>'; state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets'); }
   const A = ((state.assets && state.assets.rows) || []);
   if (state.athTabG.trd === 'short') {
-    const L = ['wshort', 'dshort'].flatMap((k) => shortItems(A.filter((r) => r[k]).map((r) => ({ ...r[k], name: r.name, close: r.close, _key: r.key, _g: r.group === 'Crypto' ? 'Coins' : r.group })), '', (r) => tvOf(r._key))
+    const L = ['wshort', 'dshort'].flatMap((k) => shortItems(A.filter((r) => r[k]).map((r) => ({ ...r[k], name: r.name, close: r.close, _key: r.key, _g: r.group === 'Crypto' ? 'Coins' : r.group })), '', (r) => tvOf(r._key), 'asset')
       .map((x) => ({ ...x, g: `${x.z._g} · ${k === 'wshort' ? 'week' : 'day'}` }))).sort((a, b) => (a.g < b.g ? -1 : a.g > b.g ? 1 : 0));
     $('#asof').textContent = state.assets ? `Assets to ${day(A[0] && A[0].asof)}${updTxt(state.assets.generated)}` : '';
     el.innerHTML = `${mkSeg}<div class="card"><ul class="list flat" id="athlist"></ul></div>`;
@@ -3311,9 +3371,9 @@ function athList() {
     const d = state.ath.d || {}; const mk = AM(); const px = { NSE: 'NSE:', US: '', ASX: 'ASX:', UK: 'LSE:' }[mk];
     const q = (state.ath.q || '').toLowerCase(); const f = (r) => !q || (r.symbol || r.index || '').toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q);
     const L = [...shortItems((d.week_short || []).filter(f), 'Week closes', (r) => px + r.symbol), ...shortItems((d.day_short || []).filter(f), 'Day closes', (r) => px + r.symbol),
-      ...(mk === 'NSE' && state.idxMc ? [...shortItems((state.idxMc.week_short || []).filter(f), 'NSE indices · week', (r) => nseIdxTv(r.index)), ...shortItems((state.idxMc.day_short || []).filter(f), 'NSE indices · day', (r) => nseIdxTv(r.index))] : []),
+      ...(mk === 'NSE' && state.idxMc ? [...shortItems((state.idxMc.week_short || []).filter(f), 'NSE indices · week', (r) => nseIdxTv(r.index), 'index'), ...shortItems((state.idxMc.day_short || []).filter(f), 'NSE indices · day', (r) => nseIdxTv(r.index), 'index')] : []),
       ...['wshort', 'dshort'].flatMap((k) => { const fm = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[mk]; return shortItems(((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === fm && r[k] && f({ symbol: String(r.symbol || r.key), name: r.name }))
-        .map((r) => ({ ...r[k], symbol: String(r.symbol || r.key).replace(/^[A-Z]{2}:/, ''), name: r.name, close: r.close })), `ETFs · ${k === 'wshort' ? 'week' : 'day'}`, (r) => (mk === 'UK' ? tvOf(r.symbol) : px + r.symbol)); })];
+        .map((r) => ({ ...r[k], symbol: String(r.symbol || r.key).replace(/^[A-Z]{2}:/, ''), name: r.name, close: r.close, _key: r.key })), `ETFs · ${k === 'wshort' ? 'week' : 'day'}`, (r) => (mk === 'UK' ? tvOf(r.symbol) : px + r.symbol), 'etf'); })];
     if (!('week_short' in d)) { $('#athlist').innerHTML = '<li class="empty">The short watch list appears after tonight\'s scan.</li>'; return; }
     shortListRender($('#athlist'), L); return;
   }

@@ -60,6 +60,16 @@ def add_row(t, nm, grp, x):
         r["wshort"], r["dshort"] = wd_short(x)
     except Exception as e:  # noqa: BLE001
         print("short fail", t, e); r["wshort"] = r["dshort"] = None
+    try:   # chart file for the app (short-watch panel): weekly bars 5 years, daily bars ~15 months
+        os.makedirs("data/scan/asset_charts", exist_ok=True)
+        W = pd.DataFrame({"o": x.Open.resample("W-FRI").first(), "h": x.High.resample("W-FRI").max(), "l": x.Low.resample("W-FRI").min(), "c": x.Close.resample("W-FRI").last()}).dropna().tail(260)
+        Dd = x.tail(320)
+        rd = lambda v: [float(f"{z:.6g}") for z in v]  # noqa: E731
+        json.dump(dict(w=dict(t=[str(i.date()) for i in W.index], o=rd(W.o), h=rd(W.h), l=rd(W.l), c=rd(W.c)),
+                       d=dict(t=[str(i.date()) for i in Dd.index], o=rd(Dd.Open), h=rd(Dd.High), l=rd(Dd.Low), c=rd(Dd.Close))),
+                  open("data/scan/asset_charts/" + t.replace(":", "_").replace("/", "_").replace("=", "_").replace("^", "_") + ".json", "w"), separators=(",", ":"))
+    except Exception as e:  # noqa: BLE001
+        print("chart fail", t, e)
     try:
         r["support_w"] = weekly_support(x)
     except Exception as e:  # noqa: BLE001
