@@ -96,7 +96,7 @@ def main():
             for z, L in ((wk, wrows), (dy, drows)):
                 if z:
                     L.append(dict(index=name, close=last, since=str(g.index[0].date()), sma_rising=rising, **z))
-            ws_, ds_ = wd_short(g.rename(columns={"CLOSE": "Close"})[["Close"]], -IX_WK_DEP, -IX_DY_DEP)
+            ws_, ds_ = wd_short(g.rename(columns={"CLOSE": "Close"})[["Close"]])
             for z, L in ((ws_, wsrows), (ds_, dsrows)):
                 if z:
                     L.append(dict(index=name, close=last, since=str(g.index[0].date()), **z))

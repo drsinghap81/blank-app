@@ -80,13 +80,16 @@ def cupclose_short(ll, cc, K, B, D):
         j = int(below[-1]); lo_, hi_ = max(0, j - B), min(a_, j + B + 1)
         sup = float(np.nanmin(ll[lo_:hi_]))
     room = (1 - sup / c_) if sup else None
-    if room is not None and room < rally / (1 + rally):
-        return None
-    return a_, rim, age, rally, sup, room
+    return a_, rim, age, rally, sup, room   # room is shown, not required (support breaks rarely have room to an older low)
 
 
-def wd_short(x, wk_dep=-WK_DEP, dy_dep=-DY_DEP):
-    """Weekly / daily reverse-cup closes for a daily OHLC frame (Low, Close). Only when the last completed week is below a falling
+SH_WK_K, SH_WK_MIN, SH_WK_UP, SH_DY_K, SH_DY_MIN, SH_DY_UP = 52, 8, 0.10, 120, 10, 0.08   # support break (15 Nov 2026, Amritpal's gold chart)
+
+
+def wd_short(x, wk_dep=SH_WK_UP, dy_dep=SH_DY_UP):
+    """Support break (reverse cup): the week / day CLOSES below the lowest low of the last 52 weeks / 120 days (at least 8 weeks /
+    10 days old) after a rally of 10% / 8%+ off it, under a falling 30-week SMA. Watch only.
+    Weekly / daily reverse-cup closes for a daily OHLC frame (Low, Close). Only when the last completed week is below a falling
     30-week SMA. Returns (week_row or None, day_row or None)."""
     x = (x[["Low", "Close"]] if "Low" in x else x[["Close"]].assign(Low=x.Close)).copy(); x["Low"] = x.Low.where(x.Low.notna(), x.Close); x = x.dropna()
     last = x.index[-1].normalize()
@@ -99,12 +102,12 @@ def wd_short(x, wk_dep=-WK_DEP, dy_dep=-DY_DEP):
     if not (W.c.iloc[-1] < sma.iloc[-1] < sma.iloc[-5]):
         return None, None
     out = []
-    for kind, L, C, T, K, B, D, lc in (("WS", W.l, W.c, W.index, WK_K, WK_MIN, wk_dep, 52), ("DS", x.Low, x.Close, x.index, DY_K, DY_MIN, dy_dep, 120)):
+    for kind, L, C, T, K, B, D, lc in (("WS", W.l, W.c, W.index, SH_WK_K, SH_WK_MIN, wk_dep, 26), ("DS", x.Low, x.Close, x.index, SH_DY_K, SH_DY_MIN, dy_dep, 60)):
         r = cupclose_short(L.to_numpy(float), C.to_numpy(float), K, B, D)
         if not r:
             out.append(None); continue
         a_, rim, age, rally, sup, room = r
         out.append(dict(kind=kind, period=str(T[-1].date()), close_p=float(C.iloc[-1]), low_p=float(L.iloc[-1]), old_low=rim, low_date=str(T[a_].date()),
                         base=int(age), rally=round(rally, 4), below_pct=round((1 - float(C.iloc[-1]) / rim) * 100, 2), support=sup,
-                        room_pct=None if room is None else round(room * 100, 2), atl=sup is None, long_cup=bool(age >= lc and rally >= 0.30)))
+                        room_pct=None if room is None else round(room * 100, 2), atl=sup is None, long_cup=bool(age >= lc and rally >= 0.20)))
     return out[0], out[1]

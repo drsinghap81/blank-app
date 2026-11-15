@@ -57,7 +57,7 @@ def add_row(t, nm, grp, x):
     except Exception as e:  # noqa: BLE001
         print("wd fail", t, e); r["wclose"] = r["dclose"] = None
     try:   # reverse cup closes under a falling 30-week SMA (watch only)
-        r["wshort"], r["dshort"] = wd_short(x, -IX_WK_DEP, -IX_DY_DEP) if grp == "World indices" else wd_short(x)
+        r["wshort"], r["dshort"] = wd_short(x)
     except Exception as e:  # noqa: BLE001
         print("short fail", t, e); r["wshort"] = r["dshort"] = None
     try:
