@@ -250,9 +250,10 @@ def extra_etfs(rows, have):
                     if not len(x):
                         continue
                     x = drop_partial(x, ses)
-                    j = np.flatnonzero(np.abs(np.diff(np.log(x.Close.to_numpy()))) > 0.4)
-                    if len(j):
-                        x = x.iloc[j[-1] + 1:]
+                    if mkt == "IN":   # Yahoo NSE history can miss ETF splits: cut before a >40% one-day jump (US/UK are adjusted)
+                        j = np.flatnonzero(np.abs(np.diff(np.log(x.Close.to_numpy()))) > 0.4)
+                        if len(j):
+                            x = x.iloc[j[-1] + 1:]
                     sym = t[:-3] if mkt == "IN" else t
                     key = sym if mkt == "IN" else f"{mkt}:{sym}"
                     if key in have:
@@ -304,10 +305,7 @@ def main():
         for k, nm in lst.items():
             try:
                 x = pd.DataFrame({c: dd2[c][k + suf] for c in ("Open", "High", "Low", "Close")}).dropna(subset=["Close"])
-                x = drop_partial(x, "US" if mkt == "US" else "ASX")
-                j = np.flatnonzero(np.abs(np.diff(np.log(x.Close.to_numpy()))) > 0.4)
-                if len(j):
-                    x = x.iloc[j[-1] + 1:]
+                x = drop_partial(x, "US" if mkt == "US" else "ASX")   # Yahoo adjusts US/ASX splits: keep full history (real crashes are real)
                 kind = "debt" if any(w in nm for w in ("Treasur", "bonds", "Cash")) else "etf"
                 r, ch = metrics(x.Close, f"{mkt}:{k}", nm, kind, "ETF", x, market=mkt, no_topup=nt | {f"{mkt}:{z}" for z in nt})
                 if r:
