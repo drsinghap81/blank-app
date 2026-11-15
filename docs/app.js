@@ -2312,7 +2312,7 @@ async function loadATH() {
   const exits = T.filter((r) => r.status === 'exit next open').length;
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
-  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ['tracked', 'Tracked signals', T.length],
+  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ...(d.week_close ? [['wclose', 'Week close', d.week_close.length], ['dclose', 'Day close', (d.day_close || []).length]] : []), ['tracked', 'Tracked signals', T.length],
     ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length]];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     <section class="summary">
@@ -2324,6 +2324,8 @@ async function loadATH() {
       <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
       <details class="info"><summary>How this list works</summary><p>${mk !== 'NSE' ? NOTE_G[state.ath.tab] || '' : { td: 'Top-down: world → India → sectors → themes → stocks. Score 0–3 = sector RS > 0, best theme RS > 0, stock RS > 0. Aligned (sector and stock RS both positive) ATH breakouts won 54% and averaged +29% vs 48% / +15% (2017–26). World and Nifty trend did not help, so they are context only; IPO cups showed no clear lift. A guide for confidence and size, not a filter.',
         brk: 'Price went above the high of the all-time-high closing month this month or last, and the trade is still open. Bold rows have a base of 2 years or more (the tested system); the rest 1–2 years.',
+        wclose: `Stocks whose last completed WEEK closed above their cup high: the highest high of the last 2 years, at least ${(d.wd_rules || {}).week_min || 26} weeks old, with a fall of at least ${Math.abs(((d.wd_rules || {}).week_depth || -0.2) * 100)}% since. Kept only if the room up to the next older high is at least the cup depth (all-time-high cups always pass). Sorted by sector strength. India test 2017–26 (buy next open, weekly 30-SMA exit, 10 stocks): 9.0%/yr, worst fall −26% at 1% risk + add (equal weight 20.4% / −34%) vs 21.5% / −20% for the live Breakouts rule. Watch list only.`,
+        dclose: `Stocks whose last DAY closed above their cup high: the highest high of the last year, at least ${(d.wd_rules || {}).day_min || 20} trading days old, with a fall of at least ${Math.abs(((d.wd_rules || {}).day_depth || -0.15) * 100)}% since. Kept only if the room up to the next older high is at least the cup depth (all-time-high cups always pass). Sorted by sector strength. India test 2017–26: all-time-high cups 12.7%/yr, −35% at 1% risk + add; with the room rule 11.3%, −40%; live Breakouts rule 21.5% / −20%. Watch list only.`,
         mclose: `Stocks whose last completed month (${(d.month_close || []).length ? mLab(d.month_close[0].month) : 'last month'}) CLOSED above their all-time HIGH (the highest price of all earlier months, wicks included, as on TradingView), after a base of 1+ years since that high (bold = 2+ years), ${mk === 'NSE' ? '₹2 cr+' : 'liquid stocks only, same floor as Breakouts,'} a day. Long cup = base of 3+ years with a 30%+ fall inside it. ${mk === 'NSE' ? '' : 'Not tested in this market. India result: '}Tested 2017–26 on all NSE stocks (buy at the next month's first open, sell after a weekly close below the 30-week SMA, 10 stocks, 1% risk + 1 add): 5.4%/yr, worst fall −25%; long cups 6.5% / −18%. The live Breakouts rule (buy when price crosses the ATH-month high during the month) did 21.5% / −20%. By the time a month closes above the high, the move has usually run, so this is a month-end check, NOT an entry.`,
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
@@ -3049,10 +3051,16 @@ const WORLD_MK = ['BSE', 'SME', 'JP', 'HK', 'CA', 'EU', 'KR', 'TW'];
 /* every month-close list in one place: India/US/Australia/UK stocks, ETFs & funds, world stocks, other assets */
 /* sector strength order: leading > uptrend > mixed > weak > untagged, then 6-month sector RS, long cups, base */
 const SEC_O = { leading: 0, uptrend: 1, mixed: 2, weak: 3 };
-const secSort = (a, b) => ((SEC_O[a.sector_tag] ?? 4) - (SEC_O[b.sector_tag] ?? 4)) || ((b.sector_rs ?? -999) - (a.sector_rs ?? -999)) || ((b.long_cup ? 1 : 0) - (a.long_cup ? 1 : 0)) || (b.base_months - a.base_months);
+const secSort = (a, b) => ((SEC_O[a.sector_tag] ?? 4) - (SEC_O[b.sector_tag] ?? 4)) || ((b.sector_rs ?? -999) - (a.sector_rs ?? -999)) || ((b.long_cup ? 1 : 0) - (a.long_cup ? 1 : 0)) || ((b.base_months ?? b.base ?? 0) - (a.base_months ?? a.base ?? 0));
 function allMcRows() {
   const out = []; const q = ((state.ath && state.ath.q) || '').toLowerCase();
   const S = state.mcAll || {};
+  if (state.allMode === 'W' || state.allMode === 'D') {
+    [['NSE', 'India stocks', 'NSE:'], ['US', 'US stocks', ''], ['ASX', 'Australia stocks', 'ASX:'], ['UK', 'UK stocks', 'LSE:']].forEach(([m, g, tv]) => {
+      ((S[m] && S[m][state.allMode === 'W' ? 'week_close' : 'day_close']) || []).slice().sort(secSort).forEach((r) => out.push({ g, sym: r.symbol, name: r.name, a: r, wd: true, cur: MKT[m].cur, close: r.close, tv: tv + r.symbol, sec: r }));
+    });
+    return out.filter((r) => !q || (r.sym || '').toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q) || r.g.toLowerCase().includes(q));
+  }
   [['NSE', 'India stocks', 'NSE:'], ['US', 'US stocks', ''], ['ASX', 'Australia stocks', 'ASX:'], ['UK', 'UK stocks', 'LSE:']].forEach(([m, g, tv]) => {
     ((S[m] && S[m].month_close) || []).slice().sort(secSort).forEach((r) => out.push({ g, sym: r.symbol, name: r.name, a: r, cur: MKT[m].cur, close: r.close, tv: tv + r.symbol, sec: r }));
   });
@@ -3067,7 +3075,12 @@ function allMcRows() {
   return out.filter((r) => !q || (r.sym || '').toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q) || r.g.toLowerCase().includes(q));
 }
 function allMcItem(r, i, L) {
-  const a = r.a; const sep = i === 0 || L[i - 1].g !== r.g ? `<li class="ixsep">${esc(r.g)}</li>` : '';
+  const a = r.a;
+  if (r.wd) {
+    const sp = i === 0 || L[i - 1].g !== r.g ? `<li class="ixsep">${esc(r.g)}</li>` : '';
+    return `${sp}<li class="row ${a.ath ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.sym)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${secChip(a) + rsChip('Sector RS', a.sector_rs) + wdChips(a)}</div></div><div></div><div class="num">${wdRight(r.close, a, r.cur)}</div></li>`;
+  }
+  const sep = i === 0 || L[i - 1].g !== r.g ? `<li class="ixsep">${esc(r.g)}</li>` : '';
   const chip = (r.sec ? secChip(r.sec) + (r.sec.industry ? `<span class="chip">${esc(r.sec.industry)}</span>` : '') + rsChip('Sector RS', r.sec.sector_rs) : '') + `<span class="chip">Closed ${pct(a.above_pct)} over ATH ${fmt(a.old_ath, 2, 'en-US')} (${mLab(a.ath_month)})</span>${a.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${a.base_months >= 24 ? 'new' : ''}">${baseTxt(a.base_months)}</span>`
     + (a.depth != null ? `<span class="chip">fell ${fmt(Math.abs(a.depth * 100), 0)}% in base</span>` : '') + (a.sma_rising == null ? '' : `<span class="chip ${a.sma_rising ? 'open' : 'exit'}">${a.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>`);
   const sm = r.close && a.close_m ? r.close / a.close_m - 1 : null;
@@ -3117,6 +3130,7 @@ function athRows() {
   let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : tab === 'mclose' ? (d.month_close || []) : (d.tracked || []);
   if (tab === 'brk') L = L.slice().sort((a, b) => (b.main - a.main) || (a.date < b.date ? 1 : -1));
   if (tab === 'mclose') L = L.slice().sort(secSort);
+  if (tab === 'wclose' || tab === 'dclose') { L = (tab === 'wclose' ? d.week_close : d.day_close) || []; if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); } L = L.slice().sort(secSort); }
   if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); }
   return L;
 }
@@ -3159,8 +3173,18 @@ function athList() {
   if (tab === 'pulse') { pulseView(); return; }
   if (tab === 'all') {
     const W = all; const mo = ((state.mcAll && state.mcAll.NSE && state.mcAll.NSE.month_close || [])[0] || {}).month || ((state.worldMC || [])[0] || {}).month;
-    $('#athlist').innerHTML = `<li class="muted pad">Every month-close list in one place${mo ? ` (${mLab(mo)})` : ''}: the last completed month CLOSED above the all-time high (highest price of earlier months, wicks included, as on TradingView) after a base of 1+ years. Within each market, strongest sectors first (leading, uptrend, mixed, weak; then 6-month sector RS). A month-end check, not an entry: in the India test, buying the next month's open after such a close made 5.4%/yr vs 21.5% for the live Breakouts rule. Tap a row for its TradingView chart.</li>`
+    const md = state.allMode || 'M';
+    const seg = `<li><div class="seg" id="allmd" style="margin:6px 0">${[['M', 'Month close'], ['W', 'Week close'], ['D', 'Day close']].map(([k, n]) => `<button data-k="${k}" aria-selected="${md === k}">${n}</button>`).join('')}</div></li>`;
+    if (md !== 'M') {
+      $('#athlist').innerHTML = seg + `<li class="muted pad">${md === 'W' ? 'Last completed week' : 'Last day'} CLOSED above the cup high (${md === 'W' ? 'highest high of the last 2 years, 26+ weeks old, 20%+ fall since' : 'highest high of the last year, 20+ days old, 15%+ fall since'}), with room to the next older high at least the cup depth (all-time highs always pass). India, US, Australia and UK stocks, strongest sectors first. Watch list only: India test ${md === 'W' ? '9.0' : '12.7'}%/yr at 1% risk vs 21.5% for the live Breakouts rule.</li>`
+        + (W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : `<li class="empty">None ${md === 'W' ? 'last week' : 'on the last day'}.</li>`);
+      $('#athlist').querySelectorAll('#allmd button').forEach((b) => b.addEventListener('click', () => { state.allMode = b.dataset.k; athList(); }));
+      $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv), '_blank', 'noopener'); }));
+      return;
+    }
+    $('#athlist').innerHTML = seg + `<li class="muted pad">Every month-close list in one place${mo ? ` (${mLab(mo)})` : ''}: the last completed month CLOSED above the all-time high (highest price of earlier months, wicks included, as on TradingView) after a base of 1+ years. Within each market, strongest sectors first (leading, uptrend, mixed, weak; then 6-month sector RS). A month-end check, not an entry: in the India test, buying the next month's open after such a close made 5.4%/yr vs 21.5% for the live Breakouts rule. Tap a row for its TradingView chart.</li>`
       + (W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : '<li class="empty">Nothing closed last month above an all-time high at least a year old.</li>');
+    $('#athlist').querySelectorAll('#allmd button').forEach((b) => b.addEventListener('click', () => { state.allMode = b.dataset.k; athList(); }));
     $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv), '_blank', 'noopener'); }));
     return;
   }
@@ -3209,6 +3233,12 @@ function athList() {
       return `<li class="row ${r.status === 'buy next open' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
         <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
     }
+    if (tab === 'wclose' || tab === 'dclose') {
+      const Lp = (state.ath.lp || {})[r.symbol]; const px = Lp ? Lp.price : r.close;
+      chip = secChip(r) + rsChip('Sector RS', r.sector_rs) + wdChips(r) + (r.low_price ? '<span class="chip exit">Under the A$30 price floor</span>' : '') + (r.size ? `<span class="chip">${esc(r.size)}</span>` : '');
+      return `<li class="row ${r.ath ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
+        <div class="tags">${chip}</div></div><div></div><div class="num">${wdRight(px, r)}</div></li>`;
+    }
     if (tab === 'mclose') {
       const tr = (state.ath.d.tracked || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
       chip = `${r.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">fell ${fmt(Math.abs((r.depth || 0) * 100), 0)}% in base</span>${r.low_price ? '<span class="chip exit">Under the A$30 price floor</span>' : ''}`
@@ -3249,7 +3279,7 @@ function athList() {
   const m = $('#athmore'); if (m) m.addEventListener('click', () => { state.ath.all = true; athList(); });
   const ia = $('#ixall'); if (ia) ia.addEventListener('click', () => { state.ath.ixAll = true; athList(); });
   $('#athlist').querySelectorAll('.row').forEach((el) => {
-    const open = () => (tab === 'mclose' ? mcloseSelect(L[+el.dataset.i]) : tab === 'td' && L[+el.dataset.i]._trend ? trendFromATH(L[+el.dataset.i]) : tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
+    const open = () => (tab === 'mclose' || tab === 'wclose' || tab === 'dclose' ? mcloseSelect(L[+el.dataset.i]) : tab === 'td' && L[+el.dataset.i]._trend ? trendFromATH(L[+el.dataset.i]) : tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
     el.addEventListener('click', open);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   });
@@ -3268,6 +3298,18 @@ function trendFromATH(r) {
 const hiGap = (px, a) => { if (!a || !a.high_m || !px) return ''; const g = (px / a.high_m - 1) * 100;
   return `<span style="display:block" class="${g >= 0 ? 'up' : 'muted'}" title="High of the ${mLab(a.month)} candle ${fmt(a.high_m, 2, 'en-US')}">${g >= 0 ? `${pct(g)} over` : `${fmt(-g, 1)}% below`} ${mLab(a.month).split(' ')[0]} high</span>`; };
 const mLab = (s) => new Date(String(s).slice(0, 7) + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+/* weekly / daily cup closes (tools/ath_scan.py week_close / day_close) */
+const wdUnit = (r) => (r.kind === 'W' ? 'wk' : 'd');
+function wdChips(r) {
+  const room = r.ath ? '<span class="chip new">At all-time high · no resistance above</span>'
+    : `<span class="chip ${r.room_pct >= 2 * Math.abs(r.depth * 100) ? 'open' : ''}">Room ${fmt(r.room_pct, 0)}% to ${fmt(r.resistance, 2, 'en-US')} (cup ${fmt(Math.abs(r.depth * 100), 0)}%)</span>`;
+  return `<span class="chip">Closed ${pct(r.above_pct)} over cup high ${fmt(r.old_ath, 2, 'en-US')} (${day(r.ath_date)})</span>${room}${r.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip">${r.base} ${wdUnit(r)} cup</span>`
+    + (r.ath ? `<span class="chip">fell ${fmt(Math.abs(r.depth * 100), 0)}% in cup</span>` : '') + `<span class="chip ${r.sma_rising ? 'open' : 'exit'}">${r.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>`;
+}
+function wdRight(px, r, cur) {
+  const g = r.high_p ? (px / r.high_p - 1) * 100 : null; const lab = r.kind === 'W' ? 'week' : 'day';
+  return `<b>${cur || ''}${fmt(px, px >= 1000 ? 0 : 2, 'en-US')}</b>${g == null ? '' : `<span style="display:block" class="${g >= 0 ? 'up' : 'muted'}">${g >= 0 ? `${pct(g)} over` : `${fmt(-g, 1)}% below`} that ${lab}'s high</span>`}`;
+}
 function mcloseSelect(r) {
   const tr = ((state.ath.d && state.ath.d.tracked) || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
   if (tr) { athSelect(tr); return; }
@@ -3275,7 +3317,8 @@ function mcloseSelect(r) {
 }
 function athSelect(r) {
   const near = state.ath.tab === 'near' || !!r._near;
-  const st = r._mclose ? `<div class="status info">${mLab(r.month)} closed at ${fmt(r.close_m, 2, AL())}, ${pct(r.above_pct)} above its all-time high ${fmt(r.old_ath, 2, AL())} (${mLab(r.ath_month)}). A month-end check, not an entry: buying the next month's open after such a close made 5.4%/yr in the India test vs 21.5% for the live Breakouts rule.</div>`
+  const st = r._mclose && r.kind && (r.kind === 'W' || r.kind === 'D') ? `<div class="status info">${r.kind === 'W' ? 'Week to' : 'Day'} ${day(r.period)} closed at ${fmt(r.close_p, 2, AL())}, ${pct(r.above_pct)} above its ${r.base}-${r.kind === 'W' ? 'week' : 'day'} cup high ${fmt(r.old_ath, 2, AL())} (${day(r.ath_date)}); cup ${fmt(Math.abs(r.depth * 100), 0)}% deep; ${r.ath ? 'an all-time high, no resistance above.' : `next resistance ${fmt(r.resistance, 2, AL())}, ${fmt(r.room_pct, 0)}% away.`} A watch list, not an entry: in the India test these made ${r.kind === 'W' ? '9.0' : '12.7'}%/yr at 1% risk vs 21.5% for the live Breakouts rule.</div>`
+    : r._mclose ? `<div class="status info">${mLab(r.month)} closed at ${fmt(r.close_m, 2, AL())}, ${pct(r.above_pct)} above its all-time high ${fmt(r.old_ath, 2, AL())} (${mLab(r.ath_month)}). A month-end check, not an entry: buying the next month's open after such a close made 5.4%/yr in the India test vs 21.5% for the live Breakouts rule.</div>`
     : near && r.kind === 'close' ? `<div class="status info">Not triggered yet. Signal: a MONTH CLOSE above ${fmt(r.trigger, 2, AL())}, its old all-time-high close (${fmt(r.gap_pct, 1, AL())}% above the last close); buy at the next month's first open. The old high ${fmt(r.wick_high, 2, AL())} was a one-month spike.</div>`
     : near ? `<div class="status info">Not triggered yet. Buy if it trades above ${fmt(r.trigger, 2, AL())} this month (${fmt(r.gap_pct, 1, AL())}% above the last close).</div>`
     : r.status === 'exit next open' ? '<div class="status exit">Weekly close below the 30-week SMA. Sell at the next open.</div>'

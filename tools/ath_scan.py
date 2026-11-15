@@ -42,6 +42,8 @@ UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6, "UK": 1e8}[MARKET]            # value
 MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0, "UK": 100.0}[MARKET]   # no penny stocks (30 Oct 2026)
 MCL_MIN = {"ASX": 1.0}.get(MARKET, MIN_CLOSE)   # 15 Nov 2026: month-close list only goes down to A$1 on the ASX (A$1 m/day still applies)
 BASE_MAIN, BASE_MIN = 24, 12
+WCLOSE, DCLOSE = [], []   # 15 Nov 2026: week / day CLOSED above the all-time high (cup >= 26 weeks & 20% / >= 20 days & 15%)
+WK_MIN, WK_DEP, DY_MIN, DY_DEP, WK_K, DY_K = 26, -0.20, 20, -0.15, 104, 250
 MCLOSE = []   # month-end list (15 Nov 2026): last completed month CLOSED above the old all-time closing high
 NEAR = 0.05
 
@@ -248,13 +250,62 @@ def analyse(sym, x, today, lookback_days=550):
                            close=float(x.Close.iloc[-1]), since_pct=(float(x.Close.iloc[-1]) / float(M.c.loc[lm_]) - 1) * 100,
                            value_cr=v_me / UNIT)
                 MCLOSE.append(mcl)
+    # 15 Nov 2026: weekly and daily cup closes. Rim = highest high of the last WK_K weeks / DY_K days (excluding the signal bar),
+    # at least WK_MIN / DY_MIN bars old; cup depth = lowest close since the rim; next resistance = highest high BEFORE the rim.
+    # Kept when the room to that resistance is at least the cup depth (Amritpal), or the rim is the all-time high.
+    # NSE 2017-26 at 1% risk + add: weekly 9.0%/yr -26% (equal weight 20.4% -34%); daily (ATH cups) 12.7% -35%;
+    # live monthly cross 21.5% -20%. Watch lists only.
+    lists = mcl is not None
+
+    def cupclose(hh, cc, K, B, D):
+        n_ = len(hh)
+        if n_ < B + 3:
+            return None
+        lo = max(0, n_ - 1 - K); win = hh[lo:n_ - 1]
+        a_ = lo + int(np.nanargmax(win)); rim = float(hh[a_]); age = n_ - 1 - a_
+        if not (cc[-1] > rim and age >= B):
+            return None
+        seg = cc[a_ + 1:n_ - 1]; dep = float(np.nanmin(seg) / rim - 1) if len(seg) else 0.0
+        if dep > D:
+            return None
+        res = float(np.nanmax(hh[:a_])) if a_ > 0 else np.nan
+        res = res if np.isfinite(res) and res > rim else None
+        room = (res / cc[-1] - 1) if res else None
+        if room is not None and room < -dep:
+            return None
+        return a_, rim, age, dep, res, room
+    try:
+        Wc = W.loc[:last_complete]
+        r_ = cupclose(Wc.h.to_numpy(float), Wc.c.to_numpy(float), WK_K, WK_MIN, WK_DEP)
+        wend = Wc.index[-1].end_time.normalize(); vw = val20.loc[:wend]
+        if r_ and len(vw) and float(vw.iloc[-1]) >= MINVAL:
+            a_, rim, age, dep, res, room = r_; lw = Wc.iloc[-1]
+            sm = float(lw.sma) if np.isfinite(lw.sma) else None; sm4 = W.sma.shift(4).loc[Wc.index[-1]]
+            WCLOSE.append(dict(symbol=sym, kind="W", period=str(Wc.index[-1].end_time.date()), close_p=float(lw.c), high_p=float(lw.h), old_ath=rim,
+                               ath_date=str(Wc.index[a_].end_time.date()), base=int(age), depth=round(dep, 4), above_pct=(float(lw.c) / rim - 1) * 100,
+                               resistance=res, room_pct=None if room is None else round(room * 100, 2), ath=res is None,
+                               long_cup=bool(age >= 52 and dep <= -0.30), sma_rising=bool(sm is not None and np.isfinite(sm4) and sm > sm4 and float(lw.c) > sm),
+                               close=float(x.Close.iloc[-1]), value_cr=float(vw.iloc[-1]) / UNIT))
+            lists = True
+        r_ = cupclose(x.High.to_numpy(float), x.Close.to_numpy(float), DY_K, DY_MIN, DY_DEP)
+        if r_ and float(val20.iloc[-1]) >= MINVAL:
+            a_, rim, age, dep, res, room = r_; cc = float(x.Close.iloc[-1])
+            sm = W.sma.loc[last_complete]; sm4 = W.sma.shift(4).loc[last_complete]
+            DCLOSE.append(dict(symbol=sym, kind="D", period=str(x.index[-1].date()), close_p=cc, high_p=float(x.High.iloc[-1]), old_ath=rim,
+                               ath_date=str(x.index[a_].date()), base=int(age), depth=round(dep, 4), above_pct=(cc / rim - 1) * 100,
+                               resistance=res, room_pct=None if room is None else round(room * 100, 2), ath=res is None,
+                               long_cup=bool(age >= 120 and dep <= -0.30), sma_rising=bool(np.isfinite(sm) and np.isfinite(sm4) and sm > sm4 and float(Wc.c.iloc[-1]) > sm),
+                               close=cc, value_cr=float(val20.iloc[-1]) / UNIT))
+            lists = True
+    except Exception as e:  # noqa: BLE001
+        print("w/d close fail", sym, str(e)[:60])
     Mc = M.tail(240); Wt = W.tail(260)
     chart = dict(m=dict(t=[str(p) for p in Mc.index], o=Mc.o.round(2).tolist(), h=Mc.h.round(2).tolist(),
                         l=Mc.l.round(2).tolist(), c=Mc.c.round(2).tolist()),
                  w=dict(t=[str(p.end_time.date()) for p in Wt.index], o=Wt.o.round(2).tolist(), h=Wt.h.round(2).tolist(),
                         l=Wt.l.round(2).tolist(), c=Wt.c.round(2).tolist(), sma=Wt.sma.round(2).tolist()),
                  trigger=float(t_now) if np.isfinite(t_now) else None, ath_month=d.ath_month.iloc[-1])
-    if mcl is not None:
+    if lists:
         chart["mclose"] = True
     return events, near, chart
 
@@ -325,8 +376,9 @@ def main():
                     ev, nr = [], None
                     if not (ch and ch.get("mclose")):
                         continue
-                    if MCLOSE and MCLOSE[-1]["symbol"] == sym:
-                        MCLOSE[-1]["low_price"] = True
+                    for L_ in (MCLOSE, WCLOSE, DCLOSE):
+                        if L_ and L_[-1]["symbol"] == sym:
+                            L_[-1]["low_price"] = True
                 if ev or nr:
                     rsd = stock_rs(sym, x.Close, SEC, BENCH)
                     for e_ in ev:
@@ -338,8 +390,11 @@ def main():
             events += ev
             if nr:
                 near.append(nr)
-            if ch and ch.get("mclose") and MCLOSE and MCLOSE[-1]["symbol"] == sym:
-                MCLOSE[-1].update(stock_rs(sym, x.Close, SEC, BENCH) if SEC else {})
+            if ch and ch.get("mclose") and SEC:
+                rsd_ = stock_rs(sym, x.Close, SEC, BENCH)
+                for L_ in (MCLOSE, WCLOSE, DCLOSE):
+                    if L_ and L_[-1]["symbol"] == sym:
+                        L_[-1].update(rsd_)
             if ev or nr or (ch and ch.get("mclose")):
                 ch["d"] = daily_block(x)                        # daily bars for the app's Today chart (11 Nov 2026)
                 charts[sym] = ch
@@ -376,19 +431,22 @@ def main():
         brk = E
     if len(N):
         N = N.sort_values("gap_pct")
-    MC = pd.DataFrame(MCLOSE)
-    if len(MC):
-        MC["name"] = MC.symbol.map(name).fillna(""); MC["size"] = MC.symbol.map(size)
+    def tagsort(rows, base_col):
+        D_ = pd.DataFrame(rows)
+        if not len(D_):
+            return D_
+        D_["name"] = D_.symbol.map(name).fillna(""); D_["size"] = D_.symbol.map(size)
         if sec:
-            t_ = [tag_for(s_, sec) for s_ in MC.symbol]
-            MC["industry"], MC["sector_index"], MC["sector_tag"] = [x[0] for x in t_], [x[1] for x in t_], [x[2] for x in t_]
+            t_ = [tag_for(s_, sec) for s_ in D_.symbol]
+            D_["industry"], D_["sector_index"], D_["sector_tag"] = [x[0] for x in t_], [x[1] for x in t_], [x[2] for x in t_]
             ix_ = sec.get("indices") or {}
-            MC["sector_rs"] = [(ix_.get(x[1]) or {}).get("rs_6m") if x[1] else None for x in t_]
+            D_["sector_rs"] = [(ix_.get(x[1]) or {}).get("rs_6m") if x[1] else None for x in t_]
         # 15 Nov 2026: strongest sectors first (leading > uptrend > mixed > weak > untagged), then sector RS, long cups, base
-        MC["_o"] = MC.get("sector_tag", pd.Series(index=MC.index, dtype=object)).map({"leading": 0, "uptrend": 1, "mixed": 2, "weak": 3}).fillna(4)
-        MC["_r"] = pd.to_numeric(MC.get("sector_rs", pd.Series(index=MC.index, dtype=float)), errors="coerce").fillna(-999)
-        MC = MC.sort_values(["_o", "_r", "long_cup", "base_months"], ascending=[True, False, False, False]).drop(columns=["_o", "_r"])
-    keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set()) | (set(MC.symbol) if len(MC) else set())
+        D_["_o"] = D_.get("sector_tag", pd.Series(index=D_.index, dtype=object)).map({"leading": 0, "uptrend": 1, "mixed": 2, "weak": 3}).fillna(4)
+        D_["_r"] = pd.to_numeric(D_.get("sector_rs", pd.Series(index=D_.index, dtype=float)), errors="coerce").fillna(-999)
+        return D_.sort_values(["_o", "_r", "long_cup", base_col], ascending=[True, False, False, False]).drop(columns=["_o", "_r"])
+    MC = tagsort(MCLOSE, "base_months"); WC = tagsort(WCLOSE, "base"); DC = tagsort(DCLOSE, "base")
+    keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set()) | (set(MC.symbol) if len(MC) else set()) | (set(WC.symbol) if len(WC) else set()) | (set(DC.symbol) if len(DC) else set())
     for f in os.listdir(CH):
         if f[:-5] not in keep:
             os.remove(os.path.join(CH, f))
@@ -401,7 +459,9 @@ def main():
                breakouts=clean(brk.to_dict("records")) if len(brk) else [],
                near=clean(N.to_dict("records")) if len(N) else [],
                tracked=clean(E.to_dict("records")) if len(E) else [],
-               month_close=clean(MC.to_dict("records")) if len(MC) else [])
+               month_close=clean(MC.to_dict("records")) if len(MC) else [],
+               week_close=clean(WC.to_dict("records")) if len(WC) else [], day_close=clean(DC.to_dict("records")) if len(DC) else [],
+               wd_rules=dict(week_min=WK_MIN, week_depth=WK_DEP, week_window=WK_K, day_min=DY_MIN, day_depth=DY_DEP, day_window=DY_K))
     json.dump(out, open(f"{OUT}/ath.json", "w"), indent=0, allow_nan=False)
     print("breakouts", len(brk), "near", len(N), "tracked", len(E))
     nb = brk[brk.main] if len(brk) else brk
