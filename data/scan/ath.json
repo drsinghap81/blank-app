@@ -2,7 +2,7 @@
 "market": "NSE",
 "asof": "2026-11-13",
 "scan_date": "2026-11-15",
-"generated": "2026-11-15 02:52 UTC",
+"generated": "2026-11-15 04:12 UTC",
 "scanned": 1768,
 "rules": {
 "base_main": 24,
@@ -15497,6 +15497,34 @@
 ],
 "month_close": [
 {
+"symbol": "KOTAKBANK",
+"month": "2026-10",
+"close_m": 461.6,
+"old_ath": 460.38,
+"ath_month": "2025-04",
+"above_pct": 0.265,
+"base_months": 18,
+"depth": -0.2324,
+"high_m": 462.9,
+"long_cup": false,
+"main": false,
+"sma30": 401.47,
+"sma_rising": true,
+"close": 488.55,
+"since_pct": 5.8384,
+"value_cr": 1213.9319,
+"rs_bench": "NIFTY FINANCIAL SERVICES",
+"stock_rs": 14.3832,
+"stock_rs_up": true,
+"stock_rs_days": 250,
+"name": "Kotak Mahindra Bank Limited",
+"size": "Large",
+"industry": "Financial Services",
+"sector_index": "NIFTY FINANCIAL SERVICES",
+"sector_tag": "leading",
+"sector_rs": 3.2665
+},
+{
 "symbol": "WSTCSTPAPR",
 "month": "2026-10",
 "close_m": 815.45,
@@ -15520,7 +15548,9 @@
 "name": "West Coast Paper Mills Limited",
 "size": "Small",
 "industry": null,
-"sector_tag": null
+"sector_index": null,
+"sector_tag": null,
+"sector_rs": null
 },
 {
 "symbol": "DPABHUSHAN",
@@ -15546,33 +15576,9 @@
 "name": "D. P. Abhushan Limited",
 "size": "Micro",
 "industry": null,
-"sector_tag": null
-},
-{
-"symbol": "KOTAKBANK",
-"month": "2026-10",
-"close_m": 461.6,
-"old_ath": 460.38,
-"ath_month": "2025-04",
-"above_pct": 0.265,
-"base_months": 18,
-"depth": -0.2324,
-"high_m": 462.9,
-"long_cup": false,
-"main": false,
-"sma30": 401.47,
-"sma_rising": true,
-"close": 488.55,
-"since_pct": 5.8384,
-"value_cr": 1213.9319,
-"rs_bench": "NIFTY FINANCIAL SERVICES",
-"stock_rs": 14.3832,
-"stock_rs_up": true,
-"stock_rs_days": 250,
-"name": "Kotak Mahindra Bank Limited",
-"size": "Large",
-"industry": "Financial Services",
-"sector_tag": "leading"
+"sector_index": null,
+"sector_tag": null,
+"sector_rs": null
 }
 ]
 }
