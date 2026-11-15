@@ -2236,7 +2236,7 @@ async function loadATH() {
   const exits = T.filter((r) => r.status === 'exit next open').length;
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
-  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ['tracked', 'Tracked signals', T.length],
+  const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(mk === 'NSE' ? [['mclose', 'Month close', (d.month_close || []).length]] : []), ['tracked', 'Tracked signals', T.length],
     ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length]];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     <section class="summary">
@@ -2248,6 +2248,7 @@ async function loadATH() {
       <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
       <details class="info"><summary>How this list works</summary><p>${mk !== 'NSE' ? NOTE_G[state.ath.tab] || '' : { td: 'Top-down: world → India → sectors → themes → stocks. Score 0–3 = sector RS > 0, best theme RS > 0, stock RS > 0. Aligned (sector and stock RS both positive) ATH breakouts won 54% and averaged +29% vs 48% / +15% (2017–26). World and Nifty trend did not help, so they are context only; IPO cups showed no clear lift. A guide for confidence and size, not a filter.',
         brk: 'Price went above the high of the all-time-high closing month this month or last, and the trade is still open. Bold rows have a base of 2 years or more (the tested system); the rest 1–2 years.',
+        mclose: `Stocks whose last completed month (${(d.month_close || []).length ? mLab(d.month_close[0].month) : 'last month'}) CLOSED above their old all-time-high monthly close after a base of 1+ years (bold = 2+ years), ₹2 cr+ a day. Long cup = base of 3+ years with a fall of 30%+ inside it. Tested 2017–26 on all NSE stocks (buy at the next month's first open, sell after a weekly close below the 30-week SMA, 10 stocks): 2-yr bases 26.7%/yr, worst fall −40% equal weight, 21.4% at 2% risk; long cups 24.4% / −27% equal weight, 25.3% / −29% at 2% risk. The live Breakouts rule (buy when price crosses the old ATH-month high during the month) did 26.1% / −32% and 29.1% / −26% at 2% risk, so waiting for the month close is not better; use this as a month-end check. Most of these already show under Breakouts.`,
         near: 'Within 5% below the trigger this month, above a rising 30-week SMA, base of at least a year. A buy-stop at the trigger is the entry.',
         tracked: 'Every signal of the last 18 months followed with the exit rule: weekly close below the 30-week SMA, sell at the next open. Not your trades.',
         themes: 'Shortlist = indices (broad, sector and thematic) in an uptrend (above a rising 30-week SMA) with 6-month RS vs Nifty 50 above zero, ordered: cup breakout (new monthly-close high after a base of 2+ years), new high (shorter base), cup forming (within 5% of a 2+-year-old high), within 5% of the high, then the rest; inside each group leading before uptrend, RS rising first, then by RS. Tap one for its weekly chart with the 30-week SMA, or monthly with the highest-month-close line. Below: the rest, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
@@ -2952,7 +2953,7 @@ function athRows() {
   if (tab === 'pulse') return ((state.gp[AM()] || {}).rows || []);
   if (tab === 'ipo') return ipoRows();
   if (tab === 'themes') return themeRows();
-  let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : (d.tracked || []);
+  let L = tab === 'brk' ? (d.breakouts || []) : tab === 'near' ? (d.near || []) : tab === 'mclose' ? (d.month_close || []) : (d.tracked || []);
   if (tab === 'brk') L = L.slice().sort((a, b) => (b.main - a.main) || (a.date < b.date ? 1 : -1));
   if (q) { const s = q.toLowerCase(); L = L.filter((r) => r.symbol.toLowerCase().includes(s) || (r.name || '').toLowerCase().includes(s)); }
   return L;
@@ -3020,6 +3021,17 @@ function athList() {
       return `<li class="row ${r.status === 'buy next open' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
         <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
     }
+    if (tab === 'mclose') {
+      const tr = (state.ath.d.tracked || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
+      chip = `${r.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">fell ${fmt(Math.abs((r.depth || 0) * 100), 0)}% in base</span>`
+        + `<span class="chip ${r.sma_rising ? 'open' : 'exit'}">${r.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>${tr ? `<span class="chip open">In Breakouts since ${day(tr.date)}</span>` : ''}`;
+      const Lp = (state.ath.lp || {})[r.symbol]; const px = Lp ? Lp.price : r.close; const sm = px / r.close_m - 1;
+      chip = `<span class="chip">Closed ${pct(r.above_pct)} over old ATH</span>` + chip;
+      right = `<b>${fmt(px, 2, AL())}</b><span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(r.month).split(' ')[0]}</span>`;
+      chip += secChip(r) + (r.size ? `<span class="chip">${esc(r.size)}</span>` : '');
+      return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
+        <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
+    }
     if (tab === 'near') {
       chip = `<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">${fmt(r.gap_pct, 1, AL())}% to go${r.kind === 'close' ? ' (month close)' : ''}</span>`;
       const L = (state.ath.lp || {})[r.symbol];
@@ -3043,13 +3055,13 @@ function athList() {
     if (r.size) chip += `<span class="chip">${esc(r.size)}</span>`;
     return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
       <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
-  }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.', themes: 'Thematic index data appears after tonight\'s scan.', td: 'No ATH or IPO setups right now.', ipo: state.ath.ipo ? 'No running IPO signals and nothing near its post-listing high.' : 'The first IPO scan runs tonight after 20:45 IST.' }[tab]}</li>`)
+  }).join('') : `<li class="empty">${{ brk: 'No open breakouts this month or last.', near: 'Nothing within 5% of its trigger right now.', tracked: 'No signals in the last 18 months.', mclose: 'No stock closed last month above an all-time high that was at least a year old.', themes: 'Thematic index data appears after tonight\'s scan.', td: 'No ATH or IPO setups right now.', ipo: state.ath.ipo ? 'No running IPO signals and nothing near its post-listing high.' : 'The first IPO scan runs tonight after 20:45 IST.' }[tab]}</li>`)
     + (all.length > L.length ? `<li><button class="more" id="athmore">Show all ${all.length}</button></li>` : '')
     + (tab === 'themes' && !state.ath.ixAll && !state.ath.q ? `<li><button class="more" id="ixall">Show all indices (${Object.keys(state.ath.sec.indices || {}).length})</button></li>` : '');
   const m = $('#athmore'); if (m) m.addEventListener('click', () => { state.ath.all = true; athList(); });
   const ia = $('#ixall'); if (ia) ia.addEventListener('click', () => { state.ath.ixAll = true; athList(); });
   $('#athlist').querySelectorAll('.row').forEach((el) => {
-    const open = () => (tab === 'td' && L[+el.dataset.i]._trend ? trendFromATH(L[+el.dataset.i]) : tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
+    const open = () => (tab === 'mclose' ? mcloseSelect(L[+el.dataset.i]) : tab === 'td' && L[+el.dataset.i]._trend ? trendFromATH(L[+el.dataset.i]) : tab === 'themes' ? themeSelect(L[+el.dataset.i]) : tab === 'ipo' || (tab === 'td' && L[+el.dataset.i]._ipo) ? ipoSelect(L[+el.dataset.i]) : athSelect(L[+el.dataset.i]));
     el.addEventListener('click', open);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   });
@@ -3064,9 +3076,16 @@ function trendFromATH(r) {
   const prevTab = state.tab; state.tab = row.list === 'watch' ? 'watch' : 'trend';
   try { select(row); } finally { state.tab = prevTab; }
 }
+const mLab = (s) => new Date(String(s).slice(0, 7) + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+function mcloseSelect(r) {
+  const tr = ((state.ath.d && state.ath.d.tracked) || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
+  if (tr) { athSelect(tr); return; }
+  athSelect({ ...r, _near: true, _mclose: true, kind: 'close', trigger: r.old_ath, gap_pct: (r.old_ath / r.close - 1) * 100, wick_high: r.wick_trigger });
+}
 function athSelect(r) {
   const near = state.ath.tab === 'near' || !!r._near;
-  const st = near && r.kind === 'close' ? `<div class="status info">Not triggered yet. Signal: a MONTH CLOSE above ${fmt(r.trigger, 2, AL())}, its old all-time-high close (${fmt(r.gap_pct, 1, AL())}% above the last close); buy at the next month's first open. The old high ${fmt(r.wick_high, 2, AL())} was a one-month spike.</div>`
+  const st = r._mclose ? `<div class="status info">${mLab(r.month)} closed at ${fmt(r.close_m, 2, AL())}, ${pct(r.above_pct)} above its old all-time-high monthly close ${fmt(r.old_ath, 2, AL())} (${mLab(r.ath_month)}). Tested rule: buy at the next month's first open while above a rising 30-week SMA; sell after a weekly close below it.</div>`
+    : near && r.kind === 'close' ? `<div class="status info">Not triggered yet. Signal: a MONTH CLOSE above ${fmt(r.trigger, 2, AL())}, its old all-time-high close (${fmt(r.gap_pct, 1, AL())}% above the last close); buy at the next month's first open. The old high ${fmt(r.wick_high, 2, AL())} was a one-month spike.</div>`
     : near ? `<div class="status info">Not triggered yet. Buy if it trades above ${fmt(r.trigger, 2, AL())} this month (${fmt(r.gap_pct, 1, AL())}% above the last close).</div>`
     : r.status === 'exit next open' ? '<div class="status exit">Weekly close below the 30-week SMA. Sell at the next open.</div>'
       : r.status === 'exited' ? `<div class="status info">Exited ${day(r.exit_date)} at ${fmt(r.exit_price, 2, AL())} (${pct(r.ret * 100)}).</div>`

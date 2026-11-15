@@ -41,6 +41,7 @@ MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6, "UK": 1e8}[MARKET]          # Rs 2 
 UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6, "UK": 1e8}[MARKET]            # value_cr field = traded value in Rs cr / $ m / A$ m
 MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0, "UK": 100.0}[MARKET]   # no penny stocks (30 Oct 2026)
 BASE_MAIN, BASE_MIN = 24, 12
+MCLOSE = []   # month-end list (15 Nov 2026): last completed month CLOSED above the old all-time closing high
 NEAR = 0.05
 
 
@@ -221,12 +222,35 @@ def analyse(sym, x, today, lookback_days=550):
                         base_months=int(d.age.iloc[-1]), depth=d.depth.iloc[-1], sma30=float(lastw.sma), kind="high",
                         main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / UNIT,
                         ema21=float(e21.iloc[-1]) if np.isfinite(e21.iloc[-1]) else None, ema9=float(e9.iloc[-1]) if np.isfinite(e9.iloc[-1]) else None)
+    # month-end close list (15 Nov 2026): the last COMPLETED month closed above the old all-time closing high after a base
+    # >= BASE_MIN months. Long cup = base >= 36 m and a fall of >= 30% inside the base. NSE 2017-26 (buy next month's open,
+    # weekly SMA30 exit, 10 stocks): base >= 24 m 26.7%/yr -40% (equal wt) / 21.4% -39% (2% risk); long cups 24.4% -27% /
+    # 25.3% -29%; the live intramonth cross: 26.1% -32% / 29.1% -26%.
+    mcl = None
+    lm_ = M.index[np.asarray(done)][-1] if np.asarray(done).any() else None
+    if lm_ is not None and lm_ == pd.Timestamp(today).to_period("M") - 1 and bool(isb.loc[lm_]) and np.isfinite(age_m.loc[lm_]) and age_m.loc[lm_] >= BASE_MIN and hist_ok.loc[lm_] == True:  # noqa: E712
+        old_c = float(best.shift(1).loc[lm_]); dm = d[d.mon == lm_]; v_me = float(dm.val.iloc[-1]) if len(dm) else np.nan
+        if np.isfinite(old_c) and old_c > 0 and np.isfinite(v_me) and v_me >= MINVAL:
+            wme = W[W.index.end_time.normalize() <= dm.index[-1]]
+            sm_ = float(wme.sma.iloc[-1]) if len(wme) and np.isfinite(wme.sma.iloc[-1]) else None
+            sm4 = float(wme.sma.iloc[-5]) if len(wme) > 5 and np.isfinite(wme.sma.iloc[-5]) else None
+            base_, dep_ = int(age_m.loc[lm_]), float(depth_m.loc[lm_]) if np.isfinite(depth_m.loc[lm_]) else None
+            mcl = dict(symbol=sym, month=str(lm_), close_m=float(M.c.loc[lm_]), old_ath=old_c, ath_month=str(ath_month.loc[lm_]),
+                       above_pct=(float(M.c.loc[lm_]) / old_c - 1) * 100, base_months=base_, depth=dep_,
+                       high_m=float(M.h.loc[lm_]), wick_trigger=float(trig_m.loc[lm_]) if np.isfinite(trig_m.loc[lm_]) else None,
+                       long_cup=bool(base_ >= 36 and dep_ is not None and dep_ <= -0.30), main=bool(base_ >= BASE_MAIN),
+                       sma30=sm_, sma_rising=bool(sm_ is not None and sm4 is not None and sm_ > sm4 and float(wme.c.iloc[-1]) > sm_),
+                       close=float(x.Close.iloc[-1]), since_pct=(float(x.Close.iloc[-1]) / float(M.c.loc[lm_]) - 1) * 100,
+                       value_cr=v_me / UNIT)
+            MCLOSE.append(mcl)
     Mc = M.tail(240); Wt = W.tail(260)
     chart = dict(m=dict(t=[str(p) for p in Mc.index], o=Mc.o.round(2).tolist(), h=Mc.h.round(2).tolist(),
                         l=Mc.l.round(2).tolist(), c=Mc.c.round(2).tolist()),
                  w=dict(t=[str(p.end_time.date()) for p in Wt.index], o=Wt.o.round(2).tolist(), h=Wt.h.round(2).tolist(),
                         l=Wt.l.round(2).tolist(), c=Wt.c.round(2).tolist(), sma=Wt.sma.round(2).tolist()),
                  trigger=float(t_now) if np.isfinite(t_now) else None, ath_month=d.ath_month.iloc[-1])
+    if mcl is not None:
+        chart["mclose"] = True
     return events, near, chart
 
 
@@ -301,7 +325,9 @@ def main():
             events += ev
             if nr:
                 near.append(nr)
-            if ev or nr:
+            if ch and ch.get("mclose") and MCLOSE and MCLOSE[-1]["symbol"] == sym:
+                MCLOSE[-1].update(stock_rs(sym, x.Close, SEC, BENCH) if SEC else {})
+            if ev or nr or (ch and ch.get("mclose")):
                 ch["d"] = daily_block(x)                        # daily bars for the app's Today chart (11 Nov 2026)
                 charts[sym] = ch
         print(a + len(chunk), "done;", len(events), "signals,", len(near), "near", flush=True)
@@ -337,7 +363,14 @@ def main():
         brk = E
     if len(N):
         N = N.sort_values("gap_pct")
-    keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set())
+    MC = pd.DataFrame(MCLOSE)
+    if len(MC):
+        MC["name"] = MC.symbol.map(name).fillna(""); MC["size"] = MC.symbol.map(size)
+        if sec:
+            t_ = [tag_for(s_, sec) for s_ in MC.symbol]
+            MC["industry"], MC["sector_tag"] = [x[0] for x in t_], [x[2] for x in t_]
+        MC = MC.sort_values(["long_cup", "main", "base_months"], ascending=False)
+    keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set()) | (set(MC.symbol) if len(MC) else set())
     for f in os.listdir(CH):
         if f[:-5] not in keep:
             os.remove(os.path.join(CH, f))
@@ -349,7 +382,8 @@ def main():
                rules=dict(base_main=BASE_MAIN, base_min=BASE_MIN, near_pct=NEAR * 100, min_value_cr=MINVAL / UNIT, min_close=MIN_CLOSE),
                breakouts=clean(brk.to_dict("records")) if len(brk) else [],
                near=clean(N.to_dict("records")) if len(N) else [],
-               tracked=clean(E.to_dict("records")) if len(E) else [])
+               tracked=clean(E.to_dict("records")) if len(E) else [],
+               month_close=clean(MC.to_dict("records")) if len(MC) else [])
     json.dump(out, open(f"{OUT}/ath.json", "w"), indent=0, allow_nan=False)
     print("breakouts", len(brk), "near", len(N), "tracked", len(E))
     nb = brk[brk.main] if len(brk) else brk
