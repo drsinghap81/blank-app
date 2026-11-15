@@ -4750,6 +4750,15 @@ async function tdRender2(el) {
   const ok = wi ? wi.up : true;
   const light = wi ? `<div class="t2-light ${ok ? 'ok' : 'warn'}"><i></i><div><b>${ok ? 'Market OK to buy' : 'Market below its 30-week average: be choosy'}</b>
     <span>${esc(MX_BENCH[mk])} ${fmt(wi.close, 0, MKT[mk].loc)} · ${fmt(Math.abs(wi.from_high), 1)}% below its high · ${wi.up ? 'above' : 'below'} a ${wi.up ? 'rising ' : ''}30-week average.${lead.length ? ` ${lead.length} sectors leading: ${lead.map(secName).slice(0, 7).join(', ')}.` : ''}</span></div></div>` : '';
+  // ---- top-down ribbon (15 Nov 2026): World -> market -> sectors -> stocks, each step taps through to its page
+  const WI = (wl && wl.indices) ? Object.values(wl.indices) : []; const wUp = WI.filter((x) => x.up).length;
+  const secL = sec && sec.indices ? lead.map((k) => [k, sec.indices[k].rs_6m ?? -99]).sort((a, b) => b[1] - a[1]) : [];
+  const td = (cls, k, b, sm, go) => `<button class="t2-td ${cls}" data-go="${go}"><small>${k}</small><b>${b}</b><span>${sm}</span></button>`;
+  const ribbon = () => `<div class="t2-tdr" aria-label="Top-down">
+    ${td(wl ? (wl.risk_on ? 'ok' : 'warn') : '', '1 · World', wl ? (wl.risk_on ? 'Risk on' : 'Risk off') : '–', WI.length ? `${wUp} of ${WI.length} indices above a rising 30-wk avg` : '', 'mk')}
+    ${td(wi ? (ok ? 'ok' : 'warn') : '', '2 · ' + esc(MX_BENCH[mk]), wi ? (ok ? 'Uptrend' : 'Be choosy') : '–', wi ? `${fmt(Math.abs(wi.from_high), 1)}% below high` : '', 'inv')}
+    ${td(secL.length ? 'ok' : 'warn', '3 · Sectors', secL.length ? `${secL.length} leading` : 'None leading', secL.slice(0, 3).map(([k]) => esc(secName(k))).join(', '), 'mk')}
+    ${td('', '4 · Stocks', `${nBuy} to buy`, 'below: Investment → Momentum → Trading', 'ath')}</div>`;
   // ---- card for an act-on buy (existing plan numbers; shares from your capital and risk %)
   const card = (r, i) => { const L = tdLabel(r); const e = r.trigger || r.price; const z = t2Shares(e, r.stop, mk); const ck = closeK(r.symbol);
     const tg = r.aligned ? '<span class="t2-tag al">Aligned</span>' : ''; const bt = ck.length ? '<span class="t2-tag both">In both</span>' : '';
@@ -4796,7 +4805,7 @@ async function tdRender2(el) {
         <div class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small><b>${clk.txt}</b><small>${esc(clk.at)} · ${esc(clk.local)} your time</small></div></div>
       ${tiles}
       <small class="t2-sub">Plan from the ${day(P.asof)} close${updTxt(P.generated)} · “to sell” and “to add” count only what you hold${knowHeld ? '' : ' (add holdings in Portfolio or connect your server in Live)'}</small></div>
-    ${light}
+    ${ribbon()}
     <div class="t2-h"><h2>Sell at the open</h2><small>do these first</small></div>
     <div class="t2-box">${!knowHeld ? '<p class="t2-empty">Your holdings are not known yet: add them in Portfolio, or connect your server in Live to read your Angel holdings.</p>'
       : sells.length ? sells.map((e) => `<div class="t2-sell"><span><b>${esc(e.symbol)}</b><small>${esc(e.system === 'Monthly ATH' ? 'Momentum' : e.system)} · ${esc(e.why)}</small></span><span class="t2-red">Sell</span></div>`).join('')
@@ -4828,6 +4837,7 @@ async function tdRender2(el) {
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   const W = [...el.querySelectorAll('.t2-sec')]; [invRows, momRows, trdRows].forEach((L, k) => W[k].querySelectorAll('.t2-wr').forEach((b) => b.addEventListener('click', () => L[+b.dataset.w].go())));
   $('#t2live').addEventListener('click', () => show('live'));
+  el.querySelectorAll('.t2-td[data-go]').forEach((b) => b.addEventListener('click', () => { const g = b.dataset.go; if (g === 'inv') { state.athMkt = mk; state.athTabG.inv = 'themes'; } if (g === 'ath') { state.athMkt = mk; state.athWorld = false; } show(g); }));
   $('#t2old').addEventListener('click', () => { state.todayV1 = true; tdRender(el, false); });
   tdMatrix($('#tdmx'), mk); tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); }
   clearTimeout(state._t2clk); state._t2clk = setTimeout(() => { if (state.view === 'today' && !state.todayV1) { const c = el.querySelector('.t2-clock b'); if (c) { const k = mktClock(mk); c.textContent = k.txt; } } }, 60000);

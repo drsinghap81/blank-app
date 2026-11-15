@@ -1046,3 +1046,14 @@ body.pub .owner-only { display: none !important; }
 .season-t th,.season-t td{padding:3px 4px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
 .season-t td.hot{background:rgba(232,163,61,.35);font-weight:600}
 .season-t td.avg,.season-t .avgrow td{font-weight:600}
+
+/* Today top-down ribbon (15 Nov 2026) */
+.t2-tdr{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 16px 0}
+.t2-td{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;padding:8px 9px;border-radius:12px;border:1px solid var(--line);background:var(--soft);color:inherit;font:inherit;cursor:pointer;min-width:0}
+.t2-td small{font-size:10.5px;opacity:.7;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.t2-td b{font-size:15px;line-height:1.2}
+.t2-td span{font-size:11px;opacity:.75;line-height:1.25}
+.t2-td.ok{border-color:var(--rise);box-shadow:inset 3px 0 0 var(--rise)}
+.t2-td.warn{border-color:var(--saffron);box-shadow:inset 3px 0 0 var(--saffron)}
+.t2-td:not(:last-child)::after{content:'›';position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.5;z-index:1}
+@media (max-width:420px){.t2-tdr{grid-template-columns:repeat(2,1fr)}.t2-td:nth-child(2)::after{content:''}}
