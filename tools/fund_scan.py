@@ -215,7 +215,8 @@ def extra_etfs(rows, have):
         for u, sc in (("https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt", "Symbol"), ("https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt", "ACT Symbol")):
             r = requests.get(u, timeout=30); d = pd.read_csv(io.StringIO(r.text), sep="|")
             d = d[(d["ETF"] == "Y") & (d["Test Issue"] == "N")]
-            U.update({str(s): str(n) for s, n in zip(d[sc], d["Security Name"]) if isinstance(s, str) and re.fullmatch(r"[A-Z]{1,5}", s) and s not in US_ETFS})
+            U.update({str(s): str(n) for s, n in zip(d[sc], d["Security Name"]) if isinstance(s, str) and re.fullmatch(r"[A-Z]{1,5}", s) and s not in US_ETFS
+                      and not re.search(r"(?i)\b(daily|[1-5](\.\d+)?x|ultra(pro)?|leveraged|inverse|bear|short|option income|covered call|buffer|yieldmax)\b", str(n))})
         lists.append(("US", U, 1e7, "US")); print("US ETF list", len(U))
     except Exception as e:  # noqa: BLE001
         print("US ETF list fail", str(e)[:80])
