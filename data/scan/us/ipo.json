@@ -1,8 +1,8 @@
 {
 "market": "US",
 "asof": "2026-11-13",
-"scan_date": "2026-11-14",
-"generated": "2026-11-15 04:43 UTC",
+"scan_date": "2026-11-15",
+"generated": "2026-11-15 05:05 UTC",
 "scanned": 1010,
 "rules": {
 "max_age_months": 36,
@@ -394,7 +394,7 @@
 "theme_rs": null,
 "td_score": 2,
 "aligned": true,
-"age_months": 9
+"age_months": 10
 },
 {
 "symbol": "PS",
@@ -520,7 +520,7 @@
 "sma10": 112.756,
 "value_cr": 235.5391,
 "rs_bench": "XLK",
-"stock_rs": 29.2742,
+"stock_rs": 29.2743,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "name": "Rubrik Inc. Class A Common Stock",
@@ -814,7 +814,7 @@
 "theme_rs": 12.9736,
 "td_score": 3,
 "aligned": true,
-"age_months": 6
+"age_months": 7
 },
 {
 "symbol": "AKTS",
@@ -1045,7 +1045,7 @@
 "sma10": 55.954,
 "value_cr": 25.5604,
 "rs_bench": "XLK",
-"stock_rs": 62.0084,
+"stock_rs": 62.0085,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "name": "Ambiq Micro Inc. Common Stock",
@@ -1199,7 +1199,7 @@
 "theme_rs": -3.081,
 "td_score": 0,
 "aligned": false,
-"age_months": 9
+"age_months": 10
 },
 {
 "symbol": "MWH",
