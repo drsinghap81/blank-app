@@ -1,0 +1,20 @@
+name: rsi-zone-bt
+# research only: long vs short trend systems on coins, commodities, currencies, world indices (prints results to the log)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas yfinance && python tools/rsi_zone_bt.py 2>&1 | grep -v -i "warn\|possibly delisted\|failed download\|^\[" | tee result.txt
+      - run: |
+          mkdir -p research && cp result.txt research/rsi_zone_bt.txt
+          git config user.name "research bot"; git config user.email "actions@users.noreply.github.com"
+          git add research/rsi_zone_bt.txt; git commit -qm "Research: RSI zone backtest" || exit 0
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done
