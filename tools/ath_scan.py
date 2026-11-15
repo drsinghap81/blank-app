@@ -289,7 +289,7 @@ def analyse(sym, x, today, lookback_days=550):
                                ath_date=str(Wc.index[a_].end_time.date()), base=int(age), depth=round(dep, 4), above_pct=(float(lw.c) / rim - 1) * 100,
                                resistance=res, room_pct=None if room is None else round(room * 100, 2), ath=res is None,
                                long_cup=bool(age >= 52 and dep <= -0.30), sma_rising=bool(sm is not None and np.isfinite(sm4) and sm > sm4 and float(lw.c) > sm),
-                               close=float(x.Close.iloc[-1]), value_cr=float(vw.iloc[-1]) / UNIT))
+                               close=float(x.Close.iloc[-1]), value_cr=float(vw.iloc[-1]) / UNIT, first=str(x.index[0].date())))
             lists = True
         r_ = cupclose(x.High.to_numpy(float), x.Close.to_numpy(float), DY_K, DY_MIN, DY_DEP)
         if r_ and float(val20.iloc[-1]) >= MINVAL:
@@ -299,7 +299,7 @@ def analyse(sym, x, today, lookback_days=550):
                                ath_date=str(x.index[a_].date()), base=int(age), depth=round(dep, 4), above_pct=(cc / rim - 1) * 100,
                                resistance=res, room_pct=None if room is None else round(room * 100, 2), ath=res is None,
                                long_cup=bool(age >= 120 and dep <= -0.30), sma_rising=bool(np.isfinite(sm) and np.isfinite(sm4) and sm > sm4 and float(Wc.c.iloc[-1]) > sm),
-                               close=cc, value_cr=float(val20.iloc[-1]) / UNIT))
+                               close=cc, value_cr=float(val20.iloc[-1]) / UNIT, first=str(x.index[0].date())))
             lists = True
     except Exception as e:  # noqa: BLE001
         print("w/d close fail", sym, str(e)[:60])
