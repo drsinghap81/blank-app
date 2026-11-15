@@ -2204,12 +2204,69 @@ function planATH(r, near) {
 }
 
 /* ------------------------------------------------------------------ Monthly ATH */
+function wireAthMk(el) {
+  el.querySelectorAll('.seg.mk button').forEach((b) => b.addEventListener('click', () => {
+    if (b.dataset.mk === 'WORLD') { state.athWorld = true; loadATH(); return; }
+    state.athWorld = false; setTimeout(livePoll, 600); state.athMkt = b.dataset.mk; try { localStorage.setItem('td_athmkt', b.dataset.mk); } catch (e) { /* */ } loadATH();
+  }));
+}
+/* 15 Nov 2026: one place for everything outside the four stock markets: World stocks (Japan, HK, Canada, Europe, Korea,
+   Taiwan, BSE-only, NSE SME) and Commodities & more. Month-close ATH check only. */
+async function loadATHWorld(el, mkSeg) {
+  if (!state.assets || !state.worldMC) {
+    el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>';
+    const [a, ...w] = await Promise.all([getJSON(MAIN + 'data/scan/assets.json', 'assets'), ...WORLD_MK.map((k) => getJSON(MAIN + `data/scan/world/${k}.json`, 'world_' + k).catch(() => null))]);
+    state.assets = a; state.worldMC = w.filter(Boolean);
+  }
+  state.athW = state.athW || { tab: 'world', q: '', all: true, d: {} }; state.ath = state.athW;
+  const g = (state.worldMC || [])[0]; $('#asof').textContent = `Month closes to ${g ? mLab(g.month) : 'last month'} · Yahoo data · information only`;
+  const tabs = [['world', 'World stocks', worldRows().length], ['assets', 'Commodities & more', assetRows(true).length]];
+  el.innerHTML = `${mkSeg}<div class="card">
+      <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
+      <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="athq" type="search" placeholder="Search name, symbol or market" value="${esc(state.ath.q)}" autocomplete="off"></label>
+      <ul class="list flat" id="athlist"></ul></div>`;
+  el.querySelectorAll('.seg:not(.mk) button').forEach((b) => b.addEventListener('click', () => { state.ath.tab = b.dataset.t; loadATH(); }));
+  wireAthMk(el);
+  $('#athq').addEventListener('input', (e) => { state.ath.q = e.target.value; athList(); });
+  athList();
+}
+/* TradingView symbol for a Yahoo ticker (world stocks and other assets) */
+const TV_FUT = { 'GC=F': 'COMEX:GC1!', 'SI=F': 'COMEX:SI1!', 'PL=F': 'NYMEX:PL1!', 'PA=F': 'NYMEX:PA1!', 'HG=F': 'COMEX:HG1!', 'ALI=F': 'COMEX:ALI1!',
+  'CL=F': 'NYMEX:CL1!', 'BZ=F': 'TVC:UKOIL', 'NG=F': 'NYMEX:NG1!', 'HO=F': 'NYMEX:HO1!', 'RB=F': 'NYMEX:RB1!', 'ZC=F': 'CBOT:ZC1!', 'ZW=F': 'CBOT:ZW1!',
+  'ZS=F': 'CBOT:ZS1!', 'ZM=F': 'CBOT:ZM1!', 'ZL=F': 'CBOT:ZL1!', 'KC=F': 'ICEUS:KC1!', 'CC=F': 'ICEUS:CC1!', 'SB=F': 'ICEUS:SB1!', 'CT=F': 'ICEUS:CT1!',
+  'OJ=F': 'ICEUS:OJ1!', 'LE=F': 'CME:LE1!', 'HE=F': 'CME:HE1!', 'GC=F:INR': 'MCX:GOLD1!', 'SI=F:INR': 'MCX:SILVER1!', 'HG=F:INR': 'MCX:COPPER1!',
+  'ALI=F:INR': 'MCX:ALUMINIUM1!', 'CL=F:INR': 'MCX:CRUDEOIL1!', 'NG=F:INR': 'MCX:NATURALGAS1!', 'DX-Y.NYB': 'TVC:DXY', '^TNX': 'TVC:US10Y', '^TYX': 'TVC:US30Y',
+  '^FVX': 'TVC:US05Y', 'FRED:INDIRLTLT01STM': 'TVC:IN10Y', 'FRED:IRLTLT01GBM156N': 'TVC:GB10Y', 'FRED:IRLTLT01DEM156N': 'TVC:DE10Y',
+  'FRED:IRLTLT01JPM156N': 'TVC:JP10Y', 'FRED:IRLTLT01AUM156N': 'TVC:AU10Y', 'FRED:IRLTLT01CAM156N': 'TVC:CA10Y', '^GSPC': 'SP:SPX', '^NDX': 'NASDAQ:NDX',
+  '^DJI': 'DJ:DJI', '^RUT': 'TVC:RUT', '^NSEI': 'NSE:NIFTY', '^BSESN': 'BSE:SENSEX', '^NSEBANK': 'NSE:BANKNIFTY', '^AXJO': 'ASX:XJO', '^FTSE': 'TVC:UKX',
+  '^GDAXI': 'XETR:DAX', '^FCHI': 'EURONEXT:PX1', '^STOXX50E': 'TVC:SX5E', '^N225': 'TVC:NI225', '^HSI': 'TVC:HSI', '000001.SS': 'SSE:000001',
+  '^KS11': 'TVC:KOSPI', '^TWII': 'TVC:TAIEX', '^BVSP': 'BMFBOVESPA:IBOV' };
+const TV_EX = { '.T': 'TSE', '.HK': 'HKEX', '.TO': 'TSX', '.KS': 'KRX', '.KQ': 'KRX', '.TW': 'TWSE', '.TWO': 'TPEX', '.BO': 'BSE', '.NS': 'NSE', '.DE': 'XETR',
+  '.PA': 'EURONEXT', '.AS': 'EURONEXT', '.BR': 'EURONEXT', '.LS': 'EURONEXT', '.IR': 'EURONEXT', '.MC': 'BME', '.MI': 'MIL', '.SW': 'SIX', '.ST': 'OMXSTO',
+  '.OL': 'OSL', '.CO': 'OMXCOP', '.HE': 'OMXHEX', '.VI': 'VIE' };
+function tvOf(key, sym) {
+  if (TV_FUT[key]) return TV_FUT[key];
+  let m = key.match(/^([A-Z]{6})=X$/); if (m) return 'FX_IDC:' + m[1];
+  m = key.match(/^([A-Z]+?)\d*-USD$/); if (m) return 'CRYPTO:' + m[1] + 'USD';
+  m = key.match(/^(.+?)(\.[A-Z]+)$/);
+  if (m && TV_EX[m[2]]) {
+    let s = sym || m[1];
+    if (m[2] === '.HK') s = String(parseInt(s, 10));
+    if (m[2] === '.TO') s = s.replace('-', '.');
+    if (['.ST', '.CO', '.HE'].includes(m[2])) s = s.replace(/[ .-]/g, '_');
+    return TV_EX[m[2]] + ':' + s;
+  }
+  return key;
+}
+const tvOpen = (key, sym) => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvOf(key, sym)), '_blank', 'noopener');
 async function loadATH() {
   $('#title').textContent = 'Monthly ATH';
   const el = $('#view-ath');
   state.athC = state.athC || {};
   const mk = AM();
-  const mkSeg = `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-mk="${k}" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
+  const mkSeg = `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK'], ['WORLD', 'World & other assets']].map(([k, n]) => `<button data-mk="${k}" aria-selected="${state.athWorld ? k === 'WORLD' : mk === k}">${n}</button>`).join('')}</div>`;
+  if (state.athWorld) { loadATHWorld(el, mkSeg); return; }
   if (!state.athC[mk]) {
     el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>';
     const tag = mk === 'NSE' ? '' : '_' + mk;
@@ -2218,14 +2275,12 @@ async function loadATH() {
       getJSON(MAIN + AP() + 'sectors.json', 'sectors' + tag), getJSON(MAIN + 'data/scan/world.json', 'world')]);
     const tr = state.data[mk] || await getJSON(MAIN + AP() + 'trend_scan.json', 'td_' + mk);
     if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds');
-    if (!state.assets) state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets');
-    if (!state.worldMC) state.worldMC = (await Promise.all(WORLD_MK.map((k) => getJSON(MAIN + `data/scan/world/${k}.json`, 'world_' + k).catch(() => null)))).filter(Boolean);
     await loadGP(mk);
     state.athC[mk] = { d, live, ipo, sec, world, tr, tab: 'brk', q: '', all: false };
   }
   state.ath = state.athC[mk];
   if (state.ath.tab === 'td' || state.ath.tab === 'pulse') state.ath.tab = 'brk';
-  const wireMk = () => el.querySelectorAll('.seg.mk button').forEach((b) => b.addEventListener('click', () => { setTimeout(livePoll, 600); state.athMkt = b.dataset.mk; try { localStorage.setItem('td_athmkt', b.dataset.mk); } catch (e) { /* */ } loadATH(); }));
+  const wireMk = () => wireAthMk(el);
   const { d } = state.ath;
   if (!d) { el.innerHTML = mkSeg + `<p class="empty">The ${MKT[mk].name} monthly-ATH scan appears after its first evening run. Try again later.</p>`; $('#asof').textContent = ''; wireMk(); return; }
   const lv = state.ath.live;
@@ -2239,7 +2294,7 @@ async function loadATH() {
   const open = T.filter((r) => r.status === 'open').length;
   const nearMain = (d.near || []).filter((r) => r.main).length;
   const tabs = [['brk', 'Breakouts', (d.breakouts || []).length], ['near', 'Near trigger', (d.near || []).length], ...(d.month_close ? [['mclose', 'Month close', d.month_close.length]] : []), ['tracked', 'Tracked signals', T.length],
-    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length], ['assets', 'Commodities & more', assetRows(true).length], ['world', 'World stocks', worldRows().length]];
+    ['ipo', 'IPO cups', ipoRows(true).length], ['themes', 'Indices', themeRows(true).length], ['fund', 'ETFs & funds', fundAthRows(true).length]];
   el.innerHTML = `${mkSeg}${mk === 'NSE' ? '' : `<div class="status exit watch"><b>Watch only.</b> ${WATCH[mk]}</div>`}
     <section class="summary">
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
@@ -2256,8 +2311,8 @@ async function loadATH() {
         themes: 'Shortlist = indices (broad, sector and thematic) in an uptrend (above a rising 30-week SMA) with 6-month RS vs Nifty 50 above zero, ordered: cup breakout (new monthly-close high after a base of 2+ years), new high (shorter base), cup forming (within 5% of a 2+-year-old high), within 5% of the high, then the rest; inside each group leading before uptrend, RS rising first, then by RS. Tap one for its weekly chart with the 30-week SMA, or monthly with the highest-month-close line. Below: the rest, sorted by 6-month RS vs Nifty 50, with the same trend tag as sectors (leading / uptrend / mixed / weak) and how far it is from its high. ATH month = its highest monthly close; a base of 2+ years that the index closes above is the index version of the ATH breakout.',
         pulse: `${(state.gp[mk] && state.gp[mk].rule) || ''} ${(state.gp[mk] && state.gp[mk].backtest) || ''} Tile size = number of liquid stocks; colour = Pulse; bottom strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-but-bouncing, red weak); ↑/↓ = 1-month Pulse vs a month ago. Tap a group for its stocks. Our own computation of industry breadth (the idea behind RideWinners' Market Pulse), not their data.`,
         fund: `ETFs${mk === 'NSE' ? ' and mutual funds (AMFI NAVs)' : mk === 'US' ? ' listed in the US' : ' listed on the ASX, incl. global ones'} with the same monthly ATH rules: trigger = high of the highest-monthly-close month, base 12+ months (2+ years = tested version), buy when the price trades above it while above a rising 30-week SMA; sell at the next open after a weekly close below the 30-week SMA. Signals of the last 18 months plus "near" (within 5% below the trigger). "Cup + trend only" (default) keeps live signals whose base had a real cup — the monthly close fell 15%+ below the old high before coming back — and leaves out bond/cash ETFs and exited trades; diversified funds often just drift back to an old high without a cup. ${(state.fund && state.fund.ath_note) || ''} Tap one for its chart.`,
-        world: 'Japan, Hong Kong, Canada, Europe (ex-UK, index members), South Korea, Taiwan, and Indian stocks outside the NSE scan (BSE-only and NSE SME): the same month-close check as the Month close tab. Tap one to open it on Yahoo Finance.',
-        assets: 'Commodities, currencies, crypto, US bond yields and world indices. Top: assets whose last completed month closed above their old all-time-high monthly close after a base of 1+ years (long cup = 3+ years with a 30%+ fall). Then those within 5% of such a high. Tap one to open it on Yahoo Finance.',
+        world: 'Japan, Hong Kong, Canada, Europe (ex-UK, index members), South Korea, Taiwan, and Indian stocks outside the NSE scan (BSE-only and NSE SME): the same month-close check as the Month close tab. Tap one to open its chart in TradingView.',
+        assets: 'Commodities, currencies, crypto, US bond yields and world indices. Top: assets whose last completed month closed above their old all-time-high monthly close after a base of 1+ years (long cup = 3+ years with a 30%+ fall). Then those within 5% of such a high. Tap one to open its chart in TradingView.',
         ipo: `IPOs listed in the last 3 years. Signal: a daily close above the highest price since listing, after a cup at least 15% deep and 20 days long; buy next open, sell after a weekly close below the 10-week SMA. Backtest ~12%/yr, worst fall −27% (Nifty 11%): a small add-on, weaker than the monthly ATH system.${state.ath.ipo ? ' Scan ' + longDay(state.ath.ipo.asof) + '.' : ' The first scan runs tonight (20:45 IST).'}` }[state.ath.tab]}</p>${state.ath.tab === 'td' ? '' : sectorStrip()}</details>
       ${state.ath.tab === 'td' ? topStrip() : ''}
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -3057,14 +3112,14 @@ function athList() {
     const W = all; const S = state.worldMC || [];
     $('#athlist').innerHTML = `<li class="muted pad">Stocks the main scans don't cover whose last completed month CLOSED above their old all-time-high monthly close after a base of 1+ years (bold = 2+ years; long cup = 3+ years with a 30%+ fall). Liquid stocks only (about US$1 m a day; India ₹2 cr). Not tested in these markets; information only. Scanned: ${S.map((m) => `${esc(m.name)} ${Number(m.liquid).toLocaleString()} of ${Number(m.listed).toLocaleString()}`).join(' · ') || 'first run pending'}.</li>`
       + (W.length ? W.map((r, i) => worldItem(r, i, W)).join('') : '<li class="empty">None last month, or the first scan has not run yet.</li>');
-    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => window.open(`https://finance.yahoo.com/quote/${encodeURIComponent(W[+el.dataset.i].ticker)}`, '_blank', 'noopener')));
+    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => tvOpen(W[+el.dataset.i].ticker, W[+el.dataset.i].symbol)));
     return;
   }
   if (tab === 'assets') {
     const A = all;
     $('#athlist').innerHTML = (state.assets ? `<li class="muted pad">Monthly closes to ${state.assets.month ? mLab(state.assets.month) : 'last month'} · Yahoo data · ${A.length} assets. Same month-close check as the stock list. Commodity prices are front-month futures (not roll-adjusted), so very old highs are approximate. "In rupees" = global price × US$/₹, close to MCX but without Indian import duty, which has changed over the years. Not tested as a trading system; information only.</li>` : '')
       + (A.length ? A.map((r, i) => assetItem(r, i, A)).join('') : '<li class="empty">The asset scan appears after its first run.</li>');
-    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => window.open(A[+el.dataset.i].key.startsWith('FRED:') ? `https://fred.stlouisfed.org/series/${A[+el.dataset.i].key.slice(5)}` : `https://finance.yahoo.com/quote/${encodeURIComponent(A[+el.dataset.i].key.split(':')[0])}`, '_blank', 'noopener')));
+    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => tvOpen(A[+el.dataset.i].key)));
     return;
   }
   if (tab === 'fund') {
