@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-13T16:30+00:00",
+"generated": "2026-11-15T02:32+00:00",
 "asof": "2026-11-13",
 "market": "NSE",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
@@ -11,18 +11,18 @@
 "status": "touched",
 "touch_date": "2026-11-13",
 "days_ago": 0,
-"level": 1639.48,
+"level": 1641.8,
 "level_kind": "old swing low",
 "level_date": "2026-09-02",
 "close": 1703.5,
-"above_pct": 3.905029431664375,
-"stop": 1568.37,
-"risk_pct": 7.93244717250986,
-"resistance": 1754.81,
-"room_r": 0.3797435258466061,
+"above_pct": 3.758067324697345,
+"stop": 1570.69,
+"risk_pct": 7.796131143470375,
+"resistance": 1757.3,
+"room_r": 0.40509920965795604,
 "sq9": 1681,
 "sq9_cross": "41\u00b2",
-"sq9_dist_pct": -2.4700829700513127,
+"sq9_dist_pct": -2.3319423659652005,
 "sq9_gap_pct": 9.994051160023787,
 "sq9_below": [
 [
@@ -105,72 +105,6 @@
 "sq9_match": false
 },
 {
-"symbol": "MATRIMONY",
-"name": "Matrimony.Com Limited",
-"status": "touched",
-"touch_date": "2026-11-13",
-"days_ago": 0,
-"level": 550.75,
-"level_kind": "breakout retest",
-"level_date": "2026-09-22",
-"close": 562.3499755859375,
-"above_pct": 2.106214359679992,
-"stop": 522.32,
-"risk_pct": 7.117450053410512,
-"resistance": 607.35,
-"room_r": 1.1243146884365194,
-"sq9": 529,
-"sq9_cross": "23\u00b2",
-"sq9_dist_pct": 4.111531190926265,
-"sq9_gap_pct": 18.14744801512287,
-"sq9_below": [
-[
-441,
-"21\u00b2"
-]
-],
-"sq9_above": [
-[
-625,
-"25\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "COFORGE",
-"name": "Coforge Limited",
-"status": "touched",
-"touch_date": "2026-11-12",
-"days_ago": 1,
-"level": 1936.59,
-"level_kind": "breakout retest",
-"level_date": "2024-12-30",
-"close": 2028.0,
-"above_pct": 4.720121276682909,
-"stop": 1863.05,
-"risk_pct": 8.133741579246568,
-"resistance": 2127.9,
-"room_r": 0.6056291117153904,
-"sq9": 2025,
-"sq9_cross": "45\u00b2",
-"sq9_dist_pct": -4.365897472993829,
-"sq9_gap_pct": 9.086419753086417,
-"sq9_below": [
-[
-1849,
-"43\u00b2"
-]
-],
-"sq9_above": [
-[
-2209,
-"47\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "ENTERO",
 "name": "Entero Healthcare Solutions Limited",
 "status": "touched",
@@ -242,18 +176,18 @@
 "status": "touched",
 "touch_date": "2026-11-11",
 "days_ago": 2,
-"level": 146.29,
+"level": 146.79,
 "level_kind": "breakout retest",
-"level_date": "2026-10-07",
+"level_date": "2026-07-02",
 "close": 153.49000549316406,
-"above_pct": 4.921739378952972,
-"stop": 135.82,
-"risk_pct": 11.513088114614733,
-"resistance": 157.15,
-"room_r": 0.20686711073991415,
+"above_pct": 4.564352144884376,
+"stop": 136.32,
+"risk_pct": 11.18733400548333,
+"resistance": 158.92,
+"room_r": 0.3162223324738844,
 "sq9": 169,
 "sq9_cross": "13\u00b2",
-"sq9_dist_pct": -13.437873795187683,
+"sq9_dist_pct": -13.142015807022,
 "sq9_gap_pct": 33.136094674556205,
 "sq9_below": [
 [
@@ -315,8 +249,8 @@
 "above_pct": 7.384150136474732,
 "stop": 812.9,
 "risk_pct": 11.971022948223254,
-"resistance": 946.18,
-"room_r": 0.20561536925909973,
+"resistance": 934.15,
+"room_r": 0.09679203448209768,
 "sq9": 841,
 "sq9_cross": "29\u00b2",
 "sq9_dist_pct": 2.2532713682557937,
@@ -468,6 +402,39 @@
 "sq9_match": false
 },
 {
+"symbol": "GABRIEL",
+"name": "Gabriel India Limited",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 1488.5,
+"level_kind": "breakout retest",
+"level_date": "2026-07-21",
+"close": 1552.699951171875,
+"above_pct": 4.313063565460196,
+"stop": 1416.46,
+"risk_pct": 8.77411354559905,
+"resistance": 1587.7,
+"room_r": 0.25690777904963297,
+"sq9": 1521,
+"sq9_cross": "39\u00b2",
+"sq9_dist_pct": -2.1367521367521403,
+"sq9_gap_pct": 10.519395134779753,
+"sq9_below": [
+[
+1369,
+"37\u00b2"
+]
+],
+"sq9_above": [
+[
+1681,
+"41\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "GRWRHITECH",
 "name": "Garware Hi-Tech Films Limited",
 "status": "near",
@@ -501,39 +468,6 @@
 "sq9_match": true
 },
 {
-"symbol": "TECHM",
-"name": "Tech Mahindra Limited",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 1687.71,
-"level_kind": "breakout retest",
-"level_date": "2024-12-13",
-"close": 1764.0,
-"above_pct": 4.520366577786383,
-"stop": 1642.72,
-"risk_pct": 6.875483318559949,
-"resistance": 1860.0,
-"room_r": 0.7915337174998996,
-"sq9": 1681,
-"sq9_cross": "41\u00b2",
-"sq9_dist_pct": 0.3991285297999747,
-"sq9_gap_pct": 9.994051160023787,
-"sq9_below": [
-[
-1521,
-"39\u00b2"
-]
-],
-"sq9_above": [
-[
-1849,
-"43\u00b2"
-]
-],
-"sq9_match": true
-},
-{
 "symbol": "ADANIGREEN",
 "name": "Adani Green Energy Limited",
 "status": "near",
@@ -562,39 +496,6 @@
 [
 1521,
 "39\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "GABRIEL",
-"name": "Gabriel India Limited",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 1483.83,
-"level_kind": "breakout retest",
-"level_date": "2026-10-19",
-"close": 1552.699951171875,
-"above_pct": 4.641539251936266,
-"stop": 1412.0,
-"risk_pct": 9.06178577546488,
-"resistance": 1582.0,
-"room_r": 0.2082335624685631,
-"sq9": 1521,
-"sq9_cross": "39\u00b2",
-"sq9_dist_pct": -2.4439503847181077,
-"sq9_gap_pct": 10.519395134779753,
-"sq9_below": [
-[
-1369,
-"37\u00b2"
-]
-],
-"sq9_above": [
-[
-1681,
-"41\u00b2"
 ]
 ],
 "sq9_match": false
@@ -638,18 +539,18 @@
 "status": "near",
 "touch_date": null,
 "days_ago": null,
-"level": 617.68,
+"level": 616.3,
 "level_kind": "breakout retest",
-"level_date": "2025-05-29",
+"level_date": "2026-03-24",
 "close": 646.7000122070312,
-"above_pct": 4.69744257616862,
-"stop": 587.75,
-"risk_pct": 9.116248430370788,
-"resistance": 660.23,
-"room_r": 0.2294497699865157,
+"above_pct": 4.9326667233805965,
+"stop": 586.25,
+"risk_pct": 9.346907256644322,
+"resistance": 662.65,
+"room_r": 0.2638701215617924,
 "sq9": 625,
 "sq9_cross": "25\u00b2",
-"sq9_dist_pct": -1.1704589843750002,
+"sq9_dist_pct": -1.3920019531249994,
 "sq9_gap_pct": 16.64000000000001,
 "sq9_below": [
 [
