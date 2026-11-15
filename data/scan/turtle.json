@@ -1,8 +1,8 @@
 {
-"generated": "2026-11-15 22:55 UTC",
+"generated": "2026-11-15 23:20 UTC",
 "fx": {
 "USDINR=X": 94.2300033569336,
-"AUDUSD=X": 0.6781499981880188
+"AUDUSD=X": 0.6776444911956787
 },
 "rows": [
 {
@@ -13,11 +13,11 @@
 "contract": "Micro gold MGC",
 "mult": 10,
 "tv": "COMEX:MGC1!",
-"close": 3886.300048828125,
-"date": "2026-11-13",
-"N": 91.01196505063527,
-"buy_stop": 4211.2001953125,
-"dist_pct": 8.36,
+"close": 3886.0,
+"date": "2026-11-15",
+"N": 87.7113667981035,
+"buy_stop": 4174.89990234375,
+"dist_pct": 7.43,
 "trades": [
 {
 "entry": "2025-08-07",
@@ -63,7 +63,7 @@
 }
 ],
 "status": "flat",
-"fixed_stop_if_filled": 4029.1762652112293
+"fixed_stop_if_filled": 3999.477168747543
 },
 {
 "key": "SI=F",
@@ -73,11 +73,11 @@
 "contract": "Micro silver SIL",
 "mult": 1000,
 "tv": "COMEX:SIL1!",
-"close": 49.12099838256836,
-"date": "2026-11-13",
-"N": 1.503154281937318,
+"close": 48.744998931884766,
+"date": "2026-11-15",
+"N": 1.428416546935911,
 "buy_stop": 57.70600128173828,
-"dist_pct": 17.48,
+"dist_pct": 18.38,
 "trades": [
 {
 "entry": "2025-08-22",
@@ -123,7 +123,7 @@
 }
 ],
 "status": "flat",
-"fixed_stop_if_filled": 54.69969271786365
+"fixed_stop_if_filled": 54.84916818786646
 },
 {
 "key": "HG=F",
@@ -133,11 +133,11 @@
 "contract": "Micro copper MHG",
 "mult": 2500,
 "tv": "COMEX:MHG1!",
-"close": 6.0904998779296875,
-"date": "2026-11-13",
-"N": 0.10637421573487331,
+"close": 6.081999778747559,
+"date": "2026-11-15",
+"N": 0.0992617436947727,
 "buy_stop": 6.641499996185303,
-"dist_pct": 9.05,
+"dist_pct": 9.2,
 "trades": [
 {
 "entry": "2026-04-10",
@@ -183,7 +183,7 @@
 }
 ],
 "status": "flat",
-"fixed_stop_if_filled": 6.428751564715556
+"fixed_stop_if_filled": 6.442976508795757
 },
 {
 "key": "CL=F",
@@ -193,11 +193,11 @@
 "contract": "Micro crude MCL",
 "mult": 100,
 "tv": "NYMEX:MCL1!",
-"close": 88.55999755859375,
-"date": "2026-11-13",
-"N": 4.454062649567119,
+"close": 88.33000183105469,
+"date": "2026-11-15",
+"N": 4.264359700194231,
 "buy_stop": 110.4800033569336,
-"dist_pct": 24.75,
+"dist_pct": 25.08,
 "trades": [
 {
 "entry": "2025-07-29",
@@ -243,7 +243,7 @@
 }
 ],
 "status": "flat",
-"fixed_stop_if_filled": 101.57187805779935
+"fixed_stop_if_filled": 101.95128395654513
 },
 {
 "key": "^GSPC",
@@ -509,11 +509,11 @@
 "contract": "Micro bitcoin MBT",
 "mult": 0.1,
 "tv": "CME:MBT1!",
-"close": 65115.4609375,
+"close": 64893.8984375,
 "date": "2026-11-15",
 "N": 2516.2328121040036,
 "buy_stop": 81889.9453125,
-"dist_pct": 25.76,
+"dist_pct": 26.19,
 "trades": [
 {
 "entry": "2026-01-02",
@@ -569,11 +569,11 @@
 "contract": "Micro ether MET",
 "mult": 0.1,
 "tv": "CME:MET1!",
-"close": 1824.8599853515625,
+"close": 1820.3699951171875,
 "date": "2026-11-15",
-"N": 100.4128702858593,
+"N": 100.48020427023431,
 "buy_stop": 2446.0478515625,
-"dist_pct": 34.04,
+"dist_pct": 34.37,
 "trades": [
 {
 "entry": "2026-03-04",
@@ -619,7 +619,7 @@
 }
 ],
 "status": "flat",
-"fixed_stop_if_filled": 2245.2221109907814
+"fixed_stop_if_filled": 2245.0874430220315
 }
 ],
 "rules": "Daily 20/10 long: buy-stop above the 20-day high; fixed stop entry - 2N; trailing stop 10-day low; exit at the first hit; no target. 1 unit, no adds."
