@@ -1,5 +1,5 @@
 symbol,setup,signal_date,signal_close,stop,rsi_signal,value_cr,supertrend,st_up,close,entry,risk_pct,days,status,gain_pct,R,name,board
-CVSG,52w-high base breakout,2026-11-13,1412.0,1354.0,72.3,5.35,1309.35,True,1412.0,,4.3,0,NEW - buy next open,,,CVS Group,FTSE 250
+CVSG,52w-high base breakout,2026-11-13,1412.0,1354.0,72.3,5.36,1309.35,True,1412.0,,4.3,0,NEW - buy next open,,,CVS Group,FTSE 250
 ALFA,EMA 9/21 cross,2026-11-13,169.0,155.44,55.6,2.47,156.73,True,169.0,,8.7,0,NEW - buy next open,,,Alfa Financial Software,FTSE 250
 SGE,EMA 9/21 cross,2026-10-09,1071.5,982.6,65.6,35.39,1104.16,True,1180.0,1071.5,9.0,25,open,10.1,1.22,Sage Group,FTSE 100
 DCC,EMA 9/21 cross,2026-09-17,6390.0,6325.0,62.6,22.99,6412.26,True,6455.0,6365.0,0.6,41,open,1.4,2.25,DCC Energy,FTSE 100
@@ -14,8 +14,8 @@ AVON,EMA 9/21 cross,2026-09-30,1844.0,1716.0,58.4,3.09,2191.4,True,2310.0,1884.0
 HSL,EMA 9/21 cross,2026-10-26,973.0,945.0,57.2,1.22,943.96,True,973.0,966.0,2.2,14,open,0.7,0.33,Henderson Smaller Companies Investment Trust,FTSE 250
 BP,EMA 9/21 cross,2026-09-01,541.22,512.62,55.8,288.17,599.44,False,574.9,545.42,6.4,53,exited 2026-11-05 (Supertrend red),2.7,0.45,BP,FTSE 100
 BP,52w-high base breakout,2026-10-13,609.91,558.51,72.3,288.17,599.44,False,574.9,609.91,9.2,23,exited 2026-11-05 (Supertrend red),-8.2,-0.97,BP,FTSE 100
-ULVR,EMA 9/21 cross,2026-08-24,4782.12,4507.64,59.1,177.21,4665.41,True,4987.5,4768.62,5.8,58,exited 2026-09-14 (Supertrend red),-3.7,-0.68,Unilever,FTSE 100
-NWG,EMA 9/21 cross,2026-09-16,702.2,673.2,56.1,108.75,656.54,False,600.0,704.6,4.7,42,stopped 2026-10-01,-4.5,-1.0,NatWest Group,FTSE 100
+ULVR,EMA 9/21 cross,2026-08-24,4782.12,4507.64,59.1,177.56,4665.41,True,4987.5,4768.62,5.8,58,exited 2026-09-14 (Supertrend red),-3.7,-0.68,Unilever,FTSE 100
+NWG,EMA 9/21 cross,2026-09-16,702.2,673.2,56.1,108.89,656.54,False,600.0,704.6,4.7,42,stopped 2026-10-01,-4.5,-1.0,NatWest Group,FTSE 100
 RKT,EMA 9/21 cross,2026-09-01,5360.0,5072.0,64.0,80.5,5285.6,True,5702.0,5320.0,4.9,53,stopped 2026-09-04,-4.8,-1.03,Reckitt,FTSE 100
 BT-A,EMA 9/21 cross,2026-09-14,204.7,197.0,57.2,44.86,234.53,False,215.8,203.7,3.4,44,stopped 2026-09-18,-3.3,-1.0,BT Group,FTSE 100
 BT-A,52w-high base breakout,2026-11-05,231.8,221.1,73.6,44.86,234.53,False,215.8,229.4,3.8,6,stopped 2026-11-06,-3.6,-1.0,BT Group,FTSE 100
@@ -37,7 +37,7 @@ ATT,EMA 9/21 cross,2026-09-17,721.0,678.0,58.2,7.47,679.76,False,636.0,721.0,6.3
 FCIT,EMA 9/21 cross,2026-09-22,345.79,338.39,57.5,6.66,345.55,False,337.0,348.59,3.0,38,stopped 2026-10-20,-2.9,-1.0,F & C Investment Trust,FTSE 100
 ATYM,52w-high base breakout,2026-08-27,1099.94,967.95,75.6,6.25,951.99,False,833.5,1099.94,13.6,55,stopped 2026-09-11,-12.0,-1.0,Atalaya Mining,FTSE 250
 LRE,52w-high base breakout,2026-10-13,680.0,626.0,71.4,5.57,714.66,False,652.0,687.0,9.7,23,exited 2026-11-13 (Supertrend red),-4.9,-0.56,Lancashire Holdings,FTSE 250
-CVSG,EMA 9/21 cross,2026-09-17,1317.91,1252.92,57.7,5.35,1309.35,True,1412.0,1317.91,5.2,41,stopped 2026-09-24,-4.9,-1.0,CVS Group,FTSE 250
+CVSG,EMA 9/21 cross,2026-09-17,1317.91,1252.92,57.7,5.36,1309.35,True,1412.0,1317.91,5.2,41,stopped 2026-09-24,-4.9,-1.0,CVS Group,FTSE 250
 ITH,EMA 9/21 cross,2026-10-09,285.4,269.8,55.9,5.3,284.03,False,257.6,283.0,4.9,25,stopped 2026-11-04,-4.7,-1.0,Ithaca Energy,FTSE 100
 HILS,EMA 9/21 cross,2026-09-21,3100.0,2795.0,66.0,5.16,3090.64,False,2880.0,3100.0,10.9,39,exited 2026-10-21 (Supertrend red),-4.5,-0.46,Hill & Smith,FTSE 250
 SVS,EMA 9/21 cross,2026-09-22,1032.0,996.0,55.1,4.0,1076.51,True,1126.0,1036.0,4.0,38,stopped 2026-10-01,-3.9,-1.0,Savills,FTSE 250
