@@ -3262,7 +3262,7 @@ function trendFromATH(r) {
 }
 /* distance of the current price from the high of the month-close candle (e.g. the October high) */
 const hiGap = (px, a) => { if (!a || !a.high_m || !px) return ''; const g = (px / a.high_m - 1) * 100;
-  return `<span class="${g >= 0 ? 'up' : 'muted'}" title="High of the ${mLab(a.month)} candle ${fmt(a.high_m, 2, 'en-US')}">${g >= 0 ? `${pct(g)} above` : `${fmt(-g, 1)}% below`} ${mLab(a.month).split(' ')[0]} high ${fmt(a.high_m, a.high_m >= 1000 ? 0 : 2, 'en-US')}</span>`; };
+  return `<span style="display:block" class="${g >= 0 ? 'up' : 'muted'}" title="High of the ${mLab(a.month)} candle ${fmt(a.high_m, 2, 'en-US')}">${g >= 0 ? `${pct(g)} over` : `${fmt(-g, 1)}% below`} ${mLab(a.month).split(' ')[0]} high</span>`; };
 const mLab = (s) => new Date(String(s).slice(0, 7) + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
 function mcloseSelect(r) {
   const tr = ((state.ath.d && state.ath.d.tracked) || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
