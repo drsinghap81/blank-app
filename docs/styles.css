@@ -1073,3 +1073,12 @@ body.pub .owner-only { display: none !important; }
   .row:has(> div:nth-child(2):empty) > .num { text-align: left; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
   .row:has(> div:nth-child(2):empty) > .num > * { display: inline !important; margin: 0; }
 }
+
+/* Today: 5 tiles, tappable (16 Nov 2026) */
+.t2-tiles.t2-tiles5{grid-template-columns:repeat(5,1fr);gap:6px}
+.t2-tiles5 .t2-tile b{font-size:28px}
+.t2-tile[role=button]{cursor:pointer}
+.t2-tile.fut b{color:var(--saffron)}
+.t2-flash{animation:t2flash 1.4s ease}
+@keyframes t2flash{0%,40%{background:rgba(232,163,61,.22)}100%{background:transparent}}
+#t2sell,#t2both,#t2mom,#t2adds,#t2tur{scroll-margin-top:110px}

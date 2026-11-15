@@ -2410,9 +2410,9 @@ function turSize(r, S, fx, N, px) {
   const risk = toInstr(S.acct * S.risk / 100); const sym = r.cur === 'USD' ? '$' : '₹';
   if (!(N > 0)) return '';
   if (r.mult) { const per = 2 * N * r.mult; const k = Math.floor(risk / per);
-    return `${k > 0 ? `<b>${k} × ${esc(r.contract)}</b>` : `<b>0</b> ${esc(r.contract)} (one contract risks ${sym}${fmt(per, 0, 'en-US')}; needs an account of about ${S.cur} ${fmt(S.acct * per / risk, 0, 'en-US')} at ${S.risk}%)`} · notional ≈ ${sym}${fmt(k * px * r.mult, 0, 'en-US')}`; }
+    return `${k > 0 ? `<b>${k} × ${esc(r.contract)}</b>` : `<b>0</b> ${esc(r.contract)} (one contract risks ${sym}${fmt(per, 0, 'en-US')}; needs an account of about ${S.cur === 'INR' ? lakh(S.acct * per / risk) : S.cur + ' ' + fmt(S.acct * per / risk, 0, 'en-US')} at ${S.risk}%)`} · notional ≈ ${sym}${fmt(k * px * r.mult, 0, 'en-US')}`; }
   const lot = r.key === '^NSEI' ? S.lotN : S.lotB; const units = risk / (2 * N);
-  return lot ? `<b>${Math.floor(units / lot)} lot${Math.floor(units / lot) === 1 ? '' : 's'}</b> of ${esc(r.contract)} (${fmt(units, 0, 'en-IN')} units ÷ lot ${lot}${Math.floor(units / lot) < 1 ? `; one lot needs an account of about ${S.cur} ${fmt(S.acct * lot / units, 0, 'en-US')} at ${S.risk}%` : ''})` : `${fmt(units, 0, 'en-IN')} index units ÷ your lot size (enter it above)`;
+  return lot ? `<b>${Math.floor(units / lot)} lot${Math.floor(units / lot) === 1 ? '' : 's'}</b> of ${esc(r.contract)} (${fmt(units, 0, 'en-IN')} units ÷ lot ${lot}${Math.floor(units / lot) < 1 ? `; one lot needs an account of about ${S.cur === 'INR' ? lakh(S.acct * lot / units) : S.cur + ' ' + fmt(S.acct * lot / units, 0, 'en-US')} at ${S.risk}%` : ''})` : `${fmt(units, 0, 'en-IN')} index units ÷ your lot size (enter it above)`;
 }
 // MCX contracts for the same signals (price converted from the global contract with USD/INR; excludes India import duty, so
 // levels are approximate: place orders on the MCX chart's own levels). [name, global key, conversion from USD price, multiplier]
@@ -2424,6 +2424,29 @@ function turMcx(r, S, fx, N) {
   const riskINR = (S.cur === 'INR' ? 1 : S.cur === 'USD' ? usdinr : audusd * usdinr) * S.acct * S.risk / 100;
   return 'MCX: ' + L.map(([nm, conv, mult]) => { const per = 2 * N * usdinr * conv * mult; const k = Math.floor(riskINR / per);
     return `${k > 0 ? `<b>${k}</b>` : '0'} × ${nm}${k > 0 ? '' : ` (needs ≈ ₹${fmt(per / (S.risk / 100) / 1e5, 1)} L)`}`; }).join(' · ');
+}
+async function turtleSelect(r) {
+  const p2 = (v) => (v == null ? '–' : fmt(v, v >= 1000 ? 0 : 2, 'en-US')); const S = turSet(); const fx = (state.turtle && state.turtle.fx) || {};
+  const N = r.status === 'in trade' ? r.entry_N : r.N; const mc = turMcx(r, S, fx, N);
+  const f = r.status === 'in trade' ? [['Bought', `${day(r.entry_date)} at ${p2(r.entry)}`], ['Sell-stop next session', `${p2(r.stop)} (fixed ${p2(r.fixed_stop)}, 10-day low ${p2(r.trail_stop)})`], ['Open', `${pct(r.open_pct)} · ${r.open_R >= 0 ? '+' : ''}${fmt(r.open_R, 1)}R`]]
+    : [['Buy-stop (20-day high)', `${p2(r.buy_stop)} · ${fmt(r.dist_pct, 1)}% above`], ['Stop if filled (entry − 2N)', p2(r.fixed_stop_if_filled)], ['Then trail', '10-day low; exit at the first hit']];
+  f.push(['Size for your account', turSize(r, S, fx, N, r.status === 'in trade' ? r.entry : r.buy_stop)]); if (mc) f.push(['MCX', mc.replace(/^MCX: /, '')]);
+  f.push(['Last trades', (r.trades || []).slice().reverse().map((z) => `${day(z.entry)}→${day(z.exit)} ${z.R >= 0 ? '+' : ''}${fmt(z.R, 1)}R`).join(' · ') || '–']);
+  openPanel(`<div class="d-head no-push"><div><h2>${esc(r.name)}</h2><div class="co">Turtle 20/10 · ${esc(r.contract)}</div></div><div class="d-price"><b>${p2(r.close)}</b></div></div>
+    <div class="chart" id="tuc" style="height:300px"></div>
+    <p class="muted" style="margin:4px 16px;font-size:12px">Daily · gold = 20-day high (buy-stop) · red = stop · blue = entry</p>
+    <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+    <div class="links"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.tv)}&interval=D" target="_blank" rel="noopener">Open in TradingView</a></div>`);
+  let j = null; try { const res = await fetch(MAIN + 'data/scan/asset_charts/' + encodeURIComponent(String(r.key).replace(/[:/=^]/g, '_')) + '.json'); if (res.ok) j = await res.json(); } catch (e) { /* */ }
+  const box = $('#tuc'); if (!box) return;
+  if (!j || !j.d) { box.innerHTML = '<p class="muted pad">Chart file not available: use TradingView below.</p>'; return; }
+  const b = j.d; const T = b.t; const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
+  const s = priceSeries(ch, T.map((t, i) => ({ time: t, open: b.o[i], high: b.h[i], low: b.l[i], close: b.c[i] })), 'ath');
+  if (r.status !== 'in trade') s.createPriceLine({ price: r.buy_stop, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'buy-stop' });
+  else { s.createPriceLine({ price: r.entry, color: C.e21, lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'entry' }); }
+  const stp = r.status === 'in trade' ? r.stop : r.fixed_stop_if_filled; if (stp) s.createPriceLine({ price: stp, color: C.fall || '#C0392B', lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'stop' });
+  const n = T.length; ch.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 130), to: n + 2 });
+  new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
 }
 async function loadTurtle(el) {
   $('#title').textContent = 'Trading · Turtle (futures)';
@@ -2452,7 +2475,7 @@ async function loadTurtle(el) {
     const mcx = turMcx(r, S, D.fx || {}, r.status === 'in trade' ? r.entry_N : r.N);
     if (mcx) line += `<br>${mcx}`;
     const hist = (r.trades || []).slice().reverse().map((z) => `${day(z.entry)} → ${day(z.exit)}: ${z.R >= 0 ? '+' : ''}${fmt(z.R, 1)}R`).join(' · ');
-    return `<li class="row" style="cursor:default"><div><div class="sym">${esc(r.name)}</div><div class="co">${esc(r.group)} · ${esc(r.contract)} · close ${px(r.close)} (${day(r.date)})</div>
+    return `<li class="row" data-tk="${esc(r.key)}"><div><div class="sym">${esc(r.name)}</div><div class="co">${esc(r.group)} · ${esc(r.contract)} · close ${px(r.close)} (${day(r.date)})</div>
       <div class="tags">${st}</div><div class="muted" style="font-size:13px;margin-top:4px">${line}</div>
       ${hist ? `<details style="margin-top:4px"><summary class="muted" style="font-size:12px">Last trades</summary><div class="muted" style="font-size:12px">${hist}</div></details>` : ''}</div><div></div>
       <div class="num"><a class="tv-btn" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.tv)}&interval=D" target="_blank" rel="noopener">Chart ↗</a></div></li>`;
@@ -2471,6 +2494,7 @@ async function loadTurtle(el) {
       <p class="muted" style="font-size:12px;margin:6px 0 0">One unit risks ${S.risk}% of the account at the 2N stop. US markets are sized in CME micro contracts; check your broker's contract specs and margin.</p></div>
     <div class="card"><ul class="list flat">${R.map(row).join('')}</ul></div>`;
   tradeStripWire(el);
+  el.querySelectorAll('.row[data-tk]').forEach((li) => li.addEventListener('click', (e) => { if (e.target.closest('a,summary,details')) return; turtleSelect(D.rows.find((r) => r.key === li.dataset.tk)); }));
   const save = () => { turSave({ cur: $('#tcur').value, acct: +$('#tacct').value, risk: +$('#trisk').value, lotN: +$('#tlotn').value, lotB: +$('#tlotb').value }); loadTurtle(el); };
   ['#tcur', '#tacct', '#trisk', '#tlotn', '#tlotb'].forEach((id) => $(id).addEventListener('change', save));
 }
@@ -4991,6 +5015,8 @@ async function tdRender2(el) {
     mk === 'NSE' ? getJSON(MP + 'vcp.json', 'vcp') : null, getJSON(MP + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'US' ? getJSON(MP + 'rsi2.json', 'rsi2') : null,
     getJSON(MP + 'patterns.json', 'pat_' + mk)]);
   if (fund) state.fund = fund; if (assets) state.assets = assets;
+  if (!state.turtle) state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null);
+  const TU = (state.turtle && state.turtle.rows) || []; const tuNew = TU.filter((r) => r.status === 'in trade' && r.new), tuEx = TU.filter((r) => r.status === 'exited today'), tuIn = TU.filter((r) => r.status === 'in trade');
   const seg = `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
   if (!P) { el.innerHTML = `<div class="td-wrap">${seg}<p class="empty">Today's plan appears after the evening scan.</p></div>`; el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); })); return; }
   const S = await sysMap(mk);
@@ -5066,8 +5092,17 @@ async function tdRender2(el) {
     { n: ipo ? ((ipo.breakouts || []).filter((r) => r.status === 'open').length + (ipo.near || []).length) : null, name: 'IPO cups', sub: 'First base after listing', go: () => goAth(mk, 'ipo') },
     { n: pat ? (pat.rows || []).filter((r) => r.kind === 'stock').length : null, name: 'Chart patterns', sub: 'Double bottoms, inverse H&S… (tested: watch only)', go: () => show('bot') },
     ...(mk === 'NSE' ? [{ n: null, name: 'Top Bottom · Bank Nifty futures', sub: 'On pledged holdings · dry run until you switch', go: () => show('tb') }] : [])];
-  const tiles = `<div class="t2-tiles"><div class="t2-tile sell"><b>${knowHeld ? sells.length : '–'}</b><span>to sell</span></div><div class="t2-tile both"><b>${bothRows.length}</b><span>in both</span></div>
-    <div class="t2-tile buy"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div></div>`;
+  const tuShow = [...tuNew, ...tuEx, ...tuIn.filter((r) => !r.new), ...TU.filter((r) => r.status === 'flat').sort((a, b) => a.dist_pct - b.dist_pct).slice(0, 3)];
+  state._tuShow = tuShow;
+  const tuCards = () => (tuShow.length ? tuShow.map((r, i) => { const S = turSet(); const N = r.status === 'in trade' ? r.entry_N : r.N; const mc = turMcx(r, S, (state.turtle && state.turtle.fx) || {}, N);
+    const sz = mc || turSize(r, S, (state.turtle && state.turtle.fx) || {}, N, r.status === 'in trade' ? r.entry : r.buy_stop);
+    const p2 = (v) => fmt(v, v >= 1000 ? 0 : 2, 'en-US');
+    const head = r.status === 'in trade' ? (r.new ? '<span class="t2-tag both">BUY today</span>' : `<span class="t2-tag al">Holding ${r.open_R >= 0 ? '+' : ''}${fmt(r.open_R, 1)}R</span>`) : r.status === 'exited today' ? '<span class="t2-tag" style="background:var(--fall-soft);color:var(--fall)">EXIT today</span>' : `<span class="t2-tag">${fmt(r.dist_pct, 1)}% away</span>`;
+    const line = r.status === 'in trade' ? `Sell-stop <b>${p2(r.stop)}</b> · since ${day(r.entry_date)} at ${p2(r.entry)}` : r.status === 'exited today' ? `Stopped at ~${p2(r.trades[r.trades.length - 1].x)}` : `Buy-stop <b>${p2(r.buy_stop)}</b> · stop if filled ${p2(r.fixed_stop_if_filled)}`;
+    return `<div class="t2-wcard" role="button" tabindex="0" data-tu="${i}"><span class="t2-ch"><span><b>${esc(r.name)}</b><small>${esc(r.contract)}</small></span>${head}</span><span class="t2-line">${line}</span><span class="t2-line" style="font-size:12.5px">${sz.replace(/^MCX: /, 'MCX ')}</span></div>`; }).join('') : '<p class="t2-empty">No Turtle data yet.</p>');
+  const tiles = `<div class="t2-tiles t2-tiles5"><div class="t2-tile sell" data-go="t2sell" role="button" tabindex="0"><b>${knowHeld ? sells.length : '–'}</b><span>to sell</span></div><div class="t2-tile both" data-go="${bothRows.length ? 't2both' : 't2mom'}" role="button" tabindex="0"><b>${bothRows.length}</b><span>in both</span></div>
+    <div class="t2-tile buy" data-go="t2mom" role="button" tabindex="0"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add" data-go="${knowHeld && adds.length ? 't2adds' : 't2mom'}" role="button" tabindex="0"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div>
+    <div class="t2-tile fut" data-go="t2tur" role="button" tabindex="0"><b>${tuNew.length + tuEx.length || tuIn.length}</b><span>${tuNew.length + tuEx.length ? 'futures signals' : 'futures held'}</span></div></div>`;
   el.innerHTML = `<div class="td-wrap t2">
     <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
       <div class="t2-date"><div><b>${esc(clk.dayNum)}</b><span>${esc(clk.month)}</span></div>
@@ -5075,26 +5110,28 @@ async function tdRender2(el) {
       ${tiles}
       <small class="t2-sub">Plan from the ${day(P.asof)} close${knowHeld ? '' : ' · holdings not linked'}</small></div>
     ${ribbon()}
-    <div class="t2-h"><h2>Sell at the open</h2><small>do these first</small></div>
+    <div class="t2-h" id="t2sell"><h2>Sell at the open</h2><small>do these first</small></div>
     <div class="t2-box">${!knowHeld ? '<p class="t2-empty">Holdings not linked: add them in Portfolio or connect Live.</p>'
       : sells.length ? sells.map((e) => `<div class="t2-sell"><span><b>${esc(e.symbol)}</b><small>${esc(e.system === 'Monthly ATH' ? 'Momentum' : e.system)} · ${esc(e.why)}</small></span><span class="t2-red">Sell</span></div>`).join('')
       : '<p class="t2-empty">No sells today. Nothing you hold has an exit signal.</p>'}</div>
-    ${bothRows.length ? `<div class="t2-strip"><b>In both: a live system and a close list</b><span>${bothRows.map((r) => `${esc(r.name || r.symbol)} (${bkOf(r) === 'mom' ? 'Momentum' : '9/21'} + ${closeK(r.symbol).map((k) => ({ mo: 'month close', wk: 'week cup close', dy: 'day cup close' })[k]).join(' + ')})`).join(' · ')}. Trade them with the live system's own entry, stop and exit.</span></div>` : ''}
+    ${bothRows.length ? `<div class="t2-strip" id="t2both"><b>In both: a live system and a close list</b><span>${bothRows.map((r) => `${esc(r.name || r.symbol)} (${bkOf(r) === 'mom' ? 'Momentum' : '9/21'} + ${closeK(r.symbol).map((k) => ({ mo: 'month close', wk: 'week cup close', dy: 'day cup close' })[k]).join(' + ')})`).join(' · ')}. Trade them with the live system's own entry, stop and exit.</span></div>` : ''}
     <section class="t2-sec inv"><div class="t2-band"><span><b>Investment</b><small>ETFs, mutual funds, indices · hold for years</small></span><em>Monthly charts</em></div>
       ${invFirst.length ? `<div class="t2-lbl"><b>Watch first · month close above ATH</b><small>see only</small></div><div class="t2-hs">${invFirst.map(invCard).join('')}</div>` : ''}
       <details class="t2-more t2-wd"><summary>Watch lists (${invRows.length}) · monthly charts</summary>${t2Watch(invRows)}</details>${mk === 'US' ? '<details class="t2-more t2-wd"><summary>Trading 212 pies</summary><div id="tdpies"></div></details>' : ''}</section>
     <section class="t2-sec mom"><div class="t2-band"><span><b>Momentum investing</b><small>Stocks, single commodities and coins at all-time highs</small></span><em>Monthly charts</em></div>
-      <div class="t2-lbl"><b>Act on · Monthly ATH system</b><small>21.5%/yr tested</small></div>
+      <div class="t2-lbl" id="t2mom"><b>Act on · Monthly ATH system</b><small>21.5%/yr tested</small></div>
       <div class="t2-list">${topM.map((r) => card(r, idxOf(r))).join('') || '<p class="t2-empty">No new Momentum buy today. Waiting is part of the system.</p>'}</div>
       ${restM.length ? `<details class="t2-more"><summary>${restM.length} more Momentum setups (weaker rank)</summary><div class="t2-list">${restM.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
-      ${knowHeld && adds.length ? `<div class="t2-lbl"><b>Add to winners you hold</b></div><div class="t2-adds">${adds.map((r) => `<span>${esc(r.symbol)} <b>&gt; ${Mz(r.add_level, 2)}</b></span>`).join('')}</div>` : ''}
+      ${knowHeld && adds.length ? `<div class="t2-lbl" id="t2adds"><b>Add to winners you hold</b></div><div class="t2-adds">${adds.map((r) => `<span>${esc(r.symbol)} <b>&gt; ${Mz(r.add_level, 2)}</b></span>`).join('')}</div>` : ''}
       <details class="t2-more t2-wd"><summary>Watch lists (${momRows.length}) · monthly charts</summary>${t2Watch(momRows)}</details></section>
     <section class="t2-sec trd"><div class="t2-band"><span><b>Trading</b><small>Swing trades held days to weeks</small></span><em>Weekly + daily charts</em></div>
       <div class="t2-lbl"><b>Act on · Trend 9/21 system</b><small>24.2%/yr tested</small></div>
       <div class="t2-list">${topT.map((r) => card(r, idxOf(r))).join('') || '<p class="t2-empty">No new 9/21 buy today.</p>'}</div>
       ${restT.length ? `<details class="t2-more"><summary>${restT.length} more 9/21 setups</summary><div class="t2-list">${restT.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
       ${wdCards.length ? `<div class="t2-lbl"><b>Watch · week and day cup closes</b><small>see only</small></div><div class="t2-hs">${wdCards.map(wdCard).join('')}</div>` : ''}
-      <details class="t2-more t2-wd"><summary>Watch lists (${trdRows.length}) · weekly and daily charts</summary>${t2Watch(trdRows)}</details>${mk === 'US' ? '<div id="tdrsi2"></div>' : ''}</section>
+      <details class="t2-more t2-wd"><summary>Watch lists (${trdRows.length}) · weekly and daily charts</summary>${t2Watch(trdRows)}</details>${mk === 'US' ? '<div id="tdrsi2"></div>' : ''}
+      <div class="t2-lbl" id="t2tur"><b>Turtle futures · 20/10 daily long</b><small>paper · 24%/yr tested</small></div>
+      <div class="t2-hs">${tuCards()}</div></section>
     <div id="tdmx"></div>
     ${(P.missed || []).length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${P.missed.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${P.missed.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
@@ -5104,6 +5141,8 @@ async function tdRender2(el) {
   $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)} · refreshed ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
   el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); }));
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
+  el.querySelectorAll('.t2-tile[data-go]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.go); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('t2-flash'); setTimeout(() => t.classList.remove('t2-flash'), 1400); } }));
+  el.querySelectorAll('.t2-wcard[data-tu]').forEach((b) => b.addEventListener('click', () => turtleSelect(state._tuShow[+b.dataset.tu])));
   const W = [...el.querySelectorAll('.t2-sec')]; [invRows, momRows, trdRows].forEach((L, k) => W[k].querySelectorAll('.t2-wr').forEach((b) => b.addEventListener('click', () => L[+b.dataset.w].go())));
   $('#t2live').addEventListener('click', () => show('live'));
   // 15 Nov 2026: close-list cards open their chart (stocks: the ATH panel with weekly/daily chart; ETFs/funds: fund panel; indices: TradingView)
