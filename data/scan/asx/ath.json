@@ -1,8 +1,8 @@
 {
 "market": "ASX",
 "asof": "2026-11-13",
-"scan_date": "2026-11-13",
-"generated": "2026-11-13 08:27 UTC",
+"scan_date": "2026-11-15",
+"generated": "2026-11-15 00:31 UTC",
 "scanned": 47,
 "rules": {
 "base_main": 24,
@@ -541,6 +541,35 @@
 "theme_rs": null,
 "td_score": 1,
 "aligned": false
+}
+],
+"month_close": [
+{
+"symbol": "BSL",
+"month": "2026-10",
+"close_m": 33.29,
+"old_ath": 32.5766,
+"ath_month": "2008-07",
+"above_pct": 2.1899,
+"base_months": 219,
+"depth": -0.9633,
+"high_m": 34.3,
+"wick_trigger": 32.8289,
+"long_cup": true,
+"main": true,
+"sma30": 30.4829,
+"sma_rising": true,
+"close": 32.66,
+"since_pct": -1.8925,
+"value_cr": 46.8328,
+"rs_bench": "^AXMJ",
+"stock_rs": 33.9405,
+"stock_rs_up": false,
+"stock_rs_days": 250,
+"name": "BLUESCOPE STEEL LIMITED",
+"size": "Large",
+"industry": "Materials",
+"sector_tag": "weak"
 }
 ]
 }
