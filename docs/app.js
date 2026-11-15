@@ -2220,10 +2220,16 @@ async function loadATHWorld(el, mkSeg) {
     const [a, ...w] = await Promise.all([getJSON(MAIN + 'data/scan/assets.json', 'assets'), ...WORLD_MK.map((k) => getJSON(MAIN + `data/scan/world/${k}.json`, 'world_' + k).catch(() => null))]);
     state.assets = a; state.worldMC = w.filter(Boolean); state.athWAt = new Date();
   }
-  state.athW = state.athW || { tab: 'world', q: '', all: true, d: {} }; state.ath = state.athW;
+  if (!state.mcAll) {
+    const [n, u, a, k, f] = await Promise.all([...['NSE', 'US', 'ASX', 'UK'].map((m) => (state.athC && state.athC[m] && state.athC[m].d) || getJSON(MAIN + MKT[m].path + 'ath.json', m === 'NSE' ? 'ath' : 'ath_' + m)),
+      state.fund || getJSON(MAIN + 'data/scan/funds.json', 'funds')]);
+    if (!state.fund) state.fund = f;
+    state.mcAll = { NSE: n, US: u, ASX: a, UK: k };
+  }
+  state.athW = state.athW || { tab: 'all', q: '', all: true, d: {} }; state.ath = state.athW;
   const g = (state.worldMC || [])[0]; state.athWAt = state.athWAt || new Date();
   $('#asof').textContent = `Month closes to ${g ? mLab(g.month) : 'last month'}${updTxt(g && g.generated)} · refreshed ${state.athWAt.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })}`;
-  const tabs = [['world', 'World stocks', worldRows().length], ['assets', 'Commodities & more', assetRows(true).length]];
+  const tabs = [['all', 'All month closes', allMcRows().length], ['world', 'World stocks', worldRows().length], ['assets', 'Commodities & more', assetRows(true).length]];
   el.innerHTML = `${mkSeg}<div class="card">
       <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
       <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -2247,7 +2253,7 @@ const TV_FUT = { 'GC=F': 'COMEX:GC1!', 'SI=F': 'COMEX:SI1!', 'PL=F': 'NYMEX:PL1!
   '^KS11': 'TVC:KOSPI', '^TWII': 'TVC:TAIEX', '^BVSP': 'BMFBOVESPA:IBOV' };
 const TV_EX = { '.T': 'TSE', '.HK': 'HKEX', '.TO': 'TSX', '.KS': 'KRX', '.KQ': 'KRX', '.TW': 'TWSE', '.TWO': 'TPEX', '.BO': 'BSE', '.NS': 'NSE', '.DE': 'XETR',
   '.PA': 'EURONEXT', '.AS': 'EURONEXT', '.BR': 'EURONEXT', '.LS': 'EURONEXT', '.IR': 'EURONEXT', '.MC': 'BME', '.MI': 'MIL', '.SW': 'SIX', '.ST': 'OMXSTO',
-  '.OL': 'OSL', '.CO': 'OMXCOP', '.HE': 'OMXHEX', '.VI': 'VIE' };
+  '.OL': 'OSL', '.CO': 'OMXCOP', '.HE': 'OMXHEX', '.VI': 'VIE', '.L': 'LSE', '.AX': 'ASX' };
 function tvOf(key, sym) {
   if (TV_FUT[key]) return TV_FUT[key];
   let m = key.match(/^([A-Z]{6})=X$/); if (m) return 'FX_IDC:' + m[1];
@@ -3031,6 +3037,30 @@ function assetItem(r, i, L) {
 }
 /* 15 Nov 2026: month-close check for stocks outside the main scans (tools/world_mclose.py) */
 const WORLD_MK = ['BSE', 'SME', 'JP', 'HK', 'CA', 'EU', 'KR', 'TW'];
+/* every month-close list in one place: India/US/Australia/UK stocks, ETFs & funds, world stocks, other assets */
+function allMcRows() {
+  const out = []; const q = ((state.ath && state.ath.q) || '').toLowerCase();
+  const S = state.mcAll || {};
+  [['NSE', 'India stocks', 'NSE:'], ['US', 'US stocks', ''], ['ASX', 'Australia stocks', 'ASX:'], ['UK', 'UK stocks', 'LSE:']].forEach(([m, g, tv]) => {
+    ((S[m] && S[m].month_close) || []).forEach((r) => out.push({ g, sym: r.symbol, name: r.name, a: r, cur: MKT[m].cur, close: r.close, tv: tv + r.symbol }));
+  });
+  const FM = { IN: ['India ETFs & funds', 'NSE:', '₹'], US: ['US ETFs', '', '$'], AU: ['Australia ETFs', 'ASX:', 'A$'], UK: ['UK & Europe ETFs', '', ''] };
+  ((state.fund && state.fund.rows) || []).filter((r) => r.mclose).forEach((r) => {
+    const [g, tv, cur] = FM[r.market || 'IN'] || ['ETFs', '', '']; const s = r.symbol || r.key;
+    out.push({ g, sym: r.kind === 'fund' ? '' : s, name: r.name, a: r.mclose, cur, close: r.close, tv: r.kind === 'fund' ? null : (r.market === 'UK' ? tvOf(s) : tv + s) });
+  });
+  (state.worldMC || []).forEach((m) => (m.rows || []).forEach((r) => out.push({ g: m.name, sym: r.symbol, name: r.name, a: r, cur: r.cur, close: r.close, tv: tvOf(r.ticker, r.symbol) })));
+  ((state.assets && state.assets.rows) || []).filter((r) => r.mclose).forEach((r) => out.push({ g: 'Commodities & other assets', sym: '', name: r.name, a: r.mclose, cur: '', close: r.close, tv: tvOf(r.key) }));
+  return out.filter((r) => !q || (r.sym || '').toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q) || r.g.toLowerCase().includes(q));
+}
+function allMcItem(r, i, L) {
+  const a = r.a; const sep = i === 0 || L[i - 1].g !== r.g ? `<li class="ixsep">${esc(r.g)}</li>` : '';
+  const chip = `<span class="chip">Closed ${pct(a.above_pct)} over ATH ${fmt(a.old_ath, 2, 'en-US')} (${mLab(a.ath_month)})</span>${a.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${a.base_months >= 24 ? 'new' : ''}">${baseTxt(a.base_months)}</span>`
+    + (a.depth != null ? `<span class="chip">fell ${fmt(Math.abs(a.depth * 100), 0)}% in base</span>` : '') + (a.sma_rising == null ? '' : `<span class="chip ${a.sma_rising ? 'open' : 'exit'}">${a.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>`);
+  const sm = r.close && a.close_m ? r.close / a.close_m - 1 : null;
+  return `${sep}<li class="row ${a.base_months >= 24 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.sym || r.name)}</div>${r.sym ? `<div class="co">${esc(r.name || '')}</div>` : ''}<div class="tags">${chip}</div></div><div></div>
+    <div class="num"><b>${esc(r.cur)}${fmt(r.close, r.close >= 1000 ? 0 : 2, 'en-US')}</b>${sm == null ? '' : `<span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(a.month).split(' ')[0]}</span>`}</div></li>`;
+}
 function worldRows() {
   const W = state.worldMC || []; const q = ((state.ath && state.ath.q) || '').toLowerCase();
   return W.flatMap((m) => (m.rows || []).map((r) => ({ ...r, _mk: m.name })))
@@ -3067,6 +3097,7 @@ function athRows() {
   if (tab === 'fund') return fundAthRows();
   if (tab === 'assets') return assetRows();
   if (tab === 'world') return worldRows();
+  if (tab === 'all') return allMcRows();
   if (tab === 'pulse') return ((state.gp[AM()] || {}).rows || []);
   if (tab === 'ipo') return ipoRows();
   if (tab === 'themes') return themeRows();
@@ -3112,6 +3143,13 @@ const baseTxt = (m) => (m >= 24 ? `${(m / 12).toFixed(m % 12 ? 1 : 0)}-yr base` 
 function athList() {
   const tab = state.ath.tab; const all = athRows(); const L = state.ath.all ? all : all.slice(0, 60);
   if (tab === 'pulse') { pulseView(); return; }
+  if (tab === 'all') {
+    const W = all; const mo = ((state.mcAll && state.mcAll.NSE && state.mcAll.NSE.month_close || [])[0] || {}).month || ((state.worldMC || [])[0] || {}).month;
+    $('#athlist').innerHTML = `<li class="muted pad">Every month-close list in one place${mo ? ` (${mLab(mo)})` : ''}: the last completed month CLOSED above the all-time high (highest price of earlier months, wicks included, as on TradingView) after a base of 1+ years. Long cups first in each list where marked. A month-end check, not an entry: in the India test, buying the next month's open after such a close made 5.4%/yr vs 21.5% for the live Breakouts rule. Tap a row for its TradingView chart.</li>`
+      + (W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : '<li class="empty">Nothing closed last month above an all-time high at least a year old.</li>');
+    $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv), '_blank', 'noopener'); }));
+    return;
+  }
   if (tab === 'world') {
     const W = all; const S = state.worldMC || [];
     $('#athlist').innerHTML = `<li class="muted pad">Stocks the main scans don't cover whose last completed month CLOSED above their all-time high (highest price of earlier months, wicks included) after a base of 1+ years (bold = 2+ years; long cup = 3+ years with a 30%+ fall). Liquid stocks only (about US$1 m a day; India ₹2 cr). Not tested in these markets; information only. Scanned: ${S.map((m) => `${esc(m.name)} ${Number(m.liquid).toLocaleString()} of ${Number(m.listed).toLocaleString()}`).join(' · ') || 'first run pending'}.</li>`
