@@ -228,22 +228,26 @@ def analyse(sym, x, today, lookback_days=550):
     # weekly SMA30 exit, 10 stocks): base >= 24 m 26.7%/yr -40% (equal wt) / 21.4% -39% (2% risk); long cups 24.4% -27% /
     # 25.3% -29%; the live intramonth cross: 26.1% -32% / 29.1% -26%.
     mcl = None
+    # 15 Nov 2026 (Amritpal): the ATH level is the all-time HIGH price (wicks included), as on TradingView. The list = the last
+    # completed month CLOSED above the highest price of all earlier months, after a base >= BASE_MIN months since that high.
     lm_ = M.index[np.asarray(done)][-1] if np.asarray(done).any() else None
-    if lm_ is not None and lm_ == pd.Timestamp(today).to_period("M") - 1 and bool(isb.loc[lm_]) and np.isfinite(age_m.loc[lm_]) and age_m.loc[lm_] >= BASE_MIN and hist_ok.loc[lm_] == True:  # noqa: E712
-        old_c = float(best.shift(1).loc[lm_]); dm = d[d.mon == lm_]; v_me = float(dm.val.iloc[-1]) if len(dm) else np.nan
-        if np.isfinite(old_c) and old_c > 0 and np.isfinite(v_me) and v_me >= MINVAL:
-            wme = W[W.index.end_time.normalize() <= dm.index[-1]]
-            sm_ = float(wme.sma.iloc[-1]) if len(wme) and np.isfinite(wme.sma.iloc[-1]) else None
-            sm4 = float(wme.sma.iloc[-5]) if len(wme) > 5 and np.isfinite(wme.sma.iloc[-5]) else None
-            base_, dep_ = int(age_m.loc[lm_]), float(depth_m.loc[lm_]) if np.isfinite(depth_m.loc[lm_]) else None
-            mcl = dict(symbol=sym, month=str(lm_), close_m=float(M.c.loc[lm_]), old_ath=old_c, ath_month=str(ath_month.loc[lm_]),
-                       above_pct=(float(M.c.loc[lm_]) / old_c - 1) * 100, base_months=base_, depth=dep_,
-                       high_m=float(M.h.loc[lm_]), wick_trigger=float(trig_m.loc[lm_]) if np.isfinite(trig_m.loc[lm_]) else None,
-                       long_cup=bool(base_ >= 36 and dep_ is not None and dep_ <= -0.30), main=bool(base_ >= BASE_MAIN),
-                       sma30=sm_, sma_rising=bool(sm_ is not None and sm4 is not None and sm_ > sm4 and float(wme.c.iloc[-1]) > sm_),
-                       close=float(x.Close.iloc[-1]), since_pct=(float(x.Close.iloc[-1]) / float(M.c.loc[lm_]) - 1) * 100,
-                       value_cr=v_me / UNIT)
-            MCLOSE.append(mcl)
+    if lm_ is not None and lm_ == pd.Timestamp(today).to_period("M") - 1:
+        i_ = M.index.get_loc(lm_); prior = M.iloc[:i_]
+        if len(prior) >= 13 and float(M.c.loc[lm_]) > float(prior.h.max()):
+            a_ = int(np.argmax(prior.h.to_numpy())); old_h = float(prior.h.iloc[a_]); base_ = int(i_ - a_)
+            dm = d[d.mon == lm_]; v_me = float(dm.val.iloc[-1]) if len(dm) else np.nan
+            if base_ >= BASE_MIN and a_ >= 3 and np.isfinite(v_me) and v_me >= MINVAL:
+                wme = W[W.index.end_time.normalize() <= dm.index[-1]]
+                sm_ = float(wme.sma.iloc[-1]) if len(wme) and np.isfinite(wme.sma.iloc[-1]) else None
+                sm4 = float(wme.sma.iloc[-5]) if len(wme) > 5 and np.isfinite(wme.sma.iloc[-5]) else None
+                seg = prior.c.iloc[a_ + 1:]; dep_ = float(seg.min() / old_h - 1) if len(seg) else None
+                mcl = dict(symbol=sym, month=str(lm_), close_m=float(M.c.loc[lm_]), old_ath=old_h, ath_month=str(prior.index[a_]),
+                           above_pct=(float(M.c.loc[lm_]) / old_h - 1) * 100, base_months=base_, depth=dep_, high_m=float(M.h.loc[lm_]),
+                           long_cup=bool(base_ >= 36 and dep_ is not None and dep_ <= -0.30), main=bool(base_ >= BASE_MAIN),
+                           sma30=sm_, sma_rising=bool(sm_ is not None and sm4 is not None and sm_ > sm4 and float(wme.c.iloc[-1]) > sm_),
+                           close=float(x.Close.iloc[-1]), since_pct=(float(x.Close.iloc[-1]) / float(M.c.loc[lm_]) - 1) * 100,
+                           value_cr=v_me / UNIT)
+                MCLOSE.append(mcl)
     Mc = M.tail(240); Wt = W.tail(260)
     chart = dict(m=dict(t=[str(p) for p in Mc.index], o=Mc.o.round(2).tolist(), h=Mc.h.round(2).tolist(),
                         l=Mc.l.round(2).tolist(), c=Mc.c.round(2).tolist()),

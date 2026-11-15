@@ -117,21 +117,23 @@ def ath_state(x):
 
 
 def mclose_state(x):
-    """Month-end list (15 Nov 2026), same as tools/ath_scan.py: the last COMPLETED month closed above the old all-time-high
-    monthly close after a base >= 12 months. Long cup = base >= 36 months with a fall >= 30% inside it."""
+    """Month-end list (15 Nov 2026), same as tools/ath_scan.py: the last COMPLETED month CLOSED above the all-time HIGH price of
+    all earlier months (wicks included, as on TradingView), after a base >= 12 months since that high.
+    Long cup = base >= 36 months with a fall >= 30% inside it."""
     x = x.dropna(subset=["Close"])
-    mc = x.Close.resample("ME").last().dropna()
+    hi = x["High"].where(x["High"].notna(), x.Close) if "High" in x else x.Close
+    mc = x.Close.resample("ME").last().dropna(); mh = hi.resample("ME").max().reindex(mc.index)
     lm = pd.Timestamp(datetime.now(timezone.utc).date()).to_period("M") - 1
     per = mc.index.to_period("M")
     if len(mc) < 14 or per[-1] < lm or lm not in set(per):
         return None
-    i = list(per).index(lm); prior = mc.iloc[:i]
-    if len(prior) < 13 or mc.iloc[i] <= prior.max():
+    i = list(per).index(lm); prior_h = mh.iloc[:i]; prior_c = mc.iloc[:i]
+    if len(prior_h) < 13 or mc.iloc[i] <= prior_h.max():
         return None
-    a = int(np.argmax(prior.to_numpy())); base = i - a
+    a = int(np.nanargmax(prior_h.to_numpy())); base = i - a
     if base < 12:
         return None
-    old = float(prior.iloc[a]); dep = float(prior.iloc[a + 1:].min() / old - 1) if a + 1 < len(prior) else 0.0
+    old = float(prior_h.iloc[a]); dep = float(prior_c.iloc[a + 1:].min() / old - 1) if a + 1 < len(prior_c) else 0.0
     w = x.Close.resample("W-FRI").last().dropna(); w = w[w.index <= mc.index[i]]; sma = w.rolling(30).mean()
     rising = bool(len(sma.dropna()) > 5 and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5])
     return dict(month=str(lm), close_m=float(mc.iloc[i]), old_ath=old, ath_month=str(per[a]), base_months=int(base), depth=round(dep, 4),

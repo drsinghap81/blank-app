@@ -41,11 +41,12 @@ rows = []
 
 def add_row(t, nm, grp, x):
     mc = x.Close.resample("ME").last().dropna(); per = mc.index.to_period("M")
+    mh = x.High.where(x.High.notna(), x.Close).resample("ME").max().reindex(mc.index)   # ATH = highest price (wicks), as on TradingView
     lm = pd.Timestamp(datetime.now(timezone.utc).date()).to_period("M") - 1
-    done = mc[per <= lm]
+    done = mc[per <= lm]; dh = mh[per <= lm]
     if len(done) < 14:
         return
-    a = int(np.argmax(done.to_numpy())); old = float(done.iloc[a])
+    a = int(np.nanargmax(dh.to_numpy())); old = float(dh.iloc[a])
     w = x.Close.resample("W-FRI").last().dropna(); sma = w.rolling(30).mean()
     r = dict(key=t, name=nm, group=grp, close=float(x.Close.iloc[-1]), asof=str(x.index[-1].date()), first=str(x.index[0].date()),
              ath_close=old, ath_month=str(per[per <= lm][a]), base_months=int(len(done) - 1 - a), below_ath_pct=round((1 - float(x.Close.iloc[-1]) / old) * 100, 2),

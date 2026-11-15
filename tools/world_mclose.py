@@ -201,21 +201,22 @@ def col(dd, f, t):
         return None
 
 
-def check(mc, w, lm):
-    """mc: monthly closes (PeriodIndex), w: weekly closes up to the month end."""
-    mc = mc.dropna()
+def check(mc, w, lm, mh=None):
+    """mc: monthly closes, mh: monthly highs (PeriodIndex), w: weekly closes up to the month end. The month must CLOSE above the
+    all-time HIGH price of all earlier months (wicks included, as on TradingView)."""
+    mc = mc.dropna(); mh = mc if mh is None else mh.reindex(mc.index).fillna(mc)
     if not len(mc) or mc.index[-1] != lm or len(mc) < 14:
         return None
-    prior = mc.iloc[:-1]
-    if mc.iloc[-1] <= prior.max():
+    prior, ph = mc.iloc[:-1], mh.iloc[:-1]
+    if mc.iloc[-1] <= ph.max():
         return None
-    a = int(np.argmax(prior.to_numpy())); base = len(prior) - a
+    a = int(np.argmax(ph.to_numpy())); base = len(ph) - a
     if base < 12:
         return None
-    old = float(prior.iloc[a]); dep = float(prior.iloc[a + 1:].min() / old - 1) if a + 1 < len(prior) else 0.0
+    old = float(ph.iloc[a]); dep = float(prior.iloc[a + 1:].min() / old - 1) if a + 1 < len(prior) else 0.0
     sma = w.rolling(30).mean()
     rising = bool(len(sma.dropna()) > 5 and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5])
-    return dict(month=str(lm), close_m=float(mc.iloc[-1]), old_ath=old, ath_month=str(prior.index[a]), base_months=int(base), depth=round(dep, 4),
+    return dict(month=str(lm), close_m=float(mc.iloc[-1]), old_ath=old, ath_month=str(ph.index[a]), base_months=int(base), depth=round(dep, 4),
                 above_pct=round(float((mc.iloc[-1] / old - 1) * 100), 2), sma_rising=rising, long_cup=bool(base >= 36 and dep <= -0.30))
 
 
@@ -255,8 +256,9 @@ def main():
                     if len(x) < 300:
                         continue
                     o_, h_, l_, c_, v_ = fix_gaps(x.Open, x.High, x.Low, x.Close, x.Volume)
-                    c = pd.Series(np.asarray(c_, float), index=x.index)
+                    c = pd.Series(np.asarray(c_, float), index=x.index); hh = pd.Series(np.asarray(h_, float), index=x.index)
                     mc = c.groupby(c.index.to_period("M")).last(); mc = mc[mc.index <= lm]
+                    mh = hh.groupby(hh.index.to_period("M")).max()
                     w = c[c.index <= me].resample("W-FRI").last().dropna()
                     last = float(c.iloc[-1])
                 else:
@@ -267,14 +269,16 @@ def main():
                     if len(c) < 300:
                         continue
                     mc = c.groupby(c.index.to_period("M")).last(); mc = mc[mc.index <= lm]
+                    hh = col(dd, "High", t); hh = c if hh is None else hh.reindex(c.index).fillna(c)
+                    mh = hh.groupby(hh.index.to_period("M")).max()
                     w = c[c.index <= me].resample("W-FRI").last().dropna()
                     last = float(c.iloc[-1])
                 if t in os.environ.get("WM_DEBUG", "2480.TW").split(","):
-                    print("DEBUG", t, "top monthly closes:", mc.sort_values().tail(5).round(2).to_dict(), "last", mc.tail(3).round(2).to_dict())
+                    print("DEBUG", t, "top monthly highs:", mh.sort_values().tail(3).round(2).to_dict(), "top closes:", mc.sort_values().tail(3).round(2).to_dict(), "last", mc.tail(3).round(2).to_dict())
                 n_hist += int(len(mc.dropna()) >= 14); n_cur += int(len(mc.dropna()) > 0 and mc.dropna().index[-1] == lm)
                 m_ = mc.dropna()
                 n_new += int(len(m_) >= 14 and m_.index[-1] == lm and m_.iloc[-1] > m_.iloc[:-1].max())   # new closing high, any base
-                r = check(mc, w, lm)
+                r = check(mc, w, lm, mh)
                 if r:
                     sym, nm = L[t]
                     rows.append(dict(ticker=t, symbol=sym, name=nm, market=M, cur=CUR.get(suffix(t), "€"), close=last,
