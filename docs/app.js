@@ -2414,6 +2414,17 @@ function turSize(r, S, fx, N, px) {
   const lot = r.key === '^NSEI' ? S.lotN : S.lotB; const units = risk / (2 * N);
   return lot ? `<b>${Math.floor(units / lot)} lot${Math.floor(units / lot) === 1 ? '' : 's'}</b> of ${esc(r.contract)} (${fmt(units, 0, 'en-IN')} units ÷ lot ${lot}${Math.floor(units / lot) < 1 ? `; one lot needs an account of about ${S.cur} ${fmt(S.acct * lot / units, 0, 'en-US')} at ${S.risk}%` : ''})` : `${fmt(units, 0, 'en-IN')} index units ÷ your lot size (enter it above)`;
 }
+// MCX contracts for the same signals (price converted from the global contract with USD/INR; excludes India import duty, so
+// levels are approximate: place orders on the MCX chart's own levels). [name, global key, conversion from USD price, multiplier]
+const MCX_ALT = { 'GC=F': [['Gold Petal (1 g)', 1 / 31.1035, 1], ['Gold Guinea (8 g)', 8 / 31.1035, 1], ['Gold Mini (100 g)', 10 / 31.1035, 10]],
+  'SI=F': [['Silver Micro (1 kg)', 32.1507, 1], ['Silver Mini (5 kg)', 32.1507, 5]], 'CL=F': [['Crude Oil Mini (10 bbl)', 1, 10]], 'HG=F': [['Copper (2,500 kg)', 2.20462, 2500]] };
+function turMcx(r, S, fx, N) {
+  const L = MCX_ALT[r.key]; if (!L || !(N > 0)) return '';
+  const usdinr = fx['USDINR=X'] || 85, audusd = fx['AUDUSD=X'] || 0.65;
+  const riskINR = (S.cur === 'INR' ? 1 : S.cur === 'USD' ? usdinr : audusd * usdinr) * S.acct * S.risk / 100;
+  return 'MCX: ' + L.map(([nm, conv, mult]) => { const per = 2 * N * usdinr * conv * mult; const k = Math.floor(riskINR / per);
+    return `${k > 0 ? `<b>${k}</b>` : '0'} × ${nm}${k > 0 ? '' : ` (needs ≈ ₹${fmt(per / (S.risk / 100) / 1e5, 1)} L)`}`; }).join(' · ');
+}
 async function loadTurtle(el) {
   $('#title').textContent = 'Trading · Turtle (futures)';
   if (!state.turtle) { el.innerHTML = tradeStrip('turtle') + '<p class="muted pad">Loading…</p>'; tradeStripWire(el); state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); }
@@ -2438,6 +2449,8 @@ async function loadTurtle(el) {
       st = `<span class="chip">Waiting · ${fmt(r.dist_pct, 1)}% to the 20-day high</span>`;
       line = `Buy-stop <b>${px(r.buy_stop)}</b> · if filled, fixed stop ${px(r.fixed_stop_if_filled)} · size ${sz}`;
     }
+    const mcx = turMcx(r, S, D.fx || {}, r.status === 'in trade' ? r.entry_N : r.N);
+    if (mcx) line += `<br>${mcx}`;
     const hist = (r.trades || []).slice().reverse().map((z) => `${day(z.entry)} → ${day(z.exit)}: ${z.R >= 0 ? '+' : ''}${fmt(z.R, 1)}R`).join(' · ');
     return `<li class="row" style="cursor:default"><div><div class="sym">${esc(r.name)}</div><div class="co">${esc(r.group)} · ${esc(r.contract)} · close ${px(r.close)} (${day(r.date)})</div>
       <div class="tags">${st}</div><div class="muted" style="font-size:13px;margin-top:4px">${line}</div>
