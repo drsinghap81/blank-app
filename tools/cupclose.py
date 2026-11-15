@@ -58,38 +58,43 @@ def wd_closes(x, wk_dep=WK_DEP, dy_dep=DY_DEP):
     return wk, dy
 
 
-def cupclose_short(ll, cc, K, B, D, piv=3, level_only=False):
-    """Support break (15 Nov 2026): support = the nearest swing low under the previous close (a low that is the lowest within +-piv
-    bars, at least B bars old, followed by a rally of at least D off it, and not closed below since). Signal: this bar CLOSES below it.
-    Returns (a, level, age, rally, next_support, room) or None. Watch only: shorting breakdowns lost money on F&O stocks in 2016-26."""
+def cupclose_short(ll, cc, K, B, D, piv=3, level_only=False, fresh=4):
+    """Support break (15 Nov 2026): support = a swing low (lowest within +-piv bars) followed by a rally of at least D before price
+    first CLOSED below it, at least B bars before that close. Listed while the break is fresh (first close below within the last
+    `fresh` bars) and price has not closed back above it. level_only: the nearest unbroken support under the last close instead.
+    Returns (a, level, age, rally, next_support, room, break_index) or None. Watch only: shorting breakdowns lost money on F&O
+    stocks in 2016-26."""
     n_ = len(ll)
     if n_ < B + 2 * piv + 3:
         return None
-    lo = max(piv, n_ - 1 - K); best = None
-    for j in range(lo, n_ - 1 - B + 1):
-        if j + piv >= n_ - 1:
-            break
+    lo = max(piv, n_ - 1 - K); best = None; unb = None
+    for j in range(lo, n_ - 1 - piv):
         v = ll[j]
         if not np.isfinite(v) or v > np.nanmin(ll[max(0, j - piv):j + piv + 1]):
             continue
-        after = cc[j + 1:n_ - 1]
-        if not len(after) or np.nanmin(after) < v:          # already closed below: support used up
+        below = np.flatnonzero(cc[j + 1:] < v)
+        if not len(below):                                   # never closed below: an unbroken support
+            if n_ - 1 - j >= B and np.nanmax(cc[j + 1:]) / v - 1 >= D and (unb is None or v > unb[1]):
+                unb = (j, float(v), float(np.nanmax(cc[j + 1:]) / v - 1))
             continue
-        rally = float(np.nanmax(after) / v - 1)
+        f = j + 1 + int(below[0])                            # first close below
+        if f - j < B or f < n_ - fresh or not (cc[f:] < v).all():
+            continue
+        rally = float(np.nanmax(cc[j + 1:f]) / v - 1) if f > j + 1 else 0.0
         if rally < D:
             continue
         if best is None or v > best[1]:
-            best = (j, float(v), rally)
+            best = (j, float(v), rally, f)
     if level_only:
-        return best
-    if best is None or not (cc[-1] < best[1]):
+        return unb
+    if best is None:
         return None
-    a_, lev, rally = best; age = n_ - 1 - a_
-    sup = None; c_ = float(cc[-1]); below = np.flatnonzero(ll[:a_] < c_)
-    if len(below):
-        k = int(below[-1]); sup = float(np.nanmin(ll[max(0, k - B):min(a_, k + B + 1)]))
+    a_, lev, rally, f = best; age = f - a_
+    sup = None; c_ = float(cc[-1]); bl = np.flatnonzero(ll[:a_] < c_)
+    if len(bl):
+        k = int(bl[-1]); sup = float(np.nanmin(ll[max(0, k - B):min(a_, k + B + 1)]))
     room = (1 - sup / c_) if sup else None
-    return a_, lev, age, rally, sup, room
+    return a_, lev, age, rally, sup, room, f
 
 
 SH_WK_K, SH_WK_MIN, SH_WK_UP, SH_DY_K, SH_DY_MIN, SH_DY_UP = 104, 8, 0.10, 250, 10, 0.08   # support break (15 Nov 2026, Amritpal's gold chart)
@@ -112,11 +117,11 @@ def wd_short(x, wk_dep=SH_WK_UP, dy_dep=SH_DY_UP):
         return None, None
     out = []
     for kind, L, C, T, K, B, D, lc in (("WS", W.l, W.c, W.index, SH_WK_K, SH_WK_MIN, wk_dep, 26), ("DS", x.Low, x.Close, x.index, SH_DY_K, SH_DY_MIN, dy_dep, 60)):
-        r = cupclose_short(L.to_numpy(float), C.to_numpy(float), K, B, D, 3 if kind == "WS" else 5)
+        r = cupclose_short(L.to_numpy(float), C.to_numpy(float), K, B, D, 3 if kind == "WS" else 5, False, 4 if kind == "WS" else 5)
         if not r:
             out.append(None); continue
-        a_, rim, age, rally, sup, room = r
-        out.append(dict(kind=kind, period=str(T[-1].date()), close_p=float(C.iloc[-1]), low_p=float(L.iloc[-1]), old_low=rim, low_date=str(T[a_].date()),
+        a_, rim, age, rally, sup, room, f_ = r
+        out.append(dict(kind=kind, period=str(T[-1].date()), broke=str(T[f_].date()), close_p=float(C.iloc[-1]), low_p=float(L.iloc[-1]), old_low=rim, low_date=str(T[a_].date()),
                         base=int(age), rally=round(rally, 4), below_pct=round((1 - float(C.iloc[-1]) / rim) * 100, 2), support=sup,
                         room_pct=None if room is None else round(room * 100, 2), atl=sup is None, long_cup=bool(age >= lc and rally >= 0.20)))
     return out[0], out[1]

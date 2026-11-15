@@ -2291,11 +2291,11 @@ function wdListWire(root, L, kind) {
 /* Short watch (15 Nov 2026): reverse cup = the week / day CLOSED below its cup low (lowest low of 2 years / 1 year, 26+ weeks / 20+ days
    old, 20% / 15%+ rally since; indices 10% / 8%), only under a falling 30-week SMA, room to the next older low >= the rally.
    Watch only: shorting these on F&O stocks lost money in the 2016-26 test (as did H&S / double / triple tops). Use it to avoid buying. */
-const SHORT_NOTE = '<b>Watch only, not a short system.</b> Support break: the week or day CLOSED below the nearest swing low (at least 8 weeks / 10 days old, 10% / 8%+ rally off it, not closed below since), under a falling 30-week average. Next support = the next older low below. Shorting breakdowns of 52-week lows, reverse cups and H&S / double / triple tops all lost money on F&O stocks in 2016–26; only coins in bear years paid. Use it to avoid buying, not to short.';
+const SHORT_NOTE = '<b>Watch only, not a short system.</b> Support break: the week or day CLOSED below the nearest swing low (a 10% / 8%+ rally off it first; the break stays listed for 4 weeks / 5 days while price stays below), under a falling 30-week average. Next support = the next older low below. Shorting breakdowns of 52-week lows, reverse cups and H&S / double / triple tops all lost money on F&O stocks in 2016–26; only coins in bear years paid. Use it to avoid buying, not to short.';
 function shortItems(rows, g, tvf) { return rows.map((r) => ({ g, sym: r.symbol || '', name: r.symbol ? r.name : (r.index || r.name), z: r, close: r.close, tv: tvf(r) })); }
 function shortItemHtml(x, i, L) {
   const r = x.z; const wk = r.kind === 'WS'; const sp = i === 0 || L[i - 1].g !== x.g ? `<li class="ixsep">${esc(x.g)}</li>` : '';
-  const chips = (r.sector_tag ? secChip(r) : '') + `<span class="chip exit">Closed ${fmt(r.below_pct, 1)}% below support: the ${r.base}-${wk ? 'wk' : 'day'}-old swing low ${fmt(r.old_low, 2, 'en-US')} (${day(r.low_date)})</span>`
+  const chips = (r.sector_tag ? secChip(r) : '') + `<span class="chip exit">Broke support ${fmt(r.old_low, 2, 'en-US')} (swing low of ${day(r.low_date)})${r.broke && r.broke !== r.period ? ` on ${day(r.broke)}` : ' this ' + (wk ? 'week' : 'day')} · now ${fmt(r.below_pct, 1)}% below</span>`
     + `<span class="chip">rallied ${fmt(r.rally * 100, 0)}% in between</span>${r.long_cup ? '<span class="chip new">Big base</span>' : ''}`
     + `<span class="chip">${r.atl ? 'No older low below · new low' : `next support ${fmt(r.support, 2, 'en-US')} (${fmt(r.room_pct, 0)}% down)`}</span><span class="chip exit">Below a falling 30-wk SMA</span>`;
   const g = r.low_p ? (x.close / r.low_p - 1) * 100 : null;
