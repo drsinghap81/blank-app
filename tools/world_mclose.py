@@ -188,7 +188,7 @@ LISTS = dict(BSE=lst_bse, SME=lst_sme, JP=lst_jp, HK=lst_hk, CA=lst_ca, EU=lst_e
 def dl(tick, **kw):
     for k in range(3):
         try:
-            return yf.download(tick, auto_adjust=True, progress=False, group_by="column", threads=True, **kw)
+            return yf.download(tick, auto_adjust=False, progress=False, group_by="column", threads=True, **kw)
         except Exception as e:  # noqa: BLE001
             print("yf retry", str(e)[:60]); time.sleep(10 + 10 * k)
     return None

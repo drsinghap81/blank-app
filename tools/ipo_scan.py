@@ -206,7 +206,7 @@ def main():
         chunk = tick[a:a + 80]; dd = None
         for _ in range(3):
             try:
-                dd = yf.download(chunk, period="max", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+                dd = yf.download(chunk, period="max", interval="1d", auto_adjust=False, progress=False, group_by="column", threads=True)
                 break
             except Exception as e:  # noqa: BLE001
                 print("retry", a, e, flush=True); time.sleep(20)

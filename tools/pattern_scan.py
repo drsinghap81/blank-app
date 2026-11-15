@@ -329,7 +329,7 @@ def main(mk="NSE"):
         chunk = jobs[a:a + 80]; dd = None
         for _ in range(3):
             try:
-                dd = yf.download([j[0] for j in chunk], period="3y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+                dd = yf.download([j[0] for j in chunk], period="3y", interval="1d", auto_adjust=False, progress=False, group_by="column", threads=True)
                 break
             except Exception as e:  # noqa: BLE001
                 print("retry", a, e, flush=True); time.sleep(20)

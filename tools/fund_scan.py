@@ -193,7 +193,7 @@ EXTRA_DEBT = r"(?i)gilt|treasur|bond|cash|liquid|g-?sec|sdl|bharat bond|money ma
 
 def _hist(tick, period):
     try:
-        return yf.download(tick, period=period, interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+        return yf.download(tick, period=period, interval="1d", auto_adjust=False, progress=False, group_by="column", threads=True)
     except Exception as e:  # noqa: BLE001
         print("download fail", period, len(tick), str(e)[:60]); return None
 
@@ -277,7 +277,7 @@ def extra_etfs(rows, have):
 def main():
     os.makedirs(OUT, exist_ok=True); rows, charts = [], {}
     # ETFs
-    dd = yf.download([k + ".NS" for k in ETFS], period="max", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+    dd = yf.download([k + ".NS" for k in ETFS], period="max", interval="1d", auto_adjust=False, progress=False, group_by="column", threads=True)
     from session import drop_partial
     for k, nm in ETFS.items():
         try:
@@ -298,7 +298,7 @@ def main():
     # US and ASX ETFs (keys prefixed so they never clash with Indian symbols / AMFI codes)
     for mkt, lst, suf, nt in (("US", US_ETFS, "", US_NO_TOPUP), ("AU", ASX_ETFS, ".AX", ASX_NO_TOPUP)):
         try:
-            dd2 = yf.download([k + suf for k in lst], period="max", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+            dd2 = yf.download([k + suf for k in lst], period="max", interval="1d", auto_adjust=False, progress=False, group_by="column", threads=True)
         except Exception as e:  # noqa: BLE001
             print("download fail", mkt, e); continue
         n1 = len(rows)
