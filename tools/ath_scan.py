@@ -40,6 +40,7 @@ CH = f"{OUT}/ath_charts"
 MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6, "UK": 1e8}[MARKET]          # Rs 2 cr / $5 m / A$1 m a day
 UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6, "UK": 1e8}[MARKET]            # value_cr field = traded value in Rs cr / $ m / A$ m
 MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0, "UK": 100.0}[MARKET]   # no penny stocks (30 Oct 2026)
+MCL_MIN = {"ASX": 1.0}.get(MARKET, MIN_CLOSE)   # 15 Nov 2026: month-close list only goes down to A$1 on the ASX (A$1 m/day still applies)
 BASE_MAIN, BASE_MIN = 24, 12
 MCLOSE = []   # month-end list (15 Nov 2026): last completed month CLOSED above the old all-time closing high
 NEAR = 0.05
@@ -310,10 +311,18 @@ def main():
                         LAST_BAR[0] = max(LAST_BAR[0], _xl.index[-1].date()) if LAST_BAR[0] else _xl.index[-1].date()
                 if len(x) and x.index.max() < pd.Timestamp(today) - pd.Timedelta(days=10):
                     continue
-                if not len(x) or float(x.Close.iloc[-1]) < MIN_CLOSE:
+                if not len(x) or float(x.Close.iloc[-1]) < MCL_MIN:
                     continue
-                vals[sym] = float((x.Close * x.Volume).tail(20).mean())
+                low_px = float(x.Close.iloc[-1]) < MIN_CLOSE
+                if not low_px:
+                    vals[sym] = float((x.Close * x.Volume).tail(20).mean())
                 ev, nr, ch = analyse(sym, x, today)
+                if low_px:          # below the tested price floor: month-close list only, no signals
+                    ev, nr = [], None
+                    if not (ch and ch.get("mclose")):
+                        continue
+                    if MCLOSE and MCLOSE[-1]["symbol"] == sym:
+                        MCLOSE[-1]["low_price"] = True
                 if ev or nr:
                     rsd = stock_rs(sym, x.Close, SEC, BENCH)
                     for e_ in ev:

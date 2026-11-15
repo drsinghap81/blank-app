@@ -3072,7 +3072,7 @@ function athList() {
     }
     if (tab === 'mclose') {
       const tr = (state.ath.d.tracked || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');
-      chip = `${r.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">fell ${fmt(Math.abs((r.depth || 0) * 100), 0)}% in base</span>`
+      chip = `${r.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${r.main ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">fell ${fmt(Math.abs((r.depth || 0) * 100), 0)}% in base</span>${r.low_price ? '<span class="chip exit">Under the A$30 price floor</span>' : ''}`
         + `<span class="chip ${r.sma_rising ? 'open' : 'exit'}">${r.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>${tr ? `<span class="chip open">In Breakouts since ${day(tr.date)}</span>` : ''}`;
       const Lp = (state.ath.lp || {})[r.symbol]; const px = Lp ? Lp.price : r.close; const sm = px / r.close_m - 1;
       chip = `<span class="chip">Closed ${pct(r.above_pct)} over old ATH</span>` + chip;
