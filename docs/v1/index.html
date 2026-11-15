@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trend Desk (v1, saved 15 Nov 2026)</title>
+<meta name="description" content="Nightly scans of India, US and Australian stocks: setups with charts, a size calculator and your open risk in one calm number.">
+<meta name="theme-color" content="#0E0B1A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Trend Desk">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>/* theme before first paint (no flash): same rule as applyTheme() in app.js */
+try { var t = localStorage.getItem('td.theme') || 'aurora'; if (t === 'auto') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'neon' : 'pop'; if (t !== 'classic') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<link rel="stylesheet" href="styles.css?v=130">
+</head>
+<body><div style="position:sticky;top:0;z-index:999;background:#FFB23D;color:#08090D;font:600 13px Inter,sans-serif;padding:6px 12px;text-align:center">Saved version from 15 Nov 2026 (before the consolidation) · <a href="../" style="color:#08090D">open the current app</a></div>
+<header class="bar">
+  <div class="brand">
+    <img src="icons/icon-192.png" alt="" width="30" height="30">
+    <div>
+      <h1 id="title">Trend Desk</h1>
+      <p id="asof">Loading…</p>
+    </div>
+  </div>
+  <div class="bar-actions">
+    <button class="icon-btn" id="btn-refresh" title="Refresh" aria-label="Refresh the app and its data">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-download" title="Save this page as a PDF" aria-label="Save this page as a PDF">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 19h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+ <button class="icon-btn" id="btn-theme" title="Theme" aria-label="Choose a theme">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.6-.8 1.6-1.7 0-.5-.2-.9-.4-1.2-.3-.4-.4-.8-.4-1.2 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5c0-4-4-7.2-9-7.2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="7.5" cy="11.5" r="1.3" fill="currentColor"/><circle cx="10.5" cy="7.5" r="1.3" fill="currentColor"/><circle cx="15" cy="8" r="1.3" fill="currentColor"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-info" title="How the signals work" aria-label="How the signals work">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="views" aria-label="Sections">
+  <button data-view="today" aria-current="page">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 15l6-6M10 9h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Today</button>
+  <button data-view="mk">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 12h17M12 3.5c3 3.2 3 13.8 0 17M12 3.5c-3 3.2-3 13.8 0 17" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Markets</button>
+  <button data-view="trends">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-5 4 3 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Trends</button>
+  <button data-view="live">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>Live</button>
+  <button data-view="ath">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h11M4 20V14l4-4 4 3 4-7 4 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>ATH</button>
+  <button data-view="tb" class="owner-only">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V9m5 9V5m5 13v-6m5 6V8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Top Btm</button>
+  <button data-view="bot">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5l4 12 5-7 5 7 4-12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Bottoms</button>
+  <button data-view="pf">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4zM9 8V5h6v3M4 13h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Portfolio</button>
+</nav>
+
+<nav class="views bg-nav" id="bgnav" aria-label="Beginner sections">
+  <button data-bg="today"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>Today</button>
+  <button data-bg="trades"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4zM9 8V5h6v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>My trades</button>
+  <button data-bg="proof"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Proof</button>
+  <button data-bg="explore"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Explore</button>
+  <button data-bg="me"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Me</button>
+</nav>
+<section id="view-bg" class="view page" hidden></section>
+<section id="view-today" class="view page" hidden></section>
+
+<!-- MARKETS (top-down) -->
+<section id="view-mk" class="view page"></section>
+
+<!-- TRENDS -->
+<section id="view-trends" class="view" hidden>
+  <div class="markets" role="tablist" aria-label="Market">
+    <button data-mkt="NSE" aria-selected="true">India</button>
+    <button data-mkt="US">US</button>
+    <button data-mkt="ASX">Australia</button>
+    <button data-mkt="UK">UK</button>
+  </div>
+  <section class="summary" id="summary" aria-live="polite"></section>
+  <p class="note" id="mktnote" hidden></p>
+  <nav class="tabs" role="tablist" aria-label="Lists">
+    <button role="tab" data-tab="new" aria-selected="true">Buy next open</button>
+    <button role="tab" data-tab="open">Tracked signals</button>
+    <button role="tab" data-tab="trend">Clear trends</button>
+    <button role="tab" data-tab="watch">Watchlist</button>
+  </nav>
+  <div class="filters">
+    <label class="search"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Search symbol or company" autocomplete="off"></label>
+    <select id="size" aria-label="Company size">
+      <option value="">All sizes</option><option>Large</option><option>Mid</option><option>Small</option><option>Micro</option>
+    </select>
+    <select id="setup" aria-label="Setup">
+      <option value="">Both setups</option><option value="EMA">EMA 9/21 cross</option><option value="52w">Base breakout</option>
+    </select>
+  </div>
+  <main class="layout">
+    <ul class="list" id="list" aria-label="Stocks"></ul>
+    <section class="detail" id="detail" aria-label="Chart">
+      <div class="detail-empty">
+        <svg viewBox="0 0 64 40" width="96" aria-hidden="true"><path d="M2 34 14 30 22 32 34 20 42 23 60 6" fill="none" stroke="#0E9F6E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60" cy="6" r="4" fill="#E8A33D"/></svg>
+        <p>Pick a stock to see its chart, entry, stop and trailing stop.</p>
+      </div>
+    </section>
+  </main>
+</section>
+
+<!-- MONTHLY ATH -->
+<section id="view-live" class="view page" hidden></section>
+<section id="view-ath" class="view page" hidden></section>
+<!-- TOP BOTTOM -->
+<section id="view-tb" class="view page" hidden></section>
+<!-- OI ALERTS -->
+<section id="view-oi" class="view page" hidden></section>
+<section id="view-ratio" class="view page" hidden></section>
+<!-- RESULTS -->
+<section id="view-results" class="view page" hidden></section>
+<section id="view-bot" class="view page" hidden></section>
+<section id="view-pf" class="view page" hidden></section>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-label="Chart">
+    <div class="sheet-head">
+      <button class="icon-btn" id="sheet-close" aria-label="Close chart">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="m15 5-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div id="sheet-body"></div>
+  </div>
+</div>
+
+<dialog id="info">
+  <form method="dialog"><button class="icon-btn close" aria-label="Close">✕</button></form>
+  <h2>How the signals work</h2>
+  <h3>EMA 9/21 cross — the main system</h3>
+  <p>The 9 EMA crosses above the 21 EMA while Supertrend (10,3) is green, price is above a rising 50 EMA and RSI is 55 or more. Buy at the next open. The stop is the lowest low of the last 5 sessions; skip the trade if that is more than 12% away. Hold until Supertrend turns red, then sell at the next open.</p>
+  <h3>52-week-high base breakout</h3>
+  <p>The first new 52-week high after at least 6 months without one, with Supertrend green. Stop is the 5-day low, never more than 12% away. Same Supertrend exit.</p>
+  <h3>Sizing</h3>
+  <p>Risk 1% of capital per trade, at most 10 positions, each up to 20% of capital.</p>
+  <h3>Monthly all-time-high breakout</h3>
+  <p>On the monthly chart, find the month with the highest close ever. Buy when price trades above that month's high, if that month is at least 2 years old and the stock is above a rising 30-week average (higher than 4 weeks earlier). Sell at the next open after a weekly close below the 30-week average. Size: 1% of capital at risk to the 30-week SMA (change it in the position plan), max 20% of capital per stock, 10 stocks, one add after the stock holds a test of the SMA and makes a new high. Backtest 2017–2026, all NSE stocks including delisted: 22% a year, worst fall −20.5% at 1% risk; 28.6%, −23.5% at 2%.</p>
+  <h3 class="owner-only">Top Bottom</h3>
+  <p class="owner-only">Bank Nifty futures: buy above the last top, sell below the last bottom, always in the market, with a 1% stop on the entry day. Paper trading since 19 Oct 2026.</p>
+  <h3>OI alerts</h3>
+  <p>Trapped put writers: the biggest put open interest sits above the price. Trapped call writers: the biggest call open interest sits below it. In backtests single stocks did not fall after put traps; a market-wide share of 60% or more was mildly bearish.</p>
+  <p class="muted">Signals are candidates, not recommendations. Past results do not guarantee future returns. Data: closing prices via Yahoo and NSE, updated every trading evening.</p>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script src="app.js?v=254"></script>
+</body>
+</html>

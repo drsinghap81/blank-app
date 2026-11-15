@@ -1,0 +1,15 @@
+{
+  "name": "Trend Desk",
+  "short_name": "Trend Desk",
+  "description": "Nightly NSE trend scanner with entry, stop and exit signals and charts.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F6FA",
+  "theme_color": "#14213D",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
