@@ -3069,7 +3069,7 @@ function allMcItem(r, i, L) {
     + (a.depth != null ? `<span class="chip">fell ${fmt(Math.abs(a.depth * 100), 0)}% in base</span>` : '') + (a.sma_rising == null ? '' : `<span class="chip ${a.sma_rising ? 'open' : 'exit'}">${a.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>`);
   const sm = r.close && a.close_m ? r.close / a.close_m - 1 : null;
   return `${sep}<li class="row ${a.base_months >= 24 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.sym || r.name)}</div>${r.sym ? `<div class="co">${esc(r.name || '')}</div>` : ''}<div class="tags">${chip}</div></div><div></div>
-    <div class="num"><b>${esc(r.cur)}${fmt(r.close, r.close >= 1000 ? 0 : 2, 'en-US')}</b>${sm == null ? '' : `<span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(a.month).split(' ')[0]}</span>`}</div></li>`;
+    <div class="num"><b>${esc(r.cur)}${fmt(r.close, r.close >= 1000 ? 0 : 2, 'en-US')}</b>${sm == null ? '' : `<span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(a.month).split(' ')[0]}</span>`}${hiGap(r.close, a)}</div></li>`;
 }
 function worldRows() {
   const W = state.worldMC || []; const q = ((state.ath && state.ath.q) || '').toLowerCase();
@@ -3083,14 +3083,14 @@ function worldItem(r, i, L) {
   const chip = `<span class="chip">Closed ${pct(r.above_pct)} over old ATH</span>${r.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${r.base_months >= 24 ? 'new' : ''}">${baseTxt(r.base_months)}</span><span class="chip">fell ${fmt(Math.abs(r.depth * 100), 0)}% in base</span>`
     + `<span class="chip ${r.sma_rising ? 'open' : 'exit'}">${r.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>`;
   return `${sep}<li class="row ${r.base_months >= 24 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${chip}</div></div><div></div>
-    <div class="num"><b>${esc(r.cur)}${n(r.close)}</b><span class="${r.since_pct >= 0 ? 'up' : 'down'}">${pct(r.since_pct)} since ${mLab(r.month).split(' ')[0]}</span></div></li>`;
+    <div class="num"><b>${esc(r.cur)}${n(r.close)}</b><span class="${r.since_pct >= 0 ? 'up' : 'down'}">${pct(r.since_pct)} since ${mLab(r.month).split(' ')[0]}</span>${hiGap(r.close, r)}</div></li>`;
 }
 function fundMcItem(r, i) {
   const a = r.mclose; const sm = r.close / a.close_m - 1;
   return `<li class="row ${a.base_months >= 24 ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(fundName(r))}</div>
     <div class="tags"><span class="chip">Closed ${pct(a.above_pct)} over old ATH</span>${a.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${a.base_months >= 24 ? 'new' : ''}">${baseTxt(a.base_months)}</span><span class="chip">fell ${fmt(Math.abs(a.depth * 100), 0)}% in base</span>
     <span class="chip ${a.sma_rising ? 'open' : 'exit'}">${a.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span><span class="chip">${r.kind === 'fund' ? esc(r.category) : 'ETF'}</span></div></div><div></div>
-    <div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(a.month).split(' ')[0]}</span></div></li>`;
+    <div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(a.month).split(' ')[0]}</span>${hiGap(r.close, a)}</div></li>`;
 }
 function fundAthItem(r, i) {
   const a = r.ath; const pc = (v) => `${v >= 0 ? '+' : ''}${fmt(v * 100, 1)}%`;
@@ -3211,7 +3211,7 @@ function athList() {
         + `<span class="chip ${r.sma_rising ? 'open' : 'exit'}">${r.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span>${tr ? `<span class="chip open">In Breakouts since ${day(tr.date)}</span>` : ''}`;
       const Lp = (state.ath.lp || {})[r.symbol]; const px = Lp ? Lp.price : r.close; const sm = px / r.close_m - 1;
       chip = `<span class="chip">Closed ${pct(r.above_pct)} over old ATH</span>` + chip;
-      right = `<b>${fmt(px, 2, AL())}</b><span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(r.month).split(' ')[0]}</span>`;
+      right = `<b>${fmt(px, 2, AL())}</b><span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(r.month).split(' ')[0]}</span>${hiGap(px, r)}`;
       chip += secChip(r) + (r.size ? `<span class="chip">${esc(r.size)}</span>` : '');
       return `<li class="row ${r.main ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div>
         <div class="tags">${chip}</div></div><div></div><div class="num">${right}</div></li>`;
@@ -3260,6 +3260,9 @@ function trendFromATH(r) {
   const prevTab = state.tab; state.tab = row.list === 'watch' ? 'watch' : 'trend';
   try { select(row); } finally { state.tab = prevTab; }
 }
+/* distance of the current price from the high of the month-close candle (e.g. the October high) */
+const hiGap = (px, a) => { if (!a || !a.high_m || !px) return ''; const g = (px / a.high_m - 1) * 100;
+  return `<span class="${g >= 0 ? 'up' : 'muted'}" title="High of the ${mLab(a.month)} candle ${fmt(a.high_m, 2, 'en-US')}">${g >= 0 ? `${pct(g)} above` : `${fmt(-g, 1)}% below`} ${mLab(a.month).split(' ')[0]} high ${fmt(a.high_m, a.high_m >= 1000 ? 0 : 2, 'en-US')}</span>`; };
 const mLab = (s) => new Date(String(s).slice(0, 7) + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
 function mcloseSelect(r) {
   const tr = ((state.ath.d && state.ath.d.tracked) || []).find((x) => x.symbol === r.symbol && x.status !== 'exited');

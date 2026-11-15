@@ -136,7 +136,7 @@ def mclose_state(x):
     old = float(prior_h.iloc[a]); dep = float(prior_c.iloc[a + 1:].min() / old - 1) if a + 1 < len(prior_c) else 0.0
     w = x.Close.resample("W-FRI").last().dropna(); w = w[w.index <= mc.index[i]]; sma = w.rolling(30).mean()
     rising = bool(len(sma.dropna()) > 5 and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5])
-    return dict(month=str(lm), close_m=float(mc.iloc[i]), old_ath=old, ath_month=str(per[a]), base_months=int(base), depth=round(dep, 4),
+    return dict(month=str(lm), close_m=float(mc.iloc[i]), high_m=float(mh.iloc[i]), old_ath=old, ath_month=str(per[a]), base_months=int(base), depth=round(dep, 4),
                 above_pct=round(float((mc.iloc[i] / old - 1) * 100), 2), sma_rising=rising, long_cup=bool(base >= 36 and dep <= -0.30))
 
 

@@ -216,7 +216,7 @@ def check(mc, w, lm, mh=None):
     old = float(ph.iloc[a]); dep = float(prior.iloc[a + 1:].min() / old - 1) if a + 1 < len(prior) else 0.0
     sma = w.rolling(30).mean()
     rising = bool(len(sma.dropna()) > 5 and w.iloc[-1] > sma.iloc[-1] > sma.iloc[-5])
-    return dict(month=str(lm), close_m=float(mc.iloc[-1]), old_ath=old, ath_month=str(ph.index[a]), base_months=int(base), depth=round(dep, 4),
+    return dict(month=str(lm), close_m=float(mc.iloc[-1]), high_m=float(mh.iloc[-1]), old_ath=old, ath_month=str(ph.index[a]), base_months=int(base), depth=round(dep, 4),
                 above_pct=round(float((mc.iloc[-1] / old - 1) * 100), 2), sma_rising=rising, long_cup=bool(base >= 36 and dep <= -0.30))
 
 

@@ -92,7 +92,7 @@ def main():
         dist.append(dict(index=name, close=last, ath=allh, below_pct=round((1 - last / allh) * 100, 2), since=str(g.index[0].date())))
         if c > old and base >= 12:
             dep = float(mc.iloc[a + 1:i].min() / old - 1) if a + 1 < i else 0.0
-            rows.append(dict(index=name, month=str(lm), close_m=c, old_ath=old, ath_month=str(ph.index[a]), base_months=int(base), depth=round(dep, 4),
+            rows.append(dict(index=name, month=str(lm), close_m=c, high_m=float(mh.iloc[i]), old_ath=old, ath_month=str(ph.index[a]), base_months=int(base), depth=round(dep, 4),
                              above_pct=round((c / old - 1) * 100, 2), sma_rising=rising, long_cup=bool(base >= 36 and dep <= -0.30), close=last,
                              since=str(g.index[0].date())))
     rows.sort(key=lambda r: (-r["long_cup"], -r["base_months"]))
