@@ -976,3 +976,5 @@ body.pub .owner-only { display: none !important; }
 .mxd.buy{background:rgba(10,122,85,.16);color:#0A7A55}
 .mxd.on{background:rgba(59,130,246,.15);color:#3B82F6}
 .mxd.watch{background:rgba(156,163,175,.2);color:var(--muted,#888)}
+.mxn{display:inline-block;min-width:18px;color:var(--muted,#888);font-weight:500;font-size:11px}
+.mxt tbody th small{margin-left:18px}

@@ -4409,8 +4409,8 @@ const MXC = [['ath', 'ATH', 'Momentum (monthly ATH system)'], ['t921', '9/21', '
 async function sysMap(mk) {
   state.sysMap = state.sysMap || {}; if (state.sysMap[mk]) return state.sysMap[mk];
   const P = MAIN + MKT[mk].path;
-  const [at, tr, vcp, ipo, gm] = await Promise.all([getJSON(P + 'ath.json', 'ath_mx_' + mk), state.data[mk] || getJSON(P + 'trend_scan.json', 'td_' + mk),
-    mk === 'NSE' ? getJSON(P + 'vcp.json', 'vcp') : null, getJSON(P + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'NSE' ? getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom') : null]);
+  const [at, tr, vcp, ipo, gm, sec] = await Promise.all([getJSON(P + 'ath.json', 'ath_mx_' + mk), state.data[mk] || getJSON(P + 'trend_scan.json', 'td_' + mk),
+    mk === 'NSE' ? getJSON(P + 'vcp.json', 'vcp') : null, getJSON(P + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'NSE' ? getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom') : null, getJSON(P + 'sectors.json', mk === 'NSE' ? 'sectors' : 'sectors_' + mk)]);
   const M = {}; const meta = {};
   const put = (sym, k, lvl, txt, r) => { M[sym] = M[sym] || {}; const o = M[sym][k]; if (!o || lvl < o.lvl) M[sym][k] = { lvl, txt }; if (r && !meta[sym]) meta[sym] = r; };
   // lvl 0 = buy / breakout now, 1 = in a trade or on the list, 2 = near / watch
@@ -4426,7 +4426,12 @@ async function sysMap(mk) {
   if (vcp) (vcp.rows || []).forEach((r) => put(r.symbol, 'vcp', 2, 'Setup', r));
   if (ipo) { (ipo.breakouts || []).filter((r) => r.status === 'open').forEach((r) => put(r.symbol, 'ipo', 0, 'Buy', r)); (ipo.near || []).forEach((r) => put(r.symbol, 'ipo', 2, 'Near', r)); }
   if (gm) (gm.picks || []).forEach((r) => put(r.symbol, 'gm', 1, '✓', r));
-  return (state.sysMap[mk] = { M, meta, cols: MXC.filter(([k]) => Object.values(M).some((o) => o[k])) });
+  // sector for every stock from sectors.json (symbol -> industry -> sector index -> tag / 6-month RS)
+  const SEC = {};
+  if (sec && sec.symbols) Object.keys(M).forEach((s) => { const ind = sec.symbols[s]; const ix = ind && sec.industries && sec.industries[ind]; const x = ix && sec.indices && sec.indices[ix];
+    if (x) SEC[s] = { tag: x.tag, rs: x.rs_6m, name: ind }; });
+  Object.keys(M).forEach((s) => { const r = meta[s] || {}; if (!SEC[s] && r.sector_tag) SEC[s] = { tag: r.sector_tag, rs: r.sector_rs, name: r.industry }; });
+  return (state.sysMap[mk] = { M, meta, SEC, cols: MXC.filter(([k]) => Object.values(M).some((o) => o[k])) });
 }
 /* "Also in" chips for a stock (used on the Week / Day / Month close lists) */
 function alsoIn(sym, skip) {
@@ -4435,19 +4440,23 @@ function alsoIn(sym, skip) {
   return ks.length ? `<span class="chip new" title="${ks.map(([k, , d]) => `${d}: ${o[k].txt}`).join(' · ')}">Also: ${ks.map(([k, n]) => `${n}${o[k].txt === '✓' ? '' : ' ' + o[k].txt.toLowerCase()}`).join(', ')}</span>` : '';
 }
 async function tdMatrix(box, mk) {
-  if (!box) return; const S = await sysMap(mk); const { M, meta } = S;
-  const rows = Object.entries(M).filter(([, o]) => Object.keys(o).length >= 2).map(([sym, o]) => ({ sym, o, n: Object.keys(o).length, buy: Object.values(o).some((x) => x.lvl === 0), r: meta[sym] || {} }));
+  if (!box) return; const S = await sysMap(mk); const { M, SEC } = S;
+  const rows = Object.entries(M).filter(([, o]) => Object.keys(o).length >= 2).map(([sym, o]) => ({ sym, o, n: Object.keys(o).length, buy: Object.values(o).some((x) => x.lvl === 0), s: SEC[sym] || {} }));
   if (!rows.length) { box.innerHTML = ''; return; }
-  rows.sort((a, b) => (b.n - a.n) || (b.buy - a.buy) || ((SEC_O[a.r.sector_tag] ?? 4) - (SEC_O[b.r.sector_tag] ?? 4)) || (a.sym < b.sym ? -1 : 1));
+  const so = (x) => SEC_O[x.s.tag] ?? 4; const rs = (x) => x.s.rs ?? -999;
+  const bySec = state.mxSort === 'sec';
+  rows.sort((a, b) => (bySec ? (so(a) - so(b)) || (rs(b) - rs(a)) || (b.n - a.n) : (b.n - a.n) || (so(a) - so(b)) || (rs(b) - rs(a))) || (b.buy - a.buy) || (a.sym < b.sym ? -1 : 1));
   const cols = S.cols.filter(([k]) => rows.some((x) => x.o[k]));
   const cell = (x) => (!x ? '<td></td>' : `<td><span class="mxd ${x.lvl === 0 ? 'buy' : x.lvl === 1 ? 'on' : 'watch'}">${x.txt}</span></td>`);
   const all = !!state.mxAll; const show = all ? rows : rows.slice(0, 12);
   box.innerHTML = `<details class="td-risk td-track" open><summary><span><b>Stocks in 2+ systems or lists <span class="pill">${rows.length}</span></b>
     <small>${esc(MKT[mk].name)} · one row per stock · tap a name for its chart</small></span></summary>
+    <div class="seg" id="mxsort" style="margin:6px 0"><button data-k="n" aria-selected="${!bySec}">Most systems first</button><button data-k="sec" aria-selected="${bySec}">Strongest sector first</button></div>
     <div class="mxwrap"><table class="mxt"><thead><tr><th>Stock</th>${cols.map(([, n, d]) => `<th title="${esc(d)}">${n}</th>`).join('')}</tr></thead>
-    <tbody>${show.map((x) => `<tr><th><a href="#" data-mxs="${esc(x.sym)}">${esc(x.sym)}</a>${x.r.sector_tag ? `<small class="mxtag ${x.r.sector_tag}">${esc(SECTOR_TXT[x.r.sector_tag] || '').replace('Sector ', '')}</small>` : ''}</th>${cols.map(([k]) => cell(x.o[k])).join('')}</tr>`).join('')}</tbody></table></div>
+    <tbody>${show.map((x, i) => `<tr><th><span class="mxn">${i + 1}</span><a href="#" data-mxs="${esc(x.sym)}">${esc(x.sym)}</a><small class="mxtag ${x.s.tag || ''}">${x.s.tag ? `${esc(x.s.tag)}${x.s.rs != null ? ` · RS ${x.s.rs > 0 ? '+' : ''}${fmt(x.s.rs, 1)}%` : ''}` : 'no sector data'}</small></th>${cols.map(([k]) => cell(x.o[k])).join('')}</tr>`).join('')}</tbody></table></div>
     ${rows.length > 12 ? `<button class="more" id="mxall">${all ? 'Show the top 12' : `Show all ${rows.length}`}</button>` : ''}
-    <p class="muted td-rs"><span class="mxd buy">Buy</span> signal now · <span class="mxd on">Open</span> the system's trade is still running · <span class="mxd on">✓</span> on the list · <span class="mxd watch">Near</span>/<span class="mxd watch">Setup</span> watch. Most lists first, then buy signals, then sector strength. Columns: ${cols.map(([, n, d]) => `${n} = ${d}`).join('; ')}. A stock in several lists was not consistently better in our tests, so this is for reading the overlap, not a ranking.</p></details>`;
+    <p class="muted td-rs"><span class="mxd buy">Buy</span> signal now · <span class="mxd on">Open</span> the system's trade is still running · <span class="mxd on">✓</span> on the list · <span class="mxd watch">Near</span>/<span class="mxd watch">Setup</span> watch. <b>Open</b> = the system bought earlier and its exit rule has not fired yet (the system's trade, not your portfolio). Sector = the stock's sector index: leading / uptrend / mixed / weak, RS = 6-month return vs ${esc(MX_BENCH[mk] || 'the index')}. Columns: ${cols.map(([, n, d]) => `${n} = ${d}`).join('; ')}. A stock in several lists was not consistently better in our tests, so this is for reading the overlap, not a ranking.</p></details>`;
+  box.querySelectorAll('#mxsort button').forEach((b) => b.addEventListener('click', () => { state.mxSort = b.dataset.k; tdMatrix(box, mk); }));
   const mb = box.querySelector('#mxall'); if (mb) mb.addEventListener('click', () => { state.mxAll = !all; tdMatrix(box, mk); });
   box.querySelectorAll('[data-mxs]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(MKT[mk].tv + a.dataset.mxs), '_blank', 'noopener'); }));
 }
