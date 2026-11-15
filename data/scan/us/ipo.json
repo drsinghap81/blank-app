@@ -1,8 +1,8 @@
 {
 "market": "US",
 "asof": "2026-11-13",
-"scan_date": "2026-11-13",
-"generated": "2026-11-13 23:33 UTC",
+"scan_date": "2026-11-14",
+"generated": "2026-11-15 00:36 UTC",
 "scanned": 1010,
 "rules": {
 "max_age_months": 36,
@@ -201,7 +201,7 @@
 "base_days": 78,
 "depth": -0.2449,
 "sma10": 62.232,
-"value_cr": 173.527,
+"value_cr": 173.5326,
 "rs_bench": "XLV",
 "stock_rs": 75.9683,
 "stock_rs_up": true,
@@ -590,7 +590,7 @@
 "sma10": 112.756,
 "value_cr": 235.5391,
 "rs_bench": "XLK",
-"stock_rs": 29.2742,
+"stock_rs": 29.2743,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "name": "Rubrik Inc. Class A Common Stock",
@@ -674,7 +674,7 @@
 "theme_rs": 12.9736,
 "td_score": 2,
 "aligned": false,
-"age_months": 6
+"age_months": 7
 },
 {
 "symbol": "DPC",
@@ -1115,7 +1115,7 @@
 "sma10": 55.954,
 "value_cr": 25.5604,
 "rs_bench": "XLK",
-"stock_rs": 62.0084,
+"stock_rs": 62.0085,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "name": "Ambiq Micro Inc. Common Stock",
@@ -1129,7 +1129,7 @@
 "theme_rs": -14.2808,
 "td_score": 1,
 "aligned": false,
-"age_months": 15
+"age_months": 16
 },
 {
 "symbol": "MIAX",
@@ -1199,7 +1199,7 @@
 "theme_rs": -14.2808,
 "td_score": 1,
 "aligned": false,
-"age_months": 13
+"age_months": 14
 },
 {
 "symbol": "RVI",
@@ -1556,13 +1556,13 @@
 "signal_date": "2025-12-10",
 "date": "2025-12-11",
 "entry": 709.4196,
-"ath": 675.3603,
+"ath": 675.3604,
 "ath_date": "2025-07-31",
 "base_days": 91,
 "depth": -0.1906,
 "status": "exited",
 "exit_date": "2026-01-12",
-"exit_price": 618.8169,
+"exit_price": 618.817,
 "close": 803.13,
 "ret": -0.1277,
 "peak": 0.6551,
