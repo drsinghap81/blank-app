@@ -58,37 +58,44 @@ def wd_closes(x, wk_dep=WK_DEP, dy_dep=DY_DEP):
     return wk, dy
 
 
-def cupclose_short(ll, cc, K, B, D):
-    """Reverse cup (15 Nov 2026): the close is BELOW the lowest low of the last K bars (signal bar excluded), that low is at least
-    B bars old, and price rallied at least D (e.g. 0.20) above it in between. Room: the next older trough below the close is at
-    least the rally height away (None = all-time low). Returns (a, rim, age, rally, support, room) or None. Watch only: shorting
-    these on F&O stocks lost money in the 2016-26 test."""
+def cupclose_short(ll, cc, K, B, D, piv=3):
+    """Support break (15 Nov 2026): support = the nearest swing low under the previous close (a low that is the lowest within +-piv
+    bars, at least B bars old, followed by a rally of at least D off it, and not closed below since). Signal: this bar CLOSES below it.
+    Returns (a, level, age, rally, next_support, room) or None. Watch only: shorting breakdowns lost money on F&O stocks in 2016-26."""
     n_ = len(ll)
-    if n_ < B + 3:
+    if n_ < B + 2 * piv + 3:
         return None
-    lo = max(0, n_ - 1 - K); win = ll[lo:n_ - 1]
-    if not np.isfinite(win).any():
+    lo = max(piv, n_ - 1 - K); best = None
+    for j in range(lo, n_ - 1 - B + 1):
+        if j + piv >= n_ - 1:
+            break
+        v = ll[j]
+        if not np.isfinite(v) or v > np.nanmin(ll[max(0, j - piv):j + piv + 1]):
+            continue
+        after = cc[j + 1:n_ - 1]
+        if not len(after) or np.nanmin(after) < v:          # already closed below: support used up
+            continue
+        rally = float(np.nanmax(after) / v - 1)
+        if rally < D:
+            continue
+        if best is None or v > best[1]:
+            best = (j, float(v), rally)
+    if best is None or not (cc[-1] < best[1]):
         return None
-    a_ = lo + int(np.nanargmin(win)); rim = float(ll[a_]); age = n_ - 1 - a_
-    if not (cc[-1] < rim and age >= B):
-        return None
-    seg = cc[a_ + 1:n_ - 1]; rally = float(np.nanmax(seg) / rim - 1) if len(seg) else 0.0
-    if rally < D:
-        return None
+    a_, lev, rally = best; age = n_ - 1 - a_
     sup = None; c_ = float(cc[-1]); below = np.flatnonzero(ll[:a_] < c_)
     if len(below):
-        j = int(below[-1]); lo_, hi_ = max(0, j - B), min(a_, j + B + 1)
-        sup = float(np.nanmin(ll[lo_:hi_]))
+        k = int(below[-1]); sup = float(np.nanmin(ll[max(0, k - B):min(a_, k + B + 1)]))
     room = (1 - sup / c_) if sup else None
-    return a_, rim, age, rally, sup, room   # room is shown, not required (support breaks rarely have room to an older low)
+    return a_, lev, age, rally, sup, room
 
 
-SH_WK_K, SH_WK_MIN, SH_WK_UP, SH_DY_K, SH_DY_MIN, SH_DY_UP = 52, 8, 0.10, 120, 10, 0.08   # support break (15 Nov 2026, Amritpal's gold chart)
+SH_WK_K, SH_WK_MIN, SH_WK_UP, SH_DY_K, SH_DY_MIN, SH_DY_UP = 104, 8, 0.10, 250, 10, 0.08   # support break (15 Nov 2026, Amritpal's gold chart)
 
 
 def wd_short(x, wk_dep=SH_WK_UP, dy_dep=SH_DY_UP):
-    """Support break (reverse cup): the week / day CLOSES below the lowest low of the last 52 weeks / 120 days (at least 8 weeks /
-    10 days old) after a rally of 10% / 8%+ off it, under a falling 30-week SMA. Watch only.
+    """Support break: the week / day CLOSES below the nearest swing low (2-year / 1-year lookback, at least 8 weeks / 10 days old,
+    10% / 8%+ rally off it, not closed below since), under a falling 30-week SMA. Watch only.
     Weekly / daily reverse-cup closes for a daily OHLC frame (Low, Close). Only when the last completed week is below a falling
     30-week SMA. Returns (week_row or None, day_row or None)."""
     x = (x[["Low", "Close"]] if "Low" in x else x[["Close"]].assign(Low=x.Close)).copy(); x["Low"] = x.Low.where(x.Low.notna(), x.Close); x = x.dropna()
@@ -103,7 +110,7 @@ def wd_short(x, wk_dep=SH_WK_UP, dy_dep=SH_DY_UP):
         return None, None
     out = []
     for kind, L, C, T, K, B, D, lc in (("WS", W.l, W.c, W.index, SH_WK_K, SH_WK_MIN, wk_dep, 26), ("DS", x.Low, x.Close, x.index, SH_DY_K, SH_DY_MIN, dy_dep, 60)):
-        r = cupclose_short(L.to_numpy(float), C.to_numpy(float), K, B, D)
+        r = cupclose_short(L.to_numpy(float), C.to_numpy(float), K, B, D, 3 if kind == "WS" else 5)
         if not r:
             out.append(None); continue
         a_, rim, age, rally, sup, room = r
