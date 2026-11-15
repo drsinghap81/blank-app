@@ -77,9 +77,10 @@ def st(e, a, b):
 rows = []; curves = {}
 for name, kw in (("55/20, 1 unit, 1% risk", dict()), ("55/20, pyramid x4, 1% per unit (Turtle)", dict(pyramid=True)), ("55/20, 1 unit, 2% risk", dict(risk=0.02)),
                  ("20/10, 1 unit, 1% risk (slide)", dict(nin=20, nout=10)), ("20/10, pyramid x4, 1% per unit", dict(nin=20, nout=10, pyramid=True)),
-                 ("55/20, 1 unit, 1%, no coins", "nocoin")):
-    if kw == "nocoin":
-        saved = keys[:]; keys[:] = [k for k in keys if not k.endswith("-USD")]; e, g = sim(); keys[:] = saved
+                 ("55/20, 1 unit, 1%, no coins", ("nocoin", dict())), ("20/10, 1 unit, 1%, no coins", ("nocoin", dict(nin=20, nout=10))),
+                 ("20/10, pyramid x4, no coins", ("nocoin", dict(nin=20, nout=10, pyramid=True))), ("Coins only, 20/10, 1 unit, 1%", ("coins", dict(nin=20, nout=10)))):
+    if isinstance(kw, tuple):
+        saved = keys[:]; keys[:] = [k for k in keys if (k.endswith("-USD")) == (kw[0] == "coins")]; e, g = sim(**kw[1]); keys[:] = saved
     else:
         e, g = sim(**kw)
     curves[name] = e
