@@ -2224,7 +2224,7 @@ async function loadATHWorld(el, mkSeg) {
     const [n, u, a, k, f] = await Promise.all([...['NSE', 'US', 'ASX', 'UK'].map((m) => (state.athC && state.athC[m] && state.athC[m].d) || getJSON(MAIN + MKT[m].path + 'ath.json', m === 'NSE' ? 'ath' : 'ath_' + m)),
       state.fund || getJSON(MAIN + 'data/scan/funds.json', 'funds')]);
     if (!state.fund) state.fund = f;
-    state.mcAll = { NSE: n, US: u, ASX: a, UK: k };
+    state.mcAll = { NSE: n, US: u, ASX: a, UK: k, IDX: await getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose').catch(() => null) };
   }
   state.athW = state.athW || { tab: 'all', q: '', all: true, d: {} }; state.ath = state.athW;
   const g = (state.worldMC || [])[0]; state.athWAt = state.athWAt || new Date();
@@ -2268,6 +2268,15 @@ function tvOf(key, sym) {
   }
   return key;
 }
+/* NSE index name -> TradingView symbol (common ones; others: NSE: + name with underscores) */
+const NSE_IDX_TV = { 'NIFTY 50': 'NIFTY', 'NIFTY BANK': 'BANKNIFTY', 'NIFTY IT': 'CNXIT', 'NIFTY AUTO': 'CNXAUTO', 'NIFTY PHARMA': 'CNXPHARMA', 'NIFTY FMCG': 'CNXFMCG',
+  'NIFTY METAL': 'CNXMETAL', 'NIFTY REALTY': 'CNXREALTY', 'NIFTY ENERGY': 'CNXENERGY', 'NIFTY MEDIA': 'CNXMEDIA', 'NIFTY PSU BANK': 'CNXPSUBANK', 'NIFTY INFRA': 'CNXINFRA',
+  'NIFTY INFRASTRUCTURE': 'CNXINFRA', 'NIFTY FIN SERVICE': 'CNXFINANCE', 'NIFTY FINANCIAL SERVICES': 'CNXFINANCE', 'NIFTY MIDCAP 100': 'CNXMIDCAP', 'NIFTY SMALLCAP 100': 'CNXSMALLCAP',
+  'NIFTY 500': 'CNX500', 'NIFTY 100': 'CNX100', 'NIFTY 200': 'CNX200', 'NIFTY NEXT 50': 'NIFTYJR', 'NIFTY PSE': 'CNXPSE', 'NIFTY CONSUMPTION': 'CNXCONSUMPTION',
+  'NIFTY INDIA CONSUMPTION': 'CNXCONSUMPTION', 'NIFTY COMMODITIES': 'CNXCOMMODITIES', 'NIFTY MNC': 'CNXMNC', 'NIFTY SERV SECTOR': 'CNXSERVICE', 'NIFTY SERVICES SECTOR': 'CNXSERVICE',
+  'NIFTY PVT BANK': 'NIFTYPVTBANK', 'NIFTY PRIVATE BANK': 'NIFTYPVTBANK', 'NIFTY MIDCAP 150': 'NIFTYMIDCAP150', 'NIFTY SMALLCAP 250': 'NIFTYSMLCAP250', 'NIFTY SMLCAP 250': 'NIFTYSMLCAP250',
+  'NIFTY MIDCAP 50': 'NIFTYMIDCAP50', 'NIFTY HEALTHCARE INDEX': 'NIFTY_HEALTHCARE', 'NIFTY OIL & GAS': 'NIFTY_OIL_AND_GAS', 'NIFTY CPSE': 'CPSE', 'INDIA VIX': 'INDIAVIX' };
+const nseIdxTv = (n) => 'NSE:' + (NSE_IDX_TV[n] || n.replace(/&/g, 'AND').replace(/[^A-Z0-9]+/g, '_'));
 const tvOpen = (key, sym) => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvOf(key, sym)), '_blank', 'noopener');
 async function loadATH() {
   $('#title').textContent = 'Monthly ATH';
@@ -3044,6 +3053,7 @@ function allMcRows() {
   [['NSE', 'India stocks', 'NSE:'], ['US', 'US stocks', ''], ['ASX', 'Australia stocks', 'ASX:'], ['UK', 'UK stocks', 'LSE:']].forEach(([m, g, tv]) => {
     ((S[m] && S[m].month_close) || []).forEach((r) => out.push({ g, sym: r.symbol, name: r.name, a: r, cur: MKT[m].cur, close: r.close, tv: tv + r.symbol }));
   });
+  ((S.IDX && S.IDX.rows) || []).forEach((r) => out.push({ g: 'India indices', sym: r.index, name: `data from ${String(r.since).slice(0, 4)}`, a: r, cur: '', close: r.close, tv: nseIdxTv(r.index) }));
   const FM = { IN: ['India ETFs & funds', 'NSE:', '₹'], US: ['US ETFs', '', '$'], AU: ['Australia ETFs', 'ASX:', 'A$'], UK: ['UK & Europe ETFs', '', ''] };
   ((state.fund && state.fund.rows) || []).filter((r) => r.mclose).forEach((r) => {
     const [g, tv, cur] = FM[r.market || 'IN'] || ['ETFs', '', '']; const s = r.symbol || r.key;

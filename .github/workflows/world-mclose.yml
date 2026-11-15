@@ -11,6 +11,7 @@ on:
     paths: ["tools/world_mclose.py", ".github/workflows/world-mclose.yml"]
 permissions:
   contents: write
+concurrency: {group: world-mclose, cancel-in-progress: true}
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -36,4 +37,4 @@ jobs:
           git add data/scan/world/${{ matrix.market }}.json || exit 0
           git diff --cached --quiet && exit 0
           git commit -qm "World month-close ${{ matrix.market }} $(date -u +%F)"
-          for i in 1 2 3 4 5 6 7 8; do git pull -q --rebase origin main && git push -q && break; sleep $((i*9)); done
+          for i in 1 2 3 4 5 6 7 8; do git pull -q --rebase -X theirs origin main && git push -q && break; git rebase --abort 2>/dev/null; sleep $((i*9)); done

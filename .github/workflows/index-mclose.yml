@@ -1,0 +1,26 @@
+name: index-mclose
+# NSE indices: month-close above the all-time high (tools/index_mclose.py -> data/scan/index_mclose.json, cache index_hl.csv.gz)
+on:
+  schedule:
+    - cron: "10 16 * * 1-5"   # 21:40 IST trading days
+  workflow_dispatch:
+  push:
+    paths: ["tools/index_mclose.py", ".github/workflows/index-mclose.yml"]
+permissions:
+  contents: write
+concurrency: {group: index-mclose, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas requests && python tools/index_mclose.py 85
+      - run: |
+          git config user.name "index bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/scan/index_mclose.json data/scan/index_hl.csv.gz data/scan/index_hl.csv.gz.empty 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -qm "Index month-close $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase -X theirs origin main && git push -q && break; git rebase --abort 2>/dev/null; sleep $((i*7)); done
