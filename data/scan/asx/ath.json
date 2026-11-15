@@ -2,7 +2,7 @@
 "market": "ASX",
 "asof": "2026-11-13",
 "scan_date": "2026-11-15",
-"generated": "2026-11-15 02:33 UTC",
+"generated": "2026-11-15 02:51 UTC",
 "scanned": 47,
 "rules": {
 "base_main": 24,
@@ -832,33 +832,5 @@
 "aligned": true
 }
 ],
-"month_close": [
-{
-"symbol": "CPU",
-"month": "2026-10",
-"close_m": 43.24,
-"old_ath": 42.15,
-"ath_month": "2025-07",
-"above_pct": 2.586,
-"base_months": 15,
-"depth": -0.3265,
-"high_m": 43.36,
-"wick_trigger": 42.275,
-"long_cup": false,
-"main": false,
-"sma30": 37.56,
-"sma_rising": true,
-"close": 44.73,
-"since_pct": 3.4459,
-"value_cr": 57.3785,
-"rs_bench": "^AXNJ",
-"stock_rs": 25.2461,
-"stock_rs_up": true,
-"stock_rs_days": 250,
-"name": "COMPUTERSHARE LIMITED.",
-"size": "Large",
-"industry": "Commercial & Professional Services",
-"sector_tag": "leading"
-}
-]
+"month_close": []
 }
