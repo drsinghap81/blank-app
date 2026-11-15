@@ -75,17 +75,21 @@ def st(e, a, b):
     e = e[(e.index >= a) & (e.index <= b)]; y = (e.index[-1] - e.index[0]).days / 365.25
     return round(((e.iloc[-1] / e.iloc[0]) ** (1 / y) - 1) * 100, 1), round((e / e.cummax() - 1).min() * 100, 1)
 rows = []; curves = {}
-for name, kw in (("55/20, 1 unit, 1% risk", dict()), ("55/20, pyramid x4, 1% per unit (Turtle)", dict(pyramid=True)), ("55/20, 1 unit, 2% risk", dict(risk=0.02)),
-                 ("20/10, 1 unit, 1% risk (slide)", dict(nin=20, nout=10)), ("20/10, pyramid x4, 1% per unit", dict(nin=20, nout=10, pyramid=True)),
-                 ("55/20, 1 unit, 1%, no coins", ("nocoin", dict())), ("20/10, 1 unit, 1%, no coins", ("nocoin", dict(nin=20, nout=10))),
-                 ("20/10, pyramid x4, no coins", ("nocoin", dict(nin=20, nout=10, pyramid=True))), ("Coins only, 20/10, 1 unit, 1%", ("coins", dict(nin=20, nout=10)))):
+CASES = [("20/10, 1 unit, 1%", dict(nin=20, nout=10))]
+for r_ in (0.004, 0.005, 0.006, 0.007):
+    CASES.append((f"20/10, pyramid x4, {r_*100:.1f}% per unit", dict(nin=20, nout=10, pyramid=True, risk=r_)))
+CASES += [("20/10, 1 unit, 1%, no coins", ("nocoin", dict(nin=20, nout=10)))]
+for r_ in (0.004, 0.006):
+    CASES.append((f"20/10, pyramid x4, {r_*100:.1f}%, no coins", ("nocoin", dict(nin=20, nout=10, pyramid=True, risk=r_))))
+CASES += [("20/10, 1 unit, 0.6%", dict(nin=20, nout=10, risk=0.006))]
+for name, kw in CASES:
     if isinstance(kw, tuple):
         saved = keys[:]; keys[:] = [k for k in keys if (k.endswith("-USD")) == (kw[0] == "coins")]; e, g = sim(**kw[1]); keys[:] = saved
     else:
         e, g = sim(**kw)
     curves[name] = e
     c, dd = st(e, "2010-01-01", "2030"); c17, dd17 = st(e, "2017-01-01", "2030"); c22, _ = st(e, "2022-01-01", "2030")
-    rows.append(dict(name=name, cagr_2010=c, dd_2010=dd, cagr_2017=c17, dd_2017=dd17, cagr_2022=c22, gross_avg=round(g.mean() * 100), gross_max=round(g.max() * 100)))
+    rows.append(dict(name=name, cagr_2010=c, dd_2010=dd, ratio=round(c / -dd, 2), cagr_2017=c17, dd_2017=dd17, cagr_2022=c22, gross_avg=round(g.mean() * 100), gross_max=round(g.max() * 100)))
 pd.set_option("display.width", 220)
 print(pd.DataFrame(rows).set_index("name").to_string())
 y = pd.DataFrame({k: v.resample("YE").last().pct_change() * 100 for k, v in curves.items()}).round(1); y.index = y.index.year
