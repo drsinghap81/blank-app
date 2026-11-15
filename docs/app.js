@@ -4849,20 +4849,20 @@ async function tdRender2(el) {
       : '<p class="t2-empty">No sells today. Nothing you hold has an exit signal.</p>'}</div>
     ${bothRows.length ? `<div class="t2-strip"><b>In both: a live system and a close list</b><span>${bothRows.map((r) => `${esc(r.name || r.symbol)} (${bkOf(r) === 'mom' ? 'Momentum' : '9/21'} + ${closeK(r.symbol).map((k) => ({ mo: 'month close', wk: 'week cup close', dy: 'day cup close' })[k]).join(' + ')})`).join(' · ')}. Trade them with the live system's own entry, stop and exit.</span></div>` : ''}
     <section class="t2-sec inv"><div class="t2-band"><span><b>Investment</b><small>ETFs, mutual funds, indices · hold for years</small></span><em>Monthly charts</em></div>
-      ${invFirst.length ? `<div class="t2-lbl"><b>Watch first · month closed above its all-time high</b><small>see only · no tested system yet</small></div>${invFirst.map(invCard).join('')}` : ''}
-      <div class="t2-lbl"><b>Watch</b><small>monthly charts</small></div>${t2Watch(invRows)}${mk === 'US' ? '<div id="tdpies"></div>' : ''}</section>
+      ${invFirst.length ? `<div class="t2-lbl"><b>Watch first · month closed above its all-time high</b><small>see only · no tested system yet</small></div><div class="t2-hs">${invFirst.map(invCard).join('')}</div>` : ''}
+      <details class="t2-more t2-wd"><summary>Watch lists (${invRows.length}) · monthly charts</summary>${t2Watch(invRows)}</details>${mk === 'US' ? '<div id="tdpies"></div>' : ''}</section>
     <section class="t2-sec mom"><div class="t2-band"><span><b>Momentum investing</b><small>Stocks, single commodities and coins at all-time highs</small></span><em>Monthly charts</em></div>
       <div class="t2-lbl"><b>Act on · Monthly ATH system</b><small>21.5%/yr · worst −20% (2017–26, 1% risk)</small></div>
       <div class="t2-list">${topM.map((r) => card(r, idxOf(r))).join('') || '<p class="t2-empty">No new Momentum buy today. Waiting is part of the system.</p>'}</div>
       ${restM.length ? `<details class="t2-more"><summary>${restM.length} more Momentum setups (weaker rank)</summary><div class="t2-list">${restM.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
       ${knowHeld && adds.length ? `<div class="t2-lbl"><b>Add to winners you hold</b><small>dip to the 30-week average held</small></div><div class="t2-adds">${adds.map((r) => `<span>${esc(r.symbol)} <b>&gt; ${Mz(r.add_level, 2)}</b></span>`).join('')}</div>` : ''}
-      <div class="t2-lbl"><b>Watch</b><small>monthly charts, no action</small></div>${t2Watch(momRows)}</section>
+      <details class="t2-more t2-wd"><summary>Watch lists (${momRows.length}) · monthly charts</summary>${t2Watch(momRows)}</details></section>
     <section class="t2-sec trd"><div class="t2-band"><span><b>Trading</b><small>Swing trades held days to weeks</small></span><em>Weekly + daily charts</em></div>
       <div class="t2-lbl"><b>Act on · Trend 9/21 system</b><small>24.2%/yr · worst −31% (2017–26)</small></div>
       <div class="t2-list">${topT.map((r) => card(r, idxOf(r))).join('') || '<p class="t2-empty">No new 9/21 buy today.</p>'}</div>
       ${restT.length ? `<details class="t2-more"><summary>${restT.length} more 9/21 setups</summary><div class="t2-list">${restT.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
-      ${wdCards.length ? `<div class="t2-lbl"><b>Watch · week and day cup closes</b><small>see only · in a live system first</small></div>${wdCards.map(wdCard).join('')}` : ''}
-      <div class="t2-lbl"><b>Watch</b><small>weekly and daily charts, no action</small></div>${t2Watch(trdRows)}${mk === 'US' ? '<div id="tdrsi2"></div>' : ''}</section>
+      ${wdCards.length ? `<div class="t2-lbl"><b>Watch · week and day cup closes</b><small>see only · in a live system first</small></div><div class="t2-hs">${wdCards.map(wdCard).join('')}</div>` : ''}
+      <details class="t2-more t2-wd"><summary>Watch lists (${trdRows.length}) · weekly and daily charts</summary>${t2Watch(trdRows)}</details>${mk === 'US' ? '<div id="tdrsi2"></div>' : ''}</section>
     <div id="tdmx"></div>
     ${(P.missed || []).length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${P.missed.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${P.missed.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}

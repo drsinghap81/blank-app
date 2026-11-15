@@ -1058,3 +1058,9 @@ body.pub .owner-only { display: none !important; }
 .t2-td:not(:last-child)::after{content:'›';position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.5;z-index:1}
 @media (max-width:420px){.t2-tdr{grid-template-columns:repeat(2,1fr)}.t2-td:nth-child(2)::after{content:''}}
 .t2-wcard[role=button]{cursor:pointer}
+
+/* 15 Nov 2026: signals swipe sideways instead of stacking (phones); the cut-off next card shows there is more */
+.t2-list,.t2-hs{display:flex;flex-direction:row;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:6px;scrollbar-width:thin}
+.t2-list>.t2-card,.t2-hs>.t2-wcard{flex:0 0 min(84%,340px);scroll-snap-align:start;margin-bottom:0}
+.t2-list>.t2-empty{flex:1}
+@media (min-width:900px){.t2-list,.t2-hs{flex-wrap:wrap;overflow-x:visible}.t2-list>.t2-card,.t2-hs>.t2-wcard{flex:0 0 calc(50% - 5px)}}
