@@ -1047,8 +1047,14 @@ async function loadLive() {
       ${S && pend.length ? '<p class="lv-sub"><span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</details>
-    ${swCard('my')}${swCard('tf')}${swCard('vcp')}${swCard('t9')}${swCard('rt')}${swCard('pt')}<div id="wccard"></div>
-    ${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}
+    ${swCard('my')}${swCard('tf')}${['vcp', 't9', 'rt', 'pt'].filter((b) => (alN[b] ?? 0) > 0).map(swCard).join('')}<div id="wccard"></div>
+    ${(() => { /* 15 Nov 2026 consolidation: buckets switched off in your split and the month-close watch are watch lists that live on
+       Trading / Momentum investing; here they stay folded in one place so Send still works if you pick one. */
+      const offB = ['vcp', 't9', 'rt', 'pt'].filter((b) => !((alN[b] ?? 0) > 0)); const inner = offB.map(swCard).join('');
+      const n = offB.reduce((a2, b) => a2 + rows.filter((r) => r.tier === 'swing' && bkOf(r) === b).length, 0);
+      return inner || watch ? `<details class="lv-card lv-offgrp"><summary class="bk-sum"><b>Outside your split · watch lists</b><span class="muted">${n} setups${watch ? ' · month-close watch' : ''}</span></summary>
+        <p class="lv-sub">Not part of your tested 60/40 split. The same lists live on Trading (VCP, 9/21 any stock, retest, patterns) and Momentum investing (near trigger); they stay here only so you can still Send one if you choose.</p>
+        ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}`)}
     ${S && isOwner() ? pane('fut', '<div id="tbcard"></div><div id="tbcardn"></div>') : ''}
@@ -1534,7 +1540,7 @@ function renderTrends() {
   $('#summary').innerHTML = `
     <div class="stat new"><b>${buys}</b><span>to buy at next open</span></div>
     <div class="stat"><b>${L.open.length - exits}</b><span>signals still running</span></div>
-    <div class="stat exit"><b>${exits}</b><span>to sell at next open</span></div>
+    <div class="stat exit"><b>${exits}</b><span>system exits at next open (not your holdings)</span></div>
     <div class="stat"><b>${L.trend.length}</b><span>clear trends</span></div>`;
   const note = $('#mktnote');
   const warn = { UK: '<b>Watch only.</b> UK (FTSE 350) is not backtested yet: use the list for ideas only. Prices are in pence (GBX).', US: '<b>Watch only.</b> Tested 2017–2026 on US stocks this system made about 4% a year against 15% for the S&P 500, and no liquidity or price filter fixed it. Use the US list for ideas, not as a trading system.',
@@ -2321,7 +2327,7 @@ async function loadATH() {
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
       <div class="stat"><b>${nearMain}</b><span>within 5% of the trigger</span></div>
       <div class="stat"><b>${open}</b><span>signals still running</span></div>
-      <div class="stat exit"><b>${exits}</b><span>to sell at next open</span></div></section>
+      <div class="stat exit"><b>${exits}</b><span>system exits at next open (not your holdings)</span></div></section>
     <div class="card">
       <div class="seg" role="tablist">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n} ${c}</button>`).join('')}</div>
       <details class="info"><summary>How this list works</summary><p>${mk !== 'NSE' ? NOTE_G[state.ath.tab] || '' : { td: 'Top-down: world → India → sectors → themes → stocks. Score 0–3 = sector RS > 0, best theme RS > 0, stock RS > 0. Aligned (sector and stock RS both positive) ATH breakouts won 54% and averaged +29% vs 48% / +15% (2017–26). World and Nifty trend did not help, so they are context only; IPO cups showed no clear lift. A guide for confidence and size, not a filter.',
