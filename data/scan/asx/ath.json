@@ -2,7 +2,7 @@
 "market": "ASX",
 "asof": "2026-11-13",
 "scan_date": "2026-11-15",
-"generated": "2026-11-15 04:46 UTC",
+"generated": "2026-11-15 05:10 UTC",
 "scanned": 47,
 "rules": {
 "base_main": 24,
@@ -852,6 +852,7 @@
 "sma_rising": true,
 "close": 5.4,
 "value_cr": 39.0496,
+"first": "2014-11-25",
 "low_price": true,
 "rs_bench": "^AXFJ",
 "stock_rs": 2.0344,
