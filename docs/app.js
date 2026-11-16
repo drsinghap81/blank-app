@@ -3972,7 +3972,7 @@ async function tlCard(anchor, mk) {
     const L = (T.items || []).filter((x) => x.mk === mk);
     if (!NR.length && !L.length && !srv) { el.innerHTML = ''; return; }
     const sum = NR.length ? `${NR.length} near their line: ${NR.slice(0, 4).map((r) => esc(r.symbol)).join(', ')}${NR.length > 4 ? '…' : ''}` : 'none near their line today';
-    const nrRow = (r) => { const cc = r.mk === 'NSE' ? '₹' : ''; const v = (x) => cc + fmt(x, x > 999 ? 0 : 1, 'en-IN');
+    const nrRow = (r) => { const cc = r.mk === 'NSE' && r.kind !== 'index' ? '₹' : ''; const v = (x) => cc + fmt(x, x > 999 ? 0 : 1, 'en-IN');
       return `<div class="tl-nr" role="button" tabindex="0" data-n="${NR.indexOf(r)}"><b>${esc(r.symbol)}</b>${r.kind === 'index' ? ' <span class="chip muted">index</span>' : ''}<span>line ${v(r.line_next)} · ${r.dist >= 0 ? '+' : ''}${fmt(r.dist, 1)}% · next = ${({ 3: '3rd' })[r.touches + 1] || (r.touches + 1) + 'th'} touch</span><em>chart ›</em></div>`; };
     el.innerHTML = `<details class="t2-more t2-wd tl-box"${open ? ' open' : ''}><summary>📈 <b>Trend lines:</b> ${sum}</summary>
       <div class="cd-box">${NR.length ? `<div class="cd-row"><div class="cd-h"><b>Within 3% of the line</b></div><div class="lv-sub muted">${esc(String(S.scanned || ''))} stocks and indices scanned ${esc((S.generated || '').slice(0, 10))}. Phone alert when one comes within 1% of its line.</div>${NR.map(nrRow).join('')}</div>` : ''}
@@ -3997,7 +3997,7 @@ async function tlCard(anchor, mk) {
 }
 /* 17 Nov 2026: tap a trend line row -> daily candles with the line through the 2 latest swing lows */
 async function tlChart(r, getBars) {
-  const cur = r.mk === 'US' ? '$' : r.mk === 'NSE' ? '₹' : ''; const M = (v) => cur + fmt(v, v > 999 ? 0 : 2, r.mk === 'US' ? 'en-US' : 'en-IN');
+  const cur = r.kind === 'index' ? '' : r.mk === 'US' ? '$' : r.mk === 'NSE' ? '₹' : ''; const M = (v) => cur + fmt(v, v > 999 ? 0 : 2, r.mk === 'US' ? 'en-US' : 'en-IN');
   const dd = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   const lineNow = r.line_next != null ? r.line_next : r.line;
   $('#sheet-body').innerHTML = `<div class="tdc-h"><div class="t2-sh"><b>${esc(r.symbol)}</b><span>Trend line through the 2 latest swing lows</span></div><b class="tdc-px" id="tdcpx"></b></div>
