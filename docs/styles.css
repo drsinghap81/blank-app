@@ -1093,3 +1093,6 @@ body.pub .owner-only { display: none !important; }
 .us-raise .td-card{box-sizing:border-box;width:100%;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
 .us-raise .td-nm{min-width:0}
 .us-raise .td-nm small{white-space:normal}
+
+/* 16 Nov 2026: beginner Today, other markets */
+.bgo-idea{box-sizing:border-box;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;margin:6px 0}

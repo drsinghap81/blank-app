@@ -4601,6 +4601,30 @@ function bgSentence(r, s) {
 }
 
 async function bgToday(el) { return tdRender(el, true); }
+/* 16 Nov 2026: beginner Today for the other markets. These lists are ideas only (no tested edge outside India), so the
+   page is short: market switch, date/clock, your US stops to move and US holdings, then the top ideas with charts. */
+async function bgOther(el, mk) {
+  el.innerHTML = '<p class="muted pad">Loading today…</p>';
+  const P = await getJSON(MAIN + MKT[mk].path + 'trade_plan.json', 'tp_' + mk).catch(() => null);
+  const seg = `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
+  const clk = mktClock(mk); const M = (v) => (MKT[mk].pence ? `${fmt(v, 0, 'en-GB')}p` : `${MKT[mk].cur}${fmt(v, 2, MKT[mk].loc)}`);
+  const ideas = P ? (P.top || []).concat(P.swing || []).filter((r, i, a) => a.findIndex((x) => x.symbol === r.symbol) === i).slice(0, 8) : [];
+  state._tdRows = ideas; state._tdMkNow = mk;
+  if (P) $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)}`;
+  el.innerHTML = `<div class="td-wrap t2">
+    <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
+      <div class="t2-date"><div><b>${esc(clk.dayNum)}</b><span>${esc(clk.month)}</span></div>
+        <div class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small><b>${clk.txt}</b><small>${esc(clk.at)} · ${esc(clk.local)} your time</small></div></div>
+      <div id="bgostops"></div></div>
+    ${mk === 'US' ? '<div id="bgous"></div>' : ''}
+    <section class="t2-sec"><div class="t2-band"><span><b>Ideas</b><small>${esc(MKT[mk].name)} · close ${P ? day(P.asof) : '–'}</small></span></div>
+      <div class="status exit watch" style="margin:6px 0"><b>Ideas only, not a tested system here.</b> ${WATCH[mk] || ''}</div>
+      ${ideas.length ? ideas.map((r, i) => `<button class="td-card bgo-idea" data-i="${i}"><span class="td-av" style="background:var(--accent)">${esc(r.symbol.slice(0, 2))}</span><span class="td-nm"><b>${esc(r.symbol)}</b><small>${esc((r.name || '').slice(0, 40))} · ${M(r.trigger || r.price)}</small></span></button>`).join('') : '<p class="empty">No ideas from the last scan.</p>'}
+    </section></div>`;
+  el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender(el, true); }));
+  el.querySelectorAll('.bgo-idea').forEach((b) => b.addEventListener('click', () => tdChart(ideas[+b.dataset.i], mk)));
+  if (mk === 'US') { usStopsToday($('#bgostops')); pfUS($('#bgous')); }
+}
 const T2_COL = ['#7C8CFF', '#2BB3A3', '#F2A93B', '#F472B6', '#38BDF8', '#A78BFA', '#FB923C', '#84CC16'];
 function t2Row(o) {
   const h = [...o.sym].reduce((a, c) => a + c.charCodeAt(0), 0); const ini = o.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -5313,10 +5337,11 @@ async function tdRender2(el) {
 }
 
 async function tdRender(el, beginner) {
+  if (beginner && tdMk() !== 'NSE') return bgOther(el, tdMk());   // 16 Nov 2026: beginner Today for US / Australia / UK
   const mk = beginner ? 'NSE' : tdMk(); const MP = MAIN + MKT[mk].path; const tag = mk === 'NSE' ? '' : '_' + mk;
   el.innerHTML = '<p class="muted pad">Loading today…</p>';
   const P = await getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk); const A = state['_athN' + tag] ? { scanned: state['_athN' + tag] } : null;   // 11 Nov 2026: ath.json (316 KB) no longer blocks Today
-  const seg = beginner ? '' : `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
+  const seg = `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
   const wire = () => el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender(el, beginner); }));
   if (!P) { el.innerHTML = `<div class="td-wrap">${seg}<p class="empty">Today's setups appear after the evening scan.</p></div>`; wire(); return; }
   $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)}`;
