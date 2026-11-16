@@ -730,3 +730,30 @@ def test_history(tmp_path):
     j = c.get("/api/history?mk=NSE&syms=TCS,^NSEI&rng=1y", headers=h).json()
     assert j["TCS"]["c"] == [100.0, 101.5] and seen[0].endswith("/TCS.NS") and seen[1].endswith("/^NSEI")
     assert c.get("/api/history?rng=10y", headers=h).status_code == 400
+
+
+def test_trend_line(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    # zig-zag: swing lows 100 (bar 10) and 110 (bar 30) -> line +0.5 a bar; price runs well above, then dips to the line
+    lows = [120 - i for i in range(10)] + [100] + [101 + i for i in range(10)] + [110 + 9 - i for i in range(9)] + [110] + [111 + 2 * i for i in range(15)]
+    lows += [128, 127]                                   # today = bar 47: line 110 + 0.5 * 17 = 118.5
+    lows[-1] = 118.2
+    n = len(lows); t0 = 1760000000
+    class R:
+        def raise_for_status(self): pass
+        def json(self):
+            return {"chart": {"result": [{"timestamp": [t0 + 86400 * i for i in range(n)], "indicators": {"quote": [{
+                "high": [x + 6 for x in lows], "low": lows, "close": [x + 4 for x in lows[:-1]] + [121.0]}]}}]}}
+    A.requests.get = lambda url, **k: R()
+    t, hi, lo, cl = A.yohlc("KOTAKBANK", "NSE")
+    L = A.tl_line(t, hi, lo, cl)
+    assert L["b_l"] == 110 and L["a_l"] == 100 and L["rising"] and abs(L["line"] - 118.5) < 0.01 and L["armed"] and L["touches"] == 2
+    A.tl_check("NSE")
+    al = A.alerts_load()["items"]
+    assert len(al) == 1 and "3rd touch" in al[0]["text"] and al[0]["mk"] == "NSE"
+    A.tl_check("NSE"); assert len(A.alerts_load()["items"]) == 1          # once a day
+    j = c.post("/api/tl", json={"symbol": "tcs", "mk": "NSE"}, headers=h).json(); assert j["ok"] and j["item"]["symbol"] == "TCS"
+    assert {x["symbol"] for x in c.get("/api/tl", headers=h).json()["items"]} == {"KOTAKBANK", "TCS"}
+    c.post("/api/tl", json={"symbol": "TCS", "remove": True}, headers=h)
+    assert [x["symbol"] for x in c.get("/api/tl", headers=h).json()["items"]] == ["KOTAKBANK"]

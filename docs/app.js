@@ -3956,6 +3956,35 @@ async function condorCard(box, mk) {
       <div class="lv-sub"><b>Sell ${f(r.short_call)} CE + ${f(r.short_put)} PE</b></div><div class="lv-sub"><b>Buy ${f(r.long_call)} CE + ${f(r.long_put)} PE</b></div>
       <div class="lv-sub muted">Expiry ${esc(r.expiry_day)} · hold to expiry</div></div>`).join('')}</div></details>`;
 }
+/* 17 Nov 2026: trend line alerts. Line through the 2 latest swing lows (your server checks every 10 min in market hours):
+   phone alert on the 3rd (4th ...) touch and on a close below. Watch only, not a tested buy signal. */
+async function tlCard(anchor, mk) {
+  const c = lvCfg(); if (!anchor || !c.url || !c.token || (mk !== 'NSE' && mk !== 'US')) return;
+  const old = anchor.parentNode && anchor.parentNode.querySelector('.tl-wrap'); if (old) old.remove();
+  const el = document.createElement('div'); el.className = 'tl-wrap'; anchor.after(el);
+  const cur = mk === 'US' ? '$' : '₹'; const m = (v) => cur + fmt(v, mk === 'US' ? 2 : 1, mk === 'US' ? 'en-US' : 'en-IN');
+  const dd = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const draw = async (open) => {
+    let T; try { T = await lvApi('/api/tl', { timeout: 30000 }); } catch (e) { el.innerHTML = ''; return; }
+    const L = (T.items || []).filter((x) => x.mk === mk);
+    const near = L.filter((x) => x.rising && x.dist != null && x.dist <= 2);
+    const sum = L.length ? L.map((x) => `${esc(x.symbol)} ${x.dist != null ? (x.dist >= 0 ? '+' : '') + fmt(x.dist, 1) + '%' : '–'}`).join(' · ') : 'none yet';
+    el.innerHTML = `<details class="t2-more t2-wd tl-box"${open ? ' open' : ''}><summary>📈 <b>Trend line alerts${near.length ? ` · ${near.length} near the line` : ''}:</b> ${sum}</summary>
+      <div class="cd-box">${L.map((x) => `<div class="cd-row"><div class="cd-h"><b>${esc(x.symbol)}</b>${x.error ? ' <span class="chip muted">no data</span>' : x.rising ? (x.below ? ' <span class="chip down">broken</span>' : x.dist <= 2 ? ' <span class="chip up">near the line</span>' : '') : ' <span class="chip muted">line falling · no alerts</span>'}
+          <button class="lv-link tl-x" data-x="${esc(x.symbol)}" aria-label="Remove">✕</button></div>
+        ${x.error ? '' : `<div class="lv-sub"><b>Line today ${m(x.line)}</b> · close ${m(x.close)} (${x.dist >= 0 ? '+' : ''}${fmt(x.dist, 1)}%)</div>
+        <div class="lv-sub muted">Swing lows ${dd(x.a_d)} ${m(x.a_l)} → ${dd(x.b_d)} ${m(x.b_l)} · ${x.touches > 2 ? `touched ${x.touches - 2}× since` : 'next touch = 3rd'}</div>`}</div>`).join('')}
+        <div class="cd-row"><div class="tl-add"><input id="tlsym" placeholder="${mk === 'US' ? 'e.g. AAPL' : 'e.g. KOTAKBANK'}" autocapitalize="characters" autocomplete="off"><button class="bg-ghost sm" id="tladd">Add</button></div>
+        <div class="lv-sub muted">Phone alert when price comes back to the line (3rd touch) and when a day closes below it. Watch only: not a tested buy signal.</div><div class="lv-sub" id="tlmsg"></div></div></div></details>`;
+    el.querySelectorAll('.tl-x').forEach((b) => b.addEventListener('click', async (e) => { e.preventDefault();
+      try { await lvApi('/api/tl', { method: 'POST', body: JSON.stringify({ symbol: b.dataset.x, mk, remove: true }) }); } catch (er) { /* */ } draw(true); }));
+    const add = async () => { const v = (el.querySelector('#tlsym').value || '').trim().toUpperCase(); if (!v) return; const msg = el.querySelector('#tlmsg'); msg.textContent = 'Adding…';
+      try { await lvApi('/api/tl', { method: 'POST', timeout: 30000, body: JSON.stringify({ symbol: v, mk }) }); draw(true); } catch (er) { msg.textContent = er.message; } };
+    el.querySelector('#tladd').addEventListener('click', add);
+    el.querySelector('#tlsym').addEventListener('keydown', (e) => { if (e.key === 'Enter') add(); });
+  };
+  draw(false);
+}
 /* Today (US): one line when stops were raised at the last check -> Live › US */
 async function usStopsToday(anchor) {
   /* same cards as India's "Stop raised to ₹…" (beginner Today): stops raised in the last 7 days, to set in moomoo */
@@ -5404,6 +5433,7 @@ async function tdRender2(el) {
   el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); }));
   alCard($('#tdal'), mk);
   condorCard($('#t2condor'), mk);
+  tlCard($('#t2condor'), mk);
   if (mk === 'US') usStopsToday($('#t2condor'));
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   el.querySelectorAll('.t2-tile[data-go]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.go); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('t2-flash'); setTimeout(() => t.classList.remove('t2-flash'), 1400); } }));
@@ -5480,7 +5510,7 @@ async function tdRender(el, beginner) {
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (mk === 'US') usStopsToday($('#tdmini'));
   alCard($('#tdal'), mk);
-  if (beginner) { bgActTiles($('#bgact'), P, rows); condorCard($('#t2condor'), 'NSE'); }
+  if (beginner) { bgActTiles($('#bgact'), P, rows); condorCard($('#t2condor'), 'NSE'); tlCard($('#t2condor'), 'NSE'); }
   tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } if (mk === 'NSE') tdGrowthMom($('#tdgm')); tdMatrix($('#tdmx'), mk); tdHeat($('#tdheat'), mk);
 }
 /* Heating up (11 Nov 2026): industries whose 1-week pulse jumped well above last month's. Information only: strength by

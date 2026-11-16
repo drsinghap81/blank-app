@@ -2136,6 +2136,125 @@ def condor_alerts():
         alert("setup", x["key"], txt, key=f"condor:{x['key']}:{x.get('date')}", mk="US" if x.get("market") == "US" else "NSE")
 
 
+# ------------------------------------------------------------------ trend line alerts (17 Nov 2026)
+# Line through the 2 latest major swing lows (lowest low with 5 days each side). Rising line only. Alerts: price comes
+# back to the line after being >1% above it for 5 days (the 3rd touch, then 4th ...) and a daily close below it (break).
+# Watch only, not a tested buy signal.
+TL_K = 5
+
+
+def _tl_path():
+    return os.path.join(DATA, "tl_watch.json")
+
+
+def tl_load():
+    try:
+        return json.load(open(_tl_path()))
+    except Exception:  # noqa: BLE001
+        return {"KOTAKBANK": {"mk": "NSE", "added": "2026-11-17"}}
+
+
+def tl_save(W):
+    json.dump(W, open(_tl_path(), "w"), indent=1)
+
+
+def yohlc(sym, mk, rng="1y"):
+    y = sym if sym.startswith("^") else (sym.replace(".", "-") if mk == "US" else sym + ".NS")
+    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{y}", params=dict(interval="1d", range=rng),
+                     headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
+    r.raise_for_status(); res = r.json()["chart"]["result"][0]; q = res["indicators"]["quote"][0]
+    rows = [(datetime.fromtimestamp(t, timezone.utc).date().isoformat(), q["high"][i], q["low"][i], q["close"][i])
+            for i, t in enumerate(res["timestamp"]) if None not in (q["high"][i], q["low"][i], q["close"][i])]
+    return [r[0] for r in rows], [r[1] for r in rows], [r[2] for r in rows], [r[3] for r in rows]
+
+
+def tl_line(t, h, l, c, today=None):
+    """Line through the 2 latest swing lows. today = the live (unfinished) bar's date: it is not used to find pivots."""
+    n = len(c); m = n - 1 if today and t and t[-1] == today else n
+    piv = [i for i in range(TL_K, m - TL_K) if l[i] == min(l[i - TL_K:i + TL_K + 1])]
+    if len(piv) < 2:
+        return None
+    a, b = piv[-2], piv[-1]; s = (l[b] - l[a]) / (b - a)
+    line = lambda i: l[b] + s * (i - b)  # noqa: E731
+    touches, armed = 2, False
+    for i in range(b + 1, n - 1):                      # earlier returns to the line after the 2nd swing low
+        if i >= b + 5 and all(c[k] > line(k) * 1.01 for k in range(i - 5, i)):
+            armed = True
+        if armed and l[i] <= line(i) * 1.005:
+            touches += 1; armed = False
+    i = n - 1; armed_now = i >= b + 5 and all(c[k] > line(k) * 1.01 for k in range(i - 5, i))
+    return dict(a_d=t[a], a_l=round(l[a], 2), b_d=t[b], b_l=round(l[b], 2), slope=round(s, 4), rising=s > 0, line=round(line(i), 2),
+                day=t[i], low=round(l[i], 2), close=round(c[i], 2), dist=round((c[i] / line(i) - 1) * 100, 2), armed=armed_now,
+                touches=touches, below=c[i] < line(i))
+
+
+def tl_check(mk, eod=False):
+    W = tl_load(); cur = "$" if mk == "US" else "Rs "
+    for sym, w in W.items():
+        if w.get("mk", "NSE") != mk:
+            continue
+        try:
+            t, h, l, c = yohlc(sym, mk)
+            today = (et_now() if mk == "US" else ist_now()).date().isoformat()
+            L = tl_line(t, h, l, c, None if eod else today)
+        except Exception as ex:  # noqa: BLE001
+            log("tl_error", symbol=sym, error=str(ex)[:160]); continue
+        if not L:
+            continue
+        w["last"] = L; lid = f"{sym}:{L['a_d']}:{L['b_d']}"
+        pre = "US " if mk == "US" else ""
+        lows = f"swing lows {L['a_d'][5:]} {cur}{L['a_l']:g} and {L['b_d'][5:]} {cur}{L['b_l']:g}"
+        if not L["rising"]:
+            continue
+        if not eod and L["armed"] and L["low"] <= L["line"] * 1.005:
+            n = L["touches"] + 1; nth = {3: "3rd"}.get(n, f"{n}th")
+            alert("setup", sym, f"{pre}{sym}: {nth} touch of its rising trend line ({lows}). Line {cur}{L['line']:g}, low {cur}{L['low']:g}, "
+                  f"now {cur}{L['close']:g}. Watch only: a hold here is the classic buy, a close below breaks the trend.",
+                  key=f"tltouch:{lid}:{L['day']}", mk=mk)
+        if eod and L["below"]:
+            alert("exit", sym, f"{pre}{sym}: closed {cur}{L['close']:g}, below its rising trend line {cur}{L['line']:g} ({lows}). Trend line broken.",
+                  key=f"tlbreak:{lid}", mk=mk)
+    tl_save(W)
+
+
+class TLItem(BaseModel):
+    symbol: str
+    mk: str = "NSE"
+    remove: bool = False
+
+
+@app.get("/api/tl")
+def tl_get(_=Depends(auth)):
+    W = tl_load(); out = []; changed = False
+    for sym, w in sorted(W.items()):
+        L = w.get("last")
+        if not L or L.get("day", "") < (date.today() - timedelta(days=1)).isoformat():
+            try:
+                L = tl_line(*yohlc(sym, w.get("mk", "NSE"))); w["last"] = L; changed = True
+            except Exception as ex:  # noqa: BLE001
+                L = dict(error=str(ex)[:80])
+        out.append(dict(symbol=sym, mk=w.get("mk", "NSE"), **(L or {"error": "fewer than 2 swing lows"})))
+    if changed:
+        tl_save(W)
+    return dict(items=out)
+
+
+@app.post("/api/tl")
+def tl_set(body: TLItem, _=Depends(auth)):
+    sym = re.sub(r"[^A-Za-z0-9.\-&]", "", body.symbol.upper())[:20]
+    if not sym or body.mk not in ("NSE", "US"):
+        raise HTTPException(400, "symbol and market NSE or US")
+    W = tl_load()
+    if body.remove:
+        W.pop(sym, None); tl_save(W); return dict(ok=True)
+    try:
+        L = tl_line(*yohlc(sym, body.mk))
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(400, f"no prices for {sym}: {str(ex)[:60]}")
+    W[sym] = dict(mk=body.mk, added=date.today().isoformat(), last=L); tl_save(W)
+    return dict(ok=True, item=dict(symbol=sym, mk=body.mk, **(L or {})))
+
+
 _HIST = {}
 
 
@@ -2342,7 +2461,15 @@ def _loop():
                 us_sync()
             if us_open(et_now()) and t.minute % 10 < 2:
                 us_watch_check()
+            if t.minute % 10 < 2 and t.weekday() < 5 and (9, 20) <= (t.hour, t.minute) <= (15, 30):
+                tl_check("NSE")
+            if t.weekday() < 5 and (15, 45) <= (t.hour, t.minute) <= (16, 30) and _HB.get("tl_eod_nse") != t.date():
+                _HB["tl_eod_nse"] = t.date(); tl_check("NSE", eod=True)
+            if us_open(et_now()) and t.minute % 10 < 2:
+                tl_check("US")
             _et = et_now()
+            if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("tl_eod_us") != _et.date():
+                _HB["tl_eod_us"] = _et.date(); tl_check("US", eod=True)
             if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("usw_eod") != _et.date():
                 _HB["usw_eod"] = _et.date(); us_watch_eod(_et)
         except Exception as ex:  # noqa: BLE001

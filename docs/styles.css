@@ -1104,3 +1104,10 @@ body.pub .owner-only { display: none !important; }
 .bg-actt span{font-size:15px;opacity:.85}
 .bg-actt.sell b{color:var(--fall)} .bg-actt.buy b{color:var(--rise)} .bg-actt.tur b{color:var(--saffron)}
 .bg-sells{display:flex;flex-direction:column;gap:8px;margin:6px 0 12px}
+
+/* 17 Nov 2026: trend line alerts card */
+.tl-box .cd-h{justify-content:flex-start}
+.tl-box .tl-x{margin-left:auto;font-size:16px;padding:2px 8px}
+.tl-add{display:flex;gap:8px;align-items:center}
+.tl-add input{flex:1;min-width:0;box-sizing:border-box;font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);background:transparent;color:inherit;text-transform:uppercase}
+.tl-add input::placeholder{text-transform:none}
