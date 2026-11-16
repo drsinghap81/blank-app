@@ -1,0 +1,97 @@
+{
+ "method": "Do prices reverse or pause at the app's lines and levels? (17 Nov 2026) F&O stocks (current list), 2016 - Nov 2026.\n\nLines and levels exactly as tools/trendline_scan.py, rebuilt each day from data known that day:\n  support line    = latest pair of swing lows (3 bars each side) that no candle cuts, rising\n  resistance line = latest pair of swing highs that no candle cuts, any slope\n  low level / high level = latest PROMINENT swing (5 bars each side, price moved 3 x ATR away), unbroken by a close\nTouch (same as the alert): 5 closes > 1% away, then today's low (support) / high (resistance) within 1% of the line.\nOutcomes from the touch-day close (where an option trade would start):\n  rev5/rev10  = return in the reversal direction (down from resistance, up from support), %\n  held5       = no close beyond the line in the next 5 days, %\n  calm5       = |5-day move| < 1 x the expected 5-day move (20-day realised vol x sqrt 5), %  (a \"pause\")\n  straddle    = short 5-day ATM straddle P&L as % of premium, premium = 0.8 x sigma x sqrt(5) (IV assumed = 20-day realised;\n                real stock IV is usually higher, so this understates every seller equally - compare with the control)\n  spread_ok   = for resistance: close 5 days later still below the line; support: still above (a credit spread at the line wins)\nControl: every 3rd day of the same stocks with a pretend line 1% away (same distance as a touch).\nOutput: data/research/level_reaction.json.",
+ "groups": {
+  "line resistance": {
+   "n": 23290,
+   "rev5": -0.46,
+   "rev10": -0.91,
+   "t_rev10": -18.95,
+   "held5": 48.0,
+   "calm5": 66.4,
+   "straddle": -14.0,
+   "straddle_med": 16.4,
+   "spread_ok": 63.7
+  },
+  "line support": {
+   "n": 27502,
+   "rev5": 0.37,
+   "rev10": 0.64,
+   "t_rev10": 14.57,
+   "held5": 50.0,
+   "calm5": 65.4,
+   "straddle": -15.7,
+   "straddle_med": 13.9,
+   "spread_ok": 67.1
+  },
+  "level resistance": {
+   "n": 12963,
+   "rev5": -0.54,
+   "rev10": -1.0,
+   "t_rev10": -16.35,
+   "held5": 47.7,
+   "calm5": 66.9,
+   "straddle": -11.8,
+   "straddle_med": 15.8,
+   "spread_ok": 63.3
+  },
+  "level support": {
+   "n": 11087,
+   "rev5": 0.34,
+   "rev10": 0.48,
+   "t_rev10": 6.6,
+   "held5": 52.2,
+   "calm5": 64.9,
+   "straddle": -19.3,
+   "straddle_med": 12.3,
+   "spread_ok": 68.7
+  },
+  "control resistance": {
+   "n": 164392,
+   "rev5": -0.45,
+   "rev10": -0.88,
+   "t_rev10": -47.8,
+   "held5": 40.3,
+   "calm5": 68.6,
+   "straddle": -21.2,
+   "straddle_med": 20.5,
+   "spread_ok": 58.3
+  },
+  "control support": {
+   "n": 164392,
+   "rev5": 0.45,
+   "rev10": 0.88,
+   "t_rev10": 47.8,
+   "held5": 42.6,
+   "calm5": 68.6,
+   "straddle": -21.2,
+   "straddle_med": 20.5,
+   "spread_ok": 62.7
+  },
+  "line straddle by year": {
+   "2016": -13.9,
+   "2017": -16.8,
+   "2018": -14.3,
+   "2019": -11.7,
+   "2020": -25.5,
+   "2021": -14.6,
+   "2022": -13.1,
+   "2023": -19.8,
+   "2024": -15.1,
+   "2025": -8.3,
+   "2026": -11.7
+  },
+  "level straddle by year": {
+   "2016": -15.8,
+   "2017": -10.9,
+   "2018": -11.1,
+   "2019": -15.6,
+   "2020": -33.4,
+   "2021": -15.1,
+   "2022": -10.3,
+   "2023": -15.6,
+   "2024": -23.6,
+   "2025": -10.5,
+   "2026": -9.8
+  }
+ }
+}
