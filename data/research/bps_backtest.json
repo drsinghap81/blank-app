@@ -1,0 +1,137 @@
+{
+ "method": "Bull put spread at support in an uptrend (17 Nov 2026), step 2: real NSE stock put prices (bhavcopy EOD, branches oput-*).\nEvents (bps_events.csv): swing-low LEVEL touches, support LINE touches, and matched random uptrend days (control).\nTrade at the touch-day close:\n  expiry   = the first monthly expiry at least 10 calendar days away\n  short put= the highest strike at or below the support (variant \"2% below\": at or below support x 0.98)\n  long put = the highest strike at or below short x 0.95\n  needs a traded short leg that day (volume > 0) and a credit > 0\nExits: (a) hold to expiry (settled on the near future's close that day); (b) take 50% of the credit when the spread's closing\nvalue falls to half, else expiry. Costs: slippage max(Rs 0.05, 1% of premium) per leg per side, Rs 20 + GST per order, STT\n0.1% on premium sold. Per lot of the day; return on risk = P&L / (width - credit) x lot.\nOutput: data/research/bps_backtest.json.",
+ "groups": {
+  "level | at support": {
+   "hold to expiry": {
+    "n": 1791,
+    "win": 68.5,
+    "avg_rs": -1245,
+    "med_rs": 5473,
+    "worst_rs": -70778,
+    "avg_ror": -2.2,
+    "t": -1.82,
+    "pos_years": "4/10"
+   },
+   "take 50%": {
+    "n": 1791,
+    "win": 80.0,
+    "avg_rs": -393,
+    "med_rs": 4263,
+    "worst_rs": -66190,
+    "avg_ror": 0.1,
+    "t": 0.09,
+    "pos_years": "6/10"
+   }
+  },
+  "level | 2% below": {
+   "hold to expiry": {
+    "n": 1616,
+    "win": 76.7,
+    "avg_rs": -341,
+    "med_rs": 4064,
+    "worst_rs": -57707,
+    "avg_ror": -0.4,
+    "t": -0.36,
+    "pos_years": "5/10"
+   },
+   "take 50%": {
+    "n": 1616,
+    "win": 85.6,
+    "avg_rs": 97,
+    "med_rs": 2990,
+    "worst_rs": -53646,
+    "avg_ror": 0.9,
+    "t": 1.15,
+    "pos_years": "6/10"
+   }
+  },
+  "line | at support": {
+   "hold to expiry": {
+    "n": 5587,
+    "win": 67.3,
+    "avg_rs": -1315,
+    "med_rs": 5802,
+    "worst_rs": -82607,
+    "avg_ror": -2.9,
+    "t": -3.4,
+    "pos_years": "3/10"
+   },
+   "take 50%": {
+    "n": 5587,
+    "win": 77.4,
+    "avg_rs": -973,
+    "med_rs": 4407,
+    "worst_rs": -82607,
+    "avg_ror": -1.8,
+    "t": -2.65,
+    "pos_years": "4/10"
+   }
+  },
+  "line | 2% below": {
+   "hold to expiry": {
+    "n": 5124,
+    "win": 75.0,
+    "avg_rs": -913,
+    "med_rs": 4173,
+    "worst_rs": -89818,
+    "avg_ror": -2.6,
+    "t": -4.08,
+    "pos_years": "4/10"
+   },
+   "take 50%": {
+    "n": 5124,
+    "win": 83.3,
+    "avg_rs": -506,
+    "med_rs": 2998,
+    "worst_rs": -84117,
+    "avg_ror": -1.3,
+    "t": -2.45,
+    "pos_years": "5/10"
+   }
+  },
+  "control | at support": {
+   "hold to expiry": {
+    "n": 1575,
+    "win": 66.9,
+    "avg_rs": -1511,
+    "med_rs": 5752,
+    "worst_rs": -86776,
+    "avg_ror": -4.0,
+    "t": -3.13,
+    "pos_years": "4/10"
+   },
+   "take 50%": {
+    "n": 1575,
+    "win": 76.2,
+    "avg_rs": -1572,
+    "med_rs": 4229,
+    "worst_rs": -86776,
+    "avg_ror": -4.1,
+    "t": -3.76,
+    "pos_years": "3/10"
+   }
+  },
+  "control | 2% below": {
+   "hold to expiry": {
+    "n": 1467,
+    "win": 76.6,
+    "avg_rs": -633,
+    "med_rs": 4210,
+    "worst_rs": -90891,
+    "avg_ror": -1.2,
+    "t": -1.14,
+    "pos_years": "4/10"
+   },
+   "take 50%": {
+    "n": 1467,
+    "win": 83.2,
+    "avg_rs": -761,
+    "med_rs": 2861,
+    "worst_rs": -90891,
+    "avg_ror": -1.7,
+    "t": -1.96,
+    "pos_years": "4/10"
+   }
+  }
+ }
+}
