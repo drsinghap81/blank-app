@@ -1,97 +1,259 @@
 {
- "method": "Do prices reverse or pause at the app's lines and levels? (17 Nov 2026) F&O stocks (current list), 2016 - Nov 2026.\n\nLines and levels exactly as tools/trendline_scan.py, rebuilt each day from data known that day:\n  support line    = latest pair of swing lows (3 bars each side) that no candle cuts, rising\n  resistance line = latest pair of swing highs that no candle cuts, any slope\n  low level / high level = latest PROMINENT swing (5 bars each side, price moved 3 x ATR away), unbroken by a close\nTouch (same as the alert): 5 closes > 1% away, then today's low (support) / high (resistance) within 1% of the line.\nOutcomes from the touch-day close (where an option trade would start):\n  rev5/rev10  = return in the reversal direction (down from resistance, up from support), %\n  held5       = no close beyond the line in the next 5 days, %\n  calm5       = |5-day move| < 1 x the expected 5-day move (20-day realised vol x sqrt 5), %  (a \"pause\")\n  straddle    = short 5-day ATM straddle P&L as % of premium, premium = 0.8 x sigma x sqrt(5) (IV assumed = 20-day realised;\n                real stock IV is usually higher, so this understates every seller equally - compare with the control)\n  spread_ok   = for resistance: close 5 days later still below the line; support: still above (a credit spread at the line wins)\nControl: every 3rd day of the same stocks with a pretend line 1% away (same distance as a touch).\nOutput: data/research/level_reaction.json.",
+ "method": "Do prices reverse or pause at the app's lines and levels? (17 Nov 2026) F&O stocks (current list), 2016 - Nov 2026.\n\nLines and levels exactly as tools/trendline_scan.py, rebuilt each day from data known that day:\n  support line    = latest pair of swing lows (3 bars each side) that no candle cuts, rising\n  resistance line = latest pair of swing highs that no candle cuts, any slope\n  low level / high level = latest PROMINENT swing (5 bars each side, price moved 3 x ATR away), unbroken by a close\nTouch (same as the alert): 5 closes > 1% away, then today's low (support) / high (resistance) within 1% of the line.\nOutcomes from the touch-day close (where an option trade would start):\n  rev5/rev10  = return in the reversal direction (down from resistance, up from support), %\n  held5       = no close beyond the line in the next 5 days, %\n  calm5       = |5-day move| < 1 x the expected 5-day move (20-day realised vol x sqrt 5), %  (a \"pause\")\n  straddle    = short 5-day ATM straddle P&L as % of premium, premium = 0.8 x sigma x sqrt(5) (IV assumed = 20-day realised;\n                real stock IV is usually higher, so this understates every seller equally - compare with the control)\n  spread_ok   = for resistance: close 5 days later still below the line; support: still above (a credit spread at the line wins)\nControl: every 3rd day of the same stocks with a pretend line 1% away (same distance as a touch).\nBreaks (17 Nov 2026, 2nd run): brk5/10/20 = % of touches with a close beyond the line (above resistance, below support)\nwithin 5/10/20 days; split by trend: uptrend = close > 200-day and 50-day > 200-day, downtrend = both below, else sideways.\nOutput: data/research/level_reaction.json.",
  "groups": {
   "line resistance": {
-   "n": 23290,
+   "n": 23293,
    "rev5": -0.46,
-   "rev10": -0.91,
-   "t_rev10": -18.95,
+   "rev10": -0.9,
+   "t_rev10": -18.87,
    "held5": 48.0,
-   "calm5": 66.4,
-   "straddle": -14.0,
-   "straddle_med": 16.4,
-   "spread_ok": 63.7
+   "calm5": 66.5,
+   "straddle": -13.9,
+   "straddle_med": 16.6,
+   "spread_ok": 63.7,
+   "brk5": 54.2,
+   "brk10": 66.7,
+   "brk20": 75.9
   },
   "line support": {
-   "n": 27502,
+   "n": 27441,
    "rev5": 0.37,
-   "rev10": 0.64,
-   "t_rev10": 14.57,
+   "rev10": 0.6,
+   "t_rev10": 13.56,
    "held5": 50.0,
-   "calm5": 65.4,
-   "straddle": -15.7,
-   "straddle_med": 13.9,
-   "spread_ok": 67.1
+   "calm5": 65.5,
+   "straddle": -15.6,
+   "straddle_med": 14.1,
+   "spread_ok": 67.0,
+   "brk5": 58.1,
+   "brk10": 71.1,
+   "brk20": 80.4
   },
   "level resistance": {
-   "n": 12963,
+   "n": 12964,
    "rev5": -0.54,
    "rev10": -1.0,
-   "t_rev10": -16.35,
-   "held5": 47.7,
+   "t_rev10": -16.29,
+   "held5": 47.6,
    "calm5": 66.9,
    "straddle": -11.8,
    "straddle_med": 15.8,
-   "spread_ok": 63.3
+   "spread_ok": 63.3,
+   "brk5": 52.4,
+   "brk10": 65.3,
+   "brk20": 75.7
   },
   "level support": {
-   "n": 11087,
-   "rev5": 0.34,
-   "rev10": 0.48,
-   "t_rev10": 6.6,
-   "held5": 52.2,
+   "n": 11034,
+   "rev5": 0.33,
+   "rev10": 0.42,
+   "t_rev10": 5.72,
+   "held5": 52.1,
    "calm5": 64.9,
-   "straddle": -19.3,
-   "straddle_med": 12.3,
-   "spread_ok": 68.7
+   "straddle": -19.1,
+   "straddle_med": 12.5,
+   "spread_ok": 68.6,
+   "brk5": 47.9,
+   "brk10": 59.2,
+   "brk20": 69.1
   },
   "control resistance": {
-   "n": 164392,
+   "n": 164605,
    "rev5": -0.45,
-   "rev10": -0.88,
-   "t_rev10": -47.8,
+   "rev10": -0.86,
+   "t_rev10": -46.62,
    "held5": 40.3,
-   "calm5": 68.6,
-   "straddle": -21.2,
-   "straddle_med": 20.5,
-   "spread_ok": 58.3
+   "calm5": 68.7,
+   "straddle": -21.1,
+   "straddle_med": 20.6,
+   "spread_ok": 58.3,
+   "brk5": 59.7,
+   "brk10": 71.7,
+   "brk20": 80.8
   },
   "control support": {
-   "n": 164392,
+   "n": 164605,
    "rev5": 0.45,
-   "rev10": 0.88,
-   "t_rev10": 47.8,
+   "rev10": 0.86,
+   "t_rev10": 46.62,
    "held5": 42.6,
-   "calm5": 68.6,
-   "straddle": -21.2,
-   "straddle_med": 20.5,
-   "spread_ok": 62.7
+   "calm5": 68.7,
+   "straddle": -21.1,
+   "straddle_med": 20.6,
+   "spread_ok": 62.6,
+   "brk5": 57.4,
+   "brk10": 68.1,
+   "brk20": 76.0
+  },
+  "line resistance | uptrend": {
+   "n": 13461,
+   "brk5": 52.4,
+   "brk10": 64.6,
+   "brk20": 73.9,
+   "rev10": -1.09,
+   "held5": 47.3
+  },
+  "line resistance | downtrend": {
+   "n": 6684,
+   "brk5": 59.1,
+   "brk10": 72.5,
+   "brk20": 81.8,
+   "rev10": -0.73,
+   "held5": 48.5
+  },
+  "line resistance | sideways": {
+   "n": 3148,
+   "brk5": 51.7,
+   "brk10": 63.2,
+   "brk20": 72.2,
+   "rev10": -0.45,
+   "held5": 50.2
+  },
+  "line support | uptrend": {
+   "n": 15318,
+   "brk5": 58.1,
+   "brk10": 71.7,
+   "brk20": 80.9,
+   "rev10": 0.71,
+   "held5": 51.4
+  },
+  "line support | downtrend": {
+   "n": 7704,
+   "brk5": 58.8,
+   "brk10": 70.7,
+   "brk20": 79.9,
+   "rev10": 0.49,
+   "held5": 47.5
+  },
+  "line support | sideways": {
+   "n": 4419,
+   "brk5": 56.7,
+   "brk10": 69.5,
+   "brk20": 79.2,
+   "rev10": 0.39,
+   "held5": 50.0
+  },
+  "level resistance | uptrend": {
+   "n": 7859,
+   "brk5": 53.4,
+   "brk10": 65.6,
+   "brk20": 76.1,
+   "rev10": -1.16,
+   "held5": 46.6
+  },
+  "level resistance | downtrend": {
+   "n": 2881,
+   "brk5": 49.5,
+   "brk10": 63.5,
+   "brk20": 74.8,
+   "rev10": -0.57,
+   "held5": 50.5
+  },
+  "level resistance | sideways": {
+   "n": 2224,
+   "brk5": 52.5,
+   "brk10": 66.3,
+   "brk20": 75.9,
+   "rev10": -0.97,
+   "held5": 47.5
+  },
+  "level support | uptrend": {
+   "n": 4756,
+   "brk5": 43.8,
+   "brk10": 55.3,
+   "brk20": 66.0,
+   "rev10": 0.71,
+   "held5": 56.2
+  },
+  "level support | downtrend": {
+   "n": 4136,
+   "brk5": 51.7,
+   "brk10": 63.0,
+   "brk20": 71.9,
+   "rev10": 0.18,
+   "held5": 48.3
+  },
+  "level support | sideways": {
+   "n": 2142,
+   "brk5": 49.5,
+   "brk10": 60.8,
+   "brk20": 70.3,
+   "rev10": 0.23,
+   "held5": 50.5
+  },
+  "control resistance | uptrend": {
+   "n": 91234,
+   "brk5": 60.0,
+   "brk10": 71.9,
+   "brk20": 81.1,
+   "rev10": -1.01,
+   "held5": 40.0
+  },
+  "control resistance | downtrend": {
+   "n": 50475,
+   "brk5": 59.4,
+   "brk10": 71.5,
+   "brk20": 80.2,
+   "rev10": -0.72,
+   "held5": 40.6
+  },
+  "control resistance | sideways": {
+   "n": 22896,
+   "brk5": 59.3,
+   "brk10": 71.4,
+   "brk20": 80.5,
+   "rev10": -0.58,
+   "held5": 40.7
+  },
+  "control support | uptrend": {
+   "n": 91234,
+   "brk5": 56.4,
+   "brk10": 67.4,
+   "brk20": 75.4,
+   "rev10": 1.01,
+   "held5": 43.6
+  },
+  "control support | downtrend": {
+   "n": 50475,
+   "brk5": 59.0,
+   "brk10": 69.3,
+   "brk20": 76.8,
+   "rev10": 0.72,
+   "held5": 41.0
+  },
+  "control support | sideways": {
+   "n": 22896,
+   "brk5": 57.6,
+   "brk10": 68.5,
+   "brk20": 76.1,
+   "rev10": 0.58,
+   "held5": 42.4
   },
   "line straddle by year": {
-   "2016": -13.9,
-   "2017": -16.8,
-   "2018": -14.3,
-   "2019": -11.7,
+   "2016": -14.0,
+   "2017": -17.1,
+   "2018": -14.4,
+   "2019": -11.6,
    "2020": -25.5,
-   "2021": -14.6,
+   "2021": -14.4,
    "2022": -13.1,
-   "2023": -19.8,
+   "2023": -19.7,
    "2024": -15.1,
    "2025": -8.3,
-   "2026": -11.7
+   "2026": -10.4
   },
   "level straddle by year": {
    "2016": -15.8,
-   "2017": -10.9,
-   "2018": -11.1,
+   "2017": -10.7,
+   "2018": -11.3,
    "2019": -15.6,
-   "2020": -33.4,
-   "2021": -15.1,
+   "2020": -33.3,
+   "2021": -15.0,
    "2022": -10.3,
-   "2023": -15.6,
+   "2023": -15.3,
    "2024": -23.6,
    "2025": -10.5,
-   "2026": -9.8
+   "2026": -8.8
   }
  }
 }
