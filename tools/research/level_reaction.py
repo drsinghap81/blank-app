@@ -76,7 +76,7 @@ def scan(sym, df):
     ev = []
     # ---- lines (support on lows, resistance on highs via mirror), recomputed when a pivot confirms or the line breaks
     for side, X, C in (("sup", l, c), ("res", -h, -c)):
-        cur = None; K = 3
+        cur = None; K = 3; cnt = {}
         for d in range(260, n):
             m = d + 1
             newpiv = X[d - K] == X[d - 2 * K:d + 1].min()
@@ -98,10 +98,11 @@ def scan(sym, df):
             armed = all((c[k] > Lm(k) * 1.01) if side == "sup" else (c[k] < -Lm(k) * 0.99) for k in range(d - 5, d))
             hit = l[d] <= L * 1.01 if side == "sup" else h[d] >= L * 0.99
             if armed and hit:
+                cnt[(a, b)] = cnt.get((a, b), 0) + 1        # 1st return to the line after its 2 swing points = the 3rd touch
                 Lf = [(Lm(i) if side == "sup" else -Lm(i)) for i in range(d + 1, d + 21)]
                 x = outcomes(d, L, side, c, h, l, sig, Lf, trend[d])
                 if x:
-                    ev.append(dict(sym=sym, d=ds[d], kind="line", side=side, **x))
+                    ev.append(dict(sym=sym, d=ds[d], kind="line", side=side, nth=cnt[(a, b)] + 2, **x))
     # ---- prominent horizontal levels
     K = 5
     for side in ("res", "sup"):

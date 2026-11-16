@@ -106,11 +106,13 @@ def main():
         for below in (False, True):
             t = trade(g, pd.Timestamp(e.d), e.L, below)
             if t:
-                rows.append(dict(sym=e.sym, d=e.d, kind=e.kind, place="2% below" if below else "at support", **t))
+                kind = "line 3rd touch" if e.kind == "line" and getattr(e, "nth", np.nan) == 3 else e.kind
+                rows.append(dict(sym=e.sym, d=e.d, kind=kind, place="2% below" if below else "at support", **t))
     T = pd.DataFrame(rows); out = dict(method=__doc__, groups={})
-    for kind in ("level", "line", "control"):
+    T.loc[T.kind == "line 3rd touch", "kind2"] = "line"
+    for kind in ("level", "line 3rd touch", "line", "control"):
         for place in ("at support", "2% below"):
-            X = T[(T.kind == kind) & (T.place == place)]
+            X = T[((T.kind == kind) | ((kind == "line") & (T.kind == "line 3rd touch"))) & (T.place == place)]
             g = {"hold to expiry": summ(X, "hold", "ror_hold"), "take 50%": summ(X, "tp50", "ror_tp")}
             out["groups"][f"{kind} | {place}"] = g; print(kind, place, g, flush=True)
     os.makedirs("data/research", exist_ok=True)

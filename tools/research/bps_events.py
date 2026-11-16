@@ -37,12 +37,13 @@ def main():
     C = E[E.kind == "control"].sample(n=min(4000, (E.kind == "control").sum()), random_state=5).copy()
     C["dist"] = rng.choice(T.dist.clip(0, 0.03).values, size=len(C))
     C["L"] = C.close / (1 + C.dist)
-    out = pd.concat([T, C])[["sym", "d", "kind", "L", "close", "dist"]]
+    out = pd.concat([T, C])[["sym", "d", "kind", "L", "close", "dist", "nth"]]
     os.makedirs("data/research", exist_ok=True)
     out.to_csv("data/research/bps_events.csv", index=False)
     w = out.assign(start=out.d, end=(pd.to_datetime(out.d) + pd.Timedelta(days=62)).dt.date.astype(str))[["sym", "start", "end"]]
     w["sys"] = "BPS"
-    w.to_csv("data/optwin_put.csv", index=False)
+    if not os.environ.get("KEEP_WIN"):
+        w.to_csv("data/optwin_put.csv", index=False)
     print(out.kind.value_counts().to_dict())
 
 
