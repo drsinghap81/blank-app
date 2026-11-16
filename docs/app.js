@@ -3958,13 +3958,15 @@ async function condorCard(box, mk) {
 }
 /* Today (US): one line when stops were raised at the last check -> Live › US */
 async function usStopsToday(anchor) {
+  /* same cards as India's "Stop raised to ₹…" (beginner Today): stops raised in the last 7 days, to set in moomoo */
   const c = lvCfg(); if (!anchor || !c.url || !c.token) return;
   let W; try { W = await lvApi('/api/us/watch', { timeout: 20000 }); } catch (e) { return; }
-  const day = W.trail && W.trail.day; const mv = (W.items || []).filter((r) => r.stop_set && r.stop_set === day);
+  const wk = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+  const mv = (W.items || []).filter((r) => r.stop_set && r.stop_set >= wk);
   if (!mv.length) return;
-  const el = document.createElement('button'); el.className = 'more'; el.style.margin = '8px 0';
-  el.innerHTML = `⬆ Move ${mv.length} US stop${mv.length > 1 ? 's' : ''} in moomoo: ${mv.map((r) => `${esc(r.symbol)} $${fmt(r.stop, 2, 'en-US')}`).join(' · ')}`;
-  el.addEventListener('click', () => { state.lvMk = 'US'; try { localStorage.setItem('td.lvMk', 'US'); } catch (e) { /* */ } show('live'); });
+  const el = document.createElement('div'); el.className = 'us-raise';
+  el.innerHTML = mv.map((r) => `<button class="td-card td-raise"><span class="td-av" style="background:var(--rise)">↑</span><span class="td-nm"><b>Move stop to $${fmt(r.stop, 2, 'en-US')}</b><small>${esc(r.symbol)}${r.stop_prev ? ` · from $${fmt(r.stop_prev, 2, 'en-US')}` : ''} · set it in moomoo (GTC, ${r.qty} shares)</small></span></button>`).join('');
+  el.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { state.lvMk = 'US'; try { localStorage.setItem('td.lvMk', 'US'); } catch (e) { /* */ } show('live'); }));
   anchor.after(el);
 }
 /* 16 Nov 2026: US holdings (moomoo) in Portfolio, from the server's US watch list (or the copy on this phone) */
@@ -5365,6 +5367,7 @@ async function tdRender(el, beginner) {
   tdApplyHeld(mk);
   tdTopTiles($('#tdtop'), mk);
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
+  if (mk === 'US') usStopsToday($('#tdmini'));
   if (!beginner) alCard($('#tdal'), mk);
   tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } if (mk === 'NSE') tdGrowthMom($('#tdgm')); tdMatrix($('#tdmx'), mk); tdHeat($('#tdheat'), mk);
 }

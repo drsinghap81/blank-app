@@ -1088,3 +1088,8 @@ body.pub .owner-only { display: none !important; }
 .cd-row{border-top:1px solid color-mix(in srgb,currentColor 14%,transparent);padding-top:10px;display:flex;flex-direction:column;gap:4px;min-width:0}
 .cd-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:17px}
 .cd-row .lv-sub{font-size:15px;line-height:1.45}
+/* 16 Nov 2026: US "Move stop to $…" cards on Today (same look as India's stop-raised cards) */
+.us-raise{display:flex;flex-direction:column;gap:8px;margin:8px 0;padding:0 2px}
+.us-raise .td-card{box-sizing:border-box;width:100%;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.us-raise .td-nm{min-width:0}
+.us-raise .td-nm small{white-space:normal}
