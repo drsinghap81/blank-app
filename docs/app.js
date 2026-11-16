@@ -4803,29 +4803,43 @@ async function usWatchCard(box) {
   if (!c.url || !c.token) { box.innerHTML = '<div class="lv-card"><b>Your moomoo holdings</b><p class="lv-sub">Connect your server on the India tab to track the US shares you bought.</p></div>'; return; }
   const imp = uswParse(location.hash) || state._uswImp; if (imp) state._uswImp = imp;
   const $f = (v) => (v == null ? '–' : `$${fmt(v, 2, 'en-US')}`);
-  let W; try { W = await lvApi('/api/us/watch', { timeout: 30000 }); } catch (e) { box.innerHTML = `<div class="lv-card"><b>Your moomoo holdings</b><p class="down lv-sub">Couldn't load: ${esc(e.message)}</p></div>`; return; }
+  /* 16 Nov 2026: a copy stays on this phone (td.uswLocal), shown when the server is not updated yet and sent to it once it is */
+  let loc = []; try { loc = JSON.parse(localStorage.getItem('td.uswLocal') || '[]'); } catch (e) { /* */ }
+  let W = null; try { W = await lvApi('/api/us/watch', { timeout: 30000 }); } catch (e) { W = null; }
+  if (W && !W.items.length && loc.length && !imp) { try { await lvApi('/api/us/watch', { method: 'POST', body: JSON.stringify({ items: loc }) }); W = await lvApi('/api/us/watch', { timeout: 30000 }); } catch (e) { /* keep local */ } }
+  const offline = !W;
+  if (offline) W = { items: loc.map((x) => ({ ...x, system: (USW_SYS.find((k) => k[0] === x.system) || [0, x.system])[1], price: null, pnl: null, to_stop: null })) };
   const sysN = (k) => (USW_SYS.find((x) => x[0] === k) || [k, k])[1];
-  const rows = W.items.map((r) => `<div class="lv-row"><div class="lv-main"><b>${esc(r.symbol)}</b> <small class="muted">${esc(r.system)} · ${r.qty} @ ${$f(r.entry)}</small>
-      ${r.last && r.last.exit ? `<div class="down lv-sub"><b>Sell signal:</b> ${esc(r.last.note)} · sell at the next open</div>` : ''}
-      <div class="lv-sub"><b>Stop to set in moomoo: ${$f(r.stop)}</b>${r.stop_set ? ` <span class="chip">raised ${esc(day(r.stop_set))}</span>` : ''}${r.last ? ` · ${esc(r.last.note)}` : ''}</div>
-      <div class="lv-sub">now ${$f(r.price)} · stop ${$f(r.stop)}${r.to_stop != null ? ` (<b class="${r.to_stop < 3 ? 'down' : ''}">${fmt(r.to_stop, 1)}% above</b>)` : ''}${r.target ? ` · target ${$f(r.target)}` : ''}${r.pnl != null ? ` · <b class="${r.pnl >= 0 ? 'up' : 'down'}">${r.pnl >= 0 ? '+' : '−'}${$f(Math.abs(r.pnl))}</b>` : ''}</div></div>
-      <button class="lv-link" data-uswdel="${esc(r.symbol)}">Remove</button></div>`).join('');
-  box.innerHTML = `<div class="lv-card" data-fold="skip"><b>Your moomoo holdings · alerts only</b>
+  const rows = W.items.map((r) => { const pct = r.price && r.entry ? (r.price / r.entry - 1) * 100 : null;
+    return `<div class="lv-row lv-trade"><div><div class="lv-sym">${esc(r.symbol)} <span class="lv-mode ok" style="background:var(--rise-soft);color:var(--rise-ink)">Held</span> <span class="chip">${esc(r.system)}</span>${pct == null ? '' : ` <b class="${pct >= 0 ? 'up' : 'down'}" style="margin-left:auto">${pct >= 0 ? '+' : ''}${fmt(pct, 1)}%${r.pnl != null ? ` · ${r.pnl >= 0 ? '+' : '−'}${$f(Math.abs(r.pnl))}` : ''}</b>`}</div>
+      <div class="lv-sub">${r.qty} @ ${$f(r.entry)}${r.price ? ` · now ${$f(r.price)}` : ''} · stop ${$f(r.stop)}${r.to_stop != null ? ` (${fmt(r.to_stop, 1)}% away)` : ''}</div>
+      ${slTrack({ stop: r.stop, entry: r.entry, now: r.price, target: r.target })}
+      ${r.last && r.last.exit ? `<div class="lv-sub down"><b>Sell signal:</b> ${esc(r.last.note)} · sell at the next open in moomoo</div>` : ''}
+      <div class="lv-sub">🛡 Stop to set in moomoo: <b>${$f(r.stop)}</b> GTC${r.stop_set ? ` · raised ${esc(day(r.stop_set))}` : ''}${r.last ? ` · ${esc(r.last.note)}` : ''} · <a href="#" data-uswdel="${esc(r.symbol)}">Stop tracking</a></div></div><div></div></div>`; }).join('');
+  const op = W.items.filter((r) => r.price); const cost = op.reduce((a, r) => a + r.qty * r.entry, 0), val = op.reduce((a, r) => a + r.qty * r.price, 0);
+  const risk = W.items.reduce((a, r) => a + Math.max(0, r.qty * ((r.price || r.entry) - r.stop)), 0);
+  const sumH = W.items.length ? `<div class="facts"><div class="fact"><span>Open (${W.items.length})</span><b class="${val - cost >= 0 ? 'up' : 'down'}">${op.length ? `${val - cost >= 0 ? '+' : '−'}${$f(Math.abs(val - cost))}` : '–'}</b><small>${op.length ? `${$f(cost)} → ${$f(val)}` : 'prices after the server update'}</small></div>
+    <div class="fact"><span>At risk to stops</span><b>${$f(risk)}</b><small>if every stop is hit</small></div></div>` : '';
+  box.innerHTML = `<div class="lv-card" data-fold="skip"><b>Your US holdings · moomoo · alerts only</b>
+    ${offline ? '<p class="status exit watch lv-sub"><b>Saved on this phone.</b> Your server takes these over after its next update (outside Indian market hours, about 9:05 pm Melbourne); alerts start then. Live prices show from then too.</p>' : ''}
     <p class="lv-sub">Alerts: stop hit or within 3%; Trend 9/21 sell (a daily close with EMA 9 under EMA 21) and Monthly ATH sell (a weekly close under the 30-week average), checked after each US close. Every Friday after the close the stops are raised (EMA 21 or the 30-week average, never lowered) and you get one alert listing the new stops to set in moomoo. The app never sells these.</p>
     ${imp ? `<div class="status exit watch"><b>Add ${imp.length} holdings from your link?</b><div class="lv-sub">${imp.map((x) => `${esc(x.symbol)} ${x.qty} @ ${$f(x.entry)} · stop ${$f(x.stop)}${x.target ? ` · target ${$f(x.target)}` : ''} · ${esc(sysN(x.system))}`).join('<br>')}</div>
       <button class="lv-btn" id="uswimp">Add these ${imp.length}</button> <button class="lv-link" id="uswno">Not now</button></div>` : ''}
-    ${rows || '<p class="empty">Nothing tracked yet.</p>'}
+    ${sumH}${rows || '<p class="empty">Nothing tracked yet.</p>'}
     <details class="info"><summary>Add a holding</summary><div class="row" style="display:flex;flex-wrap:wrap;gap:6px">
       <input id="uwsym" placeholder="Symbol" style="width:6em"><input id="uwq" type="number" placeholder="Shares" style="width:6em"><input id="uwe" type="number" step="any" placeholder="Buy price" style="width:7em">
       <input id="uwst" type="number" step="any" placeholder="Stop" style="width:7em"><input id="uwt" type="number" step="any" placeholder="Target (optional)" style="width:9em">
       <select id="uwsys">${USW_SYS.map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select><button class="lv-btn" id="uwadd">Add</button></div></details>
     <p class="lv-sub" id="uwmsg"></p></div>`;
-  const send = async (body, msg) => { const m = box.querySelector('#uwmsg');
-    try { await lvApi('/api/us/watch', { method: 'POST', body: JSON.stringify(body) }); alertMsg(msg, true); usWatchCard(box); } catch (e) { m.className = 'down lv-sub'; m.textContent = e.message; } };
+  const keepLocal = (body) => { let L = loc.slice(); (body.items || []).forEach((it) => { L = L.filter((x) => x.symbol !== String(it.symbol).toUpperCase()); L.push({ ...it, symbol: String(it.symbol).toUpperCase() }); });
+    (body.remove || []).forEach((sy) => { L = L.filter((x) => x.symbol !== sy); }); try { localStorage.setItem('td.uswLocal', JSON.stringify(L)); } catch (e) { /* */ } };
+  const send = async (body, msg) => { const m = box.querySelector('#uwmsg'); keepLocal(body);
+    try { await lvApi('/api/us/watch', { method: 'POST', body: JSON.stringify(body) }); alertMsg(msg, true); } catch (e) { alertMsg(msg + ' (saved on this phone; the server takes it after its update)', true); }
+    usWatchCard(box); };
   const done = () => { state._uswImp = null; if (/^#usw=/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search + '#live'); };
   const ib = box.querySelector('#uswimp'); if (ib) ib.addEventListener('click', () => { const it = imp; done(); send({ items: it }, `Tracking ${it.length} US holdings`); });
   const nb = box.querySelector('#uswno'); if (nb) nb.addEventListener('click', () => { done(); usWatchCard(box); });
-  box.querySelectorAll('[data-uswdel]').forEach((b) => b.addEventListener('click', () => send({ remove: [b.dataset.uswdel] }, `Stopped tracking ${b.dataset.uswdel}`)));
+  box.querySelectorAll('[data-uswdel]').forEach((b) => b.addEventListener('click', (e) => e.preventDefault() || send({ remove: [b.dataset.uswdel] }, `Stopped tracking ${b.dataset.uswdel}`)));
   box.querySelector('#uwadd').addEventListener('click', () => { const v = (id) => box.querySelector(id).value;
     send({ items: [{ symbol: v('#uwsym'), qty: +v('#uwq'), entry: +v('#uwe'), stop: +v('#uwst'), target: v('#uwt') ? +v('#uwt') : null, system: v('#uwsys') }] }, 'Added'); });
 }
