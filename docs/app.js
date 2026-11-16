@@ -122,6 +122,7 @@ const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 
 const athGrp = () => (state.view === 'inv' ? 'inv' : state.view === 'trd' ? 'trd' : 'mom');
 const grpOfTab = (t) => (ATH_GRP.inv.includes(t) ? 'inv' : ATH_GRP.trd.includes(t) ? 'trd' : 'mom');
 state.athTabG = { mom: 'brk', inv: 'imc', trd: 'wclose' };
+try { const g = JSON.parse(sessionStorage.getItem('td.tabg') || 'null'); if (g) { Object.assign(state.athTabG, g); sessionStorage.removeItem('td.tabg'); } } catch (e) { /* */ }
 function tradeStrip(cur) {
   const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['turtle', 'Turtle (futures)'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
   return `<div class="seg trdstrip" style="margin:10px 16px 0;flex-wrap:wrap">${B.map(([k, n]) => `<button data-tk="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
@@ -2452,7 +2453,8 @@ async function turtleSelect(r) {
 }
 async function loadTurtle(el) {
   $('#title').textContent = 'Trading · Turtle (futures)';
-  if (!state.turtle) { el.innerHTML = tradeStrip('turtle') + '<p class="muted pad">Loading…</p>'; tradeStripWire(el); state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); }
+  if (state.turtle && Date.now() - (state.turtleAt || 0) > 600000) state.turtle = null;   // refetch after 10 min
+  if (!state.turtle) { state.turtleAt = Date.now(); el.innerHTML = tradeStrip('turtle') + '<p class="muted pad">Loading…</p>'; tradeStripWire(el); state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); }
   const D = state.turtle; const S = turSet();
   if (!D) { el.innerHTML = tradeStrip('turtle') + '<p class="empty">The Turtle watch appears after its first run.</p>'; tradeStripWire(el); return; }
   $('#asof').textContent = `Daily bars${updTxt(D.generated)}`;
@@ -5017,7 +5019,7 @@ async function tdRender2(el) {
     mk === 'NSE' ? getJSON(MP + 'vcp.json', 'vcp') : null, getJSON(MP + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'US' ? getJSON(MP + 'rsi2.json', 'rsi2') : null,
     getJSON(MP + 'patterns.json', 'pat_' + mk)]);
   if (fund) state.fund = fund; if (assets) state.assets = assets;
-  if (!state.turtle) state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null);
+  if (!state.turtle || Date.now() - (state.turtleAt || 0) > 600000) { state.turtleAt = Date.now(); state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); }
   const TU = (state.turtle && state.turtle.rows) || []; const tuNew = TU.filter((r) => r.status === 'in trade' && r.new), tuEx = TU.filter((r) => r.status === 'exited today'), tuIn = TU.filter((r) => r.status === 'in trade');
   const seg = `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
   if (!P) { el.innerHTML = `<div class="td-wrap">${seg}<p class="empty">Today's plan appears after the evening scan.</p></div>`; el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); })); return; }
@@ -5451,7 +5453,7 @@ setTimeout(tdVerCheck, 4000);
 { const b = document.getElementById('btn-refresh');
   if (b) b.addEventListener('click', async () => {
     b.classList.add('spin'); b.disabled = true;
-    try { sessionStorage.setItem('td.reopen', state.view || 'today'); } catch (e) { /* */ }
+    try { sessionStorage.setItem('td.reopen', state.view || 'today'); sessionStorage.setItem('td.tabg', JSON.stringify(state.athTabG)); } catch (e) { /* */ }
     try { const r = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration() : null; if (r) await Promise.race([r.update(), new Promise((ok) => setTimeout(ok, 3000))]); } catch (e) { /* offline: reload anyway */ }
     location.reload();
   });
