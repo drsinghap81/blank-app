@@ -2291,6 +2291,24 @@ def tl_get(_=Depends(auth)):
     return dict(items=out)
 
 
+@app.get("/api/tl/bars")
+def tl_bars(sym: str, mk: str = "NSE", _=Depends(auth)):
+    """Daily candles for the app's trend line chart (last 160 days)."""
+    sym = re.sub(r"[^A-Za-z0-9.\-&^=]", "", sym.upper())[:20]
+    y = sym if sym.startswith("^") else (sym.replace(".", "-") if mk == "US" else sym + ".NS")
+    try:
+        r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{y}", params=dict(interval="1d", range="1y"),
+                         headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
+        r.raise_for_status(); res = r.json()["chart"]["result"][0]; q = res["indicators"]["quote"][0]
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(400, f"no prices for {sym}: {str(ex)[:60]}")
+    keep = [i for i in range(len(res["timestamp"])) if None not in (q["open"][i], q["high"][i], q["low"][i], q["close"][i])][-160:]
+    out = dict(t=[datetime.fromtimestamp(res["timestamp"][i], timezone.utc).date().isoformat() for i in keep])
+    for k in ("open", "high", "low", "close"):
+        out[k[0]] = [round(q[k][i], 2) for i in keep]
+    return out
+
+
 @app.post("/api/tl")
 def tl_set(body: TLItem, _=Depends(auth)):
     sym = re.sub(r"[^A-Za-z0-9.\-&]", "", body.symbol.upper())[:20]

@@ -3973,10 +3973,10 @@ async function tlCard(anchor, mk) {
     if (!NR.length && !L.length && !srv) { el.innerHTML = ''; return; }
     const sum = NR.length ? `${NR.length} near their line: ${NR.slice(0, 4).map((r) => esc(r.symbol)).join(', ')}${NR.length > 4 ? '…' : ''}` : 'none near their line today';
     const nrRow = (r) => { const cc = r.mk === 'NSE' ? '₹' : ''; const v = (x) => cc + fmt(x, x > 999 ? 0 : 1, 'en-IN');
-      return `<div class="tl-nr"><b>${esc(r.symbol)}</b>${r.kind === 'index' ? ' <span class="chip muted">index</span>' : ''}<span>line ${v(r.line_next)} · ${r.dist >= 0 ? '+' : ''}${fmt(r.dist, 1)}% · next = ${({ 3: '3rd' })[r.touches + 1] || (r.touches + 1) + 'th'} touch</span></div>`; };
+      return `<div class="tl-nr" role="button" tabindex="0" data-n="${NR.indexOf(r)}"><b>${esc(r.symbol)}</b>${r.kind === 'index' ? ' <span class="chip muted">index</span>' : ''}<span>line ${v(r.line_next)} · ${r.dist >= 0 ? '+' : ''}${fmt(r.dist, 1)}% · next = ${({ 3: '3rd' })[r.touches + 1] || (r.touches + 1) + 'th'} touch</span><em>chart ›</em></div>`; };
     el.innerHTML = `<details class="t2-more t2-wd tl-box"${open ? ' open' : ''}><summary>📈 <b>Trend lines:</b> ${sum}</summary>
       <div class="cd-box">${NR.length ? `<div class="cd-row"><div class="cd-h"><b>Within 3% of the line</b></div><div class="lv-sub muted">${esc(String(S.scanned || ''))} stocks and indices scanned ${esc((S.generated || '').slice(0, 10))}. Phone alert when one comes within 1% of its line.</div>${NR.map(nrRow).join('')}</div>` : ''}
-      ${srv && L.length ? '<div class="cd-row"><div class="cd-h"><b>Your watch list</b></div></div>' : ''}${L.map((x) => `<div class="cd-row"><div class="cd-h"><b>${esc(x.symbol)}</b>${x.error ? ' <span class="chip muted">no data</span>' : x.rising ? (x.below ? ' <span class="chip down">broken</span>' : x.dist <= 2 ? ' <span class="chip up">near the line</span>' : '') : ' <span class="chip muted">line falling · no alerts</span>'}
+      ${srv && L.length ? '<div class="cd-row"><div class="cd-h"><b>Your watch list</b></div></div>' : ''}${L.map((x, wi) => `<div class="cd-row"><div class="cd-h"><b class="tl-w" role="button" data-w="${wi}">${esc(x.symbol)} <em>chart ›</em></b>${x.error ? ' <span class="chip muted">no data</span>' : x.rising ? (x.below ? ' <span class="chip down">broken</span>' : x.dist <= 2 ? ' <span class="chip up">near the line</span>' : '') : ' <span class="chip muted">line falling · no alerts</span>'}
           <button class="lv-link tl-x" data-x="${esc(x.symbol)}" aria-label="Remove">✕</button></div>
         ${x.error ? '' : `<div class="lv-sub"><b>Line today ${m(x.line)}</b> · close ${m(x.close)} (${x.dist >= 0 ? '+' : ''}${fmt(x.dist, 1)}%)</div>
         <div class="lv-sub muted">Swing lows ${dd(x.a_d)} ${m(x.a_l)} → ${dd(x.b_d)} ${m(x.b_l)} · ${x.touches > 2 ? `touched ${x.touches - 2}× since` : 'next touch = 3rd'}</div>`}</div>`).join('')}
@@ -3986,11 +3986,44 @@ async function tlCard(anchor, mk) {
       try { await lvApi('/api/tl', { method: 'POST', body: JSON.stringify({ symbol: b.dataset.x, mk, remove: true }) }); } catch (er) { /* */ } draw(true); }));
     const add = async () => { const v = (el.querySelector('#tlsym').value || '').trim().toUpperCase(); if (!v) return; const msg = el.querySelector('#tlmsg'); msg.textContent = 'Adding…';
       try { await lvApi('/api/tl', { method: 'POST', timeout: 30000, body: JSON.stringify({ symbol: v, mk }) }); draw(true); } catch (er) { msg.textContent = er.message; } };
+    el.querySelectorAll('.tl-nr[data-n]').forEach((b) => b.addEventListener('click', () => { const r = NR[+b.dataset.n]; tlChart(r, async () => r.bars); }));
+    el.querySelectorAll('.tl-w[data-w]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const x = L[+b.dataset.w];
+      tlChart({ ...x, line_next: x.line }, () => lvApi(`/api/tl/bars?sym=${encodeURIComponent(x.symbol)}&mk=${x.mk}`, { timeout: 30000 })); }));
     if (!srv) return;
     el.querySelector('#tladd').addEventListener('click', add);
     el.querySelector('#tlsym').addEventListener('keydown', (e) => { if (e.key === 'Enter') add(); });
   };
   draw(false);
+}
+/* 17 Nov 2026: tap a trend line row -> daily candles with the line through the 2 latest swing lows */
+async function tlChart(r, getBars) {
+  const cur = r.mk === 'US' ? '$' : r.mk === 'NSE' ? '₹' : ''; const M = (v) => cur + fmt(v, v > 999 ? 0 : 2, r.mk === 'US' ? 'en-US' : 'en-IN');
+  const dd = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const lineNow = r.line_next != null ? r.line_next : r.line;
+  $('#sheet-body').innerHTML = `<div class="tdc-h"><div class="t2-sh"><b>${esc(r.symbol)}</b><span>Trend line through the 2 latest swing lows</span></div><b class="tdc-px" id="tdcpx"></b></div>
+    <div class="tdc-chart" id="tdcv"><p class="muted pad">Loading chart…</p></div><p class="tdc-key" id="tdckey"></p>
+    <div class="bg-tiles"><div><span>Swing low 1</span><b>${M(r.a_l)}</b><small>${dd(r.a_d)}</small></div><div><span>Swing low 2</span><b>${M(r.b_l)}</b><small>${dd(r.b_d)}</small></div><div class="risk"><span>Line next day</span><b>${M(lineNow)}</b></div></div>
+    <p class="tdc-why">Alert when price comes within 1% of the line (${({ 3: '3rd' })[(r.touches || 2) + 1] || ((r.touches || 2) + 1) + 'th'} touch). A close below it breaks the trend. Watch only: tested 2016–26, no better than the 50-day average.</p>`;
+  $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+  let B = null; try { B = await getBars(); } catch (e) { B = null; }
+  const box = $('#tdcv'); if (!box) return;
+  if (!B || !B.t || !B.t.length || !window.LightweightCharts) { box.innerHTML = '<p class="muted pad">Chart not available right now.</p>'; return; }
+  box.innerHTML = '';
+  const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight || 300, width: box.clientWidth, handleScroll: false, handleScale: false,
+    timeScale: { borderColor: C.line, fixLeftEdge: true, fixRightEdge: true }, grid: { vertLines: { visible: false }, horzLines: { color: C.grid } } });
+  const cs = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall, priceLineVisible: false });
+  const n = B.t.length; const bars = []; for (let i = 0; i < n; i++) bars.push({ time: B.t[i], open: B.o[i], high: B.h[i], low: B.l[i], close: B.c[i] });
+  cs.setData(bars);
+  const ib = B.t.indexOf(r.b_d); let ia = B.t.indexOf(r.a_d);
+  if (ib >= 0) {
+    const slope = ia >= 0 && ib > ia ? (r.b_l - r.a_l) / (ib - ia) : r.slope; if (ia < 0) ia = 0;
+    const ln = ch.addLineSeries({ color: '#2b8cff', lineWidth: 3, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false });
+    const pts = []; for (let i = ia; i < n; i++) pts.push({ time: B.t[i], value: r.b_l + slope * (i - ib) }); ln.setData(pts);
+    cs.setMarkers([r.a_d, r.b_d].filter((d) => B.t.includes(d)).map((d, k) => ({ time: d, position: 'belowBar', color: '#2b8cff', shape: 'arrowUp', text: 'Swing low ' + (k + 1) })));
+  }
+  ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
+  $('#tdcpx').textContent = M(B.c[n - 1]);
+  $('#tdckey').innerHTML = `Daily candles · <i style="background:#2b8cff"></i>trend line (swing low 1 → swing low 2, extended)`;
 }
 /* Today (US): one line when stops were raised at the last check -> Live › US */
 async function usStopsToday(anchor) {

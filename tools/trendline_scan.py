@@ -65,10 +65,15 @@ def main():
                 continue
             if len(df) < 60:
                 continue
-            r = line_row([str(x.date()) for x in df.index], df.High.values, df.Low.values, df.Close.values)
+            t = [str(x.date()) for x in df.index]
+            r = line_row(t, df.High.values, df.Low.values, df.Close.values)
             if r:
                 nm, mk, kind = names[y]
-                rows.append(dict(y=y, symbol=nm, mk=mk, kind=kind, **r))
+                r = dict(y=y, symbol=nm, mk=mk, kind=kind, **r)
+                if r["armed"] and r["dist"] <= 3:          # the app's "near the line" list draws this chart on tap
+                    g = df.iloc[-160:]; rd = lambda a: [round(float(x), 2) for x in a]  # noqa: E731
+                    r["bars"] = dict(t=t[-160:], o=rd(g.Open), h=rd(g.High), l=rd(g.Low), c=rd(g.Close))
+                rows.append(r)
     rows.sort(key=lambda r: (not r["armed"], r["dist"]))
     near = [r for r in rows if r["armed"] and r["dist"] <= 3]
     json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(tick), rising=len(rows),

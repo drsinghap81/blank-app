@@ -779,3 +779,15 @@ def test_trend_line_scan(tmp_path):
     finally:
         if had: open(p, "w").write(old)
         else: os.remove(p)
+
+
+def test_trend_line_bars(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    class R:
+        def raise_for_status(self): pass
+        def json(self): return {"chart": {"result": [{"timestamp": [1794988800, 1795075200], "indicators": {"quote": [{
+            "open": [10, 11], "high": [12, 13], "low": [9, None], "close": [11, 12]}]}}]}}
+    A.requests.get = lambda url, **k: R()
+    j = c.get("/api/tl/bars?sym=KOTAKBANK", headers=h).json()
+    assert j == {"t": ["2026-11-18"], "o": [10], "h": [12], "l": [9], "c": [11]}
