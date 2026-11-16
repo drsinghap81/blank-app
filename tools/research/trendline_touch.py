@@ -5,7 +5,7 @@ Swing low: lowest low with 5 days each side (known 5 days later). Line through t
 It is live from the day the 2nd low is confirmed until the next swing low is confirmed (then the line is redrawn).
 Touch: the 5 previous closes were all > 1% above the line and today's low reaches line x 1.005 (same rule as the app alert).
 The first touch on a line = the "3rd touch"; later ones = 4th+.
-Outcome from the line price: 10/20-day return minus the equal-weight universe; "held" = no close > 3% under the line in
+Outcome from the line price (only days that traded at the line; limit fill): 10/20-day return minus the equal-weight universe; "held" = no close > 3% under the line in
 the next 10 days. Controls: touches of the 50-day average with the same rule, and every day in an uptrend.
 Trades (buy at the line, or the open if it gaps below):
   T20  stop line - 1.5 ATR(14), exit after 20 days.
@@ -45,9 +45,12 @@ def scan(sym, df, mk):
     def outcome(d, line, src, nth=0):
         if d + 20 >= n or not (val[d] >= 5e7 and c[d] >= 50) or not np.isfinite(atr[d]) or not np.isfinite(mk[d + 20]):
             return
+        if l[d] > line:                                      # touched within 0.5% but never traded at the line: no fill
+            return
         e = o[d] if o[d] < line else line                    # limit order at the line
         r10 = c[d + 10] / e - 1; r20 = c[d + 20] / e - 1
         m10 = mk[d + 10] / mk[d - 1] - 1; m20 = mk[d + 20] / mk[d - 1] - 1
+        xc20 = c[d + 20] / c[d] - 1 - (mk[d + 20] / mk[d] - 1)   # bought at the touch day's close instead
         held = bool((c[d:d + 11] >= line * 0.97).all())
         stop = line - 1.5 * atr[d - 1]; up = bool(np.isfinite(sma200[d]) and c[d - 1] > sma200[d])
         # T20
@@ -65,7 +68,7 @@ def scan(sym, df, mk):
                 xr, dr = o[k + 1], k + 1; break
         if xr is None:
             dr = min(d + 120, n - 1); xr = c[dr]
-        ev.append(dict(sym=sym, d=ds[d], src=src, nth=nth, up=up, ex10=r10 - m10, ex20=r20 - m20, r20=r20, held=held, entry=e, stop=stop,
+        ev.append(dict(sym=sym, d=ds[d], src=src, nth=nth, up=up, ex10=r10 - m10, ex20=r20 - m20, xc20=xc20, r20=r20, held=held, entry=e, stop=stop,
                        x20=x20, d20=ds[d20], xr=xr, dr=ds[dr]))
     for d in range(6, n):
         p = act[d]
@@ -88,7 +91,8 @@ def summ(E):
     if not len(E):
         return {}
     return dict(n=len(E), held=round(E.held.mean() * 100, 1), ex10=round(E.ex10.mean() * 100, 2), ex20=round(E.ex20.mean() * 100, 2),
-                t20=round(E.ex20.mean() / (E.ex20.std() / math.sqrt(len(E))), 2), win20=round((E.r20 > 0).mean() * 100, 1))
+                t20=round(E.ex20.mean() / (E.ex20.std() / math.sqrt(len(E))), 2),
+                ex20_close_entry=round(E.xc20.mean() * 100, 2), win20=round((E.r20 > 0).mean() * 100, 1))
 
 
 def portfolio(T, xcol, dcol, cap=2e6):
