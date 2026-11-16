@@ -2295,14 +2295,18 @@ def tl_scan_alerts(mks):
             continue
         n = r.get("touches", 2) + 1; nth = {3: "3rd"}.get(n, f"{n}th")
         kind = "index" if r.get("kind") == "index" else "stock"; cur = "Rs " if r["mk"] == "NSE" and kind == "stock" else ""
-        if res:
+        if r.get("flat"):
+            what = "swing high" if res else "swing low"
+            txt = (f"{r['symbol']} ({kind}): {'up' if res else 'down'} to its {what} level {cur}{line:,.2f} from {r['b_d'][5:]} "
+                   f"({'high' if res else 'low'} {cur}{x:,.2f}, now {cur}{q['ltp']:,.2f}). {'Resistance' if res else 'Support'} level, watch only.")
+        elif res:
             slope = "falling" if r["slope"] < 0 else "rising"
             txt = (f"{r['symbol']} ({kind}): {nth} time at its {slope} resistance line (swing highs {r['a_d'][5:]} {cur}{r['a_l']:g} "
                    f"and {r['b_d'][5:]} {cur}{r['b_l']:g}). Line {cur}{line:,.2f}, high {cur}{x:,.2f}, now {cur}{q['ltp']:,.2f}. Watch only.")
         else:
             txt = (f"{r['symbol']} ({kind}): {nth} time at its rising trend line (swing lows {r['a_d'][5:]} {cur}{r['a_l']:g} "
                    f"and {r['b_d'][5:]} {cur}{r['b_l']:g}). Line {cur}{line:,.2f}, low {cur}{x:,.2f}, now {cur}{q['ltp']:,.2f}. Watch only, not a tested buy.")
-        alert("setup", r["symbol"], txt, key=f"tl{'res' if res else 'touch'}:{r['symbol']}:{r['a_d']}:{r['b_d']}:{qd.isoformat()}",
+        alert("setup", r["symbol"], txt, key=f"tl{'lv' if r.get('flat') else ''}{'res' if res else 'touch'}:{r['symbol']}:{r['a_d']}:{r['b_d']}:{qd.isoformat()}",
               mk="US" if r["mk"] == "US" else "NSE" if r["mk"] == "NSE" else None)
 
 

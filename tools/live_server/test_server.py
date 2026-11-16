@@ -779,6 +779,9 @@ def test_trend_line_scan(tmp_path):
         rows["rows"][0].update(side="res", slope=-20.0, line_next=26200, a_l=26600, b_l=26400); _j.dump(rows, open(p, "w")); A._TLS["d"] = None
         A.tl_scan_alerts({"NSE"}); al = A.alerts_load()["items"]       # high 26050 >= 26180 * 0.99 -> resistance alert
         assert len(al) == 2 and "falling resistance line" in al[-1]["text"]
+        rows["rows"][0].update(flat=True, slope=0.0, line_next=26200, a_d="2026-11-10", b_d="2026-11-10"); _j.dump(rows, open(p, "w")); A._TLS["d"] = None
+        A.tl_scan_alerts({"NSE"}); al = A.alerts_load()["items"]
+        assert len(al) == 3 and "swing high level 26,200.00" in al[-1]["text"]
     finally:
         if had: open(p, "w").write(old)
         else: os.remove(p)

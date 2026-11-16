@@ -99,6 +99,33 @@ def res_row(t, h, l, c):
                 dist=round(float((line(n) / c[-1] - 1) * 100), 2), armed=bool(armed_next), touches=touches, above=bool(c[-1] > line(n - 1)))
 
 
+def level_rows(t, h, l, c, K=3):
+    """17 Nov 2026: horizontal levels. The latest swing high (highest wick with K days each side) drawn flat to the right
+    while no close has gone above it (resistance), and the latest swing low drawn flat while no close has gone below it
+    (support). Alert when price comes back within 1% after 5 closes more than 1% away."""
+    n = len(c); h = np.asarray(h, float); l = np.asarray(l, float); c = np.asarray(c, float); out = []
+    for side, x in (("res", h), ("sup", l)):
+        piv = [i for i in range(K, n - K) if (x[i] == x[i - K:i + K + 1].max() if side == "res" else x[i] == x[i - K:i + K + 1].min())]
+        if not piv:
+            continue
+        b = piv[-1]; v = x[b]
+        if (c[b + 1:] > v).any() if side == "res" else (c[b + 1:] < v).any():
+            continue                                   # already broken: no level to approach
+        away = (lambda k: c[k] < v * 0.99) if side == "res" else (lambda k: c[k] > v * 1.01)
+        hit = (lambda i: h[i] >= v * 0.99) if side == "res" else (lambda i: l[i] <= v * 1.01)
+        touches, armed = 1, False
+        for i in range(b + 1, n):
+            if i >= b + 5 and all(away(k) for k in range(i - 5, i)):
+                armed = True
+            if armed and hit(i):
+                touches += 1; armed = False
+        dist = (v / c[-1] - 1) * 100 if side == "res" else (c[-1] / v - 1) * 100
+        out.append(dict(side=side, flat=True, a_d=t[b], a_l=round(float(v), 4), b_d=t[b], b_l=round(float(v), 4), slope=0.0, day=t[-1],
+                        close=round(float(c[-1]), 4), line=round(float(v), 4), line_next=round(float(v), 4), dist=round(float(dist), 2),
+                        armed=bool(n - 5 > b and all(away(k) for k in range(n - 5, n))), touches=touches))
+    return out
+
+
 def main():
     names = {}
     for s in pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "data", "universe", "nifty500.csv")).Symbol:
@@ -116,7 +143,8 @@ def main():
             if len(df) < 60:
                 continue
             t = [str(x.date()) for x in df.index]
-            for r in (line_row(t, df.High.values, df.Low.values, df.Close.values), res_row(t, df.High.values, df.Low.values, df.Close.values)):
+            for r in [line_row(t, df.High.values, df.Low.values, df.Close.values), res_row(t, df.High.values, df.Low.values, df.Close.values)] \
+                    + level_rows(t, df.High.values, df.Low.values, df.Close.values):
                 if not r:
                     continue
                 nm, mk, kind = names[y]
@@ -126,11 +154,11 @@ def main():
                     r["bars"] = dict(t=t[-160:], o=rd(g.Open), h=rd(g.High), l=rd(g.Low), c=rd(g.Close))
                 rows.append(r)
     rows.sort(key=lambda r: (not r["armed"], r["dist"]))
-    near = [(r["symbol"], r["side"], r["dist"]) for r in rows if r["armed"] and r["dist"] <= 3]
+    near = [(r["symbol"], r["side"] + ("-level" if r.get("flat") else ""), r["dist"]) for r in rows if r["armed"] and r["dist"] <= 3]
     json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(tick), lines=len(rows),
                    rule="Support: line through the 2 latest swing lows that no candle cuts (3 days each side), rising only. Resistance: the same "
                         "through the 2 latest swing highs (any slope). Alert when price comes within 1% of a line after 5 closes more than 1% "
-                        "away (the 3rd touch). Watch only: the support touch was tested 2016-26, no better than the 50-day average.",
+                        "away (the 3rd touch). Levels: the latest swing high / swing low drawn flat to the right, alert within 1%. Watch only: the support touch was tested 2016-26, no better than the 50-day average.",
                    rows=[r for r in rows if r["dist"] <= 8]), open(OUT, "w"), indent=0)
     print("lines", len(rows), "armed within 3%:", near[:40])
 
