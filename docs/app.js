@@ -2696,9 +2696,17 @@ function patRows() {
   return (P.rows || []).filter((r) => (f === 'all' || r.status === f) && (ty === 'all' || r.typ === ty)
     && (!q || r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)));
 }
+/* 17 Nov 2026: classic neckline rule for bottoms - enter on a daily CLOSE above the neckline; stop 4% under the neckline
+   (6% for an inverse H&S); minimum target = neckline + (neckline - lowest low). Tested 2016-26 on Nifty 500: target reached
+   39-48% of the time, average no better than a random stock with the same stop and target (watch only). */
+function patPlan(r) {
+  const low = Math.min(...r.lows.map((x) => x[1])); const h = r.neck - low;
+  const sl = r.neck * (r.typ === 'IHS' ? 0.94 : 0.96); const tgt = r.neck + h; const ref = r.status === 'breakout' ? r.close : r.neck;
+  return { sl, tgt, slPct: (1 - sl / ref) * 100, tgtPct: (tgt / ref - 1) * 100, rr: (tgt - ref) / Math.max(ref - sl, 1e-9), slRule: r.typ === 'IHS' ? '6%' : '4%' };
+}
 function patItem(r, i) {
   const st = r.status === 'breakout' ? `<span class="chip new">Broke neckline ${r.days_since === 0 ? 'today' : r.days_since + 'd ago'}</span>` : `<span class="chip open">${fmt(r.to_neck_pct, 1)}% to neckline</span>`;
-  const chip = `${st}<span class="chip">${PAT_NM[r.typ]}</span>${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fell ${fmt(r.fall_pct, 0)}%</span><span class="chip">stop ${fmt(r.stop_pct, 0)}% below</span>${r.rsi_div > 0 ? '<span class="chip open">RSI divergence</span>' : ''}`;
+  const chip = `${st}<span class="chip">${PAT_NM[r.typ]}</span>${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fell ${fmt(r.fall_pct, 0)}%</span>${(() => { const q = patPlan(r); return `<span class="chip up">🎯 ${fmt(q.tgt, 2, 'en-IN')} (+${fmt(q.tgtPct, 0)}%)</span><span class="chip down">SL ${fmt(q.sl, 2, 'en-IN')}</span>`; })()}${r.rsi_div > 0 ? '<span class="chip open">RSI divergence</span>' : ''}`;
   return `<li class="row ${r.status === 'breakout' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.kind === 'index' ? r.name : r.symbol)}</div><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div>
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">neck ${fmt(r.neck, 2, 'en-IN')}</span></div></li>`;
 }
@@ -2987,20 +2995,23 @@ async function drawVcp(r, mk) {
   ch.timeScale().setVisibleLogicalRange({ from: Math.max(0, (a >= 0 ? a : n - 160) - 30), to: n + 5 });
 }
 function patSelect(r) {
-  const P = state.pat || {}; const rg = P.regime;
-  const st = r.status === 'breakout' ? `<div class="status open">${PAT_NM[r.typ]}: closed above the neckline ${fmt(r.neck, 2, AL())} on ${day(r.signal_date)}.</div>`
-    : `<div class="status info">${PAT_NM[r.typ]} forming: ${fmt(r.to_neck_pct, 1)}% below the neckline ${fmt(r.neck, 2, AL())}. A daily close above it would complete the pattern.</div>`;
+  const P = state.pat || {}; const rg = P.regime; const q = patPlan(r);
+  const st = r.status === 'breakout' ? `<div class="status open">${PAT_NM[r.typ]}: closed above the neckline ${fmt(r.neck, 2, AL())} on ${day(r.signal_date)}. <b>Target ${fmt(q.tgt, 2, AL())} · SL ${fmt(q.sl, 2, AL())}</b> (classic neckline rule).</div>`
+    : `<div class="status info">${PAT_NM[r.typ]} forming: ${fmt(r.to_neck_pct, 1)}% below the neckline ${fmt(r.neck, 2, AL())}. A daily close above it would complete the pattern: then target ${fmt(q.tgt, 2, AL())}, SL ${fmt(q.sl, 2, AL())}.</div>`;
   const f = [['Pattern', PAT_NM[r.typ]], ['Lows', r.lows.map((x) => `${fmt(x[1], 2, AL())} (${day(x[0])})`).join(' · ')], ['Neckline (highest peak between the lows)', fmt(r.neck, 2, AL())],
-    ['Pattern stop (lowest low − 1%)', `${fmt(r.stop, 2, AL())} (${fmt(r.stop_pct, 1)}% below)`], ['Measured move', `${fmt(r.height_pct, 1)}% above the neckline = ${fmt(r.neck * (1 + r.height_pct / 100), 2, AL())}`],
+    ['Target (neckline + pattern height)', `${fmt(q.tgt, 2, AL())} (${q.tgtPct >= 0 ? '+' : ''}${fmt(q.tgtPct, 1)}% from ${r.status === 'breakout' ? 'now' : 'the neckline'})`],
+    [`Stop loss (${q.slRule} under the neckline)`, `${fmt(q.sl, 2, AL())} (${fmt(q.slPct, 1)}% below${r.status === 'breakout' ? ' now' : ' the neckline'}) · reward : risk ${fmt(q.rr, 1)}`],
+    ['Wide stop (lowest low − 1%)', `${fmt(r.stop, 2, AL())} (${fmt(r.stop_pct, 1)}% below)`],
     ['Fall before the pattern', `${fmt(r.fall_pct, 0)}% from the 1-year high`], ['Market', rg ? (rg.down ? 'Nifty 500 below its 200-day average (downtrend)' : 'Nifty 500 above its 200-day average') : '–']];
   if (r.rsi_lows) f.splice(2, 0, ['RSI(14) at the lows', r.rsi_lows.map((v) => fmt(v, 0)).join(' → ') + (r.rsi_now != null ? ` · now ${fmt(r.rsi_now, 0)}` : '')],
     ['RSI divergence', r.rsi_div > 0 ? `Bullish: a later low at or below an earlier one with RSI ${fmt(r.rsi_div, 0)} points higher` : (r.typ === 'TW' ? 'None (a tilted W has a higher low by design)' : 'None')]);
   openPanel(`<div class="d-head"><div><h2>${esc(r.kind === 'index' ? r.name : r.symbol)}</h2><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, AL())}</b></div></div>
     ${st}<div class="status exit watch"><b>Watch only.</b> Backtest 2016–26: no edge over a random stock. Not part of your tested systems.</div>
     <div class="chart" id="patc"></div><div class="rsi" id="patr"></div>
-    <p class="muted" style="margin:4px 16px">Daily candles · ● lows · gold = neckline · red = pattern stop · blue / grey = 50 / 200-day average · lower panel RSI(14) with 30 / 70${r.rsi_div > 0 ? ' · dashed purple = divergence (price low vs RSI low)' : ''}. RSI divergence did not improve the odds in the India 2016–26 test (target first 67% vs 66% for a random stock).</p>
+    <p class="muted" style="margin:4px 16px">Daily candles · ● lows · gold = neckline · green dashed = target (neckline + height) · red dashed = SL (${q.slRule} under the neckline) · dotted = pattern low · blue / grey = 50 / 200-day average · lower panel RSI(14) with 30 / 70${r.rsi_div > 0 ? ' · dashed purple = divergence (price low vs RSI low)' : ''}. RSI divergence did not improve the odds in the India 2016–26 test (target first 67% vs 66% for a random stock).</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
-    ${r.kind === 'index' ? '' : swingPlan(r.status === 'breakout' ? r.close : r.neck, r.stop, botMk(), r.neck * (1 + r.height_pct / 100), 'measured move', r.status !== 'breakout')}`);
+    <p class="muted" style="margin:4px 16px">Neckline rule tested 2016–26 (Nifty 500): the target was reached 39–48% of the time before the stop, and the average trade was no better than a random stock with the same stop and target.</p>
+    ${r.kind === 'index' ? '' : swingPlan(r.status === 'breakout' ? r.close : r.neck, q.sl, botMk(), q.tgt, 'neckline target', r.status !== 'breakout')}`);
   drawPat(r);
 }
 async function drawPat(r) {
@@ -3011,7 +3022,12 @@ async function drawPat(r) {
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
   const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath');
   s.createPriceLine({ price: r.neck, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'neckline' });
-  s.createPriceLine({ price: r.stop, color: C.fall || '#C62828', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'stop' });
+  { const q = patPlan(r);
+    s.createPriceLine({ price: q.tgt, color: C.rise || '#0A7A55', lineWidth: 2, lineStyle: 2, axisLabelVisible: true, title: 'target' });
+    s.createPriceLine({ price: q.sl, color: C.fall || '#C62828', lineWidth: 2, lineStyle: 2, axisLabelVisible: true, title: 'SL' });
+    s.createPriceLine({ price: r.stop, color: '#9CA3AF', lineWidth: 1, lineStyle: 3, axisLabelVisible: false, title: 'pattern low' });
+    const fit = ch.addLineSeries({ color: 'rgba(0,0,0,0)', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    const L = c.t.length; if (L > 1) fit.setData([{ time: c.t[L - 2], value: q.tgt }, { time: c.t[L - 1], value: q.sl }]); }   // keep target and SL on screen
   const ma = (k, col) => { const l = ch.addLineSeries({ color: col, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
     l.setData(c.t.map((t, i) => (c[k][i] == null ? { time: t } : { time: t, value: c[k][i] }))); };
   ma('sma50', '#3B82F6'); ma('sma200', '#9CA3AF');
