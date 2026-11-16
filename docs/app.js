@@ -4012,6 +4012,8 @@ async function tlChart(r, getBars) {
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight || 300, width: box.clientWidth, handleScroll: false, handleScale: false,
     timeScale: { borderColor: C.line, fixLeftEdge: true, fixRightEdge: true }, grid: { vertLines: { visible: false }, horzLines: { color: C.grid } } });
   const cs = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall, priceLineVisible: false });
+  { const a0 = B.t.indexOf(r.a_d); const st = Math.max(0, Math.min(B.t.length - 60, (a0 >= 0 ? a0 : B.t.length - 90) - 40));   // zoom: 40 days before swing low 1
+    if (st > 0) B = { t: B.t.slice(st), o: B.o.slice(st), h: B.h.slice(st), l: B.l.slice(st), c: B.c.slice(st) }; }
   const n = B.t.length; const bars = []; for (let i = 0; i < n; i++) bars.push({ time: B.t[i], open: B.o[i], high: B.h[i], low: B.l[i], close: B.c[i] });
   cs.setData(bars);
   const ib = B.t.indexOf(r.b_d); let ia = B.t.indexOf(r.a_d);
@@ -4019,11 +4021,11 @@ async function tlChart(r, getBars) {
     const slope = ia >= 0 && ib > ia ? (r.b_l - r.a_l) / (ib - ia) : r.slope; if (ia < 0) ia = 0;
     const ln = ch.addLineSeries({ color: '#2b8cff', lineWidth: 3, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false });
     const pts = []; for (let i = ia; i < n; i++) pts.push({ time: B.t[i], value: r.b_l + slope * (i - ib) }); ln.setData(pts);
-    cs.setMarkers([r.a_d, r.b_d].filter((d) => B.t.includes(d)).map((d, k) => ({ time: d, position: 'belowBar', color: '#2b8cff', shape: 'arrowUp', text: 'Swing low ' + (k + 1) })));
+    cs.setMarkers([r.a_d, r.b_d].filter((d) => B.t.includes(d)).map((d, k) => ({ time: d, position: 'belowBar', color: '#2b8cff', shape: 'arrowUp', text: String(k + 1) })));
   }
   ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
   $('#tdcpx').textContent = M(B.c[n - 1]);
-  $('#tdckey').innerHTML = `Daily candles · <i style="background:#2b8cff"></i>trend line (swing low 1 → swing low 2, extended)`;
+  $('#tdckey').innerHTML = `Daily candles · <i style="background:#2b8cff"></i>trend line through swing lows 1 and 2, extended`;
 }
 /* Today (US): one line when stops were raised at the last check -> Live › US */
 async function usStopsToday(anchor) {
