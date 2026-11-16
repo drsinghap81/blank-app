@@ -1,12 +1,10 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-V,2026-11-13,425.76,62.9,413.63,416.43,2.2,0,0.0,Visa Inc.,watch,127.8,0.85,72,2904.96,425.76,62.9
-MDT,2026-11-13,102.86,63.7,98.73,100.02,2.8,0,0.0,Medtronic plc. Ordinary Shares,watch,124.2,0.81,73,872.82,102.86,63.7
-CRVL,2026-11-12,86.5,65.1,82.49,81.84,5.7,1,-0.9,CorVel Corp.,trend,151.0,0.89,98,14.24,85.69,62.0
-TEVA,2026-11-11,43.24,63.9,41.42,41.64,3.8,2,2.9,Teva Pharmaceutical Industries Limited Ordinary Shares,watch,128.7,0.79,88,294.38,44.5,69.2
-BOX,2026-11-10,42.55,62.1,41.4,40.9,4.0,3,2.5,"Box, Inc. Class A Common Stock",trend,153.4,0.9,85,116.04,43.63,66.7
-BSVN,2026-11-10,59.18,61.1,58.0,57.75,2.5,3,-0.4,Bank7 Corp. - Common stock,watch,148.5,0.93,95,2.52,58.94,58.5
-RGA,2026-11-10,274.06,66.0,263.7,259.09,5.8,3,0.4,"Reinsurance Group of America, Incorporated Common Stock",watch,137.6,0.88,83,120.02,275.15,66.6
-ABM,2026-11-10,54.79,64.5,52.88,52.1,5.2,3,-0.3,ABM Industries Incorporated Common Stock,watch,125.2,0.82,73,20.18,54.64,61.9
-TMO,2026-11-09,721.63,61.6,688.32,661.6,9.1,4,-3.0,Thermo Fisher Scientific Inc Common Stock,watch,154.7,0.94,90,1558.54,700.22,53.7
-WAT,2026-11-09,476.7,61.5,455.06,450.61,5.8,4,-3.5,Waters Corporation Common Stock,watch,144.9,0.91,92,451.86,460.25,52.6
-WST,2026-11-09,413.09,64.8,395.59,386.88,6.8,4,0.8,"West Pharmaceutical Services, Inc. Common Stock",watch,118.4,0.73,80,309.2,416.42,65.8
+HNGE,2026-11-16,121.29,61.9,115.13,112.8,7.5,0,0.0,"Hinge Health, Inc. Class A Common Stock",trend,158.9,0.86,97,239.38,121.29,61.9
+V,2026-11-13,425.76,62.9,413.63,416.43,2.2,1,0.2,Visa Inc.,watch,127.9,0.85,72,2944.92,426.46,63.3
+MDT,2026-11-13,102.86,63.7,98.73,100.02,2.8,1,0.0,Medtronic plc. Ordinary Shares,watch,124.3,0.81,73,800.7,102.88,63.7
+CRVL,2026-11-12,86.5,65.1,82.49,81.84,5.7,2,1.0,CorVel Corp.,trend,151.2,0.89,98,14.7,87.34,65.6
+TEVA,2026-11-11,43.24,63.9,41.42,41.64,3.8,3,-1.5,Teva Pharmaceutical Industries Limited Ordinary Shares,watch,132.5,0.8,88,302.36,42.57,55.5
+BOX,2026-11-10,42.55,62.1,41.4,40.9,4.0,4,3.0,"Box, Inc. Class A Common Stock",trend,153.4,0.9,85,111.48,43.82,67.6
+BSVN,2026-11-10,59.18,61.1,58.0,57.75,2.5,4,-1.2,Bank7 Corp. - Common stock,watch,148.4,0.93,95,2.5,58.49,54.6
+RGA,2026-11-10,274.06,66.0,263.7,259.09,5.8,4,-0.8,"Reinsurance Group of America, Incorporated Common Stock",watch,136.5,0.87,83,121.58,271.86,60.3
+ABM,2026-11-10,54.79,64.5,52.88,52.1,5.2,4,-0.3,ABM Industries Incorporated Common Stock,watch,127.1,0.83,75,20.06,54.64,61.9
