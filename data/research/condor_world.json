@@ -1,0 +1,575 @@
+{
+ "method": "'Pause after a big move' iron condor on 9 liquid indices, 2010-2026 (16 Nov 2026).\n\nOnly Nifty has real option prices (NSE bhavcopy test: claude/quiet-market-condor-test.md). Here every index is priced\nwith Black-Scholes from its own volatility index (or 20-day realised vol x the median IV/RV ratio when Yahoo has no\nvol index), with a put/call skew. The model is calibrated on Nifty ALL weeks to the real-price result (average credit\n0.131% of spot, average P&L -0.004% of spot per trade), then the signal is evaluated on every index.\n\nRule: |10-day move| >= 3.5% and last 3 days' high-low range < 2%; enter at the close of the first qualifying day 4, 3 or\n2 trading days before the weekly expiry; short call/put 2% OTM, 1% wings, hold to expiry (settle at the close).\nResult in % of spot and as return on capital at risk (wing - credit). Output: data/research/condor_world.json.",
+ "calib": {
+  "k": 0.9,
+  "cost_pct_spot": 0.0209,
+  "real": {
+   "all_credit": 0.131,
+   "all_pnl": -0.004,
+   "sig_credit": 0.124,
+   "sig_pnl": 0.0678,
+   "sig_win": 89,
+   "sig_n": 55
+  }
+ },
+ "rows": [
+  {
+   "index": "NIFTY",
+   "iv_source": "vol index",
+   "period": "2010-26",
+   "signal": {
+    "n": 106,
+    "per_yr": 6.7,
+    "win": 86.8,
+    "avg_pct": 0.0609,
+    "t": 2.89,
+    "worst_pct": -0.825,
+    "credit_pct": 0.1579,
+    "roc_avg": 7.4,
+    "roc_worst": -103.5,
+    "yr_pct": 0.409,
+    "years_pos": "14/17"
+   },
+   "all_weeks": {
+    "n": 865,
+    "per_yr": 52.3,
+    "win": 82.4,
+    "avg_pct": -0.0018,
+    "t": -0.19,
+    "worst_pct": -0.995,
+    "credit_pct": 0.1478,
+    "roc_avg": -0.4,
+    "roc_worst": -105.2,
+    "yr_pct": -0.094,
+    "years_pos": "9/17"
+   }
+  },
+  {
+   "index": "NIFTY",
+   "iv_source": "vol index",
+   "period": "2019-26",
+   "signal": {
+    "n": 55,
+    "per_yr": 7.5,
+    "win": 90.9,
+    "avg_pct": 0.0938,
+    "t": 4.78,
+    "worst_pct": -0.571,
+    "credit_pct": 0.152,
+    "roc_avg": 11.8,
+    "roc_worst": -69.8,
+    "yr_pct": 0.708,
+    "years_pos": "8/8"
+   },
+   "all_weeks": {
+    "n": 407,
+    "per_yr": 52.4,
+    "win": 83.3,
+    "avg_pct": 0.0024,
+    "t": 0.18,
+    "worst_pct": -0.995,
+    "credit_pct": 0.1369,
+    "roc_avg": -0.2,
+    "roc_worst": -105.2,
+    "yr_pct": 0.125,
+    "years_pos": "4/8"
+   }
+  },
+  {
+   "index": "SENSEX",
+   "iv_source": "vol index",
+   "period": "2010-26",
+   "signal": {
+    "n": 107,
+    "per_yr": 6.7,
+    "win": 87.9,
+    "avg_pct": 0.0606,
+    "t": 2.79,
+    "worst_pct": -0.965,
+    "credit_pct": 0.1515,
+    "roc_avg": 7.5,
+    "roc_worst": -103.5,
+    "yr_pct": 0.406,
+    "years_pos": "13/17"
+   },
+   "all_weeks": {
+    "n": 865,
+    "per_yr": 52.3,
+    "win": 83.1,
+    "avg_pct": 0.0054,
+    "t": 0.57,
+    "worst_pct": -0.995,
+    "credit_pct": 0.1479,
+    "roc_avg": 0.6,
+    "roc_worst": -105.2,
+    "yr_pct": 0.28,
+    "years_pos": "11/17"
+   }
+  },
+  {
+   "index": "SENSEX",
+   "iv_source": "vol index",
+   "period": "2019-26",
+   "signal": {
+    "n": 51,
+    "per_yr": 6.8,
+    "win": 88.2,
+    "avg_pct": 0.0598,
+    "t": 1.91,
+    "worst_pct": -0.965,
+    "credit_pct": 0.1433,
+    "roc_avg": 7.9,
+    "roc_worst": -102.2,
+    "yr_pct": 0.407,
+    "years_pos": "6/8"
+   },
+   "all_weeks": {
+    "n": 407,
+    "per_yr": 52.4,
+    "win": 84.3,
+    "avg_pct": 0.0043,
+    "t": 0.33,
+    "worst_pct": -0.995,
+    "credit_pct": 0.1369,
+    "roc_avg": 0.1,
+    "roc_worst": -105.2,
+    "yr_pct": 0.226,
+    "years_pos": "5/8"
+   }
+  },
+  {
+   "index": "SPX",
+   "iv_source": "vol index",
+   "period": "2010-26",
+   "signal": {
+    "n": 103,
+    "per_yr": 6.4,
+    "win": 85.4,
+    "avg_pct": 0.0176,
+    "t": 0.65,
+    "worst_pct": -0.821,
+    "credit_pct": 0.1497,
+    "roc_avg": 1.8,
+    "roc_worst": -102.9,
+    "yr_pct": 0.113,
+    "years_pos": "7/16"
+   },
+   "all_weeks": {
+    "n": 865,
+    "per_yr": 52.2,
+    "win": 81.3,
+    "avg_pct": 0.0049,
+    "t": 0.51,
+    "worst_pct": -0.948,
+    "credit_pct": 0.1606,
+    "roc_avg": -0.2,
+    "roc_worst": -105.3,
+    "yr_pct": 0.258,
+    "years_pos": "10/17"
+   }
+  },
+  {
+   "index": "SPX",
+   "iv_source": "vol index",
+   "period": "2019-26",
+   "signal": {
+    "n": 56,
+    "per_yr": 7.5,
+    "win": 82.1,
+    "avg_pct": 0.0172,
+    "t": 0.43,
+    "worst_pct": -0.821,
+    "credit_pct": 0.1734,
+    "roc_avg": 1.9,
+    "roc_worst": -102.9,
+    "yr_pct": 0.128,
+    "years_pos": "3/8"
+   },
+   "all_weeks": {
+    "n": 407,
+    "per_yr": 52.3,
+    "win": 82.1,
+    "avg_pct": 0.0206,
+    "t": 1.4,
+    "worst_pct": -0.88,
+    "credit_pct": 0.1885,
+    "roc_avg": 1.7,
+    "roc_worst": -105.3,
+    "yr_pct": 1.078,
+    "years_pos": "6/8"
+   }
+  },
+  {
+   "index": "NDX",
+   "iv_source": "vol index",
+   "period": "2010-26",
+   "signal": {
+    "n": 140,
+    "per_yr": 8.7,
+    "win": 80.7,
+    "avg_pct": 0.0271,
+    "t": 1.13,
+    "worst_pct": -0.939,
+    "credit_pct": 0.1791,
+    "roc_avg": 3.3,
+    "roc_worst": -103.3,
+    "yr_pct": 0.235,
+    "years_pos": "10/17"
+   },
+   "all_weeks": {
+    "n": 865,
+    "per_yr": 52.2,
+    "win": 72.9,
+    "avg_pct": -0.0239,
+    "t": -1.98,
+    "worst_pct": -0.939,
+    "credit_pct": 0.2176,
+    "roc_avg": -4.0,
+    "roc_worst": -105.2,
+    "yr_pct": -1.249,
+    "years_pos": "7/17"
+   }
+  },
+  {
+   "index": "NDX",
+   "iv_source": "vol index",
+   "period": "2019-26",
+   "signal": {
+    "n": 66,
+    "per_yr": 8.8,
+    "win": 80.3,
+    "avg_pct": 0.0434,
+    "t": 1.14,
+    "worst_pct": -0.802,
+    "credit_pct": 0.2121,
+    "roc_avg": 5.5,
+    "roc_worst": -102.9,
+    "yr_pct": 0.38,
+    "years_pos": "5/8"
+   },
+   "all_weeks": {
+    "n": 407,
+    "per_yr": 52.3,
+    "win": 68.3,
+    "avg_pct": -0.0309,
+    "t": -1.58,
+    "worst_pct": -0.872,
+    "credit_pct": 0.2679,
+    "roc_avg": -5.1,
+    "roc_worst": -105.2,
+    "yr_pct": -1.615,
+    "years_pos": "3/8"
+   }
+  },
+  {
+   "index": "RUT",
+   "iv_source": "realised vol x1.15",
+   "period": "2010-26",
+   "signal": {
+    "n": 117,
+    "per_yr": 7.2,
+    "win": 80.3,
+    "avg_pct": 0.0285,
+    "t": 0.93,
+    "worst_pct": -0.941,
+    "credit_pct": 0.2113,
+    "roc_avg": 3.2,
+    "roc_worst": -104.1,
+    "yr_pct": 0.205,
+    "years_pos": "12/17"
+   },
+   "all_weeks": {
+    "n": 865,
+    "per_yr": 52.2,
+    "win": 69.9,
+    "avg_pct": -0.0339,
+    "t": -2.63,
+    "worst_pct": -0.961,
+    "credit_pct": 0.2293,
+    "roc_avg": -4.2,
+    "roc_worst": -105.5,
+    "yr_pct": -1.768,
+    "years_pos": "3/17"
+   }
+  },
+  {
+   "index": "RUT",
+   "iv_source": "realised vol x1.15",
+   "period": "2019-26",
+   "signal": {
+    "n": 48,
+    "per_yr": 6.2,
+    "win": 72.9,
+    "avg_pct": -0.0301,
+    "t": -0.53,
+    "worst_pct": -0.825,
+    "credit_pct": 0.2481,
+    "roc_avg": -5.6,
+    "roc_worst": -104.0,
+    "yr_pct": -0.187,
+    "years_pos": "4/8"
+   },
+   "all_weeks": {
+    "n": 407,
+    "per_yr": 52.3,
+    "win": 67.3,
+    "avg_pct": -0.0417,
+    "t": -2.07,
+    "worst_pct": -0.955,
+    "credit_pct": 0.2674,
+    "roc_avg": -5.9,
+    "roc_worst": -105.5,
+    "yr_pct": -2.182,
+    "years_pos": "0/8"
+   }
+  },
+  {
+   "index": "SX5E",
+   "iv_source": "realised vol x1.15",
+   "period": "2010-26",
+   "signal": {
+    "n": 108,
+    "per_yr": 6.8,
+    "win": 85.2,
+    "avg_pct": 0.0619,
+    "t": 2.5,
+    "worst_pct": -0.839,
+    "credit_pct": 0.1871,
+    "roc_avg": 8.2,
+    "roc_worst": -103.7,
+    "yr_pct": 0.423,
+    "years_pos": "12/17"
+   },
+   "all_weeks": {
+    "n": 867,
+    "per_yr": 52.3,
+    "win": 71.6,
+    "avg_pct": -0.0068,
+    "t": -0.58,
+    "worst_pct": -1.016,
+    "credit_pct": 0.19,
+    "roc_avg": 0.6,
+    "roc_worst": -105.5,
+    "yr_pct": -0.357,
+    "years_pos": "7/17"
+   }
+  },
+  {
+   "index": "SX5E",
+   "iv_source": "realised vol x1.15",
+   "period": "2019-26",
+   "signal": {
+    "n": 53,
+    "per_yr": 7.1,
+    "win": 84.9,
+    "avg_pct": 0.0725,
+    "t": 2.55,
+    "worst_pct": -0.587,
+    "credit_pct": 0.1752,
+    "roc_avg": 9.4,
+    "roc_worst": -103.7,
+    "yr_pct": 0.515,
+    "years_pos": "7/8"
+   },
+   "all_weeks": {
+    "n": 408,
+    "per_yr": 52.4,
+    "win": 73.0,
+    "avg_pct": -0.0084,
+    "t": -0.52,
+    "worst_pct": -1.016,
+    "credit_pct": 0.1692,
+    "roc_avg": 0.2,
+    "roc_worst": -105.5,
+    "yr_pct": -0.442,
+    "years_pos": "3/8"
+   }
+  },
+  {
+   "index": "DAX",
+   "iv_source": "realised vol x1.15",
+   "period": "2010-26",
+   "signal": {
+    "n": 112,
+    "per_yr": 6.9,
+    "win": 83.0,
+    "avg_pct": 0.0373,
+    "t": 1.35,
+    "worst_pct": -0.92,
+    "credit_pct": 0.173,
+    "roc_avg": 5.4,
+    "roc_worst": -103.5,
+    "yr_pct": 0.259,
+    "years_pos": "12/17"
+   },
+   "all_weeks": {
+    "n": 867,
+    "per_yr": 52.3,
+    "win": 71.7,
+    "avg_pct": -0.0142,
+    "t": -1.21,
+    "worst_pct": -1.017,
+    "credit_pct": 0.1822,
+    "roc_avg": -0.6,
+    "roc_worst": -105.5,
+    "yr_pct": -0.744,
+    "years_pos": "6/17"
+   }
+  },
+  {
+   "index": "DAX",
+   "iv_source": "realised vol x1.15",
+   "period": "2019-26",
+   "signal": {
+    "n": 51,
+    "per_yr": 6.8,
+    "win": 78.4,
+    "avg_pct": 0.0094,
+    "t": 0.21,
+    "worst_pct": -0.92,
+    "credit_pct": 0.1605,
+    "roc_avg": 1.8,
+    "roc_worst": -103.3,
+    "yr_pct": 0.064,
+    "years_pos": "5/8"
+   },
+   "all_weeks": {
+    "n": 408,
+    "per_yr": 52.4,
+    "win": 71.1,
+    "avg_pct": -0.0164,
+    "t": -1.0,
+    "worst_pct": -1.017,
+    "credit_pct": 0.1679,
+    "roc_avg": -1.2,
+    "roc_worst": -105.5,
+    "yr_pct": -0.857,
+    "years_pos": "2/8"
+   }
+  },
+  {
+   "index": "N225",
+   "iv_source": "realised vol x1.15",
+   "period": "2010-26",
+   "signal": {
+    "n": 127,
+    "per_yr": 8.0,
+    "win": 79.5,
+    "avg_pct": 0.0382,
+    "t": 1.27,
+    "worst_pct": -0.931,
+    "credit_pct": 0.2171,
+    "roc_avg": 7.0,
+    "roc_worst": -105.1,
+    "yr_pct": 0.304,
+    "years_pos": "12/17"
+   },
+   "all_weeks": {
+    "n": 864,
+    "per_yr": 52.2,
+    "win": 70.9,
+    "avg_pct": -0.0172,
+    "t": -1.33,
+    "worst_pct": -0.992,
+    "credit_pct": 0.2305,
+    "roc_avg": -0.7,
+    "roc_worst": -105.3,
+    "yr_pct": -0.899,
+    "years_pos": "7/17"
+   }
+  },
+  {
+   "index": "N225",
+   "iv_source": "realised vol x1.15",
+   "period": "2019-26",
+   "signal": {
+    "n": 49,
+    "per_yr": 6.8,
+    "win": 83.7,
+    "avg_pct": 0.0538,
+    "t": 1.04,
+    "worst_pct": -0.916,
+    "credit_pct": 0.2351,
+    "roc_avg": 9.6,
+    "roc_worst": -105.1,
+    "yr_pct": 0.366,
+    "years_pos": "6/8"
+   },
+   "all_weeks": {
+    "n": 407,
+    "per_yr": 52.3,
+    "win": 74.2,
+    "avg_pct": 0.0046,
+    "t": 0.25,
+    "worst_pct": -0.989,
+    "credit_pct": 0.2348,
+    "roc_avg": 2.6,
+    "roc_worst": -105.3,
+    "yr_pct": 0.24,
+    "years_pos": "4/8"
+   }
+  },
+  {
+   "index": "HSI",
+   "iv_source": "realised vol x1.15",
+   "period": "2010-26",
+   "signal": {
+    "n": 126,
+    "per_yr": 7.6,
+    "win": 72.2,
+    "avg_pct": -0.0428,
+    "t": -1.36,
+    "worst_pct": -1.017,
+    "credit_pct": 0.1942,
+    "roc_avg": -6.0,
+    "roc_worst": -104.3,
+    "yr_pct": -0.326,
+    "years_pos": "5/17"
+   },
+   "all_weeks": {
+    "n": 866,
+    "per_yr": 52.3,
+    "win": 72.4,
+    "avg_pct": -0.0156,
+    "t": -1.22,
+    "worst_pct": -1.017,
+    "credit_pct": 0.223,
+    "roc_avg": -0.6,
+    "roc_worst": -104.9,
+    "yr_pct": -0.813,
+    "years_pos": "4/17"
+   }
+  },
+  {
+   "index": "HSI",
+   "iv_source": "realised vol x1.15",
+   "period": "2019-26",
+   "signal": {
+    "n": 39,
+    "per_yr": 5.1,
+    "win": 71.8,
+    "avg_pct": -0.0376,
+    "t": -0.69,
+    "worst_pct": -0.871,
+    "credit_pct": 0.2157,
+    "roc_avg": -6.0,
+    "roc_worst": -103.4,
+    "yr_pct": -0.193,
+    "years_pos": "2/8"
+   },
+   "all_weeks": {
+    "n": 408,
+    "per_yr": 52.4,
+    "win": 68.6,
+    "avg_pct": -0.0236,
+    "t": -1.17,
+    "worst_pct": -0.974,
+    "credit_pct": 0.2685,
+    "roc_avg": -1.3,
+    "roc_worst": -104.9,
+    "yr_pct": -1.237,
+    "years_pos": "2/8"
+   }
+  }
+ ]
+}
