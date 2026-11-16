@@ -1088,7 +1088,7 @@ async function loadLive() {
   const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
   el.innerHTML = `${lvSeg()}${S ? '' : head}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
-    ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div>` : ''}${lvHero(S, PF)}${bookHtml}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
+    ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div><div id="lval"></div>` : ''}${lvHero(S, PF)}${bookHtml}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
     ${pane('buy', `    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '' : `<span class="lv-sub"><a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>
@@ -1136,7 +1136,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); srvCard(); } wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); srvCard(); alCard($('#lval')); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -4705,7 +4705,7 @@ async function alCard(box) {
     <div class="al-list">${L.length ? L.map((x) => { const [ic, lab] = AL_KIND[x.kind] || ['•', x.kind]; return `<div class="td-card td-raise"><span class="td-av" style="background:${red(x) ? 'var(--fall)' : 'var(--rise)'}">${ic}</span><span class="td-nm"><b>${esc(x.symbol || lab)}</b><small>${esc(x.text)}</small><small>${when(x)}</small></span></div>`; }).join('')
       : '<p class="muted td-rs">You get an alert when a stop is hit, a buy fills, a stock is sold, a sell signal fires or a stop is raised.</p>'}
       <button class="bg-ghost sm" id="alon">${on ? 'Phone alerts on ✓' : '🔔 Turn on phone alerts'}</button></div></details>`;
-  $('#alon').addEventListener('click', (e) => alPush(e.target));
+  box.querySelector('#alon').addEventListener('click', (e) => alPush(e.target));
 }
 async function alPoll() {
   const c = lvCfg(); if (!c.url || !c.token) return;
@@ -5135,6 +5135,7 @@ async function tdRender2(el) {
     <div class="t2-tile buy" data-go="t2mom" role="button" tabindex="0"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add" data-go="${knowHeld && adds.length ? 't2adds' : 't2mom'}" role="button" tabindex="0"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div>
     <div class="t2-tile fut" data-go="t2tur" role="button" tabindex="0"><b>${tuNew.length + tuEx.length || tuIn.length}</b><span>Turtle Trading System</span></div></div>`;
   el.innerHTML = `<div class="td-wrap t2">
+    <div id="tdal"></div>
     <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
       <div class="t2-date"><div><b>${esc(clk.dayNum)}</b><span>${esc(clk.month)}</span></div>
         <div class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small><b>${clk.txt}</b><small>${esc(clk.at)} · ${esc(clk.local)} your time</small></div></div>
@@ -5171,6 +5172,7 @@ async function tdRender2(el) {
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)} · refreshed ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
   el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); }));
+  alCard($('#tdal'));
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   el.querySelectorAll('.t2-tile[data-go]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.go); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('t2-flash'); setTimeout(() => t.classList.remove('t2-flash'), 1400); } }));
   el.querySelectorAll('.t2-wcard[data-tu]').forEach((b) => b.addEventListener('click', () => turtleSelect(state._tuShow[+b.dataset.tu])));
