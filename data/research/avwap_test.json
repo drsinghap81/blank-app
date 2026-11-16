@@ -1,0 +1,131 @@
+{
+ "method": "Anchored VWAP from major swing lows / highs as support / resistance (16 Nov 2026). Nifty 500 stocks, 2016 - Nov 2026.\n\nMajor swing low: lowest low within +-20 days AND the lowest low of the 120 days before it (confirmed 20 days later).\nMajor swing high: the mirror. AVWAP from the anchor day: cumulative (typical price x volume) / cumulative volume,\nfollowed for up to 250 days after confirmation.\nSupport touch (low-anchored): the 5 previous closes were all > 1% above the AVWAP, and today's low reaches it.\nResistance touch (high-anchored): the 5 previous closes were all > 1% below, and today's high reaches it.\nOutcome from the touch-day close: 10- and 20-day return minus the equal-weight universe return over the same days\n(excess); support \"held\" = no close more than 3% under the line in the next 10 days; resistance \"held\" = no close more\nthan 3% above it. Controls with the same touch rule: AVWAP anchored at random days (same count) and the 50-day SMA.\nTrade (support): buy the touch close, stop line - 1.5 ATR(14), exit after 20 days; portfolio Rs 20 L, 1% risk,\nmax 10% a stock, max 10 open, costs 0.3%. Liquid only (median 60-day value >= Rs 5 cr, price >= 50). Current members.\nOutput: data/research/avwap_test.json.",
+ "groups": {
+  "support | swing": {
+   "n": 9256,
+   "held": 54.7,
+   "ex10": -0.21,
+   "ex20": -0.51,
+   "t20": -5.5,
+   "win20": 52.2,
+   "portfolio": {
+    "cagr": 8.1,
+    "max_dd": -29.2,
+    "trades": 1251
+   }
+  },
+  "support | swing | uptrend": {
+   "n": 3546,
+   "held": 60.0,
+   "ex10": -0.29,
+   "ex20": -0.45,
+   "t20": -2.88,
+   "win20": 52.4,
+   "portfolio": {
+    "cagr": 5.7,
+    "max_dd": -26.6,
+    "trades": 1098
+   }
+  },
+  "support | random": {
+   "n": 10899,
+   "held": 53.3,
+   "ex10": -0.13,
+   "ex20": -0.56,
+   "t20": -6.16,
+   "win20": 53.2,
+   "portfolio": {
+    "cagr": 7.1,
+    "max_dd": -29.8,
+    "trades": 1267
+   }
+  },
+  "support | random | uptrend": {
+   "n": 7337,
+   "held": 56.8,
+   "ex10": -0.07,
+   "ex20": -0.42,
+   "t20": -3.73,
+   "win20": 53.7,
+   "portfolio": {
+    "cagr": 3.9,
+    "max_dd": -36.7,
+    "trades": 1229
+   }
+  },
+  "support | sma50": {
+   "n": 12576,
+   "held": 54.6,
+   "ex10": 0.01,
+   "ex20": -0.24,
+   "t20": -2.68,
+   "win20": 53.5,
+   "portfolio": {
+    "cagr": 7.5,
+    "max_dd": -27.6,
+    "trades": 1293
+   }
+  },
+  "support | sma50 | uptrend": {
+   "n": 9007,
+   "held": 56.2,
+   "ex10": 0.08,
+   "ex20": -0.06,
+   "t20": -0.6,
+   "win20": 54.6,
+   "portfolio": {
+    "cagr": 8.4,
+    "max_dd": -31.5,
+    "trades": 1265
+   }
+  },
+  "resistance | swing": {
+   "n": 14762,
+   "held": 49.9,
+   "ex10": -0.53,
+   "ex20": -0.65,
+   "t20": -8.13,
+   "win20": 53.1
+  },
+  "resistance | swing | downtrend": {
+   "n": 3403,
+   "held": 57.7,
+   "ex10": -0.83,
+   "ex20": -1.22,
+   "t20": -7.88,
+   "win20": 52.5
+  },
+  "resistance | random": {
+   "n": 14468,
+   "held": 48.8,
+   "ex10": -0.4,
+   "ex20": -0.51,
+   "t20": -6.35,
+   "win20": 52.6
+  },
+  "resistance | random | downtrend": {
+   "n": 6304,
+   "held": 53.0,
+   "ex10": -0.58,
+   "ex20": -0.92,
+   "t20": -7.97,
+   "win20": 51.1
+  },
+  "resistance | sma50": {
+   "n": 11008,
+   "held": 49.6,
+   "ex10": -0.41,
+   "ex20": -0.63,
+   "t20": -7.0,
+   "win20": 52.6
+  },
+  "resistance | sma50 | downtrend": {
+   "n": 5462,
+   "held": 51.0,
+   "ex10": -0.52,
+   "ex20": -0.88,
+   "t20": -7.23,
+   "win20": 52.0
+  }
+ }
+}
