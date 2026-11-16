@@ -981,7 +981,7 @@ body.pub .owner-only { display: none !important; }
 
 /* ===== Today v2 (15 Nov 2026) */
 .t2 .td-mk{margin:0}
-.t2-head{display:flex;flex-direction:column;gap:14px;padding:6px 2px 4px}
+.td-wrap.t2 .t2-head{display:flex;flex-direction:column;gap:14px;padding:6px 2px 4px}
 .t2-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .t2-k{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .t2-date{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
@@ -1015,7 +1015,7 @@ body.pub .owner-only { display: none !important; }
 .t2-band em{flex:none;font-style:normal;font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:99px;background:var(--soft)}
 .t2-sec.inv .t2-band b,.t2-sec.inv .t2-band em{color:#0E9F6E}.t2-sec.mom .t2-band b,.t2-sec.mom .t2-band em{color:var(--accent)}.t2-sec.trd .t2-band b,.t2-sec.trd .t2-band em{color:#5B6CF0}
 .t2-lbl{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:14px 2px 6px}.t2-lbl b{font-size:14px}.t2-lbl small{font-size:12px;color:var(--muted);text-align:right}
-.t2-list{display:flex;flex-direction:column;gap:10px}
+.td-wrap.t2 .t2-list{display:flex;flex-direction:column;gap:10px}
 .t2-card,.t2-wcard{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left;padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);color:var(--ink);font:inherit}
 .t2-card{cursor:pointer}.t2-card:hover{background:var(--hover)}
 .t2-wcard{margin-bottom:10px}
@@ -1033,7 +1033,7 @@ body.pub .owner-only { display: none !important; }
 .t2-wr:first-child{border-top:0}.t2-wr:hover{background:var(--hover)}
 .t2-n{min-width:36px;height:30px;padding:0 6px;box-sizing:border-box;border-radius:9px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
 .t2-wt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.t2-wt b{font-size:14.5px}.t2-wt small{font-size:12px;color:var(--muted)}
-.t2-row{display:flex;gap:14px;flex-wrap:wrap;margin:16px 2px}
+.td-wrap.t2 .t2-row{display:flex;gap:14px;flex-wrap:wrap;margin:16px 2px}
 
 /* Seasonality card (15 Nov 2026) */
 .season-bars{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;height:84px;align-items:end;margin:4px 0 6px}
@@ -1060,10 +1060,10 @@ body.pub .owner-only { display: none !important; }
 .t2-wcard[role=button]{cursor:pointer}
 
 /* 15 Nov 2026: signals swipe sideways instead of stacking (phones); the cut-off next card shows there is more */
-.t2-list,.t2-hs{display:flex;flex-direction:row;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:6px;scrollbar-width:thin}
-.t2-list>.t2-card,.t2-hs>.t2-wcard{flex:0 0 min(84%,340px);scroll-snap-align:start;margin-bottom:0}
-.t2-list>.t2-empty{flex:1}
-@media (min-width:900px){.t2-list,.t2-hs{flex-wrap:wrap;overflow-x:visible}.t2-list>.t2-card,.t2-hs>.t2-wcard{flex:0 0 calc(50% - 5px)}}
+.td-wrap.t2 .t2-list,.td-wrap.t2 .t2-hs{display:flex;flex-direction:row;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:6px;scrollbar-width:thin}
+.td-wrap.t2 .t2-list>.t2-card,.td-wrap.t2 .t2-hs>.t2-wcard{flex:0 0 min(84%,340px);scroll-snap-align:start;margin-bottom:0}
+.td-wrap.t2 .t2-list>.t2-empty{flex:1}
+@media (min-width:900px){.td-wrap.t2 .t2-list,.td-wrap.t2 .t2-hs{flex-wrap:wrap;overflow-x:visible}.td-wrap.t2 .t2-list>.t2-card,.td-wrap.t2 .t2-hs>.t2-wcard{flex:0 0 calc(50% - 5px)}}
 /* 15 Nov 2026: rows without a sparkline give the text the full width (chips were squeezed into a narrow column).
    Phones: price and its note move under the chips, so chips use the whole row. */
 .row:has(> div:nth-child(2):empty) { grid-template-columns: minmax(0, 1fr) auto; }
@@ -1096,3 +1096,11 @@ body.pub .owner-only { display: none !important; }
 
 /* 16 Nov 2026: beginner Today, other markets */
 .bgo-idea{box-sizing:border-box;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;margin:6px 0}
+
+/* 16 Nov 2026: beginner action tiles */
+.bg-act{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
+.bg-actt{font:inherit;color:inherit;border:1px solid var(--line);background:var(--card);border-radius:18px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.bg-actt b{font-size:34px;line-height:1.1}
+.bg-actt span{font-size:15px;opacity:.85}
+.bg-actt.sell b{color:var(--fall)} .bg-actt.buy b{color:var(--rise)} .bg-actt.tur b{color:var(--saffron)}
+.bg-sells{display:flex;flex-direction:column;gap:8px;margin:6px 0 12px}

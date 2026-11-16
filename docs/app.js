@@ -3983,7 +3983,7 @@ async function pfChart(box) {
   const cur = st.mk === 'US' ? '$' : '₹';
   const tabs = (k, opts) => `<div class="seg" style="margin:6px 0">${opts.map(([v, n]) => `<button data-pc="${k}" data-v="${v}" aria-selected="${st[k] === v}">${n}</button>`).join('')}</div>`;
   box.innerHTML = `<div class="card"><h3>Holdings chart</h3>${tabs('mk', [['NSE', 'India'], ['US', 'US']])}${tabs('mode', [['sum', 'Sum (value)'], ['norm', 'Normalized (=100)']])}${tabs('rng', [['3mo', '3M'], ['6mo', '6M'], ['1y', '1Y']])}
-    <div class="chart" id="pfcc" style="height:240px"><p class="muted pad">${H.length ? 'Loading prices…' : 'No holdings for this market.'}</p></div><p class="muted small" id="pfcn"></p></div>`;
+    <div class="chart" id="pfcc" style="height:${H.length ? '240px' : 'auto'}"><p class="muted pad">${H.length ? 'Loading prices…' : 'No holdings for this market.'}</p></div><p class="muted small" id="pfcn"></p></div>`;
   box.querySelectorAll('[data-pc]').forEach((b) => b.addEventListener('click', () => { st[b.dataset.pc] = b.dataset.v; pfChart(box); }));
   if (!H.length) return;
   let D; try { D = await lvApi(`/api/history?mk=${st.mk}&rng=${st.rng}&syms=${encodeURIComponent(H.map((h) => h.s).concat(idx).join(','))}`, { timeout: 60000 }); }
@@ -4716,7 +4716,47 @@ function bgHow({ r, s }) {
   $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
 }
 
+/* 16 Nov 2026: beginner Today action tiles (as in pro): sell first, buy, Turtle. Big numbers, tap to act. */
+async function bgActTiles(box, P, rows) {
+  if (!box) return;
+  let held = []; try { held = JSON.parse(localStorage.getItem('td.heldSyms') || '[]'); } catch (e) { /* */ }
+  if (!held.length) held = pfLoad().h.map((h) => h.s);
+  const H = new Set(held); const sells = ((P && P.exits) || []).filter((e) => H.has(e.symbol));
+  if (!state.turtle) state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null);
+  const TU = (state.turtle && state.turtle.rows) || []; const tu = TU.filter((r) => (r.status === 'in trade' && r.new) || r.status === 'exited today').length || TU.filter((r) => r.status === 'in trade').length;
+  const known = held.length > 0;
+  box.innerHTML = `<div class="bg-act">
+      <button class="bg-actt sell" data-go="sell"><b>${known ? sells.length : '–'}</b><span>to sell</span></button>
+      <button class="bg-actt buy" data-go="buy"><b>${rows.length}</b><span>to buy</span></button>
+      <button class="bg-actt tur" data-go="tur"><b>${tu}</b><span>Turtle</span></button></div>
+    ${sells.length ? `<div class="bg-sells" id="bgsells"><b>Sell at the next open</b>${sells.map((e) => `<div class="td-card td-raise"><span class="td-av" style="background:var(--fall)">↓</span><span class="td-nm"><b>Sell ${esc(e.symbol)}</b><small>${esc(e.system || '')} · ${esc(e.why || 'exit rule met')}</small></span></div>`).join('')}</div>` : ''}`;
+  box.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => {
+    const g = b.dataset.go;
+    if (g === 'sell') { const t = $('#bgsells'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); else toast(known ? 'Nothing to sell today' : 'Connect Live or add holdings to see sells'); }
+    else if (g === 'buy') { const t = $('#tdnew'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    else { state.athTabG = state.athTabG || {}; state.athTabG.trd = 'turtle'; show('trd'); } }));
+}
+/* My trades › Real (beginner): your Angel trades from the server with stops, your US holdings, and the holdings chart */
+async function bgReal(el) {
+  const c = lvCfg();
+  el.innerHTML = `<div class="bg-wrap"><div class="bg-seg"><button id="bgprac">Practice</button><span class="on">Real</span></div><div id="bgrealbody"><p class="muted pad">Loading your account…</p></div></div>`;
+  $('#bgprac').addEventListener('click', () => { state.bgReal = false; bgTrades(el); });
+  const body = $('#bgrealbody');
+  if (!c.url || !c.token) { body.innerHTML = '<p class="bg-empty">Connect your server in the Live tab (pro) once; your real trades then show here.</p>'; return; }
+  let S = null; try { S = await lvPlan(); } catch (e) { body.innerHTML = `<p class="down pad">Couldn't reach your server: ${esc(e.message)}</p>`; return; }
+  const T = (S.trades || []).filter((t) => t.state === 'open' && t.qty); const ex = new Set((S.exits || []).filter((e) => e.qty > 0).map((e) => e.symbol));
+  const val = T.reduce((a, t) => a + t.qty * (t.ltp || t.entry), 0), cost = T.reduce((a, t) => a + t.qty * t.entry, 0);
+  body.innerHTML = `<div class="bg-tiles"><div><span>Value</span><b>${inr(val)}</b></div><div class="${val - cost < 0 ? 'risk' : ''}"><span>P&amp;L</span><b>${val - cost >= 0 ? '+' : '−'}${inr(Math.abs(val - cost))}</b></div><div><span>Trades</span><b>${T.length}</b></div></div>
+    <div class="t2-head"><h3>India · Angel</h3><span class="muted">${T.length}</span></div>
+    <div class="t2-list">${T.map((t, i) => { const g = t.ltp ? (t.ltp / t.entry - 1) * 100 : null; const st = t.gtt_trigger || t.stop;
+      return t2Row({ sym: t.symbol, name: t.symbol, i, sub: `${t.qty} shares · stop ${inr(st, 0)}${t.trail_at ? ' ↑' : ''}`, top: inr(t.qty * (t.ltp || t.entry)),
+        right: ex.has(t.symbol) ? 'Sell now' : g == null ? '' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`, cls: ex.has(t.symbol) ? 'sellnow' : g == null ? '' : g >= 0 ? 'up' : 'down' }); }).join('') || '<p class="bg-empty">No open trades from the app.</p>'}</div>
+    <div id="bgrus"></div><div id="bgrch"></div>`;
+  body.querySelectorAll('.t2-row').forEach((b) => b.addEventListener('click', () => { const t = T[+b.dataset.i]; if (t) tdChart({ symbol: t.symbol, name: t.symbol, price: t.ltp || t.entry, stop: t.gtt_trigger || t.stop }, 'NSE'); }));
+  pfUS($('#bgrus')); pfChart($('#bgrch'));
+}
 async function bgTrades(el) {
+  if (state.bgReal) return bgReal(el);
   el.innerHTML = '<p class="muted pad">Loading your trades…</p>';
   const [pr, P] = await Promise.all([pfPrices(), getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan')]);
   const px = pr.px; const exits = new Set(((P && P.exits) || []).map((e) => e.symbol)); const L = bgPractice(); let changed = false;
@@ -4737,7 +4777,7 @@ async function bgTrades(el) {
         top: t.state === 'waiting' ? '–' : v ? inr(v) : '–', right: sell ? 'Sell now' : g == null ? '' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`, cls: sell ? 'sellnow' : g == null ? '' : g >= 0 ? 'up' : 'down' }); }).join('') || '<p class="bg-empty">Nothing open. Practise a pick from Today.</p>'}</div>
     ${done.length ? `<div class="t2-head"><h3>Closed</h3><span class="muted">${won} of ${done.length} won</span></div><div class="t2-list">${done.slice(-10).reverse().map((t) => { const g = pl(t);
       return t2Row({ sym: t.symbol, name: t.name || t.symbol, i: L.indexOf(t), sub: t.why || 'closed', top: val(t) ? inr(val(t)) : '–', right: g == null ? '' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`, cls: g >= 0 ? 'up' : 'down' }); }).join('')}</div>` : ''}</div>`;
-  $('#bgreal').addEventListener('click', () => { show('live'); bgNav('trades'); });
+  $('#bgreal').addEventListener('click', () => { state.bgReal = true; bgReal(el); });
   el.querySelectorAll('.t2-row').forEach((b) => b.addEventListener('click', () => {
     const L2 = bgPractice(); const t = L2[+b.dataset.i]; if (!t) return; const p = (px[t.symbol] || [])[0]; const g = pl(t); const sell = exits.has(t.symbol);
     $('#sheet-body').innerHTML = `<div class="t2-sh"><b>${esc(t.name || t.symbol)}</b><span>${esc(t.symbol)} · ${t.state}</span></div>
@@ -5414,6 +5454,7 @@ async function tdRender(el, beginner) {
   el.innerHTML = `<div class="td-wrap">${seg}<div id="tdal"></div><div id="tdmini"></div>
     <div class="td-hero"><span>Setups found</span><div class="td-big"><b>${n}</b>${scanned ? `<em>out of ${Number(scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>` : ''}</div>
       <div class="td-bar"><i style="width:100%"></i></div><small>Close ${day(P.asof)} · the scan runs every evening</small></div>
+    ${beginner ? '<div id="bgact"></div><div id="t2condor"></div>' : ''}
     ${beginner ? bgHero(cap('NSE') || 50000, {}) : ''}
     <div id="tdtop"></div>
     <div class="td-lh"><b>Top 10 to act on</b><small>Your 60/40 split: Momentum ranked by tested evidence (sector + stock aligned first), then Trend 9/21 in system order</small></div>
@@ -5438,7 +5479,8 @@ async function tdRender(el, beginner) {
   tdTopTiles($('#tdtop'), mk);
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (mk === 'US') usStopsToday($('#tdmini'));
-  if (!beginner) alCard($('#tdal'), mk);
+  alCard($('#tdal'), mk);
+  if (beginner) { bgActTiles($('#bgact'), P, rows); condorCard($('#t2condor'), 'NSE'); }
   tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } if (mk === 'NSE') tdGrowthMom($('#tdgm')); tdMatrix($('#tdmx'), mk); tdHeat($('#tdheat'), mk);
 }
 /* Heating up (11 Nov 2026): industries whose 1-week pulse jumped well above last month's. Information only: strength by
