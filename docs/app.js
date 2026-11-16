@@ -4870,12 +4870,12 @@ async function usWatchCard(box) {
     <div class="fact"><span>At risk to stops</span><b>${$f(risk)}</b><small>if every stop is hit</small></div></div>` : '';
   box.innerHTML = `<div class="lv-card" data-fold="skip"><b>Your US holdings · moomoo · alerts only</b>
     ${offline ? '<p class="status exit watch lv-sub"><b>Saved on this phone.</b> Your server takes these over after its next update (outside Indian market hours, about 9:05 pm Melbourne); alerts start then. Live prices show from then too.</p>' : ''}
-    <p class="lv-sub">Alerts: stop hit or within 3%; Trend 9/21 sell (a daily close with EMA 9 under EMA 21) and Monthly ATH sell (a weekly close under the 30-week average), checked after each US close, when the stops are also raised and one alert lists the stops to move in moomoo. The app never sells these.</p>
+    <p class="lv-sub">Alerts on stop hits, sell signals and stops to move. You sell in moomoo.</p>
     ${imp ? `<div class="status exit watch"><b>Add ${imp.length} holdings from your link?</b><div class="lv-sub">${imp.map((x) => `${esc(x.symbol)} ${x.qty} @ ${$f(x.entry)} · stop ${$f(x.stop)}${x.target ? ` · target ${$f(x.target)}` : ''} · ${esc(sysN(x.system))}`).join('<br>')}</div>
       <button class="lv-btn" id="uswimp">Add these ${imp.length}</button> <button class="lv-link" id="uswno">Not now</button></div>` : ''}
     ${sumH}${rows || '<p class="empty">Nothing tracked yet.</p>'}
     ${offline || !W.items.length ? '' : `<p class="lv-sub">🛡 <b>Daily stop raise:</b> Trend 9/21 stops follow EMA 21, Monthly ATH stops follow the 30-week average, and only ever move up (the system itself sells on the close). ${trTxtU} <button class="lv-link" id="uwtrail">Check stops now</button></p>`}
-    <details class="info" ${W.items.length ? '' : 'open'}><summary>Paste a list</summary><p class="lv-sub">Paste the line Claude gave you (or the whole link), then tap Read.</p>
+    <details class="info" ${W.items.length ? '' : 'open'}><summary>Paste a list</summary><p class="lv-sub">Paste the list, then tap Read.</p>
       <div style="display:flex;gap:6px;flex-wrap:wrap"><input id="uwpaste" placeholder="ACGL:7:107.28:102.99::TF,…" style="flex:1;min-width:12em"><button class="lv-btn" id="uwread">Read</button></div></details>
     <details class="info"><summary>Add a holding</summary><div class="row" style="display:flex;flex-wrap:wrap;gap:6px">
       <input id="uwsym" placeholder="Symbol" style="width:6em"><input id="uwq" type="number" placeholder="Shares" style="width:6em"><input id="uwe" type="number" step="any" placeholder="Buy price" style="width:7em">
