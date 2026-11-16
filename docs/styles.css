@@ -1116,3 +1116,4 @@ body.pub .owner-only { display: none !important; }
 .tl-nr{cursor:pointer;border-radius:8px}
 .tl-nr em,.tl-w em{font-style:normal;font-size:13px;color:var(--accent,#2b8cff);margin-left:auto}
 .tl-w{cursor:pointer}
+.tl-g{font-weight:700;font-size:15px;margin:10px 0 2px;opacity:.9}

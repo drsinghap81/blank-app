@@ -3968,15 +3968,17 @@ async function tlCard(anchor, mk) {
     let T = { items: [] }; if (srv) { try { T = await lvApi('/api/tl', { timeout: 30000 }); } catch (e) { /* scan list still shows */ } }
     const S = await getJSON(MAIN + 'data/scan/trendline.json', 'tlscan').catch(() => null);
     const NR = ((S && S.rows) || []).filter((r) => r.armed && r.dist <= 3 && (mk === 'US' ? r.mk === 'US' : r.mk !== 'US'))
-      .sort((a, b) => (a.kind === 'index' ? 0 : 1) - (b.kind === 'index' ? 0 : 1) || a.dist - b.dist).slice(0, 25);
+      .sort((a, b) => (a.kind === 'index' ? 0 : 1) - (b.kind === 'index' ? 0 : 1) || a.dist - b.dist);
     const L = (T.items || []).filter((x) => x.mk === mk);
     if (!NR.length && !L.length && !srv) { el.innerHTML = ''; return; }
+    const GR = [['Support lines (2 swing lows)', (r) => r.side !== 'res' && !r.flat], ['Resistance lines (2 swing highs)', (r) => r.side === 'res' && !r.flat],
+      ['Swing low levels', (r) => r.side !== 'res' && r.flat], ['Swing high levels', (r) => r.side === 'res' && r.flat]].map(([t, f]) => [t, NR.filter(f)]);
     const nS = NR.filter((r) => r.side !== 'res').length, nR = NR.length - nS;
     const sum = NR.length ? `${nS} near support · ${nR} near resistance` : 'none near a line today';
     const nrRow = (r) => { const cc = r.mk === 'NSE' && r.kind !== 'index' ? '₹' : ''; const v = (x) => cc + fmt(x, x > 999 ? 0 : 1, 'en-IN');
       return `<div class="tl-nr" role="button" tabindex="0" data-n="${NR.indexOf(r)}"><b>${esc(r.symbol)}</b>${r.side === 'res' ? ` <span class="chip down">${r.flat ? 'high level' : 'resistance'}</span>` : ` <span class="chip up">${r.flat ? 'low level' : 'support'}</span>`}${r.kind === 'index' ? ' <span class="chip muted">index</span>' : ''}<span>${r.flat ? 'level' : 'line'} ${v(r.line_next)} · ${r.side === 'res' ? fmt(r.dist, 1) + '% below' : (r.dist >= 0 ? '+' : '') + fmt(r.dist, 1) + '%'}${r.flat ? ` · swing ${r.side === 'res' ? 'high' : 'low'} ${new Date(r.b_d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : ` · next = ${({ 3: '3rd' })[r.touches + 1] || (r.touches + 1) + 'th'} touch`}</span><em>chart ›</em></div>`; };
     el.innerHTML = `<details class="t2-more t2-wd tl-box"${open ? ' open' : ''}><summary>📈 <b>Trend lines:</b> ${sum}</summary>
-      <div class="cd-box">${NR.length ? `<div class="cd-row"><div class="cd-h"><b>Within 3% of the line</b></div><div class="lv-sub muted">${esc(String(S.scanned || ''))} stocks and indices scanned ${esc((S.generated || '').slice(0, 10))}. Support = line through the 2 latest swing lows; resistance = through the 2 latest swing highs. No candle cuts either line. Levels = the latest swing high or low drawn flat to the right. Phone alert when price comes within 1% of one.</div>${NR.map(nrRow).join('')}</div>` : ''}
+      <div class="cd-box">${NR.length ? `<div class="cd-row"><div class="cd-h"><b>Within 3% of the line</b></div><div class="lv-sub muted">${esc(String(S.scanned || ''))} stocks and indices scanned ${esc((S.generated || '').slice(0, 10))}. Support = line through the 2 latest swing lows; resistance = through the 2 latest swing highs. No candle cuts either line. Levels = the latest swing high or low drawn flat to the right. Phone alert when price comes within 1% of one.</div>${GR.filter(([, a]) => a.length).map(([t, a]) => `<div class="tl-g">${esc(t)} · ${a.length}</div>${a.slice(0, 12).map(nrRow).join('')}${a.length > 12 ? `<div class="lv-sub muted">+${a.length - 12} more further away</div>` : ''}`).join('')}</div>` : ''}
       ${srv && L.length ? '<div class="cd-row"><div class="cd-h"><b>Your watch list</b></div></div>' : ''}${L.map((x, wi) => `<div class="cd-row"><div class="cd-h"><b class="tl-w" role="button" data-w="${wi}">${esc(x.symbol)} <em>chart ›</em></b>${x.error ? ' <span class="chip muted">no data</span>' : x.rising ? (x.below ? ' <span class="chip down">broken</span>' : x.dist <= 2 ? ' <span class="chip up">near the line</span>' : '') : ' <span class="chip muted">line falling · no alerts</span>'}
           <button class="lv-link tl-x" data-x="${esc(x.symbol)}" aria-label="Remove">✕</button></div>
         ${x.error ? '' : `<div class="lv-sub"><b>Line today ${m(x.line)}</b> · close ${m(x.close)} (${x.dist >= 0 ? '+' : ''}${fmt(x.dist, 1)}%)</div>
@@ -4024,11 +4026,11 @@ async function tlChart(r, getBars) {
     const lc = res ? '#ff5a6e' : '#2b8cff';
     const ln = ch.addLineSeries({ color: lc, lineWidth: 3, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false });
     const pts = []; for (let i = ia; i < n; i++) pts.push({ time: B.t[i], value: r.b_l + slope * (i - ib) }); ln.setData(pts);
-    cs.setMarkers([...new Set([r.a_d, r.b_d])].filter((d) => B.t.includes(d)).map((d, k) => ({ time: d, position: res ? 'aboveBar' : 'belowBar', color: lc, shape: res ? 'arrowDown' : 'arrowUp', text: String(k + 1) })));
+    cs.setMarkers([...new Set([r.a_d, r.b_d])].filter((d) => B.t.includes(d)).map((d, k) => ({ time: d, position: res ? 'aboveBar' : 'belowBar', color: lc, shape: res ? 'arrowDown' : 'arrowUp', text: r.flat ? (res ? 'swing high' : 'swing low') : String(k + 1) })));
   }
   ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
   $('#tdcpx').textContent = M(B.c[n - 1]);
-  $('#tdckey').innerHTML = `Daily candles · <i style="background:${res ? '#ff5a6e' : '#2b8cff'}"></i>${res ? 'resistance line through swing highs' : 'trend line through swing lows'} 1 and 2, extended`;
+  $('#tdckey').innerHTML = `Daily candles · <i style="background:${res ? '#ff5a6e' : '#2b8cff'}"></i>${r.flat ? `level from the swing ${res ? 'high' : 'low'}, drawn to the right` : `${res ? 'resistance line through swing highs' : 'trend line through swing lows'} 1 and 2, extended`}`;
 }
 /* Today (US): one line when stops were raised at the last check -> Live › US */
 async function usStopsToday(anchor) {
