@@ -1,4 +1,3 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-RS1,2026-11-11,815.0,63.5,784.97,777.5,4.8,2,-0.9,RS Group,watch,134.9,0.83,87,8.43,807.5,59.7
-CRDA,2026-11-10,3641.0,61.7,3585.55,3587.0,1.5,3,3.3,Croda International,watch,118.9,0.74,78,16.57,3762.0,71.6
-KIE,2026-11-09,321.6,62.2,308.95,299.2,7.5,4,-0.1,Kier Group,trend,155.3,0.93,85,3.37,321.2,58.5
+RS1,2026-11-11,815.0,63.5,784.97,777.5,4.8,3,-2.5,RS Group,watch,135.0,0.83,87,8.47,795.0,53.8
+CRDA,2026-11-10,3641.0,61.7,3585.55,3587.0,1.5,4,5.0,Croda International,watch,120.1,0.75,78,17.22,3822.0,75.4

@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-15T05:08+00:00",
-"asof": "2026-11-13",
+"generated": "2026-11-16T18:04+00:00",
+"asof": "2026-11-16",
 "market": "UK",
 "regime": null,
 "rules": "zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
@@ -12,11 +12,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 4510.0,
+"close": 4452.0,
 "neck": 4332.0,
-"to_neck_pct": -3.946784922394675,
+"to_neck_pct": -2.695417789757415,
 "stop": 3783.78,
-"stop_pct": 16.102439024390247,
+"stop_pct": 15.00943396226415,
 "height_pct": 12.344398340248963,
 "fall_pct": 39.71702880242547,
 "lows": [
@@ -40,9 +40,9 @@
 32.3
 ],
 "rsi_div": 7.0,
-"rsi_now": 70.4,
+"rsi_now": 65.1,
 "signal_date": "2026-11-06",
-"days_since": 5
+"days_since": 6
 },
 {
 "symbol": "PSH",
@@ -80,7 +80,7 @@
 "rsi_div": 0.0,
 "rsi_now": 57.1,
 "signal_date": "2026-11-04",
-"days_since": 7
+"days_since": 8
 },
 {
 "symbol": "STJ",
@@ -88,11 +88,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 1172.5,
+"close": 1174.5,
 "neck": 1120.0,
-"to_neck_pct": -4.477611940298509,
+"to_neck_pct": -4.640272456364414,
 "stop": 1001.38,
-"stop_pct": 14.59402985074627,
+"stop_pct": 14.739463601532565,
 "height_pct": 9.80392156862746,
 "fall_pct": 52.25490196078431,
 "lows": [
@@ -116,9 +116,9 @@
 40.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 65.5,
+"rsi_now": 65.8,
 "signal_date": "2026-11-04",
-"days_since": 7
+"days_since": 8
 },
 {
 "symbol": "IWG",
@@ -126,11 +126,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "breakout",
-"close": 218.39999389648438,
+"close": 217.0,
 "neck": 202.8000030517578,
-"to_neck_pct": -7.142853150499873,
+"to_neck_pct": -6.543777395503314,
 "stop": 169.78,
-"stop_pct": 22.25961321204366,
+"stop_pct": 21.75806451612904,
 "height_pct": 18.250730642424372,
 "fall_pct": 41.383221386525726,
 "lows": [
@@ -163,9 +163,9 @@
 38.5
 ],
 "rsi_div": 5.8,
-"rsi_now": 74.0,
+"rsi_now": 71.5,
 "signal_date": "2026-11-03",
-"days_since": 8
+"days_since": 9
 },
 {
 "symbol": "MRO",
@@ -173,11 +173,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 484.20001220703125,
+"close": 487.70001220703125,
 "neck": 490.0,
-"to_neck_pct": 1.1978495759493724,
+"to_neck_pct": 0.4715988795161996,
 "stop": 427.48,
-"stop_pct": 11.713759368461362,
+"stop_pct": 12.347349350983682,
 "height_pct": 11.79557692149693,
 "fall_pct": 55.55555710282552,
 "lows": [
@@ -201,7 +201,7 @@
 40.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 55.2,
+"rsi_now": 57.0,
 "signal_date": null,
 "days_since": null
 },
@@ -211,11 +211,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 7540.0,
+"close": 7555.0,
 "neck": 7650.0,
-"to_neck_pct": 1.458885941644561,
+"to_neck_pct": 1.2574454003970947,
 "stop": 6200.37,
-"stop_pct": 17.767001771800395,
+"stop_pct": 17.930270464510258,
 "height_pct": 21.42857142857142,
 "fall_pct": 26.349206349206344,
 "lows": [
@@ -239,7 +239,45 @@
 37.9
 ],
 "rsi_div": 0.0,
-"rsi_now": 57.3,
+"rsi_now": 57.8,
+"signal_date": null,
+"days_since": null
+},
+{
+"symbol": "SHC",
+"name": "Shaftesbury Capital",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 150.10000610351562,
+"neck": 152.8000030517578,
+"to_neck_pct": 1.7987986931726985,
+"stop": 124.44,
+"stop_pct": 17.093276536618962,
+"height_pct": 20.31496303288016,
+"fall_pct": 26.92913145530882,
+"lows": [
+[
+"2026-05-15",
+127.0
+],
+[
+"2026-10-08",
+134.10000610351562
+]
+],
+"peaks": [
+[
+"2026-08-25",
+152.8000030517578
+]
+],
+"rsi_lows": [
+37.8,
+37.4
+],
+"rsi_div": 0.0,
+"rsi_now": 66.8,
 "signal_date": null,
 "days_since": null
 },
@@ -249,11 +287,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 853.0,
+"close": 852.0,
 "neck": 867.5,
-"to_neck_pct": 1.6998827667057403,
+"to_neck_pct": 1.8192488262910755,
 "stop": 708.35,
-"stop_pct": 16.958382180539267,
+"stop_pct": 16.86091549295774,
 "height_pct": 19.903248099516247,
 "fall_pct": 34.07049067035246,
 "lows": [
@@ -286,45 +324,7 @@
 26.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 66.9,
-"signal_date": null,
-"days_since": null
-},
-{
-"symbol": "SHC",
-"name": "Shaftesbury Capital",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 150.0,
-"neck": 152.8000030517578,
-"to_neck_pct": 1.8666687011718697,
-"stop": 124.44,
-"stop_pct": 17.03800201416016,
-"height_pct": 20.31496303288016,
-"fall_pct": 26.92913145530882,
-"lows": [
-[
-"2026-05-15",
-127.0
-],
-[
-"2026-10-08",
-134.10000610351562
-]
-],
-"peaks": [
-[
-"2026-08-25",
-152.8000030517578
-]
-],
-"rsi_lows": [
-37.8,
-37.4
-],
-"rsi_div": 0.0,
-"rsi_now": 66.5,
+"rsi_now": 66.3,
 "signal_date": null,
 "days_since": null
 },
@@ -334,11 +334,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 2053.0,
+"close": 2066.0,
 "neck": 2130.0,
-"to_neck_pct": 3.7506088650755,
+"to_neck_pct": 3.0977734753146136,
 "stop": 1739.92,
-"stop_pct": 15.249634680954705,
+"stop_pct": 15.782913843175217,
 "height_pct": 21.091529277998866,
 "fall_pct": 32.859579306424116,
 "lows": [
@@ -362,7 +362,7 @@
 25.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 64.1,
+"rsi_now": 65.4,
 "signal_date": null,
 "days_since": null
 },
@@ -372,11 +372,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 506.0,
+"close": 505.0,
 "neck": 569.0,
-"to_neck_pct": 12.450592885375489,
+"to_neck_pct": 12.673267326732663,
 "stop": 467.28,
-"stop_pct": 7.65217391304348,
+"stop_pct": 7.469306930693076,
 "height_pct": 20.143579532731803,
 "fall_pct": 32.8996249022927,
 "lows": [
@@ -400,7 +400,7 @@
 28.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 55.3,
+"rsi_now": 54.4,
 "signal_date": null,
 "days_since": null
 },
@@ -410,11 +410,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 753.5,
+"close": 752.5,
 "neck": 852.5,
-"to_neck_pct": 13.138686131386867,
+"to_neck_pct": 13.289036544850497,
 "stop": 678.15,
-"stop_pct": 9.999999999999998,
+"stop_pct": 9.880398671096346,
 "height_pct": 21.61198288159771,
 "fall_pct": 35.285913528591365,
 "lows": [
@@ -438,7 +438,7 @@
 22.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 57.8,
+"rsi_now": 57.1,
 "signal_date": null,
 "days_since": null
 }

@@ -1,25 +1,91 @@
 {
-"generated": "2026-11-15T05:08+00:00",
-"asof": "2026-11-13",
+"generated": "2026-11-16T18:04+00:00",
+"asof": "2026-11-16",
 "market": "UK",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "UK: not backtested yet - watch only.",
 "rows": [
 {
+"symbol": "MTRO",
+"name": "Metro Bank",
+"status": "touched",
+"touch_date": "2026-11-16",
+"days_ago": 0,
+"level": 180.2,
+"level_kind": "breakout retest",
+"level_date": "2026-08-14",
+"close": 184.1999969482422,
+"above_pct": 2.219755864451489,
+"stop": 168.46,
+"risk_pct": 8.546261627977913,
+"resistance": 196.0,
+"room_r": 0.7495771120993572,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": 6.627217129137386,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "MAB",
+"name": "Mitchells & Butlers",
+"status": "touched",
+"touch_date": "2026-11-11",
+"days_ago": 3,
+"level": 301.0,
+"level_kind": "breakout retest",
+"level_date": "2026-02-27",
+"close": 318.0,
+"above_pct": 5.6478405315614655,
+"stop": 292.28,
+"risk_pct": 8.087601023328705,
+"resistance": 331.5,
+"room_r": 0.5249125181401003,
+"sq9": 289,
+"sq9_cross": "17\u00b2",
+"sq9_dist_pct": 4.152249134948094,
+"sq9_gap_pct": 24.913494809688586,
+"sq9_below": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_above": [
+[
+361,
+"19\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "AVON",
 "name": "Avon Technologies",
 "status": "touched",
 "touch_date": "2026-11-10",
-"days_ago": 3,
+"days_ago": 4,
 "level": 2180.0,
 "level_kind": "breakout retest",
 "level_date": "2025-08-04",
 "close": 2310.0,
 "above_pct": 5.9633027522935755,
-"stop": 2042.88,
-"risk_pct": 11.56361501454275,
+"stop": 2047.16,
+"risk_pct": 11.378250074887909,
 "resistance": 2565.0,
-"room_r": 0.9546288963337253,
+"room_r": 0.9701809123816242,
 "sq9": 2209,
 "sq9_cross": "47\u00b2",
 "sq9_dist_pct": -1.3128112267994596,
@@ -43,16 +109,16 @@
 "name": "NCC Group",
 "status": "touched",
 "touch_date": "2026-11-10",
-"days_ago": 3,
+"days_ago": 4,
 "level": 149.4,
 "level_kind": "breakout retest",
 "level_date": "2026-06-01",
-"close": 157.1999969482422,
-"above_pct": 5.220885790104002,
-"stop": 142.6,
-"risk_pct": 9.287805574624809,
-"resistance": 164.2,
-"room_r": 0.4794379317395337,
+"close": 156.60000610351562,
+"above_pct": 4.81928547602215,
+"stop": 142.93,
+"risk_pct": 8.73043928969045,
+"resistance": 158.6,
+"room_r": 0.14628578425659333,
 "sq9": 169,
 "sq9_cross": "13\u00b2",
 "sq9_dist_pct": -11.597636747642381,
@@ -76,16 +142,16 @@
 "name": "Sage Group",
 "status": "touched",
 "touch_date": "2026-11-10",
-"days_ago": 3,
+"days_ago": 4,
 "level": 1105.0,
 "level_kind": "breakout retest",
 "level_date": "2026-08-24",
-"close": 1180.0,
-"above_pct": 6.7873303167420795,
-"stop": 1075.43,
-"risk_pct": 8.861610098554774,
+"close": 1182.5,
+"above_pct": 7.0135746606334815,
+"stop": 1075.65,
+"risk_pct": 9.036170270499856,
 "resistance": 1208.0,
-"room_r": 0.2677709050095978,
+"room_r": 0.2386462559254699,
 "sq9": 1089,
 "sq9_cross": "33\u00b2",
 "sq9_dist_pct": 1.469237832874204,
@@ -105,39 +171,6 @@
 "sq9_match": false
 },
 {
-"symbol": "ATG",
-"name": "Auction Technology Group",
-"status": "touched",
-"touch_date": "2026-11-09",
-"days_ago": 4,
-"level": 465.5,
-"level_kind": "old swing low",
-"level_date": "2025-07-15",
-"close": 471.6000061035156,
-"above_pct": 1.310420215578012,
-"stop": 450.51,
-"risk_pct": 4.471163944315748,
-"resistance": 481.5,
-"room_r": 0.4695053337301671,
-"sq9": 441,
-"sq9_cross": "21\u00b2",
-"sq9_dist_pct": 5.555555555555558,
-"sq9_gap_pct": 19.95464852607709,
-"sq9_below": [
-[
-361,
-"19\u00b2"
-]
-],
-"sq9_above": [
-[
-529,
-"23\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "FRAS",
 "name": "Frasers Group",
 "status": "near",
@@ -148,10 +181,10 @@
 "level_date": "2024-06-24",
 "close": 948.5,
 "above_pct": 4.980630879911452,
-"stop": 873.32,
-"risk_pct": 7.92604864824159,
+"stop": 874.04,
+"risk_pct": 7.850741772723846,
 "resistance": 992.0,
-"room_r": 0.5786223277909738,
+"room_r": 0.584172661870504,
 "sq9": 961,
 "sq9_cross": "31\u00b2",
 "sq9_dist_pct": -5.983350676378773,
