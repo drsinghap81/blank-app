@@ -753,7 +753,11 @@ const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind ===
 function lvAlloc(mk, P, S) {
   if (S && S.buckets) return { ...BK_DEF, ...Object.fromEntries(S.buckets.map((b) => [b.key, b.pct])) };
   let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc2_' + mk) || '{}'); } catch (e) { /* private mode */ }
-  return { ...BK_DEF, ...Object.fromEntries((P.buckets || []).map((b) => [b.key, b.pct])), ...o };
+  const r = { ...BK_DEF, ...Object.fromEntries((P.buckets || []).map((b) => [b.key, b.pct])), ...o };
+  /* 16 Nov 2026: outside India a system the plan marks "off" (retest, 9/21 any stock, patterns: worse than random in the
+     US/ASX tests) can't be switched back on from this device's split; Amritpal bought US retests from these lists. */
+  if (mk !== 'NSE') (P.buckets || []).forEach((b) => { if (b.status === 'off') r[b.key] = 0; });
+  return r;
 }
 /* cut picked rows (in rank order) to each bucket's room: pct x capital minus what the bucket already holds */
 function lvRoomCut(rows, al, C0, used = {}) {
@@ -5193,13 +5197,13 @@ async function tdRender2(el) {
       ${invFirst.length ? `<div class="t2-lbl"><b>Watch first · month close above ATH</b><small>see only</small></div><div class="t2-hs">${invFirst.map(invCard).join('')}</div>` : ''}
       <details class="t2-more t2-wd"><summary>Watch lists (${invRows.length}) · monthly charts</summary>${t2Watch(invRows)}</details>${mk === 'US' ? '<details class="t2-more t2-wd"><summary>Trading 212 pies</summary><div id="tdpies"></div></details>' : ''}</section>
     <section class="t2-sec mom"><div class="t2-band"><span><b>Momentum investing</b><small>Stocks, single commodities and coins at all-time highs</small></span><em>Monthly charts</em></div>
-      <div class="t2-lbl" id="t2mom"><b>Act on · Monthly ATH system</b><small>21.5%/yr tested</small></div>
+      ${mk === 'NSE' ? '' : `<div class="status exit" style="margin:6px 0"><b>Ideas only, not a tested system here.</b> ${WATCH[mk] || ''}</div>`}<div class="t2-lbl" id="t2mom"><b>${mk === 'NSE' ? 'Act on · Monthly ATH system' : 'Ideas · Monthly ATH rules'}</b><small>${({ NSE: '21.5%/yr tested', US: 'US test: 1–3%/yr vs S&amp;P 9–13%', ASX: 'ASX: too few signals', UK: 'UK test: ~1%/yr, no edge' })[mk] || ''}</small></div>
       <div class="t2-list">${topM.map((r) => card(r, idxOf(r))).join('') || '<p class="t2-empty">No new Momentum buy today. Waiting is part of the system.</p>'}</div>
       ${restM.length ? `<details class="t2-more"><summary>${restM.length} more Momentum setups (weaker rank)</summary><div class="t2-list">${restM.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
       ${knowHeld && adds.length ? `<div class="t2-lbl" id="t2adds"><b>Add to winners you hold</b></div><div class="t2-adds">${adds.map((r) => `<span>${esc(r.symbol)} <b>&gt; ${Mz(r.add_level, 2)}</b></span>`).join('')}</div>` : ''}
       <details class="t2-more t2-wd"><summary>Watch lists (${momRows.length}) · monthly charts</summary>${t2Watch(momRows)}</details></section>
     <section class="t2-sec trd"><div class="t2-band"><span><b>Trading</b><small>Swing trades held days to weeks</small></span><em>Weekly + daily charts</em></div>
-      <div class="t2-lbl"><b>Act on · Trend 9/21 system</b><small>24.2%/yr tested</small></div>
+      <div class="t2-lbl"><b>${mk === 'NSE' ? 'Act on · Trend 9/21 system' : 'Ideas · Trend 9/21 rules'}</b><small>${mk === 'NSE' ? '24.2%/yr tested' : 'not tested on this market'}</small></div>
       <div class="t2-list">${topT.map((r) => card(r, idxOf(r))).join('') || '<p class="t2-empty">No new 9/21 buy today.</p>'}</div>
       ${restT.length ? `<details class="t2-more"><summary>${restT.length} more 9/21 setups</summary><div class="t2-list">${restT.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
       ${wdCards.length ? `<div class="t2-lbl"><b>Watch · week and day cup closes</b><small>see only</small></div><div class="t2-hs">${wdCards.map(wdCard).join('')}</div>` : ''}
