@@ -690,9 +690,12 @@ def test_us_watch_trailing(tmp_path):
     fri = dt.datetime(2026, 11, 20, 16, 20)              # a Friday
     A.us_watch_eod(fri)
     W = A.us_watch_load(); al = A.alerts_load()["items"]
-    assert W["UPP"]["stop"] > 96 and W["UPP"]["stop_set"] == "2026-11-20"          # raised to EMA 21
+    assert W["UPP"]["stop"] > 96 and W["UPP"]["stop_set"] == "2026-11-20" and W["UPP"]["stop_prev"] == 96   # raised to EMA 21
     assert W["ATHX"]["stop"] > 150                                                  # raised to the 30-week SMA
     assert any(x["kind"] == "exit" and x["symbol"] == "DWN" for x in al)            # EMA 9 under EMA 21
     assert any(x["kind"] == "raised" and "UPP" in x["text"] for x in al)
     old = W["UPP"]["stop"]; series["UPP"] = [x - 30 for x in series["UPP"]]; A.us_watch_eod(fri + dt.timedelta(days=7))
     assert A.us_watch_load()["UPP"]["stop"] == old                                  # never lowered
+
+    r = c.post("/api/us/watch/trail", headers=h).json()["results"]; assert {x["symbol"] for x in r} >= {"UPP", "DWN", "ATHX"}
+    assert c.get("/api/us/watch", headers=h).json()["trail"]["results"]

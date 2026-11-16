@@ -1985,7 +1985,11 @@ def us_watch_get(_=Depends(auth)):
         px = q["ltp"] if q else None
         out.append(dict(symbol=sym, **w, price=px, to_stop=round((px / w["stop"] - 1) * 100, 1) if px and w.get("stop") else None,
                         pnl=round((px - w["entry"]) * w["qty"], 2) if px else None))
-    return dict(items=out, us_open=us_open(et_now()))
+    try:
+        last = json.load(open(os.path.join(DATA, "us_trail.json")))
+    except Exception:  # noqa: BLE001
+        last = None
+    return dict(items=out, us_open=us_open(et_now()), trail=last)
 
 
 @app.post("/api/us/watch")
@@ -2069,12 +2073,13 @@ def us_trail_levels(sym, system, entry):
     return e9[-1] < e21[-1], math.floor(e21[-1] * 100) / 100, f"close {c[-1]:.2f}, EMA 9 {e9[-1]:.2f}, EMA 21 {e21[-1]:.2f}"
 
 
-def us_watch_eod(t=None):
-    """After the US close: exit alerts every day; on Fridays raise each stop (never lower it) and say what to set in moomoo."""
+def us_watch_eod(t=None, manual=False):
+    """After each US close (or "Check stops now"): sell alerts, and raise every stop to today's level (EMA 21 / 30-week
+    average), never lower; one alert lists the stops to move in moomoo. Like the India daily stop raise."""
     W = us_watch_load()
     if not W:
-        return
-    t = t or et_now(); day = t.date().isoformat(); friday = t.weekday() == 4; raised = []
+        return []
+    t = t or et_now(); day = t.date().isoformat(); friday = t.weekday() == 4; raised = []; out = []
     for sym, w in W.items():
         sysn = w.get("system")
         if sysn not in ("Trend 9/21", "Monthly ATH"):
@@ -2082,17 +2087,27 @@ def us_watch_eod(t=None):
         try:
             ex, lvl, note = us_trail_levels(sym, sysn, w["entry"])
         except Exception as e:  # noqa: BLE001
-            log("us_trail_error", symbol=sym, error=str(e)[:160]); continue
+            log("us_trail_error", symbol=sym, error=str(e)[:160]); out.append(dict(symbol=sym, result="no data")); continue
         w["last"] = dict(day=day, note=note, level=lvl, exit=ex)
-        if ex and (sysn == "Trend 9/21" or friday):
+        if ex and (sysn == "Trend 9/21" or friday) and not manual:
             why = "EMA 9 closed below EMA 21" if sysn == "Trend 9/21" else "weekly close below the 30-week average"
             alert("exit", sym, f"US {sym}: sell signal ({sysn}): {why} ({note}). Sell {w['qty']:g} at the next open in moomoo.",
                   key=f"uswtrail-exit:{sym}:{day}")
-        if friday and lvl > w["stop"] + 0.005:
-            old = w["stop"]; w["stop"] = lvl; w["stop_set"] = day; raised.append(f"{sym} {old:.2f} → {lvl:.2f}")
+        if lvl > w["stop"] + 0.005:
+            old = w["stop"]; w["stop_prev"] = old; w["stop"] = lvl; w["stop_set"] = day
+            raised.append(f"{sym} {old:.2f} → {lvl:.2f}"); out.append(dict(symbol=sym, result="raised", old=old, new=lvl))
+        else:
+            out.append(dict(symbol=sym, result="kept", new=w["stop"]))
     us_watch_save(W)
+    json.dump(dict(day=day, at=datetime.now(timezone.utc).isoformat(timespec="minutes"), results=out), open(os.path.join(DATA, "us_trail.json"), "w"))
     if raised:
-        alert("raised", "", "US stops to move in moomoo (GTC, same quantity): " + "; ".join(raised) + ".", key=f"uswraise:{day}")
+        alert("raised", "", "US stops to move in moomoo (GTC, same quantity): " + "; ".join(raised) + ".", key=f"uswraise:{day}:{len(raised)}")
+    return out
+
+
+@app.post("/api/us/watch/trail")
+def us_watch_trail_now(_=Depends(auth)):
+    return dict(results=us_watch_eod(et_now(), manual=True))
 
 
 class USOrder(BaseModel):

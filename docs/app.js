@@ -4836,17 +4836,21 @@ async function usWatchCard(box) {
       <div class="lv-sub">${r.qty} @ ${$f(r.entry)}${r.price ? ` · now ${$f(r.price)}` : ''} · stop ${$f(r.stop)}${r.to_stop != null ? ` (${fmt(r.to_stop, 1)}% away)` : ''}</div>
       ${slTrack({ stop: r.stop, entry: r.entry, now: r.price, target: r.target })}
       ${r.last && r.last.exit ? `<div class="lv-sub down"><b>Sell signal:</b> ${esc(r.last.note)} · sell at the next open in moomoo</div>` : ''}
-      <div class="lv-sub">🛡 Stop to set in moomoo: <b>${$f(r.stop)}</b> GTC${r.stop_set ? ` · raised ${esc(day(r.stop_set))}` : ''}${r.last ? ` · ${esc(r.last.note)}` : ''} · <a href="#" data-uswdel="${esc(r.symbol)}">Stop tracking</a></div></div><div></div></div>`; }).join('');
+      <div class="lv-sub">🛡 Stop in moomoo: <b>${$f(r.stop)}</b> GTC${r.stop_set ? ` · raised ${esc(day(r.stop_set))}${r.stop_prev ? ` from ${$f(r.stop_prev)}` : ''}` : ' · not raised yet'}${r.last ? ` (${r.system === 'Monthly ATH' ? '30-wk avg' : 'EMA 21'} ${$f(r.last.level)} on ${esc(day(r.last.day))})` : ''}</div>
+      ${r.stop_set && r.stop_set === (W.trail && W.trail.day) ? `<div class="lv-sub up"><b>⬆ Move your moomoo stop to ${$f(r.stop)}</b> (same ${r.qty} shares, GTC)</div>` : ''}
+      <div class="lv-sub"><a href="#" data-uswdel="${esc(r.symbol)}">Stop tracking</a></div></div><div></div></div>`; }).join('');
+  const TRu = W.trail; const trTxtU = TRu && (TRu.results || []).length ? `Last stop check ${esc(day(TRu.day))}: ${TRu.results.map((x) => `${esc(x.symbol)} ${esc(x.result)}${x.result === 'raised' ? ` ${$f(x.old)} → ${$f(x.new)}` : ''}`).join(' · ')}` : 'Stops are checked after each US close (about 8:15 am Melbourne).';
   const op = W.items.filter((r) => r.price); const cost = op.reduce((a, r) => a + r.qty * r.entry, 0), val = op.reduce((a, r) => a + r.qty * r.price, 0);
   const risk = W.items.reduce((a, r) => a + Math.max(0, r.qty * ((r.price || r.entry) - r.stop)), 0);
   const sumH = W.items.length ? `<div class="facts"><div class="fact"><span>Open (${W.items.length})</span><b class="${val - cost >= 0 ? 'up' : 'down'}">${op.length ? `${val - cost >= 0 ? '+' : '−'}${$f(Math.abs(val - cost))}` : '–'}</b><small>${op.length ? `${$f(cost)} → ${$f(val)}` : 'prices after the server update'}</small></div>
     <div class="fact"><span>At risk to stops</span><b>${$f(risk)}</b><small>if every stop is hit</small></div></div>` : '';
   box.innerHTML = `<div class="lv-card" data-fold="skip"><b>Your US holdings · moomoo · alerts only</b>
     ${offline ? '<p class="status exit watch lv-sub"><b>Saved on this phone.</b> Your server takes these over after its next update (outside Indian market hours, about 9:05 pm Melbourne); alerts start then. Live prices show from then too.</p>' : ''}
-    <p class="lv-sub">Alerts: stop hit or within 3%; Trend 9/21 sell (a daily close with EMA 9 under EMA 21) and Monthly ATH sell (a weekly close under the 30-week average), checked after each US close. Every Friday after the close the stops are raised (EMA 21 or the 30-week average, never lowered) and you get one alert listing the new stops to set in moomoo. The app never sells these.</p>
+    <p class="lv-sub">Alerts: stop hit or within 3%; Trend 9/21 sell (a daily close with EMA 9 under EMA 21) and Monthly ATH sell (a weekly close under the 30-week average), checked after each US close, when the stops are also raised and one alert lists the stops to move in moomoo. The app never sells these.</p>
     ${imp ? `<div class="status exit watch"><b>Add ${imp.length} holdings from your link?</b><div class="lv-sub">${imp.map((x) => `${esc(x.symbol)} ${x.qty} @ ${$f(x.entry)} · stop ${$f(x.stop)}${x.target ? ` · target ${$f(x.target)}` : ''} · ${esc(sysN(x.system))}`).join('<br>')}</div>
       <button class="lv-btn" id="uswimp">Add these ${imp.length}</button> <button class="lv-link" id="uswno">Not now</button></div>` : ''}
     ${sumH}${rows || '<p class="empty">Nothing tracked yet.</p>'}
+    ${offline || !W.items.length ? '' : `<p class="lv-sub">🛡 <b>Daily stop raise:</b> Trend 9/21 stops follow EMA 21, Monthly ATH stops follow the 30-week average, and only ever move up (the system itself sells on the close). ${trTxtU} <button class="lv-link" id="uwtrail">Check stops now</button></p>`}
     <details class="info" ${W.items.length ? '' : 'open'}><summary>Paste a list</summary><p class="lv-sub">Paste the line Claude gave you (or the whole link), then tap Read.</p>
       <div style="display:flex;gap:6px;flex-wrap:wrap"><input id="uwpaste" placeholder="ACGL:7:107.28:102.99::TF,…" style="flex:1;min-width:12em"><button class="lv-btn" id="uwread">Read</button></div></details>
     <details class="info"><summary>Add a holding</summary><div class="row" style="display:flex;flex-wrap:wrap;gap:6px">
@@ -4863,6 +4867,9 @@ async function usWatchCard(box) {
   const ib = box.querySelector('#uswimp'); if (ib) ib.addEventListener('click', () => { const it = imp; done(); send({ items: it }, `Tracking ${it.length} US holdings`); });
   const nb = box.querySelector('#uswno'); if (nb) nb.addEventListener('click', () => { done(); usWatchCard(box); });
   box.querySelectorAll('[data-uswdel]').forEach((b) => b.addEventListener('click', (e) => e.preventDefault() || send({ remove: [b.dataset.uswdel] }, `Stopped tracking ${b.dataset.uswdel}`)));
+  const tb = box.querySelector('#uwtrail'); if (tb) tb.addEventListener('click', async () => { tb.disabled = true; tb.textContent = 'Checking…';
+    try { const j = await lvApi('/api/us/watch/trail', { method: 'POST', timeout: 90000 }); const n = j.results.filter((x) => x.result === 'raised').length; alertMsg(n ? `${n} stop${n > 1 ? 's' : ''} raised: move them in moomoo` : 'No stop to raise today', true); }
+    catch (e) { alertMsg('Stop check failed: ' + e.message); } usWatchCard(box); });
   box.querySelector('#uwread').addEventListener('click', () => { const v = box.querySelector('#uwpaste').value.trim(); const L = uswParse('#usw=' + v.replace(/^.*#usw=/, ''));
     if (!L || !L.length) { alertMsg('Could not read that list. Paste the whole line, e.g. ACGL:7:107.28:102.99::TF'); return; }
     state._uswImp = L; usWatchCard(box); });
