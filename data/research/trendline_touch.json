@@ -1,0 +1,135 @@
+{
+ "method": "Trend line through the 2 latest swing lows: does the 3rd touch work as a buy, and the break as a sell? (17 Nov 2026)\nNifty 500 stocks (current members), 2016 - Nov 2026, liquid only (median 60-day value >= Rs 5 cr, price >= 50).\n\nSwing low: lowest low with 5 days each side (known 5 days later). Line through the 2 latest swing lows, only when rising.\nIt is live from the day the 2nd low is confirmed until the next swing low is confirmed (then the line is redrawn).\nTouch: the 5 previous closes were all > 1% above the line and today's low reaches line x 1.005 (same rule as the app alert).\nThe first touch on a line = the \"3rd touch\"; later ones = 4th+.\nOutcome from the line price: 10/20-day return minus the equal-weight universe; \"held\" = no close > 3% under the line in\nthe next 10 days. Controls: touches of the 50-day average with the same rule, and every day in an uptrend.\nTrades (buy at the line, or the open if it gaps below):\n  T20  stop line - 1.5 ATR(14), exit after 20 days.\n  RIDE stop line - 1.5 ATR, then exit on a close below the current rising line (redrawn as new swing lows form), max 120 days.\nPortfolio Rs 20 L, 1% risk a trade, max 10% a stock, max 10 open, costs 0.3% round trip.\nBreak: first close below a rising line -> next 20 days vs the universe (a sell signal if negative).\nOutput: data/research/trendline_touch.json.",
+ "nifty": {
+  "cagr": 11.4,
+  "max_dd": -38.4
+ },
+ "groups": {
+  "3rd touch": {
+   "n": 7953,
+   "held": 57.0,
+   "ex10": 1.34,
+   "ex20": 1.24,
+   "t20": 10.98,
+   "win20": 57.0,
+   "T20": {
+    "cagr": 25.4,
+    "max_dd": -28.0,
+    "trades": 1968,
+    "win": 39.7,
+    "avg": 1.29,
+    "pos_years": "10/11"
+   },
+   "RIDE": {
+    "cagr": 33.4,
+    "max_dd": -30.5,
+    "trades": 2779,
+    "win": 38.9,
+    "avg": 1.18,
+    "pos_years": "10/11"
+   }
+  },
+  "3rd touch, uptrend (above 200-day)": {
+   "n": 5979,
+   "held": 57.4,
+   "ex10": 1.45,
+   "ex20": 1.41,
+   "t20": 10.6,
+   "win20": 57.7,
+   "T20": {
+    "cagr": 18.2,
+    "max_dd": -28.6,
+    "trades": 1902,
+    "win": 39.6,
+    "avg": 1.0,
+    "pos_years": "8/11"
+   },
+   "RIDE": {
+    "cagr": 25.1,
+    "max_dd": -28.1,
+    "trades": 2611,
+    "win": 40.1,
+    "avg": 0.97,
+    "pos_years": "8/11"
+   }
+  },
+  "4th+ touch": {
+   "n": 233,
+   "held": 56.2,
+   "ex10": 0.79,
+   "ex20": 0.88,
+   "t20": 1.33,
+   "win20": 59.2,
+   "T20": {
+    "cagr": 2.0,
+    "max_dd": -14.8,
+    "trades": 233,
+    "win": 39.5,
+    "avg": 0.97,
+    "pos_years": "7/11"
+   },
+   "RIDE": {
+    "cagr": 2.1,
+    "max_dd": -6.4,
+    "trades": 233,
+    "win": 36.5,
+    "avg": 0.99,
+    "pos_years": "9/11"
+   }
+  },
+  "50-day avg touch (control)": {
+   "n": 20805,
+   "held": 57.8,
+   "ex10": 1.44,
+   "ex20": 1.22,
+   "t20": 17.43,
+   "win20": 56.3,
+   "T20": {
+    "cagr": 23.0,
+    "max_dd": -25.9,
+    "trades": 2014,
+    "win": 40.9,
+    "avg": 1.17,
+    "pos_years": "9/11"
+   },
+   "RIDE": {
+    "cagr": 38.3,
+    "max_dd": -26.0,
+    "trades": 2612,
+    "win": 49.4,
+    "avg": 1.42,
+    "pos_years": "11/11"
+   }
+  },
+  "50-day avg touch, uptrend (control)": {
+   "n": 16003,
+   "held": 58.5,
+   "ex10": 1.52,
+   "ex20": 1.38,
+   "t20": 16.88,
+   "win20": 56.9,
+   "T20": {
+    "cagr": 27.5,
+    "max_dd": -25.3,
+    "trades": 1980,
+    "win": 43.3,
+    "avg": 1.38,
+    "pos_years": "9/11"
+   },
+   "RIDE": {
+    "cagr": 33.5,
+    "max_dd": -34.1,
+    "trades": 2522,
+    "win": 49.0,
+    "avg": 1.3,
+    "pos_years": "11/11"
+   }
+  }
+ },
+ "break": {
+  "n": 15719,
+  "ex20": -0.36,
+  "t": -4.74,
+  "win20": 53.2
+ }
+}
