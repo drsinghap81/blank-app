@@ -1,0 +1,434 @@
+{
+ "method": "Book strategies (Bansal; rules summarised privately in the project) tested on Nifty 500 stocks, 2016 - Nov 2026 (17 Nov 2026).\nLiquid only (median 60-day traded value >= Rs 5 cr, price >= 50). Swing points: lowest low / highest high with 5 days each\nside, used only once confirmed (5 days later). Costs 0.3% round trip. Current Nifty 500 members (survivorship bias).\n\n1  DIV  Bottom buy on positive divergence: in a downtrend (last 2 swing lows AND last 2 swing highs falling), price makes a\n        lower low but RSI(14) [or MACD line] at that low is higher than at the previous low. Buy on the first close above the\n        lower top between the two lows (within 40 days, before a new low). Stop: 0.5% under the new low. Exit: trail the\n        stop to each new confirmed higher swing low (book: hold until a lower low). Control \"NODIV\": same setup, no divergence.\n2a TLC  Uptrend correction break: uptrend (close > 200-day, 50-day > 200-day at the correction high), the correction fell\n        >= 8% from a 60-day high; a falling line through the 2 latest swing highs of the correction (no candle above it);\n        buy the first close above that line. Stop 5% under the entry. Target +17% (book 17-20%), else trail as in 1, max\n        120 days. Also \"trail only\" (no target).\n2b SHK  Shakeout: rising support line through the 2 latest swing lows (no candle cuts, app rule); a close below it, then a\n        close back above it within 5 days -> buy at that close. Stop 0.5% under the low made below the line. Target +17%,\n        else trail; max 120 days.\n3  DB / TB / IHS with the book's stops: after a fall (250-day high >= 20% above the first low). DB: 2 swing lows within\n        3%, >= 15 days apart, the peak between >= 10% above them. TB: 3 lows within 4%. IHS: middle low >= 3% under both\n        shoulders, shoulders within 6%. Neckline = highest high between the first and last low. Buy the first CLOSE above\n        the neckline within 40 days of the last low. Stop: 4% under the neckline (IHS 6%). Target: neckline + (neckline -\n        lowest low). Max 250 days. Variant \"+vol\": breakout volume >= 1.5 x its 50-day average (book: skip low volume).\nControl for every strategy: a random liquid stock on the same day with the same % stop, % target, max hold and (where used)\nthe same trailing rule on its own swing lows.\nOutput: data/research/bansal_test.json.",
+ "groups": {
+  "DB": {
+   "trades": {
+    "n": 1070,
+    "per_yr": 98.2,
+    "win": 39.2,
+    "avg": 0.23,
+    "med": -4.61,
+    "t": 0.94,
+    "target_hit": 38.9,
+    "stop_hit": 60.4,
+    "avg_days": 15,
+    "avg_R": 0.01,
+    "pos_years": "7/11"
+   },
+   "portfolio": {
+    "cagr": 0.0,
+    "max_dd": -27.9,
+    "trades": 828
+   },
+   "random_same_stop_target": {
+    "n": 1059,
+    "per_yr": 97.2,
+    "win": 41.6,
+    "avg": 0.69,
+    "med": -4.55,
+    "t": 2.62,
+    "target_hit": 41.4,
+    "stop_hit": 57.5,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "DB +vol": {
+   "trades": {
+    "n": 672,
+    "per_yr": 61.7,
+    "win": 39.7,
+    "avg": 0.03,
+    "med": -4.71,
+    "t": 0.08,
+    "target_hit": 39.6,
+    "stop_hit": 59.8,
+    "avg_days": 14,
+    "avg_R": -0.02,
+    "pos_years": "4/11"
+   },
+   "portfolio": {
+    "cagr": 1.6,
+    "max_dd": -22.6,
+    "trades": 607
+   },
+   "random_same_stop_target": {
+    "n": 658,
+    "per_yr": 60.4,
+    "win": 38.0,
+    "avg": -0.27,
+    "med": -4.81,
+    "t": -0.84,
+    "target_hit": 37.8,
+    "stop_hit": 61.6,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "DIV macd": {
+   "trades": {
+    "n": 1391,
+    "per_yr": 127.6,
+    "win": 40.0,
+    "avg": 2.38,
+    "med": -2.97,
+    "t": 4.24,
+    "target_hit": 0.0,
+    "stop_hit": 96.1,
+    "avg_days": 39,
+    "avg_R": 0.17,
+    "pos_years": "7/11"
+   },
+   "portfolio": {
+    "cagr": 7.4,
+    "max_dd": -22.1,
+    "trades": 515
+   },
+   "random_same_stop_target": {
+    "n": 1372,
+    "per_yr": 125.9,
+    "win": 38.7,
+    "avg": 3.91,
+    "med": -2.49,
+    "t": 5.9,
+    "target_hit": 0.0,
+    "stop_hit": 96.1,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "DIV rsi": {
+   "trades": {
+    "n": 1522,
+    "per_yr": 139.6,
+    "win": 39.4,
+    "avg": 2.28,
+    "med": -3.09,
+    "t": 4.19,
+    "target_hit": 0.0,
+    "stop_hit": 95.4,
+    "avg_days": 38,
+    "avg_R": 0.16,
+    "pos_years": "7/11"
+   },
+   "portfolio": {
+    "cagr": 8.6,
+    "max_dd": -29.5,
+    "trades": 567
+   },
+   "random_same_stop_target": {
+    "n": 1498,
+    "per_yr": 137.4,
+    "win": 38.7,
+    "avg": 2.63,
+    "med": -2.58,
+    "t": 5.68,
+    "target_hit": 0.0,
+    "stop_hit": 95.6,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "IHS": {
+   "trades": {
+    "n": 1401,
+    "per_yr": 128.5,
+    "win": 42.5,
+    "avg": 1.05,
+    "med": -6.54,
+    "t": 3.36,
+    "target_hit": 42.4,
+    "stop_hit": 56.9,
+    "avg_days": 25,
+    "avg_R": 0.12,
+    "pos_years": "6/11"
+   },
+   "portfolio": {
+    "cagr": 5.3,
+    "max_dd": -45.0,
+    "trades": 787
+   },
+   "random_same_stop_target": {
+    "n": 1385,
+    "per_yr": 127.1,
+    "win": 48.0,
+    "avg": 2.37,
+    "med": -6.33,
+    "t": 7.48,
+    "target_hit": 47.5,
+    "stop_hit": 51.2,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "IHS +vol": {
+   "trades": {
+    "n": 824,
+    "per_yr": 75.6,
+    "win": 44.1,
+    "avg": 0.93,
+    "med": -6.59,
+    "t": 2.25,
+    "target_hit": 44.1,
+    "stop_hit": 55.2,
+    "avg_days": 24,
+    "avg_R": 0.09,
+    "pos_years": "6/11"
+   },
+   "portfolio": {
+    "cagr": 2.5,
+    "max_dd": -37.4,
+    "trades": 618
+   },
+   "random_same_stop_target": {
+    "n": 817,
+    "per_yr": 75.0,
+    "win": 46.9,
+    "avg": 1.71,
+    "med": -6.47,
+    "t": 4.08,
+    "target_hit": 45.9,
+    "stop_hit": 52.4,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "NODIV": {
+   "trades": {
+    "n": 4717,
+    "per_yr": 432.8,
+    "win": 40.4,
+    "avg": 3.13,
+    "med": -2.59,
+    "t": 9.77,
+    "target_hit": 0.0,
+    "stop_hit": 96.8,
+    "avg_days": 40,
+    "avg_R": 0.23,
+    "pos_years": "7/11"
+   },
+   "portfolio": {
+    "cagr": 10.1,
+    "max_dd": -20.9,
+    "trades": 625
+   },
+   "random_same_stop_target": {
+    "n": 4664,
+    "per_yr": 427.9,
+    "win": 37.5,
+    "avg": 3.62,
+    "med": -2.61,
+    "t": 10.25,
+    "target_hit": 0.0,
+    "stop_hit": 97.0,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "SHK +17%": {
+   "trades": {
+    "n": 5909,
+    "per_yr": 542.1,
+    "win": 31.3,
+    "avg": 1.0,
+    "med": -3.02,
+    "t": 8.41,
+    "target_hit": 23.0,
+    "stop_hit": 76.6,
+    "avg_days": 16,
+    "avg_R": 0.17,
+    "pos_years": "7/11"
+   },
+   "portfolio": {
+    "cagr": 10.8,
+    "max_dd": -27.8,
+    "trades": 1546
+   },
+   "random_same_stop_target": {
+    "n": 5818,
+    "per_yr": 533.8,
+    "win": 29.3,
+    "avg": 1.02,
+    "med": -2.8,
+    "t": 8.93,
+    "target_hit": 21.5,
+    "stop_hit": 78.2,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "SHK trail": {
+   "trades": {
+    "n": 5909,
+    "per_yr": 542.1,
+    "win": 29.5,
+    "avg": 2.18,
+    "med": -3.08,
+    "t": 9.39,
+    "target_hit": 0.0,
+    "stop_hit": 99.4,
+    "avg_days": 26,
+    "avg_R": 0.38,
+    "pos_years": "7/11"
+   },
+   "portfolio": {
+    "cagr": 10.7,
+    "max_dd": -32.2,
+    "trades": 1019
+   },
+   "random_same_stop_target": {
+    "n": 5829,
+    "per_yr": 534.8,
+    "win": 27.5,
+    "avg": 2.16,
+    "med": -2.93,
+    "t": 8.98,
+    "target_hit": 0.0,
+    "stop_hit": 99.5,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "TB": {
+   "trades": {
+    "n": 2402,
+    "per_yr": 220.4,
+    "win": 45.8,
+    "avg": 0.24,
+    "med": -4.37,
+    "t": 1.71,
+    "target_hit": 47.5,
+    "stop_hit": 51.7,
+    "avg_days": 13,
+    "avg_R": 0.05,
+    "pos_years": "6/11"
+   },
+   "portfolio": {
+    "cagr": 4.3,
+    "max_dd": -19.8,
+    "trades": 1372
+   },
+   "random_same_stop_target": {
+    "n": 2373,
+    "per_yr": 217.7,
+    "win": 48.0,
+    "avg": 0.65,
+    "med": -0.76,
+    "t": 4.47,
+    "target_hit": 49.7,
+    "stop_hit": 49.5,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "TB +vol": {
+   "trades": {
+    "n": 1243,
+    "per_yr": 114.0,
+    "win": 44.8,
+    "avg": -0.04,
+    "med": -4.41,
+    "t": -0.22,
+    "target_hit": 47.2,
+    "stop_hit": 52.0,
+    "avg_days": 12,
+    "avg_R": -0.0,
+    "pos_years": "4/11"
+   },
+   "portfolio": {
+    "cagr": 0.8,
+    "max_dd": -22.6,
+    "trades": 999
+   },
+   "random_same_stop_target": {
+    "n": 1226,
+    "per_yr": 112.5,
+    "win": 48.2,
+    "avg": 0.43,
+    "med": -0.35,
+    "t": 2.13,
+    "target_hit": 50.7,
+    "stop_hit": 48.7,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "TLC +17%": {
+   "trades": {
+    "n": 3068,
+    "per_yr": 281.5,
+    "win": 32.3,
+    "avg": 1.1,
+    "med": -4.86,
+    "t": 6.63,
+    "target_hit": 24.0,
+    "stop_hit": 75.7,
+    "avg_days": 15,
+    "avg_R": 0.22,
+    "pos_years": "8/11"
+   },
+   "portfolio": {
+    "cagr": 13.6,
+    "max_dd": -20.0,
+    "trades": 1355
+   },
+   "random_same_stop_target": {
+    "n": 3023,
+    "per_yr": 277.3,
+    "win": 29.3,
+    "avg": 0.75,
+    "med": -4.19,
+    "t": 4.59,
+    "target_hit": 22.1,
+    "stop_hit": 77.5,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  },
+  "TLC trail": {
+   "trades": {
+    "n": 3068,
+    "per_yr": 281.5,
+    "win": 30.1,
+    "avg": 2.54,
+    "med": -5.04,
+    "t": 7.18,
+    "target_hit": 0.0,
+    "stop_hit": 99.5,
+    "avg_days": 25,
+    "avg_R": 0.51,
+    "pos_years": "8/11"
+   },
+   "portfolio": {
+    "cagr": 22.4,
+    "max_dd": -49.6,
+    "trades": 908
+   },
+   "random_same_stop_target": {
+    "n": 3019,
+    "per_yr": 277.0,
+    "win": 28.5,
+    "avg": 2.36,
+    "med": -4.08,
+    "t": 5.94,
+    "target_hit": 0.0,
+    "stop_hit": 99.3,
+    "avg_days": null,
+    "avg_R": null,
+    "pos_years": null
+   }
+  }
+ }
+}
