@@ -5069,12 +5069,23 @@ async function tdRender2(el) {
     ${td(secL.length ? 'ok' : 'warn', '3 · Sectors', secL.length ? `${secL.length} leading` : 'None leading', secL.slice(0, 3).map(([k]) => esc((sec.names && sec.names[k]) || secName(k))).join(', '), 'mk')}
     ${td('', '4 · Stocks', `${nBuy} to buy`, 'see below', 'ath')}</div>`;
   // ---- card for an act-on buy (existing plan numbers; shares from your capital and risk %)
+  // 16 Nov 2026 (Amritpal): for a stock that is also on a close list, show the buy-stop one tick above the breakout candle's high next to
+  // the system's own entry. The live 9/21 / ATH entry is what was backtested; the cup-high buy-stop is his stricter confirmation.
+  const tick = mk === 'NSE' ? 0.05 : 0.01;
+  const cupBuy = (r) => {
+    const w = [...((at && at.week_close) || []), ...((at && at.day_close) || [])].find((x) => x.symbol === r.symbol);
+    const m = ((at && at.month_close) || []).find((x) => x.symbol === r.symbol);
+    const hi = w ? w.high_p : m ? m.high_m : null; if (!hi) return '';
+    const lab = w ? (w.kind === 'W' ? 'breakout week' : 'breakout day') : `breakout month (${mLab(m.month)})`;
+    const bs = Math.round(hi / tick) * tick + tick; const px = r.price || r.trigger;
+    const done = px && px > bs;
+    return `<span class="t2-line" style="font-size:13px">Breakout-candle entry: buy-stop <b>${Mz(bs, 2)}</b>, one tick above the ${lab} high ${Mz(hi, 2)}${done ? ' · price is already above it' : px ? ` · ${fmt((bs / px - 1) * 100, 1)}% above the last price` : ''}</span>`; };
   const card = (r, i) => { const L = tdLabel(r); const e = r.trigger || r.price; const z = t2Shares(e, r.stop, mk); const ck = closeK(r.symbol);
     const tg = r.aligned ? '<span class="t2-tag al">Aligned</span>' : ''; const bt = ck.length ? '<span class="t2-tag both">In both</span>' : '';
     const also = Object.entries(S.M[r.symbol] || {}).filter(([k]) => k !== (bkOf(r) === 'mom' ? 'ath' : 't921')).map(([k, x]) => `<span class="t2-chip">${({ ath: 'Momentum', t921: '9/21', vcp: 'VCP', ipo: 'IPO cup', gm: 'G+M', mo: 'Month close', wk: 'Week cup close', dy: 'Day cup close' })[k]}${x.txt === '✓' ? '' : ' ' + x.txt.toLowerCase()}</span>`).join('');
     return `<button class="t2-card${ck.length ? ' both' : ''}" data-i="${i}"><span class="t2-ch"><span><b>${esc(r.name || r.symbol)}</b><small>${esc(r.symbol)} · ${esc(L.t)}</small></span>${bt || tg}</span>
       <span class="t2-line">${r.trigger ? 'Buy if price goes above' : 'Buy at about'} <b>${Mz(e, 2)}</b> · stop <b>${Mz(r.stop, 2)}</b>${z ? ` · <b>${z.q.toLocaleString(MKT[mk].loc)} sh</b> ≈ ${mk === 'NSE' ? lakh(z.val) : Mz(z.val)}` : ''}</span>
-      ${also ? `<span class="t2-chips">${also}</span>` : ''}</button>`; };
+      ${cupBuy(r)}${also ? `<span class="t2-chips">${also}</span>` : ''}</button>`; };
   const idxOf = (r) => state._tdRows.indexOf(r);
   // ---- watch: close lists as cards (see only)
   const wdCards = [...((at && at.week_close) || []), ...((at && at.day_close) || [])].map((r) => ({ r, live: Object.keys(S.M[r.symbol] || {}).filter((k) => ['ath', 't921', 'vcp', 'ipo'].includes(k)) }))
