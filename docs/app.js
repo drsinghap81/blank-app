@@ -3943,6 +3943,23 @@ function pfFromAngel(H, P) {
   const tag = Object.fromEntries(P.h.map((x) => [x.s, x.t]));
   return H.map((h) => ({ s: h.symbol, q: h.qty, a: +exact(h).toFixed(4), t: tag[h.symbol] || '', d: today() }));
 }
+/* 16 Nov 2026: "pause after a big move" iron condor setups on liquid indices (tools/condor_signal.py). Watch only. */
+async function condorCard(box, mk) {
+  if (!box) return; const D = await getJSON(MAIN + 'data/scan/condor_signal.json', 'condor').catch(() => null); if (!D || !D.rows) { box.innerHTML = ''; return; }
+  const mine = (r) => (mk === 'US' ? r.market === 'US' : mk === 'NSE' ? r.market === 'NSE' : true);
+  const R = D.rows.filter((r) => r.status !== 'no data'); const on = R.filter((r) => r.status === 'ON');
+  const chip = { ON: ['up', 'Setup ON · enter'], wait: ['', 'Setup · wait for 2–4 days to expiry'], watch: ['', 'Big move · waiting for a pause'], off: ['muted', 'No setup'] };
+  const f = (v) => fmt(v, v >= 1000 ? 0 : 2, 'en-IN');
+  const row = (r) => { const [cls, lab] = chip[r.status] || ['muted', r.status];
+    return `<div class="lv-row"><div><div class="lv-sym">${esc(r.name)} <span class="chip ${cls}">${lab}</span>${r.tested ? ' <span class="chip">tested</span>' : ' <span class="chip muted">untested</span>'}</div>
+      <div class="lv-sub">${r.move10 >= 0 ? '+' : ''}${fmt(r.move10, 1)}% in 10 days (need ±3.5%) · 3-day range ${fmt(r.range3, 1)}% (need &lt;2%) · next expiry ${esc(r.expiry_day)}, ${r.days_to_expiry} trading days</div>
+      ${r.status === 'ON' || r.status === 'wait' ? `<div class="lv-sub"><b>Sell ${f(r.short_call)} CE + ${f(r.short_put)} PE · buy ${f(r.long_call)} CE + ${f(r.long_put)} PE</b> (2% shorts, 1% wings, from ${f(r.close)}) · hold to expiry · ${esc(r.how)}</div>` : ''}</div><div></div></div>`; };
+  const top = R.filter(mine); const rest = R.filter((r) => !mine(r));
+  box.innerHTML = `<details class="t2-more t2-wd" ${on.some(mine) ? 'open' : ''}><summary>🦅 Iron condor setups · ${on.length ? `<b class="up">${on.length} ON</b>: ${on.map((r) => esc(r.name)).join(', ')}` : 'none on now'}</summary>
+    <p class="lv-sub">${esc(D.rule)}</p><p class="lv-sub muted">${esc(D.test)} Margin: pledged holdings count as collateral, but about half of F&amp;O margin must be cash or cash-like. Watch only: you place the orders.</p>
+    ${top.map(row).join('')}${rest.length ? `<details class="t2-more"><summary>Other indices (${rest.length})</summary>${rest.map(row).join('')}</details>` : ''}
+    <p class="lv-sub muted">Updated ${esc(D.generated)}. You get a phone alert when one turns ON.</p></details>`;
+}
 /* 16 Nov 2026: US holdings (moomoo) in Portfolio, from the server's US watch list (or the copy on this phone) */
 async function pfUS(box) {
   if (!box) return; let loc = []; try { loc = JSON.parse(localStorage.getItem('td.uswLocal') || '[]'); } catch (e) { /* */ }
@@ -4700,7 +4717,7 @@ function bgMe(el) {
 
 /* Alerts (11 Nov 2026): the server's events — stop hit, buy filled, sold, sell signal, stop raised, stop not placed.
    Shown on Today, toasted when new while the app is open, and pushed to this phone once you turn notifications on. */
-const AL_KIND = { stop: ['🛑', 'Stop hit'], sold: ['✅', 'Sold'], filled: ['🟢', 'Bought'], exit: ['↘', 'Sell signal'], raised: ['↑', 'Stop raised'], nostop: ['⚠️', 'No stop'], pie: ['🥧', 'Pie'], tb: ['🎯', 'Top Bottom'], test: ['🔔', 'Test'] };
+const AL_KIND = { stop: ['🛑', 'Stop hit'], sold: ['✅', 'Sold'], filled: ['🟢', 'Bought'], exit: ['↘', 'Sell signal'], raised: ['↑', 'Stop raised'], nostop: ['⚠️', 'No stop'], pie: ['🥧', 'Pie'], tb: ['🎯', 'Top Bottom'], setup: ['🦅', 'Condor setup'], test: ['🔔', 'Test'] };
 const b64u = (s) => { const p = '='.repeat((4 - (s.length % 4)) % 4); const r = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...r].map((c) => c.charCodeAt(0))); };
 async function alPush(btn) {
   try {
@@ -5234,7 +5251,7 @@ async function tdRender2(el) {
     <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
       <div class="t2-date"><div><b>${esc(clk.dayNum)}</b><span>${esc(clk.month)}</span></div>
         <div class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small><b>${clk.txt}</b><small>${esc(clk.at)} · ${esc(clk.local)} your time</small></div></div>
-      ${tiles}
+      ${tiles}<div id="t2condor"></div>
       <small class="t2-sub">Plan from the ${day(P.asof)} close${knowHeld ? '' : ' · holdings not linked'}</small></div>
     ${ribbon()}
     <div class="t2-h" id="t2sell"><h2>Sell at the open</h2><small>do these first</small></div>
@@ -5268,6 +5285,7 @@ async function tdRender2(el) {
   $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)} · refreshed ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
   el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); }));
   alCard($('#tdal'), mk);
+  condorCard($('#t2condor'), mk);
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   el.querySelectorAll('.t2-tile[data-go]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.go); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('t2-flash'); setTimeout(() => t.classList.remove('t2-flash'), 1400); } }));
   el.querySelectorAll('.t2-wcard[data-tu]').forEach((b) => b.addEventListener('click', () => turtleSelect(state._tuShow[+b.dataset.tu])));

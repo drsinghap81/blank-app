@@ -2110,6 +2110,32 @@ def us_watch_trail_now(_=Depends(auth)):
     return dict(results=us_watch_eod(et_now(), manual=True))
 
 
+_CONDOR = {"t": 0}
+
+
+def condor_alerts():
+    """16 Nov 2026: 'pause after a big move' iron condor setups (tools/condor_signal.py -> data/scan/condor_signal.json).
+    One phone alert per index per signal day while the entry window is open. Watch only."""
+    if time.time() - _CONDOR["t"] < 1200:
+        return
+    _CONDOR["t"] = time.time()
+    try:
+        if ENV.get("PLAN_FILE"):
+            d = json.load(open(os.path.join(os.path.dirname(ENV["PLAN_FILE"]), "condor_signal.json")))
+        else:
+            r = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/condor_signal.json", timeout=30); r.raise_for_status(); d = r.json()
+    except Exception as ex:  # noqa: BLE001
+        log("condor_error", error=str(ex)[:160]); return
+    for x in d.get("rows", []):
+        if x.get("status") != "ON":
+            continue
+        tag = "" if x.get("tested") else " (rule tested on Nifty only)"
+        txt = (f"{'US ' if x.get('market') == 'US' else ''}{x['name']}: iron condor setup ON{tag}. Moved {x['move10']:+.1f}% in 10 days, "
+               f"3-day range {x['range3']:.1f}%. Sell {x['short_call']:g} CE / {x['short_put']:g} PE, buy {x['long_call']:g} CE / {x['long_put']:g} PE, "
+               f"expiry {x['expiry_day']} ({x['days_to_expiry']} trading days). {x.get('how', '')}.")
+        alert("setup", x["key"], txt, key=f"condor:{x['key']}:{x.get('date')}", mk="US" if x.get("market") == "US" else "NSE")
+
+
 class USOrder(BaseModel):
     id: str
     qty: int
@@ -2283,6 +2309,7 @@ def _loop():
                 exit_alerts()
             if t.minute % 10 < 2:
                 pie_alerts()
+                condor_alerts()
             if us_open(et_now()) or (et_now().weekday() < 5 and et_now().hour == 16 and et_now().minute < 15):
                 us_sync()
             if us_open(et_now()) and t.minute % 10 < 2:
@@ -2311,12 +2338,14 @@ def alerts_load():
         return dict(items=[], seen=[], subs=[])
 
 
-def alert(kind, symbol, text, key=None):
-    """Record and send once (key = de-duplication key, e.g. 'exit:TCS:2026-11-10')."""
+def alert(kind, symbol, text, key=None, mk=None):
+    """Record and send once (key = de-duplication key, e.g. 'exit:TCS:2026-11-10'). mk = market tab for the app's bell."""
     A = alerts_load(); key = key or f"{kind}:{symbol}:{datetime.now(timezone.utc).isoformat(timespec='minutes')}"
     if key in A.get("seen", []):
         return False
     item = dict(id=key, t=datetime.now(timezone.utc).isoformat(timespec="seconds"), kind=kind, symbol=symbol, text=text)
+    if mk:
+        item["mk"] = mk
     A.setdefault("items", []).append(item); A["items"] = A["items"][-200:]
     A.setdefault("seen", []).append(key); A["seen"] = A["seen"][-1000:]
     json.dump(A, open(_alerts_path(), "w")); log("alert", akind=kind, symbol=symbol, text=text)

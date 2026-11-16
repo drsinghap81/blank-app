@@ -699,3 +699,21 @@ def test_us_watch_trailing(tmp_path):
 
     r = c.post("/api/us/watch/trail", headers=h).json()["results"]; assert {x["symbol"] for x in r} >= {"UPP", "DWN", "ATHX"}
     assert c.get("/api/us/watch", headers=h).json()["trail"]["results"]
+
+
+def test_condor_alerts(tmp_path):
+    A, c = client(tmp_path)
+    p = os.path.join(os.path.dirname(os.environ["PLAN_FILE"]), "condor_signal.json"); had = os.path.exists(p); old = open(p).read() if had else None
+    json_rows = {"rows": [{"key": "NIFTY", "name": "Nifty 50", "market": "NSE", "status": "ON", "tested": True, "date": "2026-11-16", "move10": 9.4,
+                           "range3": 1.3, "short_call": 25750, "short_put": 24700, "long_call": 26000, "long_put": 24450, "expiry_day": "Tue 24 Nov",
+                           "days_to_expiry": 4, "how": "NSE options (Angel)"},
+                          {"key": "SPX", "name": "S&P 500", "market": "US", "status": "watch"}]}
+    import json as _j
+    try:
+        _j.dump(json_rows, open(p, "w")); A.condor_alerts()
+        al = A.alerts_load()["items"]
+        assert len(al) == 1 and al[0]["kind"] == "setup" and al[0]["mk"] == "NSE" and "25750 CE" in al[0]["text"]
+        A._CONDOR["t"] = 0; A.condor_alerts(); assert len(A.alerts_load()["items"]) == 1     # once per signal day
+    finally:
+        if had: open(p, "w").write(old)
+        else: os.remove(p)

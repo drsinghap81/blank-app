@@ -1,0 +1,26 @@
+name: condor-signal
+# "Pause after a big move" iron condor setups on liquid indices -> data/scan/condor_signal.json (app card + server alerts)
+on:
+  schedule:
+    - cron: "25 11 * * 1-5"   # after the India close (Nifty, Sensex); Europe/Asia from the same run
+    - cron: "45 21 * * 1-5"   # after the US close
+  workflow_dispatch:
+  push:
+    paths: ["tools/condor_signal.py", ".github/workflows/condor-signal.yml"]
+permissions:
+  contents: write
+concurrency: {group: condor-signal, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q yfinance pandas && python tools/condor_signal.py 2>&1 | grep -v -i warn | tail -12
+      - run: |
+          git config user.name "condor-signal bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/scan/condor_signal.json; git diff --cached --quiet && exit 0
+          git commit -qm "Condor setups $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done
