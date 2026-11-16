@@ -21,6 +21,6 @@ jobs:
       - run: pip install -q yfinance pandas numpy && python tools/trendline_scan.py 2>&1 | grep -v -i warn | tail -12
       - run: |
           git config user.name "trendline-scan bot"; git config user.email "actions@users.noreply.github.com"
-          git add data/scan/trendline.json; git diff --cached --quiet && exit 0
+          git add data/scan/trendline.json data/scan/trendline_tradingview.txt; git diff --cached --quiet && exit 0
           git commit -qm "Trend lines $(date -u +%F)"
           for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done

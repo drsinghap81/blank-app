@@ -1,0 +1,160 @@
+// Trend Desk - swing lines and levels (17 Nov 2026). Same rules as the Trend Desk app's "Trend lines" card.
+// Add to any chart (Pine Editor > paste > Add to chart). It redraws on every symbol and timeframe you open.
+//   Blue  = support line through the 2 latest swing lows that no candle cuts (rising only)
+//   Red   = resistance line through the 2 latest swing highs that no candle cuts (any slope)
+//   Green dashed  = latest swing low level, drawn flat to the right (until a close goes below it)
+//   Orange dashed = latest swing high level, drawn flat to the right (until a close goes above it)
+// Swing low / high = lowest low / highest high with 3 bars each side. Alerts: create an alert on this indicator with
+// "Any alert() function call" - it fires when price comes within 1% of any of the four lines. Watch only, not a buy signal.
+//@version=5
+indicator("Trend Desk - swing lines & levels", shorttitle="TD lines", overlay=true, max_lines_count=30, max_labels_count=30, max_bars_back=1000)
+
+K       = input.int(3, "Swing: bars each side", minval=2, maxval=10)
+showSup = input.bool(true, "Support line (2 latest swing lows)")
+showRes = input.bool(true, "Resistance line (2 latest swing highs)")
+showLvL = input.bool(true, "Swing low level")
+showLvH = input.bool(true, "Swing high level")
+nearPct = input.float(1.0, "Alert when within %", minval=0.1, step=0.1)
+TOL  = 0.001
+MAXP = 40
+LOOK = 250
+
+var pLoI = array.new_int()
+var pLoV = array.new_float()
+var pHiI = array.new_int()
+var pHiV = array.new_float()
+
+pl = ta.pivotlow(low, K, K)
+ph = ta.pivothigh(high, K, K)
+if not na(pl)
+    array.push(pLoI, bar_index - K)
+    array.push(pLoV, pl)
+    if array.size(pLoI) > MAXP
+        array.shift(pLoI)
+        array.shift(pLoV)
+if not na(ph)
+    array.push(pHiI, bar_index - K)
+    array.push(pHiV, ph)
+    if array.size(pHiI) > MAXP
+        array.shift(pHiI)
+        array.shift(pHiV)
+
+// Latest pair of swing points whose line no candle cuts between them and no close crosses after the 2nd one.
+bestLine(int[] idx, float[] val, bool isLow) =>
+    int   ra  = na
+    float rva = na
+    int   rb  = na
+    float rvb = na
+    n = array.size(idx)
+    done = false
+    if n >= 2
+        for j = n - 1 to 1
+            if done
+                break
+            b  = array.get(idx, j)
+            vb = array.get(val, j)
+            if bar_index - b > LOOK
+                break
+            for k = j - 1 to 0
+                a  = array.get(idx, k)
+                va = array.get(val, k)
+                if b - a > LOOK
+                    break
+                if b - a >= 5 and (not isLow or va < vb)
+                    s  = (vb - va) / (b - a)
+                    ok = true
+                    for i = a + 1 to b - 1
+                        px = isLow ? low[bar_index - i] : high[bar_index - i]
+                        ln = va + s * (i - a)
+                        if isLow ? px < ln * (1 - TOL) : px > ln * (1 + TOL)
+                            ok := false
+                            break
+                    if ok and b < bar_index
+                        for i = b + 1 to bar_index
+                            cl = close[bar_index - i]
+                            ln = vb + s * (i - b)
+                            if isLow ? cl < ln : cl > ln
+                                ok := false
+                                break
+                    if ok
+                        ra  := a
+                        rva := va
+                        rb  := b
+                        rvb := vb
+                        done := true
+                        break
+    [ra, rva, rb, rvb]
+
+// Latest swing point drawn flat, unless a close has crossed it since.
+levelOf(int[] idx, float[] val, bool isHigh) =>
+    int   rb = na
+    float rv = na
+    n = array.size(idx)
+    if n > 0
+        b = array.get(idx, n - 1)
+        v = array.get(val, n - 1)
+        broken = false
+        if b < bar_index
+            for i = b + 1 to bar_index
+                cl = close[bar_index - i]
+                if isHigh ? cl > v : cl < v
+                    broken := true
+                    break
+        if not broken
+            rb := b
+            rv := v
+    [rb, rv]
+
+var line lSup = na
+var line lRes = na
+var line lLvL = na
+var line lLvH = na
+var label t1 = na
+var label t2 = na
+var label t3 = na
+var label t4 = na
+
+near(lvl) => not na(lvl) and math.abs(close / lvl - 1) * 100 <= nearPct
+
+if barstate.islast
+    line.delete(lSup)
+    line.delete(lRes)
+    line.delete(lLvL)
+    line.delete(lLvH)
+    label.delete(t1)
+    label.delete(t2)
+    label.delete(t3)
+    label.delete(t4)
+    msg = ""
+    if showSup
+        [a1, v1, b1, w1] = bestLine(pLoI, pLoV, true)
+        if not na(a1)
+            lSup := line.new(a1, v1, b1, w1, xloc=xloc.bar_index, extend=extend.right, color=color.new(#2b8cff, 0), width=2)
+            t1 := label.new(a1, v1, "1", style=label.style_label_up, color=color.new(#2b8cff, 0), textcolor=color.white, size=size.tiny)
+            t2 := label.new(b1, w1, "2", style=label.style_label_up, color=color.new(#2b8cff, 0), textcolor=color.white, size=size.tiny)
+            now1 = w1 + (w1 - v1) / (b1 - a1) * (bar_index - b1)
+            if near(now1)
+                msg += "support line " + str.tostring(now1, format.mintick) + "; "
+    if showRes
+        [a2, v2, b2, w2] = bestLine(pHiI, pHiV, false)
+        if not na(a2)
+            lRes := line.new(a2, v2, b2, w2, xloc=xloc.bar_index, extend=extend.right, color=color.new(#ff5a6e, 0), width=2)
+            t3 := label.new(a2, v2, "1", style=label.style_label_down, color=color.new(#ff5a6e, 0), textcolor=color.white, size=size.tiny)
+            t4 := label.new(b2, w2, "2", style=label.style_label_down, color=color.new(#ff5a6e, 0), textcolor=color.white, size=size.tiny)
+            now2 = w2 + (w2 - v2) / (b2 - a2) * (bar_index - b2)
+            if near(now2)
+                msg += "resistance line " + str.tostring(now2, format.mintick) + "; "
+    if showLvL
+        [b3, v3] = levelOf(pLoI, pLoV, false)
+        if not na(b3)
+            lLvL := line.new(b3, v3, bar_index, v3, xloc=xloc.bar_index, extend=extend.right, color=color.new(#22c55e, 0), width=1, style=line.style_dashed)
+            if near(v3)
+                msg += "swing low level " + str.tostring(v3, format.mintick) + "; "
+    if showLvH
+        [b4, v4] = levelOf(pHiI, pHiV, true)
+        if not na(b4)
+            lLvH := line.new(b4, v4, bar_index, v4, xloc=xloc.bar_index, extend=extend.right, color=color.new(#f59e0b, 0), width=1, style=line.style_dashed)
+            if near(v4)
+                msg += "swing high level " + str.tostring(v4, format.mintick) + "; "
+    if msg != ""
+        alert(syminfo.ticker + " within " + str.tostring(nearPct) + "% of its " + msg + "close " + str.tostring(close, format.mintick), alert.freq_once_per_bar)

@@ -1117,3 +1117,6 @@ body.pub .owner-only { display: none !important; }
 .tl-nr em,.tl-w em{font-style:normal;font-size:13px;color:var(--accent,#2b8cff);margin-left:auto}
 .tl-w{cursor:pointer}
 .tl-g{font-weight:700;font-size:15px;margin:10px 0 2px;opacity:.9}
+.tl-nr .tl-tv{font-size:13px;color:inherit;opacity:.75;text-decoration:none;border:1px solid color-mix(in srgb,currentColor 30%,transparent);border-radius:6px;padding:1px 6px}
+.tl-nr em{margin-left:auto}
+.tl-add .bg-ghost.sm{flex:1}

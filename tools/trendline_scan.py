@@ -126,6 +126,18 @@ def level_rows(t, h, l, c, K=3):
     return out
 
 
+TV = {"^NSEI": "NSE:NIFTY", "^NSEBANK": "NSE:BANKNIFTY", "^BSESN": "BSE:SENSEX", "^CNXIT": "NSE:CNXIT", "^CNXAUTO": "NSE:CNXAUTO",
+      "^CNXPHARMA": "NSE:CNXPHARMA", "^CNXFMCG": "NSE:CNXFMCG", "^CNXMETAL": "NSE:CNXMETAL", "^CNXREALTY": "NSE:CNXREALTY",
+      "^CNXENERGY": "NSE:CNXENERGY", "^CNXPSUBANK": "NSE:CNXPSUBANK", "^CNXMEDIA": "NSE:CNXMEDIA", "^CNXINFRA": "NSE:CNXINFRA",
+      "NIFTY_FIN_SERVICE.NS": "NSE:CNXFINANCE", "^NSEMDCP50": "NSE:NIFTYMIDCAP50", "^GSPC": "SP:SPX", "^NDX": "NASDAQ:NDX", "^DJI": "DJ:DJI",
+      "^RUT": "TVC:RUT", "^AXJO": "ASX:XJO", "^FTSE": "TVC:UKX", "^GDAXI": "XETR:DAX", "^STOXX50E": "TVC:SX5E", "^N225": "TVC:NI225",
+      "^HSI": "TVC:HSI", "GC=F": "COMEX:GC1!", "SI=F": "COMEX:SI1!", "CL=F": "NYMEX:CL1!", "BTC-USD": "BITSTAMP:BTCUSD"}
+
+
+def tv_sym(y):
+    return TV.get(y) or ("NSE:" + y[:-3].replace("&", "_").replace("-", "_") if y.endswith(".NS") else y)
+
+
 def main():
     names = {}
     for s in pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "data", "universe", "nifty500.csv")).Symbol:
@@ -148,7 +160,7 @@ def main():
                 if not r:
                     continue
                 nm, mk, kind = names[y]
-                r = dict(y=y, symbol=nm, mk=mk, kind=kind, **({"side": "sup"} | r))
+                r = dict(y=y, tv=tv_sym(y), symbol=nm, mk=mk, kind=kind, **({"side": "sup"} | r))
                 if r["armed"] and r["dist"] <= 3:          # the app's "near the line" list draws this chart on tap
                     g = df.iloc[-160:]; rd = lambda a: [round(float(x), 2) for x in a]  # noqa: E731
                     r["bars"] = dict(t=t[-160:], o=rd(g.Open), h=rd(g.High), l=rd(g.Low), c=rd(g.Close))
@@ -160,6 +172,15 @@ def main():
                         "through the 2 latest swing highs (any slope). Alert when price comes within 1% of a line after 5 closes more than 1% "
                         "away (the 3rd touch). Levels: the latest swing high / swing low drawn flat to the right, alert within 1%. Watch only: the support touch was tested 2016-26, no better than the 50-day average.",
                    rows=[r for r in rows if r["dist"] <= 8]), open(OUT, "w"), indent=0)
+    # TradingView watchlist (Watchlist menu > Import list): everything within 3% of a line, in four sections
+    sec = [("Support lines", lambda r: r["side"] == "sup" and not r.get("flat")), ("Resistance lines", lambda r: r["side"] == "res" and not r.get("flat")),
+           ("Swing low levels", lambda r: r["side"] == "sup" and r.get("flat")), ("Swing high levels", lambda r: r["side"] == "res" and r.get("flat"))]
+    parts = []
+    for name, f in sec:
+        tv = list(dict.fromkeys(r["tv"] for r in rows if r["armed"] and r["dist"] <= 3 and f(r)))
+        if tv:
+            parts += ["###" + name] + tv
+    open(os.path.join(os.path.dirname(OUT), "trendline_tradingview.txt"), "w").write(",".join(parts))
     print("lines", len(rows), "armed within 3%:", near[:40])
 
 
