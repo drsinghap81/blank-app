@@ -119,7 +119,7 @@
 "sh": 118,
 "avg": 629.5922,
 "cost": 74496.32156617424,
-"last": 653.45,
+"last": 670.0,
 "stop_note": "weekly close < 30-wk SMA (482.8367)",
 "added": false
 },
@@ -130,8 +130,8 @@
 "sh": 66,
 "avg": 1476.0705,
 "cost": 97688.74245947438,
-"last": 1583.6,
-"stop_note": "weekly close < 30-wk SMA (1369.0806)",
+"last": 1585.0,
+"stop_note": "weekly close < 30-wk SMA (1374.6767)",
 "added": false
 },
 "ath:AGARWALEYE:2026-11-11": {
@@ -141,7 +141,7 @@
 "sh": 82,
 "avg": 555.5,
 "cost": 45676.350658125004,
-"last": 550.8,
+"last": 550.7,
 "stop_note": "weekly close < 30-wk SMA (485.6083)",
 "added": false
 }
@@ -162,11 +162,18 @@
 "921:SANGAMIND:2026-11-09",
 "921:SIMPLEXINF:2026-11-03",
 "921:SWANDEF:2026-11-09",
+"ath:ANGELONE:2026-11-13",
 "ath:ASAHIINDIA:2026-11-11",
 "ath:DCBBANK:2026-11-12",
 "ath:DRREDDY:2026-11-13",
+"ath:GUFICBIO:2026-11-09",
+"ath:HEGAM:2026-11-05",
 "ath:INDHOTEL:2026-11-06",
-"ath:MANAKCOAT:2026-11-12"
+"ath:INDHOTEL:2026-11-09",
+"ath:KOTAKBANK:2026-10-30",
+"ath:LALPATHLAB:2026-11-04",
+"ath:MANAKCOAT:2026-11-12",
+"ath:ZYDUSLIFE:2026-11-02"
 ],
 "trades": [
 {
