@@ -3975,7 +3975,7 @@ async function tlCard(anchor, mk) {
         ${x.error ? '' : `<div class="lv-sub"><b>Line today ${m(x.line)}</b> · close ${m(x.close)} (${x.dist >= 0 ? '+' : ''}${fmt(x.dist, 1)}%)</div>
         <div class="lv-sub muted">Swing lows ${dd(x.a_d)} ${m(x.a_l)} → ${dd(x.b_d)} ${m(x.b_l)} · ${x.touches > 2 ? `touched ${x.touches - 2}× since` : 'next touch = 3rd'}</div>`}</div>`).join('')}
         <div class="cd-row"><div class="tl-add"><input id="tlsym" placeholder="${mk === 'US' ? 'e.g. AAPL' : 'e.g. KOTAKBANK'}" autocapitalize="characters" autocomplete="off"><button class="bg-ghost sm" id="tladd">Add</button></div>
-        <div class="lv-sub muted">Phone alert when price comes back to the line (3rd touch) and when a day closes below it. Watch only: not a tested buy signal.</div><div class="lv-sub" id="tlmsg"></div></div></div></details>`;
+        <div class="lv-sub muted">Phone alert when price comes back to the line (3rd touch) and when a day closes below it. Watch only. Tested 2016–26 on Nifty 500: no better than the 50-day average, ~14%/yr with −36% drawdown, so not a buy system.</div><div class="lv-sub" id="tlmsg"></div></div></div></details>`;
     el.querySelectorAll('.tl-x').forEach((b) => b.addEventListener('click', async (e) => { e.preventDefault();
       try { await lvApi('/api/tl', { method: 'POST', body: JSON.stringify({ symbol: b.dataset.x, mk, remove: true }) }); } catch (er) { /* */ } draw(true); }));
     const add = async () => { const v = (el.querySelector('#tlsym').value || '').trim().toUpperCase(); if (!v) return; const msg = el.querySelector('#tlmsg'); msg.textContent = 'Adding…';
