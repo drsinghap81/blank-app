@@ -2093,7 +2093,7 @@ def us_watch_eod(t=None, manual=False):
             why = "EMA 9 closed below EMA 21" if sysn == "Trend 9/21" else "weekly close below the 30-week average"
             alert("exit", sym, f"US {sym}: sell signal ({sysn}): {why} ({note}). Sell {w['qty']:g} at the next open in moomoo.",
                   key=f"uswtrail-exit:{sym}:{day}")
-        if lvl > w["stop"] + 0.005:
+        if lvl > w["stop"] * 1.0025:                     # ignore moves under 0.25% (cents are not worth an order change)
             old = w["stop"]; w["stop_prev"] = old; w["stop"] = lvl; w["stop_set"] = day
             raised.append(f"{sym} {old:.2f} → {lvl:.2f}"); out.append(dict(symbol=sym, result="raised", old=old, new=lvl))
         else:
