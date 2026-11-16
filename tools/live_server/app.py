@@ -2217,6 +2217,58 @@ def tl_check(mk, eod=False):
     tl_save(W)
 
 
+_TLS = {"t": 0, "d": None}
+
+
+def tl_scan_load():
+    if _TLS["d"] is not None and time.time() - _TLS["t"] < 1200:
+        return _TLS["d"]
+    if ENV.get("PLAN_FILE"):
+        d = json.load(open(os.path.join(os.path.dirname(ENV["PLAN_FILE"]), "trendline.json")))
+    else:
+        r = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/trendline.json", timeout=30); r.raise_for_status(); d = r.json()
+    _TLS.update(t=time.time(), d=d)
+    return d
+
+
+def _wd_between(a, b):
+    """Weekdays after date a up to and including date b."""
+    n, d = 0, a
+    while d < b:
+        d += timedelta(days=1); n += d.weekday() < 5
+    return n
+
+
+def tl_scan_alerts(mks):
+    """17 Nov 2026: every stock / index from tools/trendline_scan.py whose rising line (2 latest swing lows) is armed and
+    within 4%: one phone alert when today's low comes within 1% of the line (the 3rd touch). Watch only."""
+    try:
+        D = tl_scan_load()
+    except Exception as ex:  # noqa: BLE001
+        log("tl_scan_error", error=str(ex)[:160]); return
+    for r in D.get("rows", []):
+        if r.get("mk") not in mks or not r.get("armed") or r.get("dist", 99) > 4:
+            continue
+        try:
+            q = yq(r["y"], "RAW")
+        except Exception:  # noqa: BLE001
+            continue
+        if not q.get("ltp") or not q.get("t"):
+            continue
+        qd = datetime.fromtimestamp(q["t"], timezone.utc).date()
+        if qd.isoformat() <= r["day"]:
+            continue                                   # no new session since the scan
+        line = r["line_next"] + r["slope"] * max(0, _wd_between(date.fromisoformat(r["day"]), qd) - 1)
+        lo = q.get("low") or q["ltp"]
+        if lo > line * 1.01:
+            continue
+        n = r.get("touches", 2) + 1; nth = {3: "3rd"}.get(n, f"{n}th"); cur = "Rs " if r["mk"] == "NSE" else ""
+        kind = "index" if r.get("kind") == "index" else "stock"
+        alert("setup", r["symbol"], f"{r['symbol']} ({kind}): {nth} time at its rising trend line (swing lows {r['a_d'][5:]} {cur}{r['a_l']:g} "
+              f"and {r['b_d'][5:]} {cur}{r['b_l']:g}). Line {cur}{line:,.2f}, low {cur}{lo:,.2f}, now {cur}{q['ltp']:,.2f}. Watch only, not a tested buy.",
+              key=f"tltouch:{r['symbol']}:{r['a_d']}:{r['b_d']}:{qd.isoformat()}", mk="US" if r["mk"] == "US" else "NSE" if r["mk"] == "NSE" else None)
+
+
 class TLItem(BaseModel):
     symbol: str
     mk: str = "NSE"
@@ -2462,11 +2514,13 @@ def _loop():
             if us_open(et_now()) and t.minute % 10 < 2:
                 us_watch_check()
             if t.minute % 10 < 2 and t.weekday() < 5 and (9, 20) <= (t.hour, t.minute) <= (15, 30):
-                tl_check("NSE")
+                tl_check("NSE"); tl_scan_alerts({"NSE"})
             if t.weekday() < 5 and (15, 45) <= (t.hour, t.minute) <= (16, 30) and _HB.get("tl_eod_nse") != t.date():
                 _HB["tl_eod_nse"] = t.date(); tl_check("NSE", eod=True)
             if us_open(et_now()) and t.minute % 10 < 2:
-                tl_check("US")
+                tl_check("US"); tl_scan_alerts({"US"})
+            if t.minute % 10 < 2 and t.weekday() < 5:
+                tl_scan_alerts({"W"})
             _et = et_now()
             if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("tl_eod_us") != _et.date():
                 _HB["tl_eod_us"] = _et.date(); tl_check("US", eod=True)

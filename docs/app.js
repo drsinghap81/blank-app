@@ -3959,27 +3959,34 @@ async function condorCard(box, mk) {
 /* 17 Nov 2026: trend line alerts. Line through the 2 latest swing lows (your server checks every 10 min in market hours):
    phone alert on the 3rd (4th ...) touch and on a close below. Watch only, not a tested buy signal. */
 async function tlCard(anchor, mk) {
-  const c = lvCfg(); if (!anchor || !c.url || !c.token || (mk !== 'NSE' && mk !== 'US')) return;
+  const c = lvCfg(); if (!anchor || (mk !== 'NSE' && mk !== 'US')) return; const srv = !!(c.url && c.token);
   const old = anchor.parentNode && anchor.parentNode.querySelector('.tl-wrap'); if (old) old.remove();
   const el = document.createElement('div'); el.className = 'tl-wrap'; anchor.after(el);
   const cur = mk === 'US' ? '$' : '₹'; const m = (v) => cur + fmt(v, mk === 'US' ? 2 : 1, mk === 'US' ? 'en-US' : 'en-IN');
   const dd = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   const draw = async (open) => {
-    let T; try { T = await lvApi('/api/tl', { timeout: 30000 }); } catch (e) { el.innerHTML = ''; return; }
+    let T = { items: [] }; if (srv) { try { T = await lvApi('/api/tl', { timeout: 30000 }); } catch (e) { /* scan list still shows */ } }
+    const S = await getJSON(MAIN + 'data/scan/trendline.json', 'tlscan').catch(() => null);
+    const NR = ((S && S.rows) || []).filter((r) => r.armed && r.dist <= 3 && (mk === 'US' ? r.mk === 'US' : r.mk !== 'US'))
+      .sort((a, b) => (a.kind === 'index' ? 0 : 1) - (b.kind === 'index' ? 0 : 1) || a.dist - b.dist).slice(0, 25);
     const L = (T.items || []).filter((x) => x.mk === mk);
-    const near = L.filter((x) => x.rising && x.dist != null && x.dist <= 2);
-    const sum = L.length ? L.map((x) => `${esc(x.symbol)} ${x.dist != null ? (x.dist >= 0 ? '+' : '') + fmt(x.dist, 1) + '%' : '–'}`).join(' · ') : 'none yet';
-    el.innerHTML = `<details class="t2-more t2-wd tl-box"${open ? ' open' : ''}><summary>📈 <b>Trend line alerts${near.length ? ` · ${near.length} near the line` : ''}:</b> ${sum}</summary>
-      <div class="cd-box">${L.map((x) => `<div class="cd-row"><div class="cd-h"><b>${esc(x.symbol)}</b>${x.error ? ' <span class="chip muted">no data</span>' : x.rising ? (x.below ? ' <span class="chip down">broken</span>' : x.dist <= 2 ? ' <span class="chip up">near the line</span>' : '') : ' <span class="chip muted">line falling · no alerts</span>'}
+    if (!NR.length && !L.length && !srv) { el.innerHTML = ''; return; }
+    const sum = NR.length ? `${NR.length} near their line: ${NR.slice(0, 4).map((r) => esc(r.symbol)).join(', ')}${NR.length > 4 ? '…' : ''}` : 'none near their line today';
+    const nrRow = (r) => { const cc = r.mk === 'NSE' ? '₹' : ''; const v = (x) => cc + fmt(x, x > 999 ? 0 : 1, 'en-IN');
+      return `<div class="tl-nr"><b>${esc(r.symbol)}</b>${r.kind === 'index' ? ' <span class="chip muted">index</span>' : ''}<span>line ${v(r.line_next)} · ${r.dist >= 0 ? '+' : ''}${fmt(r.dist, 1)}% · next = ${({ 3: '3rd' })[r.touches + 1] || (r.touches + 1) + 'th'} touch</span></div>`; };
+    el.innerHTML = `<details class="t2-more t2-wd tl-box"${open ? ' open' : ''}><summary>📈 <b>Trend lines:</b> ${sum}</summary>
+      <div class="cd-box">${NR.length ? `<div class="cd-row"><div class="cd-h"><b>Within 3% of the line</b></div><div class="lv-sub muted">${esc(String(S.scanned || ''))} stocks and indices scanned ${esc((S.generated || '').slice(0, 10))}. Phone alert when one comes within 1% of its line.</div>${NR.map(nrRow).join('')}</div>` : ''}
+      ${srv && L.length ? '<div class="cd-row"><div class="cd-h"><b>Your watch list</b></div></div>' : ''}${L.map((x) => `<div class="cd-row"><div class="cd-h"><b>${esc(x.symbol)}</b>${x.error ? ' <span class="chip muted">no data</span>' : x.rising ? (x.below ? ' <span class="chip down">broken</span>' : x.dist <= 2 ? ' <span class="chip up">near the line</span>' : '') : ' <span class="chip muted">line falling · no alerts</span>'}
           <button class="lv-link tl-x" data-x="${esc(x.symbol)}" aria-label="Remove">✕</button></div>
         ${x.error ? '' : `<div class="lv-sub"><b>Line today ${m(x.line)}</b> · close ${m(x.close)} (${x.dist >= 0 ? '+' : ''}${fmt(x.dist, 1)}%)</div>
         <div class="lv-sub muted">Swing lows ${dd(x.a_d)} ${m(x.a_l)} → ${dd(x.b_d)} ${m(x.b_l)} · ${x.touches > 2 ? `touched ${x.touches - 2}× since` : 'next touch = 3rd'}</div>`}</div>`).join('')}
-        <div class="cd-row"><div class="tl-add"><input id="tlsym" placeholder="${mk === 'US' ? 'e.g. AAPL' : 'e.g. KOTAKBANK'}" autocapitalize="characters" autocomplete="off"><button class="bg-ghost sm" id="tladd">Add</button></div>
-        <div class="lv-sub muted">Phone alert when price comes back to the line (3rd touch) and when a day closes below it. Watch only. Tested 2016–26 on Nifty 500: no better than the 50-day average, ~14%/yr with −36% drawdown, so not a buy system.</div><div class="lv-sub" id="tlmsg"></div></div></div></details>`;
+        ${srv ? `<div class="cd-row"><div class="tl-add"><input id="tlsym" placeholder="${mk === 'US' ? 'e.g. AAPL' : 'e.g. KOTAKBANK'}" autocapitalize="characters" autocomplete="off"><button class="bg-ghost sm" id="tladd">Add</button></div>
+        <div class="lv-sub muted">Phone alert when price comes back to the line (3rd touch) and when a day closes below it. Watch only. Tested 2016–26 on Nifty 500: no better than the 50-day average, ~14%/yr with −36% drawdown, so not a buy system.</div><div class="lv-sub" id="tlmsg"></div></div>` : '<div class="cd-row"><div class="lv-sub muted">Connect your server on Live for phone alerts. Watch only: tested 2016–26, no better than the 50-day average.</div></div>'}</div></details>`;
     el.querySelectorAll('.tl-x').forEach((b) => b.addEventListener('click', async (e) => { e.preventDefault();
       try { await lvApi('/api/tl', { method: 'POST', body: JSON.stringify({ symbol: b.dataset.x, mk, remove: true }) }); } catch (er) { /* */ } draw(true); }));
     const add = async () => { const v = (el.querySelector('#tlsym').value || '').trim().toUpperCase(); if (!v) return; const msg = el.querySelector('#tlmsg'); msg.textContent = 'Adding…';
       try { await lvApi('/api/tl', { method: 'POST', timeout: 30000, body: JSON.stringify({ symbol: v, mk }) }); draw(true); } catch (er) { msg.textContent = er.message; } };
+    if (!srv) return;
     el.querySelector('#tladd').addEventListener('click', add);
     el.querySelector('#tlsym').addEventListener('keydown', (e) => { if (e.key === 'Enter') add(); });
   };

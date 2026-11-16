@@ -757,3 +757,25 @@ def test_trend_line(tmp_path):
     assert {x["symbol"] for x in c.get("/api/tl", headers=h).json()["items"]} == {"KOTAKBANK", "TCS"}
     c.post("/api/tl", json={"symbol": "TCS", "remove": True}, headers=h)
     assert [x["symbol"] for x in c.get("/api/tl", headers=h).json()["items"]] == ["KOTAKBANK"]
+
+
+def test_trend_line_scan(tmp_path):
+    A, c = client(tmp_path)
+    p = os.path.join(os.path.dirname(os.environ["PLAN_FILE"]), "trendline.json"); had = os.path.exists(p); old = open(p).read() if had else None
+    rows = {"rows": [{"y": "^NSEI", "symbol": "Nifty 50", "mk": "NSE", "kind": "index", "a_d": "2026-09-29", "a_l": 24500, "b_d": "2026-10-23",
+                      "b_l": 25200, "slope": 20.0, "day": "2026-11-16", "line_next": 25900, "dist": 1.5, "armed": True, "touches": 2},
+                     {"y": "TCS.NS", "symbol": "TCS", "mk": "NSE", "kind": "stock", "a_d": "2026-09-01", "a_l": 3000, "b_d": "2026-10-01",
+                      "b_l": 3100, "slope": 2.0, "day": "2026-11-16", "line_next": 3200, "dist": 6, "armed": True, "touches": 2}]}
+    import json as _j
+    seen = []
+    def yq(y, mk):
+        seen.append(y); return {"ltp": 26050, "low": 26000, "t": 1794988800}     # 18 Nov 2026 UTC: line = 25900 + 20 = 25920
+    try:
+        _j.dump(rows, open(p, "w")); A.yq = yq; A.tl_scan_alerts({"NSE"})
+        al = A.alerts_load()["items"]
+        assert seen == ["^NSEI"] and len(al) == 1 and "3rd time" in al[0]["text"] and "25,920" in al[0]["text"]
+        A.tl_scan_alerts({"NSE"}); assert len(A.alerts_load()["items"]) == 1
+        A.tl_scan_alerts({"US"}); assert len(seen) == 2
+    finally:
+        if had: open(p, "w").write(old)
+        else: os.remove(p)

@@ -1111,3 +1111,5 @@ body.pub .owner-only { display: none !important; }
 .tl-add{display:flex;gap:8px;align-items:center}
 .tl-add input{flex:1;min-width:0;box-sizing:border-box;font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);background:transparent;color:inherit;text-transform:uppercase}
 .tl-add input::placeholder{text-transform:none}
+.tl-nr{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;font-size:15px;line-height:1.4;padding:4px 0}
+.tl-nr span{opacity:.8}
