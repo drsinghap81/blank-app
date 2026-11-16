@@ -124,7 +124,7 @@ const grpOfTab = (t) => (ATH_GRP.inv.includes(t) ? 'inv' : ATH_GRP.trd.includes(
 state.athTabG = { mom: 'brk', inv: 'imc', trd: 'wclose' };
 try { const g = JSON.parse(sessionStorage.getItem('td.tabg') || 'null'); if (g) { Object.assign(state.athTabG, g); sessionStorage.removeItem('td.tabg'); } } catch (e) { /* */ }
 function tradeStrip(cur) {
-  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['turtle', 'Turtle (futures)'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
+  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['turtle', 'Turtle Trading System'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
   return `<div class="seg trdstrip" style="margin:10px 16px 0;flex-wrap:wrap">${B.map(([k, n]) => `<button data-tk="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
 }
 function tradeStripWire(el) {
@@ -2452,7 +2452,7 @@ async function turtleSelect(r) {
   new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
 }
 async function loadTurtle(el) {
-  $('#title').textContent = 'Trading · Turtle (futures)';
+  $('#title').textContent = 'Trading · Turtle Trading System';
   if (state.turtle && Date.now() - (state.turtleAt || 0) > 600000) state.turtle = null;   // refetch after 10 min
   if (!state.turtle) { state.turtleAt = Date.now(); el.innerHTML = tradeStrip('turtle') + '<p class="muted pad">Loading…</p>'; tradeStripWire(el); state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); }
   const D = state.turtle; const S = turSet();
@@ -5106,7 +5106,7 @@ async function tdRender2(el) {
     return `<div class="t2-wcard" role="button" tabindex="0" data-tu="${i}"><span class="t2-ch"><span><b>${esc(r.name)}</b><small>${esc(r.contract)}</small></span>${head}</span><span class="t2-line">${line}</span><span class="t2-line" style="font-size:12.5px">${sz.replace(/^MCX: /, 'MCX ')}</span></div>`; }).join('') : '<p class="t2-empty">No Turtle data yet.</p>');
   const tiles = `<div class="t2-tiles t2-tiles5"><div class="t2-tile sell" data-go="t2sell" role="button" tabindex="0"><b>${knowHeld ? sells.length : '–'}</b><span>to sell</span></div><div class="t2-tile both" data-go="${bothRows.length ? 't2both' : 't2mom'}" role="button" tabindex="0"><b>${bothRows.length}</b><span>in both</span></div>
     <div class="t2-tile buy" data-go="t2mom" role="button" tabindex="0"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add" data-go="${knowHeld && adds.length ? 't2adds' : 't2mom'}" role="button" tabindex="0"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div>
-    <div class="t2-tile fut" data-go="t2tur" role="button" tabindex="0"><b>${tuNew.length + tuEx.length || tuIn.length}</b><span>${tuNew.length + tuEx.length ? 'futures signals' : 'futures held'}</span></div></div>`;
+    <div class="t2-tile fut" data-go="t2tur" role="button" tabindex="0"><b>${tuNew.length + tuEx.length || tuIn.length}</b><span>Turtle Trading System</span></div></div>`;
   el.innerHTML = `<div class="td-wrap t2">
     <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
       <div class="t2-date"><div><b>${esc(clk.dayNum)}</b><span>${esc(clk.month)}</span></div>
@@ -5134,7 +5134,7 @@ async function tdRender2(el) {
       ${restT.length ? `<details class="t2-more"><summary>${restT.length} more 9/21 setups</summary><div class="t2-list">${restT.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
       ${wdCards.length ? `<div class="t2-lbl"><b>Watch · week and day cup closes</b><small>see only</small></div><div class="t2-hs">${wdCards.map(wdCard).join('')}</div>` : ''}
       <details class="t2-more t2-wd"><summary>Watch lists (${trdRows.length}) · weekly and daily charts</summary>${t2Watch(trdRows)}</details>${mk === 'US' ? '<div id="tdrsi2"></div>' : ''}
-      <div class="t2-lbl" id="t2tur"><b>Turtle futures · 20/10 daily long</b><small>paper · 24%/yr tested</small></div>
+      <div class="t2-lbl" id="t2tur"><b>Turtle Trading System · 20/10 daily long</b><small>paper · 24%/yr tested</small></div>
       <div class="t2-hs">${tuCards()}</div></section>
     <div id="tdmx"></div>
     ${(P.missed || []).length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${P.missed.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
