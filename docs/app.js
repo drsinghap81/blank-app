@@ -1136,7 +1136,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); srvCard(); alCard($('#lval')); } wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -4688,10 +4688,12 @@ async function alPush(btn) {
     if (btn) btn.textContent = 'Alerts on ✓';
   } catch (e) { alertMsg('Could not turn on alerts: ' + (e.message || e)); }
 }
-async function alCard(box) {
+/* 16 Nov 2026: alerts carry no market field; US/moomoo alerts start "US ", Trading 212 pie alerts are US ETFs, the rest are India (Angel, Top Bottom) */
+const alMk = (x) => (/^US /.test(x.text || '') || x.kind === 'pie') ? 'US' : (x.mk || 'NSE');
+async function alCard(box, mk) {
   const c = lvCfg(); if (!box || !c.url || !c.token) { if (box) box.innerHTML = ''; return; }
   let A; try { A = await lvApi('/api/alerts'); } catch (e) { box.innerHTML = ''; return; }
-  const wk = Date.now() - 7 * 864e5; const L = (A.items || []).filter((x) => new Date(x.t).getTime() >= wk && x.kind !== 'test').slice(0, 6);
+  const wk = Date.now() - 7 * 864e5; const L = (A.items || []).filter((x) => new Date(x.t).getTime() >= wk && x.kind !== 'test' && (!mk || alMk(x) === mk)).slice(0, 6);
   let on = false; try { on = localStorage.getItem('td.pushOn') === '1' && Notification.permission === 'granted'; } catch (e) { /* */ }
   /* 11 Nov 2026: one-line ticker (was a full card that pushed everything down); tap it for the list and the phone-alert switch */
   const red = (x) => x.kind === 'stop' || x.kind === 'nostop' || x.kind === 'exit';
@@ -4700,7 +4702,7 @@ async function alCard(box) {
   const strip = L.map(item).join('<i class="al-sep">•</i>');
   const secs = Math.max(18, L.reduce((a, x) => a + (x.text || '').length, 0) / 6);
   box.innerHTML = `<details class="al-tick"><summary><span class="al-bell" aria-hidden="true">🔔</span>
-      <span class="al-mq" aria-label="Recent alerts">${L.length ? `<span class="al-track" style="animation-duration:${secs.toFixed(0)}s">${strip}<i class="al-sep">•</i>${strip}<i class="al-sep">•</i></span>` : '<span class="muted">No alerts this week</span>'}</span>
+      <span class="al-mq" aria-label="Recent alerts">${L.length ? `<span class="al-track" style="animation-duration:${secs.toFixed(0)}s">${strip}<i class="al-sep">•</i>${strip}<i class="al-sep">•</i></span>` : `<span class="muted">No ${({ NSE: 'India', US: 'US', ASX: 'Australia', UK: 'UK' })[mk] || ''} alerts this week</span>`}</span>
       <span class="al-n">${L.length || ''}</span></summary>
     <div class="al-list">${L.length ? L.map((x) => { const [ic, lab] = AL_KIND[x.kind] || ['•', x.kind]; return `<div class="td-card td-raise"><span class="td-av" style="background:${red(x) ? 'var(--fall)' : 'var(--rise)'}">${ic}</span><span class="td-nm"><b>${esc(x.symbol || lab)}</b><small>${esc(x.text)}</small><small>${when(x)}</small></span></div>`; }).join('')
       : '<p class="muted td-rs">You get an alert when a stop is hit, a buy fills, a stock is sold, a sell signal fires or a stop is raised.</p>'}
@@ -5172,7 +5174,7 @@ async function tdRender2(el) {
     <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)} · refreshed ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
   el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); }));
-  alCard($('#tdal'));
+  alCard($('#tdal'), mk);
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   el.querySelectorAll('.t2-tile[data-go]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.go); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('t2-flash'); setTimeout(() => t.classList.remove('t2-flash'), 1400); } }));
   el.querySelectorAll('.t2-wcard[data-tu]').forEach((b) => b.addEventListener('click', () => turtleSelect(state._tuShow[+b.dataset.tu])));
@@ -5244,7 +5246,7 @@ async function tdRender(el, beginner) {
   tdApplyHeld(mk);
   tdTopTiles($('#tdtop'), mk);
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
-  if (!beginner) alCard($('#tdal'));
+  if (!beginner) alCard($('#tdal'), mk);
   tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } if (mk === 'NSE') tdGrowthMom($('#tdgm')); tdMatrix($('#tdmx'), mk); tdHeat($('#tdheat'), mk);
 }
 /* Heating up (11 Nov 2026): industries whose 1-week pulse jumped well above last month's. Information only: strength by
