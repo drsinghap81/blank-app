@@ -2,10 +2,13 @@ symbol,name,sector,industry,sector_index,theme,listed
 A,Agilent Technologies Inc. Common Stock,Industrials,Biotechnology: Laboratory Analytical Instruments,XLI,XBI,1999
 AA,Alcoa Corporation Common Stock ,Industrials,Aluminum,XLI,XME,2016
 AAC,Ares Acquisition Corporation III Class A Ordinary Shares,Industrials,Metal Fabrications,XLI,PAVE,2026
+AAC.WS,Ares Acquisition Corporation III Redeemable warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50,Industrials,Metal Fabrications,XLI,PAVE,
 AACG,ATA Creativity Global American Depositary Shares,Real Estate,Other Consumer Services,XLRE,,2008
 AACI,Armada Acquisition Corp. III Class A Ordinary Share,Finance,Blank Checks,XLF,,2026
+AACIU,Armada Acquisition Corp. III Units,Finance,Blank Checks,XLF,,2026
 AACIW,Armada Acquisition Corp. III Warrant,Finance,Blank Checks,XLF,,2026
 AACO,Abony Acquisition Corp. I Class A Ordinary Share,,,,,2026
+AACOU,Abony Acquisition Corp. I Units,,,,,2026
 AACOW,Abony Acquisition Corp. I Warrants,,,,,2026
 AACP,Apogee Acquisition Corp Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 AACPR,Apogee Acquisition Corp Rights,Finance,Blank Checks,XLF,,2026
@@ -51,6 +54,7 @@ ABX,Abacus Global Management Inc. Class A Common Stock,Finance,Investment Manage
 ABXL,Abacus Global Management Inc. 9.875% Fixed Rate Senior Notes due 2028,Finance,Investment Managers,XLF,IAI,
 ACAA,Averin Capital Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 ACAAU,Averin Capital Acquisition Corp. Units,Finance,Blank Checks,XLF,,2026
+ACAAW,Averin Capital Acquisition Corp. Warrants,Finance,Blank Checks,XLF,,2026
 ACAD,ACADIA Pharmaceuticals Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,1985
 ACB,Aurora Cannabis Inc. Common Shares,Health Care, Medicinal Chemicals and Botanical Products ,XLV,,
 ACCL,Acco Group Holdings Limited Class A Ordinary Shares,Consumer Discretionary,Professional Services,XLY,,2025
@@ -69,7 +73,6 @@ ACGLO,Arch Capital Group Ltd. Depositary Shares Each Representing 1/1000th Inter
 ACH,Accendra Health Inc. Common Stock,Health Care,Medical Specialities,XLV,IHI,
 ACHC,Acadia Healthcare Company Inc. Common Stock,Health Care,Medical Specialities,XLV,IHI,
 ACHR,Archer Aviation Inc. Class A Common Stock,Industrials,Aerospace,XLI,ITA,2020
-ACHV,Achieve Life Sciences Inc. Common Shares,Health Care,Biotechnology: In Vitro & In Vivo Diagnostic Substances,XLV,XBI,
 ACI,Albertsons Companies Inc. Class A Common Stock,Consumer Staples,Food Chains,XLP,,2020
 ACIC,American Coastal Insurance Corporation Common Stock,Finance,Property-Casualty Insurers,XLF,KIE,
 ACIU,AC Immune SA Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2016
@@ -82,6 +85,7 @@ ACNB,ACNB Corporation Common Stock,Finance,Major Banks,XLF,KBE,
 ACNT,Ascent Industries Co. Common Stock,Industrials,Major Chemicals,XLI,,
 ACOG,Alpha Cognition Inc. Common Stock,,,,,
 ACON,Aclarion Inc. Common Stock,Health Care,Medical Specialities,XLV,IHI,2022
+ACONW,Aclarion Inc. Warrant,Health Care,Medical Specialities,XLV,IHI,2022
 ACP,abrdn Income Credit Strategies Fund Common Shares,Finance,Investment Managers,XLF,IAI,2011
 ACP^A,abrdn Income Credit Strategies Fund 5.250% Series A Perpetual Preferred Stock,,,,,
 ACR,ACRES Commercial Realty Corp. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
@@ -98,6 +102,7 @@ ACV,Virtus Diversified Income & Convertible Fund Common Shares of Beneficial Int
 ACXP,Acurx Pharmaceuticals Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
 AD,Array Digital Infrastructure Inc. Common Shares,Telecommunications,Telecommunications Equipment,XLC,,1988
 ADAC,American Drive Acquisition Company Class A Ordinary Shares,,,,,2026
+ADACW,American Drive Acquisition Company Warrant,,,,,2026
 ADAG,Adagene Inc. American Depositary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
 ADAM,Adamas Trust Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
 ADAMG,Adamas Trust Inc. 9.125% Senior Notes Due 2030,Real Estate,Real Estate Investment Trusts,XLRE,,
@@ -181,6 +186,7 @@ AFJKR,Aimei Health Technology Co. Ltd Right,,,,,2024
 AFJKU,Aimei Health Technology Co. Ltd Unit,,,,,2023
 AFL,AFLAC Incorporated Common Stock,Finance,Accident &Health Insurance,XLF,KIE,
 AFRI,Forafric Global PLC Ordinary Shares,Consumer Staples,Packaged Foods,XLP,,
+AFRIW,Forafric Global PLC Warrants,Consumer Staples,Packaged Foods,XLP,,
 AFRM,Affirm Holdings Inc. Class A Common Stock,Finance,Finance: Consumer Services,XLF,IAI,2021
 AFYA,Afya Limited Class A Common Shares,Real Estate,Other Consumer Services,XLRE,,2019
 AG,First Majestic Silver Corp. Ordinary Shares (Canada),Basic Materials,Precious Metals,XLB,GDX,
@@ -330,6 +336,7 @@ ALOY,REalloys Inc. Common Stock,Basic Materials,Metal Mining,XLB,XME,
 ALP,Alpha Compute Corp Ordinary Shares,Finance,Finance: Consumer Services,XLF,IAI,
 ALPS,ALPS Group Inc Ordinary Share,Health Care,Medical/Nursing Services,XLV,IHI,
 ALPX,Alpex Acquisition Corporation Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+ALPXR,Alpex Acquisition Corporation Rights,Finance,Blank Checks,XLF,,2026
 ALPXU,Alpex Acquisition Corporation Unit,Finance,Blank Checks,XLF,,2026
 ALRM,Alarm.com Holdings Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,2015
 ALRS,Alerus Financial Corporation Common Stock,Finance,Major Banks,XLF,KBE,2019
@@ -340,6 +347,7 @@ ALTG^A,Alta Equipment Group Inc. Depositary Shares (each representing 1/1000th i
 ALTI,AlTi Global Inc. Class A Common Stock,Finance,Investment Managers,XLF,IAI,2021
 ALTO,Alto Ingredients Inc. Common Stock,Industrials,Major Chemicals,XLI,,
 ALUB,Alussa Energy Acquisition Corp. II Class A Ordinary Shares,,,,,2026
+ALUB.WS,Alussa Energy Acquisition Corp. II Redeemable Warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50 per share,Finance,Blank Checks,XLF,,
 ALV,Autoliv Inc. Common Stock,Consumer Discretionary,Auto Parts:O.E.M.,XLY,,
 ALVO,Alvotech Ordinary Shares,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,
 ALVOW,Alvotech Warrant,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,
@@ -348,6 +356,7 @@ ALXO,ALX Oncology Holdings Inc. Common Stock,Health Care,Biotechnology: Pharmace
 ALZN,Alzamend Neuro Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
 AM,Antero Midstream Corporation Common Stock,Utilities,Natural Gas Distribution,XLU,XOP,2017
 AMAC,AMR Resources Acquisition Corp Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+AMACU,AMR Resources Acquisition Corp Units,Finance,Blank Checks,XLF,,2026
 AMAL,Amalgamated Financial Corp. Common Stock (DE),Finance,Major Banks,XLF,KBE,2018
 AMAN,Amanat Acquisition Corp Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 AMAT,Applied Materials Inc. Common Stock,Technology,Semiconductors,XLK,SMH,1972
@@ -436,6 +445,7 @@ AOUT,American Outdoor Brands Inc. Common Stock ,Consumer Discretionary,Recreatio
 AP,Ampco-Pittsburgh Corporation Common Stock,Industrials,Fluid Controls,XLI,,
 APA,APA Corporation Common Stock,Energy,Oil & Gas Production,XLE,XOP,
 APAC,StoneBridge Acquisition II Corporation Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
+APACR,StoneBridge Acquisition II Corporation Rights,,,,,2025
 APAM,Artisan Partners Asset Management Inc. Class A Common Stock,Finance,Investment Managers,XLF,IAI,2013
 APC,ARKO Petroleum Corp. Class A Common Stock,Energy,Oil Refining/Marketing,XLE,XOP,2026
 APD,Air Products and Chemicals Inc. Common Stock,Basic Materials,Major Chemicals,XLB,,
@@ -448,6 +458,8 @@ APLE,Apple Hospitality REIT Inc. Common Shares,Real Estate,Real Estate Investmen
 APLM,Apollomics Inc. Class A Ordinary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 APLMW,Apollomics Inc. Warrant,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 APMC,AmperCap Acquisition Company Ordinary Shares,Finance,Blank Checks,XLF,,2026
+APMCR,AmperCap Acquisition Company Right,Finance,Blank Checks,XLF,,2026
+APMCU,AmperCap Acquisition Company Unit,Finance,Blank Checks,XLF,,2026
 APMD,Apnimed Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2026
 APO,Apollo Global Management Inc. (New) Common Stock,Finance,Investment Managers,XLF,IAI,
 APOG,Apogee Enterprises Inc. Common Stock,Consumer Discretionary,Auto Parts:O.E.M.,XLY,,
@@ -487,6 +499,8 @@ ARCIU,Archimedes Tech SPAC Partners III Co. Units,Finance,Blank Checks,XLF,,2026
 ARCIW,Archimedes Tech SPAC Partners III Co. Warrant,,,,,2026
 ARCL,ARC Group Acquisition I Corp Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 ARCLR,ARC Group Acquisition I Corp Right,Finance,Blank Checks,XLF,,2026
+ARCLU,ARC Group Acquisition I Corp Unit,Finance,Blank Checks,XLF,,2026
+ARCLW,ARC Group Acquisition I Corp Warrants,Finance,Blank Checks,XLF,,2026
 ARCO,Arcos Dorados Holdings Inc. Class A Shares,Consumer Discretionary,Restaurants,XLY,PEJ,2011
 ARCT,Arcturus Therapeutics Holdings Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2013
 ARDC,Ares Dynamic Credit Allocation Fund Inc. Common Shares,Finance,Investment Managers,XLF,IAI,2012
@@ -516,6 +530,7 @@ ARR,ARMOUR Residential REIT Inc.,Real Estate,Real Estate Investment Trusts,XLRE,
 ARR^C,ARMOUR Residential REIT Inc. 7% Series C Cumulative Redeemable Preferred Stock (liquidation preference $25.00 per share),,,,,
 ARRY,Array Technologies Inc. Common Stock,Technology,Semiconductors,XLK,SMH,2020
 ARTC,Art Technology Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+ARTCU,Art Technology Acquisition Corp. Units,,,,,2026
 ARTCW,Art Technology Acquisition Corp. Warrants,,,,,2026
 ARTL,Artelo Biosciences Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 ARTNA,Artesian Resources Corporation Class A Common Stock,Utilities,Water Supply,XLU,,
@@ -549,6 +564,8 @@ ASML,ASML Holding N.V. New York Registry Shares,Technology,Industrial Machinery/
 ASND,Ascendis Pharma A/S Ordinary Share,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2015
 ASO,Academy Sports and Outdoors Inc. Common Stock,Consumer Discretionary,Other Specialty Stores,XLY,XRT,2020
 ASPC,A SPAC III Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
+ASPCR,A SPAC III Acquisition Corp. Right,Finance,Blank Checks,XLF,,2025
+ASPCU,A SPAC III Acquisition Corp. Unit,Finance,Blank Checks,XLF,,2024
 ASPE,Aspen Neuroscience Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2026
 ASPI,ASP Isotopes Inc. Common Stock,Industrials,Major Chemicals,XLI,,2022
 ASPN,Aspen Aerogels Inc. Common Stock,Consumer Discretionary,RETAIL: Building Materials,XLY,ITB,2014
@@ -568,7 +585,6 @@ ASUR,Asure Software Inc Common Stock,Technology,EDP Services,XLK,IGV,
 ASX,ASE Technology Holding Co. Ltd. American Depositary Shares (each representing Two Common Shares) ,Technology,Semiconductors,XLK,SMH,2018
 ASYS,Amtech Systems Inc. Common Stock,Technology,Industrial Machinery/Components,XLK,PAVE,
 ATAT,Atour Lifestyle Holdings Limited American Depositary Shares,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,2022
-ATCH,AtlasClear Holdings Inc. Common Stock,Finance,Finance: Consumer Services,XLF,IAI,2024
 ATCX,Atlas Critical Minerals Corporation Common Stock,Basic Materials,Precious Metals,XLB,GDX,
 ATEC,Alphatec Holdings Inc. Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,2006
 ATEN,A10 Networks Inc. Common Stock,Telecommunications,Computer Communications Equipment,XLC,IGV,2014
@@ -592,6 +608,7 @@ ATLO,Ames National Corporation Common Stock,Finance,Major Banks,XLF,KBE,
 ATLQ,JAB Acquisition Corp I Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 ATLQR,JAB Acquisition Corp I Rights,Finance,Blank Checks,XLF,,2026
 ATLQU,JAB Acquisition Corp I Unit,Finance,Blank Checks,XLF,,2026
+ATLQW,JAB Acquisition Corp I Warrants,Finance,Blank Checks,XLF,,2026
 ATLX,Atlas Lithium Corporation Common Stock,Industrials,Mining & Quarrying of Nonmetallic Minerals (No Fuels),XLI,XME,
 ATMU,Atmus Filtration Technologies Inc. Common Stock,Consumer Discretionary,Auto Parts:O.E.M.,XLY,,2023
 ATNI,ATN International Inc. Common Stock,Telecommunications,Telecommunications Equipment,XLC,,
@@ -704,6 +721,7 @@ BAC^Q,Bank of America Corporation Depositary shares each representing 1/1000th i
 BAC^S,Bank of America Corporation Depositary shares each representing 1/1000th interest in a share of 4.750% Non-Cumulative Preferred Stock Series SS,,,,,
 BACC,Blue Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
 BACCR,Blue Acquisition Corp. Right ,Finance,Blank Checks,XLF,,2025
+BACCU,Blue Acquisition Corp. Unit,Finance,Blank Checks,XLF,,2025
 BAER,Bridger Aerospace Group Holdings Inc. Common Stock,Industrials,Aerospace,XLI,ITA,
 BAERW,Bridger Aerospace Group Holdings Inc. Warrant,Industrials,Aerospace,XLI,ITA,
 BAFN,BayFirst Financial Corp. Common Stock,Finance,Major Banks,XLF,KBE,
@@ -800,10 +818,11 @@ BDX,Becton Dickinson and Company Common Stock,Health Care,Medical/Dental Instrum
 BE,Bloom Energy Corporation Class A Common Stock,Energy,Industrial Machinery/Components,XLE,PAVE,2018
 BEAG,Bold Eagle Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2024
 BEAGR,Bold Eagle Acquisition Corp. Right,Finance,Blank Checks,XLF,,2024
+BEAGU,Bold Eagle Acquisition Corp. Units,Finance,Blank Checks,XLF,,2024
 BEAM,Beam Therapeutics Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2020
 BEAT,Heartbeam Inc. Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,2021
-BEATW,Heartbeam Inc. Warrant,Health Care,Medical/Dental Instruments,XLV,IHI,2021
 BEBE,TGE Value Creative Solutions Corp Class A Ordinary Shares,Consumer Discretionary,Diversified Commercial Services,XLY,,2026
+BEBE.WS,TGE Value Creative Solutions Corp Redeemable warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50 per share,,,,,
 BEEM,Beam Global Common Stock,Miscellaneous,Industrial Machinery/Components,,PAVE,
 BEEP,Mobile Infrastructure Corporation Common Stock,Finance,Real Estate,XLF,,
 BEKE,KE Holdings Inc American Depositary Shares (each representing three Class A Ordinary Shares),Finance,Real Estate,XLF,,2020
@@ -887,6 +906,7 @@ BID,Tribeca Strategic Acquisition Corp. Class A Ordinary Shares,Finance,Blank Ch
 BIDU,Baidu Inc. ADS,Technology,Computer Software: Programming Data Processing,XLK,IGV,2005
 BIIB,Biogen Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,
 BIII,Black Spade Acquisition III Co Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+BIII.WS,Black Spade Acquisition III Co Redeemable warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50,Finance,Blank Checks,XLF,,
 BILI,Bilibili Inc. American Depositary Shares,Technology,EDP Services,XLK,IGV,2018
 BILL,BILL Holdings Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,2019
 BIO,Bio-Rad Laboratories Inc. Class A Common Stock,Industrials,Biotechnology: Laboratory Analytical Instruments,XLI,XBI,1980
@@ -916,7 +936,6 @@ BJDX,Bluejay Diagnostics Inc. Common Stock,Health Care,Medical/Dental Instrument
 BJRI,BJ's Restaurants Inc. Common Stock,Consumer Discretionary,Restaurants,XLY,PEJ,
 BKD,Brookdale Senior Living Inc. Common Stock,Health Care,Hospital/Nursing Management,XLV,IHI,2005
 BKE,Buckle Inc. (The) Common Stock,Consumer Discretionary,Clothing/Shoe/Accessory Stores,XLY,XRT,
-BKH,Black Hills Corporation Common Stock,Utilities,Electric Utilities: Central,XLU,PAVE,
 BKHA,Black Hawk Acquisition Corporation Class A Ordinary Shares,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2024
 BKHAR,Black Hawk Acquisition Corporation Rights,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2024
 BKHAU,Black Hawk Acquisition Corporation Units,,,,,2024
@@ -951,6 +970,7 @@ BLSH,Bullish Ordinary Shares,Finance,Finance: Consumer Services,XLF,IAI,2025
 BLSM,BlossomHill Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2026
 BLTE,Belite Bio Inc American Depositary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2022
 BLUW,Blue Water Acquisition Corp. III Class A Ordinary Shares,,,,,2025
+BLUWU,Blue Water Acquisition Corp. III Unit.,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2025
 BLUWW,Blue Water Acquisition Corp. III Warrant.,,,,,2025
 BLW,Blackrock Limited Duration Income Trust,Consumer Discretionary,Other Consumer Services,XLY,,2003
 BLX,Bladex Inc. Class E Common Stock,Finance,Commercial Banks,XLF,KRE,1992
@@ -1023,6 +1043,7 @@ BOX,Box Inc. Class A Common Stock,Technology,Computer Software: Prepackaged Soft
 BOXL,Boxlight Corporation Class A Common Stock,Real Estate,Other Consumer Services,XLRE,,2017
 BP,BP p.l.c. Common Stock,Energy,Integrated oil Companies,XLE,XOP,
 BPAC,Blueport Acquisition Ltd Class A Ordinary Shares,,,,,2026
+BPACR,Blueport Acquisition Ltd Rights,Finance,Blank Checks,XLF,,2026
 BPOP,Popular Inc. Common Stock,Finance,Major Banks,XLF,KBE,
 BPOPM,Popular Inc. Popular Capital Trust II - 6.125% Cumulative Monthly Income Trust Preferred Securities,Finance,Major Banks,XLF,KBE,
 BPRE,Bluerock Private Real Estate Fund Common Shares of Beneficial Interest,,,,,2025
@@ -1092,7 +1113,6 @@ BSVN,Bank7 Corp. Common stock,Finance,Major Banks,XLF,KBE,2018
 BSX,Boston Scientific Corporation Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,
 BSY,Bentley Systems Incorporated Class B Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,2020
 BTBD,BT Brands Inc. Common Stock,Consumer Discretionary,Restaurants,XLY,PEJ,2021
-BTBDW,BT Brands Inc. Warrant,Consumer Discretionary,Restaurants,XLY,PEJ,2021
 BTBT,Bit Digital Inc. Ordinary Shares,Finance,Finance: Consumer Services,XLF,IAI,2018
 BTCS,BTCS Inc. Common Stock,Finance,Finance: Consumer Services,XLF,IAI,
 BTCT,BTC Digital Ltd. Ordinary Shares,Finance,Finance: Consumer Services,XLF,IAI,
@@ -1140,6 +1160,7 @@ BWFG,Bankwell Financial Group Inc. Common Stock,Finance,Major Banks,XLF,KBE,2014
 BWG,BrandywineGLOBAL Global Income Opportunities Fund Inc.,Finance,Finance/Investors Services,XLF,IAI,2012
 BWIN,The Baldwin Insurance Group Inc. Class A Common Stock,Finance,Specialty Insurers,XLF,,2019
 BWIV,Blue Water Acquisition Corp. IV Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+BWIV.WS,Blue Water Acquisition Corp. IV Warrants entitling the holder to purchase one Class A ordinary share at a price of $11.50 per share,,,,,
 BWLP,BW LPG Limited Common Shares,Consumer Discretionary,Transportation Services,XLY,IYT,2024
 BWMX,Betterware de Mexico S.A.P.I. de C.V. Ordinary Shares,Consumer Discretionary,Catalog/Specialty Distribution,XLY,XRT,
 BWXT,BWX Technologies Inc. Common Stock,Industrials,Industrial Machinery/Components,XLI,PAVE,
@@ -1201,6 +1222,8 @@ CAPNU,Cayson Acquisition Corp Unit,,,,,2024
 CAPR,Capricor Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 CAPS,Capstone Holding Corp. Common Stock,Consumer Discretionary,RETAIL: Building Materials,XLY,ITB,
 CAQ,Cambridge Acquisition Corp. Class A Ordinary Shares,,,,,2026
+CAQUU,Cambridge Acquisition Corp. Unit,,,,,2026
+CAQUW,Cambridge Acquisition Corp. Warrants,,,,,2026
 CAR,Avis Budget Group Inc. Common Stock,Consumer Discretionary,Rental/Leasing Companies,XLY,,
 CARE,Carter Bankshares Inc. Common Stock,Finance,Major Banks,XLF,KBE,
 CARG,CarGurus Inc. Class A Common Stock ,Technology,EDP Services,XLK,IGV,2017
@@ -1215,6 +1238,7 @@ CAST,FreeCast Inc. Class A Common Stock,Technology,EDP Services,XLK,IGV,
 CASY,Casey's General Stores Inc. Common Stock,Consumer Discretionary,Retail-Auto Dealers and Gas Stations,XLY,XRT,1983
 CAT,Caterpillar Inc. Common Stock,Industrials,Construction/Ag Equipment/Trucks,XLI,ITB,
 CATL, Catalyst Acquisition Corp. Class A Ordinary Share,Finance,Blank Checks,XLF,,2026
+CATLR,Catalyst Acquisition Corp. Rights,Finance,Blank Checks,XLF,,2026
 CATO,Cato Corporation (The) Class A Common Stock,Consumer Discretionary,Clothing/Shoe/Accessory Stores,XLY,XRT,
 CATX,Perspective Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 CATY,Cathay General Bancorp Common Stock,Finance,Major Banks,XLF,KBE,
@@ -1254,6 +1278,7 @@ CCEC,Capital Clean Energy Carriers Corp. Common Share,Consumer Discretionary,Mar
 CCEL,Cryo-Cell International Inc. Common Stock,Health Care,Misc Health and Biotechnology Services,XLV,XBI,2022
 CCEP,Coca-Cola Europacific Partners plc Ordinary Shares,Consumer Staples,Beverages (Production/Distribution),XLP,,
 CCG,Cheche Group Inc. Class A Ordinary Shares,Finance,Specialty Insurers,XLF,,
+CCGWW,Cheche Group Inc. Warrant,Finance,Specialty Insurers,XLF,,
 CCHH,CCH Holdings Ltd Class A Ordinary Shares,Consumer Discretionary,Restaurants,XLY,PEJ,2025
 CCI,Crown Castle Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
 CCID,Carlyle Credit Income Fund 7.375% Series D Term Preferred Shares due 2028,,,,,
@@ -1329,8 +1354,6 @@ CFG^E,Citizens Financial Group Inc. Depositary Shares Each Representing 1/40th I
 CFG^H,Citizens Financial Group Inc. Depositary Shares Each Representing a 1/40th Interest in a Share of 7.375% Fixed-Rate Non-Cumulative Perpetual Preferred Stock Series H,,,,,
 CFG^I,Citizens Financial Group Inc. Depositary Shares Each Representing a 1/40th Interest in a Share of 6.500% Fixed-Rate Reset Non-Cumulative Perpetual Preferred Stock Series I,,,,,
 CFND,C1 Fund Inc. Common Stock,,,,,2025
-CFR,Cullen/Frost Bankers Inc. Common Stock,Finance,Major Banks,XLF,KBE,
-CFR^B,Cullen/Frost Bankers Inc. Depositary Shares each representing a 1/40th ownership interest in a share of 4.450% non-cumulative perpetual preferred stock Series B,,,,,
 CFTR^A,Cantor Fitzgerald Income Trust Inc. 9.50% Series A Cumulative Redeemable Preferred Stock,,,,,
 CG,The Carlyle Group Inc. Common Stock,Finance,Investment Managers,XLF,IAI,2012
 CGABL,The Carlyle Group Inc. 4.625% Subordinated Notes due 2061,Finance,Investment Managers,XLF,IAI,
@@ -1436,6 +1459,7 @@ CLAR,Clarus Corporation Common Stock,Consumer Discretionary,Recreational Games/P
 CLB,Core Laboratories Inc. Common Stock,Energy,Oilfield Services/Equipment,XLE,XOP,2023
 CLBK,Columbia Financial Inc. Common Stock,Finance,Savings Institutions,XLF,KRE,2018
 CLBR,Colombier Acquisition Corp. III Class A Ordinary Shares,,,,,2026
+CLBR.WS,Colombier Acquisition Corp. III Warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50 per share,Finance,Blank Checks,XLF,,
 CLBT,Cellebrite DI Ltd. Ordinary Shares,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 CLDI,Calidi Biotherapeutics Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2021
 CLDT,Chatham Lodging Trust (REIT) Common Shares of Beneficial Interest,Real Estate,Real Estate Investment Trusts,XLRE,,2010
@@ -1443,7 +1467,6 @@ CLDT^A,Chatham Lodging Trust (REIT) 6.625% Series A Cumulative Redeemable Prefer
 CLDX,Celldex Therapeutics Inc.,Health Care,Biotechnology: In Vitro & In Vivo Diagnostic Substances,XLV,XBI,
 CLF,Cleveland-Cliffs Inc. Common Stock,Basic Materials,Metal Mining,XLB,XME,
 CLFD,Clearfield Inc. Common Stock,Utilities,Telecommunications Equipment,XLU,,
-CLGN,CollPlant Biotechnologies Ltd Ordinary Shares,Health Care,Industrial Specialties,XLV,,
 CLH,Clean Harbors Inc. Common Stock,Industrials,Environmental Services,XLI,,
 CLIK,Click Holdings Limited Class A Ordinary Share,Consumer Discretionary,Diversified Commercial Services,XLY,,2024
 CLIR,ClearSign Technologies Corporation Common Stock (DE),Industrials,Industrial Machinery/Components,XLI,PAVE,2012
@@ -1616,6 +1639,8 @@ CRAI,CRA International Inc. Common Stock,Consumer Discretionary,Other Consumer S
 CRAN,Crane Harbor Acquisition Corp. II Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 CRANR,Crane Harbor Acquisition Corp. II Rights,Finance,Blank Checks,XLF,,2026
 CRAQ,Cal Redwood Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
+CRAQR,Cal Redwood Acquisition Corp. Right,Finance,Blank Checks,XLF,,2025
+CRAQU,Cal Redwood Acquisition Corp. Units,Finance,Blank Checks,XLF,,2025
 CRBD,Corebridge Financial Inc. 6.375% Junior Subordinated Notes due 2064,Finance,Life Insurance,XLF,KIE,2024
 CRBG,Corebridge Financial Inc. Common Stock,Finance,Life Insurance,XLF,KIE,2022
 CRBP,Corbus Pharmaceuticals Holdings Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
@@ -1644,6 +1669,7 @@ CRM,Salesforce Inc. Common Stock,Technology,Computer Software: Prepackaged Softw
 CRMD,CorMedix Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 CRML,Critical Metals Corp. Ordinary Shares,Basic Materials,Metal Mining,XLB,XME,
 CRMLW,Critical Metals Corp. Warrants,Basic Materials,Metal Mining,XLB,XME,
+CRMN,Skyline Builders Group Holding Limited Class A Ordinary Shares,Consumer Discretionary,Engineering & Construction,XLY,ITB,2025
 CRMT,America's Car-Mart Inc Common Stock,Consumer Discretionary,Retail-Auto Dealers and Gas Stations,XLY,XRT,
 CRNC,Cerence Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 CRNT,Ceragon Networks Ltd. Ordinary Shares,Technology,Radio And Television Broadcasting And Communications Equipment,XLK,,
@@ -1684,6 +1710,7 @@ CTA^A,EIDP Inc. Preferred Stock $3.50 Series,,,,,
 CTA^B,EIDP Inc. Preferred Stock $4.50 Series,,,,,
 CTAA,ClearThink 1 Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 CTAAR,ClearThink 1 Acquisition Corp. Rights,Finance,Blank Checks,XLF,,2026
+CTAAU,ClearThink 1 Acquisition Corp. Units,Finance,Blank Checks,XLF,,2026
 CTAS,Cintas Corporation Common Stock,Industrials,Garments and Clothing,XLI,XRT,1983
 CTBI,Community Trust Bancorp Inc. Common Stock,Finance,Major Banks,XLF,KBE,
 CTEV,Claritev Corporation Class A Common Stock,Consumer Discretionary,Business Services,XLY,,2020
@@ -1715,6 +1742,7 @@ CUBB,Customers Bancorp Inc 5.375% Subordinated Notes Due 2034,Finance,Major Bank
 CUBE,CubeSmart Common Shares,Real Estate,Real Estate Investment Trusts,XLRE,,
 CUBI,Customers Bancorp Inc Common Stock,Finance,Major Banks,XLF,KBE,
 CUBWU,Lionheart Holdings Unit,Finance,Blank Checks,XLF,,2024
+CUBWW,Lionheart Holdings Warrant,Industrials,Industrial Machinery/Components,XLI,PAVE,2024
 CUE,Cue Biopharma Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2018
 CULP,Culp Inc. Common Stock,Consumer Discretionary,Textiles,XLY,,
 CUPR,Cuprina Holdings (Cayman) Limited Class A Ordinary Shares,Health Care,Industrial Specialties,XLV,,2025
@@ -1797,6 +1825,7 @@ DAVEW,Dave Inc. Warrants,Finance,Finance: Consumer Services,XLF,IAI,
 DAVI,Davion Healthcare Plc Ordinary Shares,Health Care,Medical/Dental Instruments,XLV,IHI,
 DB,Deutsche Bank AG Common Stock,Finance,Major Banks,XLF,KBE,
 DBCA,D. Boral Acquisition I Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+DBCAU,D. Boral Acquisition I Corp. Unit,Finance,Blank Checks,XLF,,2026
 DBCAW,D. Boral Acquisition I Corp. Warrants,Finance,Blank Checks,XLF,,2026
 DBD,Diebold Nixdorf Incorporated Common stock,Miscellaneous,Office Equipment/Supplies/Services,,,2023
 DBGI,Digital Brands Group Inc. Common Stock,Consumer Discretionary,Clothing/Shoe/Accessory Stores,XLY,XRT,2025
@@ -1843,6 +1872,7 @@ DFNS,T3 Defense Inc. Common Stock,Consumer Discretionary,Professional Services,X
 DFNSW,T3 Defense Inc. Warrants,Consumer Discretionary,Professional Services,XLY,,2020
 DFP,Flaherty & Crumrine Dynamic Preferred and Income Fund Inc. Common Stock,Finance,Investment Managers,XLF,IAI,2013
 DFSC,DEFSEC Technologies Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
+DFSCW,DEFSEC Technologies Inc. Warrant,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 DFTX,Definium Therapeutics Inc. Common Shares,Health Care, Medicinal Chemicals and Botanical Products ,XLV,,
 DG,Dollar General Corporation Common Stock,Consumer Discretionary,Department/Specialty Retail Stores,XLY,XRT,2009
 DGAC,Disciplined Growth Acquisition Corporation Class A Ordinary Shares,,,,,2026
@@ -1894,6 +1924,7 @@ DLY,DoubleLine Yield Opportunities Fund Common Shares of Beneficial Interest,Fin
 DMA,Destra Multi-Alternative Fund Common Stock,Finance,Trusts Except Educational Religious and Charitable,XLF,,2022
 DMAA,Drugs Made In America Acquisition Corp. Ordinary Shares,,,,,2025
 DMAAR,Drugs Made In America Acquisition Corp. Rights,Finance,Blank Checks,XLF,,2025
+DMAAU,Drugs Made In America Acquisition Corp. Units,Finance,Blank Checks,XLF,,2025
 DMAC,DiaMedica Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2018
 DMB,BNY Mellon Municipal Bond Infrastructure Fund Inc. Common Stock,Finance,Trusts Except Educational Religious and Charitable,XLF,,2013
 DMC,Del Monte Corporation Ordinary Shares,Consumer Staples,Farming/Seeds/Milling,XLP,,
@@ -1949,6 +1980,7 @@ DRTSW,Alpha Tau Medical Ltd. Warrant,Health Care,Medical/Dental Instruments,XLV,
 DRUG,Bright Minds Biosciences Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 DRVN,Driven Brands Holdings Inc. Common Stock,Consumer Discretionary,Automotive Aftermarket,XLY,,2021
 DSAC,Daedalus Special Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+DSACU,Daedalus Special Acquisition Corp. Unit,Finance,Blank Checks,XLF,,2025
 DSC,DSC Holdings Ltd. American Depositary Shares,Technology,Computer Software: Programming Data Processing,XLK,IGV,2026
 DSGN,Design Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
 DSGR,Distribution Solutions Group Inc. Common Stock,Consumer Discretionary,Industrial Specialties,XLY,,
@@ -1975,6 +2007,7 @@ DTIL,Precision BioSciences Inc. Common Stock,Health Care,Biotechnology: Biologic
 DTK,DTE Energy Company 2025 Series H 6.25% Junior Subordinated Debentures due 2085,Utilities,Electric Utilities: Central,XLU,PAVE,2025
 DTM,DT Midstream Inc. Common Stock ,Utilities,Natural Gas Distribution,XLU,XOP,2021
 DTSQ,DT Cloud Star Acquisition Corporation Ordinary Shares,,,,,2024
+DTSQR,DT Cloud Star Acquisition Corporation Right,Finance,Blank Checks,XLF,,2024
 DTSS,Datasea Intelligent Technology Ltd. Class A Ordinary Shares,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 DTST,Data Storage Corporation Common Stock,Technology,EDP Services,XLK,IGV,
 DTW,DTE Energy Company 2017 Series E 5.25% Junior Subordinated Debentures due 2077,Utilities,Electric Utilities: Central,XLU,PAVE,2017
@@ -2008,6 +2041,7 @@ DY,Dycom Industries Inc. Common Stock,Industrials,Water Sewer Pipeline Comm & Po
 DYAI,Dyadic International Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,
 DYN,Dyne Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2020
 DYOR,Insight Digital Partners II Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
+DYORU,Insight Digital Partners II Units,Finance,Blank Checks,XLF,,2025
 DYORW,Insight Digital Partners II Warrants,Finance,Blank Checks,XLF,,2025
 E,ENI S.p.A. Common Stock,Energy,Oil & Gas Production,XLE,XOP,
 EAD,Allspring Income Opportunities Fund Common Shares,Finance,Finance/Investors Services,XLF,IAI,2003
@@ -2039,6 +2073,7 @@ ECOR,electroCore Inc. Common Stock,Health Care,Biotechnology: Electromedical & E
 ECPG,Encore Capital Group Inc Common Stock,Finance,Finance Companies,XLF,IAI,
 ECVT,Ecovyst Inc. Common Stock,Industrials,Major Chemicals,XLI,,2017
 ECX,ECARX Holdings Inc. Class A Ordinary shares,Technology,EDP Services,XLK,IGV,
+ECXWW,ECARX Holdings Inc. Warrants,Technology,EDP Services,XLK,IGV,
 ED,Consolidated Edison Inc. Common Stock,Utilities,Power Generation,XLU,,
 EDBL,Edible Garden AG Incorporated Common Stock,Consumer Staples,Farming/Seeds/Milling,XLP,,2022
 EDBLW,Edible Garden AG Incorporated Warrant,Consumer Staples,Farming/Seeds/Milling,XLP,,2022
@@ -2076,6 +2111,7 @@ EGBN,Eagle Bancorp Inc. Common Stock,Finance,Major Banks,XLF,KBE,
 EGG,Enigmatig Limited Class A Ordinary Shares,Consumer Discretionary,Professional Services,XLY,,2025
 EGHA,EGH Acquisition Corp. Class A Ordinary Shares,Finance,Finance/Investors Services,XLF,IAI,2025
 EGHAR,EGH Acquisition Corp. Rights,Finance,Finance/Investors Services,XLF,IAI,2025
+EGHAU,EGH Acquisition Corp. Unit,Finance,Finance/Investors Services,XLF,IAI,2025
 EGHT,8x8 Inc Common Stock,Technology,EDP Services,XLK,IGV,
 EGO,Eldorado Gold Corporation Ordinary Shares,Basic Materials,Precious Metals,XLB,GDX,
 EGP,EastGroup Properties Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
@@ -2164,6 +2200,7 @@ EOG,EOG Resources Inc. Common Stock,Energy,Oil & Gas Production,XLE,XOP,
 EOI,Eaton Vance Enhance Equity Income Fund Eaton Vance Enhanced Equity Income Fund Shares of Beneficial Interest,Finance,Finance/Investors Services,XLF,IAI,2004
 EOLS,Evolus Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2018
 EONR,EON Resources Inc. Class A Common Stock,Energy,Oil & Gas Production,XLE,XOP,2022
+EONR.WS,EON Resources Inc. Warrants each whole warrant exercisable for three quarters of one share of Class A Common Stock at an exercise price of $11.50 per whole share,Energy,Oil & Gas Production,XLE,XOP,
 EOS,Eaton Vance Enhance Equity Income Fund II Common Stock,Finance,Trusts Except Educational Religious and Charitable,XLF,,2005
 EOSE,Eos Energy Enterprises Inc. Class A Common Stock,Miscellaneous,Industrial Machinery/Components,,PAVE,
 EOSEW,Eos Energy Enterprises Inc. Warrant,Miscellaneous,Industrial Machinery/Components,,PAVE,
@@ -2202,6 +2239,7 @@ ERIC,Ericsson American Depositary Shares,Technology,Radio And Television Broadca
 ERIE,Erie Indemnity Company Class A Common Stock,Finance,Specialty Insurers,XLF,,
 ERII,Energy Recovery Inc. Common Stock,Technology,Industrial Machinery/Components,XLK,PAVE,2008
 ERNA,Ernexa Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
+ERNAW,Ernexa Therapeutics Inc. Warrants,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 ERO,Ero Copper Corp. Common Shares,Basic Materials,Metal Mining,XLB,XME,2021
 EROC,ERock Inc. Class A Common Stock,Energy,Industrial Machinery/Components,XLE,PAVE,2026
 EROK,EagleRock Land LLC Class A shares representing limited liability company interests,Energy,Oil & Gas Production,XLE,XOP,2026
@@ -2212,6 +2250,7 @@ ESE,ESCO Technologies Inc. Common Stock,Telecommunications,Telecommunications Eq
 ESEA,Euroseas Ltd. Common Stock (Marshall Islands),Consumer Discretionary,Marine Transportation,XLY,IYT,
 ESI,Element Solutions Inc. Common Stock,Industrials,Major Chemicals,XLI,,2014
 ESLA,Estrella Immunopharma Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2021
+ESLAW,Estrella Immunopharma Inc. Warrant,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2021
 ESLT,Elbit Systems Ltd. Ordinary Shares,Industrials,Military/Government/Technical,XLI,ITA,
 ESNT,Essent Group Ltd. Common Shares,Finance,Property-Casualty Insurers,XLF,KIE,2013
 ESOA,Energy Services of America Corporation Common Stock,Industrials,Water Sewer Pipeline Comm & Power Line Construction,XLI,ITB,
@@ -2235,6 +2274,7 @@ ETR,Entergy Corporation Common Stock,Utilities,Electric Utilities: Central,XLU,P
 ETRA,Electra Therapeutics Inc. Common stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2026
 ETS,Elite Express Holding Inc. Class A Common Stock,Industrials,Trucking Freight/Courier Services,XLI,IYT,2025
 ETSS,Energy Transition Special Opportunities Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+ETSS.WS,Energy Transition Special Opportunities Warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50,Finance,Blank Checks,XLF,,
 ETSY,Etsy Inc. Common Stock,Consumer Discretionary,Business Services,XLY,,2025
 ETV,Eaton Vance Corporation Eaton Vance Tax-Managed Buy-Write Opportunities Fund Common Shares of Beneficial Interest,Finance,Investment Bankers/Brokers/Service,XLF,IAI,2005
 ETW,Eaton Vance Corporation Eaton Vance Tax-Managed Global Buy-Write Opportunites Fund Common Shares of Beneficial Interest,Finance,Investment Managers,XLF,IAI,2005
@@ -2242,7 +2282,10 @@ ETX,Eaton Vance Municipal Income 2028 Term Trust Common Shares of Beneficial Int
 ETY,Eaton Vance Tax-Managed Diversified Equity Income Fund Common Shares of Beneficial Interest,Finance,Finance Companies,XLF,IAI,2006
 EU,enCore Energy Corp. Common Shares,Basic Materials,Other Metals and Minerals,XLB,,
 EUDA,EUDA Health Holdings Limited Class A Ordinary Shares,Health Care,Medical/Nursing Services,XLV,IHI,2021
+EUDAW,EUDA Health Holdings Limited Warrant,Health Care,Medical/Nursing Services,XLV,IHI,2021
 EURK,Eureka Acquisition Corp Class A Ordinary Share,,,,,2024
+EURKR,Eureka Acquisition Corp Right,Consumer Discretionary,Marine Transportation,XLY,IYT,2024
+EURKU,Eureka Acquisition Corp Unit,Consumer Discretionary,Marine Transportation,XLY,IYT,2024
 EVAC,EQV Ventures Acquisition Corp. II Class A Ordinary Shares,Industrials,Fluid Controls,XLI,,2025
 EVAX,Evaxion A/S American Depositary Share,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2021
 EVC,Entravision Communications Corporation Common Stock,Industrials,Broadcasting,XLI,,2000
@@ -2295,7 +2338,6 @@ EYE,National Vision Holdings Inc. Common Stock,Health Care,Ophthalmic Goods,XLV,
 EYPT,EyePoint Inc. Common Stock,Industrials,Biotechnology: Laboratory Analytical Instruments,XLI,XBI,
 EZGO,EZGO Technologies Ltd. Ordinary Shares,Consumer Discretionary,Motor Vehicles,XLY,,2021
 EZPW,EZCORP Inc. Class A Non Voting Common Stock,Consumer Discretionary,Other Specialty Stores,XLY,XRT,1991
-EZRA,Reliance Global Group Inc. Common Stock,Finance,Specialty Insurers,XLF,,
 F,Ford Motor Company Common Stock,Industrials,Auto Manufacturing,XLI,,
 F^B,Ford Motor Company 6.20% Notes due June 1 2059,,,,,
 F^C,Ford Motor Company 6% Notes due December 1 2059,,,,,
@@ -2390,6 +2432,7 @@ FGC,FG Communities Holdings Inc. Common Stock ,Finance,Property-Casualty Insurer
 FGCPP,FG Communities Holdings Inc. 8.00% Cumulative Preferred Stock,Finance,Property-Casualty Insurers,XLF,KIE,
 FGI,FGI Industries Ltd. Ordinary Shares,Industrials,Industrial Specialties,XLI,,2022
 FGII,FG Imperii Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+FGIIU,FG Imperii Acquisition Corp. Units,Finance,Blank Checks,XLF,,2026
 FGIIW,FG Imperii Acquisition Corp. Warrants,Finance,Blank Checks,XLF,,2026
 FGIWW,FGI Industries Ltd. Warrant,Industrials,Industrial Specialties,XLI,,2022
 FGL,Founder Group Limited Class A Ordinary Shares,Consumer Discretionary,Engineering & Construction,XLY,ITB,2024
@@ -2430,7 +2473,9 @@ FIVN,Five9 Inc. Common Stock,Technology,EDP Services,XLK,IGV,2014
 FIX,Comfort Systems USA Inc. Common Stock,Industrials,Engineering & Construction,XLI,ITB,1997
 FIZZ,National Beverage Corp. Common Stock,Consumer Staples,Beverages (Production/Distribution),XLP,,
 FJDI,ARC Group Securities Acquisition I Class A Ordinary Shares,,,,,2026
+FJDIR,ARC Group Securities Acquisition I Rights,,,,,2026
 FJDIU,ARC Group Securities Acquisition I Units,,,,,2026
+FJDIW,ARC Group Securities Acquisition I Warrants,,,,,2026
 FJET,Starfighters Space Inc. Common Stock,Consumer Discretionary,Air Freight/Delivery Services,XLY,IYT,2025
 FKWL,Franklin Wireless Corp. Common Stock,Utilities,Telecommunications Equipment,XLU,,
 FLC,Flaherty & Crumrine Total Return Fund Inc Common Stock,Finance,Trusts Except Educational Religious and Charitable,XLF,,2003
@@ -2460,6 +2505,7 @@ FLY,Firefly Aerospace Inc. Common Stock,Industrials,Military/Government/Technica
 FLYE,Fly-E Group Inc. Common Stock,Industrials,Aerospace,XLI,ITA,2024
 FLYW,Flywire Corporation Voting Common Stock,Consumer Discretionary,Business Services,XLY,,2021
 FLYX,flyExclusive Inc. Class A Common Stock,Consumer Discretionary,Transportation Services,XLY,IYT,2023
+FLYX.WS,flyExclusive Inc. Redeemable warrants each whole warrant exercisable for one Class A common stock at an exercise price of $11.50 per share,Consumer Discretionary,Transportation Services,XLY,IYT,
 FMAC,Future Money Acquisition Corporation Ordinary Shares,Finance,Blank Checks,XLF,,2026
 FMACR,Future Money Acquisition Corporation Rights,Finance,Blank Checks,XLF,,2026
 FMACU,Future Money Acquisition Corporation Units,Finance,Blank Checks,XLF,,2026
@@ -2489,7 +2535,7 @@ FNWD,Finward Bancorp Common Stock,Finance,Savings Institutions,XLF,KRE,
 FOA,Finance of America Companies Inc. Class A Common Stock,Finance,Finance: Consumer Services,XLF,IAI,2021
 FOCL,EDAP TMS S.A. American Depositary Shares,Health Care,Biotechnology: Electromedical & Electrotherapeutic Apparatus,XLV,XBI,
 FOF,Cohen & Steers Closed-End Opportunity Fund Inc. Common Stock,Finance,Investment Managers,XLF,IAI,2006
-FOFO,Hang Feng Technology Innovation Co. Ltd. Ordinary Shares,Consumer Discretionary,Professional Services,XLY,,2025
+FOFO,Hang Feng Technology Innovation Co. Ltd. Class A Ordinary Shares,Consumer Discretionary,Professional Services,XLY,,2025
 FOIL,Londian Wason New Energy Tech Inc. American Depositary Shares each representing five Ordinary Shares,Industrials,Industrial Specialties,XLI,,2026
 FOR,Forestar Group Inc Common Stock ,Finance,Real Estate,XLF,,2017
 FORM,FormFactor Inc. FormFactor Inc. Common Stock,Technology,Semiconductors,XLK,SMH,2003
@@ -2536,6 +2582,7 @@ FSBW,FS Bancorp Inc. Common Stock,Finance,Banks,XLF,KRE,2012
 FSCO,FS Credit Opportunities Corp. Common Stock,Finance,Trusts Except Educational Religious and Charitable,XLF,,2022
 FSHP,Flag Ship Acquisition Corp. Ordinary Shares,,,,,2024
 FSHPR,Flag Ship Acquisition Corp. Right,,,,,2024
+FSHPU,Flag Ship Acquisition Corp. Unit,,,,,2024
 FSI,Flexible Solutions International Inc. Common Stock (CDA),Industrials,Major Chemicals,XLI,,2002
 FSK,FS KKR Capital Corp. Common Stock,Finance,Investment Managers,XLF,IAI,2014
 FSLR,First Solar Inc. Common Stock,Technology,Semiconductors,XLK,SMH,2006
@@ -2557,6 +2604,7 @@ FTF,Franklin Limited Duration Income Trust Common Shares of Beneficial Interest,
 FTFT,Future FinTech Group Inc. Common Stock,Consumer Discretionary,Business Services,XLY,,
 FTH,Faeth Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
 FTHA,Forefront Tech Holdings Acquisition Corp Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+FTHAU,Forefront Tech Holdings Acquisition Corp Unit,Finance,Blank Checks,XLF,,2026
 FTHAW,Forefront Tech Holdings Acquisition Corp Warrant,Finance,Blank Checks,XLF,,2026
 FTHM,Fathom Holdings Inc. Common Stock,Finance,Real Estate,XLF,,2020
 FTHY,First Trust High Yield Opportunities 2027 Term Fund Common Stock,Finance,Investment Managers,XLF,IAI,2020
@@ -2594,6 +2642,7 @@ FVR,FrontView REIT Inc. Common Stock,Real Estate,Real Estate Investment Trusts,X
 FVRR,Fiverr International Ltd. Ordinary Shares no par value,Consumer Discretionary,Business Services,XLY,,2019
 FWAC,Futurewave Acquisition Corporation Ordinary Shares,Finance,Blank Checks,XLF,,2026
 FWACR,Futurewave Acquisition Corporation Rights,Finance,Blank Checks,XLF,,2026
+FWACU,Futurewave Acquisition Corporation Units,Finance,Blank Checks,XLF,,2026
 FWACW,Futurewave Acquisition Corporation Warrants,Finance,Blank Checks,XLF,,2026
 FWDI,Forward Industries Inc. Common Stock,Finance,Finance: Consumer Services,XLF,IAI,
 FWONA,Liberty Media Corporation Series A Common Stock,Industrials,Broadcasting,XLI,,
@@ -2634,8 +2683,9 @@ GBFH,GBank Financial Holdings Inc. Common Stock,Finance,Major Banks,XLF,KBE,
 GBLI,Global Indemnity Group LLC Class A Common Stock ,Finance,Property-Casualty Insurers,XLF,KIE,
 GBR,New Concept Energy Inc Common Stock,Energy,Oil & Gas Production,XLE,XOP,1993
 GBX,Greenbrier Companies Inc. (The) Common Stock,Industrials,Railroads,XLI,IYT,1994
-GCBC,Greene County Bancorp Inc. Common Stock,Finance,Banks,XLF,KRE,
+GCBC,Greene Bancorp Inc. Common Stock,Finance,Banks,XLF,KRE,
 GCGR,General Catalyst Global Resilience Merger Corp. Class A Ordinary Shares,,,,,2026
+GCGRU,General Catalyst Global Resilience Merger Corp. Units,,,,,2026
 GCGRW,General Catalyst Global Resilience Merger Corp. Warrants,,,,,2026
 GCL,GCL Global Holdings Ltd Ordinary Shares,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 GCLWW,GCL Global Holdings Ltd Warrants,Technology,Computer Software: Prepackaged Software,XLK,IGV,
@@ -2711,6 +2761,7 @@ GHI,Greystone Housing Impact Investors LP Beneficial Unit Certificates represent
 GHM,Graham Corporation Common Stock,Industrials,Industrial Machinery/Components,XLI,PAVE,1978
 GHRS,GH Research PLC Ordinary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
 GHXI,Gores Holdings XI Inc. Class A Ordinary Shares,,,,,2026
+GHXIU,Gores Holdings XI Inc. Units,,,,,2026
 GHXIW,Gores Holdings XI Inc. Warrant,,,,,2026
 GHY,PGIM Global High Yield Fund Inc.,Finance,Trusts Except Educational Religious and Charitable,XLF,,2012
 GIB,CGI Inc. Common Stock,Consumer Discretionary,Professional Services,XLY,,
@@ -2732,7 +2783,9 @@ GIWWU,GigCapital8 Corp. Units,Finance,Blank Checks,XLF,,2025
 GIX,GigCapital9 Corp. Class A Ordinary Share,Finance,Blank Checks,XLF,,2026
 GIXI,Gix Internet Ltd. Ordinary Shares,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 GIXXR,GigCapital9 Corp. Rights,Finance,Blank Checks,XLF,,2026
+GIXXU,GigCapital9 Corp. Units,Finance,Blank Checks,XLF,,2026
 GJH,Synthetic Fixed-Income Securities Inc 6.375% (STRATS) Cl A-1,Finance,Finance: Consumer Services,XLF,IAI,
+GJO,Synthetic Fixed-Income Securities Inc. on behalf of STRATS(SM) Trust for Wal-Mart Stores Inc. Securities Series 2004-5,Finance,Finance: Consumer Services,XLF,IAI,
 GJP,Synthetic Fixed-Income Securities Inc. on behalf of STRATS (SM) Trust for Dominion Resources Inc. Securities Series 2005-6 Floating Rate Structured Repackaged Asset-Backed Trust Securities (STRATS) Certificates,Finance,Finance: Consumer Services,XLF,IAI,
 GJR,Synthetic Fixed-Income Securities Inc. STRATS Trust for Procter&Gamble Securities Series 2006-1,Finance,Finance: Consumer Services,XLF,IAI,
 GJS,Goldman Sachs Group Securities STRATS Trust for Goldman Sachs Group Securities Series 2006-2,Finance,Finance: Consumer Services,XLF,IAI,
@@ -2819,6 +2872,7 @@ GOW,GOWell Energy Technology Ordinary shares,Consumer Discretionary,Oil and Gas 
 GP,GreenPower Motor Company Inc. Common Shares,Consumer Discretionary,Construction/Ag Equipment/Trucks,XLY,ITB,
 GPAC,General Purpose Acquisition Corp. Class A Ordinary Shares,,,,,2026
 GPACU,General Purpose Acquisition Corp. Units,,,,,2025
+GPACW,General Purpose Acquisition Corp. Warrant,Industrials,Major Chemicals,XLI,,2026
 GPAT,GP-Act III Acquisition Corp. Class A Ordinary Share,,,,,2024
 GPATU,GP-Act III Acquisition Corp. Units,,,,,2024
 GPATW,GP-Act III Acquisition Corp. Warrants,,,,,2024
@@ -2930,6 +2984,8 @@ GYRE,Gyre Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutic
 GYRO,Gyrodyne LLC Common Stock,Real Estate,Building operators,XLRE,,
 H,Hyatt Hotels Corporation Class A Common Stock,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,2009
 HACQ,HCM IV Acquisition Corp. Class A Ordinary Share,Finance,Blank Checks,XLF,,2026
+HACQU,HCM IV Acquisition Corp. Unit,,,,,2026
+HACQW,HCM IV Acquisition Corp. Warrants,Finance,Blank Checks,XLF,,2026
 HAE,Haemonetics Corporation Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,1991
 HAFC,Hanmi Financial Corporation Common Stock,Finance,Major Banks,XLF,KBE,
 HAFN,Hafnia Limited Common Shares,Consumer Discretionary,Transportation Services,XLY,IYT,2024
@@ -2941,6 +2997,7 @@ HAPN,Happen Inc. Common Stock,Finance,Finance: Consumer Services,XLF,IAI,
 HAS,Hasbro Inc. Common Stock,Consumer Discretionary,Recreational Games/Products/Toys,XLY,PEJ,
 HASI,HA Sustainable Infrastructure Capital Inc. Common Stock,Finance,Finance/Investors Services,XLF,IAI,2013
 HAVA,Harvard Ave Acquisition Corporation Class A Ordinary Share,Finance,Blank Checks,XLF,,2025
+HAVAR,Harvard Ave Acquisition Corporation Rights that convert on a 1/10th of 1 basis to Class A ordinary Shares,,,,,2025
 HAWK,HawkEye 360 Inc. Common Stock,Technology,EDP Services,XLK,IGV,2026
 HAYW,Hayward Holdings Inc. Common Stock,Industrials,Industrial Machinery/Components,XLI,PAVE,2021
 HBAN,Huntington Bancshares Incorporated Common Stock,Finance,Major Banks,XLF,KBE,
@@ -2968,6 +3025,7 @@ HCICR,Hennessy Capital Investment Corp. VIII Share Rights,,,,,2026
 HCKT,Hackett Group Inc (The). Common Stock,Consumer Discretionary,Professional Services,XLY,,
 HCM,HUTCHMED (China) Limited American Depositary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2016
 HCMA,HCM III Acquisition Corp. Class A Ordinary Share,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,2025
+HCMAU,HCM III Acquisition Corp. Units,,,,,2025
 HCMAW,HCM III Acquisition Corp. Warrants,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,2025
 HCSG,Healthcare Services Group Inc. Common Stock,Health Care,Hospital/Nursing Management,XLV,IHI,1983
 HCTI,Healthcare Triangle Inc. Common Stock,Technology,EDP Services,XLK,IGV,2021
@@ -3020,6 +3078,7 @@ HIX,Western Asset High Income Fund II Inc. Common Stock,Finance,Finance/Investor
 HKD,AMTD Digital Inc. American Depositary Shares (every five of which represent two Class A Ordinary Shares),Finance,Finance: Consumer Services,XLF,IAI,2022
 HKPD,Cellyan Biotechnology Co. Ltd Class A Ordinary Shares,Health Care,Other Pharmaceuticals,XLV,PPH,2025
 HL,Hecla Mining Company Common Stock,Industrials,Mining & Quarrying of Nonmetallic Minerals (No Fuels),XLI,XME,
+HL^B,Hecla Mining Company Preferred Stock,,,,,
 HLF,Herbalife Ltd. Common Shares,Health Care,Other Pharmaceuticals,XLV,PPH,2004
 HLI,Houlihan Lokey Inc. Class A Common Stock,Finance,Investment Managers,XLF,IAI,2015
 HLIO,Helios Technologies Inc. Common Stock,Industrials,Metal Fabrications,XLI,PAVE,2021
@@ -3029,7 +3088,6 @@ HLMN,Hillman Solutions Corp. Common Stock,Consumer Discretionary,Industrial Mach
 HLN,Haleon plc American Depositary Shares (Each representing two Ordinary Shares),Consumer Discretionary,Package Goods/Cosmetics,XLY,,2022
 HLNE,Hamilton Lane Incorporated Class A Common Stock,Finance,Investment Managers,XLF,IAI,2017
 HLP,Hongli Group Inc. Class A Ordinary Shares,Industrials,Industrial Machinery/Components,XLI,PAVE,2023
-HLSQ,Tessera Defense and Homeland Security Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2019
 HLT,Hilton Worldwide Holdings Inc. Common Stock ,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,
 HLXC,Helix Acquisition Corp. III Class A Ordinary Shares,,,,,2026
 HMC,Honda Motor Company Ltd. Common Stock,Industrials,Auto Manufacturing,XLI,,
@@ -3115,7 +3173,7 @@ HTT,High Templar Tech Limited American depositary shares each representing one C
 HTZ,Hertz Global Holdings Inc Common Stock,Consumer Discretionary,Rental/Leasing Companies,XLY,,
 HTZWW,Hertz Global Holdings Inc Warrant,Consumer Discretionary,Rental/Leasing Companies,XLY,,
 HUBB,Hubbell Inc Common Stock,Technology,Electrical Products,XLK,PAVE,2015
-HUBC,Hub Cyber Security Ltd. Ordinary Shares,Telecommunications,Computer Communications Equipment,XLC,IGV,
+HUBC,Hub Cyber Security Ltd.,,,,,
 HUBCW,Hub Cyber Security Ltd. Warrant 2/27/28,Telecommunications,Computer Communications Equipment,XLC,IGV,
 HUBCZ,Hub Cyber Security Ltd. Warrant ,Telecommunications,Computer Communications Equipment,XLC,IGV,
 HUBG,Hub Group Inc. Class A Common Stock,Industrials,Integrated Freight & Logistics,XLI,,1996
@@ -3143,8 +3201,8 @@ HWM,Howmet Aerospace Inc. Common Stock,Industrials,Metal Fabrications,XLI,PAVE,
 HXHX,Haoxin Holdings Limited Class A Ordinary Shares,Industrials,Trucking Freight/Courier Services,XLI,IYT,2025
 HXL,Hexcel Corporation Common Stock,Industrials,Major Chemicals,XLI,,
 HY,Hyster-Yale Inc. Class A common stock,Industrials,Construction/Ag Equipment/Trucks,XLI,ITB,
-HYAC,Haymaker Acquisition Corp V,,,,,
-HYAC.WS,Haymaker Acquisition Corp V,,,,,
+HYAC,Haymaker Acquisition Corp V Class A Ordinary Shares,,,,,2026
+HYAC.WS,Haymaker Acquisition Corp V Redeemable warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50,,,,,
 HYFM,Hydrofarm Holdings Group Inc. Common Stock,Consumer Discretionary,Consumer Specialties,XLY,XRT,2020
 HYFT,MindWalk Holdings Corp. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 HYI,Western Asset High Yield Opportunity Fund Inc. Common Stock,Finance,Investment Managers,XLF,IAI,2010
@@ -3205,6 +3263,7 @@ IDE,Voya Infrastructure Industrials and Materials Fund Common Shares of Benefici
 IDN,Intellicheck Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,1999
 IDR,Idaho Strategic Resources Inc. Common Stock,Basic Materials,Precious Metals,XLB,GDX,2022
 IDT,IDT Corporation Class B Common Stock,Telecommunications,Telecommunications Equipment,XLC,,
+IDXG,Interpace Biosciences Inc.,,,,,
 IDXX,IDEXX Laboratories Inc. Common Stock,Health Care,Biotechnology: In Vitro & In Vivo Diagnostic Substances,XLV,XBI,1991
 IDYA,IDEAYA Biosciences Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2019
 IE,Ivanhoe Electric Inc. Common Stock,Basic Materials,Metal Mining,XLB,XME,2022
@@ -3221,6 +3280,7 @@ IFRX,InflaRx N.V. Common Stock,Health Care,Biotechnology: Pharmaceutical Prepara
 IFS,Intercorp Financial Services Inc. Common Shares,Finance,Commercial Banks,XLF,KRE,2019
 IGA,Voya Global Advantage and Premium Opportunity Fund Common Shares of Beneficial Interest,Finance,Investment Managers,XLF,IAI,2005
 IGAC,Invest Green Acquisition Corporation Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
+IGACR,Invest Green Acquisition Corporation Rights,,,,,2025
 IGC,IGC Pharma Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 IGD,Voya Global Equity Dividend and Premium Opportunity Fund,Finance,Trusts Except Educational Religious and Charitable,XLF,,2005
 IGI,Western Asset Investment Grade Opportunity Trust Inc. Common Stock,Finance,Investment Managers,XLF,IAI,2009
@@ -3242,6 +3302,7 @@ IIPR^B,Innovative Industrial Properties Inc. 9.25% Series B Cumulative Redeemabl
 IKT,Inhibikase Therapeutics Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2020
 ILAG,Intelligent Living Application Group Inc. Ordinary Shares,Consumer Discretionary,Office Equipment/Supplies/Services,XLY,,2022
 ILLU,Illumination Acquisition Corp I Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+ILLUU,Illumination Acquisition Corp I Units,Finance,Blank Checks,XLF,,2026
 ILLUW,Illumination Acquisition Corp I Warrant,,,,,2026
 ILMN,Illumina Inc. Common Stock,Health Care,Medical Specialities,XLV,IHI,2000
 ILPT,Industrial Logistics Properties Trust Common Shares of Beneficial Interest,Real Estate,Real Estate Investment Trusts,XLRE,,2018
@@ -3347,12 +3408,14 @@ IPFXW,Inflection Point Acquisition Corp. VI Warrant,Finance,Blank Checks,XLF,,20
 IPGP,IPG Photonics Corporation Common Stock,Technology,Semiconductors,XLK,SMH,2006
 IPHA,Innate Pharma S.A. ADS,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2019
 IPHX,Inflection Point Acquisition Corp. VIII Class A Ordinary Shares,,,,,2026
+IPHXU,Inflection Point Acquisition Corp. VIII Unit,,,,,2026
 IPHXW,Inflection Point Acquisition Corp. VIII Warrant,,,,,2026
 IPI,Intrepid Potash Inc Common Stock,Industrials,Mining & Quarrying of Nonmetallic Minerals (No Fuels),XLI,XME,2008
 IPM,Intelligent Protection Management Corp. Common Stock ,Technology,Computer Software: Programming Data Processing,XLK,IGV,
 IPSC,Century Therapeutics Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2021
 IPST,IP Strategy Holdings Inc. Common Stock,Consumer Staples,Beverages (Production/Distribution),XLP,,2024
 IPVV,InterPrivate Investment Partners V Inc. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+IPVVU,InterPrivate Investment Partners V Inc. Units,Finance,Blank Checks,XLF,,2026
 IPVVW,InterPrivate Investment Partners V Inc. Warrants,Finance,Blank Checks,XLF,,2026
 IPW,iPower Inc. Common Stock,Consumer Discretionary,RETAIL: Building Materials,XLY,ITB,2021
 IPWR,Ideal Power Inc. Common Stock,Technology,Semiconductors,XLK,SMH,2013
@@ -3387,6 +3450,7 @@ IRWD,Ironwood Pharmaceuticals Inc. Class A Common Stock,Health Care,Biotechnolog
 ISBA,Isabella Bank Corporation Common stock,Finance,Major Banks,XLF,KBE,
 ISD,PGIM High Yield Bond Fund Inc.,Finance,Trusts Except Educational Religious and Charitable,XLF,,2012
 ISNR,Snow Rothschild Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+ISNRU,Snow Rothschild Acquisition Corp. Units,Finance,Blank Checks,XLF,,2026
 ISNRW,Snow Rothschild Acquisition Corp. Warrants,Finance,Blank Checks,XLF,,2026
 ISOU,IsoEnergy Ltd. Common Shares,,,,,2025
 ISPC,iSpecimen Inc. Common Stock,Health Care,Biotechnology: Commercial Physical & Biological Resarch,XLV,XBI,2021
@@ -3395,7 +3459,6 @@ ISRG,Intuitive Surgical Inc. Common Stock,Health Care,Industrial Specialties,XLV
 ISTR,Investar Holding Corporation Common Stock,Finance,Major Banks,XLF,KBE,2014
 IT,Gartner Inc. Common Stock,Consumer Discretionary,Other Consumer Services,XLY,,1993
 ITG,ITG Inc. Class A Common Stock,Industrials,Water Sewer Pipeline Comm & Power Line Construction,XLI,ITB,2026
-ITGR,Integer Holdings Corporation Common Stock,Health Care,Biotechnology: Electromedical & Electrotherapeutic Apparatus,XLV,XBI,
 ITHA,ITHAX Acquisition Corp III Class A Ordinary Shares,,,,,2026
 ITHAU,ITHAX Acquisition Corp III Units,,,,,2025
 ITHAW,ITHAX Acquisition Corp III Warrants,,,,,2026
@@ -3411,6 +3474,7 @@ ITW,Illinois Tool Works Inc. Common Stock,Industrials,Industrial Machinery/Compo
 IVA,Inventiva S.A. American Depository Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2020
 IVAI,Ives Ultra AI Opportunities Inc. Common Stock,,,,,2026
 IVDA,Iveda Solutions Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
+IVDAW,Iveda Solutions Inc. Warrant,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 IVF,INVO Fertility Inc. Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,
 IVR,INVESCO MORTGAGE CAPITAL INC Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,2009
 IVR^C,INVESCO MORTGAGE CAPITAL INC 7.5% Fixed-to-Floating Series C Cumulative Redeemable Preferred Stock Liquation Preference $25.00 per Share,,,,,
@@ -3436,6 +3500,7 @@ JBGS,JBG SMITH Properties Common Shares ,Real Estate,Real Estate Investment Trus
 JBHT,J.B. Hunt Transport Services Inc. Common Stock,Industrials,Trucking Freight/Courier Services,XLI,IYT,
 JBI,Janus International Group Inc. Common Stock,Industrials,Building Products,XLI,ITB,2021
 JBIO,Jade Biosciences Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
+JBK,Lehman ABS 3.50 3.50% Adjustable Corp Backed Tr Certs GS Cap I,Finance,Finance: Consumer Services,XLF,IAI,
 JBL,Jabil Inc. Common Stock,Technology,Electrical Products,XLK,PAVE,1993
 JBLU,JetBlue Airways Corporation Common Stock,Consumer Discretionary,Air Freight/Delivery Services,XLY,IYT,2002
 JBS,JBS N.V. Class A Common Shares,Consumer Staples,Meat/Poultry/Fish,XLP,,2025
@@ -3479,6 +3544,7 @@ JOBY,Joby Aviation Inc. Common Stock,Industrials,Aerospace,XLI,ITA,2020
 JOE,St. Joe Company (The) Common Stock,Real Estate,Homebuilding,XLRE,ITB,
 JOF,Japan Smaller Capitalization Fund Inc Common Stock,Finance,Trusts Except Educational Religious and Charitable,XLF,,1990
 JONE,Jones Ventures INTL Acquisition1 Corp Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+JONER,Jones Ventures INTL Acquisition1 Corp Rights,Finance,Blank Checks,XLF,,2026
 JONEU,Jones Ventures INTL Acquisition1 Corp Units,,,,,2026
 JOUT,Johnson Outdoors Inc. Class A Common Stock,Consumer Discretionary,Recreational Games/Products/Toys,XLY,PEJ,
 JOYY,JOYY Inc. American Depositary Shares,Technology,EDP Services,XLK,IGV,2012
@@ -3515,7 +3581,6 @@ KALU,Kaiser Aluminum Corporation Common Stock,Industrials,Metal Fabrications,XLI
 KAPA,Kairos Pharma Ltd. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2024
 KARD,Kardigan Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2026
 KARO,Karooooo Ltd. Ordinary Shares,Technology,Computer Software: Prepackaged Software,XLK,IGV,2021
-KAZR,Skyline Builders Group Holding Limited Class A Ordinary Shares,Consumer Discretionary,Engineering & Construction,XLY,ITB,2025
 KB,KB Financial Group Inc,Finance,Commercial Banks,XLF,KRE,
 KBDC,Kayne Anderson BDC Inc. Common Stock,,,,,2024
 KBH,KB Home Common Stock,Consumer Discretionary,Homebuilding,XLY,ITB,1986
@@ -3549,6 +3614,7 @@ KEY^L,KeyCorp Depositary Shares each representing a 1/40th ownership interest in
 KEYS,Keysight Technologies Inc. Common Stock,Industrials,Industrial Machinery/Components,XLI,PAVE,2014
 KEYY,Keystone Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 KEYYU,Keystone Acquisition Corp. Unit,Finance,Blank Checks,XLF,,2026
+KEYYW,Keystone Acquisition Corp. Warrants,Finance,Blank Checks,XLF,,2026
 KF,Korea Fund Inc. (The) New Common Stock,Finance,Investment Managers,XLF,IAI,
 KFFB,Kentucky First Federal Bancorp Common Stock,Finance,Savings Institutions,XLF,KRE,2005
 KFII,K&F Growth Acquisition Corp. II Class A Ordinary shares,Finance,Blank Checks,XLF,,2025
@@ -3597,7 +3663,6 @@ KN,Knowles Corporation Common Stock,Consumer Staples,Consumer Electronics/Applia
 KNDI,Kandi Technologies Group Inc. Ordinary Shares,Industrials,Auto Manufacturing,XLI,,
 KNF,Knife Riv Holding Co. Common Stock,Industrials,Mining & Quarrying of Nonmetallic Minerals (No Fuels),XLI,XME,2023
 KNOP,KNOT Offshore Partners LP Common Units representing Limited Partner Interests,Consumer Discretionary,Marine Transportation,XLY,IYT,2013
-KNRX,KNOREX LTD. Class A Ordinary Shares,Technology,Computer Software: Programming Data Processing,XLK,IGV,2025
 KNSA,Kiniksa Pharmaceuticals International plc Class A Ordinary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2018
 KNSL,Kinsale Capital Group Inc. Common Stock,Finance,Property-Casualty Insurers,XLF,KIE,
 KNTK,Kinetik Holdings Inc. Class A Common Stock,Utilities,Natural Gas Distribution,XLU,XOP,2022
@@ -3617,9 +3682,9 @@ KPET,KPET Ultra Paceline Corporation Class A Ordinary Shares,,,,,2026
 KPET.WS,KPET Ultra Paceline Corporation Warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50 per share,,,,,
 KPLT,Katapult Holdings Inc. Common Stock,Consumer Discretionary,Diversified Commercial Services,XLY,,2019
 KPRX,Kiora Pharmaceuticals Inc.  Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
-KPTI,Karyopharm Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2013
 KR,Kroger Company (The) Common Stock,Consumer Staples,Food Chains,XLP,,
 KRAQ,KRAKacquisition Corp Class A Ordinary Shares,,,,,2026
+KRAQU,KRAKacquisition Corp Unit,,,,,2026
 KRAQW,KRAKacquisition Corp Warrants,,,,,2026
 KRC,Kilroy Realty Corporation Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,1997
 KREF,KKR Real Estate Finance Trust Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,2017
@@ -3636,6 +3701,7 @@ KRP,Kimbell Royalty Partners Common Units Representing Limited Partner Interests
 KRRO,Korro Bio Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2019
 KRSA,Korsana Biosciences Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 KRSP,Rice Acquisition Corporation 3 Class A Ordinary Shares,,,,,2025
+KRSP.WS,Rice Acquisition Corporation 3 Redeemable warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50,,,,,
 KRT,Karat Packaging Inc. Common Stock,Industrials,Plastic Products,XLI,,2021
 KRUS,Kura Sushi USA Inc. Class A Common Stock,Consumer Discretionary,Restaurants,XLY,PEJ,2019
 KRYS,Krystal Biotech Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2017
@@ -3645,7 +3711,6 @@ KSS,Kohl's Corporation Common Stock,Consumer Discretionary,Department/Specialty 
 KT,KT Corporation Common Stock,Telecommunications,Telecommunications Equipment,XLC,,
 KTB,Kontoor Brands Inc. Common Stock ,Industrials,Garments and Clothing,XLI,XRT,2019
 KTCC,Key Tronic Corporation Common Stock,Technology,Electrical Products,XLK,PAVE,1983
-KTF,DWS Municipal Income Trust,Finance,Finance Companies,XLF,IAI,1988
 KTH,Structures Products Cp 8% CorTS Issued by Peco Energy Cap Tr II Preferred Stock,Finance,Finance: Consumer Services,XLF,IAI,
 KTN,Structured Products Corp 8.205% CorTS 8.205% Corporate Backed Trust Securities (CorTS),Finance,Finance: Consumer Services,XLF,IAI,
 KTOS,Kratos Defense & Security Solutions Inc. Common Stock,Industrials,Military/Government/Technical,XLI,ITA,
@@ -3679,7 +3744,7 @@ LAFA,LaFayette Acquisition Corp. Ordinary Share,,,,,2025
 LAFAU,LaFayette Acquisition Corp. Unit,,,,,2025
 LAKE,Lakeland Industries Inc. Common Stock,Health Care,Industrial Specialties,XLV,,1986
 LAMR,Lamar Advertising Company Class A Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,1996
-LAND,Gladstone Land Corporation Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,2013
+LAND,Gladstone Land Corporation Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,1993
 LANDO,Gladstone Land Corporation 6.00% Series B Cumulative Redeemable Preferred Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
 LANDP,Gladstone Land Corporation 6.00% Series C Cumulative Redeemable Preferred Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
 LANV,Lanvin Group Holdings Limited Ordinary Shares,Consumer Discretionary,Apparel,XLY,XRT,2022
@@ -3688,6 +3753,7 @@ LARK,Landmark Bancorp Inc. Common Stock,Finance,Major Banks,XLF,KBE,
 LASE,LASE Corp. Common Stock,Miscellaneous,Industrial Machinery/Components,,PAVE,2022
 LASR,nLIGHT Inc. Common Stock,Technology,Semiconductors,XLK,SMH,2018
 LATA,Galata Acquisition Corp. II Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
+LATAU,Galata Acquisition Corp. II Units,,,,,2025
 LATAW,Galata Acquisition Corp. II Warrant,Finance,Blank Checks,XLF,,2025
 LAUR,Laureate Education Inc. Common Stock,Real Estate,Other Consumer Services,XLRE,,2017
 LAW,CS Disco Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,2021
@@ -3733,6 +3799,7 @@ LEU,Centrus Energy Corp. Class A Common Stock,Industrials,Mining & Quarrying of 
 LEVI,Levi Strauss & Co Class A Common Stock,Consumer Discretionary,Apparel,XLY,XRT,2019
 LEXX,Lexaria Bioscience Corp. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 LFAC,Leapfrog Acquisition Corporation Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+LFACU,Leapfrog Acquisition Corporation Units,,,,,2025
 LFCR,Lifecore Biomedical Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 LFMD,LifeMD Inc. Common Stock,Health Care,Medical/Nursing Services,XLV,IHI,
 LFMDP,LifeMD Inc. 8.875% Series A Cumulative Perpetual Preferred Stock,Health Care,Medical/Nursing Services,XLV,IHI,
@@ -3814,6 +3881,7 @@ LOAN,Manhattan Bridge Capital Inc,Real Estate,Real Estate Investment Trusts,XLRE
 LOAR,Loar Holdings Inc. Common Stock,Industrials,Military/Government/Technical,XLI,ITA,2024
 LOB,Live Oak Bancshares Inc. Common Stock,Finance,Major Banks,XLF,KBE,2022
 LOB^A,Live Oak Bancshares Inc. Depositary Shares Each Representing a 1/40th Interest in a Share of 8.375% Fixed Rate Series A Non-Cumulative Perpetual Preferred Stock,,,,,
+LOB^B,Live Oak Bancshares Inc. Depositary Shares Each Representing a 1/40th Interest in a Share of 8.750% Fixed Rate Series B Non-Cumulative Perpetual Preferred Stock,,,,,
 LOBO,LOBO TECHNOLOGIES LTD. Class A Ordinary Shares,Consumer Discretionary,Motor Vehicles,XLY,,2024
 LOCL,Local Bounti Corporation Common Stock,Consumer Staples,Farming/Seeds/Milling,XLP,,2021
 LOCO,El Pollo Loco Holdings Inc. Common Stock,Consumer Discretionary,Restaurants,XLY,PEJ,2014
@@ -3826,15 +3894,20 @@ LOPE,Grand Canyon Education Inc. Common Stock,Real Estate,Other Consumer Service
 LOT,Lotus Technology Inc. American Depositary Shares,Industrials,Auto Manufacturing,XLI,,
 LOTWW,Lotus Technology Inc. Warrants,Industrials,Auto Manufacturing,XLI,,
 LOVE,The Lovesac Company Common Stock,Consumer Discretionary,Other Specialty Stores,XLY,XRT,2018
+LOVI,Live Oak Acquisition Corp. VI Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 LOVIU,Live Oak Acquisition Corp. VI Units,Finance,Blank Checks,XLF,,2026
+LOVIW,Live Oak Acquisition Corp. VI Warrants,Finance,Blank Checks,XLF,,2026
 LOW,Lowe's Companies Inc. Common Stock,Consumer Discretionary,RETAIL: Building Materials,XLY,ITB,
 LPA,Logistic Properties of the Americas Ordinary Shares,Finance,Real Estate,XLF,,2024
 LPAA,Launch One Acquisition Corp. Class A Ordinary shares,,,,,2024
 LPAAU,Launch One Acquisition Corp. Unit,Finance,Blank Checks,XLF,,2024
+LPAAW,Launch One Acquisition Corp. Warrant,Finance,Blank Checks,XLF,,2024
 LPBB,Launch Two Acquisition Corp. Class A Ordinary Shares,,,,,2024
 LPBBW,Launch Two Acquisition Corp. Warrant,Finance,Blank Checks,XLF,,2024
 LPCN,Lipocine Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 LPCV,Launchpad Cadenza Acquisition Corp I Class A Ordinary Share,,,,,2026
+LPCVU,Launchpad Cadenza Acquisition Corp I Unit,Finance,Blank Checks,XLF,,2025
+LPCVW,Launchpad Cadenza Acquisition Corp I Warrant,,,,,2026
 LPG,Dorian LPG Ltd. Common Stock,Consumer Discretionary,Marine Transportation,XLY,IYT,2014
 LPL,LG Display Co Ltd AMERICAN DEPOSITORY SHARES,Technology,Industrial Machinery/Components,XLK,PAVE,2004
 LPLA,LPL Financial Holdings Inc. Common Stock,Finance,Investment Bankers/Brokers/Service,XLF,IAI,2010
@@ -3858,6 +3931,7 @@ LTBR,Lightbridge Corporation Common Stock,Basic Materials,Major Chemicals,XLB,,
 LTC,LTC Properties Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
 LTGO,Latigo Biotherapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2026
 LTGR,Long Table Growth Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+LTGRU,Long Table Growth Corp. Units,Finance,Blank Checks,XLF,,2026
 LTGRW,Long Table Growth Corp. Warrants,,,,,2026
 LTH,Life Time Group Holdings Inc. Common Stock,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,2021
 LTM,LATAM Airlines Group S.A. American Depositary Shares (each representing two thousand (2000) shares of Common Stock),Consumer Discretionary,Air Freight/Delivery Services,XLY,IYT,2024
@@ -3879,10 +3953,10 @@ LVLU,Lulu's Fashion Lounge Holdings Inc. Common Stock,Consumer Discretionary,Cat
 LVO,LiveOne Inc. Common Stock,Consumer Discretionary,Restaurants,XLY,PEJ,
 LVS,Las Vegas Sands Corp. Common Stock,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,2004
 LVWR,LiveWire Group Inc. Common Stock,Consumer Discretionary,Motor Vehicles,XLY,,2022
-LVWR.WS,LiveWire Group Inc. Warrants each exercisable for one share of Common Stock at an exercise price of $11.50 per share,Consumer Discretionary,Motor Vehicles,XLY,,
 LW,Lamb Weston Holdings Inc. Common Stock ,Consumer Staples,Packaged Foods,XLP,,2016
 LWAC,LightWave Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
 LWACU,LightWave Acquisition Corp. Units,Finance,Blank Checks,XLF,,2025
+LWACW,LightWave Acquisition Corp. Warrants,Finance,Blank Checks,XLF,,2025
 LWAY,Lifeway Foods Inc. Common Stock,Consumer Staples,Packaged Foods,XLP,,
 LWLG,Lightwave Logic Inc. Common Stock,Industrials,Containers/Packaging,XLI,,
 LX,LexinFintech Holdings Ltd. American Depositary Shares,Finance,Finance: Consumer Services,XLF,IAI,2017
@@ -3949,16 +4023,18 @@ MBINM,Merchants Bancorp Depositary Shares Each Representing a 1/40th Interest in
 MBINN,Merchants Bancorp Depositary Shares Preferred Series C,Finance,Major Banks,XLF,KBE,
 MBIO,Mustang Bio Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 MBLY,Mobileye Global Inc. Class A Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,2022
-MBNKO,Medallion Bank Fixed-Rate Reset Non-Cumulative Perpetual Preferred Stock Series G par value $1.00 per share,Finance,Commercial Banks,XLF,KRE,
+MBNKO,Medallion Bank Fixed-Rate Reset Non-Cumulative Perpetual Preferred Stock Series G par value $1.00 per share,Finance,Finance: Consumer Services,XLF,IAI,
 MBOT,Microbot Medical Inc. Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,
 MBRX,Moleculin Biotech Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2016
 MBUU,Malibu Boats Inc. Class A Common Stock,Industrials,Marine Transportation,XLI,IYT,2014
 MBVI,M3-Brigade Acquisition VI Corp. Class A Ordinary Shares,,,,,2025
+MBVIU,M3-Brigade Acquisition VI Corp. Units,Finance,Blank Checks,XLF,,2025
 MBVIW,M3-Brigade Acquisition VI Corp. Warrant,,,,,2025
 MBWM,Mercantile Bank Corporation Common Stock,Finance,Major Banks,XLF,KBE,1998
 MBX,MBX Biosciences Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2024
 MC,Moelis & Company Class A Common Stock,Finance,Investment Managers,XLF,IAI,2014
 MCAH,Mountain Crest Acquisition 6 Corp. Ordinary Shares,Finance,Blank Checks,XLF,,2026
+MCAHR,Mountain Crest Acquisition 6 Corp. Rights,Finance,Blank Checks,XLF,,2026
 MCAHU,Mountain Crest Acquisition 6 Corp. Units,Finance,Blank Checks,XLF,,2026
 MCB,Metropolitan Bank Holding Corp. Common Stock,Finance,Major Banks,XLF,KBE,2017
 MCBS,MetroCity Bankshares Inc. Common Stock,Finance,Major Banks,XLF,KBE,2019
@@ -3992,6 +4068,7 @@ MDGL,Madrigal Pharmaceuticals Inc. Common Stock,Health Care,Biotechnology: Pharm
 MDIA,Mediaco Holding Inc. Class A Common Stock ,Consumer Discretionary,Broadcasting,XLY,,
 MDLN,Medline Inc. Class A Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,2025
 MDLZ,Mondelez International Inc. Class A Common Stock,Consumer Staples,Packaged Foods,XLP,,
+MDRN,Modern Mining Technology Corp. Common Shares,Utilities,Environmental Services,XLU,,2026
 MDRR,Medalist Diversified Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,2018
 MDT,Medtronic plc. Ordinary Shares,Health Care,Biotechnology: Electromedical & Electrotherapeutic Apparatus,XLV,XBI,
 MDU,MDU Resources Group Inc. Common Stock (Holding Company),Industrials,Mining & Quarrying of Nonmetallic Minerals (No Fuels),XLI,XME,
@@ -4024,6 +4101,7 @@ METCB,Ramaco Resources Inc. Class B Common Stock,Energy,Coal Mining,XLE,XOP,
 METCI,Ramaco Resources Inc. 8.250% Senior Notes due 2030,Energy,Coal Mining,XLE,XOP,
 METCZ,Ramaco Resources Inc. 8.375% Senior Notes due 2029,Energy,Coal Mining,XLE,XOP,
 MEVO,M Evo Global Acquisition Corp II Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+MEVOU,M Evo Global Acquisition Corp II Units,Finance,Blank Checks,XLF,,2026
 MEVOW,M Evo Global Acquisition Corp II Warrants,Finance,Blank Checks,XLF,,2026
 MF,MindForge Inc. Class A Ordinary Shares,Technology,Computer Software: Programming Data Processing,XLK,IGV,2024
 MFA,MFA Financial Inc.,Real Estate,Real Estate Investment Trusts,XLRE,,
@@ -4182,6 +4260,7 @@ MQY,Blackrock MuniYield Quality Fund Inc. Common Stock,Finance,Investment Banker
 MRAM,Everspin Technologies Inc. Common Stock,Technology,Semiconductors,XLK,SMH,2016
 MRBK,Meridian Corporation Common Stock,Finance,Major Banks,XLF,KBE,2017
 MRCO,Mercator Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+MRCOU,Mercator Acquisition Corp. Units,Finance,Blank Checks,XLF,,2026
 MRCOW,Mercator Acquisition Corp. Warrant,Finance,Blank Checks,XLF,,2026
 MRCY,Mercury Systems Inc Common Stock,Technology,Electrical Products,XLK,PAVE,1998
 MRDN,Meridian Holdings Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
@@ -4237,6 +4316,7 @@ MT,Arcelor Mittal NY Registry Shares NEW,Industrials,Steel/Iron Ore,XLI,XME,
 MTA,Metalla Royalty & Streaming Ltd. Common Shares,Basic Materials,Precious Metals,XLB,GDX,
 MTAK,Market Technology Acquisition Corp Class A Ordinary Shares,,,,,2026
 MTAKU,Market Technology Acquisition Corp Unit,Finance,Blank Checks,XLF,,2026
+MTAKW,Market Technology Acquisition Corp Warrants,,,,,2026
 MTAL,Metals Acquisition Corp. II Class A Ordinary Shares,Basic Materials,Metal Mining,XLB,XME,2026
 MTAL.WS,Metals Acquisition Corp. II Warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50 per share,Basic Materials,Metal Mining,XLB,XME,
 MTB,M&T Bank Corporation Common Stock,Finance,Major Banks,XLF,KBE,
@@ -4260,6 +4340,7 @@ MTNB,Matinas Biopharma Holdings Inc. Common Stock,Health Care,Biotechnology: Pha
 MTNE,CH4 Natural Solutions Corporation Class A Ordinary Shares,,,,,2026
 MTNE.WS,CH4 Natural Solutions Corporation Warrants each whole warrant exercisable for one Class A Ordinary Share at an exercise price of $11.50 per share,,,,,
 MTR,Mesa Royalty Trust Common Stock,Energy,Oil & Gas Production,XLE,XOP,
+MTRI,Mentari Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 MTRN,Materion Corporation,Industrials,Industrial Specialties,XLI,,
 MTRX,Matrix Service Company Common Stock,Consumer Discretionary,Engineering & Construction,XLY,ITB,1990
 MTSI,MACOM Technology Solutions Holdings Inc. Common Stock,Technology,Semiconductors,XLK,SMH,2012
@@ -4278,6 +4359,7 @@ MUSA,Murphy USA Inc. Common Stock,Consumer Discretionary,Retail-Auto Dealers and
 MUX,McEwen Inc. Common Stock,Basic Materials,Precious Metals,XLB,GDX,
 MUZE,Muzero Acquisition Corp Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 MUZEU,Muzero Acquisition Corp Unit,Finance,Blank Checks,XLF,,2026
+MUZEW,Muzero Acquisition Corp Warrant,Finance,Blank Checks,XLF,,2026
 MVBF,MVB Financial Corp. Common Stock,Finance,Major Banks,XLF,KBE,
 MVIS,MicroVision Inc. Common Stock,Technology,Industrial Machinery/Components,XLK,PAVE,1996
 MVST,Microvast Holdings Inc. Common Stock,Miscellaneous,Industrial Machinery/Components,,PAVE,2019
@@ -4306,6 +4388,7 @@ MYSZ,My Size Inc. Common Stock,Technology,Computer Software: Prepackaged Softwar
 MYX,Maywood Acquisition Corp. 2 Class A Ordinary Share,Finance,Blank Checks,XLF,,2026
 MYXXR,Maywood Acquisition Corp. 2 Rights,Finance,Blank Checks,XLF,,2026
 MYXXU,Maywood Acquisition Corp. 2 Units,Finance,Blank Checks,XLF,,2026
+MYXXW,Maywood Acquisition Corp. 2 Warrants,Finance,Blank Checks,XLF,,2026
 MZTI,The Marzetti Company Common Stock,Consumer Staples,Packaged Foods,XLP,,
 MZYX,MOZAYYX Acquisition Corp. Class A Ordinary Shares,,,,,2026
 MZYX.WS,MOZAYYX Acquisition Corp. Redeemable warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50,,,,,
@@ -4346,6 +4429,7 @@ NBP,NovaBridge Biosciences American Depositary Shares,Health Care,Biotechnology:
 NBR,Nabors Industries Ltd.,Energy,Oil & Gas Production,XLE,XOP,1951
 NBRG,Newbridge Acquisition Limited Class A Ordinary Share,Finance,Blank Checks,XLF,,2026
 NBRGR,Newbridge Acquisition Limited Rights,,,,,2026
+NBRGU,Newbridge Acquisition Limited Unit,Finance,Blank Checks,XLF,,2026
 NBTB,NBT Bancorp Inc. Common Stock,Finance,Major Banks,XLF,KBE,
 NBTX,Nanobiotix S.A. American Depositary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2020
 NBXG,Neuberger Next Generation Connectivity Fund Inc. Common Stock,Finance,Trusts Except Educational Religious and Charitable,XLF,,2021
@@ -4360,10 +4444,12 @@ NCMI,National CineMedia Inc. Common Stock,Consumer Discretionary,Advertising,XLY
 NCNA,NuCana plc American Depositary Share,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2017
 NCNO,nCino Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,2020
 NCO,Southern Cross Acquisition I Corp. Ordinary Shares,,,,,2026
+NCOOR,Southern Cross Acquisition I Corp. Rights,Finance,Blank Checks,XLF,,2026
+NCOOU,Southern Cross Acquisition I Corp. Units,Finance,Blank Checks,XLF,,2026
 NCPL,Netcapital Inc. Common Stock,Finance,Finance: Consumer Services,XLF,IAI,
 NCPLW,Netcapital Inc. Warrants,Finance,Finance: Consumer Services,XLF,IAI,
 NCRA,Nocera Inc. Common Stock,Consumer Staples,Farming/Seeds/Milling,XLP,,
-NCT,Intercont (Cayman) Limited Class A Ordinary shares,Consumer Discretionary,Restaurants,XLY,PEJ,2025
+NCT,Intercont (Cayman) Limited Class A Ordinary shares,Consumer Discretionary,Marine Transportation,XLY,IYT,2025
 NCTY,The9 Limited American Depository Shares,Finance,Finance: Consumer Services,XLF,IAI,2004
 NCV,Virtus Convertible & Income Fund Common Shares of Beneficial Interest,Finance,Finance Companies,XLF,IAI,2003
 NCV^A,Virtus Convertible & Income Fund 5.625% Series A Cumulative Preferred Shares,,,,,
@@ -4430,6 +4516,7 @@ NGVT,Ingevity Corporation Common Stock ,Industrials,Major Chemicals,XLI,,2016
 NHC,National HealthCare Corporation Common Stock,Health Care,Hospital/Nursing Management,XLV,IHI,1986
 NHI,National Health Investors Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
 NHIV,NewHold Investment Corp IV Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+NHIVU,NewHold Investment Corp IV Units,Finance,Blank Checks,XLF,,2026
 NHIVW,NewHold Investment Corp IV Warrants,Finance,Blank Checks,XLF,,2026
 NHP,National Healthcare Properties Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
 NHS,Neuberger High Yield Strategies Fund Inc. Common Stock,Finance,Trusts Except Educational Religious and Charitable,XLF,,
@@ -4616,7 +4703,6 @@ NWAX.WS,New America Acquisition I Corp. Warrants each whole warrant is exercisab
 NWBI,Northwest Bancshares Inc. Common Stock,Finance,Major Banks,XLF,KBE,2009
 NWCL,newcleo plc Ordinary Shares,Industrials,Metal Fabrications,XLI,PAVE,
 NWCLW,newcleo plc Warrants,Industrials,Metal Fabrications,XLI,PAVE,
-NWE,NorthWestern Energy Group Inc. Common Stock,Utilities,Power Generation,XLU,,
 NWFL,Norwood Financial Corp. Common Stock,Finance,Major Banks,XLF,KBE,
 NWG,NatWest Group plc American Depositary Shares (each representing two (2) Ordinary Shares),Finance,Commercial Banks,XLF,KRE,2022
 NWGL,CL Workshop Group Limited American Depositary Shares,Basic Materials,Forest Products,XLB,,2023
@@ -4628,6 +4714,7 @@ NWSA,News Corporation Class A Common Stock,Consumer Discretionary,Newspapers/Mag
 NWTG,Newton Golf Company Inc. Common Stock,Consumer Discretionary,Recreational Games/Products/Toys,XLY,PEJ,2023
 NX,Quanex Building Products Corporation Common Stock,Industrials,Metal Fabrications,XLI,PAVE,
 NXAT,Nexus Advanced Technologies Inc. Ordinary Shares,Consumer Discretionary,Movies/Entertainment,XLY,PEJ,
+NXATW,Nexus Advanced Technologies Inc. Warrant,Consumer Discretionary,Movies/Entertainment,XLY,PEJ,
 NXB,NextBoat Inc. Common Stcok,Industrials,Marine Transportation,XLI,IYT,2025
 NXDR,Nextdoor Holdings Inc. Class A Common Stock,Technology,Computer Software: Programming Data Processing,XLK,IGV,2026
 NXDT,NexPoint Diversified Real Estate Trust Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
@@ -4647,7 +4734,6 @@ NXT,Nextpower Inc. Common Stock,Technology,Semiconductors,XLK,SMH,2023
 NXTC,NextCure Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2019
 NXTS,Nexentis Technologies Inc. Common Stock,Industrials,Agricultural Chemicals,XLI,,
 NXTT,Next Technology Holding Inc. Ordinary Shares,Technology,EDP Services,XLK,IGV,
-NXXT,NextNRG Inc. Common Stock,Consumer Discretionary,Retail-Auto Dealers and Gas Stations,XLY,XRT,2021
 NYAX,Nayax Ltd. Ordinary Shares,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 NYC,American Strategic Investment Co. Class A Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,2020
 NYT,New York Times Company (The) Common Stock,Consumer Discretionary,Newspapers/Magazines,XLY,,
@@ -4657,10 +4743,13 @@ O,Realty Income Corporation Common Stock,Real Estate,Real Estate Investment Trus
 OABI,OmniAb Inc. Common Stock,Health Care,Biotechnology: Commercial Physical & Biological Resarch,XLV,XBI,2021
 OABIW,OmniAb Inc. Warrant,Health Care,Biotechnology: Commercial Physical & Biological Resarch,XLV,XBI,2021
 OACC,Oaktree Acquisition Corp. III Life Sciences Class A Ordinary Share,Finance,Blank Checks,XLF,,2024
+OACCU,Oaktree Acquisition Corp. III Life Sciences Unit,Finance,Blank Checks,XLF,,2024
+OACCW,Oaktree Acquisition Corp. III Life Sciences Warrant,Finance,Blank Checks,XLF,,2024
 OAK^A,Brookfield Oaktree Holdings LLC 6.625% Series A Preferred Units,,,,,
 OAK^B,Brookfield Oaktree Holdings LLC 6.550% Series B Preferred Units,,,,,
 OBA,Oxley Bridge Acquisition Limited Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
 OBAI,Our Bond Inc. Common Stock,Consumer Discretionary,Telecommunications Equipment,XLY,,
+OBAWU,Oxley Bridge Acquisition Limited Unit,,,,,2025
 OBAWW,Oxley Bridge Acquisition Limited Warrants,Finance,Blank Checks,XLF,,2025
 OBDC,Blue Owl Capital Corporation Common Stock,Finance,Diversified Financial Services,XLF,,2019
 OBE,Obsidian Energy Ltd. Common Shares,Energy,Oil & Gas Production,XLE,XOP,2022
@@ -4708,12 +4797,15 @@ OGI,Organigram Global Inc. Common Shares,Health Care,Biotechnology: Pharmaceutic
 OGN,Organon & Co. Common Stock ,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
 OGS,ONE Gas Inc. Common Stock,Utilities,Oil/Gas Transmission,XLU,,2014
 OHAC,Oceanhawk Acquisition Corp. Class A Ordinary Shares,,,,,2026
+OHACR,Oceanhawk Acquisition Corp. Rights,,,,,2026
+OHACU,Oceanhawk Acquisition Corp. Units,,,,,2026
 OHI,Omega Healthcare Investors Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,1992
 OI,O-I Glass Inc. Common Stock,Consumer Discretionary,Containers/Packaging,XLY,,
 OIA,Invesco Municipal Income Opportunities Trust Common Stock,Finance,Finance Companies,XLF,IAI,
 OIG,Orion180 Insurance Group Inc. Class A common stock,Finance,Specialty Insurers,XLF,,2026
 OII,Oceaneering International Inc. Common Stock,Energy,Oilfield Services/Equipment,XLE,XOP,
 OIM,OneIM Acquisition Corp. Class A Ordinary Shares,,,,,2026
+OIMAU,OneIM Acquisition Corp. Units,Finance,Blank Checks,XLF,,2026
 OIMAW,OneIM Acquisition Corp. Warrant,,,,,2026
 OIO,OIO Group Ordinary Shares,Utilities,Environmental Services,XLU,,
 OIS,Oil States International Inc. Common Stock,Consumer Discretionary,Oil and Gas Field Machinery,XLY,,2001
@@ -4725,7 +4817,7 @@ OKYO,OKYO Pharma Limited Ordinary Shares,Health Care,Biotechnology: Biological P
 OLB,The OLB Group Inc. Common Stock,Consumer Discretionary,Business Services,XLY,,
 OLED,Universal Display Corporation Common Stock,Technology,Electrical Products,XLK,PAVE,
 OLLI,Ollie's Bargain Outlet Holdings Inc. Common Stock,Consumer Discretionary,Department/Specialty Retail Stores,XLY,XRT,2015
-OLMA,Olema Pharmaceuticals Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2020
+OLMA,Olema Oncology Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2020
 OLN,Olin Corporation Common Stock,Industrials,Major Chemicals,XLI,,
 OLOX,Olenox Industries Inc. Common Stock,Consumer Discretionary,RETAIL: Building Materials,XLY,ITB,2017
 OLP,One Liberty Properties Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,1986
@@ -4773,6 +4865,7 @@ OPENW,Opendoor Technologies Inc  Series K Warrants each whole warrant exercisabl
 OPENZ,Opendoor Technologies Inc  Series Z Warrants each whole warrant exercisable to purchase one share of Common Stock at an exercise price of $17.00 per warrant,Finance,Real Estate,XLF,,
 OPFI,OppFi Inc. Class A Common Stock,Finance,Finance: Consumer Services,XLF,IAI,2020
 OPHC,OptimumBank Holdings Inc. Common Stock,Finance,Major Banks,XLF,KBE,
+OPHI,CollPlant Biotechnologies Ltd Ordinary Shares,,,,,
 OPI,Office Properties Income Trust Common shares of beneficial interest,Finance,Real Estate,XLF,,
 OPK,OPKO Health Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 OPLN,OPENLANE Inc. Common Stock,Consumer Discretionary,Retail-Auto Dealers and Gas Stations,XLY,XRT,
@@ -4802,6 +4895,7 @@ ORI,Old Republic International Corporation Common Stock,Finance,Property-Casualt
 ORIC,Oric Pharmaceuticals Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2020
 ORIO,Orion Digital Corp. Common Shares,Finance,Finance: Consumer Services,XLF,IAI,
 ORIQ,Origin Investment Corp I Ordinary Shares,,,,,2025
+ORIQU,Origin Investment Corp I Units,,,,,2025
 ORIQW,Origin Investment Corp I Warrant.,Finance,Blank Checks,XLF,,2025
 ORKA,Oruka Therapeutics Inc. Common Stock,Health Care,Biotechnology: In Vitro & In Vivo Diagnostic Substances,XLV,XBI,
 ORKT,Orangekloud Technology Inc. Class A Ordinary Shares,Technology,Computer Software: Prepackaged Software,XLK,IGV,2024
@@ -4816,6 +4910,7 @@ OSIS,OSI Systems Inc. Common Stock (DE),Technology,Semiconductors,XLK,SMH,1997
 OSK,Oshkosh Corporation (Holding Company)Common Stock,Industrials,Auto Manufacturing,XLI,,
 OSPN,OneSpan Inc. Common Stock,Technology,EDP Services,XLK,IGV,
 OSPR,Osprey Acquisition Corp. III Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+OSPRU,Osprey Acquisition Corp. III Units,Finance,Blank Checks,XLF,,2026
 OSPRW,Osprey Acquisition Corp. III Warrants,Finance,Blank Checks,XLF,,2026
 OSS,One Stop Systems Inc. Common Stock,Technology,Computer Manufacturing,XLK,IGV,2018
 OSTX,OS Therapies Incorporated Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2024
@@ -4826,6 +4921,7 @@ OTEX,Open Text Corporation Common Shares,Technology,EDP Services,XLK,IGV,1996
 OTF,Blue Owl Technology Finance Corp. Common Stock,,,,,2025
 OTGA,OTG Acquisition Corp. I Class A Ordinary Share ,Finance,Blank Checks,XLF,,2025
 OTGAU,OTG Acquisition Corp. I Unit,Finance,Blank Checks,XLF,,2025
+OTGAW,OTG Acquisition Corp. I Warrants,Finance,Blank Checks,XLF,,2025
 OTIS,Otis Worldwide Corporation Common Stock ,Technology,Consumer Electronics/Appliances,XLK,,2020
 OTLK,Outlook Therapeutics Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2016
 OTLY,Oatly Group AB American Depositary Shares,Consumer Staples,Packaged Foods,XLP,,2021
@@ -4864,6 +4960,7 @@ OZKAP,Bank OZK 4.625% Series A Non-Cumulative Perpetual Preferred Stock,Finance,
 P,Everpure Inc. Class A common stock,Technology,Electronic Components,XLK,,2015
 PAA,Plains All American Pipeline L.P. Common Units representing Limited Partner Interests,Energy,Natural Gas Distribution,XLE,XOP,1998
 PAAC,Proem Acquisition Corp I Ordinary Shares,Finance,Investment Managers,XLF,IAI,2026
+PAACU,Proem Acquisition Corp I Units,Finance,Blank Checks,XLF,,2026
 PAACW,Proem Acquisition Corp I Warrants,Finance,Investment Managers,XLF,IAI,2026
 PAAI,Paradium.AI Inc. Common Stock,Technology,EDP Services,XLK,IGV,2022
 PAAS,Pan American Silver Corp. Common Stock,Basic Materials,Precious Metals,XLB,GDX,
@@ -4896,13 +4993,14 @@ PARAW,Banzai International Inc. Warrant,Technology,Computer Software: Prepackage
 PARK,Park Dental Partners Inc. Common Stock,Health Care,Misc Health and Biotechnology Services,XLV,XBI,2025
 PARR,Par Pacific Holdings Inc.  Common Stock,Energy,Oil & Gas Production,XLE,XOP,
 PASG,Passage Bio Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2020
-PASW,Ping An Biomedical Co. Ltd. Class A Ordinary Shares,Consumer Discretionary,Apparel,XLY,XRT,2025
+PASW,Ping An Biomedical Co. Ltd. Class A Ordinary Shares,Consumer Discretionary,Apparel,XLY,XRT,1999
 PATH,UiPath Inc. Class A Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,2021
 PATK,Patrick Industries Inc. Common Stock,Consumer Discretionary,Auto Parts:O.E.M.,XLY,,
 PAVM,PAVmed Inc. Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,2016
 PAVS,Paranovus Entertainment Technology Ltd. Class A Ordinary Shares,Technology,EDP Services,XLK,IGV,2019
 PAX,Patria Investments Limited Class A Common Shares,Finance,Investment Managers,XLF,IAI,2021
 PAXG,Pine Tree Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+PAXGR,Pine Tree Acquisition Corp. Rights,Finance,Blank Checks,XLF,,2026
 PAXGU,Pine Tree Acquisition Corp. Units,Finance,Blank Checks,XLF,,2026
 PAXS,PIMCO Access Income Fund Common Shares of Beneficial Interest,Finance,Investment Managers,XLF,IAI,2022
 PAY,Paymentus Holdings Inc. Class A Common Stock,Consumer Discretionary,Business Services,XLY,,2021
@@ -4941,6 +5039,7 @@ PCG^D,Pacific Gas & Electric Co. 5% 1st  Red. Preferred Stock,,,,,
 PCG^E,Pacific Gas & Electric Co. 5% 1st A Preferred Stock,,,,,
 PCG^G,Pacific Gas & Electric Co. 4.80% 1st Preferred Stock,,,,,
 PCG^H,Pacific Gas & Electric Co. 4.50% 1st Preferred Stock,,,,,
+PCG^I,Pacific Gas & Electric Co. 4.36% 1st Preferred Stock,,,,,
 PCG^X,PG&E Corp 6.000% Series A Mandatory Convertible Preferred Stock,,,,,
 PCLA,PicoCELA Inc. American Depositary Shares,Consumer Discretionary,Building Products,XLY,ITB,2025
 PCM,PCM Fund Inc. Common Stock,Finance,Trusts Except Educational Religious and Charitable,XLF,,1993
@@ -4996,6 +5095,7 @@ PESI,Perma-Fix Environmental Services Inc. Common Stock,Industrials,Environmenta
 PETS,PetMed Express Inc. Common Stock,Consumer Staples,Retail-Drug Stores and Proprietary Stores,XLP,XRT,
 PETZ,TDH Holdings Inc. Common Shares,Finance,Real Estate,XLF,,2017
 PEW,GrabAGun Digital Holdings Inc. Common Stock,Consumer Discretionary,Other Specialty Stores,XLY,XRT,2025
+PEW.WS,GrabAGun Digital Holdings Inc. Warrants each whole warrant exercisable to purchase one share of Common Stock at an exercise price of $11.50 per share,Consumer Discretionary,Other Specialty Stores,XLY,XRT,
 PFAI,Pinnacle Food Group Limited Class A Common Shares,Consumer Staples,Farming/Seeds/Milling,XLP,,2025
 PFBC,Preferred Bank Common Stock,Finance,Major Banks,XLF,KBE,
 PFD,Flaherty & Crumrine Preferred and Income Fund Incorporated,Finance,Investment Managers,XLF,IAI,1991
@@ -5017,6 +5117,7 @@ PFXNZ,PhenixFIN Corporation  5.25% Notes due 2028,Finance,Finance: Consumer Serv
 PG,Procter & Gamble Company (The) Common Stock,Consumer Discretionary,Package Goods/Cosmetics,XLY,,
 PGAC,Pantages Capital Acquisition Corporation Class A Ordinary Shares,,,,,2025
 PGACR,Pantages Capital Acquisition Corporation Right,,,,,2025
+PGACU,Pantages Capital Acquisition Corporation Unit,,,,,2024
 PGC,Peapack-Gladstone Financial Corporation Common Stock,Finance,Commercial Banks,XLF,KRE,
 PGEN,Precigen Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 PGNY,Progyny Inc. Common Stock,Health Care,Misc Health and Biotechnology Services,XLV,XBI,2019
@@ -5064,14 +5165,15 @@ PLAY,Dave & Buster's Entertainment Inc. Common Stock,Consumer Discretionary,Rest
 PLBC,Plumas Bancorp,Finance,Finance Companies,XLF,IAI,
 PLBL,Polibeli Group Ltd Class A Ordinary Shares,Consumer Discretionary,Consumer Electronics/Appliances,XLY,,
 PLBY,Playboy Inc. Common Stock,Consumer Discretionary,Other Specialty Stores,XLY,XRT,2020
-PLCE,Children's Place Inc. (The) Common Stock,Consumer Discretionary,Clothing/Shoe/Accessory Stores,XLY,XRT,1997
 PLCI,Pelican Acquisition II Corporation Ordinary Shares,Finance,Blank Checks,XLF,,2026
 PLCIR,Pelican Acquisition II Corporation Right,Finance,Blank Checks,XLF,,2026
+PLCIU,Pelican Acquisition II Corporation Unit,Finance,Blank Checks,XLF,,2026
 PLD,Prologis Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,
 PLG,Platinum Group Metals Ltd. Ordinary Shares (Canada),Basic Materials,Precious Metals,XLB,GDX,
 PLGO,Pelagos Insurance Capital Limited Common Shares,Finance,Property-Casualty Insurers,XLF,KIE,2023
 PLMK,Plum Acquisition Corp. IV Class A Ordinary Shares,,,,,2025
 PLMKU,Plum Acquisition Corp. IV Unit,,,,,2025
+PLMKW,Plum Acquisition Corp. IV Warrants,,,,,2025
 PLMR,Palomar Holdings Inc. Common stock,Finance,Property-Casualty Insurers,XLF,KIE,2019
 PLNT,Planet Fitness Inc. Common Stock,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,2015
 PLOW,Douglas Dynamics Inc. Common Stock,Industrials,Construction/Ag Equipment/Trucks,XLI,ITB,2010
@@ -5137,6 +5239,7 @@ POLEW,Andretti Acquisition Corp. II Warrant,,,,,2024
 POM,POMDOCTOR LIMITED Class A Ordinary Shares,Consumer Discretionary,Other Specialty Stores,XLY,XRT,2025
 PONO,Pono Capital Four Inc. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 PONOR,Pono Capital Four Inc. Rights,Finance,Blank Checks,XLF,,2026
+PONOU,Pono Capital Four Inc. Units,Industrials,Aerospace,XLI,ITA,2026
 PONY,Pony AI Inc. American Depositary Shares ,Technology,EDP Services,XLK,IGV,2024
 POOL,Pool Corporation Common Stock,Consumer Discretionary,Industrial Specialties,XLY,,1995
 POR,Portland General Electric Co Common Stock,Utilities,Electric Utilities: Central,XLU,PAVE,
@@ -5164,6 +5267,7 @@ PRCH,Porch Group Inc. Common Stock,Technology,Computer Software: Prepackaged Sof
 PRCT,PROCEPT BioRobotics Corporation Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,2021
 PRDO,Perdoceo Education Corporation Common Stock,Real Estate,Other Consumer Services,XLRE,,
 PRE,Prenetics Global Limited Class A Ordinary Share,Finance,Blank Checks,XLF,,
+PRENW,Prenetics Global Limited Warrant,Finance,Blank Checks,XLF,,
 PRFX,PRF Technologies Ltd. Ordinary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2020
 PRG,PROG Holdings Inc. Common Stock,Consumer Discretionary,Diversified Commercial Services,XLY,,
 PRGO,Perrigo Company plc Ordinary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
@@ -5231,8 +5335,6 @@ PSNL,Personalis Inc. Common Stock,Health Care,Medical Specialities,XLV,IHI,2019
 PSNY,Polestar Automotive Holding UK PLC Class A ADS,Industrials,Auto Manufacturing,XLI,,
 PSNYW,Polestar Automotive Holding UK PLC Class C-1 ADS (ADW),Industrials,Auto Manufacturing,XLI,,
 PSO,Pearson Plc Common Stock,Consumer Discretionary,Books,XLY,,
-PSQH,PSQ Holdings Inc. Class A Common Stock,Consumer Discretionary,Advertising,XLY,,2021
-PSQH.WS,PSQ Holdings Inc. Warrants each exercisable for one share of Class A common stock at an exercise price of $11.50 per share,Consumer Discretionary,Advertising,XLY,,
 PSQL,Pasqal Holding SA Ordinary Share,Technology,EDP Services,XLK,IGV,
 PSQLW,Pasqal Holding SA Warrant,Technology,EDP Services,XLK,IGV,
 PSTL,Postal Realty Trust Inc. Class A Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,,2019
@@ -5240,17 +5342,18 @@ PSUS,Pershing Square USA Ltd. Common Shares,,,,,2026
 PSX,Phillips 66 Common Stock,Energy,Integrated oil Companies,XLE,XOP,
 PTA,Cohen & Steers Tax-Advantaged Preferred Securities and Income Fund Common Shares of Beneficial Interest,Finance,Trusts Except Educational Religious and Charitable,XLF,,2020
 PTAC,Patriot Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+PTACU,Patriot Acquisition Corp. Units,,,,,2026
 PTC,PTC Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 PTCT,PTC Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2013
 PTEN,Patterson-UTI Energy Inc. Common Stock,Energy,Oil & Gas Production,XLE,XOP,1993
 PTGX,Protagonist Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2016
 PTHS,Pelthos Therapeutics Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2024
 PTIV,Pineapple Financial Inc. Common Stock,Finance,Finance: Consumer Services,XLF,IAI,
-PTLE,PTL LTD Class A Ordinary Shares,Energy,Oil Refining/Marketing,XLE,XOP,2024
 PTLO,Portillo's Inc. Class A Common Stock,Consumer Discretionary,Restaurants,XLY,PEJ,2021
 PTN,Palatin Technologies Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 PTON,Peloton Interactive Inc. Class A Common Stock,Consumer Discretionary,Recreational Games/Products/Toys,XLY,PEJ,2019
 PTOR,Praetorian Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+PTORU,Praetorian Acquisition Corp. Units,,,,,2026
 PTORW,Praetorian Acquisition Corp. Warrant,Finance,Blank Checks,XLF,,2026
 PTRN,Pattern Group Inc. Series A Common Stock,Consumer Discretionary,Catalog/Specialty Distribution,XLY,XRT,2025
 PTY,Pimco Corporate & Income Opportunity Fund,Finance,Investment Managers,XLF,IAI,2002
@@ -5281,6 +5384,7 @@ PZZA,Papa John's International Inc. Common Stock,Consumer Discretionary,Restaura
 Q,Qnity Electronics Inc. Common Stock,Technology,Semiconductors,XLK,SMH,2025
 QADR,QDRO Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 QADRU,QDRO Acquisition Corp. Units,Finance,Blank Checks,XLF,,2026
+QADRW,QDRO Acquisition Corp. Warrant,Finance,Blank Checks,XLF,,2026
 QBTS,D-Wave Quantum Inc. Common Stock,Technology,EDP Services,XLK,IGV,
 QCLS,Q/C Technologies Inc. Common Stock,Health Care,Biotechnology: In Vitro & In Vivo Diagnostic Substances,XLV,XBI,2014
 QCOM,QUALCOMM Incorporated Common Stock,Technology,Radio And Television Broadcasting And Communications Equipment,XLK,,1991
@@ -5307,6 +5411,7 @@ QRHC,Quest Resource Holding Corporation Common Stock,Utilities,Environmental Ser
 QS,QuantumScape Corporation Class A Common Stock,Miscellaneous,Industrial Machinery/Components,,PAVE,
 QSEA,Quartzsea Acquisition Corporation Ordinary Shares,Finance,Blank Checks,XLF,,2025
 QSEAR,Quartzsea Acquisition Corporation Rights,Finance,Blank Checks,XLF,,2025
+QSEAU,Quartzsea Acquisition Corporation Units,Finance,Blank Checks,XLF,,2025
 QSI,Quantum-Si Incorporated Class A Common Stock,Industrials,Industrial Machinery/Components,XLI,PAVE,2020
 QSR,Restaurant Brands International Inc. Common Shares,Consumer Discretionary,Restaurants,XLY,PEJ,2014
 QTEX,QTREX Quantum Ltd. Ordinary Shares,Health Care,Medical/Dental Instruments,XLV,IHI,2021
@@ -5318,8 +5423,10 @@ QUAD,Quad Graphics Inc Class A Common Stock,Consumer Discretionary,Publishing,XL
 QUBT,Quantum Computing Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 QUCY,Quantum Cyber N.V. Ordinary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
 QUIK,QuickLogic Corporation Common Stock,Technology,Semiconductors,XLK,SMH,1999
+QUIT,Achieve Life Sciences Inc. Common Shares,Health Care,Biotechnology: In Vitro & In Vivo Diagnostic Substances,XLV,XBI,
 QUMS,Quantumsphere Acquisition Corp. Ordinary Shares,,,,,2025
 QUMSR,Quantumsphere Acquisition Corp. Rights,,,,,2025
+QUMSU,Quantumsphere Acquisition Corp. Units,,,,,2025
 QURE,uniQure N.V. Ordinary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2014
 QVCG,QVC Group Inc. Common Stock,Consumer Discretionary,Catalog/Specialty Distribution,XLY,XRT,
 QXL,Quantum X Labs Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
@@ -5340,6 +5447,7 @@ RAL,Ralliant Corporation Common Stock,Industrials,Industrial Machinery/Component
 RAND,Rand Capital Corporation Common Stock,Finance,Finance: Consumer Services,XLF,IAI,
 RANG,Range Capital Acquisition Corp. Ordinary Shares,Finance,Blank Checks,XLF,,2025
 RANGR,Range Capital Acquisition Corp. Rights,Finance,Blank Checks,XLF,,2025
+RANGU,Range Capital Acquisition Corp. Units,Finance,Blank Checks,XLF,,2024
 RANI,Rani Therapeutics Holdings Inc. Class A Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2021
 RAPP,Rapport Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2024
 RARE,Ultragenyx Pharmaceutical Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2014
@@ -5657,6 +5765,7 @@ SAJ,Saratoga Investment Corp 8.00% Notes due 2027,Finance,Investment Managers,XL
 SAM,Boston Beer Company Inc. (The) Common Stock,Consumer Staples,Beverages (Production/Distribution),XLP,,
 SAMG,Silvercrest Asset Management Group Inc. Class A Common Stock,Finance,Investment Managers,XLF,IAI,2013
 SAMO,Samos Energy Acquisition Corporation Class A Ordinary Shares,,,,,2026
+SAMO.WS,Samos Energy Acquisition Corporation Warrants each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50 per share,,,,,
 SAN,Banco Santander S.A. Sponsored ADR (Spain),Finance,Commercial Banks,XLF,KRE,
 SANA,Sana Biotechnology Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2021
 SANG,Sangoma Technologies Corporation Common Shares,Technology,Computer Software: Programming Data Processing,XLK,IGV,
@@ -5726,8 +5835,12 @@ SCNI,Scinai Immunotherapeutics Ltd. American Depositary Shares,Health Care,Biote
 SCNX,Scienture Holdings Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 SCOR,comScore Inc. Common Stock,Consumer Discretionary,Business Services,XLY,,2018
 SCPQ,Social Commerce Partners Corporation Class A Ordinary Shares,,,,,2026
+SCPQU,Social Commerce Partners Corporation Unit,,,,,2025
 SCPQW,Social Commerce Partners Corporation Warrant,,,,,2026
+SCQC,SPACCircle Acquisition Corp. Class A Ordinary Shares,,,,,2026
+SCQCR,SPACCircle Acquisition Corp. Rights,,,,,2026
 SCQCU,SPACCircle Acquisition Corp. Units,,,,,2026
+SCQCW,SPACCircle Acquisition Corp. Warrants,,,,,2026
 SCSC,ScanSource Inc. Common Stock,Technology,Retail: Computer Software & Peripheral Equipment,XLK,IGV,
 SCTX,Scribe Therapeutics Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2026
 SCWO,374Water Inc. Common Stock,Consumer Discretionary,Metal Fabrications,XLY,PAVE,
@@ -5819,6 +5932,7 @@ SHOE,Shoe Station Group Inc. Common Stock,Consumer Discretionary,Clothing/Shoe/A
 SHOO,Steven Madden Ltd. Common Stock,Consumer Discretionary,Shoe Manufacturing,XLY,XRT,1993
 SHOP,Shopify Inc. Class A Subordinate Voting Shares,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 SHOT,RMG ML Sports Holdings Class A Ordinary Shares,,,,,2026
+SHOTU,RMG ML Sports Holdings Unit,,,,,2026
 SHPH,Shuttle Pharmaceuticals Holdings Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2022
 SHW,Sherwin-Williams Company (The) Common Stock,Consumer Discretionary,RETAIL: Building Materials,XLY,ITB,
 SI,Shoulder Innovations Inc. Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,2025
@@ -5987,6 +6101,7 @@ SPCB,SuperCom Ltd. Ordinary Shares (Israel),Technology,Semiconductors,XLK,SMH,
 SPCE,Virgin Galactic Holdings Inc. Common Stock,Consumer Discretionary,Transportation Services,XLY,IYT,2017
 SPCX,Space Exploration Technologies Corp. Class A Common Stock,Technology,Computer Software: Programming Data Processing,XLK,IGV,2026
 SPE,Special Opportunities Fund Inc Common Stock,Finance,Finance/Investors Services,XLF,IAI,
+SPE^C,Special Opportunities Fund Inc. 2.75% Convertible Preferred Stock Series C,,,,,
 SPEG,Silver Pegasus Acquisition Corp Class A Ordinary Shares,,,,,2025
 SPEGR,Silver Pegasus Acquisition Corp Rights.,,,,,2025
 SPFI,South Plains Financial Inc. Common Stock,Finance,Major Banks,XLF,KBE,2019
@@ -6071,7 +6186,7 @@ STBA,S&T Bancorp Inc. Common Stock,Finance,Major Banks,XLF,KBE,
 STC,Stewart Information Services Corporation Common Stock,Finance,Specialty Insurers,XLF,,
 STDN,Standard Nuclear Inc. Class A Common Stock,Basic Materials,Major Chemicals,XLB,,2026
 STE,STERIS plc (Ireland) Ordinary Shares,Health Care,Industrial Specialties,XLV,,
-STEM,Stem Inc. Class A Common Stock,Technology,EDP Services,XLK,IGV,1992
+STEM,Stem Inc. Class A Common Stock,Technology,EDP Services,XLK,IGV,2020
 STEP,StepStone Group Inc. Class A Common Stock,Finance,Investment Managers,XLF,IAI,2020
 STEW,SRH Total Return Fund Inc. Common Stock,Finance,Investment Managers,XLF,IAI,
 STEX,Streamex Corp. Common Stock,Finance,Finance: Consumer Services,XLF,IAI,
@@ -6088,7 +6203,6 @@ STKS,The ONE Group Hospitality Inc. Common Stock,Consumer Discretionary,Restaura
 STLA,Stellantis N.V. Common Shares,Industrials,Auto Manufacturing,XLI,,2014
 STLD,Steel Dynamics Inc.,Industrials,Steel/Iron Ore,XLI,XME,1996
 STLN,Starling Oncology Inc. Common Stock,Health Care,Medical/Nursing Services,XLV,IHI,2020
-STLNW,Starling Oncology Inc. Warrant,Health Care,Medical/Nursing Services,XLV,IHI,2020
 STM,STMicroelectronics N.V. Common Stock,Technology,Semiconductors,XLK,SMH,
 STN,Stantec Inc Common Stock,Consumer Discretionary,Military/Government/Technical,XLY,ITA,
 STNE,StoneCo Ltd. Class A Common Shares,Technology,EDP Services,XLK,IGV,2018
@@ -6130,6 +6244,7 @@ SUPX,SuperX AI Technology Limited Ordinary Shares,,,,,2024
 SURG,SurgePays Inc. Common Stock,Consumer Discretionary,Advertising,XLY,,
 SUZ,Suzano S.A. American Depositary Shares (each representing One Ordinary Share),Basic Materials,Paper,XLB,,2018
 SVAQ,Silicon Valley Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
+SVAQU,Silicon Valley Acquisition Corp. Units,Finance,Blank Checks,XLF,,2025
 SVAQW,Silicon Valley Acquisition Corp. Warrants,Finance,Blank Checks,XLF,,2026
 SVC,Service Properties Trust Common Shares of Beneficial Interest,Real Estate,Real Estate Investment Trusts,XLRE,,
 SVCC,Stellar V Capital Corp. Class A Ordinary Shares,,,,,2025
@@ -6148,7 +6263,6 @@ SVRN,SVRN Inc. Common Stock,Consumer Discretionary,Marine Transportation,XLY,IYT
 SVV,Savers Value Village Inc. Common Stock,Consumer Discretionary,Other Specialty Stores,XLY,XRT,2023
 SW,Smurfit WestRock plc Ordinary Shares,Consumer Discretionary,Containers/Packaging,XLY,,2024
 SWAG,Stran & Company Inc. Common Stock,Consumer Discretionary,Advertising,XLY,,2021
-SWAGW,Stran & Company Inc. Warrant,Consumer Discretionary,Advertising,XLY,,2021
 SWBI,Smith & Wesson Brands Inc. Common Stock,Industrials,Ordnance And Accessories,XLI,ITA,
 SWIM,Latham Group Inc. Common Stock,Industrials,Plastic Products,XLI,,2021
 SWK,Stanley Black & Decker Inc. Common Stock,Consumer Discretionary,Industrial Machinery/Components,XLY,PAVE,
@@ -6185,8 +6299,10 @@ T^A,AT&T Inc. Depositary Shares each representing a 1/1000th interest in a share
 T^C,AT&T Inc. Depositary Shares each representing a 1/1000th interest in a share of 4.750% Perpetual Preferred Stock Series C,,,,,
 TAC,TransAlta Corporation Ordinary Shares,Utilities,Electric Utilities: Central,XLU,PAVE,
 TACH,Titan Acquisition Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
+TACHU,Titan Acquisition Corp. Units,Finance,Blank Checks,XLF,,2025
 TACHW,Titan Acquisition Corp. Warrants,Finance,Blank Checks,XLF,,2025
 TACO,Berto Acquisition Corp. Ordinary Shares,Finance,Blank Checks,XLF,,2025
+TACOU,Berto Acquisition Corp. Unit,Finance,Blank Checks,XLF,,2025
 TACOW,Berto Acquisition Corp. Warrant,Finance,Blank Checks,XLF,,2025
 TACT,TransAct Technologies Incorporated Common Stock,Technology,Computer peripheral equipment,XLK,IGV,1996
 TAK,Takeda Pharmaceutical Company Limited American Depositary Shares (each representing 1/2 of a share of Common Stock),Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2018
@@ -6201,6 +6317,7 @@ TARS,Tarsus Pharmaceuticals Inc. Common Stock,Health Care,Biotechnology: Biologi
 TASK,TaskUs Inc. Class A Common Stock,Technology,EDP Services,XLK,IGV,2021
 TATT,TAT Technologies Ltd. Ordinary Shares,Industrials,Aerospace,XLI,ITA,
 TAVI,Tavia Acquisition Corp. Ordinary Shares,Finance,Blank Checks,XLF,,2024
+TAVIR,Tavia Acquisition Corp. Right,Finance,Blank Checks,XLF,,2024
 TAYD,Taylor Devices Inc. Common Stock,Industrials,Industrial Machinery/Components,XLI,PAVE,
 TBB,AT&T Inc. 5.350% Global Notes due 2066,Telecommunications,Telecommunications Equipment,XLC,,2017
 TBBB,BBB Foods Inc. Class A Common Shares,Consumer Staples,Food Chains,XLP,,2024
@@ -6208,6 +6325,7 @@ TBBK,The Bancorp Inc Common Stock,Finance,Major Banks,XLF,KBE,2004
 TBCH,Turtle Beach Corporation Common Stock,Telecommunications,Telecommunications Equipment,XLC,,
 TBCV,Thunder Bridge Capital Partners V Ltd. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 TBCVU,Thunder Bridge Capital Partners V Ltd. Units,Finance,Blank Checks,XLF,,2026
+TBCVW,Thunder Bridge Capital Partners V Ltd. Warrants,Finance,Blank Checks,XLF,,2026
 TBI,TrueBlue Inc. Common Stock,Consumer Discretionary,Professional Services,XLY,,
 TBLA,Taboola.com Ltd. Ordinary Shares,Technology,Computer Software: Programming Data Processing,XLK,IGV,
 TBLD,Thornburg Income Builder Opportunities Trust Common Stock,Finance,Investment Managers,XLF,IAI,2021
@@ -6228,6 +6346,7 @@ TCX,Tucows Inc. Class A Common Stock,Technology,EDP Services,XLK,IGV,
 TCXB,TCGX Acquisition Corp. II Class A Ordinary Shares,,,,,2026
 TD,Toronto Dominion Bank (The) Common Stock,Finance,Commercial Banks,XLF,KRE,
 TDAC,Translational Development Acquisition Corp. Ordinary Shares,,,,,2025
+TDACU,Translational Development Acquisition Corp. Units,,,,,2024
 TDACW,Translational Development Acquisition Corp. Warrants,,,,,2025
 TDAY,USA TODAY Co. Inc. Common Stock,Consumer Discretionary,Newspapers/Magazines,XLY,,2014
 TDC,Teradata Corporation Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
@@ -6278,6 +6397,7 @@ TFX,Teleflex Incorporated Common Stock,Health Care,Medical/Dental Instruments,XL
 TG,Tredegar Corporation Common Stock,Industrials,Metal Fabrications,XLI,PAVE,
 TGB,Trekor Metals Limited Common Shares,Basic Materials,Precious Metals,XLB,GDX,
 TGE,The Generation Essentials Group Class A Ordinary Shares,Consumer Discretionary,Newspapers/Magazines,XLY,,2025
+TGE.WS,The Generation Essentials Group Warrants each whole warrant exercisable for one Class A Ordinary Share,Consumer Discretionary,Newspapers/Magazines,XLY,,
 TGEN,Tecogen Inc. Common Stock,Industrials,Industrial Machinery/Components,XLI,PAVE,2025
 TGHL,The GrowHub Limited Class A Ordinary Shares,Technology,EDP Services,XLK,IGV,2025
 TGL,Treasure Global Inc. Common Stock,Consumer Discretionary,Business Services,XLY,,2022
@@ -6324,6 +6444,8 @@ TLIH,Ten-League International Holdings Limited Ordinary Shares,Consumer Discreti
 TLK,PT Telekomunikasi Indonesia Tbk,Telecommunications,Telecommunications Equipment,XLC,,
 TLN,Talen Energy Corporation Common Stock,Utilities,Electric Utilities: Central,XLU,PAVE,
 TLNC,Talon Capital Corp. Class A Ordinary Shares,Finance,Blank Checks,XLF,,2025
+TLNCU,Talon Capital Corp. Units,Finance,Blank Checks,XLF,,2025
+TLNCW,Talon Capital Corp. Warrants,,,,,2025
 TLPH,Talphera Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2011
 TLRY,Tilray Brands Inc. Common Stock ,Health Care, Medicinal Chemicals and Botanical Products ,XLV,,2018
 TLS,Telos Corporation Common Stock,Technology,EDP Services,XLK,IGV,2020
@@ -6346,6 +6468,7 @@ TMS,Teamshares Inc. Common Stock,,,,,2025
 TMSWW,Teamshares Inc. Warrants,,,,,2025
 TMTS,Spartacus Acquisition Corp. II Class A Ordinary Shares,,,,,2026
 TMTSU,Spartacus Acquisition Corp. II Unit,Finance,Blank Checks,XLF,,2026
+TMTSW,Spartacus Acquisition Corp. II Warrants,,,,,2026
 TMUS,T-Mobile US Inc. Common Stock,Telecommunications,Telecommunications Equipment,XLC,,
 TMUSI,T-Mobile US Inc. 5.500% Senior Notes due June 2070,Telecommunications,Telecommunications Equipment,XLC,,
 TMUSL,T-Mobile US Inc. 6.250% Senior Notes due 2069,Telecommunications,Telecommunications Equipment,XLC,,
@@ -6479,6 +6602,7 @@ TVACU,Texas Ventures Acquisition III Corp Unit,Finance,Blank Checks,XLF,,2025
 TVACW,Texas Ventures Acquisition III Corp Warrants,,,,,2025
 TVAI,Thayer Ventures Acquisition Corporation II Class A Ordinary Shares,,,,,2025
 TVAIR,Thayer Ventures Acquisition Corporation II Rights,,,,,2025
+TVAIU,Thayer Ventures Acquisition Corporation II Unit,Finance,Blank Checks,XLF,,2025
 TVC,Tennessee Valley Authority Common Stock,Utilities,Electric Utilities: Central,XLU,PAVE,
 TVE,Tennessee Valley Authority,Utilities,Electric Utilities: Central,XLU,PAVE,
 TVGN,Tevogen Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2022
@@ -6625,6 +6749,8 @@ UVV,Universal Corporation Common Stock,Industrials,Farming/Seeds/Milling,XLI,,
 UWMC,UWM Holdings Corporation Class A Common Stock,Finance,Finance: Consumer Services,XLF,IAI,
 UXIN,Uxin Limited ADS,Consumer Discretionary,Business Services,XLY,,2018
 UYSC,UY Scuti Acquisition Corp. Ordinary Shares,Finance,Blank Checks,XLF,,2025
+UYSCR,UY Scuti Acquisition Corp. Rights,Finance,Blank Checks,XLF,,2025
+UYSCU,UY Scuti Acquisition Corp. Units,,,,,2025
 UZD,Array Digital Infrastructure Inc. 6.250% Senior Notes due 2069,Telecommunications,Telecommunications Equipment,XLC,,2020
 UZE,Array Digital Infrastructure Inc. 5.500% Senior Notes due 2070,Telecommunications,Telecommunications Equipment,XLC,,2020
 UZF,Array Digital Infrastructure Inc. 5.500% Senior Notes due 2070,Telecommunications,Telecommunications Equipment,XLC,,2021
@@ -6689,6 +6815,7 @@ VICI,VICI Properties Inc. Common Stock,Real Estate,Real Estate Investment Trusts
 VICR,Vicor Corporation Common Stock,Technology,Industrial Machinery/Components,XLK,PAVE,
 VIDA,VIDA Global Inc. Class A Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,2026
 VII,Viking Acquisition Corp. II Class A Ordinary Shares,,,,,2026
+VII.WS,Viking Acquisition Corp. II Warrants to purchase one Class A Ordinary Share,,,,,
 VIK,Viking Holdings Ltd Ordinary Shares,Consumer Discretionary,Marine Transportation,XLY,IYT,2024
 VINP,Vinci Compass Investments Ltd. Class A Common Shares,Finance,Investment Managers,XLF,IAI,2021
 VIOT,Viomi Technology Co. Ltd American Depositary Shares,Consumer Discretionary,Consumer Electronics/Appliances,XLY,,2018
@@ -6712,6 +6839,7 @@ VLGEA,Village Super Market Inc. Class A Common Stock,Consumer Staples,Food Chain
 VLN,Valens Semiconductor Ltd. Ordinary Shares,Technology,Semiconductors,XLK,SMH,
 VLO,Valero Energy Corporation Common Stock,Energy,Integrated oil Companies,XLE,XOP,
 VLOS,Velos Acquisition I Corp. Class A Ordinary shares,,,,,2024
+VLOSU,Velos Acquisition I Corp. Units,Finance,Blank Checks,XLF,,2024
 VLOSW,Velos Acquisition I Corp. Warrant,Finance,Blank Checks,XLF,,2024
 VLRS,Controladora Vuela Compania de Aviacion S.A.B. de C.V. American Depositary Shares each representing ten (10) Ordinary Participation Certificates,Consumer Discretionary,Air Freight/Delivery Services,XLY,IYT,2013
 VLT,Invesco High Income Trust II,Finance,Trusts Except Educational Religious and Charitable,XLF,,1989
@@ -6792,6 +6920,7 @@ VUZI,Vuzix Corporation Common Stock,Technology,Radio And Television Broadcasting
 VVOS,Vivos Therapeutics Inc. Common Stock,Health Care,Medical/Dental Instruments,XLV,IHI,2020
 VVR,Invesco Senior Income Trust Common Stock (DE),Finance,Trusts Except Educational Religious and Charitable,XLF,,1998
 VVV,Valvoline Inc. Common Stock,Industrials,Major Chemicals,XLI,,2016
+VVVV,vVARDIS Holding AG Class A Ordinary Shares,Health Care,Medical/Dental Instruments,XLV,IHI,2026
 VVX,V2X Inc. Common Stock,Consumer Discretionary,Diversified Commercial Services,XLY,,2014
 VWAV,VisionWave Holdings Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 VWAVW,VisionWave Holdings Inc. Warrant,Technology,Computer Software: Prepackaged Software,XLK,IGV,
@@ -6836,6 +6965,7 @@ WELL,Welltower Inc. Common Stock,Real Estate,Real Estate Investment Trusts,XLRE,
 WEN,Wendy's Company (The) Common Stock,Consumer Discretionary,Restaurants,XLY,PEJ,
 WENC,West Enclave Merger Corp. Ordinary Shares,Finance,Blank Checks,XLF,,2026
 WENN,Wen Acquisition Corp Class A Ordinary Shares,,,,,2025
+WENNU,Wen Acquisition Corp Unit,Finance,Blank Checks,XLF,,2025
 WENNW,Wen Acquisition Corp Warrant,Finance,Blank Checks,XLF,,2025
 WERN,Werner Enterprises Inc. Common Stock,Industrials,Trucking Freight/Courier Services,XLI,IYT,1986
 WES,Western Midstream Partners LP Common Units Representing Limited Partner Interests,Utilities,Natural Gas Distribution,XLU,XOP,2012
@@ -6855,7 +6985,7 @@ WFC^Z,Wells Fargo & Company Depositary Shares each representing a 1/1000th inter
 WFCF,Where Food Comes From Inc. Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 WFF,WF Holding Limited Ordinary Shares,Consumer Discretionary,Miscellaneous manufacturing industries,XLY,,2025
 WFG,West Fraser Timber Co. Ltd Common stock,Basic Materials,Forest Products,XLB,,2021
-WFRD,Weatherford International plc Ordinary Shares,Consumer Discretionary,Oil and Gas Field Machinery,XLY,,
+WFRD,Weatherford International Corp Common Stock,Consumer Discretionary,Oil and Gas Field Machinery,XLY,,
 WGO,Winnebago Industries Inc. Common Stock,Industrials,Homebuilding,XLI,ITB,
 WGS,GeneDx Holdings Corp. Class A Common Stock,Health Care,Medical/Nursing Services,XLV,IHI,2020
 WH,Wyndham Hotels & Resorts Inc. Common Stock ,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,2018
@@ -6890,6 +7020,7 @@ WLDSW,Wearable Devices Ltd. Warrant,Telecommunications,Computer Communications E
 WLFC,Willis Lease Finance Corporation Common Stock,Consumer Discretionary,Industrial Specialties,XLY,,1996
 WLII,Willow Lane Acquisition Corp. II Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 WLIIU,Willow Lane Acquisition Corp. II Unit,,,,,2026
+WLIIW,Willow Lane Acquisition Corp. II Warrants,Finance,Blank Checks,XLF,,2026
 WLK,Westlake Corporation Common Stock,Industrials,Major Chemicals,XLI,,2004
 WLKP,Westlake Chemical Partners LP Common Units representing limited partner interests,Industrials,Major Chemicals,XLI,,2014
 WLTH,Wealthfront Corporation Common Stock,Finance,Finance: Consumer Services,XLF,IAI,2025
@@ -6960,6 +7091,7 @@ WVE,Wave Life Sciences Inc. Common Stock,Health Care,Biotechnology: Pharmaceutic
 WVVI,Willamette Valley Vineyards Inc. Common Stock,Consumer Staples,Beverages (Production/Distribution),XLP,,
 WVVIP,Willamette Valley Vineyards Inc. Series A Redeemable Preferred Stock,Consumer Staples,Beverages (Production/Distribution),XLP,,
 WW,WW International Inc.  Common Stock,Consumer Discretionary,Other Consumer Services,XLY,,
+WWB,Windward Bio Group AG Common Shares,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2026
 WWD,Woodward Inc. Common Stock,Energy,Industrial Machinery/Components,XLE,PAVE,
 WWR,Westwater Resources Inc. Common Stock,Basic Materials,Metal Mining,XLB,XME,
 WWW,Wolverine World Wide Inc. Common Stock,Consumer Discretionary,Shoe Manufacturing,XLY,XRT,
@@ -6988,11 +7120,13 @@ XFLH,XFLH Capital Corporation Ordinary Shares,Finance,Blank Checks,XLF,,2026
 XFLT,XAI Floating Rate & Alternative Income Trust Common Shares of Beneficial Interest,Finance,Investment Managers,XLF,IAI,2017
 XFOR,X4 Pharmaceuticals Inc. Common Stock,Health Care,Biotechnology: Biological Products (No Diagnostic Substances),XLV,XBI,2017
 XGN,Exagen Inc. Common Stock,Health Care,Medical Specialities,XLV,IHI,2019
+XGPU,Reliance Global Group Inc. Common Stock,,,,,
 XHG,XChange TEC.INC American Depositary Shares ,Finance,Specialty Insurers,XLF,,2019
 XHLD,TEN Holdings Inc. Common Stock,Consumer Discretionary,Business Services,XLY,,2025
 XHR,Xenia Hotels & Resorts Inc. Common Stock,Consumer Discretionary,Hotels/Resorts,XLY,PEJ,2015
 XIFR,XPLR Infrastructure LP Common Units representing limited partner interests,Utilities,Electric Utilities: Central,XLU,PAVE,2014
 XIII,Churchill Capital Corp XIII Class A Ordinary Shares,,,,,2026
+XIIIU,Churchill Capital Corp XIII Units,,,,,2026
 XIIIW,Churchill Capital Corp XIII Warrants,,,,,2026
 XLAB,Exascale Labs Holdings Inc. Class A Common Stock,Technology,Computer Software: Prepackaged Software,XLK,IGV,
 XLABW,Exascale Labs Holdings Inc. Warrant,Technology,Computer Software: Prepackaged Software,XLK,IGV,
@@ -7027,6 +7161,7 @@ XSLLU,Xsolla SPAC 1 Units,Finance,Blank Checks,XLF,,2026
 XSLLW,Xsolla SPAC 1 Warrants,Finance,Blank Checks,XLF,,2026
 XTER,Xterax Corporation II Class A Ordinary Shares,Finance,Blank Checks,XLF,,2026
 XTERU,Xterax Corporation II Units,,,,,2026
+XTERW,Xterax Corporation II Warrants,Finance,Blank Checks,XLF,,2026
 XTIA,XTI Aerospace Inc. Common Stock,Technology,EDP Services,XLK,IGV,2014
 XTLB,XTL Biopharmaceuticals Ltd. American Depositary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
 XTND,Xtend AI Robotics Inc. Common Stock,Industrials,Military/Government/Technical,XLI,ITA,2026
@@ -7112,6 +7247,7 @@ ZNB,Zeta Network Group Class A Ordinary Shares,Real Estate,Other Consumer Servic
 ZNTL,Zentalis Pharmaceuticals Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2020
 ZONE,Zone Frontier Inc. Class B Common Stock,Consumer Discretionary,Specialty Chemicals,XLY,,2024
 ZOOZ,ZOOZ Strategy Ltd. Ordinary Shares,Technology,Industrial Machinery/Components,XLK,PAVE,
+ZOOZW,ZOOZ Strategy Ltd. Warrant,Technology,Industrial Machinery/Components,XLK,PAVE,
 ZS,Zscaler Inc. Common Stock,Technology,EDP Services,XLK,IGV,2018
 ZSQR,Z Squared Inc. Common Stock,Finance,Finance: Consumer Services,XLF,IAI,2020
 ZSTK,ZeroStack Corp. Common Stock,Health Care,Other Pharmaceuticals,XLV,PPH,2021
@@ -7126,3 +7262,4 @@ ZVRA,Zevra Therapeutics Inc. Common Stock,Health Care,Biotechnology: Pharmaceuti
 ZWS,Zurn Elkay Water Solutions Corporation Common Stock,Industrials,Industrial Machinery/Components,XLI,PAVE,2012
 ZYBT,Zhengye Biotechnology Holding Limited Class A Ordinary Shares,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,2025
 ZYME,Zymeworks Inc. Common Stock,Health Care,Biotechnology: Pharmaceutical Preparations,XLV,XBI,
+ZYN,PTL LTD Class A Ordinary Shares,Energy,Oil Refining/Marketing,XLE,XOP,2024
