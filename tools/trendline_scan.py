@@ -1,6 +1,7 @@
 """Trend line scan (17 Nov 2026): for every Nifty 500 stock, Indian sector index, world index and a few commodities /
 crypto, draw the line through the 2 latest swing lows (right to left: the newest swing low and the one before it;
-swing low = lowest low with 5 days each side). Rising lines only.
+swing low = lowest low with 3 days each side). The line must join both wick lows with no candle between them
+cutting below it and no close below it since the 2nd low (the latest such pair). Rising lines only.
 
 Writes data/scan/trendline.json. The live server watches the rows that are "armed" (the last 5 closes all > 1% above
 the line) and close to it, and sends one phone alert when price comes within 1% of the line (the 3rd touch) - India
@@ -28,20 +29,46 @@ INDICES = {  # yahoo: (name, market)
 }
 
 
+def best_line(l, c, m=None, K=3, tol=0.001):
+    """17 Nov 2026: the latest pair of swing lows (lowest low with K bars each side) that a trader would join: the line
+    runs through both wick lows, no candle between them pokes below it, and no close after the 2nd low is under it.
+    Rising only. Returns (a, b, slope) or None."""
+    l = np.asarray(l, float); c = np.asarray(c, float); m = len(c) if m is None else m
+    piv = [i for i in range(K, m - K) if l[i] == l[i - K:i + K + 1].min()]
+    for j in range(len(piv) - 1, -1, -1):
+        b = piv[j]
+        if b < m - 250:
+            break
+        after = np.arange(b + 1, m)
+        for k in range(j - 1, -1, -1):
+            a = piv[k]
+            if b - a < 5:
+                continue
+            if b - a > 250:
+                break
+            if l[a] >= l[b]:
+                continue
+            s = (l[b] - l[a]) / (b - a)
+            if (l[a + 1:b] < (l[a] + s * (np.arange(a + 1, b) - a)) * (1 - tol)).any():
+                continue
+            if len(after) and (c[b + 1:m] < l[b] + s * (after - b)).any():
+                continue
+            return int(a), int(b), float(s)
+    return None
+
+
 def line_row(t, h, l, c):
-    n = len(c)
-    piv = [i for i in range(K, n - K) if l[i] == l[i - K:i + K + 1].min()]
-    if len(piv) < 2:
+    n = len(c); l = np.asarray(l, float); c = np.asarray(c, float)
+    r = best_line(l, c)
+    if not r:
         return None
-    a, b = piv[-2], piv[-1]; s = (l[b] - l[a]) / (b - a)
-    if s <= 0:
-        return None
+    a, b, s = r
     line = lambda i: l[b] + s * (i - b)  # noqa: E731
     touches, armed = 2, False
     for i in range(b + 1, n):
         if i >= b + 5 and all(c[k] > line(k) * 1.01 for k in range(i - 5, i)):
             armed = True
-        if armed and l[i] <= line(i) * 1.005:
+        if armed and l[i] <= line(i) * 1.01:
             touches += 1; armed = False
     armed_next = n - 5 > b and all(c[k] > line(k) * 1.01 for k in range(n - 5, n))
     return dict(a_d=t[a], a_l=round(float(l[a]), 4), b_d=t[b], b_l=round(float(l[b]), 4), slope=round(float(s), 5),
@@ -77,7 +104,7 @@ def main():
     rows.sort(key=lambda r: (not r["armed"], r["dist"]))
     near = [r for r in rows if r["armed"] and r["dist"] <= 3]
     json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(tick), rising=len(rows),
-                   rule="Line through the 2 latest swing lows (5 days each side), rising only. Alert when price comes within 1% of it "
+                   rule="Line through the 2 latest swing lows that no candle cuts (3 days each side), rising only. Alert when price comes within 1% of it "
                         "after 5 closes more than 1% above (the 3rd touch). Watch only: tested 2016-26, no better than the 50-day average.",
                    rows=[r for r in rows if r["dist"] <= 8]), open(OUT, "w"), indent=0)
     print("rising lines", len(rows), "armed within 3%:", [(r["symbol"], r["dist"]) for r in near][:30])

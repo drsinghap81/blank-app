@@ -749,7 +749,7 @@ def test_trend_line(tmp_path):
     t, hi, lo, cl = A.yohlc("KOTAKBANK", "NSE")
     L = A.tl_line(t, hi, lo, cl)
     assert L["b_l"] == 110 and L["a_l"] == 100 and L["rising"] and abs(L["line"] - 118.5) < 0.01 and L["armed"] and L["touches"] == 2
-    A.tl_check("NSE")
+    A.tl_save({"KOTAKBANK": {"mk": "NSE"}}); A.tl_check("NSE")
     al = A.alerts_load()["items"]
     assert len(al) == 1 and "3rd touch" in al[0]["text"] and al[0]["mk"] == "NSE"
     A.tl_check("NSE"); assert len(A.alerts_load()["items"]) == 1          # once a day

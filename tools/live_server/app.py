@@ -2151,7 +2151,7 @@ def tl_load():
     try:
         return json.load(open(_tl_path()))
     except Exception:  # noqa: BLE001
-        return {"KOTAKBANK": {"mk": "NSE", "added": "2026-11-17"}}
+        return {}
 
 
 def tl_save(W):
@@ -2168,19 +2168,49 @@ def yohlc(sym, mk, rng="1y"):
     return [r[0] for r in rows], [r[1] for r in rows], [r[2] for r in rows], [r[3] for r in rows]
 
 
+def best_line(l, c, m=None, K=3, tol=0.001):
+    import numpy as _np
+    """17 Nov 2026: the latest pair of swing lows (lowest low with K bars each side) that a trader would join: the line
+    runs through both wick lows, no candle between them pokes below it, and no close after the 2nd low is under it.
+    Rising only. Returns (a, b, slope) or None."""
+    l = _np.asarray(l, float); c = _np.asarray(c, float); m = len(c) if m is None else m
+    piv = [i for i in range(K, m - K) if l[i] == l[i - K:i + K + 1].min()]
+    for j in range(len(piv) - 1, -1, -1):
+        b = piv[j]
+        if b < m - 250:
+            break
+        after = _np.arange(b + 1, m)
+        for k in range(j - 1, -1, -1):
+            a = piv[k]
+            if b - a < 5:
+                continue
+            if b - a > 250:
+                break
+            if l[a] >= l[b]:
+                continue
+            s = (l[b] - l[a]) / (b - a)
+            if (l[a + 1:b] < (l[a] + s * (_np.arange(a + 1, b) - a)) * (1 - tol)).any():
+                continue
+            if len(after) and (c[b + 1:m] < l[b] + s * (after - b)).any():
+                continue
+            return int(a), int(b), float(s)
+    return None
+
+
 def tl_line(t, h, l, c, today=None):
-    """Line through the 2 latest swing lows. today = the live (unfinished) bar's date: it is not used to find pivots."""
+    """Line through the latest 2 swing lows that no candle cuts (best_line). today = the live (unfinished) bar's date:
+    it is not used to pick the line."""
     n = len(c); m = n - 1 if today and t and t[-1] == today else n
-    piv = [i for i in range(TL_K, m - TL_K) if l[i] == min(l[i - TL_K:i + TL_K + 1])]
-    if len(piv) < 2:
+    r = best_line(l, c, m)
+    if not r:
         return None
-    a, b = piv[-2], piv[-1]; s = (l[b] - l[a]) / (b - a)
+    a, b, s = r
     line = lambda i: l[b] + s * (i - b)  # noqa: E731
     touches, armed = 2, False
     for i in range(b + 1, n - 1):                      # earlier returns to the line after the 2nd swing low
         if i >= b + 5 and all(c[k] > line(k) * 1.01 for k in range(i - 5, i)):
             armed = True
-        if armed and l[i] <= line(i) * 1.005:
+        if armed and l[i] <= line(i) * 1.01:
             touches += 1; armed = False
     i = n - 1; armed_now = i >= b + 5 and all(c[k] > line(k) * 1.01 for k in range(i - 5, i))
     return dict(a_d=t[a], a_l=round(l[a], 2), b_d=t[b], b_l=round(l[b], 2), slope=round(s, 4), rising=s > 0, line=round(line(i), 2),
@@ -2206,7 +2236,7 @@ def tl_check(mk, eod=False):
         lows = f"swing lows {L['a_d'][5:]} {cur}{L['a_l']:g} and {L['b_d'][5:]} {cur}{L['b_l']:g}"
         if not L["rising"]:
             continue
-        if not eod and L["armed"] and L["low"] <= L["line"] * 1.005:
+        if not eod and L["armed"] and L["low"] <= L["line"] * 1.01:
             n = L["touches"] + 1; nth = {3: "3rd"}.get(n, f"{n}th")
             alert("setup", sym, f"{pre}{sym}: {nth} touch of its rising trend line ({lows}). Line {cur}{L['line']:g}, low {cur}{L['low']:g}, "
                   f"now {cur}{L['close']:g}. Watch only: a hold here is the classic buy, a close below breaks the trend.",
