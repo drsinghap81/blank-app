@@ -769,13 +769,16 @@ def test_trend_line_scan(tmp_path):
     import json as _j
     seen = []
     def yq(y, mk):
-        seen.append(y); return {"ltp": 26050, "low": 26000, "t": 1794988800}     # 18 Nov 2026 UTC: line = 25900 + 20 = 25920
+        seen.append(y); return {"ltp": 26050, "low": 26000, "high": 26100, "t": 1794988800}     # 18 Nov 2026 UTC: line = 25900 + 20 = 25920
     try:
         _j.dump(rows, open(p, "w")); A.yq = yq; A.tl_scan_alerts({"NSE"})
         al = A.alerts_load()["items"]
         assert seen == ["^NSEI"] and len(al) == 1 and "3rd time" in al[0]["text"] and "25,920" in al[0]["text"]
         A.tl_scan_alerts({"NSE"}); assert len(A.alerts_load()["items"]) == 1
         A.tl_scan_alerts({"US"}); assert len(seen) == 2
+        rows["rows"][0].update(side="res", slope=-20.0, line_next=26200, a_l=26600, b_l=26400); _j.dump(rows, open(p, "w")); A._TLS["d"] = None
+        A.tl_scan_alerts({"NSE"}); al = A.alerts_load()["items"]       # high 26050 >= 26180 * 0.99 -> resistance alert
+        assert len(al) == 2 and "falling resistance line" in al[-1]["text"]
     finally:
         if had: open(p, "w").write(old)
         else: os.remove(p)

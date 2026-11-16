@@ -29,7 +29,7 @@ INDICES = {  # yahoo: (name, market)
 }
 
 
-def best_line(l, c, m=None, K=3, tol=0.001):
+def best_line(l, c, m=None, K=3, tol=0.001, rising=True):
     """17 Nov 2026: the latest pair of swing lows (lowest low with K bars each side) that a trader would join: the line
     runs through both wick lows, no candle between them pokes below it, and no close after the 2nd low is under it.
     Rising only. Returns (a, b, slope) or None."""
@@ -46,7 +46,7 @@ def best_line(l, c, m=None, K=3, tol=0.001):
                 continue
             if b - a > 250:
                 break
-            if l[a] >= l[b]:
+            if rising and l[a] >= l[b]:
                 continue
             s = (l[b] - l[a]) / (b - a)
             if (l[a + 1:b] < (l[a] + s * (np.arange(a + 1, b) - a)) * (1 - tol)).any():
@@ -76,6 +76,29 @@ def line_row(t, h, l, c):
                 dist=round(float((c[-1] / line(n) - 1) * 100), 2), armed=bool(armed_next), touches=touches, below=bool(c[-1] < line(n - 1)))
 
 
+def res_row(t, h, l, c):
+    """Mirror of line_row for swing highs: the latest pair of swing-high wicks that no candle pokes above, no close above
+    it since the 2nd high. Any slope (falling = downtrend line, rising = channel top). Touch = high within 1% of it."""
+    n = len(c); h = np.asarray(h, float); c = np.asarray(c, float)
+    r = best_line(-h, -c, rising=False)
+    if not r:
+        return None
+    a, b, s = r; s = -s
+    line = lambda i: h[b] + s * (i - b)  # noqa: E731
+    touches, armed = 2, False
+    for i in range(b + 1, n):
+        if i >= b + 5 and all(c[k] < line(k) * 0.99 for k in range(i - 5, i)):
+            armed = True
+        if armed and h[i] >= line(i) * 0.99:
+            touches += 1; armed = False
+    armed_next = n - 5 > b and all(c[k] < line(k) * 0.99 for k in range(n - 5, n))
+    if line(n) <= 0:
+        return None
+    return dict(side="res", a_d=t[a], a_l=round(float(h[a]), 4), b_d=t[b], b_l=round(float(h[b]), 4), slope=round(float(s), 5),
+                day=t[-1], close=round(float(c[-1]), 4), line=round(float(line(n - 1)), 4), line_next=round(float(line(n)), 4),
+                dist=round(float((line(n) / c[-1] - 1) * 100), 2), armed=bool(armed_next), touches=touches, above=bool(c[-1] > line(n - 1)))
+
+
 def main():
     names = {}
     for s in pd.read_csv(os.path.join(os.path.dirname(__file__), "..", "data", "universe", "nifty500.csv")).Symbol:
@@ -93,21 +116,23 @@ def main():
             if len(df) < 60:
                 continue
             t = [str(x.date()) for x in df.index]
-            r = line_row(t, df.High.values, df.Low.values, df.Close.values)
-            if r:
+            for r in (line_row(t, df.High.values, df.Low.values, df.Close.values), res_row(t, df.High.values, df.Low.values, df.Close.values)):
+                if not r:
+                    continue
                 nm, mk, kind = names[y]
-                r = dict(y=y, symbol=nm, mk=mk, kind=kind, **r)
+                r = dict(y=y, symbol=nm, mk=mk, kind=kind, **({"side": "sup"} | r))
                 if r["armed"] and r["dist"] <= 3:          # the app's "near the line" list draws this chart on tap
                     g = df.iloc[-160:]; rd = lambda a: [round(float(x), 2) for x in a]  # noqa: E731
                     r["bars"] = dict(t=t[-160:], o=rd(g.Open), h=rd(g.High), l=rd(g.Low), c=rd(g.Close))
                 rows.append(r)
     rows.sort(key=lambda r: (not r["armed"], r["dist"]))
-    near = [r for r in rows if r["armed"] and r["dist"] <= 3]
-    json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(tick), rising=len(rows),
-                   rule="Line through the 2 latest swing lows that no candle cuts (3 days each side), rising only. Alert when price comes within 1% of it "
-                        "after 5 closes more than 1% above (the 3rd touch). Watch only: tested 2016-26, no better than the 50-day average.",
+    near = [(r["symbol"], r["side"], r["dist"]) for r in rows if r["armed"] and r["dist"] <= 3]
+    json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), scanned=len(tick), lines=len(rows),
+                   rule="Support: line through the 2 latest swing lows that no candle cuts (3 days each side), rising only. Resistance: the same "
+                        "through the 2 latest swing highs (any slope). Alert when price comes within 1% of a line after 5 closes more than 1% "
+                        "away (the 3rd touch). Watch only: the support touch was tested 2016-26, no better than the 50-day average.",
                    rows=[r for r in rows if r["dist"] <= 8]), open(OUT, "w"), indent=0)
-    print("rising lines", len(rows), "armed within 3%:", [(r["symbol"], r["dist"]) for r in near][:30])
+    print("lines", len(rows), "armed within 3%:", near[:40])
 
 
 if __name__ == "__main__":

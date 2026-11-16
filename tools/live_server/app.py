@@ -2289,14 +2289,21 @@ def tl_scan_alerts(mks):
         if qd.isoformat() <= r["day"]:
             continue                                   # no new session since the scan
         line = r["line_next"] + r["slope"] * max(0, _wd_between(date.fromisoformat(r["day"]), qd) - 1)
-        lo = q.get("low") or q["ltp"]
-        if lo > line * 1.01:
+        res = r.get("side") == "res"
+        x = (q.get("high") or q["ltp"]) if res else (q.get("low") or q["ltp"])
+        if (x < line * 0.99) if res else (x > line * 1.01):
             continue
-        n = r.get("touches", 2) + 1; nth = {3: "3rd"}.get(n, f"{n}th"); cur = "Rs " if r["mk"] == "NSE" else ""
-        kind = "index" if r.get("kind") == "index" else "stock"
-        alert("setup", r["symbol"], f"{r['symbol']} ({kind}): {nth} time at its rising trend line (swing lows {r['a_d'][5:]} {cur}{r['a_l']:g} "
-              f"and {r['b_d'][5:]} {cur}{r['b_l']:g}). Line {cur}{line:,.2f}, low {cur}{lo:,.2f}, now {cur}{q['ltp']:,.2f}. Watch only, not a tested buy.",
-              key=f"tltouch:{r['symbol']}:{r['a_d']}:{r['b_d']}:{qd.isoformat()}", mk="US" if r["mk"] == "US" else "NSE" if r["mk"] == "NSE" else None)
+        n = r.get("touches", 2) + 1; nth = {3: "3rd"}.get(n, f"{n}th")
+        kind = "index" if r.get("kind") == "index" else "stock"; cur = "Rs " if r["mk"] == "NSE" and kind == "stock" else ""
+        if res:
+            slope = "falling" if r["slope"] < 0 else "rising"
+            txt = (f"{r['symbol']} ({kind}): {nth} time at its {slope} resistance line (swing highs {r['a_d'][5:]} {cur}{r['a_l']:g} "
+                   f"and {r['b_d'][5:]} {cur}{r['b_l']:g}). Line {cur}{line:,.2f}, high {cur}{x:,.2f}, now {cur}{q['ltp']:,.2f}. Watch only.")
+        else:
+            txt = (f"{r['symbol']} ({kind}): {nth} time at its rising trend line (swing lows {r['a_d'][5:]} {cur}{r['a_l']:g} "
+                   f"and {r['b_d'][5:]} {cur}{r['b_l']:g}). Line {cur}{line:,.2f}, low {cur}{x:,.2f}, now {cur}{q['ltp']:,.2f}. Watch only, not a tested buy.")
+        alert("setup", r["symbol"], txt, key=f"tl{'res' if res else 'touch'}:{r['symbol']}:{r['a_d']}:{r['b_d']}:{qd.isoformat()}",
+              mk="US" if r["mk"] == "US" else "NSE" if r["mk"] == "NSE" else None)
 
 
 class TLItem(BaseModel):
