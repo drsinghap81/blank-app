@@ -19,6 +19,11 @@ MK = [  # ticker, name, group, currency, micro contract (name, multiplier) for s
     ("^NSEBANK", "Bank Nifty", "Indices", "INR", ("Bank Nifty futures (NSE)", None), "NSE:BANKNIFTY1!"),
     ("BTC-USD", "Bitcoin", "Coins", "USD", ("Micro bitcoin MBT", 0.1), "CME:MBT1!"),
     ("ETH-USD", "Ether", "Coins", "USD", ("Micro ether MET", 0.1), "CME:MET1!"),
+    # NSE ETFs: the same trades without futures or leverage (1 share = 1 unit; a 1% risk usually needs ~30-50% of the account per position)
+    ("NIFTYBEES.NS", "NIFTYBEES (Nifty ETF)", "ETFs (no leverage)", "INR", ("NIFTYBEES shares", 1), "NSE:NIFTYBEES"),
+    ("BANKBEES.NS", "BANKBEES (Bank Nifty ETF)", "ETFs (no leverage)", "INR", ("BANKBEES shares", 1), "NSE:BANKBEES"),
+    ("GOLDBEES.NS", "GOLDBEES (gold ETF)", "ETFs (no leverage)", "INR", ("GOLDBEES shares", 1), "NSE:GOLDBEES"),
+    ("SILVERBEES.NS", "SILVERBEES (silver ETF)", "ETFs (no leverage)", "INR", ("SILVERBEES shares", 1), "NSE:SILVERBEES"),
 ]
 # MCX mini / micro contracts (16 Nov 2026). Yahoo has no MCX data: each series = the global contract x USD/INR x unit conversion,
 # so levels are approximate (no import duty / local premium); the signal timing tracks MCX closely. Place orders on MCX's own chart.

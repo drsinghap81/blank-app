@@ -2409,6 +2409,9 @@ function turSize(r, S, fx, N, px) {
   const toInstr = (amt) => (r.cur === 'USD' ? (S.cur === 'USD' ? amt : S.cur === 'AUD' ? amt * audusd : amt / usdinr) : (S.cur === 'INR' ? amt : S.cur === 'USD' ? amt * usdinr : amt * audusd * usdinr));
   const risk = toInstr(S.acct * S.risk / 100); const sym = r.cur === 'USD' ? '$' : '₹';
   if (!(N > 0)) return '';
+  if (/BEES/.test(r.key)) { const k = Math.floor(risk / (2 * N)); const val = k * px;   // ETF: shares, no leverage
+    const acctInr = (S.cur === 'INR' ? 1 : S.cur === 'USD' ? usdinr : audusd * usdinr) * S.acct;
+    return `<b>${k.toLocaleString('en-IN')} shares</b> ≈ ${lakh(val)} (${fmt(val / acctInr * 100, 0)}% of your account; no leverage)`; }
   if (r.mult) { const per = 2 * N * r.mult; const k = Math.floor(risk / per);
     return `${k > 0 ? `<b>${k} × ${esc(r.contract)}</b>` : `<b>0</b> ${esc(r.contract)} (one contract risks ${sym}${fmt(per, 0, 'en-US')}; needs an account of about ${S.cur === 'INR' ? lakh(S.acct * per / risk) : S.cur + ' ' + fmt(S.acct * per / risk, 0, 'en-US')} at ${S.risk}%)`} · notional ≈ ${sym}${fmt(k * px * r.mult, 0, 'en-US')}`; }
   const lot = r.key === '^NSEI' ? S.lotN : S.lotB; const units = risk / (2 * N);
