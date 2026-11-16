@@ -46,12 +46,48 @@
    }
   },
   "line 3rd touch | at support": {
-   "hold to expiry": {},
-   "take 50%": {}
+   "hold to expiry": {
+    "n": 3450,
+    "win": 67.3,
+    "avg_rs": -1284,
+    "med_rs": 5859,
+    "worst_rs": -82607,
+    "avg_ror": -2.2,
+    "t": -1.81,
+    "pos_years": "4/10"
+   },
+   "take 50%": {
+    "n": 3450,
+    "win": 77.3,
+    "avg_rs": -949,
+    "med_rs": 4475,
+    "worst_rs": -82607,
+    "avg_ror": -1.4,
+    "t": -1.4,
+    "pos_years": "3/10"
+   }
   },
   "line 3rd touch | 2% below": {
-   "hold to expiry": {},
-   "take 50%": {}
+   "hold to expiry": {
+    "n": 3161,
+    "win": 74.4,
+    "avg_rs": -1009,
+    "med_rs": 4170,
+    "worst_rs": -89818,
+    "avg_ror": -2.9,
+    "t": -3.41,
+    "pos_years": "4/10"
+   },
+   "take 50%": {
+    "n": 3161,
+    "win": 83.4,
+    "avg_rs": -479,
+    "med_rs": 3046,
+    "worst_rs": -84117,
+    "avg_ror": -1.3,
+    "t": -1.82,
+    "pos_years": "4/10"
+   }
   },
   "line | at support": {
    "hold to expiry": {
