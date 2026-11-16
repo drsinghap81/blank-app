@@ -20,6 +20,20 @@ MK = [  # ticker, name, group, currency, micro contract (name, multiplier) for s
     ("BTC-USD", "Bitcoin", "Coins", "USD", ("Micro bitcoin MBT", 0.1), "CME:MBT1!"),
     ("ETH-USD", "Ether", "Coins", "USD", ("Micro ether MET", 0.1), "CME:MET1!"),
 ]
+# MCX mini / micro contracts (16 Nov 2026). Yahoo has no MCX data: each series = the global contract x USD/INR x unit conversion,
+# so levels are approximate (no import duty / local premium); the signal timing tracks MCX closely. Place orders on MCX's own chart.
+# key, name, global ticker, conversion (USD price -> MCX quote unit, before USD/INR), lot multiplier (quote units per lot), TradingView
+MCX_ROWS = [
+    ("MCX:GOLDM", "Gold Mini (MCX)", "GC=F", 10 / 31.1035, 10, "GOLDM · 100 g, quoted per 10 g", "MCX:GOLDM1!"),
+    ("MCX:GOLDGUINEA", "Gold Guinea (MCX)", "GC=F", 8 / 31.1035, 1, "GOLDGUINEA · 8 g", "MCX:GOLDGUINEA1!"),
+    ("MCX:GOLDPETAL", "Gold Petal (MCX)", "GC=F", 1 / 31.1035, 1, "GOLDPETAL · 1 g", "MCX:GOLDPETAL1!"),
+    ("MCX:SILVERM", "Silver Mini (MCX)", "SI=F", 32.1507, 5, "SILVERM · 5 kg, quoted per kg", "MCX:SILVERM1!"),
+    ("MCX:SILVERMIC", "Silver Micro (MCX)", "SI=F", 32.1507, 1, "SILVERMIC · 1 kg", "MCX:SILVERMIC1!"),
+    ("MCX:CRUDEOILM", "Crude Oil Mini (MCX)", "CL=F", 1, 10, "CRUDEOILM · 10 bbl", "MCX:CRUDEOILM1!"),
+    ("MCX:NATGASMINI", "Natural Gas Mini (MCX)", "NG=F", 1, 250, "NATGASMINI · 250 mmBtu", "MCX:NATGASMINI1!"),
+    ("MCX:ALUMINI", "Aluminium Mini (MCX)", "ALI=F", 1 / 1000, 1000, "ALUMINI · 1 tonne, quoted per kg", "MCX:ALUMINI1!"),
+    ("MCX:COPPER", "Copper (MCX)", "HG=F", 2.20462, 2500, "COPPER · 2,500 kg, quoted per kg", "MCX:COPPER1!"),
+]
 
 
 def state(x):
@@ -63,6 +77,8 @@ NSE_LOT = {"^NSEI": 65, "^NSEBANK": 30}
 def lots_text(r, usdinr):
     """Lots per Rs 10 lakh of account at 1% risk (scale to your own account; no account size is stored in the repo)."""
     N = r.get("entry_N") or r["N"]; risk = 1_000_000 * 0.01; out = []
+    if r["key"].startswith("MCX:"):
+        per = 2 * N * r["mult"]; return f"Per Rs 10 L at 1%: {int(risk // per)} lot(s) (risk Rs {per:,.0f}/lot)"
     for nm, conv, mult in MCX.get(r["key"], []):
         per = 2 * N * usdinr * conv * mult; out.append(f"{nm} {int(risk // per)} (risk Rs {per:,.0f}/lot)")
     if r["key"] in NSE_LOT:
@@ -70,6 +86,14 @@ def lots_text(r, usdinr):
     if r.get("mult"):
         per = 2 * N * r["mult"]; out.append(f"{r['contract']}: risk ${per:,.0f} per contract")
     return ("Per Rs 10 L at 1%: " + "; ".join(out)) if out else ""
+
+
+RAW = {}
+
+
+def chart(x, n=130):
+    z = x.tail(n); rd = lambda v: [float(f"{q:.6g}") for q in v]  # noqa: E731
+    return dict(t=[str(i.date()) for i in z.index], o=rd(z.Open), h=rd(z.High), l=rd(z.Low), c=rd(z.Close))
 
 
 def main():
@@ -86,16 +110,40 @@ def main():
         if isinstance(x.columns, pd.MultiIndex):
             x.columns = x.columns.get_level_values(0)
         x = x[["Open", "High", "Low", "Close"]].dropna(); x = x[(x.Close > 0) & (x.Open > 0)]
+        RAW[t] = x
         try:
             s = state(x)
         except Exception as e:  # noqa: BLE001
             print("fail", t, e); continue
-        rows.append(dict(key=t, name=nm, group=g, cur=cur, contract=cname, mult=mult, tv=tv, **s)); time.sleep(0.3)
+        rows.append(dict(key=t, name=nm, group=g, cur=cur, contract=cname, mult=mult, tv=tv, **s, chart=chart(x))); time.sleep(0.3)
+    fxs = {}
     for k in ("USDINR=X", "AUDUSD=X"):
         try:
-            fx[k] = float(yf.download(k, period="5d", interval="1d", progress=False)["Close"].dropna().iloc[-1].squeeze())
+            z = yf.download(k, period="2y", interval="1d", progress=False)
+            if isinstance(z.columns, pd.MultiIndex):
+                z.columns = z.columns.get_level_values(0)
+            fxs[k] = z["Close"].dropna(); fx[k] = float(fxs[k].iloc[-1])
         except Exception:  # noqa: BLE001
             pass
+    for key, nm, src, conv, mult, cname, tv in MCX_ROWS:
+        x = RAW.get(src)
+        if x is None:
+            try:
+                x = yf.download(src, period="2y", interval="1d", auto_adjust=False, progress=False)
+                if isinstance(x.columns, pd.MultiIndex):
+                    x.columns = x.columns.get_level_values(0)
+                x = x[["Open", "High", "Low", "Close"]].dropna(); x = x[(x.Close > 0) & (x.Open > 0)]; RAW[src] = x
+            except Exception as e:  # noqa: BLE001
+                print("no data", src, e); continue
+        if "USDINR=X" not in fxs or x is None or x.empty:
+            continue
+        k = fxs["USDINR=X"].reindex(x.index, method="ffill") * conv
+        xi = x[["Open", "High", "Low", "Close"]].mul(k, axis=0).dropna()
+        try:
+            s = state(xi)
+        except Exception as e:  # noqa: BLE001
+            print("fail", key, e); continue
+        rows.append(dict(key=key, name=nm, group="MCX (approx.)", cur="INR", contract=cname, mult=mult, tv=tv, approx=True, **s, chart=chart(xi)))
     os.makedirs("data/scan", exist_ok=True)
     json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), fx=fx, rows=rows,
                    rules="Daily 20/10 long: buy-stop above the 20-day high; fixed stop entry - 2N; trailing stop 10-day low; exit at the first hit; no target. 1 unit, no adds."),

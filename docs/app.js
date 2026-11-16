@@ -2416,8 +2416,7 @@ function turSize(r, S, fx, N, px) {
 }
 // MCX contracts for the same signals (price converted from the global contract with USD/INR; excludes India import duty, so
 // levels are approximate: place orders on the MCX chart's own levels). [name, global key, conversion from USD price, multiplier]
-const MCX_ALT = { 'GC=F': [['Gold Petal (1 g)', 1 / 31.1035, 1], ['Gold Guinea (8 g)', 8 / 31.1035, 1], ['Gold Mini (100 g)', 10 / 31.1035, 10]],
-  'SI=F': [['Silver Micro (1 kg)', 32.1507, 1], ['Silver Mini (5 kg)', 32.1507, 5]], 'CL=F': [['Crude Oil Mini (10 bbl)', 1, 10]], 'HG=F': [['Copper (2,500 kg)', 2.20462, 2500]] };
+const MCX_ALT = {};   // 16 Nov 2026: MCX minis are their own rows in turtle.json now
 function turMcx(r, S, fx, N) {
   const L = MCX_ALT[r.key]; if (!L || !(N > 0)) return '';
   const usdinr = fx['USDINR=X'] || 85, audusd = fx['AUDUSD=X'] || 0.65;
@@ -2437,7 +2436,7 @@ async function turtleSelect(r) {
     <p class="muted" style="margin:4px 16px;font-size:12px">Daily · gold = 20-day high (buy-stop) · red = stop · blue = entry</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
     <div class="links"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.tv)}&interval=D" target="_blank" rel="noopener">Open in TradingView</a></div>`);
-  let j = null; try { const res = await fetch(MAIN + 'data/scan/asset_charts/' + encodeURIComponent(String(r.key).replace(/[:/=^]/g, '_')) + '.json'); if (res.ok) j = await res.json(); } catch (e) { /* */ }
+  let j = r.chart ? { d: r.chart } : null; if (!j) try { const res = await fetch(MAIN + 'data/scan/asset_charts/' + encodeURIComponent(String(r.key).replace(/[:/=^]/g, '_')) + '.json'); if (res.ok) j = await res.json(); } catch (e) { /* */ }
   const box = $('#tuc'); if (!box) return;
   if (!j || !j.d) { box.innerHTML = '<p class="muted pad">Chart file not available: use TradingView below.</p>'; return; }
   const b = j.d; const T = b.t; const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
@@ -2475,7 +2474,7 @@ async function loadTurtle(el) {
     const mcx = turMcx(r, S, D.fx || {}, r.status === 'in trade' ? r.entry_N : r.N);
     if (mcx) line += `<br>${mcx}`;
     const hist = (r.trades || []).slice().reverse().map((z) => `${day(z.entry)} → ${day(z.exit)}: ${z.R >= 0 ? '+' : ''}${fmt(z.R, 1)}R`).join(' · ');
-    return `<li class="row" data-tk="${esc(r.key)}"><div><div class="sym">${esc(r.name)}</div><div class="co">${esc(r.group)} · ${esc(r.contract)} · close ${px(r.close)} (${day(r.date)})</div>
+    return `<li class="row" data-tk="${esc(r.key)}"><div><div class="sym">${esc(r.name)}</div><div class="co">${esc(r.group)} · ${esc(r.contract)} · close ${px(r.close)} (${day(r.date)})</div>${r.approx ? '<div class="muted" style="font-size:12px">≈ global price × USD/INR (no import duty): use MCX\'s own chart for the exact levels</div>' : ''}
       <div class="tags">${st}</div><div class="muted" style="font-size:13px;margin-top:4px">${line}</div>
       ${hist ? `<details style="margin-top:4px"><summary class="muted" style="font-size:12px">Last trades</summary><div class="muted" style="font-size:12px">${hist}</div></details>` : ''}</div><div></div>
       <div class="num"><a class="tv-btn" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.tv)}&interval=D" target="_blank" rel="noopener">Chart ↗</a></div></li>`;
