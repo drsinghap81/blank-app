@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-16 16:58 UTC",
+"generated": "2026-11-16 22:57 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-16",
@@ -158,7 +158,7 @@
 "td_score": 3,
 "group": "Information Technology Services",
 "lane": "weak",
-"group_pulse": 25.9,
+"group_pulse": 26.3,
 "group_rank": 16,
 "rank": 2,
 "risk_pct": 15.2
@@ -191,8 +191,8 @@
 "aligned": true,
 "td_score": 2,
 "group": "Entertainment",
-"lane": "build",
-"group_pulse": 73.8,
+"lane": "hold",
+"group_pulse": 75.0,
 "group_rank": 1,
 "rank": 3,
 "risk_pct": 40.1
@@ -226,7 +226,7 @@
 "td_score": 2,
 "group": "Diagnostics & Research",
 "lane": "hold",
-"group_pulse": 19.0,
+"group_pulse": 19.7,
 "group_rank": 26,
 "rank": 4,
 "risk_pct": 13.9
@@ -260,7 +260,7 @@
 "td_score": 2,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 19.0,
+"group_pulse": 20.3,
 "group_rank": 25,
 "rank": 5,
 "risk_pct": 8.7
@@ -327,7 +327,7 @@
 "td_score": 1,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 19.0,
+"group_pulse": 20.3,
 "group_rank": 25,
 "rank": 7,
 "risk_pct": 13.5
@@ -364,8 +364,8 @@
 "td_score": 2,
 "group": "Lodging",
 "lane": "hold",
-"group_pulse": 36.9,
-"group_rank": 6,
+"group_pulse": 38.1,
+"group_rank": 7,
 "rank": 1,
 "risk_pct": 7.4
 },
@@ -398,8 +398,8 @@
 "td_score": 1,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 17.4,
-"group_rank": 30,
+"group_pulse": 18.9,
+"group_rank": 27,
 "rank": 2,
 "risk_pct": 16.3
 },
@@ -432,7 +432,7 @@
 "td_score": 1,
 "group": "Metal Fabrication",
 "lane": "hold",
-"group_pulse": 17.9,
+"group_pulse": 18.7,
 "group_rank": 28,
 "rank": 3,
 "risk_pct": 14.8
@@ -466,8 +466,8 @@
 "td_score": 1,
 "group": "Medical Instruments & Supplies",
 "lane": "hold",
-"group_pulse": 27.4,
-"group_rank": 15,
+"group_pulse": 28.6,
+"group_rank": 14,
 "rank": 4,
 "risk_pct": 7.9
 },
@@ -498,8 +498,8 @@
 "td_score": null,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 17.4,
-"group_rank": 30,
+"group_pulse": 18.9,
+"group_rank": 27,
 "rank": 1,
 "risk_pct": 6.4
 },
@@ -530,8 +530,8 @@
 "td_score": null,
 "group": "Specialty Industrial Machinery",
 "lane": "hold",
-"group_pulse": 16.6,
-"group_rank": 31,
+"group_pulse": 16.3,
+"group_rank": 33,
 "rank": 2,
 "risk_pct": 13.5
 },
@@ -562,8 +562,8 @@
 "td_score": null,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 17.4,
-"group_rank": 30,
+"group_pulse": 18.9,
+"group_rank": 27,
 "rank": 3,
 "risk_pct": 11.6
 },
@@ -596,8 +596,8 @@
 "td_score": 3,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 35.2,
-"group_rank": 8,
+"group_pulse": 38.1,
+"group_rank": 6,
 "rank": 5,
 "risk_pct": 8.4
 },
@@ -630,8 +630,8 @@
 "td_score": 3,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 35.2,
-"group_rank": 8,
+"group_pulse": 38.1,
+"group_rank": 6,
 "rank": 6,
 "risk_pct": 7.6
 },
@@ -663,8 +663,8 @@
 "td_score": 2,
 "group": "Credit Services",
 "lane": "mid",
-"group_pulse": 13.5,
-"group_rank": 45,
+"group_pulse": 14.4,
+"group_rank": 40,
 "rank": 7,
 "risk_pct": 10.5
 },
@@ -694,7 +694,7 @@
 "td_score": null,
 "group": "Dairy",
 "lane": "mid",
-"group_pulse": 21.0,
+"group_pulse": 21.9,
 "group_rank": 23,
 "rank": 1,
 "risk_pct": 9.0
@@ -820,8 +820,8 @@
 "td_score": null,
 "group": "Telecom Services",
 "lane": "bounce",
-"group_pulse": 15.9,
-"group_rank": 36,
+"group_pulse": 18.3,
+"group_rank": 29,
 "rank": 3,
 "risk_pct": 6.6
 }
@@ -837,7 +837,7 @@
 "signal_date": "2026-11-03",
 "group": "Lodging",
 "lane": "hold",
-"group_rank": 6
+"group_rank": 7
 },
 {
 "symbol": "APOLLOTYRE",
@@ -849,7 +849,7 @@
 "signal_date": "2026-11-05",
 "group": "Auto Parts",
 "lane": "hold",
-"group_rank": 30
+"group_rank": 27
 },
 {
 "symbol": "SWIGGY",
@@ -861,7 +861,19 @@
 "signal_date": "2026-11-05",
 "group": "Internet Retail",
 "lane": "hold",
-"group_rank": 10
+"group_rank": 11
+},
+{
+"symbol": "HAVELLS",
+"name": "Havells India Limited",
+"typ": "DB",
+"close": 1172.0,
+"neck": 1121.0,
+"stop": 989.21,
+"signal_date": "2026-11-06",
+"group": "Electrical Equipment & Parts",
+"lane": "hold",
+"group_rank": 57
 },
 {
 "symbol": "HDFCAMC",
@@ -873,7 +885,7 @@
 "signal_date": "2026-11-03",
 "group": "Asset Management",
 "lane": "mid",
-"group_rank": 44
+"group_rank": 39
 },
 {
 "symbol": "FRACTAL",
@@ -885,7 +897,7 @@
 "signal_date": "2026-11-04",
 "group": "Software - Infrastructure",
 "lane": "mid",
-"group_rank": 43
+"group_rank": 45
 },
 {
 "symbol": "ZAGGLE",
@@ -897,7 +909,7 @@
 "signal_date": "2026-11-04",
 "group": "Software - Infrastructure",
 "lane": "mid",
-"group_rank": 43
+"group_rank": 45
 },
 {
 "symbol": "HDFCBANK",
@@ -909,7 +921,7 @@
 "signal_date": "2026-11-05",
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_rank": 8
+"group_rank": 6
 },
 {
 "symbol": "ICICIBANK",
@@ -921,7 +933,7 @@
 "signal_date": "2026-11-05",
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_rank": 8
+"group_rank": 6
 },
 {
 "symbol": "MARATHON",
@@ -969,7 +981,7 @@
 "signal_date": "2026-11-03",
 "group": "Telecom Services",
 "lane": "bounce",
-"group_rank": 36
+"group_rank": 29
 },
 {
 "symbol": "EMAMILTD",
@@ -981,7 +993,7 @@
 "signal_date": "2026-11-09",
 "group": "Household & Personal Products",
 "lane": "bounce",
-"group_rank": 42
+"group_rank": 43
 },
 {
 "symbol": "ABREL",
@@ -993,19 +1005,7 @@
 "signal_date": "2026-11-12",
 "group": "Real Estate Services",
 "lane": "bounce",
-"group_rank": 35
-},
-{
-"symbol": "HAVELLS",
-"name": "Havells India Limited",
-"typ": "DB",
-"close": 1172.0,
-"neck": 1121.0,
-"stop": 989.21,
-"signal_date": "2026-11-06",
-"group": "Electrical Equipment & Parts",
-"lane": "fade",
-"group_rank": 54
+"group_rank": 32
 },
 {
 "symbol": "ANURAS",
@@ -1017,7 +1017,7 @@
 "signal_date": "2026-11-09",
 "group": "Specialty Chemicals",
 "lane": "fade",
-"group_rank": 37
+"group_rank": 38
 },
 {
 "symbol": "IOC",
@@ -1029,7 +1029,7 @@
 "signal_date": "2026-11-09",
 "group": "Oil & Gas Refining & Marketing",
 "lane": "fade",
-"group_rank": 20
+"group_rank": 24
 },
 {
 "symbol": "TIRUMALCHM",
@@ -1041,7 +1041,7 @@
 "signal_date": "2026-11-11",
 "group": "Specialty Chemicals",
 "lane": "fade",
-"group_rank": 37
+"group_rank": 38
 },
 {
 "symbol": "GANESHCP",
@@ -1094,8 +1094,8 @@
 "td_score": 1,
 "group": "Lodging",
 "lane": "hold",
-"group_pulse": 36.9,
-"group_rank": 6
+"group_pulse": 38.1,
+"group_rank": 7
 },
 {
 "id": "WATCH-DCBBANK",
@@ -1122,8 +1122,8 @@
 "td_score": 2,
 "group": "Banks - Private Mid & Small",
 "lane": "hold",
-"group_pulse": 30.6,
-"group_rank": 11
+"group_pulse": 32.1,
+"group_rank": 10
 },
 {
 "id": "WATCH-TCPLPACK",
@@ -1150,8 +1150,8 @@
 "td_score": 1,
 "group": "Packaging & Containers",
 "lane": "mid",
-"group_pulse": 11.4,
-"group_rank": 52
+"group_pulse": 12.9,
+"group_rank": 48
 },
 {
 "id": "WATCH-INDGN",
@@ -1206,8 +1206,8 @@
 "td_score": 1,
 "group": "Household & Personal Products",
 "lane": "bounce",
-"group_pulse": 13.9,
-"group_rank": 42
+"group_pulse": 14.3,
+"group_rank": 43
 }
 ],
 "exits": [
