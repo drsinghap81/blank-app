@@ -9,7 +9,10 @@ s = requests.Session()
 s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
                   "Referer": "https://www.nseindia.com/"})
 COLS = ["Date", "SYMBOL", "INST", "EXPIRY", "STRIKE", "TYPE", "OPEN", "HIGH", "LOW", "CLOSE", "SETTLE", "OI", "VOL", "LOT", "UNDER"]
-W = pd.read_csv("data/optwin.csv", parse_dates=["start", "end"])
+import os
+W = pd.read_csv(os.environ.get("OPTWIN", "data/optwin.csv"), parse_dates=["start", "end"])
+OTYPE = os.environ.get("OPT_TYPE", "CE")                          # 17 Nov 2026: PE for the bull put spread test
+LO, HI = float(os.environ.get("STRIKE_LO", "0.85")), float(os.environ.get("STRIKE_HI", "1.40"))
 WIN = {k: list(zip(g.start, g.end)) for k, g in W.groupby("sym")}
 
 
@@ -64,9 +67,9 @@ def day(d):
         if f.empty:
             continue
         ref = float(f.CLOSE.iloc[0])
-        o = g[(g.INST == "OPT") & (g.TYPE == "CE")]
+        o = g[(g.INST == "OPT") & (g.TYPE == OTYPE)]
         ex = sorted(o.EXPIRY.unique())[:3]
-        o = o[o.EXPIRY.isin(ex) & o.STRIKE.between(ref * 0.85, ref * 1.40)]
+        o = o[o.EXPIRY.isin(ex) & o.STRIKE.between(ref * LO, ref * HI)]
         out += [f.head(3), o]
     r = pd.concat(out)
     r.insert(0, "Date", d.date())

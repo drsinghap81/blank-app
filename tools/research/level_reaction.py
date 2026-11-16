@@ -63,7 +63,7 @@ def outcomes(d, L, side, c, h, l, sig, Lf=None, tr=0):
     exp5 = sig[d] * math.sqrt(5); mv = abs(c[d + 5] / c[d] - 1)
     prem = 0.8 * exp5
     ok = c[d + 5] < L if side == "res" else c[d + 5] > L
-    return dict(trend=tr, brk5=first <= 5, brk10=first <= 10, brk20=first <= 20, rev5=r5 * 100, rev10=r10 * 100, held5=bool(held), calm5=bool(mv < exp5), straddle=(prem - mv) / prem * 100, spread_ok=bool(ok))
+    return dict(L=float(L), close=float(c[d]), trend=tr, brk5=first <= 5, brk10=first <= 10, brk20=first <= 20, rev5=r5 * 100, rev10=r10 * 100, held5=bool(held), calm5=bool(mv < exp5), straddle=(prem - mv) / prem * 100, spread_ok=bool(ok))
 
 
 def scan(sym, df):
