@@ -3947,18 +3947,19 @@ function pfFromAngel(H, P) {
 async function condorCard(box, mk) {
   if (!box) return; const D = await getJSON(MAIN + 'data/scan/condor_signal.json', 'condor').catch(() => null); if (!D || !D.rows) { box.innerHTML = ''; return; }
   const mine = (r) => (mk === 'US' ? r.market === 'US' : mk === 'NSE' ? r.market === 'NSE' : true);
-  const R = D.rows.filter((r) => r.status !== 'no data'); const on = R.filter((r) => r.status === 'ON');
+  const R = D.rows.filter((r) => r.status !== 'no data'); const on = R.filter((r) => r.status === 'ON' && (r.grade || 'good') === 'good');
   const chip = { ON: ['up', 'Setup ON · enter'], wait: ['', 'Setup · wait for 2–4 days to expiry'], watch: ['', 'Big move · waiting for a pause'], off: ['muted', 'No setup'] };
   const f = (v) => fmt(v, v >= 1000 ? 0 : 2, 'en-IN');
-  const row = (r) => { const [cls, lab] = chip[r.status] || ['muted', r.status];
-    return `<div class="cd-row"><div class="cd-h"><b>${esc(r.name)}</b> <span class="chip ${cls}">${lab}</span>${r.tested ? ' <span class="chip">tested</span>' : ' <span class="chip muted">untested</span>'}</div>
+  const row = (r) => { const [cls, lab] = r.status === 'ON' && r.grade && r.grade !== 'good' ? ['', 'Setup, but this index is weak in the test'] : chip[r.status] || ['muted', r.status];
+    return `<div class="cd-row"><div class="cd-h"><b>${esc(r.name)}</b> <span class="chip ${cls}">${lab}</span>${r.grade === 'good' || (!r.grade && r.tested) ? ' <span class="chip up">works in test</span>' : r.grade === 'fail' ? ' <span class="chip down">fails in test</span>' : ' <span class="chip muted">weak in test</span>'}</div>
+      ${r.grade_note ? `<div class="lv-sub muted">Backtest: ${esc(r.grade_note)}</div>` : ''}
       <div class="lv-sub">${r.move10 >= 0 ? '+' : ''}${fmt(r.move10, 1)}% in 10 days (need ±3.5%) · 3-day range ${fmt(r.range3, 1)}% (need &lt;2%) · next expiry ${esc(r.expiry_day)}, ${r.days_to_expiry} trading days</div>
       ${r.status === 'ON' || r.status === 'wait' ? `<div class="lv-sub"><b>Sell ${f(r.short_call)} CE + ${f(r.short_put)} PE · buy ${f(r.long_call)} CE + ${f(r.long_put)} PE</b> (2% shorts, 1% wings, from ${f(r.close)}) · hold to expiry · ${esc(r.how)}</div>` : ''}</div>`; };
   const top = R.filter(mine); const rest = R.filter((r) => !mine(r));
   box.innerHTML = `<details class="t2-more t2-wd" ${on.some(mine) ? 'open' : ''}><summary>🦅 Iron condor setups · ${on.length ? `<b class="up">${on.length} ON</b>: ${on.map((r) => esc(r.name)).join(', ')}` : 'none on now'}</summary>
     <div class="cd-box"><p class="lv-sub">${esc(D.rule)}</p><p class="lv-sub muted">${esc(D.test)} Margin: pledged holdings count as collateral, but about half of F&amp;O margin must be cash or cash-like. Watch only: you place the orders.</p>
     ${top.map(row).join('')}${rest.length ? `<details class="t2-more"><summary>Other indices (${rest.length})</summary>${rest.map(row).join('')}</details>` : ''}
-    <p class="lv-sub muted">Updated ${esc(D.generated)}. You get a phone alert when one turns ON.</p></div></details>`;
+    <p class="lv-sub muted">Updated ${esc(D.generated)}. You get a phone alert when one that works in the test turns ON.</p></div></details>`;
 }
 /* 16 Nov 2026: US holdings (moomoo) in Portfolio, from the server's US watch list (or the copy on this phone) */
 async function pfUS(box) {

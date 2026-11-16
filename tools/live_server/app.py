@@ -2127,9 +2127,9 @@ def condor_alerts():
     except Exception as ex:  # noqa: BLE001
         log("condor_error", error=str(ex)[:160]); return
     for x in d.get("rows", []):
-        if x.get("status") != "ON":
+        if x.get("status") != "ON" or x.get("grade", "good" if x.get("tested") else "weak") != "good":
             continue
-        tag = "" if x.get("tested") else " (rule tested on Nifty only)"
+        tag = "" if x.get("key") == "NIFTY" else " (tested on a price model; Nifty on real prices)"
         txt = (f"{'US ' if x.get('market') == 'US' else ''}{x['name']}: iron condor setup ON{tag}. Moved {x['move10']:+.1f}% in 10 days, "
                f"3-day range {x['range3']:.1f}%. Sell {x['short_call']:g} CE / {x['short_put']:g} PE, buy {x['long_call']:g} CE / {x['long_put']:g} PE, "
                f"expiry {x['expiry_day']} ({x['days_to_expiry']} trading days). {x.get('how', '')}.")
