@@ -190,11 +190,21 @@ function curveSVG(E, up) {
 function lvHero(S, PF, part = 'top') {
   if (!S) return '';
   const real = S.real_value != null, val = real ? S.real_value : S.account_value;
-  const E = S.equity || [], rng = state.heroRng || '1M', days = { '1M': 31, '3M': 92, '1Y': 366, All: 1e5 }[rng];
+  // 16 Nov 2026: the curve skips day-to-day jumps over 8% of the account (no money was added or withdrawn; they come from Angel's
+  // settlement timing / cash shown as blocked), so it follows gains and losses only and ends at today's real value
+  const E0 = S.equity || []; const E = (() => { if (E0.length < 2) return E0; const out = [[E0[0][0], 0]]; let adj = 0;
+    for (let i = 1; i < E0.length; i++) { const d = E0[i][1] - E0[i - 1][1]; adj += Math.abs(d) > 0.08 * E0[i - 1][1] ? 0 : d; out.push([E0[i][0], adj]); }
+    const end = E0[E0.length - 1][1]; return out.map(([t, v]) => [t, end - adj + v]); })();
+  const rng = state.heroRng || '1M', days = { '1M': 31, '3M': 92, '1Y': 366, All: 1e5 }[rng];
   const cut = new Date(Date.now() - days * 864e5).toISOString().slice(0, 10), Ev = E.filter((x) => x[0] >= cut);
-  const today = E.length >= 2 && E[E.length - 1][0] === new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10) ? E[E.length - 1][1] - E[E.length - 2][1] : null;
+  const today = E0.length >= 2 && E0[E0.length - 1][0] === new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10) ? E0[E0.length - 1][1] - E0[E0.length - 2][1] : null;
   const rs = (v) => `${v >= 0 ? '+' : '−'}₹${fmt(Math.abs(v), 0, 'en-IN')}`;
-  const badge = PF && (PF.open.n + PF.closed.n) ? `<span class="hero-badge ${PF.total_pnl >= 0 ? 'up' : 'down'}">${rs(PF.total_pnl)}${PF.total_pct == null ? '' : ` · ${PF.total_pct >= 0 ? '+' : ''}${fmt(PF.total_pct, 1)}%`}</span><span class="muted">on app trades${PF.since ? ' since ' + day(PF.since) : ''}</span>` : '<span class="muted">No app trades filled yet</span>';
+  // 16 Nov 2026: headline gain = all holdings vs Angel's average price (what Angel's Portfolio "Overall Gain" shows); the app-trades
+  // figure (entries sent from the app, at their own fill prices) is kept as a second, smaller line
+  const HH = (S.holdings || []).filter((h) => h.avg > 0 && h.ltp > 0); const hCost = HH.reduce((a, h) => a + h.avg * h.qty, 0), hPnl = HH.reduce((a, h) => a + (h.ltp - h.avg) * h.qty, 0);
+  const appTxt = PF && (PF.open.n + PF.closed.n) ? ` · app trades ${rs(PF.total_pnl)}${PF.since ? ' since ' + day(PF.since) : ''}` : '';
+  const badge = HH.length ? `<span class="hero-badge ${hPnl >= 0 ? 'up' : 'down'}">${rs(hPnl)} · ${hPnl >= 0 ? '+' : ''}${fmt(hPnl / hCost * 100, 2)}%</span><span class="muted">holdings gain, as Angel shows it${appTxt}</span>`
+    : PF && (PF.open.n + PF.closed.n) ? `<span class="hero-badge ${PF.total_pnl >= 0 ? 'up' : 'down'}">${rs(PF.total_pnl)}${PF.total_pct == null ? '' : ` · ${PF.total_pct >= 0 ? '+' : ''}${fmt(PF.total_pct, 1)}%`}</span><span class="muted">on app trades${PF.since ? ' since ' + day(PF.since) : ''}</span>` : '<span class="muted">No app trades filled yet</span>';
   // slices
   const B = (S.buckets || []).filter((b) => b.key !== 'tb' && b.used > 0);
   const H = S.holdings || []; const idle = H.filter((h) => IDLE_ETF.has(h.symbol)).reduce((a, h) => a + h.value, 0);
@@ -216,7 +226,7 @@ function lvHero(S, PF, part = 'top') {
     ${S.value_parts ? (() => { const V = S.value_parts, R = V.rms || {};
       return `<details class="hero-parts"><summary>= Cash ${lakh(V.cash)} + Holdings ${lakh(V.holdings)}${V.todays_buys > 0 ? ` + Today's buys ${lakh(V.todays_buys)}` : ''}</summary>
         <p class="lv-sub">Matches Angel like this: <b>Cash</b> = Angel's opening ledger balance (Account → Trading balance summary)${R.collateral ? `. Angel's <b>Trading balance ${lakh(R.availablecash || 0)}</b> also adds <b>pledge margin ${lakh(R.collateral)}</b>: that is a loan against your holdings, so it isn't counted again` : ''}. <b>Holdings</b> = Angel's Portfolio "Current value" (shares × last price).</p></details>`; })() : ''}
-    <div class="hero-line">${badge}${today == null ? '' : Math.abs(today) > 0.08 * E[E.length - 2][1] ? `<span class="muted">today: cash moved ${rs(today)} (money in/out or blocked by Angel, not a gain/loss)</span>` : `<span class="muted">today <b class="${today >= 0 ? 'up' : 'down'}">${rs(today)}</b></span>`}</div>
+    <div class="hero-line">${badge}${today == null ? '' : Math.abs(today) > 0.08 * E0[E0.length - 2][1] ? `<span class="muted">today the value caught up ${rs(today)} with Angel (settlement timing, not a gain; left out of the curve)</span>` : `<span class="muted">today <b class="${today >= 0 ? 'up' : 'down'}">${rs(today)}</b></span>`}</div>
     ${Ev.length >= 2 ? curveSVG(Ev, Ev[Ev.length - 1][1] >= Ev[0][1]) + `<div class="hero-rng">${['1M', '3M', '1Y', 'All'].map((k) => `<button data-rng="${k}" aria-pressed="${k === rng}">${k}</button>`).join('')}</div>`
       : `<p class="lv-sub">Your value curve builds from here, one point each day${real ? '' : ' once your server takes today\'s update'}.</p>`}
     </div>`;
