@@ -15,7 +15,7 @@ from datetime import date, datetime, timedelta, timezone
 import yfinance as yf
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "data", "scan", "condor_signal.json")
-MOVE, PAUSE, SHORT, WING = 0.035, 2.0, 0.02, 0.01
+MOVE, PAUSE, SHORT, WING = 0.035, 2.0, 0.025, 0.015   # 16 Nov 2026: 2.5% / 1.5% = lowest drawdown for the return (grid on real Nifty prices)
 # key, name, yahoo, market, weekly expiry weekday (0=Mon; None = daily expiries), strike step, lot, how to trade it, tested
 IDX = [   # grade from the 2010-26 test (research/condor_world.json): good = alert, weak/fail = shown only
     ("NIFTY", "Nifty 50", "^NSEI", "NSE", 1, 50, 65, "NSE options (Angel)", "good", "real prices 2019-26: 89% win, t 3.8; model 2010-26: 87% win, 14/17 years up"),
@@ -105,8 +105,9 @@ def main():
                rule=f"Index moved {MOVE * 100:.1f}%+ over 10 trading days, then the last 3 days' high-low range is under {PAUSE:.0f}%. "
                     f"Sell an iron condor: short call and put about {SHORT * 100:.0f}% from the price, {WING * 100:.0f}% wings, "
                     "entered 2-4 trading days before a weekly expiry, held to expiry.",
-               test="Nifty weekly options, Feb 2019 - Oct 2026, real NSE prices and costs: ~7 trades a year, 89% win, "
-                    "avg +Rs 793 per lot, worst -Rs 5.2k, about Rs 5.7k a year per lot (more at today's Nifty level). "
+               test="Nifty weekly options, Feb 2019 - Oct 2026, real NSE prices and costs, 2.5% shorts / 1.5% wings: 55 trades (~7 a year), "
+                    "96% win, avg +Rs 897 per lot, worst trade and worst drawdown -Rs 760, about Rs 6.4k a year per lot at past Nifty levels "
+                    "(every year 2019-26 positive). 2% shorts earned a little more but with a -Rs 8.6k drawdown. "
                     "Tight (1%) condors and iron flies lost money with the same signal. All 9 indices 2010-26 (options priced from each "
                     "index's volatility, checked against Nifty's real prices): works on Nifty, Sensex and Euro Stoxx 50; weak on the US "
                     "indices, DAX and Nikkei; fails on Hang Seng. Alerts only for the ones that work.",
