@@ -1,0 +1,81 @@
+{
+ "method": "Volume-profile POC pullback (from a social-media setup, 16 Nov 2026) on Nifty 500 stocks, 2016 - Nov 2026.\n\nImpulse: a pivot swing low (5 bars each side) followed within 60 trading days by a swing high >= 20% above it, with no\nlower low in between. \"Sweep start\": that swing low took out the lowest low of the 25 days before it (stop hunt) and the\nclose got back above that old low within 2 days.\nVolume profile of the impulse (swing low -> swing high): each day's volume spread evenly over its high-low range, 40 price\nbins; POC = the bin with the most volume.\nA  first touch: after the high, the first day whose low reaches the POC (no new high first, within 60 days). Buy at the POC\n   (or the open if it gaps below). Stop POC - 1.5 ATR(14), target the swing high, out after 60 days.\nB  sweep + reclaim: after the first touch, within 20 days, a day that trades 0.5 ATR or more below the POC and closes back\n   above it. Buy at that close, stop 0.2 ATR under that day's low, target the swing high, out after 60 days.\n   Cancelled if a close falls 3 ATR below the POC first.\nStops/targets checked on daily high/low (stop first if both). Costs 0.3% round trip. Liquid only: median 60-day traded\nvalue >= Rs 5 cr and price >= 50. Current Nifty 500 members (survivorship bias flatters results).\nPortfolio: Rs 20 L, risk 1% per trade to the stop, max 10% a stock, max 10 open, realised equity.\nOutput: data/research/poc_pullback.json.",
+ "nifty_buy_hold": {
+  "cagr": 11.4,
+  "max_dd": -38.4
+ },
+ "versions": {
+  "A all impulses": {
+   "trades": {
+    "n": 4749,
+    "per_yr": 456.6,
+    "win": 41.0,
+    "avg_ret": 0.39,
+    "avg_R": 0.46,
+    "t": 2.95,
+    "target_hit": 38.7,
+    "stop_hit": 58.5,
+    "pos_years": "7/11"
+   },
+   "portfolio": {
+    "cagr": 4.6,
+    "max_dd": -35.3,
+    "trades": 2022
+   }
+  },
+  "A sweep-start only": {
+   "trades": {
+    "n": 1891,
+    "per_yr": 181.8,
+    "win": 39.1,
+    "avg_ret": -0.11,
+    "avg_R": 0.92,
+    "t": -0.53,
+    "target_hit": 36.9,
+    "stop_hit": 60.3,
+    "pos_years": "5/11"
+   },
+   "portfolio": {
+    "cagr": -2.7,
+    "max_dd": -39.4,
+    "trades": 1432
+   }
+  },
+  "B all impulses": {
+   "trades": {
+    "n": 1805,
+    "per_yr": 173.6,
+    "win": 44.7,
+    "avg_ret": 0.46,
+    "avg_R": 0.04,
+    "t": 2.57,
+    "target_hit": 43.0,
+    "stop_hit": 54.9,
+    "pos_years": "8/11"
+   },
+   "portfolio": {
+    "cagr": 3.9,
+    "max_dd": -28.9,
+    "trades": 1559
+   }
+  },
+  "B sweep-start only": {
+   "trades": {
+    "n": 702,
+    "per_yr": 67.5,
+    "win": 43.2,
+    "avg_ret": 0.29,
+    "avg_R": 0.01,
+    "t": 1.06,
+    "target_hit": 41.3,
+    "stop_hit": 56.1,
+    "pos_years": "5/11"
+   },
+   "portfolio": {
+    "cagr": 1.0,
+    "max_dd": -18.4,
+    "trades": 677
+   }
+  }
+ }
+}
