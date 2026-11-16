@@ -24,7 +24,7 @@ import os
 import re
 import threading
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import requests
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -1941,7 +1941,7 @@ def us_plan():
 # ------------------------------------------------------------------ US holdings you bought yourself (16 Nov 2026)
 # Positions bought in moomoo by hand from the app's US plan. ALERTS ONLY: the server never sells these. Kept in
 # DATA/us_watch.json on the server (never in the public repo). Checked every loop during US hours with Yahoo prices.
-US_SYS = {"ATH": "Monthly ATH", "RT": "Breakout retest", "T921": "9/21 trend", "MY": "My pick"}
+US_SYS = {"ATH": "Monthly ATH", "TF": "Trend 9/21", "RT": "Breakout retest", "T921": "9/21 trend", "MY": "My pick"}
 
 
 def _usw_path():
@@ -2035,6 +2035,64 @@ def us_watch_check(t=None):
                       key=f"uswexit:{sym}:{P.get('asof')}")
     except Exception as ex:  # noqa: BLE001
         log("us_watch_error", error=str(ex)[:200])
+
+
+def ydaily(sym, rng="1y"):
+    """Daily closes from Yahoo (split-adjusted, not dividend-adjusted, like TradingView)."""
+    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym.replace('.', '-')}", params=dict(interval="1d", range=rng),
+                     headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
+    r.raise_for_status(); res = r.json()["chart"]["result"][0]
+    c = res["indicators"]["quote"][0]["close"]
+    out = [(datetime.fromtimestamp(t, timezone.utc).date().isoformat(), x) for t, x in zip(res["timestamp"], c) if x is not None]
+    return [d for d, _ in out], [x for _, x in out]
+
+
+def _ema_list(c, n):
+    k = 2 / (n + 1); e = c[0]; out = []
+    for x in c:
+        e = x * k + e * (1 - k); out.append(e)
+    return out
+
+
+def us_trail_levels(sym, system, entry):
+    """(exit_signal, new_stop, note) from the last close. Trend 9/21: stop = EMA 21 (at least 4% under the entry at the
+    start), exit = daily close with EMA 9 below EMA 21. Monthly ATH: stop = 30-week SMA, exit = weekly close below it."""
+    t, c = ydaily(sym)
+    if system == "Monthly ATH":
+        wk = {}
+        for d, x in zip(t, c):
+            y, w, _ = date.fromisoformat(d).isocalendar(); wk[(y, w)] = x
+        wc = [wk[k] for k in sorted(wk)]
+        sma = sum(wc[-30:]) / 30
+        return wc[-1] < sma, math.floor(sma * 100) / 100, f"weekly close {wc[-1]:.2f}, 30-week average {sma:.2f}"
+    e9, e21 = _ema_list(c, 9), _ema_list(c, 21)
+    return e9[-1] < e21[-1], math.floor(e21[-1] * 100) / 100, f"close {c[-1]:.2f}, EMA 9 {e9[-1]:.2f}, EMA 21 {e21[-1]:.2f}"
+
+
+def us_watch_eod(t=None):
+    """After the US close: exit alerts every day; on Fridays raise each stop (never lower it) and say what to set in moomoo."""
+    W = us_watch_load()
+    if not W:
+        return
+    t = t or et_now(); day = t.date().isoformat(); friday = t.weekday() == 4; raised = []
+    for sym, w in W.items():
+        sysn = w.get("system")
+        if sysn not in ("Trend 9/21", "Monthly ATH"):
+            continue
+        try:
+            ex, lvl, note = us_trail_levels(sym, sysn, w["entry"])
+        except Exception as e:  # noqa: BLE001
+            log("us_trail_error", symbol=sym, error=str(e)[:160]); continue
+        w["last"] = dict(day=day, note=note, level=lvl, exit=ex)
+        if ex and (sysn == "Trend 9/21" or friday):
+            why = "EMA 9 closed below EMA 21" if sysn == "Trend 9/21" else "weekly close below the 30-week average"
+            alert("exit", sym, f"US {sym}: sell signal ({sysn}): {why} ({note}). Sell {w['qty']:g} at the next open in moomoo.",
+                  key=f"uswtrail-exit:{sym}:{day}")
+        if friday and lvl > w["stop"] + 0.005:
+            old = w["stop"]; w["stop"] = lvl; w["stop_set"] = day; raised.append(f"{sym} {old:.2f} → {lvl:.2f}")
+    us_watch_save(W)
+    if raised:
+        alert("raised", "", "US stops to move in moomoo (GTC, same quantity): " + "; ".join(raised) + ".", key=f"uswraise:{day}")
 
 
 class USOrder(BaseModel):
@@ -2214,6 +2272,9 @@ def _loop():
                 us_sync()
             if us_open(et_now()) and t.minute % 10 < 2:
                 us_watch_check()
+            _et = et_now()
+            if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("usw_eod") != _et.date():
+                _HB["usw_eod"] = _et.date(); us_watch_eod(_et)
         except Exception as ex:  # noqa: BLE001
             log("loop_error", error=str(ex)[:200])
         time.sleep(120)

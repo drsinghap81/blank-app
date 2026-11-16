@@ -4791,7 +4791,7 @@ async function tdRsi2(box) {
 /* 16 Nov 2026: US shares you bought yourself in moomoo (from this plan). The server only WATCHES them: stop hit, within 3%
    of the stop, retest target, and the plan's sell signals -> alert. It never sells them. Kept on the server, not in the repo.
    A link like …/#usw=ACGL:7:107.28:82.96::ATH,CNC:12:70:65.63:84.87:RT opens an "add these" box (nothing saved until you tap). */
-const USW_SYS = [['ATH', 'Monthly ATH'], ['RT', 'Breakout retest'], ['T921', '9/21 trend'], ['MY', 'My pick']];
+const USW_SYS = [['TF', 'Trend 9/21'], ['ATH', 'Monthly ATH'], ['RT', 'Breakout retest'], ['T921', '9/21 trend'], ['MY', 'My pick']];
 function uswParse(h) {
   const m = /^#usw=(.+)$/.exec(h || ''); if (!m) return null;
   return decodeURIComponent(m[1]).split(',').map((x) => { const [symbol, qty, entry, stop, target, system] = x.split(':');
@@ -4806,10 +4806,12 @@ async function usWatchCard(box) {
   let W; try { W = await lvApi('/api/us/watch', { timeout: 30000 }); } catch (e) { box.innerHTML = `<div class="lv-card"><b>Your moomoo holdings</b><p class="down lv-sub">Couldn't load: ${esc(e.message)}</p></div>`; return; }
   const sysN = (k) => (USW_SYS.find((x) => x[0] === k) || [k, k])[1];
   const rows = W.items.map((r) => `<div class="lv-row"><div class="lv-main"><b>${esc(r.symbol)}</b> <small class="muted">${esc(r.system)} · ${r.qty} @ ${$f(r.entry)}</small>
+      ${r.last && r.last.exit ? `<div class="down lv-sub"><b>Sell signal:</b> ${esc(r.last.note)} · sell at the next open</div>` : ''}
+      <div class="lv-sub"><b>Stop to set in moomoo: ${$f(r.stop)}</b>${r.stop_set ? ` <span class="chip">raised ${esc(day(r.stop_set))}</span>` : ''}${r.last ? ` · ${esc(r.last.note)}` : ''}</div>
       <div class="lv-sub">now ${$f(r.price)} · stop ${$f(r.stop)}${r.to_stop != null ? ` (<b class="${r.to_stop < 3 ? 'down' : ''}">${fmt(r.to_stop, 1)}% above</b>)` : ''}${r.target ? ` · target ${$f(r.target)}` : ''}${r.pnl != null ? ` · <b class="${r.pnl >= 0 ? 'up' : 'down'}">${r.pnl >= 0 ? '+' : '−'}${$f(Math.abs(r.pnl))}</b>` : ''}</div></div>
       <button class="lv-link" data-uswdel="${esc(r.symbol)}">Remove</button></div>`).join('');
   box.innerHTML = `<div class="lv-card" data-fold="skip"><b>Your moomoo holdings · alerts only</b>
-    <p class="lv-sub">You get a phone alert when a stop is hit, a price is within 3% of its stop, a retest reaches its target, or the plan lists a sell. The app never sells these; you sell in moomoo.</p>
+    <p class="lv-sub">Alerts: stop hit or within 3%; Trend 9/21 sell (a daily close with EMA 9 under EMA 21) and Monthly ATH sell (a weekly close under the 30-week average), checked after each US close. Every Friday after the close the stops are raised (EMA 21 or the 30-week average, never lowered) and you get one alert listing the new stops to set in moomoo. The app never sells these.</p>
     ${imp ? `<div class="status exit watch"><b>Add ${imp.length} holdings from your link?</b><div class="lv-sub">${imp.map((x) => `${esc(x.symbol)} ${x.qty} @ ${$f(x.entry)} · stop ${$f(x.stop)}${x.target ? ` · target ${$f(x.target)}` : ''} · ${esc(sysN(x.system))}`).join('<br>')}</div>
       <button class="lv-btn" id="uswimp">Add these ${imp.length}</button> <button class="lv-link" id="uswno">Not now</button></div>` : ''}
     ${rows || '<p class="empty">Nothing tracked yet.</p>'}

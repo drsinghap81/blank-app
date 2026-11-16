@@ -673,3 +673,26 @@ def test_us_watch_alerts_only(tmp_path):
     n = len(al); A.us_watch_check(); assert len(A.alerts_load()["items"]) == n      # once per day
     c.post("/api/us/watch", headers=h, json={"remove": ["CNC"]})
     assert len(c.get("/api/us/watch", headers=h).json()["items"]) == 2
+
+
+def test_us_watch_trailing(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    c.post("/api/us/watch", headers=h, json={"items": [
+        {"symbol": "UPP", "qty": 5, "entry": 100, "stop": 96, "system": "TF"},
+        {"symbol": "DWN", "qty": 3, "entry": 50, "stop": 45, "system": "TF"},
+        {"symbol": "ATHX", "qty": 2, "entry": 200, "stop": 150, "system": "ATH"}]})
+    import datetime as dt
+    days = [(dt.date(2026, 1, 1) + dt.timedelta(days=i)).isoformat() for i in range(250)]
+    series = {"UPP": [80 + i * 0.1 for i in range(250)], "DWN": [40 + i * 0.05 for i in range(240)] + [52 - i for i in range(10)],
+              "ATHX": [150 + i * 0.3 for i in range(250)]}
+    A.ydaily = lambda sym, rng="1y": (days, series[sym])
+    fri = dt.datetime(2026, 11, 20, 16, 20)              # a Friday
+    A.us_watch_eod(fri)
+    W = A.us_watch_load(); al = A.alerts_load()["items"]
+    assert W["UPP"]["stop"] > 96 and W["UPP"]["stop_set"] == "2026-11-20"          # raised to EMA 21
+    assert W["ATHX"]["stop"] > 150                                                  # raised to the 30-week SMA
+    assert any(x["kind"] == "exit" and x["symbol"] == "DWN" for x in al)            # EMA 9 under EMA 21
+    assert any(x["kind"] == "raised" and "UPP" in x["text"] for x in al)
+    old = W["UPP"]["stop"]; series["UPP"] = [x - 30 for x in series["UPP"]]; A.us_watch_eod(fri + dt.timedelta(days=7))
+    assert A.us_watch_load()["UPP"]["stop"] == old                                  # never lowered
