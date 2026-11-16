@@ -6,7 +6,8 @@ Trade at the touch-day close:
   long put = the highest strike at or below short x 0.95
   needs a traded short leg that day (volume > 0) and a credit > 0
 Exits: (a) hold to expiry (settled on the near future's close that day); (b) take 50% of the credit when the spread's closing
-value falls to half, else expiry. Costs: slippage max(Rs 0.05, 1% of premium) per leg per side, Rs 20 + GST per order, STT
+value falls to half, else expiry; (c) (b) plus a stop on daily closes: spread worth 2x the credit, or the future closing
+below the support, or below the short strike (exit at that day's closing prices; gaps make losses bigger than the stop). Costs: slippage max(Rs 0.05, 1% of premium) per leg per side, Rs 20 + GST per order, STT
 0.1% on premium sold. Per lot of the day; return on risk = P&L / (width - credit) x lot.
 Output: data/research/bps_backtest.json."""
 import glob
@@ -81,8 +82,22 @@ def trade(g, d, L, below):
     else:
         tpp = hold
     risk = (width - credit) * lot
+    # 17 Nov 2026: stop-loss versions, all with the 50% take-profit, checked on each day's closing prices (exit at that close)
+    fut = g[(g.INST == "FUT") & (g.EXPIRY == ex) & (g.Date > d) & (g.Date <= ex)].set_index("Date").CLOSE
+    def run(stop):
+        for day, v in val.items():
+            if v <= 0.5 * credit:
+                return (credit - v - entry_cost - slip(v / 2 + 0.01) * 2) * lot - fees(4) - stt
+            fx_ = fut.get(day)
+            hit = (v >= 2 * credit) if stop == "2x" else (fx_ is not None and np.isfinite(fx_) and fx_ < (L if stop == "support" else ks_ * 0.995))
+            if hit:
+                return (credit - v - entry_cost - slip(max(v, 0.01) / 2) * 2) * lot - fees(4) - stt
+        return hold
+    st = {k: run(k) for k in ("2x", "support", "short")}
     return dict(expiry=str(ex.date()), short=ks_, long=kl, credit=credit, width=width, lot=lot, hold=hold, tp50=tpp,
-                ror_hold=hold / risk * 100, ror_tp=tpp / risk * 100, max_win=(credit - entry_cost) * lot)
+                ror_hold=hold / risk * 100, ror_tp=tpp / risk * 100, max_win=(credit - entry_cost) * lot,
+                stop2x=st["2x"], stopsup=st["support"], stopshort=st["short"],
+                ror_2x=st["2x"] / risk * 100, ror_sup=st["support"] / risk * 100, ror_short=st["short"] / risk * 100)
 
 
 def summ(X, col, rcol):
@@ -113,7 +128,9 @@ def main():
     for kind in ("level", "line 3rd touch", "line", "control"):
         for place in ("at support", "2% below"):
             X = T[((T.kind == kind) | ((kind == "line") & (T.kind == "line 3rd touch"))) & (T.place == place)]
-            g = {"hold to expiry": summ(X, "hold", "ror_hold"), "take 50%": summ(X, "tp50", "ror_tp")}
+            g = {"hold to expiry": summ(X, "hold", "ror_hold"), "take 50%": summ(X, "tp50", "ror_tp"),
+                 "50% + stop at 2x credit": summ(X, "stop2x", "ror_2x"), "50% + stop on a close below support": summ(X, "stopsup", "ror_sup"),
+                 "50% + stop on a close below the short strike": summ(X, "stopshort", "ror_short")}
             out["groups"][f"{kind} | {place}"] = g; print(kind, place, g, flush=True)
     os.makedirs("data/research", exist_ok=True)
     json.dump(out, open("data/research/bps_backtest.json", "w"), indent=1, default=float)
