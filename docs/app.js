@@ -4826,6 +4826,8 @@ async function usWatchCard(box) {
     ${imp ? `<div class="status exit watch"><b>Add ${imp.length} holdings from your link?</b><div class="lv-sub">${imp.map((x) => `${esc(x.symbol)} ${x.qty} @ ${$f(x.entry)} · stop ${$f(x.stop)}${x.target ? ` · target ${$f(x.target)}` : ''} · ${esc(sysN(x.system))}`).join('<br>')}</div>
       <button class="lv-btn" id="uswimp">Add these ${imp.length}</button> <button class="lv-link" id="uswno">Not now</button></div>` : ''}
     ${sumH}${rows || '<p class="empty">Nothing tracked yet.</p>'}
+    <details class="info" ${W.items.length ? '' : 'open'}><summary>Paste a list</summary><p class="lv-sub">Paste the line Claude gave you (or the whole link), then tap Read.</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><input id="uwpaste" placeholder="ACGL:7:107.28:102.99::TF,…" style="flex:1;min-width:12em"><button class="lv-btn" id="uwread">Read</button></div></details>
     <details class="info"><summary>Add a holding</summary><div class="row" style="display:flex;flex-wrap:wrap;gap:6px">
       <input id="uwsym" placeholder="Symbol" style="width:6em"><input id="uwq" type="number" placeholder="Shares" style="width:6em"><input id="uwe" type="number" step="any" placeholder="Buy price" style="width:7em">
       <input id="uwst" type="number" step="any" placeholder="Stop" style="width:7em"><input id="uwt" type="number" step="any" placeholder="Target (optional)" style="width:9em">
@@ -4840,6 +4842,9 @@ async function usWatchCard(box) {
   const ib = box.querySelector('#uswimp'); if (ib) ib.addEventListener('click', () => { const it = imp; done(); send({ items: it }, `Tracking ${it.length} US holdings`); });
   const nb = box.querySelector('#uswno'); if (nb) nb.addEventListener('click', () => { done(); usWatchCard(box); });
   box.querySelectorAll('[data-uswdel]').forEach((b) => b.addEventListener('click', (e) => e.preventDefault() || send({ remove: [b.dataset.uswdel] }, `Stopped tracking ${b.dataset.uswdel}`)));
+  box.querySelector('#uwread').addEventListener('click', () => { const v = box.querySelector('#uwpaste').value.trim(); const L = uswParse('#usw=' + v.replace(/^.*#usw=/, ''));
+    if (!L || !L.length) { alertMsg('Could not read that list. Paste the whole line, e.g. ACGL:7:107.28:102.99::TF'); return; }
+    state._uswImp = L; usWatchCard(box); });
   box.querySelector('#uwadd').addEventListener('click', () => { const v = (id) => box.querySelector(id).value;
     send({ items: [{ symbol: v('#uwsym'), qty: +v('#uwq'), entry: +v('#uwe'), stop: +v('#uwst'), target: v('#uwt') ? +v('#uwt') : null, system: v('#uwsys') }] }, 'Added'); });
 }
