@@ -3943,6 +3943,26 @@ function pfFromAngel(H, P) {
   const tag = Object.fromEntries(P.h.map((x) => [x.s, x.t]));
   return H.map((h) => ({ s: h.symbol, q: h.qty, a: +exact(h).toFixed(4), t: tag[h.symbol] || '', d: today() }));
 }
+/* 16 Nov 2026: US holdings (moomoo) in Portfolio, from the server's US watch list (or the copy on this phone) */
+async function pfUS(box) {
+  if (!box) return; let loc = []; try { loc = JSON.parse(localStorage.getItem('td.uswLocal') || '[]'); } catch (e) { /* */ }
+  const c = lvCfg(); let W = null;
+  if (c.url && c.token) { try { W = await lvApi('/api/us/watch', { timeout: 30000 }); } catch (e) { W = null; } }
+  const items = W && W.items.length ? W.items : loc.map((x) => ({ ...x, system: (USW_SYS.find((k) => k[0] === x.system) || [0, x.system])[1], price: null, pnl: null }));
+  if (!items.length) { box.innerHTML = ''; return; }
+  const $f = (v) => `${v < 0 ? '−' : ''}$${fmt(Math.abs(v), 2, 'en-US')}`;
+  const cost = items.reduce((a, r) => a + r.qty * r.entry, 0); const priced = items.every((r) => r.price);
+  const val = items.reduce((a, r) => a + r.qty * (r.price || r.entry), 0);
+  box.innerHTML = `<div class="card"><h3>US holdings · moomoo (US$)</h3>
+    <div class="facts"><div class="fact"><span>Invested</span><b>${$f(cost)}</b></div><div class="fact"><span>Value</span><b>${priced ? $f(val) : '–'}</b></div>
+      <div class="fact"><span>Unrealised</span><b class="${val - cost >= 0 ? 'up' : 'down'}">${priced ? `${val - cost >= 0 ? '+' : ''}${$f(val - cost)} (${fmt((val / cost - 1) * 100, 1)}%)` : '–'}</b></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Stock</th><th class="r">Now</th><th class="r">P&amp;L</th><th class="r">Stop</th></tr></thead><tbody>
+    ${items.slice().sort((a, b) => b.qty * (b.price || b.entry) - a.qty * (a.price || a.entry)).map((r) => { const pl = r.price ? r.qty * (r.price - r.entry) : null;
+      return `<tr class="pfus-row" style="cursor:pointer"><td>${esc(r.symbol)}<div class="co">${r.qty} × ${$f(r.entry)} · ${esc(r.system)}</div></td><td class="r">${r.price ? $f(r.price) : '–'}</td>
+        <td class="r ${pl == null ? '' : pl >= 0 ? 'up' : 'down'}">${pl == null ? '–' : `${pl >= 0 ? '+' : ''}${$f(pl)}`}${pl == null ? '' : `<div class="co">${fmt((r.price / r.entry - 1) * 100, 1)}%</div>`}</td><td class="r">${$f(r.stop)}</td></tr>`; }).join('')}
+    </tbody></table></div><p class="muted small">${priced ? 'Prices from Yahoo (about 15 min delayed outside US hours: last close).' : 'Prices show once your server has updated (after about 9:05 pm Melbourne).'} Tap a row for alerts and stops in Live › US.</p></div>`;
+  box.querySelectorAll('.pfus-row').forEach((tr) => tr.addEventListener('click', () => { state.lvMk = 'US'; try { localStorage.setItem('td.lvMk', 'US'); } catch (e) { /* */ } show('live'); }));
+}
 async function loadPortfolio() {
   $('#title').textContent = 'My portfolio';
   const el = $('#view-pf');
@@ -4004,13 +4024,14 @@ function renderPortfolio() {
             <div class="co">LTP ${r.ltp != null ? fmt(r.ltp, 2, 'en-IN') : '–'} <span class="${sgn(r.dch)}">${r.dch != null ? pct(r.dch) : ''}</span></div></div>
         </li>`).join('')}</ul>` : '<p class="empty">No holdings yet. Tap <b>Import</b> to load them from Angel One (when Live is connected), paste or load your broker\'s holdings CSV, or <b>+ Add</b> one at a time.</p>'}
     </div>
+    <div id="pfus"></div>
     ${P.c.length ? `<div class="card"><h3>Closed trades</h3><div class="table-wrap"><table>
       <thead><tr><th>Sold</th><th>Stock</th><th class="r">P&amp;L</th><th></th></tr></thead>
       <tbody>${P.c.map((c, j) => ({ ...c, j })).reverse().map((c) => `<tr><td>${day(c.xd)}</td><td>${esc(c.s)}<div class="co">${fmt(c.q, 0, 'en-IN')} × ${fmt(c.a, 2, 'en-IN')} → ${fmt(c.x, 2, 'en-IN')}</div></td>
         <td class="r ${sgn(c.q * (c.x - c.a))}">${inr(c.q * (c.x - c.a))}</td><td><button class="linkbtn" data-undo="${c.j}">undo</button></td></tr>`).join('')}</tbody></table></div></div>` : ''}
     <details class="card pf-fold owner-only"><summary><b>Wealth Creation · ETF Pie &amp; ETF rotation</b><span class="muted">monthly SIP plans</span></summary><div id="wccardpf"></div><div id="rotcard"></div></details>
     <p class="muted small pad">Your holdings are stored only in this app on this phone — never uploaded or shared. Use the download button to keep a backup (clearing Safari data erases them). Prices: every NSE stock, about 15 minutes delayed in market hours, otherwise the last close. P&amp;L is before brokerage and taxes.</p>`;
-  rotCard(); wcPie($("#wccardpf"), null);
+  rotCard(); wcPie($("#wccardpf"), null); pfUS($('#pfus'));
   $('#pf-add').onclick = () => pfForm();
   $('#pf-imp').onclick = () => pfImport();
   el.querySelectorAll('.pf-row').forEach((li) => (li.onclick = () => pfForm(+li.dataset.i)));
