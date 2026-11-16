@@ -647,3 +647,29 @@ def test_us_rsi2_orders(tmp_path, monkeypatch):
     A.us_sync(); J = A.us_journal(); assert J["pos"] == {} and J["closed"][-1]["why"] == "stop" and J["closed"][-1]["exit"] == 90.5
     A.et_now = lambda: datetime(2026, 11, 18, 17, 0, tzinfo=A.ET_TZ)
     assert c.post("/api/us/order", headers=h, json=body).status_code == 400                                     # market closed
+
+
+def test_us_watch_alerts_only(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    px = {"ACGL": 100.0, "CNC": 85.0, "BDX": 230.0}
+    A.yq = lambda sym, mk: dict(ltp=px[sym], low=px[sym], prev=px[sym], high=px[sym], open=px[sym], t=0)
+    r = c.post("/api/us/watch", headers=h, json={"items": [
+        {"symbol": "acgl", "qty": 7, "entry": 107.28, "stop": 97.6, "system": "ATH"},
+        {"symbol": "CNC", "qty": 12, "entry": 70.0, "stop": 65.63, "target": 84.87, "system": "RT"},
+        {"symbol": "BDX", "qty": 2, "entry": 213.02, "stop": 167.91, "system": "ATH"}]})
+    assert r.json()["n"] == 3
+    assert c.post("/api/us/watch", headers=h, json={"items": [{"symbol": "X", "qty": 1, "entry": 10, "stop": -1}]}).status_code == 400
+    g = c.get("/api/us/watch", headers=h).json()["items"]
+    assert {x["symbol"] for x in g} == {"ACGL", "CNC", "BDX"} and next(x for x in g if x["symbol"] == "ACGL")["system"] == "Monthly ATH"
+    A.mkt_plan = lambda mk: {"asof": "2026-11-13", "exits": [{"symbol": "BDX", "system": "Monthly ATH", "why": "weekly close below the 30-week SMA"},
+                                                              {"symbol": "ACGL", "system": "9/21 trend", "why": "other system"}]}
+    px["ACGL"] = 97.0
+    A.us_watch_check()
+    al = A.alerts_load()["items"]
+    kinds = {(x["symbol"], x["kind"]) for x in al}
+    assert ("ACGL", "stop") in kinds and ("CNC", "raised") in kinds and ("BDX", "exit") in kinds
+    assert not any(x["symbol"] == "ACGL" and "other system" in x["text"] for x in al)
+    n = len(al); A.us_watch_check(); assert len(A.alerts_load()["items"]) == n      # once per day
+    c.post("/api/us/watch", headers=h, json={"remove": ["CNC"]})
+    assert len(c.get("/api/us/watch", headers=h).json()["items"]) == 2

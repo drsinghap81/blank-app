@@ -1938,6 +1938,105 @@ def us_plan():
                 capital=US_CAPITAL, realized=round(J.get("realized", 0.0), 2), buys=buys, sells=sells, closed=J.get("closed", [])[-20:])
 
 
+# ------------------------------------------------------------------ US holdings you bought yourself (16 Nov 2026)
+# Positions bought in moomoo by hand from the app's US plan. ALERTS ONLY: the server never sells these. Kept in
+# DATA/us_watch.json on the server (never in the public repo). Checked every loop during US hours with Yahoo prices.
+US_SYS = {"ATH": "Monthly ATH", "RT": "Breakout retest", "T921": "9/21 trend", "MY": "My pick"}
+
+
+def _usw_path():
+    return os.path.join(DATA, "us_watch.json")
+
+
+def us_watch_load():
+    try:
+        return json.load(open(_usw_path()))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def us_watch_save(W):
+    tmp = _usw_path() + ".tmp"; json.dump(W, open(tmp, "w"), indent=1); os.replace(tmp, _usw_path())
+
+
+class USWatchItem(BaseModel):
+    symbol: str
+    qty: float
+    entry: float
+    stop: float
+    target: float | None = None
+    system: str = "My pick"
+
+
+class USWatch(BaseModel):
+    items: list[USWatchItem] = []
+    remove: list[str] = []
+
+
+@app.get("/api/us/watch")
+def us_watch_get(_=Depends(auth)):
+    W = us_watch_load(); out = []
+    for sym, w in sorted(W.items()):
+        q = None
+        try:
+            q = yq(sym, "US")
+        except Exception:  # noqa: BLE001
+            pass
+        px = q["ltp"] if q else None
+        out.append(dict(symbol=sym, **w, price=px, to_stop=round((px / w["stop"] - 1) * 100, 1) if px and w.get("stop") else None,
+                        pnl=round((px - w["entry"]) * w["qty"], 2) if px else None))
+    return dict(items=out, us_open=us_open(et_now()))
+
+
+@app.post("/api/us/watch")
+def us_watch_set(body: USWatch, _=Depends(auth)):
+    W = us_watch_load()
+    for it in body.items:
+        sym = re.sub(r"[^A-Z0-9.\-]", "", it.symbol.upper())[:10]
+        if not sym or it.qty <= 0 or it.entry <= 0 or it.stop <= 0 or it.stop >= it.entry * 1.5:
+            raise HTTPException(400, f"check {it.symbol}: qty, entry and stop must be positive")
+        sysn = US_SYS.get(it.system, it.system)[:30]
+        W[sym] = dict(qty=it.qty, entry=round(it.entry, 2), stop=round(it.stop, 2), target=round(it.target, 2) if it.target else None,
+                      system=sysn, since=W.get(sym, {}).get("since") or et_now().date().isoformat())
+    for sym in body.remove:
+        W.pop(sym.upper(), None)
+    us_watch_save(W)
+    return dict(ok=True, n=len(W))
+
+
+def us_watch_check(t=None):
+    """US hours: stop hit, within 3% of the stop, target reached; plus the US plan's sell signals. Alerts only."""
+    W = us_watch_load()
+    if not W:
+        return
+    t = t or et_now(); day = t.date().isoformat()
+    for sym, w in W.items():
+        try:
+            q = yq(sym, "US")
+        except Exception:  # noqa: BLE001
+            continue
+        px = q.get("ltp"); lo = q.get("low") or px
+        if not px:
+            continue
+        if lo <= w["stop"]:
+            alert("stop", sym, f"US {sym}: stop {w['stop']:.2f} hit (low {lo:.2f}, now {px:.2f}). You hold {w['qty']:g} in moomoo; sell there.",
+                  key=f"uswstop:{sym}:{day}")
+        elif px <= w["stop"] * 1.03:
+            alert("exit", sym, f"US {sym}: {px:.2f}, within 3% of the stop {w['stop']:.2f}.", key=f"uswnear:{sym}:{day}")
+        if w.get("target") and px >= w["target"]:
+            alert("raised", sym, f"US {sym}: target {w['target']:.2f} reached ({px:.2f}). Breakout retest rule: take the profit.",
+                  key=f"uswtgt:{sym}:{day}")
+    try:
+        P = mkt_plan("US")
+        for e in P.get("exits") or []:
+            sym = e.get("symbol"); w = W.get(sym)
+            if w and (not e.get("system") or e.get("system") == w.get("system")):
+                alert("exit", sym, f"US {sym}: sell signal ({e.get('system')}): {e.get('why') or 'exit rule met'}. Sell {w['qty']:g} at the next open.",
+                      key=f"uswexit:{sym}:{P.get('asof')}")
+    except Exception as ex:  # noqa: BLE001
+        log("us_watch_error", error=str(ex)[:200])
+
+
 class USOrder(BaseModel):
     id: str
     qty: int
@@ -2113,6 +2212,8 @@ def _loop():
                 pie_alerts()
             if us_open(et_now()) or (et_now().weekday() < 5 and et_now().hour == 16 and et_now().minute < 15):
                 us_sync()
+            if us_open(et_now()) and t.minute % 10 < 2:
+                us_watch_check()
         except Exception as ex:  # noqa: BLE001
             log("loop_error", error=str(ex)[:200])
         time.sleep(120)

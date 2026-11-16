@@ -899,7 +899,7 @@ async function loadLiveG(mk) {
       ${(Pp.log || []).length ? `<details style="margin-top:6px"><summary class="lv-sub">Paper fills and misses</summary><p class="lv-sub">${Pp.log.slice(0, 30).map(esc).join('<br>')}</p></details>` : ''}`;
   }
   el.innerHTML = `${lvSeg()}<div class="lv-card" style="border-left:5px solid var(--fall)"><b>Paper-trading phase · you place orders yourself on moomoo</b>
-      <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>
+      <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>${mk === 'US' ? '<div id="usw"></div>' : ''}
     <div class="lv-card"><b>Paper record</b>${paper}</div>
     ${lvBucketCard(mk, P, alG, inUseG, null)}
     <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Momentum Investing · max ${alG.mom}% · top ${rows.length}</b>${capInput(mk, 'lvcapg')}</div>
@@ -909,6 +909,7 @@ async function loadLiveG(mk) {
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
   lvSegWire(el); lvBucketWire(el, mk, null); wireCap('lvcapg', mk, () => loadLive());
+  if (mk === 'US') usWatchCard($('#usw'));
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', () => { try { localStorage.setItem('td.lvN_' + mk, ns.value); localStorage.removeItem(selKey(mk, P.asof)); } catch (e) { /* private mode */ } lvKeep(); });
   lvSelWire(el, mk, P.asof, rows, nP, selG);
   el.querySelectorAll('.vcp-ch').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); vcpSelect(swR[+a.dataset.v], mk); }));
@@ -4783,6 +4784,45 @@ async function tdRsi2(box) {
   if (c.url && c.token) { box.querySelector('details').addEventListener('toggle', (e) => { if (e.target.open && !up.dataset.done) usPlanLoad(up); }, { once: false }); }
   else up.innerHTML = '<p class="muted td-rs">Connect the server on the Live tab to send these orders to moomoo.</p>';
 }
+/* 16 Nov 2026: US shares you bought yourself in moomoo (from this plan). The server only WATCHES them: stop hit, within 3%
+   of the stop, retest target, and the plan's sell signals -> alert. It never sells them. Kept on the server, not in the repo.
+   A link like …/#usw=ACGL:7:107.28:82.96::ATH,CNC:12:70:65.63:84.87:RT opens an "add these" box (nothing saved until you tap). */
+const USW_SYS = [['ATH', 'Monthly ATH'], ['RT', 'Breakout retest'], ['T921', '9/21 trend'], ['MY', 'My pick']];
+function uswParse(h) {
+  const m = /^#usw=(.+)$/.exec(h || ''); if (!m) return null;
+  return decodeURIComponent(m[1]).split(',').map((x) => { const [symbol, qty, entry, stop, target, system] = x.split(':');
+    return { symbol: (symbol || '').toUpperCase(), qty: +qty, entry: +entry, stop: +stop, target: target ? +target : null, system: system || 'MY' }; })
+    .filter((x) => x.symbol && x.qty > 0 && x.entry > 0 && x.stop > 0);
+}
+async function usWatchCard(box) {
+  if (!box) return; const c = lvCfg();
+  if (!c.url || !c.token) { box.innerHTML = '<div class="lv-card"><b>Your moomoo holdings</b><p class="lv-sub">Connect your server on the India tab to track the US shares you bought.</p></div>'; return; }
+  const imp = uswParse(location.hash) || state._uswImp; if (imp) state._uswImp = imp;
+  const $f = (v) => (v == null ? '–' : `$${fmt(v, 2, 'en-US')}`);
+  let W; try { W = await lvApi('/api/us/watch', { timeout: 30000 }); } catch (e) { box.innerHTML = `<div class="lv-card"><b>Your moomoo holdings</b><p class="down lv-sub">Couldn't load: ${esc(e.message)}</p></div>`; return; }
+  const sysN = (k) => (USW_SYS.find((x) => x[0] === k) || [k, k])[1];
+  const rows = W.items.map((r) => `<div class="lv-row"><div class="lv-main"><b>${esc(r.symbol)}</b> <small class="muted">${esc(r.system)} · ${r.qty} @ ${$f(r.entry)}</small>
+      <div class="lv-sub">now ${$f(r.price)} · stop ${$f(r.stop)}${r.to_stop != null ? ` (<b class="${r.to_stop < 3 ? 'down' : ''}">${fmt(r.to_stop, 1)}% above</b>)` : ''}${r.target ? ` · target ${$f(r.target)}` : ''}${r.pnl != null ? ` · <b class="${r.pnl >= 0 ? 'up' : 'down'}">${r.pnl >= 0 ? '+' : '−'}${$f(Math.abs(r.pnl))}</b>` : ''}</div></div>
+      <button class="lv-link" data-uswdel="${esc(r.symbol)}">Remove</button></div>`).join('');
+  box.innerHTML = `<div class="lv-card" data-fold="skip"><b>Your moomoo holdings · alerts only</b>
+    <p class="lv-sub">You get a phone alert when a stop is hit, a price is within 3% of its stop, a retest reaches its target, or the plan lists a sell. The app never sells these; you sell in moomoo.</p>
+    ${imp ? `<div class="status exit watch"><b>Add ${imp.length} holdings from your link?</b><div class="lv-sub">${imp.map((x) => `${esc(x.symbol)} ${x.qty} @ ${$f(x.entry)} · stop ${$f(x.stop)}${x.target ? ` · target ${$f(x.target)}` : ''} · ${esc(sysN(x.system))}`).join('<br>')}</div>
+      <button class="lv-btn" id="uswimp">Add these ${imp.length}</button> <button class="lv-link" id="uswno">Not now</button></div>` : ''}
+    ${rows || '<p class="empty">Nothing tracked yet.</p>'}
+    <details class="info"><summary>Add a holding</summary><div class="row" style="display:flex;flex-wrap:wrap;gap:6px">
+      <input id="uwsym" placeholder="Symbol" style="width:6em"><input id="uwq" type="number" placeholder="Shares" style="width:6em"><input id="uwe" type="number" step="any" placeholder="Buy price" style="width:7em">
+      <input id="uwst" type="number" step="any" placeholder="Stop" style="width:7em"><input id="uwt" type="number" step="any" placeholder="Target (optional)" style="width:9em">
+      <select id="uwsys">${USW_SYS.map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select><button class="lv-btn" id="uwadd">Add</button></div></details>
+    <p class="lv-sub" id="uwmsg"></p></div>`;
+  const send = async (body, msg) => { const m = box.querySelector('#uwmsg');
+    try { await lvApi('/api/us/watch', { method: 'POST', body: JSON.stringify(body) }); alertMsg(msg, true); usWatchCard(box); } catch (e) { m.className = 'down lv-sub'; m.textContent = e.message; } };
+  const done = () => { state._uswImp = null; if (/^#usw=/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search + '#live'); };
+  const ib = box.querySelector('#uswimp'); if (ib) ib.addEventListener('click', () => { const it = imp; done(); send({ items: it }, `Tracking ${it.length} US holdings`); });
+  const nb = box.querySelector('#uswno'); if (nb) nb.addEventListener('click', () => { done(); usWatchCard(box); });
+  box.querySelectorAll('[data-uswdel]').forEach((b) => b.addEventListener('click', () => send({ remove: [b.dataset.uswdel] }, `Stopped tracking ${b.dataset.uswdel}`)));
+  box.querySelector('#uwadd').addEventListener('click', () => { const v = (id) => box.querySelector(id).value;
+    send({ items: [{ symbol: v('#uwsym'), qty: +v('#uwq'), entry: +v('#uwe'), stop: +v('#uwst'), target: v('#uwt') ? +v('#uwt') : null, system: v('#uwsys') }] }, 'Added'); });
+}
 /* 14 Nov 2026: send RSI(2) orders to moomoo through the server (same as Angel: typed confirmation, Live switch, server
    checks the live rules again). Paper account unless the server's .env says MOOMOO_ENV=REAL. */
 async function usPlanLoad(el) {
@@ -5462,6 +5502,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
   if (!modeNow() && used) setMode('pro');
   applyMode();
   let back = null; try { back = sessionStorage.getItem('td.reopen'); sessionStorage.removeItem('td.reopen'); } catch (e) { /* */ }
+  if (/^#usw=/.test(location.hash)) { back = 'live'; state.lvMk = 'US'; state._uswImp = uswParse(location.hash); }   // 16 Nov 2026: US holdings import link
   if (modeNow() === 'beginner') bgShow('today'); else if (!modeNow()) bgShow('welcome'); else show(back && document.getElementById('view-' + back) ? back : 'today');
 }
 /* 12 Nov 2026: new-version check. An app opened from the home screen resumes without reloading, so it never noticed
