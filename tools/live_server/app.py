@@ -2136,6 +2136,34 @@ def condor_alerts():
         alert("setup", x["key"], txt, key=f"condor:{x['key']}:{x.get('date')}", mk="US" if x.get("market") == "US" else "NSE")
 
 
+_HIST = {}
+
+
+@app.get("/api/history")
+def history(mk: str = "NSE", syms: str = "", rng: str = "1y", _=Depends(auth)):
+    """16 Nov 2026: daily closes for the portfolio chart (Yahoo; NSE symbols get .NS, ^ indices as given). Cached 1 hour."""
+    if rng not in ("3mo", "6mo", "1y", "2y"):
+        raise HTTPException(400, "range must be 3mo, 6mo, 1y or 2y")
+    out = {}
+    for sym in [x for x in syms.split(",") if x][:80]:
+        sym = re.sub(r"[^A-Za-z0-9.\-^&]", "", sym)[:20]
+        y = sym if sym.startswith("^") else (sym.replace(".", "-") if mk == "US" else sym + ".NS")
+        k = (y, rng); c = _HIST.get(k)
+        if c and time.time() - c[0] < 3600:
+            out[sym] = c[1]; continue
+        try:
+            r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{y}", params=dict(interval="1d", range=rng),
+                             headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
+            r.raise_for_status(); res = r.json()["chart"]["result"][0]
+            cl = res["indicators"]["quote"][0]["close"]
+            d = dict(t=[datetime.fromtimestamp(ts, timezone.utc).date().isoformat() for ts, x in zip(res["timestamp"], cl) if x is not None],
+                     c=[round(x, 4) for x in cl if x is not None])
+            _HIST[k] = (time.time(), d); out[sym] = d
+        except Exception as ex:  # noqa: BLE001
+            out[sym] = dict(error=str(ex)[:80])
+    return out
+
+
 class USOrder(BaseModel):
     id: str
     qty: int

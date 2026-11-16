@@ -717,3 +717,16 @@ def test_condor_alerts(tmp_path):
     finally:
         if had: open(p, "w").write(old)
         else: os.remove(p)
+
+
+def test_history(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    class R:
+        def raise_for_status(self): pass
+        def json(self): return {"chart": {"result": [{"timestamp": [1763337600, 1763424000], "indicators": {"quote": [{"close": [100.0, 101.5]}]}}]}}
+    seen = []
+    A.requests.get = lambda url, **k: (seen.append(url), R())[1]
+    j = c.get("/api/history?mk=NSE&syms=TCS,^NSEI&rng=1y", headers=h).json()
+    assert j["TCS"]["c"] == [100.0, 101.5] and seen[0].endswith("/TCS.NS") and seen[1].endswith("/^NSEI")
+    assert c.get("/api/history?rng=10y", headers=h).status_code == 400

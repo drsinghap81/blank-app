@@ -3969,6 +3969,51 @@ async function usStopsToday(anchor) {
   el.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { state.lvMk = 'US'; try { localStorage.setItem('td.lvMk', 'US'); } catch (e) { /* */ } show('live'); }));
   anchor.after(el);
 }
+/* 16 Nov 2026: holdings chart. Sum = today's quantities x each day's close (what the current holdings were worth then);
+   Normalized = every stock rebased to 100 on the first day and averaged (equal weight), against the market index.
+   Daily closes come from your server (/api/history, Yahoo). */
+async function pfChart(box) {
+  if (!box) return; const c = lvCfg();
+  if (!c.url || !c.token) { box.innerHTML = '<div class="card"><h3>Holdings chart</h3><p class="muted small">Connect your server on the Live tab to draw it.</p></div>'; return; }
+  const st = state.pfc = state.pfc || { mk: 'NSE', mode: 'sum', rng: '6mo' };
+  const india = pfLoad().h.map((h) => ({ s: h.s, q: h.q }));
+  let us = []; try { const W = await lvApi('/api/us/watch', { timeout: 20000 }); us = (W.items || []).map((r) => ({ s: r.symbol, q: r.qty })); } catch (e) {
+    try { us = JSON.parse(localStorage.getItem('td.uswLocal') || '[]').map((r) => ({ s: r.symbol, q: r.qty })); } catch (e2) { /* */ } }
+  const H = st.mk === 'US' ? us : india; const idx = st.mk === 'US' ? '^GSPC' : '^NSEI'; const idxName = st.mk === 'US' ? 'S&P 500' : 'Nifty 50';
+  const cur = st.mk === 'US' ? '$' : '₹';
+  const tabs = (k, opts) => `<div class="seg" style="margin:6px 0">${opts.map(([v, n]) => `<button data-pc="${k}" data-v="${v}" aria-selected="${st[k] === v}">${n}</button>`).join('')}</div>`;
+  box.innerHTML = `<div class="card"><h3>Holdings chart</h3>${tabs('mk', [['NSE', 'India'], ['US', 'US']])}${tabs('mode', [['sum', 'Sum (value)'], ['norm', 'Normalized (=100)']])}${tabs('rng', [['3mo', '3M'], ['6mo', '6M'], ['1y', '1Y']])}
+    <div class="chart" id="pfcc" style="height:240px"><p class="muted pad">${H.length ? 'Loading prices…' : 'No holdings for this market.'}</p></div><p class="muted small" id="pfcn"></p></div>`;
+  box.querySelectorAll('[data-pc]').forEach((b) => b.addEventListener('click', () => { st[b.dataset.pc] = b.dataset.v; pfChart(box); }));
+  if (!H.length) return;
+  let D; try { D = await lvApi(`/api/history?mk=${st.mk}&rng=${st.rng}&syms=${encodeURIComponent(H.map((h) => h.s).concat(idx).join(','))}`, { timeout: 60000 }); }
+  catch (e) { $('#pfcc').innerHTML = `<p class="down pad">Couldn't load prices: ${esc(e.message)}</p>`; return; }
+  const ok = H.filter((h) => D[h.s] && D[h.s].c && D[h.s].c.length > 1); const miss = H.filter((h) => !ok.includes(h)).map((h) => h.s);
+  const dates = [...new Set(ok.flatMap((h) => D[h.s].t))].sort();
+  const series = (sym) => { const m = new Map(D[sym].t.map((t, i) => [t, D[sym].c[i]])); let last = null; const first = D[sym].c[0];
+    return dates.map((t) => { if (m.has(t)) last = m.get(t); return last == null ? first : last; }); };   // carry forward; before listing = first close
+  const box2 = $('#pfcc'); box2.innerHTML = '';
+  const ch = window.LightweightCharts.createChart(box2, { ...chartBase(), height: 240, width: box2.clientWidth });
+  const fmtv = (v) => `${cur}${fmt(v, 0, st.mk === 'US' ? 'en-US' : 'en-IN')}`;
+  if (st.mode === 'sum') {
+    const tot = dates.map((_, i) => ok.reduce((a, h) => a + h.q * series(h.s)[i], 0));
+    ch.addAreaSeries({ lineColor: C.ink, topColor: 'rgba(124,140,255,.25)', bottomColor: 'rgba(124,140,255,0)', lineWidth: 2, priceLineVisible: false })
+      .setData(dates.map((t, i) => ({ time: t, value: tot[i] })));
+    const ch1 = (tot[tot.length - 1] / tot[0] - 1) * 100;
+    $('#pfcn').textContent = `Today's holdings (${ok.length} stocks, today's quantities) were worth ${fmtv(tot[0])} on ${day(dates[0])} and ${fmtv(tot[tot.length - 1])} now: ${ch1 >= 0 ? '+' : ''}${fmt(ch1, 1)}%.${miss.length ? ` No prices: ${miss.join(', ')}.` : ''}`;
+  } else {
+    const norm = ok.map((h) => { const v = series(h.s); return v.map((x) => x / v[0] * 100); });
+    const avg = dates.map((_, i) => norm.reduce((a, v) => a + v[i], 0) / norm.length);
+    norm.forEach((v) => ch.addLineSeries({ color: 'rgba(150,150,170,.25)', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
+      .setData(dates.map((t, i) => ({ time: t, value: v[i] }))));
+    if (D[idx] && D[idx].c) { const v = series(idx); ch.addLineSeries({ color: '#9CA3AF', lineWidth: 2, lineStyle: 2, priceLineVisible: false, title: idxName })
+      .setData(dates.map((t, i) => ({ time: t, value: v[i] / v[0] * 100 }))); }
+    ch.addLineSeries({ color: C.ink, lineWidth: 3, priceLineVisible: false, title: 'holdings' }).setData(dates.map((t, i) => ({ time: t, value: avg[i] })));
+    const iv = D[idx] && D[idx].c ? series(idx) : null;
+    $('#pfcn').textContent = `Each stock = 100 on ${day(dates[0])}; thick line = their average (equal weight) ${fmt(avg[avg.length - 1] - 100, 1)}%${iv ? `, dashed = ${idxName} ${fmt((iv[iv.length - 1] / iv[0] - 1) * 100, 1)}%` : ''}; thin lines = each stock.${miss.length ? ` No prices: ${miss.join(', ')}.` : ''}`;
+  }
+  ch.timeScale().fitContent();
+}
 /* 16 Nov 2026: US holdings (moomoo) in Portfolio, from the server's US watch list (or the copy on this phone) */
 async function pfUS(box) {
   if (!box) return; let loc = []; try { loc = JSON.parse(localStorage.getItem('td.uswLocal') || '[]'); } catch (e) { /* */ }
@@ -4050,14 +4095,14 @@ function renderPortfolio() {
             <div class="co">LTP ${r.ltp != null ? fmt(r.ltp, 2, 'en-IN') : '–'} <span class="${sgn(r.dch)}">${r.dch != null ? pct(r.dch) : ''}</span></div></div>
         </li>`).join('')}</ul>` : '<p class="empty">No holdings yet. Tap <b>Import</b> to load them from Angel One (when Live is connected), paste or load your broker\'s holdings CSV, or <b>+ Add</b> one at a time.</p>'}
     </div>
-    <div id="pfus"></div>
+    <div id="pfchart"></div><div id="pfus"></div>
     ${P.c.length ? `<div class="card"><h3>Closed trades</h3><div class="table-wrap"><table>
       <thead><tr><th>Sold</th><th>Stock</th><th class="r">P&amp;L</th><th></th></tr></thead>
       <tbody>${P.c.map((c, j) => ({ ...c, j })).reverse().map((c) => `<tr><td>${day(c.xd)}</td><td>${esc(c.s)}<div class="co">${fmt(c.q, 0, 'en-IN')} × ${fmt(c.a, 2, 'en-IN')} → ${fmt(c.x, 2, 'en-IN')}</div></td>
         <td class="r ${sgn(c.q * (c.x - c.a))}">${inr(c.q * (c.x - c.a))}</td><td><button class="linkbtn" data-undo="${c.j}">undo</button></td></tr>`).join('')}</tbody></table></div></div>` : ''}
     <details class="card pf-fold owner-only"><summary><b>Wealth Creation · ETF Pie &amp; ETF rotation</b><span class="muted">monthly SIP plans</span></summary><div id="wccardpf"></div><div id="rotcard"></div></details>
     <p class="muted small pad">Your holdings are stored only in this app on this phone — never uploaded or shared. Use the download button to keep a backup (clearing Safari data erases them). Prices: every NSE stock, about 15 minutes delayed in market hours, otherwise the last close. P&amp;L is before brokerage and taxes.</p>`;
-  rotCard(); wcPie($("#wccardpf"), null); pfUS($('#pfus'));
+  rotCard(); wcPie($("#wccardpf"), null); pfUS($('#pfus')); pfChart($('#pfchart'));
   $('#pf-add').onclick = () => pfForm();
   $('#pf-imp').onclick = () => pfImport();
   el.querySelectorAll('.pf-row').forEach((li) => (li.onclick = () => pfForm(+li.dataset.i)));
