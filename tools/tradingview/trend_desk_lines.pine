@@ -2,9 +2,9 @@
 // Add to any chart (Pine Editor > paste > Add to chart). It redraws on every symbol and timeframe you open.
 //   Blue  = support line through the 2 latest swing lows that no candle cuts (rising only)
 //   Red   = resistance line through the 2 latest swing highs that no candle cuts (any slope)
-//   Green dashed  = latest swing low level, drawn flat to the right (until a close goes below it)
-//   Orange dashed = latest swing high level, drawn flat to the right (until a close goes above it)
-// Swing low / high = lowest low / highest high with 3 bars each side. Alerts: create an alert on this indicator with
+//   Green dashed  = latest PROMINENT swing low level, flat to the right (price rose 3 x ATR off it; until a close goes below it)
+//   Orange dashed = latest PROMINENT swing high level, flat to the right (price fell 3 x ATR off it; until a close goes above it)
+// Lines: swing low / high = lowest low / highest high with 3 bars each side. Levels: 5 bars each side. Alerts: create an alert on this indicator with
 // "Any alert() function call" - it fires when price comes within 1% of any of the four lines. Watch only, not a buy signal.
 //@version=5
 indicator("Trend Desk - swing lines & levels", shorttitle="TD lines", overlay=true, max_lines_count=30, max_labels_count=30, max_bars_back=1000)
@@ -15,6 +15,8 @@ showRes = input.bool(true, "Resistance line (2 latest swing highs)")
 showLvL = input.bool(true, "Swing low level")
 showLvH = input.bool(true, "Swing high level")
 nearPct = input.float(1.0, "Alert when within %", minval=0.1, step=0.1)
+KL      = input.int(5, "Levels: swing bars each side", minval=2, maxval=20)
+PROM    = input.float(3.0, "Levels: prominent = move of x ATR(14) away", minval=0.5, step=0.5)
 TOL  = 0.001
 MAXP = 40
 LOOK = 250
@@ -23,6 +25,32 @@ var pLoI = array.new_int()
 var pLoV = array.new_float()
 var pHiI = array.new_int()
 var pHiV = array.new_float()
+
+var lLoI = array.new_int()
+var lLoV = array.new_float()
+var lLoA = array.new_float()
+var lHiI = array.new_int()
+var lHiV = array.new_float()
+var lHiA = array.new_float()
+atr14 = ta.atr(14)
+lpl = ta.pivotlow(low, KL, KL)
+lph = ta.pivothigh(high, KL, KL)
+if not na(lpl)
+    array.push(lLoI, bar_index - KL)
+    array.push(lLoV, lpl)
+    array.push(lLoA, atr14[KL])
+    if array.size(lLoI) > MAXP
+        array.shift(lLoI)
+        array.shift(lLoV)
+        array.shift(lLoA)
+if not na(lph)
+    array.push(lHiI, bar_index - KL)
+    array.push(lHiV, lph)
+    array.push(lHiA, atr14[KL])
+    if array.size(lHiI) > MAXP
+        array.shift(lHiI)
+        array.shift(lHiV)
+        array.shift(lHiA)
 
 pl = ta.pivotlow(low, K, K)
 ph = ta.pivothigh(high, K, K)
@@ -85,24 +113,31 @@ bestLine(int[] idx, float[] val, bool isLow) =>
                         break
     [ra, rva, rb, rvb]
 
-// Latest swing point drawn flat, unless a close has crossed it since.
-levelOf(int[] idx, float[] val, bool isHigh) =>
+// Latest prominent swing point drawn flat: not crossed by a close since, and price moved PROM x ATR away from it.
+levelOf(int[] idx, float[] val, float[] atrs, bool isHigh) =>
     int   rb = na
     float rv = na
     n = array.size(idx)
     if n > 0
-        b = array.get(idx, n - 1)
-        v = array.get(val, n - 1)
-        broken = false
-        if b < bar_index
-            for i = b + 1 to bar_index
-                cl = close[bar_index - i]
-                if isHigh ? cl > v : cl < v
-                    broken := true
-                    break
-        if not broken
-            rb := b
-            rv := v
+        for j = n - 1 to 0
+            b = array.get(idx, j)
+            v = array.get(val, j)
+            a = array.get(atrs, j)
+            if bar_index - b > LOOK or na(a)
+                break
+            broken = false
+            far = 0.0
+            if b < bar_index
+                for i = b + 1 to bar_index
+                    cl = close[bar_index - i]
+                    if isHigh ? cl > v : cl < v
+                        broken := true
+                        break
+                    far := math.max(far, isHigh ? v - low[bar_index - i] : high[bar_index - i] - v)
+            if not broken and far >= PROM * a
+                rb := b
+                rv := v
+                break
     [rb, rv]
 
 var line lSup = na
@@ -145,13 +180,13 @@ if barstate.islast
             if near(now2)
                 msg += "resistance line " + str.tostring(now2, format.mintick) + "; "
     if showLvL
-        [b3, v3] = levelOf(pLoI, pLoV, false)
+        [b3, v3] = levelOf(lLoI, lLoV, lLoA, false)
         if not na(b3)
             lLvL := line.new(b3, v3, bar_index, v3, xloc=xloc.bar_index, extend=extend.right, color=color.new(#22c55e, 0), width=1, style=line.style_dashed)
             if near(v3)
                 msg += "swing low level " + str.tostring(v3, format.mintick) + "; "
     if showLvH
-        [b4, v4] = levelOf(pHiI, pHiV, true)
+        [b4, v4] = levelOf(lHiI, lHiV, lHiA, true)
         if not na(b4)
             lLvH := line.new(b4, v4, bar_index, v4, xloc=xloc.bar_index, extend=extend.right, color=color.new(#f59e0b, 0), width=1, style=line.style_dashed)
             if near(v4)

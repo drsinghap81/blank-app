@@ -99,18 +99,27 @@ def res_row(t, h, l, c):
                 dist=round(float((line(n) / c[-1] - 1) * 100), 2), armed=bool(armed_next), touches=touches, above=bool(c[-1] > line(n - 1)))
 
 
-def level_rows(t, h, l, c, K=3):
-    """17 Nov 2026: horizontal levels. The latest swing high (highest wick with K days each side) drawn flat to the right
-    while no close has gone above it (resistance), and the latest swing low drawn flat while no close has gone below it
-    (support). Alert when price comes back within 1% after 5 closes more than 1% away."""
+def level_rows(t, h, l, c, K=5, PROM=3.0):
+    """17 Nov 2026: horizontal levels from the latest PROMINENT swing. Swing high = highest wick with K days each side,
+    prominent = price fell at least PROM x ATR(14) below it afterwards (a real turn, not a pause); still unbroken (no close
+    above it since). Drawn flat to the right as resistance. Swing low = the mirror (support). Alert when price comes back
+    within 1% after 5 closes more than 1% away."""
     n = len(c); h = np.asarray(h, float); l = np.asarray(l, float); c = np.asarray(c, float); out = []
+    pc = np.r_[c[0], c[:-1]]; atr = pd.Series(np.maximum(h - l, np.maximum(abs(h - pc), abs(l - pc)))).rolling(14, min_periods=5).mean().values
     for side, x in (("res", h), ("sup", l)):
         piv = [i for i in range(K, n - K) if (x[i] == x[i - K:i + K + 1].max() if side == "res" else x[i] == x[i - K:i + K + 1].min())]
-        if not piv:
+        b = None
+        for i in reversed(piv):
+            if not np.isfinite(atr[i]):
+                break
+            if (c[i + 1:] > x[i]).any() if side == "res" else (c[i + 1:] < x[i]).any():
+                continue                               # broken: price closed through it
+            move = (x[i] - l[i + 1:].min()) if side == "res" else (h[i + 1:].max() - x[i])
+            if move >= PROM * atr[i]:
+                b = i; break
+        if b is None:
             continue
-        b = piv[-1]; v = x[b]
-        if (c[b + 1:] > v).any() if side == "res" else (c[b + 1:] < v).any():
-            continue                                   # already broken: no level to approach
+        v = x[b]
         away = (lambda k: c[k] < v * 0.99) if side == "res" else (lambda k: c[k] > v * 1.01)
         hit = (lambda i: h[i] >= v * 0.99) if side == "res" else (lambda i: l[i] <= v * 1.01)
         touches, armed = 1, False
@@ -162,8 +171,8 @@ def main():
                 nm, mk, kind = names[y]
                 r = dict(y=y, tv=tv_sym(y), symbol=nm, mk=mk, kind=kind, **({"side": "sup"} | r))
                 if r["armed"] and r["dist"] <= 3:          # the app's "near the line" list draws this chart on tap
-                    g = df.iloc[-160:]; rd = lambda a: [round(float(x), 2) for x in a]  # noqa: E731
-                    r["bars"] = dict(t=t[-160:], o=rd(g.Open), h=rd(g.High), l=rd(g.Low), c=rd(g.Close))
+                    g = df.iloc[-260:]; rd = lambda a: [round(float(x), 2) for x in a]  # noqa: E731
+                    r["bars"] = dict(t=t[-260:], o=rd(g.Open), h=rd(g.High), l=rd(g.Low), c=rd(g.Close))
                 rows.append(r)
     rows.sort(key=lambda r: (not r["armed"], r["dist"]))
     near = [(r["symbol"], r["side"] + ("-level" if r.get("flat") else ""), r["dist"]) for r in rows if r["armed"] and r["dist"] <= 3]
