@@ -1082,3 +1082,9 @@ body.pub .owner-only { display: none !important; }
 .t2-flash{animation:t2flash 1.4s ease}
 @keyframes t2flash{0%,40%{background:rgba(232,163,61,.22)}100%{background:transparent}}
 #t2sell,#t2both,#t2mom,#t2adds,#t2tur{scroll-margin-top:110px}
+
+/* 16 Nov 2026: iron condor setups card on Today */
+.cd-box{padding:4px 14px 12px;display:flex;flex-direction:column;gap:8px}
+.cd-row{border-top:1px solid color-mix(in srgb,currentColor 14%,transparent);padding-top:10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.cd-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:17px}
+.cd-row .lv-sub{font-size:15px;line-height:1.45}

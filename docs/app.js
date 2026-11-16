@@ -3951,14 +3951,14 @@ async function condorCard(box, mk) {
   const chip = { ON: ['up', 'Setup ON · enter'], wait: ['', 'Setup · wait for 2–4 days to expiry'], watch: ['', 'Big move · waiting for a pause'], off: ['muted', 'No setup'] };
   const f = (v) => fmt(v, v >= 1000 ? 0 : 2, 'en-IN');
   const row = (r) => { const [cls, lab] = chip[r.status] || ['muted', r.status];
-    return `<div class="lv-row"><div><div class="lv-sym">${esc(r.name)} <span class="chip ${cls}">${lab}</span>${r.tested ? ' <span class="chip">tested</span>' : ' <span class="chip muted">untested</span>'}</div>
+    return `<div class="cd-row"><div class="cd-h"><b>${esc(r.name)}</b> <span class="chip ${cls}">${lab}</span>${r.tested ? ' <span class="chip">tested</span>' : ' <span class="chip muted">untested</span>'}</div>
       <div class="lv-sub">${r.move10 >= 0 ? '+' : ''}${fmt(r.move10, 1)}% in 10 days (need ±3.5%) · 3-day range ${fmt(r.range3, 1)}% (need &lt;2%) · next expiry ${esc(r.expiry_day)}, ${r.days_to_expiry} trading days</div>
-      ${r.status === 'ON' || r.status === 'wait' ? `<div class="lv-sub"><b>Sell ${f(r.short_call)} CE + ${f(r.short_put)} PE · buy ${f(r.long_call)} CE + ${f(r.long_put)} PE</b> (2% shorts, 1% wings, from ${f(r.close)}) · hold to expiry · ${esc(r.how)}</div>` : ''}</div><div></div></div>`; };
+      ${r.status === 'ON' || r.status === 'wait' ? `<div class="lv-sub"><b>Sell ${f(r.short_call)} CE + ${f(r.short_put)} PE · buy ${f(r.long_call)} CE + ${f(r.long_put)} PE</b> (2% shorts, 1% wings, from ${f(r.close)}) · hold to expiry · ${esc(r.how)}</div>` : ''}</div>`; };
   const top = R.filter(mine); const rest = R.filter((r) => !mine(r));
   box.innerHTML = `<details class="t2-more t2-wd" ${on.some(mine) ? 'open' : ''}><summary>🦅 Iron condor setups · ${on.length ? `<b class="up">${on.length} ON</b>: ${on.map((r) => esc(r.name)).join(', ')}` : 'none on now'}</summary>
-    <p class="lv-sub">${esc(D.rule)}</p><p class="lv-sub muted">${esc(D.test)} Margin: pledged holdings count as collateral, but about half of F&amp;O margin must be cash or cash-like. Watch only: you place the orders.</p>
+    <div class="cd-box"><p class="lv-sub">${esc(D.rule)}</p><p class="lv-sub muted">${esc(D.test)} Margin: pledged holdings count as collateral, but about half of F&amp;O margin must be cash or cash-like. Watch only: you place the orders.</p>
     ${top.map(row).join('')}${rest.length ? `<details class="t2-more"><summary>Other indices (${rest.length})</summary>${rest.map(row).join('')}</details>` : ''}
-    <p class="lv-sub muted">Updated ${esc(D.generated)}. You get a phone alert when one turns ON.</p></details>`;
+    <p class="lv-sub muted">Updated ${esc(D.generated)}. You get a phone alert when one turns ON.</p></div></details>`;
 }
 /* 16 Nov 2026: US holdings (moomoo) in Portfolio, from the server's US watch list (or the copy on this phone) */
 async function pfUS(box) {
