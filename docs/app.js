@@ -3945,21 +3945,27 @@ function pfFromAngel(H, P) {
 }
 /* 16 Nov 2026: "pause after a big move" iron condor setups on liquid indices (tools/condor_signal.py). Watch only. */
 async function condorCard(box, mk) {
+  /* 16 Nov 2026 (v2): Today shows one compact line only when a tested setup is ON for this market; details on tap. */
   if (!box) return; const D = await getJSON(MAIN + 'data/scan/condor_signal.json', 'condor').catch(() => null); if (!D || !D.rows) { box.innerHTML = ''; return; }
-  const mine = (r) => (mk === 'US' ? r.market === 'US' : mk === 'NSE' ? r.market === 'NSE' : true);
-  const R = D.rows.filter((r) => r.status !== 'no data'); const on = R.filter((r) => r.status === 'ON' && (r.grade || 'good') === 'good');
-  const chip = { ON: ['up', 'Setup ON · enter'], wait: ['', 'Setup · wait for 2–4 days to expiry'], watch: ['', 'Big move · waiting for a pause'], off: ['muted', 'No setup'] };
-  const f = (v) => fmt(v, v >= 1000 ? 0 : 2, 'en-IN');
-  const row = (r) => { const [cls, lab] = r.status === 'ON' && r.grade && r.grade !== 'good' ? ['', 'Setup, but this index is weak in the test'] : chip[r.status] || ['muted', r.status];
-    return `<div class="cd-row"><div class="cd-h"><b>${esc(r.name)}</b> <span class="chip ${cls}">${lab}</span>${r.grade === 'good' || (!r.grade && r.tested) ? ' <span class="chip up">works in test</span>' : r.grade === 'fail' ? ' <span class="chip down">fails in test</span>' : ' <span class="chip muted">weak in test</span>'}</div>
-      ${r.grade_note ? `<div class="lv-sub muted">Backtest: ${esc(r.grade_note)}</div>` : ''}
-      <div class="lv-sub">${r.move10 >= 0 ? '+' : ''}${fmt(r.move10, 1)}% in 10 days (need ±3.5%) · 3-day range ${fmt(r.range3, 1)}% (need &lt;2%) · next expiry ${esc(r.expiry_day)}, ${r.days_to_expiry} trading days</div>
-      ${r.status === 'ON' || r.status === 'wait' ? `<div class="lv-sub"><b>Sell ${f(r.short_call)} CE + ${f(r.short_put)} PE · buy ${f(r.long_call)} CE + ${f(r.long_put)} PE</b> (2.5% shorts, 1.5% wings, from ${f(r.close)}) · hold to expiry · ${esc(r.how)}</div>` : ''}</div>`; };
-  const top = R.filter(mine); const rest = R.filter((r) => !mine(r));
-  box.innerHTML = `<details class="t2-more t2-wd" ${on.some(mine) ? 'open' : ''}><summary>🦅 Iron condor setups · ${on.length ? `<b class="up">${on.length} ON</b>: ${on.map((r) => esc(r.name)).join(', ')}` : 'none on now'}</summary>
-    <div class="cd-box"><p class="lv-sub">${esc(D.rule)}</p><p class="lv-sub muted">${esc(D.test)} Margin: pledged holdings count as collateral, but about half of F&amp;O margin must be cash or cash-like. Watch only: you place the orders.</p>
-    ${top.map(row).join('')}${rest.length ? `<details class="t2-more"><summary>Other indices (${rest.length})</summary>${rest.map(row).join('')}</details>` : ''}
-    <p class="lv-sub muted">Updated ${esc(D.generated)}. You get a phone alert when one that works in the test turns ON.</p></div></details>`;
+  const mine = (r) => (mk === 'US' ? r.market === 'US' : mk === 'NSE' ? r.market === 'NSE' : false);
+  const on = D.rows.filter((r) => r.status === 'ON' && (r.grade || 'good') === 'good' && mine(r));
+  if (!on.length) { box.innerHTML = ''; return; }
+  const f = (v) => fmt(v, 0, 'en-IN');
+  box.innerHTML = `<details class="t2-more t2-wd cd-mini"><summary>🦅 <b>Condor setup ON:</b> ${on.map((r) => `${esc(r.name)} · ${esc(r.expiry_day)}`).join(' · ')}</summary>
+    <div class="cd-box">${on.map((r) => `<div class="cd-row"><div class="cd-h"><b>${esc(r.name)}</b>${r.key === 'NIFTY' ? ' <span class="chip up">tested</span>' : ' <span class="chip muted">model-tested · 1 lot</span>'}</div>
+      <div class="lv-sub"><b>Sell ${f(r.short_call)} CE + ${f(r.short_put)} PE</b></div><div class="lv-sub"><b>Buy ${f(r.long_call)} CE + ${f(r.long_put)} PE</b></div>
+      <div class="lv-sub muted">Expiry ${esc(r.expiry_day)} · hold to expiry</div></div>`).join('')}</div></details>`;
+}
+/* Today (US): one line when stops were raised at the last check -> Live › US */
+async function usStopsToday(anchor) {
+  const c = lvCfg(); if (!anchor || !c.url || !c.token) return;
+  let W; try { W = await lvApi('/api/us/watch', { timeout: 20000 }); } catch (e) { return; }
+  const day = W.trail && W.trail.day; const mv = (W.items || []).filter((r) => r.stop_set && r.stop_set === day);
+  if (!mv.length) return;
+  const el = document.createElement('button'); el.className = 'more'; el.style.margin = '8px 0';
+  el.innerHTML = `⬆ Move ${mv.length} US stop${mv.length > 1 ? 's' : ''} in moomoo: ${mv.map((r) => `${esc(r.symbol)} $${fmt(r.stop, 2, 'en-US')}`).join(' · ')}`;
+  el.addEventListener('click', () => { state.lvMk = 'US'; try { localStorage.setItem('td.lvMk', 'US'); } catch (e) { /* */ } show('live'); });
+  anchor.after(el);
 }
 /* 16 Nov 2026: US holdings (moomoo) in Portfolio, from the server's US watch list (or the copy on this phone) */
 async function pfUS(box) {
@@ -5287,6 +5293,7 @@ async function tdRender2(el) {
   el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); }));
   alCard($('#tdal'), mk);
   condorCard($('#t2condor'), mk);
+  if (mk === 'US') usStopsToday($('#t2condor'));
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   el.querySelectorAll('.t2-tile[data-go]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.go); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('t2-flash'); setTimeout(() => t.classList.remove('t2-flash'), 1400); } }));
   el.querySelectorAll('.t2-wcard[data-tu]').forEach((b) => b.addEventListener('click', () => turtleSelect(state._tuShow[+b.dataset.tu])));
