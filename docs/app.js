@@ -118,13 +118,13 @@ document.addEventListener('click', (e) => { if (e.target && e.target.id === 'tor
 /* 15 Nov 2026 layout: Investment (ETFs, funds, indices: monthly), Momentum investing (monthly ATH stocks), Trading (9/21, cup closes,
    IPO cups, patterns, support). Sub-pages light up their parent button. */
 const NAV_OF = { bot: 'trends', trd: 'trends' };
-const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 'fund', 'themes', 'top', 'pie'], trd: ['wclose', 'dclose', 'ipo', 'short', 'turtle'] };
+const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 'fund', 'themes', 'top', 'pie'], trd: ['wclose', 'dclose', 'ipo', 'short', 'turtle', 'opt'] };
 const athGrp = () => (state.view === 'inv' ? 'inv' : state.view === 'trd' ? 'trd' : 'mom');
 const grpOfTab = (t) => (ATH_GRP.inv.includes(t) ? 'inv' : ATH_GRP.trd.includes(t) ? 'trd' : 'mom');
 state.athTabG = { mom: 'brk', inv: 'imc', trd: 'wclose' };
 try { const g = JSON.parse(sessionStorage.getItem('td.tabg') || 'null'); if (g) { Object.assign(state.athTabG, g); sessionStorage.removeItem('td.tabg'); } } catch (e) { /* */ }
 function tradeStrip(cur) {
-  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['turtle', 'Turtle Trading System'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
+  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['turtle', 'Turtle Trading System'], ['opt', 'ATM option charts'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
   return `<div class="seg trdstrip" style="margin:10px 16px 0;flex-wrap:wrap">${B.map(([k, n]) => `<button data-tk="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
 }
 function tradeStripWire(el) {
@@ -2490,6 +2490,50 @@ async function turtleSelect(r) {
   const n = T.length; ch.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 130), to: n + 2 });
   new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
 }
+/* 17 Nov 2026: ATM option charts for liquid F&O stocks and index options, with the app's systems run on the premium chart
+   (tools/opt_charts.py, nightly after the NSE bhavcopy). Watch only: not backtested on option premiums. */
+async function loadOptCharts(el) {
+  $('#title').textContent = 'Trading · ATM option charts';
+  if (!state.optScan || Date.now() - (state.optAt || 0) > 600000) { el.innerHTML = tradeStrip('opt') + '<p class="muted pad">Loading…</p>'; tradeStripWire(el);
+    state.optAt = Date.now(); state.optScan = await getJSON(MAIN + 'data/scan/optscan.json', 'optscan').catch(() => null); }
+  const D = state.optScan;
+  if (!D) { el.innerHTML = tradeStrip('opt') + '<p class="empty">The option charts appear after the first evening run (about 7:45 pm IST).</p>'; tradeStripWire(el); return; }
+  $('#asof').textContent = `NSE F&O close ${day(D.asof)}${updTxt(D.generated)}`;
+  const R = D.rows || []; const hasSig = (r) => ['ce', 'pe'].some((t) => r[t] && r[t].signals && r[t].signals.length);
+  const f = state.optF || 'all'; const q = (state.optQ || '').toUpperCase();
+  const L = R.filter((r) => (f === 'all' || (f === 'sig' ? hasSig(r) : f === 'idx' ? r.kind === 'index' : true)) && (!q || r.symbol.includes(q)));
+  const leg = (r, t) => { const x = r[t]; if (!x) return `<span class="muted">${t.toUpperCase()} –</span>`;
+    return `<span><b>${t.toUpperCase()}</b> ${fmt(x.close, 2, 'en-IN')} <span class="${(x.chg || 0) >= 0 ? 'up' : 'down'}">${x.chg == null ? '' : `${x.chg >= 0 ? '+' : ''}${fmt(x.chg, 1)}%`}</span>${(x.signals || []).map((g) => ` <span class="chip new">${esc(g)}</span>`).join('')}</span>`; };
+  const items = L.map((r, i) => `<li class="row" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)} <span class="muted">${fmt(r.strike, 0, 'en-IN')} · ${esc(day(r.expiry))} · ${r.dte} d</span></div>
+      <div class="tags">${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fut ${fmt(r.fut, 2, 'en-IN')}</span>${r.lot ? `<span class="chip">lot ${r.lot}</span>` : ''}</div>
+      <div class="lv-sub">${leg(r, 'ce')}<br>${leg(r, 'pe')}</div></div><div></div><div></div></li>`).join('');
+  el.innerHTML = `${tradeStrip('opt')}<div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> Systems run on the option premium itself (9/21 cross, 20-day high close, Top Bottom close above the last top). Not backtested on option charts; a test of Top Bottom's trades taken with ATM options made about half what futures made. Monthly expiry, today's ATM strike; liquid = ATM CE + PE ≥ 200 contracts a day.</div>
+    <section class="summary"><div class="stat"><b>${R.length}</b><span>liquid underlyings</span></div><div class="stat new"><b>${R.filter(hasSig).length}</b><span>with a signal on CE or PE</span></div></section>
+    <div class="card"><div class="seg" id="optf">${[['all', `All ${R.length}`], ['sig', `Signals ${R.filter(hasSig).length}`], ['idx', 'Indices']].map(([k, n]) => `<button data-k="${k}" aria-selected="${f === k}">${n}</button>`).join('')}</div>
+    <label class="search"><input id="optq" type="search" placeholder="Search symbol" value="${esc(state.optQ || '')}" autocomplete="off"></label>
+    <ul class="list flat">${items || '<li class="empty">Nothing matches.</li>'}</ul></div>`;
+  tradeStripWire(el);
+  el.querySelectorAll('#optf button').forEach((b) => b.addEventListener('click', () => { state.optF = b.dataset.k; loadOptCharts(el); }));
+  const qi = $('#optq'); qi.addEventListener('change', () => { state.optQ = qi.value; loadOptCharts(el); });
+  el.querySelectorAll('.row').forEach((x) => x.addEventListener('click', () => optSelect(L[+x.dataset.i])));
+}
+async function optSelect(r) {
+  openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)} ${fmt(r.strike, 0, 'en-IN')}</h2><div class="co">ATM options · expiry ${esc(day(r.expiry))} (${r.dte} days) · future ${fmt(r.fut, 2, 'en-IN')}${r.lot ? ` · lot ${r.lot}` : ''}</div></div></div>
+    <h3 style="margin:10px 16px 0">CE ${r.ce ? fmt(r.ce.close, 2, 'en-IN') : ''}</h3><div class="chart" id="optce" style="height:220px"></div><p class="muted small" style="margin:2px 16px">${r.ce && r.ce.signals.length ? r.ce.signals.map(esc).join(' · ') : 'No signal'}${r.ce && r.ce.top ? ` · last top ${fmt(r.ce.top, 2, 'en-IN')}` : ''}${r.ce && r.lot ? ` · 1 lot ≈ ₹${fmt(r.ce.value_lot, 0, 'en-IN')}` : ''}</p>
+    <h3 style="margin:10px 16px 0">PE ${r.pe ? fmt(r.pe.close, 2, 'en-IN') : ''}</h3><div class="chart" id="optpe" style="height:220px"></div><p class="muted small" style="margin:2px 16px">${r.pe && r.pe.signals.length ? r.pe.signals.map(esc).join(' · ') : 'No signal'}${r.pe && r.pe.top ? ` · last top ${fmt(r.pe.top, 2, 'en-IN')}` : ''}${r.pe && r.lot ? ` · 1 lot ≈ ₹${fmt(r.pe.value_lot, 0, 'en-IN')}` : ''}</p>
+    <p class="muted small" style="margin:6px 16px">Daily candles of this contract (days without a trade use the settle price) · orange = EMA 9 · blue = EMA 21 · grey dashed = last top (Top Bottom buy level). Watch only.</p>`);
+  if (!state.optCh) state.optCh = await getJSON(MAIN + 'data/scan/optcharts.json', 'optcharts').catch(() => null);
+  const C = state.optCh && state.optCh[r.symbol]; if (!C || !window.LightweightCharts) return;
+  const ema = (v, n) => { const k = 2 / (n + 1); let e = v[0]; return v.map((x) => (e = x * k + e * (1 - k))); };
+  [['ce', '#optce'], ['pe', '#optpe']].forEach(([t, id]) => { const S = C[t]; const box = $(id); if (!S || !box) return;
+    const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 220, width: box.clientWidth });
+    const cs = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
+    cs.setData(S.t.map((x, i) => ({ time: x, open: S.o[i], high: S.h[i], low: S.l[i], close: S.c[i] })));
+    const ln = (v, col) => ch.addLineSeries({ color: col, lineWidth: 2, priceLineVisible: false, lastValueVisible: false }).setData(S.t.map((x, i) => ({ time: x, value: v[i] })));
+    if (S.c.length >= 9) ln(ema(S.c, 9), '#F59E0B'); if (S.c.length >= 21) ln(ema(S.c, 21), '#3B82F6');
+    const top = r[t] && r[t].top; if (top) cs.createPriceLine({ price: top, color: '#9CA3AF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'last top' });
+    ch.timeScale().fitContent(); });
+}
 async function loadTurtle(el) {
   $('#title').textContent = 'Trading · Turtle Trading System';
   if (state.turtle && Date.now() - (state.turtleAt || 0) > 600000) state.turtle = null;   // refetch after 10 min
@@ -2642,6 +2686,7 @@ async function loadATH() {
   const mkSeg = `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK'], ...(grp !== 'inv' ? [['WORLD', 'World & other assets']] : [])].map(([k, n]) => `<button data-mk="${k}" aria-selected="${wOn || tOn ? k === 'WORLD' : mk === k}">${n}</button>`).join('')}</div>` + (grp === 'trd' ? tradeStrip(state.athTabG.trd) : '');   // 17 Nov 2026: market first on every tab
   if (wOn) { loadATHWorld(el, mkSeg); return; }
   if (grp === 'trd' && state.athTabG.trd === 'turtle') { loadTurtle(el); return; }
+  if (grp === 'trd' && state.athTabG.trd === 'opt') { loadOptCharts(el); return; }
   if (tOn) { loadTrdWorld(el, mkSeg); return; }
   if (!state.athC[mk]) {
     el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>';
