@@ -3404,6 +3404,11 @@ const ATH_ST = { breakout: 0, 'exit next open': 1, open: 2, near: 3, exited: 4 }
 function fundAthRows(countOnly) {
   const F = state.fund; if (!F) return [];
   const m = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[AM()];
+  if (state.athFundEvery && !countOnly) {          // 17 Nov 2026: every ETF of this market, signal or not (e.g. the India ETFs)
+    let E = (F.rows || []).filter((r) => (r.market || 'IN') === m && r.kind !== 'fund');
+    const q1 = (state.ath.q || '').toLowerCase(); if (q1) E = E.filter((r) => (r.name || '').toLowerCase().includes(q1) || r.key.toLowerCase().includes(q1));
+    return E.sort((a, b) => (a.below_high_pct ?? 999) - (b.below_high_pct ?? 999));
+  }
   if (state.athFundMC && !countOnly) {
     let M = (F.rows || []).filter((r) => (r.market || 'IN') === m && r.mclose);
     const q0 = (state.ath.q || '').toLowerCase(); if (q0) M = M.filter((r) => r.name.toLowerCase().includes(q0) || r.key.toLowerCase().includes(q0));
@@ -3499,6 +3504,12 @@ function fundMcItem(r, i) {
     <div class="tags"><span class="chip">Closed ${pct(a.above_pct)} over old ATH</span>${a.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${a.base_months >= 24 ? 'new' : ''}">${baseTxt(a.base_months)}</span><span class="chip">fell ${fmt(Math.abs(a.depth * 100), 0)}% in base</span>
     <span class="chip ${a.sma_rising ? 'open' : 'exit'}">${a.sma_rising ? 'Above rising 30-wk SMA' : 'Not above a rising 30-wk SMA'}</span><span class="chip">${r.kind === 'fund' ? esc(r.category) : 'ETF'}</span></div></div><div></div>
     <div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${sm >= 0 ? 'up' : 'down'}">${pct(sm * 100)} since ${mLab(a.month).split(' ')[0]}</span>${hiGap(r.close, a)}</div></li>`;
+}
+function fundEveryItem(r, i) {
+  const pc = (v) => (v == null ? '–' : `${v >= 0 ? '+' : ''}${fmt(v, 1)}%`);
+  return `<li class="row" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol || r.key.split(':').pop())} <span class="muted">${esc(r.name || '')}</span></div>
+    <div class="tags"><span class="chip">${r.below_high_pct < 0.5 ? 'at its high' : `${fmt(r.below_high_pct, 1)}% below high`}</span><span class="chip ${r.above_200 ? 'open' : 'exit'}">${r.above_200 ? 'above' : 'below'} 200-day</span>${r.rsi != null ? `<span class="chip">RSI ${fmt(r.rsi, 0)}</span>` : ''}</div></div><div></div>
+    <div class="px"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${(r.r1m || 0) >= 0 ? 'up' : 'down'}">${pc(r.r1m)} 1m</span></div></li>`;
 }
 function fundAthItem(r, i) {
   const a = r.ath; const pc = (v) => `${v >= 0 ? '+' : ''}${fmt(v * 100, 1)}%`;
@@ -3649,11 +3660,13 @@ function athList() {
   if (tab === 'fund') {
     const mcN = ((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[AM()]) && r.mclose).length;
     const MC = !!state.athFundMC && state.view !== 'inv'; // Investment has its own Month close tab
-    $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!MC && !state.athFundAll}">Cup + trend only</button><button data-k="1" aria-selected="${!MC && !!state.athFundAll}">Show all (incl. exited, shallow bases)</button>${state.view === 'inv' ? '' : `<button data-k="2" aria-selected="${MC}">Month close ${mcN}</button>`}</div></li>`
+    const EV = !!state.athFundEvery; const nEv = ((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[AM()]) && r.kind !== 'fund').length;
+    $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!MC && !EV && !state.athFundAll}">Cup + trend only</button><button data-k="1" aria-selected="${!MC && !EV && !!state.athFundAll}">Show all (incl. exited, shallow bases)</button><button data-k="3" aria-selected="${EV}">Every ETF ${nEv}</button>${state.view === 'inv' ? '' : `<button data-k="2" aria-selected="${MC}">Month close ${mcN}</button>`}</div></li>`
       + (MC ? '<li class="muted pad">Last completed month CLOSED above the all-time high (highest price of earlier months, wicks included) after a base of 1+ years (bold = 2+ years). Long cup = base of 3+ years with a 30%+ fall inside it. Not tested for ETFs and funds (the ATH system itself did not beat buy-and-hold on mutual funds); a month-end check only.</li>' : '')
-      + (L.length ? L.map(MC ? fundMcItem : fundAthItem).join('') : `<li class="empty">${MC ? 'No ETF or fund closed last month above an all-time high that was at least a year old.' : state.athFundAll ? 'No ETF or fund signals in the last 18 months.' : 'None right now with a real cup (15%+ dip during the base) and an uptrend.'}</li>`)
+      + (EV ? '<li class="muted pad">Every ETF in this market, signal or not, nearest to its all-time high first. Type India in the search box for the India ETFs.</li>' : '')
+      + (L.length ? L.map(EV ? fundEveryItem : MC ? fundMcItem : fundAthItem).join('') : `<li class="empty">${MC ? 'No ETF or fund closed last month above an all-time high that was at least a year old.' : state.athFundAll ? 'No ETF or fund signals in the last 18 months.' : 'None right now with a real cup (15%+ dip during the base) and an uptrend.'}</li>`)
       + (all.length > L.length ? '<li><button class="more" id="athall">Show all ' + all.length + '</button></li>' : '');
-    $('#athlist').querySelectorAll('#athfa button').forEach((b) => b.addEventListener('click', () => { state.athFundAll = b.dataset.k === '1'; state.athFundMC = b.dataset.k === '2'; loadATH(); }));
+    $('#athlist').querySelectorAll('#athfa button').forEach((b) => b.addEventListener('click', () => { state.athFundAll = b.dataset.k === '1'; state.athFundMC = b.dataset.k === '2'; state.athFundEvery = b.dataset.k === '3'; loadATH(); }));
     $('#athlist').querySelectorAll('.row').forEach((r) => { const go = () => fundSelect(L[+r.dataset.i]); r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
     const b = $('#athall'); if (b) b.addEventListener('click', () => { state.ath.all = true; athList(); });
     return;
