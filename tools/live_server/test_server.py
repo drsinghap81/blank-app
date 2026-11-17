@@ -975,3 +975,11 @@ def test_opt_intra_scan(tmp_path):
     assert len(A._resample(A.broker.icandles, 15)) == 25 and len(A._resample(A.broker.icandles, 60)) == 7
     A.opt_intra_scan()
     j = c.get("/api/opt/scan", headers=h).json(); assert j["items"] and any("5m" in v["tf"] for v in j["items"].values())
+
+
+def test_prem_cup():
+    import app as A
+    h = [10.0] + [9.0] * 25 + [7.0] * 5 + [9.5] * 5 + [10.6]
+    c = [x - 0.2 for x in h[:-1]] + [10.5]
+    sig, _ = A.prem_systems(c, h)
+    assert any(x.startswith("cup close") for x in sig), sig

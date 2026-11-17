@@ -3160,8 +3160,25 @@ def _ema_l(v, n):
     return out
 
 
-def prem_systems(c):
+def _cupclose(hh, cc, K=250, B=20, D=-0.15):
+    """cup close (same rule as the day cup close in tools/cupclose.py): close above the highest high of the last K bars
+    (signal bar excluded), that high at least B bars old, and the lowest close since it at least 15% below it."""
+    n = len(hh)
+    if n < B + 3:
+        return None
+    lo = max(0, n - 1 - K); win = hh[lo:n - 1]; a = lo + max(range(len(win)), key=lambda i: win[i]); rim = hh[a]
+    if not (cc[-1] > rim and n - 1 - a >= B):
+        return None
+    seg = cc[a + 1:n - 1]; dep = (min(seg) / rim - 1) if seg else 0.0
+    return (round(rim, 2), n - 1 - a, round(dep * 100, 1)) if dep <= D else None
+
+
+def prem_systems(c, h=None):
     sig = []; n = len(c)
+    if h is not None:
+        cu = _cupclose(list(h), list(c))
+        if cu:
+            sig.append(f"cup close (rim {cu[0]}, {cu[1]} bars, {abs(cu[2])}% deep)")
     if n >= 25:
         e9, e21 = _ema_l(c, 9), _ema_l(c, 21)
         if any(e9[i] > e21[i] and e9[i - 1] <= e21[i - 1] for i in (n - 1, n - 2)) and c[-1] > e21[-1]:
@@ -3224,7 +3241,7 @@ def opt_intra_scan():
                     continue
                 tf = {}
                 for name, bars in (("5m", B), ("15m", _resample(B, 15)), ("1h", _resample(B, 60))):
-                    sig, top = prem_systems([x[4] for x in bars])
+                    sig, top = prem_systems([x[4] for x in bars], [x[2] for x in bars])
                     if sig:
                         tf[name] = sig
                 res[f"{r['symbol']}|{typ}"] = dict(ltp=B[-1][4], at=B[-1][0], tf=tf)
@@ -3271,7 +3288,7 @@ def opt_candles(symbol: str, expiry: str, strike: float, type: str, interval: st
     if not B:
         raise HTTPException(404, "no candles yet for this contract")
     ts = [int(datetime.fromisoformat(x[0]).timestamp()) + 19800 for x in B]    # IST shown as chart time
-    cl = [x[4] for x in B]; sig, top = prem_systems(cl)
+    cl = [x[4] for x in B]; sig, top = prem_systems(cl, [x[2] for x in B])
     out = dict(symbol=sym, tsym=tk[1], interval=interval, t=ts, o=[x[1] for x in B], h=[x[2] for x in B], l=[x[3] for x in B], c=cl,
                v=[x[5] for x in B], signals=sig, top=top)
     _OPTC[key] = (time.time(), out)

@@ -9,6 +9,7 @@ For every liquid F&O stock and the index options (NIFTY, BANKNIFTY, FINNIFTY, MI
     9/21    : EMA 9 crossed above EMA 21 in the last 2 sessions and the close is above EMA 21
     breakout: close above the highest close of the previous 20 sessions
     TB      : close above the last top of the closing line (Top Bottom buy level)
+    cup     : cup close - close above the highest high of the window, that high 20+ bars old, cup 15%+ deep (day cup close rule)
 Cache: daily filtered bhavcopies in optcache/ (kept by the workflow's actions/cache).
 Output: data/scan/optscan.json (list + signals) and data/scan/optcharts.json (bars, loaded on demand)."""
 import io
@@ -85,9 +86,14 @@ def last_top(c):
     return top
 
 
-def systems(c):
+def systems(c, h=None):
     sig = []
     n = len(c)
+    if h is not None:
+        from cupclose import cupclose
+        r_ = cupclose(np.asarray(h, float), np.asarray(c, float), 250, 20, -0.15)     # day cup close rule on the premium
+        if r_:
+            sig.append(f"cup close (rim {round(r_[1], 2)}, {r_[2]} bars, {abs(round(r_[3] * 100, 1))}% deep)")
     if n >= 25:
         e9, e21 = ema(c, 9), ema(c, 21)
         if any(e9[i] > e21[i] and e9[i - 1] <= e21[i - 1] for i in (n - 1, n - 2)) and c[-1] > e21[-1]:
@@ -155,7 +161,7 @@ def main():
             traded = S.VOL > 0
             c = np.where(traded, S.CLOSE, S.SETTLE).astype(float)
             o_ = np.where(traded, S.OPEN, c); h_ = np.where(traded, S.HIGH, c); l_ = np.where(traded, S.LOW, c)
-            sig, top = systems(list(c))
+            sig, top = systems(list(c), list(h_))
             row[typ.lower()] = dict(close=round(c[-1], 2), chg=round((c[-1] / c[-2] - 1) * 100, 1) if c[-2] else None, signals=sig, top=top,
                                     bars=len(c), value_lot=round(c[-1] * (row["lot"] or 0)), oi=int(S.OI.iloc[-1]), vol=int(S.VOL.iloc[-1]))
             ch[typ.lower()] = dict(t=[str(d.date()) for d in S.Date], o=[round(float(v), 2) for v in o_], h=[round(float(v), 2) for v in h_],
