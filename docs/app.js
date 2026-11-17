@@ -845,7 +845,7 @@ const BK_HEAD = {
   my: 'Stocks you pushed here from any chart (Push to Live). Each is sized at the swing risk from your cash, outside your split. India: Send places an Angel GTT buy (good for a year) at your trigger; when it fills the server puts the protective GTT stop at your stop. US/ASX: place the stop-limit buy (GTC) on moomoo yourself. Untested — your call.',
   vcp: 'Volatility contraction pattern in a Stage 2 uptrend: 2+ shrinking pullbacks with higher lows and volume drying up. Buy-stop just above the last pullback\'s high (needs 1.4× volume on the day); stop = that pullback\'s low (max 10%); sell after a daily close below EMA 50 — this tab lists the sell. NSE 2017–26: +4.9% a trade (221 trades, 37% win); added to your mix +1 point a year, so a watch bucket: your call. Tap a row for the chart.' };
 function lvSeg() {
-  return `<div class="seg" id="lvmk" style="margin:10px 16px 0">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia']].map(([k, n]) => `<button data-k="${k}" aria-selected="${state.lvMk === k}">${n}</button>`).join('')}</div>`;
+  return `<div class="seg mk" id="lvmk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-k="${k}" aria-selected="${state.lvMk === k}">${n}</button>`).join('')}</div>`;
 }
 function lvSegWire(el) {
   el.querySelectorAll('#lvmk button').forEach((b) => b.addEventListener('click', () => { state.lvMk = b.dataset.k; try { localStorage.setItem('td.lvMk', b.dataset.k); } catch (e) { /* private mode */ } loadLive(); }));
@@ -854,7 +854,8 @@ function lvSegWire(el) {
 async function loadLiveG(mk) {
   const el = $('#view-live');
   const [P, Pp] = await Promise.all([getJSON(MAIN + MKT[mk].path + 'trade_plan.json', 'tp_' + mk), getJSON(MAIN + MKT[mk].path + 'paper.json', 'paper_' + mk)]);
-  if (!P) { el.innerHTML = lvSeg() + `<p class="empty">The ${MKT[mk].name} trade plan appears after its evening run.</p>`; lvSegWire(el); return; }
+  if (!P) { el.innerHTML = lvSeg() + (mk === 'UK' ? `<div class="lv-card"><b>UK · watch only</b><p class="lv-sub">There is no tested UK system and no UK broker link, so there is no live plan to trade. The UK lists stay on Momentum and Trading for ideas.</p></div>`
+    : `<p class="empty">The ${MKT[mk].name} trade plan appears after its evening run.</p>`); lvSegWire(el); return; }
   $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)}`;
   const C0 = cap(mk); const nP = lvN(mk); const risk = lvRiskN(nP) / 100; const L = MKT[mk].loc; const cur = MKT[mk].cur;
   const selG = lvSel(mk, P.asof, P.top || [], nP);
@@ -902,16 +903,35 @@ async function loadLiveG(mk) {
       ${pos.length ? `<table class="mini"><tr><th>Open (${pos.length})</th><th>Qty</th><th>Entry</th><th>Now</th></tr>${pos.map(([s, p]) => `<tr><td>${esc(s)} <span class="muted">${({ 'Monthly ATH': 'Momentum', 'Trend 9/21': 'Trend 9/21', '9/21 trend': '9/21 (old)', 'Breakout retest': 'Retest', 'Bottom pattern': 'Pattern' })[p.system] || esc(p.system)}</span></td><td>${p.qty}</td><td>${fmt(p.entry, 2, L)}</td><td class="${p.last >= p.entry ? 'up' : 'down'}">${fmt(p.last, 2, L)} (${pct((p.last / p.entry - 1) * 100)})</td></tr>`).join('')}</table>` : ''}
       ${(Pp.log || []).length ? `<details style="margin-top:6px"><summary class="lv-sub">Paper fills and misses</summary><p class="lv-sub">${Pp.log.slice(0, 30).map(esc).join('<br>')}</p></details>` : ''}`;
   }
-  el.innerHTML = `${lvSeg()}<div class="lv-card" style="border-left:5px solid var(--fall)"><b>Paper-trading phase · you place orders yourself on moomoo</b>
-      <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>${mk === 'US' ? '<div id="usw"></div><div id="pvus"></div><div id="usj"></div>' : ''}
-    <div class="lv-card"><b>Paper record</b>${paper}</div>
-    ${lvBucketCard(mk, P, alG, inUseG, null)}
-    <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Momentum Investing · max ${alG.mom}% · top ${rows.length}</b>${capInput(mk, 'lvcapg')}</div>
+  /* 17 Nov 2026: same tabs as India (Home · Buy · Holdings · Settings) */
+  const nBuyG = rows.filter((r) => !r.off && r.qty > 0).length + swR.filter((r) => !r.skip && r.qty > 0).length; const nExG = (P.exits || []).length;
+  const TABS = [['home', 'Home', ''], ['buy', 'Buy', nBuyG || ''], ['hold', 'Holdings', nExG || ''], ['set', 'Settings', '']];
+  let tab = state.lvTab; if (!tab) { try { tab = sessionStorage.getItem('td.lvTab'); } catch (e) { /* */ } }
+  if (!TABS.some((t) => t[0] === tab)) tab = 'home';
+  const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
+  const srvOn = !!(lvCfg().url && lvCfg().token);
+  const go = (k, c, t, sub) => `<button class="lv-need-i ${c}" data-go="${k}"><b>${t}</b><span>${sub}</span><i>›</i></button>`;
+  el.innerHTML = `${lvSeg()}
+    <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
+    ${pane('home', `<div class="lv-conn"><span class="lv-dot"></span><span><b>${mk === 'UK' ? 'Your broker' : 'moomoo'}</b> · you place the orders · ${srvOn ? 'server connected' : 'server not connected'}</span><button class="lv-link" data-go="set">Settings</button></div><div id="lval"></div>
+      <div class="lv-card lv-need" data-fold="skip"><div class="lv-need-h"><b>Needs you today</b><span class="lv-mode dry">MANUAL</span></div>
+        ${nExG ? go('hold', 'sell', `${nExG} to sell`, 'system exit signals for the next open — only if you hold them') : ''}${nBuyG ? go('buy', 'buy', `${nBuyG} to buy`, 'order tickets ready to place on moomoo') : ''}
+        ${nExG || nBuyG ? '' : '<p class="lv-sub">✓ Nothing to do — no new signals today.</p>'}</div>
+      <div class="lv-card"><b>Paper record</b>${paper}</div>${mk === 'US' ? '<div id="pvus"></div>' : ''}`)}
+    ${pane('buy', `    <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Momentum Investing · max ${alG.mom}% · top ${rows.length}</b>${capInput(mk, 'lvcapg')}</div>
       <p class="lv-sub">Sized from your ${MKT[mk].name} capital (${money(C0, mk)}${mk === 'US' ? ' in US$ — the cash you hold in USD on moomoo' : ''}) at ${fmt(risk * 100, 2)}% risk and max 10% a stock. Holdings and cash are not checked.</p>${lvPicker(nP, risk * 100)}<div class="lv-pdfbar"><span class="lv-sub">Tick up to ${nP} picks (top ${nP} by rank to start). <a href="#" id="lvselreset">Reset to top ${nP}</a></span><button class="lv-btn" id="lvpdf">Export PDF</button></div><p class="lv-sub">Top-down order: stocks passing all three checks first (sector beating the index over 6 months, industry Building/Strong, stock beating its sector over 1 year), then sector, industry lane and system score. Not backtested as a ranking — in the US/ASX tests these levels did not lift returns as filters.</p>
       ${list || '<p class="empty">No qualifying trades today.</p>'}</div>
     ${swCardG('my')}${swCardG('tf')}${swCardG('vcp')}${swCardG('t9')}${swCardG('rt')}${swCardG('pt')}
-    ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
-    <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
+    <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
+    ${pane('hold', `${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}${mk === 'US' ? '<div id="usw"></div><div id="usj"></div>' : `<div class="lv-card"><b>Your ${MKT[mk].name} holdings</b><p class="lv-sub">${mk === 'ASX' ? "moomoo's API cannot read ASX positions for Australian accounts, so" : 'There is no UK broker link, so'} holdings, the trade journal and you-vs-market are India and US only for now.</p></div>`}`)}
+    ${pane('set', `<div class="lv-card" style="border-left:5px solid var(--fall)"><b>Paper-trading phase · you place orders yourself on moomoo</b>
+      <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>
+    ${lvBucketCard(mk, P, alG, inUseG, null)}`)}`;
+  el.querySelectorAll('.lv-tabs [data-tab], .lv-need-i[data-go], .lv-conn [data-go]').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.tab || b.dataset.go; state.lvTab = k; try { sessionStorage.setItem('td.lvTab', k); } catch (e) { /* */ }
+    el.querySelectorAll('.lv-tabs [data-tab]').forEach((x) => x.setAttribute('aria-selected', x.dataset.tab === k));
+    el.querySelectorAll('.lv-pane').forEach((p) => (p.hidden = p.dataset.pane !== k)); window.scrollTo(0, 0); }));
+  alCard($('#lval'), mk);
   lvSegWire(el); lvBucketWire(el, mk, null); wireCap('lvcapg', mk, () => loadLive());
   if (mk === 'US') { usWatchCard($('#usw')); perfVsCard($('#pvus'), 'US'); usJournalCard($('#usj')); }
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', () => { try { localStorage.setItem('td.lvN_' + mk, ns.value); localStorage.removeItem(selKey(mk, P.asof)); } catch (e) { /* private mode */ } lvKeep(); });
@@ -2617,7 +2637,7 @@ async function loadATH() {
   const el = $(grp === 'mom' ? '#view-ath' : '#view-' + state.view);
   state.athC = state.athC || {};
   const mk = AM(); const wOn = grp === 'mom' && state.athWorld; const tOn = grp === 'trd' && state.trdWorld;
-  const mkSeg = (grp === 'trd' ? tradeStrip(state.athTabG.trd) : '') + `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK'], ...(grp !== 'inv' ? [['WORLD', 'World & other assets']] : [])].map(([k, n]) => `<button data-mk="${k}" aria-selected="${wOn || tOn ? k === 'WORLD' : mk === k}">${n}</button>`).join('')}</div>`;
+  const mkSeg = `<div class="seg mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK'], ...(grp !== 'inv' ? [['WORLD', 'World & other assets']] : [])].map(([k, n]) => `<button data-mk="${k}" aria-selected="${wOn || tOn ? k === 'WORLD' : mk === k}">${n}</button>`).join('')}</div>` + (grp === 'trd' ? tradeStrip(state.athTabG.trd) : '');   // 17 Nov 2026: market first on every tab
   if (wOn) { loadATHWorld(el, mkSeg); return; }
   if (grp === 'trd' && state.athTabG.trd === 'turtle') { loadTurtle(el); return; }
   if (tOn) { loadTrdWorld(el, mkSeg); return; }
