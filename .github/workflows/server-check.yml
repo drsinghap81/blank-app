@@ -1,0 +1,11 @@
+name: server-check
+on: workflow_dispatch
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for u in https://13-126-118-48.sslip.io/api/health https://13-126-118-48.sslip.io/ ; do
+            echo "== $u"; curl -sS -m 20 -w "\nHTTP %{http_code} in %{time_total}s\n" "$u" | head -c 1500; echo; done
+          echo "== login with a wrong password (expect 401 if the server is fine)"
+          curl -sS -m 20 -X POST -H 'Content-Type: application/json' -d '{"password":"x"}' -w "\nHTTP %{http_code}\n" https://13-126-118-48.sslip.io/api/login | head -c 500
