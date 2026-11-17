@@ -5073,8 +5073,17 @@ function uswParse(h) {
 }
 async function usWatchCard(box) {
   if (!box) return; const c = lvCfg();
-  if (!c.url || !c.token) { box.innerHTML = '<div class="lv-card"><b>Your moomoo holdings</b><p class="lv-sub">Connect your server on the India tab to track the US shares you bought.</p></div>'; return; }
   const imp = uswParse(location.hash) || state._uswImp; if (imp) state._uswImp = imp;
+  if (!c.url || !c.token) {
+    /* 17 Nov 2026: an import link opened in another browser (e.g. inside Claude) has no server login - show the list to copy
+       into the home-screen app's "Paste a list" box instead */
+    const txt = imp ? decodeURIComponent((location.hash.match(/^#usw=(.+)$/) || [])[1] || imp.map((x) => [x.symbol, x.qty, x.entry, x.stop, x.target || '', x.system].join(':')).join(',')) : '';
+    box.innerHTML = `<div class="lv-card"><b>Your moomoo holdings</b>${imp ? `<p class="lv-sub"><b>This browser isn't signed in to your server.</b> Open Trend Desk from your home screen › Live › US › Your moomoo holdings › <b>Paste a list</b>, paste this, tap Read, then <b>Replace my list</b>:</p>
+      <textarea readonly style="width:100%;box-sizing:border-box;min-height:5em;font:inherit;font-size:14px">${esc(txt)}</textarea><button class="lv-btn" id="uswcopy">Copy list</button>`
+      : '<p class="lv-sub">Connect your server on the India tab to track the US shares you bought.</p>'}</div>`;
+    const cb = box.querySelector('#uswcopy'); if (cb) cb.addEventListener('click', async () => { try { await navigator.clipboard.writeText(txt); cb.textContent = 'Copied ✓'; } catch (e) { box.querySelector('textarea').select(); } });
+    return;
+  }
   const $f = (v) => (v == null ? '–' : `$${fmt(v, 2, 'en-US')}`);
   /* 16 Nov 2026: a copy stays on this phone (td.uswLocal), shown when the server is not updated yet and sent to it once it is */
   let loc = []; try { loc = JSON.parse(localStorage.getItem('td.uswLocal') || '[]'); } catch (e) { /* */ }
