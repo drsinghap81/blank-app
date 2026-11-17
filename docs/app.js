@@ -4834,10 +4834,12 @@ function bgHow({ r, s }) {
 }
 
 /* 16 Nov 2026: beginner Today action tiles (as in pro): sell first, buy, Turtle. Big numbers, tap to act. */
-async function bgActTiles(box, P, rows) {
+async function bgActTiles(box, P, rows, mk = 'NSE') {
   if (!box) return;
-  let held = []; try { held = JSON.parse(localStorage.getItem('td.heldSyms') || '[]'); } catch (e) { /* */ }
-  if (!held.length) held = pfLoad().h.map((h) => h.s);
+  let held = [];
+  if (mk === 'NSE') { try { held = JSON.parse(localStorage.getItem('td.heldSyms') || '[]'); } catch (e) { /* */ } if (!held.length) held = pfLoad().h.map((h) => h.s); }
+  else if (mk === 'US') { try { held = JSON.parse(localStorage.getItem('td.uswLocal') || '[]').map((x) => x.symbol); } catch (e) { /* */ }
+    try { const W = await lvApi('/api/us/watch', { timeout: 15000 }); held = (W.items || []).map((x) => x.symbol); } catch (e) { /* phone copy */ } }
   const H = new Set(held); const sells = ((P && P.exits) || []).filter((e) => H.has(e.symbol));
   if (!state.turtle) state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null);
   const TU = (state.turtle && state.turtle.rows) || []; const tu = TU.filter((r) => (r.status === 'in trade' && r.new) || r.status === 'exited today').length || TU.filter((r) => r.status === 'in trade').length;
@@ -4845,7 +4847,7 @@ async function bgActTiles(box, P, rows) {
   box.innerHTML = `<div class="bg-act">
       <button class="bg-actt sell" data-go="sell"><b>${known ? sells.length : '–'}</b><span>to sell</span></button>
       <button class="bg-actt buy" data-go="buy"><b>${rows.length}</b><span>to buy</span></button>
-      <button class="bg-actt tur" data-go="tur"><b>${tu}</b><span>Turtle</span></button></div>
+      ${mk === 'NSE' ? `<button class="bg-actt tur" data-go="tur"><b>${tu}</b><span>Turtle</span></button>` : ''}</div>
     ${sells.length ? `<div class="bg-sells" id="bgsells"><b>Sell at the next open</b>${sells.map((e) => `<div class="td-card td-raise"><span class="td-av" style="background:var(--fall)">↓</span><span class="td-nm"><b>Sell ${esc(e.symbol)}</b><small>${esc(e.system || '')} · ${esc(e.why || 'exit rule met')}</small></span></div>`).join('')}</div>` : ''}`;
   box.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => {
     const g = b.dataset.go;
@@ -5682,8 +5684,8 @@ async function tdRender2(el) {
 }
 
 async function tdRender(el, beginner) {
-  if (beginner && tdMk() !== 'NSE') return bgOther(el, tdMk());   // 16 Nov 2026: beginner Today for US / Australia / UK
-  const mk = beginner ? 'NSE' : tdMk(); const MP = MAIN + MKT[mk].path; const tag = mk === 'NSE' ? '' : '_' + mk;
+  // 17 Nov 2026: beginner Today uses the same page for every market (was a separate, simpler page for US / Australia / UK)
+  const mk = tdMk(); const MP = MAIN + MKT[mk].path; const tag = mk === 'NSE' ? '' : '_' + mk;
   el.innerHTML = '<p class="muted pad">Loading today…</p>';
   const P = await getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk); const A = state['_athN' + tag] ? { scanned: state['_athN' + tag] } : null;   // 11 Nov 2026: ath.json (316 KB) no longer blocks Today
   const seg = `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
@@ -5714,8 +5716,9 @@ async function tdRender(el, beginner) {
   el.innerHTML = `<div class="td-wrap">${seg}<div id="tdal"></div><div id="tdmini"></div>
     <div class="td-hero"><span>Setups found</span><div class="td-big"><b>${n}</b>${scanned ? `<em>out of ${Number(scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>` : ''}</div>
       <div class="td-bar"><i style="width:100%"></i></div><small>Close ${day(P.asof)} · the scan runs every evening</small></div>
+    ${beginner && mk !== 'NSE' ? `<p class="status exit watch">${MKT[mk].name}: ideas only. The India systems did not beat this market's index in the backtest, so treat these as a watch list, not tested buys.</p>` : ''}
     ${beginner ? '<div id="bgact"></div><div id="t2condor"></div>' : ''}
-    ${beginner ? bgHero(cap('NSE') || 50000, {}) : ''}
+    ${beginner && mk === 'NSE' ? bgHero(cap('NSE') || 50000, {}) : ''}
     <div id="tdtop"></div>
     <div class="td-lh"><b>Top 10 to act on</b><small>Your 60/40 split: Momentum ranked by tested evidence (sector + stock aligned first), then Trend 9/21 in system order</small></div>
     <div class="td-list" id="tdnew">${rows.map((r, i) => { const L = tdLabel(r);
@@ -5740,7 +5743,7 @@ async function tdRender(el, beginner) {
   if (mk === 'NSE') tdRiskCard($('#tdrisk'));
   if (mk === 'US') usStopsToday($('#tdmini'));
   alCard($('#tdal'), mk);
-  if (beginner) { bgActTiles($('#bgact'), P, rows); condorCard($('#t2condor'), 'NSE'); tlCard($('#t2condor'), 'NSE'); }
+  if (beginner) { bgActTiles($('#bgact'), P, rows, mk); condorCard($('#t2condor'), mk); tlCard($('#t2condor'), mk); }
   tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); } if (mk === 'NSE') tdGrowthMom($('#tdgm')); tdMatrix($('#tdmx'), mk); tdHeat($('#tdheat'), mk);
 }
 /* Heating up (11 Nov 2026): industries whose 1-week pulse jumped well above last month's. Information only: strength by
