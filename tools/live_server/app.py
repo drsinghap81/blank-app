@@ -2069,6 +2069,33 @@ def _jcalc(r):
     return r
 
 
+def _entry_ctx(sym, date_):
+    """Top-down context for the journal's entry line: market (S&P 500 vs its 200-day on that day), then sector / theme /
+    stock strength and the system note from the US plan row (as of the plan the user bought from, or today's if missing)."""
+    ctx = {}
+    try:
+        r = requests.get("https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC", params=dict(interval="1d", range="2y"),
+                         headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
+        res = r.json()["chart"]["result"][0]; cl = res["indicators"]["quote"][0]["close"]
+        tt = [datetime.fromtimestamp(x, timezone.utc).date().isoformat() for x in res["timestamp"]]
+        S = [(d, c) for d, c in zip(tt, cl) if c is not None and d <= date_]
+        if len(S) >= 200:
+            c = [x[1] for x in S]; m200 = sum(c[-200:]) / 200
+            ctx.update(spx=round(c[-1], 2), spx_200=round(m200, 2), spx_up=c[-1] > m200, spx_1m=round((c[-1] / c[-22] - 1) * 100, 1))
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        P = mkt_plan("US")
+        row = next((x for k in ("top", "swing", "more", "watch", "missed") for x in (P.get(k) or []) if x.get("symbol") == sym), None)
+        if row:
+            ctx.update({k: row.get(k) for k in ("system", "note", "sector", "sector_rs", "sector_pct", "theme", "theme_rs", "theme_pct",
+                                                 "stock_rs", "rs_rating", "group", "lane", "score", "base_months", "why")})
+            ctx["plan_asof"] = P.get("asof")
+    except Exception:  # noqa: BLE001
+        pass
+    return ctx
+
+
 @app.get("/api/us/snap")
 def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
     """17 Nov 2026: the daily chart as it looked on the buy date (130 bars up to and including that day) with EMA 9 / EMA 21 /
@@ -2093,7 +2120,7 @@ def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
     s150 = [sum(C[max(0, i - 149):i + 1]) / (i + 1 - max(0, i - 149)) if i >= 149 else None for i in range(len(C))]
     rd = lambda v: [None if x is None else round(x, 2) for x in v[a:e + 1]]  # noqa: E731
     out = dict(symbol=sym, date=date_, bar=t[e], t=t[a:e + 1], o=rd(O), h=rd(H), l=rd(L), c=rd(C), e9=rd(e9), e21=rd(e21), s150=rd(s150),
-               hi52=round(max(H[max(0, e - 251):e + 1]), 2))
+               hi52=round(max(H[max(0, e - 251):e + 1]), 2), ctx=_entry_ctx(sym, date_))
     if t[e] < et_now().date().isoformat():          # freeze only once that day has closed
         json.dump(out, open(f, "w"))
     return out

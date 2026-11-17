@@ -5078,65 +5078,120 @@ function uswParse(h) {
    Trend 9/21 -> EMA 9 / EMA 21; Monthly ATH -> 150-day (~30-week) average + 52-week high; entry, first stop, 2R, and the
    sale price for closed trades. */
 const usSnapGet = (sym, d) => lvApi(`/api/us/snap?symbol=${encodeURIComponent(sym)}&date_=${encodeURIComponent(d)}`, { timeout: 30000 });
-function usEntryChart(box, S, t, w, h) {
-  box.innerHTML = '';
-  const ch = window.LightweightCharts.createChart(box, { ...chartBase(), width: w || box.clientWidth || 360, height: h || 260, handleScroll: false, handleScale: false,
-    timeScale: { borderColor: C.line, fixLeftEdge: true, fixRightEdge: true } });
-  const cs = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall, priceLineVisible: false });
+function usEntryChart(box, S, t, w, h, light) {
+  box.innerHTML = ''; const base = chartBase();
+  const opt = light ? { ...base, layout: { ...base.layout, background: { color: '#FFFFFF' }, textColor: '#374151' }, grid: { vertLines: { color: '#F3F4F6' }, horzLines: { color: '#EEF0F4' } },
+    rightPriceScale: { borderColor: '#E5E7EB' } } : base;
+  const ch = window.LightweightCharts.createChart(box, { ...opt, width: w || box.clientWidth || 360, height: h || 260, handleScroll: false, handleScale: false,
+    timeScale: { borderColor: light ? '#E5E7EB' : C.line, fixLeftEdge: true, rightOffset: 10 } });
+  const up = light ? '#16A34A' : C.rise, dn = light ? '#DC2626' : C.fall;
+  const cs = ch.addCandlestickSeries({ upColor: up, downColor: dn, borderVisible: false, wickUpColor: up, wickDownColor: dn, priceLineVisible: false, lastValueVisible: false });
   cs.setData(S.t.map((x, i) => ({ time: x, open: S.o[i], high: S.h[i], low: S.l[i], close: S.c[i] })));
   const line = (k, col) => { const l = ch.addLineSeries({ color: col, lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
     l.setData(S.t.map((x, i) => (S[k][i] == null ? { time: x } : { time: x, value: S[k][i] }))); };
-  const ath = /ATH/.test(t.system || '');
-  if (ath) { line('s150', '#9CA3AF'); cs.createPriceLine({ price: S.hi52, color: '#B45309', lineWidth: 1, lineStyle: 3, axisLabelVisible: true, title: '52-wk high' }); }
-  else { line('e9', '#F59E0B'); line('e21', '#3B82F6'); }
+  const ath = /ATH/.test((S.ctx && S.ctx.system) || t.system || '');
+  if (ath) line('s150', '#9CA3AF'); else { line('e9', '#F59E0B'); line('e21', '#3B82F6'); }
+  if (ath && S.hi52) cs.createPriceLine({ price: S.hi52, color: '#B45309', lineWidth: 1, lineStyle: 3, axisLabelVisible: true, title: '52-wk high' });
+  /* 17 Nov 2026: levels drawn as short segments over the last bars (not across the whole chart), each with its label */
+  const n = S.t.length, K = Math.min(22, n); const seg = (price, col, title, style, width = 2) => { if (!(price > 0)) return;
+    const l = ch.addLineSeries({ color: col, lineWidth: width, lineStyle: style, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title });
+    l.setData(S.t.slice(n - K).map((x) => ({ time: x, value: price }))); };
   const s0 = t.stop0 || t.stop; const r2 = t.entry + 2 * (t.entry - s0);
-  cs.createPriceLine({ price: t.entry, color: '#7C5CFC', lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'entry' });
-  cs.createPriceLine({ price: s0, color: C.fall || '#C62828', lineWidth: 2, lineStyle: 2, axisLabelVisible: true, title: 'SL' });
-  cs.createPriceLine({ price: r2, color: C.rise || '#0A7A55', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '2R' });
-  if (t.exit) cs.createPriceLine({ price: t.exit, color: '#111827', lineWidth: 1, lineStyle: 1, axisLabelVisible: true, title: 'sold' });
-  cs.setMarkers([{ time: S.t[S.t.length - 1], position: 'belowBar', color: '#7C5CFC', shape: 'arrowUp', text: 'BUY' }]);
-  const fit = ch.addLineSeries({ color: 'rgba(0,0,0,0)', priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
-  fit.setData([{ time: S.t[S.t.length - 2], value: Math.max(r2, t.exit || 0) }, { time: S.t[S.t.length - 1], value: Math.min(s0, t.exit || s0) }]);
+  seg(r2, '#16A34A', '2R target', 2); seg(t.entry, '#7C3AED', 'entry', 0, 3); seg(s0, '#DC2626', 'first SL', 2);
+  const sl = t.stop_last != null ? t.stop_last : (t.exit ? null : t.stop);   // open holdings: the stop now
+  if (sl && Math.abs(sl - s0) / s0 > 0.002) seg(sl, '#F97316', t.exit ? 'last SL' : 'stop now', 2);
+  if (t.exit) seg(t.exit, '#111827', 'sold', 1);
+  cs.setMarkers([{ time: S.t[n - 1], position: 'belowBar', color: '#7C3AED', shape: 'arrowUp', text: 'BUY' }]);
   ch.timeScale().fitContent(); return ch;
+}
+/* one line of top-down logic for the journal: market -> sector -> theme -> stock -> system */
+function usEntryLogic(t, ctx) {
+  const c = ctx || {}; const P = [];
+  if (c.spx_up != null) P.push(`Market: S&P 500 ${c.spx_up ? 'above' : 'below'} its 200-day (${c.spx_1m >= 0 ? '+' : ''}${c.spx_1m}% in 1 month)`);
+  if (c.sector) P.push(`sector ${c.sector}${c.sector_pct != null ? ` ${Math.round(c.sector_pct)}/99` : ''}`);
+  if (c.theme) P.push(`theme ${c.theme}${c.theme_pct != null ? ` ${Math.round(c.theme_pct)}/99` : ''}`);
+  if (c.rs_rating != null) P.push(`stock RS ${Math.round(c.rs_rating)}/99`);
+  const sig = c.system ? `${c.system}${c.note ? ` (${c.note})` : ''}` : (t.system || '');
+  P.push(`signal: ${sig}${c.system && t.system && c.system !== t.system ? ` · managed as ${t.system}` : ''}`);
+  return P.join(' → ');
 }
 async function usEntrySheet(t) {
   const d = t.since; const sys = t.system || '';
   $('#sheet-body').innerHTML = `<div class="tdc-h"><div class="t2-sh"><b>${esc(t.symbol)}</b><span>Entry chart · ${esc(day(d))} · ${esc(sys)}</span></div></div>
     <div class="tdc-chart" id="usec"><p class="muted pad">Loading chart…</p></div>
-    <p class="tdc-key">Daily candles to the buy date · purple = entry ${fmt(t.entry, 2, 'en-US')} · red dashed = first SL ${fmt(t.stop0 || t.stop, 2, 'en-US')} · green dashed = 2R${/ATH/.test(sys) ? ' · grey = 150-day (~30-week) average · brown = 52-week high' : ' · orange = EMA 9 · blue = EMA 21'}${t.exit ? ` · black = sold ${fmt(t.exit, 2, 'en-US')}` : ''}</p>
+    <p class="tdc-key">Daily candles to the buy date · purple = entry ${fmt(t.entry, 2, 'en-US')} · red = first SL ${fmt(t.stop0 || t.stop, 2, 'en-US')}${t.stop_last && t.stop_last !== (t.stop0 || t.stop) ? ` · orange = last SL ${fmt(t.stop_last, 2, 'en-US')}` : ''} · green = 2R target${/ATH/.test(sys) ? ' · grey = 150-day (~30-week) average · brown = 52-week high' : ' · orange = EMA 9 · blue = EMA 21'}${t.exit ? ` · black = sold ${fmt(t.exit, 2, 'en-US')}` : ''}</p>
     <p class="tdc-why">Frozen as of that day's close, so it shows exactly what the chart looked like when you bought.</p>`;
   $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
-  try { const S = await usSnapGet(t.symbol, d); usEntryChart($('#usec'), S, t); } catch (e) { $('#usec').innerHTML = `<p class="muted pad">Chart not available: ${esc(e.message)}</p>`; }
+  try { const S = await usSnapGet(t.symbol, d); usEntryChart($('#usec'), S, t);
+    $('#usec').insertAdjacentHTML('afterend', `<p class="tdc-why"><b>Why it was bought:</b> ${esc(usEntryLogic(t, S.ctx))}</p>`); }
+  catch (e) { $('#usec').innerHTML = `<p class="muted pad">Chart not available: ${esc(e.message)}</p>`; }
 }
 async function usJournalPdf(C, H, S, fx) {
   if (!window.jspdf) await new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
-  const doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' }); const f2 = (v) => (v == null ? '-' : Number(v).toFixed(2));
-  doc.setFontSize(16); doc.text('US trade journal - moomoo', 14, 16); doc.setFontSize(9);
-  doc.text(`Exported ${new Date().toLocaleString('en-AU')} · AUD/USD ${f2(fx)}`, 14, 22);
-  let y = 30; doc.setFontSize(11);
-  if (S && S.n) { doc.text(`Closed ${S.n} · won ${S.wins} (${S.win_rate}%) · P&L US$ ${f2(S.pnl)} / A$ ${f2(S.pnl_aud)} · avg R ${S.avg_r == null ? '-' : f2(S.avg_r)}`, 14, y); y += 8; }
-  const head = (cols) => { doc.setFontSize(8); doc.setFont(undefined, 'bold'); cols.forEach(([t_, x]) => doc.text(t_, x, y)); doc.setFont(undefined, 'normal'); y += 5; };
-  const X = [14, 34, 58, 72, 92, 112, 132, 152, 172, 190];
-  if (C.length) { doc.setFontSize(11); doc.text('Closed trades', 14, y); y += 6;
-    head([['Sold', X[0]], ['Symbol', X[1]], ['Qty', X[2]], ['Entry', X[3]], ['First SL', X[4]], ['Exit', X[5]], ['P&L $', X[6]], ['P&L A$', X[7]], ['%', X[8]], ['R', X[9]]]);
-    C.forEach((t) => { if (y > 280) { doc.addPage(); y = 16; } [t.closed, t.symbol, t.qty, f2(t.entry), f2(t.stop0), f2(t.exit), f2(t.pnl), f2(t.pnl_aud), f2(t.pnl_pct), t.r_mult == null ? '-' : f2(t.r_mult)].forEach((v, i) => doc.text(String(v == null ? '-' : v), X[i], y)); y += 5; }); y += 4; }
-  if (H.length) { if (y > 260) { doc.addPage(); y = 16; } doc.setFontSize(11); doc.text('Open holdings', 14, y); y += 6;
-    head([['Bought', X[0]], ['Symbol', X[1]], ['Qty', X[2]], ['Entry', X[3]], ['First SL', X[4]], ['Stop now', X[5]], ['Price', X[6]], ['P&L $', X[7]], ['System', X[8]]]);
-    H.forEach((t) => { if (y > 280) { doc.addPage(); y = 16; } [t.since, t.symbol, t.qty, f2(t.entry), f2(t.stop0 || t.stop), f2(t.stop), f2(t.price), f2(t.pnl), (t.system || '').slice(0, 14)].forEach((v, i) => doc.text(String(v == null ? '-' : v), X[i], y)); y += 5; }); }
-  // one page per trade with its entry chart
-  const tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-10000px;top:0;width:900px;height:450px'; document.body.appendChild(tmp);
+  const doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' }); const W = 210, M = 14;
+  const f2 = (v) => (v == null || !isFinite(v) ? '-' : Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  const sg = (v) => (v == null ? '-' : `${v >= 0 ? '+' : '-'}${f2(Math.abs(v))}`);
+  const tx = (x) => String(x).replace(/→/g, '>').replace(/−/g, '-').replace(/–/g, '-').replace(/[^\x00-\xFF]/g, '');   // standard PDF fonts: Latin-1 only
+  const INK = [17, 24, 39], MUTE = [107, 114, 128], LINE = [229, 231, 235], ACC = [79, 70, 229], GRN = [22, 163, 74], RED = [220, 38, 38];
+  const col = (c) => doc.setTextColor(...c); const fill = (c) => doc.setFillColor(...c);
+  const band = (title, sub) => { fill(ACC); doc.rect(0, 0, W, 26, 'F'); fill([99, 102, 241]); doc.rect(0, 26, W, 1.2, 'F');
+    col([255, 255, 255]); doc.setFont('helvetica', 'bold'); doc.setFontSize(17); doc.text(tx(title), M, 13); doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.text(tx(sub), M, 20); col(INK); };
+  const foot = () => { const n = doc.getNumberOfPages(); for (let p = 1; p <= n; p++) { doc.setPage(p); doc.setFontSize(7.5); col(MUTE);
+    doc.text('Trend Desk · trade journal · for your records, not investment advice', M, 290); doc.text(`${p} / ${n}`, W - M, 290, { align: 'right' }); } };
+  const kpi = (x, y, w, label, val, sub, c) => { fill([248, 250, 252]); doc.setDrawColor(...LINE); doc.roundedRect(x, y, w, 20, 2.5, 2.5, 'FD');
+    doc.setFontSize(7.5); col(MUTE); doc.text(tx(label.toUpperCase()), x + 3, y + 5.5); doc.setFont('helvetica', 'bold'); doc.setFontSize(13); col(c || INK); doc.text(tx(val), x + 3, y + 13);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); col(MUTE); if (sub) doc.text(tx(sub), x + 3, y + 17.5); col(INK); };
+  const table = (y, head, rows, widths, colorCol) => { let x0 = M; doc.setFontSize(8); fill([243, 244, 246]); doc.rect(M, y - 4.5, W - 2 * M, 7, 'F');
+    doc.setFont('helvetica', 'bold'); col(MUTE); head.forEach((h_, i) => { doc.text(h_, x0 + 1.5, y); x0 += widths[i]; }); doc.setFont('helvetica', 'normal'); y += 6.5;
+    rows.forEach((r, k) => { if (y > 278) { doc.addPage(); y = 20; } if (k % 2) { fill([250, 250, 252]); doc.rect(M, y - 4.5, W - 2 * M, 6.5, 'F'); }
+      let x = M; r.forEach((v, i) => { const neg = colorCol && colorCol.includes(i) && String(v).startsWith('-'); const pos = colorCol && colorCol.includes(i) && String(v).startsWith('+');
+        col(neg ? RED : pos ? GRN : INK); if (i === 1) doc.setFont('helvetica', 'bold'); doc.text(tx(v == null ? '-' : v), x + 1.5, y); doc.setFont('helvetica', 'normal'); x += widths[i]; }); y += 6.5; });
+    col(INK); return y + 3; };
+  // ---------- page 1: summary
+  band('Trading Journal · US · moomoo', `Exported ${new Date().toLocaleString('en-AU', { dateStyle: 'medium', timeStyle: 'short' })} · A$1 = US$${f2(fx)} · prices in US$ unless marked A$`);
+  const open = H.reduce((a, t) => a + (t.pnl || 0), 0); const risk = H.reduce((a, t) => a + Math.max(0, t.qty * ((t.price || t.entry) - t.stop)), 0);
+  const kw = (W - 2 * M - 3 * 4) / 4; let y = 34;
+  kpi(M, y, kw, 'Closed trades', String(S && S.n ? S.n : 0), S && S.n ? `${S.wins} won · ${S.win_rate}% win rate` : 'none yet');
+  kpi(M + (kw + 4), y, kw, 'Realised P&L', S && S.n ? sg(S.pnl) : '–', S && S.n ? `A$ ${sg(S.pnl_aud)}` : '', S && S.pnl < 0 ? RED : GRN);
+  kpi(M + 2 * (kw + 4), y, kw, 'Average R', S && S.avg_r != null ? `${S.avg_r >= 0 ? '+' : ''}${f2(S.avg_r)}R` : '–', S && S.n ? `best ${sg(S.best)} · worst ${sg(S.worst)}` : '');
+  kpi(M + 3 * (kw + 4), y, kw, `Open (${H.length})`, sg(open), `at risk to stops ${f2(risk)}`, open < 0 ? RED : GRN);
+  y += 30;
+  if (C.length) { doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('Closed trades', M, y); doc.setFont('helvetica', 'normal'); y += 7;
+    y = table(y, ['Sold', 'Stock', 'Qty', 'Entry', 'First SL', 'Exit', 'P&L US$', 'P&L A$', '%', 'R', 'Days'],
+      C.map((t) => [t.closed, t.symbol, t.qty, f2(t.entry), f2(t.stop0), f2(t.exit), sg(t.pnl), sg(t.pnl_aud), sg(t.pnl_pct), t.r_mult == null ? '-' : sg(t.r_mult), t.days ?? '-']),
+      [20, 18, 10, 18, 18, 18, 20, 20, 14, 14, 12], [6, 7, 8, 9]); }
+  if (H.length) { if (y > 250) { doc.addPage(); y = 20; } doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('Open holdings', M, y); doc.setFont('helvetica', 'normal'); y += 7;
+    y = table(y, ['Bought', 'Stock', 'Qty', 'Entry', 'First SL', 'Stop now', '2R target', 'Price', 'P&L US$', 'System'],
+      H.map((t) => { const s0 = t.stop0 || t.stop; return [t.since, t.symbol, t.qty, f2(t.entry), f2(s0), f2(t.stop), f2(t.entry + 2 * (t.entry - s0)), f2(t.price), sg(t.pnl), (t.system || '').slice(0, 13)]; }),
+      [20, 18, 10, 18, 18, 18, 19, 18, 19, 24], [8]); }
+  // ---------- one page per trade
+  const tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-10000px;top:0;width:1000px;height:520px'; document.body.appendChild(tmp);
   for (const t of C.concat(H)) {
-    doc.addPage(); doc.setFontSize(14); doc.text(`${t.symbol} · ${t.system || ''}`, 14, 16); doc.setFontSize(9);
-    const lines = [`Bought ${t.since} · ${t.qty} @ ${f2(t.entry)} · first SL ${f2(t.stop0 || t.stop)} (risk ${f2((t.entry - (t.stop0 || t.stop)) * t.qty)} US$)`,
-      t.exit ? `Sold ${t.closed} @ ${f2(t.exit)} · P&L US$ ${f2(t.pnl)} / A$ ${f2(t.pnl_aud)} · ${f2(t.pnl_pct)}% · ${t.r_mult == null ? '-' : f2(t.r_mult)}R · ${t.days ?? '-'} days · ${t.reason || ''}` : `Open · now ${f2(t.price)} · stop ${f2(t.stop)} · P&L US$ ${f2(t.pnl)}`,
-      `Stop moves: ${(t.stop_log || []).map((x) => `${x[0]} ${x[1]} (${x[2]})`).join(' · ') || '-'}`];
-    lines.forEach((l_, i) => doc.text(doc.splitTextToSize(l_, 182), 14, 23 + i * 6));
-    try { const SN = await usSnapGet(t.symbol, t.since); const ch = usEntryChart(tmp, SN, t, 900, 450); await new Promise((r) => setTimeout(r, 120));
-      doc.addImage(ch.takeScreenshot().toDataURL('image/png'), 'PNG', 14, 44, 182, 91); ch.remove();
-      doc.setFontSize(8); doc.text(`Daily chart frozen on ${SN.bar}: purple entry, red first SL, green 2R${/ATH/.test(t.system || '') ? ', grey 150-day avg, brown 52-week high' : ', orange EMA 9, blue EMA 21'}${t.exit ? ', black sale' : ''}.`, 14, 140);
-    } catch (e) { doc.text('Chart not available.', 14, 50); }
+    doc.addPage(); const closed = !!t.exit; const s0 = t.stop0 || t.stop; const r2 = t.entry + 2 * (t.entry - s0);
+    band(`${t.symbol}  ·  ${t.system || ''}`, closed ? `Closed · bought ${t.since} · sold ${t.closed} · ${t.days ?? '–'} days · ${t.reason || ''}` : `Open since ${t.since}`);
+    let SN = null; try { SN = await usSnapGet(t.symbol, t.since); } catch (e) { /* no chart */ }
+    const bw = (W - 2 * M - 4 * 3) / 5; y = 33;
+    kpi(M, y, bw, 'Entry', f2(t.entry), `${t.qty} shares · ${f2(t.qty * t.entry)}`, [124, 58, 237]);
+    kpi(M + (bw + 3), y, bw, 'First SL', f2(s0), `risk ${f2(t.entry - s0)}/sh · ${f2((t.entry - s0) * t.qty)}`, RED);
+    kpi(M + 2 * (bw + 3), y, bw, closed ? 'Last SL' : 'Stop now', f2(closed ? t.stop_last : t.stop), `${f2(((closed ? t.stop_last : t.stop) / t.entry - 1) * 100)}% vs entry`, [249, 115, 22]);
+    kpi(M + 3 * (bw + 3), y, bw, '2R target', f2(r2), `+${f2((r2 / t.entry - 1) * 100)}% · no fixed exit`, GRN);
+    if (closed) kpi(M + 4 * (bw + 3), y, bw, 'Exit · P&L', f2(t.exit), `${sg(t.pnl)} · ${t.r_mult == null ? '-' : sg(t.r_mult) + 'R'} · A$${sg(t.pnl_aud)}`, t.pnl < 0 ? RED : GRN);
+    else kpi(M + 4 * (bw + 3), y, bw, 'Now · P&L', f2(t.price), `${sg(t.pnl)} US$`, (t.pnl || 0) < 0 ? RED : GRN);
+    y += 26; doc.setFontSize(8.5); const LG = doc.splitTextToSize(tx(usEntryLogic(t, SN && SN.ctx)), W - 2 * M - 6); const bh = 8 + LG.length * 4.2;
+    fill([238, 242, 255]); doc.roundedRect(M, y, W - 2 * M, bh, 2, 2, 'F'); doc.setFontSize(7.5); col(ACC); doc.setFont('helvetica', 'bold'); doc.text('ENTRY LOGIC  (top-down: market > sector > theme > stock > system)', M + 3, y + 4.5);
+    doc.setFont('helvetica', 'normal'); col(INK); doc.setFontSize(8.5); doc.text(LG, M + 3, y + 9.3);
+    y += bh + 5;
+    if (SN) { const ch = usEntryChart(tmp, SN, t, 1000, 520, true); await new Promise((r) => setTimeout(r, 150));
+      doc.setDrawColor(...LINE); doc.roundedRect(M, y, W - 2 * M, (W - 2 * M) * 0.52 + 2, 2, 2, 'S');
+      doc.addImage(ch.takeScreenshot().toDataURL('image/png'), 'PNG', M + 1, y + 1, W - 2 * M - 2, (W - 2 * M - 2) * 0.52); ch.remove();
+      y += (W - 2 * M) * 0.52 + 6; doc.setFontSize(7.5); col(MUTE);
+      const cap = (txt) => { const Lc = doc.splitTextToSize(txt, W - 2 * M); doc.text(Lc, M, y); y += Lc.length * 3.6; };
+      cap(tx(`Daily chart frozen at the close of ${SN.bar} (the buy day). Lines: purple entry · red first SL · ${(t.stop_last || t.stop) && (t.stop_last || t.stop) !== s0 ? `orange ${closed ? 'last SL' : 'stop now'} · ` : ''}green 2R target${closed ? ' · black sale' : ''} · ${/ATH/.test((SN.ctx && SN.ctx.system) || t.system || '') ? 'grey 150-day (~30-week) average · brown 52-week high' : 'orange EMA 9 · blue EMA 21'}.`)); y += 5; col(INK);
+    } else { doc.setFontSize(9); col(MUTE); doc.text('Chart not available for this date.', M, y + 6); y += 14; col(INK); }
+    const L = (t.stop_log || []); if (L.length) { doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.text('Stop-loss history', M, y); doc.setFont('helvetica', 'normal'); y += 6;
+      y = table(y, ['Date', 'Stop', 'Change', 'vs entry'], L.map((x) => [x[0], f2(x[1]), x[2], `${f2((x[1] / t.entry - 1) * 100)}%`]), [30, 30, 30, 30]); }
   }
-  tmp.remove(); doc.save(`us_trade_journal_${new Date().toISOString().slice(0, 10)}.pdf`);
+  tmp.remove(); foot(); doc.save(`trade_journal_us_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 /* 17 Nov 2026: US trade journal (moomoo). Closed trades with entry, initial / last stop, stop moves, sale, P&L $ / A$, %, R and
    days; holdings removed without a price wait here as "pending". CSV export matches the user's spreadsheet columns. */
