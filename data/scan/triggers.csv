@@ -2,6 +2,6 @@ symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,
 RAYMOND,2026-11-16,1185.8,61.5,1119.6,1100.4,7.8,0,0.0,Raymond Limited,watch,151.2,0.82,82,79.51,1185.8,61.5
 GLOBAL,2026-11-16,146.7,63.0,142.94,143.01,2.6,0,0.0,Global Education Limited,trend,145.1,0.8,100,1.21,146.7,63.0
 NAZARA,2026-11-13,425.4,64.5,405.7,407.9,4.3,1,1.2,Nazara Technologies Limited,trend,155.8,0.94,95,59.51,430.4,66.6
-AAREYDRUGS,2026-11-12,114.11,61.8,107.98,106.69,7.0,2,-2.6,Aarey Drugs & Pharmaceuticals Limited,watch,130.4,0.74,87,2.23,111.12,55.3
+AAREYDRUGS,2026-11-12,114.11,61.8,107.98,106.69,7.0,2,0.9,Aarey Drugs & Pharmaceuticals Limited,watch,127.1,0.73,87,2.18,115.15,63.1
 RATNAVEER,2026-11-11,370.55,62.4,354.02,355.1,4.4,3,-2.2,Ratnaveer Precision Engineering Limited,watch,171.0,0.92,98,126.04,362.3,56.3
-SKYGOLD,2026-11-11,983.4,60.3,928.46,923.05,6.5,3,-1.4,SKY GOLD AND DIAMONDS LIMITED,watch,161.0,0.91,80,194.44,969.6,54.2
+SKYGOLD,2026-11-11,983.4,60.3,928.46,923.05,6.5,3,3.9,SKY GOLD AND DIAMONDS LIMITED,watch,155.2,0.91,80,205.88,1022.1,62.3
