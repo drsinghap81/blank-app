@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-14 00:12 UTC",
-"asof": "2026-11-13",
+"generated": "2026-11-17 00:19 UTC",
+"asof": "2026-11-16",
 "broker": "Trading 212 (Australia)",
 "note": "Rebalance on the first trading day after the month-end decision. FX fee 0.15% each way on Trading 212 AU. Pies have no stop-loss: the month-end check is the exit.",
 "pies": [
@@ -81,6 +81,11 @@
 "2026-11-13",
 0.99644,
 0.68069
+],
+[
+"2026-11-16",
+0.97759,
+0.6779
 ]
 ]
 },
@@ -119,16 +124,8 @@
 ],
 "provisional": [
 {
-"ticker": "XBI",
-"pct": 33.3
-},
-{
-"ticker": "XRT",
-"pct": 33.3
-},
-{
 "ticker": "VOO",
-"pct": 33.3
+"pct": 100.0
 }
 ],
 "record": [],
@@ -182,6 +179,11 @@
 "2026-11-13",
 0.98554,
 0.68069
+],
+[
+"2026-11-16",
+0.96301,
+0.6779
 ]
 ]
 }
@@ -272,6 +274,11 @@
 "2026-11-13",
 0.99644,
 0.68069
+],
+[
+"2026-11-16",
+0.97759,
+0.6779
 ]
 ]
 },
@@ -316,7 +323,14 @@
 "name": "Vanguard S&P 500 UCITS (Acc)"
 }
 ],
-"provisional": null,
+"provisional": [
+{
+"ticker": "VUAG",
+"pct": 100.0,
+"us": "VOO",
+"name": "Vanguard S&P 500 UCITS (Acc)"
+}
+],
 "record": [],
 "nav": [
 [
@@ -368,6 +382,11 @@
 "2026-11-13",
 0.98554,
 0.68069
+],
+[
+"2026-11-16",
+0.96301,
+0.6779
 ]
 ]
 }
