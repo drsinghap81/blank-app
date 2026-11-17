@@ -5165,18 +5165,22 @@ async function usJournalCard(box) {
     ${C.length ? `<div class="usj-wrap"><table class="usj"><thead><tr><th>Sold</th><th>Stock</th><th>Qty</th><th>Entry · SL</th><th>Exit</th><th>P&L</th><th>R</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
       ` : (P.length ? '' : '<p class="empty">No closed trades yet. Use "Record sale" on a holding when moomoo sells it.</p>')}
     <p class="t2-row"><button class="lv-link" id="usjpdf">⬇ Export PDF (with entry charts)</button> ${C.length ? '<button class="lv-link" id="usjcsv">⬇ Export CSV</button>' : ''}</p>
-    <details class="info"><summary>Add a past trade</summary><div class="tl-add" style="flex-wrap:wrap">
-      <input id="ujs" placeholder="Symbol" style="max-width:6em"><input id="ujq" type="number" placeholder="Shares" style="max-width:6em"><input id="uje" type="number" step="any" placeholder="Buy $" style="max-width:7em">
-      <input id="ujx" type="number" step="any" placeholder="Sold $" style="max-width:7em"><input id="ujl" type="number" step="any" placeholder="First stop $" style="max-width:8em">
-      <input id="ujb" type="date" title="Bought" style="max-width:10em"><input id="ujd" type="date" title="Sold" style="max-width:10em">
-      <select id="ujy">${USW_SYS.map(([k, nm]) => `<option value="${k}">${nm}</option>`).join('')}</select><button class="lv-btn" id="ujadd">Add</button></div></details>
+    <details class="info"><summary>Paste past trades</summary><p class="lv-sub">One line, trades separated by commas: <b>SYMBOL:shares:buy:sold:first stop:system:bought date:sold date</b> (system TF / ATH / RT / MY, dates YYYY-MM-DD).</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><input id="ujpaste" placeholder="KDP:13:36.70:35.62:31.13:ATH:2026-11-13:2026-11-16,…" style="flex:1;min-width:12em"><button class="lv-btn" id="ujread">Add</button></div></details>
     <p class="lv-sub" id="ujmsg"></p></div>`;
   const post = async (body, msg) => { try { await lvApi('/api/us/journal', { method: 'POST', body: JSON.stringify(body) }); alertMsg(msg, true); } catch (e) { alertMsg('Could not save: ' + e.message); } usJournalCard(box); };
   box.querySelectorAll('[data-jsave]').forEach((b) => b.addEventListener('click', () => { const id = b.dataset.jsave; const px = +box.querySelector(`[data-jp="${id}"]`).value;
     if (!(px > 0)) { alertMsg('Enter the sale price'); return; } post({ action: 'edit', id, exit: px, date: box.querySelector(`[data-jd="${id}"]`).value || null }, 'Sale saved'); }));
   box.querySelectorAll('[data-jdel]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); if (confirm('Delete this journal entry?')) post({ action: 'delete', id: b.dataset.jdel }, 'Deleted'); }));
-  const ad = box.querySelector('#ujadd'); if (ad) ad.addEventListener('click', () => { const v = (id) => box.querySelector(id).value;
-    post({ action: 'add', symbol: v('#ujs'), qty: +v('#ujq'), entry: +v('#uje'), exit: +v('#ujx'), stop0: +v('#ujl'), since: v('#ujb') || null, date: v('#ujd') || null, system: v('#ujy') }, 'Trade added'); });
+  const rd = box.querySelector('#ujread'); if (rd) rd.addEventListener('click', async () => {   // 17 Nov 2026: paste, same style as the holdings list
+    const D = /^\d{4}-\d{2}-\d{2}$/; const L = box.querySelector('#ujpaste').value.trim().split(',').map((x) => x.trim()).filter(Boolean).map((x) => {
+      const [symbol, qty, entry, exit, stop0, system, since, date] = x.split(':');
+      return { action: 'add', symbol: (symbol || '').toUpperCase(), qty: +qty, entry: +entry, exit: +exit, stop0: +stop0, system: system || 'MY', since: D.test(since || '') ? since : null, date: D.test(date || '') ? date : null }; });
+    const bad = L.filter((t) => !t.symbol || !(t.qty > 0 && t.entry > 0 && t.exit > 0 && t.stop0 > 0));
+    if (!L.length || bad.length) { alertMsg(`Could not read ${bad.length ? bad.map((t) => t.symbol || '?').join(', ') : 'that'}. Use SYMBOL:shares:buy:sold:stop:system:bought:sold`); return; }
+    rd.disabled = true; let ok = 0;
+    for (const t of L) { try { await lvApi('/api/us/journal', { method: 'POST', body: JSON.stringify(t) }); ok++; } catch (e) { alertMsg(`${t.symbol}: ${e.message}`); } }
+    alertMsg(`${ok} trade${ok === 1 ? '' : 's'} added`, true); usJournalCard(box); });
   box.querySelectorAll('[data-jchart]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); usEntrySheet(T.find((x) => x.id === b.dataset.jchart)); }));
   const sy = box.querySelector('#usjsync'); if (sy) sy.addEventListener('click', async () => { sy.disabled = true; sy.textContent = 'Syncing…';
     try { const r = await lvApi('/api/us/journal/sync', { method: 'POST', timeout: 60000 }); alertMsg(r.ok ? `${r.buys} buys, ${r.sells} sells recorded` : r.why, r.ok); } catch (e) { alertMsg('Sync failed: ' + e.message); }
