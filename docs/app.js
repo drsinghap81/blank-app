@@ -903,7 +903,7 @@ async function loadLiveG(mk) {
       ${(Pp.log || []).length ? `<details style="margin-top:6px"><summary class="lv-sub">Paper fills and misses</summary><p class="lv-sub">${Pp.log.slice(0, 30).map(esc).join('<br>')}</p></details>` : ''}`;
   }
   el.innerHTML = `${lvSeg()}<div class="lv-card" style="border-left:5px solid var(--fall)"><b>Paper-trading phase · you place orders yourself on moomoo</b>
-      <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>${mk === 'US' ? '<div id="usw"></div><div id="usj"></div>' : ''}
+      <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>${mk === 'US' ? '<div id="usw"></div><div id="pvus"></div><div id="usj"></div>' : ''}
     <div class="lv-card"><b>Paper record</b>${paper}</div>
     ${lvBucketCard(mk, P, alG, inUseG, null)}
     <div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Momentum Investing · max ${alG.mom}% · top ${rows.length}</b>${capInput(mk, 'lvcapg')}</div>
@@ -913,7 +913,7 @@ async function loadLiveG(mk) {
     ${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`;
   lvSegWire(el); lvBucketWire(el, mk, null); wireCap('lvcapg', mk, () => loadLive());
-  if (mk === 'US') { usWatchCard($('#usw')); usJournalCard($('#usj')); }
+  if (mk === 'US') { usWatchCard($('#usw')); perfVsCard($('#pvus'), 'US'); usJournalCard($('#usj')); }
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', () => { try { localStorage.setItem('td.lvN_' + mk, ns.value); localStorage.removeItem(selKey(mk, P.asof)); } catch (e) { /* private mode */ } lvKeep(); });
   lvSelWire(el, mk, P.asof, rows, nP, selG);
   el.querySelectorAll('.vcp-ch').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); vcpSelect(swR[+a.dataset.v], mk); }));
@@ -1111,7 +1111,7 @@ async function loadLive() {
         <p class="lv-sub">Not part of your tested 60/40 split. The same lists live on Trading (VCP, 9/21 any stock, retest, patterns) and Momentum investing (near trigger); they stay here only so you can still Send one if you choose.</p>
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
-    ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="adoptcard"></div><div id="inj"></div>' : ''}`)}
+    ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="inj"></div>' : ''}`)}
     ${S && isOwner() ? pane('fut', '<div id="tbcard"></div><div id="tbcardn"></div>') : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
@@ -1141,7 +1141,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); usJournalCard($('#inj'), 'IN'); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); perfVsCard($('#pvin'), 'IN'); usJournalCard($('#inj'), 'IN'); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -4870,9 +4870,9 @@ async function bgReal(el) {
     <div class="t2-list">${T.map((t, i) => { const g = t.ltp ? (t.ltp / t.entry - 1) * 100 : null; const st = t.gtt_trigger || t.stop;
       return t2Row({ sym: t.symbol, name: t.symbol, i, sub: `${t.qty} shares · stop ${inr(st, 0)}${t.trail_at ? ' ↑' : ''}`, top: inr(t.qty * (t.ltp || t.entry)),
         right: ex.has(t.symbol) ? 'Sell now' : g == null ? '' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`, cls: ex.has(t.symbol) ? 'sellnow' : g == null ? '' : g >= 0 ? 'up' : 'down' }); }).join('') || '<p class="bg-empty">No open trades from the app.</p>'}</div>
-    <div id="bgrinj"></div><div id="bgrus"></div><div id="bgrch"></div>`;
+    <div id="bgrpv"></div><div id="bgrinj"></div><div id="bgrus"></div><div id="bgrch"></div>`;
   body.querySelectorAll('.t2-row').forEach((b) => b.addEventListener('click', () => { const t = T[+b.dataset.i]; if (t) tdChart({ symbol: t.symbol, name: t.symbol, price: t.ltp || t.entry, stop: t.gtt_trigger || t.stop }, 'NSE'); }));
-  usJournalCard($('#bgrinj'), 'IN'); pfUS($('#bgrus')); pfChart($('#bgrch'));
+  perfVsCard($('#bgrpv')); usJournalCard($('#bgrinj'), 'IN'); pfUS($('#bgrus')); pfChart($('#bgrch'));
 }
 async function bgTrades(el) {
   if (state.bgReal) return bgReal(el);
@@ -5203,6 +5203,41 @@ async function usJournalPdf(C, H, S, fx, mk) {
       y = table(y, ['Date', 'Stop', 'Change', 'vs entry'], L.map((x) => [x[0], f2(x[1]), x[2], `${f2((x[1] / t.entry - 1) * 100)}%`]), [30, 30, 30, 30]); }
   }
   tmp.remove(); foot(); doc.save(`trade_journal_${IN ? 'india' : 'us'}_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+/* 17 Nov 2026: portfolio vs market, day by day. Day % = holdings' change on their previous close (cash and new money don't
+   distort it). India = all Angel holdings vs Nifty 50; US = your moomoo holdings vs S&P 500. Rows recorded at each close;
+   earlier days are estimated with today's holdings (est.). */
+async function perfVsCard(box, mk0) {
+  if (!box) return; const c = lvCfg(); if (!c.url || !c.token) { box.innerHTML = ''; return; }
+  const mk = state.pvMk = mk0 || state.pvMk || 'IN';
+  const tabs = `<div class="seg" style="margin:6px 0">${[['IN', 'India · Angel'], ['US', 'US · moomoo']].map(([v, n]) => `<button data-pv="${v}" aria-selected="${mk === v}">${n}</button>`).join('')}</div>`;
+  box.innerHTML = `<div class="lv-card" data-fold="skip"><b>My portfolio vs the market · day by day</b>${mk0 ? '' : tabs}<p class="lv-sub">Loading…</p></div>`;
+  const wire = () => box.querySelectorAll('[data-pv]').forEach((b) => b.addEventListener('click', () => { state.pvMk = b.dataset.pv; perfVsCard(box); }));
+  wire();
+  let J; try { J = await lvApi(`/api/perf/daily?mk=${mk}`, { timeout: 60000 }); } catch (e) {
+    box.querySelector('.lv-sub').textContent = /404|Not Found/i.test(e.message) ? 'Your server has not picked this up yet (it updates from GitHub every 15 minutes outside Indian market hours).' : 'Could not reach your server: ' + e.message; return; }
+  const R = J.rows || []; const IX = J.index;
+  if (!R.length) { box.querySelector('.lv-sub').textContent = J.n ? 'No prices yet.' : `No ${mk === 'IN' ? 'Angel' : 'moomoo'} holdings to compare.`; return; }
+  const p = (v) => (v == null ? '–' : `${v >= 0 ? '+' : '−'}${fmt(Math.abs(v), 2)}%`); const cls = (v) => (v >= 0 ? 'up' : 'down');
+  const pts = (a, b) => { const d = a - b; return `<span class="${cls(d)}">${d >= 0 ? 'beat by' : 'behind by'} ${fmt(Math.abs(d), 2)} pts</span>`; };
+  const L = R[R.length - 1];
+  const tile = (name, X) => `<div class="fact"><span>${name}</span><b class="${cls(X.p)}">${p(X.p)}</b><small>${IX} ${p(X.i)} · ${pts(X.p, X.i)}</small></div>`;
+  const rows = R.slice(-10).reverse().map((r) => `<tr><td>${esc(day(r.d))}${r.live ? ' <small>so far</small>' : r.est ? ' <small class="muted">est.</small>' : ''}</td>
+    <td class="${cls(r.p)}"><b>${p(r.p)}</b></td><td class="${cls(r.i)}">${p(r.i)}</td><td class="${cls(r.p - r.i)}">${r.p - r.i >= 0 ? '+' : '−'}${fmt(Math.abs(r.p - r.i), 2)}</td></tr>`).join('');
+  box.innerHTML = `<div class="lv-card" data-fold="skip"><b>My portfolio vs the market · day by day</b>${mk0 ? '' : tabs}
+    <div class="facts">${tile(L.live ? 'Today so far' : `Last day · ${day(L.d)}`, L)}${tile('Last 5 days', J.d5)}${tile(`Last ${J.d20.n} days`, J.d20)}</div>
+    <div class="chart" id="pvch" style="height:200px"></div>
+    <p class="lv-sub"><b style="color:#7C8CFF">━ You</b> vs <b style="color:#9CA3AF">━ ${IX}</b>, both = 100 at the start (${J.all.n} trading days: you ${p(J.all.p)}, ${IX} ${p(J.all.i)}).</p>
+    <div class="usj-wrap"><table class="usj" style="min-width:0;width:100%"><thead><tr><th>Day</th><th>You</th><th>${IX}</th><th>Diff (pts)</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="lv-sub">Day % = your ${J.n} holdings' change on the previous close, so cash and new money don't distort it (same as a broker's "day's change %"). ${J.recorded_since ? `Recorded at each close since ${day(J.recorded_since)}; ` : 'Recording starts at today\'s close; '}earlier days marked <i>est.</i> use today's holdings.${(J.missing || []).length ? ` No prices: ${esc(J.missing.join(', '))}.` : ''}</p></div>`;
+  wire();
+  const el = box.querySelector('#pvch'); if (!window.LightweightCharts || !el) return;
+  const ch = window.LightweightCharts.createChart(el, { ...chartBase(), height: 200, width: el.clientWidth || 340 });
+  let a = 100, b = 100; const A = [{ time: R[0].d, value: 100 }], B = [{ time: R[0].d, value: 100 }];
+  R.slice(1).forEach((r) => { a *= 1 + r.p / 100; b *= 1 + r.i / 100; A.push({ time: r.d, value: +a.toFixed(2) }); B.push({ time: r.d, value: +b.toFixed(2) }); });
+  ch.addLineSeries({ color: '#9CA3AF', lineWidth: 2, priceLineVisible: false, title: IX }).setData(B);
+  ch.addLineSeries({ color: '#7C8CFF', lineWidth: 3, priceLineVisible: false, title: 'You' }).setData(A);
+  ch.timeScale().fitContent();
 }
 /* 17 Nov 2026: US trade journal (moomoo). Closed trades with entry, initial / last stop, stop moves, sale, P&L $ / A$, %, R and
    days; holdings removed without a price wait here as "pending". CSV export matches the user's spreadsheet columns. */

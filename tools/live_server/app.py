@@ -2925,6 +2925,100 @@ def history(mk: str = "NSE", syms: str = "", rng: str = "1y", _=Depends(auth)):
     return out
 
 
+# ------------------------------------------------------------------ portfolio vs market, day by day (17 Nov 2026)
+# Day % = sum(shares x (close - previous close)) / sum(shares x previous close) over the holdings, so cash and new money
+# don't distort it (the usual "day's change %"). India = all Angel holdings vs Nifty 50; US = "Your moomoo holdings" vs S&P 500.
+# Each day's row is recorded at the close with that day's holdings (DATA/perf_daily.json); days before recording started are
+# estimated with today's holdings and marked est.
+def _closes(y, rng="3mo", ttl=3600):
+    k = (y, rng); c = _HIST.get(k)
+    if c and time.time() - c[0] < ttl:
+        return c[1]
+    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{requests.utils.quote(y)}", params=dict(interval="1d", range=rng),
+                     headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
+    r.raise_for_status(); res = r.json()["chart"]["result"][0]; cl = res["indicators"]["quote"][0]["close"]
+    d = dict(t=[datetime.fromtimestamp(ts, timezone.utc).date().isoformat() for ts, x in zip(res["timestamp"], cl) if x is not None],
+             c=[round(x, 4) for x in cl if x is not None])
+    _HIST[k] = (time.time(), d)
+    return d
+
+
+def _perf_holdings(mk):
+    if mk == "IN":
+        acc = account_cached(30)
+        return {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
+    return {s_: w["qty"] for s_, w in us_watch_load().items() if w.get("qty")}
+
+
+def perf_series(mk, H, ttl=600):
+    I = _closes("^NSEI" if mk == "IN" else "^GSPC", "3mo", ttl)
+    M, miss = {}, []
+    for sym in H:
+        try:
+            d = _closes(sym + ".NS" if mk == "IN" else sym.replace(".", "-"), "3mo", ttl); M[sym] = dict(zip(d["t"], d["c"]))
+        except Exception:  # noqa: BLE001
+            miss.append(sym)
+    rows = []
+    for i in range(1, len(I["t"])):
+        d0, d1 = I["t"][i - 1], I["t"][i]; num = den = val = 0.0
+        for sym, q in H.items():
+            m = M.get(sym) or {}
+            if d1 in m and d0 in m:
+                num += q * (m[d1] - m[d0]); den += q * m[d0]; val += q * m[d1]
+        if den:
+            rows.append(dict(d=d1, p=round(num / den * 100, 2), i=round((I["c"][i] / I["c"][i - 1] - 1) * 100, 2), v=round(val, 2)))
+    return rows, miss
+
+
+def perf_load():
+    try:
+        return json.load(open(os.path.join(DATA, "perf_daily.json")))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def perf_record(mk):
+    try:
+        H = _perf_holdings(mk)
+        if not H:
+            return None
+        rows, miss = perf_series(mk, H, ttl=0)
+        if not rows:
+            return None
+        P = perf_load(); last = rows[-1]; P.setdefault(mk, {})[last["d"]] = dict(p=last["p"], i=last["i"], v=last["v"], n=len(H) - len(miss))
+        json.dump(P, open(os.path.join(DATA, "perf_daily.json"), "w"), indent=1)
+        log("perf_record", mk=mk, **last)
+        return last
+    except Exception as ex:  # noqa: BLE001
+        log("perf_record_error", mk=mk, error=str(ex)[:160])
+        return None
+
+
+@app.get("/api/perf/daily")
+def perf_daily(mk: str = "IN", _=Depends(auth)):
+    mk = "US" if mk.upper() == "US" else "IN"
+    H = _perf_holdings(mk)
+    rows, miss = perf_series(mk, H) if H else ([], [])
+    rec = perf_load().get(mk, {})
+    for r in rows:
+        x = rec.get(r["d"])
+        if x:
+            r.update(p=x["p"], i=x["i"], v=x.get("v", r["v"]), est=False)
+        else:
+            r["est"] = True
+    last = rows[-1]["d"] if rows else None
+    today = (ist_now() if mk == "IN" else et_now()).date().isoformat()
+    if rows and last == today and not rec.get(last):
+        rows[-1]["live"] = True; rows[-1]["est"] = False            # today so far, with today's holdings
+    def comp(R):
+        a = b = 1.0
+        for r in R:
+            a *= 1 + r["p"] / 100; b *= 1 + r["i"] / 100
+        return dict(p=round((a - 1) * 100, 2), i=round((b - 1) * 100, 2), n=len(R))
+    return dict(mk=mk, index="Nifty 50" if mk == "IN" else "S&P 500", rows=rows, missing=miss, n=len(H), recorded_since=min(rec) if rec else None,
+                d5=comp(rows[-5:]), d20=comp(rows[-20:]), all=comp(rows))
+
+
 class USOrder(BaseModel):
     id: str
     qty: int
@@ -3118,6 +3212,10 @@ def _loop():
             _et = et_now()
             if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("tl_eod_us") != _et.date():
                 _HB["tl_eod_us"] = _et.date(); tl_check("US", eod=True)
+            if t.weekday() < 5 and (15, 40) <= (t.hour, t.minute) <= (16, 30) and _HB.get("perf_in") != t.date():
+                _HB["perf_in"] = t.date(); perf_record("IN")
+            if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("perf_us") != _et.date():
+                _HB["perf_us"] = _et.date(); perf_record("US")
             if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("usw_eod") != _et.date():
                 _HB["usw_eod"] = _et.date(); us_watch_eod(_et)
         except Exception as ex:  # noqa: BLE001

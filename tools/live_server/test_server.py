@@ -904,3 +904,16 @@ def test_slog():
     e = {}
     A._slog(e, 100, "raised"); A._slog(e, 100, "raised"); A._slog(e, 104, "raised")
     assert [x[2] for x in e["stop_log"]] == ["set", "raised"] and e["stop_log"][-1][1] == 104.0
+
+
+def test_perf_daily(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    T = ["2026-11-10", "2026-11-11", "2026-11-12"]
+    data = {"^NSEI": [100, 101, 100], "RELIANCE.NS": [50, 52, 51]}
+    A._closes = lambda y, rng="3mo", ttl=3600: dict(t=T, c=data[y])
+    j = c.get("/api/perf/daily?mk=IN", headers=h).json()          # mock holds RELIANCE x10
+    assert [r["p"] for r in j["rows"]] == [4.0, -1.92] and [r["i"] for r in j["rows"]] == [1.0, -0.99] and all(r["est"] for r in j["rows"])
+    assert A.perf_record("IN")["d"] == "2026-11-12"
+    j = c.get("/api/perf/daily?mk=IN", headers=h).json()
+    assert j["rows"][-1]["est"] is False and j["recorded_since"] == "2026-11-12" and j["d5"]["p"] == round((1.04 * (1 - 0.0192) - 1) * 100, 2)
