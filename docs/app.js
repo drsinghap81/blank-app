@@ -3100,7 +3100,7 @@ function ipoSelect(r) {
   const f = [['High since listing', `${fmt(r.ath, 2, AL())} (${day(r.ath_date)})`], ['Cup depth', pct(r.depth * 100)], ['Cup length', `${r.base_days} trading days`],
     ['Listed', `${day(r.listed)} (${r.age_months} months ago)`], ['10-week SMA', fmt(r.sma10, 2, AL())], ['Traded a day', valTxt(r.value_cr)]];
   if (!near && r.entry) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, AL())}`], ['Best since entry', pct(r.peak * 100)]);
-  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf); if (r.td_score != null) f.push(['Top-down', `score ${r.td_score}/3${r.aligned ? ' · aligned' : ''}${r.theme ? ` · best theme ${esc(themeName(r.theme))} ${pct(r.theme_rs)}` : ''}`]);
+  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf); if (r.td_score != null) f.push(['Top-down', `score ${r.td_score}/3${r.aligned ? ' · aligned' : ''}${r.theme ? ` · best theme ${esc(themeName(r.theme))} ${pct(r.theme_rs)}${r.theme_pct != null ? ` = ${r99(r.theme_pct)}` : ''}` : ''}`]);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, AL())}</b></div></div>
     ${st}${plan}
     <div class="seg-row"><div class="seg small" id="ipotf"><button data-tf="d" aria-selected="true">Daily</button><button data-tf="w" aria-selected="false">Weekly + 10 SMA</button></div></div>
@@ -3522,11 +3522,15 @@ function pulseChip(sym, mk) {
   const gr = G.rows ? G.rows.find((r) => r.group === x[0]) : null; const sh = gr && gr.shift;
   return sh ? laneChip(sh, ` industry · #${x[2]}/${x[3]}`) : `<span class="chip ${gpCls(x[1])}" title="${esc(x[0])}: industry Pulse ${fmt(x[1], 0)}, rank ${x[2]} of ${x[3]}">Group ${fmt(x[1], 0)} · #${x[2]}/${x[3]}</span>`;
 }
-const rsChips = (r) => rsChip('Sector RS', r.sector_rs) + rsChip('Stock RS', r.stock_rs) + pulseChip(r.symbol);
+/* 17 Nov 2026: 1-99 ratings (percentiles, 99 = top 1%) next to the raw RS: rs_rating = 1-year return vs every stock scanned,
+   sector_pct / theme_pct = 6-month RS vs every index tracked. Display only; the tested rule is RS above / below zero. */
+const r99 = (v) => (v == null || !isFinite(v) ? '' : `${Math.round(v)}/99`);
+const rsRateChip = (r) => (r.rs_rating == null || !isFinite(r.rs_rating) ? '' : `<span class="chip ${r.rs_rating >= 80 ? 'up' : r.rs_rating < 50 ? 'down' : ''}" title="RS rating: the stock's 1-year return beat ${Math.round(r.rs_rating)}% of all stocks scanned">RS ${Math.round(r.rs_rating)}</span>`);
+const rsChips = (r) => rsRateChip(r) + rsChip('Sector RS', r.sector_rs) + rsChip('Stock RS', r.stock_rs) + pulseChip(r.symbol);
 function rsFact(r) {
-  if (r.stock_rs == null && r.sector_rs == null) return null;
+  if (r.stock_rs == null && r.sector_rs == null && r.rs_rating == null) return null;
   const bn = r.rs_bench ? secName(r.rs_bench) : '';
-  return ['Relative strength', `${r.sector_rs != null ? `sector ${pct(r.sector_rs)} vs ${BENCH_NM[AM()] || 'the market'} (6 m${r.sector_rs_up ? ', rising' : ''}) · ` : ''}${r.stock_rs != null ? `stock ${pct(r.stock_rs)} vs ${esc(bn)} (1 y${r.stock_rs_up ? ', rising' : ''})` : ''}`];
+  return ['Relative strength', `${r.rs_rating != null && isFinite(r.rs_rating) ? `<b>RS rating ${r99(r.rs_rating)}</b> (1-year return beat ${Math.round(r.rs_rating)}% of all stocks) · ` : ''}${r.sector_rs != null ? `sector ${pct(r.sector_rs)}${r.sector_pct != null ? ` = ${r99(r.sector_pct)}` : ''} vs ${BENCH_NM[AM()] || 'the market'} (6 m${r.sector_rs_up ? ', rising' : ''}) · ` : ''}${r.stock_rs != null ? `stock ${pct(r.stock_rs)} vs ${esc(bn)} (1 y${r.stock_rs_up ? ', rising' : ''})` : ''}`];
 }
 function secFact(r) {
   const S = state.ath && state.ath.sec; if (!r.sector_index || !S || !S.indices[r.sector_index]) return null;
@@ -3755,7 +3759,7 @@ function athSelect(r) {
     ['Deepest fall in the base', pct((r.depth || 0) * 100)], ['30-week SMA', fmt(r.sma30, 2, AL())]];
   if (!near) f.push(['Entry', `${day(r.date)} at ${fmt(r.entry, 2, AL())}`], ['Best since entry', pct(r.peak * 100)], ['Weeks', r.weeks]);
   f.push(['Traded a day', valTxt(r.value_cr)]);
-  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf); if (r.td_score != null) f.push(['Top-down', `score ${r.td_score}/3${r.aligned ? ' · aligned' : ''}${r.theme ? ` · best theme ${esc(themeName(r.theme))} ${pct(r.theme_rs)}` : ''}`]);
+  const sf = secFact(r); if (sf) f.push(sf); const rf = rsFact(r); if (rf) f.push(rf); if (r.td_score != null) f.push(['Top-down', `score ${r.td_score}/3${r.aligned ? ' · aligned' : ''}${r.theme ? ` · best theme ${esc(themeName(r.theme))} ${pct(r.theme_rs)}${r.theme_pct != null ? ` = ${r99(r.theme_pct)}` : ''}` : ''}`]);
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)}</h2><div class="co">${esc(r.name || '')}</div></div><div class="d-price"><b>${fmt(r.close, 2, AL())}</b></div></div>
     ${st}
     ${planATH(r, near)}
@@ -5426,7 +5430,7 @@ async function tdRender2(el) {
   const card = (r, i) => { const L = tdLabel(r); const e = r.trigger || r.price; const z = t2Shares(e, r.stop, mk); const ck = closeK(r.symbol);
     const tg = r.aligned ? '<span class="t2-tag al">Aligned</span>' : ''; const bt = ck.length ? '<span class="t2-tag both">In both</span>' : '';
     const also = Object.entries(S.M[r.symbol] || {}).filter(([k]) => k !== (bkOf(r) === 'mom' ? 'ath' : 't921')).map(([k, x]) => `<span class="t2-chip">${({ ath: 'Momentum', t921: '9/21', vcp: 'VCP', ipo: 'IPO cup', gm: 'G+M', mo: 'Month close', wk: 'Week cup close', dy: 'Day cup close' })[k]}${x.txt === '✓' ? '' : ' ' + x.txt.toLowerCase()}</span>`).join('');
-    return `<button class="t2-card${ck.length ? ' both' : ''}" data-i="${i}"><span class="t2-ch"><span><b>${esc(r.name || r.symbol)}</b><small>${esc(r.symbol)} · ${esc(L.t)}</small></span>${bt || tg}</span>
+    return `<button class="t2-card${ck.length ? ' both' : ''}" data-i="${i}"><span class="t2-ch"><span><b>${esc(r.name || r.symbol)}</b><small>${esc(r.symbol)} · ${esc(L.t)}${r.rs_rating != null && isFinite(r.rs_rating) ? ` · RS ${Math.round(r.rs_rating)}/99` : ''}${r.score != null && r.system === 'Monthly ATH' ? ` · score ${r.score}/6` : ''}</small></span>${bt || tg}</span>
       <span class="t2-line">${r.trigger ? 'Buy if price goes above' : 'Buy at about'} <b>${Mz(e, 2)}</b> · stop <b>${Mz(r.stop, 2)}</b>${z ? ` · <b>${z.q.toLocaleString(MKT[mk].loc)} sh</b> ≈ ${mk === 'NSE' ? lakh(z.val) : Mz(z.val)}` : ''}</span>
       ${cupBuy(r)}${also ? `<span class="t2-chips">${also}</span>` : ''}</button>`; };
   const idxOf = (r) => state._tdRows.indexOf(r);

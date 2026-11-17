@@ -131,7 +131,7 @@ def main(mk="NSE"):
     def td(r):
         return dict(sector=secname(r.get("sector_index")), sector_rs=num(r.get("sector_rs")), theme=secname(r.get("theme")),
                     theme_rs=num(r.get("theme_rs")), stock_rs=num(r.get("stock_rs")), aligned=bool(r.get("aligned")),
-                    td_score=r.get("td_score"))
+                    td_score=r.get("td_score"), rs_rating=r.get("rs_rating"), sector_pct=r.get("sector_pct"), theme_pct=r.get("theme_pct"))
 
     for r in ath.get("breakouts") or []:
         if r.get("status") != "open":

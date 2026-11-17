@@ -355,6 +355,7 @@ def main():
     tick = list(u.ticker)
     print("symbols", len(tick), flush=True)
     events, near, charts, vals = [], [], {}, {}
+    R1Y = {}
     for a in range(0, len(tick), 80):
         chunk = tick[a:a + 80]
         dd = None
@@ -383,6 +384,8 @@ def main():
                 low_px = float(x.Close.iloc[-1]) < MIN_CLOSE
                 if not low_px:
                     vals[sym] = float((x.Close * x.Volume).tail(20).mean())
+                if len(x) >= 252:                              # 1-year return for the 1-99 RS rating (17 Nov 2026)
+                    R1Y[sym] = float(x.Close.iloc[-1] / x.Close.iloc[-252] - 1)
                 ev, nr, ch = analyse(sym, x, today)
                 if low_px:          # below the tested price floor: month-close list only, no signals
                     ev, nr = [], None
@@ -419,6 +422,10 @@ def main():
     size = pd.cut(rk, {"NSE": [0, 100, 250, 500, 1e9], "US": [0, 500, 1500, 3000, 1e9], "ASX": [0, 100, 300, 600, 1e9], "UK": [0, 100, 200, 300, 1e9]}[MARKET], labels=["Large", "Mid", "Small", "Micro"]).astype(str).to_dict()
     E = pd.DataFrame(events)
     N = pd.DataFrame(near)
+    # 17 Nov 2026: easy-to-read 1-99 ratings. rs_rating = percentile of the stock's 1-year return among every stock scanned
+    # (99 = beat 99% of them, like IBD's RS rating); sector_pct / theme_pct = percentile of that index's 6-month RS among all
+    # indices tracked. Display only - the tested filters stay "RS above / below zero".
+    RSR = (pd.Series(R1Y).rank(pct=True) * 98 + 1).round().astype(int).to_dict() if R1Y else {}
     try:
         from sector_state import tag_for, stock_rs, topdown  # noqa: F401
         sec = json.load(open(f"{OUT}/sectors.json"))
@@ -435,6 +442,13 @@ def main():
                 df["sector_rs"] = [(ix_.get(x[1]) or {}).get("rs_6m") if x[1] else None for x in t]
                 df["sector_rs_up"] = [(ix_.get(x[1]) or {}).get("rs_6m_up") if x[1] else None for x in t]
                 df = topdown(df, sec)
+            df["rs_rating"] = df.symbol.map(RSR)
+            if sec:
+                allrs = pd.Series([v.get("rs_6m") for v in (sec.get("indices") or {}).values() if v.get("rs_6m") is not None], dtype=float)
+                pctl = lambda v: int(round((allrs < v).mean() * 98 + 1)) if v is not None and np.isfinite(v) and len(allrs) else None  # noqa: E731
+                for col, src in (("sector_pct", "sector_rs"), ("theme_pct", "theme_rs")):
+                    if src in df:
+                        df[col] = [pctl(v) for v in pd.to_numeric(df[src], errors="coerce")]
     cur = pd.Timestamp(today).to_period("M")
     if len(E):
         E["date"] = pd.to_datetime(E.date)
@@ -456,6 +470,7 @@ def main():
             D_["industry"], D_["sector_index"], D_["sector_tag"] = [x[0] for x in t_], [x[1] for x in t_], [x[2] for x in t_]
             ix_ = sec.get("indices") or {}
             D_["sector_rs"] = [(ix_.get(x[1]) or {}).get("rs_6m") if x[1] else None for x in t_]
+        D_["rs_rating"] = D_.symbol.map(RSR)
         # 15 Nov 2026: strongest sectors first (leading > uptrend > mixed > weak > untagged), then sector RS, long cups, base
         D_["_o"] = D_.get("sector_tag", pd.Series(index=D_.index, dtype=object)).map({"leading": 0, "uptrend": 1, "mixed": 2, "weak": 3}).fillna(4)
         D_["_r"] = pd.to_numeric(D_.get("sector_rs", pd.Series(index=D_.index, dtype=float)), errors="coerce").fillna(-999)
