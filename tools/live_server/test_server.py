@@ -836,3 +836,30 @@ def test_us_snap(tmp_path):
     j = c.get(f"/api/us/snap?symbol=acgl&date_={d}", headers=h).json()
     assert j["bar"] == d and len(j["t"]) == 130 and j["c"][-1] == 300.5 and j["e21"][-1] is not None and j["s150"][-1] is not None
     assert c.get("/api/us/snap?symbol=acgl&date_=bad", headers=h).status_code == 400
+
+
+def test_us_fill_sync(tmp_path):
+    A, c = client(tmp_path)
+    A.yq = lambda s, mk: {"ltp": 0.65}
+    A.us_trail_levels = lambda sym, system, entry: (False, entry * 0.97, "x")
+    A.moomoo.deals = [dict(deal_id="1", sym="CL", side="BUY", qty=5, price=101.2452, time="2026-11-16 10:15:18"),
+                      dict(deal_id="2", sym="KDP", side="BUY", qty=13, price=36.70, time="2026-11-13 09:31:00"),
+                      dict(deal_id="3", sym="KDP", side="SELL", qty=13, price=35.62, time="2026-11-16 15:57:49")]
+    A.us_watch_save({"CL": dict(qty=5, entry=101.25, stop=96.15, system="Trend 9/21", since="2026-11-17", stop0=96.15)})
+    r = A.us_fill_sync(); assert r["ok"] and r["sells"] == 1
+    W = A.us_watch_load(); assert W["CL"]["since"] == "2026-11-16" and W["CL"]["qty"] == 5 and "KDP" not in W
+    J = [A._jcalc(x) for x in A.us_journal_load()]; k = J[0]
+    assert k["symbol"] == "KDP" and k["exit"] == 35.62 and k["since"] == "2026-11-13" and k["pnl"] == round((35.62 - 36.70) * 13, 2) and k["stop0"] == round(36.70 * 0.96, 2)
+    assert A.us_fill_sync()["buys"] == 0 and len(A.us_journal_load()) == 1          # each fill used once
+    al = A.alerts_load()["items"]; assert any("bought 13" in a["text"] for a in al) and any("sold 13" in a["text"] for a in al)
+
+
+def test_us_fill_sync_manual_dupes(tmp_path):
+    A, c = client(tmp_path)
+    A.yq = lambda s, mk: {"ltp": 0.65}
+    A.us_trail_levels = lambda sym, system, entry: (False, entry * 0.97, "x")
+    A.us_journal_save([A._jrow("KDP", dict(qty=13, entry=36.70, stop=31.13, stop0=31.13, system="Monthly ATH", since="2026-11-13"), 35.62, "2026-11-16", "sold")])
+    A.moomoo.deals = [dict(deal_id="2", sym="KDP", side="BUY", qty=13, price=36.70, time="2026-11-13 09:31:00"),
+                      dict(deal_id="3", sym="KDP", side="SELL", qty=13, price=35.62, time="2026-11-16 15:57:49")]
+    A.us_fill_sync()
+    assert "KDP" not in A.us_watch_load() and len(A.us_journal_load()) == 1

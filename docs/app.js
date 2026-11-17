@@ -5156,6 +5156,8 @@ async function usJournalCard(box) {
       <td>${t.r_mult == null ? '–' : (t.r_mult >= 0 ? '+' : '') + fmt(t.r_mult, 2) + 'R'}<br><small>${t.days == null ? '' : t.days + ' d'}</small></td><td><a href="#" data-jchart="${esc(t.id)}" aria-label="Entry chart">📷</a> <a href="#" data-jdel="${esc(t.id)}" aria-label="Delete">✕</a></td></tr>`).join('');
   box.innerHTML = `<div class="lv-card" data-fold="skip"><b>US trade journal · moomoo</b>
     <p class="lv-sub">Every sale: entry, stop (first → last), exit, P&L in US$ and A$ (A$1 = US$${fmt(J.fx, 4)}), % and R (P&L ÷ the first risk per share).</p>
+    ${J.auto ? `<p class="status open lv-sub">🔄 <b>Automatic:</b> every moomoo fill is read from your account (read only) every 10 minutes in US hours: buys start a holding with its stop, sells close it here. <button class="lv-link" id="usjsync">Sync now</button></p>`
+      : '<p class="status exit watch lv-sub"><b>Manual for now.</b> To make it automatic, moomoo OpenD has to run on your server (one-time setup, you log in yourself). Until then use 💰 Record sale.</p>'}
     ${tiles}${P.length ? `<p class="lv-sub"><b>Sold, price missing (${P.length})</b></p>${pend}` : ''}
     ${C.length ? `<div class="usj-wrap"><table class="usj"><thead><tr><th>Sold</th><th>Stock</th><th>Qty</th><th>Entry · SL</th><th>Exit</th><th>P&L</th><th>R</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
       ` : (P.length ? '' : '<p class="empty">No closed trades yet. Use "Record sale" on a holding when moomoo sells it.</p>')}
@@ -5173,6 +5175,9 @@ async function usJournalCard(box) {
   const ad = box.querySelector('#ujadd'); if (ad) ad.addEventListener('click', () => { const v = (id) => box.querySelector(id).value;
     post({ action: 'add', symbol: v('#ujs'), qty: +v('#ujq'), entry: +v('#uje'), exit: +v('#ujx'), stop0: +v('#ujl'), since: v('#ujb') || null, date: v('#ujd') || null, system: v('#ujy') }, 'Trade added'); });
   box.querySelectorAll('[data-jchart]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); usEntrySheet(T.find((x) => x.id === b.dataset.jchart)); }));
+  const sy = box.querySelector('#usjsync'); if (sy) sy.addEventListener('click', async () => { sy.disabled = true; sy.textContent = 'Syncing…';
+    try { const r = await lvApi('/api/us/journal/sync', { method: 'POST', timeout: 60000 }); alertMsg(r.ok ? `${r.buys} buys, ${r.sells} sells recorded` : r.why, r.ok); } catch (e) { alertMsg('Sync failed: ' + e.message); }
+    usJournalCard(box); usWatchCard($('#usw')); });
   const pb = box.querySelector('#usjpdf'); if (pb) pb.addEventListener('click', async () => { pb.disabled = true; pb.textContent = 'Building PDF…';
     let H = []; try { H = (await lvApi('/api/us/watch', { timeout: 30000 })).items || []; } catch (e) { /* closed only */ }
     try { await usJournalPdf(C, H, S, J.fx); pb.textContent = '⬇ Export PDF (with entry charts)'; } catch (e) { pb.textContent = 'PDF failed: ' + e.message; } pb.disabled = false; });

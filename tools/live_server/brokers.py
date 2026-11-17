@@ -388,6 +388,31 @@ class MoomooTrade(MoomooRO):
         finally:
             t.close()
 
+    def us_deals(self, days=40):
+        """17 Nov 2026: the REAL account's US fills (read only - no unlock, no orders) for the trade journal: list of
+        dict(deal_id, sym, side BUY/SELL, qty, price, time 'YYYY-MM-DD HH:MM:SS' New York)."""
+        m = _mm()
+        t = m.OpenSecTradeContext(filter_trdmarket=m.TrdMarket.US, host=self.host, port=self.port, security_firm=getattr(m.SecurityFirm, self.firm))
+        try:
+            end = datetime.now(ET_TZ); start = end - timedelta(days=days); out = {}
+            ret, d = t.history_deal_list_query(start=start.strftime("%Y-%m-%d %H:%M:%S"), end=end.strftime("%Y-%m-%d %H:%M:%S"),
+                                               trd_env=m.TrdEnv.REAL, acc_id=self.acc)
+            frames = [d] if ret == m.RET_OK else []
+            ret2, d2 = t.deal_list_query(trd_env=m.TrdEnv.REAL, acc_id=self.acc, refresh_cache=True)
+            if ret2 == m.RET_OK:
+                frames.append(d2)
+            if not frames:
+                raise RuntimeError(f"moomoo deals: {d}")
+            for f in frames:
+                for r in f.itertuples():
+                    if not str(r.code).startswith("US."):
+                        continue
+                    out[str(r.deal_id)] = dict(deal_id=str(r.deal_id), sym=str(r.code)[3:].replace(".", "-"), side="SELL" if "SELL" in str(r.trd_side) else "BUY",
+                                               qty=float(r.qty), price=float(r.price), time=str(r.create_time)[:19])
+            return sorted(out.values(), key=lambda x: x["time"])
+        finally:
+            t.close()
+
     def us_cash(self):
         m, t, env = self._t()
         try:
@@ -458,6 +483,9 @@ class MockMoomoo:
 
     def us_cash(self):
         return 1e6
+
+    def us_deals(self, days=40):
+        return list(getattr(self, "deals", []))
 
     def place(self, sym, side, qty, otype, price, aux=None, tif="DAY"):
         self.n += 1; oid = f"MM{self.n}"

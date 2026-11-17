@@ -2099,6 +2099,87 @@ def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
     return out
 
 
+# ------------------------------------------------------------------ automatic journal from moomoo fills (17 Nov 2026)
+# With OpenD running on this server (MOOMOO_ENABLED=1), every fill on the REAL US account is read (read only: no unlock,
+# no orders): a BUY adds or tops up "Your moomoo holdings" (Trend 9/21: stop = EMA 21, at most 4% under the fill); a SELL
+# moves the shares to the trade journal at the fill price (reason "stop" when it filled at or under the stop). Each fill
+# is used once (DATA/us_deals_seen.json). Fills that match what was typed in by hand are only marked as seen.
+def _seen_path():
+    return os.path.join(DATA, "us_deals_seen.json")
+
+
+def us_fill_sync():
+    if not getattr(moomoo, "enabled", False):
+        return dict(ok=False, why="moomoo is off on the server (OpenD not set up)")
+    try:
+        deals = moomoo.us_deals()
+    except Exception as ex:  # noqa: BLE001
+        log("us_fill_error", error=str(ex)[:200]); return dict(ok=False, why=str(ex)[:120])
+    try:
+        seen = set(json.load(open(_seen_path())))
+    except Exception:  # noqa: BLE001
+        seen = set()
+    W = us_watch_load(); J = us_journal_load(); n_b = n_s = 0
+    try:
+        P = mkt_plan("US"); plan = {r["symbol"]: r for k in ("top", "swing", "more") for r in (P.get(k) or [])}
+    except Exception:  # noqa: BLE001
+        plan = {}
+    for dl in deals:
+        if dl["deal_id"] in seen:
+            continue
+        seen.add(dl["deal_id"]); sym, q, px, d = dl["sym"], dl["qty"], dl["price"], dl["time"][:10]
+        if dl["side"] == "BUY":
+            w = W.get(sym)
+            if w and abs(w["entry"] / px - 1) < 0.003 and abs(w["qty"] - q) < 1e-6:
+                if w.get("since", "") > d:
+                    w["since"] = d                      # typed in by hand: just fix the buy date
+                continue
+            if not w and any(x["symbol"] == sym and abs(x["entry"] / px - 1) < 0.003 and (x.get("since") or "") >= d for x in J):
+                continue                                # already in the journal (typed in by hand)
+            if w:                                       # top-up: average price
+                tot = w["qty"] + q; w["entry"] = round((w["entry"] * w["qty"] + px * q) / tot, 4); w["qty"] = tot
+            else:
+                try:
+                    _, lvl, _ = us_trail_levels(sym, "Trend 9/21", px)
+                except Exception:  # noqa: BLE001
+                    lvl = px * 0.96
+                st = round(min(lvl, px * 0.96), 2); src = (plan.get(sym) or {}).get("system")
+                W[sym] = dict(qty=q, entry=round(px, 4), stop=st, target=None, system="Trend 9/21", since=d, stop0=st,
+                              stop_log=[[d, st, "set"]], source=src or "moomoo fill")
+                alert("filled", sym, f"US {sym}: bought {q:g} at {px:.2f} (moomoo). Journal started; stop {st:.2f} (Trend 9/21) - set it in moomoo, GTC.",
+                      key=f"usdeal:{dl['deal_id']}", mk="US")
+            n_b += 1
+        else:
+            w = W.get(sym)
+            pend = next((x for x in J if x["symbol"] == sym and x.get("status") == "pending"), None)
+            done = next((x for x in J if x["symbol"] == sym and x.get("status") == "closed" and x.get("closed") == d
+                         and x.get("exit") and abs(x["exit"] / px - 1) < 0.003), None)
+            if done:
+                continue
+            if pend:
+                pend.update(exit=round(px, 4), closed=d, status="closed", fx=audusd(), reason="sold (moomoo fill)")
+            elif w:
+                why = "stop" if px <= w["stop"] * 1.005 else "sold"
+                if q < w["qty"] - 1e-6:
+                    J.append(_jrow(sym, dict(w, qty=q), round(px, 4), d, why)); w["qty"] = round(w["qty"] - q, 6)
+                else:
+                    J.append(_jrow(sym, w, round(px, 4), d, why)); W.pop(sym)
+            else:
+                continue
+            r = _jcalc(J[-1] if not pend else pend)
+            alert("exit" if r.get("pnl", 0) < 0 else "raised", sym, f"US {sym}: sold {q:g} at {px:.2f} (moomoo). Journal: {r.get('pnl', 0):+.2f} US$ "
+                  f"({r.get('pnl_pct', 0):+.1f}%, {r.get('r_mult') if r.get('r_mult') is not None else '-'}R).", key=f"usdeal:{dl['deal_id']}", mk="US")
+            n_s += 1
+    us_watch_save(W); us_journal_save(J)
+    json.dump(sorted(seen)[-5000:], open(_seen_path(), "w"))
+    return dict(ok=True, buys=n_b, sells=n_s, deals=len(deals))
+
+
+@app.post("/api/us/journal/sync")
+def us_journal_sync_now(_=Depends(auth)):
+    return us_fill_sync()
+
+
 class JournalReq(BaseModel):
     action: str                       # close | edit | add | delete
     symbol: str = ""
@@ -2124,7 +2205,8 @@ def us_journal_get(_=Depends(auth)):
         st = dict(n=len(C), wins=len(wins), win_rate=round(len(wins) / len(C) * 100, 1), pnl=round(sum(r["pnl"] for r in C), 2),
                   pnl_aud=round(sum(r["pnl_aud"] for r in C), 2), avg_r=round(sum(Rs) / len(Rs), 2) if Rs else None,
                   best=max(r["pnl"] for r in C), worst=min(r["pnl"] for r in C))
-    return dict(trades=sorted(J, key=lambda r: (r.get("status") != "pending", r.get("closed") or ""), reverse=False), stats=st, fx=audusd())
+    return dict(trades=sorted(J, key=lambda r: (r.get("status") != "pending", r.get("closed") or ""), reverse=False), stats=st, fx=audusd(),
+                auto=bool(getattr(moomoo, "enabled", False)))
 
 
 @app.post("/api/us/journal")
@@ -2734,6 +2816,8 @@ def _loop():
                 us_sync()
             if us_open(et_now()) and t.minute % 10 < 2:
                 us_watch_check()
+            if (us_open(et_now()) or (et_now().weekday() < 5 and (16, 0) <= (et_now().hour, et_now().minute) <= (17, 0))) and t.minute % 10 < 2:
+                us_fill_sync()
             if t.minute % 10 < 2 and t.weekday() < 5 and (9, 20) <= (t.hour, t.minute) <= (15, 30):
                 tl_check("NSE"); tl_scan_alerts({"NSE"})
             if t.weekday() < 5 and (15, 45) <= (t.hour, t.minute) <= (16, 30) and _HB.get("tl_eod_nse") != t.date():
