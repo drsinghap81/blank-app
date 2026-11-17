@@ -5139,7 +5139,8 @@ async function usJournalPdf(C, H, S, fx) {
    days; holdings removed without a price wait here as "pending". CSV export matches the user's spreadsheet columns. */
 async function usJournalCard(box) {
   if (!box) return; const c = lvCfg(); if (!c.url || !c.token) { box.innerHTML = ''; return; }
-  let J; try { J = await lvApi('/api/us/journal', { timeout: 30000 }); } catch (e) { box.innerHTML = ''; return; }
+  let J; try { J = await lvApi('/api/us/journal', { timeout: 30000 }); } catch (e) {
+    box.innerHTML = `<div class="lv-card"><b>US trade journal · moomoo</b><p class="lv-sub">${/404|Not Found/i.test(e.message) ? 'Your server has not picked up the journal yet. It updates itself from GitHub every 15 minutes (outside Indian market hours); pull down to refresh after that.' : 'Could not reach your server: ' + esc(e.message)}</p></div>`; return; }
   const T = J.trades || []; const P = T.filter((t) => t.status === 'pending'); const C = T.filter((t) => t.status === 'closed').sort((a, b) => (b.closed || '').localeCompare(a.closed || ''));
   const $f = (v) => (v == null ? '–' : `$${fmt(v, 2, 'en-US')}`); const sg = (v, f) => (v == null ? '–' : `${v >= 0 ? '+' : '−'}${f(Math.abs(v))}`);
   const S = J.stats || {}; const a$ = (v) => `A$${fmt(v, 2, 'en-AU')}`;
