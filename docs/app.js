@@ -4972,7 +4972,8 @@ async function alPush(btn) {
 const alMk = (x) => (/^US /.test(x.text || '') || x.kind === 'pie') ? 'US' : (x.mk || 'NSE');
 async function alCard(box, mk) {
   const c = lvCfg(); if (!box || !c.url || !c.token) { if (box) box.innerHTML = ''; return; }
-  let A; try { A = await lvApi('/api/alerts'); } catch (e) { box.innerHTML = ''; return; }
+  let A; try { A = await lvApi('/api/alerts' + (mk ? `?mk=${encodeURIComponent(mk)}` : '')); } catch (e) {
+    box.innerHTML = `<div class="al-tick"><span class="al-bell" aria-hidden="true">🔔</span> <span class="muted">Alerts unavailable: your server isn't answering (${esc(e.message)}). It may be restarting after an update; refresh in a minute.</span></div>`; return; }
   const wk = Date.now() - 7 * 864e5; const L = (A.items || []).filter((x) => new Date(x.t).getTime() >= wk && x.kind !== 'test' && (!mk || alMk(x) === mk)).slice(0, 6);
   let on = false; try { on = localStorage.getItem('td.pushOn') === '1' && Notification.permission === 'granted'; } catch (e) { /* */ }
   /* 11 Nov 2026: one-line ticker (was a full card that pushed everything down); tap it for the list and the phone-alert switch */

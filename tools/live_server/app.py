@@ -2860,7 +2860,7 @@ def alert(kind, symbol, text, key=None, mk=None):
     item = dict(id=key, t=datetime.now(timezone.utc).isoformat(timespec="seconds"), kind=kind, symbol=symbol, text=text)
     if mk:
         item["mk"] = mk
-    A.setdefault("items", []).append(item); A["items"] = A["items"][-200:]
+    A.setdefault("items", []).append(item); A["items"] = A["items"][-1000:]
     A.setdefault("seen", []).append(key); A["seen"] = A["seen"][-1000:]
     json.dump(A, open(_alerts_path(), "w")); log("alert", akind=kind, symbol=symbol, text=text)
     threading.Thread(target=_send_alert, args=(item, list(A.get("subs", []))), daemon=True).start()
@@ -2952,9 +2952,13 @@ class PushSub(BaseModel):
 
 
 @app.get("/api/alerts")
-def alerts_list(_=Depends(auth)):
-    A = alerts_load()
-    return dict(items=list(reversed(A.get("items", [])))[:50], push=len(A.get("subs", [])))
+def alerts_list(mk: str = "", _=Depends(auth)):
+    """Newest first. mk = NSE / US / ...: only that market's alerts (17 Nov 2026: busy markets - trend-line alerts - pushed
+    a quieter market's alerts out of the last 50)."""
+    A = alerts_load(); L = list(reversed(A.get("items", [])))
+    if mk:
+        L = [x for x in L if (("US" if (x.get("text", "").startswith("US ") or x.get("kind") == "pie") else (x.get("mk") or "NSE")) == mk)]
+    return dict(items=L[:50], push=len(A.get("subs", [])))
 
 
 @app.get("/api/push/key")
