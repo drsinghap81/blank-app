@@ -74,7 +74,7 @@ def patterns_at(piv, k):
 
 def scan(x, sym, name, kind="stock"):
     """latest pattern state for one series (DataFrame Open/High/Low/Close/Volume) or None."""
-    c = x.Close.to_numpy(float); lw = x.Low.to_numpy(float); n = len(c); dts = x.index
+    c = x.Close.to_numpy(float); lw = x.Low.to_numpy(float); hg = x.High.to_numpy(float); n = len(c); dts = x.index
     if n < 150:
         return None
     piv = zigzag(c, THR)
@@ -113,6 +113,16 @@ def scan(x, sym, name, kind="stock"):
                        rsi_lows=[round(float(rv[i_]), 1) for i_ in li], rsi_div=round(dv, 1), rsi_now=round(float(rv[-1]), 1),
                        signal_date=str(dts[sig].date()) if sig is not None else None,
                        days_since=int(n - 1 - sig) if sig is not None else None)
+            # 17 Nov 2026: classic neckline rule after the breakout close - target = neckline + height (low to neckline),
+            # SL = daily close 4% under the neckline (6% for an inverse H&S); which came first since the breakout
+            low0 = min(l_[2] for l_ in lows); tgt = neck + (neck - low0); sl = neck * (0.94 if typ == "IHS" else 0.96)
+            row.update(target=round(tgt, 2), sl=round(sl, 2))
+            if sig is not None:
+                for j in range(sig + 1, n):
+                    if c[j] < sl:
+                        row["outcome"] = "sl"; row["outcome_date"] = str(dts[j].date()); break
+                    if hg[j] >= tgt:
+                        row["outcome"] = "target"; row["outcome_date"] = str(dts[j].date()); break
             if best is None or (row["status"] == "breakout") > (best["status"] == "breakout"):
                 best = row
         if best:

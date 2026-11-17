@@ -2704,11 +2704,15 @@ function patRows() {
 function patPlan(r) {
   const low = Math.min(...r.lows.map((x) => x[1])); const h = r.neck - low;
   const sl = r.neck * (r.typ === 'IHS' ? 0.94 : 0.96); const tgt = r.neck + h; const ref = r.status === 'breakout' ? r.close : r.neck;
-  return { sl, tgt, slPct: (1 - sl / ref) * 100, tgtPct: (tgt / ref - 1) * 100, rr: (tgt - ref) / Math.max(ref - sl, 1e-9), slRule: r.typ === 'IHS' ? '6%' : '4%' };
+  /* outcome since the breakout: the nightly scan's (high reached the target / a close under the SL), else today's close */
+  const out = r.outcome || (r.status === 'breakout' ? (r.close >= tgt ? 'target' : r.close < sl ? 'sl' : '') : '');
+  return { sl, tgt, out, outDate: r.outcome_date, slPct: (1 - sl / ref) * 100, tgtPct: (tgt / ref - 1) * 100, rr: (tgt - ref) / Math.max(ref - sl, 1e-9), slRule: r.typ === 'IHS' ? '6%' : '4%' };
 }
 function patItem(r, i) {
   const st = r.status === 'breakout' ? `<span class="chip new">Broke neckline ${r.days_since === 0 ? 'today' : r.days_since + 'd ago'}</span>` : `<span class="chip open">${fmt(r.to_neck_pct, 1)}% to neckline</span>`;
-  const chip = `${st}<span class="chip">${PAT_NM[r.typ]}</span>${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fell ${fmt(r.fall_pct, 0)}%</span>${(() => { const q = patPlan(r); return `<span class="chip up">🎯 ${fmt(q.tgt, 2, 'en-IN')} (+${fmt(q.tgtPct, 0)}%)</span><span class="chip down">SL ${fmt(q.sl, 2, 'en-IN')}</span>`; })()}${r.rsi_div > 0 ? '<span class="chip open">RSI divergence</span>' : ''}`;
+  const chip = `${st}<span class="chip">${PAT_NM[r.typ]}</span>${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fell ${fmt(r.fall_pct, 0)}%</span>${(() => { const q = patPlan(r); return q.out === 'target' ? `<span class="chip up">✅ Target ${fmt(q.tgt, 2, 'en-IN')} hit${q.outDate ? ' ' + day(q.outDate) : ''}</span>`
+        : q.out === 'sl' ? `<span class="chip down">❌ SL ${fmt(q.sl, 2, 'en-IN')} hit${q.outDate ? ' ' + day(q.outDate) : ''}</span>`
+        : `<span class="chip up">🎯 ${fmt(q.tgt, 2, 'en-IN')} (+${fmt(q.tgtPct, 0)}%)</span><span class="chip down">SL ${fmt(q.sl, 2, 'en-IN')}</span>`; })()}${r.rsi_div > 0 ? '<span class="chip open">RSI divergence</span>' : ''}`;
   return `<li class="row ${r.status === 'breakout' ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.kind === 'index' ? r.name : r.symbol)}</div><div class="co">${esc(r.kind === 'index' ? 'Index' : r.name || '')}</div>
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="muted">neck ${fmt(r.neck, 2, 'en-IN')}</span></div></li>`;
 }
@@ -2998,7 +3002,7 @@ async function drawVcp(r, mk) {
 }
 function patSelect(r) {
   const P = state.pat || {}; const rg = P.regime; const q = patPlan(r);
-  const st = r.status === 'breakout' ? `<div class="status open">${PAT_NM[r.typ]}: closed above the neckline ${fmt(r.neck, 2, AL())} on ${day(r.signal_date)}. <b>Target ${fmt(q.tgt, 2, AL())} · SL ${fmt(q.sl, 2, AL())}</b> (classic neckline rule).</div>`
+  const st = r.status === 'breakout' ? `<div class="status open">${PAT_NM[r.typ]}: closed above the neckline ${fmt(r.neck, 2, AL())} on ${day(r.signal_date)}. <b>Target ${fmt(q.tgt, 2, AL())} · SL ${fmt(q.sl, 2, AL())}</b> (classic neckline rule).${q.out === 'target' ? ` <b>✅ Target reached${q.outDate ? ' on ' + day(q.outDate) : ''}: trade done, don't chase.</b>` : q.out === 'sl' ? ` <b>❌ SL hit${q.outDate ? ' on ' + day(q.outDate) : ''}: pattern failed.</b>` : ''}</div>`
     : `<div class="status info">${PAT_NM[r.typ]} forming: ${fmt(r.to_neck_pct, 1)}% below the neckline ${fmt(r.neck, 2, AL())}. A daily close above it would complete the pattern: then target ${fmt(q.tgt, 2, AL())}, SL ${fmt(q.sl, 2, AL())}.</div>`;
   const f = [['Pattern', PAT_NM[r.typ]], ['Lows', r.lows.map((x) => `${fmt(x[1], 2, AL())} (${day(x[0])})`).join(' · ')], ['Neckline (highest peak between the lows)', fmt(r.neck, 2, AL())],
     ['Target (neckline + pattern height)', `${fmt(q.tgt, 2, AL())} (${q.tgtPct >= 0 ? '+' : ''}${fmt(q.tgtPct, 1)}% from ${r.status === 'breakout' ? 'now' : 'the neckline'})`],
