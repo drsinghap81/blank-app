@@ -29,7 +29,7 @@ US_ETFS = {"SPY": "S&P 500", "QQQ": "Nasdaq 100", "DIA": "Dow Jones 30", "IWM": 
            "XLY": "Consumer discretionary", "XLP": "Consumer staples", "XLU": "Utilities", "XLB": "Materials", "XLRE": "Real estate",
            "XLC": "Communication services", "SMH": "Semiconductors", "IBB": "Biotech", "ARKK": "ARK Innovation", "ICLN": "Clean energy",
            "URA": "Uranium", "ITA": "Aerospace & defence", "VEA": "Developed ex-US", "EFA": "EAFE developed", "VWO": "Emerging markets",
-           "EEM": "Emerging markets (iShares)", "INDA": "India (MSCI)", "EPI": "India earnings (WisdomTree)", "MCHI": "China", "KWEB": "China internet",
+           "EEM": "Emerging markets (iShares)", "INDA": "India (MSCI)", "EPI": "India earnings (WisdomTree)", "INDY": "India 50 (iShares)", "SMIN": "India small-cap (iShares)", "FLIN": "India (Franklin FTSE)", "GLIN": "India growth leaders (VanEck)", "NFTY": "India Nifty 50 equal weight (First Trust)", "INCO": "India consumer (Columbia)", "MCHI": "China", "KWEB": "China internet",
            "EWJ": "Japan", "EWZ": "Brazil", "EWG": "Germany", "EWU": "UK", "EWA": "Australia", "GLD": "Gold", "SLV": "Silver", "GDX": "Gold miners",
            "USO": "Crude oil", "DBC": "Commodities", "TLT": "US Treasuries 20y+", "IEF": "US Treasuries 7-10y", "SHY": "US Treasuries 1-3y",
            "LQD": "US investment-grade bonds", "HYG": "US high-yield bonds", "VNQ": "US REITs", "IBIT": "Bitcoin (iShares)"}
@@ -39,7 +39,7 @@ ASX_ETFS = {"VAS": "ASX 300 (Vanguard)", "A200": "ASX 200 (Betashares)", "IOZ": 
             "IVV": "S&P 500", "VTS": "US total market", "NDQ": "Nasdaq 100", "HNDQ": "Nasdaq 100, A$ hedged", "QUAL": "World quality", "MOAT": "US wide moat",
             "IHVV": "S&P 500, A$ hedged", "SEMI": "Global semiconductors", "HACK": "Global cybersecurity", "RBTZ": "Robotics & AI", "FANG": "FANG+",
             "ETHI": "Global sustainability leaders", "ASIA": "Asia technology", "VAE": "Asia ex-Japan", "IAA": "Asia 50", "VGE": "Emerging markets",
-            "IEM": "Emerging markets (iShares)", "NDIA": "India (Global X)", "IIND": "India quality (Betashares)", "IZZ": "China large-cap", "CETF": "China A-shares",
+            "IEM": "Emerging markets (iShares)", "NDIA": "India (Global X)", "IIND": "India quality (Betashares)", "GRIN": "India growth leaders (VanEck)", "IAEF": "India Avenue equity (active)", "FIIN": "India (Fidelity, active)", "IZZ": "China large-cap", "CETF": "China A-shares",
             "IJP": "Japan", "IEU": "Europe 350", "VEQ": "Europe (Vanguard)", "F100": "FTSE 100", "VDHG": "Diversified high growth",
             "DHHF": "Diversified all growth", "VAP": "Australian property", "GOLD": "Gold (Perth Mint)", "QAU": "Gold, A$ hedged", "ETPMAG": "Silver",
             "VAF": "Australian bonds", "IAF": "Australian bonds (iShares)", "AAA": "Cash (high interest)"}
