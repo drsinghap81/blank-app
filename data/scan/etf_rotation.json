@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-16T11:51+00:00",
-"asof": "2026-11-16",
+"generated": "2026-11-17T11:36+00:00",
+"asof": "2026-11-17",
 "rule": "Each month-end: rank NIFTYBEES, MID150BEES, GOLDBEES, MON100 by 3-month return; hold the best 2 equally; a pick below cash (6.5%/yr, 1.6% over 3 months) is held as LIQUIDBEES instead. Trade at the next open.",
 "backtest": "2016-26 (indices/ETFs, 0.2% per switch): 17.7%/yr, worst month-end fall -12.8%, 5-7 switches a year; 2016-21 19.0%, 2021-26 16.1%. Nifty 50 11.6% / -29%; 25% each of the four, never rebalanced to picks: 18% / -16%.",
 "names": {
@@ -46,7 +46,7 @@
 ]
 },
 "provisional": {
-"asof": "2026-11-16",
+"asof": "2026-11-17",
 "hold": [
 "NIFTYBEES",
 "LIQUIDBEES"
@@ -54,31 +54,31 @@
 "ranks": [
 {
 "sym": "NIFTYBEES",
-"ret_3m_pct": 4.63,
+"ret_3m_pct": 5.36,
 "beats_cash": true
 },
 {
 "sym": "MID150BEES",
-"ret_3m_pct": -3.63,
+"ret_3m_pct": -4.03,
 "beats_cash": false
 },
 {
 "sym": "MON100",
-"ret_3m_pct": -9.24,
+"ret_3m_pct": -9.81,
 "beats_cash": false
 },
 {
 "sym": "GOLDBEES",
-"ret_3m_pct": -13.56,
+"ret_3m_pct": -13.67,
 "beats_cash": false
 }
 ]
 },
 "prices": {
-"NIFTYBEES": 287.61,
-"MID150BEES": 233.94,
-"GOLDBEES": 110.06,
-"MON100": 301.5
+"NIFTYBEES": 289.6,
+"MID150BEES": 234.24,
+"GOLDBEES": 109.92,
+"MON100": 299.6
 },
 "history": [
 {
