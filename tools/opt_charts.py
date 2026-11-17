@@ -1,8 +1,8 @@
 """ATM option charts + systems on the option premium (17 Nov 2026, Amritpal's request; WATCH ONLY - not backtested).
 
 For every liquid F&O stock and the index options (NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY):
-  contract  = today's ATM strike (nearest to the near-month future's close) of the current monthly expiry, or the next
-              monthly when fewer than 10 days are left; CE and PE
+  contract  = today's ATM strike (nearest to the near-month future's close) of whichever of the next two monthly expiries
+              traded more ATM contracts over the last 5 sessions (at least 3 days left); CE and PE
   chart     = that contract's daily OHLC over its life (NSE F&O bhavcopy, EOD); days without a trade use the settle price
   liquid    = ATM CE + PE traded at least 200 contracts a day on average over the last 5 sessions
   systems on the premium chart (the same rules the app uses on stocks):
@@ -128,17 +128,20 @@ def main():
             continue
         F = float(f.CLOSE.iloc[0]); lot = f.LOT.iloc[0]
         o = g[g.INST == "OPT"]
-        exps = sorted(o.EXPIRY.unique())
-        exps = [e for e in exps if (pd.Timestamp(e) - last).days >= 10] or exps
-        if not exps:
+        exps = [e for e in sorted(o.EXPIRY.unique()) if (pd.Timestamp(e) - last).days >= 3][:2]
+        last5 = sorted(X.Date.unique())[-5:]; best = None
+        for e in exps:                                  # the more traded of the next two monthlies (what traders actually use)
+            oe = o[o.EXPIRY == e]
+            if oe.empty:
+                continue
+            k = float(min(oe.STRIKE.unique(), key=lambda v: abs(v - F)))
+            H = X[(X.SYMBOL == sym) & (X.INST == "OPT") & (X.EXPIRY == e) & (X.STRIKE == k)]
+            v5 = H[H.Date.isin(last5)].groupby("Date").VOL.sum().reindex(last5).fillna(0).mean()
+            if best is None or v5 > best[0]:
+                best = (v5, e, k, H)
+        if best is None:
             continue
-        e = exps[0]; oe = o[o.EXPIRY == e]
-        if oe.empty:
-            continue
-        k = float(min(oe.STRIKE.unique(), key=lambda v: abs(v - F)))
-        H = X[(X.SYMBOL == sym) & (X.INST == "OPT") & (X.EXPIRY == e) & (X.STRIKE == k)]
-        last5 = sorted(X.Date.unique())[-5:]
-        v5 = H[H.Date.isin(last5)].groupby("Date").VOL.sum().reindex(last5).fillna(0).mean()
+        v5, e, k, H = best
         if v5 < MIN_VOL:
             continue
         Fs = X[(X.SYMBOL == sym) & (X.INST == "FUT")].sort_values(["Date", "EXPIRY"]).groupby("Date").CLOSE.first()
