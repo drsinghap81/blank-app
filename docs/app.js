@@ -5100,7 +5100,8 @@ async function usWatchCard(box) {
     ${offline ? '<p class="status exit watch lv-sub"><b>Saved on this phone.</b> Your server takes these over after its next update (outside Indian market hours, about 9:05 pm Melbourne); alerts start then. Live prices show from then too.</p>' : ''}
     <p class="lv-sub">Alerts on stop hits, sell signals and stops to move. You sell in moomoo.</p>
     ${imp ? `<div class="status exit watch"><b>Add ${imp.length} holdings from your link?</b><div class="lv-sub">${imp.map((x) => `${esc(x.symbol)} ${x.qty} @ ${$f(x.entry)} · stop ${$f(x.stop)}${x.target ? ` · target ${$f(x.target)}` : ''} · ${esc(sysN(x.system))}`).join('<br>')}</div>
-      <button class="lv-btn" id="uswimp">Add these ${imp.length}</button> <button class="lv-link" id="uswno">Not now</button></div>` : ''}
+      <button class="lv-btn" id="uswrep">Replace my list with these ${imp.length}</button> <button class="lv-link" id="uswimp">Only add / update</button> <button class="lv-link" id="uswno">Not now</button>
+      ${(() => { const gone = (W.items || []).map((x) => x.symbol).filter((sy) => !imp.some((x) => x.symbol === sy)); return gone.length ? `<div class="lv-sub">Replace stops tracking: ${gone.map(esc).join(', ')} (sold).</div>` : ''; })()}</div>` : ''}
     ${sumH}${rows || '<p class="empty">Nothing tracked yet.</p>'}
     ${offline || !W.items.length ? '' : `<p class="lv-sub">🛡 <b>Daily stop raise:</b> Trend 9/21 stops follow EMA 21, Monthly ATH stops follow the 30-week average, and only ever move up (the system itself sells on the close). ${trTxtU} <button class="lv-link" id="uwtrail">Check stops now</button></p>`}
     <details class="info" ${W.items.length ? '' : 'open'}><summary>Paste a list</summary><p class="lv-sub">Paste the list, then tap Read.</p>
@@ -5117,6 +5118,9 @@ async function usWatchCard(box) {
     usWatchCard(box); };
   const done = () => { state._uswImp = null; if (/^#usw=/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search + '#live'); };
   const ib = box.querySelector('#uswimp'); if (ib) ib.addEventListener('click', () => { const it = imp; done(); send({ items: it }, `Tracking ${it.length} US holdings`); });
+  const rb = box.querySelector('#uswrep'); if (rb) rb.addEventListener('click', () => { const it = imp; done();   // 17 Nov 2026: whole-list update (sold ones drop out)
+    const gone = (W.items || []).map((x) => x.symbol).filter((sy) => !it.some((x) => x.symbol === sy));
+    send({ items: it, remove: gone }, `Tracking ${it.length} US holdings${gone.length ? ` · removed ${gone.join(', ')}` : ''}`); });
   const nb = box.querySelector('#uswno'); if (nb) nb.addEventListener('click', () => { done(); usWatchCard(box); });
   box.querySelectorAll('[data-uswdel]').forEach((b) => b.addEventListener('click', (e) => e.preventDefault() || send({ remove: [b.dataset.uswdel] }, `Stopped tracking ${b.dataset.uswdel}`)));
   const tb = box.querySelector('#uwtrail'); if (tb) tb.addEventListener('click', async () => { tb.disabled = true; tb.textContent = 'Checking…';
