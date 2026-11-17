@@ -961,3 +961,17 @@ def test_opt_candles(tmp_path):
     j = c.get("/api/opt/candles?symbol=itc&expiry=2026-11-23&strike=295&type=CE&interval=5", headers=h).json()
     assert j["tsym"] == "ITC23NOV26295CE" and len(j["t"]) == 40 and "20-bar high close" in j["signals"]
     assert c.get("/api/opt/candles?symbol=itc&expiry=2026-11-23&strike=295&type=XX&interval=5", headers=h).status_code == 400
+
+
+def test_opt_intra_scan(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    import json as _j, os as _o
+    p = _o.path.join(_o.path.dirname(_o.environ["PLAN_FILE"]), "optscan.json")
+    if not _o.path.exists(p):
+        return
+    A.requests.get = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("no net"))
+    A.broker.icandles = [(f"2026-11-17T{9 + (15 + i * 5) // 60:02d}:{(15 + i * 5) % 60:02d}:00+05:30", 10.0, 11.0, 9.0, 10.0 + (3.0 if i == 74 else (i % 5) * 0.1), 10.0) for i in range(75)]
+    assert len(A._resample(A.broker.icandles, 15)) == 25 and len(A._resample(A.broker.icandles, 60)) == 7
+    A.opt_intra_scan()
+    j = c.get("/api/opt/scan", headers=h).json(); assert j["items"] and any("5m" in v["tf"] for v in j["items"].values())

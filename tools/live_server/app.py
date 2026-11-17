@@ -3177,6 +3177,81 @@ def prem_systems(c):
     return sig, (round(top, 2) if top is not None else None)
 
 
+def _resample(B, mins):
+    """5-minute bars (iso time, o, h, l, c, v) -> mins-minute bars of the NSE session (anchored at 09:15 IST)."""
+    out = []; cur = None
+    for x in B:
+        t = datetime.fromisoformat(x[0]); m = (t.hour * 60 + t.minute) - (9 * 60 + 15)
+        key = (t.date(), m // mins)
+        if cur and cur[0] == key:
+            cur[1][2] = max(cur[1][2], x[2]); cur[1][3] = min(cur[1][3], x[3]); cur[1][4] = x[4]; cur[1][5] += x[5]
+        else:
+            if cur:
+                out.append(tuple(cur[1]))
+            cur = (key, [x[0], x[1], x[2], x[3], x[4], x[5]])
+    if cur:
+        out.append(tuple(cur[1]))
+    return out
+
+
+_OPTSCAN = {"running": False}
+
+
+def opt_intra_scan():
+    """every ATM option of the nightly list: 5-minute candles from Angel (10 days), resampled to 15 and 60 minutes; the
+    premium systems on each timeframe. One Angel call per contract (~440 calls, about 3 minutes). Watch only."""
+    if _OPTSCAN["running"]:
+        return
+    _OPTSCAN["running"] = True
+    try:
+        if ENV.get("PLAN_FILE"):
+            D = json.load(open(os.path.join(os.path.dirname(ENV["PLAN_FILE"]), "optscan.json")))
+        else:
+            D = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/optscan.json", timeout=30).json()
+        res = {}
+        for r in D.get("rows") or []:
+            for typ in ("CE", "PE"):
+                if not r.get(typ.lower()):
+                    continue
+                try:
+                    tk = broker.opt_token(r["symbol"], date.fromisoformat(r["expiry"]), r["strike"], typ)
+                    if not tk:
+                        continue
+                    B = broker.candles_int("NFO", tk[0], "FIVE_MINUTE", 10)
+                except Exception as ex:  # noqa: BLE001
+                    log("opt_intra_error", symbol=r["symbol"], error=str(ex)[:120]); continue
+                if not B:
+                    continue
+                tf = {}
+                for name, bars in (("5m", B), ("15m", _resample(B, 15)), ("1h", _resample(B, 60))):
+                    sig, top = prem_systems([x[4] for x in bars])
+                    if sig:
+                        tf[name] = sig
+                res[f"{r['symbol']}|{typ}"] = dict(ltp=B[-1][4], at=B[-1][0], tf=tf)
+        json.dump(dict(at=ist_now().isoformat(timespec="minutes"), items=res), open(os.path.join(DATA, "optscan_intra.json"), "w"))
+        log("opt_intra_scan", n=len(res), signals=sum(1 for v in res.values() if v["tf"]))
+    except Exception as ex:  # noqa: BLE001
+        log("opt_intra_scan_error", error=str(ex)[:200])
+    finally:
+        _OPTSCAN["running"] = False; _OPTSCAN["last"] = time.time()
+
+
+@app.get("/api/opt/scan")
+def opt_scan_get(_=Depends(auth)):
+    try:
+        return json.load(open(os.path.join(DATA, "optscan_intra.json")))
+    except Exception:  # noqa: BLE001
+        return dict(at=None, items={})
+
+
+@app.post("/api/opt/scan")
+def opt_scan_now(_=Depends(auth)):
+    if _OPTSCAN["running"]:
+        return dict(ok=True, note="already running")
+    threading.Thread(target=opt_intra_scan, daemon=True).start()
+    return dict(ok=True, note="started; takes about 3 minutes")
+
+
 @app.get("/api/opt/candles")
 def opt_candles(symbol: str, expiry: str, strike: float, type: str, interval: str = "15", _=Depends(auth)):
     if interval not in OPT_IV or type not in ("CE", "PE") or not re.match(r"^\d{4}-\d{2}-\d{2}$", expiry):
@@ -3495,6 +3570,9 @@ def _loop():
                 us_watch_check(mk="ASX")
             if _sy.weekday() < 5 and (16, 20) <= (_sy.hour, _sy.minute) <= (16, 50) and _HB.get("asx_eod") != _sy.date():
                 _HB["asx_eod"] = _sy.date(); us_watch_eod(_sy, mk="ASX"); perf_record("ASX")
+            if t.weekday() < 5 and (9, 30) <= (t.hour, t.minute) <= (15, 35) and not _OPTSCAN["running"] \
+                    and time.time() - _OPTSCAN.get("last", 0) > 900:                   # option systems on 5m/15m/1h, every 15 min
+                threading.Thread(target=opt_intra_scan, daemon=True).start()
             if t.weekday() < 5 and (23, 40) <= (t.hour, t.minute) <= (23, 58) and _HB.get("fo_mcx") != t.date():
                 _HB["fo_mcx"] = t.date(); fo_check()
             if t.weekday() < 5 and (15, 40) <= (t.hour, t.minute) <= (16, 30) and _HB.get("fo_nfo") != t.date():

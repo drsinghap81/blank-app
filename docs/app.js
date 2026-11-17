@@ -2498,17 +2498,29 @@ async function loadOptCharts(el) {
     state.optAt = Date.now(); state.optScan = await getJSON(MAIN + 'data/scan/optscan.json', 'optscan').catch(() => null); }
   const D = state.optScan;
   if (!D) { el.innerHTML = tradeStrip('opt') + '<p class="empty">The option charts appear after the first evening run (about 7:45 pm IST).</p>'; tradeStripWire(el); return; }
+  /* 17 Nov 2026: the same systems on 1h / 15m / 5m from the server's Angel scan (every 15 min in market hours); sorted by how
+     many timeframes agree */
+  if (lvCfg().url && lvCfg().token && (!state.optIntra || Date.now() - (state.optIntraAt || 0) > 120000)) {
+    state.optIntraAt = Date.now(); state.optIntra = await lvApi('/api/opt/scan', { timeout: 20000 }).catch(() => null); }
+  const IN = (state.optIntra && state.optIntra.items) || {};
+  const tfs = (r, t) => { const o = []; if (r[t] && r[t].signals && r[t].signals.length) o.push(['D', r[t].signals]);
+    const x = IN[`${r.symbol}|${t.toUpperCase()}`]; if (x && x.tf) ['1h', '15m', '5m'].forEach((k) => { if (x.tf[k]) o.push([k, x.tf[k]]); }); return o; };
+  const score = (r) => { const all = tfs(r, 'ce').concat(tfs(r, 'pe')); return new Set(all.map((x) => x[0])).size * 100 + all.reduce((a, x) => a + x[1].length, 0) * 10; };
   $('#asof').textContent = `NSE F&O close ${day(D.asof)}${updTxt(D.generated)}`;
-  const R = D.rows || []; const hasSig = (r) => ['ce', 'pe'].some((t) => r[t] && r[t].signals && r[t].signals.length);
+  const R = (D.rows || []).slice().sort((a, b) => (score(b) - score(a)) || ((b.kind === 'index') - (a.kind === 'index')) || (b.atm_vol5 - a.atm_vol5));
+  const hasSig = (r) => tfs(r, 'ce').length + tfs(r, 'pe').length > 0;
   const f = state.optF || 'all'; const q = (state.optQ || '').toUpperCase();
   const L = R.filter((r) => (f === 'all' || (f === 'sig' ? hasSig(r) : f === 'idx' ? r.kind === 'index' : true)) && (!q || r.symbol.includes(q)));
   const leg = (r, t) => { const x = r[t]; if (!x) return `<span class="muted">${t.toUpperCase()} –</span>`;
-    return `<span><b>${t.toUpperCase()}</b> ${fmt(x.close, 2, 'en-IN')} <span class="${(x.chg || 0) >= 0 ? 'up' : 'down'}">${x.chg == null ? '' : `${x.chg >= 0 ? '+' : ''}${fmt(x.chg, 1)}%`}</span>${(x.signals || []).map((g) => ` <span class="chip new">${esc(g)}</span>`).join('')}</span>`; };
+    const sh = { '9/21 cross up': '9/21', '20-day high close': '20-high', '20-bar high close': '20-high', 'Top Bottom buy (close above last top)': 'TB' };
+    const lt = IN[`${r.symbol}|${t.toUpperCase()}`];
+    return `<span><b>${t.toUpperCase()}</b> ${fmt(lt && lt.ltp ? lt.ltp : x.close, 2, 'en-IN')} <span class="${(x.chg || 0) >= 0 ? 'up' : 'down'}">${x.chg == null || (lt && lt.ltp) ? '' : `${x.chg >= 0 ? '+' : ''}${fmt(x.chg, 1)}%`}</span>${tfs(r, t).map(([k, g]) => ` <span class="chip new">${k}: ${g.map((z) => sh[z] || esc(z)).join('+')}</span>`).join('')}</span>`; };
   const items = L.map((r, i) => `<li class="row" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)} <span class="muted">${fmt(r.strike, 0, 'en-IN')} · ${esc(day(r.expiry))} · ${r.dte} d</span></div>
       <div class="tags">${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fut ${fmt(r.fut, 2, 'en-IN')}</span>${r.lot ? `<span class="chip">lot ${r.lot}</span>` : ''}</div>
       <div class="lv-sub">${leg(r, 'ce')}<br>${leg(r, 'pe')}</div></div><div></div><div></div></li>`).join('');
   el.innerHTML = `${tradeStrip('opt')}<div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> Systems run on the option premium itself (9/21 cross, 20-day high close, Top Bottom close above the last top). Not backtested on option charts; a test of Top Bottom's trades taken with ATM options made about half what futures made. Monthly expiry, today's ATM strike; liquid = ATM CE + PE ≥ 200 contracts a day.</div>
-    <section class="summary"><div class="stat"><b>${R.length}</b><span>liquid underlyings</span></div><div class="stat new"><b>${R.filter(hasSig).length}</b><span>with a signal on CE or PE</span></div></section>
+    <section class="summary"><div class="stat"><b>${R.length}</b><span>liquid underlyings</span></div><div class="stat new"><b>${R.filter(hasSig).length}</b><span>with a signal on CE or PE (any timeframe)</span></div></section>
+    <p class="muted small" style="margin:6px 16px">Sorted by how many timeframes (D · 1h · 15m · 5m) show a signal, then signal count. 9/21 = EMA 9 crossed above 21 · 20-high = close above the 20-bar high · TB = close above the last top. ${state.optIntra && state.optIntra.at ? `Intraday as of ${esc(state.optIntra.at.slice(11, 16))} IST (every 15 min in market hours).` : (lvCfg().url ? 'Intraday timeframes appear once your server has run its first scan (market hours).' : 'Connect your server (Live tab) for the 1h / 15m / 5m timeframes.')}</p>
     <div class="card"><div class="seg" id="optf">${[['all', `All ${R.length}`], ['sig', `Signals ${R.filter(hasSig).length}`], ['idx', 'Indices']].map(([k, n]) => `<button data-k="${k}" aria-selected="${f === k}">${n}</button>`).join('')}</div>
     <label class="search"><input id="optq" type="search" placeholder="Search symbol" value="${esc(state.optQ || '')}" autocomplete="off"></label>
     <ul class="list flat">${items || '<li class="empty">Nothing matches.</li>'}</ul></div>`;
