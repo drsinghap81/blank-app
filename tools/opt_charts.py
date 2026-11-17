@@ -2,7 +2,7 @@
 
 For every liquid F&O stock and the index options (NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY):
   contract  = today's ATM strike (nearest to the near-month future's close) of the current monthly expiry, or the next
-              monthly when fewer than 7 days are left; CE and PE
+              monthly when fewer than 10 days are left; CE and PE
   chart     = that contract's daily OHLC over its life (NSE F&O bhavcopy, EOD); days without a trade use the settle price
   liquid    = ATM CE + PE traded at least 200 contracts a day on average over the last 5 sessions
   systems on the premium chart (the same rules the app uses on stocks):
@@ -129,7 +129,7 @@ def main():
         F = float(f.CLOSE.iloc[0]); lot = f.LOT.iloc[0]
         o = g[g.INST == "OPT"]
         exps = sorted(o.EXPIRY.unique())
-        exps = [e for e in exps if (pd.Timestamp(e) - last).days >= 7] or exps
+        exps = [e for e in exps if (pd.Timestamp(e) - last).days >= 10] or exps
         if not exps:
             continue
         e = exps[0]; oe = o[o.EXPIRY == e]
