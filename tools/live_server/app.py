@@ -1953,19 +1953,33 @@ def us_plan():
 US_SYS = {"ATH": "Monthly ATH", "TF": "Trend 9/21", "RT": "Breakout retest", "T921": "9/21 trend", "MY": "My pick"}
 
 
-def _usw_path():
-    return os.path.join(DATA, "us_watch.json")
+# 17 Nov 2026: the same holdings tracker for ASX shares (DATA/asx_watch.json); each holding carries an account label
+WMK = {"US": dict(name="US", tz="America/New_York", ysuf="", idx="^GSPC", idx_name="S&P 500", cur="USD"),
+       "ASX": dict(name="ASX", tz="Australia/Sydney", ysuf=".AX", idx="^AXJO", idx_name="ASX 200", cur="AUD")}
 
 
-def us_watch_load():
+def mk_now(mk):
+    from zoneinfo import ZoneInfo
+    return et_now() if mk == "US" else datetime.now(ZoneInfo(WMK[mk]["tz"]))
+
+
+def ysym_of(sym, mk):
+    return sym.replace(".", "-") if mk == "US" else sym + WMK[mk]["ysuf"]
+
+
+def _usw_path(mk="US"):
+    return os.path.join(DATA, "us_watch.json" if mk == "US" else f"{mk.lower()}_watch.json")
+
+
+def us_watch_load(mk="US"):
     try:
-        return json.load(open(_usw_path()))
+        return json.load(open(_usw_path(mk)))
     except Exception:  # noqa: BLE001
         return {}
 
 
-def us_watch_save(W):
-    tmp = _usw_path() + ".tmp"; json.dump(W, open(tmp, "w"), indent=1); os.replace(tmp, _usw_path())
+def us_watch_save(W, mk="US"):
+    tmp = _usw_path(mk) + ".tmp"; json.dump(W, open(tmp, "w"), indent=1); os.replace(tmp, _usw_path(mk))
 
 
 class USWatchItem(BaseModel):
@@ -1976,6 +1990,7 @@ class USWatchItem(BaseModel):
     target: float | None = None
     system: str = "My pick"
     since: str | None = None          # buy date (YYYY-MM-DD), for the journal's entry chart
+    acct: str = ""                    # account label, e.g. Alphanomics / Personal (17 Nov 2026)
 
 
 class USWatch(BaseModel):
@@ -1985,46 +2000,69 @@ class USWatch(BaseModel):
 
 @app.get("/api/us/watch")
 def us_watch_get(_=Depends(auth)):
-    W = us_watch_load(); out = []
+    return _watch_get("US")
+
+
+@app.get("/api/asx/watch")
+def asx_watch_get(_=Depends(auth)):
+    return _watch_get("ASX")
+
+
+@app.post("/api/asx/watch")
+def asx_watch_set(body: USWatch, _=Depends(auth)):
+    return _watch_set(body, "ASX")
+
+
+@app.post("/api/asx/watch/trail")
+def asx_watch_trail_now(_=Depends(auth)):
+    return dict(results=us_watch_eod(mk_now("ASX"), manual=True, mk="ASX"))
+
+
+def _watch_get(mk):
+    W = us_watch_load(mk); out = []
     for sym, w in sorted(W.items()):
         q = None
         try:
-            q = yq(sym, "US")
+            q = yq(sym, mk)
         except Exception:  # noqa: BLE001
             pass
         px = q["ltp"] if q else None
         out.append(dict(symbol=sym, **w, price=px, to_stop=round((px / w["stop"] - 1) * 100, 1) if px and w.get("stop") else None,
                         pnl=round((px - w["entry"]) * w["qty"], 2) if px else None))
     try:
-        last = json.load(open(os.path.join(DATA, "us_trail.json")))
+        last = json.load(open(os.path.join(DATA, "us_trail.json" if mk == "US" else f"{mk.lower()}_trail.json")))
     except Exception:  # noqa: BLE001
         last = None
-    return dict(items=out, us_open=us_open(et_now()), trail=last)
+    return dict(items=out, us_open=us_open(et_now()) if mk == "US" else mkt_open(mk), trail=last, mk=mk, cur=WMK[mk]["cur"])
 
 
 @app.post("/api/us/watch")
 def us_watch_set(body: USWatch, _=Depends(auth)):
-    W = us_watch_load()
+    return _watch_set(body, "US")
+
+
+def _watch_set(body, mk):
+    W = us_watch_load(mk)
     for it in body.items:
         sym = re.sub(r"[^A-Z0-9.\-]", "", it.symbol.upper())[:10]
         if not sym or it.qty <= 0 or it.entry <= 0 or it.stop <= 0 or it.stop >= it.entry * 1.5:
             raise HTTPException(400, f"check {it.symbol}: qty, entry and stop must be positive")
         sysn = US_SYS.get(it.system, it.system)[:30]
-        old = W.get(sym, {}); day = et_now().date().isoformat(); st = round(it.stop, 2)
+        old = W.get(sym, {}); day = mk_now(mk).date().isoformat(); st = round(it.stop, 2)
         log = list(old.get("stop_log") or [])
         if not log or log[-1][1] != st:
             log.append([day, st, "set"])
         W[sym] = dict(qty=it.qty, entry=round(it.entry, 2), stop=st, target=round(it.target, 2) if it.target else None,
                       system=sysn, since=(it.since if it.since and re.match(r"^\d{4}-\d{2}-\d{2}$", it.since) else None) or old.get("since") or day,
-                      stop0=old.get("stop0") or st, stop_log=log[-60:])
-    J = us_journal_load(); moved = []
+                      stop0=old.get("stop0") or st, stop_log=log[-60:], acct=(it.acct or old.get("acct") or ("Personal" if mk == "ASX" else ""))[:20])
+    J = us_journal_load(mk); moved = []
     for sym in body.remove:
         w = W.pop(sym.upper(), None)
         if w:                                        # 17 Nov 2026: a holding that leaves the list waits in the journal for its sale price
-            J.append(_jrow(sym.upper(), w, None, None, "removed from the list - enter the sale price")); moved.append(sym.upper())
+            J.append(_jrow(sym.upper(), w, None, None, "removed from the list - enter the sale price", cur=WMK[mk]["cur"])); moved.append(sym.upper())
     if moved:
-        us_journal_save(J)
-    us_watch_save(W)
+        us_journal_save(J, mk)
+    us_watch_save(W, mk)
     return dict(ok=True, n=len(W), pending=moved)
 
 
@@ -2032,19 +2070,19 @@ def us_watch_set(body: USWatch, _=Depends(auth)):
 # Every moomoo trade that leaves "Your moomoo holdings" is kept here with its entry, initial and last stop, the stop moves,
 # the sale price and date, P&L in US$ and A$, % and R (P&L per share / initial risk per share). A holding removed without a
 # price stays "pending" until the app sends the sale price.
-def _usj_path2():
-    return os.path.join(DATA, "us_trades.json")
+def _usj_path2(mk="US"):
+    return os.path.join(DATA, "us_trades.json" if mk == "US" else f"{mk.lower()}_trades.json")
 
 
-def us_journal_load():
+def us_journal_load(mk="US"):
     try:
-        return json.load(open(_usj_path2()))
+        return json.load(open(_usj_path2(mk)))
     except Exception:  # noqa: BLE001
         return []
 
 
-def us_journal_save(J):
-    tmp = _usj_path2() + ".tmp"; json.dump(J, open(tmp, "w"), indent=1); os.replace(tmp, _usj_path2())
+def us_journal_save(J, mk="US"):
+    tmp = _usj_path2(mk) + ".tmp"; json.dump(J, open(tmp, "w"), indent=1); os.replace(tmp, _usj_path2(mk))
 
 
 _FX = {"t": 0, "v": None}
@@ -2060,10 +2098,11 @@ def audusd():
     return v
 
 
-def _jrow(sym, w, exit_px, date_, reason, fees=0.0):
+def _jrow(sym, w, exit_px, date_, reason, fees=0.0, cur="USD"):
     return dict(id=f"{sym}-{w.get('since', '')}-{int(time.time() * 1000) % 10**8}", symbol=sym, qty=w["qty"], entry=w["entry"],
                 stop0=w.get("stop0") or w.get("stop"), stop_last=w.get("stop"), stop_log=w.get("stop_log") or [], system=w.get("system"),
-                since=w.get("since"), exit=exit_px, closed=date_, reason=reason, fees=fees, fx=audusd() if exit_px else None,
+                since=w.get("since"), exit=exit_px, closed=date_, reason=reason, fees=fees,
+                fx=audusd() if exit_px and cur == "USD" else None, cur=cur, acct=w.get("acct") or "",
                 status="closed" if exit_px else "pending")
 
 
@@ -2071,8 +2110,8 @@ def _jcalc(r):
     r = dict(r)
     if r.get("exit"):
         q, e, x, s0 = r["qty"], r["entry"], r["exit"], r.get("stop0") or r["entry"]
-        pnl = (x - e) * q - (r.get("fees") or 0); inr = r.get("cur") == "INR"; fx = None if inr else (r.get("fx") or audusd())
-        r.update(pnl=round(pnl, 2), pnl_aud=None if inr else round(pnl / fx, 2), pnl_pct=round((x / e - 1) * 100, 2),
+        pnl = (x - e) * q - (r.get("fees") or 0); cu = r.get("cur") or "USD"; fx = None if cu != "USD" else (r.get("fx") or audusd())
+        r.update(pnl=round(pnl, 2), pnl_aud=None if cu == "INR" else round(pnl, 2) if cu == "AUD" else round(pnl / fx, 2), pnl_pct=round((x / e - 1) * 100, 2),
                  r_mult=round((x - e) / (e - s0), 2) if e > s0 else None,
                  days=(date.fromisoformat(r["closed"]) - date.fromisoformat(r["since"])).days if r.get("closed") and r.get("since") else None)
     return r
@@ -2082,7 +2121,7 @@ def _entry_ctx(sym, date_, mk="US"):
     """Top-down context for the journal's entry line: market (S&P 500 / Nifty 50 vs its 200-day on that day), then sector /
     theme / stock strength and the system note from that market's plan row (today's plan if the stock is still in it)."""
     ctx = {}
-    idx, name = ("%5EGSPC", "S&P 500") if mk == "US" else ("%5ENSEI", "Nifty 50")
+    idx, name = {"US": ("%5EGSPC", "S&P 500"), "ASX": ("%5EAXJO", "ASX 200")}.get(mk, ("%5ENSEI", "Nifty 50"))
     try:
         r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{idx}", params=dict(interval="1d", range="2y"),
                          headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
@@ -2097,7 +2136,7 @@ def _entry_ctx(sym, date_, mk="US"):
     except Exception:  # noqa: BLE001
         pass
     try:
-        P = mkt_plan("US") if mk == "US" else plan()
+        P = plan() if mk == "IN" else mkt_plan(mk)
         row = next((x for k in ("top", "swing", "more", "watch", "missed") for x in (P.get(k) or []) if x.get("symbol") == sym), None)
         if row:
             ctx.update({k: row.get(k) for k in ("system", "note", "sector", "sector_rs", "sector_pct", "theme", "theme_rs", "theme_pct",
@@ -2113,6 +2152,11 @@ def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
     return _snap(symbol, date_, "US")
 
 
+@app.get("/api/asx/snap")
+def asx_snap(symbol: str, date_: str = "", _=Depends(auth)):
+    return _snap(symbol, date_, "ASX")
+
+
 @app.get("/api/in/snap")
 def in_snap(symbol: str, date_: str = "", _=Depends(auth)):
     return _snap(symbol, date_, "IN")
@@ -2122,11 +2166,11 @@ def _snap(symbol, date_, mk):
     """17 Nov 2026: the daily chart as it looked on the buy date (130 bars up to and including that day) with EMA 9 / EMA 21 /
     150-day (~30-week) average, for the journal. Frozen on first request (DATA/us_snaps) so it never changes afterwards."""
     sym = re.sub(r"[^A-Z0-9.&\-]", "", symbol.upper())[:20]
-    ysym = requests.utils.quote(sym.replace(".", "-") if mk == "US" else sym + ".NS")
-    today = (et_now() if mk == "US" else ist_now()).date().isoformat()
+    ysym = requests.utils.quote(sym + ".NS" if mk == "IN" else ysym_of(sym, mk))
+    today = (ist_now() if mk == "IN" else mk_now(mk)).date().isoformat()
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", date_ or ""):
         raise HTTPException(400, "date_ must be YYYY-MM-DD")
-    d = os.path.join(DATA, "us_snaps" if mk == "US" else "in_snaps"); os.makedirs(d, exist_ok=True); f = os.path.join(d, f"{re.sub(r'[^A-Z0-9.-]', '_', sym)}_{date_}_v2.json")
+    d = os.path.join(DATA, {"US": "us_snaps", "IN": "in_snaps"}.get(mk, mk.lower() + "_snaps")); os.makedirs(d, exist_ok=True); f = os.path.join(d, f"{re.sub(r'[^A-Z0-9.-]', '_', sym)}_{date_}_v2.json")
     if os.path.exists(f):
         return json.load(open(f))
     r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{ysym}", params=dict(interval="1d", range="2y"),
@@ -2143,7 +2187,7 @@ def _snap(symbol, date_, mk):
     s150 = [sum(C[max(0, i - 149):i + 1]) / (i + 1 - max(0, i - 149)) if i >= 149 else None for i in range(len(C))]
     rd = lambda v: [None if x is None else round(x, 2) for x in v[a:e + 1]]  # noqa: E731
     out = dict(symbol=sym, date=date_, bar=t[e], t=t[a:e + 1], o=rd(O), h=rd(H), l=rd(L), c=rd(C), e9=rd(e9), e21=rd(e21), s150=rd(s150),
-               hi52=round(max(H[max(0, e - 251):e + 1]), 2), ctx=_entry_ctx(sym, date_, mk), cur="USD" if mk == "US" else "INR")
+               hi52=round(max(H[max(0, e - 251):e + 1]), 2), ctx=_entry_ctx(sym, date_, mk), cur={"US": "USD", "IN": "INR"}.get(mk, "AUD"))
     # 17 Nov 2026: monthly candles for trades taken on the monthly chart (Monthly ATH): months before the buy month from
     # Yahoo's monthly series, the buy month built from the daily bars up to the buy day (so it is frozen too)
     try:
@@ -2482,9 +2526,23 @@ def in_journal_post(body: JournalReq, _=Depends(auth)):
     return dict(ok=True, n=len(J))
 
 
+@app.get("/api/asx/journal")
+def asx_journal_get(_=Depends(auth)):
+    return _journal_get("ASX")
+
+
+@app.post("/api/asx/journal")
+def asx_journal_post(body: JournalReq, _=Depends(auth)):
+    return _journal_post(body, "ASX")
+
+
 @app.get("/api/us/journal")
 def us_journal_get(_=Depends(auth)):
-    J = [_jcalc(r) for r in us_journal_load()]
+    return _journal_get("US")
+
+
+def _journal_get(mk):
+    J = [_jcalc(r) for r in us_journal_load(mk)]
     C = [r for r in J if r.get("status") == "closed"]
     st = {}
     if C:
@@ -2493,28 +2551,33 @@ def us_journal_get(_=Depends(auth)):
                   pnl_aud=round(sum(r["pnl_aud"] for r in C), 2), avg_r=round(sum(Rs) / len(Rs), 2) if Rs else None,
                   best=max(r["pnl"] for r in C), worst=min(r["pnl"] for r in C))
     return dict(trades=sorted(J, key=lambda r: (r.get("status") != "pending", r.get("closed") or ""), reverse=False), stats=st, fx=audusd(),
-                auto=bool(getattr(moomoo, "enabled", False)))
+                auto=bool(getattr(moomoo, "enabled", False)) and mk == "US", cur=WMK[mk]["cur"])
 
 
 @app.post("/api/us/journal")
 def us_journal_post(body: JournalReq, _=Depends(auth)):
-    J = us_journal_load(); day = et_now().date().isoformat(); sym = re.sub(r"[^A-Z0-9.\-]", "", body.symbol.upper())[:10]
+    return _journal_post(body, "US")
+
+
+def _journal_post(body, mk):
+    J = us_journal_load(mk); day = mk_now(mk).date().isoformat(); sym = re.sub(r"[^A-Z0-9.\-]", "", body.symbol.upper())[:10]
+    cu = WMK[mk]["cur"]
     if body.action == "close":                     # sold in moomoo: move the holding to the journal
-        W = us_watch_load(); w = W.get(sym)
+        W = us_watch_load(mk); w = W.get(sym)
         if not w or not body.exit or body.exit <= 0:
             raise HTTPException(400, "holding and sale price needed")
         if body.qty and 0 < body.qty < w["qty"]:      # part sale
             part = dict(w, qty=body.qty); w["qty"] = round(w["qty"] - body.qty, 6)
-            J.append(_jrow(sym, part, round(body.exit, 4), body.date or day, body.reason or "sold", body.fees))
+            J.append(_jrow(sym, part, round(body.exit, 4), body.date or day, body.reason or "sold", body.fees, cu))
         else:
-            W.pop(sym); J.append(_jrow(sym, w, round(body.exit, 4), body.date or day, body.reason or "sold", body.fees))
-        us_watch_save(W)
+            W.pop(sym); J.append(_jrow(sym, w, round(body.exit, 4), body.date or day, body.reason or "sold", body.fees, cu))
+        us_watch_save(W, mk)
     elif body.action == "edit":
         r = next((x for x in J if x["id"] == body.id), None)
         if not r:
             raise HTTPException(404, "trade not found")
         if body.exit:
-            r["exit"] = round(body.exit, 4); r["status"] = "closed"; r["fx"] = r.get("fx") or audusd()
+            r["exit"] = round(body.exit, 4); r["status"] = "closed"; r["fx"] = r.get("fx") or (audusd() if cu == "USD" else None)
             r["reason"] = body.reason or ("sold" if (r.get("reason") or "").startswith("removed") else r.get("reason"))
         if body.date:
             r["closed"] = body.date
@@ -2527,24 +2590,24 @@ def us_journal_post(body: JournalReq, _=Depends(auth)):
             raise HTTPException(400, "symbol, qty, entry, exit and stop needed")
         w = dict(qty=body.qty, entry=body.entry, stop=body.stop0, stop0=body.stop0, system=US_SYS.get(body.system, body.system or "My pick"),
                  since=body.since or day)
-        J.append(_jrow(sym, w, round(body.exit, 4), body.date or day, body.reason or "sold", body.fees))
+        J.append(_jrow(sym, w, round(body.exit, 4), body.date or day, body.reason or "sold", body.fees, cu))
     elif body.action == "delete":
         J = [x for x in J if x["id"] != body.id]
     else:
         raise HTTPException(400, "unknown action")
-    us_journal_save(J)
+    us_journal_save(J, mk)
     return dict(ok=True, n=len(J))
 
 
-def us_watch_check(t=None):
-    """US hours: stop hit, within 3% of the stop, target reached; plus the US plan's sell signals. Alerts only."""
-    W = us_watch_load()
+def us_watch_check(t=None, mk="US"):
+    """Market hours: stop hit, within 3% of the stop, target reached; plus the plan's sell signals. Alerts only."""
+    W = us_watch_load(mk)
     if not W:
         return
-    t = t or et_now(); day = t.date().isoformat()
+    t = t or mk_now(mk); day = t.date().isoformat(); N = WMK[mk]["name"]; K = "usw" if mk == "US" else mk.lower() + "w"
     for sym, w in W.items():
         try:
-            q = yq(sym, "US")
+            q = yq(sym, mk)
         except Exception:  # noqa: BLE001
             continue
         px = q.get("ltp"); lo = q.get("low") or px
@@ -2552,28 +2615,28 @@ def us_watch_check(t=None):
             continue
         if lo <= w["stop"]:
             if not w.get("stop_hit"):
-                w["stop_hit"] = dict(day=day, low=round(lo, 2), stop=w["stop"]); us_watch_save(W)
-            alert("stop", sym, f"US {sym}: stop {w['stop']:.2f} hit (low {lo:.2f}, now {px:.2f}). You hold {w['qty']:g} in moomoo; sell there.",
-                  key=f"uswstop:{sym}:{day}")
+                w["stop_hit"] = dict(day=day, low=round(lo, 2), stop=w["stop"]); us_watch_save(W, mk)
+            alert("stop", sym, f"{N} {sym}: stop {w['stop']:.2f} hit (low {lo:.2f}, now {px:.2f}). You hold {w['qty']:g} in moomoo; sell there.",
+                  key=f"{K}stop:{sym}:{day}", mk=mk)
         elif px <= w["stop"] * 1.03:
-            alert("exit", sym, f"US {sym}: {px:.2f}, within 3% of the stop {w['stop']:.2f}.", key=f"uswnear:{sym}:{day}")
+            alert("exit", sym, f"{N} {sym}: {px:.2f}, within 3% of the stop {w['stop']:.2f}.", key=f"{K}near:{sym}:{day}", mk=mk)
         if w.get("target") and px >= w["target"]:
-            alert("raised", sym, f"US {sym}: target {w['target']:.2f} reached ({px:.2f}). Breakout retest rule: take the profit.",
-                  key=f"uswtgt:{sym}:{day}")
+            alert("raised", sym, f"{N} {sym}: target {w['target']:.2f} reached ({px:.2f}). Breakout retest rule: take the profit.",
+                  key=f"{K}tgt:{sym}:{day}", mk=mk)
     try:
-        P = mkt_plan("US")
+        P = mkt_plan(mk)
         for e in P.get("exits") or []:
             sym = e.get("symbol"); w = W.get(sym)
             if w and (not e.get("system") or e.get("system") == w.get("system")):
-                alert("exit", sym, f"US {sym}: sell signal ({e.get('system')}): {e.get('why') or 'exit rule met'}. Sell {w['qty']:g} at the next open.",
-                      key=f"uswexit:{sym}:{P.get('asof')}")
+                alert("exit", sym, f"{N} {sym}: sell signal ({e.get('system')}): {e.get('why') or 'exit rule met'}. Sell {w['qty']:g} at the next open.",
+                      key=f"{K}exit:{sym}:{P.get('asof')}", mk=mk)
     except Exception as ex:  # noqa: BLE001
         log("us_watch_error", error=str(ex)[:200])
 
 
-def ydaily(sym, rng="1y"):
-    """Daily closes from Yahoo (split-adjusted, not dividend-adjusted, like TradingView)."""
-    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym.replace('.', '-')}", params=dict(interval="1d", range=rng),
+def ydaily(sym, rng="1y", raw=False):
+    """Daily closes from Yahoo (split-adjusted, not dividend-adjusted, like TradingView). raw: sym is already Yahoo's."""
+    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym if raw else sym.replace('.', '-')}", params=dict(interval="1d", range=rng),
                      headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
     r.raise_for_status(); res = r.json()["chart"]["result"][0]
     c = res["indicators"]["quote"][0]["close"]
@@ -2588,10 +2651,10 @@ def _ema_list(c, n):
     return out
 
 
-def us_trail_levels(sym, system, entry):
+def us_trail_levels(sym, system, entry, mk="US"):
     """(exit_signal, new_stop, note) from the last close. Trend 9/21: stop = EMA 21 (at least 4% under the entry at the
     start), exit = daily close with EMA 9 below EMA 21. Monthly ATH: stop = 30-week SMA, exit = weekly close below it."""
-    t, c = ydaily(sym)
+    t, c = ydaily(ysym_of(sym, mk), raw=True)
     if system == "Monthly ATH":
         wk = {}
         for d, x in zip(t, c):
@@ -2603,36 +2666,37 @@ def us_trail_levels(sym, system, entry):
     return e9[-1] < e21[-1], math.floor(e21[-1] * 100) / 100, f"close {c[-1]:.2f}, EMA 9 {e9[-1]:.2f}, EMA 21 {e21[-1]:.2f}"
 
 
-def us_watch_eod(t=None, manual=False):
+def us_watch_eod(t=None, manual=False, mk="US"):
     """After each US close (or "Check stops now"): sell alerts, and raise every stop to today's level (EMA 21 / 30-week
     average), never lower; one alert lists the stops to move in moomoo. Like the India daily stop raise."""
-    W = us_watch_load()
+    W = us_watch_load(mk)
     if not W:
         return []
-    t = t or et_now(); day = t.date().isoformat(); friday = t.weekday() == 4; raised = []; out = []
+    t = t or mk_now(mk); day = t.date().isoformat(); friday = t.weekday() == 4; raised = []; out = []; N = WMK[mk]["name"]; K = "usw" if mk == "US" else mk.lower() + "w"
     for sym, w in W.items():
         sysn = w.get("system")
         if sysn not in ("Trend 9/21", "Monthly ATH"):
             continue
         try:
-            ex, lvl, note = us_trail_levels(sym, sysn, w["entry"])
+            ex, lvl, note = us_trail_levels(sym, sysn, w["entry"], mk)
         except Exception as e:  # noqa: BLE001
             log("us_trail_error", symbol=sym, error=str(e)[:160]); out.append(dict(symbol=sym, result="no data")); continue
         w["last"] = dict(day=day, note=note, level=lvl, exit=ex)
         if ex and (sysn == "Trend 9/21" or friday) and not manual:
             why = "EMA 9 closed below EMA 21" if sysn == "Trend 9/21" else "weekly close below the 30-week average"
-            alert("exit", sym, f"US {sym}: sell signal ({sysn}): {why} ({note}). Sell {w['qty']:g} at the next open in moomoo.",
-                  key=f"uswtrail-exit:{sym}:{day}")
+            alert("exit", sym, f"{N} {sym}: sell signal ({sysn}): {why} ({note}). Sell {w['qty']:g} at the next open in moomoo.",
+                  key=f"{K}trail-exit:{sym}:{day}", mk=mk)
         if lvl > w["stop"] * 1.0025:                     # ignore moves under 0.25% (cents are not worth an order change)
             old = w["stop"]; w["stop_prev"] = old; w["stop"] = lvl; w["stop_set"] = day
             w["stop_log"] = (w.get("stop_log") or [])[-59:] + [[day, lvl, "raised"]]
             raised.append(f"{sym} {old:.2f} → {lvl:.2f}"); out.append(dict(symbol=sym, result="raised", old=old, new=lvl))
         else:
             out.append(dict(symbol=sym, result="kept", new=w["stop"]))
-    us_watch_save(W)
-    json.dump(dict(day=day, at=datetime.now(timezone.utc).isoformat(timespec="minutes"), results=out), open(os.path.join(DATA, "us_trail.json"), "w"))
+    us_watch_save(W, mk)
+    json.dump(dict(day=day, at=datetime.now(timezone.utc).isoformat(timespec="minutes"), results=out),
+              open(os.path.join(DATA, "us_trail.json" if mk == "US" else f"{mk.lower()}_trail.json"), "w"))
     if raised:
-        alert("raised", "", "US stops to move in moomoo (GTC, same quantity): " + "; ".join(raised) + ".", key=f"uswraise:{day}:{len(raised)}")
+        alert("raised", "", f"{N} stops to move in moomoo (GTC, same quantity): " + "; ".join(raised) + ".", key=f"{K}raise:{day}:{len(raised)}", mk=mk)
     return out
 
 
@@ -2947,15 +3011,15 @@ def _perf_holdings(mk):
     if mk == "IN":
         acc = account_cached(30)
         return {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
-    return {s_: w["qty"] for s_, w in us_watch_load().items() if w.get("qty")}
+    return {s_: w["qty"] for s_, w in us_watch_load(mk).items() if w.get("qty")}
 
 
 def perf_series(mk, H, ttl=600):
-    I = _closes("^NSEI" if mk == "IN" else "^GSPC", "3mo", ttl)
+    I = _closes("^NSEI" if mk == "IN" else WMK[mk]["idx"], "3mo", ttl)
     M, miss = {}, []
     for sym in H:
         try:
-            d = _closes(sym + ".NS" if mk == "IN" else sym.replace(".", "-"), "3mo", ttl); M[sym] = dict(zip(d["t"], d["c"]))
+            d = _closes(sym + ".NS" if mk == "IN" else ysym_of(sym, mk), "3mo", ttl); M[sym] = dict(zip(d["t"], d["c"]))
         except Exception:  # noqa: BLE001
             miss.append(sym)
     rows = []
@@ -2996,7 +3060,7 @@ def perf_record(mk):
 
 @app.get("/api/perf/daily")
 def perf_daily(mk: str = "IN", _=Depends(auth)):
-    mk = "US" if mk.upper() == "US" else "IN"
+    mk = mk.upper() if mk.upper() in ("US", "ASX") else "IN"
     H = _perf_holdings(mk)
     rows, miss = perf_series(mk, H) if H else ([], [])
     rec = perf_load().get(mk, {})
@@ -3007,7 +3071,7 @@ def perf_daily(mk: str = "IN", _=Depends(auth)):
         else:
             r["est"] = True
     last = rows[-1]["d"] if rows else None
-    today = (ist_now() if mk == "IN" else et_now()).date().isoformat()
+    today = (ist_now() if mk == "IN" else mk_now(mk)).date().isoformat()
     if rows and last == today and not rec.get(last):
         rows[-1]["live"] = True; rows[-1]["est"] = False            # today so far, with today's holdings
     def comp(R):
@@ -3015,7 +3079,7 @@ def perf_daily(mk: str = "IN", _=Depends(auth)):
         for r in R:
             a *= 1 + r["p"] / 100; b *= 1 + r["i"] / 100
         return dict(p=round((a - 1) * 100, 2), i=round((b - 1) * 100, 2), n=len(R))
-    return dict(mk=mk, index="Nifty 50" if mk == "IN" else "S&P 500", rows=rows, missing=miss, n=len(H), recorded_since=min(rec) if rec else None,
+    return dict(mk=mk, index="Nifty 50" if mk == "IN" else WMK[mk]["idx_name"], rows=rows, missing=miss, n=len(H), recorded_since=min(rec) if rec else None,
                 d5=comp(rows[-5:]), d20=comp(rows[-20:]), all=comp(rows))
 
 
@@ -3212,6 +3276,11 @@ def _loop():
             _et = et_now()
             if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("tl_eod_us") != _et.date():
                 _HB["tl_eod_us"] = _et.date(); tl_check("US", eod=True)
+            _sy = mk_now("ASX")
+            if mkt_open("ASX") and t.minute % 10 < 2:
+                us_watch_check(mk="ASX")
+            if _sy.weekday() < 5 and (16, 20) <= (_sy.hour, _sy.minute) <= (16, 50) and _HB.get("asx_eod") != _sy.date():
+                _HB["asx_eod"] = _sy.date(); us_watch_eod(_sy, mk="ASX"); perf_record("ASX")
             if t.weekday() < 5 and (15, 40) <= (t.hour, t.minute) <= (16, 30) and _HB.get("perf_in") != t.date():
                 _HB["perf_in"] = t.date(); perf_record("IN")
             if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("perf_us") != _et.date():

@@ -686,7 +686,7 @@ def test_us_watch_trailing(tmp_path):
     days = [(dt.date(2026, 1, 1) + dt.timedelta(days=i)).isoformat() for i in range(250)]
     series = {"UPP": [80 + i * 0.1 for i in range(250)], "DWN": [40 + i * 0.05 for i in range(240)] + [52 - i for i in range(10)],
               "ATHX": [150 + i * 0.3 for i in range(250)]}
-    A.ydaily = lambda sym, rng="1y": (days, series[sym])
+    A.ydaily = lambda sym, rng="1y", raw=False: (days, series[sym.split(".")[0]])
     fri = dt.datetime(2026, 11, 20, 16, 20)              # a Friday
     A.us_watch_eod(fri)
     W = A.us_watch_load(); al = A.alerts_load()["items"]
@@ -917,3 +917,19 @@ def test_perf_daily(tmp_path):
     assert A.perf_record("IN")["d"] == "2026-11-12"
     j = c.get("/api/perf/daily?mk=IN", headers=h).json()
     assert j["rows"][-1]["est"] is False and j["recorded_since"] == "2026-11-12" and j["d5"]["p"] == round((1.04 * (1 - 0.0192) - 1) * 100, 2)
+
+
+def test_asx_watch_journal(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    seen = []; A.yq = lambda s, mk: (seen.append((s, mk)), {"ltp": 40.0, "low": 39.5, "prev": 39.0})[1]
+    r = c.post("/api/asx/watch", headers=h, json={"items": [{"symbol": "anz", "qty": 120, "entry": 39.6461, "stop": 37.9, "system": "TF", "since": "2026-11-10"}]}).json()
+    assert r["ok"] and "ANZ" in A.us_watch_load("ASX") and not A.us_watch_load("US")
+    j = c.get("/api/asx/watch", headers=h).json(); it = j["items"][0]
+    assert it["acct"] == "Personal" and it["price"] == 40.0 and j["cur"] == "AUD" and ("ANZ", "ASX") in seen
+    assert c.post("/api/asx/journal", headers=h, json=dict(action="close", symbol="ANZ", exit=41.0, qty=20)).json()["ok"]
+    k = c.get("/api/asx/journal", headers=h).json()["trades"][0]
+    assert k["cur"] == "AUD" and k["pnl_aud"] == k["pnl"] == round((41.0 - 39.65) * 20, 2) and k["acct"] == "Personal"
+    assert A.us_watch_load("ASX")["ANZ"]["qty"] == 100 and not A.us_journal_load("US")
+    A.us_watch_check(A.mk_now("ASX"), mk="ASX")                       # 39.5 low is above the 37.9 stop: no stop alert
+    assert not any("stop 37.90 hit" in a["text"] for a in A.alerts_load()["items"])
