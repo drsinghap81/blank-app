@@ -397,6 +397,13 @@ def protect_level(kind, stop):
     return stop if kind in ("T921", "RETEST", "PATTERN", "VCP", "VCP_STOP", "MY_GTT") else stop * (1 - ATH_NET_PCT)
 
 
+def _slog(e, px, why):
+    """17 Nov 2026: stop history for the India journal (first protective stop, then every raise)."""
+    L = e.setdefault("stop_log", []); px = round(float(px), 2)
+    if not L or L[-1][1] != px:
+        L.append([ist_now().date().isoformat(), px, why if L or why != "raised" else "set"]); del L[:-60]
+
+
 def _protect(sym, e):
     """place the GTT stop for a filled journal entry (live only)."""
     trig = protect_level(e.get("kind"), e.get("stop"))
@@ -407,7 +414,7 @@ def _protect(sym, e):
         if tgt and tgt > trig:                      # 11 Nov 2026: your own picks get stop + target in one Angel GTT (OCO)
             try:
                 gid, gp = broker.gtt_oco(sym, e["qty"], tgt, trig, trig * (1 - GTT_LIMIT_GAP))
-                e.update(gtt_id=gid, gtt_trigger=round(trig, 2), oco=True); e.pop("gtt_error", None); e.pop("oco_error", None)
+                e.update(gtt_id=gid, gtt_trigger=round(trig, 2), oco=True); e.pop("gtt_error", None); e.pop("oco_error", None); _slog(e, trig, "set")
                 log("gtt_oco", symbol=sym, gtt_id=gid, trigger=round(trig, 2), target=round(tgt, 2), qty=e["qty"])
                 return
             except Exception as ex:  # noqa: BLE001   Angel refused the two-leg GTT: the stop goes on alone, you get told
@@ -415,7 +422,7 @@ def _protect(sym, e):
                 alert("nostop", sym, f"Angel refused the stop + target GTT ({str(ex)[:60]}); the stop is placed alone. Set the target in Angel if you want it.",
                       key=f"oco:{sym}:{ist_now().date()}")
         gid, gp = broker.gtt_stop(sym, e["qty"], trig, trig * (1 - GTT_LIMIT_GAP))
-        e.update(gtt_id=gid, gtt_trigger=round(trig, 2)); e.pop("gtt_error", None)
+        e.update(gtt_id=gid, gtt_trigger=round(trig, 2)); e.pop("gtt_error", None); _slog(e, trig, "set")
         log("gtt", symbol=sym, gtt_id=gid, trigger=round(trig, 2), qty=e["qty"])
     except Exception as ex:  # noqa: BLE001
         e["gtt_error"] = str(ex)[:200]; e["gtt_tries"] = e.get("gtt_tries", 0) + 1; e["gtt_last"] = time.time()
@@ -583,6 +590,7 @@ def sync(acc=None):
             px = float(o.get("avg") or e.get("exit_px") or 0); record_exit(sym, px); log("sold", symbol=sym, price=px)
             alert("sold", sym, f"Sold {e.get('qty')} at ₹{px:,.2f}.", key=f"sold:{sym}:{today}")
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="sold", exit=px, ended=today); changed = True
+            in_journal_from_app(sym, e, px, today, "sold (app)", est=False)
         elif st == "open" and held.get(sym, 0) <= 0 and (e.get("gtt_id") or e.get("filled", today) < today):
             px = float(e.get("gtt_trigger") or 0) * (1 - GTT_LIMIT_GAP / 2) or e["entry"]
             hit_tgt = False
@@ -600,6 +608,7 @@ def sync(acc=None):
                 alert("stop", sym, f"Stop hit or sold outside the app: {e.get('qty')} shares gone from Angel"
                       + (f" (stop ₹{e['gtt_trigger']:,.2f})" if e.get("gtt_trigger") else "") + ".", key=f"stop:{sym}:{today}")
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="stopped or sold outside the app", exit=px, ended=today); changed = True
+            in_journal_from_app(sym, e, px, today, "target (GTT)" if hit_tgt else "stop (GTT) or sold in Angel", est=True)
     changed = backfill_targets(J, acc) or changed
     changed = gtt_buy_upkeep(J, acc) or changed
     if changed:
@@ -683,7 +692,7 @@ def trail(force=False):
                 r["result"] = "dry run: would raise"
             else:
                 broker.gtt_modify(e["gtt_id"], sym, e.get("qty") or held[sym], guard, guard * (1 - GTT_LIMIT_GAP))
-                e.update(gtt_trigger=guard, trail_prev=cur or None, trail_level=round(lvl, 2), trail_at=today)
+                e.update(gtt_trigger=guard, trail_prev=cur or None, trail_level=round(lvl, 2), trail_at=today); _slog(e, guard, "raised")
                 log("gtt_trail", symbol=sym, old=cur, new=guard, level=round(lvl, 2)); r["result"] = "raised"
                 alert("raised", sym, f"Stop raised to ₹{guard:,.2f}" + (f" from ₹{cur:,.2f}" if cur else "") + ".", key=f"raised:{sym}:{today}")
             out.append(r)
@@ -2062,30 +2071,33 @@ def _jcalc(r):
     r = dict(r)
     if r.get("exit"):
         q, e, x, s0 = r["qty"], r["entry"], r["exit"], r.get("stop0") or r["entry"]
-        pnl = (x - e) * q - (r.get("fees") or 0); fx = r.get("fx") or audusd()
-        r.update(pnl=round(pnl, 2), pnl_aud=round(pnl / fx, 2), pnl_pct=round((x / e - 1) * 100, 2),
+        pnl = (x - e) * q - (r.get("fees") or 0); inr = r.get("cur") == "INR"; fx = None if inr else (r.get("fx") or audusd())
+        r.update(pnl=round(pnl, 2), pnl_aud=None if inr else round(pnl / fx, 2), pnl_pct=round((x / e - 1) * 100, 2),
                  r_mult=round((x - e) / (e - s0), 2) if e > s0 else None,
                  days=(date.fromisoformat(r["closed"]) - date.fromisoformat(r["since"])).days if r.get("closed") and r.get("since") else None)
     return r
 
 
-def _entry_ctx(sym, date_):
-    """Top-down context for the journal's entry line: market (S&P 500 vs its 200-day on that day), then sector / theme /
-    stock strength and the system note from the US plan row (as of the plan the user bought from, or today's if missing)."""
+def _entry_ctx(sym, date_, mk="US"):
+    """Top-down context for the journal's entry line: market (S&P 500 / Nifty 50 vs its 200-day on that day), then sector /
+    theme / stock strength and the system note from that market's plan row (today's plan if the stock is still in it)."""
     ctx = {}
+    idx, name = ("%5EGSPC", "S&P 500") if mk == "US" else ("%5ENSEI", "Nifty 50")
     try:
-        r = requests.get("https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC", params=dict(interval="1d", range="2y"),
+        r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{idx}", params=dict(interval="1d", range="2y"),
                          headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
         res = r.json()["chart"]["result"][0]; cl = res["indicators"]["quote"][0]["close"]
         tt = [datetime.fromtimestamp(x, timezone.utc).date().isoformat() for x in res["timestamp"]]
         S = [(d, c) for d, c in zip(tt, cl) if c is not None and d <= date_]
         if len(S) >= 200:
             c = [x[1] for x in S]; m200 = sum(c[-200:]) / 200
-            ctx.update(spx=round(c[-1], 2), spx_200=round(m200, 2), spx_up=c[-1] > m200, spx_1m=round((c[-1] / c[-22] - 1) * 100, 1))
+            ctx.update(idx_name=name, idx=round(c[-1], 2), idx_200=round(m200, 2), idx_up=c[-1] > m200, idx_1m=round((c[-1] / c[-22] - 1) * 100, 1))
+            if mk == "US":
+                ctx.update(spx=ctx["idx"], spx_200=ctx["idx_200"], spx_up=ctx["idx_up"], spx_1m=ctx["idx_1m"])
     except Exception:  # noqa: BLE001
         pass
     try:
-        P = mkt_plan("US")
+        P = mkt_plan("US") if mk == "US" else plan()
         row = next((x for k in ("top", "swing", "more", "watch", "missed") for x in (P.get(k) or []) if x.get("symbol") == sym), None)
         if row:
             ctx.update({k: row.get(k) for k in ("system", "note", "sector", "sector_rs", "sector_pct", "theme", "theme_rs", "theme_pct",
@@ -2098,15 +2110,26 @@ def _entry_ctx(sym, date_):
 
 @app.get("/api/us/snap")
 def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
+    return _snap(symbol, date_, "US")
+
+
+@app.get("/api/in/snap")
+def in_snap(symbol: str, date_: str = "", _=Depends(auth)):
+    return _snap(symbol, date_, "IN")
+
+
+def _snap(symbol, date_, mk):
     """17 Nov 2026: the daily chart as it looked on the buy date (130 bars up to and including that day) with EMA 9 / EMA 21 /
     150-day (~30-week) average, for the journal. Frozen on first request (DATA/us_snaps) so it never changes afterwards."""
-    sym = re.sub(r"[^A-Z0-9.\-]", "", symbol.upper())[:10]
+    sym = re.sub(r"[^A-Z0-9.&\-]", "", symbol.upper())[:20]
+    ysym = requests.utils.quote(sym.replace(".", "-") if mk == "US" else sym + ".NS")
+    today = (et_now() if mk == "US" else ist_now()).date().isoformat()
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", date_ or ""):
         raise HTTPException(400, "date_ must be YYYY-MM-DD")
-    d = os.path.join(DATA, "us_snaps"); os.makedirs(d, exist_ok=True); f = os.path.join(d, f"{sym}_{date_}_v2.json")
+    d = os.path.join(DATA, "us_snaps" if mk == "US" else "in_snaps"); os.makedirs(d, exist_ok=True); f = os.path.join(d, f"{re.sub(r'[^A-Z0-9.-]', '_', sym)}_{date_}_v2.json")
     if os.path.exists(f):
         return json.load(open(f))
-    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym.replace('.', '-')}", params=dict(interval="1d", range="2y"),
+    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{ysym}", params=dict(interval="1d", range="2y"),
                      headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
     r.raise_for_status(); res = r.json()["chart"]["result"][0]; q = res["indicators"]["quote"][0]
     keep = [i for i in range(len(res["timestamp"])) if None not in (q["open"][i], q["high"][i], q["low"][i], q["close"][i])]
@@ -2120,11 +2143,11 @@ def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
     s150 = [sum(C[max(0, i - 149):i + 1]) / (i + 1 - max(0, i - 149)) if i >= 149 else None for i in range(len(C))]
     rd = lambda v: [None if x is None else round(x, 2) for x in v[a:e + 1]]  # noqa: E731
     out = dict(symbol=sym, date=date_, bar=t[e], t=t[a:e + 1], o=rd(O), h=rd(H), l=rd(L), c=rd(C), e9=rd(e9), e21=rd(e21), s150=rd(s150),
-               hi52=round(max(H[max(0, e - 251):e + 1]), 2), ctx=_entry_ctx(sym, date_))
+               hi52=round(max(H[max(0, e - 251):e + 1]), 2), ctx=_entry_ctx(sym, date_, mk), cur="USD" if mk == "US" else "INR")
     # 17 Nov 2026: monthly candles for trades taken on the monthly chart (Monthly ATH): months before the buy month from
     # Yahoo's monthly series, the buy month built from the daily bars up to the buy day (so it is frozen too)
     try:
-        mm = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym.replace('.', '-')}", params=dict(interval="1mo", range="10y"),
+        mm = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{ysym}", params=dict(interval="1mo", range="10y"),
                           headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15).json()["chart"]["result"][0]
         qm = mm["indicators"]["quote"][0]; ym = date_[:7]
         M = [(datetime.fromtimestamp(ts, timezone.utc).date().isoformat()[:7], qm["open"][i], qm["high"][i], qm["low"][i], qm["close"][i])
@@ -2139,7 +2162,7 @@ def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
                         c=[round(x[4], 2) for x in M], sma10=sma10, prior_ath=round(max(x[2] for x in M[:-1]), 2) if len(M) > 1 else None)
     except Exception as ex:  # noqa: BLE001
         log("us_snap_monthly", symbol=sym, error=str(ex)[:120])
-    if t[e] < et_now().date().isoformat():          # freeze only once that day has closed
+    if t[e] < today:          # freeze only once that day has closed
         json.dump(out, open(f, "w"))
     return out
 
@@ -2238,6 +2261,225 @@ class JournalReq(BaseModel):
     stop0: float | None = None
     system: str = ""
     since: str | None = None
+
+
+# ------------------------------------------------------------------ India trade journal (17 Nov 2026)
+# Same journal as the US one, in rupees, filled automatically from Angel One (read only):
+#  - trades the app placed or adopted: when sync() sees them sold or stopped, with their stop history (first GTT stop, raises);
+#    a GTT exit is first recorded at an estimated price and corrected from Angel's trade book with the real fill price
+#  - trades you place yourself in Angel: each delivery BUY in the trade book starts an open trade (stop from the plan row, else
+#    Trend 9/21: EMA 21, at most 4% under the fill), each SELL closes it at the fill price
+# Angel's trade book only shows today, so it is read every 10 minutes 09:15-20:00 IST. Past trades: paste them in the app.
+def _inj_path(n):
+    return os.path.join(DATA, n)
+
+
+def _jl(n, default):
+    try:
+        return json.load(open(_inj_path(n)))
+    except Exception:  # noqa: BLE001
+        return default
+
+
+def _js(n, v):
+    tmp = _inj_path(n) + ".tmp"; json.dump(v, open(tmp, "w"), indent=1); os.replace(tmp, _inj_path(n))
+
+
+def in_journal_load():
+    return _jl("in_trades.json", [])
+
+
+def in_journal_save(J):
+    _js("in_trades.json", J)
+
+
+def in_manual_load():
+    return _jl("in_manual.json", {})
+
+
+def in_manual_save(M):
+    _js("in_manual.json", M)
+
+
+def _in_row(sym, w, exit_px, date_, reason, src, est=False):
+    r = _jrow(sym, w, exit_px, date_, reason)
+    r.update(cur="INR", fx=None, src=src, est=est)
+    return r
+
+
+def in_journal_from_app(sym, e, px, day, reason, est):
+    try:
+        L = e.get("stop_log") or []
+        w = dict(qty=e.get("qty") or 0, entry=round(float(e.get("entry") or 0), 2), stop=e.get("gtt_trigger") or e.get("stop"),
+                 stop0=(L[0][1] if L else None) or e.get("gtt_trigger") or e.get("stop"), stop_log=L, system=e.get("system") or e.get("kind"),
+                 since=e.get("filled") or e.get("since"))
+        if not (w["qty"] and w["entry"] and px):
+            return
+        J = in_journal_load(); J.append(_in_row(sym, w, round(float(px), 2), day, reason, "app", est)); in_journal_save(J)
+    except Exception as ex:  # noqa: BLE001
+        log("in_journal_error", symbol=sym, error=str(ex)[:160])
+
+
+def _in_stop_for(sym, px):
+    """(system, stop) for a buy you placed yourself: the plan row's system and stop if the stock is in today's plan,
+    otherwise Trend 9/21 (EMA 21, at most 4% under the fill)."""
+    try:
+        P = plan(); row = next((x for k in ("top", "swing", "more", "watch") for x in (P.get(k) or []) if x.get("symbol") == sym), None)
+        if row and row.get("stop") and row["stop"] < px:
+            return row.get("system") or "My pick", round(float(row["stop"]), 2)
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        e21 = chart_read(sym).get("ema21")
+    except Exception:  # noqa: BLE001
+        e21 = None
+    return "Trend 9/21", round(min(e21 or px, px * 0.96), 2)
+
+
+def in_fill_sync():
+    if not hasattr(broker, "trades"):
+        return dict(ok=False, why="this broker has no trade book")
+    try:
+        fills = broker.trades()
+    except Exception as ex:  # noqa: BLE001
+        log("in_fill_error", error=str(ex)[:200]); return dict(ok=False, why=angel_msg(ex) if "angel_msg" in globals() else str(ex)[:120])
+    day = ist_now().date().isoformat()
+    seen = set(_jl("in_fills_seen.json", [])); A = _jl("in_hold_avg.json", {})
+    try:                                            # remember each holding's average price, for sales of shares bought before the journal
+        acc = account_cached(0)
+        A.update({h["symbol"]: [h["qty"], h.get("avg")] for h in acc["holdings"] if h["qty"] > 0 and h.get("avg")})
+    except Exception:  # noqa: BLE001
+        pass
+    APP = journal(); TJ = in_journal_load(); M = in_manual_load(); n_b = n_s = 0
+    for f in fills:
+        fid = f"{day}:{f['id']}"
+        if fid in seen or f.get("exchange") not in (None, "NSE", "BSE") or str(f.get("product") or "DELIVERY").upper() not in ("DELIVERY", "CNC"):
+            continue
+        sym, q, px = f["symbol"], float(f["qty"]), float(f["price"])
+        if not (q > 0 and px > 0):
+            continue
+        managed = sym in APP and not sym.startswith("_") and APP[sym].get("state") in ("open", "pending", "exiting")
+        if f["side"] == "BUY":
+            seen.add(fid)
+            if managed:
+                continue                                # the app's own trade: tracked by sync()
+            m = M.get(sym)
+            if m:
+                tot = m["qty"] + q; m["entry"] = round((m["entry"] * m["qty"] + px * q) / tot, 4); m["qty"] = tot
+            else:
+                sysn, st = _in_stop_for(sym, px)
+                M[sym] = dict(qty=q, entry=round(px, 4), stop=st, stop0=st, system=sysn, since=day, stop_log=[[day, st, "set"]], src="Angel fill")
+                alert("filled", sym, f"Bought {q:g} {sym} at ₹{px:,.2f} in Angel. Journal started; stop ₹{st:,.2f} ({sysn}). "
+                      "Adopt it in the app if you want the protective stop placed for you.", key=f"infill:{fid}")
+            n_b += 1
+            continue
+        # SELL
+        app_row = next((x for x in TJ if x["symbol"] == sym and x.get("closed") == day and x.get("src") == "app"), None)
+        if managed and not app_row:
+            continue                                    # not seen as sold by sync() yet: try again next run
+        seen.add(fid)
+        if app_row:
+            if app_row.get("est"):
+                app_row.update(exit=round(px, 2), est=False); n_s += 1
+            continue
+        m = M.get(sym)
+        if m:
+            why = "stop" if px <= m["stop"] * 1.005 else "sold"
+            if q < m["qty"] - 1e-6:
+                TJ.append(_in_row(sym, dict(m, qty=q), round(px, 2), day, why, "Angel fill")); m["qty"] = round(m["qty"] - q, 6)
+            else:
+                TJ.append(_in_row(sym, m, round(px, 2), day, why, "Angel fill")); M.pop(sym)
+        elif sym in A:                                  # bought before the journal: entry = Angel's average price, no stop on record
+            avg = float(A[sym][1])
+            TJ.append(_in_row(sym, dict(qty=q, entry=round(avg, 2), stop=None, stop0=None, system="older holding", since=None),
+                              round(px, 2), day, "sold in Angel", "Angel fill"))
+        else:
+            continue
+        r = _jcalc(TJ[-1]); n_s += 1
+        alert("exit" if (r.get("pnl") or 0) < 0 else "raised", sym, f"Sold {q:g} {sym} at ₹{px:,.2f} in Angel. Journal: ₹{r.get('pnl', 0):+,.0f} ({r.get('pnl_pct', 0):+.1f}%).",
+              key=f"infill:{fid}")
+    in_manual_save(M); in_journal_save(TJ); _js("in_hold_avg.json", A); _js("in_fills_seen.json", sorted(seen)[-5000:])
+    return dict(ok=True, buys=n_b, sells=n_s, fills=len(fills))
+
+
+@app.post("/api/in/journal/sync")
+def in_journal_sync_now(_=Depends(auth)):
+    return in_fill_sync()
+
+
+def _jstats(C):
+    if not C:
+        return {}
+    wins = [r for r in C if r["pnl"] > 0]; Rs = [r["r_mult"] for r in C if r.get("r_mult") is not None]
+    st = dict(n=len(C), wins=len(wins), win_rate=round(len(wins) / len(C) * 100, 1), pnl=round(sum(r["pnl"] for r in C), 2),
+              avg_r=round(sum(Rs) / len(Rs), 2) if Rs else None, best=max(r["pnl"] for r in C), worst=min(r["pnl"] for r in C))
+    if all(r.get("pnl_aud") is not None for r in C):
+        st["pnl_aud"] = round(sum(r["pnl_aud"] for r in C), 2)
+    return st
+
+
+@app.get("/api/in/journal")
+def in_journal_get(_=Depends(auth)):
+    J = [_jcalc(r) for r in in_journal_load()]
+    C = [r for r in J if r.get("status") == "closed"]
+    try:
+        acc = account_cached(30); px = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
+        px.update({p["symbol"]: p.get("ltp") for p in acc.get("positions") or [] if p.get("ltp")})
+    except Exception:  # noqa: BLE001
+        px = {}
+    H = []
+    for sym, e in journal().items():                 # the app's open trades
+        if sym.startswith("_") or e.get("state") != "open" or not e.get("qty"):
+            continue
+        L = e.get("stop_log") or []; stop = e.get("gtt_trigger") or e.get("stop")
+        H.append(dict(symbol=sym, qty=e["qty"], entry=round(float(e.get("entry") or 0), 2), stop=stop, stop0=(L[0][1] if L else None) or stop,
+                      stop_log=L, system=e.get("system") or e.get("kind"), since=e.get("filled") or e.get("since"), src="app"))
+    for sym, m in in_manual_load().items():          # your own Angel buys
+        H.append(dict(m, symbol=sym, src="Angel fill"))
+    for h in H:
+        p = px.get(h["symbol"])
+        if p:
+            h.update(price=p, pnl=round((p - h["entry"]) * h["qty"], 2))
+    return dict(trades=sorted(J, key=lambda r: (r.get("status") != "pending", r.get("closed") or "")), stats=_jstats(C), open=H, cur="INR",
+                auto=hasattr(broker, "trades"))
+
+
+@app.post("/api/in/journal")
+def in_journal_post(body: JournalReq, _=Depends(auth)):
+    J = in_journal_load(); day = ist_now().date().isoformat(); sym = re.sub(r"[^A-Z0-9.&\-]", "", body.symbol.upper())[:20]
+    if body.action == "close":                     # a buy of yours sold: price typed in (normally the trade book does this)
+        M = in_manual_load(); m = M.get(sym)
+        if not m or not body.exit or body.exit <= 0:
+            raise HTTPException(400, "open trade and sale price needed")
+        if body.qty and 0 < body.qty < m["qty"]:
+            J.append(_in_row(sym, dict(m, qty=body.qty), round(body.exit, 2), body.date or day, body.reason or "sold", "typed")); m["qty"] -= body.qty
+        else:
+            M.pop(sym); J.append(_in_row(sym, m, round(body.exit, 2), body.date or day, body.reason or "sold", "typed"))
+        in_manual_save(M)
+    elif body.action == "edit":
+        r = next((x for x in J if x["id"] == body.id), None)
+        if not r:
+            raise HTTPException(404, "trade not found")
+        if body.exit:
+            r.update(exit=round(body.exit, 2), status="closed", est=False)
+        if body.date:
+            r["closed"] = body.date
+        if body.stop0:
+            r["stop0"] = body.stop0
+        if body.fees:
+            r["fees"] = body.fees
+    elif body.action == "add":
+        if not (sym and body.qty and body.entry and body.exit and body.stop0):
+            raise HTTPException(400, "symbol, qty, entry, exit and stop needed")
+        w = dict(qty=body.qty, entry=body.entry, stop=body.stop0, stop0=body.stop0, system=US_SYS.get(body.system, body.system or "My pick"),
+                 since=body.since or day, stop_log=[[body.since or day, body.stop0, "set"]])
+        J.append(_in_row(sym, w, round(body.exit, 2), body.date or day, body.reason or "sold", "typed"))
+    elif body.action == "delete":
+        J = [x for x in J if x["id"] != body.id]
+    else:
+        raise HTTPException(400, "unknown action")
+    in_journal_save(J)
+    return dict(ok=True, n=len(J))
 
 
 @app.get("/api/us/journal")
@@ -2863,6 +3105,8 @@ def _loop():
                 us_watch_check()
             if (us_open(et_now()) or (et_now().weekday() < 5 and (16, 0) <= (et_now().hour, et_now().minute) <= (17, 0))) and t.minute % 10 < 2:
                 us_fill_sync()
+            if t.minute % 10 < 2 and t.weekday() < 5 and (9, 15) <= (t.hour, t.minute) <= (20, 0):
+                in_fill_sync()
             if t.minute % 10 < 2 and t.weekday() < 5 and (9, 20) <= (t.hour, t.minute) <= (15, 30):
                 tl_check("NSE"); tl_scan_alerts({"NSE"})
             if t.weekday() < 5 and (15, 45) <= (t.hour, t.minute) <= (16, 30) and _HB.get("tl_eod_nse") != t.date():

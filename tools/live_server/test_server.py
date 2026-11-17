@@ -836,6 +836,9 @@ def test_us_snap(tmp_path):
     j = c.get(f"/api/us/snap?symbol=acgl&date_={d}", headers=h).json()
     assert j["bar"] == d and len(j["t"]) == 130 and j["c"][-1] == 300.5 and j["e21"][-1] is not None and j["s150"][-1] is not None
     assert c.get("/api/us/snap?symbol=acgl&date_=bad", headers=h).status_code == 400
+    urls = []; A.requests.get = lambda url, **k: (urls.append(url), R())[1]
+    j = c.get(f"/api/in/snap?symbol=M%26M&date_={d}", headers=h).json()
+    assert j["cur"] == "INR" and j["bar"] == d and any("M%26M.NS" in u for u in urls) and any("%5ENSEI" in u for u in urls)
 
 
 def test_us_fill_sync(tmp_path):
@@ -863,3 +866,41 @@ def test_us_fill_sync_manual_dupes(tmp_path):
                       dict(deal_id="3", sym="KDP", side="SELL", qty=13, price=35.62, time="2026-11-16 15:57:49")]
     A.us_fill_sync()
     assert "KDP" not in A.us_watch_load() and len(A.us_journal_load()) == 1
+
+
+def test_in_journal(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    A.chart_read = lambda sym: dict(ema21=95.0)
+    A.plan = lambda: {}
+    # your own buy and sale in Angel (trade book), plus an older holding sold
+    A.broker.fills = [dict(id="1:A", symbol="TCS", side="BUY", qty=10, price=100.0, product="DELIVERY", exchange="NSE"),
+                      dict(id="2:B", symbol="TCS", side="SELL", qty=4, price=110.0, product="DELIVERY", exchange="NSE"),
+                      dict(id="3:C", symbol="RELIANCE", side="SELL", qty=10, price=120.0, product="DELIVERY", exchange="NSE"),
+                      dict(id="4:D", symbol="NIFTY", side="BUY", qty=50, price=10.0, product="CARRYFORWARD", exchange="NFO")]
+    r = A.in_fill_sync(); assert r["ok"] and r["buys"] == 1 and r["sells"] == 2, r
+    M = A.in_manual_load(); assert M["TCS"]["qty"] == 6 and M["TCS"]["stop0"] == 95.0 and M["TCS"]["system"] == "Trend 9/21"
+    J = {x["symbol"]: A._jcalc(x) for x in A.in_journal_load()}
+    assert J["TCS"]["pnl"] == 40.0 and J["TCS"]["r_mult"] == 2.0 and J["TCS"]["pnl_aud"] is None and J["TCS"]["cur"] == "INR"
+    assert J["RELIANCE"]["entry"] == 100.0 and J["RELIANCE"]["pnl"] == 200.0 and J["RELIANCE"]["r_mult"] is None
+    assert A.in_fill_sync()["sells"] == 0 and len(A.in_journal_load()) == 2          # each fill once
+    # an app trade stopped out: estimated price first, then the real fill from the trade book
+    e = dict(qty=5, entry=200.0, stop=190.0, system="Trend 9/21", since="2026-11-10", gtt_trigger=190.0, stop_log=[["2026-11-10", 185.0, "set"], ["2026-11-12", 190.0, "raised"]])
+    A.in_journal_from_app("INFY", e, 189.5, A.ist_now().date().isoformat(), "stop (GTT) or sold in Angel", est=True)
+    A.broker.fills.append(dict(id="5:E", symbol="INFY", side="SELL", qty=5, price=189.0, product="DELIVERY", exchange="NSE"))
+    A.in_fill_sync()
+    k = next(A._jcalc(x) for x in A.in_journal_load() if x["symbol"] == "INFY")
+    assert k["exit"] == 189.0 and not k["est"] and k["stop0"] == 185.0 and k["stop_last"] == 190.0 and k["r_mult"] == round(-11 / 15, 2)
+    j = c.get("/api/in/journal", headers=h).json()
+    assert j["stats"]["n"] == 3 and "pnl_aud" not in j["stats"] and any(o["symbol"] == "TCS" for o in j["open"])
+    assert c.post("/api/in/journal", headers=h, json=dict(action="add", symbol="m&m", qty=2, entry=3000, exit=3300, stop0=2800, system="ATH",
+                                                          since="2026-10-01", date="2026-11-01")).json()["ok"]
+    assert any(x["symbol"] == "M&M" and x["system"] == "Monthly ATH" for x in A.in_journal_load())
+    assert c.post("/api/in/journal", headers=h, json=dict(action="close", symbol="TCS", exit=105)).json()["ok"] and "TCS" not in A.in_manual_load()
+
+
+def test_slog():
+    import app as A
+    e = {}
+    A._slog(e, 100, "raised"); A._slog(e, 100, "raised"); A._slog(e, 104, "raised")
+    assert [x[2] for x in e["stop_log"]] == ["set", "raised"] and e["stop_log"][-1][1] == 104.0

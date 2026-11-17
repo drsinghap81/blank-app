@@ -1111,7 +1111,7 @@ async function loadLive() {
         <p class="lv-sub">Not part of your tested 60/40 split. The same lists live on Trading (VCP, 9/21 any stock, retest, patterns) and Momentum investing (near trigger); they stay here only so you can still Send one if you choose.</p>
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
-    ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="adoptcard"></div>' : ''}`)}
+    ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="adoptcard"></div><div id="inj"></div>' : ''}`)}
     ${S && isOwner() ? pane('fut', '<div id="tbcard"></div><div id="tbcardn"></div>') : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
@@ -1141,7 +1141,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); usJournalCard($('#inj'), 'IN'); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -4870,9 +4870,9 @@ async function bgReal(el) {
     <div class="t2-list">${T.map((t, i) => { const g = t.ltp ? (t.ltp / t.entry - 1) * 100 : null; const st = t.gtt_trigger || t.stop;
       return t2Row({ sym: t.symbol, name: t.symbol, i, sub: `${t.qty} shares · stop ${inr(st, 0)}${t.trail_at ? ' ↑' : ''}`, top: inr(t.qty * (t.ltp || t.entry)),
         right: ex.has(t.symbol) ? 'Sell now' : g == null ? '' : `${g >= 0 ? '+' : ''}${fmt(g, 1)}%`, cls: ex.has(t.symbol) ? 'sellnow' : g == null ? '' : g >= 0 ? 'up' : 'down' }); }).join('') || '<p class="bg-empty">No open trades from the app.</p>'}</div>
-    <div id="bgrus"></div><div id="bgrch"></div>`;
+    <div id="bgrinj"></div><div id="bgrus"></div><div id="bgrch"></div>`;
   body.querySelectorAll('.t2-row').forEach((b) => b.addEventListener('click', () => { const t = T[+b.dataset.i]; if (t) tdChart({ symbol: t.symbol, name: t.symbol, price: t.ltp || t.entry, stop: t.gtt_trigger || t.stop }, 'NSE'); }));
-  pfUS($('#bgrus')); pfChart($('#bgrch'));
+  usJournalCard($('#bgrinj'), 'IN'); pfUS($('#bgrus')); pfChart($('#bgrch'));
 }
 async function bgTrades(el) {
   if (state.bgReal) return bgReal(el);
@@ -5077,7 +5077,7 @@ function uswParse(h) {
 /* 17 Nov 2026: entry chart = the daily chart frozen on the buy date (server /api/us/snap) with the system's markings:
    Trend 9/21 -> EMA 9 / EMA 21; Monthly ATH -> 150-day (~30-week) average + 52-week high; entry, first stop, 2R, and the
    sale price for closed trades. */
-const usSnapGet = (sym, d) => lvApi(`/api/us/snap?symbol=${encodeURIComponent(sym)}&date_=${encodeURIComponent(d)}`, { timeout: 30000 });
+const usSnapGet = (sym, d, mk) => lvApi(`/api/${mk === 'IN' ? 'in' : 'us'}/snap?symbol=${encodeURIComponent(sym)}&date_=${encodeURIComponent(d)}`, { timeout: 30000 });
 function usEntryChart(box, S, t, w, h, light) {
   box.innerHTML = ''; const base = chartBase();
   const opt = light ? { ...base, layout: { ...base.layout, background: { color: '#FFFFFF' }, textColor: '#374151' }, grid: { vertLines: { color: '#F3F4F6' }, horzLines: { color: '#EEF0F4' } },
@@ -5112,7 +5112,8 @@ const usChartKey = (S, t, closed) => (usSnapMonthly(S, t)
 /* one line of top-down logic for the journal: market -> sector -> theme -> stock -> system */
 function usEntryLogic(t, ctx) {
   const c = ctx || {}; const P = [];
-  if (c.spx_up != null) P.push(`Market: S&P 500 ${c.spx_up ? 'above' : 'below'} its 200-day (${c.spx_1m >= 0 ? '+' : ''}${c.spx_1m}% in 1 month)`);
+  const up = c.idx_up != null ? c.idx_up : c.spx_up, m1 = c.idx_1m != null ? c.idx_1m : c.spx_1m;
+  if (up != null) P.push(`Market: ${c.idx_name || 'S&P 500'} ${up ? 'above' : 'below'} its 200-day (${m1 >= 0 ? '+' : ''}${m1}% in 1 month)`);
   if (c.sector) P.push(`sector ${c.sector}${c.sector_pct != null ? ` ${Math.round(c.sector_pct)}/99` : ''}`);
   if (c.theme) P.push(`theme ${c.theme}${c.theme_pct != null ? ` ${Math.round(c.theme_pct)}/99` : ''}`);
   if (c.rs_rating != null) P.push(`stock RS ${Math.round(c.rs_rating)}/99`);
@@ -5120,19 +5121,20 @@ function usEntryLogic(t, ctx) {
   P.push(`signal: ${sig}${c.system && t.system && c.system !== t.system ? ` · managed as ${t.system}` : ''}`);
   return P.join(' → ');
 }
-async function usEntrySheet(t) {
-  const d = t.since; const sys = t.system || '';
+async function usEntrySheet(t, mk) {
+  const d = t.since; if (!d) { alertMsg('No buy date on record for this trade, so no entry chart.'); return; } const sys = t.system || ''; const LC = mk === 'IN' ? 'en-IN' : LC;
   $('#sheet-body').innerHTML = `<div class="tdc-h"><div class="t2-sh"><b>${esc(t.symbol)}</b><span>Entry chart · ${esc(day(d))} · ${esc(sys)}</span></div></div>
     <div class="tdc-chart" id="usec"><p class="muted pad">Loading chart…</p></div>
-    <p class="tdc-key">Daily candles to the buy date · purple = entry ${fmt(t.entry, 2, 'en-US')} · red = first SL ${fmt(t.stop0 || t.stop, 2, 'en-US')}${t.stop_last && t.stop_last !== (t.stop0 || t.stop) ? ` · orange = last SL ${fmt(t.stop_last, 2, 'en-US')}` : ''} · green = 2R target${/ATH/.test(sys) ? ' · grey = 150-day (~30-week) average · brown = 52-week high' : ' · orange = EMA 9 · blue = EMA 21'}${t.exit ? ` · black = sold ${fmt(t.exit, 2, 'en-US')}` : ''}</p>
+    <p class="tdc-key">Daily candles to the buy date · purple = entry ${fmt(t.entry, 2, LC)} · red = first SL ${fmt(t.stop0 || t.stop, 2, LC)}${t.stop_last && t.stop_last !== (t.stop0 || t.stop) ? ` · orange = last SL ${fmt(t.stop_last, 2, LC)}` : ''} · green = 2R target${/ATH/.test(sys) ? ' · grey = 150-day (~30-week) average · brown = 52-week high' : ' · orange = EMA 9 · blue = EMA 21'}${t.exit ? ` · black = sold ${fmt(t.exit, 2, LC)}` : ''}</p>
     <p class="tdc-why">Frozen as of that day's close, so it shows exactly what the chart looked like when you bought.</p>`;
   $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
-  try { const S = await usSnapGet(t.symbol, d); usEntryChart($('#usec'), S, t);
+  try { const S = await usSnapGet(t.symbol, d, mk); usEntryChart($('#usec'), S, t);
     $('#usec').insertAdjacentHTML('afterend', `<p class="tdc-why"><b>Why it was bought:</b> ${esc(usEntryLogic(t, S.ctx))}</p>`);
     const k = $('#sheet-body .tdc-key'); if (k) k.textContent = usChartKey(S, t, !!t.exit); }
   catch (e) { $('#usec').innerHTML = `<p class="muted pad">Chart not available: ${esc(e.message)}</p>`; }
 }
-async function usJournalPdf(C, H, S, fx) {
+async function usJournalPdf(C, H, S, fx, mk) {
+  const IN = mk === 'IN'; const CU = IN ? 'Rs' : 'US$';
   if (!window.jspdf) await new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
   const doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' }); const W = 210, M = 14;
   const f2 = (v) => (v == null || !isFinite(v) ? '-' : Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
@@ -5154,35 +5156,38 @@ async function usJournalPdf(C, H, S, fx) {
         col(neg ? RED : pos ? GRN : INK); if (i === 1) doc.setFont('helvetica', 'bold'); doc.text(tx(v == null ? '-' : v), x + 1.5, y); doc.setFont('helvetica', 'normal'); x += widths[i]; }); y += 6.5; });
     col(INK); return y + 3; };
   // ---------- page 1: summary
-  band('Trading Journal · US · moomoo', `Exported ${new Date().toLocaleString('en-AU', { dateStyle: 'medium', timeStyle: 'short' })} · A$1 = US$${f2(fx)} · prices in US$ unless marked A$`);
+  band(IN ? 'Trading Journal · India · Angel One' : 'Trading Journal · US · moomoo', `Exported ${new Date().toLocaleString('en-AU', { dateStyle: 'medium', timeStyle: 'short' })} · ${IN ? 'prices in Rs' : `A$1 = US$${f2(fx)} · prices in US$ unless marked A$`}`);
   const open = H.reduce((a, t) => a + (t.pnl || 0), 0); const risk = H.reduce((a, t) => a + Math.max(0, t.qty * ((t.price || t.entry) - t.stop)), 0);
   const kw = (W - 2 * M - 3 * 4) / 4; let y = 34;
   kpi(M, y, kw, 'Closed trades', String(S && S.n ? S.n : 0), S && S.n ? `${S.wins} won · ${S.win_rate}% win rate` : 'none yet');
-  kpi(M + (kw + 4), y, kw, 'Realised P&L', S && S.n ? sg(S.pnl) : '–', S && S.n ? `A$ ${sg(S.pnl_aud)}` : '', S && S.pnl < 0 ? RED : GRN);
+  kpi(M + (kw + 4), y, kw, `Realised P&L ${CU}`, S && S.n ? sg(S.pnl) : '–', S && S.n && !IN ? `A$ ${sg(S.pnl_aud)}` : '', S && S.pnl < 0 ? RED : GRN);
   kpi(M + 2 * (kw + 4), y, kw, 'Average R', S && S.avg_r != null ? `${S.avg_r >= 0 ? '+' : ''}${f2(S.avg_r)}R` : '–', S && S.n ? `best ${sg(S.best)} · worst ${sg(S.worst)}` : '');
   kpi(M + 3 * (kw + 4), y, kw, `Open (${H.length})`, sg(open), `at risk to stops ${f2(risk)}`, open < 0 ? RED : GRN);
   y += 30;
   if (C.length) { doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('Closed trades', M, y); doc.setFont('helvetica', 'normal'); y += 7;
-    y = table(y, ['Sold', 'Stock', 'Qty', 'Entry', 'First SL', 'Exit', 'P&L US$', 'P&L A$', '%', 'R', 'Days'],
+    y = IN ? table(y, ['Sold', 'Stock', 'Qty', 'Entry', 'First SL', 'Exit', 'P&L Rs', '%', 'R', 'Days'],
+      C.map((t) => [t.closed, t.symbol, t.qty, f2(t.entry), f2(t.stop0), f2(t.exit), sg(t.pnl), sg(t.pnl_pct), t.r_mult == null ? '-' : sg(t.r_mult), t.days ?? '-']),
+      [20, 24, 10, 20, 20, 20, 24, 15, 15, 14], [6, 7, 8])
+      : table(y, ['Sold', 'Stock', 'Qty', 'Entry', 'First SL', 'Exit', 'P&L US$', 'P&L A$', '%', 'R', 'Days'],
       C.map((t) => [t.closed, t.symbol, t.qty, f2(t.entry), f2(t.stop0), f2(t.exit), sg(t.pnl), sg(t.pnl_aud), sg(t.pnl_pct), t.r_mult == null ? '-' : sg(t.r_mult), t.days ?? '-']),
       [20, 18, 10, 18, 18, 18, 20, 20, 14, 14, 12], [6, 7, 8, 9]); }
   if (H.length) { if (y > 250) { doc.addPage(); y = 20; } doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('Open holdings', M, y); doc.setFont('helvetica', 'normal'); y += 7;
-    y = table(y, ['Bought', 'Stock', 'Qty', 'Entry', 'First SL', 'Stop now', '2R target', 'Price', 'P&L US$', 'System'],
+    y = table(y, ['Bought', 'Stock', 'Qty', 'Entry', 'First SL', 'Stop now', '2R target', 'Price', `P&L ${CU}`, 'System'],
       H.map((t) => { const s0 = t.stop0 || t.stop; return [t.since, t.symbol, t.qty, f2(t.entry), f2(s0), f2(t.stop), f2(t.entry + 2 * (t.entry - s0)), f2(t.price), sg(t.pnl), (t.system || '').slice(0, 13)]; }),
       [20, 18, 10, 18, 18, 18, 19, 18, 19, 24], [8]); }
   // ---------- one page per trade
   const tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-10000px;top:0;width:1000px;height:520px'; document.body.appendChild(tmp);
   for (const t of C.concat(H)) {
-    doc.addPage(); const closed = !!t.exit; const s0 = t.stop0 || t.stop; const r2 = t.entry + 2 * (t.entry - s0);
-    band(`${t.symbol}  ·  ${t.system || ''}`, closed ? `Closed · bought ${t.since} · sold ${t.closed} · ${t.days ?? '–'} days · ${t.reason || ''}` : `Open since ${t.since}`);
-    let SN = null; try { SN = await usSnapGet(t.symbol, t.since); } catch (e) { /* no chart */ }
+    doc.addPage(); const closed = !!t.exit; const s0 = t.stop0 || t.stop || null; const r2 = s0 ? t.entry + 2 * (t.entry - s0) : null;
+    band(`${t.symbol}  ·  ${t.system || ''}`, closed ? `Closed · bought ${t.since || 'before the journal'} · sold ${t.closed} · ${t.days ?? '–'} days · ${t.reason || ''}` : `Open since ${t.since}`);
+    let SN = null; if (t.since) { try { SN = await usSnapGet(t.symbol, t.since, mk); } catch (e) { /* no chart */ } }
     const bw = (W - 2 * M - 4 * 3) / 5; y = 33;
     kpi(M, y, bw, 'Entry', f2(t.entry), `${t.qty} shares · ${f2(t.qty * t.entry)}`, [124, 58, 237]);
-    kpi(M + (bw + 3), y, bw, 'First SL', f2(s0), `risk ${f2(t.entry - s0)}/sh · ${f2((t.entry - s0) * t.qty)}`, RED);
-    kpi(M + 2 * (bw + 3), y, bw, closed ? 'Last SL' : 'Stop now', f2(closed ? t.stop_last : t.stop), `${f2(((closed ? t.stop_last : t.stop) / t.entry - 1) * 100)}% vs entry`, [249, 115, 22]);
-    kpi(M + 3 * (bw + 3), y, bw, '2R target', f2(r2), `+${f2((r2 / t.entry - 1) * 100)}% · no fixed exit`, GRN);
-    if (closed) kpi(M + 4 * (bw + 3), y, bw, 'Exit · P&L', f2(t.exit), `${sg(t.pnl)} · ${t.r_mult == null ? '-' : sg(t.r_mult) + 'R'} · A$${sg(t.pnl_aud)}`, t.pnl < 0 ? RED : GRN);
-    else kpi(M + 4 * (bw + 3), y, bw, 'Now · P&L', f2(t.price), `${sg(t.pnl)} US$`, (t.pnl || 0) < 0 ? RED : GRN);
+    kpi(M + (bw + 3), y, bw, 'First SL', f2(s0), s0 ? `risk ${f2(t.entry - s0)}/sh · ${f2((t.entry - s0) * t.qty)}` : 'none on record', RED);
+    kpi(M + 2 * (bw + 3), y, bw, closed ? 'Last SL' : 'Stop now', f2(closed ? t.stop_last : t.stop), (closed ? t.stop_last : t.stop) ? `${f2(((closed ? t.stop_last : t.stop) / t.entry - 1) * 100)}% vs entry` : '', [249, 115, 22]);
+    kpi(M + 3 * (bw + 3), y, bw, '2R target', f2(r2), r2 ? `+${f2((r2 / t.entry - 1) * 100)}% · no fixed exit` : 'needs a first SL', GRN);
+    if (closed) kpi(M + 4 * (bw + 3), y, bw, 'Exit · P&L', f2(t.exit), `${sg(t.pnl)}${t.r_mult == null ? '' : ` · ${sg(t.r_mult)}R`}${IN ? '' : ` · A$${sg(t.pnl_aud)}`}`, t.pnl < 0 ? RED : GRN);
+    else kpi(M + 4 * (bw + 3), y, bw, 'Now · P&L', f2(t.price), `${sg(t.pnl)} ${CU}`, (t.pnl || 0) < 0 ? RED : GRN);
     y += 26; doc.setFontSize(8.5); const LG = doc.splitTextToSize(tx(usEntryLogic(t, SN && SN.ctx)), W - 2 * M - 6); const bh = 8 + LG.length * 4.2;
     fill([238, 242, 255]); doc.roundedRect(M, y, W - 2 * M, bh, 2, 2, 'F'); doc.setFontSize(7.5); col(ACC); doc.setFont('helvetica', 'bold'); doc.text('ENTRY LOGIC  (top-down: market > sector > theme > stock > system)', M + 3, y + 4.5);
     doc.setFont('helvetica', 'normal'); col(INK); doc.setFontSize(8.5); doc.text(LG, M + 3, y + 9.3);
@@ -5197,39 +5202,46 @@ async function usJournalPdf(C, H, S, fx) {
     const L = (t.stop_log || []); if (L.length) { doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.text('Stop-loss history', M, y); doc.setFont('helvetica', 'normal'); y += 6;
       y = table(y, ['Date', 'Stop', 'Change', 'vs entry'], L.map((x) => [x[0], f2(x[1]), x[2], `${f2((x[1] / t.entry - 1) * 100)}%`]), [30, 30, 30, 30]); }
   }
-  tmp.remove(); foot(); doc.save(`trade_journal_us_${new Date().toISOString().slice(0, 10)}.pdf`);
+  tmp.remove(); foot(); doc.save(`trade_journal_${IN ? 'india' : 'us'}_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 /* 17 Nov 2026: US trade journal (moomoo). Closed trades with entry, initial / last stop, stop moves, sale, P&L $ / A$, %, R and
    days; holdings removed without a price wait here as "pending". CSV export matches the user's spreadsheet columns. */
-async function usJournalCard(box) {
+async function usJournalCard(box, mk = 'US') {
   if (!box) return; const c = lvCfg(); if (!c.url || !c.token) { box.innerHTML = ''; return; }
-  let J; try { J = await lvApi('/api/us/journal', { timeout: 30000 }); } catch (e) {
-    box.innerHTML = `<div class="lv-card"><b>US trade journal · moomoo</b><p class="lv-sub">${/404|Not Found/i.test(e.message) ? 'Your server has not picked up the journal yet. It updates itself from GitHub every 15 minutes (outside Indian market hours); pull down to refresh after that.' : 'Could not reach your server: ' + esc(e.message)}</p></div>`; return; }
+  const IN = mk === 'IN'; const B = IN ? '/api/in/journal' : '/api/us/journal'; const TTL = IN ? 'India trade journal · Angel One' : 'US trade journal · moomoo';
+  let J; try { J = await lvApi(B, { timeout: 30000 }); } catch (e) {
+    box.innerHTML = `<div class="lv-card"><b>${TTL}</b><p class="lv-sub">${/404|Not Found/i.test(e.message) ? 'Your server has not picked up the journal yet. It updates itself from GitHub every 15 minutes (outside Indian market hours); pull down to refresh after that.' : 'Could not reach your server: ' + esc(e.message)}</p></div>`; return; }
   const T = J.trades || []; const P = T.filter((t) => t.status === 'pending'); const C = T.filter((t) => t.status === 'closed').sort((a, b) => (b.closed || '').localeCompare(a.closed || ''));
-  const $f = (v) => (v == null ? '–' : `$${fmt(v, 2, 'en-US')}`); const sg = (v, f) => (v == null ? '–' : `${v >= 0 ? '+' : '−'}${f(Math.abs(v))}`);
+  const $f = (v) => (v == null ? '–' : IN ? `₹${fmt(v, 2, 'en-IN')}` : `$${fmt(v, 2, 'en-US')}`); const sg = (v, f) => (v == null ? '–' : `${v >= 0 ? '+' : '−'}${f(Math.abs(v))}`);
   const S = J.stats || {}; const a$ = (v) => `A$${fmt(v, 2, 'en-AU')}`;
   const tiles = C.length ? `<div class="facts"><div class="fact"><span>Closed trades</span><b>${S.n}</b><small>${S.wins} won · ${fmt(S.win_rate, 0)}%</small></div>
-    <div class="fact"><span>Realised P&L</span><b class="${S.pnl >= 0 ? 'up' : 'down'}">${sg(S.pnl, $f)}</b><small>${sg(S.pnl_aud, a$)}</small></div>
+    <div class="fact"><span>Realised P&L</span><b class="${S.pnl >= 0 ? 'up' : 'down'}">${sg(S.pnl, $f)}</b><small>${IN ? 'before brokerage and taxes' : sg(S.pnl_aud, a$)}</small></div>
     <div class="fact"><span>Average R</span><b>${S.avg_r == null ? '–' : fmt(S.avg_r, 2)}</b><small>best ${$f(S.best)} · worst ${$f(S.worst)}</small></div></div>` : '';
   const pend = P.map((t) => `<div class="usj-pend"><div><div class="lv-sym">${esc(t.symbol)} <span class="chip down">needs sale price</span></div>
       <div class="lv-sub">${t.qty} @ ${$f(t.entry)} · ${esc(t.system || '')} · since ${esc(day(t.since))} · stop ${$f(t.stop_last)}</div>
       <div class="tl-add"><input type="number" step="any" data-jp="${esc(t.id)}" placeholder="Sale price $"><input type="date" data-jd="${esc(t.id)}" style="max-width:10em">
       <button class="lv-btn" data-jsave="${esc(t.id)}">Save</button> <button class="lv-link" data-jdel="${esc(t.id)}">Delete</button></div></div></div>`).join('');
   const rows = C.map((t) => `<tr><td>${esc(day(t.closed))}</td><td><b>${esc(t.symbol)}</b><br><small>${esc(t.system || '')}</small></td><td>${t.qty}</td><td>${$f(t.entry)}<br><small>SL ${$f(t.stop0)}${t.stop_last && t.stop_last !== t.stop0 ? ` → ${$f(t.stop_last)}` : ''}</small></td>
-      <td>${$f(t.exit)}<br><small>${esc(t.reason || '')}</small></td><td class="${t.pnl >= 0 ? 'up' : 'down'}"><b>${sg(t.pnl, $f)}</b><br><small>${sg(t.pnl_pct, (v) => fmt(v, 1) + '%')} · ${sg(t.pnl_aud, a$)}</small></td>
+      <td>${$f(t.exit)}${t.est ? ' <small>(est.)</small>' : ''}<br><small>${esc(t.reason || '')}</small></td><td class="${t.pnl >= 0 ? 'up' : 'down'}"><b>${sg(t.pnl, $f)}</b><br><small>${sg(t.pnl_pct, (v) => fmt(v, 1) + '%')}${IN ? '' : ` · ${sg(t.pnl_aud, a$)}`}</small></td>
       <td>${t.r_mult == null ? '–' : (t.r_mult >= 0 ? '+' : '') + fmt(t.r_mult, 2) + 'R'}<br><small>${t.days == null ? '' : t.days + ' d'}</small></td><td><a href="#" data-jchart="${esc(t.id)}" aria-label="Entry chart">📷</a> <a href="#" data-jdel="${esc(t.id)}" aria-label="Delete">✕</a></td></tr>`).join('');
-  box.innerHTML = `<div class="lv-card" data-fold="skip"><b>US trade journal · moomoo</b>
-    <p class="lv-sub">Every sale: entry, stop (first → last), exit, P&L in US$ and A$ (A$1 = US$${fmt(J.fx, 4)}), % and R (P&L ÷ the first risk per share).</p>
-    ${J.auto ? `<p class="status open lv-sub">🔄 <b>Automatic:</b> every moomoo fill is read from your account (read only) every 10 minutes in US hours: buys start a holding with its stop, sells close it here. <button class="lv-link" id="usjsync">Sync now</button></p>`
+  const O = J.open || [];
+  const orows = O.map((t, i) => `<tr><td>${esc(day(t.since))}</td><td><b>${esc(t.symbol)}</b><br><small>${esc(t.system || '')}${t.src === 'app' ? ' · app' : ''}</small></td><td>${t.qty}</td>
+      <td>${$f(t.entry)}<br><small>SL ${$f(t.stop0)}${t.stop && t.stop !== t.stop0 ? ` → ${$f(t.stop)}` : ''}</small></td><td>${$f(t.price)}</td>
+      <td class="${(t.pnl || 0) >= 0 ? 'up' : 'down'}"><b>${t.pnl == null ? '–' : sg(t.pnl, $f)}</b></td><td><a href="#" data-jochart="${i}" aria-label="Entry chart">📷</a></td></tr>`).join('');
+  box.innerHTML = `<div class="lv-card" data-fold="skip"><b>${TTL}</b>
+    <p class="lv-sub">Every sale: entry, stop (first → last), exit, P&L${IN ? ' in ₹' : ` in US$ and A$ (A$1 = US$${fmt(J.fx, 4)})`}, % and R (P&L ÷ the first risk per share).</p>
+    ${IN ? (J.auto ? `<p class="status open lv-sub">🔄 <b>Automatic:</b> Angel's trade book is read every 10 minutes, 09:15–20:00 IST (read only). The app's own trades come with their stop history; your own delivery buys start a trade here and sells close it at the real fill price. Trades from before today: paste them below. <button class="lv-link" id="usjsync">Sync now</button></p>` : '<p class="status exit watch lv-sub">Angel is not connected on the server.</p>')
+      : J.auto ? `<p class="status open lv-sub">🔄 <b>Automatic:</b> every moomoo fill is read from your account (read only) every 10 minutes in US hours: buys start a holding with its stop, sells close it here. <button class="lv-link" id="usjsync">Sync now</button></p>`
       : '<p class="status exit watch lv-sub"><b>Manual for now.</b> To make it automatic, moomoo OpenD has to run on your server (one-time setup, you log in yourself). Until then use 💰 Record sale.</p>'}
+    ${IN && O.length ? `<p class="lv-sub"><b>Open (${O.length})</b></p><div class="usj-wrap"><table class="usj"><thead><tr><th>Bought</th><th>Stock</th><th>Qty</th><th>Entry · SL</th><th>Now</th><th>P&L</th><th></th></tr></thead><tbody>${orows}</tbody></table></div>` : ''}
     ${tiles}${P.length ? `<p class="lv-sub"><b>Sold, price missing (${P.length})</b></p>${pend}` : ''}
     ${C.length ? `<div class="usj-wrap"><table class="usj"><thead><tr><th>Sold</th><th>Stock</th><th>Qty</th><th>Entry · SL</th><th>Exit</th><th>P&L</th><th>R</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
-      ` : (P.length ? '' : '<p class="empty">No closed trades yet. Use "Record sale" on a holding when moomoo sells it.</p>')}
+      ` : (P.length ? '' : `<p class="empty">${IN ? 'No closed trades yet. Sales in Angel show up here by themselves.' : 'No closed trades yet. Use "Record sale" on a holding when moomoo sells it.'}</p>`)}
     <p class="t2-row"><button class="lv-link" id="usjpdf">⬇ Export PDF (with entry charts)</button> ${C.length ? '<button class="lv-link" id="usjcsv">⬇ Export CSV</button>' : ''}</p>
     <details class="info"><summary>Paste past trades</summary><p class="lv-sub">One line, trades separated by commas: <b>SYMBOL:shares:buy:sold:first stop:system:bought date:sold date</b> (system TF / ATH / RT / MY, dates YYYY-MM-DD).</p>
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><input id="ujpaste" placeholder="KDP:13:36.70:35.62:31.13:ATH:2026-11-13:2026-11-16,…" style="flex:1;min-width:12em"><button class="lv-btn" id="ujread">Add</button></div></details>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><input id="ujpaste" placeholder="${IN ? 'TATAPOWER:50:405:432:380:ATH:2026-10-01:2026-11-10,…' : 'KDP:13:36.70:35.62:31.13:ATH:2026-11-13:2026-11-16,…'}" style="flex:1;min-width:12em"><button class="lv-btn" id="ujread">Add</button></div></details>
     <p class="lv-sub" id="ujmsg"></p></div>`;
-  const post = async (body, msg) => { try { await lvApi('/api/us/journal', { method: 'POST', body: JSON.stringify(body) }); alertMsg(msg, true); } catch (e) { alertMsg('Could not save: ' + e.message); } usJournalCard(box); };
+  const post = async (body, msg) => { try { await lvApi(B, { method: 'POST', body: JSON.stringify(body) }); alertMsg(msg, true); } catch (e) { alertMsg('Could not save: ' + e.message); } usJournalCard(box, mk); };
   box.querySelectorAll('[data-jsave]').forEach((b) => b.addEventListener('click', () => { const id = b.dataset.jsave; const px = +box.querySelector(`[data-jp="${id}"]`).value;
     if (!(px > 0)) { alertMsg('Enter the sale price'); return; } post({ action: 'edit', id, exit: px, date: box.querySelector(`[data-jd="${id}"]`).value || null }, 'Sale saved'); }));
   box.querySelectorAll('[data-jdel]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); if (confirm('Delete this journal entry?')) post({ action: 'delete', id: b.dataset.jdel }, 'Deleted'); }));
@@ -5240,21 +5252,22 @@ async function usJournalCard(box) {
     const bad = L.filter((t) => !t.symbol || !(t.qty > 0 && t.entry > 0 && t.exit > 0 && t.stop0 > 0));
     if (!L.length || bad.length) { alertMsg(`Could not read ${bad.length ? bad.map((t) => t.symbol || '?').join(', ') : 'that'}. Use SYMBOL:shares:buy:sold:stop:system:bought:sold`); return; }
     rd.disabled = true; let ok = 0;
-    for (const t of L) { try { await lvApi('/api/us/journal', { method: 'POST', body: JSON.stringify(t) }); ok++; } catch (e) { alertMsg(`${t.symbol}: ${e.message}`); } }
-    alertMsg(`${ok} trade${ok === 1 ? '' : 's'} added`, true); usJournalCard(box); });
-  box.querySelectorAll('[data-jchart]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); usEntrySheet(T.find((x) => x.id === b.dataset.jchart)); }));
+    for (const t of L) { try { await lvApi(B, { method: 'POST', body: JSON.stringify(t) }); ok++; } catch (e) { alertMsg(`${t.symbol}: ${e.message}`); } }
+    alertMsg(`${ok} trade${ok === 1 ? '' : 's'} added`, true); usJournalCard(box, mk); });
+  box.querySelectorAll('[data-jchart]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); usEntrySheet(T.find((x) => x.id === b.dataset.jchart), mk); }));
+  box.querySelectorAll('[data-jochart]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); usEntrySheet(O[+b.dataset.jochart], mk); }));
   const sy = box.querySelector('#usjsync'); if (sy) sy.addEventListener('click', async () => { sy.disabled = true; sy.textContent = 'Syncing…';
-    try { const r = await lvApi('/api/us/journal/sync', { method: 'POST', timeout: 60000 }); alertMsg(r.ok ? `${r.buys} buys, ${r.sells} sells recorded` : r.why, r.ok); } catch (e) { alertMsg('Sync failed: ' + e.message); }
-    usJournalCard(box); usWatchCard($('#usw')); });
+    try { const r = await lvApi(B + '/sync', { method: 'POST', timeout: 60000 }); alertMsg(r.ok ? `${r.buys} buys, ${r.sells} sells recorded` : r.why, r.ok); } catch (e) { alertMsg('Sync failed: ' + e.message); }
+    usJournalCard(box, mk); if (!IN) usWatchCard($('#usw')); });
   const pb = box.querySelector('#usjpdf'); if (pb) pb.addEventListener('click', async () => { pb.disabled = true; pb.textContent = 'Building PDF…';
-    let H = []; try { H = (await lvApi('/api/us/watch', { timeout: 30000 })).items || []; } catch (e) { /* closed only */ }
-    try { await usJournalPdf(C, H, S, J.fx); pb.textContent = '⬇ Export PDF (with entry charts)'; } catch (e) { pb.textContent = 'PDF failed: ' + e.message; } pb.disabled = false; });
+    let H = O; if (!IN) { try { H = (await lvApi('/api/us/watch', { timeout: 30000 })).items || []; } catch (e) { /* closed only */ } }
+    try { await usJournalPdf(C, H, S, J.fx, mk); pb.textContent = '⬇ Export PDF (with entry charts)'; } catch (e) { pb.textContent = 'PDF failed: ' + e.message; } pb.disabled = false; });
   const cv = box.querySelector('#usjcsv'); if (cv) cv.addEventListener('click', () => {
-    const H = ['Sl No', 'Strategy', 'Symbol', 'Buy/Short', 'Trade date', 'Exit date', 'Qty', 'Entry', 'Initial SL', 'Last SL', 'Risk $', 'Exit', 'P/L USD', 'P/L AUD', 'P/L %', 'R', 'Days', 'Reason', 'Stop moves'];
-    const L = C.slice().reverse().map((t, i) => [i + 1, t.system, t.symbol, 'Buy', t.since, t.closed, t.qty, t.entry, t.stop0, t.stop_last, ((t.entry - t.stop0) * t.qty).toFixed(2), t.exit, t.pnl, t.pnl_aud, t.pnl_pct, t.r_mult, t.days, t.reason,
-      (t.stop_log || []).map((x) => `${x[0]} ${x[1]} ${x[2]}`).join(' | ')]);
+    const H = ['Sl No', 'Strategy', 'Symbol', 'Buy/Short', 'Trade date', 'Exit date', 'Qty', 'Entry', 'Initial SL', 'Last SL', IN ? 'Risk Rs' : 'Risk $', 'Exit', IN ? 'P/L INR' : 'P/L USD'].concat(IN ? [] : ['P/L AUD'], ['P/L %', 'R', 'Days', 'Reason', 'Stop moves']);
+    const L = C.slice().reverse().map((t, i) => [i + 1, t.system, t.symbol, 'Buy', t.since, t.closed, t.qty, t.entry, t.stop0, t.stop_last, t.stop0 ? ((t.entry - t.stop0) * t.qty).toFixed(2) : '', t.exit, t.pnl].concat(IN ? [] : [t.pnl_aud], [t.pnl_pct, t.r_mult, t.days, t.reason,
+      (t.stop_log || []).map((x) => `${x[0]} ${x[1]} ${x[2]}`).join(' | ')]));
     const csv = [H].concat(L).map((r) => r.map((x) => `"${String(x == null ? '' : x).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `us_trade_journal_${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); a.remove(); });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `${IN ? 'india' : 'us'}_trade_journal_${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); a.remove(); });
 }
 async function usWatchCard(box) {
   if (!box) return; const c = lvCfg();

@@ -202,6 +202,14 @@ class AngelEquity:
                      variety=o.get("variety"), text=o.get("text"), time=o.get("updatetime"))
                 for o in (self._data(self._call(api.orderBook)) or [])]
 
+    def trades(self):
+        """Today's fills (Angel's trade book; it only shows the current day). Read only."""
+        api = self._session()
+        return [dict(id=f"{t.get('fillid')}:{t.get('orderid')}", symbol=str(t.get("tradingsymbol", "")).replace("-EQ", ""), side=t.get("transactiontype"),
+                     qty=float(t.get("fillsize") or 0), price=float(t.get("fillprice") or 0), product=t.get("producttype"),
+                     exchange=t.get("exchange"), time=t.get("filltime"))
+                for t in (self._data(self._call(api.tradeBook)) or [])]
+
     def params(self, symbol, side, qty, price, kind="LIMIT", trigger=None, amo=False):
         ts, t = self._ts(symbol) if self.tokens else (f"{symbol}-EQ", dict(token="?", tick=0.05))
         tick = t["tick"] or 0.05
@@ -507,7 +515,7 @@ class MockBroker(AngelEquity):
     """Fake Angel account for tests and the demo mode (MOCK_BROKER=1)."""
 
     def __init__(self, *a, **k):
-        self.placed = []; self.tokens = {}; self.hold = {"RELIANCE": 10}
+        self.placed = []; self.tokens = {}; self.hold = {"RELIANCE": 10}; self.fills = []
 
     def account(self):
         H = [dict(symbol=s, qty=q, avg=100.0, ltp=100.0, pnl=0.0) for s, q in self.hold.items() if q > 0]
@@ -515,6 +523,9 @@ class MockBroker(AngelEquity):
 
     def ltp(self, symbol):
         return 100.0
+
+    def trades(self):
+        return list(self.fills)
 
     def quotes(self, symbols):
         return {s: dict(ltp=100.0 + i, prev=99.0 + i, high=101.0 + i, low=98.0 + i, open=99.5 + i) for i, s in enumerate(symbols)}
