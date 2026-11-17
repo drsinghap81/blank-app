@@ -1966,6 +1966,7 @@ class USWatchItem(BaseModel):
     stop: float
     target: float | None = None
     system: str = "My pick"
+    since: str | None = None          # buy date (YYYY-MM-DD), for the journal's entry chart
 
 
 class USWatch(BaseModel):
@@ -2000,12 +2001,170 @@ def us_watch_set(body: USWatch, _=Depends(auth)):
         if not sym or it.qty <= 0 or it.entry <= 0 or it.stop <= 0 or it.stop >= it.entry * 1.5:
             raise HTTPException(400, f"check {it.symbol}: qty, entry and stop must be positive")
         sysn = US_SYS.get(it.system, it.system)[:30]
-        W[sym] = dict(qty=it.qty, entry=round(it.entry, 2), stop=round(it.stop, 2), target=round(it.target, 2) if it.target else None,
-                      system=sysn, since=W.get(sym, {}).get("since") or et_now().date().isoformat())
+        old = W.get(sym, {}); day = et_now().date().isoformat(); st = round(it.stop, 2)
+        log = list(old.get("stop_log") or [])
+        if not log or log[-1][1] != st:
+            log.append([day, st, "set"])
+        W[sym] = dict(qty=it.qty, entry=round(it.entry, 2), stop=st, target=round(it.target, 2) if it.target else None,
+                      system=sysn, since=(it.since if it.since and re.match(r"^\d{4}-\d{2}-\d{2}$", it.since) else None) or old.get("since") or day,
+                      stop0=old.get("stop0") or st, stop_log=log[-60:])
+    J = us_journal_load(); moved = []
     for sym in body.remove:
-        W.pop(sym.upper(), None)
+        w = W.pop(sym.upper(), None)
+        if w:                                        # 17 Nov 2026: a holding that leaves the list waits in the journal for its sale price
+            J.append(_jrow(sym.upper(), w, None, None, "removed from the list - enter the sale price")); moved.append(sym.upper())
+    if moved:
+        us_journal_save(J)
     us_watch_save(W)
-    return dict(ok=True, n=len(W))
+    return dict(ok=True, n=len(W), pending=moved)
+
+
+# ------------------------------------------------------------------ US trade journal (17 Nov 2026)
+# Every moomoo trade that leaves "Your moomoo holdings" is kept here with its entry, initial and last stop, the stop moves,
+# the sale price and date, P&L in US$ and A$, % and R (P&L per share / initial risk per share). A holding removed without a
+# price stays "pending" until the app sends the sale price.
+def _usj_path2():
+    return os.path.join(DATA, "us_trades.json")
+
+
+def us_journal_load():
+    try:
+        return json.load(open(_usj_path2()))
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def us_journal_save(J):
+    tmp = _usj_path2() + ".tmp"; json.dump(J, open(tmp, "w"), indent=1); os.replace(tmp, _usj_path2())
+
+
+_FX = {"t": 0, "v": None}
+
+
+def audusd():
+    if _FX["v"] and time.time() - _FX["t"] < 6 * 3600:
+        return _FX["v"]
+    try:
+        v = float(yq("AUDUSD=X", "RAW")["ltp"]); _FX.update(t=time.time(), v=v)
+    except Exception:  # noqa: BLE001
+        v = _FX["v"] or 0.65
+    return v
+
+
+def _jrow(sym, w, exit_px, date_, reason, fees=0.0):
+    return dict(id=f"{sym}-{w.get('since', '')}-{int(time.time() * 1000) % 10**8}", symbol=sym, qty=w["qty"], entry=w["entry"],
+                stop0=w.get("stop0") or w.get("stop"), stop_last=w.get("stop"), stop_log=w.get("stop_log") or [], system=w.get("system"),
+                since=w.get("since"), exit=exit_px, closed=date_, reason=reason, fees=fees, fx=audusd() if exit_px else None,
+                status="closed" if exit_px else "pending")
+
+
+def _jcalc(r):
+    r = dict(r)
+    if r.get("exit"):
+        q, e, x, s0 = r["qty"], r["entry"], r["exit"], r.get("stop0") or r["entry"]
+        pnl = (x - e) * q - (r.get("fees") or 0); fx = r.get("fx") or audusd()
+        r.update(pnl=round(pnl, 2), pnl_aud=round(pnl / fx, 2), pnl_pct=round((x / e - 1) * 100, 2),
+                 r_mult=round((x - e) / (e - s0), 2) if e > s0 else None,
+                 days=(date.fromisoformat(r["closed"]) - date.fromisoformat(r["since"])).days if r.get("closed") and r.get("since") else None)
+    return r
+
+
+@app.get("/api/us/snap")
+def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
+    """17 Nov 2026: the daily chart as it looked on the buy date (130 bars up to and including that day) with EMA 9 / EMA 21 /
+    150-day (~30-week) average, for the journal. Frozen on first request (DATA/us_snaps) so it never changes afterwards."""
+    sym = re.sub(r"[^A-Z0-9.\-]", "", symbol.upper())[:10]
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", date_ or ""):
+        raise HTTPException(400, "date_ must be YYYY-MM-DD")
+    d = os.path.join(DATA, "us_snaps"); os.makedirs(d, exist_ok=True); f = os.path.join(d, f"{sym}_{date_}.json")
+    if os.path.exists(f):
+        return json.load(open(f))
+    r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym.replace('.', '-')}", params=dict(interval="1d", range="2y"),
+                     headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15)
+    r.raise_for_status(); res = r.json()["chart"]["result"][0]; q = res["indicators"]["quote"][0]
+    keep = [i for i in range(len(res["timestamp"])) if None not in (q["open"][i], q["high"][i], q["low"][i], q["close"][i])]
+    t = [datetime.fromtimestamp(res["timestamp"][i], timezone.utc).date().isoformat() for i in keep]
+    O, H, L, C = ([q[k][i] for i in keep] for k in ("open", "high", "low", "close"))
+    upto = [i for i, x in enumerate(t) if x <= date_]
+    if not upto:
+        raise HTTPException(404, "no prices before that date")
+    e = upto[-1]; a = max(0, e - 129)
+    e9, e21 = _ema_list(C, 9), _ema_list(C, 21)
+    s150 = [sum(C[max(0, i - 149):i + 1]) / (i + 1 - max(0, i - 149)) if i >= 149 else None for i in range(len(C))]
+    rd = lambda v: [None if x is None else round(x, 2) for x in v[a:e + 1]]  # noqa: E731
+    out = dict(symbol=sym, date=date_, bar=t[e], t=t[a:e + 1], o=rd(O), h=rd(H), l=rd(L), c=rd(C), e9=rd(e9), e21=rd(e21), s150=rd(s150),
+               hi52=round(max(H[max(0, e - 251):e + 1]), 2))
+    if t[e] < et_now().date().isoformat():          # freeze only once that day has closed
+        json.dump(out, open(f, "w"))
+    return out
+
+
+class JournalReq(BaseModel):
+    action: str                       # close | edit | add | delete
+    symbol: str = ""
+    id: str = ""
+    exit: float | None = None
+    date: str | None = None
+    reason: str = ""
+    fees: float = 0.0
+    qty: float | None = None
+    entry: float | None = None
+    stop0: float | None = None
+    system: str = ""
+    since: str | None = None
+
+
+@app.get("/api/us/journal")
+def us_journal_get(_=Depends(auth)):
+    J = [_jcalc(r) for r in us_journal_load()]
+    C = [r for r in J if r.get("status") == "closed"]
+    st = {}
+    if C:
+        wins = [r for r in C if r["pnl"] > 0]; Rs = [r["r_mult"] for r in C if r.get("r_mult") is not None]
+        st = dict(n=len(C), wins=len(wins), win_rate=round(len(wins) / len(C) * 100, 1), pnl=round(sum(r["pnl"] for r in C), 2),
+                  pnl_aud=round(sum(r["pnl_aud"] for r in C), 2), avg_r=round(sum(Rs) / len(Rs), 2) if Rs else None,
+                  best=max(r["pnl"] for r in C), worst=min(r["pnl"] for r in C))
+    return dict(trades=sorted(J, key=lambda r: (r.get("status") != "pending", r.get("closed") or ""), reverse=False), stats=st, fx=audusd())
+
+
+@app.post("/api/us/journal")
+def us_journal_post(body: JournalReq, _=Depends(auth)):
+    J = us_journal_load(); day = et_now().date().isoformat(); sym = re.sub(r"[^A-Z0-9.\-]", "", body.symbol.upper())[:10]
+    if body.action == "close":                     # sold in moomoo: move the holding to the journal
+        W = us_watch_load(); w = W.get(sym)
+        if not w or not body.exit or body.exit <= 0:
+            raise HTTPException(400, "holding and sale price needed")
+        if body.qty and 0 < body.qty < w["qty"]:      # part sale
+            part = dict(w, qty=body.qty); w["qty"] = round(w["qty"] - body.qty, 6)
+            J.append(_jrow(sym, part, round(body.exit, 4), body.date or day, body.reason or "sold", body.fees))
+        else:
+            W.pop(sym); J.append(_jrow(sym, w, round(body.exit, 4), body.date or day, body.reason or "sold", body.fees))
+        us_watch_save(W)
+    elif body.action == "edit":
+        r = next((x for x in J if x["id"] == body.id), None)
+        if not r:
+            raise HTTPException(404, "trade not found")
+        if body.exit:
+            r["exit"] = round(body.exit, 4); r["status"] = "closed"; r["fx"] = r.get("fx") or audusd()
+            r["reason"] = body.reason or ("sold" if (r.get("reason") or "").startswith("removed") else r.get("reason"))
+        if body.date:
+            r["closed"] = body.date
+        elif r.get("exit") and not r.get("closed"):
+            r["closed"] = day
+        if body.fees:
+            r["fees"] = body.fees
+    elif body.action == "add":                     # a past trade typed in by hand
+        if not (sym and body.qty and body.entry and body.exit and body.stop0):
+            raise HTTPException(400, "symbol, qty, entry, exit and stop needed")
+        w = dict(qty=body.qty, entry=body.entry, stop=body.stop0, stop0=body.stop0, system=US_SYS.get(body.system, body.system or "My pick"),
+                 since=body.since or day)
+        J.append(_jrow(sym, w, round(body.exit, 4), body.date or day, body.reason or "sold", body.fees))
+    elif body.action == "delete":
+        J = [x for x in J if x["id"] != body.id]
+    else:
+        raise HTTPException(400, "unknown action")
+    us_journal_save(J)
+    return dict(ok=True, n=len(J))
 
 
 def us_watch_check(t=None):
@@ -2023,6 +2182,8 @@ def us_watch_check(t=None):
         if not px:
             continue
         if lo <= w["stop"]:
+            if not w.get("stop_hit"):
+                w["stop_hit"] = dict(day=day, low=round(lo, 2), stop=w["stop"]); us_watch_save(W)
             alert("stop", sym, f"US {sym}: stop {w['stop']:.2f} hit (low {lo:.2f}, now {px:.2f}). You hold {w['qty']:g} in moomoo; sell there.",
                   key=f"uswstop:{sym}:{day}")
         elif px <= w["stop"] * 1.03:
@@ -2095,6 +2256,7 @@ def us_watch_eod(t=None, manual=False):
                   key=f"uswtrail-exit:{sym}:{day}")
         if lvl > w["stop"] * 1.0025:                     # ignore moves under 0.25% (cents are not worth an order change)
             old = w["stop"]; w["stop_prev"] = old; w["stop"] = lvl; w["stop_set"] = day
+            w["stop_log"] = (w.get("stop_log") or [])[-59:] + [[day, lvl, "raised"]]
             raised.append(f"{sym} {old:.2f} → {lvl:.2f}"); out.append(dict(symbol=sym, result="raised", old=old, new=lvl))
         else:
             out.append(dict(symbol=sym, result="kept", new=w["stop"]))

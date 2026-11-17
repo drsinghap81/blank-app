@@ -797,3 +797,42 @@ def test_trend_line_bars(tmp_path):
     A.requests.get = lambda url, **k: R()
     j = c.get("/api/tl/bars?sym=KOTAKBANK", headers=h).json()
     assert j == {"t": ["2026-11-18"], "o": [10], "h": [12], "l": [9], "c": [11]}
+
+
+def test_us_journal(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    A.yq = lambda s, mk: {"ltp": 0.65 if s == "AUDUSD=X" else 110.0}
+    c.post("/api/us/watch", json={"items": [{"symbol": "ACGL", "qty": 7, "entry": 107.28, "stop": 102.99, "system": "TF"},
+                                             {"symbol": "KDP", "qty": 13, "entry": 36.7, "stop": 31.13, "system": "ATH"}]}, headers=h)
+    c.post("/api/us/watch", json={"items": [{"symbol": "ACGL", "qty": 7, "entry": 107.28, "stop": 106.18, "system": "TF"}]}, headers=h)
+    W = A.us_watch_load(); assert W["ACGL"]["stop0"] == 102.99 and [x[1] for x in W["ACGL"]["stop_log"]] == [102.99, 106.18]
+    # sold ACGL at 108.12 -> journal
+    assert c.post("/api/us/journal", json={"action": "close", "symbol": "ACGL", "exit": 108.12, "date": "2026-11-17"}, headers=h).json()["ok"]
+    # KDP removed from the list -> pending, then price entered
+    j = c.post("/api/us/watch", json={"remove": ["KDP"]}, headers=h).json(); assert j["pending"] == ["KDP"]
+    J = c.get("/api/us/journal", headers=h).json(); p = [t for t in J["trades"] if t["symbol"] == "KDP"][0]
+    assert p["status"] == "pending" and "pnl" not in p
+    c.post("/api/us/journal", json={"action": "edit", "id": p["id"], "exit": 37.13, "date": "2026-11-16"}, headers=h)
+    J = c.get("/api/us/journal", headers=h).json()
+    a = [t for t in J["trades"] if t["symbol"] == "ACGL"][0]; k = [t for t in J["trades"] if t["symbol"] == "KDP"][0]
+    assert a["pnl"] == round((108.12 - 107.28) * 7, 2) and a["r_mult"] == round((108.12 - 107.28) / (107.28 - 102.99), 2) and a["pnl_aud"] == round(a["pnl"] / 0.65, 2)
+    assert k["status"] == "closed" and k["pnl"] == round((37.13 - 36.7) * 13, 2) and J["stats"]["n"] == 2 and J["stats"]["wins"] == 2
+    assert c.post("/api/us/journal", json={"action": "add", "symbol": "ETSY", "qty": 9, "entry": 89.99, "exit": 88.44, "stop0": 82.39, "system": "RT"}, headers=h).json()["ok"]
+    assert c.get("/api/us/journal", headers=h).json()["stats"]["n"] == 3
+
+
+def test_us_snap(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    n = 300; t0 = 1760000000
+    class R:
+        def raise_for_status(self): pass
+        def json(self):
+            return {"chart": {"result": [{"timestamp": [t0 + 86400 * i for i in range(n)], "indicators": {"quote": [{
+                "open": [100 + i for i in range(n)], "high": [101 + i for i in range(n)], "low": [99 + i for i in range(n)], "close": [100.5 + i for i in range(n)]}]}}]}}
+    A.requests.get = lambda url, **k: R()
+    d = A.datetime.fromtimestamp(t0 + 86400 * 200, A.timezone.utc).date().isoformat()
+    j = c.get(f"/api/us/snap?symbol=acgl&date_={d}", headers=h).json()
+    assert j["bar"] == d and len(j["t"]) == 130 and j["c"][-1] == 300.5 and j["e21"][-1] is not None and j["s150"][-1] is not None
+    assert c.get("/api/us/snap?symbol=acgl&date_=bad", headers=h).status_code == 400

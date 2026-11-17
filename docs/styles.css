@@ -1120,3 +1120,12 @@ body.pub .owner-only { display: none !important; }
 .tl-nr .tl-tv{font-size:13px;color:inherit;opacity:.75;text-decoration:none;border:1px solid color-mix(in srgb,currentColor 30%,transparent);border-radius:6px;padding:1px 6px}
 .tl-nr em{margin-left:auto}
 .tl-add .bg-ghost.sm{flex:1}
+/* 17 Nov 2026: US trade journal */
+.usj-wrap{overflow-x:auto;margin:8px 0}
+.usj{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+.usj th{text-align:left;font-weight:600;opacity:.7;padding:6px 4px;border-bottom:1px solid color-mix(in srgb,currentColor 18%,transparent)}
+.usj td{padding:7px 4px;border-bottom:1px solid color-mix(in srgb,currentColor 10%,transparent);vertical-align:top}
+.usj small{opacity:.7}
+.usw-sell summary{cursor:pointer;font-weight:600;margin:6px 0}
+.usj-pend{border-top:1px solid color-mix(in srgb,currentColor 12%,transparent);padding:10px 0}
+.usj-pend .tl-add input{min-width:7em}
