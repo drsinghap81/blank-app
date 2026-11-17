@@ -175,7 +175,7 @@ def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
     try:
         pr = P.scan(x.tail(750), key, name, "stock")
         if pr:
-            row["pattern"] = dict(typ=pr["typ"], status=pr["status"], neck=pr["neck"], to_neck_pct=pr["to_neck_pct"], days_since=pr["days_since"])
+            row["pattern"] = dict(typ=pr["typ"], status=pr["status"], neck=pr["neck"], to_neck_pct=pr["to_neck_pct"], days_since=pr["days_since"], lows=pr.get("lows"))
     except Exception:  # noqa: BLE001
         pass
     w = s.resample("W-FRI").last().dropna().tail(260)

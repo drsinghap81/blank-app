@@ -2776,7 +2776,19 @@ async function loadBottoms() {
       ${seg('patt', state.patT || 'all', [['all', 'All types'], ['DB', `Double bottom ${cnt('DB')}`], ['TW', `Tilted W ${cnt('TW')}`], ['TB', `Triple bottom ${cnt('TB')}`], ['IHS', `Inverse H&S ${cnt('IHS')}`]])}
       <details class="info"><summary>How patterns are found</summary><p>Daily closing line, swings of 6% or more, after a fall of 20%+ from the 1-year high (first low near the 1-year low). Double bottom: second low within ±3% of the first. Tilted W: second low 3–12% higher. Triple bottom: three lows within 4%. Inverse H&S: head at least 3% below both shoulders. Neckline = highest peak between the lows; a breakout is a close above it within 60 days of the last low. Stop = lowest low − 1%. Liquid stocks (₹2 cr+ a day, price ₹100+) plus Nifty, Bank Nifty and sector indices. Updated nightly.</p></details>
       <label class="search"><input id="patq" type="search" placeholder="Search symbol or company" value="${esc(state.patQ || '')}" autocomplete="off"></label>
-      <ul class="list flat" id="patlist"></ul></div>`;
+      <ul class="list flat" id="patlist"></ul></div><div id="patetf"></div>`;
+  /* 17 Nov 2026: ETFs of this market with a bottom pattern (from the ETF scan), e.g. the India ETFs on the ASX / in the US */
+  (async () => { if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds').catch(() => null);
+    const fm = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[bmk]; const box = $('#patetf'); if (!box || !state.fund) return;
+    const E = (state.fund.rows || []).filter((r) => (r.market || 'IN') === fm && r.kind !== 'fund' && r.pattern)
+      .sort((a, b) => ((b.pattern.status === 'breakout') - (a.pattern.status === 'breakout')) || (a.pattern.to_neck_pct - b.pattern.to_neck_pct));
+    if (!E.length) return;
+    box.innerHTML = `<div class="card"><h3>ETFs with a bottom pattern (${E.length})</h3><p class="muted small">Same pattern rules on each ETF's daily closes. Target = neckline + the pattern's height; SL 4% under the neckline (6% for inverse H&amp;S), as in the stock list${fm === 'IN' ? '' : '; buy in moomoo yourself'}. Watch only, like the stock patterns.</p><ul class="list flat">${E.map((r, i) => {
+      const p_ = r.pattern; const br = p_.status === 'breakout'; const pl = p_.lows && p_.lows.length ? patPlan({ ...p_, close: r.close }) : null;
+      return `<li class="row" tabindex="0" data-e="${i}"><div><div class="sym">${esc(r.symbol || r.key.split(':').pop())} <span class="muted">${esc(r.name || '')}</span></div>
+        <div class="tags"><span class="chip ${br ? 'new' : 'open'}">${PAT_NM[p_.typ]} ${br ? `breakout${p_.days_since != null ? ` ${p_.days_since} d ago` : ''}` : 'forming'}</span><span class="chip">neckline ${fmt(p_.neck, 2, 'en-IN')}</span><span class="chip">${br ? `${fmt(-p_.to_neck_pct, 1)}% above it` : `${fmt(p_.to_neck_pct, 1)}% to go`}</span>${pl ? `<span class="chip new">target ${fmt(pl.tgt, 2, 'en-IN')}</span><span class="chip exit">SL ${fmt(pl.sl, 2, 'en-IN')}</span>` : ''}</div></div><div></div>
+        <div class="px"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${(r.r1m || 0) >= 0 ? 'up' : 'down'}">${(r.r1m || 0) >= 0 ? '+' : ''}${fmt(r.r1m, 1)}% 1m</span></div></li>`; }).join('')}</ul></div>`;
+    box.querySelectorAll('[data-e]').forEach((x) => x.addEventListener('click', () => fundSelect(E[+x.dataset.e]))); })();
   const list = () => {
     const L = patRows();
     $('#patlist').innerHTML = L.length ? L.map(patItem).join('') : '<li class="empty">No patterns match.</li>';
