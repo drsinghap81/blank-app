@@ -1848,9 +1848,11 @@ function wireStyle(id, group, redraw) {
     setStyle(group, b.dataset.st); el.querySelectorAll('button').forEach((x) => x.setAttribute('aria-selected', x === b)); redraw();
   }));
 }
-function priceSeries(ch, rows, group) {
+function priceSeries(ch, rows, group, sym) {
+  /* 17 Nov 2026: sym = the stock this chart shows (the live bar used state.selected, which on the Bottoms / support / VCP
+     charts was a different, earlier-selected stock - its live price appeared as a stray candle) */
   const v = state.style[group] || getStyle(group);
-  state._ps = { sym: state.selected, rows, line: v === 'line', s: null };
+  state._ps = { sym: sym !== undefined ? sym : state.selected, rows, line: v === 'line', s: null };
   if (v === 'line') {
     const s = ch.addLineSeries({ color: C.ink, lineWidth: 2, priceLineVisible: true, lastValueVisible: true });
     s.setData(rows.map((r) => ({ time: r.time, value: r.close }))); state._ps.s = s; liveBar(); return s;
@@ -2937,7 +2939,7 @@ async function drawSup(r) {
   catch (e) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; }
   box.innerHTML = '';
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
-  const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath');
+  const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath', r.kind === 'index' ? '' : r.symbol);
   s.createPriceLine({ price: r.level, color: '#0A7A55', lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'support' });
   s.createPriceLine({ price: r.stop, color: C.fall || '#C62828', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'stop' });
   if (r.resistance != null) s.createPriceLine({ price: r.resistance, color: C.saffron, lineWidth: 1, lineStyle: 0, axisLabelVisible: true, title: 'resistance' });
@@ -2975,7 +2977,7 @@ async function drawVcp(r, mk) {
   catch (e) { box.innerHTML = '<p class="muted pad">Chart not available yet — it appears after the next evening scan.</p>'; return; }
   box.innerHTML = '';
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
-  const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath');
+  const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath', r.kind === 'index' ? '' : r.symbol);
   if (c.v) { const v = ch.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, color: 'rgba(140,150,170,.45)', lastValueVisible: false, priceLineVisible: false });
     ch.priceScale('vol').applyOptions({ scaleMargins: { top: 0.8, bottom: 0 } }); v.setData(c.t.map((t, i) => (c.v[i] == null ? { time: t } : { time: t, value: c.v[i] }))); }
   let e50 = c.ema50; if (!e50) { let m = null; e50 = c.c.map((x) => (m = m == null ? x : m + (2 / 51) * (x - m))); }
@@ -3020,7 +3022,7 @@ async function drawPat(r) {
   catch (e) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; }
   box.innerHTML = '';
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
-  const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath');
+  const s = priceSeries(ch, c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })), 'ath', r.kind === 'index' ? '' : r.symbol);
   s.createPriceLine({ price: r.neck, color: C.saffron, lineWidth: 2, lineStyle: 0, axisLabelVisible: true, title: 'neckline' });
   { const q = patPlan(r);
     s.createPriceLine({ price: q.tgt, color: C.rise || '#0A7A55', lineWidth: 2, lineStyle: 2, axisLabelVisible: true, title: 'target' });
