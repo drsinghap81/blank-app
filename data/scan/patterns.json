@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-17T05:47+00:00",
+"generated": "2026-11-17T05:54+00:00",
 "asof": "2026-11-16",
 "market": "NSE",
 "regime": {
@@ -1258,6 +1258,46 @@
 "days_since": null,
 "target": 493.3,
 "sl": 424.94
+},
+{
+"symbol": "RAJESH.BO",
+"name": "RAJESH POWER SERVICES LIMITED",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 811.3499755859375,
+"neck": 830.7000122070312,
+"to_neck_pct": 2.3849186175324277,
+"stop": 718.79,
+"stop_pct": 11.408207365021916,
+"height_pct": 13.708853067894932,
+"fall_pct": 112.14436828340504,
+"lows": [
+[
+"2026-10-09",
+732.8499755859375
+],
+[
+"2026-10-23",
+730.5499877929688
+]
+],
+"peaks": [
+[
+"2026-10-15",
+830.7000122070312
+]
+],
+"rsi_lows": [
+36.7,
+39.1
+],
+"rsi_div": 2.4,
+"rsi_now": 57.4,
+"signal_date": null,
+"days_since": null,
+"target": 930.85,
+"sl": 797.47
 },
 {
 "symbol": "KSCL",
