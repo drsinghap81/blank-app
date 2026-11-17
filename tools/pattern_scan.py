@@ -123,6 +123,8 @@ def scan(x, sym, name, kind="stock"):
                         row["outcome"] = "sl"; row["outcome_date"] = str(dts[j].date()); break
                     if hg[j] >= tgt:
                         row["outcome"] = "target"; row["outcome_date"] = str(dts[j].date()); break
+                if row.get("outcome") == "target":
+                    continue                               # 17 Nov 2026: target already reached - the trade is over, not listed
             if best is None or (row["status"] == "breakout") > (best["status"] == "breakout"):
                 best = row
         if best:

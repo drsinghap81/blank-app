@@ -2695,7 +2695,7 @@ const PAT_NM = { DB: 'Double bottom', TW: 'Tilted W', TB: 'Triple bottom', IHS: 
 function patRows() {
   const P = state.pat; if (!P) return [];
   const f = state.patF || 'all'; const ty = state.patT || 'all'; const q = (state.patQ || '').toLowerCase();
-  return (P.rows || []).filter((r) => (f === 'all' || r.status === f) && (ty === 'all' || r.typ === ty)
+  return (P.rows || []).filter((r) => patPlan(r).out !== 'target' && (f === 'all' || r.status === f) && (ty === 'all' || r.typ === ty)
     && (!q || r.symbol.toLowerCase().includes(q) || (r.name || '').toLowerCase().includes(q)));
 }
 /* 17 Nov 2026: classic neckline rule for bottoms - enter on a daily CLOSE above the neckline; stop 4% under the neckline
@@ -2740,7 +2740,7 @@ async function loadBottoms() {
   const P = await botData('pat');
   if (!P) { el.innerHTML = botTabs('pat') + botMkSeg() + `<p class="empty">The ${MKT[bmk].name} pattern scan appears after its first evening run.</p>`; botTabsWire(el); $('#asof').textContent = ''; return; }
   $('#asof').textContent = `${MKT[bmk].name} close ${closeTxt(bmk, P.asof)}${updTxt(P.generated)}`;
-  const R = P.rows || []; const nb = R.filter((r) => r.status === 'breakout').length; const nf = R.length - nb;
+  const R = (P.rows || []).filter((r) => patPlan(r).out !== 'target'); const nb = R.filter((r) => r.status === 'breakout').length; const nf = R.length - nb;
   const cnt = (t) => R.filter((r) => r.typ === t).length;
   const seg = (id, cur, opts) => `<div class="seg" id="${id}">${opts.map(([k, n]) => `<button data-k="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
   el.innerHTML = `${botTabs('pat')}${botMkSeg()}${botWatch(bmk)}<section class="summary">
@@ -5464,7 +5464,7 @@ async function tdRender2(el) {
   const trdRows = [
     ...(mk === 'NSE' ? [{ n: vcp ? (vcp.rows || []).length : null, name: 'VCP setups', sub: 'Tightening bases, pivot buy points', go: () => show('trends') }] : []),
     { n: ipo ? ((ipo.breakouts || []).filter((r) => r.status === 'open').length + (ipo.near || []).length) : null, name: 'IPO cups', sub: 'First base after listing', go: () => goAth(mk, 'ipo') },
-    { n: pat ? (pat.rows || []).filter((r) => r.kind === 'stock').length : null, name: 'Chart patterns', sub: 'Double bottoms, inverse H&S… (tested: watch only)', go: () => show('bot') },
+    { n: pat ? (pat.rows || []).filter((r) => r.kind === 'stock' && patPlan(r).out !== 'target').length : null, name: 'Chart patterns', sub: 'Double bottoms, inverse H&S… (tested: watch only)', go: () => show('bot') },
     ...(mk === 'NSE' ? [{ n: null, name: 'Top Bottom · Bank Nifty futures', sub: 'On pledged holdings · dry run until you switch', go: () => show('tb') }] : [])];
   const tuShow = [...tuNew, ...tuEx, ...tuIn.filter((r) => !r.new), ...TU.filter((r) => r.status === 'flat').sort((a, b) => a.dist_pct - b.dist_pct).slice(0, 3)];
   state._tuShow = tuShow;
