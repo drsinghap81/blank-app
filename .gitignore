@@ -180,3 +180,4 @@ tools/moomoo_rsi2/journal_*.csv
 tools/moomoo_rsi2/PAUSE
 tools/moomoo_rsi2/.lock_*
 tools/moomoo_rsi2/bot.log
+optcache/
