@@ -2621,8 +2621,9 @@ def us_watch_check(t=None, mk="US"):
         elif px <= w["stop"] * 1.03:
             alert("exit", sym, f"{N} {sym}: {px:.2f}, within 3% of the stop {w['stop']:.2f}.", key=f"{K}near:{sym}:{day}", mk=mk)
         if w.get("target") and px >= w["target"]:
-            alert("raised", sym, f"{N} {sym}: target {w['target']:.2f} reached ({px:.2f}). Breakout retest rule: take the profit.",
-                  key=f"{K}tgt:{sym}:{day}", mk=mk)
+            why = ("Breakout retest rule: take the profit." if w.get("system") == "Breakout retest" else
+                   f"{w.get('system')} has no fixed target: the system keeps holding with its trailing stop; booking here is your call.")
+            alert("raised", sym, f"{N} {sym}: target {w['target']:.2f} reached ({px:.2f}). {why}", key=f"{K}tgt:{sym}:{day}", mk=mk)
     try:
         P = mkt_plan(mk)
         for e in P.get("exits") or []:
