@@ -1132,7 +1132,7 @@ async function loadLive() {
         <p class="lv-sub">Not part of your tested 60/40 split. The same lists live on Trading (VCP, 9/21 any stock, retest, patterns) and Momentum investing (near trigger); they stay here only so you can still Send one if you choose.</p>
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
-    ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="inj"></div>' : ''}`)}
+    ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
     ${S && isOwner() ? pane('fut', '<div id="tbcard"></div><div id="tbcardn"></div>') : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
@@ -1162,7 +1162,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); perfVsCard($('#pvin'), 'IN'); usJournalCard($('#inj'), 'IN'); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); perfVsCard($('#pvin'), 'IN'); foCard($('#focard')); usJournalCard($('#inj'), 'IN'); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -5251,6 +5251,31 @@ async function usJournalPdf(C, H, S, fx, mk) {
       y = table(y, ['Date', 'Stop', 'Change', 'vs entry'], L.map((x) => [x[0], f2(x[1]), x[2], `${f2((x[1] / t.entry - 1) * 100)}%`]), [30, 30, 30, 30]); }
   }
   tmp.remove(); foot(); doc.save(`trade_journal_${AU ? 'australia' : IN ? 'india' : 'us'}_${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+/* 17 Nov 2026: F&O / MCX positions in Angel (read only), each tracked on a trend system of its underlying futures:
+   exit on a close beyond the 10-day high/low against you, target a 20-day break in your favour, expiry warning. */
+async function foCard(box) {
+  if (!box) return; const c = lvCfg(); if (!c.url || !c.token) { box.innerHTML = ''; return; }
+  let W, P; try { [W, P] = await Promise.all([lvApi('/api/fo/watch', { timeout: 40000 }), lvApi('/api/fo/positions', { timeout: 40000 }).catch(() => ({ positions: [] }))]); } catch (e) {
+    box.innerHTML = `<div class="lv-card"><b>F&amp;O positions · trend watch</b><p class="lv-sub">${/404|Not Found/i.test(e.message) ? 'Your server picks this up at its next update (outside Indian market hours).' : 'Could not reach your server: ' + esc(e.message)}</p></div>`; return; }
+  const I = W.items || []; const un = (P.positions || []).filter((p) => !p.tracked);
+  const r0 = (v) => (v == null ? '–' : fmt(v, 2, 'en-IN')); const rs = (v) => (v == null ? '–' : `${v >= 0 ? '+' : '−'}₹${fmt(Math.abs(v), 0, 'en-IN')}`);
+  const rows = I.map((t) => { const L = t.levels || {}; const sh = L.view === 'short';
+    return `<div class="lv-row lv-trade"><div><div class="lv-sym">${esc(t.tsym)} <span class="chip">${t.netqty > 0 ? 'Bought' : 'Sold'} ${Math.abs(t.netqty)}</span> <span class="chip">${sh ? 'short view' : 'long view'}</span>${t.status !== 'open' ? ` <span class="chip exit">${esc(t.status)}</span>` : ''}
+        <b class="${(t.pnl || 0) >= 0 ? 'up' : 'down'}" style="margin-left:auto">${rs(t.pnl)}</b></div>
+      <div class="lv-sub">Premium ${r0(t.avg)} → ${r0(t.ltp)} · ${esc(t.und_tsym)} ${r0(t.und_ltp)}${t.days_left != null ? ` · ${t.days_left} days to expiry` : ''}</div>
+      ${L.stop ? `<div class="lv-sub"><b class="down">Exit</b> if ${esc(t.und_tsym)} closes ${sh ? 'above' : 'below'} <b>${r0(L.stop)}</b> (10-day ${sh ? 'high' : 'low'}, ${fmt(Math.abs(L.to_stop_pct), 1)}% away) · <b class="up">Target</b> ${sh ? 'below' : 'above'} <b>${r0(L.target)}</b> (20-day ${sh ? 'low' : 'high'}) · as of ${esc(day(L.day))} close</div>` : '<div class="lv-sub">Levels after the next close.</div>'}
+      ${L.exit ? `<div class="lv-sub down"><b>Exit signal:</b> the close went ${sh ? 'above the 10-day high' : 'below the 10-day low'}. Exit at the next session in Angel.</div>` : L.target_hit ? `<div class="lv-sub up"><b>Target reached:</b> book it, or keep it with the 10-day exit as the stop.</div>` : ''}
+      <div class="lv-sub"><a href="#" data-form="${esc(t.tsym)}">Stop tracking</a></div></div><div></div></div>`; }).join('');
+  box.innerHTML = `<div class="lv-card" data-fold="skip"><b>F&amp;O positions · trend watch</b>
+    <p class="lv-sub">Your Angel option / futures positions (MCX, NFO), read only. System: trend levels on the underlying futures — exit on a close beyond the 10-day high/low against you, target a 20-day break your way (Turtle 20/10 mirrored; not backtested on the short side). Alerts after each close (MCX 11:40 pm IST) and 7 days before expiry. You exit in Angel.</p>
+    ${rows || '<p class="empty">Nothing tracked yet.</p>'}
+    ${un.length ? `<p class="lv-sub"><b>Open in Angel, not tracked (${un.length})</b></p>${un.map((p) => `<div class="tl-add"><span><b>${esc(p.tsym)}</b> · ${p.netqty > 0 ? 'bought' : 'sold'} ${Math.abs(p.netqty)} @ ${r0(p.avg)} · ${rs(p.pnl)}</span> <button class="lv-btn" data-foadd="${esc(p.tsym)}">Track</button></div>`).join('')}` : ''}
+    ${I.length ? '<p class="t2-row"><button class="lv-link" id="focheck">Check levels now</button></p>' : ''}</div>`;
+  const post = async (body, msg) => { try { await lvApi('/api/fo/watch', { method: 'POST', body: JSON.stringify(body), timeout: 60000 }); alertMsg(msg, true); } catch (e) { alertMsg('Could not save: ' + e.message); } foCard(box); };
+  box.querySelectorAll('[data-foadd]').forEach((b) => b.addEventListener('click', () => { b.disabled = true; b.textContent = 'Adding…'; post({ action: 'add', tsym: b.dataset.foadd }, `Tracking ${b.dataset.foadd}`); }));
+  box.querySelectorAll('[data-form]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); post({ action: 'remove', tsym: b.dataset.form }, 'Stopped tracking'); }));
+  const ck = box.querySelector('#focheck'); if (ck) ck.addEventListener('click', async () => { ck.disabled = true; ck.textContent = 'Checking…'; try { await lvApi('/api/fo/check', { method: 'POST', timeout: 90000 }); } catch (e) { alertMsg('Check failed: ' + e.message); } foCard(box); });
 }
 /* 17 Nov 2026: portfolio vs market, day by day. Day % = holdings' change on their previous close (cash and new money don't
    distort it). India = all Angel holdings vs Nifty 50; US = your moomoo holdings vs S&P 500. Rows recorded at each close;

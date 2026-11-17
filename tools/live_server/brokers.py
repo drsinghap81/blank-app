@@ -300,6 +300,55 @@ class AngelEquity:
         time.sleep(0.6)                                      # Angel: ~3 historical calls a second (kept below it)
         return out
 
+    # ---- F&O / MCX (17 Nov 2026): read-only helpers for the derivatives watch (no orders)
+    def fo_positions(self):
+        """Open NFO / MCX / BFO / CDS positions from Angel's position book (read only)."""
+        api = self._session(); out = []
+        for p in (self._data(self._call(api.position)) or []):
+            if p.get("exchange") not in ("MCX", "NFO", "BFO", "CDS") or int(float(p.get("netqty") or 0)) == 0:
+                continue
+            nq = int(float(p.get("netqty") or 0))
+            out.append(dict(exchange=p.get("exchange"), tsym=p.get("tradingsymbol"), token=str(p.get("symboltoken")), name=p.get("symbolname") or p.get("name"),
+                            netqty=nq, side="BUY" if nq > 0 else "SELL", avg=float(p.get("avgnetprice") or p.get("buyavgprice" if nq > 0 else "sellavgprice") or 0),
+                            ltp=float(p.get("ltp") or 0), pnl=float(p.get("unrealised") or p.get("pnl") or 0), lotsize=int(float(p.get("lotsize") or 1)),
+                            expiry=p.get("expirydate"), strike=float(p.get("strikeprice") or 0) or None, opt=p.get("optiontype") or None,
+                            itype=p.get("instrumenttype"), product=p.get("producttype")))
+        return out
+
+    def _master(self):
+        if getattr(self, "_mst", None) is None:
+            self._session()
+            path = os.path.join(self.cache_dir, f"scrip_master_{date.today()}.json")
+            self._mst = json.load(open(path)) if os.path.exists(path) else requests.get(MASTER_URL, timeout=120).json()
+        return self._mst
+
+    def fut_for(self, exchange, name, min_expiry):
+        """The futures contract of `name` on `exchange` with the nearest expiry on/after min_expiry (datetime.date)."""
+        best = None
+        for x in self._master():
+            if x.get("exch_seg") == exchange and x.get("name") == name and str(x.get("instrumenttype", "")).startswith("FUT"):
+                try:
+                    e = datetime.strptime(x["expiry"], "%d%b%Y").date()
+                except Exception:  # noqa: BLE001
+                    continue
+                if e >= min_expiry and (best is None or e < best[0]):
+                    best = (e, x["symbol"], str(x["token"]))
+        return best
+
+    def candles_ex(self, exchange, token, days=60):
+        """Daily candles for any exchange token: list of (date, o, h, l, c), today's included (the caller decides)."""
+        api = self._session(); now = ist_now()
+        r = self._call(api.getCandleData, dict(exchange=exchange, symboltoken=str(token), interval="ONE_DAY",
+                                                fromdate=(now - timedelta(days=days)).strftime("%Y-%m-%d 09:00"),
+                                                todate=now.strftime("%Y-%m-%d %H:%M")), tries=4) or {}
+        time.sleep(0.6)
+        return [(str(x[0])[:10], float(x[1]), float(x[2]), float(x[3]), float(x[4])) for x in (self._data(r) or [])]
+
+    def ltp_ex(self, exchange, tsym, token):
+        api = self._session()
+        d = self._data(self._call(api.ltpData, exchange, tsym, str(token))) or {}
+        return float(d.get("ltp") or 0)
+
     def gtt_cancel(self, rule_id, symbol):
         api = self._session(); ts, t = self._ts(symbol)
         r = self._call(api._postRequest, "api.gtt.cancel", dict(id=str(rule_id), symboltoken=str(t["token"]), exchange="NSE"), tries=2) or {}
@@ -526,6 +575,18 @@ class MockBroker(AngelEquity):
 
     def trades(self):
         return list(self.fills)
+
+    def fo_positions(self):
+        return list(getattr(self, "fo", []))
+
+    def fut_for(self, exchange, name, min_expiry):
+        return getattr(self, "fut", None)
+
+    def candles_ex(self, exchange, token, days=60):
+        return list(getattr(self, "fcandles", []))
+
+    def ltp_ex(self, exchange, tsym, token):
+        return getattr(self, "fltp", {}).get(tsym, 0.0)
 
     def quotes(self, symbols):
         return {s: dict(ltp=100.0 + i, prev=99.0 + i, high=101.0 + i, low=98.0 + i, open=99.5 + i) for i, s in enumerate(symbols)}

@@ -2990,6 +2990,162 @@ def history(mk: str = "NSE", syms: str = "", rng: str = "1y", _=Depends(auth)):
     return out
 
 
+# ------------------------------------------------------------------ F&O / MCX positions watch (17 Nov 2026)
+# Option / futures positions in the Angel account (MCX, NFO), read only, put into a trend system on the underlying futures:
+#   short view (put bought, call or futures sold): exit when the underlying CLOSES above its 10-day high; target = a break of
+#   its 20-day low (Turtle 20/10 mirrored; not tested on the short side). Long view: the mirror. Alerts after the close
+#   (MCX 23:30 IST, NFO 15:30), plus 7 days before expiry. Never places or closes an order.
+FO_RULE = {"trend": "Trend levels on the underlying futures: exit on a close beyond the 10-day high/low against you, target a 20-day break in your favour"}
+
+
+def fo_load():
+    try:
+        return json.load(open(os.path.join(DATA, "fo_watch.json")))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def fo_save(W):
+    tmp = os.path.join(DATA, "fo_watch.json.tmp"); json.dump(W, open(tmp, "w"), indent=1); os.replace(tmp, os.path.join(DATA, "fo_watch.json"))
+
+
+def _fo_short(it):
+    return (it.get("opt") == "PE" and it["netqty"] > 0) or (it.get("opt") == "CE" and it["netqty"] < 0) or (not it.get("opt") and it["netqty"] < 0)
+
+
+def _fo_closed_candles(it):
+    C = broker.candles_ex(it["und_exchange"], it["und_token"], 60)
+    t = ist_now(); close_at = (23, 35) if it["und_exchange"] == "MCX" else (15, 35)
+    if C and C[-1][0] == t.date().isoformat() and (t.hour, t.minute) < close_at:
+        C = C[:-1]
+    return C
+
+
+def fo_levels(it):
+    C = _fo_closed_candles(it)
+    if len(C) < 22:
+        return None
+    last = C[-1]; prev10, prev20 = C[-11:-1], C[-21:-1]
+    hi10, lo10 = max(x[2] for x in prev10), min(x[3] for x in prev10)
+    hi20, lo20 = max(x[2] for x in prev20), min(x[3] for x in prev20)
+    short = _fo_short(it)
+    stop, tgt = (hi10, lo20) if short else (lo10, hi20)
+    exit_ = last[4] > hi10 if short else last[4] < lo10
+    hit = last[3] < lo20 if short else last[2] > hi20
+    return dict(day=last[0], close=round(last[4], 2), stop=round(stop, 2), target=round(tgt, 2), exit=bool(exit_), target_hit=bool(hit),
+                view="short" if short else "long", to_stop_pct=round((stop / last[4] - 1) * 100 * (1 if short else -1), 2))
+
+
+def _fo_days_left(it):
+    try:
+        return (datetime.strptime(it["expiry"], "%d%b%Y").date() - ist_now().date()).days
+    except Exception:  # noqa: BLE001
+        return None
+
+
+@app.get("/api/fo/positions")
+def fo_positions(_=Depends(auth)):
+    W = fo_load()
+    try:
+        P = broker.fo_positions()
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(502, f"couldn't read Angel positions: {str(ex)[:120]}")
+    return dict(positions=[dict(p, tracked=p["tsym"] in W) for p in P])
+
+
+class FOReq(BaseModel):
+    action: str            # add | remove
+    tsym: str
+    system: str = "trend"
+
+
+@app.post("/api/fo/watch")
+def fo_watch_set(body: FOReq, _=Depends(auth)):
+    W = fo_load()
+    if body.action == "remove":
+        W.pop(body.tsym, None); fo_save(W); return dict(ok=True)
+    p = next((x for x in broker.fo_positions() if x["tsym"] == body.tsym), None)
+    if not p:
+        raise HTTPException(404, "that position isn't open in Angel")
+    exp = None
+    try:
+        exp = datetime.strptime(p["expiry"], "%d%b%Y").date()
+    except Exception:  # noqa: BLE001
+        pass
+    und = (p["exchange"], p["tsym"], p["token"]) if not p.get("opt") else None
+    if p.get("opt"):
+        f = broker.fut_for(p["exchange"], p["name"], exp or ist_now().date())
+        if not f:
+            raise HTTPException(404, f"no {p['name']} futures found for the option's underlying")
+        und = (p["exchange"], f[1], f[2])
+    mult = round(p["pnl"] / ((p["ltp"] - p["avg"]) * p["netqty"]), 4) if p["ltp"] != p["avg"] and p["netqty"] else None
+    it = dict(p, system=body.system, rule=FO_RULE.get(body.system, body.system), und_exchange=und[0], und_tsym=und[1], und_token=und[2],
+              mult=mult, since=ist_now().date().isoformat(), status="open")
+    lv = None
+    try:
+        lv = fo_levels(it)
+    except Exception as ex:  # noqa: BLE001
+        log("fo_levels_error", tsym=body.tsym, error=str(ex)[:160])
+    it["levels"] = lv; W[body.tsym] = it; fo_save(W)
+    return dict(ok=True, item=it)
+
+
+@app.get("/api/fo/watch")
+def fo_watch_get(_=Depends(auth)):
+    W = fo_load(); out = []
+    try:
+        P = {x["tsym"]: x for x in broker.fo_positions()}
+    except Exception:  # noqa: BLE001
+        P = None
+    for k, it in W.items():
+        it = dict(it); p = (P or {}).get(k)
+        if p:
+            it.update(ltp=p["ltp"], pnl=p["pnl"], netqty=p["netqty"], avg=p["avg"])
+        elif P is not None:
+            it["status"] = "not in Angel any more"
+        try:
+            it["und_ltp"] = broker.ltp_ex(it["und_exchange"], it["und_tsym"], it["und_token"])
+        except Exception:  # noqa: BLE001
+            it["und_ltp"] = None
+        it["days_left"] = _fo_days_left(it)
+        out.append(it)
+    return dict(items=out)
+
+
+def fo_check(eod=True):
+    """after the close: refresh levels, alert exits / targets / expiry. Alerts only."""
+    W = fo_load()
+    if not W:
+        return []
+    day = ist_now().date().isoformat(); out = []
+    for k, it in W.items():
+        if it.get("status") != "open":
+            continue
+        try:
+            lv = fo_levels(it)
+        except Exception as ex:  # noqa: BLE001
+            log("fo_check_error", tsym=k, error=str(ex)[:160]); continue
+        if not lv:
+            continue
+        it["levels"] = lv; out.append(dict(tsym=k, **lv)); und = it["und_tsym"]
+        if lv["exit"]:
+            alert("exit", k, f"{k}: exit signal — {und} closed {lv['close']:,.0f}, {'above its 10-day high' if lv['view'] == 'short' else 'below its 10-day low'} "
+                  f"{lv['stop']:,.0f}. The trend turned against the {lv['view']} view; exit at the next session in Angel.", key=f"foexit:{k}:{lv['day']}")
+        elif lv["target_hit"]:
+            alert("raised", k, f"{k}: target — {und} broke its 20-day {'low' if lv['view'] == 'short' else 'high'} {lv['target']:,.0f}. Book it, or keep it with the 10-day exit "
+                  f"({lv['stop']:,.0f}) as the stop.", key=f"fotgt:{k}:{lv['day']}")
+        d = _fo_days_left(it)
+        if d is not None and d <= 7:
+            alert("exit", k, f"{k}: {d} days to expiry. Time value falls fast now; decide to exit or roll.", key=f"foexp:{k}:{day}")
+    fo_save(W)
+    return out
+
+
+@app.post("/api/fo/check")
+def fo_check_now(_=Depends(auth)):
+    return dict(results=fo_check())
+
+
 # ------------------------------------------------------------------ portfolio vs market, day by day (17 Nov 2026)
 # Day % = sum(shares x (close - previous close)) / sum(shares x previous close) over the holdings, so cash and new money
 # don't distort it (the usual "day's change %"). India = all Angel holdings vs Nifty 50; US = "Your moomoo holdings" vs S&P 500.
@@ -3282,6 +3438,10 @@ def _loop():
                 us_watch_check(mk="ASX")
             if _sy.weekday() < 5 and (16, 20) <= (_sy.hour, _sy.minute) <= (16, 50) and _HB.get("asx_eod") != _sy.date():
                 _HB["asx_eod"] = _sy.date(); us_watch_eod(_sy, mk="ASX"); perf_record("ASX")
+            if t.weekday() < 5 and (23, 40) <= (t.hour, t.minute) <= (23, 58) and _HB.get("fo_mcx") != t.date():
+                _HB["fo_mcx"] = t.date(); fo_check()
+            if t.weekday() < 5 and (15, 40) <= (t.hour, t.minute) <= (16, 30) and _HB.get("fo_nfo") != t.date():
+                _HB["fo_nfo"] = t.date(); fo_check()
             if t.weekday() < 5 and (15, 40) <= (t.hour, t.minute) <= (16, 30) and _HB.get("perf_in") != t.date():
                 _HB["perf_in"] = t.date(); perf_record("IN")
             if _et.weekday() < 5 and (16, 10) <= (_et.hour, _et.minute) <= (16, 40) and _HB.get("perf_us") != _et.date():

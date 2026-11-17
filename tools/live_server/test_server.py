@@ -933,3 +933,22 @@ def test_asx_watch_journal(tmp_path):
     assert A.us_watch_load("ASX")["ANZ"]["qty"] == 100 and not A.us_journal_load("US")
     A.us_watch_check(A.mk_now("ASX"), mk="ASX")                       # 39.5 low is above the 37.9 stop: no stop alert
     assert not any("stop 37.90 hit" in a["text"] for a in A.alerts_load()["items"])
+
+
+def test_fo_watch(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    A.broker.fo = [dict(exchange="MCX", tsym="GOLDM29DEC26140000PE", token="1", name="GOLDM", netqty=5, side="BUY", avg=6862.5, ltp=6900.0,
+                        pnl=1875.0, lotsize=1, expiry="29DEC2026", strike=140000.0, opt="PE", itype="OPTFUT", product="CARRYFORWARD")]
+    A.broker.fut = ("2027-01-05", "GOLDM05JAN27FUT", "9")
+    import datetime as dt
+    days = [(dt.date(2026, 10, 1) + dt.timedelta(days=i)).isoformat() for i in range(30)]
+    A.broker.fcandles = [(d, 130000.0, 131000.0 + i * 10, 129000.0 - i * 10, 130000.0) for i, d in enumerate(days)]
+    A.broker.fcandles[-1] = (days[-1], 130000.0, 132000.0, 129500.0, 131500.0)   # last close above the 10-day high
+    A.broker.fltp = {"GOLDM05JAN27FUT": 131400.0}
+    assert any(p["tsym"] == "GOLDM29DEC26140000PE" for p in c.get("/api/fo/positions", headers=h).json()["positions"])
+    r = c.post("/api/fo/watch", headers=h, json=dict(action="add", tsym="GOLDM29DEC26140000PE")).json()
+    it = r["item"]; assert it["und_tsym"] == "GOLDM05JAN27FUT" and it["mult"] == 10.0 and it["levels"]["view"] == "short"
+    assert it["levels"]["exit"] and it["levels"]["stop"] == 131280.0 and it["levels"]["target"] == 128720.0
+    A.fo_check(); assert any("exit signal" in a["text"] for a in A.alerts_load()["items"])
+    j = c.get("/api/fo/watch", headers=h).json()["items"][0]; assert j["und_ltp"] == 131400.0 and j["pnl"] == 1875.0
