@@ -72,7 +72,7 @@ def nse_symbols(bse=False):
     u["ticker"] = u.symbol + ".NS"
     if bse:
         try:
-            b = bse_only(set(u.isin) - {""})
+            b = bse_only(set(u["isin"]) - {""})
             if len(b):
                 u = pd.concat([u, b])
         except Exception as e:  # noqa: BLE001
