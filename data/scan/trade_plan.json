@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-17 00:21 UTC",
+"generated": "2026-11-17 00:27 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-16",
@@ -748,18 +748,6 @@
 "group_rank": 57
 },
 {
-"symbol": "HDFCAMC",
-"name": "HDFC Asset Management Company Limited",
-"typ": "DB",
-"close": 2663.0,
-"neck": 2415.0,
-"stop": 2193.44,
-"signal_date": "2026-11-03",
-"group": "Asset Management",
-"lane": "mid",
-"group_rank": 39
-},
-{
 "symbol": "FRACTAL",
 "name": "Fractal Analytics Limited",
 "typ": "TW",
@@ -784,18 +772,6 @@
 "group_rank": 45
 },
 {
-"symbol": "HDFCBANK",
-"name": "HDFC Bank Limited",
-"typ": "DB",
-"close": 804.0,
-"neck": 739.5,
-"stop": 671.86,
-"signal_date": "2026-11-05",
-"group": "Banks - Private Large",
-"lane": "mid",
-"group_rank": 6
-},
-{
 "symbol": "ICICIBANK",
 "name": "ICICI Bank Limited",
 "typ": "TW",
@@ -806,18 +782,6 @@
 "group": "Banks - Private Large",
 "lane": "mid",
 "group_rank": 6
-},
-{
-"symbol": "MARATHON",
-"name": "Marathon Nextgen Realty Limited",
-"typ": "DB",
-"close": 435.8999938964844,
-"neck": 382.6000061035156,
-"stop": 345.46,
-"signal_date": "2026-11-02",
-"group": null,
-"lane": null,
-"group_rank": null
 },
 {
 "symbol": "SESHAPAPER",
@@ -880,18 +844,6 @@
 "group_rank": 32
 },
 {
-"symbol": "ANURAS",
-"name": "Anupam Rasayan India Limited",
-"typ": "DB",
-"close": 1300.5999755859375,
-"neck": 1187.0,
-"stop": 1066.72,
-"signal_date": "2026-11-09",
-"group": "Specialty Chemicals",
-"lane": "fade",
-"group_rank": 38
-},
-{
 "symbol": "IOC",
 "name": "Indian Oil Corporation Limited",
 "typ": "TB",
@@ -935,6 +887,54 @@
 "neck": 331.75,
 "stop": 283.63,
 "signal_date": "2026-11-04",
+"group": "Building Materials",
+"lane": "weak",
+"group_rank": 65
+},
+{
+"symbol": "AURIONPRO",
+"name": "Aurionpro Solutions Limited",
+"typ": "DB",
+"close": 586.8499755859375,
+"neck": 582.6500244140625,
+"stop": 528.66,
+"signal_date": "2026-11-05",
+"group": "Software - Application",
+"lane": "weak",
+"group_rank": 34
+},
+{
+"symbol": "EUROPRATIK",
+"name": "Euro Pratik Sales Limited",
+"typ": "TW",
+"close": 188.9499969482422,
+"neck": 196.19000244140625,
+"stop": 157.51,
+"signal_date": "2026-11-05",
+"group": "Building Materials",
+"lane": "weak",
+"group_rank": 65
+},
+{
+"symbol": "IXIGO",
+"name": "Le Travenues Technology Limited",
+"typ": "DB",
+"close": 163.19000244140625,
+"neck": 157.0800018310547,
+"stop": 134.99,
+"signal_date": "2026-11-05",
+"group": "Travel Services",
+"lane": "weak",
+"group_rank": 83
+},
+{
+"symbol": "JKCEMENT",
+"name": "JK Cement Limited",
+"typ": "DB",
+"close": 5155.10009765625,
+"neck": 5184.5,
+"stop": 4653.99,
+"signal_date": "2026-11-05",
 "group": "Building Materials",
 "lane": "weak",
 "group_rank": 65
