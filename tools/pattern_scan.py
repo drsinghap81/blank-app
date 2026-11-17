@@ -333,8 +333,7 @@ def main(mk="NSE"):
         tk = lambda s_: (s_.replace("/", "-").replace(".", "-") if mk == "US" else s_) + g["suf"]  # noqa: E731
         jobs = [(tk(s_), s_, n_, "stock") for s_, n_ in sorted(mem.items())] + [(t, n_, n_, "index") for t, n_ in g["idx"].items()]
     else:
-        u = nse_symbols(); u = u[u.board == "main"] if "board" in u else u
-        u["ticker"] = u.symbol + ".NS"; name = dict(zip(u.symbol, u.name)) if "name" in u else {}
+        u = nse_symbols(bse=True); name = dict(zip(u.symbol, u.name)) if "name" in u else {}   # 17 Nov 2026: + SME, liquid BSE-only
         jobs = [(t, s, name.get(s, s), "stock") for t, s in zip(u.ticker, u.symbol)] + [(t, n_, n_, "index") for t, n_ in INDICES.items()]
     rows, srows, vrows, asof = [], [], [], None
     for a in range(0, len(jobs), 80):

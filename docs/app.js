@@ -1666,7 +1666,7 @@ function rowHTML(r, i) {
     right = `<b>${fmt(r.close)}</b><span class="${r.r1m >= 0 ? 'up' : 'down'}">${pct(r.r1m)} 1M</span>`;
   }
   return `<li class="row" tabindex="0" data-i="${i}" ${state.selected === r.symbol ? 'aria-current="true"' : ''}>
-    <div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${chips}${pulseChip(r.symbol, state.mkt)}</div></div>
+    <div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${boardChip(r)}${chips}${pulseChip(r.symbol, state.mkt)}</div></div>
     ${sparkSVG(r.spark, t === 'new')}
     <div class="num">${right}</div></li>`;
 }
@@ -1751,6 +1751,7 @@ function panelMk() {
 }
 function tvSym(sym, mk) {
   const s = String(sym || '').trim(); if (TV_IDX[s.toUpperCase()]) return TV_IDX[s.toUpperCase()];
+  if (/\.BO$/.test(s)) return 'BSE:' + s.slice(0, -3).replace(/[-&]/g, '_');   // BSE-only scrips (17 Nov 2026)
   return mk === 'NSE' ? 'NSE:' + s.replace(/[-&]/g, '_') : mk === 'ASX' ? 'ASX:' + s : mk === 'UK' ? 'LSE:' + s.replace('-', '.') : s.replace('-', '.');
 }
 const myKey = (mk) => 'td.mypicks_' + mk;
@@ -2247,8 +2248,8 @@ const valTxt = (v) => (AM() === 'NSE' ? `₹${fmt(v, 1, 'en-IN')} cr` : `${MKT[A
 const BENCH_NM = { NSE: 'Nifty 50', US: 'S&P 500', ASX: 'ASX 200', UK: 'FTSE 100' };
 function athLinks(r) {
   const m = AM();
-  const tv = m === 'NSE' ? 'NSE:' + r.symbol : m === 'ASX' ? 'ASX:' + r.symbol : m === 'UK' ? 'LSE:' + r.symbol.replace('-', '.') : r.symbol.replace('.', '-');
-  const yh = m === 'US' ? r.symbol.replace('.', '-') : m === 'ASX' ? r.symbol + '.AX' : m === 'UK' ? r.symbol + '.L' : r.symbol + '.NS';
+  const tv = m === 'NSE' ? tvSym(r.symbol, 'NSE') : m === 'ASX' ? 'ASX:' + r.symbol : m === 'UK' ? 'LSE:' + r.symbol.replace('-', '.') : r.symbol.replace('.', '-');
+  const yh = m === 'US' ? r.symbol.replace('.', '-') : m === 'ASX' ? r.symbol + '.AX' : m === 'UK' ? r.symbol + '.L' : /\.BO$/.test(r.symbol) ? r.symbol : r.symbol + '.NS';
   return `<a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tv)}" target="_blank" rel="noopener">Open in TradingView</a>`
     + (m === 'NSE' ? `<a href="https://www.screener.in/company/${encodeURIComponent(r.symbol)}/" target="_blank" rel="noopener">Fundamentals on Screener</a>`
       : `<a href="https://finance.yahoo.com/quote/${encodeURIComponent(yh)}" target="_blank" rel="noopener">Yahoo Finance</a>`);
@@ -3531,7 +3532,8 @@ const ixNames = () => (state.ath && state.ath.sec && state.ath.sec.names) || {};
 const secName = (k) => ixNames()[k] || ({ 'NIFTY IT': 'IT', 'NIFTY FMCG': 'FMCG', 'NIFTY INDIA CONSUMPTION': 'Consumption', 'NIFTY SERVICES SECTOR': 'Services', 'NIFTY FINANCIAL SERVICES': 'Financials' }[k]
   || k.replace('NIFTY ', '').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()));
 const SECTOR_TXT = { leading: 'Sector leading', uptrend: 'Sector uptrend', mixed: 'Sector mixed', weak: 'Sector weak' };
-const secChip = (r) => (r.sector_tag ? `<span class="chip ${r.sector_tag === 'leading' ? 'new' : r.sector_tag === 'weak' ? 'exit' : r.sector_tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.sector_tag]}</span>` : '');
+const boardChip = (r) => (r && (r.board === 'SME' || r.board === 'BSE' || /\.BO$/.test(r.symbol || '')) ? `<span class="chip watch" title="Not in the trade plan: ${r.board === 'SME' ? 'SME lots' : 'BSE only'}">${r.board === 'SME' ? 'SME' : 'BSE only'}</span>` : '');   // 17 Nov 2026
+const secChip = (r) => boardChip(r) + (r.sector_tag ? `<span class="chip ${r.sector_tag === 'leading' ? 'new' : r.sector_tag === 'weak' ? 'exit' : r.sector_tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.sector_tag]}</span>` : '');
 const rsChip = (lab, v) => (v == null ? '' : `<span class="chip ${v > 0 ? 'open' : 'exit'}">${lab} ${v > 0 ? '+' : ''}${Number(v).toFixed(0)}%</span>`);
 // ---- Industry Pulse (our computation of group breadth): data/scan[/us|/asx]/group_pulse.json ----
 state.gp = state.gp || {};

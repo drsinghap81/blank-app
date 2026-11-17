@@ -40,6 +40,7 @@ OUT = "data/scan" if MARKET == "NSE" else f"data/scan/{MARKET.lower()}"
 CH = f"{OUT}/ath_charts"
 MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6, "UK": 1e8}[MARKET]          # Rs 2 cr / $5 m / A$1 m a day
 UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6, "UK": 1e8}[MARKET]            # value_cr field = traded value in Rs cr / $ m / A$ m
+BOARD = {}      # symbol -> main / SME / BSE (NSE run)
 MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0, "UK": 100.0}[MARKET]   # no penny stocks (30 Oct 2026)
 MCL_MIN = {"ASX": 1.0}.get(MARKET, MIN_CLOSE)   # 15 Nov 2026: month-close list only goes down to A$1 on the ASX (A$1 m/day still applies)
 BASE_MAIN, BASE_MIN = 24, 12
@@ -344,13 +345,12 @@ def main():
         SEC, BENCH = None, None
         stock_rs = lambda *a_: {}  # noqa: E731
     if MARKET == "NSE":
-        u = nse_symbols()
-        u = u[u.board == "main"] if "board" in u else u
-        u["ticker"] = u.symbol + ".NS"
+        u = nse_symbols(bse=True)                          # 17 Nov 2026: main board + SME + liquid BSE-only (Rs 100 / liquidity floors apply)
     else:
         from global_universe import symbols
         u = symbols(MARKET)
     name = dict(zip(u.symbol, u.name)) if "name" in u else {}
+    BOARD.update(dict(zip(u.symbol, u.board)) if "board" in u else {})
     sym_of = dict(zip(u.ticker, u.symbol))
     tick = list(u.ticker)
     print("symbols", len(tick), flush=True)
@@ -399,6 +399,8 @@ def main():
                             L_.pop()
                 if ev or nr:
                     rsd = stock_rs(sym, x.Close, SEC, BENCH)
+                    if BOARD.get(sym, "main") != "main":
+                        rsd = dict(rsd, board=BOARD[sym])
                     for e_ in ev:
                         e_.update(rsd)
                     if nr:

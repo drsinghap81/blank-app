@@ -47,7 +47,11 @@ s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple
                   "Referer": "https://www.nseindia.com/"})
 
 
-def nse_symbols():
+def nse_symbols(bse=False):
+    """NSE main board + NSE SME (Emerge); with bse=True also BSE-only scrips (17 Nov 2026: liquid, non-penny ones only, picked from
+    the latest BSE bhavcopy: close >= Rs 100 and that day's turnover >= Rs 50 lakh, equity codes, ISIN not listed on NSE).
+    BSE-only symbols carry Yahoo's .BO suffix (e.g. ABCD.BO) so they never clash with an NSE symbol; the scans' own 20-day
+    Rs 1 crore and Rs 100 floors still apply."""
     rows = []
     for u, board in (("https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv", "main"),
                      ("https://nsearchives.nseindia.com/emerge/corporates/content/SME_EQUITY_L.csv", "SME")):
@@ -58,12 +62,49 @@ def nse_symbols():
                     d = pd.read_csv(io.BytesIO(r.content))
                     d.columns = [c.strip().upper() for c in d.columns]
                     col = lambda key: next(c for c in d.columns if key in c)  # noqa: E731
+                    isin = d[col("ISIN")].astype(str).str.strip() if any("ISIN" in c for c in d.columns) else ""
                     rows.append(pd.DataFrame({"symbol": d[col("SYMBOL")].astype(str).str.strip(),
-                                              "name": d[col("NAME")].astype(str).str.strip(), "board": board}))
+                                              "name": d[col("NAME")].astype(str).str.strip(), "board": board, "isin": isin}))
                     break
             except Exception:  # noqa: BLE001
                 time.sleep(2)
-    return pd.concat(rows).drop_duplicates("symbol")
+    u = pd.concat(rows).drop_duplicates("symbol")
+    u["ticker"] = u.symbol + ".NS"
+    if bse:
+        try:
+            b = bse_only(set(u.isin) - {""})
+            if len(b):
+                u = pd.concat([u, b])
+        except Exception as e:  # noqa: BLE001
+            print("BSE list failed:", e, flush=True)
+    return u
+
+
+def bse_only(nse_isins, min_close=100.0, min_turnover=5e6):
+    """Liquid, non-penny BSE equity scrips that are not listed on NSE (from the latest BSE bhavcopy)."""
+    from datetime import date as _d, timedelta as _td
+    for back in range(0, 10):
+        d = _d.today() - _td(days=back)
+        if d.weekday() >= 5:
+            continue
+        try:
+            r = s.get(f"https://www.bseindia.com/download/BhavCopy/Equity/BhavCopy_BSE_CM_0_0_0_{d:%Y%m%d}_F_0000.CSV", timeout=40,
+                      headers={"Referer": "https://www.bseindia.com/"})
+        except Exception:  # noqa: BLE001
+            continue
+        if r.status_code != 200 or r.content[:5] == b"<!DOC":
+            continue
+        x = pd.read_csv(io.BytesIO(r.content))
+        x = x[x.ISIN.astype(str).str.startswith("INE")]
+        code = x.FinInstrmId.astype(str)
+        x = x[(code.str.len() == 6) & (code < "700000") & ~x.ISIN.isin(nse_isins)]
+        x = x[(pd.to_numeric(x.ClsPric, errors="coerce") >= min_close) & (pd.to_numeric(x.TtlTrfVal, errors="coerce") >= min_turnover)]
+        print("BSE bhavcopy", d, "BSE-only liquid:", len(x), flush=True)
+        sym = x.TckrSymb.astype(str).str.strip() + ".BO"
+        return pd.DataFrame({"symbol": sym.values, "name": x.FinInstrmNm.astype(str).str.strip().values, "board": "BSE",
+                             "isin": x.ISIN.astype(str).values, "ticker": sym.values})
+    print("no BSE bhavcopy found", flush=True)
+    return pd.DataFrame(columns=["symbol", "name", "board", "isin", "ticker"])
 
 
 def rsi(c, n=14):
@@ -259,7 +300,9 @@ def main():
     if MARKET != "NSE":
         OUT = f"data/scan/{MARKET.lower()}"
     os.makedirs(OUT, exist_ok=True)
-    u = nse_symbols() if MARKET == "NSE" else symbols(MARKET)
+    u = nse_symbols(bse=True) if MARKET == "NSE" else symbols(MARKET)
+    if MARKET == "NSE":                                  # 17 Nov 2026: SME / BSE-only symbols, for the plan and the app (chips, links)
+        json.dump({r.symbol: r.board for r in u.itertuples() if r.board != "main"}, open(f"{OUT}/boards.json", "w"))
     if "ticker" not in u:
         u["ticker"] = u.symbol + ".NS"
     print(MARKET, "symbols", len(u), u.board.value_counts().to_dict(), flush=True)

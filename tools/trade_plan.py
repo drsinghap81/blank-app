@@ -18,6 +18,7 @@ Exits: ATH signals with "exit next open" and 9/21 trades whose Supertrend turned
 Writes data/scan/trade_plan.json. Sizing is done in the apps / server from your capital: risk 1% to the stop, max 20% a stock,
 max 10 positions."""
 import json
+import os
 import sys
 from datetime import datetime, timezone
 
@@ -84,11 +85,27 @@ def buckets(mk):
     return B
 
 
+_BOARDS = {}
+
+
 def load(p):
+    """17 Nov 2026: the scans now include NSE SME and liquid BSE-only stocks; they stay in the scan lists (Momentum, Trading,
+    Bottoms) but are left out of the trade plan: SME trades in fixed lots and BSE-only can't be sent through Angel's NSE
+    route, and neither was in the backtests."""
     try:
-        return json.load(open(p))
+        d = json.load(open(p))
     except Exception:  # noqa: BLE001
         return {}
+    if not _BOARDS and p.endswith(("ath.json", "trend_scan.json", "support.json", "patterns.json", "vcp.json")):
+        try:
+            _BOARDS.update(json.load(open(os.path.join(os.path.dirname(p), "boards.json"))))
+        except Exception:  # noqa: BLE001
+            _BOARDS["_none"] = "main"
+    if isinstance(d, dict) and len(_BOARDS) > 1:
+        off = lambda r: isinstance(r, dict) and (_BOARDS.get(r.get("symbol")) in ("SME", "BSE") or r.get("board") in ("SME", "BSE")  # noqa: E731
+                                                 or str(r.get("symbol", "")).endswith(".BO"))
+        d = {k: ([r for r in v if not off(r)] if isinstance(v, list) else v) for k, v in d.items()}
+    return d
 
 
 def num(v):
