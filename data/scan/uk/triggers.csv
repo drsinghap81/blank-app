@@ -1,3 +1,1 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-RS1,2026-11-11,815.0,63.5,784.97,777.5,4.8,3,-2.5,RS Group,watch,135.0,0.83,87,8.47,795.0,53.8
-CRDA,2026-11-10,3641.0,61.7,3585.55,3587.0,1.5,4,5.0,Croda International,watch,120.1,0.75,78,17.22,3822.0,75.4
