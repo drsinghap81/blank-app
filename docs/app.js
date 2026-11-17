@@ -2518,21 +2518,39 @@ async function loadOptCharts(el) {
   el.querySelectorAll('.row').forEach((x) => x.addEventListener('click', () => optSelect(L[+x.dataset.i])));
 }
 async function optSelect(r) {
+  const iv = state.optIv || 'D'; const srv = !!(lvCfg().url && lvCfg().token);
+  const IV = [['D', 'Daily'], ['60', '1h'], ['15', '15m'], ['5', '5m']];
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)} ${fmt(r.strike, 0, 'en-IN')}</h2><div class="co">ATM options · expiry ${esc(day(r.expiry))} (${r.dte} days) · future ${fmt(r.fut, 2, 'en-IN')}${r.lot ? ` · lot ${r.lot}` : ''}</div></div></div>
-    <h3 style="margin:10px 16px 0">CE ${r.ce ? fmt(r.ce.close, 2, 'en-IN') : ''}</h3><div class="chart" id="optce" style="height:220px"></div><p class="muted small" style="margin:2px 16px">${r.ce && r.ce.signals.length ? r.ce.signals.map(esc).join(' · ') : 'No signal'}${r.ce && r.ce.top ? ` · last top ${fmt(r.ce.top, 2, 'en-IN')}` : ''}${r.ce && r.lot ? ` · 1 lot ≈ ₹${fmt(r.ce.value_lot, 0, 'en-IN')}` : ''}</p>
-    <h3 style="margin:10px 16px 0">PE ${r.pe ? fmt(r.pe.close, 2, 'en-IN') : ''}</h3><div class="chart" id="optpe" style="height:220px"></div><p class="muted small" style="margin:2px 16px">${r.pe && r.pe.signals.length ? r.pe.signals.map(esc).join(' · ') : 'No signal'}${r.pe && r.pe.top ? ` · last top ${fmt(r.pe.top, 2, 'en-IN')}` : ''}${r.pe && r.lot ? ` · 1 lot ≈ ₹${fmt(r.pe.value_lot, 0, 'en-IN')}` : ''}</p>
-    <p class="muted small" style="margin:6px 16px">Daily candles of this contract (days without a trade use the settle price) · orange = EMA 9 · blue = EMA 21 · grey dashed = last top (Top Bottom buy level). Watch only.</p>`);
-  if (!state.optCh) state.optCh = await getJSON(MAIN + 'data/scan/optcharts.json', 'optcharts').catch(() => null);
-  const C = state.optCh && state.optCh[r.symbol]; if (!C || !window.LightweightCharts) return;
+    <div class="seg" id="optiv" style="margin:8px 16px">${IV.map(([k, n]) => `<button data-k="${k}" aria-selected="${iv === k}">${n}</button>`).join('')}</div>
+    ${iv !== 'D' && !srv ? '<p class="muted pad">Intraday candles come from Angel through your server: connect it on the Live tab.</p>' : ''}
+    <h3 style="margin:10px 16px 0">CE</h3><div class="chart" id="optce" style="height:230px"><p class="muted pad">Loading…</p></div><p class="muted small" style="margin:2px 16px" id="optcen"></p>
+    <h3 style="margin:10px 16px 0">PE</h3><div class="chart" id="optpe" style="height:230px"><p class="muted pad">Loading…</p></div><p class="muted small" style="margin:2px 16px" id="optpen"></p>
+    <p class="muted small" style="margin:6px 16px">${iv === 'D' ? 'Daily candles of this contract (days without a trade use the settle price)' : `${IV.find((x) => x[0] === iv)[1]} candles from Angel (times in IST)`} · orange = EMA 9 · blue = EMA 21 · grey dashed = last top (Top Bottom buy level). Systems on the premium are watch only.</p>`);
+  document.querySelectorAll('#optiv button').forEach((b) => b.addEventListener('click', () => { state.optIv = b.dataset.k; optSelect(r); }));
   const ema = (v, n) => { const k = 2 / (n + 1); let e = v[0]; return v.map((x) => (e = x * k + e * (1 - k))); };
-  [['ce', '#optce'], ['pe', '#optpe']].forEach(([t, id]) => { const S = C[t]; const box = $(id); if (!S || !box) return;
-    const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 220, width: box.clientWidth });
+  const draw = (id, S, top, sig, note) => { const box = $(id); if (!box) return; box.innerHTML = '';
+    if (!S || !S.t || !S.t.length) { box.innerHTML = '<p class="muted pad">No candles.</p>'; return; }
+    const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 230, width: box.clientWidth, timeScale: { timeVisible: iv !== 'D', secondsVisible: false } });
     const cs = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
     cs.setData(S.t.map((x, i) => ({ time: x, open: S.o[i], high: S.h[i], low: S.l[i], close: S.c[i] })));
     const ln = (v, col) => ch.addLineSeries({ color: col, lineWidth: 2, priceLineVisible: false, lastValueVisible: false }).setData(S.t.map((x, i) => ({ time: x, value: v[i] })));
     if (S.c.length >= 9) ln(ema(S.c, 9), '#F59E0B'); if (S.c.length >= 21) ln(ema(S.c, 21), '#3B82F6');
-    const top = r[t] && r[t].top; if (top) cs.createPriceLine({ price: top, color: '#9CA3AF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'last top' });
-    ch.timeScale().fitContent(); });
+    if (top) cs.createPriceLine({ price: top, color: '#9CA3AF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'last top' });
+    ch.timeScale().fitContent();
+    const n = $(id + 'n'); if (n) n.textContent = `${S.c[S.c.length - 1]} · ${sig && sig.length ? sig.join(' · ') : 'No signal'}${top ? ` · last top ${top}` : ''}${note || ''}`; };
+  if (!window.LightweightCharts) return;
+  if (iv === 'D') {
+    if (!state.optCh) state.optCh = await getJSON(MAIN + 'data/scan/optcharts.json', 'optcharts').catch(() => null);
+    const C2 = state.optCh && state.optCh[r.symbol];
+    [['ce', '#optce'], ['pe', '#optpe']].forEach(([t, id]) => draw(id, C2 && C2[t], r[t] && r[t].top, r[t] && r[t].signals, r[t] && r.lot ? ` · 1 lot ≈ ₹${fmt(r[t].value_lot, 0, 'en-IN')}` : ''));
+    return;
+  }
+  if (!srv) { ['#optce', '#optpe'].forEach((id) => { $(id).innerHTML = ''; }); return; }
+  await Promise.all([['CE', '#optce'], ['PE', '#optpe']].map(async ([t, id]) => {
+    try { const S = await lvApi(`/api/opt/candles?symbol=${encodeURIComponent(r.symbol)}&expiry=${r.expiry}&strike=${r.strike}&type=${t}&interval=${iv}`, { timeout: 40000 });
+      draw(id, S, S.top, S.signals, ` · ${S.tsym}`); }
+    catch (e) { const box = $(id); if (box) box.innerHTML = `<p class="muted pad">${/404|Not Found/i.test(e.message) && !/contract|candles/i.test(e.message) ? 'Your server picks up intraday option candles at its next update (outside Indian market hours).' : esc(e.message)}</p>`; }
+  }));
 }
 async function loadTurtle(el) {
   $('#title').textContent = 'Trading · Turtle Trading System';

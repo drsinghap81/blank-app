@@ -952,3 +952,12 @@ def test_fo_watch(tmp_path):
     assert it["levels"]["exit"] and it["levels"]["stop"] == 131280.0 and it["levels"]["target"] == 128720.0
     A.fo_check(); assert any("exit signal" in a["text"] for a in A.alerts_load()["items"])
     j = c.get("/api/fo/watch", headers=h).json()["items"][0]; assert j["und_ltp"] == 131400.0 and j["pnl"] == 1875.0
+
+
+def test_opt_candles(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    A.broker.icandles = [(f"2026-11-17T{9 + i // 12:02d}:{(i % 12) * 5:02d}:00+05:30", 10.0, 11.0, 9.0, 10.0 + (i % 7) * 0.1 + (2.0 if i == 39 else 0), 100.0) for i in range(40)]
+    j = c.get("/api/opt/candles?symbol=itc&expiry=2026-11-23&strike=295&type=CE&interval=5", headers=h).json()
+    assert j["tsym"] == "ITC23NOV26295CE" and len(j["t"]) == 40 and "20-bar high close" in j["signals"]
+    assert c.get("/api/opt/candles?symbol=itc&expiry=2026-11-23&strike=295&type=XX&interval=5", headers=h).status_code == 400

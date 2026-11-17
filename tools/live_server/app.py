@@ -3146,6 +3146,63 @@ def fo_check_now(_=Depends(auth)):
     return dict(results=fo_check())
 
 
+# ------------------------------------------------------------------ intraday option candles (17 Nov 2026)
+# 5 / 15 / 60-minute candles of a live NFO option from Angel, with the same watch-only premium systems as the daily
+# option charts (9/21 cross, 20-bar high close, close above the last top). Only contracts trading now (Angel has no expired ones).
+_OPTC = {}
+OPT_IV = {"5": ("FIVE_MINUTE", 30), "15": ("FIFTEEN_MINUTE", 60), "60": ("ONE_HOUR", 120)}
+
+
+def _ema_l(v, n):
+    k = 2 / (n + 1); e = v[0]; out = []
+    for x in v:
+        e = x * k + e * (1 - k); out.append(e)
+    return out
+
+
+def prem_systems(c):
+    sig = []; n = len(c)
+    if n >= 25:
+        e9, e21 = _ema_l(c, 9), _ema_l(c, 21)
+        if any(e9[i] > e21[i] and e9[i - 1] <= e21[i - 1] for i in (n - 1, n - 2)) and c[-1] > e21[-1]:
+            sig.append("9/21 cross up")
+        if c[-1] > max(c[-21:-1]):
+            sig.append("20-bar high close")
+    top = None
+    for i in range(1, n - 2):
+        if c[i] > c[i - 1] and c[i] >= c[i + 1]:
+            top = c[i]
+    if top is not None and n >= 3 and c[-1] > top and c[-2] <= top:
+        sig.append("Top Bottom buy (close above last top)")
+    return sig, (round(top, 2) if top is not None else None)
+
+
+@app.get("/api/opt/candles")
+def opt_candles(symbol: str, expiry: str, strike: float, type: str, interval: str = "15", _=Depends(auth)):
+    if interval not in OPT_IV or type not in ("CE", "PE") or not re.match(r"^\d{4}-\d{2}-\d{2}$", expiry):
+        raise HTTPException(400, "interval 5/15/60, type CE/PE, expiry YYYY-MM-DD")
+    sym = re.sub(r"[^A-Z0-9&\-]", "", symbol.upper())[:20]
+    key = (sym, expiry, strike, type, interval); c = _OPTC.get(key)
+    if c and time.time() - c[0] < 60:
+        return c[1]
+    tk = broker.opt_token(sym, date.fromisoformat(expiry), strike, type)
+    if not tk:
+        raise HTTPException(404, f"{sym} {expiry} {strike:g} {type} not found in Angel's contract list")
+    iv, days = OPT_IV[interval]
+    try:
+        B = broker.candles_int("NFO", tk[0], iv, days)
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(502, f"Angel candles failed: {str(ex)[:120]}")
+    if not B:
+        raise HTTPException(404, "no candles yet for this contract")
+    ts = [int(datetime.fromisoformat(x[0]).timestamp()) + 19800 for x in B]    # IST shown as chart time
+    cl = [x[4] for x in B]; sig, top = prem_systems(cl)
+    out = dict(symbol=sym, tsym=tk[1], interval=interval, t=ts, o=[x[1] for x in B], h=[x[2] for x in B], l=[x[3] for x in B], c=cl,
+               v=[x[5] for x in B], signals=sig, top=top)
+    _OPTC[key] = (time.time(), out)
+    return out
+
+
 # ------------------------------------------------------------------ portfolio vs market, day by day (17 Nov 2026)
 # Day % = sum(shares x (close - previous close)) / sum(shares x previous close) over the holdings, so cash and new money
 # don't distort it (the usual "day's change %"). India = all Angel holdings vs Nifty 50; US = "Your moomoo holdings" vs S&P 500.

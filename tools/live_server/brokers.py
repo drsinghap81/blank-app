@@ -344,6 +344,25 @@ class AngelEquity:
         time.sleep(0.6)
         return [(str(x[0])[:10], float(x[1]), float(x[2]), float(x[3]), float(x[4])) for x in (self._data(r) or [])]
 
+    def opt_token(self, name, expiry, strike, typ, exchange="NFO"):
+        """token + trading symbol of an option from Angel's scrip master (expiry: date; strike in rupees; typ CE/PE)."""
+        exp = expiry.strftime("%d%b%Y").upper()
+        for x in self._master():
+            if x.get("exch_seg") == exchange and x.get("name") == name and str(x.get("instrumenttype", "")).startswith("OPT") \
+                    and str(x.get("expiry", "")).upper() == exp and str(x.get("symbol", "")).endswith(typ) \
+                    and abs(float(x.get("strike") or 0) / 100 - float(strike)) < 0.01:
+                return str(x["token"]), x["symbol"]
+        return None
+
+    def candles_int(self, exchange, token, interval, days):
+        """intraday candles (FIVE_MINUTE / FIFTEEN_MINUTE / ONE_HOUR): list of (iso time, o, h, l, c, v)."""
+        api = self._session(); now = ist_now()
+        r = self._call(api.getCandleData, dict(exchange=exchange, symboltoken=str(token), interval=interval,
+                                                fromdate=(now - timedelta(days=days)).strftime("%Y-%m-%d 09:15"),
+                                                todate=now.strftime("%Y-%m-%d %H:%M")), tries=4) or {}
+        time.sleep(0.4)
+        return [(str(x[0]), float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5] if len(x) > 5 else 0)) for x in (self._data(r) or [])]
+
     def ltp_ex(self, exchange, tsym, token):
         api = self._session()
         d = self._data(self._call(api.ltpData, exchange, tsym, str(token))) or {}
@@ -587,6 +606,12 @@ class MockBroker(AngelEquity):
 
     def ltp_ex(self, exchange, tsym, token):
         return getattr(self, "fltp", {}).get(tsym, 0.0)
+
+    def opt_token(self, name, expiry, strike, typ, exchange="NFO"):
+        return ("77", f"{name}{expiry:%d%b%y}{int(strike)}{typ}".upper())
+
+    def candles_int(self, exchange, token, interval, days):
+        return list(getattr(self, "icandles", []))
 
     def quotes(self, symbols):
         return {s: dict(ltp=100.0 + i, prev=99.0 + i, high=101.0 + i, low=98.0 + i, open=99.5 + i) for i, s in enumerate(symbols)}
