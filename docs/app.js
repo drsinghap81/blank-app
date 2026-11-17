@@ -5086,24 +5086,29 @@ function usEntryChart(box, S, t, w, h, light) {
     timeScale: { borderColor: light ? '#E5E7EB' : C.line, fixLeftEdge: true, rightOffset: 10 } });
   const up = light ? '#16A34A' : C.rise, dn = light ? '#DC2626' : C.fall;
   const cs = ch.addCandlestickSeries({ upColor: up, downColor: dn, borderVisible: false, wickUpColor: up, wickDownColor: dn, priceLineVisible: false, lastValueVisible: false });
-  cs.setData(S.t.map((x, i) => ({ time: x, open: S.o[i], high: S.h[i], low: S.l[i], close: S.c[i] })));
+  /* 17 Nov 2026: a trade taken on the monthly chart (Monthly ATH) is shown on monthly candles; the rest on daily */
+  const monthly = usSnapMonthly(S, t); const D = monthly ? S.m : S;
+  cs.setData(D.t.map((x, i) => ({ time: x, open: D.o[i], high: D.h[i], low: D.l[i], close: D.c[i] })));
   const line = (k, col) => { const l = ch.addLineSeries({ color: col, lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
-    l.setData(S.t.map((x, i) => (S[k][i] == null ? { time: x } : { time: x, value: S[k][i] }))); };
-  const ath = /ATH/.test((S.ctx && S.ctx.system) || t.system || '');
-  if (ath) line('s150', '#9CA3AF'); else { line('e9', '#F59E0B'); line('e21', '#3B82F6'); }
-  if (ath && S.hi52) cs.createPriceLine({ price: S.hi52, color: '#B45309', lineWidth: 1, lineStyle: 3, axisLabelVisible: true, title: '52-wk high' });
-  /* 17 Nov 2026: levels drawn as short segments over the last bars (not across the whole chart), each with its label */
-  const n = S.t.length, K = Math.min(22, n); const seg = (price, col, title, style, width = 2) => { if (!(price > 0)) return;
+    l.setData(D.t.map((x, i) => (D[k][i] == null ? { time: x } : { time: x, value: D[k][i] }))); };
+  if (monthly) { line('sma10', '#9CA3AF'); if (D.prior_ath) cs.createPriceLine({ price: D.prior_ath, color: '#B45309', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'old ATH' }); }
+  else { line('e9', '#F59E0B'); line('e21', '#3B82F6'); }
+  /* levels drawn as short segments over the last bars (not across the whole chart), each with its label */
+  const n = D.t.length, K = monthly ? Math.min(5, n) : Math.min(15, n); const seg = (price, col, title, style, width = 2) => { if (!(price > 0)) return;
     const l = ch.addLineSeries({ color: col, lineWidth: width, lineStyle: style, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title });
-    l.setData(S.t.slice(n - K).map((x) => ({ time: x, value: price }))); };
+    l.setData(D.t.slice(n - K).map((x) => ({ time: x, value: price }))); };
   const s0 = t.stop0 || t.stop; const r2 = t.entry + 2 * (t.entry - s0);
   seg(r2, '#16A34A', '2R target', 2); seg(t.entry, '#7C3AED', 'entry', 0, 3); seg(s0, '#DC2626', 'first SL', 2);
   const sl = t.stop_last != null ? t.stop_last : (t.exit ? null : t.stop);   // open holdings: the stop now
   if (sl && Math.abs(sl - s0) / s0 > 0.002) seg(sl, '#F97316', t.exit ? 'last SL' : 'stop now', 2);
   if (t.exit) seg(t.exit, '#111827', 'sold', 1);
-  cs.setMarkers([{ time: S.t[n - 1], position: 'belowBar', color: '#7C3AED', shape: 'arrowUp', text: 'BUY' }]);
+  cs.setMarkers([{ time: D.t[n - 1], position: 'belowBar', color: '#7C3AED', shape: 'arrowUp', text: 'BUY' }]);
   ch.timeScale().fitContent(); return ch;
 }
+const usSnapMonthly = (S, t) => !!(S && S.m && S.m.t && S.m.t.length > 3 && /ATH/.test((S.ctx && S.ctx.system) || t.system || ''));
+const usChartKey = (S, t, closed) => (usSnapMonthly(S, t)
+  ? `Monthly candles to the buy month (the system's chart) · grey = 10-month average (~ the 30-week stop line) · brown dashed = old all-time high the breakout cleared`
+  : `Daily candles to the buy day · orange = EMA 9 · blue = EMA 21`) + ` · short lines at the right: purple entry, red first SL, orange ${closed ? 'last SL' : 'stop now'}, green 2R target${closed ? ', black sale' : ''}.`;
 /* one line of top-down logic for the journal: market -> sector -> theme -> stock -> system */
 function usEntryLogic(t, ctx) {
   const c = ctx || {}; const P = [];
@@ -5123,7 +5128,8 @@ async function usEntrySheet(t) {
     <p class="tdc-why">Frozen as of that day's close, so it shows exactly what the chart looked like when you bought.</p>`;
   $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
   try { const S = await usSnapGet(t.symbol, d); usEntryChart($('#usec'), S, t);
-    $('#usec').insertAdjacentHTML('afterend', `<p class="tdc-why"><b>Why it was bought:</b> ${esc(usEntryLogic(t, S.ctx))}</p>`); }
+    $('#usec').insertAdjacentHTML('afterend', `<p class="tdc-why"><b>Why it was bought:</b> ${esc(usEntryLogic(t, S.ctx))}</p>`);
+    const k = $('#sheet-body .tdc-key'); if (k) k.textContent = usChartKey(S, t, !!t.exit); }
   catch (e) { $('#usec').innerHTML = `<p class="muted pad">Chart not available: ${esc(e.message)}</p>`; }
 }
 async function usJournalPdf(C, H, S, fx) {
@@ -5186,7 +5192,7 @@ async function usJournalPdf(C, H, S, fx) {
       doc.addImage(ch.takeScreenshot().toDataURL('image/png'), 'PNG', M + 1, y + 1, W - 2 * M - 2, (W - 2 * M - 2) * 0.52); ch.remove();
       y += (W - 2 * M) * 0.52 + 6; doc.setFontSize(7.5); col(MUTE);
       const cap = (txt) => { const Lc = doc.splitTextToSize(txt, W - 2 * M); doc.text(Lc, M, y); y += Lc.length * 3.6; };
-      cap(tx(`Daily chart frozen at the close of ${SN.bar} (the buy day). Lines: purple entry · red first SL · ${(t.stop_last || t.stop) && (t.stop_last || t.stop) !== s0 ? `orange ${closed ? 'last SL' : 'stop now'} · ` : ''}green 2R target${closed ? ' · black sale' : ''} · ${/ATH/.test((SN.ctx && SN.ctx.system) || t.system || '') ? 'grey 150-day (~30-week) average · brown 52-week high' : 'orange EMA 9 · blue EMA 21'}.`)); y += 5; col(INK);
+      cap(tx(`Frozen at the close of ${SN.bar} (the buy day). ` + usChartKey(SN, t, closed))); y += 5; col(INK);
     } else { doc.setFontSize(9); col(MUTE); doc.text('Chart not available for this date.', M, y + 6); y += 14; col(INK); }
     const L = (t.stop_log || []); if (L.length) { doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.text('Stop-loss history', M, y); doc.setFont('helvetica', 'normal'); y += 6;
       y = table(y, ['Date', 'Stop', 'Change', 'vs entry'], L.map((x) => [x[0], f2(x[1]), x[2], `${f2((x[1] / t.entry - 1) * 100)}%`]), [30, 30, 30, 30]); }

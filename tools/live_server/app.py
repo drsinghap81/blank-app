@@ -2103,7 +2103,7 @@ def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
     sym = re.sub(r"[^A-Z0-9.\-]", "", symbol.upper())[:10]
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", date_ or ""):
         raise HTTPException(400, "date_ must be YYYY-MM-DD")
-    d = os.path.join(DATA, "us_snaps"); os.makedirs(d, exist_ok=True); f = os.path.join(d, f"{sym}_{date_}.json")
+    d = os.path.join(DATA, "us_snaps"); os.makedirs(d, exist_ok=True); f = os.path.join(d, f"{sym}_{date_}_v2.json")
     if os.path.exists(f):
         return json.load(open(f))
     r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym.replace('.', '-')}", params=dict(interval="1d", range="2y"),
@@ -2121,6 +2121,24 @@ def us_snap(symbol: str, date_: str = "", _=Depends(auth)):
     rd = lambda v: [None if x is None else round(x, 2) for x in v[a:e + 1]]  # noqa: E731
     out = dict(symbol=sym, date=date_, bar=t[e], t=t[a:e + 1], o=rd(O), h=rd(H), l=rd(L), c=rd(C), e9=rd(e9), e21=rd(e21), s150=rd(s150),
                hi52=round(max(H[max(0, e - 251):e + 1]), 2), ctx=_entry_ctx(sym, date_))
+    # 17 Nov 2026: monthly candles for trades taken on the monthly chart (Monthly ATH): months before the buy month from
+    # Yahoo's monthly series, the buy month built from the daily bars up to the buy day (so it is frozen too)
+    try:
+        mm = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{sym.replace('.', '-')}", params=dict(interval="1mo", range="10y"),
+                          headers={"User-Agent": "Mozilla/5.0 (Trend Desk personal app)"}, timeout=15).json()["chart"]["result"][0]
+        qm = mm["indicators"]["quote"][0]; ym = date_[:7]
+        M = [(datetime.fromtimestamp(ts, timezone.utc).date().isoformat()[:7], qm["open"][i], qm["high"][i], qm["low"][i], qm["close"][i])
+             for i, ts in enumerate(mm["timestamp"]) if None not in (qm["open"][i], qm["high"][i], qm["low"][i], qm["close"][i])]
+        M = [x for x in M if x[0] < ym]
+        cur = [i for i in range(e + 1) if t[i][:7] == ym]
+        if cur:
+            M.append((ym, O[cur[0]], max(H[i] for i in cur), min(L[i] for i in cur), C[e]))
+        M = M[-72:]; mc = [x[4] for x in M]
+        sma10 = [round(sum(mc[i - 9:i + 1]) / 10, 2) if i >= 9 else None for i in range(len(mc))]
+        out["m"] = dict(t=[x[0] + "-01" for x in M], o=[round(x[1], 2) for x in M], h=[round(x[2], 2) for x in M], l=[round(x[3], 2) for x in M],
+                        c=[round(x[4], 2) for x in M], sma10=sma10, prior_ath=round(max(x[2] for x in M[:-1]), 2) if len(M) > 1 else None)
+    except Exception as ex:  # noqa: BLE001
+        log("us_snap_monthly", symbol=sym, error=str(ex)[:120])
     if t[e] < et_now().date().isoformat():          # freeze only once that day has closed
         json.dump(out, open(f, "w"))
     return out
