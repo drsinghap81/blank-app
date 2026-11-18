@@ -3279,6 +3279,8 @@ def opt_intra_scan():
                     tk = broker.opt_token(r["symbol"], date.fromisoformat(r["expiry"]), r["strike"], typ)
                     if not tk:
                         continue
+                    while _otr_busy():                     # 18 Nov 2026: the 5-minute option trader goes first
+                        time.sleep(1)
                     B = broker.candles_int("NFO", tk[0], "FIVE_MINUTE", 10)
                 except Exception as ex:  # noqa: BLE001
                     log("opt_intra_error", symbol=r["symbol"], error=str(ex)[:120]); continue
@@ -4002,6 +4004,64 @@ def optbt_status(_=Depends(auth)):
     return optbt_job().status()
 
 
+# ------------------------------------------------------------------ 5-minute option trader (18 Nov 2026): paper always, live on request
+_otr = {}
+
+
+def _otr_busy():
+    try:
+        import opt_trader
+        return opt_trader.BUSY.is_set()
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def otr_job():
+    if "j" not in _otr:
+        import opt_trader
+
+        def rows():
+            if ENV.get("PLAN_FILE"):
+                return json.load(open(os.path.join(os.path.dirname(ENV["PLAN_FILE"]), "optscan.json"))).get("rows") or []
+            return requests.get(PLAN_URL.rsplit("/", 1)[0] + "/optscan.json", timeout=30).json().get("rows") or []
+
+        def pcr():
+            return requests.get(PLAN_URL.rsplit("/", 1)[0] + "/pcr.json", timeout=30).json()
+        _otr["j"] = opt_trader.OptTrader(broker, DATA, rows, pcr, log=lambda ev, **kw: log(ev, **kw))
+    return _otr["j"]
+
+
+@app.get("/api/opt/trader")
+def otr_status(_=Depends(auth)):
+    return otr_job().status()
+
+
+@app.post("/api/opt/trader/mode")
+def otr_mode(body: Mode, request: Request, _=Depends(auth)):
+    """paper is always on; LIVE (real orders on Angel) needs the app password + typing LIVE. Turning it off is one tap."""
+    if body.live:
+        ip = request.client.host if request.client else "?"
+        n, t0 = FAILS.get(ip, (0, 0))
+        if n >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if body.confirm.strip().upper() != "LIVE":
+            raise HTTPException(400, "type LIVE to confirm")
+        if not check_pw(body.password):
+            FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
+    otr_job().set_live(body.live); log("opt_trader_mode", live=body.live)
+    return dict(ok=True, live=bool(body.live))
+
+
+@app.post("/api/opt/trader/stop")
+def otr_stop(_=Depends(auth)):
+    otr_job().stop_today(); return dict(ok=True)
+
+
+@app.post("/api/opt/trader/flat")
+def otr_flat(_=Depends(auth)):
+    otr_job().flat_all(); return dict(ok=True)
+
+
 @app.get("/api/research/optbt/summary")
 def optbt_summary():
     """backtest statistics only (no positions, no account data) - readable without the app password so results can be checked
@@ -4023,6 +4083,10 @@ def _start():
         threading.Thread(target=_loop, daemon=True).start()
         threading.Thread(target=_tb_loop, daemon=True).start()
         _opt_today_load()
+        try:
+            otr_job().start()
+        except Exception as ex:  # noqa: BLE001
+            log("opt_trader_error", error=str(ex)[:200])
         try:
             j = optbt_job()
             if j.st.get("state") in ("idle", "running", "error"):

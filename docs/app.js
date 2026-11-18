@@ -1171,7 +1171,7 @@ async function loadLive() {
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
-    ${S && isOwner() ? pane('fut', '<div id="tbcard"></div><div id="tbcardn"></div>') : ''}
+    ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tbcard"></div><div id="tbcardn"></div>') : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
     const sym = b.dataset.tgt, E = +b.dataset.e, St = +b.dataset.s, R = E - St;
@@ -1264,7 +1264,7 @@ async function loadLive() {
   el.querySelectorAll('input[data-bq]').forEach((c) => c.addEventListener('input', bkUpd));
   const bk = $('#lvbkgo'); if (bk) bk.addEventListener('click', () => lvBasket(pick(), bk));
   state._lvBkUpd = bkUpd;
-  if (S) { tbLoad(); tbLoad('nifty'); }
+  if (S) { tbLoad(); tbLoad('nifty'); otrLoad(); }
   state._lvMoreAll = false;
   const ma = $('#lvmoreall'); if (ma) ma.addEventListener('click', () => { state._lvMoreAll = !state._lvMoreAll; lvMoreUpd(); });
   lvMoreUpd();
@@ -1527,6 +1527,38 @@ async function resCard() {
   $('#rescopy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(JSON.stringify(res)); toast('Copied: paste it into the chat'); } catch (e) { alertMsg('Copy is blocked in this browser'); } });
 }
 /* Top Bottom (Bank Nifty futures) bot: approve each level here; the bot on the server trades only approved levels */
+/* 18 Nov 2026: the 5-minute option trader (tools/live_server/opt_trader.py) - paper always, live orders only after the password +
+   LIVE; 1 lot, max 3 open, -Rs 10,000 daily stop; 5 EMA trail + PCR + BB rules from the 28 Oct - 18 Nov backtest. */
+async function otrLoad(box = $('#otrcard')) {
+  if (!box || !isOwner()) return;
+  let T; try { T = await lvApi('/api/opt/trader'); } catch (e) { box.innerHTML = `<div class="lv-card"><b>Option trader · 5-minute</b><p class="lv-sub">${/404/.test(e.message) ? 'Arrives with your server\'s next update (after 3:35 pm IST, or Settings › Server › Update now).' : esc(e.message)}</p></div>`; return; }
+  const rs = (v) => `${v >= 0 ? '+' : '−'}₹${fmt(Math.abs(v || 0), 0, 'en-IN')}`, live = T.live, H = T.history || {};
+  const row = (t) => { const p = t.state === 'closed' ? t.pnl : t.upnl;
+    return `<div class="otr-row"><div style="flex:1;min-width:0"><div class="lv-sym">${esc(t.symbol)} ${t.side} <span class="chip ${t.state === 'open' ? 'buy' : ''}">${{ pending: 'waiting', open: 'open', closed: 'closed', cancelled: 'cancelled' }[t.state] || t.state}</span>${t.live ? ' <span class="lv-mode live">LIVE</span>' : ''}</div>
+      <div class="lv-sub">signal ${esc((t.signal || '').slice(11))} · ${t.state === 'pending' ? `buy above ${fmt(t.trigger, 2, 'en-IN')}` : t.entry ? `in ${fmt(t.entry, 2, 'en-IN')}${t.live_entry != null ? ` (Angel ${fmt(t.live_entry, 2, 'en-IN')})` : ''} · stop ${fmt(t.stop, 2, 'en-IN')}${t.exit ? ` · out ${fmt(t.exit, 2, 'en-IN')} (${esc(t.why || '')})` : t.now ? ` · now ${fmt(t.now, 2, 'en-IN')}` : ''}` : esc(t.why || '')}${t.live_state ? ` · ${esc(t.live_state)}` : ''}</div></div>
+      <div class="${(p || 0) >= 0 ? 'up' : 'down'}" style="font-weight:700;white-space:nowrap">${p != null ? rs(p) : ''}</div></div>`; };
+  const act = (T.trades || []).filter((t) => t.state !== 'cancelled');
+  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Option trader · 5-minute</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE + PAPER' : 'PAPER'}</span></div>
+    <div class="lv-seg" role="group" aria-label="Option trader mode"><button id="otrdry" class="${live ? '' : 'on'}">Paper only</button><button id="otrlive" class="${live ? 'on live' : ''}">Live orders</button></div>
+    <div id="otrarm" class="lv-form" hidden><input id="otrpw" type="password" placeholder="App password"><input id="otrcf" placeholder="Type LIVE" autocapitalize="characters"><button class="lv-btn sell" id="otrgo">Turn on live</button></div>
+    <p class="lv-sub">ATM CE/PE of the 4 indices + 30 most liquid stocks. Buy on a break of the signal candle's high (RSI 60 cross, close above the upper BB, VWAP, Nifty + Bank Nifty agree, PCR agrees, not 11:00–14:30); stop at the signal low; out on a close below the 5 EMA or 15:15. 1 lot, max ${T.cfg.max_open} open, stops for the day at −₹${fmt(T.cfg.day_loss, 0, 'en-IN')}.</p>
+    <section class="summary"><div class="stat"><b class="${T.day_pnl >= 0 ? 'up' : 'down'}">${rs(T.day_pnl)}</b><span>today (paper)</span></div><div class="stat"><b>${T.open}</b><span>open / waiting</span></div>
+      <div class="stat"><b class="${(H.pnl || 0) >= 0 ? 'up' : 'down'}">${rs(H.pnl || 0)}</b><span>paper since start · ${H.days || 0} days · ${H.trades || 0} trades${H.trades ? ` · ${fmt(H.wins / H.trades * 100, 0)}% won` : ''}</span></div>
+      ${H.live_pnl ? `<div class="stat"><b class="${H.live_pnl >= 0 ? 'up' : 'down'}">${rs(H.live_pnl)}</b><span>live (real fills)</span></div>` : ''}</section>
+    ${T.stopped ? '<p class="lv-sub"><b>Stopped for today</b> — no new entries; open trades keep their stops.</p>' : ''}
+    ${act.length ? act.slice().reverse().map(row).join('') : `<p class="lv-sub">No trades today yet${T.last_cycle ? ` · last check ${esc(T.last_cycle)} IST` : ' · checks run every 5 minutes in market hours'}.</p>`}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="lv-btn ghost" id="otrstop">Stop today</button><button class="lv-btn sell" id="otrflat">Square off all</button></div>
+    ${(H.by_day || []).length ? `<details class="info"><summary>Paper record by day</summary><p class="lv-sub">${H.by_day.slice().reverse().map((d) => `${esc(d.day.slice(5))}: ${rs(d.pnl)} (${d.n})`).join(' · ')}</p></details>` : ''}
+    ${(T.notes || []).length ? `<details class="info"><summary>Log</summary><p class="lv-sub" style="white-space:pre-line">${T.notes.slice().reverse().map(esc).join('\n')}</p></details>` : ''}
+    ${T.last_error ? `<p class="lv-sub down">Last error: ${esc(T.last_error)}</p>` : ''}</div>`;
+  const q = (id) => box.querySelector('#' + id);
+  q('otrdry').addEventListener('click', async () => { if (!live) return; try { await lvApi('/api/opt/trader/mode', { method: 'POST', body: JSON.stringify({ live: false }) }); alertMsg('Option trader: paper only. Open live trades keep being managed until they close.', true); otrLoad(box); } catch (e) { alertMsg(e.message); } });
+  q('otrlive').addEventListener('click', () => { if (!live) q('otrarm').hidden = !q('otrarm').hidden; });
+  q('otrgo').addEventListener('click', async () => { try { await lvApi('/api/opt/trader/mode', { method: 'POST', body: JSON.stringify({ live: true, password: q('otrpw').value, confirm: q('otrcf').value }) }); alertMsg('Option trader: LIVE. New signals now also go to Angel as stop-limit buys (1 lot, max 3 open).', true); otrLoad(box); } catch (e) { alertMsg(e.message); } });
+  q('otrstop').addEventListener('click', async () => { try { await lvApi('/api/opt/trader/stop', { method: 'POST', body: '{}' }); alertMsg('No new option trades today. Open ones keep their stops.', true); otrLoad(box); } catch (e) { alertMsg(e.message); } });
+  q('otrflat').addEventListener('click', async () => { if (!window.confirm('Square off every open option trade now (live ones with a sell limit on Angel) and stop for today?')) return; try { await lvApi('/api/opt/trader/flat', { method: 'POST', body: '{}' }); alertMsg('Squared off; no new option trades today.', true); otrLoad(box); } catch (e) { alertMsg(e.message); } });
+}
+
 async function tbLoad(inst = 'bn') {
   if (!isOwner()) { const b0 = $(inst === 'bn' ? '#tbcard' : '#tbcardn'); if (b0) b0.innerHTML = ''; return; }
   const bn = inst === 'bn', px = bn ? 'tb' : 'tn';

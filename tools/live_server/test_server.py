@@ -1001,3 +1001,45 @@ def test_opt_ltp(tmp_path):
     A.broker.fltp = {"ITC23NOV26295CE": 3.6, "ITC23NOV26295PE": 3.9}
     j = c.get("/api/opt/ltp?symbol=ITC&expiry=2026-11-23&strike=295", headers=h).json()
     assert j["CE"] == 3.6 and j["PE"] == 3.9 and j["at"]
+
+
+def test_opt_trader_paper_and_live(tmp_path):
+    """18 Nov 2026: the 5-minute option trader finds an RSI-60 / BB / VWAP / index / PCR signal, buys on the break of the signal
+    high, puts the stop on Angel after a live fill and squares off from the app."""
+    import opt_trader as O, brokers
+    from datetime import datetime, timedelta
+    D0, D1 = "2026-11-17", "2026-11-18"
+
+    def series(day, path):
+        t = datetime.fromisoformat(day + "T09:15"); out = []
+        for i, p in enumerate(path):
+            o = path[i - 1] if i else p
+            out.append(((t + timedelta(minutes=5 * i)).strftime("%Y-%m-%dT%H:%M"), o, max(o, p) * 1.01, min(o, p) * 0.99, p, 1000))
+        return out
+    flat = [100 + (i % 3) * 0.2 for i in range(75)]
+    ce = [100] * 6 + [100.2, 99.8] * 4 + [103, 109, 112, 116, 112, 115, 118, 117, 120, 119, 122]
+    pe = [100] * 6 + [99.8, 100.2] * 4 + [97, 92, 90, 88, 90, 89, 87, 88, 86, 87, 85]
+    data = {s: {"ce": series(D0, flat) + series(D1, ce), "pe": series(D0, flat) + series(D1, pe)} for s in ("NIFTY", "BANKNIFTY", "ABC")}
+    b = brokers.MockBroker({}, ".")
+    b.opt_token = lambda n, e, k, t: (f"{n}{t}", f"{n}23NOV26{int(k)}{t}")
+    rows = [dict(symbol="NIFTY", kind="index", strike=100, expiry="2026-11-23", lot=65), dict(symbol="BANKNIFTY", kind="index", strike=100, expiry="2026-11-23", lot=30),
+            dict(symbol="ABC", kind="stock", strike=100, expiry="2026-11-23", lot=500, atm_vol5=5)]
+    T = O.OptTrader(b, str(tmp_path), lambda: rows, lambda: {"rows": {"ABC": {"q": 5}, "NIFTY": {"q": 4}, "BANKNIFTY": {"q": 3}}}, log=lambda *a, **k: None)
+    lull, now0 = O.CFG["lull"], O.now_ist
+    O.CFG["lull"] = ("23:00", "23:30"); T.set_live(True)
+    try:
+        for upto in range(10, 26):
+            T._bars = lambda token, u=upto: data[token[:-2]][token[-2:].lower()][:75 + u]
+            O.now_ist = lambda u=upto: datetime.fromisoformat(D1 + "T09:15").replace(tzinfo=O.IST) + timedelta(minutes=5 * u + 5)
+            T.cycle()
+            for o in b.nfo.values():
+                if o["status"] == "open" and o["side"] == "BUY":
+                    o.update(status="complete", avg=o["trigger"])
+        keys = sorted(t["key"] for t in T.st["trades"])
+        assert keys == ["ABC|CE", "NIFTY|CE"]                          # BANKNIFTY's PCR fifth (3) does not agree
+        assert all(t["state"] == "open" and t["entry"] == 104.1 and t.get("live_stop_oid") for t in T.st["trades"])
+        T.flat_all()
+        assert all(t["state"] == "closed" for t in T.st["trades"]) and T.st["stopped"]
+        assert sum(1 for o in b.nfo.values() if o["side"] == "SELL" and o["trigger"] is None) == 2
+    finally:
+        O.CFG["lull"] = lull; O.now_ist = now0

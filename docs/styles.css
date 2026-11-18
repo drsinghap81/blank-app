@@ -1158,3 +1158,5 @@ body.pub .owner-only { display: none !important; }
 .b5-l { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; }
 .b5-hold { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
 .b5-h { padding: 4px 10px; border-radius: 999px; background: var(--rise-soft, rgba(0,160,90,.12)); font-size: 13px; }
+
+.otr-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-top: 1px solid var(--line, rgba(127,127,127,.2)); }

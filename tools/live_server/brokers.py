@@ -246,6 +246,29 @@ class AngelEquity:
         raise RuntimeError(f"{r.get('message') or 'no order id'} [{r.get('errorcode') or '?'}]")
 
 
+    # 18 Nov 2026: option orders for the 5-minute option trader (NFO, intraday product, limit / stop-limit only - SEBI 2026)
+    def nfo_order(self, tsym, token, side, qty, price, trigger=None, tick=0.05):
+        api = self._session()
+        rnd = lambda v: round(max(tick, round(v / tick) * tick), 2)  # noqa: E731
+        p = dict(variety="STOPLOSS" if trigger else "NORMAL", tradingsymbol=tsym, symboltoken=str(token), transactiontype=side,
+                 exchange="NFO", ordertype="STOPLOSS_LIMIT" if trigger else "LIMIT", producttype="INTRADAY", duration="DAY",
+                 price=f"{rnd(price):.2f}", quantity=str(int(qty)))
+        if trigger:
+            p["triggerprice"] = f"{rnd(trigger):.2f}"
+        r = self._call(api.placeOrderFullResponse, p, tries=1) or {}
+        d = r.get("data") or {}
+        if r.get("status") and d.get("orderid"):
+            return str(d["orderid"])
+        raise RuntimeError(f"{r.get('message') or 'no order id'} [{r.get('errorcode') or '?'}]")
+
+    def cancel_order(self, oid, variety="NORMAL"):
+        api = self._session()
+        return self._call(api.cancelOrder, oid, variety, tries=1)
+
+    def order_map(self):
+        """order id -> dict(status, avg, filled) from today's order book."""
+        return {str(o["id"]): o for o in self.orders()}
+
     def gtt_stop(self, symbol, qty, trigger, limit):
         """Angel GTT (good till triggered, 1 year): SELL `qty` when the price falls to `trigger`, as a LIMIT at `limit`.
         Sits on Angel's side, so it works even if this server is down."""
@@ -597,6 +620,20 @@ class MockBroker(AngelEquity):
 
     def __init__(self, *a, **k):
         self.placed = []; self.tokens = {}; self.hold = {"RELIANCE": 10}; self.fills = []
+        self.nfo = {}
+
+    def nfo_order(self, tsym, token, side, qty, price, trigger=None, tick=0.05):
+        oid = f"N{len(self.nfo) + 1}"
+        self.nfo[oid] = dict(id=oid, symbol=tsym, side=side, qty=qty, price=price, trigger=trigger, status="open", avg=0.0, filled=0)
+        return oid
+
+    def cancel_order(self, oid, variety="NORMAL"):
+        if oid in self.nfo:
+            self.nfo[oid]["status"] = "cancelled"
+        return {"status": True}
+
+    def order_map(self):
+        return dict(self.nfo)
 
     def account(self):
         H = [dict(symbol=s, qty=q, avg=100.0, ltp=100.0, pnl=0.0) for s, q in self.hold.items() if q > 0]
