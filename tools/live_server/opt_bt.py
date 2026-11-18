@@ -162,7 +162,7 @@ class OptBT:
             for k, r in enumerate(rows):
                 sym = r["symbol"]; self.st["progress"] = f"{k + 1}/{len(rows)} {sym}"; self._save()
                 try:
-                    trades += self._symbol(sym, r.get("kind"), ch.get(sym) or {}, monthly.get(sym) or [], days, idx, last)
+                    trades += self._symbol(sym, r.get("kind"), ch.get(sym) or {}, monthly.get(sym) or [], days, idx, last, r.get("lot") or 0)
                 except Exception as ex:  # noqa: BLE001
                     self.log("optbt_symbol_error", symbol=sym, error=str(ex)[:160])
             try:                                                   # sector: average day % of the OTHER F&O stocks in the sector
@@ -200,7 +200,7 @@ class OptBT:
             self.st.update(state="error", progress=str(ex)[:200]); self.log("optbt_error", error=str(ex)[:200])
         self._save()
 
-    def _symbol(self, sym, kind, chain, months, days, idx, last):
+    def _symbol(self, sym, kind, chain, months, days, idx, last, lot=0):
         if kind == "index" or sym in IDXTOK:
             if sym not in IDXTOK:
                 return []
@@ -289,27 +289,44 @@ class OptBT:
                     nf = ib["NIFTY"].get(x[0]); bn = ib["BANKNIFTY"].get(x[0])
                     nfp = (nf / ipc["NIFTY"][d] - 1) * 100 if nf and d in ipc["NIFTY"] else None
                     bnp = (bn / ipc["BANKNIFTY"][d] - 1) * 100 if bn and d in ipc["BANKNIFTY"] else None
-                    out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
+                    # realistic version: stop-limit at most 1% above the trigger, and the signal candle must have traded >= 20 lots
+                    trl = entry_sim([b[1] for b in A], [b[2] for b in A], [b[3] for b in A], [b[4] for b in A], i, ia[-1], limit=LIMIT)
+                    real = None
+                    if trl is not None and lot and x[5] >= 20 * lot:
+                        e2, r2, h2, x2, _, _ = trl
+                        R2 = -1.0 if h2 == "SL" else 3.0 if h2 == "target" else (x2 - e2) / r2
+                        real = dict(R=round(R2 - COST * e2 / r2, 3), pct=round((x2 / e2 - 1 - COST) * 100, 2), how=h2)
+                    out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], real=real, vol_lots=round(x[5] / lot, 1) if lot else None, bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
                                     nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index"))
         return out
 
 
+LIMIT = 0.01           # stop-limit: pay at most 1% above the trigger
 TRIG_BARS = 3          # the buy-stop above the signal candle's high stays for the next 3 candles (15 minutes)
 
 
-def entry_sim(o, h, l, c, i, last):
+def entry_sim(o, h, l, c, i, last, limit=None):
     """18 Nov 2026 (Amritpal: "entry when the high of the signal candle is breached, or low"): after the signal candle i, a
     buy-stop just above its high; filled at max(high, that bar's open) on the first of the next TRIG_BARS candles to trade above it,
     cancelled if a candle breaks the signal low first (or touches both: no fill). Stop = the signal candle's low (at least 3% under
     the entry), target = entry + 3 x risk; stop first if both in one bar; else out at bar `last`'s close.
+    limit (18 Nov 2026, "limit orders, spreads"): a buy STOP-LIMIT - the order may pay at most high x (1 + limit); a candle that
+    opens above that fills only if it trades back down to the limit (filled at the limit), otherwise no fill on that candle.
     Returns (entry, risk, how, exit price, exit index, fill index) or None (no fill)."""
     hi, lo = h[i], l[i]; e = f = None
     for k in range(i + 1, min(last, i + TRIG_BARS) + 1):
         if l[k] < lo:
             return None
         if h[k] > hi:
-            e = max(hi, o[k]); f = k; break
+            e = max(hi, o[k])
+            if limit is not None and e > hi * (1 + limit):
+                cap = hi * (1 + limit)
+                if l[k] <= cap:
+                    e = cap
+                else:
+                    continue                         # gapped through the limit: not filled on this candle
+            f = k; break
     if e is None or e <= 0:
         return None
     risk = max(e - lo, e * 0.03); sl, tg = e - risk, e + 3 * risk
@@ -381,4 +398,8 @@ def summarise(T):
             "basket + BB close": _agg([t for t in F if t.get("bb")]),
             "basket, no BB close": _agg([t for t in F if not t.get("bb")]),
             "basket + BB + sector agrees": _agg([t for t in F if t.get("bb") and t.get("sec") is not None and ((t["side"] == "CE" and t["sec"] > 0) or (t["side"] == "PE" and t["sec"] < 0))]),
+            # 18 Nov 2026: realistic fills - buy stop-LIMIT (max 1% above the trigger, no chasing a gap) and only options whose
+            # signal candle traded >= 20 lots (thin strikes have wide spreads)
+            "basket, realistic fills": _agg([dict(t, **t["real"]) for t in F if t.get("real")]),
+            "basket + BB, realistic fills": _agg([dict(t, **t["real"]) for t in F if t.get("real") and t.get("bb")]),
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
