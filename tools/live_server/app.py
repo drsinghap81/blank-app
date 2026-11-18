@@ -3312,6 +3312,72 @@ def opt_intra_scan():
         _OPTSCAN["running"] = False; _OPTSCAN["last"] = time.time()
 
 
+@app.get("/api/opt/today_basket")
+def opt_today_basket():
+    """18 Nov 2026: today's 5-minute RSI-60 option basket from the last intraday scan (option-market statistics only, no account
+    data - readable without the password so it can be checked from GitHub Actions). Rules as opt_bt.py; open trades valued at the
+    latest bar."""
+    import opt_bt
+    I = _OPT_TODAY
+    try:
+        S = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/optscan.json", timeout=20).json()["rows"]
+        pq = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/pcr.json", timeout=20).json()["rows"]
+    except Exception:  # noqa: BLE001
+        S, pq = [], {}
+    row = {r["symbol"]: r for r in S}
+
+    def syn(sym):
+        r, C, P = row.get(sym), I.get(sym + "|CE"), I.get(sym + "|PE")
+        if not (r and C and P and r.get("ce") and r.get("pe")):
+            return {}
+        y = r["strike"] + r["ce"]["close"] - r["pe"]["close"]; pm = dict(zip(P["t"], P["c"]))
+        return {t: (r["strike"] + c - pm[t]) / y * 100 - 100 for t, c in zip(C["t"], C["c"]) if t in pm and y > 0}
+    SY = {s_.split("|")[0]: None for s_ in I}
+    for s_ in SY:
+        SY[s_] = syn(s_)
+    at = lambda m, t: ([m[x] for x in sorted(m) if x <= t] or [None])[-1]      # noqa: E731
+    sec = opt_bt.sector_map(); T = []
+    for sym in SY:
+        C, P = I.get(sym + "|CE"), I.get(sym + "|PE")
+        if not C or not P:
+            continue
+        for side, A, B in (("CE", C, P), ("PE", P, C)):
+            def vw(X):
+                pv = vv = 0.0; o_ = []
+                for h, l_, c, v in zip(X["h"], X["l"], X["c"], X["v"]):
+                    pv += (h + l_ + c) / 3 * v; vv += v; o_.append(pv / vv if vv else c)
+                return o_
+            va, vb = vw(A), vw(B); bi = {t: i for i, t in enumerate(B["t"])}; busy = -1
+            for i, t in enumerate(A["t"]):
+                prev = A["rsi"][i - 1] if i else A.get("rsi_prev")
+                if t >= "15:00" or i <= busy or A["rsi"][i] is None or prev is None or not (A["rsi"][i] > 60 >= prev):
+                    continue
+                j = bi.get(t)
+                if j is None or not (A["c"][i] > va[i] and B["c"][j] < vb[j]):
+                    continue
+                e = A["c"][i]; risk = max(e - A["l"][i], e * 0.03); sl, tg = e - risk, e + 3 * risk; how, R, k = "open", None, len(A["c"]) - 1
+                for k in range(i + 1, len(A["c"])):
+                    if A["l"][k] <= sl:
+                        how, R = "SL", -1.0; break
+                    if A["h"][k] >= tg:
+                        how, R = "target", 3.0; break
+                ex = sl if how == "SL" else tg if how == "target" else A["c"][-1]
+                if R is None:
+                    R = (ex - e) / risk
+                busy = k if how != "open" else 10 ** 9
+                g = sec.get(sym); others = [at(SY[s2], t) for s2 in SY if s2 != sym and g and sec.get(s2) == g and SY[s2]]
+                others = [v for v in others if v is not None]
+                T.append(dict(s=sym, d=A.get("day"), t=t, side=side, how=how, R=round(R - 0.01 * e / risk, 3), pct=round((ex / e - 1.01) * 100, 2),
+                              nf=at(SY.get("NIFTY") or {}, t), bn=at(SY.get("BANKNIFTY") or {}, t), idx=A.get("kind") == "index",
+                              sec=round(sum(others) / len(others), 2) if len(others) >= 2 else None, pcrq=(pq.get(sym) or {}).get("q")))
+    res = opt_bt.summarise(T)
+    for v in res.values():
+        if isinstance(v, dict):
+            v.pop("by_day", None)
+    return dict(scan_at=_OPTSCAN.get("last"), contracts=len(I), last_bar=max((x["t"][-1] for x in I.values() if x["t"]), default=None),
+                note="open trades valued at the latest 5-minute close; 1% cost per trade", results=res)
+
+
 @app.get("/api/opt/today5")
 def opt_today5(_=Depends(auth)):
     """18 Nov 2026: today's 5-minute bars + RSI(14) of every ATM CE/PE from the last intraday scan (for "how did today's signals do")."""
