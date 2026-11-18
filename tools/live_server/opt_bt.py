@@ -514,6 +514,17 @@ def trail_summary(T):
 WIN = [("09:15-11:15", "09:15", "11:15"), ("11:15-13:15", "11:15", "13:15"), ("13:15-15:30", "13:15", "15:31")]
 
 
+def one_at_a_time(T):
+    out, busy = [], {}
+    for t in sorted(T, key=lambda x: (x["d"], x.get("et") or x["t"], x["s"])):
+        if (t.get("et") or t["t"]) < busy.get(t["d"], "00:00"):
+            continue
+        out.append(t); busy[t["d"]] = (t.get("xt") or "15:30") if t["how"] != "SL" or t.get("xt") else "15:30"
+        if busy[t["d"]] <= (t.get("et") or t["t"]):
+            busy[t["d"]] = (t.get("et") or t["t"]) + "~"          # exit in the entry candle: the next trade starts from the next candle
+    return out
+
+
 def summarise(T):
     up = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] > 0 and t["bn"] > 0      # noqa: E731
     dn = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] < 0 and t["bn"] < 0      # noqa: E731
@@ -552,5 +563,11 @@ def summarise(T):
             "basket, trail, no entries 11:00-14:30": _agg([dict(t, **t["alt"]["trail"]) for t in F if (t.get("alt") or {}).get("trail") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
             "basket, trail on the 5 EMA (out on a close below it)": _agg([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5")]),
             "basket, trail 5 EMA, no entries 11:00-14:30": _agg([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
+            # 18 Nov 2026 (Amritpal: "one trade at a time, then the next"): take the first basket trade that triggers; nothing new until
+            # it is closed (stop / target / trail / day end); then the next signal that triggers after that exit
+            "one at a time, 1:3": _agg(one_at_a_time(F)),
+            "one at a time, 1:2": _agg(one_at_a_time([dict(t, **t["alt"]["2.0"]) for t in F if (t.get("alt") or {}).get("2.0")])),
+            "one at a time, 5 EMA trail": _agg(one_at_a_time([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5")])),
+            "one at a time, 1:3, indices only": _agg(one_at_a_time([t for t in F if t["idx"]])),
             "basket stop hits by window": {w: sum(1 for t in F if t["how"] == "SL" and lo_ <= t.get("xt", "") < hi_) for w, lo_, hi_ in WIN},
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
