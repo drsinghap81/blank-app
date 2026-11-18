@@ -1,0 +1,25 @@
+# quick price check (19 Nov 2026): daily + 5-minute bars of a few symbols from Yahoo, printed to the log
+name: yahoo-check
+on:
+  workflow_dispatch:
+    inputs:
+      symbols: {description: "comma separated", required: true}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: |
+          pip install -q yfinance
+          python - <<'PY'
+          import yfinance as yf, os
+          for s in os.environ["SYMS"].split(","):
+              d = yf.Ticker(s.strip()).history(period="5d", interval="1d")
+              print("==", s); print(d[["Open","High","Low","Close"]].round(2).tail(3).to_string())
+              m = yf.Ticker(s.strip()).history(period="2d", interval="5m")
+              if len(m):
+                  lo = m.Low.idxmin(); print("intraday low", round(m.Low.min(), 2), "at", lo)
+          PY
+        env:
+          SYMS: ${{ inputs.symbols }}
