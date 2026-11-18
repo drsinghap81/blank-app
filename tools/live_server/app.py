@@ -3255,7 +3255,14 @@ def opt_intra_scan():
                     sig, top = prem_systems([x[4] for x in bars], [x[2] for x in bars])
                     if sig:
                         tf[name] = sig
-                res[f"{r['symbol']}|{typ}"] = dict(ltp=B[-1][4], at=B[-1][0], tf=tf)
+                # 18 Nov 2026: today's session VWAP of the option (5-minute bars) and where the last 5-minute / 1-hour close sits
+                day_ = B[-1][0][:10]; S5 = [x for x in B if x[0][:10] == day_]; pv = vv = 0.0
+                for x in S5:
+                    pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]
+                vw = pv / vv if vv else None
+                H1 = [x for x in _resample(B, 60) if x[0][:10] == day_]
+                res[f"{r['symbol']}|{typ}"] = dict(ltp=B[-1][4], at=B[-1][0], tf=tf, vwap=round(vw, 2) if vw else None,
+                                                   a5=bool(vw and B[-1][4] > vw), a60=bool(vw and H1 and H1[-1][4] > vw))
                 new = [(k_, x) for k_, L in tf.items() for x in L if (r["symbol"], typ, k_, x, B[-1][0][:10]) not in _OPT_SEEN]
                 if new:
                     try:

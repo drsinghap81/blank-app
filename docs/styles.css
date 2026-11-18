@@ -1126,3 +1126,18 @@ body.pub .owner-only { display: none !important; }
 .usw-sell summary{cursor:pointer;font-weight:600;margin:6px 0}
 .usj-pend{border-top:1px solid color-mix(in srgb,currentColor 12%,transparent);padding:10px 0}
 .usj-pend .tl-add input{min-width:7em}
+
+/* 18 Nov 2026: compact ATM option rows */
+.ov-row{display:block!important;padding:8px 2px!important}
+.ov-l1{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px}
+.ov-l1 .chip{margin:0}
+.ov-l2{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px;margin-top:3px}
+.ov-leg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px}
+.ov-dot{display:inline-block;padding:0 5px;border-radius:6px;font-size:11px;font-weight:700;background:var(--soft);color:var(--slate)}
+.ov-dot.on{background:var(--rise-soft);color:var(--rise-ink)}
+.ov-dot.off{background:color-mix(in srgb,var(--fall) 18%,transparent);color:var(--fall)}
+.ov-s{font-size:11px!important;padding:1px 6px!important}
+.ov-z{margin-left:auto;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:800}
+.ov-z.buy{background:var(--rise);color:#fff}.ov-z.lbuy{background:var(--rise-soft);color:var(--rise-ink)}
+.ov-z.sell{background:var(--fall);color:#fff}.ov-z.lsell{background:color-mix(in srgb,var(--fall) 18%,transparent);color:var(--fall)}
+.ov-z.neu{background:var(--soft);color:var(--slate)}

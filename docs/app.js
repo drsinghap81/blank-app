@@ -2512,19 +2512,30 @@ async function loadOptCharts(el) {
   $('#asof').textContent = `NSE F&O close ${day(D.asof)}${updTxt(D.generated)}`;
   const R = (D.rows || []).slice().sort((a, b) => (score(b) - score(a)) || ((b.kind === 'index') - (a.kind === 'index')) || (b.atm_vol5 - a.atm_vol5));
   const hasSig = (r) => tfs(r, 'ce').length + tfs(r, 'pe').length > 0;
+  /* 18 Nov 2026: zone hint from VWAP on 5m and 1h (calls vs puts) plus PCR. Guide only, untested.
+     Buy zone  = CE above its VWAP on 5m and 1h, PE below on both, PCR in the top two fifths
+     Sell zone = the mirror with PCR in the bottom two fifths; Leaning = 3 of the 4 VWAP checks agree */
+  const zone = (r) => { const c = IN[`${r.symbol}|CE`], p = IN[`${r.symbol}|PE`]; if (!c || !p || c.vwap == null || p.vwap == null) return null;
+    const bull = (c.a5 ? 1 : 0) + (c.a60 ? 1 : 0) + (p.a5 ? 0 : 1) + (p.a60 ? 0 : 1); const x = state.pcr && state.pcr.rows && state.pcr.rows[r.symbol]; const qn = x ? x.q : 3;
+    if (bull === 4 && qn >= 4) return ['buy', 'Buy zone']; if (bull === 0 && qn <= 2) return ['sell', 'Sell zone'];
+    if (bull >= 3) return ['lbuy', 'Leaning buy']; if (bull <= 1) return ['lsell', 'Leaning sell']; return ['neu', 'Neutral']; };
   const f = state.optF || 'all'; const q = (state.optQ || '').toUpperCase();
-  const L = R.filter((r) => (f === 'all' || (f === 'sig' ? hasSig(r) : f === 'idx' ? r.kind === 'index' : true)) && (!q || r.symbol.includes(q)));
+  const zk = (r) => (zone(r) || [''])[0];
+  const L = R.filter((r) => (f === 'all' || (f === 'sig' ? hasSig(r) : f === 'idx' ? r.kind === 'index' : f === 'buy' ? ['buy', 'lbuy'].includes(zk(r)) : f === 'sell' ? ['sell', 'lsell'].includes(zk(r)) : true)) && (!q || r.symbol.includes(q)))
+    .sort((a, b) => (f === 'buy' || f === 'sell' ? (['buy', 'sell'].includes(zk(b)) - ['buy', 'sell'].includes(zk(a))) : 0));
   const leg = (r, t) => { const x = r[t]; if (!x) return `<span class="muted">${t.toUpperCase()} –</span>`;
     const sh = { '9/21 cross up': '9/21', '20-day high close': '20-high', '20-bar high close': '20-high', 'Top Bottom buy (close above last top)': 'TB' };
     const lt = IN[`${r.symbol}|${t.toUpperCase()}`];
-    return `<span><b>${t.toUpperCase()}</b> ${fmt(lt && lt.ltp ? lt.ltp : x.close, 2, 'en-IN')} <span class="${(x.chg || 0) >= 0 ? 'up' : 'down'}">${x.chg == null || (lt && lt.ltp) ? '' : `${x.chg >= 0 ? '+' : ''}${fmt(x.chg, 1)}%`}</span>${tfs(r, t).map(([k, g]) => ` <span class="chip new">${k}: ${g.map((z) => (/^cup close/.test(z) ? 'CUP' : z === 'RSI 60 cross' ? 'RSI60' : sh[z] || esc(z))).join('+')}</span>`).join('')}</span>`; };
-  const items = L.map((r, i) => `<li class="row" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)} <span class="muted">${fmt(r.strike, 0, 'en-IN')} · ${esc(day(r.expiry))} · ${r.dte} d</span></div>
-      <div class="tags">${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}${pcrChip(r.symbol)}<span class="chip">fut ${fmt(r.fut, 2, 'en-IN')}</span>${r.lot ? `<span class="chip">lot ${r.lot}</span>` : ''}</div>
-      <div class="lv-sub">${leg(r, 'ce')}<br>${leg(r, 'pe')}</div></div><div></div><div></div></li>`).join('');
+    const dot = (k, on) => `<span class="ov-dot ${lt && lt.vwap != null ? (on ? 'on' : 'off') : ''}" title="${k} close ${lt && lt.vwap != null ? (on ? 'above' : 'below') + ' VWAP ' + lt.vwap : 'VWAP not scanned yet'}">${k}</span>`;
+    return `<span class="ov-leg"><b>${t.toUpperCase()}</b> ${fmt(lt && lt.ltp ? lt.ltp : x.close, 2, 'en-IN')}${x.chg == null || (lt && lt.ltp) ? '' : ` <span class="${x.chg >= 0 ? 'up' : 'down'}">${x.chg >= 0 ? '+' : ''}${fmt(x.chg, 0)}%</span>`} ${dot('5m', lt && lt.a5)}${dot('1h', lt && lt.a60)}${tfs(r, t).map(([k, g]) => ` <span class="chip new ov-s">${k}: ${g.map((z) => (/^cup close/.test(z) ? 'CUP' : z === 'RSI 60 cross' ? 'RSI60' : sh[z] || esc(z))).join('+')}</span>`).join('')}</span>`; };
+  const items = L.map((r, i) => { const z = zone(r);
+    return `<li class="row ov-row" tabindex="0" data-i="${i}"><div class="ov-l1"><b>${esc(r.symbol)}</b> <span class="muted">${fmt(r.strike, 0, 'en-IN')} · ${r.dte}d</span>${pcrChip(r.symbol)}${z ? ` <span class="ov-z ${z[0]}">${z[1]}</span>` : ''}</div>
+      <div class="ov-l2">${leg(r, 'ce')}${leg(r, 'pe')}</div></li>`; }).join('');
   el.innerHTML = `${tradeStrip('opt')}<div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> Systems run on the option premium itself (cup close, 9/21 cross, 20-day high close, Top Bottom close above the last top). Not backtested on option charts; a test of Top Bottom's trades taken with ATM options made about half what futures made. Monthly expiry, today's ATM strike; liquid = ATM CE + PE ≥ 200 contracts a day.</div>
     <section class="summary"><div class="stat"><b>${R.length}</b><span>liquid underlyings</span></div><div class="stat new"><b>${R.filter(hasSig).length}</b><span>with a signal on CE or PE (any timeframe)</span></div></section>
     <p class="muted small" style="margin:6px 16px">Sorted by how many timeframes (D · 1h · 15m · 5m) show a signal, then signal count. CUP = cup close: the bar CLOSED above the highest high of the last 250 bars, that high 20+ bars old, after a dip of 15%+ (day cup close rule) · RSI60 = RSI(14) crossed above 60 · 9/21 = EMA 9 crossed above 21 · 20-high = close above the 20-bar high · TB = close above the last top. ${state.optIntra && state.optIntra.at ? `Intraday as of ${esc(state.optIntra.at.slice(11, 16))} IST (every 15 min in market hours).` : (lvCfg().url ? 'Intraday timeframes appear once your server has run its first scan (market hours).' : 'Connect your server (Live tab) for the 1h / 15m / 5m timeframes.')}</p>
-    <div class="card"><div class="seg" id="optf">${[['all', `All ${R.length}`], ['sig', `Signals ${R.filter(hasSig).length}`], ['idx', 'Indices']].map(([k, n]) => `<button data-k="${k}" aria-selected="${f === k}">${n}</button>`).join('')}</div>
+    <p class="muted small" style="margin:6px 16px"><b>5m · 1h</b> dots: green = that option's last 5-minute / 1-hour close is above today's VWAP, red = below. <b>Buy zone</b> = calls above VWAP on both, puts below on both, PCR high. <b>Sell zone</b> = the mirror with PCR low. <b>Leaning</b> = 3 of 4 VWAP checks agree. Guide only, untested.</p>
+    <div class="card"><div class="seg" id="optf">${[['all', `All ${R.length}`], ['buy', `Buy zone ${R.filter((r) => ['buy', 'lbuy'].includes(zk(r))).length}`], ['sell', `Sell zone ${R.filter((r) => ['sell', 'lsell'].includes(zk(r))).length}`], ['sig', `Signals ${R.filter(hasSig).length}`], ['idx', 'Indices']].map(([k, n]) => `<button data-k="${k}" aria-selected="${f === k}">${n}</button>`).join('')}</div>
     <label class="search"><input id="optq" type="search" placeholder="Search symbol" value="${esc(state.optQ || '')}" autocomplete="off"></label>
     <ul class="list flat">${items || '<li class="empty">Nothing matches.</li>'}</ul></div>`;
   tradeStripWire(el);
