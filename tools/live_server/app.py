@@ -3262,7 +3262,8 @@ def opt_intra_scan():
                 vw = pv / vv if vv else None
                 H1 = [x for x in _resample(B, 60) if x[0][:10] == day_]
                 res[f"{r['symbol']}|{typ}"] = dict(ltp=B[-1][4], at=B[-1][0], tf=tf, vwap=round(vw, 2) if vw else None,
-                                                   a5=bool(vw and B[-1][4] > vw), a60=bool(vw and H1 and H1[-1][4] > vw))
+                                                   a5=bool(vw and B[-1][4] > vw),
+                                                   a60=bool(vw and H1 and (H1[-2][4] if len(H1) >= 2 else H1[-1][4]) > vw))   # last completed hour
                 new = [(k_, x) for k_, L in tf.items() for x in L if (r["symbol"], typ, k_, x, B[-1][0][:10]) not in _OPT_SEEN]
                 if new:
                     try:

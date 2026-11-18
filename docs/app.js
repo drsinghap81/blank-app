@@ -2505,7 +2505,10 @@ async function loadOptCharts(el) {
      many timeframes agree */
   if (lvCfg().url && lvCfg().token && (!state.optIntra || Date.now() - (state.optIntraAt || 0) > 120000)) {
     state.optIntraAt = Date.now(); state.optIntra = await lvApi('/api/opt/scan', { timeout: 20000 }).catch(() => null); }
-  const IN = (state.optIntra && state.optIntra.items) || {};
+  const IN = { ...((state.optIntra && state.optIntra.items) || {}) };
+  /* 18 Nov 2026: until the server's scan carries VWAP, work it out here from Angel 5-minute candles (first 40 rows, cached 5 min) */
+  const VW = state.optVw = state.optVw || {};
+  Object.entries(VW).forEach(([k, v]) => { if (Date.now() - v.at < 300000) IN[k] = { ...(IN[k] || {}), ...v.x }; });
   const tfs = (r, t) => { const o = []; if (r[t] && r[t].signals && r[t].signals.length) o.push(['D', r[t].signals]);
     const x = IN[`${r.symbol}|${t.toUpperCase()}`]; if (x && x.tf) ['1h', '15m', '5m'].forEach((k) => { if (x.tf[k]) o.push([k, x.tf[k]]); }); return o; };
   const score = (r) => { const all = tfs(r, 'ce').concat(tfs(r, 'pe')); return new Set(all.map((x) => x[0])).size * 100 + all.reduce((a, x) => a + x[1].length, 0) * 10; };
@@ -2542,6 +2545,28 @@ async function loadOptCharts(el) {
   el.querySelectorAll('#optf button').forEach((b) => b.addEventListener('click', () => { state.optF = b.dataset.k; loadOptCharts(el); }));
   const qi = $('#optq'); qi.addEventListener('change', () => { state.optQ = qi.value; loadOptCharts(el); });
   el.querySelectorAll('.row').forEach((x) => x.addEventListener('click', () => optSelect(L[+x.dataset.i])));
+  const need = lvCfg().url && lvCfg().token ? R.slice(0, 40).filter((r) => !(IN[`${r.symbol}|CE`] && IN[`${r.symbol}|CE`].vwap != null)) : [];
+  if (need.length && !state.optVwBusy) {
+    state.optVwBusy = true;
+    (async () => {
+      const one = async (r, t) => { try {
+        const S = await lvApi(`/api/opt/candles?symbol=${encodeURIComponent(r.symbol)}&expiry=${r.expiry}&strike=${r.strike}&type=${t}&interval=5`, { timeout: 30000 });
+        const day0 = new Date(S.t[S.t.length - 1] * 1000).toISOString().slice(0, 10); let pv = 0, vv = 0; const hcl = {};
+        S.t.forEach((x, i) => { const d = new Date(x * 1000).toISOString(); if (d.slice(0, 10) !== day0) return;
+          pv += (S.h[i] + S.l[i] + S.c[i]) / 3 * (S.v[i] || 0); vv += S.v[i] || 0;
+          hcl[Math.floor(((x % 86400) - 33300) / 3600)] = S.c[i]; });            // close of each hour (anchored 09:15)
+        const hk = Object.keys(hcl).map(Number).sort((a, b) => a - b); const hc = hk.length >= 2 ? hcl[hk[hk.length - 2]] : hcl[hk[hk.length - 1]];   // last COMPLETED hour
+        const vw = vv ? pv / vv : null; const last = S.c[S.c.length - 1];
+        VW[`${r.symbol}|${t}`] = { at: Date.now(), x: { vwap: vw && +vw.toFixed(2), ltp: last, a5: !!(vw && last > vw), a60: !!(vw && hc > vw) } };
+      } catch (e) { VW[`${r.symbol}|${t}`] = { at: Date.now(), x: {} }; } };
+      for (let i = 0; i < need.length; i += 3) {
+        await Promise.all(need.slice(i, i + 3).flatMap((r) => [one(r, 'CE'), one(r, 'PE')]));
+        if (state.view !== 'trd' || state.athTabG.trd !== 'opt') break;
+        if (i % 9 === 6 || i + 3 >= need.length) { const y = window.scrollY; await loadOptCharts(el); window.scrollTo(0, y); }
+      }
+      state.optVwBusy = false;
+    })();
+  }
 }
 async function optSelect(r) {
   const iv = state.optIv || 'D'; const srv = !!(lvCfg().url && lvCfg().token);
