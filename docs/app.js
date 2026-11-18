@@ -2795,7 +2795,20 @@ async function loadTurtle(el) {
       ${hist ? `<details style="margin-top:4px"><summary class="muted" style="font-size:12px">Last trades</summary><div class="muted" style="font-size:12px">${hist}</div></details>` : ''}</div><div></div>
       <div class="num"><a class="tv-btn" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.tv)}&interval=D" target="_blank" rel="noopener">Chart ↗</a></div></li>`;
   };
-  el.innerHTML = `${tradeStrip('turtle')}
+  /* 19 Nov 2026 (Amritpal): show what needs an order - instruments within 2% of their 20-day high (place the buy-stop now),
+     today's new buys and exits, and holdings - in front; everything else only under "All" */
+  let tf = state.turF || 'act'; const NEAR = 2;
+  const act = (r) => r.status !== 'flat' || (r.dist_pct != null && r.dist_pct <= NEAR);
+  const near = R.filter((r) => r.status === 'flat' && r.dist_pct != null && r.dist_pct <= NEAR);
+  const shown = tf === 'all' ? R : R.filter(act);
+  const nearCard = near.length ? `<div class="card pad b5" style="margin:10px 16px"><b class="b5-title">Place these buy-stops now (${near.length})</b>
+      <p class="muted small">Within ${NEAR}% of the 20-day high: a buy-stop just above it fills only if the breakout comes. Size is for ${S.risk}% risk at the 2N stop.</p>
+      <div class="b5-g">${near.map((r, i) => `<div class="b5-t"><div class="b5-n">${i + 1}</div><div class="b5-b"><div class="b5-s">${esc(r.name)}</div>
+        <div class="b5-sys">${esc(r.contract)} · ${fmt(r.dist_pct, 1)}% below the 20-day high · close ${px(r.close)}</div>
+        <div class="b5-l"><span>Buy-stop <b>${px(r.buy_stop)}</b></span><span>Stop if filled <b>${px(r.fixed_stop_if_filled)}</b></span><span>${turSize(r, S, D.fx || {}, r.N, r.buy_stop)}</span></div>
+        ${turMcx(r, S, D.fx || {}, r.N) ? `<div class="muted small" style="margin-top:4px">${turMcx(r, S, D.fx || {}, r.N)}</div>` : ''}</div></div>`).join('')}</div></div>`
+    : `<div class="card pad" style="margin:10px 16px"><b>No buy-stops to place today</b><p class="muted small">Nothing is within ${NEAR}% of its 20-day high. The nearest: ${R.filter((r) => r.status === 'flat').slice(0, 3).map((r) => `${esc(r.name)} ${fmt(r.dist_pct, 1)}%`).join(' · ')}.</p></div>`;
+  el.innerHTML = `${tradeStrip('turtle')}${nearCard}
     <section class="summary"><div class="stat new"><b>${nNew}</b><span>new buys today</span></div><div class="stat"><b>${nIn}</b><span>holding</span></div>
       <div class="stat exit"><b>${nEx}</b><span>exits today</span></div><div class="stat"><b>${R.length - nIn - nEx}</b><span>waiting with a buy-stop</span></div></section>
     <div class="status exit watch" style="margin:10px 16px"><b>Paper / watch.</b> Daily 20/10 long Turtle. Tested 2010–26: 24%/yr, −27% worst fall at 1% risk (≈12%, −33% without BTC/ETH), about 2.5× leverage. Profit is booked only when the trailing stop (10-day low) is hit; there is no target. Orders are yours to place.</div>
@@ -2807,7 +2820,9 @@ async function loadTurtle(el) {
         <label>Nifty lot <input id="tlotn" type="number" value="${S.lotN || ''}" placeholder="65" style="width:64px"></label>
         <label>Bank Nifty lot <input id="tlotb" type="number" value="${S.lotB || ''}" placeholder="?" style="width:64px"></label></div>
       <p class="muted" style="font-size:12px;margin:6px 0 0">One unit risks ${S.risk}% of the account at the 2N stop. US markets are sized in CME micro contracts; check your broker's contract specs and margin.</p></div>
-    <div class="card"><ul class="list flat">${R.map(row).join('')}</ul></div>`;
+    <div class="card"><div class="seg" id="turf">${[['act', `Act on (${R.filter(act).length})`], ['all', `All ${R.length}`]].map(([k, l]) => `<button data-k="${k}" aria-selected="${tf === k}">${l}</button>`).join('')}</div>
+      <ul class="list flat">${shown.map(row).join('') || '<li class="empty">Nothing to act on today.</li>'}</ul></div>`;
+  el.querySelectorAll('#turf button').forEach((b) => b.addEventListener('click', () => { state.turF = b.dataset.k; loadTurtle(el); }));
   tradeStripWire(el);
   el.querySelectorAll('.row[data-tk]').forEach((li) => li.addEventListener('click', (e) => { if (e.target.closest('a,summary,details')) return; turtleSelect(D.rows.find((r) => r.key === li.dataset.tk)); }));
   const save = () => { turSave({ cur: $('#tcur').value, acct: +$('#tacct').value, risk: +$('#trisk').value, lotN: +$('#tlotn').value, lotB: +$('#tlotb').value }); loadTurtle(el); };
