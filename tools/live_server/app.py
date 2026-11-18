@@ -3291,6 +3291,39 @@ def opt_scan_now(_=Depends(auth)):
     return dict(ok=True, note="started; takes about 3 minutes")
 
 
+_VWAP = {}
+
+
+@app.get("/api/vwap")
+def vwap(syms: str, _=Depends(auth)):
+    """18 Nov 2026: today's session VWAP for NSE stocks (Angel 5-minute candles): last price vs VWAP and when it last crossed
+    above. Entry GUIDE with PCR (Amritpal: "if price trades above VWAP in the shorter time frame, that's the entry"). Untested."""
+    out = {}
+    for sym in [re.sub(r"[^A-Z0-9&\-]", "", x.upper())[:20] for x in syms.split(",") if x][:40]:
+        c = _VWAP.get(sym)
+        if c and time.time() - c[0] < 120:
+            out[sym] = c[1]; continue
+        try:
+            _, t = broker._ts(sym)
+            B = broker.candles_int("NSE", t["token"], "FIVE_MINUTE", 4)
+        except Exception as ex:  # noqa: BLE001
+            out[sym] = dict(error=str(ex)[:80]); continue
+        if not B:
+            continue
+        day = B[-1][0][:10]; S = [x for x in B if x[0][:10] == day]
+        pv = vv = 0.0; above_since = None; vw = None
+        for x in S:
+            tp = (x[2] + x[3] + x[4]) / 3; pv += tp * x[5]; vv += x[5]
+            vw = pv / vv if vv else x[4]
+            if x[4] > vw:
+                above_since = above_since or x[0][11:16]
+            else:
+                above_since = None
+        r = dict(day=day, vwap=round(vw, 2) if vw else None, ltp=S[-1][4], above=bool(vw and S[-1][4] > vw), since=above_since, at=S[-1][0][11:16])
+        _VWAP[sym] = (time.time(), r); out[sym] = r
+    return out
+
+
 @app.get("/api/opt/candles")
 def opt_candles(symbol: str, expiry: str, strike: float, type: str, interval: str = "15", _=Depends(auth)):
     if interval not in OPT_IV or type not in ("CE", "PE") or not re.match(r"^\d{4}-\d{2}-\d{2}$", expiry):

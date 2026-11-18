@@ -950,6 +950,7 @@ async function loadLiveG(mk) {
   }
 }
 async function loadLive() {
+  await pcrLoad();
   $('#title').textContent = 'Live trades';
   const el = $('#view-live'); el.innerHTML = '<p class="muted pad">Loading…</p>';
   if (!state.lvMk) { try { state.lvMk = localStorage.getItem('td.lvMk') || 'NSE'; } catch (e) { state.lvMk = 'NSE'; } }
@@ -1019,7 +1020,7 @@ async function loadLive() {
     const can = S && !r.skip && !r.surv && r.qty > 0 && !r.local;
     const hdr = r.tier === 'more' && (first ?? (i === 0 || rows[i - 1].tier !== 'more'))
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
-    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${pos ?? r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${r.tier === 'swing' && (!S || r.local) ? `<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${r.surv ? ' <span class="chip exit" title="Exchange surveillance list: Angel needs your consent in its own app">⚠ Surveillance · place in Angel</span>' : ''} ${strMeter(r)} ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
+    return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${pos ?? r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${r.tier === 'swing' && (!S || r.local) ? `<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${pcrChip(r.symbol)}<span data-vw="${esc(r.symbol)}"></span>${r.surv ? ' <span class="chip exit" title="Exchange surveillance list: Angel needs your consent in its own app">⚠ Surveillance · place in Angel</span>' : ''} ${strMeter(r)} ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
       ${r.dupNote ? `<div class="lv-sub">${esc(r.dupNote)}</div>` : ''}<div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} · stop ${fmt(r.stop, 2, 'en-IN')} <span class="muted">(−${fmt(r.risk_pct ?? (E > r.stop ? (1 - r.stop / E) * 100 : null), 0)}%)</span>`}</div>
       ${r.skip ? '' : slTrack({ stop: r.stop, entry: E, now: r.ltp || null, target: r.target || (+((r.exit_rule || '').match(/R target ([\d.]+)/) || [])[1] || null), entryLab: 'Buy at', exitTxt: r.exit_rule || null })}
       ${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}
@@ -1040,14 +1041,14 @@ async function loadLive() {
       ${off ? `<p class="lv-sub lv-offnote">Switched off in your split: ${b === 'my' ? 'your own picks sit outside the tested split' : b === 'vcp' ? 'VCP is a watch bucket (+4.9% a trade, but only +1 point a year added to your mix)' : b === 'pt' ? 'bottom patterns showed no edge in the 2017–26 test' : b === 'rt' ? 'retests lost about 1.3%/yr in the full-account test' : 'not part of the tested mix'}. Sized at the swing risk from your cash so you can decide; protective stop at the plan stop.</p>` : ''}
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">${BK_HEAD[b]}</p></details>${b === 'tf' ? lvSwingHead(srNow, S && !S.swing ? Math.max(0, S.cash - 0.15 * S.capital) : idleNow, 'NSE', S && S.swing ? S.swing.open : null) + (S && !S.swing && swRows.length ? '<p class="lv-sub"><b>View only until your server updates</b> (it updates itself at 08:00 IST on weekdays): sized here from your cash; place these in the Angel app, or Send them after the update.</p>' : '') : ''}
       ${L || `<p class="empty">${b === 'vcp' ? 'No VCP setup near its pivot today — the scan checks every evening.' : 'No new signals for the next session.'}</p>`}</details>`; };
-  const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span></div>
+  const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span>${pcrChip(e.symbol)}</div>
       <div class="lv-sub">${esc(e.system)}: ${esc(e.why)} · ${S ? `you hold ${e.qty}` : 'matched to your holdings once the server is connected'}</div></div>
       <div>${S && e.qty > 0 ? `<button class="lv-btn sell" data-x="${i}">Sell ${e.qty}</button>` : ''}</div></div>`).join('');
   const watch = (P.watch || []).map((w, i) => `<a href="#" class="lv-w" data-w="${i}">${esc(w.symbol)}</a> (${fmt(w.price, 2, 'en-IN')})`).join(', ');
   const ST = { pending: ['Sent', 'dry'], open: ['Filled', 'ok'], exiting: ['Selling', 'dry'] };
   const trades = S && S.trades ? S.trades.map((t) => { const [lab, cls] = ST[t.state] || [t.state, 'dry'];
     const pnl = t.ltp && t.entry ? (t.ltp / t.entry - 1) * 100 : null;
-    return `<div class="lv-row lv-trade"><div><div class="lv-sym">${esc(t.symbol)} <span class="lv-mode ${cls}" style="${cls === 'ok' ? 'background:var(--rise-soft);color:var(--rise-ink)' : ''}">${lab}</span> <span class="chip">${esc(t.system || '')}</span>${pnl == null ? '' : ` <b class="${pnl >= 0 ? 'up' : 'down'}" style="margin-left:auto">${pnl >= 0 ? '+' : ''}${fmt(pnl, 1)}%${t.R == null ? '' : ` · ${t.R >= 0 ? '+' : ''}${fmt(t.R, 2)}R`}</b>`}</div>
+    return `<div class="lv-row lv-trade"><div><div class="lv-sym">${esc(t.symbol)} <span class="lv-mode ${cls}" style="${cls === 'ok' ? 'background:var(--rise-soft);color:var(--rise-ink)' : ''}">${lab}</span> <span class="chip">${esc(t.system || '')}</span>${pcrChip(t.symbol)}<span data-vw="${esc(t.symbol)}"></span>${pnl == null ? '' : ` <b class="${pnl >= 0 ? 'up' : 'down'}" style="margin-left:auto">${pnl >= 0 ? '+' : ''}${fmt(pnl, 1)}%${t.R == null ? '' : ` · ${t.R >= 0 ? '+' : ''}${fmt(t.R, 2)}R`}</b>`}</div>
       <div class="lv-sub">${t.qty} @ ${fmt(t.entry, 2, 'en-IN')}${t.ltp ? ` · now ${fmt(t.ltp, 2, 'en-IN')}` : ''} · plan stop ${fmt(t.stop, 2, 'en-IN')}${t.state === 'pending' && t.order_status ? ` · Angel: ${esc(t.order_status)}` : ''}</div>
       ${slTrack({ stop: t.gtt_trigger || t.stop, entry: t.entry, now: t.ltp, target: t.target })}
       <div class="lv-sub">${t.gtt_id ? `🛡 Stop on Angel at ${fmt(t.gtt_trigger, 2, 'en-IN')}${t.trail_at ? ` · raised ${day(t.trail_at)}${t.trail_prev ? ` from ${fmt(t.trail_prev, 2, 'en-IN')}` : ''} (${t.system === 'Monthly ATH' ? '30-wk SMA' : 'EMA 21'} ${fmt(t.trail_level, 2, 'en-IN')} − ${fmt(S.protect && S.protect.trail_gap_pct || 15, 0)}%)` : ''}` : t.gtt_error ? `<span class="down">Stop not placed yet: ${esc(t.gtt_error)}</span> <button class="lv-btn sell" data-prot="1" style="padding:4px 10px;font-size:12px">Retry stop</button>` : t.state === 'open' ? '<span class="down">No protective stop on Angel</span>' : 'Stop goes on Angel after the fill'}</div>
@@ -1162,7 +1163,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); perfVsCard($('#pvin'), 'IN'); foCard($('#focard')); usJournalCard($('#inj'), 'IN'); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); vwFill(el); perfVsCard($('#pvin'), 'IN'); foCard($('#focard')); usJournalCard($('#inj'), 'IN'); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -1568,6 +1569,7 @@ async function lvBasket(B, btn) {
 
 /* ------------------------------------------------------------------ trends */
 async function loadTrends() {
+  await pcrLoad();
   $('#title').textContent = 'Trading';
   const ts = $('#trdstrip'); if (ts && !ts.firstChild) { ts.innerHTML = tradeStrip('t921'); tradeStripWire(ts); }
   if (!state.data[state.mkt]) {
@@ -1666,7 +1668,7 @@ function rowHTML(r, i) {
     right = `<b>${fmt(r.close)}</b><span class="${r.r1m >= 0 ? 'up' : 'down'}">${pct(r.r1m)} 1M</span>`;
   }
   return `<li class="row" tabindex="0" data-i="${i}" ${state.selected === r.symbol ? 'aria-current="true"' : ''}>
-    <div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${boardChip(r)}${chips}${pulseChip(r.symbol, state.mkt)}</div></div>
+    <div><div class="sym">${esc(r.symbol)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${boardChip(r)}${state.mkt === 'NSE' ? pcrChip(r.symbol) : ''}${chips}${pulseChip(r.symbol, state.mkt)}</div></div>
     ${sparkSVG(r.spark, t === 'new')}
     <div class="num">${right}</div></li>`;
 }
@@ -2493,6 +2495,7 @@ async function turtleSelect(r) {
 /* 17 Nov 2026: ATM option charts for liquid F&O stocks and index options, with the app's systems run on the premium chart
    (tools/opt_charts.py, nightly after the NSE bhavcopy). Watch only: not backtested on option premiums. */
 async function loadOptCharts(el) {
+  await pcrLoad();
   $('#title').textContent = 'Trading · ATM option charts';
   if (!state.optScan || Date.now() - (state.optAt || 0) > 600000) { el.innerHTML = tradeStrip('opt') + '<p class="muted pad">Loading…</p>'; tradeStripWire(el);
     state.optAt = Date.now(); state.optScan = await getJSON(MAIN + 'data/scan/optscan.json', 'optscan').catch(() => null); }
@@ -2516,7 +2519,7 @@ async function loadOptCharts(el) {
     const lt = IN[`${r.symbol}|${t.toUpperCase()}`];
     return `<span><b>${t.toUpperCase()}</b> ${fmt(lt && lt.ltp ? lt.ltp : x.close, 2, 'en-IN')} <span class="${(x.chg || 0) >= 0 ? 'up' : 'down'}">${x.chg == null || (lt && lt.ltp) ? '' : `${x.chg >= 0 ? '+' : ''}${fmt(x.chg, 1)}%`}</span>${tfs(r, t).map(([k, g]) => ` <span class="chip new">${k}: ${g.map((z) => (/^cup close/.test(z) ? 'CUP' : z === 'RSI 60 cross' ? 'RSI60' : sh[z] || esc(z))).join('+')}</span>`).join('')}</span>`; };
   const items = L.map((r, i) => `<li class="row" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.symbol)} <span class="muted">${fmt(r.strike, 0, 'en-IN')} · ${esc(day(r.expiry))} · ${r.dte} d</span></div>
-      <div class="tags">${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}<span class="chip">fut ${fmt(r.fut, 2, 'en-IN')}</span>${r.lot ? `<span class="chip">lot ${r.lot}</span>` : ''}</div>
+      <div class="tags">${r.kind === 'index' ? '<span class="chip">Index</span>' : ''}${pcrChip(r.symbol)}<span class="chip">fut ${fmt(r.fut, 2, 'en-IN')}</span>${r.lot ? `<span class="chip">lot ${r.lot}</span>` : ''}</div>
       <div class="lv-sub">${leg(r, 'ce')}<br>${leg(r, 'pe')}</div></div><div></div><div></div></li>`).join('');
   el.innerHTML = `${tradeStrip('opt')}<div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> Systems run on the option premium itself (cup close, 9/21 cross, 20-day high close, Top Bottom close above the last top). Not backtested on option charts; a test of Top Bottom's trades taken with ATM options made about half what futures made. Monthly expiry, today's ATM strike; liquid = ATM CE + PE ≥ 200 contracts a day.</div>
     <section class="summary"><div class="stat"><b>${R.length}</b><span>liquid underlyings</span></div><div class="stat new"><b>${R.filter(hasSig).length}</b><span>with a signal on CE or PE (any timeframe)</span></div></section>
@@ -2544,7 +2547,7 @@ async function optSelect(r) {
     ${iv !== 'D' && !srv ? '<p class="muted pad">Intraday candles come from Angel through your server: connect it on the Live tab.</p>' : ''}
     <h3 style="margin:10px 16px 0">CE</h3><div class="chart" id="optce" style="height:230px"><p class="muted pad">Loading…</p></div><div class="chart" id="optcer" style="height:100px"></div><p class="muted small" style="margin:2px 16px" id="optcen"></p>
     <h3 style="margin:10px 16px 0">PE</h3><div class="chart" id="optpe" style="height:230px"><p class="muted pad">Loading…</p></div><div class="chart" id="optper" style="height:100px"></div><p class="muted small" style="margin:2px 16px" id="optpen"></p>
-    <p class="muted small" style="margin:6px 16px">${iv === 'D' ? 'Daily candles of this contract (days without a trade use the settle price)' : `${IV.find((x) => x[0] === iv)[1]} candles from Angel (times in IST)`} · orange = EMA 9 · blue = EMA 21 · grey dashed = last top (Top Bottom buy level) · lower pane: RSI(14), red 70 / green 30. Systems on the premium are watch only.</p>`);
+    <p class="muted small" style="margin:6px 16px">${iv === 'D' ? 'Daily candles of this contract (days without a trade use the settle price)' : `${IV.find((x) => x[0] === iv)[1]} candles from Angel (times in IST)`} · orange = EMA 9 · blue = EMA 21 · pink = VWAP (intraday) · grey dashed = last top (Top Bottom buy level) · lower pane: RSI(14), red 70 / green 30. Systems on the premium are watch only.</p>`);
   document.querySelectorAll('#optiv button').forEach((b) => b.addEventListener('click', () => { state.optIv = b.dataset.k; optSelect(r); }));
   document.querySelectorAll('[data-cp]').forEach((b) => b.addEventListener('click', async () => { try { await navigator.clipboard.writeText(b.dataset.cp); b.textContent = 'Copied ✓'; } catch (e) { alertMsg(b.dataset.cp); } }));
   const ema = (v, n) => { const k = 2 / (n + 1); let e = v[0]; return v.map((x) => (e = x * k + e * (1 - k))); };
@@ -2555,6 +2558,10 @@ async function optSelect(r) {
     cs.setData(S.t.map((x, i) => ({ time: x, open: S.o[i], high: S.h[i], low: S.l[i], close: S.c[i] })));
     const ln = (v, col) => ch.addLineSeries({ color: col, lineWidth: 2, priceLineVisible: false, lastValueVisible: false }).setData(S.t.map((x, i) => ({ time: x, value: v[i] })));
     if (S.c.length >= 9) ln(ema(S.c, 9), '#F59E0B'); if (S.c.length >= 21) ln(ema(S.c, 21), '#3B82F6');
+    if (iv !== 'D' && S.v && S.v.length === S.c.length) {          // session VWAP, reset each day (18 Nov 2026)
+      let d0 = null, pv = 0, vv = 0; const vw = S.t.map((x, i) => { const dd = new Date(x * 1000).toISOString().slice(0, 10); if (dd !== d0) { d0 = dd; pv = 0; vv = 0; }
+        pv += (S.h[i] + S.l[i] + S.c[i]) / 3 * (S.v[i] || 0); vv += S.v[i] || 0; return vv ? pv / vv : S.c[i]; });
+      ln(vw, '#EC4899'); }
     if (top) cs.createPriceLine({ price: top, color: '#9CA3AF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'last top' });
     /* 18 Nov 2026: RSI(14) (Wilder) in its own pane under the candles, with 30 / 70 lines */
     const rsi = (() => { const c = S.c; const o = new Array(c.length).fill(null); if (c.length < 15) return o; let g = 0, l = 0;
@@ -2729,6 +2736,7 @@ const NSE_IDX_TV = { 'NIFTY 50': 'NIFTY', 'NIFTY BANK': 'BANKNIFTY', 'NIFTY IT':
 const nseIdxTv = (n) => 'NSE:' + (NSE_IDX_TV[n] || n.replace(/&/g, 'AND').replace(/[^A-Z0-9]+/g, '_'));
 const tvOpen = (key, sym) => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvOf(key, sym)), '_blank', 'noopener');
 async function loadATH() {
+  await pcrLoad();
   const grp = athGrp();
   $('#title').textContent = { mom: 'Momentum investing', inv: 'Investment', trd: 'Trading · cup closes' }[grp];
   const el = $(grp === 'mom' ? '#view-ath' : '#view-' + state.view);
@@ -3651,8 +3659,23 @@ const ixNames = () => (state.ath && state.ath.sec && state.ath.sec.names) || {};
 const secName = (k) => ixNames()[k] || ({ 'NIFTY IT': 'IT', 'NIFTY FMCG': 'FMCG', 'NIFTY INDIA CONSUMPTION': 'Consumption', 'NIFTY SERVICES SECTOR': 'Services', 'NIFTY FINANCIAL SERVICES': 'Financials' }[k]
   || k.replace('NIFTY ', '').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()));
 const SECTOR_TXT = { leading: 'Sector leading', uptrend: 'Sector uptrend', mixed: 'Sector mixed', weak: 'Sector weak' };
+/* 18 Nov 2026: put/call OI ratio as a GUIDE on every Indian F&O trade (data/scan/pcr.json, nightly). Tested 2020-26: the highest
+   fifth of PCR beat the lowest fifth in every year (+1.5% vs +0.4% over 10 days). Not a system and not a filter. */
+/* 18 Nov 2026: today's VWAP (server, Angel 5-minute candles) on the Live India buy list and open trades: entry guide with PCR */
+async function vwFill(root) {
+  const els = [...root.querySelectorAll('[data-vw]')]; const syms = [...new Set(els.map((e) => e.dataset.vw))]; if (!syms.length) return;
+  let V; try { V = await lvApi('/api/vwap?syms=' + encodeURIComponent(syms.slice(0, 40).join(',')), { timeout: 60000 }); } catch (e) { return; }
+  els.forEach((e) => { const x = V[e.dataset.vw]; if (!x || x.vwap == null) return;
+    e.innerHTML = ` <span class="chip ${x.above ? 'new' : 'exit'}" title="Today's VWAP ${x.vwap} (5-minute candles, ${x.day} ${x.at}). Entry guide: price above VWAP with high PCR. Not backtested.">${x.above ? `Above VWAP${x.since ? ' since ' + x.since : ''}` : 'Below VWAP'}</span>`; });
+}
+async function pcrLoad() { if (state.pcr === undefined) { state.pcr = null; state.pcr = await getJSON(MAIN + 'data/scan/pcr.json', 'pcr').catch(() => null); } return state.pcr; }
+function pcrChip(sym) {
+  const x = state.pcr && state.pcr.rows && state.pcr.rows[String(sym || '').toUpperCase()]; if (!x) return '';
+  const lab = { 5: 'high', 4: 'above avg', 3: 'mid', 2: 'below avg', 1: 'low' }[x.q]; const cls = x.q === 5 ? 'new' : x.q === 4 ? 'open' : x.q === 1 ? 'exit' : '';
+  return ` <span class="chip ${cls}" title="Put/call OI ratio ${x.pcr} (${lab} among F&O names today${x.d5 != null ? `, ${x.d5 >= 0 ? '+' : ''}${x.d5} in 5 days` : ''}). Guide only: high PCR stocks did better over the next 10 days in 2020-26.">PCR ${fmt(x.pcr, 2)} ${x.q >= 4 ? '▲' : x.q <= 2 ? '▼' : '·'}</span>`;
+}
 const boardChip = (r) => (r && (r.board === 'SME' || r.board === 'BSE' || /\.BO$/.test(r.symbol || '')) ? `<span class="chip watch" title="Not in the trade plan: ${r.board === 'SME' ? 'SME lots' : 'BSE only'}">${r.board === 'SME' ? 'SME' : 'BSE only'}</span>` : '');   // 17 Nov 2026
-const secChip = (r) => boardChip(r) + (r.sector_tag ? `<span class="chip ${r.sector_tag === 'leading' ? 'new' : r.sector_tag === 'weak' ? 'exit' : r.sector_tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.sector_tag]}</span>` : '');
+const secChip = (r) => boardChip(r) + (AM() === 'NSE' ? pcrChip(r.symbol) : '') + (r.sector_tag ? `<span class="chip ${r.sector_tag === 'leading' ? 'new' : r.sector_tag === 'weak' ? 'exit' : r.sector_tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.sector_tag]}</span>` : '');
 const rsChip = (lab, v) => (v == null ? '' : `<span class="chip ${v > 0 ? 'open' : 'exit'}">${lab} ${v > 0 ? '+' : ''}${Number(v).toFixed(0)}%</span>`);
 // ---- Industry Pulse (our computation of group breadth): data/scan[/us|/asx]/group_pulse.json ----
 state.gp = state.gp || {};

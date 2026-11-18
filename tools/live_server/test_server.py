@@ -983,3 +983,13 @@ def test_prem_cup():
     c = [x - 0.2 for x in h[:-1]] + [10.5]
     sig, _ = A.prem_systems(c, h)
     assert any(x.startswith("cup close") for x in sig), sig
+
+
+def test_vwap(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    A.broker._ts = lambda s: (s + "-EQ", {"token": "1"})
+    A.broker.icandles = [("2026-11-18T09:15:00+05:30", 100, 101, 99, 100, 1000), ("2026-11-18T09:20:00+05:30", 100, 100, 98, 98, 3000),
+                         ("2026-11-18T09:25:00+05:30", 98, 103, 98, 103, 2000)]
+    j = c.get("/api/vwap?syms=reliance", headers=h).json()["RELIANCE"]
+    assert j["above"] and j["since"] == "09:25" and 99 < j["vwap"] < 101
