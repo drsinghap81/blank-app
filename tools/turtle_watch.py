@@ -24,6 +24,21 @@ MK = [  # ticker, name, group, currency, micro contract (name, multiplier) for s
     ("BANKBEES.NS", "BANKBEES (Bank Nifty ETF)", "ETFs (no leverage)", "INR", ("BANKBEES shares", 1), "NSE:BANKBEES"),
     ("GOLDBEES.NS", "GOLDBEES (gold ETF)", "ETFs (no leverage)", "INR", ("GOLDBEES shares", 1), "NSE:GOLDBEES"),
     ("SILVERBEES.NS", "SILVERBEES (silver ETF)", "ETFs (no leverage)", "INR", ("SILVERBEES shares", 1), "NSE:SILVERBEES"),
+    # 19 Nov 2026 (Amritpal: "add the ETFs and commodities"): more NSE ETFs, US agri / energy / platinum, USD/INR.
+    # NOT part of the 2010-26 Turtle test (those 14 markets); watch them as extra candidates.
+    *[(f"{e}.NS", f"{e} ({nm})", "ETFs (no leverage)", "INR", (f"{e} shares", 1), f"NSE:{e}") for e, nm in (
+        ("JUNIORBEES", "Nifty Next 50"), ("MID150BEES", "Midcap 150"), ("ITBEES", "IT"), ("PSUBNKBEES", "PSU banks"),
+        ("PHARMABEES", "pharma"), ("AUTOBEES", "auto"), ("METALIETF", "metal"), ("CPSEETF", "CPSE"), ("INFRABEES", "infra"),
+        ("CONSUMBEES", "consumption"), ("MON100", "Nasdaq 100"), ("MAFANG", "US FANG+"), ("HNGSNGBEES", "Hang Seng"))],
+    ("NG=F", "Natural gas (Henry Hub)", "Energy", "USD", ("Micro Henry Hub MNG · 1,000 mmBtu", 1000), "NYMEX:MNG1!"),
+    ("PL=F", "Platinum", "Metals", "USD", ("Platinum PL · 50 oz", 50), "NYMEX:PL1!"),
+    ("ZW=F", "Wheat", "Agri", "USD", ("Mini wheat XW · 1,000 bu (price in cents)", 10), "CBOT_MINI:XW1!"),
+    ("ZC=F", "Corn", "Agri", "USD", ("Mini corn XC · 1,000 bu (price in cents)", 10), "CBOT_MINI:XC1!"),
+    ("ZS=F", "Soybeans", "Agri", "USD", ("Mini soybeans XK · 1,000 bu (price in cents)", 10), "CBOT_MINI:XK1!"),
+    ("SB=F", "Sugar", "Agri", "USD", ("Sugar No. 11 SB · 112,000 lb (cents)", 1120), "ICEUS:SB1!"),
+    ("KC=F", "Coffee", "Agri", "USD", ("Coffee KC · 37,500 lb (cents)", 375), "ICEUS:KC1!"),
+    ("CT=F", "Cotton", "Agri", "USD", ("Cotton CT · 50,000 lb (cents)", 500), "ICEUS:CT1!"),
+    ("INR=X", "USD/INR", "Currencies", "INR", ("USDINR futures (NSE) · $1,000", 1000), "NSE:USDINR1!"),
 ]
 # MCX mini / micro contracts (16 Nov 2026). Yahoo has no MCX data: each series = the global contract x USD/INR x unit conversion,
 # so levels are approximate (no import duty / local premium); the signal timing tracks MCX closely. Place orders on MCX's own chart.
