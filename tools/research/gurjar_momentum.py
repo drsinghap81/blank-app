@@ -7,6 +7,8 @@ positions, costs 0.25% + 0.15% slippage a side):
   A  Supertrend(10,3) turns red -> next open         (the 9/21 system's exit)
   B  a close below SMA 20 -> next open
   C  a close below SMA 50 -> next open
+Variant (Amritpal): pullback to the 20 SMA inside a tight 10-session range (<= 12%, also <= 8%), volume contracting in the range,
+breakout close above the range high on >= 1.5x average volume.
 'fresh' = only the first day a stock passes after not passing the day before (the raw scan repeats every day of a trend).
 NSE stocks from Yahoo 2016 -> today (survivors). Reference: the 9/21 system on the same data.
 Output: data/research/gurjar_momentum.json"""
@@ -31,7 +33,18 @@ def extra(x):
     d_ = c.diff(); up = d_.clip(lower=0).ewm(alpha=1 / 14, adjust=False).mean(); dn = (-d_.clip(upper=0)).ewm(alpha=1 / 14, adjust=False).mean()
     rsi = 100 - 100 / (1 + up / dn); s20, s50, vs = c.rolling(20).mean(), c.rolling(50).mean(), v.rolling(20).mean()
     g = (c > 50) & (v > vs) & (s20 > s50) & (rsi > 50) & (c > s50) & (c > h.shift(1)) & (vs > 500000)
-    return pd.DataFrame({"g": g, "b20": c < s20, "b50": c < s50}, index=x.index)
+    # 19 Nov 2026 (Amritpal's caveat): a pullback to the 20 SMA in a TIGHT range (high-to-low <= 12% over the last 10 sessions),
+    # volume CONTRACTING in that range (its average below the 50-day average), then a breakout close above the range high on
+    # HIGH volume (>= 1.5x the 20-day average) - the trend conditions as above
+    l = x.Low; rh = h.shift(1).rolling(10).max(); rl = l.shift(1).rolling(10).min()
+    tight = (rh / rl - 1) <= 0.12
+    touch = (l.shift(1).rolling(10).min() <= s20.shift(1) * 1.02)                 # the range came back to (within 2% of) the 20 SMA
+    vcon = v.shift(1).rolling(10).mean() < v.rolling(50).mean().shift(1)
+    brk = (c > rh) & (v >= 1.5 * vs)
+    t = (c > 50) & (s20 > s50) & (c > s50) & (rsi > 50) & (vs > 500000) & tight & touch & vcon & brk
+    t12 = t & ((rh / rl - 1) <= 0.12)
+    t8 = t & ((rh / rl - 1) <= 0.08)
+    return pd.DataFrame({"g": g, "t": t12, "t8": t8, "b20": c < s20, "b50": c < s50}, index=x.index)
 
 
 def main():
@@ -57,12 +70,13 @@ def main():
             F.append(pd.concat([f, ex], axis=1))
         print("downloaded", i + 200, len(F), flush=True); time.sleep(2)
     d = pd.concat(F, ignore_index=True).sort_values(["SYMBOL", "Date"])
-    d[["g", "b20", "b50"]] = d[["g", "b20", "b50"]].fillna(False).astype(bool)
+    d[["g", "t", "t8", "b20", "b50"]] = d[["g", "t", "t8", "b20", "b50"]].fillna(False).astype(bool)
     gp = d.groupby("SYMBOL")
     d["g_fresh"] = d.g & ~gp.g.shift(1).fillna(False).astype(bool)
     d["near_high"] = d.CLOSE / gp.CLOSE.transform(lambda s: s.rolling(250, min_periods=60).max())
     d["r63"] = gp.CLOSE.transform(lambda s: s / s.shift(63) - 1)
-    res = dict(method=__doc__, signals_raw=int(d.g.sum()), signals_fresh=int(d.g_fresh.sum()), signals_921=int(d.sig.sum()))
+    res = dict(method=__doc__, signals_raw=int(d.g.sum()), signals_fresh=int(d.g_fresh.sum()), signals_921=int(d.sig.sum()),
+               signals_tight12=int(d.t.sum()), signals_tight8=int(d.t8.sum()))
 
     def go(label, sigcol, exitcol=None, rank="random", seed=0, mp=10):
         z = d.copy(); z["sig"] = z[sigcol]
@@ -80,6 +94,10 @@ def main():
         for ex_nm, ex in (("A Supertrend exit", None), ("B close < SMA20", "b20"), ("C close < SMA50", "b50")):
             go(f"Scanner {nm} | {ex_nm} | random", col, ex)
             go(f"Scanner {nm} | {ex_nm} | 3-month strength", col, ex, rank="r63")
+    for nm, col in (("tight range <= 12%", "t"), ("tight range <= 8%", "t8")):
+        for ex_nm, ex in (("A Supertrend exit", None), ("B close < SMA20", "b20"), ("C close < SMA50", "b50")):
+            go(f"Pullback {nm} + volume dry-up + high-volume breakout | {ex_nm} | random", col, ex)
+            go(f"Pullback {nm} + volume dry-up + high-volume breakout | {ex_nm} | 3-month strength", col, ex, rank="r63")
     go("9/21 system (reference) | random", "sig")
     go("9/21 system (reference) | 3-month strength", "sig", rank="r63")
     os.makedirs("data/research", exist_ok=True)
