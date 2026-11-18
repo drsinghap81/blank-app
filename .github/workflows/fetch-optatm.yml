@@ -1,0 +1,29 @@
+name: fetch-optatm
+# 18 Nov 2026: near-ATM (+-4%) stock options, CE and PE, all current F&O stocks 2020-2026 (option-signal -> delivery test)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  chunk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        typ: ["CE", "PE"]
+        part: ["2020-01-01:2020-12-31", "2021-01-01:2021-12-31", "2022-01-01:2022-12-31", "2023-01-01:2023-12-31", "2024-01-01:2024-06-30",
+               "2024-07-01:2025-06-30", "2025-07-01:2026-12-31"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q pandas requests
+      - run: |
+          P="${{ matrix.part }}"; S=${P%%:*}; E=${P##*:}; T="${{ matrix.typ }}"
+          mkdir -p oatm && OPTWIN=data/optwin_all.csv OPT_TYPE=$T STRIKE_LO=0.96 STRIKE_HI=1.04 python tools/fetch_optstk.py $S $E oatm/oatm_${T}_${S}.csv 2>&1 | tail -3 | tee oatm/log_${T}_${S}.txt
+          gzip -f oatm/oatm_${T}_${S}.csv
+          echo "TAG=${T}-${S}" >> $GITHUB_ENV
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan optatm-$TAG; git rm -rq --cached . ; git add -f oatm; git commit -qm "optatm $TAG" || exit 0; git push -f origin optatm-$TAG
