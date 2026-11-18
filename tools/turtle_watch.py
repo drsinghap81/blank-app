@@ -165,9 +165,19 @@ def main():
             print("fail", key, e); continue
         rows.append(dict(key=key, name=nm, group="MCX (approx.)", cur="INR", contract=cname, mult=mult, tv=tv, approx=True, **s, chart=chart(xi)))
     os.makedirs("data/scan", exist_ok=True)
+
+    def clean(v):              # 19 Nov 2026: a NaN made the file invalid JSON for the app (it fell back to days-old data)
+        if isinstance(v, float) and not np.isfinite(v):
+            return None
+        if isinstance(v, dict):
+            return {k: clean(x) for k, x in v.items()}
+        if isinstance(v, (list, tuple)):
+            return [clean(x) for x in v]
+        return v
+    rows = clean(rows); fx = clean(fx)
     json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), fx=fx, rows=rows,
                    rules="Daily 20/10 long: buy-stop above the 20-day high; fixed stop entry - 2N; trailing stop 10-day low; exit at the first hit; no target. 1 unit, no adds."),
-              open("data/scan/turtle.json", "w"), indent=0)
+              open("data/scan/turtle.json", "w"), indent=0, allow_nan=False)
     news = [r for r in rows if (r["status"] == "in trade" and r.get("new")) or r["status"] == "exited today"]
     print(len(rows), "markets;", [(r["name"], r["status"]) for r in rows])
     if news:
