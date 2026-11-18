@@ -482,7 +482,8 @@ def _agg(T):
                 target=sum(t["how"] == "target" for t in T), sl=sum(t["how"] == "SL" for t in T), at_close=sum(t["how"] in ("close", "open") for t in T),
                 trailed=sum(t["how"] == "trail" for t in T),
                 avg_pct=round(sum(P) / len(P), 2), days=len(days), up_days=sum(v > 0 for v in days.values()), worst_dd_R=round(dd, 1),
-                by_day={d: round(v, 1) for d, v in sorted(days.items())})
+                by_day={d: round(v, 1) for d, v in sorted(days.items())},
+                by_day_rs={d: round(sum(t["pnl"] for t in T if t["d"] == d)) for d in sorted(days)} if all(t.get("pnl") is not None for t in T) else None)
 
 
 def trail_summary(T):
