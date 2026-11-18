@@ -2762,6 +2762,31 @@ async function optSelect(r) {
   };
   tick(); state.optTimer = setInterval(tick, 5000);
 }
+/* 19 Nov 2026 (Amritpal: "with a push to live option"): NSE ETFs go to Live as a GTT buy on Angel (through My picks: your server
+   sizes it and puts the stop on after the fill; no target - Turtle exits on the trail). Futures / MCX: the order to place by hand. */
+function turLive(r) {
+  if (/\.NS$/.test(r.key) && r.buy_stop && r.fixed_stop_if_filled) {
+    return `<div style="margin-top:8px"><button class="lv-btn" data-turlive="${esc(r.key)}">Push to Live · GTT buy on Angel</button></div>`;
+  }
+  const exp = r.key.startsWith('MCX:') ? 'MCX' : (r.key === '^NSEI' || r.key === '^NSEBANK') ? 'NFO' : null;
+  if (exp && r.buy_stop) {
+    const lim = r.buy_stop * 1.01;
+    return `<div class="muted small" style="margin-top:8px">Place in Angel (${exp}, near-month future): <b>BUY stop-limit</b> · trigger ${fmt(r.buy_stop, 2, 'en-IN')} · limit ${fmt(lim, 2, 'en-IN')} · then a sell-stop at ${fmt(r.fixed_stop_if_filled, 2, 'en-IN')}${r.approx ? ' — read the exact 20-day high off MCX\'s own chart first' : ''}.</div>`;
+  }
+  return '';
+}
+
+async function turPush(key) {
+  const r = (state.turtle && state.turtle.rows || []).find((x) => x.key === key); if (!r) return;
+  if (!(lvCfg().url && lvCfg().token)) { alertMsg('Connect your server in Live › Settings first.'); return; }
+  const sym = r.key.replace(/\.NS$/, '');
+  try {
+    await lvApi('/api/mypicks', { method: 'POST', body: JSON.stringify({ symbol: sym, trigger: +r.buy_stop.toFixed(2), stop: +r.fixed_stop_if_filled.toFixed(2), note: 'Turtle: 20-day high breakout, stop 2N; exit on the 10-day low', src: 'Turtle', name: r.name }) });
+    state.planAt = 0;
+    alertMsg(`${sym} added to Live › Buy › My picks. Tap Send there: your server sizes it (1% risk) and places the GTT buy at ${fmt(r.buy_stop, 2, 'en-IN')} on Angel; the stop goes on after it fills.`, true);
+  } catch (e) { alertMsg(e.message); }
+}
+
 async function loadTurtle(el) {
   $('#title').textContent = 'Trading · Turtle Trading System';
   if (state.turtle && Date.now() - (state.turtleAt || 0) > 600000) state.turtle = null;   // refetch after 10 min
@@ -2785,7 +2810,7 @@ async function loadTurtle(el) {
       line = `Next buy-stop ${px(r.buy_stop)} (${fmt(r.dist_pct, 1)}% above)`;
     } else {
       st = `<span class="chip">Waiting · ${fmt(r.dist_pct, 1)}% to the 20-day high</span>`;
-      line = `Buy-stop <b>${px(r.buy_stop)}</b> · if filled, fixed stop ${px(r.fixed_stop_if_filled)} · size ${sz}`;
+      line = `Buy-stop <b>${px(r.buy_stop)}</b> · if filled, fixed stop ${px(r.fixed_stop_if_filled)} · size ${sz}${r.dist_pct != null && r.dist_pct <= 2 ? turLive(r) : ''}`;
     }
     const mcx = turMcx(r, S, D.fx || {}, r.status === 'in trade' ? r.entry_N : r.N);
     if (mcx) line += `<br>${mcx}`;
@@ -2814,7 +2839,8 @@ async function loadTurtle(el) {
       <div class="b5-g">${near.map((r, i) => `<div class="b5-t"><div class="b5-n">${i + 1}</div><div class="b5-b"><div class="b5-s">${esc(r.name)}</div>
         <div class="b5-sys">${esc(r.contract)} · ${fmt(r.dist_pct, 1)}% below the 20-day high · close ${px(r.close)}</div>
         <div class="b5-l"><span>Buy-stop <b>${px(r.buy_stop)}</b></span><span>Stop if filled <b>${px(r.fixed_stop_if_filled)}</b></span><span>${turSize(r, S, D.fx || {}, r.N, r.buy_stop)}</span></div>
-        ${turMcx(r, S, D.fx || {}, r.N) ? `<div class="muted small" style="margin-top:4px">${turMcx(r, S, D.fx || {}, r.N)}</div>` : ''}</div></div>`).join('')}</div></div>`
+        ${turMcx(r, S, D.fx || {}, r.N) ? `<div class="muted small" style="margin-top:4px">${turMcx(r, S, D.fx || {}, r.N)}</div>` : ''}
+        ${turLive(r)}</div></div>`).join('')}</div></div>`
     : `<div class="card pad" style="margin:10px 16px"><b>No buy-stops to place today</b><p class="muted small">Nothing is within ${NEAR}% of its 20-day high. The nearest: ${R.filter((r) => r.status === 'flat').slice(0, 3).map((r) => `${esc(r.name)} ${fmt(r.dist_pct, 1)}%`).join(' · ')}.</p></div>`;
   el.innerHTML = `${tradeStrip('turtle')}${freshCard}${nearCard}
     <section class="summary"><div class="stat new"><b>${nNew}</b><span>new buys today</span></div><div class="stat"><b>${nIn}</b><span>holding</span></div>
@@ -2831,6 +2857,7 @@ async function loadTurtle(el) {
     <div class="card"><div class="seg" id="turf">${[['act', `Act on (${R.filter(act).length})`], ['all', `All ${R.length}`]].map(([k, l]) => `<button data-k="${k}" aria-selected="${tf === k}">${l}</button>`).join('')}</div>
       <ul class="list flat">${shown.map(row).join('') || '<li class="empty">Nothing to act on today.</li>'}</ul></div>`;
   el.querySelectorAll('#turf button').forEach((b) => b.addEventListener('click', () => { state.turF = b.dataset.k; loadTurtle(el); }));
+  el.querySelectorAll('[data-turlive]').forEach((b) => b.addEventListener('click', () => turPush(b.dataset.turlive)));
   tradeStripWire(el);
   el.querySelectorAll('.row[data-tk]').forEach((li) => li.addEventListener('click', (e) => { if (e.target.closest('a,summary,details')) return; turtleSelect(D.rows.find((r) => r.key === li.dataset.tk)); }));
   const save = () => { turSave({ cur: $('#tcur').value, acct: +$('#tacct').value, risk: +$('#trisk').value, lotN: +$('#tlotn').value, lotB: +$('#tlotb').value }); loadTurtle(el); };
