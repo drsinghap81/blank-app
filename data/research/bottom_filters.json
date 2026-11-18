@@ -1,0 +1,179 @@
+{
+ "method": "Bottom-pattern breakouts with trend / RSI filters (18 Nov 2026, Amritpal: \"failed as price was below the moving average and\nRSI below 60 - check\").\n\nPatterns exactly as tools/pattern_scan.py (zigzag 6% on closes, double bottom / tilted W / triple bottom / inverse H&S after a\n20%+ fall, breakout = first close above the neckline within 60 days of the last low). Nifty 500 (current list), 2016 - Oct 2026,\nYahoo daily (adjusted). Each breakout: buy next open. Outcomes:\n  classic : target = neckline + height (a high reaches it) vs SL = a close 4% under the neckline (6% IHS), whichever first,\n            else the close 120 days later\n  fixed   : return 20 / 60 / 120 days after the next open\nFilters at the breakout close: above the 50-day SMA / 200-day SMA, RSI(14) > 60, and combinations.\nOutput: data/research/bottom_filters.json",
+ "control": {
+  "r20": 1.59,
+  "r60": 5.27,
+  "r120": 11.29
+ },
+ "groups": {
+  "all": {
+   "n": 1702,
+   "classic_avg": 0.9,
+   "win": 46.9,
+   "t": 4.09,
+   "target_hit": 46.7,
+   "sl_hit": 51.3,
+   "r20": 1.0,
+   "r60": 3.41,
+   "r120": 6.63
+  },
+  "above 50d": {
+   "n": 1420,
+   "classic_avg": 0.79,
+   "win": 44.9,
+   "t": 3.22,
+   "target_hit": 44.2,
+   "sl_hit": 53.5,
+   "r20": 0.6,
+   "r60": 2.08,
+   "r120": 4.76
+  },
+  "below 50d": {
+   "n": 282,
+   "classic_avg": 1.43,
+   "win": 57.1,
+   "t": 3.05,
+   "target_hit": 59.2,
+   "sl_hit": 40.4,
+   "r20": 2.99,
+   "r60": 9.96,
+   "r120": 15.38
+  },
+  "above 200d": {
+   "n": 568,
+   "classic_avg": 1.14,
+   "win": 42.6,
+   "t": 2.73,
+   "target_hit": 40.8,
+   "sl_hit": 54.9,
+   "r20": 0.59,
+   "r60": 0.77,
+   "r120": 4.06
+  },
+  "below 200d": {
+   "n": 1134,
+   "classic_avg": 0.78,
+   "win": 49.0,
+   "t": 3.05,
+   "target_hit": 49.6,
+   "sl_hit": 49.5,
+   "r20": 1.2,
+   "r60": 4.71,
+   "r120": 7.88
+  },
+  "RSI > 60": {
+   "n": 1211,
+   "classic_avg": 0.7,
+   "win": 43.8,
+   "t": 2.58,
+   "target_hit": 43.2,
+   "sl_hit": 54.1,
+   "r20": 0.39,
+   "r60": 1.55,
+   "r120": 4.38
+  },
+  "RSI <= 60": {
+   "n": 491,
+   "classic_avg": 1.39,
+   "win": 54.4,
+   "t": 3.8,
+   "target_hit": 55.2,
+   "sl_hit": 44.4,
+   "r20": 2.47,
+   "r60": 7.92,
+   "r120": 11.89
+  },
+  "above 50d & RSI > 60": {
+   "n": 1210,
+   "classic_avg": 0.7,
+   "win": 43.9,
+   "t": 2.58,
+   "target_hit": 43.1,
+   "sl_hit": 54.1,
+   "r20": 0.39,
+   "r60": 1.55,
+   "r120": 4.38
+  },
+  "below 50d & RSI <= 60": {
+   "n": 281,
+   "classic_avg": 1.44,
+   "win": 57.3,
+   "t": 3.05,
+   "target_hit": 59.1,
+   "sl_hit": 40.6,
+   "r20": 2.97,
+   "r60": 9.98,
+   "r120": 15.45
+  },
+  "above 200d & RSI > 60": {
+   "n": 555,
+   "classic_avg": 1.01,
+   "win": 41.8,
+   "t": 2.4,
+   "target_hit": 40.0,
+   "sl_hit": 55.7,
+   "r20": 0.61,
+   "r60": 0.56,
+   "r120": 3.82
+  },
+  "above 50d & 200d & RSI > 60": {
+   "n": 555,
+   "classic_avg": 1.01,
+   "win": 41.8,
+   "t": 2.4,
+   "target_hit": 40.0,
+   "sl_hit": 55.7,
+   "r20": 0.61,
+   "r60": 0.56,
+   "r120": 3.82
+  },
+  "below 200d & RSI <= 60": {
+   "n": 478,
+   "classic_avg": 1.25,
+   "win": 53.8,
+   "t": 3.4,
+   "target_hit": 54.6,
+   "sl_hit": 45.0,
+   "r20": 2.54,
+   "r60": 7.87,
+   "r120": 11.83
+  },
+  "50d rising & RSI > 60": {
+   "n": 661,
+   "classic_avg": 0.65,
+   "win": 40.7,
+   "t": 1.7,
+   "target_hit": 38.7,
+   "sl_hit": 58.5,
+   "r20": 0.15,
+   "r60": 1.09,
+   "r120": 3.82
+  }
+ },
+ "above 50d & RSI > 60, classic by year": {
+  "2016": 3.2,
+  "2017": -0.35,
+  "2018": -1.69,
+  "2019": -1.19,
+  "2020": 2.94,
+  "2021": -6.45,
+  "2022": 0.1,
+  "2023": 3.69,
+  "2024": 0.61,
+  "2025": 1.61,
+  "2026": 0.46
+ },
+ "all, classic by year": {
+  "2016": 3.36,
+  "2017": -0.0,
+  "2018": -0.7,
+  "2019": -0.77,
+  "2020": 1.98,
+  "2021": -6.45,
+  "2022": 0.1,
+  "2023": 3.73,
+  "2024": 0.29,
+  "2025": 1.49,
+  "2026": 1.05
+ }
+}
