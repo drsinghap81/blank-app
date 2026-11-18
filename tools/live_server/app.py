@@ -3150,7 +3150,7 @@ def fo_check_now(_=Depends(auth)):
 # 5 / 15 / 60-minute candles of a live NFO option from Angel, with the same watch-only premium systems as the daily
 # option charts (9/21 cross, 20-bar high close, close above the last top). Only contracts trading now (Angel has no expired ones).
 _OPTC = {}
-OPT_IV = {"5": ("FIVE_MINUTE", 30), "15": ("FIFTEEN_MINUTE", 60), "60": ("ONE_HOUR", 120)}
+OPT_IV = {"1": ("ONE_MINUTE", 5), "5": ("FIVE_MINUTE", 30), "15": ("FIFTEEN_MINUTE", 60), "60": ("ONE_HOUR", 120)}
 
 
 def _ema_l(v, n):
@@ -3291,6 +3291,27 @@ def opt_scan_now(_=Depends(auth)):
     return dict(ok=True, note="started; takes about 3 minutes")
 
 
+_OPTL = {}
+
+
+@app.get("/api/opt/ltp")
+def opt_ltp(symbol: str, expiry: str, strike: float, _=Depends(auth)):
+    """18 Nov 2026: live last price of the CE and PE (Angel, real time) for the in-app live option chart; cached 3 s."""
+    sym = re.sub(r"[^A-Z0-9&\-]", "", symbol.upper())[:20]; key = (sym, expiry, strike); c = _OPTL.get(key)
+    if c and time.time() - c[0] < 3:
+        return c[1]
+    out = {}
+    for typ in ("CE", "PE"):
+        tk = broker.opt_token(sym, date.fromisoformat(expiry), strike, typ)
+        if tk:
+            try:
+                out[typ] = broker.ltp_ex("NFO", tk[1], tk[0])
+            except Exception as ex:  # noqa: BLE001
+                out[typ + "_error"] = str(ex)[:80]
+    out["at"] = ist_now().strftime("%H:%M:%S"); _OPTL[key] = (time.time(), out)
+    return out
+
+
 _VWAP = {}
 
 
@@ -3327,10 +3348,10 @@ def vwap(syms: str, _=Depends(auth)):
 @app.get("/api/opt/candles")
 def opt_candles(symbol: str, expiry: str, strike: float, type: str, interval: str = "15", _=Depends(auth)):
     if interval not in OPT_IV or type not in ("CE", "PE") or not re.match(r"^\d{4}-\d{2}-\d{2}$", expiry):
-        raise HTTPException(400, "interval 5/15/60, type CE/PE, expiry YYYY-MM-DD")
+        raise HTTPException(400, "interval 1/5/15/60, type CE/PE, expiry YYYY-MM-DD")
     sym = re.sub(r"[^A-Z0-9&\-]", "", symbol.upper())[:20]
     key = (sym, expiry, strike, type, interval); c = _OPTC.get(key)
-    if c and time.time() - c[0] < 60:
+    if c and time.time() - c[0] < (20 if interval in ("1", "5") else 60):
         return c[1]
     tk = broker.opt_token(sym, date.fromisoformat(expiry), strike, type)
     if not tk:

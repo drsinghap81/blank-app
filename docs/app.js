@@ -2534,7 +2534,8 @@ async function loadOptCharts(el) {
 }
 async function optSelect(r) {
   const iv = state.optIv || 'D'; const srv = !!(lvCfg().url && lvCfg().token);
-  const IV = [['D', 'Daily'], ['60', '1h'], ['15', '15m'], ['5', '5m']];
+  const IV = [['D', 'Daily'], ['60', '1h'], ['15', '15m'], ['5', '5m'], ['1', '1m']];
+  if (state.optTimer) { clearInterval(state.optTimer); state.optTimer = null; }
   /* 18 Nov 2026: the option's own symbols: TradingView NSE:<root><YYMMDD><C|P><strike>, Angel <root><DDMMMYY><strike><CE|PE> */
   const ex = r.expiry.split('-'); const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][+ex[1] - 1];
   const kS = String(+r.strike); const tvRoot = r.symbol.replace(/[-&]/g, '_');
@@ -2545,17 +2546,20 @@ async function optSelect(r) {
     ${links}<p class="muted small" style="margin:2px 16px">Angel: tap Copy, then paste in the Angel app's search to open that option's chart.</p>
     <div class="seg" id="optiv" style="margin:8px 16px">${IV.map(([k, n]) => `<button data-k="${k}" aria-selected="${iv === k}">${n}</button>`).join('')}</div>
     ${iv !== 'D' && !srv ? '<p class="muted pad">Intraday candles come from Angel through your server: connect it on the Live tab.</p>' : ''}
+    ${iv !== 'D' && srv ? '<p class="muted small" style="margin:2px 16px" id="optlive">Live from Angel: connecting…</p>' : ''}
     <h3 style="margin:10px 16px 0">CE</h3><div class="chart" id="optce" style="height:230px"><p class="muted pad">Loading…</p></div><div class="chart" id="optcer" style="height:100px"></div><p class="muted small" style="margin:2px 16px" id="optcen"></p>
     <h3 style="margin:10px 16px 0">PE</h3><div class="chart" id="optpe" style="height:230px"><p class="muted pad">Loading…</p></div><div class="chart" id="optper" style="height:100px"></div><p class="muted small" style="margin:2px 16px" id="optpen"></p>
     <p class="muted small" style="margin:6px 16px">${iv === 'D' ? 'Daily candles of this contract (days without a trade use the settle price)' : `${IV.find((x) => x[0] === iv)[1]} candles from Angel (times in IST)`} · orange = EMA 9 · blue = EMA 21 · pink = VWAP (intraday) · grey dashed = last top (Top Bottom buy level) · lower pane: RSI(14), red 70 / green 30. Systems on the premium are watch only.</p>`);
   document.querySelectorAll('#optiv button').forEach((b) => b.addEventListener('click', () => { state.optIv = b.dataset.k; optSelect(r); }));
   document.querySelectorAll('[data-cp]').forEach((b) => b.addEventListener('click', async () => { try { await navigator.clipboard.writeText(b.dataset.cp); b.textContent = 'Copied ✓'; } catch (e) { alertMsg(b.dataset.cp); } }));
   const ema = (v, n) => { const k = 2 / (n + 1); let e = v[0]; return v.map((x) => (e = x * k + e * (1 - k))); };
+  const LIVE = {};
   const draw = (id, S, top, sig, note) => { const box = $(id); if (!box) return; box.innerHTML = '';
     if (!S || !S.t || !S.t.length) { box.innerHTML = '<p class="muted pad">No candles.</p>'; return; }
     const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: 230, width: box.clientWidth, timeScale: { timeVisible: iv !== 'D', secondsVisible: false } });
     const cs = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
     cs.setData(S.t.map((x, i) => ({ time: x, open: S.o[i], high: S.h[i], low: S.l[i], close: S.c[i] })));
+    LIVE[id] = { cs, last: { time: S.t[S.t.length - 1], open: S.o[S.o.length - 1], high: S.h[S.h.length - 1], low: S.l[S.l.length - 1], close: S.c[S.c.length - 1] } };
     const ln = (v, col) => ch.addLineSeries({ color: col, lineWidth: 2, priceLineVisible: false, lastValueVisible: false }).setData(S.t.map((x, i) => ({ time: x, value: v[i] })));
     if (S.c.length >= 9) ln(ema(S.c, 9), '#F59E0B'); if (S.c.length >= 21) ln(ema(S.c, 21), '#3B82F6');
     if (iv !== 'D' && S.v && S.v.length === S.c.length) {          // session VWAP, reset each day (18 Nov 2026)
@@ -2591,6 +2595,19 @@ async function optSelect(r) {
       draw(id, S, S.top, S.signals, ` · ${S.tsym}`); }
     catch (e) { const box = $(id); if (box) box.innerHTML = `<p class="muted pad">${/404|Not Found/i.test(e.message) && !/contract|candles/i.test(e.message) ? 'Your server picks up intraday option candles at its next update (outside Indian market hours).' : esc(e.message)}</p>`; }
   }));
+  /* 18 Nov 2026: live ticks from Angel every 5 s, building the current candle (the chart Amritpal watches instead of a delayed one) */
+  const mins = +iv; const tick = async () => {
+    if (!$('#optce') || state.optIv !== iv) { clearInterval(state.optTimer); state.optTimer = null; return; }
+    let L; try { L = await lvApi(`/api/opt/ltp?symbol=${encodeURIComponent(r.symbol)}&expiry=${r.expiry}&strike=${r.strike}`, { timeout: 8000 }); } catch (e) { const s_ = $('#optlive'); if (s_) s_.textContent = 'Live from Angel: ' + e.message; return; }
+    const now = Math.floor(Date.now() / 1000) + 19800; const sod = now % 86400; const anc = 9 * 3600 + 15 * 60;   // IST, candles anchored at 09:15
+    const t0 = now - sod + anc + Math.floor((sod - anc) / (mins * 60)) * mins * 60;
+    [['CE', '#optce'], ['PE', '#optpe']].forEach(([t, id]) => { const Lv = LIVE[id]; const px = L[t]; if (!Lv || !(px > 0)) return;
+      const b = t0 > Lv.last.time ? { time: t0, open: Lv.last.close, high: Math.max(Lv.last.close, px), low: Math.min(Lv.last.close, px), close: px }
+        : { ...Lv.last, high: Math.max(Lv.last.high, px), low: Math.min(Lv.last.low, px), close: px };
+      try { Lv.cs.update(b); Lv.last = b; } catch (e) { /* out-of-order bar */ } });
+    const s_ = $('#optlive'); if (s_) s_.innerHTML = `<b>Live from Angel</b> · CE ${L.CE ?? '–'} · PE ${L.PE ?? '–'} · ${esc(L.at || '')} IST · updates every 5 s`;
+  };
+  tick(); state.optTimer = setInterval(tick, 5000);
 }
 async function loadTurtle(el) {
   $('#title').textContent = 'Trading · Turtle Trading System';

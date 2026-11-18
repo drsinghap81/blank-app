@@ -993,3 +993,11 @@ def test_vwap(tmp_path):
                          ("2026-11-18T09:25:00+05:30", 98, 103, 98, 103, 2000)]
     j = c.get("/api/vwap?syms=reliance", headers=h).json()["RELIANCE"]
     assert j["above"] and j["since"] == "09:25" and 99 < j["vwap"] < 101
+
+
+def test_opt_ltp(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    A.broker.fltp = {"ITC23NOV26295CE": 3.6, "ITC23NOV26295PE": 3.9}
+    j = c.get("/api/opt/ltp?symbol=ITC&expiry=2026-11-23&strike=295", headers=h).json()
+    assert j["CE"] == 3.6 and j["PE"] == 3.9 and j["at"]
