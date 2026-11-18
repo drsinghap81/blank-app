@@ -178,6 +178,7 @@ def main():
     json.dump(dict(asof=str(last.date()), generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), rules=__doc__, rows=rows),
               open(f"{OUT}/optscan.json", "w"), separators=(",", ":"))
     json.dump(charts, open(f"{OUT}/optcharts.json", "w"), separators=(",", ":"))
+    print("rows", len(rows), "with signals", sum(1 for r in rows for t in ("ce", "pe") if r.get(t, {}).get("signals")), flush=True)
     pcr_file(X, last)
 
 
@@ -205,7 +206,6 @@ def pcr_file(X, last):
                    "today (tested: highest fifth beat the lowest by about 1% over 10 days, every year 2020-26). Guide only.", rows=out),
               open(f"{OUT}/pcr.json", "w"), separators=(",", ":"))
     print("pcr rows", len(out), flush=True)
-    print("rows", len(rows), "with signals", sum(1 for r in rows for t in ("ce", "pe") if r.get(t, {}).get("signals")), flush=True)
 
 
 if __name__ == "__main__":
