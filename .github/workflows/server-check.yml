@@ -12,5 +12,18 @@ jobs:
           head -c 600 out/health.json; echo
           echo "== login with a wrong password (expect 401 if the server is fine)"
           curl -sS -m 20 -X POST -H 'Content-Type: application/json' -d '{"password":"x"}' -w "\nHTTP %{http_code}\n" https://13-126-118-48.sslip.io/api/login | head -c 500
+          python3 - <<'PY'
+          import json
+          for f in ("out/opt_today_basket.json", "out/research_optbt_summary.json"):
+              try:
+                  d = json.load(open(f))
+              except Exception as e:
+                  print(f, "unreadable", e); continue
+              tr = d.pop("trades", None); print("##", f); print(json.dumps({k: v for k, v in d.items() if k != "results"}))
+              for k, v in (d.get("results") or {}).items():
+                  print("R|", k, json.dumps(v))
+              for t in tr or []:
+                  print("T|", json.dumps(t, separators=(",", ":")))
+          PY
       - uses: actions/upload-artifact@v4
         with: {name: server-check, path: out, retention-days: 3}
