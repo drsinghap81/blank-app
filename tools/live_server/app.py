@@ -3191,6 +3191,16 @@ def prem_systems(c, h=None):
             top = c[i]
     if top is not None and n >= 3 and c[-1] > top and c[-2] <= top:
         sig.append("Top Bottom buy (close above last top)")
+    if n >= 16:                                                       # 18 Nov 2026: RSI(14) crossing above 60
+        g = l_ = 0.0
+        for i in range(1, 15):
+            d_ = c[i] - c[i - 1]; g += max(d_, 0); l_ += max(-d_, 0)
+        g /= 14; l_ /= 14; rs = []
+        for i in range(15, n):
+            d_ = c[i] - c[i - 1]; g = (g * 13 + max(d_, 0)) / 14; l_ = (l_ * 13 + max(-d_, 0)) / 14
+            rs.append(100.0 if l_ == 0 else 100 - 100 / (1 + g / l_))
+        if len(rs) >= 2 and rs[-1] > 60 >= rs[-2]:
+            sig.append("RSI 60 cross")
     return sig, (round(top, 2) if top is not None else None)
 
 
@@ -3212,6 +3222,7 @@ def _resample(B, mins):
 
 
 _OPTSCAN = {"running": False}
+_OPT_SEEN = set()     # (symbol, CE/PE, timeframe, signal, day) already logged to DATA/opt_events.jsonl (forward record)
 
 
 def opt_intra_scan():
@@ -3245,6 +3256,17 @@ def opt_intra_scan():
                     if sig:
                         tf[name] = sig
                 res[f"{r['symbol']}|{typ}"] = dict(ltp=B[-1][4], at=B[-1][0], tf=tf)
+                new = [(k_, x) for k_, L in tf.items() for x in L if (r["symbol"], typ, k_, x, B[-1][0][:10]) not in _OPT_SEEN]
+                if new:
+                    try:
+                        spot = broker.ltp(r["symbol"]) if r.get("kind") != "index" else None
+                    except Exception:  # noqa: BLE001
+                        spot = None
+                    with open(os.path.join(DATA, "opt_events.jsonl"), "a") as fh:
+                        for k_, x in new:
+                            _OPT_SEEN.add((r["symbol"], typ, k_, x, B[-1][0][:10]))
+                            fh.write(json.dumps(dict(at=B[-1][0], sym=r["symbol"], typ=typ, tf=k_, sig=x, opt=B[-1][4], spot=spot,
+                                                     both=len(L_ := tf.get(k_, [])) > 1)) + "\n")
         json.dump(dict(at=ist_now().isoformat(timespec="minutes"), items=res), open(os.path.join(DATA, "optscan_intra.json"), "w"))
         log("opt_intra_scan", n=len(res), signals=sum(1 for v in res.values() if v["tf"]))
     except Exception as ex:  # noqa: BLE001

@@ -100,6 +100,12 @@ def systems(c, h=None):
             sig.append("9/21 cross up")
         if c[-1] > max(c[-21:-1]):
             sig.append("20-day high close")
+    if n >= 16:                                                       # 18 Nov 2026: RSI(14) crossing above 60
+        d_ = np.diff(np.asarray(c, float)); g, l_ = np.maximum(d_, 0), np.maximum(-d_, 0); ag, al = g[:14].mean(), l_[:14].mean(); rs = []
+        for i in range(14, len(d_)):
+            ag = (ag * 13 + g[i]) / 14; al = (al * 13 + l_[i]) / 14; rs.append(100.0 if al == 0 else 100 - 100 / (1 + ag / al))
+        if len(rs) >= 2 and rs[-1] > 60 >= rs[-2]:
+            sig.append("RSI 60 cross")
     lt = last_top(c[:-1]) if n >= 5 else None
     if lt and c[-1] > lt[1] and c[-2] <= lt[1]:
         sig.append("Top Bottom buy (close above last top)")
