@@ -3902,7 +3902,9 @@ def optbt_job():
             if ENV.get("PLAN_FILE"):
                 return json.load(open(os.path.join(os.path.dirname(ENV["PLAN_FILE"]), "optscan.json"))).get("rows") or []
             return requests.get(PLAN_URL.rsplit("/", 1)[0] + "/optscan.json", timeout=30).json().get("rows") or []
-        _obt["j"] = opt_bt.OptBT(broker, DATA, rows, log=lambda ev, **kw: log(ev, **kw))
+        def pcr():
+            return requests.get(PLAN_URL.rsplit("/", 1)[0] + "/pcr_hist.json", timeout=30).json()
+        _obt["j"] = opt_bt.OptBT(broker, DATA, rows, log=lambda ev, **kw: log(ev, **kw), pcr_fn=pcr)
     return _obt["j"]
 
 

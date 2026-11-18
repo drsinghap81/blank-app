@@ -206,6 +206,15 @@ def pcr_file(X, last):
                    "today (tested: highest fifth beat the lowest by about 1% over 10 days, every year 2020-26). Guide only.", rows=out),
               open(f"{OUT}/pcr.json", "w"), separators=(",", ":"))
     print("pcr rows", len(out), flush=True)
+    # 18 Nov 2026: daily quintiles for the last 30 sessions (backtests use the PREVIOUS session's quintile, known before the open)
+    H = {}
+    for d in days[-30:]:
+        row = P.loc[d].dropna()
+        if len(row) < 25:
+            continue
+        qq = pd.qcut(row.rank(method="first"), 5, labels=False) + 1
+        H[str(pd.Timestamp(d).date())] = {k: int(v) for k, v in qq.items()}
+    json.dump(H, open(f"{OUT}/pcr_hist.json", "w"), separators=(",", ":"))
 
 
 if __name__ == "__main__":

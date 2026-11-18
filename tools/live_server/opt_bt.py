@@ -10,6 +10,7 @@ Rules (exactly the basket checked live on 18 Nov):
   index filter (the version Amritpal asked for): CE buys only while Nifty AND Bank Nifty are above yesterday's close at the
   signal bar, PE buys only while both are below.
   costs: 1% of the premium round trip (brokerage, taxes, slippage), charged in R.
+  PCR: each trade also carries the stock's PCR quintile from the previous session (data/scan/pcr_hist.json) to see if it adds value.
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
@@ -56,8 +57,8 @@ def prev_expiry(e):
 
 
 class OptBT:
-    def __init__(self, broker, data_dir, rows_fn, log=print):
-        self.b, self.rows_fn, self.log = broker, rows_fn, log
+    def __init__(self, broker, data_dir, rows_fn, log=print, pcr_fn=None):
+        self.b, self.rows_fn, self.log, self.pcr_fn = broker, rows_fn, log, pcr_fn
         self.dir = os.path.join(data_dir, "research", "optbt"); os.makedirs(self.dir, exist_ok=True)
         self.sp = os.path.join(self.dir, "state.json")
         try:
@@ -141,6 +142,14 @@ class OptBT:
                     trades += self._symbol(sym, r.get("kind"), ch.get(sym) or {}, monthly.get(sym) or [], days, idx, last)
                 except Exception as ex:  # noqa: BLE001
                     self.log("optbt_symbol_error", symbol=sym, error=str(ex)[:160])
+            try:                                                   # PCR quintile of the PREVIOUS session (known before the open)
+                H = self.pcr_fn() if self.pcr_fn else {}
+                hd = sorted(H)
+                for t in trades:
+                    prev = [x for x in hd if x < t["d"]]
+                    t["pcrq"] = H[prev[-1]].get(t["s"]) if prev else None
+            except Exception as ex:  # noqa: BLE001
+                self.log("optbt_pcr_error", error=str(ex)[:120])
             json.dump(trades, gzip.open(os.path.join(self.dir, "trades.json.gz"), "wt"))
             res = summarise(trades)
             res.update(method=__doc__, built=_ist().isoformat(timespec="minutes"))
@@ -264,4 +273,9 @@ def summarise(T):
     return {"all signals": _agg(T), "all CE": _agg([t for t in T if t["side"] == "CE"]), "all PE": _agg([t for t in T if t["side"] == "PE"]),
             "index filter (basket)": _agg(F), "filter CE": _agg([t for t in F if t["side"] == "CE"]), "filter PE": _agg([t for t in F if t["side"] == "PE"]),
             "filter, indices only": _agg([t for t in F if t["idx"]]), "filter, before 10:00": _agg([t for t in F if t["t"] < "10:00"]),
-            "filter, 10:00 and later": _agg([t for t in F if t["t"] >= "10:00"])}
+            "filter, 10:00 and later": _agg([t for t in F if t["t"] >= "10:00"]),
+            # PCR as a guide (high PCR = bullish in the 2020-26 daily test): agrees = CE with q 4-5 / PE with q 1-2
+            "filter + PCR agrees": _agg([t for t in F if t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]),
+            "filter + PCR neutral (q3)": _agg([t for t in F if t.get("pcrq") == 3]),
+            "filter + PCR disagrees": _agg([t for t in F if t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] <= 2) or (t["side"] == "PE" and t["pcrq"] >= 4))]),
+            "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
