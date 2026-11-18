@@ -949,6 +949,33 @@ async function loadLiveG(mk) {
     ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
   }
 }
+/* 18 Nov 2026 (Amritpal: "show these 5 positions passing on all systems, in a big way"): the concentrated-book view tested on
+   18 Nov (claude/concentrated-921-test.md) - hold at most 5 positions, risk 1% of capital each (at most 20% of capital in one),
+   and when more signals pass than there are free places, take the strongest 3-month gainers. Every tested buy system feeds it. */
+function lvBest5(P, S, rows, C0) {
+  const MAX = 5;
+  const r3 = {}; [...(P.top || []), ...(P.more || []), ...(P.swing || [])].forEach((x) => { if (x.r3m != null) r3[x.symbol] = x.r3m; });
+  const open = S && S.trades ? S.trades.filter((t) => t.state === 'open' || t.state === 'exiting' || t.state === 'pending') : [];
+  const held = new Set(open.map((t) => t.symbol));
+  const seen = new Set();
+  const cand = rows.filter((r) => r.price && r.stop && r.stop < r.price && r.side !== 'SELL' && !held.has(r.symbol) && r.kind !== 'WATCH')
+    .filter((r) => (seen.has(r.symbol) ? false : seen.add(r.symbol)))
+    .map((r) => ({ ...r, r3: r3[r.symbol] ?? r.r3m ?? null }))
+    .sort((a, b) => ((b.r3 ?? -999) - (a.r3 ?? -999)) || ((b.stock_rs ?? -999) - (a.stock_rs ?? -999)));
+  const free = Math.max(0, MAX - open.length);
+  const pick = cand.slice(0, free), next = cand.slice(free, free + 5);
+  const qtyOf = (r) => { const px = r.trigger || r.price; return C0 ? Math.max(0, Math.floor(Math.min(0.01 * C0 / (px - r.stop), 0.2 * C0 / px))) : 0; };
+  const tile = (r, i) => { const px = r.trigger || r.price, q = qtyOf(r);
+    return `<div class="b5-t"><div class="b5-n">${i + 1}</div><div class="b5-b"><div class="b5-s">${esc(r.symbol)}</div><div class="b5-sys">${esc(r.system || '')}${r.r3 != null ? ` · <b class="${r.r3 >= 0 ? 'up' : 'down'}">${r.r3 >= 0 ? '+' : ''}${fmt(r.r3, 0)}%</b> in 3 months` : ''}</div>
+      <div class="b5-l"><span>Buy above <b>${fmt(px, 2, 'en-IN')}</b></span><span>Stop <b>${fmt(r.stop, 2, 'en-IN')}</b> (−${fmt((1 - r.stop / px) * 100, 1)}%)</span>${q ? `<span>Qty <b>${q}</b> · ${money(q * px, 'NSE')}</span>` : ''}</div></div></div>`; };
+  const hold = open.map((t) => `<span class="b5-h"><b>${esc(t.symbol)}</b> ${esc(t.system || '')}</span>`).join('');
+  return `<div class="lv-card b5"><div class="lv-need-h"><b class="b5-title">Best 5 · your concentrated book</b><span class="lv-mode ${open.length >= MAX ? 'live' : 'dry'}">${open.length} of ${MAX} held</span></div>
+    <p class="lv-sub">At most 5 positions, 1% of capital at risk each (max 20% in one). When more setups pass than you have places, take the strongest 3-month gainers. Tested 2017–26: about the same return as 10 positions with the same worst fall, half the trades to watch.</p>
+    ${open.length ? `<div class="b5-hold">${hold}</div>` : ''}
+    ${free ? (pick.length ? `<div class="b5-g">${pick.map(tile).join('')}</div>` : '<p class="lv-sub">No new setups passed today.</p>') : '<p class="lv-sub"><b>Book full.</b> Nothing new until one of your 5 exits.</p>'}
+    ${next.length ? `<details class="info"><summary>Next in line (${next.length})</summary><p class="lv-sub">${next.map((r) => `${esc(r.symbol)} (${esc(r.system || '')}${r.r3 != null ? `, ${r.r3 >= 0 ? '+' : ''}${fmt(r.r3, 0)}%` : ''})`).join(' · ')}</p></details>` : ''}</div>`;
+}
+
 async function loadLive() {
   await pcrLoad();
   $('#title').textContent = 'Live trades';
@@ -1115,8 +1142,8 @@ async function loadLive() {
   const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
   el.innerHTML = `${lvSeg()}${S ? '' : head}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
-    ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div><div id="lval"></div>` : ''}${lvHero(S, PF)}${bookHtml}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
-    ${pane('buy', `    <details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
+    ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div><div id="lval"></div>` : ''}${lvHero(S, PF)}${lvBest5(P, S, rows, C0n)}${bookHtml}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
+    ${pane('buy', `    ${lvBest5(P, S, rows, C0n)}<details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '' : `<span class="lv-sub"><a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high; stop = weekly close below the 30-week SMA, raised every week. Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>

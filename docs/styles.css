@@ -1146,3 +1146,15 @@ body.pub .owner-only { display: none !important; }
 .ov-bk { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
 .ov-bk th, .ov-bk td { text-align: right; padding: 3px 4px; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); white-space: nowrap; }
 .ov-bk th:first-child, .ov-bk td:first-child { text-align: left; white-space: normal; }
+
+/* 18 Nov 2026: Best 5 concentrated book */
+.b5 { border: 2px solid var(--accent, #5b3df5); }
+.b5-title { font-size: 18px; }
+.b5-g { display: grid; gap: 10px; margin-top: 8px; }
+.b5-t { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 14px; background: var(--accent-soft, rgba(91,61,245,.08)); }
+.b5-n { font-size: 26px; font-weight: 800; line-height: 1; min-width: 26px; color: var(--accent, #5b3df5); }
+.b5-s { font-size: 22px; font-weight: 800; letter-spacing: .3px; }
+.b5-sys { font-size: 13px; margin: 2px 0 6px; }
+.b5-l { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; }
+.b5-hold { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.b5-h { padding: 4px 10px; border-radius: 999px; background: var(--rise-soft, rgba(0,160,90,.12)); font-size: 13px; }

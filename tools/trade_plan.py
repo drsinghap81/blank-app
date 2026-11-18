@@ -380,6 +380,27 @@ def main(mk="NSE"):
         if str(r.get("status", "")).startswith("EXIT"):
             exits.append(dict(id=f"EXIT-T921-{r['symbol']}", symbol=r["symbol"], system="9/21 trend", side="SELL", order="LIMIT",
                               when="next open", ref=num(r.get("close")), why="Supertrend turned red"))
+    # 18 Nov 2026: 3-month price change of every candidate - the "strongest 3-month gain" pick for the Best 5 card
+    # (concentrated 9/21 test: 5 positions at 1% risk, ranked by 3-month strength = about the 10-position return)
+    allc = trades[:30] + swing
+    r3 = {r["symbol"]: num(r.get("r3m")) for r in (tr.get("rows") or [])}
+    if india:
+        try:
+            import yfinance as yf
+            syms = sorted({c["symbol"] for c in allc})
+            tick = {s_: s_ + (".BO" if (c_.get("board") == "BSE") else ".NS") for c_ in allc for s_ in [c_["symbol"]]}
+            Y = yf.download([tick[s_] for s_ in syms], period="6mo", auto_adjust=True, progress=False, group_by="column", threads=True)["Close"]
+            for s_ in syms:
+                try:
+                    c_ = Y[tick[s_]].dropna() if hasattr(Y, "columns") and tick[s_] in Y.columns else Y.dropna()
+                    if len(c_) > 63:
+                        r3[s_] = round(float(c_.iloc[-1] / c_.iloc[-64] - 1) * 100, 1)
+                except Exception:  # noqa: BLE001
+                    pass
+        except Exception as ex:  # noqa: BLE001
+            print("r3m download failed", ex)
+    for c_ in allc:
+        c_["r3m"] = r3.get(c_["symbol"])
     out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), market=mk, watch_only=not india,
                asof=max(str(ath.get("asof") or ""), str(tr.get("asof") or "")),
                rules=dict(risk_pct=1.0, max_pos_pct=20.0, max_positions=10, max_late_pct=MAX_LATE * 100, max_below_pct=MAX_BELOW * 100, top=TOP,
