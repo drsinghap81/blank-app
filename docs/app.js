@@ -968,11 +968,21 @@ function lvBest5(P, S, rows, C0) {
   const tile = (r, i) => { const px = r.trigger || r.price, q = qtyOf(r);
     return `<div class="b5-t"><div class="b5-n">${i + 1}</div><div class="b5-b"><div class="b5-s">${esc(r.symbol)}</div><div class="b5-sys">${esc(r.system || '')}${r.r3 != null ? ` · <b class="${r.r3 >= 0 ? 'up' : 'down'}">${r.r3 >= 0 ? '+' : ''}${fmt(r.r3, 0)}%</b> in 3 months` : ''}</div>
       <div class="b5-l"><span>Buy above <b>${fmt(px, 2, 'en-IN')}</b></span><span>Stop <b>${fmt(r.stop, 2, 'en-IN')}</b> (−${fmt((1 - r.stop / px) * 100, 1)}%)</span>${q ? `<span>Qty <b>${q}</b> · ${money(q * px, 'NSE')}</span>` : ''}</div></div></div>`; };
-  const hold = open.map((t) => `<span class="b5-h"><b>${esc(t.symbol)}</b> ${esc(t.system || '')}</span>`).join('');
-  return `<div class="lv-card b5"><div class="lv-need-h"><b class="b5-title">Best 5 · your concentrated book</b><span class="lv-mode ${open.length >= MAX ? 'live' : 'dry'}">${open.length} of ${MAX} held</span></div>
+  // 18 Nov 2026: more than 5 held - show the 5 strongest (by gain since entry) big; the rest stay folded. They are NOT sold to
+  // make room (the 11 Nov swap test: forcing out holdings lowered returns) - they leave on their own system exits.
+  const gain = (t) => (t.ltp && t.entry ? (t.ltp / t.entry - 1) * 100 : null);
+  const ranked = open.slice().sort((a, b) => (gain(b) ?? -999) - (gain(a) ?? -999));
+  const focus = ranked.slice(0, MAX), rest = ranked.slice(MAX);
+  const htile = (t, i) => { const g = gain(t), st = t.gtt_trigger || t.stop;
+    return `<div class="b5-t"><div class="b5-n">${i + 1}</div><div class="b5-b"><div class="b5-s">${esc(t.symbol)}</div><div class="b5-sys">${esc(t.system || '')}${g != null ? ` · <b class="${g >= 0 ? 'up' : 'down'}">${g >= 0 ? '+' : ''}${fmt(g, 1)}%</b> since entry` : ''}${t.state === 'pending' ? ' · order pending' : ''}</div>
+      <div class="b5-l">${t.entry ? `<span>In <b>${fmt(t.entry, 2, 'en-IN')}</b></span>` : ''}${t.ltp ? `<span>Now <b>${fmt(t.ltp, 2, 'en-IN')}</b></span>` : ''}${st ? `<span>Stop <b>${fmt(st, 2, 'en-IN')}</b></span>` : ''}</div></div></div>`; };
+  const hold = `<div class="b5-g">${focus.map(htile).join('')}</div>${rest.length ? `<details class="info"><summary>The other ${rest.length} you hold</summary><p class="lv-sub">${rest.map((t) => { const g = gain(t); return `${esc(t.symbol)}${g != null ? ` (${g >= 0 ? '+' : ''}${fmt(g, 1)}%)` : ''}`; }).join(' · ')}</p>
+    <p class="lv-sub">Don't sell these just to get down to 5 (forcing holdings out lowered returns in the 11 Nov test). Let each leave on its own system exit; take no new buys until you are under 5.</p></details>` : ''}`;
+  return `<div class="lv-card b5"><div class="lv-need-h"><b class="b5-title">Best 5 · your concentrated book</b><span class="lv-mode ${open.length >= MAX ? 'live' : 'dry'}">${open.length > MAX ? `${open.length} held · ${open.length - MAX} over` : `${open.length} of ${MAX} held`}</span></div>
     <p class="lv-sub">At most 5 positions, 1% of capital at risk each (max 20% in one). When more setups pass than you have places, take the strongest 3-month gainers. Tested 2017–26: about the same return as 10 positions with the same worst fall, half the trades to watch.</p>
-    ${open.length ? `<div class="b5-hold">${hold}</div>` : ''}
-    ${free ? (pick.length ? `<div class="b5-g">${pick.map(tile).join('')}</div>` : '<p class="lv-sub">No new setups passed today.</p>') : '<p class="lv-sub"><b>Book full.</b> Nothing new until one of your 5 exits.</p>'}
+    ${open.length ? `<p class="lv-sub"><b>${open.length > MAX ? 'Your strongest 5' : 'You hold'}</b></p>${hold}` : ''}
+    ${free ? `<p class="lv-sub"><b>Buy next (${Math.min(free, pick.length)})</b></p>${pick.length ? `<div class="b5-g">${pick.map((r, i) => tile(r, i + open.length)).join('')}</div>` : '<p class="lv-sub">No new setups passed today.</p>'}`
+      : `<p class="lv-sub"><b>Book full${open.length > MAX ? ` (${open.length - MAX} over)` : ''}.</b> No new buys until you hold fewer than 5.</p>`}
     ${next.length ? `<details class="info"><summary>Next in line (${next.length})</summary><p class="lv-sub">${next.map((r) => `${esc(r.symbol)} (${esc(r.system || '')}${r.r3 != null ? `, ${r.r3 >= 0 ? '+' : ''}${fmt(r.r3, 0)}%` : ''})`).join(' · ')}</p></details>` : ''}</div>`;
 }
 
