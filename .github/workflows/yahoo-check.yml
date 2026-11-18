@@ -20,6 +20,9 @@ jobs:
               m = yf.Ticker(s.strip()).history(period="2d", interval="5m")
               if len(m):
                   lo = m.Low.idxmin(); print("intraday low", round(m.Low.min(), 2), "at", lo)
+              y = yf.Ticker(s.strip()).history(period="2y", interval="1d").Close
+              wk = y.groupby(y.index.tz_localize(None).to_period("W-FRI")).last(); sm = wk.rolling(30).mean()
+              print("weekly close vs 30-wk SMA (last 5):"); print(round(wk.tail(5), 2).to_string()); print(round(sm.tail(5), 2).to_string())
           PY
         env:
           SYMS: ${{ inputs.symbols }}
