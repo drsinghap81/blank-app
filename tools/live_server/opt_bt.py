@@ -407,5 +407,9 @@ def summarise(T):
             "basket + BB, realistic fills": _agg([dict(t, **t["real"]) for t in F if t.get("real") and t.get("bb")]),
             # 18 Nov 2026: when do the stops hit? basket trades by 2-hour window of ENTRY, and stop hits by 2-hour window of the HIT
             "basket by entry window": {w: _agg([t for t in F if lo_ <= t.get("et", t["t"]) < hi_]) for w, lo_, hi_ in WIN},
+            # Amritpal: "markets are quiet 11:00-14:30" - skip entries in that window
+            "basket, no entries 11:00-14:30": _agg([t for t in F if not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
+            "basket, only entries 11:00-14:30": _agg([t for t in F if "11:00" <= t.get("et", t["t"]) < "14:30"]),
+            "basket, realistic fills, no entries 11:00-14:30": _agg([dict(t, **t["real"]) for t in F if t.get("real") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
             "basket stop hits by window": {w: sum(1 for t in F if t["how"] == "SL" and lo_ <= t.get("xt", "") < hi_) for w, lo_, hi_ in WIN},
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
