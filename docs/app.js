@@ -2801,6 +2801,14 @@ async function loadTurtle(el) {
   const act = (r) => r.status !== 'flat' || (r.dist_pct != null && r.dist_pct <= NEAR);
   const near = R.filter((r) => r.status === 'flat' && r.dist_pct != null && r.dist_pct <= NEAR);
   const shown = tf === 'all' ? R : R.filter(act);
+  // 19 Nov 2026: a breakout that filled today moves from "place buy-stop" to "bought today" - keep it in the top box
+  const fresh = R.filter((r) => r.status === 'in trade' && r.new);
+  const freshCard = fresh.length ? `<div class="card pad b5" style="margin:10px 16px"><b class="b5-title">Bought today: breakout filled (${fresh.length})</b>
+      <p class="muted small">The buy-stop above the 20-day high traded. Place the sell-stop for the next session; it trails up with the 10-day low.</p>
+      <div class="b5-g">${fresh.map((r, i) => `<div class="b5-t"><div class="b5-n">${i + 1}</div><div class="b5-b"><div class="b5-s">${esc(r.name)}</div>
+        <div class="b5-sys">${esc(r.contract)} · bought ${day(r.entry_date)} at ${px(r.entry)} · close ${px(r.close)}</div>
+        <div class="b5-l"><span>Sell-stop <b>${px(r.stop)}</b></span><span>${turSize(r, S, D.fx || {}, r.entry_N, r.entry)}</span></div>
+        ${turMcx(r, S, D.fx || {}, r.entry_N) ? `<div class="muted small" style="margin-top:4px">${turMcx(r, S, D.fx || {}, r.entry_N)}</div>` : ''}</div></div>`).join('')}</div></div>` : '';
   const nearCard = near.length ? `<div class="card pad b5" style="margin:10px 16px"><b class="b5-title">Place these buy-stops now (${near.length})</b>
       <p class="muted small">Within ${NEAR}% of the 20-day high: a buy-stop just above it fills only if the breakout comes. Size is for ${S.risk}% risk at the 2N stop.</p>
       <div class="b5-g">${near.map((r, i) => `<div class="b5-t"><div class="b5-n">${i + 1}</div><div class="b5-b"><div class="b5-s">${esc(r.name)}</div>
@@ -2808,7 +2816,7 @@ async function loadTurtle(el) {
         <div class="b5-l"><span>Buy-stop <b>${px(r.buy_stop)}</b></span><span>Stop if filled <b>${px(r.fixed_stop_if_filled)}</b></span><span>${turSize(r, S, D.fx || {}, r.N, r.buy_stop)}</span></div>
         ${turMcx(r, S, D.fx || {}, r.N) ? `<div class="muted small" style="margin-top:4px">${turMcx(r, S, D.fx || {}, r.N)}</div>` : ''}</div></div>`).join('')}</div></div>`
     : `<div class="card pad" style="margin:10px 16px"><b>No buy-stops to place today</b><p class="muted small">Nothing is within ${NEAR}% of its 20-day high. The nearest: ${R.filter((r) => r.status === 'flat').slice(0, 3).map((r) => `${esc(r.name)} ${fmt(r.dist_pct, 1)}%`).join(' · ')}.</p></div>`;
-  el.innerHTML = `${tradeStrip('turtle')}${nearCard}
+  el.innerHTML = `${tradeStrip('turtle')}${freshCard}${nearCard}
     <section class="summary"><div class="stat new"><b>${nNew}</b><span>new buys today</span></div><div class="stat"><b>${nIn}</b><span>holding</span></div>
       <div class="stat exit"><b>${nEx}</b><span>exits today</span></div><div class="stat"><b>${R.length - nIn - nEx}</b><span>waiting with a buy-stop</span></div></section>
     <div class="status exit watch" style="margin:10px 16px"><b>Paper / watch.</b> Daily 20/10 long Turtle. Tested 2010–26: 24%/yr, −27% worst fall at 1% risk (≈12%, −33% without BTC/ETH), about 2.5× leverage. Profit is booked only when the trailing stop (10-day low) is hit; there is no target. Orders are yours to place.</div>
