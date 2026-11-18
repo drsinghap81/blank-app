@@ -1,1 +1,3 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
+UKW,2026-11-18,121.6,60.8,119.76,119.5,1.8,0,0.0,Greencoat UK Wind,watch,128.2,0.84,80,5.1,121.6,60.8
+KGF,2026-11-18,381.6,64.5,365.18,366.5,4.1,0,0.0,Kingfisher plc,watch,122.5,0.78,73,19.59,381.6,64.5

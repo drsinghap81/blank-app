@@ -1,25 +1,58 @@
 {
-"generated": "2026-11-17T18:02+00:00",
-"asof": "2026-11-17",
+"generated": "2026-11-18T23:23+00:00",
+"asof": "2026-11-18",
 "market": "UK",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "UK: not backtested yet - watch only.",
 "rows": [
 {
+"symbol": "MTRO",
+"name": "Metro Bank",
+"status": "touched",
+"touch_date": "2026-11-18",
+"days_ago": 0,
+"level": 174.0,
+"level_kind": "breakout retest",
+"level_date": "2026-06-01",
+"close": 180.1999969482422,
+"above_pct": 3.5632166369208074,
+"stop": 162.75,
+"risk_pct": 9.684237899259307,
+"resistance": 182.8,
+"room_r": 0.14898897713804307,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": 2.9585798816567976,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "FGP",
 "name": "FirstGroup",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 0,
+"days_ago": 1,
 "level": 217.0,
 "level_kind": "old swing low",
 "level_date": "2025-07-24",
-"close": 224.60000610351562,
-"above_pct": 3.5023069601454404,
-"stop": 209.08,
-"risk_pct": 6.911304879545543,
+"close": 228.8000030517578,
+"above_pct": 5.437789424773176,
+"stop": 208.72,
+"risk_pct": 8.776193496000317,
 "resistance": 232.0,
-"room_r": 0.47671799549831473,
+"room_r": 0.1593629455382789,
 "sq9": 225,
 "sq9_cross": "15\u00b2",
 "sq9_dist_pct": -3.5555555555555562,
@@ -32,107 +65,8 @@
 ],
 "sq9_above": [
 [
-225,
-"15\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "MTRO",
-"name": "Metro Bank",
-"status": "touched",
-"touch_date": "2026-11-17",
-"days_ago": 0,
-"level": 174.6,
-"level_kind": "breakout retest",
-"level_date": "2026-06-26",
-"close": 181.8000030517578,
-"above_pct": 4.123709448196422,
-"stop": 163.13,
-"risk_pct": 10.266931683107593,
-"resistance": 196.0,
-"room_r": 0.7607705504858812,
-"sq9": 169,
-"sq9_cross": "13\u00b2",
-"sq9_dist_pct": 3.3136130790033302,
-"sq9_gap_pct": 33.136094674556205,
-"sq9_below": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_above": [
-[
-225,
-"15\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "MAB",
-"name": "Mitchells & Butlers",
-"status": "touched",
-"touch_date": "2026-11-11",
-"days_ago": 4,
-"level": 301.0,
-"level_kind": "breakout retest",
-"level_date": "2026-02-27",
-"close": 317.5,
-"above_pct": 5.481727574750828,
-"stop": 291.96,
-"risk_pct": 8.044094433264204,
-"resistance": 331.5,
-"room_r": 0.5481597531555,
-"sq9": 289,
-"sq9_cross": "17\u00b2",
-"sq9_dist_pct": 4.152249134948094,
-"sq9_gap_pct": 24.913494809688586,
-"sq9_below": [
-[
-225,
-"15\u00b2"
-]
-],
-"sq9_above": [
-[
-361,
-"19\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "NCC",
-"name": "NCC Group",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 145.0,
-"level_kind": "breakout retest",
-"level_date": "2026-08-28",
-"close": 150.8000030517578,
-"above_pct": 4.0000021046605605,
-"stop": 138.21,
-"risk_pct": 8.346250277700273,
-"resistance": 156.0,
-"room_r": 0.4131524521600964,
-"sq9": 169,
-"sq9_cross": "13\u00b2",
-"sq9_dist_pct": -14.201183431952657,
-"sq9_gap_pct": 33.136094674556205,
-"sq9_below": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_above": [
-[
-169,
-"13\u00b2"
+289,
+"17\u00b2"
 ]
 ],
 "sq9_match": false
@@ -146,12 +80,12 @@
 "level": 5070.0,
 "level_kind": "breakout retest",
 "level_date": "2025-08-07",
-"close": 5300.0,
-"above_pct": 4.536489151873768,
-"stop": 4799.71,
-"risk_pct": 9.439353099730463,
+"close": 5285.0,
+"above_pct": 4.240631163708097,
+"stop": 4799.65,
+"risk_pct": 9.183592298156851,
 "resistance": 5415.0,
-"room_r": 0.22986864648772112,
+"room_r": 0.2678463703423609,
 "sq9": 5041,
 "sq9_cross": "71\u00b2",
 "sq9_dist_pct": 0.5752826820075274,
@@ -169,6 +103,39 @@
 ]
 ],
 "sq9_match": true
+},
+{
+"symbol": "WWH",
+"name": "Worldwide Healthcare Trust",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 371.0,
+"level_kind": "breakout retest",
+"level_date": "2024-07-16",
+"close": 389.0,
+"above_pct": 4.851752021563338,
+"stop": 361.95,
+"risk_pct": 6.954645051091102,
+"resistance": 397.0,
+"room_r": 0.295709594783738,
+"sq9": 361,
+"sq9_cross": "19\u00b2",
+"sq9_dist_pct": 2.7700831024930705,
+"sq9_gap_pct": 22.160664819944607,
+"sq9_below": [
+[
+289,
+"17\u00b2"
+]
+],
+"sq9_above": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_match": false
 }
 ]
 }
