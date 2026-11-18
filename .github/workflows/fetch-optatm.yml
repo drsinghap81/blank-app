@@ -1,5 +1,5 @@
 name: fetch-optatm
-# 18 Nov 2026: near-ATM (+-4%) stock options, CE and PE, all current F&O stocks 2020-2026 (option-signal -> delivery test)
+# 18 Nov 2026: near-ATM (+-10%, so a fixed strike keeps its history) stock options, CE and PE, all current F&O stocks 2020-2026 (option-signal -> delivery test)
 on:
   workflow_dispatch:
 permissions:
@@ -21,7 +21,7 @@ jobs:
       - run: pip install -q pandas requests
       - run: |
           P="${{ matrix.part }}"; S=${P%%:*}; E=${P##*:}; T="${{ matrix.typ }}"
-          mkdir -p oatm && OPTWIN=data/optwin_all.csv OPT_TYPE=$T STRIKE_LO=0.96 STRIKE_HI=1.04 python tools/fetch_optstk.py $S $E oatm/oatm_${T}_${S}.csv 2>&1 | tail -3 | tee oatm/log_${T}_${S}.txt
+          mkdir -p oatm && OPTWIN=data/optwin_all.csv OPT_TYPE=$T STRIKE_LO=0.90 STRIKE_HI=1.10 python tools/fetch_optstk.py $S $E oatm/oatm_${T}_${S}.csv 2>&1 | tail -3 | tee oatm/log_${T}_${S}.txt
           gzip -f oatm/oatm_${T}_${S}.csv
           echo "TAG=${T}-${S}" >> $GITHUB_ENV
       - run: |
