@@ -3890,12 +3890,44 @@ def research_start(_=Depends(auth)):
     return dict(started=research_job().start(), **research_job().status())
 
 
+# 18 Nov 2026: backtest of the 5-minute ATM option RSI-60 basket (opt_bt.py) - runs once, outside market hours
+_obt = {}
+
+
+def optbt_job():
+    if "j" not in _obt:
+        import opt_bt
+
+        def rows():
+            if ENV.get("PLAN_FILE"):
+                return json.load(open(os.path.join(os.path.dirname(ENV["PLAN_FILE"]), "optscan.json"))).get("rows") or []
+            return requests.get(PLAN_URL.rsplit("/", 1)[0] + "/optscan.json", timeout=30).json().get("rows") or []
+        _obt["j"] = opt_bt.OptBT(broker, DATA, rows, log=lambda ev, **kw: log(ev, **kw))
+    return _obt["j"]
+
+
+@app.get("/api/research/optbt")
+def optbt_status(_=Depends(auth)):
+    return optbt_job().status()
+
+
+@app.post("/api/research/optbt")
+def optbt_start(_=Depends(auth)):
+    return dict(started=optbt_job().start(), **{k: v for k, v in optbt_job().status().items() if k != "results"})
+
+
 @app.on_event("startup")
 def _start():
     if ENV.get("MOCK_BROKER") != "1":
         import threading
         threading.Thread(target=_loop, daemon=True).start()
         threading.Thread(target=_tb_loop, daemon=True).start()
+        try:
+            j = optbt_job()
+            if j.st.get("state") in ("idle", "running"):
+                j.start()          # waits for the market to close before it downloads anything
+        except Exception as ex:  # noqa: BLE001
+            log("optbt_error", error=str(ex)[:200])
         if ENV.get("RESEARCH_AUTO", "0") == "1":          # 11 Nov 2026: research test removed at Amritpal's request (off unless RESEARCH_AUTO=1)
             try:
                 j = research_job()

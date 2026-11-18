@@ -1,0 +1,267 @@
+"""Backtest of the 5-minute ATM option RSI-60 basket (18 Nov 2026, Amritpal: "can you backtest this for some time back").
+
+Rules (exactly the basket checked live on 18 Nov):
+  each liquid F&O name + NIFTY / BANKNIFTY / FINNIFTY / MIDCPNIFTY; contract = near MONTHLY expiry with >= 3 days left, strike nearest
+  the underlying's previous close; CE and PE of that strike on 5-minute bars.
+  signal on a 5-minute close (before 15:00): RSI(14) of the option crosses above 60, the option is above its session VWAP and the
+  OTHER option (PE for a CE signal) is below its session VWAP  ->  BUY that option (CE = bullish, PE = bearish; never a sale).
+  stop = the signal candle's low (at least 3% of the premium), target = entry + 3 x risk; first touched wins (stop first if both in
+  one bar); otherwise out at the day's last 5-minute close (intraday). One open trade per contract.
+  index filter (the version Amritpal asked for): CE buys only while Nifty AND Bank Nifty are above yesterday's close at the
+  signal bar, PE buys only while both are below.
+  costs: 1% of the premium round trip (brokerage, taxes, slippage), charged in R.
+Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
+expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
+Output: DATA/research/optbt/results.json"""
+import gzip
+import json
+import os
+import threading
+import time
+from datetime import date, datetime, timedelta
+
+IDXTOK = {"NIFTY": "99926000", "BANKNIFTY": "99926009", "FINNIFTY": "99926037", "MIDCPNIFTY": "99926074"}
+COST = 0.01
+
+
+def _ist():
+    return datetime.utcnow() + timedelta(hours=5, minutes=30)
+
+
+def _quiet():
+    t = _ist()
+    return t.weekday() >= 5 or not ((9, 0) <= (t.hour, t.minute) <= (15, 45))
+
+
+def rsi_series(c, n=14):
+    out = [None] * len(c)
+    if len(c) <= n:
+        return out
+    g = l_ = 0.0
+    for i in range(1, n + 1):
+        d_ = c[i] - c[i - 1]; g += max(d_, 0); l_ += max(-d_, 0)
+    g /= n; l_ /= n; out[n] = 100.0 if l_ == 0 else 100 - 100 / (1 + g / l_)
+    for i in range(n + 1, len(c)):
+        d_ = c[i] - c[i - 1]; g = (g * (n - 1) + max(d_, 0)) / n; l_ = (l_ * (n - 1) + max(-d_, 0)) / n
+        out[i] = 100.0 if l_ == 0 else 100 - 100 / (1 + g / l_)
+    return out
+
+
+def prev_expiry(e):
+    """the monthly expiry of the month before e's: NSE's last Tuesday (close enough when a holiday moves it a day)."""
+    first = e.replace(day=1); d = first - timedelta(days=1)
+    while d.weekday() != 1:
+        d -= timedelta(days=1)
+    return d
+
+
+class OptBT:
+    def __init__(self, broker, data_dir, rows_fn, log=print):
+        self.b, self.rows_fn, self.log = broker, rows_fn, log
+        self.dir = os.path.join(data_dir, "research", "optbt"); os.makedirs(self.dir, exist_ok=True)
+        self.sp = os.path.join(self.dir, "state.json")
+        try:
+            self.st = json.load(open(self.sp))
+        except Exception:  # noqa: BLE001
+            self.st = dict(state="idle", progress="", errors=0)
+        self.thread = None
+
+    def _save(self):
+        json.dump(self.st, open(self.sp, "w"))
+
+    def status(self):
+        try:
+            res = json.load(open(os.path.join(self.dir, "results.json")))
+        except Exception:  # noqa: BLE001
+            res = None
+        return dict(self.st, running=bool(self.thread and self.thread.is_alive()), results=res)
+
+    def start(self):
+        if self.thread and self.thread.is_alive():
+            return False
+        self.st.update(state="running", started=_ist().isoformat(timespec="minutes"), errors=0); self._save()
+        self.thread = threading.Thread(target=self._run, daemon=True); self.thread.start()
+        return True
+
+    # ------------------------------------------------------------------ data
+    def _get(self, exchange, token, interval, d0, d1):
+        while not _quiet():
+            self.st["progress"] = "paused for market hours"; self._save(); time.sleep(300)
+        api = self.b._session()
+        r = self.b._call(api.getCandleData, dict(exchange=exchange, symboltoken=str(token), interval=interval,
+                                                 fromdate=d0.strftime("%Y-%m-%d 09:15"), todate=d1.strftime("%Y-%m-%d 15:30")), tries=4) or {}
+        time.sleep(0.45)
+        return [(str(x[0])[:16], float(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5] if len(x) > 5 else 0)) for x in (self.b._data(r) or [])]
+
+    def _cached(self, key, exchange, token, interval, d0, d1):
+        p = os.path.join(self.dir, key + ".json.gz")
+        if os.path.exists(p):
+            return json.load(gzip.open(p, "rt"))
+        try:
+            B = self._get(exchange, token, interval, d0, d1)
+        except Exception as ex:  # noqa: BLE001
+            self.st["errors"] = self.st.get("errors", 0) + 1; self.log("optbt_fetch_error", key=key, error=str(ex)[:120]); return []
+        json.dump(B, gzip.open(p, "wt"))
+        return B
+
+    def _chain(self):
+        """name -> {expiry date: sorted strikes} from Angel's scrip master (options only)."""
+        ch = {}
+        for x in self.b._master():
+            if x.get("exch_seg") != "NFO" or not str(x.get("instrumenttype", "")).startswith("OPT"):
+                continue
+            try:
+                e = datetime.strptime(str(x["expiry"]).title(), "%d%b%Y").date()
+            except Exception:  # noqa: BLE001
+                continue
+            ch.setdefault(x["name"], {}).setdefault(e, set()).add(round(float(x.get("strike") or 0) / 100, 2))
+        return {n: {e: sorted(s) for e, s in d.items()} for n, d in ch.items()}
+
+    # ------------------------------------------------------------------ run
+    def _run(self):
+        try:
+            rows = self.rows_fn()
+            today = _ist().date(); last = today if (_ist().hour, _ist().minute) >= (15, 30) else today - timedelta(days=1)
+            ch = self._chain()
+            monthly = {}
+            for n, d in ch.items():
+                by_m = {}
+                for e in d:
+                    by_m[(e.year, e.month)] = max(by_m.get((e.year, e.month), e), e)
+                monthly[n] = sorted(by_m.values())
+            start = min((m[0] for m in monthly.values() if m), default=today) - timedelta(days=40)
+            idx = {}
+            for nm in ("NIFTY", "BANKNIFTY"):
+                idx[nm] = self._cached(f"idx5_{nm}_{last}", "NSE", IDXTOK[nm], "FIVE_MINUTE", start, last)
+            days = sorted({b[0][:10] for b in idx["NIFTY"]})
+            trades = []
+            for k, r in enumerate(rows):
+                sym = r["symbol"]; self.st["progress"] = f"{k + 1}/{len(rows)} {sym}"; self._save()
+                try:
+                    trades += self._symbol(sym, r.get("kind"), ch.get(sym) or {}, monthly.get(sym) or [], days, idx, last)
+                except Exception as ex:  # noqa: BLE001
+                    self.log("optbt_symbol_error", symbol=sym, error=str(ex)[:160])
+            json.dump(trades, gzip.open(os.path.join(self.dir, "trades.json.gz"), "wt"))
+            res = summarise(trades)
+            res.update(method=__doc__, built=_ist().isoformat(timespec="minutes"))
+            json.dump(res, open(os.path.join(self.dir, "results.json"), "w"))
+            self.st.update(state="done", progress="done", finished=_ist().isoformat(timespec="minutes"))
+        except Exception as ex:  # noqa: BLE001
+            self.st.update(state="error", progress=str(ex)[:200]); self.log("optbt_error", error=str(ex)[:200])
+        self._save()
+
+    def _symbol(self, sym, kind, chain, months, days, idx, last):
+        if kind == "index" or sym in IDXTOK:
+            if sym not in IDXTOK:
+                return []
+            D = self._cached(f"d_{sym}_{last}", "NSE", IDXTOK[sym], "ONE_DAY", date.fromisoformat(days[0]) - timedelta(days=10), last)
+        else:
+            _, t = self.b._ts(sym)
+            D = self._cached(f"d_{sym}_{last}", "NSE", t["token"], "ONE_DAY", date.fromisoformat(days[0]) - timedelta(days=10), last)
+        closes = {b[0][:10]: b[4] for b in D}
+        dl = sorted(closes)
+        # which contract on which day
+        plan = {}
+        for d in days:
+            dd = date.fromisoformat(d)
+            if d not in closes:
+                continue
+            prev = [x for x in dl if x < d]
+            if not prev:
+                continue
+            # Angel serves live contracts only: skip days whose near monthly (the previous month's) has already expired
+            if not months or dd <= prev_expiry(months[0]):
+                continue
+            ex = next((e for e in months if (e - dd).days >= 3), None)
+            if ex is None:
+                continue
+            strikes = chain.get(ex) or []
+            if not strikes:
+                continue
+            pc = closes[prev[-1]]; k = min(strikes, key=lambda s: abs(s - pc))
+            plan[d] = (ex, k)
+        out = []
+        need = sorted(set(plan.values()))
+        series = {}
+        for ex, k in need:
+            for typ in ("CE", "PE"):
+                tk = self.b.opt_token(sym, ex, k, typ)
+                if not tk:
+                    continue
+                first = min(d for d, v in plan.items() if v == (ex, k))
+                d0 = date.fromisoformat(first) - timedelta(days=12)
+                series[(ex, k, typ)] = self._cached(f"o_{sym}_{ex}_{k:g}_{typ}_{last}", "NFO", tk[0], "FIVE_MINUTE", d0, last)
+        ib = {nm: {b[0]: b[4] for b in idx[nm]} for nm in idx}
+        ipc = {}
+        for nm in idx:
+            byday = {}
+            for b in idx[nm]:
+                byday[b[0][:10]] = b[4]
+            dd = sorted(byday); ipc[nm] = {dd[i]: byday[dd[i - 1]] for i in range(1, len(dd))}
+        for d, (ex, k) in plan.items():
+            C, P = series.get((ex, k, "CE")), series.get((ex, k, "PE"))
+            if not C or not P:
+                continue
+            for side, A, B in (("CE", C, P), ("PE", P, C)):
+                rs = rsi_series([x[4] for x in A])
+                ia = [i for i, x in enumerate(A) if x[0][:10] == d]
+                if len(ia) < 3:
+                    continue
+                bmap = {}; pv = vv = 0.0
+                for x in B:
+                    if x[0][:10] == d:
+                        pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]; bmap[x[0]] = (x[4], pv / vv if vv else x[4])
+                pv = vv = 0.0; busy = -1
+                for i in ia:
+                    x = A[i]; pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]; vw = pv / vv if vv else x[4]
+                    if x[0][11:16] >= "15:00" or i <= busy or rs[i] is None or rs[i - 1] is None or not (rs[i] > 60 >= rs[i - 1]):
+                        continue
+                    o = bmap.get(x[0])
+                    if not o or not (x[4] > vw and o[0] < o[1]):
+                        continue
+                    e = x[4]
+                    if e <= 0:
+                        continue
+                    risk = max(e - x[3], e * 0.03); sl, tg = e - risk, e + 3 * risk; how, R, j = "close", None, ia[-1]
+                    for j in [q for q in ia if q > i]:
+                        if A[j][3] <= sl:
+                            how, R = "SL", -1.0; break
+                        if A[j][2] >= tg:
+                            how, R = "target", 3.0; break
+                    exitp = sl if how == "SL" else tg if how == "target" else A[ia[-1]][4]
+                    if R is None:
+                        R = (exitp - e) / risk
+                    busy = j
+                    nf = ib["NIFTY"].get(x[0]); bn = ib["BANKNIFTY"].get(x[0])
+                    nfp = (nf / ipc["NIFTY"][d] - 1) * 100 if nf and d in ipc["NIFTY"] else None
+                    bnp = (bn / ipc["BANKNIFTY"][d] - 1) * 100 if bn and d in ipc["BANKNIFTY"] else None
+                    out.append(dict(s=sym, d=d, t=x[0][11:16], side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
+                                    R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
+                                    nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index"))
+        return out
+
+
+def _agg(T):
+    if not T:
+        return dict(n=0)
+    R = [t["R"] for t in T]; P = [t["pct"] for t in T]
+    days = {}
+    for t in T:
+        days[t["d"]] = days.get(t["d"], 0) + t["R"]
+    eq = pk = dd = 0.0
+    for d in sorted(days):
+        eq += days[d]; pk = max(pk, eq); dd = min(dd, eq - pk)
+    return dict(n=len(T), total_R=round(sum(R), 1), avg_R=round(sum(R) / len(R), 3), win=round(sum(r > 0 for r in R) / len(R) * 100, 1),
+                target=sum(t["how"] == "target" for t in T), sl=sum(t["how"] == "SL" for t in T), at_close=sum(t["how"] == "close" for t in T),
+                avg_pct=round(sum(P) / len(P), 2), days=len(days), up_days=sum(v > 0 for v in days.values()), worst_dd_R=round(dd, 1),
+                by_day={d: round(v, 1) for d, v in sorted(days.items())})
+
+
+def summarise(T):
+    up = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] > 0 and t["bn"] > 0      # noqa: E731
+    dn = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] < 0 and t["bn"] < 0      # noqa: E731
+    F = [t for t in T if (t["side"] == "CE" and up(t)) or (t["side"] == "PE" and dn(t))]
+    return {"all signals": _agg(T), "all CE": _agg([t for t in T if t["side"] == "CE"]), "all PE": _agg([t for t in T if t["side"] == "PE"]),
+            "index filter (basket)": _agg(F), "filter CE": _agg([t for t in F if t["side"] == "CE"]), "filter PE": _agg([t for t in F if t["side"] == "PE"]),
+            "filter, indices only": _agg([t for t in F if t["idx"]]), "filter, before 10:00": _agg([t for t in F if t["t"] < "10:00"]),
+            "filter, 10:00 and later": _agg([t for t in F if t["t"] >= "10:00"])}
