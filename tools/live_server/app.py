@@ -3336,7 +3336,7 @@ def opt_today_basket():
     for s_ in SY:
         SY[s_] = syn(s_)
     at = lambda m, t: ([m[x] for x in sorted(m) if x <= t] or [None])[-1]      # noqa: E731
-    sec = opt_bt.sector_map(); T = []
+    sec = opt_bt.sector_map(); T = []; W = []
     for sym in SY:
         C, P = I.get(sym + "|CE"), I.get(sym + "|PE")
         if not C or not P:
@@ -3355,19 +3355,19 @@ def opt_today_basket():
                 j = bi.get(t)
                 if j is None or not (A["c"][i] > va[i] and B["c"][j] < vb[j]):
                     continue
-                e = A["c"][i]; risk = max(e - A["l"][i], e * 0.03); sl, tg = e - risk, e + 3 * risk; how, R, k = "open", None, len(A["c"]) - 1
-                for k in range(i + 1, len(A["c"])):
-                    if A["l"][k] <= sl:
-                        how, R = "SL", -1.0; break
-                    if A["h"][k] >= tg:
-                        how, R = "target", 3.0; break
-                ex = sl if how == "SL" else tg if how == "target" else A["c"][-1]
-                if R is None:
-                    R = (ex - e) / risk
+                tr = opt_bt.entry_sim(A["o"], A["h"], A["l"], A["c"], i, len(A["c"]) - 1)
+                if tr is None:
+                    if i + opt_bt.TRIG_BARS > len(A["c"]) - 1 and not any(A["l"][q] < A["l"][i] for q in range(i + 1, len(A["c"]))):
+                        W.append(dict(s=sym, side=side, t=t, trig=A["h"][i], stop=A["l"][i]))     # buy-stop still waiting
+                    continue
+                e, risk, how, ex, k, fi = tr
+                if how == "close":
+                    how = "open"
+                R = -1.0 if how == "SL" else 3.0 if how == "target" else (ex - e) / risk
                 busy = k if how != "open" else 10 ** 9
                 g = sec.get(sym); others = [at(SY[s2], t) for s2 in SY if s2 != sym and g and sec.get(s2) == g and SY[s2]]
                 others = [v for v in others if v is not None]
-                T.append(dict(s=sym, d=A.get("day"), t=t, side=side, how=how, R=round(R - 0.01 * e / risk, 3), pct=round((ex / e - 1.01) * 100, 2),
+                T.append(dict(s=sym, d=A.get("day"), t=t, et=A["t"][fi], e=round(e, 2), side=side, how=how, R=round(R - 0.01 * e / risk, 3), pct=round((ex / e - 1.01) * 100, 2),
                               nf=at(SY.get("NIFTY") or {}, t), bn=at(SY.get("BANKNIFTY") or {}, t), idx=A.get("kind") == "index",
                               sec=round(sum(others) / len(others), 2) if len(others) >= 2 else None, pcrq=(pq.get(sym) or {}).get("q")))
     res = opt_bt.summarise(T)
@@ -3376,7 +3376,8 @@ def opt_today_basket():
             v.pop("by_day", None)
     return dict(scan_at=_OPTSCAN.get("last"), contracts=len(I), last_bar=max((x["t"][-1] for x in I.values() if x["t"]), default=None),
                 note="open trades valued at the latest 5-minute close; 1% cost per trade", results=res,
-                trades=sorted(T, key=lambda x: x["t"])[-400:])
+                trades=sorted(T, key=lambda x: x["t"])[-400:], waiting=W,
+                entry="buy-stop above the signal candle's high for the next 3 candles; cancelled if its low breaks first")
 
 
 @app.get("/api/opt/today5")

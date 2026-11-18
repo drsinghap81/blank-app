@@ -3,6 +3,7 @@
 Rules (exactly the basket checked live on 18 Nov):
   each liquid F&O name + NIFTY / BANKNIFTY / FINNIFTY / MIDCPNIFTY; contract = near MONTHLY expiry with >= 3 days left, strike nearest
   the underlying's previous close; CE and PE of that strike on 5-minute bars.
+  ENTRY (18 Nov 2026): buy-stop above the signal candle's high for the next 3 candles, cancelled if its low breaks first.
   signal on a 5-minute close (before 15:00): RSI(14) of the option crosses above 60, the option is above its session VWAP and the
   OTHER option (PE for a CE signal) is below its session VWAP  ->  BUY that option (CE = bullish, PE = bearish; never a sale).
   stop = the signal candle's low (at least 3% of the premium), target = entry + 3 x risk; first touched wins (stop first if both in
@@ -257,26 +258,49 @@ class OptBT:
                     o = bmap.get(x[0])
                     if not o or not (x[4] > vw and o[0] < o[1]):
                         continue
-                    e = x[4]
-                    if e <= 0:
+                    tr = entry_sim([b[1] for b in A], [b[2] for b in A], [b[3] for b in A], [b[4] for b in A], i, ia[-1])
+                    if tr is None:
                         continue
-                    risk = max(e - x[3], e * 0.03); sl, tg = e - risk, e + 3 * risk; how, R, j = "close", None, ia[-1]
-                    for j in [q for q in ia if q > i]:
-                        if A[j][3] <= sl:
-                            how, R = "SL", -1.0; break
-                        if A[j][2] >= tg:
-                            how, R = "target", 3.0; break
-                    exitp = sl if how == "SL" else tg if how == "target" else A[ia[-1]][4]
-                    if R is None:
-                        R = (exitp - e) / risk
+                    e, risk, how, exitp, j, fi = tr
+                    R = -1.0 if how == "SL" else 3.0 if how == "target" else (exitp - e) / risk
                     busy = j
                     nf = ib["NIFTY"].get(x[0]); bn = ib["BANKNIFTY"].get(x[0])
                     nfp = (nf / ipc["NIFTY"][d] - 1) * 100 if nf and d in ipc["NIFTY"] else None
                     bnp = (bn / ipc["BANKNIFTY"][d] - 1) * 100 if bn and d in ipc["BANKNIFTY"] else None
-                    out.append(dict(s=sym, d=d, t=x[0][11:16], side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
+                    out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
                                     nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index"))
         return out
+
+
+TRIG_BARS = 3          # the buy-stop above the signal candle's high stays for the next 3 candles (15 minutes)
+
+
+def entry_sim(o, h, l, c, i, last):
+    """18 Nov 2026 (Amritpal: "entry when the high of the signal candle is breached, or low"): after the signal candle i, a
+    buy-stop just above its high; filled at max(high, that bar's open) on the first of the next TRIG_BARS candles to trade above it,
+    cancelled if a candle breaks the signal low first (or touches both: no fill). Stop = the signal candle's low (at least 3% under
+    the entry), target = entry + 3 x risk; stop first if both in one bar; else out at bar `last`'s close.
+    Returns (entry, risk, how, exit price, exit index, fill index) or None (no fill)."""
+    hi, lo = h[i], l[i]; e = f = None
+    for k in range(i + 1, min(last, i + TRIG_BARS) + 1):
+        if l[k] < lo:
+            return None
+        if h[k] > hi:
+            e = max(hi, o[k]); f = k; break
+    if e is None or e <= 0:
+        return None
+    risk = max(e - lo, e * 0.03); sl, tg = e - risk, e + 3 * risk
+    if l[f] <= sl:                                       # the fill bar itself (after the fill) touched the stop
+        return e, risk, "SL", sl, f, f
+    if c[f] >= tg:
+        return e, risk, "target", tg, f, f
+    for k in range(f + 1, last + 1):
+        if l[k] <= sl:
+            return e, risk, "SL", sl, k, f
+        if h[k] >= tg:
+            return e, risk, "target", tg, k, f
+    return e, risk, "close", c[last], last, f
 
 
 def sector_map():
