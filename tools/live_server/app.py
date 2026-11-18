@@ -4089,7 +4089,9 @@ def _start():
             log("opt_trader_error", error=str(ex)[:200])
         try:
             j = optbt_job()
-            if j.st.get("state") in ("idle", "running", "error"):
+            import opt_bt as _ob
+            old = ((j.status().get("results") or {}).get("version") or 1) < getattr(_ob, "VERSION", 1)
+            if j.st.get("state") in ("idle", "running", "error") or (j.st.get("state") == "done" and old):
                 j.start()          # waits for the market to close before it downloads anything
         except Exception as ex:  # noqa: BLE001
             log("optbt_error", error=str(ex)[:200])

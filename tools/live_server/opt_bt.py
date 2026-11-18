@@ -19,6 +19,7 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
+VERSION = 2                     # bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import gzip
 import json
 import os
@@ -228,7 +229,7 @@ class OptBT:
             res = summarise(trades)
             res["SMA-20 trail version"] = trail_summary(self.trail)
             json.dump(self.trail, gzip.open(os.path.join(self.dir, "trail.json.gz"), "wt"))
-            res.update(method=__doc__, built=_ist().isoformat(timespec="minutes"))
+            res.update(method=__doc__, built=_ist().isoformat(timespec="minutes"), version=VERSION)
             json.dump(res, open(os.path.join(self.dir, "results.json"), "w"))
             self.st.update(state="done", progress="done", finished=_ist().isoformat(timespec="minutes"))
         except Exception as ex:  # noqa: BLE001
@@ -303,7 +304,19 @@ class OptBT:
                 ia = [i for i, x in enumerate(A) if x[0][:10] == d]
                 if len(ia) < 3:
                     continue
-                bmap = {}; pv = vv = 0.0
+                bmap = {}; pv = vv = 0.0; bfull = {x[0]: x for x in B}
+
+                def short_other(fi_, xi_, how_):
+                    """18 Nov 2026 (Amritpal: "instead of buying the CE, sell the PE"): SELL the other option of the same strike at
+                    the close of the fill candle, buy it back at the close of the exit candle (at that candle's HIGH when the trade
+                    stopped out - conservative); 1% of the premium cost; margin ~18% (stocks) / 9% (indices) of strike x lot."""
+                    bi_, bx_ = bfull.get(A[fi_][0]), bfull.get(A[xi_][0])
+                    if not (bi_ and bx_ and lot):
+                        return None
+                    pin, pout = bi_[4], (bx_[2] if how_ == "SL" else bx_[4])
+                    mg = (0.09 if kind == "index" else 0.18) * k * lot
+                    return dict(pnl=round((pin - pout - COST * pin) * lot), inv=round(mg), pct=round((pin - pout - COST * pin) * lot / mg * 100, 2),
+                                how=how_, prem=pin)
                 for x in B:
                     if x[0][:10] == d:
                         pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]; bmap[x[0]] = (x[4], pv / vv if vv else x[4])
@@ -339,10 +352,13 @@ class OptBT:
                                        tgt_r=3.0 if tr_ in ("trail", "ema5") else tr_,
                                        trail=sm20 if tr_ == "trail" else em5 if tr_ == "ema5" else None)
                         if ta:
-                            ea, ra, ha, xa, _, _ = ta
+                            ea, ra, ha, xa, xia, fia = ta
+                            if tr_ == "ema5":
+                                alt["short_ema5"] = short_other(fia, xia, ha)
                             Ra = -1.0 if ha == "SL" else tr_ if ha == "target" else (xa - ea) / ra
                             alt[str(tr_)] = dict(R=round(Ra - COST * ea / ra, 3), pct=round((xa / ea - 1 - COST) * 100, 2), how=ha,
                                                  inv=round(ea * lot) if lot else None, pnl=round((xa - ea - COST * ea) * lot) if lot else None)
+                    alt["short_13"] = short_other(fi, j, how)
                     out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], alt=alt, xt=A[j][0][11:16], real=real, vol_lots=round(x[5] / lot, 1) if lot else None, bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
                                     inv=round(e * lot) if lot else None, pnl=round((exitp - e - COST * e) * lot) if lot else None,
@@ -525,6 +541,31 @@ def one_at_a_time(T):
     return out
 
 
+def money_agg(T):
+    """rupee view for the option-SELLING variants: profit, win rate, most margin tied up at once, return on it."""
+    if not T:
+        return dict(n=0)
+    P = [t["pnl"] for t in T]; days = {}
+    for t in T:
+        days[t["d"]] = days.get(t["d"], 0) + t["pnl"]
+    byd = {}
+    for t in T:
+        byd.setdefault(t["d"], []).append(t)
+    peaks = []
+    for L in byd.values():
+        ev = sorted([(t["xt"], 0, -t["inv"]) for t in L] + [(t["et"], 1, t["inv"]) for t in L]); cur = pk = 0.0
+        for _, _, v in ev:
+            cur += v; pk = max(pk, cur)
+        peaks.append(pk)
+    eq = pk = dd = 0.0
+    for d in sorted(days):
+        eq += days[d]; pk = max(pk, eq); dd = min(dd, eq - pk)
+    return dict(n=len(T), pnl_rs=round(sum(P)), win=round(sum(p > 0 for p in P) / len(P) * 100, 1), avg_rs=round(sum(P) / len(P)),
+                worst_trade_rs=round(min(P)), peak_margin_rs=round(max(peaks)), return_on_peak_pct=round(sum(P) / max(peaks) * 100, 1) if max(peaks) else None,
+                worst_run_rs=round(dd), days=len(days), up_days=sum(v > 0 for v in days.values()), stopped=sum(t["how"] == "SL" for t in T),
+                by_day_rs={d: round(v) for d, v in sorted(days.items())})
+
+
 def summarise(T):
     up = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] > 0 and t["bn"] > 0      # noqa: E731
     dn = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] < 0 and t["bn"] < 0      # noqa: E731
@@ -570,4 +611,10 @@ def summarise(T):
             "one at a time, 5 EMA trail": _agg(one_at_a_time([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5")])),
             "one at a time, 1:3, indices only": _agg(one_at_a_time([t for t in F if t["idx"]])),
             "basket stop hits by window": {w: sum(1 for t in F if t["how"] == "SL" and lo_ <= t.get("xt", "") < hi_) for w, lo_, hi_ in WIN},
+            # 18 Nov 2026: SELL the opposite option instead of buying (CE signal -> sell the PE, PE signal -> sell the CE)
+            "SELL opposite, basket, 1:3 exits": money_agg([dict(t, **t["alt"]["short_13"]) for t in F if (t.get("alt") or {}).get("short_13")]),
+            "SELL opposite, basket, 5 EMA exits": money_agg([dict(t, **t["alt"]["short_ema5"]) for t in F if (t.get("alt") or {}).get("short_ema5")]),
+            "SELL opposite, 5 EMA exits, no entries 11:00-14:30": money_agg([dict(t, **t["alt"]["short_ema5"]) for t in F if (t.get("alt") or {}).get("short_ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
+            "SELL opposite, 5 EMA exits, no lull + PCR + BB": money_agg([dict(t, **t["alt"]["short_ema5"]) for t in F if (t.get("alt") or {}).get("short_ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30") and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]),
+            "BUY, 5 EMA exits, no lull + PCR + BB (the paper trader)": _agg([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30") and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]),
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
