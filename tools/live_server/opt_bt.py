@@ -19,7 +19,7 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 4                     # bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
+VERSION = 5                     # bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import gzip
 import json
 import os
@@ -214,18 +214,24 @@ class OptBT:
             except Exception as ex:  # noqa: BLE001
                 self.log("optbt_weekly_error", error=str(ex)[:160])
             # Sensex (BSE options, weekly + monthly) - same rules, kept apart from the main results
+            self.sx_debug = {}
             try:
                 bch = self._chain("BFO").get("SENSEX") or {}
+                self.sx_debug = dict(bfo_names=sorted(self._chain("BFO"))[:15], expiries=[str(e) for e in sorted(bch)][:12],
+                                     strikes_sample=(bch[min(bch)][::max(1, len(bch[min(bch)]) // 6)][:8] if bch else None))
                 if bch:
                     lot_s = next((int(float(x.get("lotsize") or 0)) for x in self.b._master() if x.get("exch_seg") == "BFO" and x.get("name") == "SENSEX"), 0)
                     mon_s = sorted({max(e for e in bch if (e.year, e.month) == (m.year, m.month)) for m in bch})
                     ntr = len(self.trail)
+                    self.sx_debug["lot"] = lot_s
                     for wkly, L in ((False, mon_s), (True, sorted(bch))):
-                        for t in self._symbol("SENSEX", "index", bch, L, days, idx, last, lot_s, weekly=wkly, seg="BFO"):
+                        got = self._symbol("SENSEX", "index", bch, L, days, idx, last, lot_s, weekly=wkly, seg="BFO")
+                        self.sx_debug["weekly" if wkly else "monthly"] = dict(trades=len(got), plan_days=self._last_plan_days, series=self._last_series)
+                        for t in got:
                             t["sx"] = "weekly" if wkly else "monthly"; trades.append(t)
                     del self.trail[ntr:]
             except Exception as ex:  # noqa: BLE001
-                self.log("optbt_sensex_error", error=str(ex)[:160])
+                self.log("optbt_sensex_error", error=str(ex)[:160]); self.sx_debug["error"] = str(ex)[:300]
             try:                                                   # sector: average day % of the OTHER F&O stocks in the sector
                 sec = sector_map()
                 for t in trades:
@@ -255,6 +261,7 @@ class OptBT:
             json.dump(trades, gzip.open(os.path.join(self.dir, "trades.json.gz"), "wt"))
             res = summarise([t for t in trades if not t.get("wk") and not t.get("sx")])
             res["NIFTY monthly vs weekly"] = nifty_weekly([t for t in trades if t["s"] == "NIFTY" and not t.get("wk")], [t for t in trades if t.get("wk")])
+            res["SENSEX debug"] = getattr(self, "sx_debug", None)
             res["SENSEX monthly vs weekly"] = nifty_weekly([t for t in trades if t.get("sx") == "monthly"], [t for t in trades if t.get("sx") == "weekly"])
             res["SMA-20 trail version"] = trail_summary(self.trail)
             json.dump(self.trail, gzip.open(os.path.join(self.dir, "trail.json.gz"), "wt"))
@@ -266,6 +273,7 @@ class OptBT:
         self._save()
 
     def _symbol(self, sym, kind, chain, months, days, idx, last, lot=0, weekly=False, seg="NFO"):
+        self._last_plan_days, self._last_series = 0, {}
         if kind == "index" or sym in IDXTOK:
             if sym not in IDXTOK:
                 return []
@@ -296,7 +304,7 @@ class OptBT:
             pc = closes[prev[-1]]; k = min(strikes, key=lambda s: abs(s - pc))
             plan[d] = (ex, k)
         out = []
-        need = sorted(set(plan.values()))
+        need = sorted(set(plan.values())); self._last_plan_days = len(plan)
         series = {}
         for ex, k in need:
             for typ in ("CE", "PE"):
@@ -306,6 +314,7 @@ class OptBT:
                 first = min(d for d, v in plan.items() if v == (ex, k))
                 d0 = date.fromisoformat(first) - timedelta(days=12)
                 series[(ex, k, typ)] = self._cached(f"o_{sym}_{ex}_{k:g}_{typ}_{last}", seg, tk[0], "FIVE_MINUTE", d0, last)
+        self._last_series = {f"{a}|{b_:g}|{c_}": len(v) for (a, b_, c_), v in list(series.items())[:6]}; self._last_series["daily_closes"] = len(closes)
         ib = {nm: {b[0]: b[4] for b in idx[nm]} for nm in idx}
         ipc = {}
         for nm in idx:
