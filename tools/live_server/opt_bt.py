@@ -10,6 +10,7 @@ Rules (exactly the basket checked live on 18 Nov):
   index filter (the version Amritpal asked for): CE buys only while Nifty AND Bank Nifty are above yesterday's close at the
   signal bar, PE buys only while both are below.
   costs: 1% of the premium round trip (brokerage, taxes, slippage), charged in R.
+  sector: CE/PE kept only if the stock's sector (average day % of its other F&O stocks, from put-call parity) agrees.
   PCR: each trade also carries the stock's PCR quintile from the previous session (data/scan/pcr_hist.json) to see if it adds value.
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
@@ -135,13 +136,31 @@ class OptBT:
             for nm in ("NIFTY", "BANKNIFTY"):
                 idx[nm] = self._cached(f"idx5_{nm}_{last}", "NSE", IDXTOK[nm], "FIVE_MINUTE", start, last)
             days = sorted({b[0][:10] for b in idx["NIFTY"]})
-            trades = []
+            trades = []; self.syn = {}
             for k, r in enumerate(rows):
                 sym = r["symbol"]; self.st["progress"] = f"{k + 1}/{len(rows)} {sym}"; self._save()
                 try:
                     trades += self._symbol(sym, r.get("kind"), ch.get(sym) or {}, monthly.get(sym) or [], days, idx, last)
                 except Exception as ex:  # noqa: BLE001
                     self.log("optbt_symbol_error", symbol=sym, error=str(ex)[:160])
+            try:                                                   # sector: average day % of the OTHER F&O stocks in the sector
+                sec = sector_map()
+                for t in trades:
+                    g = sec.get(t["s"]); t["sector"] = g
+                    if not g or t["idx"]:
+                        t["sec"] = None; continue
+                    vals = []
+                    for s2, dd in self.syn.items():
+                        if s2 == t["s"] or sec.get(s2) != g:
+                            continue
+                        path = dd.get(t["d"]) or {}
+                        v = [path[x] for x in path if x <= t["t"]]
+                        if v:
+                            vals.append(v[-1])
+                    t["sec"] = round(sum(vals) / len(vals), 2) if len(vals) >= 2 else None
+                    t["sec_n"] = len(vals)
+            except Exception as ex:  # noqa: BLE001
+                self.log("optbt_sector_error", error=str(ex)[:120])
             try:                                                   # PCR quintile of the PREVIOUS session (known before the open)
                 H = self.pcr_fn() if self.pcr_fn else {}
                 hd = sorted(H)
@@ -211,6 +230,16 @@ class OptBT:
             C, P = series.get((ex, k, "CE")), series.get((ex, k, "PE"))
             if not C or not P:
                 continue
+            # the stock's own day % from put-call parity (K + CE - PE ~ future), vs the same contract's previous-day last bar
+            pm = {x[0]: x[4] for x in P}; synp = {}
+            prevd = [x[0] for x in C if x[0][:10] < d]
+            if prevd and prevd[-1] in pm:
+                ref = k + [x[4] for x in C if x[0] == prevd[-1]][0] - pm[prevd[-1]]
+                if ref > 0:
+                    for x in C:
+                        if x[0][:10] == d and x[0] in pm:
+                            synp[x[0][11:16]] = (k + x[4] - pm[x[0]]) / ref * 100 - 100
+            self.syn.setdefault(sym, {})[d] = synp
             for side, A, B in (("CE", C, P), ("PE", P, C)):
                 rs = rsi_series([x[4] for x in A])
                 ia = [i for i, x in enumerate(A) if x[0][:10] == d]
@@ -250,6 +279,25 @@ class OptBT:
         return out
 
 
+def sector_map():
+    """symbol -> sector (Nifty 500 industry; Financial Services split into Banks and other financials)."""
+    import csv
+    base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "universe")
+    ind = {}
+    try:
+        for r in csv.DictReader(open(os.path.join(base, "nse_industry.csv"))):
+            ind[r["symbol"]] = r.get("industry") or ""
+    except Exception:  # noqa: BLE001
+        pass
+    out = {}
+    for r in csv.DictReader(open(os.path.join(base, "nifty500.csv"))):
+        g = r["Industry"]
+        if g == "Financial Services":
+            g = "Banks" if "bank" in ind.get(r["Symbol"], "").lower() else "Financials (non-bank)"
+        out[r["Symbol"]] = g
+    return out
+
+
 def _agg(T):
     if not T:
         return dict(n=0)
@@ -278,4 +326,9 @@ def summarise(T):
             "filter + PCR agrees": _agg([t for t in F if t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]),
             "filter + PCR neutral (q3)": _agg([t for t in F if t.get("pcrq") == 3]),
             "filter + PCR disagrees": _agg([t for t in F if t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] <= 2) or (t["side"] == "PE" and t["pcrq"] >= 4))]),
+            # 18 Nov 2026: sector as a further filter - the stock's sector (other F&O members, put-call parity) up for CE / down for PE
+            "filter + sector agrees": _agg([t for t in F if t.get("sec") is not None and ((t["side"] == "CE" and t["sec"] > 0) or (t["side"] == "PE" and t["sec"] < 0))]),
+            "filter + sector disagrees": _agg([t for t in F if t.get("sec") is not None and ((t["side"] == "CE" and t["sec"] < 0) or (t["side"] == "PE" and t["sec"] > 0))]),
+            "filter + sector unknown (index / small sector)": _agg([t for t in F if t.get("sec") is None]),
+            "no index filter, sector agrees": _agg([t for t in T if t.get("sec") is not None and ((t["side"] == "CE" and t["sec"] > 0) or (t["side"] == "PE" and t["sec"] < 0))]),
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}

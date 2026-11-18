@@ -3913,6 +3913,15 @@ def optbt_status(_=Depends(auth)):
     return optbt_job().status()
 
 
+@app.get("/api/research/optbt/summary")
+def optbt_summary():
+    """backtest statistics only (no positions, no account data) - readable without the app password so results can be checked
+    from GitHub Actions."""
+    st = optbt_job().status(); r = st.get("results") or {}
+    return dict(state=st.get("state"), progress=st.get("progress"), running=st.get("running"), built=r.get("built"),
+                results={k: v for k, v in r.items() if k not in ("method", "built")})
+
+
 @app.post("/api/research/optbt")
 def optbt_start(_=Depends(auth)):
     return dict(started=optbt_job().start(), **{k: v for k, v in optbt_job().status().items() if k != "results"})
