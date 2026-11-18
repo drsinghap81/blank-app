@@ -1713,6 +1713,15 @@ def tb_state(inst: str = "bn", _=Depends(auth)):
                 pending=[dict(key=k, **v) for k, v in P.items()], answers=A, messages=msgs[::-1])
 
 
+@app.get("/api/tb/diag")
+def tb_diag(_=Depends(auth)):
+    """18 Nov 2026: what systemd says about the Top Bottom bot (written every minute by the watchdog)."""
+    try:
+        return dict(text=open(os.path.join(DATA, "tb_diag.txt")).read()[-4000:])
+    except Exception:  # noqa: BLE001
+        return dict(text="no diagnostics yet (the watchdog writes them every minute after the next update)")
+
+
 class TBAnswer(BaseModel):
     key: str
     value: bool | str
