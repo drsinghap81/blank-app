@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-17 00:19 UTC",
-"asof": "2026-11-16",
+"generated": "2026-11-18 00:25 UTC",
+"asof": "2026-11-17",
 "broker": "Trading 212 (Australia)",
 "note": "Rebalance on the first trading day after the month-end decision. FX fee 0.15% each way on Trading 212 AU. Pies have no stop-loss: the month-end check is the exit.",
 "pies": [
@@ -86,6 +86,11 @@
 "2026-11-16",
 0.97759,
 0.6779
+],
+[
+"2026-11-17",
+0.96743,
+0.67373
 ]
 ]
 },
@@ -124,7 +129,7 @@
 ],
 "provisional": [
 {
-"ticker": "VOO",
+"ticker": "SGOV",
 "pct": 100.0
 }
 ],
@@ -184,6 +189,11 @@
 "2026-11-16",
 0.96301,
 0.6779
+],
+[
+"2026-11-17",
+0.95496,
+0.67373
 ]
 ]
 }
@@ -279,6 +289,11 @@
 "2026-11-16",
 0.97759,
 0.6779
+],
+[
+"2026-11-17",
+0.96743,
+0.67373
 ]
 ]
 },
@@ -325,10 +340,10 @@
 ],
 "provisional": [
 {
-"ticker": "VUAG",
+"ticker": "CSH2",
 "pct": 100.0,
-"us": "VOO",
-"name": "Vanguard S&P 500 UCITS (Acc)"
+"us": "SGOV",
+"name": "Amundi Smart Overnight Return GBP (cash)"
 }
 ],
 "record": [],
@@ -387,6 +402,11 @@
 "2026-11-16",
 0.96301,
 0.6779
+],
+[
+"2026-11-17",
+0.95496,
+0.67373
 ]
 ]
 }
