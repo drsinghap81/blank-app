@@ -292,7 +292,7 @@ class OptBT:
             self.syn.setdefault(sym, {})[d] = synp
             for side, A, B in (("CE", C, P), ("PE", P, C)):
                 rs = rsi_series([x[4] for x in A])
-                bbu = bb_upper([x[4] for x in A])
+                bbu = bb_upper([x[4] for x in A]); sm20 = sma([x[4] for x in A], 20)
                 ia = [i for i, x in enumerate(A) if x[0][:10] == d]
                 if len(ia) < 3:
                     continue
@@ -327,8 +327,9 @@ class OptBT:
                                     inv=round(e2 * lot), pnl=round((x2 - e2 - COST * e2) * lot))
                     # 18 Nov 2026 ("1:2 or 1:3?"): the same trade with a 1.5R / 2R target
                     alt = {}
-                    for tr_ in (1.5, 2.0):
-                        ta = entry_sim([b[1] for b in A], [b[2] for b in A], [b[3] for b in A], [b[4] for b in A], i, ia[-1], tgt_r=tr_)
+                    for tr_ in (1.5, 2.0, "trail"):
+                        ta = entry_sim([b[1] for b in A], [b[2] for b in A], [b[3] for b in A], [b[4] for b in A], i, ia[-1],
+                                       tgt_r=3.0 if tr_ == "trail" else tr_, trail=sm20 if tr_ == "trail" else None)
                         if ta:
                             ea, ra, ha, xa, _, _ = ta
                             Ra = -1.0 if ha == "SL" else tr_ if ha == "target" else (xa - ea) / ra
@@ -379,7 +380,7 @@ LIMIT = 0.01           # stop-limit: pay at most 1% above the trigger
 TRIG_BARS = 3          # the buy-stop above the signal candle's high stays for the next 3 candles (15 minutes)
 
 
-def entry_sim(o, h, l, c, i, last, limit=None, tgt_r=3.0):
+def entry_sim(o, h, l, c, i, last, limit=None, tgt_r=3.0, trail=None):
     """18 Nov 2026 (Amritpal: "entry when the high of the signal candle is breached, or low"): after the signal candle i, a
     buy-stop just above its high; filled at max(high, that bar's open) on the first of the next TRIG_BARS candles to trade above it,
     cancelled if a candle breaks the signal low first (or touches both: no fill). Stop = the signal candle's low (at least 3% under
@@ -403,6 +404,13 @@ def entry_sim(o, h, l, c, i, last, limit=None, tgt_r=3.0):
     if e is None or e <= 0:
         return None
     risk = max(e - lo, e * 0.03); sl, tg = e - risk, e + tgt_r * risk
+    if trail is not None:                                # 18 Nov 2026: no target - stop at the signal low, else out on a close below the 20 SMA
+        for k in range(f, last + 1):
+            if l[k] <= sl:
+                return e, risk, "SL", sl, k, f
+            if k > f and trail[k] is not None and c[k] < trail[k]:
+                return e, risk, "trail", c[k], k, f
+        return e, risk, "close", c[last], last, f
     if l[f] <= sl:                                       # the fill bar itself (after the fill) touched the stop
         return e, risk, "SL", sl, f, f
     if c[f] >= tg:
@@ -464,6 +472,7 @@ def _agg(T):
                      total_return_on_max_peak_pct=round(pnl / max(peaks) * 100, 1) if max(peaks) else None)
     return dict(**money, n=len(T), total_R=round(sum(R), 1), avg_R=round(sum(R) / len(R), 3), win=round(sum(r > 0 for r in R) / len(R) * 100, 1),
                 target=sum(t["how"] == "target" for t in T), sl=sum(t["how"] == "SL" for t in T), at_close=sum(t["how"] in ("close", "open") for t in T),
+                trailed=sum(t["how"] == "trail" for t in T),
                 avg_pct=round(sum(P) / len(P), 2), days=len(days), up_days=sum(v > 0 for v in days.values()), worst_dd_R=round(dd, 1),
                 by_day={d: round(v, 1) for d, v in sorted(days.items())})
 
@@ -530,5 +539,7 @@ def summarise(T):
             "basket, target 1.5R": _agg([dict(t, **t["alt"]["1.5"]) for t in F if (t.get("alt") or {}).get("1.5")]),
             "basket, target 2R": _agg([dict(t, **t["alt"]["2.0"]) for t in F if (t.get("alt") or {}).get("2.0")]),
             "basket, target 2R, no entries 11:00-14:30": _agg([dict(t, **t["alt"]["2.0"]) for t in F if (t.get("alt") or {}).get("2.0") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
+            "basket, trail (stop at signal low, out on a close below the 20 SMA)": _agg([dict(t, **t["alt"]["trail"]) for t in F if (t.get("alt") or {}).get("trail")]),
+            "basket, trail, no entries 11:00-14:30": _agg([dict(t, **t["alt"]["trail"]) for t in F if (t.get("alt") or {}).get("trail") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
             "basket stop hits by window": {w: sum(1 for t in F if t["how"] == "SL" and lo_ <= t.get("xt", "") < hi_) for w, lo_, hi_ in WIN},
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
