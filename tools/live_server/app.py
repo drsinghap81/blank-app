@@ -531,6 +531,17 @@ def backfill_targets(J, acc):
     return ch
 
 
+def _gone_confirmed(e):
+    """19 Nov 2026: a holding counts as gone (stop filled / sold in Angel) only when it is missing in market hours
+    (Mon-Fri 09:15-16:00 IST; Angel's holdings can be incomplete overnight) on two checks at least 20 minutes apart."""
+    t = ist_now()
+    if t.weekday() >= 5 or not ((9, 15) <= (t.hour, t.minute) <= (16, 0)):
+        return False
+    if not e.get("gone_seen"):
+        e["gone_seen"] = time.time(); return False
+    return time.time() - e["gone_seen"] >= 1200
+
+
 def sync(acc=None):
     """Match journal entries to Angel's order book and holdings:
     pending buy -> filled (real price/qty, then the GTT stop) / rejected / cancelled;
@@ -546,6 +557,34 @@ def sync(acc=None):
     held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
     held = held_map(acc, held)
     today = ist_now().date().isoformat(); changed = False
+    # 19 Nov 2026: undo a false "stop hit or sold outside the app" - at 02:36 IST Angel's holdings briefly left out 6 stocks
+    # still held; they were dropped from tracking, written to the journal as exits and counted as losers in the streak guard.
+    # If the shares are back in the holdings within 3 days, put the trade back exactly as it was.
+    D = J.get("_done") or {}; restored = []
+    cut = (ist_now().date() - timedelta(days=3)).isoformat()
+    for k, v in list(D.items()):
+        sym_ = k.split(":")[0]
+        if isinstance(v, dict) and v.get("state") == "stopped or sold outside the app" and sym_ not in J and v.get("ended", "") >= cut \
+                and held.get(sym_, 0) >= (v.get("qty") or 1):
+            e_ = {kk: vv for kk, vv in v.items() if kk not in ("state", "exit", "ended", "gone_seen")}; e_["state"] = "open"
+            J[sym_] = e_; D.pop(k); restored.append((sym_, v.get("ended"))); changed = True
+    if restored:
+        try:
+            IJ = in_journal_load(); keep = [r for r in IJ if not any(r.get("symbol") == s_ and r.get("closed") == d_ and r.get("est")
+                                                                    for s_, d_ in restored)]
+            if len(keep) != len(IJ):
+                in_journal_save(keep)
+        except Exception as ex:  # noqa: BLE001
+            log("restore_journal_error", error=str(ex)[:160])
+        try:
+            gp = os.path.join(DATA, "guard.json"); g = json.load(open(gp)) if os.path.exists(gp) else {}
+            g["streak"] = 0; g.pop("pause_until", None); json.dump(g, open(gp, "w"))      # the streak was built from false exits
+        except Exception:  # noqa: BLE001
+            pass
+        names = ", ".join(s_ for s_, _ in restored)
+        log("restored", symbols=names)
+        alert("info", names.split(",")[0], f"False alarm fixed: {names} are still in your Angel holdings. Tracking and stops restored.",
+              key=f"restored:{today}:{names}")
     for sym, e in list(J.items()):
         st = e.get("state", "open")
         o = book.get(str(e.get("order_id"))) if st in ("pending", "exiting") else None
@@ -591,6 +630,10 @@ def sync(acc=None):
             alert("sold", sym, f"Sold {e.get('qty')} at ₹{px:,.2f}.", key=f"sold:{sym}:{today}")
             J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="sold", exit=px, ended=today); changed = True
             in_journal_from_app(sym, e, px, today, "sold (app)", est=False)
+        elif st == "open" and held.get(sym, 0) > 0 and e.get("gone_seen"):
+            e.pop("gone_seen", None); changed = True                                  # it was a blip: still held
+        elif st == "open" and held.get(sym, 0) <= 0 and (e.get("gtt_id") or e.get("filled", today) < today) and not _gone_confirmed(e):
+            changed = True                                                            # first sighting: wait for a second check
         elif st == "open" and held.get(sym, 0) <= 0 and (e.get("gtt_id") or e.get("filled", today) < today):
             px = float(e.get("gtt_trigger") or 0) * (1 - GTT_LIMIT_GAP / 2) or e["entry"]
             hit_tgt = False

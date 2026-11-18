@@ -104,10 +104,18 @@ def test_fill_protect_exit(tmp_path):
     assert next(x for x in P2["rows"] if x["id"] == r["id"])["skip"] == "already held"
     # the stop fires on Angel's side: holding disappears -> recorded as stopped, streak counted
     A.broker.hold[r["symbol"]] = 0; A._acc["d"] = None
+    _gc = A._gone_confirmed; A._gone_confirmed = lambda e: True      # (19 Nov 2026: real runs need two in-hours checks)
     P3 = c.get("/api/plan", headers=h).json()
     assert not any(t["symbol"] == r["symbol"] for t in P3["trades"])
     assert P3["recent"][0]["symbol"] == r["symbol"] and "stopped" in P3["recent"][0]["state"]
     assert P3["guard"]["streak"] == 1
+    # 19 Nov 2026: the shares come back (it was Angel's overnight holdings blip) -> trade restored, streak undone
+    qty0 = P2_q = next(t for t in P2["trades"] if t["symbol"] == r["symbol"])["qty"]
+    A.broker.hold[r["symbol"]] = qty0; A._acc["d"] = None
+    P4 = c.get("/api/plan", headers=h).json()
+    assert any(t["symbol"] == r["symbol"] and t["state"] == "open" for t in P4["trades"]) and P4["guard"]["streak"] == 0
+    A.broker.hold[r["symbol"]] = 0; A._acc["d"] = None; c.get("/api/plan", headers=h)
+    A._gone_confirmed = _gc
 
 
 def test_dry_shows_protect(tmp_path):
