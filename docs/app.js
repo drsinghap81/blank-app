@@ -2513,20 +2513,27 @@ async function optBasketCard(box) {
     state.optBk = { a, b };
   }
   const { a, b } = state.optBk; if (!a && !b) { ph('Your server doesn\'t have this yet: tap Live › Settings › Server › Update now (or wait: it installs itself after 3:35 pm IST).'); state.optBk = null; return; }
-  const G = [['index filter (basket)', '<b>Basket</b>'], ['filter CE', '· CE'], ['filter PE', '· PE'],
-    ['filter + sector agrees', '+ sector ✓'], ['filter + sector disagrees', '+ sector ✗'], ['filter + PCR agrees', '+ PCR ✓'],
-    ['filter + PCR disagrees', '+ PCR ✗'], ['filter, indices only', 'Indices'], ['all signals', 'No filter']];
-  const tb = (res, open) => `<table class="ov-bk"><tr><th></th><th>Trades</th><th>Total R</th><th>Win</th><th>Tgt / SL / ${open}</th><th>Avg %</th></tr>${G.map(([k, lbl]) => {
-    const v = (res || {})[k]; if (!v || !v.n) return `<tr><td>${lbl}</td><td>0</td><td colspan="4" class="muted">—</td></tr>`;
-    return `<tr><td>${lbl}</td><td>${v.n}</td><td class="${v.total_R >= 0 ? 'up' : 'down'}"><b>${v.total_R >= 0 ? '+' : ''}${fmt(v.total_R, 1)}</b></td><td>${fmt(v.win, 0)}%</td><td>${v.target} / ${v.sl} / ${v.at_close}</td><td class="${v.avg_pct >= 0 ? 'up' : 'down'}">${v.avg_pct >= 0 ? '+' : ''}${fmt(v.avg_pct, 1)}%</td></tr>`; }).join('')}</table>`;
-  const today = a && a.results ? `<p class="lv-sub">Today · ${a.contracts} contracts scanned · last bar ${esc(a.last_bar || '—')} IST · open trades at the latest price · 1% cost per trade</p>${tb(a.results, 'open')}
-    <details class="info"><summary>Today's basket trades (${(a.trades || []).filter((t) => (t.side === 'CE' && t.nf > 0 && t.bn > 0) || (t.side === 'PE' && t.nf < 0 && t.bn < 0)).length})</summary><ul class="list flat">${(a.trades || []).filter((t) => (t.side === 'CE' && t.nf > 0 && t.bn > 0) || (t.side === 'PE' && t.nf < 0 && t.bn < 0)).slice().reverse().map((t) =>
-      `<li class="row"><span><b>${esc(t.s)}</b> ${t.side} · signal ${esc(t.t)}${t.et ? ` · bought ${esc(t.et)}${t.e ? ' @ ' + fmt(t.e, 2, 'en-IN') : ''}` : ''}${t.sec != null ? ` · sector ${t.sec >= 0 ? '+' : ''}${fmt(t.sec, 1)}%` : ''}${t.pcrq ? ` · PCR q${t.pcrq}` : ''}</span><span class="${t.R >= 0 ? 'up' : 'down'}">${t.how === 'open' ? 'open ' : t.how === 'SL' ? 'stop ' : 'target '}${t.R >= 0 ? '+' : ''}${fmt(t.R, 1)}R</span></li>`).join('')}</ul></details>${(a.waiting || []).length ? `<details class="info"><summary>Waiting to trigger (${a.waiting.length})</summary><ul class="list flat">${a.waiting.map((w) =>
-      `<li class="row"><span><b>${esc(w.s)}</b> ${w.side} · signal ${esc(w.t)}</span><span>buy above ${fmt(w.trig, 2, 'en-IN')} · stop ${fmt(w.stop, 2, 'en-IN')}</span></li>`).join('')}</ul></details>` : ''}` : '<p class="lv-sub">Today: appears after the server\'s next option scan.</p>';
-  const bt = b && b.results && b.results['all signals'] ? `<p class="lv-sub" style="margin-top:12px"><b>Backtest</b> · ${b.results['index filter (basket)'] ? b.results['index filter (basket)'].days : 0} sessions to ${esc((b.built || '').slice(0, 10))} (Angel keeps only live contracts, so about 3 weeks) · exits at the day's close</p>${tb(b.results, 'close')}`
+  // 18 Nov 2026 (Amritpal: "don't show PCR or other options - consolidated profit if every triggered trade was bought at the actual price"):
+  // only the basket (Nifty and Bank Nifty agree), 1 lot each, bought at the trigger price; open trades at the latest 5-minute close
+  const inB = (t) => (t.side === 'CE' && t.nf > 0 && t.bn > 0) || (t.side === 'PE' && t.nf < 0 && t.bn < 0);
+  const Tb = ((a && a.trades) || []).filter(inB);
+  const inv = Tb.reduce((x, t) => x + (t.inv || 0), 0), pnl = Tb.reduce((x, t) => x + (t.pnl || 0), 0);
+  const cnt = (h) => Tb.filter((t) => t.how === h).length;
+  const rs = (v) => `${v >= 0 ? '+' : '−'}₹${fmt(Math.abs(v), 0, 'en-IN')}`;
+  const today = a ? `<p class="lv-sub">Today · ${a.contracts} contracts scanned · last bar ${esc(a.last_bar || '—')} IST</p>
+    <section class="summary"><div class="stat"><b>${Tb.length}</b><span>trades bought</span></div><div class="stat"><b>₹${fmt(inv, 0, 'en-IN')}</b><span>money in (1 lot each)</span></div>
+      <div class="stat ${pnl >= 0 ? 'new' : ''}"><b class="${pnl >= 0 ? 'up' : 'down'}">${rs(pnl)}</b><span>profit so far</span></div><div class="stat"><b class="${pnl >= 0 ? 'up' : 'down'}">${inv ? (pnl >= 0 ? '+' : '') + fmt(pnl / inv * 100, 1) + '%' : '—'}</b><span>on the money in</span></div></section>
+    <p class="lv-sub">${cnt('target')} hit the target · ${cnt('SL')} stopped · ${cnt('open')} still open (at the latest price) · after 1% costs</p>
+    <details class="info"><summary>The trades (${Tb.length})</summary><ul class="list flat">${Tb.slice().reverse().map((t) =>
+      `<li class="row"><span><b>${esc(t.s)}</b> ${t.side} · bought ${esc(t.et || t.t)} @ ${fmt(t.e, 2, 'en-IN')} · ${t.how === 'open' ? 'now' : t.how === 'SL' ? 'stop' : 'target'} ${fmt(t.x, 2, 'en-IN')}</span><span class="${(t.pnl || 0) >= 0 ? 'up' : 'down'}">${rs(t.pnl || 0)}</span></li>`).join('')}</ul></details>
+    ${(a.waiting || []).length ? `<details class="info"><summary>Waiting to trigger (${a.waiting.length})</summary><ul class="list flat">${a.waiting.map((w) =>
+      `<li class="row"><span><b>${esc(w.s)}</b> ${w.side} · signal ${esc(w.t)}</span><span>buy above ${fmt(w.trig, 2, 'en-IN')} · stop ${fmt(w.stop, 2, 'en-IN')}</span></li>`).join('')}</ul></details>` : ''}`
+    : '<p class="lv-sub">Today: appears after the server\'s next option scan.</p>';
+  const B = b && b.results && b.results['index filter (basket)'];
+  const bt = B && B.n ? `<p class="lv-sub" style="margin-top:12px"><b>Backtest</b> (${B.days} sessions, about 3 weeks): ${B.n} trades · ${B.total_R >= 0 ? '+' : ''}${fmt(B.total_R, 1)}R · ${fmt(B.win, 0)}% winners · average ${B.avg_pct >= 0 ? '+' : ''}${fmt(B.avg_pct, 1)}% a trade · ${B.up_days} of ${B.days} days in profit</p>`
     : `<p class="lv-sub" style="margin-top:12px">Backtest: ${b ? esc(b.progress || b.state || 'waiting') : 'not on the server yet'} (runs after the close).</p>`;
   box.innerHTML = `<div class="card" style="margin:10px 16px;padding:12px"><b>RSI-60 option basket (5-minute)</b>
-    <p class="muted small">Signal: the CE's 5-minute close crosses RSI 60 in the buy zone (CE above VWAP, PE below); the PE in the sell zone. Entry: buy when the next 3 candles trade above the signal candle's high (cancelled if its low breaks first). Stop = the signal candle's low, target = 3x that risk. CE only while Nifty and Bank Nifty are both up on the day, PE only while both are down. Basket = with that index filter; ✓ / ✗ = the stock's sector (or its PCR fifth) agrees / disagrees with the trade. Results in R (1R = the risk of one trade). Watch only.</p>${today}${bt}</div>`;
+    <p class="muted small">Signal: the CE's 5-minute close crosses RSI 60 in the buy zone (CE above VWAP, PE below); the PE in the sell zone. Entry: buy when the next 3 candles trade above the signal candle's high (cancelled if its low breaks first). Stop = the signal candle's low, target = 3x that risk. CE only while Nifty and Bank Nifty are both up on the day, PE only while both are down. 1 lot each at the actual trigger price. Watch only.</p>${today}${bt}</div>`;
 }
 
 async function loadOptCharts(el) {
