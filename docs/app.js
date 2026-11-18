@@ -2504,13 +2504,15 @@ async function turtleSelect(r) {
    ~3-week backtest (opt_bt.py) once it has run after the close. Buy the CE in the buy zone, the PE in the sell zone; stop = signal
    candle low, target 3R; Nifty AND Bank Nifty must agree (up for CE, down for PE). */
 async function optBasketCard(box) {
-  if (!box || !(lvCfg().url && lvCfg().token)) return;
+  if (!box) return;
+  const ph = (m) => { box.innerHTML = `<div class="card" style="margin:10px 16px;padding:12px"><b>RSI-60 option basket (5-minute)</b><p class="lv-sub">${m}</p></div>`; };
+  if (!(lvCfg().url && lvCfg().token)) { ph('Connect your server (Live › Settings) to see today\'s basket and the backtest.'); return; }
   if (!state.optBk || Date.now() - (state.optBkAt || 0) > 120000) {
     state.optBkAt = Date.now();
     const [a, b] = await Promise.all([lvApi('/api/opt/today_basket', { timeout: 30000 }).catch(() => null), lvApi('/api/research/optbt/summary', { timeout: 20000 }).catch(() => null)]);
     state.optBk = { a, b };
   }
-  const { a, b } = state.optBk; if (!a && !b) { box.innerHTML = ''; return; }
+  const { a, b } = state.optBk; if (!a && !b) { ph('Your server doesn\'t have this yet: tap Live › Settings › Server › Update now (or wait: it installs itself after 3:35 pm IST).'); state.optBk = null; return; }
   const G = [['index filter (basket)', '<b>Basket</b>'], ['filter CE', '· CE'], ['filter PE', '· PE'],
     ['filter + sector agrees', '+ sector ✓'], ['filter + sector disagrees', '+ sector ✗'], ['filter + PCR agrees', '+ PCR ✓'],
     ['filter + PCR disagrees', '+ PCR ✗'], ['filter, indices only', 'Indices'], ['all signals', 'No filter']];
