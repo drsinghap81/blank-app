@@ -1,119 +1,119 @@
 {
- "expiry": "2026-11-17",
- "asof": "2026-11-09",
- "future": 25033.2,
- "days_to_expiry": 8,
- "atm": 25050.0,
- "straddle": 498.25,
- "straddle_pct_of_future": 1.99,
- "ivn": 0.007037,
- "percentile": 75,
+ "expiry": "2026-11-23",
+ "asof": "2026-11-17",
+ "future": 25415.3,
+ "days_to_expiry": 6,
+ "atm": 25400.0,
+ "straddle": 369.15,
+ "straddle_pct_of_future": 1.452,
+ "ivn": 0.00593,
+ "percentile": 58,
  "skip_above_pct": 80,
  "decision": "TRADE",
  "legs": {
   "CE": {
-   "long": 24900.0,
-   "short2": 25400.0,
-   "short4": 25450.0,
+   "long": 25250.0,
+   "short2": 25800.0,
+   "short4": 25850.0,
    "prices": [
-    308.2,
-    108.55,
-    96.4
+    270.2,
+    51.45,
+    43.65
    ],
-   "net_debit": -294.5,
-   "best_at": 25400.0,
-   "best_pts": 794.5,
-   "breakeven_far": 25599.0,
-   "breakeven_near": 24606.0,
-   "shift_trigger": 24900.0
+   "net_debit": -7.3,
+   "best_at": 25800.0,
+   "best_pts": 557.3,
+   "breakeven_far": 25951.0,
+   "breakeven_near": 25243.0,
+   "shift_trigger": 25250.0
   },
   "PE": {
-   "long": 25200.0,
-   "short2": 24650.0,
-   "short4": 24600.0,
+   "long": 25550.0,
+   "short2": 25050.0,
+   "short4": 25000.0,
    "prices": [
-    353.5,
-    105.5,
-    91.9
+    263.9,
+    61.1,
+    50.55
    ],
-   "net_debit": -225.1,
-   "best_at": 24650.0,
-   "best_pts": 775.1,
-   "breakeven_far": 24455.0,
-   "breakeven_near": 25425.0,
-   "shift_trigger": 25200.0
+   "net_debit": -60.5,
+   "best_at": 25050.0,
+   "best_pts": 560.5,
+   "breakeven_far": 24898.0,
+   "breakeven_near": 25610.0,
+   "shift_trigger": 25550.0
   }
  },
  "lot": 65,
  "margin": "Rs 8-10 lakh per set (estimate; check your broker)",
  "late": false,
- "updated": "2026-11-17 17:49 IST",
- "position": {
-  "expiry": "2026-11-17",
-  "entry": "2026-11-11",
-  "future": 25214.2,
-  "legs": {
-   "CE": {
-    "long": 25050.0,
-    "short2": 25600.0,
-    "short4": 25650.0,
-    "entry_prices": [
-     298.15,
-     92.85,
-     81.85
-    ],
-    "entry_value": -214.95,
-    "entry_cost": 8.931817307692308
-   },
-   "PE": {
-    "long": 25350.0,
-    "short2": 24850.0,
-    "short4": 24800.0,
-    "entry_prices": [
-     319.7,
-     93.05,
-     79.3
-    ],
-    "entry_value": -183.6,
-    "entry_cost": 8.998792307692309
-   }
-  }
- },
- "paper_start": "2026-11-04",
  "entered": {
-  "date": "2026-11-11",
-  "future": 25214.2,
+  "date": "2026-11-18",
+  "future": 25239.3,
   "legs": {
    "CE": {
-    "long": 25050.0,
+    "long": 25100.0,
     "short2": 25600.0,
     "short4": 25650.0,
     "prices": [
-     298.15,
-     92.85,
-     81.85
+     244.8,
+     47.15,
+     38.45
     ],
-    "net": -214.95,
-    "breakeven_far": 25793.0
+    "net": -3.3,
+    "breakeven_far": 25741.0
    },
    "PE": {
-    "long": 25350.0,
-    "short2": 24850.0,
+    "long": 25400.0,
+    "short2": 24900.0,
     "short4": 24800.0,
     "prices": [
-     319.7,
-     93.05,
-     79.3
+     258.0,
+     48.9,
+     32.65
     ],
-    "net": -183.6,
-    "breakeven_far": 24673.0
+    "net": 29.6,
+    "breakeven_far": 24726.0
    }
   }
  },
  "paper_mtm": {
-  "date": "2026-11-16",
-  "pts": 672.7,
-  "rs": 43724,
-  "future": 25293.6
- }
+  "date": "2026-11-18",
+  "pts": -14.2,
+  "rs": -923,
+  "future": 25239.3
+ },
+ "updated": "2026-11-19 00:59 IST",
+ "position": {
+  "expiry": "2026-11-23",
+  "entry": "2026-11-18",
+  "future": 25239.3,
+  "legs": {
+   "CE": {
+    "long": 25100.0,
+    "short2": 25600.0,
+    "short4": 25650.0,
+    "entry_prices": [
+     244.8,
+     47.15,
+     38.45
+    ],
+    "entry_value": -3.3000000000000114,
+    "entry_cost": 7.117222307692308
+   },
+   "PE": {
+    "long": 25400.0,
+    "short2": 24900.0,
+    "short4": 24800.0,
+    "entry_prices": [
+     258.0,
+     48.9,
+     32.65
+    ],
+    "entry_value": 29.599999999999994,
+    "entry_cost": 7.080172307692308
+   }
+  }
+ },
+ "paper_start": "2026-11-04"
 }
