@@ -3776,8 +3776,17 @@ def us_sync():
                 _us_close(J, sym, o["avg"], o["dealt"], "sold"); changed = True
             continue
         have = held.get(sym, 0)
+        if have >= p["qty"] - 1e-9 and p.get("gone_seen"):
+            p.pop("gone_seen", None); changed = True
         if have < p["qty"] - 1e-9:      # stop filled at moomoo (or sold outside the app)
-            o = moomoo.order(p["stop_id"]) if p.get("stop_id") else dict(avg=0, status="")
+            o = moomoo.order(p["stop_id"]) if p.get("stop_id") else dict(avg=0, status="", dealt=0)
+            # 19 Nov 2026 (the Angel overnight false alarm): close only if the stop order really dealt, or the shares are still
+            # missing on a second check at least 20 minutes later (a positions blip must not close a trade)
+            if not (o.get("dealt") or 0) > 0:
+                if not p.get("gone_seen"):
+                    p["gone_seen"] = time.time(); changed = True; continue
+                if time.time() - p["gone_seen"] < 1200:
+                    continue
             px = o["avg"] or p["stop"]; _us_close(J, sym, px, p["qty"] - have, "stop" if p.get("stop_id") else "sold outside the app"); changed = True
             alert("stop", sym, f"US {sym}: stop filled at {px:.2f}.", key=f"usstophit:{sym}:{p['date']}")
             continue
