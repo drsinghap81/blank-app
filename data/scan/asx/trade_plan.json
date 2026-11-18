@@ -1,8 +1,8 @@
 {
-"generated": "2026-11-17 10:32 UTC",
+"generated": "2026-11-18 18:20 UTC",
 "market": "ASX",
 "watch_only": true,
-"asof": "2026-11-17",
+"asof": "2026-11-18",
 "rules": {
 "risk_pct": 1.0,
 "max_pos_pct": 20.0,
@@ -95,21 +95,21 @@
 "order": "LIMIT",
 "when": "next open",
 "side": "BUY",
-"price": 42.46,
-"ref": 42.04,
+"price": 42.41,
+"ref": 41.99,
 "stop": 38.63,
 "exit_rule": "weekly close below the 30-week SMA",
-"note": "breakout 2026-11-10, base 63 m, -1.5% vs entry 42.66",
+"note": "breakout 2026-11-10, base 63 m, -1.6% vs entry 42.66",
 "base_months": 63,
 "score": 3,
 "value_cr": 110.2557,
 "entry0": 42.66,
-"late_pct": -1.5,
+"late_pct": -1.6,
 "sector": "Consumer Staples",
-"sector_rs": 13.53,
+"sector_rs": 14.2314,
 "theme": "",
 "theme_rs": null,
-"stock_rs": 28.1325,
+"stock_rs": 28.9308,
 "aligned": true,
 "td_score": 2,
 "rs_rating": 93,
@@ -121,7 +121,8 @@
 "group_rank": null,
 "td_levels": 2,
 "rank": 1,
-"risk_pct": 9.9
+"risk_pct": 9.8,
+"r3m": null
 }
 ],
 "more": [],
@@ -154,10 +155,11 @@
 "td_score": null,
 "group": "Capital Goods",
 "lane": "mid",
-"group_pulse": 12.7,
+"group_pulse": 14.3,
 "group_rank": 11,
 "rank": 1,
-"risk_pct": 9.9
+"risk_pct": 9.9,
+"r3m": null
 }
 ],
 "pattern_watch": [],
