@@ -2532,13 +2532,21 @@ async function loadOptCharts(el) {
 async function optSelect(r) {
   const iv = state.optIv || 'D'; const srv = !!(lvCfg().url && lvCfg().token);
   const IV = [['D', 'Daily'], ['60', '1h'], ['15', '15m'], ['5', '5m']];
+  /* 18 Nov 2026: the option's own symbols: TradingView NSE:<root><YYMMDD><C|P><strike>, Angel <root><DDMMMYY><strike><CE|PE> */
+  const ex = r.expiry.split('-'); const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][+ex[1] - 1];
+  const kS = String(+r.strike); const tvRoot = r.symbol.replace(/[-&]/g, '_');
+  const tvO = (t) => `NSE:${tvRoot}${ex[0].slice(2)}${ex[1]}${ex[2]}${t[0]}${kS}`; const agO = (t) => `${r.symbol}${ex[2]}${MON}${ex[0].slice(2)}${kS}${t}`;
+  const links = ['CE', 'PE'].map((t) => `<div style="margin:6px 16px;display:flex;flex-wrap:wrap;gap:6px;align-items:center"><b>${t}</b> <a class="tv-btn" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvO(t))}" style="margin:0">TradingView ↗</a>
+      <span class="chip">Angel: ${esc(agO(t))}</span><button class="lv-link" data-cp="${esc(agO(t))}">Copy</button></div>`).join('');
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)} ${fmt(r.strike, 0, 'en-IN')}</h2><div class="co">ATM options · expiry ${esc(day(r.expiry))} (${r.dte} days) · future ${fmt(r.fut, 2, 'en-IN')}${r.lot ? ` · lot ${r.lot}` : ''}</div></div></div>
+    ${links}<p class="muted small" style="margin:2px 16px">Angel: tap Copy, then paste in the Angel app's search to open that option's chart.</p>
     <div class="seg" id="optiv" style="margin:8px 16px">${IV.map(([k, n]) => `<button data-k="${k}" aria-selected="${iv === k}">${n}</button>`).join('')}</div>
     ${iv !== 'D' && !srv ? '<p class="muted pad">Intraday candles come from Angel through your server: connect it on the Live tab.</p>' : ''}
     <h3 style="margin:10px 16px 0">CE</h3><div class="chart" id="optce" style="height:230px"><p class="muted pad">Loading…</p></div><div class="chart" id="optcer" style="height:100px"></div><p class="muted small" style="margin:2px 16px" id="optcen"></p>
     <h3 style="margin:10px 16px 0">PE</h3><div class="chart" id="optpe" style="height:230px"><p class="muted pad">Loading…</p></div><div class="chart" id="optper" style="height:100px"></div><p class="muted small" style="margin:2px 16px" id="optpen"></p>
     <p class="muted small" style="margin:6px 16px">${iv === 'D' ? 'Daily candles of this contract (days without a trade use the settle price)' : `${IV.find((x) => x[0] === iv)[1]} candles from Angel (times in IST)`} · orange = EMA 9 · blue = EMA 21 · grey dashed = last top (Top Bottom buy level) · lower pane: RSI(14), red 70 / green 30. Systems on the premium are watch only.</p>`);
   document.querySelectorAll('#optiv button').forEach((b) => b.addEventListener('click', () => { state.optIv = b.dataset.k; optSelect(r); }));
+  document.querySelectorAll('[data-cp]').forEach((b) => b.addEventListener('click', async () => { try { await navigator.clipboard.writeText(b.dataset.cp); b.textContent = 'Copied ✓'; } catch (e) { alertMsg(b.dataset.cp); } }));
   const ema = (v, n) => { const k = 2 / (n + 1); let e = v[0]; return v.map((x) => (e = x * k + e * (1 - k))); };
   const draw = (id, S, top, sig, note) => { const box = $(id); if (!box) return; box.innerHTML = '';
     if (!S || !S.t || !S.t.length) { box.innerHTML = '<p class="muted pad">No candles.</p>'; return; }
