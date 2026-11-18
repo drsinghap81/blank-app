@@ -11,6 +11,8 @@ Rules (exactly the basket checked live on 18 Nov):
   index filter (the version Amritpal asked for): CE buys only while Nifty AND Bank Nifty are above yesterday's close at the
   signal bar, PE buys only while both are below.
   costs: 1% of the premium round trip (brokerage, taxes, slippage), charged in R.
+  SMA-20 trail version (Amritpal's chart): RSI 60 cross + close above a rising 20 SMA, buy next open, exit on a close below
+  the 20 SMA (held overnight), on 5- and 15-minute bars.
   BB: also split by the signal candle closing above the option's upper Bollinger band (20, 2).
   sector: CE/PE kept only if the stock's sector (average day % of its other F&O stocks, from put-call parity) agrees.
   PCR: each trade also carries the stock's PCR quintile from the previous session (data/scan/pcr_hist.json) to see if it adds value.
@@ -44,6 +46,30 @@ def bb_upper(c, n=20, k=2.0):
         w = c[i - n + 1:i + 1]; m = sum(w) / n
         out[i] = m + k * (sum((x - m) ** 2 for x in w) / n) ** 0.5
     return out
+
+
+def sma(c, n):
+    out = [None] * len(c); s_ = 0.0
+    for i, v in enumerate(c):
+        s_ += v
+        if i >= n:
+            s_ -= c[i - n]
+        if i >= n - 1:
+            out[i] = s_ / n
+    return out
+
+
+def resample(B, mins):
+    """5-minute bars (iso time, o, h, l, c, v) -> `mins`-minute bars from 09:15 IST each day."""
+    out = []
+    for b in B:
+        hh, mm = int(b[0][11:13]), int(b[0][14:16]); k = ((hh * 60 + mm) - 555) // mins
+        key = b[0][:10] + "#" + str(k)
+        if out and out[-1][6] == key:
+            o_ = out[-1]; out[-1] = (o_[0], o_[1], max(o_[2], b[2]), min(o_[3], b[3]), b[4], o_[5] + b[5], key)
+        else:
+            out.append((b[0], b[1], b[2], b[3], b[4], b[5], key))
+    return [x[:6] for x in out]
 
 
 def rsi_series(c, n=14):
@@ -158,7 +184,7 @@ class OptBT:
             for nm in ("NIFTY", "BANKNIFTY"):
                 idx[nm] = self._cached(f"idx5_{nm}_{last}", "NSE", IDXTOK[nm], "FIVE_MINUTE", start, last)
             days = sorted({b[0][:10] for b in idx["NIFTY"]})
-            trades = []; self.syn = {}
+            trades = []; self.syn = {}; self.trail = []
             for k, r in enumerate(rows):
                 sym = r["symbol"]; self.st["progress"] = f"{k + 1}/{len(rows)} {sym}"; self._save()
                 try:
@@ -193,6 +219,8 @@ class OptBT:
                 self.log("optbt_pcr_error", error=str(ex)[:120])
             json.dump(trades, gzip.open(os.path.join(self.dir, "trades.json.gz"), "wt"))
             res = summarise(trades)
+            res["SMA-20 trail version"] = trail_summary(self.trail)
+            json.dump(self.trail, gzip.open(os.path.join(self.dir, "trail.json.gz"), "wt"))
             res.update(method=__doc__, built=_ist().isoformat(timespec="minutes"))
             json.dump(res, open(os.path.join(self.dir, "results.json"), "w"))
             self.st.update(state="done", progress="done", finished=_ist().isoformat(timespec="minutes"))
@@ -301,6 +329,40 @@ class OptBT:
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
                                     inv=round(e * lot) if lot else None, pnl=round((exitp - e - COST * e) * lot) if lot else None,
                                     nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index"))
+        # 18 Nov 2026 (Amritpal's chart): TREND version - RSI(14) crosses above 60 with the close above a RISING 20-bar SMA;
+        # buy at the next candle's open, hold (overnight too) until a candle CLOSES below the 20 SMA -> sell at that close.
+        # On 5- and 15-minute bars of the day's ATM CE/PE; a position stays in its contract until 2 days before expiry.
+        for tf in (5, 15):
+            for (ex, k_), _ in [((e_, kk), None) for e_, kk in set(plan.values())]:
+                for side in ("CE", "PE"):
+                    S = series.get((ex, k_, side))
+                    if not S:
+                        continue
+                    B = S if tf == 5 else resample(S, tf)
+                    c = [b[4] for b in B]; rs = rsi_series(c); sm = sma(c, 20); n = len(B); i = 21; stop_day = str(ex - timedelta(days=2))
+                    while i < n - 1:
+                        b = B[i]; d = b[0][:10]
+                        ok = plan.get(d) == (ex, k_) and b[0][11:16] < "15:00" and rs[i] is not None and rs[i - 1] is not None \
+                            and rs[i] > 60 >= rs[i - 1] and sm[i] is not None and sm[i - 1] is not None and c[i] > sm[i] and sm[i] > sm[i - 1]
+                        if not ok:
+                            i += 1; continue
+                        e = B[i + 1][1]; j = i + 1
+                        while j < n - 1 and not (c[j] < sm[j]) and B[j][0][:10] < stop_day:
+                            j += 1
+                        xp = c[j]
+                        nf = ib["NIFTY"].get(b[0][:16]) if tf == 5 else None
+                        nfp = bnp = None
+                        try:
+                            tt = b[0][:16]; nfv = ib["NIFTY"].get(tt); bnv = ib["BANKNIFTY"].get(tt)
+                            nfp = (nfv / ipc["NIFTY"][d] - 1) * 100 if nfv and d in ipc["NIFTY"] else None
+                            bnp = (bnv / ipc["BANKNIFTY"][d] - 1) * 100 if bnv and d in ipc["BANKNIFTY"] else None
+                        except Exception:  # noqa: BLE001
+                            pass
+                        if e > 0:
+                            self.trail.append(dict(s=sym, tf=tf, side=side, d=d, t=b[0][11:16], xd=B[j][0][:10], xt=B[j][0][11:16], bars=j - i,
+                                                   e=e, x=xp, pct=round((xp / e - 1 - COST) * 100, 2), nf=nfp, bn=bnp, idx=kind == "index",
+                                                   inv=round(e * lot) if lot else None, pnl=round((xp - e - COST * e) * lot) if lot else None))
+                        i = j + 1
         return out
 
 
@@ -395,6 +457,31 @@ def _agg(T):
                 target=sum(t["how"] == "target" for t in T), sl=sum(t["how"] == "SL" for t in T), at_close=sum(t["how"] in ("close", "open") for t in T),
                 avg_pct=round(sum(P) / len(P), 2), days=len(days), up_days=sum(v > 0 for v in days.values()), worst_dd_R=round(dd, 1),
                 by_day={d: round(v, 1) for d, v in sorted(days.items())})
+
+
+def trail_summary(T):
+    """SMA-20 trail version: % per trade (equal money), by timeframe, with / without the Nifty + Bank Nifty filter."""
+    def agg(L):
+        if not L:
+            return dict(n=0)
+        P = [t["pct"] for t in L]; bars = sorted(t["bars"] for t in L)
+        days = {}
+        for t in L:
+            days[t["d"]] = days.get(t["d"], 0) + t["pct"]
+        o_ = dict(n=len(L), avg_pct=round(sum(P) / len(P), 2), win=round(sum(p > 0 for p in P) / len(P) * 100, 1), best=round(max(P), 1),
+                  worst=round(min(P), 1), median_bars_held=bars[len(bars) // 2], overnight=sum(t["xd"] != t["d"] for t in L),
+                  days=len(days), up_days=sum(v > 0 for v in days.values()))
+        if all(t.get("pnl") is not None for t in L):
+            o_["pnl_rs_1lot"] = round(sum(t["pnl"] for t in L))
+        return o_
+    up = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] > 0 and t["bn"] > 0      # noqa: E731
+    dn = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] < 0 and t["bn"] < 0      # noqa: E731
+    out = {}
+    for tf in (5, 15):
+        L = [t for t in T if t["tf"] == tf]; F = [t for t in L if (t["side"] == "CE" and up(t)) or (t["side"] == "PE" and dn(t))]
+        out[f"{tf}m all"] = agg(L); out[f"{tf}m index filter"] = agg(F)
+        out[f"{tf}m index filter, no entries 11:00-14:30"] = agg([t for t in F if not ("11:00" <= t["t"] < "14:30")])
+    return out
 
 
 WIN = [("09:15-11:15", "09:15", "11:15"), ("11:15-13:15", "11:15", "13:15"), ("13:15-15:30", "13:15", "15:31")]
