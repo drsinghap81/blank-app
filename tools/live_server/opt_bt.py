@@ -295,9 +295,11 @@ class OptBT:
                     if trl is not None and lot and x[5] >= 20 * lot:
                         e2, r2, h2, x2, _, _ = trl
                         R2 = -1.0 if h2 == "SL" else 3.0 if h2 == "target" else (x2 - e2) / r2
-                        real = dict(R=round(R2 - COST * e2 / r2, 3), pct=round((x2 / e2 - 1 - COST) * 100, 2), how=h2)
+                        real = dict(R=round(R2 - COST * e2 / r2, 3), pct=round((x2 / e2 - 1 - COST) * 100, 2), how=h2,
+                                    inv=round(e2 * lot), pnl=round((x2 - e2 - COST * e2) * lot))
                     out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], xt=A[j][0][11:16], real=real, vol_lots=round(x[5] / lot, 1) if lot else None, bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
+                                    inv=round(e * lot) if lot else None, pnl=round((exitp - e - COST * e) * lot) if lot else None,
                                     nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index"))
         return out
 
@@ -371,7 +373,25 @@ def _agg(T):
     eq = pk = dd = 0.0
     for d in sorted(days):
         eq += days[d]; pk = max(pk, eq); dd = min(dd, eq - pk)
-    return dict(n=len(T), total_R=round(sum(R), 1), avg_R=round(sum(R) / len(R), 3), win=round(sum(r > 0 for r in R) / len(R) * 100, 1),
+    # 18 Nov 2026 (Amritpal: "money freed by stops is reused"): the money actually needed = the most tied up at any moment of a day
+    # (1 lot each; a trade holds its cost from its entry candle to its exit candle)
+    money = {}
+    if all(t.get("inv") is not None and t.get("et") and t.get("xt") for t in T):
+        byd = {}
+        for t in T:
+            byd.setdefault(t["d"], []).append(t)
+        peaks, dp = [], []
+        for d, L in byd.items():
+            ev = sorted([(t["xt"], 0, -t["inv"]) for t in L] + [(t["et"], 1, t["inv"]) for t in L])
+            cur = pk_ = 0.0
+            for _, _, v in ev:
+                cur += v; pk_ = max(pk_, cur)
+            peaks.append(pk_); dp.append(sum(t["pnl"] for t in L) / pk_ * 100 if pk_ else 0)
+        pnl = sum(t["pnl"] for t in T)
+        money = dict(pnl_rs=round(pnl), sum_inv_rs=round(sum(t["inv"] for t in T)), peak_money_rs=round(max(peaks)),
+                     avg_day_peak_rs=round(sum(peaks) / len(peaks)), avg_day_return_on_peak_pct=round(sum(dp) / len(dp), 2),
+                     total_return_on_max_peak_pct=round(pnl / max(peaks) * 100, 1) if max(peaks) else None)
+    return dict(**money, n=len(T), total_R=round(sum(R), 1), avg_R=round(sum(R) / len(R), 3), win=round(sum(r > 0 for r in R) / len(R) * 100, 1),
                 target=sum(t["how"] == "target" for t in T), sl=sum(t["how"] == "SL" for t in T), at_close=sum(t["how"] in ("close", "open") for t in T),
                 avg_pct=round(sum(P) / len(P), 2), days=len(days), up_days=sum(v > 0 for v in days.values()), worst_dd_R=round(dd, 1),
                 by_day={d: round(v, 1) for d, v in sorted(days.items())})

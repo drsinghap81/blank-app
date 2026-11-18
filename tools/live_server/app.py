@@ -3388,6 +3388,9 @@ def opt_today_basket():
                               pnl=round((ex - e) * lot - 0.01 * e * lot, 0), inv=round(e * lot, 0), side=side, how=how, R=round(R - 0.01 * e / risk, 3), pct=round((ex / e - 1.01) * 100, 2),
                               nf=at(SY.get("NIFTY") or {}, t), bn=at(SY.get("BANKNIFTY") or {}, t), idx=A.get("kind") == "index",
                               sec=round(sum(others) / len(others), 2) if len(others) >= 2 else None, pcrq=(pq.get(sym) or {}).get("q")))
+    for t in T:                                         # open trades still hold their money: exit "time" = now
+        if t["how"] == "open":
+            t["xt"] = "15:31"
     res = opt_bt.summarise(T)
     for v in res.values():
         if isinstance(v, dict):
