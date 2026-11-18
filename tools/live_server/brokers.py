@@ -49,10 +49,23 @@ class AngelEquity:
         from SmartApi import SmartConnect  # pip install smartapi-python
         import pyotp
         e = self.env
-        api = SmartConnect(api_key=e["ANGEL_API_KEY"])
-        r = api.generateSession(e["ANGEL_CLIENT_CODE"], e["ANGEL_PIN"], pyotp.TOTP(e["ANGEL_TOTP_SECRET"]).now())
-        if not r or not r.get("status"):
-            raise RuntimeError(f"Angel login failed: {r.get('message') if isinstance(r, dict) else r}")
+        api = None
+        # 18 Nov 2026: use the Top Bottom bot's session when it has one today - a second login with the same API key can end the
+        # bot's session (the bot now logs in again by itself, but sharing avoids the tug of war altogether)
+        sf = e.get("TB_SESSION_FILE") or "/opt/trenddesk/var/tb/session.json"
+        try:
+            d = json.load(open(sf))
+            if d.get("day") == str(date.today()) and d.get("access_token") and d["access_token"] != getattr(self, "_bad_token", None):
+                api = SmartConnect(api_key=e["ANGEL_API_KEY"], access_token=d["access_token"], refresh_token=d.get("refresh_token"),
+                                   feed_token=d.get("feed_token"), userId=d.get("userId"))
+                self.log("Angel session shared from the Top Bottom bot")
+        except Exception:  # noqa: BLE001
+            api = None
+        if api is None:
+            api = SmartConnect(api_key=e["ANGEL_API_KEY"])
+            r = api.generateSession(e["ANGEL_CLIENT_CODE"], e["ANGEL_PIN"], pyotp.TOTP(e["ANGEL_TOTP_SECRET"]).now())
+            if not r or not r.get("status"):
+                raise RuntimeError(f"Angel login failed: {r.get('message') if isinstance(r, dict) else r}")
         # smartapi-python 1.5.5 still points GTT at /gtt-service/... ("no Route matched"); Angel's live routes:
         for k, v in {"api.gtt.create": "/rest/secure/angelbroking/gtt/v1/createRule", "api.gtt.modify": "/rest/secure/angelbroking/gtt/v1/modifyRule",
                      "api.gtt.cancel": "/rest/secure/angelbroking/gtt/v1/cancelRule"}.items():
@@ -91,11 +104,11 @@ class AngelEquity:
                 r = fn(*a)
                 if isinstance(r, dict) and r.get("status") is False and any(w in str(r.get("message")) + str(r.get("errorcode")) for w in self.TOKEN_ERR) \
                         and not relogged and name:
-                    self.api = None; relogged = True; fn = getattr(self._session(), name); continue
+                    self._bad_token = getattr(self.api, "access_token", None); self.api = None; relogged = True; fn = getattr(self._session(), name); continue
                 return r
             except Exception as e:  # noqa: BLE001
                 if any(w in str(e) for w in self.TOKEN_ERR) and not relogged and name:
-                    self.api = None; relogged = True; fn = getattr(self._session(), name); continue
+                    self._bad_token = getattr(self.api, "access_token", None); self.api = None; relogged = True; fn = getattr(self._session(), name); continue
                 rate = any(w in str(e) for w in ("access rate", "Access denied"))
                 if k >= tries or not (rate or any(w in str(e) for w in ("JSON", "Expecting value", "parse"))):
                     raise

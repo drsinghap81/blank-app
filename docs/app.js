@@ -1511,7 +1511,7 @@ async function tbLoad(inst = 'bn') {
       ${T.auto == null ? '<small class="muted">after your server updates</small>' : `<button class="ad-sy" aria-pressed="${!!T.auto}" id="${px}auto">${T.auto ? 'On' : 'Off'}</button>`}</div>
     <div id="${px}autoarm" class="lv-form" hidden><input id="${px}apw" type="password" placeholder="App password"><input id="${px}acf" placeholder="Type AUTO" autocapitalize="characters"><button class="lv-btn sell" id="${px}ago">Turn on auto</button></div>
     <p class="lv-sub">${pos}${S.ltp ? ` · ${bn ? 'BN' : 'Nifty'} fut ${fmt(S.ltp, 2, 'en-IN')}` : ''} · ${S.running ? '● bot running' : `bot idle (starts ${bn ? '08:25' : '08:27'} IST on weekdays)`}${S.note ? ' · ' + esc(S.note) : ''}</p>
-    ${S.running ? '' : `<details class="info" data-tbdiag="${bn ? 'bn' : 'nifty'}"><summary>Diagnostics (is the bot installed and running?)</summary><pre class="lv-sub" style="white-space:pre-wrap;font-size:11px;max-height:260px;overflow:auto">Loading…</pre></details>`}
+    ${`<details class="info" data-tbdiag="${bn ? 'bn' : 'nifty'}"><summary>Diagnostics (the bot's own log)</summary><pre class="lv-sub" style="white-space:pre-wrap;font-size:11px;max-height:260px;overflow:auto">Loading…</pre></details>`}
     ${S.pos ? '' : lvl('BUY', S.buy_lvl) + (bn ? lvl('SELL', S.sell_lvl) : '')}
     ${pend ? `<p class="lv-sub" style="margin-top:8px"><b>Needs your OK</b> — the bot trades only approved levels; no answer = no trade.</p>${pend}` : ''}
     ${S.running ? `<div style="margin-top:8px"><button class="lv-btn sell" id="${px}stop" style="font-size:12px">Stop new trades today</button> ${S.pos ? '<button class="lv-btn sell" id="${px}flat" style="font-size:12px">Square off…</button>' : ''}</div>` : ''}

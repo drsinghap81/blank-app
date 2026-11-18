@@ -19,6 +19,36 @@ DONE = {"complete"}
 DEAD = {"rejected", "cancelled"}
 
 
+TOKEN_ERR = ("Invalid Token", "AG8001", "AG8002", "AG8003", "Token Expired", "token is invalid", "Invalid Session")
+
+
+class _Guard:
+    """18 Nov 2026: the Trend Desk server and this bot share one Angel API key, and a new login can end the other's session.
+    Every Angel call goes through here: on a session error the bot logs in again (at most once a minute) and retries once,
+    so a server restart never leaves the bot blind or unable to place / cancel orders."""
+
+    def __init__(self, raw, owner):
+        self._raw, self._own = raw, owner
+
+    def __getattr__(self, name):
+        v = getattr(self._raw, name)
+        if not callable(v):
+            return v
+
+        def call(*a, **k):
+            try:
+                r = getattr(self._raw, name)(*a, **k)
+            except Exception as e:  # noqa: BLE001
+                if any(w in str(e) for w in TOKEN_ERR) and self._own._relogin(f"{name}: {e}"):
+                    return getattr(self._own.api._raw, name)(*a, **k)
+                raise
+            if isinstance(r, dict) and r.get("status") is False and any(w in f"{r.get('message')} {r.get('errorcode')}" for w in TOKEN_ERR) \
+                    and self._own._relogin(f"{name}: {r.get('message')}"):
+                return getattr(self._own.api._raw, name)(*a, **k)
+            return r
+        return call
+
+
 class AngelBroker:
     def __init__(self, cfg: dict, env: dict, log=print, cache_dir: str = "."):
         self.cfg, self.env, self.log = cfg, env, log
@@ -36,10 +66,11 @@ class AngelBroker:
         if not totp:
             import pyotp
             totp = pyotp.TOTP(e["ANGEL_TOTP_SECRET"]).now()
-        self.api = SmartConnect(api_key=e["ANGEL_API_KEY"])
-        r = self.api.generateSession(e["ANGEL_CLIENT_CODE"], e["ANGEL_PIN"], totp)
+        raw = SmartConnect(api_key=e["ANGEL_API_KEY"])
+        r = raw.generateSession(e["ANGEL_CLIENT_CODE"], e["ANGEL_PIN"], totp)
         if not r or not r.get("status"):
             raise RuntimeError(f"Angel login failed: {r}")
+        self.api = _Guard(raw, self)
         self.log(f"Angel login OK ({e['ANGEL_CLIENT_CODE']}){' — DRY RUN, no orders will be sent' if self.dry else ''}")
         self.load_contracts()
         out = e.get("TB_SESSION_OUT")
@@ -68,12 +99,23 @@ class AngelBroker:
             return False
         if d.get("day") != str(datetime.now(ZoneInfo("Asia/Kolkata")).date()) or not d.get("access_token"):
             return False
-        self.api = SmartConnect(api_key=self.env["ANGEL_API_KEY"], access_token=d["access_token"],
-                                refresh_token=d.get("refresh_token"), feed_token=d.get("feed_token"), userId=d.get("userId"))
+        self.api = _Guard(SmartConnect(api_key=self.env["ANGEL_API_KEY"], access_token=d["access_token"],
+                                       refresh_token=d.get("refresh_token"), feed_token=d.get("feed_token"), userId=d.get("userId")), self)
         self.shared = True
         self.log(f"Angel session shared from the main bot{' — DRY RUN, no orders will be sent' if self.dry else ''}")
         self.load_contracts()
         return True
+
+    def _relogin(self, why) -> bool:
+        if time.time() - getattr(self, "_last_relogin", 0) < 60 or not self.env.get("ANGEL_TOTP_SECRET"):
+            return False
+        self._last_relogin = time.time()
+        self.log(f"Angel session lost ({why[:120]}) - logging in again")
+        try:
+            self.shared = False
+            self.login(); return True
+        except Exception as e:  # noqa: BLE001
+            self.log(f"re-login failed: {e}"); return False
 
     def logout(self):
         if getattr(self, "shared", False) or self.env.get("TB_SESSION_OUT"):
