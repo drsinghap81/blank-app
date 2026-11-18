@@ -1457,13 +1457,16 @@ async function srvCard() {
     ${h && h.update_waiting ? `<p class="lv-sub">🆕 New code ${h.latest ? '(' + esc(h.latest) + ') ' : ''}is waiting: it installs itself after 3:35 pm IST, or now with Update.</p>` : ''}
     ${h && h.loop_age == null ? '<p class="lv-sub">The watchdog and these buttons start working after the server\'s next update.</p>' : ''}
     <p class="lv-sub">A watchdog checks the server every minute and restarts it if it stops answering for ~3 minutes. Your stops are GTTs on Angel, so a restart (~10 s) never leaves a position unprotected.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="lv-btn" id="srvupd">Update now</button><button class="lv-btn ghost" id="srvrst">Restart</button><button class="lv-btn ghost" id="srvchk">Check again</button></div></div>`;
-  const act = async (a) => {
-    const pw = window.prompt(`${a === 'update' ? 'Pull the latest code now (even in market hours) and restart' : 'Restart the server'} — about 10 seconds offline.\n\nApp password:`);
-    if (pw === null) return;
-    const c = window.prompt(`Type ${a.toUpperCase()} to confirm:`); if (c === null) return;
-    try { const j = await lvApi('/api/admin', { method: 'POST', body: JSON.stringify({ action: a, password: pw, confirm: c }), timeout: 30000 }); alertMsg(j.msg, true); setTimeout(srvCard, 75000); }
-    catch (e) { alertMsg(/404/.test(e.message) ? 'Your server gets these buttons with its next update (after 3:35 pm IST).' : e.message); } };
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="lv-btn" id="srvupd">Update now</button><button class="lv-btn ghost" id="srvrst">Restart</button><button class="lv-btn ghost" id="srvchk">Check again</button></div>
+    <div id="srvarm" class="lv-form" hidden><input id="srvpw" type="password" placeholder="App password"><input id="srvcf" autocapitalize="characters"><button class="lv-btn" id="srvgo">Confirm</button></div></div>`;
+  // 18 Nov 2026: inline form instead of window.prompt (prompts are blocked in some in-app browsers)
+  let pend = null; const arm = box.querySelector('#srvarm');
+  const act = (a) => { pend = a; arm.hidden = false; const cf = box.querySelector('#srvcf'); cf.value = ''; cf.placeholder = `Type ${a.toUpperCase()}`;
+    box.querySelector('#srvgo').textContent = a === 'update' ? 'Update now (~10 s offline)' : 'Restart (~10 s offline)'; box.querySelector('#srvpw').focus(); };
+  box.querySelector('#srvgo').addEventListener('click', async () => { const a = pend; if (!a) return;
+    const pw = box.querySelector('#srvpw').value, c = box.querySelector('#srvcf').value;
+    try { const j = await lvApi('/api/admin', { method: 'POST', body: JSON.stringify({ action: a, password: pw, confirm: c }), timeout: 30000 }); arm.hidden = true; alertMsg(j.msg, true); setTimeout(srvCard, 75000); }
+    catch (e) { alertMsg(/404/.test(e.message) ? 'Your server gets these buttons with its next update (after 3:35 pm IST).' : e.message); } });
   box.querySelector('#srvupd').addEventListener('click', () => act('update'));
   box.querySelector('#srvrst').addEventListener('click', () => act('restart'));
   box.querySelector('#srvchk').addEventListener('click', srvCard);
