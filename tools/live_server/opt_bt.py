@@ -19,7 +19,7 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 2                     # bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
+VERSION = 3                     # bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import gzip
 import json
 import os
@@ -199,6 +199,19 @@ class OptBT:
                     trades += self._symbol(sym, r.get("kind"), ch.get(sym) or {}, monthly.get(sym) or [], days, idx, last, r.get("lot") or 0)
                 except Exception as ex:  # noqa: BLE001
                     self.log("optbt_symbol_error", symbol=sym, error=str(ex)[:160])
+            # 18 Nov 2026 (Amritpal: "weekly options for indices?"): Nifty again on its nearest WEEKLY expiry (>= 2 days left);
+            # kept apart from the main results and compared with Nifty on the monthly
+            try:
+                nr = next((r for r in rows if r["symbol"] == "NIFTY"), None)
+                if nr and ch.get("NIFTY"):
+                    ntr = len(self.trail)
+                    wk = self._symbol("NIFTY", "index", ch["NIFTY"], sorted(ch["NIFTY"]), days, idx, last, nr.get("lot") or 0, weekly=True)
+                    del self.trail[ntr:]
+                    for t in wk:
+                        t["wk"] = True
+                    trades += wk
+            except Exception as ex:  # noqa: BLE001
+                self.log("optbt_weekly_error", error=str(ex)[:160])
             try:                                                   # sector: average day % of the OTHER F&O stocks in the sector
                 sec = sector_map()
                 for t in trades:
@@ -226,7 +239,8 @@ class OptBT:
             except Exception as ex:  # noqa: BLE001
                 self.log("optbt_pcr_error", error=str(ex)[:120])
             json.dump(trades, gzip.open(os.path.join(self.dir, "trades.json.gz"), "wt"))
-            res = summarise(trades)
+            res = summarise([t for t in trades if not t.get("wk")])
+            res["NIFTY monthly vs weekly"] = nifty_weekly([t for t in trades if t["s"] == "NIFTY" and not t.get("wk")], [t for t in trades if t.get("wk")])
             res["SMA-20 trail version"] = trail_summary(self.trail)
             json.dump(self.trail, gzip.open(os.path.join(self.dir, "trail.json.gz"), "wt"))
             res.update(method=__doc__, built=_ist().isoformat(timespec="minutes"), version=VERSION)
@@ -236,7 +250,7 @@ class OptBT:
             self.st.update(state="error", progress=str(ex)[:200]); self.log("optbt_error", error=str(ex)[:200])
         self._save()
 
-    def _symbol(self, sym, kind, chain, months, days, idx, last, lot=0):
+    def _symbol(self, sym, kind, chain, months, days, idx, last, lot=0, weekly=False):
         if kind == "index" or sym in IDXTOK:
             if sym not in IDXTOK:
                 return []
@@ -256,9 +270,9 @@ class OptBT:
             if not prev:
                 continue
             # Angel serves live contracts only: skip days whose near monthly (the previous month's) has already expired
-            if not months or dd <= prev_expiry(months[0]):
+            if not months or dd <= (months[0] - timedelta(days=7) if weekly else prev_expiry(months[0])):
                 continue
-            ex = next((e for e in months if (e - dd).days >= 3), None)
+            ex = next((e for e in months if (e - dd).days >= (2 if weekly else 3)), None)
             if ex is None:
                 continue
             strikes = chain.get(ex) or []
@@ -564,6 +578,21 @@ def money_agg(T):
                 worst_trade_rs=round(min(P)), peak_margin_rs=round(max(peaks)), return_on_peak_pct=round(sum(P) / max(peaks) * 100, 1) if max(peaks) else None,
                 worst_run_rs=round(dd), days=len(days), up_days=sum(v > 0 for v in days.values()), stopped=sum(t["how"] == "SL" for t in T),
                 by_day_rs={d: round(v) for d, v in sorted(days.items())})
+
+
+def nifty_weekly(M, W):
+    up = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] > 0 and t["bn"] > 0      # noqa: E731
+    dn = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] < 0 and t["bn"] < 0      # noqa: E731
+    out = {}
+    for nm, T in (("monthly", M), ("weekly", W)):
+        F = [t for t in T if (t["side"] == "CE" and up(t)) or (t["side"] == "PE" and dn(t))]
+        nl = [t for t in F if not ("11:00" <= t.get("et", t["t"]) < "14:30")]
+        out[f"{nm}: basket 1:3"] = _agg(F)
+        out[f"{nm}: 5 EMA trail, no 11:00-14:30"] = _agg([dict(t, **t["alt"]["ema5"]) for t in nl if (t.get("alt") or {}).get("ema5")])
+        out[f"{nm}: paper-trader rules (+ PCR + BB)"] = _agg([dict(t, **t["alt"]["ema5"]) for t in nl if (t.get("alt") or {}).get("ema5") and t.get("bb")
+                                                             and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))])
+        out[f"{nm}: median premium"] = sorted(t["e"] for t in F)[len(F) // 2] if F else None
+    return out
 
 
 def summarise(T):
