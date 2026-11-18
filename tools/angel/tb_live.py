@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(HERE))          # tools/
+sys.path.append(os.path.dirname(HERE))              # tools/ (append: tools/notify.py must not shadow angel/notify.py)
 from topbottom_backtest import confirmed_swings     # noqa: E402  (identical top/bottom logic)
 
 EPS = 1e-6
