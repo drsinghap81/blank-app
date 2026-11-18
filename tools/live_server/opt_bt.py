@@ -59,6 +59,13 @@ def sma(c, n):
     return out
 
 
+def ema(c, n):
+    out, k, e = [], 2 / (n + 1), None
+    for v in c:
+        e = v if e is None else v * k + e * (1 - k); out.append(e)
+    return out
+
+
 def resample(B, mins):
     """5-minute bars (iso time, o, h, l, c, v) -> `mins`-minute bars from 09:15 IST each day."""
     out = []
@@ -292,7 +299,7 @@ class OptBT:
             self.syn.setdefault(sym, {})[d] = synp
             for side, A, B in (("CE", C, P), ("PE", P, C)):
                 rs = rsi_series([x[4] for x in A])
-                bbu = bb_upper([x[4] for x in A]); sm20 = sma([x[4] for x in A], 20)
+                bbu = bb_upper([x[4] for x in A]); sm20 = sma([x[4] for x in A], 20); em5 = ema([x[4] for x in A], 5)
                 ia = [i for i, x in enumerate(A) if x[0][:10] == d]
                 if len(ia) < 3:
                     continue
@@ -327,9 +334,10 @@ class OptBT:
                                     inv=round(e2 * lot), pnl=round((x2 - e2 - COST * e2) * lot))
                     # 18 Nov 2026 ("1:2 or 1:3?"): the same trade with a 1.5R / 2R target
                     alt = {}
-                    for tr_ in (1.5, 2.0, "trail"):
+                    for tr_ in (1.5, 2.0, "trail", "ema5"):
                         ta = entry_sim([b[1] for b in A], [b[2] for b in A], [b[3] for b in A], [b[4] for b in A], i, ia[-1],
-                                       tgt_r=3.0 if tr_ == "trail" else tr_, trail=sm20 if tr_ == "trail" else None)
+                                       tgt_r=3.0 if tr_ in ("trail", "ema5") else tr_,
+                                       trail=sm20 if tr_ == "trail" else em5 if tr_ == "ema5" else None)
                         if ta:
                             ea, ra, ha, xa, _, _ = ta
                             Ra = -1.0 if ha == "SL" else tr_ if ha == "target" else (xa - ea) / ra
@@ -541,5 +549,7 @@ def summarise(T):
             "basket, target 2R, no entries 11:00-14:30": _agg([dict(t, **t["alt"]["2.0"]) for t in F if (t.get("alt") or {}).get("2.0") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
             "basket, trail (stop at signal low, out on a close below the 20 SMA)": _agg([dict(t, **t["alt"]["trail"]) for t in F if (t.get("alt") or {}).get("trail")]),
             "basket, trail, no entries 11:00-14:30": _agg([dict(t, **t["alt"]["trail"]) for t in F if (t.get("alt") or {}).get("trail") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
+            "basket, trail on the 5 EMA (out on a close below it)": _agg([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5")]),
+            "basket, trail 5 EMA, no entries 11:00-14:30": _agg([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
             "basket stop hits by window": {w: sum(1 for t in F if t["how"] == "SL" and lo_ <= t.get("xt", "") < hi_) for w, lo_, hi_ in WIN},
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
