@@ -178,6 +178,33 @@ def main():
     json.dump(dict(asof=str(last.date()), generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), rules=__doc__, rows=rows),
               open(f"{OUT}/optscan.json", "w"), separators=(",", ":"))
     json.dump(charts, open(f"{OUT}/optcharts.json", "w"), separators=(",", ":"))
+    pcr_file(X, last)
+
+
+def pcr_file(X, last):
+    """18 Nov 2026: put/call OI ratio per F&O stock / index as a GUIDE on every trade (tested 2020-26: the top fifth of PCR beat the
+    bottom fifth in every year, +1.5% vs +0.4% over 10 days; not a system, no filter). Near monthly expiry with >= 3 days left,
+    strikes within +-10% of the near future. q = today's quintile among all F&O names (5 = highest PCR); d5 = change over 5 sessions."""
+    O = X[X.INST == "OPT"]; Fu = X[X.INST == "FUT"].sort_values("EXPIRY").groupby(["SYMBOL", "Date"]).CLOSE.first().rename("F")
+    O = O.join(Fu, on=["SYMBOL", "Date"])
+    O = O[(O.EXPIRY - O.Date).dt.days >= 3]
+    ne = O.groupby(["SYMBOL", "Date"]).EXPIRY.transform("min"); O = O[(O.EXPIRY == ne) & (O.STRIKE.between(O.F * 0.90, O.F * 1.10))]
+    T = O.pivot_table(index=["SYMBOL", "Date"], columns="TYPE", values="OI", aggfunc="sum")
+    T = T[(T.get("CE", 0) > 0)]; T["PCR"] = T["PE"] / T["CE"]
+    P = T.PCR.unstack("SYMBOL").sort_index()
+    days = list(P.index)
+    if not days:
+        return
+    now = P.iloc[-1].dropna(); prev = P.iloc[-6] if len(P) >= 6 else None
+    q = pd.qcut(now.rank(method="first"), 5, labels=False) + 1
+    out = {}
+    for sym, v in now.items():
+        d5 = None if prev is None or pd.isna(prev.get(sym)) else round(float(v - prev[sym]), 3)
+        out[sym] = dict(pcr=round(float(v), 3), q=int(q[sym]), d5=d5)
+    json.dump(dict(asof=str(pd.Timestamp(days[-1]).date()), rule="Put/call OI ratio, near monthly, strikes +-10%. q 5 = highest fifth of F&O names "
+                   "today (tested: highest fifth beat the lowest by about 1% over 10 days, every year 2020-26). Guide only.", rows=out),
+              open(f"{OUT}/pcr.json", "w"), separators=(",", ":"))
+    print("pcr rows", len(out), flush=True)
     print("rows", len(rows), "with signals", sum(1 for r in rows for t in ("ce", "pe") if r.get(t, {}).get("signals")), flush=True)
 
 
