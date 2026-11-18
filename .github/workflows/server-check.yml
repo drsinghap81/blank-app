@@ -5,7 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          for u in https://13-126-118-48.sslip.io/api/health https://13-126-118-48.sslip.io/api/opt/today_basket https://13-126-118-48.sslip.io/api/research/optbt/summary ; do
-            echo "== $u"; curl -sS -m 20 -w "\nHTTP %{http_code} in %{time_total}s\n" "$u" | head -c 900000; echo; done
+          mkdir out
+          for u in health opt/today_basket research/optbt/summary ; do
+            f=out/$(echo $u | tr / _).json
+            curl -sS -m 30 "https://13-126-118-48.sslip.io/api/$u" -o "$f" -w "== $u HTTP %{http_code} in %{time_total}s, %{size_download} bytes\n"; done
+          head -c 600 out/health.json; echo
           echo "== login with a wrong password (expect 401 if the server is fine)"
           curl -sS -m 20 -X POST -H 'Content-Type: application/json' -d '{"password":"x"}' -w "\nHTTP %{http_code}\n" https://13-126-118-48.sslip.io/api/login | head -c 500
+      - uses: actions/upload-artifact@v4
+        with: {name: server-check, path: out, retention-days: 3}
