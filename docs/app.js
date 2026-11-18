@@ -2535,9 +2535,9 @@ async function optSelect(r) {
   openPanel(`<div class="d-head"><div><h2>${esc(r.symbol)} ${fmt(r.strike, 0, 'en-IN')}</h2><div class="co">ATM options · expiry ${esc(day(r.expiry))} (${r.dte} days) · future ${fmt(r.fut, 2, 'en-IN')}${r.lot ? ` · lot ${r.lot}` : ''}</div></div></div>
     <div class="seg" id="optiv" style="margin:8px 16px">${IV.map(([k, n]) => `<button data-k="${k}" aria-selected="${iv === k}">${n}</button>`).join('')}</div>
     ${iv !== 'D' && !srv ? '<p class="muted pad">Intraday candles come from Angel through your server: connect it on the Live tab.</p>' : ''}
-    <h3 style="margin:10px 16px 0">CE</h3><div class="chart" id="optce" style="height:230px"><p class="muted pad">Loading…</p></div><p class="muted small" style="margin:2px 16px" id="optcen"></p>
-    <h3 style="margin:10px 16px 0">PE</h3><div class="chart" id="optpe" style="height:230px"><p class="muted pad">Loading…</p></div><p class="muted small" style="margin:2px 16px" id="optpen"></p>
-    <p class="muted small" style="margin:6px 16px">${iv === 'D' ? 'Daily candles of this contract (days without a trade use the settle price)' : `${IV.find((x) => x[0] === iv)[1]} candles from Angel (times in IST)`} · orange = EMA 9 · blue = EMA 21 · grey dashed = last top (Top Bottom buy level). Systems on the premium are watch only.</p>`);
+    <h3 style="margin:10px 16px 0">CE</h3><div class="chart" id="optce" style="height:230px"><p class="muted pad">Loading…</p></div><div class="chart" id="optcer" style="height:100px"></div><p class="muted small" style="margin:2px 16px" id="optcen"></p>
+    <h3 style="margin:10px 16px 0">PE</h3><div class="chart" id="optpe" style="height:230px"><p class="muted pad">Loading…</p></div><div class="chart" id="optper" style="height:100px"></div><p class="muted small" style="margin:2px 16px" id="optpen"></p>
+    <p class="muted small" style="margin:6px 16px">${iv === 'D' ? 'Daily candles of this contract (days without a trade use the settle price)' : `${IV.find((x) => x[0] === iv)[1]} candles from Angel (times in IST)`} · orange = EMA 9 · blue = EMA 21 · grey dashed = last top (Top Bottom buy level) · lower pane: RSI(14), red 70 / green 30. Systems on the premium are watch only.</p>`);
   document.querySelectorAll('#optiv button').forEach((b) => b.addEventListener('click', () => { state.optIv = b.dataset.k; optSelect(r); }));
   const ema = (v, n) => { const k = 2 / (n + 1); let e = v[0]; return v.map((x) => (e = x * k + e * (1 - k))); };
   const draw = (id, S, top, sig, note) => { const box = $(id); if (!box) return; box.innerHTML = '';
@@ -2548,8 +2548,21 @@ async function optSelect(r) {
     const ln = (v, col) => ch.addLineSeries({ color: col, lineWidth: 2, priceLineVisible: false, lastValueVisible: false }).setData(S.t.map((x, i) => ({ time: x, value: v[i] })));
     if (S.c.length >= 9) ln(ema(S.c, 9), '#F59E0B'); if (S.c.length >= 21) ln(ema(S.c, 21), '#3B82F6');
     if (top) cs.createPriceLine({ price: top, color: '#9CA3AF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'last top' });
+    /* 18 Nov 2026: RSI(14) (Wilder) in its own pane under the candles, with 30 / 70 lines */
+    const rsi = (() => { const c = S.c; const o = new Array(c.length).fill(null); if (c.length < 15) return o; let g = 0, l = 0;
+      for (let i = 1; i <= 14; i++) { const d = c[i] - c[i - 1]; g += Math.max(d, 0); l += Math.max(-d, 0); } g /= 14; l /= 14; o[14] = l ? 100 - 100 / (1 + g / l) : 100;
+      for (let i = 15; i < c.length; i++) { const d = c[i] - c[i - 1]; g = (g * 13 + Math.max(d, 0)) / 14; l = (l * 13 + Math.max(-d, 0)) / 14; o[i] = l ? 100 - 100 / (1 + g / l) : 100; } return o; })();
     ch.timeScale().fitContent();
-    const n = $(id + 'n'); if (n) n.textContent = `${S.c[S.c.length - 1]} · ${sig && sig.length ? sig.join(' · ') : 'No signal'}${top ? ` · last top ${top}` : ''}${note || ''}`; };
+    const rb = $(id + 'r');
+    if (rb) { rb.innerHTML = ''; const rc = window.LightweightCharts.createChart(rb, { ...chartBase(), height: 100, width: rb.clientWidth, timeScale: { visible: false }, rightPriceScale: { scaleMargins: { top: 0.08, bottom: 0.08 } } });
+      const rs = rc.addLineSeries({ color: '#A78BFA', lineWidth: 2, priceLineVisible: false, lastValueVisible: true, title: 'RSI 14' });
+      rs.setData(S.t.map((x, i) => (rsi[i] == null ? { time: x } : { time: x, value: +rsi[i].toFixed(1) })));
+      [70, 30].forEach((v) => rs.createPriceLine({ price: v, color: v === 70 ? '#F87171' : '#34D399', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '' }));
+      rs.applyOptions({ autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
+      rc.timeScale().fitContent();
+      ch.timeScale().subscribeVisibleLogicalRangeChange((r_) => { if (r_) rc.timeScale().setVisibleLogicalRange(r_); }); }
+    const last = rsi[rsi.length - 1];
+    const n = $(id + 'n'); if (n) n.textContent = `${S.c[S.c.length - 1]}${last != null ? ` · RSI ${fmt(last, 0)}` : ''} · ${sig && sig.length ? sig.join(' · ') : 'No signal'}${top ? ` · last top ${top}` : ''}${note || ''}`; };
   if (!window.LightweightCharts) return;
   if (iv === 'D') {
     if (!state.optCh) state.optCh = await getJSON(MAIN + 'data/scan/optcharts.json', 'optcharts').catch(() => null);
