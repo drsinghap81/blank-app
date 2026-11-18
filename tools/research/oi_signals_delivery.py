@@ -62,12 +62,14 @@ def main():
         g["ret1"] = g.F.pct_change() * 100; g["doi"] = g.FOI.pct_change() * 100
         g["dpcr5"] = g.PCR - g.PCR.shift(5)
         idx = px.index; po, pc = px.Open.values, px.Close.values
+        ma200 = px.Close.rolling(200).mean().values
         for d, r in g.iterrows():
             if d not in idx:
                 continue
             j = idx.get_loc(d)
             fw = {f"r{h}": (pc[j + h] / po[j + 1] - 1) * 100 if j + h < len(idx) else np.nan for h in H}
-            rows.append(dict(sym=sym, d=d, ret1=r.ret1, doi=r.doi, pcr=r.PCR, dpcr5=r.dpcr5, skew=r.SKEW, **fw))
+            rows.append(dict(sym=sym, d=d, ret1=r.ret1, doi=r.doi, pcr=r.PCR, dpcr5=r.dpcr5, skew=r.SKEW,
+                             p5=(pc[j] / pc[j - 5] - 1) * 100 if j >= 5 else np.nan, up=bool(j >= 200 and pc[j] > ma200[j]), **fw))
         print(sym, len(rows), flush=True)
     E = pd.DataFrame(rows); E = E[E.d >= "2020-02-01"]
 
@@ -89,6 +91,24 @@ def main():
         Z["q"] = Z.groupby(Z.d.dt.to_period("M"))[col].transform(lambda s: pd.qcut(s.rank(method="first"), 5, labels=False) + 1 if len(s) >= 25 else np.nan)
         res[col] = {f"Q{int(q)} (low->high)": summ(Z[Z.q == q]) for q in sorted(Z.q.dropna().unique())}
         res[col + " Q5-Q1 10d by year"] = (Z[Z.q == 5].groupby(Z.d.dt.year).r10.mean() - Z[Z.q == 1].groupby(Z.d.dt.year).r10.mean()).round(2).to_dict()
+    # 18 Nov 2026 follow-up: is high PCR just short-term reversal (stocks that just fell)? and does it hold in uptrends?
+    Z = E[(E.pcr.notna()) & np.isfinite(E.pcr) & (E.d.dt.year != 2022)].copy()
+    Z["q"] = Z.groupby(Z.d.dt.to_period("M")).pcr.transform(lambda s_: pd.qcut(s_.rank(method="first"), 5, labels=False) + 1 if len(s_) >= 25 else np.nan)
+    Z["p5q"] = Z.groupby(Z.d.dt.to_period("M")).p5.transform(lambda s_: pd.qcut(s_.rank(method="first"), 3, labels=False) + 1 if s_.notna().sum() >= 25 else np.nan)
+    res["pcr x prior 5-day return (tercile 1 = fell most)"] = {f"p5 T{int(t)} | PCR Q{q}": summ(Z[(Z.p5q == t) & (Z.q == q)]) for t in (1, 2, 3) for q in (1, 5)}
+    res["pcr x trend (close vs 200-day)"] = {f"{'above' if u else 'below'} 200d | PCR Q{q}": summ(Z[(Z.up == u) & (Z.q == q)]) for u in (True, False) for q in (1, 5)}
+    # tradable version: every Friday buy the 10 highest-PCR stocks (equal weight), hold 10 trading days (2 overlapping books)
+    W = Z[Z.d.dt.weekday == 4]; port = []
+    for d, g in W.groupby("d"):
+        top = g.nlargest(10, "pcr"); allg = g
+        port.append(dict(d=d, top=top.r10.mean() - 0.25, all=allg.r10.mean() - 0.25))
+    Pt = pd.DataFrame(port).dropna().set_index("d")
+    def curve(r):                                   # two overlapping 2-week books, each half the money
+        eq = (1 + r / 100 / 2).cumprod(); yrs = (eq.index[-1] - eq.index[0]).days / 365.25
+        return dict(cagr=round((eq.iloc[-1] ** (1 / yrs) - 1) * 100, 1), maxdd=round(((eq / eq.cummax()) - 1).min() * 100, 1),
+                    by_year={int(y): round((v.add(1).prod() - 1) * 100, 1) for y, v in (r / 100 / 2).groupby(r.index.year)})
+    res["portfolio: top-10 PCR each Friday, 10 days, 0.25% cost"] = curve(Pt.top)
+    res["portfolio: all F&O stocks each Friday, same rules"] = curve(Pt["all"])
     os.makedirs("data/research", exist_ok=True)
     json.dump(res, open("data/research/oi_signals_delivery.json", "w"), indent=1, default=str)
     for k, v in res.items():
