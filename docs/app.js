@@ -6027,14 +6027,14 @@ async function tdRender2(el) {
   const lead = sec && sec.indices ? [...new Set(Object.values(sec.industries || {}))].filter((k) => sec.indices[k] && sec.indices[k].tag === 'leading') : [];
   const ok = wi ? wi.up : true;
   const light = wi ? `<div class="t2-light ${ok ? 'ok' : 'warn'}"><i></i><div><b>${ok ? 'Market OK to buy' : 'Market below its 30-week average: be choosy'}</b>
-    <span>${esc(MX_BENCH[mk])} ${fmt(wi.close, 0, MKT[mk].loc)} · ${fmt(Math.abs(wi.from_high), 1)}% below its high · ${wi.up ? 'above' : 'below'} a ${wi.up ? 'rising ' : ''}30-week average.${lead.length ? ` ${lead.length} sectors leading: ${lead.map(secName).slice(0, 7).join(', ')}.` : ''}</span></div></div>` : '';
+    <span>${esc(MX_BENCH[mk])} ${fmt(wi.close, 0, MKT[mk].loc)} · ${fmt(Math.abs(wi.from_high), 1)}% below its high · ${wi.up ? 'above' : 'below'} a ${wi.up ? 'rising ' : ''}30-week average at last Friday's close${wi.up && wi.below_now ? ` — <b>but below it now</b> (${fmt(wi.sma30, 0, MKT[mk].loc)}); it turns "Be choosy" if this Friday closes below` : ''}.${lead.length ? ` ${lead.length} sectors leading: ${lead.map(secName).slice(0, 7).join(', ')}.` : ''}</span></div></div>` : '';
   // ---- top-down ribbon (15 Nov 2026): World -> market -> sectors -> stocks, each step taps through to its page
   const WI = (wl && wl.indices) ? Object.values(wl.indices) : []; const wUp = WI.filter((x) => x.up).length;
   const secL = sec && sec.indices ? lead.map((k) => [k, sec.indices[k].rs_6m ?? -99]).sort((a, b) => b[1] - a[1]) : [];
   const td = (cls, k, b, sm, go) => `<button class="t2-td ${cls}" data-go="${go}"><small>${k}</small><b>${b}</b><span>${sm}</span></button>`;
   const ribbon = () => `<div class="t2-tdr" aria-label="Top-down">
     ${td(wl ? (wl.risk_on && !wl.risk_watch ? 'ok' : 'warn') : '', '1 · World', wl ? (wl.risk_on ? (wl.risk_watch ? 'Risk on · watch' : 'Risk on') : 'Risk off') : '–', WI.length ? `${wUp}/${WI.length} indices up` : '', 'mk')}
-    ${td(wi ? (ok ? 'ok' : 'warn') : '', '2 · ' + esc(MX_BENCH[mk]), wi ? (ok ? 'Uptrend' : 'Be choosy') : '–', wi ? `−${fmt(Math.abs(wi.from_high), 1)}% from high` : '', 'inv')}
+    ${td(wi ? (ok && !wi.below_now ? 'ok' : 'warn') : '', '2 · ' + esc(MX_BENCH[mk]), wi ? (ok ? (wi.below_now ? 'Uptrend · below 30-wk now' : 'Uptrend') : 'Be choosy') : '–', wi ? `−${fmt(Math.abs(wi.from_high), 1)}% from high` : '', 'inv')}
     ${td(secL.length ? 'ok' : 'warn', '3 · Sectors', secL.length ? `${secL.length} leading` : 'None leading', secL.slice(0, 3).map(([k]) => esc((sec.names && sec.names[k]) || secName(k))).join(', '), 'mk')}
     ${td('', '4 · Stocks', `${nBuy} to buy`, 'see below', 'ath')}</div>`;
   // ---- card for an act-on buy (existing plan numbers; shares from your capital and risk %)
