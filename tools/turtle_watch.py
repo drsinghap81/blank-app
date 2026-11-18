@@ -27,7 +27,7 @@ MK = [  # ticker, name, group, currency, micro contract (name, multiplier) for s
     # 19 Nov 2026 (Amritpal: "add the ETFs and commodities"): more NSE ETFs, US agri / energy / platinum, USD/INR.
     # NOT part of the 2010-26 Turtle test (those 14 markets); watch them as extra candidates.
     *[(f"{e}.NS", f"{e} ({nm})", "ETFs (no leverage)", "INR", (f"{e} shares", 1), f"NSE:{e}") for e, nm in (
-        ("JUNIORBEES", "Nifty Next 50"), ("MID150BEES", "Midcap 150"), ("ITBEES", "IT"), ("PSUBNKBEES", "PSU banks"),
+        ("JUNIORBEES", "Nifty Next 50"), ("MID150BEES", "Midcap 150"), ("MOM100", "Midcap 100"), ("ITBEES", "IT"), ("PSUBNKBEES", "PSU banks"),
         ("PHARMABEES", "pharma"), ("AUTOBEES", "auto"), ("METALIETF", "metal"), ("CPSEETF", "CPSE"), ("INFRABEES", "infra"),
         ("CONSUMBEES", "consumption"), ("MON100", "Nasdaq 100"), ("MAFANG", "US FANG+"), ("HNGSNGBEES", "Hang Seng"))],
     ("NG=F", "Natural gas (Henry Hub)", "Energy", "USD", ("Micro Henry Hub MNG · 1,000 mmBtu", 1000), "NYMEX:MNG1!"),
@@ -130,6 +130,8 @@ def main():
         if isinstance(x.columns, pd.MultiIndex):
             x.columns = x.columns.get_level_values(0)
         x = x[["Open", "High", "Low", "Close"]].dropna(); x = x[(x.Close > 0) & (x.Open > 0)]
+        if len(x) < 120:            # 19 Nov 2026: Yahoo had only 19 days of MID150BEES - no reliable 20-day high or N
+            print("too little history", t, len(x)); continue
         RAW[t] = x
         try:
             s = state(x)
