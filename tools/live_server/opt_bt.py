@@ -309,7 +309,7 @@ def _agg(T):
     for d in sorted(days):
         eq += days[d]; pk = max(pk, eq); dd = min(dd, eq - pk)
     return dict(n=len(T), total_R=round(sum(R), 1), avg_R=round(sum(R) / len(R), 3), win=round(sum(r > 0 for r in R) / len(R) * 100, 1),
-                target=sum(t["how"] == "target" for t in T), sl=sum(t["how"] == "SL" for t in T), at_close=sum(t["how"] == "close" for t in T),
+                target=sum(t["how"] == "target" for t in T), sl=sum(t["how"] == "SL" for t in T), at_close=sum(t["how"] in ("close", "open") for t in T),
                 avg_pct=round(sum(P) / len(P), 2), days=len(days), up_days=sum(v > 0 for v in days.values()), worst_dd_R=round(dd, 1),
                 by_day={d: round(v, 1) for d, v in sorted(days.items())})
 

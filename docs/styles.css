@@ -1141,3 +1141,8 @@ body.pub .owner-only { display: none !important; }
 .ov-z.buy{background:var(--rise);color:#fff}.ov-z.lbuy{background:var(--rise-soft);color:var(--rise-ink)}
 .ov-z.sell{background:var(--fall);color:#fff}.ov-z.lsell{background:color-mix(in srgb,var(--fall) 18%,transparent);color:var(--fall)}
 .ov-z.neu{background:var(--soft);color:var(--slate)}
+
+/* 18 Nov 2026: option basket table */
+.ov-bk { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+.ov-bk th, .ov-bk td { text-align: right; padding: 3px 4px; border-bottom: 1px solid var(--line, rgba(127,127,127,.2)); white-space: nowrap; }
+.ov-bk th:first-child, .ov-bk td:first-child { text-align: left; white-space: normal; }

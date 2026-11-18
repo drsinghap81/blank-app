@@ -3375,7 +3375,8 @@ def opt_today_basket():
         if isinstance(v, dict):
             v.pop("by_day", None)
     return dict(scan_at=_OPTSCAN.get("last"), contracts=len(I), last_bar=max((x["t"][-1] for x in I.values() if x["t"]), default=None),
-                note="open trades valued at the latest 5-minute close; 1% cost per trade", results=res)
+                note="open trades valued at the latest 5-minute close; 1% cost per trade", results=res,
+                trades=sorted(T, key=lambda x: x["t"])[-400:])
 
 
 @app.get("/api/opt/today5")

@@ -2500,6 +2500,32 @@ async function turtleSelect(r) {
 }
 /* 17 Nov 2026: ATM option charts for liquid F&O stocks and index options, with the app's systems run on the premium chart
    (tools/opt_charts.py, nightly after the NSE bhavcopy). Watch only: not backtested on option premiums. */
+/* 18 Nov 2026 (Amritpal: "provide this in the app"): the 5-minute RSI-60 option basket - today from the server's live scan, and the
+   ~3-week backtest (opt_bt.py) once it has run after the close. Buy the CE in the buy zone, the PE in the sell zone; stop = signal
+   candle low, target 3R; Nifty AND Bank Nifty must agree (up for CE, down for PE). */
+async function optBasketCard(box) {
+  if (!box || !(lvCfg().url && lvCfg().token)) return;
+  if (!state.optBk || Date.now() - (state.optBkAt || 0) > 120000) {
+    state.optBkAt = Date.now();
+    const [a, b] = await Promise.all([lvApi('/api/opt/today_basket', { timeout: 30000 }).catch(() => null), lvApi('/api/research/optbt/summary', { timeout: 20000 }).catch(() => null)]);
+    state.optBk = { a, b };
+  }
+  const { a, b } = state.optBk; if (!a && !b) { box.innerHTML = ''; return; }
+  const G = [['index filter (basket)', 'Basket (Nifty + Bank Nifty agree)'], ['filter CE', '· CE buys'], ['filter PE', '· PE buys'],
+    ['filter + sector agrees', '+ sector agrees'], ['filter + sector disagrees', '+ sector disagrees'], ['filter + PCR agrees', '+ PCR agrees'],
+    ['filter + PCR disagrees', '+ PCR disagrees'], ['filter, indices only', 'Indices only'], ['all signals', 'No filter (all signals)']];
+  const tb = (res, open) => `<table class="ov-bk"><tr><th></th><th>Trades</th><th>Total R</th><th>Win</th><th>Tgt / SL / ${open}</th><th>Avg %</th></tr>${G.map(([k, lbl]) => {
+    const v = (res || {})[k]; if (!v || !v.n) return `<tr><td>${lbl}</td><td>0</td><td colspan="4" class="muted">—</td></tr>`;
+    return `<tr><td>${lbl}</td><td>${v.n}</td><td class="${v.total_R >= 0 ? 'up' : 'down'}"><b>${v.total_R >= 0 ? '+' : ''}${fmt(v.total_R, 1)}</b></td><td>${fmt(v.win, 0)}%</td><td>${v.target} / ${v.sl} / ${v.at_close}</td><td class="${v.avg_pct >= 0 ? 'up' : 'down'}">${v.avg_pct >= 0 ? '+' : ''}${fmt(v.avg_pct, 1)}%</td></tr>`; }).join('')}</table>`;
+  const today = a && a.results ? `<p class="lv-sub">Today · ${a.contracts} contracts scanned · last bar ${esc(a.last_bar || '—')} IST · open trades at the latest price · 1% cost per trade</p>${tb(a.results, 'open')}
+    <details class="info"><summary>Today's basket trades (${(a.trades || []).filter((t) => (t.side === 'CE' && t.nf > 0 && t.bn > 0) || (t.side === 'PE' && t.nf < 0 && t.bn < 0)).length})</summary><ul class="list flat">${(a.trades || []).filter((t) => (t.side === 'CE' && t.nf > 0 && t.bn > 0) || (t.side === 'PE' && t.nf < 0 && t.bn < 0)).slice().reverse().map((t) =>
+      `<li class="row"><span><b>${esc(t.s)}</b> ${t.side} · ${esc(t.t)}${t.sec != null ? ` · sector ${t.sec >= 0 ? '+' : ''}${fmt(t.sec, 1)}%` : ''}${t.pcrq ? ` · PCR q${t.pcrq}` : ''}</span><span class="${t.R >= 0 ? 'up' : 'down'}">${t.how === 'open' ? 'open ' : t.how === 'SL' ? 'stop ' : 'target '}${t.R >= 0 ? '+' : ''}${fmt(t.R, 1)}R</span></li>`).join('')}</ul></details>` : '<p class="lv-sub">Today: appears after the server\'s next option scan.</p>';
+  const bt = b && b.results && b.results['all signals'] ? `<p class="lv-sub" style="margin-top:12px"><b>Backtest</b> · ${b.results['index filter (basket)'] ? b.results['index filter (basket)'].days : 0} sessions to ${esc((b.built || '').slice(0, 10))} (Angel keeps only live contracts, so about 3 weeks) · exits at the day's close</p>${tb(b.results, 'close')}`
+    : `<p class="lv-sub" style="margin-top:12px">Backtest: ${b ? esc(b.progress || b.state || 'waiting') : 'not on the server yet'} (runs after the close).</p>`;
+  box.innerHTML = `<div class="card" style="margin:10px 16px;padding:12px"><b>RSI-60 option basket (5-minute)</b>
+    <p class="muted small">Buy the CE when it crosses RSI 60 in the buy zone (CE above VWAP, PE below), the PE in the sell zone. Stop = the signal candle's low, target = 3x that risk. CE only while Nifty and Bank Nifty are both up on the day, PE only while both are down. Results in R (1R = the risk of one trade). Watch only.</p>${today}${bt}</div>`;
+}
+
 async function loadOptCharts(el) {
   await pcrLoad();
   $('#title').textContent = 'Trading · ATM option charts';
@@ -2541,13 +2567,13 @@ async function loadOptCharts(el) {
     return `<li class="row ov-row" tabindex="0" data-i="${i}"><div class="ov-l1"><b>${esc(r.symbol)}</b> <span class="muted">${fmt(r.strike, 0, 'en-IN')} · ${r.dte}d</span>${pcrChip(r.symbol)}${z ? ` <span class="ov-z ${z[0]}">${z[1]}</span>` : ''}</div>
       <div class="ov-l2">${leg(r, 'ce')}${leg(r, 'pe')}</div></li>`; }).join('');
   el.innerHTML = `${tradeStrip('opt')}<div class="status exit watch" style="margin:10px 16px"><b>Watch only.</b> Systems run on the option premium itself (cup close, 9/21 cross, 20-day high close, Top Bottom close above the last top). Not backtested on option charts; a test of Top Bottom's trades taken with ATM options made about half what futures made. Monthly expiry, today's ATM strike; liquid = ATM CE + PE ≥ 200 contracts a day.</div>
-    <section class="summary"><div class="stat"><b>${R.length}</b><span>liquid underlyings</span></div><div class="stat new"><b>${R.filter(hasSig).length}</b><span>with a signal on CE or PE (any timeframe)</span></div></section>
+    <section class="summary"><div class="stat"><b>${R.length}</b><span>liquid underlyings</span></div><div class="stat new"><b>${R.filter(hasSig).length}</b><span>with a signal on CE or PE (any timeframe)</span></div></section><div id="optbasket"></div>
     <p class="muted small" style="margin:6px 16px">Sorted by how many timeframes (D · 1h · 15m · 5m) show a signal, then signal count. CUP = cup close: the bar CLOSED above the highest high of the last 250 bars, that high 20+ bars old, after a dip of 15%+ (day cup close rule) · RSI60 = RSI(14) crossed above 60 · 9/21 = EMA 9 crossed above 21 · 20-high = close above the 20-bar high · TB = close above the last top. ${state.optIntra && state.optIntra.at ? `Intraday as of ${esc(state.optIntra.at.slice(11, 16))} IST (every 15 min in market hours).` : (lvCfg().url ? 'Intraday timeframes appear once your server has run its first scan (market hours).' : 'Connect your server (Live tab) for the 1h / 15m / 5m timeframes.')}</p>
     <p class="muted small" style="margin:6px 16px"><b>5m · 1h</b> dots: green = that option's last 5-minute / 1-hour close is above today's VWAP, red = below. <b>Buy zone</b> = calls above VWAP on both, puts below on both, PCR high. <b>Sell zone</b> = the mirror with PCR low. <b>Leaning</b> = 3 of 4 VWAP checks agree. Guide only, untested.</p>
     <div class="card"><div class="seg" id="optf">${[['all', `All ${R.length}`], ['buy', `Buy zone ${R.filter((r) => ['buy', 'lbuy'].includes(zk(r))).length}`], ['sell', `Sell zone ${R.filter((r) => ['sell', 'lsell'].includes(zk(r))).length}`], ['sig', `Signals ${R.filter(hasSig).length}`], ['idx', 'Indices']].map(([k, n]) => `<button data-k="${k}" aria-selected="${f === k}">${n}</button>`).join('')}</div>
     <label class="search"><input id="optq" type="search" placeholder="Search symbol" value="${esc(state.optQ || '')}" autocomplete="off"></label>
     <ul class="list flat">${items || '<li class="empty">Nothing matches.</li>'}</ul></div>`;
-  tradeStripWire(el);
+  tradeStripWire(el); optBasketCard($('#optbasket'));
   el.querySelectorAll('#optf button').forEach((b) => b.addEventListener('click', () => { state.optF = b.dataset.k; loadOptCharts(el); }));
   const qi = $('#optq'); qi.addEventListener('change', () => { state.optQ = qi.value; loadOptCharts(el); });
   el.querySelectorAll('.row').forEach((x) => x.addEventListener('click', () => optSelect(L[+x.dataset.i])));
