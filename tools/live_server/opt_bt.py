@@ -11,6 +11,7 @@ Rules (exactly the basket checked live on 18 Nov):
   index filter (the version Amritpal asked for): CE buys only while Nifty AND Bank Nifty are above yesterday's close at the
   signal bar, PE buys only while both are below.
   costs: 1% of the premium round trip (brokerage, taxes, slippage), charged in R.
+  BB: also split by the signal candle closing above the option's upper Bollinger band (20, 2).
   sector: CE/PE kept only if the stock's sector (average day % of its other F&O stocks, from put-call parity) agrees.
   PCR: each trade also carries the stock's PCR quintile from the previous session (data/scan/pcr_hist.json) to see if it adds value.
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
@@ -34,6 +35,15 @@ def _ist():
 def _quiet():
     t = _ist()
     return t.weekday() >= 5 or not ((9, 0) <= (t.hour, t.minute) <= (15, 45))
+
+
+def bb_upper(c, n=20, k=2.0):
+    """upper Bollinger band (20-bar SMA + 2 population standard deviations) per bar; None before 20 bars."""
+    out = [None] * len(c)
+    for i in range(n - 1, len(c)):
+        w = c[i - n + 1:i + 1]; m = sum(w) / n
+        out[i] = m + k * (sum((x - m) ** 2 for x in w) / n) ** 0.5
+    return out
 
 
 def rsi_series(c, n=14):
@@ -254,6 +264,7 @@ class OptBT:
             self.syn.setdefault(sym, {})[d] = synp
             for side, A, B in (("CE", C, P), ("PE", P, C)):
                 rs = rsi_series([x[4] for x in A])
+                bbu = bb_upper([x[4] for x in A])
                 ia = [i for i, x in enumerate(A) if x[0][:10] == d]
                 if len(ia) < 3:
                     continue
@@ -278,7 +289,7 @@ class OptBT:
                     nf = ib["NIFTY"].get(x[0]); bn = ib["BANKNIFTY"].get(x[0])
                     nfp = (nf / ipc["NIFTY"][d] - 1) * 100 if nf and d in ipc["NIFTY"] else None
                     bnp = (bn / ipc["BANKNIFTY"][d] - 1) * 100 if bn and d in ipc["BANKNIFTY"] else None
-                    out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
+                    out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
                                     nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index"))
         return out
@@ -366,4 +377,8 @@ def summarise(T):
             "filter + sector disagrees": _agg([t for t in F if t.get("sec") is not None and ((t["side"] == "CE" and t["sec"] < 0) or (t["side"] == "PE" and t["sec"] > 0))]),
             "filter + sector unknown (index / small sector)": _agg([t for t in F if t.get("sec") is None]),
             "no index filter, sector agrees": _agg([t for t in T if t.get("sec") is not None and ((t["side"] == "CE" and t["sec"] > 0) or (t["side"] == "PE" and t["sec"] < 0))]),
+            # 18 Nov 2026: the signal candle must also CLOSE above the upper Bollinger band (20, 2) of the option
+            "basket + BB close": _agg([t for t in F if t.get("bb")]),
+            "basket, no BB close": _agg([t for t in F if not t.get("bb")]),
+            "basket + BB + sector agrees": _agg([t for t in F if t.get("bb") and t.get("sec") is not None and ((t["side"] == "CE" and t["sec"] > 0) or (t["side"] == "PE" and t["sec"] < 0))]),
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}

@@ -3234,6 +3234,16 @@ _OPTSCAN = {"running": False}
 _OPT_TODAY = {}       # 18 Nov 2026: "SYM|CE" -> today's 5-minute bars + RSI(14) (from the scan's own candles, no extra Angel calls)
 
 
+def _opt_today_load():
+    """after a restart, today's option bars come back from disk (same IST day only)."""
+    try:
+        d = json.load(open(os.path.join(DATA, "opt_today.json")))
+        day_ = str(ist_now().date())
+        _OPT_TODAY.update({k: v for k, v in d.items() if v.get("day") == day_})
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def _rsi_series(c, n=14):
     out = [None] * len(c)
     if len(c) <= n:
@@ -3289,7 +3299,8 @@ def opt_intra_scan():
                 _OPT_TODAY[f"{r['symbol']}|{typ}"] = dict(day=day_, kind=r.get("kind"), t=[x[0][11:16] for x in S5], o=[x[1] for x in S5], h=[x[2] for x in S5],
                                                          l=[x[3] for x in S5], c=[x[4] for x in S5], v=[x[5] for x in S5],
                                                          rsi=[round(v, 1) if v is not None else None for v in rs_[i0:]],
-                                                         rsi_prev=round(rs_[i0 - 1], 1) if i0 > 0 and rs_[i0 - 1] is not None else None)
+                                                         rsi_prev=round(rs_[i0 - 1], 1) if i0 > 0 and rs_[i0 - 1] is not None else None,
+                                                         cprev=[x[4] for x in B[max(0, i0 - 19):i0]])     # for the 20-bar Bollinger band
                 res[f"{r['symbol']}|{typ}"] = dict(ltp=B[-1][4], at=B[-1][0], tf=tf, vwap=round(vw, 2) if vw else None,
                                                    a5=bool(vw and B[-1][4] > vw),
                                                    a60=bool(vw and H1 and (H1[-2][4] if len(H1) >= 2 else H1[-1][4]) > vw))   # last completed hour
@@ -3305,6 +3316,10 @@ def opt_intra_scan():
                             fh.write(json.dumps(dict(at=B[-1][0], sym=r["symbol"], typ=typ, tf=k_, sig=x, opt=B[-1][4], spot=spot,
                                                      both=len(L_ := tf.get(k_, [])) > 1)) + "\n")
         json.dump(dict(at=ist_now().isoformat(timespec="minutes"), items=res), open(os.path.join(DATA, "optscan_intra.json"), "w"))
+        try:
+            json.dump(_OPT_TODAY, open(os.path.join(DATA, "opt_today.json"), "w"), separators=(",", ":"))
+        except Exception:  # noqa: BLE001
+            pass
         log("opt_intra_scan", n=len(res), signals=sum(1 for v in res.values() if v["tf"]))
     except Exception as ex:  # noqa: BLE001
         log("opt_intra_scan_error", error=str(ex)[:200])
@@ -3348,6 +3363,7 @@ def opt_today_basket():
                     pv += (h + l_ + c) / 3 * v; vv += v; o_.append(pv / vv if vv else c)
                 return o_
             va, vb = vw(A), vw(B); bi = {t: i for i, t in enumerate(B["t"])}; busy = -1
+            cp = A.get("cprev") or []; bbu = opt_bt.bb_upper(cp + A["c"])[len(cp):]
             for i, t in enumerate(A["t"]):
                 prev = A["rsi"][i - 1] if i else A.get("rsi_prev")
                 if t >= "15:00" or i <= busy or A["rsi"][i] is None or prev is None or not (A["rsi"][i] > 60 >= prev):
@@ -3368,7 +3384,7 @@ def opt_today_basket():
                 g = sec.get(sym); others = [at(SY[s2], t) for s2 in SY if s2 != sym and g and sec.get(s2) == g and SY[s2]]
                 others = [v for v in others if v is not None]
                 lot = (row.get(sym) or {}).get("lot") or 0
-                T.append(dict(s=sym, d=A.get("day"), t=t, et=A["t"][fi], e=round(e, 2), x=round(ex, 2), lot=lot,
+                T.append(dict(s=sym, d=A.get("day"), t=t, et=A["t"][fi], e=round(e, 2), x=round(ex, 2), lot=lot, bb=bool(bbu[i] is not None and A["c"][i] > bbu[i]),
                               pnl=round((ex - e) * lot - 0.01 * e * lot, 0), inv=round(e * lot, 0), side=side, how=how, R=round(R - 0.01 * e / risk, 3), pct=round((ex / e - 1.01) * 100, 2),
                               nf=at(SY.get("NIFTY") or {}, t), bn=at(SY.get("BANKNIFTY") or {}, t), idx=A.get("kind") == "index",
                               sec=round(sum(others) / len(others), 2) if len(others) >= 2 else None, pcrq=(pq.get(sym) or {}).get("q")))
@@ -4003,6 +4019,7 @@ def _start():
         import threading
         threading.Thread(target=_loop, daemon=True).start()
         threading.Thread(target=_tb_loop, daemon=True).start()
+        _opt_today_load()
         try:
             j = optbt_job()
             if j.st.get("state") in ("idle", "running", "error"):
