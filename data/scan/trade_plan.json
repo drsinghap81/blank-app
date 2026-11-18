@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-17 23:04 UTC",
+"generated": "2026-11-18 10:51 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-17",
@@ -130,7 +130,8 @@
 "group_pulse": 38.9,
 "group_rank": 7,
 "rank": 1,
-"risk_pct": 12.9
+"risk_pct": 12.9,
+"r3m": 15.8
 },
 {
 "id": "ATH-TECHM-2026-10-22",
@@ -167,7 +168,8 @@
 "group_pulse": 26.5,
 "group_rank": 15,
 "rank": 2,
-"risk_pct": 14.3
+"risk_pct": 14.3,
+"r3m": 9.6
 },
 {
 "id": "ATH-LALPATHLAB-2026-11-04",
@@ -204,7 +206,8 @@
 "group_pulse": 21.1,
 "group_rank": 25,
 "rank": 3,
-"risk_pct": 12.7
+"risk_pct": 12.7,
+"r3m": 5.0
 },
 {
 "id": "ATH-ZYDUSLIFE-2026-11-02",
@@ -241,7 +244,8 @@
 "group_pulse": 21.4,
 "group_rank": 24,
 "rank": 4,
-"risk_pct": 9.8
+"risk_pct": 9.8,
+"r3m": 6.2
 },
 {
 "id": "ATH-SAREGAMA-2026-11-04",
@@ -278,7 +282,8 @@
 "group_pulse": 75.0,
 "group_rank": 1,
 "rank": 5,
-"risk_pct": 41.2
+"risk_pct": 41.2,
+"r3m": 29.4
 },
 {
 "id": "STOP-HONASA-537.9",
@@ -314,7 +319,8 @@
 "group_pulse": 14.7,
 "group_rank": 42,
 "rank": 6,
-"risk_pct": 22.5
+"risk_pct": 22.5,
+"r3m": 9.6
 },
 {
 "id": "STOP-DRREDDY-1421.49",
@@ -350,7 +356,8 @@
 "group_pulse": 21.4,
 "group_rank": 24,
 "rank": 7,
-"risk_pct": 13.5
+"risk_pct": 13.5,
+"r3m": 17.3
 }
 ],
 "more": [],
@@ -390,7 +397,8 @@
 "group_pulse": 39.9,
 "group_rank": 6,
 "rank": 1,
-"risk_pct": 8.5
+"risk_pct": 8.5,
+"r3m": null
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-11",
@@ -427,7 +435,8 @@
 "group_pulse": 20.7,
 "group_rank": 26,
 "rank": 2,
-"risk_pct": 14.8
+"risk_pct": 14.8,
+"r3m": 24.5
 },
 {
 "id": "TF-MANAKCOAT-2026-11-12",
@@ -464,7 +473,8 @@
 "group_pulse": 19.6,
 "group_rank": 29,
 "rank": 3,
-"risk_pct": 9.7
+"risk_pct": 9.7,
+"r3m": 32.8
 },
 {
 "id": "TF-AGARWALEYE-2026-11-11",
@@ -501,7 +511,8 @@
 "group_pulse": 29.8,
 "group_rank": 13,
 "rank": 4,
-"risk_pct": 5.3
+"risk_pct": 5.3,
+"r3m": 9.5
 },
 {
 "id": "RET-GABRIEL-2026-11-16",
@@ -533,7 +544,8 @@
 "group_pulse": 20.7,
 "group_rank": 26,
 "rank": 1,
-"risk_pct": 6.4
+"risk_pct": 6.4,
+"r3m": 3.5
 },
 {
 "id": "RET-GRWRHITECH-2026-11-16",
@@ -565,7 +577,8 @@
 "group_pulse": 14.0,
 "group_rank": 45,
 "rank": 2,
-"risk_pct": 12.1
+"risk_pct": 12.1,
+"r3m": 11.8
 },
 {
 "id": "RET-MACPOWER-2026-11-16",
@@ -597,7 +610,8 @@
 "group_pulse": 15.7,
 "group_rank": 35,
 "rank": 3,
-"risk_pct": 13.5
+"risk_pct": 13.5,
+"r3m": 21.8
 },
 {
 "id": "RET-SHREEPUSHK-2026-11-16",
@@ -629,7 +643,8 @@
 "group_pulse": 14.0,
 "group_rank": 45,
 "rank": 4,
-"risk_pct": 13.1
+"risk_pct": 13.1,
+"r3m": 37.9
 },
 {
 "id": "RET-WHEELS-2026-11-16",
@@ -661,7 +676,8 @@
 "group_pulse": 20.7,
 "group_rank": 26,
 "rank": 5,
-"risk_pct": 11.6
+"risk_pct": 11.6,
+"r3m": 61.9
 },
 {
 "id": "TF-ICICIBANK-2026-11-05",
@@ -698,7 +714,8 @@
 "group_pulse": 40.0,
 "group_rank": 5,
 "rank": 5,
-"risk_pct": 8.5
+"risk_pct": 8.5,
+"r3m": 13.1
 },
 {
 "id": "TF-KOTAKBANK-2026-10-30",
@@ -735,7 +752,8 @@
 "group_pulse": 40.0,
 "group_rank": 5,
 "rank": 6,
-"risk_pct": 7.5
+"risk_pct": 7.5,
+"r3m": 26.0
 },
 {
 "id": "TFSTOP-POONAWALLA-513.35",
@@ -771,7 +789,8 @@
 "group_pulse": 15.0,
 "group_rank": 38,
 "rank": 7,
-"risk_pct": 9.9
+"risk_pct": 9.9,
+"r3m": 0.8
 },
 {
 "id": "T921-PRIMESECU-2026-11-17",
@@ -802,7 +821,8 @@
 "group_pulse": null,
 "group_rank": null,
 "rank": 1,
-"risk_pct": 6.0
+"risk_pct": 6.0,
+"r3m": 9.0
 },
 {
 "id": "RET-ARHAM-2026-11-16",
@@ -834,7 +854,8 @@
 "group_pulse": null,
 "group_rank": null,
 "rank": 6,
-"risk_pct": 12.6
+"risk_pct": 12.6,
+"r3m": 12.1
 },
 {
 "id": "RET-GUFICBIO-2026-11-16",
@@ -866,7 +887,8 @@
 "group_pulse": null,
 "group_rank": null,
 "rank": 7,
-"risk_pct": 9.1
+"risk_pct": 9.1,
+"r3m": 1.0
 }
 ],
 "pattern_watch": [
