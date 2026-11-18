@@ -325,7 +325,16 @@ class OptBT:
                         R2 = -1.0 if h2 == "SL" else 3.0 if h2 == "target" else (x2 - e2) / r2
                         real = dict(R=round(R2 - COST * e2 / r2, 3), pct=round((x2 / e2 - 1 - COST) * 100, 2), how=h2,
                                     inv=round(e2 * lot), pnl=round((x2 - e2 - COST * e2) * lot))
-                    out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], xt=A[j][0][11:16], real=real, vol_lots=round(x[5] / lot, 1) if lot else None, bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
+                    # 18 Nov 2026 ("1:2 or 1:3?"): the same trade with a 1.5R / 2R target
+                    alt = {}
+                    for tr_ in (1.5, 2.0):
+                        ta = entry_sim([b[1] for b in A], [b[2] for b in A], [b[3] for b in A], [b[4] for b in A], i, ia[-1], tgt_r=tr_)
+                        if ta:
+                            ea, ra, ha, xa, _, _ = ta
+                            Ra = -1.0 if ha == "SL" else tr_ if ha == "target" else (xa - ea) / ra
+                            alt[str(tr_)] = dict(R=round(Ra - COST * ea / ra, 3), pct=round((xa / ea - 1 - COST) * 100, 2), how=ha,
+                                                 inv=round(ea * lot) if lot else None, pnl=round((xa - ea - COST * ea) * lot) if lot else None)
+                    out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], alt=alt, xt=A[j][0][11:16], real=real, vol_lots=round(x[5] / lot, 1) if lot else None, bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
                                     inv=round(e * lot) if lot else None, pnl=round((exitp - e - COST * e) * lot) if lot else None,
                                     nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index"))
@@ -370,7 +379,7 @@ LIMIT = 0.01           # stop-limit: pay at most 1% above the trigger
 TRIG_BARS = 3          # the buy-stop above the signal candle's high stays for the next 3 candles (15 minutes)
 
 
-def entry_sim(o, h, l, c, i, last, limit=None):
+def entry_sim(o, h, l, c, i, last, limit=None, tgt_r=3.0):
     """18 Nov 2026 (Amritpal: "entry when the high of the signal candle is breached, or low"): after the signal candle i, a
     buy-stop just above its high; filled at max(high, that bar's open) on the first of the next TRIG_BARS candles to trade above it,
     cancelled if a candle breaks the signal low first (or touches both: no fill). Stop = the signal candle's low (at least 3% under
@@ -393,7 +402,7 @@ def entry_sim(o, h, l, c, i, last, limit=None):
             f = k; break
     if e is None or e <= 0:
         return None
-    risk = max(e - lo, e * 0.03); sl, tg = e - risk, e + 3 * risk
+    risk = max(e - lo, e * 0.03); sl, tg = e - risk, e + tgt_r * risk
     if l[f] <= sl:                                       # the fill bar itself (after the fill) touched the stop
         return e, risk, "SL", sl, f, f
     if c[f] >= tg:
@@ -518,5 +527,8 @@ def summarise(T):
             "basket, no entries 11:00-14:30": _agg([t for t in F if not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
             "basket, only entries 11:00-14:30": _agg([t for t in F if "11:00" <= t.get("et", t["t"]) < "14:30"]),
             "basket, realistic fills, no entries 11:00-14:30": _agg([dict(t, **t["real"]) for t in F if t.get("real") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
+            "basket, target 1.5R": _agg([dict(t, **t["alt"]["1.5"]) for t in F if (t.get("alt") or {}).get("1.5")]),
+            "basket, target 2R": _agg([dict(t, **t["alt"]["2.0"]) for t in F if (t.get("alt") or {}).get("2.0")]),
+            "basket, target 2R, no entries 11:00-14:30": _agg([dict(t, **t["alt"]["2.0"]) for t in F if (t.get("alt") or {}).get("2.0") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
             "basket stop hits by window": {w: sum(1 for t in F if t["how"] == "SL" and lo_ <= t.get("xt", "") < hi_) for w, lo_, hi_ in WIN},
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
