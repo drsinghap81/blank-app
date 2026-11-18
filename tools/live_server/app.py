@@ -3231,6 +3231,21 @@ def _resample(B, mins):
 
 
 _OPTSCAN = {"running": False}
+_OPT_TODAY = {}       # 18 Nov 2026: "SYM|CE" -> today's 5-minute bars + RSI(14) (from the scan's own candles, no extra Angel calls)
+
+
+def _rsi_series(c, n=14):
+    out = [None] * len(c)
+    if len(c) <= n:
+        return out
+    g = l_ = 0.0
+    for i in range(1, n + 1):
+        d_ = c[i] - c[i - 1]; g += max(d_, 0); l_ += max(-d_, 0)
+    g /= n; l_ /= n; out[n] = 100.0 if l_ == 0 else 100 - 100 / (1 + g / l_)
+    for i in range(n + 1, len(c)):
+        d_ = c[i] - c[i - 1]; g = (g * (n - 1) + max(d_, 0)) / n; l_ = (l_ * (n - 1) + max(-d_, 0)) / n
+        out[i] = 100.0 if l_ == 0 else 100 - 100 / (1 + g / l_)
+    return out
 _OPT_SEEN = set()     # (symbol, CE/PE, timeframe, signal, day) already logged to DATA/opt_events.jsonl (forward record)
 
 
@@ -3270,6 +3285,11 @@ def opt_intra_scan():
                     pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]
                 vw = pv / vv if vv else None
                 H1 = [x for x in _resample(B, 60) if x[0][:10] == day_]
+                rs_ = _rsi_series([x[4] for x in B]); i0 = len(B) - len(S5)
+                _OPT_TODAY[f"{r['symbol']}|{typ}"] = dict(day=day_, kind=r.get("kind"), t=[x[0][11:16] for x in S5], o=[x[1] for x in S5], h=[x[2] for x in S5],
+                                                         l=[x[3] for x in S5], c=[x[4] for x in S5], v=[x[5] for x in S5],
+                                                         rsi=[round(v, 1) if v is not None else None for v in rs_[i0:]],
+                                                         rsi_prev=round(rs_[i0 - 1], 1) if i0 > 0 and rs_[i0 - 1] is not None else None)
                 res[f"{r['symbol']}|{typ}"] = dict(ltp=B[-1][4], at=B[-1][0], tf=tf, vwap=round(vw, 2) if vw else None,
                                                    a5=bool(vw and B[-1][4] > vw),
                                                    a60=bool(vw and H1 and (H1[-2][4] if len(H1) >= 2 else H1[-1][4]) > vw))   # last completed hour
@@ -3290,6 +3310,12 @@ def opt_intra_scan():
         log("opt_intra_scan_error", error=str(ex)[:200])
     finally:
         _OPTSCAN["running"] = False; _OPTSCAN["last"] = time.time()
+
+
+@app.get("/api/opt/today5")
+def opt_today5(_=Depends(auth)):
+    """18 Nov 2026: today's 5-minute bars + RSI(14) of every ATM CE/PE from the last intraday scan (for "how did today's signals do")."""
+    return dict(at=_OPTSCAN.get("last"), items=_OPT_TODAY)
 
 
 @app.get("/api/opt/scan")
