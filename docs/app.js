@@ -3552,7 +3552,7 @@ function topStrip() {
   const legend = '<div class="tdlegend"><span><i class="dot lead"></i>leading</span><span><i class="dot up"></i>uptrend</span><span><i class="dot mix"></i>mixed</span><span><i class="dot weak"></i>weak</span><span>↑ RS rising</span><span>★ ATH breakout</span><span>2y = 2-yr+ base</span></div>';
   if (W && W.indices) {
     const I = Object.entries(W.indices).filter(([t]) => t !== '^NSEI' && t !== '^CRSLDX');
-    h += `<div class="td-sec"><div class="td-h"><span>1 · World</span><span class="tdpill ${W.risk_on ? 'on' : 'off'}">${W.risk_on ? 'Risk-on' : 'Risk-off'}</span></div>
+    h += `<div class="td-sec"><div class="td-h"><span>1 · World</span><span class="tdpill ${W.risk_on ? (W.risk_watch ? 'warn' : 'on') : 'off'}" title="${W.risk_watch ? 'Weekly close still above the 30-week average, but the S&P 500 or MSCI World is below it now; it turns Risk-off if Friday closes below.' : ''}">${W.risk_on ? (W.risk_watch ? 'Risk-on · below 30-wk now' : 'Risk-on') : 'Risk-off'}</span></div>
       <div class="tiles">${I.map(([, x]) => tile(SHORT[x.name] || x.name, x, x.ath_breakout ? ' ★' : '')).join('')}</div><p class="cap">RS = 6-month return vs MSCI World · close ${day(W.asof)}${updTxt(W.generated)}</p></div>`;
   }
   if (S && S.indices) {
@@ -6033,7 +6033,7 @@ async function tdRender2(el) {
   const secL = sec && sec.indices ? lead.map((k) => [k, sec.indices[k].rs_6m ?? -99]).sort((a, b) => b[1] - a[1]) : [];
   const td = (cls, k, b, sm, go) => `<button class="t2-td ${cls}" data-go="${go}"><small>${k}</small><b>${b}</b><span>${sm}</span></button>`;
   const ribbon = () => `<div class="t2-tdr" aria-label="Top-down">
-    ${td(wl ? (wl.risk_on ? 'ok' : 'warn') : '', '1 · World', wl ? (wl.risk_on ? 'Risk on' : 'Risk off') : '–', WI.length ? `${wUp}/${WI.length} indices up` : '', 'mk')}
+    ${td(wl ? (wl.risk_on && !wl.risk_watch ? 'ok' : 'warn') : '', '1 · World', wl ? (wl.risk_on ? (wl.risk_watch ? 'Risk on · watch' : 'Risk on') : 'Risk off') : '–', WI.length ? `${wUp}/${WI.length} indices up` : '', 'mk')}
     ${td(wi ? (ok ? 'ok' : 'warn') : '', '2 · ' + esc(MX_BENCH[mk]), wi ? (ok ? 'Uptrend' : 'Be choosy') : '–', wi ? `−${fmt(Math.abs(wi.from_high), 1)}% from high` : '', 'inv')}
     ${td(secL.length ? 'ok' : 'warn', '3 · Sectors', secL.length ? `${secL.length} leading` : 'None leading', secL.slice(0, 3).map(([k]) => esc((sec.names && sec.names[k]) || secName(k))).join(', '), 'mk')}
     ${td('', '4 · Stocks', `${nBuy} to buy`, 'see below', 'ath')}</div>`;

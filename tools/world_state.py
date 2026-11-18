@@ -82,7 +82,7 @@ def state(x, bench_close, today):
     else:
         ptrig, pbase, crossed_last = np.nan, 0, False
     brk = (crossed and base >= 24) or (crossed_last and pbase >= 24)
-    return dict(close=float(c.iloc[-1]), sma30=float(sma.iloc[-1]), up=up, ret_3m=r3 * 100,
+    return dict(close=float(c.iloc[-1]), sma30=float(sma.iloc[-1]), up=up, below_now=bool(c.iloc[-1] < sma.iloc[-1]), ret_3m=r3 * 100,
                 vs_world_3m=(r3 - b3) * 100 if np.isfinite(b3) else None, tag=tag,
                 rs_6m=rs_now * 100 if np.isfinite(rs_now) else None, rs_6m_up=rs_up,
                 from_high=float(c.iloc[-1] / c.max() - 1) * 100, ath_trigger=trig, ath_month=str(best_m), base_months=base,
@@ -102,7 +102,9 @@ def main():
         if st:
             out[t] = dict(name=name, region=region, **st)
     risk_on = bool(out.get("^GSPC", {}).get("up") and out.get("URTH", {}).get("up"))
-    res = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(pd.Series([g.index[-1].date() for g in G.values()]).mode().max()), benchmark="MSCI World (URTH)", risk_on=risk_on, indices=out)
+    # 19 Nov 2026: the weekly reading only changes at Friday's close; flag when either is already below its 30-week SMA mid-week
+    risk_watch = bool(risk_on and (out.get("^GSPC", {}).get("below_now") or out.get("URTH", {}).get("below_now")))
+    res = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(pd.Series([g.index[-1].date() for g in G.values()]).mode().max()), benchmark="MSCI World (URTH)", risk_on=risk_on, risk_watch=risk_watch, indices=out)
     fix = lambda v: {k: fix(x) for k, x in v.items()} if isinstance(v, dict) else (None if isinstance(v, float) and not np.isfinite(v) else v)  # noqa: E731
     json.dump(fix(res), open(OUT, "w"), indent=0, allow_nan=False)
     print("world indices", len(out), "risk-on", risk_on)

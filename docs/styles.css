@@ -1160,3 +1160,5 @@ body.pub .owner-only { display: none !important; }
 .b5-h { padding: 4px 10px; border-radius: 999px; background: var(--rise-soft, rgba(0,160,90,.12)); font-size: 13px; }
 
 .otr-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-top: 1px solid var(--line, rgba(127,127,127,.2)); }
+
+.tdpill.warn { background: rgba(230,160,0,.18); color: #b77900; }
