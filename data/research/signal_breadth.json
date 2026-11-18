@@ -1,0 +1,318 @@
+{
+ "method": "Signal breadth as a caution light (19 Nov 2026, Amritpal: \"if across all systems the sells outnumber the buys, that's a\nwarning sign for me - investment, momentum, trend systems\").\n\nAcross all liquid NSE stocks (Yahoo, 2016 -> today, survivors only), each day:\n  trend breadth  : stocks whose EMA 9 crossed ABOVE EMA 21 (buys) vs crossed BELOW (sells), summed over the last 10 sessions\n  momentum/invest: stocks whose WEEKLY close crossed above vs below their 30-week SMA (the Monthly ATH exit line), last 2 weeks\n  warning        : W1 trend sells > buys; W2 weekly sells > buys; W3 both\nTests:\n  1. Nifty 50 after a warning day vs other days: next 20 / 60-day return, worst fall within 60 days\n  2. the live 9/21 engine (10 positions, 1% risk, random pick; and the 5-position 3-month-strength version) with NO NEW BUYS\n     while the warning is on (open positions keep their own stops) vs no filter\nOutput: data/research/signal_breadth.json (+ the daily breadth series for the app)",
+ "days": 2592,
+ "W1": {
+  "share_of_days": 53.4,
+  "nifty_20d_on": 0.65,
+  "nifty_20d_off": 1.29,
+  "nifty_60d_on": 2.7,
+  "nifty_60d_off": 2.91,
+  "worst_fall_60d_on": -4.34,
+  "worst_fall_60d_off": -4.45,
+  "by_year": {
+   "2016": 42,
+   "2017": 51,
+   "2018": 53,
+   "2019": 60,
+   "2020": 51,
+   "2021": 50,
+   "2022": 47,
+   "2023": 47,
+   "2024": 59,
+   "2025": 57,
+   "2026": 66
+  }
+ },
+ "W2": {
+  "share_of_days": 48.3,
+  "nifty_20d_on": 0.92,
+  "nifty_20d_off": 0.98,
+  "nifty_60d_on": 2.96,
+  "nifty_60d_off": 2.66,
+  "worst_fall_60d_on": -4.43,
+  "worst_fall_60d_off": -4.36,
+  "by_year": {
+   "2016": 46,
+   "2017": 36,
+   "2018": 55,
+   "2019": 49,
+   "2020": 43,
+   "2021": 58,
+   "2022": 48,
+   "2023": 34,
+   "2024": 56,
+   "2025": 56,
+   "2026": 50
+  }
+ },
+ "W3": {
+  "share_of_days": 37.1,
+  "nifty_20d_on": 0.65,
+  "nifty_20d_off": 1.12,
+  "nifty_60d_on": 2.75,
+  "nifty_60d_off": 2.84,
+  "worst_fall_60d_on": -4.64,
+  "worst_fall_60d_off": -4.25,
+  "by_year": {
+   "2016": 30,
+   "2017": 30,
+   "2018": 38,
+   "2019": 37,
+   "2020": 35,
+   "2021": 43,
+   "2022": 37,
+   "2023": 24,
+   "2024": 46,
+   "2025": 40,
+   "2026": 44
+  }
+ },
+ "portfolio": {
+  "10 positions, 1% risk, random | no filter": {
+   "cagr": 21.8,
+   "maxdd": -29.8,
+   "cagr_17_21": 26.8,
+   "cagr_22_26": 16.2,
+   "dd_22_26": -23.5,
+   "trades": 578
+  },
+  "10 positions, 1% risk, random | no new buys while W1": {
+   "cagr": 14.1,
+   "maxdd": -24.6,
+   "cagr_17_21": 17.9,
+   "cagr_22_26": 10.2,
+   "dd_22_26": -24.1,
+   "trades": 483
+  },
+  "10 positions, 1% risk, random | no new buys while W2": {
+   "cagr": 13.7,
+   "maxdd": -25.7,
+   "cagr_17_21": 15.2,
+   "cagr_22_26": 12.1,
+   "dd_22_26": -25.1,
+   "trades": 475
+  },
+  "10 positions, 1% risk, random | no new buys while W3": {
+   "cagr": 16.8,
+   "maxdd": -25.9,
+   "cagr_17_21": 21.9,
+   "cagr_22_26": 11.9,
+   "dd_22_26": -21.4,
+   "trades": 525
+  },
+  "5 positions, 1% risk, 3-month strength | no filter": {
+   "cagr": 21.9,
+   "maxdd": -21.8,
+   "cagr_17_21": 31.6,
+   "cagr_22_26": 12.6,
+   "dd_22_26": -17.8,
+   "trades": 280
+  },
+  "5 positions, 1% risk, 3-month strength | no new buys while W1": {
+   "cagr": 14.6,
+   "maxdd": -26.7,
+   "cagr_17_21": 22.3,
+   "cagr_22_26": 7.2,
+   "dd_22_26": -26.7,
+   "trades": 252
+  },
+  "5 positions, 1% risk, 3-month strength | no new buys while W2": {
+   "cagr": 10.0,
+   "maxdd": -28.0,
+   "cagr_17_21": 16.2,
+   "cagr_22_26": 4.1,
+   "dd_22_26": -18.9,
+   "trades": 254
+  },
+  "5 positions, 1% risk, 3-month strength | no new buys while W3": {
+   "cagr": 17.4,
+   "maxdd": -25.9,
+   "cagr_17_21": 22.1,
+   "cagr_22_26": 12.8,
+   "dd_22_26": -25.9,
+   "trades": 252
+  }
+ },
+ "latest": {
+  "2026-10-07": {
+   "buys10": 428,
+   "sells10": 532,
+   "wbuys": 130,
+   "wsells": 322
+  },
+  "2026-10-08": {
+   "buys10": 350,
+   "sells10": 614,
+   "wbuys": 130,
+   "wsells": 322
+  },
+  "2026-10-09": {
+   "buys10": 332,
+   "sells10": 626,
+   "wbuys": 130,
+   "wsells": 322
+  },
+  "2026-10-12": {
+   "buys10": 319,
+   "sells10": 628,
+   "wbuys": 120,
+   "wsells": 331
+  },
+  "2026-10-13": {
+   "buys10": 339,
+   "sells10": 562,
+   "wbuys": 120,
+   "wsells": 331
+  },
+  "2026-10-14": {
+   "buys10": 372,
+   "sells10": 508,
+   "wbuys": 120,
+   "wsells": 331
+  },
+  "2026-10-15": {
+   "buys10": 382,
+   "sells10": 500,
+   "wbuys": 120,
+   "wsells": 331
+  },
+  "2026-10-16": {
+   "buys10": 413,
+   "sells10": 483,
+   "wbuys": 120,
+   "wsells": 331
+  },
+  "2026-10-19": {
+   "buys10": 432,
+   "sells10": 500,
+   "wbuys": 200,
+   "wsells": 222
+  },
+  "2026-10-20": {
+   "buys10": 373,
+   "sells10": 466,
+   "wbuys": 200,
+   "wsells": 222
+  },
+  "2026-10-21": {
+   "buys10": 347,
+   "sells10": 527,
+   "wbuys": 200,
+   "wsells": 222
+  },
+  "2026-10-22": {
+   "buys10": 349,
+   "sells10": 527,
+   "wbuys": 200,
+   "wsells": 222
+  },
+  "2026-10-23": {
+   "buys10": 331,
+   "sells10": 567,
+   "wbuys": 200,
+   "wsells": 222
+  },
+  "2026-10-26": {
+   "buys10": 297,
+   "sells10": 578,
+   "wbuys": 136,
+   "wsells": 497
+  },
+  "2026-10-27": {
+   "buys10": 272,
+   "sells10": 585,
+   "wbuys": 136,
+   "wsells": 497
+  },
+  "2026-10-28": {
+   "buys10": 262,
+   "sells10": 586,
+   "wbuys": 136,
+   "wsells": 497
+  },
+  "2026-10-29": {
+   "buys10": 269,
+   "sells10": 551,
+   "wbuys": 136,
+   "wsells": 497
+  },
+  "2026-10-30": {
+   "buys10": 239,
+   "sells10": 543,
+   "wbuys": 136,
+   "wsells": 497
+  },
+  "2026-11-02": {
+   "buys10": 262,
+   "sells10": 493,
+   "wbuys": 136,
+   "wsells": 488
+  },
+  "2026-11-03": {
+   "buys10": 326,
+   "sells10": 506,
+   "wbuys": 136,
+   "wsells": 488
+  },
+  "2026-11-04": {
+   "buys10": 421,
+   "sells10": 419,
+   "wbuys": 136,
+   "wsells": 488
+  },
+  "2026-11-05": {
+   "buys10": 553,
+   "sells10": 329,
+   "wbuys": 136,
+   "wsells": 488
+  },
+  "2026-11-06": {
+   "buys10": 662,
+   "sells10": 259,
+   "wbuys": 136,
+   "wsells": 488
+  },
+  "2026-11-09": {
+   "buys10": 809,
+   "sells10": 220,
+   "wbuys": 363,
+   "wsells": 127
+  },
+  "2026-11-11": {
+   "buys10": 991,
+   "sells10": 192,
+   "wbuys": 363,
+   "wsells": 127
+  },
+  "2026-11-12": {
+   "buys10": 1105,
+   "sells10": 193,
+   "wbuys": 363,
+   "wsells": 127
+  },
+  "2026-11-13": {
+   "buys10": 1165,
+   "sells10": 199,
+   "wbuys": 363,
+   "wsells": 127
+  },
+  "2026-11-16": {
+   "buys10": 1190,
+   "sells10": 235,
+   "wbuys": 412,
+   "wsells": 107
+  },
+  "2026-11-17": {
+   "buys10": 1183,
+   "sells10": 281,
+   "wbuys": 412,
+   "wsells": 107
+  },
+  "2026-11-18": {
+   "buys10": 1119,
+   "sells10": 268,
+   "wbuys": 412,
+   "wsells": 107
+  }
+ }
+}
