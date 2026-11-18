@@ -4005,7 +4005,7 @@ def _start():
         threading.Thread(target=_tb_loop, daemon=True).start()
         try:
             j = optbt_job()
-            if j.st.get("state") in ("idle", "running"):
+            if j.st.get("state") in ("idle", "running", "error"):
                 j.start()          # waits for the market to close before it downloads anything
         except Exception as ex:  # noqa: BLE001
             log("optbt_error", error=str(ex)[:200])

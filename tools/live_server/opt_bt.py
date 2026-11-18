@@ -122,7 +122,18 @@ class OptBT:
 
     # ------------------------------------------------------------------ run
     def _run(self):
+        """18 Nov 2026: touch nothing (not even Angel's login) until the market is closed; retry a failed run up to 3 times."""
+        for attempt in range(3):
+            while not _quiet():
+                self.st["progress"] = "waiting for the market to close"; self._save(); time.sleep(300)
+            self._run_once()
+            if self.st.get("state") == "done":
+                return
+            time.sleep(600)
+
+    def _run_once(self):
         try:
+            self.st.update(state="running", progress="starting"); self._save()
             rows = self.rows_fn()
             today = _ist().date(); last = today if (_ist().hour, _ist().minute) >= (15, 30) else today - timedelta(days=1)
             ch = self._chain()
