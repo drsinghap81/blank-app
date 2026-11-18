@@ -19,7 +19,7 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 5                     # bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
+VERSION = 6                     # bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import gzip
 import json
 import os
@@ -461,7 +461,8 @@ def entry_sim(o, h, l, c, i, last, limit=None, tgt_r=3.0, trail=None):
                 if l[k] <= cap:
                     e = cap
                 else:
-                    continue                         # gapped through the limit: not filled on this candle
+                    e = None                         # gapped through the limit: not filled on this candle
+                    continue
             f = k; break
     if e is None or e <= 0:
         return None
