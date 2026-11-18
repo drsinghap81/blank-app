@@ -2511,9 +2511,9 @@ async function optBasketCard(box) {
     state.optBk = { a, b };
   }
   const { a, b } = state.optBk; if (!a && !b) { box.innerHTML = ''; return; }
-  const G = [['index filter (basket)', 'Basket (Nifty + Bank Nifty agree)'], ['filter CE', '· CE buys'], ['filter PE', '· PE buys'],
-    ['filter + sector agrees', '+ sector agrees'], ['filter + sector disagrees', '+ sector disagrees'], ['filter + PCR agrees', '+ PCR agrees'],
-    ['filter + PCR disagrees', '+ PCR disagrees'], ['filter, indices only', 'Indices only'], ['all signals', 'No filter (all signals)']];
+  const G = [['index filter (basket)', '<b>Basket</b>'], ['filter CE', '· CE'], ['filter PE', '· PE'],
+    ['filter + sector agrees', '+ sector ✓'], ['filter + sector disagrees', '+ sector ✗'], ['filter + PCR agrees', '+ PCR ✓'],
+    ['filter + PCR disagrees', '+ PCR ✗'], ['filter, indices only', 'Indices'], ['all signals', 'No filter']];
   const tb = (res, open) => `<table class="ov-bk"><tr><th></th><th>Trades</th><th>Total R</th><th>Win</th><th>Tgt / SL / ${open}</th><th>Avg %</th></tr>${G.map(([k, lbl]) => {
     const v = (res || {})[k]; if (!v || !v.n) return `<tr><td>${lbl}</td><td>0</td><td colspan="4" class="muted">—</td></tr>`;
     return `<tr><td>${lbl}</td><td>${v.n}</td><td class="${v.total_R >= 0 ? 'up' : 'down'}"><b>${v.total_R >= 0 ? '+' : ''}${fmt(v.total_R, 1)}</b></td><td>${fmt(v.win, 0)}%</td><td>${v.target} / ${v.sl} / ${v.at_close}</td><td class="${v.avg_pct >= 0 ? 'up' : 'down'}">${v.avg_pct >= 0 ? '+' : ''}${fmt(v.avg_pct, 1)}%</td></tr>`; }).join('')}</table>`;
@@ -2523,7 +2523,7 @@ async function optBasketCard(box) {
   const bt = b && b.results && b.results['all signals'] ? `<p class="lv-sub" style="margin-top:12px"><b>Backtest</b> · ${b.results['index filter (basket)'] ? b.results['index filter (basket)'].days : 0} sessions to ${esc((b.built || '').slice(0, 10))} (Angel keeps only live contracts, so about 3 weeks) · exits at the day's close</p>${tb(b.results, 'close')}`
     : `<p class="lv-sub" style="margin-top:12px">Backtest: ${b ? esc(b.progress || b.state || 'waiting') : 'not on the server yet'} (runs after the close).</p>`;
   box.innerHTML = `<div class="card" style="margin:10px 16px;padding:12px"><b>RSI-60 option basket (5-minute)</b>
-    <p class="muted small">Buy the CE when it crosses RSI 60 in the buy zone (CE above VWAP, PE below), the PE in the sell zone. Stop = the signal candle's low, target = 3x that risk. CE only while Nifty and Bank Nifty are both up on the day, PE only while both are down. Results in R (1R = the risk of one trade). Watch only.</p>${today}${bt}</div>`;
+    <p class="muted small">Buy the CE when it crosses RSI 60 in the buy zone (CE above VWAP, PE below), the PE in the sell zone. Stop = the signal candle's low, target = 3x that risk. CE only while Nifty and Bank Nifty are both up on the day, PE only while both are down. Basket = with that index filter; ✓ / ✗ = the stock's sector (or its PCR fifth) agrees / disagrees with the trade. Results in R (1R = the risk of one trade). Watch only.</p>${today}${bt}</div>`;
 }
 
 async function loadOptCharts(el) {
