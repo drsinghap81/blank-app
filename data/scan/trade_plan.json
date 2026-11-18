@@ -1,8 +1,8 @@
 {
-"generated": "2026-11-18 16:47 UTC",
+"generated": "2026-11-18 22:20 UTC",
 "market": "NSE",
 "watch_only": false,
-"asof": "2026-11-17",
+"asof": "2026-11-18",
 "rules": {
 "risk_pct": 1.0,
 "max_pos_pct": 20.0,
@@ -131,7 +131,7 @@
 "group_rank": 7,
 "rank": 1,
 "risk_pct": 12.9,
-"r3m": 15.8
+"r3m": 22.3
 },
 {
 "id": "ATH-TECHM-2026-10-22",
@@ -169,7 +169,7 @@
 "group_rank": 15,
 "rank": 2,
 "risk_pct": 14.3,
-"r3m": 9.6
+"r3m": 8.8
 },
 {
 "id": "ATH-LALPATHLAB-2026-11-04",
@@ -207,7 +207,7 @@
 "group_rank": 25,
 "rank": 3,
 "risk_pct": 12.7,
-"r3m": 5.0
+"r3m": 3.6
 },
 {
 "id": "ATH-ZYDUSLIFE-2026-11-02",
@@ -245,7 +245,7 @@
 "group_rank": 24,
 "rank": 4,
 "risk_pct": 9.8,
-"r3m": 6.2
+"r3m": 6.1
 },
 {
 "id": "ATH-SAREGAMA-2026-11-04",
@@ -283,7 +283,7 @@
 "group_rank": 1,
 "rank": 5,
 "risk_pct": 41.2,
-"r3m": 29.4
+"r3m": 28.0
 },
 {
 "id": "STOP-HONASA-537.9",
@@ -320,7 +320,7 @@
 "group_rank": 42,
 "rank": 6,
 "risk_pct": 22.5,
-"r3m": 9.6
+"r3m": 3.6
 },
 {
 "id": "STOP-DRREDDY-1421.49",
@@ -357,7 +357,7 @@
 "group_rank": 24,
 "rank": 7,
 "risk_pct": 13.5,
-"r3m": 17.3
+"r3m": 15.7
 }
 ],
 "more": [],
@@ -398,7 +398,7 @@
 "group_rank": 6,
 "rank": 1,
 "risk_pct": 8.5,
-"r3m": null
+"r3m": 25.2
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-11",
@@ -474,7 +474,7 @@
 "group_rank": 29,
 "rank": 3,
 "risk_pct": 9.7,
-"r3m": 32.8
+"r3m": 41.6
 },
 {
 "id": "TF-AGARWALEYE-2026-11-11",
@@ -512,7 +512,7 @@
 "group_rank": 13,
 "rank": 4,
 "risk_pct": 5.3,
-"r3m": 9.5
+"r3m": 6.6
 },
 {
 "id": "RET-APOLLO-2026-11-18",
@@ -545,7 +545,7 @@
 "group_rank": 23,
 "rank": 1,
 "risk_pct": 9.2,
-"r3m": 15.7
+"r3m": 16.5
 },
 {
 "id": "RET-EIMCOELECO-2026-11-18",
@@ -578,7 +578,7 @@
 "group_rank": 37,
 "rank": 2,
 "risk_pct": 9.7,
-"r3m": 15.5
+"r3m": 29.0
 },
 {
 "id": "RET-GABRIEL-2026-11-18",
@@ -611,7 +611,7 @@
 "group_rank": 26,
 "rank": 3,
 "risk_pct": 10.2,
-"r3m": 3.5
+"r3m": 2.9
 },
 {
 "id": "RET-KALYANKJIL-2026-11-18",
@@ -644,7 +644,7 @@
 "group_rank": 12,
 "rank": 4,
 "risk_pct": 9.3,
-"r3m": 7.0
+"r3m": 12.7
 },
 {
 "id": "RET-KTKBANK-2026-11-18",
@@ -677,7 +677,7 @@
 "group_rank": 9,
 "rank": 5,
 "risk_pct": 6.0,
-"r3m": 13.4
+"r3m": 21.0
 },
 {
 "id": "RET-ROLEXRINGS-2026-11-18",
@@ -710,7 +710,7 @@
 "group_rank": 29,
 "rank": 6,
 "risk_pct": 10.1,
-"r3m": 13.2
+"r3m": 16.0
 },
 {
 "id": "TF-ICICIBANK-2026-11-05",
@@ -748,7 +748,7 @@
 "group_rank": 5,
 "rank": 5,
 "risk_pct": 8.5,
-"r3m": 13.1
+"r3m": 12.8
 },
 {
 "id": "TF-KOTAKBANK-2026-10-30",
@@ -786,7 +786,7 @@
 "group_rank": 5,
 "rank": 6,
 "risk_pct": 7.5,
-"r3m": 26.0
+"r3m": 27.1
 },
 {
 "id": "TFSTOP-POONAWALLA-513.35",
@@ -823,7 +823,7 @@
 "group_rank": 38,
 "rank": 7,
 "risk_pct": 9.9,
-"r3m": 0.8
+"r3m": -1.5
 },
 {
 "id": "RET-PRINCEPIPE-2026-11-18",
@@ -856,7 +856,7 @@
 "group_rank": 47,
 "rank": 7,
 "risk_pct": 7.1,
-"r3m": 3.4
+"r3m": 7.5
 },
 {
 "id": "T921-PRIMESECU-2026-11-17",
@@ -888,7 +888,7 @@
 "group_rank": null,
 "rank": 1,
 "risk_pct": 6.0,
-"r3m": 9.0
+"r3m": 10.0
 },
 {
 "id": "RET-TRANSWORLD-2026-11-17",
@@ -921,7 +921,7 @@
 "group_rank": null,
 "rank": 8,
 "risk_pct": 6.7,
-"r3m": 21.5
+"r3m": 30.9
 },
 {
 "symbol": "SWANDEF",
@@ -972,7 +972,7 @@
 "note": "VCP 16% \u2192 7%, pivot 2,884.00 (1.0% above the close); buy-stop needs 1.4x volume on the day as tested",
 "rank": 1,
 "risk_pct": 7.4,
-"r3m": 19.5
+"r3m": 16.8
 }
 ],
 "pattern_watch": [
