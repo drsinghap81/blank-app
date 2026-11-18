@@ -296,7 +296,7 @@ class OptBT:
                         e2, r2, h2, x2, _, _ = trl
                         R2 = -1.0 if h2 == "SL" else 3.0 if h2 == "target" else (x2 - e2) / r2
                         real = dict(R=round(R2 - COST * e2 / r2, 3), pct=round((x2 / e2 - 1 - COST) * 100, 2), how=h2)
-                    out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], real=real, vol_lots=round(x[5] / lot, 1) if lot else None, bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
+                    out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], xt=A[j][0][11:16], real=real, vol_lots=round(x[5] / lot, 1) if lot else None, bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
                                     nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index"))
         return out
@@ -377,6 +377,9 @@ def _agg(T):
                 by_day={d: round(v, 1) for d, v in sorted(days.items())})
 
 
+WIN = [("09:15-11:15", "09:15", "11:15"), ("11:15-13:15", "11:15", "13:15"), ("13:15-15:30", "13:15", "15:31")]
+
+
 def summarise(T):
     up = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] > 0 and t["bn"] > 0      # noqa: E731
     dn = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] < 0 and t["bn"] < 0      # noqa: E731
@@ -402,4 +405,7 @@ def summarise(T):
             # signal candle traded >= 20 lots (thin strikes have wide spreads)
             "basket, realistic fills": _agg([dict(t, **t["real"]) for t in F if t.get("real")]),
             "basket + BB, realistic fills": _agg([dict(t, **t["real"]) for t in F if t.get("real") and t.get("bb")]),
+            # 18 Nov 2026: when do the stops hit? basket trades by 2-hour window of ENTRY, and stop hits by 2-hour window of the HIT
+            "basket by entry window": {w: _agg([t for t in F if lo_ <= t.get("et", t["t"]) < hi_]) for w, lo_, hi_ in WIN},
+            "basket stop hits by window": {w: sum(1 for t in F if t["how"] == "SL" and lo_ <= t.get("xt", "") < hi_) for w, lo_, hi_ in WIN},
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
