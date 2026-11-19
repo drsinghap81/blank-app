@@ -1179,3 +1179,5 @@ body.pub .owner-only { display: none !important; }
 .mx5s{font-style:normal;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--ink);color:var(--card);margin-left:4px}
 .mx5p{color:var(--ink)!important}
 .mxsc{font-variant-numeric:tabular-nums}
+
+.otr-cmp{display:flex;flex-direction:column;gap:3px;margin:8px 0;padding:10px 12px;border-radius:12px;border:1px solid var(--line);font-size:13.5px}

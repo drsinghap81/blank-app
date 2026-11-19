@@ -1535,7 +1535,7 @@ async function otrLoad(box = $('#otrcard')) {
   const rs = (v) => `${v >= 0 ? '+' : '−'}₹${fmt(Math.abs(v || 0), 0, 'en-IN')}`, live = T.live, H = T.history || {};
   const row = (t) => { const p = t.state === 'closed' ? t.pnl : t.upnl;
     return `<div class="otr-row"><div style="flex:1;min-width:0"><div class="lv-sym">${esc(t.symbol)} ${t.side} <span class="chip ${t.state === 'open' ? 'buy' : ''}">${{ pending: 'waiting', open: 'open', closed: 'closed', cancelled: 'cancelled' }[t.state] || t.state}</span>${t.live ? ' <span class="lv-mode live">LIVE</span>' : ''}</div>
-      <div class="lv-sub">signal ${esc((t.signal || '').slice(11))} · ${t.state === 'pending' ? `buy above ${fmt(t.trigger, 2, 'en-IN')}` : t.entry ? `in ${fmt(t.entry, 2, 'en-IN')}${t.live_entry != null ? ` (Angel ${fmt(t.live_entry, 2, 'en-IN')})` : ''} · stop ${fmt(t.stop, 2, 'en-IN')}${t.exit ? ` · out ${fmt(t.exit, 2, 'en-IN')} (${esc(t.why || '')})` : t.now ? ` · now ${fmt(t.now, 2, 'en-IN')}` : ''}` : esc(t.why || '')}${t.live_state ? ` · ${esc(t.live_state)}` : ''}</div></div>
+      <div class="lv-sub">signal ${esc((t.signal || '').slice(11))} · ${t.state === 'pending' ? `buy above ${fmt(t.trigger, 2, 'en-IN')}` : t.entry ? `in ${fmt(t.entry, 2, 'en-IN')}${t.live_entry != null ? ` (Angel ${fmt(t.live_entry, 2, 'en-IN')})` : ''} · stop ${fmt(t.stop, 2, 'en-IN')}${t.exit ? ` · out ${fmt(t.exit, 2, 'en-IN')}${t.live_exit != null ? ` (Angel ${fmt(t.live_exit, 2, 'en-IN')})` : ''} (${esc(t.why || '')})` : t.now ? ` · now ${fmt(t.now, 2, 'en-IN')}` : ''}` : esc(t.why || '')}${t.live_state ? ` · ${esc(t.live_state)}` : ''}</div></div>
       <div class="${(p || 0) >= 0 ? 'up' : 'down'}" style="font-weight:700;white-space:nowrap">${p != null ? rs(p) : ''}</div></div>`; };
   const act = (T.trades || []).filter((t) => t.state !== 'cancelled');
   box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Option trader · 5-minute</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE + PAPER' : 'PAPER'}</span></div>
@@ -1545,10 +1545,16 @@ async function otrLoad(box = $('#otrcard')) {
     <section class="summary"><div class="stat"><b class="${T.day_pnl >= 0 ? 'up' : 'down'}">${rs(T.day_pnl)}</b><span>today (paper)</span></div><div class="stat"><b>${T.open}</b><span>open / waiting</span></div>
       <div class="stat"><b class="${(H.pnl || 0) >= 0 ? 'up' : 'down'}">${rs(H.pnl || 0)}</b><span>paper since start · ${H.days || 0} days · ${H.trades || 0} trades${H.trades ? ` · ${fmt(H.wins / H.trades * 100, 0)}% won` : ''}</span></div>
       ${H.live_pnl ? `<div class="stat"><b class="${H.live_pnl >= 0 ? 'up' : 'down'}">${rs(H.live_pnl)}</b><span>live (real fills)</span></div>` : ''}</section>
+    ${(() => { const C = H.compare; if (!C || !(C.n || C.unfilled)) return live ? '<p class="lv-sub"><b>Paper vs live:</b> the comparison appears here after the first live trade closes.</p>' : '';
+      const pc = (v) => (v == null ? '–' : `${v > 0 ? '+' : ''}${fmt(v, 2)}%`);
+      return `<div class="otr-cmp"><b>Paper vs live · same ${C.n} trade${C.n === 1 ? '' : 's'}</b>
+        <span>Paper ${rs(C.paper)} · Live on Angel ${rs(C.live)} · <b class="${C.diff >= 0 ? 'up' : 'down'}">difference ${rs(C.diff)}</b></span>
+        <span>Angel fills vs paper: entries ${pc(C.entry_slip_pct)}, exits ${pc(C.exit_slip_pct)} on average${C.unfilled ? ` · ${C.unfilled} live buy${C.unfilled === 1 ? '' : 's'} never filled (paper took ${C.unfilled === 1 ? 'it' : 'them'})` : ''}</span>
+        <small class="muted">Before costs on both sides. Paper P&amp;L elsewhere on this card subtracts 1% per trade.</small></div>`; })()}
     ${T.stopped ? '<p class="lv-sub"><b>Stopped for today</b> — no new entries; open trades keep their stops.</p>' : ''}
     ${act.length ? act.slice().reverse().map(row).join('') : `<p class="lv-sub">No trades today yet${T.last_cycle ? ` · last check ${esc(T.last_cycle)} IST` : ' · checks run every 5 minutes in market hours'}.</p>`}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="lv-btn ghost" id="otrstop">Stop today</button><button class="lv-btn sell" id="otrflat">Square off all</button></div>
-    ${(H.by_day || []).length ? `<details class="info"><summary>Paper record by day</summary><p class="lv-sub">${H.by_day.slice().reverse().map((d) => `${esc(d.day.slice(5))}: ${rs(d.pnl)} (${d.n})`).join(' · ')}</p></details>` : ''}
+    ${(H.by_day || []).length ? `<details class="info"><summary>Record by day</summary><p class="lv-sub">${H.by_day.slice().reverse().map((d) => `${esc(d.day.slice(5))}: paper ${rs(d.pnl)} (${d.n})${d.live_n ? ` · live ${rs(d.live_pnl)} vs paper ${rs(d.paper_on_live)} on ${d.live_n}` : ''}`).join('<br>')}</p></details>` : ''}
     ${(T.notes || []).length ? `<details class="info"><summary>Log</summary><p class="lv-sub" style="white-space:pre-line">${T.notes.slice().reverse().map(esc).join('\n')}</p></details>` : ''}
     ${T.last_error ? `<p class="lv-sub down">Last error: ${esc(T.last_error)}</p>` : ''}</div>`;
   const q = (id) => box.querySelector('#' + id);

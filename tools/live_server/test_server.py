@@ -1049,5 +1049,15 @@ def test_opt_trader_paper_and_live(tmp_path):
         T.flat_all()
         assert all(t["state"] == "closed" for t in T.st["trades"]) and T.st["stopped"]
         assert sum(1 for o in b.nfo.values() if o["side"] == "SELL" and o["trigger"] is None) == 2
+        # 19 Nov 2026: the live sells are re-checked each cycle (no second sell while one is working) and the paper-vs-live record is written
+        T.cycle()
+        assert sum(1 for o in b.nfo.values() if o["side"] == "SELL" and o["trigger"] is None and o["status"] != "cancelled") == 2
+        for o in b.nfo.values():
+            if o["side"] == "SELL" and o["trigger"] is None and o["status"] == "open":
+                o.update(status="complete", avg=o["price"])
+        T.cycle()
+        assert all(t.get("live_exit") is not None for t in T.st["trades"])
+        H = T.status()["history"]
+        assert H["compare"]["n"] == 2 and H["compare"]["entry_slip_pct"] == 0 and H["live_pnl"] == H["compare"]["live"]
     finally:
         O.CFG["lull"] = lull; O.now_ist = now0

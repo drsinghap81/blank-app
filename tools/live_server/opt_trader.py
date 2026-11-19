@@ -165,6 +165,9 @@ class OptTrader:
     def cycle(self):
         with self.lock:
             if self.st.get("day") != str(now_ist().date()):
+                for t in self.st.get("trades", []):
+                    if t.get("hist_due"):
+                        self._hist(t)
                 self.st = dict(day=str(now_ist().date()), trades=[], stopped=False, notes=[])
             uni = self.universe(); day = str(now_ist().date())
             BUSY.set()
@@ -198,6 +201,10 @@ class OptTrader:
                     A, B = bars.get((u["symbol"], side)), bars.get((u["symbol"], other))
                     if A and B:
                         self._contract(u, side, A, B, idx, day, om)
+            # 19 Nov 2026: the live sell of a closed paper trade is checked / re-priced every cycle until Angel fills it
+            for t in self.st["trades"]:
+                if t["state"] == "closed" and t.get("live_entry") is not None and t.get("live_exit") is None:
+                    self._live_exit(t, om)
             self.last_cycle = now_ist().strftime("%H:%M:%S")
             self._save()
 
@@ -317,8 +324,6 @@ class OptTrader:
             # a live stop that filled on Angel closes the live side even if the candles have not shown it yet
             if live_o is not None and t.get("live_stop_oid") and om and str((om.get(t["live_stop_oid"]) or {}).get("status", "")).lower() == "complete":
                 t["live_exit"] = (om[t["live_stop_oid"]].get("avg") or t["stop"]); t["live_state"] = "stopped on Angel"
-        if t["state"] == "closed" and t.get("live_entry") is not None and t.get("live_exit") is None:
-            self._live_exit(t, om)
 
     def _cancel(self, t, why):
         t["state"] = "cancelled"; t["why"] = why
@@ -338,6 +343,13 @@ class OptTrader:
             except Exception:  # noqa: BLE001
                 pass
         self.note(f"{t['key']} sold (paper) {t['exit']} - {why}: {'+' if t['pnl'] >= 0 else '-'}Rs {abs(t['pnl']):,}")
+        if t.get("live_entry") is not None and t.get("live_exit") is None:
+            t["hist_due"] = True                                     # written when Angel's sell fills (paper vs live record)
+        else:
+            self._hist(t)
+
+    def _hist(self, t):
+        t["hist_due"] = False
         try:
             with open(self.hp, "a") as f:
                 f.write(json.dumps({k: t.get(k) for k in ("key", "symbol", "side", "signal", "filled_at", "entry", "exit", "exit_at", "why",
@@ -346,14 +358,30 @@ class OptTrader:
             pass
 
     def _live_exit(self, t, om):
-        """the paper trade closed on a 5 EMA close / 15:15: sell the live lot with a limit 2% under the last price (re-priced each cycle)."""
-        if t.get("live_exit_oid") and om and str((om.get(t["live_exit_oid"]) or {}).get("status", "")).lower() == "complete":
-            t["live_exit"] = om[t["live_exit_oid"]].get("avg") or t["exit"]; t["live_state"] = "sold on Angel"; return
+        """the paper trade closed (5 EMA close / 15:15 / stop): sell the live lot with a limit 2% under the last price, re-priced each
+        cycle until Angel fills it. Never places a second sell while an earlier one may still be working (no accidental short)."""
+        if t.get("live_exit") is not None:
+            return
+        so, eo = t.get("live_stop_oid"), t.get("live_exit_oid")
+        st = lambda oid: str(((om or {}).get(oid) or {}).get("status", "")).lower()  # noqa: E731
+        for oid, how, px in ((so, "stopped on Angel", t.get("stop")), (eo, "sold on Angel", t.get("exit"))):
+            if oid and st(oid) == "complete":
+                t["live_exit"] = (om[oid].get("avg") or px); t["live_state"] = how
+                if t.get("hist_due"):
+                    self._hist(t)
+                return
+        if (so or eo) and om is None:                       # order book not visible: wait, never risk a double sell
+            return
         try:
-            if t.get("live_stop_oid") and not t.get("stop_cancelled"):
-                self.b.cancel_order(t["live_stop_oid"], "STOPLOSS"); t["stop_cancelled"] = True
-            if t.get("live_exit_oid"):
-                self.b.cancel_order(t["live_exit_oid"], "NORMAL")
+            if so and not t.get("stop_cancelled") and st(so) not in ("cancelled", "rejected"):
+                self.b.cancel_order(so, "STOPLOSS")
+            if so:
+                t["stop_cancelled"] = True
+            if eo and st(eo) not in ("cancelled", "rejected"):
+                self.b.cancel_order(eo, "NORMAL")
+        except Exception as ex:  # noqa: BLE001
+            t["live_state"] = f"could not cancel the earlier order - check Angel: {str(ex)[:80]}"; return
+        try:
             ltp = self.b.ltp_ex("NFO", t["tsym"], t["token"]) or t["exit"]
             t["live_exit_oid"] = self.b.nfo_order(t["tsym"], t["token"], "SELL", t["lot"], rnd(ltp * 0.98)); t["live_state"] = "sell order on Angel"
         except Exception as ex:  # noqa: BLE001
@@ -367,13 +395,17 @@ class OptTrader:
     def flat_all(self):
         """square off everything open now (paper at the last price; live with a sell limit)."""
         with self.lock:
+            try:
+                om = self.b.order_map()
+            except Exception:  # noqa: BLE001
+                om = None
             for t in self.st["trades"]:
                 if t["state"] == "pending":
                     self._cancel(t, "square-off from the app")
                 elif t["state"] == "open":
                     self._close(t, t.get("now") or t["entry"], now_ist().strftime("%Y-%m-%dT%H:%M"), "square-off from the app")
-                    if t.get("live_entry") is not None:
-                        self._live_exit(t, None)
+                if t["state"] == "closed" and t.get("live_entry") is not None and t.get("live_exit") is None:
+                    self._live_exit(t, om)
             self.st["stopped"] = True; self._save()
 
     def status(self):
@@ -387,15 +419,27 @@ class OptTrader:
         except Exception:  # noqa: BLE001
             pass
         days = {}
+        cmp = dict(n=0, paper=0, live=0, slip_in=[], slip_out=[], unfilled=0)   # paper vs live on the trades that went live (gross, no cost)
         for h in hist:
-            d = days.setdefault(h["day"], dict(day=h["day"], n=0, pnl=0, wins=0, live_pnl=0))
+            d = days.setdefault(h["day"], dict(day=h["day"], n=0, pnl=0, wins=0, live_pnl=0, live_n=0, paper_on_live=0))
             d["n"] += 1; d["pnl"] += h.get("pnl") or 0; d["wins"] += (h.get("pnl") or 0) > 0
+            if h.get("live") and h.get("live_entry") is None:
+                cmp["unfilled"] += 1
             if h.get("live_entry") is not None and h.get("live_exit") is not None:
-                d["live_pnl"] += round((h["live_exit"] - h["live_entry"]) * (h.get("lot") or 0))
+                lot = h.get("lot") or 0; lp = round((h["live_exit"] - h["live_entry"]) * lot); pp = round((h["exit"] - h["entry"]) * lot)
+                d["live_pnl"] += lp; d["live_n"] += 1; d["paper_on_live"] += pp
+                cmp["n"] += 1; cmp["paper"] += pp; cmp["live"] += lp
+                if h.get("entry"):
+                    cmp["slip_in"].append((h["live_entry"] / h["entry"] - 1) * 100)
+                if h.get("exit"):
+                    cmp["slip_out"].append((h["live_exit"] / h["exit"] - 1) * 100)
+        avg = lambda L: round(sum(L) / len(L), 2) if L else None  # noqa: E731
+        cmp = dict(n=cmp["n"], paper=cmp["paper"], live=cmp["live"], diff=cmp["live"] - cmp["paper"], unfilled=cmp["unfilled"],
+                   entry_slip_pct=avg(cmp["slip_in"]), exit_slip_pct=avg(cmp["slip_out"]))
         D = sorted(days.values(), key=lambda x: x["day"])
         return dict(live=self.live(), day=self.st.get("day"), stopped=self.st.get("stopped"), trades=self.st.get("trades", []),
                     notes=self.st.get("notes", [])[-12:], day_pnl=self.day_pnl(), open=self._open_count(), cfg=CFG,
                     universe=len(self.uni or []), last_cycle=self.last_cycle, last_error=self.last_error,
                     history=dict(days=len(D), trades=sum(d["n"] for d in D), pnl=sum(d["pnl"] for d in D),
                                  wins=sum(d["wins"] for d in D), up_days=sum(d["pnl"] > 0 for d in D), live_pnl=sum(d["live_pnl"] for d in D),
-                                 by_day=D[-15:]))
+                                 by_day=D[-15:], compare=cmp))
