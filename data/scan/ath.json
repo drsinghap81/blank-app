@@ -2,8 +2,8 @@
 "market": "NSE",
 "asof": "2026-11-19",
 "scan_date": "2026-11-20",
-"generated": "2026-11-19 21:47 UTC",
-"scanned": 1968,
+"generated": "2026-11-19 22:37 UTC",
+"scanned": 1967,
 "rules": {
 "base_main": 24,
 "base_min": 12,
@@ -580,7 +580,7 @@
 "theme_rs": -2.4044,
 "td_score": 2,
 "aligned": true,
-"rs_rating": 75,
+"rs_rating": 76,
 "sector_pct": 85.0,
 "theme_pct": 52.0
 },
@@ -1598,7 +1598,7 @@
 "theme_rs": null,
 "td_score": 1,
 "aligned": false,
-"rs_rating": 50,
+"rs_rating": 51,
 "sector_pct": null,
 "theme_pct": null
 }
@@ -2172,7 +2172,7 @@
 "theme_rs": -2.4044,
 "td_score": 2,
 "aligned": true,
-"rs_rating": 75,
+"rs_rating": 76,
 "sector_pct": 85.0,
 "theme_pct": 52.0
 },
@@ -3108,7 +3108,7 @@
 "theme_rs": null,
 "td_score": 0,
 "aligned": false,
-"rs_rating": 51,
+"rs_rating": 52,
 "sector_pct": null,
 "theme_pct": null
 },
@@ -10492,7 +10492,7 @@
 "theme_rs": null,
 "td_score": 1,
 "aligned": false,
-"rs_rating": 77,
+"rs_rating": 78,
 "sector_pct": null,
 "theme_pct": null
 },
@@ -18190,7 +18190,7 @@
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "name": "Aptus Value Housing Finance India Limited",
-"size": "Small",
+"size": "Mid",
 "industry": "Financial Services",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "sector_tag": "leading",
@@ -18443,7 +18443,7 @@
 "sector_index": null,
 "sector_tag": null,
 "sector_rs": null,
-"rs_rating": 34
+"rs_rating": 35
 },
 {
 "symbol": "SOUTHWEST",
