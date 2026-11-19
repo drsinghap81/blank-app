@@ -71,6 +71,8 @@ class OptTrader:
         self.b, self.rows_fn, self.pcr_fn, self.log = broker, rows_fn, pcr_fn, log
         self.alert = alert or (lambda text, key=None: None)
         self.hist, self.hist_day, self.warm_day, self.cycle_secs = {}, None, None, None
+        self.api_today, self.feed, self.fq_last, self.feed_ok, self.feed_err, self.feed_n = {}, {}, {}, 0.0, None, 0
+        self.flock = threading.Lock()
         self.dir = data_dir
         self.sp = os.path.join(data_dir, "opt_trader.json"); self.mp = os.path.join(data_dir, "opt_trader_mode.json")
         self.hp = os.path.join(data_dir, "opt_trader_hist.jsonl")
@@ -138,6 +140,62 @@ class OptTrader:
             return
         self.thread = threading.Thread(target=self._loop, daemon=True); self.thread.start()
         self.fast = threading.Thread(target=self._fast_loop, daemon=True); self.fast.start()
+        threading.Thread(target=self._feed_loop, daemon=True).start()
+
+    # ------------------------------------------------------------------ live quote feed (19 Nov 2026)
+    # Candle-history calls (one per contract every 5 minutes) took 8-12 s each on Angel and half came back empty, so a check
+    # took 9-12 minutes. Instead: poll Angel's quote API every 5 s for all contracts (50 per call) and build today's 5-minute
+    # candles here. Earlier days are downloaded once a day; a contract falls back to a history call only if the feed is stale.
+    def _feed_loop(self):
+        while True:
+            t = now_ist()
+            if t.weekday() < 5 and (9, 15) <= (t.hour, t.minute) < (15, 31) and self.uni and self.uni_day == str(t.date()):
+                try:
+                    self._poll(); self.feed_ok = time.time(); self.feed_err = None
+                except Exception as ex:  # noqa: BLE001
+                    self.feed_err = f"{now_ist():%H:%M:%S} {str(ex)[:120]}"
+                time.sleep(5)
+            else:
+                time.sleep(15)
+
+    @staticmethod
+    def _bucket(t):
+        return (t - timedelta(minutes=t.minute % 5, seconds=t.second, microseconds=t.microsecond)).strftime("%Y-%m-%dT%H:%M")
+
+    def _poll(self):
+        toks = [u[sd]["token"] for u in (self.uni or []) for sd in ("ce", "pe")]
+        Q = self.b.fo_quotes("NFO", toks); t = now_ist(); b = self._bucket(t); day = str(t.date())
+        with self.flock:
+            if getattr(self, "feed_day", None) != day:
+                self.feed, self.fq_last, self.feed_day = {}, {}, day
+            for tk, q in Q.items():
+                p = q.get("ltp") or 0
+                if p <= 0:
+                    continue
+                F = self.feed.setdefault(tk, {}); last = self.fq_last.get(tk); c = F.get(b)
+                if c is None:
+                    F[b] = c = dict(o=p, h=p, l=p, c=p, v0=(last or q)["vol"], v=q["vol"], late=(t.minute % 5) * 60 + t.second > 20)
+                else:
+                    c["h"], c["l"], c["c"], c["v"] = max(c["h"], p), min(c["l"], p), p, q["vol"]
+                if last:                                     # a new day high / low between two polls belongs to this candle
+                    if q["high"] > last["high"] > 0:
+                        c["h"] = max(c["h"], q["high"])
+                    if 0 < q["low"] < last["low"]:
+                        c["l"] = min(c["l"], q["low"])
+                self.fq_last[tk] = q
+            self.feed_n = len(Q)
+        if Q and not getattr(self, "feed_noted", None) == day:
+            self.feed_noted = day; v = sum(1 for q in Q.values() if q.get("vol")); a = sum(1 for q in Q.values() if q.get("atp"))
+            self.note(f"live quotes on: {len(Q)} contracts every 5 s · volume in {v}, average price in {a}")
+
+    def _feed_bars(self, token):
+        """completed 5-minute candles built from quotes, or None when the feed is not fresh (then the history call is used)."""
+        if time.time() - self.feed_ok > 60:
+            return None
+        cut = self._bucket(now_ist() - timedelta(minutes=5))
+        with self.flock:
+            F = dict(self.feed.get(str(token), {}))
+        return [(k, c["o"], c["h"], c["l"], c["c"], max(0.0, c["v"] - c["v0"]), c["late"]) for k, c in sorted(F.items()) if k <= cut]
 
     def _stage(self, txt):
         self.stage = txt; self.stage_at = now_ist().strftime("%H:%M:%S")
@@ -199,7 +257,7 @@ class OptTrader:
                 continue
             if t.weekday() < 5 and (9, 20) <= (t.hour, t.minute) <= (15, 31):
                 # run 25 s after each 5-minute candle closes
-                nxt = (t.replace(second=0, microsecond=0) + timedelta(minutes=5 - t.minute % 5)) + timedelta(seconds=25)
+                nxt = (t.replace(second=0, microsecond=0) + timedelta(minutes=5 - t.minute % 5)) + timedelta(seconds=8)
                 time.sleep(max(1, (nxt - now_ist()).total_seconds()))
                 try:
                     self.cycle()
@@ -216,7 +274,7 @@ class OptTrader:
         for u in uni:
             for side in ("ce", "pe"):
                 try:
-                    self._bars(u[side]["token"]); n += 1
+                    self._load_hist(u[side]["token"]); n += 1
                 except Exception as ex:  # noqa: BLE001
                     self.log("opt_trader_fetch", symbol=u["symbol"], error=str(ex)[:120])
         self.warm_day = str(now_ist().date())
@@ -225,27 +283,41 @@ class OptTrader:
         self.alert(f"Option trader ready: {len(uni)} underlyings, {n} contracts{' · LIVE orders ON' if self.live() else ' · paper only'}",
                    key=f"otr:ready:{now_ist().date()}")
 
-    def _bars(self, token):
-        day = str(now_ist().date())
-        if self.hist_day != day:
-            self.hist, self.hist_day = {}, day
-        if token in self.hist:                               # earlier days already cached: only today's candles
-            B = self.hist[token] + list(self.b.candles_int("NFO", token, "FIVE_MINUTE", 0))
-        else:
-            B = list(self.b.candles_int("NFO", token, "FIVE_MINUTE", 6))
-            self.hist[token] = [x for x in B if str(x[0])[:10] < day]
-        cut = now_ist() - timedelta(minutes=5)
+    @staticmethod
+    def _norm(B, upto=None):
         out = []
         for x in B:
             try:
-                ts = datetime.fromisoformat(x[0])
+                ts = datetime.fromisoformat(str(x[0]))
                 if ts.tzinfo is None:
                     ts = ts.replace(tzinfo=IST)
             except Exception:  # noqa: BLE001
                 continue
-            if ts <= cut:                                   # completed candles only
+            if upto is None or ts <= upto:
                 out.append((ts.astimezone(IST).strftime("%Y-%m-%dT%H:%M"), x[1], x[2], x[3], x[4], x[5]))
         return out
+
+    def _load_hist(self, token):
+        day = str(now_ist().date())
+        if self.hist_day != day:
+            self.hist, self.api_today, self.hist_day = {}, {}, day
+        if token not in self.hist:
+            B = self._norm(self.b.candles_int("NFO", token, "FIVE_MINUTE", 6), now_ist() - timedelta(minutes=5))
+            self.hist[token] = [x for x in B if x[0][:10] < day]; self.api_today[token] = [x for x in B if x[0][:10] == day]
+
+    def _bars(self, token):
+        """earlier days (once a day) + today's candles: built from the quote feed; Angel's own candles for the part of today before
+        the feed started (e.g. after a restart); a history call only when the feed is not running."""
+        cut = now_ist() - timedelta(minutes=5)
+        self._load_hist(token)
+        F = self._feed_bars(token)
+        if F is None:
+            today = self._norm(self.b.candles_int("NFO", token, "FIVE_MINUTE", 0), cut)
+        else:
+            api = {x[0]: x for x in self.api_today.get(token, [])}
+            today = list(api.values()) + [x[:6] for x in F if x[0] not in api and not (x[6] and api)]
+            today.sort(key=lambda x: x[0])
+        return self.hist[token] + today
 
     def cycle(self):
         t0 = time.time()
@@ -268,7 +340,7 @@ class OptTrader:
             bars = {}; N = 2 * len(uni); k = 0
             for u in uni:
                 for side in ("ce", "pe"):
-                    k += 1; self._stage(f"fetching 5-minute candles {k}/{N}")
+                    k += 1; self._stage(f"reading 5-minute candles {k}/{N}")
                     try:
                         bars[(u["symbol"], side)] = self._bars(u[side]["token"])
                     except Exception as ex:  # noqa: BLE001
@@ -346,12 +418,12 @@ class OptTrader:
         pv = vv = 0.0
         for k in today:
             x = A[k]; pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]
-        va = pv / vv if vv else c[i]
+        va = pv / vv if vv else ((self.fq_last.get(str(info["token"])) or {}).get("atp") or c[i])
         bm = [x for x in B if x[0][:10] == day]; pv = vv = 0.0; ob = None
         for x in bm:
             pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]
             if x[0] == A[i][0]:
-                ob = (x[4], pv / vv if vv else x[4])
+                ob = (x[4], pv / vv if vv else ((self.fq_last.get(str(u["pe" if side == "ce" else "ce"]["token"])) or {}).get("atp") or x[4]))
         if not ob or not (c[i] > va and ob[0] < ob[1]):
             return
         nf, bn = (idx.get("NIFTY") or {}).get(A[i][0]), (idx.get("BANKNIFTY") or {}).get(A[i][0])
@@ -542,7 +614,8 @@ class OptTrader:
         return dict(live=self.live(), day=self.st.get("day"), stopped=self.st.get("stopped"), trades=self.st.get("trades", []),
                     notes=self.st.get("notes", [])[-12:], day_pnl=self.day_pnl(), open=self._open_count(), cfg=CFG,
                     universe=len(self.uni or []), last_cycle=self.last_cycle, last_error=self.last_error,
-                    stage=self.stage, stage_at=self.stage_at, cycle_secs=self.cycle_secs, ready=self.warm_day == str(now_ist().date()), running=bool(self.thread and self.thread.is_alive()),
+                    stage=self.stage, stage_at=self.stage_at, cycle_secs=self.cycle_secs, ready=self.warm_day == str(now_ist().date()),
+                    feed=dict(age=round(time.time() - self.feed_ok) if self.feed_ok else None, n=self.feed_n, err=self.feed_err), running=bool(self.thread and self.thread.is_alive()),
                     watcher=bool(self.fast and self.fast.is_alive()),
                     history=dict(days=len(D), trades=sum(d["n"] for d in D), pnl=sum(d["pnl"] for d in D),
                                  wins=sum(d["wins"] for d in D), up_days=sum(d["pnl"] > 0 for d in D), live_pnl=sum(d["live_pnl"] for d in D),

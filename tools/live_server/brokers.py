@@ -208,6 +208,19 @@ class AngelEquity:
                                     low=float(q.get("low") or 0), open=float(q.get("open") or 0))
         return out
 
+    def fo_quotes(self, exchange, tokens):
+        """19 Nov 2026 (option trader live feed): Angel market-data FULL quotes, 50 tokens a call (limit 10/s, so far lighter than
+        one candle-history call per contract). token -> dict(ltp, high, low, open, vol = cumulative day volume, atp = avg traded price)."""
+        api = self._session(); out = {}; ids = [str(t) for t in tokens]
+        for i in range(0, len(ids), 50):
+            d = self._data(self._call(api.getMarketData, "FULL", {exchange: ids[i:i + 50]})) or {}
+            for q in d.get("fetched") or []:
+                g = lambda *ks: next((float(q[k]) for k in ks if q.get(k) not in (None, "")), 0.0)  # noqa: E731  field names vary
+                out[str(q.get("symbolToken"))] = dict(ltp=g("ltp"), high=g("high"), low=g("low"), open=g("open"),
+                                                      vol=g("tradeVolume", "volume", "totalTradedVolume", "vtt"),
+                                                      atp=g("avgPrice", "averagePrice", "atp", "averageTradedPrice"))
+        return out
+
     def orders(self):
         api = self._session()
         return [dict(id=o.get("orderid"), symbol=str(o.get("tradingsymbol", "")).replace("-EQ", ""), side=o.get("transactiontype"),
@@ -734,6 +747,9 @@ class MockBroker(AngelEquity):
 
     def candles_int(self, exchange, token, interval, days):
         return list(getattr(self, "icandles", []))
+
+    def fo_quotes(self, exchange, tokens):
+        return {str(t): dict(v) for t, v in getattr(self, "fq", {}).items() if str(t) in {str(x) for x in tokens}}
 
     def quotes(self, symbols):
         return {s: dict(ltp=100.0 + i, prev=99.0 + i, high=101.0 + i, low=98.0 + i, open=99.5 + i) for i, s in enumerate(symbols)}

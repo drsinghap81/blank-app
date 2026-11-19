@@ -1133,3 +1133,31 @@ def test_turtle_mcx_dry_then_live(tmp_path):
         assert "NATGASMINI" not in T.st["pos"] and T.st["hist"][-1]["exit"] == P["stop"]
     finally:
         M.now_ist = now0
+
+
+def test_opt_trader_builds_candles_from_quotes(tmp_path):
+    """19 Nov 2026: today's 5-minute candles come from 5-second quote polls (open/high/low/close/volume), earlier days from one
+    history call a day - no history call per check while the feed is fresh."""
+    import opt_trader as O, brokers, time as _t
+    from datetime import datetime
+    b = brokers.MockBroker({}, ".")
+    calls = []
+    b.candles_int = lambda ex, tk, iv, days: (calls.append(days) or [("2026-11-18T15:25", 90, 91, 89, 90, 10)])
+    T = O.OptTrader(b, str(tmp_path), lambda: [], lambda: {"rows": {}}, log=lambda *a, **k: None)
+    T.uni = [dict(symbol="NIFTY", ce=dict(token="1", tsym="A"), pe=dict(token="2", tsym="B"))]; T.uni_day = "2026-11-19"
+    now0 = O.now_ist
+    seq = [("09:15:02", 100, 0, 100, 100), ("09:16:30", 104, 50, 105, 100), ("09:18:00", 99, 60, 105, 98), ("09:19:58", 103, 80, 105, 98),
+           ("09:20:03", 103.5, 90, 105, 98)]
+    try:
+        for hhmmss, ltp, vol, hi, lo in seq:
+            O.now_ist = lambda h=hhmmss: datetime.fromisoformat(f"2026-11-19T{h}").replace(tzinfo=O.IST)
+            b.fq = {"1": dict(ltp=ltp, vol=vol, high=hi, low=lo, open=100, atp=101)}
+            T._poll(); T.feed_ok = _t.time()
+        O.now_ist = lambda: datetime.fromisoformat("2026-11-19T09:20:10").replace(tzinfo=O.IST)
+        B = T._bars("1")
+        assert B[0] == ("2026-11-18T15:25", 90, 91, 89, 90, 10)
+        assert B[1] == ("2026-11-19T09:15", 100, 105, 98, 103, 80) and len(B) == 2       # the 09:20 candle is still forming
+        n = len(calls); T._bars("1")
+        assert len(calls) == n                                                          # no more history calls while the feed is fresh
+    finally:
+        O.now_ist = now0
