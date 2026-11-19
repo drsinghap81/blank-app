@@ -402,7 +402,9 @@ class OptTrader:
                     self._live_exit(t, om)
             first = self.last_cycle is None
             self.last_cycle = now_ist().strftime("%H:%M:%S")
-            self._stage(f"check done at {self.last_cycle} in {time.time() - getattr(self, '_t_fetch', time.time()):.0f} s, next in 5 minutes")
+            _n = now_ist(); _m = (_n.minute // 5 + 1) * 5
+            _nx = (_n.replace(minute=0, second=8, microsecond=0) + timedelta(minutes=_m)).strftime("%H:%M:%S")
+            self._stage(f"check done at {self.last_cycle} in {time.time() - getattr(self, '_t_fetch', time.time()):.0f} s, next at {_nx}")
             if first:
                 self.note(f"first check done: {sum(1 for v in bars.values() if v)} of {2 * len(uni)} contracts had candles")
             self._save()
