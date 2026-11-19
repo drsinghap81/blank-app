@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-19 02:10 UTC",
+"generated": "2026-11-19 03:28 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-18",
@@ -128,10 +128,10 @@
 "group": "Capital Markets",
 "lane": "build",
 "group_pulse": 38.9,
-"group_rank": 7,
+"group_rank": 8,
 "rank": 1,
 "risk_pct": 12.9,
-"r3m": 22.3
+"r3m": 15.8
 },
 {
 "id": "ATH-TECHM-2026-10-22",
@@ -166,7 +166,7 @@
 "group": "Information Technology Services",
 "lane": "weak",
 "group_pulse": 26.5,
-"group_rank": 15,
+"group_rank": 17,
 "rank": 2,
 "risk_pct": 14.3,
 "r3m": 8.8
@@ -203,8 +203,8 @@
 "theme_pct": 48.0,
 "group": "Diagnostics & Research",
 "lane": "hold",
-"group_pulse": 21.1,
-"group_rank": 25,
+"group_pulse": 22.4,
+"group_rank": 23,
 "rank": 3,
 "risk_pct": 12.7,
 "r3m": 3.6
@@ -241,8 +241,8 @@
 "theme_pct": 48.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 21.4,
-"group_rank": 24,
+"group_pulse": 23.0,
+"group_rank": 21,
 "rank": 4,
 "risk_pct": 9.8,
 "r3m": 6.1
@@ -316,8 +316,8 @@
 "theme_pct": null,
 "group": "Household & Personal Products",
 "lane": "bounce",
-"group_pulse": 14.7,
-"group_rank": 42,
+"group_pulse": 15.5,
+"group_rank": 41,
 "rank": 6,
 "risk_pct": 22.5,
 "r3m": 3.6
@@ -353,11 +353,11 @@
 "theme_pct": 44.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 21.4,
-"group_rank": 24,
+"group_pulse": 23.0,
+"group_rank": 21,
 "rank": 7,
 "risk_pct": 13.5,
-"r3m": 15.7
+"r3m": 17.3
 }
 ],
 "more": [],
@@ -394,11 +394,11 @@
 "theme_pct": 87.0,
 "group": "Lodging",
 "lane": "build",
-"group_pulse": 39.9,
+"group_pulse": 40.5,
 "group_rank": 6,
 "rank": 1,
 "risk_pct": 8.5,
-"r3m": 25.2
+"r3m": 21.5
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-11",
@@ -432,11 +432,11 @@
 "theme_pct": 44.0,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 20.7,
-"group_rank": 26,
+"group_pulse": 22.3,
+"group_rank": 24,
 "rank": 2,
 "risk_pct": 14.8,
-"r3m": 24.5
+"r3m": null
 },
 {
 "id": "TF-MANAKCOAT-2026-11-12",
@@ -470,8 +470,8 @@
 "theme_pct": null,
 "group": "Metal Fabrication",
 "lane": "hold",
-"group_pulse": 19.6,
-"group_rank": 29,
+"group_pulse": 21.1,
+"group_rank": 28,
 "rank": 3,
 "risk_pct": 9.7,
 "r3m": 41.6
@@ -508,11 +508,11 @@
 "theme_pct": null,
 "group": "Medical Instruments & Supplies",
 "lane": "hold",
-"group_pulse": 29.8,
-"group_rank": 13,
+"group_pulse": 31.0,
+"group_rank": 12,
 "rank": 4,
 "risk_pct": 5.3,
-"r3m": 6.6
+"r3m": 9.5
 },
 {
 "id": "RET-APOLLO-2026-11-18",
@@ -541,44 +541,11 @@
 "td_score": null,
 "group": "Aerospace & Defense",
 "lane": "hold",
-"group_pulse": 21.6,
-"group_rank": 23,
+"group_pulse": 21.1,
+"group_rank": 27,
 "rank": 1,
 "risk_pct": 9.2,
-"r3m": 16.5
-},
-{
-"id": "RET-EIMCOELECO-2026-11-18",
-"symbol": "EIMCOELECO",
-"name": "Eimco Elecon (India) Limited",
-"system": "Breakout retest",
-"bucket": "rt",
-"kind": "RETEST",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 2553.38,
-"ref": 2528.10009765625,
-"stop": 2328.06,
-"target": 3229.34,
-"exit_rule": "3R target 3229.34 or the stop, max 120 days (as tested)",
-"note": "retest of the old breakout level 2454.20 on 2026-11-18, next resistance 2615.10",
-"score": 2,
-"value_cr": null,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": "Farm & Heavy Construction Machinery",
-"lane": "hold",
-"group_pulse": 15.2,
-"group_rank": 37,
-"rank": 2,
-"risk_pct": 9.7,
-"r3m": 29.0
+"r3m": 15.7
 },
 {
 "id": "RET-GABRIEL-2026-11-18",
@@ -607,11 +574,11 @@
 "td_score": null,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 20.7,
-"group_rank": 26,
-"rank": 3,
+"group_pulse": 22.3,
+"group_rank": 24,
+"rank": 2,
 "risk_pct": 10.2,
-"r3m": 2.9
+"r3m": 3.5
 },
 {
 "id": "RET-KALYANKJIL-2026-11-18",
@@ -641,10 +608,10 @@
 "group": "Luxury Goods",
 "lane": "hold",
 "group_pulse": 30.2,
-"group_rank": 12,
-"rank": 4,
+"group_rank": 13,
+"rank": 3,
 "risk_pct": 9.3,
-"r3m": 12.7
+"r3m": 7.0
 },
 {
 "id": "RET-KTKBANK-2026-11-18",
@@ -673,11 +640,11 @@
 "td_score": null,
 "group": "Banks - Private Mid & Small",
 "lane": "hold",
-"group_pulse": 34.5,
+"group_pulse": 36.5,
 "group_rank": 9,
-"rank": 5,
+"rank": 4,
 "risk_pct": 6.0,
-"r3m": 21.0
+"r3m": 13.4
 },
 {
 "id": "RET-ROLEXRINGS-2026-11-18",
@@ -706,11 +673,11 @@
 "td_score": null,
 "group": "Metal Fabrication",
 "lane": "hold",
-"group_pulse": 19.6,
-"group_rank": 29,
-"rank": 6,
+"group_pulse": 21.1,
+"group_rank": 28,
+"rank": 5,
 "risk_pct": 10.1,
-"r3m": 16.0
+"r3m": 13.2
 },
 {
 "id": "TF-ICICIBANK-2026-11-05",
@@ -744,11 +711,11 @@
 "theme_pct": 70.0,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 40.0,
-"group_rank": 5,
+"group_pulse": 41.9,
+"group_rank": 4,
 "rank": 5,
 "risk_pct": 8.5,
-"r3m": 12.8
+"r3m": 13.1
 },
 {
 "id": "TF-KOTAKBANK-2026-10-30",
@@ -782,11 +749,11 @@
 "theme_pct": 70.0,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 40.0,
-"group_rank": 5,
+"group_pulse": 41.9,
+"group_rank": 4,
 "rank": 6,
 "risk_pct": 7.5,
-"r3m": 27.1
+"r3m": 26.0
 },
 {
 "id": "TFSTOP-POONAWALLA-513.35",
@@ -819,44 +786,11 @@
 "theme_pct": 33.0,
 "group": "Credit Services",
 "lane": "mid",
-"group_pulse": 15.0,
-"group_rank": 38,
+"group_pulse": 15.7,
+"group_rank": 39,
 "rank": 7,
 "risk_pct": 9.9,
-"r3m": -1.5
-},
-{
-"id": "RET-PRINCEPIPE-2026-11-18",
-"symbol": "PRINCEPIPE",
-"name": "Prince Pipes And Fittings Limited",
-"system": "Breakout retest",
-"bucket": "rt",
-"kind": "RETEST",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 295.88,
-"ref": 292.95001220703125,
-"stop": 276.17,
-"target": 355.01,
-"exit_rule": "3R target 355.01 or the stop, max 120 days (as tested)",
-"note": "retest of the old breakout level 292.40 on 2026-11-18, next resistance 298.40",
-"score": 2,
-"value_cr": null,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": "Building Products & Equipment",
-"lane": "mid",
-"group_pulse": 13.3,
-"group_rank": 47,
-"rank": 7,
-"risk_pct": 7.1,
-"r3m": 7.5
+"r3m": 0.8
 },
 {
 "id": "T921-PRIMESECU-2026-11-17",
@@ -900,12 +834,78 @@
 "order": "LIMIT",
 "when": "next open",
 "side": "BUY",
-"price": 186.9,
-"ref": 185.0500030517578,
-"stop": 175.11,
-"target": 222.27,
-"exit_rule": "3R target 222.27 or the stop, max 120 days (as tested)",
-"note": "retest of the old breakout level 192.63 on 2026-11-17, next resistance 190.96",
+"price": 196.73,
+"ref": 194.77999877929688,
+"stop": 175.34,
+"target": 260.9,
+"exit_rule": "3R target 260.90 or the stop, max 120 days (as tested)",
+"note": "retest of the old breakout level 192.63 on 2026-11-17, next resistance 212.96",
+"score": 2,
+"value_cr": null,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": null,
+"lane": null,
+"group_pulse": null,
+"group_rank": null,
+"rank": 6,
+"risk_pct": 12.2,
+"r3m": 30.9
+},
+{
+"id": "RET-ARHAM-2026-11-16",
+"symbol": "ARHAM",
+"name": "Arham Technologies Limited",
+"system": "Breakout retest",
+"bucket": "rt",
+"kind": "RETEST",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 212.38,
+"ref": 210.27999877929688,
+"stop": 193.45,
+"target": 269.17,
+"exit_rule": "3R target 269.17 or the stop, max 120 days (as tested)",
+"note": "retest of the old breakout level 206.60 on 2026-11-16, next resistance 215.40",
+"score": 2,
+"value_cr": null,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": null,
+"lane": null,
+"group_pulse": null,
+"group_rank": null,
+"rank": 7,
+"risk_pct": 9.8,
+"r3m": 11.0
+},
+{
+"id": "RET-GUFICBIO-2026-11-16",
+"symbol": "GUFICBIO",
+"name": "Gufic Biosciences Limited",
+"system": "Breakout retest",
+"bucket": "rt",
+"kind": "RETEST",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 444.25,
+"ref": 439.8500061035156,
+"stop": 409.22,
+"target": 549.34,
+"exit_rule": "3R target 549.34 or the stop, max 120 days (as tested)",
+"note": "retest of the old breakout level 433.00 on 2026-11-16, next resistance 448.00",
 "score": 2,
 "value_cr": null,
 "sector": null,
@@ -920,8 +920,8 @@
 "group_pulse": null,
 "group_rank": null,
 "rank": 8,
-"risk_pct": 6.7,
-"r3m": 30.9
+"risk_pct": 8.6,
+"r3m": 4.2
 },
 {
 "symbol": "SWANDEF",
@@ -968,8 +968,8 @@
 "side": "BUY",
 "trigger": 2886.88,
 "price": 2915.75,
-"ref": 2856.2,
-"note": "VCP 16% \u2192 7%, pivot 2,884.00 (1.0% above the close); buy-stop needs 1.4x volume on the day as tested",
+"ref": 2827.4,
+"note": "VCP 16% \u2192 7%, pivot 2,884.00 (2.0% above the close); buy-stop needs 1.4x volume on the day as tested",
 "rank": 1,
 "risk_pct": 7.4,
 "r3m": 16.8
@@ -992,13 +992,13 @@
 "symbol": "APOLLOTYRE",
 "name": "Apollo Tyres Limited",
 "typ": "DB",
-"close": 415.1000061035156,
+"close": 418.70001220703125,
 "neck": 416.75,
 "stop": 374.42,
 "signal_date": "2026-11-05",
 "group": "Auto Parts",
 "lane": "hold",
-"group_rank": 26
+"group_rank": 24
 },
 {
 "symbol": "SWIGGY",
@@ -1022,7 +1022,7 @@
 "signal_date": "2026-11-06",
 "group": "Electrical Equipment & Parts",
 "lane": "hold",
-"group_rank": 58
+"group_rank": 61
 },
 {
 "symbol": "TIRUMALCHM",
@@ -1034,7 +1034,7 @@
 "signal_date": "2026-11-11",
 "group": "Specialty Chemicals",
 "lane": "hold",
-"group_rank": 45
+"group_rank": 44
 },
 {
 "symbol": "CSBBANK",
@@ -1052,13 +1052,13 @@
 "symbol": "FRACTAL",
 "name": "Fractal Analytics Limited",
 "typ": "TW",
-"close": 793.9500122070312,
+"close": 798.25,
 "neck": 785.9000244140625,
 "stop": 689.34,
 "signal_date": "2026-11-04",
 "group": "Software - Infrastructure",
 "lane": "mid",
-"group_rank": 46
+"group_rank": 45
 },
 {
 "symbol": "ZAGGLE",
@@ -1070,7 +1070,7 @@
 "signal_date": "2026-11-04",
 "group": "Software - Infrastructure",
 "lane": "mid",
-"group_rank": 46
+"group_rank": 45
 },
 {
 "symbol": "ICICIBANK",
@@ -1082,7 +1082,7 @@
 "signal_date": "2026-11-05",
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_rank": 5
+"group_rank": 4
 },
 {
 "symbol": "TATACHEM",
@@ -1100,13 +1100,25 @@
 "symbol": "SESHAPAPER",
 "name": "Seshasayee Paper and Boards Limited",
 "typ": "DB",
-"close": 210.27000427246094,
+"close": 212.22999572753906,
 "neck": 214.27000427246094,
 "stop": 187.7,
 "signal_date": "2026-11-04",
 "group": null,
 "lane": null,
 "group_rank": null
+},
+{
+"symbol": "AURIONPRO",
+"name": "Aurionpro Solutions Limited",
+"typ": "DB",
+"close": 563.1500244140625,
+"neck": 582.6500244140625,
+"stop": 528.66,
+"signal_date": "2026-11-05",
+"group": "Software - Application",
+"lane": "bounce",
+"group_rank": 37
 },
 {
 "symbol": "EMAMILTD",
@@ -1118,7 +1130,19 @@
 "signal_date": "2026-11-09",
 "group": "Household & Personal Products",
 "lane": "bounce",
-"group_rank": 42
+"group_rank": 41
+},
+{
+"symbol": "KPITTECH",
+"name": "KPIT Technologies Limited",
+"typ": "TW",
+"close": 521.75,
+"neck": 555.0,
+"stop": 465.4,
+"signal_date": "2026-11-12",
+"group": "Software - Application",
+"lane": "bounce",
+"group_rank": 37
 },
 {
 "symbol": "IOC",
@@ -1130,19 +1154,19 @@
 "signal_date": "2026-11-09",
 "group": "Oil & Gas Refining & Marketing",
 "lane": "fade",
-"group_rank": 28
+"group_rank": 32
 },
 {
 "symbol": "GANESHCP",
 "name": "Ganesh Consumer Products Limited",
 "typ": "IHS",
-"close": 176.97000122070312,
+"close": 179.67999267578125,
 "neck": 174.4600067138672,
 "stop": 143.3,
 "signal_date": "2026-11-04",
 "group": "Packaged Foods",
 "lane": "weak",
-"group_rank": 59
+"group_rank": 58
 },
 {
 "symbol": "INDIACEM",
@@ -1154,31 +1178,31 @@
 "signal_date": "2026-11-04",
 "group": "Building Materials",
 "lane": "weak",
-"group_rank": 65
-},
-{
-"symbol": "AURIONPRO",
-"name": "Aurionpro Solutions Limited",
-"typ": "DB",
-"close": 555.8499755859375,
-"neck": 582.6500244140625,
-"stop": 528.66,
-"signal_date": "2026-11-05",
-"group": "Software - Application",
-"lane": "weak",
-"group_rank": 33
+"group_rank": 64
 },
 {
 "symbol": "EUROPRATIK",
 "name": "Euro Pratik Sales Limited",
 "typ": "TW",
-"close": 188.14999389648438,
+"close": 190.82000732421875,
 "neck": 196.19000244140625,
 "stop": 157.51,
 "signal_date": "2026-11-05",
 "group": "Building Materials",
 "lane": "weak",
-"group_rank": 65
+"group_rank": 64
+},
+{
+"symbol": "ULTRACEMCO",
+"name": "UltraTech Cement Limited",
+"typ": "TB",
+"close": 12290.0,
+"neck": 12193.0,
+"stop": 10221.75,
+"signal_date": "2026-11-05",
+"group": "Building Materials",
+"lane": "weak",
+"group_rank": 64
 },
 {
 "symbol": "JKCEMENT",
@@ -1190,31 +1214,7 @@
 "signal_date": "2026-11-05",
 "group": "Building Materials",
 "lane": "weak",
-"group_rank": 65
-},
-{
-"symbol": "PATANJALI",
-"name": "Patanjali Foods Limited",
-"typ": "DB",
-"close": 401.0,
-"neck": 409.45001220703125,
-"stop": 332.39,
-"signal_date": "2026-11-05",
-"group": "Packaged Foods",
-"lane": "weak",
-"group_rank": 59
-},
-{
-"symbol": "ULTRACEMCO",
-"name": "UltraTech Cement Limited",
-"typ": "TB",
-"close": 12428.0,
-"neck": 12193.0,
-"stop": 10221.75,
-"signal_date": "2026-11-05",
-"group": "Building Materials",
-"lane": "weak",
-"group_rank": 65
+"group_rank": 64
 }
 ],
 "watch": [
@@ -1246,7 +1246,7 @@
 "theme_pct": 36.0,
 "group": "Lodging",
 "lane": "build",
-"group_pulse": 39.9,
+"group_pulse": 40.5,
 "group_rank": 6
 },
 {
@@ -1308,7 +1308,7 @@
 "theme_pct": null,
 "group": "Banks - Private Mid & Small",
 "lane": "hold",
-"group_pulse": 34.5,
+"group_pulse": 36.5,
 "group_rank": 9
 },
 {
@@ -1339,8 +1339,8 @@
 "theme_pct": null,
 "group": "Packaging & Containers",
 "lane": "mid",
-"group_pulse": 14.8,
-"group_rank": 39
+"group_pulse": 16.7,
+"group_rank": 35
 },
 {
 "id": "WATCH-360ONE",
@@ -1370,8 +1370,8 @@
 "theme_pct": 81.0,
 "group": "Asset Management",
 "lane": "mid",
-"group_pulse": 15.9,
-"group_rank": 34
+"group_pulse": 17.1,
+"group_rank": 33
 },
 {
 "id": "WATCH-PARAGMILK",
@@ -1402,7 +1402,7 @@
 "group": "Dairy",
 "lane": "mid",
 "group_pulse": 21.9,
-"group_rank": 22
+"group_rank": 25
 },
 {
 "id": "WATCH-SEJALLTD",
