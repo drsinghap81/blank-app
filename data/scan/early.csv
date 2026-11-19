@@ -183,7 +183,6 @@ LANDMARK,EMA 9/21 cross,2026-08-24,541.75,498.05,58.5,6.44,440.73,True,452.4,536
 RPGLIFE,EMA 9/21 cross,2026-10-29,3003.8,2558.0,58.2,6.28,2900.7,False,2548.2,2812.0,9.9,12,stopped 2026-10-30,-9.0,-1.0,RPG Life Sciences Limited,main
 CRAMC,EMA 9/21 cross,2026-08-21,264.7,249.65,57.5,6.05,212.25,True,229.31,264.7,6.0,58,stopped 2026-09-07,-5.7,-1.0,Canara Robeco Asset Management Company Limited,main
 GARUDA,EMA 9/21 cross,2026-09-23,184.48,174.1,57.8,5.66,135.09,True,151.56,183.39,5.3,36,stopped 2026-09-29,-5.1,-1.0,Garuda Construction and Engineering Limited,main
-FOSECOIND,52w-high base breakout,2026-08-28,6362.0,5598.56,78.8,5.33,6431.28,False,6018.5,6413.0,14.5,53,exited 2026-10-22 (Supertrend red),-8.0,-0.63,Foseco India Limited,main
 HATSUN,EMA 9/21 cross,2026-10-16,1162.1,1102.0,56.1,5.15,1115.92,False,1037.4,1165.0,5.7,20,stopped 2026-10-22,-5.4,-1.0,Hatsun Agro Product Limited,main
 SHOPERSTOP,EMA 9/21 cross,2026-09-25,423.55,379.05,62.3,5.14,399.5,False,367.0,428.9,13.2,34,skipped (stop too far / gap below stop),,,Shoppers Stop Limited,main
 LOKESHMACH,EMA 9/21 cross,2026-09-30,365.9,319.0,58.7,5.08,437.96,False,350.65,366.2,14.8,31,skipped (stop too far / gap below stop),,,Lokesh Machines Limited,main
