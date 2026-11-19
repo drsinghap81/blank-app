@@ -5950,14 +5950,14 @@ async function mxLight(mk, S) {
 }
 function lightHTML(L, mk) {
   const { lvl, br, wi } = L; const loc = MKT[mk].loc;
-  const head = { red: 'RED · no new swing entries today (your rule)', amber: 'AMBER · one warning on: only the top-scored trades', green: 'GREEN · OK to take new swing trades' }[lvl];
+  const head = { red: 'RED · no new swing entries today', amber: 'AMBER · one warning on: trade normally', green: 'GREEN · OK to take new swing trades' }[lvl];
   const bits = [];
   if (br.buys10 != null) bits.push(`Breadth: <b class="${L.brBad ? 'down' : 'up'}">${Number(br.buys10).toLocaleString(loc)} stocks turned up vs ${Number(br.sells10).toLocaleString(loc)} down</b> (9/21 crosses, last 10 sessions)${br.p50 != null ? ` · ${fmt(br.p50, 0)}% above their 50-day` : ''}`);
   if (wi) bits.push(`${esc(MX_BENCH[mk])} <b class="${L.idxBad ? 'down' : 'up'}">${wi.up ? 'above' : 'below'} its 30-week average</b> at Friday's close${wi.up && wi.below_now ? ' · <b class="down">below it now</b>' : ''}`);
   return `<div class="mxl ${lvl}"><i></i><div><b>${head}</b><span>${bits.join('<br>')}</span>
     <small>${LIGHT_TEST}</small></div></div>`;
 }
-const LIGHT_TEST = 'Red = both warnings, amber = one. Open trades keep their own stops. Backtest of this light on 9/21: being checked.';
+const LIGHT_TEST = 'Red = both warnings (about 15% of days), amber = one. Tested on 9/21, 2017–26: skipping new buys on red days kept the return (26.9% → 29.1% a year, best book) and cut the worst fall (−26% → −22.5%; −22 to −30% → −19 to −23% across 3 books). Skipping amber days too halved the return, so amber is not a stop. Open trades keep their own stops.';
 async function tdTop5(box, mk) {
   if (!box) return; const S = await sysMap(mk); const L = await mxLight(mk, S);
   const H = mk === 'NSE' ? tdHeldSet() : new Set();
