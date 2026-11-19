@@ -1,31 +1,19 @@
 {
- "generated": "2026-11-19T10:37+00:00",
- "asof": "2026-11-18",
+ "generated": "2026-11-19T19:51+00:00",
+ "asof": "2026-11-19",
  "market": "US",
  "ema": 9,
  "rows": [
   {
-   "symbol": "Financials (XLF)",
-   "index": true,
-   "status": "left below",
-   "signal": "2026-10-09",
-   "signal_close": 54.73,
-   "gain": 3.1,
-   "days": 28,
-   "ema": 57.56,
-   "close": 56.42
-  },
-  {
    "symbol": "Utilities (XLU)",
    "index": true,
-   "status": "riding",
+   "status": "left below",
    "signal": "2026-10-06",
    "signal_close": 41.16,
-   "gain": 5.8,
-   "days": 31,
-   "ema": 43.64,
-   "close": 43.55,
-   "low": 43.19
+   "gain": 4.7,
+   "days": 32,
+   "ema": 43.53,
+   "close": 43.09
   },
   {
    "symbol": "Communication (XLC)",
@@ -33,34 +21,57 @@
    "status": "riding",
    "signal": "2026-11-09",
    "signal_close": 107.36,
-   "gain": -1.7,
-   "days": 7,
-   "ema": 106.26,
-   "close": 105.58,
-   "low": 105.18
+   "gain": -3.3,
+   "days": 8,
+   "ema": 105.77,
+   "close": 103.78,
+   "low": 103.5
   },
   {
-   "symbol": "V",
+   "symbol": "PANW",
    "index": false,
-   "status": "left below",
-   "signal": "2026-10-06",
-   "signal_close": 369.96,
-   "gain": 12.2,
-   "days": 31,
-   "ema": 420.23,
-   "close": 415.22
+   "status": "lift-off today",
+   "signal": "2026-11-19",
+   "signal_close": 360.08,
+   "gain": 0.0,
+   "days": 0,
+   "ema": 334.67,
+   "close": 360.08,
+   "low": 350.52
+  },
+  {
+   "symbol": "CRWD",
+   "index": false,
+   "status": "lift-off today",
+   "signal": "2026-11-19",
+   "signal_close": 242.9,
+   "gain": 0.0,
+   "days": 0,
+   "ema": 232.12,
+   "close": 242.9,
+   "low": 242.15
   },
   {
    "symbol": "BRK.B",
    "index": false,
-   "status": "riding",
+   "status": "left below",
    "signal": "2026-10-07",
    "signal_close": 506.25,
-   "gain": 13.5,
-   "days": 30,
-   "ema": 580.84,
-   "close": 574.62,
-   "low": 573.09
+   "gain": 12.8,
+   "days": 31,
+   "ema": 578.87,
+   "close": 570.97
+  },
+  {
+   "symbol": "JNJ",
+   "index": false,
+   "status": "left below",
+   "signal": "2026-10-22",
+   "signal_close": 267.61,
+   "gain": -0.7,
+   "days": 20,
+   "ema": 275.77,
+   "close": 265.86
   }
  ],
  "test": "Tested 2007\u201326: indices +0.45% a trade vs +0.67% holding any 16 days; top-50 stocks +1.48% vs +1.61%. No edge in the US: shown for reference only.",

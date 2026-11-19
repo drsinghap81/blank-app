@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-19T10:39+00:00",
+ "generated": "2026-11-19T19:52+00:00",
  "asof": "2026-11-19",
  "market": "UK",
  "ema": 9,
@@ -10,10 +10,10 @@
    "status": "left below",
    "signal": "2026-10-06",
    "signal_close": 2571.0,
-   "gain": 15.0,
+   "gain": 15.2,
    "days": 32,
-   "ema": 2994.78,
-   "close": 2956.0
+   "ema": 2996.18,
+   "close": 2963.0
   },
   {
    "symbol": "SN",
@@ -21,10 +21,10 @@
    "status": "left below",
    "signal": "2026-10-07",
    "signal_close": 1019.0,
-   "gain": 11.7,
+   "gain": 11.4,
    "days": 31,
-   "ema": 1152.16,
-   "close": 1138.5
+   "ema": 1151.46,
+   "close": 1135.0
   },
   {
    "symbol": "AZN",
@@ -32,10 +32,10 @@
    "status": "left below",
    "signal": "2026-10-15",
    "signal_close": 12698.0,
-   "gain": 6.2,
+   "gain": 4.8,
    "days": 25,
-   "ema": 13756.02,
-   "close": 13490.0
+   "ema": 13718.82,
+   "close": 13304.0
   },
   {
    "symbol": "MKS",
@@ -43,11 +43,11 @@
    "status": "riding",
    "signal": "2026-09-28",
    "signal_close": 377.6,
-   "gain": 22.6,
+   "gain": 21.3,
    "days": 38,
-   "ema": 457.02,
-   "close": 462.9,
-   "low": 461.3
+   "ema": 456.02,
+   "close": 457.9,
+   "low": 452.2
   },
   {
    "symbol": "RTO",
@@ -55,11 +55,11 @@
    "status": "riding",
    "signal": "2026-10-14",
    "signal_close": 306.5,
-   "gain": 17.1,
+   "gain": 18.3,
    "days": 26,
-   "ema": 357.16,
-   "close": 358.8,
-   "low": 357.6
+   "ema": 357.94,
+   "close": 362.7,
+   "low": 355.8
   },
   {
    "symbol": "TSCO",
@@ -67,11 +67,11 @@
    "status": "riding",
    "signal": "2026-10-09",
    "signal_close": 503.75,
-   "gain": 8.7,
+   "gain": 9.2,
    "days": 29,
-   "ema": 553.68,
-   "close": 547.4,
-   "low": 546.8
+   "ema": 554.2,
+   "close": 550.0,
+   "low": 546.4
   },
   {
    "symbol": "NXT",
@@ -79,11 +79,11 @@
    "status": "riding",
    "signal": "2026-10-13",
    "signal_close": 14800.0,
-   "gain": 8.1,
+   "gain": 7.7,
    "days": 27,
-   "ema": 15882.73,
-   "close": 16000.0,
-   "low": 15910.0
+   "ema": 15869.73,
+   "close": 15935.0,
+   "low": 15895.0
   },
   {
    "symbol": "AV",
@@ -91,11 +91,11 @@
    "status": "riding",
    "signal": "2026-10-13",
    "signal_close": 691.8,
-   "gain": 7.3,
+   "gain": 6.7,
    "days": 27,
-   "ema": 744.51,
-   "close": 742.6,
-   "low": 739.4
+   "ema": 743.67,
+   "close": 738.4,
+   "low": 737.2
   },
   {
    "symbol": "PRU",
@@ -103,11 +103,11 @@
    "status": "riding",
    "signal": "2026-10-28",
    "signal_close": 902.0,
-   "gain": 5.1,
+   "gain": 4.5,
    "days": 16,
-   "ema": 950.47,
-   "close": 948.4,
-   "low": 945.8
+   "ema": 949.27,
+   "close": 942.4,
+   "low": 942.2
   },
   {
    "symbol": "IAG",
@@ -115,11 +115,11 @@
    "status": "riding",
    "signal": "2026-11-04",
    "signal_close": 436.3,
-   "gain": 3.5,
+   "gain": 2.9,
    "days": 11,
-   "ema": 446.91,
-   "close": 451.5,
-   "low": 448.9
+   "ema": 446.37,
+   "close": 448.8,
+   "low": 445.9
   },
   {
    "symbol": "EZJ",
@@ -127,10 +127,10 @@
    "status": "riding",
    "signal": "2026-09-28",
    "signal_close": 674.0,
-   "gain": 2.3,
+   "gain": 2.2,
    "days": 38,
-   "ema": 688.44,
-   "close": 689.2,
+   "ema": 688.4,
+   "close": 689.0,
    "low": 688.4
   },
   {
@@ -139,11 +139,11 @@
    "status": "riding",
    "signal": "2026-11-10",
    "signal_close": 1330.8,
-   "gain": 2.1,
+   "gain": -0.4,
    "days": 7,
-   "ema": 1331.54,
-   "close": 1358.4,
-   "low": 1340.0
+   "ema": 1325.06,
+   "close": 1326.0,
+   "low": 1325.4
   },
   {
    "symbol": "LLOY",
@@ -151,10 +151,10 @@
    "status": "riding",
    "signal": "2026-11-16",
    "signal_close": 98.14,
-   "gain": -1.0,
+   "gain": -1.3,
    "days": 3,
-   "ema": 97.32,
-   "close": 97.12,
+   "ema": 97.27,
+   "close": 96.86,
    "low": 96.5
   }
  ],
