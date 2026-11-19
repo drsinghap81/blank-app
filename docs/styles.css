@@ -1184,3 +1184,7 @@ body.pub .owner-only { display: none !important; }
 
 .srvbar{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:60;max-width:min(560px,calc(100vw - 32px));padding:12px 16px;border-radius:14px;background:var(--saffron);color:#1b1300;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .srvbar.ok{background:var(--rise);color:#fff}.srvbar.bad{background:var(--fall);color:#fff}.srvbar button{all:unset;cursor:pointer;margin-left:8px}
+
+/* index early alert (W + trendline break) */
+.idxw-b{display:flex;flex-direction:column;gap:4px;margin:8px 0 4px;padding:8px 10px;border:1px solid var(--line,#d0d7de);border-radius:10px;font-size:.88em}
+.idxw-b small{opacity:.7}

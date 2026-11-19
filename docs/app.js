@@ -6050,7 +6050,7 @@ async function tdTop5(box, mk) {
     if (o.ath && o.ath.lvl === 0) { const m = S.meta[sym] || {}; if (m.trigger) return `ATH momentum: buy above ${Mz(m.trigger)} · exit on a weekly close below the 30-week average (${Mz(m.sma30)}) · holds months, not weeks`; }
     const m = S.meta[sym] || {}; return m.stop ? `Stop ${Mz(m.stop)}${m.trigger ? ` · trigger ${Mz(m.trigger)}` : ''}` : 'Open the chart for the plan'; };
   const red = L.lvl === 'red';
-  box.innerHTML = `<section class="mx5 ${L.lvl}">${lightHTML(L, mk)}
+  box.innerHTML = `<section class="mx5 ${L.lvl}">${lightHTML(L, mk)}${mk === 'NSE' ? '<div class="idxw"></div>' : ''}
     <div class="mx5h"><b>Top 5 swing trades today</b><small>${C.length} swing setups now (9/21 buys, tight-base breakouts, bases near their trigger) · ranked by score · tap for the chart</small></div>
     ${top.length ? `<ol class="mx5l${red ? ' dim' : ''}">${top.map((x, i) => `<li><button data-m5="${esc(x.sym)}"><span class="mx5n">${i + 1}</span>
       <span class="mx5b"><b>${esc(x.sym)} <em class="mx5s">${x.p} pts</em>${x.stack ? ' <small class="chip">MA stack ✓</small>' : ''}</b>
@@ -6059,6 +6059,21 @@ async function tdTop5(box, mk) {
     ${red && top.length ? '<p class="down td-rs"><b>Red day:</b> these are shown for the record. Your rule is to wait.</p>' : ''}
     <p class="muted td-rs">Score: 9/21 buy +3 (trend running +1), tight-base breakout +2 (near trigger or recent +1), also an ATH breakout +2, IPO cup +1, 3-month gain top 20% +2 (top 40% +1), sector leading/uptrend +1 (weak −1), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></section>`;
   box.querySelectorAll('[data-m5]').forEach((b) => b.addEventListener('click', () => mxOpen(b.dataset.m5, mk, S)));
+  idxW(box.querySelector('.idxw'));
+}
+/* 19 Nov 2026 (Amritpal, Bank Nifty chart): index early alert = W bottom + falling trendline break. Info only - entries stay on
+   9/21 + the light. Tested on 23 NSE indices 2015-26 (tools/research/index_w_bottom.py): the break came before the 9/21 cross 71% of
+   the time, ~1% lower; next 20 sessions median +1.6% (63% up) vs +1.2% (59%) any day; RSI divergence added nothing. */
+async function idxW(el) {
+  if (!el) return; const d = await getJSON(MAIN + 'data/scan/index_w.json', 'index_w');
+  const rows = (d && d.rows) || []; if (!rows.length) { el.innerHTML = ''; return; }
+  const nm = (x) => x.replace(/^NIFTY /, '').replace(/\b(\w)(\w*)/g, (m, a, b) => a + b.toLowerCase()).replace(/^50$/, 'Nifty 50').replace(/^Bank$/, 'Bank Nifty');
+  const n0 = (v) => Number(v).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  const br = rows.filter((r) => r.status === 'broken'), fm = rows.filter((r) => r.status === 'forming');
+  el.innerHTML = `<div class="idxw-b"><b>Index early alert · W bottom + trendline break</b>
+    ${br.map((r) => `<span><b class="up">▲ ${esc(nm(r.index))}</b> broke its falling trendline ${r.days_ago === 0 ? 'today' : r.days_ago === 1 ? 'yesterday' : r.days_ago + ' sessions ago'} (${esc(r.broke_on)}) at ${n0(r.broke_close)} · ${r.since >= 0 ? '+' : ''}${fmt(r.since, 1)}% since${r.above_neck ? ' · above the W middle peak' : ` · middle peak ${n0(r.neckline)}`}</span>`).join('')}
+    ${fm.map((r) => `<span>${esc(nm(r.index))}: W in place (lows ${esc(r.low1)} and ${esc(r.low2)}) · trendline ${n0(r.line_now)}, ${fmt(r.dist_pct, 1)}% above</span>`).join('')}
+    <small>Info only: get ready, but enter on 9/21 / your rules. Tested on 23 NSE indices 2015–26: the break came before the 9/21 cross 71% of the time and about 1% lower; next 20 sessions median +1.6% (63% up) vs +1.2% (59%) on any day. RSI divergence added nothing. On single stocks W bottoms showed no edge.</small></div>`;
 }
 async function mxOpen(sym, mk, S) {
   const e = S.EA[sym], t = S.TB[sym];
