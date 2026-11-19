@@ -6091,15 +6091,16 @@ function athLines(A, mk) {
   const Mz = (v) => (mk === 'NSE' ? inr(v, 2) : `${MKT[mk].cur}${fmt(v, 2, MKT[mk].loc)}`);
   const one = (lab, L, hk) => { if (!L || !L.length) return '';
     const x = L.map((r) => ({ s: r.symbol, h: r[hk], c: r.close })).filter((r) => r.h && r.c);
-    const yes = x.filter((r) => r.c > r.h).sort((a, b) => b.c / b.h - a.c / a.h), no = x.filter((r) => r.c <= r.h).sort((a, b) => a.h / a.c - b.h / b.c);
+    /* 20 Nov 2026 (Amritpal): list only the ones that HAVE crossed the ATH candle's high, plus any within 2% of it (shown as "near") */
+    const yes = x.filter((r) => r.c > r.h).sort((a, b) => b.c / b.h - a.c / a.h), no = x.filter((r) => r.c <= r.h && r.h / r.c - 1 <= 0.02).sort((a, b) => a.h / a.c - b.h / b.c);
     if (!yes.length && !no.length) return '';
     const at = (sym) => (hk === 'high_m' ? `data-ath="${esc(sym)}"` : `data-tv="${esc(sym)}"`);
-    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((r) => `<a href="#" class="al-t ok" ${at(r.s)}>✓ ${esc(r.s)} +${fmt((r.c / r.h - 1) * 100, 1)}%</a>`).join('')}${no.slice(0, 4).map((r) => `<a href="#" class="al-t" ${at(r.s)}>${esc(r.s)} above ${Mz(r.h)}</a>`).join('')}${yes.length + no.length > 10 ? `<small>+${yes.length + no.length - 10} more</small>` : ''}</div>`; };
+    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((r) => `<a href="#" class="al-t ok" ${at(r.s)}>✓ ${esc(r.s)} +${fmt((r.c / r.h - 1) * 100, 1)}%</a>`).join('')}${no.slice(0, 4).map((r) => `<a href="#" class="al-t" ${at(r.s)}>${esc(r.s)} near · needs ${Mz(r.h)}</a>`).join('')}${yes.length + no.length > 10 ? `<small>+${yes.length + no.length - 10} more</small>` : ''}</div>`; };
   const asof = A.asof ? new Date(A.asof + 'T00:00:00') : null;
   const recent = (A.breakouts || []).filter((b) => asof && (asof - new Date(b.date + 'T00:00:00')) / 864e5 <= 7).sort((a, b) => (a.date < b.date ? 1 : -1));
   const out = one('ATH month close →', A.month_close, 'high_m') + one('ATH week close →', A.week_close, 'high_p') + one('ATH day close →', A.day_close, 'high_p')
     + (recent.length ? `<div class="al-r"><b class="up">▲ ATH buys this week</b> <span>${recent.slice(0, 8).map((b) => `<a href="#" class="al-s" data-ath="${esc(b.symbol)}">${esc(b.symbol)}</a>`).join(', ')}${recent.length > 8 ? ` +${recent.length - 8}` : ''}</span></div>` : '');
-  return out ? `<div class="al-sub">All-time highs · ✓ = now above the ATH candle's high</div>${out}` : '';
+  return out ? `<div class="al-sub">All-time highs · ✓ = crossed the high of the candle that closed above the ATH</div>${out}` : '';
 }
 async function alertsCard(box, mk) {
   if (!box) return;
