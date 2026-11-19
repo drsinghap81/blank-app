@@ -1,0 +1,198 @@
+{
+ "method": "Morning check before a 9/21 entry (19 Nov 2026, Amritpal: \"check on the day if market, sector, industry and theme are up,\nthen only take the position\").\n\nOnly daily closes exist for the sector / theme indices (NSE archive from Nov 2015), so \"up that day\" is tested two ways:\n  P  on the SIGNAL day all of them closed up (known the next morning) -> buy at the next open\n  D  on the ENTRY day all of them are up -> buy near that day's close instead of the open (what an intraday check\n     during the day amounts to, bought late in the session); otherwise skip.  D0 = buy at the entry-day close with no check,\n     to separate the effect of the later fill from the check itself.\n\"Up\" = day change > 0. Market = Nifty 50; sector = the stock's sector index (sector_state.INDUSTRY_INDEX); industry = average\nday change of the liquid stocks in the same NSE industry; theme = every thematic index the stock belongs to (missing -> ignored).\nMapping uses today's lists (sectors.json). NSE stocks from Yahoo 2016 -> today, survivors; 9/21 engine (5-day-low stop,\nSupertrend exit, 1% risk, costs). Output: data/research/morning_check.json",
+ "coverage_pct": {
+  "mkt_up": 97.1,
+  "sec_up": 31.2,
+  "ind_up": 33.2,
+  "thm_up": 11.8
+ },
+ "10 positions, 3-month strength | baseline: buy next open": {
+  "cagr": 26.9,
+  "maxdd": -26.1,
+  "cagr_22_26": 17.3,
+  "dd_22_26": -20.0,
+  "trades": 563,
+  "win": 37,
+  "avg": 5.81
+ },
+ "10 positions, 3-month strength | P all four up on the signal day -> next open": {
+  "cagr": 22.2,
+  "maxdd": -39.3,
+  "cagr_22_26": 14.1,
+  "dd_22_26": -36.5,
+  "trades": 549,
+  "win": 34,
+  "avg": 5.56
+ },
+ "10 positions, 3-month strength | P market + sector up on the signal day -> next open": {
+  "cagr": 21.8,
+  "maxdd": -38.0,
+  "cagr_22_26": 12.9,
+  "dd_22_26": -34.1,
+  "trades": 555,
+  "win": 34,
+  "avg": 5.33
+ },
+ "10 positions, 3-month strength | D0 buy at the entry-day close, no check": {
+  "cagr": 25.6,
+  "maxdd": -22.8,
+  "cagr_22_26": 14.4,
+  "dd_22_26": -22.8,
+  "trades": 577,
+  "win": 37,
+  "avg": 5.4
+ },
+ "10 positions, 3-month strength | D market up on the entry day -> buy at its close": {
+  "cagr": 20.6,
+  "maxdd": -24.0,
+  "cagr_22_26": 12.7,
+  "dd_22_26": -24.0,
+  "trades": 506,
+  "win": 39,
+  "avg": 5.02
+ },
+ "10 positions, 3-month strength | D market + sector up on the entry day -> buy at its close": {
+  "cagr": 21.8,
+  "maxdd": -26.4,
+  "cagr_22_26": 12.3,
+  "dd_22_26": -26.4,
+  "trades": 481,
+  "win": 41,
+  "avg": 5.89
+ },
+ "10 positions, 3-month strength | D all four up on the entry day -> buy at its close": {
+  "cagr": 21.6,
+  "maxdd": -30.9,
+  "cagr_22_26": 10.2,
+  "dd_22_26": -30.9,
+  "trades": 472,
+  "win": 39,
+  "avg": 6.36
+ },
+ "5 positions, 3-month strength | baseline: buy next open": {
+  "cagr": 21.9,
+  "maxdd": -21.8,
+  "cagr_22_26": 12.7,
+  "dd_22_26": -17.8,
+  "trades": 280,
+  "win": 39,
+  "avg": 7.0
+ },
+ "5 positions, 3-month strength | P all four up on the signal day -> next open": {
+  "cagr": 16.9,
+  "maxdd": -28.5,
+  "cagr_22_26": 6.9,
+  "dd_22_26": -18.1,
+  "trades": 286,
+  "win": 34,
+  "avg": 5.96
+ },
+ "5 positions, 3-month strength | P market + sector up on the signal day -> next open": {
+  "cagr": 17.4,
+  "maxdd": -28.3,
+  "cagr_22_26": 7.7,
+  "dd_22_26": -17.8,
+  "trades": 281,
+  "win": 35,
+  "avg": 6.18
+ },
+ "5 positions, 3-month strength | D0 buy at the entry-day close, no check": {
+  "cagr": 22.1,
+  "maxdd": -29.3,
+  "cagr_22_26": 14.4,
+  "dd_22_26": -29.3,
+  "trades": 293,
+  "win": 40,
+  "avg": 6.48
+ },
+ "5 positions, 3-month strength | D market up on the entry day -> buy at its close": {
+  "cagr": 17.0,
+  "maxdd": -21.3,
+  "cagr_22_26": 7.7,
+  "dd_22_26": -21.3,
+  "trades": 260,
+  "win": 39,
+  "avg": 5.85
+ },
+ "5 positions, 3-month strength | D market + sector up on the entry day -> buy at its close": {
+  "cagr": 18.1,
+  "maxdd": -18.1,
+  "cagr_22_26": 12.7,
+  "dd_22_26": -16.3,
+  "trades": 258,
+  "win": 40,
+  "avg": 6.01
+ },
+ "5 positions, 3-month strength | D all four up on the entry day -> buy at its close": {
+  "cagr": 18.2,
+  "maxdd": -19.1,
+  "cagr_22_26": 11.5,
+  "dd_22_26": -19.1,
+  "trades": 248,
+  "win": 39,
+  "avg": 6.33
+ },
+ "10 positions, random | baseline: buy next open": {
+  "cagr": 22.0,
+  "maxdd": -26.1,
+  "cagr_22_26": 13.4,
+  "dd_22_26": -26.1,
+  "trades": 575,
+  "win": 35,
+  "avg": 4.74
+ },
+ "10 positions, random | P all four up on the signal day -> next open": {
+  "cagr": 18.1,
+  "maxdd": -39.7,
+  "cagr_22_26": 9.7,
+  "dd_22_26": -34.8,
+  "trades": 569,
+  "win": 32,
+  "avg": 4.25
+ },
+ "10 positions, random | P market + sector up on the signal day -> next open": {
+  "cagr": 21.1,
+  "maxdd": -34.8,
+  "cagr_22_26": 14.2,
+  "dd_22_26": -33.5,
+  "trades": 567,
+  "win": 33,
+  "avg": 5.09
+ },
+ "10 positions, random | D0 buy at the entry-day close, no check": {
+  "cagr": 16.6,
+  "maxdd": -33.3,
+  "cagr_22_26": 3.5,
+  "dd_22_26": -33.3,
+  "trades": 598,
+  "win": 35,
+  "avg": 3.82
+ },
+ "10 positions, random | D market up on the entry day -> buy at its close": {
+  "cagr": 15.1,
+  "maxdd": -28.5,
+  "cagr_22_26": 5.6,
+  "dd_22_26": -28.5,
+  "trades": 517,
+  "win": 36,
+  "avg": 3.55
+ },
+ "10 positions, random | D market + sector up on the entry day -> buy at its close": {
+  "cagr": 16.0,
+  "maxdd": -26.5,
+  "cagr_22_26": 5.1,
+  "dd_22_26": -26.5,
+  "trades": 489,
+  "win": 38,
+  "avg": 4.76
+ },
+ "10 positions, random | D all four up on the entry day -> buy at its close": {
+  "cagr": 17.1,
+  "maxdd": -32.3,
+  "cagr_22_26": 7.2,
+  "dd_22_26": -32.3,
+  "trades": 498,
+  "win": 38,
+  "avg": 4.16
+ }
+}
