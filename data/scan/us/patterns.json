@@ -1,22 +1,71 @@
 {
-"generated": "2026-11-18T22:42+00:00",
-"asof": "2026-11-18",
+"generated": "2026-11-19T22:48+00:00",
+"asof": "2026-11-19",
 "market": "US",
 "regime": null,
 "rules": "zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
 "backtest": "2008-26, 17,432 signals: 120-day return +2.5% vs +5.0% for a random liquid stock the same day; target before stop 57% vs 58%. Worse than random - watch only.",
 "rows": [
 {
+"symbol": "PDD",
+"name": "PDD Holdings Inc. American Depositary Shares",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 86.0,
+"neck": 83.94999694824219,
+"to_neck_pct": -2.3837244787881517,
+"stop": 73.97,
+"stop_pct": 13.985114873841752,
+"height_pct": 11.369063421444503,
+"fall_pct": 83.2449056988381,
+"lows": [
+[
+"2026-10-02",
+75.37999725341797
+],
+[
+"2026-10-28",
+77.47000122070312
+],
+[
+"2026-11-17",
+77.38999938964844
+]
+],
+"peaks": [
+[
+"2026-10-15",
+82.41999816894531
+],
+[
+"2026-11-05",
+83.94999694824219
+]
+],
+"rsi_lows": [
+33.4,
+40.8,
+42.7
+],
+"rsi_div": 0.0,
+"rsi_now": 64.0,
+"signal_date": "2026-11-19",
+"days_since": 0,
+"target": 92.52,
+"sl": 80.59
+},
+{
 "symbol": "CALM",
 "name": "Cal-Maine Foods Inc. Common Stock",
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 70.43000030517578,
+"close": 69.87000274658203,
 "neck": 68.83000183105469,
-"to_neck_pct": -2.271757017163478,
+"to_neck_pct": -1.4884798549377742,
 "stop": 59.53,
-"stop_pct": 15.478204175075916,
+"stop_pct": 14.800774699631503,
 "height_pct": 13.562120339756657,
 "fall_pct": 54.264971223298694,
 "lows": [
@@ -40,11 +89,91 @@
 46.0
 ],
 "rsi_div": 0.0,
-"rsi_now": 60.0,
+"rsi_now": 58.5,
 "signal_date": "2026-11-18",
-"days_since": 0,
+"days_since": 1,
 "target": 77.05,
 "sl": 66.08
+},
+{
+"symbol": "HROW",
+"name": "Harrow Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 32.130001068115234,
+"neck": 30.360000610351562,
+"to_neck_pct": -5.5088714563416685,
+"stop": 25.71,
+"stop_pct": 19.980396932712807,
+"height_pct": 16.58985999592748,
+"fall_pct": 110.44545818116296,
+"lows": [
+[
+"2026-11-05",
+26.040000915527344
+],
+[
+"2026-11-12",
+28.299999237060547
+]
+],
+"peaks": [
+[
+"2026-11-10",
+30.360000610351562
+]
+],
+"rsi_lows": [
+30.7,
+46.0
+],
+"rsi_div": 0.0,
+"rsi_now": 59.8,
+"signal_date": "2026-11-18",
+"days_since": 1,
+"target": 34.68,
+"sl": 29.15
+},
+{
+"symbol": "JJSF",
+"name": "J & J Snack Foods Corp. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 94.44000244140625,
+"neck": 91.91000366210938,
+"to_neck_pct": -2.6789482358035466,
+"stop": 70.94,
+"stop_pct": 24.87992186414443,
+"height_pct": 28.13327667748553,
+"fall_pct": 66.513309426551,
+"lows": [
+[
+"2026-06-22",
+71.7300033569336
+],
+[
+"2026-09-30",
+76.44999694824219
+]
+],
+"peaks": [
+[
+"2026-08-07",
+91.91000366210938
+]
+],
+"rsi_lows": [
+36.5,
+30.8
+],
+"rsi_div": 0.0,
+"rsi_now": 63.8,
+"signal_date": "2026-11-18",
+"days_since": 1,
+"target": 112.09,
+"sl": 88.23
 },
 {
 "symbol": "KLAR",
@@ -52,11 +181,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 14.449999809265137,
+"close": 12.670000076293945,
 "neck": 13.890000343322754,
-"to_neck_pct": -3.8754288812053783,
+"to_neck_pct": 9.629047037746075,
 "stop": 12.34,
-"stop_pct": 14.633908646447058,
+"stop_pct": 2.640884266090038,
 "height_pct": 10.063395160699784,
 "fall_pct": 214.81774883135222,
 "lows": [
@@ -80,11 +209,53 @@
 42.0
 ],
 "rsi_div": 0.0,
-"rsi_now": 60.0,
+"rsi_now": 43.3,
 "signal_date": "2026-11-17",
-"days_since": 1,
+"days_since": 2,
 "target": 15.16,
-"sl": 13.33
+"sl": 13.33,
+"outcome": "sl",
+"outcome_date": "2026-11-19"
+},
+{
+"symbol": "TU",
+"name": "Telus Corporation Ordinary Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 10.779999732971191,
+"neck": 9.420000076293945,
+"to_neck_pct": -12.615952600792891,
+"stop": 7.56,
+"stop_pct": 29.83673418203272,
+"height_pct": 22.020729693052132,
+"fall_pct": 98.57513394214075,
+"lows": [
+[
+"2026-10-09",
+7.71999979019165
+],
+[
+"2026-11-12",
+8.520000457763672
+]
+],
+"peaks": [
+[
+"2026-11-05",
+9.420000076293945
+]
+],
+"rsi_lows": [
+24.1,
+45.1
+],
+"rsi_div": 0.0,
+"rsi_now": 72.9,
+"signal_date": "2026-11-16",
+"days_since": 3,
+"target": 11.12,
+"sl": 9.04
 },
 {
 "symbol": "CHRW",
@@ -92,11 +263,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 137.47000122070312,
+"close": 137.94000244140625,
 "neck": 133.83999633789062,
-"to_neck_pct": -2.6405796541637216,
+"to_neck_pct": -2.97231117221215,
 "stop": 120.99,
-"stop_pct": 11.989599171250298,
+"stop_pct": 12.289475893680068,
 "height_pct": 7.407106718826473,
 "fall_pct": 68.06034599405054,
 "lows": [
@@ -120,9 +291,9 @@
 36.3
 ],
 "rsi_div": 0.0,
-"rsi_now": 52.5,
+"rsi_now": 53.2,
 "signal_date": "2026-11-12",
-"days_since": 4,
+"days_since": 5,
 "target": 143.07,
 "sl": 128.49
 },
@@ -132,11 +303,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 14.010000228881836,
+"close": 12.970000267028809,
 "neck": 14.899999618530273,
-"to_neck_pct": 6.352600821616616,
+"to_neck_pct": 14.880488140063797,
 "stop": 12.19,
-"stop_pct": 13.012846421679248,
+"stop_pct": 6.03777822271141,
 "height_pct": 20.941558341027754,
 "fall_pct": 122.15910322410046,
 "lows": [
@@ -160,9 +331,9 @@
 41.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 47.8,
+"rsi_now": 38.1,
 "signal_date": "2026-11-11",
-"days_since": 5,
+"days_since": 6,
 "target": 17.48,
 "sl": 14.3,
 "outcome": "sl",
@@ -174,11 +345,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 12.970000267028809,
+"close": 12.539999961853027,
 "neck": 14.0600004196167,
-"to_neck_pct": 8.404010255564852,
+"to_neck_pct": 12.121215808513153,
 "stop": 12.46,
-"stop_pct": 3.9005405208267563,
+"stop_pct": 0.6052616508923858,
 "height_pct": 11.234177513642862,
 "fall_pct": 26.702792125130337,
 "lows": [
@@ -202,13 +373,55 @@
 31.1
 ],
 "rsi_div": 0.0,
-"rsi_now": 38.7,
+"rsi_now": 33.5,
 "signal_date": "2026-11-11",
-"days_since": 5,
+"days_since": 6,
 "target": 15.48,
 "sl": 13.5,
 "outcome": "sl",
 "outcome_date": "2026-11-18"
+},
+{
+"symbol": "HWM",
+"name": "Howmet Aerospace Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 218.1699981689453,
+"neck": 223.1199951171875,
+"to_neck_pct": 2.2688715175259944,
+"stop": 181.68,
+"stop_pct": 16.7232865405058,
+"height_pct": 20.015056060515768,
+"fall_pct": 57.41487178300231,
+"lows": [
+[
+"2026-10-23",
+185.91000366210938
+],
+[
+"2026-11-05",
+200.89999389648438
+]
+],
+"peaks": [
+[
+"2026-11-03",
+223.1199951171875
+]
+],
+"rsi_lows": [
+19.5,
+42.7
+],
+"rsi_div": 0.0,
+"rsi_now": 51.6,
+"signal_date": "2026-11-11",
+"days_since": 6,
+"target": 260.33,
+"sl": 214.2,
+"outcome": "sl",
+"outcome_date": "2026-11-16"
 },
 {
 "symbol": "RDDT",
@@ -216,11 +429,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 94.08999633789062,
+"close": 89.87999725341797,
 "neck": 101.88999938964844,
-"to_neck_pct": 8.289938734556745,
+"to_neck_pct": 13.362263577254119,
 "stop": 89.59,
-"stop_pct": 4.7773371376787495,
+"stop_pct": 0.3170864064608425,
 "height_pct": 12.003955174686887,
 "fall_pct": 184.63228449078386,
 "lows": [
@@ -244,13 +457,64 @@
 25.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 32.6,
+"rsi_now": 30.5,
 "signal_date": "2026-11-11",
-"days_since": 5,
+"days_since": 6,
 "target": 112.81,
 "sl": 97.81,
 "outcome": "sl",
 "outcome_date": "2026-11-16"
+},
+{
+"symbol": "TIMB",
+"name": "TIM S.A. American Depositary Shares (Each representing 5 Com",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 18.469999313354492,
+"neck": 19.459999084472656,
+"to_neck_pct": 5.360042273539012,
+"stop": 15.78,
+"stop_pct": 14.560908655965621,
+"height_pct": 15.902311038447326,
+"fall_pct": 60.13746019802344,
+"lows": [
+[
+"2026-10-01",
+17.459999084472656
+],
+[
+"2026-10-09",
+17.979999542236328
+],
+[
+"2026-10-26",
+16.790000915527344
+]
+],
+"peaks": [
+[
+"2026-10-05",
+19.299999237060547
+],
+[
+"2026-10-22",
+19.459999084472656
+]
+],
+"rsi_lows": [
+33.2,
+44.0,
+33.7
+],
+"rsi_div": 0.0,
+"rsi_now": 48.8,
+"signal_date": "2026-11-11",
+"days_since": 6,
+"target": 22.13,
+"sl": 18.68,
+"outcome": "sl",
+"outcome_date": "2026-11-19"
 },
 {
 "symbol": "CAE",
@@ -258,11 +522,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "breakout",
-"close": 27.600000381469727,
+"close": 27.18000030517578,
 "neck": 27.68000030517578,
-"to_neck_pct": 0.2898547920302308,
+"to_neck_pct": 1.839587911648355,
 "stop": 22.53,
-"stop_pct": 18.360869872592566,
+"stop_pct": 17.099337845473595,
 "height_pct": 19.56803784575225,
 "fall_pct": 47.02072306302403,
 "lows": [
@@ -295,9 +559,9 @@
 35.8
 ],
 "rsi_div": 5.6,
-"rsi_now": 62.2,
+"rsi_now": 57.1,
 "signal_date": "2026-11-10",
-"days_since": 6,
+"days_since": 7,
 "target": 32.21,
 "sl": 26.57
 },
@@ -307,11 +571,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 271.67999267578125,
+"close": 267.8399963378906,
 "neck": 298.7200012207031,
-"to_neck_pct": 9.952889161474253,
+"to_neck_pct": 11.529273187360767,
 "stop": 268.18,
-"stop_pct": 1.2878674426363257,
+"stop_pct": -0.12735893396300657,
 "height_pct": 7.3335503004387625,
 "fall_pct": 121.16071428571429,
 "lows": [
@@ -335,9 +599,9 @@
 26.1
 ],
 "rsi_div": 12.9,
-"rsi_now": 32.5,
+"rsi_now": 31.5,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 319.13,
 "sl": 286.77,
 "outcome": "sl",
@@ -349,11 +613,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "breakout",
-"close": 21.770000457763672,
+"close": 21.030000686645508,
 "neck": 21.979999542236328,
-"to_neck_pct": 0.9646259993429052,
+"to_neck_pct": 4.5173505685812465,
 "stop": 18.32,
-"stop_pct": 15.847731814697186,
+"stop_pct": 12.886597379939758,
 "height_pct": 17.855227838168062,
 "fall_pct": 119.1924483795638,
 "lows": [
@@ -386,11 +650,13 @@
 37.0
 ],
 "rsi_div": 10.1,
-"rsi_now": 54.2,
+"rsi_now": 49.1,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 25.31,
-"sl": 21.1
+"sl": 21.1,
+"outcome": "sl",
+"outcome_date": "2026-11-19"
 },
 {
 "symbol": "EYE",
@@ -398,11 +664,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 17.600000381469727,
+"close": 17.010000228881836,
 "neck": 18.8700008392334,
-"to_neck_pct": 7.2159115354383685,
+"to_neck_pct": 10.934747709135273,
 "stop": 14.77,
-"stop_pct": 16.07500138987192,
+"stop_pct": 13.16402188842314,
 "height_pct": 22.056926213922235,
 "fall_pct": 85.86749763687331,
 "lows": [
@@ -426,9 +692,9 @@
 35.0
 ],
 "rsi_div": 5.6,
-"rsi_now": 49.1,
+"rsi_now": 45.1,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 22.28,
 "sl": 18.12,
 "outcome": "sl",
@@ -440,11 +706,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 12.020000457763672,
+"close": 11.859999656677246,
 "neck": 13.029999732971191,
-"to_neck_pct": 8.402655879727238,
+"to_neck_pct": 9.865093677597446,
 "stop": 10.5,
-"stop_pct": 12.613150914432413,
+"stop_pct": 11.434233017058148,
 "height_pct": 19.98158512794912,
 "fall_pct": 69.61326573310203,
 "lows": [
@@ -468,9 +734,9 @@
 39.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 45.0,
+"rsi_now": 43.0,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 15.2,
 "sl": 12.51,
 "outcome": "sl",
@@ -482,11 +748,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 37.02000045776367,
+"close": 36.65999984741211,
 "neck": 34.9900016784668,
-"to_neck_pct": -5.4835190550927,
+"to_neck_pct": -4.555368728576791,
 "stop": 28.96,
-"stop_pct": 21.77876920061691,
+"stop_pct": 21.01063796909929,
 "height_pct": 18.409484202570113,
 "fall_pct": 92.35195133711274,
 "lows": [
@@ -510,9 +776,9 @@
 40.0
 ],
 "rsi_div": 0.0,
-"rsi_now": 59.9,
+"rsi_now": 57.8,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 40.43,
 "sl": 33.59
 },
@@ -522,11 +788,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 27.200000762939453,
+"close": 27.18000030517578,
 "neck": 26.809999465942383,
-"to_neck_pct": -1.4338282575655503,
+"to_neck_pct": -1.3612981423070103,
 "stop": 20.1,
-"stop_pct": 26.11397543755769,
+"stop_pct": 26.05960625812448,
 "height_pct": 25.397570244717826,
 "fall_pct": 118.75585731354485,
 "lows": [
@@ -550,9 +816,9 @@
 47.5
 ],
 "rsi_div": 0.0,
-"rsi_now": 56.6,
+"rsi_now": 56.5,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 32.24,
 "sl": 25.74
 },
@@ -562,11 +828,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "breakout",
-"close": 205.24000549316406,
+"close": 201.0,
 "neck": 196.94000244140625,
-"to_neck_pct": -4.044047373617065,
+"to_neck_pct": -2.0198992828824647,
 "stop": 152.81,
-"stop_pct": 25.547406961275886,
+"stop_pct": 23.97686266543261,
 "height_pct": 27.304464335119704,
 "fall_pct": 63.95604679585642,
 "lows": [
@@ -599,9 +865,9 @@
 31.9
 ],
 "rsi_div": 4.7,
-"rsi_now": 73.3,
+"rsi_now": 66.1,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 239.18,
 "sl": 189.06
 },
@@ -611,11 +877,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 23.399999618530273,
+"close": 23.59000015258789,
 "neck": 25.93000030517578,
-"to_neck_pct": 10.811968922606386,
+"to_neck_pct": 9.919457979872814,
 "stop": 21.84,
-"stop_pct": 6.6649949923946465,
+"stop_pct": 7.416741524103343,
 "height_pct": 15.244445800781259,
 "fall_pct": 133.33333333333334,
 "lows": [
@@ -639,13 +905,64 @@
 35.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 37.5,
+"rsi_now": 38.4,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 29.36,
 "sl": 24.89,
 "outcome": "sl",
 "outcome_date": "2026-11-16"
+},
+{
+"symbol": "SHAK",
+"name": "Shake Shack Inc. Class A Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 72.94000244140625,
+"neck": 75.81999969482422,
+"to_neck_pct": 3.948446883767942,
+"stop": 53.05,
+"stop_pct": 27.263369378577785,
+"height_pct": 40.01846271156424,
+"fall_pct": 162.28992571942794,
+"lows": [
+[
+"2026-06-23",
+54.150001525878906
+],
+[
+"2026-07-22",
+55.939998626708984
+],
+[
+"2026-09-18",
+54.880001068115234
+]
+],
+"peaks": [
+[
+"2026-07-13",
+62.18000030517578
+],
+[
+"2026-08-21",
+75.81999969482422
+]
+],
+"rsi_lows": [
+34.1,
+43.3,
+26.4
+],
+"rsi_div": 0.0,
+"rsi_now": 54.1,
+"signal_date": "2026-11-09",
+"days_since": 8,
+"target": 97.49,
+"sl": 72.79,
+"outcome": "sl",
+"outcome_date": "2026-11-12"
 },
 {
 "symbol": "TAC",
@@ -653,11 +970,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 12.789999961853027,
+"close": 12.899999618530273,
 "neck": 13.34000015258789,
-"to_neck_pct": 4.300236062355545,
+"to_neck_pct": 3.410856954023278,
 "stop": 11.36,
-"stop_pct": 11.217354978683257,
+"stop_pct": 11.974413952329588,
 "height_pct": 15.698182667262529,
 "fall_pct": 53.77276628667749,
 "lows": [
@@ -681,9 +998,9 @@
 44.3
 ],
 "rsi_div": 0.0,
-"rsi_now": 46.9,
+"rsi_now": 48.9,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 15.15,
 "sl": 12.81,
 "outcome": "sl",
@@ -695,11 +1012,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 26.170000076293945,
+"close": 25.84000015258789,
 "neck": 27.969999313354492,
-"to_neck_pct": 6.878101764665545,
+"to_neck_pct": 8.24303075924433,
 "stop": 23.76,
-"stop_pct": 9.190106611094818,
+"stop_pct": 8.030383015385311,
 "height_pct": 15.530773940810905,
 "fall_pct": 74.01901140564588,
 "lows": [
@@ -723,9 +1040,9 @@
 44.0
 ],
 "rsi_div": 0.0,
-"rsi_now": 45.0,
+"rsi_now": 44.0,
 "signal_date": "2026-11-09",
-"days_since": 7,
+"days_since": 8,
 "target": 31.73,
 "sl": 26.85,
 "outcome": "sl",
@@ -737,11 +1054,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 85.81999969482422,
+"close": 82.93000030517578,
 "neck": 98.95999908447266,
-"to_neck_pct": 15.311115633155747,
+"to_neck_pct": 19.329553503325414,
 "stop": 88.93,
-"stop_pct": -3.6258472721802937,
+"stop_pct": -7.237069197494961,
 "height_pct": 9.723912191668926,
 "fall_pct": 133.00193752322352,
 "lows": [
@@ -765,53 +1082,55 @@
 31.1
 ],
 "rsi_div": 5.8,
-"rsi_now": 31.1,
+"rsi_now": 28.0,
 "signal_date": "2026-11-06",
-"days_since": 8,
+"days_since": 9,
 "target": 107.73,
 "sl": 95.0,
 "outcome": "sl",
 "outcome_date": "2026-11-10"
 },
 {
-"symbol": "INSM",
-"name": "Insmed Incorporated Common Stock",
+"symbol": "HSAI",
+"name": "Hesai Group American Depositary Share",
 "kind": "stock",
-"typ": "TW",
+"typ": "DB",
 "status": "breakout",
-"close": 119.80000305175781,
-"neck": 112.58000183105469,
-"to_neck_pct": -6.026712050736616,
-"stop": 92.03,
-"stop_pct": 23.17996932448527,
-"height_pct": 20.625736228791915,
-"fall_pct": 126.51880372273246,
+"close": 12.770000457763672,
+"neck": 13.829999923706055,
+"to_neck_pct": 8.300700297140118,
+"stop": 11.88,
+"stop_pct": 6.969463005951471,
+"height_pct": 14.581609555769482,
+"fall_pct": 137.14991846241938,
 "lows": [
 [
-"2026-10-26",
-93.33000183105469
+"2026-10-22",
+12.140000343322754
 ],
 [
 "2026-11-03",
-104.44000244140625
+12.069999694824219
 ]
 ],
 "peaks": [
 [
-"2026-10-30",
-112.58000183105469
+"2026-10-28",
+13.829999923706055
 ]
 ],
 "rsi_lows": [
-28.2,
-50.2
+32.0,
+36.7
 ],
-"rsi_div": 0.0,
-"rsi_now": 61.1,
+"rsi_div": 4.8,
+"rsi_now": 42.9,
 "signal_date": "2026-11-06",
-"days_since": 8,
-"target": 131.83,
-"sl": 108.08
+"days_since": 9,
+"target": 15.59,
+"sl": 13.28,
+"outcome": "sl",
+"outcome_date": "2026-11-16"
 },
 {
 "symbol": "KRMN",
@@ -819,11 +1138,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 34.189998626708984,
+"close": 32.9900016784668,
 "neck": 41.689998626708984,
-"to_neck_pct": 21.936239547377625,
+"to_neck_pct": 26.371617173699157,
 "stop": 29.2,
-"stop_pct": 14.580283202511568,
+"stop_pct": 11.473178193068545,
 "height_pct": 38.32116612791767,
 "fall_pct": 282.5149411088695,
 "lows": [
@@ -847,13 +1166,55 @@
 39.5
 ],
 "rsi_div": 0.0,
-"rsi_now": 42.8,
+"rsi_now": 41.0,
 "signal_date": "2026-11-06",
-"days_since": 8,
+"days_since": 9,
 "target": 53.24,
 "sl": 40.02,
 "outcome": "sl",
 "outcome_date": "2026-11-16"
+},
+{
+"symbol": "LI",
+"name": "Li Auto Inc. American Depositary Shares",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 11.239999771118164,
+"neck": 11.930000305175781,
+"to_neck_pct": 6.138794911994694,
+"stop": 10.55,
+"stop_pct": 6.108540357308845,
+"height_pct": 11.599633053942737,
+"fall_pct": 132.8344281259175,
+"lows": [
+[
+"2026-10-02",
+10.6899995803833
+],
+[
+"2026-10-30",
+11.029999732971191
+]
+],
+"peaks": [
+[
+"2026-10-20",
+11.930000305175781
+]
+],
+"rsi_lows": [
+33.2,
+42.7
+],
+"rsi_div": 0.0,
+"rsi_now": 43.0,
+"signal_date": "2026-11-06",
+"days_since": 9,
+"target": 13.17,
+"sl": 11.45,
+"outcome": "sl",
+"outcome_date": "2026-11-19"
 },
 {
 "symbol": "STEP",
@@ -861,11 +1222,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 43.61000061035156,
+"close": 43.84000015258789,
 "neck": 46.400001525878906,
-"to_neck_pct": 6.397617235678488,
+"to_neck_pct": 5.839419170576576,
 "stop": 39.65,
-"stop_pct": 9.08163565749075,
+"stop_pct": 9.558624300439433,
 "height_pct": 12.267117034131614,
 "fall_pct": 84.53905943395914,
 "lows": [
@@ -889,175 +1250,53 @@
 46.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 44.8,
+"rsi_now": 45.6,
 "signal_date": "2026-11-06",
-"days_since": 8,
+"days_since": 9,
 "target": 51.47,
 "sl": 44.54,
 "outcome": "sl",
 "outcome_date": "2026-11-17"
 },
 {
-"symbol": "PDD",
-"name": "PDD Holdings Inc. American Depositary Shares",
-"kind": "stock",
-"typ": "DB",
-"status": "breakout",
-"close": 77.44999694824219,
-"neck": 82.41999816894531,
-"to_neck_pct": 6.417045082680173,
-"stop": 73.97,
-"stop_pct": 4.4896008737996596,
-"height_pct": 9.339348861820396,
-"fall_pct": 83.2449056988381,
-"lows": [
-[
-"2026-10-02",
-75.37999725341797
-],
-[
-"2026-10-28",
-77.47000122070312
-]
-],
-"peaks": [
-[
-"2026-10-15",
-82.41999816894531
-]
-],
-"rsi_lows": [
-33.4,
-40.8
-],
-"rsi_div": 0.0,
-"rsi_now": 42.9,
-"signal_date": "2026-11-05",
-"days_since": 9,
-"target": 89.46,
-"sl": 79.12,
-"outcome": "sl",
-"outcome_date": "2026-11-11"
-},
-{
-"symbol": "PRVA",
-"name": "Privia Health Group Inc. Common Stock",
-"kind": "stock",
-"typ": "TW",
-"status": "breakout",
-"close": 24.600000381469727,
-"neck": 22.93000030517578,
-"to_neck_pct": -6.788618091046428,
-"stop": 18.79,
-"stop_pct": 23.637194770918523,
-"height_pct": 20.05235522100728,
-"fall_pct": 47.12041790706738,
-"lows": [
-[
-"2026-09-23",
-19.100000381469727
-],
-[
-"2026-11-02",
-21.280000686645508
-]
-],
-"peaks": [
-[
-"2026-10-20",
-22.93000030517578
-]
-],
-"rsi_lows": [
-22.5,
-46.5
-],
-"rsi_div": 0.0,
-"rsi_now": 63.6,
-"signal_date": "2026-11-05",
-"days_since": 9,
-"target": 26.76,
-"sl": 22.01
-},
-{
-"symbol": "WM",
-"name": "Waste Management Inc. Common Stock",
-"kind": "stock",
-"typ": "TW",
-"status": "breakout",
-"close": 241.2100067138672,
-"neck": 241.02000427246094,
-"to_neck_pct": -0.07877054687521756,
-"stop": 199.43,
-"stop_pct": 17.322832027628653,
-"height_pct": 19.375934402471383,
-"fall_pct": 22.09509755271386,
-"lows": [
-[
-"2026-10-01",
-201.89999389648438
-],
-[
-"2026-10-28",
-225.14999389648438
-]
-],
-"peaks": [
-[
-"2026-10-26",
-241.02000427246094
-]
-],
-"rsi_lows": [
-24.4,
-53.1
-],
-"rsi_div": 0.0,
-"rsi_now": 60.3,
-"signal_date": "2026-11-05",
-"days_since": 9,
-"target": 280.14,
-"sl": 231.38
-},
-{
-"symbol": "VCYT",
-"name": "Veracyte Inc. Common Stock",
+"symbol": "ORLY",
+"name": "O'Reilly Automotive Inc. Common Stock",
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 25.56999969482422,
-"neck": 25.920000076293945,
-"to_neck_pct": 1.368793060801532,
-"stop": 21.69,
-"stop_pct": 15.17051189746953,
-"height_pct": 8.00000031789143,
-"fall_pct": 152.04167366027832,
+"close": 92.61000061035156,
+"neck": 93.52999877929688,
+"to_neck_pct": 0.99341125459671,
+"stop": 81.76,
+"stop_pct": 11.711374759053317,
+"height_pct": 13.05450862339188,
+"fall_pct": 30.32756596133732,
 "lows": [
 [
-"2026-11-05",
-24.0
+"2026-07-15",
+82.7300033569336
 ],
 [
-"2026-11-16",
-24.010000228881836
+"2026-09-21",
+82.87999725341797
 ]
 ],
 "peaks": [
 [
-"2026-11-09",
-25.920000076293945
+"2026-08-07",
+93.52999877929688
 ]
 ],
 "rsi_lows": [
-24.5,
-27.8
+37.8,
+34.8
 ],
 "rsi_div": 0.0,
-"rsi_now": 31.7,
+"rsi_now": 59.3,
 "signal_date": null,
 "days_since": null,
-"target": 27.84,
-"sl": 24.88
+"target": 104.33,
+"sl": 89.79
 },
 {
 "symbol": "BANF",
@@ -1065,11 +1304,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 118.36000061035156,
+"close": 117.87999725341797,
 "neck": 120.04000091552734,
-"to_neck_pct": 1.419398695938212,
+"to_neck_pct": 1.8323750529666283,
 "stop": 103.69,
-"stop_pct": 12.39219554713059,
+"stop_pct": 12.03545953414481,
 "height_pct": 14.019759030556699,
 "fall_pct": 27.790254520308967,
 "lows": [
@@ -1093,91 +1332,100 @@
 33.3
 ],
 "rsi_div": 0.0,
-"rsi_now": 67.7,
+"rsi_now": 65.0,
 "signal_date": null,
 "days_since": null,
 "target": 134.8,
 "sl": 115.24
 },
 {
-"symbol": "BROS",
-"name": "Dutch Bros Inc. Class A Common Stock",
+"symbol": "WM",
+"name": "Waste Management Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 238.6699981689453,
+"neck": 246.50999450683594,
+"to_neck_pct": 3.284868813859454,
+"stop": 192.17,
+"stop_pct": 19.48342813149935,
+"height_pct": 25.278238122870423,
+"fall_pct": 23.037048760891278,
+"lows": [
+[
+"2025-11-03",
+196.77000427246094
+],
+[
+"2026-05-29",
+211.4600067138672
+],
+[
+"2026-10-01",
+201.89999389648438
+]
+],
+"peaks": [
+[
+"2026-03-09",
+246.50999450683594
+],
+[
+"2026-07-16",
+242.25
+]
+],
+"rsi_lows": [
+25.5,
+32.8,
+24.4
+],
+"rsi_div": 0.0,
+"rsi_now": 56.1,
+"signal_date": null,
+"days_since": null,
+"target": 296.25,
+"sl": 236.65
+},
+{
+"symbol": "VCYT",
+"name": "Veracyte Inc. Common Stock",
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 35.470001220703125,
-"neck": 36.0099983215332,
-"to_neck_pct": 1.522405081043221,
-"stop": 32.84,
-"stop_pct": 7.419517741406767,
-"height_pct": 6.822899138315197,
-"fall_pct": 117.08616098564457,
+"close": 25.040000915527344,
+"neck": 25.920000076293945,
+"to_neck_pct": 3.514373516739422,
+"stop": 21.69,
+"stop_pct": 13.375003770517324,
+"height_pct": 8.00000031789143,
+"fall_pct": 152.04167366027832,
 "lows": [
 [
-"2026-11-06",
-33.77000045776367
+"2026-11-05",
+24.0
 ],
 [
-"2026-11-12",
-33.709999084472656
+"2026-11-16",
+24.010000228881836
 ]
 ],
 "peaks": [
 [
 "2026-11-09",
-36.0099983215332
+25.920000076293945
 ]
 ],
 "rsi_lows": [
-29.8,
-33.1
-],
-"rsi_div": 3.3,
-"rsi_now": 40.5,
-"signal_date": null,
-"days_since": null,
-"target": 38.31,
-"sl": 34.57
-},
-{
-"symbol": "MZTI",
-"name": "The Marzetti Company Common Stock",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 110.26000213623047,
-"neck": 112.33000183105469,
-"to_neck_pct": 1.877380423289532,
-"stop": 96.82,
-"stop_pct": 12.187555645416248,
-"height_pct": 13.247302214162682,
-"fall_pct": 75.52172781360741,
-"lows": [
-[
-"2026-09-30",
-99.19000244140625
-],
-[
-"2026-11-06",
-104.93000030517578
-]
-],
-"peaks": [
-[
-"2026-10-22",
-112.33000183105469
-]
-],
-"rsi_lows": [
-36.3,
-46.0
+24.5,
+27.8
 ],
 "rsi_div": 0.0,
-"rsi_now": 54.4,
+"rsi_now": 31.0,
 "signal_date": null,
 "days_since": null,
-"target": 125.47,
-"sl": 107.84
+"target": 27.84,
+"sl": 24.88
 },
 {
 "symbol": "DPZ",
@@ -1185,11 +1433,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 353.5400085449219,
+"close": 352.2799987792969,
 "neck": 367.6300048828125,
-"to_neck_pct": 3.985403631085882,
+"to_neck_pct": 4.357331144744436,
 "stop": 279.18,
-"stop_pct": 21.03298261799794,
+"stop_pct": 20.75053906909258,
 "height_pct": 29.890826579653694,
 "fall_pct": 71.54718611927314,
 "lows": [
@@ -1213,269 +1461,11 @@
 31.8
 ],
 "rsi_div": 0.0,
-"rsi_now": 71.9,
+"rsi_now": 70.4,
 "signal_date": null,
 "days_since": null,
 "target": 452.23,
 "sl": 352.92
-},
-{
-"symbol": "CRUS",
-"name": "Cirrus Logic Inc. Common Stock",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 116.80000305175781,
-"neck": 122.20999908447266,
-"to_neck_pct": 4.631845797399081,
-"stop": 104.71,
-"stop_pct": 10.349063406929549,
-"height_pct": 14.93463460919462,
-"fall_pct": 64.91518101068516,
-"lows": [
-[
-"2026-08-28",
-108.4800033569336
-],
-[
-"2026-10-12",
-106.33000183105469
-]
-],
-"peaks": [
-[
-"2026-09-15",
-122.20999908447266
-]
-],
-"rsi_lows": [
-21.3,
-29.3
-],
-"rsi_div": 8.0,
-"rsi_now": 52.6,
-"signal_date": null,
-"days_since": null,
-"target": 138.09,
-"sl": 117.32
-},
-{
-"symbol": "KMB",
-"name": "Kimberly-Clark Corporation Common Stock",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 107.23999786376953,
-"neck": 112.31999969482422,
-"to_neck_pct": 4.737040220299127,
-"stop": 93.25,
-"stop_pct": 13.047273149475169,
-"height_pct": 19.058728063265917,
-"fall_pct": 29.97668805010654,
-"lows": [
-[
-"2026-10-01",
-94.33999633789062
-],
-[
-"2026-11-03",
-104.45999908447266
-]
-],
-"peaks": [
-[
-"2026-10-22",
-112.31999969482422
-]
-],
-"rsi_lows": [
-28.1,
-49.0
-],
-"rsi_div": 0.0,
-"rsi_now": 49.9,
-"signal_date": null,
-"days_since": null,
-"target": 130.3,
-"sl": 107.83
-},
-{
-"symbol": "TLK",
-"name": "PT Telekomunikasi Indonesia Tbk",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 11.6899995803833,
-"neck": 12.25,
-"to_neck_pct": 4.790422923166071,
-"stop": 10.05,
-"stop_pct": 14.041916312750702,
-"height_pct": 17.788465858916712,
-"fall_pct": 124.2105333284539,
-"lows": [
-[
-"2026-10-19",
-10.449999809265137
-],
-[
-"2026-11-03",
-10.399999618530273
-]
-],
-"peaks": [
-[
-"2026-10-26",
-12.25
-]
-],
-"rsi_lows": [
-15.6,
-28.5
-],
-"rsi_div": 12.9,
-"rsi_now": 48.9,
-"signal_date": null,
-"days_since": null,
-"target": 14.1,
-"sl": 11.76
-},
-{
-"symbol": "LKFN",
-"name": "Lakeland Financial Corporation Common Stock",
-"kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 60.7400016784668,
-"neck": 63.70000076293945,
-"to_neck_pct": 4.873228519389428,
-"stop": 56.06,
-"stop_pct": 7.698881283848458,
-"height_pct": 12.068966558648464,
-"fall_pct": 20.03144493821436,
-"lows": [
-[
-"2026-05-15",
-57.2599983215332
-],
-[
-"2026-07-08",
-58.79999923706055
-],
-[
-"2026-10-09",
-56.84000015258789
-]
-],
-"peaks": [
-[
-"2026-07-01",
-63.119998931884766
-],
-[
-"2026-07-28",
-63.70000076293945
-]
-],
-"rsi_lows": [
-37.0,
-40.8,
-35.1
-],
-"rsi_div": 0.0,
-"rsi_now": 50.1,
-"signal_date": null,
-"days_since": null,
-"target": 70.56,
-"sl": 61.15
-},
-{
-"symbol": "MGEE",
-"name": "MGE Energy Inc",
-"kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 80.19999694824219,
-"neck": 84.2300033569336,
-"to_neck_pct": 5.02494583795583,
-"stop": 67.61,
-"stop_pct": 15.701865986350427,
-"height_pct": 22.981465884218345,
-"fall_pct": 29.026925182226183,
-"lows": [
-[
-"2026-03-18",
-72.44999694824219
-],
-[
-"2026-06-01",
-72.62999725341797
-],
-[
-"2026-09-24",
-68.48999786376953
-]
-],
-"peaks": [
-[
-"2026-04-09",
-81.0999984741211
-],
-[
-"2026-07-02",
-84.2300033569336
-]
-],
-"rsi_lows": [
-28.3,
-33.1,
-12.3
-],
-"rsi_div": 0.0,
-"rsi_now": 68.0,
-"signal_date": null,
-"days_since": null,
-"target": 99.97,
-"sl": 80.86
-},
-{
-"symbol": "TJX",
-"name": "TJX Companies Inc. (The) Common Stock",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 140.3000030517578,
-"neck": 147.3800048828125,
-"to_neck_pct": 5.046330489702711,
-"stop": 121.55,
-"stop_pct": 13.362654207026415,
-"height_pct": 19.97721367348526,
-"fall_pct": 37.097043864175404,
-"lows": [
-[
-"2026-09-16",
-122.83999633789062
-],
-[
-"2026-11-17",
-129.85000610351562
-]
-],
-"peaks": [
-[
-"2026-10-22",
-147.3800048828125
-]
-],
-"rsi_lows": [
-15.1,
-35.7
-],
-"rsi_div": 0.0,
-"rsi_now": 53.4,
-"signal_date": null,
-"days_since": null,
-"target": 171.92,
-"sl": 141.48
 },
 {
 "symbol": "MKL",
@@ -1483,11 +1473,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 1940.1700439453125,
+"close": 1951.6500244140625,
 "neck": 2039.3499755859375,
-"to_neck_pct": 5.1119195428326325,
+"to_neck_pct": 4.493631033986478,
 "stop": 1695.33,
-"stop_pct": 12.619749132259962,
+"stop_pct": 13.13373655867741,
 "height_pct": 19.089610425715286,
 "fall_pct": 25.15344607106198,
 "lows": [
@@ -1511,140 +1501,91 @@
 28.1
 ],
 "rsi_div": 0.0,
-"rsi_now": 57.5,
+"rsi_now": 59.6,
 "signal_date": null,
 "days_since": null,
 "target": 2366.25,
 "sl": 1957.78
 },
 {
-"symbol": "PBH",
-"name": "Prestige Consumer Healthcare Inc. Common Stock",
-"kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 50.619998931884766,
-"neck": 53.279998779296875,
-"to_neck_pct": 5.254839793638588,
-"stop": 41.35,
-"stop_pct": 18.308373516896992,
-"height_pct": 23.964633193955166,
-"fall_pct": 56.12630015262181,
-"lows": [
-[
-"2026-09-18",
-44.970001220703125
-],
-[
-"2026-10-01",
-44.77000045776367
-],
-[
-"2026-11-06",
-42.97999954223633
-]
-],
-"peaks": [
-[
-"2026-09-22",
-47.72999954223633
-],
-[
-"2026-11-04",
-53.279998779296875
-]
-],
-"rsi_lows": [
-29.9,
-36.2,
-36.7
-],
-"rsi_div": 6.8,
-"rsi_now": 58.9,
-"signal_date": null,
-"days_since": null,
-"target": 63.58,
-"sl": 51.15
-},
-{
-"symbol": "ITW",
-"name": "Illinois Tool Works Inc. Common Stock",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 282.2900085449219,
-"neck": 297.32000732421875,
-"to_neck_pct": 5.324311284260386,
-"stop": 239.63,
-"stop_pct": 15.112297365244132,
-"height_pct": 20.95521348896583,
-"fall_pct": 21.88275866692524,
-"lows": [
-[
-"2026-06-01",
-245.80999755859375
-],
-[
-"2026-09-30",
-257.2799987792969
-]
-],
-"peaks": [
-[
-"2026-08-05",
-297.32000732421875
-]
-],
-"rsi_lows": [
-35.8,
-30.9
-],
-"rsi_div": 0.0,
-"rsi_now": 51.7,
-"signal_date": null,
-"days_since": null,
-"target": 348.83,
-"sl": 285.43
-},
-{
-"symbol": "BSX",
-"name": "Boston Scientific Corporation Common Stock",
+"symbol": "BROS",
+"name": "Dutch Bros Inc. Class A Common Stock",
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 43.63999938964844,
-"neck": 46.0099983215332,
-"to_neck_pct": 5.430795061942506,
-"stop": 41.09,
-"stop_pct": 5.854719123241992,
-"height_pct": 10.654151744577135,
-"fall_pct": 152.47714943227254,
+"close": 34.150001525878906,
+"neck": 36.0099983215332,
+"to_neck_pct": 5.446549670707301,
+"stop": 32.84,
+"stop_pct": 3.8410052123395544,
+"height_pct": 6.822899138315197,
+"fall_pct": 117.08616098564457,
 "lows": [
 [
-"2026-10-07",
-41.58000183105469
+"2026-11-06",
+33.77000045776367
 ],
 [
-"2026-10-30",
-41.97999954223633
+"2026-11-12",
+33.709999084472656
+]
+],
+"peaks": [
+[
+"2026-11-09",
+36.0099983215332
+]
+],
+"rsi_lows": [
+29.8,
+33.1
+],
+"rsi_div": 3.3,
+"rsi_now": 37.4,
+"signal_date": null,
+"days_since": null,
+"target": 38.31,
+"sl": 34.57
+},
+{
+"symbol": "TJX",
+"name": "TJX Companies Inc. (The) Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 139.41000366210938,
+"neck": 147.3800048828125,
+"to_neck_pct": 5.716950729031023,
+"stop": 121.55,
+"stop_pct": 12.809557708561403,
+"height_pct": 19.97721367348526,
+"fall_pct": 37.097043864175404,
+"lows": [
+[
+"2026-09-16",
+122.83999633789062
+],
+[
+"2026-11-17",
+129.85000610351562
 ]
 ],
 "peaks": [
 [
 "2026-10-22",
-46.0099983215332
+147.3800048828125
 ]
 ],
 "rsi_lows": [
-31.8,
-38.8
+15.1,
+35.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 48.0,
+"rsi_now": 52.1,
 "signal_date": null,
 "days_since": null,
-"target": 50.44,
-"sl": 44.17
+"target": 171.92,
+"sl": 141.48
 },
 {
 "symbol": "WTW",
@@ -1652,11 +1593,11 @@
 "kind": "stock",
 "typ": "IHS",
 "status": "forming",
-"close": 332.55999755859375,
+"close": 331.260009765625,
 "neck": 350.75,
-"to_neck_pct": 5.469690454337139,
+"to_neck_pct": 5.883592845440244,
 "stop": 238.22,
-"stop_pct": 28.366698766284493,
+"stop_pct": 28.085582982825542,
 "height_pct": 44.86618497998687,
 "fall_pct": 24.912534582011393,
 "lows": [
@@ -1689,11 +1630,189 @@
 29.0
 ],
 "rsi_div": 0.0,
-"rsi_now": 57.1,
+"rsi_now": 55.7,
 "signal_date": null,
 "days_since": null,
 "target": 459.38,
 "sl": 329.7
+},
+{
+"symbol": "MGEE",
+"name": "MGE Energy Inc",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 79.54000091552734,
+"neck": 84.2300033569336,
+"to_neck_pct": 5.896407326405617,
+"stop": 67.61,
+"stop_pct": 15.002388574056202,
+"height_pct": 22.981465884218345,
+"fall_pct": 29.026925182226183,
+"lows": [
+[
+"2026-03-18",
+72.44999694824219
+],
+[
+"2026-06-01",
+72.62999725341797
+],
+[
+"2026-09-24",
+68.48999786376953
+]
+],
+"peaks": [
+[
+"2026-04-09",
+81.0999984741211
+],
+[
+"2026-07-02",
+84.2300033569336
+]
+],
+"rsi_lows": [
+28.3,
+33.1,
+12.3
+],
+"rsi_div": 0.0,
+"rsi_now": 63.9,
+"signal_date": null,
+"days_since": null,
+"target": 99.97,
+"sl": 80.86
+},
+{
+"symbol": "CRUS",
+"name": "Cirrus Logic Inc. Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 115.2699966430664,
+"neck": 122.20999908447266,
+"to_neck_pct": 6.02064946951979,
+"stop": 104.71,
+"stop_pct": 9.159104948291608,
+"height_pct": 14.93463460919462,
+"fall_pct": 64.91518101068516,
+"lows": [
+[
+"2026-08-28",
+108.4800033569336
+],
+[
+"2026-10-12",
+106.33000183105469
+]
+],
+"peaks": [
+[
+"2026-09-15",
+122.20999908447266
+]
+],
+"rsi_lows": [
+21.3,
+29.3
+],
+"rsi_div": 8.0,
+"rsi_now": 49.5,
+"signal_date": null,
+"days_since": null,
+"target": 138.09,
+"sl": 117.32
+},
+{
+"symbol": "MZTI",
+"name": "The Marzetti Company Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 105.76000213623047,
+"neck": 112.33000183105469,
+"to_neck_pct": 6.212178103364008,
+"stop": 96.82,
+"stop_pct": 8.451209279929017,
+"height_pct": 13.247302214162682,
+"fall_pct": 75.52172781360741,
+"lows": [
+[
+"2026-09-30",
+99.19000244140625
+],
+[
+"2026-11-06",
+104.93000030517578
+]
+],
+"peaks": [
+[
+"2026-10-22",
+112.33000183105469
+]
+],
+"rsi_lows": [
+36.3,
+46.0
+],
+"rsi_div": 0.0,
+"rsi_now": 45.3,
+"signal_date": null,
+"days_since": null,
+"target": 125.47,
+"sl": 107.84
+},
+{
+"symbol": "LKFN",
+"name": "Lakeland Financial Corporation Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 59.900001525878906,
+"neck": 63.70000076293945,
+"to_neck_pct": 6.343905075559664,
+"stop": 56.06,
+"stop_pct": 6.404508131418673,
+"height_pct": 12.068966558648464,
+"fall_pct": 20.03144493821436,
+"lows": [
+[
+"2026-05-15",
+57.2599983215332
+],
+[
+"2026-07-08",
+58.79999923706055
+],
+[
+"2026-10-09",
+56.84000015258789
+]
+],
+"peaks": [
+[
+"2026-07-01",
+63.119998931884766
+],
+[
+"2026-07-28",
+63.70000076293945
+]
+],
+"rsi_lows": [
+37.0,
+40.8,
+35.1
+],
+"rsi_div": 0.0,
+"rsi_now": 45.7,
+"signal_date": null,
+"days_since": null,
+"target": 70.56,
+"sl": 61.15
 },
 {
 "symbol": "MAIN",
@@ -1701,11 +1820,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 55.869998931884766,
+"close": 55.65999984741211,
 "neck": 59.22999954223633,
-"to_neck_pct": 6.013962188272082,
+"to_neck_pct": 6.41394125873358,
 "stop": 48.46,
-"stop_pct": 13.262033861157175,
+"stop_pct": 12.934781013005681,
 "height_pct": 19.34313573950053,
 "fall_pct": 36.08704304243584,
 "lows": [
@@ -1729,7 +1848,7 @@
 35.1
 ],
 "rsi_div": 0.0,
-"rsi_now": 51.0,
+"rsi_now": 49.4,
 "signal_date": null,
 "days_since": null,
 "target": 68.83,
@@ -1741,11 +1860,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 212.08999633789062,
+"close": 211.2100067138672,
 "neck": 225.35000610351562,
-"to_neck_pct": 6.252067515951976,
+"to_neck_pct": 6.694758269102441,
 "stop": 197.46,
-"stop_pct": 6.9001365513797985,
+"stop_pct": 6.512243406033836,
 "height_pct": 12.37160349456261,
 "fall_pct": 24.164759317969995,
 "lows": [
@@ -1769,11 +1888,51 @@
 42.1
 ],
 "rsi_div": 0.0,
-"rsi_now": 46.9,
+"rsi_now": 45.9,
 "signal_date": null,
 "days_since": null,
 "target": 250.16,
 "sl": 216.34
+},
+{
+"symbol": "KMB",
+"name": "Kimberly-Clark Corporation Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 105.25,
+"neck": 112.31999969482422,
+"to_neck_pct": 6.717339377505205,
+"stop": 93.25,
+"stop_pct": 11.403228107370843,
+"height_pct": 19.058728063265917,
+"fall_pct": 29.97668805010654,
+"lows": [
+[
+"2026-10-01",
+94.33999633789062
+],
+[
+"2026-11-03",
+104.45999908447266
+]
+],
+"peaks": [
+[
+"2026-10-22",
+112.31999969482422
+]
+],
+"rsi_lows": [
+28.1,
+49.0
+],
+"rsi_div": 0.0,
+"rsi_now": 46.2,
+"signal_date": null,
+"days_since": null,
+"target": 130.3,
+"sl": 107.83
 },
 {
 "symbol": "PPC",
@@ -1781,11 +1940,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 27.760000228881836,
+"close": 27.639999389648438,
 "neck": 29.579999923706055,
-"to_neck_pct": 6.556194812025495,
+"to_neck_pct": 7.018815401219491,
 "stop": 25.59,
-"stop_pct": 7.811598823297816,
+"stop_pct": 7.411356936428149,
 "height_pct": 12.130405097580987,
 "fall_pct": 65.883243797122,
 "lows": [
@@ -1809,11 +1968,140 @@
 44.1
 ],
 "rsi_div": 0.0,
-"rsi_now": 47.1,
+"rsi_now": 46.5,
 "signal_date": null,
 "days_since": null,
 "target": 32.78,
 "sl": 28.4
+},
+{
+"symbol": "BSX",
+"name": "Boston Scientific Corporation Common Stock",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 42.9900016784668,
+"neck": 46.0099983215332,
+"to_neck_pct": 7.0248814262761305,
+"stop": 41.09,
+"stop_pct": 4.431266815746582,
+"height_pct": 10.654151744577135,
+"fall_pct": 152.47714943227254,
+"lows": [
+[
+"2026-10-07",
+41.58000183105469
+],
+[
+"2026-10-30",
+41.97999954223633
+]
+],
+"peaks": [
+[
+"2026-10-22",
+46.0099983215332
+]
+],
+"rsi_lows": [
+31.8,
+38.8
+],
+"rsi_div": 0.0,
+"rsi_now": 45.4,
+"signal_date": null,
+"days_since": null,
+"target": 50.44,
+"sl": 44.17
+},
+{
+"symbol": "ITW",
+"name": "Illinois Tool Works Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 276.8900146484375,
+"neck": 297.32000732421875,
+"to_neck_pct": 7.37837827114165,
+"stop": 239.63,
+"stop_pct": 13.456791381410527,
+"height_pct": 20.95521348896583,
+"fall_pct": 21.88275866692524,
+"lows": [
+[
+"2026-06-01",
+245.80999755859375
+],
+[
+"2026-09-30",
+257.2799987792969
+]
+],
+"peaks": [
+[
+"2026-08-05",
+297.32000732421875
+]
+],
+"rsi_lows": [
+35.8,
+30.9
+],
+"rsi_div": 0.0,
+"rsi_now": 45.4,
+"signal_date": null,
+"days_since": null,
+"target": 348.83,
+"sl": 285.43
+},
+{
+"symbol": "PBH",
+"name": "Prestige Consumer Healthcare Inc. Common Stock",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 49.599998474121094,
+"neck": 53.279998779296875,
+"to_neck_pct": 7.419355682230178,
+"stop": 41.35,
+"stop_pct": 16.628423940856194,
+"height_pct": 23.964633193955166,
+"fall_pct": 56.12630015262181,
+"lows": [
+[
+"2026-09-18",
+44.970001220703125
+],
+[
+"2026-10-01",
+44.77000045776367
+],
+[
+"2026-11-06",
+42.97999954223633
+]
+],
+"peaks": [
+[
+"2026-09-22",
+47.72999954223633
+],
+[
+"2026-11-04",
+53.279998779296875
+]
+],
+"rsi_lows": [
+29.9,
+36.2,
+36.7
+],
+"rsi_div": 6.8,
+"rsi_now": 55.7,
+"signal_date": null,
+"days_since": null,
+"target": 63.58,
+"sl": 51.15
 },
 {
 "symbol": "NAMS",
@@ -1821,11 +2109,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 19.739999771118164,
+"close": 19.510000228881836,
 "neck": 21.06999969482422,
-"to_neck_pct": 6.737588344109269,
+"to_neck_pct": 7.995896707540884,
 "stop": 18.67,
-"stop_pct": 5.413369702433323,
+"stop_pct": 4.298306585319056,
 "height_pct": 11.540499606211752,
 "fall_pct": 112.2375796498702,
 "lows": [
@@ -1858,91 +2146,220 @@
 38.2
 ],
 "rsi_div": 3.2,
-"rsi_now": 45.7,
+"rsi_now": 44.4,
 "signal_date": null,
 "days_since": null,
 "target": 23.25,
 "sl": 20.23
 },
 {
-"symbol": "TTWO",
-"name": "Take-Two Interactive Software Inc. Common Stock",
+"symbol": "GBDC",
+"name": "Golub Capital BDC Inc. Common Stock",
 "kind": "stock",
-"typ": "TW",
+"typ": "DB",
 "status": "forming",
-"close": 216.61000061035156,
-"neck": 231.30999755859375,
-"to_neck_pct": 6.78638885869598,
-"stop": 182.02,
-"stop_pct": 15.96814547280444,
-"height_pct": 21.63327537769655,
-"fall_pct": 35.883686254516476,
+"close": 12.300000190734863,
+"neck": 13.399999618530273,
+"to_neck_pct": 8.94308464014495,
+"stop": 11.73,
+"stop_pct": 4.621949628163935,
+"height_pct": 11.853089570559971,
+"fall_pct": 25.95605850516478,
 "lows": [
 [
-"2026-10-30",
-190.1699981689453
+"2026-06-22",
+12.289999961853027
 ],
 [
-"2026-11-17",
-203.92999267578125
+"2026-10-21",
+11.979999542236328
 ]
 ],
 "peaks": [
 [
-"2026-11-11",
-231.30999755859375
+"2026-08-13",
+13.399999618530273
 ]
 ],
 "rsi_lows": [
-31.6,
-45.5
+33.6,
+35.8
 ],
-"rsi_div": 0.0,
-"rsi_now": 53.5,
+"rsi_div": 2.2,
+"rsi_now": 45.1,
 "signal_date": null,
 "days_since": null,
-"target": 272.45,
-"sl": 222.06
+"target": 14.82,
+"sl": 12.86
 },
 {
-"symbol": "UTI",
-"name": "Universal Technical Institute Inc Common Stock",
+"symbol": "GPOR",
+"name": "Gulfport Energy Corporation Common Shares",
 "kind": "stock",
-"typ": "TW",
+"typ": "TB",
 "status": "forming",
-"close": 22.040000915527344,
-"neck": 23.610000610351562,
-"to_neck_pct": 7.123410297674448,
-"stop": 18.28,
-"stop_pct": 17.080769807260875,
-"height_pct": 27.828919805539233,
-"fall_pct": 177.2062948909801,
+"close": 155.3800048828125,
+"neck": 169.50999450683594,
+"to_neck_pct": 9.093827506750474,
+"stop": 148.5,
+"stop_pct": 4.427857296053883,
+"height_pct": 13.006663004557284,
+"fall_pct": 47.853543201853356,
 "lows": [
 [
-"2026-09-28",
-18.469999313354492
+"2026-09-30",
+150.47999572753906
 ],
 [
-"2026-11-05",
-19.690000534057617
+"2026-10-21",
+158.00999450683594
+],
+[
+"2026-11-06",
+150.0
 ]
 ],
 "peaks": [
 [
-"2026-10-29",
-23.610000610351562
+"2026-10-13",
+168.1300048828125
+],
+[
+"2026-10-27",
+169.50999450683594
 ]
 ],
 "rsi_lows": [
-25.9,
-39.0
+30.0,
+42.5,
+33.4
 ],
-"rsi_div": 0.0,
-"rsi_now": 51.7,
+"rsi_div": 3.5,
+"rsi_now": 41.1,
 "signal_date": null,
 "days_since": null,
-"target": 28.75,
-"sl": 22.67
+"target": 189.02,
+"sl": 162.73
+},
+{
+"symbol": "TLK",
+"name": "PT Telekomunikasi Indonesia Tbk",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 11.220000267028809,
+"neck": 12.25,
+"to_neck_pct": 9.180033052209069,
+"stop": 10.05,
+"stop_pct": 10.44118196794006,
+"height_pct": 17.788465858916712,
+"fall_pct": 124.2105333284539,
+"lows": [
+[
+"2026-10-19",
+10.449999809265137
+],
+[
+"2026-11-03",
+10.399999618530273
+]
+],
+"peaks": [
+[
+"2026-10-26",
+12.25
+]
+],
+"rsi_lows": [
+15.6,
+28.5
+],
+"rsi_div": 12.9,
+"rsi_now": 42.1,
+"signal_date": null,
+"days_since": null,
+"target": 14.1,
+"sl": 11.76
+},
+{
+"symbol": "AMH",
+"name": "American Homes 4 Rent Common Shares of Beneficial Interest",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 31.790000915527344,
+"neck": 34.810001373291016,
+"to_neck_pct": 9.49984388420888,
+"stop": 26.95,
+"stop_pct": 15.23183848963432,
+"height_pct": 27.136604968093003,
+"fall_pct": 43.57195974505059,
+"lows": [
+[
+"2026-03-20",
+27.3799991607666
+],
+[
+"2026-10-07",
+30.0
+]
+],
+"peaks": [
+[
+"2026-08-24",
+34.810001373291016
+]
+],
+"rsi_lows": [
+23.6,
+28.9
+],
+"rsi_div": 0.0,
+"rsi_now": 47.1,
+"signal_date": null,
+"days_since": null,
+"target": 42.24,
+"sl": 33.42
+},
+{
+"symbol": "THRM",
+"name": "Gentherm Inc Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 30.190000534057617,
+"neck": 33.15999984741211,
+"to_neck_pct": 9.83769215241983,
+"stop": 25.06,
+"stop_pct": 17.002653103579647,
+"height_pct": 26.806884631518102,
+"fall_pct": 74.41683088221404,
+"lows": [
+[
+"2026-10-22",
+26.149999618530273
+],
+[
+"2026-11-16",
+28.530000686645508
+]
+],
+"peaks": [
+[
+"2026-10-28",
+33.15999984741211
+]
+],
+"rsi_lows": [
+23.8,
+40.8
+],
+"rsi_div": 0.0,
+"rsi_now": 49.1,
+"signal_date": null,
+"days_since": null,
+"target": 40.17,
+"sl": 31.83
 },
 {
 "symbol": "AWI",
@@ -1950,11 +2367,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 174.25999450683594,
+"close": 169.02999877929688,
 "neck": 186.6999969482422,
-"to_neck_pct": 7.13875980348333,
+"to_neck_pct": 10.4537645959621,
 "stop": 149.53,
-"stop_pct": 14.191668732432062,
+"stop_pct": 11.536653592175172,
 "height_pct": 23.291293652754554,
 "fall_pct": 34.524213542042425,
 "lows": [
@@ -1987,171 +2404,11 @@
 33.9
 ],
 "rsi_div": 4.3,
-"rsi_now": 55.4,
+"rsi_now": 47.7,
 "signal_date": null,
 "days_since": null,
 "target": 221.97,
 "sl": 179.23
-},
-{
-"symbol": "VIV",
-"name": "Telefonica Brasil S.A. American Depositary Shares (Each repr",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 12.130000114440918,
-"neck": 13.079999923706055,
-"to_neck_pct": 7.8318202827891925,
-"stop": 10.85,
-"stop_pct": 10.549052469933907,
-"height_pct": 19.01729022852605,
-"fall_pct": 51.815761271581515,
-"lows": [
-[
-"2026-09-28",
-11.289999961853027
-],
-[
-"2026-11-03",
-10.989999771118164
-]
-],
-"peaks": [
-[
-"2026-10-22",
-13.079999923706055
-]
-],
-"rsi_lows": [
-34.1,
-33.6
-],
-"rsi_div": 0.0,
-"rsi_now": 53.6,
-"signal_date": null,
-"days_since": null,
-"target": 15.17,
-"sl": 12.56
-},
-{
-"symbol": "AMH",
-"name": "American Homes 4 Rent Common Shares of Beneficial Interest",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 32.11000061035156,
-"neck": 34.810001373291016,
-"to_neck_pct": 8.408597669316254,
-"stop": 26.95,
-"stop_pct": 16.076615359722023,
-"height_pct": 27.136604968093003,
-"fall_pct": 43.57195974505059,
-"lows": [
-[
-"2026-03-20",
-27.3799991607666
-],
-[
-"2026-10-07",
-30.0
-]
-],
-"peaks": [
-[
-"2026-08-24",
-34.810001373291016
-]
-],
-"rsi_lows": [
-23.6,
-28.9
-],
-"rsi_div": 0.0,
-"rsi_now": 51.4,
-"signal_date": null,
-"days_since": null,
-"target": 42.24,
-"sl": 33.42
-},
-{
-"symbol": "EQPT",
-"name": "EquipmentShare.com Inc Class A Common Stock",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 14.920000076293945,
-"neck": 16.209999084472656,
-"to_neck_pct": 8.646105908728252,
-"stop": 12.28,
-"stop_pct": 17.66809698637639,
-"height_pct": 19.763570500312987,
-"fall_pct": 153.3284628737451,
-"lows": [
-[
-"2026-11-05",
-13.670000076293945
-],
-[
-"2026-11-10",
-13.53499984741211
-]
-],
-"peaks": [
-[
-"2026-11-09",
-16.209999084472656
-]
-],
-"rsi_lows": [
-36.7,
-40.1
-],
-"rsi_div": 3.5,
-"rsi_now": 46.6,
-"signal_date": null,
-"days_since": null,
-"target": 18.88,
-"sl": 15.56
-},
-{
-"symbol": "WSO",
-"name": "Watsco Inc. Common Stock",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 299.45001220703125,
-"neck": 327.0400085449219,
-"to_neck_pct": 9.213556591480687,
-"stop": 274.57,
-"stop_pct": 8.309706067173517,
-"height_pct": 16.841734789701835,
-"fall_pct": 63.22257781846303,
-"lows": [
-[
-"2026-10-09",
-279.8999938964844
-],
-[
-"2026-10-28",
-290.8299865722656
-]
-],
-"peaks": [
-[
-"2026-10-22",
-327.0400085449219
-]
-],
-"rsi_lows": [
-27.2,
-42.6
-],
-"rsi_div": 0.0,
-"rsi_now": 46.1,
-"signal_date": null,
-"days_since": null,
-"target": 374.18,
-"sl": 313.96
 },
 {
 "symbol": "TRIN",
@@ -2159,11 +2416,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 17.110000610351562,
+"close": 16.90999984741211,
 "neck": 18.729999542236328,
-"to_neck_pct": 9.468140701904272,
+"to_neck_pct": 10.762860504122052,
 "stop": 13.99,
-"stop_pct": 18.24255047172041,
+"stop_pct": 17.27557516544079,
 "height_pct": 32.08744103764067,
 "fall_pct": 20.31028983628009,
 "lows": [
@@ -2187,91 +2444,220 @@
 20.0
 ],
 "rsi_div": 0.0,
-"rsi_now": 44.8,
+"rsi_now": 41.4,
 "signal_date": null,
 "days_since": null,
 "target": 23.28,
 "sl": 17.98
 },
 {
-"symbol": "GBDC",
-"name": "Golub Capital BDC Inc. Common Stock",
+"symbol": "TTWO",
+"name": "Take-Two Interactive Software Inc. Common Stock",
 "kind": "stock",
-"typ": "DB",
+"typ": "TW",
 "status": "forming",
-"close": 12.130000114440918,
-"neck": 13.399999618530273,
-"to_neck_pct": 10.46990512866859,
-"stop": 11.73,
-"stop_pct": 3.285240997743022,
-"height_pct": 11.853089570559971,
-"fall_pct": 25.95605850516478,
+"close": 208.64999389648438,
+"neck": 231.30999755859375,
+"to_neck_pct": 10.860294428453932,
+"stop": 182.02,
+"stop_pct": 12.762326418014336,
+"height_pct": 21.63327537769655,
+"fall_pct": 35.883686254516476,
 "lows": [
 [
-"2026-06-22",
-12.289999961853027
+"2026-10-30",
+190.1699981689453
 ],
 [
-"2026-10-21",
-11.979999542236328
+"2026-11-17",
+203.92999267578125
 ]
 ],
 "peaks": [
 [
-"2026-08-13",
-13.399999618530273
+"2026-11-11",
+231.30999755859375
 ]
 ],
 "rsi_lows": [
-33.6,
-35.8
-],
-"rsi_div": 2.2,
-"rsi_now": 39.6,
-"signal_date": null,
-"days_since": null,
-"target": 14.82,
-"sl": 12.86
-},
-{
-"symbol": "EQT",
-"name": "EQT Corporation Common Stock",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 50.689998626708984,
-"neck": 56.27000045776367,
-"to_neck_pct": 11.008092290842031,
-"stop": 48.04,
-"stop_pct": 5.218583363328899,
-"height_pct": 15.877262904513234,
-"fall_pct": 39.888794036440565,
-"lows": [
-[
-"2026-09-30",
-48.560001373291016
-],
-[
-"2026-11-06",
-49.400001525878906
-]
-],
-"peaks": [
-[
-"2026-10-27",
-56.27000045776367
-]
-],
-"rsi_lows": [
-29.5,
-33.9
+31.6,
+45.5
 ],
 "rsi_div": 0.0,
-"rsi_now": 42.3,
+"rsi_now": 48.7,
 "signal_date": null,
 "days_since": null,
-"target": 63.98,
-"sl": 54.02
+"target": 272.45,
+"sl": 222.06
+},
+{
+"symbol": "VIV",
+"name": "Telefonica Brasil S.A. American Depositary Shares (Each repr",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 11.789999961853027,
+"neck": 13.079999923706055,
+"to_neck_pct": 10.941475538819923,
+"stop": 10.85,
+"stop_pct": 7.969465030768729,
+"height_pct": 19.01729022852605,
+"fall_pct": 51.815761271581515,
+"lows": [
+[
+"2026-09-28",
+11.289999961853027
+],
+[
+"2026-11-03",
+10.989999771118164
+]
+],
+"peaks": [
+[
+"2026-10-22",
+13.079999923706055
+]
+],
+"rsi_lows": [
+34.1,
+33.6
+],
+"rsi_div": 0.0,
+"rsi_now": 48.4,
+"signal_date": null,
+"days_since": null,
+"target": 15.17,
+"sl": 12.56
+},
+{
+"symbol": "WSO",
+"name": "Watsco Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 294.1199951171875,
+"neck": 327.0400085449219,
+"to_neck_pct": 11.192715209524561,
+"stop": 274.57,
+"stop_pct": 6.648102498058661,
+"height_pct": 16.841734789701835,
+"fall_pct": 63.22257781846303,
+"lows": [
+[
+"2026-10-09",
+279.8999938964844
+],
+[
+"2026-10-28",
+290.8299865722656
+]
+],
+"peaks": [
+[
+"2026-10-22",
+327.0400085449219
+]
+],
+"rsi_lows": [
+27.2,
+42.6
+],
+"rsi_div": 0.0,
+"rsi_now": 43.1,
+"signal_date": null,
+"days_since": null,
+"target": 374.18,
+"sl": 313.96
+},
+{
+"symbol": "BAM",
+"name": "Brookfield Asset Management Inc Class A Limited Voting Share",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 50.209999084472656,
+"neck": 55.86000061035156,
+"to_neck_pct": 11.25274174248323,
+"stop": 43.17,
+"stop_pct": 14.02320188417634,
+"height_pct": 26.925704932418483,
+"fall_pct": 43.58100667273008,
+"lows": [
+[
+"2026-06-29",
+44.0099983215332
+],
+[
+"2026-07-23",
+45.709999084472656
+],
+[
+"2026-09-28",
+44.5
+]
+],
+"peaks": [
+[
+"2026-07-16",
+49.56999969482422
+],
+[
+"2026-08-13",
+55.86000061035156
+]
+],
+"rsi_lows": [
+35.3,
+43.9,
+29.2
+],
+"rsi_div": 0.0,
+"rsi_now": 51.7,
+"signal_date": null,
+"days_since": null,
+"target": 67.71,
+"sl": 53.63
+},
+{
+"symbol": "CLBT",
+"name": "Cellebrite DI Ltd. Ordinary Shares",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 11.319999694824219,
+"neck": 12.699999809265137,
+"to_neck_pct": 12.190814060462273,
+"stop": 10.32,
+"stop_pct": 8.82729269377619,
+"height_pct": 19.248828771486547,
+"fall_pct": 81.27895769318644,
+"lows": [
+[
+"2026-09-25",
+10.789999961853027
+],
+[
+"2026-11-17",
+10.649999618530273
+]
+],
+"peaks": [
+[
+"2026-11-09",
+12.699999809265137
+]
+],
+"rsi_lows": [
+36.2,
+36.9
+],
+"rsi_div": 0.0,
+"rsi_now": 45.5,
+"signal_date": null,
+"days_since": null,
+"target": 14.75,
+"sl": 12.19
 },
 {
 "symbol": "ORI",
@@ -2279,11 +2665,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 40.09000015258789,
+"close": 39.61000061035156,
 "neck": 44.59000015258789,
-"to_neck_pct": 11.224744282545274,
+"to_neck_pct": 12.572581331732845,
 "stop": 36.28,
-"stop_pct": 9.494883081765348,
+"stop_pct": 8.3981293826643,
 "height_pct": 21.63120659624218,
 "fall_pct": 27.16857372048176,
 "lows": [
@@ -2307,7 +2693,7 @@
 21.8
 ],
 "rsi_div": 0.0,
-"rsi_now": 55.3,
+"rsi_now": 50.9,
 "signal_date": null,
 "days_since": null,
 "target": 52.52,
@@ -2319,11 +2705,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 247.97000122070312,
+"close": 245.5399932861328,
 "neck": 276.9700012207031,
-"to_neck_pct": 11.694963042803241,
+"to_neck_pct": 12.800361975225872,
 "stop": 224.58,
-"stop_pct": 9.431985749520555,
+"stop_pct": 8.53567150636393,
 "height_pct": 21.862901578795913,
 "fall_pct": 63.7583616862063,
 "lows": [
@@ -2347,100 +2733,51 @@
 29.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 48.4,
+"rsi_now": 47.0,
 "signal_date": null,
 "days_since": null,
 "target": 326.66,
 "sl": 265.89
 },
 {
-"symbol": "KT",
-"name": "KT Corporation Common Stock",
+"symbol": "EQPT",
+"name": "EquipmentShare.com Inc Class A Common Stock",
 "kind": "stock",
-"typ": "TB",
+"typ": "DB",
 "status": "forming",
-"close": 17.610000610351562,
-"neck": 19.969999313354492,
-"to_neck_pct": 13.401468604241096,
-"stop": 16.42,
-"stop_pct": 6.73424428271997,
-"height_pct": 19.01071809399728,
-"fall_pct": 42.1784506958673,
+"close": 14.109999656677246,
+"neck": 16.209999084472656,
+"to_neck_pct": 14.883057965218537,
+"stop": 12.28,
+"stop_pct": 12.941741379605176,
+"height_pct": 19.763570500312987,
+"fall_pct": 153.3284628737451,
 "lows": [
 [
-"2026-07-01",
-17.260000228881836
+"2026-11-05",
+13.670000076293945
 ],
 [
-"2026-07-14",
-17.34000015258789
-],
-[
-"2026-10-28",
-16.780000686645508
+"2026-11-10",
+13.53499984741211
 ]
 ],
 "peaks": [
 [
-"2026-07-09",
-18.68000030517578
-],
-[
-"2026-09-14",
-19.969999313354492
+"2026-11-09",
+16.209999084472656
 ]
 ],
 "rsi_lows": [
-29.3,
-38.8,
-22.8
+36.7,
+40.1
 ],
-"rsi_div": 0.0,
-"rsi_now": 40.2,
+"rsi_div": 3.5,
+"rsi_now": 43.4,
 "signal_date": null,
 "days_since": null,
-"target": 23.16,
-"sl": 19.17
-},
-{
-"symbol": "AMP",
-"name": "Ameriprise Financial Inc. Common Stock",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 501.4200134277344,
-"neck": 570.6799926757812,
-"to_neck_pct": 13.812767219756928,
-"stop": 432.87,
-"stop_pct": 13.671656746820904,
-"height_pct": 29.744227522296708,
-"fall_pct": 24.019550399101377,
-"lows": [
-[
-"2026-05-28",
-439.8500061035156
-],
-[
-"2026-10-19",
-480.4100036621094
-]
-],
-"peaks": [
-[
-"2026-08-13",
-570.6799926757812
-]
-],
-"rsi_lows": [
-35.1,
-32.9
-],
-"rsi_div": 0.0,
-"rsi_now": 46.5,
-"signal_date": null,
-"days_since": null,
-"target": 701.51,
-"sl": 547.85
+"target": 18.88,
+"sl": 15.56
 },
 {
 "symbol": "FSK",
@@ -2448,11 +2785,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 11.100000381469727,
+"close": 10.9399995803833,
 "neck": 12.640000343322754,
-"to_neck_pct": 13.873873053409014,
+"to_neck_pct": 15.539312871526544,
 "stop": 9.91,
-"stop_pct": 10.721622648441132,
+"stop_pct": 9.415899390319659,
 "height_pct": 25.89641824052218,
 "fall_pct": 123.90437876144493,
 "lows": [
@@ -2476,7 +2813,7 @@
 26.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 46.4,
+"rsi_now": 43.5,
 "signal_date": null,
 "days_since": null,
 "target": 15.24,
@@ -2488,11 +2825,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 50.7599983215332,
+"close": 50.150001525878906,
 "neck": 57.95000076293945,
-"to_neck_pct": 14.164701889590358,
+"to_neck_pct": 15.553337985514348,
 "stop": 39.32,
-"stop_pct": 22.541663807772917,
+"stop_pct": 21.59950357973006,
 "height_pct": 44.94747730479327,
 "fall_pct": 26.89670736007541,
 "lows": [
@@ -2525,11 +2862,51 @@
 30.3
 ],
 "rsi_div": 3.6,
-"rsi_now": 71.1,
+"rsi_now": 65.6,
 "signal_date": null,
 "days_since": null,
 "target": 75.92,
 "sl": 55.63
+},
+{
+"symbol": "AMP",
+"name": "Ameriprise Financial Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 492.3599853515625,
+"neck": 570.6799926757812,
+"to_neck_pct": 15.907061835720771,
+"stop": 432.87,
+"stop_pct": 12.083109267511173,
+"height_pct": 29.744227522296708,
+"fall_pct": 24.019550399101377,
+"lows": [
+[
+"2026-05-28",
+439.8500061035156
+],
+[
+"2026-10-19",
+480.4100036621094
+]
+],
+"peaks": [
+[
+"2026-08-13",
+570.6799926757812
+]
+],
+"rsi_lows": [
+35.1,
+32.9
+],
+"rsi_div": 0.0,
+"rsi_now": 42.3,
+"signal_date": null,
+"days_since": null,
+"target": 701.51,
+"sl": 547.85
 },
 {
 "symbol": "UDR",
@@ -2537,11 +2914,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 36.08000183105469,
+"close": 35.33000183105469,
 "neck": 41.2400016784668,
-"to_neck_pct": 14.301550957713104,
+"to_neck_pct": 16.72799190804821,
 "stop": 32.89,
-"stop_pct": 8.847562252092267,
+"stop_pct": 6.912540322632887,
 "height_pct": 23.95551881888627,
 "fall_pct": 35.080399454900466,
 "lows": [
@@ -2565,11 +2942,91 @@
 25.9
 ],
 "rsi_div": 0.0,
-"rsi_now": 53.3,
+"rsi_now": 44.7,
 "signal_date": null,
 "days_since": null,
 "target": 49.21,
 "sl": 39.59
+},
+{
+"symbol": "UTI",
+"name": "Universal Technical Institute Inc Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 20.170000076293945,
+"neck": 23.610000610351562,
+"to_neck_pct": 17.055034809348825,
+"stop": 18.28,
+"stop_pct": 9.393162992065452,
+"height_pct": 27.828919805539233,
+"fall_pct": 177.2062948909801,
+"lows": [
+[
+"2026-09-28",
+18.469999313354492
+],
+[
+"2026-11-05",
+19.690000534057617
+]
+],
+"peaks": [
+[
+"2026-10-29",
+23.610000610351562
+]
+],
+"rsi_lows": [
+25.9,
+39.0
+],
+"rsi_div": 0.0,
+"rsi_now": 41.9,
+"signal_date": null,
+"days_since": null,
+"target": 28.75,
+"sl": 22.67
+},
+{
+"symbol": "INVH",
+"name": "Invitation Homes Inc. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 26.09000015258789,
+"neck": 30.59000015258789,
+"to_neck_pct": 17.247987633889082,
+"stop": 24.01,
+"stop_pct": 7.981985973201788,
+"height_pct": 25.420257966758484,
+"fall_pct": 45.42846292877418,
+"lows": [
+[
+"2026-03-20",
+24.389999389648438
+],
+[
+"2026-10-07",
+25.860000610351562
+]
+],
+"peaks": [
+[
+"2026-06-29",
+30.59000015258789
+]
+],
+"rsi_lows": [
+32.4,
+25.9
+],
+"rsi_div": 0.0,
+"rsi_now": 38.4,
+"signal_date": null,
+"days_since": null,
+"target": 36.79,
+"sl": 29.37
 },
 {
 "symbol": "MTG",
@@ -2577,11 +3034,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 26.969999313354492,
+"close": 26.690000534057617,
 "neck": 31.469999313354492,
-"to_neck_pct": 16.6852062090034,
+"to_neck_pct": 17.909324404836124,
 "stop": 24.44,
-"stop_pct": 9.369294953545781,
+"stop_pct": 8.418508656354028,
 "height_pct": 26.588891957832715,
 "fall_pct": 20.112630238303495,
 "lows": [
@@ -2605,51 +3062,60 @@
 14.1
 ],
 "rsi_div": 0.0,
-"rsi_now": 36.8,
+"rsi_now": 34.6,
 "signal_date": null,
 "days_since": null,
 "target": 38.08,
 "sl": 30.21
 },
 {
-"symbol": "UBER",
-"name": "Uber Technologies Inc. Common Stock",
+"symbol": "KT",
+"name": "KT Corporation Common Stock",
 "kind": "stock",
-"typ": "DB",
+"typ": "TB",
 "status": "forming",
-"close": 68.76000213623047,
-"neck": 80.3499984741211,
-"to_neck_pct": 16.855724226023128,
-"stop": 64.03,
-"stop_pct": 6.881543001722834,
-"height_pct": 23.141760113595545,
-"fall_pct": 51.804662978393324,
+"close": 16.8799991607666,
+"neck": 19.969999313354492,
+"to_neck_pct": 18.305689017863426,
+"stop": 16.42,
+"stop_pct": 2.7008236514858175,
+"height_pct": 19.01071809399728,
+"fall_pct": 42.1784506958673,
 "lows": [
 [
-"2026-07-24",
-65.94000244140625
+"2026-07-01",
+17.260000228881836
 ],
 [
-"2026-10-30",
-65.25
+"2026-07-14",
+17.34000015258789
+],
+[
+"2026-10-28",
+16.780000686645508
 ]
 ],
 "peaks": [
 [
-"2026-08-25",
-80.3499984741211
+"2026-07-09",
+18.68000030517578
+],
+[
+"2026-09-14",
+19.969999313354492
 ]
 ],
 "rsi_lows": [
-33.2,
-35.8
+29.3,
+38.8,
+22.8
 ],
-"rsi_div": 2.6,
-"rsi_now": 48.9,
+"rsi_div": 0.0,
+"rsi_now": 33.7,
 "signal_date": null,
 "days_since": null,
-"target": 95.45,
-"sl": 77.14
+"target": 23.16,
+"sl": 19.17
 },
 {
 "symbol": "UFPI",
@@ -2657,11 +3123,11 @@
 "kind": "stock",
 "typ": "IHS",
 "status": "forming",
-"close": 79.55000305175781,
+"close": 78.88999938964844,
 "neck": 94.04000091552734,
-"to_neck_pct": 18.214955761022257,
+"to_neck_pct": 19.203956956636524,
 "stop": 73.28,
-"stop_pct": 7.882094449503008,
+"stop_pct": 7.1114244599028815,
 "height_pct": 26.721468906747138,
 "fall_pct": 40.451898900883386,
 "lows": [
@@ -2694,11 +3160,51 @@
 46.2
 ],
 "rsi_div": 5.8,
-"rsi_now": 48.1,
+"rsi_now": 46.6,
 "signal_date": null,
 "days_since": null,
 "target": 113.87,
 "sl": 88.4
+},
+{
+"symbol": "FTAI",
+"name": "FTAI Aviation Ltd. Common Stock",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 168.17999267578125,
+"neck": 200.74000549316406,
+"to_neck_pct": 19.36021776392407,
+"stop": 145.02,
+"stop_pct": 13.773812530825158,
+"height_pct": 30.03822753299663,
+"fall_pct": 100.84214442681039,
+"lows": [
+[
+"2026-10-23",
+154.3699951171875
+],
+[
+"2026-11-05",
+162.4499969482422
+]
+],
+"peaks": [
+[
+"2026-11-03",
+200.74000549316406
+]
+],
+"rsi_lows": [
+35.6,
+44.0
+],
+"rsi_div": 0.0,
+"rsi_now": 45.4,
+"signal_date": null,
+"days_since": null,
+"target": 247.11,
+"sl": 192.71
 },
 {
 "symbol": "NMIH",
@@ -2706,11 +3212,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 38.619998931884766,
+"close": 38.22999954223633,
 "neck": 45.709999084472656,
-"to_neck_pct": 18.358364445044995,
+"to_neck_pct": 19.56578506879776,
 "stop": 34.77,
-"stop_pct": 9.972035463054585,
+"stop_pct": 9.053624486305567,
 "height_pct": 29.051387485810665,
 "fall_pct": 21.823838951270535,
 "lows": [
@@ -2734,91 +3240,11 @@
 11.9
 ],
 "rsi_div": 0.0,
-"rsi_now": 37.2,
+"rsi_now": 35.3,
 "signal_date": null,
 "days_since": null,
 "target": 56.0,
 "sl": 43.88
-},
-{
-"symbol": "CSGP",
-"name": "CoStar Group Inc. Common Stock",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 29.899999618530273,
-"neck": 35.45000076293945,
-"to_neck_pct": 18.561876973970314,
-"stop": 26.25,
-"stop_pct": 12.191301711874125,
-"height_pct": 31.539887789869205,
-"fall_pct": 214.656774215648,
-"lows": [
-[
-"2026-09-29",
-26.950000762939453
-],
-[
-"2026-10-28",
-27.540000915527344
-]
-],
-"peaks": [
-[
-"2026-10-22",
-35.45000076293945
-]
-],
-"rsi_lows": [
-31.7,
-38.3
-],
-"rsi_div": 0.0,
-"rsi_now": 46.1,
-"signal_date": null,
-"days_since": null,
-"target": 43.95,
-"sl": 34.03
-},
-{
-"symbol": "DRS",
-"name": "Leonardo DRS Inc. Common Stock",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 33.36000061035156,
-"neck": 39.63999938964844,
-"to_neck_pct": 18.824936044360264,
-"stop": 32.54,
-"stop_pct": 2.4541416451041798,
-"height_pct": 20.121210271661937,
-"fall_pct": 46.40542320943284,
-"lows": [
-[
-"2026-10-20",
-33.939998626708984
-],
-[
-"2026-11-05",
-33.0
-]
-],
-"peaks": [
-[
-"2026-10-29",
-39.63999938964844
-]
-],
-"rsi_lows": [
-27.4,
-39.2
-],
-"rsi_div": 11.8,
-"rsi_now": 41.0,
-"signal_date": null,
-"days_since": null,
-"target": 46.28,
-"sl": 38.05
 }
 ]
 }

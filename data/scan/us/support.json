@@ -1,28 +1,226 @@
 {
-"generated": "2026-11-18T22:42+00:00",
-"asof": "2026-11-18",
+"generated": "2026-11-19T22:48+00:00",
+"asof": "2026-11-19",
 "market": "US",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.19R (30,963) vs +0.25R for a random uptrend stock; old swing lows +0.11R vs +0.24R. Worse than random - watch only.",
 "rows": [
 {
-"symbol": "ADUS",
-"name": "Addus HomeCare Corporation Common Stock",
+"symbol": "AMPH",
+"name": "Amphastar Pharmaceuticals Inc. Common Stock",
 "status": "touched",
-"touch_date": "2026-11-18",
+"touch_date": "2026-11-19",
 "days_ago": 0,
-"level": 117.63,
+"level": 27.39,
 "level_kind": "breakout retest",
-"level_date": "2026-02-23",
-"close": 120.8499984741211,
-"above_pct": 2.737398024218307,
-"stop": 113.35,
-"risk_pct": 6.205451250486149,
-"resistance": 122.75,
-"room_r": 0.25335759759667215,
+"level_date": "2026-09-28",
+"close": 28.110000610351562,
+"above_pct": 2.6287011199249477,
+"stop": 26.09,
+"risk_pct": 7.168270040158909,
+"resistance": 28.99,
+"room_r": 0.43672398626925846,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": 9.559997558593757,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "ARHS",
+"name": "Arhaus Inc. Class A Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 12.57,
+"level_kind": "breakout retest",
+"level_date": "2025-01-30",
+"close": 12.930000305175781,
+"above_pct": 2.863966738995183,
+"stop": 11.68,
+"risk_pct": 9.684018235356739,
+"resistance": 13.33,
+"room_r": 0.3194518764143259,
+"sq9": 9,
+"sq9_cross": "3\u00b2",
+"sq9_dist_pct": 39.66666327582465,
+"sq9_gap_pct": 177.77777777777777,
+"sq9_below": [
+[
+1,
+"1\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "BLK",
+"name": "BlackRock Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 1104.03,
+"level_kind": "breakout retest",
+"level_date": "2026-05-14",
+"close": 1135.81005859375,
+"above_pct": 2.8785475443194875,
+"stop": 1068.54,
+"risk_pct": 5.922961672908256,
+"resistance": 1163.17,
+"room_r": 0.40669724245069083,
+"sq9": 1089,
+"sq9_cross": "33\u00b2",
+"sq9_dist_pct": 1.3801679795110156,
+"sq9_gap_pct": 12.488521579430678,
+"sq9_below": [
+[
+961,
+"31\u00b2"
+]
+],
+"sq9_above": [
+[
+1225,
+"35\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "BTSG",
+"name": "BrightSpring Health Services Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 62.56,
+"level_kind": "breakout retest",
+"level_date": "2026-09-08",
+"close": 64.0199966430664,
+"above_pct": 2.3337519784625727,
+"stop": 59.5,
+"risk_pct": 7.0670573319559615,
+"resistance": 72.62,
+"room_r": 1.9008353406872631,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -22.76543040334442,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "BUD",
+"name": "Anheuser-Busch Inbev SA Sponsored ADR (Belgium)",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 79.52,
+"level_kind": "old swing low",
+"level_date": "2026-10-29",
+"close": 80.86000061035156,
+"above_pct": 1.6851157241616788,
+"stop": 77.42,
+"risk_pct": 4.252505891207536,
+"resistance": 83.96,
+"room_r": 0.9015354649859,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -1.8271646381896267,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CDNA",
+"name": "CareDx Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 69.85,
+"level_kind": "breakout retest",
+"level_date": "2026-10-05",
+"close": 71.91999816894531,
+"above_pct": 2.9634928275497963,
+"stop": 64.59,
+"risk_pct": 10.185415477857218,
+"resistance": 84.42,
+"room_r": 1.7064029613875906,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -13.765433982566556,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CHD",
+"name": "Church & Dwight Company Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 106.22,
+"level_kind": "breakout retest",
+"level_date": "2024-09-04",
+"close": 109.68000030517578,
+"above_pct": 3.257389422622481,
+"stop": 103.58,
+"risk_pct": 5.5609810529250066,
+"resistance": 112.25,
+"room_r": 0.42136088100366054,
 "sq9": 121,
 "sq9_cross": "11\u00b2",
-"sq9_dist_pct": -2.7851262368446594,
+"sq9_dist_pct": -12.21487502421229,
 "sq9_gap_pct": 39.66942148760331,
 "sq9_below": [
 [
@@ -39,23 +237,749 @@
 "sq9_match": false
 },
 {
-"symbol": "CDW",
-"name": "CDW Corporation Common Stock",
+"symbol": "CHYM",
+"name": "Chime Financial Inc. Class A Common Stock",
 "status": "touched",
-"touch_date": "2026-11-18",
+"touch_date": "2026-11-19",
 "days_ago": 0,
-"level": 157.0,
+"level": 30.46,
+"level_kind": "breakout retest",
+"level_date": "2026-10-20",
+"close": 30.850000381469727,
+"above_pct": 1.2803719918556444,
+"stop": 28.85,
+"risk_pct": 6.468631711209671,
+"resistance": 31.25,
+"room_r": 0.20044350021495025,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": 21.83999633789062,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CL",
+"name": "Colgate-Palmolive Company Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 93.33,
+"level_kind": "breakout retest",
+"level_date": "2025-07-07",
+"close": 96.87999725341797,
+"above_pct": 3.803702295848499,
+"stop": 91.11,
+"risk_pct": 5.9599162022093255,
+"resistance": 99.14,
+"room_r": 0.3914123984511968,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": 15.222224482783563,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CPAY",
+"name": "Corpay Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 425.24,
+"level_kind": "breakout retest",
+"level_date": "2026-08-13",
+"close": 434.2900085449219,
+"above_pct": 2.1282143068338533,
+"stop": 408.98,
+"risk_pct": 5.828729516093878,
+"resistance": 462.22,
+"room_r": 1.1033596092540379,
+"sq9": 441,
+"sq9_cross": "21\u00b2",
+"sq9_dist_pct": -3.5736983595521576,
+"sq9_gap_pct": 19.95464852607709,
+"sq9_below": [
+[
+361,
+"19\u00b2"
+]
+],
+"sq9_above": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CUBI",
+"name": "Customers Bancorp Inc Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 79.58,
+"level_kind": "breakout retest",
+"level_date": "2026-02-02",
+"close": 80.55000305175781,
+"above_pct": 1.2189007267961571,
+"stop": 77.17,
+"risk_pct": 4.191717875460299,
+"resistance": 83.65,
+"room_r": 0.9181293572037978,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -1.7530841591917423,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "EHC",
+"name": "Encompass Health Corporation Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 127.18,
+"level_kind": "breakout retest",
+"level_date": "2025-10-27",
+"close": 132.27999877929688,
+"above_pct": 4.010063266145103,
+"stop": 123.36,
+"risk_pct": 6.744353188402408,
+"resistance": 142.51,
+"room_r": 1.146676638835162,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": 5.107438268740316,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "FIGS",
+"name": "FIGS Inc. Class A Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 19.82,
 "level_kind": "old swing low",
 "level_date": "2026-11-06",
-"close": 169.00999450683594,
-"above_pct": 7.649678029831808,
-"stop": 147.46,
-"risk_pct": 12.749872561822261,
-"resistance": 170.77,
-"room_r": 0.08167644864123211,
+"close": 20.31999969482422,
+"above_pct": 2.522704377894458,
+"stop": 18.38,
+"risk_pct": 9.560602597738066,
+"resistance": 21.94,
+"room_r": 0.833885219388558,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": -20.72000122070312,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "HELE",
+"name": "Helen of Troy Limited Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 34.12,
+"level_kind": "breakout retest",
+"level_date": "2025-04-23",
+"close": 35.09000015258789,
+"above_pct": 2.842911052370134,
+"stop": 32.31,
+"risk_pct": 7.918417645006914,
+"resistance": 38.2,
+"room_r": 1.1192798874890386,
+"sq9": 49,
+"sq9_cross": "7\u00b2",
+"sq9_dist_pct": -30.367349118602515,
+"sq9_gap_pct": 65.3061224489796,
+"sq9_below": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "HLT",
+"name": "Hilton Worldwide Holdings Inc. Common Stock ",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 350.22,
+"level_kind": "breakout retest",
+"level_date": "2026-06-16",
+"close": 362.29998779296875,
+"above_pct": 3.4492566187426243,
+"stop": 341.74,
+"risk_pct": 5.674372075629308,
+"resistance": 381.34,
+"room_r": 0.9261493151727815,
+"sq9": 361,
+"sq9_cross": "19\u00b2",
+"sq9_dist_pct": -2.9861492463426287,
+"sq9_gap_pct": 22.160664819944607,
+"sq9_below": [
+[
+289,
+"17\u00b2"
+]
+],
+"sq9_above": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "KO",
+"name": "Coca-Cola Company (The) Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 91.99,
+"level_kind": "breakout retest",
+"level_date": "2026-08-24",
+"close": 96.08999633789062,
+"above_pct": 4.457004641083806,
+"stop": 90.1,
+"risk_pct": 6.230019669485676,
+"resistance": 100.56,
+"room_r": 0.7466895047937038,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": 13.56789859724634,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "MGNI",
+"name": "Magnite Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 26.52,
+"level_kind": "breakout retest",
+"level_date": "2025-08-28",
+"close": 26.610000610351562,
+"above_pct": 0.33936708534838544,
+"stop": 24.97,
+"risk_pct": 6.149675532634291,
+"resistance": 29.34,
+"room_r": 1.668266724744636,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": 6.080001831054682,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "MGRC",
+"name": "McGrath RentCorp Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 117.44,
+"level_kind": "old swing low",
+"level_date": "2025-08-07",
+"close": 121.18000030517578,
+"above_pct": 3.1846030194315755,
+"stop": 112.5,
+"risk_pct": 7.160833790124732,
+"resistance": 122.55,
+"room_r": 0.15787991907948112,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": -2.942146742639462,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "PAYX",
+"name": "Paychex Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 108.21,
+"level_kind": "old swing low",
+"level_date": "2026-10-28",
+"close": 111.4000015258789,
+"above_pct": 2.947973817942673,
+"stop": 104.96,
+"risk_pct": 5.781612918750467,
+"resistance": 116.7,
+"room_r": 0.8228890543319782,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": -10.570248690518468,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "PTRN",
+"name": "Pattern Group Inc. Series A Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 18.42,
+"level_kind": "breakout retest",
+"level_date": "2026-10-09",
+"close": 18.860000610351562,
+"above_pct": 2.3887108156089853,
+"stop": 17.29,
+"risk_pct": 8.325633580106862,
+"resistance": 20.95,
+"room_r": 1.3310284002542192,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": -26.319999694824215,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "QTWO",
+"name": "Q2 Holdings Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 66.22,
+"level_kind": "breakout retest",
+"level_date": "2026-08-13",
+"close": 67.2300033569336,
+"above_pct": 1.5252221649230346,
+"stop": 63.5,
+"risk_pct": 5.551309527848936,
+"resistance": 68.84,
+"room_r": 0.4313853641598614,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -18.246912073206023,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "RLJ",
+"name": "RLJ Lodging Trust Common Shares of Beneficial Interest $0.01",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 12.2,
+"level_kind": "breakout retest",
+"level_date": "2024-03-08",
+"close": 12.579999923706055,
+"above_pct": 3.114755085097065,
+"stop": 11.83,
+"risk_pct": 5.993073655952208,
+"resistance": 13.4,
+"room_r": 1.0876356568800387,
+"sq9": 9,
+"sq9_cross": "3\u00b2",
+"sq9_dist_pct": 35.5555534362793,
+"sq9_gap_pct": 177.77777777777777,
+"sq9_below": [
+[
+1,
+"1\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "SLS",
+"name": "SELLAS Life Sciences Group Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 14.16,
+"level_kind": "breakout retest",
+"level_date": "2026-09-02",
+"close": 14.859999656677246,
+"above_pct": 4.943501531132211,
+"stop": 11.61,
+"risk_pct": 21.846760880682048,
+"resistance": 15.21,
+"room_r": 0.10781089790387734,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": -43.36000061035157,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "SPOT",
+"name": "Spotify Technology S.A. Ordinary Shares",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 565.19,
+"level_kind": "breakout retest",
+"level_date": "2026-03-06",
+"close": 583.8499755859375,
+"above_pct": 3.3015398474720348,
+"stop": 544.88,
+"risk_pct": 6.675315684961303,
+"resistance": 609.41,
+"room_r": 0.6558246448047635,
+"sq9": 529,
+"sq9_cross": "23\u00b2",
+"sq9_dist_pct": 6.841210291381139,
+"sq9_gap_pct": 18.14744801512287,
+"sq9_below": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_above": [
+[
+625,
+"25\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "SWK",
+"name": "Stanley Black & Decker Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 104.0,
+"level_kind": "breakout retest",
+"level_date": "2026-08-11",
+"close": 107.63999938964844,
+"above_pct": 3.499999413123489,
+"stop": 98.9,
+"risk_pct": 8.121647369236962,
+"resistance": 110.13,
+"room_r": 0.2848270020899644,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": -14.049586776859503,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "TRNS",
+"name": "Transcat Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 94.36,
+"level_kind": "breakout retest",
+"level_date": "2025-05-20",
+"close": 97.52999877929688,
+"above_pct": 3.3594723913106472,
+"stop": 88.53,
+"risk_pct": 9.232321821769496,
+"resistance": 108.13,
+"room_r": 1.1772173364872525,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": 16.493827914014282,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "U",
+"name": "Unity Software Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 46.53,
+"level_kind": "breakout retest",
+"level_date": "2025-09-15",
+"close": 46.70000076293945,
+"above_pct": 0.3653599572373434,
+"stop": 43.24,
+"risk_pct": 7.413768909751017,
+"resistance": 47.29,
+"room_r": 0.17041043754190804,
+"sq9": 49,
+"sq9_cross": "7\u00b2",
+"sq9_dist_pct": -5.040818817761483,
+"sq9_gap_pct": 65.3061224489796,
+"sq9_below": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "UCB",
+"name": "United Community Banks Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 34.84,
+"level_kind": "breakout retest",
+"level_date": "2026-04-09",
+"close": 35.63999938964844,
+"above_pct": 2.2962090515407763,
+"stop": 34.03,
+"risk_pct": 4.513585264418096,
+"resistance": 36.51,
+"room_r": 0.5408282646545642,
+"sq9": 49,
+"sq9_cross": "7\u00b2",
+"sq9_dist_pct": -28.897958872269612,
+"sq9_gap_pct": 65.3061224489796,
+"sq9_below": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "VAC",
+"name": "Marriott Vacations Worldwide Corporation Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 107.18,
+"level_kind": "old swing low",
+"level_date": "2026-11-05",
+"close": 109.4800033569336,
+"above_pct": 2.1459255879912043,
+"stop": 101.81,
+"risk_pct": 7.005984797698151,
+"resistance": 117.02,
+"room_r": 0.9830304407362067,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": -11.421487351094395,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "WCN",
+"name": "Waste Connections Inc. Common Shares",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 173.16,
+"level_kind": "breakout retest",
+"level_date": "2026-03-02",
+"close": 180.42999267578125,
+"above_pct": 4.198422765027177,
+"stop": 167.83,
+"risk_pct": 6.984893676193893,
+"resistance": 191.84,
+"room_r": 0.9053515566118215,
 "sq9": 169,
 "sq9_cross": "13\u00b2",
-"sq9_dist_pct": -7.100591715976334,
+"sq9_dist_pct": 2.461540628467085,
 "sq9_gap_pct": 33.136094674556205,
 "sq9_below": [
 [
@@ -72,20 +996,152 @@
 "sq9_match": false
 },
 {
+"symbol": "WMK",
+"name": "Weis Markets Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 74.28,
+"level_kind": "old swing low",
+"level_date": "2026-10-28",
+"close": 78.11000061035156,
+"above_pct": 5.15616840871862,
+"stop": 71.44,
+"risk_pct": 8.543814592304965,
+"resistance": 80.29,
+"room_r": 0.3266616098025313,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -8.296297803337193,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "ADUS",
+"name": "Addus HomeCare Corporation Common Stock",
+"status": "touched",
+"touch_date": "2026-11-18",
+"days_ago": 1,
+"level": 117.63,
+"level_kind": "breakout retest",
+"level_date": "2026-02-23",
+"close": 121.06999969482422,
+"above_pct": 2.9244261852656717,
+"stop": 113.23,
+"risk_pct": 6.472645408050893,
+"resistance": 122.75,
+"room_r": 0.21438332563161888,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": -2.7851262368446594,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CDW",
+"name": "CDW Corporation Common Stock",
+"status": "touched",
+"touch_date": "2026-11-18",
+"days_ago": 1,
+"level": 157.0,
+"level_kind": "old swing low",
+"level_date": "2026-11-06",
+"close": 167.61000061035156,
+"above_pct": 6.7579621721984395,
+"stop": 148.64,
+"risk_pct": 11.320072070977272,
+"resistance": 170.77,
+"room_r": 0.16654763360687871,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": -7.100591715976334,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CENTA",
+"name": "Central Garden & Pet Company Class A Common Stock Nonvoting",
+"status": "touched",
+"touch_date": "2026-11-18",
+"days_ago": 1,
+"level": 38.11,
+"level_kind": "breakout retest",
+"level_date": "2024-02-12",
+"close": 39.349998474121094,
+"above_pct": 3.2537335185261584,
+"stop": 36.8,
+"risk_pct": 6.473038793360741,
+"resistance": 40.6,
+"room_r": 0.490746355896584,
+"sq9": 49,
+"sq9_cross": "7\u00b2",
+"sq9_dist_pct": -22.224488550302933,
+"sq9_gap_pct": 65.3061224489796,
+"sq9_below": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "CERT",
 "name": "Certara Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 0,
+"days_ago": 1,
 "level": 10.71,
 "level_kind": "old swing low",
 "level_date": "2026-11-02",
-"close": 11.180000305175781,
-"above_pct": 4.388424513116318,
-"stop": 10.09,
-"risk_pct": 9.7131385267353,
-"resistance": 11.33,
-"room_r": 0.13813023687975276,
+"close": 10.680000305175781,
+"above_pct": -0.28010955055404185,
+"stop": 10.07,
+"risk_pct": 5.693556054974502,
+"resistance": 11.03,
+"room_r": 0.5755889772658657,
 "sq9": 9,
 "sq9_cross": "3\u00b2",
 "sq9_dist_pct": 19.000000423855255,
@@ -105,53 +1161,20 @@
 "sq9_match": false
 },
 {
-"symbol": "FCNCA",
-"name": "First Citizens BancShares Inc. Class A Common Stock",
-"status": "touched",
-"touch_date": "2026-11-18",
-"days_ago": 0,
-"level": 2160.99,
-"level_kind": "breakout retest",
-"level_date": "2026-02-06",
-"close": 2229.820068359375,
-"above_pct": 3.185117859686848,
-"stop": 2105.28,
-"risk_pct": 5.585176831121485,
-"resistance": 2291.33,
-"room_r": 0.49390002530250005,
-"sq9": 2209,
-"sq9_cross": "47\u00b2",
-"sq9_dist_pct": -2.173382062726348,
-"sq9_gap_pct": 8.691715708465363,
-"sq9_below": [
-[
-2025,
-"45\u00b2"
-]
-],
-"sq9_above": [
-[
-2401,
-"49\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "FTDR",
 "name": "Frontdoor Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 0,
+"days_ago": 1,
 "level": 90.83,
 "level_kind": "breakout retest",
 "level_date": "2026-08-07",
-"close": 93.58999633789062,
-"above_pct": 3.0386375109510366,
-"stop": 86.53,
-"risk_pct": 7.539719482176121,
+"close": 90.16000366210938,
+"above_pct": -0.7376397175368532,
+"stop": 86.31,
+"risk_pct": 4.27573437271297,
 "resistance": 100.73,
-"room_r": 1.0118450707347122,
+"room_r": 2.741891953022074,
 "sq9": 81,
 "sq9_cross": "9\u00b2",
 "sq9_dist_pct": 12.135804729697153,
@@ -171,23 +1194,23 @@
 "sq9_match": false
 },
 {
-"symbol": "MEOH",
-"name": "Methanex Corporation Common Stock",
+"symbol": "HNI",
+"name": "HNI Corporation Common Stock",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 0,
-"level": 60.74,
+"days_ago": 1,
+"level": 45.06,
 "level_kind": "old swing low",
-"level_date": "2026-10-22",
-"close": 63.75,
-"above_pct": 4.955545338090261,
-"stop": 57.21,
-"risk_pct": 10.254339650899425,
-"resistance": 64.47,
-"room_r": 0.11014006927645029,
+"level_date": "2026-10-21",
+"close": 48.279998779296875,
+"above_pct": 7.146021544319092,
+"stop": 43.03,
+"risk_pct": 10.878501347221615,
+"resistance": 48.91,
+"room_r": 0.11995130175764095,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
-"sq9_dist_pct": 23.959187098911826,
+"sq9_dist_pct": -8.040813523895885,
 "sq9_gap_pct": 65.3061224489796,
 "sq9_below": [
 [
@@ -197,8 +1220,41 @@
 ],
 "sq9_above": [
 [
-81,
-"9\u00b2"
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "ICE",
+"name": "Intercontinental Exchange Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-18",
+"days_ago": 1,
+"level": 166.29,
+"level_kind": "breakout retest",
+"level_date": "2026-03-04",
+"close": 170.8800048828125,
+"above_pct": 2.760245223404234,
+"stop": 162.27,
+"risk_pct": 5.039049875073265,
+"resistance": 175.1,
+"room_r": 0.49008642371289046,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": -1.6035542685604698,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
 ]
 ],
 "sq9_match": false
@@ -208,16 +1264,16 @@
 "name": "Mohawk Industries Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 0,
+"days_ago": 1,
 "level": 140.1,
 "level_kind": "breakout retest",
 "level_date": "2026-08-14",
-"close": 148.44000244140625,
-"above_pct": 5.952887919025818,
-"stop": 133.9,
-"risk_pct": 9.798329586431432,
-"resistance": 156.6,
-"room_r": 0.5610316434173521,
+"close": 142.85000610351562,
+"above_pct": 1.9628835690186364,
+"stop": 134.31,
+"risk_pct": 5.979299564007157,
+"resistance": 145.03,
+"room_r": 0.2552257325570293,
 "sq9": 121,
 "sq9_cross": "11\u00b2",
 "sq9_dist_pct": 15.785129011169929,
@@ -241,16 +1297,16 @@
 "name": "3M Company Common Stock",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 0,
+"days_ago": 1,
 "level": 174.61,
 "level_kind": "breakout retest",
 "level_date": "2026-02-12",
-"close": 181.0500030517578,
-"above_pct": 3.688220845825052,
-"stop": 169.18,
-"risk_pct": 6.556595658567266,
+"close": 178.47000122070312,
+"above_pct": 2.210641198590513,
+"stop": 169.29,
+"risk_pct": 5.144478425062482,
 "resistance": 183.78,
-"room_r": 0.22997733080045513,
+"room_r": 0.5783460111116836,
 "sq9": 169,
 "sq9_cross": "13\u00b2",
 "sq9_dist_pct": 3.3195269883737,
@@ -274,16 +1330,16 @@
 "name": "MSCI Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 0,
+"days_ago": 1,
 "level": 613.3,
 "level_kind": "breakout retest",
 "level_date": "2024-10-15",
-"close": 636.9000244140625,
-"above_pct": 3.84804126705125,
-"stop": 596.23,
-"risk_pct": 6.385246641136211,
-"resistance": 643.83,
-"room_r": 0.17040558822835766,
+"close": 624.3300170898438,
+"above_pct": 1.7984721207264132,
+"stop": 595.79,
+"risk_pct": 4.571190648971502,
+"resistance": 635.99,
+"room_r": 0.4085582641867057,
 "sq9": 625,
 "sq9_cross": "25\u00b2",
 "sq9_dist_pct": -1.872001953125002,
@@ -296,8 +1352,74 @@
 ],
 "sq9_above": [
 [
-729,
-"27\u00b2"
+625,
+"25\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "NDAQ",
+"name": "Nasdaq Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-18",
+"days_ago": 1,
+"level": 100.98,
+"level_kind": "breakout retest",
+"level_date": "2026-01-16",
+"close": 103.94999694824219,
+"above_pct": 2.941170026317552,
+"stop": 98.52,
+"risk_pct": 5.227095307135321,
+"resistance": 111.45,
+"room_r": 1.3803091397579859,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": -16.54545177112926,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "PCTY",
+"name": "Paylocity Holding Corporation Common Stock",
+"status": "touched",
+"touch_date": "2026-11-18",
+"days_ago": 1,
+"level": 170.69,
+"level_kind": "old swing low",
+"level_date": "2025-08-12",
+"close": 173.08999633789062,
+"above_pct": 1.4060541696390372,
+"stop": 163.57,
+"risk_pct": 5.497302437257979,
+"resistance": 177.39,
+"room_r": 0.4519050187003708,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": 1.000001444619092,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
 ]
 ],
 "sq9_match": false
@@ -307,16 +1429,16 @@
 "name": "RELX PLC PLC American Depositary Shares (Each representing O",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 0,
+"days_ago": 1,
 "level": 38.23,
 "level_kind": "breakout retest",
 "level_date": "2026-07-29",
-"close": 39.02000045776367,
-"above_pct": 2.066442388142198,
-"stop": 37.3,
-"risk_pct": 4.404335671400739,
-"resistance": 42.15,
-"room_r": 1.8212803617968467,
+"close": 38.83000183105469,
+"above_pct": 1.5694540831879378,
+"stop": 37.38,
+"risk_pct": 3.7241125906700923,
+"resistance": 41.45,
+"room_r": 1.8118026926514295,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
 "sq9_dist_pct": -21.979592770946265,
@@ -336,28 +1458,61 @@
 "sq9_match": false
 },
 {
-"symbol": "SEIC",
-"name": "SEI Investments Company Common Stock",
+"symbol": "SENEA",
+"name": "Seneca Foods Corp. Class A Common Stock",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 0,
-"level": 102.07,
+"days_ago": 1,
+"level": 34.28,
 "level_kind": "old swing low",
-"level_date": "2026-10-07",
-"close": 105.51000213623047,
-"above_pct": 3.3702385144424474,
-"stop": 99.29,
-"risk_pct": 5.894501787800044,
-"resistance": 111.63,
-"room_r": 0.9840345342299559,
-"sq9": 121,
-"sq9_cross": "11\u00b2",
-"sq9_dist_pct": -15.644628351384949,
-"sq9_gap_pct": 39.66942148760331,
+"level_date": "2026-10-06",
+"close": 34.56999969482422,
+"above_pct": 0.8342063201089989,
+"stop": 32.14,
+"risk_pct": 7.040786127472343,
+"resistance": 35.07,
+"room_r": 0.20706724350591252,
+"sq9": 49,
+"sq9_cross": "7\u00b2",
+"sq9_dist_pct": -30.032652251574454,
+"sq9_gap_pct": 65.3061224489796,
 "sq9_below": [
 [
-81,
-"9\u00b2"
+25,
+"5\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "URBN",
+"name": "Urban Outfitters Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-18",
+"days_ago": 1,
+"level": 79.49,
+"level_kind": "breakout retest",
+"level_date": "2026-08-10",
+"close": 85.2300033569336,
+"above_pct": 7.221041196907962,
+"stop": 75.58,
+"risk_pct": 11.32396940421222,
+"resistance": 92.19,
+"room_r": 0.7211373500093057,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -1.864200168185759,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
 ]
 ],
 "sq9_above": [
@@ -373,16 +1528,16 @@
 "name": "Amplitude Inc. Class A Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 16.1,
 "level_kind": "old swing low",
 "level_date": "2026-11-05",
-"close": 16.889999389648438,
-"above_pct": 4.906826021494748,
-"stop": 15.14,
-"risk_pct": 10.389488332375496,
+"close": 16.540000915527344,
+"above_pct": 2.7329225070332086,
+"stop": 15.11,
+"risk_pct": 8.637935943137887,
 "resistance": 17.44,
-"room_r": 0.31342944926716626,
+"room_r": 0.6299365636542621,
 "sq9": 25,
 "sq9_cross": "5\u00b2",
 "sq9_dist_pct": -35.599998474121094,
@@ -406,16 +1561,16 @@
 "name": "American Tower Corporation (REIT) Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 179.26,
 "level_kind": "breakout retest",
 "level_date": "2026-07-29",
-"close": 184.82000732421875,
-"above_pct": 3.1016473210763174,
-"stop": 174.58,
-"risk_pct": 5.541885606664865,
-"resistance": 193.09,
-"room_r": 0.807417935765579,
+"close": 181.14999389648438,
+"above_pct": 1.0543341780457016,
+"stop": 174.52,
+"risk_pct": 3.6583737693362983,
+"resistance": 183.57,
+"room_r": 0.3651668771506493,
 "sq9": 169,
 "sq9_cross": "13\u00b2",
 "sq9_dist_pct": 6.071002666766834,
@@ -435,86 +1590,20 @@
 "sq9_match": false
 },
 {
-"symbol": "ANRO",
-"name": "Alto Neuroscience Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-17",
-"days_ago": 1,
-"level": 24.41,
-"level_kind": "breakout retest",
-"level_date": "2026-10-20",
-"close": 25.90999984741211,
-"above_pct": 6.145022570162073,
-"stop": 22.06,
-"risk_pct": 14.875391252554394,
-"resistance": 27.16,
-"room_r": 0.3243203538713767,
-"sq9": 25,
-"sq9_cross": "5\u00b2",
-"sq9_dist_pct": -2.3600006103515647,
-"sq9_gap_pct": 96.0,
-"sq9_below": [
-[
-9,
-"3\u00b2"
-]
-],
-"sq9_above": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "ARHS",
-"name": "Arhaus Inc. Class A Common Stock",
-"status": "touched",
-"touch_date": "2026-11-17",
-"days_ago": 1,
-"level": 12.8,
-"level_kind": "breakout retest",
-"level_date": "2025-08-15",
-"close": 13.8100004196167,
-"above_pct": 7.890626670559842,
-"stop": 11.94,
-"risk_pct": 13.543500278619492,
-"resistance": 14.71,
-"room_r": 0.48119124009581965,
-"sq9": 9,
-"sq9_cross": "3\u00b2",
-"sq9_dist_pct": 42.222224341498475,
-"sq9_gap_pct": 177.77777777777777,
-"sq9_below": [
-[
-1,
-"1\u00b2"
-]
-],
-"sq9_above": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "CGON",
 "name": "CG Oncology Inc. Common stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 78.25,
 "level_kind": "breakout retest",
 "level_date": "2026-09-21",
-"close": 80.0,
-"above_pct": 2.2364217252396124,
-"stop": 71.29,
-"risk_pct": 10.892320360456187,
+"close": 81.9000015258789,
+"above_pct": 4.664538691219056,
+"stop": 71.32,
+"risk_pct": 12.915925923624162,
 "resistance": 84.78,
-"room_r": 0.5485514818140045,
+"room_r": 0.2722592339242257,
 "sq9": 81,
 "sq9_cross": "9\u00b2",
 "sq9_dist_pct": -3.3950617283950657,
@@ -527,8 +1616,8 @@
 ],
 "sq9_above": [
 [
-81,
-"9\u00b2"
+121,
+"11\u00b2"
 ]
 ],
 "sq9_match": false
@@ -538,16 +1627,16 @@
 "name": "Crane NXT Co. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 52.5,
 "level_kind": "breakout retest",
 "level_date": "2026-07-02",
-"close": 55.38999938964844,
-"above_pct": 5.504760742187509,
-"stop": 49.97,
-"risk_pct": 9.789028535820933,
-"resistance": 56.05,
-"room_r": 0.12172306523966533,
+"close": 54.20000076293945,
+"above_pct": 3.2380966913132525,
+"stop": 49.95,
+"risk_pct": 7.836059214678115,
+"resistance": 55.36,
+"room_r": 0.2731246704403461,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
 "sq9_dist_pct": 7.14285714285714,
@@ -571,16 +1660,16 @@
 "name": "DocuSign Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 73.14,
 "level_kind": "breakout retest",
 "level_date": "2025-10-31",
-"close": 76.58000183105469,
-"above_pct": 4.703312100236512,
-"stop": 70.29,
-"risk_pct": 8.211864008515036,
+"close": 75.05999755859375,
+"above_pct": 2.6251000614816222,
+"stop": 70.16,
+"risk_pct": 6.53029770873631,
 "resistance": 78.59,
-"room_r": 0.31962279831001056,
+"room_r": 0.7201666875867394,
 "sq9": 81,
 "sq9_cross": "9\u00b2",
 "sq9_dist_pct": -9.703704457224148,
@@ -600,20 +1689,53 @@
 "sq9_match": false
 },
 {
+"symbol": "DUOL",
+"name": "Duolingo Inc. Class A Common Stock",
+"status": "touched",
+"touch_date": "2026-11-17",
+"days_ago": 2,
+"level": 155.98,
+"level_kind": "breakout retest",
+"level_date": "2026-01-23",
+"close": 149.3800048828125,
+"above_pct": -4.228242322572006,
+"stop": 143.01,
+"risk_pct": 4.263282483157049,
+"resistance": 151.72,
+"room_r": 0.36743337224236394,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": -7.707096980168271,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "DXC",
 "name": "DXC Technology Company Common Stock ",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 13.78,
 "level_kind": "old swing low",
 "level_date": "2026-11-03",
-"close": 14.369999885559082,
-"above_pct": 4.281568679397041,
-"stop": 13.03,
-"risk_pct": 9.320012951919354,
-"resistance": 14.79,
-"room_r": 0.3136000250651016,
+"close": 13.329999923706055,
+"above_pct": -3.2656010013442094,
+"stop": 13.08,
+"risk_pct": 1.9049422283494377,
+"resistance": 14.2,
+"room_r": 3.426156835424385,
 "sq9": 25,
 "sq9_cross": "5\u00b2",
 "sq9_dist_pct": -44.88000106811524,
@@ -633,34 +1755,67 @@
 "sq9_match": false
 },
 {
-"symbol": "EWTX",
-"name": "Edgewise Therapeutics Inc. Common Stock",
+"symbol": "ECPG",
+"name": "Encore Capital Group Inc Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
-"level": 40.49,
+"days_ago": 2,
+"level": 100.2,
 "level_kind": "breakout retest",
-"level_date": "2026-10-28",
-"close": 41.369998931884766,
-"above_pct": 2.173369268803871,
-"stop": 37.16,
-"risk_pct": 10.183354965407753,
-"resistance": 42.3,
-"room_r": 0.22075304304486312,
-"sq9": 49,
-"sq9_cross": "7\u00b2",
-"sq9_dist_pct": -17.36734351333307,
-"sq9_gap_pct": 65.3061224489796,
+"level_date": "2026-08-07",
+"close": 101.80999755859375,
+"above_pct": 1.6067870852163768,
+"stop": 93.61,
+"risk_pct": 8.049307962181784,
+"resistance": 103.74,
+"room_r": 0.23550948733436103,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": -17.190085166741998,
+"sq9_gap_pct": 39.66942148760331,
 "sq9_below": [
 [
-25,
-"5\u00b2"
+81,
+"9\u00b2"
 ]
 ],
 "sq9_above": [
 [
-49,
-"7\u00b2"
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "FROG",
+"name": "JFrog Ltd. Ordinary Shares",
+"status": "touched",
+"touch_date": "2026-11-17",
+"days_ago": 2,
+"level": 104.03,
+"level_kind": "breakout retest",
+"level_date": "2026-08-27",
+"close": 109.2699966430664,
+"above_pct": 5.037006560854018,
+"stop": 93.47,
+"risk_pct": 14.457109598172412,
+"resistance": 113.6,
+"room_r": 0.27409788023316156,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": -14.024794397275308,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
 ]
 ],
 "sq9_match": false
@@ -670,16 +1825,16 @@
 "name": "Kodiak Sciences Inc Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 92.97,
 "level_kind": "breakout retest",
 "level_date": "2026-10-20",
-"close": 97.80999755859375,
-"above_pct": 5.205976416415092,
-"stop": 86.21,
-"risk_pct": 11.864836481100783,
+"close": 97.9000015258789,
+"above_pct": 5.302786103522106,
+"stop": 86.11,
+"risk_pct": 12.044360080118333,
 "resistance": 99.87,
-"room_r": 0.17751019816098995,
+"room_r": 0.1670706129387467,
 "sq9": 81,
 "sq9_cross": "9\u00b2",
 "sq9_dist_pct": 14.77777928481867,
@@ -703,16 +1858,16 @@
 "name": "Kymera Therapeutics Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 119.35,
 "level_kind": "breakout retest",
 "level_date": "2026-07-10",
-"close": 121.12999725341797,
-"above_pct": 1.4914108102672685,
-"stop": 111.82,
-"risk_pct": 7.687488184092928,
-"resistance": 127.31,
-"room_r": 0.6636702159442497,
+"close": 119.38999938964844,
+"above_pct": 0.033515639747583315,
+"stop": 112.19,
+"risk_pct": 6.03484261508328,
+"resistance": 122.06,
+"room_r": 0.37057580875606905,
 "sq9": 121,
 "sq9_cross": "11\u00b2",
 "sq9_dist_pct": -1.3636376246933146,
@@ -725,8 +1880,8 @@
 ],
 "sq9_above": [
 [
-169,
-"13\u00b2"
+121,
+"11\u00b2"
 ]
 ],
 "sq9_match": false
@@ -736,16 +1891,16 @@
 "name": "LB Pharmaceuticals Inc Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 38.09,
 "level_kind": "old swing low",
 "level_date": "2026-11-05",
-"close": 40.060001373291016,
-"above_pct": 5.171964328724954,
-"stop": 35.19,
-"risk_pct": 12.159440301411406,
+"close": 40.040000915527344,
+"above_pct": 5.1194559073977075,
+"stop": 35.17,
+"risk_pct": 12.172470995820795,
 "resistance": 41.0,
-"room_r": 0.19297572198151453,
+"room_r": 0.19696905066127135,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
 "sq9_dist_pct": -22.26530581104512,
@@ -765,53 +1920,20 @@
 "sq9_match": false
 },
 {
-"symbol": "LIND",
-"name": "Lindblad Expeditions Holdings Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-17",
-"days_ago": 1,
-"level": 31.57,
-"level_kind": "old swing low",
-"level_date": "2026-11-05",
-"close": 33.42499923706055,
-"above_pct": 5.875830092391321,
-"stop": 29.61,
-"risk_pct": 11.408270423638545,
-"resistance": 34.48,
-"room_r": 0.27666955528961884,
-"sq9": 25,
-"sq9_cross": "5\u00b2",
-"sq9_dist_pct": 26.279998779296875,
-"sq9_gap_pct": 96.0,
-"sq9_below": [
-[
-9,
-"3\u00b2"
-]
-],
-"sq9_above": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "MAC",
 "name": "Macerich Company (The) Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 23.49,
 "level_kind": "old swing low",
 "level_date": "2026-08-06",
-"close": 24.469999313354492,
-"above_pct": 4.171986171925268,
-"stop": 22.84,
-"risk_pct": 6.658297152186665,
+"close": 23.610000610351562,
+"above_pct": 0.5108592609734508,
+"stop": 22.79,
+"risk_pct": 3.472079565068664,
 "resistance": 24.9,
-"room_r": 0.26391959331737097,
+"room_r": 1.5736339236004364,
 "sq9": 25,
 "sq9_cross": "5\u00b2",
 "sq9_dist_pct": -6.040000915527344,
@@ -835,16 +1957,16 @@
 "name": "Porch Group Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 19.73,
 "level_kind": "old swing low",
 "level_date": "2026-11-06",
-"close": 20.760000228881836,
-"above_pct": 5.220480033162533,
+"close": 19.959999084472656,
+"above_pct": 1.165735162557735,
 "stop": 18.63,
-"risk_pct": 10.274569473998485,
+"risk_pct": 6.666545534824564,
 "resistance": 21.56,
-"room_r": 0.3750581315768679,
+"room_r": 1.2024269992765417,
 "sq9": 25,
 "sq9_cross": "5\u00b2",
 "sq9_dist_pct": -21.080001831054684,
@@ -864,34 +1986,34 @@
 "sq9_match": false
 },
 {
-"symbol": "QTWO",
-"name": "Q2 Holdings Inc. Common Stock",
+"symbol": "PRGO",
+"name": "Perrigo Company plc Ordinary Shares",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
-"level": 69.82,
+"days_ago": 2,
+"level": 15.42,
 "level_kind": "breakout retest",
-"level_date": "2026-10-26",
-"close": 69.75,
-"above_pct": -0.10025736913518157,
-"stop": 67.17,
-"risk_pct": 3.6953419706361235,
-"resistance": 70.47,
-"room_r": 0.2793408087345272,
-"sq9": 81,
-"sq9_cross": "9\u00b2",
-"sq9_dist_pct": -13.802469512562698,
-"sq9_gap_pct": 49.382716049382715,
+"level_date": "2026-09-25",
+"close": 16.040000915527344,
+"above_pct": 4.020757692385235,
+"stop": 14.62,
+"risk_pct": 8.852874171055936,
+"resistance": 16.95,
+"room_r": 0.6408444674004103,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": -38.31999969482421,
+"sq9_gap_pct": 96.0,
 "sq9_below": [
 [
-49,
-"7\u00b2"
+9,
+"3\u00b2"
 ]
 ],
 "sq9_above": [
 [
-81,
-"9\u00b2"
+25,
+"5\u00b2"
 ]
 ],
 "sq9_match": false
@@ -901,16 +2023,16 @@
 "name": "SI-BONE Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 22.41,
 "level_kind": "breakout retest",
 "level_date": "2026-10-29",
-"close": 23.540000915527344,
-"above_pct": 5.042396589956799,
-"stop": 20.91,
-"risk_pct": 11.175510908510466,
+"close": 23.75,
+"above_pct": 5.9794741709586985,
+"stop": 20.96,
+"risk_pct": 11.753384582978443,
 "resistance": 25.6,
-"room_r": 0.7830567644430588,
+"room_r": 0.662743164354527,
 "sq9": 25,
 "sq9_cross": "5\u00b2",
 "sq9_dist_pct": -10.36000061035156,
@@ -930,28 +2052,28 @@
 "sq9_match": false
 },
 {
-"symbol": "SWK",
-"name": "Stanley Black & Decker Inc. Common Stock",
+"symbol": "SYRE",
+"name": "Spyre Therapeutics Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
-"level": 106.05,
+"days_ago": 2,
+"level": 93.19,
 "level_kind": "breakout retest",
-"level_date": "2024-07-30",
-"close": 110.83000183105469,
-"above_pct": 4.507306592875815,
-"stop": 101.01,
-"risk_pct": 8.863475821926848,
-"resistance": 118.33,
-"room_r": 0.7634838566515031,
-"sq9": 121,
-"sq9_cross": "11\u00b2",
-"sq9_dist_pct": -12.355369378712556,
-"sq9_gap_pct": 39.66942148760331,
+"level_date": "2026-10-02",
+"close": 97.62999725341797,
+"above_pct": 4.764454014048769,
+"stop": 87.12,
+"risk_pct": 10.767323688902842,
+"resistance": 100.32,
+"room_r": 0.2558948985469409,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": 15.04938573013117,
+"sq9_gap_pct": 49.382716049382715,
 "sq9_below": [
 [
-81,
-"9\u00b2"
+49,
+"7\u00b2"
 ]
 ],
 "sq9_above": [
@@ -967,16 +2089,16 @@
 "name": "Victory Capital Holdings Inc. Class A Common Stock",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 115.28,
 "level_kind": "breakout retest",
 "level_date": "2026-10-05",
-"close": 119.55999755859375,
-"above_pct": 3.712698494637312,
-"stop": 109.72,
-"risk_pct": 8.228264156095166,
-"resistance": 121.13,
-"room_r": 0.15958991553477359,
+"close": 114.2699966430664,
+"above_pct": -0.8761295514620127,
+"stop": 109.5,
+"risk_pct": 4.175759493137843,
+"resistance": 120.19,
+"room_r": 1.2406647420431105,
 "sq9": 121,
 "sq9_cross": "11\u00b2",
 "sq9_dist_pct": -4.727273736118287,
@@ -996,166 +2118,34 @@
 "sq9_match": false
 },
 {
-"symbol": "WCN",
-"name": "Waste Connections Inc. Common Shares",
+"symbol": "DLTR",
+"name": "Dollar Tree Inc. Common Stock",
 "status": "touched",
-"touch_date": "2026-11-17",
-"days_ago": 1,
-"level": 178.54,
-"level_kind": "breakout retest",
-"level_date": "2025-12-29",
-"close": 182.0,
-"above_pct": 1.9379449109321323,
-"stop": 173.03,
-"risk_pct": 4.931124413219323,
-"resistance": 191.84,
-"room_r": 1.0964216153118043,
-"sq9": 169,
-"sq9_cross": "13\u00b2",
-"sq9_dist_pct": 5.6449664414987,
-"sq9_gap_pct": 33.136094674556205,
-"sq9_below": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_above": [
-[
-225,
-"15\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "XYZ",
-"name": "Block Inc. Class A Common Stock",
-"status": "touched",
-"touch_date": "2026-11-17",
-"days_ago": 1,
-"level": 77.88,
+"touch_date": "2026-11-16",
+"days_ago": 3,
+"level": 131.14,
 "level_kind": "old swing low",
-"level_date": "2026-09-01",
-"close": 79.01000213623047,
-"above_pct": 1.4509565005960567,
-"stop": 73.9,
-"risk_pct": 6.465190576288881,
-"resistance": 79.83,
-"room_r": 0.16052781188993526,
-"sq9": 81,
-"sq9_cross": "9\u00b2",
-"sq9_dist_pct": -3.851855242693869,
-"sq9_gap_pct": 49.382716049382715,
+"level_date": "2026-11-06",
+"close": 140.24000549316406,
+"above_pct": 6.9391536875620385,
+"stop": 124.89,
+"risk_pct": 10.9432332127408,
+"resistance": 142.54,
+"room_r": 0.1498676703258962,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": 8.380164784833411,
+"sq9_gap_pct": 39.66942148760331,
 "sq9_below": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_above": [
 [
 81,
 "9\u00b2"
 ]
 ],
-"sq9_match": false
-},
-{
-"symbol": "ZETA",
-"name": "Zeta Global Holdings Corp. Class A Common Stock",
-"status": "touched",
-"touch_date": "2026-11-17",
-"days_ago": 1,
-"level": 32.68,
-"level_kind": "breakout retest",
-"level_date": "2026-09-03",
-"close": 33.959999084472656,
-"above_pct": 3.916764893953051,
-"stop": 30.47,
-"risk_pct": 10.265856179875533,
-"resistance": 36.74,
-"room_r": 0.7974112447395783,
-"sq9": 25,
-"sq9_cross": "5\u00b2",
-"sq9_dist_pct": 30.720001220703132,
-"sq9_gap_pct": 96.0,
-"sq9_below": [
-[
-9,
-"3\u00b2"
-]
-],
 "sq9_above": [
 [
-49,
-"7\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "ANET",
-"name": "Arista Networks Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-16",
-"days_ago": 2,
-"level": 187.0,
-"level_kind": "breakout retest",
-"level_date": "2026-10-27",
-"close": 193.94000244140625,
-"above_pct": 3.711231252088898,
-"stop": 173.01,
-"risk_pct": 10.792915267830095,
-"resistance": 202.25,
-"room_r": 0.39700386232912754,
-"sq9": 169,
-"sq9_cross": "13\u00b2",
-"sq9_dist_pct": 10.650887573964507,
-"sq9_gap_pct": 33.136094674556205,
-"sq9_below": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_above": [
-[
-225,
-"15\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "CTS",
-"name": "CTS Corporation Common Stock",
-"status": "touched",
-"touch_date": "2026-11-16",
-"days_ago": 2,
-"level": 56.89,
-"level_kind": "old swing low",
-"level_date": "2026-11-05",
-"close": 59.20000076293945,
-"above_pct": 4.060470026497032,
-"stop": 54.47,
-"risk_pct": 7.993475247618176,
-"resistance": 61.61,
-"room_r": 0.5092835731173222,
-"sq9": 49,
-"sq9_cross": "7\u00b2",
-"sq9_dist_pct": 16.102039570711103,
-"sq9_gap_pct": 65.3061224489796,
-"sq9_below": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_above": [
-[
-81,
-"9\u00b2"
+169,
+"13\u00b2"
 ]
 ],
 "sq9_match": false
@@ -1165,16 +2155,16 @@
 "name": "GigaCloud Technology Inc Class A Ordinary Shares",
 "status": "touched",
 "touch_date": "2026-11-16",
-"days_ago": 2,
+"days_ago": 3,
 "level": 60.63,
 "level_kind": "breakout retest",
 "level_date": "2026-10-28",
-"close": 65.30000305175781,
-"above_pct": 7.702460665300048,
-"stop": 56.55,
-"risk_pct": 13.402834733034796,
-"resistance": 67.4,
-"room_r": 0.23994356941272635,
+"close": 60.439998626708984,
+"above_pct": -0.3133802376034778,
+"stop": 56.42,
+"risk_pct": 6.650026971482759,
+"resistance": 63.01,
+"room_r": 0.639418532191592,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
 "sq9_dist_pct": 23.734696057378034,
@@ -1194,20 +2184,119 @@
 "sq9_match": false
 },
 {
+"symbol": "ICLR",
+"name": "ICON plc Ordinary Shares",
+"status": "touched",
+"touch_date": "2026-11-16",
+"days_ago": 3,
+"level": 187.97,
+"level_kind": "breakout retest",
+"level_date": "2026-01-27",
+"close": 190.36000061035156,
+"above_pct": 1.2714791584441443,
+"stop": 180.45,
+"risk_pct": 5.203861747438232,
+"resistance": 193.89,
+"room_r": 0.35634700061393854,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": 11.224852793315465,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "IRON",
+"name": "Disc Medicine Inc. Common Stock",
+"status": "touched",
+"touch_date": "2026-11-16",
+"days_ago": 3,
+"level": 74.51,
+"level_kind": "old swing low",
+"level_date": "2026-10-23",
+"close": 76.11000061035156,
+"above_pct": 2.1473606606476014,
+"stop": 70.62,
+"risk_pct": 7.214649519992699,
+"resistance": 79.48,
+"room_r": 0.6137242601519607,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -8.012343041690784,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "KSS",
+"name": "Kohl's Corporation Common Stock",
+"status": "touched",
+"touch_date": "2026-11-16",
+"days_ago": 3,
+"level": 22.11,
+"level_kind": "breakout retest",
+"level_date": "2026-01-06",
+"close": 22.989999771118164,
+"above_pct": 3.9800955968974483,
+"stop": 20.79,
+"risk_pct": 9.569374293048094,
+"resistance": 23.85,
+"room_r": 0.3909095232716439,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": -11.559997558593748,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "M",
 "name": "Macy's Inc Common Stock",
 "status": "touched",
 "touch_date": "2026-11-16",
-"days_ago": 2,
+"days_ago": 3,
 "level": 23.08,
 "level_kind": "old swing low",
 "level_date": "2026-11-06",
-"close": 24.8799991607666,
-"above_pct": 7.798956858798434,
+"close": 23.75,
+"above_pct": 2.9029466139892435,
 "stop": 21.85,
-"risk_pct": 12.162664667761735,
-"resistance": 25.7,
-"room_r": 0.27097898170300116,
+"risk_pct": 7.978948148569664,
+"resistance": 24.15,
+"room_r": 0.21108157225327823,
 "sq9": 25,
 "sq9_cross": "5\u00b2",
 "sq9_dist_pct": -7.680000305175783,
@@ -1231,16 +2320,16 @@
 "name": "Oruka Therapeutics Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-16",
-"days_ago": 2,
+"days_ago": 3,
 "level": 97.73,
 "level_kind": "breakout retest",
 "level_date": "2026-09-17",
-"close": 95.73999786376953,
-"above_pct": -2.0362277957733044,
-"stop": 91.51,
-"risk_pct": 4.418583328482761,
-"resistance": 97.73,
-"room_r": 0.4704113720831933,
+"close": 97.56999969482422,
+"above_pct": -0.16372010295037098,
+"stop": 91.26,
+"risk_pct": 6.471906298045704,
+"resistance": 109.5,
+"room_r": 1.889260872983471,
 "sq9": 121,
 "sq9_cross": "11\u00b2",
 "sq9_dist_pct": -19.231402184352397,
@@ -1264,16 +2353,16 @@
 "name": "Trex Company Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-16",
-"days_ago": 2,
+"days_ago": 3,
 "level": 50.48,
 "level_kind": "old swing low",
 "level_date": "2025-09-25",
-"close": 52.2599983215332,
-"above_pct": 3.5261465836733175,
-"stop": 47.51,
-"risk_pct": 9.084383990554912,
+"close": 50.59000015258789,
+"above_pct": 0.21790929348073362,
+"stop": 47.48,
+"risk_pct": 6.155932819403609,
 "resistance": 53.57,
-"room_r": 0.2759350544557989,
+"room_r": 0.9568803692836096,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
 "sq9_dist_pct": 3.020407229053723,
@@ -1293,53 +2382,20 @@
 "sq9_match": false
 },
 {
-"symbol": "TRNS",
-"name": "Transcat Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-16",
-"days_ago": 2,
-"level": 100.38,
-"level_kind": "old swing low",
-"level_date": "2026-11-05",
-"close": 100.12000274658203,
-"above_pct": -0.25901027490522477,
-"stop": 94.56,
-"risk_pct": 5.5569083918471485,
-"resistance": 108.13,
-"room_r": 1.4397202995570257,
-"sq9": 121,
-"sq9_cross": "11\u00b2",
-"sq9_dist_pct": -17.04132458395209,
-"sq9_gap_pct": 39.66942148760331,
-"sq9_below": [
-[
-81,
-"9\u00b2"
-]
-],
-"sq9_above": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "VSXY",
 "name": "Victorias Secret & Co. Common Stock ",
 "status": "touched",
 "touch_date": "2026-11-16",
-"days_ago": 2,
+"days_ago": 3,
 "level": 99.97,
 "level_kind": "breakout retest",
 "level_date": "2026-08-10",
-"close": 101.30000305175781,
-"above_pct": 1.3304009350949775,
-"stop": 93.77,
-"risk_pct": 7.437808924030742,
-"resistance": 113.52,
-"room_r": 1.6218717246633838,
+"close": 96.47000122070312,
+"above_pct": -3.501050272344275,
+"stop": 93.87,
+"risk_pct": 2.6946187580449865,
+"resistance": 99.97,
+"room_r": 1.3464134197577786,
 "sq9": 121,
 "sq9_cross": "11\u00b2",
 "sq9_dist_pct": -17.380164280410636,
@@ -1359,53 +2415,20 @@
 "sq9_match": false
 },
 {
-"symbol": "WS",
-"name": "Worthington Steel Inc. Common Shares",
-"status": "touched",
-"touch_date": "2026-11-16",
-"days_ago": 2,
-"level": 35.9,
-"level_kind": "old swing low",
-"level_date": "2026-11-05",
-"close": 38.290000915527344,
-"above_pct": 6.65737963249271,
-"stop": 33.37,
-"risk_pct": 12.85658124855239,
-"resistance": 39.12,
-"room_r": 0.16860334206025457,
-"sq9": 49,
-"sq9_cross": "7\u00b2",
-"sq9_dist_pct": -26.734690763512436,
-"sq9_gap_pct": 65.3061224489796,
-"sq9_below": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_above": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "ZBH",
 "name": "Zimmer Biomet Holdings Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-16",
-"days_ago": 2,
+"days_ago": 3,
 "level": 98.41,
 "level_kind": "breakout retest",
 "level_date": "2026-09-15",
-"close": 103.31999969482422,
-"above_pct": 4.989326135555605,
-"stop": 94.31,
-"risk_pct": 8.718747914282465,
-"resistance": 107.71,
-"room_r": 0.4873331366017631,
+"close": 101.47000122070312,
+"above_pct": 3.1094375009884656,
+"stop": 94.34,
+"risk_pct": 7.028816337406873,
+"resistance": 103.05,
+"room_r": 0.2215326432007743,
 "sq9": 121,
 "sq9_cross": "11\u00b2",
 "sq9_dist_pct": -18.669418461066634,
@@ -1425,20 +2448,53 @@
 "sq9_match": false
 },
 {
+"symbol": "CPA",
+"name": "Copa Holdings S.A. Class A Common Stock",
+"status": "touched",
+"touch_date": "2026-11-13",
+"days_ago": 4,
+"level": 137.11,
+"level_kind": "breakout retest",
+"level_date": "2026-09-21",
+"close": 140.69000244140625,
+"above_pct": 2.611043552708159,
+"stop": 130.59,
+"risk_pct": 7.182458598161623,
+"resistance": 142.95,
+"room_r": 0.22365108793416844,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": 13.314050091199636,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "ETON",
 "name": "Eton Pharmaceuticals Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-13",
-"days_ago": 3,
+"days_ago": 4,
 "level": 59.49,
 "level_kind": "breakout retest",
 "level_date": "2026-09-24",
-"close": 61.9900016784668,
-"above_pct": 4.202386837223626,
-"stop": 54.7,
-"risk_pct": 11.757656991605492,
+"close": 61.36000061035156,
+"above_pct": 3.143383558789914,
+"stop": 54.66,
+"risk_pct": 10.912761963354821,
 "resistance": 64.43,
-"room_r": 0.3347704742295792,
+"room_r": 0.4584777824433736,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
 "sq9_dist_pct": 21.408166690748565,
@@ -1462,16 +2518,16 @@
 "name": "LifeStance Health Group Inc. Common Stock",
 "status": "touched",
 "touch_date": "2026-11-13",
-"days_ago": 3,
+"days_ago": 4,
 "level": 13.38,
 "level_kind": "breakout retest",
 "level_date": "2026-09-14",
-"close": 13.770000457763672,
-"above_pct": 2.914800747287205,
-"stop": 12.6,
-"risk_pct": 8.516964360660673,
-"resistance": 15.66,
-"room_r": 1.6115466410448447,
+"close": 13.34000015258789,
+"above_pct": -0.2989533745209494,
+"stop": 12.56,
+"risk_pct": 5.830477518961452,
+"resistance": 14.6,
+"room_r": 1.6199837729104283,
 "sq9": 25,
 "sq9_cross": "5\u00b2",
 "sq9_dist_pct": -46.47999954223633,
@@ -1491,402 +2547,6 @@
 "sq9_match": false
 },
 {
-"symbol": "SONO",
-"name": "Sonos Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-13",
-"days_ago": 3,
-"level": 17.45,
-"level_kind": "breakout retest",
-"level_date": "2026-02-10",
-"close": 17.760000228881836,
-"above_pct": 1.7765011598209535,
-"stop": 16.35,
-"risk_pct": 7.9351651060145745,
-"resistance": 18.04,
-"room_r": 0.19868274968981386,
-"sq9": 25,
-"sq9_cross": "5\u00b2",
-"sq9_dist_pct": -30.19999694824219,
-"sq9_gap_pct": 96.0,
-"sq9_below": [
-[
-9,
-"3\u00b2"
-]
-],
-"sq9_above": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "CDNA",
-"name": "CareDx Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-12",
-"days_ago": 4,
-"level": 76.33,
-"level_kind": "old swing low",
-"level_date": "2026-11-05",
-"close": 74.44000244140625,
-"above_pct": -2.4760897999605347,
-"stop": 70.07,
-"risk_pct": 5.868102754066673,
-"resistance": 84.42,
-"room_r": 2.2846846649037134,
-"sq9": 81,
-"sq9_cross": "9\u00b2",
-"sq9_dist_pct": -5.765429838204095,
-"sq9_gap_pct": 49.382716049382715,
-"sq9_below": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_above": [
-[
-81,
-"9\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "CNMD",
-"name": "CONMED Corporation Common Stock",
-"status": "touched",
-"touch_date": "2026-11-12",
-"days_ago": 4,
-"level": 48.77,
-"level_kind": "breakout retest",
-"level_date": "2025-10-22",
-"close": 48.0099983215332,
-"above_pct": -1.5583394076214008,
-"stop": 46.56,
-"risk_pct": 3.010515554418147,
-"resistance": 48.77,
-"room_r": 0.5258262304946856,
-"sq9": 49,
-"sq9_cross": "7\u00b2",
-"sq9_dist_pct": -0.4693868208904606,
-"sq9_gap_pct": 65.3061224489796,
-"sq9_below": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_above": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_match": true
-},
-{
-"symbol": "DAL",
-"name": "Delta Air Lines Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-12",
-"days_ago": 4,
-"level": 84.94,
-"level_kind": "breakout retest",
-"level_date": "2026-09-25",
-"close": 84.87999725341797,
-"above_pct": -0.07064420327710375,
-"stop": 81.7,
-"risk_pct": 3.742249855051649,
-"resistance": 92.2,
-"room_r": 2.3044799073010194,
-"sq9": 81,
-"sq9_cross": "9\u00b2",
-"sq9_dist_pct": 4.864200544945985,
-"sq9_gap_pct": 49.382716049382715,
-"sq9_below": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_above": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "ELF",
-"name": "e.l.f. Beauty Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-12",
-"days_ago": 4,
-"level": 109.67,
-"level_kind": "breakout retest",
-"level_date": "2026-09-04",
-"close": 113.7699966430664,
-"above_pct": 3.7384868629295465,
-"stop": 103.22,
-"risk_pct": 9.27648431695659,
-"resistance": 115.43,
-"room_r": 0.15728883153873124,
-"sq9": 121,
-"sq9_cross": "11\u00b2",
-"sq9_dist_pct": -9.363637876904695,
-"sq9_gap_pct": 39.66942148760331,
-"sq9_below": [
-[
-81,
-"9\u00b2"
-]
-],
-"sq9_above": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "KDP",
-"name": "Keurig Dr Pepper Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-12",
-"days_ago": 4,
-"level": 35.2,
-"level_kind": "breakout retest",
-"level_date": "2025-08-21",
-"close": 35.0099983215332,
-"above_pct": -0.5397796513865294,
-"stop": 33.72,
-"risk_pct": 3.698731860204585,
-"resistance": 35.71,
-"room_r": 0.5405720353025922,
-"sq9": 49,
-"sq9_cross": "7\u00b2",
-"sq9_dist_pct": -28.163263749103162,
-"sq9_gap_pct": 65.3061224489796,
-"sq9_below": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_above": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "KSS",
-"name": "Kohl's Corporation Common Stock",
-"status": "touched",
-"touch_date": "2026-11-12",
-"days_ago": 4,
-"level": 23.04,
-"level_kind": "old swing low",
-"level_date": "2026-11-06",
-"close": 24.040000915527344,
-"above_pct": 4.340277605310638,
-"stop": 21.7,
-"risk_pct": 9.747146763875092,
-"resistance": 24.5,
-"room_r": 0.19631115674871502,
-"sq9": 25,
-"sq9_cross": "5\u00b2",
-"sq9_dist_pct": -7.83999633789062,
-"sq9_gap_pct": 96.0,
-"sq9_below": [
-[
-9,
-"3\u00b2"
-]
-],
-"sq9_above": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "PVLA",
-"name": "Palvella Therapeutics Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-12",
-"days_ago": 4,
-"level": 148.34,
-"level_kind": "breakout retest",
-"level_date": "2026-02-26",
-"close": 146.5800018310547,
-"above_pct": -1.1864598559292117,
-"stop": 137.66,
-"risk_pct": 6.086345210148448,
-"resistance": 148.34,
-"room_r": 0.19727861403759986,
-"sq9": 169,
-"sq9_cross": "13\u00b2",
-"sq9_dist_pct": -12.224854237934546,
-"sq9_gap_pct": 33.136094674556205,
-"sq9_below": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_above": [
-[
-169,
-"13\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "U",
-"name": "Unity Software Inc. Common Stock",
-"status": "touched",
-"touch_date": "2026-11-12",
-"days_ago": 4,
-"level": 47.29,
-"level_kind": "breakout retest",
-"level_date": "2026-01-12",
-"close": 48.959999084472656,
-"above_pct": 3.531398047397749,
-"stop": 44.11,
-"risk_pct": 9.900745186076133,
-"resistance": 49.47,
-"room_r": 0.10521137851584819,
-"sq9": 49,
-"sq9_cross": "7\u00b2",
-"sq9_dist_pct": -3.489794049944195,
-"sq9_gap_pct": 65.3061224489796,
-"sq9_below": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_above": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "CUBI",
-"name": "Customers Bancorp Inc Common Stock",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 79.58,
-"level_kind": "breakout retest",
-"level_date": "2026-02-02",
-"close": 82.76000213623047,
-"above_pct": 3.9959791807077316,
-"stop": 77.04,
-"risk_pct": 6.917160372932152,
-"resistance": 83.65,
-"room_r": 0.1554681285557677,
-"sq9": 81,
-"sq9_cross": "9\u00b2",
-"sq9_dist_pct": -1.7530841591917423,
-"sq9_gap_pct": 49.382716049382715,
-"sq9_below": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_above": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "TRMK",
-"name": "Trustmark Corporation Common Stock",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 44.13,
-"level_kind": "old swing low",
-"level_date": "2026-10-14",
-"close": 45.9900016784668,
-"above_pct": 4.214821131503332,
-"stop": 42.65,
-"risk_pct": 7.27176802650572,
-"resistance": 48.52,
-"room_r": 0.756513826768123,
-"sq9": 49,
-"sq9_cross": "7\u00b2",
-"sq9_dist_pct": -9.938773330377071,
-"sq9_gap_pct": 65.3061224489796,
-"sq9_below": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_above": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "BUD",
-"name": "Anheuser-Busch Inbev SA Sponsored ADR (Belgium)",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 79.52,
-"level_kind": "old swing low",
-"level_date": "2026-10-29",
-"close": 82.9800033569336,
-"above_pct": 4.351115266513128,
-"stop": 77.58,
-"risk_pct": 6.509322943472984,
-"resistance": 83.96,
-"room_r": 0.1814324293593448,
-"sq9": 81,
-"sq9_cross": "9\u00b2",
-"sq9_dist_pct": -1.8271646381896267,
-"sq9_gap_pct": 49.382716049382715,
-"sq9_below": [
-[
-49,
-"7\u00b2"
-]
-],
-"sq9_above": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "ONC",
 "name": "BeOne Medicines Ltd. American Depositary Shares",
 "status": "near",
@@ -1895,12 +2555,12 @@
 "level": 386.46,
 "level_kind": "breakout retest",
 "level_date": "2026-10-21",
-"close": 403.6000061035156,
-"above_pct": 4.435133009216008,
-"stop": 373.29,
-"risk_pct": 7.5099505914887015,
+"close": 399.70001220703125,
+"above_pct": 3.425974497929918,
+"stop": 373.37,
+"risk_pct": 6.586284661947939,
 "resistance": 424.73,
-"room_r": 0.6971261172453036,
+"room_r": 0.9507934248590757,
 "sq9": 361,
 "sq9_cross": "19\u00b2",
 "sq9_dist_pct": 7.0526292119329925,
@@ -1920,34 +2580,34 @@
 "sq9_match": false
 },
 {
-"symbol": "MGNI",
-"name": "Magnite Inc. Common Stock",
+"symbol": "FDS",
+"name": "FactSet Research Systems Inc. Common Stock",
 "status": "near",
 "touch_date": null,
 "days_ago": null,
-"level": 26.52,
+"level": 296.92,
 "level_kind": "breakout retest",
-"level_date": "2025-08-28",
-"close": 27.709999084472656,
-"above_pct": 4.4871742314039675,
-"stop": 24.99,
-"risk_pct": 9.80048013621756,
-"resistance": 29.78,
-"room_r": 0.7622313682248203,
-"sq9": 25,
-"sq9_cross": "5\u00b2",
-"sq9_dist_pct": 6.080001831054682,
-"sq9_gap_pct": 96.0,
+"level_date": "2026-01-12",
+"close": 308.0,
+"above_pct": 3.731640196413477,
+"stop": 284.79,
+"risk_pct": 7.5369847285283065,
+"resistance": 313.55,
+"room_r": 0.23908023613284807,
+"sq9": 289,
+"sq9_cross": "17\u00b2",
+"sq9_dist_pct": 2.740489075340613,
+"sq9_gap_pct": 24.913494809688586,
 "sq9_below": [
 [
-9,
-"3\u00b2"
+225,
+"15\u00b2"
 ]
 ],
 "sq9_above": [
 [
-49,
-"7\u00b2"
+361,
+"19\u00b2"
 ]
 ],
 "sq9_match": false
@@ -1961,12 +2621,12 @@
 "level": 42.34,
 "level_kind": "breakout retest",
 "level_date": "2025-10-22",
-"close": 44.41999816894531,
-"above_pct": 4.912607484320675,
-"stop": 41.36,
-"risk_pct": 6.887176477614343,
+"close": 44.04999923706055,
+"above_pct": 4.038731880751167,
+"stop": 41.43,
+"risk_pct": 5.954465417149057,
 "resistance": 45.58,
-"room_r": 0.3791749275447516,
+"room_r": 0.5833154568466459,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
 "sq9_dist_pct": -13.591836423290015,
@@ -1986,28 +2646,754 @@
 "sq9_match": false
 },
 {
-"symbol": "UCB",
-"name": "United Community Banks Inc. Common Stock",
+"symbol": "VVX",
+"name": "V2X Inc. Common Stock",
 "status": "near",
 "touch_date": null,
 "days_ago": null,
-"level": 34.84,
+"level": 74.01,
+"level_kind": "old swing low",
+"level_date": "2026-11-05",
+"close": 77.0,
+"above_pct": 4.039991592306436,
+"stop": 70.32,
+"risk_pct": 8.68107188831676,
+"resistance": 82.71,
+"room_r": 0.8542243771265128,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -8.62962699230806,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "PUBM",
+"name": "PubMatic Inc. Class A Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 19.03,
 "level_kind": "breakout retest",
-"level_date": "2026-04-09",
-"close": 36.560001373291016,
-"above_pct": 4.93685767270402,
-"stop": 34.05,
-"risk_pct": 6.855660026298338,
-"resistance": 37.09,
-"room_r": 0.2114556984318108,
+"level_date": "2026-11-09",
+"close": 19.799999237060547,
+"above_pct": 4.046235011202048,
+"stop": 17.56,
+"risk_pct": 11.327554745655588,
+"resistance": 20.48,
+"room_r": 0.3031850372902077,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": -23.879997253417972,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "FWONK",
+"name": "Liberty Media Corporation Series C Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 102.2,
+"level_kind": "breakout retest",
+"level_date": "2025-02-13",
+"close": 106.41000366210938,
+"above_pct": 4.119380469257039,
+"stop": 98.93,
+"risk_pct": 7.0282134256444255,
+"resistance": 108.33,
+"room_r": 0.25672810500808296,
+"sq9": 121,
+"sq9_cross": "11\u00b2",
+"sq9_dist_pct": -15.53719260475852,
+"sq9_gap_pct": 39.66942148760331,
+"sq9_below": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "MA",
+"name": "Mastercard Incorporated Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 599.86,
+"level_kind": "breakout retest",
+"level_date": "2026-08-24",
+"close": 626.5,
+"above_pct": 4.441038792214891,
+"stop": 583.46,
+"risk_pct": 6.870599706908786,
+"resistance": 672.68,
+"room_r": 1.0728478565136723,
+"sq9": 625,
+"sq9_cross": "25\u00b2",
+"sq9_dist_pct": -4.022402343749998,
+"sq9_gap_pct": 16.64000000000001,
+"sq9_below": [
+[
+529,
+"23\u00b2"
+]
+],
+"sq9_above": [
+[
+729,
+"27\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "HMC",
+"name": "Honda Motor Company Ltd. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 31.93,
+"level_kind": "breakout retest",
+"level_date": "2025-10-28",
+"close": 33.349998474121094,
+"above_pct": 4.4472225348370475,
+"stop": 30.98,
+"risk_pct": 7.117149399238665,
+"resistance": 34.4,
+"room_r": 0.4423730492707128,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": 27.72000122070313,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "FAST",
+"name": "Fastenal Company Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 50.39,
+"level_kind": "breakout retest",
+"level_date": "2025-08-22",
+"close": 52.68000030517578,
+"above_pct": 4.544554362502673,
+"stop": 49.13,
+"risk_pct": 6.745581293509262,
+"resistance": 56.27,
+"room_r": 1.0102510668306428,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
-"sq9_dist_pct": -28.897958872269612,
+"sq9_dist_pct": 2.8367334482621187,
 "sq9_gap_pct": 65.3061224489796,
 "sq9_below": [
 [
 25,
 "5\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "FTV",
+"name": "Fortive Corporation Common Stock ",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 62.53,
+"level_kind": "breakout retest",
+"level_date": "2025-02-19",
+"close": 65.41000366210938,
+"above_pct": 4.6024022357683325,
+"stop": 60.89,
+"risk_pct": 6.906614529890898,
+"resistance": 68.94,
+"room_r": 0.7813851688501964,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -22.79996518735532,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "PVH",
+"name": "PVH Corp. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 89.95,
+"level_kind": "old swing low",
+"level_date": "2026-11-06",
+"close": 94.12000274658203,
+"above_pct": 4.635915441708449,
+"stop": 86.23,
+"risk_pct": 8.385956610813306,
+"resistance": 97.3,
+"room_r": 0.40289568809012993,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": 11.049378948447153,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "KDP",
+"name": "Keurig Dr Pepper Inc. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 32.88,
+"level_kind": "breakout retest",
+"level_date": "2026-09-03",
+"close": 34.40999984741211,
+"above_pct": 4.653280807769078,
+"stop": 31.39,
+"risk_pct": 8.781703326397983,
+"resistance": 34.82,
+"room_r": 0.13568138347389838,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": 31.520004272460934,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "PCOR",
+"name": "Procore Technologies Inc. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 70.04,
+"level_kind": "old swing low",
+"level_date": "2026-01-02",
+"close": 73.30000305175781,
+"above_pct": 4.654486141658154,
+"stop": 66.51,
+"risk_pct": 9.26447405817128,
+"resistance": 74.62,
+"room_r": 0.19437887690849157,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -13.530863067250198,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "V",
+"name": "Visa Inc.",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 384.14,
+"level_kind": "breakout retest",
+"level_date": "2026-08-25",
+"close": 402.25,
+"above_pct": 4.714423038728888,
+"stop": 373.7,
+"risk_pct": 7.097306480566889,
+"resistance": 436.57,
+"room_r": 1.202147505144741,
+"sq9": 361,
+"sq9_cross": "19\u00b2",
+"sq9_dist_pct": 6.409976356907898,
+"sq9_gap_pct": 22.160664819944607,
+"sq9_below": [
+[
+289,
+"17\u00b2"
+]
+],
+"sq9_above": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CRL",
+"name": "Charles River Laboratories International Inc. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 313.02,
+"level_kind": "old swing low",
+"level_date": "2026-11-05",
+"close": 327.92999267578125,
+"above_pct": 4.763275249319032,
+"stop": 295.69,
+"risk_pct": 9.829842140185619,
+"resistance": 353.34,
+"room_r": 0.7882737143162799,
+"sq9": 289,
+"sq9_cross": "17\u00b2",
+"sq9_dist_pct": 8.311414883623481,
+"sq9_gap_pct": 24.913494809688586,
+"sq9_below": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_above": [
+[
+361,
+"19\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "ADP",
+"name": "Automatic Data Processing Inc. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 287.48,
+"level_kind": "breakout retest",
+"level_date": "2026-08-28",
+"close": 301.19000244140625,
+"above_pct": 4.769024255996057,
+"stop": 280.86,
+"risk_pct": 6.749178318344573,
+"resistance": 307.94,
+"room_r": 0.3320567539854947,
+"sq9": 289,
+"sq9_cross": "17\u00b2",
+"sq9_dist_pct": -0.5259477555958014,
+"sq9_gap_pct": 24.913494809688586,
+"sq9_below": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_above": [
+[
+361,
+"19\u00b2"
+]
+],
+"sq9_match": true
+},
+{
+"symbol": "J",
+"name": "Jacobs Solutions Inc. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 147.54,
+"level_kind": "old swing low",
+"level_date": "2026-11-05",
+"close": 154.5800018310547,
+"above_pct": 4.771593374868055,
+"stop": 142.26,
+"risk_pct": 7.972299783039672,
+"resistance": 160.24,
+"room_r": 0.45928237846949665,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": -12.698228824773484,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "ASO",
+"name": "Academy Sports and Outdoors Inc. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 67.27,
+"level_kind": "old swing low",
+"level_date": "2024-03-12",
+"close": 70.4800033569336,
+"above_pct": 4.771825292187004,
+"stop": 64.08,
+"risk_pct": 9.081908356804691,
+"resistance": 72.13,
+"room_r": 0.25777411612440654,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -16.950621428313084,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "ECL",
+"name": "Ecolab Inc. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 283.72,
+"level_kind": "breakout retest",
+"level_date": "2026-07-06",
+"close": 297.32000732421875,
+"above_pct": 4.793460469830002,
+"stop": 276.39,
+"risk_pct": 7.0381129824868776,
+"resistance": 308.35,
+"room_r": 0.5271025233561617,
+"sq9": 289,
+"sq9_cross": "17\u00b2",
+"sq9_dist_pct": -1.8269891969885377,
+"sq9_gap_pct": 24.913494809688586,
+"sq9_below": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_above": [
+[
+361,
+"19\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "AJG",
+"name": "Arthur J. Gallagher & Co. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 264.84,
+"level_kind": "breakout retest",
+"level_date": "2026-01-12",
+"close": 277.6199951171875,
+"above_pct": 4.8255546579119235,
+"stop": 256.49,
+"risk_pct": 7.611764935340748,
+"resistance": 294.53,
+"room_r": 0.8002166645846756,
+"sq9": 289,
+"sq9_cross": "17\u00b2",
+"sq9_dist_pct": -8.359862858861378,
+"sq9_gap_pct": 24.913494809688586,
+"sq9_below": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_above": [
+[
+289,
+"17\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CYRX",
+"name": "CryoPort Inc. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 18.64,
+"level_kind": "breakout retest",
+"level_date": "2026-10-28",
+"close": 19.549999237060547,
+"above_pct": 4.881973590178701,
+"stop": 17.35,
+"risk_pct": 11.26781266476755,
+"resistance": 21.78,
+"room_r": 1.012322250611863,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": -25.44000244140625,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "CBRL",
+"name": "Cracker Barrel Old Country Store Inc Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 68.33,
+"level_kind": "breakout retest",
+"level_date": "2025-07-10",
+"close": 71.66999816894531,
+"above_pct": 4.888037828754532,
+"stop": 65.17,
+"risk_pct": 9.06934014076871,
+"resistance": 72.45,
+"room_r": 0.11999988765499886,
+"sq9": 81,
+"sq9_cross": "9\u00b2",
+"sq9_dist_pct": -15.641973048080636,
+"sq9_gap_pct": 49.382716049382715,
+"sq9_below": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "ARMK",
+"name": "Aramark Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 52.52,
+"level_kind": "old swing low",
+"level_date": "2026-10-22",
+"close": 55.099998474121094,
+"above_pct": 4.91241049861042,
+"stop": 50.39,
+"risk_pct": 8.556517525681063,
+"resistance": 56.02,
+"room_r": 0.1951372285931857,
+"sq9": 49,
+"sq9_cross": "7\u00b2",
+"sq9_dist_pct": 7.183674403599327,
+"sq9_gap_pct": 65.3061224489796,
+"sq9_below": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_above": [
+[
+81,
+"9\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "BLMN",
+"name": "Bloomin' Brands Inc. Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 9.75,
+"level_kind": "old swing low",
+"level_date": "2026-11-06",
+"close": 10.229999542236328,
+"above_pct": 4.923072228064895,
+"stop": 9.04,
+"risk_pct": 11.594047979954968,
+"resistance": 10.34,
+"room_r": 0.0927436934425149,
+"sq9": 9,
+"sq9_cross": "3\u00b2",
+"sq9_dist_pct": 8.333333333333325,
+"sq9_gap_pct": 177.77777777777777,
+"sq9_below": [
+[
+1,
+"1\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "UTHR",
+"name": "United Therapeutics Corporation Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 532.78,
+"level_kind": "old swing low",
+"level_date": "2026-10-08",
+"close": 559.0999755859375,
+"above_pct": 4.940115027171288,
+"stop": 513.32,
+"risk_pct": 8.18866106886339,
+"resistance": 571.38,
+"room_r": 0.2682236287546625,
+"sq9": 529,
+"sq9_cross": "23\u00b2",
+"sq9_dist_pct": 0.7145613037570886,
+"sq9_gap_pct": 18.14744801512287,
+"sq9_below": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_above": [
+[
+625,
+"25\u00b2"
+]
+],
+"sq9_match": true
+},
+{
+"symbol": "RYZ",
+"name": "Ryerson Holding Corporation Common Stock",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 26.58,
+"level_kind": "old swing low",
+"level_date": "2026-11-05",
+"close": 27.899999618530273,
+"above_pct": 4.966138820967192,
+"stop": 24.65,
+"risk_pct": 11.665130028587289,
+"resistance": 28.23,
+"room_r": 0.10139582145618312,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": 6.319999694824219,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
 ]
 ],
 "sq9_above": [
