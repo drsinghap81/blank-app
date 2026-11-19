@@ -323,10 +323,11 @@ def export_charts(frames, syms, tbs=None):
         n = min(160, len(c))
         rd = lambda a: [None if not np.isfinite(x) else round(float(x), 2) for x in np.asarray(a)[-n:]]  # noqa: E731
         b = (tbs or {}).get(sym)
-        tb = dict(f=b["base_from"], to=b["base_to"], hi=b["base_hi"], lo=b["base_lo"], bo=b["breakout_date"], stop=b["stop"]) if b else None
+        tb = dict(f=b["base_from"], to=b["base_to"], hi=b["base_hi"], lo=b["base_lo"], stop=b["stop"],
+                  bo=b["breakout_date"] if isinstance(b["breakout_date"], str) else None) if b else None   # NaN breaks the browser's JSON
         json.dump(dict(t=[str(x.date()) for x in c.index[-n:]], o=rd(o), h=rd(h), l=rd(l), c=rd(c), e9=rd(e9),
                        e21=rd(e21), e50=rd(e50), st=rd(line), sd=[int(x) for x in sd[-n:]], rsi=rd(r), tb=tb),
-                  open(f"{cdir}/{sym}.json", "w"), separators=(",", ":"))
+                  open(f"{cdir}/{sym}.json", "w"), separators=(",", ":"), allow_nan=False)
 
 
 def telegram(text):
