@@ -41,7 +41,7 @@ CH = f"{OUT}/ath_charts"
 MINVAL = {"NSE": 2e7, "US": 5e6, "ASX": 1e6, "UK": 1e8}[MARKET]          # Rs 2 cr / $5 m / A$1 m a day
 UNIT = {"NSE": 1e7, "US": 1e6, "ASX": 1e6, "UK": 1e8}[MARKET]            # value_cr field = traded value in Rs cr / $ m / A$ m
 BOARD = {}      # symbol -> main / SME / BSE (NSE run)
-MIN_CLOSE = {"NSE": 100.0, "US": 30.0, "ASX": 30.0, "UK": 100.0}[MARKET]   # no penny stocks (30 Oct 2026)
+MIN_CLOSE = {"NSE": 100.0, "US": 10.0, "ASX": 10.0, "UK": 100.0}[MARKET]   # no penny stocks (30 Oct 2026); US / ASX $30 -> $10 (20 Nov 2026, Amritpal: many ETFs / funds trade $10-30)
 MCL_MIN = {"ASX": 1.0}.get(MARKET, MIN_CLOSE)   # 15 Nov 2026: month-close list only goes down to A$1 on the ASX (A$1 m/day still applies)
 BASE_MAIN, BASE_MIN = 24, 12
 WSHORT, DSHORT = [], []   # 15 Nov 2026: reverse cup closes under a falling 30-week SMA (watch only; shorts lost in tests)
