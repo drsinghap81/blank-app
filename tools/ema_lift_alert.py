@@ -62,7 +62,7 @@ def main():
     out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00"), asof=str(asof.date()) if asof is not None else None,
                ema=N, rows=rows, rule=__doc__.split("Data:")[0].strip())
     json.dump(out, open(OUT, "w"), indent=1)
-    new = [r for r in rows if r["status"] in ("lift-off today", "left below")]
+    new = [r for r in rows if r["status"] == "lift-off today"]   # 20 Nov 2026: lift-offs only (no "fell below" messages)
     for r in rows:
         print(r["symbol"], r["status"], r["signal"], r["gain"])
     if new and os.environ.get("SEND_TELEGRAM") == "1" and prev.get("asof") != out["asof"]:

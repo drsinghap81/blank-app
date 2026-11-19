@@ -6122,15 +6122,15 @@ async function alertsCard(box, mk) {
       ${r.vol_ratio != null ? `<span class="al-t">volume ${fmt(r.vol_ratio, 1)}×</span>` : ''}${r.ema_status ? tick(r.ema_status !== 'left below', r.ema_status === 'left below' ? 'back below 9 EMA' : 'above 9 EMA') : ''}
       ${r.full ? '<em class="al-full">full setup</em>' : ''}<small>${r.since >= 0 ? '+' : ''}${fmt(r.since, 1)}% since · chart ›</small></div>`;
   const ER = (E && E.rows) || [];
-  const up = ER.filter((r) => r.status === 'lift-off today'), dn = ER.filter((r) => r.status === 'left below');
+  /* 20 Nov 2026 (Amritpal): show only stocks LEAVING the 9 EMA upward (whole candle above a rising 9 EMA) - today and the last 2 sessions */
+  const up = ER.filter((r) => r.status === 'lift-off today' || (r.status === 'riding' && r.days <= 2)).sort((a, b) => a.days - b.days), dn = [];
   const ix = ER.filter((r) => r.index && r.status === 'riding');
   const names = (L2) => L2.slice(0, 8).map((r) => r.index ? esc(nm(r.symbol)) : `<a href="#" class="al-s" data-tv="${esc(r.symbol)}">${esc(r.symbol)}</a>`).join(', ') + (L2.length > 8 ? ` +${L2.length - 8}` : '');
   box.innerHTML = `<section class="al-card ${lt ? lt[0] : ''}">
     ${lt ? `<div class="al-light"><i></i><b>${lt[1]}</b></div>` : ''}
     ${br.length ? br.slice(0, 4).map(wline).join('') : ''}
     ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><span>${esc(nm(r.index))}: W forming · trendline ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% above)</span><small>chart ›</small></div>`).join('')}
-    ${up.length ? `<div class="al-r"><b class="up">▲ Left the 9 EMA upward</b> <span>${names(up)}</span></div>` : ''}
-    ${dn.length ? `<div class="al-r"><b class="down">▼ Fell below the 9 EMA</b> <span>${names(dn)}</span></div>` : ''}
+    ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
     ${athLines(AT, mk)}
     ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
