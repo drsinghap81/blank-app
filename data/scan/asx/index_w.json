@@ -1,0 +1,33 @@
+{
+ "generated": "2026-11-19T10:39+00:00",
+ "asof": "2026-11-19",
+ "market": "ASX",
+ "rows": [
+  {
+   "index": "Materials",
+   "ticker": "^AXMJ",
+   "low1": "2026-10-23",
+   "low1_close": 21345.1,
+   "low2": "2026-11-04",
+   "low2_close": 21557.5,
+   "high": 26576.3,
+   "high_date": "2026-08-25",
+   "mid": 22552.8,
+   "mid_date": "2026-10-28",
+   "rsi_div": true,
+   "close": 20530.1,
+   "asof": "2026-11-19",
+   "neckline": 22552.8,
+   "status": "broken",
+   "broke_on": "2026-11-05",
+   "days_ago": 10,
+   "broke_close": 23185.9,
+   "line_then": 22028.0,
+   "from_low2": 7.6,
+   "since": -11.5,
+   "above_neck": false
+  }
+ ],
+ "test": "Tested on 13 ASX indices 2005\u201326 (532 W's): next 20 sessions median +0.7% (58% up) vs +0.7% (56%) on any day. No real edge on the ASX: reference only.",
+ "rule": "Index early alert: W bottom + falling trendline break (19 Nov 2026, Amritpal; tested in tools/research/index_w_bottom.py,\nproject doc index-w-bottom-trendline-test). INFORMATION ONLY - stock entries stay on 9/21 + the RED light.\nRule (tested on 23 NSE indices 2015-26, 541 setups): two zigzag(2%) closing lows within -2%..+4%, 8-60 sessions apart, the\nfirst >= 5% below the 120-day high close, middle peak >= 2% above the first low; trendline = from that high through the middle\npeak. Trendline break = first close above the line after the 2nd low is confirmed. It came before the index's 9/21 cross 71% of the\ntime, ~1% lower (entry +3.1% off the 2nd low vs +3.9%); next 20 sessions median +1.6% (63% up) vs +1.2% (59%) on any day; 9/21\nafter the W +1.9%. RSI divergence added nothing (also tested with 3% swings / 8% fall: same picture)."
+}
