@@ -1094,3 +1094,42 @@ def test_opt_trader_fetches_earlier_days_once(tmp_path):
         assert calls[-1] == 0 and [x[0] for x in B] == ["2026-11-18T15:20", "2026-11-18T15:25", "2026-11-19T09:15", "2026-11-19T09:20"]
     finally:
         O.now_ist = now0
+
+
+def test_turtle_mcx_dry_then_live(tmp_path):
+    """19 Nov 2026: Turtle MCX - dry run shows the planned buy-stop from the real contract's 20-day high; live sends a stop-limit BUY
+    (qty = lots x Angel lot size), puts the stop on after the fill, and closes the position when the stop fills."""
+    import turtle_mcx as M, brokers
+    from datetime import datetime, timedelta
+    b = brokers.MockBroker({}, ".")
+    d0 = datetime(2026, 9, 1)
+    days = [(d0 + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(60)]
+    b.fcandles = [(d, 300 + i * 0.5, 305 + i * 0.5, 295 + i * 0.5, 300 + i * 0.5) for i, d in enumerate(days)]
+    b.futinfo = dict(expiry="2026-12-24", tsym="NATGASMINI24DEC26FUT", token="999", lotsize=1, tick=0.1)
+    b.fltp = {"NATGASMINI24DEC26FUT": 320.0}
+    sent = []
+    T = M.TurtleMCX(b, str(tmp_path), alert=lambda text, key=None: sent.append(text))
+    now0 = M.now_ist
+    try:
+        M.now_ist = lambda: datetime(2026, 11, 2, 10, 0, tzinfo=M.IST)
+        T.arm("MCX:NATGASMINI", 2, True, 250)
+        T.run_once()
+        L = T.st["plan"]["NATGASMINI"]
+        assert L["trigger"] == round(max(x[2] for x in b.fcandles[-20:]) + 0.1, 2)
+        assert "BUY 2 NATGASMINI24DEC26FUT" in T.st["orders"]["NATGASMINI"]["planned"] and not b.nfo      # dry run: nothing sent
+        T.set_live(True); T.st["orders"]["NATGASMINI"] = {}
+        T.run_once()
+        o = [x for x in b.nfo.values() if x["side"] == "BUY"]
+        assert len(o) == 1 and o[0]["trigger"] == L["trigger"] and o[0]["qty"] == 2
+        o[0].update(status="complete", avg=L["trigger"]); b.fltp["NATGASMINI24DEC26FUT"] = 336.0
+        T.run_once()
+        P = T.st["pos"]["NATGASMINI"]
+        s = [x for x in b.nfo.values() if x["side"] == "SELL"]
+        assert P["entry"] == L["trigger"] and len(s) == 1 and s[0]["trigger"] == P["stop"] and any("bought" in x for x in sent)
+        T.run_once()
+        assert len([x for x in b.nfo.values() if x["side"] == "SELL"]) == 1          # no duplicate stop the same day
+        s[0].update(status="complete", avg=P["stop"])
+        T.run_once()
+        assert "NATGASMINI" not in T.st["pos"] and T.st["hist"][-1]["exit"] == P["stop"]
+    finally:
+        M.now_ist = now0

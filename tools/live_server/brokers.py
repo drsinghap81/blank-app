@@ -404,6 +404,37 @@ class AngelEquity:
                     best = (e, x["symbol"], str(x["token"]))
         return best
 
+    def fut_info(self, exchange, name, min_expiry):
+        """19 Nov 2026 (Turtle MCX): nearest futures contract expiring on/after min_expiry, with Angel's lot size and tick."""
+        best = None
+        for x in self._master():
+            if x.get("exch_seg") == exchange and x.get("name") == name and str(x.get("instrumenttype", "")).startswith("FUT"):
+                try:
+                    e = datetime.strptime(x["expiry"], "%d%b%Y").date()
+                except Exception:  # noqa: BLE001
+                    continue
+                if e >= min_expiry and (best is None or e < best["expiry"]):
+                    best = dict(expiry=e, tsym=x["symbol"], token=str(x["token"]), lotsize=int(float(x.get("lotsize") or 1)),
+                                tick=(float(x.get("tick_size") or 5) / 100) or 0.05)
+        if best:
+            best["expiry"] = str(best["expiry"])
+        return best
+
+    def fut_order(self, exchange, tsym, token, side, qty, price, trigger=None, tick=0.05, product="CARRYFORWARD"):
+        """Futures order (MCX / NFO), limit or stop-limit (SEBI 2026), DAY validity, carry-forward product."""
+        api = self._session()
+        rnd = lambda v: round(max(tick, round(v / tick) * tick), 2)  # noqa: E731
+        p = dict(variety="STOPLOSS" if trigger else "NORMAL", tradingsymbol=tsym, symboltoken=str(token), transactiontype=side,
+                 exchange=exchange, ordertype="STOPLOSS_LIMIT" if trigger else "LIMIT", producttype=product, duration="DAY",
+                 price=f"{rnd(price):.2f}", quantity=str(int(qty)))
+        if trigger:
+            p["triggerprice"] = f"{rnd(trigger):.2f}"
+        r = self._call(api.placeOrderFullResponse, p, tries=1) or {}
+        d = r.get("data") or {}
+        if r.get("status") and d.get("orderid"):
+            return str(d["orderid"])
+        raise RuntimeError(f"{r.get('message') or 'no order id'} [{r.get('errorcode') or '?'}]")
+
     def candles_ex(self, exchange, token, days=60):
         """Daily candles for any exchange token: list of (date, o, h, l, c), today's included (the caller decides)."""
         api = self._session(); now = ist_now()
@@ -683,6 +714,14 @@ class MockBroker(AngelEquity):
 
     def fut_for(self, exchange, name, min_expiry):
         return getattr(self, "fut", None)
+
+    def fut_info(self, exchange, name, min_expiry):
+        return getattr(self, "futinfo", None)
+
+    def fut_order(self, exchange, tsym, token, side, qty, price, trigger=None, tick=0.05, product="CARRYFORWARD"):
+        oid = f"F{len(getattr(self, 'nfo', {})) + 1}"
+        self.nfo[oid] = dict(id=oid, symbol=tsym, side=side, qty=qty, price=price, trigger=trigger, status="open", avg=0.0, filled=0, exchange=exchange)
+        return oid
 
     def candles_ex(self, exchange, token, days=60):
         return list(getattr(self, "fcandles", []))

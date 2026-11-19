@@ -4088,6 +4088,55 @@ def otr_job():
     return _otr["j"]
 
 
+_tmcx = {}
+
+
+def tmcx_job():
+    """19 Nov 2026: Turtle 20/10 on MCX futures (tools/live_server/turtle_mcx.py). Dry run unless switched to LIVE."""
+    if "j" not in _tmcx:
+        import turtle_mcx
+        _tmcx["j"] = turtle_mcx.TurtleMCX(broker, DATA, log=lambda ev, **kw: log(ev, **kw),
+                                          alert=lambda text, key=None: alert("turtle_mcx", "MCX", text, key=key, mk="NSE"))
+    return _tmcx["j"]
+
+
+class TArm(BaseModel):
+    name: str
+    lots: int = 1
+    on: bool = True
+    mult: float = 0.0
+
+
+@app.get("/api/turtle/mcx")
+def tmcx_status(_=Depends(auth)):
+    return tmcx_job().status()
+
+
+@app.post("/api/turtle/mcx/arm")
+def tmcx_arm(body: TArm, _=Depends(auth)):
+    nm = re.sub(r"[^A-Z0-9]", "", body.name.upper().replace("MCX:", ""))[:20]
+    if not nm or not (1 <= body.lots <= 20):
+        raise HTTPException(400, "name and 1-20 lots")
+    tmcx_job().arm(nm, body.lots, body.on, body.mult); log("turtle_mcx_arm", name=nm, lots=body.lots, on=body.on)
+    return dict(ok=True)
+
+
+@app.post("/api/turtle/mcx/mode")
+def tmcx_mode(body: Mode, request: Request, _=Depends(auth)):
+    """dry run by default; LIVE (real MCX orders on Angel) needs the app password + typing LIVE."""
+    if body.live:
+        ip = request.client.host if request.client else "?"
+        n, t0 = FAILS.get(ip, (0, 0))
+        if n >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if body.confirm.strip().upper() != "LIVE":
+            raise HTTPException(400, "type LIVE to confirm")
+        if not check_pw(body.password):
+            FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
+    tmcx_job().set_live(body.live); log("turtle_mcx_mode", live=body.live)
+    return dict(ok=True, live=bool(body.live))
+
+
 @app.get("/api/opt/trader")
 def otr_status(_=Depends(auth)):
     return otr_job().status()
@@ -4144,6 +4193,10 @@ def _start():
             otr_job().start()
         except Exception as ex:  # noqa: BLE001
             log("opt_trader_error", error=str(ex)[:200])
+        try:
+            tmcx_job().start()
+        except Exception as ex:  # noqa: BLE001
+            log("turtle_mcx_error", error=str(ex)[:200])
         try:
             j = optbt_job()
             import opt_bt as _ob

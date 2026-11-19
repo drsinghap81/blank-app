@@ -1171,7 +1171,7 @@ async function loadLive() {
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
-    ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tbcard"></div><div id="tbcardn"></div>') : ''}
+    ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>') : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
     const sym = b.dataset.tgt, E = +b.dataset.e, St = +b.dataset.s, R = E - St;
@@ -1264,7 +1264,7 @@ async function loadLive() {
   el.querySelectorAll('input[data-bq]').forEach((c) => c.addEventListener('input', bkUpd));
   const bk = $('#lvbkgo'); if (bk) bk.addEventListener('click', () => lvBasket(pick(), bk));
   state._lvBkUpd = bkUpd;
-  if (S) { tbLoad(); tbLoad('nifty'); otrLoad(); }
+  if (S) { tbLoad(); tbLoad('nifty'); otrLoad(); tmcxLoad(); }
   state._lvMoreAll = false;
   const ma = $('#lvmoreall'); if (ma) ma.addEventListener('click', () => { state._lvMoreAll = !state._lvMoreAll; lvMoreUpd(); });
   lvMoreUpd();
@@ -1529,6 +1529,35 @@ async function resCard() {
 /* Top Bottom (Bank Nifty futures) bot: approve each level here; the bot on the server trades only approved levels */
 /* 18 Nov 2026: the 5-minute option trader (tools/live_server/opt_trader.py) - paper always, live orders only after the password +
    LIVE; 1 lot, max 3 open, -Rs 10,000 daily stop; 5 EMA trail + PCR + BB rules from the 28 Oct - 18 Nov backtest. */
+/* 19 Nov 2026: Turtle 20/10 on MCX futures, orders on Angel (tools/live_server/turtle_mcx.py) */
+async function tmcxLoad(box = $('#tmcxcard')) {
+  if (!box || !isOwner()) return;
+  let T; try { T = await lvApi('/api/turtle/mcx'); } catch (e) { box.innerHTML = /404/.test(e.message) ? '' : `<div class="lv-card"><b>Turtle · MCX</b><p class="lv-sub">${esc(e.message)}</p></div>`; return; }
+  const live = T.live; const names = [...new Set(Object.keys(T.armed || {}).concat(Object.keys(T.pos || {})))];
+  const inr2 = (v) => fmt(v, 2, 'en-IN');
+  const row = (n) => { const a = (T.armed || {})[n], p = (T.pos || {})[n], o = (T.orders || {})[n] || {}, L = (T.plan || {})[n] || {}, m = (a && a.mult) || (p && p.mult) || 0, lots = (a && a.lots) || (p && p.lots) || 1;
+    const risk = L.N && m ? 2 * L.N * m * lots : null;
+    return `<div class="otr-row"><div style="flex:1;min-width:0"><div class="lv-sym">${esc(n)} ${p ? '<span class="chip buy">in trade</span>' : '<span class="chip">waiting for breakout</span>'} ${L.tsym ? `<small class="muted">${esc(L.tsym)} · exp ${esc(String(L.expiry).slice(5))}</small>` : ''}</div>
+      <div class="lv-sub">${p ? `bought ${inr2(p.entry)} · stop ${inr2(p.stop)} (fixed ${inr2(p.fixed)}, 10-day low ${inr2(L.ll10)})` : L.trigger ? `buy above <b>${inr2(L.trigger)}</b> (20-day high) · N ${inr2(L.N)} · stop if filled ≈ ${inr2(L.trigger - 2 * L.N)}${risk ? ` · risk ≈ ₹${fmt(risk, 0, 'en-IN')} for ${lots} lot` : ''}` : 'levels appear after the next check (MCX hours, every minute)'}</div>
+      ${o.planned ? `<div class="lv-sub">${o.entry_oid || o.stop_oid ? 'On Angel' : live ? 'Next' : 'Dry run, would send'}: ${esc(o.planned)}${o.entry_oid ? ` · order ${esc(o.entry_oid)}` : ''}</div>` : ''}
+      ${a ? `<div style="display:flex;gap:6px;margin-top:6px;align-items:center"><button class="lv-btn ghost" data-tml="${esc(n)}" data-d="-1">−</button><b>${lots} lot${lots > 1 ? 's' : ''}</b><button class="lv-btn ghost" data-tml="${esc(n)}" data-d="1">+</button><button class="lv-btn ghost" data-tmoff="${esc(n)}">Disarm</button></div>` : ''}</div></div>`; };
+  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Turtle · MCX futures</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
+    <div class="lv-seg" role="group" aria-label="Turtle MCX mode"><button id="tmdry" class="${live ? '' : 'on'}">Dry run</button><button id="tmlive" class="${live ? 'on live' : ''}">Live orders</button></div>
+    <div id="tmarm" class="lv-form" hidden><input id="tmpw" type="password" placeholder="App password"><input id="tmcf" placeholder="Type LIVE" autocapitalize="characters"><button class="lv-btn sell" id="tmgo">Turn on live</button></div>
+    <p class="lv-sub">Daily 20/10: stop-limit buy one tick above the real MCX contract's 20-day high, re-placed every morning; after a fill a stop-limit sell at the higher of entry − 2N and the 10-day low, moved up each morning. Carry-forward (NRML), quantity = lots × Angel's lot size. Arm a market from its Turtle row (Trading › Turtle). Contract roll near expiry is by hand (you get an alert 3 days before).</p>
+    ${names.length ? names.map(row).join('') : '<p class="lv-sub">Nothing armed yet. In Trading › Turtle, tap <b>Push to Live</b> on an MCX row (e.g. Natural Gas Mini).</p>'}
+    ${(T.hist || []).length ? `<details class="info"><summary>Closed trades</summary><p class="lv-sub">${T.hist.slice().reverse().map((h) => `${esc(h.name)} ${inr2(h.entry)} → ${inr2(h.exit)} (${esc(h.why)}) ₹${fmt(h.pnl, 0, 'en-IN')}`).join('<br>')}</p></details>` : ''}
+    ${(T.notes || []).length ? `<details class="info"><summary>Log</summary><p class="lv-sub" style="white-space:pre-line">${T.notes.slice().reverse().map(esc).join('\n')}</p></details>` : ''}
+    ${T.last_error ? `<p class="lv-sub down">Last error: ${esc(T.last_error)}</p>` : ''}${T.last_run ? `<p class="lv-sub muted">Last check ${esc(T.last_run)} IST</p>` : ''}</div>`;
+  const q = (id) => box.querySelector('#' + id);
+  q('tmdry').addEventListener('click', async () => { if (!live) return; try { await lvApi('/api/turtle/mcx/mode', { method: 'POST', body: JSON.stringify({ live: false }) }); alertMsg('Turtle MCX: dry run. No new buys are sent; an open position keeps its stop on Angel, moved each morning.', true); tmcxLoad(box); } catch (e) { alertMsg(e.message); } });
+  q('tmlive').addEventListener('click', () => { if (!live) q('tmarm').hidden = !q('tmarm').hidden; });
+  q('tmgo').addEventListener('click', async () => { try { await lvApi('/api/turtle/mcx/mode', { method: 'POST', body: JSON.stringify({ live: true, password: q('tmpw').value, confirm: q('tmcf').value }) }); alertMsg('Turtle MCX: LIVE. Armed markets get a stop-limit buy on Angel within a minute (MCX hours).', true); tmcxLoad(box); } catch (e) { alertMsg(e.message); } });
+  box.querySelectorAll('[data-tml]').forEach((b) => b.addEventListener('click', async () => { const n = b.dataset.tml; const a = T.armed[n]; const lots = Math.max(1, Math.min(20, a.lots + +b.dataset.d));
+    try { await lvApi('/api/turtle/mcx/arm', { method: 'POST', body: JSON.stringify({ name: n, lots, on: true, mult: a.mult || 0 }) }); tmcxLoad(box); } catch (e) { alertMsg(e.message); } }));
+  box.querySelectorAll('[data-tmoff]').forEach((b) => b.addEventListener('click', async () => { try { await lvApi('/api/turtle/mcx/arm', { method: 'POST', body: JSON.stringify({ name: b.dataset.tmoff, lots: 1, on: false }) }); tmcxLoad(box); } catch (e) { alertMsg(e.message); } }));
+}
+
 async function otrLoad(box = $('#otrcard')) {
   if (!box || !isOwner()) return;
   let T; try { T = await lvApi('/api/opt/trader'); } catch (e) { box.innerHTML = `<div class="lv-card"><b>Option trader · 5-minute</b><p class="lv-sub">${/404/.test(e.message) ? 'Arrives with your server\'s next update (after 3:35 pm IST, or Settings › Server › Update now).' : esc(e.message)}</p></div>`; return; }
@@ -2813,6 +2842,10 @@ function turLive(r) {
   if (/\.NS$/.test(r.key) && r.buy_stop && r.fixed_stop_if_filled) {
     return `<div style="margin-top:8px"><button class="lv-btn" data-turlive="${esc(r.key)}">Push to Live · GTT buy on Angel</button></div>`;
   }
+  if (r.key.startsWith('MCX:') && r.buy_stop) {      // 19 Nov 2026: real MCX contract, orders on Angel (dry run until Live is on)
+    return `<div style="margin-top:8px"><button class="lv-btn" data-turmcx="${esc(r.key)}" data-mult="${r.mult || 0}">Push to Live · MCX buy-stop on Angel</button>
+      <div class="muted small">Uses the real MCX contract's 20-day high (the level here is an estimate from the US price). Starts in dry run; manage it in Live › Futures › Turtle · MCX.</div></div>`;
+  }
   const exp = r.key.startsWith('MCX:') ? 'MCX' : (r.key === '^NSEI' || r.key === '^NSEBANK') ? 'NFO' : null;
   if (exp && r.buy_stop) {
     const lim = r.buy_stop * 1.01;
@@ -2903,6 +2936,11 @@ async function loadTurtle(el) {
       <ul class="list flat">${shown.map(row).join('') || '<li class="empty">Nothing to act on today.</li>'}</ul></div>`;
   el.querySelectorAll('#turf button').forEach((b) => b.addEventListener('click', () => { state.turF = b.dataset.k; loadTurtle(el); }));
   el.querySelectorAll('[data-turlive]').forEach((b) => b.addEventListener('click', () => turPush(b.dataset.turlive)));
+  el.querySelectorAll('[data-turmcx]').forEach((b) => b.addEventListener('click', async () => {
+    if (!(lvCfg().url && lvCfg().token)) { alertMsg('Connect your server in Live › Settings first.'); return; }
+    try { await lvApi('/api/turtle/mcx/arm', { method: 'POST', body: JSON.stringify({ name: b.dataset.turmcx, lots: 1, on: true, mult: +b.dataset.mult || 0 }) });
+      alertMsg(`${b.dataset.turmcx.replace('MCX:', '')} armed with 1 lot. Check the planned order in Live › Futures › Turtle · MCX (dry run until you switch Live on).`, true); b.textContent = 'Armed ✓'; b.disabled = true;
+    } catch (e) { alertMsg(e.message.includes('404') ? 'Arrives with your server\'s next update (after 3:35 pm IST).' : e.message); } }));
   tradeStripWire(el);
   el.querySelectorAll('.row[data-tk]').forEach((li) => li.addEventListener('click', (e) => { if (e.target.closest('a,summary,details')) return; turtleSelect(D.rows.find((r) => r.key === li.dataset.tk)); }));
   const save = () => { turSave({ cur: $('#tcur').value, acct: +$('#tacct').value, risk: +$('#trisk').value, lotN: +$('#tlotn').value, lotB: +$('#tlotb').value }); loadTurtle(el); };
