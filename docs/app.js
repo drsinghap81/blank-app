@@ -1195,7 +1195,9 @@ async function loadLive() {
     if (!pw) { alertMsg('Enter your app password.'); return; }
     lvSave({ url, token: null }); go.disabled = true; go.textContent = 'Connecting…';
     try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }), timeout: 45000 }); lvSave({ token: j.token }); toast('Connected'); loadLive(); }
-    catch (e) { alertMsg(e.name === 'AbortError' ? 'The server did not answer in 45 seconds — it may be busy with a long test. Try again in a minute.' : /fetch|network|load/i.test(e.message) ? `Could not reach ${url}. Check the address and your internet.` : e.message); go.disabled = false; go.textContent = 'Connect'; }
+    catch (e) { const recent = (() => { try { return Date.now() - (+localStorage.getItem('td.srvRestartAt') || 0) < 360000; } catch (x) { return false; } })();
+      if (recent && (e.name === 'AbortError' || /fetch|network|load/i.test(e.message))) { srvWait(+localStorage.getItem('td.srvRestartAt')); go.disabled = false; go.textContent = 'Connect'; return; }
+      alertMsg(e.name === 'AbortError' ? 'The server did not answer in 45 seconds — it may be busy with a long test. Try again in a minute.' : /fetch|network|load/i.test(e.message) ? `Could not reach ${url}. Check the address and your internet.` : e.message); go.disabled = false; go.textContent = 'Connect'; }
   });
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
@@ -1317,6 +1319,33 @@ async function lvOpen(r, mk = 'NSE') {
   alertMsg('Chart not available for ' + r.symbol);
 }
 /* result banner: fixed above the bottom bar, stays until tapped (errors) or 20 s (ok) */
+/* 19 Nov 2026 (Amritpal): after Update now / Restart show "Server restarting…" and then "Server ready", instead of
+   "Could not reach" errors while it is down. Polls the public /api/health every 5 s for up to 6 minutes. */
+function srvWait(start) {
+  const url = (lvCfg().url || '').replace(/\/+$/, ''); if (!url) return;
+  start = start || Date.now(); try { localStorage.setItem('td.srvRestartAt', String(start)); } catch (e) { /* */ }
+  let bar = document.getElementById('srvbar');
+  if (!bar) { bar = document.createElement('div'); bar.id = 'srvbar'; bar.className = 'srvbar'; document.body.appendChild(bar); }
+  clearTimeout(state._srvT); let seenDown = false;
+  const tick = async () => {
+    const secs = Math.round((Date.now() - start) / 1000);
+    let j = null; try { const r = await fetch(url + '/api/health', { cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (r.ok) j = await r.json(); } catch (e) { /* down */ }
+    const fresh = j && j.ok && j.uptime != null && j.uptime < secs + 20;
+    if (!j) seenDown = true;
+    if (j && j.ok && (fresh || seenDown || secs > 45)) {
+      bar.className = 'srvbar ok'; bar.innerHTML = `<b>Server ready ✓</b> · version ${esc(String(j.version || '').slice(0, 7))} · back after ${secs} s`;
+      try { localStorage.removeItem('td.srvRestartAt'); } catch (e) { /* */ }
+      setTimeout(() => bar.remove(), 8000); if (state.view === 'live') loadLive(); return;
+    }
+    if (secs > 360) { bar.className = 'srvbar bad'; bar.innerHTML = '<b>Server still restarting after 6 minutes.</b> Its watchdog restarts it automatically; check again in a few minutes. <button>✕</button>';
+      bar.querySelector('button').onclick = () => bar.remove(); try { localStorage.removeItem('td.srvRestartAt'); } catch (e) { /* */ } return; }
+    bar.className = 'srvbar'; bar.innerHTML = `<b>Server restarting…</b> ${secs} s · the app reconnects by itself when it's ready`;
+    state._srvT = setTimeout(tick, 5000);
+  };
+  tick();
+}
+function srvResume() { try { const t = +localStorage.getItem('td.srvRestartAt'); if (t && Date.now() - t < 360000) srvWait(t); } catch (e) { /* */ } }
+
 function alertMsg(t, ok) {
   document.querySelectorAll('.lv-toast').forEach((x) => x.remove());
   const m = document.createElement('div'); m.className = 'lv-toast ' + (ok ? 'ok' : 'bad'); m.setAttribute('role', 'alert');
@@ -1502,7 +1531,7 @@ async function srvCard() {
     box.querySelector('#srvgo').textContent = a === 'update' ? 'Update now (~10 s offline)' : 'Restart (~10 s offline)'; box.querySelector('#srvpw').focus(); };
   box.querySelector('#srvgo').addEventListener('click', async () => { const a = pend; if (!a) return;
     const pw = box.querySelector('#srvpw').value, c = box.querySelector('#srvcf').value;
-    try { const j = await lvApi('/api/admin', { method: 'POST', body: JSON.stringify({ action: a, password: pw, confirm: c }), timeout: 30000 }); arm.hidden = true; alertMsg(j.msg, true); setTimeout(srvCard, 75000); }
+    try { const j = await lvApi('/api/admin', { method: 'POST', body: JSON.stringify({ action: a, password: pw, confirm: c }), timeout: 30000 }); arm.hidden = true; srvWait(); setTimeout(srvCard, 75000); }
     catch (e) { alertMsg(/404/.test(e.message) ? 'Your server gets these buttons with its next update (after 3:35 pm IST).' : e.message); } });
   box.querySelector('#srvupd').addEventListener('click', () => act('update'));
   box.querySelector('#srvrst').addEventListener('click', () => act('restart'));
@@ -6682,3 +6711,6 @@ setTimeout(tdVerCheck, 4000);
 /* live prices: start the feed and re-tag rows whenever a list redraws */
 livePoll();
 { let lt = null; new MutationObserver(() => { clearTimeout(lt); lt = setTimeout(liveTag, 250); }).observe(document.body, { childList: true, subtree: true }); }
+
+// 19 Nov 2026: keep showing "Server restarting…" if the app was reopened during a restart
+try { srvResume(); } catch (e) { /* */ }
