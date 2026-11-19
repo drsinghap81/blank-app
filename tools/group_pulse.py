@@ -165,6 +165,28 @@ def main(mkt):
         gi = (1 + ret[ss].iloc[-N:].mean(axis=1).fillna(0)).cumprod(); gi = gi / gi.iloc[0] * 100
         pp = (p21[ss].iloc[-N:].mean(axis=1) * 100)
         charts["groups"][g] = dict(idx=[round(float(v), 2) for v in gi], pulse=[None if np.isnan(v) else round(float(v), 1) for v in pp])
+    # 20 Nov 2026 (Amritpal: StockEdge-style industry charts): each group's equal-weight index over the full history (current liquid
+    # members), today's / 1-week / 1-month change, and the latest W + falling trendline (tools/index_w_alert.py rule, closes) with a
+    # small daily chart in <out>/group_w_charts/<slug>.json for the app.
+    import index_w_alert as IW, shutil
+    shutil.rmtree(cf["out"] + "group_w_charts", ignore_errors=True); os.makedirs(cf["out"] + "group_w_charts", exist_ok=True)
+    for r in rows:
+        ss = [m["symbol"] for m in r["members"]]
+        gi = (1 + ret[ss].mean(axis=1).fillna(0)).cumprod() * 100
+        r["d1"] = round(float(gi.iloc[-1] / gi.iloc[-2] - 1) * 100, 2); r["r1w"] = round(float(gi.iloc[-1] / gi.iloc[-6] - 1) * 100, 1)
+        r["r1m"] = round(float(gi.iloc[-1] / gi.iloc[-22] - 1) * 100, 1)
+        for m in r["members"]:
+            m["d1"] = round(float(C[m["symbol"]].iloc[-1] / C[m["symbol"]].iloc[-2] - 1) * 100, 2) if pd.notna(C[m["symbol"]].iloc[-2]) else None
+        sl = IW.slug(r["group"]); r["slug"] = sl
+        try:
+            w = IW.latest(gi)
+            X = pd.DataFrame({"Open": gi, "High": gi, "Low": gi, "Close": gi})
+            j = IW.chart_json(X, w or {})
+            json.dump(dict(name=r["group"], **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
+            r["w"] = {k: w.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if w and (w["status"] == "forming" or w.get("days_ago", 99) <= 5) else None
+            e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
+        except Exception as e:  # noqa: BLE001
+            print("group w fail", r["group"], e); r["w"] = None
     secof = dict(zip(u.symbol, u.sector))
     for r in rows:
         ss = [m["symbol"] for m in r["members"]]
