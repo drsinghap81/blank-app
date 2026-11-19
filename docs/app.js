@@ -6098,7 +6098,7 @@ async function alertsCard(box, mk) {
   const fm = wr.filter((r) => r.status === 'forming').slice(0, 2);
   const tick = (ok, txt) => `<span class="al-t ${ok ? 'ok' : 'no'}">${ok ? '✓' : '·'} ${txt}</span>`;
   const wline = (r) => `<div class="al-r"><b class="up">▲ ${esc(nm(r.index))}</b> <span>W + trendline broke ${dd(r.broke_on)}</span>
-      ${r.vol_ratio != null ? tick(r.vol_ratio >= 1.2, `volume ${fmt(r.vol_ratio, 1)}×`) : ''}${r.ema_status ? tick(r.ema_status !== 'left below', r.ema_status === 'left below' ? 'back below 9 EMA' : 'above 9 EMA') : ''}
+      ${r.vol_ratio != null ? `<span class="al-t">volume ${fmt(r.vol_ratio, 1)}×</span>` : ''}${r.ema_status ? tick(r.ema_status !== 'left below', r.ema_status === 'left below' ? 'back below 9 EMA' : 'above 9 EMA') : ''}
       ${r.full ? '<em class="al-full">full setup</em>' : ''}<small>${r.since >= 0 ? '+' : ''}${fmt(r.since, 1)}% since</small></div>`;
   const ER = (E && E.rows) || [];
   const up = ER.filter((r) => r.status === 'lift-off today'), dn = ER.filter((r) => r.status === 'left below');
@@ -6114,7 +6114,7 @@ async function alertsCard(box, mk) {
     ${!br.length && !fm.length && !up.length && !dn.length ? '<div class="al-r muted"><span>No index W or 9 EMA alerts today.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
       ${L ? lightHTML(L, mk) : ''}
-      <p class="muted td-rs"><b>W + trendline:</b> ${esc((W && W.test) || 'Tested on 23 NSE indices 2015–26: the break came before the 9/21 cross 71% of the time, about 1% lower; next 20 sessions median +1.6% (63% up) vs +1.2% on any day.')} Volume = break-day volume vs its 20-day average (✓ at 1.2× or more). Volume and the 9 EMA tick are confirmations, not separately tested.</p>
+      <p class="muted td-rs"><b>W + trendline:</b> ${esc((W && W.test) || 'Tested on 23 NSE indices 2015–26: the break came before the 9/21 cross 71% of the time, about 1% lower; next 20 sessions median +1.6% (63% up) vs +1.2% on any day.')} ${mk === 'NSE' ? '<b>Full setup</b> = W broken and riding above a rising 9 EMA. Tested on 551 Indian index W breaks 2016–26: with a 9 EMA lift-off around the break, next 20 sessions median +1.5% (63% up); without one −0.6% (46% up). Break-day volume (shown) added nothing: +1.4% with high volume, +1.4% without. Since 2021 the edge is smaller.' : 'Volume and the 9 EMA tick are shown for context; the combination was tested on India only.'}</p>
       <p class="muted td-rs"><b>9 EMA:</b> ${esc((E && E.test) || 'Lift-off = first whole candle above a rising 9 EMA in 10 sessions; ride until a whole candle is below it. Tested 2007–26: Bank Nifty +1.95% a trade (42% won), Nifty +0.96%, F&O stocks +1.46%, against about +1% for holding any 16 days.')}</p>
       <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
 }

@@ -67,7 +67,7 @@ def latest(c):
                    rsi_div=bool(rsi[l2] > rsi[l1]), close=round(float(v[-1]), 2), asof=str(dts[-1].date()), neckline=round(float(mid), 2))
         if brk is not None:
             ago = n - 1 - brk
-            if ago > 10:
+            if ago > 20:                                   # 20 Nov 2026: keep the latest break visible for 20 sessions (was 10)
                 return None
             rec.update(status="broken", broke_on=str(dts[brk].date()), days_ago=int(ago), broke_close=round(float(v[brk]), 2),
                        line_then=round(float(line(brk)), 2), from_low2=round(float(v[brk] / v[l2] - 1) * 100, 1),
@@ -118,7 +118,9 @@ def main():
         r = latest(c)
         if r:
             r.update(extras(r, XO.get(ix)))
-            r["full"] = bool(r["status"] == "broken" and (r.get("vol_ratio") or 0) >= 1.2 and r.get("ema_status") in ("riding", "lift-off today"))
+            # 20 Nov 2026 test (551 W breaks, 23 indices 2016-26): with a 9 EMA lift-off within 3 days of the break, next 20 sessions
+            # median +1.5% (63% up); without one -0.6% (46% up). Break-day volume >= 1.2x added nothing (+1.40% vs +1.36%).
+            r["full"] = bool(r["status"] == "broken" and r.get("ema_status") in ("riding", "lift-off today"))
             rows.append(dict(index=ix, **r))
     rows.sort(key=lambda r: (r["status"] != "broken", r.get("days_ago", 99), r.get("dist_pct", 99)))
     prev = {}
