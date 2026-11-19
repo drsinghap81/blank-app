@@ -6109,7 +6109,8 @@ async function alertsCard(box, mk) {
     getJSON(P + 'ath.json', mk === 'NSE' ? 'ath' : 'ath_' + mk), mk === 'NSE' ? getJSON(MAIN + 'data/scan/asx_clue.json', 'asx_clue') : null]);
   /* 20 Nov 2026: morning metals clue from Australia (ASX Materials vs ASX 200), shown on its own day only */
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-  const axl = AX && AX.date === today && AX.diff != null ? `<div class="al-r"><b class="${AX.diff > 0.5 ? 'up' : AX.diff < -0.5 ? 'down' : ''}">${AX.diff > 0.5 ? '▲' : AX.diff < -0.5 ? '▼' : '•'} Metals today: ${esc(AX.call)}</b><small>ASX materials ${AX.diff > 0 ? '+' : ''}${fmt(AX.diff, 2)}% vs ASX 200 at ${esc(AX.ist)} IST</small></div>` : '';
+  const axl = AX && AX.date === today && AX.diff != null ? `<div class="al-r"><b class="${AX.diff > 0.5 ? 'up' : AX.diff < -0.5 ? 'down' : ''}">${AX.diff > 0.5 ? '▲' : AX.diff < -0.5 ? '▼' : '•'} Metals today: ${esc(AX.call)}</b><small>ASX materials ${AX.diff > 0 ? '+' : ''}${fmt(AX.diff, 2)}% vs ASX 200 at ${esc(AX.ist)} IST</small></div>`
+    : mk === 'NSE' ? '<div class="al-r muted"><span>• Metals today: waiting for Australia (ASX opens 10:00 Sydney); this line fills in at 09:00 IST</span></div>' : '';
   const L = S ? await mxLight(mk, S).catch(() => null) : null;
   const nm = (x) => (mk !== 'NSE' ? x : x === 'NIFTY BANK' || x === 'BANKNIFTY' ? 'Bank Nifty' : x === 'NIFTY 50' || x === 'NIFTY' ? 'Nifty 50'
     : /^NIFTY (\d|MIDCAP|SMALLCAP)/.test(x) ? x.replace(/\b(\w)(\w*)/g, (m, a, b) => a + b.toLowerCase()) : x.replace(/^NIFTY /, '').replace(/\b(\w)(\w*)/g, (m, a, b) => a + b.toLowerCase()));
