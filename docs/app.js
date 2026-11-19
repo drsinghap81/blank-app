@@ -5381,7 +5381,7 @@ async function bgActTiles(box, P, rows, mk = 'NSE') {
     try { const W = await lvApi('/api/us/watch', { timeout: 15000 }); held = (W.items || []).map((x) => x.symbol); } catch (e) { /* phone copy */ } }
   const H = new Set(held); const sells = ((P && P.exits) || []).filter((e) => H.has(e.symbol));
   if (!state.turtle) state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null);
-  const TU = (state.turtle && state.turtle.rows) || []; const tu = TU.filter((r) => (r.status === 'in trade' && r.new) || r.status === 'exited today').length || TU.filter((r) => r.status === 'in trade').length;
+  const TU = tuFor((state.turtle && state.turtle.rows) || [], mk); const tu = TU.filter((r) => (r.status === 'in trade' && r.new) || r.status === 'exited today').length || TU.filter((r) => r.status === 'in trade').length;
   const known = held.length > 0;
   box.innerHTML = `<div class="bg-act">
       <button class="bg-actt sell" data-go="sell"><b>${known ? sells.length : '–'}</b><span>to sell</span></button>
@@ -6522,6 +6522,18 @@ function goAth(mk, tab, world) {
   const g = world ? 'mom' : grpOfTab(tab || 'brk'); if (tab && !world) { state.athTabG[g] = tab; state.athTabNext = null; }
   show(g === 'inv' ? 'inv' : g === 'trd' ? 'trd' : 'ath');
 }
+/* 20 Nov 2026 (Amritpal: "the Turtle list is the same under each market - categorise it per market"): each market shows only the
+   Turtle rows you can trade there. India: rupee rows (MCX, NSE ETFs, Nifty / Bank Nifty, USD/INR). US: US futures, US indices, coins.
+   Australia / UK: the futures signal traded through the local ETF / ETC (gold, silver, crude...; the instrument is named). */
+const TU_LOCAL = { ASX: { 'GC=F': 'ASX GOLD / QAU', 'SI=F': 'ASX ETPMAG', 'PL=F': 'ASX ETPMPT', 'CL=F': 'ASX OOO', '^GSPC': 'ASX IVV', '^NDX': 'ASX NDQ', 'BTC-USD': 'ASX EBTC', 'ETH-USD': 'ASX EETH' },
+  UK: { 'GC=F': 'LSE SGLN', 'SI=F': 'LSE PHAG', 'PL=F': 'LSE PHPT', 'HG=F': 'LSE COPA', 'CL=F': 'LSE CRUD', 'NG=F': 'LSE NGAS', 'ZW=F': 'LSE WEAT', 'ZC=F': 'LSE CORN', 'ZS=F': 'LSE SOYB',
+    'SB=F': 'LSE SUGA', 'KC=F': 'LSE COFF', 'CT=F': 'LSE COTN', '^GSPC': 'LSE CSPX', '^NDX': 'LSE EQQQ' } };
+function tuFor(rows, mk) {
+  if (mk === 'NSE') return rows.filter((r) => r.cur === 'INR');
+  if (mk === 'US') return rows.filter((r) => r.cur === 'USD');
+  const M = TU_LOCAL[mk] || {};
+  return rows.filter((r) => M[r.key]).map((r) => ({ ...r, _where: `${M[r.key]} · signal from ${r.contract || r.key}` }));
+}
 async function tdRender2(el) {
   const mk = tdMk(); const MP = MAIN + MKT[mk].path;
   el.innerHTML = '<p class="muted pad">Loading today…</p>';
@@ -6534,7 +6546,7 @@ async function tdRender2(el) {
     getJSON(MP + 'patterns.json', 'pat_' + mk)]);
   if (fund) state.fund = fund; if (assets) state.assets = assets;
   if (!state.turtle || Date.now() - (state.turtleAt || 0) > 600000) { state.turtleAt = Date.now(); state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); }
-  const TU = (state.turtle && state.turtle.rows) || []; const tuNew = TU.filter((r) => r.status === 'in trade' && r.new), tuEx = TU.filter((r) => r.status === 'exited today'), tuIn = TU.filter((r) => r.status === 'in trade');
+  const TU = tuFor((state.turtle && state.turtle.rows) || [], mk); const tuNew = TU.filter((r) => r.status === 'in trade' && r.new), tuEx = TU.filter((r) => r.status === 'exited today'), tuIn = TU.filter((r) => r.status === 'in trade');
   const seg = `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
   if (!P) { el.innerHTML = `<div class="td-wrap">${seg}<p class="empty">Today's plan appears after the evening scan.</p></div>`; el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); })); return; }
   const S = await sysMap(mk);
@@ -6634,7 +6646,7 @@ async function tdRender2(el) {
     const p2 = (v) => fmt(v, v >= 1000 ? 0 : 2, 'en-US');
     const head = r.status === 'in trade' ? (r.new ? '<span class="t2-tag both">BUY today</span>' : `<span class="t2-tag al">Holding ${r.open_R >= 0 ? '+' : ''}${fmt(r.open_R, 1)}R</span>`) : r.status === 'exited today' ? '<span class="t2-tag" style="background:var(--fall-soft);color:var(--fall)">EXIT today</span>' : `<span class="t2-tag">${fmt(r.dist_pct, 1)}% away</span>`;
     const line = r.status === 'in trade' ? `Sell-stop <b>${p2(r.stop)}</b> · since ${day(r.entry_date)} at ${p2(r.entry)}` : r.status === 'exited today' ? `Stopped at ~${p2(r.trades[r.trades.length - 1].x)}` : `Buy-stop <b>${p2(r.buy_stop)}</b> · stop if filled ${p2(r.fixed_stop_if_filled)}`;
-    return `<div class="t2-wcard" role="button" tabindex="0" data-tu="${i}"><span class="t2-ch"><span><b>${esc(r.name)}</b><small>${esc(r.contract)}</small></span>${head}</span><span class="t2-line">${line}</span><span class="t2-line" style="font-size:12.5px">${sz.replace(/^MCX: /, 'MCX ')}</span></div>`; }).join('') : '<p class="t2-empty">No Turtle data yet.</p>');
+    return `<div class="t2-wcard" role="button" tabindex="0" data-tu="${i}"><span class="t2-ch"><span><b>${esc(r.name)}</b><small>${esc(r._where || r.contract)}</small></span>${head}</span><span class="t2-line">${line}</span><span class="t2-line" style="font-size:12.5px">${sz.replace(/^MCX: /, 'MCX ')}</span></div>`; }).join('') : '<p class="t2-empty">No Turtle data yet.</p>');
   const tiles = `<div class="t2-tiles t2-tiles5"><div class="t2-tile sell" data-go="t2sell" role="button" tabindex="0"><b>${knowHeld ? sells.length : '–'}</b><span>to sell</span></div><div class="t2-tile both" data-go="${bothAll.length ? 't2both' : 't2mom'}" role="button" tabindex="0"><b>${bothAll.length}</b><span>in both</span></div>
     <div class="t2-tile buy" data-go="t2mom" role="button" tabindex="0"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add" data-go="${knowHeld && adds.length ? 't2adds' : 't2mom'}" role="button" tabindex="0"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div>
     <div class="t2-tile fut" data-go="t2tur" role="button" tabindex="0"><b>${tuNew.length + tuEx.length || tuIn.length}</b><span>Turtle Trading System</span></div></div>`;
