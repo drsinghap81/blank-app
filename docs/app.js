@@ -6052,16 +6052,15 @@ async function tdTop5(box, mk) {
     if (o.ath && o.ath.lvl === 0) { const m = S.meta[sym] || {}; if (m.trigger) return `ATH momentum: buy above ${Mz(m.trigger)} · exit on a weekly close below the 30-week average (${Mz(m.sma30)}) · holds months, not weeks`; }
     const m = S.meta[sym] || {}; return m.stop ? `Stop ${Mz(m.stop)}${m.trigger ? ` · trigger ${Mz(m.trigger)}` : ''}` : 'Open the chart for the plan'; };
   const red = L.lvl === 'red';
-  box.innerHTML = `<section class="mx5 ${L.lvl}">${lightHTML(L, mk)}<div class="idxw"></div><div class="emal"></div>
+  box.innerHTML = `<section class="mx5 ${L.lvl}">
     <div class="mx5h"><b>Top 5 swing trades today</b><small>${C.length} swing setups now (9/21 buys, tight-base breakouts, bases near their trigger) · ranked by score · tap for the chart</small></div>
     ${top.length ? `<ol class="mx5l${red ? ' dim' : ''}">${top.map((x, i) => `<li><button data-m5="${esc(x.sym)}"><span class="mx5n">${i + 1}</span>
       <span class="mx5b"><b>${esc(x.sym)} <em class="mx5s">${x.p} pts</em>${x.stack ? ' <small class="chip">MA stack ✓</small>' : ''}</b>
       <small>${x.w.map(([n, t]) => `<span class="${n > 0 ? 'up' : 'down'}">${n > 0 ? '+' : ''}${n} ${esc(t)}</span>`).join(' · ')}</small>
       <small class="mx5p">${plan(x.sym)}</small></span></button></li>`).join('')}</ol>` : '<p class="muted td-rs">No stock has a buy signal right now.</p>'}
     ${red && top.length ? '<p class="down td-rs"><b>Red day:</b> these are shown for the record. Your rule is to wait.</p>' : ''}
-    <p class="muted td-rs">Score: 9/21 buy +3 (trend running +1), tight-base breakout +2 (near trigger or recent +1), also an ATH breakout +2, IPO cup +1, 3-month gain top 20% +2 (top 40% +1), sector leading/uptrend +1 (weak −1), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></section>`;
+    <details class="al-why"><summary>ⓘ How the score works</summary><p class="muted td-rs">Score: 9/21 buy +3 (trend running +1), tight-base breakout +2 (near trigger or recent +1), also an ATH breakout +2, IPO cup +1, 3-month gain top 20% +2 (top 40% +1), sector leading/uptrend +1 (weak −1), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></details></section>`;
   box.querySelectorAll('[data-m5]').forEach((b) => b.addEventListener('click', () => mxOpen(b.dataset.m5, mk, S)));
-  idxW(box.querySelector('.idxw'), mk); emaLift(box.querySelector('.emal'), mk);
 }
 /* 19 Nov 2026 (Amritpal): alert when a whole candle leaves a RISING 9 EMA; ride until a whole candle is below it. Info only.
    Tested on daily futures 2007-26 (tools/research/ema_liftoff.py): Bank Nifty avg +1.95% a trade (42% win, PF 2.1; 2017-26 +0.94%),
@@ -6079,6 +6078,45 @@ async function emaLift(el, mk = 'NSE') {
     ${idx.map(line).join('')}${today.map(line).join('') || '<span class="muted">No stock lifted off or fell below its 9 EMA today.</span>'}
     ${ride.length ? `<details><summary>${ride.length} ${mk === 'NSE' ? 'F&amp;O stocks' : 'stocks'} riding</summary>${ride.map(line).join('<br>')}</details>` : ''}
     <small>Info only. Lift-off = first whole candle (low) above a rising 9 EMA in 10 sessions; ride ends on the first whole candle (high) below it. ${d.test ? `${esc(d.test)} Covers the main indices and the 50 most-traded stocks.` : `Tested on daily futures 2007–26: Bank Nifty +1.95% a trade (42% won, profit factor 2.1; +0.94% since 2017), Nifty +0.96%, F&amp;O stocks +1.46%, against roughly +1% for holding any 16 days. Only India showed this edge; in the US, ASX and UK it was no better than holding. Most trades are small losses; a few big trends pay. The candle alone doesn't predict direction, and shorting the mirror lost money. Covers Nifty, Bank Nifty and 53 F&amp;O stocks.`}</small></div>`;
+}
+/* 20 Nov 2026 (Amritpal: "too much information ... I need an alert only plus a Bank Nifty type W with trendline break with
+   volume and price leaving EMA ... in pro too but with minimal text"). One short card at the top of Today, both modes:
+   market light (one line), the latest index W + trendline breaks with volume and 9 EMA ticks, and today's 9 EMA lift-offs.
+   The test results sit behind the ⓘ line. */
+async function alertsCard(box, mk) {
+  if (!box) return;
+  const P = MAIN + MKT[mk].path;
+  const [S, W, E] = await Promise.all([sysMap(mk).catch(() => null), getJSON(P + 'index_w.json', 'index_w_' + mk), getJSON(P + 'ema_lift.json', 'ema_lift_' + mk)]);
+  const L = S ? await mxLight(mk, S).catch(() => null) : null;
+  const nm = (x) => (mk !== 'NSE' ? x : x === 'NIFTY BANK' || x === 'BANKNIFTY' ? 'Bank Nifty' : x === 'NIFTY 50' || x === 'NIFTY' ? 'Nifty 50'
+    : x.replace(/^NIFTY /, '').replace(/\b(\w)(\w*)/g, (m, a, b) => a + b.toLowerCase()));
+  const n0 = (v) => Number(v).toLocaleString(MKT[mk].loc, { maximumFractionDigits: v < 1000 ? 2 : 0 });
+  const dd = (s) => { try { return new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); } catch (e) { return s; } };
+  const lt = L ? { red: ['red', 'RED · no new buys today'], amber: ['amber', 'AMBER · one warning, trade normally'], green: ['green', 'GREEN · OK to buy'] }[L.lvl] : null;
+  const wr = ((W && W.rows) || []).filter((r) => r.status === 'broken' || r.status === 'forming');
+  const br = wr.filter((r) => r.status === 'broken').sort((a, b) => (b.full - a.full) || (a.days_ago - b.days_ago));
+  const fm = wr.filter((r) => r.status === 'forming').slice(0, 2);
+  const tick = (ok, txt) => `<span class="al-t ${ok ? 'ok' : 'no'}">${ok ? '✓' : '·'} ${txt}</span>`;
+  const wline = (r) => `<div class="al-r"><b class="up">▲ ${esc(nm(r.index))}</b> <span>W + trendline broke ${dd(r.broke_on)}</span>
+      ${r.vol_ratio != null ? tick(r.vol_ratio >= 1.2, `volume ${fmt(r.vol_ratio, 1)}×`) : ''}${r.ema_status ? tick(r.ema_status !== 'left below', r.ema_status === 'left below' ? 'back below 9 EMA' : 'above 9 EMA') : ''}
+      ${r.full ? '<em class="al-full">full setup</em>' : ''}<small>${r.since >= 0 ? '+' : ''}${fmt(r.since, 1)}% since</small></div>`;
+  const ER = (E && E.rows) || [];
+  const up = ER.filter((r) => r.status === 'lift-off today'), dn = ER.filter((r) => r.status === 'left below');
+  const ix = ER.filter((r) => r.index && r.status === 'riding');
+  const names = (L2) => L2.slice(0, 8).map((r) => esc(r.index ? nm(r.symbol) : r.symbol)).join(', ') + (L2.length > 8 ? ` +${L2.length - 8}` : '');
+  box.innerHTML = `<section class="al-card ${lt ? lt[0] : ''}">
+    ${lt ? `<div class="al-light"><i></i><b>${lt[1]}</b></div>` : ''}
+    ${br.length ? br.slice(0, 4).map(wline).join('') : ''}
+    ${fm.map((r) => `<div class="al-r muted"><span>${esc(nm(r.index))}: W forming · trendline ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% above)</span></div>`).join('')}
+    ${up.length ? `<div class="al-r"><b class="up">▲ Left the 9 EMA upward</b> <span>${names(up)}</span></div>` : ''}
+    ${dn.length ? `<div class="al-r"><b class="down">▼ Fell below the 9 EMA</b> <span>${names(dn)}</span></div>` : ''}
+    ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
+    ${!br.length && !fm.length && !up.length && !dn.length ? '<div class="al-r muted"><span>No index W or 9 EMA alerts today.</span></div>' : ''}
+    <details class="al-why"><summary>ⓘ What these mean</summary>
+      ${L ? lightHTML(L, mk) : ''}
+      <p class="muted td-rs"><b>W + trendline:</b> ${esc((W && W.test) || 'Tested on 23 NSE indices 2015–26: the break came before the 9/21 cross 71% of the time, about 1% lower; next 20 sessions median +1.6% (63% up) vs +1.2% on any day.')} Volume = break-day volume vs its 20-day average (✓ at 1.2× or more). Volume and the 9 EMA tick are confirmations, not separately tested.</p>
+      <p class="muted td-rs"><b>9 EMA:</b> ${esc((E && E.test) || 'Lift-off = first whole candle above a rising 9 EMA in 10 sessions; ride until a whole candle is below it. Tested 2007–26: Bank Nifty +1.95% a trade (42% won), Nifty +0.96%, F&O stocks +1.46%, against about +1% for holding any 16 days.')}</p>
+      <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
 }
 /* 19 Nov 2026 (Amritpal, Bank Nifty chart): index early alert = W bottom + falling trendline break. Info only - entries stay on
    9/21 + the light. Tested on 23 NSE indices 2015-26 (tools/research/index_w_bottom.py): the break came before the 9/21 cross 71% of
@@ -6387,7 +6425,7 @@ async function tdRender2(el) {
         <div class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small><b>${clk.txt}</b><small>${esc(clk.at)} · ${esc(clk.local)} your time</small></div></div>
       ${tiles}<div id="t2condor"></div>
       <small class="t2-sub">Plan from the ${day(P.asof)} close${knowHeld ? '' : ' · holdings not linked'}</small></div>
-    ${ribbon()}
+    <div id="tdalert"></div>${ribbon()}
     <div id="tdtop5"></div>
     <div class="t2-h" id="t2sell"><h2>Sell at the open</h2><small>do these first</small></div>
     <div class="t2-box">${!knowHeld ? '<p class="t2-empty">Holdings not linked: add them in Portfolio or connect Live.</p>'
@@ -6435,7 +6473,7 @@ async function tdRender2(el) {
     if (x.row) fundSelect(x.row); else if (x.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(x.tv) + '&interval=1M', '_blank', 'noopener'); }));
   el.querySelectorAll('.t2-td[data-go]').forEach((b) => b.addEventListener('click', () => { const g = b.dataset.go; if (g === 'inv') { state.athMkt = mk; state.athTabG.inv = 'themes'; } if (g === 'ath') { state.athMkt = mk; state.athWorld = false; } show(g); }));
   $('#t2old').addEventListener('click', () => { state.todayV1 = true; tdRender(el, false); });
-  tdTop5($('#tdtop5'), mk); tdMatrix($('#tdmx'), mk); tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); }
+  alertsCard($('#tdalert'), mk); tdTop5($('#tdtop5'), mk); tdMatrix($('#tdmx'), mk); tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); }
   clearTimeout(state._t2clk); state._t2clk = setTimeout(() => { if (state.view === 'today' && !state.todayV1) { const c = el.querySelector('.t2-clock b'); if (c) { const k = mktClock(mk); c.textContent = k.txt; } } }, 60000);
 }
 
@@ -6469,7 +6507,7 @@ async function tdRender(el, beginner) {
   const held = new Set(bgPractice().filter((t) => t.state !== 'closed').map((t) => t.symbol));
   const Mz = (v, d = 0) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
   const MS = (P.missed || []);
-  el.innerHTML = `<div class="td-wrap">${seg}<div id="tdal"></div><div id="tdmini"></div>
+  el.innerHTML = `<div class="td-wrap">${seg}<div id="tdalert"></div>${beginner ? `<details class="td-risk td-bgmore"><summary><span><b>Today's trades and lists</b><small>Open when you want the details</small></span></summary>` : ''}<div id="tdal"></div><div id="tdmini"></div>
     <div class="td-hero"><span>Setups found</span><div class="td-big"><b>${n}</b>${scanned ? `<em>out of ${Number(scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>` : ''}</div>
       <div class="td-bar"><i style="width:100%"></i></div><small>Close ${day(P.asof)} · the scan runs every evening</small></div>
     ${beginner && mk !== 'NSE' ? `<p class="status exit watch">${MKT[mk].name}: ideas only. The India systems did not beat this market's index in the backtest, so treat these as a watch list, not tested buys.</p>` : ''}
@@ -6488,9 +6526,9 @@ async function tdRender(el, beginner) {
     ${MS.length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${MS.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${MS.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
     <div id="tdmx"></div>${mk === 'US' ? '<div id="tdpies"></div><div id="tdrsi2"></div>' : ''}${mk === 'NSE' ? '<div id="tdgm"></div>' : ''}<div id="tdheat"></div><div id="tdtrack"></div>
-    <p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
+    ${beginner ? '</details>' : ''}<p class="bg-fine">Scan results and a calculator, not investment advice. You decide and place every trade.</p></div>`;
   wire();
-  state._tdEl = el; state._tdBg = beginner;
+  state._tdEl = el; state._tdBg = beginner; alertsCard($('#tdalert'), mk);
   el.querySelectorAll('.td-card:not(.td-raise)').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   if (!A) fetch(MP + 'ath.json', { cache: 'no-cache' }).then((r) => r.json()).then((j) => { if (!j || !j.scanned) return; state['_athN' + tag] = j.scanned;
     const big = el.querySelector('.td-big'); if (big && !big.querySelector('em')) big.insertAdjacentHTML('beforeend', `<em>out of ${Number(j.scanned).toLocaleString(MKT[mk].loc)} ${MKT[mk].name} stocks scanned</em>`); }).catch(() => {});

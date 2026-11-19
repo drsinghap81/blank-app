@@ -1188,3 +1188,17 @@ body.pub .owner-only { display: none !important; }
 /* index early alert (W + trendline break) */
 .idxw-b{display:flex;flex-direction:column;gap:4px;margin:8px 0 4px;padding:8px 10px;border:1px solid var(--line,#d0d7de);border-radius:10px;font-size:.88em}
 .idxw-b small{opacity:.7}
+
+/* 20 Nov 2026: compact alert card at the top of Today */
+.al-card{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.al-light{display:flex;align-items:center;gap:8px;font-size:1.02em}
+.al-light i{width:12px;height:12px;border-radius:50%;background:var(--slate);flex:none}
+.al-card.green .al-light i{background:var(--rise)} .al-card.red .al-light i{background:var(--fall)} .al-card.amber .al-light i{background:#e0a100}
+.al-card.red{border-color:var(--fall)}
+.al-r{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:.92em;line-height:1.35}
+.al-r small{opacity:.7}
+.al-t{font-size:.86em;padding:1px 6px;border-radius:8px;border:1px solid var(--line)}
+.al-t.ok{color:var(--rise);border-color:var(--rise)} .al-t.no{opacity:.7}
+.al-full{font-style:normal;font-size:.8em;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--rise);color:#fff}
+.al-why{font-size:.86em} .al-why summary{cursor:pointer;opacity:.75;list-style:none} .al-why summary::-webkit-details-marker{display:none}
+.al-why .mxl{margin-top:6px}
