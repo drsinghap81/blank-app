@@ -1,0 +1,452 @@
+{
+ "method": "Inter-market clues for India's day (20 Nov 2026, Amritpal: \"if Australia is ahead, do the sectors that run there that day\nimpact India ... any other market ... a clue for that day's momentum?\").\nTiming: ASX trades 04:30/05:30-10:30/11:30 IST, so most of its day is known at India's 09:15 open; the US closes ~01:30-02:30 IST\nthe night before. India's opening GAP already prices overnight news, so the useful question is India OPEN -> CLOSE.\nData: India indices from NSE (data/scan/index_ohlcv.csv.gz, 2016->); ASX indices and US ETFs from Yahoo.\nTests (daily, 2016-2026):\n  A. index: ASX 200 same-day return / S&P 500 previous-night return  vs  Nifty gap and Nifty open->close\n  B. sector pairs, relative to each market's index: ASX/US sector beat its index by > +1% (or lagged by < -1%) -> does the matching\n     Indian sector beat Nifty open->close that day? (hit rate vs the sector's own base rate, average excess)\nOutput: data/research/intermarket.json",
+ "index": {
+  "ASX 200 same day vs Nifty gap": [
+   0.474,
+   2571
+  ],
+  "ASX 200 same day vs Nifty open->close": [
+   0.131,
+   2571
+  ],
+  "S&P 500 prev night vs Nifty gap": [
+   0.467,
+   2684
+  ],
+  "S&P 500 prev night vs Nifty open->close": [
+   -0.046,
+   2685
+  ]
+ },
+ "index_buckets": {
+  "ASX 200 same day up > 1%": {
+   "days": 224,
+   "gap": 0.6,
+   "oc": 0.058,
+   "oc_up": 53
+  },
+  "ASX 200 same day down < -1%": {
+   "days": 224,
+   "gap": -0.65,
+   "oc": -0.132,
+   "oc_up": 46
+  },
+  "ASX 200 same day in between": {
+   "days": 2123,
+   "gap": 0.14,
+   "oc": -0.064,
+   "oc_up": 46
+  },
+  "S&P 500 prev night up > 1%": {
+   "days": 346,
+   "gap": 0.51,
+   "oc": -0.106,
+   "oc_up": 45
+  },
+  "S&P 500 prev night down < -1%": {
+   "days": 282,
+   "gap": -0.54,
+   "oc": 0.016,
+   "oc_up": 51
+  },
+  "S&P 500 prev night in between": {
+   "days": 2057,
+   "gap": 0.13,
+   "oc": -0.062,
+   "oc_up": 47
+  }
+ },
+ "pairs": {
+  "ASX Financials -> Bank Nifty": {
+   "days": 2571,
+   "corr": 0.068,
+   "base_beat": 52,
+   "strong": {
+    "days": 99,
+    "beat": 56,
+    "avg_excess": 0.141
+   },
+   "weak": {
+    "days": 95,
+    "beat": 51,
+    "avg_excess": -0.056
+   },
+   "2016-20": {
+    "strong_avg": 0.381,
+    "weak_avg": -0.145
+   },
+   "2021-26": {
+    "strong_avg": 0.016,
+    "weak_avg": -0.002
+   }
+  },
+  "ASX Financials -> Fin Services": {
+   "days": 2571,
+   "corr": 0.075,
+   "base_beat": 53,
+   "strong": {
+    "days": 99,
+    "beat": 56,
+    "avg_excess": 0.144
+   },
+   "weak": {
+    "days": 95,
+    "beat": 53,
+    "avg_excess": -0.012
+   },
+   "2016-20": {
+    "strong_avg": 0.305,
+    "weak_avg": -0.025
+   },
+   "2021-26": {
+    "strong_avg": 0.06,
+    "weak_avg": -0.003
+   }
+  },
+  "ASX Materials -> Nifty Metal": {
+   "days": 2571,
+   "corr": 0.246,
+   "base_beat": 48,
+   "strong": {
+    "days": 359,
+    "beat": 61,
+    "avg_excess": 0.431
+   },
+   "weak": {
+    "days": 337,
+    "beat": 31,
+    "avg_excess": -0.516
+   },
+   "2016-20": {
+    "strong_avg": 0.482,
+    "weak_avg": -0.371
+   },
+   "2021-26": {
+    "strong_avg": 0.396,
+    "weak_avg": -0.597
+   }
+  },
+  "ASX Energy -> Nifty Energy": {
+   "days": 2571,
+   "corr": 0.116,
+   "base_beat": 46,
+   "strong": {
+    "days": 446,
+    "beat": 55,
+    "avg_excess": 0.09
+   },
+   "weak": {
+    "days": 472,
+    "beat": 37,
+    "avg_excess": -0.188
+   },
+   "2016-20": {
+    "strong_avg": 0.018,
+    "weak_avg": -0.053
+   },
+   "2021-26": {
+    "strong_avg": 0.137,
+    "weak_avg": -0.289
+   }
+  },
+  "ASX IT -> Nifty IT": {
+   "days": 2571,
+   "corr": 0.077,
+   "base_beat": 49,
+   "strong": {
+    "days": 479,
+    "beat": 54,
+    "avg_excess": 0.136
+   },
+   "weak": {
+    "days": 461,
+    "beat": 45,
+    "avg_excess": -0.062
+   },
+   "2016-20": {
+    "strong_avg": 0.109,
+    "weak_avg": 0.04
+   },
+   "2021-26": {
+    "strong_avg": 0.151,
+    "weak_avg": -0.106
+   }
+  },
+  "ASX Health -> Nifty Pharma": {
+   "days": 2571,
+   "corr": 0.089,
+   "base_beat": 46,
+   "strong": {
+    "days": 277,
+    "beat": 51,
+    "avg_excess": 0.091
+   },
+   "weak": {
+    "days": 285,
+    "beat": 40,
+    "avg_excess": -0.198
+   },
+   "2016-20": {
+    "strong_avg": 0.056,
+    "weak_avg": -0.261
+   },
+   "2021-26": {
+    "strong_avg": 0.119,
+    "weak_avg": -0.157
+   }
+  },
+  "ASX A-REIT -> Nifty Realty": {
+   "days": 2571,
+   "corr": -0.028,
+   "base_beat": 47,
+   "strong": {
+    "days": 274,
+    "beat": 45,
+    "avg_excess": -0.098
+   },
+   "weak": {
+    "days": 282,
+    "beat": 49,
+    "avg_excess": -0.016
+   },
+   "2016-20": {
+    "strong_avg": -0.181,
+    "weak_avg": 0.074
+   },
+   "2021-26": {
+    "strong_avg": -0.027,
+    "weak_avg": -0.081
+   }
+  },
+  "ASX Discretionary -> Nifty Auto": {
+   "days": 2571,
+   "corr": -0.005,
+   "base_beat": 45,
+   "strong": {
+    "days": 146,
+    "beat": 42,
+    "avg_excess": -0.076
+   },
+   "weak": {
+    "days": 164,
+    "beat": 55,
+    "avg_excess": 0.016
+   },
+   "2016-20": {
+    "strong_avg": -0.22,
+    "weak_avg": -0.091
+   },
+   "2021-26": {
+    "strong_avg": 0.009,
+    "weak_avg": 0.072
+   }
+  },
+  "ASX Staples -> Nifty FMCG": {
+   "days": 2571,
+   "corr": 0.113,
+   "base_beat": 47,
+   "strong": {
+    "days": 219,
+    "beat": 49,
+    "avg_excess": 0.08
+   },
+   "weak": {
+    "days": 207,
+    "beat": 39,
+    "avg_excess": -0.186
+   },
+   "2016-20": {
+    "strong_avg": 0.111,
+    "weak_avg": -0.265
+   },
+   "2021-26": {
+    "strong_avg": 0.064,
+    "weak_avg": -0.141
+   }
+  },
+  "US Tech (prev night) -> Nifty IT": {
+   "days": 2685,
+   "corr": 0.037,
+   "base_beat": 49,
+   "strong": {
+    "days": 181,
+    "beat": 48,
+    "avg_excess": 0.075
+   },
+   "weak": {
+    "days": 155,
+    "beat": 47,
+    "avg_excess": -0.04
+   },
+   "2016-20": {
+    "strong_avg": 0.189,
+    "weak_avg": 0.114
+   },
+   "2021-26": {
+    "strong_avg": 0.033,
+    "weak_avg": -0.103
+   }
+  },
+  "US Semis (prev night) -> Nifty IT": {
+   "days": 2685,
+   "corr": 0.029,
+   "base_beat": 49,
+   "strong": {
+    "days": 568,
+    "beat": 47,
+    "avg_excess": 0.025
+   },
+   "weak": {
+    "days": 459,
+    "beat": 47,
+    "avg_excess": -0.058
+   },
+   "2016-20": {
+    "strong_avg": 0.113,
+    "weak_avg": -0.031
+   },
+   "2021-26": {
+    "strong_avg": -0.016,
+    "weak_avg": -0.072
+   }
+  },
+  "US Financials (prev night) -> Bank Nifty": {
+   "days": 2685,
+   "corr": 0.041,
+   "base_beat": 51,
+   "strong": {
+    "days": 203,
+    "beat": 54,
+    "avg_excess": 0.059
+   },
+   "weak": {
+    "days": 185,
+    "beat": 52,
+    "avg_excess": -0.029
+   },
+   "2016-20": {
+    "strong_avg": 0.012,
+    "weak_avg": -0.024
+   },
+   "2021-26": {
+    "strong_avg": 0.095,
+    "weak_avg": -0.033
+   }
+  },
+  "US Energy (prev night) -> Nifty Energy": {
+   "days": 2685,
+   "corr": 0.102,
+   "base_beat": 46,
+   "strong": {
+    "days": 538,
+    "beat": 51,
+    "avg_excess": 0.057
+   },
+   "weak": {
+    "days": 531,
+    "beat": 41,
+    "avg_excess": -0.16
+   },
+   "2016-20": {
+    "strong_avg": -0.02,
+    "weak_avg": -0.056
+   },
+   "2021-26": {
+    "strong_avg": 0.096,
+    "weak_avg": -0.224
+   }
+  },
+  "US Materials (prev night) -> Nifty Metal": {
+   "days": 2685,
+   "corr": 0.096,
+   "base_beat": 48,
+   "strong": {
+    "days": 207,
+    "beat": 58,
+    "avg_excess": 0.255
+   },
+   "weak": {
+    "days": 189,
+    "beat": 44,
+    "avg_excess": -0.183
+   },
+   "2016-20": {
+    "strong_avg": 0.397,
+    "weak_avg": 0.021
+   },
+   "2021-26": {
+    "strong_avg": 0.178,
+    "weak_avg": -0.285
+   }
+  },
+  "US Health (prev night) -> Nifty Pharma": {
+   "days": 2685,
+   "corr": 0.035,
+   "base_beat": 46,
+   "strong": {
+    "days": 219,
+    "beat": 47,
+    "avg_excess": -0.03
+   },
+   "weak": {
+    "days": 213,
+    "beat": 46,
+    "avg_excess": -0.101
+   },
+   "2016-20": {
+    "strong_avg": -0.07,
+    "weak_avg": -0.287
+   },
+   "2021-26": {
+    "strong_avg": -0.017,
+    "weak_avg": -0.036
+   }
+  },
+  "US Discretionary (prev night) -> Nifty Auto": {
+   "days": 2685,
+   "corr": 0.067,
+   "base_beat": 45,
+   "strong": {
+    "days": 129,
+    "beat": 53,
+    "avg_excess": 0.151
+   },
+   "weak": {
+    "days": 141,
+    "beat": 47,
+    "avg_excess": -0.141
+   },
+   "2016-20": {
+    "strong_avg": 0.48,
+    "weak_avg": -0.321
+   },
+   "2021-26": {
+    "strong_avg": 0.101,
+    "weak_avg": -0.116
+   }
+  },
+  "US Staples (prev night) -> Nifty FMCG": {
+   "days": 2685,
+   "corr": 0.095,
+   "base_beat": 47,
+   "strong": {
+    "days": 243,
+    "beat": 47,
+    "avg_excess": 0.109
+   },
+   "weak": {
+    "days": 289,
+    "beat": 44,
+    "avg_excess": -0.124
+   },
+   "2016-20": {
+    "strong_avg": 0.186,
+    "weak_avg": -0.132
+   },
+   "2021-26": {
+    "strong_avg": 0.078,
+    "weak_avg": -0.121
+   }
+  }
+ }
+}
