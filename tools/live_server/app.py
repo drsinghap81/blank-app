@@ -1762,7 +1762,13 @@ def tb_state(inst: str = "bn", _=Depends(auth)):
 def tb_diag(_=Depends(auth)):
     """18 Nov 2026: what systemd says about the Top Bottom bot (written every minute by the watchdog)."""
     try:
-        return dict(text=open(os.path.join(DATA, "tb_diag.txt")).read()[-4000:])
+        t = open(os.path.join(DATA, "tb_diag.txt")).read()[-6000:]
+        # 19 Nov 2026: Angel's library prints request headers on errors - hide the API key, session token and IPs
+        t = re.sub(r"('Authorization': 'Bearer )[^']+", r"\1[hidden]", t)
+        t = re.sub(r"('X-PrivateKey': ')[^']+", r"\1[hidden]", t)
+        t = re.sub(r"('X-Client(?:Public|Local)IP': ')[^']+", r"\1[hidden]", t)
+        t = re.sub(r"('X-MACAddress': ')[^']+", r"\1[hidden]", t)
+        return dict(text=t[-4000:])
     except Exception:  # noqa: BLE001
         return dict(text="no diagnostics yet (the watchdog writes them every minute after the next update)")
 
