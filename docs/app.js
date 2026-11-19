@@ -6136,6 +6136,16 @@ const COMM_WHERE = {
   UK: { 'GC=F': 'LSE SGLN', 'SI=F': 'LSE PHAG', 'PL=F': 'LSE PHPT', 'PA=F': 'LSE PHPD', 'HG=F': 'LSE COPA', 'ALI=F': 'LSE ALUM', 'CL=F': 'LSE CRUD', 'BZ=F': 'LSE BRNT', 'NG=F': 'LSE NGAS',
     'HO=F': 'LSE HEAT', 'RB=F': 'LSE UGAS', 'ZC=F': 'LSE CORN', 'ZW=F': 'LSE WEAT', 'ZS=F': 'LSE SOYB', 'ZL=F': 'LSE SOYO', 'KC=F': 'LSE COFF', 'CC=F': 'LSE COCO', 'SB=F': 'LSE SUGA', 'CT=F': 'LSE COTN' },
 };
+/* 20 Nov 2026 (Amritpal: "are ETFs, indices and funds factored in"): indices too - India's NSE indices (index_mclose.json) and each
+   market's main index (assets.json world indices), same rule: last month closed above the ATH, now above that month's high. */
+const MK_IDX_ASSET = { US: ['^GSPC', '^NDX', '^DJI', '^RUT'], ASX: ['^AXJO'], UK: ['^FTSE'], NSE: [] };
+function idxAthLines(IM, A, mk) {
+  const L = [];
+  ((IM && IM.rows) || []).forEach((r) => { if (r.month === athLastMonth(null) && r.high_m && r.close > r.high_m) L.push({ n: r.index, h: r.high_m, c: r.close, tv: tvIdx(r.index) }); });
+  ((A && A.rows) || []).forEach((r) => { if ((MK_IDX_ASSET[mk] || []).includes(r.key) && r.mclose && r.mclose.high_m && r.close > r.mclose.high_m && r.mclose.month === athLastMonth(r.asof)) L.push({ n: r.name, h: r.mclose.high_m, c: r.close, tv: tvIdx(r.key) }); });
+  if (!L.length) return '';
+  return `<div class="al-r"><b>Indices</b>${L.map((x) => `<a href="#" class="al-t ok"${x.tv ? ` data-tvx="${esc(x.tv)}"` : ''}>✓ ${esc(x.n)} above ${fmt(x.h, 2, MKT[mk].loc)} · +${fmt((x.c / x.h - 1) * 100, 1)}%</a>`).join('')}</div>`;
+}
 function commAthLines(A, mk) {
   const WH = COMM_WHERE[mk] || {};
   const L = ((A && A.rows) || []).filter((r) => WH[r.key] && r.mclose && r.mclose.high_m && r.close > r.mclose.high_m && r.mclose.month === athLastMonth(r.asof));
@@ -6254,6 +6264,7 @@ async function alertsCard(box, mk) {
   if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds').catch(() => null);
   if (!state.assets) state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets').catch(() => null);
   const BK = mk === 'US' ? await getJSON(P + 'baskets.json', 'baskets_' + mk).catch(() => null) : null;
+  const IM = mk === 'NSE' ? await getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose').catch(() => null) : null;
   /* 20 Nov 2026: morning metals clue from Australia (ASX Materials vs ASX 200), shown on its own day only */
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
   const axl = AX && AX.date === today && AX.diff != null ? `<div class="al-r"><b class="${AX.diff > 0.5 ? 'up' : AX.diff < -0.5 ? 'down' : ''}">${AX.diff > 0.5 ? '▲' : AX.diff < -0.5 ? '▼' : '•'} Metals today: ${esc(AX.call)}</b><small>ASX materials ${AX.diff > 0 ? '+' : ''}${fmt(AX.diff, 2)}% vs ASX 200 at ${esc(AX.ist)} IST</small></div>`
@@ -6286,8 +6297,8 @@ async function alertsCard(box, mk) {
     ${basketLines(BK, mk)}
     ${(() => { const fw = fundWLines(state.fund, mk), fa = fundAthLines(state.fund, mk);
       return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets, mk)}
-    ${(() => { const x = athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
-      return `<div class="al-sub">All-time highs · closed last month above the ATH, now above that month's high</div>${x || '<div class="al-r muted"><span>None this month yet.</span></div>'}`; })()}
+    ${(() => { const x = idxAthLines(IM, state.assets, mk) + athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
+      return `<div class="al-sub">All-time highs · indices, stocks, ETFs &amp; funds, commodities · closed last month above the ATH, now above that month's high</div>${x || '<div class="al-r muted"><span>None this month yet.</span></div>'}`; })()}
     ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
       ${L ? lightHTML(L, mk) : ''}
@@ -6302,6 +6313,7 @@ async function alertsCard(box, mk) {
   box.querySelectorAll('[data-asv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const k = b.dataset.asv; const tv = tvIdx(k); window.open(tv ? 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tv) + '&interval=D' : 'https://finance.yahoo.com/quote/' + encodeURIComponent(k), '_blank', 'noopener'); }));
   box.querySelectorAll('[data-tv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(b.dataset.tv, mk)) + '&interval=D', '_blank', 'noopener'); }));
   box.querySelectorAll('[data-ath]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ symbol: b.dataset.ath, kind: 'ATH' }, mk); }));
+  box.querySelectorAll('[data-tvx]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(b.dataset.tvx) + '&interval=1M', '_blank', 'noopener'); }));
   box.querySelectorAll('[data-fd]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const r = ((state.fund && state.fund.rows) || []).find((x) => x.key === b.dataset.fd); if (r) fundSelect(r); }));
 }
 /* 20 Nov 2026: tap an index line in the alert card -> daily candles, 9 EMA, the W's falling trendline and the two lows / break */
