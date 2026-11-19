@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-19 19:54 UTC",
+"generated": "2026-11-19 20:09 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-19",
@@ -710,7 +710,7 @@
 "group_rank": 9,
 "rank": 6,
 "risk_pct": 6.7,
-"r3m": null
+"r3m": 13.4
 },
 {
 "id": "RET-ROLEXRINGS-2026-11-18",
