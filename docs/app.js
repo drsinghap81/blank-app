@@ -6161,7 +6161,10 @@ async function wChart(sl, mk) {
   else if (c.tl) { const t0 = c.t[0], [a, b] = c.tl; const d0 = new Date(a[0]), d1 = new Date(b[0]), dt = new Date(t0); const v0 = a[1] + (b[1] - a[1]) * ((dt - d0) / (d1 - d0));
     const l = ch.addLineSeries({ color: '#3b82f6', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }); l.setData([{ time: t0, value: v0 }, { time: b[0], value: b[1] }]); }
   s.setMarkers((c.marks || []).filter(([t]) => t >= c.t[0]).sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([t, txt]) => ({ time: t, position: txt === 'break' || txt === 'middle peak' ? 'aboveBar' : 'belowBar', color: txt === 'break' ? C.rise : '#3b82f6', shape: txt === 'break' ? 'arrowUp' : txt === 'middle peak' ? 'arrowDown' : 'circle', text: txt })));
-  ch.timeScale().fitContent();
+  /* zoom to the W: from a little before the trendline's start (or the last 70 sessions, whichever is longer) to today */
+  const n = c.t.length; const hiAt = c.tl ? c.t.indexOf(c.tl[0][0]) : -1;
+  const from = Math.max(0, Math.min(n - 70, (hiAt >= 0 ? hiAt : n - 70) - 8));
+  ch.timeScale().setVisibleLogicalRange({ from, to: n + 3 });
 }
 /* 19 Nov 2026 (Amritpal, Bank Nifty chart): index early alert = W bottom + falling trendline break. Info only - entries stay on
    9/21 + the light. Tested on 23 NSE indices 2015-26 (tools/research/index_w_bottom.py): the break came before the 9/21 cross 71% of
