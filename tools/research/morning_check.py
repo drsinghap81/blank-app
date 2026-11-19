@@ -99,8 +99,8 @@ def main():
     ind = base.map(sec["symbols"]); d["sector_ix"] = ind.map(lambda i: INDUSTRY_INDEX.get(i) if isinstance(i, str) else None)
     th = sec.get("themes", {})
     H = pd.read_csv("data/scan/sector_hist.csv.gz"); H["Date"] = pd.to_datetime(H.Date)
-    P = H.pivot_table(index="Date", columns="INDEX", values="CLOSE").sort_index(); U = P.pct_change() > 0
-    U = U.where(P.pct_change().notna())                      # NaN where the index had no change that day
+    P = H.pivot_table(index="Date", columns="INDEX", values="CLOSE").sort_index(); R = P.pct_change()
+    U = (R > 0).astype(float).where(R.notna())               # 1 up / 0 down / NaN no data
     def up(ixname, dates):
         if ixname not in U:
             return pd.Series(np.nan, index=dates.index)
@@ -121,7 +121,9 @@ def main():
         L = [U.at[dt, t] for t in th.get(s, []) if t in U.columns and dt in U.index and pd.notna(U.at[dt, t])]
         tu.append(np.nan if not L else bool(all(L)))
     d["thm_up"] = tu
-    ok = lambda c: d[c].isna() | (d[c] == True)                # noqa: E712,E731  missing data = no veto
+    for c in ("mkt_up", "sec_up", "ind_up", "thm_up"):
+        d[c] = pd.to_numeric(d[c].astype(float), errors="coerce")
+    ok = lambda c: d[c].isna() | (d[c] == 1)                   # noqa: E731  missing data = no veto
     d["g_mkt"] = ok("mkt_up")
     d["g_ms"] = ok("mkt_up") & ok("sec_up")
     d["g_all"] = ok("mkt_up") & ok("sec_up") & ok("ind_up") & ok("thm_up")
