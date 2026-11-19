@@ -6120,6 +6120,20 @@ function commodityLines(A, mk = 'NSE') {
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${up.map((r) => `<a href="#" class="al-s" data-asv="${esc(r.key)}">${nm(r)}</a>`).join(', ')}</span></div>` : ''}
     ${ath.length ? `<div class="al-r"><b>ATH closes →</b>${ath.slice(0, 8).join('')}</div>` : ''}`;
 }
+/* 20 Nov 2026 (Amritpal: "match ETFs with Trading 212 symbols - I can't find Global X FANG"): Trading 212 lists US and European
+   (LSE/Xetra) instruments, not ASX ones. US ETFs: same ticker (Trading 212 AU account); LSE ETFs: same ticker (UK ISA);
+   ASX ETFs: the US-listed equivalent where there is a close one, else "not on Trading 212". Availability is not checked live. */
+const ASX_T212 = { FANG: 'FNGS', NDQ: 'QQQ', HNDQ: 'QQQ', IVV: 'IVV', VTS: 'VTI', VEU: 'VEU', CETF: 'MCHI', RBTZ: 'BOTZ', SEMI: 'SOXX', HACK: 'HACK',
+  GOLD: 'GLD', QAU: 'GLD', OOO: 'USO', IOO: 'IOO', VGS: 'VEA', VGAD: 'VEA', IEM: 'EEM', VGE: 'VWO', ASIA: 'AAXJ', IXJ: 'IXJ', TECH: 'IXN', ETHI: 'ESGV',
+  MNRS: 'GDX', ACDC: 'LIT', ERTH: 'ICLN', DRUG: 'IXJ', FUEL: 'IXC', BNKS: 'IXG', ROBO: 'ROBO', CRYP: 'BITQ', IJH: 'IJH', IJR: 'IJR', QUAL: 'QUAL', MOAT: 'MOAT' };
+function t212(r, mk) {
+  if (r.kind === 'fund') return '';
+  const sym = String(r.symbol || r.key).replace(/^[A-Z]{2}:/, '').replace(/\.(L|DE|AS|PA|MI)$/, '');
+  if (mk === 'US') return ` <small class="al-where">T212: ${esc(sym)}</small>`;
+  if (mk === 'UK') return ` <small class="al-where">T212 ISA: ${esc(sym)}</small>`;
+  if (mk === 'ASX') { const u = ASX_T212[sym]; return ` <small class="al-where">${u ? `not on T212 · US twin ${esc(u)}` : 'not on T212 (ASX only)'}</small>`; }
+  return '';
+}
 /* 20 Nov 2026 (Amritpal: "add ETFs and funds to W as well"): latest W per ETF / mutual fund (funds.json row.w, daily closes / NAVs,
    same rule as the indices; not separately tested on funds). Breaks of the last 5 sessions first, then W's forming nearest their line. */
 function fundWLines(F, mk) {
@@ -6133,8 +6147,8 @@ function fundWLines(F, mk) {
   const L = [...br.slice(0, 4), ...fm.slice(0, Math.max(0, 6 - Math.min(4, br.length)))];
   const more = br.length + fm.length - L.length;
   return `<div class="al-sub">Funds &amp; ETFs · W + trendline</div>${L.map((r) => `<div class="al-r al-tap"${r.w.chart ? ` data-fwch="${esc(r.w.chart)}"` : ''}>${r.w.status === 'broken'
-    ? `<b class="up">▲ ${esc(nm(r))}</b> <span>W + trendline broke ${esc(r.w.broke_on)}</span><small>${r.w.since >= 0 ? '+' : ''}${fmt(r.w.since, 1)}% since · chart ›</small>`
-    : `<span>${esc(nm(r))}: ${r.w.stage === '2nd low now' ? '2nd low forming now' : 'W formed'} · breaks above ${fmt(r.w.line_now, 2, MKT[mk].loc)} (${fmt(r.w.dist_pct, 1)}% away)</span><small>chart ›</small>`}</div>`).join('')}${more > 0 ? `<div class="al-r muted"><small>+${more} more W's in funds &amp; ETFs</small></div>` : ''}`;
+    ? `<b class="up">▲ ${esc(nm(r))}</b>${t212(r, mk)} <span>W + trendline broke ${esc(r.w.broke_on)}</span><small>${r.w.since >= 0 ? '+' : ''}${fmt(r.w.since, 1)}% since · chart ›</small>`
+    : `<span>${esc(nm(r))}${t212(r, mk)}: ${r.w.stage === '2nd low now' ? '2nd low forming now' : 'W formed'} · breaks above ${fmt(r.w.line_now, 2, MKT[mk].loc)} (${fmt(r.w.dist_pct, 1)}% away)</span><small>chart ›</small>`}</div>`).join('')}${more > 0 ? `<div class="al-r muted"><small>+${more} more W's in funds &amp; ETFs</small></div>` : ''}`;
 }
 /* 20 Nov 2026 (Amritpal: "include funds and ETFs in the categorisation on the card"): the same month / week / day all-time-high
    closes for this market's ETFs and mutual funds (funds.json), crossed (✓) or within 2% of that candle's high. Tap = fund panel. */
@@ -6146,7 +6160,7 @@ function fundAthLines(F, mk) {
     const x = R.filter((r) => r[k] && r[k][hk] && r.close).map((r) => ({ r, h: r[k][hk], c: r.close }));
     const yes = x.filter((z) => z.c > z.h).sort((a, b) => b.c / b.h - a.c / a.h), near = x.filter((z) => z.c <= z.h && z.h / z.c - 1 <= 0.02);
     if (!yes.length && !near.length) return '';
-    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((z) => `<a href="#" class="al-t ok" data-fd="${esc(z.r.key)}">✓ ${esc(nm(z.r))} +${fmt((z.c / z.h - 1) * 100, 1)}%</a>`).join('')}${near.slice(0, 4).map((z) => `<a href="#" class="al-t" data-fd="${esc(z.r.key)}">${esc(nm(z.r))} near · needs ${fmt(z.h, 2, MKT[mk].loc)}</a>`).join('')}${yes.length + near.length > 10 ? `<small>+${yes.length + near.length - 10} more</small>` : ''}</div>`; };
+    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((z) => `<a href="#" class="al-t ok" data-fd="${esc(z.r.key)}">✓ ${esc(nm(z.r))} +${fmt((z.c / z.h - 1) * 100, 1)}%${t212(z.r, mk)}</a>`).join('')}${near.slice(0, 4).map((z) => `<a href="#" class="al-t" data-fd="${esc(z.r.key)}">${esc(nm(z.r))} near · needs ${fmt(z.h, 2, MKT[mk].loc)}${t212(z.r, mk)}</a>`).join('')}${yes.length + near.length > 10 ? `<small>+${yes.length + near.length - 10} more</small>` : ''}</div>`; };
   const out = one('Funds &amp; ETFs · month close →', 'mclose', 'high_m') + one('Funds &amp; ETFs · week close →', 'wclose', 'high_p') + one('Funds &amp; ETFs · day close →', 'dclose', 'high_p');
   return out;
 }
