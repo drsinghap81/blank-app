@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-18 18:20 UTC",
+"generated": "2026-11-19 07:55 UTC",
 "market": "ASX",
 "watch_only": true,
 "asof": "2026-11-18",
@@ -153,10 +153,10 @@
 "stock_rs": null,
 "aligned": false,
 "td_score": null,
-"group": "Capital Goods",
-"lane": "mid",
-"group_pulse": 14.3,
-"group_rank": 11,
+"group": null,
+"lane": null,
+"group_pulse": null,
+"group_rank": null,
 "rank": 1,
 "risk_pct": 9.9,
 "r3m": null
