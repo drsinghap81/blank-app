@@ -1,0 +1,364 @@
+{
+ "method": "FII index-futures positioning as a market filter (19 Nov 2026, Amritpal: \"Yes\" to testing it next to the traffic light).\n\nData: NSE participant-wise open interest, published every evening (archives.nseindia.com/content/nsccl/fao_participant_oi_DDMMYYYY.csv).\nFII long% = FII index-futures long / (long + short) contracts. Known after the close, so it can gate the NEXT morning's buys.\nTests:\n  1. Nifty's next 5 / 20 sessions by FII long% bucket and by its 5-day change (rising / falling)\n  2. live 9/21 engine (buy next open, 5-day-low stop, Supertrend exit, 1% risk) with no new buys when:\n     FII long% < 25 / < 30 / in its bottom fifth of the past year / falling by >= 5 points over 5 days,\n     each alone and together with the RED traffic light (the light is already live)\nOutput: data/research/gurjar_fii_oi.json",
+ "days": 2675,
+ "first": "2016-01-04",
+ "latest": {
+  "2026-11-04": {
+   "fii_long": 13.6,
+   "client_long": 76.6
+  },
+  "2026-11-05": {
+   "fii_long": 21.5,
+   "client_long": 69.4
+  },
+  "2026-11-06": {
+   "fii_long": 24.6,
+   "client_long": 65.1
+  },
+  "2026-11-09": {
+   "fii_long": 26.8,
+   "client_long": 64.2
+  },
+  "2026-11-11": {
+   "fii_long": 31.0,
+   "client_long": 62.1
+  },
+  "2026-11-12": {
+   "fii_long": 37.0,
+   "client_long": 60.1
+  },
+  "2026-11-13": {
+   "fii_long": 34.6,
+   "client_long": 61.0
+  },
+  "2026-11-16": {
+   "fii_long": 34.1,
+   "client_long": 60.3
+  },
+  "2026-11-17": {
+   "fii_long": 33.4,
+   "client_long": 59.6
+  },
+  "2026-11-18": {
+   "fii_long": 32.5,
+   "client_long": 60.5
+  }
+ },
+ "long_pct_quantiles": {
+  "0.1": 14.1,
+  "0.25": 28.9,
+  "0.5": 49.8,
+  "0.75": 63.2,
+  "0.9": 73.5
+ },
+ "nifty_forward": {
+  "< 20": {
+   "days": 468,
+   "next5": 0.05,
+   "next20": 0.29,
+   "up20": 57
+  },
+  "20-30": {
+   "days": 222,
+   "next5": 0.09,
+   "next20": 0.17,
+   "up20": 55
+  },
+  "30-45": {
+   "days": 420,
+   "next5": 0.29,
+   "next20": 1.21,
+   "up20": 64
+  },
+  "45-60": {
+   "days": 772,
+   "next5": 0.37,
+   "next20": 1.31,
+   "up20": 65
+  },
+  ">= 60": {
+   "days": 793,
+   "next5": 0.27,
+   "next20": 1.2,
+   "up20": 66
+  },
+  "bottom fifth of past year": {
+   "days": 740,
+   "next5": 0.15,
+   "next20": 0.6,
+   "up20": 63
+  },
+  "fell >= 5 pts in 5 days": {
+   "days": 673,
+   "next5": 0.3,
+   "next20": 1.07,
+   "up20": 62
+  },
+  "rose >= 5 pts in 5 days": {
+   "days": 640,
+   "next5": 0.36,
+   "next20": 1.2,
+   "up20": 64
+  },
+  "all days": {
+   "days": 2675,
+   "next5": 0.25,
+   "next20": 0.99,
+   "up20": 63
+  }
+ },
+ "gate_days_pct": {
+  "no filter": 0.0,
+  "RED light (live)": 14.8,
+  "FII long < 25%": 23.1,
+  "RED light + FII long < 25%": 29.8,
+  "FII long < 30%": 27.0,
+  "RED light + FII long < 30%": 33.0,
+  "FII long in bottom fifth of past year": 28.7,
+  "RED light + FII long in bottom fifth of past year": 36.6,
+  "FII long fell >= 5 pts in 5 days": 25.1,
+  "RED light + FII long fell >= 5 pts in 5 days": 35.8
+ },
+ "portfolio": {
+  "10 positions, 3-month strength | no filter": {
+   "cagr": 26.9,
+   "maxdd": -25.7,
+   "cagr_22_26": 17.2,
+   "dd_22_26": -20.0,
+   "trades": 559,
+   "days_blocked": 0.0
+  },
+  "10 positions, 3-month strength | RED light (live)": {
+   "cagr": 29.3,
+   "maxdd": -22.5,
+   "cagr_22_26": 26.8,
+   "dd_22_26": -22.5,
+   "trades": 494,
+   "days_blocked": 14.8
+  },
+  "10 positions, 3-month strength | FII long < 25%": {
+   "cagr": 23.4,
+   "maxdd": -24.5,
+   "cagr_22_26": 9.8,
+   "dd_22_26": -22.3,
+   "trades": 466,
+   "days_blocked": 23.1
+  },
+  "10 positions, 3-month strength | RED light + FII long < 25%": {
+   "cagr": 20.1,
+   "maxdd": -23.0,
+   "cagr_22_26": 8.9,
+   "dd_22_26": -23.0,
+   "trades": 446,
+   "days_blocked": 29.8
+  },
+  "10 positions, 3-month strength | FII long < 30%": {
+   "cagr": 19.9,
+   "maxdd": -27.3,
+   "cagr_22_26": 6.8,
+   "dd_22_26": -27.3,
+   "trades": 445,
+   "days_blocked": 27.0
+  },
+  "10 positions, 3-month strength | RED light + FII long < 30%": {
+   "cagr": 18.8,
+   "maxdd": -27.3,
+   "cagr_22_26": 6.7,
+   "dd_22_26": -27.3,
+   "trades": 422,
+   "days_blocked": 33.0
+  },
+  "10 positions, 3-month strength | FII long in bottom fifth of past year": {
+   "cagr": 18.4,
+   "maxdd": -28.9,
+   "cagr_22_26": 11.2,
+   "dd_22_26": -23.1,
+   "trades": 501,
+   "days_blocked": 28.7
+  },
+  "10 positions, 3-month strength | RED light + FII long in bottom fifth of past year": {
+   "cagr": 17.8,
+   "maxdd": -28.8,
+   "cagr_22_26": 14.5,
+   "dd_22_26": -24.3,
+   "trades": 471,
+   "days_blocked": 36.6
+  },
+  "10 positions, 3-month strength | FII long fell >= 5 pts in 5 days": {
+   "cagr": 21.1,
+   "maxdd": -32.6,
+   "cagr_22_26": 14.0,
+   "dd_22_26": -26.5,
+   "trades": 561,
+   "days_blocked": 25.1
+  },
+  "10 positions, 3-month strength | RED light + FII long fell >= 5 pts in 5 days": {
+   "cagr": 21.2,
+   "maxdd": -25.2,
+   "cagr_22_26": 18.8,
+   "dd_22_26": -20.3,
+   "trades": 508,
+   "days_blocked": 35.8
+  },
+  "5 positions, 3-month strength | no filter": {
+   "cagr": 21.9,
+   "maxdd": -21.8,
+   "cagr_22_26": 12.6,
+   "dd_22_26": -17.8,
+   "trades": 280,
+   "days_blocked": 0.0
+  },
+  "5 positions, 3-month strength | RED light (live)": {
+   "cagr": 18.7,
+   "maxdd": -19.4,
+   "cagr_22_26": 18.4,
+   "dd_22_26": -19.4,
+   "trades": 252,
+   "days_blocked": 14.8
+  },
+  "5 positions, 3-month strength | FII long < 25%": {
+   "cagr": 20.5,
+   "maxdd": -19.7,
+   "cagr_22_26": 8.7,
+   "dd_22_26": -15.3,
+   "trades": 230,
+   "days_blocked": 23.1
+  },
+  "5 positions, 3-month strength | RED light + FII long < 25%": {
+   "cagr": 14.0,
+   "maxdd": -14.8,
+   "cagr_22_26": 8.6,
+   "dd_22_26": -14.8,
+   "trades": 219,
+   "days_blocked": 29.8
+  },
+  "5 positions, 3-month strength | FII long < 30%": {
+   "cagr": 22.4,
+   "maxdd": -26.7,
+   "cagr_22_26": 12.2,
+   "dd_22_26": -26.7,
+   "trades": 223,
+   "days_blocked": 27.0
+  },
+  "5 positions, 3-month strength | RED light + FII long < 30%": {
+   "cagr": 15.1,
+   "maxdd": -27.7,
+   "cagr_22_26": 12.3,
+   "dd_22_26": -27.7,
+   "trades": 219,
+   "days_blocked": 33.0
+  },
+  "5 positions, 3-month strength | FII long in bottom fifth of past year": {
+   "cagr": 17.7,
+   "maxdd": -19.5,
+   "cagr_22_26": 12.5,
+   "dd_22_26": -19.5,
+   "trades": 254,
+   "days_blocked": 28.7
+  },
+  "5 positions, 3-month strength | RED light + FII long in bottom fifth of past year": {
+   "cagr": 13.0,
+   "maxdd": -19.8,
+   "cagr_22_26": 11.9,
+   "dd_22_26": -19.8,
+   "trades": 236,
+   "days_blocked": 36.6
+  },
+  "5 positions, 3-month strength | FII long fell >= 5 pts in 5 days": {
+   "cagr": 21.5,
+   "maxdd": -26.4,
+   "cagr_22_26": 14.6,
+   "dd_22_26": -16.9,
+   "trades": 271,
+   "days_blocked": 25.1
+  },
+  "5 positions, 3-month strength | RED light + FII long fell >= 5 pts in 5 days": {
+   "cagr": 15.4,
+   "maxdd": -24.3,
+   "cagr_22_26": 16.4,
+   "dd_22_26": -22.0,
+   "trades": 264,
+   "days_blocked": 35.8
+  },
+  "10 positions, random | no filter": {
+   "cagr": 23.6,
+   "maxdd": -31.4,
+   "cagr_22_26": 18.0,
+   "dd_22_26": -20.7,
+   "trades": 566,
+   "days_blocked": 0.0
+  },
+  "10 positions, random | RED light (live)": {
+   "cagr": 22.9,
+   "maxdd": -22.8,
+   "cagr_22_26": 23.9,
+   "dd_22_26": -22.8,
+   "trades": 522,
+   "days_blocked": 14.8
+  },
+  "10 positions, random | FII long < 25%": {
+   "cagr": 20.2,
+   "maxdd": -26.4,
+   "cagr_22_26": 10.3,
+   "dd_22_26": -17.2,
+   "trades": 463,
+   "days_blocked": 23.1
+  },
+  "10 positions, random | RED light + FII long < 25%": {
+   "cagr": 15.1,
+   "maxdd": -21.8,
+   "cagr_22_26": 9.5,
+   "dd_22_26": -21.6,
+   "trades": 453,
+   "days_blocked": 29.8
+  },
+  "10 positions, random | FII long < 30%": {
+   "cagr": 15.9,
+   "maxdd": -26.2,
+   "cagr_22_26": 7.5,
+   "dd_22_26": -23.2,
+   "trades": 462,
+   "days_blocked": 27.0
+  },
+  "10 positions, random | RED light + FII long < 30%": {
+   "cagr": 12.6,
+   "maxdd": -22.9,
+   "cagr_22_26": 5.6,
+   "dd_22_26": -22.9,
+   "trades": 435,
+   "days_blocked": 33.0
+  },
+  "10 positions, random | FII long in bottom fifth of past year": {
+   "cagr": 22.0,
+   "maxdd": -24.3,
+   "cagr_22_26": 19.7,
+   "dd_22_26": -16.7,
+   "trades": 483,
+   "days_blocked": 28.7
+  },
+  "10 positions, random | RED light + FII long in bottom fifth of past year": {
+   "cagr": 13.0,
+   "maxdd": -25.0,
+   "cagr_22_26": 11.9,
+   "dd_22_26": -23.5,
+   "trades": 487,
+   "days_blocked": 36.6
+  },
+  "10 positions, random | FII long fell >= 5 pts in 5 days": {
+   "cagr": 20.8,
+   "maxdd": -28.7,
+   "cagr_22_26": 15.2,
+   "dd_22_26": -27.6,
+   "trades": 565,
+   "days_blocked": 25.1
+  },
+  "10 positions, random | RED light + FII long fell >= 5 pts in 5 days": {
+   "cagr": 20.2,
+   "maxdd": -22.0,
+   "cagr_22_26": 18.1,
+   "dd_22_26": -16.2,
+   "trades": 516,
+   "days_blocked": 35.8
+  }
+ }
+}
