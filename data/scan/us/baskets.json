@@ -1,0 +1,27 @@
+{
+ "generated": "2026-11-19T22:15+00:00",
+ "rows": [
+  {
+   "slug": "fang10",
+   "name": "FANG+ pie (10 stocks, equal weight)",
+   "members": [
+    "AAPL",
+    "MSFT",
+    "AMZN",
+    "GOOGL",
+    "META",
+    "NVDA",
+    "AVGO",
+    "NFLX",
+    "PLTR",
+    "MU"
+   ],
+   "close": 136.27,
+   "day": -2.52,
+   "m1": -13.1,
+   "w": null,
+   "lift": null,
+   "asof": "2026-11-19"
+  }
+ ]
+}
