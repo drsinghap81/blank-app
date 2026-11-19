@@ -1674,8 +1674,11 @@ function lists() {
       .sort((a, b) => (b.status.startsWith('EXIT') ? 1 : 0) - (a.status.startsWith('EXIT') ? 1 : 0) || (b.gain_pct ?? -99) - (a.gain_pct ?? -99)),
     trend: rows.filter((r) => r.list === 'trend'),
     watch: rows.filter((r) => r.list === 'watch'),
+    base: d.bases || [],
   };
 }
+/* 19 Nov 2026: tight base (<= 12% for 10 sessions, back at the 20 SMA, volume drying up) -> breakout on >= 1.5x volume. Watch-only. */
+const tbMap = () => Object.fromEntries(((state.data[state.mkt] || {}).bases || []).map((b) => [b.symbol, b]));
 
 function filtered() {
   let L = lists()[state.tab];
@@ -1700,7 +1703,8 @@ function renderTrends() {
   const warn = { UK: '<b>Watch only.</b> UK (FTSE 350) is not backtested yet: use the list for ideas only. Prices are in pence (GBX).', US: '<b>Watch only.</b> Tested 2017–2026 on US stocks this system made about 4% a year against 15% for the S&P 500, and no liquidity or price filter fixed it. Use the US list for ideas, not as a trading system.',
     ASX: '<b>Watch only.</b> Tested 2017–2026 on Australian stocks this system lost about 1% a year against 4.5% for the ASX 200, and no liquidity or price filter fixed it. Use the list for ideas, not as a trading system.' }[state.mkt];
   const track = 'Tracked signals are not your trades: each signal is followed as if bought at the next open, until its stop or a red Supertrend. Use it to see whether a signal you missed is still running.';
-  note.innerHTML = warn ? warn : (state.tab === 'open' ? track : '');
+  const baseNote = '<b>Watch-only: use it to time a buy.</b> A tight base is 10 sessions within 12% high to low, back at the 20 SMA, on below-average volume. The breakout is a close above the base high on at least 1.5× normal volume; the tested way is to buy at the next open, stop at the 5-day low, and exit when Supertrend turns red. On its own it made about 16% a year, against about 27% for 9/21, so it is best for timing 9/21 buys.';
+  note.innerHTML = warn ? warn : (state.tab === 'open' ? track : state.tab === 'base' ? baseNote : '');
   note.className = warn ? 'note warn' : 'note';
   note.hidden = !note.innerHTML;
   document.querySelectorAll('.tabs button').forEach((b) => {
@@ -1728,14 +1732,21 @@ function rowHTML(r, i) {
   let chips = r.size ? `<span class="chip">${esc(r.size)}</span>` : '';
   let right = '';
   const setup = r.setup ? `<span class="chip">${r.setup.startsWith('EMA') ? '9/21 cross' : 'Base breakout'}</span>` : '';
-  if (t === 'new') {
+  const tbx = (t === 'new' || t === 'open') && state.mkt === 'NSE' ? tbMap()[r.symbol] : null;
+  const tbChip = tbx ? `<span class="chip open">${tbx.status === 'base forming' ? 'Tight base' : 'Base breakout'}</span>` : '';
+  if (t === 'base') {
+    const e9 = ((state.data[state.mkt] || {}).early || []).find((e) => e.symbol === r.symbol && (e.status === 'open' || e.status.startsWith('NEW')));
+    const bo = r.status.startsWith('BREAKOUT'), fm = r.status === 'base forming';
+    chips = `<span class="chip ${bo ? 'new' : fm ? '' : 'open'}">${bo ? 'Broke out today' : fm ? `Buy above ${fmt(r.trigger)}` : esc(r.status.replace('broke out', 'Broke out'))}</span>${r.tight8 ? '<span class="chip open">≤ 8%</span>' : ''}${e9 ? '<span class="chip new">9/21 ' + (e9.status === 'open' ? 'in trade' : 'buy') + '</span>' : ''}${chips}`;
+    right = fm ? `<b>${fmt(r.trigger)}</b><span class="muted">${fmt(r.dist_pct, 1)}% away</span>` : `<b>${fmt(r.close)}</b><span class="muted">vol ${fmt(r.breakout_vol, 1)}×</span>`;
+  } else if (t === 'new') {
     const buy = r.status.startsWith('NEW - buy');
     const z = buy ? size921(r, state.mkt) : null;
-    chips = `<span class="chip ${buy ? 'new' : ''}">${buy ? 'Buy next open' : 'Stop too far, skip'}</span>${z && z.sh ? `<span class="chip">${z.sh.toLocaleString(loc())} sh</span>` : ''}${setup}${chips}`;
+    chips = `<span class="chip ${buy ? 'new' : ''}">${buy ? 'Buy next open' : 'Stop too far, skip'}</span>${z && z.sh ? `<span class="chip">${z.sh.toLocaleString(loc())} sh</span>` : ''}${setup}${tbChip}${chips}`;
     right = `<b>${fmt(r.signal_close)}</b><span class="muted">risk ${fmt(r.risk_pct, 1)}%</span>`;
   } else if (t === 'open') {
     const ex = r.status.startsWith('EXIT');
-    chips = `<span class="chip ${ex ? 'exit' : 'open'}">${ex ? 'Sell next open' : `Day ${r.days}`}</span>${setup}${chips}`;
+    chips = `<span class="chip ${ex ? 'exit' : 'open'}">${ex ? 'Sell next open' : `Day ${r.days}`}</span>${setup}${tbChip}${chips}`;
     right = `<b>${fmt(r.close)}</b><span class="${r.gain_pct >= 0 ? 'up' : 'down'}">${pct(r.gain_pct)}</span>`;
   } else {
     if (r.tag === 'extended') chips = '<span class="chip ext">Extended</span>' + chips;
@@ -1751,7 +1762,7 @@ function rowHTML(r, i) {
 function renderList() {
   const L = filtered();
   const empty = { new: 'No new entry signals at the last close. New ones appear after the next evening scan.',
-    open: 'No tracked signals match these filters.', trend: 'No clear trends match these filters.', watch: 'Nothing on the watchlist matches these filters.' }[state.tab];
+    open: 'No tracked signals match these filters.', base: 'No tight bases or base breakouts at the last close.', trend: 'No clear trends match these filters.', watch: 'Nothing on the watchlist matches these filters.' }[state.tab];
   $('#list').innerHTML = L.length ? L.map(rowHTML).join('') : `<li class="empty">${empty}</li>`;
   $('#list').querySelectorAll('.row').forEach((el) => {
     const open = () => select(L[+el.dataset.i]);
@@ -1781,6 +1792,10 @@ document.addEventListener('keydown', (e) => {
 
 function statusBlock(r) {
   const t = state.tab;
+  if (t === 'base') {
+    if (r.status === 'base forming') return `<div class="status info">Tight base: ${day(r.base_from)} to ${day(r.base_to)}, ${fmt(r.range_pct, 1)}% high to low, volume at ${fmt(r.vol_dry * 100, 0)}% of normal. Breakout = a close above <b>${fmt(r.trigger)}</b> on at least ${Number(r.vol_needed).toLocaleString(loc())} shares (1.5× normal), then buy at the next open. Stop at the 5-day low, now ${fmt(r.stop)}.</div>`;
+    return `<div class="status ${r.status.startsWith('BREAKOUT') ? 'new' : 'open'}">Closed above the ${fmt(r.range_pct, 1)}% base high of ${fmt(r.base_hi)} on ${fmt(r.breakout_vol, 1)}× normal volume (${day(r.breakout_date)}). ${r.status.startsWith('BREAKOUT') ? 'Buy at the next open.' : `Now ${fmt(r.close)}, ${pct((r.close / r.base_hi - 1) * 100)} above the base high.`} Stop at the 5-day low ${fmt(r.stop)} (${fmt(r.risk_pct, 1)}%); exit when Supertrend turns red.</div>`;
+  }
   if (t === 'new') {
     return r.status.startsWith('NEW - buy')
       ? `<div class="status new">Buy at the next open. Initial stop ${fmt(r.stop)} (${fmt(r.risk_pct, 1)}% below the signal close). Hold until Supertrend turns red.</div>`
@@ -1796,7 +1811,10 @@ function statusBlock(r) {
 
 function facts(r) {
   const t = state.tab; const f = []; const unit = state.data[state.mkt].value_label || MKT[state.mkt].unit;
-  if (t === 'new' || t === 'open') {
+  if (t === 'base') {
+    f.push(['Base', `${day(r.base_from)} – ${day(r.base_to)}`], ['Base high / low', `${fmt(r.base_hi)} / ${fmt(r.base_lo)}`], ['Range', `${fmt(r.range_pct, 1)}%`],
+      ['Volume in base', `${fmt(r.vol_dry * 100, 0)}% of normal`], ['Stop (5-day low)', fmt(r.stop)]);
+  } else if (t === 'new' || t === 'open') {
     f.push(['Signal', `${day(r.signal_date)} at ${fmt(r.signal_close)}`]);
     if (r.entry != null) f.push(['Entry', fmt(r.entry)]);
     f.push(['Initial stop', fmt(r.stop)], ['Supertrend trail', fmt(r.supertrend)]);
@@ -1927,7 +1945,7 @@ function select(r) {
     <div class="chart" id="cv"></div><div class="rsi" id="rv"></div>
     <div class="legend"><span><i style="background:${C.e9}"></i>9 EMA</span><span><i style="background:${C.e21}"></i>21 EMA</span>
       <span><i style="background:${C.e50}"></i>50 EMA</span><span><i style="background:${C.rise}"></i>Supertrend</span>
-      ${trade ? `<span><i style="background:${C.fall}"></i>Initial stop</span>` : ''}<span><i style="background:${C.rsi}"></i>RSI with 55 line</span></div>
+      ${trade || state.tab === 'base' ? `<span><i style="background:${C.fall}"></i>Initial stop</span>` : ''}<span><i style="background:${C.saffron}"></i>Tight base</span><span><i style="background:${C.rsi}"></i>RSI with 55 line</span></div>
     ${(state.tab === 'new' || state.tab === 'open') ? plan921(r) : ''}${facts(r)}${links(r.symbol)}`);
   wireStyle('trst', 'trend', () => drawStock(r));
   wirePlan921(r);
@@ -1982,10 +2000,22 @@ async function drawStock(r) {
     const s = ch.addLineSeries({ color: col, lineWidth: 2, lineStyle: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
     s.setData(T.map((t, i) => (c.sd[i] === dir ? { time: t, value: c.st[i] } : { time: t })));
   }
+  const mk = [];
   if ((state.tab === 'new' || state.tab === 'open') && r.signal_date) {
     candles.createPriceLine({ price: r.stop, color: C.fall, lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'stop' });
-    if (T.includes(r.signal_date)) candles.setMarkers([{ time: r.signal_date, position: 'belowBar', color: C.saffron, shape: 'arrowUp', text: 'signal' }]);
+    if (T.includes(r.signal_date)) mk.push({ time: r.signal_date, position: 'belowBar', color: C.saffron, shape: 'arrowUp', text: 'signal' });
   }
+  if (c.tb && T.includes(c.tb.f)) {      /* tight base: a box over the base sessions, the breakout level carried to today */
+    const i0 = T.indexOf(c.tb.f), i1 = T.indexOf(c.tb.to);
+    const edge = (v, from, to, style) => { const s = ch.addLineSeries({ color: C.saffron, lineWidth: 2, lineStyle: style, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+      s.setData(T.map((t, i) => (i >= from && i <= to ? { time: t, value: v } : { time: t }))); };
+    edge(c.tb.hi, i0, i1, 0); edge(c.tb.lo, i0, i1, 0);
+    edge(c.tb.hi, i1, T.length - 1, 2);
+    candles.createPriceLine({ price: c.tb.hi, color: C.saffron, lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: c.tb.bo ? 'base high' : 'buy above' });
+    if (state.tab === 'base') candles.createPriceLine({ price: c.tb.stop, color: C.fall, lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'stop' });
+    if (c.tb.bo && T.includes(c.tb.bo)) mk.push({ time: c.tb.bo, position: 'belowBar', color: C.saffron, shape: 'arrowUp', text: 'breakout' });
+  }
+  if (mk.length) candles.setMarkers(mk.sort((a, b) => (a.time < b.time ? -1 : 1)));
   const rc = LW.createChart(rbox, { ...chartBase(), height: rbox.clientHeight, width: rbox.clientWidth, timeScale: { visible: false } });
   const rs = rc.addLineSeries({ color: C.rsi, lineWidth: 2, priceLineVisible: false });
   rs.setData(T.map((t, i) => (c.rsi[i] == null ? { time: t } : { time: t, value: c.rsi[i] })));

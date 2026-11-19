@@ -257,7 +257,56 @@ def base_breakout(o, h, l, c, v):
     sig = ((h > pmax) & (c > c.shift(1)) & (c > MIN_PRICE) & (val >= 2) & (age >= 126) & (sd == 1))
     return follow(o, h, l, c, sig, sd, line, r, val, cap_stop=True)
 
-def export_charts(frames, syms):
+
+def tight_base(o, h, l, c, v, lookback=5):
+    """TIGHT BASE BREAKOUT (Amritpal, 19 Nov 2026; WATCH-ONLY - research tools/research/gurjar_momentum.py: as a system ~16-19%/yr,
+    worst fall about -30%, below 9/21; the <= 8% version held up best in 2022-26):
+      trend : close > SMA50, SMA20 > SMA50, RSI(14) > 50, 20-day average volume > 500,000 shares
+      base  : the last 10 sessions within 12% high-to-low, the base came back to within 2% of the 20 SMA, and its average volume is
+              below the 50-day average (volume drying up)
+      break : a close above the base high on >= 1.5x the 20-day average volume (tested: buy next open, stop = 5-day low,
+              exit when Supertrend turns red)
+    Returns the latest breakout of the last `lookback` sessions, else a base still forming today (buy-stop level = base high)."""
+    if len(c) < 70:
+        return None
+    s20, s50 = c.rolling(20).mean(), c.rolling(50).mean()
+    vs20, vs50 = v.rolling(20).mean(), v.rolling(50).mean()
+    r = rsi(c); n = len(c)
+
+    def trend(i):
+        return bool(c.iloc[i] > s50.iloc[i] and s20.iloc[i] > s50.iloc[i] and r.iloc[i] > 50 and vs20.iloc[i] > 500000)
+
+    def base(i):
+        hi, lo = float(h.iloc[i - 9:i + 1].max()), float(l.iloc[i - 9:i + 1].min())
+        ok = (hi / lo - 1 <= 0.12 and lo <= s20.iloc[i] * 1.02 and v.iloc[i - 9:i + 1].mean() < vs50.iloc[i])
+        return ok, hi, lo
+
+    def rec(i, hi, lo, status, j=None):
+        stop = float(l.iloc[(j if j is not None else n - 1) - 4:(j if j is not None else n - 1) + 1].min())
+        last = float(c.iloc[-1])
+        return dict(status=status, base_from=str(c.index[i - 9].date()), base_to=str(c.index[i].date()), base_hi=round(hi, 2),
+                    base_lo=round(lo, 2), range_pct=round((hi / lo - 1) * 100, 1), tight8=bool(hi / lo - 1 <= 0.08),
+                    vol_dry=round(float(v.iloc[i - 9:i + 1].mean() / vs50.iloc[i]), 2),
+                    breakout_date=str(c.index[j].date()) if j is not None else None,
+                    breakout_vol=round(float(v.iloc[j] / vs20.iloc[j]), 1) if j is not None else None,
+                    vol_needed=round(float(1.5 * vs20.iloc[-1])), trigger=round(hi, 2), stop=round(stop, 2),
+                    risk_pct=round((max(last, hi) / stop - 1) * 100, 1), dist_pct=round((hi / last - 1) * 100, 1),
+                    close=round(last, 2), days_ago=(n - 1 - j) if j is not None else None)
+
+    for k in range(lookback):
+        j = n - 1 - k
+        if j < 60:
+            break
+        ok, hi, lo = base(j - 1)
+        if ok and trend(j) and c.iloc[j] > hi and v.iloc[j] >= 1.5 * vs20.iloc[j]:
+            st = "BREAKOUT today - buy next open" if k == 0 else f"broke out {k} session{'s' if k > 1 else ''} ago"
+            return rec(j - 1, hi, lo, st, j)
+    ok, hi, lo = base(n - 1)
+    if ok and trend(n - 1) and c.iloc[-1] <= hi:
+        return rec(n - 1, hi, lo, "base forming")
+    return None
+
+def export_charts(frames, syms, tbs=None):
     """Compact daily chart files for the phone app: data/scan/charts/<SYM>.json (last ~160 sessions with
     EMA 9/21/50, Supertrend(10,3) line/direction and RSI(14))."""
     import shutil
@@ -273,8 +322,10 @@ def export_charts(frames, syms):
         r = rsi(c)
         n = min(160, len(c))
         rd = lambda a: [None if not np.isfinite(x) else round(float(x), 2) for x in np.asarray(a)[-n:]]  # noqa: E731
+        b = (tbs or {}).get(sym)
+        tb = dict(f=b["base_from"], to=b["base_to"], hi=b["base_hi"], lo=b["base_lo"], bo=b["breakout_date"], stop=b["stop"]) if b else None
         json.dump(dict(t=[str(x.date()) for x in c.index[-n:]], o=rd(o), h=rd(h), l=rd(l), c=rd(c), e9=rd(e9),
-                       e21=rd(e21), e50=rd(e50), st=rd(line), sd=[int(x) for x in sd[-n:]], rsi=rd(r)),
+                       e21=rd(e21), e50=rd(e50), st=rd(line), sd=[int(x) for x in sd[-n:]], rsi=rd(r), tb=tb),
                   open(f"{cdir}/{sym}.json", "w"), separators=(",", ":"))
 
 
@@ -308,7 +359,7 @@ def main():
     print(MARKET, "symbols", len(u), u.board.value_counts().to_dict(), flush=True)
     tick = list(u.ticker)
     tmap = dict(zip(u.ticker, u.symbol))
-    out, trigs, earl, frames, closes, close_day = [], [], [], {}, {}, ""
+    out, trigs, earl, frames, closes, close_day, bases = [], [], [], {}, {}, "", []
     for i in range(0, len(tick), 150):
         chunk = tick[i:i + 150]
         try:
@@ -345,6 +396,13 @@ def main():
                 bo = None
             if bo:
                 earl.append(dict(symbol=tmap[t], setup="52w-high base breakout", **bo))
+            if MARKET == "NSE":
+                try:
+                    tbx = tight_base(o, h, l, c, v)
+                except Exception:  # noqa: BLE001
+                    tbx = None
+                if tbx:
+                    bases.append(dict(symbol=tmap[t], **tbx))
             if m:
                 out.append(dict(symbol=tmap[t], **m))
                 trigs += [dict(symbol=tmap[t], **x) for x in tg]
@@ -398,11 +456,22 @@ def main():
         tr["size"] = tr.symbol.map(size)
     chart_syms = set(p.symbol) | (set(tr.symbol) if len(tr) else set()) | \
         (set(E[E.status.str.startswith(("NEW", "open", "EXIT"))].symbol) if len(E) else set())
-    export_charts(frames, chart_syms)
+    B = pd.DataFrame(bases)
+    if len(B):
+        B = B.merge(u[["symbol", "name", "board"]], on="symbol", how="left")
+        B["size"] = B.symbol.map(size)
+        B["value_cr"] = B.symbol.map(df.set_index("symbol").value_cr * DISP_MULT).round(2)
+        B["order"] = np.where(B.status.str.startswith("BREAKOUT"), 0, np.where(B.status == "base forming", 1, 2))
+        B = B.sort_values(["order", "dist_pct", "days_ago"]).drop(columns="order")
+        chart_syms = chart_syms | set(B.symbol)
+    tbs = {r["symbol"]: r for r in B.to_dict("records")} if len(B) else {}
+    export_charts(frames, chart_syms, tbs)
     spark = {k: [round(float(x), 2) for x in frames[k][3].iloc[-60:].values] for k in chart_syms if k in frames}
     p["spark"] = p.symbol.map(spark)
     if len(E):
         E["spark"] = E.symbol.map(spark)
+    if len(B):
+        B["spark"] = B.symbol.map(spark)
     cols = ["symbol", "name", "board", "size", "list", "tag", "score", "close", "ema9", "ema21", "dist21", "rsi", "r1m",
             "r3m", "r6m", "r2", "above21_60d", "off_high", "value_cr", "last_date", "spark"]
     def clean(o):   # strict JSON for the phone app: NaN/inf -> null
@@ -421,8 +490,10 @@ def main():
                          asof=asof, generated=datetime.now(timezone.utc).isoformat(timespec="minutes"),
                          scanned=len(df), rows=p[cols].to_dict("records"),
                          triggers=tr.to_dict("records") if len(tr) else [],
-                         early=E.to_dict("records") if len(E) else [])),
+                         early=E.to_dict("records") if len(E) else [],
+                         bases=B.to_dict("records") if len(B) else [])),
               open(f"{OUT}/trend_scan.json", "w"), indent=1, default=str, allow_nan=False)
+    print("tight bases", len(B), (B.status.value_counts().to_dict() if len(B) else {}))
     print("trend", int(strict.sum()), "watch", int((loose & ~strict).sum()), "triggers", len(tr))
     print(p.head(40).to_string(index=False))
     if len(tr):
