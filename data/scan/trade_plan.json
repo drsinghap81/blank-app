@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-19 00:56 UTC",
+"generated": "2026-11-19 01:01 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-18",
@@ -283,7 +283,7 @@
 "group_rank": 1,
 "rank": 5,
 "risk_pct": 41.2,
-"r3m": null
+"r3m": 28.0
 },
 {
 "id": "STOP-HONASA-537.9",
