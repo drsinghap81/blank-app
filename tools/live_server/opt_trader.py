@@ -75,6 +75,7 @@ class OptTrader:
         self.st = self._load()
         self.uni = None; self.uni_day = None; self.pcr = {}
         self.lock = threading.Lock(); self.thread = None; self.last_cycle = None; self.last_error = None
+        self.stage = "waiting for 09:25"; self.stage_at = None; self.fast = None
 
     # ------------------------------------------------------------------ state
     def _load(self):
@@ -107,6 +108,7 @@ class OptTrader:
         d = str(now_ist().date())
         if self.uni is not None and self.uni_day == d:
             return self.uni
+        self._stage("building today's contract list")
         rows = self.rows_fn() or []
         idx = [r for r in rows if r.get("kind") == "index"]
         stk = sorted([r for r in rows if r.get("kind") != "index"], key=lambda r: -(r.get("atm_vol5") or 0))[:CFG["top"]]
@@ -125,6 +127,7 @@ class OptTrader:
         except Exception:  # noqa: BLE001
             self.pcr = {}
         self.uni, self.uni_day = uni, d
+        self.note(f"contract list ready: {len(uni)} underlyings ({len(idx)} indices + {len(stk)} stocks), PCR for {len(self.pcr)}")
         return uni
 
     # ------------------------------------------------------------------ loop
@@ -132,7 +135,10 @@ class OptTrader:
         if self.thread and self.thread.is_alive():
             return
         self.thread = threading.Thread(target=self._loop, daemon=True); self.thread.start()
-        threading.Thread(target=self._fast_loop, daemon=True).start()
+        self.fast = threading.Thread(target=self._fast_loop, daemon=True); self.fast.start()
+
+    def _stage(self, txt):
+        self.stage = txt; self.stage_at = now_ist().strftime("%H:%M:%S")
 
     def _fast_loop(self):
         """19 Nov 2026 (Amritpal: a 5-minute delay before the stop is a risk): while a live buy is waiting on Angel, look at the order
@@ -208,18 +214,20 @@ class OptTrader:
 
     def cycle(self):
         # 19 Nov 2026: candles are fetched OUTSIDE the lock (it takes tens of seconds) so the 10-second fill watcher can place stops meanwhile
-        uni = self.universe(); day = str(now_ist().date())
         BUSY.set()
         try:
-            bars = {}
+            uni = self.universe(); day = str(now_ist().date())
+            bars = {}; N = 2 * len(uni); k = 0
             for u in uni:
                 for side in ("ce", "pe"):
+                    k += 1; self._stage(f"fetching 5-minute candles {k}/{N}")
                     try:
                         bars[(u["symbol"], side)] = self._bars(u[side]["token"])
                     except Exception as ex:  # noqa: BLE001
                         self.log("opt_trader_fetch", symbol=u["symbol"], error=str(ex)[:120])
         finally:
             BUSY.clear()
+        self._stage("checking signals")
         with self.lock:
             if self.st.get("day") != str(now_ist().date()):
                 for t in self.st.get("trades", []):
@@ -250,7 +258,10 @@ class OptTrader:
             for t in self.st["trades"]:
                 if t["state"] == "closed" and t.get("live_entry") is not None and t.get("live_exit") is None:
                     self._live_exit(t, om)
-            self.last_cycle = now_ist().strftime("%H:%M:%S")
+            first = self.last_cycle is None
+            self.last_cycle = now_ist().strftime("%H:%M:%S"); self._stage(f"check done at {self.last_cycle}, next in 5 minutes")
+            if first:
+                self.note(f"first check done: {sum(1 for v in bars.values() if v)} of {2 * len(uni)} contracts had candles")
             self._save()
 
     # ------------------------------------------------------------------ one contract
@@ -480,6 +491,8 @@ class OptTrader:
         return dict(live=self.live(), day=self.st.get("day"), stopped=self.st.get("stopped"), trades=self.st.get("trades", []),
                     notes=self.st.get("notes", [])[-12:], day_pnl=self.day_pnl(), open=self._open_count(), cfg=CFG,
                     universe=len(self.uni or []), last_cycle=self.last_cycle, last_error=self.last_error,
+                    stage=self.stage, stage_at=self.stage_at, running=bool(self.thread and self.thread.is_alive()),
+                    watcher=bool(self.fast and self.fast.is_alive()),
                     history=dict(days=len(D), trades=sum(d["n"] for d in D), pnl=sum(d["pnl"] for d in D),
                                  wins=sum(d["wins"] for d in D), up_days=sum(d["pnl"] > 0 for d in D), live_pnl=sum(d["live_pnl"] for d in D),
                                  by_day=D[-15:], compare=cmp))

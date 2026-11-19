@@ -7,6 +7,7 @@ MockBroker   : for tests / running without keys.
 Secrets come from the server's environment (.env on the server), never from the app or the repo."""
 from __future__ import annotations
 
+import glob
 import json
 import os
 import time
@@ -351,11 +352,43 @@ class AngelEquity:
                             itype=p.get("instrumenttype"), product=p.get("producttype")))
         return out
 
+    _mst_lock = __import__("threading").Lock()
+
     def _master(self):
-        if getattr(self, "_mst", None) is None:
-            self._session()
-            path = os.path.join(self.cache_dir, f"scrip_master_{date.today()}.json")
-            self._mst = json.load(open(path)) if os.path.exists(path) else requests.get(MASTER_URL, timeout=120).json()
+        """Angel's futures & options contracts, once per day per process. 19 Nov 2026: one load at a time (two threads used to
+        load the whole ~40 MB master together on a 400 MB server) and only F&O rows / the fields we use are kept in memory."""
+        if getattr(self, "_mst", None) is not None and getattr(self, "_mst_day", None) == date.today():
+            return self._mst
+        with self._mst_lock:
+            if getattr(self, "_mst", None) is None or getattr(self, "_mst_day", None) != date.today():
+                self._session()                                # writes today's master to the cache (_load_tokens)
+                path = os.path.join(self.cache_dir, f"scrip_master_{date.today()}.json")
+                raw = json.load(open(path)) if os.path.exists(path) else requests.get(MASTER_URL, timeout=120).json()
+                keep = ("token", "symbol", "name", "expiry", "strike", "lotsize", "instrumenttype", "exch_seg", "tick_size")
+                M = [{k: x.get(k) for k in keep} for x in raw if x.get("exch_seg") in ("NFO", "BFO", "MCX")
+                     and str(x.get("instrumenttype", ""))[:3] in ("OPT", "FUT")]
+                del raw
+                import gc
+                gc.collect()
+                self._mst, self._mst_day = M, date.today()
+        return self._mst
+        with self._mst_lock:
+            if getattr(self, "_mst", None) is None or getattr(self, "_mst_day", None) != date.today():
+                path = os.path.join(self.cache_dir, f"scrip_master_{date.today()}.json")
+                keep = ("token", "symbol", "name", "expiry", "strike", "lotsize", "instrumenttype", "exch_seg", "tick_size")
+                if os.path.exists(path):
+                    M = json.load(open(path))
+                else:
+                    self._session()
+                    M = [{k: x.get(k) for k in keep} for x in requests.get(MASTER_URL, timeout=120).json()
+                         if x.get("exch_seg") in ("NSE", "NFO", "BSE", "BFO", "MCX")]
+                    try:
+                        for old in glob.glob(os.path.join(self.cache_dir, "scrip_master_*.json")):
+                            os.remove(old)
+                        json.dump(M, open(path + ".tmp", "w"), separators=(",", ":")); os.replace(path + ".tmp", path)
+                    except Exception:  # noqa: BLE001
+                        pass
+                self._mst, self._mst_day = M, date.today()
         return self._mst
 
     def fut_for(self, exchange, name, min_expiry):
