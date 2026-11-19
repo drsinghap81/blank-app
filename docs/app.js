@@ -6136,6 +6136,12 @@ const COMM_WHERE = {
   UK: { 'GC=F': 'LSE SGLN', 'SI=F': 'LSE PHAG', 'PL=F': 'LSE PHPT', 'PA=F': 'LSE PHPD', 'HG=F': 'LSE COPA', 'ALI=F': 'LSE ALUM', 'CL=F': 'LSE CRUD', 'BZ=F': 'LSE BRNT', 'NG=F': 'LSE NGAS',
     'HO=F': 'LSE HEAT', 'RB=F': 'LSE UGAS', 'ZC=F': 'LSE CORN', 'ZW=F': 'LSE WEAT', 'ZS=F': 'LSE SOYB', 'ZL=F': 'LSE SOYO', 'KC=F': 'LSE COFF', 'CC=F': 'LSE COCO', 'SB=F': 'LSE SUGA', 'CT=F': 'LSE COTN' },
 };
+function commAthLines(A, mk) {
+  const WH = COMM_WHERE[mk] || {};
+  const L = ((A && A.rows) || []).filter((r) => WH[r.key] && r.mclose && r.mclose.high_m && r.close > r.mclose.high_m && r.mclose.month === athLastMonth(r.asof));
+  if (!L.length) return '';
+  return `<div class="al-r"><b>Commodities</b>${L.map((r) => `<a href="#" class="al-t ok" data-asv="${esc(r.key)}">✓ ${esc(String(r.name).replace(' in rupees', ''))} <small class="al-where">${esc(WH[r.key])}</small> +${fmt((r.close / r.mclose.high_m - 1) * 100, 1)}%</a>`).join('')}</div>`;
+}
 function commodityLines(A, mk = 'NSE') {
   const WH = COMM_WHERE[mk] || {};
   const R = ((A && A.rows) || []).filter((r) => WH[r.key]);
@@ -6148,13 +6154,13 @@ function commodityLines(A, mk = 'NSE') {
     R.filter((r) => r[k] && r[k][hk] && r.close).forEach((r) => { const h = r[k][hk];
       if (r.close > h) ath.push(`<a href="#" class="al-t ok" data-asv="${esc(r.key)}">✓ ${nm(r)} (${lab}) +${fmt((r.close / h - 1) * 100, 1)}%</a>`);
       else if (h / r.close - 1 <= 0.02) ath.push(`<a href="#" class="al-t" data-asv="${esc(r.key)}">${nm(r)} (${lab}) near · needs ${fmt(h, 2)}</a>`); }); }
-  if (!w.length && !up.length && !ath.length) return `<div class="al-sub">Commodities · ${{ NSE: 'MCX', US: 'US futures / ETFs', ASX: 'ASX ETFs', UK: 'LSE ETCs' }[mk]}</div><div class="al-r muted"><span>No W, 9 EMA lift-off or ATH-candle cross in the ones you can trade here.</span></div>`;
+  if (!w.length && !up.length) return `<div class="al-sub">Commodities · ${{ NSE: 'MCX', US: 'US futures / ETFs', ASX: 'ASX ETFs', UK: 'LSE ETCs' }[mk]}</div><div class="al-r muted"><span>No W, 9 EMA lift-off or ATH-candle cross in the ones you can trade here.</span></div>`;
 
   return `<div class="al-sub">Commodities · ${{ NSE: 'MCX', US: 'US futures / ETFs', ASX: 'ASX ETFs', UK: 'LSE ETCs' }[mk]}</div>${w.slice(0, 5).map((r) => `<div class="al-r al-tap"${r.w.chart ? ` data-awch="${esc(r.w.chart)}" data-tvs="${esc(tvIdx(r.key))}"` : ''}>${r.w.status === 'broken'
     ? `<b class="up">▲ ${nm(r)}</b> <span>W + trendline broke ${esc(r.w.broke_on)}</span><small>${r.w.since >= 0 ? '+' : ''}${fmt(r.w.since, 1)}% since · chart ›</small>`
     : `<span>${nm(r)}: ${r.w.stage === '2nd low now' ? 'W · 2nd low forming now' : 'W formed'} · breaks above ${fmt(r.w.line_now, 2)} (${fmt(r.w.dist_pct, 1)}% away)</span><small>chart ›</small>`}</div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${up.map((r) => `<a href="#" class="al-s" data-asv="${esc(r.key)}">${nm(r)}</a>`).join(', ')}</span></div>` : ''}
-    ${ath.length ? `<div class="al-r"><b>ATH closes →</b>${ath.slice(0, 8).join('')}</div>` : ''}`;
+`;
 }
 /* 20 Nov 2026: your Trading 212 pies rebuilt as equal-weight baskets (tools/world_alerts.py BASKETS) - always shown, tap for the chart */
 function basketLines(B, mk) {
@@ -6219,35 +6225,26 @@ function fundWLines(F, mk) {
    closes for this market's ETFs and mutual funds (funds.json), crossed (✓) or within 2% of that candle's high. Tap = fund panel. */
 function fundAthLines(F, mk) {
   const R = ((F && F.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[mk]) && r.kind !== 'debt');
-  if (!R.length) return '';
   const nm = (r) => (r.kind === 'fund' ? String(r.name || r.key).replace(/ (Fund|Scheme).*$/i, '').replace(/ - (Direct|Regular).*$/i, '').slice(0, 28) : String(r.symbol || r.key).replace(/^[A-Z]{2}:/, ''));
-  const one = (lab, k, hk) => {
-    const x = R.filter((r) => r[k] && r[k][hk] && r.close).map((r) => ({ r, h: r[k][hk], c: r.close }));
-    const yes = x.filter((z) => z.c > z.h).sort((a, b) => b.c / b.h - a.c / a.h), near = x.filter((z) => z.c <= z.h && z.h / z.c - 1 <= 0.02);
-    if (!yes.length && !near.length) return '';
-    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((z) => `<a href="#" class="al-t ok" data-fd="${esc(z.r.key)}">✓ ${esc(nm(z.r))} +${fmt((z.c / z.h - 1) * 100, 1)}%${t212(z.r, mk)}</a>`).join('')}${near.slice(0, 4).map((z) => `<a href="#" class="al-t" data-fd="${esc(z.r.key)}">${esc(nm(z.r))} near · needs ${fmt(z.h, 2, MKT[mk].loc)}${t212(z.r, mk)}</a>`).join('')}${yes.length + near.length > 10 ? `<small>+${yes.length + near.length - 10} more</small>` : ''}</div>`; };
-  const out = one('Funds &amp; ETFs · month close →', 'mclose', 'high_m') + one('Funds &amp; ETFs · week close →', 'wclose', 'high_p') + one('Funds &amp; ETFs · day close →', 'dclose', 'high_p');
-  return out;
+  const seen = new Set();
+  const L = R.filter((r) => r.mclose && r.mclose.high_m && r.close > r.mclose.high_m && r.mclose.month === athLastMonth(r.asof))
+    .filter((r) => { const k = nm(r); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => b.close / b.mclose.high_m - a.close / a.mclose.high_m);
+  if (!L.length) return '';
+  return `<div class="al-r"><b>Funds &amp; ETFs</b>${L.slice(0, 8).map((r) => `<a href="#" class="al-t ok" data-fd="${esc(r.key)}">✓ ${esc(nm(r))} +${fmt((r.close / r.mclose.high_m - 1) * 100, 1)}%${t212(r, mk)}</a>`).join('')}${L.length > 8 ? `<small>+${L.length - 8} more</small>` : ''}</div>`;
 }
 function athLines(A, mk) {
+  /* 20 Nov 2026 (Amritpal: "show only those stocks that closed LAST MONTH above the ATH and, as and when this month, cross the high
+     of that ATH breakout candle"). Month candles only; week / day closes and the system's intramonth entries are no longer listed. */
   if (!A) return '';
   const Mz = (v) => (mk === 'NSE' ? inr(v, 2) : `${MKT[mk].cur}${fmt(v, 2, MKT[mk].loc)}`);
-  const one = (lab, L, hk) => { if (!L || !L.length) return '';
-    const x = L.map((r) => ({ s: r.symbol, h: r[hk], c: r.close })).filter((r) => r.h && r.c);
-    /* 20 Nov 2026 (Amritpal): list only the ones that HAVE crossed the ATH candle's high, plus any within 2% of it (shown as "near") */
-    const yes = x.filter((r) => r.c > r.h).sort((a, b) => b.c / b.h - a.c / a.h), no = x.filter((r) => r.c <= r.h && r.h / r.c - 1 <= 0.02).sort((a, b) => a.h / a.c - b.h / b.c);
-    if (!yes.length && !no.length) return '';
-    const at = (sym) => (hk === 'high_m' ? `data-ath="${esc(sym)}"` : `data-tv="${esc(sym)}"`);
-    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((r) => `<a href="#" class="al-t ok" ${at(r.s)}>✓ ${esc(r.s)} +${fmt((r.c / r.h - 1) * 100, 1)}%</a>`).join('')}${no.slice(0, 4).map((r) => `<a href="#" class="al-t" ${at(r.s)}>${esc(r.s)} near · needs ${Mz(r.h)}</a>`).join('')}${yes.length + no.length > 10 ? `<small>+${yes.length + no.length - 10} more</small>` : ''}</div>`; };
-  const asof = A.asof ? new Date(A.asof + 'T00:00:00') : null;
-  const recent = (A.breakouts || []).filter((b) => asof && (asof - new Date(b.date + 'T00:00:00')) / 864e5 <= 7).sort((a, b) => (a.date < b.date ? 1 : -1));
-  const out = one('ATH month close →', A.month_close, 'high_m') + one('ATH week close →', A.week_close, 'high_p') + one('ATH day close →', A.day_close, 'high_p')
-    /* 20 Nov 2026 (Amritpal: ANGELONE "has not closed above its ATH but the card shows it"): these are the Momentum system's
-       intramonth entries - price went above the highest MONTHLY CLOSE (not the wick high); the month has not closed yet. Say so,
-       with the level, and whether it is still above it. */
-    + (recent.length ? `<div class="al-r"><b>Momentum (ATH) entries this week</b><small>price crossed the highest monthly close · month not closed yet</small></div>${recent.slice(0, 8).map((b) => { const ok = b.close >= b.trigger;
-      return `<a href="#" class="al-t ${ok ? 'ok' : ''}" data-ath="${esc(b.symbol)}">${ok ? '✓' : '✗'} ${esc(b.symbol)} crossed ${Mz(b.trigger)} on ${esc(String(b.date).slice(5))} · now ${b.close >= b.trigger ? '+' : ''}${fmt((b.close / b.trigger - 1) * 100, 1)}%${ok ? '' : ' (back below)'}</a>`; }).join('')}` : '');
-  return `<div class="al-sub">All-time highs · ✓ = crossed the high of the candle that closed above the ATH</div>${out || '<div class="al-r muted"><span>Stocks: none crossed or near today.</span></div>'}`;
+  const lm = athLastMonth(A.asof);
+  const L = (A.month_close || []).filter((r) => r.month === lm && r.high_m && r.close > r.high_m).sort((a, b) => b.close / b.high_m - a.close / a.high_m);
+  if (!L.length) return '';
+  return `<div class="al-r"><b>Stocks</b>${L.map((r) => `<a href="#" class="al-t ok" data-ath="${esc(r.symbol)}">✓ ${esc(r.symbol)} above ${Mz(r.high_m)} · +${fmt((r.close / r.high_m - 1) * 100, 1)}%</a>`).join('')}</div>`;
+}
+function athLastMonth(asof) {
+  const d = asof ? new Date(asof + 'T00:00:00') : new Date(); d.setDate(1); d.setMonth(d.getMonth() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 async function alertsCard(box, mk) {
   if (!box) return;
@@ -6289,13 +6286,14 @@ async function alertsCard(box, mk) {
     ${basketLines(BK, mk)}
     ${(() => { const fw = fundWLines(state.fund, mk), fa = fundAthLines(state.fund, mk);
       return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets, mk)}
-    ${athLines(AT, mk)}${fundAthLines(state.fund, mk)}
+    ${(() => { const x = athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
+      return `<div class="al-sub">All-time highs · closed last month above the ATH, now above that month's high</div>${x || '<div class="al-r muted"><span>None this month yet.</span></div>'}`; })()}
     ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
       ${L ? lightHTML(L, mk) : ''}
       <p class="muted td-rs"><b>W + trendline:</b> ${esc((W && W.test) || 'Tested on 23 NSE indices 2015–26: the break came before the 9/21 cross 71% of the time, about 1% lower; next 20 sessions median +1.6% (63% up) vs +1.2% on any day.')} ${mk === 'NSE' ? '<b>Full setup</b> = W broken and riding above a rising 9 EMA. Tested on 551 Indian index W breaks 2016–26: with a 9 EMA lift-off around the break, next 20 sessions median +1.5% (63% up); without one −0.6% (46% up). Break-day volume (shown) added nothing: +1.4% with high volume, +1.4% without. Since 2021 the edge is smaller.' : 'Volume and the 9 EMA tick are shown for context; the combination was tested on India only.'}</p>
       <p class="muted td-rs"><b>9 EMA:</b> ${esc((E && E.test) || 'Lift-off = first whole candle above a rising 9 EMA in 10 sessions; ride until a whole candle is below it. Tested 2007–26: Bank Nifty +1.95% a trade (42% won), Nifty +0.96%, F&O stocks +1.46%, against about +1% for holding any 16 days.')}</p>
-      <p class="muted td-rs"><b>All-time highs:</b> a month, week or day candle closed above the old all-time high; ✓ = the price is now above that candle's high, otherwise the level it needs. The monthly close + break of its high is the tested Momentum system (21.5%/yr India; ideas only elsewhere); week and day closes are watch lists.</p>
+      <p class="muted td-rs"><b>All-time highs:</b> only stocks, ETFs / funds and commodities whose LAST month closed above the old all-time high and whose price this month is above that breakout month's high. Monthly closes above the ATH are the base of the tested Momentum system (21.5%/yr India; ideas only elsewhere).</p>
       ${mk === 'NSE' ? '<p class="muted td-rs"><b>Metals today:</b> Australia trades before India opens. When ASX materials beat the ASX 200 by more than 0.5%, Indian metal stocks rose from open to close on 52% of days (+0.18%); when they lagged by more than 0.5%, only 38% (−0.49%), against 45% on all days (2016–26, 12 metal F&amp;O stocks). The 5-minute option trader skips metal CE on weak days and metal PE on strong days.</p>' : ''}
       <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
   box.querySelectorAll('[data-wch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.wch, mk, 'index_w_charts', b.dataset.tvs || '')));
