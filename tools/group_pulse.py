@@ -129,10 +129,10 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW):
                                       d1=round(float(C[x].iloc[-1] / C[x].iloc[-2] - 1) * 100, 2) if pd.notna(C[x].iloc[-2]) else None) for x in ss],
                                 key=lambda m: -(m["d1"] or -99)))
         try:
-            w = IW.latest(gi)
-            j = IW.chart_json(pd.DataFrame({"Open": gi, "High": gi, "Low": gi, "Close": gi}), w or {})
+            wl = IW.latest(gi)
+            j = IW.chart_json(pd.DataFrame({"Open": gi, "High": gi, "Low": gi, "Close": gi}), wl or {})
             json.dump(dict(name=bas, **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
-            r["w"] = {k: w.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if w and (w["status"] == "forming" or w.get("days_ago", 99) <= 5) else None
+            r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
             e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
         except Exception as e:  # noqa: BLE001
             print("nse w fail", bas, e); r["w"] = None
@@ -223,11 +223,11 @@ def main(mkt):
             m["d1"] = round(float(C[m["symbol"]].iloc[-1] / C[m["symbol"]].iloc[-2] - 1) * 100, 2) if pd.notna(C[m["symbol"]].iloc[-2]) else None
         sl = IW.slug(r["group"]); r["slug"] = sl
         try:
-            w = IW.latest(gi)
+            wl = IW.latest(gi)
             X = pd.DataFrame({"Open": gi, "High": gi, "Low": gi, "Close": gi})
-            j = IW.chart_json(X, w or {})
+            j = IW.chart_json(X, wl or {})
             json.dump(dict(name=r["group"], **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
-            r["w"] = {k: w.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if w and (w["status"] == "forming" or w.get("days_ago", 99) <= 5) else None
+            r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
             e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
         except Exception as e:  # noqa: BLE001
             print("group w fail", r["group"], e); r["w"] = None
