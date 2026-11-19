@@ -59,6 +59,12 @@ def latest(c):
             slope = (mid - hi) / (mid_i - hi_i)
             if slope < 0:
                 ln = hi + slope * (n - 1 - hi_i)
+                if v[-1] > ln:                       # already closed above the line: it broke today
+                    return dict(status="broken", stage="2nd low now", low1=str(dts[l1].date()), low1_close=round(float(v[l1]), 2),
+                                low2=str(dts[-1].date()), low2_close=round(float(v[-1]), 2), high=round(float(hi), 2), high_date=str(dts[hi_i].date()),
+                                mid=round(float(mid), 2), mid_date=str(dts[mid_i].date()), rsi_div=bool(rsi[-1] > rsi[l1]), close=round(float(v[-1]), 2),
+                                asof=str(dts[-1].date()), neckline=round(float(mid), 2), broke_on=str(dts[-1].date()), days_ago=0,
+                                broke_close=round(float(v[-1]), 2), line_then=round(float(ln), 2), from_low2=0.0, since=0.0, above_neck=bool(v[-1] > mid))
                 return dict(status="forming", stage="2nd low now", low1=str(dts[l1].date()), low1_close=round(float(v[l1]), 2),
                             low2=str(dts[-1].date()), low2_close=round(float(v[-1]), 2), high=round(float(hi), 2), high_date=str(dts[hi_i].date()),
                             mid=round(float(mid), 2), mid_date=str(dts[mid_i].date()), rsi_div=bool(rsi[-1] > rsi[l1]), close=round(float(v[-1]), 2),

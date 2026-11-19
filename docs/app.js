@@ -6110,7 +6110,8 @@ function commodityLines(A) {
    same rule as the indices; not separately tested on funds). Breaks of the last 5 sessions first, then W's forming nearest their line. */
 function fundWLines(F, mk) {
   const code = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[mk];
-  const R = ((F && F.rows) || []).filter((r) => (r.market || 'IN') === code && r.w);
+  const seen = new Set();   // the same fund in several plans (direct / regular, growth / IDCW): show it once
+  const R = ((F && F.rows) || []).filter((r) => (r.market || 'IN') === code && r.w).filter((r) => { const k = r.kind === 'fund' ? String(r.name).replace(/ - .*$/, '').trim() : r.key; if (seen.has(k)) return false; seen.add(k); return true; });
   if (!R.length) return '';
   const nm = (r) => (r.kind === 'fund' ? String(r.name || r.key).replace(/ (Fund|Scheme).*$/i, '').replace(/ - (Direct|Regular).*$/i, '').slice(0, 30) : String(r.symbol || r.key).replace(/^[A-Z]{2}:/, ''));
   const br = R.filter((r) => r.w.status === 'broken').sort((a, b) => a.w.days_ago - b.w.days_ago);
