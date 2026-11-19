@@ -6129,7 +6129,7 @@ async function alertsCard(box, mk) {
   box.innerHTML = `<section class="al-card ${lt ? lt[0] : ''}">
     ${lt ? `<div class="al-light"><i></i><b>${lt[1]}</b></div>` : ''}
     ${br.length ? br.slice(0, 4).map(wline).join('') : ''}
-    ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><span>${esc(nm(r.index))}: W forming · trendline ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% above)</span><small>chart ›</small></div>`).join('')}
+    ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
     ${athLines(AT, mk)}
@@ -6149,7 +6149,7 @@ async function wChart(sl, mk) {
   $('#sheet-body').innerHTML = '<p class="muted pad">Loading chart…</p>'; $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
   let c; try { const r = await fetch(MAIN + MKT[mk].path + 'index_w_charts/' + encodeURIComponent(sl) + '.json', { cache: 'no-cache' }); if (!r.ok) throw 0; c = await r.json(); }
   catch (e) { $('#sheet-body').innerHTML = '<p class="muted pad">The chart appears after tonight\'s scan.</p>'; return; }
-  $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">${esc(c.name)}</h2><p class="muted" style="margin:0 0 8px;font-size:.85em">Daily · 9 EMA (orange) · W trendline (blue) · ▲ the two lows and the break</p><div id="wchc" style="height:360px"></div>`;
+  $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">${esc(c.name)}</h2><p class="muted" style="margin:0 0 8px;font-size:.85em">Daily · 9 EMA (orange) · W trendline (blue): a close above it is the break</p><div id="wchc" style="height:360px"></div>`;
   const LW = window.LightweightCharts, box = $('#wchc');
   const ch = LW.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
   const s = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
@@ -6160,7 +6160,7 @@ async function wChart(sl, mk) {
     l.setData(c.tl.map(([t, v]) => ({ time: t, value: v }))); }
   else if (c.tl) { const t0 = c.t[0], [a, b] = c.tl; const d0 = new Date(a[0]), d1 = new Date(b[0]), dt = new Date(t0); const v0 = a[1] + (b[1] - a[1]) * ((dt - d0) / (d1 - d0));
     const l = ch.addLineSeries({ color: '#3b82f6', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }); l.setData([{ time: t0, value: v0 }, { time: b[0], value: b[1] }]); }
-  s.setMarkers((c.marks || []).filter(([t]) => t >= c.t[0]).map(([t, txt]) => ({ time: t, position: txt === 'break' ? 'aboveBar' : 'belowBar', color: txt === 'break' ? C.rise : '#3b82f6', shape: txt === 'break' ? 'arrowUp' : 'circle', text: txt })));
+  s.setMarkers((c.marks || []).filter(([t]) => t >= c.t[0]).sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([t, txt]) => ({ time: t, position: txt === 'break' || txt === 'middle peak' ? 'aboveBar' : 'belowBar', color: txt === 'break' ? C.rise : '#3b82f6', shape: txt === 'break' ? 'arrowUp' : txt === 'middle peak' ? 'arrowDown' : 'circle', text: txt })));
   ch.timeScale().fitContent();
 }
 /* 19 Nov 2026 (Amritpal, Bank Nifty chart): index early alert = W bottom + falling trendline break. Info only - entries stay on

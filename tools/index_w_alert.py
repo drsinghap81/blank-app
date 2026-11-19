@@ -45,7 +45,25 @@ def latest(c):
     d = c.diff(); up = d.clip(lower=0).ewm(alpha=1 / 14, adjust=False).mean(); dn = (-d.clip(upper=0)).ewm(alpha=1 / 14, adjust=False).mean()
     rsi = (100 - 100 / (1 + up / dn)).values
     lows = [(p[1], p[2]) for p in zigzag(v) if p[0] == "L"]
-    for a in range(len(lows) - 2, -1, -1):
+    if not lows:
+        return None
+    # 20 Nov 2026 (Amritpal: "show the latest W only"): 1) a NEW W whose 2nd low is being made right now (price back near the
+    # last confirmed low after a bounce), 2) otherwise only the LATEST pair of lows, never older ones; a W whose price has since
+    # closed 2% below both lows is dead.
+    l1 = lows[-1][0]
+    if l1 >= 120 and n - 1 - l1 >= 8:
+        hi = v[l1 - 120:l1 + 1].max(); hi_i = l1 - 120 + int(np.argmax(v[l1 - 120:l1 + 1]))
+        mid_i = l1 + int(np.argmax(v[l1:])); mid = v[mid_i]
+        if (v[l1] <= hi * 0.95 and mid >= v[l1] * 1.02 and mid_i < n - 1 and -0.02 <= v[-1] / v[l1] - 1 <= 0.04 and mid_i > hi_i
+                and v[l1:].min() >= v[l1] * 0.98):
+            slope = (mid - hi) / (mid_i - hi_i)
+            if slope < 0:
+                ln = hi + slope * (n - 1 - hi_i)
+                return dict(status="forming", stage="2nd low now", low1=str(dts[l1].date()), low1_close=round(float(v[l1]), 2),
+                            low2=str(dts[-1].date()), low2_close=round(float(v[-1]), 2), high=round(float(hi), 2), high_date=str(dts[hi_i].date()),
+                            mid=round(float(mid), 2), mid_date=str(dts[mid_i].date()), rsi_div=bool(rsi[-1] > rsi[l1]), close=round(float(v[-1]), 2),
+                            asof=str(dts[-1].date()), neckline=round(float(mid), 2), line_now=round(float(ln), 2), dist_pct=round(float(ln / v[-1] - 1) * 100, 1))
+    for a in range(len(lows) - 2, max(-1, len(lows) - 3), -1):        # the latest pair only
         (l1, _), (l2, conf2) = lows[a], lows[a + 1]
         if n - 1 - l2 > 70:
             return None                                   # nothing recent
@@ -73,9 +91,9 @@ def latest(c):
                        line_then=round(float(line(brk)), 2), from_low2=round(float(v[brk] / v[l2] - 1) * 100, 1),
                        since=round(float(v[-1] / v[brk] - 1) * 100, 1), above_neck=bool(v[-1] > mid))
         else:
-            if n - 1 >= l2 + 60:
+            if n - 1 >= l2 + 60 or v[l2:].min() < min(v[l1], v[l2]) * 0.98:      # too old, or broke down below both lows
                 return None
-            rec.update(status="forming", line_now=round(float(line(n)), 2), dist_pct=round(float(line(n) / v[-1] - 1) * 100, 1))
+            rec.update(status="forming", stage="2nd low done", line_now=round(float(line(n)), 2), dist_pct=round(float(line(n) / v[-1] - 1) * 100, 1))
         return rec
     return None
 
@@ -102,7 +120,8 @@ def chart_json(x, r, days=160):
         out["tl"] = [[str(idx[hi_i].date()), r["high"]], [str(idx[end_i].date()), round(r["high"] + slope * (end_i - hi_i), 2)]]
     except Exception:  # noqa: BLE001
         pass
-    out["marks"] = [m for m in ([r.get("low1"), "low 1"], [r.get("low2"), "low 2"], [r.get("broke_on"), "break"]) if m[0]]
+    out["marks"] = [m for m in ([r.get("low1"), "low 1"], [r.get("low2"), "low 2 now" if r.get("stage") == "2nd low now" else "low 2"],
+                                [r.get("mid_date"), "middle peak"], [r.get("broke_on"), "break"]) if m[0]]
     return out
 
 
