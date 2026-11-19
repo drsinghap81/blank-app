@@ -29,6 +29,25 @@ IDX = {
     "UK": {"^FTSE": "FTSE 100", "^FTMC": "FTSE 250", "^FTAS": "FTSE All-Share"},
 }
 PATH = {"US": "data/scan/us", "ASX": "data/scan/asx", "UK": "data/scan/uk"}
+# 20 Nov 2026 (Amritpal: "create this [FANG+ as a Trading 212 pie] in the app and show me the chart by adding all"): equal-weight
+# baskets built from their stocks, so a pie you hold on Trading 212 gets the same W / 9 EMA checks and a chart. Members of the NYSE
+# FANG+ index as held by FNGG on 20 Nov 2026 (check now and then: the index reconstitutes quarterly).
+BASKETS = {"US": {"fang10": ("FANG+ pie (10 stocks, equal weight)", ["AAPL", "MSFT", "AMZN", "GOOGL", "META", "NVDA", "AVGO", "NFLX", "PLTR", "MU"])}}
+
+
+def basket(frames):
+    """equal-weight, rebalanced daily: each day's open/high/low/close move vs the previous close, averaged across the stocks"""
+    C = pd.DataFrame({k: x.Close for k, x in frames.items()}).dropna()
+    pc = C.shift(1)
+    rel = {f: pd.DataFrame({k: frames[k][f].reindex(C.index) for k in frames}) / pc for f in ("Open", "High", "Low", "Close")}
+    idx = [100.0]; o = [np.nan]; h = [np.nan]; l = [np.nan]
+    for i in range(1, len(C)):
+        b = idx[-1]
+        o.append(b * rel["Open"].iloc[i].mean()); h.append(b * rel["High"].iloc[i].mean()); l.append(b * rel["Low"].iloc[i].mean())
+        idx.append(b * rel["Close"].iloc[i].mean())
+    X = pd.DataFrame({"Open": o, "High": h, "Low": l, "Close": idx}, index=C.index).iloc[1:]
+    X["High"] = X[["Open", "High", "Close"]].max(axis=1); X["Low"] = X[["Open", "Low", "Close"]].min(axis=1)
+    return X
 # backtest results per market (python tools/world_alerts.py <MK> test, 19 Nov 2026; indices from 2005, top-50 stocks from 2007)
 TEST = {
     "US": dict(w="Tested on 17 US indices/sector ETFs 2005–26 (695 W's): the break came before the 9/21 cross 67% of the time; next 20 sessions median +2.0% (65% up) vs +1.3% (62%) on any day. Useful, like India.",
@@ -168,6 +187,26 @@ def run(mk):
     except Exception:  # noqa: BLE001
         pw = set()
     IW.write_charts(wr, I, PATH[mk])
+    # 1b. baskets (Trading 212 pies)
+    bk = []
+    for slug_, (bname, members) in BASKETS.get(mk, {}).items():
+        try:
+            F = dl(members, (pd.Timestamp.today() - pd.Timedelta(days=500)).strftime("%Y-%m-%d"))
+            if len(F) < len(members) - 1:
+                print("basket short", slug_, len(F)); continue
+            X = basket(F)
+            r = IW.latest(X.Close) or {}
+            ls = EL.state(X) or {}
+            j = IW.chart_json(X, r) if r else IW.chart_json(X, {})
+            json.dump(dict(name=bname, **j), open(f"{PATH[mk]}/index_w_charts/{slug_}.json", "w"), separators=(",", ":"))
+            bk.append(dict(slug=slug_, name=bname, members=members, close=round(float(X.Close.iloc[-1]), 2), day=round(float(X.Close.iloc[-1] / X.Close.iloc[-2] - 1) * 100, 2),
+                           m1=round(float(X.Close.iloc[-1] / X.Close.iloc[-22] - 1) * 100, 1), w={k: r.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct", "mid")} if r else None,
+                           lift={k: ls.get(k) for k in ("status", "signal", "gain", "days", "ema")} if ls else None, asof=str(X.index[-1].date())))
+            print("B|", bname, bk[-1], flush=True)
+        except Exception as e:  # noqa: BLE001
+            print("basket fail", slug_, e)
+    if bk:
+        json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00"), rows=bk), open(f"{PATH[mk]}/baskets.json", "w"), indent=1)
     json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00"), asof=str(asof.date()), market=mk, rows=wr, test=TEST[mk]["w"],
                    rule=IW.__doc__.split("Output:")[0].strip()), open(f"{PATH[mk]}/index_w.json", "w"), indent=1)
     # 2. EMA 9 lift-off

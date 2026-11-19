@@ -6120,6 +6120,14 @@ function commodityLines(A, mk = 'NSE') {
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${up.map((r) => `<a href="#" class="al-s" data-asv="${esc(r.key)}">${nm(r)}</a>`).join(', ')}</span></div>` : ''}
     ${ath.length ? `<div class="al-r"><b>ATH closes →</b>${ath.slice(0, 8).join('')}</div>` : ''}`;
 }
+/* 20 Nov 2026: your Trading 212 pies rebuilt as equal-weight baskets (tools/world_alerts.py BASKETS) - always shown, tap for the chart */
+function basketLines(B, mk) {
+  const R = (B && B.rows) || []; if (!R.length) return '';
+  return `<div class="al-sub">Your pies (Trading 212)</div>${R.map((r) => { const w = r.w, l = r.lift;
+    const ws = !w ? 'no W' : w.status === 'broken' ? `<b class="up">W + trendline broke ${esc(w.broke_on)}</b>` : `${w.stage === '2nd low now' ? 'W · 2nd low forming now' : 'W formed'} · breaks above ${fmt(w.line_now, 2)} (${fmt(w.dist_pct, 1)}% away)`;
+    const ls = !l ? '' : l.status === 'lift-off today' ? ' · <b class="up">left the 9 EMA today</b>' : l.status === 'riding' ? ` · above the 9 EMA since ${esc(l.signal)}` : '';
+    return `<div class="al-r al-tap" data-wch="${esc(r.slug)}"><b>${esc(r.name)}</b><span>${r.day >= 0 ? '+' : ''}${fmt(r.day, 2)}% today · ${r.m1 >= 0 ? '+' : ''}${fmt(r.m1, 1)}% 1 m · ${ws}${ls}</span><small>${esc(r.members.join(' · '))} · chart ›</small></div>`; }).join('')}`;
+}
 /* 20 Nov 2026 (Amritpal: "match ETFs with Trading 212 symbols - I can't find Global X FANG"): Trading 212 lists US and European
    (LSE/Xetra) instruments, not ASX ones. US ETFs: same ticker (Trading 212 AU account); LSE ETFs: same ticker (UK ISA);
    ASX ETFs: the US-listed equivalent where there is a close one, else "not on Trading 212". Availability is not checked live. */
@@ -6187,6 +6195,7 @@ async function alertsCard(box, mk) {
     getJSON(P + 'ath.json', mk === 'NSE' ? 'ath' : 'ath_' + mk), mk === 'NSE' ? getJSON(MAIN + 'data/scan/asx_clue.json', 'asx_clue') : null]);
   if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds').catch(() => null);
   if (!state.assets) state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets').catch(() => null);
+  const BK = mk === 'US' ? await getJSON(P + 'baskets.json', 'baskets_' + mk).catch(() => null) : null;
   /* 20 Nov 2026: morning metals clue from Australia (ASX Materials vs ASX 200), shown on its own day only */
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
   const axl = AX && AX.date === today && AX.diff != null ? `<div class="al-r"><b class="${AX.diff > 0.5 ? 'up' : AX.diff < -0.5 ? 'down' : ''}">${AX.diff > 0.5 ? '▲' : AX.diff < -0.5 ? '▼' : '•'} Metals today: ${esc(AX.call)}</b><small>ASX materials ${AX.diff > 0 ? '+' : ''}${fmt(AX.diff, 2)}% vs ASX 200 at ${esc(AX.ist)} IST</small></div>`
@@ -6216,6 +6225,7 @@ async function alertsCard(box, mk) {
     ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
+    ${basketLines(BK, mk)}
     ${(() => { const fw = fundWLines(state.fund, mk), fa = fundAthLines(state.fund, mk);
       return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets, mk)}
     ${athLines(AT, mk)}${fundAthLines(state.fund, mk)}
