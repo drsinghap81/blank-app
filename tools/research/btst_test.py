@@ -41,6 +41,10 @@ def main():
     O, H, L, C, V = (pd.concat(P[k], axis=1) for k in ("Open", "High", "Low", "Close", "Volume"))
     nif = yf.download("^NSEI", start="2015-09-01", auto_adjust=True, progress=False)["Close"].squeeze().reindex(C.index).ffill()
     liq = ((C * V).rolling(20).mean().shift(1) >= 5e7) & (C >= 50)
+    # 19 Nov 2026: a close AT the day's high on a band-sized gain (~5/10/20%) is usually an upper circuit - can't be bought at 3:20
+    cg = C.pct_change() * 100
+    uc = (C >= H * 0.999) & (((cg >= 4.8) & (cg <= 5.2)) | ((cg >= 9.7) & (cg <= 10.2)) | ((cg >= 19.5) & (cg <= 20.2)))
+    liq = liq & ~uc
     chg = C.pct_change() * 100
     rng = (H - L).replace(0, np.nan); clv = (C - L) / rng
     nchg = nif.pct_change() * 100
@@ -61,10 +65,11 @@ def main():
     X = {"next open (BTST)": O.shift(-1) / C - 1, "next close": C.shift(-1) / C - 1, "3 days later close": C.shift(-3) / C - 1}
     up = nchg > 0
     res = dict(method=__doc__)
+    G["G5 G4 on a Nifty up day only"] = G["G4 gap up >= 1% held, close in top 25%"] & (nchg > 0).values[:, None]
     for gname, mask in G.items():
         m = mask & (C.index >= "2016-06-01")[:, None]
         for xname, R in X.items():
-            r = (R - COST).where(m).stack()
+            r = (R - COST).where(m).stack().dropna()
             if not len(r):
                 continue
             dts = r.index.get_level_values(0)
