@@ -5933,8 +5933,8 @@ function alsoIn(sym, skip) {
 function mxScore(S, sym) {
   const o = S.M[sym] || {}; const w = []; let p = 0; const add = (n, t) => { p += n; w.push([n, t]); };
   if (o.t921 && o.t921.lvl === 0) add(3, '9/21 buy'); else if (o.t921) add(1, '9/21 trend running');
-  if (o.ath && o.ath.lvl === 0) add(3, 'ATH breakout'); else if (o.ath && o.ath.lvl === 1) add(1, 'ATH trade running');
-  if (o.ipo && o.ipo.lvl === 0) add(2, 'IPO cup breakout');
+  if (o.ath && o.ath.lvl <= 1) add(2, 'Also an ATH breakout (momentum)');
+  if (o.ipo && o.ipo.lvl === 0) add(1, 'Also an IPO cup breakout');
   const tb = S.TB[sym];
   if (tb) { if (o.tb.lvl === 0) add(2, `Tight-base breakout, ${fmt(tb.breakout_vol, 1)}× volume`); else if (o.tb.lvl === 1) add(1, 'Broke out of a tight base'); else if (tb.dist_pct <= 2) add(1, `Tight base, ${fmt(tb.dist_pct, 1)}% to trigger`); }
   const rp = S.R3P(sym); if (rp != null) { if (rp >= 80) add(2, `3-month gain in the top ${100 - rp || 1}%`); else if (rp >= 60) add(1, '3-month gain above most'); }
@@ -5961,23 +5961,27 @@ const LIGHT_TEST = 'Red = both warnings (about 15% of days), amber = one. Tested
 async function tdTop5(box, mk) {
   if (!box) return; const S = await sysMap(mk); const L = await mxLight(mk, S);
   const H = mk === 'NSE' ? tdHeldSet() : new Set();
-  const act = (sym) => { const o = S.M[sym]; return ['t921', 'ath', 'ipo', 'tb'].some((k) => o[k] && o[k].lvl === 0) || (S.TB[sym] && S.TB[sym].status === 'base forming' && S.TB[sym].dist_pct <= 2); };
+  /* swing entries only (Amritpal wants 1-2 week style trades): a 9/21 buy, a tight-base breakout (today or the last few sessions),
+     or a tight base within 2% of its trigger. ATH / IPO buys hold for months, so they add points but do not qualify alone. */
+  const act = (sym) => { const o = S.M[sym], t = S.TB[sym]; return (o.t921 && o.t921.lvl === 0) || (t && (o.tb.lvl <= 1 || t.dist_pct <= 2)); };
   const C = Object.keys(S.M).filter((s) => act(s) && !H.has(s)).map((s) => ({ sym: s, ...mxScore(S, s) })).sort((a, b) => b.p - a.p || ((S.R3[b.sym] ?? -99) - (S.R3[a.sym] ?? -99)));
   const top = C.slice(0, 5); const Mz = (v) => (mk === 'NSE' ? inr(v, 2) : `${MKT[mk].cur}${fmt(v, 2, MKT[mk].loc)}`);
   const plan = (sym) => { const e = S.EA[sym], t = S.TB[sym], o = S.M[sym];
     if (e && (e.status || '').startsWith('NEW')) return `9/21: buy next open · stop ${Mz(e.stop)} (${fmt(e.risk_pct, 1)}%) · exit when Supertrend turns red`;
     if (t && o.tb.lvl === 0) return `Buy next open · stop ${Mz(t.stop)} (5-day low) · exit when Supertrend turns red`;
+    if (t && o.tb.lvl === 1) return `Broke out ${t.days_ago} sessions ago at ${Mz(t.base_hi)}, now ${Mz(t.close)} · buy only near the base high · stop ${Mz(t.stop)}`;
     if (t && t.status === 'base forming') return `Buy only on a close above ${Mz(t.trigger)} with ≥ ${Number(t.vol_needed).toLocaleString(MKT[mk].loc)} shares · stop ${Mz(t.stop)}`;
+    if (o.ath && o.ath.lvl === 0) { const m = S.meta[sym] || {}; if (m.trigger) return `ATH momentum: buy above ${Mz(m.trigger)} · exit on a weekly close below the 30-week average (${Mz(m.sma30)}) · holds months, not weeks`; }
     const m = S.meta[sym] || {}; return m.stop ? `Stop ${Mz(m.stop)}${m.trigger ? ` · trigger ${Mz(m.trigger)}` : ''}` : 'Open the chart for the plan'; };
   const red = L.lvl === 'red';
   box.innerHTML = `<section class="mx5 ${L.lvl}">${lightHTML(L, mk)}
-    <div class="mx5h"><b>Top 5 swing trades today</b><small>${C.length} stocks with a buy signal now · ranked by score · tap for the chart</small></div>
+    <div class="mx5h"><b>Top 5 swing trades today</b><small>${C.length} swing setups now (9/21 buys, tight-base breakouts, bases near their trigger) · ranked by score · tap for the chart</small></div>
     ${top.length ? `<ol class="mx5l${red ? ' dim' : ''}">${top.map((x, i) => `<li><button data-m5="${esc(x.sym)}"><span class="mx5n">${i + 1}</span>
       <span class="mx5b"><b>${esc(x.sym)} <em class="mx5s">${x.p} pts</em>${x.stack ? ' <small class="chip">MA stack ✓</small>' : ''}</b>
       <small>${x.w.map(([n, t]) => `<span class="${n > 0 ? 'up' : 'down'}">${n > 0 ? '+' : ''}${n} ${esc(t)}</span>`).join(' · ')}</small>
       <small class="mx5p">${plan(x.sym)}</small></span></button></li>`).join('')}</ol>` : '<p class="muted td-rs">No stock has a buy signal right now.</p>'}
     ${red && top.length ? '<p class="down td-rs"><b>Red day:</b> these are shown for the record. Your rule is to wait.</p>' : ''}
-    <p class="muted td-rs">Score: buy signal in a tested system (9/21 or ATH +3, IPO cup +2), tight-base breakout +2 (near trigger +1), 3-month gain top 20% +2 (top 40% +1), sector leading/uptrend +1 (weak −1), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></section>`;
+    <p class="muted td-rs">Score: 9/21 buy +3 (trend running +1), tight-base breakout +2 (near trigger or recent +1), also an ATH breakout +2, IPO cup +1, 3-month gain top 20% +2 (top 40% +1), sector leading/uptrend +1 (weak −1), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></section>`;
   box.querySelectorAll('[data-m5]').forEach((b) => b.addEventListener('click', () => mxOpen(b.dataset.m5, mk, S)));
 }
 async function mxOpen(sym, mk, S) {
