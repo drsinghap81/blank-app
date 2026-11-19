@@ -4991,7 +4991,10 @@ async function loadMarkets() {
           <span class="mxk-trio"><span title="ATH breakouts"><b>${S.nbrk}</b>ATH</span><span title="9/21 buys"><b>${S.n921}</b>9/21</span><span title="ATH near trigger"><b>${S.nnear}</b>Near ATH</span></span></div></section>
       <div class="card"><h4 style="margin:0 0 4px">Sectors</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Colour = Pulse (share of the sector's stocks trending); strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-bouncing, red weak); RS = equal-weight 3-month return vs ${MX_BENCH[mk]}. Tap a sector for its industries.</p>
         ${mxPer()}${mxTiles(secs, 'sector', 'data-s')}
-        <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div></div>`;
+        <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div>${(() => { const L = (G.rows || []).filter((r) => r.d1 != null).sort((a, b) => b.d1 - a.d1); if (!L.length) return '';
+          const row = (r) => `<div class="gpsr" data-ig="${esc(r.group)}"><span class="gpsn">${esc(r.group)} <span class="muted">· ${esc(r.sector || '')} · ${r.n} stocks</span>${r.w ? (r.w.status === 'broken' ? ' <span class="chip open">W broke</span>' : ` <span class="chip">W ${fmt(r.w.dist_pct, 1)}% to break</span>`) : ''}</span><span class="gpsv"><b class="${r.d1 >= 0 ? 'up' : 'down'}">${r.d1 >= 0 ? '+' : ''}${fmt(r.d1, 2)}%</b></span></div>`;
+          return `<h4 style="margin:14px 0 4px">Industries today · ${L.length} (equal weight, like StockEdge sectors)</h4><div class="mxlist">${L.slice(0, 8).map(row).join('')}</div>
+          <details class="t2-more"><summary>All ${L.length} industries by today's change</summary><div class="mxlist">${L.map(row).join('')}</div></details>`; })()}</div>`;
     const setups = []; G.rows.forEach((g) => g.members.forEach((m) => { const c = S.map[m.symbol]; if (c && c.some((x) => !x.includes('sell') && !x.includes('forming') && !x.includes('Near support'))) setups.push({ m, g, c }); }));
     setups.sort((a, b) => (b.g.p1m - a.g.p1m) || (b.m.wrpi - a.m.wrpi));
     el.insertAdjacentHTML('beforeend', `<div class="card"><h4 style="margin:0 0 4px">Signals ranked by industry strength</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Every stock with a live buy or in-trade signal from your systems, strongest industry (1-month Pulse) first. This replaces the old Top-down tab: in the 2017–26 test, ATH breakouts in strong sectors with strong stock RS won 54% vs 48%.</p>
@@ -5001,6 +5004,7 @@ async function loadMarkets() {
     const ab = $('#mxallset'); if (ab) ab.addEventListener('click', () => { state.mxAllSet = true; loadMarkets(); });
     mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
     el.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'sector', sec: b.dataset.s, grp: null })));
+    el.querySelectorAll('[data-ig]').forEach((b) => b.addEventListener('click', () => { const g = G.rows.find((r) => r.group === b.dataset.ig); mxGo({ lvl: 'industry', sec: g ? g.sector : null, grp: b.dataset.ig }); }));
     return;
   }
   if (x.lvl === 'sector') {
@@ -5009,7 +5013,7 @@ async function loadMarkets() {
     el.innerHTML = `${mxCrumb()}<div class="card"><div class="status info" style="border-left:5px solid ${GP_SHIFT[sr.shift || 'mid'].c}"><b>${esc(x.sec)}: ${GP_SHIFT[sr.shift || 'mid'].t}.</b> Pulse ${fmt(sr.p1q, 0)} → ${fmt(sr.p1m, 0)} → ${fmt(sr.p1w, 0)} (quarter → month → week) · RS ${sr.rs3m >= 0 ? '+' : ''}${fmt(sr.rs3m, 1)}% 3 m · ${sr.n} stocks in ${sr.groups} industries · ${sr.trending_now} trending today. ${gpSlope(sr, 120, 36)}</div>
       <div class="chart" id="mxc"></div><div class="rsi" id="mxcp"></div><p class="muted" style="margin:4px 0;font-size:12.5px">Last 12 months · dark = sector (equal weight) · grey = ${MX_BENCH[mk]} · lower = 1-month Pulse.</p>
       <h4 style="margin:12px 0 4px">Industries in ${esc(x.sec)}</h4>${mxPer()}${mxTiles(grs, 'group', 'data-g')}
-      <div class="mxlist">${mxByLane(grs).map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div></div>`;
+      <div class="mxlist">${mxByLane(grs).map((r) => `<div class="gpsr" data-g="${esc(r.group)}">${gpSlope(r)}<span class="gpsn">${esc(r.group)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span>${indTags(r)}</span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div></div>`;
     mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
     el.querySelectorAll('[data-g]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'industry', grp: b.dataset.g })));
     mxChart(mk, 'sectors', x.sec, sr.shift);
@@ -5021,13 +5025,20 @@ async function loadMarkets() {
   const rows = r.members.filter((m) => !q || m.symbol.toLowerCase().includes(q) || (m.name || '').toLowerCase().includes(q));
   el.innerHTML = `${mxCrumb()}<div class="card"><div class="status info" style="border-left:5px solid ${GP_SHIFT[r.shift || 'mid'].c}"><b>${esc(r.group)}: ${GP_SHIFT[r.shift || 'mid'].t}.</b> ${GP_SHIFT[r.shift || 'mid'].note}. Pulse ${fmt(r.p1q, 0)} → ${fmt(r.p1m, 0)} → ${fmt(r.p1w, 0)} · rank ${r.rank} of ${G.groups_n} · ${r.trending_now} of ${r.n} trending today. ${gpSlope(r, 120, 36)}</div>
     <div class="chart" id="mxc"></div><div class="rsi" id="mxcp"></div><p class="muted" style="margin:4px 0;font-size:12.5px">Last 12 months · dark = industry (equal weight) · grey = ${MX_BENCH[mk]} · lower = 1-month Pulse.</p>
+    ${r.slug ? `<div class="ind-bar">${indTags(r)}<button class="lv-btn" id="indw">Daily chart · 9 EMA · W trendline ›</button></div>` : ''}
     <h4 style="margin:12px 0 4px">Stocks (${r.n} liquid)</h4>
     <ul class="list flat">${rows.map((m, i) => `<li class="row mxrow" tabindex="0" data-i="${i}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}</div>
       <div class="tags">${m.trending ? '<span class="chip new">Trending</span>' : ''}<span class="chip">${m.d1m}/21 d trending</span><span class="chip ${m.wrpi >= 100 ? 'open' : 'exit'}">RPI ${fmt(m.wrpi, 0)}</span>${m.stage2 ? '<span class="chip">Stage 2</span>' : ''}${(S.map[m.symbol] || []).join('')}</div></div><div></div>
-      <div class="num"><b>${fmt(m.close, 2, MKT[mk].loc)}</b><span class="muted">${fmt(m.from_high, 0)}% from high</span></div></li>`).join('')}</ul></div>`;
-  mxWire(el);
+      <div class="num"><b>${fmt(m.close, 2, MKT[mk].loc)}</b>${m.d1 != null ? `<span class="${m.d1 >= 0 ? 'up' : 'down'}">${m.d1 >= 0 ? '+' : ''}${fmt(m.d1, 2)}% today</span>` : ''}<span class="muted">${fmt(m.from_high, 0)}% from high</span></div></li>`).join('')}</ul></div>`;
+  mxWire(el); { const b = el.querySelector('#indw'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts')); }
   el.querySelectorAll('.list .row').forEach((li) => { const go = () => { mxStock(rows[+li.dataset.i], r, mk, S); }; li.addEventListener('click', go); li.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
   mxChart(mk, 'groups', r.group, r.shift);
+}
+/* 20 Nov 2026 (Amritpal, StockEdge-style industries): today / 1-month change of the industry's equal-weight index and its latest W */
+function indTags(r) {
+  if (r.d1 == null) return '';
+  const w = r.w; const wt = !w ? '' : w.status === 'broken' ? '<span class="chip open">W broke</span>' : `<span class="chip">W forming · ${fmt(w.dist_pct, 1)}% to break</span>`;
+  return ` <span class="ind-t"><span class="${r.d1 >= 0 ? 'up' : 'down'}">${r.d1 >= 0 ? '+' : ''}${fmt(r.d1, 2)}% today</span> · ${r.r1m >= 0 ? '+' : ''}${fmt(r.r1m, 1)}% 1 m${r.above_e9 ? ' · above rising 9 EMA' : ''} ${wt}</span>`;
 }
 async function mxChart(mk, kind, key, shift) {
   state.gpCh = state.gpCh || {};
@@ -6248,7 +6259,7 @@ async function alertsCard(box, mk) {
 /* 20 Nov 2026: tap an index line in the alert card -> daily candles, 9 EMA, the W's falling trendline and the two lows / break */
 async function wChart(sl, mk, dir = 'index_w_charts') {
   $('#sheet-body').innerHTML = '<p class="muted pad">Loading chart…</p>'; $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
-  let c; try { const r = await fetch(MAIN + (dir === 'index_w_charts' ? MKT[mk].path : 'data/scan/') + dir + '/' + encodeURIComponent(sl) + '.json', { cache: 'no-cache' }); if (!r.ok) throw 0; c = await r.json(); }
+  let c; try { const r = await fetch(MAIN + (dir === 'index_w_charts' || dir === 'group_w_charts' ? MKT[mk].path : 'data/scan/') + dir + '/' + encodeURIComponent(sl) + '.json', { cache: 'no-cache' }); if (!r.ok) throw 0; c = await r.json(); }
   catch (e) { $('#sheet-body').innerHTML = '<p class="muted pad">The chart appears after tonight\'s scan.</p>'; return; }
   $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">${esc(c.name)}</h2><p class="muted" style="margin:0 0 8px;font-size:.85em">Daily · 9 EMA (orange) · W trendline (blue): a close above it is the break</p><div id="wchc" style="height:360px"></div>`;
   const LW = window.LightweightCharts, box = $('#wchc');
