@@ -6150,7 +6150,7 @@ function commodityLines(A, mk = 'NSE') {
       else if (h / r.close - 1 <= 0.02) ath.push(`<a href="#" class="al-t" data-asv="${esc(r.key)}">${nm(r)} (${lab}) near · needs ${fmt(h, 2)}</a>`); }); }
   if (!w.length && !up.length && !ath.length) return `<div class="al-sub">Commodities · ${{ NSE: 'MCX', US: 'US futures / ETFs', ASX: 'ASX ETFs', UK: 'LSE ETCs' }[mk]}</div><div class="al-r muted"><span>No W, 9 EMA lift-off or ATH-candle cross in the ones you can trade here.</span></div>`;
 
-  return `<div class="al-sub">Commodities · ${{ NSE: 'MCX', US: 'US futures / ETFs', ASX: 'ASX ETFs', UK: 'LSE ETCs' }[mk]}</div>${w.slice(0, 5).map((r) => `<div class="al-r al-tap"${r.w.chart ? ` data-awch="${esc(r.w.chart)}"` : ''}>${r.w.status === 'broken'
+  return `<div class="al-sub">Commodities · ${{ NSE: 'MCX', US: 'US futures / ETFs', ASX: 'ASX ETFs', UK: 'LSE ETCs' }[mk]}</div>${w.slice(0, 5).map((r) => `<div class="al-r al-tap"${r.w.chart ? ` data-awch="${esc(r.w.chart)}" data-tvs="${esc(tvIdx(r.key))}"` : ''}>${r.w.status === 'broken'
     ? `<b class="up">▲ ${nm(r)}</b> <span>W + trendline broke ${esc(r.w.broke_on)}</span><small>${r.w.since >= 0 ? '+' : ''}${fmt(r.w.since, 1)}% since · chart ›</small>`
     : `<span>${nm(r)}: ${r.w.stage === '2nd low now' ? 'W · 2nd low forming now' : 'W formed'} · breaks above ${fmt(r.w.line_now, 2)} (${fmt(r.w.dist_pct, 1)}% away)</span><small>chart ›</small>`}</div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${up.map((r) => `<a href="#" class="al-s" data-asv="${esc(r.key)}">${nm(r)}</a>`).join(', ')}</span></div>` : ''}
@@ -6170,6 +6170,27 @@ function basketLines(B, mk) {
 const ASX_T212 = { FANG: 'MAGS or QQQ', NDQ: 'QQQ', HNDQ: 'QQQ', IVV: 'IVV', VTS: 'VTI', VEU: 'VEU', CETF: 'MCHI', RBTZ: 'BOTZ', SEMI: 'SOXX', HACK: 'HACK',
   GOLD: 'GLD', QAU: 'GLD', OOO: 'USO', IOO: 'IOO', VGS: 'VEA', VGAD: 'VEA', IEM: 'EEM', VGE: 'VWO', ASIA: 'AAXJ', IXJ: 'IXJ', TECH: 'IXN', ETHI: 'ESGV',
   MNRS: 'GDX', ACDC: 'LIT', ERTH: 'ICLN', DRUG: 'IXJ', FUEL: 'IXC', BNKS: 'IXG', ROBO: 'ROBO', CRYP: 'BITQ', IJH: 'IJH', IJR: 'IJR', QUAL: 'QUAL', MOAT: 'MOAT' };
+/* 20 Nov 2026 (Amritpal: "I need the TradingView version of the chart too"): TradingView symbols for the alert card's charts */
+const TV_W = { '^GSPC': 'SP:SPX', '^NDX': 'NASDAQ:NDX', '^DJI': 'DJ:DJI', '^RUT': 'TVC:RUT', '^AXJO': 'ASX:XJO', '^AORD': 'ASX:XAO', '^AXFJ': 'ASX:XFJ', '^AXMJ': 'ASX:XMJ',
+  '^AXEJ': 'ASX:XEJ', '^AXHJ': 'ASX:XHJ', '^AXIJ': 'ASX:XIJ', '^AXDJ': 'ASX:XDJ', '^AXSJ': 'ASX:XSJ', '^AXNJ': 'ASX:XNJ', '^AXPJ': 'ASX:XPJ', '^AXUJ': 'ASX:XUJ', '^AXTJ': 'ASX:XTJ',
+  '^FTSE': 'TVC:UKX', '^FTMC': 'FTSE:MCX', '^FTAS': 'FTSE:ASX',
+  'NIFTY 50': 'NSE:NIFTY', 'NIFTY BANK': 'NSE:BANKNIFTY', 'NIFTY FINANCIAL SERVICES': 'NSE:CNXFINANCE', 'NIFTY PRIVATE BANK': 'NSE:NIFTYPVTBANK', 'NIFTY PSU BANK': 'NSE:CNXPSUBANK',
+  'NIFTY IT': 'NSE:CNXIT', 'NIFTY AUTO': 'NSE:CNXAUTO', 'NIFTY FMCG': 'NSE:CNXFMCG', 'NIFTY PHARMA': 'NSE:CNXPHARMA', 'NIFTY METAL': 'NSE:CNXMETAL', 'NIFTY REALTY': 'NSE:CNXREALTY',
+  'NIFTY ENERGY': 'NSE:CNXENERGY', 'NIFTY INFRASTRUCTURE': 'NSE:CNXINFRA', 'NIFTY MEDIA': 'NSE:CNXMEDIA', 'NIFTY PSE': 'NSE:CNXPSE', 'NIFTY CPSE': 'NSE:CPSE', 'NIFTY COMMODITIES': 'NSE:CNXCOMMODITIES',
+  'NIFTY INDIA CONSUMPTION': 'NSE:CNXCONSUMPTION', 'NIFTY SERVICES SECTOR': 'NSE:CNXSERVICE', 'NIFTY MNC': 'NSE:CNXMNC', 'NIFTY 500': 'NSE:CNX500', 'NIFTY MIDCAP 150': 'NSE:NIFTYMIDCAP150',
+  'NIFTY SMALLCAP 250': 'NSE:NIFTYSMLCAP250', 'NIFTY CAPITAL MARKETS': 'NSE:NIFTY_CAPITAL_MKT', 'NIFTY CONSUMER DURABLES': 'NSE:NIFTY_CONSR_DURBL', 'NIFTY OIL & GAS': 'NSE:NIFTY_OIL_AND_GAS',
+  'NIFTY HEALTHCARE INDEX': 'NSE:NIFTY_HEALTHCARE', 'NIFTY INDIA DEFENCE': 'NSE:NIFTY_IND_DEFENCE',
+  'GC=F': 'COMEX:GC1!', 'SI=F': 'COMEX:SI1!', 'HG=F': 'COMEX:HG1!', 'PL=F': 'NYMEX:PL1!', 'PA=F': 'NYMEX:PA1!', 'ALI=F': 'COMEX:ALI1!', 'CL=F': 'NYMEX:CL1!', 'BZ=F': 'NYMEX:BB1!',
+  'NG=F': 'NYMEX:NG1!', 'HO=F': 'NYMEX:HO1!', 'RB=F': 'NYMEX:RB1!', 'ZC=F': 'CBOT:ZC1!', 'ZW=F': 'CBOT:ZW1!', 'ZS=F': 'CBOT:ZS1!', 'ZM=F': 'CBOT:ZM1!', 'ZL=F': 'CBOT:ZL1!',
+  'KC=F': 'ICEUS:KC1!', 'CC=F': 'ICEUS:CC1!', 'SB=F': 'ICEUS:SB1!', 'CT=F': 'ICEUS:CT1!', 'OJ=F': 'ICEUS:OJ1!', 'LE=F': 'CME:LE1!', 'HE=F': 'CME:HE1!',
+  'GC=F:INR': 'MCX:GOLD1!', 'SI=F:INR': 'MCX:SILVER1!', 'HG=F:INR': 'MCX:COPPER1!', 'ALI=F:INR': 'MCX:ALUMINIUM1!', 'CL=F:INR': 'MCX:CRUDEOIL1!', 'NG=F:INR': 'MCX:NATURALGAS1!',
+  fang10: '' };
+const tvIdx = (k) => (TV_W[k] !== undefined ? TV_W[k] : /^[A-Z]{2,5}$/.test(k) ? k : '');
+function fundTv(r) {
+  const sym = String(r.symbol || r.key).replace(/^[A-Z]{2}:/, '');
+  const m = r.market || 'IN';
+  return m === 'IN' ? 'NSE:' + sym.replace(/[-&]/g, '_') : m === 'AU' ? 'ASX:' + sym : m === 'UK' ? (/\.DE$/.test(sym) ? 'XETR:' + sym.replace('.DE', '') : 'LSE:' + sym.replace(/\.L$/, '')) : sym;
+}
 function t212(r, mk) {
   if (r.kind === 'fund') return '';
   const sym = String(r.symbol || r.key).replace(/^[A-Z]{2}:/, '').replace(/\.(L|DE|AS|PA|MI)$/, '');
@@ -6182,17 +6203,17 @@ function t212(r, mk) {
    same rule as the indices; not separately tested on funds). Breaks of the last 5 sessions first, then W's forming nearest their line. */
 function fundWLines(F, mk) {
   const code = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[mk];
-  const seen = new Set();   // the same fund in several plans (direct / regular, growth / IDCW): show it once
-  const R = ((F && F.rows) || []).filter((r) => (r.market || 'IN') === code && r.w).filter((r) => { const k = r.kind === 'fund' ? String(r.name).replace(/ - .*$/, '').trim() : r.key; if (seen.has(k)) return false; seen.add(k); return true; });
+  const seen = new Set();   // the same fund in several plans (direct / regular, growth / IDCW): show it once; 20 Nov 2026: ETFs only (mutual funds trade once a day at NAV, no candles)
+  const R = ((F && F.rows) || []).filter((r) => (r.market || 'IN') === code && r.w && r.kind !== 'fund').filter((r) => { const k = r.kind === 'fund' ? String(r.name).replace(/ - .*$/, '').trim() : r.key; if (seen.has(k)) return false; seen.add(k); return true; });
   if (!R.length) return '';
   const nm = (r) => (r.kind === 'fund' ? String(r.name || r.key).replace(/ (Fund|Scheme).*$/i, '').replace(/ - (Direct|Regular).*$/i, '').slice(0, 30) : String(r.symbol || r.key).replace(/^[A-Z]{2}:/, ''));
   const br = R.filter((r) => r.w.status === 'broken').sort((a, b) => a.w.days_ago - b.w.days_ago);
   const fm = R.filter((r) => r.w.status === 'forming').sort((a, b) => a.w.dist_pct - b.w.dist_pct);
   const L = [...br.slice(0, 4), ...fm.slice(0, Math.max(0, 6 - Math.min(4, br.length)))];
   const more = br.length + fm.length - L.length;
-  return `<div class="al-sub">Funds &amp; ETFs · W + trendline</div>${L.map((r) => `<div class="al-r al-tap"${r.w.chart ? ` data-fwch="${esc(r.w.chart)}"` : ''}>${r.w.status === 'broken'
+  return `<div class="al-sub">ETFs · W + trendline</div>${L.map((r) => `<div class="al-r al-tap"${r.w.chart ? ` data-fwch="${esc(r.w.chart)}" data-tvs="${esc(fundTv(r))}"` : ''}>${r.w.status === 'broken'
     ? `<b class="up">▲ ${esc(nm(r))}</b>${t212(r, mk)} <span>W + trendline broke ${esc(r.w.broke_on)}</span><small>${r.w.since >= 0 ? '+' : ''}${fmt(r.w.since, 1)}% since · chart ›</small>`
-    : `<span>${esc(nm(r))}${t212(r, mk)}: ${r.w.stage === '2nd low now' ? '2nd low forming now' : 'W formed'} · breaks above ${fmt(r.w.line_now, 2, MKT[mk].loc)} (${fmt(r.w.dist_pct, 1)}% away)</span><small>chart ›</small>`}</div>`).join('')}${more > 0 ? `<div class="al-r muted"><small>+${more} more W's in funds &amp; ETFs</small></div>` : ''}`;
+    : `<span>${esc(nm(r))}${t212(r, mk)}: ${r.w.stage === '2nd low now' ? '2nd low forming now' : 'W formed'} · breaks above ${fmt(r.w.line_now, 2, MKT[mk].loc)} (${fmt(r.w.dist_pct, 1)}% away)</span><small>chart ›</small>`}</div>`).join('')}${more > 0 ? `<div class="al-r muted"><small>+${more} more W's in ETFs</small></div>` : ''}`;
 }
 /* 20 Nov 2026 (Amritpal: "include funds and ETFs in the categorisation on the card"): the same month / week / day all-time-high
    closes for this market's ETFs and mutual funds (funds.json), crossed (✓) or within 2% of that candle's high. Tap = fund panel. */
@@ -6247,7 +6268,7 @@ async function alertsCard(box, mk) {
   const br = wr.filter((r) => r.status === 'broken' && r.days_ago <= 5).sort((a, b) => (a.days_ago - b.days_ago) || (b.full - a.full));
   const fm = wr.filter((r) => r.status === 'forming').sort((a, b) => a.dist_pct - b.dist_pct).slice(0, 4);
   const tick = (ok, txt) => `<span class="al-t ${ok ? 'ok' : 'no'}">${ok ? '✓' : '·'} ${txt}</span>`;
-  const wline = (r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><b class="up">▲ ${esc(nm(r.index))}</b> <span>W + trendline broke ${dd(r.broke_on)}</span>
+  const wline = (r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}" data-tvs="${esc(tvIdx(r.ticker || r.index))}"` : ''}><b class="up">▲ ${esc(nm(r.index))}</b> <span>W + trendline broke ${dd(r.broke_on)}</span>
       ${r.vol_ratio != null ? `<span class="al-t">volume ${fmt(r.vol_ratio, 1)}×</span>` : ''}${r.ema_status ? tick(r.ema_status !== 'left below', r.ema_status === 'left below' ? 'back below 9 EMA' : 'above 9 EMA') : ''}
       ${r.full ? '<em class="al-full">full setup</em>' : ''}<small>${r.since >= 0 ? '+' : ''}${fmt(r.since, 1)}% since · chart ›</small></div>`;
   const ER = (E && E.rows) || [];
@@ -6258,7 +6279,7 @@ async function alertsCard(box, mk) {
   box.innerHTML = `<section class="al-card ${lt ? lt[0] : ''}">
     ${lt ? `<div class="al-light"><i></i><b>${lt[1]}</b></div>` : ''}${axl}
     ${br.length ? br.slice(0, 4).map(wline).join('') : ''}
-    ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
+    ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}" data-tvs="${esc(tvIdx(r.ticker || r.index))}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
     ${basketLines(BK, mk)}
@@ -6273,20 +6294,20 @@ async function alertsCard(box, mk) {
       <p class="muted td-rs"><b>All-time highs:</b> a month, week or day candle closed above the old all-time high; ✓ = the price is now above that candle's high, otherwise the level it needs. The monthly close + break of its high is the tested Momentum system (21.5%/yr India; ideas only elsewhere); week and day closes are watch lists.</p>
       ${mk === 'NSE' ? '<p class="muted td-rs"><b>Metals today:</b> Australia trades before India opens. When ASX materials beat the ASX 200 by more than 0.5%, Indian metal stocks rose from open to close on 52% of days (+0.18%); when they lagged by more than 0.5%, only 38% (−0.49%), against 45% on all days (2016–26, 12 metal F&amp;O stocks). The 5-minute option trader skips metal CE on weak days and metal PE on strong days.</p>' : ''}
       <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
-  box.querySelectorAll('[data-wch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.wch, mk)));
-  box.querySelectorAll('[data-fwch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.fwch, mk, 'fund_w_charts')));
-  box.querySelectorAll('[data-awch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.awch, mk, 'asset_w_charts')));
-  box.querySelectorAll('[data-asv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const r = ((state.assets && state.assets.rows) || []).find((x) => x.key === b.dataset.asv); if (r && r.tv !== undefined && r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv) + '&interval=D', '_blank', 'noopener'); else if (r) window.open('https://finance.yahoo.com/quote/' + encodeURIComponent(r.key), '_blank', 'noopener'); }));
+  box.querySelectorAll('[data-wch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.wch, mk, 'index_w_charts', b.dataset.tvs || '')));
+  box.querySelectorAll('[data-fwch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.fwch, mk, 'fund_w_charts', b.dataset.tvs || '')));
+  box.querySelectorAll('[data-awch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.awch, mk, 'asset_w_charts', b.dataset.tvs || '')));
+  box.querySelectorAll('[data-asv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const k = b.dataset.asv; const tv = tvIdx(k); window.open(tv ? 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tv) + '&interval=D' : 'https://finance.yahoo.com/quote/' + encodeURIComponent(k), '_blank', 'noopener'); }));
   box.querySelectorAll('[data-tv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(b.dataset.tv, mk)) + '&interval=D', '_blank', 'noopener'); }));
   box.querySelectorAll('[data-ath]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ symbol: b.dataset.ath, kind: 'ATH' }, mk); }));
   box.querySelectorAll('[data-fd]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const r = ((state.fund && state.fund.rows) || []).find((x) => x.key === b.dataset.fd); if (r) fundSelect(r); }));
 }
 /* 20 Nov 2026: tap an index line in the alert card -> daily candles, 9 EMA, the W's falling trendline and the two lows / break */
-async function wChart(sl, mk, dir = 'index_w_charts') {
+async function wChart(sl, mk, dir = 'index_w_charts', tv = '') {
   $('#sheet-body').innerHTML = '<p class="muted pad">Loading chart…</p>'; $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
   let c; try { const r = await fetch(MAIN + (dir === 'index_w_charts' || dir === 'group_w_charts' ? MKT[mk].path : 'data/scan/') + dir + '/' + encodeURIComponent(sl) + '.json', { cache: 'no-cache' }); if (!r.ok) throw 0; c = await r.json(); }
   catch (e) { $('#sheet-body').innerHTML = '<p class="muted pad">The chart appears after tonight\'s scan.</p>'; return; }
-  $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">${esc(c.name)}</h2><p class="muted" style="margin:0 0 8px;font-size:.85em">Daily · 9 EMA (orange) · W trendline (blue): a close above it is the break</p><div id="wchc" style="height:360px"></div>`;
+  $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">${esc(c.name)}</h2>${tv ? `<a class="tv-btn" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tv)}&interval=D" style="margin:2px 0 6px;display:inline-block">Open in TradingView ↗</a>` : ''}<p class="muted" style="margin:0 0 8px;font-size:.85em">Daily · 9 EMA (orange) · W trendline (blue): a close above it is the break</p><div id="wchc" style="height:360px"></div>`;
   const LW = window.LightweightCharts, box = $('#wchc');
   const ch = LW.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
   const s = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
