@@ -6242,7 +6242,11 @@ function athLines(A, mk) {
   const asof = A.asof ? new Date(A.asof + 'T00:00:00') : null;
   const recent = (A.breakouts || []).filter((b) => asof && (asof - new Date(b.date + 'T00:00:00')) / 864e5 <= 7).sort((a, b) => (a.date < b.date ? 1 : -1));
   const out = one('ATH month close →', A.month_close, 'high_m') + one('ATH week close →', A.week_close, 'high_p') + one('ATH day close →', A.day_close, 'high_p')
-    + (recent.length ? `<div class="al-r"><b class="up">▲ ATH buys this week</b> <span>${recent.slice(0, 8).map((b) => `<a href="#" class="al-s" data-ath="${esc(b.symbol)}">${esc(b.symbol)}</a>`).join(', ')}${recent.length > 8 ? ` +${recent.length - 8}` : ''}</span></div>` : '');
+    /* 20 Nov 2026 (Amritpal: ANGELONE "has not closed above its ATH but the card shows it"): these are the Momentum system's
+       intramonth entries - price went above the highest MONTHLY CLOSE (not the wick high); the month has not closed yet. Say so,
+       with the level, and whether it is still above it. */
+    + (recent.length ? `<div class="al-r"><b>Momentum (ATH) entries this week</b><small>price crossed the highest monthly close · month not closed yet</small></div>${recent.slice(0, 8).map((b) => { const ok = b.close >= b.trigger;
+      return `<a href="#" class="al-t ${ok ? 'ok' : ''}" data-ath="${esc(b.symbol)}">${ok ? '✓' : '✗'} ${esc(b.symbol)} crossed ${Mz(b.trigger)} on ${esc(String(b.date).slice(5))} · now ${b.close >= b.trigger ? '+' : ''}${fmt((b.close / b.trigger - 1) * 100, 1)}%${ok ? '' : ' (back below)'}</a>`; }).join('')}` : '');
   return `<div class="al-sub">All-time highs · ✓ = crossed the high of the candle that closed above the ATH</div>${out || '<div class="al-r muted"><span>Stocks: none crossed or near today.</span></div>'}`;
 }
 async function alertsCard(box, mk) {
