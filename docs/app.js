@@ -5277,7 +5277,7 @@ async function bgOther(el, mk) {
   state._tdRows = ideas; state._tdMkNow = mk;
   if (P) $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)}`;
   el.innerHTML = `<div class="td-wrap t2">
-    <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
+    <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div><div id="tdalert"></div>
       <div class="t2-date"><div><b>${esc(clk.dayNum)}</b><span>${esc(clk.month)}</span></div>
         <div class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small><b>${clk.txt}</b><small>${esc(clk.at)} · ${esc(clk.local)} your time</small></div></div>
       <div id="bgostops"></div></div>
@@ -6112,8 +6112,9 @@ async function alertsCard(box, mk) {
   const dd = (s) => { try { return new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); } catch (e) { return s; } };
   const lt = L ? { red: ['red', 'RED · no new buys today'], amber: ['amber', 'AMBER · one warning, trade normally'], green: ['green', 'GREEN · OK to buy'] }[L.lvl] : null;
   const wr = ((W && W.rows) || []).filter((r) => r.status === 'broken' || r.status === 'forming');
-  const br = wr.filter((r) => r.status === 'broken').sort((a, b) => (b.full - a.full) || (a.days_ago - b.days_ago));
-  const fm = wr.filter((r) => r.status === 'forming').slice(0, 2);
+  /* 20 Nov 2026 (Amritpal: "latest formation, not older ones"): only breaks of the last 5 sessions, newest first, and W's still forming */
+  const br = wr.filter((r) => r.status === 'broken' && r.days_ago <= 5).sort((a, b) => (a.days_ago - b.days_ago) || (b.full - a.full));
+  const fm = wr.filter((r) => r.status === 'forming').sort((a, b) => a.dist_pct - b.dist_pct).slice(0, 4);
   const tick = (ok, txt) => `<span class="al-t ${ok ? 'ok' : 'no'}">${ok ? '✓' : '·'} ${txt}</span>`;
   const wline = (r) => `<div class="al-r"><b class="up">▲ ${esc(nm(r.index))}</b> <span>W + trendline broke ${dd(r.broke_on)}</span>
       ${r.vol_ratio != null ? `<span class="al-t">volume ${fmt(r.vol_ratio, 1)}×</span>` : ''}${r.ema_status ? tick(r.ema_status !== 'left below', r.ema_status === 'left below' ? 'back below 9 EMA' : 'above 9 EMA') : ''}
@@ -6130,7 +6131,7 @@ async function alertsCard(box, mk) {
     ${dn.length ? `<div class="al-r"><b class="down">▼ Fell below the 9 EMA</b> <span>${names(dn)}</span></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
     ${athLines(AT, mk)}
-    ${!br.length && !fm.length && !up.length && !dn.length ? '<div class="al-r muted"><span>No index W or 9 EMA alerts today.</span></div>' : ''}
+    ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
       ${L ? lightHTML(L, mk) : ''}
       <p class="muted td-rs"><b>W + trendline:</b> ${esc((W && W.test) || 'Tested on 23 NSE indices 2015–26: the break came before the 9/21 cross 71% of the time, about 1% lower; next 20 sessions median +1.6% (63% up) vs +1.2% on any day.')} ${mk === 'NSE' ? '<b>Full setup</b> = W broken and riding above a rising 9 EMA. Tested on 551 Indian index W breaks 2016–26: with a 9 EMA lift-off around the break, next 20 sessions median +1.5% (63% up); without one −0.6% (46% up). Break-day volume (shown) added nothing: +1.4% with high volume, +1.4% without. Since 2021 the edge is smaller.' : 'Volume and the 9 EMA tick are shown for context; the combination was tested on India only.'}</p>
@@ -6440,12 +6441,12 @@ async function tdRender2(el) {
     <div class="t2-tile fut" data-go="t2tur" role="button" tabindex="0"><b>${tuNew.length + tuEx.length || tuIn.length}</b><span>Turtle Trading System</span></div></div>`;
   el.innerHTML = `<div class="td-wrap t2">
     <div id="tdal"></div>
-    <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
+    <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div><div id="tdalert"></div>
       <div class="t2-date"><div><b>${esc(clk.dayNum)}</b><span>${esc(clk.month)}</span></div>
         <div class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small><b>${clk.txt}</b><small>${esc(clk.at)} · ${esc(clk.local)} your time</small></div></div>
       ${tiles}<div id="t2condor"></div>
       <small class="t2-sub">Plan from the ${day(P.asof)} close${knowHeld ? '' : ' · holdings not linked'}</small></div>
-    <div id="tdalert"></div>${ribbon()}
+    ${ribbon()}
     <div id="tdtop5"></div>
     <div class="t2-h" id="t2sell"><h2>Sell at the open</h2><small>do these first</small></div>
     <div class="t2-box">${!knowHeld ? '<p class="t2-empty">Holdings not linked: add them in Portfolio or connect Live.</p>'
