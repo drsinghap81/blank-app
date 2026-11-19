@@ -1,0 +1,44 @@
+# 19 Nov 2026: index W + trendline break and EMA 9 lift-off alerts for US / ASX / UK (tools/world_alerts.py). Info only.
+name: world-alerts
+on:
+  schedule:
+    - cron: "40 21 * * 1-5"   # US, after the 16:00 ET close
+    - cron: "40 6 * * 1-5"    # ASX, after the 16:00 Sydney close
+    - cron: "10 17 * * 1-5"   # UK, after the 16:30 London close
+  workflow_dispatch:
+    inputs:
+      market: { description: "US, ASX, UK or ALL", required: false, default: "ALL" }
+permissions:
+  contents: write
+concurrency:
+  group: world-alerts
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas yfinance lxml requests
+      - name: Alerts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          SEND_TELEGRAM: ${{ github.event_name == 'schedule' && '1' || '0' }}
+        run: |
+          case "${{ github.event.schedule }}" in
+            "40 21 * * 1-5") M="US";; "40 6 * * 1-5") M="ASX";; "10 17 * * 1-5") M="UK";;
+            *) M="${{ inputs.market || 'ALL' }}";; esac
+          [ "$M" = "ALL" ] && M="US ASX UK"
+          for m in $M; do python tools/world_alerts.py $m 2>&1 | grep -v -i "delisted\|failed download\|^\[" | tail -20 || true; done
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add data/scan/us/index_w.json data/scan/us/ema_lift.json data/scan/asx/index_w.json data/scan/asx/ema_lift.json data/scan/uk/index_w.json data/scan/uk/ema_lift.json 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -qm "World alerts $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done

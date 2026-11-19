@@ -29,6 +29,15 @@ IDX = {
     "UK": {"^FTSE": "FTSE 100", "^FTMC": "FTSE 250", "^FTAS": "FTSE All-Share"},
 }
 PATH = {"US": "data/scan/us", "ASX": "data/scan/asx", "UK": "data/scan/uk"}
+# backtest results per market (python tools/world_alerts.py <MK> test, 19 Nov 2026; indices from 2005, top-50 stocks from 2007)
+TEST = {
+    "US": dict(w="Tested on 17 US indices/sector ETFs 2005–26 (695 W's): the break came before the 9/21 cross 67% of the time; next 20 sessions median +2.0% (65% up) vs +1.3% (62%) on any day. Useful, like India.",
+               lift="Tested 2007–26: indices +0.45% a trade vs +0.67% holding any 16 days; top-50 stocks +1.48% vs +1.61%. No edge in the US: shown for reference only.", alert_w=True),
+    "ASX": dict(w="Tested on 13 ASX indices 2005–26 (532 W's): next 20 sessions median +0.7% (58% up) vs +0.7% (56%) on any day. No real edge on the ASX: reference only.",
+                lift="Tested 2007–26: indices +0.19% a trade vs +0.27% holding any 16 days; top-50 stocks +0.66% vs +0.94%. No edge on the ASX: reference only.", alert_w=False),
+    "UK": dict(w="Tested on FTSE 100 / 250 / All-Share 2005–26 (111 W's): next 20 sessions avg −0.1% vs +0.5% on any day. Worse than random in the UK: reference only.",
+               lift="Tested 2007–26: indices +0.30% vs +0.32% holding any 16 days; top-50 stocks +0.03% vs +0.40%. No edge in the UK: reference only.", alert_w=False),
+}
 
 
 def dl(tickers, start, minrows=150):
@@ -158,7 +167,7 @@ def run(mk):
         pw = {(r["index"], r.get("broke_on")) for r in json.load(open(f"{PATH[mk]}/index_w.json")).get("rows", []) if r.get("status") == "broken"}
     except Exception:  # noqa: BLE001
         pw = set()
-    json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00"), asof=str(asof.date()), market=mk, rows=wr,
+    json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00"), asof=str(asof.date()), market=mk, rows=wr, test=TEST[mk]["w"],
                    rule=IW.__doc__.split("Output:")[0].strip()), open(f"{PATH[mk]}/index_w.json", "w"), indent=1)
     # 2. EMA 9 lift-off
     er = []
@@ -175,7 +184,7 @@ def run(mk):
         prev = json.load(open(f"{PATH[mk]}/ema_lift.json"))
     except Exception:  # noqa: BLE001
         pass
-    json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00"), asof=str(asof.date()), market=mk, ema=9, rows=er,
+    json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00"), asof=str(asof.date()), market=mk, ema=9, rows=er, test=TEST[mk]["lift"],
                    rule=EL.__doc__.split("Data:")[0].strip()), open(f"{PATH[mk]}/ema_lift.json", "w"), indent=1)
     for r in wr:
         print("W|", r["index"], r["status"], r.get("broke_on") or r.get("line_now"))
@@ -183,11 +192,9 @@ def run(mk):
         if r["index"] or r["status"] != "riding":
             print("E|", r["symbol"], r["status"], r["signal"], r["gain"])
     if os.environ.get("SEND_TELEGRAM") == "1":
+        # messages only where the rule tested positive on this market (US index W); everything else is shown in the app only
         msgs = [f"{r['index']}: broke its falling trendline after a W on {r['broke_on']}" for r in wr
-                if r["status"] == "broken" and r["days_ago"] <= 1 and (r["index"], r["broke_on"]) not in pw]
-        if prev.get("asof") != str(asof.date()):
-            msgs += [f"{r['symbol']}: {'whole candle above its rising 9 EMA (lift-off)' if r['status'] == 'lift-off today' else 'whole candle below the 9 EMA - ride over'}"
-                     for r in er if r["status"] in ("lift-off today", "left below")]
+                if TEST[mk]["alert_w"] and r["status"] == "broken" and r["days_ago"] <= 1 and (r["index"], r["broke_on"]) not in pw]
         if msgs:
             try:
                 import notify
