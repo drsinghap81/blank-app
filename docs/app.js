@@ -6123,7 +6123,7 @@ function commodityLines(A, mk = 'NSE') {
 /* 20 Nov 2026 (Amritpal: "match ETFs with Trading 212 symbols - I can't find Global X FANG"): Trading 212 lists US and European
    (LSE/Xetra) instruments, not ASX ones. US ETFs: same ticker (Trading 212 AU account); LSE ETFs: same ticker (UK ISA);
    ASX ETFs: the US-listed equivalent where there is a close one, else "not on Trading 212". Availability is not checked live. */
-const ASX_T212 = { FANG: 'FNGS', NDQ: 'QQQ', HNDQ: 'QQQ', IVV: 'IVV', VTS: 'VTI', VEU: 'VEU', CETF: 'MCHI', RBTZ: 'BOTZ', SEMI: 'SOXX', HACK: 'HACK',
+const ASX_T212 = { FANG: 'MAGS or QQQ', NDQ: 'QQQ', HNDQ: 'QQQ', IVV: 'IVV', VTS: 'VTI', VEU: 'VEU', CETF: 'MCHI', RBTZ: 'BOTZ', SEMI: 'SOXX', HACK: 'HACK',
   GOLD: 'GLD', QAU: 'GLD', OOO: 'USO', IOO: 'IOO', VGS: 'VEA', VGAD: 'VEA', IEM: 'EEM', VGE: 'VWO', ASIA: 'AAXJ', IXJ: 'IXJ', TECH: 'IXN', ETHI: 'ESGV',
   MNRS: 'GDX', ACDC: 'LIT', ERTH: 'ICLN', DRUG: 'IXJ', FUEL: 'IXC', BNKS: 'IXG', ROBO: 'ROBO', CRYP: 'BITQ', IJH: 'IJH', IJR: 'IJR', QUAL: 'QUAL', MOAT: 'MOAT' };
 function t212(r, mk) {
