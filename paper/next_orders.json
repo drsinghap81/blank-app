@@ -1,22 +1,22 @@
 {
   "BANKNIFTY": {
-    "date": "2026-11-18 00:00:00",
-    "close": 61946.8,
+    "date": "2026-11-19 00:00:00",
+    "close": 63079.6,
     "prev_top": 62316.8,
-    "prev_bottom": 60933.4,
+    "prev_bottom": 61946.8,
     "position": "LONG from 54,403.00 (2026-10-28)",
     "orders": [
-      "HOLD long. Stop: Sell below 60,908 \u2014 system point (exit & REVERSE)",
+      "HOLD long. Stop: Sell below 61,922 \u2014 system point (exit & REVERSE)",
       "Gap > 1% beyond a level at the open: exit only, no new trade (let the market settle)"
     ],
     "lines": {
       "Entry": 54403.0,
-      "Stop-loss (reverse)": 60908.4
+      "Stop-loss (reverse)": 61921.8
     },
-    "open_pnl": 7543.8,
+    "open_pnl": 8676.6,
     "breakeven_active": "True",
     "futures_contract_expiry": "2026-11-23",
     "lot_size": 30,
-    "spot_close": 62038.65
+    "spot_close": 63063.0
   }
 }
