@@ -6187,7 +6187,8 @@ async function alertsCard(box, mk) {
     ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
-    ${fundWLines(state.fund, mk)}${commodityLines(state.assets)}
+    ${(() => { const fw = fundWLines(state.fund, mk), fa = fundAthLines(state.fund, mk);
+      return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets)}
     ${athLines(AT, mk)}${fundAthLines(state.fund, mk)}
     ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
