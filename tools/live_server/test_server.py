@@ -1117,7 +1117,7 @@ def test_turtle_mcx_dry_then_live(tmp_path):
         L = T.st["plan"]["NATGASMINI"]
         assert L["trigger"] == round(max(x[2] for x in b.fcandles[-20:]) + 0.1, 2)
         assert "BUY 2 NATGASMINI24DEC26FUT" in T.st["orders"]["NATGASMINI"]["planned"] and not b.nfo      # dry run: nothing sent
-        T.set_live(True); T.st["orders"]["NATGASMINI"] = {}
+        T.set_live(True)                                   # same day: the dry-run plan must not block the live order
         T.run_once()
         o = [x for x in b.nfo.values() if x["side"] == "BUY"]
         assert len(o) == 1 and o[0]["trigger"] == L["trigger"] and o[0]["qty"] == 2

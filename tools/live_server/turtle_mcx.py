@@ -54,7 +54,12 @@ class TurtleMCX:
     # ------------------------------------------------------------------ app
     def set_live(self, on):
         with self.lock:
-            self.st["live"] = bool(on); self.note(f"mode: {'LIVE orders' if on else 'dry run'}"); self._save()
+            self.st["live"] = bool(on); self.note(f"mode: {'LIVE orders' if on else 'dry run'}")
+            if on:   # 19 Nov 2026 bug: a buy planned in dry run earlier the same day blocked the live order until the next day
+                for name, o in self.st.get("orders", {}).items():
+                    if name not in self.st.get("pos", {}) and not o.get("entry_oid") and not o.get("stop_oid"):
+                        o.pop("entry_day", None)
+            self._save()
 
     def arm(self, name, lots, on=True, mult=None):
         name = name.upper().replace("MCX:", "")
@@ -187,7 +192,7 @@ class TurtleMCX:
                     o["rej_alert"] = True
                     self.alert(f"Turtle MCX {name}: Angel {e.get('status')} the buy order: {str(e.get('text') or '')[:100]}", key=f"tmcx:rej:{name}:{day}")
                 return
-        if o.get("entry_day") == day:
+        if o.get("entry_day") == day and (o.get("entry_oid") or not live):
             return
         ltp = self.b.ltp_ex("MCX", c["tsym"], c["token"]) if live else 0
         if live and ltp and ltp >= L["trigger"]:
