@@ -3851,8 +3851,10 @@ def _loop():
                 us_watch_check(mk="ASX")
             if _sy.weekday() < 5 and (16, 20) <= (_sy.hour, _sy.minute) <= (16, 50) and _HB.get("asx_eod") != _sy.date():
                 _HB["asx_eod"] = _sy.date(); us_watch_eod(_sy, mk="ASX"); perf_record("ASX")
-            if t.weekday() < 5 and (9, 30) <= (t.hour, t.minute) <= (15, 35) and not _OPTSCAN["running"] \
-                    and time.time() - _OPTSCAN.get("last", 0) > 900:                   # option systems on 5m/15m/1h, every 15 min
+            # 19 Nov 2026: the ~440-call option chart scan no longer runs in market hours (it took Angel's rate limit away from the
+            # live 5-minute option trader, whose checks then took 9 minutes); once after the close instead
+            if t.weekday() < 5 and (15, 36) <= (t.hour, t.minute) <= (16, 30) and not _OPTSCAN["running"] \
+                    and time.time() - _OPTSCAN.get("last", 0) > 3 * 3600:
                 threading.Thread(target=opt_intra_scan, daemon=True).start()
             if t.weekday() < 5 and (23, 40) <= (t.hour, t.minute) <= (23, 58) and _HB.get("fo_mcx") != t.date():
                 _HB["fo_mcx"] = t.date(); fo_check()
@@ -4081,7 +4083,8 @@ def otr_job():
 
         def pcr():
             return requests.get(PLAN_URL.rsplit("/", 1)[0] + "/pcr.json", timeout=30).json()
-        _otr["j"] = opt_trader.OptTrader(broker, DATA, rows, pcr, log=lambda ev, **kw: log(ev, **kw))
+        _otr["j"] = opt_trader.OptTrader(broker, DATA, rows, pcr, log=lambda ev, **kw: log(ev, **kw),
+                                         alert=lambda text, key=None: alert("opt_trader", "OPTIONS", text, key=key, mk="NSE"))
     return _otr["j"]
 
 

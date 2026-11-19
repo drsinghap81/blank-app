@@ -67,8 +67,10 @@ def rnd(v, tick=0.05, up=False):
 
 
 class OptTrader:
-    def __init__(self, broker, data_dir, rows_fn, pcr_fn, log=lambda ev, **kw: print(ev, kw)):
+    def __init__(self, broker, data_dir, rows_fn, pcr_fn, log=lambda ev, **kw: print(ev, kw), alert=None):
         self.b, self.rows_fn, self.pcr_fn, self.log = broker, rows_fn, pcr_fn, log
+        self.alert = alert or (lambda text, key=None: None)
+        self.hist, self.hist_day, self.warm_day, self.cycle_secs = {}, None, None, None
         self.dir = data_dir
         self.sp = os.path.join(data_dir, "opt_trader.json"); self.mp = os.path.join(data_dir, "opt_trader_mode.json")
         self.hp = os.path.join(data_dir, "opt_trader_hist.jsonl")
@@ -181,11 +183,20 @@ class OptTrader:
             self.note(f"{t['key']} bought on Angel {e} · stop {stop} placed")
         except Exception as ex:  # noqa: BLE001
             t["live_state"] = f"bought · STOP NOT PLACED - put it in Angel: {str(ex)[:100]}"
+            self.alert(f"{t['key']}: bought on Angel at {e} but the STOP was NOT placed - put a stop at {stop} in Angel now", key=f"otr:nostop:{t['key']}:{t['signal']}")
             self.note(f"{t['key']} bought on Angel {e} · STOP NOT PLACED: {str(ex)[:80]}")
 
     def _loop(self):
         while True:
             t = now_ist()
+            if t.weekday() < 5 and (9, 0) <= (t.hour, t.minute) < (9, 15) and self.warm_day != str(t.date()):
+                try:
+                    self.prewarm()
+                except Exception as ex:  # noqa: BLE001
+                    self.last_error = f"{now_ist():%H:%M} prewarm: {str(ex)[:180]}"
+                    self.alert(f"Option trader could not get ready before the open: {str(ex)[:120]}", key=f"otr:warm:{t.date()}")
+                    time.sleep(60)
+                continue
             if t.weekday() < 5 and (9, 20) <= (t.hour, t.minute) <= (15, 31):
                 # run 25 s after each 5-minute candle closes
                 nxt = (t.replace(second=0, microsecond=0) + timedelta(minutes=5 - t.minute % 5)) + timedelta(seconds=25)
@@ -197,8 +208,32 @@ class OptTrader:
             else:
                 time.sleep(60)
 
+    def prewarm(self):
+        """19 Nov 2026: before 09:15 build the contract list and load the earlier days' 5-minute candles of every contract once, so each
+        5-minute check only downloads today's candles (one light call per contract instead of six days)."""
+        t0 = time.time(); self._stage("getting ready before the open")
+        uni = self.universe(); n = 0
+        for u in uni:
+            for side in ("ce", "pe"):
+                try:
+                    self._bars(u[side]["token"]); n += 1
+                except Exception as ex:  # noqa: BLE001
+                    self.log("opt_trader_fetch", symbol=u["symbol"], error=str(ex)[:120])
+        self.warm_day = str(now_ist().date())
+        self._stage(f"ready: {n} contracts loaded in {time.time() - t0:.0f} s, first check 09:20")
+        self.note(f"ready before the open: {len(uni)} underlyings, {n} contracts, {time.time() - t0:.0f} s")
+        self.alert(f"Option trader ready: {len(uni)} underlyings, {n} contracts{' · LIVE orders ON' if self.live() else ' · paper only'}",
+                   key=f"otr:ready:{now_ist().date()}")
+
     def _bars(self, token):
-        B = self.b.candles_int("NFO", token, "FIVE_MINUTE", 6)
+        day = str(now_ist().date())
+        if self.hist_day != day:
+            self.hist, self.hist_day = {}, day
+        if token in self.hist:                               # earlier days already cached: only today's candles
+            B = self.hist[token] + list(self.b.candles_int("NFO", token, "FIVE_MINUTE", 0))
+        else:
+            B = list(self.b.candles_int("NFO", token, "FIVE_MINUTE", 6))
+            self.hist[token] = [x for x in B if str(x[0])[:10] < day]
         cut = now_ist() - timedelta(minutes=5)
         out = []
         for x in B:
@@ -213,8 +248,21 @@ class OptTrader:
         return out
 
     def cycle(self):
+        t0 = time.time()
+        try:
+            self._cycle()
+        except Exception as ex:
+            self.alert(f"Option trader check failed: {str(ex)[:140]}", key=f"otr:err:{now_ist():%Y-%m-%d %H}")
+            raise
+        finally:
+            self.cycle_secs = round(time.time() - t0)
+        if self.cycle_secs > 150:
+            self.alert(f"Option trader is slow: the {now_ist():%H:%M} check took {self.cycle_secs} s (should be under 90 s). "
+                       f"Signals are acted on late; consider Paper only.", key=f"otr:slow:{now_ist():%Y-%m-%d %H}")
+
+    def _cycle(self):
         # 19 Nov 2026: candles are fetched OUTSIDE the lock (it takes tens of seconds) so the 10-second fill watcher can place stops meanwhile
-        BUSY.set()
+        BUSY.set(); self._t_fetch = time.time()
         try:
             uni = self.universe(); day = str(now_ist().date())
             bars = {}; N = 2 * len(uni); k = 0
@@ -259,7 +307,8 @@ class OptTrader:
                 if t["state"] == "closed" and t.get("live_entry") is not None and t.get("live_exit") is None:
                     self._live_exit(t, om)
             first = self.last_cycle is None
-            self.last_cycle = now_ist().strftime("%H:%M:%S"); self._stage(f"check done at {self.last_cycle}, next in 5 minutes")
+            self.last_cycle = now_ist().strftime("%H:%M:%S")
+            self._stage(f"check done at {self.last_cycle} in {time.time() - getattr(self, '_t_fetch', time.time()):.0f} s, next in 5 minutes")
             if first:
                 self.note(f"first check done: {sum(1 for v in bars.values() if v)} of {2 * len(uni)} contracts had candles")
             self._save()
@@ -325,6 +374,7 @@ class OptTrader:
                 t["live_state"] = "buy order on Angel"
             except Exception as ex:  # noqa: BLE001
                 t["live_state"] = f"buy order rejected: {str(ex)[:120]}"
+                self.alert(f"{key}: Angel rejected the live buy: {str(ex)[:100]}", key=f"otr:rej:{key}:{A[i][0]}")
         self.st["trades"].append(t)
         self.note(f"{key} signal {hm}: buy above {trig}{' (LIVE order sent)' if t.get('oid') else ''}")
 
@@ -437,6 +487,7 @@ class OptTrader:
             t["live_exit_oid"] = self.b.nfo_order(t["tsym"], t["token"], "SELL", t["lot"], rnd(ltp * 0.98)); t["live_state"] = "sell order on Angel"
         except Exception as ex:  # noqa: BLE001
             t["live_state"] = f"SELL FAILED - close it in Angel: {str(ex)[:80]}"
+            self.alert(f"{t['key']}: the live SELL failed - close it in Angel: {str(ex)[:80]}", key=f"otr:sellfail:{t['key']}:{t['signal']}")
 
     # ------------------------------------------------------------------ app
     def stop_today(self):
@@ -491,7 +542,7 @@ class OptTrader:
         return dict(live=self.live(), day=self.st.get("day"), stopped=self.st.get("stopped"), trades=self.st.get("trades", []),
                     notes=self.st.get("notes", [])[-12:], day_pnl=self.day_pnl(), open=self._open_count(), cfg=CFG,
                     universe=len(self.uni or []), last_cycle=self.last_cycle, last_error=self.last_error,
-                    stage=self.stage, stage_at=self.stage_at, running=bool(self.thread and self.thread.is_alive()),
+                    stage=self.stage, stage_at=self.stage_at, cycle_secs=self.cycle_secs, ready=self.warm_day == str(now_ist().date()), running=bool(self.thread and self.thread.is_alive()),
                     watcher=bool(self.fast and self.fast.is_alive()),
                     history=dict(days=len(D), trades=sum(d["n"] for d in D), pnl=sum(d["pnl"] for d in D),
                                  wins=sum(d["wins"] for d in D), up_days=sum(d["pnl"] > 0 for d in D), live_pnl=sum(d["live_pnl"] for d in D),

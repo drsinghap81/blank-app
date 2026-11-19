@@ -1065,3 +1065,32 @@ def test_opt_trader_paper_and_live(tmp_path):
         assert H["compare"]["n"] == 2 and H["compare"]["entry_slip_pct"] == 0 and H["live_pnl"] == H["compare"]["live"]
     finally:
         O.CFG["lull"] = lull; O.now_ist = now0
+
+
+def test_opt_trader_fetches_earlier_days_once(tmp_path):
+    """19 Nov 2026: earlier days are downloaded once a day (prewarm before 09:15); each check then asks Angel for today's candles only."""
+    import opt_trader as O, brokers
+    from datetime import datetime
+    b = brokers.MockBroker({}, ".")
+    calls = []
+
+    def ci(ex, token, iv, days):
+        calls.append(days)
+        old = [("2026-11-18T15:20", 1, 1, 1, 1, 10), ("2026-11-18T15:25", 1, 1, 1, 1, 10)]
+        today = [("2026-11-19T09:15", 2, 2, 2, 2, 5), ("2026-11-19T09:20", 3, 3, 3, 3, 5)]
+        return (old if days else []) + today
+    b.candles_int = ci
+    b.opt_token = lambda n, e, k, t: (f"{n}{t}", f"{n}{t}")
+    sent = []
+    T = O.OptTrader(b, str(tmp_path), lambda: [dict(symbol="NIFTY", kind="index", strike=100, expiry="2026-11-25", lot=65)],
+                    lambda: {"rows": {}}, log=lambda *a, **k: None, alert=lambda text, key=None: sent.append(text))
+    now0 = O.now_ist
+    try:
+        O.now_ist = lambda: datetime.fromisoformat("2026-11-19T09:05").replace(tzinfo=O.IST)
+        T.prewarm()
+        assert calls == [6, 6] and T.warm_day == "2026-11-19" and sent and "ready" in sent[0]
+        O.now_ist = lambda: datetime.fromisoformat("2026-11-19T09:30").replace(tzinfo=O.IST)
+        B = T._bars("NIFTYCE")
+        assert calls[-1] == 0 and [x[0] for x in B] == ["2026-11-18T15:20", "2026-11-18T15:25", "2026-11-19T09:15", "2026-11-19T09:20"]
+    finally:
+        O.now_ist = now0

@@ -10,6 +10,18 @@ log() { echo "$(date -u +%FT%TZ) $*" >> "$LOG"; tail -n 400 "$LOG" > "$LOG.tmp" 
 for alt in $APP/repo/tools/live_server/var; do for c in cmd_update cmd_restart; do [ -f "$alt/$c" ] && mv -f "$alt/$c" "$VAR/$c"; done; done   # if DATA_DIR isn't set
 if [ -f "$VAR/cmd_update" ]; then rm -f "$VAR/cmd_update"; log "update requested from the app"; bash $APP/repo/tools/live_server/deploy/autoupdate.sh --now; echo 0 > "$F"; exit 0; fi
 if [ -f "$VAR/cmd_restart" ]; then rm -f "$VAR/cmd_restart"; log "restart requested from the app"; systemctl restart trenddesk; echo 0 > "$F"; exit 0; fi
+# 19 Nov 2026: a 1 GB swap file (the server has ~400 MB of RAM; a restart that loads Angel's contract list could freeze it)
+if [ -z "$(swapon --show --noheadings 2>/dev/null)" ] && [ ! -f "$VAR/swap_failed" ]; then
+  if [ ! -f /swapfile ]; then
+    { fallocate -l 1G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=1024; } >> "$LOG" 2>&1 && chmod 600 /swapfile && mkswap /swapfile >> "$LOG" 2>&1
+  fi
+  if swapon /swapfile >> "$LOG" 2>&1; then
+    grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    sysctl -q vm.swappiness=10; log "swap file on (1 GB)"
+  else
+    touch "$VAR/swap_failed"; log "could not turn on the swap file"
+  fi
+fi
 # 18 Nov 2026: Top Bottom (Bank Nifty) bot - the app's switch creates var/tb, but the bot service may never have been set up.
 # Install it once (keeps the app's Live / auto-approve settings); on a weekday 08:25-15:20 IST start it once that day if it is not running.
 TB=$VAR/tb
