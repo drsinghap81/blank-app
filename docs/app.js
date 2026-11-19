@@ -1705,6 +1705,14 @@ function renderTrends() {
   const track = 'Tracked signals are not your trades: each signal is followed as if bought at the next open, until its stop or a red Supertrend. Use it to see whether a signal you missed is still running.';
   const baseNote = '<b>Watch-only: use it to time a buy.</b> A tight base is 10 sessions within 12% high to low, back at the 20 SMA, on below-average volume. The breakout is a close above the base high on at least 1.5× normal volume; the tested way is to buy at the next open, stop at the 5-day low, and exit when Supertrend turns red. On its own it made about 16% a year, against about 27% for 9/21, so it is best for timing 9/21 buys.';
   note.innerHTML = warn ? warn : (state.tab === 'open' ? track : state.tab === 'base' ? baseNote : '');
+  if (!warn && state.tab === 'base') {      /* 19 Nov 2026: the same tight bases in TradingView */
+    note.insertAdjacentHTML('beforeend', '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px"><button class="bg-ghost sm" id="tbpine">Copy TradingView indicator</button><button class="bg-ghost sm" id="tbwl">Download TradingView watchlist</button></div>');
+    const pn = $('#tbpine'), wl = $('#tbwl');
+    const save = async (url, name) => { const t = await (await fetch(url + '?t=' + Date.now())).text(); const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([t], { type: 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); };
+    pn.addEventListener('click', async () => { let t = null; try { t = await (await fetch(MAIN + 'tools/tradingview/tight_base.pine?t=' + Date.now())).text(); await navigator.clipboard.writeText(t); pn.textContent = 'Copied ✓ paste it in TradingView › Pine Editor › Add to chart'; } catch (e) { try { await save(MAIN + 'tools/tradingview/tight_base.pine', 'tight_base.pine'); pn.textContent = 'Downloaded tight_base.pine'; } catch (e2) { pn.textContent = 'Could not load it'; } } });
+    wl.addEventListener('click', async () => { try { await save(MAIN + 'data/scan/tight_bases_tradingview.txt', 'tight_bases_watchlist.txt'); wl.textContent = 'Downloaded ✓ TradingView › Watchlist › Import list'; } catch (e) { wl.textContent = 'Could not load it'; } });
+  }
   note.className = warn ? 'note warn' : 'note';
   note.hidden = !note.innerHTML;
   document.querySelectorAll('.tabs button').forEach((b) => {

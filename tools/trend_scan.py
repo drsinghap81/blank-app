@@ -466,6 +466,17 @@ def main():
         B = B.sort_values(["order", "dist_pct", "days_ago"]).drop(columns="order")
         chart_syms = chart_syms | set(B.symbol)
     tbs = {r["symbol"]: r for r in B.to_dict("records")} if len(B) else {}
+    if MARKET == "NSE":             # TradingView watchlist (File > Import list) for the Tight bases tab
+        tvs = lambda x: ("BSE:" + x[:-3]) if x.endswith(".BO") else "NSE:" + x.replace("&", "_").replace("-", "_")  # noqa: E731
+        live = set(E[E.status.str.startswith("NEW") | (E.status == "open")].symbol) if len(E) else set()
+        parts = []
+        if len(B):
+            for title, m in (("Tight base breakouts", ~(B.status == "base forming")),
+                             ("Tight base forming + 9/21", (B.status == "base forming") & B.symbol.isin(live)),
+                             ("Tight base forming", (B.status == "base forming") & ~B.symbol.isin(live))):
+                if m.any():
+                    parts += ["###" + title] + [tvs(x) for x in B[m].symbol]
+        open(f"{OUT}/tight_bases_tradingview.txt", "w").write(",".join(parts))
     export_charts(frames, chart_syms, tbs)
     spark = {k: [round(float(x), 2) for x in frames[k][3].iloc[-60:].values] for k in chart_syms if k in frames}
     p["spark"] = p.symbol.map(spark)

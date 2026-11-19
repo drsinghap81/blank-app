@@ -1,0 +1,59 @@
+// Trend Desk - tight base (19 Nov 2026). Same rules as the Trend Desk app's "Tight bases" tab (Trend page). Daily chart.
+// Add to any chart (Pine Editor > paste > Add to chart). It redraws on every symbol you open.
+//   Trend    : close > SMA 50, SMA 20 > SMA 50, RSI(14) > 50, 20-day average volume > the minimum below
+//   Base     : the last 10 sessions within 12% high to low, the base low within 2% of the SMA 20, and the base's average volume
+//              below the 50-day average (volume drying up)
+//   Breakout : a close above the base high on >= 1.5x the 20-day average volume
+//              (tested: buy at the next open, stop = 5-day low, exit when Supertrend(10,3) turns red)
+// Drawn: saffron box = a base still forming today, with a dashed "buy above" line at the base high and the 5-day-low stop;
+//        green boxes + "BO" labels = past breakouts. Alerts: create an alert on this indicator with "Any alert() function call" -
+//        it fires on a breakout close. Watch only, not a buy signal on its own.
+//@version=5
+indicator("Trend Desk - tight base", shorttitle="TD base", overlay=true, max_boxes_count=60, max_lines_count=20, max_labels_count=60)
+
+LEN    = input.int(10, "Base length (sessions)", minval=5, maxval=40)
+MAXR   = input.float(12.0, "Max base range, high to low %", minval=2, step=0.5)
+TOUCH  = input.float(2.0, "Base low within % of SMA 20", minval=0, step=0.5)
+VOLX   = input.float(1.5, "Breakout volume, x 20-day average", minval=1, step=0.1)
+MINVOL = input.float(500000, "Minimum 20-day average volume (shares)", minval=0)
+SHOWBO = input.bool(true, "Show past breakouts")
+
+s20  = ta.sma(close, 20)
+s50  = ta.sma(close, 50)
+r14  = ta.rsi(close, 14)
+vs20 = ta.sma(volume, 20)
+vs50 = ta.sma(volume, 50)
+trend = close > s50 and s20 > s50 and r14 > 50 and vs20 > MINVOL
+
+bh   = ta.highest(high, LEN)
+bl   = ta.lowest(low, LEN)
+vavg = ta.sma(volume, LEN)
+isBase = (bh / bl - 1) * 100 <= MAXR and bl <= s20 * (1 + TOUCH / 100) and vavg < vs50
+
+breakout = trend and isBase[1] and close > bh[1] and volume >= VOLX * vs20
+stop5 = ta.lowest(low, 5)
+
+orange = color.new(#E8833A, 0)
+green  = color.new(#1F9D63, 0)
+
+if breakout and SHOWBO
+    box.new(bar_index - LEN, bh[1], bar_index - 1, bl[1], border_color=green, bgcolor=color.new(#1F9D63, 88), border_width=1)
+    label.new(bar_index, low, "BO " + str.tostring(volume / vs20, "#.0") + "x", style=label.style_label_up, color=green, textcolor=color.white, size=size.tiny)
+
+if breakout
+    alert(syminfo.ticker + " tight-base breakout: close " + str.tostring(close, format.mintick) + " above " + str.tostring(bh[1], format.mintick) + " on " + str.tostring(volume / vs20, "#.0") + "x volume. Tested: buy next open, stop 5-day low " + str.tostring(stop5, format.mintick), alert.freq_once_per_bar_close)
+
+var box   fb = na
+var line  fl = na
+var line  fs = na
+var label ft = na
+if barstate.islast
+    box.delete(fb)
+    line.delete(fl)
+    line.delete(fs)
+    label.delete(ft)
+    if isBase and trend and close <= bh
+        fb := box.new(bar_index - LEN + 1, bh, bar_index, bl, border_color=orange, bgcolor=color.new(#E8833A, 85), border_width=2)
+        fl := line.new(bar_index - LEN + 1, bh, bar_index + 8, bh, color=orange, style=line.style_dashed, width=2)
+        fs := line.new(bar_index - 4, stop5, bar_index + 8, stop5, color=color.new(#D64545, 0), style=line.style_dashed, width=1)
+        ft := label.new(bar_index + 8, bh, "Buy above " + str.tostring(bh, format.mintick) + " on a close, vol >= " + str.tostring(VOLX * vs20, format.volume) + " | range " + str.tostring((bh / bl - 1) * 100, "#.0") + "% | stop " + str.tostring(stop5, format.mintick), style=label.style_label_left, color=orange, textcolor=color.white, size=size.small)
