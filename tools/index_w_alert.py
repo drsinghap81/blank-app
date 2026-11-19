@@ -80,9 +80,34 @@ def latest(c):
     return None
 
 
+def extras(r, x):
+    """volume on the break day vs its 20-day average, and the EMA 9 lift-off state (whole candle above a rising EMA 9)"""
+    import ema_lift_alert as EL
+    out = {}
+    if x is None or x.empty:
+        return out
+    if r.get("broke_on") and "Volume" in x and x.Volume.notna().sum() > 30:
+        v = x.Volume; d = pd.Timestamp(r["broke_on"])
+        if d in v.index:
+            i = v.index.get_loc(d); avg = v.iloc[max(0, i - 20):i].mean()
+            if avg and avg > 0:
+                out["vol_ratio"] = round(float(v.iloc[i] / avg), 2)
+            # volume on the up-days since the 2nd low vs the down-days before it (rising volume on the rally)
+    s = EL.state(x[["Open", "High", "Low", "Close"]].dropna())
+    if s:
+        out.update(ema_status=s["status"], ema_since=s["signal"], ema_gain=s["gain"], ema9=s["ema"])
+    return out
+
+
 def main():
     s = pd.read_csv(f"{OUT}/sector_hist.csv.gz", parse_dates=["Date"])
     P = s.pivot_table(index="Date", columns="INDEX", values="CLOSE").sort_index()
+    try:
+        import index_ohlcv
+        X = index_ohlcv.update(KEEP)
+        XO = {k: g.set_index("Date").sort_index() for k, g in X.groupby("INDEX")}
+    except Exception as e:  # noqa: BLE001
+        print("index_ohlcv failed", e); XO = {}
     rows = []
     for ix in KEEP:
         if ix not in P.columns:
@@ -92,6 +117,8 @@ def main():
             continue
         r = latest(c)
         if r:
+            r.update(extras(r, XO.get(ix)))
+            r["full"] = bool(r["status"] == "broken" and (r.get("vol_ratio") or 0) >= 1.2 and r.get("ema_status") in ("riding", "lift-off today"))
             rows.append(dict(index=ix, **r))
     rows.sort(key=lambda r: (r["status"] != "broken", r.get("days_ago", 99), r.get("dist_pct", 99)))
     prev = {}
