@@ -79,7 +79,7 @@ class OptTrader:
         self.st = self._load()
         self.uni = None; self.uni_day = None; self.pcr = {}
         self.lock = threading.Lock(); self.thread = None; self.last_cycle = None; self.last_error = None
-        self.stage = "waiting for 09:25"; self.stage_at = None; self.fast = None
+        self.stage = "starting"; self.stage_at = None; self.fast = None; self.hlock = threading.Lock()
 
     # ------------------------------------------------------------------ state
     def _load(self):
@@ -141,6 +141,17 @@ class OptTrader:
         self.thread = threading.Thread(target=self._loop, daemon=True); self.thread.start()
         self.fast = threading.Thread(target=self._fast_loop, daemon=True); self.fast.start()
         threading.Thread(target=self._feed_loop, daemon=True).start()
+        t = now_ist()
+        if t.weekday() < 5 and (9, 15) <= (t.hour, t.minute) < (15, 30):      # started in market hours (a restart): get ready now
+            threading.Thread(target=self._warm_now, daemon=True).start()
+        else:
+            self._stage("waiting for the market (ready at 09:00, first check 09:20)")
+
+    def _warm_now(self):
+        try:
+            self.prewarm()
+        except Exception as ex:  # noqa: BLE001
+            self.last_error = f"{now_ist():%H:%M} get ready: {str(ex)[:180]}"
 
     # ------------------------------------------------------------------ live quote feed (19 Nov 2026)
     # Candle-history calls (one per contract every 5 minutes) took 8-12 s each on Angel and half came back empty, so a check
@@ -271,6 +282,7 @@ class OptTrader:
         5-minute check only downloads today's candles (one light call per contract instead of six days)."""
         t0 = time.time(); self._stage("getting ready before the open")
         uni = self.universe(); n = 0
+        self._stage(f"loading earlier days' candles for {2 * len(uni)} contracts (once a day); live quotes already on")
         for u in uni:
             for side in ("ce", "pe"):
                 try:
@@ -278,7 +290,7 @@ class OptTrader:
                 except Exception as ex:  # noqa: BLE001
                     self.log("opt_trader_fetch", symbol=u["symbol"], error=str(ex)[:120])
         self.warm_day = str(now_ist().date())
-        self._stage(f"ready: {n} contracts loaded in {time.time() - t0:.0f} s, first check 09:20")
+        self._stage(f"ready: {n} contracts loaded in {time.time() - t0:.0f} s, checks every 5 minutes")
         self.note(f"ready before the open: {len(uni)} underlyings, {n} contracts, {time.time() - t0:.0f} s")
         self.alert(f"Option trader ready: {len(uni)} underlyings, {n} contracts{' · LIVE orders ON' if self.live() else ' · paper only'}",
                    key=f"otr:ready:{now_ist().date()}")
@@ -298,6 +310,10 @@ class OptTrader:
         return out
 
     def _load_hist(self, token):
+        with self.hlock:                                     # the start-up warm-up and a check never download the same contract twice
+            self._load_hist1(token)
+
+    def _load_hist1(self, token):
         day = str(now_ist().date())
         if self.hist_day != day:
             self.hist, self.api_today, self.hist_day = {}, {}, day
