@@ -1,0 +1,357 @@
+{
+ "method": "ASX Materials clue as a filter for Indian METAL stocks intraday (20 Nov 2026, Amritpal: \"Yes\" - test it for the 5-minute option\ntrader). The option trader's own history is only ~3 weeks of 5-minute candles, so this uses daily open->close of the metal F&O\nstocks 2016-26 as the proxy for \"is today a CE day or a PE day\".\nClue = ASX 200 Materials (^AXMJ) minus ASX 200 (^AXJO), same date (full ASX day; at 09:15 IST ~80% of it is known).\n  strong  > +1%   weak  < -1%   (also +-0.5%)\nPer stock: open->close (absolute: what a CE / PE trader gets) and minus Nifty open->close. Filter: CE only when not weak, PE only\nwhen not strong. Output: data/research/asx_metal_filter.json",
+ "strong 0.5%": {
+  "oc": {
+   "n": 9287,
+   "avg": 0.182,
+   "up": 52
+  },
+  "vs_nifty": {
+   "n": 9287,
+   "avg": 0.268,
+   "up": 53
+  },
+  "2016-20": {
+   "n": 4115,
+   "avg": 0.07,
+   "up": 50
+  },
+  "2021-26": {
+   "n": 5172,
+   "avg": 0.271,
+   "up": 53
+  }
+ },
+ "weak 0.5%": {
+  "oc": {
+   "n": 8637,
+   "avg": -0.485,
+   "up": 38
+  },
+  "vs_nifty": {
+   "n": 8637,
+   "avg": -0.438,
+   "up": 38
+  },
+  "2016-20": {
+   "n": 3825,
+   "avg": -0.437,
+   "up": 38
+  },
+  "2021-26": {
+   "n": 4812,
+   "avg": -0.524,
+   "up": 39
+  }
+ },
+ "neutral 0.5%": {
+  "oc": {
+   "n": 14543,
+   "avg": -0.1,
+   "up": 45
+  },
+  "vs_nifty": {
+   "n": 14543,
+   "avg": -0.041,
+   "up": 46
+  },
+  "2016-20": {
+   "n": 7847,
+   "avg": -0.107,
+   "up": 45
+  },
+  "2021-26": {
+   "n": 6696,
+   "avg": -0.092,
+   "up": 45
+  }
+ },
+ "strong 1%": {
+  "oc": {
+   "n": 4499,
+   "avg": 0.324,
+   "up": 54
+  },
+  "vs_nifty": {
+   "n": 4499,
+   "avg": 0.416,
+   "up": 56
+  },
+  "2016-20": {
+   "n": 1955,
+   "avg": 0.282,
+   "up": 55
+  },
+  "2021-26": {
+   "n": 2544,
+   "avg": 0.357,
+   "up": 54
+  }
+ },
+ "weak 1%": {
+  "oc": {
+   "n": 4281,
+   "avg": -0.624,
+   "up": 35
+  },
+  "vs_nifty": {
+   "n": 4281,
+   "avg": -0.586,
+   "up": 35
+  },
+  "2016-20": {
+   "n": 1689,
+   "avg": -0.44,
+   "up": 38
+  },
+  "2021-26": {
+   "n": 2592,
+   "avg": -0.744,
+   "up": 34
+  }
+ },
+ "neutral 1%": {
+  "oc": {
+   "n": 23687,
+   "avg": -0.116,
+   "up": 45
+  },
+  "vs_nifty": {
+   "n": 23687,
+   "avg": -0.053,
+   "up": 46
+  },
+  "2016-20": {
+   "n": 12143,
+   "avg": -0.167,
+   "up": 44
+  },
+  "2021-26": {
+   "n": 11544,
+   "avg": -0.062,
+   "up": 47
+  }
+ },
+ "all days": {
+  "oc": {
+   "n": 32467,
+   "avg": -0.122,
+   "up": 45
+  },
+  "vs_nifty": {
+   "n": 32467,
+   "avg": -0.059,
+   "up": 46
+  }
+ },
+ "filter 0.5%": {
+  "CE_all": {
+   "n": 32467,
+   "avg": -0.122,
+   "up": 45
+  },
+  "CE_skip_weak": {
+   "n": 23830,
+   "avg": 0.01,
+   "up": 48
+  },
+  "PE_all": {
+   "n": 32467,
+   "avg": 0.122,
+   "up": 54
+  },
+  "PE_skip_strong": {
+   "n": 23180,
+   "avg": 0.244,
+   "up": 56
+  },
+  "CE_only_strong": {
+   "n": 9287,
+   "avg": 0.182,
+   "up": 52
+  },
+  "PE_only_weak": {
+   "n": 8637,
+   "avg": 0.485,
+   "up": 61
+  }
+ },
+ "filter 1%": {
+  "CE_all": {
+   "n": 32467,
+   "avg": -0.122,
+   "up": 45
+  },
+  "CE_skip_weak": {
+   "n": 28186,
+   "avg": -0.046,
+   "up": 47
+  },
+  "PE_all": {
+   "n": 32467,
+   "avg": 0.122,
+   "up": 54
+  },
+  "PE_skip_strong": {
+   "n": 27968,
+   "avg": 0.194,
+   "up": 55
+  },
+  "CE_only_strong": {
+   "n": 4499,
+   "avg": 0.324,
+   "up": 54
+  },
+  "PE_only_weak": {
+   "n": 4281,
+   "avg": 0.624,
+   "up": 64
+  }
+ },
+ "by_stock": {
+  "COALINDIA": {
+   "strong": {
+    "n": 375,
+    "avg": 0.058,
+    "up": 47
+   },
+   "weak": {
+    "n": 357,
+    "avg": -0.377,
+    "up": 36
+   }
+  },
+  "HINDALCO": {
+   "strong": {
+    "n": 375,
+    "avg": 0.526,
+    "up": 60
+   },
+   "weak": {
+    "n": 357,
+    "avg": -0.552,
+    "up": 34
+   }
+  },
+  "HINDCOPPER": {
+   "strong": {
+    "n": 375,
+    "avg": 0.242,
+    "up": 47
+   },
+   "weak": {
+    "n": 357,
+    "avg": -0.942,
+    "up": 31
+   }
+  },
+  "HINDZINC": {
+   "strong": {
+    "n": 375,
+    "avg": 0.27,
+    "up": 54
+   },
+   "weak": {
+    "n": 357,
+    "avg": -0.541,
+    "up": 39
+   }
+  },
+  "JINDALSTEL": {
+   "strong": {
+    "n": 374,
+    "avg": 0.397,
+    "up": 55
+   },
+   "weak": {
+    "n": 357,
+    "avg": -0.614,
+    "up": 38
+   }
+  },
+  "JSL": {
+   "strong": {
+    "n": 375,
+    "avg": 0.143,
+    "up": 47
+   },
+   "weak": {
+    "n": 357,
+    "avg": -0.418,
+    "up": 38
+   }
+  },
+  "JSWSTEEL": {
+   "strong": {
+    "n": 375,
+    "avg": 0.294,
+    "up": 54
+   },
+   "weak": {
+    "n": 357,
+    "avg": -0.266,
+    "up": 39
+   }
+  },
+  "NATIONALUM": {
+   "strong": {
+    "n": 375,
+    "avg": 0.404,
+    "up": 55
+   },
+   "weak": {
+    "n": 356,
+    "avg": -0.773,
+    "up": 34
+   }
+  },
+  "NMDC": {
+   "strong": {
+    "n": 375,
+    "avg": 0.314,
+    "up": 57
+   },
+   "weak": {
+    "n": 357,
+    "avg": -0.677,
+    "up": 33
+   }
+  },
+  "SAIL": {
+   "strong": {
+    "n": 375,
+    "avg": 0.335,
+    "up": 55
+   },
+   "weak": {
+    "n": 356,
+    "avg": -0.735,
+    "up": 37
+   }
+  },
+  "TATASTEEL": {
+   "strong": {
+    "n": 375,
+    "avg": 0.438,
+    "up": 58
+   },
+   "weak": {
+    "n": 356,
+    "avg": -0.728,
+    "up": 34
+   }
+  },
+  "VEDL": {
+   "strong": {
+    "n": 375,
+    "avg": 0.469,
+    "up": 62
+   },
+   "weak": {
+    "n": 357,
+    "avg": -0.863,
+    "up": 32
+   }
+  }
+ }
+}
