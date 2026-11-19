@@ -6052,7 +6052,7 @@ async function tdTop5(box, mk) {
     if (o.ath && o.ath.lvl === 0) { const m = S.meta[sym] || {}; if (m.trigger) return `ATH momentum: buy above ${Mz(m.trigger)} · exit on a weekly close below the 30-week average (${Mz(m.sma30)}) · holds months, not weeks`; }
     const m = S.meta[sym] || {}; return m.stop ? `Stop ${Mz(m.stop)}${m.trigger ? ` · trigger ${Mz(m.trigger)}` : ''}` : 'Open the chart for the plan'; };
   const red = L.lvl === 'red';
-  box.innerHTML = `<section class="mx5 ${L.lvl}">${lightHTML(L, mk)}${mk === 'NSE' ? '<div class="idxw"></div>' : ''}
+  box.innerHTML = `<section class="mx5 ${L.lvl}">${lightHTML(L, mk)}${mk === 'NSE' ? '<div class="idxw"></div><div class="emal"></div>' : ''}
     <div class="mx5h"><b>Top 5 swing trades today</b><small>${C.length} swing setups now (9/21 buys, tight-base breakouts, bases near their trigger) · ranked by score · tap for the chart</small></div>
     ${top.length ? `<ol class="mx5l${red ? ' dim' : ''}">${top.map((x, i) => `<li><button data-m5="${esc(x.sym)}"><span class="mx5n">${i + 1}</span>
       <span class="mx5b"><b>${esc(x.sym)} <em class="mx5s">${x.p} pts</em>${x.stack ? ' <small class="chip">MA stack ✓</small>' : ''}</b>
@@ -6061,7 +6061,24 @@ async function tdTop5(box, mk) {
     ${red && top.length ? '<p class="down td-rs"><b>Red day:</b> these are shown for the record. Your rule is to wait.</p>' : ''}
     <p class="muted td-rs">Score: 9/21 buy +3 (trend running +1), tight-base breakout +2 (near trigger or recent +1), also an ATH breakout +2, IPO cup +1, 3-month gain top 20% +2 (top 40% +1), sector leading/uptrend +1 (weak −1), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></section>`;
   box.querySelectorAll('[data-m5]').forEach((b) => b.addEventListener('click', () => mxOpen(b.dataset.m5, mk, S)));
-  idxW(box.querySelector('.idxw'));
+  idxW(box.querySelector('.idxw')); emaLift(box.querySelector('.emal'));
+}
+/* 19 Nov 2026 (Amritpal): alert when a whole candle leaves a RISING 9 EMA; ride until a whole candle is below it. Info only.
+   Tested on daily futures 2007-26 (tools/research/ema_liftoff.py): Bank Nifty avg +1.95% a trade (42% win, PF 2.1; 2017-26 +0.94%),
+   Nifty +0.96%, 53 F&O stocks +1.46%. The candle alone does not predict direction; the short side lost money. */
+async function emaLift(el) {
+  if (!el) return; const d = await getJSON(MAIN + 'data/scan/ema_lift.json', 'ema_lift'); const R = (d && d.rows) || [];
+  if (!R.length) { el.innerHTML = ''; return; }
+  const nm = (s) => (s === 'BANKNIFTY' ? 'Bank Nifty' : s === 'NIFTY' ? 'Nifty' : s);
+  const n2 = (v) => Number(v).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  const line = (r) => r.status === 'lift-off today' ? `<span><b class="up">▲ ${esc(nm(r.symbol))}</b> whole candle above its rising 9 EMA today · close ${n2(r.close)}, EMA ${n2(r.ema)} · ride until a whole candle closes below the EMA</span>`
+    : r.status === 'left below' ? `<span><b class="down">▼ ${esc(nm(r.symbol))}</b> whole candle below the 9 EMA today: ride over · ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}% since the lift-off on ${esc(r.signal)}</span>`
+    : `<span>${esc(nm(r.symbol))}: riding since ${esc(r.signal)} (${r.days} sessions) · ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}% · EMA 9 at ${n2(r.ema)}</span>`;
+  const idx = R.filter((r) => r.index), today = R.filter((r) => !r.index && r.status !== 'riding'), ride = R.filter((r) => !r.index && r.status === 'riding');
+  el.innerHTML = `<div class="idxw-b"><b>EMA 9 lift-off · as of ${esc(d.asof || '')}</b>
+    ${idx.map(line).join('')}${today.map(line).join('') || '<span class="muted">No stock lifted off or fell below its 9 EMA today.</span>'}
+    ${ride.length ? `<details><summary>${ride.length} F&amp;O stocks riding</summary>${ride.map(line).join('<br>')}</details>` : ''}
+    <small>Info only. Lift-off = first whole candle (low) above a rising 9 EMA in 10 sessions; ride ends on the first whole candle (high) below it. Tested on daily futures 2007–26: Bank Nifty +1.95% a trade (42% won, profit factor 2.1; +0.94% since 2017), Nifty +0.96%, F&amp;O stocks +1.46%. Most trades are small losses; a few big trends pay. The candle alone doesn't predict direction, and shorting the mirror lost money. Covers Nifty, Bank Nifty and 53 F&amp;O stocks.</small></div>`;
 }
 /* 19 Nov 2026 (Amritpal, Bank Nifty chart): index early alert = W bottom + falling trendline break. Info only - entries stay on
    9/21 + the light. Tested on 23 NSE indices 2015-26 (tools/research/index_w_bottom.py): the break came before the 9/21 cross 71% of
