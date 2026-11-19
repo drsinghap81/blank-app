@@ -1,25 +1,91 @@
 {
-"generated": "2026-11-18T23:23+00:00",
-"asof": "2026-11-18",
+"generated": "2026-11-19T23:32+00:00",
+"asof": "2026-11-19",
 "market": "UK",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "UK: not backtested yet - watch only.",
 "rows": [
 {
+"symbol": "FRAS",
+"name": "Frasers Group",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 903.5,
+"level_kind": "breakout retest",
+"level_date": "2024-06-24",
+"close": 936.5,
+"above_pct": 3.652462645268395,
+"stop": 873.61,
+"risk_pct": 6.715734879109137,
+"resistance": 992.0,
+"room_r": 0.8824531516183991,
+"sq9": 961,
+"sq9_cross": "31\u00b2",
+"sq9_dist_pct": -5.983350676378773,
+"sq9_gap_pct": 13.319458896982317,
+"sq9_below": [
+[
+841,
+"29\u00b2"
+]
+],
+"sq9_above": [
+[
+961,
+"31\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "WWH",
+"name": "Worldwide Healthcare Trust",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 0,
+"level": 371.0,
+"level_kind": "breakout retest",
+"level_date": "2024-07-16",
+"close": 382.5,
+"above_pct": 3.0997304582210283,
+"stop": 361.55,
+"risk_pct": 5.476503915368225,
+"resistance": 397.0,
+"room_r": 0.6922024948370239,
+"sq9": 361,
+"sq9_cross": "19\u00b2",
+"sq9_dist_pct": 2.7700831024930705,
+"sq9_gap_pct": 22.160664819944607,
+"sq9_below": [
+[
+289,
+"17\u00b2"
+]
+],
+"sq9_above": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "MTRO",
 "name": "Metro Bank",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 0,
+"days_ago": 1,
 "level": 174.0,
 "level_kind": "breakout retest",
 "level_date": "2026-06-01",
-"close": 180.1999969482422,
-"above_pct": 3.5632166369208074,
-"stop": 162.75,
-"risk_pct": 9.684237899259307,
-"resistance": 182.8,
-"room_r": 0.14898897713804307,
+"close": 177.60000610351562,
+"above_pct": 2.068969025008971,
+"stop": 162.83,
+"risk_pct": 8.313789965672392,
+"resistance": 180.2,
+"room_r": 0.17608801337308158,
 "sq9": 169,
 "sq9_cross": "13\u00b2",
 "sq9_dist_pct": 2.9585798816567976,
@@ -43,16 +109,16 @@
 "name": "FirstGroup",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 1,
+"days_ago": 2,
 "level": 217.0,
 "level_kind": "old swing low",
 "level_date": "2025-07-24",
-"close": 228.8000030517578,
-"above_pct": 5.437789424773176,
-"stop": 208.72,
-"risk_pct": 8.776193496000317,
-"resistance": 232.0,
-"room_r": 0.1593629455382789,
+"close": 230.0,
+"above_pct": 5.990783410138256,
+"stop": 208.01,
+"risk_pct": 9.562702060486217,
+"resistance": 233.0,
+"room_r": 0.1363995048508954,
 "sq9": 225,
 "sq9_cross": "15\u00b2",
 "sq9_dist_pct": -3.5555555555555562,
@@ -72,6 +138,105 @@
 "sq9_match": false
 },
 {
+"symbol": "UU",
+"name": "United Utilities",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 1457.0,
+"level_kind": "breakout retest",
+"level_date": "2026-04-30",
+"close": 1509.0,
+"above_pct": 3.568977350720659,
+"stop": 1427.29,
+"risk_pct": 5.415128277951342,
+"resistance": 1586.0,
+"room_r": 0.9423076923076915,
+"sq9": 1521,
+"sq9_cross": "39\u00b2",
+"sq9_dist_pct": -4.207758053911903,
+"sq9_gap_pct": 10.519395134779753,
+"sq9_below": [
+[
+1369,
+"37\u00b2"
+]
+],
+"sq9_above": [
+[
+1521,
+"39\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "DGE",
+"name": "Diageo",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 1792.0,
+"level_kind": "breakout retest",
+"level_date": "2026-08-10",
+"close": 1865.0,
+"above_pct": 4.073660714285721,
+"stop": 1744.29,
+"risk_pct": 6.47261585599388,
+"resistance": 1948.0,
+"room_r": 0.687573964497041,
+"sq9": 1849,
+"sq9_cross": "43\u00b2",
+"sq9_dist_pct": -3.0827474310438086,
+"sq9_gap_pct": 9.518658734451058,
+"sq9_below": [
+[
+1681,
+"41\u00b2"
+]
+],
+"sq9_above": [
+[
+2025,
+"45\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "PCGH",
+"name": "Polar Capital Global Healthcare Trust",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 437.0,
+"level_kind": "breakout retest",
+"level_date": "2026-01-22",
+"close": 455.5,
+"above_pct": 4.233409610983974,
+"stop": 421.17,
+"risk_pct": 7.535902205466172,
+"resistance": 488.0,
+"room_r": 0.9468032188962349,
+"sq9": 441,
+"sq9_cross": "21\u00b2",
+"sq9_dist_pct": -0.9070294784580546,
+"sq9_gap_pct": 19.95464852607709,
+"sq9_below": [
+[
+361,
+"19\u00b2"
+]
+],
+"sq9_above": [
+[
+529,
+"23\u00b2"
+]
+],
+"sq9_match": true
+},
+{
 "symbol": "TBCG",
 "name": "TBC Bank",
 "status": "near",
@@ -82,10 +247,10 @@
 "level_date": "2025-08-07",
 "close": 5285.0,
 "above_pct": 4.240631163708097,
-"stop": 4799.65,
-"risk_pct": 9.183592298156851,
+"stop": 4822.22,
+"risk_pct": 8.7565075569756,
 "resistance": 5415.0,
-"room_r": 0.2678463703423609,
+"room_r": 0.28091015142285325,
 "sq9": 5041,
 "sq9_cross": "71\u00b2",
 "sq9_dist_pct": 0.5752826820075274,
@@ -105,37 +270,37 @@
 "sq9_match": true
 },
 {
-"symbol": "WWH",
-"name": "Worldwide Healthcare Trust",
+"symbol": "SVT",
+"name": "Severn Trent",
 "status": "near",
 "touch_date": null,
 "days_ago": null,
-"level": 371.0,
-"level_kind": "breakout retest",
-"level_date": "2024-07-16",
-"close": 389.0,
-"above_pct": 4.851752021563338,
-"stop": 361.95,
-"risk_pct": 6.954645051091102,
-"resistance": 397.0,
-"room_r": 0.295709594783738,
-"sq9": 361,
-"sq9_cross": "19\u00b2",
-"sq9_dist_pct": 2.7700831024930705,
-"sq9_gap_pct": 22.160664819944607,
+"level": 3047.0,
+"level_kind": "old swing low",
+"level_date": "2026-04-29",
+"close": 3180.0,
+"above_pct": 4.364949130292084,
+"stop": 2985.64,
+"risk_pct": 6.111859838274924,
+"resistance": 3255.0,
+"room_r": 0.3858875413450941,
+"sq9": 3025,
+"sq9_cross": "55\u00b2",
+"sq9_dist_pct": 0.727272727272732,
+"sq9_gap_pct": 7.404958677685958,
 "sq9_below": [
 [
-289,
-"17\u00b2"
+2809,
+"53\u00b2"
 ]
 ],
 "sq9_above": [
 [
-441,
-"21\u00b2"
+3249,
+"57\u00b2"
 ]
 ],
-"sq9_match": false
+"sq9_match": true
 }
 ]
 }

@@ -1,22 +1,62 @@
 {
-"generated": "2026-11-18T23:23+00:00",
-"asof": "2026-11-18",
+"generated": "2026-11-19T23:32+00:00",
+"asof": "2026-11-19",
 "market": "UK",
 "regime": null,
 "rules": "zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
 "backtest": "UK: not backtested yet - watch only.",
 "rows": [
 {
+"symbol": "BAB",
+"name": "Babcock International",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 1066.5,
+"neck": 1062.0,
+"to_neck_pct": -0.42194092827003704,
+"stop": 878.13,
+"stop_pct": 17.662447257383963,
+"height_pct": 19.702432978796946,
+"fall_pct": 69.29666133159418,
+"lows": [
+[
+"2026-10-13",
+887.2000122070312
+],
+[
+"2026-11-18",
+975.0
+]
+],
+"peaks": [
+[
+"2026-11-10",
+1062.0
+]
+],
+"rsi_lows": [
+30.0,
+44.8
+],
+"rsi_div": 0.0,
+"rsi_now": 61.0,
+"signal_date": "2026-11-19",
+"days_since": 0,
+"target": 1236.8,
+"sl": 1019.52
+},
+{
 "symbol": "MGNS",
 "name": "Morgan Sindall Group",
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 4394.0,
+"close": 4334.0,
 "neck": 4332.0,
-"to_neck_pct": -1.4110150204824756,
+"to_neck_pct": -0.046146746654363024,
 "stop": 3783.78,
-"stop_pct": 13.887573964497047,
+"stop_pct": 12.69543147208122,
 "height_pct": 12.344398340248963,
 "fall_pct": 39.71702880242547,
 "lows": [
@@ -40,9 +80,9 @@
 32.3
 ],
 "rsi_div": 7.0,
-"rsi_now": 59.8,
+"rsi_now": 55.2,
 "signal_date": "2026-11-06",
-"days_since": 8,
+"days_since": 9,
 "target": 4808.0,
 "sl": 4158.72
 },
@@ -52,11 +92,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 7465.0,
+"close": 7490.0,
 "neck": 7650.0,
-"to_neck_pct": 2.4782317481580662,
+"to_neck_pct": 2.1361815754339153,
 "stop": 6200.37,
-"stop_pct": 16.94081625711654,
+"stop_pct": 17.218049847713612,
 "height_pct": 21.42857142857142,
 "fall_pct": 26.349206349206344,
 "lows": [
@@ -80,51 +120,51 @@
 37.9
 ],
 "rsi_div": 0.0,
-"rsi_now": 53.4,
+"rsi_now": 54.4,
 "signal_date": null,
 "days_since": null,
 "target": 9000.0,
 "sl": 7344.0
 },
 {
-"symbol": "SHC",
-"name": "Shaftesbury Capital",
+"symbol": "MRO",
+"name": "Melrose Industries",
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 148.10000610351562,
-"neck": 152.8000030517578,
-"to_neck_pct": 3.173529206310155,
-"stop": 124.44,
-"stop_pct": 15.973671944497159,
-"height_pct": 20.31496303288016,
-"fall_pct": 26.92913145530882,
+"close": 477.0,
+"neck": 490.0,
+"to_neck_pct": 2.7253668763102645,
+"stop": 427.48,
+"stop_pct": 10.381134609006493,
+"height_pct": 11.79557692149693,
+"fall_pct": 55.55555710282552,
 "lows": [
 [
-"2026-05-15",
-127.0
+"2026-10-08",
+438.29998779296875
 ],
 [
-"2026-10-08",
-134.10000610351562
+"2026-10-23",
+452.6000061035156
 ]
 ],
 "peaks": [
 [
-"2026-08-25",
-152.8000030517578
+"2026-10-21",
+490.0
 ]
 ],
 "rsi_lows": [
-37.8,
-37.4
+31.7,
+40.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 57.3,
+"rsi_now": 50.5,
 "signal_date": null,
 "days_since": null,
-"target": 178.6,
-"sl": 146.69
+"target": 541.7,
+"sl": 470.4
 },
 {
 "symbol": "HWDN",
@@ -132,11 +172,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 838.5,
+"close": 828.0,
 "neck": 867.5,
-"to_neck_pct": 3.458556946929048,
+"to_neck_pct": 4.770531400966194,
 "stop": 708.35,
-"stop_pct": 15.522361359570658,
+"stop_pct": 14.451086956521731,
 "height_pct": 19.903248099516247,
 "fall_pct": 34.07049067035246,
 "lows": [
@@ -169,11 +209,51 @@
 26.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 58.0,
+"rsi_now": 52.6,
 "signal_date": null,
 "days_since": null,
 "target": 1011.5,
 "sl": 832.8
+},
+{
+"symbol": "SHC",
+"name": "Shaftesbury Capital",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 145.6999969482422,
+"neck": 152.8000030517578,
+"to_neck_pct": 4.873031058496036,
+"stop": 124.44,
+"stop_pct": 14.589567889307276,
+"height_pct": 20.31496303288016,
+"fall_pct": 26.92913145530882,
+"lows": [
+[
+"2026-05-15",
+127.0
+],
+[
+"2026-10-08",
+134.10000610351562
+]
+],
+"peaks": [
+[
+"2026-08-25",
+152.8000030517578
+]
+],
+"rsi_lows": [
+37.8,
+37.4
+],
+"rsi_div": 0.0,
+"rsi_now": 48.3,
+"signal_date": null,
+"days_since": null,
+"target": 178.6,
+"sl": 146.69
 },
 {
 "symbol": "ABF",
@@ -181,11 +261,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 2043.0,
+"close": 2003.0,
 "neck": 2130.0,
-"to_neck_pct": 4.2584434654919345,
+"to_neck_pct": 6.340489266100846,
 "stop": 1739.92,
-"stop_pct": 14.834801762114536,
+"stop_pct": 13.134048926610086,
 "height_pct": 21.091529277998866,
 "fall_pct": 32.859579306424116,
 "lows": [
@@ -209,51 +289,11 @@
 25.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 60.8,
+"rsi_now": 54.1,
 "signal_date": null,
 "days_since": null,
 "target": 2501.0,
 "sl": 2044.8
-},
-{
-"symbol": "MRO",
-"name": "Melrose Industries",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 469.20001220703125,
-"neck": 490.0,
-"to_neck_pct": 4.4330748618546245,
-"stop": 427.48,
-"stop_pct": 8.891309293825088,
-"height_pct": 11.79557692149693,
-"fall_pct": 55.55555710282552,
-"lows": [
-[
-"2026-10-08",
-438.29998779296875
-],
-[
-"2026-10-23",
-452.6000061035156
-]
-],
-"peaks": [
-[
-"2026-10-21",
-490.0
-]
-],
-"rsi_lows": [
-31.7,
-40.4
-],
-"rsi_div": 0.0,
-"rsi_now": 46.0,
-"signal_date": null,
-"days_since": null,
-"target": 541.7,
-"sl": 470.4
 },
 {
 "symbol": "STJ",
@@ -261,11 +301,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 1094.5,
+"close": 1081.0,
 "neck": 1196.5,
-"to_neck_pct": 9.319323892188214,
+"to_neck_pct": 10.684551341350602,
 "stop": 1001.38,
-"stop_pct": 8.507537688442213,
+"stop_pct": 7.364939870490284,
 "height_pct": 17.303921568627455,
 "fall_pct": 47.41338395823447,
 "lows": [
@@ -298,7 +338,7 @@
 40.2
 ],
 "rsi_div": 4.9,
-"rsi_now": 45.9,
+"rsi_now": 43.4,
 "signal_date": null,
 "days_since": null,
 "target": 1373.0,
@@ -310,11 +350,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 493.6000061035156,
+"close": 491.20001220703125,
 "neck": 569.0,
-"to_neck_pct": 15.275525316884186,
+"to_neck_pct": 15.838759336222807,
 "stop": 467.28,
-"stop_pct": 5.332254006900461,
+"stop_pct": 4.86970920451636,
 "height_pct": 20.143579532731803,
 "fall_pct": 32.8996249022927,
 "lows": [
@@ -338,7 +378,7 @@
 28.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 45.9,
+"rsi_now": 44.2,
 "signal_date": null,
 "days_since": null,
 "target": 664.4,
@@ -350,11 +390,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 735.5,
+"close": 721.0,
 "neck": 852.5,
-"to_neck_pct": 15.907545887151597,
+"to_neck_pct": 18.2385575589459,
 "stop": 678.15,
-"stop_pct": 7.797416723317474,
+"stop_pct": 5.943134535367545,
 "height_pct": 21.61198288159771,
 "fall_pct": 35.285913528591365,
 "lows": [
@@ -378,7 +418,7 @@
 22.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 46.7,
+"rsi_now": 39.6,
 "signal_date": null,
 "days_since": null,
 "target": 1004.0,
