@@ -4,7 +4,7 @@
  "currency": "A$",
  "value_label": "A$ m",
  "asof": "2026-11-18",
- "generated": "2026-11-18T16:41+00:00",
+ "generated": "2026-11-19T00:52+00:00",
  "scanned": 47,
  "rows": [
   {
@@ -110,7 +110,7 @@
    "r2": 0.93,
    "above21_60d": 100,
    "off_high": -2.5,
-   "value_cr": 187.76,
+   "value_cr": 187.85,
    "last_date": "2026-11-18",
    "spark": [
     173.88,
@@ -194,7 +194,7 @@
    "r2": 0.82,
    "above21_60d": 78,
    "off_high": -9.7,
-   "value_cr": 72.84,
+   "value_cr": 75.03,
    "last_date": "2026-11-18",
    "spark": [
     32.39,
@@ -278,7 +278,7 @@
    "r2": 0.82,
    "above21_60d": 75,
    "off_high": -0.9,
-   "value_cr": 42.41,
+   "value_cr": 42.43,
    "last_date": "2026-11-18",
    "spark": [
     55.12,
@@ -353,7 +353,7 @@
    "signal_close": 37.78,
    "stop": 36.6,
    "rsi_signal": 55.8,
-   "value_cr": 224.98,
+   "value_cr": 226.02,
    "supertrend": 38.85,
    "st_up": true,
    "close": 39.02,
@@ -436,7 +436,7 @@
    "signal_close": 46.4,
    "stop": 45.06,
    "rsi_signal": 55.9,
-   "value_cr": 24.1,
+   "value_cr": 24.14,
    "supertrend": 46.06,
    "st_up": true,
    "close": 47.4,
@@ -519,7 +519,7 @@
    "signal_close": 32.04,
    "stop": 29.96,
    "rsi_signal": 76.2,
-   "value_cr": 9.69,
+   "value_cr": 9.7,
    "supertrend": 29.53,
    "st_up": true,
    "close": 31.31,
@@ -602,7 +602,7 @@
    "signal_close": 32.63,
    "stop": 28.71,
    "rsi_signal": 66.7,
-   "value_cr": 7.58,
+   "value_cr": 7.6,
    "supertrend": 30.26,
    "st_up": true,
    "close": 32.68,
@@ -768,7 +768,7 @@
    "signal_close": 40.81,
    "stop": 39.17,
    "rsi_signal": 72.2,
-   "value_cr": 224.98,
+   "value_cr": 226.02,
    "supertrend": 38.85,
    "st_up": true,
    "close": 39.02,
@@ -851,7 +851,7 @@
    "signal_close": 40.31,
    "stop": 38.06,
    "rsi_signal": 56.6,
-   "value_cr": 99.01,
+   "value_cr": 99.08,
    "supertrend": 42.56,
    "st_up": false,
    "close": 41.99,
@@ -873,7 +873,7 @@
    "signal_close": 32.63,
    "stop": 27.88,
    "rsi_signal": 66.7,
-   "value_cr": 7.58,
+   "value_cr": 7.6,
    "supertrend": 30.26,
    "st_up": true,
    "close": 32.68,
@@ -971,5 +971,6 @@
    "size": "Large",
    "spark": null
   }
- ]
+ ],
+ "bases": []
 }
