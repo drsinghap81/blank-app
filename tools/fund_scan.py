@@ -178,6 +178,22 @@ def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
             row["pattern"] = dict(typ=pr["typ"], status=pr["status"], neck=pr["neck"], to_neck_pct=pr["to_neck_pct"], days_since=pr["days_since"], lows=pr.get("lows"))
     except Exception:  # noqa: BLE001
         pass
+    # 20 Nov 2026 (Amritpal: "add ETFs and funds to W as well"): the index W + falling-trendline rule (tools/index_w_alert.py) on the
+    # daily closes / NAVs; latest formation only. A small daily chart for the app goes to data/scan/fund_w_charts/<key>.json.
+    row["w"] = None
+    if kind != "debt":
+        try:
+            import index_w_alert as IW
+            wr = IW.latest(s)
+            if wr and (wr["status"] == "forming" or wr.get("days_ago", 99) <= 5):
+                xx = x.copy(); j = IW.chart_json(xx, wr)
+                if j:
+                    os.makedirs(f"{OUT}/fund_w_charts", exist_ok=True); fn = key.replace(":", "_").replace("/", "_")
+                    json.dump(dict(name=name, **j), open(f"{OUT}/fund_w_charts/{fn}.json", "w"), separators=(",", ":"))
+                    wr["chart"] = fn
+                row["w"] = {k: wr.get(k) for k in ("status", "stage", "low1", "low2", "broke_on", "days_ago", "since", "line_now", "dist_pct", "low1_close", "chart")}
+        except Exception as e:  # noqa: BLE001
+            print("w fail", key, str(e)[:80])
     w = s.resample("W-FRI").last().dropna().tail(260)
     return row, dict(t=[str(d.date()) for d in w.index], c=[round(float(v), 4) for v in w])
 
@@ -287,6 +303,8 @@ def extra_etfs(rows, have):
 
 def main():
     os.makedirs(OUT, exist_ok=True); rows, charts = [], {}
+    import shutil
+    shutil.rmtree(f"{OUT}/fund_w_charts", ignore_errors=True)        # rebuilt every run: only current W's keep a chart
     # ETFs
     dd = yf.download([k + ".NS" for k in ETFS], period="max", interval="1d", auto_adjust=False, progress=False, group_by="column", threads=True)
     from session import drop_partial

@@ -6086,6 +6086,21 @@ async function emaLift(el, mk = 'NSE') {
 /* 20 Nov 2026 (Amritpal: "which broke and closed above the all-time high and now crossed the ATH candle's high"): for the month,
    week and day candles that CLOSED above the old ATH, has the price since gone above that candle's high? Monthly = the tested
    Momentum (ATH) system's trigger; week / day closes are watch-only lists. Plus the system's buys of the last 7 days. */
+/* 20 Nov 2026 (Amritpal: "add ETFs and funds to W as well"): latest W per ETF / mutual fund (funds.json row.w, daily closes / NAVs,
+   same rule as the indices; not separately tested on funds). Breaks of the last 5 sessions first, then W's forming nearest their line. */
+function fundWLines(F, mk) {
+  const code = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[mk];
+  const R = ((F && F.rows) || []).filter((r) => (r.market || 'IN') === code && r.w);
+  if (!R.length) return '';
+  const nm = (r) => (r.kind === 'fund' ? String(r.name || r.key).replace(/ (Fund|Scheme).*$/i, '').replace(/ - (Direct|Regular).*$/i, '').slice(0, 30) : String(r.symbol || r.key).replace(/^[A-Z]{2}:/, ''));
+  const br = R.filter((r) => r.w.status === 'broken').sort((a, b) => a.w.days_ago - b.w.days_ago);
+  const fm = R.filter((r) => r.w.status === 'forming').sort((a, b) => a.w.dist_pct - b.w.dist_pct);
+  const L = [...br.slice(0, 4), ...fm.slice(0, Math.max(0, 6 - Math.min(4, br.length)))];
+  const more = br.length + fm.length - L.length;
+  return `<div class="al-sub">Funds &amp; ETFs · W + trendline</div>${L.map((r) => `<div class="al-r al-tap"${r.w.chart ? ` data-fwch="${esc(r.w.chart)}"` : ''}>${r.w.status === 'broken'
+    ? `<b class="up">▲ ${esc(nm(r))}</b> <span>W + trendline broke ${esc(r.w.broke_on)}</span><small>${r.w.since >= 0 ? '+' : ''}${fmt(r.w.since, 1)}% since · chart ›</small>`
+    : `<span>${esc(nm(r))}: ${r.w.stage === '2nd low now' ? '2nd low forming now' : 'W formed'} · breaks above ${fmt(r.w.line_now, 2, MKT[mk].loc)} (${fmt(r.w.dist_pct, 1)}% away)</span><small>chart ›</small>`}</div>`).join('')}${more > 0 ? `<div class="al-r muted"><small>+${more} more W's in funds &amp; ETFs</small></div>` : ''}`;
+}
 /* 20 Nov 2026 (Amritpal: "include funds and ETFs in the categorisation on the card"): the same month / week / day all-time-high
    closes for this market's ETFs and mutual funds (funds.json), crossed (✓) or within 2% of that candle's high. Tap = fund panel. */
 function fundAthLines(F, mk) {
@@ -6151,6 +6166,7 @@ async function alertsCard(box, mk) {
     ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
+    ${fundWLines(state.fund, mk)}
     ${athLines(AT, mk)}${fundAthLines(state.fund, mk)}
     ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
@@ -6161,14 +6177,15 @@ async function alertsCard(box, mk) {
       ${mk === 'NSE' ? '<p class="muted td-rs"><b>Metals today:</b> Australia trades before India opens. When ASX materials beat the ASX 200 by more than 0.5%, Indian metal stocks rose from open to close on 52% of days (+0.18%); when they lagged by more than 0.5%, only 38% (−0.49%), against 45% on all days (2016–26, 12 metal F&amp;O stocks). The 5-minute option trader skips metal CE on weak days and metal PE on strong days.</p>' : ''}
       <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
   box.querySelectorAll('[data-wch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.wch, mk)));
+  box.querySelectorAll('[data-fwch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.fwch, mk, 'fund_w_charts')));
   box.querySelectorAll('[data-tv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(b.dataset.tv, mk)) + '&interval=D', '_blank', 'noopener'); }));
   box.querySelectorAll('[data-ath]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ symbol: b.dataset.ath, kind: 'ATH' }, mk); }));
   box.querySelectorAll('[data-fd]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const r = ((state.fund && state.fund.rows) || []).find((x) => x.key === b.dataset.fd); if (r) fundSelect(r); }));
 }
 /* 20 Nov 2026: tap an index line in the alert card -> daily candles, 9 EMA, the W's falling trendline and the two lows / break */
-async function wChart(sl, mk) {
+async function wChart(sl, mk, dir = 'index_w_charts') {
   $('#sheet-body').innerHTML = '<p class="muted pad">Loading chart…</p>'; $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
-  let c; try { const r = await fetch(MAIN + MKT[mk].path + 'index_w_charts/' + encodeURIComponent(sl) + '.json', { cache: 'no-cache' }); if (!r.ok) throw 0; c = await r.json(); }
+  let c; try { const r = await fetch(MAIN + (dir === 'index_w_charts' ? MKT[mk].path : 'data/scan/') + dir + '/' + encodeURIComponent(sl) + '.json', { cache: 'no-cache' }); if (!r.ok) throw 0; c = await r.json(); }
   catch (e) { $('#sheet-body').innerHTML = '<p class="muted pad">The chart appears after tonight\'s scan.</p>'; return; }
   $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">${esc(c.name)}</h2><p class="muted" style="margin:0 0 8px;font-size:.85em">Daily · 9 EMA (orange) · W trendline (blue): a close above it is the break</p><div id="wchc" style="height:360px"></div>`;
   const LW = window.LightweightCharts, box = $('#wchc');
