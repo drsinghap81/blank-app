@@ -70,7 +70,7 @@ def main():
           "9/21 + tight base + dry-up (F3)": d.sig & d.base12, "F3 + high-volume signal day (F4)": d.sig & d.base12 & d.hv}
     S = {}
     for k, v in S0.items():
-        S[k] = v; S[k + " + MA STACK"] = v & d.stack
+        S[k] = v; S[k + " + MA STACK"] = v & d["stack"]
     M = {"standard (5-day low stop, Supertrend exit)": (False, False),
          "YOURS: breakout-candle-low stop + 2 closes below 9 EMA": (True, True)}
     res = dict(method=__doc__, signals={k: int(v.sum()) for k, v in S.items()})
