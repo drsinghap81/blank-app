@@ -2940,7 +2940,7 @@ async function loadTurtle(el) {
     if (!(lvCfg().url && lvCfg().token)) { alertMsg('Connect your server in Live › Settings first.'); return; }
     try { await lvApi('/api/turtle/mcx/arm', { method: 'POST', body: JSON.stringify({ name: b.dataset.turmcx, lots: 1, on: true, mult: +b.dataset.mult || 0 }) });
       alertMsg(`${b.dataset.turmcx.replace('MCX:', '')} armed with 1 lot. Check the planned order in Live › Futures › Turtle · MCX (dry run until you switch Live on).`, true); b.textContent = 'Armed ✓'; b.disabled = true;
-    } catch (e) { alertMsg(e.message.includes('404') ? 'Arrives with your server\'s next update (after 3:35 pm IST).' : e.message); } }));
+    } catch (e) { alertMsg(/404|not found/i.test(e.message) ? 'Your server gets this after today\'s market close (it updates itself after 3:35 pm IST). Tap Push to Live again after that.' : e.message); } }));
   tradeStripWire(el);
   el.querySelectorAll('.row[data-tk]').forEach((li) => li.addEventListener('click', (e) => { if (e.target.closest('a,summary,details')) return; turtleSelect(D.rows.find((r) => r.key === li.dataset.tk)); }));
   const save = () => { turSave({ cur: $('#tcur').value, acct: +$('#tacct').value, risk: +$('#trisk').value, lotN: +$('#tlotn').value, lotB: +$('#tlotb').value }); loadTurtle(el); };
