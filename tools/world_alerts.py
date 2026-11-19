@@ -167,6 +167,7 @@ def run(mk):
         pw = {(r["index"], r.get("broke_on")) for r in json.load(open(f"{PATH[mk]}/index_w.json")).get("rows", []) if r.get("status") == "broken"}
     except Exception:  # noqa: BLE001
         pw = set()
+    IW.write_charts(wr, I, PATH[mk])
     json.dump(dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00"), asof=str(asof.date()), market=mk, rows=wr, test=TEST[mk]["w"],
                    rule=IW.__doc__.split("Output:")[0].strip()), open(f"{PATH[mk]}/index_w.json", "w"), indent=1)
     # 2. EMA 9 lift-off

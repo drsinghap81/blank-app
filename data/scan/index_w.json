@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-19T18:11+00:00",
+ "generated": "2026-11-19T19:45+00:00",
  "asof": "2026-11-19",
  "rows": [
   {
@@ -25,7 +25,8 @@
    "since": 11.3,
    "above_neck": true,
    "vol_ratio": 0.89,
-   "full": false
+   "full": false,
+   "chart": "nifty_private_bank"
   },
   {
    "index": "NIFTY BANK",
@@ -54,7 +55,8 @@
    "ema_since": "2026-11-03",
    "ema_gain": 13.5,
    "ema9": 60990.58,
-   "full": true
+   "full": true,
+   "chart": "nifty_bank"
   },
   {
    "index": "NIFTY FINANCIAL SERVICES",
@@ -83,7 +85,8 @@
    "ema_since": "2026-11-03",
    "ema_gain": 11.6,
    "ema9": 27647.81,
-   "full": true
+   "full": true,
+   "chart": "nifty_financial_services"
   },
   {
    "index": "NIFTY CAPITAL MARKETS",
@@ -112,7 +115,8 @@
    "ema_since": "2026-10-29",
    "ema_gain": 11.2,
    "ema9": 5759.68,
-   "full": true
+   "full": true,
+   "chart": "nifty_capital_markets"
   },
   {
    "index": "NIFTY PSE",
@@ -137,7 +141,8 @@
    "since": 2.5,
    "above_neck": true,
    "vol_ratio": 1.13,
-   "full": false
+   "full": false,
+   "chart": "nifty_pse"
   },
   {
    "index": "NIFTY 500",
@@ -166,7 +171,8 @@
    "ema_since": "2026-11-02",
    "ema_gain": 7.4,
    "ema9": 23577.52,
-   "full": true
+   "full": true,
+   "chart": "nifty_500"
   },
   {
    "index": "NIFTY OIL & GAS",
@@ -191,7 +197,8 @@
    "since": 5.3,
    "above_neck": true,
    "vol_ratio": 2.66,
-   "full": false
+   "full": false,
+   "chart": "nifty_oil_gas"
   },
   {
    "index": "NIFTY 50",
@@ -220,7 +227,8 @@
    "ema_since": "2026-10-16",
    "ema_gain": 10.2,
    "ema9": 25070.64,
-   "full": true
+   "full": true,
+   "chart": "nifty_50"
   },
   {
    "index": "NIFTY PSU BANK",
@@ -245,7 +253,8 @@
    "since": 17.4,
    "above_neck": true,
    "vol_ratio": 0.95,
-   "full": false
+   "full": false,
+   "chart": "nifty_psu_bank"
   },
   {
    "index": "NIFTY REALTY",
@@ -274,7 +283,8 @@
    "ema_since": "2026-10-30",
    "ema_gain": 13.4,
    "ema9": 907.42,
-   "full": true
+   "full": true,
+   "chart": "nifty_realty"
   },
   {
    "index": "NIFTY CPSE",
@@ -299,7 +309,8 @@
    "since": 3.8,
    "above_neck": true,
    "vol_ratio": 1.03,
-   "full": false
+   "full": false,
+   "chart": "nifty_cpse"
   },
   {
    "index": "NIFTY COMMODITIES",
@@ -328,7 +339,8 @@
    "ema_since": "2026-11-02",
    "ema_gain": 3.2,
    "ema9": 9568.8,
-   "full": true
+   "full": true,
+   "chart": "nifty_commodities"
   },
   {
    "index": "NIFTY AUTO",
@@ -353,7 +365,8 @@
    "since": 11.3,
    "above_neck": true,
    "vol_ratio": 0.94,
-   "full": false
+   "full": false,
+   "chart": "nifty_auto"
   },
   {
    "index": "NIFTY INDIA CONSUMPTION",
@@ -382,7 +395,8 @@
    "ema_since": "2026-10-30",
    "ema_gain": 10.5,
    "ema9": 11986.21,
-   "full": true
+   "full": true,
+   "chart": "nifty_india_consumption"
   }
  ],
  "rule": "Index early alert: W bottom + falling trendline break (19 Nov 2026, Amritpal; tested in tools/research/index_w_bottom.py,\nproject doc index-w-bottom-trendline-test). INFORMATION ONLY - stock entries stay on 9/21 + the RED light.\nRule (tested on 23 NSE indices 2015-26, 541 setups): two zigzag(2%) closing lows within -2%..+4%, 8-60 sessions apart, the\nfirst >= 5% below the 120-day high close, middle peak >= 2% above the first low; trendline = from that high through the middle\npeak. Trendline break = first close above the line after the 2nd low is confirmed. It came before the index's 9/21 cross 71% of the\ntime, ~1% lower (entry +3.1% off the 2nd low vs +3.9%); next 20 sessions median +1.6% (63% up) vs +1.2% (59%) on any day; 9/21\nafter the W +1.9%. RSI divergence added nothing (also tested with 3% swings / 8% fall: same picture).",

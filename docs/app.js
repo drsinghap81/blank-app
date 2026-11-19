@@ -6093,11 +6093,12 @@ function athLines(A, mk) {
     const x = L.map((r) => ({ s: r.symbol, h: r[hk], c: r.close })).filter((r) => r.h && r.c);
     const yes = x.filter((r) => r.c > r.h).sort((a, b) => b.c / b.h - a.c / a.h), no = x.filter((r) => r.c <= r.h).sort((a, b) => a.h / a.c - b.h / b.c);
     if (!yes.length && !no.length) return '';
-    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((r) => `<span class="al-t ok">✓ ${esc(r.s)} +${fmt((r.c / r.h - 1) * 100, 1)}%</span>`).join('')}${no.slice(0, 4).map((r) => `<span class="al-t">${esc(r.s)} above ${Mz(r.h)}</span>`).join('')}${yes.length + no.length > 10 ? `<small>+${yes.length + no.length - 10} more</small>` : ''}</div>`; };
+    const at = (sym) => (hk === 'high_m' ? `data-ath="${esc(sym)}"` : `data-tv="${esc(sym)}"`);
+    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((r) => `<a href="#" class="al-t ok" ${at(r.s)}>✓ ${esc(r.s)} +${fmt((r.c / r.h - 1) * 100, 1)}%</a>`).join('')}${no.slice(0, 4).map((r) => `<a href="#" class="al-t" ${at(r.s)}>${esc(r.s)} above ${Mz(r.h)}</a>`).join('')}${yes.length + no.length > 10 ? `<small>+${yes.length + no.length - 10} more</small>` : ''}</div>`; };
   const asof = A.asof ? new Date(A.asof + 'T00:00:00') : null;
   const recent = (A.breakouts || []).filter((b) => asof && (asof - new Date(b.date + 'T00:00:00')) / 864e5 <= 7).sort((a, b) => (a.date < b.date ? 1 : -1));
   const out = one('ATH month close →', A.month_close, 'high_m') + one('ATH week close →', A.week_close, 'high_p') + one('ATH day close →', A.day_close, 'high_p')
-    + (recent.length ? `<div class="al-r"><b class="up">▲ ATH buys this week</b> <span>${recent.slice(0, 8).map((b) => esc(b.symbol)).join(', ')}${recent.length > 8 ? ` +${recent.length - 8}` : ''}</span></div>` : '');
+    + (recent.length ? `<div class="al-r"><b class="up">▲ ATH buys this week</b> <span>${recent.slice(0, 8).map((b) => `<a href="#" class="al-s" data-ath="${esc(b.symbol)}">${esc(b.symbol)}</a>`).join(', ')}${recent.length > 8 ? ` +${recent.length - 8}` : ''}</span></div>` : '');
   return out ? `<div class="al-sub">All-time highs · ✓ = now above the ATH candle's high</div>${out}` : '';
 }
 async function alertsCard(box, mk) {
@@ -6116,17 +6117,17 @@ async function alertsCard(box, mk) {
   const br = wr.filter((r) => r.status === 'broken' && r.days_ago <= 5).sort((a, b) => (a.days_ago - b.days_ago) || (b.full - a.full));
   const fm = wr.filter((r) => r.status === 'forming').sort((a, b) => a.dist_pct - b.dist_pct).slice(0, 4);
   const tick = (ok, txt) => `<span class="al-t ${ok ? 'ok' : 'no'}">${ok ? '✓' : '·'} ${txt}</span>`;
-  const wline = (r) => `<div class="al-r"><b class="up">▲ ${esc(nm(r.index))}</b> <span>W + trendline broke ${dd(r.broke_on)}</span>
+  const wline = (r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><b class="up">▲ ${esc(nm(r.index))}</b> <span>W + trendline broke ${dd(r.broke_on)}</span>
       ${r.vol_ratio != null ? `<span class="al-t">volume ${fmt(r.vol_ratio, 1)}×</span>` : ''}${r.ema_status ? tick(r.ema_status !== 'left below', r.ema_status === 'left below' ? 'back below 9 EMA' : 'above 9 EMA') : ''}
-      ${r.full ? '<em class="al-full">full setup</em>' : ''}<small>${r.since >= 0 ? '+' : ''}${fmt(r.since, 1)}% since</small></div>`;
+      ${r.full ? '<em class="al-full">full setup</em>' : ''}<small>${r.since >= 0 ? '+' : ''}${fmt(r.since, 1)}% since · chart ›</small></div>`;
   const ER = (E && E.rows) || [];
   const up = ER.filter((r) => r.status === 'lift-off today'), dn = ER.filter((r) => r.status === 'left below');
   const ix = ER.filter((r) => r.index && r.status === 'riding');
-  const names = (L2) => L2.slice(0, 8).map((r) => esc(r.index ? nm(r.symbol) : r.symbol)).join(', ') + (L2.length > 8 ? ` +${L2.length - 8}` : '');
+  const names = (L2) => L2.slice(0, 8).map((r) => r.index ? esc(nm(r.symbol)) : `<a href="#" class="al-s" data-tv="${esc(r.symbol)}">${esc(r.symbol)}</a>`).join(', ') + (L2.length > 8 ? ` +${L2.length - 8}` : '');
   box.innerHTML = `<section class="al-card ${lt ? lt[0] : ''}">
     ${lt ? `<div class="al-light"><i></i><b>${lt[1]}</b></div>` : ''}
     ${br.length ? br.slice(0, 4).map(wline).join('') : ''}
-    ${fm.map((r) => `<div class="al-r muted"><span>${esc(nm(r.index))}: W forming · trendline ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% above)</span></div>`).join('')}
+    ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><span>${esc(nm(r.index))}: W forming · trendline ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% above)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Left the 9 EMA upward</b> <span>${names(up)}</span></div>` : ''}
     ${dn.length ? `<div class="al-r"><b class="down">▼ Fell below the 9 EMA</b> <span>${names(dn)}</span></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
@@ -6138,6 +6139,28 @@ async function alertsCard(box, mk) {
       <p class="muted td-rs"><b>9 EMA:</b> ${esc((E && E.test) || 'Lift-off = first whole candle above a rising 9 EMA in 10 sessions; ride until a whole candle is below it. Tested 2007–26: Bank Nifty +1.95% a trade (42% won), Nifty +0.96%, F&O stocks +1.46%, against about +1% for holding any 16 days.')}</p>
       <p class="muted td-rs"><b>All-time highs:</b> a month, week or day candle closed above the old all-time high; ✓ = the price is now above that candle's high, otherwise the level it needs. The monthly close + break of its high is the tested Momentum system (21.5%/yr India; ideas only elsewhere); week and day closes are watch lists.</p>
       <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
+  box.querySelectorAll('[data-wch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.wch, mk)));
+  box.querySelectorAll('[data-tv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(b.dataset.tv, mk)) + '&interval=D', '_blank', 'noopener'); }));
+  box.querySelectorAll('[data-ath]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ symbol: b.dataset.ath, kind: 'ATH' }, mk); }));
+}
+/* 20 Nov 2026: tap an index line in the alert card -> daily candles, 9 EMA, the W's falling trendline and the two lows / break */
+async function wChart(sl, mk) {
+  $('#sheet-body').innerHTML = '<p class="muted pad">Loading chart…</p>'; $('#sheet').hidden = false; document.body.style.overflow = 'hidden'; history.pushState({ sheet: 1 }, '');
+  let c; try { const r = await fetch(MAIN + MKT[mk].path + 'index_w_charts/' + encodeURIComponent(sl) + '.json', { cache: 'no-cache' }); if (!r.ok) throw 0; c = await r.json(); }
+  catch (e) { $('#sheet-body').innerHTML = '<p class="muted pad">The chart appears after tonight\'s scan.</p>'; return; }
+  $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">${esc(c.name)}</h2><p class="muted" style="margin:0 0 8px;font-size:.85em">Daily · 9 EMA (orange) · W trendline (blue) · ▲ the two lows and the break</p><div id="wchc" style="height:360px"></div>`;
+  const LW = window.LightweightCharts, box = $('#wchc');
+  const ch = LW.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
+  const s = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
+  s.setData(c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })));
+  const e = ch.addLineSeries({ color: C.e9 || '#f59e0b', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+  e.setData(c.t.map((t, i) => ({ time: t, value: c.e9[i] })));
+  if (c.tl && c.tl[0][0] >= c.t[0]) { const l = ch.addLineSeries({ color: '#3b82f6', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    l.setData(c.tl.map(([t, v]) => ({ time: t, value: v }))); }
+  else if (c.tl) { const t0 = c.t[0], [a, b] = c.tl; const d0 = new Date(a[0]), d1 = new Date(b[0]), dt = new Date(t0); const v0 = a[1] + (b[1] - a[1]) * ((dt - d0) / (d1 - d0));
+    const l = ch.addLineSeries({ color: '#3b82f6', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }); l.setData([{ time: t0, value: v0 }, { time: b[0], value: b[1] }]); }
+  s.setMarkers((c.marks || []).filter(([t]) => t >= c.t[0]).map(([t, txt]) => ({ time: t, position: txt === 'break' ? 'aboveBar' : 'belowBar', color: txt === 'break' ? C.rise : '#3b82f6', shape: txt === 'break' ? 'arrowUp' : 'circle', text: txt })));
+  ch.timeScale().fitContent();
 }
 /* 19 Nov 2026 (Amritpal, Bank Nifty chart): index early alert = W bottom + falling trendline break. Info only - entries stay on
    9/21 + the light. Tested on 23 NSE indices 2015-26 (tools/research/index_w_bottom.py): the break came before the 9/21 cross 71% of

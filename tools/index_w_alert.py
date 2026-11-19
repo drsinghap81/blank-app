@@ -80,6 +80,45 @@ def latest(c):
     return None
 
 
+def slug(name):
+    import re
+    return re.sub(r"[^a-z0-9]+", "_", str(name).lower()).strip("_")
+
+
+def chart_json(x, r, days=160):
+    """daily candles + EMA 9 + the W trendline for the app's chart sheet (20 Nov 2026). x: DataFrame Open/High/Low/Close."""
+    x = x[["Open", "High", "Low", "Close"]].dropna()
+    x = x[(x > 0).all(axis=1)]
+    if x.empty:
+        return None
+    e9 = x.Close.ewm(span=9, adjust=False).mean()
+    y = x.tail(days); e = e9.tail(days); idx = list(x.index)
+    out = dict(t=[str(d.date()) for d in y.index], o=[round(float(v), 2) for v in y.Open], h=[round(float(v), 2) for v in y.High],
+               l=[round(float(v), 2) for v in y.Low], c=[round(float(v), 2) for v in y.Close], e9=[round(float(v), 2) for v in e])
+    try:
+        hi_i, mid_i = idx.index(pd.Timestamp(r["high_date"])), idx.index(pd.Timestamp(r["mid_date"]))
+        slope = (r["mid"] - r["high"]) / (mid_i - hi_i)
+        end_i = min(len(idx) - 1, (idx.index(pd.Timestamp(r["broke_on"])) + 5) if r.get("broke_on") else len(idx) - 1)
+        out["tl"] = [[str(idx[hi_i].date()), r["high"]], [str(idx[end_i].date()), round(r["high"] + slope * (end_i - hi_i), 2)]]
+    except Exception:  # noqa: BLE001
+        pass
+    out["marks"] = [m for m in ([r.get("low1"), "low 1"], [r.get("low2"), "low 2"], [r.get("broke_on"), "break"]) if m[0]]
+    return out
+
+
+def write_charts(rows, frames, folder):
+    """frames: {row key -> OHLC DataFrame}; writes <folder>/index_w_charts/<slug>.json and sets r['chart'] = slug"""
+    os.makedirs(f"{folder}/index_w_charts", exist_ok=True)
+    for r in rows:
+        x = frames.get(r.get("ticker") or r["index"])
+        if x is None:
+            continue
+        j = chart_json(x, r)
+        if j:
+            sl = slug(r.get("ticker") or r["index"]); r["chart"] = sl
+            json.dump(dict(name=r["index"], **j), open(f"{folder}/index_w_charts/{sl}.json", "w"), separators=(",", ":"))
+
+
 def extras(r, x):
     """volume on the break day vs its 20-day average, and the EMA 9 lift-off state (whole candle above a rising EMA 9)"""
     import ema_lift_alert as EL
@@ -132,6 +171,11 @@ def main():
     out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M+00:00"), asof=str(P.index[-1].date()), rows=rows,
                rule=__doc__.split("Output:")[0].strip(),
                test=dict(setups=541, tl_before_921_pct=71, fwd20_median=1.6, fwd20_up=63, any_day_fwd20_median=1.18, any_day_up=59))
+    FR = {k: v for k, v in XO.items()}
+    for r in rows:                      # indices without OHLC history: draw closes as flat candles
+        if r["index"] not in FR and r["index"] in P.columns:
+            cc = P[r["index"]].dropna(); FR[r["index"]] = pd.DataFrame({"Open": cc, "High": cc, "Low": cc, "Close": cc})
+    write_charts(rows, FR, OUT)
     json.dump(out, open(f"{OUT}/index_w.json", "w"), indent=1)
     for r in rows:
         print(r["index"], r["status"], r.get("broke_on") or f"line {r.get('line_now')} ({r.get('dist_pct')}% away)")
