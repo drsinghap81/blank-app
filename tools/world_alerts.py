@@ -31,7 +31,7 @@ IDX = {
 PATH = {"US": "data/scan/us", "ASX": "data/scan/asx", "UK": "data/scan/uk"}
 
 
-def dl(tickers, start):
+def dl(tickers, start, minrows=150):
     out = {}
     for i in range(0, len(tickers), 100):
         ch = tickers[i:i + 100]
@@ -47,7 +47,7 @@ def dl(tickers, start):
                 x = (D[t] if len(ch) > 1 else D)[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"])
                 x.index = pd.to_datetime(x.index).tz_localize(None)
                 x = x[(x[["Open", "High", "Low", "Close"]] > 0).all(axis=1)]
-                if len(x) > 150:
+                if len(x) > minrows:
                     out[t] = x
             except Exception:  # noqa: BLE001
                 pass
@@ -57,7 +57,7 @@ def dl(tickers, start):
 
 def top_stocks(mk, n=50):
     u = symbols(mk); tick = list(u.ticker); name = dict(zip(u.ticker, u.symbol))
-    P = dl(tick, (pd.Timestamp.today() - pd.Timedelta(days=60)).strftime("%Y-%m-%d"))
+    P = dl(tick, (pd.Timestamp.today() - pd.Timedelta(days=60)).strftime("%Y-%m-%d"), minrows=15)
     val = {t: float((x.Close * x.Volume).tail(20).mean()) for t, x in P.items()}
     best = sorted(val, key=lambda t: -val[t])[:n]
     return {t: name.get(t, t) for t in best}
