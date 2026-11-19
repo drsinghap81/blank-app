@@ -6088,10 +6088,23 @@ async function emaLift(el, mk = 'NSE') {
    Momentum (ATH) system's trigger; week / day closes are watch-only lists. Plus the system's buys of the last 7 days. */
 /* 20 Nov 2026 (Amritpal: "include commodities too"): commodities (metals, energy, agriculture, ≈MCX in rupees) on every market's card -
    latest W + trendline, leaving a rising 9 EMA (last 3 sessions), and all-time-high closes crossed / near. assets.json, daily bars. */
-function commodityLines(A) {
-  const R = ((A && A.rows) || []).filter((r) => ['Metals', 'Energy', 'Agriculture', 'In rupees (≈MCX)'].includes(r.group));
+/* 20 Nov 2026 (Amritpal: "same commodities in each market - where are those tradable?"): each market's card lists only the
+   commodities you can trade there, with the instrument: India = MCX (rupee prices ≈ MCX), US = CME futures or the US ETF,
+   Australia = ASX ETFs (gold, silver, platinum, palladium, crude), UK = LSE ETCs. */
+const COMM_WHERE = {
+  NSE: { 'GC=F:INR': 'MCX GOLD / GOLDM', 'SI=F:INR': 'MCX SILVER / SILVERM', 'HG=F:INR': 'MCX COPPER', 'ALI=F:INR': 'MCX ALUMINIUM', 'CL=F:INR': 'MCX CRUDEOIL / CRUDEOILM', 'NG=F:INR': 'MCX NATURALGAS / NATGASMINI' },
+  US: { 'GC=F': 'GLD · COMEX GC', 'SI=F': 'SLV · COMEX SI', 'PL=F': 'PPLT · NYMEX PL', 'PA=F': 'PALL · NYMEX PA', 'HG=F': 'CPER · COMEX HG', 'CL=F': 'USO · NYMEX CL', 'BZ=F': 'BNO', 'NG=F': 'UNG · NYMEX NG',
+    'RB=F': 'UGA · NYMEX RB', 'HO=F': 'NYMEX HO', 'ZC=F': 'CORN · CBOT ZC', 'ZW=F': 'WEAT · CBOT ZW', 'ZS=F': 'SOYB · CBOT ZS', 'ZM=F': 'CBOT ZM', 'ZL=F': 'CBOT ZL', 'SB=F': 'CANE · ICE SB', 'KC=F': 'ICE KC',
+    'CC=F': 'ICE CC', 'CT=F': 'ICE CT', 'OJ=F': 'ICE OJ', 'LE=F': 'CME LE', 'HE=F': 'CME HE', 'ALI=F': 'COMEX ALI' },
+  ASX: { 'GC=F': 'ASX GOLD / QAU', 'SI=F': 'ASX ETPMAG', 'PL=F': 'ASX ETPMPT', 'PA=F': 'ASX ETPMPD', 'CL=F': 'ASX OOO' },
+  UK: { 'GC=F': 'LSE SGLN', 'SI=F': 'LSE PHAG', 'PL=F': 'LSE PHPT', 'PA=F': 'LSE PHPD', 'HG=F': 'LSE COPA', 'ALI=F': 'LSE ALUM', 'CL=F': 'LSE CRUD', 'BZ=F': 'LSE BRNT', 'NG=F': 'LSE NGAS',
+    'HO=F': 'LSE HEAT', 'RB=F': 'LSE UGAS', 'ZC=F': 'LSE CORN', 'ZW=F': 'LSE WEAT', 'ZS=F': 'LSE SOYB', 'ZL=F': 'LSE SOYO', 'KC=F': 'LSE COFF', 'CC=F': 'LSE COCO', 'SB=F': 'LSE SUGA', 'CT=F': 'LSE COTN' },
+};
+function commodityLines(A, mk = 'NSE') {
+  const WH = COMM_WHERE[mk] || {};
+  const R = ((A && A.rows) || []).filter((r) => WH[r.key]);
   if (!R.length) return '';
-  const nm = (r) => esc(String(r.name).replace(' (Henry Hub)', ''));
+  const nm = (r) => `${esc(String(r.name).replace(' (Henry Hub)', '').replace(' in rupees', ''))} <small class="al-where">${esc(WH[r.key])}</small>`;
   const w = R.filter((r) => r.w && (r.w.status === 'forming' || r.w.days_ago <= 5)).sort((a, b) => (a.w.status === 'broken' ? -1 : 0) - (b.w.status === 'broken' ? -1 : 0) || (a.w.dist_pct || 0) - (b.w.dist_pct || 0));
   const up = R.filter((r) => r.lift && (r.lift.status === 'lift-off today' || (r.lift.status === 'riding' && r.lift.days <= 2)));
   const ath = [];
@@ -6099,8 +6112,9 @@ function commodityLines(A) {
     R.filter((r) => r[k] && r[k][hk] && r.close).forEach((r) => { const h = r[k][hk];
       if (r.close > h) ath.push(`<a href="#" class="al-t ok" data-asv="${esc(r.key)}">✓ ${nm(r)} (${lab}) +${fmt((r.close / h - 1) * 100, 1)}%</a>`);
       else if (h / r.close - 1 <= 0.02) ath.push(`<a href="#" class="al-t" data-asv="${esc(r.key)}">${nm(r)} (${lab}) near · needs ${fmt(h, 2)}</a>`); }); }
-  if (!w.length && !up.length && !ath.length) return '';
-  return `<div class="al-sub">Commodities</div>${w.slice(0, 5).map((r) => `<div class="al-r al-tap"${r.w.chart ? ` data-awch="${esc(r.w.chart)}"` : ''}>${r.w.status === 'broken'
+  if (!w.length && !up.length && !ath.length) return `<div class="al-sub">Commodities · ${{ NSE: 'MCX', US: 'US futures / ETFs', ASX: 'ASX ETFs', UK: 'LSE ETCs' }[mk]}</div><div class="al-r muted"><span>No W, 9 EMA lift-off or ATH-candle cross in the ones you can trade here.</span></div>`;
+
+  return `<div class="al-sub">Commodities · ${{ NSE: 'MCX', US: 'US futures / ETFs', ASX: 'ASX ETFs', UK: 'LSE ETCs' }[mk]}</div>${w.slice(0, 5).map((r) => `<div class="al-r al-tap"${r.w.chart ? ` data-awch="${esc(r.w.chart)}"` : ''}>${r.w.status === 'broken'
     ? `<b class="up">▲ ${nm(r)}</b> <span>W + trendline broke ${esc(r.w.broke_on)}</span><small>${r.w.since >= 0 ? '+' : ''}${fmt(r.w.since, 1)}% since · chart ›</small>`
     : `<span>${nm(r)}: ${r.w.stage === '2nd low now' ? 'W · 2nd low forming now' : 'W formed'} · breaks above ${fmt(r.w.line_now, 2)} (${fmt(r.w.dist_pct, 1)}% away)</span><small>chart ›</small>`}</div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${up.map((r) => `<a href="#" class="al-s" data-asv="${esc(r.key)}">${nm(r)}</a>`).join(', ')}</span></div>` : ''}
@@ -6189,7 +6203,7 @@ async function alertsCard(box, mk) {
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
     ${(() => { const fw = fundWLines(state.fund, mk), fa = fundAthLines(state.fund, mk);
-      return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets)}
+      return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets, mk)}
     ${athLines(AT, mk)}${fundAthLines(state.fund, mk)}
     ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
