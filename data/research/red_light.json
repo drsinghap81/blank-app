@@ -1,0 +1,335 @@
+{
+ "method": "Market traffic light for new swing entries (19 Nov 2026, Amritpal: \"if market breadth is RED I need to be cautioned not to enter\").\n\nLight, decided at each close (all liquid NSE stocks, Yahoo 2016 -> today, survivors):\n  breadth bad : over the last 10 sessions more stocks crossed EMA 9 BELOW EMA 21 than above (sells > buys)\n  index bad   : Nifty's last weekly close below its 30-week SMA (known from the next session)\n  RED = both bad, AMBER = one bad, GREEN = neither.  Also tested: share of stocks above their 50-day SMA < 40%.\nTests on the live 9/21 engine (buy next open, 5-day-low stop, Supertrend exit, 1% risk):\n  1. no new buys on RED / on RED or AMBER / on index-bad / on <40% above 50-day\n  2. 9/21 trades split by the light on their signal day: average trade, win rate, count\nOutput: data/research/red_light.json",
+ "days": {
+  "GREEN": 34.3,
+  "AMBER": 50.8,
+  "RED": 14.9
+ },
+ "by_year": {
+  "2016": {
+   "GREEN": 47,
+   "AMBER": 41,
+   "RED": 12
+  },
+  "2017": {
+   "GREEN": 43,
+   "AMBER": 56,
+   "RED": 1
+  },
+  "2018": {
+   "GREEN": 29,
+   "AMBER": 57,
+   "RED": 15
+  },
+  "2019": {
+   "GREEN": 21,
+   "AMBER": 60,
+   "RED": 19
+  },
+  "2020": {
+   "GREEN": 31,
+   "AMBER": 53,
+   "RED": 16
+  },
+  "2021": {
+   "GREEN": 50,
+   "AMBER": 50,
+   "RED": 0
+  },
+  "2022": {
+   "GREEN": 31,
+   "AMBER": 49,
+   "RED": 20
+  },
+  "2023": {
+   "GREEN": 44,
+   "AMBER": 48,
+   "RED": 8
+  },
+  "2024": {
+   "GREEN": 38,
+   "AMBER": 57,
+   "RED": 5
+  },
+  "2025": {
+   "GREEN": 30,
+   "AMBER": 53,
+   "RED": 16
+  },
+  "2026": {
+   "GREEN": 16,
+   "AMBER": 31,
+   "RED": 53
+  }
+ },
+ "nifty_next20d": {
+  "GREEN": 0.81,
+  "AMBER": 0.88,
+  "RED": 1.53
+ },
+ "portfolio": {
+  "10 positions, 3-month strength | no filter": {
+   "cagr": 26.9,
+   "maxdd": -26.1,
+   "cagr_22_26": 17.3,
+   "dd_22_26": -20.0,
+   "trades": 559,
+   "by_light": {
+    "GREEN": {
+     "n": 93,
+     "avg": 11.23,
+     "win": 42
+    },
+    "AMBER": {
+     "n": 325,
+     "avg": 4.51,
+     "win": 36
+    },
+    "RED": {
+     "n": 141,
+     "avg": 5.13,
+     "win": 38
+    }
+   }
+  },
+  "10 positions, 3-month strength | no new buys on RED": {
+   "cagr": 29.1,
+   "maxdd": -22.5,
+   "cagr_22_26": 26.7,
+   "dd_22_26": -22.5,
+   "trades": 496
+  },
+  "10 positions, 3-month strength | no new buys on RED or AMBER": {
+   "cagr": 9.8,
+   "maxdd": -26.9,
+   "cagr_22_26": 1.6,
+   "dd_22_26": -25.0,
+   "trades": 425
+  },
+  "10 positions, 3-month strength | no new buys when Nifty < 30-week": {
+   "cagr": 21.0,
+   "maxdd": -21.7,
+   "cagr_22_26": 15.6,
+   "dd_22_26": -21.7,
+   "trades": 465
+  },
+  "10 positions, 3-month strength | no new buys when < 40% of stocks above 50-day": {
+   "cagr": 20.5,
+   "maxdd": -34.0,
+   "cagr_22_26": 18.1,
+   "dd_22_26": -34.0,
+   "trades": 449
+  },
+  "5 positions, 3-month strength | no filter": {
+   "cagr": 21.9,
+   "maxdd": -21.8,
+   "cagr_22_26": 12.6,
+   "dd_22_26": -17.8,
+   "trades": 280,
+   "by_light": {
+    "GREEN": {
+     "n": 48,
+     "avg": 14.38,
+     "win": 44
+    },
+    "AMBER": {
+     "n": 155,
+     "avg": 5.14,
+     "win": 37
+    },
+    "RED": {
+     "n": 77,
+     "avg": 6.17,
+     "win": 39
+    }
+   }
+  },
+  "5 positions, 3-month strength | no new buys on RED": {
+   "cagr": 18.7,
+   "maxdd": -19.4,
+   "cagr_22_26": 18.3,
+   "dd_22_26": -19.4,
+   "trades": 252
+  },
+  "5 positions, 3-month strength | no new buys on RED or AMBER": {
+   "cagr": 6.2,
+   "maxdd": -27.8,
+   "cagr_22_26": 3.6,
+   "dd_22_26": -22.9,
+   "trades": 215
+  },
+  "5 positions, 3-month strength | no new buys when Nifty < 30-week": {
+   "cagr": 10.9,
+   "maxdd": -19.8,
+   "cagr_22_26": 8.9,
+   "dd_22_26": -19.8,
+   "trades": 229
+  },
+  "5 positions, 3-month strength | no new buys when < 40% of stocks above 50-day": {
+   "cagr": 12.2,
+   "maxdd": -27.4,
+   "cagr_22_26": 12.4,
+   "dd_22_26": -27.4,
+   "trades": 232
+  },
+  "10 positions, random | no filter": {
+   "cagr": 23.1,
+   "maxdd": -29.8,
+   "cagr_22_26": 18.1,
+   "dd_22_26": -19.2,
+   "trades": 552,
+   "by_light": {
+    "GREEN": {
+     "n": 89,
+     "avg": 8.49,
+     "win": 34
+    },
+    "AMBER": {
+     "n": 324,
+     "avg": 3.68,
+     "win": 36
+    },
+    "RED": {
+     "n": 139,
+     "avg": 5.67,
+     "win": 35
+    }
+   }
+  },
+  "10 positions, random | no new buys on RED": {
+   "cagr": 22.8,
+   "maxdd": -22.8,
+   "cagr_22_26": 23.7,
+   "dd_22_26": -22.8,
+   "trades": 522
+  },
+  "10 positions, random | no new buys on RED or AMBER": {
+   "cagr": 9.2,
+   "maxdd": -28.0,
+   "cagr_22_26": 2.8,
+   "dd_22_26": -26.1,
+   "trades": 423
+  },
+  "10 positions, random | no new buys when Nifty < 30-week": {
+   "cagr": 14.0,
+   "maxdd": -18.5,
+   "cagr_22_26": 7.6,
+   "dd_22_26": -18.5,
+   "trades": 467
+  },
+  "10 positions, random | no new buys when < 40% of stocks above 50-day": {
+   "cagr": 19.5,
+   "maxdd": -23.7,
+   "cagr_22_26": 15.1,
+   "dd_22_26": -19.3,
+   "trades": 455
+  }
+ },
+ "latest": {
+  "2026-10-28": {
+   "light": "RED",
+   "buys10": 262,
+   "sells10": 586,
+   "p50": 18.1,
+   "idx_bad": true
+  },
+  "2026-10-29": {
+   "light": "RED",
+   "buys10": 269,
+   "sells10": 551,
+   "p50": 20.5,
+   "idx_bad": true
+  },
+  "2026-10-30": {
+   "light": "RED",
+   "buys10": 239,
+   "sells10": 543,
+   "p50": 17.8,
+   "idx_bad": true
+  },
+  "2026-11-02": {
+   "light": "RED",
+   "buys10": 262,
+   "sells10": 493,
+   "p50": 20.0,
+   "idx_bad": true
+  },
+  "2026-11-03": {
+   "light": "RED",
+   "buys10": 326,
+   "sells10": 506,
+   "p50": 22.3,
+   "idx_bad": true
+  },
+  "2026-11-04": {
+   "light": "AMBER",
+   "buys10": 421,
+   "sells10": 419,
+   "p50": 28.6,
+   "idx_bad": true
+  },
+  "2026-11-05": {
+   "light": "AMBER",
+   "buys10": 553,
+   "sells10": 329,
+   "p50": 34.8,
+   "idx_bad": true
+  },
+  "2026-11-06": {
+   "light": "AMBER",
+   "buys10": 662,
+   "sells10": 259,
+   "p50": 32.2,
+   "idx_bad": true
+  },
+  "2026-11-09": {
+   "light": "GREEN",
+   "buys10": 809,
+   "sells10": 220,
+   "p50": 37.4,
+   "idx_bad": false
+  },
+  "2026-11-11": {
+   "light": "GREEN",
+   "buys10": 991,
+   "sells10": 192,
+   "p50": 43.9,
+   "idx_bad": false
+  },
+  "2026-11-12": {
+   "light": "GREEN",
+   "buys10": 1105,
+   "sells10": 193,
+   "p50": 47.6,
+   "idx_bad": false
+  },
+  "2026-11-13": {
+   "light": "GREEN",
+   "buys10": 1165,
+   "sells10": 199,
+   "p50": 45.1,
+   "idx_bad": false
+  },
+  "2026-11-16": {
+   "light": "GREEN",
+   "buys10": 1190,
+   "sells10": 235,
+   "p50": 39.4,
+   "idx_bad": false
+  },
+  "2026-11-17": {
+   "light": "GREEN",
+   "buys10": 1183,
+   "sells10": 281,
+   "p50": 39.5,
+   "idx_bad": false
+  },
+  "2026-11-18": {
+   "light": "GREEN",
+   "buys10": 1119,
+   "sells10": 268,
+   "p50": 50.0,
+   "idx_bad": false
+  }
+ }
+}
