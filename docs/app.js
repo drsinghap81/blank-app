@@ -6086,6 +6086,20 @@ async function emaLift(el, mk = 'NSE') {
 /* 20 Nov 2026 (Amritpal: "which broke and closed above the all-time high and now crossed the ATH candle's high"): for the month,
    week and day candles that CLOSED above the old ATH, has the price since gone above that candle's high? Monthly = the tested
    Momentum (ATH) system's trigger; week / day closes are watch-only lists. Plus the system's buys of the last 7 days. */
+/* 20 Nov 2026 (Amritpal: "include funds and ETFs in the categorisation on the card"): the same month / week / day all-time-high
+   closes for this market's ETFs and mutual funds (funds.json), crossed (✓) or within 2% of that candle's high. Tap = fund panel. */
+function fundAthLines(F, mk) {
+  const R = ((F && F.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[mk]) && r.kind !== 'debt');
+  if (!R.length) return '';
+  const nm = (r) => (r.kind === 'fund' ? String(r.name || r.key).replace(/ (Fund|Scheme).*$/i, '').replace(/ - (Direct|Regular).*$/i, '').slice(0, 28) : String(r.symbol || r.key).replace(/^[A-Z]{2}:/, ''));
+  const one = (lab, k, hk) => {
+    const x = R.filter((r) => r[k] && r[k][hk] && r.close).map((r) => ({ r, h: r[k][hk], c: r.close }));
+    const yes = x.filter((z) => z.c > z.h).sort((a, b) => b.c / b.h - a.c / a.h), near = x.filter((z) => z.c <= z.h && z.h / z.c - 1 <= 0.02);
+    if (!yes.length && !near.length) return '';
+    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((z) => `<a href="#" class="al-t ok" data-fd="${esc(z.r.key)}">✓ ${esc(nm(z.r))} +${fmt((z.c / z.h - 1) * 100, 1)}%</a>`).join('')}${near.slice(0, 4).map((z) => `<a href="#" class="al-t" data-fd="${esc(z.r.key)}">${esc(nm(z.r))} near · needs ${fmt(z.h, 2, MKT[mk].loc)}</a>`).join('')}${yes.length + near.length > 10 ? `<small>+${yes.length + near.length - 10} more</small>` : ''}</div>`; };
+  const out = one('Funds &amp; ETFs · month close →', 'mclose', 'high_m') + one('Funds &amp; ETFs · week close →', 'wclose', 'high_p') + one('Funds &amp; ETFs · day close →', 'dclose', 'high_p');
+  return out;
+}
 function athLines(A, mk) {
   if (!A) return '';
   const Mz = (v) => (mk === 'NSE' ? inr(v, 2) : `${MKT[mk].cur}${fmt(v, 2, MKT[mk].loc)}`);
@@ -6100,13 +6114,14 @@ function athLines(A, mk) {
   const recent = (A.breakouts || []).filter((b) => asof && (asof - new Date(b.date + 'T00:00:00')) / 864e5 <= 7).sort((a, b) => (a.date < b.date ? 1 : -1));
   const out = one('ATH month close →', A.month_close, 'high_m') + one('ATH week close →', A.week_close, 'high_p') + one('ATH day close →', A.day_close, 'high_p')
     + (recent.length ? `<div class="al-r"><b class="up">▲ ATH buys this week</b> <span>${recent.slice(0, 8).map((b) => `<a href="#" class="al-s" data-ath="${esc(b.symbol)}">${esc(b.symbol)}</a>`).join(', ')}${recent.length > 8 ? ` +${recent.length - 8}` : ''}</span></div>` : '');
-  return out ? `<div class="al-sub">All-time highs · ✓ = crossed the high of the candle that closed above the ATH</div>${out}` : '';
+  return `<div class="al-sub">All-time highs · ✓ = crossed the high of the candle that closed above the ATH</div>${out || '<div class="al-r muted"><span>Stocks: none crossed or near today.</span></div>'}`;
 }
 async function alertsCard(box, mk) {
   if (!box) return;
   const P = MAIN + MKT[mk].path;
   const [S, W, E, AT, AX] = await Promise.all([sysMap(mk).catch(() => null), getJSON(P + 'index_w.json', 'index_w_' + mk), getJSON(P + 'ema_lift.json', 'ema_lift_' + mk),
     getJSON(P + 'ath.json', mk === 'NSE' ? 'ath' : 'ath_' + mk), mk === 'NSE' ? getJSON(MAIN + 'data/scan/asx_clue.json', 'asx_clue') : null]);
+  if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds').catch(() => null);
   /* 20 Nov 2026: morning metals clue from Australia (ASX Materials vs ASX 200), shown on its own day only */
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
   const axl = AX && AX.date === today && AX.diff != null ? `<div class="al-r"><b class="${AX.diff > 0.5 ? 'up' : AX.diff < -0.5 ? 'down' : ''}">${AX.diff > 0.5 ? '▲' : AX.diff < -0.5 ? '▼' : '•'} Metals today: ${esc(AX.call)}</b><small>ASX materials ${AX.diff > 0 ? '+' : ''}${fmt(AX.diff, 2)}% vs ASX 200 at ${esc(AX.ist)} IST</small></div>`
@@ -6136,7 +6151,7 @@ async function alertsCard(box, mk) {
     ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
-    ${athLines(AT, mk)}
+    ${athLines(AT, mk)}${fundAthLines(state.fund, mk)}
     ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
       ${L ? lightHTML(L, mk) : ''}
@@ -6148,6 +6163,7 @@ async function alertsCard(box, mk) {
   box.querySelectorAll('[data-wch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.wch, mk)));
   box.querySelectorAll('[data-tv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(b.dataset.tv, mk)) + '&interval=D', '_blank', 'noopener'); }));
   box.querySelectorAll('[data-ath]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ symbol: b.dataset.ath, kind: 'ATH' }, mk); }));
+  box.querySelectorAll('[data-fd]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const r = ((state.fund && state.fund.rows) || []).find((x) => x.key === b.dataset.fd); if (r) fundSelect(r); }));
 }
 /* 20 Nov 2026: tap an index line in the alert card -> daily candles, 9 EMA, the W's falling trendline and the two lows / break */
 async function wChart(sl, mk) {
