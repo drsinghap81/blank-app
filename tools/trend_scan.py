@@ -457,6 +457,35 @@ def main():
         tr["size"] = tr.symbol.map(size)
     chart_syms = set(p.symbol) | (set(tr.symbol) if len(tr) else set()) | \
         (set(E[E.status.str.startswith(("NEW", "open", "EXIT"))].symbol) if len(E) else set())
+    # 19 Nov 2026 (Amritpal): market breadth for the traffic light, the 20 > 50 > 100 > 200 SMA stack, 3-month strength for every stock.
+    # Breadth = EMA 9/21 cross-ups vs cross-downs summed over the last 10 sessions across all scanned stocks (as data/research/red_light.json).
+    xu, xd, a50, a200, R3, STACK = {}, {}, [], [], {}, []
+    for sym, (fo, fh, fl, fc) in frames.items():
+        if len(fc) < 120:
+            continue
+        e9, e21 = fc.ewm(span=9, adjust=False).mean(), fc.ewm(span=21, adjust=False).mean()
+        up = e9 > e21; pu = up.shift(1)
+        cu, cd = (up & (pu == False)).iloc[-30:], ((~up) & (pu == True)).iloc[-30:]   # noqa: E712
+        for dt, v in cu.items():
+            xu[dt] = xu.get(dt, 0) + int(v)
+        for dt, v in cd.items():
+            xd[dt] = xd.get(dt, 0) + int(v)
+        sm = {n: fc.rolling(n).mean() for n in (20, 50, 100, 200)}
+        a50.append(bool(fc.iloc[-1] > sm[50].iloc[-1]))
+        if np.isfinite(sm[200].iloc[-1]):
+            a200.append(bool(fc.iloc[-1] > sm[200].iloc[-1]))
+            if (fc.iloc[-1] > sm[20].iloc[-1] > sm[50].iloc[-1] > sm[100].iloc[-1] > sm[200].iloc[-1]
+                    and all(sm[n].iloc[-1] > sm[n].iloc[-1 - k] for n, k in ((20, 5), (50, 10), (100, 10), (200, 20)))):
+                STACK.append(sym)
+        if len(fc) > 64:
+            R3[sym] = round(float(fc.iloc[-1] / fc.iloc[-64] - 1) * 100, 1)
+    dts = sorted(xu)[-20:]
+    bu, bd = pd.Series(xu).sort_index(), pd.Series(xd).sort_index()
+    b10, s10 = bu.rolling(10).sum(), bd.rolling(10).sum()
+    BREADTH = dict(buys10=int(b10.iloc[-1]), sells10=int(s10.iloc[-1]), p50=round(float(np.mean(a50)) * 100, 1) if a50 else None,
+                   p200=round(float(np.mean(a200)) * 100, 1) if a200 else None, stocks=len(a50),
+                   hist=[dict(d=str(pd.Timestamp(k).date()), b=int(b10[k]), s=int(s10[k])) for k in dts if np.isfinite(b10[k])]) if len(bu) else {}
+    print("breadth", {k: v for k, v in BREADTH.items() if k != "hist"}, "stack", len(STACK))
     B = pd.DataFrame(bases)
     if len(B):
         B = B.merge(u[["symbol", "name", "board"]], on="symbol", how="left")
@@ -503,7 +532,8 @@ def main():
                          scanned=len(df), rows=p[cols].to_dict("records"),
                          triggers=tr.to_dict("records") if len(tr) else [],
                          early=E.to_dict("records") if len(E) else [],
-                         bases=B.to_dict("records") if len(B) else [])),
+                         bases=B.to_dict("records") if len(B) else [],
+                         breadth=BREADTH, stack=sorted(STACK), r3m=R3)),
               open(f"{OUT}/trend_scan.json", "w"), indent=1, default=str, allow_nan=False)
     print("tight bases", len(B), (B.status.value_counts().to_dict() if len(B) else {}))
     print("trend", int(strict.sum()), "watch", int((loose & ~strict).sum()), "triggers", len(tr))
