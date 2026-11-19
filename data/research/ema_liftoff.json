@@ -1,0 +1,865 @@
+{
+ "method": "'Candle leaves the EMA' trend start (19 Nov 2026, Amritpal: \"first candle whose whole OHLC is above (or below) EMA 5 or 9\nstarts a trend in that direction\").\nData: continuous near-month futures, daily OHLC 2007 -> Nov 2026 (data/futures/*.csv): BANKNIFTY, NIFTY + 53 F&O stocks.\nSignal at the close of day t (EMA of closes):\n  LONG  : low > EMA today, and no candle in the previous 10 sessions had its low above the EMA (a FRESH lift-off)\n  SHORT : high < EMA today, and none of the previous 10 had its high below the EMA\nEntry next open. Exits tested:\n  hold 5 / 10 / 20 sessions (close)\n  trail : first close back below (long) / above (short) the same EMA -> out next open\n  flip  : first candle fully on the other side of the EMA -> out next open\nCosts: indices 0.05%, stocks 0.10% round trip. Roll days / splits: daily moves > 20% are dropped from stocks.\nBaseline: buying (or shorting) on any day with the same holds. For timing, the 9/21 EMA cross on the same data.",
+ "BANKNIFTY": {
+  "LONG any day, hold 5": {
+   "n": 4837,
+   "win": 53,
+   "avg": 0.22,
+   "median": 0.23
+  },
+  "LONG any day, hold 10": {
+   "n": 4832,
+   "win": 55,
+   "avg": 0.55,
+   "median": 0.56
+  },
+  "LONG any day, hold 20": {
+   "n": 4822,
+   "win": 58,
+   "avg": 1.2,
+   "median": 1.09
+  },
+  "LONG EMA5 lift-off, hold5": {
+   "n": 136,
+   "win": 51,
+   "avg": 0.09,
+   "median": 0.1,
+   "pf": 1.07,
+   "days": 5.0,
+   "per_year": 7.0
+  },
+  "LONG EMA5 lift-off, hold10": {
+   "n": 136,
+   "win": 60,
+   "avg": 0.5,
+   "median": 0.95,
+   "pf": 1.26,
+   "days": 10.0,
+   "per_year": 7.0
+  },
+  "LONG EMA5 lift-off, hold20": {
+   "n": 136,
+   "win": 58,
+   "avg": 1.27,
+   "median": 1.42,
+   "pf": 1.54,
+   "days": 19.9,
+   "per_year": 7.0
+  },
+  "LONG EMA5 lift-off, trail": {
+   "n": 136,
+   "win": 40,
+   "avg": 0.43,
+   "median": -0.32,
+   "pf": 1.47,
+   "days": 6.5,
+   "per_year": 7.0
+  },
+  "LONG EMA5 lift-off, flip": {
+   "n": 132,
+   "win": 47,
+   "avg": 1.38,
+   "median": -0.38,
+   "pf": 1.77,
+   "days": 14.9,
+   "per_year": 6.8,
+   "recent": [
+    [
+     "2026-04-08",
+     1.4
+    ],
+    [
+     "2026-05-25",
+     4.0
+    ],
+    [
+     "2026-07-29",
+     0.8
+    ],
+    [
+     "2026-08-26",
+     -0.8
+    ],
+    [
+     "2026-10-16",
+     -3.0
+    ],
+    [
+     "2026-11-03",
+     11.9
+    ]
+   ]
+  },
+  "LONG EMA9 lift-off, hold5": {
+   "n": 110,
+   "win": 51,
+   "avg": -0.09,
+   "median": 0.09,
+   "pf": 0.94,
+   "days": 5.0,
+   "per_year": 5.7
+  },
+  "LONG EMA9 lift-off, hold10": {
+   "n": 110,
+   "win": 55,
+   "avg": 0.25,
+   "median": 0.47,
+   "pf": 1.13,
+   "days": 10.0,
+   "per_year": 5.7
+  },
+  "LONG EMA9 lift-off, hold20": {
+   "n": 110,
+   "win": 55,
+   "avg": 0.81,
+   "median": 1.1,
+   "pf": 1.28,
+   "days": 19.9,
+   "per_year": 5.7
+  },
+  "LONG EMA9 lift-off, trail": {
+   "n": 110,
+   "win": 36,
+   "avg": 0.76,
+   "median": -0.67,
+   "pf": 1.57,
+   "days": 8.9,
+   "per_year": 5.7
+  },
+  "LONG EMA9 lift-off, flip": {
+   "n": 109,
+   "win": 39,
+   "avg": 1.62,
+   "median": -0.65,
+   "pf": 1.9,
+   "days": 16.0,
+   "per_year": 5.6,
+   "recent": [
+    [
+     "2026-04-08",
+     -0.2
+    ],
+    [
+     "2026-05-25",
+     -2.6
+    ],
+    [
+     "2026-07-31",
+     -0.7
+    ],
+    [
+     "2026-08-26",
+     -0.8
+    ],
+    [
+     "2026-10-14",
+     -1.2
+    ],
+    [
+     "2026-11-03",
+     11.9
+    ]
+   ]
+  },
+  "SHORT any day, hold 5": {
+   "n": 4837,
+   "win": 45,
+   "avg": -0.32,
+   "median": -0.33
+  },
+  "SHORT any day, hold 10": {
+   "n": 4832,
+   "win": 44,
+   "avg": -0.65,
+   "median": -0.66
+  },
+  "SHORT any day, hold 20": {
+   "n": 4822,
+   "win": 41,
+   "avg": -1.3,
+   "median": -1.19
+  },
+  "SHORT EMA5 lift-off, hold5": {
+   "n": 160,
+   "win": 41,
+   "avg": -0.69,
+   "median": -0.49,
+   "pf": 0.54,
+   "days": 5.0,
+   "per_year": 8.2
+  },
+  "SHORT EMA5 lift-off, hold10": {
+   "n": 160,
+   "win": 44,
+   "avg": -0.93,
+   "median": -0.63,
+   "pf": 0.6,
+   "days": 10.0,
+   "per_year": 8.2
+  },
+  "SHORT EMA5 lift-off, hold20": {
+   "n": 160,
+   "win": 39,
+   "avg": -1.11,
+   "median": -1.56,
+   "pf": 0.65,
+   "days": 20.0,
+   "per_year": 8.2
+  },
+  "SHORT EMA5 lift-off, trail": {
+   "n": 160,
+   "win": 30,
+   "avg": -0.61,
+   "median": -0.68,
+   "pf": 0.52,
+   "days": 4.8,
+   "per_year": 8.2
+  },
+  "SHORT EMA5 lift-off, flip": {
+   "n": 155,
+   "win": 26,
+   "avg": -1.21,
+   "median": -1.62,
+   "pf": 0.44,
+   "days": 9.9,
+   "per_year": 8.0,
+   "recent": [
+    [
+     "2026-02-02",
+     1.3
+    ],
+    [
+     "2026-03-02",
+     6.4
+    ],
+    [
+     "2026-04-24",
+     0.3
+    ],
+    [
+     "2026-07-09",
+     0.9
+    ],
+    [
+     "2026-08-19",
+     -1.1
+    ],
+    [
+     "2026-10-26",
+     -2.2
+    ]
+   ]
+  },
+  "SHORT EMA9 lift-off, hold5": {
+   "n": 129,
+   "win": 40,
+   "avg": -0.79,
+   "median": -0.37,
+   "pf": 0.49,
+   "days": 5.0,
+   "per_year": 6.7
+  },
+  "SHORT EMA9 lift-off, hold10": {
+   "n": 129,
+   "win": 40,
+   "avg": -1.25,
+   "median": -0.91,
+   "pf": 0.52,
+   "days": 10.0,
+   "per_year": 6.7
+  },
+  "SHORT EMA9 lift-off, hold20": {
+   "n": 129,
+   "win": 40,
+   "avg": -1.35,
+   "median": -1.82,
+   "pf": 0.61,
+   "days": 20.0,
+   "per_year": 6.7
+  },
+  "SHORT EMA9 lift-off, trail": {
+   "n": 129,
+   "win": 26,
+   "avg": -0.75,
+   "median": -0.96,
+   "pf": 0.5,
+   "days": 6.2,
+   "per_year": 6.7
+  },
+  "SHORT EMA9 lift-off, flip": {
+   "n": 128,
+   "win": 23,
+   "avg": -1.44,
+   "median": -1.64,
+   "pf": 0.34,
+   "days": 10.4,
+   "per_year": 6.6,
+   "recent": [
+    [
+     "2025-12-17",
+     -1.4
+    ],
+    [
+     "2026-03-02",
+     6.4
+    ],
+    [
+     "2026-04-30",
+     -1.3
+    ],
+    [
+     "2026-07-09",
+     -0.1
+    ],
+    [
+     "2026-08-18",
+     -1.5
+    ],
+    [
+     "2026-10-22",
+     -1.0
+    ]
+   ]
+  }
+ },
+ "NIFTY": {
+  "LONG any day, hold 5": {
+   "n": 4837,
+   "win": 55,
+   "avg": 0.14,
+   "median": 0.25
+  },
+  "LONG any day, hold 10": {
+   "n": 4832,
+   "win": 56,
+   "avg": 0.38,
+   "median": 0.47
+  },
+  "LONG any day, hold 20": {
+   "n": 4822,
+   "win": 59,
+   "avg": 0.83,
+   "median": 0.94
+  },
+  "LONG EMA5 lift-off, hold5": {
+   "n": 122,
+   "win": 58,
+   "avg": 0.03,
+   "median": 0.42,
+   "pf": 1.03,
+   "days": 5.0,
+   "per_year": 6.3
+  },
+  "LONG EMA5 lift-off, hold10": {
+   "n": 122,
+   "win": 58,
+   "avg": 0.56,
+   "median": 0.8,
+   "pf": 1.43,
+   "days": 10.0,
+   "per_year": 6.3
+  },
+  "LONG EMA5 lift-off, hold20": {
+   "n": 122,
+   "win": 58,
+   "avg": 1.06,
+   "median": 0.91,
+   "pf": 1.59,
+   "days": 20.0,
+   "per_year": 6.3
+  },
+  "LONG EMA5 lift-off, trail": {
+   "n": 122,
+   "win": 40,
+   "avg": 0.23,
+   "median": -0.4,
+   "pf": 1.27,
+   "days": 6.8,
+   "per_year": 6.3
+  },
+  "LONG EMA5 lift-off, flip": {
+   "n": 118,
+   "win": 40,
+   "avg": 1.4,
+   "median": -0.43,
+   "pf": 2.23,
+   "days": 15.7,
+   "per_year": 6.1,
+   "recent": [
+    [
+     "2026-05-07",
+     -2.2
+    ],
+    [
+     "2026-05-25",
+     -2.3
+    ],
+    [
+     "2026-06-15",
+     -1.1
+    ],
+    [
+     "2026-07-29",
+     0.7
+    ],
+    [
+     "2026-08-26",
+     -1.3
+    ],
+    [
+     "2026-10-16",
+     9.2
+    ]
+   ]
+  },
+  "LONG EMA9 lift-off, hold5": {
+   "n": 104,
+   "win": 61,
+   "avg": 0.25,
+   "median": 0.5,
+   "pf": 1.28,
+   "days": 5.0,
+   "per_year": 5.4
+  },
+  "LONG EMA9 lift-off, hold10": {
+   "n": 104,
+   "win": 60,
+   "avg": 0.57,
+   "median": 1.0,
+   "pf": 1.49,
+   "days": 10.0,
+   "per_year": 5.4
+  },
+  "LONG EMA9 lift-off, hold20": {
+   "n": 104,
+   "win": 58,
+   "avg": 1.05,
+   "median": 1.06,
+   "pf": 1.63,
+   "days": 20.0,
+   "per_year": 5.4
+  },
+  "LONG EMA9 lift-off, trail": {
+   "n": 104,
+   "win": 39,
+   "avg": 0.71,
+   "median": -0.49,
+   "pf": 1.81,
+   "days": 9.3,
+   "per_year": 5.4
+  },
+  "LONG EMA9 lift-off, flip": {
+   "n": 103,
+   "win": 42,
+   "avg": 1.31,
+   "median": -0.44,
+   "pf": 2.14,
+   "days": 16.6,
+   "per_year": 5.3,
+   "recent": [
+    [
+     "2026-04-08",
+     -0.9
+    ],
+    [
+     "2026-05-25",
+     -2.3
+    ],
+    [
+     "2026-06-15",
+     -0.4
+    ],
+    [
+     "2026-07-29",
+     0.5
+    ],
+    [
+     "2026-08-26",
+     -1.3
+    ],
+    [
+     "2026-10-16",
+     9.2
+    ]
+   ]
+  },
+  "SHORT any day, hold 5": {
+   "n": 4837,
+   "win": 44,
+   "avg": -0.24,
+   "median": -0.35
+  },
+  "SHORT any day, hold 10": {
+   "n": 4832,
+   "win": 42,
+   "avg": -0.48,
+   "median": -0.57
+  },
+  "SHORT any day, hold 20": {
+   "n": 4822,
+   "win": 40,
+   "avg": -0.93,
+   "median": -1.04
+  },
+  "SHORT EMA5 lift-off, hold5": {
+   "n": 144,
+   "win": 40,
+   "avg": -0.43,
+   "median": -0.55,
+   "pf": 0.64,
+   "days": 5.0,
+   "per_year": 7.4
+  },
+  "SHORT EMA5 lift-off, hold10": {
+   "n": 144,
+   "win": 46,
+   "avg": -0.46,
+   "median": -0.3,
+   "pf": 0.7,
+   "days": 10.0,
+   "per_year": 7.4
+  },
+  "SHORT EMA5 lift-off, hold20": {
+   "n": 144,
+   "win": 39,
+   "avg": -0.34,
+   "median": -1.09,
+   "pf": 0.85,
+   "days": 20.0,
+   "per_year": 7.4
+  },
+  "SHORT EMA5 lift-off, trail": {
+   "n": 144,
+   "win": 26,
+   "avg": -0.42,
+   "median": -0.71,
+   "pf": 0.55,
+   "days": 5.0,
+   "per_year": 7.4
+  },
+  "SHORT EMA5 lift-off, flip": {
+   "n": 142,
+   "win": 30,
+   "avg": -0.46,
+   "median": -0.96,
+   "pf": 0.65,
+   "days": 9.3,
+   "per_year": 7.3,
+   "recent": [
+    [
+     "2025-12-09",
+     -1.4
+    ],
+    [
+     "2025-12-30",
+     -0.8
+    ],
+    [
+     "2026-04-27",
+     -1.1
+    ],
+    [
+     "2026-06-02",
+     -2.0
+    ],
+    [
+     "2026-07-23",
+     -2.4
+    ],
+    [
+     "2026-08-13",
+     0.2
+    ]
+   ]
+  },
+  "SHORT EMA9 lift-off, hold5": {
+   "n": 128,
+   "win": 38,
+   "avg": -0.52,
+   "median": -0.66,
+   "pf": 0.59,
+   "days": 5.0,
+   "per_year": 6.7
+  },
+  "SHORT EMA9 lift-off, hold10": {
+   "n": 128,
+   "win": 39,
+   "avg": -0.83,
+   "median": -0.66,
+   "pf": 0.54,
+   "days": 10.0,
+   "per_year": 6.7
+  },
+  "SHORT EMA9 lift-off, hold20": {
+   "n": 128,
+   "win": 36,
+   "avg": -0.92,
+   "median": -1.43,
+   "pf": 0.64,
+   "days": 20.0,
+   "per_year": 6.7
+  },
+  "SHORT EMA9 lift-off, trail": {
+   "n": 128,
+   "win": 23,
+   "avg": -0.59,
+   "median": -0.84,
+   "pf": 0.46,
+   "days": 6.1,
+   "per_year": 6.7
+  },
+  "SHORT EMA9 lift-off, flip": {
+   "n": 126,
+   "win": 25,
+   "avg": -0.7,
+   "median": -1.17,
+   "pf": 0.48,
+   "days": 9.8,
+   "per_year": 6.6,
+   "recent": [
+    [
+     "2025-09-24",
+     -0.5
+    ],
+    [
+     "2025-11-06",
+     -1.6
+    ],
+    [
+     "2025-12-09",
+     -1.4
+    ],
+    [
+     "2026-05-11",
+     -1.2
+    ],
+    [
+     "2026-07-22",
+     -1.7
+    ],
+    [
+     "2026-08-14",
+     -0.0
+    ]
+   ]
+  }
+ },
+ "STOCKS": {
+  "LONG any day, hold 5": {
+   "n": 201061,
+   "win": 51,
+   "avg": 0.18,
+   "median": 0.09
+  },
+  "LONG any day, hold 10": {
+   "n": 200796,
+   "win": 53,
+   "avg": 0.52,
+   "median": 0.38
+  },
+  "LONG any day, hold 20": {
+   "n": 200266,
+   "win": 55,
+   "avg": 1.21,
+   "median": 0.88
+  },
+  "LONG EMA5 lift-off, hold5": {
+   "n": 6089,
+   "win": 51,
+   "avg": 0.15,
+   "median": 0.09,
+   "pf": 1.09,
+   "days": 5.0,
+   "per_year": 310.9
+  },
+  "LONG EMA5 lift-off, hold10": {
+   "n": 6089,
+   "win": 53,
+   "avg": 0.45,
+   "median": 0.33,
+   "pf": 1.21,
+   "days": 10.0,
+   "per_year": 310.9
+  },
+  "LONG EMA5 lift-off, hold20": {
+   "n": 6089,
+   "win": 55,
+   "avg": 1.39,
+   "median": 1.0,
+   "pf": 1.49,
+   "days": 19.9,
+   "per_year": 310.9
+  },
+  "LONG EMA5 lift-off, trail": {
+   "n": 6088,
+   "win": 37,
+   "avg": 0.3,
+   "median": -0.78,
+   "pf": 1.22,
+   "days": 6.0,
+   "per_year": 310.9
+  },
+  "LONG EMA5 lift-off, flip": {
+   "n": 5348,
+   "win": 41,
+   "avg": 1.39,
+   "median": -1.17,
+   "pf": 1.58,
+   "days": 18.0,
+   "per_year": 273.1
+  },
+  "LONG EMA9 lift-off, hold5": {
+   "n": 4891,
+   "win": 51,
+   "avg": 0.17,
+   "median": 0.07,
+   "pf": 1.11,
+   "days": 5.0,
+   "per_year": 249.7
+  },
+  "LONG EMA9 lift-off, hold10": {
+   "n": 4891,
+   "win": 53,
+   "avg": 0.49,
+   "median": 0.37,
+   "pf": 1.22,
+   "days": 10.0,
+   "per_year": 249.7
+  },
+  "LONG EMA9 lift-off, hold20": {
+   "n": 4891,
+   "win": 56,
+   "avg": 1.5,
+   "median": 1.24,
+   "pf": 1.54,
+   "days": 19.9,
+   "per_year": 249.7
+  },
+  "LONG EMA9 lift-off, trail": {
+   "n": 4891,
+   "win": 36,
+   "avg": 0.45,
+   "median": -1.0,
+   "pf": 1.29,
+   "days": 8.2,
+   "per_year": 249.7
+  },
+  "LONG EMA9 lift-off, flip": {
+   "n": 4756,
+   "win": 40,
+   "avg": 1.47,
+   "median": -1.38,
+   "pf": 1.64,
+   "days": 17.3,
+   "per_year": 242.8
+  },
+  "SHORT any day, hold 5": {
+   "n": 201061,
+   "win": 47,
+   "avg": -0.38,
+   "median": -0.29
+  },
+  "SHORT any day, hold 10": {
+   "n": 200796,
+   "win": 46,
+   "avg": -0.72,
+   "median": -0.58
+  },
+  "SHORT any day, hold 20": {
+   "n": 200266,
+   "win": 44,
+   "avg": -1.41,
+   "median": -1.08
+  },
+  "SHORT EMA5 lift-off, hold5": {
+   "n": 6035,
+   "win": 46,
+   "avg": -0.45,
+   "median": -0.32,
+   "pf": 0.76,
+   "days": 5.0,
+   "per_year": 307.5
+  },
+  "SHORT EMA5 lift-off, hold10": {
+   "n": 6035,
+   "win": 46,
+   "avg": -0.65,
+   "median": -0.47,
+   "pf": 0.76,
+   "days": 10.0,
+   "per_year": 307.5
+  },
+  "SHORT EMA5 lift-off, hold20": {
+   "n": 6035,
+   "win": 46,
+   "avg": -1.08,
+   "median": -0.84,
+   "pf": 0.73,
+   "days": 20.0,
+   "per_year": 307.5
+  },
+  "SHORT EMA5 lift-off, trail": {
+   "n": 6033,
+   "win": 33,
+   "avg": -0.35,
+   "median": -1.01,
+   "pf": 0.78,
+   "days": 5.6,
+   "per_year": 307.4
+  },
+  "SHORT EMA5 lift-off, flip": {
+   "n": 5577,
+   "win": 32,
+   "avg": -0.89,
+   "median": -2.05,
+   "pf": 0.69,
+   "days": 13.7,
+   "per_year": 284.2
+  },
+  "SHORT EMA9 lift-off, hold5": {
+   "n": 5144,
+   "win": 46,
+   "avg": -0.44,
+   "median": -0.33,
+   "pf": 0.77,
+   "days": 5.0,
+   "per_year": 262.1
+  },
+  "SHORT EMA9 lift-off, hold10": {
+   "n": 5144,
+   "win": 46,
+   "avg": -0.72,
+   "median": -0.52,
+   "pf": 0.73,
+   "days": 10.0,
+   "per_year": 262.1
+  },
+  "SHORT EMA9 lift-off, hold20": {
+   "n": 5144,
+   "win": 46,
+   "avg": -1.14,
+   "median": -0.88,
+   "pf": 0.72,
+   "days": 20.0,
+   "per_year": 262.1
+  },
+  "SHORT EMA9 lift-off, trail": {
+   "n": 5144,
+   "win": 30,
+   "avg": -0.54,
+   "median": -1.33,
+   "pf": 0.7,
+   "days": 7.3,
+   "per_year": 262.1
+  },
+  "SHORT EMA9 lift-off, flip": {
+   "n": 5040,
+   "win": 30,
+   "avg": -0.88,
+   "median": -2.06,
+   "pf": 0.68,
+   "days": 13.7,
+   "per_year": 256.8
+  }
+ }
+}
