@@ -38,6 +38,8 @@ FRED = {"INDIRLTLT01STM": "India 10-year G-sec yield", "IRLTLT01GBM156N": "UK 10
         "IRLTLT01JPM156N": "Japan 10-year yield", "IRLTLT01AUM156N": "Australia 10-year yield", "IRLTLT01CAM156N": "Canada 10-year yield"}
 RAW = {}
 rows = []
+import shutil  # noqa: E402
+shutil.rmtree("data/scan/asset_w_charts", ignore_errors=True)   # 20 Nov 2026: rebuilt each run (current W's only)
 
 
 def add_row(t, nm, grp, x):
@@ -87,6 +89,27 @@ def add_row(t, nm, grp, x):
     if r["mclose"]:                                  # the breakout month is the new ATH: report the OLD high it cleared
         r.update(ath_close=r["mclose"]["old_ath"], ath_month=r["mclose"]["ath_month"], base_months=r["mclose"]["base_months"])
     r["depth"] = r["mclose"]["depth"] if r["mclose"] else (round(float(done.iloc[a + 1:].min() / old - 1), 4) if a + 1 < len(done) else None)
+    # 20 Nov 2026 (Amritpal: "include commodities too"): latest W + falling trendline (tools/index_w_alert.py rule) and the 9 EMA
+    # lift-off state (tools/ema_lift_alert.py) on the daily bars; chart for the app in data/scan/asset_w_charts/<key>.json
+    r["w"] = r["lift"] = None
+    if not coarse:
+        try:
+            import index_w_alert as IW, ema_lift_alert as EL
+            xd = x[["Open", "High", "Low", "Close"]].copy(); xd = xd.dropna(subset=["Close"])
+            for k in ("Open", "High", "Low"):
+                xd[k] = xd[k].fillna(xd.Close)
+            wr = IW.latest(xd.Close)
+            if wr and (wr["status"] == "forming" or wr.get("days_ago", 99) <= 5):
+                j = IW.chart_json(xd, wr)
+                if j:
+                    os.makedirs("data/scan/asset_w_charts", exist_ok=True); fn = t.replace(":", "_").replace("/", "_").replace("=", "_").replace("^", "_")
+                    json.dump(dict(name=nm, **j), open(f"data/scan/asset_w_charts/{fn}.json", "w"), separators=(",", ":")); wr["chart"] = fn
+                r["w"] = {k: wr.get(k) for k in ("status", "stage", "low1", "low2", "broke_on", "days_ago", "since", "line_now", "dist_pct", "low1_close", "chart")}
+            ls = EL.state(xd)
+            if ls:
+                r["lift"] = {k: ls.get(k) for k in ("status", "signal", "gain", "days", "ema")}
+        except Exception as e:  # noqa: BLE001
+            print("w/lift fail", t, str(e)[:80])
     rows.append(r)
 
 
