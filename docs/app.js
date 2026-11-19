@@ -4994,7 +4994,7 @@ async function loadMarkets() {
         <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div>${(() => { const L = (G.rows || []).filter((r) => r.d1 != null).sort((a, b) => b.d1 - a.d1); if (!L.length) return '';
           const row = (r) => `<div class="gpsr" data-ig="${esc(r.group)}"><span class="gpsn">${esc(r.group)} <span class="muted">· ${esc(r.sector || '')} · ${r.n} stocks</span>${r.w ? (r.w.status === 'broken' ? ' <span class="chip open">W broke</span>' : ` <span class="chip">W ${fmt(r.w.dist_pct, 1)}% to break</span>`) : ''}</span><span class="gpsv"><b class="${r.d1 >= 0 ? 'up' : 'down'}">${r.d1 >= 0 ? '+' : ''}${fmt(r.d1, 2)}%</b></span></div>`;
           return `<h4 style="margin:14px 0 4px">Industries today · ${L.length} (equal weight, like StockEdge sectors)</h4><div class="mxlist">${L.slice(0, 8).map(row).join('')}</div>
-          <details class="t2-more"><summary>All ${L.length} industries by today's change</summary><div class="mxlist">${L.map(row).join('')}</div></details>`; })()}</div>`;
+          <details class="t2-more"><summary>All ${L.length} industries by today's change</summary><div class="mxlist">${L.map(row).join('')}</div></details>`; })()}${mk === 'NSE' ? nseIndHTML(G) : ''}</div>`;
     const setups = []; G.rows.forEach((g) => g.members.forEach((m) => { const c = S.map[m.symbol]; if (c && c.some((x) => !x.includes('sell') && !x.includes('forming') && !x.includes('Near support'))) setups.push({ m, g, c }); }));
     setups.sort((a, b) => (b.g.p1m - a.g.p1m) || (b.m.wrpi - a.m.wrpi));
     el.insertAdjacentHTML('beforeend', `<div class="card"><h4 style="margin:0 0 4px">Signals ranked by industry strength</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Every stock with a live buy or in-trade signal from your systems, strongest industry (1-month Pulse) first. This replaces the old Top-down tab: in the 2017–26 test, ATH breakouts in strong sectors with strong stock RS won 54% vs 48%.</p>
@@ -5005,6 +5005,7 @@ async function loadMarkets() {
     mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
     el.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'sector', sec: b.dataset.s, grp: null })));
     el.querySelectorAll('[data-ig]').forEach((b) => b.addEventListener('click', () => { const g = G.rows.find((r) => r.group === b.dataset.ig); mxGo({ lvl: 'industry', sec: g ? g.sector : null, grp: b.dataset.ig }); }));
+    el.querySelectorAll('[data-nb]').forEach((b) => b.addEventListener('click', () => nseIndOpen(((G.nse || {}).rows || []).find((r) => r.slug === b.dataset.nb))));
     return;
   }
   if (x.lvl === 'sector') {
@@ -5033,6 +5034,30 @@ async function loadMarkets() {
   mxWire(el); { const b = el.querySelector('#indw'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts')); }
   el.querySelectorAll('.list .row').forEach((li) => { const go = () => { mxStock(rows[+li.dataset.i], r, mk, S); }; li.addEventListener('click', go); li.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
   mxChart(mk, 'groups', r.group, r.shift);
+}
+/* 20 Nov 2026 (Amritpal: NSE Indices' public Industry Classification Structure): NSE's official sectors -> basic industries (Sugar,
+   Plastic Products...) with today's change, like StockEdge's sector screen. Map fetched weekly by the Mumbai server. Tap = panel. */
+function nseIndHTML(G) {
+  const N = G && G.nse; if (!N || !(N.rows || []).length) return '<h4 style="margin:14px 0 4px">NSE industries (official)</h4><p class="muted" style="font-size:12.5px">Appears after your server has fetched NSE\'s industry map (weekly, outside market hours) and the next nightly scan.</p>';
+  const by = {}; N.rows.forEach((r) => { (by[r.sector] = by[r.sector] || []).push(r); });
+  const secs = Object.entries(by).map(([s, L]) => ({ s, L: L.sort((a, b) => b.d1 - a.d1), d1: L.reduce((x, r) => x + r.d1 * r.n, 0) / L.reduce((x, r) => x + r.n, 0), n: L.reduce((x, r) => x + r.n, 0) })).sort((a, b) => b.d1 - a.d1);
+  const pc = (v, d = 2) => `<b class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '▲' : '▼'}${fmt(Math.abs(v), d)}%</b>`;
+  return `<h4 style="margin:14px 0 4px">NSE industries (official) · ${N.rows.length} basic industries</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">NSE Indices classification, equal-weight, today's change. Tap a sector, then an industry for its chart and stocks.</p>
+    ${secs.map((x) => `<details class="t2-more nse-sec"><summary><span>${esc(x.s)} <span class="muted">· ${x.L.length} industries · ${x.n} stocks</span></span>${pc(x.d1, 1)}</summary><div class="mxlist">${x.L.map((r) => `<div class="gpsr" data-nb="${esc(r.slug)}"><span class="gpsn">${esc(r.basic)} <span class="muted">· ${r.n} stocks</span>${r.w ? (r.w.status === 'broken' ? ' <span class="chip open">W broke</span>' : ` <span class="chip">W ${fmt(r.w.dist_pct, 1)}% to break</span>`) : ''}</span><span class="gpsv">${pc(r.d1)}</span></div>`).join('')}</div></details>`).join('')}
+    <p class="muted" style="font-size:11.5px">Map as of ${esc((N.asof || '').slice(0, 10))}.</p>`;
+}
+function nseIndOpen(r) {
+  if (!r) return; const mk = 'NSE';
+  const pc = (v, d = 1) => (v == null ? '–' : `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : ''}${fmt(v, d)}%</span>`);
+  openPanel(`<div class="d-head"><div><h2>${esc(r.basic)}</h2><div class="co">${esc(r.macro)} › ${esc(r.sector)} › ${esc(r.industry)}</div></div></div>
+    <div class="facts"><div class="fact"><span>Today</span><b>${pc(r.d1, 2)}</b></div><div class="fact"><span>1 week / 1 month / 3 months</span><b>${pc(r.r1w)} / ${pc(r.r1m)} / ${pc(r.r3m)}</b></div>
+      <div class="fact"><span>Stocks</span><b>${r.n} (${r.n_liquid} liquid)</b></div><div class="fact"><span>W + trendline</span><b>${!r.w ? 'none now' : r.w.status === 'broken' ? `broke ${esc(r.w.broke_on)}` : `forming · ${fmt(r.w.dist_pct, 1)}% to break`}</b></div>
+      <div class="fact"><span>9 EMA</span><b>${r.above_e9 ? 'above a rising 9 EMA' : 'not above a rising 9 EMA'}</b></div></div>
+    <button class="lv-btn" id="nsew">Daily chart · 9 EMA · W trendline ›</button>
+    <h4 style="margin:12px 0 4px">Stocks</h4><ul class="list flat">${r.members.map((m) => `<li class="row" data-tv="${esc(m.symbol)}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}${m.liquid ? '' : ' · thin'}</div></div><div></div><div class="num"><b>${fmt(m.close, 2, 'en-IN')}</b>${m.d1 != null ? pc(m.d1, 2) : ''}</div></li>`).join('')}</ul>
+    <p class="muted" style="font-size:12px">Equal-weight index of the liquid members (all members if fewer than 2 are liquid). Tap a stock for TradingView.</p>`);
+  const b = document.getElementById('nsew'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts'));
+  document.querySelectorAll('[data-tv]').forEach((li) => li.addEventListener('click', () => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(li.dataset.tv, 'NSE')) + '&interval=D', '_blank', 'noopener')));
 }
 /* 20 Nov 2026 (Amritpal, StockEdge-style industries): today / 1-month change of the industry's equal-weight index and its latest W */
 function indTags(r) {

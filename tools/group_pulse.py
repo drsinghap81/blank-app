@@ -98,6 +98,50 @@ def download(tickers):
     return out
 
 
+def nse_groups(mkt, cf, C, ret, liq, nm, IW):
+    """20 Nov 2026: NSE's official basic industries (served by our Mumbai server, which can read NSE's quote pages): each basic industry
+    with 2+ stocks gets an equal-weight index from its liquid members (all members if fewer than 2 are liquid), today / 1 w / 1 m,
+    latest W and a daily chart (<out>/group_w_charts/nse_<slug>.json). Returns None if the map is unavailable."""
+    import requests
+    try:
+        js = requests.get("https://13-126-118-48.sslip.io/api/nse_industry", timeout=60).json()
+        M = js.get("rows") or {}
+    except Exception as e:  # noqa: BLE001
+        print("nse industry map unavailable", e); return None
+    if len(M) < 500:
+        print("nse industry map too small", len(M)); return None
+    L = liq.iloc[-1]; G = {}
+    for sym, (mac, sec, ind, bas) in M.items():
+        if sym in C.columns and pd.notna(C[sym].iloc[-1]):
+            G.setdefault((mac, sec, ind, bas), []).append(sym)
+    out = []
+    for (mac, sec, ind, bas), ss in G.items():
+        lq = [x for x in ss if L.get(x, False)]
+        use = lq if len(lq) >= 2 else ss
+        if len(use) < 2:
+            continue
+        gi = (1 + ret[use].mean(axis=1).fillna(0)).cumprod() * 100
+        sl = "nse_" + IW.slug(bas)
+        r = dict(basic=bas, industry=ind, sector=sec, macro=mac, n=len(ss), n_liquid=len(lq), slug=sl,
+                 d1=round(float(gi.iloc[-1] / gi.iloc[-2] - 1) * 100, 2), r1w=round(float(gi.iloc[-1] / gi.iloc[-6] - 1) * 100, 1),
+                 r1m=round(float(gi.iloc[-1] / gi.iloc[-22] - 1) * 100, 1), r3m=round(float(gi.iloc[-1] / gi.iloc[-64] - 1) * 100, 1),
+                 members=sorted([dict(symbol=x, name=str(nm.get(x, x))[:60], close=round(float(C[x].iloc[-1]), 2), liquid=bool(L.get(x, False)),
+                                      d1=round(float(C[x].iloc[-1] / C[x].iloc[-2] - 1) * 100, 2) if pd.notna(C[x].iloc[-2]) else None) for x in ss],
+                                key=lambda m: -(m["d1"] or -99)))
+        try:
+            w = IW.latest(gi)
+            j = IW.chart_json(pd.DataFrame({"Open": gi, "High": gi, "Low": gi, "Close": gi}), w or {})
+            json.dump(dict(name=bas, **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
+            r["w"] = {k: w.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if w and (w["status"] == "forming" or w.get("days_ago", 99) <= 5) else None
+            e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
+        except Exception as e:  # noqa: BLE001
+            print("nse w fail", bas, e); r["w"] = None
+        out.append(r)
+    out.sort(key=lambda r: -r["d1"])
+    print("nse basic industries", len(out), "map asof", js.get("asof"))
+    return dict(asof=js.get("asof"), rows=out)
+
+
 def main(mkt):
     cf = CFG[mkt]; u = universe(mkt)
     tick = {s: (s.replace("/", "-").replace(".", "-") if mkt == "US" else s) + cf["suf"] for s in u.symbol}
@@ -258,7 +302,7 @@ def main(mkt):
                         "(+2.2% in 2017-21, +3.6% in 2022-26), better than plain group return (+1.8%); 1-week Pulse +1.2% over the next month. "
                         "Trending stocks in top-Pulse groups beat the average stock by +1.4% over 3 months. As a hard filter on ATH breakouts "
                         "it did not raise returns - use it as a tiebreaker / tailwind. US and ASX: not separately tested.",
-               rows=rows, sectors=sectors, themes=themes, mstats=market, stock=stock)
+               rows=rows, sectors=sectors, themes=themes, mstats=market, stock=stock, nse=nse_groups(mkt, cf, C, ret, liq, nm, IW) if mkt == "NSE" else None)
     os.makedirs(cf["out"], exist_ok=True); json.dump(out, open(cf["out"] + "group_pulse.json", "w"), separators=(",", ":"))
     # weekly closes (last ~60 weeks) of every liquid stock, for the stock panel's mini chart
     # + weekly RSI(14, Wilder) on the full ~3-year weekly series, for the range-shift panel (40/60 bands)

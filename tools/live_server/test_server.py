@@ -1176,3 +1176,30 @@ def test_mypick_above_trigger_not_a_dip_gtt(tmp_path):
     A.market_open = lambda t=None: True; A.broker.ltp = lambda s: 101.5
     o = c.post("/api/order", headers=h, json={"id": r["id"], "qty": q, "confirm": f"BUY {q} ZZUP"}).json()
     assert o["sent"] and "gtt_id" not in o                                     # a capped limit buy, not a GTT
+
+
+def test_nse_industry_map(tmp_path, monkeypatch):
+    """20 Nov 2026: the weekly NSE industry fetch keeps the 4-level classification per symbol and only runs outside market hours."""
+    import nse_industry as M
+    from datetime import datetime
+
+    class R:
+        def __init__(self, code=200, js=None, text=""):
+            self.status_code, self._js, self.text = code, js, text
+        def json(self):
+            return self._js
+
+    class S:
+        def get(self, url, params=None, timeout=None):
+            if url.endswith("EQUITY_L.csv"):
+                return R(text="SYMBOL,NAME OF COMPANY, SERIES\nBALRAMCHIN,Balrampur, EQ\nSUPREMEIND,Supreme, EQ\nXYZ,Bond, N1\n")
+            sym = params["symbol"]
+            ii = {"BALRAMCHIN": dict(macro="Fast Moving Consumer Goods", sector="Fast Moving Consumer Goods", industry="Agricultural Food & other Products", basicIndustry="Sugar"),
+                  "SUPREMEIND": dict(macro="Industrials", sector="Capital Goods", industry="Industrial Products", basicIndustry="Plastic Products - Industrial")}[sym]
+            return R(js={"industryInfo": ii})
+    monkeypatch.setattr(M.time, "sleep", lambda s: None)
+    j = M.NseIndustry(str(tmp_path), session=S())
+    assert j.due(datetime(2026, 11, 21, 18, 0, tzinfo=M.IST)) and not j.due(datetime(2026, 11, 20, 11, 0, tzinfo=M.IST))
+    j._run()
+    assert j.st["rows"]["BALRAMCHIN"][3] == "Sugar" and j.st["rows"]["SUPREMEIND"][3] == "Plastic Products - Industrial" and "XYZ" not in j.st["rows"]
+    assert not j.due(datetime(2026, 11, 22, 18, 0, tzinfo=M.IST))

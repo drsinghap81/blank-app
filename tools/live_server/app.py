@@ -4220,6 +4220,27 @@ def otr_flat(_=Depends(auth)):
     otr_job().flat_all(); return dict(ok=True)
 
 
+_nind = {}
+
+
+def nind_job():
+    if "j" not in _nind:
+        import nse_industry
+        _nind["j"] = nse_industry.NseIndustry(DATA, log=lambda ev, **kw: log(ev, **kw))
+    return _nind["j"]
+
+
+@app.get("/api/nse_industry")
+def nse_industry_map():
+    """20 Nov 2026: NSE's official industry classification per symbol (public NSE data, no account data) for the nightly scan."""
+    j = nind_job(); return dict(**j.status(), rows=j.st.get("rows") or {})
+
+
+@app.post("/api/nse_industry/refresh")
+def nse_industry_refresh(_=Depends(auth)):
+    return dict(started=nind_job().start(), **nind_job().status())
+
+
 @app.get("/api/research/optbt/summary")
 def optbt_summary():
     """backtest statistics only (no positions, no account data) - readable without the app password so results can be checked
@@ -4249,6 +4270,10 @@ def _start():
             tmcx_job().start()
         except Exception as ex:  # noqa: BLE001
             log("turtle_mcx_error", error=str(ex)[:200])
+        try:
+            threading.Thread(target=nind_job().loop, daemon=True).start()      # weekly NSE industry map, outside market hours
+        except Exception as ex:  # noqa: BLE001
+            log("nse_industry_error", error=str(ex)[:200])
         try:
             j = optbt_job()
             import opt_bt as _ob
