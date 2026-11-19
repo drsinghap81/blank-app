@@ -480,12 +480,32 @@ def gtt_buy_upkeep(J, acc):
         P = plan(); plan_syms = {r["symbol"] for r in plan_rows(P) if r.get("kind") in STOP_KINDS}
     except Exception:  # noqa: BLE001
         return False
-    month = ist_now().strftime("%Y-%m"); ch = False
+    month = ist_now().strftime("%Y-%m"); ch = False; tn = ist_now()
+    mk_open = tn.weekday() < 5 and (9, 30) <= (tn.hour, tn.minute) <= (15, 25)
     for sym, e in list(J.items()):
-        if sym.startswith("_") or e.get("state") != "pending" or not e.get("gtt_buy_id") or e.get("kind") not in STOP_KINDS or held.get(sym, 0) > 0:
+        if sym.startswith("_") or e.get("state") != "pending" or not e.get("gtt_buy_id") or held.get(sym, 0) > 0:
             continue
         why = None
-        if e.get("gtt_month") and e["gtt_month"] != month:
+        if mk_open and e.get("entry"):
+            # 19 Nov 2026: a GTT buy whose trigger sits below the market only buys on a dip - not the tested breakout entry.
+            # Two checks >= 20 minutes apart with the price > CHASE above the trigger -> cancel (a real trigger fills at once).
+            try:
+                lt0 = broker.ltp(sym)
+            except Exception:  # noqa: BLE001
+                lt0 = None
+            if lt0 and lt0 > float(e["entry"]) * (1 + CHASE):
+                if not e.get("above_seen"):
+                    e["above_seen"] = time.time(); ch = True
+                elif time.time() - e["above_seen"] >= 1200:
+                    why = (f"the price {lt0:.2f} is {(lt0 / float(e['entry']) - 1) * 100:.1f}% above its trigger {float(e['entry']):.2f}, "
+                           f"so it would only buy on a dip, not on the breakout")
+            elif e.pop("above_seen", None):
+                ch = True
+        if why:
+            pass
+        elif e.get("kind") not in STOP_KINDS:
+            continue
+        elif e.get("gtt_month") and e["gtt_month"] != month:
             why = "the month ended without the breakout (the trigger was last month's high)"
         elif sym not in plan_syms:
             why = "the setup is no longer in the plan"
@@ -1222,12 +1242,26 @@ def order(body: Order, _=Depends(auth)):
             raise HTTPException(400, "order value above the limits")
         side = "BUY"
         if row["kind"] == "MY_GTT":
-            if market_open(t):
+            # 19 Nov 2026: a GTT buy whose trigger is already BELOW the price only fills on a dip (MEESHO 252.64 vs 259) - not a
+            # breakout buy. Above the trigger: buy now as a capped limit (within CHASE) in market hours, else don't send.
+            try:
                 ltp = broker.ltp(row["symbol"])
-                if ltp and ltp <= row["stop"]:
-                    raise HTTPException(400, f"not sent: the price {ltp:.2f} is at or below your stop {row['stop']:.2f}")
-            p = dict(gtt="BUY", symbol=row["symbol"], qty=body.qty, trigger=row["trigger"], limit=row["price"])
-        elif row["kind"] in STOP_KINDS and (lambda l: not l or live_check(row, l)[0] == "wait")(broker.ltp(row["symbol"])):
+            except Exception:  # noqa: BLE001
+                ltp = None
+            if not ltp:
+                raise HTTPException(400, "no price from Angel right now - try again in a minute")
+            if ltp <= row["stop"]:
+                raise HTTPException(400, f"not sent: the price {ltp:.2f} is at or below your stop {row['stop']:.2f}")
+            T0 = float(row["trigger"])
+            if ltp > T0:
+                if not market_open(t) or ltp > T0 * (1 + CHASE):
+                    raise HTTPException(400, f"not sent: the price {ltp:.2f} is already {(ltp / T0 - 1) * 100:.1f}% above the trigger {T0:.2f}. "
+                                             f"A GTT buy here would only fill on a dip. "
+                                             + ("In market hours it buys as a limit if still within " + f"{CHASE * 100:.0f}% of the trigger." if ltp <= T0 * (1 + CHASE) else "Skip it or set a new trigger."))
+                p = broker.params(row["symbol"], side, body.qty, round(min(ltp * 1.01, T0 * (1 + CHASE)), 2))
+            else:
+                p = dict(gtt="BUY", symbol=row["symbol"], qty=body.qty, trigger=row["trigger"], limit=row["price"])
+        elif row["kind"] in STOP_KINDS and _stop_waits(row):
             # 13 Nov 2026: a buy-stop still below its trigger goes on Angel as a GTT buy (sits there until the price reaches the
             # trigger, any day this month) instead of a day SL order that lapsed every evening. The server cancels it if the
             # setup ends first (gtt_buy_upkeep). Above the trigger -> the branches below (limit now / missed).
@@ -1458,6 +1492,18 @@ def del_mypick(sym: str, _=Depends(auth)):
         J.pop(sym); save_journal(J)
     d.pop(sym, None); _save_mypicks(d); log("mypick_del", symbol=sym)
     return dict(ok=True, msg=msg, rows=list(d.values()))
+
+
+def _stop_waits(row):
+    """19 Nov 2026: a plan buy-stop goes on Angel as a GTT only when the live price is still BELOW its trigger. No price -> don't
+    guess (a GTT placed blind could sit under the market and buy on a dip, as happened with ASAHIINDIA)."""
+    try:
+        l = broker.ltp(row["symbol"])
+    except Exception:  # noqa: BLE001
+        l = None
+    if not l:
+        raise HTTPException(400, "no price from Angel right now - try again in a minute")
+    return live_check(row, l)[0] == "wait"
 
 
 def live_check(r, ltp):

@@ -433,7 +433,7 @@ def test_mypicks_gtt(tmp_path):
     """Push a stock to Live -> sized row -> Send places an Angel GTT BUY -> once held, the protective GTT stop goes in."""
     A, c = client(tmp_path, live="1")
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
-    A.market_open = lambda t=None: False
+    A.market_open = lambda t=None: False; A.broker.ltp = lambda s: 95.0          # below the trigger: a real buy-stop GTT
     assert c.post("/api/mypicks", headers=h, json={"symbol": "ZZTEST", "trigger": 100, "stop": 110}).status_code == 400
     j = c.post("/api/mypicks", headers=h, json={"symbol": "zztest", "trigger": 100, "stop": 92, "src": "Bottoms"}).json()
     assert j["ok"] and j["rows"][0]["symbol"] == "ZZTEST"
@@ -454,7 +454,7 @@ def test_mypicks_gtt(tmp_path):
 def test_mypicks_cancel(tmp_path):
     A, c = client(tmp_path, live="1")
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
-    A.market_open = lambda t=None: False
+    A.market_open = lambda t=None: False; A.broker.ltp = lambda s: 48.0
     c.post("/api/mypicks", headers=h, json={"symbol": "ZZTWO", "trigger": 50, "stop": 46})
     r = next(x for x in c.get("/api/plan", headers=h).json()["rows"] if x["id"] == "MY-ZZTWO")
     o = c.post("/api/order", headers=h, json={"id": r["id"], "qty": r["qty"], "confirm": f"BUY {r['qty']} ZZTWO"}).json()
@@ -1161,3 +1161,18 @@ def test_opt_trader_builds_candles_from_quotes(tmp_path):
         assert len(calls) == n                                                          # no more history calls while the feed is fresh
     finally:
         O.now_ist = now0
+
+
+def test_mypick_above_trigger_not_a_dip_gtt(tmp_path):
+    """19 Nov 2026: a My pick whose price is already above its trigger is not sent as a GTT (it would only buy on a dip);
+    in market hours within CHASE it buys as a limit, further above it is refused."""
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    c.post("/api/mypicks", headers=h, json={"symbol": "ZZUP", "trigger": 100, "stop": 92})
+    r = next(x for x in c.get("/api/plan", headers=h).json()["rows"] if x["id"] == "MY-ZZUP"); q = r["qty"]
+    A.market_open = lambda t=None: False; A.broker.ltp = lambda s: 104.0
+    o = c.post("/api/order", headers=h, json={"id": r["id"], "qty": q, "confirm": f"BUY {q} ZZUP"})
+    assert o.status_code == 400 and "dip" in o.json()["detail"] and not any(g["side"] == "BUY" for g in getattr(A.broker, "gtts", {}).values())
+    A.market_open = lambda t=None: True; A.broker.ltp = lambda s: 101.5
+    o = c.post("/api/order", headers=h, json={"id": r["id"], "qty": q, "confirm": f"BUY {q} ZZUP"}).json()
+    assert o["sent"] and "gtt_id" not in o                                     # a capped limit buy, not a GTT
