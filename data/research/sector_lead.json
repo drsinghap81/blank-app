@@ -1,0 +1,251 @@
+{
+ "method": "Can we see money flowing into an industry BEFORE it moves? (19 Nov 2026, Amritpal: \"we should know in advance\").\nEqual-weight industry series from member stocks (NSE, Yahoo 2016 -> today; industry = today's NSE classification in\ndata/scan/sectors.json; liquid >= Rs 2 cr/day). Daily signals per industry, known at the close:\n  S1 quiet accumulation : share of the last 10 days' traded value that traded on up days (up-value ratio), high = buying\n  S2 money-flow index   : 10-day sum of value x close-location ((C-L)-(H-C))/(H-L), / 10-day value\n  S3 breadth thrust     : share of members above their 20-day average rose from < 40% to > 60% within 10 days (event)\n  S4 RS turn            : the industry's 20-day return minus Nifty's turned from negative to positive today (event)\n  S5 volume surge, quiet price: 5-day value / 50-day value >= 1.3 while the industry's 5-day return is within +/-2%\nTargets: the industry's next 5 and 20 trading days' return minus Nifty's. For S1/S2: top fifth of industries that day vs bottom\nfifth (average excess return) and rank correlation (IC); for events: average excess return after the event vs all days.\nOutput: data/research/sector_lead.json",
+ "industries": 19,
+ "S1 up-value ratio | next 5 d": {
+  "ic": 0.049,
+  "top_fifth": 0.42,
+  "bottom_fifth": 0.1,
+  "spread": 0.32,
+  "spread_by_year": {
+   "2016": 0.46,
+   "2017": 0.14,
+   "2018": 0.33,
+   "2019": 0.13,
+   "2020": 0.37,
+   "2021": 0.66,
+   "2022": 0.55,
+   "2023": 0.16,
+   "2024": 0.15,
+   "2025": 0.15,
+   "2026": 0.44
+  }
+ },
+ "S2 money-flow index | next 5 d": {
+  "ic": 0.047,
+  "top_fifth": 0.42,
+  "bottom_fifth": 0.12,
+  "spread": 0.3,
+  "spread_by_year": {
+   "2016": 0.47,
+   "2017": 0.24,
+   "2018": 0.27,
+   "2019": 0.2,
+   "2020": 0.15,
+   "2021": 0.69,
+   "2022": 0.62,
+   "2023": 0.06,
+   "2024": 0.17,
+   "2025": 0.27,
+   "2026": 0.21
+  }
+ },
+ "S3 breadth thrust | next 5 d": {
+  "events": 49058,
+  "after_event": 0.71,
+  "all_days": 0.27,
+  "win": 2
+ },
+ "S4 RS turns positive | next 5 d": {
+  "events": 49058,
+  "after_event": 0.4,
+  "all_days": 0.27,
+  "win": 2
+ },
+ "S5 volume surge, quiet price | next 5 d": {
+  "events": 49058,
+  "after_event": 0.3,
+  "all_days": 0.27,
+  "win": 3
+ },
+ "S1 up-value ratio | next 20 d": {
+  "ic": 0.053,
+  "top_fifth": 1.37,
+  "bottom_fifth": 0.9,
+  "spread": 0.47,
+  "spread_by_year": {
+   "2016": 1.85,
+   "2017": 0.49,
+   "2018": 0.43,
+   "2019": -0.82,
+   "2020": 0.21,
+   "2021": 0.37,
+   "2022": 1.21,
+   "2023": 0.37,
+   "2024": 1.19,
+   "2025": 0.47,
+   "2026": -0.15
+  }
+ },
+ "S2 money-flow index | next 20 d": {
+  "ic": 0.054,
+  "top_fifth": 1.44,
+  "bottom_fifth": 0.94,
+  "spread": 0.5,
+  "spread_by_year": {
+   "2016": 1.94,
+   "2017": 0.83,
+   "2018": 0.5,
+   "2019": -0.35,
+   "2020": -0.62,
+   "2021": 0.85,
+   "2022": 1.73,
+   "2023": -0.01,
+   "2024": 1.11,
+   "2025": 0.72,
+   "2026": -0.87
+  }
+ },
+ "S3 breadth thrust | next 20 d": {
+  "events": 48773,
+  "after_event": 1.73,
+  "all_days": 1.12,
+  "win": 2
+ },
+ "S4 RS turns positive | next 20 d": {
+  "events": 48773,
+  "after_event": 1.2,
+  "all_days": 1.12,
+  "win": 2
+ },
+ "S5 volume surge, quiet price | next 20 d": {
+  "events": 48773,
+  "after_event": 1.65,
+  "all_days": 1.12,
+  "win": 3
+ },
+ "latest": {
+  "Financial Services": {
+   "S1": 0.729,
+   "S2": 0.244,
+   "S3": true,
+   "S4": false,
+   "S5": false
+  },
+  "Chemicals": {
+   "S1": 0.597,
+   "S2": 0.009,
+   "S3": true,
+   "S4": false,
+   "S5": false
+  },
+  "Healthcare": {
+   "S1": 0.625,
+   "S2": 0.112,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  },
+  "Capital Goods": {
+   "S1": 0.487,
+   "S2": -0.046,
+   "S3": true,
+   "S4": false,
+   "S5": false
+  },
+  "Fast Moving Consumer Goods": {
+   "S1": 0.643,
+   "S2": 0.159,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  },
+  "Consumer Services": {
+   "S1": 0.669,
+   "S2": 0.103,
+   "S3": true,
+   "S4": false,
+   "S5": false
+  },
+  "Realty": {
+   "S1": 0.677,
+   "S2": 0.319,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  },
+  "Construction Materials": {
+   "S1": 0.604,
+   "S2": 0.164,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  },
+  "Power": {
+   "S1": 0.542,
+   "S2": 0.007,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  },
+  "Metals & Mining": {
+   "S1": 0.539,
+   "S2": 0.013,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  },
+  "Services": {
+   "S1": 0.58,
+   "S2": 0.037,
+   "S3": true,
+   "S4": false,
+   "S5": false
+  },
+  "Oil Gas & Consumable Fuels": {
+   "S1": 0.665,
+   "S2": 0.121,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  },
+  "Construction": {
+   "S1": 0.709,
+   "S2": 0.019,
+   "S3": true,
+   "S4": false,
+   "S5": false
+  },
+  "Information Technology": {
+   "S1": 0.48,
+   "S2": -0.183,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  },
+  "Consumer Durables": {
+   "S1": 0.686,
+   "S2": 0.134,
+   "S3": true,
+   "S4": false,
+   "S5": false
+  },
+  "Automobile and Auto Components": {
+   "S1": 0.633,
+   "S2": 0.181,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  },
+  "Textiles": {
+   "S1": 0.459,
+   "S2": -0.233,
+   "S3": false,
+   "S4": true,
+   "S5": false
+  },
+  "Telecommunication": {
+   "S1": 0.522,
+   "S2": 0.079,
+   "S3": true,
+   "S4": false,
+   "S5": false
+  },
+  "Media Entertainment & Publication": {
+   "S1": 0.481,
+   "S2": -0.09,
+   "S3": false,
+   "S4": false,
+   "S5": false
+  }
+ }
+}
