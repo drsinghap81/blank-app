@@ -132,6 +132,50 @@ class OptTrader:
         if self.thread and self.thread.is_alive():
             return
         self.thread = threading.Thread(target=self._loop, daemon=True); self.thread.start()
+        threading.Thread(target=self._fast_loop, daemon=True).start()
+
+    def _fast_loop(self):
+        """19 Nov 2026 (Amritpal: a 5-minute delay before the stop is a risk): while a live buy is waiting on Angel, look at the order
+        book every 10 seconds and put the stop-loss on Angel as soon as the buy fills."""
+        while True:
+            time.sleep(10)
+            t0 = now_ist()
+            if t0.weekday() >= 5 or not ((9, 15) <= (t0.hour, t0.minute) <= (15, 31)):
+                continue
+            try:
+                self.watch_fills()
+            except Exception as ex:  # noqa: BLE001
+                self.log("opt_trader_fast", error=str(ex)[:160])
+
+    def watch_fills(self):
+        want = [t for t in self.st.get("trades", []) if t.get("oid") and t.get("live_entry") is None and t["state"] in ("pending", "open")]
+        if not want:
+            return
+        om = self.b.order_map()
+        if not self.lock.acquire(timeout=8):
+            return
+        try:
+            for t in self.st.get("trades", []):
+                if t.get("oid") and t.get("live_entry") is None and t["state"] in ("pending", "open"):
+                    o = om.get(t["oid"]) or {}
+                    if str(o.get("status", "")).lower() == "complete":
+                        self._live_filled(t, o)
+            self._save()
+        finally:
+            self.lock.release()
+
+    def _live_filled(self, t, o):
+        """Angel filled the live buy: record it and place the stop-limit sell right away (trigger = the trade's stop, limit 5% below)."""
+        e = float(o.get("avg") or t.get("entry") or t["trigger"])
+        stop = t.get("stop") or rnd(e - max(e - t["sig_low"], e * 0.03))
+        t["live_entry"] = e; t["live_state"] = "bought on Angel"; t["live_fill_at"] = now_ist().strftime("%H:%M:%S")
+        try:
+            t["live_stop_oid"] = self.b.nfo_order(t["tsym"], t["token"], "SELL", t["lot"], rnd(stop * 0.95), trigger=stop)
+            t["live_stop"] = stop; t["live_state"] = "bought · stop on Angel"
+            self.note(f"{t['key']} bought on Angel {e} · stop {stop} placed")
+        except Exception as ex:  # noqa: BLE001
+            t["live_state"] = f"bought · STOP NOT PLACED - put it in Angel: {str(ex)[:100]}"
+            self.note(f"{t['key']} bought on Angel {e} · STOP NOT PLACED: {str(ex)[:80]}")
 
     def _loop(self):
         while True:
@@ -163,24 +207,25 @@ class OptTrader:
         return out
 
     def cycle(self):
+        # 19 Nov 2026: candles are fetched OUTSIDE the lock (it takes tens of seconds) so the 10-second fill watcher can place stops meanwhile
+        uni = self.universe(); day = str(now_ist().date())
+        BUSY.set()
+        try:
+            bars = {}
+            for u in uni:
+                for side in ("ce", "pe"):
+                    try:
+                        bars[(u["symbol"], side)] = self._bars(u[side]["token"])
+                    except Exception as ex:  # noqa: BLE001
+                        self.log("opt_trader_fetch", symbol=u["symbol"], error=str(ex)[:120])
+        finally:
+            BUSY.clear()
         with self.lock:
             if self.st.get("day") != str(now_ist().date()):
                 for t in self.st.get("trades", []):
                     if t.get("hist_due"):
                         self._hist(t)
                 self.st = dict(day=str(now_ist().date()), trades=[], stopped=False, notes=[])
-            uni = self.universe(); day = str(now_ist().date())
-            BUSY.set()
-            try:
-                bars = {}
-                for u in uni:
-                    for side in ("ce", "pe"):
-                        try:
-                            bars[(u["symbol"], side)] = self._bars(u[side]["token"])
-                        except Exception as ex:  # noqa: BLE001
-                            self.log("opt_trader_fetch", symbol=u["symbol"], error=str(ex)[:120])
-            finally:
-                BUSY.clear()
             idx = {}
             for nm in ("NIFTY", "BANKNIFTY"):
                 u = next((x for x in uni if x["symbol"] == nm), None)
@@ -305,12 +350,7 @@ class OptTrader:
                 return
         if t["state"] == "open":
             if live_o and t.get("live_entry") is None and str(live_o.get("status", "")).lower() == "complete":
-                t["live_entry"] = live_o.get("avg") or t["entry"]; t["live_state"] = "bought on Angel"
-                try:
-                    t["live_stop_oid"] = self.b.nfo_order(t["tsym"], t["token"], "SELL", t["lot"], rnd(t["stop"] * 0.95), trigger=t["stop"])
-                    t["live_state"] = "bought · stop on Angel"
-                except Exception as ex:  # noqa: BLE001
-                    t["live_state"] = f"bought · STOP NOT PLACED: {str(ex)[:100]}"
+                self._live_filled(t, live_o)
             for k in range(max(t.get("fill_bar", s), t.get("walked", 0)) + 1, last + 1):
                 t["walked"] = k; x = A[k]
                 if x[3] <= t["stop"]:

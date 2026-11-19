@@ -1043,6 +1043,10 @@ def test_opt_trader_paper_and_live(tmp_path):
             for o in b.nfo.values():
                 if o["status"] == "open" and o["side"] == "BUY":
                     o.update(status="complete", avg=o["trigger"])
+            T.watch_fills()                                            # 19 Nov 2026: the stop goes on Angel within seconds of the fill
+            for t in T.st["trades"]:
+                if t.get("oid") and b.nfo[t["oid"]]["status"] == "complete":
+                    assert t.get("live_stop_oid") and b.nfo[t["live_stop_oid"]]["side"] == "SELL" and b.nfo[t["live_stop_oid"]]["trigger"]
         keys = sorted(t["key"] for t in T.st["trades"])
         assert keys == ["ABC|CE", "NIFTY|CE"]                          # BANKNIFTY's PCR fifth (3) does not agree
         assert all(t["state"] == "open" and t["entry"] == 104.1 and t.get("live_stop_oid") for t in T.st["trades"])
