@@ -318,7 +318,13 @@ class OptTrader:
         if self.hist_day != day:
             self.hist, self.api_today, self.hist_day = {}, {}, day
         if token not in self.hist:
-            B = self._norm(self.b.candles_int("NFO", token, "FIVE_MINUTE", 6), now_ist() - timedelta(minutes=5))
+            fails = getattr(self, "hist_fail", {})
+            if time.time() - fails.get(token, 0) < 600:          # Angel refused it recently: skip this contract, retry in 10 minutes
+                raise RuntimeError("history not available yet (retry in 10 minutes)")
+            try:
+                B = self._norm(self.b.candles_int("NFO", token, "FIVE_MINUTE", 6), now_ist() - timedelta(minutes=5))
+            except Exception:
+                self.hist_fail = fails; fails[token] = time.time(); raise
             self.hist[token] = [x for x in B if x[0][:10] < day]; self.api_today[token] = [x for x in B if x[0][:10] == day]
 
     def _bars(self, token):
