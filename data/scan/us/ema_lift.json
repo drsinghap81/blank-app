@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-19T19:51+00:00",
+ "generated": "2026-11-19T20:07+00:00",
  "asof": "2026-11-19",
  "market": "US",
  "ema": 9,
@@ -10,10 +10,10 @@
    "status": "left below",
    "signal": "2026-10-06",
    "signal_close": 41.16,
-   "gain": 4.7,
+   "gain": 4.6,
    "days": 32,
-   "ema": 43.53,
-   "close": 43.09
+   "ema": 43.52,
+   "close": 43.04
   },
   {
    "symbol": "Communication (XLC)",
@@ -21,22 +21,22 @@
    "status": "riding",
    "signal": "2026-11-09",
    "signal_close": 107.36,
-   "gain": -3.3,
+   "gain": -4.0,
    "days": 8,
-   "ema": 105.77,
-   "close": 103.78,
-   "low": 103.5
+   "ema": 105.63,
+   "close": 103.09,
+   "low": 103.09
   },
   {
    "symbol": "PANW",
    "index": false,
    "status": "lift-off today",
    "signal": "2026-11-19",
-   "signal_close": 360.08,
+   "signal_close": 356.93,
    "gain": 0.0,
    "days": 0,
-   "ema": 334.67,
-   "close": 360.08,
+   "ema": 334.05,
+   "close": 356.93,
    "low": 350.52
   },
   {
@@ -44,12 +44,12 @@
    "index": false,
    "status": "lift-off today",
    "signal": "2026-11-19",
-   "signal_close": 242.9,
+   "signal_close": 240.8,
    "gain": 0.0,
    "days": 0,
-   "ema": 232.12,
-   "close": 242.9,
-   "low": 242.15
+   "ema": 231.69,
+   "close": 240.8,
+   "low": 240.21
   },
   {
    "symbol": "BRK.B",
@@ -57,10 +57,10 @@
    "status": "left below",
    "signal": "2026-10-07",
    "signal_close": 506.25,
-   "gain": 12.8,
+   "gain": 12.7,
    "days": 31,
-   "ema": 578.87,
-   "close": 570.97
+   "ema": 578.8,
+   "close": 570.62
   },
   {
    "symbol": "JNJ",
@@ -68,10 +68,10 @@
    "status": "left below",
    "signal": "2026-10-22",
    "signal_close": 267.61,
-   "gain": -0.7,
+   "gain": -0.6,
    "days": 20,
-   "ema": 275.77,
-   "close": 265.86
+   "ema": 275.78,
+   "close": 265.92
   }
  ],
  "test": "Tested 2007\u201326: indices +0.45% a trade vs +0.67% holding any 16 days; top-50 stocks +1.48% vs +1.61%. No edge in the US: shown for reference only.",
