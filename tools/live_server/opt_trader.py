@@ -23,7 +23,33 @@ from datetime import date, datetime, timedelta, timezone
 
 IST = timezone(timedelta(hours=5, minutes=30))
 CFG = dict(max_open=3, lots=1, day_loss=10000.0, lull=("11:00", "14:30"), last_entry="15:00", eod="15:15", trig_bars=3,
-           limit_pct=0.01, top=30, tick=0.05)
+           limit_pct=0.01, top=30, tick=0.05, asx_metal=0.005)
+# 20 Nov 2026 (Amritpal "Yes" after tools/research/asx_metal_filter.py, 2016-26, 12 metal F&O stocks, 32k stock-days): when ASX
+# 200 Materials lags the ASX 200 by > 0.5% that day, Indian metal stocks rose open->close on only 38% of days (avg -0.49%); when it
+# leads by > 0.5%, 52% (+0.18%) vs 45% (-0.12%) on all days. So: no CE on a metal stock on a weak-ASX-materials day, no PE on a strong one.
+METALS = {"TATASTEEL", "HINDALCO", "JSWSTEEL", "SAIL", "VEDL", "NMDC", "NATIONALUM", "JINDALSTEL", "HINDZINC", "COALINDIA", "JSL",
+          "HINDCOPPER", "APLAPOLLO", "NIFTYMETAL"}
+
+
+def asx_clue(cache={}):
+    """ASX 200 Materials minus ASX 200, today's % change so far (Yahoo). Cached 10 minutes. None if unavailable."""
+    import urllib.request
+    now = time.time()
+    if cache.get("at") and now - cache["at"] < 600:
+        return cache.get("v")
+    out = {}
+    try:
+        for sym in ("^AXMJ", "^AXJO"):
+            url = "https://query1.finance.yahoo.com/v8/finance/chart/" + sym.replace("^", "%5E") + "?range=5d&interval=1d"
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            m = json.loads(urllib.request.urlopen(req, timeout=10).read())["chart"]["result"][0]["meta"]
+            out[sym] = (m["regularMarketPrice"] / m["chartPreviousClose"] - 1) * 100
+        v = dict(diff=round(out["^AXMJ"] - out["^AXJO"], 2), materials=round(out["^AXMJ"], 2), asx200=round(out["^AXJO"], 2),
+                 at=now_ist().strftime("%H:%M"))
+    except Exception:  # noqa: BLE001
+        v = None
+    cache.update(at=now, v=v)
+    return v
 BUSY = threading.Event()           # set while a cycle is fetching candles: the slower 15-minute scan waits
 
 
@@ -456,6 +482,10 @@ class OptTrader:
         q = self.pcr.get(u["symbol"])
         if q is None or not ((side == "ce" and q >= 4) or (side == "pe" and q <= 2)):
             return
+        if u["symbol"] in METALS and CFG.get("asx_metal"):
+            ax = asx_clue()
+            if ax and ((side == "ce" and ax["diff"] < -CFG["asx_metal"] * 100) or (side == "pe" and ax["diff"] > CFG["asx_metal"] * 100)):
+                self.note(f"{key} signal {hm} skipped: ASX materials {ax['diff']:+.2f}% vs ASX 200 says no {side.upper()} on metals today"); return
         if self._open_count() >= CFG["max_open"]:
             self.note(f"{key} signal {hm} skipped: {CFG['max_open']} already open"); return
         if self.day_pnl() <= -CFG["day_loss"]:
@@ -638,7 +668,7 @@ class OptTrader:
         return dict(live=self.live(), day=self.st.get("day"), stopped=self.st.get("stopped"), trades=self.st.get("trades", []),
                     notes=self.st.get("notes", [])[-12:], day_pnl=self.day_pnl(), open=self._open_count(), cfg=CFG,
                     universe=len(self.uni or []), last_cycle=self.last_cycle, last_error=self.last_error,
-                    stage=self.stage, stage_at=self.stage_at, cycle_secs=self.cycle_secs, ready=self.warm_day == str(now_ist().date()),
+                    asx=asx_clue() if now_ist().hour < 16 else None, stage=self.stage, stage_at=self.stage_at, cycle_secs=self.cycle_secs, ready=self.warm_day == str(now_ist().date()),
                     feed=dict(age=round(time.time() - self.feed_ok) if self.feed_ok else None, n=self.feed_n, err=self.feed_err), running=bool(self.thread and self.thread.is_alive()),
                     watcher=bool(self.fast and self.fast.is_alive()),
                     history=dict(days=len(D), trades=sum(d["n"] for d in D), pnl=sum(d["pnl"] for d in D),

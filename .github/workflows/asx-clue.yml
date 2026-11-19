@@ -1,0 +1,23 @@
+# 20 Nov 2026: ASX Materials vs ASX 200 before / after India's open (tools/asx_clue.py). Info for the Today alert card.
+name: asx-clue
+on:
+  schedule:
+    - cron: "30 3 * * 1-5"   # 09:00 IST
+    - cron: "15 4 * * 1-5"   # 09:45 IST
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python tools/asx_clue.py
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add data/scan/asx_clue.json; git diff --cached --quiet && exit 0
+          git commit -qm "ASX clue $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
