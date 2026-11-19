@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-19 22:47 UTC",
+"generated": "2026-11-19 22:48 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-19",
@@ -358,7 +358,7 @@
 "group_rank": 41,
 "rank": 7,
 "risk_pct": 22.5,
-"r3m": 9.6
+"r3m": null
 },
 {
 "id": "STOP-DRREDDY-1421.49",
