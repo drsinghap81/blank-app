@@ -233,8 +233,8 @@ PRLB,EMA 9/21 cross,2026-09-17,86.42,77.88,60.7,21.66,76.49,False,64.29,86.99,11
 CNMD,EMA 9/21 cross,2026-11-04,53.66,43.5,68.6,18.92,45.54,True,48.39,54.4,25.1,9,skipped (stop too far / gap below stop),,,CONMED Corporation Common Stock,NYSE
 WOR,52w-high base breakout,2026-09-04,62.49,56.32,70.7,18.18,64.27,False,57.53,62.29,10.6,51,exited 2026-09-14 (Supertrend red),-9.7,-1.01,"Worthington Enterprises, Inc. Common Shares",NYSE
 NBN,EMA 9/21 cross,2026-11-09,134.33,124.78,58.7,17.4,121.3,True,123.66,134.11,7.5,6,stopped 2026-11-16,-7.0,-1.0,Northeast Bank,Nasdaq
-OFG,EMA 9/21 cross,2026-09-02,52.71,51.47,55.4,16.86,49.65,True,50.15,53.02,3.0,53,stopped 2026-09-04,-2.9,-1.0,OFG Bancorp Common Stock,NYSE
 NPK,EMA 9/21 cross,2026-10-01,150.12,142.61,55.2,16.84,150.09,False,138.34,150.7,5.7,33,stopped 2026-11-05,-5.4,-1.0,"National Presto Industries, Inc. Common Stock",NYSE
+OFG,EMA 9/21 cross,2026-09-02,52.71,51.47,55.4,16.74,49.65,True,50.07,53.02,3.0,54,stopped 2026-09-04,-2.9,-1.0,OFG Bancorp Common Stock,NYSE
 CSTL,EMA 9/21 cross,2026-10-28,36.68,32.69,62.3,15.64,32.37,True,32.98,37.57,14.9,14,skipped (stop too far / gap below stop),,,"Castle Biosciences, Inc. - Common stock",Nasdaq
 DCOM,EMA 9/21 cross,2026-09-04,41.25,39.34,58.5,15.1,40.19,True,41.03,41.04,4.3,51,stopped 2026-09-29,-4.1,-1.0,"Dime Commercial Bancshares, Inc. Common Stock",NYSE
 ITIC,EMA 9/21 cross,2026-10-08,298.63,287.5,57.2,14.62,283.71,False,255.82,300.54,4.5,28,stopped 2026-10-14,-4.3,-1.0,Investors Title Company,Nasdaq
