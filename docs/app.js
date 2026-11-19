@@ -6083,13 +6083,31 @@ async function emaLift(el, mk = 'NSE') {
    volume and price leaving EMA ... in pro too but with minimal text"). One short card at the top of Today, both modes:
    market light (one line), the latest index W + trendline breaks with volume and 9 EMA ticks, and today's 9 EMA lift-offs.
    The test results sit behind the ⓘ line. */
+/* 20 Nov 2026 (Amritpal: "which broke and closed above the all-time high and now crossed the ATH candle's high"): for the month,
+   week and day candles that CLOSED above the old ATH, has the price since gone above that candle's high? Monthly = the tested
+   Momentum (ATH) system's trigger; week / day closes are watch-only lists. Plus the system's buys of the last 7 days. */
+function athLines(A, mk) {
+  if (!A) return '';
+  const Mz = (v) => (mk === 'NSE' ? inr(v, 2) : `${MKT[mk].cur}${fmt(v, 2, MKT[mk].loc)}`);
+  const one = (lab, L, hk) => { if (!L || !L.length) return '';
+    const x = L.map((r) => ({ s: r.symbol, h: r[hk], c: r.close })).filter((r) => r.h && r.c);
+    const yes = x.filter((r) => r.c > r.h).sort((a, b) => b.c / b.h - a.c / a.h), no = x.filter((r) => r.c <= r.h).sort((a, b) => a.h / a.c - b.h / b.c);
+    if (!yes.length && !no.length) return '';
+    return `<div class="al-r"><b>${lab}</b>${yes.slice(0, 6).map((r) => `<span class="al-t ok">✓ ${esc(r.s)} +${fmt((r.c / r.h - 1) * 100, 1)}%</span>`).join('')}${no.slice(0, 4).map((r) => `<span class="al-t">${esc(r.s)} above ${Mz(r.h)}</span>`).join('')}${yes.length + no.length > 10 ? `<small>+${yes.length + no.length - 10} more</small>` : ''}</div>`; };
+  const asof = A.asof ? new Date(A.asof + 'T00:00:00') : null;
+  const recent = (A.breakouts || []).filter((b) => asof && (asof - new Date(b.date + 'T00:00:00')) / 864e5 <= 7).sort((a, b) => (a.date < b.date ? 1 : -1));
+  const out = one('ATH month close →', A.month_close, 'high_m') + one('ATH week close →', A.week_close, 'high_p') + one('ATH day close →', A.day_close, 'high_p')
+    + (recent.length ? `<div class="al-r"><b class="up">▲ ATH buys this week</b> <span>${recent.slice(0, 8).map((b) => esc(b.symbol)).join(', ')}${recent.length > 8 ? ` +${recent.length - 8}` : ''}</span></div>` : '');
+  return out ? `<div class="al-sub">All-time highs · ✓ = now above the ATH candle's high</div>${out}` : '';
+}
 async function alertsCard(box, mk) {
   if (!box) return;
   const P = MAIN + MKT[mk].path;
-  const [S, W, E] = await Promise.all([sysMap(mk).catch(() => null), getJSON(P + 'index_w.json', 'index_w_' + mk), getJSON(P + 'ema_lift.json', 'ema_lift_' + mk)]);
+  const [S, W, E, AT] = await Promise.all([sysMap(mk).catch(() => null), getJSON(P + 'index_w.json', 'index_w_' + mk), getJSON(P + 'ema_lift.json', 'ema_lift_' + mk),
+    getJSON(P + 'ath.json', mk === 'NSE' ? 'ath' : 'ath_' + mk)]);
   const L = S ? await mxLight(mk, S).catch(() => null) : null;
   const nm = (x) => (mk !== 'NSE' ? x : x === 'NIFTY BANK' || x === 'BANKNIFTY' ? 'Bank Nifty' : x === 'NIFTY 50' || x === 'NIFTY' ? 'Nifty 50'
-    : x.replace(/^NIFTY /, '').replace(/\b(\w)(\w*)/g, (m, a, b) => a + b.toLowerCase()));
+    : /^NIFTY (\d|MIDCAP|SMALLCAP)/.test(x) ? x.replace(/\b(\w)(\w*)/g, (m, a, b) => a + b.toLowerCase()) : x.replace(/^NIFTY /, '').replace(/\b(\w)(\w*)/g, (m, a, b) => a + b.toLowerCase()));
   const n0 = (v) => Number(v).toLocaleString(MKT[mk].loc, { maximumFractionDigits: v < 1000 ? 2 : 0 });
   const dd = (s) => { try { return new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); } catch (e) { return s; } };
   const lt = L ? { red: ['red', 'RED · no new buys today'], amber: ['amber', 'AMBER · one warning, trade normally'], green: ['green', 'GREEN · OK to buy'] }[L.lvl] : null;
@@ -6111,11 +6129,13 @@ async function alertsCard(box, mk) {
     ${up.length ? `<div class="al-r"><b class="up">▲ Left the 9 EMA upward</b> <span>${names(up)}</span></div>` : ''}
     ${dn.length ? `<div class="al-r"><b class="down">▼ Fell below the 9 EMA</b> <span>${names(dn)}</span></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
+    ${athLines(AT, mk)}
     ${!br.length && !fm.length && !up.length && !dn.length ? '<div class="al-r muted"><span>No index W or 9 EMA alerts today.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
       ${L ? lightHTML(L, mk) : ''}
       <p class="muted td-rs"><b>W + trendline:</b> ${esc((W && W.test) || 'Tested on 23 NSE indices 2015–26: the break came before the 9/21 cross 71% of the time, about 1% lower; next 20 sessions median +1.6% (63% up) vs +1.2% on any day.')} ${mk === 'NSE' ? '<b>Full setup</b> = W broken and riding above a rising 9 EMA. Tested on 551 Indian index W breaks 2016–26: with a 9 EMA lift-off around the break, next 20 sessions median +1.5% (63% up); without one −0.6% (46% up). Break-day volume (shown) added nothing: +1.4% with high volume, +1.4% without. Since 2021 the edge is smaller.' : 'Volume and the 9 EMA tick are shown for context; the combination was tested on India only.'}</p>
       <p class="muted td-rs"><b>9 EMA:</b> ${esc((E && E.test) || 'Lift-off = first whole candle above a rising 9 EMA in 10 sessions; ride until a whole candle is below it. Tested 2007–26: Bank Nifty +1.95% a trade (42% won), Nifty +0.96%, F&O stocks +1.46%, against about +1% for holding any 16 days.')}</p>
+      <p class="muted td-rs"><b>All-time highs:</b> a month, week or day candle closed above the old all-time high; ✓ = the price is now above that candle's high, otherwise the level it needs. The monthly close + break of its high is the tested Momentum system (21.5%/yr India; ideas only elsewhere); week and day closes are watch lists.</p>
       <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
 }
 /* 19 Nov 2026 (Amritpal, Bank Nifty chart): index early alert = W bottom + falling trendline break. Info only - entries stay on

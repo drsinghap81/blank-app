@@ -1202,3 +1202,5 @@ body.pub .owner-only { display: none !important; }
 .al-full{font-style:normal;font-size:.8em;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--rise);color:#fff}
 .al-why{font-size:.86em} .al-why summary{cursor:pointer;opacity:.75;list-style:none} .al-why summary::-webkit-details-marker{display:none}
 .al-why .mxl{margin-top:6px}
+
+.al-sub{font-size:.8em;opacity:.7;margin-top:4px;border-top:1px solid var(--line);padding-top:6px}
