@@ -21,7 +21,7 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 7                     # 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
+VERSION = 7                     # (8 once data/research/nse_quad_daily.json is the full run) 21 Nov 2026: rotation quadrant slices; 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import gzip
 import json
 import os
@@ -265,6 +265,10 @@ class OptBT:
                 for t in trades:
                     prev = [x for x in pd_ if x < t["d"]]
                     t["pulse"] = None if t["idx"] or not prev else PH[prev[-1]].get(t["s"])
+                QH = quad_hist(); qd = sorted(QH)            # 21 Nov 2026: industry rotation quadrant (L / I / W / G), previous session
+                for t in trades:
+                    prev = [x for x in qd if x < t["d"]]
+                    t["quad"] = None if t["idx"] or not prev else QH[prev[-1]].get(t["s"])
             except Exception as ex:  # noqa: BLE001
                 self.log("optbt_pulse_error", error=str(ex)[:120])
             json.dump(trades, gzip.open(os.path.join(self.dir, "trades.json.gz"), "wt"))
@@ -278,6 +282,7 @@ class OptBT:
                          and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]
                 res["Pulse"] = pulse_rows(F, paper)
                 res["Pulse"]["trades with Pulse"] = sum(t.get("pulse") is not None for t in F)
+                res["Rotation"] = quad_rows(F, paper); res["Rotation"]["trades with a quadrant"] = sum(t.get("quad") is not None for t in F)
             except Exception as ex:  # noqa: BLE001
                 res["Pulse"] = dict(error=str(ex)[:200])
             res["NIFTY monthly vs weekly"] = nifty_weekly([t for t in trades if t["s"] == "NIFTY" and not t.get("wk")], [t for t in trades if t.get("wk")])
@@ -504,6 +509,29 @@ def entry_sim(o, h, l, c, i, last, limit=None, tgt_r=3.0, trail=None):
         if h[k] >= tg:
             return e, risk, "target", tg, k, f
     return e, risk, "close", c[last], last, f
+
+
+def quad_hist():
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "research", "nse_quad_daily.json")
+    try:
+        return json.load(open(p))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def quad_rows(F, paper):
+    """21 Nov 2026 (Amritpal: "and what about leading and lagging sectors"): rotation slices. agrees = CE in a Leading / Improving
+    industry, PE in a Lagging / Weakening one; against = the opposite. L Leading, I Improving, W Weakening, G Lagging."""
+    up, dn = ("L", "I"), ("G", "W")
+    out = {}
+    for nm, X in (("basket 1:3", F), ("paper-trader rules", paper)):
+        out[f"{nm} + rotation agrees (CE Leading/Improving, PE Lagging/Weakening)"] = _agg([t for t in X if (t["side"] == "CE" and t.get("quad") in up) or (t["side"] == "PE" and t.get("quad") in dn)])
+        out[f"{nm} + rotation AGAINST"] = _agg([t for t in X if (t["side"] == "CE" and t.get("quad") in dn) or (t["side"] == "PE" and t.get("quad") in up)])
+        for side in ("CE", "PE"):
+            for q, qn in (("L", "Leading"), ("I", "Improving"), ("W", "Weakening"), ("G", "Lagging")):
+                out[f"{nm}, {side} in {qn}"] = _agg([t for t in X if t["side"] == side and t.get("quad") == q])
+        out[f"{nm}, no industry (indices / unmapped)"] = _agg([t for t in X if t.get("quad") is None])
+    return out
 
 
 def pulse_hist():
