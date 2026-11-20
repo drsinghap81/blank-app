@@ -1,0 +1,46 @@
+{
+ "time": "2026-11-17 12:36 IST",
+ "nifty": 25471.2,
+ "expiry": "2026-11-17",
+ "decision": "TRADE",
+ "entry_day": false,
+ "live_strikes": {
+  "CE": [
+   25300,
+   25850,
+   25900
+  ],
+  "PE": [
+   25600,
+   25100,
+   25050
+  ]
+ },
+ "far_breakevens": [
+  24910,
+  25599.0
+ ],
+ "long_strikes": {
+  "CE": 24900.0,
+  "PE": 25550
+ },
+ "current_legs": {
+  "CE": {
+   "long": 24900.0,
+   "short2": 25400.0,
+   "short4": 25450.0,
+   "be": 25599.0
+  },
+  "PE": {
+   "long": 25550,
+   "short2": 25050,
+   "short4": 25000,
+   "be": 24910
+  }
+ },
+ "alerts_sent": [
+  "entry",
+  "shift_PE_1",
+  "shift_PE_2"
+ ]
+}
