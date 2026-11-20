@@ -5032,7 +5032,7 @@ async function rrgMount(el, G, mk) {
   const box = el.querySelector('#rrgbox'); if (!box) return;
   const V = state.rrgV || (state.rrgV = { view: 'weekly', all: false, sel: null });
   let src = null;
-  if (mk === 'NSE') { const R = await getJSON(MAIN + 'data/scan/sector_rrg.json', 'sector_rrg').catch(() => null); if (R) src = { asof: R.asof, data: R[V.view] || {}, idx: true }; }
+  if (mk !== 'UK') { const R = await getJSON(MAIN + MKT[mk].path + 'sector_rrg.json', 'sector_rrg_' + mk).catch(() => null); if (R && R.weekly) src = { asof: R.asof, data: R[V.view] || {}, idx: true, bench: R.bench }; }
   if (!src) src = { data: Object.fromEntries((G.sectors || []).filter((r) => r.rrg).map((r) => [r.sector, { pts: r.rrg.pts, now: r.rrg.now, was: r.rrg.wk4 }])) };
   const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
   const all = Object.entries(src.data).map(([nm, r]) => ({ nm, ...r, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now,
@@ -5040,7 +5040,8 @@ async function rrgMount(el, G, mk) {
   const shown = V.all ? all : all.filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was || r.nm === V.sel);
   const seg = (k, opts) => `<div class="seg" style="margin:4px 0">${opts.map(([v, t]) => `<button data-rrgk="${k}" data-v="${v}" aria-selected="${String(V[k]) === String(v)}">${t}</button>`).join('')}</div>`;
   const chips = ['Leading', 'Improving', 'Weakening', 'Lagging'].map((q) => { const L = all.filter((r) => r.now === q); return L.length ? `<div class="rrg-row"><b style="color:${RRG_Q[q]}">${q}</b> ${L.map((r) => `<button class="rrg-chip${r.nm === V.sel ? ' on' : ''}" data-rrgsel="${esc(r.nm)}" style="border-color:${RRG_Q[q]}">${esc(RRG_SHORT(r.nm))}${r.now !== r.was ? ' <small>new</small>' : ''}</button>`).join('')}</div>` : ''; }).join('');
-  box.innerHTML = `<h5 style="margin:6px 0 0">Sectors${src.idx ? ' · NSE sector indices vs Nifty 50' : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
+  const srcName = { NSE: 'NSE sector indices', US: 'SPDR sector ETFs', ASX: 'ASX 200 sector indices' }[mk] || 'sectors';
+  box.innerHTML = `<h5 style="margin:6px 0 0">Sectors${src.idx ? ` · ${srcName} vs ${esc(src.bench || 'the market')}` : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
     <div class="rrg-ctl">${src.idx ? seg('view', [['daily', 'Daily'], ['weekly', 'Weekly']]) : ''}${seg('all', [[false, 'Key'], [true, 'All']])}</div>
     ${rrgClean(shown, V.sel, 360, 330, false)}<div class="rrg-chips">${chips}</div><p class="muted" style="font-size:11.5px">Tap a dot or a name to highlight its trail; tap again to clear. "Key" = Leading, Improving and this week's movers. "new" = changed quadrant this week. Arrows mark sectors beyond the zoomed area.</p>`;
   box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V[b.dataset.rrgk] = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; rrgMount(el, G, mk); }));
@@ -6482,7 +6483,7 @@ async function alertsCard(box, mk) {
 async function igMiniMap(box, G, mk) {
   const m = box.querySelector('.ig-map'); if (!m) return;
   let data = null;
-  if (mk === 'NSE') { const R = await getJSON(MAIN + 'data/scan/sector_rrg.json', 'sector_rrg').catch(() => null); if (R && R.weekly) data = R.weekly; }
+  if (mk !== 'UK') { const R = await getJSON(MAIN + MKT[mk].path + 'sector_rrg.json', 'sector_rrg_' + mk).catch(() => null); if (R && R.weekly) data = R.weekly; }
   if (!data && G) data = Object.fromEntries((G.sectors || []).filter((r) => r.rrg).map((r) => [r.sector, { pts: r.rrg.pts, now: r.rrg.now }]));
   const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
   const items = Object.entries(data || {}).map(([nm, r]) => ({ nm, now: r.now, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now, pts: r.pts.slice(-4) }))
