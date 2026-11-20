@@ -1261,3 +1261,7 @@ body.pub .owner-only { display: none !important; }
 .rrg-ctl { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; } .rrg-ctl .seg { margin: 0 !important; } .rrg-ctl .seg button { font-size: 13px; padding: 5px 12px; }
 .rrg-chip { font-size: 12px !important; padding: 1px 8px !important; } .rrg-row { font-size: 12px; overflow-wrap: anywhere; }
 .ig-map, .ig-map-c { max-width: 100%; overflow: hidden; }
+
+.rrg-play { display: flex; align-items: center; gap: 8px; margin: 6px 0 2px; } .rrg-play input { flex: 1; min-width: 0; accent-color: #6366F1; }
+.rrg-pb { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #6366F1; background: transparent; color: inherit; font-size: 13px; cursor: pointer; flex: none; }
+.rrg-play b { font-size: 13px; min-width: 52px; text-align: right; }

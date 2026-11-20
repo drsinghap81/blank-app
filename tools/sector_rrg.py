@@ -32,6 +32,24 @@ def view(C, bench, avg, step, smooth, n, names=None):
     return out
 
 
+def history(C, bench, avg, step, smooth, names, keep):
+    """21 Nov 2026 (Amritpal: "store sector rotation data so we can later see how the dots moved"): every point of every sector,
+    {date: {name: [ratio, momentum]}} for the last `keep` periods (rebuilt from prices each run, so it is always complete)"""
+    rs = 100 * C.div(bench, axis=0); ratio = 100 * rs / rs.rolling(avg).mean(); mom = (100 * ratio / ratio.shift(step)).rolling(smooth).mean()
+    out = {}
+    for d in ratio.index[-keep:]:
+        row = {names[k]: [round(float(ratio.at[d, k]), 2), round(float(mom.at[d, k]), 2)] for k in C.columns if pd.notna(ratio.at[d, k]) and pd.notna(mom.at[d, k])}
+        if row:
+            out[str(d.date())] = row
+    return out
+
+
+def write_hist(path, C, bench, W, BW, names):
+    h = dict(weekly=history(W, BW, 10, 1, 3, names, 104), daily=history(C, bench, 50, 10, 5, names, 260))
+    json.dump(h, open(path, "w"), separators=(",", ":"))
+    print("history", path, "weekly", len(h["weekly"]), "daily", len(h["daily"]))
+
+
 def main():
     d = pd.read_csv(SRC, parse_dates=["Date"])
     C = d.pivot_table(index="Date", columns="INDEX", values="Close").sort_index()
@@ -42,6 +60,7 @@ def main():
     out = dict(asof=str(C.index[-1].date()), bench="Nifty 50", weekly=view(W, BW, 10, 1, 3, 8), daily=view(C, bench, 50, 10, 5, 10),
                method=__doc__)
     json.dump(out, open(OUT, "w"), separators=(",", ":"))
+    write_hist(OUT.replace(".json", "_hist.json"), C, bench, W, BW, NAMES)
     for v in ("weekly", "daily"):
         print(v, {q: [k for k, r in out[v].items() if r["now"] == q] for q in ("Leading", "Improving", "Weakening", "Lagging")})
 

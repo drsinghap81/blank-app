@@ -9,3 +9,5 @@ for k in ("index filter (basket)", "filter CE", "filter PE", "BUY, 5 EMA exits, 
     print("R|", k, {x: v.get(x) for x in ("n", "pnl_rs", "win", "worst_run_rs", "days", "up_days")})
 for k, v in (r.get("Pulse") or {}).items():
     print("R| PULSE", k, v if not isinstance(v, dict) else {x: v.get(x) for x in ("n", "pnl_rs", "win", "worst_run_rs", "days", "up_days")})
+for k, v in (r.get("Rotation") or {}).items():
+    print("R| ROTATION", k, v if not isinstance(v, dict) else {x: v.get(x) for x in ("n", "pnl_rs", "win", "days", "up_days")})

@@ -10,7 +10,7 @@ import pandas as pd
 import yfinance as yf
 
 sys.path.insert(0, "tools")
-from sector_rrg import view  # noqa: E402
+from sector_rrg import view, write_hist  # noqa: E402
 
 CFG = {
     "US": dict(bench=("^GSPC", "S&P 500"), out="data/scan/us/sector_rrg.json", names={
@@ -37,6 +37,7 @@ def main(mk, dry=False):
         print(mk, v, {q: [k for k, r in out[v].items() if r["now"] == q] for q in ("Leading", "Improving", "Weakening", "Lagging")}, flush=True)
     if not dry:
         json.dump(out, open(cf["out"], "w"), separators=(",", ":"))
+        write_hist(cf["out"].replace(".json", "_hist.json"), C, bench, W, BW, cf["names"])
 
 
 if __name__ == "__main__":

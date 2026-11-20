@@ -39,7 +39,7 @@ jobs:
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
-          for f in data/scan/{us,asx,uk}/index_w.json data/scan/{us,asx,uk}/ema_lift.json data/scan/us/baskets.json data/scan/{us,asx}/sector_rrg.json data/scan/{us,asx,uk}/index_w_charts; do [ -e "$f" ] && git add -A "$f"; done
+          for f in data/scan/{us,asx,uk}/index_w.json data/scan/{us,asx,uk}/ema_lift.json data/scan/us/baskets.json data/scan/{us,asx}/sector_rrg.json data/scan/{us,asx}/sector_rrg_hist.json data/scan/{us,asx,uk}/index_w_charts; do [ -e "$f" ] && git add -A "$f"; done
           git diff --cached --quiet && exit 0
           git commit -qm "World alerts $(date -u +%F)"
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
