@@ -41,12 +41,22 @@ def nse_symbols():
         r = _get(u, headers={"Referer": "https://www.nseindia.com/"})
         if r is None:
             continue
-        d = pd.read_csv(io.BytesIO(r.content))
-        d.columns = [c.strip().upper() for c in d.columns]
-        col = lambda key: next(c for c in d.columns if key in c)  # noqa: E731
+        try:
+            d = pd.read_csv(io.BytesIO(r.content))
+            d.columns = [c.strip().upper() for c in d.columns]
+            col = lambda key: next(c for c in d.columns if key in c)  # noqa: E731
+            col("SYMBOL"); col("NAME")
+        except Exception:  # noqa: BLE001   21 Nov 2026: NSE sometimes serves an HTML page instead of the CSV
+            print("nse_symbols: bad response from", u, flush=True); continue
         sym = d[col("SYMBOL")].astype(str).str.strip()
         rows.append(pd.DataFrame({"symbol": sym, "ticker": sym + ".NS", "name": d[col("NAME")].astype(str).str.strip(),
                                   "board": board}))
+    if not any(r_["board"].iloc[0] == "main" for r_ in rows if len(r_)):     # fallback: the stored Nifty Total Market list
+        t = pd.read_csv("data/universe/niftytotalmarket.csv")
+        sc = next(c for c in t.columns if "symbol" in c.lower()); nc = next((c for c in t.columns if "name" in c.lower()), sc)
+        rows.append(pd.DataFrame({"symbol": t[sc].astype(str).str.strip(), "ticker": t[sc].astype(str).str.strip() + ".NS",
+                                  "name": t[nc].astype(str).str.strip(), "board": "main"}))
+        print("nse_symbols: NSE list unavailable, using data/universe/niftytotalmarket.csv", flush=True)
     return pd.concat(rows).drop_duplicates("symbol")
 
 
