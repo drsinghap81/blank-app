@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-19T23:37+00:00",
+"generated": "2026-11-20T03:14+00:00",
 "asof": "2026-11-19",
 "market": "NSE",
 "regime": {
@@ -58,6 +58,46 @@
 "days_since": 7,
 "target": 30465.9,
 "sl": 25914.1
+},
+{
+"symbol": "BLUESTARCO",
+"name": "Blue Star Limited",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 1764.0,
+"neck": 1673.0,
+"to_neck_pct": -5.158730158730163,
+"stop": 1472.62,
+"stop_pct": 16.51785714285714,
+"height_pct": 11.607738492328213,
+"fall_pct": 34.53635431433455,
+"lows": [
+[
+"2026-10-23",
+1499.0
+],
+[
+"2026-11-04",
+1555.0
+]
+],
+"peaks": [
+[
+"2026-10-29",
+1673.0
+]
+],
+"rsi_lows": [
+43.5,
+49.0
+],
+"rsi_div": 0.0,
+"rsi_now": 70.8,
+"signal_date": "2026-11-19",
+"days_since": 0,
+"target": 1847.0,
+"sl": 1606.08
 },
 {
 "symbol": "INDIASHLTR",
@@ -145,11 +185,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 333.54998779296875,
+"close": 326.5,
 "neck": 321.29998779296875,
-"to_neck_pct": -3.67261293608665,
+"to_neck_pct": -1.5926530496267244,
 "stop": 291.11,
-"stop_pct": 12.723879907401503,
+"stop_pct": 10.839360516067675,
 "height_pct": 8.823027194908972,
 "fall_pct": 85.60013347058369,
 "lows": [
@@ -173,51 +213,11 @@
 37.3
 ],
 "rsi_div": 2.5,
-"rsi_now": 65.9,
+"rsi_now": 59.9,
 "signal_date": "2026-11-17",
-"days_since": 1,
+"days_since": 2,
 "target": 347.35,
 "sl": 308.45
-},
-{
-"symbol": "TATACHEM",
-"name": "Tata Chemicals Limited",
-"kind": "stock",
-"typ": "DB",
-"status": "breakout",
-"close": 634.5999755859375,
-"neck": 637.6500244140625,
-"to_neck_pct": 0.4806254247502695,
-"stop": 564.35,
-"stop_pct": 11.070042605349128,
-"height_pct": 10.549590483509984,
-"fall_pct": 57.14285714285714,
-"lows": [
-[
-"2026-10-09",
-589.75
-],
-[
-"2026-10-23",
-576.7999877929688
-]
-],
-"peaks": [
-[
-"2026-10-19",
-637.6500244140625
-]
-],
-"rsi_lows": [
-36.2,
-35.8
-],
-"rsi_div": 0.0,
-"rsi_now": 56.3,
-"signal_date": "2026-11-17",
-"days_since": 1,
-"target": 698.5,
-"sl": 612.14
 },
 {
 "symbol": "IVALUE",
@@ -300,53 +300,44 @@
 "sl": 403.63
 },
 {
-"symbol": "LEMONTREE",
-"name": "Lemon Tree Hotels Limited",
+"symbol": "TATACHEM",
+"name": "Tata Chemicals Limited",
 "kind": "stock",
-"typ": "TB",
+"typ": "DB",
 "status": "breakout",
-"close": 123.58999633789062,
-"neck": 120.62000274658203,
-"to_neck_pct": -2.40310193325739,
-"stop": 101.28,
-"stop_pct": 18.054044807678014,
-"height_pct": 17.58627470609577,
-"fall_pct": 71.61457576394206,
+"close": 650.0499877929688,
+"neck": 637.6500244140625,
+"to_neck_pct": -1.9075399756572908,
+"stop": 564.35,
+"stop_pct": 13.183678407394117,
+"height_pct": 10.549590483509984,
+"fall_pct": 57.14285714285714,
 "lows": [
 [
-"2026-06-11",
-103.68000030517578
+"2026-10-09",
+589.75
 ],
 [
-"2026-09-15",
-102.58000183105469
-],
-[
-"2026-10-27",
-106.52999877929688
+"2026-10-23",
+576.7999877929688
 ]
 ],
 "peaks": [
 [
-"2026-07-07",
-120.62000274658203
-],
-[
-"2026-10-16",
-113.41999816894531
+"2026-10-19",
+637.6500244140625
 ]
 ],
 "rsi_lows": [
-32.5,
-31.5,
-42.9
+36.2,
+35.8
 ],
 "rsi_div": 0.0,
-"rsi_now": 69.6,
-"signal_date": "2026-11-13",
-"days_since": 3,
-"target": 138.66,
-"sl": 115.8
+"rsi_now": 60.7,
+"signal_date": "2026-11-17",
+"days_since": 2,
+"target": 698.5,
+"sl": 612.14
 },
 {
 "symbol": "KPITTECH",
@@ -391,6 +382,55 @@
 "outcome_date": "2026-11-17"
 },
 {
+"symbol": "LEMONTREE",
+"name": "Lemon Tree Hotels Limited",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 124.83000183105469,
+"neck": 120.62000274658203,
+"to_neck_pct": -3.372585935046679,
+"stop": 101.28,
+"stop_pct": 18.868059332155706,
+"height_pct": 17.58627470609577,
+"fall_pct": 71.61457576394206,
+"lows": [
+[
+"2026-06-11",
+103.68000030517578
+],
+[
+"2026-09-15",
+102.58000183105469
+],
+[
+"2026-10-27",
+106.52999877929688
+]
+],
+"peaks": [
+[
+"2026-07-07",
+120.62000274658203
+],
+[
+"2026-10-16",
+113.41999816894531
+]
+],
+"rsi_lows": [
+32.5,
+31.5,
+42.9
+],
+"rsi_div": 0.0,
+"rsi_now": 71.3,
+"signal_date": "2026-11-13",
+"days_since": 4,
+"target": 138.66,
+"sl": 115.8
+},
+{
 "symbol": "TIRUMALCHM",
 "name": "Thirumalai Chemicals Limited",
 "kind": "stock",
@@ -433,146 +473,6 @@
 "outcome_date": "2026-11-18"
 },
 {
-"symbol": "V2RETAIL",
-"name": "V2 Retail Limited",
-"kind": "stock",
-"typ": "TB",
-"status": "breakout",
-"close": 141.61000061035156,
-"neck": 174.8000030517578,
-"to_neck_pct": 23.437611961269987,
-"stop": 143.89,
-"stop_pct": -1.6076518285063512,
-"height_pct": 18.532583986456142,
-"fall_pct": 69.29679700430016,
-"lows": [
-[
-"2026-10-13",
-151.4499969482422
-],
-[
-"2026-10-30",
-147.47000122070312
-],
-[
-"2026-11-04",
-149.1300048828125
-]
-],
-"peaks": [
-[
-"2026-10-19",
-174.8000030517578
-],
-[
-"2026-11-03",
-164.6199951171875
-]
-],
-"rsi_lows": [
-13.8,
-27.9,
-35.8
-],
-"rsi_div": 22.0,
-"rsi_now": 39.0,
-"signal_date": "2026-11-11",
-"days_since": 5,
-"target": 202.13,
-"sl": 167.81,
-"outcome": "sl",
-"outcome_date": "2026-11-13"
-},
-{
-"symbol": "EMAMILTD",
-"name": "Emami Limited",
-"kind": "stock",
-"typ": "DB",
-"status": "breakout",
-"close": 412.79998779296875,
-"neck": 391.45001220703125,
-"to_neck_pct": -5.171990362714141,
-"stop": 353.43,
-"stop_pct": 14.382264910033026,
-"height_pct": 8.811678167347115,
-"fall_pct": 69.25615573506832,
-"lows": [
-[
-"2026-09-08",
-363.6499938964844
-],
-[
-"2026-10-30",
-359.75
-]
-],
-"peaks": [
-[
-"2026-09-23",
-391.45001220703125
-]
-],
-"rsi_lows": [
-33.1,
-38.2
-],
-"rsi_div": 5.1,
-"rsi_now": 67.3,
-"signal_date": "2026-11-09",
-"days_since": 6,
-"target": 423.15,
-"sl": 375.79
-},
-{
-"symbol": "IOC",
-"name": "Indian Oil Corporation Limited",
-"kind": "stock",
-"typ": "TB",
-"status": "breakout",
-"close": 143.82000732421875,
-"neck": 146.3000030517578,
-"to_neck_pct": 1.7243746358239997,
-"stop": 124.1,
-"stop_pct": 13.714022966481586,
-"height_pct": 16.713206886844855,
-"fall_pct": 42.227452160726074,
-"lows": [
-[
-"2026-05-18",
-131.80999755859375
-],
-[
-"2026-06-11",
-134.24000549316406
-],
-[
-"2026-10-12",
-125.3499984741211
-]
-],
-"peaks": [
-[
-"2026-05-25",
-143.9499969482422
-],
-[
-"2026-06-24",
-146.3000030517578
-]
-],
-"rsi_lows": [
-33.3,
-40.3,
-31.4
-],
-"rsi_div": 0.0,
-"rsi_now": 61.6,
-"signal_date": "2026-11-09",
-"days_since": 6,
-"target": 167.25,
-"sl": 140.45
-},
-{
 "symbol": "HAVELLS",
 "name": "Havells India Limited",
 "kind": "stock",
@@ -611,6 +511,55 @@
 "days_since": 7,
 "target": 1233.5,
 "sl": 1076.16
+},
+{
+"symbol": "IOC",
+"name": "Indian Oil Corporation Limited",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 147.8000030517578,
+"neck": 146.3000030517578,
+"to_neck_pct": -1.0148849587470643,
+"stop": 124.1,
+"stop_pct": 16.037553499966606,
+"height_pct": 16.713206886844855,
+"fall_pct": 42.227452160726074,
+"lows": [
+[
+"2026-05-18",
+131.80999755859375
+],
+[
+"2026-06-11",
+134.24000549316406
+],
+[
+"2026-10-12",
+125.3499984741211
+]
+],
+"peaks": [
+[
+"2026-05-25",
+143.9499969482422
+],
+[
+"2026-06-24",
+146.3000030517578
+]
+],
+"rsi_lows": [
+33.3,
+40.3,
+31.4
+],
+"rsi_div": 0.0,
+"rsi_now": 67.6,
+"signal_date": "2026-11-09",
+"days_since": 7,
+"target": 167.25,
+"sl": 140.45
 },
 {
 "symbol": "SBILIFE",
@@ -782,11 +731,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 1601.300048828125,
+"close": 1608.9000244140625,
 "neck": 1463.0999755859375,
-"to_neck_pct": -8.630492039472937,
+"to_neck_pct": -9.062095009988159,
 "stop": 1208.49,
-"stop_pct": 24.53051178356209,
+"stop_pct": 24.88700768711397,
 "height_pct": 19.280939565242193,
 "fall_pct": 21.359856939084377,
 "lows": [
@@ -810,9 +759,9 @@
 22.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 77.5,
+"rsi_now": 78.2,
 "signal_date": "2026-11-05",
-"days_since": 8,
+"days_since": 9,
 "target": 1699.6,
 "sl": 1404.58
 },
@@ -822,11 +771,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 5151.7998046875,
+"close": 5320.39990234375,
 "neck": 5184.5,
-"to_neck_pct": 0.6347334242830405,
+"to_neck_pct": -2.554317435497344,
 "stop": 4653.99,
-"stop_pct": 9.662832865410554,
+"stop_pct": 12.525560382222068,
 "height_pct": 10.027589134125648,
 "fall_pct": 45.62818336162988,
 "lows": [
@@ -850,9 +799,9 @@
 41.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 53.3,
+"rsi_now": 59.4,
 "signal_date": "2026-11-05",
-"days_since": 8,
+"days_since": 9,
 "target": 5657.0,
 "sl": 4977.12
 },
@@ -862,11 +811,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 401.0,
+"close": 402.0,
 "neck": 409.45001220703125,
-"to_neck_pct": 2.107234964346949,
+"to_neck_pct": 1.8532368674207156,
 "stop": 332.39,
-"stop_pct": 17.109102244389028,
+"stop_pct": 17.315298507462696,
 "height_pct": 20.942261695610974,
 "fall_pct": 80.04726326137776,
 "lows": [
@@ -890,233 +839,11 @@
 38.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 55.8,
+"rsi_now": 56.2,
 "signal_date": "2026-11-05",
-"days_since": 8,
+"days_since": 9,
 "target": 480.35,
 "sl": 393.07
-},
-{
-"symbol": "SWIGGY",
-"name": "Swiggy Limited",
-"kind": "stock",
-"typ": "DB",
-"status": "breakout",
-"close": 180.49000549316406,
-"neck": 188.9499969482422,
-"to_neck_pct": 4.687235413375035,
-"stop": 172.75,
-"stop_pct": 4.285558899524233,
-"height_pct": 7.357952811501245,
-"fall_pct": 145.53976925936612,
-"lows": [
-[
-"2026-10-23",
-176.0
-],
-[
-"2026-10-30",
-176.60000610351562
-]
-],
-"peaks": [
-[
-"2026-10-27",
-188.9499969482422
-]
-],
-"rsi_lows": [
-15.6,
-23.7
-],
-"rsi_div": 0.0,
-"rsi_now": 34.2,
-"signal_date": "2026-11-05",
-"days_since": 8,
-"target": 201.9,
-"sl": 181.39,
-"outcome": "sl",
-"outcome_date": "2026-11-18"
-},
-{
-"symbol": "ULTRACEMCO",
-"name": "UltraTech Cement Limited",
-"kind": "stock",
-"typ": "TB",
-"status": "breakout",
-"close": 12428.0,
-"neck": 12193.0,
-"to_neck_pct": -1.890891535243,
-"stop": 10221.75,
-"stop_pct": 17.752252977148373,
-"height_pct": 17.670333912372136,
-"fall_pct": 25.960239336035507,
-"lows": [
-[
-"2026-03-23",
-10362.0
-],
-[
-"2026-06-08",
-10795.0
-],
-[
-"2026-10-08",
-10426.0
-]
-],
-"peaks": [
-[
-"2026-04-22",
-12193.0
-],
-[
-"2026-08-05",
-12190.0
-]
-],
-"rsi_lows": [
-29.3,
-31.3,
-33.3
-],
-"rsi_div": 0.0,
-"rsi_now": 68.9,
-"signal_date": "2026-11-05",
-"days_since": 8,
-"target": 14024.0,
-"sl": 11705.28
-},
-{
-"symbol": "FRACTAL",
-"name": "Fractal Analytics Limited",
-"kind": "stock",
-"typ": "TW",
-"status": "breakout",
-"close": 793.9500122070312,
-"neck": 785.9000244140625,
-"to_neck_pct": -1.0139161999117907,
-"stop": 689.34,
-"stop_pct": 13.17627340305566,
-"height_pct": 12.231349434353799,
-"fall_pct": 57.30811122143877,
-"lows": [
-[
-"2026-10-12",
-700.25
-],
-[
-"2026-10-23",
-728.4000244140625
-]
-],
-"peaks": [
-[
-"2026-10-21",
-785.9000244140625
-]
-],
-"rsi_lows": [
-31.5,
-46.1
-],
-"rsi_div": 0.0,
-"rsi_now": 53.6,
-"signal_date": "2026-11-04",
-"days_since": 9,
-"target": 871.55,
-"sl": 754.46
-},
-{
-"symbol": "GANESHCP",
-"name": "Ganesh Consumer Products Limited",
-"kind": "stock",
-"typ": "IHS",
-"status": "breakout",
-"close": 176.97000122070312,
-"neck": 174.4600067138672,
-"to_neck_pct": -1.4183163753870742,
-"stop": 143.3,
-"stop_pct": 19.024411475657754,
-"height_pct": 19.92851120498804,
-"fall_pct": 90.32639876119994,
-"lows": [
-[
-"2026-08-14",
-160.5399932861328
-],
-[
-"2026-10-06",
-145.47000122070312
-],
-[
-"2026-10-23",
-156.0
-]
-],
-"peaks": [
-[
-"2026-09-04",
-174.4600067138672
-],
-[
-"2026-10-19",
-172.00999450683594
-]
-],
-"rsi_lows": [
-31.8,
-26.1,
-45.8
-],
-"rsi_div": 14.0,
-"rsi_now": 54.3,
-"signal_date": "2026-11-04",
-"days_since": 9,
-"target": 203.45,
-"sl": 163.99
-},
-{
-"symbol": "INDIACEM",
-"name": "The India Cements Limited",
-"kind": "stock",
-"typ": "DB",
-"status": "breakout",
-"close": 310.04998779296875,
-"neck": 331.75,
-"to_neck_pct": 6.998875362485446,
-"stop": 283.63,
-"stop_pct": 8.519590012242473,
-"height_pct": 12.70595995276851,
-"fall_pct": 62.57855541700739,
-"lows": [
-[
-"2026-10-19",
-294.3500061035156
-],
-[
-"2026-10-29",
-300.25
-]
-],
-"peaks": [
-[
-"2026-10-22",
-331.75
-]
-],
-"rsi_lows": [
-32.2,
-41.8
-],
-"rsi_div": 0.0,
-"rsi_now": 42.1,
-"signal_date": "2026-11-04",
-"days_since": 9,
-"target": 369.15,
-"sl": 318.48,
-"outcome": "sl",
-"outcome_date": "2026-11-18"
 },
 {
 "symbol": "SESHAPAPER",
@@ -1157,6 +884,97 @@
 "days_since": 9,
 "target": 235.6,
 "sl": 205.7
+},
+{
+"symbol": "SWIGGY",
+"name": "Swiggy Limited",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 183.3000030517578,
+"neck": 188.9499969482422,
+"to_neck_pct": 3.0823752331793575,
+"stop": 172.75,
+"stop_pct": 5.752865726238021,
+"height_pct": 7.357952811501245,
+"fall_pct": 145.53976925936612,
+"lows": [
+[
+"2026-10-23",
+176.0
+],
+[
+"2026-10-30",
+176.60000610351562
+]
+],
+"peaks": [
+[
+"2026-10-27",
+188.9499969482422
+]
+],
+"rsi_lows": [
+15.6,
+23.7
+],
+"rsi_div": 0.0,
+"rsi_now": 36.9,
+"signal_date": "2026-11-05",
+"days_since": 9,
+"target": 201.9,
+"sl": 181.39,
+"outcome": "sl",
+"outcome_date": "2026-11-18"
+},
+{
+"symbol": "ULTRACEMCO",
+"name": "UltraTech Cement Limited",
+"kind": "stock",
+"typ": "TB",
+"status": "breakout",
+"close": 12560.0,
+"neck": 12193.0,
+"to_neck_pct": -2.9219745222929916,
+"stop": 10221.75,
+"stop_pct": 18.61664012738854,
+"height_pct": 17.670333912372136,
+"fall_pct": 25.960239336035507,
+"lows": [
+[
+"2026-03-23",
+10362.0
+],
+[
+"2026-06-08",
+10795.0
+],
+[
+"2026-10-08",
+10426.0
+]
+],
+"peaks": [
+[
+"2026-04-22",
+12193.0
+],
+[
+"2026-08-05",
+12190.0
+]
+],
+"rsi_lows": [
+29.3,
+31.3,
+33.3
+],
+"rsi_div": 0.0,
+"rsi_now": 70.9,
+"signal_date": "2026-11-05",
+"days_since": 9,
+"target": 14024.0,
+"sl": 11705.28
 },
 {
 "symbol": "ZAGGLE",
@@ -1201,56 +1019,16 @@
 "outcome_date": "2026-11-18"
 },
 {
-"symbol": "EIHOTEL",
-"name": "EIH Limited",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 313.45001220703125,
-"neck": 317.8999938964844,
-"to_neck_pct": 1.419678263248536,
-"stop": 278.24,
-"stop_pct": 11.233218350853324,
-"height_pct": 12.61070054654898,
-"fall_pct": 48.12256889048978,
-"lows": [
-[
-"2026-08-31",
-282.29998779296875
-],
-[
-"2026-10-30",
-286.3500061035156
-]
-],
-"peaks": [
-[
-"2026-09-18",
-317.8999938964844
-]
-],
-"rsi_lows": [
-27.1,
-42.0
-],
-"rsi_div": 0.0,
-"rsi_now": 60.1,
-"signal_date": null,
-"days_since": null,
-"target": 353.5,
-"sl": 305.18
-},
-{
 "symbol": "FORTIS",
 "name": "Fortis Healthcare Limited",
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 793.5499877929688,
+"close": 809.8499755859375,
 "neck": 819.7999877929688,
-"to_neck_pct": 3.307920156738553,
+"to_neck_pct": 1.2286241287878363,
 "stop": 697.9,
-"stop_pct": 12.053364901942643,
+"stop_pct": 13.823481740550726,
 "height_pct": 14.995084825080207,
 "fall_pct": 54.004767402895546,
 "lows": [
@@ -1274,11 +1052,171 @@
 45.0
 ],
 "rsi_div": 0.0,
-"rsi_now": 53.1,
+"rsi_now": 56.9,
 "signal_date": null,
 "days_since": null,
 "target": 926.7,
 "sl": 787.01
+},
+{
+"symbol": "EIHOTEL",
+"name": "EIH Limited",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 310.0,
+"neck": 317.8999938964844,
+"to_neck_pct": 2.5483851278981895,
+"stop": 278.24,
+"stop_pct": 10.245326479019667,
+"height_pct": 12.61070054654898,
+"fall_pct": 48.12256889048978,
+"lows": [
+[
+"2026-08-31",
+282.29998779296875
+],
+[
+"2026-10-30",
+286.3500061035156
+]
+],
+"peaks": [
+[
+"2026-09-18",
+317.8999938964844
+]
+],
+"rsi_lows": [
+27.1,
+42.0
+],
+"rsi_div": 0.0,
+"rsi_now": 56.2,
+"signal_date": null,
+"days_since": null,
+"target": 353.5,
+"sl": 305.18
+},
+{
+"symbol": "KPIGREEN",
+"name": "KPI Green Energy Limited",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 329.8999938964844,
+"neck": 340.5,
+"to_neck_pct": 3.2130967867922022,
+"stop": 273.24,
+"stop_pct": 17.174899952942425,
+"height_pct": 22.791206270883848,
+"fall_pct": 94.30220393490787,
+"lows": [
+[
+"2026-10-30",
+277.29998779296875
+],
+[
+"2026-11-16",
+297.95001220703125
+]
+],
+"peaks": [
+[
+"2026-11-11",
+340.5
+]
+],
+"rsi_lows": [
+32.1,
+45.4
+],
+"rsi_div": 0.0,
+"rsi_now": 56.8,
+"signal_date": null,
+"days_since": null,
+"target": 403.7,
+"sl": 326.88
+},
+{
+"symbol": "JAINREC",
+"name": "Jain Resource Recycling Limited",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 293.0,
+"neck": 302.95001220703125,
+"to_neck_pct": 3.3959086030823427,
+"stop": 265.42,
+"stop_pct": 9.413308517924756,
+"height_pct": 12.203708224826393,
+"fall_pct": 109.53253895508706,
+"lows": [
+[
+"2026-09-21",
+272.75
+],
+[
+"2026-10-30",
+270.0
+]
+],
+"peaks": [
+[
+"2026-09-23",
+302.95001220703125
+]
+],
+"rsi_lows": [
+35.9,
+36.3
+],
+"rsi_div": 0.0,
+"rsi_now": 57.3,
+"signal_date": null,
+"days_since": null,
+"target": 335.9,
+"sl": 290.83
+},
+{
+"symbol": "PFC",
+"name": "Power Finance Corporation Limited",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 331.6000061035156,
+"neck": 344.5,
+"to_neck_pct": 3.8902272795668713,
+"stop": 310.22,
+"stop_pct": 6.448582529386282,
+"height_pct": 9.853314188483985,
+"fall_pct": 51.38364587939761,
+"lows": [
+[
+"2026-10-01",
+318.0
+],
+[
+"2026-10-30",
+313.6000061035156
+]
+],
+"peaks": [
+[
+"2026-10-14",
+344.5
+]
+],
+"rsi_lows": [
+22.4,
+34.3
+],
+"rsi_div": 11.9,
+"rsi_now": 50.9,
+"signal_date": null,
+"days_since": null,
+"target": 375.4,
+"sl": 330.72
 },
 {
 "symbol": "ICICIGI",
@@ -1326,11 +1264,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 1417.0,
+"close": 1418.5,
 "neck": 1477.0,
-"to_neck_pct": 4.234297812279464,
+"to_neck_pct": 4.124074726824101,
 "stop": 1154.04,
-"stop_pct": 18.557307575147764,
+"stop_pct": 18.643429562202595,
 "height_pct": 23.867827051227053,
 "fall_pct": 39.51693571990822,
 "lows": [
@@ -1354,51 +1292,51 @@
 26.8
 ],
 "rsi_div": 0.0,
-"rsi_now": 62.2,
+"rsi_now": 62.6,
 "signal_date": null,
 "days_since": null,
 "target": 1761.6,
 "sl": 1417.92
 },
 {
-"symbol": "VBL",
-"name": "Varun Beverages Limited",
+"symbol": "RECLTD",
+"name": "REC Limited",
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 424.54998779296875,
-"neck": 442.6499938964844,
-"to_neck_pct": 4.263339211857908,
-"stop": 385.75,
-"stop_pct": 9.138262855013501,
-"height_pct": 12.920916810327654,
-"fall_pct": 35.85965069510269,
+"close": 299.0,
+"neck": 311.79998779296875,
+"to_neck_pct": 4.2809323722303505,
+"stop": 279.72,
+"stop_pct": 6.446659560187607,
+"height_pct": 9.59577778311731,
+"fall_pct": 33.98783242153562,
 "lows": [
 [
-"2026-08-31",
-400.45001220703125
+"2026-10-01",
+287.75
 ],
 [
-"2026-10-30",
-392.0
+"2026-11-03",
+284.5
 ]
 ],
 "peaks": [
 [
 "2026-10-14",
-442.6499938964844
+311.79998779296875
 ]
 ],
 "rsi_lows": [
-28.8,
+30.3,
 37.8
 ],
-"rsi_div": 9.0,
-"rsi_now": 49.9,
+"rsi_div": 7.6,
+"rsi_now": 50.0,
 "signal_date": null,
 "days_since": null,
-"target": 493.3,
-"sl": 424.94
+"target": 339.1,
+"sl": 299.33
 },
 {
 "symbol": "RUSTOMJEE",
@@ -1441,84 +1379,44 @@
 "sl": 364.13
 },
 {
-"symbol": "JAINREC",
-"name": "Jain Resource Recycling Limited",
+"symbol": "VBL",
+"name": "Varun Beverages Limited",
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 290.1000061035156,
-"neck": 302.95001220703125,
-"to_neck_pct": 4.429509077269844,
-"stop": 265.42,
-"stop_pct": 8.507755788267135,
-"height_pct": 12.203708224826393,
-"fall_pct": 109.53253895508706,
+"close": 420.5,
+"neck": 442.6499938964844,
+"to_neck_pct": 5.267537192980831,
+"stop": 385.75,
+"stop_pct": 8.263140557070269,
+"height_pct": 12.920916810327654,
+"fall_pct": 35.85965069510269,
 "lows": [
 [
-"2026-09-21",
-272.75
+"2026-08-31",
+400.45001220703125
 ],
 [
 "2026-10-30",
-270.0
+392.0
 ]
 ],
 "peaks": [
 [
-"2026-09-23",
-302.95001220703125
+"2026-10-14",
+442.6499938964844
 ]
 ],
 "rsi_lows": [
-35.9,
-36.3
+28.8,
+37.8
 ],
-"rsi_div": 0.0,
-"rsi_now": 54.9,
+"rsi_div": 9.0,
+"rsi_now": 47.7,
 "signal_date": null,
 "days_since": null,
-"target": 335.9,
-"sl": 290.83
-},
-{
-"symbol": "KPIGREEN",
-"name": "KPI Green Energy Limited",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 325.8999938964844,
-"neck": 340.5,
-"to_neck_pct": 4.4799037670902875,
-"stop": 273.24,
-"stop_pct": 16.15832920610939,
-"height_pct": 22.791206270883848,
-"fall_pct": 94.30220393490787,
-"lows": [
-[
-"2026-10-30",
-277.29998779296875
-],
-[
-"2026-11-16",
-297.95001220703125
-]
-],
-"peaks": [
-[
-"2026-11-11",
-340.5
-]
-],
-"rsi_lows": [
-32.1,
-45.4
-],
-"rsi_div": 0.0,
-"rsi_now": 55.5,
-"signal_date": null,
-"days_since": null,
-"target": 403.7,
-"sl": 326.88
+"target": 493.3,
+"sl": 424.94
 },
 {
 "symbol": "MARATHON",
@@ -1610,44 +1508,44 @@
 "sl": 210.16
 },
 {
-"symbol": "PFC",
-"name": "Power Finance Corporation Limited",
+"symbol": "JSL",
+"name": "Jindal Stainless Limited",
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 323.54998779296875,
-"neck": 344.5,
-"to_neck_pct": 6.475046514431226,
-"stop": 310.22,
-"stop_pct": 4.120995905900027,
-"height_pct": 9.853314188483985,
-"fall_pct": 51.38364587939761,
+"close": 736.5999755859375,
+"neck": 783.2999877929688,
+"to_neck_pct": 6.339942133433163,
+"stop": 663.3,
+"stop_pct": 9.951123814201889,
+"height_pct": 16.21661539955026,
+"fall_pct": 26.946765423258512,
 "lows": [
 [
-"2026-10-01",
-318.0
+"2026-07-01",
+681.9000244140625
 ],
 [
 "2026-10-30",
-313.6000061035156
+674.0
 ]
 ],
 "peaks": [
 [
-"2026-10-14",
-344.5
+"2026-09-09",
+783.2999877929688
 ]
 ],
 "rsi_lows": [
-22.4,
-34.3
+42.4,
+36.5
 ],
-"rsi_div": 11.9,
-"rsi_now": 43.9,
+"rsi_div": 0.0,
+"rsi_now": 60.2,
 "signal_date": null,
 "days_since": null,
-"target": 375.4,
-"sl": 330.72
+"target": 892.6,
+"sl": 751.97
 },
 {
 "symbol": "RAJESH.BO",
@@ -1730,124 +1628,93 @@
 "sl": 26179.2
 },
 {
-"symbol": "JSL",
-"name": "Jindal Stainless Limited",
+"symbol": "BPCL",
+"name": "Bharat Petroleum Corporation Limited",
 "kind": "stock",
-"typ": "DB",
+"typ": "TB",
 "status": "forming",
-"close": 731.4500122070312,
-"neck": 783.2999877929688,
-"to_neck_pct": 7.088656055864795,
-"stop": 663.3,
-"stop_pct": 9.317111363687003,
-"height_pct": 16.21661539955026,
-"fall_pct": 26.946765423258512,
+"close": 308.1000061035156,
+"neck": 329.95001220703125,
+"to_neck_pct": 7.091855134911773,
+"stop": 273.83,
+"stop_pct": 11.121713528795741,
+"height_pct": 17.503570708949013,
+"fall_pct": 38.28347744774789,
 "lows": [
 [
-"2026-07-01",
-681.9000244140625
+"2026-05-18",
+280.79998779296875
 ],
 [
-"2026-10-30",
-674.0
+"2026-06-08",
+285.1499938964844
+],
+[
+"2026-10-23",
+281.95001220703125
 ]
 ],
 "peaks": [
 [
-"2026-09-09",
-783.2999877929688
+"2026-05-25",
+308.25
+],
+[
+"2026-08-03",
+329.95001220703125
 ]
 ],
 "rsi_lows": [
-42.4,
-36.5
+36.8,
+40.2,
+33.5
 ],
 "rsi_div": 0.0,
-"rsi_now": 58.5,
+"rsi_now": 55.1,
 "signal_date": null,
 "days_since": null,
-"target": 892.6,
-"sl": 751.97
+"target": 379.1,
+"sl": 316.75
 },
 {
-"symbol": "RECLTD",
-"name": "REC Limited",
+"symbol": "TENNIND",
+"name": "Tenneco Clean Air India Limited",
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 290.6499938964844,
-"neck": 311.79998779296875,
-"to_neck_pct": 7.276791446972131,
-"stop": 279.72,
-"stop_pct": 3.7589906110015114,
-"height_pct": 9.59577778311731,
-"fall_pct": 33.98783242153562,
+"close": 436.0,
+"neck": 467.54998779296875,
+"to_neck_pct": 7.236235732332275,
+"stop": 415.85,
+"stop_pct": 4.621677083706643,
+"height_pct": 10.466624404717951,
+"fall_pct": 52.16680157948523,
 "lows": [
 [
-"2026-10-01",
-287.75
+"2026-10-29",
+428.04998779296875
 ],
 [
-"2026-11-03",
-284.5
+"2026-11-06",
+423.25
 ]
 ],
 "peaks": [
 [
-"2026-10-14",
-311.79998779296875
+"2026-11-05",
+467.54998779296875
 ]
 ],
 "rsi_lows": [
-30.3,
-37.8
+24.9,
+34.0
 ],
-"rsi_div": 7.6,
-"rsi_now": 43.0,
+"rsi_div": 9.1,
+"rsi_now": 43.8,
 "signal_date": null,
 "days_since": null,
-"target": 339.1,
-"sl": 299.33
-},
-{
-"symbol": "INFY",
-"name": "Infosys Limited",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 1108.800048828125,
-"neck": 1190.699951171875,
-"to_neck_pct": 7.386354503709569,
-"stop": 972.58,
-"stop_pct": 12.285715968553246,
-"height_pct": 20.846439249328895,
-"fall_pct": 71.50107274569315,
-"lows": [
-[
-"2026-07-01",
-985.2999877929688
-],
-[
-"2026-10-07",
-992.0
-]
-],
-"peaks": [
-[
-"2026-08-11",
-1190.699951171875
-]
-],
-"rsi_lows": [
-29.2,
-36.2
-],
-"rsi_div": 0.0,
-"rsi_now": 45.7,
-"signal_date": null,
-"days_since": null,
-"target": 1396.1,
-"sl": 1143.07
+"target": 511.85,
+"sl": 448.85
 },
 {
 "symbol": "WONDERLA",
@@ -1930,55 +1797,6 @@
 "sl": 1493.76
 },
 {
-"symbol": "BPCL",
-"name": "Bharat Petroleum Corporation Limited",
-"kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 305.5,
-"neck": 329.95001220703125,
-"to_neck_pct": 8.00327731817716,
-"stop": 273.83,
-"stop_pct": 10.365300804425392,
-"height_pct": 17.503570708949013,
-"fall_pct": 38.28347744774789,
-"lows": [
-[
-"2026-05-18",
-280.79998779296875
-],
-[
-"2026-06-08",
-285.1499938964844
-],
-[
-"2026-10-23",
-281.95001220703125
-]
-],
-"peaks": [
-[
-"2026-05-25",
-308.25
-],
-[
-"2026-08-03",
-329.95001220703125
-]
-],
-"rsi_lows": [
-36.8,
-40.2,
-33.5
-],
-"rsi_div": 0.0,
-"rsi_now": 52.9,
-"signal_date": null,
-"days_since": null,
-"target": 379.1,
-"sl": 316.75
-},
-{
 "symbol": "CELLO",
 "name": "Cello World Limited",
 "kind": "stock",
@@ -2019,44 +1837,53 @@
 "sl": 375.02
 },
 {
-"symbol": "TENNIND",
-"name": "Tenneco Clean Air India Limited",
+"symbol": "EPACK",
+"name": "EPACK Durable Limited",
 "kind": "stock",
-"typ": "DB",
+"typ": "TB",
 "status": "forming",
-"close": 430.6000061035156,
-"neck": 467.54998779296875,
-"to_neck_pct": 8.581045324130908,
-"stop": 415.85,
-"stop_pct": 3.425573148954064,
-"height_pct": 10.466624404717951,
-"fall_pct": 52.16680157948523,
+"close": 160.47999572753906,
+"neck": 174.1199951171875,
+"to_neck_pct": 8.499501341467042,
+"stop": 142.91,
+"stop_pct": 10.950579606753386,
+"height_pct": 20.008270392185267,
+"fall_pct": 126.44445691190657,
 "lows": [
 [
-"2026-10-29",
-428.04998779296875
+"2026-10-23",
+154.2100067138672
 ],
 [
-"2026-11-06",
-423.25
+"2026-11-02",
+152.10000610351562
+],
+[
+"2026-11-18",
+145.08999633789062
 ]
 ],
 "peaks": [
 [
-"2026-11-05",
-467.54998779296875
+"2026-10-29",
+174.1199951171875
+],
+[
+"2026-11-11",
+162.44000244140625
 ]
 ],
 "rsi_lows": [
-24.9,
-34.0
+26.2,
+34.5,
+33.6
 ],
-"rsi_div": 9.1,
-"rsi_now": 41.5,
+"rsi_div": 8.4,
+"rsi_now": 48.8,
 "signal_date": null,
 "days_since": null,
-"target": 511.85,
-"sl": 448.85
+"target": 203.15,
+"sl": 167.16
 },
 {
 "symbol": "ASIANPAINT",
@@ -2097,6 +1924,46 @@
 "days_since": null,
 "target": 3498.7,
 "sl": 2697.6
+},
+{
+"symbol": "INFY",
+"name": "Infosys Limited",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 1091.9000244140625,
+"neck": 1190.699951171875,
+"to_neck_pct": 9.048440749951503,
+"stop": 972.58,
+"stop_pct": 10.928106747517708,
+"height_pct": 20.846439249328895,
+"fall_pct": 71.50107274569315,
+"lows": [
+[
+"2026-07-01",
+985.2999877929688
+],
+[
+"2026-10-07",
+992.0
+]
+],
+"peaks": [
+[
+"2026-08-11",
+1190.699951171875
+]
+],
+"rsi_lows": [
+29.2,
+36.2
+],
+"rsi_div": 0.0,
+"rsi_now": 42.5,
+"signal_date": null,
+"days_since": null,
+"target": 1396.1,
+"sl": 1143.07
 },
 {
 "symbol": "METROBRAND",
@@ -2228,46 +2095,6 @@
 "sl": 245.91
 },
 {
-"symbol": "HAPPSTMNDS",
-"name": "Happiest Minds Technologies Limited",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 302.79998779296875,
-"neck": 335.8999938964844,
-"to_neck_pct": 10.931310250298566,
-"stop": 293.09,
-"stop_pct": 3.2069023346754544,
-"height_pct": 12.850663794504369,
-"fall_pct": 74.6169190178179,
-"lows": [
-[
-"2026-10-08",
-300.20001220703125
-],
-[
-"2026-10-30",
-297.6499938964844
-]
-],
-"peaks": [
-[
-"2026-10-16",
-335.8999938964844
-]
-],
-"rsi_lows": [
-25.5,
-37.4
-],
-"rsi_div": 11.8,
-"rsi_now": 40.6,
-"signal_date": null,
-"days_since": null,
-"target": 374.15,
-"sl": 322.46
-},
-{
 "symbol": "PIDILITIND",
 "name": "Pidilite Industries Limited",
 "kind": "stock",
@@ -2308,6 +2135,86 @@
 "sl": 1633.44
 },
 {
+"symbol": "BAJAJFINSV",
+"name": "Bajaj Finserv Limited",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 1885.0,
+"neck": 2105.0,
+"to_neck_pct": 11.671087533156488,
+"stop": 1608.55,
+"stop_pct": 14.665673828125003,
+"height_pct": 27.955749269904363,
+"fall_pct": 32.30807427864726,
+"lows": [
+[
+"2026-06-11",
+1645.0999755859375
+],
+[
+"2026-10-28",
+1652.4000244140625
+]
+],
+"peaks": [
+[
+"2026-08-04",
+2105.0
+]
+],
+"rsi_lows": [
+31.9,
+30.7
+],
+"rsi_div": 0.0,
+"rsi_now": 64.0,
+"signal_date": null,
+"days_since": null,
+"target": 2564.9,
+"sl": 2020.8
+},
+{
+"symbol": "HAPPSTMNDS",
+"name": "Happiest Minds Technologies Limited",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 298.95001220703125,
+"neck": 335.8999938964844,
+"to_neck_pct": 12.3599197794527,
+"stop": 293.09,
+"stop_pct": 1.9603693101486241,
+"height_pct": 12.850663794504369,
+"fall_pct": 74.6169190178179,
+"lows": [
+[
+"2026-10-08",
+300.20001220703125
+],
+[
+"2026-10-30",
+297.6499938964844
+]
+],
+"peaks": [
+[
+"2026-10-16",
+335.8999938964844
+]
+],
+"rsi_lows": [
+25.5,
+37.4
+],
+"rsi_div": 11.8,
+"rsi_now": 38.1,
+"signal_date": null,
+"days_since": null,
+"target": 374.15,
+"sl": 322.46
+},
+{
 "symbol": "SIRCA",
 "name": "Sirca Paints India Limited",
 "kind": "stock",
@@ -2346,46 +2253,6 @@
 "days_since": null,
 "target": 515.4,
 "sl": 435.07
-},
-{
-"symbol": "BAJAJFINSV",
-"name": "Bajaj Finserv Limited",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 1856.199951171875,
-"neck": 2105.0,
-"to_neck_pct": 13.403731029679754,
-"stop": 1608.55,
-"stop_pct": 13.3416608849539,
-"height_pct": 27.955749269904363,
-"fall_pct": 32.30807427864726,
-"lows": [
-[
-"2026-06-11",
-1645.0999755859375
-],
-[
-"2026-10-28",
-1652.4000244140625
-]
-],
-"peaks": [
-[
-"2026-08-04",
-2105.0
-]
-],
-"rsi_lows": [
-31.9,
-30.7
-],
-"rsi_div": 0.0,
-"rsi_now": 60.5,
-"signal_date": null,
-"days_since": null,
-"target": 2564.9,
-"sl": 2020.8
 },
 {
 "symbol": "PRAKASH",
@@ -2435,6 +2302,55 @@
 "days_since": null,
 "target": 143.29,
 "sl": 121.83
+},
+{
+"symbol": "SUPREMEIND",
+"name": "Supreme Industries Limited",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 3208.5,
+"neck": 3650.0,
+"to_neck_pct": 13.760324139005764,
+"stop": 3095.73,
+"stop_pct": 3.5147265077138834,
+"height_pct": 15.873015873015884,
+"fall_pct": 46.868064252789225,
+"lows": [
+[
+"2026-06-30",
+3157.800048828125
+],
+[
+"2026-09-15",
+3300.0
+],
+[
+"2026-10-30",
+3150.0
+]
+],
+"peaks": [
+[
+"2026-08-20",
+3650.0
+],
+[
+"2026-10-19",
+3620.699951171875
+]
+],
+"rsi_lows": [
+27.2,
+34.8,
+32.0
+],
+"rsi_div": 4.8,
+"rsi_now": 42.8,
+"signal_date": null,
+"days_since": null,
+"target": 4150.0,
+"sl": 3504.0
 },
 {
 "symbol": "GODREJAGRO",
@@ -2526,65 +2442,16 @@
 "sl": 319.1
 },
 {
-"symbol": "SUPREMEIND",
-"name": "Supreme Industries Limited",
-"kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 3151.0,
-"neck": 3650.0,
-"to_neck_pct": 15.83624246271025,
-"stop": 3095.73,
-"stop_pct": 1.7540463344969837,
-"height_pct": 15.873015873015884,
-"fall_pct": 46.868064252789225,
-"lows": [
-[
-"2026-06-30",
-3157.800048828125
-],
-[
-"2026-09-15",
-3300.0
-],
-[
-"2026-10-30",
-3150.0
-]
-],
-"peaks": [
-[
-"2026-08-20",
-3650.0
-],
-[
-"2026-10-19",
-3620.699951171875
-]
-],
-"rsi_lows": [
-27.2,
-34.8,
-32.0
-],
-"rsi_div": 4.8,
-"rsi_now": 38.6,
-"signal_date": null,
-"days_since": null,
-"target": 4150.0,
-"sl": 3504.0
-},
-{
 "symbol": "JUNIPER",
 "name": "Juniper Hotels Limited",
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 194.83999633789062,
+"close": 195.80999755859375,
 "neck": 227.38999938964844,
-"to_neck_pct": 16.70601707223898,
+"to_neck_pct": 16.127880202646327,
 "stop": 188.1,
-"stop_pct": 3.4592467997187626,
+"stop_pct": 3.9374892266604733,
 "height_pct": 18.376804479533803,
 "fall_pct": 59.690772996017884,
 "lows": [
@@ -2608,7 +2475,7 @@
 28.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 35.3,
+"rsi_now": 37.2,
 "signal_date": null,
 "days_since": null,
 "target": 262.69,
@@ -2662,6 +2529,55 @@
 "days_since": null,
 "target": 4109.6,
 "sl": 2920.02
+},
+{
+"symbol": "V2RETAIL",
+"name": "V2 Retail Limited",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 157.36000061035156,
+"neck": 186.11000061035156,
+"to_neck_pct": 18.270208368383003,
+"stop": 131.48,
+"stop_pct": 16.44515946045403,
+"height_pct": 33.27843126884742,
+"fall_pct": 73.86586544659816,
+"lows": [
+[
+"2026-10-30",
+147.47000122070312
+],
+[
+"2026-11-04",
+149.1300048828125
+],
+[
+"2026-11-16",
+139.63999938964844
+]
+],
+"peaks": [
+[
+"2026-11-03",
+164.6199951171875
+],
+[
+"2026-11-12",
+186.11000061035156
+]
+],
+"rsi_lows": [
+27.9,
+35.8,
+37.5
+],
+"rsi_div": 9.6,
+"rsi_now": 46.7,
+"signal_date": null,
+"days_since": null,
+"target": 232.58,
+"sl": 178.67
 }
 ]
 }
