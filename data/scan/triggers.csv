@@ -1,9 +1,10 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-NAZARA,2026-11-19,425.55,60.6,411.23,413.1,3.0,0,0.0,Nazara Technologies Limited,trend,158.0,0.95,95,56.19,425.55,60.6
-GLAND,2026-11-19,3292.9,61.0,3177.67,3208.7,2.6,0,0.0,Gland Pharma Limited,trend,146.9,0.9,88,143.99,3292.9,61.0
-SANSERA,2026-11-19,4720.9,61.6,4460.3,4423.0,6.7,0,0.0,Sansera Engineering Limited,watch,143.6,0.89,75,98.89,4720.9,61.6
-PGIL,2026-11-17,1368.2,61.9,1300.83,1303.2,5.0,2,2.6,Pearl Global Industries Limited,watch,134.2,0.84,72,24.93,1404.1,64.7
-63MOONS,2026-11-17,958.9,61.0,911.0,901.0,6.4,2,-0.7,63 moons technologies limited,watch,127.1,0.79,70,33.0,952.45,58.2
-RAYMOND,2026-11-16,1185.8,61.5,1119.6,1100.4,7.8,3,0.8,Raymond Limited,watch,154.0,0.83,82,78.42,1195.3,60.2
-GLOBAL,2026-11-16,146.7,63.0,142.94,143.01,2.6,3,-2.8,Global Education Limited,watch,145.1,0.81,97,1.07,142.63,51.4
-NAZARA,2026-11-13,425.4,64.5,405.7,407.9,4.3,4,0.0,Nazara Technologies Limited,trend,158.0,0.95,95,56.19,425.55,60.6
+AEROPLANE,2026-11-20,242.7,60.4,230.43,226.8,7.0,0,0.0,Amir Chand Jagdish Kumar (Exports) Limited,watch,145.9,0.81,78,14.82,242.7,60.4
+INDGN,2026-11-20,657.65,63.5,628.76,640.25,2.7,0,0.0,Indegene Limited,watch,126.3,0.81,77,44.83,657.65,63.5
+NAZARA,2026-11-19,425.55,60.6,411.23,413.1,3.0,1,-2.6,Nazara Technologies Limited,watch,156.9,0.94,95,54.31,414.55,53.7
+GLAND,2026-11-19,3292.9,61.0,3177.67,3208.7,2.6,1,1.2,Gland Pharma Limited,trend,146.9,0.9,88,144.18,3331.9,63.2
+SANSERA,2026-11-19,4720.9,61.6,4460.3,4423.0,6.7,1,1.6,Sansera Engineering Limited,watch,141.5,0.89,75,100.46,4798.4,63.8
+PGIL,2026-11-17,1368.2,61.9,1300.83,1303.2,5.0,3,4.9,Pearl Global Industries Limited,watch,131.1,0.84,72,26.93,1435.5,67.7
+63MOONS,2026-11-17,958.9,61.0,911.0,901.0,6.4,3,-3.5,63 moons technologies limited,watch,126.9,0.79,70,32.69,925.7,52.9
+RAYMOND,2026-11-16,1185.8,61.5,1119.6,1100.4,7.8,4,1.1,Raymond Limited,watch,154.0,0.83,82,76.94,1198.7,60.6
+GLOBAL,2026-11-16,146.7,63.0,142.94,143.01,2.6,4,-4.7,Global Education Limited,watch,145.2,0.82,95,1.03,139.76,45.9
