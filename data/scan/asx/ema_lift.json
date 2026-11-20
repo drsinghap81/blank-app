@@ -1,20 +1,19 @@
 {
- "generated": "2026-11-19T22:17+00:00",
- "asof": "2026-11-19",
+ "generated": "2026-11-20T11:58+00:00",
+ "asof": "2026-11-20",
  "market": "ASX",
  "ema": 9,
  "rows": [
   {
-   "symbol": "Communication",
+   "symbol": "A-REIT",
    "index": true,
-   "status": "riding",
-   "signal": "2026-10-16",
-   "signal_close": 1536.8,
-   "gain": 8.0,
-   "days": 24,
-   "ema": 1646.06,
-   "close": 1659.0,
-   "low": 1637.9
+   "status": "left below",
+   "signal": "2026-10-12",
+   "signal_close": 1514.4,
+   "gain": 5.6,
+   "days": 29,
+   "ema": 1623.69,
+   "close": 1599.5
   },
   {
    "symbol": "Utilities",
@@ -22,23 +21,23 @@
    "status": "riding",
    "signal": "2026-10-09",
    "signal_close": 10151.3,
-   "gain": 7.2,
-   "days": 29,
-   "ema": 10822.05,
-   "close": 10880.3,
-   "low": 10869.0
+   "gain": 6.6,
+   "days": 30,
+   "ema": 10822.18,
+   "close": 10822.7,
+   "low": 10712.1
   },
   {
-   "symbol": "A-REIT",
+   "symbol": "Communication",
    "index": true,
    "status": "riding",
-   "signal": "2026-10-12",
-   "signal_close": 1514.4,
-   "gain": 7.1,
-   "days": 28,
-   "ema": 1629.74,
-   "close": 1621.2,
-   "low": 1615.1
+   "signal": "2026-10-16",
+   "signal_close": 1536.8,
+   "gain": 6.0,
+   "days": 25,
+   "ema": 1642.67,
+   "close": 1629.1,
+   "low": 1621.3
   },
   {
    "symbol": "Industrials",
@@ -46,11 +45,11 @@
    "status": "riding",
    "signal": "2026-10-19",
    "signal_close": 8048.5,
-   "gain": 5.6,
-   "days": 23,
-   "ema": 8511.79,
-   "close": 8496.6,
-   "low": 8435.0
+   "gain": 3.7,
+   "days": 24,
+   "ema": 8478.35,
+   "close": 8344.6,
+   "low": 8329.2
   },
   {
    "symbol": "Info Tech",
@@ -58,11 +57,33 @@
    "status": "riding",
    "signal": "2026-11-06",
    "signal_close": 1783.5,
-   "gain": 1.5,
-   "days": 9,
-   "ema": 1801.24,
-   "close": 1811.0,
-   "low": 1782.5
+   "gain": -3.2,
+   "days": 10,
+   "ema": 1786.15,
+   "close": 1725.8,
+   "low": 1708.8
+  },
+  {
+   "symbol": "TCL",
+   "index": false,
+   "status": "left below",
+   "signal": "2026-10-13",
+   "signal_close": 13.51,
+   "gain": 8.8,
+   "days": 28,
+   "ema": 14.91,
+   "close": 14.7
+  },
+  {
+   "symbol": "GMG",
+   "index": false,
+   "status": "left below",
+   "signal": "2026-10-28",
+   "signal_close": 26.68,
+   "gain": 3.3,
+   "days": 17,
+   "ema": 28.3,
+   "close": 27.55
   },
   {
    "symbol": "CHC",
@@ -70,11 +91,11 @@
    "status": "riding",
    "signal": "2026-10-12",
    "signal_close": 18.6,
-   "gain": 19.3,
-   "days": 28,
-   "ema": 21.96,
-   "close": 22.19,
-   "low": 21.82
+   "gain": 17.8,
+   "days": 29,
+   "ema": 21.95,
+   "close": 21.91,
+   "low": 21.76
   },
   {
    "symbol": "BXB",
@@ -82,35 +103,23 @@
    "status": "riding",
    "signal": "2026-09-16",
    "signal_close": 18.9,
-   "gain": 18.3,
-   "days": 46,
-   "ema": 22.1,
-   "close": 22.35,
-   "low": 21.89
+   "gain": 15.5,
+   "days": 47,
+   "ema": 22.04,
+   "close": 21.83,
+   "low": 21.75
   },
   {
-   "symbol": "TCL",
+   "symbol": "IAG",
    "index": false,
    "status": "riding",
-   "signal": "2026-10-13",
-   "signal_close": 13.51,
-   "gain": 11.4,
-   "days": 27,
-   "ema": 14.97,
-   "close": 15.05,
-   "low": 14.93
-  },
-  {
-   "symbol": "QAN",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-28",
-   "signal_close": 8.7,
+   "signal": "2026-10-09",
+   "signal_close": 8.13,
    "gain": 11.3,
-   "days": 16,
-   "ema": 9.57,
-   "close": 9.68,
-   "low": 9.49
+   "days": 30,
+   "ema": 9.0,
+   "close": 9.05,
+   "low": 8.96
   },
   {
    "symbol": "ORG",
@@ -119,22 +128,10 @@
    "signal": "2026-10-08",
    "signal_close": 11.2,
    "gain": 11.3,
-   "days": 30,
-   "ema": 12.38,
-   "close": 12.47,
-   "low": 12.48
-  },
-  {
-   "symbol": "CBA",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-16",
-   "signal_close": 154.38,
-   "gain": 11.2,
-   "days": 24,
-   "ema": 169.84,
-   "close": 171.63,
-   "low": 169.06
+   "days": 31,
+   "ema": 12.4,
+   "close": 12.46,
+   "low": 12.35
   },
   {
    "symbol": "SIG",
@@ -143,34 +140,34 @@
    "signal": "2026-10-05",
    "signal_close": 2.6,
    "gain": 11.2,
-   "days": 33,
+   "days": 34,
    "ema": 2.88,
    "close": 2.89,
-   "low": 2.89
+   "low": 2.87
   },
   {
-   "symbol": "IAG",
+   "symbol": "QAN",
    "index": false,
    "status": "riding",
-   "signal": "2026-10-09",
-   "signal_close": 8.13,
+   "signal": "2026-10-28",
+   "signal_close": 8.7,
    "gain": 10.8,
-   "days": 29,
-   "ema": 8.99,
-   "close": 9.01,
-   "low": 8.98
+   "days": 17,
+   "ema": 9.58,
+   "close": 9.64,
+   "low": 9.54
   },
   {
-   "symbol": "COH",
+   "symbol": "CBA",
    "index": false,
    "status": "riding",
-   "signal": "2026-10-21",
-   "signal_close": 141.47,
-   "gain": 8.8,
-   "days": 21,
-   "ema": 151.69,
-   "close": 153.87,
-   "low": 151.6
+   "signal": "2026-10-16",
+   "signal_close": 154.38,
+   "gain": 10.1,
+   "days": 25,
+   "ema": 169.86,
+   "close": 169.92,
+   "low": 168.6
   },
   {
    "symbol": "TLS",
@@ -178,23 +175,23 @@
    "status": "riding",
    "signal": "2026-10-22",
    "signal_close": 4.86,
-   "gain": 7.6,
-   "days": 20,
-   "ema": 5.13,
-   "close": 5.23,
-   "low": 5.14
+   "gain": 6.4,
+   "days": 21,
+   "ema": 5.14,
+   "close": 5.17,
+   "low": 5.15
   },
   {
-   "symbol": "GMG",
+   "symbol": "COH",
    "index": false,
    "status": "riding",
-   "signal": "2026-10-28",
-   "signal_close": 26.68,
-   "gain": 5.0,
-   "days": 16,
-   "ema": 28.49,
-   "close": 28.02,
-   "low": 27.99
+   "signal": "2026-10-21",
+   "signal_close": 141.47,
+   "gain": 6.0,
+   "days": 22,
+   "ema": 151.35,
+   "close": 149.99,
+   "low": 147.63
   },
   {
    "symbol": "TLC",
@@ -202,11 +199,11 @@
    "status": "riding",
    "signal": "2026-10-09",
    "signal_close": 5.19,
-   "gain": 5.0,
-   "days": 29,
+   "gain": 5.6,
+   "days": 30,
    "ema": 5.47,
-   "close": 5.45,
-   "low": 5.45
+   "close": 5.48,
+   "low": 5.41
   },
   {
    "symbol": "NXT",
@@ -214,11 +211,11 @@
    "status": "riding",
    "signal": "2026-11-05",
    "signal_close": 9.85,
-   "gain": -1.5,
-   "days": 10,
-   "ema": 9.52,
-   "close": 9.7,
-   "low": 9.27
+   "gain": -8.5,
+   "days": 11,
+   "ema": 9.41,
+   "close": 9.01,
+   "low": 9.01
   }
  ],
  "test": "Tested 2007\u201326: indices +0.19% a trade vs +0.27% holding any 16 days; top-50 stocks +0.66% vs +0.94%. No edge on the ASX: reference only.",

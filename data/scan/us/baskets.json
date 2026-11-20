@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20T02:39+00:00",
+ "generated": "2026-11-20T11:57+00:00",
  "rows": [
   {
    "slug": "fang10",
@@ -16,21 +16,12 @@
     "PLTR",
     "MU"
    ],
-   "close": 139.75,
-   "day": 0.48,
-   "m1": -10.4,
-   "w": {
-    "status": "forming",
-    "stage": "2nd low now",
-    "broke_on": null,
-    "days_ago": null,
-    "since": null,
-    "line_now": 143.69,
-    "dist_pct": 2.8,
-    "mid": 146.96
-   },
+   "close": 136.26,
+   "day": -2.5,
+   "m1": -13.1,
+   "w": null,
    "lift": null,
-   "asof": "2026-11-18"
+   "asof": "2026-11-19"
   }
  ]
 }

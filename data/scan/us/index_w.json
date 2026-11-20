@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20T02:39+00:00",
+ "generated": "2026-11-20T11:57+00:00",
  "asof": "2026-11-19",
  "market": "US",
  "rows": [
@@ -132,6 +132,27 @@
    "line_now": 169.51,
    "dist_pct": 5.1,
    "chart": "xli"
+  },
+  {
+   "index": "Communication (XLC)",
+   "ticker": "XLC",
+   "status": "forming",
+   "stage": "2nd low now",
+   "low1": "2026-10-30",
+   "low1_close": 99.9,
+   "low2": "2026-11-19",
+   "low2_close": 102.76,
+   "high": 116.42,
+   "high_date": "2026-05-14",
+   "mid": 108.69,
+   "mid_date": "2026-11-13",
+   "rsi_div": true,
+   "close": 102.76,
+   "asof": "2026-11-19",
+   "neckline": 108.69,
+   "line_now": 108.45,
+   "dist_pct": 5.5,
+   "chart": "xlc"
   },
   {
    "index": "Regional Banks (KRE)",
