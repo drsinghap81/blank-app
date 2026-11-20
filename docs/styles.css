@@ -1256,3 +1256,8 @@ body.pub .owner-only { display: none !important; }
 .ig-tile.zero b { opacity: .35; } .ig-tile.on { border-color: #6366F1; background: rgba(99,102,241,.1); }
 .ig-tile:focus-visible, .ig-map:focus-visible { outline: 2px solid #6366F1; outline-offset: 2px; }
 .ig-panel { padding: 4px 2px 8px; }
+
+#rrgbox { max-width: 100%; overflow: hidden; } #rrgbox h5 { font-size: 13px; overflow-wrap: anywhere; }
+.rrg-ctl { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; } .rrg-ctl .seg { margin: 0 !important; } .rrg-ctl .seg button { font-size: 13px; padding: 5px 12px; }
+.rrg-chip { font-size: 12px !important; padding: 1px 8px !important; } .rrg-row { font-size: 12px; overflow-wrap: anywhere; }
+.ig-map, .ig-map-c { max-width: 100%; overflow: hidden; }

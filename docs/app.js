@@ -4981,40 +4981,52 @@ function rrgSVG(rows, nm, W = 340, H = 300) {
    Short faint tails, a solid dot for now, labels placed so they don't overlap (skipped if no room), Leading + Improving by default,
    tap a name to highlight it. */
 const RRG_SHORT = (n) => String(n).replace('Communication Services', 'Comm Services').replace('Consumer ', 'Cons ').replace('Information Technology', 'IT').replace('Financial Services', 'Fin Services');
-function rrgClean(items, sel, W = 360, H = 340, tails0 = true) {
+function rrgClean(items, sel, W = 360, H = 340, tails0 = false) {
+  /* 20 Nov 2026 v2 (Amritpal: "does it make sense or can you improve"): dots only (trail when tapped), zoom on the main group with
+     outliers pinned to the edge (arrow + value), every dot labelled (leader line when crowded) */
   if (!items.length) return '<p class="muted">Nothing to show for this choice.</p>';
-  const xs = items.flatMap((r) => r.pts.map((p) => p[1])), ys = items.flatMap((r) => r.pts.map((p) => p[2]));
-  const dx = Math.max(2, ...xs.map((v) => Math.abs(v - 100))) * 1.12, dy = Math.max(0.6, ...ys.map((v) => Math.abs(v - 100))) * 1.15;
-  const pad = 22, X = (v) => pad + ((v - 100 + dx) / (2 * dx)) * (W - pad - 6), Y = (v) => 6 + ((100 + dy - v) / (2 * dy)) * (H - pad - 6);
-  const qbg = (x, y, w, h, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}" opacity="0.08"/>`;
+  const heads = items.map((r) => r.pts[r.pts.length - 1]);
+  const qx = heads.map((p) => Math.abs(p[1] - 100)).sort((a, b) => a - b), qy = heads.map((p) => Math.abs(p[2] - 100)).sort((a, b) => a - b);
+  const q80 = (a) => a[Math.min(a.length - 1, Math.floor(a.length * 0.8))];
+  const dx = Math.max(1.5, Math.min(qx[qx.length - 1], q80(qx) * 1.6)) * 1.15, dy = Math.max(0.4, Math.min(qy[qy.length - 1], q80(qy) * 1.6)) * 1.15;
+  const pad = 20, X0 = pad, X1 = W - 4, Y0 = 4, Y1 = H - pad;
+  const X = (v) => X0 + ((Math.max(-dx, Math.min(dx, v - 100)) + dx) / (2 * dx)) * (X1 - X0), Y = (v) => Y0 + ((dy - Math.max(-dy, Math.min(dy, v - 100))) / (2 * dy)) * (Y1 - Y0);
+  const out = (p) => Math.abs(p[1] - 100) > dx || Math.abs(p[2] - 100) > dy;
   const cx = X(100), cy = Y(100);
-  let g = qbg(cx, 6, W - 6 - cx, cy - 6, RRG_Q.Leading) + qbg(pad, 6, cx - pad, cy - 6, RRG_Q.Improving) + qbg(pad, cy, cx - pad, H - pad - cy, RRG_Q.Lagging) + qbg(cx, cy, W - 6 - cx, H - pad - cy, RRG_Q.Weakening);
-  const qt = (t, x, y, a, c) => `<text x="${x}" y="${y}" font-size="12" font-weight="800" fill="${c}" text-anchor="${a}" opacity="0.9">${t}</text>`;
-  g += qt('IMPROVING', pad + 4, 20, 'start', RRG_Q.Improving) + qt('LEADING', W - 10, 20, 'end', RRG_Q.Leading) + qt('LAGGING', pad + 4, H - pad - 6, 'start', RRG_Q.Lagging) + qt('WEAKENING', W - 10, H - pad - 6, 'end', RRG_Q.Weakening);
-  g += `<line x1="${cx}" y1="6" x2="${cx}" y2="${H - pad}" stroke="#94A3B8" stroke-width="1"/><line x1="${pad}" y1="${cy}" x2="${W - 6}" y2="${cy}" stroke="#94A3B8" stroke-width="1"/>`;
-  const stp = Math.max(1, Math.ceil((2 * dx) / 7));
-  for (let v = Math.ceil((100 - dx) / stp) * stp; v <= 100 + dx; v += stp) g += `<text x="${X(v)}" y="${H - 9}" font-size="9" fill="#94A3B8" text-anchor="middle">${v}</text>`;
-  g += `<text x="${pad - 4}" y="12" font-size="9" fill="#94A3B8" text-anchor="end" transform="rotate(-90 ${pad - 12} 12)">momentum ↑</text>`;
-  const placed = [[pad, 6, pad + 80, 24], [W - 90, 6, W - 6, 24], [pad, H - pad - 18, pad + 80, H - pad], [W - 90, H - pad - 18, W - 6, H - pad]], dots = items.map((r) => { const l = r.pts[r.pts.length - 1]; return [X(l[1]), Y(l[2])]; });
-  const hit = (b) => placed.some((p) => !(b[2] < p[0] || b[0] > p[2] || b[3] < p[1] || b[1] > p[3])) || dots.some(([x, y]) => x > b[0] - 3 && x < b[2] + 3 && y > b[1] - 3 && y < b[3] + 3);
-  const order = items.map((r, i) => [r, i]).sort((a, b) => (b[0].nm === sel) - (a[0].nm === sel));
-  let tails = '', heads = '', labels = '';
+  const qbg = (x, y, w, h, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}" opacity="0.09"/>`;
+  let g = qbg(cx, Y0, X1 - cx, cy - Y0, RRG_Q.Leading) + qbg(X0, Y0, cx - X0, cy - Y0, RRG_Q.Improving) + qbg(X0, cy, cx - X0, Y1 - cy, RRG_Q.Lagging) + qbg(cx, cy, X1 - cx, Y1 - cy, RRG_Q.Weakening);
+  const qt = (t, x, y, a, c) => `<text x="${x}" y="${y}" font-size="10.5" font-weight="800" fill="${c}" text-anchor="${a}" opacity="0.85">${t}</text>`;
+  g += qt('Improving', X0 + 5, Y0 + 13, 'start', RRG_Q.Improving) + qt('Leading', X1 - 5, Y0 + 13, 'end', RRG_Q.Leading) + qt('Lagging', X0 + 5, Y1 - 5, 'start', RRG_Q.Lagging) + qt('Weakening', X1 - 5, Y1 - 5, 'end', RRG_Q.Weakening);
+  g += `<line x1="${cx}" y1="${Y0}" x2="${cx}" y2="${Y1}" stroke="#94A3B8" stroke-width="1"/><line x1="${X0}" y1="${cy}" x2="${X1}" y2="${cy}" stroke="#94A3B8" stroke-width="1"/>`;
+  const stp = Math.max(1, Math.ceil((2 * dx) / 6));
+  for (let v = Math.ceil((100 - dx) / stp) * stp; v <= 100 + dx; v += stp) g += `<text x="${X(v)}" y="${H - 6}" font-size="9" fill="#94A3B8" text-anchor="middle">${v}</text>`;
+  const placed = [[X0, Y0, X0 + 62, Y0 + 16], [X1 - 56, Y0, X1, Y0 + 16], [X0, Y1 - 16, X0 + 56, Y1], [X1 - 70, Y1 - 16, X1, Y1]];
+  const dots = heads.map((p) => [X(p[1]), Y(p[2])]);
+  const hit = (b) => placed.some((q) => !(b[2] < q[0] || b[0] > q[2] || b[3] < q[1] || b[1] > q[3])) || dots.some(([x, y]) => x > b[0] - 4 && x < b[2] + 4 && y > b[1] - 4 && y < b[3] + 4);
+  const order = items.map((r, i) => [r, i]).sort((a, b) => (b[0].nm === sel) - (a[0].nm === sel) || Math.abs(dots[b[1]][0] - cx) - Math.abs(dots[a[1]][0] - cx));
+  let tails = '', heads2 = '', labels = '';
+  const R = [[9, 0], [-9, 0], [0, -11], [0, 13], [14, -12], [-14, -12], [14, 14], [-14, 14], [24, 0], [-24, 0], [0, -24], [0, 26], [28, -22], [-28, -22], [28, 26], [-28, 26], [40, 0], [-40, 0], [0, -36], [0, 38]];
   order.forEach(([r, i]) => {
     const c = RRG_Q[r.now] || '#888'; const on = !sel || r.nm === sel; const P = r.pts;
-    if (tails0 || r.nm === sel) tails += `<polyline points="${P.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="${r.nm === sel ? 2.4 : 1.3}" stroke-linecap="round" stroke-linejoin="round" opacity="${on ? (sel ? 0.95 : 0.4) : 0.08}"/>`;
-    if (r.nm === sel) tails += P.slice(0, -1).map((p) => `<circle cx="${X(p[1]).toFixed(1)}" cy="${Y(p[2]).toFixed(1)}" r="2.2" fill="${c}"/>`).join('');
-    const [hx, hy] = dots[i];
-    heads += `<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="${r.nm === sel ? 6.5 : 5}" fill="${c}" stroke="#fff" stroke-width="1.2" opacity="${on ? 1 : 0.25}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer"/>`;
-    const t = RRG_SHORT(r.nm), w = t.length * 5.9 + 2, h = 11;
-    for (const [ox, oy, a] of [[8, 4, 's'], [-8, 4, 'e'], [8, -7, 's'], [-8, -7, 'e'], [0, -10, 'm'], [0, 16, 'm'], [8, 14, 's'], [-8, 14, 'e']]) {
-      const x0 = a === 's' ? hx + ox : a === 'e' ? hx + ox - w : hx - w / 2, y0 = hy + oy - 9; const b = [x0, y0, x0 + w, y0 + h];
-      if (x0 < pad || x0 + w > W - 4 || y0 < 6 || y0 + h > H - pad || (hit(b) && r.nm !== sel)) continue;
+    if (tails0 || r.nm === sel) {
+      tails += `<polyline points="${P.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="${r.nm === sel ? 0.95 : 0.4}"/>`;
+      tails += P.slice(0, -1).map((p, k) => `<circle cx="${X(p[1]).toFixed(1)}" cy="${Y(p[2]).toFixed(1)}" r="${1.6 + k * 0.25}" fill="${c}" opacity="0.8"/>`).join('');
+    }
+    const [hx, hy] = dots[i]; const o = out(P[P.length - 1]);
+    heads2 += `<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="${r.nm === sel ? 7 : 5.5}" fill="${c}" stroke="#fff" stroke-width="1.4" opacity="${on ? 1 : 0.25}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer"/>`;
+    const t = RRG_SHORT(r.nm) + (o ? ` ${P[P.length - 1][1] < 100 ? '◀' : '▶'} ${fmt(P[P.length - 1][1], 0)}` : ''), w = t.length * 5.6 + 2, h = 11;
+    for (const [ox, oy] of R) {
+      const a = ox > 0 ? 's' : ox < 0 ? 'e' : 'm'; const tx = hx + ox, ty = hy + oy + 4;
+      const x0 = a === 's' ? tx : a === 'e' ? tx - w : tx - w / 2; const b = [x0, ty - 9, x0 + w, ty - 9 + h];
+      if (b[0] < X0 + 1 || b[2] > X1 - 1 || b[1] < Y0 || b[3] > Y1 || hit(b)) continue;
       placed.push(b);
-      labels += `<text x="${(a === 's' ? hx + ox : a === 'e' ? hx + ox : hx).toFixed(1)}" y="${(hy + oy).toFixed(1)}" font-size="10.5" font-weight="${r.nm === sel ? 800 : 600}" fill="currentColor" text-anchor="${a === 's' ? 'start' : a === 'e' ? 'end' : 'middle'}" opacity="${on ? 1 : 0.3}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer">${esc(t)}</text>`;
+      const far = Math.hypot(ox, oy) > 15;
+      if (far) labels += `<line x1="${hx.toFixed(1)}" y1="${hy.toFixed(1)}" x2="${(a === 's' ? b[0] : a === 'e' ? b[2] : tx).toFixed(1)}" y2="${(oy < 0 ? b[3] : oy > 0 ? b[1] : ty - 4).toFixed(1)}" stroke="currentColor" stroke-width="0.6" opacity="${on ? 0.45 : 0.15}"/>`;
+      labels += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" font-size="10" font-weight="${r.nm === sel ? 800 : 600}" fill="currentColor" text-anchor="${a === 's' ? 'start' : a === 'e' ? 'end' : 'middle'}" opacity="${on ? 1 : 0.3}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer">${esc(t)}</text>`;
       break;
     }
   });
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:560px;display:block;margin:4px auto;color:var(--ink,#111)" role="img" aria-label="Relative rotation chart">${g}${tails}${heads}${labels}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;max-width:100%;color:var(--ink,#111)" role="img" aria-label="Relative rotation chart"><defs><clipPath id="rrgclip"><rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${Y1 - Y0}"/></clipPath></defs>${g}<g clip-path="url(#rrgclip)">${tails}</g>${heads2}${labels}</svg>`;
 }
 async function rrgMount(el, G, mk) {
   const box = el.querySelector('#rrgbox'); if (!box) return;
@@ -5023,14 +5035,14 @@ async function rrgMount(el, G, mk) {
   if (mk === 'NSE') { const R = await getJSON(MAIN + 'data/scan/sector_rrg.json', 'sector_rrg').catch(() => null); if (R) src = { asof: R.asof, data: R[V.view] || {}, idx: true }; }
   if (!src) src = { data: Object.fromEntries((G.sectors || []).filter((r) => r.rrg).map((r) => [r.sector, { pts: r.rrg.pts, now: r.rrg.now, was: r.rrg.wk4 }])) };
   const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
-  const all = Object.entries(src.data).map(([nm, r]) => ({ nm, ...r, was: r.pts.length >= 3 ? qOf(r.pts[r.pts.length - 3]) : r.now,
+  const all = Object.entries(src.data).map(([nm, r]) => ({ nm, ...r, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now,
     pts: V.all || V.sel === nm ? r.pts : r.pts.slice(-4) }));
   const shown = V.all ? all : all.filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was || r.nm === V.sel);
   const seg = (k, opts) => `<div class="seg" style="margin:4px 0">${opts.map(([v, t]) => `<button data-rrgk="${k}" data-v="${v}" aria-selected="${String(V[k]) === String(v)}">${t}</button>`).join('')}</div>`;
   const chips = ['Leading', 'Improving', 'Weakening', 'Lagging'].map((q) => { const L = all.filter((r) => r.now === q); return L.length ? `<div class="rrg-row"><b style="color:${RRG_Q[q]}">${q}</b> ${L.map((r) => `<button class="rrg-chip${r.nm === V.sel ? ' on' : ''}" data-rrgsel="${esc(r.nm)}" style="border-color:${RRG_Q[q]}">${esc(RRG_SHORT(r.nm))}${r.now !== r.was ? ' <small>new</small>' : ''}</button>`).join('')}</div>` : ''; }).join('');
   box.innerHTML = `<h5 style="margin:6px 0 0">Sectors${src.idx ? ' · NSE sector indices vs Nifty 50' : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
-    ${src.idx ? seg('view', [['daily', 'Daily · 10 days'], ['weekly', 'Weekly · 8 weeks']]) : ''}${seg('all', [[false, 'Leading + Improving + movers'], [true, 'All']])}
-    ${rrgClean(shown, V.sel, 360, 340, !V.all)}<div class="rrg-chips">${chips}</div><p class="muted" style="font-size:11.5px">Tap a dot or a name to highlight its trail; tap again to clear. "All" shows dots only until you tap one. "new" = changed quadrant in the last 2 points.</p>`;
+    <div class="rrg-ctl">${src.idx ? seg('view', [['daily', 'Daily'], ['weekly', 'Weekly']]) : ''}${seg('all', [[false, 'Key'], [true, 'All']])}</div>
+    ${rrgClean(shown, V.sel, 360, 330, false)}<div class="rrg-chips">${chips}</div><p class="muted" style="font-size:11.5px">Tap a dot or a name to highlight its trail; tap again to clear. "Key" = Leading, Improving and this week's movers. "new" = changed quadrant this week. Arrows mark sectors beyond the zoomed area.</p>`;
   box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V[b.dataset.rrgk] = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; rrgMount(el, G, mk); }));
   box.querySelectorAll('[data-rrgsel]').forEach((b) => b.addEventListener('click', () => { V.sel = V.sel === b.dataset.rrgsel ? null : b.dataset.rrgsel; rrgMount(el, G, mk); }));
 }
@@ -6473,10 +6485,10 @@ async function igMiniMap(box, G, mk) {
   if (mk === 'NSE') { const R = await getJSON(MAIN + 'data/scan/sector_rrg.json', 'sector_rrg').catch(() => null); if (R && R.weekly) data = R.weekly; }
   if (!data && G) data = Object.fromEntries((G.sectors || []).filter((r) => r.rrg).map((r) => [r.sector, { pts: r.rrg.pts, now: r.rrg.now }]));
   const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
-  const items = Object.entries(data || {}).map(([nm, r]) => ({ nm, now: r.now, was: r.pts.length >= 3 ? qOf(r.pts[r.pts.length - 3]) : r.now, pts: r.pts.slice(-3) }))
+  const items = Object.entries(data || {}).map(([nm, r]) => ({ nm, now: r.now, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now, pts: r.pts.slice(-4) }))
     .filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was);
   if (!items.length) { m.hidden = true; return; }
-  m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 220, true);
+  m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 230, false);
   const go = () => { Object.assign(state.mx, { lvl: 'market', m: mk, sec: null, grp: null }); show('mk'); setTimeout(() => { const e = document.querySelector('#rrgbox'); if (e) e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1800); };
   m.addEventListener('click', go); m.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
 }
