@@ -5008,9 +5008,16 @@ function rrgClean(items, sel, W = 360, H = 340, tails0 = false) {
   const R = [[9, 0], [-9, 0], [0, -11], [0, 13], [14, -12], [-14, -12], [14, 14], [-14, 14], [24, 0], [-24, 0], [0, -24], [0, 26], [28, -22], [-28, -22], [28, 26], [-28, 26], [40, 0], [-40, 0], [0, -36], [0, 38]];
   order.forEach(([r, i]) => {
     const c = RRG_Q[r.now] || '#888'; const on = !sel || r.nm === sel; const P = r.pts;
-    if (tails0 || r.nm === sel) {
+    if (tails0 === 'short' && r.nm !== sel && P.length >= 2) {
+      /* 21 Nov 2026 (Amritpal: "how will I know the dots moved from where to where"): every dot gets a short faint trail -
+         hollow ring = where it was 3 steps ago, line = the path, solid dot = now */
+      const S = P.slice(-3), op = on ? 0.5 : 0.12;
+      tails += `<polyline points="${S.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="${op}"/>`;
+      tails += `<circle cx="${X(S[0][1]).toFixed(1)}" cy="${Y(S[0][2]).toFixed(1)}" r="2.6" fill="none" stroke="${c}" stroke-width="1.3" opacity="${op + 0.15}"/>`;
+    } else if (tails0 === true || r.nm === sel) {
       tails += `<polyline points="${P.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="${r.nm === sel ? 0.95 : 0.4}"/>`;
       tails += P.slice(0, -1).map((p, k) => `<circle cx="${X(p[1]).toFixed(1)}" cy="${Y(p[2]).toFixed(1)}" r="${1.6 + k * 0.25}" fill="${c}" opacity="0.8"/>`).join('');
+      if (r.nm === sel && P.length > 1 && P[0][0]) tails += `<text x="${(X(P[0][1]) + 4).toFixed(1)}" y="${(Y(P[0][2]) - 4).toFixed(1)}" font-size="9" fill="${c}" font-weight="700">${esc(day(P[0][0]))}</text>`;
     }
     const [hx, hy] = dots[i]; const o = out(P[P.length - 1]);
     heads2 += `<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="${r.nm === sel ? 7 : 5.5}" fill="${c}" stroke="#fff" stroke-width="1.4" opacity="${on ? 1 : 0.25}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer"/>`;
@@ -5048,12 +5055,15 @@ async function rrgMount(el, G, mk) {
     pts: V.all || V.sel === nm ? r.pts : r.pts.slice(-4) }));
   const shown = V.all ? all : all.filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was || r.nm === V.sel);
   const seg = (k, opts) => `<div class="seg" style="margin:4px 0">${opts.map(([v, t]) => `<button data-rrgk="${k}" data-v="${v}" aria-selected="${String(V[k]) === String(v)}">${t}</button>`).join('')}</div>`;
-  const chips = ['Leading', 'Improving', 'Weakening', 'Lagging'].map((q) => { const L = all.filter((r) => r.now === q); return L.length ? `<div class="rrg-row"><b style="color:${RRG_Q[q]}">${q}</b> ${L.map((r) => `<button class="rrg-chip${r.nm === V.sel ? ' on' : ''}" data-rrgsel="${esc(r.nm)}" style="border-color:${RRG_Q[q]}">${esc(RRG_SHORT(r.nm))}${r.now !== r.was ? ' <small>new</small>' : ''}</button>`).join('')}</div>` : ''; }).join('');
+  const chips = ['Leading', 'Improving', 'Weakening', 'Lagging'].map((q) => { const L = all.filter((r) => r.now === q); return L.length ? `<div class="rrg-row"><b style="color:${RRG_Q[q]}">${q}</b> ${L.map((r) => `<button class="rrg-chip${r.nm === V.sel ? ' on' : ''}" data-rrgsel="${esc(r.nm)}" style="border-color:${RRG_Q[q]}">${esc(RRG_SHORT(r.nm))}${r.now !== r.was ? ` <small>from ${esc(r.was)}</small>` : ''}</button>`).join('')}</div>` : ''; }).join('');
+  const per = V.view === 'daily' && src.idx ? 'today' : 'this week';
+  const mv = all.filter((r) => r.now !== r.was);
+  const moves = mv.length ? `<div class="rrg-moves"><b>Moved ${per}:</b> ${mv.map((r) => `<button class="rrg-mv" data-rrgsel="${esc(r.nm)}">${esc(RRG_SHORT(r.nm))} <span style="color:${RRG_Q[r.was]}">${esc(r.was)}</span> → <b style="color:${RRG_Q[r.now]}">${esc(r.now)}</b></button>`).join('')}</div>` : `<div class="rrg-moves muted">No sector changed quadrant ${per}.</div>`;
   const srcName = { NSE: 'NSE sector indices', US: 'SPDR sector ETFs', ASX: 'ASX 200 sector indices' }[mk] || 'sectors';
   box.innerHTML = `<h5 style="margin:6px 0 0">Sectors${src.idx ? ` · ${srcName} vs ${esc(src.bench || 'the market')}` : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
     <div class="rrg-ctl">${src.idx ? seg('view', [['daily', 'Daily'], ['weekly', 'Weekly']]) : ''}${seg('all', [[false, 'Key'], [true, 'All']])}</div>
     ${dates.length ? `<div class="rrg-play"><button class="rrg-pb" aria-label="${V.playing ? 'Pause' : 'Play'} the replay">${V.playing ? '❚❚' : '▶'}</button><input type="range" min="0" max="${dates.length - 1}" value="${V.t == null ? dates.length - 1 : V.t}" aria-label="Replay date"><b>${esc(day(src.asof))}${String(src.asof).slice(0, 4) !== String(new Date().getFullYear()) ? ' ' + String(src.asof).slice(2, 4) : ''}</b></div>` : ''}
-    ${rrgClean(shown, V.sel, 360, 330, false)}<div class="rrg-chips">${chips}</div><p class="muted" style="font-size:11.5px">Tap a dot or a name to highlight its trail; tap again to clear. ▶ replays the last ${V.view === 'daily' ? '60 sessions' : '26 weeks'} (drag the slider for up to ${V.view === 'daily' ? 'a year' : '2 years'}). "Key" = Leading, Improving and this week's movers. "new" = changed quadrant this week. Arrows mark sectors beyond the zoomed area.</p>`;
+    ${moves}${rrgClean(shown, V.sel, 360, 330, 'short')}<div class="rrg-key"><svg width="54" height="12" aria-hidden="true"><circle cx="5" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".6"/><line x1="8" y1="6" x2="44" y2="6" stroke="currentColor" stroke-width="1.6" opacity=".45"/><circle cx="48" cy="6" r="4.5" fill="currentColor"/></svg> ring = ${V.view === 'daily' && src.idx ? '2 days' : '2 weeks'} ago → dot = now</div><div class="rrg-chips">${chips}</div><p class="muted" style="font-size:11.5px">Each dot moves clockwise: Improving → Leading → Weakening → Lagging. Tap a dot or a name for its full trail (dated); tap again to clear. ▶ replays the last ${V.view === 'daily' ? '60 sessions' : '26 weeks'} (drag the slider for up to ${V.view === 'daily' ? 'a year' : '2 years'}). "Key" = Leading, Improving and this period's movers. "from …" = the quadrant it just left. Arrows mark sectors beyond the zoomed area.</p>`;
   box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V[b.dataset.rrgk] = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; if (b.dataset.rrgk === 'view') V.t = null; rrgMount(el, G, mk); }));
   const rg = box.querySelector('.rrg-play input'); if (rg) rg.addEventListener('input', () => { V.t = +rg.value; V.playing = false; clearInterval(state.rrgTimer); rrgMount(el, G, mk); });
   const pb = box.querySelector('.rrg-pb');
