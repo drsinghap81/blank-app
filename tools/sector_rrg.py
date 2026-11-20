@@ -19,7 +19,8 @@ NAMES = {"NIFTY BANK": "Bank Nifty", "NIFTY PRIVATE BANK": "Pvt Bank", "NIFTY PS
 Q = lambda x, y: "Leading" if x >= 100 and y >= 100 else "Weakening" if x >= 100 else "Lagging" if y < 100 else "Improving"  # noqa: E731
 
 
-def view(C, bench, avg, step, smooth, n):
+def view(C, bench, avg, step, smooth, n, names=None):
+    names = names or NAMES
     rs = 100 * C.div(bench, axis=0); ratio = 100 * rs / rs.rolling(avg).mean(); mom = (100 * ratio / ratio.shift(step)).rolling(smooth).mean()
     out = {}
     for k in C.columns:
@@ -27,7 +28,7 @@ def view(C, bench, avg, step, smooth, n):
         if len(p) < 3:
             continue
         P = [[str(i.date()), round(float(a), 2), round(float(b), 2)] for i, (a, b) in p.iterrows()]
-        out[NAMES[k]] = dict(index=k, pts=P, now=Q(P[-1][1], P[-1][2]), was=Q(P[0][1], P[0][2]))
+        out[names[k]] = dict(index=k, pts=P, now=Q(P[-1][1], P[-1][2]), was=Q(P[0][1], P[0][2]))
     return out
 
 
