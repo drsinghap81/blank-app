@@ -21,7 +21,7 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 7                     # (8 once data/research/nse_quad_daily.json is the full run) 21 Nov 2026: rotation quadrant slices; 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
+VERSION = 8                     # 21 Nov 2026: rotation quadrant slices; 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import gzip
 import json
 import os
