@@ -5031,7 +5031,7 @@ async function loadMarkets() {
     <ul class="list flat">${rows.map((m, i) => `<li class="row mxrow" tabindex="0" data-i="${i}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}</div>
       <div class="tags">${m.trending ? '<span class="chip new">Trending</span>' : ''}<span class="chip">${m.d1m}/21 d trending</span><span class="chip ${m.wrpi >= 100 ? 'open' : 'exit'}">RPI ${fmt(m.wrpi, 0)}</span>${m.stage2 ? '<span class="chip">Stage 2</span>' : ''}${(S.map[m.symbol] || []).join('')}</div></div><div></div>
       <div class="num"><b>${fmt(m.close, 2, MKT[mk].loc)}</b>${m.d1 != null ? `<span class="${m.d1 >= 0 ? 'up' : 'down'}">${m.d1 >= 0 ? '+' : ''}${fmt(m.d1, 2)}% today</span>` : ''}<span class="muted">${fmt(m.from_high, 0)}% from high</span></div></li>`).join('')}</ul></div>`;
-  mxWire(el); { const b = el.querySelector('#indw'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts')); }
+  mxWire(el); { const b = el.querySelector('#indw'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts', indTv(r, mk))); }
   el.querySelectorAll('.list .row').forEach((li) => { const go = () => { mxStock(rows[+li.dataset.i], r, mk, S); }; li.addEventListener('click', go); li.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
   mxChart(mk, 'groups', r.group, r.shift);
 }
@@ -5049,14 +5049,15 @@ function nseIndHTML(G) {
 function nseIndOpen(r) {
   if (!r) return; const mk = 'NSE';
   const pc = (v, d = 1) => (v == null ? '–' : `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : ''}${fmt(v, d)}%</span>`);
-  openPanel(`<div class="d-head"><div><h2>${esc(r.basic)}</h2><div class="co">${esc(r.macro)} › ${esc(r.sector)} › ${esc(r.industry)}</div></div></div>
+  const tvb = indTv(r, mk);
+  openPanel(`<div class="d-head no-push"><div><h2>${esc(r.basic)}</h2><div class="co">${esc(r.macro)} › ${esc(r.sector)} › ${esc(r.industry)}</div>${tvb ? `<a class="tv-btn" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvb)}&interval=D">Open top ${r.top.length} stocks in TradingView ↗</a>` : ''}</div></div>
     <div class="facts"><div class="fact"><span>Today</span><b>${pc(r.d1, 2)}</b></div><div class="fact"><span>1 week / 1 month / 3 months</span><b>${pc(r.r1w)} / ${pc(r.r1m)} / ${pc(r.r3m)}</b></div>
       <div class="fact"><span>Stocks</span><b>${r.n} (${r.n_liquid} liquid)</b></div><div class="fact"><span>W + trendline</span><b>${!r.w ? 'none now' : r.w.status === 'broken' ? `broke ${esc(r.w.broke_on)}` : `forming · ${fmt(r.w.dist_pct, 1)}% to break`}</b></div>
       <div class="fact"><span>9 EMA</span><b>${r.above_e9 ? 'above a rising 9 EMA' : 'not above a rising 9 EMA'}</b></div></div>
     <button class="lv-btn" id="nsew">Daily chart · 9 EMA · W trendline ›</button>
     <h4 style="margin:12px 0 4px">Stocks</h4><ul class="list flat">${[...r.members].sort((a, b) => (b.liquid - a.liquid) || ((b.d1 ?? -99) - (a.d1 ?? -99))).map((m) => `<li class="row" data-tv="${esc(m.symbol)}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}${m.liquid ? '' : ' · thin'}</div></div><div></div><div class="num"><b>${fmt(m.close, 2, 'en-IN')}</b>${m.d1 != null ? pc(m.d1, 2) : ''}</div></li>`).join('')}</ul>
     <p class="muted" style="font-size:12px">Equal-weight index of the liquid members (all members if fewer than 2 are liquid). Tap a stock for TradingView.</p>`);
-  const b = document.getElementById('nsew'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts'));
+  const b = document.getElementById('nsew'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts', indTv(r, mk)));
   document.querySelectorAll('[data-tv]').forEach((li) => li.addEventListener('click', () => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(li.dataset.tv, 'NSE')) + '&interval=D', '_blank', 'noopener')));
 }
 /* 20 Nov 2026 (Amritpal, StockEdge-style industries): today / 1-month change of the industry's equal-weight index and its latest W */
@@ -6151,7 +6152,7 @@ function indAthLines(G, mk) {
   if (!G) return '';
   const R = (mk === 'NSE' && G.nse && G.nse.rows && G.nse.rows.length ? G.nse.rows : G.rows || []).filter((r) => r.slug && r.ath_m);
   if (!R.length) return '';
-  return `<div class="al-r"><b>Industries</b>${R.map((r) => `<a href="#" class="al-t ok" data-gwch="${esc(r.slug)}">✓ ${esc(r.basic || r.group)} +${fmt((r.ath_m.close / r.ath_m.high_m - 1) * 100, 1)}%</a>`).join('')}<small>industry index, 3-year high · tap for chart</small></div>`;
+  return `<div class="al-r"><b>Industries</b>${R.map((r) => `<a href="#" class="al-t ok" data-gwch="${esc(r.slug)}" data-tvs="${esc(indTv(r, mk))}">✓ ${esc(r.basic || r.group)} +${fmt((r.ath_m.close / r.ath_m.high_m - 1) * 100, 1)}%</a>`).join('')}<small>industry index, 3-year high · tap for chart</small></div>`;
 }
 function commAthLines(A, mk) {
   const WH = COMM_WHERE[mk] || {};
@@ -6317,7 +6318,7 @@ async function alertsCard(box, mk) {
       ${mk === 'NSE' ? '<p class="muted td-rs"><b>Metals today:</b> Australia trades before India opens. When ASX materials beat the ASX 200 by more than 0.5%, Indian metal stocks rose from open to close on 52% of days (+0.18%); when they lagged by more than 0.5%, only 38% (−0.49%), against 45% on all days (2016–26, 12 metal F&amp;O stocks). The 5-minute option trader skips metal CE on weak days and metal PE on strong days.</p>' : ''}
       <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
   box.querySelectorAll('[data-wch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.wch, mk, 'index_w_charts', b.dataset.tvs || '')));
-  box.querySelectorAll('[data-gwch]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); wChart(b.dataset.gwch, mk, 'group_w_charts'); }));
+  box.querySelectorAll('[data-gwch]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); wChart(b.dataset.gwch, mk, 'group_w_charts', b.dataset.tvs || ''); }));
   box.querySelectorAll('[data-fwch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.fwch, mk, 'fund_w_charts', b.dataset.tvs || '')));
   box.querySelectorAll('[data-awch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.awch, mk, 'asset_w_charts', b.dataset.tvs || '')));
   box.querySelectorAll('[data-asv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const k = b.dataset.asv; const tv = tvIdx(k); window.open(tv ? 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tv) + '&interval=D' : 'https://finance.yahoo.com/quote/' + encodeURIComponent(k), '_blank', 'noopener'); }));
@@ -6328,6 +6329,12 @@ async function alertsCard(box, mk) {
 }
 /* 20 Nov 2026 (Amritpal: industries on the alert card): industry indices (NSE official basic industries in India, the scan's groups
    elsewhere) with a W + trendline break in the last 5 sessions, a W within 3% of its line, or leaving a rising 9 EMA (last 3 sessions) */
+/* 20 Nov 2026 (Amritpal: "simply add top liquid stock prices"): TradingView basket of the industry's 10 most-traded stocks, each
+   divided by today's close so they weigh equally (the line reads 100 today), e.g. (NSE:A/512.3+NSE:B/88.1)*100/2 */
+function indTv(r, mk) {
+  const T = (r && r.top) || []; if (!T.length) return '';
+  return '(' + T.map(([x, c]) => `${tvSym(x, mk)}/${c}`).join('+') + `)*100/${T.length}`;
+}
 function indAlertLines(G, mk) {
   if (!G) return '';
   const R = (mk === 'NSE' && G.nse && G.nse.rows && G.nse.rows.length ? G.nse.rows : G.rows || []).map((r) => ({ ...r, nm: r.basic || r.group })).filter((r) => r.slug);
@@ -6335,7 +6342,7 @@ function indAlertLines(G, mk) {
   const nr = R.filter((r) => r.w && r.w.status === 'forming' && r.w.dist_pct != null && r.w.dist_pct >= 0 && r.w.dist_pct <= 3).sort((a, b) => a.w.dist_pct - b.w.dist_pct);
   const lf = R.filter((r) => r.lift_days != null).sort((a, b) => a.lift_days - b.lift_days || b.d1 - a.d1);
   if (!br.length && !nr.length && !lf.length) return '';
-  const a = (r) => `<a href="#" class="al-s" data-gwch="${esc(r.slug)}">${esc(r.nm)}</a>`;
+  const a = (r) => `<a href="#" class="al-s" data-gwch="${esc(r.slug)}" data-tvs="${esc(indTv(r, mk))}">${esc(r.nm)}</a>`;
   const more = (L, n) => (L.length > n ? ` <details class="al-more"><summary>+${L.length - n} more</summary>${L.slice(n).map(a).join(', ')}</details>` : '');
   return `<div class="al-sub">Industries</div>
     ${br.length ? `<div class="al-r"><b class="up">▲ W + trendline broke</b> <span>${br.slice(0, 6).map((r) => `${a(r)} <small>${r.w.days_ago === 0 ? 'today' : r.w.days_ago + 'd ago'}</small>`).join(', ')}${more(br, 6)}</span></div>` : ''}

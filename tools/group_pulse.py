@@ -80,7 +80,7 @@ def download(tickers):
                 d = yf.download(ch, period="3y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
                 for t in ch:
                     try:
-                        x = pd.DataFrame({"c": d["Close"][t], "v": d["Volume"][t]}).dropna()
+                        x = pd.DataFrame({"c": d["Close"][t], "v": d["Volume"][t], "o": d["Open"][t], "h": d["High"][t], "l": d["Low"][t]}).dropna(subset=["c", "v"])
                         if len(x):
                             out[t] = x
                     except Exception:  # noqa: BLE001
@@ -96,6 +96,21 @@ def download(tickers):
         print(f"retry pass {k + 1}: {len(miss)} missing, waiting {wait}s", flush=True); time.sleep(wait); grab(miss)
     print("downloaded", len(out), "of", len(tickers), flush=True)
     return out
+
+
+def ind_ohlc(gi, use, C, OHL):
+    """20 Nov 2026 (Amritpal: candlestick industry charts): equal-weight daily candles - each day's open / high / low is yesterday's
+    index level moved by the members' average open / high / low change against their own previous close."""
+    pc = C[use].shift(1); prev = gi.shift(1)
+    leg = {k: prev * (1 + (OHL[k][use] / pc - 1).clip(-0.3, 0.3).mean(axis=1)) for k in ("o", "h", "l")}
+    o = leg["o"].fillna(gi); h = pd.concat([leg["h"].fillna(gi), o, gi], axis=1).max(axis=1); lo = pd.concat([leg["l"].fillna(gi), o, gi], axis=1).min(axis=1)
+    return pd.DataFrame({"Open": o, "High": h, "Low": lo, "Close": gi})
+
+
+def top_liquid(use, C, V, n=10):
+    """the n members with the highest 60-day median traded value (for the TradingView basket) with today's close"""
+    val = (C[use] * V[use]).rolling(60, min_periods=20).median().iloc[-1].sort_values(ascending=False)
+    return [[x, round(float(C[x].iloc[-1]), 2)] for x in val.index[:n] if pd.notna(C[x].iloc[-1])]
 
 
 def ath_month(gi):
@@ -130,7 +145,7 @@ def lift_days(gi, e9):
     return k - 1
 
 
-def nse_groups(mkt, cf, C, ret, liq, nm, IW):
+def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None):
     """20 Nov 2026: NSE's official basic industries (served by our Mumbai server, which can read NSE's quote pages): each basic industry
     with 2+ stocks gets an equal-weight index from its liquid members (all members if fewer than 2 are liquid), today / 1 w / 1 m,
     latest W and a daily chart (<out>/group_w_charts/nse_<slug>.json). Returns None if the map is unavailable."""
@@ -162,7 +177,8 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW):
                                 key=lambda m: -(m["d1"] or -99)))
         try:
             wl = IW.latest(gi)
-            j = IW.chart_json(pd.DataFrame({"Open": gi, "High": gi, "Low": gi, "Close": gi}), wl or {})
+            j = IW.chart_json(ind_ohlc(gi, use, C, OHL) if OHL else pd.DataFrame({"Open": gi, "High": gi, "Low": gi, "Close": gi}), wl or {})
+            r["top"] = top_liquid(use, C, V) if V is not None else None
             json.dump(dict(name=bas, **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
             r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
             e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
@@ -193,6 +209,8 @@ def main(mkt):
     # every stock is blank, which broke every 150/200-day average and zeroed the whole Pulse
     cnt = C.notna().sum(axis=1); C = C[cnt >= 0.5 * cnt.rolling(20, min_periods=1).max()]
     C = drop_partial(C, {"NSE": "NSE", "US": "US", "ASX": "ASX", "UK": "UK"}[mkt]); V = V.reindex(C.index)
+    # 20 Nov 2026: opens / highs / lows too, so industry charts can be real candles
+    OHL = {k: pd.DataFrame({s: data[t][k] for s, t in tick.items() if t in data and len(data[t]) > 160}).reindex(C.index) for k in ("o", "h", "l")}
     B = B.reindex(C.index).ffill()
     liq = ((C * V).rolling(60, min_periods=40).median() >= cf["minval"]) & (C >= cf["minpx"])
     rpi = lambda k: 100 * (C / C.shift(k)).div(B / B.shift(k), axis=0)
@@ -257,7 +275,7 @@ def main(mkt):
         sl = IW.slug(r["group"]); r["slug"] = sl
         try:
             wl = IW.latest(gi)
-            X = pd.DataFrame({"Open": gi, "High": gi, "Low": gi, "Close": gi})
+            X = ind_ohlc(gi, ss, C, OHL); r["top"] = top_liquid(ss, C, V)
             j = IW.chart_json(X, wl or {})
             json.dump(dict(name=r["group"], **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
             r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
@@ -336,7 +354,7 @@ def main(mkt):
                         "(+2.2% in 2017-21, +3.6% in 2022-26), better than plain group return (+1.8%); 1-week Pulse +1.2% over the next month. "
                         "Trending stocks in top-Pulse groups beat the average stock by +1.4% over 3 months. As a hard filter on ATH breakouts "
                         "it did not raise returns - use it as a tiebreaker / tailwind. US and ASX: not separately tested.",
-               rows=rows, sectors=sectors, themes=themes, mstats=market, stock=stock, nse=nse_groups(mkt, cf, C, ret, liq, nm, IW) if mkt == "NSE" else None)
+               rows=rows, sectors=sectors, themes=themes, mstats=market, stock=stock, nse=nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL, V) if mkt == "NSE" else None)
     os.makedirs(cf["out"], exist_ok=True); json.dump(out, open(cf["out"] + "group_pulse.json", "w"), separators=(",", ":"))
     # weekly closes (last ~60 weeks) of every liquid stock, for the stock panel's mini chart
     # + weekly RSI(14, Wilder) on the full ~3-year weekly series, for the range-shift panel (40/60 bands)
