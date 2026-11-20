@@ -72,7 +72,8 @@ def run(O, H, L, C, first_end, exit_at, label):
             prev_close = C.loc[idx].iloc[-1]; continue
         c1 = C.loc[f[-1]]; h1 = H.loc[f].max(); l1 = L.loc[f].min()
         r1 = c1 / prev_close - 1
-        rows.append(dict(day=d, r1=r1, c1=c1, h1=h1, l1=l1, later=later))
+        o1 = O.loc[f[0]]
+        rows.append(dict(day=d, r1=r1, c1=c1, h1=h1, l1=l1, later=later, gap=o1 / prev_close - 1))
         prev_close = C.loc[idx].iloc[-1]
     print("R|", label, "days", len(rows), flush=True)
     return rows
@@ -169,16 +170,17 @@ def test(rows, O, H, L, C, tag):
     return res
 
 
-O, H, L, C = dl("1h", "730d")
-print("R| hourly", C.shape, C.index[0], C.index[-1], flush=True)
-import datetime as dt  # noqa: E402
-rows = run(O, H, L, C, dt.time(10, 15), dt.time(15, 15), "hourly")
-res = test(rows, O, H, L, C, "1h 10:15 entry")
-O5, H5, L5, C5 = dl("5m", "60d")
-print("R| 5-minute", C5.shape, C5.index[0], C5.index[-1], flush=True)
-rows5 = run(O5, H5, L5, C5, dt.time(9, 45), dt.time(15, 15), "5m")
-test(rows5, O5, H5, L5, C5, "5m 09:45 entry")
-# same 60 days on hourly for a like-for-like comparison
-last60 = {r["day"] for r in rows5}
-for k in (("first-hour", 2, 0.005, "mixed"), ("1% fixed", 2, 0.005, "mixed"), ("first-hour", 2, 0.005, "FADE: buy weakest, sell strongest")):
-    stats(f"1h 10:15 entry, SAME 60 days, {k}", {d: v for d, v in res[k].items() if d in last60})
+if __name__ == "__main__":
+    O, H, L, C = dl("1h", "730d")
+    print("R| hourly", C.shape, C.index[0], C.index[-1], flush=True)
+    import datetime as dt  # noqa: E402
+    rows = run(O, H, L, C, dt.time(10, 15), dt.time(15, 15), "hourly")
+    res = test(rows, O, H, L, C, "1h 10:15 entry")
+    O5, H5, L5, C5 = dl("5m", "60d")
+    print("R| 5-minute", C5.shape, C5.index[0], C5.index[-1], flush=True)
+    rows5 = run(O5, H5, L5, C5, dt.time(9, 45), dt.time(15, 15), "5m")
+    test(rows5, O5, H5, L5, C5, "5m 09:45 entry")
+    # same 60 days on hourly for a like-for-like comparison
+    last60 = {r["day"] for r in rows5}
+    for k in (("first-hour", 2, 0.005, "mixed"), ("1% fixed", 2, 0.005, "mixed"), ("first-hour", 2, 0.005, "FADE: buy weakest, sell strongest")):
+        stats(f"1h 10:15 entry, SAME 60 days, {k}", {d: v for d, v in res[k].items() if d in last60})
