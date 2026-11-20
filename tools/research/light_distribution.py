@@ -8,7 +8,7 @@ Traffic light exactly as tools/research/red_light.py (all liquid NSE stocks, Yah
     bottoms: breakout close (buy next open)
     ATH    : previous close before the intramonth trigger cross (or the month-close breakout's entry open)
 Systems (live rules, every signal taken - no slot limit, so the distribution is not shaped by which trades fit):
-  9/21    tools/research/concentrated_921.run with 400 slots at 0.25% risk (5-day-low stop, Supertrend exit)  + the live book
+  9/21    tools/research/concentrated_921.run with 150 slots at 0.5% risk (min position 0.5% of capital) (5-day-low stop, Supertrend exit)  + the live book
           (10 positions, 1% risk, 3-month strength) for reference
   bottoms tools/research/bottom_filters.events (double / tilted W / triple bottom / inverse H&S, neckline breakout,
           target = height or SL = close 4% (6% IHS) under the neckline, else 120 days), Nifty 500
@@ -107,7 +107,7 @@ def main():
     print("R| panel", d.SYMBOL.nunique(), "stocks; days", res["days"], "from", L.index[0].date(), "to", L.index[-1].date(), flush=True)
 
     # ---- 9/21: every signal (400 slots), then the live book
-    for nm, args in (("9/21 every signal", (400, 0.0025, "random", 0)), ("9/21 live book (10 pos, strength)", (10, 0.01, "r63", 0))):
+    for nm, args in (("9/21 every signal (150 slots)", (150, 0.005, "random", 0)), ("9/21 live book (10 pos, strength)", (10, 0.01, "r63", 0))):
         _, T = K.run(d, *args)
         T = T.assign(ret=T.ret * 100, d=pd.to_datetime(T.entry), light=[before(L, e) for e in T.entry])
         report(nm, T, L, res)
