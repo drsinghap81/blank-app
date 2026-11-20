@@ -4,7 +4,7 @@
  "currency": "A$",
  "value_label": "A$ m",
  "asof": "2026-11-19",
- "generated": "2026-11-19T16:44+00:00",
+ "generated": "2026-11-20T06:38+00:00",
  "scanned": 47,
  "rows": [
   {
@@ -194,7 +194,7 @@
    "r2": 0.82,
    "above21_60d": 77,
    "off_high": -1.5,
-   "value_cr": 40.91,
+   "value_cr": 40.97,
    "last_date": "2026-11-19",
    "spark": [
     55.32,
@@ -436,7 +436,7 @@
    "signal_close": 46.4,
    "stop": 45.06,
    "rsi_signal": 55.9,
-   "value_cr": 24.6,
+   "value_cr": 24.62,
    "supertrend": 46.06,
    "st_up": true,
    "close": 47.14,
@@ -851,7 +851,7 @@
    "signal_close": 40.31,
    "stop": 38.06,
    "rsi_signal": 56.6,
-   "value_cr": 99.54,
+   "value_cr": 99.98,
    "supertrend": 42.56,
    "st_up": false,
    "close": 42.25,
