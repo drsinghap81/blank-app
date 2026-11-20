@@ -1215,3 +1215,14 @@ body.pub .owner-only { display: none !important; }
 
 .al-more{display:inline}.al-more summary{display:inline;cursor:pointer;color:var(--accent,#7c5cff)}
 .gpsr.nos { grid-template-columns: 1fr auto; }
+
+.rb { margin: 8px 0 12px; padding: 12px; border-radius: 14px; background: var(--card2, rgba(99,102,241,.07)); border: 1px solid rgba(99,102,241,.25); }
+.rb-h { font-size: 21px; font-weight: 800; letter-spacing: -.2px; margin-bottom: 6px; }
+.rb-b { padding: 8px 0; border-top: 1px dashed var(--line, #E3E8F0); }
+.rb-ind { font-size: 19px; font-weight: 800; line-height: 1.25; } .rb-ind a { color: inherit; text-decoration: none; }
+.rb-q { display: inline-block; font-size: 11px; font-weight: 700; color: #fff; border-radius: 10px; padding: 2px 8px; vertical-align: middle; }
+.rb-stk { font-size: 16px; font-weight: 700; margin-top: 3px; line-height: 1.6; } .rb-stk small, .rb-ind small { font-weight: 500; opacity: .7; font-size: 12px; }
+.rb-n, .rb-foot { font-size: 12px; opacity: .75; margin-top: 2px; } .rb-foot { margin-top: 8px; }
+.rb-none { font-size: 16px; font-weight: 700; opacity: .8; padding: 6px 0; }
+.rb-x { margin-top: 8px; padding-top: 8px; border-top: 2px solid #D64545; } .rb-h2 { font-size: 18px; font-weight: 800; color: #D64545; }
+.rb-open { font-size: 15px; margin-top: 4px; }

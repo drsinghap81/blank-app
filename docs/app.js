@@ -6359,7 +6359,7 @@ async function alertsCard(box, mk) {
   const ix = ER.filter((r) => r.index && r.status === 'riding');
   const names = (L2) => L2.slice(0, 8).map((r) => r.index ? esc(nm(r.symbol)) : `<a href="#" class="al-s" data-tv="${esc(r.symbol)}">${esc(r.symbol)}</a>`).join(', ') + (L2.length > 8 ? ` +${L2.length - 8}` : '');
   box.innerHTML = `<section class="al-card ${lt ? lt[0] : ''}">
-    ${lt ? `<div class="al-light"><i></i><b>${lt[1]}</b></div>` : ''}${axl}
+    ${lt ? `<div class="al-light"><i></i><b>${lt[1]}</b></div>` : ''}${rotBasket(GPX, S, mk)}${axl}
     ${br.length ? br.slice(0, 4).map(wline).join('') : ''}
     ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}" data-tvs="${esc(tvIdx(r.ticker || r.index))}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
@@ -6395,6 +6395,47 @@ async function alertsCard(box, mk) {
 function indTv(r, mk) {
   const T = (r && r.top) || []; if (!T.length) return '';
   return '(' + T.map(([x, c]) => `${tvSym(x, mk)}/${c}`).join('+') + `)*100/${T.length}`;
+}
+/* 20 Nov 2026 (Amritpal: "display the most important info on Today with big bold text - short-term sector / industry rotation
+   gelling with our systems, so I can basket-order stocks and exit on time"): live BUY signals from the app's systems grouped by
+   the stock's industry where that industry is Leading or Improving (basket ideas), and industries that turned down this week
+   with the system trades you have open there (exit watch). Information: rotation did not improve 9/21 in the backtests. */
+function rotIndOf(G, sym, mk) {
+  if (!G) return null;
+  if (mk === 'NSE') { const n = nseInd(G, sym); if (n && n.rrg) return { ...n, nm: n.basic }; }
+  const x = G.stock && G.stock[sym]; const r = x && (G.rows || []).find((g) => g.group === x[0]);
+  return r && r.rrg ? { ...r, nm: r.group } : null;
+}
+function rotBasket(G, S, mk) {
+  if (!G || !S || !S.M) return '';
+  const NM = Object.fromEntries(MXC.map(([k, n]) => [k, n]));
+  const B = {}, open = {};
+  Object.entries(S.M).forEach(([sym, o]) => {
+    const ks = Object.keys(o); const buy = ks.filter((k) => o[k].lvl === 0); const op = ks.filter((k) => o[k].lvl === 1 && /Open|Broke out/.test(o[k].txt));
+    if (!buy.length && !op.length) return;
+    const ind = rotIndOf(G, sym, mk); if (!ind) return;
+    if (buy.length && ['Leading', 'Improving'].includes(ind.rrg.now)) (B[ind.slug] = B[ind.slug] || { ind, s: [] }).s.push([sym, buy.map((k) => `${NM[k] || k} ${String(o[k].txt).toLowerCase()}`)]);
+    if (op.length) (open[ind.slug] = open[ind.slug] || []).push(sym);
+  });
+  const qc = (q) => `<span class="rb-q" style="background:${RRG_Q[q]}">${q}</span>`;
+  const L = Object.values(B).sort((a, b) => (b.ind.rrg.now === 'Leading') - (a.ind.rrg.now === 'Leading') || (b.ind.rrg.wk1 !== b.ind.rrg.now) - (a.ind.rrg.wk1 !== a.ind.rrg.now) || b.s.length - a.s.length).slice(0, 3);
+  const I = rrgRows(G, mk);
+  const down = I.filter((r) => ['Leading', 'Improving'].includes(r.rrg.wk1) && ['Weakening', 'Lagging'].includes(r.rrg.now));
+  const downOpen = down.filter((r) => open[r.slug]);
+  /* your real holdings (India: Angel holdings cached by the Live tab, else the Portfolio tab) in industries that turned down */
+  let held = [];
+  if (mk === 'NSE') { try { held = JSON.parse(localStorage.getItem('td.heldSyms') || '[]'); } catch (e) { /* */ } if (!held.length) { try { held = pfLoad().h.map((h) => h.s); } catch (e) { /* */ } } }
+  const downSet = new Set(down.map((r) => r.slug));
+  const heldDown = held.filter((h) => { const i = rotIndOf(G, h, mk); return i && downSet.has(i.slug); });
+  const bask = L.length ? L.map((b) => `<div class="rb-b"><div class="rb-ind"><a href="#" class="al-s" data-gwch="${esc(b.ind.slug)}" data-tvs="${esc(indTv(b.ind, mk))}">${esc(b.ind.nm)}</a> ${qc(b.ind.rrg.now)}${b.ind.rrg.wk1 !== b.ind.rrg.now ? ' <small>new this week</small>' : ''}</div>
+      <div class="rb-stk">${b.s.slice(0, 6).map(([sym, sy]) => `<a href="#" class="al-s" data-tv="${esc(sym)}">${esc(sym)}</a> <small>${esc(sy.join(' + '))}</small>`).join(' · ')}${b.s.length > 6 ? ` <small>+${b.s.length - 6}</small>` : ''}</div>
+      <div class="rb-n">${b.s.length} buy signal${b.s.length > 1 ? 's' : ''}${b.ind.r1m != null ? ` · industry ${b.ind.r1m >= 0 ? '+' : ''}${fmt(b.ind.r1m, 1)}% in 1 month` : ''}</div></div>`).join('')
+    : '<div class="rb-none">No buy signals in Leading or Improving industries today.</div>';
+  const ex = down.length ? `<div class="rb-x"><div class="rb-h2">⚠ Turned down this week</div><div class="rb-stk">${down.slice(0, 6).map((r) => `<a href="#" class="al-s" data-gwch="${esc(r.slug)}">${esc(r.nm)}</a> <small>${r.rrg.wk1} → ${r.rrg.now}</small>`).join(' · ')}${down.length > 6 ? ` <small>+${down.length - 6}</small>` : ''}</div>
+      ${heldDown.length ? `<div class="rb-open">🔴 <b>Your holdings there: ${heldDown.slice(0, 10).map(esc).join(', ')}</b> — check their stops</div>` : held.length ? '<div class="rb-n">None of your holdings are in these.</div>' : ''}
+      ${downOpen.length ? `<div class="rb-n">Open system trades (scans) there: ${downOpen.flatMap((r) => open[r.slug]).slice(0, 10).map(esc).join(', ')}</div>` : ''}</div>` : '';
+  return `<div class="rb"><div class="rb-h">Rotation × your signals</div>${bask}${ex}
+    <div class="rb-foot">Baskets = today's buy signals from your systems, grouped by industries that are Leading or Improving. Exit each stock on its own system's rule. Rotation is a guide: in the backtests it did not improve 9/21.</div></div>`;
 }
 /* 20 Nov 2026 (Amritpal: put the catching-up industries on the Today card): industries that moved into Improving or Leading this week,
    and weak-base groups turning up fast (1-week Pulse 20+ above the month) */
