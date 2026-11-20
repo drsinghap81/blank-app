@@ -79,23 +79,26 @@ def run(O, H, L, C, first_end, exit_at, label):
 
 
 def trade(row, sym, side, O, H, L, C):
-    e = row["c1"].get(sym); s = (row["l1"] if side > 0 else row["h1"]).get(sym)
-    if not (np.isfinite(e) and np.isfinite(s)):
+    if sym not in C.columns:
         return None
+    e = row["c1"].get(sym); s = (row["l1"] if side > 0 else row["h1"]).get(sym)
+    if e is None or s is None or pd.isna(e) or pd.isna(s):
+        return None
+    e, s = float(e), float(s)
     risk = (e - s) / e * side
     if risk < 0.002:            # stop closer than 0.2%: skip (no room)
         return None
     px = None
     for t in row["later"]:
         o, h, lo = O.at[t, sym], H.at[t, sym], L.at[t, sym]
-        if not np.isfinite(lo):
+        if pd.isna(lo) or pd.isna(h):
             continue
         if side > 0 and lo <= s:
-            px = min(s, o) if np.isfinite(o) else s; break
+            px = min(s, o) if pd.notna(o) else s; break
         if side < 0 and h >= s:
-            px = max(s, o) if np.isfinite(o) else s; break
+            px = max(s, o) if pd.notna(o) else s; break
     if px is None:
-        last = [t for t in row["later"] if np.isfinite(C.at[t, sym])]
+        last = [t for t in row["later"] if pd.notna(C.at[t, sym])]
         if not last:
             return None
         px = C.at[last[-1], sym]
