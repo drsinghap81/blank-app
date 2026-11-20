@@ -5008,12 +5008,15 @@ function rrgClean(items, sel, W = 360, H = 340, tails0 = false) {
   const R = [[9, 0], [-9, 0], [0, -11], [0, 13], [14, -12], [-14, -12], [14, 14], [-14, 14], [24, 0], [-24, 0], [0, -24], [0, 26], [28, -22], [-28, -22], [28, 26], [-28, 26], [40, 0], [-40, 0], [0, -36], [0, 38]];
   order.forEach(([r, i]) => {
     const c = RRG_Q[r.now] || '#888'; const on = !sel || r.nm === sel; const P = r.pts;
-    if (tails0 === 'short' && r.nm !== sel && P.length >= 2) {
-      /* 21 Nov 2026 (Amritpal: "how will I know the dots moved from where to where"): every dot gets a short faint trail -
-         hollow ring = where it was 3 steps ago, line = the path, solid dot = now */
-      const S = P.slice(-3), op = on ? 0.7 : 0.15;
-      tails += `<polyline points="${S.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="${op}"/>`;
-      tails += `<circle cx="${X(S[0][1]).toFixed(1)}" cy="${Y(S[0][2]).toFixed(1)}" r="3" fill="var(--bg,#fff)" stroke="${c}" stroke-width="1.6" opacity="${Math.min(1, op + 0.2)}"/>`;
+    if (tails0 === 'short' && r.nm !== sel && P.length >= 2 && r.was && r.now !== r.was) {
+      /* 21 Nov 2026 v3 (Amritpal: "these look too messy"): only sectors that changed quadrant get a mark - a hollow ring where
+         they were last period and one thin arrow to now. Everything else is a plain dot; tap any dot for its full trail. */
+      const a = P[P.length - 2], op = on ? 0.85 : 0.15;
+      const ax = X(a[1]), ay = Y(a[2]), bx = X(P[P.length - 1][1]), by = Y(P[P.length - 1][2]);
+      const L = Math.hypot(bx - ax, by - ay) || 1, ux = (bx - ax) / L, uy = (by - ay) / L, ex = bx - ux * 7, ey = by - uy * 7;
+      tails += `<line x1="${ax.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="${c}" stroke-width="1.6" stroke-dasharray="3 2" opacity="${op}"/>`;
+      tails += `<path d="M${ex.toFixed(1)},${ey.toFixed(1)} l${(-ux * 5 + uy * 3.5).toFixed(1)},${(-uy * 5 - ux * 3.5).toFixed(1)} M${ex.toFixed(1)},${ey.toFixed(1)} l${(-ux * 5 - uy * 3.5).toFixed(1)},${(-uy * 5 + ux * 3.5).toFixed(1)}" stroke="${c}" stroke-width="1.6" fill="none" opacity="${op}"/>`;
+      tails += `<circle cx="${ax.toFixed(1)}" cy="${ay.toFixed(1)}" r="3.4" fill="var(--bg,#fff)" stroke="${RRG_Q[r.was] || c}" stroke-width="1.6" opacity="${op}"/>`;
     } else if (tails0 === true || r.nm === sel) {
       tails += `<polyline points="${P.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="${r.nm === sel ? 0.95 : 0.4}"/>`;
       tails += P.slice(0, -1).map((p, k) => `<circle cx="${X(p[1]).toFixed(1)}" cy="${Y(p[2]).toFixed(1)}" r="${1.6 + k * 0.25}" fill="${c}" opacity="0.8"/>`).join('');
@@ -5063,7 +5066,7 @@ async function rrgMount(el, G, mk) {
   box.innerHTML = `<h5 style="margin:6px 0 0">Sectors${src.idx ? ` · ${srcName} vs ${esc(src.bench || 'the market')}` : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
     <div class="rrg-ctl">${src.idx ? seg('view', [['daily', 'Daily'], ['weekly', 'Weekly']]) : ''}${seg('all', [[false, 'Key'], [true, 'All']])}</div>
     ${dates.length ? `<div class="rrg-play"><button class="rrg-pb" aria-label="${V.playing ? 'Pause' : 'Play'} the replay">${V.playing ? '❚❚' : '▶'}</button><input type="range" min="0" max="${dates.length - 1}" value="${V.t == null ? dates.length - 1 : V.t}" aria-label="Replay date"><b>${esc(day(src.asof))}${String(src.asof).slice(0, 4) !== String(new Date().getFullYear()) ? ' ' + String(src.asof).slice(2, 4) : ''}</b></div>` : ''}
-    ${moves}${rrgClean(shown, V.sel, 360, 330, 'short')}<div class="rrg-key"><svg width="54" height="12" aria-hidden="true"><circle cx="5" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".6"/><line x1="8" y1="6" x2="44" y2="6" stroke="currentColor" stroke-width="1.6" opacity=".45"/><circle cx="48" cy="6" r="4.5" fill="currentColor"/></svg> ring = ${V.view === 'daily' && src.idx ? '2 days' : '2 weeks'} ago → dot = now</div><div class="rrg-chips">${chips}</div><p class="muted" style="font-size:11.5px">Each dot moves clockwise: Improving → Leading → Weakening → Lagging. Tap a dot or a name for its full trail (dated); tap again to clear. ▶ replays the last ${V.view === 'daily' ? '60 sessions' : '26 weeks'} (drag the slider for up to ${V.view === 'daily' ? 'a year' : '2 years'}). "Key" = Leading, Improving and this period's movers. "from …" = the quadrant it just left. Arrows mark sectors beyond the zoomed area.</p>`;
+    ${moves}${rrgClean(shown, V.sel, 360, 330, 'short')}<div class="rrg-key"><svg width="54" height="12" aria-hidden="true"><circle cx="5" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".6"/><line x1="8" y1="6" x2="42" y2="6" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 2" opacity=".7"/><circle cx="48" cy="6" r="4.5" fill="currentColor"/></svg> ring → dot = changed quadrant ${V.view === 'daily' && src.idx ? 'today' : 'this week'} (from → to)</div><div class="rrg-chips">${chips}</div><p class="muted" style="font-size:11.5px">Each dot moves clockwise: Improving → Leading → Weakening → Lagging. Tap a dot or a name for its full trail (dated); tap again to clear. ▶ replays the last ${V.view === 'daily' ? '60 sessions' : '26 weeks'} (drag the slider for up to ${V.view === 'daily' ? 'a year' : '2 years'}). "Key" = Leading, Improving and this period's movers. "from …" = the quadrant it just left. Arrows mark sectors beyond the zoomed area.</p>`;
   box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V[b.dataset.rrgk] = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; if (b.dataset.rrgk === 'view') V.t = null; rrgMount(el, G, mk); }));
   const rg = box.querySelector('.rrg-play input'); if (rg) rg.addEventListener('input', () => { V.t = +rg.value; V.playing = false; clearInterval(state.rrgTimer); rrgMount(el, G, mk); });
   const pb = box.querySelector('.rrg-pb');
@@ -6518,7 +6521,7 @@ async function igMiniMap(box, G, mk) {
   const items = Object.entries(data || {}).map(([nm, r]) => ({ nm, now: r.now, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now, pts: r.pts.slice(-4) }))
     .filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was);
   if (!items.length) { m.hidden = true; return; }
-  m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 230, 'short');
+  m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 230, false);
   const go = () => { Object.assign(state.mx, { lvl: 'market', m: mk, sec: null, grp: null }); show('mk'); setTimeout(() => { const e = document.querySelector('#rrgbox'); if (e) e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1800); };
   m.addEventListener('click', go); m.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
 }
