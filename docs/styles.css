@@ -1214,3 +1214,4 @@ body.pub .owner-only { display: none !important; }
 .nse-sec summary{display:flex;justify-content:space-between;gap:8px;align-items:center}
 
 .al-more{display:inline}.al-more summary{display:inline;cursor:pointer;color:var(--accent,#7c5cff)}
+.gpsr.nos { grid-template-columns: 1fr auto; }
