@@ -4995,7 +4995,7 @@ function rrgClean(items, sel, W = 360, H = 340, tails0 = true) {
   const stp = Math.max(1, Math.ceil((2 * dx) / 7));
   for (let v = Math.ceil((100 - dx) / stp) * stp; v <= 100 + dx; v += stp) g += `<text x="${X(v)}" y="${H - 9}" font-size="9" fill="#94A3B8" text-anchor="middle">${v}</text>`;
   g += `<text x="${pad - 4}" y="12" font-size="9" fill="#94A3B8" text-anchor="end" transform="rotate(-90 ${pad - 12} 12)">momentum ↑</text>`;
-  const placed = [], dots = items.map((r) => { const l = r.pts[r.pts.length - 1]; return [X(l[1]), Y(l[2])]; });
+  const placed = [[pad, 6, pad + 80, 24], [W - 90, 6, W - 6, 24], [pad, H - pad - 18, pad + 80, H - pad], [W - 90, H - pad - 18, W - 6, H - pad]], dots = items.map((r) => { const l = r.pts[r.pts.length - 1]; return [X(l[1]), Y(l[2])]; });
   const hit = (b) => placed.some((p) => !(b[2] < p[0] || b[0] > p[2] || b[3] < p[1] || b[1] > p[3])) || dots.some(([x, y]) => x > b[0] - 3 && x < b[2] + 3 && y > b[1] - 3 && y < b[3] + 3);
   const order = items.map((r, i) => [r, i]).sort((a, b) => (b[0].nm === sel) - (a[0].nm === sel));
   let tails = '', heads = '', labels = '';
@@ -6417,20 +6417,33 @@ async function alertsCard(box, mk) {
   const up = ER.filter((r) => r.status === 'lift-off today' || (r.status === 'riding' && r.days <= 2)).sort((a, b) => a.days - b.days), dn = [];
   const ix = ER.filter((r) => r.index && r.status === 'riding');
   const names = (L2) => L2.slice(0, 8).map((r) => r.index ? esc(nm(r.symbol)) : `<a href="#" class="al-s" data-tv="${esc(r.symbol)}">${esc(r.symbol)}</a>`).join(', ') + (L2.length > 8 ? ` +${L2.length - 8}` : '');
-  box.innerHTML = `<section class="al-card ${lt ? lt[0] : ''}">
-    ${lt ? `<div class="al-light"><i></i><b>${lt[1]}</b></div>` : ''}${rotBasket(GPX, S, mk)}${axl}
-    ${br.length ? br.slice(0, 4).map(wline).join('') : ''}
-    ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}" data-tvs="${esc(tvIdx(r.ticker || r.index))}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
-    ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
-    ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
-    ${indAlertLines(GPX, mk)}${rotAlertLines(GPX, mk)}
-    ${basketLines(BK, mk)}
-    ${(() => { const fw = fundWLines(state.fund, mk), fa = fundAthLines(state.fund, mk);
-      return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets, mk)}
-    ${(() => { const x = idxAthLines(IM, state.assets, mk) + indAthLines(GPX, mk) + athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
-      return `<div class="al-sub">All-time highs · indices, industries, stocks, ETFs &amp; funds, commodities · closed last month above the ATH, now above that month's high</div>${x || '<div class="al-r muted"><span>None this month yet.</span></div>'}`; })()}
-    ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
-    <details class="al-why"><summary>ⓘ What these mean</summary>
+  /* 20 Nov 2026 (Amritpal: "a lot of text - put it the infographic way"): hero light, mini rotation map, basket cards, exit chips and
+     big-number tiles first; each tile opens its list; the remaining text lines sit under "More details" */
+  const wHtml = (br.length ? br.slice(0, 4).map(wline).join('') : '') + fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}" data-tvs="${esc(tvIdx(r.ticker || r.index))}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')
+    + (!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : '');
+  const emaHtml = (up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : '<div class="al-r muted"><span>No stock left the 9 EMA upward in the last 3 sessions.</span></div>')
+    + (ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : '');
+  const indHtml = indAlertLines(GPX, mk) + rotAlertLines(GPX, mk);
+  const athX = idxAthLines(IM, state.assets, mk) + indAthLines(GPX, mk) + athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
+  const athHtml = athX || '<div class="al-r muted"><span>None this month yet.</span></div>';
+  const fundHtml = (() => { const fw = fundWLines(state.fund, mk); return fw || '<div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })() + commodityLines(state.assets, mk) + basketLines(BK, mk);
+  const cnt = (h, re) => (h.match(re) || []).length;
+  const tiles = [
+    ['w', 'Index W breaks', br.length, fm.length ? `${fm.length} forming` : 'last 5 sessions', wHtml],
+    ['ema', 'Leaving 9 EMA', up.length, 'last 3 sessions', emaHtml],
+    ['ath', 'All-time highs', cnt(athX, /al-t ok/g), 'closed above, now higher', athHtml],
+    ['ind', 'Industries moving', cnt(indHtml, /data-gwch/g), 'W, 9 EMA, rotation', indHtml],
+    ['fund', 'ETFs & commodities', cnt(fundHtml, /data-(fwch|awch|asv|bk)/g), 'W and ATH crosses', fundHtml],
+  ];
+  const hero = lt ? (() => { const [w, ...rest] = lt[1].split(' · '); return `<div class="ig-hero ${lt[0]}"><span class="ig-dot"></span><span class="ig-word">${esc({ GREEN: 'Go', AMBER: 'Careful', RED: 'Pause' }[w] || w)}</span><span class="ig-sub">${esc(rest.join(' · '))}</span></div>`; })() : '';
+  box.innerHTML = `<section class="al-card ig ${lt ? lt[0] : ''}">
+    ${hero}
+    <div class="ig-map" role="button" tabindex="0" aria-label="Open the full rotation chart"><div class="ig-map-h"><b>Sector rotation</b><span>tap for the full chart</span></div><div class="ig-map-c"></div></div>
+    ${rotBasket(GPX, S, mk)}
+    <div class="ig-tiles">${tiles.map(([k, t, n, sub]) => `<button class="ig-tile${n ? '' : ' zero'}" data-igt="${k}"><b>${n}</b><span>${t}</span><small>${sub}</small></button>`).join('')}</div>
+    ${tiles.map(([k, , , , h]) => `<div class="ig-panel" data-igp="${k}" hidden>${h}</div>`).join('')}
+    <details class="al-why"><summary>More details</summary>${axl}
+      <h5 style="margin:10px 0 2px">What these mean</h5>
       ${L ? lightHTML(L, mk) : ''}
       <p class="muted td-rs"><b>W + trendline:</b> ${esc((W && W.test) || 'Tested on 23 NSE indices 2015–26: the break came before the 9/21 cross 71% of the time, about 1% lower; next 20 sessions median +1.6% (63% up) vs +1.2% on any day.')} ${mk === 'NSE' ? '<b>Full setup</b> = W broken and riding above a rising 9 EMA. Tested on 551 Indian index W breaks 2016–26: with a 9 EMA lift-off around the break, next 20 sessions median +1.5% (63% up); without one −0.6% (46% up). Break-day volume (shown) added nothing: +1.4% with high volume, +1.4% without. Since 2021 the edge is smaller.' : 'Volume and the 9 EMA tick are shown for context; the combination was tested on India only.'}</p>
       <p class="muted td-rs"><b>9 EMA:</b> ${esc((E && E.test) || 'Lift-off = first whole candle above a rising 9 EMA in 10 sessions; ride until a whole candle is below it. Tested 2007–26: Bank Nifty +1.95% a trade (42% won), Nifty +0.96%, F&O stocks +1.46%, against about +1% for holding any 16 days.')}</p>
@@ -6446,6 +6459,26 @@ async function alertsCard(box, mk) {
   box.querySelectorAll('[data-ath]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ symbol: b.dataset.ath, kind: 'ATH' }, mk); }));
   box.querySelectorAll('[data-tvx]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(b.dataset.tvx) + '&interval=1M', '_blank', 'noopener'); }));
   box.querySelectorAll('[data-fd]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const r = ((state.fund && state.fund.rows) || []).find((x) => x.key === b.dataset.fd); if (r) fundSelect(r); }));
+  box.querySelectorAll('[data-igt]').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.igt; const on = b.classList.toggle('on');
+    box.querySelectorAll('[data-igt]').forEach((x) => { if (x !== b) x.classList.remove('on'); });
+    box.querySelectorAll('[data-igp]').forEach((x) => { x.hidden = !(on && x.dataset.igp === k); });
+  }));
+  igMiniMap(box, GPX, mk);
+}
+/* mini rotation map on Today: Leading + Improving + this week's movers, dots and short trails; tap -> Markets > Rotation */
+async function igMiniMap(box, G, mk) {
+  const m = box.querySelector('.ig-map'); if (!m) return;
+  let data = null;
+  if (mk === 'NSE') { const R = await getJSON(MAIN + 'data/scan/sector_rrg.json', 'sector_rrg').catch(() => null); if (R && R.weekly) data = R.weekly; }
+  if (!data && G) data = Object.fromEntries((G.sectors || []).filter((r) => r.rrg).map((r) => [r.sector, { pts: r.rrg.pts, now: r.rrg.now }]));
+  const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
+  const items = Object.entries(data || {}).map(([nm, r]) => ({ nm, now: r.now, was: r.pts.length >= 3 ? qOf(r.pts[r.pts.length - 3]) : r.now, pts: r.pts.slice(-3) }))
+    .filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was);
+  if (!items.length) { m.hidden = true; return; }
+  m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 220, true);
+  const go = () => { Object.assign(state.mx, { lvl: 'market', m: mk, sec: null, grp: null }); show('mk'); setTimeout(() => { const e = document.querySelector('#rrgbox'); if (e) e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1800); };
+  m.addEventListener('click', go); m.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
 }
 /* 20 Nov 2026 (Amritpal: industries on the alert card): industry indices (NSE official basic industries in India, the scan's groups
    elsewhere) with a W + trendline break in the last 5 sessions, a W within 3% of its line, or leaving a rising 9 EMA (last 3 sessions) */
@@ -6486,15 +6519,15 @@ function rotBasket(G, S, mk) {
   if (mk === 'NSE') { try { held = JSON.parse(localStorage.getItem('td.heldSyms') || '[]'); } catch (e) { /* */ } if (!held.length) { try { held = pfLoad().h.map((h) => h.s); } catch (e) { /* */ } } }
   const downSet = new Set(down.map((r) => r.slug));
   const heldDown = held.filter((h) => { const i = rotIndOf(G, h, mk); return i && downSet.has(i.slug); });
-  const bask = L.length ? L.map((b) => `<div class="rb-b"><div class="rb-ind"><a href="#" class="al-s" data-gwch="${esc(b.ind.slug)}" data-tvs="${esc(indTv(b.ind, mk))}">${esc(b.ind.nm)}</a> ${qc(b.ind.rrg.now)}${b.ind.rrg.wk1 !== b.ind.rrg.now ? ' <small>new this week</small>' : ''}</div>
-      <div class="rb-stk">${b.s.slice(0, 6).map(([sym, sy]) => `<a href="#" class="al-s" data-tv="${esc(sym)}">${esc(sym)}</a> <small>${esc(sy.join(' + '))}</small>`).join(' · ')}${b.s.length > 6 ? ` <small>+${b.s.length - 6}</small>` : ''}</div>
-      <div class="rb-n">${b.s.length} buy signal${b.s.length > 1 ? 's' : ''}${b.ind.r1m != null ? ` · industry ${b.ind.r1m >= 0 ? '+' : ''}${fmt(b.ind.r1m, 1)}% in 1 month` : ''}</div></div>`).join('')
+  const bask = L.length ? '<div class="rb-cards">' + L.map((b) => `<div class="rb-b" style="border-top:4px solid ${RRG_Q[b.ind.rrg.now]}"><div class="rb-ind"><a href="#" class="al-s" data-gwch="${esc(b.ind.slug)}" data-tvs="${esc(indTv(b.ind, mk))}">${esc(b.ind.nm)}</a> ${qc(b.ind.rrg.now)}${b.ind.rrg.wk1 !== b.ind.rrg.now ? ' <small>new this week</small>' : ''}</div>
+      <div class="rb-tks">${b.s.slice(0, 6).map(([sym, sy]) => `<a href="#" class="rb-tk" data-tv="${esc(sym)}"><b>${esc(sym)}</b><small>${esc(sy.join(' + '))}</small></a>`).join('')}${b.s.length > 6 ? `<span class="rb-tk more">+${b.s.length - 6}</span>` : ''}</div>
+      <div class="rb-n">${b.ind.r1m != null ? `industry ${b.ind.r1m >= 0 ? '+' : ''}${fmt(b.ind.r1m, 1)}% in a month` : ''}</div></div>`).join('') + '</div>'
     : '<div class="rb-none">No buy signals in Leading or Improving industries today.</div>';
-  const ex = down.length ? `<div class="rb-x"><div class="rb-h2">⚠ Turned down this week</div><div class="rb-stk">${down.slice(0, 6).map((r) => `<a href="#" class="al-s" data-gwch="${esc(r.slug)}">${esc(r.nm)}</a> <small>${r.rrg.wk1} → ${r.rrg.now}</small>`).join(' · ')}${down.length > 6 ? ` <small>+${down.length - 6}</small>` : ''}</div>
+  const ex = down.length ? `<div class="rb-x"><div class="rb-h2">Turned down this week</div><div class="rb-xcs">${down.slice(0, 6).map((r) => `<a href="#" class="rb-xc" data-gwch="${esc(r.slug)}">${esc(r.nm)}</a>`).join('')}${down.length > 6 ? `<span class="rb-xc more">+${down.length - 6} more</span>` : ''}</div>
       ${heldDown.length ? `<div class="rb-open">🔴 <b>Your holdings there: ${heldDown.slice(0, 10).map(esc).join(', ')}</b> — check their stops</div>` : held.length ? '<div class="rb-n">None of your holdings are in these.</div>' : ''}
-      ${downOpen.length ? `<div class="rb-n">Open system trades (scans) there: ${downOpen.flatMap((r) => open[r.slug]).slice(0, 10).map(esc).join(', ')}</div>` : ''}</div>` : '';
-  return `<div class="rb"><div class="rb-h">Rotation × your signals</div>${bask}${ex}
-    <div class="rb-foot">Baskets = today's buy signals from your systems, grouped by industries that are Leading or Improving. Exit each stock on its own system's rule. Rotation is a guide: in the backtests it did not improve 9/21.</div></div>`;
+      ${downOpen.length ? `<div class="rb-n" title="${esc(downOpen.flatMap((r) => open[r.slug]).join(', '))}">${downOpen.flatMap((r) => open[r.slug]).length} open system trades (from the scans) are in these industries</div>` : ''}</div>` : '';
+  return `<div class="rb"><div class="rb-h">Basket ideas</div><div class="rb-sub">Your systems' buy signals in industries that are leading or improving</div>${bask}${ex}
+    <div class="rb-foot">Exit each stock on its own system's rule. Rotation is a guide; it didn't improve 9/21 in the backtests.</div></div>`;
 }
 /* 20 Nov 2026 (Amritpal: put the catching-up industries on the Today card): industries that moved into Improving or Leading this week,
    and weak-base groups turning up fast (1-week Pulse 20+ above the month) */
