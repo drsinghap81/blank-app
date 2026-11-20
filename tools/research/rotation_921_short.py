@@ -28,7 +28,7 @@ d["imom"] = d.imom.fillna(0)
 g = d.groupby("SYMBOL").CLOSE
 d["e9"] = g.transform(lambda s: s.ewm(span=9, adjust=False).mean())
 CFG = G["K"].CFG
-nifty = G["nifty"]; bull = (nifty > nifty.rolling(200).mean()).shift(1).fillna(False)   # yesterday's regime
+nifty = G["nifty"]; bull = (nifty > nifty.rolling(200).mean()).shift(1).fillna(False).astype(bool)   # yesterday's regime
 
 
 def report(eq):
@@ -36,13 +36,13 @@ def report(eq):
     eq = eq.sort_index(); end = eq.index[-1]; out = {}
     for y in (1, 2, 3, 5):
         e = eq[eq.index >= end - pd.DateOffset(years=y)]
-        out[f"last {y}y"] = round(((e.iloc[-1] / e.iloc[0]) ** (1 / y) - 1) * 100, 1) if len(e) > 50 else None
+        out[f"last {y}y"] = round(float((e.iloc[-1] / e.iloc[0]) ** (1 / y) - 1) * 100, 1) if len(e) > 50 else None
     yr = eq.resample("YE").last(); yr = pd.concat([eq.iloc[:1], yr]).pct_change().dropna()
     out["years (newest first)"] = {str(k.year): round(v * 100, 1) for k, v in sorted(yr.items(), reverse=True)}
-    r = eq.pct_change().dropna(); b = bull.reindex(r.index).fillna(False)
-    ann = lambda x: round(((1 + x).prod() ** (252 / max(1, len(x))) - 1) * 100, 1)  # noqa: E731
+    r = eq.pct_change().dropna(); b = bull.reindex(r.index).fillna(False).astype(bool).values
+    ann = lambda x: round(float((1 + x).prod() ** (252 / max(1, len(x))) - 1) * 100, 1)  # noqa: E731
     out["bull days a year"] = ann(r[b]); out["bear days a year"] = ann(r[~b]); out["bear share of days"] = round((~b).mean() * 100)
-    cov = (r.index >= "2020-02-15") & (r.index <= "2020-12-31")      # Covid crash + rebound treated as an exception
+    cov = np.asarray((r.index >= "2020-02-15") & (r.index <= "2020-12-31"))      # Covid crash + rebound treated as an exception
     rx = r[~cov]; eqx = (1 + rx).cumprod()
     out["ex-Covid a year"] = ann(rx); out["ex-Covid max drawdown"] = round(float((eqx / eqx.cummax() - 1).min()) * 100, 1)
     return out
