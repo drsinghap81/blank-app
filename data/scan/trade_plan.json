@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-20 21:15 UTC",
+"generated": "2026-11-20 21:59 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-20",
@@ -282,7 +282,7 @@
 "group_rank": 7,
 "rank": 5,
 "risk_pct": 24.0,
-"r3m": null
+"r3m": 28.4
 },
 {
 "id": "ATH-TECHM-2026-10-22",
@@ -862,6 +862,38 @@
 "rank": 5,
 "risk_pct": 9.7,
 "r3m": 5.1
+},
+{
+"id": "T921-AXISBANK-2026-11-20",
+"symbol": "AXISBANK",
+"name": "Axis Bank Limited",
+"system": "9/21 trend",
+"bucket": "t9",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 1460.46,
+"ref": 1446.0,
+"stop": 1333.1,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-20, stop 8.5% below",
+"score": 3,
+"value_cr": 949.13,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Banks - Private Large",
+"lane": "mid",
+"group_pulse": 45.7,
+"group_rank": 4,
+"rank": 1,
+"risk_pct": 9.6,
+"r3m": 17.1
 },
 {
 "id": "RET-MANCREDIT-2026-11-19",
