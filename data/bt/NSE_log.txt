@@ -1,0 +1,23 @@
+nse_symbols: bad response from https://nsearchives.nseindia.com/emerge/corporates/content/SME_EQUITY_L.csv
+NSE universe 2631
+NSE 200 downloaded, 160 liquid
+NSE 400 downloaded, 325 liquid
+NSE 600 downloaded, 495 liquid
+NSE 800 downloaded, 665 liquid
+NSE 1000 downloaded, 835 liquid
+NSE 1200 downloaded, 1014 liquid
+NSE 1400 downloaded, 1171 liquid
+NSE 1600 downloaded, 1336 liquid
+NSE 1800 downloaded, 1503 liquid
+NSE 2000 downloaded, 1676 liquid
+NSE 2200 downloaded, 1839 liquid
+NSE 2400 downloaded, 2003 liquid
+NSE 2600 downloaded, 2168 liquid
+NSE 2631 downloaded, 2193 liquid
+signals 7476 rows 4597587
+{'seed': 0, 'cagr': np.float64(22.0), 'maxdd': np.float64(-26.6), 'cagr_17_21': np.float64(28.7), 'cagr_22_26': np.float64(15.0), 'dd_22_26': np.float64(-26.1), 'trades': 531, 'win': 36, 'pf': np.float64(1.75), 'years': {'2017': 41.4, '2018': -16.3, '2019': 5.0, '2020': 50.8, '2021': 89.8, '2022': 6.2, '2023': 39.1, '2024': 26.2, '2025': -8.0, '2026': 17.9}}
+{'seed': 1, 'cagr': np.float64(33.0), 'maxdd': np.float64(-23.8), 'cagr_17_21': np.float64(40.5), 'cagr_22_26': np.float64(25.1), 'dd_22_26': np.float64(-23.8), 'trades': 531, 'win': 39, 'pf': np.float64(2.06), 'years': {'2017': 38.3, '2018': -12.8, '2019': 17.9, '2020': 68.1, '2021': 131.0, '2022': -0.3, '2023': 86.8, '2024': 26.3, '2025': -0.0, '2026': 30.6}}
+{'seed': 2, 'cagr': np.float64(27.6), 'maxdd': np.float64(-27.4), 'cagr_17_21': np.float64(32.4), 'cagr_22_26': np.float64(22.1), 'dd_22_26': np.float64(-23.7), 'trades': 524, 'win': 37, 'pf': np.float64(2.06), 'years': {'2017': 35.4, '2018': -15.0, '2019': 4.8, '2020': 57.1, '2021': 116.7, '2022': 2.3, '2023': 53.5, '2024': 21.4, '2025': 18.3, '2026': 21.2}}
+{'seed': 3, 'cagr': np.float64(23.8), 'maxdd': np.float64(-29.5), 'cagr_17_21': np.float64(29.5), 'cagr_22_26': np.float64(17.5), 'dd_22_26': np.float64(-29.5), 'trades': 539, 'win': 36, 'pf': np.float64(1.78), 'years': {'2017': 29.0, '2018': -12.7, '2019': 9.4, '2020': 40.2, '2021': 112.8, '2022': -2.2, '2023': 53.8, '2024': 35.9, '2025': -3.8, '2026': 15.6}}
+{'seed': 4, 'cagr': np.float64(27.3), 'maxdd': np.float64(-28.1), 'cagr_17_21': np.float64(38.6), 'cagr_22_26': np.float64(16.0), 'dd_22_26': np.float64(-22.0), 'trades': 559, 'win': 34, 'pf': np.float64(1.78), 'years': {'2017': 44.2, '2018': -18.8, '2019': 26.5, '2020': 49.1, '2021': 131.9, '2022': 3.9, '2023': 42.0, '2024': 3.9, '2025': 4.4, '2026': 32.8}}
+{"cagr": 27.3, "maxdd": -27.4, "cagr_17_21": 32.4, "cagr_22_26": 17.5, "pf": 1.78, "trades": 531.0, "win": 36.0} {"name": "Nifty 50", "cagr": 12.2, "maxdd": -38.4, "cagr_22_26": 7.9}
