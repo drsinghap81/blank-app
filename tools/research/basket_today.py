@@ -44,7 +44,10 @@ def run(name, buys, sells):
                     continue
                 after = [t for t in T if t > f15[-1]]
                 hit = [t for t in after if (side > 0 and L.at[t, s] <= st) or (side < 0 and H.at[t, s] >= st)]
-                px = st if hit else C.at[last, s]
+                lastpx = C.loc[T, s].dropna()
+                if lastpx.empty:
+                    continue
+                px = st if hit else lastpx.iloc[-1]
                 r_ = ((px - e) * side - 0.001 * e) / risk; rr.append(r_); tot.append(r_)
             out.append(f"{'BUY ' if side > 0 else 'SELL'} {k} ({len(rr)} stocks, Pulse {R.set_index('ind').at[k, 'pulse']:.2f}, 09:30 breadth "
                        f"{R.set_index('ind').at[k, 'br'] * 100:.0f}%): avg {np.mean(rr) if rr else 0:+.2f} R, stopped {sum(1 for x in rr if x <= -0.99)}")
