@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 import yfinance as yf
+import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
 
 K = 5
 OUT = os.path.join(os.path.dirname(__file__), "..", "data", "scan", "trendline.json")

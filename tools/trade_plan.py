@@ -387,6 +387,7 @@ def main(mk="NSE"):
     if india:
         try:
             import yfinance as yf
+            import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
             syms = sorted({c["symbol"] for c in allc})
             tick = {s_: s_ + (".BO" if (c_.get("board") == "BSE") else ".NS") for c_ in allc for s_ in [c_["symbol"]]}
             Y = yf.download([tick[s_] for s_ in syms], period="6mo", auto_adjust=True, progress=False, group_by="column", threads=True)["Close"]

@@ -29,6 +29,7 @@ import pandas as pd
 SEC, BENCH = None, None
 LAST_BAR = [None]
 import yfinance as yf
+import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from trend_scan import nse_symbols, telegram  # noqa: E402

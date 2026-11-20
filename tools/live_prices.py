@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 import yfinance as yf
+import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
 
 OUT = "data/live"
 

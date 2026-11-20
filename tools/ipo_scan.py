@@ -180,6 +180,7 @@ def listings():
 
 def main():
     import yfinance as yf
+    import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
     from trend_scan import telegram
     os.makedirs(CH, exist_ok=True)
     from zoneinfo import ZoneInfo

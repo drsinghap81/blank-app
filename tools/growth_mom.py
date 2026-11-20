@@ -7,6 +7,7 @@ Prices: Yahoo. Output: data/scan/growth_mom.json."""
 import csv, glob, json, os
 from datetime import date, timedelta
 import numpy as np, pandas as pd, yfinance as yf
+import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
 
 OUT = "data/scan/growth_mom.json"; N, RES = 25, 15
 BT = dict(period="Jan 2017 - Oct 2026", cagr=24.7, dd=-35.9, filt_cagr=23.4, filt_dd=-29.2, mom_cagr=22.1, mom_dd=-43.5,

@@ -7,6 +7,7 @@ breaks out (buy) or is stopped out (exit). Paper / watch: the app sizes it from 
 import json, os, sys, time
 from datetime import datetime, timezone
 import numpy as np, pandas as pd, yfinance as yf
+import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
 
 MK = [  # ticker, name, group, currency, micro contract (name, multiplier) for sizing, TradingView symbol
     ("GC=F", "Gold", "Metals", "USD", ("Micro gold MGC", 10), "COMEX:MGC1!"),

@@ -10,6 +10,7 @@ Usage: python tools/group_pulse.py NSE|US|ASX  -> data/scan[/us|/asx]/group_puls
 import json, os, sys, time
 from datetime import datetime, timezone
 import numpy as np, pandas as pd, yfinance as yf
+import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from session import drop_partial  # noqa: E402

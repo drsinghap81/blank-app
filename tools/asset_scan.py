@@ -5,6 +5,7 @@ contracts (not roll-adjusted), so long-run levels are approximate. Not tested as
 import json, os, sys, time
 from datetime import datetime, timezone
 import numpy as np, pandas as pd, yfinance as yf
+import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fund_scan import mclose_state  # noqa: E402
 from cupclose import IX_DY_DEP, IX_WK_DEP, wd_closes, wd_short, weekly_support  # noqa: E402

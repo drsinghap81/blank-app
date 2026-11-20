@@ -34,6 +34,7 @@ import numpy as np
 import pandas as pd
 import requests
 import yfinance as yf
+import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
 
 OUT = "data/scan"
 MARKET = "NSE"
