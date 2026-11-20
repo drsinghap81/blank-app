@@ -80,7 +80,7 @@ def download(tickers):
                 d = yf.download(ch, period="3y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
                 for t in ch:
                     try:
-                        x = pd.DataFrame({"c": d["Close"][t], "v": d["Volume"][t], "o": d["Open"][t], "h": d["High"][t], "l": d["Low"][t]}).dropna(subset=["c", "v"])
+                        x = pd.DataFrame({"c": d["Close"][t], "v": d["Volume"][t], "o": d["Open"][t], "h": d["High"][t], "l": d["Low"][t]}).dropna(subset=["c"])   # 20 Nov 2026: Yahoo left volume blank on 19 Nov for most NSE / LSE stocks; keep the price
                         if len(x):
                             out[t] = x
                     except Exception:  # noqa: BLE001
