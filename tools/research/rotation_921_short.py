@@ -28,6 +28,21 @@ d["imom"] = d.imom.fillna(0)
 g = d.groupby("SYMBOL").CLOSE
 d["e9"] = g.transform(lambda s: s.ewm(span=9, adjust=False).mean())
 CFG = G["K"].CFG
+nifty = G["nifty"]; bull = (nifty > nifty.rolling(200).mean()).shift(1).fillna(False)   # yesterday's regime
+
+
+def report(eq):
+    """newest first: trailing 1 / 2 / 3 / 5 years, each year, and bull vs bear (Nifty above / below its 200-day average)"""
+    eq = eq.sort_index(); end = eq.index[-1]; out = {}
+    for y in (1, 2, 3, 5):
+        e = eq[eq.index >= end - pd.DateOffset(years=y)]
+        out[f"last {y}y"] = round(((e.iloc[-1] / e.iloc[0]) ** (1 / y) - 1) * 100, 1) if len(e) > 50 else None
+    yr = eq.resample("YE").last(); yr = pd.concat([eq.iloc[:1], yr]).pct_change().dropna()
+    out["years (newest first)"] = {str(k.year): round(v * 100, 1) for k, v in sorted(yr.items(), reverse=True)}
+    r = eq.pct_change().dropna(); b = bull.reindex(r.index).fillna(False)
+    ann = lambda x: round(((1 + x).prod() ** (252 / max(1, len(x))) - 1) * 100, 1)  # noqa: E731
+    out["bull days a year"] = ann(r[b]); out["bear days a year"] = ann(r[~b]); out["bear share of days"] = round((~b).mean() * 100)
+    return out
 
 
 def run(d, rank="random", rot_exit=False, ema9_exit=False, seed=0, maxpos=10, risk=0.01, skip=0.12, liq=0.05, start="2016-06-01", cap0=2_000_000):
@@ -104,6 +119,9 @@ for nm, kw in VAR.items():
         a = stats(eq, "2017-01-01", "2030-01-01"); b = stats(eq, "2017-01-01", "2021-12-31"); c = stats(eq, "2022-01-01", "2030-01-01")
         hold = (pd.to_datetime(T.exit) - pd.to_datetime(T.entry)).dt.days
         rs.append((a["cagr"], a["maxdd"], b["cagr"], c["cagr"], len(T), T.ret.mean() * 100, hold.median(), np.mean(T.ret > 0) * 100))
+        if sd == 0:
+            rep0 = report(eq)
     m = np.array(rs)
     print(f"R| {nm}: CAGR {m[:, 0].mean():.1f}%, max drawdown {m[:, 1].mean():.1f}%, 2017-21 {m[:, 2].mean():.1f}%, 2022-26 {m[:, 3].mean():.1f}%, "
           f"trades {m[:, 4].mean():.0f}, avg trade {m[:, 5].mean():+.2f}%, win {m[:, 7].mean():.0f}%, median hold {m[:, 6].mean():.0f} days", flush=True)
+    print(f"R|    {nm} (seed 0) newest first: {rep0}", flush=True)
