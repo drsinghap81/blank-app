@@ -6146,6 +6146,13 @@ function idxAthLines(IM, A, mk) {
   if (!L.length) return '';
   return `<div class="al-r"><b>Indices</b>${L.map((x) => `<a href="#" class="al-t ok"${x.tv ? ` data-tvx="${esc(x.tv)}"` : ''}>✓ ${esc(x.n)} above ${fmt(x.h, 2, MKT[mk].loc)} · +${fmt((x.c / x.h - 1) * 100, 1)}%</a>`).join('')}</div>`;
 }
+/* 20 Nov 2026 (Amritpal): industries in the ATH list - industry index closed last month above its high (3 years of data) and is now above that month's high */
+function indAthLines(G, mk) {
+  if (!G) return '';
+  const R = (mk === 'NSE' && G.nse && G.nse.rows && G.nse.rows.length ? G.nse.rows : G.rows || []).filter((r) => r.slug && r.ath_m);
+  if (!R.length) return '';
+  return `<div class="al-r"><b>Industries</b>${R.map((r) => `<a href="#" class="al-t ok" data-gwch="${esc(r.slug)}">✓ ${esc(r.basic || r.group)} +${fmt((r.ath_m.close / r.ath_m.high_m - 1) * 100, 1)}%</a>`).join('')}<small>industry index, 3-year high · tap for chart</small></div>`;
+}
 function commAthLines(A, mk) {
   const WH = COMM_WHERE[mk] || {};
   const L = ((A && A.rows) || []).filter((r) => WH[r.key] && r.mclose && r.mclose.high_m && r.close > r.mclose.high_m && r.mclose.month === athLastMonth(r.asof));
@@ -6299,8 +6306,8 @@ async function alertsCard(box, mk) {
     ${basketLines(BK, mk)}
     ${(() => { const fw = fundWLines(state.fund, mk), fa = fundAthLines(state.fund, mk);
       return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets, mk)}
-    ${(() => { const x = idxAthLines(IM, state.assets, mk) + athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
-      return `<div class="al-sub">All-time highs · indices, stocks, ETFs &amp; funds, commodities · closed last month above the ATH, now above that month's high</div>${x || '<div class="al-r muted"><span>None this month yet.</span></div>'}`; })()}
+    ${(() => { const x = idxAthLines(IM, state.assets, mk) + indAthLines(GPX, mk) + athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
+      return `<div class="al-sub">All-time highs · indices, industries, stocks, ETFs &amp; funds, commodities · closed last month above the ATH, now above that month's high</div>${x || '<div class="al-r muted"><span>None this month yet.</span></div>'}`; })()}
     ${!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : ''}
     <details class="al-why"><summary>ⓘ What these mean</summary>
       ${L ? lightHTML(L, mk) : ''}

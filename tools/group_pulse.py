@@ -98,6 +98,24 @@ def download(tickers):
     return out
 
 
+def ath_month(gi):
+    """20 Nov 2026 (Amritpal: industries in the ATH list): the industry index CLOSED last month above its highest close before that
+    month, and today's close is above last month's highest close. Industry indices go back ~3 years (the download window), so the
+    'all-time' high is the 3-year high. Returns dict(month, high_m, ath, close) or None."""
+    gi = gi.dropna()
+    if len(gi) < 300:
+        return None
+    cur = gi.index[-1].to_period("M"); lm = cur - 1
+    pm = gi.index.to_period("M")
+    m = gi[pm == lm]; before = gi[pm < lm]
+    if m.empty or before.empty:
+        return None
+    ath, mclose, mhigh, now = float(before.max()), float(m.iloc[-1]), float(m.max()), float(gi.iloc[-1])
+    if mclose > ath and now > mhigh:
+        return dict(month=str(lm), high_m=round(mhigh, 2), ath=round(ath, 2), close=round(now, 2))
+    return None
+
+
 def lift_days(gi, e9):
     """20 Nov 2026: sessions since the industry index started closing above a RISING 9 EMA (0 = today), if that run began within
     the last 3 sessions after at least 10 sessions without it; else None. Industry indices are close-only, so 'whole candle' = close."""
@@ -148,7 +166,7 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW):
             json.dump(dict(name=bas, **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
             r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
             e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
-            r["lift_days"] = lift_days(gi, e9)
+            r["lift_days"] = lift_days(gi, e9); r["ath_m"] = ath_month(gi)
         except Exception as e:  # noqa: BLE001
             print("nse w fail", bas, e); r["w"] = None
         out.append(r)
@@ -244,7 +262,7 @@ def main(mkt):
             json.dump(dict(name=r["group"], **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
             r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
             e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
-            r["lift_days"] = lift_days(gi, e9)
+            r["lift_days"] = lift_days(gi, e9); r["ath_m"] = ath_month(gi)
         except Exception as e:  # noqa: BLE001
             print("group w fail", r["group"], e); r["w"] = None
     secof = dict(zip(u.symbol, u.sector))
