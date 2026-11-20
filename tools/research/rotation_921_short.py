@@ -3,7 +3,7 @@ Same panel, live 9/21 signals, 10 positions, 1% risk, 3 seeds and the same weekl
 Variants (entries / exits change, everything else as live):
   live                 random order when more signals than slots; exit Supertrend red / stop (as now)
   RANK rotation        more signals than slots -> strongest industry RS-momentum first (no industry = last)
-  EXIT rotation        also sell at the next open when the stock's industry turns Weakening or Lagging
+  EXIT rotation        also sell at the next open when the stock's industry, Improving / Leading at entry, turns Weakening or Lagging
   RANK + EXIT          both
   SHORT Leading + 9EMA only industries in Leading; sell on a close below the 9 EMA (next open) or the stop / Supertrend
   SHORT Lead+Impr 9EMA same with Improving or Leading
@@ -71,7 +71,7 @@ def run(d, rank="random", rot_exit=False, ema9_exit=False, seed=0, maxpos=10, ri
             q = min(risk * e / (o - stop), maxw * e / o, liq * v / o, cash / fill)
             if q * o < 0.005 * cap0:
                 continue
-            cash -= q * fill; pos[sym] = dict(q=q, cin=fill, stop=stop, dt=dt, last=o)
+            cash -= q * fill; pos[sym] = dict(q=q, cin=fill, stop=stop, dt=dt, last=o, q0=x.at[sym, "quad"])
         pending = []
         for sym in list(pos):
             p = pos[sym]
@@ -84,7 +84,7 @@ def run(d, rank="random", rot_exit=False, ema9_exit=False, seed=0, maxpos=10, ri
             if r.LOW <= p["stop"]:
                 sell(sym, min(float(r.OPEN), p["stop"]), dt, "stop"); continue
             p["last"] = float(r.CLOSE)
-            if r.st == -1 or (rot_exit and r.quad in ("Weakening", "Lagging")) or (ema9_exit and r.CLOSE < r.e9 and dt > p["dt"]):
+            if r.st == -1 or (rot_exit and p["q0"] in ("Improving", "Leading") and r.quad in ("Weakening", "Lagging")) or (ema9_exit and r.CLOSE < r.e9 and dt > p["dt"]):
                 p["sell_next"] = True
         if len(pos) < maxpos:
             t = x[x.sig & ~x.index.isin(list(pos))]
