@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-19T22:15+00:00",
+ "generated": "2026-11-20T02:39+00:00",
  "asof": "2026-11-19",
  "market": "US",
  "ema": 9,
@@ -14,42 +14,6 @@
    "days": 32,
    "ema": 43.52,
    "close": 43.01
-  },
-  {
-   "symbol": "Communication (XLC)",
-   "index": true,
-   "status": "riding",
-   "signal": "2026-11-09",
-   "signal_close": 107.36,
-   "gain": -4.3,
-   "days": 8,
-   "ema": 105.56,
-   "close": 102.76,
-   "low": 102.7
-  },
-  {
-   "symbol": "PANW",
-   "index": false,
-   "status": "lift-off today",
-   "signal": "2026-11-19",
-   "signal_close": 361.73,
-   "gain": 0.0,
-   "days": 0,
-   "ema": 335.01,
-   "close": 361.73,
-   "low": 350.52
-  },
-  {
-   "symbol": "CRWD",
-   "index": false,
-   "status": "lift-off today",
-   "signal": "2026-11-19",
-   "signal_close": 243.46,
-   "gain": 0.0,
-   "days": 0,
-   "ema": 232.23,
-   "close": 243.46,
-   "low": 239.7
   },
   {
    "symbol": "BRK.B",
