@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-19T23:34+00:00",
- "asof": "2026-11-19",
+ "generated": "2026-11-20T23:04+00:00",
+ "asof": "2026-11-20",
  "market": "UK",
  "rows": [],
  "test": "Tested on FTSE 100 / 250 / All-Share 2005\u201326 (111 W's): next 20 sessions avg \u22120.1% vs +0.5% on any day. Worse than random in the UK: reference only.",
