@@ -117,8 +117,12 @@ def main():
                         evs.append(dict(sym=t, d=pd.Timestamp(r["date"]).normalize(), entry=float(r["entry"]), sma=r.get("sma_entry"),
                                         xd=pd.Timestamp(r["exit_date"]).normalize() if r["exit_date"] is not None else None,
                                         xp=float(r["exit_price"]) if r["exit_price"] is not None else np.nan)); got = True
-                if got:
-                    C[t] = x.Close.loc["2016-01-01":].to_dict()
+                if got:   # mark positions on the same split-fixed closes analyse() uses (raw Yahoo NSE closes miss some splits)
+                    from adjust import fix_gaps
+                    from session import drop_partial
+                    xx = drop_partial(x, "NSE"); xx = xx[(xx.Close > 0) & (xx.High > 0)]
+                    cc = fix_gaps(xx.Open, xx.High, xx.Low, xx.Close, xx.Volume)[3]
+                    C[t] = pd.Series(cc, index=xx.index).loc["2016-01-01":].to_dict()
             except Exception as ex:  # noqa: BLE001
                 print("ath skip", t, str(ex)[:80], flush=True)
         print("ath", a + len(chunk), "events", len(evs), flush=True)
@@ -138,6 +142,9 @@ def main():
             for sd in seeds:
                 EE = E.drop(index=list(gidx)) if gidx else E
                 eq, T, _ = sim(EE, C, days, "live" if sizing == "live" else "eq", None, sd)
+                if sd == 0 and gname == "no filter":
+                    dr = eq.pct_change().dropna(); big = dr.abs().sort_values(ascending=False).head(4)
+                    print("R| sanity, biggest daily equity moves:", {str(k.date()): round(float(dr[k]) * 100, 1) for k in big.index}, flush=True)
                 rp = report(eq, bull); rp["trades"] = len(T); rp["avg trade"] = round(float(np.mean(T)) * 100, 2) if T else None
                 reps.append(rp)
             k = f"{sizing} | {gname}"
