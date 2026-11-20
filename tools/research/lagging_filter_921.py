@@ -57,7 +57,7 @@ print("R| signals by industry quadrant:", d[d.sig].quad.fillna("none").value_cou
 VAR = {"no filter": None, "block Lagging": {"Lagging"}, "block Lagging + Weakening": {"Lagging", "Weakening"},
        "only Improving + Leading": {"Lagging", "Weakening", "none"}}
 seeds = (0,) if PILOT else (0, 1, 2)
-for nm, block in VAR.items():
+for nm, block in (VAR.items() if not os.environ.get("NO_RUN") else []):
     x = d.copy()
     if block:
         q = x.quad.fillna("none")
