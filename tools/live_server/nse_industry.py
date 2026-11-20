@@ -3,7 +3,10 @@ public NSE Indices "Industry Classification Structure": macro sector -> sector -
 NSE shows each stock's classification on its quote page (api/quote-equity -> industryInfo) but blocks cloud servers such as
 GitHub's; this server is in Mumbai, so it fetches the map here and serves it read-only at /api/nse_industry for the nightly scan.
 Runs at most once every 6 days, only outside 08:30-16:00 IST, ~3 requests a second (about 15 minutes for ~2,200 symbols).
-Public, non-account data. Output: DATA/nse_industry.json"""
+Public, non-account data. Output: DATA/nse_industry.json
+20 Nov 2026: NSE moved to www.nseindia.in and the old api/quote-equity now answers 403 to everyone; the new quote page reads
+api/NextApi/apiClient/GetQuoteApi?functionName=getSymbolData -> equityResponse[0].secInfo (macro, sector, industryInfo,
+basicIndustry). A pass that finds almost nothing (blocked) is retried after 6 hours instead of waiting 6 days."""
 import csv
 import io
 import json
@@ -14,10 +17,12 @@ from datetime import datetime, timedelta, timezone
 
 IST = timezone(timedelta(hours=5, minutes=30))
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
-      "Accept": "application/json,text/plain,*/*", "Accept-Language": "en-US,en;q=0.9", "Referer": "https://www.nseindia.com/get-quotes/equity"}
+      "Accept": "application/json,text/plain,*/*", "Accept-Language": "en-US,en;q=0.9", "Referer": "https://www.nseindia.in/"}
+BASE = "https://www.nseindia.in"
 
 
 class NseIndustry:
+    MIN = 500          # fewer rows than this = the pass was blocked; retry sooner
     def __init__(self, data_dir, log=lambda *a, **k: None, session=None):
         self.path = os.path.join(data_dir, "nse_industry.json"); self.log = log
         self.st = self._load(); self.thread = None; self.lock = threading.Lock(); self.progress = None; self.err = None
@@ -37,7 +42,12 @@ class NseIndustry:
         if 8 * 60 + 30 <= now.hour * 60 + now.minute <= 16 * 60:
             return False
         a = self.st.get("asof")
-        return not a or (now - datetime.fromisoformat(a)).days >= 6
+        if not a:
+            return True
+        age = now - datetime.fromisoformat(a)
+        if len(self.st.get("rows") or {}) < self.MIN:
+            return age >= timedelta(hours=6)
+        return age.days >= 6
 
     def start(self):
         if self.thread and self.thread.is_alive():
@@ -49,7 +59,7 @@ class NseIndustry:
             return self._session
         import requests
         s = requests.Session(); s.headers.update(UA)
-        for u in ("https://www.nseindia.com/", "https://www.nseindia.com/market-data/live-equity-market"):
+        for u in (BASE + "/", BASE + "/get-quote/equity/SBIN/State-Bank-of-India"):
             try:
                 s.get(u, timeout=20)
             except Exception:  # noqa: BLE001
@@ -66,17 +76,22 @@ class NseIndustry:
         try:
             s = self._sess(); syms = self.symbols(s); out = dict(self.st.get("rows") or {}); fails = 0
             for i, sym in enumerate(syms):
-                self.progress = f"{i + 1}/{len(syms)}"
+                self.progress = f"{i + 1}/{len(syms)} found {len(out) - len(self.st.get('rows') or {})}"
                 try:
-                    r = s.get("https://www.nseindia.com/api/quote-equity", params={"symbol": sym}, timeout=20)
+                    r = s.get(BASE + "/api/NextApi/apiClient/GetQuoteApi",
+                              params={"functionName": "getSymbolData", "marketType": "N", "series": "EQ", "symbol": sym}, timeout=20)
                     if r.status_code in (401, 403):
                         fails += 1
                         if fails % 20 == 0:
                             s = self._sess() if self._session is None else s      # cookies expired: warm up again
                         time.sleep(2); continue
-                    ii = (r.json() or {}).get("industryInfo") or {}
-                    if ii.get("basicIndustry"):
-                        out[sym] = [ii.get("macro") or "", ii.get("sector") or "", ii.get("industry") or "", ii.get("basicIndustry") or ""]
+                    er = (r.json() or {}).get("equityResponse") or [{}]
+                    si = (er[0] if er else {}).get("secInfo") or {}
+                    if si.get("basicIndustry"):
+                        out[sym] = [(si.get("macro") or "").strip(), (si.get("sector") or "").strip(),
+                                    (si.get("industryInfo") or "").strip(), si["basicIndustry"].strip()]
+                    else:
+                        fails += 1
                 except Exception:  # noqa: BLE001
                     fails += 1
                 time.sleep(0.33)

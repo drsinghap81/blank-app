@@ -1196,10 +1196,14 @@ def test_nse_industry_map(tmp_path, monkeypatch):
             sym = params["symbol"]
             ii = {"BALRAMCHIN": dict(macro="Fast Moving Consumer Goods", sector="Fast Moving Consumer Goods", industry="Agricultural Food & other Products", basicIndustry="Sugar"),
                   "SUPREMEIND": dict(macro="Industrials", sector="Capital Goods", industry="Industrial Products", basicIndustry="Plastic Products - Industrial")}[sym]
-            return R(js={"industryInfo": ii})
+            assert "nseindia.in" in url and params["functionName"] == "getSymbolData"
+            return R(js={"equityResponse": [{"secInfo": dict(macro=ii["macro"], sector=ii["sector"], industryInfo=ii["industry"], basicIndustry=ii["basicIndustry"])}]})
     monkeypatch.setattr(M.time, "sleep", lambda s: None)
-    j = M.NseIndustry(str(tmp_path), session=S())
+    j = M.NseIndustry(str(tmp_path), session=S()); j.MIN = 1
     assert j.due(datetime(2026, 11, 21, 18, 0, tzinfo=M.IST)) and not j.due(datetime(2026, 11, 20, 11, 0, tzinfo=M.IST))
     j._run()
     assert j.st["rows"]["BALRAMCHIN"][3] == "Sugar" and j.st["rows"]["SUPREMEIND"][3] == "Plastic Products - Industrial" and "XYZ" not in j.st["rows"]
     assert not j.due(datetime(2026, 11, 22, 18, 0, tzinfo=M.IST))
+    j.MIN = 500                                       # a blocked pass (too few rows) is retried after 6 hours, not 6 days
+    j.st["asof"] = "2026-11-21T06:00+05:30"
+    assert j.due(datetime(2026, 11, 21, 18, 0, tzinfo=M.IST)) and not j.due(datetime(2026, 11, 21, 7, 0, tzinfo=M.IST))
