@@ -241,7 +241,7 @@ def fill_gaps(data, mkt):
                 try:
                     h = yf.Ticker(t).history(period="10d", auto_adjust=True)
                     h.index = pd.to_datetime([x.date() for x in h.index])
-                    if pd.Timestamp(d) in h.index:
+                    if pd.Timestamp(d) in h.index and pd.notna(h.loc[pd.Timestamp(d), "Close"]):
                         b = h.loc[pd.Timestamp(d)]
                         data[t].loc[pd.Timestamp(d)] = dict(c=float(b["Close"]), v=float(b["Volume"]), o=float(b["Open"]), h=float(b["High"]), l=float(b["Low"]))
                         data[t] = data[t].sort_index(); got += 1
