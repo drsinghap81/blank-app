@@ -236,6 +236,8 @@ def fill_gaps(data, mkt):
                     data[t].loc[pd.Timestamp(d)] = dict(c=float(b["ClsPric"]), v=float(b["TtlTradgVol"]), o=float(b["OpnPric"]),
                                                         h=float(b["HghPric"]), l=float(b["LwPric"]))
                     data[t] = data[t].sort_index(); got += 1
+        elif len(miss) > 400:
+            print("gap", str(d)[:10], len(miss), "missing - too many to fetch one by one; the day is skipped until Yahoo has it", flush=True); continue
         else:
             for t in miss:
                 try:
