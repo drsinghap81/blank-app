@@ -49,7 +49,23 @@ pct = P.rank(axis=1, pct=True).iloc[-120:]
 out = {}
 for d, row in pct.iterrows():
     out[str(d.date())] = {s: round(float(row[k]), 3) for k, v in IND.items() if pd.notna(row.get(k)) for s in v}
+# 21 Nov 2026: weekly relative-rotation quadrant of each NSE industry vs Nifty 50 (same formula as the app), per stock and day
+# (a Friday's quadrant applies from the next session), for the option backtest's "calls in Leading / puts in Lagging" test
+idx = {}
+for k, v in IND.items():
+    ss = [x for x in v if x in C.columns]
+    if len(ss) >= 3:
+        r = C[ss].pct_change(fill_method=None).clip(-0.3, 0.3); n = r.notna().sum(axis=1)
+        idx[k] = (1 + r.mean(axis=1).where(n >= 3).fillna(0)).cumprod()
+I = pd.DataFrame(idx); Wk = I.resample("W-FRI").last(); NB = bench.resample("W-FRI").last()
+RS = 100 * Wk.div(NB, axis=0); ratio = 100 * RS / RS.rolling(10).mean(); mom = (100 * ratio / ratio.shift(1)).rolling(3).mean()
+Qw = pd.DataFrame(np.where(ratio >= 100, np.where(mom >= 100, "L", "W"), np.where(mom >= 100, "I", "G")), index=Wk.index, columns=Wk.columns).where(ratio.notna() & mom.notna())
+Qd = Qw.reindex(I.index, method="ffill").iloc[-120:]
+quad = {str(d.date()): {s: row[k] for k, v in IND.items() if isinstance(row.get(k), str) for s in v} for d, row in Qd.iterrows()}
 os.makedirs("data/research", exist_ok=True)
+json.dump(quad, open("data/research/nse_quad_daily.json", "w"), separators=(",", ":"))
+lq = sorted(quad)[-1]
+print("R| quadrant days", len(quad), "last", lq, "SBIN", quad[lq].get("SBIN"), "counts", pd.Series(list(quad[lq].values())).value_counts().to_dict(), flush=True)
 json.dump(out, open("data/research/nse_pulse_daily.json", "w"), separators=(",", ":"))
 last = sorted(out)[-1]
 print("R| days", len(out), "first", min(out), "last", last, "stocks", len(out[last]), "SBIN", out[last].get("SBIN"), "top",

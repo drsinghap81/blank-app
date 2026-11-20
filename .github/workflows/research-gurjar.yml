@@ -17,6 +17,6 @@ jobs:
       - run: pip install -q numpy pandas yfinance lxml requests && python tools/research/${{ inputs.script || 'gurjar_momentum' }}.py
       - run: |
           git config user.name "trend-desk-bot"; git config user.email "bot@users.noreply.github.com"
-          git add data/research/gurjar_*.json; [ -f data/research/nse_pulse_daily.json ] && git add data/research/nse_pulse_daily.json
+          git add data/research/gurjar_*.json; [ -f data/research/nse_pulse_daily.json ] && git add data/research/nse_pulse_daily.json; [ -f data/research/nse_quad_daily.json ] && git add data/research/nse_quad_daily.json
           git commit -m "research: gurjar momentum scanner" || exit 0
           for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && break; sleep 5; done
