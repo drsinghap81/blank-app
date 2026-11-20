@@ -1265,3 +1265,9 @@ body.pub .owner-only { display: none !important; }
 .rrg-play { display: flex; align-items: center; gap: 8px; margin: 6px 0 2px; } .rrg-play input { flex: 1; min-width: 0; accent-color: #6366F1; }
 .rrg-pb { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #6366F1; background: transparent; color: inherit; font-size: 13px; cursor: pointer; flex: none; }
 .rrg-play b { font-size: 13px; min-width: 52px; text-align: right; }
+/* 21 Nov 2026: the Today card overflowed the phone in pro view (inside the .t2-head flex row it grew to its content width) */
+#tdalert { flex: 1 1 100%; width: 100%; min-width: 0; max-width: 100%; }
+.al-card { max-width: 100%; min-width: 0; box-sizing: border-box; }
+.al-card > * { min-width: 0; max-width: 100%; }
+.ig-map svg { max-width: 100%; height: auto; }
+.rb-xcs .rb-xc { display: inline-flex; width: auto; flex: 0 0 auto; }
