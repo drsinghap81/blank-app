@@ -78,13 +78,15 @@ def run(O, H, L, C, first_end, exit_at, label):
     return rows
 
 
-def trade(row, sym, side, O, H, L, C):
+def trade(row, sym, side, O, H, L, C, stop="first-hour"):
     if sym not in C.columns:
         return None
     e = row["c1"].get(sym); s = (row["l1"] if side > 0 else row["h1"]).get(sym)
     if e is None or s is None or pd.isna(e) or pd.isna(s):
         return None
     e, s = float(e), float(s)
+    if stop == "1% fixed":
+        s = e * (1 - 0.01 * side)
     risk = (e - s) / e * side
     if risk < 0.002:            # stop closer than 0.2%: skip (no room)
         return None
@@ -120,9 +122,9 @@ def stats(name, daily):
 def test(rows, O, H, L, C, tag):
     res = {}
     rng = np.random.default_rng(7)
-    for K in (1, 2, 3):
-        for thr in (0.0, 0.005):
-            for mode in ("mixed", "buy only", "sell only", "mixed + Nifty agrees"):
+    for stop, K, thr, mode in [(st, K, thr, md) for st in ("first-hour", "1% fixed") for K in (1, 2, 3) for thr in (0.0, 0.005)
+                               for md in ("mixed", "buy only", "sell only", "mixed + Nifty agrees", "FADE: buy weakest, sell strongest")]:
+            if True:
                 daily = {}
                 for row in rows:
                     sc = {}
@@ -140,14 +142,16 @@ def test(rows, O, H, L, C, tag):
                         sells = []
                     if mode == "sell only":
                         buys = []
+                    if mode.startswith("FADE"):
+                        buys, sells = [k for k in order[:K] if sc[k][0] < -thr], [k for k in order[::-1][:K] if sc[k][0] > thr]
                     if mode == "mixed + Nifty agrees":
                         buys = buys if mkt > 0 else []; sells = sells if mkt < 0 else []
-                    Rs = [trade(row, s, 1, O, H, L, C) for k in buys for s in IND[k]] + [trade(row, s, -1, O, H, L, C) for k in sells for s in IND[k]]
+                    Rs = [trade(row, s, 1, O, H, L, C, stop) for k in buys for s in IND[k]] + [trade(row, s, -1, O, H, L, C, stop) for k in sells for s in IND[k]]
                     Rs = [x for x in Rs if x is not None]
                     if Rs:
                         daily[row["day"]] = float(np.mean(Rs))
-                res[(K, thr, mode)] = daily
-                stats(f"{tag} top/bottom {K}, move > {thr * 100:.1f}%, {mode}", daily)
+                res[(stop, K, thr, mode)] = daily
+                stats(f"{tag} stop {stop}, top/bottom {K}, move > {thr * 100:.1f}%, {mode}", daily)
     # baselines: every liquid stock bought at the same time with the same stop; and random industries
     daily_all, daily_rand = {}, {}
     for row in rows:
@@ -176,5 +180,5 @@ rows5 = run(O5, H5, L5, C5, dt.time(9, 45), dt.time(15, 15), "5m")
 test(rows5, O5, H5, L5, C5, "5m 09:45 entry")
 # same 60 days on hourly for a like-for-like comparison
 last60 = {r["day"] for r in rows5}
-for k in ((2, 0.0, "mixed"), (2, 0.005, "mixed"), (2, 0.0, "mixed + Nifty agrees")):
-    stats(f"1h 10:15 entry, SAME 60 days, top/bottom {k[0]}, move > {k[1] * 100:.1f}%, {k[2]}", {d: v for d, v in res[k].items() if d in last60})
+for k in (("first-hour", 2, 0.005, "mixed"), ("1% fixed", 2, 0.005, "mixed"), ("first-hour", 2, 0.005, "FADE: buy weakest, sell strongest")):
+    stats(f"1h 10:15 entry, SAME 60 days, {k}", {d: v for d, v in res[k].items() if d in last60})
