@@ -1,8 +1,7 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-MTD,2026-11-18,1737.26,61.8,1696.94,1687.11,3.0,0,0.0,"Mettler-Toledo International, Inc. Common Stock",watch,142.9,0.88,83,305.92,1737.26,61.8
-ABM,2026-11-18,54.7,60.8,53.59,53.71,1.8,0,0.0,ABM Industries Incorporated Common Stock,watch,128.3,0.83,78,20.28,54.7,60.8
-GMAB,2026-11-17,51.96,60.4,50.03,50.68,2.5,1,-1.9,Genmab A/S - American Depositary Shares,watch,165.5,0.88,95,336.66,50.97,57.0
-GILD,2026-11-17,170.26,61.8,165.01,165.72,2.7,1,-0.8,"Gilead Sciences, Inc.",trend,141.8,0.9,85,1070.18,168.98,59.3
-HNGE,2026-11-16,121.29,61.9,115.13,112.8,7.5,2,-5.6,"Hinge Health, Inc. Class A Common Stock",watch,156.1,0.86,93,219.38,114.53,51.7
-V,2026-11-13,425.76,62.9,413.63,416.43,2.2,3,-2.5,Visa Inc.,watch,127.9,0.85,72,2965.02,415.22,53.1
-CRVL,2026-11-12,86.5,65.1,82.49,81.84,5.7,4,2.7,CorVel Corp.,trend,151.5,0.9,98,16.0,88.87,68.7
+MTD,2026-11-18,1737.26,61.8,1696.94,1687.11,3.0,1,-1.8,"Mettler-Toledo International, Inc. Common Stock",watch,142.9,0.88,83,297.42,1705.66,54.9
+ABM,2026-11-18,54.7,60.8,53.59,53.71,1.8,1,-1.6,ABM Industries Incorporated Common Stock,watch,129.2,0.84,78,20.14,53.82,54.0
+DIS,2026-11-18,122.36,69.6,115.83,116.13,5.4,1,-1.7,Walt Disney Company (The) Common Stock,watch,114.7,0.71,78,1119.78,120.25,62.8
+GMAB,2026-11-17,51.96,60.4,50.03,50.68,2.5,2,-1.9,Genmab A/S - American Depositary Shares,watch,165.5,0.88,95,336.66,50.97,57.0
+GILD,2026-11-17,170.26,61.8,165.01,165.72,2.7,2,-2.2,"Gilead Sciences, Inc.",watch,142.9,0.91,85,1063.98,166.53,54.6
+HNGE,2026-11-16,121.29,61.9,115.13,112.8,7.5,3,-5.6,"Hinge Health, Inc. Class A Common Stock",watch,156.1,0.86,93,219.38,114.53,51.7
