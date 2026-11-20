@@ -95,14 +95,7 @@ def download(tickers):
         if len(miss) < max(5, 0.02 * len(tickers)):
             break
         print(f"retry pass {k + 1}: {len(miss)} missing, waiting {wait}s", flush=True); time.sleep(wait); grab(miss)
-    # 20 Nov 2026: Yahoo's 3-year daily history can lack the most recent session (19 Nov was missing for ~3/4 of NSE and all
-    # sampled LSE stocks while a 10-day request had it) -> top up the last 10 days from a short request
-    rec = {}
-    grab([t for t in tickers if t in out], "10d", rec)
-    filled = 0
-    for t, x in rec.items():
-        before = len(out[t]); out[t] = out[t].combine_first(x); filled += len(out[t]) > before
-    print("downloaded", len(out), "of", len(tickers), "recent days topped up for", filled, flush=True)
+    print("downloaded", len(out), "of", len(tickers), flush=True)
     return out
 
 
@@ -207,6 +200,57 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None, S1=None):
     return dict(asof=js.get("asof"), rows=out)
 
 
+def fill_gaps(data, mkt):
+    """20 Nov 2026: Yahoo was missing 19 Nov for ~70% of NSE stocks (even one at a time) and, in batched requests, for every LSE
+    stock. For each of the last 8 sessions that most series lack: NSE -> fill from NSE's own CM bhavcopy (UDiFF);
+    other markets -> re-fetch the missing tickers one at a time (10 days)."""
+    import io
+    import zipfile
+    keys = [t for t in data if len(data[t]) > 160]
+    if not keys:
+        return
+    alld = sorted({d for t in keys for d in data[t].index[-12:]})[-8:]
+    for d in alld:
+        miss = [t for t in keys if d not in data[t].index]
+        if len(miss) < 0.3 * len(keys):
+            continue
+        got = 0
+        if mkt == "NSE":
+            ymd = pd.Timestamp(d).strftime("%Y%m%d"); bh = None
+            for host in ("nsearchives.nseindia.com", "archives.nseindia.com"):
+                try:
+                    import requests
+                    r = requests.get(f"https://{host}/content/cm/BhavCopy_NSE_CM_0_0_0_{ymd}_F_0000.csv.zip", timeout=40,
+                                     headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.nseindia.com/"})
+                    if r.status_code == 200 and r.content[:2] == b"PK":
+                        z = zipfile.ZipFile(io.BytesIO(r.content)); bh = pd.read_csv(z.open(z.namelist()[0])); break
+                except Exception as e:  # noqa: BLE001
+                    print("bhavcopy", ymd, host, e, flush=True)
+            if bh is None:
+                print("gap", str(d)[:10], len(miss), "missing; no NSE bhavcopy", flush=True); continue
+            bh = bh[bh["SctySrs"].isin(["EQ", "BE", "BZ", "SM", "ST"])].drop_duplicates("TckrSymb").set_index("TckrSymb")
+            for t in miss:
+                sym = t[:-3] if t.endswith(".NS") else t
+                if sym in bh.index:
+                    b = bh.loc[sym]
+                    data[t].loc[pd.Timestamp(d)] = dict(c=float(b["ClsPric"]), v=float(b["TtlTradgVol"]), o=float(b["OpnPric"]),
+                                                        h=float(b["HghPric"]), l=float(b["LwPric"]))
+                    data[t] = data[t].sort_index(); got += 1
+        else:
+            for t in miss:
+                try:
+                    h = yf.Ticker(t).history(period="10d", auto_adjust=True)
+                    h.index = pd.to_datetime([x.date() for x in h.index])
+                    if pd.Timestamp(d) in h.index:
+                        b = h.loc[pd.Timestamp(d)]
+                        data[t].loc[pd.Timestamp(d)] = dict(c=float(b["Close"]), v=float(b["Volume"]), o=float(b["Open"]), h=float(b["High"]), l=float(b["Low"]))
+                        data[t] = data[t].sort_index(); got += 1
+                except Exception:  # noqa: BLE001
+                    pass
+                time.sleep(0.2)
+        print("gap", str(d)[:10], "missing", len(miss), "filled", got, flush=True)
+
+
 def main(mkt):
     cf = CFG[mkt]; u = universe(mkt)
     tick = {s: (s.replace("/", "-").replace(".", "-") if mkt == "US" else s) + cf["suf"] for s in u.symbol}
@@ -217,6 +261,7 @@ def main(mkt):
             if x not in tick and not x.startswith("DUMMY"):
                 tick[x] = x + cf["suf"]
     data = download(list(tick.values()) + [cf["bench"]])
+    fill_gaps(data, mkt)
     B = data.get(cf["bench"]); B = B.c if B is not None else None
     C = pd.DataFrame({s: data[t].c for s, t in tick.items() if t in data and len(data[t]) > 160})
     V = pd.DataFrame({s: data[t].v for s, t in tick.items() if t in data and len(data[t]) > 160}).reindex(C.index)
