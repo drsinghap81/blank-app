@@ -4017,8 +4017,16 @@ const rsChip = (lab, v) => (v == null ? '' : `<span class="chip ${v > 0 ? 'open'
 state.gp = state.gp || {};
 async function loadGP(mk) { if (state.gp[mk] === undefined) state.gp[mk] = await getJSON(MAIN + MKT[mk].path + 'group_pulse.json', 'gp_' + mk); return state.gp[mk]; }
 const gpCls = (p) => (p >= 45 ? 'new' : p >= 25 ? 'open' : p < 10 ? 'exit' : '');
+/* 20 Nov 2026 (Amritpal: NSE official industries everywhere in India): symbol -> its NSE basic industry row (with Pulse + rank) */
+function nseInd(G, sym) {
+  if (!G || !G.nse || !G.nse.rows) return null;
+  if (!G._nseBy) { G._nseBy = {}; G._nseN = G.nse.rows.filter((r) => r.rank).length; G.nse.rows.forEach((r) => r.members.forEach((m) => { G._nseBy[m.symbol] = r; })); }
+  return G._nseBy[sym] || null;
+}
 function pulseChip(sym, mk) {
-  const G = state.gp[mk || AM()]; const x = G && G.stock && G.stock[sym]; if (!x) return '';
+  const G = state.gp[mk || AM()];
+  if ((mk || AM()) === 'NSE') { const n = nseInd(G, sym); if (n && n.rank) return `<span class="chip ${gpCls(n.p1m)}" title="NSE industry ${esc(n.basic)} (${esc(n.industry)}): Pulse ${fmt(n.p1m, 0)} = share of its liquid stocks trending over the last month; rank ${n.rank} of ${G._nseN}">${esc(n.basic)} · ${fmt(n.p1m, 0)} · #${n.rank}/${G._nseN}</span>`; }
+  const x = G && G.stock && G.stock[sym]; if (!x) return '';
   if (G.rows && G.rows.length && G.rows[0].shift === undefined) gpShift(G.rows);
   const gr = G.rows ? G.rows.find((r) => r.group === x[0]) : null; const sh = gr && gr.shift;
   return sh ? laneChip(sh, ` industry · #${x[2]}/${x[3]}`) : `<span class="chip ${gpCls(x[1])}" title="${esc(x[0])}: industry Pulse ${fmt(x[1], 0)}, rank ${x[2]} of ${x[3]}">Group ${fmt(x[1], 0)} · #${x[2]}/${x[3]}</span>`;
@@ -4996,11 +5004,13 @@ async function loadMarkets() {
           return `<h4 style="margin:14px 0 4px">Industries today · ${L.length} (equal weight, like StockEdge sectors)</h4><div class="mxlist">${L.slice(0, 8).map(row).join('')}</div>
           <details class="t2-more"><summary>All ${L.length} industries by today's change</summary><div class="mxlist">${L.map(row).join('')}</div></details>`; })()}${mk === 'NSE' ? nseIndHTML(G) : ''}</div>`;
     const setups = []; G.rows.forEach((g) => g.members.forEach((m) => { const c = S.map[m.symbol]; if (c && c.some((x) => !x.includes('sell') && !x.includes('forming') && !x.includes('Near support'))) setups.push({ m, g, c }); }));
+    /* India: rank by the stock's NSE official industry Pulse (same measure); the old group stays for the stock page */
+    if (mk === 'NSE') setups.forEach((x) => { const n = nseInd(G, x.m.symbol); if (n && n.rank) { x.og = x.g; x.g = { group: n.basic, sector: n.sector, p1m: n.p1m, rank: n.rank, shift: undefined }; } });
     setups.sort((a, b) => (b.g.p1m - a.g.p1m) || (b.m.wrpi - a.m.wrpi));
     el.insertAdjacentHTML('beforeend', `<div class="card"><h4 style="margin:0 0 4px">Signals ranked by industry strength</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Every stock with a live buy or in-trade signal from your systems, strongest industry (1-month Pulse) first. This replaces the old Top-down tab: in the 2017–26 test, ATH breakouts in strong sectors with strong stock RS won 54% vs 48%.</p>
-      <ul class="list flat">${setups.slice(0, state.mxAllSet ? 999 : 15).map((x, i) => `<li class="row mxrow" tabindex="0" data-k="${i}"><div><div class="sym">${esc(x.m.symbol)}</div><div class="co">${esc(x.g.group)} · Pulse ${fmt(x.g.p1m, 0)} · ${GP_SHIFT[x.g.shift || 'mid'].t.split(' —')[0]}</div><div class="tags">${x.c.join('')}<span class="chip ${x.m.wrpi >= 100 ? 'open' : 'exit'}">RPI ${fmt(x.m.wrpi, 0)}</span></div></div><div></div><div class="num"><b>${fmt(x.m.close, 2, MKT[mk].loc)}</b><span class="muted">${fmt(x.m.from_high, 0)}% from high</span></div></li>`).join('') || '<li class="empty">No live signals today.</li>'}
+      <ul class="list flat">${setups.slice(0, state.mxAllSet ? 999 : 15).map((x, i) => `<li class="row mxrow" tabindex="0" data-k="${i}"><div><div class="sym">${esc(x.m.symbol)}</div><div class="co">${esc(x.g.group)} · Pulse ${fmt(x.g.p1m, 0)} · ${x.og ? `#${x.g.rank} of NSE industries` : GP_SHIFT[x.g.shift || 'mid'].t.split(' —')[0]}</div><div class="tags">${x.c.join('')}<span class="chip ${x.m.wrpi >= 100 ? 'open' : 'exit'}">RPI ${fmt(x.m.wrpi, 0)}</span></div></div><div></div><div class="num"><b>${fmt(x.m.close, 2, MKT[mk].loc)}</b><span class="muted">${fmt(x.m.from_high, 0)}% from high</span></div></li>`).join('') || '<li class="empty">No live signals today.</li>'}
       ${setups.length > 15 && !state.mxAllSet ? `<li><button class="more" id="mxallset">Show all ${setups.length}</button></li>` : ''}</ul></div>`);
-    el.querySelectorAll('[data-k]').forEach((li) => li.addEventListener('click', () => { const x = setups[+li.dataset.k]; mxStock(x.m, x.g, mk, S); }));
+    el.querySelectorAll('[data-k]').forEach((li) => li.addEventListener('click', () => { const x = setups[+li.dataset.k]; mxStock(x.m, x.og || x.g, mk, S); }));
     const ab = $('#mxallset'); if (ab) ab.addEventListener('click', () => { state.mxAllSet = true; loadMarkets(); });
     mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
     el.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'sector', sec: b.dataset.s, grp: null })));

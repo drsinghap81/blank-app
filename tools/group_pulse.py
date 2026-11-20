@@ -145,7 +145,7 @@ def lift_days(gi, e9):
     return k - 1
 
 
-def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None):
+def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None, S1=None):
     """20 Nov 2026: NSE's official basic industries (served by our Mumbai server, which can read NSE's quote pages): each basic industry
     with 2+ stocks gets an equal-weight index from its liquid members (all members if fewer than 2 are liquid), today / 1 w / 1 m,
     latest W and a daily chart (<out>/group_w_charts/nse_<slug>.json). Returns None if the map is unavailable."""
@@ -169,7 +169,12 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None):
             continue
         gi = (1 + ret[use].mean(axis=1).fillna(0)).cumprod() * 100
         sl = "nse_" + IW.slug(bas)
-        r = dict(basic=bas, industry=ind, sector=sec, macro=mac, n=len(ss), n_liquid=len(lq), slug=sl,
+        # 20 Nov 2026: the same Pulse as the groups (share of the liquid members trending, 1 w / 1 m / 1 q), so NSE industries can
+        # replace the groups in the stock chip and the "Signals ranked by industry strength" list (Pulse is the tested measure)
+        pl = {}
+        if S1 is not None and len(lq) >= 2:
+            pl = {k: round(float(np.nanmean([S1[i][x] for x in lq if x in S1[i].index])) * 100, 1) for i, k in enumerate(("p1w", "p1m", "p1q"))}
+        r = dict(basic=bas, industry=ind, sector=sec, macro=mac, n=len(ss), n_liquid=len(lq), slug=sl, **pl,
                  d1=round(float(gi.iloc[-1] / gi.iloc[-2] - 1) * 100, 2), r1w=round(float(gi.iloc[-1] / gi.iloc[-6] - 1) * 100, 1),
                  r1m=round(float(gi.iloc[-1] / gi.iloc[-22] - 1) * 100, 1), r3m=round(float(gi.iloc[-1] / gi.iloc[-64] - 1) * 100, 1),
                  members=sorted([dict(symbol=x, name=str(nm.get(x, x))[:60], close=round(float(C[x].iloc[-1]), 2), liquid=bool(L.get(x, False)),
@@ -187,7 +192,10 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None):
             print("nse w fail", bas, e); r["w"] = None
         out.append(r)
     out.sort(key=lambda r: -r["d1"])
-    print("nse basic industries", len(out), "map asof", js.get("asof"))
+    rk = sorted([r for r in out if r.get("p1m") is not None], key=lambda r: -r["p1m"])
+    for i, r in enumerate(rk):
+        r["rank"] = i + 1
+    print("nse basic industries", len(out), "with Pulse", len(rk), "map asof", js.get("asof"))
     return dict(asof=js.get("asof"), rows=out)
 
 
@@ -354,7 +362,7 @@ def main(mkt):
                         "(+2.2% in 2017-21, +3.6% in 2022-26), better than plain group return (+1.8%); 1-week Pulse +1.2% over the next month. "
                         "Trending stocks in top-Pulse groups beat the average stock by +1.4% over 3 months. As a hard filter on ATH breakouts "
                         "it did not raise returns - use it as a tiebreaker / tailwind. US and ASX: not separately tested.",
-               rows=rows, sectors=sectors, themes=themes, mstats=market, stock=stock, nse=nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL, V) if mkt == "NSE" else None)
+               rows=rows, sectors=sectors, themes=themes, mstats=market, stock=stock, nse=nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL, V, (s1w, s1m, s1q)) if mkt == "NSE" else None)
     os.makedirs(cf["out"], exist_ok=True); json.dump(out, open(cf["out"] + "group_pulse.json", "w"), separators=(",", ":"))
     # weekly closes (last ~60 weeks) of every liquid stock, for the stock panel's mini chart
     # + weekly RSI(14, Wilder) on the full ~3-year weekly series, for the range-shift panel (40/60 bands)
