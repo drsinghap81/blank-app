@@ -75,6 +75,16 @@ class NseIndustry:
     def _run(self):
         try:
             s = self._sess(); syms = self.symbols(s); out = dict(self.st.get("rows") or {}); fails = 0
+            # pilot (Amritpal, 20 Nov 2026: always pilot-check before a batch): 5 large stocks first; stop if none comes back
+            pilot = {}
+            for sym in ("RELIANCE", "SBIN", "BALRAMCHIN", "SUPREMEIND", "TCS"):
+                row = self._one(s, sym)
+                if row:
+                    pilot[sym] = row
+                time.sleep(0.5)
+            if not pilot:
+                raise RuntimeError("pilot failed: NSE returned no industry for 5 test stocks (blocked or the address changed)")
+            self.log("nse_industry_pilot", ok=len(pilot), sample=pilot.get("BALRAMCHIN") or next(iter(pilot.values())))
             for i, sym in enumerate(syms):
                 self.progress = f"{i + 1}/{len(syms)} found {len(out) - len(self.st.get('rows') or {})}"
                 try:
@@ -103,6 +113,18 @@ class NseIndustry:
             self.err = str(ex)[:200]; self.log("nse_industry_error", error=self.err)
         finally:
             self.progress = None
+
+    def _one(self, s, sym):
+        try:
+            r = s.get(BASE + "/api/NextApi/apiClient/GetQuoteApi",
+                      params={"functionName": "getSymbolData", "marketType": "N", "series": "EQ", "symbol": sym}, timeout=20)
+            er = (r.json() or {}).get("equityResponse") or [{}] if r.status_code == 200 else [{}]
+            si = (er[0] if er else {}).get("secInfo") or {}
+            if si.get("basicIndustry"):
+                return [(si.get("macro") or "").strip(), (si.get("sector") or "").strip(), (si.get("industryInfo") or "").strip(), si["basicIndustry"].strip()]
+        except Exception:  # noqa: BLE001
+            pass
+        return None
 
     def loop(self):
         while True:
