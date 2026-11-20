@@ -98,6 +98,20 @@ def download(tickers):
     return out
 
 
+def lift_days(gi, e9):
+    """20 Nov 2026: sessions since the industry index started closing above a RISING 9 EMA (0 = today), if that run began within
+    the last 3 sessions after at least 10 sessions without it; else None. Industry indices are close-only, so 'whole candle' = close."""
+    up = ((gi > e9) & (e9 > e9.shift(3))).values
+    if not up[-1]:
+        return None
+    k = 0
+    while k < len(up) and up[-1 - k]:
+        k += 1
+    if k > 3 or up[-1 - k - 10:-1 - k].any():
+        return None
+    return k - 1
+
+
 def nse_groups(mkt, cf, C, ret, liq, nm, IW):
     """20 Nov 2026: NSE's official basic industries (served by our Mumbai server, which can read NSE's quote pages): each basic industry
     with 2+ stocks gets an equal-weight index from its liquid members (all members if fewer than 2 are liquid), today / 1 w / 1 m,
@@ -134,6 +148,7 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW):
             json.dump(dict(name=bas, **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
             r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
             e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
+            r["lift_days"] = lift_days(gi, e9)
         except Exception as e:  # noqa: BLE001
             print("nse w fail", bas, e); r["w"] = None
         out.append(r)
@@ -229,6 +244,7 @@ def main(mkt):
             json.dump(dict(name=r["group"], **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
             r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
             e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
+            r["lift_days"] = lift_days(gi, e9)
         except Exception as e:  # noqa: BLE001
             print("group w fail", r["group"], e); r["w"] = None
     secof = dict(zip(u.symbol, u.sector))

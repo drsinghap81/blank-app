@@ -5054,7 +5054,7 @@ function nseIndOpen(r) {
       <div class="fact"><span>Stocks</span><b>${r.n} (${r.n_liquid} liquid)</b></div><div class="fact"><span>W + trendline</span><b>${!r.w ? 'none now' : r.w.status === 'broken' ? `broke ${esc(r.w.broke_on)}` : `forming · ${fmt(r.w.dist_pct, 1)}% to break`}</b></div>
       <div class="fact"><span>9 EMA</span><b>${r.above_e9 ? 'above a rising 9 EMA' : 'not above a rising 9 EMA'}</b></div></div>
     <button class="lv-btn" id="nsew">Daily chart · 9 EMA · W trendline ›</button>
-    <h4 style="margin:12px 0 4px">Stocks</h4><ul class="list flat">${r.members.map((m) => `<li class="row" data-tv="${esc(m.symbol)}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}${m.liquid ? '' : ' · thin'}</div></div><div></div><div class="num"><b>${fmt(m.close, 2, 'en-IN')}</b>${m.d1 != null ? pc(m.d1, 2) : ''}</div></li>`).join('')}</ul>
+    <h4 style="margin:12px 0 4px">Stocks</h4><ul class="list flat">${[...r.members].sort((a, b) => (b.liquid - a.liquid) || ((b.d1 ?? -99) - (a.d1 ?? -99))).map((m) => `<li class="row" data-tv="${esc(m.symbol)}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}${m.liquid ? '' : ' · thin'}</div></div><div></div><div class="num"><b>${fmt(m.close, 2, 'en-IN')}</b>${m.d1 != null ? pc(m.d1, 2) : ''}</div></li>`).join('')}</ul>
     <p class="muted" style="font-size:12px">Equal-weight index of the liquid members (all members if fewer than 2 are liquid). Tap a stock for TradingView.</p>`);
   const b = document.getElementById('nsew'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts'));
   document.querySelectorAll('[data-tv]').forEach((li) => li.addEventListener('click', () => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(li.dataset.tv, 'NSE')) + '&interval=D', '_blank', 'noopener')));
@@ -6264,6 +6264,7 @@ async function alertsCard(box, mk) {
   if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds').catch(() => null);
   if (!state.assets) state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets').catch(() => null);
   const BK = mk === 'US' ? await getJSON(P + 'baskets.json', 'baskets_' + mk).catch(() => null) : null;
+  const GPX = await loadGP(mk).catch(() => null);
   const IM = mk === 'NSE' ? await getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose').catch(() => null) : null;
   /* 20 Nov 2026: morning metals clue from Australia (ASX Materials vs ASX 200), shown on its own day only */
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
@@ -6294,6 +6295,7 @@ async function alertsCard(box, mk) {
     ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}" data-tvs="${esc(tvIdx(r.ticker || r.index))}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
+    ${indAlertLines(GPX, mk)}
     ${basketLines(BK, mk)}
     ${(() => { const fw = fundWLines(state.fund, mk), fa = fundAthLines(state.fund, mk);
       return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets, mk)}
@@ -6308,6 +6310,7 @@ async function alertsCard(box, mk) {
       ${mk === 'NSE' ? '<p class="muted td-rs"><b>Metals today:</b> Australia trades before India opens. When ASX materials beat the ASX 200 by more than 0.5%, Indian metal stocks rose from open to close on 52% of days (+0.18%); when they lagged by more than 0.5%, only 38% (−0.49%), against 45% on all days (2016–26, 12 metal F&amp;O stocks). The 5-minute option trader skips metal CE on weak days and metal PE on strong days.</p>' : ''}
       <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
   box.querySelectorAll('[data-wch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.wch, mk, 'index_w_charts', b.dataset.tvs || '')));
+  box.querySelectorAll('[data-gwch]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); wChart(b.dataset.gwch, mk, 'group_w_charts'); }));
   box.querySelectorAll('[data-fwch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.fwch, mk, 'fund_w_charts', b.dataset.tvs || '')));
   box.querySelectorAll('[data-awch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.awch, mk, 'asset_w_charts', b.dataset.tvs || '')));
   box.querySelectorAll('[data-asv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const k = b.dataset.asv; const tv = tvIdx(k); window.open(tv ? 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tv) + '&interval=D' : 'https://finance.yahoo.com/quote/' + encodeURIComponent(k), '_blank', 'noopener'); }));
@@ -6315,6 +6318,22 @@ async function alertsCard(box, mk) {
   box.querySelectorAll('[data-ath]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); lvOpen({ symbol: b.dataset.ath, kind: 'ATH' }, mk); }));
   box.querySelectorAll('[data-tvx]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(b.dataset.tvx) + '&interval=1M', '_blank', 'noopener'); }));
   box.querySelectorAll('[data-fd]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const r = ((state.fund && state.fund.rows) || []).find((x) => x.key === b.dataset.fd); if (r) fundSelect(r); }));
+}
+/* 20 Nov 2026 (Amritpal: industries on the alert card): industry indices (NSE official basic industries in India, the scan's groups
+   elsewhere) with a W + trendline break in the last 5 sessions, a W within 3% of its line, or leaving a rising 9 EMA (last 3 sessions) */
+function indAlertLines(G, mk) {
+  if (!G) return '';
+  const R = (mk === 'NSE' && G.nse && G.nse.rows && G.nse.rows.length ? G.nse.rows : G.rows || []).map((r) => ({ ...r, nm: r.basic || r.group })).filter((r) => r.slug);
+  const br = R.filter((r) => r.w && r.w.status === 'broken').sort((a, b) => a.w.days_ago - b.w.days_ago);
+  const nr = R.filter((r) => r.w && r.w.status === 'forming' && r.w.dist_pct != null && r.w.dist_pct >= 0 && r.w.dist_pct <= 3).sort((a, b) => a.w.dist_pct - b.w.dist_pct);
+  const lf = R.filter((r) => r.lift_days != null).sort((a, b) => a.lift_days - b.lift_days || b.d1 - a.d1);
+  if (!br.length && !nr.length && !lf.length) return '';
+  const a = (r) => `<a href="#" class="al-s" data-gwch="${esc(r.slug)}">${esc(r.nm)}</a>`;
+  const more = (L, n) => (L.length > n ? ` <details class="al-more"><summary>+${L.length - n} more</summary>${L.slice(n).map(a).join(', ')}</details>` : '');
+  return `<div class="al-sub">Industries</div>
+    ${br.length ? `<div class="al-r"><b class="up">▲ W + trendline broke</b> <span>${br.slice(0, 6).map((r) => `${a(r)} <small>${r.w.days_ago === 0 ? 'today' : r.w.days_ago + 'd ago'}</small>`).join(', ')}${more(br, 6)}</span></div>` : ''}
+    ${nr.length ? `<div class="al-r"><span>W near its trendline: ${nr.slice(0, 6).map((r) => `${a(r)} <small>${fmt(r.w.dist_pct, 1)}%</small>`).join(', ')}${more(nr, 6)}</span></div>` : ''}
+    ${lf.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${lf.slice(0, 8).map(a).join(', ')}${more(lf, 8)}</span><small>tap a name for its chart</small></div>` : ''}`;
 }
 /* 20 Nov 2026: tap an index line in the alert card -> daily candles, 9 EMA, the W's falling trendline and the two lows / break */
 async function wChart(sl, mk, dir = 'index_w_charts', tv = '') {
@@ -6324,8 +6343,10 @@ async function wChart(sl, mk, dir = 'index_w_charts', tv = '') {
   $('#sheet-body').innerHTML = `<h2 style="margin:4px 0 2px">${esc(c.name)}</h2>${tv ? `<a class="tv-btn" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tv)}&interval=D" style="margin:2px 0 6px;display:inline-block">Open in TradingView ↗</a>` : ''}<p class="muted" style="margin:0 0 8px;font-size:.85em">Daily · 9 EMA (orange) · W trendline (blue): a close above it is the break</p><div id="wchc" style="height:360px"></div>`;
   const LW = window.LightweightCharts, box = $('#wchc');
   const ch = LW.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
-  const s = ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
-  s.setData(c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })));
+  /* industry indices are close-only: draw a line, not flat candles */
+  const flat = c.c.every((v, i) => c.o[i] === v && c.h[i] === v && c.l[i] === v);
+  const s = flat ? ch.addLineSeries({ color: C.text || '#e5e7eb', lineWidth: 2, priceLineVisible: false }) : ch.addCandlestickSeries({ upColor: C.rise, downColor: C.fall, borderVisible: false, wickUpColor: C.rise, wickDownColor: C.fall });
+  s.setData(c.t.map((t, i) => (flat ? { time: t, value: c.c[i] } : { time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] })));
   const e = ch.addLineSeries({ color: C.e9 || '#f59e0b', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
   e.setData(c.t.map((t, i) => ({ time: t, value: c.e9[i] })));
   if (c.tl && c.tl[0][0] >= c.t[0]) { const l = ch.addLineSeries({ color: '#3b82f6', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
