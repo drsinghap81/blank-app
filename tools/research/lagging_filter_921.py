@@ -27,7 +27,8 @@ d, _ = load("NSE")
 if PILOT:
     keep = sorted(d.SYMBOL.unique())[:400]; d = d[d.SYMBOL.isin(keep)]
 d = d.sort_values(["SYMBOL", "Date"])
-d["ind"] = d.SYMBOL.map(IND_OF)
+d["ind"] = d.SYMBOL.astype(str).str.replace(r"\.(NS|BO)$", "", regex=True).map(IND_OF)
+print("R| sample symbols", list(d.SYMBOL.unique()[:5]), flush=True)
 print("R| panel", d.SYMBOL.nunique(), "stocks;", int(d.ind.notna().groupby(d.SYMBOL).first().sum()), "with an NSE industry; signals", int(d.sig.sum()), flush=True)
 
 C = d.pivot(index="Date", columns="SYMBOL", values="CLOSE").sort_index()
@@ -35,7 +36,7 @@ ret = C.pct_change(fill_method=None).clip(-0.3, 0.3)
 nifty = yf.download("^NSEI", start="2015-06-01", progress=False, auto_adjust=True)["Close"]
 nifty = (nifty.iloc[:, 0] if isinstance(nifty, pd.DataFrame) else nifty).reindex(C.index).ffill()
 members = {}
-for s, k in IND_OF.items():
+for s, k in d.groupby("SYMBOL").ind.first().dropna().items():
     if s in ret.columns:
         members.setdefault(k, []).append(s)
 idx = {}
