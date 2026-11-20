@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-20 03:14 UTC",
+"generated": "2026-11-20 06:37 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-19",
@@ -127,11 +127,11 @@
 "theme_pct": 90.0,
 "group": "Capital Markets",
 "lane": "build",
-"group_pulse": 39.4,
-"group_rank": 7,
+"group_pulse": 39.2,
+"group_rank": 8,
 "rank": 1,
 "risk_pct": 9.2,
-"r3m": 15.9
+"r3m": 19.6
 },
 {
 "id": "ATH-LALPATHLAB-2026-11-04",
@@ -165,11 +165,11 @@
 "theme_pct": 52.0,
 "group": "Diagnostics & Research",
 "lane": "hold",
-"group_pulse": 24.5,
+"group_pulse": 25.9,
 "group_rank": 20,
 "rank": 2,
 "risk_pct": 11.9,
-"r3m": 5.0
+"r3m": 7.2
 },
 {
 "id": "ATH-ZYDUSLIFE-2026-11-02",
@@ -203,11 +203,11 @@
 "theme_pct": 52.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 24.9,
-"group_rank": 19,
+"group_pulse": 26.4,
+"group_rank": 18,
 "rank": 3,
 "risk_pct": 9.6,
-"r3m": 7.8
+"r3m": 8.7
 },
 {
 "id": "ATH-SAREGAMA-2026-11-04",
@@ -245,7 +245,7 @@
 "group_rank": 1,
 "rank": 4,
 "risk_pct": 41.7,
-"r3m": 29.4
+"r3m": 31.6
 },
 {
 "id": "ATH-TECHM-2026-10-22",
@@ -279,11 +279,11 @@
 "theme_pct": 82.0,
 "group": "Information Technology Services",
 "lane": "weak",
-"group_pulse": 26.1,
-"group_rank": 18,
+"group_pulse": 25.9,
+"group_rank": 19,
 "rank": 5,
 "risk_pct": 13.5,
-"r3m": 9.1
+"r3m": 11.3
 },
 {
 "id": "ATH-GLOBAL-2026-10-01",
@@ -321,7 +321,7 @@
 "group_rank": null,
 "rank": 6,
 "risk_pct": 21.3,
-"r3m": 30.4
+"r3m": 29.2
 },
 {
 "id": "STOP-HONASA-537.9",
@@ -354,11 +354,11 @@
 "theme_pct": null,
 "group": "Household & Personal Products",
 "lane": "bounce",
-"group_pulse": 16.3,
-"group_rank": 40,
+"group_pulse": 17.1,
+"group_rank": 39,
 "rank": 7,
 "risk_pct": 22.5,
-"r3m": 9.6
+"r3m": 9.7
 },
 {
 "id": "STOP-DRREDDY-1421.49",
@@ -391,11 +391,11 @@
 "theme_pct": 50.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 24.9,
-"group_rank": 19,
+"group_pulse": 26.4,
+"group_rank": 18,
 "rank": 8,
 "risk_pct": 13.5,
-"r3m": 17.3
+"r3m": 19.1
 }
 ],
 "more": [],
@@ -432,11 +432,11 @@
 "theme_pct": 87.0,
 "group": "Lodging",
 "lane": "build",
-"group_pulse": 40.5,
+"group_pulse": 41.7,
 "group_rank": 6,
 "rank": 1,
 "risk_pct": 4.9,
-"r3m": 23.7
+"r3m": 25.0
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-11",
@@ -470,11 +470,11 @@
 "theme_pct": 50.0,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 23.7,
-"group_rank": 21,
+"group_pulse": 25.0,
+"group_rank": 22,
 "rank": 2,
 "risk_pct": 12.6,
-"r3m": 24.5
+"r3m": 23.4
 },
 {
 "id": "TF-AGARWALEYE-2026-11-11",
@@ -508,11 +508,11 @@
 "theme_pct": null,
 "group": "Medical Instruments & Supplies",
 "lane": "hold",
-"group_pulse": 33.3,
-"group_rank": 12,
+"group_pulse": 35.7,
+"group_rank": 10,
 "rank": 3,
 "risk_pct": 6.6,
-"r3m": 9.5
+"r3m": 10.7
 },
 {
 "id": "RET-EIMCOELECO-2026-11-18",
@@ -541,11 +541,11 @@
 "td_score": null,
 "group": "Farm & Heavy Construction Machinery",
 "lane": "hold",
-"group_pulse": 18.1,
-"group_rank": 36,
+"group_pulse": 20.0,
+"group_rank": 33,
 "rank": 1,
 "risk_pct": 9.7,
-"r3m": 15.5
+"r3m": 14.2
 },
 {
 "id": "RET-GABRIEL-2026-11-18",
@@ -574,11 +574,11 @@
 "td_score": null,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 23.7,
-"group_rank": 21,
+"group_pulse": 25.0,
+"group_rank": 22,
 "rank": 2,
 "risk_pct": 10.2,
-"r3m": 3.5
+"r3m": 8.5
 },
 {
 "id": "RET-MCX-2026-11-19",
@@ -607,11 +607,11 @@
 "td_score": null,
 "group": "Financial Data & Stock Exchanges",
 "lane": "hold",
-"group_pulse": 26.7,
+"group_pulse": 27.6,
 "group_rank": 17,
 "rank": 3,
 "risk_pct": 11.5,
-"r3m": 20.2
+"r3m": 19.3
 },
 {
 "id": "RET-RKFORGE-2026-11-19",
@@ -640,11 +640,11 @@
 "td_score": null,
 "group": "Metal Fabrication",
 "lane": "hold",
-"group_pulse": 22.0,
-"group_rank": 25,
+"group_pulse": 25.8,
+"group_rank": 21,
 "rank": 4,
 "risk_pct": 10.9,
-"r3m": 2.0
+"r3m": 0.2
 },
 {
 "id": "RET-APOLLO-2026-11-18",
@@ -673,11 +673,11 @@
 "td_score": null,
 "group": "Aerospace & Defense",
 "lane": "hold",
-"group_pulse": 20.3,
-"group_rank": 30,
+"group_pulse": 20.1,
+"group_rank": 32,
 "rank": 5,
 "risk_pct": 9.6,
-"r3m": 15.9
+"r3m": 13.8
 },
 {
 "id": "RET-KALYANKJIL-2026-11-18",
@@ -706,11 +706,11 @@
 "td_score": null,
 "group": "Luxury Goods",
 "lane": "hold",
-"group_pulse": 29.6,
-"group_rank": 14,
+"group_pulse": 28.6,
+"group_rank": 16,
 "rank": 6,
 "risk_pct": 11.2,
-"r3m": 10.3
+"r3m": 5.0
 },
 {
 "id": "RET-KTKBANK-2026-11-18",
@@ -739,11 +739,11 @@
 "td_score": null,
 "group": "Banks - Private Mid & Small",
 "lane": "hold",
-"group_pulse": 38.5,
-"group_rank": 9,
+"group_pulse": 40.1,
+"group_rank": 7,
 "rank": 7,
 "risk_pct": 6.7,
-"r3m": 12.9
+"r3m": 6.7
 },
 {
 "id": "RET-MANAKCOAT-2026-11-17",
@@ -772,11 +772,11 @@
 "td_score": null,
 "group": "Metal Fabrication",
 "lane": "hold",
-"group_pulse": 22.0,
-"group_rank": 25,
+"group_pulse": 25.8,
+"group_rank": 21,
 "rank": 8,
 "risk_pct": 7.5,
-"r3m": 32.8
+"r3m": 27.7
 },
 {
 "id": "TF-ICICIBANK-2026-11-05",
@@ -810,11 +810,11 @@
 "theme_pct": 68.0,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 43.8,
+"group_pulse": 45.7,
 "group_rank": 4,
 "rank": 4,
 "risk_pct": 7.9,
-"r3m": 13.9
+"r3m": 16.3
 },
 {
 "id": "TF-KOTAKBANK-2026-10-30",
@@ -848,11 +848,11 @@
 "theme_pct": 68.0,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 43.8,
+"group_pulse": 45.7,
 "group_rank": 4,
 "rank": 5,
 "risk_pct": 6.4,
-"r3m": 26.0
+"r3m": 30.2
 },
 {
 "id": "TFSTOP-POONAWALLA-513.35",
@@ -885,11 +885,11 @@
 "theme_pct": 41.0,
 "group": "Credit Services",
 "lane": "mid",
-"group_pulse": 16.0,
+"group_pulse": 16.4,
 "group_rank": 41,
 "rank": 6,
 "risk_pct": 9.2,
-"r3m": 1.4
+"r3m": 1.1
 },
 {
 "symbol": "SWANDEF",
@@ -940,7 +940,7 @@
 "note": "VCP 16% \u2192 7%, pivot 2,884.00 (1.0% above the close); buy-stop needs 1.4x volume on the day as tested",
 "rank": 1,
 "risk_pct": 7.4,
-"r3m": 19.5
+"r3m": 21.4
 }
 ],
 "pattern_watch": [
@@ -966,7 +966,7 @@
 "signal_date": "2026-11-05",
 "group": "Auto Parts",
 "lane": "hold",
-"group_rank": 21
+"group_rank": 22
 },
 {
 "symbol": "SWIGGY",
@@ -978,7 +978,7 @@
 "signal_date": "2026-11-05",
 "group": "Internet Retail",
 "lane": "hold",
-"group_rank": 10
+"group_rank": 11
 },
 {
 "symbol": "TIRUMALCHM",
@@ -990,7 +990,7 @@
 "signal_date": "2026-11-11",
 "group": "Specialty Chemicals",
 "lane": "hold",
-"group_rank": 44
+"group_rank": 46
 },
 {
 "symbol": "CSBBANK",
@@ -1002,7 +1002,19 @@
 "signal_date": "2026-11-17",
 "group": "Banks - Private Mid & Small",
 "lane": "hold",
-"group_rank": 9
+"group_rank": 7
+},
+{
+"symbol": "TATACHEM",
+"name": "Tata Chemicals Limited",
+"typ": "DB",
+"close": 650.0499877929688,
+"neck": 637.6500244140625,
+"stop": 564.35,
+"signal_date": "2026-11-17",
+"group": "Chemicals",
+"lane": "hold",
+"group_rank": 54
 },
 {
 "symbol": "ZAGGLE",
@@ -1014,7 +1026,7 @@
 "signal_date": "2026-11-04",
 "group": "Software - Infrastructure",
 "lane": "mid",
-"group_rank": 45
+"group_rank": 47
 },
 {
 "symbol": "ICICIBANK",
@@ -1038,19 +1050,7 @@
 "signal_date": "2026-11-06",
 "group": "Electrical Equipment & Parts",
 "lane": "mid",
-"group_rank": 63
-},
-{
-"symbol": "TATACHEM",
-"name": "Tata Chemicals Limited",
-"typ": "DB",
-"close": 650.0499877929688,
-"neck": 637.6500244140625,
-"stop": 564.35,
-"signal_date": "2026-11-17",
-"group": "Chemicals",
-"lane": "mid",
-"group_rank": 54
+"group_rank": 62
 },
 {
 "symbol": "BLUESTARCO",
@@ -1062,7 +1062,7 @@
 "signal_date": "2026-11-19",
 "group": "Building Products & Equipment",
 "lane": "mid",
-"group_rank": 49
+"group_rank": 52
 },
 {
 "symbol": "SESHAPAPER",
@@ -1077,30 +1077,6 @@
 "group_rank": null
 },
 {
-"symbol": "AURIONPRO",
-"name": "Aurionpro Solutions Limited",
-"typ": "DB",
-"close": 555.8499755859375,
-"neck": 582.6500244140625,
-"stop": 528.66,
-"signal_date": "2026-11-05",
-"group": "Software - Application",
-"lane": "bounce",
-"group_rank": 39
-},
-{
-"symbol": "KPITTECH",
-"name": "KPIT Technologies Limited",
-"typ": "TW",
-"close": 521.75,
-"neck": 555.0,
-"stop": 465.4,
-"signal_date": "2026-11-12",
-"group": "Software - Application",
-"lane": "bounce",
-"group_rank": 39
-},
-{
 "symbol": "IOC",
 "name": "Indian Oil Corporation Limited",
 "typ": "TB",
@@ -1110,7 +1086,19 @@
 "signal_date": "2026-11-09",
 "group": "Oil & Gas Refining & Marketing",
 "lane": "fade",
-"group_rank": 33
+"group_rank": 38
+},
+{
+"symbol": "AURIONPRO",
+"name": "Aurionpro Solutions Limited",
+"typ": "DB",
+"close": 555.8499755859375,
+"neck": 582.6500244140625,
+"stop": 528.66,
+"signal_date": "2026-11-05",
+"group": "Software - Application",
+"lane": "weak",
+"group_rank": 40
 },
 {
 "symbol": "EUROPRATIK",
@@ -1122,7 +1110,7 @@
 "signal_date": "2026-11-05",
 "group": "Building Materials",
 "lane": "weak",
-"group_rank": 62
+"group_rank": 63
 },
 {
 "symbol": "JKCEMENT",
@@ -1134,7 +1122,7 @@
 "signal_date": "2026-11-05",
 "group": "Building Materials",
 "lane": "weak",
-"group_rank": 62
+"group_rank": 63
 },
 {
 "symbol": "PATANJALI",
@@ -1158,7 +1146,7 @@
 "signal_date": "2026-11-05",
 "group": "Building Materials",
 "lane": "weak",
-"group_rank": 62
+"group_rank": 63
 },
 {
 "symbol": "SBILIFE",
@@ -1170,7 +1158,19 @@
 "signal_date": "2026-11-06",
 "group": "Insurance - Life",
 "lane": "weak",
-"group_rank": 74
+"group_rank": 73
+},
+{
+"symbol": "KPITTECH",
+"name": "KPIT Technologies Limited",
+"typ": "TW",
+"close": 521.75,
+"neck": 555.0,
+"stop": 465.4,
+"signal_date": "2026-11-12",
+"group": "Software - Application",
+"lane": "weak",
+"group_rank": 40
 },
 {
 "symbol": "IVALUE",
@@ -1182,7 +1182,7 @@
 "signal_date": "2026-11-16",
 "group": "Information Technology Services",
 "lane": "weak",
-"group_rank": 18
+"group_rank": 19
 }
 ],
 "watch": [
@@ -1214,7 +1214,7 @@
 "theme_pct": 33.0,
 "group": "Lodging",
 "lane": "build",
-"group_pulse": 40.5,
+"group_pulse": 41.7,
 "group_rank": 6
 },
 {
@@ -1245,8 +1245,8 @@
 "theme_pct": null,
 "group": "Banks - Private Mid & Small",
 "lane": "hold",
-"group_pulse": 38.5,
-"group_rank": 9
+"group_pulse": 40.1,
+"group_rank": 7
 },
 {
 "id": "WATCH-GREAVESCOT",
@@ -1276,7 +1276,7 @@
 "theme_pct": null,
 "group": "Specialty Industrial Machinery",
 "lane": "hold",
-"group_pulse": 15.3,
+"group_pulse": 15.8,
 "group_rank": 42
 },
 {
@@ -1308,7 +1308,7 @@
 "group": "Dairy",
 "lane": "hold",
 "group_pulse": 21.9,
-"group_rank": 26
+"group_rank": 27
 },
 {
 "id": "WATCH-TCPLPACK",
@@ -1338,7 +1338,7 @@
 "theme_pct": null,
 "group": "Packaging & Containers",
 "lane": "mid",
-"group_pulse": 18.6,
+"group_pulse": 20.0,
 "group_rank": 34
 },
 {
@@ -1369,7 +1369,7 @@
 "theme_pct": 79.0,
 "group": "Asset Management",
 "lane": "mid",
-"group_pulse": 18.1,
+"group_pulse": 19.0,
 "group_rank": 35
 },
 {
