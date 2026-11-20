@@ -4956,6 +4956,41 @@ function mxTiles(rows, key, onAttr) {
       <span class="gpt">${esc(r[key])}</span><span class="gpv">${fmt(r[per], 0)}<small>${r.shift === 'build' || r.shift === 'bounce' || r.shift === 'turn' ? ' ▲' : r.shift === 'fade' ? ' ▼' : ''}</small></span>
       <span class="gpc">${r.r1m != null ? `<b>${r.r1m >= 0 ? '+' : ''}${fmt(r.r1m, 1)}% 1 m</b> · ` : ''}${r.n} stocks${r.rs3m != null ? ` · RS ${r.rs3m >= 0 ? '+' : ''}${fmt(r.rs3m, 0)}%` : ` · ${r.trending_now} trending`}</span><span class="gpstrip" style="background:${GP_SHIFT[r.shift || 'mid'].c}"></span></button>`; }).join('')}</div>`;
 }
+/* 20 Nov 2026 (Amritpal: track rotation to ride short-term sector / industry rallies): Relative Rotation Graph.
+   x = RS-ratio (strength vs the market relative to its own 10-week trend), y = RS-momentum (is that strength rising).
+   Clockwise cycle: Improving (top-left) -> Leading (top-right) -> Weakening (bottom-right) -> Lagging (bottom-left). */
+const RRG_Q = { Leading: '#0A7A55', Weakening: '#E8A33D', Lagging: '#D64545', Improving: '#3B82F6' };
+function rrgSVG(rows, nm, W = 340, H = 300) {
+  const R = rows.filter((r) => r.rrg && r.rrg.pts && r.rrg.pts.length);
+  if (!R.length) return '';
+  const xs = R.flatMap((r) => r.rrg.pts.map((p) => p[1])), ys = R.flatMap((r) => r.rrg.pts.map((p) => p[2]));
+  const dx = Math.max(3, ...xs.map((v) => Math.abs(v - 100))) * 1.08, dy = Math.max(1, ...ys.map((v) => Math.abs(v - 100))) * 1.08;
+  const X = (v) => W / 2 + ((v - 100) / dx) * (W / 2 - 8), Y = (v) => H / 2 - ((v - 100) / dy) * (H / 2 - 8);
+  const q = (x, y, w, h, c, t, tx, ty, a) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}" opacity="0.07"/><text x="${tx}" y="${ty}" font-size="10" fill="${c}" text-anchor="${a}" font-weight="700">${t}</text>`;
+  const body = R.map((r) => { const P = r.rrg.pts; const c = RRG_Q[r.rrg.now] || '#888'; const l = P[P.length - 1];
+    return `<g class="rrg-i" data-rrg="${esc(r.slug || '')}"><polyline points="${P.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="1.4" opacity="0.55"/>
+      ${P.slice(0, -1).map((p) => `<circle cx="${X(p[1]).toFixed(1)}" cy="${Y(p[2]).toFixed(1)}" r="1.6" fill="${c}" opacity="0.5"/>`).join('')}
+      <circle cx="${X(l[1]).toFixed(1)}" cy="${Y(l[2]).toFixed(1)}" r="4.2" fill="${c}"/><text x="${(X(l[1]) + 6).toFixed(1)}" y="${(Y(l[2]) + 3).toFixed(1)}" font-size="9.5" fill="currentColor">${esc(String(nm(r)).slice(0, 18))}</text></g>`; }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:520px;display:block;margin:6px auto;color:var(--ink,#111)" role="img" aria-label="Relative rotation graph">
+    ${q(W / 2, 0, W / 2, H / 2, RRG_Q.Leading, 'LEADING', W - 4, 12, 'end')}${q(0, 0, W / 2, H / 2, RRG_Q.Improving, 'IMPROVING', 4, 12, 'start')}
+    ${q(0, H / 2, W / 2, H / 2, RRG_Q.Lagging, 'LAGGING', 4, H - 5, 'start')}${q(W / 2, H / 2, W / 2, H / 2, RRG_Q.Weakening, 'WEAKENING', W - 4, H - 5, 'end')}
+    <line x1="${W / 2}" y1="0" x2="${W / 2}" y2="${H}" stroke="#94A3B8" stroke-width="0.8"/><line x1="0" y1="${H / 2}" x2="${W}" y2="${H / 2}" stroke="#94A3B8" stroke-width="0.8"/>${body}</svg>`;
+}
+function rrgRows(G, mk) { return (mk === 'NSE' && G.nse && G.nse.rows && G.nse.rows.some((r) => r.rrg) ? G.nse.rows.map((r) => ({ ...r, nm: r.basic })) : (G.rows || []).map((r) => ({ ...r, nm: r.group }))).filter((r) => r.rrg); }
+function rrgBlock(G, mk) {
+  const S = (G.sectors || []).filter((r) => r.rrg); const I = rrgRows(G, mk);
+  if (!S.length && !I.length) return '';
+  const order = ['Improving', 'Leading', 'Weakening', 'Lagging'];
+  const moved = (r) => r.rrg.wk1 !== r.rrg.now ? ` <span class="chip" style="border-color:${RRG_Q[r.rrg.now]};color:${RRG_Q[r.rrg.now]}">new: ${r.rrg.wk1} → ${r.rrg.now}</span>` : '';
+  const li = (r) => `<div class="gpsr nos" data-rrg="${esc(r.slug || '')}"><span class="gpsn">${esc(r.nm)}${moved(r)} <span class="muted">· 4 wks ago ${esc(r.rrg.wk4)}</span></span><span class="gpsv">${r.r1m != null ? `<b class="${r.r1m >= 0 ? 'up' : 'down'}">${r.r1m >= 0 ? '+' : ''}${fmt(r.r1m, 1)}%</b> <small class="muted">1 m</small>` : ''}</span></div>`;
+  const groups = order.map((q) => { const L = I.filter((r) => r.rrg.now === q).sort((a, b) => (b.rrg.wk1 !== b.rrg.now) - (a.rrg.wk1 !== a.rrg.now) || b.rrg.pts.at(-1)[2] - a.rrg.pts.at(-1)[2]);
+    return `<details class="t2-more"${q === 'Improving' || q === 'Leading' ? ' open' : ''}><summary><span style="color:${RRG_Q[q]};font-weight:700">${q}</span> <span class="muted">· ${L.length} industries${L.filter((r) => r.rrg.wk1 !== q).length ? ` · ${L.filter((r) => r.rrg.wk1 !== q).length} new this week` : ''}</span></summary><div class="mxlist">${L.slice(0, 25).map(li).join('')}</div></details>`; }).join('');
+  return `<div class="card" style="margin-top:12px"><h4 style="margin:0 0 4px">Rotation · sectors and industries vs the market</h4>
+    <p class="muted" style="margin:0 0 6px;font-size:12.5px">Weekly, last 8 weeks (the dot is now). Right = stronger than the market, top = getting stronger. Groups usually turn clockwise: Improving → Leading → Weakening → Lagging. Riding rotation = catching Improving → Leading.</p>
+    ${S.length ? `<h5 style="margin:6px 0 0">Sectors</h5>${rrgSVG(S, (r) => r.sector)}` : ''}
+    <h5 style="margin:10px 0 2px">Industries by quadrant${mk === 'NSE' ? ' (NSE official)' : ''}</h5>${groups}
+    <p class="muted" style="font-size:11.5px">Information only — rotation entries are not backtested yet.</p></div>`;
+}
 function mxPer() { const per = state.gpPer || 'p1w'; return `<div class="seg" id="gpper" style="margin:6px 0">${[['p1w', '1 week'], ['p1m', '1 month'], ['p1q', '1 quarter']].map(([k, n]) => `<button data-k="${k}" aria-selected="${per === k}">Pulse ${n}</button>`).join('')}</div>`; }
 async function loadMarkets() {
   $('#title').textContent = 'Markets';
@@ -5013,6 +5048,7 @@ async function loadMarkets() {
           const it = (r) => `<div class="gpsr nos" data-ig="${esc(r.group)}"><span class="gpsn">${esc(r.group)} <span class="muted">${r.sector && r.sector !== r.group ? `· ${esc(r.sector)} ` : ''}· Pulse ${fmt(r.p1w, 0)} wk · ${esc(LANE_TXT[r.shift] || '')}</span></span><span class="gpsv"><b class="${r.r1m >= 0 ? 'up' : 'down'}">${r.r1m >= 0 ? '+' : ''}${fmt(r.r1m, 1)}%</b> <small class="muted">1 m</small></span></div>`;
           return L.length ? `<h4 style="margin:14px 0 4px">Industries on the move · last month</h4><div class="mxlist">${up.map(it).join('')}</div>
             <details class="t2-more"><summary>Biggest falls</summary><div class="mxlist">${dn.map(it).join('')}</div></details>` : ''; })()}
+        ${rrgBlock(G, mk)}
         <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div>${(() => { const L = (G.rows || []).filter((r) => r.d1 != null).sort((a, b) => b.d1 - a.d1); if (!L.length) return '';
           const row = (r) => `<div class="gpsr nos" data-ig="${esc(r.group)}"><span class="gpsn">${esc(r.group)} <span class="muted">· ${esc(r.sector || '')} · ${r.n} stocks</span>${r.w ? (r.w.status === 'broken' ? ' <span class="chip open">W broke</span>' : ` <span class="chip">W ${fmt(r.w.dist_pct, 1)}% to break</span>`) : ''}</span><span class="gpsv"><b class="${r.d1 >= 0 ? 'up' : 'down'}">${r.d1 >= 0 ? '+' : ''}${fmt(r.d1, 2)}%</b></span></div>`;
           return `<h4 style="margin:14px 0 4px">Industries · ${L.length} · change on ${esc(day(G.asof))} (last close, updated each night)</h4><div class="mxlist">${L.slice(0, 8).map(row).join('')}</div>
@@ -5030,6 +5066,7 @@ async function loadMarkets() {
     el.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'sector', sec: b.dataset.s, grp: null })));
     el.querySelectorAll('[data-ig]').forEach((b) => b.addEventListener('click', () => { const g = G.rows.find((r) => r.group === b.dataset.ig); mxGo({ lvl: 'industry', sec: g ? g.sector : null, grp: b.dataset.ig }); }));
     el.querySelectorAll('[data-nb]').forEach((b) => b.addEventListener('click', () => nseIndOpen(((G.nse || {}).rows || []).find((r) => r.slug === b.dataset.nb))));
+    el.querySelectorAll('[data-rrg]').forEach((b) => b.addEventListener('click', () => { const r = rrgRows(G, mk).find((x) => x.slug === b.dataset.rrg); if (r && b.dataset.rrg) wChart(b.dataset.rrg, mk, 'group_w_charts', indTv(r, mk)); }));
     return;
   }
   if (x.lvl === 'sector') {
@@ -6327,7 +6364,7 @@ async function alertsCard(box, mk) {
     ${fm.map((r) => `<div class="al-r al-tap"${r.chart ? ` data-wch="${esc(r.chart)}" data-tvs="${esc(tvIdx(r.ticker || r.index))}"` : ''}><span>${esc(nm(r.index))}: ${r.stage === '2nd low now' ? `new W · 2nd low forming now near ${n0(r.low1_close)}` : 'W formed'} · breaks above ${n0(r.line_now)} (${fmt(r.dist_pct, 1)}% away)</span><small>chart ›</small></div>`).join('')}
     ${up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : ''}
     ${ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : ''}
-    ${indAlertLines(GPX, mk)}
+    ${indAlertLines(GPX, mk)}${rotAlertLines(GPX, mk)}
     ${basketLines(BK, mk)}
     ${(() => { const fw = fundWLines(state.fund, mk), fa = fundAthLines(state.fund, mk);
       return fw || fa ? fw : '<div class="al-sub">Funds &amp; ETFs</div><div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })()}${commodityLines(state.assets, mk)}
@@ -6358,6 +6395,22 @@ async function alertsCard(box, mk) {
 function indTv(r, mk) {
   const T = (r && r.top) || []; if (!T.length) return '';
   return '(' + T.map(([x, c]) => `${tvSym(x, mk)}/${c}`).join('+') + `)*100/${T.length}`;
+}
+/* 20 Nov 2026 (Amritpal: put the catching-up industries on the Today card): industries that moved into Improving or Leading this week,
+   and weak-base groups turning up fast (1-week Pulse 20+ above the month) */
+function rotAlertLines(G, mk) {
+  if (!G) return '';
+  const I = rrgRows(G, mk);
+  const into = (q) => I.filter((r) => r.rrg.now === q && r.rrg.wk1 !== q).sort((a, b) => b.rrg.pts.at(-1)[2] - a.rrg.pts.at(-1)[2]);
+  const lead = into('Leading'), impr = into('Improving');
+  const turn = (G.rows || []).filter((r) => r.p1w != null && r.p1m != null && r.p1w - r.p1m >= 20 && r.slug).sort((a, b) => (b.p1w - b.p1m) - (a.p1w - a.p1m));
+  if (!lead.length && !impr.length && !turn.length) return '';
+  const a = (r) => `<a href="#" class="al-s" data-gwch="${esc(r.slug)}" data-tvs="${esc(indTv(r, mk))}">${esc(r.nm || r.basic || r.group)}</a>${r.r1m != null ? ` <small>${r.r1m >= 0 ? '+' : ''}${fmt(r.r1m, 1)}% 1 m</small>` : ''}`;
+  const more = (L, n) => (L.length > n ? ` <details class="al-more"><summary>+${L.length - n} more</summary>${L.slice(n).map(a).join(', ')}</details>` : '');
+  return `<div class="al-sub">Rotation · catching up</div>
+    ${lead.length ? `<div class="al-r"><b class="up">▲ Moved into Leading this week</b> <span>${lead.slice(0, 5).map(a).join(', ')}${more(lead, 5)}</span></div>` : ''}
+    ${impr.length ? `<div class="al-r"><span><b>Moved into Improving</b> (getting stronger vs the market): ${impr.slice(0, 5).map(a).join(', ')}${more(impr, 5)}</span></div>` : ''}
+    ${turn.length ? `<div class="al-r"><span><b>Turning up fast</b> (1-week Pulse 20+ above the month): ${turn.slice(0, 5).map((r) => a({ ...r, nm: r.group })).join(', ')}${more(turn.map((r) => ({ ...r, nm: r.group })), 5)}</span></div>` : ''}`;
 }
 function indAlertLines(G, mk) {
   if (!G) return '';
