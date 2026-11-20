@@ -1,0 +1,39 @@
+ASX list 1821 from https://asx.api.markitdigital.com/asx-research/1.0/companies/directory/file
+ASX universe 1821
+$ADXN.AX: possibly delisted; no timezone found
+
+1 Failed download:
+['ADXN.AX']: possibly delisted; no timezone found
+ASX 200 downloaded, 138 liquid
+ASX 400 downloaded, 268 liquid
+ASX 600 downloaded, 402 liquid
+$GMDN.AX: possibly delisted; no timezone found
+
+1 Failed download:
+['GMDN.AX']: possibly delisted; no timezone found
+ASX 800 downloaded, 525 liquid
+ASX 1000 downloaded, 659 liquid
+ASX 1200 downloaded, 788 liquid
+$PIL.AX: possibly delisted; no timezone found
+
+1 Failed download:
+['PIL.AX']: possibly delisted; no timezone found
+ASX 1400 downloaded, 923 liquid
+$SAU.AX: possibly delisted; no timezone found
+
+1 Failed download:
+['SAU.AX']: possibly delisted; no timezone found
+ASX 1600 downloaded, 1050 liquid
+$TMBN.AX: possibly delisted; no timezone found
+
+1 Failed download:
+['TMBN.AX']: possibly delisted; no timezone found
+ASX 1800 downloaded, 1174 liquid
+ASX 1821 downloaded, 1188 liquid
+signals 2191 rows 2896759
+{'seed': 0, 'cagr': np.float64(2.0), 'maxdd': np.float64(-34.9), 'cagr_17_21': np.float64(7.8), 'cagr_22_26': np.float64(-3.8), 'dd_22_26': np.float64(-34.9), 'trades': 660, 'win': 32, 'pf': np.float64(1.09), 'years': {'2017': 4.7, '2018': -8.8, '2019': 8.8, '2020': 13.9, '2021': 25.1, '2022': -9.8, '2023': -14.6, '2024': 13.1, '2025': 9.5, '2026': -12.1}}
+{'seed': 1, 'cagr': np.float64(1.2), 'maxdd': np.float64(-33.9), 'cagr_17_21': np.float64(7.8), 'cagr_22_26': np.float64(-5.3), 'dd_22_26': np.float64(-33.9), 'trades': 657, 'win': 32, 'pf': np.float64(1.05), 'years': {'2017': 6.9, '2018': -7.2, '2019': 8.7, '2020': 13.7, '2021': 20.8, '2022': -8.3, '2023': -10.2, '2024': 0.8, '2025': 9.8, '2026': -15.0}}
+{'seed': 2, 'cagr': np.float64(-1.2), 'maxdd': np.float64(-33.7), 'cagr_17_21': np.float64(3.2), 'cagr_22_26': np.float64(-5.8), 'dd_22_26': np.float64(-33.7), 'trades': 657, 'win': 32, 'pf': np.float64(0.95), 'years': {'2017': 3.4, '2018': -11.3, '2019': 7.5, '2020': 13.8, '2021': 6.0, '2022': -9.1, '2023': -12.6, '2024': 16.2, '2025': 5.6, '2026': -22.4}}
+{'seed': 3, 'cagr': np.float64(-0.5), 'maxdd': np.float64(-41.6), 'cagr_17_21': np.float64(7.3), 'cagr_22_26': np.float64(-8.1), 'dd_22_26': np.float64(-41.6), 'trades': 666, 'win': 31, 'pf': np.float64(0.98), 'years': {'2017': 5.6, '2018': -8.5, '2019': 9.6, '2020': 14.2, '2021': 19.5, '2022': -9.2, '2023': -16.2, '2024': 9.8, '2025': 3.9, '2026': -22.7}}
+{'seed': 4, 'cagr': np.float64(1.9), 'maxdd': np.float64(-32.5), 'cagr_17_21': np.float64(6.2), 'cagr_22_26': np.float64(-2.5), 'dd_22_26': np.float64(-32.5), 'trades': 648, 'win': 32, 'pf': np.float64(1.08), 'years': {'2017': 7.0, '2018': -10.6, '2019': 6.0, '2020': 9.1, '2021': 23.9, '2022': -8.7, '2023': -10.7, '2024': 12.5, '2025': 12.3, '2026': -13.3}}
+{"cagr": 1.2, "maxdd": -33.9, "cagr_17_21": 7.3, "cagr_22_26": -5.3, "pf": 1.05, "trades": 657.0, "win": 32.0} {"name": "S&P/ASX 200", "cagr": 4.2, "maxdd": -36.5, "cagr_22_26": 2.6}
