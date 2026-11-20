@@ -1226,3 +1226,7 @@ body.pub .owner-only { display: none !important; }
 .rb-none { font-size: 16px; font-weight: 700; opacity: .8; padding: 6px 0; }
 .rb-x { margin-top: 8px; padding-top: 8px; border-top: 2px solid #D64545; } .rb-h2 { font-size: 18px; font-weight: 800; color: #D64545; }
 .rb-open { font-size: 15px; margin-top: 4px; }
+
+.rrg-chips { margin-top: 6px; } .rrg-row { margin: 4px 0; font-size: 12.5px; line-height: 2; }
+.rrg-chip { border: 1.5px solid; background: transparent; color: inherit; border-radius: 14px; padding: 2px 9px; margin: 0 3px 3px 0; font-size: 12.5px; cursor: pointer; }
+.rrg-chip.on { font-weight: 800; background: rgba(99,102,241,.12); } .rrg-chip small { opacity: .7; font-size: 10px; }

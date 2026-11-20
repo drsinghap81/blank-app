@@ -4976,10 +4976,68 @@ function rrgSVG(rows, nm, W = 340, H = 300) {
     ${q(0, H / 2, W / 2, H / 2, RRG_Q.Lagging, 'LAGGING', 4, H - 5, 'start')}${q(W / 2, H / 2, W / 2, H / 2, RRG_Q.Weakening, 'WEAKENING', W - 4, H - 5, 'end')}
     <line x1="${W / 2}" y1="0" x2="${W / 2}" y2="${H}" stroke="#94A3B8" stroke-width="0.8"/><line x1="0" y1="${H / 2}" x2="${W}" y2="${H / 2}" stroke="#94A3B8" stroke-width="0.8"/>${body}</svg>`;
 }
+/* 20 Nov 2026 (Amritpal: "looks so cluttered - can we have a cleaner version"): clean rotation chart.
+   India: NSE's official sector indices (data/scan/sector_rrg.json, daily or weekly); other markets: the app's sectors (weekly).
+   Short faint tails, a solid dot for now, labels placed so they don't overlap (skipped if no room), Leading + Improving by default,
+   tap a name to highlight it. */
+const RRG_SHORT = (n) => String(n).replace('Communication Services', 'Comm Services').replace('Consumer ', 'Cons ').replace('Information Technology', 'IT').replace('Financial Services', 'Fin Services');
+function rrgClean(items, sel, W = 360, H = 340, tails0 = true) {
+  if (!items.length) return '<p class="muted">Nothing to show for this choice.</p>';
+  const xs = items.flatMap((r) => r.pts.map((p) => p[1])), ys = items.flatMap((r) => r.pts.map((p) => p[2]));
+  const dx = Math.max(2, ...xs.map((v) => Math.abs(v - 100))) * 1.12, dy = Math.max(0.6, ...ys.map((v) => Math.abs(v - 100))) * 1.15;
+  const pad = 22, X = (v) => pad + ((v - 100 + dx) / (2 * dx)) * (W - pad - 6), Y = (v) => 6 + ((100 + dy - v) / (2 * dy)) * (H - pad - 6);
+  const qbg = (x, y, w, h, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}" opacity="0.08"/>`;
+  const cx = X(100), cy = Y(100);
+  let g = qbg(cx, 6, W - 6 - cx, cy - 6, RRG_Q.Leading) + qbg(pad, 6, cx - pad, cy - 6, RRG_Q.Improving) + qbg(pad, cy, cx - pad, H - pad - cy, RRG_Q.Lagging) + qbg(cx, cy, W - 6 - cx, H - pad - cy, RRG_Q.Weakening);
+  const qt = (t, x, y, a, c) => `<text x="${x}" y="${y}" font-size="12" font-weight="800" fill="${c}" text-anchor="${a}" opacity="0.9">${t}</text>`;
+  g += qt('IMPROVING', pad + 4, 20, 'start', RRG_Q.Improving) + qt('LEADING', W - 10, 20, 'end', RRG_Q.Leading) + qt('LAGGING', pad + 4, H - pad - 6, 'start', RRG_Q.Lagging) + qt('WEAKENING', W - 10, H - pad - 6, 'end', RRG_Q.Weakening);
+  g += `<line x1="${cx}" y1="6" x2="${cx}" y2="${H - pad}" stroke="#94A3B8" stroke-width="1"/><line x1="${pad}" y1="${cy}" x2="${W - 6}" y2="${cy}" stroke="#94A3B8" stroke-width="1"/>`;
+  const stp = Math.max(1, Math.ceil((2 * dx) / 7));
+  for (let v = Math.ceil((100 - dx) / stp) * stp; v <= 100 + dx; v += stp) g += `<text x="${X(v)}" y="${H - 9}" font-size="9" fill="#94A3B8" text-anchor="middle">${v}</text>`;
+  g += `<text x="${pad - 4}" y="12" font-size="9" fill="#94A3B8" text-anchor="end" transform="rotate(-90 ${pad - 12} 12)">momentum ↑</text>`;
+  const placed = [], dots = items.map((r) => { const l = r.pts[r.pts.length - 1]; return [X(l[1]), Y(l[2])]; });
+  const hit = (b) => placed.some((p) => !(b[2] < p[0] || b[0] > p[2] || b[3] < p[1] || b[1] > p[3])) || dots.some(([x, y]) => x > b[0] - 3 && x < b[2] + 3 && y > b[1] - 3 && y < b[3] + 3);
+  const order = items.map((r, i) => [r, i]).sort((a, b) => (b[0].nm === sel) - (a[0].nm === sel));
+  let tails = '', heads = '', labels = '';
+  order.forEach(([r, i]) => {
+    const c = RRG_Q[r.now] || '#888'; const on = !sel || r.nm === sel; const P = r.pts;
+    if (tails0 || r.nm === sel) tails += `<polyline points="${P.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="${r.nm === sel ? 2.4 : 1.3}" stroke-linecap="round" stroke-linejoin="round" opacity="${on ? (sel ? 0.95 : 0.4) : 0.08}"/>`;
+    if (r.nm === sel) tails += P.slice(0, -1).map((p) => `<circle cx="${X(p[1]).toFixed(1)}" cy="${Y(p[2]).toFixed(1)}" r="2.2" fill="${c}"/>`).join('');
+    const [hx, hy] = dots[i];
+    heads += `<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="${r.nm === sel ? 6.5 : 5}" fill="${c}" stroke="#fff" stroke-width="1.2" opacity="${on ? 1 : 0.25}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer"/>`;
+    const t = RRG_SHORT(r.nm), w = t.length * 5.9 + 2, h = 11;
+    for (const [ox, oy, a] of [[8, 4, 's'], [-8, 4, 'e'], [8, -7, 's'], [-8, -7, 'e'], [0, -10, 'm'], [0, 16, 'm'], [8, 14, 's'], [-8, 14, 'e']]) {
+      const x0 = a === 's' ? hx + ox : a === 'e' ? hx + ox - w : hx - w / 2, y0 = hy + oy - 9; const b = [x0, y0, x0 + w, y0 + h];
+      if (x0 < pad || x0 + w > W - 4 || y0 < 6 || y0 + h > H - pad || (hit(b) && r.nm !== sel)) continue;
+      placed.push(b);
+      labels += `<text x="${(a === 's' ? hx + ox : a === 'e' ? hx + ox : hx).toFixed(1)}" y="${(hy + oy).toFixed(1)}" font-size="10.5" font-weight="${r.nm === sel ? 800 : 600}" fill="currentColor" text-anchor="${a === 's' ? 'start' : a === 'e' ? 'end' : 'middle'}" opacity="${on ? 1 : 0.3}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer">${esc(t)}</text>`;
+      break;
+    }
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:560px;display:block;margin:4px auto;color:var(--ink,#111)" role="img" aria-label="Relative rotation chart">${g}${tails}${heads}${labels}</svg>`;
+}
+async function rrgMount(el, G, mk) {
+  const box = el.querySelector('#rrgbox'); if (!box) return;
+  const V = state.rrgV || (state.rrgV = { view: 'weekly', all: false, sel: null });
+  let src = null;
+  if (mk === 'NSE') { const R = await getJSON(MAIN + 'data/scan/sector_rrg.json', 'sector_rrg').catch(() => null); if (R) src = { asof: R.asof, data: R[V.view] || {}, idx: true }; }
+  if (!src) src = { data: Object.fromEntries((G.sectors || []).filter((r) => r.rrg).map((r) => [r.sector, { pts: r.rrg.pts, now: r.rrg.now, was: r.rrg.wk4 }])) };
+  const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
+  const all = Object.entries(src.data).map(([nm, r]) => ({ nm, ...r, was: r.pts.length >= 3 ? qOf(r.pts[r.pts.length - 3]) : r.now,
+    pts: V.all || V.sel === nm ? r.pts : r.pts.slice(-4) }));
+  const shown = V.all ? all : all.filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was || r.nm === V.sel);
+  const seg = (k, opts) => `<div class="seg" style="margin:4px 0">${opts.map(([v, t]) => `<button data-rrgk="${k}" data-v="${v}" aria-selected="${String(V[k]) === String(v)}">${t}</button>`).join('')}</div>`;
+  const chips = ['Leading', 'Improving', 'Weakening', 'Lagging'].map((q) => { const L = all.filter((r) => r.now === q); return L.length ? `<div class="rrg-row"><b style="color:${RRG_Q[q]}">${q}</b> ${L.map((r) => `<button class="rrg-chip${r.nm === V.sel ? ' on' : ''}" data-rrgsel="${esc(r.nm)}" style="border-color:${RRG_Q[q]}">${esc(RRG_SHORT(r.nm))}${r.now !== r.was ? ' <small>new</small>' : ''}</button>`).join('')}</div>` : ''; }).join('');
+  box.innerHTML = `<h5 style="margin:6px 0 0">Sectors${src.idx ? ' · NSE sector indices vs Nifty 50' : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
+    ${src.idx ? seg('view', [['daily', 'Daily · 10 days'], ['weekly', 'Weekly · 8 weeks']]) : ''}${seg('all', [[false, 'Leading + Improving + movers'], [true, 'All']])}
+    ${rrgClean(shown, V.sel, 360, 340, !V.all)}<div class="rrg-chips">${chips}</div><p class="muted" style="font-size:11.5px">Tap a dot or a name to highlight its trail; tap again to clear. "All" shows dots only until you tap one. "new" = changed quadrant in the last 2 points.</p>`;
+  box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V[b.dataset.rrgk] = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; rrgMount(el, G, mk); }));
+  box.querySelectorAll('[data-rrgsel]').forEach((b) => b.addEventListener('click', () => { V.sel = V.sel === b.dataset.rrgsel ? null : b.dataset.rrgsel; rrgMount(el, G, mk); }));
+}
 function rrgRows(G, mk) { return (mk === 'NSE' && G.nse && G.nse.rows && G.nse.rows.some((r) => r.rrg) ? G.nse.rows.map((r) => ({ ...r, nm: r.basic })) : (G.rows || []).map((r) => ({ ...r, nm: r.group }))).filter((r) => r.rrg); }
 function rrgBlock(G, mk) {
   const S = (G.sectors || []).filter((r) => r.rrg); const I = rrgRows(G, mk);
-  if (!S.length && !I.length) return '';
+  if (!S.length && !I.length && mk !== 'NSE') return '';
   const order = ['Improving', 'Leading', 'Weakening', 'Lagging'];
   const moved = (r) => r.rrg.wk1 !== r.rrg.now ? ` <span class="chip" style="border-color:${RRG_Q[r.rrg.now]};color:${RRG_Q[r.rrg.now]}">new: ${r.rrg.wk1} → ${r.rrg.now}</span>` : '';
   const li = (r) => `<div class="gpsr nos" data-rrg="${esc(r.slug || '')}"><span class="gpsn">${esc(r.nm)}${moved(r)} <span class="muted">· 4 wks ago ${esc(r.rrg.wk4)}</span></span><span class="gpsv">${r.r1m != null ? `<b class="${r.r1m >= 0 ? 'up' : 'down'}">${r.r1m >= 0 ? '+' : ''}${fmt(r.r1m, 1)}%</b> <small class="muted">1 m</small>` : ''}</span></div>`;
@@ -4987,7 +5045,7 @@ function rrgBlock(G, mk) {
     return `<details class="t2-more"${q === 'Improving' || q === 'Leading' ? ' open' : ''}><summary><span style="color:${RRG_Q[q]};font-weight:700">${q}</span> <span class="muted">· ${L.length} industries${L.filter((r) => r.rrg.wk1 !== q).length ? ` · ${L.filter((r) => r.rrg.wk1 !== q).length} new this week` : ''}</span></summary><div class="mxlist">${L.slice(0, 25).map(li).join('')}</div></details>`; }).join('');
   return `<div class="card" style="margin-top:12px"><h4 style="margin:0 0 4px">Rotation · sectors and industries vs the market</h4>
     <p class="muted" style="margin:0 0 6px;font-size:12.5px">Weekly, last 8 weeks (the dot is now). Right = stronger than the market, top = getting stronger. Groups usually turn clockwise: Improving → Leading → Weakening → Lagging. Riding rotation = catching Improving → Leading.</p>
-    ${S.length ? `<h5 style="margin:6px 0 0">Sectors</h5>${rrgSVG(S, (r) => r.sector)}` : ''}
+    <div id="rrgbox" data-mk="${mk}"></div>
     <h5 style="margin:10px 0 2px">Industries by quadrant${mk === 'NSE' ? ' (NSE official)' : ''}</h5>${groups}
     <p class="muted" style="font-size:11.5px">Information only — rotation entries are not backtested yet.</p></div>`;
 }
@@ -5066,6 +5124,7 @@ async function loadMarkets() {
     el.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'sector', sec: b.dataset.s, grp: null })));
     el.querySelectorAll('[data-ig]').forEach((b) => b.addEventListener('click', () => { const g = G.rows.find((r) => r.group === b.dataset.ig); mxGo({ lvl: 'industry', sec: g ? g.sector : null, grp: b.dataset.ig }); }));
     el.querySelectorAll('[data-nb]').forEach((b) => b.addEventListener('click', () => nseIndOpen(((G.nse || {}).rows || []).find((r) => r.slug === b.dataset.nb))));
+    rrgMount(el, G, mk);
     el.querySelectorAll('[data-rrg]').forEach((b) => b.addEventListener('click', () => { const r = rrgRows(G, mk).find((x) => x.slug === b.dataset.rrg); if (r && b.dataset.rrg) wChart(b.dataset.rrg, mk, 'group_w_charts', indTv(r, mk)); }));
     return;
   }
