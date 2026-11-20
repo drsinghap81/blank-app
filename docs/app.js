@@ -5011,9 +5011,9 @@ function rrgClean(items, sel, W = 360, H = 340, tails0 = false) {
     if (tails0 === 'short' && r.nm !== sel && P.length >= 2) {
       /* 21 Nov 2026 (Amritpal: "how will I know the dots moved from where to where"): every dot gets a short faint trail -
          hollow ring = where it was 3 steps ago, line = the path, solid dot = now */
-      const S = P.slice(-3), op = on ? 0.5 : 0.12;
-      tails += `<polyline points="${S.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="${op}"/>`;
-      tails += `<circle cx="${X(S[0][1]).toFixed(1)}" cy="${Y(S[0][2]).toFixed(1)}" r="2.6" fill="none" stroke="${c}" stroke-width="1.3" opacity="${op + 0.15}"/>`;
+      const S = P.slice(-3), op = on ? 0.7 : 0.15;
+      tails += `<polyline points="${S.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="${op}"/>`;
+      tails += `<circle cx="${X(S[0][1]).toFixed(1)}" cy="${Y(S[0][2]).toFixed(1)}" r="3" fill="var(--bg,#fff)" stroke="${c}" stroke-width="1.6" opacity="${Math.min(1, op + 0.2)}"/>`;
     } else if (tails0 === true || r.nm === sel) {
       tails += `<polyline points="${P.map((p) => `${X(p[1]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(' ')}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="${r.nm === sel ? 0.95 : 0.4}"/>`;
       tails += P.slice(0, -1).map((p, k) => `<circle cx="${X(p[1]).toFixed(1)}" cy="${Y(p[2]).toFixed(1)}" r="${1.6 + k * 0.25}" fill="${c}" opacity="0.8"/>`).join('');
@@ -6518,7 +6518,7 @@ async function igMiniMap(box, G, mk) {
   const items = Object.entries(data || {}).map(([nm, r]) => ({ nm, now: r.now, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now, pts: r.pts.slice(-4) }))
     .filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was);
   if (!items.length) { m.hidden = true; return; }
-  m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 230, false);
+  m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 230, 'short');
   const go = () => { Object.assign(state.mx, { lvl: 'market', m: mk, sec: null, grp: null }); show('mk'); setTimeout(() => { const e = document.querySelector('#rrgbox'); if (e) e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1800); };
   m.addEventListener('click', go); m.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
 }
