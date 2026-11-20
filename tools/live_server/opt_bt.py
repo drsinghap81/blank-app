@@ -15,11 +15,13 @@ Rules (exactly the basket checked live on 18 Nov):
   the 20 SMA (held overnight), on 5- and 15-minute bars.
   BB: also split by the signal candle closing above the option's upper Bollinger band (20, 2).
   sector: CE/PE kept only if the stock's sector (average day % of its other F&O stocks, from put-call parity) agrees.
+  Pulse (20 Nov 2026, Amritpal: "put buys should be on low-strength stocks and vice versa"): each stock trade carries its NSE
+  industry's Pulse rank (0-1 across industries) as of the PREVIOUS session (data/research/nse_pulse_daily.json, built on GitHub).
   PCR: each trade also carries the stock's PCR quintile from the previous session (data/scan/pcr_hist.json) to see if it adds value.
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 6                     # bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
+VERSION = 7                     # 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import gzip
 import json
 import os
@@ -258,8 +260,26 @@ class OptBT:
                     t["pcrq"] = H[prev[-1]].get(t["s"]) if prev else None
             except Exception as ex:  # noqa: BLE001
                 self.log("optbt_pcr_error", error=str(ex)[:120])
+            try:                                                   # Pulse rank of the stock's NSE industry, previous session
+                PH = pulse_hist(); pd_ = sorted(PH)
+                for t in trades:
+                    prev = [x for x in pd_ if x < t["d"]]
+                    t["pulse"] = None if t["idx"] or not prev else PH[prev[-1]].get(t["s"])
+            except Exception as ex:  # noqa: BLE001
+                self.log("optbt_pulse_error", error=str(ex)[:120])
             json.dump(trades, gzip.open(os.path.join(self.dir, "trades.json.gz"), "wt"))
             res = summarise([t for t in trades if not t.get("wk") and not t.get("sx")])
+            try:
+                M = [t for t in trades if not t.get("wk") and not t.get("sx")]
+                up = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] > 0 and t["bn"] > 0      # noqa: E731
+                dn = lambda t: t["nf"] is not None and t["bn"] is not None and t["nf"] < 0 and t["bn"] < 0      # noqa: E731
+                F = [t for t in M if (t["side"] == "CE" and up(t)) or (t["side"] == "PE" and dn(t))]
+                paper = [dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30")
+                         and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]
+                res["Pulse"] = pulse_rows(F, paper)
+                res["Pulse"]["trades with Pulse"] = sum(t.get("pulse") is not None for t in F)
+            except Exception as ex:  # noqa: BLE001
+                res["Pulse"] = dict(error=str(ex)[:200])
             res["NIFTY monthly vs weekly"] = nifty_weekly([t for t in trades if t["s"] == "NIFTY" and not t.get("wk")], [t for t in trades if t.get("wk")])
             res["SENSEX debug"] = getattr(self, "sx_debug", None)
             res["SENSEX monthly vs weekly"] = nifty_weekly([t for t in trades if t.get("sx") == "monthly"], [t for t in trades if t.get("sx") == "weekly"])
@@ -484,6 +504,31 @@ def entry_sim(o, h, l, c, i, last, limit=None, tgt_r=3.0, trail=None):
         if h[k] >= tg:
             return e, risk, "target", tg, k, f
     return e, risk, "close", c[last], last, f
+
+
+def pulse_hist():
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "research", "nse_pulse_daily.json")
+    try:
+        return json.load(open(p))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def pulse_rows(F, paper):
+    """20 Nov 2026: Pulse slices. agrees = CE on a strong-Pulse stock (top 25% of industries) / PE on a weak one (bottom 25%);
+    'leans' = CE above the middle / PE below it; against = the opposite. Indices have no Pulse and are shown apart."""
+    ag = lambda t, lo, hi: t.get("pulse") is not None and ((t["side"] == "CE" and t["pulse"] >= hi) or (t["side"] == "PE" and t["pulse"] <= lo))  # noqa: E731
+    out = {}
+    for nm, X in (("basket 1:3", F), ("paper-trader rules", paper)):
+        out[f"{nm} + Pulse agrees (CE top 25%, PE bottom 25%)"] = _agg([t for t in X if ag(t, 0.25, 0.75)])
+        out[f"{nm} + Pulse leans the right way (CE top half, PE bottom half)"] = _agg([t for t in X if ag(t, 0.5, 0.5)])
+        out[f"{nm} + Pulse AGAINST (CE bottom half, PE top half)"] = _agg([t for t in X if t.get("pulse") is not None and not ag(t, 0.5, 0.5)])
+        out[f"{nm}, stocks without Pulse (indices / unmapped)"] = _agg([t for t in X if t.get("pulse") is None])
+        out[f"{nm}, PE + Pulse bottom half"] = _agg([t for t in X if t["side"] == "PE" and t.get("pulse") is not None and t["pulse"] <= 0.5])
+        out[f"{nm}, PE + Pulse top half"] = _agg([t for t in X if t["side"] == "PE" and t.get("pulse") is not None and t["pulse"] > 0.5])
+        out[f"{nm}, CE + Pulse top half"] = _agg([t for t in X if t["side"] == "CE" and t.get("pulse") is not None and t["pulse"] >= 0.5])
+        out[f"{nm}, CE + Pulse bottom half"] = _agg([t for t in X if t["side"] == "CE" and t.get("pulse") is not None and t["pulse"] < 0.5])
+    return out
 
 
 def sector_map():
