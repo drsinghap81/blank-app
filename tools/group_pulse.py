@@ -73,16 +73,17 @@ def download(tickers):
     retry the tickers that came back empty (up to 3 more passes, longer waits)."""
     out = {}
 
-    def grab(ts):
+    def grab(ts, period="3y", into=None):
+        into = out if into is None else into
         for a in range(0, len(ts), 200):
             ch = ts[a:a + 200]
             try:
-                d = yf.download(ch, period="3y", interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
+                d = yf.download(ch, period=period, interval="1d", auto_adjust=True, progress=False, group_by="column", threads=True)
                 for t in ch:
                     try:
                         x = pd.DataFrame({"c": d["Close"][t], "v": d["Volume"][t], "o": d["Open"][t], "h": d["High"][t], "l": d["Low"][t]}).dropna(subset=["c"])   # 20 Nov 2026: Yahoo left volume blank on 19 Nov for most NSE / LSE stocks; keep the price
                         if len(x):
-                            out[t] = x
+                            into[t] = x
                     except Exception:  # noqa: BLE001
                         pass
             except Exception as e:  # noqa: BLE001
@@ -94,7 +95,14 @@ def download(tickers):
         if len(miss) < max(5, 0.02 * len(tickers)):
             break
         print(f"retry pass {k + 1}: {len(miss)} missing, waiting {wait}s", flush=True); time.sleep(wait); grab(miss)
-    print("downloaded", len(out), "of", len(tickers), flush=True)
+    # 20 Nov 2026: Yahoo's 3-year daily history can lack the most recent session (19 Nov was missing for ~3/4 of NSE and all
+    # sampled LSE stocks while a 10-day request had it) -> top up the last 10 days from a short request
+    rec = {}
+    grab([t for t in tickers if t in out], "10d", rec)
+    filled = 0
+    for t, x in rec.items():
+        before = len(out[t]); out[t] = out[t].combine_first(x); filled += len(out[t]) > before
+    print("downloaded", len(out), "of", len(tickers), "recent days topped up for", filled, flush=True)
     return out
 
 
