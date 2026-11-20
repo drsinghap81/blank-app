@@ -42,6 +42,9 @@ def report(eq):
     r = eq.pct_change().dropna(); b = bull.reindex(r.index).fillna(False)
     ann = lambda x: round(((1 + x).prod() ** (252 / max(1, len(x))) - 1) * 100, 1)  # noqa: E731
     out["bull days a year"] = ann(r[b]); out["bear days a year"] = ann(r[~b]); out["bear share of days"] = round((~b).mean() * 100)
+    cov = (r.index >= "2020-02-15") & (r.index <= "2020-12-31")      # Covid crash + rebound treated as an exception
+    rx = r[~cov]; eqx = (1 + rx).cumprod()
+    out["ex-Covid a year"] = ann(rx); out["ex-Covid max drawdown"] = round(float((eqx / eqx.cummax() - 1).min()) * 100, 1)
     return out
 
 
