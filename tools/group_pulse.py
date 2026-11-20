@@ -115,6 +115,33 @@ def top_liquid(use, C, V, n=10):
     return [[x, round(float(C[x].iloc[-1]), 2)] for x in val.index[:n] if pd.notna(C[x].iloc[-1])]
 
 
+QUAD = lambda x, y: "Leading" if x >= 100 and y >= 100 else "Weakening" if x >= 100 else "Lagging" if y < 100 else "Improving"  # noqa: E731
+
+
+def rrg(gi, bench, weeks=8):
+    """20 Nov 2026 (Amritpal: track how sectors / industries rotate, to ride short-term rallies): relative rotation, weekly.
+    RS = index / benchmark; RS-ratio = 100 x RS / its 10-week average (above 100 = stronger than its own recent relative trend);
+    RS-momentum = 100 x RS-ratio / RS-ratio 1 week ago, smoothed over 3 weeks (above 100 = relative strength improving).
+    Quadrants: Leading (ratio >= 100, momentum >= 100), Weakening (>= 100, < 100), Lagging (< 100, < 100), Improving (< 100, >= 100).
+    Returns the last `weeks` weekly points [[date, ratio, momentum], ...] and the quadrant now and a week / 4 weeks ago."""
+    if bench is None:
+        return None
+    x = pd.concat([gi, bench], axis=1).dropna()
+    if len(x) < 120:
+        return None
+    w = x.resample("W-FRI").last().dropna()
+    if w.index[-1] > x.index[-1]:
+        w.index = list(w.index[:-1]) + [x.index[-1]]
+    rs = 100 * w.iloc[:, 0] / w.iloc[:, 1]
+    ratio = 100 * rs / rs.rolling(10).mean()
+    mom = (100 * ratio / ratio.shift(1)).rolling(3).mean()
+    pts = pd.concat([ratio, mom], axis=1).dropna().iloc[-weeks:]
+    if len(pts) < 5:
+        return None
+    P = [[str(i.date()), round(float(a), 2), round(float(b), 2)] for i, (a, b) in pts.iterrows()]
+    return dict(pts=P, now=QUAD(P[-1][1], P[-1][2]), wk1=QUAD(P[-2][1], P[-2][2]), wk4=QUAD(P[-5][1], P[-5][2]))
+
+
 def ath_month(gi):
     """20 Nov 2026 (Amritpal: industries in the ATH list): the industry index CLOSED last month above its highest close before that
     month, and today's close is above last month's highest close. Industry indices go back ~3 years (the download window), so the
@@ -189,7 +216,7 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None, S1=None):
             json.dump(dict(name=bas, **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
             r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
             e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
-            r["lift_days"] = lift_days(gi, e9); r["ath_m"] = ath_month(gi)
+            r["lift_days"] = lift_days(gi, e9); r["ath_m"] = ath_month(gi); r["rrg"] = rrg(gi, BENCH.get("b"))
         except Exception as e:  # noqa: BLE001
             print("nse w fail", bas, e); r["w"] = None
         out.append(r)
@@ -285,6 +312,9 @@ def fill_gaps(data, mkt):
         print("gap", str(d)[:10], "missing", len(miss), "filled", got, flush=True)
 
 
+BENCH = {}
+
+
 def main(mkt):
     cf = CFG[mkt]; u = universe(mkt)
     tick = {s: (s.replace("/", "-").replace(".", "-") if mkt == "US" else s) + cf["suf"] for s in u.symbol}
@@ -306,7 +336,7 @@ def main(mkt):
     C = drop_partial(C, {"NSE": "NSE", "US": "US", "ASX": "ASX", "UK": "UK"}[mkt]); V = V.reindex(C.index)
     # 20 Nov 2026: opens / highs / lows too, so industry charts can be real candles
     OHL = {k: pd.DataFrame({s: data[t][k] for s, t in tick.items() if t in data and len(data[t]) > 160}).reindex(C.index) for k in ("o", "h", "l")}
-    B = B.reindex(C.index).ffill()
+    B = B.reindex(C.index).ffill(); BENCH["b"] = B
     liq = ((C * V).rolling(60, min_periods=40).median() >= cf["minval"]) & (C >= cf["minpx"])
     rpi = lambda k: 100 * (C / C.shift(k)).div(B / B.shift(k), axis=0)
     r2, r3, r6 = rpi(10), rpi(63), rpi(126); w = (r2 + r3 + r6) / 3
@@ -375,7 +405,7 @@ def main(mkt):
             json.dump(dict(name=r["group"], **j), open(cf["out"] + f"group_w_charts/{sl}.json", "w"), separators=(",", ":"))
             r["w"] = {k: wl.get(k) for k in ("status", "stage", "broke_on", "days_ago", "since", "line_now", "dist_pct")} if wl and (wl["status"] == "forming" or wl.get("days_ago", 99) <= 5) else None
             e9 = gi.ewm(span=9, adjust=False).mean(); r["above_e9"] = bool(gi.iloc[-1] > e9.iloc[-1] and e9.iloc[-1] > e9.iloc[-4])
-            r["lift_days"] = lift_days(gi, e9); r["ath_m"] = ath_month(gi)
+            r["lift_days"] = lift_days(gi, e9); r["ath_m"] = ath_month(gi); r["rrg"] = rrg(gi, BENCH.get("b"))
         except Exception as e:  # noqa: BLE001
             print("group w fail", r["group"], e); r["w"] = None
     secof = dict(zip(u.symbol, u.sector))
@@ -393,7 +423,9 @@ def main(mkt):
         gi = (1 + ret[ss].iloc[-N:].mean(axis=1).fillna(0)).cumprod(); gi = gi / gi.iloc[0] * 100
         charts.setdefault("sectors", {})[sec] = dict(idx=[round(float(v), 2) for v in gi],
                                                      pulse=[None if np.isnan(v) else round(float(v), 1) for v in (p21[ss].iloc[-N:].mean(axis=1) * 100)])
+        gfull = (1 + ret[ss].mean(axis=1).fillna(0)).cumprod() * 100
         sectors.append(dict(sector=sec, n=len(ss), groups=sum(r["sector"] == sec for r in rows), p1w=p(s1w), p1m=p(s1m), p1q=p(s1q), p1m_prev=p(s1m_prev),
+                            rrg=rrg(gfull, B), r1m=round(float(gfull.iloc[-1] / gfull.iloc[-22] - 1) * 100, 1),
                             rs1m=round(float(np.nanmean(r1[ss].iloc[-1])) * 100, 1), rs3m=round(float(np.nanmean(r3[ss].iloc[-1])) * 100, 1),
                             trending_now=int(sum(bool(tr[x].iloc[-1]) for x in ss))))
     sectors.sort(key=lambda r: -r["p1m"])
