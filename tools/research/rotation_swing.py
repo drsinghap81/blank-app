@@ -22,7 +22,9 @@ sys.path.insert(0, "tools/research")
 import industry_basket_intraday as B  # noqa: E402
 
 IND, SYMS = B.IND, B.SYMS
-COST, SLOTS = 0.002, 5
+import os  # noqa: E402
+COST, SLOTS, DELAY = float(os.environ.get("COST", "0.002")), int(os.environ.get("SLOTS", "5")), int(os.environ.get("DELAY", "0"))
+ONLY = os.environ.get("ONLY", "")
 
 
 def daily():
@@ -69,6 +71,8 @@ SIG = {
 
 
 def run(name, ent, ex):
+    if DELAY:                        # act one day after the signal (buy / sell at the next close)
+        ent, ex = ent.shift(DELAY).fillna(False).astype(bool), ex.shift(DELAY).fillna(False).astype(bool)
     days = I.index[I.index >= start]
     held = {}; trades = []; daily = []
     for t, d in enumerate(days[:-1]):
@@ -100,7 +104,9 @@ def run(name, ent, ex):
 
 print("R| industries", I.shape[1], "from", start.date(), "to", I.index[-1].date(), flush=True)
 for nm, (ent, ex) in SIG.items():
-    run(nm, ent.fillna(False), ex.fillna(False))
+    if ONLY and not nm.startswith(ONLY):
+        continue
+    run(f"{nm} [cost {COST * 100:.1f}%, {SLOTS} slots, delay {DELAY}d]", ent.fillna(False), ex.fillna(False))
 s = R.loc[start:].mean(axis=1); eq = (1 + s).cumprod(); yrs = (s.index[-1] - s.index[0]).days / 365.25
 print(f"R| BENCHMARK all industries equal weight: CAGR {(eq.iloc[-1] ** (1 / yrs) - 1) * 100:+.1f}%, max drawdown {(eq / eq.cummax() - 1).min() * 100:.1f}%")
 s = nifty.loc[start:].pct_change().dropna(); eq = (1 + s).cumprod()
