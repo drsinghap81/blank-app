@@ -1,0 +1,43 @@
+/home/runner/work/blank-app/blank-app/tools/global_universe.py:80: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  d = d[~d.name.str.contains(bad, regex=True)]
+US universe 5888
+
+1 Failed download:
+['ACB']: OperationalError('database is locked')
+US 200 downloaded, 172 liquid
+US 400 downloaded, 347 liquid
+US 600 downloaded, 513 liquid
+US 800 downloaded, 695 liquid
+US 1000 downloaded, 874 liquid
+US 1200 downloaded, 1043 liquid
+US 1400 downloaded, 1216 liquid
+US 1600 downloaded, 1393 liquid
+US 1800 downloaded, 1567 liquid
+US 2000 downloaded, 1738 liquid
+US 2200 downloaded, 1915 liquid
+US 2400 downloaded, 2087 liquid
+US 2600 downloaded, 2262 liquid
+US 2800 downloaded, 2438 liquid
+US 3000 downloaded, 2613 liquid
+US 3200 downloaded, 2792 liquid
+US 3400 downloaded, 2968 liquid
+US 3600 downloaded, 3155 liquid
+US 3800 downloaded, 3340 liquid
+US 4000 downloaded, 3521 liquid
+US 4200 downloaded, 3702 liquid
+US 4400 downloaded, 3868 liquid
+US 4600 downloaded, 4045 liquid
+US 4800 downloaded, 4218 liquid
+US 5000 downloaded, 4388 liquid
+US 5200 downloaded, 4569 liquid
+US 5400 downloaded, 4739 liquid
+US 5600 downloaded, 4927 liquid
+US 5800 downloaded, 5109 liquid
+US 5888 downloaded, 5187 liquid
+signals 15871 rows 11350188
+{'seed': 0, 'cagr': np.float64(7.2), 'maxdd': np.float64(-21.6), 'cagr_17_21': np.float64(13.1), 'cagr_22_26': np.float64(1.5), 'dd_22_26': np.float64(-19.1), 'trades': 770, 'win': 36, 'pf': np.float64(1.25), 'years': {'2017': 24.2, '2018': 12.5, '2019': 21.8, '2020': -1.6, '2021': 11.4, '2022': -7.1, '2023': 9.0, '2024': 5.8, '2025': -11.2, '2026': 12.8}}
+{'seed': 1, 'cagr': np.float64(4.7), 'maxdd': np.float64(-21.7), 'cagr_17_21': np.float64(9.7), 'cagr_22_26': np.float64(-0.1), 'dd_22_26': np.float64(-18.1), 'trades': 771, 'win': 35, 'pf': np.float64(1.17), 'years': {'2017': 19.1, '2018': -2.5, '2019': 10.9, '2020': -7.7, '2021': 34.2, '2022': -6.9, '2023': 7.7, '2024': 11.0, '2025': -0.9, '2026': -10.1}}
+{'seed': 2, 'cagr': np.float64(7.8), 'maxdd': np.float64(-30.4), 'cagr_17_21': np.float64(21.6), 'cagr_22_26': np.float64(-4.8), 'dd_22_26': np.float64(-30.4), 'trades': 755, 'win': 38, 'pf': np.float64(1.21), 'years': {'2017': 18.9, '2018': 10.6, '2019': 24.8, '2020': 38.3, '2021': 17.4, '2022': -1.7, '2023': 7.9, '2024': -1.8, '2025': -16.1, '2026': -9.9}}
+{'seed': 3, 'cagr': np.float64(6.3), 'maxdd': np.float64(-39.7), 'cagr_17_21': np.float64(22.4), 'cagr_22_26': np.float64(-7.9), 'dd_22_26': np.float64(-39.7), 'trades': 803, 'win': 35, 'pf': np.float64(1.15), 'years': {'2017': 32.4, '2018': 14.4, '2019': 25.9, '2020': 25.2, '2021': 15.6, '2022': 4.9, '2023': -3.2, '2024': 1.2, '2025': -13.2, '2026': -25.1}}
+{'seed': 4, 'cagr': np.float64(5.1), 'maxdd': np.float64(-29.1), 'cagr_17_21': np.float64(14.4), 'cagr_22_26': np.float64(-3.5), 'dd_22_26': np.float64(-29.1), 'trades': 762, 'win': 35, 'pf': np.float64(1.14), 'years': {'2017': 30.7, '2018': -2.8, '2019': 25.5, '2020': -5.9, '2021': 30.7, '2022': -12.9, '2023': 12.7, '2024': -7.6, '2025': -10.1, '2026': 3.1}}
+{"cagr": 6.3, "maxdd": -29.1, "cagr_17_21": 14.4, "cagr_22_26": -3.5, "pf": 1.17, "trades": 770.0, "win": 35.0} {"name": "S&P 500 (SPY)", "cagr": 13.7, "maxdd": -33.7, "cagr_22_26": 9.2}
