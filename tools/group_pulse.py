@@ -201,6 +201,35 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None, S1=None):
     return dict(asof=js.get("asof"), rows=out)
 
 
+def nasdaq_fill(data, miss, d, threads=12):
+    """20 Nov 2026 (Amritpal: "data should be latest - take it from another source than Yahoo"): fill session d for US tickers
+    from Nasdaq's own daily bars (api.nasdaq.com historical, one request per ticker, 12 at a time)."""
+    import requests
+    from concurrent.futures import ThreadPoolExecutor
+    H = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36", "Accept": "application/json"}
+    ds = pd.Timestamp(d).strftime("%m/%d/%Y"); f0 = (pd.Timestamp(d) - pd.Timedelta(days=7)).strftime("%Y-%m-%d")
+    num = lambda v: float(str(v).replace("$", "").replace(",", "")) if v not in (None, "", "N/A") else float("nan")  # noqa: E731
+
+    def one(t):
+        for cls in ("stocks", "etf"):
+            try:
+                r = requests.get(f"https://api.nasdaq.com/api/quote/{t.replace('-', '.')}/historical?assetclass={cls}&fromdate={f0}&limit=15",
+                                 headers=H, timeout=20)
+                rows = (((r.json() or {}).get("data") or {}).get("tradesTable") or {}).get("rows") or []
+                x = next((x for x in rows if x.get("date") == ds), None)
+                if x:
+                    return t, dict(c=num(x["close"]), v=num(x["volume"]), o=num(x["open"]), h=num(x["high"]), l=num(x["low"]))
+            except Exception:  # noqa: BLE001
+                pass
+        return t, None
+    got = 0
+    with ThreadPoolExecutor(threads) as ex:
+        for t, row in ex.map(one, miss):
+            if row and row["c"] == row["c"]:
+                data[t].loc[pd.Timestamp(d)] = row; data[t] = data[t].sort_index(); got += 1
+    return got
+
+
 def fill_gaps(data, mkt):
     """20 Nov 2026: Yahoo was missing 19 Nov for ~70% of NSE stocks (even one at a time) and, in batched requests, for every LSE
     stock. For each of the last 8 sessions that most series lack: NSE -> fill from NSE's own CM bhavcopy (UDiFF);
@@ -237,6 +266,8 @@ def fill_gaps(data, mkt):
                     data[t].loc[pd.Timestamp(d)] = dict(c=float(b["ClsPric"]), v=float(b["TtlTradgVol"]), o=float(b["OpnPric"]),
                                                         h=float(b["HghPric"]), l=float(b["LwPric"]))
                     data[t] = data[t].sort_index(); got += 1
+        elif mkt == "US":
+            got = nasdaq_fill(data, miss, d)
         elif len(miss) > 400:
             print("gap", str(d)[:10], len(miss), "missing - too many to fetch one by one; the day is skipped until Yahoo has it", flush=True); continue
         else:
