@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-20 22:24 UTC",
+"generated": "2026-11-21 00:10 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-20",
@@ -282,7 +282,7 @@
 "group_rank": 7,
 "rank": 5,
 "risk_pct": 24.0,
-"r3m": 28.4
+"r3m": null
 },
 {
 "id": "ATH-TECHM-2026-10-22",
