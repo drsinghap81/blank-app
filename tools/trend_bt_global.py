@@ -61,9 +61,13 @@ def features(sym, o, h, l, c, v, minval):
     n = np.arange(len(x))
     sig = ((e9 > e21) & (e9.shift(1) <= e21.shift(1)) & (st == 1) & (cc > e50) & (e50 > e50.shift(10)) & (rsi >= 55)
            & (val >= minval) & (n >= 120) & (cc >= 0.7 * hi))
+    # 22 Nov 2026 (Amritpal: "if we release the 50 rising condition will it impact the backtest?"): research variants, same rules
+    # minus the 50-day EMA rising (sig_ne50) / minus both 50-day rules (sig_no50). The live signal 'sig' is unchanged.
+    base = ((e9 > e21) & (e9.shift(1) <= e21.shift(1)) & (st == 1) & (rsi >= 55) & (val >= minval) & (n >= 120) & (cc >= 0.7 * hi))
+    sig_ne50 = base & (cc > e50); sig_no50 = base
     return pd.DataFrame({"Date": x.index, "SYMBOL": sym, "OPEN": x.OPEN.values, "HIGH": x.HIGH.values, "LOW": x.LOW.values,
                          "CLOSE": cc.values, "st": st, "low5": x.LOW.rolling(5).min().values, "val": val.values,
-                         "sig": sig.values}).astype({"OPEN": "float32", "HIGH": "float32", "LOW": "float32", "CLOSE": "float32",
+                         "sig": sig.values, "sig_ne50": sig_ne50.values, "sig_no50": sig_no50.values}).astype({"OPEN": "float32", "HIGH": "float32", "LOW": "float32", "CLOSE": "float32",
                                                      "low5": "float32", "val": "float32"})
 
 
