@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-21 00:10 UTC",
+"generated": "2026-11-21 03:16 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-20",
@@ -127,7 +127,7 @@
 "theme_pct": 90.0,
 "group": "Capital Markets",
 "lane": "build",
-"group_pulse": 39.2,
+"group_pulse": 39.7,
 "group_rank": 8,
 "rank": 1,
 "risk_pct": 12.0,
@@ -203,8 +203,8 @@
 "theme_pct": 52.0,
 "group": "Diagnostics & Research",
 "lane": "hold",
-"group_pulse": 25.9,
-"group_rank": 20,
+"group_pulse": 27.9,
+"group_rank": 19,
 "rank": 3,
 "risk_pct": 12.9,
 "r3m": 6.6
@@ -241,7 +241,7 @@
 "theme_pct": 52.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 26.4,
+"group_pulse": 28.0,
 "group_rank": 18,
 "rank": 4,
 "risk_pct": 8.5,
@@ -277,12 +277,12 @@
 "sector_pct": 81.0,
 "theme_pct": null,
 "group": "Banks - Private Mid & Small",
-"lane": "hold",
-"group_pulse": 40.1,
+"lane": "build",
+"group_pulse": 42.1,
 "group_rank": 7,
 "rank": 5,
 "risk_pct": 24.0,
-"r3m": null
+"r3m": 28.4
 },
 {
 "id": "ATH-TECHM-2026-10-22",
@@ -316,8 +316,8 @@
 "theme_pct": 85.0,
 "group": "Information Technology Services",
 "lane": "weak",
-"group_pulse": 25.9,
-"group_rank": 19,
+"group_pulse": 25.2,
+"group_rank": 25,
 "rank": 6,
 "risk_pct": 12.3,
 "r3m": 10.7
@@ -429,8 +429,8 @@
 "theme_pct": null,
 "group": "Household & Personal Products",
 "lane": "bounce",
-"group_pulse": 17.1,
-"group_rank": 39,
+"group_pulse": 17.5,
+"group_rank": 38,
 "rank": 9,
 "risk_pct": 20.9,
 "r3m": 10.9
@@ -466,7 +466,7 @@
 "theme_pct": 47.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 26.4,
+"group_pulse": 28.0,
 "group_rank": 18,
 "rank": 10,
 "risk_pct": 13.2,
@@ -507,7 +507,7 @@
 "theme_pct": 87.0,
 "group": "Lodging",
 "lane": "build",
-"group_pulse": 41.7,
+"group_pulse": 43.5,
 "group_rank": 6,
 "rank": 1,
 "risk_pct": 8.0,
@@ -545,7 +545,7 @@
 "theme_pct": 47.0,
 "group": "Auto Parts",
 "lane": "hold",
-"group_pulse": 25.0,
+"group_pulse": 26.4,
 "group_rank": 22,
 "rank": 2,
 "risk_pct": 10.7,
@@ -583,8 +583,8 @@
 "theme_pct": null,
 "group": "Medical Instruments & Supplies",
 "lane": "hold",
-"group_pulse": 35.7,
-"group_rank": 10,
+"group_pulse": 38.1,
+"group_rank": 9,
 "rank": 3,
 "risk_pct": 6.2,
 "r3m": 10.3
@@ -616,8 +616,8 @@
 "td_score": null,
 "group": "Aerospace & Defense",
 "lane": "hold",
-"group_pulse": 20.1,
-"group_rank": 32,
+"group_pulse": 19.8,
+"group_rank": 35,
 "rank": 1,
 "risk_pct": 7.8,
 "r3m": 10.7
@@ -633,7 +633,7 @@
 "when": "next open",
 "side": "BUY",
 "price": 2498.94,
-"ref": 2474.199951171875,
+"ref": 2474.2,
 "stop": 2302.09,
 "target": 3089.49,
 "exit_rule": "3R target 3089.49 or the stop, max 120 days (as tested)",
@@ -649,8 +649,8 @@
 "td_score": null,
 "group": "Farm & Heavy Construction Machinery",
 "lane": "hold",
-"group_pulse": 20.0,
-"group_rank": 33,
+"group_pulse": 21.0,
+"group_rank": 32,
 "rank": 2,
 "risk_pct": 8.6,
 "r3m": 14.0
@@ -682,8 +682,8 @@
 "td_score": null,
 "group": "Luxury Goods",
 "lane": "hold",
-"group_pulse": 28.6,
-"group_rank": 16,
+"group_pulse": 27.2,
+"group_rank": 20,
 "rank": 3,
 "risk_pct": 11.4,
 "r3m": 7.7
@@ -715,7 +715,7 @@
 "td_score": null,
 "group": "Financial Data & Stock Exchanges",
 "lane": "hold",
-"group_pulse": 27.6,
+"group_pulse": 28.6,
 "group_rank": 17,
 "rank": 4,
 "risk_pct": 9.7,
@@ -732,7 +732,7 @@
 "when": "next open",
 "side": "BUY",
 "price": 373.8,
-"ref": 370.1000061035156,
+"ref": 370.1,
 "stop": 339.46,
 "target": 476.82,
 "exit_rule": "3R target 476.82 or the stop, max 120 days (as tested)",
@@ -748,8 +748,8 @@
 "td_score": null,
 "group": "Steel",
 "lane": "hold",
-"group_pulse": 12.9,
-"group_rank": 45,
+"group_pulse": 12.8,
+"group_rank": 47,
 "rank": 5,
 "risk_pct": 10.1,
 "r3m": 3.7
@@ -781,7 +781,7 @@
 "td_score": null,
 "group": "Metal Fabrication",
 "lane": "hold",
-"group_pulse": 25.8,
+"group_pulse": 26.6,
 "group_rank": 21,
 "rank": 6,
 "risk_pct": 7.6,
@@ -819,8 +819,8 @@
 "theme_pct": 71.0,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 45.7,
-"group_rank": 4,
+"group_pulse": 47.6,
+"group_rank": 3,
 "rank": 4,
 "risk_pct": 8.9,
 "r3m": 17.0
@@ -857,8 +857,8 @@
 "theme_pct": 42.0,
 "group": "Credit Services",
 "lane": "mid",
-"group_pulse": 16.4,
-"group_rank": 41,
+"group_pulse": 16.8,
+"group_rank": 40,
 "rank": 5,
 "risk_pct": 9.7,
 "r3m": 5.1
@@ -889,8 +889,8 @@
 "td_score": null,
 "group": "Banks - Private Large",
 "lane": "mid",
-"group_pulse": 45.7,
-"group_rank": 4,
+"group_pulse": 47.6,
+"group_rank": 3,
 "rank": 1,
 "risk_pct": 9.6,
 "r3m": 17.1
@@ -922,8 +922,8 @@
 "td_score": null,
 "group": "Credit Services",
 "lane": "mid",
-"group_pulse": 16.4,
-"group_rank": 41,
+"group_pulse": 16.8,
+"group_rank": 40,
 "rank": 7,
 "risk_pct": 10.8,
 "r3m": 17.2
@@ -939,7 +939,7 @@
 "when": "next open",
 "side": "BUY",
 "price": 1920.82,
-"ref": 1901.800048828125,
+"ref": 1901.8,
 "stop": 1747.24,
 "target": 2441.56,
 "exit_rule": "3R target 2441.56 or the stop, max 120 days (as tested)",
@@ -1041,6 +1041,18 @@
 "group_rank": 6
 },
 {
+"symbol": "CSBBANK",
+"name": "CSB Bank Limited",
+"typ": "DB",
+"close": 316.25,
+"neck": 321.29998779296875,
+"stop": 291.11,
+"signal_date": "2026-11-17",
+"group": "Banks - Private Mid & Small",
+"lane": "build",
+"group_rank": 7
+},
+{
 "symbol": "EIHOTEL",
 "name": "EIH Limited",
 "typ": "DB",
@@ -1065,16 +1077,16 @@
 "group_rank": 46
 },
 {
-"symbol": "CSBBANK",
-"name": "CSB Bank Limited",
+"symbol": "HAVELLS",
+"name": "Havells India Limited",
 "typ": "DB",
-"close": 316.25,
-"neck": 321.29998779296875,
-"stop": 291.11,
-"signal_date": "2026-11-17",
-"group": "Banks - Private Mid & Small",
-"lane": "hold",
-"group_rank": 7
+"close": 1211.0,
+"neck": 1121.0,
+"stop": 989.21,
+"signal_date": "2026-11-06",
+"group": "Electrical Equipment & Parts",
+"lane": "mid",
+"group_rank": 63
 },
 {
 "symbol": "TATACHEM",
@@ -1085,20 +1097,8 @@
 "stop": 564.35,
 "signal_date": "2026-11-17",
 "group": "Chemicals",
-"lane": "hold",
-"group_rank": 54
-},
-{
-"symbol": "HAVELLS",
-"name": "Havells India Limited",
-"typ": "DB",
-"close": 1211.0,
-"neck": 1121.0,
-"stop": 989.21,
-"signal_date": "2026-11-06",
-"group": "Electrical Equipment & Parts",
 "lane": "mid",
-"group_rank": 62
+"group_rank": 54
 },
 {
 "symbol": "BLUESTARCO",
@@ -1110,7 +1110,7 @@
 "signal_date": "2026-11-19",
 "group": "Building Products & Equipment",
 "lane": "mid",
-"group_rank": 52
+"group_rank": 55
 },
 {
 "symbol": "FORTIS",
@@ -1122,7 +1122,7 @@
 "signal_date": "2026-11-20",
 "group": "Medical Care Facilities",
 "lane": "mid",
-"group_rank": 59
+"group_rank": 60
 },
 {
 "symbol": "ICICIGI",
@@ -1146,7 +1146,7 @@
 "signal_date": "2026-11-09",
 "group": "Oil & Gas Refining & Marketing",
 "lane": "fade",
-"group_rank": 38
+"group_rank": 39
 },
 {
 "symbol": "SBILIFE",
@@ -1158,7 +1158,7 @@
 "signal_date": "2026-11-06",
 "group": "Insurance - Life",
 "lane": "weak",
-"group_rank": 73
+"group_rank": 72
 },
 {
 "symbol": "KPITTECH",
@@ -1170,31 +1170,31 @@
 "signal_date": "2026-11-12",
 "group": "Software - Application",
 "lane": "weak",
-"group_rank": 40
+"group_rank": 42
 },
 {
 "symbol": "IVALUE",
 "name": "Ivalue Infosolutions Limited",
 "typ": "TW",
-"close": 235.52000427246094,
+"close": 235.52,
 "neck": 221.0399932861328,
 "stop": 181.66,
 "signal_date": "2026-11-16",
 "group": "Information Technology Services",
 "lane": "weak",
-"group_rank": 19
+"group_rank": 25
 },
 {
 "symbol": "SRM",
 "name": "SRM Contractors Limited",
 "typ": "TW",
-"close": 424.29998779296875,
+"close": 424.3,
 "neck": 420.45001220703125,
 "stop": 341.55,
 "signal_date": "2026-11-16",
 "group": "Engineering & Construction",
 "lane": "weak",
-"group_rank": 51
+"group_rank": 52
 },
 {
 "symbol": "INDIASHLTR",
@@ -1206,19 +1206,19 @@
 "signal_date": "2026-11-18",
 "group": "Mortgage Finance",
 "lane": "weak",
-"group_rank": 65
+"group_rank": 64
 },
 {
 "symbol": "KSCL",
 "name": "Kaveri Seed Company Limited",
 "typ": "DB",
-"close": 710.2000122070312,
+"close": 710.2,
 "neck": 735.0,
 "stop": 643.65,
 "signal_date": "2026-11-18",
 "group": "Agricultural Inputs",
 "lane": "weak",
-"group_rank": 57
+"group_rank": 58
 },
 {
 "symbol": "ASHAPURMIN",
@@ -1230,7 +1230,7 @@
 "signal_date": "2026-11-20",
 "group": "Other Industrial Metals & Mining",
 "lane": "weak",
-"group_rank": 72
+"group_rank": 76
 }
 ],
 "watch": [
@@ -1262,7 +1262,7 @@
 "theme_pct": 32.0,
 "group": "Lodging",
 "lane": "build",
-"group_pulse": 41.7,
+"group_pulse": 43.5,
 "group_rank": 6
 },
 {
@@ -1293,8 +1293,8 @@
 "theme_pct": null,
 "group": "Electronics & Computer Distribution",
 "lane": "build",
-"group_pulse": 52.4,
-"group_rank": 2
+"group_pulse": 47.6,
+"group_rank": 4
 },
 {
 "id": "WATCH-MANOMAY",
@@ -1324,8 +1324,8 @@
 "theme_pct": null,
 "group": "Textile Manufacturing",
 "lane": "build",
-"group_pulse": 34.8,
-"group_rank": 12
+"group_pulse": 35.7,
+"group_rank": 10
 },
 {
 "id": "WATCH-GREAVESCOT",
@@ -1355,8 +1355,8 @@
 "theme_pct": null,
 "group": "Specialty Industrial Machinery",
 "lane": "hold",
-"group_pulse": 15.8,
-"group_rank": 42
+"group_pulse": 16.7,
+"group_rank": 41
 },
 {
 "id": "WATCH-PARAGMILK",
@@ -1387,7 +1387,7 @@
 "group": "Dairy",
 "lane": "hold",
 "group_pulse": 21.9,
-"group_rank": 27
+"group_rank": 29
 },
 {
 "id": "WATCH-TCPLPACK",
@@ -1417,8 +1417,8 @@
 "theme_pct": null,
 "group": "Packaging & Containers",
 "lane": "mid",
-"group_pulse": 20.0,
-"group_rank": 34
+"group_pulse": 21.4,
+"group_rank": 31
 },
 {
 "id": "WATCH-360ONE",
@@ -1448,8 +1448,8 @@
 "theme_pct": 79.0,
 "group": "Asset Management",
 "lane": "mid",
-"group_pulse": 19.0,
-"group_rank": 35
+"group_pulse": 19.4,
+"group_rank": 36
 },
 {
 "id": "WATCH-FAZE3Q",
