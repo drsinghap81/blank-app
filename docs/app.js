@@ -5110,14 +5110,19 @@ function flowBlock(G, mk) {
   if (R.length < 6) return '';
   const S = state.sysMap && state.sysMap[mk]; const SM = (S && S.M) || {};
   const sig = (r) => (r.members || []).filter((m) => SM[m.symbol] && Object.keys(SM[m.symbol]).some((k) => k !== 'st')).length;
-  const row = (r) => `<div class="gpsr nos fl-r" ${r.nse ? `data-nb="${esc(r.slug)}"` : `data-flg="${esc(r.group)}" data-fls="${esc(r.sector || '')}"`}><span class="gpsn"><b class="fl-n">${esc(r.nm)}</b><span class="fl-tags"><span class="chip" style="border-color:${FLOW_C[r.flow.tag] || '#94A3B8'};color:${FLOW_C[r.flow.tag] || 'inherit'}">${esc(r.flow.tag || 'mixed')}</span>${r.rrg ? ` <span class="chip" style="border-color:${RRG_Q[r.rrg.now]};color:${RRG_Q[r.rrg.now]}">${esc(r.rrg.now)}</span>` : ''}${r.rank ? ` <span class="muted">Pulse #${r.rank}</span>` : ''}${sig(r) ? ` <span class="chip new">${sig(r)} in our systems</span>` : ''}</span></span>
-      <span class="gpsv"><b class="${r.flow.obv10 >= 0 ? 'up' : 'down'}">${r.flow.obv10 >= 0 ? '+' : ''}${fmt(r.flow.obv10, 1)}</b> <small class="muted">price ${r.flow.rs10 >= 0 ? '+' : ''}${fmt(r.flow.rs10, 1)}%</small></span></div>`;
-  const top = [...R].sort((a, b) => b.flow.obv10 - a.flow.obv10).slice(0, 10), bot = [...R].sort((a, b) => a.flow.obv10 - b.flow.obv10).slice(0, 10);
-  return `<div class="card" style="margin-top:12px"><h4 style="margin:0 0 4px">Volume flow · last 10 sessions</h4>
-    <p class="muted" style="margin:0 0 6px;font-size:12.5px">Number = money traded on up days minus down days, in a normal day's turnover (On-Balance Volume). Price = the industry vs ${esc(MX_BENCH[mk])} over the same 10 days. Tap an industry for its stocks, chart and which of them are in our systems.</p>
-    <h5 style="margin:8px 0 2px">Most net buying</h5><div class="mxlist">${top.map(row).join('')}</div>
-    <details class="t2-more"><summary>Most net selling</summary><div class="mxlist">${bot.map(row).join('')}</div></details>
-    <p class="muted" style="font-size:11.5px">Tested 2016–26 (NSE, 104 industries): volume and price both up → +1.3% vs Nifty over the next 4 weeks; both down → about 0%. "Volume up, price lagging" (hidden buying) did worse than average (+0.3%) and "price up, volume down" did better (+0.9%) — divergence is not an early clue. Confirmation only; entries stay on the stock systems.</p></div>`;
+  const mx = Math.max(...R.map((r) => Math.abs(r.flow.obv10))) || 1;
+  const row = (r) => { const f = r.flow, c = FLOW_C[f.tag] || '#94A3B8', n = sig(r);
+    return `<button class="fl-r" ${r.nse ? `data-nb="${esc(r.slug)}"` : `data-flg="${esc(r.group)}" data-fls="${esc(r.sector || '')}"`}>
+      <span class="fl-top"><b class="fl-n">${esc(r.nm)}</b><b class="fl-v ${f.obv10 >= 0 ? 'up' : 'down'}">${f.obv10 >= 0 ? '+' : ''}${fmt(f.obv10, 1)}</b></span>
+      <span class="fl-bar"><i style="width:${Math.max(4, (Math.abs(f.obv10) / mx) * 100).toFixed(0)}%;background:${c}"></i></span>
+      <span class="fl-tags"><span style="color:${c}">● ${esc(f.tag || 'mixed')}</span><span class="muted">price ${f.rs10 >= 0 ? '+' : ''}${fmt(f.rs10, 1)}%</span>${r.rrg ? `<span style="color:${RRG_Q[r.rrg.now]}">${esc(r.rrg.now)}</span>` : ''}${n ? `<span class="fl-sys">${n} in our systems</span>` : ''}</span></button>`; };
+  const top = [...R].sort((a, b) => b.flow.obv10 - a.flow.obv10).slice(0, 8), bot = [...R].sort((a, b) => a.flow.obv10 - b.flow.obv10).slice(0, 8);
+  const both = R.filter((r) => r.flow.tag === 'both up').length;
+  return `<div class="card fl-card"><div class="fl-hero"><span class="fl-big">${both}</span><span><b>industries with volume and price both rising</b><small class="muted">last 10 sessions · ${R.length} industries</small></span></div>
+    <div class="fl-key">${Object.entries(FLOW_C).map(([k, c]) => `<span><i style="background:${c}"></i>${esc(k)}</span>`).join('')}</div>
+    <h5 class="fl-h">Most net buying</h5><div class="fl-list">${top.map(row).join('')}</div>
+    <h5 class="fl-h">Most net selling</h5><div class="fl-list">${bot.map(row).join('')}</div>
+    <details class="info"><summary>How to read this</summary><p>Number = money traded on up days minus down days over the last 10 sessions, in a normal day's turnover (On-Balance Volume). Price = the industry vs ${esc(MX_BENCH[mk])} over the same days. Tap an industry for its stocks, chart and which of them are in our systems. Tested 2016–26 (NSE, 104 industries): both up → +1.3% vs Nifty over the next 4 weeks; both down → about 0%; "volume up, price lagging" +0.3% (below average) and "price up, volume down" +0.9% — divergence is not an early clue. Confirmation only; entries stay on the stock systems.</p></details></div>`;
 }
 function rrgBlock(G, mk) {
   const S = (G.sectors || []).filter((r) => r.rrg); const I = rrgRows(G, mk);
@@ -5134,6 +5139,13 @@ function rrgBlock(G, mk) {
     <p class="muted" style="font-size:11.5px">Information only — rotation entries are not backtested yet.</p></div>`;
 }
 function mxPer() { const per = state.gpPer || 'p1w'; return `<div class="seg" id="gpper" style="margin:6px 0">${[['p1w', '1 week'], ['p1m', '1 month'], ['p1q', '1 quarter']].map(([k, n]) => `<button data-k="${k}" aria-selected="${per === k}">Pulse ${n}</button>`).join('')}</div>`; }
+/* 21 Nov 2026 (Amritpal: "can't find, that page has a lot of stuff and text - make it infographic"): one section at a time */
+const MX_TABS = [['sec', 'Sectors'], ['rot', 'Rotation'], ['flow', 'Money flow'], ['ind', 'Industries'], ['sig', 'Signals']];
+function mxTabShow(el) {
+  if (!state.mxTab) { try { state.mxTab = localStorage.getItem('td.mxTab') || 'sec'; } catch (e) { state.mxTab = 'sec'; } }
+  el.querySelectorAll('.mxtab').forEach((d) => { d.hidden = d.dataset.tab !== state.mxTab; });
+  el.querySelectorAll('[data-mxt]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.mxt === state.mxTab)));
+}
 async function loadMarkets() {
   $('#title').textContent = 'Markets';
   const el = $('#view-mk'); const x = state.mx;
@@ -5181,25 +5193,27 @@ async function loadMarkets() {
           <span class="mxk-s">quarter ${fmt(ms.p1q, 0)} · month ${fmt(ms.p1m, 0)} · week ${fmt(ms.p1w, 0)}</span></div>
         <div class="mxkpi"><span class="mxk-l">Signals today</span>
           <span class="mxk-trio"><span title="ATH breakouts"><b>${S.nbrk}</b>ATH</span><span title="9/21 buys"><b>${S.n921}</b>9/21</span><span title="ATH near trigger"><b>${S.nnear}</b>Near ATH</span></span></div></section>
-      <div class="card"><h4 style="margin:0 0 4px">Sectors</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Colour = Pulse (share of the sector's stocks trending); strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-bouncing, red weak); RS = equal-weight 3-month return vs ${MX_BENCH[mk]}. Tap a sector for its industries.</p>
-        ${mxPer()}${mxTiles(secs, 'sector', 'data-s')}
-        ${(() => { /* 20 Nov 2026 (Amritpal: "banking moved a lot but I don't see it"): the industries behind the sector averages -
+      <nav class="mxtabs" role="tablist" aria-label="Market sections">${MX_TABS.map(([k, n]) => `<button role="tab" data-mxt="${k}" aria-selected="${(state.mxTab || 'sec') === k}">${n}</button>`).join('')}</nav>
+      <div class="mxwrap"><div class="mxtab card" data-tab="sec"><h4 style="margin:0 0 4px">Sectors</h4><details class="info"><summary>How to read</summary><p>Colour = Pulse (share of the sector's stocks trending); strip and ▲/▼ = momentum shift (green building, blue steady, amber fading, grey weak-bouncing, red weak); RS = equal-weight 3-month return vs ${MX_BENCH[mk]}. Tap a sector for its industries.</p></details>
+        ${mxPer()}${mxTiles(secs, 'sector', 'data-s')}</div>
+        <div class="mxtab card" data-tab="ind">${(() => { /* 20 Nov 2026 (Amritpal: "banking moved a lot but I don't see it"): the industries behind the sector averages -
           biggest 1-month price moves up and down, with their 1-week Pulse and lane, tappable */
           const L = (G.rows || []).filter((r) => r.r1m != null && r.n >= 3);
           const up = L.slice().sort((a, b) => b.r1m - a.r1m).slice(0, 6), dn = L.slice().sort((a, b) => a.r1m - b.r1m).slice(0, 4);
           const it = (r) => `<div class="gpsr nos" data-ig="${esc(r.group)}"><span class="gpsn">${esc(r.group)} <span class="muted">${r.sector && r.sector !== r.group ? `· ${esc(r.sector)} ` : ''}· Pulse ${fmt(r.p1w, 0)} wk · ${esc(LANE_TXT[r.shift] || '')}</span></span><span class="gpsv"><b class="${r.r1m >= 0 ? 'up' : 'down'}">${r.r1m >= 0 ? '+' : ''}${fmt(r.r1m, 1)}%</b> <small class="muted">1 m</small></span></div>`;
           return L.length ? `<h4 style="margin:14px 0 4px">Industries on the move · last month</h4><div class="mxlist">${up.map(it).join('')}</div>
             <details class="t2-more"><summary>Biggest falls</summary><div class="mxlist">${dn.map(it).join('')}</div></details>` : ''; })()}
-        ${rrgBlock(G, mk)}${flowBlock(G, mk)}
-        <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div>${(() => { const L = (G.rows || []).filter((r) => r.d1 != null).sort((a, b) => b.d1 - a.d1); if (!L.length) return '';
+        </div>
+        <div class="mxtab" data-tab="rot">${rrgBlock(G, mk)}</div><div class="mxtab" data-tab="flow">${flowBlock(G, mk) || `<div class="card"><h4 style="margin:0 0 4px">Money flow</h4><p class="muted">Appears after the next nightly industry scan.</p></div>`}</div>
+        <div class="mxtab card" data-tab="sec"><div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div></div><div class="mxtab card" data-tab="ind">${(() => { const L = (G.rows || []).filter((r) => r.d1 != null).sort((a, b) => b.d1 - a.d1); if (!L.length) return '';
           const row = (r) => `<div class="gpsr nos" data-ig="${esc(r.group)}"><span class="gpsn">${esc(r.group)} <span class="muted">· ${esc(r.sector || '')} · ${r.n} stocks</span>${r.w ? (r.w.status === 'broken' ? ' <span class="chip open">W broke</span>' : ` <span class="chip">W ${fmt(r.w.dist_pct, 1)}% to break</span>`) : ''}</span><span class="gpsv"><b class="${r.d1 >= 0 ? 'up' : 'down'}">${r.d1 >= 0 ? '+' : ''}${fmt(r.d1, 2)}%</b></span></div>`;
           return `<h4 style="margin:14px 0 4px">Industries · ${L.length} · change on ${esc(day(G.asof))} (last close, updated each night)</h4><div class="mxlist">${L.slice(0, 8).map(row).join('')}</div>
-          <details class="t2-more"><summary>All ${L.length} industries by today's change</summary><div class="mxlist">${L.map(row).join('')}</div></details>`; })()}${mk === 'NSE' ? nseIndHTML(G) : ''}</div>`;
+          <details class="t2-more"><summary>All ${L.length} industries by today's change</summary><div class="mxlist">${L.map(row).join('')}</div></details>`; })()}${mk === 'NSE' ? nseIndHTML(G) : ''}</div></div>`;
     const setups = []; G.rows.forEach((g) => g.members.forEach((m) => { const c = S.map[m.symbol]; if (c && c.some((x) => !x.includes('sell') && !x.includes('forming') && !x.includes('Near support'))) setups.push({ m, g, c }); }));
     /* India: rank by the stock's NSE official industry Pulse (same measure); the old group stays for the stock page */
     if (mk === 'NSE') setups.forEach((x) => { const n = nseInd(G, x.m.symbol); if (n && n.rank) { x.og = x.g; x.g = { group: n.basic, sector: n.sector, p1m: n.p1m, rank: n.rank, shift: undefined }; } });
     setups.sort((a, b) => (b.g.p1m - a.g.p1m) || (b.m.wrpi - a.m.wrpi));
-    el.insertAdjacentHTML('beforeend', `<div class="card"><h4 style="margin:0 0 4px">Signals ranked by industry strength</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Every stock with a live buy or in-trade signal from your systems, strongest industry (1-month Pulse) first. This replaces the old Top-down tab: in the 2017–26 test, ATH breakouts in strong sectors with strong stock RS won 54% vs 48%.</p>
+    el.querySelector('.mxwrap').insertAdjacentHTML('beforeend', `<div class="mxtab card" data-tab="sig"><h4 style="margin:0 0 4px">Signals ranked by industry strength</h4><p class="muted" style="margin:0 0 6px;font-size:12.5px">Every stock with a live buy or in-trade signal from your systems, strongest industry (1-month Pulse) first. This replaces the old Top-down tab: in the 2017–26 test, ATH breakouts in strong sectors with strong stock RS won 54% vs 48%.</p>
       <ul class="list flat">${setups.slice(0, state.mxAllSet ? 999 : 15).map((x, i) => `<li class="row mxrow" tabindex="0" data-k="${i}"><div><div class="sym">${esc(x.m.symbol)}</div><div class="co">${esc(x.g.group)} · Pulse ${fmt(x.g.p1m, 0)} · ${x.og ? `#${x.g.rank} of NSE industries` : GP_SHIFT[x.g.shift || 'mid'].t.split(' —')[0]}</div><div class="tags">${x.c.join('')}<span class="chip ${x.m.wrpi >= 100 ? 'open' : 'exit'}">RPI ${fmt(x.m.wrpi, 0)}</span></div></div><div></div><div class="num"><b>${fmt(x.m.close, 2, MKT[mk].loc)}</b><span class="muted">${fmt(x.m.from_high, 0)}% from high</span></div></li>`).join('') || '<li class="empty">No live signals today.</li>'}
       ${setups.length > 15 && !state.mxAllSet ? `<li><button class="more" id="mxallset">Show all ${setups.length}</button></li>` : ''}</ul></div>`);
     el.querySelectorAll('[data-k]').forEach((li) => li.addEventListener('click', () => { const x = setups[+li.dataset.k]; mxStock(x.m, x.og || x.g, mk, S); }));
@@ -5210,6 +5224,7 @@ async function loadMarkets() {
     el.querySelectorAll('[data-flg]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'industry', sec: b.dataset.fls || null, grp: b.dataset.flg })));
     el.querySelectorAll('[data-nb]').forEach((b) => b.addEventListener('click', () => nseIndOpen(((G.nse || {}).rows || []).find((r) => r.slug === b.dataset.nb))));
     rrgMount(el, G, mk);
+    mxTabShow(el); el.querySelectorAll('[data-mxt]').forEach((b) => b.addEventListener('click', () => { state.mxTab = b.dataset.mxt; try { localStorage.setItem('td.mxTab', state.mxTab); } catch (e) { /* */ } mxTabShow(el); }));
     el.querySelectorAll('[data-rrg]').forEach((b) => b.addEventListener('click', () => { const r = rrgRows(G, mk).find((x) => x.slug === b.dataset.rrg); if (r && b.dataset.rrg) wChart(b.dataset.rrg, mk, 'group_w_charts', indTv(r, mk)); }));
     return;
   }

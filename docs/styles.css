@@ -1282,3 +1282,25 @@ body.pub .owner-only { display: none !important; }
 .fl-r .fl-n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fl-r .fl-tags{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:12px}
 .fl-r .gpsv{flex:0 0 auto;text-align:right}
+
+/* 21 Nov 2026: Markets tabs + money-flow infographic */
+.mxtabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 6px;position:sticky;top:0;z-index:5;background:var(--paper);scrollbar-width:none}
+.mxtabs::-webkit-scrollbar{display:none}
+.mxtabs button{flex:0 0 auto;font:inherit;font-weight:700;font-size:14px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.mxtabs button[aria-selected="true"]{background:var(--accent,#5b4bdb);border-color:transparent;color:#fff}
+.fl-hero{display:flex;align-items:center;gap:12px;margin:2px 0 8px}
+.fl-big{font-size:44px;font-weight:900;line-height:1;color:#0A7A55}
+.fl-hero b{display:block;font-size:15px}.fl-hero small{display:block;font-size:12px}
+.fl-key{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;margin-bottom:6px}
+.fl-key i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.fl-h{margin:10px 0 4px;font-size:14px}
+.fl-list{display:flex;flex-direction:column;gap:6px}
+.fl-r{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:12px;border:1px solid var(--line,#e5e7eb);cursor:pointer;width:100%}
+.fl-r:focus-visible{outline:2px solid var(--accent,#5b4bdb)}
+.fl-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.fl-n{font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.fl-v{font-size:20px;font-weight:900;flex:0 0 auto}
+.fl-bar{display:block;height:6px;border-radius:3px;background:rgba(148,163,184,.18);overflow:hidden}
+.fl-bar i{display:block;height:100%;border-radius:3px}
+.fl-r .fl-tags{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px}
+.fl-sys{color:#0A7A55;font-weight:700}
