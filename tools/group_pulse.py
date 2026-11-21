@@ -496,7 +496,8 @@ def main(mkt):
             nm_ = th.replace("NIFTY INDIA ", "").replace("NIFTY ", "").title().replace("Psu", "PSU").replace("Cpse", "CPSE").replace("Pse", "PSE").replace("Mnc", "MNC").replace("Ev ", "EV ").replace("Ai ", "AI ")
             themes.append(dict(group=nm_, index=th, theme=True, n=len(ss), listed=len(gdf), p1w=p(s1w), p1m=p(s1m), p1q=p(s1q), p1m_prev=p(s1m_prev),
                                trending_now=int(sum(m["trending"] for m in mem)), members=mem,
-                               rs1m=round(float(np.nanmean(r1[ss].iloc[-1])) * 100, 1), rs3m=round(float(np.nanmean(r3[ss].iloc[-1])) * 100, 1)))
+                               rs1m=round(float(np.nanmean(r1[ss].iloc[-1])) * 100, 1), rs3m=round(float(np.nanmean(r3[ss].iloc[-1])) * 100, 1),
+                               rrg=rrg((1 + ret[ss].mean(axis=1).fillna(0)).cumprod() * 100, B)))   # 22 Nov 2026: theme rotation (weekly, vs the market)
             gi = (1 + ret[ss].iloc[-N:].mean(axis=1).fillna(0)).cumprod(); gi = gi / gi.iloc[0] * 100
             charts.setdefault("themes", {})[nm_] = dict(idx=[round(float(v), 2) for v in gi],
                                                        pulse=[None if np.isnan(v) else round(float(v), 1) for v in (p21[ss].iloc[-N:].mean(axis=1) * 100)])

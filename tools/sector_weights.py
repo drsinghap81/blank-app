@@ -185,6 +185,30 @@ def world():
     return {k: dict(w=round(float(v), 2), part=k in part) for k, v in m.items() if v and v > 0}
 
 
+def industries():
+    """22 Nov 2026: industry dot size on the 'industries in a sector' map = the industry's share of its sector's market value
+    (members' Yahoo caps); NSE themes = the theme's market value as a share of all NSE caps we have (themes overlap: no share bar)."""
+    out = {}
+    for mk, fund, path in (("NSE", "data/scan/fundamentals.json", "data/scan/"), ("US", "data/scan/us/fundamentals.json", "data/scan/us/"),
+                           ("ASX", "data/scan/asx/fundamentals.json", "data/scan/asx/")):
+        mc = caps(fund)
+        try:
+            G = json.load(open(path + "group_pulse.json"))
+        except Exception:  # noqa: BLE001
+            continue
+        rows = [(r["basic"], r.get("sector"), r["members"]) for r in (G.get("nse") or {}).get("rows", [])] if mk == "NSE" else [(r["group"], r.get("sector"), r["members"]) for r in G.get("rows", [])]
+        val = {nm: sum(mc.get(m["symbol"], 0) for m in mem) for nm, _, mem in rows}
+        sec_tot = {}
+        for nm, sec, _ in rows:
+            sec_tot[sec] = sec_tot.get(sec, 0) + val[nm]
+        out["IND_" + mk] = {nm: dict(w=round(100 * val[nm] / sec_tot[sec], 2), part=True) for nm, sec, _ in rows if sec_tot.get(sec) and val[nm] > 0}
+        if mk == "NSE":
+            tot = sum(mc.values()) or 1
+            out["THEME_NSE"] = {t["group"]: dict(w=round(100 * sum(mc.get(m["symbol"], 0) for m in t["members"]) / tot, 2), part=False)
+                                for t in G.get("themes", []) if sum(mc.get(m["symbol"], 0) for m in t["members"]) > 0}
+    return out
+
+
 def main():
     import sys
     sys.path.insert(0, "tools")
@@ -204,6 +228,10 @@ def main():
         out["WORLD"] = world()
     except Exception as e:  # noqa: BLE001
         print("world weights failed", e); out["WORLD"] = {}
+    try:
+        out.update(industries())
+    except Exception as e:  # noqa: BLE001
+        print("industry weights failed", e)
     for k in ("NSE", "US", "ASX", "WSECT", "UK", "WORLD"):
         print("R|", k, len(out[k]), sorted(((float(v["w"]), n) for n, v in out[k].items()), reverse=True)[:11])
     if os.environ.get("PILOT"):

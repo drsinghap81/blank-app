@@ -51,6 +51,12 @@ CFG = {
 CFG["WSECT"] = dict(bench=("ACWI", "MSCI All-Country World (ACWI)"), out="data/scan/wsect_rrg.json", names={
     "IXN": "Info Tech", "IXG": "Financials", "IXJ": "Health Care", "IXC": "Energy", "EXI": "Industrials", "MXI": "Materials",
     "JXI": "Utilities", "KXI": "Cons Staples", "RXI": "Cons Discretionary", "IXP": "Communication", "REET": "Real Estate"})
+# 22 Nov 2026 (Amritpal: "have we plotted industries and themes?"): US themes = the main theme ETFs vs the S&P 500
+CFG["USTHEME"] = dict(bench=("^GSPC", "S&P 500"), out="data/scan/us/theme_rrg.json", names={
+    "SMH": "Semiconductors", "IGV": "Software", "CIBR": "Cybersecurity", "SKYY": "Cloud", "BOTZ": "Robotics & AI", "XBI": "Biotech",
+    "IHI": "Medical devices", "ITB": "Homebuilders", "KRE": "Regional banks", "IAI": "Brokers", "KIE": "Insurance", "XRT": "Retail",
+    "PEJ": "Leisure", "JETS": "Airlines", "IYT": "Transports", "PAVE": "Infrastructure", "ITA": "Aerospace & defence", "XME": "Metals & mining",
+    "XOP": "Oil & gas E&P", "TAN": "Solar", "ICLN": "Clean energy", "URA": "Uranium", "LIT": "Lithium & battery", "GDX": "Gold miners"})
 CFG["WORLDUSD"] = dict(bench=("USD", "US$ (absolute)"), out="data/scan/worldusd_rrg.json", names={"ACWI": "World stocks (ACWI)", **CFG["WORLD"]["names"]})
 
 

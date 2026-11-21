@@ -1389,3 +1389,6 @@ input,select,textarea{font-size:16px!important}
 .ind-mini{min-height:170px}
 .ind-st{cursor:pointer}.ind-chart{list-style:none;padding:6px 12px 12px;border-bottom:1px solid var(--line)}
 .ind-act{display:flex;gap:16px;margin-top:6px}
+/* 22 Nov 2026: industries-in-sector picker and drill buttons on the rotation chart */
+.rrg-secpick button{flex:0 0 auto;white-space:nowrap}.rrg-secpick small{opacity:.7;font-weight:600}
+.rrg-go{display:inline-flex;min-height:40px;align-items:center;font-weight:800}
