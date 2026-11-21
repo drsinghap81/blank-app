@@ -6733,7 +6733,7 @@ async function igWorldMap(box) {
   const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
   await swLoad();
   const items = swAttach(Object.entries(R.weekly).map(([nm, r]) => ({ nm, now: r.now, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now, pts: r.pts.slice(-4) })), 'WORLD')
-    .filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was);
+    .filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was || (r.wp && (r.w || 0) >= 8));   // the biggest markets always shown
   if (!items.length) { m.hidden = true; return; }
   m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 230, false);
   const go = () => { Object.assign(state.mx, { lvl: 'world', m: null, sec: null, grp: null }); show('mk'); setTimeout(() => { const e = document.querySelector('#rrgbox'); if (e) e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1800); };
