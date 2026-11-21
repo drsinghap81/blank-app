@@ -45,6 +45,12 @@ CFG = {
         "EWC": "Canada", "EEM": "Emerging mkts", "GLD": "Gold", "SLV": "Silver", "DBC": "Commodities", "USO": "Crude oil",
         "TLT": "US long bonds", "AGG": "US bonds (all)", "EMB": "EM bonds", "UUP": "US dollar", "VNQ": "US real estate", "BTC-USD": "Bitcoin"}),
 }
+# 21 Nov 2026 (Amritpal: "take authentic"): the 11 official GICS sectors (the MSCI / S&P sector standard) for the whole world, via the
+# iShares Global sector ETFs (S&P Global 1200 sector indices), vs MSCI ACWI. AI infrastructure sits across Info Tech (chips, cloud),
+# Utilities (power) and Industrials (grid, electrical equipment) rather than being one dot.
+CFG["WSECT"] = dict(bench=("ACWI", "MSCI All-Country World (ACWI)"), out="data/scan/wsect_rrg.json", names={
+    "IXN": "Info Tech", "IXG": "Financials", "IXJ": "Health Care", "IXC": "Energy", "EXI": "Industrials", "MXI": "Materials",
+    "JXI": "Utilities", "KXI": "Cons Staples", "RXI": "Cons Discretionary", "IXP": "Communication", "REET": "Real Estate"})
 CFG["WORLDUSD"] = dict(bench=("USD", "US$ (absolute)"), out="data/scan/worldusd_rrg.json", names={"ACWI": "World stocks (ACWI)", **CFG["WORLD"]["names"]})
 
 
