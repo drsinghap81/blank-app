@@ -10,6 +10,8 @@ Per industry (3+ members with results): the latest quarter with >= 70% reported 
 ('in progress', share reported so far). Output: data/scan/results_season.json."""
 import glob
 import json
+import os
+import sys
 from datetime import date
 
 import numpy as np
@@ -71,10 +73,35 @@ def main():
             o["profile"] = bool((o["strong"] or 0) >= 0.5 and (o["accel"] or 0) >= 0.5 and o["pe_rank"] is not None and o["pe_rank"] <= 0.4)
             o["weak"] = bool(o["strong"] is not None and o["strong"] < 0.2)
     out.sort(key=lambda o: (-(o.get("profile") or 0), -(o["strong"] or -1), o["pe"] or 999))
-    js = dict(generated=str(date.today()), note=PROFILE_TXT, rows=out)
+    # 22 Nov 2026 (Amritpal: "Yes" to an alert): PSU banks met the profile on 26 Oct, 10 days before their 5 Nov breakout, but
+    # nothing pinged. Track when each industry entered the profile; alert (scheduled runs) on new entries only.
+    try:
+        prev = {r["basic"]: r for r in json.load(open("data/scan/results_season.json")).get("rows", [])}
+    except Exception:  # noqa: BLE001
+        prev = None
+    today_s = str(date.today()); new = []
+    for o in out:
+        p_ = (prev or {}).get(o["basic"]) or {}
+        if o.get("profile"):
+            if p_.get("profile"):
+                o["profile_since"] = p_.get("profile_since") or p_.get("done_on") or today_s
+            else:
+                o["profile_since"] = today_s
+                if prev is not None:
+                    new.append(o)
+    js = dict(generated=today_s, note=PROFILE_TXT, rows=out,
+              new_profile=[dict(basic=o["basic"], quarter=o["quarter"], since=o["profile_since"], strong=o["strong"], accel=o["accel"], pe=o["pe"]) for o in new])
     json.dump(js, open("data/scan/results_season.json", "w"), separators=(",", ":"))
+    if new and os.environ.get("SEND_TELEGRAM") == "1":
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from notify import send
+        lines = [f"Results season: {len(new)} industr{'y' if len(new) == 1 else 'ies'} now strong + improving + cheap"]
+        for o in new[:10]:
+            lines.append(f"- {o['basic']}: {round((o['strong'] or 0) * 100)}% of stocks profit > 20% y/y, {round((o['accel'] or 0) * 100)}% speeding up, P/E {o['pe']}")
+        lines.append("Tested 2016-26: such industries beat Nifty by +4.4% over 3 months on average (PSU banks met it 26 Oct 2026, 10 days before their breakout). Context, not an entry signal: wait for your system's buy.")
+        send("\n".join(lines))
     print("results season:", len(out), "industries;", sum(o.get("profile", False) for o in out), "fit the profile;",
-          [o["basic"] for o in out if o.get("profile")][:10])
+          [o["basic"] for o in out if o.get("profile")][:10], "| new:", [o["basic"] for o in new])
 
 
 if __name__ == "__main__":

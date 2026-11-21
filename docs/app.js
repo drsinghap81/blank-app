@@ -5163,17 +5163,19 @@ function rsTxt(r) {
   if (!r) return '–';
   return `${rsQ(r.quarter)} quarter: <b>${Math.round((r.strong || 0) * 100)}%</b> of ${r.reported} grew profit > 20%${r.accel != null ? ` · ${Math.round(r.accel * 100)}% speeding up` : ''}${r.pe ? ` · P/E ${fmt(r.pe, 1)}` : ''}${r.profile ? ' · <b style="color:#0A7A55">strong + cheap ✓</b>' : r.weak ? ' · <b class="down">weak season</b>' : ''}`;
 }
+/* 22 Nov 2026 (Amritpal: "Yes" to a results alert): industries that newly met strong + improving + cheap (profile_since, nightly) */
+const rsIsNew = (r, days = 10) => !!(r && r.profile && r.profile_since && (Date.now() - new Date(r.profile_since + 'T00:00:00').getTime()) / 864e5 <= days);
 function rsAlertLines() {
   const d = state.rsData; if (!d || !d.rows) return '';
-  const P = d.rows.filter((r) => r.profile).slice(0, 5);
-  return P.length ? `<div class="al-r"><b>Results: strong + cheap</b>${P.map((r) => `<a href="#" class="al-t ok" data-nb="${esc(r.slug)}">${esc(r.basic)} ${Math.round(r.strong * 100)}%</a>`).join('')}<small>share of stocks growing profit > 20% · tap for stocks</small></div>` : '';
+  const P = d.rows.filter((r) => r.profile).sort((a, b) => rsIsNew(b) - rsIsNew(a)).slice(0, 5);
+  return P.length ? `<div class="al-r"><b>Results: strong + cheap</b>${P.map((r) => `<a href="#" class="al-t ok" data-nb="${esc(r.slug)}">${rsIsNew(r) ? '🆕 ' : ''}${esc(r.basic)} ${Math.round(r.strong * 100)}%</a>`).join('')}<small>share of stocks growing profit > 20% · tap for stocks</small></div>` : '';
 }
 function rsBlock(G, mk) {
   if (mk !== 'NSE') return '<div class="card"><h4 style="margin:0 0 4px">Results season</h4><p class="muted">India only for now (NSE quarterly results with announcement dates).</p></div>';
   const d = state.rsData; if (!d || !(d.rows || []).length) return '<div class="card"><h4 style="margin:0 0 4px">Results season</h4><p class="muted">Appears after the next nightly industry scan.</p></div>';
-  const R = d.rows, P = R.filter((r) => r.profile), O = R.filter((r) => !r.profile && !r.weak && (r.strong || 0) >= 0.5).sort((a, b) => b.strong - a.strong), Wk = R.filter((r) => r.weak);
+  const R = d.rows, P = R.filter((r) => r.profile).sort((a, b) => rsIsNew(b) - rsIsNew(a)), O = R.filter((r) => !r.profile && !r.weak && (r.strong || 0) >= 0.5).sort((a, b) => b.strong - a.strong), Wk = R.filter((r) => r.weak);
   const qn = rsQ((R.find((r) => r.reported) || {}).quarter);
-  const row = (r) => `<button class="fl-r" data-nb="${esc(r.slug)}"><span class="fl-top"><b class="fl-n">${esc(r.basic)}</b><b class="fl-v ${(r.strong || 0) >= 0.5 ? 'up' : (r.strong || 0) < 0.2 ? 'down' : ''}">${Math.round((r.strong || 0) * 100)}%</b></span>
+  const row = (r) => `<button class="fl-r" data-nb="${esc(r.slug)}"><span class="fl-top"><b class="fl-n">${rsIsNew(r) ? `<span class="rs-new">New ${esc(day(r.profile_since))}</span> ` : ''}${esc(r.basic)}</b><b class="fl-v ${(r.strong || 0) >= 0.5 ? 'up' : (r.strong || 0) < 0.2 ? 'down' : ''}">${Math.round((r.strong || 0) * 100)}%</b></span>
       <span class="fl-bar"><i style="width:${Math.max(4, (r.strong || 0) * 100).toFixed(0)}%;background:${r.profile ? '#0A7A55' : r.weak ? '#D64545' : '#3B82F6'}"></i></span>
       <span class="fl-tags"><span class="muted">${rsQ(r.quarter)} · ${r.reported} of ${r.of} reported</span>${r.med != null ? `<span>median growth ${r.med >= 0 ? '+' : ''}${fmt(r.med, 0)}%</span>` : ''}${r.accel != null ? `<span>${Math.round(r.accel * 100)}% speeding up</span>` : ''}${r.pe ? `<span>P/E ${fmt(r.pe, 1)}</span>` : ''}${r.profile ? '<span class="fl-sys">strong + cheap ✓</span>' : ''}</span></button>`;
   return `<div class="card fl-card"><div class="fl-hero"><span class="fl-big">${P.length}</span><span><b>industries with strong, improving, cheap results</b><small class="muted">latest season (${esc(qn)}) · ${R.length} industries · bar = share of stocks growing profit > 20%</small></span></div>
@@ -7450,6 +7452,7 @@ async function tdRender2(el) {
       sm.textContent = (L.length ? 'leading this week: ' + L.slice(0, 3).map(([k]) => k).join(', ') : 'none leading this week') + (I.length ? ` · ${I.length} improving` : '');
       await swLoad(); const all = swAttach(E.map(([nm, r]) => ({ nm, now: r.now, pts: r.pts })), mk); const sh = swShare(all, mk === 'NSE' ? 'the Nifty 500' : MX_BENCH[mk]);
       const mp = h.querySelector('.tds-map'); if (mp && sh) mp.insertAdjacentHTML('beforebegin', sh);
+      if (mk === 'NSE') { await rsLoad(); const NR = ((state.rsData || {}).rows || []).filter((r) => rsIsNew(r)); if (NR.length && mp) mp.insertAdjacentHTML('beforebegin', `<p class="tds-note rs">🆕 <b>Results season: newly strong + improving + cheap</b> — ${NR.slice(0, 4).map((r) => esc(r.basic)).join(', ')}. Early clue (tested +4.4% vs Nifty over 3 months; PSU banks met it 10 days before their breakout). Buy only on your system's signal.</p>`); }
       if (!ok && mp) mp.insertAdjacentHTML('beforebegin', `<p class="tds-note">${esc(MX_BENCH[mk])} is below its 30-week average: here <b>Leading = falling less than the index</b>, not rising. Defensive sectors leading while the biggest sector lags is how money hides in a falling market.</p>`); }).catch(() => {}); } }
   el.querySelectorAll('.t2-tile[data-go]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.go); if (t) { const fd = t.closest('details'); if (fd) fd.open = true; t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('t2-flash'); setTimeout(() => t.classList.remove('t2-flash'), 1400); } }));
   el.querySelectorAll('.t2-wcard[data-tu]').forEach((b) => b.addEventListener('click', () => turtleSelect(state._tuShow[+b.dataset.tu])));

@@ -1380,3 +1380,5 @@ html,body{overflow-x:hidden;max-width:100%}
 /* 21 Nov 2026: iPhone zoom - no double-tap zoom, and no auto-zoom when a search box gets focus (iOS zooms inputs under 16px) */
 html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 input,select,textarea{font-size:16px!important}
+.rs-new{display:inline-block;font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:999px;background:#0A7A55;color:#fff;vertical-align:1px}
+.tds-note.rs{background:rgba(10,122,85,.12);border-color:rgba(10,122,85,.4)}

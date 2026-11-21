@@ -16,8 +16,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: |
-          pip install -q yfinance pandas
+      - env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          SEND_TELEGRAM: ${{ github.event_name == 'schedule' && '1' || '0' }}
+        run: |
+          pip install -q yfinance pandas requests
           python tools/group_pulse.py ASX NSE US UK 2>&1 | grep -v -i "warn\|delisted\|failed download\|possibly\|YFRateLimit" | tail -40
           python tools/results_now.py 2>&1 | tail -2 || true
           python tools/sector_weights.py 2>&1 | grep -v -i "warn\|delisted\|possibly" | tail -8 || true
