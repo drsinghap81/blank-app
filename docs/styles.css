@@ -1308,3 +1308,5 @@ body.pub .owner-only { display: none !important; }
 /* 21 Nov 2026: matrix industry columns */
 .mxq{display:inline-block;min-width:16px;padding:0 3px;border-radius:5px;color:#fff;font-size:11px;font-weight:800;text-align:center;line-height:16px}
 .mxfl{font-size:11px;font-weight:800;letter-spacing:-1px;white-space:nowrap}
+/* 21 Nov 2026: squeeze context under the Go / Careful / Pause hero */
+.ig-sq{font-size:12.5px;line-height:1.35;margin:6px 2px 0;padding:8px 10px;border-radius:10px;background:rgba(59,130,246,.10);color:var(--ink)}

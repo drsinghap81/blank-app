@@ -6292,7 +6292,14 @@ async function mxLight(mk, S) {
   const wl = await getJSON(MAIN + 'data/scan/world.json', 'world'); const wi = wl && wl.indices && wl.indices[MX_IDX[mk]];
   const br = S.breadth || {}; const brBad = br.buys10 != null && br.sells10 > br.buys10; const idxBad = wi ? !wi.up : false;
   const lvl = brBad && idxBad ? 'red' : brBad || idxBad ? 'amber' : 'green';
-  return { lvl, br, wi, brBad, idxBad };
+  const fii = mk === 'NSE' ? await getJSON(MAIN + 'data/scan/fii.json', 'fii').catch(() => null) : null;   // 21 Nov 2026: squeeze context
+  return { lvl, br, wi, brBad, idxBad, fii };
+}
+/* 21 Nov 2026 (Amritpal: "Yes"): short-squeeze context from FII positioning (tools/fii_squeeze.py; test tools/research/squeeze_market.py) */
+function squeezeTxt(f) {
+  if (!f || !f.state) return '';
+  return f.state === 'setup' ? '<b>falling market + FIIs very short</b>: in 2016–26 Nifty was higher 60 days later 83% of the time (20 cases, +5.5% vs +3% normally; Covid 2020 the exception). Context, not a signal.'
+    : `<b>FIIs started covering${f.cover_on && f.cover_on.length ? ' on ' + esc(day(f.cover_on[0])) : ''}</b>: in 2016–26 the next 1–2 weeks were flat on average, then +4.8% over 60 days (86% of 14 cases). Which sector leads was not predictable.`;
 }
 function lightHTML(L, mk) {
   const { lvl, br, wi } = L; const loc = MKT[mk].loc;
@@ -6300,6 +6307,7 @@ function lightHTML(L, mk) {
   const bits = [];
   if (br.buys10 != null) bits.push(`Breadth: <b class="${L.brBad ? 'down' : 'up'}">${Number(br.buys10).toLocaleString(loc)} stocks turned up vs ${Number(br.sells10).toLocaleString(loc)} down</b> (9/21 crosses, last 10 sessions)${br.p50 != null ? ` · ${fmt(br.p50, 0)}% above their 50-day` : ''}`);
   if (wi) bits.push(`${esc(MX_BENCH[mk])} <b class="${L.idxBad ? 'down' : 'up'}">${wi.up ? 'above' : 'below'} its 30-week average</b> at Friday's close${wi.up && wi.below_now ? ' · <b class="down">below it now</b>' : ''}`);
+  if (L.fii) bits.push(`FIIs <b>${fmt(L.fii.fii_long, 0)}% long</b> in index futures${squeezeTxt(L.fii) ? ' · ' + squeezeTxt(L.fii) : ''}`);
   return `<div class="mxl ${lvl}"><i></i><div><b>${head}</b><span>${bits.join('<br>')}</span>
     <small>${LIGHT_TEST}</small></div></div>`;
 }
@@ -6547,9 +6555,10 @@ async function alertsCard(box, mk) {
     ['ind', 'Industries moving', cnt(indHtml, /data-gwch/g), 'W, 9 EMA, rotation', indHtml],
     ['fund', 'ETFs & commodities', cnt(fundHtml, /data-(fwch|awch|asv|bk)/g), 'W and ATH crosses', fundHtml],
   ];
+  const sq = L && L.fii && L.fii.state ? `<div class="ig-sq">${squeezeTxt(L.fii)}</div>` : '';
   const hero = lt ? (() => { const [w, ...rest] = lt[1].split(' · '); return `<div class="ig-hero ${lt[0]}"><span class="ig-dot"></span><span class="ig-word">${esc({ GREEN: 'Go', AMBER: 'Careful', RED: 'Pause' }[w] || w)}</span><span class="ig-sub">${esc(rest.join(' · '))}</span></div>`; })() : '';
   box.innerHTML = `<section class="al-card ig ${lt ? lt[0] : ''}">
-    ${hero}
+    ${hero}${sq}
     <div class="ig-map" role="button" tabindex="0" aria-label="Open the full rotation chart"><div class="ig-map-h"><b>Sector rotation</b><span>tap for the full chart</span></div><div class="ig-map-c"></div></div>
     ${rotBasket(GPX, S, mk)}
     <div class="ig-tiles">${tiles.map(([k, t, n, sub]) => `<button class="ig-tile${n ? '' : ' zero'}" data-igt="${k}"><b>${n}</b><span>${t}</span><small>${sub}</small></button>`).join('')}</div>
