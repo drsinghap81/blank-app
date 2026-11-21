@@ -2476,6 +2476,17 @@ function planATH(r, near) {
 }
 
 /* ------------------------------------------------------------------ Monthly ATH */
+/* 21 Nov 2026 (Amritpal: "Yes"): no new ATH buys on a RED traffic-light day (same light as the 9/21 rule: 9/21 breadth turned down
+   over 10 sessions AND the index below its 30-week average). Open ATH trades keep their weekly 30-week-SMA exit. */
+function athLightLvl(mk) {
+  const a = state.ath || {}; const br = (a.tr && a.tr.breadth) || {}; const wi = a.world && a.world.indices && a.world.indices[MX_IDX[mk]];
+  const brBad = br.buys10 != null && br.sells10 > br.buys10; const idxBad = wi ? !wi.up : false;
+  return brBad && idxBad ? 'red' : brBad || idxBad ? 'amber' : 'green';
+}
+function athRedBanner(mk) {
+  if (athLightLvl(mk) !== 'red') return '';
+  return `<div class="status exit"><b>Red light: skip new ATH buys today.</b> Stocks turning down outnumber those turning up and ${esc(MX_BENCH[mk] || 'the index')} is below its 30-week average. Open ATH trades keep their 30-week exit. Tested 2016–26: about the same 10-year return, clearly better in the last 1–3 years.</div>`;
+}
 function wireAthMk(el) {
   el.querySelectorAll('.seg.mk button').forEach((b) => b.addEventListener('click', () => {
     const tr = athGrp() === 'trd';
@@ -3122,7 +3133,7 @@ async function loadATH() {
       <div class="stat new"><b>${brkMain}</b><span>breakouts with a 2-year base</span></div>
       <div class="stat"><b>${nearMain}</b><span>within 5% of the trigger</span></div>
       <div class="stat"><b>${open}</b><span>signals still running</span></div>
-      <div class="stat exit"><b>${exits}</b><span>system exits at next open (not your holdings)</span></div></section>`}
+      <div class="stat exit"><b>${exits}</b><span>system exits at next open (not your holdings)</span></div></section>${athRedBanner(mk)}`}
     <div class="card">
       <div class="seg ${grp === 'inv' ? 'invstrip' : ''}" role="tablist" style="flex-wrap:wrap${grp === 'trd' ? ';display:none' : ''}">${tabs.map(([k, n, c]) => `<button data-t="${k}" aria-selected="${state.ath.tab === k}">${n}${c == null ? '' : ' ' + c}</button>`).join('')}</div>
       <details class="info"><summary>How this list works</summary><p>${mk !== 'NSE' ? NOTE_G[state.ath.tab] || '' : { td: 'Top-down: world → India → sectors → themes → stocks. Score 0–3 = sector RS > 0, best theme RS > 0, stock RS > 0. Aligned (sector and stock RS both positive) ATH breakouts won 54% and averaged +29% vs 48% / +15% (2017–26). World and Nifty trend did not help, so they are context only; IPO cups showed no clear lift. A guide for confidence and size, not a filter.',
@@ -6230,14 +6241,14 @@ async function mxLight(mk, S) {
 }
 function lightHTML(L, mk) {
   const { lvl, br, wi } = L; const loc = MKT[mk].loc;
-  const head = { red: 'RED · no new swing entries today', amber: 'AMBER · one warning on: trade normally', green: 'GREEN · OK to take new swing trades' }[lvl];
+  const head = { red: 'RED · no new swing or ATH entries today', amber: 'AMBER · one warning on: trade normally', green: 'GREEN · OK to take new swing trades' }[lvl];
   const bits = [];
   if (br.buys10 != null) bits.push(`Breadth: <b class="${L.brBad ? 'down' : 'up'}">${Number(br.buys10).toLocaleString(loc)} stocks turned up vs ${Number(br.sells10).toLocaleString(loc)} down</b> (9/21 crosses, last 10 sessions)${br.p50 != null ? ` · ${fmt(br.p50, 0)}% above their 50-day` : ''}`);
   if (wi) bits.push(`${esc(MX_BENCH[mk])} <b class="${L.idxBad ? 'down' : 'up'}">${wi.up ? 'above' : 'below'} its 30-week average</b> at Friday's close${wi.up && wi.below_now ? ' · <b class="down">below it now</b>' : ''}`);
   return `<div class="mxl ${lvl}"><i></i><div><b>${head}</b><span>${bits.join('<br>')}</span>
     <small>${LIGHT_TEST}</small></div></div>`;
 }
-const LIGHT_TEST = 'Red = both warnings (about 15% of days), amber = one. Tested on 9/21, 2017–26: skipping new buys on red days kept the return (26.9% → 29.1% a year, best book) and cut the worst fall (−26% → −22.5%; −22 to −30% → −19 to −23% across 3 books). Skipping amber days too halved the return, so amber is not a stop. Open trades keep their own stops.';
+const LIGHT_TEST = 'Red = both warnings (about 15% of days), amber = one. Tested on 9/21, 2017–26: skipping new buys on red days kept the return (26.9% → 29.1% a year, best book) and cut the worst fall (−26% → −22.5%; −22 to −30% → −19 to −23% across 3 books). Skipping amber days too halved the return, so amber is not a stop. Open trades keep their own stops. ATH breakouts (adopted 21 Nov 2026): skipping red days kept the 10-year return about the same (25.1% → 24.6% a year) but did much better in the last 1–3 years (last year 18% → 37%, worst 2-year fall −22% → −17%); only 64 red-day ATH signals in 10 years, so a modest edge.';
 async function tdTop5(box, mk) {
   if (!box) return; const S = await sysMap(mk); const L = await mxLight(mk, S);
   const H = mk === 'NSE' ? tdHeldSet() : new Set();
@@ -6470,7 +6481,8 @@ async function alertsCard(box, mk) {
     + (ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : '');
   const indHtml = indAlertLines(GPX, mk) + rotAlertLines(GPX, mk);
   const athX = idxAthLines(IM, state.assets, mk) + indAthLines(GPX, mk) + athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
-  const athHtml = athX || '<div class="al-r muted"><span>None this month yet.</span></div>';
+  let athHtml = athX || '<div class="al-r muted"><span>None this month yet.</span></div>';
+  if (L && L.lvl === 'red' && athX) athHtml = '<div class="al-r"><span class="down"><b>Red light: skip new ATH buys today.</b> Open ATH trades keep their 30-week exit.</span></div>' + athHtml;   // 21 Nov 2026 (Amritpal: "Yes")
   const fundHtml = (() => { const fw = fundWLines(state.fund, mk); return fw || '<div class="al-r muted"><span>No W, trendline break or ATH-candle cross in this market\'s ETFs and funds today.</span></div>'; })() + commodityLines(state.assets, mk) + basketLines(BK, mk);
   const cnt = (h, re) => (h.match(re) || []).length;
   const tiles = [

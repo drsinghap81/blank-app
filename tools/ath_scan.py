@@ -334,6 +334,19 @@ def daily_block(x, n=320):
                 e9=rd(e[9]), e21=rd(e[21]), e50=rd(e[50]))
 
 
+def light_level():
+    """Traffic light as the app shows it (docs/app.js mxLight): 9/21 breadth sells > buys over 10 sessions (trend_scan.json) and the
+    market index below its 30-week average (world.json). RED = both, AMBER = one, GREEN = neither, None if unknown."""
+    try:
+        br = json.load(open(f"{OUT}/trend_scan.json")).get("breadth") or {}
+        idx = {"NSE": "^NSEI", "US": "^GSPC", "ASX": "^AXJO", "UK": "^FTSE"}[MARKET]
+        wi = (json.load(open("data/scan/world.json")).get("indices") or {}).get(idx) or {}
+        b = br.get("buys10") is not None and br.get("sells10", 0) > br.get("buys10", 0); i = wi.get("up") is False
+        return "RED" if b and i else "AMBER" if b or i else "GREEN"
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def main():
     os.makedirs(CH, exist_ok=True)
     from zoneinfo import ZoneInfo
@@ -505,6 +518,9 @@ def main():
     nb = brk[brk.main] if len(brk) else brk
     ex = E[E.status == "exit next open"] if len(E) else E
     msg = [f"Monthly ATH scan {MARKET} {today}", f"New breakouts this/last month (base >= 2 y): {len(nb)}"]
+    lvl = light_level()
+    if lvl == "RED":    # 21 Nov 2026 (Amritpal: "Yes"): no new ATH buys on a RED traffic-light day; open trades keep their exit
+        msg.insert(1, "RED light: skip new ATH buys today (open ATH trades keep their 30-week exit).")
     msg += [f"  {r.symbol} above {r.trigger:.2f} (ATH {r.ath_month}, base {r.base_months} m)" for r in nb.head(10).itertuples()]
     msg += [f"Sell next open (weekly close < 30-wk SMA): {', '.join(ex.symbol.head(15))}" if len(ex) else "No exits."]
     msg += [f"Near trigger (<= 5%): {', '.join(N[N.main].symbol.head(15))}" if len(N) else ""]
