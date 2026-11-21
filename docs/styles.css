@@ -1323,3 +1323,36 @@ body.pub .owner-only { display: none !important; }
 .al6 .al6-n{background:transparent;color:var(--muted);border:1px dashed var(--line)}
 .al6 b{font-size:11.5px;margin-left:3px;color:var(--ink)}
 .lv-al{margin:2px 0}
+
+/* 21 Nov 2026: sub-switch under Ideas (Invest / Momentum / Trading) and Live (Stocks / Top Bottom) */
+.subbar{padding:10px 16px 0;max-width:1100px;margin:0 auto}
+.subbar .seg{margin:0;flex-wrap:nowrap;overflow-x:auto}
+.subbar .seg button{flex:1 1 0;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15}
+.subbar .seg button small{font-weight:600;font-size:11px;opacity:.75}
+body:not(.classic) .views .nav-old{display:none}
+body.classic .views .nav-new{display:none}
+body.classic .subbar{display:none}
+/* 21 Nov 2026: Today redesign - date line, solo traffic light, folded sections */
+.t2-when{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.t2-when>b{font-family:var(--font-head);font-size:22px;letter-spacing:-.02em}
+.t2-when .t2-clock b{font-family:var(--font-head);font-size:18px;color:var(--accent)}
+.t2-when>small,.t2-when .t2-clock small{font-size:12.5px;color:var(--muted)}
+.ig-solo{padding:12px;margin:10px 0 0}
+.ig-solo .ig-hero{margin-bottom:6px}
+.ig-why{margin:4px 2px 6px;font-size:15px;line-height:1.45}
+.ig-solo .al-why summary{min-height:44px;display:flex;align-items:center}
+.t2-fold{border:1px solid var(--line);border-radius:16px;background:var(--card);margin:10px 0;overflow:hidden}
+.t2-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;min-height:44px}
+.t2-fold>summary::-webkit-details-marker{display:none}
+.t2-fold>summary::after{content:"›";font-size:22px;color:var(--muted);transition:transform .15s}
+.t2-fold[open]>summary::after{transform:rotate(90deg)}
+.t2-fold>summary>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.t2-fold>summary b{font-size:16px}.t2-fold>summary small{font-size:12.5px;color:var(--muted);line-height:1.35}
+.t2-fold[open]{padding-bottom:12px}.t2-fold>*:not(summary){margin-left:12px;margin-right:12px}
+@media (prefers-reduced-motion: reduce){.t2-fold>summary::after{transition:none}}
+/* Simple view: detail chips hidden until "show details" (classic layout always shows them) */
+body:not(.classic):not(.show-xd) .xd{display:none}
+.dtg{all:unset;cursor:pointer;display:inline-flex;align-items:center;min-height:36px;margin:6px 2px 0;font-size:13px;font-weight:700;color:var(--accent)}
+.dtg:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+body.classic .dtg{display:none}
+.mx5w{color:var(--muted)}
