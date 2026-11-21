@@ -1304,3 +1304,7 @@ body.pub .owner-only { display: none !important; }
 .fl-bar i{display:block;height:100%;border-radius:3px}
 .fl-r .fl-tags{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px}
 .fl-sys{color:#0A7A55;font-weight:700}
+
+/* 21 Nov 2026: matrix industry columns */
+.mxq{display:inline-block;min-width:16px;padding:0 3px;border-radius:5px;color:#fff;font-size:11px;font-weight:800;text-align:center;line-height:16px}
+.mxfl{font-size:11px;font-weight:800;letter-spacing:-1px;white-space:nowrap}
