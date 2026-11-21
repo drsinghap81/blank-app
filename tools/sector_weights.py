@@ -134,6 +134,7 @@ def main():
     for k in ("NSE", "US", "ASX", "WSECT", "UK"):
         print("R|", k, len(out[k]), sorted(((float(v["w"]), n) for n, v in out[k].items()), reverse=True)[:11])
     if os.environ.get("PILOT"):
+        print("JSON|" + json.dumps(out, separators=(",", ":"), default=float))
         return
     json.dump(out, open("data/scan/sector_weights.json", "w"), separators=(",", ":"), default=float)
 

@@ -1369,3 +1369,7 @@ body.classic .dtg{display:none}
 .tds-h i{font-style:normal;color:var(--muted);font-size:20px}
 .tds-map{margin-top:4px}.tds-map .ig-map-h span{font-size:12px;color:var(--muted)}
 .tds #tdhero .ig-solo{margin:2px 0 0;border:0;padding:0;background:transparent}
+/* 21 Nov 2026: sector weight share bar + falling-market note */
+.sw-share{margin:6px 0 4px}.sw-bar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--line)}.sw-bar span{display:block;height:100%}
+.sw-share small{display:block;margin-top:4px;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.tds-note{margin:6px 2px;font-size:13.5px;line-height:1.45;padding:8px 10px;border-radius:10px;background:rgba(183,121,31,.12);border:1px solid rgba(183,121,31,.35)}
