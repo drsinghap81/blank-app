@@ -150,6 +150,9 @@ def world():
         r = [A[k] / T[k] for k in keys if A.get(k) and T.get(k)]
         return sum(r) / len(r) if r else None
     EMt, EPPt, EUt = table("239637/ishares-msci-emerging-markets-etf"), table("239674/ishares-msci-pacific-ex-japan-etf"), table("264617/ishares-core-msci-europe-etf")
+    EAt = table("239623/ishares-msci-eafe-etf")   # developed ex-US/Canada: Australia, Hong Kong, Netherlands live here
+    if len(EAt) > 5:
+        A.update({k: v * scale(EAt, ["Japan", "United Kingdom", "France", "Germany", "Switzerland"]) for k, v in EAt.items() if k not in A and k in ("Australia", "Hong Kong", "Netherlands")})
     em = scale(EMt, ["India", "China", "Taiwan", "Korea (South)"]); px = scale(EPPt, ["Australia"])
     eu = scale(EUt, ["United Kingdom", "France", "Germany", "Switzerland", "Netherlands"])
     g = lambda k: A.get(k, 0.0)  # noqa: E731
@@ -157,7 +160,9 @@ def world():
          "India": g("India"), "Australia": g("Australia"), "Korea": g("Korea (South)"), "Taiwan": g("Taiwan"), "Canada": g("Canada")}
     if em:
         m["Emerging mkts"] = 100 * em; m["Brazil"] = EMt.get("Brazil", 0) * em
-    if px:
+    if A.get("Hong Kong"):
+        m["Hong Kong"] = A["Hong Kong"]
+    elif px:
         m["Hong Kong"] = EPPt.get("Hong Kong", 0) * px
     if eu:
         m["Europe"] = 100 * eu
@@ -166,6 +171,8 @@ def world():
         mc = caps("data/scan/us/fundamentals.json"); us = sorted(mc.values(), reverse=True)[:3000]; ust = sum(us)
         th = yf.Ticker("QQQ").funds_data.top_holdings
         hw = {str(sym): float(r.iloc[-1]) for sym, r in th.iterrows()}
+        if "GOOG" in hw and "GOOGL" in hw:   # two share classes, one company market cap
+            hw["GOOGL"] += hw.pop("GOOG")
         cov = sum(w for s_, w in hw.items() if s_ in mc)
         if cov > 0.2:
             ndx = sum(mc[s_] for s_ in hw if s_ in mc) / cov
