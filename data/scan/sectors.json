@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-21 00:04 UTC",
+"generated": "2026-11-21 04:04 UTC",
 "asof": "2026-11-20",
 "market": "NIFTY 500",
 "indices": {
@@ -1861,7 +1861,6 @@
 "ELECTCAST": "Capital Goods",
 "ELLEN": "Chemicals",
 "EMBDL": "Realty",
-"ENNATURE": "Healthcare",
 "ENTERO": "Consumer Services",
 "EIEL": "Utilities",
 "EQUITASBNK": "Financial Services",
@@ -1892,7 +1891,6 @@
 "HERITGFOOD": "Fast Moving Consumer Goods",
 "HCC": "Construction",
 "IFBIND": "Consumer Durables",
-"IGLSPIRITS": "Fast Moving Consumer Goods",
 "IIFLCAPS": "Financial Services",
 "INDGN": "Healthcare",
 "INDIAGLYCO": "Fast Moving Consumer Goods",
