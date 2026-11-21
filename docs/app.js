@@ -5450,9 +5450,10 @@ async function leadItems(mk) {
   let themes = (G.themes || []).map((r) => mkItem('Theme', r.group, r.rrg, r.members.map((m) => m.symbol)));
   if (mk === 'US') { const T = await getJSON(MAIN + 'data/scan/us/theme_rrg.json', 'ustheme_rrg').catch(() => null);
     if (T && T.weekly) themes = Object.entries(T.weekly).map(([nm, r]) => mkItem('Theme', nm, { pts: r.pts, now: r.now }, ((T.members || {})[nm] || []).map((m) => m.symbol), { etf: (T.etf || {})[nm] })); }
+  const imp = (L) => L.filter((x) => x && x.now === 'Improving').sort((a, b) => b.ratio - a.ratio);
   const keep = (L) => L.filter((x) => x && x.now === 'Leading').map((x) => ({ ...x, fresh: x.was !== 'Leading', fromImp: x.was === 'Improving' }))
     .sort((a, b) => (b.fromImp - a.fromImp) || (b.fresh - a.fresh) || (b.ratio - a.ratio));
-  return { G, groups: [[mk === 'NSE' ? 'Broad sectors' : 'Sectors', keep(sectors)], ['Industries', keep(inds)], ['Themes', keep(themes)]] };
+  return { G, groups: [[mk === 'NSE' ? 'Broad sectors' : 'Sectors', keep(sectors), imp(sectors)], ['Industries', keep(inds), imp(inds)], ['Themes', keep(themes), imp(themes)]] };
 }
 async function leadCard(box, mk) {
   if (!box) return; const D = await leadItems(mk).catch(() => null); if (!D) { box.innerHTML = ''; return; }
@@ -5460,9 +5461,11 @@ async function leadCard(box, mk) {
   const nNew = D.groups.reduce((a, [, L]) => a + L.filter((x) => x.fromImp).length, 0);
   const chip = (x, gi, i) => `<button class="ld-chip${x.fromImp ? ' up' : ''}" data-ld="${gi}:${i}">${x.fromImp ? '<span>🆕</span>' : ''}${esc(x.nm)}${x.fromImp ? ' <small>from Improving</small>' : x.fresh ? ` <small>from ${esc(x.was)}</small>` : ''}</button>`;
   box.innerHTML = `<section class="ld-card"><div class="ld-h"><b>Leading now</b><small>${nNew ? `<b class="up">${nNew} just moved Improving → Leading</b> · ` : ''}weekly rotation vs ${esc(MX_BENCH[mk])} · tap for chart & leading stocks</small></div>
-    ${D.groups.map(([g, L], gi) => L.length ? `<div class="ld-g"><span class="ld-gn">${g} <small>${L.length}</small></span><div class="ld-row">${L.slice(0, 8).map((x, i) => chip(x, gi, i)).join('')}${L.length > 8 ? `<button class="ld-chip more" data-ldmore="${gi}">+${L.length - 8} more</button>` : ''}</div></div>` : `<div class="ld-g"><span class="ld-gn">${g}</span><div class="ld-row"><small class="muted">${g === 'Themes' && !['NSE', 'US'].includes(mk) ? 'no theme data for this market' : 'none leading this week'}</small></div></div>`).join('')}
+    ${D.groups.map(([g, L, I], gi) => `<div class="ld-g"><span class="ld-gn">${g} <small>${L.length ? L.length + ' leading' : ''}</small></span><div class="ld-row">${L.length ? L.slice(0, 8).map((x, i) => chip(x, gi, i)).join('') + (L.length > 8 ? `<button class="ld-chip more" data-ldmore="${gi}">+${L.length - 8} more</button>` : '') : `<small class="muted">${g === 'Themes' && !['NSE', 'US'].includes(mk) ? 'no theme data for this market' : 'none leading this week'}</small>`}</div>
+      ${I && I.length ? `<div class="ld-row ld-imp"><small>Improving, next up:</small>${I.slice(0, 5).map((x, i) => `<button class="ld-chip imp" data-ldi="${gi}:${i}">${esc(x.nm)}</button>`).join('')}${I.length > 5 ? `<small class="muted">+${I.length - 5}</small>` : ''}</div>` : ''}</div>`).join('')}
     <details class="al-why"><summary>What this means</summary><p class="muted td-rs">Leading = beating ${esc(MX_BENCH[mk])} and still gaining on it (weekly). 🆕 = moved from Improving to Leading this week. Rotation shows where money is moving; in our tests it confirmed moves like the PSU banks about halfway through, and it did not improve entries on its own. Use it to choose where to look; buy only on your system's signal.</p></details></section>`;
   box.querySelectorAll('[data-ld]').forEach((b) => b.addEventListener('click', () => { const [gi, i] = b.dataset.ld.split(':').map(Number); rotOpen(D.groups[gi][1][i], mk); }));
+  box.querySelectorAll('[data-ldi]').forEach((b) => b.addEventListener('click', () => { const [gi, i] = b.dataset.ldi.split(':').map(Number); rotOpen(D.groups[gi][2][i], mk); }));
   box.querySelectorAll('[data-ldmore]').forEach((b) => b.addEventListener('click', () => { const gi = +b.dataset.ldmore; const L = D.groups[gi][1];
     b.outerHTML = L.slice(8).map((x, i) => chip(x, gi, i + 8)).join(''); box.querySelectorAll('[data-ld]').forEach((c) => { if (!c._w) { c._w = 1; c.addEventListener('click', () => { const [g2, i2] = c.dataset.ld.split(':').map(Number); rotOpen(D.groups[g2][1][i2], mk); }); } }); }));
   box.querySelectorAll('[data-ld]').forEach((c) => { c._w = 1; });
