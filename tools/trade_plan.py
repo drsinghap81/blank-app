@@ -13,7 +13,7 @@ Score (points from the backtests; the combination itself is a ranking rule, not 
   base : ATH base >= 24 m 3, 12-24 m 2; buy-stop at trigger 2; 9/21 new buy 3
   ATH only (top-down did not help 9/21): +2 aligned (sector RS > 0 and stock RS > 0; 54% win / +29% vs 48% / +15%),
         +1 best theme RS > 0, -3 stock RS <= 0 (29% win), -1 if bought > 5% above the breakout
-  ties: stock RS, then traded value
+  ties: industry results-season score (21 Nov 2026), then industry lane, stock RS, traded value
 Exits: ATH signals with "exit next open" and 9/21 trades whose Supertrend turned red (the server matches them to holdings).
 Writes data/scan/trade_plan.json. Sizing is done in the apps / server from your capital: risk 1% to the stop, max 20% a stock,
 max 10 positions."""
@@ -235,7 +235,20 @@ def main(mk="NSE"):
         g = GS.get(c["symbol"]); x = LN.get(g[0]) if g else None
         c.update(group=g[0] if g else None, lane=x[0] if x else None, group_pulse=x[1] if x else None, group_rank=x[2] if x else None)
     if india:
-        C = sorted(best.values(), key=lambda c: (-c["score"], LANE_ORD[c["lane"]], -(c["stock_rs"] or -999), -(c["value_cr"] or 0)))
+        # 21 Nov 2026 (Amritpal: "All 3"): first tiebreak after the score = the industry's latest results season
+        # (share of its stocks with profit > 20% y/y + half the share accelerating; data/scan/results_season.json).
+        # Tested 2016-26 as the ATH buying order (10 equal, no RED buys): 25.2% CAGR vs random 24.7%, 3-month strength 23.2%,
+        # best in every window (last 1/3/5 y 18/21/25% vs 16/18/24%); same max DD. Project doc rank-by-industry-test.md.
+        RSN = load(D + "results_season.json").get("rows") or []
+        rsc = {r["basic"]: (r.get("strong") or 0) + 0.5 * (r.get("accel") or 0) for r in RSN if r.get("strong") is not None}
+        med = float(np.median(list(rsc.values()))) if rsc else 0.0
+        basic = {m["symbol"]: r["basic"] for r in ((G.get("nse") or {}).get("rows") or []) for m in r.get("members") or []}
+        for c in best.values():
+            b = basic.get(c["symbol"])
+            c["results_score"] = round(rsc[b], 2) if b in rsc else None
+            c["results_ind"] = b
+        C = sorted(best.values(), key=lambda c: (-c["score"], -(c["results_score"] if c["results_score"] is not None else med),
+                                                  LANE_ORD[c["lane"]], -(c["stock_rs"] or -999), -(c["value_cr"] or 0)))
     else:
         # US / ASX (8 Nov 2026, Amritpal's choice): top-down order - number of levels passed (sector 6-month RS > 0,
         # industry Building/Strong, stock 1-year RS > 0) first, then sector, industry lane, system score, stock RS.
