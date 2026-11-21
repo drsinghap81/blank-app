@@ -857,6 +857,7 @@ async function loadLiveG(mk) {
   if (!P) { el.innerHTML = lvSeg() + (mk === 'UK' ? `<div class="lv-card"><b>UK · watch only</b><p class="lv-sub">There is no tested UK system and no UK broker link, so there is no live plan to trade. The UK lists stay on Momentum and Trading for ideas.</p></div>`
     : `<p class="empty">The ${MKT[mk].name} trade plan appears after its evening run.</p>`); lvSegWire(el); return; }
   $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}${updTxt(P.generated)}`;
+  const AL = await alignPrep(mk).catch(() => null);   // 21 Nov 2026: top-down strip on each plan row
   const C0 = cap(mk); const nP = lvN(mk); const risk = lvRiskN(nP) / 100; const L = MKT[mk].loc; const cur = MKT[mk].cur;
   const selG = lvSel(mk, P.asof, P.top || [], nP);
   const alG = lvAlloc(mk, P, null);
@@ -881,9 +882,11 @@ async function loadLiveG(mk) {
       : `<b>Stop</b> · Sell ${r.qty} · ${fmt(net, 2, L)} · GTC (the backtested 5-day-low stop); also sell when this tab lists a Supertrend exit`;
     return `<div class="lv-tk">1. ${buy}<br>2. After the fill: ${prot}</div>`; };
   const list = rows.map((r, i) => `<div class="lv-row${r.off ? ' lv-off' : ''}"><div class="lv-rank">${r.rank}<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.off ? '' : 'checked'} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span> ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}${r.td_levels != null ? ` <span class="chip ${r.td_levels === 3 ? 'open' : r.td_levels <= 1 ? 'exit' : ''}" title="Top-down checks passed: sector beats the index (6 m), industry Building/Strong, stock beats its sector (1 y)">Top-down ${r.td_levels}/3</span>` : ''} <span class="muted" style="font-size:12px">${esc(r.name || '')}${r.group ? ' · ' + esc(r.group) : ''}</span></div>
+      <div class="lv-al">${alignStrip(AL, r.symbol, mk)}${r.results_score != null ? ` <small class="muted">results ${fmt(r.results_score, 2)} = tiebreak</small>` : ''}</div>
       <div class="lv-plan">${r.off ? `<span class="muted">Not picked${r.qty ? ` (would be ${r.qty.toLocaleString(L)} shares)` : ''}</span>` : r.qty ? `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}` : '<span class="muted">Too small for your capital at this risk</span>'}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}</div>${r.qty && !r.off ? ticket(r) : ''}</div><div></div></div>`).join('');
   const swRow = (r, i) => `<div class="lv-row${r.skip ? ' lv-off' : ''}"><div class="lv-rank">S${r.rank}<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label></div><div><div class="lv-sym"><a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvp + r.symbol)}" target="_blank" rel="noopener">${esc(r.symbol)}</a> <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${bkOf(r) === 'vcp' ? ` <a href="#" class="chip open vcp-ch" data-v="${i}">chart</a>` : r.experimental ? ' <span class="chip exit">experimental</span>' : ''} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')} <span class="muted" style="font-size:12px">${esc(r.name || '')}</span></div>
+      <div class="lv-al">${alignStrip(AL, r.symbol, mk)}</div>
       <div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}${r.skip === 'not picked' && r.qty ? ` (would be ${r.qty.toLocaleString(L)} shares)` : ''}</span>` : r.qty ? `<b>Buy ${r.qty.toLocaleString(L)}</b> · ${money(r.value, mk)} (${fmt(r.value / C0 * 100, 1)}%) · risk ${money(r.risk_amt, mk)}` : '<span class="muted">Too small for your capital at this risk</span>'}</div>
       <div class="lv-sub">stop ${fmt(r.stop, 2, L)} (${fmt(r.risk_pct, 1)}% below) · ${esc(r.note || '')}${bkOf(r) === 'my' ? ` · <a href="#" class="my-rm" data-sym="${esc(r.symbol)}" data-mk="${mk}">Remove</a>` : ''}</div>${r.qty && !r.skip ? ticket(r) : ''}</div><div></div></div>`;
   const swCardG = (b) => { const L2 = swR.map((r, i) => (bkOf(r) === b ? swRow(r, i) : '')).join(''); if ((!L2 && b !== 'tf' && b !== 'vcp') || ((alG[b] ?? 0) <= 0 && b !== 'vcp' && b !== 'my')) return '';
@@ -6360,8 +6363,44 @@ function lightHTML(L, mk) {
     <small>${LIGHT_TEST}</small></div></div>`;
 }
 const LIGHT_TEST = 'Red = both warnings (about 15% of days), amber = one. Tested on 9/21, 2017–26: skipping new buys on red days kept the return (26.9% → 29.1% a year, best book) and cut the worst fall (−26% → −22.5%; −22 to −30% → −19 to −23% across 3 books). Skipping amber days too halved the return, so amber is not a stop. Open trades keep their own stops. ATH breakouts (adopted 21 Nov 2026): skipping red days kept the 10-year return about the same (25.1% → 24.6% a year) but did much better in the last 1–3 years (last year 18% → 37%, worst 2-year fall −22% → −17%); only 64 red-day ATH signals in 10 years, so a modest edge.';
+/* 21 Nov 2026 (Amritpal: "align from top to bottom in our stock selection" -> "All 3"): one strip per stock, top-down:
+   World (the market's weekly rotation vs world stocks) · Light (market traffic light) · Rotation (industry quadrant) · Flow (industry
+   volume vs price, 10 sessions) · Results (industry results season, India) · Pulse (industry rank). Green = supports, amber = mixed,
+   red = against. Display only: of these, only the results season changed which signal to take in tests (ATH buying order 25.2% vs
+   24.7% random 2016-26; now the trade plan's first tiebreak) - the others did not improve entries. */
+const AL_WORLD = { NSE: 'India', US: 'US S&P 500', ASX: 'Australia', UK: 'UK' };
+async function alignPrep(mk) {
+  state.al = state.al || {}; if (state.al[mk]) return state.al[mk];
+  const [W, G] = await Promise.all([getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null), loadGP(mk).catch(() => null)]);
+  if (mk === 'NSE') await rsLoad();
+  let lvl = null; try { const S = await sysMap(mk); lvl = (await mxLight(mk, S)).lvl; } catch (e) { lvl = null; }
+  const w = W && W.weekly && W.weekly[AL_WORLD[mk]];
+  state.al[mk] = { G, lvl, world: w ? w.now : null }; return state.al[mk];
+}
+function alignStrip(A, sym, mk) {
+  if (!A) return '';
+  const Q = { Leading: 'g', Improving: 'a', Weakening: 'a', Lagging: 'r' };
+  const G = A.G; let ind = null, nm = null, rank = null, n = null;
+  if (G) {
+    if (mk === 'NSE') { ind = nseInd(G, sym); if (ind) { nm = ind.basic; rank = ind.rank; n = G._nseN; } }
+    if (!ind) { const x = (G.stock || {})[sym]; if (x) { ind = (G.rows || []).find((r) => r.group === x[0]) || null; nm = x[0]; rank = x[2]; n = x[3]; } }
+  }
+  const rs = mk === 'NSE' && nm ? rsOf(nm) : null;
+  const fl = ind && ind.flow && ind.flow.tag;
+  const it = [
+    ['World', A.world ? Q[A.world] : null, A.world ? `${AL_WORLD[mk]} vs world stocks: ${A.world}` : 'no data'],
+    ['Light', A.lvl ? { green: 'g', amber: 'a', red: 'r' }[A.lvl] : null, A.lvl ? `Market light ${A.lvl}` : 'no data'],
+    ['Rotation', ind && ind.rrg ? Q[ind.rrg.now] : null, ind && ind.rrg ? `${nm}: ${ind.rrg.now}` : 'no industry rotation'],
+    ['Flow', fl ? (fl === 'both up' ? 'g' : fl === 'both down' ? 'r' : 'a') : null, fl ? `${nm}: ${fl}` : 'no flow data'],
+    ...(mk === 'NSE' ? [['Results', rs ? (rs.profile || (rs.strong ?? 0) >= 0.5 ? 'g' : rs.weak ? 'r' : 'a') : null,
+      rs ? `${nm}: ${fmt((rs.strong || 0) * 100, 0)}% of stocks profit > 20% y/y (${rsQ(rs.quarter)})${rs.profile ? ', strong + improving + cheap' : ''}` : 'no results season yet']] : []),
+    ['Pulse', rank && n ? (rank <= n / 3 ? 'g' : rank > (2 * n) / 3 ? 'r' : 'a') : null, rank && n ? `${nm}: Pulse rank ${rank} of ${n}` : 'no industry'],
+  ];
+  const ok = it.filter((x) => x[1] === 'g').length;
+  return `<span class="al6" aria-label="Top-down alignment ${ok} of ${it.length}">${it.map(([k, c, t]) => `<span class="al6-${c || 'n'}" title="${esc(t)}">${k}</span>`).join('')}<b>${ok}/${it.length}</b></span>`;
+}
 async function tdTop5(box, mk) {
-  if (!box) return; const S = await sysMap(mk); const L = await mxLight(mk, S);
+  if (!box) return; const S = await sysMap(mk); const L = await mxLight(mk, S); const AL = await alignPrep(mk).catch(() => null);
   const H = mk === 'NSE' ? tdHeldSet() : new Set();
   /* swing entries only (Amritpal wants 1-2 week style trades): a 9/21 buy, a tight-base breakout (today or the last few sessions),
      or a tight base within 2% of its trigger. ATH / IPO buys hold for months, so they add points but do not qualify alone. */
@@ -6380,10 +6419,11 @@ async function tdTop5(box, mk) {
     <div class="mx5h"><b>Top 5 swing trades today</b><small>${C.length} swing setups now (9/21 buys, tight-base breakouts, bases near their trigger) · ranked by score · tap for the chart</small></div>
     ${top.length ? `<ol class="mx5l${red ? ' dim' : ''}">${top.map((x, i) => `<li><button data-m5="${esc(x.sym)}"><span class="mx5n">${i + 1}</span>
       <span class="mx5b"><b>${esc(x.sym)} <em class="mx5s">${x.p} pts</em>${x.stack ? ' <small class="chip">MA stack ✓</small>' : ''}</b>
+      ${alignStrip(AL, x.sym, mk)}
       <small>${x.w.map(([n, t]) => `<span class="${n > 0 ? 'up' : 'down'}">${n > 0 ? '+' : ''}${n} ${esc(t)}</span>`).join(' · ')}</small>
       <small class="mx5p">${plan(x.sym)}</small></span></button></li>`).join('')}</ol>` : '<p class="muted td-rs">No stock has a buy signal right now.</p>'}
     ${red && top.length ? '<p class="down td-rs"><b>Red day:</b> these are shown for the record. Your rule is to wait.</p>' : ''}
-    <details class="al-why"><summary>ⓘ How the score works</summary><p class="muted td-rs">Score: 9/21 buy +3 (trend running +1), tight-base breakout +2 (near trigger or recent +1), also an ATH breakout +2, IPO cup +1, 3-month gain top 20% +2 (top 40% +1), sector leading/uptrend +1 (weak −1), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></details></section>`;
+    <details class="al-why"><summary>ⓘ How the score works</summary><p class="muted td-rs">Score: 9/21 buy +3 (trend running +1), tight-base breakout +2 (near trigger or recent +1), also an ATH breakout +2, IPO cup +1, 3-month gain top 20% +2 (top 40% +1), sector leading/uptrend +1 (weak −1), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. The coloured strip is top-down alignment, world → market → industry: green supports, amber mixed, red against (tap and hold for details). Only the industry results season changed which signal to take in tests; the strip is not part of the score. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></details></section>`;
   box.querySelectorAll('[data-m5]').forEach((b) => b.addEventListener('click', () => mxOpen(b.dataset.m5, mk, S)));
 }
 /* 19 Nov 2026 (Amritpal): alert when a whole candle leaves a RISING 9 EMA; ride until a whole candle is below it. Info only.

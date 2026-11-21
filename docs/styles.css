@@ -1315,3 +1315,11 @@ body.pub .owner-only { display: none !important; }
 .ig-wmap { border-radius: 16px; padding: 10px 10px 4px; margin-bottom: 12px; background: rgba(14,165,233,.07); border: 1px solid rgba(14,165,233,.25); cursor: pointer; max-width: 100%; overflow: hidden; }
 .ig-wmap svg { max-width: 100%; height: auto; }
 .ig-wmap:focus-visible { outline: 2px solid #0EA5E9; outline-offset: 2px; }
+
+/* 21 Nov 2026: top-down alignment strip */
+.al6{display:inline-flex;flex-wrap:wrap;align-items:center;gap:3px;margin:2px 0}
+.al6 span{font-size:10.5px;font-weight:700;line-height:17px;padding:0 6px;border-radius:999px;color:#fff;cursor:help}
+.al6 .al6-g{background:#0A7A55}.al6 .al6-a{background:#B7791F}.al6 .al6-r{background:#C53030}
+.al6 .al6-n{background:transparent;color:var(--muted);border:1px dashed var(--line)}
+.al6 b{font-size:11.5px;margin-left:3px;color:var(--ink)}
+.lv-al{margin:2px 0}
