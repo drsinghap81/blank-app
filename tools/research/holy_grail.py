@@ -29,6 +29,7 @@ PILOT = bool(os.environ.get("PILOT"))
 COST = 0.002
 MINVAL = 2e7
 STRICT = False
+TRAIL = 3      # trail below the lowest low of the last TRAIL sessions
 
 
 def adx(h, l, c, n=14):
@@ -88,8 +89,8 @@ def trades_for(sym, x, side, adx_min, half_mode):
             if half_mode != "none" and half_px is None and hi_ >= tgt:
                 half_px = max(op, tgt) if k > j else tgt
                 stp = max(stp, e)                  # rest: at least break-even
-            if k >= j + 2:
-                stp = max(stp, np.min(l[k - 2:k + 1]) - abs(np.min(l[k - 2:k + 1])) * 0.001)
+            if k >= j + TRAIL - 1:
+                stp = max(stp, np.min(l[k - TRAIL + 1:k + 1]) - abs(np.min(l[k - TRAIL + 1:k + 1])) * 0.001)
             k += 1
         if exit_px is None:
             exit_px, exit_i = c[-1], n - 1
@@ -170,10 +171,10 @@ def main():
     res = dict(method=__doc__, runs={})
     VAR = [("as given (ADX>30, half at swing high)", 30, "swing"), ("ADX > 25", 25, "swing"), ("no half exit, trail all", 30, "none"),
            ("half at 2R", 30, "2R")]
-    global STRICT
-    VAR = VAR + [("strict: ADX rising on the touch bar", 30, "swing")]
+    global STRICT, TRAIL
+    VAR = VAR + [("strict: ADX rising on the touch bar", 30, "swing"), ("looser trail: 10-day low", 30, "swing")]
     for nm, amin, hm in VAR:
-        STRICT = nm.startswith("strict")
+        STRICT = nm.startswith("strict"); TRAIL = 10 if nm.startswith("looser") else 3
         rows = []
         for s, g in d.groupby("SYMBOL"):
             x = g.set_index("Date")
