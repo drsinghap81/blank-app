@@ -256,8 +256,23 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None, S1=None):
     rk = sorted([r for r in out if r.get("p1m") is not None], key=lambda r: -r["p1m"])
     for i, r in enumerate(rk):
         r["rank"] = i + 1
-    print("nse basic industries", len(out), "with Pulse", len(rk), "map asof", js.get("asof"))
-    return dict(asof=js.get("asof"), rows=out)
+    # 22 Nov 2026 (Amritpal: "where is the broader industry graph - consumer goods, capital goods, services, chemicals"): NSE's 22
+    # sectors (the level above industries; most have no NSE index - Capital Goods, Chemicals, Services, Consumer Services, Textiles):
+    # equal-weight of each sector's liquid members, weekly rotation vs Nifty 50 + 1 w / 1 m / 3 m.
+    sectors = []
+    for sec in sorted({k[1] for k in G}):
+        ss = [x for k, v in G.items() if k[1] == sec for x in v]
+        lq = [x for x in ss if L.get(x, False)]
+        use = lq if len(lq) >= 3 else ss
+        if len(use) < 3:
+            continue
+        gi = (1 + ret[use].mean(axis=1).fillna(0)).cumprod() * 100
+        sectors.append(dict(sector=sec, macro=next(k[0] for k in G if k[1] == sec), n=len(ss), n_liquid=len(lq),
+                            industries=len({k[3] for k in G if k[1] == sec}), rrg=rrg(gi, BENCH.get("b")),
+                            r1w=round(float(gi.iloc[-1] / gi.iloc[-6] - 1) * 100, 1), r1m=round(float(gi.iloc[-1] / gi.iloc[-22] - 1) * 100, 1),
+                            r3m=round(float(gi.iloc[-1] / gi.iloc[-64] - 1) * 100, 1)))
+    print("nse basic industries", len(out), "with Pulse", len(rk), "map asof", js.get("asof"), "| nse sectors", len(sectors))
+    return dict(asof=js.get("asof"), rows=out, sectors=sectors)
 
 
 def nasdaq_fill(data, miss, d, threads=12):

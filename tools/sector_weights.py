@@ -202,6 +202,9 @@ def industries():
         for nm, sec, _ in rows:
             sec_tot[sec] = sec_tot.get(sec, 0) + val[nm]
         out["IND_" + mk] = {nm: dict(w=round(100 * val[nm] / sec_tot[sec], 2), part=True) for nm, sec, _ in rows if sec_tot.get(sec) and val[nm] > 0}
+        if mk == "NSE":   # 22 Nov 2026: NSE's 22 broad sectors as a share of all NSE market value we have (they don't overlap)
+            allv = sum(sec_tot.values()) or 1
+            out["NSEC"] = {sec: dict(w=round(100 * v / allv, 2), part=True) for sec, v in sec_tot.items() if sec and v > 0}
         if mk == "NSE":
             tot = sum(mc.values()) or 1
             out["THEME_NSE"] = {t["group"]: dict(w=round(100 * sum(mc.get(m["symbol"], 0) for m in t["members"]) / tot, 2), part=False)
