@@ -1382,3 +1382,10 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:10
 input,select,textarea{font-size:16px!important}
 .rs-new{display:inline-block;font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:999px;background:#0A7A55;color:#fff;vertical-align:1px}
 .tds-note.rs{background:rgba(10,122,85,.12);border-color:rgba(10,122,85,.4)}
+/* 22 Nov 2026: industry card - results growers, inline industry chart, per-stock charts */
+.ind-grow{margin:10px 0 2px;padding:10px;border-radius:12px;background:rgba(10,122,85,.1);border:1px solid rgba(10,122,85,.3)}
+.ind-grow b{display:block;font-size:13.5px;margin-bottom:6px}.ind-grow span{display:flex;flex-wrap:wrap;gap:6px}
+.ind-grow .chip{cursor:pointer;min-height:32px}
+.ind-mini{min-height:170px}
+.ind-st{cursor:pointer}.ind-chart{list-style:none;padding:6px 12px 12px;border-bottom:1px solid var(--line)}
+.ind-act{display:flex;gap:16px;margin-top:6px}

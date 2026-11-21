@@ -5376,6 +5376,38 @@ function nseIndHTML(G) {
     ${secs.map((x) => `<details class="t2-more nse-sec"><summary><span>${esc(x.s)} <span class="muted">· ${x.L.length} industries · ${x.n} stocks</span></span>${pc(x.d1, 1)}</summary><div class="mxlist">${x.L.map((r) => `<div class="gpsr nos" data-nb="${esc(r.slug)}"><span class="gpsn">${esc(r.basic)} <span class="muted">· ${r.n} stocks</span>${r.w ? (r.w.status === 'broken' ? ' <span class="chip open">W broke</span>' : ` <span class="chip">W ${fmt(r.w.dist_pct, 1)}% to break</span>`) : ''}</span><span class="gpsv">${pc(r.d1)}</span></div>`).join('')}</div></details>`).join('')}
     <p class="muted" style="font-size:11.5px">Map as of ${esc((N.asof || '').slice(0, 10))}.</p>`;
 }
+/* 22 Nov 2026 (Amritpal: "I should be able to see the chart of the result-season industry as well as its stocks by clicking"):
+   the industry card shows its own daily chart inline, its results-season top growers, and every stock opens a 1-year weekly chart
+   in place (with the full chart / TradingView one tap further). */
+async function indMini(el, slug, mk = 'NSE') {   // plain SVG (no chart library needed): daily close area + 9 EMA, ~8 months
+  if (!el) return; let c;
+  try { const r = await fetch(MAIN + MKT[mk].path + 'group_w_charts/' + encodeURIComponent(slug) + '.json', { cache: 'no-cache' }); if (!r.ok) throw 0; c = await r.json(); }
+  catch (e) { el.innerHTML = '<p class="muted">Industry chart appears after tonight\'s scan.</p>'; return; }
+  const v = c.c, e9 = c.e9 || [], n = v.length; if (n < 5) { el.innerHTML = '<p class="muted">Not enough data yet.</p>'; return; }
+  const all = v.concat(e9.filter((x) => x != null)), lo = Math.min(...all), hi = Math.max(...all), H = 170, Wd = 340;
+  const X = (i) => (i / (n - 1)) * Wd, Y = (x) => 6 + (hi - x) / ((hi - lo) || 1) * (H - 22);
+  const path = v.map((x, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(x).toFixed(1)}`).join(' ');
+  const ep = e9.map((x, i) => (x == null ? '' : `${i && e9[i - 1] != null ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(x).toFixed(1)}`)).join(' ');
+  const up = v[n - 1] >= v[0], col = up ? 'var(--rise)' : 'var(--fall)', ch = (v[n - 1] / v[0] - 1) * 100;
+  const months = []; for (let i = 1; i < n; i++) if (c.t[i].slice(5, 7) !== c.t[i - 1].slice(5, 7)) months.push(i);
+  el.innerHTML = `<svg viewBox="0 0 ${Wd} ${H}" width="100%" height="${H}" preserveAspectRatio="none" aria-label="${esc(c.name || slug)} daily chart">
+    ${months.map((i) => `<line x1="${X(i).toFixed(1)}" y1="0" x2="${X(i).toFixed(1)}" y2="${H - 14}" stroke="currentColor" opacity=".08"/><text x="${(X(i) + 2).toFixed(1)}" y="${H - 3}" font-size="9" fill="currentColor" opacity=".5">${new Date(c.t[i] + 'T00:00:00').toLocaleString('en', { month: 'short' })}</text>`).join('')}
+    <path d="${path} L ${Wd} ${H - 14} L 0 ${H - 14} Z" style="fill:${col};opacity:.12"/><path d="${path}" fill="none" style="stroke:${col}" stroke-width="2"/>
+    <path d="${ep}" fill="none" stroke="#f59e0b" stroke-width="1.4"/></svg>
+    <small class="muted">${esc(day(c.t[0]))} → ${esc(day(c.t[n - 1]))} · <b class="${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%</b></small>`;
+}
+function stockSpark(sym, mk = 'NSE') {   // 1-year weekly closes + 30-week average, plain SVG (stock_weekly.json)
+  const W = state.mxW && state.mxW[mk]; const v = W && W.s && W.s[sym];
+  if (!v || v.length < 10) return '<p class="muted" style="margin:4px 0">No weekly data for this stock yet.</p>';
+  const ma = v.map((_, i) => (i >= 29 ? v.slice(i - 29, i + 1).reduce((a, b) => a + b, 0) / 30 : null));
+  const lo = Math.min(...v), hi = Math.max(...v), H = 90, Wd = 340, X = (i) => (i / (v.length - 1)) * Wd, Y = (x) => 4 + (hi - x) / ((hi - lo) || 1) * (H - 8);
+  const up = v[v.length - 1] >= v[0], col = up ? 'var(--rise)' : 'var(--fall)';
+  const path = v.map((x, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(x).toFixed(1)}`).join(' ');
+  const mp = ma.map((x, i) => (x == null ? '' : `${ma[i - 1] == null ? 'M' : 'L'}${X(i).toFixed(1)} ${Y(x).toFixed(1)}`)).join(' ');
+  const ch = (v[v.length - 1] / v[0] - 1) * 100, t = W.t || [];
+  return `<svg viewBox="0 0 ${Wd} ${H}" width="100%" height="${H}" preserveAspectRatio="none" aria-label="${esc(sym)} weekly closes, 1 year"><path d="${path} L ${Wd} ${H} L 0 ${H} Z" style="fill:${col};opacity:.12"/><path d="${path}" fill="none" style="stroke:${col}" stroke-width="1.8"/><path d="${mp}" fill="none" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4 3"/></svg>
+    <small class="muted">${t.length ? esc(day(t[0])) + ' → ' + esc(day(t[t.length - 1])) + ' · ' : ''}<b class="${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%</b> in a year · dashed = 30-week average</small>`;
+}
 async function nseIndOpen(r) {
   if (!r) return; const mk = 'NSE'; await rsLoad();
   /* 21 Nov 2026 (Amritpal: "click on these industries - see stocks and charts, and whether they come in our other filters"):
@@ -5386,7 +5418,8 @@ async function nseIndOpen(r) {
   const nSig = r.members.filter((m) => sysOf(m.symbol).length).length;
   const lvlOf = (sym) => { const L = sysOf(sym); return L.length ? L[0][1].lvl : 9; };
   const pc = (v, d = 1) => (v == null ? '–' : `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : ''}${fmt(v, d)}%</span>`);
-  const tvb = indTv(r, mk);
+  const tvb = indTv(r, mk); await mxFund(mk).catch(() => null);
+  const rsr = rsOf(r.basic); const grow = {}; ((rsr && rsr.top) || []).forEach((x) => { grow[x.symbol] = x.yoy; });
   openPanel(`<div class="d-head no-push"><div><h2>${esc(r.basic)}</h2><div class="co">${esc(r.macro)} › ${esc(r.sector)} › ${esc(r.industry)}</div>${tvb ? `<a class="tv-btn" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvb)}&interval=D">Open top ${r.top.length} stocks in TradingView ↗</a>` : ''}</div></div>
     <div class="facts"><div class="fact"><span>Today</span><b>${pc(r.d1, 2)}</b></div><div class="fact"><span>1 week / 1 month / 3 months</span><b>${pc(r.r1w)} / ${pc(r.r1m)} / ${pc(r.r3m)}</b></div>
       <div class="fact"><span>Stocks</span><b>${r.n} (${r.n_liquid} liquid)</b></div><div class="fact"><span>W + trendline</span><b>${!r.w ? 'none now' : r.w.status === 'broken' ? `broke ${esc(r.w.broke_on)}` : `forming · ${fmt(r.w.dist_pct, 1)}% to break`}</b></div>
@@ -5396,11 +5429,21 @@ async function nseIndOpen(r) {
       <div class="fact"><span>Volume flow (10 days)</span><b>${flowTxt(r)}</b></div>
       <div class="fact"><span>Results season</span><b>${rsTxt(rsOf(r.basic))}</b></div>
       <div class="fact"><span>Stocks in our systems</span><b>${nSig} of ${r.n}</b></div></div>
-    <button class="lv-btn" id="nsew">Daily chart · 9 EMA · W trendline ›</button>
-    <h4 style="margin:12px 0 4px">Stocks <span class="muted" style="font-weight:400;font-size:12px">· signals first · chips = our systems (green = buy now, blue = in a trade / on the list, grey = near)</span></h4><ul class="list flat">${[...r.members].sort((a, b) => (lvlOf(a.symbol) - lvlOf(b.symbol)) || (b.liquid - a.liquid) || ((b.d1 ?? -99) - (a.d1 ?? -99))).map((m) => `<li class="row" data-tv="${esc(m.symbol)}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}${m.liquid ? '' : ' · thin'}</div>${sysOf(m.symbol).length ? `<div class="tags">${chipsOf(m.symbol)}</div>` : ''}</div><div></div><div class="num"><b>${fmt(m.close, 2, 'en-IN')}</b>${m.d1 != null ? pc(m.d1, 2) : ''}</div></li>`).join('')}</ul>
-    <p class="muted" style="font-size:12px">Equal-weight index of the liquid members (all members if fewer than 2 are liquid). Tap a stock for TradingView.</p>`);
+    ${rsr && rsr.top && rsr.top.length ? `<div class="ind-grow"><b>${rsIsNew(rsr) ? '<span class="rs-new">New</span> ' : ''}Results season ${esc(rsQ(rsr.quarter))}: biggest profit growth</b><span>${rsr.top.map((x) => `<button class="chip ${x.yoy >= 20 ? 'new' : ''}" data-indst="${esc(x.symbol)}">${esc(x.symbol)} ${x.yoy >= 0 ? '+' : ''}${fmt(x.yoy, 0)}%</button>`).join('')}</span></div>` : ''}
+    <h4 style="margin:12px 0 4px">Industry chart <span class="muted" style="font-weight:400;font-size:12px">· equal-weight daily close · orange = 9 EMA</span></h4>
+    <div id="indmini" class="ind-mini" style="color:var(--ink)"><p class="muted">Loading chart…</p></div>
+    <button class="lv-btn" id="nsew">Full chart · W trendline ›</button>
+    <h4 style="margin:12px 0 4px">Stocks <span class="muted" style="font-weight:400;font-size:12px">· signals first · chips = our systems (green = buy now, blue = in a trade / on the list, grey = near)</span></h4><ul class="list flat">${[...r.members].sort((a, b) => (lvlOf(a.symbol) - lvlOf(b.symbol)) || (b.liquid - a.liquid) || ((b.d1 ?? -99) - (a.d1 ?? -99))).map((m) => `<li class="row ind-st" data-indst="${esc(m.symbol)}" tabindex="0"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}${m.liquid ? '' : ' · thin'}</div>${sysOf(m.symbol).length || grow[m.symbol] != null ? `<div class="tags">${grow[m.symbol] != null ? `<span class="chip ${grow[m.symbol] >= 20 ? 'new' : ''}">profit ${grow[m.symbol] >= 0 ? '+' : ''}${fmt(grow[m.symbol], 0)}% y/y</span>` : ''}${chipsOf(m.symbol)}</div>` : ''}</div><div></div><div class="num"><b>${fmt(m.close, 2, 'en-IN')}</b>${m.d1 != null ? pc(m.d1, 2) : ''}</div></li><li class="ind-chart" data-for="${esc(m.symbol)}" hidden></li>`).join('')}</ul>
+    <p class="muted" style="font-size:12px">Equal-weight index of the liquid members (all members if fewer than 2 are liquid). Tap a stock for its 1-year chart.</p>`);
   const b = document.getElementById('nsew'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts', indTv(r, mk)));
-  document.querySelectorAll('[data-tv]').forEach((li) => li.addEventListener('click', () => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(li.dataset.tv, 'NSE')) + '&interval=D', '_blank', 'noopener')));
+  indMini(document.getElementById('indmini'), r.slug, mk);
+  const openSt = (sym) => { const box = document.querySelector(`.ind-chart[data-for="${CSS.escape(sym)}"]`); if (!box) return;
+    if (!box.hidden) { box.hidden = true; return; }
+    document.querySelectorAll('.ind-chart').forEach((x) => { x.hidden = true; });
+    box.innerHTML = `${stockSpark(sym, mk)}<div class="ind-act"><button class="lv-link" data-full="${esc(sym)}">Full chart & plan ›</button><a class="lv-link" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(sym, 'NSE'))}&interval=D">TradingView ›</a></div>`;
+    box.hidden = false; box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    box.querySelector('[data-full]').addEventListener('click', async () => { const S2 = S || await sysMap(mk).catch(() => null); if (S2) mxOpen(sym, mk, S2); else lvOpen({ symbol: sym, kind: 'ATH' }, mk); }); };
+  document.querySelectorAll('[data-indst]').forEach((li) => { const go = () => openSt(li.dataset.indst); li.addEventListener('click', go); li.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') go(); }); });
 }
 /* 20 Nov 2026 (Amritpal, StockEdge-style industries): today / 1-month change of the industry's equal-weight index and its latest W */
 function indTags(r) {
@@ -7464,7 +7507,7 @@ async function tdRender2(el) {
       sm.textContent = (L.length ? 'leading this week: ' + L.slice(0, 3).map(([k]) => k).join(', ') : 'none leading this week') + (I.length ? ` · ${I.length} improving` : '');
       await swLoad(); const all = swAttach(E.map(([nm, r]) => ({ nm, now: r.now, pts: r.pts })), mk); const sh = swShare(all, mk === 'NSE' ? 'the Nifty 500' : MX_BENCH[mk]);
       const mp = h.querySelector('.tds-map'); if (mp && sh) mp.insertAdjacentHTML('beforebegin', sh);
-      if (mk === 'NSE') { await rsLoad(); const NR = ((state.rsData || {}).rows || []).filter((r) => rsIsNew(r)); if (NR.length && mp) mp.insertAdjacentHTML('beforebegin', `<p class="tds-note rs">🆕 <b>Results season: newly strong + improving + cheap</b> — ${NR.slice(0, 4).map((r) => esc(r.basic)).join(', ')}. Early clue (tested +4.4% vs Nifty over 3 months; PSU banks met it 10 days before their breakout). Buy only on your system's signal.</p>`); }
+      if (mk === 'NSE') { await rsLoad(); const NR = ((state.rsData || {}).rows || []).filter((r) => rsIsNew(r)); if (NR.length && mp) mp.insertAdjacentHTML('beforebegin', `<p class="tds-note rs">🆕 <b>Results season: newly strong + improving + cheap</b> — ${NR.slice(0, 4).map((r) => `<a href="#" data-rsn="${esc(r.slug)}">${esc(r.basic)}</a>`).join(', ')}. Early clue (tested +4.4% vs Nifty over 3 months; PSU banks met it 10 days before their breakout). Buy only on your system's signal.</p>`); h.querySelectorAll('[data-rsn]').forEach((a2) => a2.addEventListener('click', (ev) => { ev.preventDefault(); const G2 = state.gp.NSE; nseIndOpen(((G2 && G2.nse) || {}).rows ? G2.nse.rows.find((x) => x.slug === a2.dataset.rsn) : null); })); }
       if (!ok && mp) mp.insertAdjacentHTML('beforebegin', `<p class="tds-note">${esc(MX_BENCH[mk])} is below its 30-week average: here <b>Leading = falling less than the index</b>, not rising. Defensive sectors leading while the biggest sector lags is how money hides in a falling market.</p>`); }).catch(() => {}); } }
   el.querySelectorAll('.t2-tile[data-go]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.go); if (t) { const fd = t.closest('details'); if (fd) fd.open = true; t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('t2-flash'); setTimeout(() => t.classList.remove('t2-flash'), 1400); } }));
   el.querySelectorAll('.t2-wcard[data-tu]').forEach((b) => b.addEventListener('click', () => turtleSelect(state._tuShow[+b.dataset.tu])));
