@@ -5099,6 +5099,34 @@ function flowTxt(r) {
   const f = r && r.flow; if (!f) return '–';
   return `${f.obv10 >= 0 ? '+' : ''}${fmt(f.obv10, 1)} days' turnover net bought · price ${f.rs10 >= 0 ? '+' : ''}${fmt(f.rs10, 1)}% vs index${f.tag ? ` · <span style="color:${FLOW_C[f.tag]}">${esc(f.tag)}</span>` : ''}`;
 }
+/* 21 Nov 2026 (Amritpal: "1"): results-season ranking of NSE industries (tools/results_now.py; tested 2016-26, project doc
+   results-season-industry-test.md). Profile = half+ growing profit > 20%, growth speeding up in half+, P/E in the cheapest 40%. */
+async function rsLoad() { if (state.rsData === undefined) state.rsData = await getJSON(MAIN + 'data/scan/results_season.json', 'results_season').catch(() => null); return state.rsData; }
+function rsOf(basic) { const d = state.rsData; if (!d || !d.rows) return null; if (!d._by) { d._by = {}; d.rows.forEach((r) => { d._by[r.basic] = r; }); } return d._by[basic] || null; }
+const rsQ = (q) => { if (!q) return ''; const [y, m] = q.split('-'); return ({ '03': 'Mar', '06': 'Jun', '09': 'Sep', '12': 'Dec' }[m] || m) + '-' + y.slice(2); };
+function rsTxt(r) {
+  if (!r) return '–';
+  return `${rsQ(r.quarter)} quarter: <b>${Math.round((r.strong || 0) * 100)}%</b> of ${r.reported} grew profit > 20%${r.accel != null ? ` · ${Math.round(r.accel * 100)}% speeding up` : ''}${r.pe ? ` · P/E ${fmt(r.pe, 1)}` : ''}${r.profile ? ' · <b style="color:#0A7A55">strong + cheap ✓</b>' : r.weak ? ' · <b class="down">weak season</b>' : ''}`;
+}
+function rsAlertLines() {
+  const d = state.rsData; if (!d || !d.rows) return '';
+  const P = d.rows.filter((r) => r.profile).slice(0, 5);
+  return P.length ? `<div class="al-r"><b>Results: strong + cheap</b>${P.map((r) => `<a href="#" class="al-t ok" data-nb="${esc(r.slug)}">${esc(r.basic)} ${Math.round(r.strong * 100)}%</a>`).join('')}<small>share of stocks growing profit > 20% · tap for stocks</small></div>` : '';
+}
+function rsBlock(G, mk) {
+  if (mk !== 'NSE') return '<div class="card"><h4 style="margin:0 0 4px">Results season</h4><p class="muted">India only for now (NSE quarterly results with announcement dates).</p></div>';
+  const d = state.rsData; if (!d || !(d.rows || []).length) return '<div class="card"><h4 style="margin:0 0 4px">Results season</h4><p class="muted">Appears after the next nightly industry scan.</p></div>';
+  const R = d.rows, P = R.filter((r) => r.profile), O = R.filter((r) => !r.profile && !r.weak && (r.strong || 0) >= 0.5).sort((a, b) => b.strong - a.strong), Wk = R.filter((r) => r.weak);
+  const qn = rsQ((R.find((r) => r.reported) || {}).quarter);
+  const row = (r) => `<button class="fl-r" data-nb="${esc(r.slug)}"><span class="fl-top"><b class="fl-n">${esc(r.basic)}</b><b class="fl-v ${(r.strong || 0) >= 0.5 ? 'up' : (r.strong || 0) < 0.2 ? 'down' : ''}">${Math.round((r.strong || 0) * 100)}%</b></span>
+      <span class="fl-bar"><i style="width:${Math.max(4, (r.strong || 0) * 100).toFixed(0)}%;background:${r.profile ? '#0A7A55' : r.weak ? '#D64545' : '#3B82F6'}"></i></span>
+      <span class="fl-tags"><span class="muted">${rsQ(r.quarter)} · ${r.reported} of ${r.of} reported</span>${r.med != null ? `<span>median growth ${r.med >= 0 ? '+' : ''}${fmt(r.med, 0)}%</span>` : ''}${r.accel != null ? `<span>${Math.round(r.accel * 100)}% speeding up</span>` : ''}${r.pe ? `<span>P/E ${fmt(r.pe, 1)}</span>` : ''}${r.profile ? '<span class="fl-sys">strong + cheap ✓</span>' : ''}</span></button>`;
+  return `<div class="card fl-card"><div class="fl-hero"><span class="fl-big">${P.length}</span><span><b>industries with strong, improving, cheap results</b><small class="muted">latest season (${esc(qn)}) · ${R.length} industries · bar = share of stocks growing profit > 20%</small></span></div>
+    <h5 class="fl-h">Strong + cheap</h5><div class="fl-list">${P.map(row).join('') || '<p class="muted">None this season.</p>'}</div>
+    <details class="t2-more"><summary>Strong growth, not cheap (${O.length})</summary><div class="fl-list">${O.slice(0, 15).map(row).join('')}</div></details>
+    <details class="t2-more"><summary>Weak seasons (${Wk.length})</summary><div class="fl-list">${Wk.slice(0, 15).map(row).join('')}</div></details>
+    <details class="info"><summary>How to read this</summary><p>Each industry's latest quarter once 70% of its stocks have reported. ${esc(d.note || '')} The edge shows over about 3 months; use it to rank industries, with entries still on the stock systems.</p></details></div>`;
+}
 function flowAlertLines(G, mk) {
   if (!G) return '';
   const R = (mk === 'NSE' && G.nse && (G.nse.rows || []).some((r) => r.flow) ? G.nse.rows.map((r) => ({ ...r, nm: r.basic, nse: 1 })) : (G.rows || []).map((r) => ({ ...r, nm: r.group })))
@@ -5140,7 +5168,7 @@ function rrgBlock(G, mk) {
 }
 function mxPer() { const per = state.gpPer || 'p1w'; return `<div class="seg" id="gpper" style="margin:6px 0">${[['p1w', '1 week'], ['p1m', '1 month'], ['p1q', '1 quarter']].map(([k, n]) => `<button data-k="${k}" aria-selected="${per === k}">Pulse ${n}</button>`).join('')}</div>`; }
 /* 21 Nov 2026 (Amritpal: "can't find, that page has a lot of stuff and text - make it infographic"): one section at a time */
-const MX_TABS = [['sec', 'Sectors'], ['rot', 'Rotation'], ['flow', 'Money flow'], ['ind', 'Industries'], ['sig', 'Signals']];
+const MX_TABS = [['sec', 'Sectors'], ['rot', 'Rotation'], ['flow', 'Money flow'], ['res', 'Results'], ['ind', 'Industries'], ['sig', 'Signals']];
 function mxTabShow(el) {
   if (!state.mxTab) { try { state.mxTab = localStorage.getItem('td.mxTab') || 'sec'; } catch (e) { state.mxTab = 'sec'; } }
   el.querySelectorAll('.mxtab').forEach((d) => { d.hidden = d.dataset.tab !== state.mxTab; });
@@ -5173,7 +5201,7 @@ async function loadMarkets() {
   /* 20 Nov 2026: sector 1-month price change = stock-weighted average of its industries' (shown on the tiles beside Pulse) */
   (G.sectors || []).forEach((s) => { if (s.r1m != null) return; const L = (G.rows || []).filter((r) => r.sector === s.sector && r.r1m != null);
     const n = L.reduce((a, r) => a + r.n, 0); s.r1m = n ? L.reduce((a, r) => a + r.r1m * r.n, 0) / n : null; });
-  const S = await mxSignals(mk); await sysMap(mk).catch(() => null);   // 21 Nov 2026: system ticks for the volume-flow list
+  const S = await mxSignals(mk); await sysMap(mk).catch(() => null); if (mk === 'NSE') await rsLoad();   // 21 Nov 2026: system ticks for the volume-flow list
   if (x.lvl === 'market') {
     const ms = G.mstats || {}; const v = ((W && W.indices) || {})[MX_IDX[mk]] || {};
     const secs = G.sectors.slice().sort((a, b) => b[state.gpPer || 'p1w'] - a[state.gpPer || 'p1w']);
@@ -5204,7 +5232,7 @@ async function loadMarkets() {
           return L.length ? `<h4 style="margin:14px 0 4px">Industries on the move · last month</h4><div class="mxlist">${up.map(it).join('')}</div>
             <details class="t2-more"><summary>Biggest falls</summary><div class="mxlist">${dn.map(it).join('')}</div></details>` : ''; })()}
         </div>
-        <div class="mxtab" data-tab="rot">${rrgBlock(G, mk)}</div><div class="mxtab" data-tab="flow">${flowBlock(G, mk) || `<div class="card"><h4 style="margin:0 0 4px">Money flow</h4><p class="muted">Appears after the next nightly industry scan.</p></div>`}</div>
+        <div class="mxtab" data-tab="rot">${rrgBlock(G, mk)}</div><div class="mxtab" data-tab="res">${rsBlock(G, mk)}</div><div class="mxtab" data-tab="flow">${flowBlock(G, mk) || `<div class="card"><h4 style="margin:0 0 4px">Money flow</h4><p class="muted">Appears after the next nightly industry scan.</p></div>`}</div>
         <div class="mxtab card" data-tab="sec"><div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div></div><div class="mxtab card" data-tab="ind">${(() => { const L = (G.rows || []).filter((r) => r.d1 != null).sort((a, b) => b.d1 - a.d1); if (!L.length) return '';
           const row = (r) => `<div class="gpsr nos" data-ig="${esc(r.group)}"><span class="gpsn">${esc(r.group)} <span class="muted">· ${esc(r.sector || '')} · ${r.n} stocks</span>${r.w ? (r.w.status === 'broken' ? ' <span class="chip open">W broke</span>' : ` <span class="chip">W ${fmt(r.w.dist_pct, 1)}% to break</span>`) : ''}</span><span class="gpsv"><b class="${r.d1 >= 0 ? 'up' : 'down'}">${r.d1 >= 0 ? '+' : ''}${fmt(r.d1, 2)}%</b></span></div>`;
           return `<h4 style="margin:14px 0 4px">Industries · ${L.length} · change on ${esc(day(G.asof))} (last close, updated each night)</h4><div class="mxlist">${L.slice(0, 8).map(row).join('')}</div>
@@ -5267,7 +5295,7 @@ function nseIndHTML(G) {
     <p class="muted" style="font-size:11.5px">Map as of ${esc((N.asof || '').slice(0, 10))}.</p>`;
 }
 async function nseIndOpen(r) {
-  if (!r) return; const mk = 'NSE';
+  if (!r) return; const mk = 'NSE'; await rsLoad();
   /* 21 Nov 2026 (Amritpal: "click on these industries - see stocks and charts, and whether they come in our other filters"):
      rotation quadrant, Pulse and volume flow on top; every stock carries its system chips (same as the matrix) and sorts first */
   const S = await sysMap(mk).catch(() => null); const SM = (S && S.M) || {};
@@ -5284,6 +5312,7 @@ async function nseIndOpen(r) {
       <div class="fact"><span>Rotation (weekly)</span><b>${r.rrg ? `<span style="color:${RRG_Q[r.rrg.now]}">${esc(r.rrg.now)}</span>${r.rrg.wk1 && r.rrg.wk1 !== r.rrg.now ? ` <small>from ${esc(r.rrg.wk1)}</small>` : ''}` : '–'}</b></div>
       <div class="fact"><span>Pulse (1 month)</span><b>${r.p1m != null ? `${fmt(r.p1m, 0)}%${r.rank ? ` · rank ${r.rank}` : ''}` : '–'}</b></div>
       <div class="fact"><span>Volume flow (10 days)</span><b>${flowTxt(r)}</b></div>
+      <div class="fact"><span>Results season</span><b>${rsTxt(rsOf(r.basic))}</b></div>
       <div class="fact"><span>Stocks in our systems</span><b>${nSig} of ${r.n}</b></div></div>
     <button class="lv-btn" id="nsew">Daily chart · 9 EMA · W trendline ›</button>
     <h4 style="margin:12px 0 4px">Stocks <span class="muted" style="font-weight:400;font-size:12px">· signals first · chips = our systems (green = buy now, blue = in a trade / on the list, grey = near)</span></h4><ul class="list flat">${[...r.members].sort((a, b) => (lvlOf(a.symbol) - lvlOf(b.symbol)) || (b.liquid - a.liquid) || ((b.d1 ?? -99) - (a.d1 ?? -99))).map((m) => `<li class="row" data-tv="${esc(m.symbol)}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}${m.liquid ? '' : ' · thin'}</div>${sysOf(m.symbol).length ? `<div class="tags">${chipsOf(m.symbol)}</div>` : ''}</div><div></div><div class="num"><b>${fmt(m.close, 2, 'en-IN')}</b>${m.d1 != null ? pc(m.d1, 2) : ''}</div></li>`).join('')}</ul>
@@ -6542,7 +6571,8 @@ async function alertsCard(box, mk) {
     + (!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : '');
   const emaHtml = (up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : '<div class="al-r muted"><span>No stock left the 9 EMA upward in the last 3 sessions.</span></div>')
     + (ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : '');
-  const indHtml = indAlertLines(GPX, mk) + rotAlertLines(GPX, mk) + flowAlertLines(GPX, mk);
+  if (mk === 'NSE') await rsLoad();
+  const indHtml = indAlertLines(GPX, mk) + rotAlertLines(GPX, mk) + flowAlertLines(GPX, mk) + (mk === 'NSE' ? rsAlertLines() : '');
   const athX = idxAthLines(IM, state.assets, mk) + indAthLines(GPX, mk) + athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
   let athHtml = athX || '<div class="al-r muted"><span>None this month yet.</span></div>';
   if (L && L.lvl === 'red' && athX) athHtml = '<div class="al-r"><span class="down"><b>Red light: skip new ATH buys today.</b> Open ATH trades keep their 30-week exit.</span></div>' + athHtml;   // 21 Nov 2026 (Amritpal: "Yes")
@@ -6735,7 +6765,9 @@ async function tdMatrix(box, mk) {
     const g = (GPm.stock || {})[sym]; const r = g && (GPm.rows || []).find((x) => x.group === g[0]); return r ? { ...r, nm: r.group } : null; };
   const QL = { Leading: 'L', Improving: 'I', Weakening: 'W', Lagging: 'G' };
   const FL = { 'both up': '▲▲', 'volume up, price lagging': '▲▽', 'price up, volume down': '▽▲', 'both down': '▼▼' };
-  const indCells = (r) => !r ? '<td></td><td></td><td></td>' : `<td>${r.rrg ? `<span class="mxq" style="background:${RRG_Q[r.rrg.now]}" title="${esc(r.nm)}: ${esc(r.rrg.now)}${r.rrg.wk1 && r.rrg.wk1 !== r.rrg.now ? ' (from ' + esc(r.rrg.wk1) + ')' : ''}">${QL[r.rrg.now] || ''}</span>` : ''}</td>`
+  if (mk === 'NSE') await rsLoad();
+  const resCell = (r) => { const x = r && r.nse ? rsOf(r.nm) : null; return `<td>${x ? (x.profile ? `<span class="mxq" style="background:#0A7A55" title="${esc(r.nm)}: strong + cheap results (${esc(rsQ(x.quarter))})">✓</span>` : x.weak ? `<span class="mxq" style="background:#D64545" title="${esc(r.nm)}: weak results season">✗</span>` : '') : ''}</td>`; };
+  const indCells = (r) => !r ? '<td></td><td></td><td></td><td></td>' : resCell(r) + `<td>${r.rrg ? `<span class="mxq" style="background:${RRG_Q[r.rrg.now]}" title="${esc(r.nm)}: ${esc(r.rrg.now)}${r.rrg.wk1 && r.rrg.wk1 !== r.rrg.now ? ' (from ' + esc(r.rrg.wk1) + ')' : ''}">${QL[r.rrg.now] || ''}</span>` : ''}</td>`
     + `<td>${r.flow && r.flow.tag ? `<span class="mxfl" style="color:${FLOW_C[r.flow.tag]}" title="${esc(r.nm)}: ${esc(r.flow.tag)}, ${fmt(r.flow.obv10, 1)} days' turnover net">${FL[r.flow.tag]}</span>` : ''}</td>`
     + `<td>${r.rank ? `<small title="${esc(r.nm)} Pulse rank">#${r.rank}</small>` : ''}</td>`;
   if (S.STK) S.STK.forEach((sym) => { if (M[sym]) M[sym].st = { lvl: 1, txt: '✓' }; });
@@ -6750,10 +6782,10 @@ async function tdMatrix(box, mk) {
   box.innerHTML = `<details class="td-risk td-track" open><summary><span><b>Stocks in 2+ systems or lists <span class="pill">${rows.length}</span></b>
     <small>${esc(MKT[mk].name)} · one row per stock · tap a name for its chart</small></span></summary>
     <div class="seg" id="mxsort" style="margin:6px 0"><button data-k="n" aria-selected="${!bySec}">Best score first</button><button data-k="sec" aria-selected="${bySec}">Strongest sector first</button></div>
-    <div class="mxwrap"><table class="mxt"><thead><tr><th>Stock</th><th title="Overall score, see Top 5 on Home">Score</th><th title="Industry rotation quadrant (weekly): L Leading, I Improving, W Weakening, G Lagging">Rot</th><th title="Industry volume flow, last 10 sessions: ▲▲ volume and price up, ▲▽ volume up price lagging, ▽▲ price up volume down, ▼▼ both down">Flow</th><th title="Industry Pulse rank (1 = strongest)">Ind</th>${cols.map(([, n, d]) => `<th title="${esc(d)}">${n}</th>`).join('')}</tr></thead>
+    <div class="mxwrap"><table class="mxt"><thead><tr><th>Stock</th><th title="Overall score, see Top 5 on Home">Score</th><th title="Industry results season: ✓ strong + improving + cheap, ✗ weak">Res</th><th title="Industry rotation quadrant (weekly): L Leading, I Improving, W Weakening, G Lagging">Rot</th><th title="Industry volume flow, last 10 sessions: ▲▲ volume and price up, ▲▽ volume up price lagging, ▽▲ price up volume down, ▼▼ both down">Flow</th><th title="Industry Pulse rank (1 = strongest)">Ind</th>${cols.map(([, n, d]) => `<th title="${esc(d)}">${n}</th>`).join('')}</tr></thead>
     <tbody>${show.map((x, i) => `<tr><th><span class="mxn">${i + 1}</span><a href="#" data-mxs="${esc(x.sym)}">${esc(x.sym)}</a><small class="mxtag ${x.s.tag || ''}">${x.s.tag ? `${esc(x.s.tag)}${x.s.rs != null ? ` · RS ${x.s.rs > 0 ? '+' : ''}${fmt(x.s.rs, 1)}%` : ''}` : 'no sector data'}</small></th><td><b class="mxsc">${x.sc}</b></td>${indCells(indOf(x.sym))}${cols.map(([k]) => cell(x.o[k])).join('')}</tr>`).join('')}</tbody></table></div>
     ${rows.length > 12 ? `<button class="more" id="mxall">${all ? 'Show the top 12' : `Show all ${rows.length}`}</button>` : ''}
-    <details class="info"><summary>How to read</summary><p class="muted td-rs">Industry columns: <b>Rot</b> = rotation quadrant (<span class="mxq" style="background:${RRG_Q.Leading}">L</span> Leading <span class="mxq" style="background:${RRG_Q.Improving}">I</span> Improving <span class="mxq" style="background:${RRG_Q.Weakening}">W</span> Weakening <span class="mxq" style="background:${RRG_Q.Lagging}">G</span> Lagging) · <b>Flow</b> = volume ▲▲ both up, ▲▽ volume up / price lagging, ▽▲ price up / volume down, ▼▼ both down · <b>Ind</b> = industry Pulse rank. Context only — tested, none of them improves entries.</p><p class="muted td-rs"><span class="mxd buy">Buy</span> signal now · <span class="mxd on">Open</span> the system's trade is still running · <span class="mxd on">✓</span> on the list · <span class="mxd watch">Near</span>/<span class="mxd watch">Setup</span> watch. <b>Open</b> = the system bought earlier and its exit rule has not fired yet (the system's trade, not your portfolio). Sector = the stock's sector index: leading / uptrend / mixed / weak, RS = 6-month return vs ${esc(MX_BENCH[mk] || 'the index')}. Columns: ${cols.map(([, n, d]) => `${n} = ${d}`).join('; ')}. Score as in Top 5 on Home: buy signals and strength count most; simply being in several lists was not consistently better in our tests. Stack is shown but not scored.</p></details></details>`;
+    <details class="info"><summary>How to read</summary><p class="muted td-rs">Industry columns: <b>Res</b> = results season (✓ strong + improving + cheap: +4.4% vs Nifty over 3 months in 2016–26; ✗ weak) · <b>Rot</b> = rotation quadrant (<span class="mxq" style="background:${RRG_Q.Leading}">L</span> Leading <span class="mxq" style="background:${RRG_Q.Improving}">I</span> Improving <span class="mxq" style="background:${RRG_Q.Weakening}">W</span> Weakening <span class="mxq" style="background:${RRG_Q.Lagging}">G</span> Lagging) · <b>Flow</b> = volume ▲▲ both up, ▲▽ volume up / price lagging, ▽▲ price up / volume down, ▼▼ both down · <b>Ind</b> = industry Pulse rank. Context only — tested, none of them improves entries.</p><p class="muted td-rs"><span class="mxd buy">Buy</span> signal now · <span class="mxd on">Open</span> the system's trade is still running · <span class="mxd on">✓</span> on the list · <span class="mxd watch">Near</span>/<span class="mxd watch">Setup</span> watch. <b>Open</b> = the system bought earlier and its exit rule has not fired yet (the system's trade, not your portfolio). Sector = the stock's sector index: leading / uptrend / mixed / weak, RS = 6-month return vs ${esc(MX_BENCH[mk] || 'the index')}. Columns: ${cols.map(([, n, d]) => `${n} = ${d}`).join('; ')}. Score as in Top 5 on Home: buy signals and strength count most; simply being in several lists was not consistently better in our tests. Stack is shown but not scored.</p></details></details>`;
   box.querySelectorAll('#mxsort button').forEach((b) => b.addEventListener('click', () => { state.mxSort = b.dataset.k; tdMatrix(box, mk); }));
   const mb = box.querySelector('#mxall'); if (mb) mb.addEventListener('click', () => { state.mxAll = !all; tdMatrix(box, mk); });
   box.querySelectorAll('[data-mxs]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(MKT[mk].tv + a.dataset.mxs), '_blank', 'noopener'); }));

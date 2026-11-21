@@ -19,9 +19,10 @@ jobs:
       - run: |
           pip install -q yfinance pandas
           python tools/group_pulse.py ASX NSE US UK 2>&1 | grep -v -i "warn\|delisted\|failed download\|possibly\|YFRateLimit" | tail -40
+          python tools/results_now.py 2>&1 | tail -2 || true
       - run: |
           git config user.name "group-pulse bot"; git config user.email "actions@users.noreply.github.com"
-          for f in data/scan/group_pulse.json data/scan/us/group_pulse.json data/scan/asx/group_pulse.json data/scan/group_pulse_charts.json data/scan/us/group_pulse_charts.json data/scan/asx/group_pulse_charts.json data/scan/stock_weekly.json data/scan/us/stock_weekly.json data/scan/asx/stock_weekly.json data/scan/uk/group_pulse.json data/scan/uk/group_pulse_charts.json data/scan/uk/stock_weekly.json data/scan/group_w_charts data/scan/us/group_w_charts data/scan/asx/group_w_charts data/scan/uk/group_w_charts; do [ -e "$f" ] && git add -A "$f"; done; true
+          for f in data/scan/results_season.json data/scan/group_pulse.json data/scan/us/group_pulse.json data/scan/asx/group_pulse.json data/scan/group_pulse_charts.json data/scan/us/group_pulse_charts.json data/scan/asx/group_pulse_charts.json data/scan/stock_weekly.json data/scan/us/stock_weekly.json data/scan/asx/stock_weekly.json data/scan/uk/group_pulse.json data/scan/uk/group_pulse_charts.json data/scan/uk/stock_weekly.json data/scan/group_w_charts data/scan/us/group_w_charts data/scan/asx/group_w_charts data/scan/uk/group_w_charts; do [ -e "$f" ] && git add -A "$f"; done; true
           git diff --cached --quiet && exit 0
           git commit -qm "Industry pulse $(date -u +%F)"
           for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done

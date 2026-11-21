@@ -1284,7 +1284,7 @@ body.pub .owner-only { display: none !important; }
 .fl-r .gpsv{flex:0 0 auto;text-align:right}
 
 /* 21 Nov 2026: Markets tabs + money-flow infographic */
-.mxtabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 6px;position:sticky;top:0;z-index:5;background:var(--paper);scrollbar-width:none}
+.mxtabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 6px;scrollbar-width:none}
 .mxtabs::-webkit-scrollbar{display:none}
 .mxtabs button{flex:0 0 auto;font:inherit;font-weight:700;font-size:14px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
 .mxtabs button[aria-selected="true"]{background:var(--accent,#5b4bdb);border-color:transparent;color:#fff}
