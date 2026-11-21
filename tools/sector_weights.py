@@ -116,6 +116,45 @@ def uk():
     return {sec_names.get(norm(k), k): dict(w=round(float(100 * v / tot), 2), n=int((D.sec == k).sum()), part=True) for k, v in g.items()}
 
 
+EUROPE = {"United Kingdom", "France", "Germany", "Switzerland", "Netherlands", "Sweden", "Denmark", "Italy", "Spain", "Finland", "Belgium",
+          "Norway", "Ireland", "Austria", "Portugal", "Poland", "Greece", "Czech Republic", "Hungary"}
+EM = {"China", "Taiwan", "India", "Korea (South)", "Brazil", "Saudi Arabia", "South Africa", "Mexico", "Indonesia", "Thailand", "Malaysia",
+      "United Arab Emirates", "Qatar", "Kuwait", "Poland", "Turkey", "Philippines", "Chile", "Greece", "Peru", "Hungary", "Czech Republic",
+      "Colombia", "Egypt"}
+
+
+def world():
+    """21 Nov 2026 (Amritpal: "I can't see bigger dots" on the world map): each market's share of world stocks = MSCI ACWI country
+    weights from the iShares ACWI holdings file (Location column). Bonds, gold, oil, the dollar and Bitcoin are not world stocks:
+    no weight. US Nasdaq 100 / small caps are slices of the US: no weight of their own."""
+    import io
+    import requests
+    url = "https://www.ishares.com/us/products/239600/ishares-msci-acwi-etf/1467271812596.ajax?fileType=csv&fileName=ACWI_holdings&dataType=fund"
+    t = requests.get(url, timeout=60, headers={"User-Agent": "Mozilla/5.0"}).text
+    lines = t.splitlines(); h = next(i for i, l in enumerate(lines) if l.startswith("Ticker,"))
+    D = pd.read_csv(io.StringIO("\n".join(lines[h:])), thousands=",")
+    D = D[pd.to_numeric(D["Weight (%)"], errors="coerce").notna()]; D["w"] = D["Weight (%)"].astype(float)
+    D = D[D["Asset Class"].astype(str).str.contains("Equity", case=False)]
+    c = D.groupby("Location").w.sum(); c = 100 * c / c.sum()
+    g = lambda *xs: float(sum(c.get(x, 0) for x in xs))  # noqa: E731
+    m = {"US S&P 500": g("United States"), "UK": g("United Kingdom"), "Germany": g("Germany"), "Japan": g("Japan"), "China": g("China"),
+         "Hong Kong": g("Hong Kong"), "India": g("India"), "Australia": g("Australia"), "Korea": g("Korea (South)"), "Taiwan": g("Taiwan"),
+         "Brazil": g("Brazil"), "Canada": g("Canada"), "Europe": g(*EUROPE), "Emerging mkts": g(*EM)}
+    print("ACWI countries", len(c), "top", c.sort_values(ascending=False).head(8).round(1).to_dict())
+    us = D[D.Location == "United States"]
+    if "Exchange" in us:   # Nasdaq 100 ~ the 100 largest Nasdaq-listed US names in ACWI
+        nq = us[us.Exchange.astype(str).str.contains("NASDAQ", case=False)].nlargest(100, "w").w.sum()
+        m["US Nasdaq 100"] = float(100 * nq / D.w.sum())
+    try:   # US small caps ~ Russell 2000 = US stocks ranked 1,001-3,000 by market cap, as a share of the US market, times the US weight
+        mc = sorted(caps("data/scan/us/fundamentals.json").values(), reverse=True)
+        if len(mc) > 1500:
+            m["US small caps"] = float(m["US S&P 500"] * sum(mc[1000:3000]) / sum(mc[:3000]))
+    except Exception as e:  # noqa: BLE001
+        print("small caps", e)
+    part = {"US S&P 500", "Japan", "China", "Hong Kong", "India", "Australia", "Korea", "Taiwan", "Brazil", "Canada", "Europe"}
+    return {k: dict(w=round(v, 2), part=k in part) for k, v in m.items() if v > 0}
+
+
 def main():
     import sys
     sys.path.insert(0, "tools")
@@ -131,7 +170,11 @@ def main():
         out["ASX"] = by_meta(U + "asx_meta.csv", "data/scan/asx/fundamentals.json", 200, CFG["ASX"]["names"])
     out["WSECT"] = fund_sectors("ACWI", {"Technology": "Info Tech"})
     out["UK"] = uk()
-    for k in ("NSE", "US", "ASX", "WSECT", "UK"):
+    try:
+        out["WORLD"] = world()
+    except Exception as e:  # noqa: BLE001
+        print("world weights failed", e); out["WORLD"] = {}
+    for k in ("NSE", "US", "ASX", "WSECT", "UK", "WORLD"):
         print("R|", k, len(out[k]), sorted(((float(v["w"]), n) for n, v in out[k].items()), reverse=True)[:11])
     if os.environ.get("PILOT"):
         print("JSON|" + json.dumps(out, separators=(",", ":"), default=float))
