@@ -135,21 +135,21 @@ def world():
     import requests
     H = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"}
 
-    def table(pid):
-        t = requests.get(f"https://www.ishares.com/us/products/{pid}/", headers=H, timeout=60).text
+    def table(path):
+        t = requests.get(f"https://www.ishares.com/us/products/{path}", headers=H, timeout=60).text
         rows = _re.findall(r'_ws-colType[^"]*">([^<]+)</td><td class="_ws-colFund[^"]*">(-?[\d.]+)%', t)
         out = {}
         for k, v in rows:
             out.setdefault(k.strip(), float(v))   # first table on the page = countries (sectors use other names)
         return out
-    A = table(239600)
+    A = table("239600/ishares-msci-acwi-etf")
     if len(A) < 8:
         raise RuntimeError(f"ACWI country table not found ({len(A)} rows)")
 
     def scale(T, keys):
         r = [A[k] / T[k] for k in keys if A.get(k) and T.get(k)]
         return sum(r) / len(r) if r else None
-    EMt, EPPt, EUt = table(239637), table(239674), table(264617)
+    EMt, EPPt, EUt = table("239637/ishares-msci-emerging-markets-etf"), table("239674/ishares-msci-pacific-ex-japan-etf"), table("264617/ishares-core-msci-europe-etf")
     em = scale(EMt, ["India", "China", "Taiwan", "Korea (South)"]); px = scale(EPPt, ["Australia"])
     eu = scale(EUt, ["United Kingdom", "France", "Germany", "Switzerland", "Netherlands"])
     g = lambda k: A.get(k, 0.0)  # noqa: E731
