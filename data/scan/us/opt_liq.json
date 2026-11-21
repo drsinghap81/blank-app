@@ -1,1035 +1,1947 @@
 {
-"generated": "2026-11-20 07:52 UTC",
+"generated": "2026-11-21 07:51 UTC",
 "rows": {
 "AA": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 187,
-"price": 35.26
+"expiry": "2026-12-11",
+"atm_spread_pct": 23.8,
+"chain_oi": 2173,
+"chain_vol": 1365,
+"price": 33.42
 },
 "AAOI": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1064,
-"price": 39.46
+"expiry": "2026-12-11",
+"atm_spread_pct": 33.7,
+"chain_oi": 2700,
+"chain_vol": 995,
+"price": 32.93
+},
+"AAUC": {
+"grade": "none"
 },
 "ABVX": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 174,
-"price": 80.65
+"chain_oi": 399,
+"chain_vol": 221,
+"price": 73.2
+},
+"ACI": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 118,
+"chain_vol": 31,
+"price": 12.09
+},
+"ACWX": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1452,
+"chain_vol": 790,
+"price": 67.01
+},
+"ADBE": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 11.1,
+"chain_oi": 7062,
+"chain_vol": 2034,
+"price": 217.71
 },
 "ADEA": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 36,
-"chain_vol": 115,
-"price": 14.46
+"chain_oi": 10554,
+"chain_vol": 3369,
+"price": 12.84
+},
+"AEHR": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 858,
+"chain_vol": 347,
+"price": 39.84
+},
+"AEM": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 31.1,
+"chain_oi": 1801,
+"chain_vol": 160,
+"price": 151.3
 },
 "AG": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 550,
-"price": 11.32
+"chain_oi": 2566,
+"chain_vol": 1992,
+"price": 10.91
 },
 "AGI": {
-"grade": "thin",
+"grade": "liquid",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 725,
-"chain_vol": 1551,
-"price": 25.97
+"chain_oi": 32446,
+"chain_vol": 2583,
+"price": 24.87
+},
+"AGIO": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 32985,
+"chain_vol": 304,
+"price": 27.6
+},
+"AGX": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 21.5,
+"chain_oi": 5615,
+"chain_vol": 869,
+"price": 268.94
+},
+"AIPO": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 30.0,
+"chain_oi": 2696,
+"chain_vol": 4661,
+"price": 20.43
+},
+"AIRR": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 35.0,
+"chain_oi": 77,
+"chain_vol": 88,
+"price": 86.72
 },
 "ALB": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 623,
-"price": 82.93
+"chain_oi": 1600,
+"chain_vol": 347,
+"price": 79.7
 },
 "ALG": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 42,
-"chain_vol": 51,
-"price": 129.58
+"chain_oi": 81,
+"chain_vol": 25,
+"price": 125.61
+},
+"ALGM": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 20.7,
+"chain_oi": 1533,
+"chain_vol": 145,
+"price": 25.56
+},
+"ALLY": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 17.6,
+"chain_oi": 27063,
+"chain_vol": 480,
+"price": 36.32
 },
 "ALNY": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 37,
-"chain_vol": 615,
-"price": 147.82
+"atm_spread_pct": 38.6,
+"chain_oi": 10925,
+"chain_vol": 714,
+"price": 143.82
+},
+"AMAT": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 22.0,
+"chain_oi": 4783,
+"chain_vol": 1639,
+"price": 302.63
 },
 "AMKR": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 143,
-"price": 34.13
+"expiry": "2026-12-11",
+"atm_spread_pct": 40.0,
+"chain_oi": 1196,
+"chain_vol": 676,
+"price": 30.24
 },
 "AMLP": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 149,
-"price": 49.23
+"chain_oi": 889,
+"chain_vol": 313,
+"price": 48.53
+},
+"AMR": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 639,
+"chain_vol": 112,
+"price": 129.95
 },
 "AMSC": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 28.6,
+"chain_oi": 889,
+"chain_vol": 414,
+"price": 19.28
+},
+"AMTM": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 176,
-"price": 22.09
+"chain_oi": 803,
+"chain_vol": 207,
+"price": 20.34
 },
 "ANDE": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 62,
-"chain_vol": 36,
-"price": 47.46
+"chain_oi": 328,
+"chain_vol": 50,
+"price": 44.97
+},
+"AORT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 47,
+"chain_vol": 5,
+"price": 18.16
+},
+"APLD": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 6976,
+"chain_vol": 4038,
+"price": 11.49
 },
 "ARGT": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 307,
-"chain_vol": 341,
-"price": 66.56
+"chain_oi": 864,
+"chain_vol": 333,
+"price": 64.56
 },
 "ARIS": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 818,
-"chain_vol": 455,
-"price": 12.74
+"chain_oi": 6405,
+"chain_vol": 386,
+"price": 12.04
+},
+"ARKB": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2857,
+"chain_vol": 242,
+"price": 19.35
 },
 "ARKQ": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 613,
-"chain_vol": 265,
-"price": 98.52
+"chain_oi": 1572,
+"chain_vol": 258,
+"price": 90.91
 },
 "ARKX": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 116,
-"price": 26.6
+"chain_oi": 261,
+"chain_vol": 129,
+"price": 24.87
 },
 "ARLO": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 61,
-"price": 12.03
-},
-"ARR": {
-"grade": "thin",
-"expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 533,
-"price": 10.83
+"chain_oi": 123,
+"chain_vol": 80,
+"price": 11.85
 },
 "ARWR": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 312,
-"chain_vol": 1200,
-"price": 43.65
+"chain_oi": 9113,
+"chain_vol": 1359,
+"price": 41.37
 },
 "ASIX": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 8,
-"chain_vol": 413,
-"price": 13.49
+"chain_oi": 545,
+"chain_vol": 437,
+"price": 12.86
 },
-"ASTS": {
+"ASTE": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 3006,
-"price": 25.55
-},
-"AU": {
-"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 3069,
-"chain_vol": 3336,
-"price": 76.99
+"chain_oi": 1224,
+"chain_vol": 374,
+"price": 34.57
+},
+"ASTS": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 6330,
+"chain_vol": 4386,
+"price": 23.27
+},
+"AU": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 27.5,
+"chain_oi": 20729,
+"chain_vol": 3283,
+"price": 72.43
+},
+"AUGO": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 810,
+"chain_vol": 62,
+"price": 57.05
+},
+"AVAV": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 1159,
+"chain_vol": 492,
+"price": 86.79
 },
 "AVBP": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 3,
-"price": 11.26
+"chain_oi": 58,
+"chain_vol": 4,
+"price": 10.52
 },
-"AXON": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 393,
-"price": 306.98
-},
-"AXSM": {
+"AVDE": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 313,
-"chain_vol": 684,
-"price": 135.68
+"chain_oi": 12,
+"chain_vol": 0,
+"price": 82.46
+},
+"AVDV": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1045,
+"chain_vol": 63,
+"price": 95.34
+},
+"AVEM": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 9,
+"chain_vol": 6,
+"price": 76.04
+},
+"AVO": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 445,
+"chain_vol": 134,
+"price": 10.97
+},
+"AX": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 33.8,
+"chain_oi": 244,
+"chain_vol": 23,
+"price": 84.46
+},
+"AXON": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 439,
+"chain_vol": 173,
+"price": 291.14
+},
+"AXTI": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 23.4,
+"chain_oi": 2653,
+"chain_vol": 499,
+"price": 30.57
+},
+"AZZ": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 30,
+"chain_vol": 48,
+"price": 117.37
 },
 "B": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 352,
-"price": 33.37
+"chain_oi": 1661,
+"chain_vol": 218,
+"price": 31.54
 },
 "BA": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1646,
-"price": 160.51
+"expiry": "2026-12-11",
+"atm_spread_pct": 23.9,
+"chain_oi": 4848,
+"chain_vol": 2491,
+"price": 155.89
 },
 "BABA": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 13328,
-"price": 83.31
+"expiry": "2026-12-11",
+"atm_spread_pct": 32.2,
+"chain_oi": 8482,
+"chain_vol": 1888,
+"price": 81.08
 },
 "BAC": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
+"atm_spread_pct": 28.9,
+"chain_oi": 17209,
+"chain_vol": 4399,
+"price": 47.04
+},
+"BAI": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 2562,
-"price": 48.57
+"chain_oi": 385,
+"chain_vol": 159,
+"price": 30.56
+},
+"BANC": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 10206,
+"chain_vol": 2280,
+"price": 16.25
+},
+"BBAX": {
+"grade": "none"
+},
+"BBEU": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1,
+"chain_vol": 1,
+"price": 71.92
+},
+"BCAT": {
+"grade": "none"
 },
 "BCC": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 45,
-"price": 64.38
+"chain_oi": 246,
+"chain_vol": 111,
+"price": 63.01
+},
+"BCH": {
+"grade": "thin",
+"expiry": "2027-01-15",
+"atm_spread_pct": null,
+"chain_oi": 694,
+"chain_vol": 15,
+"price": 36.46
+},
+"BCPC": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 34,
+"chain_vol": 10,
+"price": 163.54
 },
 "BCS": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 30.8,
+"chain_oi": 6771,
+"chain_vol": 1673,
+"price": 20.48
+},
+"BDC": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 660,
-"chain_vol": 1343,
-"price": 21.32
+"chain_oi": 1473,
+"chain_vol": 209,
+"price": 92.79
+},
+"BE": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 15.8,
+"chain_oi": 8689,
+"chain_vol": 2880,
+"price": 142.39
 },
 "BEAM": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 380,
-"price": 20.94
+"chain_oi": 1292,
+"chain_vol": 790,
+"price": 20.9
 },
 "BFAM": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 34,
-"chain_vol": 233,
-"price": 49.77
+"chain_oi": 421,
+"chain_vol": 224,
+"price": 50.15
 },
-"BHF": {
+"BG": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 36,
-"chain_vol": 9021,
-"price": 41.55
+"chain_oi": 1470,
+"chain_vol": 59,
+"price": 90.9
+},
+"BHE": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 35.1,
+"chain_oi": 57,
+"chain_vol": 14,
+"price": 55.63
+},
+"BHF": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 46288,
+"chain_vol": 8553,
+"price": 40.84
+},
+"BHP": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 25637,
+"chain_vol": 14517,
+"price": 67.18
 },
 "BIDU": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 3993,
-"price": 66.38
+"expiry": "2026-12-11",
+"atm_spread_pct": 29.3,
+"chain_oi": 1031,
+"chain_vol": 1486,
+"price": 61.9
 },
 "BILI": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 5728,
+"chain_vol": 1425,
+"price": 10.6
+},
+"BITB": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 837,
-"price": 11.06
+"chain_oi": 1725,
+"chain_vol": 173,
+"price": 31.66
+},
+"BITO": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 438,
+"chain_vol": 630,
+"price": 15.5
+},
+"BKNG": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 742,
+"chain_vol": 241,
+"price": 144.91
 },
 "BKR": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 558,
-"chain_vol": 598,
-"price": 46.67
+"atm_spread_pct": 31.6,
+"chain_oi": 28520,
+"chain_vol": 1218,
+"price": 44.81
 },
 "BKV": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 43,
-"chain_vol": 129,
-"price": 17.88
+"chain_oi": 1302,
+"chain_vol": 228,
+"price": 17.4
 },
 "BL": {
-"grade": "thin",
+"grade": "liquid",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 122,
-"chain_vol": 1124,
-"price": 24.54
+"chain_oi": 26001,
+"chain_vol": 1085,
+"price": 24.73
 },
 "BLOK": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 28,
-"price": 45.59
+"chain_oi": 106,
+"chain_vol": 32,
+"price": 42.02
 },
 "BLSH": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 115,
-"price": 19.96
+"chain_oi": 593,
+"chain_vol": 108,
+"price": 19.07
+},
+"BLTE": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 26,
+"chain_vol": 30,
+"price": 127.38
 },
 "BLX": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 52,
+"chain_oi": 229,
 "chain_vol": 56,
-"price": 48.51
+"price": 46.9
 },
 "BMNR": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 4211,
-"price": 15.07
-},
-"BNL": {
-"grade": "thin",
-"expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 19,
-"price": 17.77
+"expiry": "2026-12-11",
+"atm_spread_pct": 20.5,
+"chain_oi": 10897,
+"chain_vol": 3259,
+"price": 12.98
 },
 "BNTX": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 515,
-"chain_vol": 576,
-"price": 81.38
+"chain_oi": 13882,
+"chain_vol": 539,
+"price": 80.96
 },
 "BOTZ": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 37.8,
+"chain_oi": 7382,
+"chain_vol": 241,
+"price": 27.34
+},
+"BROS": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 31.4,
+"chain_oi": 753,
+"chain_vol": 318,
+"price": 32.78
+},
+"BTC": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 324,
-"chain_vol": 307,
-"price": 29.0
+"chain_oi": 4034,
+"chain_vol": 942,
+"price": 25.78
 },
 "BTU": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 155,
-"price": 16.29
+"chain_oi": 642,
+"chain_vol": 255,
+"price": 15.47
 },
 "BVN": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 183,
-"chain_vol": 422,
-"price": 21.23
+"chain_oi": 2883,
+"chain_vol": 472,
+"price": 19.61
+},
+"BWA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 13.6,
+"chain_oi": 2588,
+"chain_vol": 247,
+"price": 46.95
 },
 "BWXT": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 24.6,
+"chain_oi": 2149,
+"chain_vol": 501,
+"price": 108.54
+},
+"CAAP": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 202,
-"price": 117.06
+"chain_oi": 27,
+"chain_vol": 2,
+"price": 22.13
 },
 "CAMT": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 40.0,
+"chain_oi": 5021,
+"chain_vol": 1463,
+"price": 89.2
+},
+"CARR": {
+"grade": "thin",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 2446,
-"price": 97.78
+"chain_oi": 179,
+"chain_vol": 122,
+"price": 49.96
+},
+"CASH": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 232,
+"chain_vol": 124,
+"price": 68.83
 },
 "CAT": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
+"atm_spread_pct": 22.1,
+"chain_oi": 2583,
+"chain_vol": 1186,
+"price": 510.45
+},
+"CAVA": {
+"grade": "thin",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1467,
-"price": 537.37
+"chain_oi": 840,
+"chain_vol": 190,
+"price": 48.84
 },
 "CC": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 107,
-"price": 11.8
+"chain_oi": 79,
+"chain_vol": 36,
+"price": 10.88
 },
 "CCJ": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 464,
-"price": 61.42
+"expiry": "2026-12-11",
+"atm_spread_pct": 34.6,
+"chain_oi": 2125,
+"chain_vol": 276,
+"price": 58.0
 },
 "CCS": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": 18.6,
-"chain_oi": 143,
-"chain_vol": 58,
-"price": 48.64
+"atm_spread_pct": null,
+"chain_oi": 989,
+"chain_vol": 49,
+"price": 48.97
 },
 "CDE": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 672,
-"price": 11.54
+"chain_oi": 6921,
+"chain_vol": 1250,
+"price": 10.68
+},
+"CE": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 24.5,
+"chain_oi": 11121,
+"chain_vol": 351,
+"price": 45.01
 },
 "CEF": {
 "grade": "none"
 },
+"CELC": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2861,
+"chain_vol": 2077,
+"price": 53.35
+},
+"CENX": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 28.6,
+"chain_oi": 18193,
+"chain_vol": 2251,
+"price": 28.32
+},
+"CFG": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 38.6,
+"chain_oi": 2403,
+"chain_vol": 2214,
+"price": 58.71
+},
+"CGIC": {
+"grade": "none"
+},
+"CGIE": {
+"grade": "none"
+},
+"CGMM": {
+"grade": "none"
+},
+"CGNG": {
+"grade": "none"
+},
+"CGNX": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 3851,
+"chain_vol": 168,
+"price": 44.36
+},
+"CGXU": {
+"grade": "none"
+},
+"CHAT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 26.5,
+"chain_oi": 3841,
+"chain_vol": 1167,
+"price": 60.78
+},
+"CHWY": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 5248,
+"chain_vol": 508,
+"price": 19.5
+},
 "CIEN": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1587,
-"price": 262.63
+"expiry": "2026-12-11",
+"atm_spread_pct": 28.3,
+"chain_oi": 2782,
+"chain_vol": 925,
+"price": 234.37
+},
+"CLDX": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 24.2,
+"chain_oi": 4925,
+"chain_vol": 342,
+"price": 27.42
 },
 "CLS": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 575,
-"price": 240.23
+"expiry": "2026-12-11",
+"atm_spread_pct": 31.5,
+"chain_oi": 2698,
+"chain_vol": 426,
+"price": 201.8
 },
 "CMC": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 74,
-"chain_vol": 372,
-"price": 57.25
+"atm_spread_pct": 33.0,
+"chain_oi": 2118,
+"chain_vol": 520,
+"price": 54.48
 },
 "CMI": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 714,
-"chain_vol": 943,
-"price": 421.19
+"atm_spread_pct": 17.7,
+"chain_oi": 7433,
+"chain_vol": 2147,
+"price": 403.61
 },
 "CMP": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 182,
-"chain_vol": 107,
-"price": 20.03
+"chain_oi": 1134,
+"chain_vol": 89,
+"price": 19.27
 },
 "CMPR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 49,
+"chain_oi": 81,
 "chain_vol": 26,
-"price": 54.24
+"price": 53.81
 },
 "CMRE": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 475,
-"chain_vol": 490,
-"price": 12.63
-},
-"COHR": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1551,
-"price": 214.94
+"chain_oi": 3455,
+"chain_vol": 270,
+"price": 12.22
 },
 "COIN": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 2259,
-"price": 108.87
+"expiry": "2026-12-11",
+"atm_spread_pct": 30.4,
+"chain_oi": 6944,
+"chain_vol": 3050,
+"price": 101.97
 },
 "COPX": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 286,
-"price": 59.28
+"chain_oi": 1159,
+"chain_vol": 202,
+"price": 56.33
 },
 "CPS": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 129,
-"chain_vol": 660,
-"price": 18.11
+"atm_spread_pct": 23.0,
+"chain_oi": 9417,
+"chain_vol": 353,
+"price": 17.49
 },
 "CQQQ": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 39,
-"chain_vol": 294,
-"price": 35.96
+"atm_spread_pct": 28.6,
+"chain_oi": 918,
+"chain_vol": 265,
+"price": 34.46
 },
 "CRC": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 455,
-"chain_vol": 116,
-"price": 44.68
+"chain_oi": 1799,
+"chain_vol": 120,
+"price": 43.74
 },
 "CRCL": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1129,
-"price": 51.88
+"expiry": "2026-12-11",
+"atm_spread_pct": 28.6,
+"chain_oi": 8601,
+"chain_vol": 1411,
+"price": 47.51
+},
+"CRDO": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 27.2,
+"chain_oi": 4201,
+"chain_vol": 604,
+"price": 99.86
+},
+"CRK": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 24.0,
+"chain_oi": 12718,
+"chain_vol": 1229,
+"price": 11.76
 },
 "CRS": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 280,
-"chain_vol": 702,
-"price": 267.84
+"atm_spread_pct": 30.3,
+"chain_oi": 2553,
+"chain_vol": 772,
+"price": 254.0
 },
 "CRSP": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 102,
-"price": 38.93
+"chain_oi": 537,
+"chain_vol": 216,
+"price": 39.1
 },
 "CRWV": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 12906,
-"price": 44.91
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": 5.8,
+"chain_oi": 25445,
+"chain_vol": 8595,
+"price": 39.51
 },
-"CYTK": {
+"CSTM": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 252,
-"price": 51.46
+"chain_oi": 474,
+"chain_vol": 95,
+"price": 19.85
+},
+"CTRN": {
+"grade": "none"
+},
+"CW": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 36.3,
+"chain_oi": 574,
+"chain_vol": 138,
+"price": 440.81
+},
+"CWB": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 50,
+"chain_vol": 29,
+"price": 86.68
+},
+"CWEN": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2723,
+"chain_vol": 138,
+"price": 28.53
+},
+"CWI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 201,
+"chain_vol": 50,
+"price": 35.79
+},
+"CYTK": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2639,
+"chain_vol": 435,
+"price": 50.78
+},
+"DAKT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 71,
+"chain_vol": 10,
+"price": 18.12
 },
 "DAN": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 46,
-"chain_vol": 49,
-"price": 23.81
+"chain_oi": 1183,
+"chain_vol": 50,
+"price": 22.07
 },
 "DAPP": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 581,
-"chain_vol": 42,
-"price": 11.99
-},
-"DAR": {
-"grade": "thin",
-"expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 30,
-"price": 52.01
+"chain_oi": 878,
+"chain_vol": 188,
+"price": 10.67
 },
 "DBD": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 7,
-"price": 50.27
+"chain_oi": 120,
+"chain_vol": 8,
+"price": 51.86
+},
+"DEA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1580,
+"chain_vol": 42,
+"price": 21.29
+},
+"DEC": {
+"grade": "none"
+},
+"DECK": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 28.6,
+"chain_oi": 1218,
+"chain_vol": 121,
+"price": 77.94
+},
+"DFAE": {
+"grade": "none"
+},
+"DFAI": {
+"grade": "none"
+},
+"DFAX": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 200,
+"chain_vol": 0,
+"price": 32.48
+},
+"DFEM": {
+"grade": "none"
+},
+"DGP": {
+"grade": "none"
+},
+"DIOD": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1546,
+"chain_vol": 231,
+"price": 72.95
 },
 "DKNG": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1517,
-"price": 16.82
+"chain_oi": 5426,
+"chain_vol": 584,
+"price": 15.8
+},
+"DKS": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 28.9,
+"chain_oi": 562,
+"chain_vol": 140,
+"price": 132.25
+},
+"DLB": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 732,
+"chain_vol": 96,
+"price": 55.33
+},
+"DLR": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 53,
+"chain_vol": 53,
+"price": 162.46
 },
 "DMC": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 352,
-"chain_vol": 19,
-"price": 25.16
+"chain_oi": 677,
+"chain_vol": 17,
+"price": 24.93
+},
+"DOCN": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 528,
+"chain_vol": 383,
+"price": 66.76
+},
+"DOLE": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 242,
+"chain_vol": 7,
+"price": 12.49
 },
 "DOX": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 65,
-"price": 40.5
+"chain_oi": 441,
+"chain_vol": 49,
+"price": 41.18
+},
+"DRS": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 897,
+"chain_vol": 54,
+"price": 31.27
 },
 "DRUG": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 26,
-"price": 20.7
+"chain_oi": 53,
+"chain_vol": 27,
+"price": 20.4
 },
 "DRVN": {
-"grade": "fair",
+"grade": "liquid",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 10013,
-"chain_vol": 62,
-"price": 10.83
+"chain_oi": 57578,
+"chain_vol": 64,
+"price": 10.69
 },
-"DY": {
-"grade": "fair",
-"expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 2211,
-"chain_vol": 703,
-"price": 221.36
-},
-"ECG": {
+"DTCR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 25,
-"price": 83.85
+"chain_oi": 436,
+"chain_vol": 120,
+"price": 22.43
+},
+"DVN": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 27.6,
+"chain_oi": 4050,
+"chain_vol": 1012,
+"price": 41.54
+},
+"ECHO": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 3519,
+"chain_vol": 2866,
+"price": 84.26
+},
+"EEM": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 3441,
+"chain_vol": 300,
+"price": 53.84
+},
+"EEMA": {
+"grade": "none"
+},
+"EFA": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 18385,
+"chain_vol": 728,
+"price": 96.14
 },
 "EFC": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 72,
-"chain_vol": 67,
-"price": 10.93
+"chain_oi": 9987,
+"chain_vol": 259,
+"price": 11.01
+},
+"EFXT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 35.3,
+"chain_oi": 730,
+"chain_vol": 337,
+"price": 17.78
 },
 "EGO": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 605,
-"chain_vol": 4527,
-"price": 26.84
+"chain_oi": 17405,
+"chain_vol": 1659,
+"price": 24.75
 },
 "ELE": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 154,
-"chain_vol": 994,
-"price": 12.4
+"chain_oi": 1791,
+"chain_vol": 1180,
+"price": 11.33
 },
-"EME": {
-"grade": "thin",
+"ELPC": {
+"grade": "none"
+},
+"EMBJ": {
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 516,
-"chain_vol": 1248,
-"price": 636.08
+"chain_oi": 11631,
+"chain_vol": 4497,
+"price": 17.59
 },
 "EMN": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 5416,
+"chain_vol": 717,
+"price": 58.77
+},
+"EMXC": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 434,
-"chain_vol": 133,
-"price": 61.71
+"chain_oi": 1040,
+"chain_vol": 189,
+"price": 77.77
+},
+"ENLT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 888,
+"chain_vol": 28,
+"price": 59.41
 },
 "ENPH": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 268,
-"price": 21.98
+"chain_oi": 6515,
+"chain_vol": 678,
+"price": 19.63
 },
 "ENS": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
-"atm_spread_pct": 5.1,
-"chain_oi": 80,
-"chain_vol": 336,
-"price": 132.5
+"atm_spread_pct": null,
+"chain_oi": 3696,
+"chain_vol": 367,
+"price": 124.35
+},
+"EPP": {
+"grade": "thin",
+"expiry": "2027-01-15",
+"atm_spread_pct": null,
+"chain_oi": 111,
+"chain_vol": 5,
+"price": 51.34
+},
+"ERO": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 8862,
+"chain_vol": 2898,
+"price": 21.47
 },
 "ESE": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 24.9,
+"chain_oi": 256,
+"chain_vol": 217,
+"price": 210.48
+},
+"ESI": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 73,
-"chain_vol": 169,
-"price": 223.02
+"chain_oi": 11694,
+"chain_vol": 197,
+"price": 29.52
 },
 "ETD": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 15,
-"price": 15.52
+"chain_oi": 428,
+"chain_vol": 18,
+"price": 15.1
+},
+"ETH": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 35.9,
+"chain_oi": 1133,
+"chain_vol": 369,
+"price": 15.24
+},
+"ETHA": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": 4.8,
+"chain_oi": 3081,
+"chain_vol": 2598,
+"price": 36.1
 },
 "ETHE": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 1156,
-"chain_vol": 249,
-"price": 14.08
+"atm_spread_pct": 28.6,
+"chain_oi": 7022,
+"chain_vol": 413,
+"price": 12.78
 },
 "ETN": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
+"atm_spread_pct": 16.8,
+"chain_oi": 2081,
+"chain_vol": 631,
+"price": 311.33
+},
+"EWA": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 624,
-"price": 330.57
+"chain_oi": 99,
+"chain_vol": 38,
+"price": 26.73
+},
+"EWD": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 43,
+"chain_vol": 23,
+"price": 48.49
+},
+"EWG": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 11950,
+"chain_vol": 999,
+"price": 39.17
+},
+"EWI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1006,
+"chain_vol": 322,
+"price": 53.9
+},
+"EWQ": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2126,
+"chain_vol": 1229,
+"price": 40.88
+},
+"EWU": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 977,
+"chain_vol": 311,
+"price": 44.74
+},
+"EWY": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 37.0,
+"chain_oi": 29698,
+"chain_vol": 11389,
+"price": 123.26
 },
 "EWZ": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 2022,
-"price": 29.51
+"chain_oi": 4304,
+"chain_vol": 1129,
+"price": 28.54
 },
 "EWZS": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 417,
-"price": 10.13
+"chain_oi": 1387,
+"chain_vol": 410,
+"price": 9.74
+},
+"EXE": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 22.6,
+"chain_oi": 510,
+"chain_vol": 215,
+"price": 81.27
+},
+"EXI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 16,
+"chain_vol": 5,
+"price": 173.41
 },
 "EZA": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 13,
-"price": 57.96
+"chain_oi": 201,
+"chain_vol": 15,
+"price": 56.26
+},
+"EZPW": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 5896,
+"chain_vol": 217,
+"price": 24.75
+},
+"F": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 28.0,
+"chain_oi": 11888,
+"chain_vol": 1340,
+"price": 11.17
+},
+"FBTC": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 315,
+"chain_vol": 218,
+"price": 50.58
 },
 "FCFS": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 19.0,
+"chain_oi": 1608,
+"chain_vol": 719,
+"price": 165.7
+},
+"FCG": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 50,
-"chain_vol": 739,
-"price": 168.99
+"chain_oi": 3996,
+"chain_vol": 129,
+"price": 27.37
 },
 "FCX": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 732,
-"price": 49.12
+"chain_oi": 5835,
+"chain_vol": 1876,
+"price": 45.99
+},
+"FENI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 5,
+"chain_vol": 21,
+"price": 36.79
+},
+"FETH": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 20.4,
+"chain_oi": 5037,
+"chain_vol": 273,
+"price": 15.94
+},
+"FEZ": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 28,
+"chain_vol": 13,
+"price": 61.4
 },
 "FHB": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 5,
+"chain_oi": 10,
 "chain_vol": 3,
-"price": 23.6
+"price": 23.1
 },
-"FLG": {
+"FHN": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-18",
+"atm_spread_pct": 36.4,
+"chain_oi": 3077,
+"chain_vol": 367,
+"price": 21.76
+},
+"FIDU": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 35,
-"price": 10.03
+"chain_oi": 8,
+"chain_vol": 6,
+"price": 82.69
+},
+"FIG": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 27.3,
+"chain_oi": 3690,
+"chain_vol": 984,
+"price": 15.77
 },
 "FLNG": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 68,
-"price": 23.45
+"atm_spread_pct": 33.3,
+"chain_oi": 1297,
+"chain_vol": 114,
+"price": 23.0
 },
 "FLUT": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 525,
-"chain_vol": 1070,
-"price": 68.42
+"chain_oi": 19567,
+"chain_vol": 1534,
+"price": 67.19
 },
 "FMS": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 3487,
-"price": 20.13
+"chain_oi": 2952,
+"chain_vol": 281,
+"price": 20.44
+},
+"FN": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 15.7,
+"chain_oi": 6876,
+"chain_vol": 1033,
+"price": 285.04
 },
 "FOR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 2,
-"chain_vol": 52,
-"price": 22.09
+"chain_oi": 194,
+"chain_vol": 53,
+"price": 22.18
 },
 "FORM": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 744,
-"price": 81.89
+"atm_spread_pct": 18.7,
+"chain_oi": 8485,
+"chain_vol": 1322,
+"price": 73.02
 },
-"FR": {
+"FRDM": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 26.6,
+"chain_oi": 177,
+"chain_vol": 61,
+"price": 53.11
+},
+"FRME": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 536,
-"chain_vol": 20,
-"price": 53.88
+"chain_oi": 205,
+"chain_vol": 32,
+"price": 38.47
 },
 "FSLR": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 708,
-"price": 151.95
+"chain_oi": 4518,
+"chain_vol": 1319,
+"price": 137.59
 },
 "FSLY": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
+"atm_spread_pct": 31.6,
+"chain_oi": 1725,
+"chain_vol": 768,
+"price": 14.91
+},
+"FSS": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 548,
-"price": 16.86
+"chain_oi": 360,
+"chain_vol": 12,
+"price": 108.71
+},
+"FTAI": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 507,
+"chain_vol": 75,
+"price": 150.02
+},
+"FTI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 558,
+"chain_vol": 289,
+"price": 58.71
 },
 "FUL": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
+"chain_oi": 29,
 "chain_vol": 7,
-"price": 47.57
+"price": 46.24
 },
 "FUTU": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 279,
-"price": 87.21
+"chain_oi": 591,
+"chain_vol": 148,
+"price": 83.02
+},
+"FWD": {
+"grade": "none"
 },
 "FXI": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 313,
-"price": 31.79
+"chain_oi": 5203,
+"chain_vol": 587,
+"price": 31.23
 },
-"GAP": {
+"GBTC": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
+"atm_spread_pct": 35.3,
+"chain_oi": 91,
+"chain_vol": 57,
+"price": 44.97
+},
+"GBX": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 378,
-"price": 18.79
+"chain_oi": 1521,
+"chain_vol": 189,
+"price": 35.4
 },
 "GDS": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 735,
-"chain_vol": 3291,
-"price": 14.76
+"atm_spread_pct": 39.1,
+"chain_oi": 57411,
+"chain_vol": 5671,
+"price": 13.33
 },
 "GDX": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 4915,
-"price": 72.0
+"expiry": "2026-12-11",
+"atm_spread_pct": 35.4,
+"chain_oi": 11492,
+"chain_vol": 6476,
+"price": 68.4
 },
 "GDXJ": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 12988,
-"price": 85.83
+"chain_oi": 2290,
+"chain_vol": 757,
+"price": 81.26
 },
-"GEV": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1309,
-"price": 756.28
-},
-"GGG": {
+"GFI": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 19.5,
+"chain_oi": 8910,
+"chain_vol": 3189,
+"price": 31.57
+},
+"GFS": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 18.9,
+"chain_oi": 6355,
+"chain_vol": 847,
+"price": 35.56
+},
+"GGAL": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 87,
-"price": 70.45
+"chain_oi": 2934,
+"chain_vol": 1184,
+"price": 25.29
 },
 "GIL": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 121,
-"chain_vol": 429,
-"price": 33.95
+"chain_oi": 2342,
+"chain_vol": 420,
+"price": 32.98
 },
-"GLTR": {
-"grade": "none"
+"GLNG": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 26.4,
+"chain_oi": 20178,
+"chain_vol": 3253,
+"price": 39.08
 },
 "GLW": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
+"atm_spread_pct": 28.9,
+"chain_oi": 5130,
+"chain_vol": 852,
+"price": 94.38
+},
+"GLXY": {
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1168,
-"price": 105.97
+"chain_oi": 7486,
+"chain_vol": 471,
+"price": 11.22
 },
 "GMED": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2626,
+"chain_vol": 198,
+"price": 66.89
+},
+"GNR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 208,
-"chain_vol": 1185,
-"price": 68.6
+"chain_oi": 57,
+"chain_vol": 21,
+"price": 66.25
 },
 "GNTX": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 81,
-"chain_vol": 291,
-"price": 19.17
+"chain_oi": 1522,
+"chain_vol": 332,
+"price": 18.75
 },
 "GOLD": {
 "grade": "liquid",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 25783,
-"chain_vol": 425,
-"price": 37.21
+"chain_oi": 29116,
+"chain_vol": 375,
+"price": 36.14
 },
 "GOOG": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 21699,
-"price": 271.02
+"expiry": "2026-12-11",
+"atm_spread_pct": 13.2,
+"chain_oi": 24689,
+"chain_vol": 13088,
+"price": 264.0
 },
 "GOOGL": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 23044,
-"price": 272.66
+"expiry": "2026-12-11",
+"atm_spread_pct": 13.2,
+"chain_oi": 24005,
+"chain_vol": 6714,
+"price": 265.29
 },
 "GPRE": {
 "grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 7437,
-"chain_vol": 1002,
-"price": 11.66
+"chain_oi": 18321,
+"chain_vol": 1024,
+"price": 11.27
 },
 "GQGU": {
 "grade": "none"
@@ -1038,987 +1950,2086 @@
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 99,
-"price": 57.24
+"chain_oi": 419,
+"chain_vol": 30,
+"price": 56.93
+},
+"GRC": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 169,
+"chain_vol": 16,
+"price": 64.03
 },
 "GRID": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 97,
-"chain_vol": 241,
-"price": 152.42
+"chain_oi": 1012,
+"chain_vol": 313,
+"price": 145.44
+},
+"GS": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 14.7,
+"chain_oi": 5563,
+"chain_vol": 1706,
+"price": 790.69
+},
+"GSOL": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 214,
+"chain_vol": 93,
+"price": 5.1
+},
+"GTES": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 31.6,
+"chain_oi": 423,
+"chain_vol": 100,
+"price": 22.02
 },
 "GUNR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 25,
+"chain_oi": 143,
 "chain_vol": 44,
-"price": 48.7
+"price": 48.01
+},
+"HAL": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 2681,
+"chain_vol": 571,
+"price": 30.53
 },
 "HBAN": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 1005,
-"chain_vol": 415,
-"price": 14.71
+"chain_oi": 11260,
+"chain_vol": 6645,
+"price": 14.28
 },
 "HBM": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 28.6,
+"chain_oi": 2413,
+"chain_vol": 557,
+"price": 16.19
+},
+"HCC": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 34.3,
+"chain_oi": 853,
+"chain_vol": 263,
+"price": 76.56
+},
+"HESM": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 186,
-"price": 17.28
+"chain_oi": 18538,
+"chain_vol": 2003,
+"price": 29.05
+},
+"HII": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 29.0,
+"chain_oi": 2302,
+"chain_vol": 333,
+"price": 280.34
+},
+"HIMS": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 36.5,
+"chain_oi": 6782,
+"chain_vol": 2611,
+"price": 14.6
 },
 "HL": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 2351,
-"price": 11.15
+"expiry": "2026-12-11",
+"atm_spread_pct": 39.3,
+"chain_oi": 4927,
+"chain_vol": 921,
+"price": 10.52
 },
 "HLIO": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 10,
+"chain_oi": 135,
 "chain_vol": 41,
-"price": 44.35
+"price": 42.1
 },
 "HMY": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 122,
-"price": 13.49
+"chain_oi": 1875,
+"chain_vol": 1771,
+"price": 12.82
+},
+"HODL": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 45,
+"chain_vol": 4,
+"price": 16.48
+},
+"HOOD": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 21.4,
+"chain_oi": 28902,
+"chain_vol": 9046,
+"price": 62.17
 },
 "HOV": {
 "grade": "none"
+},
+"HSAI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 30.3,
+"chain_oi": 3072,
+"chain_vol": 405,
+"price": 11.83
+},
+"HSBC": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 83,
+"chain_vol": 66,
+"price": 80.02
 },
 "HTH": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 0,
-"price": 34.57
+"chain_oi": 7,
+"chain_vol": 4,
+"price": 34.5
+},
+"HUBB": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 33.8,
+"chain_oi": 2498,
+"chain_vol": 1443,
+"price": 403.66
 },
 "HXL": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": 12.8,
-"chain_oi": 526,
-"chain_vol": 156,
-"price": 76.09
+"atm_spread_pct": null,
+"chain_oi": 1101,
+"chain_vol": 173,
+"price": 72.92
 },
 "HY": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 111,
-"chain_vol": 39,
-"price": 16.06
+"chain_oi": 728,
+"chain_vol": 187,
+"price": 16.08
 },
-"ICLN": {
+"HYMC": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 8,
-"price": 14.49
+"expiry": "2026-12-18",
+"atm_spread_pct": 29.6,
+"chain_oi": 6796,
+"chain_vol": 1170,
+"price": 12.61
 },
-"IDCC": {
+"IAG": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 37.0,
+"chain_oi": 13809,
+"chain_vol": 1825,
+"price": 14.44
+},
+"IBIT": {
+"grade": "liquid",
+"expiry": "2026-12-11",
+"atm_spread_pct": 2.7,
+"chain_oi": 53604,
+"chain_vol": 16138,
+"price": 33.02
+},
+"IBOC": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 877,
-"chain_vol": 533,
-"price": 270.75
+"chain_oi": 4,
+"chain_vol": 8,
+"price": 63.42
+},
+"ICHR": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 4296,
+"chain_vol": 486,
+"price": 27.28
+},
+"ICLN": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 30,
+"chain_vol": 12,
+"price": 13.84
+},
+"IDCC": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 3026,
+"chain_vol": 591,
+"price": 253.37
+},
+"IDEQ": {
+"grade": "none"
+},
+"IDMO": {
+"grade": "none"
 },
 "IDV": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 3,
-"price": 40.74
+"chain_oi": 17,
+"chain_vol": 5,
+"price": 40.14
+},
+"IDYA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 492,
+"chain_vol": 288,
+"price": 25.56
+},
+"IEFA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 653,
+"chain_vol": 177,
+"price": 89.54
+},
+"IEMG": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1064,
+"chain_vol": 247,
+"price": 65.69
 },
 "IESC": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 3157,
+"chain_vol": 485,
+"price": 156.06
+},
+"IEUR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 263,
-"chain_vol": 477,
-"price": 166.9
+"chain_oi": 44,
+"chain_vol": 9,
+"price": 70.14
+},
+"IIPR": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 5726,
+"chain_vol": 239,
+"price": 47.77
 },
 "ILF": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 82,
-"chain_vol": 167,
-"price": 29.66
+"chain_oi": 6328,
+"chain_vol": 162,
+"price": 28.98
 },
 "IMCR": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 32,
+"chain_oi": 3571,
 "chain_vol": 631,
-"price": 26.63
+"price": 26.41
+},
+"IMNM": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2599,
+"chain_vol": 889,
+"price": 15.69
 },
 "INGR": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 34,
-"price": 88.53
+"atm_spread_pct": 28.6,
+"chain_oi": 159,
+"chain_vol": 33,
+"price": 89.19
 },
-"IONQ": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1896,
-"price": 22.71
-},
-"IONS": {
+"INMD": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 315,
-"chain_vol": 1281,
-"price": 27.22
+"chain_oi": 715,
+"chain_vol": 34,
+"price": 12.42
+},
+"INOD": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 627,
+"chain_vol": 610,
+"price": 28.12
+},
+"INTC": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 9.1,
+"chain_oi": 59390,
+"chain_vol": 9128,
+"price": 51.28
+},
+"INTF": {
+"grade": "none"
+},
+"INTU": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 35.9,
+"chain_oi": 2437,
+"chain_vol": 1214,
+"price": 270.44
+},
+"INVA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1256,
+"chain_vol": 51,
+"price": 18.41
+},
+"INVX": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 362,
+"chain_vol": 45,
+"price": 22.35
+},
+"IONQ": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 24.9,
+"chain_oi": 8015,
+"chain_vol": 810,
+"price": 20.72
+},
+"IONS": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 5422,
+"chain_vol": 998,
+"price": 26.58
 },
 "IP": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 95,
-"price": 31.11
+"expiry": "2026-12-11",
+"atm_spread_pct": 33.3,
+"chain_oi": 362,
+"chain_vol": 1273,
+"price": 30.36
 },
 "IPGP": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 14,
-"price": 63.94
+"chain_oi": 81,
+"chain_vol": 41,
+"price": 58.64
 },
 "IPI": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 222,
-"chain_vol": 188,
-"price": 29.5
+"chain_oi": 1180,
+"chain_vol": 148,
+"price": 29.29
+},
+"IREN": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": 4.2,
+"chain_oi": 37620,
+"chain_vol": 14283,
+"price": 11.82
+},
+"IRM": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 468,
+"chain_vol": 348,
+"price": 102.22
 },
 "IRTC": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": 38.6,
-"chain_oi": 263,
-"chain_vol": 372,
-"price": 94.24
+"atm_spread_pct": null,
+"chain_oi": 1230,
+"chain_vol": 370,
+"price": 94.72
+},
+"ISRG": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 587,
+"chain_vol": 229,
+"price": 399.05
+},
+"ITA": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 27147,
+"chain_vol": 920,
+"price": 66.17
 },
 "ITRN": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 12,
-"price": 46.52
+"chain_oi": 35,
+"chain_vol": 23,
+"price": 44.43
+},
+"IWF": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 9048,
+"chain_vol": 1773,
+"price": 101.72
+},
+"IWP": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 125,
+"chain_vol": 104,
+"price": 116.81
 },
 "IYM": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 151,
-"chain_vol": 85,
-"price": 168.04
+"atm_spread_pct": 21.7,
+"chain_oi": 218,
+"chain_vol": 92,
+"price": 162.11
 },
-"JBSS": {
+"IYZ": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 32.4,
+"chain_oi": 80,
+"chain_vol": 174,
+"price": 36.07
+},
+"JANX": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 5226,
+"chain_vol": 593,
+"price": 10.08
+},
+"JBL": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 25.8,
+"chain_oi": 307,
+"chain_vol": 69,
+"price": 225.77
+},
+"JCI": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 121,
+"chain_vol": 36,
+"price": 130.18
+},
+"JEF": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 3735,
+"chain_vol": 786,
+"price": 38.93
+},
+"JGRO": {
+"grade": "none"
+},
+"JTEK": {
+"grade": "none"
+},
+"KALU": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 89,
-"chain_vol": 149,
-"price": 60.77
+"chain_oi": 255,
+"chain_vol": 103,
+"price": 90.16
 },
-"JD": {
+"KBR": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1477,
-"price": 25.64
+"chain_oi": 1936,
+"chain_vol": 92,
+"price": 31.44
 },
 "KE": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
+"chain_oi": 36,
 "chain_vol": 21,
-"price": 18.42
+"price": 17.92
+},
+"KEY": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 27823,
+"chain_vol": 2407,
+"price": 19.45
 },
 "KEYS": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 181,
-"chain_vol": 2377,
-"price": 281.42
+"atm_spread_pct": 17.6,
+"chain_oi": 10545,
+"chain_vol": 2472,
+"price": 261.51
 },
 "KGC": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 383,
-"price": 18.25
+"chain_oi": 835,
+"chain_vol": 499,
+"price": 17.32
+},
+"KLAC": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 26.9,
+"chain_oi": 1221,
+"chain_vol": 385,
+"price": 126.87
+},
+"KLAR": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 2030,
+"chain_vol": 351,
+"price": 12.01
+},
+"KLIC": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 39.2,
+"chain_oi": 471,
+"chain_vol": 661,
+"price": 54.71
 },
 "KMT": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 29,
-"price": 22.25
+"chain_oi": 232,
+"chain_vol": 41,
+"price": 21.29
 },
 "KOP": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 70,
-"chain_vol": 40,
-"price": 30.32
+"chain_oi": 684,
+"chain_vol": 191,
+"price": 29.04
+},
+"KRMN": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 9874,
+"chain_vol": 360,
+"price": 29.25
+},
+"KT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 7,
+"chain_vol": 5,
+"price": 16.06
 },
 "KWEB": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"grade": "fair",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 7193,
-"price": 21.31
+"chain_oi": 4906,
+"chain_vol": 701,
+"price": 20.72
 },
 "LBRT": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 31.1,
+"chain_oi": 7376,
+"chain_vol": 541,
+"price": 10.76
+},
+"LDOS": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 148,
-"chain_vol": 677,
-"price": 12.2
+"chain_oi": 8056,
+"chain_vol": 330,
+"price": 122.21
 },
 "LEA": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 25,
-"chain_vol": 120,
-"price": 106.16
+"chain_oi": 308,
+"chain_vol": 124,
+"price": 102.02
+},
+"LEGN": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 9435,
+"chain_vol": 1899,
+"price": 15.25
+},
+"LEU": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 20.9,
+"chain_oi": 13228,
+"chain_vol": 2836,
+"price": 81.43
+},
+"LHX": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 209,
+"chain_vol": 27,
+"price": 249.89
+},
+"LI": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 31.4,
+"chain_oi": 970,
+"chain_vol": 380,
+"price": 10.39
+},
+"LINE": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 69,
+"chain_vol": 22,
+"price": 31.22
 },
 "LIT": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 265,
-"price": 54.33
+"chain_oi": 790,
+"chain_vol": 237,
+"price": 51.98
 },
-"LKQ": {
+"LITE": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 31.4,
+"chain_oi": 4986,
+"chain_vol": 4220,
+"price": 460.54
+},
+"LMAT": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 475,
-"chain_vol": 3272,
-"price": 18.81
+"chain_oi": 323,
+"chain_vol": 42,
+"price": 73.61
+},
+"LMND": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 34.8,
+"chain_oi": 740,
+"chain_vol": 194,
+"price": 35.46
 },
 "LNN": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
-"atm_spread_pct": 15.6,
-"chain_oi": 2344,
+"atm_spread_pct": null,
+"chain_oi": 2376,
 "chain_vol": 87,
-"price": 98.45
+"price": 94.64
 },
 "LOPE": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 83,
-"chain_vol": 416,
-"price": 111.22
+"atm_spread_pct": 18.9,
+"chain_oi": 1007,
+"chain_vol": 251,
+"price": 108.13
+},
+"LPLA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 35.7,
+"chain_oi": 3695,
+"chain_vol": 1642,
+"price": 264.56
 },
 "LRCX": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1584,
-"price": 203.68
+"expiry": "2026-12-11",
+"atm_spread_pct": 16.6,
+"chain_oi": 3695,
+"chain_vol": 1234,
+"price": 183.27
 },
 "LRN": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 18,
-"chain_vol": 78,
-"price": 76.2
+"atm_spread_pct": 28.6,
+"chain_oi": 983,
+"chain_vol": 84,
+"price": 74.58
 },
 "LSTR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 11,
-"price": 151.81
+"chain_oi": 202,
+"chain_vol": 13,
+"price": 146.43
+},
+"LYB": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 14658,
+"chain_vol": 1736,
+"price": 55.84
 },
 "LYTS": {
 "grade": "thin",
 "expiry": "2027-01-15",
 "atm_spread_pct": null,
-"chain_oi": 5,
+"chain_oi": 14,
 "chain_vol": 12,
-"price": 14.22
+"price": 13.62
 },
 "MAMA": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 295,
-"chain_vol": 35,
-"price": 11.24
+"chain_oi": 556,
+"chain_vol": 31,
+"price": 11.08
+},
+"MC": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 632,
+"chain_vol": 16,
+"price": 51.35
 },
 "MCHP": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1288,
-"price": 58.47
+"chain_oi": 1293,
+"chain_vol": 783,
+"price": 55.44
+},
+"MCY": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 3955,
+"chain_vol": 1228,
+"price": 81.43
 },
 "MDGL": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 561,
-"chain_vol": 919,
-"price": 396.74
+"atm_spread_pct": 27.0,
+"chain_oi": 5298,
+"chain_vol": 719,
+"price": 379.1
 },
-"MELI": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1148,
-"price": 1355.49
-},
-"MH": {
+"MEC": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 42,
-"price": 11.82
+"chain_oi": 72,
+"chain_vol": 7,
+"price": 11.65
+},
+"MELI": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 39.5,
+"chain_oi": 1370,
+"chain_vol": 985,
+"price": 1355.0
+},
+"META": {
+"grade": "liquid",
+"expiry": "2026-12-11",
+"atm_spread_pct": 2.5,
+"chain_oi": 13837,
+"chain_vol": 6927,
+"price": 560.84
+},
+"MGY": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 30.3,
+"chain_oi": 12702,
+"chain_vol": 161,
+"price": 22.84
 },
 "MLPA": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 20,
-"chain_vol": 12,
-"price": 51.02
+"chain_oi": 42,
+"chain_vol": 7,
+"price": 50.3
+},
+"MLPX": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 266,
+"chain_vol": 549,
+"price": 68.68
+},
+"MMI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 17,
+"chain_vol": 1,
+"price": 22.77
+},
+"MRCY": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1695,
+"chain_vol": 721,
+"price": 72.16
+},
+"MSOS": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 3409,
+"chain_vol": 1315,
+"price": 3.14
 },
 "MSTR": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 19336,
-"price": 86.13
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": 7.6,
+"chain_oi": 46521,
+"chain_vol": 14390,
+"price": 77.8
 },
-"NEXA": {
+"MTSI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 18.7,
+"chain_oi": 4071,
+"chain_vol": 975,
+"price": 194.91
+},
+"MTUM": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 539,
+"chain_vol": 255,
+"price": 60.27
+},
+"MTUS": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1167,
+"chain_vol": 45,
+"price": 15.53
+},
+"MTZ": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 21.7,
+"chain_oi": 7655,
+"chain_vol": 1085,
+"price": 144.71
+},
+"MUR": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 38.8,
+"chain_oi": 3413,
+"chain_vol": 169,
+"price": 32.15
+},
+"MYRG": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 20,
+"chain_vol": 25,
+"price": 247.71
+},
+"NBIS": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": 6.2,
+"chain_oi": 16402,
+"chain_vol": 7111,
+"price": 81.31
+},
+"NBR": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 665,
+"chain_vol": 21,
+"price": 69.51
+},
+"NE": {
 "grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 5505,
-"chain_vol": 342,
-"price": 9.96
+"chain_oi": 9630,
+"chain_vol": 2945,
+"price": 36.72
+},
+"NEM": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 25.4,
+"chain_oi": 2625,
+"chain_vol": 535,
+"price": 94.68
+},
+"NESR": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2207,
+"chain_vol": 171,
+"price": 17.78
 },
 "NFLX": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 7207,
-"price": 58.46
+"expiry": "2026-12-11",
+"atm_spread_pct": 28.7,
+"chain_oi": 22513,
+"chain_vol": 6086,
+"price": 56.73
 },
 "NGVT": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 0,
-"price": 55.96
+"chain_oi": 6,
+"chain_vol": 1,
+"price": 53.75
 },
-"NHI": {
-"grade": "thin",
+"NICE": {
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 36,
-"price": 61.39
+"chain_oi": 2513,
+"chain_vol": 108,
+"price": 85.22
 },
 "NKE": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 6898,
-"price": 34.33
+"expiry": "2026-12-11",
+"atm_spread_pct": 27.6,
+"chain_oi": 20156,
+"chain_vol": 4116,
+"price": 32.92
 },
 "NKTR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 64,
-"price": 32.54
+"chain_oi": 1904,
+"chain_vol": 652,
+"price": 30.2
 },
-"NMRK": {
+"NNI": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 70,
-"chain_vol": 166,
-"price": 9.76
+"chain_oi": 38,
+"chain_vol": 14,
+"price": 120.89
+},
+"NOVT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 58,
+"chain_vol": 39,
+"price": 101.99
+},
+"NPO": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 18.0,
+"chain_oi": 461,
+"chain_vol": 120,
+"price": 252.87
 },
 "NSSC": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 18,
-"chain_vol": 34,
-"price": 29.83
+"chain_oi": 156,
+"chain_vol": 35,
+"price": 28.67
+},
+"NTB": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 6,
+"chain_vol": 3,
+"price": 53.63
 },
 "NTGR": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 37.5,
+"chain_oi": 12955,
+"chain_vol": 5145,
+"price": 17.38
+},
+"NTLA": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 185,
-"chain_vol": 5143,
-"price": 18.59
+"chain_oi": 2863,
+"chain_vol": 526,
+"price": 10.0
+},
+"NTR": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 35.0,
+"chain_oi": 148,
+"chain_vol": 62,
+"price": 63.84
 },
 "NU": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1256,
-"price": 11.82
+"expiry": "2026-12-11",
+"atm_spread_pct": 33.3,
+"chain_oi": 9829,
+"chain_vol": 1278,
+"price": 11.27
+},
+"NVDA": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 9.7,
+"chain_oi": 168897,
+"chain_vol": 102147,
+"price": 125.53
+},
+"NVEC": {
+"grade": "none"
 },
 "NVR": {
 "grade": "none"
 },
+"NVST": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 13182,
+"chain_vol": 2517,
+"price": 22.91
+},
 "NVT": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 7116,
+"chain_vol": 472,
+"price": 101.84
+},
+"NWG": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 263,
-"price": 108.1
+"chain_oi": 1124,
+"chain_vol": 449,
+"price": 14.82
+},
+"NXT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 19.6,
+"chain_oi": 4982,
+"chain_vol": 1046,
+"price": 67.13
 },
 "NZF": {
 "grade": "none"
 },
+"ODC": {
+"grade": "none"
+},
+"OGC": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 156,
+"chain_vol": 54,
+"price": 22.45
+},
 "OIH": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 177,
-"price": 345.69
+"atm_spread_pct": 15.4,
+"chain_oi": 931,
+"chain_vol": 1268,
+"price": 329.73
 },
-"ONTO": {
+"OII": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 80,
-"chain_vol": 1737,
-"price": 195.93
+"chain_oi": 272,
+"chain_vol": 258,
+"price": 31.67
+},
+"OLED": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 5318,
+"chain_vol": 590,
+"price": 77.62
+},
+"ON": {
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 5772,
+"chain_vol": 1216,
+"price": 60.84
+},
+"ONON": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 25.5,
+"chain_oi": 2822,
+"chain_vol": 1710,
+"price": 29.97
+},
+"OPRA": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 8968,
+"chain_vol": 8660,
+"price": 12.86
+},
+"OPY": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 85,
+"chain_vol": 44,
+"price": 82.7
+},
+"OR": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2594,
+"chain_vol": 53,
+"price": 30.41
+},
+"ORA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 24.7,
+"chain_oi": 11571,
+"chain_vol": 232,
+"price": 83.93
 },
 "ORCL": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 14454,
-"price": 110.57
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": 6.8,
+"chain_oi": 50605,
+"chain_vol": 9209,
+"price": 101.19
 },
 "OTTR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 13,
-"price": 78.24
+"chain_oi": 28,
+"chain_vol": 20,
+"price": 76.58
 },
 "PAAS": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 389,
-"price": 32.39
+"expiry": "2026-12-11",
+"atm_spread_pct": 29.4,
+"chain_oi": 1653,
+"chain_vol": 722,
+"price": 30.6
 },
 "PALL": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 23.5,
+"chain_oi": 15296,
+"chain_vol": 1876,
+"price": 16.19
+},
+"PAM": {
 "grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 2928,
-"chain_vol": 2760,
-"price": 16.59
+"chain_oi": 3736,
+"chain_vol": 580,
+"price": 60.63
 },
-"PAM": {
-"grade": "thin",
+"PAVE": {
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 197,
-"chain_vol": 581,
-"price": 62.04
+"chain_oi": 3778,
+"chain_vol": 331,
+"price": 49.04
+},
+"PBR": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 35.0,
+"chain_oi": 2739,
+"chain_vol": 276,
+"price": 16.01
 },
 "PBW": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 271,
-"chain_vol": 294,
-"price": 22.51
+"atm_spread_pct": 12.1,
+"chain_oi": 558,
+"chain_vol": 304,
+"price": 20.69
 },
 "PCAR": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2954,
+"chain_vol": 221,
+"price": 102.2
+},
+"PDFS": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 392,
-"chain_vol": 279,
-"price": 104.15
+"chain_oi": 115,
+"chain_vol": 88,
+"price": 30.44
 },
 "PDI": {
 "grade": "none"
 },
 "PEGA": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 784,
-"chain_vol": 584,
-"price": 28.07
-},
-"PFFA": {
-"grade": "thin",
-"expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 5,
-"chain_vol": 175,
-"price": 17.36
+"chain_oi": 2691,
+"chain_vol": 434,
+"price": 27.25
 },
 "PFSI": {
 "grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 4939,
-"chain_vol": 781,
-"price": 58.4
+"chain_oi": 11884,
+"chain_vol": 794,
+"price": 58.02
+},
+"PHYS": {
+"grade": "none"
 },
 "PICK": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 97,
-"price": 48.12
+"chain_oi": 220,
+"chain_vol": 99,
+"price": 46.38
+},
+"PINS": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 1578,
+"chain_vol": 800,
+"price": 16.33
+},
+"PIPR": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 420,
+"chain_vol": 39,
+"price": 60.21
 },
 "PKX": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 23,
-"price": 47.37
+"atm_spread_pct": 34.8,
+"chain_oi": 37,
+"chain_vol": 5,
+"price": 44.84
 },
-"PLXS": {
+"PL": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 27.5,
+"chain_oi": 4230,
+"chain_vol": 366,
+"price": 10.53
+},
+"PLAB": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 299,
-"chain_vol": 126,
-"price": 208.73
+"atm_spread_pct": 18.2,
+"chain_oi": 24502,
+"chain_vol": 636,
+"price": 24.03
+},
+"PLD": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 32.0,
+"chain_oi": 10077,
+"chain_vol": 1158,
+"price": 122.5
+},
+"PLPC": {
+"grade": "none"
 },
 "POWI": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 35,
-"chain_vol": 234,
-"price": 42.33
+"chain_oi": 288,
+"chain_vol": 180,
+"price": 39.16
 },
-"POWL": {
-"grade": "fair",
+"PPA": {
+"grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 3722,
-"chain_vol": 2084,
-"price": 158.75
+"chain_oi": 305,
+"chain_vol": 97,
+"price": 146.33
 },
 "PPLT": {
-"grade": "fair",
+"grade": "liquid",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 6175,
-"chain_vol": 1564,
-"price": 12.24
+"chain_oi": 20639,
+"chain_vol": 1968,
+"price": 11.75
+},
+"PPTA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 27.7,
+"chain_oi": 18682,
+"chain_vol": 3376,
+"price": 14.51
 },
 "PRAA": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 48,
-"chain_vol": 70,
-"price": 11.3
+"chain_oi": 1320,
+"chain_vol": 68,
+"price": 10.38
 },
 "PRDO": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 35.3,
+"chain_oi": 514,
+"chain_vol": 143,
+"price": 27.47
+},
+"PRIM": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 252,
-"price": 28.29
+"chain_oi": 2301,
+"chain_vol": 804,
+"price": 53.6
+},
+"PSI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 167,
+"chain_vol": 57,
+"price": 94.29
 },
 "PSIX": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 224,
-"price": 31.77
+"atm_spread_pct": 36.2,
+"chain_oi": 2407,
+"chain_vol": 250,
+"price": 28.27
 },
 "PSLV": {
 "grade": "none"
+},
+"PTCT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 19.1,
+"chain_oi": 742,
+"chain_vol": 137,
+"price": 56.42
+},
+"PWP": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 208,
+"chain_vol": 4,
+"price": 11.77
+},
+"PWRD": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 3,
+"chain_vol": 0,
+"price": 88.55
 },
 "RAAX": {
 "grade": "thin",
 "expiry": "2027-01-15",
 "atm_spread_pct": null,
-"chain_oi": 1,
+"chain_oi": 19,
 "chain_vol": 6,
-"price": 36.47
+"price": 35.66
 },
-"RCUS": {
-"grade": "thin",
+"RAPP": {
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 461,
-"chain_vol": 560,
-"price": 15.78
+"chain_oi": 3548,
+"chain_vol": 1136,
+"price": 23.16
+},
+"RCUS": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 4528,
+"chain_vol": 504,
+"price": 15.62
 },
 "RDDT": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 2003,
-"price": 89.88
+"expiry": "2026-12-11",
+"atm_spread_pct": 23.3,
+"chain_oi": 4895,
+"chain_vol": 1834,
+"price": 85.33
 },
 "REMX": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": 29.0,
-"chain_oi": 565,
-"chain_vol": 546,
-"price": 44.32
+"atm_spread_pct": 34.5,
+"chain_oi": 14810,
+"chain_vol": 638,
+"price": 42.06
 },
-"REX": {
+"RGLD": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 4,
-"price": 34.76
+"atm_spread_pct": 19.1,
+"chain_oi": 7759,
+"chain_vol": 1156,
+"price": 222.03
 },
 "RING": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 21,
-"price": 62.65
+"chain_oi": 52,
+"chain_vol": 24,
+"price": 59.37
 },
 "RIO": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 198,
-"chain_vol": 3083,
-"price": 74.7
+"atm_spread_pct": 13.3,
+"chain_oi": 26700,
+"chain_vol": 3865,
+"price": 72.73
+},
+"RIVN": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 33.5,
+"chain_oi": 32419,
+"chain_vol": 18718,
+"price": 10.33
 },
 "RMBS": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 36.1,
+"chain_oi": 3751,
+"chain_vol": 1383,
+"price": 66.35
+},
+"ROAD": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 207,
-"price": 76.19
+"chain_oi": 1262,
+"chain_vol": 216,
+"price": 69.29
+},
+"ROBO": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 936,
+"chain_vol": 121,
+"price": 62.56
 },
 "ROCK": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 35,
-"price": 28.5
+"chain_oi": 564,
+"chain_vol": 47,
+"price": 26.7
+},
+"ROK": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 26.5,
+"chain_oi": 3768,
+"chain_vol": 339,
+"price": 361.93
+},
+"ROOT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 38.8,
+"chain_oi": 3616,
+"chain_vol": 1076,
+"price": 37.01
+},
+"RPG": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 27.5,
+"chain_oi": 22,
+"chain_vol": 0,
+"price": 46.15
 },
 "RRR": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 43,
-"price": 46.65
+"chain_oi": 216,
+"chain_vol": 40,
+"price": 46.09
 },
 "RSI": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 39,
-"chain_vol": 381,
-"price": 11.47
+"chain_oi": 2324,
+"chain_vol": 335,
+"price": 11.23
 },
-"RVLV": {
-"grade": "thin",
-"expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 5,
-"chain_vol": 136,
-"price": 18.85
-},
-"SA": {
-"grade": "thin",
-"expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 16369,
-"price": 18.06
-},
-"SBAC": {
-"grade": "thin",
-"expiry": "2026-12-18",
-"atm_spread_pct": 17.2,
-"chain_oi": 183,
-"chain_vol": 522,
-"price": 169.66
-},
-"SCCO": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 2062,
-"price": 141.46
-},
-"SCI": {
+"RSPN": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
 "chain_oi": 36,
-"chain_vol": 1974,
-"price": 69.29
+"chain_vol": 0,
+"price": 57.92
+},
+"RVLV": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 37.0,
+"chain_oi": 2354,
+"chain_vol": 99,
+"price": 18.37
+},
+"SA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 33.3,
+"chain_oi": 31867,
+"chain_vol": 6366,
+"price": 16.67
+},
+"SAIA": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 22.4,
+"chain_oi": 3404,
+"chain_vol": 2370,
+"price": 314.45
+},
+"SAN": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 23280,
+"chain_vol": 288,
+"price": 11.11
+},
+"SBAC": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1657,
+"chain_vol": 536,
+"price": 173.33
+},
+"SCCO": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 32.0,
+"chain_oi": 641,
+"chain_vol": 70,
+"price": 134.02
+},
+"SCHC": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2,
+"chain_vol": 0,
+"price": 43.91
+},
+"SCI": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 4933,
+"chain_vol": 2416,
+"price": 69.14
 },
 "SD": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 17,
-"price": 11.97
+"chain_oi": 654,
+"chain_vol": 31,
+"price": 11.72
 },
 "SDIV": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 12,
-"chain_vol": 48,
-"price": 20.58
+"chain_oi": 1667,
+"chain_vol": 64,
+"price": 20.22
+},
+"SDRL": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 24.6,
+"chain_oi": 541,
+"chain_vol": 135,
+"price": 38.71
 },
 "SE": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 162,
-"price": 65.94
+"chain_oi": 736,
+"chain_vol": 115,
+"price": 62.63
 },
 "SEB": {
 "grade": "none"
 },
 "SEDG": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
+"atm_spread_pct": 31.7,
+"chain_oi": 2491,
+"chain_vol": 803,
+"price": 18.27
+},
+"SGHC": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 210,
-"price": 20.33
+"chain_oi": 13856,
+"chain_vol": 267,
+"price": 10.25
 },
 "SGI": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 57,
-"chain_vol": 208,
-"price": 59.44
+"atm_spread_pct": 29.5,
+"chain_oi": 13948,
+"chain_vol": 642,
+"price": 57.82
 },
 "SHLD": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 131,
-"chain_vol": 796,
-"price": 57.16
+"chain_oi": 3553,
+"chain_vol": 876,
+"price": 55.34
 },
 "SII": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 70,
-"price": 96.07
+"chain_oi": 277,
+"chain_vol": 74,
+"price": 92.57
 },
 "SIL": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 34,
-"chain_vol": 1720,
-"price": 63.86
+"atm_spread_pct": 20.2,
+"chain_oi": 11648,
+"chain_vol": 3793,
+"price": 60.29
 },
 "SILJ": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 409,
-"price": 19.68
+"chain_oi": 1801,
+"chain_vol": 876,
+"price": 18.52
+},
+"SITM": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 39.4,
+"chain_oi": 4238,
+"chain_vol": 1249,
+"price": 361.24
 },
 "SIVR": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 19.4,
+"chain_oi": 4189,
+"chain_vol": 614,
+"price": 38.92
+},
+"SKE": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 523,
-"chain_vol": 445,
-"price": 41.67
+"chain_oi": 2609,
+"chain_vol": 34,
+"price": 23.83
+},
+"SKM": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 47537,
+"chain_vol": 3857,
+"price": 27.0
+},
+"SLB": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 24.8,
+"chain_oi": 1974,
+"chain_vol": 1159,
+"price": 45.89
 },
 "SLM": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 58,
-"price": 15.99
+"chain_oi": 602,
+"chain_vol": 47,
+"price": 15.87
 },
 "SLV": {
-"grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 18063,
-"price": 39.64
+"grade": "fair",
+"expiry": "2026-12-11",
+"atm_spread_pct": 5.8,
+"chain_oi": 67335,
+"chain_vol": 15757,
+"price": 36.97
 },
-"SMMT": {
+"SNA": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-18",
+"atm_spread_pct": 26.9,
+"chain_oi": 746,
+"chain_vol": 121,
+"price": 348.88
+},
+"SNDA": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 202,
-"price": 10.57
+"chain_oi": 48,
+"chain_vol": 41,
+"price": 31.47
 },
 "SNEX": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": 6.1,
-"chain_oi": 319,
-"chain_vol": 190,
-"price": 39.45
+"atm_spread_pct": null,
+"chain_oi": 807,
+"chain_vol": 409,
+"price": 36.63
+},
+"SOFI": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 8.6,
+"chain_oi": 44749,
+"chain_vol": 13136,
+"price": 12.48
+},
+"SOLZ": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2082,
+"chain_vol": 126,
+"price": 6.61
 },
 "SON": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 34,
-"price": 46.26
+"chain_oi": 423,
+"chain_vol": 15,
+"price": 45.93
+},
+"SPDW": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 28,
+"chain_vol": 51,
+"price": 45.25
+},
+"SPEM": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 22,
+"chain_vol": 17,
+"price": 44.06
+},
+"SPXC": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1963,
+"chain_vol": 465,
+"price": 136.29
+},
+"SRAD": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 34257,
+"chain_vol": 776,
+"price": 11.4
+},
+"SRE": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1621,
+"chain_vol": 1257,
+"price": 76.16
 },
 "SRPT": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 95,
-"price": 14.17
+"chain_oi": 100,
+"chain_vol": 438,
+"price": 13.33
 },
 "SSRM": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 21.4,
+"chain_oi": 9828,
+"chain_vol": 1226,
+"price": 21.59
+},
+"ST": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 326,
-"chain_vol": 633,
-"price": 23.29
+"chain_oi": 2640,
+"chain_vol": 177,
+"price": 35.4
 },
 "STRA": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 61,
-"price": 52.92
+"atm_spread_pct": 6.6,
+"chain_oi": 645,
+"chain_vol": 51,
+"price": 50.7
 },
 "STRL": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 28.1,
+"chain_oi": 7188,
+"chain_vol": 1418,
+"price": 247.92
+},
+"SUPN": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 207,
-"chain_vol": 564,
-"price": 273.25
+"chain_oi": 5728,
+"chain_vol": 139,
+"price": 28.61
+},
+"SYF": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 21.9,
+"chain_oi": 15039,
+"chain_vol": 3171,
+"price": 67.76
 },
 "SYM": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 164,
-"price": 33.16
+"chain_oi": 469,
+"chain_vol": 116,
+"price": 31.1
+},
+"TAC": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 8807,
+"chain_vol": 176,
+"price": 12.2
 },
 "TAN": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 2772,
-"price": 36.63
+"atm_spread_pct": 40.0,
+"chain_oi": 23348,
+"chain_vol": 4447,
+"price": 33.97
 },
 "TBBK": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
+"chain_oi": 183,
 "chain_vol": 14,
-"price": 44.26
+"price": 44.09
 },
 "TBN": {
 "grade": "none"
@@ -2027,220 +4038,503 @@
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 67,
-"chain_vol": 155,
-"price": 29.51
+"chain_oi": 1398,
+"chain_vol": 187,
+"price": 30.35
+},
+"TDY": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 35.8,
+"chain_oi": 210,
+"chain_vol": 200,
+"price": 598.56
+},
+"TEL": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 12.8,
+"chain_oi": 5406,
+"chain_vol": 762,
+"price": 199.97
 },
 "TER": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
+"atm_spread_pct": 32.1,
+"chain_oi": 1842,
+"chain_vol": 771,
+"price": 204.78
+},
+"TETH": {
+"grade": "thin",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 2388,
-"price": 227.43
+"chain_oi": 1,
+"chain_vol": 1,
+"price": 7.98
 },
 "TFII": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 14,
-"price": 93.07
+"chain_oi": 30,
+"chain_vol": 7,
+"price": 88.44
 },
-"TPB": {
+"TFIN": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 1415,
-"chain_vol": 765,
-"price": 47.76
+"chain_oi": 6,
+"chain_vol": 77,
+"price": 55.04
+},
+"TFPM": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1683,
+"chain_vol": 40,
+"price": 27.15
+},
+"TGS": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 440,
+"chain_vol": 128,
+"price": 19.23
+},
+"TIGO": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 39.1,
+"chain_oi": 422,
+"chain_vol": 348,
+"price": 76.24
+},
+"TKR": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 37.0,
+"chain_oi": 1196,
+"chain_vol": 250,
+"price": 97.96
+},
+"TPB": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 3709,
+"chain_vol": 764,
+"price": 46.36
 },
 "TPL": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 476,
-"price": 277.72
+"atm_spread_pct": 38.4,
+"chain_oi": 1738,
+"chain_vol": 444,
+"price": 267.44
+},
+"TS": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 36.6,
+"chain_oi": 4916,
+"chain_vol": 899,
+"price": 55.17
 },
 "TSEM": {
 "grade": "thin",
-"expiry": "2026-12-04",
+"expiry": "2026-12-11",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 722,
-"price": 127.77
+"chain_oi": 1095,
+"chain_vol": 66,
+"price": 115.56
+},
+"TT": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 18.7,
+"chain_oi": 6999,
+"chain_vol": 596,
+"price": 386.29
 },
 "TTAM": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": 25.2,
-"chain_oi": 15,
+"chain_oi": 34,
 "chain_vol": 12,
-"price": 10.87
+"price": 10.65
 },
 "TTMI": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 106,
-"chain_vol": 1631,
-"price": 68.0
+"chain_oi": 18760,
+"chain_vol": 3820,
+"price": 58.85
+},
+"TYG": {
+"grade": "none"
+},
+"UBER": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 11.1,
+"chain_oi": 9656,
+"chain_vol": 2824,
+"price": 63.47
+},
+"UCTT": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 6017,
+"chain_vol": 653,
+"price": 37.0
+},
+"UFO": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 7894,
+"chain_vol": 288,
+"price": 35.87
 },
 "UMH": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 7,
+"chain_oi": 501,
 "chain_vol": 162,
-"price": 14.2
+"price": 13.92
 },
 "UNF": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 670,
-"price": 230.4
+"atm_spread_pct": 19.2,
+"chain_oi": 13072,
+"chain_vol": 643,
+"price": 228.42
 },
-"URNJ": {
+"USLM": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 735,
-"chain_vol": 501,
-"price": 13.93
+"atm_spread_pct": 35.6,
+"chain_oi": 24,
+"chain_vol": 7,
+"price": 100.06
 },
-"URNM": {
+"UTI": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 278,
-"price": 35.96
+"atm_spread_pct": 19.6,
+"chain_oi": 2505,
+"chain_vol": 990,
+"price": 17.17
 },
 "VAL": {
-"grade": "thin",
+"grade": "liquid",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 502,
-"chain_vol": 823,
-"price": 72.77
+"chain_oi": 20013,
+"chain_vol": 850,
+"price": 70.8
 },
-"VC": {
+"VAW": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 23,
-"chain_vol": 55,
-"price": 81.3
+"chain_oi": 7,
+"chain_vol": 5,
+"price": 209.2
+},
+"VCYT": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2021,
+"chain_vol": 114,
+"price": 25.13
 },
 "VERA": {
-"grade": "thin",
+"grade": "fair",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 16,
-"chain_vol": 134,
-"price": 26.75
+"chain_oi": 3080,
+"chain_vol": 244,
+"price": 25.45
 },
-"VIAV": {
+"VEU": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 675,
-"chain_vol": 1595,
-"price": 29.37
+"chain_oi": 1063,
+"chain_vol": 216,
+"price": 73.78
+},
+"VFMO": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 9,
+"chain_vol": 40,
+"price": 193.88
 },
 "VICR": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 5881,
+"chain_vol": 806,
+"price": 125.09
+},
+"VIS": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 485,
-"price": 141.52
+"chain_oi": 52,
+"chain_vol": 24,
+"price": 299.47
 },
 "VIST": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 6320,
+"chain_vol": 600,
+"price": 49.58
+},
+"VMI": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 33.1,
+"chain_oi": 368,
+"chain_vol": 100,
+"price": 385.66
+},
+"VNOM": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 8406,
+"chain_vol": 812,
+"price": 39.69
+},
+"VOD": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 11,
+"chain_vol": 11,
+"price": 14.02
+},
+"VONG": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 41,
-"chain_vol": 500,
-"price": 50.18
+"chain_oi": 22,
+"chain_vol": 17,
+"price": 104.93
+},
+"VOYG": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 32.6,
+"chain_oi": 3385,
+"chain_vol": 822,
+"price": 18.74
+},
+"VRT": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": 22.8,
+"chain_oi": 3830,
+"chain_vol": 956,
+"price": 166.24
 },
 "VRTS": {
 "grade": "none"
 },
 "VST": {
 "grade": "thin",
-"expiry": "2026-12-04",
-"atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 1483,
-"price": 124.15
+"expiry": "2026-12-11",
+"atm_spread_pct": 31.4,
+"chain_oi": 2074,
+"chain_vol": 1758,
+"price": 115.25
 },
-"WGS": {
-"grade": "thin",
-"expiry": "2026-12-04",
+"VWO": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 38,
-"price": 49.24
+"chain_oi": 8702,
+"chain_vol": 1168,
+"price": 50.62
+},
+"WAFD": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 34.0,
+"chain_oi": 5,
+"chain_vol": 1,
+"price": 26.73
+},
+"WAL": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 1962,
+"chain_vol": 395,
+"price": 67.9
+},
+"WEAT": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 2336,
+"chain_vol": 587,
+"price": 21.44
+},
+"WERN": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 40.0,
+"chain_oi": 1250,
+"chain_vol": 117,
+"price": 25.75
+},
+"WGMI": {
+"grade": "fair",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 9311,
+"chain_vol": 1382,
+"price": 20.0
 },
 "WHR": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": null,
-"chain_oi": 8,
-"chain_vol": 1762,
-"price": 25.32
+"atm_spread_pct": 20.3,
+"chain_oi": 29410,
+"chain_vol": 2171,
+"price": 24.73
 },
 "WLK": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 172,
-"chain_vol": 237,
-"price": 59.23
+"chain_oi": 1450,
+"chain_vol": 224,
+"price": 57.95
 },
-"XME": {
+"WPM": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 418,
+"chain_vol": 220,
+"price": 109.91
+},
+"WSC": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 39762,
+"chain_vol": 2902,
+"price": 16.14
+},
+"WTAI": {
 "grade": "thin",
 "expiry": "2026-12-18",
-"atm_spread_pct": 14.0,
-"chain_oi": 7442,
-"chain_vol": 1372,
-"price": 85.38
+"atm_spread_pct": null,
+"chain_oi": 352,
+"chain_vol": 229,
+"price": 27.88
+},
+"XAR": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 32.4,
+"chain_oi": 154,
+"chain_vol": 263,
+"price": 205.58
+},
+"XME": {
+"grade": "liquid",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 26337,
+"chain_vol": 2285,
+"price": 80.3
 },
 "XMMO": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 287,
-"chain_vol": 275,
-"price": 128.44
+"chain_oi": 384,
+"chain_vol": 296,
+"price": 123.11
+},
+"XP": {
+"grade": "thin",
+"expiry": "2026-12-11",
+"atm_spread_pct": null,
+"chain_oi": 1209,
+"chain_vol": 318,
+"price": 13.13
 },
 "XPEL": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
+"chain_oi": 186,
 "chain_vol": 74,
-"price": 37.61
+"price": 38.12
+},
+"XPO": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": 40.0,
+"chain_oi": 1577,
+"chain_vol": 727,
+"price": 174.44
+},
+"XPRO": {
+"grade": "thin",
+"expiry": "2026-12-18",
+"atm_spread_pct": null,
+"chain_oi": 10,
+"chain_vol": 46,
+"price": 11.62
 },
 "XRN": {
 "grade": "thin",
 "expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 0,
-"chain_vol": 21,
-"price": 25.7
+"chain_oi": 63,
+"chain_vol": 20,
+"price": 25.47
 },
 "XYL": {
 "grade": "thin",
 "expiry": "2026-12-18",
+"atm_spread_pct": 32.9,
+"chain_oi": 11057,
+"chain_vol": 2050,
+"price": 94.66
+},
+"YPF": {
+"grade": "fair",
+"expiry": "2026-12-18",
 "atm_spread_pct": null,
-"chain_oi": 967,
-"chain_vol": 805,
-"price": 95.24
+"chain_oi": 2461,
+"chain_vol": 1784,
+"price": 32.32
 }
 }
 }
