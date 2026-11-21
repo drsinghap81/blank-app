@@ -29,11 +29,12 @@ jobs:
           python tools/index_w_alert.py 2>&1 | tail -12 || true
           python tools/sector_rrg.py 2>&1 | tail -3 || true
           python tools/fii_squeeze.py 2>&1 | tail -2 || true
+          python tools/mmf.py 2>&1 | tail -2 || true
           python tools/ath_scan.py > /tmp/ath_log.txt 2>&1 || true
           grep -v -i "warn\|delisted\|failed download\|^\[" /tmp/ath_log.txt | tail -30
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
-          git add -A data/scan/fii.json data/scan/ath.json data/scan/ath_charts data/scan/sectors.json data/scan/sector_hist.csv.gz data/scan/bench_daily.json data/scan/index_charts data/scan/index_w.json data/scan/sector_rrg.json data/scan/sector_rrg_hist.json data/scan/index_ohlcv.csv.gz data/scan/index_w_charts; git diff --cached --quiet && exit 0
+          git add -A data/scan/mmf.json data/scan/fii.json data/scan/ath.json data/scan/ath_charts data/scan/sectors.json data/scan/sector_hist.csv.gz data/scan/bench_daily.json data/scan/index_charts data/scan/index_w.json data/scan/sector_rrg.json data/scan/sector_rrg_hist.json data/scan/index_ohlcv.csv.gz data/scan/index_w_charts; git diff --cached --quiet && exit 0
           git commit -qm "Monthly ATH scan $(date -u +%F)"
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
