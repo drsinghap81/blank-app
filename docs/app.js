@@ -5051,11 +5051,14 @@ function rrgClean(items, sel, W = 360, H = 340, tails0 = false) {
 }
 async function rrgMount(el, G, mk) {
   const box = el.querySelector('#rrgbox'); if (!box) return;
-  const V = state.rrgV || (state.rrgV = { view: 'weekly', all: false, sel: null });
+  const V = state.rrgV || (state.rrgV = { view: 'weekly', all: false, sel: null, src: 'sec' });
+  /* 21 Nov 2026 (Amritpal: "also commodities, coins rotation charts"): commodities vs a broad commodity ETF (DBC), coins vs Bitcoin */
+  const SRC = { sec: null, comm: 'data/scan/comm_rrg', crypto: 'data/scan/crypto_rrg' }; const sk = V.src || 'sec';
   let src = null;
-  if (mk !== 'UK') { const R = await getJSON(MAIN + MKT[mk].path + 'sector_rrg.json', 'sector_rrg_' + mk).catch(() => null); if (R && R.weekly) src = { asof: R.asof, data: R[V.view] || {}, idx: true, bench: R.bench }; }
+  if (sk !== 'sec') { const R = await getJSON(MAIN + SRC[sk] + '.json', sk + '_rrg').catch(() => null); if (R && R.weekly) src = { asof: R.asof, data: R[V.view] || {}, idx: true, bench: R.bench, other: sk }; }
+  else if (mk !== 'UK') { const R = await getJSON(MAIN + MKT[mk].path + 'sector_rrg.json', 'sector_rrg_' + mk).catch(() => null); if (R && R.weekly) src = { asof: R.asof, data: R[V.view] || {}, idx: true, bench: R.bench }; }
   /* 21 Nov 2026 (Amritpal: "store sector rotation data so we can later see how dots moved"): replay from the stored history */
-  const HS = mk !== 'UK' && src && src.idx ? await getJSON(MAIN + MKT[mk].path + 'sector_rrg_hist.json', 'sector_rrg_hist_' + mk).catch(() => null) : null;
+  const HS = src && src.idx ? await getJSON(MAIN + (sk !== 'sec' ? SRC[sk] : MKT[mk].path + 'sector_rrg') + '_hist.json', (sk !== 'sec' ? sk : 'sector_rrg') + '_hist_' + mk).catch(() => null) : null;
   const HD = HS && HS[V.view] ? HS[V.view] : null; const dates = HD ? Object.keys(HD).sort() : [];
   if (dates.length && V.t != null && V.t < dates.length - 1) {
     const K = V.view === 'daily' ? 6 : 4; const t = Math.max(0, Math.min(dates.length - 1, V.t)); const span = dates.slice(Math.max(0, t - K + 1), t + 1);
@@ -5063,22 +5066,23 @@ async function rrgMount(el, G, mk) {
     const d = {}; Object.keys(HD[dates[t]]).forEach((nm) => { const pts = span.filter((x) => HD[x][nm]).map((x) => [x, HD[x][nm][0], HD[x][nm][1]]); if (pts.length) d[nm] = { pts, now: qq(HD[dates[t]][nm]), was: qq((HD[dates[Math.max(0, t - 1)]] || {})[nm] || HD[dates[t]][nm]) }; });
     src = { ...src, data: d, asof: dates[t] };
   }
+  const seg = (k, opts) => `<div class="seg" style="margin:4px 0">${opts.map(([v, t]) => `<button data-rrgk="${k}" data-v="${v}" aria-selected="${String(V[k]) === String(v)}">${t}</button>`).join('')}</div>`;
+  if (!src && sk !== 'sec') { box.innerHTML = `${seg('src', [['sec', 'Sectors'], ['comm', 'Commodities'], ['crypto', 'Coins']])}<p class="muted">The ${sk === 'comm' ? 'commodity' : 'coin'} rotation appears after the next world scan.</p>`; box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V.src = b.dataset.v; V.t = null; V.sel = null; rrgMount(el, G, mk); })); return; }
   if (!src) src = { data: Object.fromEntries((G.sectors || []).filter((r) => r.rrg).map((r) => [r.sector, { pts: r.rrg.pts, now: r.rrg.now, was: r.rrg.wk4 }])) };
   const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
   const all = Object.entries(src.data).map(([nm, r]) => ({ nm, ...r, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now,
     pts: V.all || V.sel === nm ? r.pts : r.pts.slice(-4) }));
   const shown = V.all ? all : all.filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was || r.nm === V.sel);
-  const seg = (k, opts) => `<div class="seg" style="margin:4px 0">${opts.map(([v, t]) => `<button data-rrgk="${k}" data-v="${v}" aria-selected="${String(V[k]) === String(v)}">${t}</button>`).join('')}</div>`;
   const chips = ['Leading', 'Improving', 'Weakening', 'Lagging'].map((q) => { const L = all.filter((r) => r.now === q); return L.length ? `<div class="rrg-row"><b style="color:${RRG_Q[q]}">${q}</b> ${L.map((r) => `<button class="rrg-chip${r.nm === V.sel ? ' on' : ''}" data-rrgsel="${esc(r.nm)}" style="border-color:${RRG_Q[q]}">${esc(RRG_SHORT(r.nm))}${r.now !== r.was ? ` <small>from ${esc(r.was)}</small>` : ''}</button>`).join('')}</div>` : ''; }).join('');
   const per = V.view === 'daily' && src.idx ? 'today' : 'this week';
   const mv = all.filter((r) => r.now !== r.was);
   const moves = mv.length ? `<div class="rrg-moves"><b>Moved ${per}:</b> ${mv.map((r) => `<button class="rrg-mv" data-rrgsel="${esc(r.nm)}">${esc(RRG_SHORT(r.nm))} <span style="color:${RRG_Q[r.was]}">${esc(r.was)}</span> → <b style="color:${RRG_Q[r.now]}">${esc(r.now)}</b></button>`).join('')}</div>` : `<div class="rrg-moves muted">No sector changed quadrant ${per}.</div>`;
-  const srcName = { NSE: 'NSE sector indices', US: 'SPDR sector ETFs', ASX: 'ASX 200 sector indices' }[mk] || 'sectors';
-  box.innerHTML = `<h5 style="margin:6px 0 0">Sectors${src.idx ? ` · ${srcName} vs ${esc(src.bench || 'the market')}` : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
+  const srcName = src.other === 'comm' ? 'Commodities' : src.other === 'crypto' ? 'Coins' : ({ NSE: 'NSE sector indices', US: 'SPDR sector ETFs', ASX: 'ASX 200 sector indices' }[mk] || 'sectors');
+  box.innerHTML = `${seg('src', [['sec', 'Sectors'], ['comm', 'Commodities'], ['crypto', 'Coins']])}<h5 style="margin:6px 0 0">${src.other ? '' : 'Sectors'}${src.idx ? `${src.other ? '' : ' · '}${srcName} vs ${esc(src.bench || 'the market')}` : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
     <div class="rrg-ctl">${src.idx ? seg('view', [['daily', 'Daily'], ['weekly', 'Weekly']]) : ''}${seg('all', [[false, 'Key'], [true, 'All']])}</div>
     ${dates.length ? `<div class="rrg-play"><button class="rrg-pb" aria-label="${V.playing ? 'Pause' : 'Play'} the replay">${V.playing ? '❚❚' : '▶'}</button><input type="range" min="0" max="${dates.length - 1}" value="${V.t == null ? dates.length - 1 : V.t}" aria-label="Replay date"><b>${esc(day(src.asof))}${String(src.asof).slice(0, 4) !== String(new Date().getFullYear()) ? ' ' + String(src.asof).slice(2, 4) : ''}</b></div>` : ''}
     ${moves}${rrgClean(shown, V.sel, 360, 330, 'short')}<div class="rrg-key"><svg width="54" height="12" aria-hidden="true"><circle cx="5" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".6"/><line x1="8" y1="6" x2="42" y2="6" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 2" opacity=".7"/><circle cx="48" cy="6" r="4.5" fill="currentColor"/></svg> ring → dot = changed quadrant ${V.view === 'daily' && src.idx ? 'today' : 'this week'} (from → to)</div><div class="rrg-chips">${chips}</div><p class="muted" style="font-size:11.5px">Each dot moves clockwise: Improving → Leading → Weakening → Lagging. Tap a dot or a name for its full trail (dated); tap again to clear. ▶ replays the last ${V.view === 'daily' ? '60 sessions' : '26 weeks'} (drag the slider for up to ${V.view === 'daily' ? 'a year' : '2 years'}). "Key" = Leading, Improving and this period's movers. "from …" = the quadrant it just left. Arrows mark sectors beyond the zoomed area.</p>`;
-  box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V[b.dataset.rrgk] = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; if (b.dataset.rrgk === 'view') V.t = null; rrgMount(el, G, mk); }));
+  box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V[b.dataset.rrgk] = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; if (b.dataset.rrgk === 'view' || b.dataset.rrgk === 'src') { V.t = null; if (b.dataset.rrgk === 'src') V.sel = null; } rrgMount(el, G, mk); }));
   const rg = box.querySelector('.rrg-play input'); if (rg) rg.addEventListener('input', () => { V.t = +rg.value; V.playing = false; clearInterval(state.rrgTimer); rrgMount(el, G, mk); });
   const pb = box.querySelector('.rrg-pb');
   if (pb) pb.addEventListener('click', () => {
