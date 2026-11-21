@@ -5091,6 +5091,34 @@ async function rrgMount(el, G, mk) {
   box.querySelectorAll('[data-rrgsel]').forEach((b) => b.addEventListener('click', () => { V.sel = V.sel === b.dataset.rrgsel ? null : b.dataset.rrgsel; rrgMount(el, G, mk); }));
 }
 function rrgRows(G, mk) { return (mk === 'NSE' && G.nse && G.nse.rows && G.nse.rows.some((r) => r.rrg) ? G.nse.rows.map((r) => ({ ...r, nm: r.basic })) : (G.rows || []).map((r) => ({ ...r, nm: r.group }))).filter((r) => r.rrg); }
+/* 21 Nov 2026 (Amritpal: "record this, show in app"): volume flow = the industry's On-Balance Volume over 10 sessions (money traded on
+   up days minus down days, in normal days' turnover) and whether price agrees. Tested 2016-26: both up +1.3-1.4% vs Nifty next 4 weeks,
+   both down ~0%, "volume up, price lagging" +0.3% (below average) - confirmation, not an early clue. */
+const FLOW_C = { 'both up': '#0A7A55', 'volume up, price lagging': '#3B82F6', 'price up, volume down': '#E8A33D', 'both down': '#D64545' };
+function flowTxt(r) {
+  const f = r && r.flow; if (!f) return '–';
+  return `${f.obv10 >= 0 ? '+' : ''}${fmt(f.obv10, 1)} days' turnover net bought · price ${f.rs10 >= 0 ? '+' : ''}${fmt(f.rs10, 1)}% vs index${f.tag ? ` · <span style="color:${FLOW_C[f.tag]}">${esc(f.tag)}</span>` : ''}`;
+}
+function flowAlertLines(G, mk) {
+  if (!G) return '';
+  const R = (mk === 'NSE' && G.nse && (G.nse.rows || []).some((r) => r.flow) ? G.nse.rows.map((r) => ({ ...r, nm: r.basic, nse: 1 })) : (G.rows || []).map((r) => ({ ...r, nm: r.group })))
+    .filter((r) => r.flow && r.flow.tag === 'both up').sort((a, b) => b.flow.obv10 - a.flow.obv10).slice(0, 5);
+  return R.length ? `<div class="al-r"><b>Volume + price up</b>${R.map((r) => `<a href="#" class="al-t ok" ${r.nse ? `data-nb="${esc(r.slug)}"` : `data-gwch="${esc(r.slug)}"`}>${esc(r.nm)} +${fmt(r.flow.obv10, 1)}</a>`).join('')}<small>10-day net buying in days of turnover · tap for stocks</small></div>` : '';
+}
+function flowBlock(G, mk) {
+  const R = (mk === 'NSE' && G.nse && (G.nse.rows || []).some((r) => r.flow) ? G.nse.rows.map((r) => ({ ...r, nm: r.basic, nse: 1 })) : (G.rows || []).map((r) => ({ ...r, nm: r.group }))).filter((r) => r.flow);
+  if (R.length < 6) return '';
+  const S = state.sysMap && state.sysMap[mk]; const SM = (S && S.M) || {};
+  const sig = (r) => (r.members || []).filter((m) => SM[m.symbol] && Object.keys(SM[m.symbol]).some((k) => k !== 'st')).length;
+  const row = (r) => `<div class="gpsr nos fl-r" ${r.nse ? `data-nb="${esc(r.slug)}"` : `data-flg="${esc(r.group)}" data-fls="${esc(r.sector || '')}"`}><span class="gpsn"><b class="fl-n">${esc(r.nm)}</b><span class="fl-tags"><span class="chip" style="border-color:${FLOW_C[r.flow.tag] || '#94A3B8'};color:${FLOW_C[r.flow.tag] || 'inherit'}">${esc(r.flow.tag || 'mixed')}</span>${r.rrg ? ` <span class="chip" style="border-color:${RRG_Q[r.rrg.now]};color:${RRG_Q[r.rrg.now]}">${esc(r.rrg.now)}</span>` : ''}${r.rank ? ` <span class="muted">Pulse #${r.rank}</span>` : ''}${sig(r) ? ` <span class="chip new">${sig(r)} in our systems</span>` : ''}</span></span>
+      <span class="gpsv"><b class="${r.flow.obv10 >= 0 ? 'up' : 'down'}">${r.flow.obv10 >= 0 ? '+' : ''}${fmt(r.flow.obv10, 1)}</b> <small class="muted">price ${r.flow.rs10 >= 0 ? '+' : ''}${fmt(r.flow.rs10, 1)}%</small></span></div>`;
+  const top = [...R].sort((a, b) => b.flow.obv10 - a.flow.obv10).slice(0, 10), bot = [...R].sort((a, b) => a.flow.obv10 - b.flow.obv10).slice(0, 10);
+  return `<div class="card" style="margin-top:12px"><h4 style="margin:0 0 4px">Volume flow · last 10 sessions</h4>
+    <p class="muted" style="margin:0 0 6px;font-size:12.5px">Number = money traded on up days minus down days, in a normal day's turnover (On-Balance Volume). Price = the industry vs ${esc(MX_BENCH[mk])} over the same 10 days. Tap an industry for its stocks, chart and which of them are in our systems.</p>
+    <h5 style="margin:8px 0 2px">Most net buying</h5><div class="mxlist">${top.map(row).join('')}</div>
+    <details class="t2-more"><summary>Most net selling</summary><div class="mxlist">${bot.map(row).join('')}</div></details>
+    <p class="muted" style="font-size:11.5px">Tested 2016–26 (NSE, 104 industries): volume and price both up → +1.3% vs Nifty over the next 4 weeks; both down → about 0%. "Volume up, price lagging" (hidden buying) did worse than average (+0.3%) and "price up, volume down" did better (+0.9%) — divergence is not an early clue. Confirmation only; entries stay on the stock systems.</p></div>`;
+}
 function rrgBlock(G, mk) {
   const S = (G.sectors || []).filter((r) => r.rrg); const I = rrgRows(G, mk);
   if (!S.length && !I.length && mk !== 'NSE') return '';
@@ -5133,7 +5161,7 @@ async function loadMarkets() {
   /* 20 Nov 2026: sector 1-month price change = stock-weighted average of its industries' (shown on the tiles beside Pulse) */
   (G.sectors || []).forEach((s) => { if (s.r1m != null) return; const L = (G.rows || []).filter((r) => r.sector === s.sector && r.r1m != null);
     const n = L.reduce((a, r) => a + r.n, 0); s.r1m = n ? L.reduce((a, r) => a + r.r1m * r.n, 0) / n : null; });
-  const S = await mxSignals(mk);
+  const S = await mxSignals(mk); await sysMap(mk).catch(() => null);   // 21 Nov 2026: system ticks for the volume-flow list
   if (x.lvl === 'market') {
     const ms = G.mstats || {}; const v = ((W && W.indices) || {})[MX_IDX[mk]] || {};
     const secs = G.sectors.slice().sort((a, b) => b[state.gpPer || 'p1w'] - a[state.gpPer || 'p1w']);
@@ -5162,7 +5190,7 @@ async function loadMarkets() {
           const it = (r) => `<div class="gpsr nos" data-ig="${esc(r.group)}"><span class="gpsn">${esc(r.group)} <span class="muted">${r.sector && r.sector !== r.group ? `· ${esc(r.sector)} ` : ''}· Pulse ${fmt(r.p1w, 0)} wk · ${esc(LANE_TXT[r.shift] || '')}</span></span><span class="gpsv"><b class="${r.r1m >= 0 ? 'up' : 'down'}">${r.r1m >= 0 ? '+' : ''}${fmt(r.r1m, 1)}%</b> <small class="muted">1 m</small></span></div>`;
           return L.length ? `<h4 style="margin:14px 0 4px">Industries on the move · last month</h4><div class="mxlist">${up.map(it).join('')}</div>
             <details class="t2-more"><summary>Biggest falls</summary><div class="mxlist">${dn.map(it).join('')}</div></details>` : ''; })()}
-        ${rrgBlock(G, mk)}
+        ${rrgBlock(G, mk)}${flowBlock(G, mk)}
         <div class="mxlist">${mxByLane(secs).map((r) => `<div class="gpsr" data-s="${esc(r.sector)}">${gpSlope(r)}<span class="gpsn">${esc(r.sector)} <span class="muted">· ${GP_SHIFT[r.shift || 'mid'].t.split(' —')[0]}</span></span><span class="gpsv" title="Pulse quarter ${fmt(r.p1q, 0)} → month ${fmt(r.p1m, 0)} → week ${fmt(r.p1w, 0)}">${gpVal(r)}</span></div>`).join('')}</div>${(() => { const L = (G.rows || []).filter((r) => r.d1 != null).sort((a, b) => b.d1 - a.d1); if (!L.length) return '';
           const row = (r) => `<div class="gpsr nos" data-ig="${esc(r.group)}"><span class="gpsn">${esc(r.group)} <span class="muted">· ${esc(r.sector || '')} · ${r.n} stocks</span>${r.w ? (r.w.status === 'broken' ? ' <span class="chip open">W broke</span>' : ` <span class="chip">W ${fmt(r.w.dist_pct, 1)}% to break</span>`) : ''}</span><span class="gpsv"><b class="${r.d1 >= 0 ? 'up' : 'down'}">${r.d1 >= 0 ? '+' : ''}${fmt(r.d1, 2)}%</b></span></div>`;
           return `<h4 style="margin:14px 0 4px">Industries · ${L.length} · change on ${esc(day(G.asof))} (last close, updated each night)</h4><div class="mxlist">${L.slice(0, 8).map(row).join('')}</div>
@@ -5179,6 +5207,7 @@ async function loadMarkets() {
     mxWire(el); el.querySelectorAll('#gpper button').forEach((b) => b.addEventListener('click', () => { state.gpPer = b.dataset.k; loadMarkets(); }));
     el.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'sector', sec: b.dataset.s, grp: null })));
     el.querySelectorAll('[data-ig]').forEach((b) => b.addEventListener('click', () => { const g = G.rows.find((r) => r.group === b.dataset.ig); mxGo({ lvl: 'industry', sec: g ? g.sector : null, grp: b.dataset.ig }); }));
+    el.querySelectorAll('[data-flg]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'industry', sec: b.dataset.fls || null, grp: b.dataset.flg })));
     el.querySelectorAll('[data-nb]').forEach((b) => b.addEventListener('click', () => nseIndOpen(((G.nse || {}).rows || []).find((r) => r.slug === b.dataset.nb))));
     rrgMount(el, G, mk);
     el.querySelectorAll('[data-rrg]').forEach((b) => b.addEventListener('click', () => { const r = rrgRows(G, mk).find((x) => x.slug === b.dataset.rrg); if (r && b.dataset.rrg) wChart(b.dataset.rrg, mk, 'group_w_charts', indTv(r, mk)); }));
@@ -5222,16 +5251,27 @@ function nseIndHTML(G) {
     ${secs.map((x) => `<details class="t2-more nse-sec"><summary><span>${esc(x.s)} <span class="muted">· ${x.L.length} industries · ${x.n} stocks</span></span>${pc(x.d1, 1)}</summary><div class="mxlist">${x.L.map((r) => `<div class="gpsr nos" data-nb="${esc(r.slug)}"><span class="gpsn">${esc(r.basic)} <span class="muted">· ${r.n} stocks</span>${r.w ? (r.w.status === 'broken' ? ' <span class="chip open">W broke</span>' : ` <span class="chip">W ${fmt(r.w.dist_pct, 1)}% to break</span>`) : ''}</span><span class="gpsv">${pc(r.d1)}</span></div>`).join('')}</div></details>`).join('')}
     <p class="muted" style="font-size:11.5px">Map as of ${esc((N.asof || '').slice(0, 10))}.</p>`;
 }
-function nseIndOpen(r) {
+async function nseIndOpen(r) {
   if (!r) return; const mk = 'NSE';
+  /* 21 Nov 2026 (Amritpal: "click on these industries - see stocks and charts, and whether they come in our other filters"):
+     rotation quadrant, Pulse and volume flow on top; every stock carries its system chips (same as the matrix) and sorts first */
+  const S = await sysMap(mk).catch(() => null); const SM = (S && S.M) || {};
+  const sysOf = (sym) => Object.entries(SM[sym] || {}).filter(([k]) => k !== 'st').sort((a, b) => a[1].lvl - b[1].lvl);
+  const chipsOf = (sym) => sysOf(sym).map(([k, o]) => `<span class="chip ${o.lvl === 0 ? 'new' : o.lvl === 1 ? 'open' : ''}" title="${esc((MXC.find((c) => c[0] === k) || [])[2] || '')}">${esc((MXC.find((c) => c[0] === k) || [k, k])[1])} ${esc(o.txt === '✓' ? '' : o.txt)}</span>`).join('');
+  const nSig = r.members.filter((m) => sysOf(m.symbol).length).length;
+  const lvlOf = (sym) => { const L = sysOf(sym); return L.length ? L[0][1].lvl : 9; };
   const pc = (v, d = 1) => (v == null ? '–' : `<span class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : ''}${fmt(v, d)}%</span>`);
   const tvb = indTv(r, mk);
   openPanel(`<div class="d-head no-push"><div><h2>${esc(r.basic)}</h2><div class="co">${esc(r.macro)} › ${esc(r.sector)} › ${esc(r.industry)}</div>${tvb ? `<a class="tv-btn" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvb)}&interval=D">Open top ${r.top.length} stocks in TradingView ↗</a>` : ''}</div></div>
     <div class="facts"><div class="fact"><span>Today</span><b>${pc(r.d1, 2)}</b></div><div class="fact"><span>1 week / 1 month / 3 months</span><b>${pc(r.r1w)} / ${pc(r.r1m)} / ${pc(r.r3m)}</b></div>
       <div class="fact"><span>Stocks</span><b>${r.n} (${r.n_liquid} liquid)</b></div><div class="fact"><span>W + trendline</span><b>${!r.w ? 'none now' : r.w.status === 'broken' ? `broke ${esc(r.w.broke_on)}` : `forming · ${fmt(r.w.dist_pct, 1)}% to break`}</b></div>
-      <div class="fact"><span>9 EMA</span><b>${r.above_e9 ? 'above a rising 9 EMA' : 'not above a rising 9 EMA'}</b></div></div>
+      <div class="fact"><span>9 EMA</span><b>${r.above_e9 ? 'above a rising 9 EMA' : 'not above a rising 9 EMA'}</b></div>
+      <div class="fact"><span>Rotation (weekly)</span><b>${r.rrg ? `<span style="color:${RRG_Q[r.rrg.now]}">${esc(r.rrg.now)}</span>${r.rrg.wk1 && r.rrg.wk1 !== r.rrg.now ? ` <small>from ${esc(r.rrg.wk1)}</small>` : ''}` : '–'}</b></div>
+      <div class="fact"><span>Pulse (1 month)</span><b>${r.p1m != null ? `${fmt(r.p1m, 0)}%${r.rank ? ` · rank ${r.rank}` : ''}` : '–'}</b></div>
+      <div class="fact"><span>Volume flow (10 days)</span><b>${flowTxt(r)}</b></div>
+      <div class="fact"><span>Stocks in our systems</span><b>${nSig} of ${r.n}</b></div></div>
     <button class="lv-btn" id="nsew">Daily chart · 9 EMA · W trendline ›</button>
-    <h4 style="margin:12px 0 4px">Stocks</h4><ul class="list flat">${[...r.members].sort((a, b) => (b.liquid - a.liquid) || ((b.d1 ?? -99) - (a.d1 ?? -99))).map((m) => `<li class="row" data-tv="${esc(m.symbol)}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}${m.liquid ? '' : ' · thin'}</div></div><div></div><div class="num"><b>${fmt(m.close, 2, 'en-IN')}</b>${m.d1 != null ? pc(m.d1, 2) : ''}</div></li>`).join('')}</ul>
+    <h4 style="margin:12px 0 4px">Stocks <span class="muted" style="font-weight:400;font-size:12px">· signals first · chips = our systems (green = buy now, blue = in a trade / on the list, grey = near)</span></h4><ul class="list flat">${[...r.members].sort((a, b) => (lvlOf(a.symbol) - lvlOf(b.symbol)) || (b.liquid - a.liquid) || ((b.d1 ?? -99) - (a.d1 ?? -99))).map((m) => `<li class="row" data-tv="${esc(m.symbol)}"><div><div class="sym">${esc(m.symbol)}</div><div class="co">${esc(m.name || '')}${m.liquid ? '' : ' · thin'}</div>${sysOf(m.symbol).length ? `<div class="tags">${chipsOf(m.symbol)}</div>` : ''}</div><div></div><div class="num"><b>${fmt(m.close, 2, 'en-IN')}</b>${m.d1 != null ? pc(m.d1, 2) : ''}</div></li>`).join('')}</ul>
     <p class="muted" style="font-size:12px">Equal-weight index of the liquid members (all members if fewer than 2 are liquid). Tap a stock for TradingView.</p>`);
   const b = document.getElementById('nsew'); if (b) b.addEventListener('click', () => wChart(r.slug, mk, 'group_w_charts', indTv(r, mk)));
   document.querySelectorAll('[data-tv]').forEach((li) => li.addEventListener('click', () => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvSym(li.dataset.tv, 'NSE')) + '&interval=D', '_blank', 'noopener')));
@@ -6479,7 +6519,7 @@ async function alertsCard(box, mk) {
     + (!br.length && !fm.length ? '<div class="al-r muted"><span>No new index W break in the last 5 sessions, and none forming.</span></div>' : '');
   const emaHtml = (up.length ? `<div class="al-r"><b class="up">▲ Leaving the 9 EMA upward</b> <span>${names(up)}</span><small>whole candle above a rising 9 EMA · last 3 sessions</small></div>` : '<div class="al-r muted"><span>No stock left the 9 EMA upward in the last 3 sessions.</span></div>')
     + (ix.length ? `<div class="al-r muted"><span>Riding above the 9 EMA: ${ix.map((r) => `${esc(nm(r.symbol))} ${r.gain >= 0 ? '+' : ''}${fmt(r.gain, 1)}%`).join(' · ')}</span></div>` : '');
-  const indHtml = indAlertLines(GPX, mk) + rotAlertLines(GPX, mk);
+  const indHtml = indAlertLines(GPX, mk) + rotAlertLines(GPX, mk) + flowAlertLines(GPX, mk);
   const athX = idxAthLines(IM, state.assets, mk) + indAthLines(GPX, mk) + athLines(AT, mk) + fundAthLines(state.fund, mk) + commAthLines(state.assets, mk);
   let athHtml = athX || '<div class="al-r muted"><span>None this month yet.</span></div>';
   if (L && L.lvl === 'red' && athX) athHtml = '<div class="al-r"><span class="down"><b>Red light: skip new ATH buys today.</b> Open ATH trades keep their 30-week exit.</span></div>' + athHtml;   // 21 Nov 2026 (Amritpal: "Yes")
@@ -6509,6 +6549,7 @@ async function alertsCard(box, mk) {
       <p class="muted td-rs">Info only. Entries stay on your systems and the light.</p></details></section>`;
   box.querySelectorAll('[data-wch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.wch, mk, 'index_w_charts', b.dataset.tvs || '')));
   box.querySelectorAll('[data-gwch]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); wChart(b.dataset.gwch, mk, 'group_w_charts', b.dataset.tvs || ''); }));
+  box.querySelectorAll('[data-nb]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); nseIndOpen(((GPX && GPX.nse) || {}).rows ? GPX.nse.rows.find((r) => r.slug === b.dataset.nb) : null); }));
   box.querySelectorAll('[data-fwch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.fwch, mk, 'fund_w_charts', b.dataset.tvs || '')));
   box.querySelectorAll('[data-awch]').forEach((b) => b.addEventListener('click', () => wChart(b.dataset.awch, mk, 'asset_w_charts', b.dataset.tvs || '')));
   box.querySelectorAll('[data-asv]').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); const k = b.dataset.asv; const tv = tvIdx(k); window.open(tv ? 'https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tv) + '&interval=D' : 'https://finance.yahoo.com/quote/' + encodeURIComponent(k), '_blank', 'noopener'); }));

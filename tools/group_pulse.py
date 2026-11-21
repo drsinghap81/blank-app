@@ -174,6 +174,35 @@ def lift_days(gi, e9):
     return k - 1
 
 
+def obv_flow(use, C, V, ret, B):
+    """21 Nov 2026 (Amritpal: "record this, show in app"): group On-Balance Volume over the last 10 sessions = sum over members of
+    sign(daily return) x traded value, in units of the group's 50-day average daily traded value; rs10 = group return minus the
+    benchmark's over the same 10 sessions (%). Labelled later across all groups (obv_label). Tested 2016-26 (tools/research/sector_obv.py):
+    OBV + price both up -> +1.3-1.4% vs Nifty over 4 weeks vs ~0% both down; OBV up while price lags ('hidden buying') +0.3%, below
+    average - divergence is no early clue. Information only."""
+    try:
+        r = ret[use]; val = (C[use] * V[use]).where(r.notna())
+        flow = (np.sign(r) * val).sum(axis=1, min_count=1); tv = val.sum(axis=1, min_count=1)
+        o = (flow / tv.rolling(50, min_periods=30).mean()).fillna(0)
+        gi = (1 + r.mean(axis=1).fillna(0)).cumprod()
+        rs10 = (gi.iloc[-1] / gi.iloc[-11] - 1 - (B.iloc[-1] / B.iloc[-11] - 1)) * 100
+        ob = float(o.iloc[-10:].sum()); hist = [round(float(v), 2) for v in o.rolling(10).sum().iloc[-60:].fillna(0)]
+        return dict(obv10=round(ob, 2), rs10=round(float(rs10), 2), obv_hist=hist) if np.isfinite(ob) and np.isfinite(rs10) else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def obv_label(rows):
+    """tag each row's flow: top / bottom third of obv10 across the groups x price leading / lagging the benchmark over 10 sessions"""
+    R = [r for r in rows if r.get("flow")]
+    if len(R) < 6:
+        return
+    v = sorted(r["flow"]["obv10"] for r in R); lo, hi = v[len(v) // 3], v[(2 * len(v)) // 3]
+    for r in R:
+        f = r["flow"]; ob, rs = f["obv10"], f["rs10"]
+        f["tag"] = ("both up" if rs > 0 else "volume up, price lagging") if ob >= hi else ("price up, volume down" if rs > 0 else "both down") if ob <= lo else None
+
+
 def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None, S1=None):
     """20 Nov 2026: NSE's official basic industries (served by our Mumbai server, which can read NSE's quote pages): each basic industry
     with 2+ stocks gets an equal-weight index from its liquid members (all members if fewer than 2 are liquid), today / 1 w / 1 m,
@@ -219,7 +248,10 @@ def nse_groups(mkt, cf, C, ret, liq, nm, IW, OHL=None, V=None, S1=None):
             r["lift_days"] = lift_days(gi, e9); r["ath_m"] = ath_month(gi); r["rrg"] = rrg(gi, BENCH.get("b"))
         except Exception as e:  # noqa: BLE001
             print("nse w fail", bas, e); r["w"] = None
+        if V is not None:
+            r["flow"] = obv_flow(use, C, V, ret, BENCH.get("b"))
         out.append(r)
+    obv_label(out)
     out.sort(key=lambda r: -r["d1"])
     rk = sorted([r for r in out if r.get("p1m") is not None], key=lambda r: -r["p1m"])
     for i, r in enumerate(rk):
@@ -408,6 +440,8 @@ def main(mkt):
             r["lift_days"] = lift_days(gi, e9); r["ath_m"] = ath_month(gi); r["rrg"] = rrg(gi, BENCH.get("b"))
         except Exception as e:  # noqa: BLE001
             print("group w fail", r["group"], e); r["w"] = None
+        r["flow"] = obv_flow(ss, C, V, ret, B)
+    obv_label(rows)
     secof = dict(zip(u.symbol, u.sector))
     for r in rows:
         ss = [m["symbol"] for m in r["members"]]
