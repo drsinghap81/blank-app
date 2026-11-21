@@ -91,7 +91,7 @@ def trades_for(sym, x, adr_min, exit_sma):
         e = max(o[i], trig); stop = l[i]
         if e <= stop or (e - stop) / e > adr[p]:
             i += 1; continue
-        risk = (e - stop) / e
+        risk = max((e - stop) / e, 0.005)   # floor: a LOD a hair under the entry would size the trade absurdly
         half_px = None; exit_px = None; exit_i = None; k = i + 1
         while k < n:
             if l[k] <= stop:
