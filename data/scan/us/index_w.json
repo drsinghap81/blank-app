@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T22:09+00:00",
+ "generated": "2026-11-21T22:29+00:00",
  "asof": "2026-11-20",
  "market": "US",
  "rows": [
@@ -73,6 +73,27 @@
    "line_now": 62.43,
    "dist_pct": 3.2,
    "chart": "xle"
+  },
+  {
+   "index": "Utilities (XLU)",
+   "ticker": "XLU",
+   "status": "forming",
+   "stage": "2nd low now",
+   "low1": "2026-10-19",
+   "low1_close": 41.36,
+   "low2": "2026-11-20",
+   "low2_close": 42.69,
+   "high": 46.21,
+   "high_date": "2026-04-30",
+   "mid": 44.12,
+   "mid_date": "2026-11-16",
+   "rsi_div": false,
+   "close": 42.69,
+   "asof": "2026-11-20",
+   "neckline": 44.12,
+   "line_now": 44.06,
+   "dist_pct": 3.2,
+   "chart": "xlu"
   },
   {
    "index": "Regional Banks (KRE)",
