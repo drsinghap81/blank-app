@@ -5179,6 +5179,16 @@ function mxTabShow(el) {
   el.querySelectorAll('.mxtab').forEach((d) => { d.hidden = d.dataset.tab !== state.mxTab; });
   el.querySelectorAll('[data-mxt]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.mxt === state.mxTab)));
 }
+/* 21 Nov 2026 (Amritpal: "Yes"): US money-market fund assets ("cash on the sidelines"), Fed Z.1 via FRED, quarterly. Context only. */
+function mmfCard(m) {
+  const q = m && m.quarterly; if (!q || !q.hist) return '';
+  const H = q.hist.slice(-48), mx = Math.max(...H.map((h) => h[1])), mn = Math.min(...H.map((h) => h[1]));
+  const W = 320, Hh = 70, pts = H.map((h, i) => `${(i / (H.length - 1) * W).toFixed(1)},${(Hh - 4 - (h[1] - mn) / (mx - mn || 1) * (Hh - 8)).toFixed(1)}`).join(' ');
+  const qn = (d) => { const [y, mo] = d.split('-'); return `${({ '01': 'Jan–Mar', '04': 'Apr–Jun', '07': 'Jul–Sep', '10': 'Oct–Dec' }[mo] || mo)} ${y}`; };
+  return `<div class="card"><div class="fl-hero"><span class="fl-big" style="color:#3B82F6">$${fmt(q.tn, 1)}T</span><span><b>US money-market funds ("cash on the sidelines")</b><small class="muted">${esc(qn(q.asof))} · ${q.yoy >= 0 ? '+' : ''}${fmt(q.yoy, 1)}% in a year · Fed Financial Accounts (FRED MMMFFAQ027S)</small></span></div>
+    <svg viewBox="0 0 ${W} ${Hh}" width="100%" style="display:block;max-width:100%" aria-label="Money-market fund assets, last 12 years"><polyline points="${pts}" fill="none" stroke="#3B82F6" stroke-width="2"/></svg>
+    <details class="info"><summary>How to read this</summary><p>Total money held in US money-market funds, quarterly, published about 10 weeks after each quarter (last 12 years shown). It grows when interest rates are high and is often called fuel for stocks, but it is not a timing signal: balances set records through 2023–25 while stocks also rose, and big outflows have usually followed rate cuts or a crisis rather than coming before rallies. Context only.</p></details></div>`;
+}
 async function loadMarkets() {
   $('#title').textContent = 'Markets';
   const el = $('#view-mk'); const x = state.mx;
@@ -5186,6 +5196,7 @@ async function loadMarkets() {
   const W = state.world;
   if (x.lvl === 'world') {
     await Promise.all(['NSE', 'US', 'ASX', 'UK'].map(loadGP));
+    if (state.mmf === undefined) state.mmf = await getJSON(MAIN + 'data/scan/mmf.json', 'mmf').catch(() => null);
     $('#asof').textContent = W ? `World indices · ${day(W.asof)}${updTxt(W.generated)}` : '';
     const I = (W && W.indices) || {};
     const card = (mk) => { const k = MX_IDX[mk]; const v = I[k] || {}; const G = state.gp[mk]; const ms = G && G.mstats;
@@ -5194,6 +5205,7 @@ async function loadMarkets() {
     const others = Object.entries(I).filter(([k]) => !Object.values(MX_IDX).includes(k));
     el.innerHTML = `${mxCrumb()}<div class="status ${W && W.risk_on ? 'open' : 'exit watch'}" style="margin:8px 16px"><b>World ${W && W.risk_on ? 'risk-on' : 'risk-off'}.</b> ${W ? esc(W.benchmark) : ''} — context only. Buy signals still come from your tested systems; industry strength is the tailwind (in the 2017–26 test, the top 10% of industries beat the bottom 10% by about 3% over the next 3 months).</div>
       <div class="card"><h4 style="margin:0 0 4px">World rotation · markets and asset classes</h4><p class="muted" style="margin:0 0 4px;font-size:12.5px">Step 1 of top-down: which markets and assets are beating world stocks (MSCI ACWI). Tap a dot for its trail.</p><div id="rrgbox" data-mk="world"></div></div>
+      ${mmfCard(state.mmf)}
       <div class="card"><h4 style="margin:0 0 8px">Your markets</h4><div class="mxcards">${['NSE', 'US', 'ASX', 'UK'].map(card).join('')}</div>
       <h4 style="margin:14px 0 6px">Other world indices · 3-month return</h4><div class="mxworld">${others.map(([k, v]) => `<div class="mxw" style="border-left:5px solid ${MX_TAGC[v.tag] || '#CBD5E1'}"><b>${esc(v.name)}</b><span class="muted">${esc(v.region)} · ${esc(v.tag)}</span><span class="${v.ret_3m >= 0 ? 'up' : 'down'}">${v.ret_3m >= 0 ? '+' : ''}${fmt(v.ret_3m, 1)}%</span></div>`).join('')}</div>
       <p class="muted" style="margin:10px 0 0;font-size:12.5px">Colour = trend tag (green leading, blue uptrend, grey mixed, red weak) from each index's 30-week average and strength vs the MSCI World.</p></div>`;

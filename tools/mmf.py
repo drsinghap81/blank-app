@@ -2,7 +2,7 @@
 
 FRED (St. Louis Fed), public CSV:
   MMMFFAQ027S  Money Market Funds; Total Financial Assets, Level (Fed Z.1 Financial Accounts, quarterly, US$ millions) - the series in
-               the reel; published ~10 weeks after each quarter
+               the reel; published ~10 weeks after each quarter; FRED dates a quarter by its first day (2026-04-01 = Apr-Jun 2026)
   WRMFNS + WIMFNS  retail + institutional money funds (weekly, US$ billions; ICI data via the Fed's H.6) - the timelier read
 Context only, not a timing signal: balances grow with interest rates; record highs in 2023-25 came with rising stocks; big outflows
 have usually followed rate cuts or a crisis rather than preceding rallies. Output data/scan/mmf.json."""
@@ -30,6 +30,8 @@ def main():
         print("quarterly fail", e)
     try:
         w = (fred("WRMFNS") + fred("WIMFNS")).dropna() / 1e3   # US$ trillions
+        if (pd.Timestamp(date.today()) - w.index[-1]).days > 60:
+            raise ValueError(f"weekly series stale (last {w.index[-1].date()}) - FRED stopped the H.6 weekly money-fund series")
         out["weekly"] = dict(asof=str(w.index[-1].date()), tn=round(float(w.iloc[-1]), 2), chg4w=round(float(w.iloc[-1] - w.iloc[-5]), 3),
                              yoy=round(float((w.iloc[-1] / w.iloc[-53] - 1) * 100), 1), hist=[[str(i.date()), round(float(v), 3)] for i, v in w.tail(104).items()])
     except Exception as e:  # noqa: BLE001
