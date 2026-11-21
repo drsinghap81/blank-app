@@ -90,6 +90,12 @@ def add_scores(d, IND, RS, PU):
     d["blend"] = (mr + rr) / 2                       # 3-month strength and industry results, equal weight
     d["blend_m"] = (2 * mr + rr) / 3                 # strength-led, results as a second vote
     d["blend3"] = (mr + rr + pr) / 3                 # strength + results + pulse
+    # 22 Nov 2026 (Amritpal: "Yes" to testing a results point in the Top 5 score): 3-month strength first, plus a bonus when the
+    # industry's latest season is strong + accelerating (score >= 0.75 = half+ growing > 20% and half+ speeding up; P/E not available
+    # point-in-time here). Bonus 0.25 / 0.5 of the percentile scale (~ +1 / +2 points on a 0-4 scale).
+    good = (d.results >= 0.75).astype(float)
+    d["r63_res25"] = mr + 0.25 * good
+    d["r63_res50"] = mr + 0.50 * good
     return d
 
 
