@@ -6673,8 +6673,8 @@ async function alertsCard(box, mk, heroBox) {
   if (heroBox) heroBox.innerHTML = hero ? `<section class="al-card ig ig-solo ${lt[0]}">${hero}<p class="ig-why">${esc({ green: 'Most stocks are turning up and the index is above its 30-week average.', amber: 'One warning: either more stocks turning down, or the index below its 30-week average. Trade normally.', red: 'More stocks turning down AND the index below its 30-week average. No new buys; open trades keep their stops.' }[L.lvl])}</p>${L.fii && L.fii.state ? `<details class="al-why"><summary>${L.fii.state === 'setup' ? 'FIIs very short in a falling market' : 'FIIs started covering their shorts'} · why it matters</summary><p class="muted td-rs">${squeezeTxt(L.fii)}</p></details>` : ''}<details class="al-why"><summary>How the light works</summary>${lightHTML(L, mk)}</details></section>` : '';
   box.innerHTML = `<section class="al-card ig ${lt ? lt[0] : ''}">
     ${heroBox ? '' : hero + sq}
-    <div class="ig-wmap ig-map2" role="button" tabindex="0" aria-label="Open the world rotation chart"><div class="ig-map-h"><b>World rotation</b><span>markets & assets vs world stocks · tap</span></div><div class="ig-map-c"></div></div>
-    <div class="ig-map" role="button" tabindex="0" aria-label="Open the full rotation chart"><div class="ig-map-h"><b>Sector rotation</b><span>tap for the full chart</span></div><div class="ig-map-c"></div></div>
+    ${heroBox ? '' : `    <div class="ig-wmap ig-map2" role="button" tabindex="0" aria-label="Open the world rotation chart"><div class="ig-map-h"><b>World rotation</b><span>markets & assets vs world stocks · tap</span></div><div class="ig-map-c"></div></div>
+    <div class="ig-map" role="button" tabindex="0" aria-label="Open the full rotation chart"><div class="ig-map-h"><b>Sector rotation</b><span>tap for the full chart</span></div><div class="ig-map-c"></div></div>`}
     ${rotBasket(GPX, S, mk)}
     <div class="ig-tiles">${tiles.map(([k, t, n, sub]) => `<button class="ig-tile${n ? '' : ' zero'}" data-igt="${k}"><b>${n}</b><span>${t}</span><small>${sub}</small></button>`).join('')}</div>
     ${tiles.map(([k, , , , h]) => `<div class="ig-panel" data-igp="${k}" hidden>${h}</div>`).join('')}
@@ -7265,6 +7265,17 @@ async function tdRender2(el) {
   const WI = (wl && wl.indices) ? Object.values(wl.indices) : []; const wUp = WI.filter((x) => x.up).length;
   const secL = sec && sec.indices ? lead.map((k) => [k, sec.indices[k].rs_6m ?? -99]).sort((a, b) => b[1] - a[1]) : [];
   const td = (cls, k, b, sm, go) => `<button class="t2-td ${cls}" data-go="${go}"><small>${k}</small><b>${b}</b><span>${sm}</span></button>`;
+  /* 21 Nov 2026 (Amritpal: "is Today a top-down approach?" -> "Yes and for all markets"): strict order World -> market -> sectors
+     -> stocks. Each step = one status line (tap -> its page) + its picture: world rotation map, the market's traffic light,
+     the sector rotation map. Same for every market. */
+  const stp = (n, go, name, cls, word, sub, body) => `<section class="tds"><button class="tds-h" data-go="${go}"><span class="tds-n">${n}</span><span class="tds-t"><b>${name}</b><small>${sub}</small></span><em class="${cls}">${word}</em><i aria-hidden="true">›</i></button>${body || ''}</section>`;
+  const steps = () => `<div class="tdsx" id="tdsteps">
+    ${stp(1, 'mk', 'World', wl ? (wl.risk_on && !wl.risk_watch ? 'ok' : 'warn') : '', wl ? (wl.risk_on ? (wl.risk_watch ? 'Risk on · watch' : 'Risk on') : 'Risk off') : '–', WI.length ? `${wUp} of ${WI.length} world indices in an uptrend` : '',
+      '<div class="ig-wmap tds-map" role="button" tabindex="0" aria-label="Open the world rotation chart"><div class="ig-map-h"><span>markets &amp; assets vs world stocks · tap for the full chart</span></div><div class="ig-map-c"></div></div>')}
+    ${stp(2, 'inv', `${esc(MKT[mk].name)} · ${esc(MX_BENCH[mk])}`, wi ? (ok && !wi.below_now ? 'ok' : 'warn') : '', wi ? (ok ? (wi.below_now ? 'Uptrend · below 30-wk now' : 'Uptrend') : 'Below 30-wk') : '–', wi ? `${fmt(Math.abs(wi.from_high), 1)}% below its high` : '', '<div id="tdhero"></div>')}
+    ${stp(3, 'mk', 'Sectors', secL.length ? 'ok' : 'warn', secL.length ? `${secL.length} leading` : 'None leading', secL.length ? 'strongest: ' + secL.slice(0, 3).map(([k]) => esc((sec.names && sec.names[k]) || secName(k))).join(', ') : 'no sector is beating the index',
+      '<div class="ig-map tds-map" role="button" tabindex="0" aria-label="Open the full rotation chart"><div class="ig-map-h"><span>sectors vs the index · tap for the full chart</span></div><div class="ig-map-c"></div></div>')}
+    ${stp(4, 'ath', 'Stocks', nBuy ? 'ok' : '', `${nBuy} to buy`, 'sell first, then buy · below')}</div>`;
   const ribbon = () => `<div class="t2-tdr" aria-label="Top-down">
     ${td(wl ? (wl.risk_on && !wl.risk_watch ? 'ok' : 'warn') : '', '1 · World', wl ? (wl.risk_on ? (wl.risk_watch ? 'Risk on · watch' : 'Risk on') : 'Risk off') : '–', WI.length ? `${wUp}/${WI.length} indices up` : '', 'mk')}
     ${td(wi ? (ok && !wi.below_now ? 'ok' : 'warn') : '', '2 · ' + esc(MX_BENCH[mk]), wi ? (ok ? (wi.below_now ? 'Uptrend · below 30-wk now' : 'Uptrend') : 'Be choosy') : '–', wi ? `−${fmt(Math.abs(wi.from_high), 1)}% from high` : '', 'inv')}
@@ -7341,9 +7352,8 @@ async function tdRender2(el) {
     <div id="tdal"></div>
     <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
       <div class="t2-when"><b>${esc(clk.dayNum)} ${esc(clk.month).split(' ')[0]}</b><span class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small> <b>${clk.txt}</b></span><small>plan from the ${day(P.asof)} close${knowHeld ? '' : ' · holdings not linked'}</small></div></div>
-    <div id="tdhero"></div>
-    <div class="t2-h"><h2>1 · Where the money is going</h2><small>world → ${esc(MX_BENCH[mk])} → sectors → stocks</small></div>
-    ${ribbon()}
+    <div class="t2-h"><h2>Top-down</h2><small>world → ${esc(MKT[mk].name)} → sectors → stocks</small></div>
+    ${steps()}
     <div class="t2-h"><h2>2 · Your to-do</h2><small>tap a number</small></div>
     ${tiles}
     <div class="t2-h" id="t2sell"><h2>Sell first</h2><small>exits on what you hold</small></div>
@@ -7398,6 +7408,18 @@ async function tdRender2(el) {
   tlCard($('#t2condor'), mk);
   if (mk === 'US') usStopsToday($('#t2condor'));
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
+  el.querySelectorAll('.tds-h[data-go]').forEach((b) => b.addEventListener('click', () => { const g = b.dataset.go; if (g === 'ath') { const t = document.getElementById('t2sell'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    if (g === 'inv') { state.athMkt = mk; state.athTabG.inv = 'themes'; } if (g === 'mk') Object.assign(state.mx, b.closest('.tds') === el.querySelector('.tds') ? { lvl: 'world', m: null, sec: null, grp: null } : { lvl: 'market', m: mk, sec: null, grp: null }); show(g); }));
+  { const sb = $('#tdsteps'); if (sb) { igWorldMap(sb); loadGP(mk).then(async (G) => { igMiniMap(sb, G, mk);
+      // step 3 text from the SAME weekly rotation as its map (6-month tags said "Pharma strongest" while the map showed it Lagging)
+      let data = null; if (mk !== 'UK') { const R = await getJSON(MAIN + MKT[mk].path + 'sector_rrg.json', 'sector_rrg_' + mk).catch(() => null); if (R && R.weekly) data = R.weekly; }
+      if (!data && G) data = Object.fromEntries((G.sectors || []).filter((r) => r.rrg).map((r) => [r.sector, { pts: r.rrg.pts, now: r.rrg.now }]));
+      const E = Object.entries(data || {}); if (!E.length) return;
+      const last = (r) => (r.pts && r.pts.length ? r.pts[r.pts.length - 1][1] : 0);
+      const L = E.filter(([, r]) => r.now === 'Leading').sort((a, b) => last(b[1]) - last(a[1])); const I = E.filter(([, r]) => r.now === 'Improving');
+      const h = sb.querySelectorAll('.tds')[2]; if (!h) return; const em = h.querySelector('.tds-h em'), sm = h.querySelector('.tds-t small');
+      em.className = L.length ? 'ok' : I.length ? 'warn' : ''; em.textContent = L.length ? `${L.length} leading` : I.length ? `${I.length} improving` : 'None leading';
+      sm.textContent = (L.length ? 'leading this week: ' + L.slice(0, 3).map(([k]) => k).join(', ') : 'none leading this week') + (I.length ? ` · ${I.length} improving` : ''); }).catch(() => {}); } }
   el.querySelectorAll('.t2-tile[data-go]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.go); if (t) { const fd = t.closest('details'); if (fd) fd.open = true; t.scrollIntoView({ behavior: 'smooth', block: 'start' }); t.classList.add('t2-flash'); setTimeout(() => t.classList.remove('t2-flash'), 1400); } }));
   el.querySelectorAll('.t2-wcard[data-tu]').forEach((b) => b.addEventListener('click', () => turtleSelect(state._tuShow[+b.dataset.tu])));
   const W = [...el.querySelectorAll('.t2-sec')]; [invRows, momRows, trdRows].forEach((L, k) => W[k].querySelectorAll('.t2-wr').forEach((b) => b.addEventListener('click', () => L[+b.dataset.w].go())));
