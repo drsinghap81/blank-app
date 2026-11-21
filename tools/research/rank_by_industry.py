@@ -86,6 +86,10 @@ def add_scores(d, IND, RS, PU):
     d["results"] = d.results.fillna(d.results.median()); d["pulse"] = d.pulse.fillna(d.pulse.median())
     rr = d.groupby("Date").results.rank(pct=True); pr = d.groupby("Date").pulse.rank(pct=True)
     d["combo"] = (rr + pr) / 2 + d.r63.rank(pct=True).fillna(0) * 1e-3
+    mr = d.groupby("Date").r63.rank(pct=True).fillna(0)
+    d["blend"] = (mr + rr) / 2                       # 3-month strength and industry results, equal weight
+    d["blend_m"] = (2 * mr + rr) / 3                 # strength-led, results as a second vote
+    d["blend3"] = (mr + rr + pr) / 3                 # strength + results + pulse
     return d
 
 
@@ -112,7 +116,8 @@ def main():
     d.loc[d.Date.isin(red), "sig"] = False                               # adopted rule: no new buys on RED
     res = dict(method=__doc__, n921={}, ath={})
     seeds = (0,) if PILOT else (0, 1, 2)
-    for rank in ("r63", "random", "results", "pulse", "combo"):
+    RANKS = os.environ.get("RANKS", "r63,random,results,pulse,combo").split(",")
+    for rank in RANKS:
         reps = []
         for sd in (seeds if rank == "random" else (0,)):
             eq, T = K.run(d, 10, 0.01, rank, sd)
@@ -121,7 +126,10 @@ def main():
         m["years"] = reps[0]["years"]; m["bull/bear"] = reps[0]["bull/bear a year"]; m["ex-Covid"] = reps[0]["ex-Covid"]; m["avg trade"] = reps[0]["avg"]
         res["n921"][rank] = m
         print(f"R| 9/21 rank by {rank}: {m}", flush=True)
-    if PILOT:
+    if PILOT or os.environ.get("NO_ATH"):
+        if not PILOT:
+            os.makedirs("data/research", exist_ok=True)
+            json.dump(res, open(os.environ.get("OUT", "data/research/rank_by_industry.json"), "w"), indent=1, default=str)
         return
     # ---- ATH (equal 10 book), same-day signals ordered by the score
     import ath_scan as A
