@@ -19,6 +19,17 @@ CFG = {
     "ASX": dict(bench=("^AXJO", "ASX 200"), out="data/scan/asx/sector_rrg.json", names={
         "^AXEJ": "Energy", "^AXMJ": "Materials", "^AXNJ": "Industrials", "^AXDJ": "Cons Discretionary", "^AXSJ": "Cons Staples",
         "^AXHJ": "Health Care", "^AXFJ": "Financials", "^AXIJ": "Info Tech", "^AXTJ": "Communication", "^AXUJ": "Utilities", "^AXPJ": "A-REITs"}),
+    # 21 Nov 2026 (Amritpal: "also commodities, coins rotation charts"): commodities vs a broad commodity ETF (Invesco DB Commodity, DBC);
+    # coins vs Bitcoin (does each coin beat holding BTC?). Same formulas; Yahoo daily closes (coins trade 7 days, weeks end Friday).
+    "COMM": dict(bench=("DBC", "commodity basket (DBC)"), out="data/scan/comm_rrg.json", names={
+        "GC=F": "Gold", "SI=F": "Silver", "PL=F": "Platinum", "HG=F": "Copper", "ALI=F": "Aluminium", "CL=F": "Crude oil", "BZ=F": "Brent",
+        "NG=F": "Natural gas", "ZC=F": "Corn", "ZW=F": "Wheat", "ZS=F": "Soybeans", "KC=F": "Coffee", "CC=F": "Cocoa", "SB=F": "Sugar",
+        "CT=F": "Cotton", "LE=F": "Live cattle"}),
+    "CRYPTO": dict(bench=("BTC-USD", "Bitcoin"), out="data/scan/crypto_rrg.json", names={
+        "ETH-USD": "Ether", "SOL-USD": "Solana", "XRP-USD": "XRP", "BNB-USD": "BNB", "ADA-USD": "Cardano", "DOGE-USD": "Dogecoin",
+        "TRX-USD": "Tron", "AVAX-USD": "Avalanche", "LINK-USD": "Chainlink", "DOT-USD": "Polkadot", "LTC-USD": "Litecoin",
+        "BCH-USD": "Bitcoin Cash", "XLM-USD": "Stellar", "SHIB-USD": "Shiba Inu", "HBAR-USD": "Hedera", "NEAR-USD": "NEAR",
+        "ATOM-USD": "Cosmos", "XMR-USD": "Monero", "ETC-USD": "Ethereum Classic"}),
 }
 
 
