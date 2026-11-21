@@ -73,6 +73,16 @@ def main(mk, dry=False):
                method=__doc__)
     for v in ("weekly", "daily"):
         print(mk, v, {q: [k for k, r in out[v].items() if r["now"] == q] for q in ("Leading", "Improving", "Weakening", "Lagging")}, flush=True)
+    if mk == "USTHEME":   # 22 Nov 2026: each theme's stocks (us_meta theme column = the ETF), liquid ones the scan tracks
+        try:
+            import os as _os
+            liq = set(json.load(open("data/scan/us/stock_weekly.json"))["s"]) if _os.path.exists("data/scan/us/stock_weekly.json") else set()
+            M = pd.read_csv("data/universe/us_meta.csv")
+            out["members"] = {cf["names"][e]: [dict(symbol=r.symbol, name=str(r.name)[:60]) for r in M[(M.theme == e) & (M.symbol.isin(liq) if liq else True)].itertuples()][:60]
+                              for e in cf["names"]}
+            out["etf"] = {v: k for k, v in cf["names"].items()}
+        except Exception as e:  # noqa: BLE001
+            print("theme members", e)
     if not dry:
         json.dump(out, open(cf["out"], "w"), separators=(",", ":"))
         write_hist(cf["out"].replace(".json", "_hist.json"), C, bench, W, BW, cf["names"])

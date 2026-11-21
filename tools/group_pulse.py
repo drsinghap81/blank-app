@@ -118,6 +118,16 @@ def top_liquid(use, C, V, n=10):
 QUAD = lambda x, y: "Leading" if x >= 100 and y >= 100 else "Weakening" if x >= 100 else "Lagging" if y < 100 else "Improving"  # noqa: E731
 
 
+def rq_codes(Wf, B):
+    try:
+        bw = B.resample("W-FRI").last().reindex(Wf.index).ffill()
+        rs = 100 * Wf.div(bw, axis=0); ratio = 100 * rs / rs.rolling(10).mean(); mom = (100 * ratio / ratio.shift(1)).rolling(3).mean()
+        code = lambda a, m: None if pd.isna(a) or pd.isna(m) else ("L" if a >= 100 and m >= 100 else "W" if a >= 100 else "I" if m >= 100 else "G")  # noqa: E731
+        return {s: [code(ratio[s].iloc[-1], mom[s].iloc[-1]), code(ratio[s].iloc[-2], mom[s].iloc[-2])] for s in Wf.columns}
+    except Exception as e:  # noqa: BLE001
+        print("stock rq failed", e); return {}
+
+
 def rrg(gi, bench, weeks=8):
     """20 Nov 2026 (Amritpal: track how sectors / industries rotate, to ride short-term rallies): relative rotation, weekly.
     RS = index / benchmark; RS-ratio = 100 x RS / its 10-week average (above 100 = stronger than its own recent relative trend);
@@ -543,7 +553,10 @@ def main(mkt):
         W.index = list(W.index[:-1]) + [C.index[-1]]
     json.dump({"t": [str(d.date()) for d in W.index],
                "s": {s: [None if pd.isna(v) else float(f"{v:.4g}") for v in W[s]] for s in syms},
-               "r": {s: [None if pd.isna(v) else round(float(v), 1) for v in RW[s]] for s in syms}},
+               "r": {s: [None if pd.isna(v) else round(float(v), 1) for v in RW[s]] for s in syms},
+               # 22 Nov 2026 (Amritpal: "stocks under those that are also leading"): each stock's weekly rotation quadrant vs the market,
+               # same formulas as sectors (RS-ratio vs 10-week average, 3-week momentum): [now, last week] as L / I / W / G
+               "rq": rq_codes(Wf, B)},
               open(cf["out"] + "stock_weekly.json", "w"), separators=(",", ":"))
     print(mkt, "themes", [(t["group"], t["n"], t["p1m"]) for t in themes])
     print(mkt, "groups", len(rows), "stocks", len(syms), "market pulse 1m", mkt_share, "top", [(r["group"], r["p1m"]) for r in rows[:5]])

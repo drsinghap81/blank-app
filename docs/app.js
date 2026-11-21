@@ -5409,6 +5409,96 @@ function nseIndHTML(G) {
 /* 22 Nov 2026 (Amritpal: "I should be able to see the chart of the result-season industry as well as its stocks by clicking"):
    the industry card shows its own daily chart inline, its results-season top growers, and every stock opens a 1-year weekly chart
    in place (with the full chart / TradingView one tap further). */
+/* 22 Nov 2026 (Amritpal: "show in Today which broad sectors, industries and themes are moving from improving to leading or are
+   leading; click -> chart, then the stocks under them that are also leading, and their charts"). Weekly rotation, information only
+   (rotation did not improve entries in our tests; it shows where money is moving). Stock quadrants: stock_weekly.json rq. */
+async function wkLoad(mk) { state.mxW = state.mxW || {}; if (state.mxW[mk] === undefined) state.mxW[mk] = await getJSON(MAIN + MKT[mk].path + 'stock_weekly.json', 'wk_' + mk).catch(() => null); return state.mxW[mk]; }
+const myd = (d) => new Date(d + 'T00:00:00').toLocaleString('en', { month: 'short', year: '2-digit' });
+const RQ = { L: 'Leading', I: 'Improving', W: 'Weakening', G: 'Lagging' };
+const rqOf = (sym, mk) => { const W = state.mxW && state.mxW[mk]; const q = W && W.rq && W.rq[sym]; return q ? { now: RQ[q[0]] || null, was: RQ[q[1]] || null } : null; };
+function eqWeekly(syms, mk) {   // equal-weight weekly index of members (stock_weekly closes), 100 at the start
+  const W = state.mxW && state.mxW[mk]; if (!W || !W.s) return null;
+  const S = syms.map((x) => W.s[x]).filter((v) => v && v.length > 20); if (S.length < 2) return null;
+  const n = W.t.length, out = [];
+  for (let i = 0; i < n; i++) { let a = 0, k = 0; S.forEach((v) => { const b0 = v.find((x) => x != null); if (v[i] != null && b0) { a += v[i] / b0; k++; } }); out.push(k ? (a / k) * 100 : null); }
+  return { t: W.t, v: out };
+}
+function lineSvg(t, v, label) {
+  const pts = v.map((x, i) => [i, x]).filter(([, x]) => x != null); if (pts.length < 5) return '<p class="muted">Not enough data for a chart yet.</p>';
+  const n = v.length, vals = pts.map((p) => p[1]), lo = Math.min(...vals), hi = Math.max(...vals), H = 150, Wd = 340;
+  const X = (i) => (i / (n - 1)) * Wd, Y = (x) => 6 + (hi - x) / ((hi - lo) || 1) * (H - 22);
+  const ma = v.map((_, i) => { const w = v.slice(Math.max(0, i - 9), i + 1).filter((x) => x != null); return i >= 9 && w.length >= 8 ? w.reduce((a, b) => a + b, 0) / w.length : null; });
+  const path = pts.map(([i, x], k) => `${k ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(x).toFixed(1)}`).join(' ');
+  const mp = ma.map((x, i) => (x == null ? '' : `${ma[i - 1] == null ? 'M' : 'L'}${X(i).toFixed(1)} ${Y(x).toFixed(1)}`)).join(' ');
+  const first = vals[0], last = vals[vals.length - 1], ch = (last / first - 1) * 100, col = ch >= 0 ? 'var(--rise)' : 'var(--fall)';
+  const months = []; for (let i = 1; i < n; i++) if (t[i].slice(5, 7) !== t[i - 1].slice(5, 7) && (t[i].slice(5, 7) % 2 === 1)) months.push(i);
+  return `<svg viewBox="0 0 ${Wd} ${H}" width="100%" height="${H}" preserveAspectRatio="none" aria-label="${esc(label || '')} weekly chart" style="color:var(--ink)">
+    ${months.map((i) => `<text x="${(X(i) + 2).toFixed(1)}" y="${H - 3}" font-size="9" fill="currentColor" opacity=".5">${new Date(t[i] + 'T00:00:00').toLocaleString('en', { month: 'short' })}</text><line x1="${X(i).toFixed(1)}" y1="0" x2="${X(i).toFixed(1)}" y2="${H - 14}" stroke="currentColor" opacity=".08"/>`).join('')}
+    <path d="${path} L ${Wd} ${H - 14} L 0 ${H - 14} Z" style="fill:${col};opacity:.12"/><path d="${path}" fill="none" style="stroke:${col}" stroke-width="2"/><path d="${mp}" fill="none" stroke="#f59e0b" stroke-width="1.3" stroke-dasharray="4 3"/></svg>
+    <small class="muted">${esc(myd(t[pts[0][0]]))} → ${esc(myd(t[pts[pts.length - 1][0]]))} · <b class="${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%</b> · dashed = 10-week average</small>`;
+}
+async function leadItems(mk) {
+  const G = await loadGP(mk).catch(() => null); if (!G) return null;
+  await wkLoad(mk);
+  const q2 = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
+  const mkItem = (kind, nm, rrg, members, extra = {}) => (rrg ? { kind, nm, now: rrg.now, was: rrg.wk1 || (rrg.pts && rrg.pts.length > 1 ? q2(rrg.pts[rrg.pts.length - 2]) : rrg.now), wk4: rrg.wk4, ratio: rrg.pts ? rrg.pts[rrg.pts.length - 1][1] : 0, members, ...extra } : null);
+  const rows = mk === 'NSE' ? ((G.nse || {}).rows || []) : (G.rows || []);
+  const nmOf = (r) => (mk === 'NSE' ? r.basic : r.group);
+  const sectors = mk === 'NSE' ? (((G.nse || {}).sectors) || []).map((r) => mkItem('Broad sector', r.sector, r.rrg, rows.filter((x) => x.sector === r.sector).flatMap((x) => x.members.map((m) => m.symbol))))
+    : (G.sectors || []).map((r) => mkItem('Sector', r.sector, r.rrg, rows.filter((x) => x.sector === r.sector).flatMap((x) => x.members.map((m) => m.symbol))));
+  const inds = rows.map((r) => mkItem('Industry', nmOf(r), r.rrg, r.members.map((m) => m.symbol), { row: r, nse: mk === 'NSE' }));
+  let themes = (G.themes || []).map((r) => mkItem('Theme', r.group, r.rrg, r.members.map((m) => m.symbol)));
+  if (mk === 'US') { const T = await getJSON(MAIN + 'data/scan/us/theme_rrg.json', 'ustheme_rrg').catch(() => null);
+    if (T && T.weekly) themes = Object.entries(T.weekly).map(([nm, r]) => mkItem('Theme', nm, { pts: r.pts, now: r.now }, ((T.members || {})[nm] || []).map((m) => m.symbol), { etf: (T.etf || {})[nm] })); }
+  const keep = (L) => L.filter((x) => x && x.now === 'Leading').map((x) => ({ ...x, fresh: x.was !== 'Leading', fromImp: x.was === 'Improving' }))
+    .sort((a, b) => (b.fromImp - a.fromImp) || (b.fresh - a.fresh) || (b.ratio - a.ratio));
+  return { G, groups: [[mk === 'NSE' ? 'Broad sectors' : 'Sectors', keep(sectors)], ['Industries', keep(inds)], ['Themes', keep(themes)]] };
+}
+async function leadCard(box, mk) {
+  if (!box) return; const D = await leadItems(mk).catch(() => null); if (!D) { box.innerHTML = ''; return; }
+  state._lead = state._lead || {}; state._lead[mk] = D;
+  const nNew = D.groups.reduce((a, [, L]) => a + L.filter((x) => x.fromImp).length, 0);
+  const chip = (x, gi, i) => `<button class="ld-chip${x.fromImp ? ' up' : ''}" data-ld="${gi}:${i}">${x.fromImp ? '<span>🆕</span>' : ''}${esc(x.nm)}${x.fromImp ? ' <small>from Improving</small>' : x.fresh ? ` <small>from ${esc(x.was)}</small>` : ''}</button>`;
+  box.innerHTML = `<section class="ld-card"><div class="ld-h"><b>Leading now</b><small>${nNew ? `<b class="up">${nNew} just moved Improving → Leading</b> · ` : ''}weekly rotation vs ${esc(MX_BENCH[mk])} · tap for chart & leading stocks</small></div>
+    ${D.groups.map(([g, L], gi) => L.length ? `<div class="ld-g"><span class="ld-gn">${g} <small>${L.length}</small></span><div class="ld-row">${L.slice(0, 8).map((x, i) => chip(x, gi, i)).join('')}${L.length > 8 ? `<button class="ld-chip more" data-ldmore="${gi}">+${L.length - 8} more</button>` : ''}</div></div>` : `<div class="ld-g"><span class="ld-gn">${g}</span><div class="ld-row"><small class="muted">${g === 'Themes' && !['NSE', 'US'].includes(mk) ? 'no theme data for this market' : 'none leading this week'}</small></div></div>`).join('')}
+    <details class="al-why"><summary>What this means</summary><p class="muted td-rs">Leading = beating ${esc(MX_BENCH[mk])} and still gaining on it (weekly). 🆕 = moved from Improving to Leading this week. Rotation shows where money is moving; in our tests it confirmed moves like the PSU banks about halfway through, and it did not improve entries on its own. Use it to choose where to look; buy only on your system's signal.</p></details></section>`;
+  box.querySelectorAll('[data-ld]').forEach((b) => b.addEventListener('click', () => { const [gi, i] = b.dataset.ld.split(':').map(Number); rotOpen(D.groups[gi][1][i], mk); }));
+  box.querySelectorAll('[data-ldmore]').forEach((b) => b.addEventListener('click', () => { const gi = +b.dataset.ldmore; const L = D.groups[gi][1];
+    b.outerHTML = L.slice(8).map((x, i) => chip(x, gi, i + 8)).join(''); box.querySelectorAll('[data-ld]').forEach((c) => { if (!c._w) { c._w = 1; c.addEventListener('click', () => { const [g2, i2] = c.dataset.ld.split(':').map(Number); rotOpen(D.groups[g2][1][i2], mk); }); } }); }));
+  box.querySelectorAll('[data-ld]').forEach((c) => { c._w = 1; });
+}
+async function rotOpen(x, mk) {
+  if (!x) return; await wkLoad(mk);
+  const S = await sysMap(mk).catch(() => null); const SM = (S && S.M) || {};
+  const sysOf = (sym) => Object.entries(SM[sym] || {}).filter(([k]) => k !== 'st').sort((a, b) => a[1].lvl - b[1].lvl);
+  const chipsOf = (sym) => sysOf(sym).map(([k, o]) => `<span class="chip ${o.lvl === 0 ? 'new' : o.lvl === 1 ? 'open' : ''}">${esc((MXC.find((c) => c[0] === k) || [k, k])[1])} ${esc(o.txt === '✓' ? '' : o.txt)}</span>`).join('');
+  const W = state.mxW && state.mxW[mk]; const nameOf = {}; ((mk === 'NSE' ? ((state.gp[mk] || {}).nse || {}).rows : (state.gp[mk] || {}).rows) || []).forEach((r) => r.members.forEach((m) => { nameOf[m.symbol] = m.name; }));
+  ((state.gp[mk] || {}).themes || []).forEach((t) => t.members.forEach((m) => { nameOf[m.symbol] = nameOf[m.symbol] || m.name; }));
+  const mem = [...new Set(x.members || [])].filter((sym) => W && W.s && W.s[sym]);
+  const qOrd = { Leading: 0, Improving: 1, Weakening: 2, Lagging: 3 };
+  const ranked = mem.map((sym) => ({ sym, q: rqOf(sym, mk) })).sort((a, b) => ((qOrd[(a.q || {}).now] ?? 9) - (qOrd[(b.q || {}).now] ?? 9)) || ((sysOf(b.sym).length > 0) - (sysOf(a.sym).length > 0)));
+  const nL = ranked.filter((r) => r.q && r.q.now === 'Leading').length;
+  const eq = eqWeekly(mem, mk);
+  const path = [x.wk4, x.was, x.now].filter(Boolean);
+  openPanel(`<div class="d-head no-push"><div><h2>${esc(x.nm)}</h2><div class="co">${esc(x.kind)} · ${esc(MKT[mk].name)}${x.etf ? ` · ETF ${esc(x.etf)}` : ''}</div></div></div>
+    <div class="ld-path">${path.map((q, i) => `<span style="color:${RRG_Q[q]}">${esc(q)}</span>${i < path.length - 1 ? ' → ' : ''}`).join('')} <small class="muted">${x.wk4 ? '4 weeks ago → last week → now' : 'last week → now'}</small></div>
+    <h4 style="margin:10px 0 4px">Chart <span class="muted" style="font-weight:400;font-size:12px">· equal-weight of its ${mem.length} stocks, weekly</span></h4>
+    ${eq ? lineSvg(eq.t, eq.v, x.nm) : '<p class="muted">Chart appears after tonight\'s scan.</p>'}
+    ${x.nse && x.row ? '<button class="lv-link" id="ldind">Industry card: daily chart, results season ›</button>' : ''}
+    <h4 style="margin:12px 0 4px">Stocks <span class="muted" style="font-weight:400;font-size:12px">· ${W && W.rq ? `${nL} of ${mem.length} also Leading · leading first` : 'stock rotation appears after tonight\'s scan'} · tap for chart</span></h4>
+    ${W && W.rq ? `<div class="seg" style="margin:4px 0" id="ldf"><button data-f="lead" aria-selected="true">Leading ${nL}</button><button data-f="all" aria-selected="false">All ${mem.length}</button></div>` : ''}
+    <ul class="list flat" id="ldst">${ranked.map((r) => `<li class="row ind-st" data-indst="${esc(r.sym)}" data-q="${esc((r.q || {}).now || '')}" tabindex="0"><div><div class="sym">${esc(r.sym)}</div><div class="co">${esc(nameOf[r.sym] || '')}</div><div class="tags">${r.q && r.q.now ? `<span class="chip" style="border-color:${RRG_Q[r.q.now]};color:${RRG_Q[r.q.now]}">${esc(r.q.now)}${r.q.was && r.q.was !== r.q.now ? ` · from ${esc(r.q.was)}` : ''}</span>` : ''}${chipsOf(r.sym)}</div></div><div></div><div class="num"><b>${fmt((W.s[r.sym] || []).slice(-1)[0], 2, MKT[mk].loc)}</b></div></li><li class="ind-chart" data-for="${esc(r.sym)}" hidden></li>`).join('') || '<li class="empty">No stocks with weekly data.</li>'}</ul>`);
+  const ib = document.getElementById('ldind'); if (ib) ib.addEventListener('click', () => nseIndOpen(x.row));
+  const list = document.getElementById('ldst');
+  const filt = (f) => list.querySelectorAll('li.row').forEach((li) => { const hide = f === 'lead' && li.dataset.q !== 'Leading'; li.hidden = hide; if (hide) { const c = li.nextElementSibling; if (c) c.hidden = true; } });
+  if (W && W.rq) { filt('lead'); document.querySelectorAll('#ldf button').forEach((b) => b.addEventListener('click', () => { document.querySelectorAll('#ldf button').forEach((c) => c.setAttribute('aria-selected', c === b)); filt(b.dataset.f); })); }
+  const openSt = (sym) => { const box = list.querySelector(`.ind-chart[data-for="${CSS.escape(sym)}"]`); if (!box) return;
+    if (!box.hidden) { box.hidden = true; return; } list.querySelectorAll('.ind-chart').forEach((c) => { c.hidden = true; });
+    box.innerHTML = `${stockSpark(sym, mk)}<div class="ind-act"><button class="lv-link" data-full="${esc(sym)}">Full chart & plan ›</button><a class="lv-link" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(sym, mk))}&interval=D">TradingView ›</a></div>`;
+    box.hidden = false; box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    box.querySelector('[data-full]').addEventListener('click', () => { if (S) mxOpen(sym, mk, S); else lvOpen({ symbol: sym, kind: 'ATH' }, mk); }); };
+  list.querySelectorAll('[data-indst]').forEach((li) => { const go = () => openSt(li.dataset.indst); li.addEventListener('click', go); li.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') go(); }); });
+}
 async function indMini(el, slug, mk = 'NSE') {   // plain SVG (no chart library needed): daily close area + 9 EMA, ~8 months
   if (!el) return; let c;
   try { const r = await fetch(MAIN + MKT[mk].path + 'group_w_charts/' + encodeURIComponent(slug) + '.json', { cache: 'no-cache' }); if (!r.ok) throw 0; c = await r.json(); }
@@ -5424,7 +5514,7 @@ async function indMini(el, slug, mk = 'NSE') {   // plain SVG (no chart library 
     ${months.map((i) => `<line x1="${X(i).toFixed(1)}" y1="0" x2="${X(i).toFixed(1)}" y2="${H - 14}" stroke="currentColor" opacity=".08"/><text x="${(X(i) + 2).toFixed(1)}" y="${H - 3}" font-size="9" fill="currentColor" opacity=".5">${new Date(c.t[i] + 'T00:00:00').toLocaleString('en', { month: 'short' })}</text>`).join('')}
     <path d="${path} L ${Wd} ${H - 14} L 0 ${H - 14} Z" style="fill:${col};opacity:.12"/><path d="${path}" fill="none" style="stroke:${col}" stroke-width="2"/>
     <path d="${ep}" fill="none" stroke="#f59e0b" stroke-width="1.4"/></svg>
-    <small class="muted">${esc(day(c.t[0]))} → ${esc(day(c.t[n - 1]))} · <b class="${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%</b></small>`;
+    <small class="muted">${esc(myd(c.t[0]))} → ${esc(myd(c.t[n - 1]))} · <b class="${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%</b></small>`;
 }
 function stockSpark(sym, mk = 'NSE') {   // 1-year weekly closes + 30-week average, plain SVG (stock_weekly.json)
   const W = state.mxW && state.mxW[mk]; const v = W && W.s && W.s[sym];
@@ -5436,7 +5526,7 @@ function stockSpark(sym, mk = 'NSE') {   // 1-year weekly closes + 30-week avera
   const mp = ma.map((x, i) => (x == null ? '' : `${ma[i - 1] == null ? 'M' : 'L'}${X(i).toFixed(1)} ${Y(x).toFixed(1)}`)).join(' ');
   const ch = (v[v.length - 1] / v[0] - 1) * 100, t = W.t || [];
   return `<svg viewBox="0 0 ${Wd} ${H}" width="100%" height="${H}" preserveAspectRatio="none" aria-label="${esc(sym)} weekly closes, 1 year"><path d="${path} L ${Wd} ${H} L 0 ${H} Z" style="fill:${col};opacity:.12"/><path d="${path}" fill="none" style="stroke:${col}" stroke-width="1.8"/><path d="${mp}" fill="none" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4 3"/></svg>
-    <small class="muted">${t.length ? esc(day(t[0])) + ' → ' + esc(day(t[t.length - 1])) + ' · ' : ''}<b class="${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%</b> in a year · dashed = 30-week average</small>`;
+    <small class="muted">${t.length ? esc(myd(t[0])) + ' → ' + esc(myd(t[t.length - 1])) + ' · ' : ''}<b class="${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '+' : ''}${fmt(ch, 1)}%</b> in a year · dashed = 30-week average</small>`;
 }
 async function nseIndOpen(r) {
   if (!r) return; const mk = 'NSE'; await rsLoad();
@@ -7469,6 +7559,7 @@ async function tdRender2(el) {
       <div class="t2-when"><b>${esc(clk.dayNum)} ${esc(clk.month).split(' ')[0]}</b><span class="t2-clock"><small>${clk.open ? `${clk.ex} open · closes in` : `${clk.ex} opens in`}</small> <b>${clk.txt}</b></span><small>plan from the ${day(P.asof)} close${knowHeld ? '' : ' · holdings not linked'}</small></div></div>
     <div class="t2-h"><h2>Top-down</h2><small>world → ${esc(MKT[mk].name)} → sectors → stocks</small></div>
     ${steps()}
+    <div id="tdlead"></div>
     <div class="t2-h"><h2>2 · Your to-do</h2><small>tap a number</small></div>
     ${tiles}
     <div class="t2-h" id="t2sell"><h2>Sell first</h2><small>exits on what you hold</small></div>
@@ -7551,7 +7642,7 @@ async function tdRender2(el) {
   el.querySelectorAll('.t2-td[data-go]').forEach((b) => b.addEventListener('click', () => { const g = b.dataset.go; if (g === 'inv') { state.athMkt = mk; state.athTabG.inv = 'themes'; } if (g === 'ath') { state.athMkt = mk; state.athWorld = false; } show(g); }));
   $('#t2old').addEventListener('click', () => { state.todayV1 = true; tdRender(el, false); });
   $('#t2cls').addEventListener('click', () => setClassic(true));
-  alertsCard($('#tdalert'), mk, $('#tdhero')); tdTop5($('#tdtop5'), mk); tdMatrix($('#tdmx'), mk); tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); }
+  alertsCard($('#tdalert'), mk, $('#tdhero')); leadCard($('#tdlead'), mk); tdTop5($('#tdtop5'), mk); tdMatrix($('#tdmx'), mk); tdTrack($('#tdtrack'), mk); if (mk === 'US') { tdPies($('#tdpies')); tdRsi2($('#tdrsi2')); }
   clearTimeout(state._t2clk); state._t2clk = setTimeout(() => { if (state.view === 'today' && !state.todayV1) { const c = el.querySelector('.t2-clock b'); if (c) { const k = mktClock(mk); c.textContent = k.txt; } } }, 60000);
 }
 
