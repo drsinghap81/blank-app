@@ -54,7 +54,12 @@ def groups_frame(groups, C, V, ret, nif):
                              f8=float(f8.at[t, k]) if pd.notna(f8.at[t, k]) else np.nan,
                              L4=bool((fut.iloc[1:5] == "L").any()), L8=bool((fut.iloc[1:9] == "L").any())))
     X = pd.DataFrame(rows)
-    return X[~((X.w >= "2020-02-15") & (X.w <= "2020-12-31"))]
+    X = X[~((X.w >= "2020-02-15") & (X.w <= "2020-12-31"))].copy()
+    t = txw.index[-1]   # latest week (no outcome yet): groups showing the pattern now
+    X.attrs["now"] = sorted([(k, round(float(txw.at[t, k]), 2), round(float(r10w.at[t, k]), 1), Q[k].dropna().iloc[-1] if Q[k].notna().any() else None)
+                             for k in txw.columns if pd.notna(txw.at[t, k]) and txw.at[t, k] >= 1.5 and abs(r10w.at[t, k]) <= 3], key=lambda z: -z[1])
+    X.attrs["now_date"] = str(t.date())
+    return X
 
 
 def st(x):
@@ -77,8 +82,7 @@ def analyse(name, X, res):
     res[name] = out
     for k, v in out.items():
         print(f"R| {name} | {k}: {v}", flush=True)
-    last = X[X.w == end]; hit = last[(last.r10.abs() <= 3) & (last.tx >= 1.5)].sort_values("tx", ascending=False)
-    print(f"R| {name} | on now ({end.date()}): {[(r.g, round(r.tx, 2), round(r.r10, 1), r.q) for r in hit.itertuples()][:15]}", flush=True)
+    print(f"R| {name} | showing the pattern now ({X.attrs.get('now_date')}): {X.attrs.get('now', [])[:15]}", flush=True)
 
 
 def main():
