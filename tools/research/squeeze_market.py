@@ -6,7 +6,7 @@ The Nov 2026 move: Nifty fell through October, FIIs were extremely short index f
   data   : NSE participant-wise OI (FII index-futures long %, tools/research/fii_oi_filter.fii_series), sector indices
            (data/scan/index_ohlcv.csv.gz)
   setup  : market fell - Nifty >= 5% below its 60-day high - while FIIs are extremely short (long % <= 20)
-  trigger: (a) FII long % up >= 5 points over 3 sessions from <= 20 (covering starts)   (b) a Nifty up-day >= 1.5% during the setup
+  trigger: (a) FII long % up >= 5 points over 3 sessions from <= 20 (covering starts), setup seen in the last 20 sessions   (b) a Nifty up-day >= 1.5% during the setup
            (c) both on the same day. One event per 20 sessions.
 Outcomes: Nifty next 5/10/20/60 sessions vs all days; each sector index's next 20 / 60 sessions vs Nifty, and whether the sectors that
 fell MOST in the 20 sessions before (or the high-beta ones) lead - rank correlation and top-3 vs bottom-3 spread. Lists every event.
@@ -47,7 +47,8 @@ def main():
     L = F["long"]
     dd = nif / nif.rolling(60).max() - 1
     setup = (dd <= -0.05) & (L <= 20)
-    trigA = setup & (L - L.shift(3) >= 5) & (L.shift(3) <= 20)
+    recent = setup.astype(float).rolling(20, min_periods=1).max().astype(bool)   # the fall can have ended a few weeks before covering starts
+    trigA = recent & (L - L.shift(3) >= 5) & (L.shift(3) <= 20)
     trigB = setup & (nif.pct_change() >= 0.015)
     trigC = trigA & trigB
     fw = {k: (nif.shift(-k) / nif - 1) * 100 for k in (5, 10, 20, 60)}
