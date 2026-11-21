@@ -5049,9 +5049,10 @@ function rrgClean(items, sel, W = 360, H = 340, tails0 = false) {
   });
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;max-width:100%;color:var(--ink,#111)" role="img" aria-label="Relative rotation chart"><defs><clipPath id="rrgclip"><rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${Y1 - Y0}"/></clipPath></defs>${g}<g clip-path="url(#rrgclip)">${tails}</g>${heads2}${labels}</svg>`;
 }
-async function rrgMount(el, G, mk) {
+async function rrgMount(el, G, mk, opts = {}) {
   const box = el.querySelector('#rrgbox'); if (!box) return;
-  const V = state.rrgV || (state.rrgV = { view: 'weekly', all: false, sel: null, src: 'sec' });
+  /* opts (21 Nov 2026, world chart on the top-down World page): key = separate view state, src = start source, only = allowed sources */
+  const KEY = opts.key || 'rrgV'; const V = state[KEY] || (state[KEY] = { view: 'weekly', all: false, sel: null, src: opts.src || 'sec' });
   /* 21 Nov 2026 (Amritpal: "also commodities, coins rotation charts"): commodities vs a broad commodity ETF (DBC), coins vs Bitcoin */
   const SRC = { sec: null, comm: 'data/scan/comm_rrg', crypto: 'data/scan/crypto_rrg', cryptousd: 'data/scan/cryptousd_rrg', world: 'data/scan/world_rrg', worldusd: 'data/scan/worldusd_rrg' }; const sk = V.src || 'sec';
   let src = null;
@@ -5067,7 +5068,7 @@ async function rrgMount(el, G, mk) {
     src = { ...src, data: d, asof: dates[t] };
   }
   const seg = (k, opts) => `<div class="seg" style="margin:4px 0">${opts.map(([v, t]) => `<button data-rrgk="${k}" data-v="${v}" aria-selected="${String(V[k]) === String(v)}">${t}</button>`).join('')}</div>`;
-  if (!src && sk !== 'sec') { box.innerHTML = `${seg('src', [['sec', 'Sectors'], ['world', 'World vs ACWI'], ['worldusd', 'World in US$'], ['comm', 'Commodities'], ['crypto', 'Coins vs BTC'], ['cryptousd', 'Coins in US$']])}<p class="muted">This rotation chart appears after the next world scan.</p>`; box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V.src = b.dataset.v; V.t = null; V.sel = null; rrgMount(el, G, mk); })); return; }
+  if (!src && sk !== 'sec') { box.innerHTML = `${seg('src', [['sec', 'Sectors'], ['world', 'World vs ACWI'], ['worldusd', 'World in US$'], ['comm', 'Commodities'], ['crypto', 'Coins vs BTC'], ['cryptousd', 'Coins in US$']].filter(([k]) => !opts.only || opts.only.includes(k)))}<p class="muted">This rotation chart appears after the next world scan.</p>`; box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V.src = b.dataset.v; V.t = null; V.sel = null; rrgMount(el, G, mk, opts); })); return; }
   if (!src) src = { data: Object.fromEntries((G.sectors || []).filter((r) => r.rrg).map((r) => [r.sector, { pts: r.rrg.pts, now: r.rrg.now, was: r.rrg.wk4 }])) };
   const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
   const all = Object.entries(src.data).map(([nm, r]) => ({ nm, ...r, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now,
@@ -5078,21 +5079,21 @@ async function rrgMount(el, G, mk) {
   const mv = all.filter((r) => r.now !== r.was);
   const moves = mv.length ? `<div class="rrg-moves"><b>Moved ${per}:</b> ${mv.map((r) => `<button class="rrg-mv" data-rrgsel="${esc(r.nm)}">${esc(RRG_SHORT(r.nm))} <span style="color:${RRG_Q[r.was]}">${esc(r.was)}</span> → <b style="color:${RRG_Q[r.now]}">${esc(r.now)}</b></button>`).join('')}</div>` : `<div class="rrg-moves muted">No sector changed quadrant ${per}.</div>`;
   const srcName = src.other === 'comm' ? 'Commodities' : src.other === 'crypto' || src.other === 'cryptousd' ? 'Coins' : src.other === 'world' || src.other === 'worldusd' ? 'World markets & assets' : ({ NSE: 'NSE sector indices', US: 'SPDR sector ETFs', ASX: 'ASX 200 sector indices' }[mk] || 'sectors');
-  box.innerHTML = `${seg('src', [['sec', 'Sectors'], ['world', 'World vs ACWI'], ['worldusd', 'World in US$'], ['comm', 'Commodities'], ['crypto', 'Coins vs BTC'], ['cryptousd', 'Coins in US$']])}<h5 style="margin:6px 0 0">${src.other ? '' : 'Sectors'}${src.idx ? `${src.other ? '' : ' · '}${srcName} vs ${esc(src.bench || 'the market')}` : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
+  box.innerHTML = `${seg('src', [['sec', 'Sectors'], ['world', 'World vs ACWI'], ['worldusd', 'World in US$'], ['comm', 'Commodities'], ['crypto', 'Coins vs BTC'], ['cryptousd', 'Coins in US$']].filter(([k]) => !opts.only || opts.only.includes(k)))}<h5 style="margin:6px 0 0">${src.other ? '' : 'Sectors'}${src.idx ? `${src.other ? '' : ' · '}${srcName} vs ${esc(src.bench || 'the market')}` : ''}${src.asof ? ` · ${esc(day(src.asof))}` : ''}</h5>
     <div class="rrg-ctl">${src.idx ? seg('view', [['daily', 'Daily'], ['weekly', 'Weekly']]) : ''}${seg('all', [[false, 'Key'], [true, 'All']])}</div>
     ${dates.length ? `<div class="rrg-play"><button class="rrg-pb" aria-label="${V.playing ? 'Pause' : 'Play'} the replay">${V.playing ? '❚❚' : '▶'}</button><input type="range" min="0" max="${dates.length - 1}" value="${V.t == null ? dates.length - 1 : V.t}" aria-label="Replay date"><b>${esc(day(src.asof))}${String(src.asof).slice(0, 4) !== String(new Date().getFullYear()) ? ' ' + String(src.asof).slice(2, 4) : ''}</b></div>` : ''}
     ${moves}${rrgClean(shown, V.sel, 360, 330, 'short')}<div class="rrg-key"><svg width="54" height="12" aria-hidden="true"><circle cx="5" cy="6" r="2.6" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".6"/><line x1="8" y1="6" x2="42" y2="6" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 2" opacity=".7"/><circle cx="48" cy="6" r="4.5" fill="currentColor"/></svg> ring → dot = changed quadrant ${V.view === 'daily' && src.idx ? 'today' : 'this week'} (from → to)</div><div class="rrg-chips">${chips}</div>${src.other === 'crypto' ? '<p class="rrg-note">Measured against Bitcoin: Improving / Leading means doing <b>better than BTC</b>, not rising. If Bitcoin is falling, a coin can fall and still look strong here. Use <b>Coins in US$</b> for the plain trend.</p>' : src.other === 'cryptousd' ? '<p class="rrg-note">Measured in US dollars: Leading = rising faster than its own 10-week trend; Lagging = falling.</p>' : src.other === 'world' ? '<p class="rrg-note">US-dollar funds for each market and asset class against <b>MSCI All-Country World (ACWI)</b>, the global stock market. Leading = beating world stocks (not necessarily rising). India here is INDA (in US$, so the rupee counts). Use <b>World in US$</b> for the plain trend.</p>' : src.other === 'worldusd' ? '<p class="rrg-note">Same funds in US dollars: Leading = rising faster than its own 10-week trend; Lagging = falling.</p>' : src.other === 'comm' ? '<p class="rrg-note">Measured against a broad commodity basket (DBC): Leading = beating commodities overall, not necessarily rising.</p>' : ''}<p class="muted" style="font-size:11.5px">Each dot moves clockwise: Improving → Leading → Weakening → Lagging. Tap a dot or a name for its full trail (dated); tap again to clear. ▶ replays the last ${V.view === 'daily' ? '60 sessions' : '26 weeks'} (drag the slider for up to ${V.view === 'daily' ? 'a year' : '2 years'}). "Key" = Leading, Improving and this period's movers. "from …" = the quadrant it just left. Arrows mark sectors beyond the zoomed area.</p>`;
-  box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V[b.dataset.rrgk] = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; if (b.dataset.rrgk === 'view' || b.dataset.rrgk === 'src') { V.t = null; if (b.dataset.rrgk === 'src') V.sel = null; } rrgMount(el, G, mk); }));
-  const rg = box.querySelector('.rrg-play input'); if (rg) rg.addEventListener('input', () => { V.t = +rg.value; V.playing = false; clearInterval(state.rrgTimer); rrgMount(el, G, mk); });
+  box.querySelectorAll('[data-rrgk]').forEach((b) => b.addEventListener('click', () => { V[b.dataset.rrgk] = b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : b.dataset.v; if (b.dataset.rrgk === 'view' || b.dataset.rrgk === 'src') { V.t = null; if (b.dataset.rrgk === 'src') V.sel = null; } rrgMount(el, G, mk, opts); }));
+  const rg = box.querySelector('.rrg-play input'); if (rg) rg.addEventListener('input', () => { V.t = +rg.value; V.playing = false; clearInterval(state.rrgTimer); rrgMount(el, G, mk, opts); });
   const pb = box.querySelector('.rrg-pb');
   if (pb) pb.addEventListener('click', () => {
     clearInterval(state.rrgTimer);
-    if (V.playing) { V.playing = false; rrgMount(el, G, mk); return; }
+    if (V.playing) { V.playing = false; rrgMount(el, G, mk, opts); return; }
     V.playing = true; if (V.t == null || V.t >= dates.length - 1) V.t = Math.max(0, dates.length - (V.view === 'daily' ? 60 : 26));
-    state.rrgTimer = setInterval(() => { if (!document.body.contains(box)) { clearInterval(state.rrgTimer); return; } V.t += 1; if (V.t >= dates.length - 1) { V.t = null; V.playing = false; clearInterval(state.rrgTimer); } rrgMount(el, G, mk); }, 700);
-    rrgMount(el, G, mk);
+    state.rrgTimer = setInterval(() => { if (!document.body.contains(box)) { clearInterval(state.rrgTimer); return; } V.t += 1; if (V.t >= dates.length - 1) { V.t = null; V.playing = false; clearInterval(state.rrgTimer); } rrgMount(el, G, mk, opts); }, 700);
+    rrgMount(el, G, mk, opts);
   });
-  box.querySelectorAll('[data-rrgsel]').forEach((b) => b.addEventListener('click', () => { V.sel = V.sel === b.dataset.rrgsel ? null : b.dataset.rrgsel; rrgMount(el, G, mk); }));
+  box.querySelectorAll('[data-rrgsel]').forEach((b) => b.addEventListener('click', () => { V.sel = V.sel === b.dataset.rrgsel ? null : b.dataset.rrgsel; rrgMount(el, G, mk, opts); }));
 }
 function rrgRows(G, mk) { return (mk === 'NSE' && G.nse && G.nse.rows && G.nse.rows.some((r) => r.rrg) ? G.nse.rows.map((r) => ({ ...r, nm: r.basic })) : (G.rows || []).map((r) => ({ ...r, nm: r.group }))).filter((r) => r.rrg); }
 /* 21 Nov 2026 (Amritpal: "record this, show in app"): volume flow = the industry's On-Balance Volume over 10 sessions (money traded on
@@ -5192,10 +5193,12 @@ async function loadMarkets() {
         <span class="mxv">${v.ret_3m != null ? `${v.ret_3m >= 0 ? '+' : ''}${fmt(v.ret_3m, 1)}% 3 m` : ''}</span><span class="muted">${v.from_high != null ? `${fmt(v.from_high, 1)}% from high` : ''}${ms ? ` · ${fmt(ms.above200, 0)}% of stocks above 200-day · Pulse ${fmt(ms.p1m, 0)}` : ''}</span><span class="mxgo">Open sectors ›</span></button>`; };
     const others = Object.entries(I).filter(([k]) => !Object.values(MX_IDX).includes(k));
     el.innerHTML = `${mxCrumb()}<div class="status ${W && W.risk_on ? 'open' : 'exit watch'}" style="margin:8px 16px"><b>World ${W && W.risk_on ? 'risk-on' : 'risk-off'}.</b> ${W ? esc(W.benchmark) : ''} — context only. Buy signals still come from your tested systems; industry strength is the tailwind (in the 2017–26 test, the top 10% of industries beat the bottom 10% by about 3% over the next 3 months).</div>
+      <div class="card"><h4 style="margin:0 0 4px">World rotation · markets and asset classes</h4><p class="muted" style="margin:0 0 4px;font-size:12.5px">Step 1 of top-down: which markets and assets are beating world stocks (MSCI ACWI). Tap a dot for its trail.</p><div id="rrgbox" data-mk="world"></div></div>
       <div class="card"><h4 style="margin:0 0 8px">Your markets</h4><div class="mxcards">${['NSE', 'US', 'ASX', 'UK'].map(card).join('')}</div>
       <h4 style="margin:14px 0 6px">Other world indices · 3-month return</h4><div class="mxworld">${others.map(([k, v]) => `<div class="mxw" style="border-left:5px solid ${MX_TAGC[v.tag] || '#CBD5E1'}"><b>${esc(v.name)}</b><span class="muted">${esc(v.region)} · ${esc(v.tag)}</span><span class="${v.ret_3m >= 0 ? 'up' : 'down'}">${v.ret_3m >= 0 ? '+' : ''}${fmt(v.ret_3m, 1)}%</span></div>`).join('')}</div>
       <p class="muted" style="margin:10px 0 0;font-size:12.5px">Colour = trend tag (green leading, blue uptrend, grey mixed, red weak) from each index's 30-week average and strength vs the MSCI World.</p></div>`;
     mxWire(el); el.querySelectorAll('.mxcard').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'market', m: b.dataset.m, sec: null, grp: null })));
+    rrgMount(el, null, 'US', { key: 'rrgW', src: 'world', only: ['world', 'worldusd'] });
     return;
   }
   const mk = x.m; const G = await loadGP(mk);
@@ -6593,6 +6596,7 @@ async function alertsCard(box, mk) {
   const hero = lt ? (() => { const [w, ...rest] = lt[1].split(' · '); return `<div class="ig-hero ${lt[0]}"><span class="ig-dot"></span><span class="ig-word">${esc({ GREEN: 'Go', AMBER: 'Careful', RED: 'Pause' }[w] || w)}</span><span class="ig-sub">${esc(rest.join(' · '))}</span></div>`; })() : '';
   box.innerHTML = `<section class="al-card ig ${lt ? lt[0] : ''}">
     ${hero}${sq}
+    <div class="ig-wmap ig-map2" role="button" tabindex="0" aria-label="Open the world rotation chart"><div class="ig-map-h"><b>World rotation</b><span>markets & assets vs world stocks · tap</span></div><div class="ig-map-c"></div></div>
     <div class="ig-map" role="button" tabindex="0" aria-label="Open the full rotation chart"><div class="ig-map-h"><b>Sector rotation</b><span>tap for the full chart</span></div><div class="ig-map-c"></div></div>
     ${rotBasket(GPX, S, mk)}
     <div class="ig-tiles">${tiles.map(([k, t, n, sub]) => `<button class="ig-tile${n ? '' : ' zero'}" data-igt="${k}"><b>${n}</b><span>${t}</span><small>${sub}</small></button>`).join('')}</div>
@@ -6620,7 +6624,21 @@ async function alertsCard(box, mk) {
     box.querySelectorAll('[data-igt]').forEach((x) => { if (x !== b) x.classList.remove('on'); });
     box.querySelectorAll('[data-igp]').forEach((x) => { x.hidden = !(on && x.dataset.igp === k); });
   }));
-  igMiniMap(box, GPX, mk);
+  igWorldMap(box); igMiniMap(box, GPX, mk);
+}
+/* 21 Nov 2026 (Amritpal: "the world asset chart should be on the main page - top-down"): world markets and asset classes vs MSCI ACWI,
+   Leading + Improving + this week's movers; tap -> Markets > World */
+async function igWorldMap(box) {
+  const m = box.querySelector('.ig-wmap'); if (!m) return;
+  const R = await getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null);
+  if (!R || !R.weekly) { m.hidden = true; return; }
+  const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
+  const items = Object.entries(R.weekly).map(([nm, r]) => ({ nm, now: r.now, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now, pts: r.pts.slice(-4) }))
+    .filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was);
+  if (!items.length) { m.hidden = true; return; }
+  m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 230, false);
+  const go = () => { Object.assign(state.mx, { lvl: 'world', m: null, sec: null, grp: null }); show('mk'); setTimeout(() => { const e = document.querySelector('#rrgbox'); if (e) e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1800); };
+  m.addEventListener('click', go); m.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
 }
 /* mini rotation map on Today: Leading + Improving + this week's movers, dots and short trails; tap -> Markets > Rotation */
 async function igMiniMap(box, G, mk) {

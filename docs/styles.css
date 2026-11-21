@@ -1311,3 +1311,7 @@ body.pub .owner-only { display: none !important; }
 /* 21 Nov 2026: squeeze context under the Go / Careful / Pause hero */
 .ig-sq{font-size:12.5px;line-height:1.35;margin:6px 2px 0;padding:8px 10px;border-radius:10px;background:rgba(59,130,246,.10);color:var(--ink)}
 .rrg-note{font-size:12.5px;margin:6px 0;padding:8px 10px;border-radius:10px;background:rgba(232,163,61,.12)}
+/* 21 Nov 2026: World rotation mini map on Today (top-down step 1) */
+.ig-wmap { border-radius: 16px; padding: 10px 10px 4px; margin-bottom: 12px; background: rgba(14,165,233,.07); border: 1px solid rgba(14,165,233,.25); cursor: pointer; max-width: 100%; overflow: hidden; }
+.ig-wmap svg { max-width: 100%; height: auto; }
+.ig-wmap:focus-visible { outline: 2px solid #0EA5E9; outline-offset: 2px; }
