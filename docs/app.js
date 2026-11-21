@@ -3107,7 +3107,7 @@ const NSE_IDX_TV = { 'NIFTY 50': 'NIFTY', 'NIFTY BANK': 'BANKNIFTY', 'NIFTY IT':
 const nseIdxTv = (n) => 'NSE:' + (NSE_IDX_TV[n] || n.replace(/&/g, 'AND').replace(/[^A-Z0-9]+/g, '_'));
 const tvOpen = (key, sym) => window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvOf(key, sym)), '_blank', 'noopener');
 async function loadATH() {
-  await pcrLoad();
+  await pcrLoad(); await secWkLoad(AM()).catch(() => null);
   const grp = athGrp();
   $('#title').textContent = { mom: 'Momentum investing', inv: 'Investment', trd: 'Trading · cup closes' }[grp];
   const el = $(grp === 'mom' ? '#view-ath' : '#view-' + state.view);
@@ -4033,7 +4033,18 @@ function athRows() {
 const ixNames = () => (state.ath && state.ath.sec && state.ath.sec.names) || {};
 const secName = (k) => ixNames()[k] || ({ 'NIFTY IT': 'IT', 'NIFTY FMCG': 'FMCG', 'NIFTY INDIA CONSUMPTION': 'Consumption', 'NIFTY SERVICES SECTOR': 'Services', 'NIFTY FINANCIAL SERVICES': 'Financials' }[k]
   || k.replace('NIFTY ', '').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()));
-const SECTOR_TXT = { leading: 'Sector leading', uptrend: 'Sector uptrend', mixed: 'Sector mixed', weak: 'Sector weak' };
+/* 22 Nov 2026 (Amritpal: "Yes"): the sector tag is a 6-MONTH reading (index vs its 30-week average + 6-month RS; the one that tested
+   well for ATH). The rotation map is WEEKLY, so "Pharma leading" on a card next to "Pharma Lagging" on the map looked contradictory.
+   Cards now say "6-mo leader" and add this week's rotation quadrant when known. */
+const SECTOR_TXT = { leading: '6-mo leader', uptrend: '6-mo uptrend', mixed: '6-mo mixed', weak: '6-mo weak' };
+state.secWk = state.secWk || {};
+async function secWkLoad(mk) {
+  if (state.secWk[mk] !== undefined || mk === 'UK') return state.secWk[mk];
+  const R = await getJSON(MAIN + MKT[mk].path + 'sector_rrg.json', 'sector_rrg_' + mk).catch(() => null);
+  state.secWk[mk] = R && R.weekly ? Object.fromEntries(Object.values(R.weekly).map((v) => [v.index, v.now])) : null; return state.secWk[mk];
+}
+const secWk = (ix, mk) => { const W = state.secWk[mk || AM()]; return W && ix ? W[ix] || null : null; };
+const secWkTxt = (ix, mk) => { const q = secWk(ix, mk); return q ? ` · this week ${q}` : ''; };
 /* 18 Nov 2026: put/call OI ratio as a GUIDE on every Indian F&O trade (data/scan/pcr.json, nightly). Tested 2020-26: the highest
    fifth of PCR beat the lowest fifth in every year (+1.5% vs +0.4% over 10 days). Not a system and not a filter. */
 /* 18 Nov 2026: today's VWAP (server, Angel 5-minute candles) on the Live India buy list and open trades: entry guide with PCR */
@@ -4050,7 +4061,7 @@ function pcrChip(sym) {
   return ` <span class="chip ${cls}" title="Put/call OI ratio ${x.pcr} (${lab} among F&O names today${x.d5 != null ? `, ${x.d5 >= 0 ? '+' : ''}${x.d5} in 5 days` : ''}). Guide only: high PCR stocks did better over the next 10 days in 2020-26.">PCR ${fmt(x.pcr, 2)} ${x.q >= 4 ? '▲' : x.q <= 2 ? '▼' : '·'}</span>`;
 }
 const boardChip = (r) => (r && (r.board === 'SME' || r.board === 'BSE' || /\.BO$/.test(r.symbol || '')) ? `<span class="chip watch" title="Not in the trade plan: ${r.board === 'SME' ? 'SME lots' : 'BSE only'}">${r.board === 'SME' ? 'SME' : 'BSE only'}</span>` : '');   // 17 Nov 2026
-const secChip = (r) => boardChip(r) + (AM() === 'NSE' ? `<span class="xd">${pcrChip(r.symbol)}</span>` : '') + (r.sector_tag ? `<span class="chip ${r.sector_tag === 'leading' ? 'new' : r.sector_tag === 'weak' ? 'exit' : r.sector_tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.sector_tag]}</span>` : '');
+const secChip = (r) => boardChip(r) + (AM() === 'NSE' ? `<span class="xd">${pcrChip(r.symbol)}</span>` : '') + (r.sector_tag ? `<span class="chip ${r.sector_tag === 'leading' ? 'new' : r.sector_tag === 'weak' ? 'exit' : r.sector_tag === 'uptrend' ? 'open' : ''}">${SECTOR_TXT[r.sector_tag]}${secWkTxt(r.sector_index)}</span>` : '');
 const rsChip = (lab, v) => (v == null ? '' : `<span class="chip ${v > 0 ? 'open' : 'exit'}">${lab} ${v > 0 ? '+' : ''}${Number(v).toFixed(0)}%</span>`);
 // ---- Industry Pulse (our computation of group breadth): data/scan[/us|/asx]/group_pulse.json ----
 state.gp = state.gp || {};
@@ -6355,13 +6366,14 @@ async function sysMap(mk) {
   // sector for every stock from sectors.json (symbol -> industry -> sector index -> tag / 6-month RS)
   const SEC = {};
   if (sec && sec.symbols) Object.keys(M).forEach((s) => { const ind = sec.symbols[s]; const ix = ind && sec.industries && sec.industries[ind]; const x = ix && sec.indices && sec.indices[ix];
-    if (x) SEC[s] = { tag: x.tag, rs: x.rs_6m, name: ind }; });
-  Object.keys(M).forEach((s) => { const r = meta[s] || {}; if (!SEC[s] && r.sector_tag) SEC[s] = { tag: r.sector_tag, rs: r.sector_rs, name: r.industry }; });
+    if (x) SEC[s] = { tag: x.tag, rs: x.rs_6m, name: ind, ix }; });
+  Object.keys(M).forEach((s) => { const r = meta[s] || {}; if (!SEC[s] && r.sector_tag) SEC[s] = { tag: r.sector_tag, rs: r.sector_rs, name: r.industry, ix: r.sector_index }; });
+  await secWkLoad(mk);
   const STK = new Set((tr && tr.stack) || []); const R3 = (tr && tr.r3m) || {};
   const r3s = Object.values(R3).filter((v) => v != null).sort((a, b) => a - b);
   const R3P = (sym) => { const v = R3[sym]; if (v == null || !r3s.length) return null; let lo = 0, hi = r3s.length; while (lo < hi) { const m = (lo + hi) >> 1; if (r3s[m] < v) lo = m + 1; else hi = m; } return Math.round((lo / r3s.length) * 100); };
   const EA = Object.fromEntries(((tr && tr.early) || []).map((r) => [r.symbol, r]));
-  return (state.sysMap[mk] = { M, meta, SEC, TB, STK, R3, R3P, EA, breadth: (tr && tr.breadth) || null, cols: MXC.filter(([k]) => k === 'st' || Object.values(M).some((o) => o[k])) });
+  return (state.sysMap[mk] = { mk, M, meta, SEC, TB, STK, R3, R3P, EA, breadth: (tr && tr.breadth) || null, cols: MXC.filter(([k]) => k === 'st' || Object.values(M).some((o) => o[k])) });
 }
 /* "Also in" chips for a stock (used on the Week / Day / Month close lists) */
 function alsoIn(sym, skip) {
@@ -6385,7 +6397,7 @@ function mxScore(S, sym) {
   const tb = S.TB[sym];
   if (tb) { if (o.tb.lvl === 0) add(2, `Tight-base breakout, ${fmt(tb.breakout_vol, 1)}× volume`); else if (o.tb.lvl === 1) add(1, 'Broke out of a tight base'); else if (tb.dist_pct <= 2) add(1, `Tight base, ${fmt(tb.dist_pct, 1)}% to trigger`); }
   const rp = S.R3P(sym); if (rp != null) { if (rp >= 80) add(2, `3-month gain in the top ${100 - rp || 1}%`); else if (rp >= 60) add(1, '3-month gain above most'); }
-  const sc = S.SEC[sym]; if (sc && sc.tag) { if (sc.tag === 'leading' || sc.tag === 'uptrend') add(1, `Sector ${sc.tag}`); else if (sc.tag === 'weak') add(-1, 'Sector weak'); }
+  const sc = S.SEC[sym]; if (sc && sc.tag) { if (sc.tag === 'leading' || sc.tag === 'uptrend') add(1, `${SECTOR_TXT[sc.tag]}${secWkTxt(sc.ix, S.mk)}`); else if (sc.tag === 'weak') add(-1, `6-mo weak sector${secWkTxt(sc.ix, S.mk)}`); }
   const oth = ['vcp', 'gm', 'mo', 'wk', 'dy'].filter((k) => o[k]); if (oth.length) add(Math.min(2, oth.length), 'Also on ' + oth.map((k) => MXC.find((c) => c[0] === k)[1]).join(', '));
   return { p, w, stack: S.STK.has(sym) };
 }
@@ -6473,7 +6485,7 @@ async function tdTop5(box, mk) {
       <small class="mx5w">${(() => { const g = x.w.filter(([n]) => n > 0).sort((a, b) => b[0] - a[0]); const bad = x.w.filter(([n]) => n < 0); return 'Why: ' + esc(g.slice(0, 2).map(([, t]) => t).join(' · ')) + (g.length > 2 ? ` <span class="xd">· ${esc(g.slice(2).map(([, t]) => t).join(' · '))}</span>` : '') + (bad.length ? ` · <span class="down">${esc(bad.map(([, t]) => t).join(' · '))}</span>` : ''); })()}</small>
       <small class="mx5p">${plan(x.sym)}</small></span></button></li>`).join('')}</ol>` : '<p class="muted td-rs">No stock has a buy signal right now.</p>'}
     ${red && top.length ? '<p class="down td-rs"><b>Red day:</b> these are shown for the record. Your rule is to wait.</p>' : ''}
-    <details class="al-why"><summary>ⓘ How the score works</summary><p class="muted td-rs">Score: 9/21 buy +3 (trend running +1), tight-base breakout +2 (near trigger or recent +1), also an ATH breakout +2, IPO cup +1, 3-month gain top 20% +2 (top 40% +1), sector leading/uptrend +1 (weak −1), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. The coloured strip is top-down alignment, world → market → industry: green supports, amber mixed, red against (tap and hold for details). Only the industry results season changed which signal to take in tests; the strip is not part of the score. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></details></section>`;
+    <details class="al-why"><summary>ⓘ How the score works</summary><p class="muted td-rs">Score: 9/21 buy +3 (trend running +1), tight-base breakout +2 (near trigger or recent +1), also an ATH breakout +2, IPO cup +1, 3-month gain top 20% +2 (top 40% +1), sector a 6-month leader/uptrend +1 (6-month weak −1; the weekly rotation quadrant is shown beside it, not scored), other lists +1 each up to 2. MA stack is shown but not scored. Each piece tested positive on its own; the total is not backtested. The coloured strip is top-down alignment, world → market → industry: green supports, amber mixed, red against (tap and hold for details). Only the industry results season changed which signal to take in tests; the strip is not part of the score. Typical 9/21 hold is 5–8 weeks, not 1 week: quick-exit versions lost money in tests.</p></details></section>`;
   box.querySelectorAll('[data-m5]').forEach((b) => b.addEventListener('click', () => mxOpen(b.dataset.m5, mk, S)));
 }
 /* 19 Nov 2026 (Amritpal): alert when a whole candle leaves a RISING 9 EMA; ride until a whole candle is below it. Info only.
@@ -6912,7 +6924,7 @@ async function tdMatrix(box, mk) {
     <small>${esc(MKT[mk].name)} · one row per stock · tap a name for its chart</small></span></summary>
     <div class="seg" id="mxsort" style="margin:6px 0"><button data-k="n" aria-selected="${!bySec}">Best score first</button><button data-k="sec" aria-selected="${bySec}">Strongest sector first</button></div>
     <div class="mxwrap"><table class="mxt"><thead><tr><th>Stock</th><th title="Overall score, see Top 5 on Home">Score</th><th title="Industry results season: ✓ strong + improving + cheap, ✗ weak">Res</th><th title="Industry rotation quadrant (weekly): L Leading, I Improving, W Weakening, G Lagging">Rot</th><th title="Industry volume flow, last 10 sessions: ▲▲ volume and price up, ▲▽ volume up price lagging, ▽▲ price up volume down, ▼▼ both down">Flow</th><th title="Industry Pulse rank (1 = strongest)">Ind</th>${cols.map(([, n, d]) => `<th title="${esc(d)}">${n}</th>`).join('')}</tr></thead>
-    <tbody>${show.map((x, i) => `<tr><th><span class="mxn">${i + 1}</span><a href="#" data-mxs="${esc(x.sym)}">${esc(x.sym)}</a><small class="mxtag ${x.s.tag || ''}">${x.s.tag ? `${esc(x.s.tag)}${x.s.rs != null ? ` · RS ${x.s.rs > 0 ? '+' : ''}${fmt(x.s.rs, 1)}%` : ''}` : 'no sector data'}</small></th><td><b class="mxsc">${x.sc}</b></td>${indCells(indOf(x.sym))}${cols.map(([k]) => cell(x.o[k])).join('')}</tr>`).join('')}</tbody></table></div>
+    <tbody>${show.map((x, i) => `<tr><th><span class="mxn">${i + 1}</span><a href="#" data-mxs="${esc(x.sym)}">${esc(x.sym)}</a><small class="mxtag ${x.s.tag || ''}">${x.s.tag ? `${esc(SECTOR_TXT[x.s.tag] || x.s.tag)}${secWk(x.s.ix, mk) ? ` · wk ${esc(secWk(x.s.ix, mk))}` : ''}${x.s.rs != null ? ` · RS ${x.s.rs > 0 ? '+' : ''}${fmt(x.s.rs, 1)}%` : ''}` : 'no sector data'}</small></th><td><b class="mxsc">${x.sc}</b></td>${indCells(indOf(x.sym))}${cols.map(([k]) => cell(x.o[k])).join('')}</tr>`).join('')}</tbody></table></div>
     ${rows.length > 12 ? `<button class="more" id="mxall">${all ? 'Show the top 12' : `Show all ${rows.length}`}</button>` : ''}
     <details class="info"><summary>How to read</summary><p class="muted td-rs">Industry columns: <b>Res</b> = results season (✓ strong + improving + cheap: +4.4% vs Nifty over 3 months in 2016–26; ✗ weak) · <b>Rot</b> = rotation quadrant (<span class="mxq" style="background:${RRG_Q.Leading}">L</span> Leading <span class="mxq" style="background:${RRG_Q.Improving}">I</span> Improving <span class="mxq" style="background:${RRG_Q.Weakening}">W</span> Weakening <span class="mxq" style="background:${RRG_Q.Lagging}">G</span> Lagging) · <b>Flow</b> = volume ▲▲ both up, ▲▽ volume up / price lagging, ▽▲ price up / volume down, ▼▼ both down · <b>Ind</b> = industry Pulse rank. Context only — tested, none of them improves entries.</p><p class="muted td-rs"><span class="mxd buy">Buy</span> signal now · <span class="mxd on">Open</span> the system's trade is still running · <span class="mxd on">✓</span> on the list · <span class="mxd watch">Near</span>/<span class="mxd watch">Setup</span> watch. <b>Open</b> = the system bought earlier and its exit rule has not fired yet (the system's trade, not your portfolio). Sector = the stock's sector index: leading / uptrend / mixed / weak, RS = 6-month return vs ${esc(MX_BENCH[mk] || 'the index')}. Columns: ${cols.map(([, n, d]) => `${n} = ${d}`).join('; ')}. Score as in Top 5 on Home: buy signals and strength count most; simply being in several lists was not consistently better in our tests. Stack is shown but not scored.</p></details></details>`;
   box.querySelectorAll('#mxsort button').forEach((b) => b.addEventListener('click', () => { state.mxSort = b.dataset.k; tdMatrix(box, mk); }));
