@@ -1373,3 +1373,7 @@ body.classic .dtg{display:none}
 .sw-share{margin:6px 0 4px}.sw-bar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--line)}.sw-bar span{display:block;height:100%}
 .sw-share small{display:block;margin-top:4px;font-size:12.5px;line-height:1.45;color:var(--muted)}
 .tds-note{margin:6px 2px;font-size:13.5px;line-height:1.45;padding:8px 10px;border-radius:10px;background:rgba(183,121,31,.12);border:1px solid rgba(183,121,31,.35)}
+/* 21 Nov 2026: the page must never slide sideways on iPhone (only the card rows scroll horizontally) */
+html,body{overflow-x:hidden;max-width:100%}
+@supports (overflow-x:clip){html,body{overflow-x:clip}}
+.t2-h{flex-wrap:wrap;gap:2px 10px}.t2-h small{min-width:0;overflow-wrap:anywhere}

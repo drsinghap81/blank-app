@@ -5051,9 +5051,12 @@ function rrgClean(items, sel, W = 360, H = 340, tails0 = false) {
   for (let v = Math.ceil((100 - dx) / stp) * stp; v <= 100 + dx; v += stp) g += `<text x="${X(v)}" y="${H - 6}" font-size="9" fill="#94A3B8" text-anchor="middle">${v}</text>`;
   const placed = [[X0, Y0, X0 + 62, Y0 + 16], [X1 - 56, Y0, X1, Y0 + 16], [X0, Y1 - 16, X0 + 56, Y1], [X1 - 70, Y1 - 16, X1, Y1]];
   const dots = heads.map((p) => [X(p[1]), Y(p[2])]);
-  const hit = (b) => placed.some((q) => !(b[2] < q[0] || b[0] > q[2] || b[3] < q[1] || b[1] > q[3])) || dots.some(([x, y]) => x > b[0] - 4 && x < b[2] + 4 && y > b[1] - 4 && y < b[3] + 4);
+  /* 21 Nov 2026 (Amritpal: crowded world map): labels keep clear of each dot's real radius (weighted dots are up to 14 px) */
+  const radOf = (r) => (r.w != null ? Math.max(3.5, Math.min(14, 3 + Math.sqrt(r.w) * 1.7)) : 5.5);
+  const rr = items.map((r) => Math.max(4, radOf(r)));
+  const hit = (b, self = -1) => placed.some((q) => !(b[2] < q[0] || b[0] > q[2] || b[3] < q[1] || b[1] > q[3])) || dots.some(([x, y], k) => k !== self && x > b[0] - rr[k] && x < b[2] + rr[k] && y > b[1] - rr[k] && y < b[3] + rr[k]);
   const order = items.map((r, i) => [r, i]).sort((a, b) => (b[0].nm === sel) - (a[0].nm === sel) || Math.abs(dots[b[1]][0] - cx) - Math.abs(dots[a[1]][0] - cx));
-  let tails = '', heads2 = '', labels = '';
+  let tails = '', heads2 = '', labels = '', pct = ''; const HS = [];
   const R = [[9, 0], [-9, 0], [0, -11], [0, 13], [14, -12], [-14, -12], [14, 14], [-14, 14], [24, 0], [-24, 0], [0, -24], [0, 26], [28, -22], [-28, -22], [28, 26], [-28, 26], [40, 0], [-40, 0], [0, -36], [0, 38]];
   order.forEach(([r, i]) => {
     const c = RRG_Q[r.now] || '#888'; const on = !sel || r.nm === sel; const P = r.pts;
@@ -5074,23 +5077,25 @@ function rrgClean(items, sel, W = 360, H = 340, tails0 = false) {
     const [hx, hy] = dots[i]; const o = out(P[P.length - 1]);
     const rad = r.w != null ? Math.max(3.5, Math.min(14, 3 + Math.sqrt(r.w) * 1.7)) + (r.nm === sel ? 1.5 : 0) : (r.nm === sel ? 7 : 5.5);
     const hollow = r.w == null && anyW;
-    heads2 += `<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="${(hollow ? 4.2 : rad).toFixed(1)}" fill="${hollow ? 'var(--card,#fff)' : c}" stroke="${hollow ? c : '#fff'}" stroke-width="${hollow ? 2 : 1.4}" opacity="${on ? 1 : 0.25}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer"/>`;
+    const hk = heads2.length; heads2 += `<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="${(hollow ? 4.2 : rad).toFixed(1)}" fill="${hollow ? 'var(--card,#fff)' : c}" fill-opacity="${rad >= 9.5 ? 0.82 : 1}" stroke="${hollow ? c : '#fff'}" stroke-width="${hollow ? 2 : 1.4}" opacity="${on ? 1 : 0.25}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer"/>`;
     /* 21 Nov 2026 (Amritpal: "show percentage weight inside the dots"): the % sits inside dots big enough to hold it; small dots
        carry it in their label instead */
     const inDot = r.w != null && rad >= 9.5;
-    if (inDot) heads2 += `<text x="${hx.toFixed(1)}" y="${(hy + 3.2).toFixed(1)}" text-anchor="middle" font-size="${Math.min(10, rad * 0.72).toFixed(1)}" font-weight="800" fill="#fff" opacity="${on ? 1 : 0.4}" style="pointer-events:none">${Math.round(r.w)}%</text>`;
+    if (inDot) pct += `<text x="${hx.toFixed(1)}" y="${(hy + 3.2).toFixed(1)}" text-anchor="middle" font-size="${Math.min(10, rad * 0.72).toFixed(1)}" font-weight="800" fill="#fff" opacity="${on ? 1 : 0.4}" style="pointer-events:none">${Math.round(r.w)}%</text>`;
+    HS.push([rad, heads2.slice(hk)]); heads2 = heads2.slice(0, hk);
     const t = RRG_SHORT(r.nm) + (r.w != null && !inDot ? ` ${r.w < 1 ? '<1' : Math.round(r.w)}%` : '') + (o ? ` ${P[P.length - 1][1] < 100 ? '◀' : '▶'} ${fmt(P[P.length - 1][1], 0)}` : ''), w = t.length * 5.6 + 2, h = 11;
     for (const [ox, oy] of R) {
       const gro = Math.max(0, rad - 5.5); const a = ox > 0 ? 's' : ox < 0 ? 'e' : 'm'; const tx = hx + ox + Math.sign(ox) * gro, ty = hy + oy + Math.sign(oy) * gro + 4;
       const x0 = a === 's' ? tx : a === 'e' ? tx - w : tx - w / 2; const b = [x0, ty - 9, x0 + w, ty - 9 + h];
-      if (b[0] < X0 + 1 || b[2] > X1 - 1 || b[1] < Y0 || b[3] > Y1 || hit(b)) continue;
+      if (b[0] < X0 + 1 || b[2] > X1 - 1 || b[1] < Y0 || b[3] > Y1 || hit(b, i)) continue;
       placed.push(b);
       const far = Math.hypot(ox, oy) > 15;
       if (far) labels += `<line x1="${hx.toFixed(1)}" y1="${hy.toFixed(1)}" x2="${(a === 's' ? b[0] : a === 'e' ? b[2] : tx).toFixed(1)}" y2="${(oy < 0 ? b[3] : oy > 0 ? b[1] : ty - 4).toFixed(1)}" stroke="currentColor" stroke-width="0.6" opacity="${on ? 0.45 : 0.15}"/>`;
-      labels += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" font-size="10" font-weight="${r.nm === sel ? 800 : 600}" fill="currentColor" text-anchor="${a === 's' ? 'start' : a === 'e' ? 'end' : 'middle'}" opacity="${on ? 1 : 0.3}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer">${esc(t)}</text>`;
+      labels += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" font-size="10" font-weight="${r.nm === sel ? 800 : 600}" fill="currentColor" stroke="var(--card,#111)" stroke-width="3" stroke-linejoin="round" paint-order="stroke" text-anchor="${a === 's' ? 'start' : a === 'e' ? 'end' : 'middle'}" opacity="${on ? 1 : 0.3}" data-rrgsel="${esc(r.nm)}" style="cursor:pointer">${esc(t)}</text>`;
       break;
     }
   });
+  heads2 = HS.sort((a, b) => b[0] - a[0]).map((x) => x[1]).join('') + pct;   // biggest dots underneath, % labels on top
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;max-width:100%;color:var(--ink,#111)" role="img" aria-label="Relative rotation chart"><defs><clipPath id="rrgclip"><rect x="${X0}" y="${Y0}" width="${X1 - X0}" height="${Y1 - Y0}"/></clipPath></defs>${g}<g clip-path="url(#rrgclip)">${tails}</g>${heads2}${labels}</svg>`;
 }
 async function rrgMount(el, G, mk, opts = {}) {
