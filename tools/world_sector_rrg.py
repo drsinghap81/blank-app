@@ -37,7 +37,15 @@ CFG = {
         "DOGE-USD": "Dogecoin", "TRX-USD": "Tron", "AVAX-USD": "Avalanche", "LINK-USD": "Chainlink", "DOT-USD": "Polkadot",
         "LTC-USD": "Litecoin", "BCH-USD": "Bitcoin Cash", "XLM-USD": "Stellar", "SHIB-USD": "Shiba Inu", "HBAR-USD": "Hedera",
         "NEAR-USD": "NEAR", "ATOM-USD": "Cosmos", "XMR-USD": "Monero", "ETC-USD": "Ethereum Classic"}),
+    # 21 Nov 2026 (Amritpal: "a world markets chart comparing all markets and other asset classes with a benchmark"): US-dollar ETFs
+    # (one currency, so the comparison is fair) vs MSCI All-Country World (ACWI = the global stock market); WORLDUSD = same set in US$
+    "WORLD": dict(bench=("ACWI", "MSCI All-Country World (ACWI)"), out="data/scan/world_rrg.json", names={
+        "SPY": "US S&P 500", "QQQ": "US Nasdaq 100", "IWM": "US small caps", "VGK": "Europe", "EWU": "UK", "EWG": "Germany", "EWJ": "Japan",
+        "MCHI": "China", "EWH": "Hong Kong", "INDA": "India", "EWA": "Australia", "EWY": "Korea", "EWT": "Taiwan", "EWZ": "Brazil",
+        "EWC": "Canada", "EEM": "Emerging mkts", "GLD": "Gold", "SLV": "Silver", "DBC": "Commodities", "USO": "Crude oil",
+        "TLT": "US long bonds", "AGG": "US bonds (all)", "EMB": "EM bonds", "UUP": "US dollar", "VNQ": "US real estate", "BTC-USD": "Bitcoin"}),
 }
+CFG["WORLDUSD"] = dict(bench=("USD", "US$ (absolute)"), out="data/scan/worldusd_rrg.json", names={"ACWI": "World stocks (ACWI)", **CFG["WORLD"]["names"]})
 
 
 def main(mk, dry=False):
