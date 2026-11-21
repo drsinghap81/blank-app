@@ -6738,7 +6738,7 @@ async function igWorldMap(box) {
   const qOf = (p) => (p[1] >= 100 ? (p[2] >= 100 ? 'Leading' : 'Weakening') : (p[2] >= 100 ? 'Improving' : 'Lagging'));
   await swLoad();
   const items = swAttach(Object.entries(R.weekly).map(([nm, r]) => ({ nm, now: r.now, was: r.pts.length >= 2 ? qOf(r.pts[r.pts.length - 2]) : r.now, pts: r.pts.slice(-4) })), 'WORLD')
-    .filter((r) => ['Leading', 'Improving'].includes(r.now) || r.now !== r.was || (r.wp && (r.w || 0) >= 8));   // the biggest markets always shown
+    .filter((r) => r.wp || r.nm === 'Gold');   // 21 Nov 2026 (Amritpal: "still clutter"): Today shows only the non-overlapping markets (+ gold); the full chart has every slice and asset
   if (!items.length) { m.hidden = true; return; }
   m.querySelector('.ig-map-c').innerHTML = rrgClean(items, null, 360, 230, false);
   const go = () => { Object.assign(state.mx, { lvl: 'world', m: null, sec: null, grp: null }); show('mk'); setTimeout(() => { const e = document.querySelector('#rrgbox'); if (e) e.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1800); };
@@ -7299,7 +7299,7 @@ async function tdRender2(el) {
   const stp = (n, go, name, cls, word, sub, body) => `<section class="tds"><button class="tds-h" data-go="${go}"><span class="tds-n">${n}</span><span class="tds-t"><b>${name}</b><small>${sub}</small></span><em class="${cls}">${word}</em><i aria-hidden="true">›</i></button>${body || ''}</section>`;
   const steps = () => `<div class="tdsx" id="tdsteps">
     ${stp(1, 'mk', 'World', wl ? (wl.risk_on && !wl.risk_watch ? 'ok' : 'warn') : '', wl ? (wl.risk_on ? (wl.risk_watch ? 'Risk on · watch' : 'Risk on') : 'Risk off') : '–', WI.length ? `${wUp} of ${WI.length} world indices in an uptrend` : '',
-      '<div class="ig-wmap tds-map" role="button" tabindex="0" aria-label="Open the world rotation chart"><div class="ig-map-h"><span>markets &amp; assets vs world stocks · tap for the full chart</span></div><div class="ig-map-c"></div></div>')}
+      '<div class="ig-wmap tds-map" role="button" tabindex="0" aria-label="Open the world rotation chart"><div class="ig-map-h"><span>main markets vs world stocks · tap for all assets</span></div><div class="ig-map-c"></div></div>')}
     ${stp(2, 'inv', `${esc(MKT[mk].name)} · ${esc(MX_BENCH[mk])}`, wi ? (ok && !wi.below_now ? 'ok' : 'warn') : '', wi ? (ok ? (wi.below_now ? 'Uptrend · below 30-wk now' : 'Uptrend') : 'Below 30-wk') : '–', wi ? `${fmt(Math.abs(wi.from_high), 1)}% below its high` : '', '<div id="tdhero"></div>')}
     ${stp(3, 'mk', 'Sectors', secL.length ? 'ok' : 'warn', secL.length ? `${secL.length} leading` : 'None leading', secL.length ? 'strongest: ' + secL.slice(0, 3).map(([k]) => esc((sec.names && sec.names[k]) || secName(k))).join(', ') : 'no sector is beating the index',
       '<div class="ig-map tds-map" role="button" tabindex="0" aria-label="Open the full rotation chart"><div class="ig-map-h"><span>sectors vs the index · tap for the full chart</span></div><div class="ig-map-c"></div></div>')}

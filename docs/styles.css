@@ -1377,3 +1377,6 @@ body.classic .dtg{display:none}
 html,body{overflow-x:hidden;max-width:100%}
 @supports (overflow-x:clip){html,body{overflow-x:clip}}
 .t2-h{flex-wrap:wrap;gap:2px 10px}.t2-h small{min-width:0;overflow-wrap:anywhere}
+/* 21 Nov 2026: iPhone zoom - no double-tap zoom, and no auto-zoom when a search box gets focus (iOS zooms inputs under 16px) */
+html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+input,select,textarea{font-size:16px!important}
