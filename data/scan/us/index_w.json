@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T05:32+00:00",
+ "generated": "2026-11-21T06:24+00:00",
  "asof": "2026-11-20",
  "market": "US",
  "rows": [
@@ -94,27 +94,6 @@
    "line_now": 44.06,
    "dist_pct": 3.2,
    "chart": "xlu"
-  },
-  {
-   "index": "Regional Banks (KRE)",
-   "ticker": "KRE",
-   "status": "forming",
-   "stage": "2nd low now",
-   "low1": "2026-10-14",
-   "low1_close": 68.54,
-   "low2": "2026-11-20",
-   "low2_close": 68.32,
-   "high": 77.49,
-   "high_date": "2026-08-14",
-   "mid": 74.13,
-   "mid_date": "2026-11-04",
-   "rsi_div": false,
-   "close": 68.32,
-   "asof": "2026-11-20",
-   "neckline": 74.13,
-   "line_now": 73.42,
-   "dist_pct": 7.5,
-   "chart": "kre"
   },
   {
    "index": "Communication (XLC)",
