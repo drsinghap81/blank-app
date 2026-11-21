@@ -30,14 +30,21 @@ CFG = {
         "TRX-USD": "Tron", "AVAX-USD": "Avalanche", "LINK-USD": "Chainlink", "DOT-USD": "Polkadot", "LTC-USD": "Litecoin",
         "BCH-USD": "Bitcoin Cash", "XLM-USD": "Stellar", "SHIB-USD": "Shiba Inu", "HBAR-USD": "Hedera", "NEAR-USD": "NEAR",
         "ATOM-USD": "Cosmos", "XMR-USD": "Monero", "ETC-USD": "Ethereum Classic"}),
+    # 21 Nov 2026 (Amritpal: "coins look improving / leading but they are all falling - is it because BTC is also falling?"):
+    # the same coins plus Bitcoin against US dollars (absolute trend: RS = price itself)
+    "CRYPTOUSD": dict(bench=("USD", "US$ (absolute)"), out="data/scan/cryptousd_rrg.json", names={
+        "BTC-USD": "Bitcoin", "ETH-USD": "Ether", "SOL-USD": "Solana", "XRP-USD": "XRP", "BNB-USD": "BNB", "ADA-USD": "Cardano",
+        "DOGE-USD": "Dogecoin", "TRX-USD": "Tron", "AVAX-USD": "Avalanche", "LINK-USD": "Chainlink", "DOT-USD": "Polkadot",
+        "LTC-USD": "Litecoin", "BCH-USD": "Bitcoin Cash", "XLM-USD": "Stellar", "SHIB-USD": "Shiba Inu", "HBAR-USD": "Hedera",
+        "NEAR-USD": "NEAR", "ATOM-USD": "Cosmos", "XMR-USD": "Monero", "ETC-USD": "Ethereum Classic"}),
 }
 
 
 def main(mk, dry=False):
     cf = CFG[mk]; b, bname = cf["bench"]
-    d = yf.download(list(cf["names"]) + [b], period="2y", interval="1d", progress=False, auto_adjust=True, group_by="column", threads=True)["Close"]
+    d = yf.download(list(cf["names"]) + ([] if b == "USD" else [b]), period="2y", interval="1d", progress=False, auto_adjust=True, group_by="column", threads=True)["Close"]
     d = d.dropna(how="all").ffill()
-    bench = d.pop(b); C = d[[k for k in cf["names"] if k in d.columns and d[k].notna().sum() > 120]]
+    bench = pd.Series(1.0, index=d.index) if b == "USD" else d.pop(b); C = d[[k for k in cf["names"] if k in d.columns and d[k].notna().sum() > 120]]
     print(mk, "got", list(C.columns), "last", C.index[-1].date(), flush=True)
     W = C.resample("W-FRI").last(); BW = bench.resample("W-FRI").last()
     if W.index[-1] > C.index[-1]:
