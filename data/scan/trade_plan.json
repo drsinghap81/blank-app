@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-21 04:12 UTC",
+"generated": "2026-11-21 04:13 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-20",
@@ -926,7 +926,7 @@
 "group_rank": 40,
 "rank": 7,
 "risk_pct": 10.8,
-"r3m": null
+"r3m": 17.2
 },
 {
 "id": "RET-ENTERO-2026-11-20",
