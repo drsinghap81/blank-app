@@ -116,7 +116,7 @@ def uk():
     return {sec_names.get(norm(k), k): dict(w=round(float(100 * v / tot), 2), n=int((D.sec == k).sum()), part=True) for k, v in g.items()}
 
 
-EUROPE = {"United Kingdom", "France", "Germany", "Switzerland", "Netherlands", "Sweden", "Denmark", "Italy", "Spain", "Finland", "Belgium",
+_EUROPE_UNUSED = {"United Kingdom", "France", "Germany", "Switzerland", "Netherlands", "Sweden", "Denmark", "Italy", "Spain", "Finland", "Belgium",
           "Norway", "Ireland", "Austria", "Portugal", "Poland", "Greece", "Czech Republic", "Hungary"}
 EM = {"China", "Taiwan", "India", "Korea (South)", "Brazil", "Saudi Arabia", "South Africa", "Mexico", "Indonesia", "Thailand", "Malaysia",
       "United Arab Emirates", "Qatar", "Kuwait", "Poland", "Turkey", "Philippines", "Chile", "Greece", "Peru", "Hungary", "Czech Republic",
@@ -124,35 +124,58 @@ EM = {"China", "Taiwan", "India", "Korea (South)", "Brazil", "Saudi Arabia", "So
 
 
 def world():
-    """21 Nov 2026 (Amritpal: "I can't see bigger dots" on the world map): each market's share of world stocks = MSCI ACWI country
-    weights from the iShares ACWI holdings file (Location column). Bonds, gold, oil, the dollar and Bitcoin are not world stocks:
-    no weight. US Nasdaq 100 / small caps are slices of the US: no weight of their own."""
-    import io
+    """21 Nov 2026 (Amritpal: "I can't see bigger dots" on the world map -> "size every market"): each market's share of world stocks
+    = MSCI ACWI country weights from the iShares ACWI product page (country table). Markets the table folds into "Other" are scaled
+    from the matching iShares fund through a country both tables list: Emerging markets + Brazil via EEM (by India, China, Taiwan,
+    Korea), Hong Kong via EPP (by Australia), Europe via IEUR (by UK, France, Germany, Switzerland, Netherlands).
+    US Nasdaq 100 = Nasdaq-100 market value (QQQ's top-10 holdings / their weights) over the US market (3,000 largest US caps), times
+    the US weight; US small caps = US stocks ranked 1,001-3,000 by market cap (Russell 2000 rule), same scaling.
+    Bonds, gold, oil, the dollar and Bitcoin are not world stocks: no weight (hollow dots)."""
+    import re as _re
     import requests
-    url = "https://www.ishares.com/us/products/239600/ishares-msci-acwi-etf/1467271812596.ajax?fileType=csv&fileName=ACWI_holdings&dataType=fund"
-    t = requests.get(url, timeout=60, headers={"User-Agent": "Mozilla/5.0"}).text
-    lines = t.splitlines(); h = next(i for i, l in enumerate(lines) if l.startswith("Ticker,"))
-    D = pd.read_csv(io.StringIO("\n".join(lines[h:])), thousands=",")
-    D = D[pd.to_numeric(D["Weight (%)"], errors="coerce").notna()]; D["w"] = D["Weight (%)"].astype(float)
-    D = D[D["Asset Class"].astype(str).str.contains("Equity", case=False)]
-    c = D.groupby("Location").w.sum(); c = 100 * c / c.sum()
-    g = lambda *xs: float(sum(c.get(x, 0) for x in xs))  # noqa: E731
+    H = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"}
+
+    def table(pid):
+        t = requests.get(f"https://www.ishares.com/us/products/{pid}/", headers=H, timeout=60).text
+        rows = _re.findall(r'_ws-colType[^"]*">([^<]+)</td><td class="_ws-colFund[^"]*">(-?[\d.]+)%', t)
+        out = {}
+        for k, v in rows:
+            out.setdefault(k.strip(), float(v))   # first table on the page = countries (sectors use other names)
+        return out
+    A = table(239600)
+    if len(A) < 8:
+        raise RuntimeError(f"ACWI country table not found ({len(A)} rows)")
+
+    def scale(T, keys):
+        r = [A[k] / T[k] for k in keys if A.get(k) and T.get(k)]
+        return sum(r) / len(r) if r else None
+    EMt, EPPt, EUt = table(239637), table(239674), table(264617)
+    em = scale(EMt, ["India", "China", "Taiwan", "Korea (South)"]); px = scale(EPPt, ["Australia"])
+    eu = scale(EUt, ["United Kingdom", "France", "Germany", "Switzerland", "Netherlands"])
+    g = lambda k: A.get(k, 0.0)  # noqa: E731
     m = {"US S&P 500": g("United States"), "UK": g("United Kingdom"), "Germany": g("Germany"), "Japan": g("Japan"), "China": g("China"),
-         "Hong Kong": g("Hong Kong"), "India": g("India"), "Australia": g("Australia"), "Korea": g("Korea (South)"), "Taiwan": g("Taiwan"),
-         "Brazil": g("Brazil"), "Canada": g("Canada"), "Europe": g(*EUROPE), "Emerging mkts": g(*EM)}
-    print("ACWI countries", len(c), "top", c.sort_values(ascending=False).head(8).round(1).to_dict())
-    us = D[D.Location == "United States"]
-    if "Exchange" in us:   # Nasdaq 100 ~ the 100 largest Nasdaq-listed US names in ACWI
-        nq = us[us.Exchange.astype(str).str.contains("NASDAQ", case=False)].nlargest(100, "w").w.sum()
-        m["US Nasdaq 100"] = float(100 * nq / D.w.sum())
-    try:   # US small caps ~ Russell 2000 = US stocks ranked 1,001-3,000 by market cap, as a share of the US market, times the US weight
-        mc = sorted(caps("data/scan/us/fundamentals.json").values(), reverse=True)
-        if len(mc) > 1500:
-            m["US small caps"] = float(m["US S&P 500"] * sum(mc[1000:3000]) / sum(mc[:3000]))
+         "India": g("India"), "Australia": g("Australia"), "Korea": g("Korea (South)"), "Taiwan": g("Taiwan"), "Canada": g("Canada")}
+    if em:
+        m["Emerging mkts"] = 100 * em; m["Brazil"] = EMt.get("Brazil", 0) * em
+    if px:
+        m["Hong Kong"] = EPPt.get("Hong Kong", 0) * px
+    if eu:
+        m["Europe"] = 100 * eu
+    try:
+        import yfinance as yf
+        mc = caps("data/scan/us/fundamentals.json"); us = sorted(mc.values(), reverse=True)[:3000]; ust = sum(us)
+        th = yf.Ticker("QQQ").funds_data.top_holdings
+        hw = {str(sym): float(r.iloc[-1]) for sym, r in th.iterrows()}
+        cov = sum(w for s_, w in hw.items() if s_ in mc)
+        if cov > 0.2:
+            ndx = sum(mc[s_] for s_ in hw if s_ in mc) / cov
+            m["US Nasdaq 100"] = m["US S&P 500"] * min(1.0, ndx / ust)
+        m["US small caps"] = m["US S&P 500"] * sum(us[1000:3000]) / ust
     except Exception as e:  # noqa: BLE001
-        print("small caps", e)
+        print("US slices", e)
+    print("ACWI table", A, "| scales em/px/eu", em, px, eu)
     part = {"US S&P 500", "Japan", "China", "Hong Kong", "India", "Australia", "Korea", "Taiwan", "Brazil", "Canada", "Europe"}
-    return {k: dict(w=round(v, 2), part=k in part) for k, v in m.items() if v > 0}
+    return {k: dict(w=round(float(v), 2), part=k in part) for k, v in m.items() if v and v > 0}
 
 
 def main():
