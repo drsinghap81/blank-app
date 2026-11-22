@@ -207,7 +207,7 @@ def main():
     for r in G:
         for m in r["members"]:
             if m.get("liquid"):
-                s2m[m["symbol"]] = r.get("macro") or r.get("sector")
+                s2m[m["symbol"]] = r.get("sector") or r.get("macro")   # NSE sector names = NSDL sector names
     syms = sorted(s2m)
     if PILOT:
         syms = syms[:400]

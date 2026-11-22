@@ -126,6 +126,12 @@ def main():
                 rows[vn].append(dict(sym=sym, side=1, entry=D[j0], exit=D[j], e=e, risk=risk, ret=ret, r_mult=ret / risk, half=False, days=j - j0,
                                      adx=s["pole"], stopped=sp, hit=bool(h[j0:j + 1].max(initial=0) >= s["tgt"]), shape=s["shape"], lane=s["lane"], year=D[t].year))
     print("R| panel", len(P), "stocks,", nsig, "breakouts since Jun 2016", flush=True)
+    FII = os.environ.get("FII") == "1"
+    if FII:     # 22 Nov 2026 "test all systems against regular FII buying": the live flag rule (VARS[7]) gated by tools/research/fii_gate.py
+        import fii_gate as FG
+        G = FG.gates(nif.index); base = rows[VARS[7]]
+        ok_ = lambda k, dt: bool(G[k].iloc[max(0, G.index.searchsorted(dt, side="right") - 1)])  # noqa: E731
+        rows = {"live flag rule (tight + volume + room)": base, **{FG.NAMES[k]: [r for r in base if ok_(k, r["entry"])] for k in FG.NAMES}}
     res = dict(method=__doc__, stocks=len(P), signals=nsig, nifty=report(pd.Series({dd: float(nif.asof(dd)) for dd in days}), bull), runs={})
     for vn, L in rows.items():
         T = pd.DataFrame(L)
@@ -141,6 +147,8 @@ def main():
         print(f"R| {vn} | trades {tr['all']} | 1y {tr['last 1y']} | 2y {tr['last 2y']} | 5y {tr['last 5y']}", flush=True)
         print(f"R| {vn} | portfolio {rp}", flush=True)
     os.makedirs("data/research", exist_ok=True)
+    if FII:
+        json.dump(res, open("data/research/fii_flags" + ("_pilot" if PILOT else "") + ".json", "w"), indent=1, default=str); return
     json.dump(res, open("data/research/flag_volume" + ("_high" if os.environ.get("BO") == "high" else "") + ("_pilot" if PILOT else "") + ".json", "w"), indent=1, default=str)
 
 

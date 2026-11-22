@@ -112,11 +112,21 @@ def run(name, D, L, bench, mk, res):
     S["light"] = [L.iloc[max(0, L.index.searchsorted(t, side="right") - 1)] if len(L) else None for t in S.sig]
     bull = bench > bench.rolling(200).mean()
     out = {"signals": len(S), "by light": S.light.value_counts().to_dict()}
-    for var in ("no filter", "skip RED", "wait for non-RED"):
+    VARS = ("no filter", "skip RED", "wait for non-RED")
+    if FIIG is not None:                     # 22 Nov 2026 FII mode: tools/research/fii_gate.py gates instead of the light
+        import fii_gate as FG
+        VARS = ("no filter",) + tuple(FG.NAMES)
+    for var in VARS:
         T = []; last_exit = {}
         for r in S.sort_values("sig").itertuples():
             x = D[r.sym]; d0 = r.sig
-            if var != "no filter" and r.light == "RED":
+            if FIIG is not None and var != "no filter":
+                rest = x.index[x.index > d0]
+                if len(rest):
+                    gi = FIIG.index.searchsorted(rest[0], side="right") - 1
+                    if gi >= 0 and not bool(FIIG[var].iloc[gi]):
+                        continue
+            elif var != "no filter" and r.light == "RED":
                 if var == "skip RED":
                     continue
                 nxt = L[(L.index > d0) & (L != "RED")].index[:1]
@@ -143,14 +153,22 @@ def run(name, D, L, bench, mk, res):
     res[name] = out
 
 
+FIIG = None
+
+
 def main():
+    global FIIG
     F = json.load(open("data/scan/funds.json"))["rows"]
     res = dict(method=__doc__)
-    for mk in (["NSE"] if PILOT else ["NSE", "US", "ASX", "UK"]):
+    FII = os.environ.get("FII") == "1"
+    for mk in (["NSE"] if PILOT or FII else ["NSE", "US", "ASX", "UK"]):
         try:
             L, bench = light(mk)
         except Exception as e:  # noqa: BLE001
             print("R|", mk, "light failed", e, flush=True); continue
+        if FII:
+            import fii_gate as FG
+            FIIG = FG.gates(L.index); res["gates"] = FG.NAMES
         print(f"R| {mk} light days {len(L)}: {L.value_counts(normalize=True).round(3).to_dict()}", flush=True)
         keys = [r for r in F if r.get("market") == FMK[mk] and r.get("kind") == "etf" and not LEV.search(r.get("name", ""))]
         tick = []
@@ -163,7 +181,10 @@ def main():
             ix = pd.read_csv("data/scan/index_ohlcv.csv.gz", parse_dates=["Date"])
             DI = {k: g.set_index("Date").sort_index()[["Close"]].assign(Open=lambda z: z.Close.shift(1).fillna(z.Close)) for k, g in ix.groupby("INDEX")}
             run(f"NSE indices ({len(DI)})", DI, L, bench, mk, res)
-    if not PILOT:
+    if FII:
+        os.makedirs("data/research", exist_ok=True)
+        json.dump(res, open("data/research/fii_etf" + ("_pilot" if PILOT else "") + ".json", "w"), indent=1, default=str)
+    elif not PILOT:
         os.makedirs("data/research", exist_ok=True)
         json.dump(res, open("data/research/etf_red_skip.json", "w"), indent=1, default=str)
 

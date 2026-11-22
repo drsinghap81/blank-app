@@ -27,7 +27,7 @@ import industry_basket_intraday as B  # noqa: E402
 from rotation_pulse import report  # noqa: E402
 
 IND, SYMS = B.IND, B.SYMS
-LIMIT = bool(os.environ.get("LIMIT"))
+LIMIT = os.environ.get("LIMIT", "0") not in ("", "0")
 COST = 0.002; MINVAL = 1e7; MINPX = 50
 
 
@@ -106,11 +106,14 @@ def main():
                 keep.append(s)
         return {s: 1.0 for s in keep}
 
-    def sim(mode, fill):
+    def sim(mode, fill, gate=None):
         val, eq, held, wts, turn = 1.0, [], [], {}, 0.0
         nh = []
         for a, b in zip(weeks[:-1], weeks[1:]):
-            new = pick(a, mode, held); tot = sum(new.values()) or 1
+            new = pick(a, mode, held)
+            if gate is not None and not bool(gate.get(a, True)):        # FII gate off: no new buys, holdings follow their rules
+                new = {s: 1.0 for s in held if s in new}
+            tot = sum(new.values()) or 1
             nw = {s: v / tot for s, v in new.items()}
             ch = sum(abs(nw.get(s, 0) - wts.get(s, 0)) for s in set(nw) | set(wts)); turn += ch
             if fill == "FRI":
@@ -140,6 +143,15 @@ def main():
     bull = (nifty > nifty.rolling(200).mean())
     res = dict(method=__doc__, industries=len(mem), stocks=C.shape[1], runs={})
     print("R| industries", len(mem), "stocks", C.shape[1], "weeks", len(weeks), flush=True)
+    if os.environ.get("FII") == "1":     # 22 Nov 2026: "test all systems against regular FII buying" (tools/research/fii_gate.py)
+        import fii_gate as FG
+        G = FG.gates(C.index); res["gates"] = FG.NAMES
+        for nm, col in [("TOP10 MON (live rule)", None)] + [(FG.NAMES[k], k) for k in FG.NAMES]:
+            e, tpy, avgn = sim("top10", "MON", None if col is None else G[col])
+            rp = report(e, bull); rp["turnover_x_per_year"] = tpy; rp["avg_holdings"] = avgn
+            res["runs"][nm] = rp; print(f"R| Pulse rotation | {nm} | {rp}", flush=True)
+        json.dump(res, open("data/research/fii_pulse_rot" + ("_pilot" if LIMIT else "") + ".json", "w"), indent=1, default=str)
+        return
     for nm, mode in (("TOP10 strong-Pulse + rotation industries", "top10"), ("TOP5", "top5"), ("BASKET (all stocks of those industries)", "basket"),
                      ("TOP10 ANY industry (control)", "any"), ("TOP10 top-10% Pulse only, no rotation (control)", "pulse_only"), ("ALL industries' stocks", "all")):
         for fill in ("FRI", "MON"):
