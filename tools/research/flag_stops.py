@@ -96,7 +96,10 @@ def signals(x):
             lane = "early" if near else "established" if est else None
             if not lane:
                 continue
-            if not c[t] > k_ * t + b_ or pk in used:
+            # BO=high (22 Nov 2026, Amritpal: "DATAPATTNS is still not broken out"): breakout = a close above the flag's highest high,
+            # not just above its falling top line
+            lvl = h[a:b].max() if os.environ.get("BO") == "high" else k_ * t + b_
+            if not c[t] > lvl or pk in used:
                 break
             used.add(pk); e = c[t]
             out.append(dict(t=t, e=e, shape=shape, lane=lane, pole=top / base - 1, tgt=e + (top - base), fl=min(plo, l[t]), pk=pk, lo_i=lo_i, a=a, b=b, depth=depth,

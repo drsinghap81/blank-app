@@ -133,7 +133,7 @@ def main():
         print(f"R| {vn} | trades {tr['all']} | 1y {tr['last 1y']} | 2y {tr['last 2y']} | 5y {tr['last 5y']}", flush=True)
         print(f"R| {vn} | portfolio {rp}", flush=True)
     os.makedirs("data/research", exist_ok=True)
-    json.dump(res, open("data/research/flag_volume" + ("_pilot" if PILOT else "") + ".json", "w"), indent=1, default=str)
+    json.dump(res, open("data/research/flag_volume" + ("_high" if os.environ.get("BO") == "high" else "") + ("_pilot" if PILOT else "") + ".json", "w"), indent=1, default=str)
 
 
 if __name__ == "__main__":
