@@ -8165,7 +8165,8 @@ async function tdRender3(el) {
     if (!((al[b] ?? 0) > 0)) return false; seen.add(r.symbol); return r.stop && (r.trigger || r.price) > r.stop; });
   const red = L && L.lvl === 'red';
   const C = rows.map((r) => { const G = t3Grade(null, r, X); const e = r.trigger || r.price; const z = t2Shares(e, r.stop, mk);
-    return { r, ...G, e, z, wait: !!r.trigger || (red && bkOf(r) === 'mom'), inv: bkOf(r) === 'mom', px: X.price(r.symbol) }; })
+    const sd = ((r.id || '').match(/(\d{4}-\d{2}-\d{2})$/) || [])[1] || null;   // 22 Nov 2026: signal date from the plan id
+    return { r, ...G, e, z, wait: !!r.trigger || (red && bkOf(r) === 'mom'), inv: bkOf(r) === 'mom', px: X.price(r.symbol), sd, isNew: !!sd && sd >= P.asof }; })
     .sort((a, b) => (a.wait - b.wait) || ('ABC'.indexOf(a.g) - 'ABC'.indexOf(b.g)) || ((b.r.score || 0) - (a.r.score || 0)));
   /* same slots as the plan: up to 6 Momentum + 4 Trader buys a day; the rest fold under "more signals" */
   const ready = C.filter((c) => !c.wait), waits = C.filter((c) => c.wait);
@@ -8173,7 +8174,7 @@ async function tdRender3(el) {
   const extraB = ready.filter((c) => !buys.includes(c));
   const sells = (P.exits || []).filter((e) => H.has(e.symbol));
   const tot = buys.reduce((a, c) => a + (c.z ? c.z.val : 0), 0);
-  state._t3 = { C, mk, X };
+  state._t3 = { C, mk, X }; state._t3L = L;
   const LV = L ? L.lvl : 'green'; const word = { green: 'Go', amber: 'Careful', red: 'Pause' }[LV] || 'Go';
   const line = { green: 'Market is up. You can be fully invested.', amber: 'One warning. Trade normally, keep stops tight.', red: 'No new Momentum buys today. Open trades keep their stops.' }[LV];
   /* every leading industry names how many of today's buys belong to it (Amritpal: "banks lead but no stock listed is banks") */
@@ -8187,21 +8188,24 @@ async function tdRender3(el) {
     return `<article class="t3-card"><div class="t3-ch"><span class="t3-g g${c.g}">${c.g}</span><span class="t3-nm" role="button" tabindex="0" data-sp="${i}"><b>${esc(r.symbol)}</b><small>${esc(BK_SHORT[bkOf(r)] || r.system)}${r.late_pct != null && r.late_pct > 5 ? ` · ${fmt(r.late_pct, 0)}% late` : ''}</small></span>
       <span class="t3-amt"><b>${c.z ? Lk(c.z.val) : '–'}</b><small>${c.z ? c.z.q.toLocaleString(MKT[mk].loc) + ' sh' : 'set capital'}</small></span></div>
       ${t3Bars(c.ch)}
-      <div class="t3-pills">${t3Px(c.px)}${t3Yoy(c.y)}${t3Pill('bad', `Stop −${fmt(c.stopP, 0)}%`)}</div>
+      <div class="t3-pills">${c.isNew ? t3Pill('ok', 'New today') : c.sd ? t3Pill('', 'Signal ' + esc(day(c.sd))) : ''}${t3Px(c.px)}${t3Yoy(c.y)}${t3Pill('bad', `Stop −${fmt(c.stopP, 0)}%`)}${mk === 'NSE' ? govChip(r.symbol, 'NSE') : ''}</div>
       <div class="t3-act"><button class="t3-why" data-why="${i}">Why?</button><button class="t3-buy" data-buy="${i}">${c.z ? `Buy ${c.z.q.toLocaleString(MKT[mk].loc)} at ${Mz(c.e, mk === 'NSE' ? 0 : 2)}` : 'Chart & plan'}</button></div></article>`; };
   el.innerHTML = `<div class="t3">
     <div class="t3-top">${seg}<span class="muted">${P.asof ? 'Plan from the ' + esc(new Date(P.asof + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })) + ' close' : ''}</span></div>
     <section class="t3-hero ${LV}"><span class="t3-word">${word}</span><div class="t3-hl"><b>${line}</b>
       <div class="t3-path">${chip(X.wq === 'L' ? 'ok' : X.wq === 'G' ? 'bad' : '', `World · ${esc(MKT[mk].name)} ${T3N[X.wq].toLowerCase()}`, 'data-go3="mk"')}${arrow}
         ${lead.length ? lead.map((x) => chip(x.n ? 'ok on' : '', `${esc(x.g)} leads${x.n ? ` · ${x.n} buy${x.n > 1 ? 's' : ''}` : ' · no buy yet'}`, x.n ? `data-ind3="${esc(x.g)}"` : 'data-go3="mk"')).join(arrow) : chip('', 'No industry leading', 'data-go3="mk"')}</div></div></section>
-    <section class="t3-tiles"><button class="t3-tile buy" data-jump="t3buys"><small>Buy</small><b>${buys.length}</b><span>${tot ? Lk(tot) : 'today'}</span></button>
-      <button class="t3-tile sell" data-jump="t3sells"><small>Sell first</small><b>${sells.length}</b><span>${H.size ? 'from your holdings' : 'load holdings'}</span></button>
-      <button class="t3-tile" data-jump="t3wait"><small>Waiting</small><b>${waits.length}</b><span>orders set</span></button></section>
+    ${t3Info(mk, L, X, buys)}
+    <section class="t3-tiles"><button class="t3-tile buy" data-show3="t3buys" aria-pressed="${state.t3Show === 't3buys'}"><small>Buy</small><b>${buys.length}</b><span>${buys.filter((c) => c.isNew).length} new · ${tot ? Lk(tot) : 'today'}</span></button>
+      <button class="t3-tile sell" data-show3="t3sells" aria-pressed="${state.t3Show === 't3sells'}"><small>Sell first</small><b>${sells.length}</b><span>${H.size ? 'from your holdings' : 'load holdings'}</span></button>
+      <button class="t3-tile" data-show3="t3wait" aria-pressed="${state.t3Show === 't3wait'}"><small>Waiting</small><b>${waits.length}</b><span>orders set</span></button></section>
     ${sells.length ? `<section id="t3sells" class="t3-sec"><h2>Sell first</h2><div class="t3-sells">${sells.map((s) => `<button class="t3-sell" data-sell="${esc(s.symbol)}"><b>${esc(s.symbol)}</b><small>${esc(s.why || '')}</small></button>`).join('')}</div></section>` : ''}
     <section id="t3buys" class="t3-sec"><div class="t3-sh"><h2>Buy today</h2><div class="t3-seg" role="group" aria-label="Show">${[['all', 'All'], ['inv', 'Investor'], ['tr', 'Trader']].map(([k, n]) => `<button data-m3="${k}" aria-pressed="${mode === k}">${n}</button>`).join('')}</div></div>
       ${mode !== 'all' && mode !== 'inv' && mode !== 'tr' ? `<p class="t3-note">${esc(mode)} only · <button class="t3-link" data-m3="all">show all</button></p>` : ''}
       ${red ? '<p class="t3-note bad">Pause light: Momentum buys wait (tested: skipping red-light buys helped).</p>' : ''}
-      <div class="t3-grid">${shown.map(card).join('') || '<p class="empty">No buys for this filter today.</p>'}${state.t3All ? extraB.filter((c) => mode === 'all' || (mode === 'inv' ? c.inv : mode === 'tr' ? !c.inv : X.grp[c.r.symbol] === mode)).map(card).join('') : ''}</div>
+      <div class="t3-grid">${shown.filter((c) => c.isNew).map(card).join('') || `<p class="empty">No new signal at the last close${shown.length ? ' - the ones below are still valid' : ''}.</p>`}</div>
+      ${shown.some((c) => !c.isNew) ? `<details class="t3-old" ${shown.every((c) => !c.isNew) ? 'open' : ''}><summary>Still valid from earlier days (${shown.filter((c) => !c.isNew).length})</summary><div class="t3-grid">${shown.filter((c) => !c.isNew).map(card).join('')}</div></details>` : ''}
+      <div class="t3-grid">${state.t3All ? extraB.filter((c) => mode === 'all' || (mode === 'inv' ? c.inv : mode === 'tr' ? !c.inv : X.grp[c.r.symbol] === mode)).map(card).join('') : ''}</div>
       ${extraB.length && !state.t3All ? `<button class="t3-link" id="t3allb">+ ${extraB.length} more signals beyond today's slots</button>` : ''}</section>
     ${waits.length ? `<section id="t3wait" class="t3-sec"><h2>Waiting</h2><div class="t3-waits">${waits.map((c) => `<button class="t3-wt" data-why="${C.indexOf(c)}"><span class="t3-g g${c.g} sm">${c.g}</span><b>${esc(c.r.symbol)}</b><small>${c.r.trigger ? 'buys above ' + Mz(c.r.trigger, 2) : 'after the pause'}</small></button>`).join('')}</div></section>` : ''}
     <div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((q) => `<span><i style="background:${T3C[q]}"></i>${T3N[q]}</span>`).join('')}<span>· A/B/C = strength, not a rule</span></div>
@@ -8211,7 +8215,13 @@ async function tdRender3(el) {
   el.querySelectorAll('[data-m3]').forEach((b) => b.addEventListener('click', () => { state.t3Mode = b.dataset.m3; tdRender3(el); }));
   el.querySelectorAll('[data-ind3]').forEach((b) => b.addEventListener('click', () => { state.t3Mode = b.dataset.ind3; tdRender3(el); }));
   el.querySelectorAll('[data-go3]').forEach((b) => b.addEventListener('click', () => show(b.dataset.go3)));
-  el.querySelectorAll('[data-jump]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.jump); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+  // 22 Nov 2026 (Amritpal: "Today tab still filtering same stocks"): the count tiles SHOW only that list (tap again for everything)
+  const showSec = () => { ['t3buys', 't3sells', 't3wait'].forEach((id) => { const t = document.getElementById(id); if (t) t.style.display = !state.t3Show || state.t3Show === id ? '' : 'none'; });
+    el.querySelectorAll('[data-show3]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.show3 === state.t3Show))); };
+  showSec();
+  el.querySelectorAll('[data-show3]').forEach((b) => b.addEventListener('click', () => { state.t3Show = state.t3Show === b.dataset.show3 ? null : b.dataset.show3; showSec();
+    const t = document.getElementById(b.dataset.show3); if (t && state.t3Show) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+  el.querySelectorAll('[data-ig]').forEach((b) => b.addEventListener('click', () => t3InfoGo(b.dataset.ig, mk, X)));
   el.querySelectorAll('[data-why]').forEach((b) => b.addEventListener('click', () => t3Why(C[+b.dataset.why], X)));
   el.querySelectorAll('[data-sp]').forEach((b) => b.addEventListener('click', () => stockPage({ mk, sym: C[+b.dataset.sp].r.symbol, name: C[+b.dataset.sp].r.name, kind: 'stock' })));
   el.querySelectorAll('[data-buy]').forEach((b) => b.addEventListener('click', () => tdChart(C[+b.dataset.buy].r, mk)));
@@ -8219,6 +8229,43 @@ async function tdRender3(el) {
   $('#t3v2').addEventListener('click', () => { try { localStorage.setItem('td.today3', '0'); } catch (e) { /* */ } tdRender2(el); });
   $('#t3cls').addEventListener('click', () => setClassic(true));
   const mo = el.querySelector('.t3-more'); mo.addEventListener('toggle', () => { if (mo.open && !mo.dataset.done) { mo.dataset.done = 1; const box = document.createElement('div'); $('#t3old').appendChild(box); tdRender2(box); } });
+}
+/* 22 Nov 2026 (Amritpal: "a visually appealing infographic"): one row of picture cards under the light - money flow, the hottest
+   industry, Govt focus buys. Each card opens its list or chart. Context only; the systems decide the buys. */
+function t3Info(mk, L, X, buys) {
+  const cards = [];
+  const c = mk === 'NSE' && L && L.fii && L.fii.cash;
+  if (c && c.f20 != null) {
+    const cr = (v) => (Math.abs(v) >= 1e5 ? `${v < 0 ? '−' : '+'}₹${fmt(Math.abs(v) / 1e5, 2)} L cr` : `${v < 0 ? '−' : '+'}₹${Math.abs(Math.round(v)).toLocaleString('en-IN')} cr`);
+    const mx = Math.max(Math.abs(c.f20), Math.abs(c.dii20 || 0), 1); const bar = (v, nm) => `<span class="ig2-bar"><small>${nm}</small><i class="${v >= 0 ? 'up' : 'dn'}" style="width:${Math.max(4, Math.abs(v) / mx * 100)}%"></i><b class="${v >= 0 ? 'up' : 'down'}">${cr(v)}</b></span>`;
+    cards.push(`<button class="ig2-card" data-ig="fii"><span class="ig2-ic" aria-hidden="true">₹</span><small>Foreign money · 20 days</small>${bar(c.f20, 'FII')}${c.dii20 != null ? bar(c.dii20, 'DII') : c.dii_day != null ? `<span class="muted">DII ${cr(c.dii_day)} on the last day</span>` : ''}
+      <span class="ig2-tag ${c.state === 'heavy selling' ? 'warn' : ''}">${c.state === 'heavy selling' ? 'Heavy selling - Nifty has done better after this' : c.state === 'heavy buying' ? 'Heavy buying - no edge after this' : 'Normal'}</span></button>`);
+  }
+  const G = (X.GP && X.GP.rows) || [];
+  const top = G.filter((g) => g.p1m != null && (g.n || 0) >= 3).sort((a, b) => (['Leading', 'Improving'].includes((b.rrg || {}).now) ? 1 : 0) - (['Leading', 'Improving'].includes((a.rrg || {}).now) ? 1 : 0) || b.p1m - a.p1m)[0];
+  if (top) { const q = T3Q[(top.rrg || {}).now] || 'N';
+    cards.push(`<button class="ig2-card" data-ig="ind:${esc(top.group)}"><span class="ig2-ic" aria-hidden="true">🔥</span><small>Hottest industry</small><b class="ig2-big">${esc(top.group)}</b>
+      <span class="ig2-meter" role="img" aria-label="Pulse ${fmt(top.p1m, 0)}"><i style="width:${Math.min(100, top.p1m)}%"></i></span><span class="ig2-tag"><i class="ig2-dot" style="background:${T3C[q]}"></i>${T3N[q]} · Pulse ${fmt(top.p1m, 0)}% trending</span></button>`); }
+  if (mk === 'NSE' && state.gov) {
+    const gb = buys.filter((b) => govOf(b.r.symbol)).length;
+    cards.push(`<button class="ig2-card" data-ig="gov"><span class="ig2-ic" aria-hidden="true">🏛</span><small>Govt focus</small><b class="ig2-big">${gb}<span> of today's ${buys.length} buys</span></b>
+      <span class="ig2-tag">Tap for every Govt focus stock on our systems</span></button>`);
+  }
+  return cards.length ? `<section class="ig2" aria-label="Today at a glance">${cards.join('')}</section>` : '';
+}
+function fiiView(L) {
+  const c = L && L.fii && L.fii.cash; if (!c) return; const H = (c.hist || []).slice(-60); const mx = Math.max(1, ...H.map((x) => Math.abs(x[1])));
+  const W = 1000, Hh = 360, bw = W / Math.max(1, H.length);
+  const bars = H.map(([d, v], i) => { const h = Math.abs(v) / mx * (Hh / 2 - 20); return `<rect x="${(i * bw + 2).toFixed(1)}" y="${(v >= 0 ? Hh / 2 - h : Hh / 2).toFixed(1)}" width="${(bw - 4).toFixed(1)}" height="${h.toFixed(1)}" class="${v >= 0 ? 'fb-up' : 'fb-dn'}"><title>${d}: ${Math.round(v).toLocaleString('en-IN')} cr</title></rect>`; }).join('');
+  openPanel(`<div class="t3"><div class="t3w-h"><div><h2 style="font-family:var(--font-head);margin:0">Foreign money (FII)</h2><small class="muted">Cash-market net buying, each bar one session, last ${H.length} sessions (Rs crore)</small></div></div>
+    <svg viewBox="0 0 ${W} ${Hh}" width="100%" class="fii-svg" role="img" aria-label="FII daily net buying"><line x1="0" x2="${W}" y1="${Hh / 2}" y2="${Hh / 2}" class="fb-zero"/>${bars}</svg>
+    <div class="t3-ex"><p>${cashTxt(c)}</p><p class="muted">FIIs' index-futures position: ${fmt(L.fii.fii_long, 0)}% long${squeezeTxt(L.fii) ? ' · ' + squeezeTxt(L.fii) : ''}</p></div></div>`);
+  history.pushState({ sheet: 1 }, '');
+}
+function t3InfoGo(k, mk, X) {
+  if (k === 'fii') { fiiView(state._t3L); return; }
+  if (k === 'gov') { const s = SYSX.find((x) => x.id === 'gov'); if (s) sysListView(s, 'NSE', 'govt'); return; }
+  if (k.startsWith('ind:')) { const g = k.slice(4); const r = ((X.GP && X.GP.rows) || []).find((x) => x.group === g); Object.assign(state.mx, { lvl: 'industry', m: mk, sec: r ? r.sector : null, grp: g }); show('mk'); }
 }
 function t3Svg(v, o) {   // plain SVG price line: base box, old high, stop, breakout dot
   const W = 1000, H = 440; const all = v.concat([o.hi, o.stop].filter((x) => x)); const lo = Math.min(...all) * 0.97, hi = Math.max(...all) * 1.03;

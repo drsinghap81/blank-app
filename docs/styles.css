@@ -1647,3 +1647,18 @@ input,select,textarea{font-size:16px!important}
 /* 22 Nov 2026: count tiles are buttons that filter the list below */
 button.t3-tile, button.t3-rule { font: inherit; text-align: left; cursor: pointer; border: 0; color: var(--ink); }
 button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* 22 Nov 2026 Today infographic (ig2) + Today sections filter */
+.ig2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 14px 0; }
+.ig2-card { position: relative; display: flex; flex-direction: column; gap: 8px; text-align: left; border: 0; cursor: pointer; border-radius: 24px; padding: 18px; background: var(--card); color: var(--ink); font: inherit; min-height: 150px; }
+.ig2-card small { color: var(--muted); font-weight: 600; }
+.ig2-ic { position: absolute; top: 14px; right: 16px; font-size: 26px; opacity: .85; }
+.ig2-big { font-family: var(--font-head); font-size: clamp(20px, 5vw, 28px); line-height: 1.15; padding-right: 34px; }
+.ig2-big span { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 6px; }
+.ig2-bar { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 8px; }
+.ig2-bar i { height: 12px; border-radius: 6px; display: block; } .ig2-bar i.up { background: var(--rise); } .ig2-bar i.dn { background: var(--fall); }
+.ig2-meter { height: 12px; border-radius: 6px; background: var(--sel); overflow: hidden; } .ig2-meter i { display: block; height: 100%; background: var(--rise); border-radius: 6px; }
+.ig2-tag { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; } .ig2-tag.warn { color: var(--warn-ink, var(--saffron)); font-weight: 700; }
+.ig2-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.t3-tiles .t3-tile[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: 2px; }
+.t3-old > summary { cursor: pointer; font-weight: 700; margin: 12px 0 8px; color: var(--muted); }
+.fii-svg { background: var(--card); border-radius: 20px; margin: 10px 0; } .fb-up { fill: var(--rise); } .fb-dn { fill: var(--fall); } .fb-zero { stroke: var(--muted); stroke-width: 2; }
