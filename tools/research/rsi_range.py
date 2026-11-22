@@ -104,7 +104,7 @@ def load(start):
     return P
 
 
-def setups(x):
+def setups(x, htf="or60"):
     """-> list of dict(i, kind 'signal'), plus the open state at the end ('zone' if RSI now sits in 40-45 after a shift)"""
     c = x.CLOSE.to_numpy(float); n = len(c); r = rsi(c); rw = htf_rsi(x, "W"); rm = htf_rsi(x, "M")
     # 22 Nov 2026 (Amritpal: "no - daily rise to 40 from below, then took support at 40"): RSI below 40 -> crosses back above 40
@@ -122,13 +122,17 @@ def setups(x):
         if armed and i - peak_i > 40:                      # stale: the pullback must come within 40 sessions of the cross
             armed = False
         if armed:
+            pk0 = pk                                       # the bounce high BEFORE today (the dip must come after it)
             if r[i] > pk:
                 pk, pk_i = r[i], i
-            if pk >= 45 and 38 <= r[i] <= 44 and r[i] > r[i - 1] and r[i - 1] <= 44 and rw[i] > 60 and rm[i] > 60:
+            # 22 Nov 2026 (Amritpal's Nifty chart: low 42.4 on 23 Oct, turned up 26 Oct at 46.1; "any one of them above 60"):
+            # the pullback low (yesterday) sits in 38-45 and today RSI turns up; weekly OR monthly RSI > 60 (htf='none': no filter)
+            hok = True if htf == "none" else (rw[i] > 60 or rm[i] > 60)
+            if pk0 >= 45 and 38 <= r[i - 1] <= 45 and r[i] > r[i - 1] and r[i - 1] < pk0 - 3 and hok:
                 out.append(dict(i=i, peak=pk_i, rsi=round(float(r[i]), 1), rw=round(float(rw[i]), 1), rm=round(float(rm[i]), 1)))
                 armed = False
     i = n - 1
-    if armed and pk >= 45 and 38 <= r[i] <= 46 and rw[i] > 60 and rm[i] > 60:
+    if armed and pk >= 45 and 38 <= r[i] <= 46 and (htf == "none" or rw[i] > 60 or rm[i] > 60):
         now = dict(rsi=round(float(r[i]), 1), rw=round(float(rw[i]), 1), rm=round(float(rm[i]), 1))
     return out, now, r
 
@@ -164,35 +168,37 @@ def trade(x, r, s, mode):
     return dict(j=j, k=k, ret=ret, stopped=st, half=half is not None, e=e, stop=stop)
 
 
-MODES = ["as given (half at RSI 60, trail 3-day low)", "all out at RSI 60", "no half, trail all", "pullback-low stop"]
+MODES = ["as given (half at RSI 60, trail 3-day low)", "pullback-low stop"]
+HTFS = {"weekly OR monthly RSI > 60": "or60", "no weekly/monthly filter": "none"}
 
 
 def main():
     P = load("2015-01-01")
     nif = yf.download("^NSEI", start="2015-01-01", auto_adjust=True, progress=False)["Close"].squeeze().dropna()
     nif.index = pd.to_datetime(nif.index).tz_localize(None); bull = nif > nif.rolling(200).mean()
-    today = []; rows = {m: [] for m in MODES}; nsig = 0
+    today = []; rows = {f"{hn} | {m}": [] for hn in HTFS for m in MODES}; nsig = 0
     for sym, (kind, x) in P.items():
-        S, now, r = setups(x)
-        D = x.index; n = len(x)
-        for s in S:
-            if s["i"] == n - 1:
-                today.append(dict(symbol=sym, kind=kind, status="signal", buy_above=round(float(x.HIGH.iloc[-1]) * 1.0005, 2), stop=round(float(x.LOW.iloc[-1]), 2),
-                                  close=round(float(x.CLOSE.iloc[-1]), 2), rsi=s["rsi"], rsi_w=s["rw"], rsi_m=s["rm"], date=str(D[-1].date())))
-                continue
-            if D[s["i"]] < pd.Timestamp("2016-06-01"):
-                continue
-            nsig += 1
-            for m in MODES:
-                t = trade(x, r, s, m)
-                if t:
-                    risk = 1 - t["stop"] / t["e"] if m != "pullback-low stop" else 1 - t["stop"] / t["e"]
-                    risk = max(risk, 1e-3); ret = t["ret"] - COST
-                    rows[m].append(dict(sym=sym, side=1, entry=D[t["j"]], exit=D[t["k"]], e=t["e"], risk=risk, ret=ret, r_mult=ret / risk, half=t["half"],
-                                        days=t["k"] - t["j"], adx=s["rsi"], stopped=t["stopped"], hit=t["half"], kind=kind, year=D[t["j"]].year))
-        if now and not any(d["symbol"] == sym for d in today):
-            today.append(dict(symbol=sym, kind=kind, status="in the 40 zone (watch)", close=round(float(x.CLOSE.iloc[-1]), 2), rsi=now["rsi"], rsi_w=now["rw"],
-                              rsi_m=now["rm"], date=str(D[-1].date())))
+      for hn, hv in HTFS.items():
+          S, now, r = setups(x, hv)
+          D = x.index; n = len(x)
+          for s in S:
+              if s["i"] == n - 1:
+                  if hv == "or60": today.append(dict(symbol=sym, kind=kind, status="signal", buy_above=round(float(x.HIGH.iloc[-1]) * 1.0005, 2), stop=round(float(x.LOW.iloc[-1]), 2),
+                                    close=round(float(x.CLOSE.iloc[-1]), 2), rsi=s["rsi"], rsi_w=s["rw"], rsi_m=s["rm"], date=str(D[-1].date())))
+                  continue
+              if D[s["i"]] < pd.Timestamp("2016-06-01"):
+                  continue
+              nsig += hv == "or60"
+              for m in MODES:
+                  t = trade(x, r, s, m)
+                  if t:
+                      risk = 1 - t["stop"] / t["e"] if m != "pullback-low stop" else 1 - t["stop"] / t["e"]
+                      risk = max(risk, 1e-3); ret = t["ret"] - COST
+                      rows[f"{hn} | {m}"].append(dict(sym=sym, side=1, entry=D[t["j"]], exit=D[t["k"]], e=t["e"], risk=risk, ret=ret, r_mult=ret / risk, half=t["half"],
+                                          days=t["k"] - t["j"], adx=s["rsi"], stopped=t["stopped"], hit=t["half"], kind=kind, year=D[t["j"]].year))
+          if hv == "or60" and now and not any(d["symbol"] == sym for d in today):
+              today.append(dict(symbol=sym, kind=kind, status="in the 40 zone (watch)", close=round(float(x.CLOSE.iloc[-1]), 2), rsi=now["rsi"], rsi_w=now["rw"],
+                                rsi_m=now["rm"], date=str(D[-1].date())))
     print("R| universe", len(P), {k: sum(v[0] == k for v in P.values()) for k in ("stock", "index", "asset")}, "| signals since Jun 2016", nsig, flush=True)
     print("R| TODAY", len(today), [(d["symbol"], d["kind"], d["status"], d["rsi"]) for d in today], flush=True)
     C = {s: x.CLOSE.astype(float).to_dict() for s, (k, x) in P.items() if k == "stock"}
