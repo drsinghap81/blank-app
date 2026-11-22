@@ -1,0 +1,23 @@
+# One-off research (22 Nov 2026): rotation + Pulse together
+name: research-rotpulse
+on:
+  workflow_dispatch:
+    inputs:
+      limit: { description: "pilot: number of stocks (0 = all)", required: false, default: "120" }
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy pandas yfinance lxml requests
+      - run: LIMIT=${{ inputs.limit == '0' && '' || inputs.limit }} python tools/research/rotation_pulse.py 2>&1 | grep --line-buffered "R|\|Error\|Traceback\|File " ; exit ${PIPESTATUS[0]}
+      - run: |
+          git config user.name "trend-desk-bot"; git config user.email "bot@users.noreply.github.com"
+          git add data/research/rotation_pulse*.json
+          git commit -m "research: rotation + pulse" || exit 0
+          for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && break; sleep 5; done
