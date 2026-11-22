@@ -992,16 +992,25 @@ def perf_view(J, acc):
             en = hav[sym][0]; q = min(q, hav[sym][1] or q)
         o["n"] += 1; o["cost"] += q * en; o["value"] += q * px; add(e.get("system"), q * en, q * (px - en))
         first = min(first or e.get("since") or "9", e.get("since") or "9")
+    openj = {s for s, e in J.items() if not s.startswith("_") and e.get("state", "open") == "open"}; closed_list = []
     for k, e in (J.get("_done") or {}).items():
         if not (e.get("exit") and e.get("entry") and e.get("qty")):
             continue          # rejected or cancelled orders never filled
+        sym = k.split(":")[0]
+        # 22 Nov 2026 (Amritpal: "it still says loss booked" - nothing was sold): a trade the journal closed but whose shares are still
+        # in Angel holdings was not sold - count it as open at Angel's price, not as a booked loss
+        if sym in hav and sym not in openj and (hav[sym][1] or 0) > 0:
+            q = min(e["qty"], hav[sym][1]); en = hav[sym][0]; px = ltp.get(sym) or en
+            o["n"] += 1; o["cost"] += q * en; o["value"] += q * px; add(e.get("system"), q * en, q * (px - en)); openj.add(sym)
+            first = min(first or e.get("since") or "9", e.get("since") or "9"); continue
         q, en = e["qty"], e.get("adopt_px") or e["entry"]; pnl = q * (e["exit"] - en)
         c["n"] += 1; c["cost"] += q * en; c["pnl"] += pnl; c["wins"] += pnl > 0; add(e.get("system"), q * en, pnl)
+        closed_list.append(dict(symbol=sym, system=e.get("system"), qty=q, entry=round(en, 2), exit=round(e["exit"], 2), pnl=round(pnl, 2), ended=e.get("ended"), state=e.get("state")))
         first = min(first or e.get("since") or "9", e.get("since") or "9")
     o["pnl"] = o["value"] - o["cost"]; tot = o["pnl"] + c["pnl"]; cost = o["cost"] + c["cost"]
     r2 = lambda x: round(x, 2)
     return dict(open=dict(n=o["n"], cost=r2(o["cost"]), value=r2(o["value"]), pnl=r2(o["pnl"])),
-                closed=dict(n=c["n"], cost=r2(c["cost"]), pnl=r2(c["pnl"]), wins=c["wins"]),
+                closed=dict(n=c["n"], cost=r2(c["cost"]), pnl=r2(c["pnl"]), wins=c["wins"], trades=closed_list[-20:]),
                 total_pnl=r2(tot), total_pct=r2(tot / cost * 100) if cost else None, since=None if first == "9" else first,
                 systems=[dict(system=k, n=v["n"], pnl=r2(v["pnl"]), pct=r2(v["pnl"] / v["cost"] * 100) if v["cost"] else None) for k, v in sysd.items()])
 
