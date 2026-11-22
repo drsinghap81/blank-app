@@ -1598,3 +1598,9 @@ input,select,textarea{font-size:16px!important}
 .pf-bar b { font-family: var(--font-head); font-size: 16px; white-space: nowrap; }
 .pf-live-none { border: 2px dashed var(--mute-line); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 4px; } .pf-live-none small { color: var(--slate); }
 .pf-out { display: flex; height: 40px; border-radius: 14px; overflow: hidden; gap: 2px; } .pf-out span { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #17142B; min-width: 0; }
+.pf-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pf-sh { background: var(--soft); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 2px; } .pf-sh span { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
+.pf-sh b { font-family: var(--font-head); font-size: clamp(20px, 3.4vw, 28px); } .pf-sh small { color: var(--slate); font-size: 12.5px; }
+.pf-sh i, .pf-sbar span { display: inline-block; } .pf-sh i { width: 12px; height: 12px; border-radius: 4px; }
+.pf-split .bk { background: var(--accent); } .pf-split .op { background: var(--saffron); }
+.pf-sbar { grid-column: 1 / -1; display: flex; height: 14px; border-radius: 99px; overflow: hidden; gap: 2px; }

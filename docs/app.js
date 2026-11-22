@@ -8478,7 +8478,7 @@ async function perfEvery(mk) {
   const by = {}; rows.forEach((r) => { const k = r.b || 'other'; by[k] = by[k] || { n: 0, pnl: 0, cost: 0, w: 0 }; by[k].n++; by[k].pnl += r.pnl; by[k].cost += r.cost; by[k].w += r.pnl > 0; });
   let tb = null;
   if (mk === 'NSE') { const t = await getText(fresh(MAIN + 'paper/ledger.csv')); const T = pfCsv(t).filter((x) => x.Net);
-    if (T.length) tb = { n: T.length, pnl: T.reduce((a, x) => a + (+x.Net || 0), 0), open: T.filter((x) => x.Open === 'True').length, w: T.filter((x) => +x.Net > 0).length, since: T[0].EntryDate, notional: 2000000 }; }
+    if (T.length) tb = { n: T.length, pnl: T.reduce((a, x) => a + (+x.Net || 0), 0), openPnl: T.filter((x) => x.Open === 'True').reduce((a, x) => a + (+x.Net || 0), 0), open: T.filter((x) => x.Open === 'True').length, w: T.filter((x) => +x.Net > 0).length, since: T[0].EntryDate, notional: 2000000 }; }
   return { rows, peak, by, tb, since: L && L.since, asof, C };
 }
 const PF_SYS = { mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21 any', vcp: 'Tight base', rt: 'Retest', pt: 'Pattern', tb: 'Top Bottom' };
@@ -8490,6 +8490,13 @@ function perfOutcome(rows) {
   const n = {}; rows.forEach((r) => { const k = pfOut(r); n[k] = (n[k] || 0) + 1; }); const tot = rows.length || 1;
   return `<div class="pf-out" role="img" aria-label="${PF_OUT.filter(([k]) => n[k]).map(([k, t]) => `${t} ${n[k]}`).join(', ')}">${PF_OUT.filter(([k]) => n[k]).map(([k, t, c]) => `<span style="flex:${n[k]};background:${c}" title="${t}">${n[k]}</span>`).join('')}</div>
     <div class="t3-key">${PF_OUT.map(([k, t, c]) => `<span><i style="background:${c}"></i>${t} <b>${n[k] || 0}</b></span>`).join('')}</div>`;
+}
+/* booked (closed trades) vs notional (open trades at the last price, not booked yet) - 22 Nov 2026 */
+function pfSplit(booked, open, money) {
+  const t = Math.abs(booked) + Math.abs(open) || 1; const f = (v) => `${v >= 0 ? '+' : '−'}${money(Math.abs(v))}`;
+  return `<div class="pf-split"><div class="pf-sh"><span><i class="bk"></i>Booked</span><b class="${booked >= 0 ? 'up' : 'down'}">${f(booked)}</b><small>closed trades</small></div>
+    <div class="pf-sh"><span><i class="op"></i>In trade · not booked</span><b class="${open >= 0 ? 'up' : 'down'}">${f(open)}</b><small>open trades at the last price</small></div>
+    <div class="pf-sbar" role="img" aria-label="Booked ${f(booked)}, not booked ${f(open)}"><span class="bk" style="flex:${Math.max(0.02, Math.abs(booked) / t)}"></span><span class="op" style="flex:${Math.max(0.02, Math.abs(open) / t)}"></span></div></div>`;
 }
 function perfBars(items, money) {   // [{k, pnl, sub}] -> horizontal bars around zero
   const mx = Math.max(1, ...items.map((x) => Math.abs(x.pnl)));
@@ -8515,11 +8522,14 @@ async function perfSection(el) {
       const [S, TB, TN] = await Promise.all([lvApi('/api/plan').catch(() => null), lvApi('/api/tb?inst=bn').catch(() => null), lvApi('/api/tb?inst=nifty').catch(() => null)]);
       const P = S && S.perf; const tbl = [...((TB && TB.live_trades) || []).map((t) => ({ ...t, ins: 'Bank Nifty' })), ...((TN && TN.live_trades) || []).map((t) => ({ ...t, ins: 'Nifty' }))];
       const tbClosed = tbl.filter((t) => t.exit_fill); const tbPnl = tbClosed.reduce((a, t) => a + (t.pnl != null ? +t.pnl : (t.exit_fill - t.fill) * (t.qty || 0) * (t.side === 'SELL' ? -1 : 1)), 0);
+      const tbOpenU = [[TB, (TB && TB.live_trades) || []], [TN, (TN && TN.live_trades) || []]].reduce((a, [X, L]) => { const o = L.filter((t) => !t.exit_fill).pop(); const lp = X && X.status && X.status.ltp;
+        return a + (o && lp ? (lp - o.fill) * (o.qty || 0) * (o.side === 'SELL' ? -1 : 1) : 0); }, 0);
       const sysI = ((P && P.systems) || []).map((x) => ({ k: x.system, pnl: x.pnl, sub: `${x.n} trades${x.pct != null ? ' · ' + (x.pct >= 0 ? '+' : '') + fmt(x.pct, 1) + '%' : ''}` }));
       sysI.push({ k: 'Top Bottom', pnl: tbPnl, sub: tbl.length ? `${tbClosed.length} closed${tbl.length > tbClosed.length ? ' · 1 open' : ''} · real fills` : `no real order yet · bot ${TB ? esc(TB.mode) : 'not reachable'}` });
-      const lt = (P ? P.total_pnl || 0 : 0) + tbPnl;
+      const lt = (P ? P.total_pnl || 0 : 0) + tbPnl + tbOpenU; const lBooked = (P ? P.closed.pnl : 0) + tbPnl, lOpen = (P ? P.open.pnl : 0) + tbOpenU;
       live = P || tbl.length ? `<div class="pf-big"><b class="${lt >= 0 ? 'up' : 'down'}">${lt >= 0 ? '+' : '−'}${lakh(Math.abs(lt))}</b><small>${P && P.total_pct != null ? `${P.total_pct >= 0 ? '+' : ''}${fmt(P.total_pct, 1)}% on the money put in` : ''}${P && P.since ? ' · since ' + esc(day(P.since)) : ''}</small></div>
         <div class="t3-tiles"><div class="t3-tile"><small>Open</small><b>${P ? P.open.n : 0}</b><span>${P ? (P.open.pnl >= 0 ? '+' : '−') + lakh(Math.abs(P.open.pnl)) : ''}</span></div><div class="t3-tile"><small>Closed</small><b>${P ? P.closed.n : 0}</b><span>${P ? P.closed.wins + ' won' : ''}</span></div><div class="t3-tile"><small>Top Bottom</small><b>${tbl.length}</b><span>${TB ? esc(TB.mode) : ''}</span></div></div>
+        ${pfSplit(lBooked, lOpen, lakh)}
         ${perfBars(sysI.sort((a, b) => b.pnl - a.pnl), lakh)}<small class="muted">Trades placed from the app, before costs. Top Bottom counts the bot's LIVE fills; trades you placed by hand in Angel before the bot can't be read back (Angel keeps only today's trade book).</small>`
         : '<div class="pf-live-none"><b>No live trades yet</b><small>Trades the app sends to Angel show here.</small></div>';
     } catch (e) { live = `<div class="pf-live-none"><b>Server didn't answer</b><small>${esc(e.message || '')}</small></div>`; }
@@ -8528,6 +8538,7 @@ async function perfSection(el) {
     <div class="pf-cols"><article class="pf-card"><h3>Forward test · every signal since launch</h3>
       ${E && (n || E.tb) ? `<div class="pf-big"><b class="${tot >= 0 ? 'up' : 'down'}">${tot >= 0 ? '+' : '−'}${money(Math.abs(tot))}</b><small>${pct != null ? `${pct >= 0 ? '+' : ''}${fmt(pct, 1)}% on ${money(capUsed)}` : ''} · simulated, not your money${E.tb ? ` · stocks alone ${stockP >= 0 ? '+' : '−'}${money(Math.abs(stockP))}` : ''}</small></div>
       <div class="t3-tiles"><div class="t3-tile"><small>Most money in trades</small><b class="pf-mid">${money(E.peak)}</b><span>stocks${E.tb ? ' + Top Bottom ' + money(E.tb.notional) : ''}</span></div><div class="t3-tile"><small>Trades</small><b>${n + (E.tb ? E.tb.n : 0)}</b><span>${E.rows.filter((r) => r.open).length + (E.tb ? E.tb.open : 0)} still open</span></div><div class="t3-tile"><small>Winning</small><b>${w + (E.tb ? E.tb.w : 0)}</b><span>of ${n + (E.tb ? E.tb.n : 0)}</span></div></div>
+      ${pfSplit(E.rows.filter((r) => !r.open).reduce((a, r) => a + r.pnl, 0) + (E.tb ? E.tb.pnl - E.tb.openPnl : 0), E.rows.filter((r) => r.open).reduce((a, r) => a + r.pnl, 0) + (E.tb ? E.tb.openPnl : 0), money)}
       ${perfOutcome(E.rows)}
       ${perfBars(items, money)}
       <div class="x3-wl" role="img" aria-label="${w} of ${n} stock trades up">${E.rows.map((r) => `<i class="${r.pnl > 0 ? 'w' : ''}" title="${esc(r.sym)} ${fmt(r.ret, 1)}%"></i>`).join('')}</div>
