@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-22T04:28+00:00",
+"generated": "2026-11-22T04:34+00:00",
 "asof": "2026-11-20",
 "market": "NSE",
 "regime": {
@@ -7,7 +7,7 @@
 "sma200": 22795.443249999997,
 "down": false
 },
-"rules": "zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
+"rules": "neighbouring swing lows (zigzag 3% on closes), neckline >= 6% above the low; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
 "backtest": "2016-26, 3,994 signals: 120-day return +3.5% vs +7.4% for a random liquid stock; in market downtrends +10.5% vs +13.6% for any stock; target before stop 63% vs 63% for a random stock; with bullish RSI divergence 66% vs 65%, 120d +4.7%. No edge - watch only.",
 "rows": [
 {
