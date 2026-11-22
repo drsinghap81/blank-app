@@ -1,5 +1,5 @@
 import io, requests, pandas as pd
-s = requests.Session(); s.headers.update({"User-Agent": "Mozilla/5.0"})
+s = requests.Session(); s.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"})
 for f in ["FIIInvestSector_Nov152026.html", "FIIInvestSector_Mar152016.html"]:
     h = s.get("https://www.fpi.nsdl.co.in/web/StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/" + f, timeout=40).text
     T = pd.read_html(io.StringIO(h)); big = max(T, key=lambda x: x.shape[0] * x.shape[1])
