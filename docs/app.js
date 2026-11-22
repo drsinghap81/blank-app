@@ -8010,18 +8010,22 @@ async function searchIndex() {
   return (state.sIdx = out);
 }
 async function searchOpen() {
-  openPanel(`<div class="d-head no-push"><div><h2>Search</h2><div class="co">Any stock or ETF in India, US, Australia or UK: which systems are on it</div></div></div>
+  openPanel(`<div class="d-head no-push"><div><h2>Search</h2><div class="co">Any stock or ETF in India, US, Australia or UK, or a system name (flag, weekly cup, 9/21, W bottom…) to list its stocks</div></div></div>
     <label class="search s-lens"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    <input id="sq" type="search" placeholder="Symbol or company, e.g. DATAPATTNS, INDY, Reliance" autocomplete="off" autocapitalize="characters"></label>
+    <input id="sq" type="search" placeholder="Stock, ETF or system: DATAPATTNS, flag, day cup" autocomplete="off" autocapitalize="characters"></label>
     <ul class="list flat" id="sres"><li class="empty">Loading every market's list…</li></ul>`);
   const inp = document.getElementById('sq'); const ul = document.getElementById('sres'); setTimeout(() => inp && inp.focus(), 50);
   const idx = await searchIndex().catch(() => []);
   const MKN = { NSE: 'India', US: 'US', ASX: 'Australia', UK: 'UK' };
   const draw = () => { const q = (inp.value || '').trim().toUpperCase();
-    if (q.length < 2) { ul.innerHTML = `<li class="empty">${idx.length.toLocaleString()} stocks and ETFs indexed. Type at least 2 letters.</li>`; return; }
+    if (q.length < 2) { ul.innerHTML = `<li class="empty">${idx.length.toLocaleString()} stocks and ETFs indexed. Type at least 2 letters.</li><li class="s-chips">${['Flag', 'Day cup', 'Week cup', 'Month cup', 'ATH', 'Cup 9/21', 'Tight base', 'W bottom', 'IPO', 'ETF'].map((t) => `<button class="chip" data-sq="${t}">${t}</button>`).join('')}</li>`;
+      ul.querySelectorAll('[data-sq]').forEach((b) => b.addEventListener('click', () => { inp.value = b.dataset.sq; draw(); })); return; }
     const hit = idx.map((e) => ({ e, s: e.sym.toUpperCase() === q ? 0 : e.sym.toUpperCase().startsWith(q) ? 1 : e.name.toUpperCase().includes(q) ? 2 : e.sym.toUpperCase().includes(q) ? 3 : 9 }))
       .filter((x) => x.s < 9).sort((a, b) => a.s - b.s || a.e.sym.length - b.e.sym.length).slice(0, 30);
-    ul.innerHTML = hit.length ? hit.map(({ e }, i) => `<li class="row" data-si="${idx.indexOf(e)}" tabindex="0"><div><div class="sym">${esc(e.sym)}</div><div class="co">${esc(e.name)}</div></div><div></div><div class="num"><span class="chip">${esc(MKN[e.mk])}${e.kind !== 'stock' ? ' · ' + esc(e.kind) : ''}</span></div></li>`).join('') : '<li class="empty">Nothing found in the scanned lists.</li>';
+    const sx = sysMatch(inp.value || '');
+    const sxh = sx.map((y) => `<li class="row s-sys" data-sx="${y.id}" tabindex="0"><div><div class="sym">${esc(y.name)}</div><div class="co">${esc(y.d)}</div></div><div></div><div class="num"><span class="chip ${y.ok ? 'new' : ''}">System · list stocks ›</span></div></li>`).join('');
+    ul.innerHTML = sxh + (hit.length ? hit.map(({ e }, i) => `<li class="row" data-si="${idx.indexOf(e)}" tabindex="0"><div><div class="sym">${esc(e.sym)}</div><div class="co">${esc(e.name)}</div></div><div></div><div class="num"><span class="chip">${esc(MKN[e.mk])}${e.kind !== 'stock' ? ' · ' + esc(e.kind) : ''}</span></div></li>`).join('') : sx.length ? '' : '<li class="empty">Nothing found in the scanned lists.</li>');
+    ul.querySelectorAll('[data-sx]').forEach((li) => { const go = () => sysListView(SYSX.find((y) => y.id === li.dataset.sx), tdMk(), inp.value); li.addEventListener('click', go); li.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') go(); }); });
     ul.querySelectorAll('[data-si]').forEach((li) => { const go = () => sysCheck(idx[+li.dataset.si]); li.addEventListener('click', go); li.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') go(); }); }); };
   let tm; inp.addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(draw, 120); }); draw();
 }
@@ -8723,4 +8727,107 @@ async function patternView(f, mk) {
   let S = await get(MAIN + MKT[mk].path + 'pattern_charts/' + fp + '.json');
   if (!S || !S.t) { const d = await tdChartData({ symbol: f.symbol, system: 'x', bucket: 'tf' }, mk).catch(() => null); if (d && d.tf === 'Daily') S = d; }
   const box = $('#pcbox'); if (box) box.innerHTML = S && S.t ? patternSvg(S, f) : '<p class="muted">No daily chart stored for this one yet (it appears after the next scan).</p>';
+}
+
+/* ------------------------------------------------------------------ Search by system (22 Nov 2026)
+   Amritpal: "In search I should be able search stocks or assets by system like day cup breakout weekly cup or flag I mean all
+   systems". Typing a system's name (or a word of it) in Search lists the matching systems first; tapping one lists every stock or
+   ETF that system has on today, in India / US / Australia / UK, strongest top-down first (same order as Strategies). */
+const SYSX = [
+  { id: 'ath', name: 'ATH breakout (Momentum)', d: 'Monthly all-time-high breakout after a long base', a: 'ath all time high alltime momentum monthly breakout mom', ok: 1 },
+  { id: 'mo', name: 'Month cup close', d: 'Month closed above the all-time high', a: 'month monthly cup close ath breakout', ok: 1 },
+  { id: 'wk', name: 'Week cup close', d: 'Week closed above the all-time high', a: 'week weekly cup close ath breakout', ok: 1 },
+  { id: 'dy', name: 'Day cup close', d: 'Day closed above the all-time high', a: 'day daily cup close ath breakout', ok: 1 },
+  { id: 'tf', name: 'Cup 9/21', d: 'Cup breakout bought with the 9/21 rules', a: 'cup 921 9 21 cup921 trend breakout', ok: 1 },
+  { id: 't921', name: '9/21 trend', d: 'Fresh 9/21 cross with a rising 50-day average', a: '921 9 21 nine twenty trend ema cross', ok: 1 },
+  { id: 'ipo', name: 'IPO cup', d: 'Recent listing breaking out of its first base', a: 'ipo cup new listing listed breakout', ok: 1 },
+  { id: 'gm', name: 'Growth + momentum', d: 'Fast-growing profits and strong price', a: 'growth momentum gm g+m earnings', ok: 1 },
+  { id: 'tb', name: 'Tight base', d: '10 sessions within 12% at the 20-day average, drying volume', a: 'tight base breakout squeeze consolidation', ok: 0 },
+  { id: 'vcp', name: 'VCP', d: 'Volatility contraction: each pullback smaller', a: 'vcp volatility contraction squeeze tight base minervini', ok: 0 },
+  { id: 'fl', name: 'Flags & pennants', d: 'Uptrend, 15%+ pole, then a tight flag, pennant or box', a: 'flag flags bull bullish pennant pennants pendant rectangle box pole continuation', ok: 0 },
+  { id: 'pt', name: 'Bottoming out', d: 'W, tilted W, triple bottom, inverse head & shoulders', a: 'bottom bottoming w double triple tilted inverse head shoulders ihs reversal', ok: 0 },
+  { id: 'rt', name: 'Support retest', d: 'Back at an old breakout level', a: 'retest support pullback old breakout', ok: 0 },
+  { id: 'st', name: 'MA stack', d: 'Close above 20 > 50 > 100 > 200-day averages, all rising', a: 'ma stack moving average averages 20 50 100 200 aligned', ok: 0 },
+  { id: 'etf', name: 'ETF ATH system', d: 'ETF month close above its all-time high after a 1-year base', a: 'etf etfs fund funds ath month close investment', ok: 1 },
+  { id: 'rot', name: 'ETF rotation', d: 'Monthly: hold the strongest of Nifty, Midcap, Gold, Nasdaq or cash', a: 'etf rotation rotate monthly gold nifty nasdaq midcap liquid', ok: 1, nse: 1 }];
+const SYS_STOP = new Set(['system', 'systems', 'stock', 'stocks', 'pattern', 'patterns', 'setup', 'setups', 'list', 'the', 'all', 'in', 'on', 'show', 'me', 'with', 'and', 'of', 'a']);
+const sysNorm = (s) => String(s).toLowerCase().replace(/[^a-z0-9+]+/g, ' ').trim();
+function sysMatch(q) {
+  const raw = sysNorm(q); if (raw.length < 2) return [];
+  const qw = raw.split(' ').filter((w) => w && !SYS_STOP.has(w)); if (!qw.length) return [];
+  const qc = qw.join('');
+  const r = SYSX.map((s) => { const words = sysNorm(s.name + ' ' + s.a).split(' '); const comp = sysNorm(s.name).replace(/ /g, '');
+    const hit = qw.filter((w) => words.some((x) => x.startsWith(w) || (w.length >= 4 && x.startsWith(w.slice(0, -1))))).length;   // "flag" ~ "flags"
+    const sc = comp === qc ? 100 : comp.startsWith(qc) ? 50 : hit === qw.length ? 20 + hit : hit && qw.length > 1 ? hit : 0;
+    // name words count double so "day cup" ranks Day cup first, "weekly cup" ranks Week cup first
+    const nm = sysNorm(s.name).split(' '); const nb = qw.filter((w) => nm.some((x) => x.startsWith(w) || w.startsWith(x) && x.length >= 3)).length;
+    return { s, sc: sc ? sc + nb * 3 : 0, full: hit === qw.length }; }).filter((x) => x.sc > 0 && (x.sc >= 20 || qw.length > 1));
+  const L = r.some((x) => x.full) ? r.filter((x) => x.full) : r;   // every word matched beats a partial match
+  return L.sort((a, b) => b.sc - a.sc).map((x) => x.s);
+}
+async function sysRows(s, mk, q) {
+  const MP = MAIN + MKT[mk].path; const qn = sysNorm(q || '');
+  if (['ath', 'mo', 'wk', 'dy', 't921', 'ipo', 'gm', 'tb', 'vcp'].includes(s.id)) {
+    const S = await sysMap(mk).catch(() => null); if (!S) return [];
+    return Object.keys(S.M).filter((sym) => S.M[sym][s.id]).map((sym) => { const o = S.M[sym][s.id]; return { sym, st: o.txt === '✓' ? 'on the list' : o.txt, sc: 3 - o.lvl, buy: o.lvl === 0 }; });
+  }
+  if (s.id === 'st') { const S = await sysMap(mk).catch(() => null); return S ? [...S.STK].map((sym) => ({ sym, st: 'stacked', sc: 0 })) : []; }
+  if (['tf', 'rt'].includes(s.id)) {
+    const P = await getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null);
+    return ((P && (P.top || []).concat(P.swing || [], P.more || [])) || []).filter((r) => bkOf(r) === s.id)
+      .map((r) => ({ sym: r.symbol, st: s.id === 'rt' ? 'at old breakout' : r.trigger ? `waiting · above ${fmt(r.trigger, 2)}` : 'Buy', sc: r.score || 0, buy: s.id === 'tf' && !r.trigger }));
+  }
+  if (s.id === 'fl') {
+    const F = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);
+    const only = /pennant|pendant/.test(qn) ? 'Pennant' : /rectangle|box/.test(qn) ? 'Rectangle' : null;
+    return ((F && F.rows) || []).filter((x) => !only || x.shape === only).map((x) => ({ sym: x.symbol, fl: x, buy: x.status === 'breakout', sc: x.status === 'breakout' ? 2 : 1,
+      st: `${x.shape} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2)}` }));
+  }
+  if (s.id === 'pt') {
+    const T = await getJSON(MP + 'patterns.json', mk === 'NSE' ? 'patterns' : 'patterns_' + mk).catch(() => null); const TYP = { DB: 'W bottom', TW: 'Tilted W', TB: 'Triple bottom', IHS: 'Inv H&S' };
+    const only = /triple/.test(qn) ? 'TB' : /inverse|head|ihs/.test(qn) ? 'IHS' : /tilt/.test(qn) ? 'TW' : /\bw\b|double/.test(qn) ? 'DB' : null;
+    return ((T && T.rows) || []).filter((x) => x.kind !== 'index' && (!only || x.typ === only)).map((x) => ({ sym: x.symbol, sc: x.status === 'breakout' ? 1 : 0,
+      st: `${TYP[x.typ] || x.typ || x.pattern || ''} · ${x.status === 'breakout' ? 'broke out' : x.to_neck_pct != null ? fmt(x.to_neck_pct, 1) + '% to go' : x.status || ''}` }));
+  }
+  if (s.id === 'etf') {
+    if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds').catch(() => null);
+    const FM = { NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' };
+    return ((state.fund || {}).rows || []).filter((f) => f.market === FM[mk] && ((f.ath && f.ath.status === 'open') || f.mclose || f.wclose))
+      .map((f) => ({ sym: String(f.key).split(':').pop().replace(/\.L$/, ''), name: f.name, fund: f, buy: !!f.mclose && !(f.ath && f.ath.status === 'open'), sc: f.mclose ? 2 : f.ath ? 1 : 0,
+        st: f.ath && f.ath.status === 'open' ? 'in a trade' : f.mclose ? 'month closed above ATH: buy' : 'week closed above ATH (watch)' }));
+  }
+  if (s.id === 'rot') {
+    if (mk !== 'NSE') return [];
+    const R = await getJSON(MAIN + 'data/scan/etf_rotation.json', 'etf_rot').catch(() => null); const c = R && R.current; if (!c) return [];
+    const hold = new Set(c.hold || []); const nm = R.names || {};
+    return [...hold].map((sym) => ({ sym, name: nm[sym], st: `hold this month (${c.month})`, sc: 9, buy: true, etfOnly: 1 }))
+      .concat((c.ranks || []).filter((r) => !hold.has(r.sym)).map((r) => ({ sym: r.sym, name: nm[r.sym], st: `not held · 3 months ${r.ret_3m_pct >= 0 ? '+' : '−'}${fmt(Math.abs(r.ret_3m_pct), 1)}%`, sc: 0, etfOnly: 1 })));
+  }
+  return [];
+}
+async function sysListView(s, mk, q) {
+  mk = s.nse ? 'NSE' : mk || tdMk();
+  openPanel('<p class="muted pad">Listing stocks…</p>');
+  const [rows, X] = await Promise.all([sysRows(s, mk, q), t3Ctx(mk).catch(() => null)]);
+  const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
+  rows.forEach((x) => { x.ch = X && !x.etfOnly && !x.fund ? X.chain(x.sym) : null; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
+  rows.sort((a, b) => (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || b.s - a.s || (b.sc || 0) - (a.sc || 0));
+  const seg = s.nse ? '' : `<div class="t3-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([m, n]) => `<button data-ymk="${m}" role="tab" aria-selected="${mk === m}">${n}</button>`).join('')}</div>`;
+  const nBuy = rows.filter((x) => x.buy).length;
+  $('#sheet-body').innerHTML = `<div class="t3">${x3Trail([{ t: 'Search', go: () => searchOpen(), done: true }, { t: s.name, on: true }])}
+    <div class="t3w-h"><div><h2 style="font-family:var(--font-head);margin:0">${esc(s.name)}</h2><small class="muted">${esc(s.d)}${s.ok ? '' : ' · watch only'}</small></div></div>
+    ${seg}
+    <div class="t3-rules"><div class="t3-rule"><b>${rows.length}</b><small>${s.id === 'rot' || s.id === 'etf' ? 'ETFs' : 'stocks'} on it</small></div><div class="t3-rule"><b class="up">${nBuy}</b><small>buy / breakout now</small></div></div>
+    ${rows.some((x) => x.ch) ? `<div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((k) => `<span><i style="background:${T3C[k]}"></i>${T3N[k]}</span>`).join('')}</div>` : ''}
+    <ol class="st-list">${rows.slice(0, 150).map((x, i) => `<li><button class="st-row" data-yi="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.buy ? 'up' : ''}">${esc(x.st)}</small></span>${x.ch ? t3Bars(x.ch, true) : `<span class="muted">${esc(x.name || '')}</span>`}<span class="st-y">${x.ch ? t3Yoy(x.y) : ''}</span></button></li>`).join('') || `<li class="empty">Nothing on ${esc(s.name)} in ${esc(MKT[mk].name)} today.</li>`}</ol>
+    ${rows.length > 150 ? `<p class="muted">Showing the first 150 of ${rows.length}.</p>` : ''}
+    <p class="t3-foot">From the last nightly scans. Order is for reading only: strongest market, industry and stock first.</p></div>`;
+  const root = $('#sheet-body');
+  x3TrailWire(root, [{ t: 'Search', go: () => searchOpen() }, { t: s.name }]);
+  root.querySelectorAll('[data-ymk]').forEach((b) => b.addEventListener('click', () => sysListView(s, b.dataset.ymk, q)));
+  root.querySelectorAll('[data-yi]').forEach((b) => b.addEventListener('click', () => { const x = rows[+b.dataset.yi];
+    if (x.fl) return patternView(x.fl, mk);
+    if (x.fund) return fundSelect(x.fund);
+    if (x.etfOnly) return sysCheck({ mk, sym: x.sym, name: x.name || x.sym, kind: 'ETF' });
+    stockPage({ mk, sym: x.sym, name: x.name || x.sym, kind: 'stock' }, [{ t: 'Search', go: () => searchOpen(), done: true }, { t: s.name, go: () => sysListView(s, mk, q), done: true }, { t: x.sym, on: true }]); }));
 }

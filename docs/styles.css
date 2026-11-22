@@ -1629,3 +1629,7 @@ input,select,textarea{font-size:16px!important}
 .pc-svg .pc-st { stroke: var(--fall); stroke-width: 2.5; stroke-dasharray: 10 8; } .pc-svg .pc-st-t { fill: var(--fall-ink); font: 800 22px var(--font-body); }
 .pc-svg .pc-bo { fill: var(--rise); stroke: var(--paper); stroke-width: 4; }
 @media (max-width: 640px) { .pc-svg .pc-lab { font-size: 34px; } .pc-svg .pc-tg-t, .pc-svg .pc-tr-t, .pc-svg .pc-st-t { font-size: 30px; } .pc-svg .t3-ax { font-size: 28px; } .pc-svg .pc-pole { stroke-width: 8; } }
+/* search by system (22 Nov 2026) */
+.s-sys { border-left: 5px solid var(--accent); }
+.s-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 2px; list-style: none; }
+.s-chips .chip { cursor: pointer; font-size: 14px; padding: 8px 12px; border: 0; }
