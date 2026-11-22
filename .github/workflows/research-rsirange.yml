@@ -1,0 +1,23 @@
+# One-off research (22 Nov 2026): RSI range-shift pullback (monthly + weekly RSI > 60, daily RSI back above 40 then support at 40)
+name: research-rsirange
+on:
+  workflow_dispatch:
+    inputs:
+      pilot: { description: "1 = 150 stocks + all assets", required: false, default: "1" }
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy pandas yfinance lxml requests
+      - run: PILOT=${{ inputs.pilot == '1' && '1' || '' }} python tools/research/rsi_range.py 2>&1 | grep --line-buffered "R|\|Error\|Traceback\|File " ; exit ${PIPESTATUS[0]}
+      - run: |
+          git config user.name "trend-desk-bot"; git config user.email "bot@users.noreply.github.com"
+          git add data/research/rsi_range*.json
+          git commit -m "research: rsi range" || exit 0
+          for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && break; sleep 5; done
