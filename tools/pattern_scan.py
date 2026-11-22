@@ -410,7 +410,18 @@ def flag(x, sym, name):
                 if not broke or l[bo + 1:].min(initial=1e18) < plo:
                     continue
                 if not (vv[bo] >= 1.5 * v50[bo] and vv[bo] >= vv[pz].max()):
-                    continue                                    # breakout without the volume jump: not listed
+                    # 22 Nov 2026 (Amritpal: "DATAPATTNS is still not broken out"): a line break without the volume jump is not a
+                    # breakout - keep it as forming, buy above the flag's highest high since it began (needs 1.5x volume)
+                    fh = float(h[pz.start:n].max())
+                    if c[-1] >= fh or l[bo:].min() < plo:
+                        continue
+                    row.update(status="forming", trigger=round(fh, 2), to_trigger_pct=round((fh / c[-1] - 1) * 100, 1), stop=round(float(plo), 2),
+                               target=round(fh + (top - base), 2), risk_pct=round((1 - plo / fh) * 100, 1), line_broken=D[bo],
+                               need_vol=int(1.5 * v50[-1]) if np.isfinite(v50[-1]) else None)
+                    row["ema21"] = round(float(x.Close.ewm(span=21, adjust=False).mean().iloc[-1]), 2)
+                    if best is None:
+                        best = row
+                    break
                 row["bo_vol_x"] = round(float(vv[bo] / v50[bo]), 1)
                 row["stop"] = round(float(plo), 2)
                 e = float(c[bo]); row.update(status="breakout", bo_date=D[bo], entry=round(e, 2), days_since=back,
