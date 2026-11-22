@@ -1,0 +1,1908 @@
+{
+"generated": "2026-11-22 11:48 UTC",
+"method": "News clues: government / regulator actions that can move a whole industry (22 Nov 2026, Amritpal, after the PSU-bank look-back\nfound the 21 Oct \"FDI cap in PSU banks to 49%\" report a week before the rally: \"add all authentic news clues, especially similar\ntypes as for PSU\").\n\nSources (checked from GitHub Actions 22 Nov 2026):\n  official  RBI press releases + notifications (rbi.org.in RSS); government outlets in Google News (PIB, DD News, News On AIR)\n  reports   Google News RSS, India edition, ONLY from named financial / national outlets (OUTLETS) - shown as \"Report\"\nEvent types searched (TYPES): FDI / foreign-ownership caps, Cabinet approvals and outlays, PLI, anti-dumping / safeguard / customs\nduty, export bans / curbs, minimum import price, bank mergers, privatisation / stake sales, GST rate changes, MSP / FRP,\nDefence Acquisition Council approvals, ethanol blending, RBI rule changes, plus \"government plans / considering\" reports.\nEach item is matched to NSE basic industries by keywords (IND_KEYS). Direction is only marked where the words say it\n(denies / no plan / rollback / ban = negative). Nothing here is a tested signal - it tells you a story exists.\nWrites data/scan/news_clues.json (last 60 days, de-duplicated).",
+"items": [
+{
+"key": "cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
+"date": "2026-11-22",
+"title": "Cabinet approves \u20b91.86 lakh crore PM-DHARA scheme for green energy transmission",
+"url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOYVFVWV96d29MZ09FX1pXN1dsQ1QyYjZnMDgwQ0JiNHU1Rl9PWnBWNnJjd1BtZGlCbzZvLVFWdVQ5amJfRlJROHhwNGt2MTUwbmFtamJHU3o3aFJoTzBaVFN0ZTZjY0VxM1lhNTYtSDZVTlVFMmFqTHFVMktRSUkzcGU0dnhsMmNmWE1hSFFTRUVLZi1UQ2RkT0lPcXUwTVhia0lLN29hUV9QQ0E1R1B4alBBTQ?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Power Generation",
+"Other Electrical Equipment",
+"Heavy Electrical Equipment",
+"Cables - Electricals",
+"Integrated Power Utilities"
+],
+"neg": false
+},
+{
+"key": "aluminiumproductmakersseekzeroimportdutyonrawmetalaheadofbudget",
+"date": "2026-11-22",
+"title": "Aluminium product makers seek zero import duty on raw metal ahead of Budget",
+"url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxOTmt0em8wUXByeUp6dnlKNHRvSkN0ZFVQTWRUTjBVZFFtOXpUdkFWcjd2bmU1eXJPRDVoR2FOYzF3ZVhpUm5iTkotbHd5eXVHWVJDZldGbXpBOUZnNl9lVjNUSE1NQm5fVDNhRU1GV2dDNV90Vl9Qakc4akFqVk9iTnY5Nkc3Ym9LNzlZTXZrN1lEWVB3QjVMNURvOExSVllWUjhaZ1YtaVZTZzk2TFpKTEx2UVdPb0NSZU5JY19PTDBtVmZuOGJvOUozbU1Hc0t2OWRrY2J2N3RFbWvSAeABQVVfeXFMTVpkOWtreHlDbTBQbG1KVnBJR1hwN0hwSWJCRzJTUnJZVlByQXh5Yk1aYVVNNE5VZ2tTTjZuVFAzUnhoc1dfd1hlR3FXMVQ2QW50Y2tZTlhxMkk4ZWxQNEhRYi04YXRQWWFicWtFN0NuS2R3ckhXMVZTYXlVUWNHRXRya1k0RUJPMVZ3OFphWE43ZERNUTNuRWpQNEtLVW5XU3RBQnlyOHY5TGVaVktVOGxNaWZ2UkVFZVVydnJremJPZk9WQXFwUTUwaXpFWmpsemN1c05md2NOMDFvMGk0aTI?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Aluminium"
+],
+"neg": false
+},
+{
+"key": "thankstopmmodigoldpricedrops65lakhperkgctiwritesopenletteryouradvicehelpedprotectsavings",
+"date": "2026-11-22",
+"title": "Thanks to PM Modi, gold price drops \u20b965 lakh per kg: CTI writes open letter, \u2018Your advice helped protect savings\u2019",
+"url": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxQRFFNdFhSZ1VhUEIxa1dULUduR05SdTlGd245SkVqSGNzM0xRckxIdnFxMENVQ2JVX3Zzd1U2YldpdkFOWTNUMjVhTnNjc09IdGdLVENJUHI3OW1VMU90Z0xGUHV1ZGFhdzIyLUJ2dTNzR2dBM0lwY2NhRjNaRy1WRVBjUWdNMjlmVlZ2UVdFUGN4YjhGTVR3SHQwYldELVVHMUVpbTBfOWp6X2xXV2RHSWt0T2xpQ04tRVdUdUpYQ0VjMHFUeHZPeEpwNHJERGNRTEFrcUNCZC1UQTFPRVpXQ2dhd1BxTE5vYVFaSnhGLTZXNndRZlNR0gH8AUFVX3lxTE9WWW9FWkszTXR1VW8wZXNGVmhMVkp3RDk1SVdlYWpCODFQM3JRODZfZ2RlOU9USzZRVzRYRXVkV2FOWDNUQmlZYjhZZjcwbkpNdmdYUTFsaHV4S1M4NHpEUF9mUmI4VEVaUEN5SjRRek1EWFhPeWVtaG5CeGNTSlA1MG5yTU5jOENvWDZybnNEa213OTEzTkxDYldic1pXTDN6dHA4Nm4td3M4dzZBNDgzUkdCWDNQWWZZcndOU29jX3I1Rk4zeXNmaFdyYkcwZVBPZGFyeFkzZi1ma0FlVS1Renh3UWZEQ0RLeXItOFZRYzlMTEJ2Y3FmclhUTw?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "indiaweighscurbsonnonbasmatiriceexportstocooldomesticprices",
+"date": "2026-11-22",
+"title": "India weighs curbs on non-Basmati rice exports to cool domestic prices",
+"url": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxNU1RlZnpmYWg5SzdpZ0lQMHRMOFA1TFE1WDZvUlI4ZW1nNVhIVWpNeTBucXFjM2MxT1hkdEtsXzVBbzBHVXhrZHZLUElJQ1lqczlVTTl5QTZ2M0JYcHM1a096N1NXQjlNSF9OMkJFRDhJR0EteVYwWG5kUDhPb1h6dFZINFZHR0VYNjF2NzhDX21yTjZyaTB3Vk9JSU5HUEVIUFBlTzZKUkU4czJJdHZiSVpTY2pGMkFfRGYtNmN6am40eEJUeGJuRGlScVZMQXdoVnNoVk1LSFRQcmRsbGJXNVBud1k5VjTSAecBQVVfeXFMTVNUZWZ6ZmFoOUs3aWdJUDB0TDhQNUxRNVg2b1JSOGVtZzVYSFVqTXkwbnFxYzNjMU9YZHRLbF81QW8wR1V4a2R2S1BJSUNZanM5VU05eUE2djNCWHBzNWtPejdTV0I5TUhfTjJCRUQ4SUdBLXlWMFhuZFA4T29YenRWSDRWR0dFWDYxdjc4Q19tck42cmkwd1ZPSUlOR1BFSFBQZU82SlJFOHMySXR2YklaU2NqRjJBX0RmLTZjempuNHhCVHhibkRpUnFWTEF3aFZzaFZNS0hUUHJkbGxiVzVQbndZOVY0?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Agricultural Products"
+],
+"neg": true
+},
+{
+"key": "hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
+"date": "2026-11-22",
+"title": "Hyundai, Samsung eye India's shipbuilding push as Centre lines up Rs 69,725-crore package",
+"url": "https://news.google.com/rss/articles/CBMikwJBVV95cUxNVjZWcW9TUVVNNlVJQ2ZSdXdrX3ZDT01McksyZlRWd3JGcWt4OGVIVjFBVkRjN28xVjFGTm02RGRndlQ3d052bFZINXJKWUdtRnd0c2xtMTFfYXVPYm9pZ2RwbVM4bDdOc0R1SnNyY0t6Z1UtMVlOQ0p1Tm5KTHFScGxsdk51Ylg4eWtTR3p6OHlNd0NGSkhPMXA0RU1TRXVGWkxjOUlpQzE4dldaejgzaHJzTVA2SnhkOXlOaUFRZGdlckFYaU5CLTZTUmdlUWZveVdCUXlzZzJKZENBdkE2Z2dnc3pDeGkwZkZ2ajJTU0xfSkZUUTFCcWFlRXo0QnlTVEs0WW43aWdTd2dONEswalc2QQ?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Plans / reports",
+"industries": [
+"Ship Building & Allied Services",
+"Shipping",
+"Port & Port services"
+],
+"neg": false
+},
+{
+"key": "governmentunveilsroadmapforgreenureaproductionpushes724lakhmtgreenammoniaprocurementundern",
+"date": "2026-11-21",
+"title": "Government unveils roadmap for green urea production, pushes 7.24 lakh MT green ammonia procurement under National Green Hydrogen Mission | DD News",
+"url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxPdlhsZ2c3QWxqNHRTU1ZiVm15YUdiVnE0bTFoMTBTQmFvSVpKT04tNjVVUTVkS0dmX1ZFd1lLbHdrOVotNXpPYzI5d3NoUXV3ZjYwcC1ETUFRaHVfVlllYjFBd3BrdVk0YjQ5akVSMGNNY3ZLUml4eDNUQ0ZFZi1ma2ZsbDRQajNKQzZWdUwxSklUR1VQUU1pc21jclpfME5RWlk2UWRmcXpSR0gtX0JyN3F1RlFFeVFyajJDOWdpby1VbGRJanNnY0I4SzRwM0Q2ZGhwLV9nMG9KMnA3a0NmSHRPR0dNeFdGN05PMkxDdjNDWDlk?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Plans / reports",
+"industries": [
+"Fertilizers"
+],
+"neg": false
+},
+{
+"key": "govtclearscoalindiathreeothersforrareearthmagnetproduction",
+"date": "2026-11-20",
+"title": "Govt clears Coal India & three others for rare earth magnet production",
+"url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxQRjdJMmJMaDFQQWkyNXJpYi1VaGlKOE9hdGpZWWtZam9kbGE1NG9YX3ExOXpJR1NLbElLZ2RqaDZ1S3ZSVGdoSVlRc014ZnBJeElWeEVDamxhWUx1ZjRVUXdxLTEyN1ROZVNqZ2tQeU5XQW02cFlqOENFLXVvdkxaTXExNHJSaVRNZVYwTDMxbjVjaVRGWlFxaGJycHdBQV9pMUdpVDhnOWpWZnBGOTNBWFZnb0dVb1B5cmNVNUxXYW05OEF0TXFJQzZtaW1FRXhnMlBmREN5dkRma1Y5ODZEMTh2OGFoWEhLYzVaWDhMMkV5UdIB9wFBVV95cUxOVF83OUk2Z0FZY2ItWTR2QUQ5Q0oxOWlCX0RDd0paQnhPWWhManZJVnp0MWJNQkVyRWNpd203eTdKNmd2ZU96RU9UUGVuM0dUQnlYZHgybnp2VEc3dkNnVjhxNlh6NUpOeUJFMWo0aXN3b0o5RWtMWmFoajQ0aDJSTlZuY1Z3TE1tQ1B2RzdFSXg3NER2VDFtN1F5a0phOTBrUGZPV1FzWUw5Zi1aN1JlamdYVHJkdzRaTXBQWjZjaWswTlRWZDJUYUd0WjUyc0dSOURhcDFHUFAyUUlRc2RGc1IwakZ2Q1ZDUUVpX3dMMGEtdFdVcFNv?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Coal"
+],
+"neg": false
+},
+{
+"key": "tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
+"date": "2026-11-20",
+"title": "Tata Steel shares slide nearly 2% as EU anti-dumping duty and bearish technicals weigh",
+"url": "https://news.google.com/rss/articles/CBMi_gFBVV95cUxQRjZYWVNiX3FlelZ6WW4zRlo0LUFKNW5QNVZJVldWbnNteHpYUjRVNnVJQUFSNzdnYks3R0NyUmhaMVlJVGo0Y1hQQWs3SFI0NnlNSjl3Zlpib0xhX3BNWkx4N1FGaUk4WnJMbi1waWN1dnJsQTJ5T2szMVFubDlWM0dmNWpxZ3F6Z2tFekJhM2ZNV3NuQjNaMGZEZkRPUzIwSzl3cm9ib2N0czJKZjJMV2FqNFY4aGNhVjZJNE1naXkzdEI5dGlOM3NvN1pUczRIVWhzeFdMY21hT2lsSWNpS2NmcEdzdUY2N2h4eFhfd0F3YjB5NG9mc3BTZ21wQdIB_gFBVV95cUxQRjZYWVNiX3FlelZ6WW4zRlo0LUFKNW5QNVZJVldWbnNteHpYUjRVNnVJQUFSNzdnYks3R0NyUmhaMVlJVGo0Y1hQQWs3SFI0NnlNSjl3Zlpib0xhX3BNWkx4N1FGaUk4WnJMbi1waWN1dnJsQTJ5T2szMVFubDlWM0dmNWpxZ3F6Z2tFekJhM2ZNV3NuQjNaMGZEZkRPUzIwSzl3cm9ib2N0czJKZjJMV2FqNFY4aGNhVjZJNE1naXkzdEI5dGlOM3NvN1pUczRIVWhzeFdMY21hT2lsSWNpS2NmcEdzdUY2N2h4eFhfd0F3YjB5NG9mc3BTZ21wQQ?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "indiamayimposedutiesoncheapaluminiumimports5stocksthatcouldbenefit",
+"date": "2026-11-20",
+"title": "India may impose duties on cheap aluminium imports: 5 stocks that could benefit",
+"url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxPYVl4SnEtNEpwRmVRS2VHcTJqWXlPRXdPckR5cGluV3ZQWkx1VzlCVTlOU3NfRjhvb0lFQS1BRUdPZndHMF9naGszVjhUVHZ1VVFhNGE2dHJvSExIZzU4cWc0NWpwZGg5YTFZZ2dGYTBycG5vZ0NQYjkzOUhQRGlQbF9SaFRtR1hjcVV3cXpFQkdEaWFjMkNZQ0ZMTFBqYklmdHFJOEhPWE5obXFmRVVtbDNHdHFWUnN5MGdETk8xS3lUdGQwMWt4aGNXVDdSYk1JU3VaMER6UzRJd9IB4AFBVV95cUxPdVYxbXRhVFNTaFVqelVWRF9CMmpxSGpzNnRSWFFkcExDd1UzQzhQZEdIMzJ1NGdROGNCbzRaVkxraEhxUnA2aEwzVll3aFdFRDZsSnpZaHdjZk1vdjhjMElwN0RkLUtVUlN5anlIWEl2LXpHelhvcXN3T012bU0zUGRHdWxSYU1vTVMxVkZnUUdZUFJSeEhwWTV2bHp6bG5rdXlkZFpJVzRlMWxabjZmX2V6ZmotNkNDRmJaNVZnR1ZHN0NJVTF0dnNKcmNZdVc3RUZieWxUOTliVHpPOE9sUA?oc=5",
+"source": "The Financial Express",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Aluminium"
+],
+"neg": false
+},
+{
+"key": "indiaachieves20ethanolblendingmilestonein202526maizeleadssupplies",
+"date": "2026-11-20",
+"title": "India achieves 20% ethanol blending milestone in 2025-26, maize leads supplies",
+"url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxQa04tWjVvdVVBM2pEQk5PUjdNcHR1ZUVld1Fya2M3aF9NRDh5UVRDNWNyQnF2c0p2eU5KX08wRUlvNjZGNkpHNlNnT0RJQ0xVd0F5U2xsV3FIMXVVSzFpMVN4OUh0dkNwdjd0eXE3YXFINjA4bHpwZHhCdW9BV2RaQV9CazRRRjJoS3VLY3R5Vzc3MXd6S2xKdUJrTDdwR1EwOVg0N3QyZDJnLUJuVUFSRTZ4SldPWFJrdThJbG1uYzlxbnJQdVo1TDZUQVNKZHdtSC12ejNXLTNxdXYzQ1dNTFZTdlVxcjdIQ1pQMy00TEVvbllu0gH7AUFVX3lxTE9vRkVmTXYwWm9aUVliRk9YeTdBVEZhUEJ1bDFNekt5cGNjQ1JpenlmdWNNbVUxU0cxRE9BTkV2ZzdBUEFQVmNFN091cnJQVGE2RzhuaGtxb3FIT3hCMWVNalBqbW9yRGhqdkNtN0hnN2I3aXZVczNiU2hkTUtYdTJUcnhPaFNXZmFkVjVrbEQ3cm0tTHZKZkVvelNxaUNPak5Pakl3eTFYQ0E4S2ZXTFg4b3NDOTBNSUVjbEstNEVvN0YzclM4UFpDT2xDcElIVnJoTE1RcE9oVEZabFNBSXpfalJuM0FDTlZ3TU55OVJHZzdQQnhzVEs3cHBR?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "indiahits1999ethanolblendingin202526grainssupply735",
+"date": "2026-11-20",
+"title": "India hits 19.99% ethanol blending in 2025-26; grains supply 73.5%",
+"url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxQazZMbG9yWWJUTVdlUDFDcG9IM1oyNWtXVFBrRUxhQ2doMDJ0d0VZcXlOcWtYSjNPZG5sa2cwcUJpNXVzWWFNd1F4X2U3WC1rWngxSE5pSkJmcDVxd1lxU1QyZlRvdmN1WU9KZTRsZGI1RlhBeFdDUFhOdFRQMmFxblJkX0RwQjJfbTllQXVDcExHdnYwVEVZaGVfNHRocVF5X1FDdjVqaUczWG1xTmNZUmk4NE8wM0pZTHRSbm1jbF9wbDJwd2RjZGhfcWNQb0xLbUkwajlB0gHbAUFVX3lxTE9SOU5wMmpfekQtQ0RmbzY1dzJnZTB5cER2WWNVSGFjTDBzTjRFaUI1T2prSm5tRzJBOGtsRXFhTnFqZFh3TzNacnhwb19zZ2dORGtMeGlxQmlBNVJSamtielQ0TlNiQWpLRGtYZkp0MTdIMzhMeXU5bFA5aVBFdjFkc3lXd1ItRXFRcDZyT0N4ZlNtTlRVZG9HODlOcDVVeGpFYVZZU3JmUVpDN0ROdERSLThQMHdYLUZzOU9oNzVpbVc5WEhTMzFnTUdJX1k5NVFZUnFaZ0VIMTQ4WQ?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "indiahits20ethanolblendinginesy202526grainnowpowersover73ofsuppliesaida",
+"date": "2026-11-20",
+"title": "India hits 20% ethanol blending in ESY 2025-26, grain now powers over 73% of supplies: AIDA",
+"url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxNQ1RLU0s2SGVGZ0RZQUpiQ2xJTXdVWjcyOTllN1Z1VFh2eUtVMUd5THFTUVBBT2hBOGJfbjhiLVpiRVp4ZDVGVTVwUW85ajk2XzlhWVdOc1p3ZlBBWEk4OE9TRnBvdTNzQnl4WWc1c09YOUY5cG9na01KNGlXdGVmMnR0aFpaaFFhdlhlNEhDZ09Nc0xJSjBXSGMtend0T0MxazB3Vm1VbnRDUTRzYjlnbndBOGgzenFSMWhiZTBRREoxRl91OExIQlJfdFQzbE9CWFctUjVOSTJtLUNsUU45c0YyeTVnbUhQTkU0TlEyWktIaWvSAfgBQVVfeXFMTUZOMjlObjR2Yk5kRW9MMTVvdU1qdVFXS19rOGlOTVN4bHhydGl0dmdJcElPSHN1Q19xNnRQTVpCR0xOWjk4QWhTMzNCbk96LUdvMV9yQzRMZWZ6OUd0ODM1Rzl4X21uTmNCdTRJMmtVY0s0T3JEV29qWUhJNndyNjJ1VGFOa0JTNC1rRWZ6Vnhqb1VaU3Nmc1VMX2FLWGk1aXU2YVFaOS0wZXRMblpfUEVDOEFzb2Y2WkNKYW93V0RjYy1VVWN2U0dsTzAtakxNVktiV0cxVVczVzVXS1lBdTZsVk0wZ0NabmFON3o5Mm1uaUJpbU9jS0I?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "governmentrulesoutimmediatemovebeyonde20reaffirmssafetyandbenefitsofethanolblendedpetrol",
+"date": "2026-11-19",
+"title": "Government rules out immediate move beyond E20, reaffirms safety and benefits of ethanol-blended petrol",
+"url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOcUVTSGhiWTFVRWFaRUlfdWszU3l3dndZTkcwejhJNzhUVTJvYUlzZkZfenFpc3ZXV2Jvb1I3TU83dGdYRFhEVjhoMzNKMDJEOTFKQkdET3ZOeGJpeXJtbFpRRVNqX28wbVo1eGdLdmF4Wm8zVmd3b1NPNDR5bHNaWHhQZGMyREN1bkRzMDdoWHktN0hteWNrSWRaRGoxczlQS0hmMGRMNTFyZVNMbFZYZlNhd285UWw4Rmprb05hanBZdlBOQkFv?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "indiaachieves20ethanolblendingin202526grainbasedfeedstockshareat74pcaida",
+"date": "2026-11-19",
+"title": "India achieves 20% ethanol blending in 2025-26; grain-based feedstock share at 74 pc: AIDA",
+"url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxNMU9saUZPYXctRE9sUGVCNTZxcmV3NVRWWk9XWC1TdlN0ajhQZXk0WW5KLURlWDFaTl8wUFJ5NXVvTkQ3Y214dFl0bkVGdTAyZDNINVE2T2s5WlVPQk11TmRHQ1pqN3liQTdpSW5LU1BYN3BxU0ZOS0NqMzZFQ1ItNVlvTU9uR2VpcERPNTNyUmFVcm5XTnN1eHZHLVd2a29JUVZVajY3OUFDMjBzalZPS3JKUnZNN3piQzBMQUNueVdyRGtfRFNaamc0THhCRDhfaWJDX0RjamzSAd4BQVVfeXFMTjc2dDVyWEloUlBuVno2TnlRb2FhX0VtVFF0Y2JFVWh0WFJUMW53THNtVzI5MUtFdXQzLUF6S2twcXJyMVh6ZFM4bGZmOE42cWFhSTBmZlJxSWVzTTFIclpITi1JcURkbWhfMjBIOTFESnRwdEV0ZjU0SmJMY0R2dktTVFhZR3NUM19tUy1NcnRuYUtpNjFjQVYzMnBnNG5rUkMwUE4td2EzY0JIVjA0YlZxeXRibzU5QjVweW4xbTBjNkpjeV9lUXZtTHdNQWwwTGRieDV2dGRsVXVWOUZ3?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "indiaachieves20ethanolblendingmilestoneinfy26grainbasedfeedstockaccountsfor74",
+"date": "2026-11-19",
+"title": "India achieves 20% ethanol blending milestone in FY26, grain-based feedstock accounts for 74%",
+"url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNLVlGRHpJcHNBd0Q2QUdyZlVwbk1YNVJSTFVSdHA5MVQtdHFhMmlFbGhNamFlWElwUm55TWFpSDYxSWtfcFdCOENudGxFWFpRdVdSX3FaZjNjQlNJU2hoSFJadmZhNTBlazQ4emdMTE9xZXE2Sy1MbEgwRGFnU0R3REs0OUtJMjlTQ25wb2xHczhLUndSZFJKQm5hRlhFa2h60gGmAUFVX3lxTE9WVlVHWjBzQWpJbUdPWEpjc2lDaFlrRjc4QmNCTkdBQzdSaHctYS1BRnVHSTNhZVRuUElyTXAyaHdQaTFQcGR1UmtndTA4amxmUHhoeC14RmRfOGNNR3FaNGtGZzQ2bnFfZUFQQzJYYkRmQk9JNURWaXl1UVFJTURXcUZHRWhBSG9jM1Fpb3FvS1BxR0JlWEhkWHFWTlBXWFdRZ0Vqd2c?oc=5",
+"source": "CNBC TV18",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "indiaeffectivelyachieves20ethanolblendingtargetin202526",
+"date": "2026-11-19",
+"title": "India effectively achieves 20% ethanol blending target in 2025-26",
+"url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQbXV2dzE0Nk5zUGxrR0s4OTgxamxuUzc2dW44OVg3dDVKd2NqZS1td0N0T0xiMTNnWFZlajAxeWpZVGRabjd5UHEtV2lBOXIxWG5JNm5tRkRrbnVIbGluOHBjMS05TTBCSjdoTi1Qck5nTVhDdDN2ck9WSElmb3E1NnY4T1ljZkVhSUpEYUVQdDhDQ1F2VjJ6M3FfT2RhM3A1ZXlfNzhwTE9UYUNpQlpTMk9tN0psYzNaOFFaNWl0RkhhNGE1d3h6T1pqT2ZiWmI4S1A1WtIB2gFBVV95cUxPU3NpelItOTdOYi1GVVQ1LXFCc3d2NHJRTDdId1RGMTl0RDlGSmFPZkVyanY1ZGRNR29UcWZSYUlwU21idXJNU3N2bUdXVVNfNGxRWjRGYWwyTkdBQ1A0SVdtMVg0MlNGZHl2ZV9XTEMyMlFXM01iV04zeExPREZCekJXTWRqbEU5U2lnNE5IZ2ExVGVhUmZFempRSkdTRmJkdmI2Y21rVDVOeGJUNnU4bWlSUWJwUkRIaXpsUWtlaUNvZnZXb3FFNl91R3FLWkNDWkh3X0EzMS11QQ?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "ethanolblendingtouches20milestoneinfy26",
+"date": "2026-11-19",
+"title": "Ethanol blending touches 20% milestone in FY26",
+"url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQVms3OWNSVVZtTGl3eHZYSG1kblN4NUg2RXIxUFgzeDcxTEFjVjhVbkVRaVFBWmx4YjhIVmxka2lva3N1Q1lmR0xnTWpHRXRKREx4d0YxdlJIWG9MUEkzQ002cVo3ZG5FZWhKU1RSNHBMRllRU2IwUUZwMUNrLWJ6ckVmdmNRenA5eHRDbmJNZ0w5VHNGWDJmWTF3cjFCNnFDRVhqYTRQdlJSNE5pR0FobXpNNmZHNzNZNTkweVd30gHDAUFVX3lxTE5WN0E2OFBCVXFHbkNYZGVSNzlkeUp3dURGQ3h3SjF6UTdCOXdyZldNUE10UTQybVlzby1MSFVHckVFZ3pKUzFYNzRzRExmczVZLTgyUEN1UnVnU1d6ZzUtU0JxTFRLU2lqRjZNV3BaSkNqYV8yYmxzYzI1VWc5dUFqZ191V1k3M2N2UmVSaUp1U3d1OGdpZmJycXVQVnBBV29LanMzLTVzVXZzN2d4cHNYb283MWVncGJ5TUl1bDNvWXRkVQ?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal",
+"date": "2026-11-18",
+"title": "Bihar cabinet approves e-auction of mineral blocks, Adani transmission deal",
+"url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxOdWlzd1dnc3hEUVNVWjNiSFFxQm81R0dValdsX0MybS1jN2xORFN1N2xuRWI5TXpzblczYjRZWXNEcGxkc3ZYc3hkdC1IQTJoblNHYW9RRXY5LU9aQTljeU1uTy1lOGM1R2dOZXRMcHFOUHNpc3ctMnJLcEU4QW1EODBRS3otQ1ppcGdZOXZZV2FrWE9lLXdRMXQ1UXNyM25JNlFDSlZ5QjlpQ3hVX3JNYjR1MnJJU1BiY2FSTEhiM2FuR0ozNzJ6eXNpZldkN3UxQ1B3ck4zLVJrUFBBSmVJZNIB5gFBVV95cUxPY1VhVExRcmNvRGMyTHVpLVk0SW9SNnFUV3hfSzJJdDhtVkRMbUExbW11X0RfVkFfMjZhYlk5WF9HMUk2TkJ5WlY1Zk1XNTdWR2htX09mUmJsdzVRenBEUzRsaDZoTUxSVHNkdlIydS1IeEFjUi1iY3lOa204ZUduZThBVDhMZkZUN0tYbHBYVmhHSlZHbGIzWE8zLXpQbjdiRDBfdW1STHlSU2RYdk96eTB1ZXl2Q2FvMzJwSmJCSlVvX05wSkZOd0p5b2hTcEE4SlNTNTY3V29rXy1Wam96R1RuUmdhQQ?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Industrial Minerals",
+"Diversified Metals",
+"Heavy Electrical Equipment",
+"Cables - Electricals",
+"Integrated Power Utilities"
+],
+"neg": false
+},
+{
+"key": "32billionsqueezewhyindiasmassivegoldimportbillisshrinkingfast",
+"date": "2026-11-18",
+"title": "$32 Billion Squeeze: Why India\u2019s Massive Gold Import Bill Is Shrinking Fast",
+"url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPX0Fkc2pFaHdaUmd3a1A5c2pocGUwd2xYSEt6WFJqZVBaeUhITDVueF9PYVpEdXYwcUozUzdQOHoyZDB2a3h3N3Nzb2NnREZoVGdFVjRZdmVuZkhZeExLMERDMEhJUm5mbW9NeXlQSTBFNk1CcjJiZXN6WEE2Z2E2eV96Z3RENDZScHZxNEhMaFE0TkI1NHZKa3hMYXZEYVpoOFNHcHo0blBRcUJqenF1amx5Wll5Yjhv0gHAAUFVX3lxTE9uUFNLRUFXd3VIa1MzVTN3eWFFSExuRzlCVjdDYWZZZ2VkWkd6MHhMM0FoZndpT2V1QkNqMXJMcW1lWFJKcU1LSEtrazhrbG94SFVYcnZNMWgtN3BiSHVEMUFPMkx3U05OMTdFdi1saEl4UExZM3ctZFJYZmU0RElfckdPY1ZiOHJXa3hBTDJOYk9HZUZBcFZlQW9CUXBreDRSanZoQ0FYMzJoal90dVJUM3F0ZTIzazVsVHo0NUotSg?oc=5",
+"source": "NDTV Profit",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "indiasgoldimportsseenfallingto40billioninfy27ashigherdutycurbsshipments",
+"date": "2026-11-18",
+"title": "India's gold imports seen falling to $40 billion in FY27 as higher duty curbs shipments",
+"url": "https://news.google.com/rss/articles/CBMinwJBVV95cUxNRFoyZXhSNEJrRTc2V3RzSnRXaG9mbktuOXg5MGxZYnFseG1CNUxVd2V0dWVMeDBHekhhcElfQUs3MW5hNVZVREN6UWNITGNsaXlyaFA4c1RzM1dudzc3U2hzeVFOdDhTbnR2YkpYa3RCMzNWM1dia0Zzd3RITnZXQ2h2SmlLVnRxbFBDRlM5NUhpdmRpaFFiMVE4Wkh2YTVhSkk3RkRqX0szZXVRcEpKTEdGVGVLaUFINVVXaFpfVGdxVlFEblA5akI0X0RfUWV4eUdSWWJ4MlhMYlBkUVhnQ3dMLVBOQ0FqZ3FpTTVKRjI2bkZrc0JaVU1xZ2FKQ3g0WGlRSWd6YTlmSUZxcHNSUVdmQ0pTZ3g4NGYwb0FKa9IBpAJBVV95cUxQZXRJUU9EeHVsSWliVGdDMjJ6UGkyRmV3YmlkTm1PQWtfdWhzcTFXMDVwa0xCZW01bXBMOGRENmZEX19MVlpNdmRjN2NNVlZzQzY3NjFwN1lsSjl4TE9TQ3V0XzJSNGtSQjR2ek85ZlNEWlFiVEdCRG1DWDJ6X2I1ZWNwcVVFU29mR0t4d2g5ZzhfTlFMaE8zZkNFOWNOMVFnc1BNSXdjYlpVR2hZTkVxblMxUHVLbk1QaHBfbWdQNmRKclZuS3BoYjhhaHNuQWRSQVBweTE4WXRWdU51RmNkMHRlYkJqcnljN1JFMXZVZTh0a25GR3pWSzFMWmRKY2V6Rl8xbzJZV0owcGVLTW94SUI4a2p4aGw3blhrSDZwSE5IM3Va?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": true
+},
+{
+"key": "indiasnewexportbankeepsbatterymineralsathome3recyclingstockscouldcashin",
+"date": "2026-11-18",
+"title": "India\u2019s new export ban keeps battery minerals at home. 3 recycling stocks could cash in",
+"url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxQREdvNDcwTXhmY1dieWdJX0gzU2p0a0NqUkQ1S0QtRDdObi1MWXJKWFg4M0NWeXJzbGJob1ZjMlpGUkJIcXRWdHN3VXFucFEwWjVMbi01MWNEX2p6SGNqUlYydWRncVpYeGVKMkJGd0RLNkF1OG83UW16b0xkdkVRYXhBMVRKX284N3ZpQ1hkRVVyVEpaM01TaF9xWXBJZG1ZV2dVNVd3VWNOUFE4OWJaN05JV3FBaXRHbVRVeEJ6eTVpWEwyckZGSXdsZkx2b253SFY3RW1tT1FxbHVHWS15UlBOUdIB6gFBVV95cUxOaXpqQTZvRmRsX3FDVkpjaXpYLXBTVk92WDJYN25tYUFlZm9MVWNIV3NhNXYxVjBCakYwdGo1cXlXMmVpc25McFM5SzhkLWNSTi1RMFg1bkZkUkkyRlN2SXhRcjFwWjBQV0ZQd01Vemp1bW9HM0ZxMHd3UVE3TkN1NTE2ejBKZFg5SGpFNkp3YnM5N2syMzFBQS0yVXRIV0haWGpwVHF6cDJDajJkVmtFYmdCTjBvMHlCeURGRlM1QnU1blBSbnp2eFhsRVpJTFA3ZG95TlYtekJURXFWUzQzMW8tRWVvOElVYlE?oc=5",
+"source": "The Financial Express",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Industrial Minerals",
+"Diversified Metals"
+],
+"neg": true
+},
+{
+"key": "niranidisputesministersclaimsonethanolblending",
+"date": "2026-11-18",
+"title": "Nirani disputes Minister\u2019s claims on ethanol blending",
+"url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNd0VscllBeThYaXRFQ3FrSnJCUWt3NXFCbTB6QUlabXdMNHlyMHRYZllHSGJuNU42X0FLNEl3UDJMZ1paSHJoMmJiTEVzTEVqUUg3M0Y5a3UtY2g5TGRidGM5RVNSLUJscnVyR09fWUZXV243RHJiUmlQRlhjQThNc1hST2xxSTVVdHVMMUdhVkVwV3l6c25aeng5VFRQejdjakh0VjB6U3VUbzZrMEtWcjV4cDRRanRtNzNxdlNB0gHEAUFVX3lxTE1sWlpwYkhKQWJhcmFrOXdhS0ZKV3dCRVBNTm9lVjVnLUJ5Q3BjemN4QTV4TklIVTZZQlNKbXNNM3Z0b2l0SEowOWZhbHpSa194WUNSSlpKRHBsenUtcllWX3kybXlLTzNwZ21iTVJHZDRNOXN5SGYtTElEcjFUdG5BdVI4QkdpV1NhNkNubE1aS0sySFNZdlVYNGYxRWZBYTVFczdWR2Q4cnkyQ09vd0RDNG50RmJJblJKNVZSbnRidEx6QXA?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "e20petrolrowkarnatakawritestocentresaysstatenotagainstethanolblendingbutagainst",
+"date": "2026-11-18",
+"title": "E20 petrol row: Karnataka writes to Centre, says state 'not against ethanol blending, but against...",
+"url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxQU3QzalhDMEtBOGdwRTB4a2lDQkFETVUxUUxXNHNveXZNRHdlNjRZLVU2TDVYc3lXaENscVdpbzhCQWFKMWUyWXdTMFRWV0wzNnFXQmpJdFlYbkNXajRVdnVGejNhcmFjejFPNUFJSnhQZWczS1hEeE5IM2tLcUxXZGRaODVyUDFSYnBzTEZKVFFNcmIxWDFMX0NVWFk1MVVnRGNYZmVTR25GYU1OQzhkbUV3NTJZdjJqaV9wWFI3RDZiM2hEM2ZvSVpjLXNnZEpEdlJGUGpvQlpPNDZyTlhv0gHkAUFVX3lxTE9iSnFlVDZYcW5QUVVnRkJ3Y0tldEZXcmVKRVdVZFJaWGhmdExIdjZzaGRNSVNKTGNQeWpjREJId2Rjai1GX05RajVJcVF3dDJYV3h0RGV5SUVXUEVVNGdla0JoX1lZUFRXR3UzT1RINVRnR1lYVFdpd3BhdWRfdW95dG4wU19kYm9fTmpsTTlXNnpNaEVpSDBObzhJSm5UVVlVU19rUVM3T0gzeWYxX2R2YTk1cE5Fb3BFQ0xrc0F5WGxiRjd1VFl1SnZ6ODM1Q3NqYXNoU25nY0gyczV0aVVUd1hGUA?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "euimposesantidumpingdutyonsteelimportsfromindia4othernations",
+"date": "2026-11-17",
+"title": "EU imposes anti-dumping duty on steel imports from India, 4 other nations",
+"url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxOd1lyZ0VYdVpZaHZEQ1dKVkwwRTdHclllOWl1YVh0bk1NVFNieldsZ0hnUG52Z3ZTZE13UnlWaVctWkpmbXNfSkVBYzZDN2tqaUJDSGhKQWlvcTZ6b0FvN3NmTnhvM0laSllEV0thTVA3MzhYeFpBUDYyRmhWd0Qxa3FRNDdYZ3hTczVmYV96SXF4MW9ZNWROX054WnFjT0tZNnVUQ0wyNmpJWXRGWTdtbDJ6b0lfcjhydHpoYXR0cm9FREVTYzZ6ZHd5dmc5MFUtNGg5RzNn0gHbAUFVX3lxTE1IakFQTTNmS05Ga2pKQUpFT2tnUGg3VTZ4MGduaVpBNDdKVENVcV9EVHI0cGNOQmxKeVBXMy1qOXE5ZFJJS0FXbDBYVDd2dE01S0g4RUVfTEtpT3QxbVRNNDIyNkFLcVFQeTM5ekdoVXlIVHFiZmNJYlhqYVlfNUlmYUhqNzZNS1FvcUJOOFI2SklORHlDX0ZBLWVKMmhhRFNrazF2U3dnQkl6S1RyVGN1V3cwZTU0Z1Z6QlYzVGxha2VnaEc1dVJOME1WMWJDNmhMRl9LRV9STUxtdw?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
+"date": "2026-11-17",
+"title": "EU's 9.5% anti-dumping duty adds to trade barriers for Indian steelmakers: JSW Steel CEO Jayant Acharya",
+"url": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxOM2VINENNdGI1eVUwYnRJbEVBd3lwM2c1M3Q2Rjc5QzV5TnNELTU4eHRoWDgxTFBHemZCQkJIczlUQ1k5TGV0X0dHcWZJcFFBYk92TVlYS1UtcEl6MldUck9pSDUwd3BJZDU3RGVPUkJITm9tZlU0YzktdkE5N2dfWU11d01mOEZiWmptcTY4SW0tZUFJbm5YOXJXNjlsMzlXM2pmUzlzaGIzdjF1NFBLWHI1Yl9uUzRGYXBQNm95WjNvamlPUXh0bmJxSW5MUnQ2Q0dzUUR4M29wR2d0Uzg0VDJMN0Z5Ukx5RDNreWt2UdIB9AFBVV95cUxPQm5kY3QycnRPNjNHQjNiX2JfTkFLUk5TZFhIVThxUWpZQVJzcmZZV21kSnpaNWI5U0xvWnhiWGNhYkJDajhnVlM4MU01YV8yQ0dQMFF5N2d0cUhIbUdFOTRoQ3NWNDZNNzJzSDhIekMzN0pRT3FQdmNUbW1YMU9wNENKclhXYnRtZEFiV3VCU1l4TGkwRlh5U0t2NWptUlY3Zk9XT29UMGFMS1psTTBJTXduRmFVVWlsNVBmZlh6NnlTcTMxREIyZWlDel9PWU16azFIa2phR2FsdHBsc01NYnFCREx5S2lwVEFJQzlMdGxTLWtV?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
+"date": "2026-11-17",
+"title": "EU imposes 9.5% duty on Indian cold-rolled steel: What it means for exporters",
+"url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxPMXVkUFBudVh3R3VWeG5zbE9jcU12SUV4T181RDhseE9RcUZaYUt1OTQ5SDFuMHBGNnJ6ODMtZzllbGs0dUJqMkF3VldhT1VxMzhQcHByTGVXUW83RGVVamlSMEZIdERFLUx5ZnFHOURadnhJR1dKTDZKYkxub1dxSlQ4MS1qR1JSQkF1TmdRUm9lb1kzVnV0VUhxOUloVzJLNHdVcnJEdUN4dUY4YzNNdHdRckZIOFRMXzRRSUk2X2lWLWstWHIxUUMyVlpfRWpxRHNsampEVW1yZw?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "centreraisesexportdutyondieselaviationfuelpetrolunchanged",
+"date": "2026-11-17",
+"title": "Centre raises export duty on diesel, aviation fuel; petrol unchanged",
+"url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOR3BsaU44czM4YW5pckEzMnYzYUozOEFJc2swc0hhb3RCalZ3TnRmVzZ6bk5neTVfbVFqYm1qYTM5aHhuZ3FrcXE5QkprUmNDbGV4RkVFMy1Dd0ItUk1aRHFnTDdHR0owY0FTbFhScnJsZHFpMTg3c2NGamdVU25LRU9HMlBERm5IV2ExVWxHbFRBVzhldG9qdmJVcE81R3JHTzVWdEd3blNYT1F1MWVTcjZEOFFhMEduQ0w1OFJoRGNOdkpsOXJEc2NsQjdjd9IB0wFBVV95cUxNZkZ2UFN6WW16RXRFbExsOVpiRkZhV1VQZUdSQmNkbzBpcE16akI1UlpWM1hHdzlFYTJqc3YyWlpyc3FYMFpmaTFtRXItWjFyS2JzZS0wX194c2tWa09lcUFQeFgzR1B2MUhQS29RanlzT2NOZWZFU0d2VmFIZ0Z6U2hSbUdpZm5tNV9GbXNTSFBVeHJuMUN6MXdwbDdiTGY5OWx5R0x3eGJGaVpXYnFXS2JUYTFlcXV3TTUwM2htRlQ3b0ZIVVRZLWJEXzlHNThKV3ZN?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "indiassolarmanufacturinghits116gwasplischemeboostsdomesticoutput",
+"date": "2026-11-16",
+"title": "India's solar manufacturing hits 116 GW as PLI scheme boosts domestic output",
+"url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxOVHB1TTBaLXR4Z0hSa0ZVNFhObU9Hd0xxUnoyOUVTSXB0NFU5TV9jelRjQXo1Mzk4a1ZKY1hfVXNROUkweTh2R04xWE1iZkhORFkwbW1tOXBaeHphN1FhM2Q3STAxNDZma29XYWZXNU5aekZMOTg3OW4yM1BlRG53cXJBYW5BVFowOVNMQWNKZFNYeVBOOW1MWWpaWHNscnNEUkk2X2lpa3BnVzlfenZuWUtJSWdfVzg5RW5LelM3dnNtQWFfT1BzckNUTTBDN1htaTI3c2M0dDFZMEFaUXVTREtyQdIB6AFBVV95cUxNZGZxYnBKbF9vR0VrOEtmLTc3dDd3Umh6RXRPa1pEUldUdGpMRmpveWVDRnZMZ1QxemVYZ0Z3NEpTNExLZ3VjUFBoU09hdm9sM1V2LXR3R0JHbWhVQ3BvcE94dVJBNTM2SmFwV3Q1N0lkV2FJQnlHMFVDSzlaZ2NuZlZQV1Z3UjNQM2NueUJxazJpWjZkWU82Z0VFVmJYY0o4MjhFX3hWMzA1RF9SeUd4dVNPbzF2LXlYREtUeld6Q2ExN2hXSGZ3ZDE3YUprMlpxS0FtUjRQZERQNFMzWnBXV0dWb2lXYlM2?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Power Generation",
+"Other Electrical Equipment"
+],
+"neg": false
+},
+{
+"key": "euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
+"date": "2026-11-16",
+"title": "EU imposes 9.5% anti-dumping duty on steel imports from India, four others",
+"url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQbGNyempSMlJGT2J2bjlQOTBhUUJKcnhSTjZUakpIV3dkenZsZTZSS3VTM2E2ekEwQTA1N0dNLUxiS3I3bEtfUTFRMkZRbFQ5RC03ZGczeVU2cUtrX2VwR0xJUlVMMGF6emZsaUJaLVYtenJCMUs3MjJCaTNKcGVwTlFVQl9rTW5PUXBaSk1oY3JSa3dHYnl3a3RyQlcwaVVMNzNRUkRVU2YteDB4UzRiYnpSUTNUal9wc1psVE5QbDQ3Ry1iQ1QwdNIBzgFBVV95cUxOVWRjYmVwbTBCMk8zNnJUTHB4a2JBeS1OeWk5c2Zvd2I5ejc2LUZXeWF2VG5YZEI0YjFlakp0bUtQamlrOU1CczkzTFVOcm5DVVptOEd2S0JQQTV5Q2xmZW9yQVREUGhqRzVhOWMzZWlrNGJMTWE3N2UzdkswV1hmUk10UmpRcWlfcHNJTDJqY2h3bEhLT3p0Z3QwV0NHb2Jpa2I0NXRSOWs5dFlvTi1GMGJaRU1PckFubWc2M0c1bUx6bWdUUm1heFBqX182dw?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
+"date": "2026-11-16",
+"title": "EU slaps anti-dumping duties on steel imports from India, 4 other countries",
+"url": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxPT0V4Qk5DTE9ONzk1RDVKcEE2bnZHZ3ZRSU93Vk8yNjJlRmZ3WGEwSlFNdTN1WXRxNDlLSTd0cmZadjVaMVQxcVlNZkczdUkxVF9XdFEwMnEySG1ZYzZmY0FWQURLc183TmFXMlBjbGxWN19vdnZXM3p6c3FoMHI4T0xTVjhBZlBPYks5SDBjV3Z0Y0YtTDNNVmhTaG5JU1poQUU1RFNnY2RMMmtnaEdCYm5BQm5kWVl5VmotcVlNRWxzN2dFOWxPRGRDT1NTRmFTdVhFVXM5alFFeFVOSEVTTWpLMER2eGRvd2hQZnIxbTZ2WWdiWk5mVmlQOHbSAYICQVVfeXFMTUI0Q2xlNmxJQmRFeUNYaXFuSVVTOTI1Wmk0dWdSTVFsU2xfRmJoOUE4V1ZFVDM5SWoydzY2S1FmSldNSEYyTHpaV25rVnlrZWNvMl9zdU5RTkFaS0hfaVcyemUweGRwa05PaGFXTVdnUTNOUExGYno0YlN6aVRhS1ZOUmY0NVN3WTlNemxGNWNxdE5jTkVGYlpockdNUmU1dVQ0anV3aVh6QWhGbUR0SVZpOFJEeVhtRFhwdTNCdnRiSlNxcXl5SWFUZ2NlSDQ5dGx0MU1mdmJEMktJeFJDZmhGVEduQzF4ZWdJQW41dm8yY0phN0RZTE5XMTZpUW02d1RB?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "indiansteelassociationcallseusantidumpingdutyassessmentunfair",
+"date": "2026-11-16",
+"title": "Indian Steel Association calls EU's anti-dumping duty assessment 'unfair'",
+"url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxQS2xiR0JGVDMwMEx6RC1DdG03ai12cWxTdTNVRjVpbUFHZTFVMzZGRm5NZnRlcS10QkRmeEtZWmlhWEQ5OUlaUXVCeTNoY0RMSHBJUnN5ajZGSGRmWXlrcWNtTXpqTnVuMlRydUVKYzdNTUMyM1Z5c1ZGTlNQS3VTNS1Bb0ttTy1wbDBZQ1U1SEdlQm9ESUs3LVQ5dnJTVXNiSFpWQmU3Zi1VN3h1OFFtbzAtbDF3bDhSRGJwdWJpZnhKMVFOUmZJU1VkNXZKMUdQX2NiOV81R09qSjhvRVVMOE0tdEtCZzhuNmfSAe8BQVVfeXFMUGxZZDFjc1QzTFRtbnNJWWE5cWdjYlBYdWpWbGp3Ym9oVTN2dmxaWlV4eUE2LWhqQVZ6N19SWDhhSWJOYUNvRS1jZm5VMjkzQThxN1htTE02czZqcDZOU3JtWWJ2Z21rQzhUSlYyZEdNcU50aHd0Z3BqeUQwckZmYk9XRy1saUZkeUF3RzMxNW5uYTJ0MnJQR1NFVDM2bmU1SG4xUHBpYWVpUmRjVEtIZ05YNWFIdWtSMDZ1VTQ1cm9OWENmQS1QSXVjb2NsT3Y2cWZlX1dCWGJSVktLMGRqTlNSbmhKcFJ1ZUV0WnFJWVk?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
+"date": "2026-11-16",
+"title": "Indian cold-rolled steel faces 9.5% anti-dumping duty in European Union",
+"url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxNc2R5RXZ3eDlSN2h2TWR3QXl0VlVOckQwOGMzN21GWEN2U0ZKZjJmYnRQQlgzUVh6bURtRFlNN1MyU2xOaU56NEZjNS1EYVFIUTV5SDZyMEVkVXo4MlhVaU1aTGZ1VHlCR1dSUGxOcG5sTTBvTzAxR3dwTS00TkhkQjFNeU4yN1FBTElYRzVUN3RucloxT3luOE5XbDBVdjFLbUNZMDZrWkFyZGNzbU80WGFxbTFheDZibFhXN2IxazhnVzhfY1h4ZFlibkMwdGh4Z1VPY1AzcjJlM2J5QjZPZktvUzROci00ZlHSAe8BQVVfeXFMTjY4ZmVKUXQ2S3FGX1JvTjAxQ3ZjaXM5aER2N0RxcjNRa0tZekxXaGt1WnNEaDN5SXFLZ3dESmwzQVdlSi1RWVdBcXhRSnlLV3BMOWNRa1dGT2VpZDduT1JGazNqbl9ZWGhrZDYwak5zZU91WmFvZFJEcGFJYmI5Q3NHZmRwMFBNSmZXcDNGRHNFNEdOQ3lJankxbmRxQzd3M3Y1SmVyXzdwSjFXN191RkVqRWdZaFFkdkt5Vl9mNGNJa0kzRnBWNHJ1bk1oYmtoc1dvOEFmUXZrcnhtNmJoUnhOMHNSd0FuRVdYeTJVMFE?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia",
+"date": "2026-11-16",
+"title": "EU imposes 9.5% anti-dumping duty on cold-rolled steel imports from India",
+"url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxQWEhPOVRHRlQxSWxZNkNPc19EZHU1dDcxOHl0ZmE3cFIzTTEyWEJTcnMweU5tN3EyQ25ySlFKcTdGMzZfNEp6akd3c2p5MlpPLUQ3Rlc5VWlnRjlWNHgzUC02YU9tOGR0VlJaeW5jaGpPa3h4SzNCWDJsb1RJdUlhaDZrc19TSWx0cTJSNm1YNy1hMXlCUVZDY3ZlSzVWYTV5eTA0V3VtMGF0ODNnM0RoXzViZUplUWxlbFhjYjFITFNDcUtVYm9qQ9IBzwFBVV95cUxOalp5cld2VWVvVGdWZWQ1OUZwbFcxeHNZVUMzQXFIVGNpSzdKc2VwcmhjU1J6Ym84dEhpbHkyc3BTYlMwNW1yU2h4WEpmbmxqbkZEb1dOVjg5OTFWMWFPY0FrclNBRWVMdjFjNU52aWJVaUctQlVNbE4yQXIzRDg2RmtxX1Q4enRld3k4dkt5QmtCRllaNmtfVks4R2RiUXAtMUU3VGxsemhlM3pRWWIxX0VJSFlvSEllamV6VWlQamNPQXJyeWdDbEZuS2VaMEk?oc=5",
+"source": "The Financial Express",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "indiaraisesdieselandaviationturbinefuelexportduty",
+"date": "2026-11-16",
+"title": "India raises diesel and aviation turbine fuel export duty",
+"url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPYldRYVVKNGVWOXJNcjd0bnZjTWt0OEVZbEpPc3RHYWNDVGV5LWZxWE1FUFVPZG5Sek1GMGxqWXhwMXNMeVczSEtWSzIySllOZW42aC1VTDdiMGR4QmZSR0ptSDhuc2pkWkJhcjQtZjFuZDBxWk1tRDhvc0p5SDZnWHZ2T3dTamxtN2ktRTRYa0RtbzU0dzJCOG5peHVnN3FLeHBmY184bTc1cm1jVHVMSHNhLTh6MGgwWUNud1Zpdm80eW81dFhmMkMyaWpFQ08ydndB0gHaAUFVX3lxTE1hVmJZVWxUSWozbVNTdnFaUzMxdWhjMVZ5cWx0VWJfZl9XejRQME1mY01JcVF6eHR2aHlNUHhGdTBMM1JYazlSa1FvaGtZdzFsTDE4Z1VIejhmUHozeExCRlRBX01BZlFDSjhCaGpLaUtFOFhyWUZhQmZxZWNBTDhqSUs1T2FINlZ4MXhVMU9Dc2ZxUE45bXZhWFFLNnZLT3pXM1g2ZXNHNjcwQ082MDFmbHRwTWtYdWVZZkNRSHBTLTk3Zm8xVVN5YTRLdHJDaHB2Z0lyYVlLY2d3?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "karnatakatosendlettertocentreonexcessiveethanolblendingonnovember17",
+"date": "2026-11-16",
+"title": "Karnataka to send letter to Centre on excessive ethanol blending on November 17",
+"url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxPUzlQbUlKZTdzclNEUVVXaVMtUDh5MWNsOEw4ZGkxUFN6c1lLVU1YTS1zaEtMamZNV0hLeHRPOTkzekU3cnRJdVBJY0pORFRFX3k2NGF6ajZuMW40UGY3azhSTUpaY292ZUZ1NEJ6RzdrZ0VwTF90XzA3TnZEUFl3b2xmTVp3elJ3Z3gwRENGMEtMMjBtdU9XdU96WkJldk9kamNoN3NUaXZadmhqVEYwd2hzck1nMWVIaUxpenpiM1JTblpoN2tHbE02OVJISlIwSXh2Vk0yWWJYQ1RNTC12NVZn0gHoAUFVX3lxTE51bEczQ0RDWWU3NDdLM2hHY1QwLVh1MFJEUUU1UXlweTVsUENpNkg0V0lIckdOdWxxZ1NYNUQ0bTZ1TXBYUU9mUFIxSmlOYTc2RVJ0VWNIS1RkVzBDbVp2b1VvdC1PTVQ4NVNRbGRjLUt3RUhnRm94WFIxbm16c0RSalc0S0JacUE0RVJobDBfcG1WTEFzZDlNTEpzQy16d3gwRDBBWUV4UUNnNktLQ3hBMnM2a1RtS00xc0VfbWlCNnF1ZFhjSDdMWTVuZWtGLTM5clpQdjBpbzF5YnZ4eEtIOVdiaHluMGM?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "eidparryseesethanolmarginsunderpressureconsumerproductstobreakeveninfy28",
+"date": "2026-11-16",
+"title": "EID Parry sees ethanol margins under pressure, consumer products to break even in FY28",
+"url": "https://news.google.com/rss/articles/CBMipAJBVV95cUxNQW5aUHBvUVRFMG04ZnBkVXRYTEtPTzJ0VnU3TWpBY19OMFIxVnBLSkZLcTAzd1lLZnBlV3ZmdDhmbmdGdHY1VFFBX2lmVEpLQ0RIMjE3d2dyeXF6UnlVUjJBWElaY3BRMW5Ock5kcWp4SXFFeGUwVG1teF9nVFlyTGRJTV9jSlBzZ2tqWE1na0EzeGo3VUMyX2pfV1hPVnZaNEhZR00wQWdjWkpiU1VmNFJ3amE2R2oyeWJHUElCTFZSdENtYzhqZ2hiYkxmRFpjTUNBTXpMUGlkM3lzenlpanN0OTdiU3FhMWhRUTFQdzBvRE5mTXRzVF82OXJNNlh6MkVLUi15ajdqZWJ0Tzk0aTFrVF84M0lab3d6TkxqaTJOSUhf0gGqAkFVX3lxTFB4RXVuQ2ZOVGVVaHVxcjUtTl9WcWRQa0RNMTZsMzY1Q25xSzduQUtSeTU2cUFBVXhVYUdIUzltblRuWDBqVDlMOEhUdGg0b3loNDEybnZib3M4aU02OEN3d25SYndldnY5eVY0dFF4dUFHMGZ2MXhJRFg1RFZHOXZjSW9qem9pZjdSUjJfMXdmdU01MjZRd3U3akNNVlR5YnNqTXdhVlFJZW4wRk5nSjlPbUU4Y2ppSGM2R0EzUGRsUXVIQWI0bUdjZFY4ZGxaSHpJX1dGT096azFuUXRJbW5XNWUzSlFIaW82YUloWnJNd0tlOUQ0SnJDQnkxc1oybmF1bFJRQ1hDRXNwVjRfYVRVY2EwbFlxZTJoNENYay05WnlhUVZQaENxS1E?oc=5",
+"source": "CNBC TV18",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "budgetwishdownstreamaluminiumcompaniesseekbasiccustomsdutyscrapped",
+"date": "2026-11-14",
+"title": "Budget Wish: Downstream aluminium companies seek basic customs duty scrapped",
+"url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxNOEZET3hLYVRkM3RMOEpBcHI2cVliX2dGRFBuVEl6RHZxYjE0LUZhNk10ekx5cG9ReTd3RFQwRmZRUFFSaGwyc1cxdjhibjViNldsOWVPSmd6RTBqT0ZyOUdkVno1ZFU2YmR4MHZIcHZTSlZ5anJGZjFRLUhxNDlQNzlmbnVPaU1BaDlKTWVSRGxJX2hWc2tGelY2aXRGTGtXUFR1d29KMEVNOGg3dVp0ams5UVhCdVZaUWFjLUlzU21Id2QxQWd0aVFxNXdUVnBkM0ZZSkc3dW1CZFliejdFT2Rzd9IB6AFBVV95cUxOeXNaRzRuRmhfa2Q2LWlOeGpicUc4cUxEb0FwS3VXaW5IY01Fc3RlaUVkQU1pZlFrcWxqRmVoNmFjNzN0MmtHcmJRcjlrTVlDeGNkeURZLVJQbkVhQ0JuTFdxekJ3c2ZiMG5NekFUSThldjZ6LXNET1pOVWpoTTR5SG1YM1ZKd1BlaU9VQWZuTElpdWI1aGw5enprVVhiMXlOZXBkQWt5cEh6TzFLZ2VqTDBXaE16Wm5ZZHZvRHJyRHRJZVpfTnFLTFJzck14TzlFZUNPblRQSTNzczVkcmNuVlVBMll3eHVj?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Aluminium"
+],
+"neg": true
+},
+{
+"key": "bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"date": "2026-11-13",
+"title": "Bajaj Auto tops auto PLI payouts in FY26, ahead of Tata Motors, Ola: Report",
+"url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQTWQzSFA3a19zOWREOHV0UWZ5U2VOMld0a094bWlReEE0TXV3aWdIYy1xM0VVNGY0RjJaYzlUNGE4RldWQjgzeHgyRzdpUk9keDgzQmpzQkVfclpTRVNVbkJOelZIRFJpbElkVjBFM2M3M2tnQ2JsYXRYZ0g4c0JOWTdsb2ROSnJRSTdXSHVxSGI0UlYwUWFWUS1lUVVld21HQk5SaG9Ebk8wTDNral9XNFZQVDUtejZkWWxHR2xhTExsLXUxNE9CVnJkX1UzNDZXY1JQWdIB2gFBVV95cUxQNG9mV1R3NjBnZmhoVDhucVlpN1RPaG5Nb2VCVjA4UTJPZlZsWUp3RFRqQkJ2cDVFcUM5TzlHLTJVMjd6a0habTlkb0JicFhQZkNzYXNvVXUzVkFqSjVXRHI2QUxOS0xpeGhCZkFFMUVzaENiWXZyTVZta1dZc1ZRQlZjOGg3SUJ4ZzBoZTY0NHM2eG1IaGUwT1dJZjRSTWVpX3R1Z2VlTVBLNVpJWGJFZFozOC1sdUpvWXQzN3hhSHNGUUhDdnZTd3pJS0loWjRkVmpuRU1GMDRVUQ?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "nitiaayogpraisesmobilephoneproductionlinkedincentivessayslaptopschemelosttimeindianews",
+"date": "2026-11-13",
+"title": "NITI Aayog praises mobile phone production-linked incentives, says laptop scheme lost time | India News",
+"url": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxPdFh3WTJ5VFBfckJ4RV9QQzRlR1VxazNKYk04ZWo0YUdRb3RiVV9PRmVuM1FNUzl2UDlacHJVbE5aTld5Rm9hcjVoQlBvVFJvU1NtN1BaTkVRMDV1VVJXWnk4b2lqT0hJWXc5LUJUa2NDQVhJMS1vRVZKZGMwRnJLTFRockJRSHNQdUkzLUdZam9wUjRRVUVsMUNYX2s3QW0yS1M3VmM4Q3ZxTVlyZ1lueHZuQVVkTzZjVnhnUDRGWjJJQkUtakdyWW1Xcll1WXpSNVBqVzltUEFXdUVHWWhfTC1DN0RJNmfSAewBQVVfeXFMTlFyZVlfMjNPWXBQUlZ2QkwxeVYxLTltZ0I1bDVsaDhZb19OZGRoLWxKSk4wa2oxTFhjcWt4SExxdGRodkNkd0dpUW8zNU5RUEZZd3BsSUJBellhU0JkcGZ3bzNvM0J2T1pTNndBNlhsdjdPX3VSWTZCMmh6eUhOY08wS2JRRXlFRFFCV2pEXzRWTFJXalduaEU4ZjZYUzJLa213REQxaktPX2NmWWt6aHNFX0J2N21QdUVWUTlOSlM1VzNnTVNGckdPMDhCMFlyWWUwZnNRRXljOHJkMWYzbm92X3Y1d29MSG1oM3k?oc=5",
+"source": "Hindustan Times",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Telecom - Cellular & Fixed line services",
+"Telecom - Equipment & Accessories"
+],
+"neg": false
+},
+{
+"key": "whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"date": "2026-11-13",
+"title": "Why India's black mass export ban matters for its EV battery ambitions",
+"url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxNREZvRnlubV83YVhoYzMzRkhEX1hzYjZGZDNFaV8yUEV1VlE4TjF1dGwyUE9DbFNJYVpsdHBTX254Rno3b3dCaTE4TmxvSFRCUTEzd1pPdDJ0WE5JeXliWl9mWkRzSk1TU05pLUJyVHAzUUpnM1hrSm9GR3ZVVFFKMWkxZ0dBVVkxbnFMcnVsZ2o4WE02aUtrTVFNMWh4Rlh5MjFvSWR5ZDEwTklSODhkS2w4T195dko0bGtBZ0NQWXpOTkp3bHdTZUlyOFE3N1nSAdQBQVVfeXFMT0swMWxRdFZUb2RRdTgtZXB6ZWRHSEYzMEZXS2ZZZzRNUjM2Z0ZTcnVYVzVJcFlyZ0xJVkZYQVVscXVxNWVXRzhoZnFEdHBfTXhpQ180VngtNXZfZ3RRYkFoMExiQm95bUh1eTk3U3B5ell4bDN0UlJDcTVKWE9GSnhUcHQxcm5pcWw5QVdVcjh0VHZmeWctNENMcjY2Y1pzazZGdS1UeVA3THdxSWJjVnJfRlFkbi1FQ2VuOWd1OHp3cGp3QUFvR1h5MnNQVm1BMmgxZXI?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": true
+},
+{
+"key": "fertilizerstocksrallyafterunioncabinetapprovesmassive62370cragrisubsidy",
+"date": "2026-11-12",
+"title": "Fertilizer Stocks Rally After Union Cabinet Approves Massive \u20b962,370 Cr Agri Subsidy",
+"url": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxQY0NxeVlLaUVvSzNxYXRnNEI4VXVfLWk1UEc1Vl9qVnktOWJZUjVlb2VpckFoYkpLTzZzN1JpcGhOVXl2ai15aWZIQV92dFh5eFFXZVRJdXgzY0VJM3loZFFWdVpDbWlhQUpzR0hGU2xUX0EtN21EQU1DS3dpTUVoNTRjNmc2b3g0RTlQNjQzMTA0Y0dUYlgzWXFJR1F3UURLXzFmRTRDY2lfRFUzRE84OVRsaDNoYWJNUnRKN3lLUEVwSE1qeTdyTDFYc1EyR3diV3JfQTBJQ2FUaXJjMkFjTEdWY1BqUXROdFJpSdIB8gFBVV95cUxOdkFWbzBkWnhjdnlMWG14MzNCVUNYVXc4cVlmR1FVb3NQVVJaWmUwYVV6clJvVFRETDhCMmpGN3Z6cjBCc2lfZl9iVUpWOWtnczRGUWRSVW5ZTi1KVEI4RVVSNlp3Q2V3WmRCVXdCQXg2Zk9aYkkzODdjaW5MdXdPSHdvQlp0OVdGelNZM1N3U2pwRU5Uai1mcTBrRHBuS2o4d1lJZDJod21EeFptQmIxUzdjQUFuTlhHVTBrNERTcGZiZkdJM052M24xdUh5bm5IYTNoWVR2dmhtM2p1dF9jcklaT3lfOEV4ZnoteGdpSkp5Zw?oc=5",
+"source": "Business Today",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Fertilizers"
+],
+"neg": false
+},
+{
+"key": "plischemedeliversstronggainsinelectronicswhitegoodspharmanewersectorsstillinearlystagesnit",
+"date": "2026-11-12",
+"title": "PLI scheme delivers strong gains in electronics, white goods, pharma; newer sectors still in early stages: NITI Aayog",
+"url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxPcXhxZEI4bmwxSDhRcnprRnNmSzdOdEVXMHNGbU1VbzZMWk56dUV2blJ2aVBrd1A4Y2tDUkFJRVk1aUZHNHRRVlJ2U1hsYkN5YTIzTHdmcE1RQmtuMElsZnBpYW5ENWNsMVh1Q3FFdkJrcVRzYnJTTmlEb2Z0ZDJ3SnM4R2dFNk9aUHhydTkyVlM2X2dvNl9IT3I0cWZCVGtxUGc3bG1kaUJSOGR3Rk0xU2ctVDNfWVhfQUtxVVlJUV91Y3JEVm9TTXJLUkVnZEZQRFRKYlNLdnZKdU9YM2VPUzdnSWdkcnZqb1Rycy1KRVc5dGot0gGCAkFVX3lxTE5tZ21Bd0NqR2dpQXpvU3pVRkRKaklhRUJrN2NOb18yYkEyY05pQmQ1X0poZ1hUeU1PQmh4N3RISUEwUEctV1NpV3F2Q09GeGdiaXRnS2hWZTFaeWhCWUN0Ni1fOVlSSFo1ZFh3Uzlsem52V3oxeC1NWk04b1J0QmgwQ05YY0ItNERoVTNXanV0am9GZzk3cXBZcjJhTjNFOG5TcTNPeW1HS3lNMjVpMldvWVFfeTlZV2pkVWYzR2h4MnM2MEVLc082ZkR2blUxUDc0OTFVNkt4OVlFMWd3YXZtdkx0bjNuLU45OWVKa3d4aHdScllBNnUzcFVLVWE2VURiUQ?oc=5",
+"source": "Fortune India",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Pharmaceuticals",
+"Computers Hardware & Equipments",
+"Consumer Electronics",
+"Industrial Products"
+],
+"neg": false
+},
+{
+"key": "howindiaslithiumionbatteryblackmassexportbanaimstoreducedependenceonchinaforcriticalminera",
+"date": "2026-11-12",
+"title": "How India\u2019s lithium-ion battery black mass export ban aims to reduce dependence on China for critical minerals",
+"url": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxPTVFCb3BHTU4xQjROazFoSVdCT2Z6Rk51X0xzdklBOFNCU3g1RGtVY2czbVNtd250d3hwa3haZW9Dd2VvNGxmRDEtM180QUN5VzhxVTdUWS11MWJwOUF6Rmh2ckd0QlFSNHFSbUVnMUZoSWZHQlgwM3V5d045aDBqS2VLRnRMMGdqVVd1Vkd6cXFDcGtFMlBGWlpGZ0p5aFlNUllESXduSzdEa2F4QTdhbk81NDU1ODFFVGRELUttalRXNnh3RTJWSENkQ3JtVGRMVnl6VkI3aFBkaGpLdUY0cWIyVWljM2trbkw2OHljdTJnZUJqOVpR0gH8AUFVX3lxTE5LUmZWekdsRVJkQlJzTEhRUHlGT2dGRFZVd2pHV3Z0WHRBMTVUY21HdHBfaEtiekZCQ3lDTDZ2NGF0c3A3cUNzTVo5eThLZjJicGhPd3FvVTFfQ1gzUWExR1VRWS15VEt6eW85a1Y1ckpYVDN5WE9LTkpEVXptVVNiX09WM3VyVDVyTXQyMWItU0NOb1JtenJGWFByQ2h0SDRuUExUVkdUUUVQRWJrd25BUndpYXkxMFFXNFhLTEN5bUJDYXY1UENNREYzOFE3RWZVdm9HT2czMG5tS21CZ0xtc29MVDF5THlBZUJJSnhPbWxWZ1J1YTlTOXdjWA?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Industrial Minerals",
+"Diversified Metals"
+],
+"neg": true
+},
+{
+"key": "cabinetapproves62370crorefertilisersubsidyforrabi202627season",
+"date": "2026-11-11",
+"title": "Cabinet approves \u20b962,370 crore fertiliser subsidy for Rabi 2026-27 season",
+"url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxQT1c3MWdPWWVzQmVpblRLWG1lTy1ObW1ITlNDTldfMkpYNG9PZW9hdFh4aGlpNlhnLTBlOWExN1VQQmRHMUM3dEQ2MmEwR1d0TzBsY0NrZEUzTkxvX2lzQndxMUZqOGZvdHQ2VTlkb08yY1YtV0hGZWJVYlZTTjVhVkJ5RE5kYm5vQWFrdGJsQ09tSUVxNzRaOU5Va0dZY0lFdWtSSWpVOHp0bDBCQjRESDFMSDBIMU1RV3JfWUpVb25FWU9IQUt3X1NJM3dzZUt4MzZOeU930gHbAUFVX3lxTFBlc1hBSnFXTjdOTVRUSTNIVFd4M25TbFRxZTF1bi1tOS0tN29GVWFvZEV3M1FVRjJ4SVpITkxwQXFKVlVQajFnSGlCdF9XYzd4U1pwcHlQQURtZmFnd2Z0NmtacklCV1d4UWMzRzBiRC1hZTVrRE8wZG4xSjUzenFpQ281VE1XYXBrb0x3aTRDWnpraHk5RlhnWGwzRzB6NTdiRHZtcl9sSldVUERsb1N6NV80bDU2ZlJsU1k2MHZzSkJRQnF0bjd6Y0IwWHFBVEJVMWdBdkZhZHVPSQ?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Fertilizers"
+],
+"neg": false
+},
+{
+"key": "governmentinvitesfreshapplicationsunderplischemeformedicaldevices",
+"date": "2026-11-11",
+"title": "Government invites fresh applications under PLI scheme for medical devices",
+"url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNa3RCcjFFLS12RU5DOE1LOEhaeEZlSDRHWVlhd3R6Q0FLM1lpSUlDX0Z6azByNklhYmw1cWRoYXNuNkhEa1JaSjdxQ0Z6djdScGl4LWsxYVJMNVRqQVYwNGVHaFdTbmNhY3dDdTc0S0Y0dFJiTmo3UjRUaEE4X2RGNVd0WVVHTy13WG1JdzltY2pXT2NoT2kwQTFUTld4WnVWUmc?oc=5",
+"source": "News On AIR",
+"official": true,
+"type": "PLI / incentive",
+"industries": [
+"Medical Equipment & Supplies"
+],
+"neg": false
+},
+{
+"key": "indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"date": "2026-11-11",
+"title": "India\u2019s lithium-ion battery black mass export ban: what it means for recyclers and EV makers",
+"url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxPMWFQU3J0Y1V6WnhLdlNVNkV0WldHcXBEWmliNWZ4SU5wbU05OXVlVFp0ZkpVenZqdXBTMkpUNXdOQ2FMREJsUEdmbUluek5aRGh4Unp6OFg1ZXpFSjF0NWtDSUdrNjN6M2JTamJ5X0UzT1NfMy1kVWwwMkxXUExPNU90eDQ3Umx3QjlSOElhdTF4eXEzOV9FLWhiT0o0U0RRc2gxLUZKdzlXeVlVVV9RWGx1SUZfdi1Yb1pMTElNVXlWWnZJMTU0OWJpYkpHNHBxOUg4NENtM2RLR0psTXdKeNIB5wFBVV95cUxOS3dkTXpTS0MtdFFwamdKOWdhUzJEYTYxeVY5X1BwaXREWmZaNG1yNkhLVUhNdF9vcFZYRFY1RTFWVmVGTWk2VU53bUozV0N0d2RmcGx0QnduY1FHeVktNWtrT1lTbW5QVENOOWFZdVZLbGRua0tHMDFLWlI1QnFDcFlFQ3l0ZGZXMzVjUzhYajJGUGNQV0RETk1mNEJJNy1HdmZ4dlI0VFJsZ3BDeXRHMDM3MWdJWnh0WG9MVGs5em1xSW1qQmQzaUN4NE44NGVlcE03akxBZUpzT1FqbzBjZFV1Mnc4MTA?oc=5",
+"source": "The Financial Express",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": true
+},
+{
+"key": "karnatakacmshivakumaronethanolblendingamidbjpprotests",
+"date": "2026-11-11",
+"title": "Karnataka CM Shivakumar on ethanol blending amid BJP protests",
+"url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxPemFZLWNfZ1FnQ0F4dXFPVTU2SG1YVVpmZVhfeHdDN1REdlpCODBKMHd2dUdvZElpVmFqRG1USm5Qc1gzUE4xNXlhSmNGZkJHRUtfdkdnRXpzek91bE5hZWItSnJhUGd3N0dmUllKYkpScS00dnFBaDBxTmcxMlNlVEExRW9iSUdvc3NoS0JnZGd5cHZLMTM2ODRGZUpZajJ0VXNrU29SNUhiX2tiQWJNQlJyeHQzU2toeXI4djVIMEdEM1Z0LU8ybVdEWWZ3U0h4OTBiOVphcnbSAd8BQVVfeXFMTWY5S2g1Wnhfd1dLQmIxQlFZd194bFJGeURrZlFwSzNzSV9iVGUzbWJyb2NXTVd6WFVHbWlpQlY2dGVES1duSFBZMWhEQ3lyZGN4emp3N1dEQnVucklaR1ozbEZNVWphY1ktY3hVWWVRWVRLbXYwT3d1YWNZTUNIUlp2Q1hYNk1GQ1RhcE4tS25PSWgtQk84QzR1N01LeHB4RVlybk1FanZoVGEtalJmLXd4dm9VNHN0d3VjWGdrRWpUdjFnZHJVNW43cXpLd0p2emMyRHZ5dlVCS0JYWFdHcw?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "govtinvitesfreshapplicationsunderplischemeformedicaldevicesakashvaninews",
+"date": "2026-11-10",
+"title": "Govt invites fresh applications under PLI scheme for medical devices | Akashvani News",
+"url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQVU5oaDBQZHUxVWZWTHpiUlNmcV90SWE0TVJYd1ExTGNMWGlLYkdfRDBKeVY5M05MdGFpTk5ZT0pzakgxNnBTZjNuTGZMOGtnU2o5bFZnZTUzSU1INjZfRkpaUjYwYk8teVFSNzhaeTBlZEtqUGpMZktvcEx6WTZMTGZ1ZGphdDhYMVBQdjduR21ubUp1Q05yb1hR?oc=5",
+"source": "News On AIR",
+"official": true,
+"type": "PLI / incentive",
+"industries": [
+"Medical Equipment & Supplies"
+],
+"neg": false
+},
+{
+"key": "centreinvitesfreshapplicationsunderplischemeformedicaldevicesextendsschemeto203536",
+"date": "2026-11-10",
+"title": "Centre invites fresh applications under PLI scheme for medical devices, extends scheme to 2035\u201336",
+"url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxNdkZnLTlJellDc0dSOWJhR0xMWlVnUXM1REV0eGdYVGFQQzc0MEhtdDZQdmVHRW13a0luZUVxZG5wbkxmMWZPbFFQZUdaWjh6NjhWc2xiMm1Ca3N6TmpWYl9CRVBnZU4yaWZXUU5mQi1sdzdFU3otUDFRS0hJMF9MRVZoNWk0a2dOSU84ZnBsYm1RcVpLcTRoaVRHbVh0MjNSY2lWQkYyT1IzUEh5RE5NbEFSLTN0N0doeHBISndKdDB2UXhNcDM2SlV1WkNKLTU3OFRKWHo2eU9QYlUwUU9fRDRhaFFaZ09yT29tdlZvOEptelpYdlBDTzBn0gGAAkFVX3lxTE5ibWVmQ3duOVRidkhBZW9pZEdfRWY0SER2X3RKMWgzRHRxS3dScEt3YzFlNW0yZnhxSFNlMU9JemI3TWU4SUVqTWZQRVV1RU0zV29LZVYxaHRzcU5QYTVPbzNwYkhlYk5wb2FXdmlxMG5WaGVOd0tGNUN0UXh0ejJyNnZDS2tvRkZCQmxLZmZZb0QtblkwQnpmRzVmdTU2UlpGYWxGSUdmeG03alBoWG0xRlpLNmFYQWJacG1XZDItZ05WRzFCOGhJUzF3NE83UHJzX1l4NHZoeEQ3Um5NRnd3YzJEcTdNR3NIb1RCUGJUaUEtLVp6Y1FrcERvRTV0cEY?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Medical Equipment & Supplies"
+],
+"neg": false
+},
+{
+"key": "govtinvitesfreshapplicationsunderplischemeformedicaldevices",
+"date": "2026-11-10",
+"title": "Govt invites fresh applications under PLI scheme for medical devices",
+"url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxQY2pPamhqNzI5WjFSbTJzX2NIY0xRczRTOTEyVFFCMlRRR0NvaXBsZ1pPTVNxYjllbDZNVzdKcDVWZnBENkstQ29Yd0NDVkU4SDNWYVZzQVk2UG92eFhOSHF5NlZqTW1WaElIVTh5VnAxVFZRMERrTWMwb0ZLbUdGLXpOckZpY21ZSFFMY3A1MXFfamRta19ISXVSaHJ6aVFNVk9DWDh3Z2F2Slgxd01jSU51RFNIb0tDOHNnR2JyVjh1Qm1zTklYbEJfNEtSUnpvRkHSAdcBQVVfeXFMT1dDWllQSjlHVEpUcFRNT1pjNXJGdW5pLXlnREJlYVhLZGpIaTlvN3NJeW4tSHdha1prTW5LN28xanFrSmlSN1Jsak1lNDh5eFg4ZnBJelFBODl5M0xWVWxwemN3WUFHVXByczlPbktFUFdTaWZ2SVh2UUpWdkZSc2gydXF0T2Vfa1ZKbFg1VzBJcXN2MV9hRHVpT1dXazIwOGdMN3Vya1dQc1ZZc1RxU2R3ZHFQYm1ndTR4R3pXT05RSExyWHROQXNZYzZtVDVKWV92NFNMOFk?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Medical Equipment & Supplies"
+],
+"neg": false
+},
+{
+"key": "medicaldeviceplischemeextendedby8yearsfocusshiftstocomponents",
+"date": "2026-11-10",
+"title": "Medical device PLI scheme extended by 8 years; focus shifts to components",
+"url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxNSURKR1RSTDg2YXU2ZzhDU0pzeVg5dWZsSExWT1E2N21uV29QWWtXbzBtRFgtLVZaTWdGYnU3a0tSNXp0TXhaX29HdTNGR1hNNUNPY2Rmekd3MzFOQ0poTUFVZ2NXQV9iMk1QMGNqUnlPcHd3dUlHd2Z3X2RSZE9WTFNNR3NrZWJsWlRIQ21TczRXWVd2VmtNbXgwN2JSN3VzUW1sQ2t2REZpcENTOVRhWW5UY0s2eGpRMy1vWHMyeGxpeU1HX1JqVThjZU5YRW01djBpR3BHMGZpUdIB3wFBVV95cUxOMFktOG9VUjhpczgxckJFYzVjWG1DLUFmbHUtM0hhSGxkLXlMVzF5NmY3bUp6SF9YWEhwQXEwdkhBdDM2dU5ncV9PYVEtTGE3Nlpkcl9HR0J0WXlPU3E4RWlHMmRBUV95dGdSRTM4LW9oZ2tpcDJsYlJrZXBSNnkzYkpSaDFsejN2c1Z6eWktNW9seUFUcExFU0RuRGZZNE9ZNkdnbW8ybUVsb3BvbHlZVS15b0VrUlplNURQOWpQeXp4LU1XNHRrU3hud0d1TW1TZ202RE8tQWtaVUV4NktV?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Medical Equipment & Supplies"
+],
+"neg": false
+},
+{
+"key": "govtextendsmedicaldevicesplischemetill203536scrapsminimumsalesthreshold",
+"date": "2026-11-10",
+"title": "Govt extends medical devices PLI scheme till 2035-36, scraps minimum sales threshold",
+"url": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxPbmpLREVPYXZ2UEFjczI1eHVCMkZfRnJud0h2MXlJcWdhbFBrMUs0d3p3T1ZJTTN3UzljSTh0MXFYZGM2MTB5bUYzWDZRUXhoM1BYazVxa3dLMVZxNUR1eXg5MEF1ak13Qkg5cVh2emQ1c1hqLVl1TzB4OWwzYmtCcFRTN1lqOUVaQlc5TlI3T0lkaEJ0RDc5NzJlR2ZWaF93eERzYUxXNzdxcjJITUVMc0tFOFNqc2ZzRW9aa3dGcE8yRlUzcTVFenI0RXdkdldpcVhHS2lNd3N0TmVKc3VpeFQ2M0lNSmc?oc=5",
+"source": "Upstox",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Medical Equipment & Supplies"
+],
+"neg": true
+},
+{
+"key": "customsdutyhiketakestheshineofforganisedgoldtradesmugglingrises",
+"date": "2026-11-10",
+"title": "Customs duty hike takes the shine off organised gold trade; smuggling rises",
+"url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxNVjJyamFsblFvRERKdURubzY5VUlhbmFUY2ZWTktTM056ZTBkMkt2RDEtMk14RGVqRmZETmJKYUE4S1hGTU1zR0ZPZF9qOVYxZ1lIVkp4NnJJXzBjeklBc2Y3UVg5aVhWOGdHT3g5TXQ5SFZZZ2ktVld6UWVqeWdfY2l1UzhBcmZ4dTZXbjZrYzMtSzBNQUVVSVZUTUVVUENqcXFQZEVXWEtjNW8wNkg3R21zWU5QWGpBT3FWT0lrV3d2ZkJqbTZvNEg1M1Z5YlRIODBhYXFYNXXSAd4BQVVfeXFMUFY2My1wX2h0OEQtWGk5TmcweGprYjBodlZpbDhfcThJQ3c1MTBCQXJVcGxyNUp0MHBPZDJzOUVEdmRSMUlrdTZmY0FXOGs4WDJIYjdxRk5sTmpfYmVMU0FYdGlHWTlFOGRzUV96cHYxaXVJWXlZYmZKd1N6cDhwOG05aER0YnEwWkQyaTNCUW9YMmNpSlZoQ1pEQTVTRU9uN3NDblVJNnJXVkhHT21VQlBzZDFpZmJJYk5yakdRR3Jsd041YU4yUW1xV1dVZjJZNGJNRjZ4MjZ5bXlUV05B?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "dgtrinitiatesantidumpingprobeintoaluminiumextrusionimports",
+"date": "2026-11-09",
+"title": "DGTR initiates anti-dumping probe into aluminium extrusion imports",
+"url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQOG1SelVGUzhSZGtlVllpc2VjQUtmQ1pVWTdGaGJyZzJJNkpneTZyM0toUDRpRFdobnRvR2NjT2p2ZjJoSXl0V3Z6VGlCNzJDeXdTNndZaWZyTG9BS2ozdGUtWTREakNydTZKSkdjQ1RxWTZKd1FnYkN2X1g4a2k5TnpPbFdVdm9yYUVNS3NyYTNkdkNSZ3RNS0xXNWRvdTdBbktUdXkzNE1sR3QzLWIyOUdFdlNTQmNOei1PQzlPU004d1NrRFh3UnE4UnhFQTRqN3Vz0gHYAUFVX3lxTE5lbmxFTXBuOWVaVFVfQ2dlY1l5MEJqaW9mUWZtZVVITWVpX3RMLUdoamNoelNXdElqT0FYVkFFRE9MMFFEM1F3MzQ2cEUyV1hmQVc2cm43QWpfYWp6ZXZwbGlSUVQ1NzNDSWdFT3BlaHFtUDJoZ1dZTks5eEQya0M2WTEtRFN2VlBzMVREX0dOQnY5blB3VTAtS0ZZRHg3M0tTb2tUTnZ0VUlBNnVBbWZ4Ul93TlhHS1BxRWtabVRGQkhZX0g2eVhfX0dXSXFZQ1oxVktpTGgxYw?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Aluminium"
+],
+"neg": false
+},
+{
+"key": "karnatakatestspetrolsamplesat67locationsoverethanolblendingcomplaintscmshivakumar",
+"date": "2026-11-09",
+"title": "Karnataka tests petrol samples at 67 locations over ethanol blending complaints: CM Shivakumar",
+"url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxPSnVNaEU1aHlpclVTQnlJSDl3Qk9PN2JzV3VlUWlEVl9HZVpFNlRBNnNnOXlIOFJuLXNhdGJfRXlfODE5Wm40TGhjNm1ocXRtWVgwVlBHZGNsdmlieTRlNm1LXzdGajJkUmtROFh6TC1JN3BBZHdSY19ydUVjN2dHdnhkQk0xSjBHM2s1ZEdMV2NYeE5OQ2p0STJSaE5RS2dpMzR6ZzBvSzVyRmxqOHhoLXhPZDcyU0ZvLUd6WEdlaUFMdXdRdTVKQ25Rb291OW1RUGthLXhOVE1XVzBVSUFWSkZfZURyLWJrRnVORTNFTXNFNGdF0gH7AUFVX3lxTE45cDJkZmkxcW1oQ1FxZGFtcHNjWHA2Si1RSFZibUtENE5RbEM2NDRMXzJtOWdXNS1jek1QX3o0dlFSZjdhOXNEMWdCSmFPVGRjeEdGNHdBNGN5UTA0X1g4ZVdtS1BtLXBpUVFTd0tZV0g3V1lEWExLc09RamlnZXY0TG1BVUN6ZHpiZmsyN3hYT1hxOEVWZUNzYlFKMFdNOVNXeUF4aVdUVi1kRW9xdllNYVZGRFp3UXZFeUI5c09KRGZUV0xCOUgyb0Fic3FEZWszR1dyekZnRTRNVHRaSTB0QTRMUFBfTC1lNW9PdVNuQ3pwbjhLSlI5QWg4?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "psbsseeuptors30000croreinforeigninflowsifinvestmentcapraisedto49",
+"date": "2026-11-07",
+"title": "PSBs see up to Rs 30,000 crore in foreign inflows if investment cap raised to 49%",
+"url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxPWFRtU09MMjctTFg3R1haYTVFdWNINEZFQ29yVXYtb2JxR1V2ang0MkFJYmhVT2hfNG16am1uVUd4RVFjUWc5LXFjODdkR042MTc5OXdITmVHX3M5MWxTVlBiQjFLS1pRdE9aeFlZcmpQTzlidG9BNWRRcXpKWmpiOENCLVd0eC00NjN5V3lpSHRZNzZUbUFoTmNZc0dRMGJTTU5pQ2gtSE9HeGFtbDFBNTNoVV8yZTJRRzE5VExxZG5wV2ttYm9VOC0zYXRpR3BjRVBQcVBxWVlDb0FnTG9VNElMNjFndzNKVGlBMjBKaWpEOUR5ZmFQNjNn0gH_AUFVX3lxTFBGMlVzTGhJR1hmWjZyc0hxYUdOX1ZGUF9JUUh5bjBqempUb0NqSVNxTzNYZ1FUbEo5bGRsUlB0dUN4aFVYcXRVS0FjSVpRUXlhc1RaUEd0VjBVWkFzcTBBRURWVjFIREVOSW95dW1pUEFfVTFUWEo5SHRCbWhpejVVZHlCU3huZUlIN25uMFVfREhjb1hJWlZ1OE5Yazk3dG5QaEpmLUdqcms4bVNLTjA0RXk4SmxHVnNRSENXWkFyWlNmVlVzRjRiOGJ6M2JRVjBTOWtmRzJKNHVPaDJXakhPRFFtZElXUmNBZ2lGMlRZRlluWHFRQl9YUEhrR0Y2Zw?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "FDI / foreign cap",
+"industries": [
+"Public Sector Bank"
+],
+"neg": false
+},
+{
+"key": "notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka",
+"date": "2026-11-07",
+"title": "'Not supported by tests': Petroleum ministry rejects over 20% ethanol blending in Karnataka",
+"url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxQTTRUTVZ5dndERm5qTmNDMGtTa3dxZDRzZ3hCX2o3S3BkR05iVFZtTHJDcFZqTHR0VXI1Z3kyellDWTVoMVoyZC1ISmRpUnd0OTIwQ0NpbDZWTnBNSzdZektLcGtwOU4xSGtFRGU1SEk2S0pfcDlrQl9QQ29QZmg0eGdMdkdxbFNldlNFeHQxVEphZUFmWk14Z2MzSVlPY0tsb0tJOHJ0WXZjdW1MR19nblZQTE1SVkpiRENkRU81cGxZdm5iczN3eDVka2FvSnAzaGc3bWZmVnNOV0JkY3RjWkRwSHI1ejJwMy0w0gHwAUFVX3lxTE5CRHBYeU84R3RlZjY4UXJCbHluWEh5eXJPSWcwMWRyQ284NzVRbzVoS3E5ZnlCLTRUSGR4OGIydUVIRUMzZy0xd2NOR09aMWFNbmNqNWVvMUN0WDhmcEtwNlk2NHZKZVh3Qkl4Uy1xSHJIRUZwVm9LVjYyd1VLUTliVjVwRHRCSUV6U2pmbWppTnByMkNqSGE0d2VsQktlck45Mms5U3F0REhwSmNOaWFFazkwU19tMkdXcVkxYkVrWmZKMU1RNndFd1UyQXZITlE0QXJyQlNWeFg2ZTFBTVF0dEZEWUVLajRBNjhaekcxaw?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries",
+"Oil Exploration & Production",
+"Refineries & Marketing",
+"LPG/CNG/PNG/LNG Supplier"
+],
+"neg": false
+},
+{
+"key": "amonthafterliftingofbanwheatexportsrisefourfoldshowsdata",
+"date": "2026-11-06",
+"title": "A month after lifting of ban, wheat exports rise fourfold, shows data",
+"url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxQV0d3bm1fMGVsZHRCdEdVTHplQXdHXzJmclBoaEVPcVpUQkFRTk5xVUJrQzRYdmZwbHd4cGdsNnl3anM3QzBGbF9FUlROd0J5YUZEemxtakxkcXdlVkJGMnFlNGg1elRpclRXNXN4aGx1YkZldWVlOTdRa0lVd2V5NWFoUmU2MEh6aWEtZVY0eVhJTWlLM3NudkZ4SWZTa2F4WjlDekRCY2tDN2lNdVBuWjRIa2Fwa2JKMXN1TUVRSTFrNHBWckh5YlZXem1meGVwQnVxaG45RFlsd9IB3wFBVV95cUxPX3JadlZSeTNDZTFYcVQ2UWdjZzc2cVE0ckJxZ3M5M2tjYVpfTWg0UTIxb3JJRkUxVy1uTVNHcmt0TzE1azl2djRVQWtYR0dvdjZmaktONHJ5MVJXOFctMFlIX0VyOXdjRDZILVFuQWxQZTVmOU9hNGJRaVlvdVNWeU5Uc0Zic0g4Z3lnSTRiXzJOX3JrUWxudlNvNjdmOThBanUyelQwaEdiTnhkd2lXM01MTTlST09CdFZlTXRTVS1PWXE3Q2hQN0NPYkRRU0lSMXNPQlVIdFZVWDFucnYw?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Agricultural Products"
+],
+"neg": true
+},
+{
+"key": "samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"date": "2026-11-06",
+"title": "Samvat 2083: Can Auto Stocks Beat The GST Hangover After An 82% Rally And 35% Crash?",
+"url": "https://news.google.com/rss/articles/CBMimwJBVV95cUxPOGNObTROTmh5T3JUUzRCUTdtTHN1azY0amM2MUtORVhRWG1JWW5ubjc5cVhWN05ZZWNhYzhPS3Byb0thazJycjlIUTlIOVo1eldvbEdTZTRIRjMxeHNBNzBuWnZQRVBxYUhEelpOdU1FTlBUNUdjaVd4aGtwc2d5cGk2TC1FWEpLRENzTVZ5S1R5OUVzNGt5T2Z6MW9GMXhFUEF6eG42bFk2Vm1Db2RIbHNkSGxPa3c0S093SlQxUzVXRUdyUDNwWjhIRVZRb24tWUR6VTF6NWsxSmVGdlY3NzBRYnJFd05seHloTEhNQ1Z5OUFLZWdPS0NSVWhEWnZiS2ZQU3Z5UVBQb1IyZm1PWjVvd1lCWXFrVTU40gGjAkFVX3lxTE1ta2k0ZHhUNlNsN041aXJTcXBoLXVZVXFsLWlNLWhPVUVSb1NscmJydkdmNG96WXY1ZktBcnA3N3VhYjc5QTlNTnBXZXlldmNhN3VrMXJtQjhSWkh0Q0JzSmM4bHVFd2taU2otQnFxcURyTTNXdjJLMXFzX1Nscy1oWDltUHVqU2lJSzZXRkJTLWViRUlVY1lQUDEzd2pQaTRIZnVacFlqbElpWEwxa00wZ1lCOS1ldjF5MlcwNm9fekM0aExtQzQzSDh2YnNIYkFKc1U3dnFPdDZjLV9xbnR5RGJKSlpmLTk3RmNvUE94UHZrUWVYaTIwSWJBbVVQNFAyTXpBSHlmcWl4ckVvak90TkY4WjJ2WFF2Sm1jcndrU0lHOA?oc=5",
+"source": "NDTV Profit",
+"official": false,
+"type": "Tax / GST",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "aistaseeks35hikeinsugarmspto42kgbackscentrescaneprice",
+"date": "2026-11-06",
+"title": "AISTA seeks 35% hike in sugar MSP to \u20b942/kg, backs Centre's cane price",
+"url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxOalU2QVNBYWRIMXBxemJaZ3JwQUMxakhrVmtSTW1FNFU2RnA1eDJBXzd6bWhxNmhvbVdFTGN6cGltRnBRUXdaZklaT2k4M3NFVFFORVRGd2N4MnpsX205cGtuSy1aUGFNSFZlLVB3YnlROHEwTUJDTFRZWnE0UGl0V2Q5Sno3Q09XTUJfeEhYbUo1WnpfRVUwXzJmTFVaSHMtU1NrQjlhMnpRVURaZkw2SnFLOW5VNl9BTjFaYTRiLUtxWnd2Z3h2Z2xuRmJuNjFJcU9FY2czb2d5QdIB3wFBVV95cUxOaHdTQ0Q0SDFob2ZMV29xanI3REtqQ1p1c09ZUE1pcGZJSkNTVGRGLWE1dTFpZ3FtTlVLYzFiMzNnZGQ1NVJpSkRhNDBob0p0N2ZKU0VMNU1RVHhrZldueFZMWnZYXy0tZTQyOGVfdzlvLUtlMko2S0tsTjZ2NEFYTXVXRHduUjRBZE9VTXY0Ql9WQVpTNmxmNDBIbFljMHE5M1oyOS0tQ253aUtlZnVTbFhGSTJGX3I3TGIxNVhEbGlDOFByZmhJLUxWTF9uSnZfenJteC1abEN5RVI0NS1R?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "vedantahindustanzincgmdcmetalstocksinfocusascabinetapproves2814crorecriticalmineralprocess",
+"date": "2026-11-04",
+"title": "Vedanta, Hindustan Zinc, GMDC: Metal stocks in focus as Cabinet approves \u20b92,814 crore critical mineral processing outlay",
+"url": "https://news.google.com/rss/articles/CBMihgJBVV95cUxPRDRNNy1OdFhJQ0owTTktWUpVWUpPWHlrTGk4SW1vSS1zRmg0aTM1RXhfYXJuYmE3enZId0lHdkIwcVBrVkhOZVYzQzF1Ny1LVVpxVl96Qk1PV2lQNHpSdW1HVnBybDdxSnlFaFVGNkVTN0YzWDB6QnFqVTJFUDhQVnlYZ3k5cnh4M3czbnRmaUJOX29TSUIxWUtwazRXLXY0ZGhHb2lKWVZWRVU0aWVScWZoRlRfeDVEcEMzZ1dYbDRIMldOOHNrS1c1Q1ZPdlVHYVA2dFFlMDQ0RXlvLUpkUzNRbE0wbldWMnJGUlFmdkpIakZRRW0xOFp5S1ZYOERvYU9NUnN3?oc=5",
+"source": "Upstox",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Aluminium Copper & Zinc Products",
+"Diversified Metals",
+"Industrial Minerals"
+],
+"neg": false
+},
+{
+"key": "goldpricesmayhavecrashedgloballybutgoldsmugglinginindiahasjumpedto50tonnesfrom3tonnesi",
+"date": "2026-11-04",
+"title": "Gold prices may have crashed globally but gold smuggling in India has jumped to 50 tonnes from 3 tonnes i",
+"url": "https://news.google.com/rss/articles/CBMiiwNBVV95cUxPQzZzM1drRHljb0NHVlNCYW13S0tEWDdhbGNNaU9lMDBudlFiQU9BeUdxM0tFQzBvd1ZKeERIMkpSTDgxa3lES0dYcmg1ZnNqTkdNdXJ5VlNDeDRUYno5WGY5ckpYOTRjelo2a3NlRzc2dld6VllIb1FwRXpScVQ2LUNFOW5FRkxYVV9SQXo5b3h0VFNvM3QzQl8yQUZ6Z1JFLVRpazRhSWpGamR4NVE2YlhoQU03MFBZRGRNdGFLcklsbWx2QmxlUG9QRTZULV9OMllPV2F5SDlILU5DN2EtM0VXY2UySlZVSDVGdFB6bzRQTkJtUW9aOVNxY2FvTzlTZXBjUzA3bS1LTzZ6WVA1MWp6eTY5Q1NOSnFCRVltSEJBVjFYME13V3dUUXpqeUczejlUTWJVcklmR3gtcjZ2YV9EQUU0WDRncU9zZmN6WTQ0QzlXMl95dURTNGlud0x3T1VuWGpabThpZVROQWFKMVpXeWJDai1pQm9hT2paWVJzS3NiNk50OUlfWdIBkANBVV95cUxPa1pBbUl5WnJjRUhUNV9qbC1wbkwyVU9lMHZJbUVFRDhHOU1oX2JuemN5WlJ0U0ZSajJPTllEdTJ1MU4zWmZsWnVqN3ZlUWNlTW12U3F0dk5vbEwzeXc0MnpfUDM4UWpyOW50UHRvb29IWEo2NHVMZkpOTEUxSl84MTdoWFZ5TlFxc1pyejRHOUdRb0FBb3JNNEtlNEZpcWwtWXFoYnRwM0JXT2pLYVl4NjBXLVVOekFkNjB2VVlGbnRwZFZ0ZnRTUzZZWXU0NVJqMVdxMEF4YUVDaF8zYlJWMWJoWm5ZcllKY01FNUlMb21vUUFIalllMlNGR2t0MHJzRzNpbXNkSmdSd2w2Y0FNSDFFeHBCMnJTb2doT2dMdWdQWVVRejh3alVEMlFBWkRfZDFtU2RpNUQ5c2lnT2VTZjJsUWsyOF90OF9GLWpnZ0pqaU01cXZ3OVU1OGZpck9hX3cxYXhTbFFUUThPTlpOOXM3OVdSdW1Ec2JoU2tqV1V6TG5LaDZUa0U1R3loVHBW?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "indiagolddemanddrops29inq3",
+"date": "2026-11-04",
+"title": "India gold demand drops 29% in Q3",
+"url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPRjdYaEZncU1mQjlnRy1fcVZUUUY0RDkxQllXV0cwaENqazlyZ0R3ek1rcllVbzBFcjBWZ1poNU9MM20tLWZDTVA1dEhIVmRQREZkcFd1TWZQa0h0Z2g0Y2xkY1RjZnRXdXNMU3ljQWRXYUZ3S0c1bWtpUVlhTUhrMThVOS04X3g5MXBRZ3dObkpTVHBjLVkxeTlzZWJTaGpVMUlmRlZEenBZT2p3UFNsRtIBtwFBVV95cUxNME53VGk1V2piQWh3dUQybFRjejdLU2dqVWxxT05jcVIwcDNQSVdWcVMzYU44NmxGd3NmWHlfZGs1ckJwWUxsREtkZVk5T2Qwek9UaUtlMzk0Z0JmV204REZtYl9CRTBHeURNb3pxZ0EwSk5MaDEweG1MM2lOMUdGREN3c3MzZm9wb2VValRnLThReU14SDBjN3Z5czZ2VDV5enJvVTdmLTZZMXRhSEdNLUkxekdfdWc?oc=5",
+"source": "The Financial Express",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "explainedwhycouldaweakmonsoonderailindiasambitiousethanolblendingprogramme",
+"date": "2026-11-04",
+"title": "Explained: Why could a weak monsoon derail India's ambitious ethanol blending programme?",
+"url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPcDFkNzdtV1ZvLWJWVlJkTzl2elRzZnJ2aURSVHA5am5scWNpakFRbmdXd2ozWktDYXBNMEdDbmpQeXZMbkRrLTVCLVlxMjdKU1ViVTJhZkw4VmxuN25Oaklza2N5V0hWcmhCLXVPd2NLMVF0dld2T200RzBCZnplOGo0eXU2WVhSZm1FbFNEREZyVkdtR3dQVHlYQjhXbFRBM1lST2lBWTF0YnFKSFVuOXFINnJIamwyY1pPYWptSWl2dlJKdEpnZjRmVTRwamxLVHRkLdIB2gFBVV95cUxQWXVWUEZLVlhJYk9aQkhyZFNnbTBxRnNvc1lfZFlyamhrN2I1cnRNQjJzbjNUb2p0NEhlSTFaVTNMdVFraThiUUZGVE9uZEtfNEVvdW5XLTdHeUNhVzMtWV9LbEFyeHJhSmZWU0UtZnhTQ05QTVpJR3FETW9VQTYyYnJUT3lucjJHeE53dkhYQlBzcUZIaHdIaGpwUGpnSUNpTFZKX3Z3MkNEbmw1clZIcUpCX3puVnU2TUQwSldnRzZIcDA2N3o5V3dISlF1X1pzTHRrZl9ydGt6Zw?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "goldsmugglingintoindiasurgesover1500to50tonnesafterimportdutyhike",
+"date": "2026-11-03",
+"title": "Gold smuggling into India surges over 1,500% to 50 tonnes after import duty hike",
+"url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxObDhfTG5VVWFDbGljdG1VQlF5MTMxaXJyTTMwYmNVa0hUdzdTT3A0VHF6eW90SjVfNEFHQUl2eDlyRmJMaFZsSzBRNUFqSkw2RUlhLUljaHc1RUFlQUQ5SjFQRElBaVBLOTBsUjlOOWJjRXhPSWxlZmdPQVk5VzN3N3dmRGpkVTJ4ZEpMLVN3V2pzRS1kM3VYVzBQRnJnT2paWUJBLWR3ekN4akJkNjhGVTJWRVFCalRIZGlIanRzZTdzZkV1eXBzam1xSjM2TTBYSGfSAdcBQVVfeXFMT2VPeEJ2Z2dDUGxpYXpCaktNRDR4VmhqcU9kYTY1ODh4OXZwZC0wMGFsbnBoSGRQYy1kNjhDZllaM2l3ajBISTNYWFdzdy1MbHY3cnlhMzFvRG41bzhMMW5jeTRVcEpXLWVKRnlNYzVMbmJaUThUcnh2WENNQjFSTV95RmN1c2d1SklVTzdnWW41RFYySk9WM1N6R2F6czNIc1AtR1o1WlhvVXNmc0wxVVlrY21NOXRnNUhjUmNoeEo1WHhvQkNrODU2Y01QQmlPMXdueW5yZVU?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "indiasgolddemanddown29injulyseptemberat1625tonnesworldgoldcouncil",
+"date": "2026-11-03",
+"title": "India's gold demand down 29% in July-September at 162.5 tonnes: World Gold Council",
+"url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNUThFSWpoMGxLS3AtVGo3MFlLeGUweGlLOHZuWGxHbDgyd1BtaVQ3dlFLSV9QNENPZHYxVXU0TnFMQUJGSW1NQmVuM0Q2aERrZEE2NTdTaEJKVUlWd2ZCT1d6OWc2WmRKblZIUl96NGE0YVRkSHpqRDRYYUw2QVFWbzYyS2otSFFTRkZreS1CRmM0aHEzSjdoakJKMlE5ZHZ3bUVjY1l3RGtBZ3YzN2lTYzJfZXdDQXRGV3dqRklDcENqaEZ1ZTdRQlVYN1g5UEFGZGduNXNoY9IB3gFBVV95cUxQQzJteXdHSTFiYmwxLUpPWnBIZFFFQUVyRFMyNTJGRjQ3UlpkTzV5T0lHZ19WV0VQVUdiSmc1Y1ZlTlphTXdSVnpRdEphdlJ5MEhLNEVEQ0lUX0J3UkpLMkc3aFhqVmNmZlphRlFZTnJxRnNpSWJ2NUI1d1RTQUtPSU9HSXAtalR2R01BVkZlTlRWdjNNVUduWWVNOTRaSDVwZzNCbE85VVFWX2Jrb3BMZVNaR1dvUVV5MFducm1zUGhWUmNOdk9HWnZ2Q0Zja2RnTUdqLW5jZmFhcnA0YXc?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "indiasillegalgoldimportssurge1500toathreeyearhighwhatsbehindthejump",
+"date": "2026-11-03",
+"title": "India's illegal gold imports surge 1500% to a three-year high: What's behind the jump?",
+"url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxNX2t6OWpGT25FVGp5M0VfVzFTbEtHRVFJREdvdlV1bXZpLXdLTlpqRGd1MHB4X19OMXJFZG5YTTlVcEdIVGpqQm9YWk5rcjRwZFlMX1duOW5HeWE4VFdNUlVvX05tRVBrSnBTR1FUQV9FdzhYclFxMlM3cmF0V0g2al9paE10Qjd2ckRWYXRKZ3M4TWZxUjJJRUlnUVJBdFZ5bUY3aTdxNUMxZ0RSWERCbkxmS2tkcm5Ca3E4Mmc0dzFoQXVSQkFkdlRnaF84WnRq0gHWAUFVX3lxTE9xM3ozM1lGWGlWWm14Tl9KMXFESmVhYUo0RTZnUGpWNWpXd3ZJYkpiVFVua3NaUm1UNWJKcWVaTTl6VlBlOE9abElRWEFWMENsOE1QSE84YnRGSTF2cEVuU3pHUlpYcHM5SlVjZllWRWNReGhDajV0SWpadXVWZmtHOGlGa3QxZ2dnYmN5ZncwMndPTlFkSU5KQnR2SDRsa0JBaGhITWo1MEdNZEd5RGZyWE9abXZWZ0E4aHIwX3lvTk40NU5GVXE4eGJud1htbnAtZmxpUVE?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "karnatakamsprowfactoryownersunionstomeetassugarcanefarmersturnupheat",
+"date": "2026-11-03",
+"title": "Karnataka MSP row: Factory owners, unions to meet as sugarcane farmers turn up heat",
+"url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxPRkN6WGdHaDRCQURzLU1TYURWWEtpS2pWQjJnZ29mYldFc1NuZ19IS0Y4amtHSGlMd0ZUY3dCMjY0N3ZZaFo2RE1DTUtsUmlUbzFNcDFpTDBwVlIycHI3NmltUWozUGxWTnZQVEN3ODd3MkgxT1ppNkFGWlNmWFhXTTA3UElRS1FscDZsZEpabldXT2ZTM0MzYnF4dkNpdUkxSW1OTzVtT1ExUjdSeWZFd1F1RzY0aExTbV9pM3VNc3pkS19tS29rVnNCQVFVbkhSRjFzeU1UM2V2RjY0allF0gHkAUFVX3lxTE1DMnJCMkRmWkxsOHR5dzFyM3pvUm9ra0Q2eXZkR1VNeHR2TXRzR2wwNEw4N2dWSUNxU0owQU9FMnJ3ZGd2al9lMDRaenpGZ2FycW1lRGNraG5sbFNTOUxKdUVHZjM5amhNWllQYjgtUXZqWDBiN3R0LWVVYmRnQ1Z0eFlielZBcEJXcVgxU19uT2kzQmdCQ3N2aERmdk1QWW9kNW5sVXZ0TzNBdnhIaFFSMUZ0eWhpRkluOC03N3hvVS1JQV9mVFNUaFZGNkhfNW1qeFA0ZmlmMThYSHprMDlSdGdFRA?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "indiaputsfoodbeforefuelaselniodentsethanolambitions",
+"date": "2026-11-03",
+"title": "India puts food before fuel as El Ni\u00f1o dents ethanol ambitions",
+"url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNcVNWMnRrUzVmMnRMM3lSRTNBX2FTblVRejJzWmtYejJ3NU5xem1IZWpYN214Z2h6TGJqbEJPOG9TWjVabkUtTGdhZ3lXUVNVS0MyUUxOa28zdFFFTlkwNURYclo5ekNjWHozY1VFdTZSa3pLMS1yZ2ZUdUZtVjNVT3RJY2twdUJZSzNXcmVBd052bVFuUjFOd3JPTnV6cmQ4LVdmSXJTZWk1NVhQUmxJ?oc=5",
+"source": "Reuters",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "govtraisesexportdutyondieselaviationfuelscrapspetrollevy",
+"date": "2026-11-01",
+"title": "Govt raises export duty on diesel, aviation fuel; scraps petrol levy",
+"url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxPOUNUalNQaGR6VDNRS29GaHVkSWs3S0dUeXQ5QUsydkFzQU9ZaTQ0enZUZmRjWHRZU2kzSV9TR3ZNRmdEcWpnVGJIS1FFcHRiNEJFU0x1WVRRVHU2cU5LNEZfZ1dPWEJySm9wRmZoMnd1cW1nb1FoZFRJR1J6cVF4R3YtMGllN2hvMWtULUxURVdPdjdNSVRoOUtRTks0VXlMQUwzLUxUd3BpM1ZhNTl4cm45aVRtdHZ2cVRSaVdOclVRRDF0NTFMX0tXczBOS0lnalHSAdcBQVVfeXFMTVd5NEZTbDRuZUp5TFoxNHNwekxzalRjbG9kU3hDNTB6MXNTdmxRcFU4QUNXRHl0bm9MQnNRMmdVMnltd3FYb19yZlVYUWw0NGdJZEdJLU5iTzY2RHR6ejQ0LTYtQXBrZkV1Zm1PRk5BWkZNcXBFVUZtLTF3a0lrdVhjc3pqTm1KSFA5X244SEt2N1AzaGdCdDd0SzlOZ1FRMHBiNmJ3UWo0ZjNld1F2a3Z6aG1rYjUtSGlxamVSdks0WEtDZjkzRS1xU3NwX0N5REhqTmxsTTA?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": true
+},
+{
+"key": "governmentextendsimportdutyexemptionforcotton",
+"date": "2026-10-31",
+"title": "Government extends import duty exemption for cotton",
+"url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNYzlLWEdkaDA1VVFwdjhfRnhWSkFZN3M5VmxCQWNKM3czc1E0cTZqMHdFY2VsSUJIQ0dfcG9QNUdtR1F6U3pzWkw0WlZIWVY1ZWhEVmdFQ0ZxVzBwNERnQnREUF96WVhvUHNMZzlCbkNWbGkxaGQ3XzJ6Z1hqbXl5VGsyOFZYeEJCNm9hNTI4M3I5aWo1U29taHpjdXdiMlJpbkZfWXlPNkTSAa8BQVVfeXFMTlNhLXNIamZtcUJfY1c0Qy1YNGVYQXQzYVo1NXRfTjdTWExNVy05emJ1cVNoM2RDTWFRZlg4RnZKUXBoY1pXa0pPZWxmd0VIMWdVVGRJdkJGRUVrWVBKSXFRcGM1NlB2Y2FkUndRQVk0WHBPVEVLeVVfU1FSUkkwZ0V3dWNqa0xoTVZicjhvN2hzZzhiaUx5YkZXQldnSm00TjVZRXNLWXlKak5fTFZSbw?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "indiaextendscottonimportdutyexemptiontilldecember31toeasetextilecosts",
+"date": "2026-10-31",
+"title": "India extends cotton import duty exemption till December 31 to ease textile costs",
+"url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxQaUZQZ3h5Y01VNzRCRGdSRVloS2lsOUFCWHFNcUtZTGF4aWh3M2xaaXBlTzBXSzRwVGs1WkN1YlMxQmZXakdZaXJzSFN4NENxT0tYM0Jrc3FkNXlTb3FtODNpcVhDRGdVcVpESzVvRFlXX3ozWWUtZjd2ZmQxeW4zT2RkaHM5UlFIYWlHekxvNlBBLWxCS2J1dXlrMFpiMS1BVGZSamY3WFpTOHM3a0VOdVRuaXNoYmVEZzlLWUhpN1REOWNHNC1tUmlrNkhUcFdm0gHWAUFVX3lxTE5rNG9tVldwU0JYMWNrcUZYS1VJeWxza091UE1pMTdqMVE2LVIwakx1WUZYMGx4S2xsWUpHSmRXa2pzazBZU3E2TW5TT09nclhxUUpSaVpmMl9hWkZhdVdlRFRjZW9qdUt2NlZZUDZFaXRmeDduc3BGX1hzQURyZEFydWNWSW5EZElSYmEtSzRxREdDc1otUGJmdG1PZGFVR2hGdUxlTE5NRUFIdzBxNVFOdGhFMnJUaUk4N3RFQkFzS0lYSEpia2JDTjJoZ2ZVMF9yNXV4TEE?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "indiaextendscottonimportdutyexemptiontilldecember31",
+"date": "2026-10-31",
+"title": "India extends cotton import duty exemption till December 31",
+"url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNV2J2VDUwMmd1d1lVRVRENEM2LXBmOWlYMURWOHlLTFQzb05hUk12d1I1bDdsVUlKYm1pUEkxYXJoNUpOMnltd3NUeWRhN3lIeHF4QzB3dHhRaTdGSFM3TlkxRi1hckRYekRUUm5rNmpqNWhFUUlqMTd2bUR6QkdEbWFfbWVQVzBMTjFyQ1ZLT3NXZmxUNkNsVE1fSDM2VmswSVVlQXZnREVjeFhTNjJuV01LU0tib081ZFMwV0d0ZTZmbzJvemp1Q3FRSVVEYlRhd3dMZ1JmRdIB3AFBVV95cUxOakU0LVRLbFZMM296WEcyQ2RENzRnNEhtVGpiUmllcFBJQmM0LW1zeUk5eTZGLVZVeHE0TlVjRHduaWhUQ01kZUJBcW1JbXJ5T0Z5REphUkViRnd0dVBVb3h1OGxJay1fQ1NiSERPQlJsNEkyN1NJVE9Wcl9KSG1MY2VaTUVRY0pDYko2SENJdV95TUxPRFZlWDJTdUtyS2R4VDY3YWQyVmtiWHVQNGFBTl9ORmpWT3lyYjNzTkJiUXVFenY2N2ZXZGVjODdSLTAwNzJtNGsyekVlSGlh?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "indiaextendsdutyfreecottonimportsbytwomonthstoeasedomesticprices",
+"date": "2026-10-30",
+"title": "India extends duty-free cotton imports by two months to ease domestic prices",
+"url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNcGp4QkhGWTFwQ0VrM1N5a253YjFPRWhaaE1EV0o2YlVkYnVhdjV6bWJaNFFiSmNMYUtPU1pVdGlvTzdjMTkxQ1lKQnZWWTh2Vjl2V1JXX3dOaTJfUURoWkR0Q3JheldpVVBjbFBVdGplWkdrdW9qUFRac1FRZ0phNTU0cWptaFROR1kzQnRJOUg3ekJlMTZQUkVVWDRxZk90NHlWMFVtbF9IckVjS1N3NGpVaVhwNnVNSWo4YjBR?oc=5",
+"source": "Reuters",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "textileministrytoreopenapplicationportalforplischeme",
+"date": "2026-10-29",
+"title": "Textile ministry to re-open application portal for PLI scheme",
+"url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQbEREOVVlOC0yMUdZU185VVlUMzJqckRTcndxSHpReURGZVBGLVFyMVE2Tzk1Rng1LVBkZk1qT2JBWVFuWVdzSDNXaU92MTc0UUNlUk4wOVJVbjQ4cFlDY1ptYzZhekt2bWJmenhDN2o4VlotU2JqM3J6SkpmQTY0MHM4S2NQMDVadVFoVjM4bS0zbXptaV81N3RDQTZVVEVDVFNfZmVqR3JqZEp3bjBiOXk5MGhVQdIBvAFBVV95cUxQS2g3RjFjbHVQYndCb2VKYWlhR29HODhwUXZRT2NvVEVnV0xUWXA1dFUyQzZzVEhiNEFuZS0zc1pBM1JGdFJhTFhwbFpFZVEtS2NfcFNYbzBHUV9OalRaRTItWXpWbWVPbzNiUGhhMTFxS05tT3VjbkVhVTlUdFRDODRhRTZMZkpqeDhCOU9udlNuV2htWlB6Ymhud2tVWWpUOE83enJfTWc2VlpObTdkbHBIN0tVVUlxN2F2LQ?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "karnatakarankssecondinplischemefortextilesandjobcreation",
+"date": "2026-10-29",
+"title": "Karnataka ranks second in PLI Scheme for Textiles and job creation",
+"url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxPb2FhUmpFT1Z4NkhuQW1NUnFDOHc4WHozLXkyeHlwNXQ4bEtlajZkMzNOanBxZ01yZ3lHTzFpXzBHNEVrZWZrSHl3YlhVRzZwSjBXQkk2N1FlWkFrczBhZkZiNkRKSlM0SGYxc3hsMU1PMmgzUXNGUGtGLUYzT0ZsSVFITldqYWF6ZDJGQXJFV1ZrT3RtV2dGNTgtdTdmWUtXVTNCcWNVaUIzOUdrS1NDbW1WWS1TdnFwWFdBaG96eGJnS29FTmxWakVhTV95THpG0gHXAUFVX3lxTE1mcUNUek9weWR5TE1qbVRmX0Nmei1HWUpZTDNESlJvaTFRSkl5dlgwZmE3VWZmVHVRNTlubzZPY3BqWlhEVkJMb0xWSlp3QmhZX2hIZWtDSm5uRlJSVFRDUjFYbkFsRXA3NkdwMGhEcWFPUjhkNkVwQ2gwMnNFbmc1MG11X0tITHRxNXRYQzdyVWRQV0NSR2pVUVYzOXRpRTk2SjZtczVBdWRlSkdpcDYwTGNVdUFrcEI2MC1kbHhiQ2F5bE9XV3ZxNXRoQTFfcEZZcWlDUjBn?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "textilesministrytoreopenplischemeapplicationportalfromnovember1",
+"date": "2026-10-29",
+"title": "Textiles Ministry to reopen PLI scheme application portal from November 1",
+"url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOaTVjRDZRLXZydWFkNWpPNzYxTUxBcjcySW5LNFUwTWtkbjdpMlcteG4tbFB5d1B3cXQyRlYyTDZxOGg4Q0RFdGVMakJnUHRqdng5Q3RVb1FweHNEZjg4RDZPeEh1U2Rlb2I5VDJfT1hqU1NrcXBPYW5kQm5QRjB5MGliSVZKRXEtaU5qMHF0UFo5aGhvWDZyb21mMWNzQUhP?oc=5",
+"source": "News On AIR",
+"official": true,
+"type": "PLI / incentive",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "karnatakasugarcanefarmersurgerameshchandpaneltofixexfieldpricingforfrp",
+"date": "2026-10-29",
+"title": "Karnataka sugarcane farmers urge Ramesh Chand panel to fix ex-field pricing for FRP",
+"url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxQMFlLZmxrN29odWFOb281eHBXc2MxRXJpZjhpOHVZTjBmMlZpcGpBWDhuei1wMUxhMmZWV21xTDgxZWtsTVBxZURwSmcwM2hmRUtNWFljdHFNNHRidzVrNGl3WG9hOGZIWFlreU9lQkUwMl9LT0JSXzBkSFp5czhuU0w1YTN5bnZSVGlVYlplUWROLTZuaEZoR0QzWHVjUkpnMUVSbEtBQVJ2UGJuR0V5UFdfblhQbDBVMkhRLTFCc3FJSDI4U0lpc2NjVGo2a3ZJcExGd1ltQUd0OElIUzNaaVc1dmVoQUdqUUtFcXAxV3d2MVBQ0gH7AUFVX3lxTE81TkFxb0tPMDhaeFdUOEEtUEoxc1BUZ3I0cXhjSGg3UkpONV93c2JvUkJMQXNHdnEtejlZampJVmszMEwwbkZnRDM4SWJ2dHdrenhMbHB3N0RpODNFX3I2SmpDV3Ryak1CQldGRjVRanhaRFoxVmlfcUdKWm1rTmRZVGF2OWRXaGpDRUV5eHJlUW1LVnYzZ0ZXQlc3YkwyNDR1SkJmNjc5OFVyU0traTFMUkVzTUFsc2hZZmhBSThTc25VNmZ3SWNpcll5MjRiWHhLOTRYUmYwRVJnR1FOQjd5UXYyYlAtaGFRdThhVHdDbFdNaFpQZnRMVlFr?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "supremecourtquestionsif100ethanolvehiclesareallowedhowsupplywouldbearrangedamidfarmerempow",
+"date": "2026-10-29",
+"title": "Supreme Court questions if 100% ethanol vehicles are allowed, how supply would be arranged, amid farmer empowerment concerns",
+"url": "https://news.google.com/rss/articles/CBMimAJBVV95cUxQV3NIUXpabGtoZVhBVXBsU0s2U09NZ2ZfSDJRQTNPNnR6Wlpubmd5NEdac3pWNDRHeXJFMWF6cENGejBlc0hWb09qYXBVWjZFTzVHV2puZklHdWRYSi12cTlvNlU5LUd0bHIyYmFQNTRUVzFYQ0pKeUl6WHRlNExkeGJkdHgxZFNrSElMS0lDV0VUTTdMWVhUV1F6X0ZVdHhmZGNZVzVDZnlhczNjZ2tkWDJXd0toUGV0OXB5TFZuVklWMEF0U1RQM0lIbmRsYWcyYkJQajMwOTBwcHd0OXo4ZllCNHN4ejBaSHQycVluWDZPYlo2TElMNVVqZW1qTVR1eWFLZGNZMGt5cDM4Nmk4bmI0U2pBSklK0gGfAkFVX3lxTE9RN2pfR25xSUZwNjVzcUQ4TkxTSGlEallBTmlXTWpZVnpEa0VkeFRRMS1YamtVS3pmYWVzd05NM19SMXRZQXJVN2FJVGltZkRaTVdESTZXdFZfTEhWUFlkcGtUdzdsZWlGVmRHeEt4S1lfbWN0TEJTVjdLVlgyMnJaNjZmWU44SU1jMTU3bXFWNkd5UU5RTjM0U1RodGFIZWUycElQelVOOVNhbkhxdG02akxzMkxYU3BFN3RPLS0ya3lEMlVKZ0VkczlBTzdVb0xZZnM1clBTRG5SeEJZWWxlT0NreWVVcG93X0lCR1hCbkl3YzVQQ1hqeDF4ck9LRXlOMW9FenFpWS1tLTAyTW5FN2xMQVJGemtyb2NOUVRN?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "textilesplischemereopenswithlower100croreturnoverthreshold",
+"date": "2026-10-28",
+"title": "Textiles PLI scheme reopens with lower \u20b9100 crore turnover threshold",
+"url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOMzBReExOV1dZZUYzWHBQMUVVMFVQVTZOZ2hjcXluQ2Z1N1ViVzJVTllTbG02aHdvSWZvelExN0RaSUktb0wtVUhkeGU1dzh6M0daYXdkR2ZrbzhZYjREcTY1a3lBWkN0OTl5cFdkU0t1SXhNZnhHMjM1d2JsLXl3S21reDFfYTVpQW1abnlrd1VCbE94dkVVUVBwbko4cGxmc1BtZDl6bWdXQTYwQVBmUTBQUzRzenRobWlIY0dKTlFVVnlHZEpUNkFwbTd6MnRH0gHWAUFVX3lxTE92T1MzbVdPOWdIeWYzY2VyR0w1ZzRwN2ZQMUF0SlNJSUxvcWlXWGo5UFM4ODNuOGwwcUlOVVMxY1VhMkVnUFE4c3o1THE2YXc3a3pzejItOWVOLWpwLUV0bjVlSng1RkNJQjI4bWdLLWtIUWF4MVlReUp0a25KaTYxNGtsZHBDTmw2VmlTUHlucm9IVEhCVmNyZTlyaV9mLWVWbE1KN1BBaHE2MlRkb2V5bUJOYk1tSFlWSTU0aW91MlZJRmVab1o1dk85UWJvcVRDR0ZwWGc?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "textilesplischemeround4applicationsopennovember1turnoverthresholdcut",
+"date": "2026-10-28",
+"title": "Textiles PLI scheme Round 4: Applications open November 1, turnover threshold cut",
+"url": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxPN0N0bVB2WDIyN2hJNUhodldKeTFORFVyRVZackNlem44dHZRTmt1Qi1Bd3hxeDdldTZoeHltNGlrXzNvV0FMRm5hNVBqQmx1UUtfY1pKbmp6aHR2czRrVmtjNW9vdFpwbmRJU1J2U094UzBGUmljd3NUY1dHWl9TMGlNMTdmZUVFcmV5X2NFODBBcy1XbXRLd3lhZGhZOVFkWlYyVnJ0aTFQemxsMl9sN0Z4YmZ3VUlEdGNJRlNlZzhibHpVMVlJZnAzSG0zRkdGeGFsME1idWpOdDNZNHfSAeQBQVVfeXFMTVFyRHkzamt6bWhmeUQwbWxwVEs4N1B4ZHo4ZFhoeDVMZ0lHcER2MkFtbmFlMkxjUW5WblVWMmttZHRma1RZVWUxcjhNcGZiQ2tSblF3N1dqMWg0OFhLMk1WSWRmTFg4cEhVNGcxTkp3TWprSEdud21PQU9PMXNPM3hreDBwU0lNZXdGWjJJVEhCNm1TOWkybDItaEpvY2JvXzEtQkl5NThzWFJWOW1LcXBnNUZfUWNhVWxtdmpXUFNOak5wV1BpWlNmdlNPbW5hV1VxSjFUZDNfdlhlVFFRUG5ZcUdU?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "textileindustrywelcomeschangesinplischeme",
+"date": "2026-10-28",
+"title": "Textile industry welcomes changes in PLI scheme",
+"url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNcnRWY0ZkTlVaLWt1Q1J5ZU5adXkxRFV3RU9hRkY2eC0zY1EzbDNocWZKUUVFUkV0UERtRDhIdmRiMXM1eVF3bjlUSEVEazVNNFlwUGZNZFVSdHYwX2RfU2pKckxxaWxaaGgtZFEtdXlWb2I3cjdLaEg1ZlRfS0tINVhoZEFRRUxTaTV2UzBkUjhPYXRpX3ZaYXNzWWdzLUJycGZNUzZ2UnJaR2dCWjJvNE1OYnVzd9IBvAFBVV95cUxQTXVtQ3Z1SFpWVUNveEJaZEVuZjRRWEFUMVpSQ0tGSXoydTlUXzlmaDRDSFhOSUlNMmJhNkFqM2RJb1EyX2NGTG9xOUd2RVloVTFVNl9PNzlsU3ZrTXVObmpRLTBOMVlxM2x3c1JIbGZyMWdWNlBnMjBxN1RtMWpBUkRyVGpIX1c1Z0N5ZG9GNEdleVVVdU9CeXFiWlNMWjhZTkM3N1hsdm5IbHRRcEJCVkZ6ZGM5WW1oM082ag?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "gstreliefforfarmersastaxonretreadedtractortyrescutto5from1november",
+"date": "2026-10-28",
+"title": "GST relief for farmers as tax on retreaded tractor tyres cut to 5% from 1 November",
+"url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNZlJjb2Z6LTZEMVh2d09CUmlDcmZMTEpGenJscUt1d3c4TDZ6WjJ4Wm9OV194Zk9qeEM1akR3TTFEd1QydUQ5eWVSQW1RN2pNcmI0dXRUaXFoQXE4NDNLb1d1MHZRX2pBU1VOZG84MF9BOWN0eHpvRWkyTXNlU0txb1FqRnJGbUhldVJxdnFCSjAzOGU1UUl3LUMyRWJpMlYwVEJN0gGoAUFVX3lxTE5mdFlFUWV1MkdDeVM5X2FoRk8wSU1nb0hITkNlM2tlS1dDWGduNlg3SlRveUNVdFZCWkJqMWxSYlhWRFZIOUN0cmFFcmEwMm9nVE5FelFiS0c0aE5MTTRYcGJxWGhwZ2NRRzFBcEtqSmVaQ2NfS3JvWHNEMDFQMW95RWk4LTV2a1ZTazNYOUpPaUJ2WC0tQ09UVDFfWVBkYkU3a2FFVExFXw?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "Tax / GST",
+"industries": [
+"Tyres & Rubber Products"
+],
+"neg": false
+},
+{
+"key": "nointentiontoincreaseethanolblendinginfuelbeyond20unionministerhardeeppuri",
+"date": "2026-10-27",
+"title": "No intention to increase ethanol blending in fuel beyond 20%: Union minister Hardeep Puri",
+"url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxNUUxadTlSU3h1cmRoN3pVdFJhOG41X1lwd0tVRS1hWENJNWhFQ042bGoyUmJLbmdHRXN2MTN2NWVqXzdWTFVZdEFNc0NrWGNDc1pXUEt2SHRmVXF6NUZ2N3I1OUVTTmQ4dk92TUxSeHNQdWpQUlE2THpCRDBZaXhEU05rbHJkY3BLWGRjNEdKaE1OekJud0tqTW0wLXpubm16Y3FKVU9oVDhzc2NoMFRUcDV5ZVNUTWJfWjltU21QeXppbDl4ZXJhMXBUSF90cnp1QlRERWNGTnJnYUl1NWdPdVJHY9IB6gFBVV95cUxOSEM1QWFBNk1MSjJlVFRGNXFCWnVYX3JMR0UyWmRQNnBIVkRjc2pOVWJ5RFZ0QndfRUl3OUtFcTEwT0dGMkVuT001dU9jQ2VfcWNiNlYySldURk5pVldzbk1xSFA0cHh3aXk4WnJ3elhPNnZHQkYyR3FoUC1HVkVvLUtUWm8wREpUVnJtM2VOd3RIb2ZrSUJBRTRHZjFpd3AxVVNzeUVoeE5fSGpTc29CMUlnMTMyeGlEbWxQbFFjNzV3bTVmR0RIM3psX1QyS1E3dlFvX2p2bzZ0bVc1bXlHdG55ZHQwZ19WZkE?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "noimmediateplantoraiseethanolblendinginpetrolbeyond20hardeeppuri",
+"date": "2026-10-27",
+"title": "No immediate plan to raise ethanol blending in petrol beyond 20%: Hardeep Puri",
+"url": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNRjJHS0ZWVHdqUk5kM3d6SHp1VHp4U3FuOTZsdG5BUXpzLVpOSmFucVRBVVVsaXZBTWE3OV92dzFYMFd6ZFJaLTNrQkhhZnFlYnhBbmhiTzBHY3o0NnRNcjljZmR6MjZLdldiMGU2c1I3cmJRRU9vNEZ5M1BfUUFldVNxVVJkZ2lBV1lsMFlBNE5nNkNOWkFUdUZpVUVqQzFBVzBkV1I3cUtIaUc4T19ROWVtNk5WTkJWbG1mbHlYeHJLN2I2T2RXZkFqUXhYQTh2MldBemlSYS1OX2RfMnc?oc=5",
+"source": "Upstox",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"date": "2026-10-27",
+"title": "Plan for bigger, heavier, stealthy next-generation destroyers gets defence council\u2019s approval",
+"url": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxPLXhlSmFRRmR4ZWhoOU1Wb0ZOa005c0tENHJyOHo5UVFYZ2FiMjhKeUFCOFNhWHdhM2NZM21zMDNpQWVrYncwSWRTRXdtczhaNUJ2aUI4c2dpd19ONjQxN2d5V3dZWjEtYmdSSlVURGZJRzFXYjJrV1RSc05ScXFjZVlRY3ZVV2puOWZ2T0R0QS1haldrSTh4ZkVwVndCVzNZeHk3VlItWHJXdmdUanpCU3dGeWRhWFF0cXY4bnd0M25sdk1teHp4eTJVZEUzSHdXd1dxM2tvSHc0SVZBTUlVZEo5MVI2bnVTQUZGUTVjUmJWRlljMkpoONIB_gFBVV95cUxPZl9QeW83b1JacnJBQXRxOTFYWHJJYzRCUk5sNHpxRTJkTmxzMGlrVmttZFVBdU9zSVBETVpPeHI1Q0hmR283UFN4eGJCU2JMbWdWcDFDMU80VVc2U01DMnVReGFyNV83MnlPVW8zYlVKRlJqZTFKcXJKRllzajVGS3cySm9GTFh5Y3FzTUxDVHV3VWZJd1FxVTVsMGt6dEpaTEI0TV9fRUlyNzZteW9neFF3Y0p4dFNMMmhCcHdJdE1rSDcwcUJ0d3BVWUFrLU00aVNrT25WZTZIUUl1NlRQZUV1VzhQNzZVcF9keFlhUUppcEtmYWcyazNXS3h4UQ?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"date": "2026-10-27",
+"title": "Defence Ministry clears \u20b92.12 lakh crore military acquisitions, including 200 helicopters",
+"url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxPaGE0STdCQ1dYT0dSaDIwM3JhS2dBV2VjQnRjamNSbE4yMGlIaV9kNUdiVU9YRWtHQm5mSTQxTXF4Y21JR3ZxZG9KRnlzUEoyendsb1VpcXkzZUM1QUNqM2NULWVOcFdDak5YMW9PcEhMOTUyZ2hwYlA0ZFVQQlhZRnI4QVFDOXVJMFV2VkFZNlBoTHRQa3lsWTdISVBfS0NZYk1IT1NmaTVyZjRDdXF6cXVPNTQ2ZXJHNjBiaG1JQVhNQ19tZ3NvZmlXREFEanlVUjQzMFZ1ZERuMy1uMF84VDAyc3cxRmV0cmfSAe8BQVVfeXFMT1lDNm5RNEJfN0s4el9pTWZmeTg4WThiSmRRQVpWRkpfbTd1MWVneUNsX1pUdmM3YkFDMVR3M1ZvWHo2YmRON1RLM3dmZVh1S1dQSlBuVkJ1RmtLZGZPallGQlVKYVV4aWl4bFF6UFprajczczM2ZGk4OElyZXExMDNlbUNqdG8tMDEtVHJaM0pjWUxwQ2pOdGtJTkZzMmkzeDFlMXkteGtoODVkWEIyamhOaUx2eG96ZFBjQlRtb2ljTnBwR1RNR0s4Smx1YjF1Yi1RdnNoWnViX3lkLVAtOEhpSWlsM016N1lPN0t5Q2M?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "indiamayextenddutyfreecottonimportstilldecemberamidtightsupplies",
+"date": "2026-10-26",
+"title": "India may extend duty-free cotton imports till December amid tight supplies",
+"url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxNSFU5NTA0VWR6OC1WRnc1eFlyUS1xaWFSaUlIWHpxUmZXNV9iZ09wZnkwYk1yWkpMOTcxMW5tYmxHb01IY1lCdXFjMWo0bDk4WG5yX084ektuQ1BWNTVFWVZZNF9WSU41U0NaSmZNcEJLb2RURW1md2dMQkt4MkJOYUQweURGdWRPMU9jTW9uM3MzQjlaTHNLWVdKMlR1TmxKNHpaUFVSZGJEOGZxX1lkNTRFem04TmxGZ0Jzc041WUZfQjRweVVXMnI1ODRrZGllRmVfRlp6YzBHNWM5UWxDbTlieXAzTEtBTTJIX2pCTng0Z9IB-AFBVV95cUxPb1VqY09JTXJUUkRzZXdJNkZPVDVPakdobkZiRXB5M3oxSG5FMzQ5dEFsblFrMmE4dTYyY2cwTjRuS2FuejdvaWJBaFRSY3RCUGlHeFpkSm43YjBPdmxLYkJTNFpMQVJtZl92SVlQQ3dfZjY5aEVQeC15b1Q0U3JrdWlySGd4d1diWklMbmR6SjVxTEtubnlfWk1wZlhxUGxjZThhX0I4UnlCTkFpa0NUcEJzMXNJSDNNUVp3d2hrQnFvTzVnTGZkemtoUl9GS0laMEdoaUZlV3FVdnY0b3hrU2ZHYUNMd2ZNSkhnQm5fX1BtdHBIaG4ybg?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Textile Products",
+"Garments & Apparels"
+],
+"neg": false
+},
+{
+"key": "indiasgoldimportroutechangingcourseforabenefitalljewellerswant",
+"date": "2026-10-26",
+"title": "India's gold import route changing course for a benefit all jewellers want",
+"url": "https://news.google.com/rss/articles/CBMinwJBVV95cUxOYkR1ZEZYZkJCZ29XSUU2MVcwd1NpaWE0dU9OTzQyckwzTjd6YU0yWXQyNUczX290Vk1NNnpwMktFMDVBR0psaEkya2g0UC10UUNmUVk3c0ZwbUlXRm1OQkVHSjIwNWxlaGVDaWhjcVVSYlUwZ3FnSnRhc0JBcG00c21tdXg4Ri1CSm9GTm5Bc3hVdHNTWjZpUEp5bWJXdjNIMlJqS2ZOOUo5M3RLVG9qQkFhTzRiX2ZpS3ByUHRieHpiaER6Zm1HbTlnSzg3Tkd0QVJUZmFrVVhQajhlSFF1bEEwemhZVmNCaGRYRkNwZTFBVzZfWjVkLUpMM0ZnU1h2U0JSc0E2Q0VVeXpTd1hLVlBGNHl5Sk90VTVIdEJKRdIBpAJBVV95cUxPLUt0Tnd1emZralZqMTF1N1BIRC1PTXoyTUV5bUoyU29VeENJWm54MnR6NEVXUG9vbkVBYmFrNk55eEhsTks0X1Nfb3dGWUNYWWhtdmU2akVpQ0RFTm13ZWRRRGo4UG1fT0pwblJFbzBQWFJwYjFfTEtGMW55UVpHX1pNVmpKZWg1aG90UW5HTzJwOG1SSFJBY0xvcTNnMVU5RFFMeUlCMnF5Q29SY0tHMnd5MWJLNFl1c19KSzVfVnFLQzR4b2ktRmd6UGg1aGJwTHc3YUxzbThMTEZoT1ZKelh2TWVHbWNSQ2VOWDhEMnhfS2JZQXd5UC1qV2dEbFQtMENZMjFYUy1tbXlSM01XS28zRTdaRllOQUdyRVBsSmtHSUJa?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"date": "2026-10-26",
+"title": "DAC clears defence procurement proposals worth \u20b92.12 lakh crore",
+"url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPVTdhT1VlLWlZajZrUlBoaHpvM0NhZ3BBMEswOUVMU2pDN0drLXc1SlZGS25MdUZtZW90M0RSVGZsUXk5NDhPNHpZNy1SZWV5ZlFoUHB1ZmEwTlNpWjRGME1kVTA5QzBiZFNxUk5GMzFGNWJ3cXZnamtuSWJGS0lRdF94M1BveWYzbFZkSThYYU1PZmsxRllxUVlqWl9QRlFLZzJseVJrSnJjMHR4LWVoclV0Rlh2VGZGUXV4Y9IBwwFBVV95cUxPRU9SZ3hDYmRXSEk2ZS14ZDNobXNZaWI3V05jdlV2SlBjY2dLRllJa0NJU2F4N1dFd0owWG9TLTExcjg4RW9KU3VpdFZaNVhYc09jQTNJV2FURHBsRTZ5R1hTSmtQeml0cTVXVndXWWs0YXBPbk55cngxWXpodHJ6N2dDa3pjQTNYUHBBOHExUEpybzBwTGJheXdKcExlQU9uMnEwVXBCc0FGR2FlR0hpNEhUemk3blh6ektTSU1FeDZGZlE?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"date": "2026-10-26",
+"title": "Defence Acquisition Council clears capital acquisition proposals worth around \u20b92.12 lakh crore",
+"url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQY2lhQzFIMmJYQzEzSnJGcGh0YlRYVlVjWmNKS0VqbFRJWURnVVJOeHprdTJkTHJza21ORFNSdk9tWGZUOVRjTVNodDE0YXBwam9RSExDUFJnUFRuNUJSY0xXbHFndUFpZjMxY2NjS3ROMlhrUW9BMm94TWgwNVllbTh5TXlfUFlST09wMG1IOWFHM0xLRzlsSkpLZG5xSU5mUTY1WF9yekRQYmU4YVlsRDlWODB4dkE5c1lYUTM0NjJ5OHpLN2Ew?oc=5",
+"source": "News On AIR",
+"official": true,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"date": "2026-10-26",
+"title": "Drones, guns and missile shields: DAC clears Rs 2.12 lakh crore defence proposals for Armed Forces",
+"url": "https://news.google.com/rss/articles/CBMigAJBVV95cUxORndFRC1GSk5kbXNWMUZWV2NGcHdNVDZQcUpzQktrVzJiZkhZdnRSSFI1RjNNTkpxVThmT1F2OWVfRVhPbDdBR2FGdk5KYnJYSkoyQ1MtUjJmcWJjd29Jc1JOOE50XzZsVEVEeE5iOTJhWVF1cGktSlBnMDc4Wlh5RHZCSHhKMGlGdGZHTjM1akROYl9xQ1ZZaWZadjVicTVZb19GYl9ZTDhnUmlBQzE2blFWeVpueThjdHEzazBaYVlreVZrMDBYQ0ZHdjNSaFYzVGxqVnlzaFJUMFNDNU91ZG41c1NMSGxNMHdXVkc4cFJuZkxLejd1NTE2bWU3Y2N00gGGAkFVX3lxTE5kLWNBSEplbWNxYmJIS2xrdXV1ZGJOYnBLLThYTENFanBVMVNWTFBuUHNOcjhDcko1WndxV1B0dUpIUGpHOTM0cVVZSnozcUpzWTBfcm9oQ2hmQzRVSHFid3h0c0Q5VG9jdkNwa2J4MFI5TEJ0eTcwSWcyLU5oZVlZSmpSNGplaEV4UkJZYjVqcTNhc2NnSHFrWWZzMEpXNjFkX0tNWTJTbTJhREt1WW4wTTlBZkJLVUI2RHhBZTlSTnBXanBoNVZRRU95dVBSZ2gtTjZkbTFyVUpiWkY1UTJzWDJfdWQ2bUhhYmVENTdOS2l1WTZnTVhUXzcxdjB4WWl1NVAza3c?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"date": "2026-10-26",
+"title": "DAC clears defence acquisition proposals worth \u20b92.12 lakh crore; 82% to be sourced domestically",
+"url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxPNnAwRDlBOXB6NkliekEyT2hHT2MwRjJhVVRNNHRMUFZ2RVdzQ0Vzbng4YTN1RGlMN1JfLVY2MkxuN3R2QzBsZlBoZHN5VTdodU9SOGV0Y05QNkdNTlU3bEdLNlFZWENxS0F1akdZNFpZM2c5T2taZFV5Nzg5dE9tUUxwbEJaRk5zQmpRWVRRMEJwZWVIOE42cGxRZHpJYk5rWWFMdGYxUFo1YlZRb1VxelZudEI5b0FYUV83djNWUGNWRXVzQkdBcW45ZlF1Z1FtT003M0N4WlFnWWc4RHRDZ0xkRWFSczRqemZTemRsbWQyT0k?oc=5",
+"source": "Upstox",
+"official": false,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "defenceministryclears212trillioninproposalsforthearmedforces",
+"date": "2026-10-26",
+"title": "Defence Ministry clears \u20b92.12 trillion in proposals for the armed forces",
+"url": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxQb1lHMVZXNUY5MmhwYWlsZkZTRGhjaGtsQmdYQ2k0b2lsRFpFX1ZGUGNaem94YVl5U181YXdFbGhGQTN5Rjkxc1MxSjRnckd1Um5jNGQ3bUdaN0M4d2FIanp4eDZNRUNsbFZaMDJFSkRCY1lrVE02dkpRT1MtSjY4d2VlUEd0Z2VNWXBhd05uUFpSMUxHcmdISjlzVm9maC1PUFlNcEJQSjV5el8tVVVJRGF6bWhoYnV0MjFCa3AyN0JJX0FESjNtdzJmTW96Z2J0TktGTExrTE1OV05RQzZLakxlejZFS01VWkpmMDR5SlpzR2RwcHRz0gH8AUFVX3lxTE5idzRSVU84anN4Y25uSXItZlpuQm5SenhTT3haQjdZWTZxV2RCUVFYdFBJNEt1al9sTXpWQ0NMcVJnRVUwR1Bla0hoQzBuY2ZiajZwSzNLd3pvdnBHUS1ZcjhIbC1tRXpTZHhRQVc2TDhTTGcwSnVILXpPX1oyWi1VVmJXcTgyWGdoYWZuRklkSXJTTlFSOGZFOWoxejRsQjRqS0lTNXU2R3dJOWdRTTlud3ZFTkR4UUs0U1A4MVY1X2dweGhpRDNNbUNiX2VxS0FlYWtrUWRvUHdqV1Q5blBLSURJZTR0NnFRenloa1NEdTRwRkZLVnVEZ0xpUg?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"date": "2026-10-26",
+"title": "Rajnath-led defence council clears Rs 2.1 lakh cr proposals for choppers, air defence systems, drones, ra",
+"url": "https://news.google.com/rss/articles/CBMingJBVV95cUxPdnlOd0dkcW5EUzVhQjBERHJabTNDckJIUV8wbm1zX1BONF94U2VwTC04X2ozRjZEeUt4YUFLa1Q0UkxaaGJ4bmNYR0ptdHJFVXp4VGl4M3kzS0JBMkxibUlEcXlKZnJjMkJiN3lyTTc4cXd3ZUY1SUR2QTlOOTdyZlNIQWdlMmVQTUxOWWJGcnNobVZ1ZmowVnNnWlVTdFNQMS1YVnM1SzloUmxZcXcwekZFNHFZWDdhckpPZ2I0OS1TZ2g4a0NYN1cwVmViQ0pxY0p5aU01OENEM3FxNURXODJjXzlPRlZkSVpudkx3Q29lMGNLa3ZWdEtjbXV2S2J4aDRhQ1dzY0NsLTRpejAtMzVUQ0lFZ0ZXSENDUU9R0gGjAkFVX3lxTE92U3k4bUY0OE1kMUg1ZDBMbFJpVmlJNWY2Rm9yNDJJUXB3LXN6NWl6QmJIZlY1ODNfbk9rNGtvd04zSlhIRVh5bm14OWVBSjZFdlVVUlJBVjVZaHhDM1VxalRrWmxrcHVCMy1ESHdiV3lZZkdtTTJvTGlOQjBSVFJfd1JOVC1ITzJULUxsNEFBZTVOdm5pY0hJNEs4Tkh2YXJ2b2RJQ2cyUVdZbmlHd1dPR3lqc1ZyaFVQdFdKR1MzLUFKR3Y3ZG1faENWcS1pT0dhQ0pYczVVenJPU1hKWklZNktvTkVzeUxDNVoxeFk2S010cUdGdDRtUkRZLUtGMTRXNHVBeTJyNUNyUEROcGxET3VHYnEzSWdRNGpXLUVNQ2djNA?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"date": "2026-10-26",
+"title": "Drones, guns, helicopters: DAC clears Rs 2.12 lakh crore defence buys",
+"url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPSHVBM1Rzdm9mbUwwbFFnLWlUUE1wNVZlaHlwN2o3NVNMdmh2WUtCUUpFSlNyUTd1dlVBeTBfNk1PWmpoVFpPQ21GN1FPa21Xd25zR05pZHFjbHozNkRFM19XUUU3SWNOMmU0ODVlY0NBQVFIeHd6WXNKQ2V4S3JpM1Nud3lzd2V1U0lQZXh5VHlVOWxmUWU2anVia1gwZ09lMVd3WHkzaFduZjZIbzhpZ0xmTkd4M21PekdTeWZ3WDVqTkMtUG94dl9kONIB0AFBVV95cUxQaXdHa2FhampHd0pzVHA1Mk1QYVlUMUVzc25VSllVV2JZRDl4MmhCODM2NmNqRWM5RlRkS1I4WUNvY2w1Q0dXeldLWFk1b1V2cEQ0RDdHZWFLTEhRWWpENGRJX2t6SnRUTnNsbnVKSE5kYXBUcXlBc3hVZzN4QU82ZGxkbzVIdGVVWWxxRXZYRGE2SE40S1FPTmVYVU5jcmpWZE5HNHZBVkl5cDNIeEVGWTM0MnV6aU1SS2xhd1RsSTI1cmtNN2FOSjhRSjNTQm9C?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef",
+"date": "2026-10-26",
+"title": "Big Update for Defence Stocks! DAC clears Rs 2.12 lakh crore proposals \u2014 Here's why HAL, BEL, BDL & others could benefit",
+"url": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxOU19YQ192aERYVUh4cUFoWWtmUUgzVGUwQ3lVbklJenFBR3hIdWpUalQtYTZXbkxkS01odkcydVMxUUVUNUc5dTlYbFFtLUY2VEhtUVozLWNTZ21TZi0wUUtwMWg4X2tzcENtT0o0djRRdDl2cHRfYVZub3dOV3ltSzB4a2RfUm1SRjU1RFJlWm9BSGNyYzFKVDlPRjVDcFJOU3BuN1JQLS1kT1Z0R21OUlZtZ1lxZXJLYWljRmJfYjROR1J0Wmo1ZG1wdW9Na3hnLVBhUjNBN0Jzd1A3Sm1qZ1VOUkMydGpwSGhZdVJqVQ?oc=5",
+"source": "Zee Business",
+"official": false,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "govteyesstakecutsin4psubanksincludingcentralbankucobank2moreinprivatisationplan",
+"date": "2026-10-23",
+"title": "Govt eyes stake cuts in 4 PSU banks, including Central Bank, UCO Bank; 2 more in privatisation plan",
+"url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxOSDZ6bHhrdklmc1hBYzFUZXg2Z2FsU2pPQTRwRGVtNE1oM0psLUtZRHQwc3Z1SGNwdFpHU0FiOVRYcGhCSkNQTzI4NlRTeWV5R193X3ZFdWhValVmNFYwOExVNi1Xd2V1ejNSSXMzQ0t4ZTdaQWsxN3VOYjFSTDZZRldsZkFOV1pVLWtFT0JGTFZVWFRobDUzLVRnN0ZKR0JOSVQyUlctWGZyazFIY1R6emxrbGYwem8xV0hUQ0ZVTG95RGJ4OGZKUWR1a2JUQ3V0MnRYVVI3T0QyUzN0WGN0NkI4NWNZS2V2Ny000gHwAUFVX3lxTE91YWZSVW8zb0RwUmFGTjk1ZWxUV3Mwb0xPcjdCVEN3Y1Z2c0RhTVo0TVZXNDlXUmVISDdHOFpfa29wTkhqMk5ObkNZSmwzRWd4MWF5OWJxald6VVlCbGRvTnNHNGROR2hScUVNdjhuYTJhbEt2UnJoTTg1TVd3amttYmVPWUM1VzJfVjJscFFEN0xIdEJSMkROR0xuUjJYYVNoTHpjN2x4NjdfMmZOckZQZ2JXemRWSFR4bHVpcWp2SXZiTkZuTzhrQnBDeTFqVkpFWnB6d0RGbVZSbnRJc0hCR0czTDdIVlZuSkl1WlZsdA?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Public Sector Bank"
+],
+"neg": false
+},
+{
+"key": "afteridbibanksalecentrelooksatcentralbankucobank2otherpsubanksforstakecutschecktermshere",
+"date": "2026-10-23",
+"title": "After IDBI Bank sale, Centre looks at Central Bank, UCO Bank, 2 other PSU banks for stake cuts | Check terms here",
+"url": "https://news.google.com/rss/articles/CBMi_wFBVV95cUxNWjhaeGtDUlZzZEVQTWNaZWlxeC1lMUlIanJ1N01xeUpvVlNEX0M3QnloYVlnbVNvQThvVE9DLTI3ZTd0eGowODZid1hBNVpKVlhaNWtfR19QVTBEQ2VnUkpXM0lvYTBFd0lSUThGRmhjSEpLaXBGNEpaamNUQ25aMmFnMEdFdUpsUmVZdUJyd3dzV3lIT0djQ1ZMTzltRlJaRllnb2JpTWVhaks3M3JfS2VNRmNCcnNmZHhQcnEyZzRGQnRnVndwd2NIUHdQLTdfYmU3VkN5Zmtkdk1SMWZ2SUJJRmNaMm96UWEwRmY1Q29BX19kQWo1VjYydVBJeHPSAYQCQVVfeXFMUDNKdVQ5MG5acXh0WXJQYVR4UUdDN3MwX2pyUnJpREJLcVVOM0lYcngxTjNtZXMtb2RwWVJYdTJNNzZEUU5Ob1lEUFpoYXVjV0toa0NuRVFaNTk4MWY5VGk3RGlBQl9UeE5CX3ZoM3cwZWJLTFZuNGUtRTVNLV9QcmNtZEpGYlVhWmVjM3hqdzlqeGtDX2Fwb0xBQUZBelJRRnpUN0pWTWJVb0dpLWRkaVpVanlpVUdLd3ZodkZKSU5mX1R6RFZPVWVuMTlaVWo2NXp2dWtmalJpaFdJVmczbDZVUVdyR2hQWVZUa1R3bV9zMndEUzloWjBhamQ4SVBrYmNpdVU?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Public Sector Bank"
+],
+"neg": false
+},
+{
+"key": "governmentplanstoparestakesin4psubanksto75",
+"date": "2026-10-23",
+"title": "Government plans to pare stakes in 4 PSU banks to 75%",
+"url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxONngtTFpYcW9JOXNmSlJHa0JtOU02UUp6VEp1X1Fod1Z0RWJrc25ZREN5ZWhSMzRiWF8wSTRuZDBqUFI4dUhIczllclg2RjZCUHNiWlVoejc1anp4TWQzUDlVVFNyX09UaVB4aTFXeTNYNmhxZ0NRSGtLY3JXUGlvZEpsVnJsWTVNZWkwckthOGtNb2xwYktVcDdxNVV1ajczTGx0WjZxMFdieDY5U3djMXBTbFY3aWZzdkdtVWxHWTVYbkZleEHSAdwBQVVfeXFMTWZaUHotcm5GZkpDd1p4VG9IZVhxdEstLUlzOHhfLTJ3MlFVbzVNTXVpTTJrMTBNWFNJbUlHT3dyeVdXUl9JOXphRnlCMFpvWHU4anpRMndjWFFfTU40Ml9zTjEwR2Fha0plalhFdmU2RjlvS0dPckNTaUFtSVYzdlNWLVFxRUQzb0FQUEViYk4zREZ3M09xeWc3a3Q1OWNscllYZnNDTUJJY0dOQ20yYjN0RDhUNVoxbW1kWWcxX09DM0NsbUM2ekRQcWtSRDNNMVNYaWo3NGZUVnNqTQ?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Public Sector Bank"
+],
+"neg": false
+},
+{
+"key": "navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"date": "2026-10-22",
+"title": "Navratri car sales fall 22% as last year's GST cut effect fades; EV sales rise 27%",
+"url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPU0ZVRWE1Q09VN3Y5ZGtkMkVLcER5Szg4UDVBdm94akRIb3FDVjBvMmdLRWNiOFNYY2piTE9aUU9xUjBYUGhSS2lCYXdJbzNEMk5XMlpFRGZCbzQxTk5FY0puOVZfVGNST0RteVA5Zk9TbmVTSUlmcklCMGxoZzRQUmVfWS1McnZIU0pic2k4Z25iRHVzVDhiMWlCa3RONTc0Vjl5cnNiclE1b2Q2THd5SW9FdHVmWE5BZElsT0l0dTV0cVNNb0ZfVC1YbGhSQdIB0wFBVV95cUxOQlQyTk42VTNMcmZ0Tl9OeWdZM0hyMm55cUFRUVJTckxBRkRmb3hGUkhBbHFfYU1NZlp6X0JvaGcxWjFlbGhETFlYU3FoQWtmVVJ1RmxwU3JkLW1QanFGZnFGWl9FcjM4WWZrVkVXVDNIdVE0bUtjRERQUS1iVlhRWTBSbUJYc1YxbVc4NmdVSF8xM2hwcVE4SHJqTll4SFBfbEdCTXVfOVZSMlVqaURpX1FLNTNqUmEwbG90Ujh4NVZzc1dZYW5KcUQzejh2akRPS3Vn?oc=5",
+"source": "CNBC TV18",
+"official": false,
+"type": "Tax / GST",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "sugarcanefarmersthreatentorestartprotestifmspfrpandsapnotrevisednow",
+"date": "2026-10-22",
+"title": "Sugarcane farmers threaten to restart protest if MSP, FRP and SAP not revised now",
+"url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxPcjk1YWllSjh4eTdvQzZOa3RGbmZVcHNON0FLa240enctbjA3ZmRodHg5b3Vpc0xDcllMcEVEU1BHbUJ2VVN6ZzNheVFrYlRNS1pKeVpVd3BZaFdRbU9lM3hlWFd6QW9Mck5tbjV5QTQ5X0xic21Qc0s0LWlwNU1VbU5FWnpaRDdMd2ZSN3U2cG0wMXlrajVtMnNtbHRPaDRUdWM4S1pDbDlsY0N1R3Z3YkhvTlYwaW12clp1eVM3cVdrOUdPelYxSTlueXBiV3V4dGdvUjhfQVJKZ1Q3QVBzMUpyMNIB6gFBVV95cUxQTnNLeEswcTd1VjFuM2JKSGZNV1BGQXVQZVNrb2gxMFEza2NkZmh3VFY4dk03WmctMWxMUmd0bE1BT0VhZVV3M1FqTnh1dGtoQ09JRFNYZTRwcjBpMFFQLUxfTzh5RnRmZENtZWRmbW5EaThKVFJxZ251V0tCT3RvWFVnNS0zeE9uOXhzcFE5RmNHbDZWdkw0bFk2b0pIUElDRURBbjZ0WmtHdVZJcjR2VnBkaTJEYXJDSEc1Z2dIaHpSVHRjSmRNYWVIYU5fZVNxdGdSdmgwNlItYWE4dFBOUU5YRm42dnhQWmc?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "governmentplanstoreplace1957mininglawwithcomprehensivenewlegislation",
+"date": "2026-10-18",
+"title": "Government plans to replace 1957 mining law with comprehensive new legislation",
+"url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPMGQ0NTBPcTRWaml4UU54TFBPcUJBWW5mLWlaenJuek8yTTJzMDdmZ2E4SmVndExOUXNaM19zdjNpSFhnM0wzRDlRRVpZajJidXREOUt5WFl0V3V2YjdZa0RTZXpWRmtCT0lOcGI5RVlNSGh6N2lFaGk0ZlJ6UHUwN0c2d2d3bXdfNHo5RXQ2T056a3NIdmR1SWt5bXhGZlZuVFZWVmdHUnJIZnkwM0pSWkVjXzZscEIyMlF5RWt5VTlTNEQxSkFmU3dmZW5GVHPSAdQBQVVfeXFMTlM2dUR3QXprYnJGMmpOQ0JXRVZISUhnbnA0dmpHNlVvUEkwdktmenZEV1NTSjJUUW5tYmtsX1pKdVBuZnRBVVU4QjJlczZfQk5mRkx1d1V2SGhITmRrRlNHRFFQa1VTWTEteml0M0JuZ20tLWFhcWV0Wm9xT18zbzBaclR5RmVCNm1yVVJBcnBBX0pZYldScVdjSDgyTFFuOU96bVc3WHp3dUFNTFhtMXBoMDBrUXEzeW8zWTY0cjRoTGhVaVNkTk9leDdlU3YxcXN4VVo?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "Plans / reports",
+"industries": [
+"Industrial Minerals",
+"Diversified Metals"
+],
+"neg": false
+},
+{
+"key": "adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint",
+"date": "2026-10-17",
+"title": "Adani Group\u2019s Vizhinjam port stake sale: Keralam Assembly records contradict State\u2019s claim of being kept in the dark",
+"url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxNalFsZGR3Z1U1WlczUmhfTzRPc0pHTEJNZTk2ZDFZcEFJd0lQajkwNm1CVmpicWMtM3o0dXE4c2k0bXQ2eWVidF9KQy1EQVBWcEluaXFYMzU0aXNJRHg0QmdNRE9jb0VPVVBPT1FvOGlXSklETko0QTJvWWkxc3ZmaEM0eTZQSE9IQ3hrVDVIYTJZTjBPQ1FmVnJ3LTZIYklIbXd3OTJEMVozSTJBT1VxNWF2dHdFSUxTZXRfdlM0dXpmWkVxXzYtaGtxYVBYazFkd3NKYy1RZU1pRGl3QlZaRXlNdnRGY1dSLWNILTIzVGNBNHlrbnZRV29R0gGAAkFVX3lxTE5QeUJWenRYdG5rVUVSd0hZdWpHMDRzTzNlZjdYRnBLWU80Y250cjBzVld5eENCRjFRNWt5Q0NqeVNUMUQ1c1dUSGhIcW01N25YVmRvTFh3VURZdkI0Y0g4dmdoZERZMDZTMVU0TmVodE1vNkctd1o2RTFJeEd3QXNGVVFyLTMxOFRUQk1DZjFGOUtsNnE0VU4yTXMzNW0tRTBjRXJNSjN3QllqaGhTTzROdTlaT3ZQLWxoZ2F5clZhaWdTalgyM0Y4anRzal9MSGoxNTdnakJoUlkzLTN1VnZKTkpPWnpIVnhQdExoTGlYNUU3azV5NTFJMEticlBQdTg?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Ship Building & Allied Services",
+"Shipping",
+"Port & Port services"
+],
+"neg": false
+},
+{
+"key": "indiasgoldimportsdrop27aftercustomsdutyhiketo15",
+"date": "2026-10-16",
+"title": "India\u2019s gold imports drop 27% after customs duty hike to 15%",
+"url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxNVUhoR0xnYldqRzN4aWlKbUd4ODlCWG9YNnh4QkFadEI3bEl6X29JR0hnMHBnVUFzVjJBd2ZVVFJSdF9rRTFnTnpfOUd6bXRJN0dNaE4xblBwcHhFcjNwbzhQaTA0OG42aVF4S042S3lLS0xISi1tUkkzZEwwekRnS1o1dmtKZXp1bTMtdWQ0S2NHRUhSSk55ZVJJMUxMMHRGaDEwdlhhMUJtVDdWZnNCSEtfb1VJTGJ5WUVjWi14UkNBMksycHdfS0o2ZDNpZDdRb0HSAdgBQVVfeXFMTTF6Uk1MY0N1b051RDV5d0s4N1R6NVo0eXRxVjRnT2dXUEF3S3FBS0MtTjFmam1XdTVDbGt5M1dmNW94ay1oNk5ZNnltMUQybWFNUllBWGVQUVlFWndJbEI4eTRzWm9RYVI1NDlIamdLcW5mY1ZVNHVya0lXT3JOVlNyRk1LTWg2dk5meWs2dUlacUdUcVFwOFM3SVlpZkhUdTBtZzFiWjNlYTFySHFqck1WVVZiWm1JYmoycUZBT1lLR3hKdEtqYlFlem9jV3F2WTh2TjV1VE1J?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "chinaconsidersnewexportcurbsonsolaraibiotech",
+"date": "2026-10-16",
+"title": "China considers new export curbs on solar, AI, biotech",
+"url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNczBZdGdKNU9lSVB6ZHJ4dURzdlJCQWVFV1BfYTdPaUwxY2lGNXZuT3M0ZlJxN1EzOUhWYmVxME14bVFUdWZtVkd6Zy1UdHVTeTVEYzNvVWtKZ0IyODkwOE1CXzRrb0JFbV9GZktjMzhBbENudHZqbTZETGstU3pMSHNLVy1zMkozd1JadlVnN2NsajdzZWlxQUxvdTFYb21UMVZFX0ZKaU9FckNubW9pNWVPd2dVNTQ?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Power Generation",
+"Other Electrical Equipment"
+],
+"neg": true
+},
+{
+"key": "nileshshahonpsuprivatisationhowhindustanzincoffersalessonforidbibank",
+"date": "2026-10-15",
+"title": "Nilesh Shah on PSU privatisation: How Hindustan Zinc offers a lesson for IDBI Bank",
+"url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxNYWNBMHZIcDc3cEJwR2RsbEtIbnR6ME9rNE1tZUVEZ0NZcWduX1U0SzVVUDJsMWxZVU4wTGlaVGpIRThzY2VmR0psczZqYzlQSlYzX2dwZTI1VHh4QjdhZG1pczk2ZnJQYWdRNGlVSU9VS3NSLW4tRHdrYmkzVVpDTVNub2dUdEVSZmtkS0ZlLUotUVl2Vmo4MC1QT2FWRW1KSEt5VlJicmtjS3YxdnpjSFpQSU5rVk1qekg2V3l6cFpVZDZ2TlJ1Uk41WjJ2bk9hVUZlckl0U0t2M3U5WXZtaFBqb1lyaTc3bDh30gHwAUFVX3lxTE5zc0tPdUN1SGYtLU92aHZzakFaeWxGQW9aSDg3Sklvc2pndjlWVkdlYVR6NmRoUlNYLVJlRkdnYWdwY1dyTjZtWVoyaWtMZ3VGUTh3SVZVTUpqRjZxWGcyRXFuMDhpYzNTeng4MFpZN2g5NEZXTnV3dFk1WG8wMVc4Mm9tc2x5MmVrT0lQWFUzWjdTVnRLT25uMEk2Q0xGXzRpZXlnWGtPQWF0b09MSF9kaVVrNi12MzZEV3BpOE54aFJiaW90VWlyT19kc1JoN3VVaG9DR0dRekdoNkhIMWVUWC1hMGo0Y3RuQVRUeGRTRA?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Aluminium Copper & Zinc Products",
+"Diversified Metals"
+],
+"neg": false
+},
+{
+"key": "sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
+"date": "2026-10-15",
+"title": "Sugarcane farmers protest over delay in increasing FRP; object to absence of farmers\u2019 representative in Ramesh Chand panel",
+"url": "https://news.google.com/rss/articles/CBMimAJBVV95cUxQUEI4WHZ5UjRIUEJZUkFFVkl0RzhObnVyTlBYZ0NwMFBxVGJHdlRaQWtUOTJ4YmJnWkZGeFYtcUhBR0IwZlcxZjctM2JkVHpxOVVNWUplUzl4dzR0QTBGWWdyZlcxa2hZQVFFOEpKS3c2ODVBaWFMTHRFVnJJNGtfMkNXUmN0eUJPNnZRa1A0RGhJRmd5NUkxYUVBS1pPeFR1QlI5dE8xQUhfNHg4VTdSZ3VjeWNoS0tRanA5eXdIOUFuZElwR0hVS25BV09raGFyS19XdEFxSzdORGdKY01hYkVJdGxwa0hiUDdWRmFGYVJ1WTQ0dWhsNC1WTFRtemVzYUhkMG5Ec21BdGxMU3hkZGtBUEIzbWVn0gGfAkFVX3lxTFBObUQ1Zzl3Rk1VVDNNam1NeElTb192WEF5eE9aMDJXNU8tcXN4QW5FMng1b01sX0l3UWhHZ0Y4OHFIYmlDejMzQ1U0dXJ5ZWVzVWJvX1ZJM3pGelJqa1R0MzN3N1dzY3EyX2FUSVJfU0xEc0RtVWJaWjc4al96YXBNcm0tRmVjRUZNUlkzTnBxam04TzBZRGFTUGh3RmoxOHBZX1o3OU5hM0RGSDhSTWFDUmNRZUVnUUMxbG5aR0prbHJBb0RaVE9lU2JGN1hqUk04YWhZQ1ZERGJHWXJ3RjROelhrNGczeG01VXR0S0RJUmV6bGZ1b3d2SzdOdGVjN1lJaDFyMXQ3R0VuZ0xZajhFTXJrbWUwbXBhX3otaXN3?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "sugarcanefarmerswelcomepanelbutwontendprotest",
+"date": "2026-10-15",
+"title": "Sugarcane farmers welcome panel, but won't end protest",
+"url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxQeW9pRDhFSjhRWUJGU0RDeHFZcS1jZjRGRFlVM0JiWjFIMmN4WVRhY3BhZG5LYm5wMG5XRFVSOVpBdm1ZTHdleF9DT0J3Ykk1S053WVVlaU1YWUhncDhzNkZrSE96ZTZXWFh0OEJnd1o3ems1a09Camx2aEtfU3BTZkVJeWFKZm9pUjVEcjFURUo4bUtuNXpBMVVGaXdLUkFQX2RNMTBRMXh3VVRHLVRhcFQwUjRFNGN5eWNFRzI1S2h2YVB2RDNya0FsaDdLaHJJaEQzc25sc00xdXdsMTVSdURqeEc4TGhQUDFQLTBEYTI1RnNtb1AzSktB0gGAAkFVX3lxTE9qbWNJS19ObDFXbzZ0WVF6ei1LVkJfeTdCOE5mSzd4N21QRWszQjhmcThxZkgzbElpZWlRb1lmWE5GX1oxZmtEOUZLWWhPLTYwbF8zNE9tWGhxRWdRQkU0elZPdDNVWktnM0FtYURUREdNOHJ0cTl4cTRxZHZvWEtqcnFzbE9ReVNKQUlHUVQ3ZTFPcWJ1bVJXVl9kNkF0cDhhZDZnTUNUSzY3b3JVRU14XzBPdUEyLWR1UjF3N1pNdGR6YWl2dE1hd25RMjE4SHVzOXN1dE9DTzQxVVN6RVRzdFo0N2NBaS0wX1VqdEN3eHNQdzJaSlFzaUhmOW1nZWE?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "noplantoreduceimportdutiesonpulsesofficial",
+"date": "2026-10-13",
+"title": "No plan to reduce import duties on pulses: Official",
+"url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNd0R0ak5GOF8yQmRYczlBT0NSZkpvMVZHUlIyZWlxbFppNUM3d3BpTHJldFlaZzMwR3lWTzZqTzFGSTZGSG9Pa1gyVFl3YVByblRPYVI0cHVZYzMxTjBiWEdCeFRBM0xvZWRsWUtiOHNZVmtEcWlNcUVUMWJhM2J3V1NidThqeWZIM0JaRjFzblVraDlNRXdFcnRnVWhqbk91d2t4bE44OWgzMFXSAbIBQVVfeXFMUGFua3FUd2pnejlrZ3k3MmxELWozUHk5bXZRNE1MTnRxcXBwQl9GbE1fVEZmTmRIR3JEQ0g1Vm1YbzZ3djFEWEZZYjhWcUN0ZTdvTGtwSzJEYVAwaFQxN0M1TnBDZlhqNlBhTHhMano4Z2NjZVJ4dF8wLTFkRG9vSjFIS1d0cmlSNGF4TUI2T2RFRTNvb1cxMENhWG1qNW5fZU5ISWduNlRKSjVMWlFEZHpYQQ?oc=5",
+"source": "The Financial Express",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Agricultural Products"
+],
+"neg": true
+},
+{
+"key": "governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme",
+"date": "2026-10-12",
+"title": "Government allows 5,841 tonnes of sugar export to EU under quota-based duty concession scheme",
+"url": "https://news.google.com/rss/articles/CBMigwJBVV95cUxQcDQyckFPWlRNUGxIaFY1QWxYV0FhTVlnS251dU1aWXZJTjFINmg5RTRWMjZCc3BqMmpTVURLZk1tbmNWcjJMSVhYY1k3bTFBWDZQR0trMFNtMHd2NkVDc2tCbXlYcVNadFBtVC1fZDlfOG02T3FidmZtN0JKT091Q2FyNDhueTdGVmhqSk1IRUtFVjh3SmhKQm1PZTNjd3FpQi0ySjE0NjhjZngtR1NVaVY1Q1R2TjFXNVNzbENiUVFReWpBNmswZnNiSk9hSEUtRlRxR29QMlFXOFp5YzhjejRDOElLWm5PTGd1NzJUN1d3R1duR044eVQzVHZSaXU4T0NR0gGIAkFVX3lxTE1IU0ZCclkyZjZGRzgxeEN0eTB5N19UV1VVSEJzOTNVdUVIZ25yTDVYU0RRSjRaZVVMWUd4YkNMX0hTZXV5eDNhbzZjY0dBTklzNzlQNXBEYnZEVmZORHZHcW5QVlFhMTdkTUZzbE1ZOFZTcE1RaDRrb3ZjTlg5VktnbEd0T3VFRjhFdGlpYjRKTk5yZXNwUG9uS0VWMkZDRlVsa3JvWWVlTDRsX0NjbUl2a2NKcEpmR3RJRWlRZXlPZ2w2WjJpV2QxYnp6OWx6enRRZTFVTHdBZlZSSTZjLWhBWWVjMWg3RHhILTFDUl9xWUdvZUFvWVNyTGg5bW1zdm9sbnpBTVlyUQ?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"date": "2026-10-11",
+"title": "India's festive car-buying joyride may hit price hike bump",
+"url": "https://news.google.com/rss/articles/CBMi5AFBVV95cUxObkhtbmpIaW1mZjRBSXRfMUo1Y2RhQ3NfMjQzY3RXZGN0Ujh0aWJZV3RxbHNwSFNuMU5vSG81WURyZFpiR0FQWkZWNEhfZTBMWGJHN2l1aFh3M3lvcThhNDZtWXlQXzJyYXJFXzdOS1ppSDNsMklTaUZqbTNrUkVwUGQzWC1GWkJDS2U5UW9FdmEzMGVHMW15azFLajFPdmp3OU1YWThtTlgwR1RPRW41Ul9qaGxqSExlQUZpN0xuWVBmQ2c0ZVQ3RnNBajhXaXV1NllfaWN1bHNVQjBVa0tKWXRqWEPSAeoBQVVfeXFMT01TSElhbktBRjdtS3Jfb0FVNG1SUkk1TmszemFHT2ZSQkdobE90d1hNYTFUaXoxNDJUVGp5R1Fzd3pWaE9DUTdrUjhOb0JqSHQ2bWxuSnFrOTlTY1VfenhrQ0hyZUNIdktqRnJqdGZVM1RRZDl5azJZclJtdVFOTHlfN1RGc083Y1BiYmlrSHBkVi1aWEFGYUNLTThEbHc0SWRNYUQ5UkllNkdaTENiS2YzN2E4Nm9YNUVQSG9HUllEa0JtdU9uektfRjdvSjFfdkRESUJUd0Nldzk0aTkxVFpBQ3RhMUlPX0RB?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Tax / GST",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "goldsilverimportsbybanksnominatedagenciestoattract3igst",
+"date": "2026-10-09",
+"title": "Gold, silver imports by banks, nominated agencies to attract 3% IGST",
+"url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOY2xMUDBBSXBINUxQNzFFbmFwM2o2TE9CVklNYWZrUERURjdGbUttS2F3RkRaRlZMYXY3QWdPNno5NXBUSXVoS3pzNjRwX1kzMGEyM19jaU5hMy12bXJ5UTFlVGx3TC1RVjdfakpEb3dmbjFpV2RmYXhaaEkzclNkNGRUaDFETjFHZG1BSU1qMV9aYmtwMXBiajliSnlMbjE3OXBUTGFuSnVEckZ4cmdzcW1nbVBnWExtUGt5ZkJqUjR6c0RkZXfSAcwBQVVfeXFMT19Cd3RnMFlDNTNDYUx3VlB1TlhSRTc4ekNrNDVzTU9oTkUyWXVIN3VrRW5zMjE0bjVqMm9vN292Q1ZwcDduclJMa19IZmY2YWV4aU1nWk9MUUd0RkVyaVB5ZzUxWGtiOXR3YW42RWEwMWRHRWtMMXhvRlI1OWVCWWpNQjBRNVFtRFBrUWdEbm9Mcjh2ejZsS3ZhYWhWOGZ6MXBhNHZPakRXT2ZHT3E1LWZPanE5OE96R0NTeHhsZWNWNEJ6ajZnbndudXZF?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "gstcouncilproposes5gstoptionforevpassengertransportrentals",
+"date": "2026-10-09",
+"title": "GST Council proposes 5% GST option for EV passenger transport, rentals",
+"url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOTlVUbVZCMzM0dFZMWDBpMW9FT2dhRnpZRUI3ZnNFSVd0LUNteVJpTG84UHNRVHpkdTVyckdVMlZya1ZRZkJRZ0NVZlQ5cEtTRHk1VVEwSUdSYlFLRElSV3RfQmtTcVhtZk4xLWFFbGRmR3prUnVBNzlUdU84X2syMFB4VUFRTlVTamNmMWl0Ynhhbm5tUk1SdjAyQ0htUmc5ZGw5cjNpVkg3bF9FVUtjZlcwTzkwTkhndVI0VFNxQUVwMjTSAcoBQVVfeXFMTVltcEZpN3psbXJkc1AzRnZhRGx1UEgtX1BNMkYyWFNVamxTX1hmek1xa0JITlZCa0xkb1ZIRzVSUVdwenBqZjN3Q3l2TmhXM2FYZzVzRTRKc0xidEFPNlJhZzVCMVh4NHZlY0U1MGRKNFI3b3JRMTNuQUJQLUhWSms5ZFpWNWtTUEhtMHFJa19XdlpyazZBaGZYcmEzZlZpSHNqNFcwQlpicUR6X2NIYW1DbGZLWjJvbmZDT1pYTUpfTC03T3FDZ3FyQQ?oc=5",
+"source": "The Financial Express",
+"official": false,
+"type": "Tax / GST",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+}
+],
+"by_industry": {
+"Power Generation": [
+"cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
+"indiassolarmanufacturinghits116gwasplischemeboostsdomesticoutput",
+"chinaconsidersnewexportcurbsonsolaraibiotech"
+],
+"Other Electrical Equipment": [
+"cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
+"indiassolarmanufacturinghits116gwasplischemeboostsdomesticoutput",
+"chinaconsidersnewexportcurbsonsolaraibiotech"
+],
+"Heavy Electrical Equipment": [
+"cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
+"biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal"
+],
+"Cables - Electricals": [
+"cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
+"biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal"
+],
+"Integrated Power Utilities": [
+"cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
+"biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal"
+],
+"Aluminium": [
+"aluminiumproductmakersseekzeroimportdutyonrawmetalaheadofbudget",
+"indiamayimposedutiesoncheapaluminiumimports5stocksthatcouldbenefit",
+"budgetwishdownstreamaluminiumcompaniesseekbasiccustomsdutyscrapped",
+"dgtrinitiatesantidumpingprobeintoaluminiumextrusionimports"
+],
+"Gems Jewellery And Watches": [
+"thankstopmmodigoldpricedrops65lakhperkgctiwritesopenletteryouradvicehelpedprotectsavings",
+"32billionsqueezewhyindiasmassivegoldimportbillisshrinkingfast",
+"indiasgoldimportsseenfallingto40billioninfy27ashigherdutycurbsshipments",
+"customsdutyhiketakestheshineofforganisedgoldtradesmugglingrises",
+"goldpricesmayhavecrashedgloballybutgoldsmugglinginindiahasjumpedto50tonnesfrom3tonnesi",
+"indiagolddemanddrops29inq3",
+"goldsmugglingintoindiasurgesover1500to50tonnesafterimportdutyhike",
+"indiasgolddemanddown29injulyseptemberat1625tonnesworldgoldcouncil",
+"indiasillegalgoldimportssurge1500toathreeyearhighwhatsbehindthejump",
+"indiasgoldimportroutechangingcourseforabenefitalljewellerswant",
+"indiasgoldimportsdrop27aftercustomsdutyhiketo15",
+"goldsilverimportsbybanksnominatedagenciestoattract3igst"
+],
+"Other Agricultural Products": [
+"indiaweighscurbsonnonbasmatiriceexportstocooldomesticprices",
+"amonthafterliftingofbanwheatexportsrisefourfoldshowsdata",
+"noplantoreduceimportdutiesonpulsesofficial"
+],
+"Ship Building & Allied Services": [
+"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
+"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"defenceministryclears212trillioninproposalsforthearmedforces",
+"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
+],
+"Shipping": [
+"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
+],
+"Port & Port services": [
+"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
+],
+"Fertilizers": [
+"governmentunveilsroadmapforgreenureaproductionpushes724lakhmtgreenammoniaprocurementundern",
+"fertilizerstocksrallyafterunioncabinetapprovesmassive62370cragrisubsidy",
+"cabinetapproves62370crorefertilisersubsidyforrabi202627season"
+],
+"Coal": [
+"govtclearscoalindiathreeothersforrareearthmagnetproduction"
+],
+"Iron & Steel": [
+"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
+"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
+"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
+"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
+"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
+"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
+"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
+"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
+"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
+],
+"Iron & Steel Products": [
+"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
+"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
+"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
+"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
+"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
+"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
+"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
+"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
+"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
+],
+"Sugar": [
+"indiaachieves20ethanolblendingmilestonein202526maizeleadssupplies",
+"indiahits1999ethanolblendingin202526grainssupply735",
+"indiahits20ethanolblendinginesy202526grainnowpowersover73ofsuppliesaida",
+"governmentrulesoutimmediatemovebeyonde20reaffirmssafetyandbenefitsofethanolblendedpetrol",
+"indiaachieves20ethanolblendingin202526grainbasedfeedstockshareat74pcaida",
+"indiaachieves20ethanolblendingmilestoneinfy26grainbasedfeedstockaccountsfor74",
+"indiaeffectivelyachieves20ethanolblendingtargetin202526",
+"ethanolblendingtouches20milestoneinfy26",
+"niranidisputesministersclaimsonethanolblending",
+"e20petrolrowkarnatakawritestocentresaysstatenotagainstethanolblendingbutagainst",
+"karnatakatosendlettertocentreonexcessiveethanolblendingonnovember17",
+"eidparryseesethanolmarginsunderpressureconsumerproductstobreakeveninfy28",
+"karnatakacmshivakumaronethanolblendingamidbjpprotests",
+"karnatakatestspetrolsamplesat67locationsoverethanolblendingcomplaintscmshivakumar",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka",
+"aistaseeks35hikeinsugarmspto42kgbackscentrescaneprice",
+"explainedwhycouldaweakmonsoonderailindiasambitiousethanolblendingprogramme",
+"karnatakamsprowfactoryownersunionstomeetassugarcanefarmersturnupheat",
+"indiaputsfoodbeforefuelaselniodentsethanolambitions",
+"karnatakasugarcanefarmersurgerameshchandpaneltofixexfieldpricingforfrp",
+"supremecourtquestionsif100ethanolvehiclesareallowedhowsupplywouldbearrangedamidfarmerempow",
+"nointentiontoincreaseethanolblendinginfuelbeyond20unionministerhardeeppuri",
+"noimmediateplantoraiseethanolblendinginpetrolbeyond20hardeeppuri",
+"sugarcanefarmersthreatentorestartprotestifmspfrpandsapnotrevisednow",
+"sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
+"sugarcanefarmerswelcomepanelbutwontendprotest",
+"governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
+],
+"Breweries & Distilleries": [
+"indiaachieves20ethanolblendingmilestonein202526maizeleadssupplies",
+"indiahits1999ethanolblendingin202526grainssupply735",
+"indiahits20ethanolblendinginesy202526grainnowpowersover73ofsuppliesaida",
+"governmentrulesoutimmediatemovebeyonde20reaffirmssafetyandbenefitsofethanolblendedpetrol",
+"indiaachieves20ethanolblendingin202526grainbasedfeedstockshareat74pcaida",
+"indiaachieves20ethanolblendingmilestoneinfy26grainbasedfeedstockaccountsfor74",
+"indiaeffectivelyachieves20ethanolblendingtargetin202526",
+"ethanolblendingtouches20milestoneinfy26",
+"niranidisputesministersclaimsonethanolblending",
+"e20petrolrowkarnatakawritestocentresaysstatenotagainstethanolblendingbutagainst",
+"karnatakatosendlettertocentreonexcessiveethanolblendingonnovember17",
+"eidparryseesethanolmarginsunderpressureconsumerproductstobreakeveninfy28",
+"karnatakacmshivakumaronethanolblendingamidbjpprotests",
+"karnatakatestspetrolsamplesat67locationsoverethanolblendingcomplaintscmshivakumar",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka",
+"aistaseeks35hikeinsugarmspto42kgbackscentrescaneprice",
+"explainedwhycouldaweakmonsoonderailindiasambitiousethanolblendingprogramme",
+"karnatakamsprowfactoryownersunionstomeetassugarcanefarmersturnupheat",
+"indiaputsfoodbeforefuelaselniodentsethanolambitions",
+"karnatakasugarcanefarmersurgerameshchandpaneltofixexfieldpricingforfrp",
+"supremecourtquestionsif100ethanolvehiclesareallowedhowsupplywouldbearrangedamidfarmerempow",
+"nointentiontoincreaseethanolblendinginfuelbeyond20unionministerhardeeppuri",
+"noimmediateplantoraiseethanolblendinginpetrolbeyond20hardeeppuri",
+"sugarcanefarmersthreatentorestartprotestifmspfrpandsapnotrevisednow",
+"sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
+"sugarcanefarmerswelcomepanelbutwontendprotest",
+"governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
+],
+"Industrial Minerals": [
+"biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal",
+"indiasnewexportbankeepsbatterymineralsathome3recyclingstockscouldcashin",
+"howindiaslithiumionbatteryblackmassexportbanaimstoreducedependenceonchinaforcriticalminera",
+"vedantahindustanzincgmdcmetalstocksinfocusascabinetapproves2814crorecriticalmineralprocess",
+"governmentplanstoreplace1957mininglawwithcomprehensivenewlegislation"
+],
+"Diversified Metals": [
+"biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal",
+"indiasnewexportbankeepsbatterymineralsathome3recyclingstockscouldcashin",
+"howindiaslithiumionbatteryblackmassexportbanaimstoreducedependenceonchinaforcriticalminera",
+"vedantahindustanzincgmdcmetalstocksinfocusascabinetapproves2814crorecriticalmineralprocess",
+"governmentplanstoreplace1957mininglawwithcomprehensivenewlegislation",
+"nileshshahonpsuprivatisationhowhindustanzincoffersalessonforidbibank"
+],
+"Airport & Airport services": [
+"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
+"indiaraisesdieselandaviationturbinefuelexportduty",
+"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
+],
+"Airline": [
+"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
+"indiaraisesdieselandaviationturbinefuelexportduty",
+"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
+],
+"Passenger Cars & Utility Vehicles": [
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"2/3 Wheelers": [
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"Auto Components & Equipments": [
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"Telecom - Cellular & Fixed line services": [
+"nitiaayogpraisesmobilephoneproductionlinkedincentivessayslaptopschemelosttimeindianews"
+],
+"Telecom - Equipment & Accessories": [
+"nitiaayogpraisesmobilephoneproductionlinkedincentivessayslaptopschemelosttimeindianews"
+],
+"Pharmaceuticals": [
+"plischemedeliversstronggainsinelectronicswhitegoodspharmanewersectorsstillinearlystagesnit"
+],
+"Computers Hardware & Equipments": [
+"plischemedeliversstronggainsinelectronicswhitegoodspharmanewersectorsstillinearlystagesnit"
+],
+"Consumer Electronics": [
+"plischemedeliversstronggainsinelectronicswhitegoodspharmanewersectorsstillinearlystagesnit"
+],
+"Industrial Products": [
+"plischemedeliversstronggainsinelectronicswhitegoodspharmanewersectorsstillinearlystagesnit"
+],
+"Medical Equipment & Supplies": [
+"governmentinvitesfreshapplicationsunderplischemeformedicaldevices",
+"govtinvitesfreshapplicationsunderplischemeformedicaldevicesakashvaninews",
+"centreinvitesfreshapplicationsunderplischemeformedicaldevicesextendsschemeto203536",
+"govtinvitesfreshapplicationsunderplischemeformedicaldevices",
+"medicaldeviceplischemeextendedby8yearsfocusshiftstocomponents",
+"govtextendsmedicaldevicesplischemetill203536scrapsminimumsalesthreshold"
+],
+"Public Sector Bank": [
+"psbsseeuptors30000croreinforeigninflowsifinvestmentcapraisedto49",
+"govteyesstakecutsin4psubanksincludingcentralbankucobank2moreinprivatisationplan",
+"afteridbibanksalecentrelooksatcentralbankucobank2otherpsubanksforstakecutschecktermshere",
+"governmentplanstoparestakesin4psubanksto75"
+],
+"Oil Exploration & Production": [
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
+],
+"Refineries & Marketing": [
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
+],
+"LPG/CNG/PNG/LNG Supplier": [
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
+],
+"Aluminium Copper & Zinc Products": [
+"vedantahindustanzincgmdcmetalstocksinfocusascabinetapproves2814crorecriticalmineralprocess",
+"nileshshahonpsuprivatisationhowhindustanzincoffersalessonforidbibank"
+],
+"Other Textile Products": [
+"governmentextendsimportdutyexemptionforcotton",
+"indiaextendscottonimportdutyexemptiontilldecember31toeasetextilecosts",
+"indiaextendscottonimportdutyexemptiontilldecember31",
+"indiaextendsdutyfreecottonimportsbytwomonthstoeasedomesticprices",
+"textileministrytoreopenapplicationportalforplischeme",
+"karnatakarankssecondinplischemefortextilesandjobcreation",
+"textilesministrytoreopenplischemeapplicationportalfromnovember1",
+"textilesplischemereopenswithlower100croreturnoverthreshold",
+"textilesplischemeround4applicationsopennovember1turnoverthresholdcut",
+"textileindustrywelcomeschangesinplischeme",
+"indiamayextenddutyfreecottonimportstilldecemberamidtightsupplies"
+],
+"Garments & Apparels": [
+"governmentextendsimportdutyexemptionforcotton",
+"indiaextendscottonimportdutyexemptiontilldecember31toeasetextilecosts",
+"indiaextendscottonimportdutyexemptiontilldecember31",
+"indiaextendsdutyfreecottonimportsbytwomonthstoeasedomesticprices",
+"textileministrytoreopenapplicationportalforplischeme",
+"karnatakarankssecondinplischemefortextilesandjobcreation",
+"textilesministrytoreopenplischemeapplicationportalfromnovember1",
+"textilesplischemereopenswithlower100croreturnoverthreshold",
+"textilesplischemeround4applicationsopennovember1turnoverthresholdcut",
+"textileindustrywelcomeschangesinplischeme",
+"indiamayextenddutyfreecottonimportstilldecemberamidtightsupplies"
+],
+"Tyres & Rubber Products": [
+"gstreliefforfarmersastaxonretreadedtractortyrescutto5from1november"
+],
+"Aerospace & Defense": [
+"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"defenceministryclears212trillioninproposalsforthearmedforces",
+"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
+],
+"Explosives": [
+"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"defenceministryclears212trillioninproposalsforthearmedforces",
+"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
+]
+}
+}
