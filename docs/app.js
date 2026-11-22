@@ -8818,10 +8818,22 @@ async function sysRows(s, mk, q) {
   if (s.id === 'gov') {
     if (mk !== 'NSE') return []; const G = await govLoad().catch(() => null); const GP = await loadGP('NSE').catch(() => null); if (!G || !GP || !GP.nse) return [];
     const msme = /msme|small/.test(qn);
-    const onlyN = /news|clue|report/.test(qn);
-    return GP.nse.rows.flatMap((r) => { const th = onlyN ? [] : govThemes(r.basic); const nw = govNews(r.basic); return th.length || nw.length ? r.members.map((m) => ({ m, th, nw })) : []; })
-      .map(({ m, th, nw }) => { const g = govOf(m.symbol); return { sym: m.symbol, sc: m.liquid ? 1 : 0, st: (th.map((t) => t.name).join(' · ') || (nw[0] ? `${nw[0].official ? 'Official' : 'Report'}: ${nw[0].title.slice(0, 70)}` : '')) + (g && g.msme ? ' · MSME' : ''), msme: g && g.msme }; })
-      .filter((x) => !msme || x.msme);
+    const onlyN = /news|clue|report/.test(qn), all = /\ball\b|every/.test(qn);
+    // 22 Nov 2026 (Amritpal: "a lot of stocks with news and govt focus - how do we shortlist those that satisfy most of our systems"):
+    // each stock is checked against every system (trade plan, ATH / cup closes, 9/21, IPO, growth+momentum, tight base, VCP, flags,
+    // bottom patterns); the list keeps only stocks on at least one system (type "govt all" for everyone), most systems first.
+    const [S, plan, FL, PT] = await Promise.all([sysMap('NSE').catch(() => null), getJSON(MP + 'trade_plan.json', 'trade_plan').catch(() => null),
+      getJSON(MP + 'flags.json', 'flags_NSE').catch(() => null), getJSON(MP + 'patterns.json', 'patterns').catch(() => null)]);
+    const fl = {}; ((FL && FL.rows) || []).forEach((x) => { fl[x.symbol] = x; }); const pt = {}; ((PT && PT.rows) || []).forEach((x) => { pt[x.symbol] = x; });
+    const rows = [];
+    for (const r of GP.nse.rows) { const th = onlyN ? [] : govThemes(r.basic); const nw = govNews(r.basic); if (!th.length && !nw.length) continue;
+      for (const m of r.members) { const g = govOf(m.symbol); const a = await sysActive('NSE', m.symbol, S, plan); const L = a.list.filter((x) => x.n !== 'Stack' && !/ · off$/.test(x.n));   // MA stack is shown, not scored; switched-off buckets don't count
+        if (fl[m.symbol]) L.push({ n: fl[m.symbol].status === 'breakout' ? 'Flag · broke out' : 'Flag', c: fl[m.symbol].status === 'breakout' ? 'buy' : 'near' });
+        if (pt[m.symbol]) L.push({ n: pt[m.symbol].status === 'breakout' ? 'Bottom · broke out' : 'Bottoming', c: pt[m.symbol].status === 'breakout' ? 'buy' : 'near' });
+        const why = th.map((t) => t.name).join(' · ') || (nw[0] ? `${nw[0].official ? 'Official' : 'Report'}: ${nw[0].title.slice(0, 60)}` : '');
+        rows.push({ sym: m.symbol, nsys: L.length, buy: L.some((x) => x.c === 'buy'), sc: (m.liquid ? 1 : 0), msme: g && g.msme,
+          st: (L.length ? `${L.length} system${L.length > 1 ? 's' : ''}: ${L.map((x) => x.n).join(', ')} · ` : '') + why + (g && g.msme ? ' · MSME' : '') }); } }
+    return rows.filter((x) => (!msme || x.msme) && (all || x.nsys > 0));
   }
   if (s.id === 'fl') {
     const F = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);
@@ -8861,7 +8873,7 @@ async function sysListView(s, mk, q) {
     x.ch = X && !x.etfOnly && !x.fund && !nonStk ? X.chain(x.sym) : null; x.pu = x.ch && X.pulse ? X.pulse(x.sym) : null; x.gmk = mk; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
   // 22 Nov 2026 (Amritpal: "sort stocks as per quadrant strength"): industry + stock quadrant first (Leading > Improving >
   // Weakening > Lagging), then the stock's own quadrant, then buy / breakout, then the tested order
-  rows.sort((a, b) => pulseSort(a, b) || b.s - a.s || (b.ch ? Pq[b.ch[2]] : -1) - (a.ch ? Pq[a.ch[2]] : -1) || (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0));
+  rows.sort((a, b) => (b.nsys || 0) - (a.nsys || 0) || (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || pulseSort(a, b) || b.s - a.s || (b.ch ? Pq[b.ch[2]] : -1) - (a.ch ? Pq[a.ch[2]] : -1) || (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0));
   const seg = s.nse ? '' : `<div class="t3-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([m, n]) => `<button data-ymk="${m}" role="tab" aria-selected="${mk === m}">${n}</button>`).join('')}</div>`;
   const nBuy = rows.filter((x) => x.buy).length;
   $('#sheet-body').innerHTML = `<div class="t3">${x3Trail([{ t: 'Search', go: () => searchOpen(), done: true }, { t: s.name, on: true }])}
@@ -8871,7 +8883,7 @@ async function sysListView(s, mk, q) {
     ${rows.some((x) => x.ch) ? `<div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((k) => `<span><i style="background:${T3C[k]}"></i>${T3N[k]}</span>`).join('')}</div>` : ''}
     <ol class="st-list">${rows.slice(0, 150).map((x, i) => `<li><button class="st-row" data-yi="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.buy ? 'up' : ''}">${esc(x.st)}</small></span>${x.ch ? t3Bars(x.ch, true) : `<span class="muted">${esc(x.name || '')}</span>`}<span class="st-y">${pulsePill(x)}${x.ch ? t3Yoy(x.y) : ''}</span></button></li>`).join('') || `<li class="empty">Nothing on ${esc(s.name)} in ${esc(MKT[mk].name)} today.</li>`}</ol>
     ${rows.length > 150 ? `<p class="muted">Showing the first 150 of ${rows.length}.</p>` : ''}
-    <p class="t3-foot">From the last nightly scans. Sorted by industry Pulse: top-10% Pulse industries that are also Leading or Improving first (tested best), then the rest by Pulse. Order is for reading only; it does not change what any system buys.</p></div>`;
+    <p class="t3-foot">${s.id === 'gov' ? 'Only stocks on at least one of our systems (type "govt all" to see everyone), most systems first, buy signals first, then industry Pulse. Govt focus and news are context - the systems decide the buy. ' : ''}From the last nightly scans. Sorted by industry Pulse: top-10% Pulse industries that are also Leading or Improving first (tested best), then the rest by Pulse. Order is for reading only; it does not change what any system buys.</p></div>`;
   const root = $('#sheet-body');
   x3TrailWire(root, [{ t: 'Search', go: () => searchOpen() }, { t: s.name }]);
   root.querySelectorAll('[data-ymk]').forEach((b) => b.addEventListener('click', () => sysListView(s, b.dataset.ymk, q)));
