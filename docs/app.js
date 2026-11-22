@@ -2034,7 +2034,8 @@ function openPanel(html) {
   $('#sheet-body').innerHTML = html; addTvLink($('#sheet-body')); $('#sheet').hidden = false; document.body.style.overflow = 'hidden';
   history.pushState({ sheet: 1 }, '');
 }
-function closeSheet() { $('#sheet').hidden = true; document.body.style.overflow = ''; $('#sheet-body').innerHTML = ''; }
+var SH = { stack: [], depth: 0, buf: [], obs: null };   // sheet back-stack (see 'Back steps through sheets')
+function closeSheet() { $('#sheet').hidden = true; document.body.style.overflow = ''; $('#sheet-body').innerHTML = ''; SH.stack = []; SH.depth = 0; SH.buf = []; try { SH.obs && SH.obs.takeRecords(); } catch (e) { /* */ } }
 
 function select(r) {
   state.selected = r.symbol;
@@ -5753,7 +5754,7 @@ $('#btn-info').addEventListener('click', () => $('#info').showModal());
 $('#btn-theme').addEventListener('click', themeSheet);
 window.addEventListener('popstate', () => { if (state._themeOpen) { state._themeOpen = false; show(state.view); } });
 $('#sheet-close').addEventListener('click', () => history.back());
-window.addEventListener('popstate', closeSheet);
+window.addEventListener('popstate', () => sheetBack());
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#sheet').hidden) history.back(); });
 
 /* ------------------------------------------------------------------ Beginner mode (9 Nov 2026)
@@ -8842,4 +8843,33 @@ async function sysListView(s, mk, q) {
     if (x.fund) return fundSelect(x.fund);
     if (x.etfOnly) return sysCheck({ mk, sym: x.sym, name: x.name || x.sym, kind: 'ETF' });
     stockPage({ mk, sym: x.sym, name: x.name || x.sym, kind: 'stock' }, [{ t: 'Search', go: () => searchOpen(), done: true }, { t: s.name, go: () => sysListView(s, mk, q), done: true }, { t: x.sym, on: true }]); }));
+}
+
+/* ------------------------------------------------------------------ Back steps through sheets (22 Nov 2026)
+   Amritpal: "When I go back from search it lands on today page rather than search". Every panel used to replace the one before
+   and Back closed them all. Now each new panel keeps the previous one (its live nodes, so taps and typed text still work) and
+   Back (phone back, the X, Esc) returns to it: Search -> system list -> stock -> back -> list -> back -> search -> back -> page.
+   Loading placeholders are skipped; a second push for the same panel (some screens pushed twice) is ignored. */
+(function () {
+  const body = document.getElementById('sheet-body'); if (!body || SH.obs) return;
+  SH.obs = new MutationObserver((recs) => { SH.buf.push(...recs); }); SH.obs.observe(body, { childList: true });
+  const isPh = (nodes) => { const el = nodes.filter((n) => n.nodeType === 1); return el.length === 1 && el[0].matches && el[0].matches('p.pad, p.muted.pad'); };
+  const push0 = history.pushState.bind(history);
+  history.pushState = function (st, t, u) {
+    if (!(st && st.sheet)) return push0(st, t, u);
+    const recs = SH.buf.concat(SH.obs.takeRecords()); SH.buf = [];
+    const rem = recs.filter((r) => r.removedNodes.length).map((r) => Array.from(r.removedNodes)).filter((L) => L.some((n) => n.nodeType === 1 || (n.textContent || '').trim()));
+    const prev = rem.length ? rem[rem.length - 1] : null;
+    if (prev && !isPh(prev) && SH.depth > 0) { SH.stack.push(prev); SH.depth++; return push0(st, t, u); }
+    if (SH.depth > 0 && !$('#sheet').hidden) return undefined;          // same panel pushed twice / placeholder swap: no new step
+    SH.stack = []; SH.depth = 1; return push0(st, t, u);
+  };
+})();
+function sheetBack() {
+  if (!$('#sheet').hidden && SH.stack.length) {
+    const nodes = SH.stack.pop(); SH.depth = Math.max(0, SH.depth - 1);
+    const body = $('#sheet-body'); body.replaceChildren(...nodes); SH.buf = []; try { SH.obs.takeRecords(); } catch (e) { /* */ }
+    body.scrollTop = 0; const sh = $('#sheet'); if (sh) sh.scrollTop = 0; return;
+  }
+  closeSheet();
 }
