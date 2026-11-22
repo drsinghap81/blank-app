@@ -307,6 +307,74 @@ def vcp(x, sym, name):
     return best
 
 
+FL_POLE, FL_POLE_D, FL_MIN_D, FL_MAX_D, FL_DEPTH = 0.15, 15, 3, 20, 0.12
+
+
+def flag(x, sym, name):
+    """Bull flag (22 Nov 2026, Amritpal's DATAPATTNS chart): a fast rise (pole >= 15% in <= 15 sessions) then a short, tight pause
+    drifting down or sideways (3-20 sessions, pullback <= half the pole and <= 12%, no close above the pole top), price above the
+    200-day average. Lane: 'early' = the pole started near the 200-day average (low within 4% of it in the 30 sessions before the
+    top: a fresh uptrend), 'established' = 50 > 200-day average, both rising. Trigger = the flag's falling top line (fit through the
+    pause highs) or the pause high, whichever is lower but not below the last close; stop = the pause low; target = trigger + pole.
+    -> row (forming / breakout <= 3 sessions ago) or None."""
+    if len(x) < 220:
+        return None
+    h, l, c = (x[k].to_numpy(float) for k in ("High", "Low", "Close")); n = len(c); D = [str(d.date()) for d in x.index]
+    s50 = x.Close.rolling(50).mean().to_numpy(); s200 = x.Close.rolling(200).mean().to_numpy()
+    if not c[-1] > s200[-1]:
+        return None
+    best = None
+    for back in range(0, 4):                                   # today forming, or a breakout 1-3 sessions ago
+        end = n - 1 - back
+        for pk in range(end - FL_MIN_D, end - FL_MAX_D - 1, -1):
+            if pk < FL_POLE_D + 30:
+                break
+            top = h[pk]
+            if h[pk + 1:end + 1 if back == 0 else end].max(initial=0) > top or c[pk + 1:end + 1].max(initial=0) > top and back == 0:
+                continue
+            lo_i = pk - FL_POLE_D + int(np.argmin(l[pk - FL_POLE_D:pk + 1])); base = l[lo_i]
+            pole = top / base - 1
+            if pole < FL_POLE:
+                continue
+            pz = slice(pk + 1, end + 1 if back == 0 else end)
+            if pz.stop - pz.start < FL_MIN_D:
+                continue
+            plo = l[pz].min(); depth = 1 - plo / top
+            if depth > FL_DEPTH or (top - plo) > 0.5 * (top - base):
+                continue
+            idx = np.arange(pz.start, pz.stop); hh = h[pz]
+            k_, b_ = np.polyfit(idx, hh, 1) if len(idx) >= 3 else (0.0, float(hh.max()))
+            if k_ > 0.002 * top:                               # a flag drifts down or sideways, not up
+                continue
+            line = lambda t: float(k_ * t + b_)                # noqa: E731
+            near200 = bool(np.nanmin(l[max(0, lo_i - 30):lo_i + 1] / s200[max(0, lo_i - 30):lo_i + 1]) <= 1.04)
+            est = bool(s50[end] > s200[end] and s50[end] > s50[end - 20] and s200[end] > s200[end - 20])
+            lane = "early" if near200 else "established" if est else None
+            if not lane:
+                continue
+            trig = max(min(line(n - 1), float(hh.max())), float(c[-1]) if back == 0 else 0)
+            row = dict(symbol=sym, name=name, lane=lane, close=round(float(c[-1]), 2), pole_pct=round(pole * 100, 1),
+                       pole_start=D[lo_i], pole_top=D[pk], top=round(float(top), 2), flag_days=pz.stop - pz.start,
+                       depth_pct=round(depth * 100, 1), stop=round(float(plo), 2), s200=round(float(s200[-1]), 2))
+            if back == 0:
+                if c[-1] > line(n - 1) and c[-1] > c[-2]:
+                    continue                                    # already through the line today -> caught as a breakout tomorrow
+                row.update(status="forming", trigger=round(trig, 2), to_trigger_pct=round((trig / c[-1] - 1) * 100, 1),
+                           target=round(trig + (top - base), 2), risk_pct=round((1 - plo / trig) * 100, 1))
+            else:
+                bo = end
+                if not (c[bo] > line(bo)) or l[bo + 1:].min(initial=1e18) < plo:
+                    continue
+                e = float(c[bo]); row.update(status="breakout", bo_date=D[bo], entry=round(e, 2), days_since=back,
+                                             target=round(e + (top - base), 2), risk_pct=round((1 - plo / e) * 100, 1), ret_pct=round((c[-1] / e - 1) * 100, 1))
+            if best is None or (row["status"] == "breakout" and best["status"] != "breakout"):
+                best = row
+            break
+        if best:
+            return best
+    return best
+
+
 def chart(x):
     t = x.tail(320)
     return dict(t=[str(d.date()) for d in t.index], o=[round(float(v), 2) for v in t.Open], h=[round(float(v), 2) for v in t.High],
@@ -336,7 +404,7 @@ def main(mk="NSE"):
     else:
         u = nse_symbols(bse=True); name = dict(zip(u.symbol, u.name)) if "name" in u else {}   # 17 Nov 2026: + SME, liquid BSE-only
         jobs = [(t, s, name.get(s, s), "stock") for t, s in zip(u.ticker, u.symbol)] + [(t, n_, n_, "index") for t, n_ in INDICES.items()]
-    rows, srows, vrows, asof = [], [], [], None
+    rows, srows, vrows, frows, asof = [], [], [], [], None
     for a in range(0, len(jobs), 80):
         chunk = jobs[a:a + 80]; dd = None
         for _ in range(3):
@@ -363,13 +431,19 @@ def main(mk="NSE"):
                     v_ = vcp(x, sym, nm) if kind == "stock" else None
                 except Exception as e:  # noqa: BLE001
                     v_ = None; print("vcp fail", sym, e)
+                try:
+                    f_ = flag(x, sym, nm) if kind == "stock" else None
+                except Exception as e:  # noqa: BLE001
+                    f_ = None; print("flag fail", sym, e)
+                if f_:
+                    frows.append(f_)
                 if r:
                     rows.append(r)
                 if s_:
                     srows.append(s_)
                 if v_:
                     vrows.append(v_)
-                if r or s_ or v_:
+                if r or s_ or v_ or f_:
                     json.dump(chart(x), open(f"{CH}/{sym.replace(' ', '_')}.json", "w"))
             except Exception as e:  # noqa: BLE001
                 print("fail", sym, e)
@@ -418,6 +492,16 @@ def main(mk="NSE"):
                              "UK": "UK: not backtested yet - watch only."}.get(mk, ""),
                    rows=vrows), open(f"{OUT}/vcp.json", "w"), indent=0)
     print("vcp", len(vrows), {k: sum(r["status"] == k for r in vrows) for k in VO})
+    frows.sort(key=lambda r: (r["status"] != "breakout", r["lane"] != "early", r.get("days_since") or 0, r.get("to_trigger_pct") or 0))
+    json.dump(dict(generated=out["generated"], asof=out["asof"], market=mk,
+                   rules="Pole: >= 15% rise in <= 15 sessions. Flag: 3-20 sessions, falling or flat highs, pullback <= half the pole and <= 12%, "
+                         "no close above the pole top, close above the 200-day average. Early = the pole started within 4% of the 200-day average "
+                         "(fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low; target = trigger + pole.",
+                   backtest="Tested 14 Nov 2026 (769 NSE stocks 2015-26): bull flags in uptrends +3.3% vs the market over 60 days; as a full system "
+                            "22.2%/yr but -40.9% worst fall (ATH breakout 19.8%, -37%), and it flips sign in several years. Early vs established lanes "
+                            "not tested yet - watch only.",
+                   rows=frows), open(f"{OUT}/flags.json", "w"), indent=0)
+    print("flags", len(frows), {k: sum(r["status"] == k for r in frows) for k in ("breakout", "forming")}, {k: sum(r["lane"] == k for r in frows) for k in ("early", "established")})
     print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["sq9_match"] for r in srows), "on a Square-of-9 number")
 
 
