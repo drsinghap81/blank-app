@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-22 03:41 UTC",
+"generated": "2026-11-22 04:26 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-20",
@@ -490,7 +490,7 @@
 "results_ind": "Pharmaceuticals",
 "rank": 10,
 "risk_pct": 13.2,
-"r3m": 18.8
+"r3m": null
 }
 ],
 "more": [],
@@ -1061,6 +1061,18 @@
 ],
 "pattern_watch": [
 {
+"symbol": "JMFINANCIL",
+"name": "JM Financial Limited",
+"typ": "TB",
+"close": 110.93000030517578,
+"neck": 114.01000213623047,
+"stop": 103.55,
+"signal_date": "2026-11-11",
+"group": "Capital Markets",
+"lane": "build",
+"group_rank": 8
+},
+{
 "symbol": "LEMONTREE",
 "name": "Lemon Tree Hotels Limited",
 "typ": "TB",
@@ -1085,16 +1097,64 @@
 "group_rank": 7
 },
 {
+"symbol": "GLOBUSSPR",
+"name": "Globus Spirits Limited",
+"typ": "TW",
+"close": 785.0,
+"neck": 741.3499755859375,
+"stop": 649.44,
+"signal_date": "2026-11-19",
+"group": "Beverages - Wineries & Distilleries",
+"lane": "build",
+"group_rank": 24
+},
+{
 "symbol": "EIHOTEL",
 "name": "EIH Limited",
-"typ": "DB",
+"typ": "TB",
 "close": 334.1499938964844,
 "neck": 317.8999938964844,
-"stop": 278.24,
+"stop": 277.5,
 "signal_date": "2026-11-20",
 "group": "Lodging",
 "lane": "build",
 "group_rank": 6
+},
+{
+"symbol": "WANBURY",
+"name": "Wanbury Limited",
+"typ": "TW",
+"close": 179.3699951171875,
+"neck": 192.41000366210938,
+"stop": 162.37,
+"signal_date": "2026-11-06",
+"group": "Drug Manufacturers - Specialty & Generic",
+"lane": "hold",
+"group_rank": 18
+},
+{
+"symbol": "BEL",
+"name": "Bharat Electronics Limited",
+"typ": "TB",
+"close": 402.0,
+"neck": 398.5,
+"stop": 351.0,
+"signal_date": "2026-11-11",
+"group": "Aerospace & Defense",
+"lane": "hold",
+"group_rank": 35
+},
+{
+"symbol": "BLS",
+"name": "BLS International Services Limited",
+"typ": "TB",
+"close": 222.77999877929688,
+"neck": 227.63999938964844,
+"stop": 201.12,
+"signal_date": "2026-11-11",
+"group": "Specialty Business Services",
+"lane": "hold",
+"group_rank": 14
 },
 {
 "symbol": "TIRUMALCHM",
@@ -1109,6 +1169,42 @@
 "group_rank": 46
 },
 {
+"symbol": "INDIAMART",
+"name": "Indiamart Intermesh Limited",
+"typ": "TW",
+"close": 1538.0999755859375,
+"neck": 1591.300048828125,
+"stop": 1450.75,
+"signal_date": "2026-11-12",
+"group": "Internet Retail",
+"lane": "hold",
+"group_rank": 11
+},
+{
+"symbol": "ITI",
+"name": "ITI Limited",
+"typ": "IHS",
+"close": 245.72000122070312,
+"neck": 261.95001220703125,
+"stop": 211.47,
+"signal_date": "2026-11-13",
+"group": "Communication Equipment",
+"lane": "hold",
+"group_rank": 53
+},
+{
+"symbol": "TVSHLTD",
+"name": "TVS Holdings Limited",
+"typ": "IHS",
+"close": 13491.0,
+"neck": 13015.0,
+"stop": 10682.1,
+"signal_date": "2026-11-19",
+"group": "Auto - 2W/3W/EV",
+"lane": "hold",
+"group_rank": 23
+},
+{
 "symbol": "HAVELLS",
 "name": "Havells India Limited",
 "typ": "DB",
@@ -1119,6 +1215,30 @@
 "group": "Electrical Equipment & Parts",
 "lane": "mid",
 "group_rank": 63
+},
+{
+"symbol": "INDOSTAR",
+"name": "IndoStar Capital Finance Limited",
+"typ": "IHS",
+"close": 184.75,
+"neck": 200.50999450683594,
+"stop": 159.22,
+"signal_date": "2026-11-09",
+"group": "Credit Services",
+"lane": "mid",
+"group_rank": 40
+},
+{
+"symbol": "CRAMC",
+"name": "Canara Robeco Asset Management Company Limited",
+"typ": "TW",
+"close": 228.6199951171875,
+"neck": 233.5,
+"stop": 197.27,
+"signal_date": "2026-11-12",
+"group": "Asset Management",
+"lane": "mid",
+"group_rank": 36
 },
 {
 "symbol": "TATACHEM",
@@ -1157,112 +1277,28 @@
 "group_rank": 60
 },
 {
-"symbol": "ICICIGI",
-"name": "ICICI Lombard General Insurance Company Limited",
+"symbol": "NH",
+"name": "Narayana Hrudayalaya Ltd.",
 "typ": "TW",
-"close": 1736.0,
-"neck": 1713.0,
-"stop": 1408.87,
+"close": 1943.699951171875,
+"neck": 1931.5,
+"stop": 1606.57,
 "signal_date": "2026-11-20",
+"group": "Medical Care Facilities",
+"lane": "mid",
+"group_rank": 60
+},
+{
+"symbol": "ALPEXSOLAR",
+"name": "Alpex Solar Limited",
+"typ": "TW",
+"close": 602.7999877929688,
+"neck": 747.5499877929688,
+"stop": 651.42,
+"signal_date": "2026-11-11",
 "group": null,
 "lane": null,
 "group_rank": null
-},
-{
-"symbol": "IOC",
-"name": "Indian Oil Corporation Limited",
-"typ": "TB",
-"close": 150.5,
-"neck": 146.3000030517578,
-"stop": 124.1,
-"signal_date": "2026-11-09",
-"group": "Oil & Gas Refining & Marketing",
-"lane": "fade",
-"group_rank": 39
-},
-{
-"symbol": "SBILIFE",
-"name": "SBI Life Insurance Company Limited",
-"typ": "DB",
-"close": 1826.5,
-"neck": 1766.9000244140625,
-"stop": 1598.85,
-"signal_date": "2026-11-06",
-"group": "Insurance - Life",
-"lane": "weak",
-"group_rank": 73
-},
-{
-"symbol": "KPITTECH",
-"name": "KPIT Technologies Limited",
-"typ": "TW",
-"close": 519.0,
-"neck": 555.0,
-"stop": 465.4,
-"signal_date": "2026-11-12",
-"group": "Software - Application",
-"lane": "weak",
-"group_rank": 42
-},
-{
-"symbol": "IVALUE",
-"name": "Ivalue Infosolutions Limited",
-"typ": "TW",
-"close": 235.52000427246094,
-"neck": 221.0399932861328,
-"stop": 181.66,
-"signal_date": "2026-11-16",
-"group": "Information Technology Services",
-"lane": "weak",
-"group_rank": 25
-},
-{
-"symbol": "SRM",
-"name": "SRM Contractors Limited",
-"typ": "TW",
-"close": 424.29998779296875,
-"neck": 420.45001220703125,
-"stop": 341.55,
-"signal_date": "2026-11-16",
-"group": "Engineering & Construction",
-"lane": "weak",
-"group_rank": 52
-},
-{
-"symbol": "INDIASHLTR",
-"name": "India Shelter Finance Corporation Limited",
-"typ": "DB",
-"close": 640.0,
-"neck": 645.5499877929688,
-"stop": 595.49,
-"signal_date": "2026-11-18",
-"group": "Mortgage Finance",
-"lane": "weak",
-"group_rank": 64
-},
-{
-"symbol": "KSCL",
-"name": "Kaveri Seed Company Limited",
-"typ": "DB",
-"close": 710.2000122070312,
-"neck": 735.0,
-"stop": 643.65,
-"signal_date": "2026-11-18",
-"group": "Agricultural Inputs",
-"lane": "weak",
-"group_rank": 58
-},
-{
-"symbol": "ASHAPURMIN",
-"name": "Ashapura Minechem Limited",
-"typ": "DB",
-"close": 434.95001220703125,
-"neck": 433.20001220703125,
-"stop": 398.03,
-"signal_date": "2026-11-20",
-"group": "Other Industrial Metals & Mining",
-"lane": "weak",
-"group_rank": 77
 }
 ],
 "watch": [
