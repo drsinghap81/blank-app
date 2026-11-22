@@ -143,6 +143,25 @@ def main():
     bull = (nifty > nifty.rolling(200).mean())
     res = dict(method=__doc__, industries=len(mem), stocks=C.shape[1], runs={})
     print("R| industries", len(mem), "stocks", C.shape[1], "weeks", len(weeks), flush=True)
+    if os.environ.get("REDLIGHT") == "1":   # 23 Nov 2026 (Amritpal: "yes" - skip the basket when the traffic light is RED)
+        # light as the app (tools/research/light_distribution.light_series) on this panel: RED = 9/21 bearish crosses > bullish crosses over
+        # the last 10 sessions AND Nifty's weekly close below its 30-week SMA; AMBER = one of the two. Read at the Friday decision close.
+        up9 = (e9 > e21); pv = up9.shift(1)
+        xu = (up9 & (pv == False)).sum(axis=1); xd = ((~up9) & (pv == True)).sum(axis=1)   # noqa: E712
+        br_bad = xd.rolling(10).sum() > xu.rolling(10).sum()
+        wk = nifty.groupby(pd.Grouper(freq="W-FRI")).last().dropna(); below = wk < wk.rolling(30).mean()
+        idx_bad = below.reindex(C.index, method="ffill").fillna(False).astype(bool)
+        light = pd.Series(np.where(br_bad & idx_bad, "RED", np.where(br_bad | idx_bad, "AMBER", "GREEN")), index=C.index)
+        LW = {d: light.loc[d] for d in weeks}
+        print("R| light at decision Fridays", pd.Series(list(LW.values())).value_counts().to_dict(), flush=True)
+        notred = {d: LW[d] != "RED" for d in weeks}; green = {d: LW[d] == "GREEN" for d in weeks}
+        for nm, gate, cash in (("TOP10 MON (live rule)", None, False), ("RED light: no new buys that week (holdings stay)", notred, False),
+                               ("RED light: no basket that week (all cash)", notred, True), ("RED or AMBER: no new buys that week", green, False)):
+            e, tpy, avgn = sim("top10", "MON", gate, cash=cash)
+            rp = report(e, bull); rp["turnover_x_per_year"] = tpy; rp["avg_holdings"] = avgn
+            res["runs"][nm] = rp; print(f"R| Pulse rotation | {nm} | {rp}", flush=True)
+        json.dump(res, open("data/research/fii_pulse_redlight" + ("_pilot" if LIMIT else "") + ".json", "w"), indent=1, default=str)
+        return
     if os.environ.get("REDFRI") == "1":     # 23 Nov 2026 (Amritpal: "if Friday's market closes red I want to avoid the basket")
         up = nifty > nifty.shift(1)                       # decision day (Friday close) green
         Gu = {d: bool(up.loc[d]) for d in weeks}
