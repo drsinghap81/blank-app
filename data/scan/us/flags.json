@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-22T04:47+00:00",
+"generated": "2026-11-22T05:08+00:00",
 "asof": "2026-11-20",
 "market": "US",
 "rules": "Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, no close above the pole top, close above the 200-day average. Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average (fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
@@ -51,6 +51,52 @@
 "risk_pct": 5.5,
 "ret_pct": 0.0,
 "ema21": 152.31
+},
+{
+"symbol": "IPAR",
+"name": "Interparfums Inc. Common Stock",
+"lane": "established",
+"shape": "Rectangle",
+"close": 137.42,
+"pole_pct": 22.3,
+"flag_vol_pct": 92,
+"range_pct": 4.0,
+"pole_start": "2026-10-21",
+"pole_top": "2026-11-10",
+"top": 137.82,
+"flag_days": 7,
+"depth_pct": 5.8,
+"stop": 129.77,
+"s200": 107.18,
+"base": 112.65,
+"geo": {
+"pole": [
+"2026-10-21",
+112.65,
+"2026-11-10",
+137.82
+],
+"up": [
+"2026-11-11",
+135.31,
+"2026-11-20",
+135.31
+],
+"lo": [
+"2026-11-11",
+129.77,
+"2026-11-20",
+129.77
+]
+},
+"status": "forming",
+"trigger": 138.5,
+"to_trigger_pct": 0.8,
+"target": 163.67,
+"risk_pct": 6.3,
+"line_broken": "2026-11-20",
+"need_vol": 350757,
+"ema21": 128.43
 },
 {
 "symbol": "SLN",
@@ -276,6 +322,144 @@
 "target": 32.45,
 "risk_pct": 5.8,
 "ema21": 24.49
+},
+{
+"symbol": "AIZ",
+"name": "Assurant Inc. Common Stock",
+"lane": "established",
+"shape": "Flag",
+"close": 316.65,
+"pole_pct": 15.3,
+"flag_vol_pct": 85,
+"range_pct": 3.5,
+"pole_start": "2026-10-28",
+"pole_top": "2026-11-16",
+"top": 326.99,
+"flag_days": 3,
+"depth_pct": 4.1,
+"stop": 313.74,
+"s200": 260.3,
+"base": 283.59,
+"geo": {
+"pole": [
+"2026-10-28",
+283.59,
+"2026-11-16",
+326.99
+],
+"up": [
+"2026-11-17",
+325.21,
+"2026-11-20",
+314.18
+],
+"lo": [
+"2026-11-17",
+320.68,
+"2026-11-20",
+310.38
+]
+},
+"status": "forming",
+"trigger": 325.09,
+"to_trigger_pct": 2.7,
+"target": 368.49,
+"risk_pct": 3.5,
+"line_broken": "2026-11-20",
+"need_vol": 599145,
+"ema21": 308.52
+},
+{
+"symbol": "LTH",
+"name": "Life Time Group Holdings Inc. Common Stock",
+"lane": "established",
+"shape": "Flag",
+"close": 46.33,
+"pole_pct": 18.6,
+"flag_vol_pct": 91,
+"range_pct": 6.4,
+"pole_start": "2026-10-22",
+"pole_top": "2026-11-11",
+"top": 47.83,
+"flag_days": 4,
+"depth_pct": 7.5,
+"stop": 44.26,
+"s200": 36.57,
+"base": 40.33,
+"geo": {
+"pole": [
+"2026-10-22",
+40.33,
+"2026-11-11",
+47.83
+],
+"up": [
+"2026-11-12",
+47.1,
+"2026-11-18",
+47.28
+],
+"lo": [
+"2026-11-12",
+44.33,
+"2026-11-18",
+46.95
+]
+},
+"status": "forming",
+"trigger": 48.48,
+"to_trigger_pct": 4.6,
+"target": 55.98,
+"risk_pct": 8.7,
+"line_broken": "2026-11-18",
+"need_vol": 5100099,
+"ema21": 45.6
+},
+{
+"symbol": "AMRX",
+"name": "Amneal Pharmaceuticals Inc. Class A Common Stock",
+"lane": "established",
+"shape": "Flag",
+"close": 21.12,
+"pole_pct": 16.0,
+"flag_vol_pct": 58,
+"range_pct": 4.4,
+"pole_start": "2026-11-04",
+"pole_top": "2026-11-12",
+"top": 22.07,
+"flag_days": 3,
+"depth_pct": 6.0,
+"stop": 20.75,
+"s200": 16.28,
+"base": 19.01,
+"geo": {
+"pole": [
+"2026-11-04",
+19.01,
+"2026-11-12",
+22.07
+],
+"up": [
+"2026-11-13",
+21.76,
+"2026-11-18",
+21.03
+],
+"lo": [
+"2026-11-13",
+21.32,
+"2026-11-18",
+20.5
+]
+},
+"status": "forming",
+"trigger": 22.12,
+"to_trigger_pct": 4.8,
+"target": 25.18,
+"risk_pct": 6.2,
+"line_broken": "2026-11-18",
+"need_vol": 5395965,
+"ema21": 20.94
 },
 {
 "symbol": "ATR",
@@ -726,6 +910,98 @@
 "target": 23.44,
 "risk_pct": 4.7,
 "ema21": 18.38
+},
+{
+"symbol": "PENN",
+"name": "PENN Entertainment Inc. Common Stock",
+"lane": "early",
+"shape": "Flag",
+"close": 18.05,
+"pole_pct": 30.5,
+"flag_vol_pct": 84,
+"range_pct": 7.5,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-09",
+"top": 18.72,
+"flag_days": 6,
+"depth_pct": 8.0,
+"stop": 17.23,
+"s200": 17.13,
+"base": 14.34,
+"geo": {
+"pole": [
+"2026-10-23",
+14.34,
+"2026-11-09",
+18.72
+],
+"up": [
+"2026-11-10",
+18.47,
+"2026-11-18",
+17.84
+],
+"lo": [
+"2026-11-10",
+17.88,
+"2026-11-18",
+17.2
+]
+},
+"status": "forming",
+"trigger": 18.84,
+"to_trigger_pct": 4.4,
+"target": 23.22,
+"risk_pct": 8.5,
+"line_broken": "2026-11-18",
+"need_vol": 4746783,
+"ema21": 17.32
+},
+{
+"symbol": "HOG",
+"name": "Harley-Davidson Inc. Common Stock",
+"lane": "early",
+"shape": "Flag",
+"close": 32.52,
+"pole_pct": 30.1,
+"flag_vol_pct": 93,
+"range_pct": 6.2,
+"pole_start": "2026-10-19",
+"pole_top": "2026-11-09",
+"top": 34.44,
+"flag_days": 5,
+"depth_pct": 6.6,
+"stop": 32.16,
+"s200": 24.96,
+"base": 26.48,
+"geo": {
+"pole": [
+"2026-10-19",
+26.48,
+"2026-11-09",
+34.44
+],
+"up": [
+"2026-11-10",
+34.49,
+"2026-11-17",
+32.82
+],
+"lo": [
+"2026-11-10",
+33.62,
+"2026-11-17",
+31.6
+]
+},
+"status": "forming",
+"trigger": 34.3,
+"to_trigger_pct": 5.5,
+"target": 42.26,
+"risk_pct": 6.2,
+"line_broken": "2026-11-17",
+"need_vol": 3238125,
+"ema21": 31.95
 }
 ]
 }
