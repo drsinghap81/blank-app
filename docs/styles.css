@@ -1409,3 +1409,11 @@ input,select,textarea{font-size:16px!important}
 .tds-etf-m{font-weight:800;font-size:13px;min-width:120px}
 .tds-etf-b{all:unset;box-sizing:border-box;cursor:pointer;min-height:36px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:10px;border:1px solid var(--line);font-size:13px}
 .tds-etf-b small{font-size:12px}.tds-etf-b:focus-visible{outline:2px solid var(--accent)}.tds-etf-n{font-size:12.5px;margin:6px 0 0}
+/* 22 Nov 2026: search lens + system check */
+.s-lens{margin:8px 0}.s-lens input{font-size:16px}
+.sc-sum{margin:8px 0;padding:10px 12px;border-radius:12px;background:var(--sel);font-size:14px}.sc-sum.on{background:rgba(10,122,85,.14)}
+.sc-list{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.sc-list li{display:flex;gap:10px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid var(--line)}
+.sc-list li span:last-child{display:flex;flex-direction:column;min-width:0}.sc-list small{font-size:12.5px}.sc-list .sc-d{color:var(--muted);font-size:11.5px}
+.sc-list li.sc-off{opacity:.6}.sc-list .mxd{min-width:44px;text-align:center}
+.mxd.off{background:transparent;color:var(--muted);border:1px solid var(--line)}

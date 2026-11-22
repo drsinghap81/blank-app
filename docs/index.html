@@ -18,7 +18,7 @@
 <script>/* theme before first paint (no flash): same rule as applyTheme() in app.js */
 try { var t = localStorage.getItem('td.theme') || 'aurora'; if (t === 'auto') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'neon' : 'pop'; if (t !== 'classic') document.documentElement.dataset.theme = t; } catch (e) {}
 </script>
-<link rel="stylesheet" href="styles.css?v=202">
+<link rel="stylesheet" href="styles.css?v=204">
 </head>
 <body>
 <header class="bar">
@@ -30,6 +30,9 @@ try { var t = localStorage.getItem('td.theme') || 'aurora'; if (t === 'auto') t 
     </div>
   </div>
   <div class="bar-actions">
+    <button class="icon-btn" id="btn-search" title="Search any stock or ETF" aria-label="Search any stock or ETF: see which systems are on it">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
     <button class="icon-btn" id="btn-refresh" title="Refresh" aria-label="Refresh the app and its data">
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
@@ -172,6 +175,6 @@ try { var t = localStorage.getItem('td.theme') || 'aurora'; if (t === 'auto') t 
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<script src="app.js?v=504"></script>
+<script src="app.js?v=505"></script>
 </body>
 </html>

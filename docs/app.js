@@ -7986,3 +7986,82 @@ livePoll();
 
 // 19 Nov 2026: keep showing "Server restarting…" if the app was reopened during a restart
 try { srvResume(); } catch (e) { /* */ }
+
+/* 22 Nov 2026 (Amritpal: "add a search lens - search any asset or stock and see which systems are activated on it"). Every market's
+   stocks (group_pulse + weekly data) and every ETF (funds.json); the check lists each system with its status, the Live plan, the
+   top-down context (industry rotation, results season, the stock's own rotation, 6-month sector tag) and a 1-year chart. */
+async function searchIndex() {
+  if (state.sIdx) return state.sIdx;
+  const out = [], seen = new Set();
+  const add = (sym, name, mk, kind, key) => { const id = mk + ':' + sym + ':' + kind; if (!sym || seen.has(id)) return; seen.add(id); out.push({ sym, name: name || '', mk, kind, key }); };
+  for (const mk of ['NSE', 'US', 'ASX', 'UK']) {
+    const [G, W] = await Promise.all([loadGP(mk).catch(() => null), wkLoad(mk)]);
+    const nm = {};
+    if (G) { ((G.nse || {}).rows || []).concat(G.rows || []).concat(G.themes || []).forEach((r) => (r.members || []).forEach((m) => { nm[m.symbol] = nm[m.symbol] || m.name; })); }
+    Object.keys((W && W.s) || {}).concat(Object.keys((G && G.stock) || {})).forEach((sym) => add(sym, nm[sym], mk, 'stock'));
+  }
+  if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds').catch(() => null);
+  const FM = { IN: 'NSE', US: 'US', AU: 'ASX', UK: 'UK' };
+  ((state.fund || {}).rows || []).forEach((r) => { const sym = String(r.key).split(':').pop().replace(/\.L$/, ''); add(sym, r.name, FM[r.market] || 'US', r.kind === 'etf' ? 'ETF' : (r.kind || 'fund'), r.key); });
+  return (state.sIdx = out);
+}
+async function searchOpen() {
+  openPanel(`<div class="d-head no-push"><div><h2>Search</h2><div class="co">Any stock or ETF in India, US, Australia or UK: which systems are on it</div></div></div>
+    <label class="search s-lens"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <input id="sq" type="search" placeholder="Symbol or company, e.g. DATAPATTNS, INDY, Reliance" autocomplete="off" autocapitalize="characters"></label>
+    <ul class="list flat" id="sres"><li class="empty">Loading every market's list…</li></ul>`);
+  const inp = document.getElementById('sq'); const ul = document.getElementById('sres'); setTimeout(() => inp && inp.focus(), 50);
+  const idx = await searchIndex().catch(() => []);
+  const MKN = { NSE: 'India', US: 'US', ASX: 'Australia', UK: 'UK' };
+  const draw = () => { const q = (inp.value || '').trim().toUpperCase();
+    if (q.length < 2) { ul.innerHTML = `<li class="empty">${idx.length.toLocaleString()} stocks and ETFs indexed. Type at least 2 letters.</li>`; return; }
+    const hit = idx.map((e) => ({ e, s: e.sym.toUpperCase() === q ? 0 : e.sym.toUpperCase().startsWith(q) ? 1 : e.name.toUpperCase().includes(q) ? 2 : e.sym.toUpperCase().includes(q) ? 3 : 9 }))
+      .filter((x) => x.s < 9).sort((a, b) => a.s - b.s || a.e.sym.length - b.e.sym.length).slice(0, 30);
+    ul.innerHTML = hit.length ? hit.map(({ e }, i) => `<li class="row" data-si="${idx.indexOf(e)}" tabindex="0"><div><div class="sym">${esc(e.sym)}</div><div class="co">${esc(e.name)}</div></div><div></div><div class="num"><span class="chip">${esc(MKN[e.mk])}${e.kind !== 'stock' ? ' · ' + esc(e.kind) : ''}</span></div></li>`).join('') : '<li class="empty">Nothing found in the scanned lists.</li>';
+    ul.querySelectorAll('[data-si]').forEach((li) => { const go = () => sysCheck(idx[+li.dataset.si]); li.addEventListener('click', go); li.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') go(); }); }); };
+  let tm; inp.addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(draw, 120); }); draw();
+}
+async function sysCheck(e) {
+  if (!e) return; const mk = e.mk, sym = e.sym; const P = MAIN + MKT[mk].path;
+  openPanel('<p class="muted pad">Checking every system…</p>');
+  const [S, plan, pat, sup, W, G] = await Promise.all([sysMap(mk).catch(() => null), getJSON(P + 'trade_plan.json', 'tp_' + mk).catch(() => null),
+    getJSON(P + 'patterns.json', mk === 'NSE' ? 'patterns' : 'patterns_' + mk).catch(() => null), getJSON(P + 'support.json', mk === 'NSE' ? 'support' : 'support_' + mk).catch(() => null),
+    wkLoad(mk), loadGP(mk).catch(() => null)]);
+  if (mk === 'NSE') await rsLoad();
+  const o = (S && S.M[sym]) || {};
+  const lv = (x) => (!x ? ['off', 'not active'] : x.lvl === 0 ? ['buy', x.txt === '✓' ? 'yes' : x.txt] : x.lvl === 1 ? ['on', x.txt === '✓' ? 'on the list' : x.txt] : ['near', x.txt]);
+  const rows = MXC.filter(([k]) => k !== 'st').map(([k, n, d]) => [n, d, ...lv(o[k])]);
+  const pr = ((pat && pat.rows) || []).find((r) => r.symbol === sym); rows.push(['Bottom pattern', 'Double / triple bottom, inverse H&S (watch-only: tested no edge)', ...(pr ? [pr.status === 'breakout' ? 'on' : 'near', `${pr.status}${pr.typ || pr.pattern ? ' · ' + (pr.typ || pr.pattern) : ''}`] : ['off', 'not active'])]);
+  const sr = ((sup && sup.rows) || []).find((r) => r.symbol === sym); rows.push(['Support retest', 'Breakout retest at support', ...(sr ? ['near', sr.status || sr.kind || 'at support'] : ['off', 'not active'])]);
+  if (S && S.STK && S.STK.has(sym)) rows.push(['MA stack', '20 > 50 > 100 > 200 (shown, not scored)', 'on', 'yes']);
+  let fund = null; if (e.kind !== 'stock' || !Object.keys(o).length) { if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds').catch(() => null); fund = ((state.fund || {}).rows || []).find((r) => r.key === e.key || String(r.key).split(':').pop().replace(/\.L$/, '') === sym); }
+  if (fund) { const f = fund; rows.unshift(['ETF system', 'Investment: month close above an all-time high after a 1-year+ base; exit on a weekly close below the 30-week average',
+    ...(f.ath && f.ath.status === 'open' ? ['on', 'in a trade'] : f.mclose ? ['buy', 'month closed above ATH: buy'] : f.wclose ? ['near', 'week closed above ATH (watch)'] : ['off', f.below_high_pct != null ? `${fmt(f.below_high_pct, 1)}% below its high` : 'not active'])]);
+    if (f.topup) rows.push(['Top-up zone', 'ETF in its tested top-up zone', 'on', 'yes']);
+    if (f.pattern) rows.push(['ETF bottom pattern', 'watch-only', f.pattern.status === 'breakout' ? 'on' : 'near', `${f.pattern.typ} ${f.pattern.status}`]); }
+  const inPlan = (L) => (L || []).find((c) => c.symbol === sym);
+  const pl = plan ? (inPlan(plan.top) && ['buy', 'in today\'s buy list']) || (inPlan(plan.more) && ['on', 'in the plan (lower rank)']) || (inPlan(plan.swing) && ['buy', 'in the swing list']) || (inPlan(plan.exits) && ['off', 'SELL at the next open']) || (inPlan(plan.missed) && ['near', 'missed: ran too far past the entry']) || (inPlan(plan.pattern_watch || plan.watch) && ['near', 'on the watch list']) : null;
+  const active = rows.filter((r) => r[2] !== 'off').length;
+  const ind = mk === 'NSE' && G ? nseInd(G, sym) : null; const gs = G && G.stock ? G.stock[sym] : null;
+  const indNm = ind ? ind.basic : gs ? gs[0] : null; const indRow = ind || (gs && (G.rows || []).find((r) => r.group === gs[0]));
+  const q = rqOf(sym, mk); const rs = mk === 'NSE' && indNm ? rsOf(indNm) : null; const sc = S && S.SEC[sym];
+  const CL = { buy: 'buy', on: 'on', near: 'watch', off: 'off' };
+  openPanel(`<div class="d-head no-push"><div><h2>${esc(sym)}</h2><div class="co">${esc(e.name)} · ${esc(MKT[mk].name)}${e.kind !== 'stock' ? ' · ' + esc(e.kind) : ''}</div></div></div>
+    <div class="sc-sum ${active ? 'on' : ''}"><b>${active ? `${active} system${active > 1 ? 's' : ''} active` : 'No system active right now'}</b>${pl ? ` · <span class="${pl[0] === 'buy' ? 'up' : pl[0] === 'off' ? 'down' : ''}">Live: ${esc(pl[1])}</span>` : ''}</div>
+    <ul class="sc-list">${rows.map(([n, d, c, t]) => `<li class="sc-${c}"><span class="mxd ${CL[c]}">${c === 'off' ? '–' : c === 'buy' ? 'Buy' : c === 'on' ? '✓' : 'Near'}</span><span><b>${esc(n)}</b> <small>${esc(t)}</small><small class="sc-d">${esc(d)}</small></span></li>`).join('')}</ul>
+    <h4 style="margin:12px 0 4px">Top-down context</h4>
+    <div class="facts">
+      <div class="fact"><span>Industry</span><b>${indNm ? esc(indNm) : '–'}${indRow && indRow.rrg ? ` · <span style="color:${RRG_Q[indRow.rrg.now]}">${esc(indRow.rrg.now)}</span>` : ''}</b></div>
+      <div class="fact"><span>Stock vs market (weekly)</span><b>${q && q.now ? `<span style="color:${RRG_Q[q.now]}">${esc(q.now)}</span>${q.was && q.was !== q.now ? ` <small>from ${esc(q.was)}</small>` : ''}` : '–'}</b></div>
+      <div class="fact"><span>Sector</span><b>${sc && sc.tag ? esc(SECTOR_TXT[sc.tag] || sc.tag) + secWkTxt(sc.ix, mk) : '–'}</b></div>
+      ${mk === 'NSE' ? `<div class="fact"><span>Results season</span><b>${rs ? rsTxt(rs) : '–'}</b></div>` : ''}
+    </div>
+    <h4 style="margin:12px 0 4px">1-year chart <span class="muted" style="font-weight:400;font-size:12px">· weekly · dashed = 30-week average</span></h4>
+    ${W && W.s && W.s[sym] ? stockSpark(sym, mk) : '<p class="muted">No weekly data for this one.</p>'}
+    <div class="ind-act">${e.kind === 'stock' ? `<button class="lv-link" id="scfull">Full chart & plan ›</button>` : fund ? `<button class="lv-link" id="scfund">ETF chart ›</button>` : ''}${indRow && indRow.slug && mk === 'NSE' ? '<button class="lv-link" id="scind">Industry card ›</button>' : ''}<a class="lv-link" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(sym, mk))}&interval=D">TradingView ›</a></div>
+    <p class="muted" style="font-size:12px;margin-top:10px">Status from the last nightly scans. "Not active" means the system's rules are not met today (e.g. 9/21 needs a fresh cross with a rising 50-day average and a stop within 12%).</p>`);
+  const f1 = document.getElementById('scfull'); if (f1) f1.addEventListener('click', () => { if (S) mxOpen(sym, mk, S); else lvOpen({ symbol: sym, kind: 'ATH' }, mk); });
+  const f2 = document.getElementById('scfund'); if (f2) f2.addEventListener('click', () => fundSelect(fund));
+  const f3 = document.getElementById('scind'); if (f3) f3.addEventListener('click', () => nseIndOpen(indRow));
+}
+document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('#btn-search'); if (b) searchOpen(); });
