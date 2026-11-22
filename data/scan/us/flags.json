@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-22T05:08+00:00",
+"generated": "2026-11-22T05:45+00:00",
 "asof": "2026-11-20",
 "market": "US",
 "rules": "Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, no close above the pole top, close above the 200-day average. Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average (fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
@@ -50,7 +50,8 @@
 "target": 192.79,
 "risk_pct": 5.5,
 "ret_pct": 0.0,
-"ema21": 152.31
+"ema21": 152.31,
+"kind": "stock"
 },
 {
 "symbol": "IPAR",
@@ -96,7 +97,8 @@
 "risk_pct": 6.3,
 "line_broken": "2026-11-20",
 "need_vol": 350757,
-"ema21": 128.43
+"ema21": 128.43,
+"kind": "stock"
 },
 {
 "symbol": "SLN",
@@ -141,7 +143,8 @@
 "to_trigger_pct": 0.2,
 "target": 31.06,
 "risk_pct": 0.8,
-"ema21": 18.91
+"ema21": 18.91,
+"kind": "stock"
 },
 {
 "symbol": "RDY",
@@ -186,7 +189,8 @@
 "to_trigger_pct": 1.1,
 "target": 17.11,
 "risk_pct": 2.9,
-"ema21": 14.42
+"ema21": 14.42,
+"kind": "stock"
 },
 {
 "symbol": "EVER",
@@ -231,7 +235,8 @@
 "to_trigger_pct": 1.6,
 "target": 38.66,
 "risk_pct": 7.4,
-"ema21": 26.95
+"ema21": 26.95,
+"kind": "stock"
 },
 {
 "symbol": "MRSH",
@@ -276,7 +281,8 @@
 "to_trigger_pct": 2.8,
 "target": 244.8,
 "risk_pct": 4.7,
-"ema21": 202.08
+"ema21": 202.08,
+"kind": "stock"
 },
 {
 "symbol": "HCSG",
@@ -321,7 +327,8 @@
 "to_trigger_pct": 4.0,
 "target": 32.45,
 "risk_pct": 5.8,
-"ema21": 24.49
+"ema21": 24.49,
+"kind": "stock"
 },
 {
 "symbol": "AIZ",
@@ -367,7 +374,8 @@
 "risk_pct": 3.5,
 "line_broken": "2026-11-20",
 "need_vol": 599145,
-"ema21": 308.52
+"ema21": 308.52,
+"kind": "stock"
 },
 {
 "symbol": "LTH",
@@ -413,7 +421,8 @@
 "risk_pct": 8.7,
 "line_broken": "2026-11-18",
 "need_vol": 5100099,
-"ema21": 45.6
+"ema21": 45.6,
+"kind": "stock"
 },
 {
 "symbol": "AMRX",
@@ -459,7 +468,8 @@
 "risk_pct": 6.2,
 "line_broken": "2026-11-18",
 "need_vol": 5395965,
-"ema21": 20.94
+"ema21": 20.94,
+"kind": "stock"
 },
 {
 "symbol": "ATR",
@@ -504,7 +514,8 @@
 "to_trigger_pct": 0.0,
 "target": 159.53,
 "risk_pct": 1.5,
-"ema21": 138.42
+"ema21": 138.42,
+"kind": "stock"
 },
 {
 "symbol": "ICE",
@@ -549,7 +560,8 @@
 "to_trigger_pct": 0.1,
 "target": 197.61,
 "risk_pct": 0.5,
-"ema21": 170.45
+"ema21": 170.45,
+"kind": "stock"
 },
 {
 "symbol": "CUBE",
@@ -594,7 +606,8 @@
 "to_trigger_pct": 1.2,
 "target": 52.7,
 "risk_pct": 1.9,
-"ema21": 43.44
+"ema21": 43.44,
+"kind": "stock"
 },
 {
 "symbol": "EXR",
@@ -639,7 +652,8 @@
 "to_trigger_pct": 1.2,
 "target": 178.01,
 "risk_pct": 1.4,
-"ema21": 153.71
+"ema21": 153.71,
+"kind": "stock"
 },
 {
 "symbol": "SKY",
@@ -684,7 +698,8 @@
 "to_trigger_pct": 1.2,
 "target": 115.65,
 "risk_pct": 4.2,
-"ema21": 89.27
+"ema21": 89.27,
+"kind": "stock"
 },
 {
 "symbol": "AHR",
@@ -729,7 +744,8 @@
 "to_trigger_pct": 1.3,
 "target": 68.44,
 "risk_pct": 2.0,
-"ema21": 56.54
+"ema21": 56.54,
+"kind": "stock"
 },
 {
 "symbol": "CCK",
@@ -774,7 +790,8 @@
 "to_trigger_pct": 2.0,
 "target": 140.62,
 "risk_pct": 3.3,
-"ema21": 119.3
+"ema21": 119.3,
+"kind": "stock"
 },
 {
 "symbol": "MAS",
@@ -819,7 +836,8 @@
 "to_trigger_pct": 2.4,
 "target": 99.36,
 "risk_pct": 2.9,
-"ema21": 81.59
+"ema21": 81.59,
+"kind": "stock"
 },
 {
 "symbol": "CINF",
@@ -864,7 +882,8 @@
 "to_trigger_pct": 2.8,
 "target": 221.37,
 "risk_pct": 3.7,
-"ema21": 184.8
+"ema21": 184.8,
+"kind": "stock"
 },
 {
 "symbol": "QNST",
@@ -909,7 +928,8 @@
 "to_trigger_pct": 3.2,
 "target": 23.44,
 "risk_pct": 4.7,
-"ema21": 18.38
+"ema21": 18.38,
+"kind": "stock"
 },
 {
 "symbol": "PENN",
@@ -955,7 +975,8 @@
 "risk_pct": 8.5,
 "line_broken": "2026-11-18",
 "need_vol": 4746783,
-"ema21": 17.32
+"ema21": 17.32,
+"kind": "stock"
 },
 {
 "symbol": "HOG",
@@ -1001,7 +1022,8 @@
 "risk_pct": 6.2,
 "line_broken": "2026-11-17",
 "need_vol": 3238125,
-"ema21": 31.95
+"ema21": 31.95,
+"kind": "stock"
 }
 ]
 }
