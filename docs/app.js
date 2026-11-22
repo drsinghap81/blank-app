@@ -8424,7 +8424,7 @@ async function stockPage(e, trail) {
     <div class="sp-grid">
       <section class="sp-t"><div class="sp-th"><h3>Systems on it</h3><b class="${list.length ? 'up' : ''}">${list.length}</b></div><div class="sp-chips">${lit}${off}</div></section>
       <section class="sp-t"><h3>Top-down</h3>${t3Bars(ch)}<small class="${ch[1] === 'L' && ch[2] === 'L' ? 'up' : ''}">${ch.every((q) => q === 'L') ? 'All three leading' : `Industry ${T3N[ch[1]].toLowerCase()} · stock ${T3N[ch[2]].toLowerCase()}`}</small></section>
-      ${mk === 'NSE' && govOf(sym) ? (() => { const gv = govOf(sym); return `<section class="sp-t sp-gov"><div class="sp-th"><h3>Govt focus</h3>${gv.msme ? '<b class="up">MSME</b>' : ''}</div>${gv.th.map((t) => `<p><b>${esc(t.name)}</b><small>${esc(t.why)} <span class="muted">(${esc(t.src)})</span></small></p>`).join('')}<small class="muted">${gv.cr != null ? `Sales last year ${inr(gv.cr, 0)} cr${gv.msme ? ' - MSME-sized (up to 500 cr)' : ''}. ` : ''}A theme, not a buy signal.</small></section>`; })() : ''}
+      ${mk === 'NSE' && govOf(sym) ? (() => { const gv = govOf(sym); return `<section class="sp-t sp-gov"><div class="sp-th"><h3>Govt focus</h3>${gv.msme ? '<b class="up">MSME</b>' : ''}</div>${gv.th.map((t) => `<p><b>${esc(t.name)}</b><small>${esc(t.why)} <span class="muted">(${esc(t.src)})</span></small></p>`).join('')}${gv.nw.slice(0, 5).map((x) => `<p class="gov-n"><a href="${esc(x.url)}" target="_blank" rel="noopener"><b>${esc(x.title)}</b></a><small><span class="chip ${x.official ? 'open' : ''}">${x.official ? 'Official' : 'Report'}</span>${x.neg ? '<span class="chip exit">negative</span>' : ''} ${esc(x.source)} · ${esc(day(x.date))} · ${esc(x.type)}</small></p>`).join('')}<small class="muted">${gv.cr != null ? `Sales last year ${inr(gv.cr, 0)} cr${gv.msme ? ' - MSME-sized (up to 500 cr)' : ''}. ` : ''}A theme, not a buy signal.</small></section>`; })() : ''}
       <section class="sp-t"><h3>Price vs results</h3><div class="t3-duo"><div><b>${px ? px.k : 'n/a'}</b><small>${px ? `P/E ${fmt(px.pe, 1)} vs ${fmt(px.m, 1)}` : 'no P/E'}</small></div><div><b class="${y == null ? '' : y >= 0 ? 'up' : 'down'}">${y == null ? 'n/a' : (y >= 0 ? '+' : '−') + fmt(Math.abs(y), 0) + '%'}</b><small>profit vs a year ago</small></div></div></section>
       ${c ? `<section class="sp-t"><div class="sp-th"><h3>Why?</h3><button class="t3-link" id="spwhy">Open</button></div><div class="sp-why"><div class="ok"><b>5/5</b><small>rules passed</small></div><div class="${(c.late || 0) > 5 ? 'warn' : 'ok'}"><b>${fmt(c.late || 0, 0)}%</b><small>past buy level</small></div><div class="bad"><b>−${fmt(c.stopP, 0)}%</b><small>to the stop</small></div></div></section>` : ''}
       ${peers.length ? `<section class="sp-t"><h3>Same industry</h3><div class="sp-chips">${peers.map((m) => { const q = (rqOf(m.symbol, mk) || {}).now; return `<button class="sp-peer" data-peer="${esc(m.symbol)}" style="border-left-color:${T3C[T3Q[q] || 'N']}">${esc(m.symbol)}</button>`; }).join('')}</div></section>` : ''}
@@ -8779,7 +8779,7 @@ const SYSX = [
   { id: 'rt', name: 'Support retest', d: 'Back at an old breakout level', a: 'retest support pullback old breakout', ok: 0 },
   { id: 'st', name: 'MA stack', d: 'Close above 20 > 50 > 100 > 200-day averages, all rising', a: 'ma stack moving average averages 20 50 100 200 aligned', ok: 0 },
   { id: 'etf', name: 'ETF ATH system', d: 'ETF month close above its all-time high after a 1-year base', a: 'etf etfs fund funds ath month close investment', ok: 1 },
-  { id: 'gov', name: 'Govt focus', d: 'Industries the government is pushing (PM at FICCI, 19 Nov 2026): APIs, steel, metals, agri, tools, machinery', a: 'govt government focus policy pm modi speech ficci msme make india atmanirbhar self reliant swadeshi export', ok: 1, nse: 1 },
+  { id: 'gov', name: 'Govt focus', d: 'Industries the government is pushing (PM at FICCI, 19 Nov 2026): APIs, steel, metals, agri, tools, machinery', a: 'govt government focus policy pm modi speech ficci msme make india atmanirbhar self reliant swadeshi export news clue clues report cabinet fdi duty pli', ok: 1, nse: 1 },
   { id: 'rot', name: 'ETF rotation', d: 'Monthly: hold the strongest of Nifty, Midcap, Gold, Nasdaq or cash', a: 'etf rotation rotate monthly gold nifty nasdaq midcap liquid', ok: 1, nse: 1 }];
 const SYS_STOP = new Set(['system', 'systems', 'stock', 'stocks', 'pattern', 'patterns', 'setup', 'setups', 'list', 'the', 'all', 'in', 'on', 'show', 'me', 'with', 'and', 'of', 'a']);
 const sysNorm = (s) => String(s).toLowerCase().replace(/[^a-z0-9+]+/g, ' ').trim();
@@ -8818,8 +8818,9 @@ async function sysRows(s, mk, q) {
   if (s.id === 'gov') {
     if (mk !== 'NSE') return []; const G = await govLoad().catch(() => null); const GP = await loadGP('NSE').catch(() => null); if (!G || !GP || !GP.nse) return [];
     const msme = /msme|small/.test(qn);
-    return GP.nse.rows.flatMap((r) => { const th = govThemes(r.basic); return th.length ? r.members.map((m) => ({ m, th })) : []; })
-      .map(({ m, th }) => { const g = govOf(m.symbol); return { sym: m.symbol, sc: m.liquid ? 1 : 0, st: th.map((t) => t.name).join(' · ') + (g && g.msme ? ' · MSME' : ''), msme: g && g.msme }; })
+    const onlyN = /news|clue|report/.test(qn);
+    return GP.nse.rows.flatMap((r) => { const th = onlyN ? [] : govThemes(r.basic); const nw = govNews(r.basic); return th.length || nw.length ? r.members.map((m) => ({ m, th, nw })) : []; })
+      .map(({ m, th, nw }) => { const g = govOf(m.symbol); return { sym: m.symbol, sc: m.liquid ? 1 : 0, st: (th.map((t) => t.name).join(' · ') || (nw[0] ? `${nw[0].official ? 'Official' : 'Report'}: ${nw[0].title.slice(0, 70)}` : '')) + (g && g.msme ? ' · MSME' : ''), msme: g && g.msme }; })
       .filter((x) => !msme || x.msme);
   }
   if (s.id === 'fl') {
@@ -8942,19 +8943,24 @@ function pulsePill(x) { const p = x.pu; if (!p || p.p == null) return ''; const 
    the government is pushing (data/scan/govt_focus.json, hand-kept, NSE basic industries) get a "Govt focus" chip; "· MSME" when the
    company's last full-year sales are up to Rs 500 cr (fundamentals). A theme to know about, not a buy signal - nothing here was tested. */
 async function govLoad() {
-  if (state.gov === undefined) { const [G, F] = await Promise.all([getJSON(MAIN + 'data/scan/govt_focus.json', 'govt_focus').catch(() => null), getJSON(MAIN + MKT.NSE.path + 'fundamentals.json', 'fund_NSE').catch(() => null), loadGP('NSE').catch(() => null)]);
-    state.gov = G; state.govF = (F && F.s) || {}; }
+  if (state.gov === undefined) { const [G, F, , N] = await Promise.all([getJSON(MAIN + 'data/scan/govt_focus.json', 'govt_focus').catch(() => null), getJSON(MAIN + MKT.NSE.path + 'fundamentals.json', 'fund_NSE').catch(() => null), loadGP('NSE').catch(() => null),
+      getJSON(MAIN + 'data/scan/news_clues.json', 'news_clues').catch(() => null)]);
+    state.gov = G || { themes: [] }; state.govF = (F && F.s) || {};
+    // 22 Nov 2026 news clues (tools/news_clues.py): government / regulator actions per NSE industry, last 30 days
+    const cut = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10); state.govN = {};
+    ((N && N.items) || []).filter((x) => x.date >= cut).forEach((x) => x.industries.forEach((i) => { (state.govN[i] = state.govN[i] || []).push(x); })); }
   return state.gov;
 }
 const govThemes = (basic) => ((state.gov && state.gov.themes) || []).filter((t) => (t.industries || []).includes(basic));
+const govNews = (basic) => ((state.govN || {})[basic] || []);
 function govOf(sym) {
-  if (!state.gov) return null; const n = nseInd(state.gp.NSE, sym); if (!n) return null; const th = govThemes(n.basic); if (!th.length) return null;
+  if (!state.gov) return null; const n = nseInd(state.gp.NSE, sym); if (!n) return null; const th = govThemes(n.basic); const nw = govNews(n.basic); if (!th.length && !nw.length) return null;
   const f = (state.govF || {})[sym]; const a = f && f.a && f.a.find((y) => y[3] != null); const cr = a ? a[3] / 1e7 : null;
-  return { th, cr, msme: cr != null && cr <= (state.gov.msme_sales_cr || 500) };
+  return { th, nw, cr, msme: cr != null && cr <= (state.gov.msme_sales_cr || 500) };
 }
 function govChip(sym, mk) {
   if ((mk || 'NSE') !== 'NSE') return ''; const g = govOf(sym); if (!g) return '';
-  return `<span class="chip gov" title="Govt focus: ${esc(g.th.map((t) => t.name).join(', '))}${g.msme ? ` · MSME-sized (sales ${inr(g.cr, 0)} cr)` : ''} - a theme, not a buy signal">Govt focus${g.msme ? ' · MSME' : ''}</span>`;
+  return `<span class="chip gov" title="Govt focus: ${esc(g.th.map((t) => t.name).concat(g.nw.slice(0, 2).map((x) => x.title)).join(' | '))}${g.msme ? ` · MSME-sized (sales ${inr(g.cr, 0)} cr)` : ''} - a theme, not a buy signal">Govt focus${g.nw.length ? ' · news' : ''}${g.msme ? ' · MSME' : ''}</span>`;
 }
 { const PP = pulsePill; pulsePill = (x) => PP(x) + (x && x.sym && x.gmk === 'NSE' ? govChip(x.sym, 'NSE') : ''); }
 { const PC = pulseChip; pulseChip = (sym, mk) => PC(sym, mk) + ((mk || AM()) === 'NSE' ? govChip(sym, 'NSE') : ''); }

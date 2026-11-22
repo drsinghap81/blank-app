@@ -1643,3 +1643,4 @@ input,select,textarea{font-size:16px!important}
 /* 22 Nov 2026 Govt focus chip (PM's FICCI speech themes) */
 .chip.gov { background: var(--sel); color: var(--accent); border: 1px solid var(--accent); }
 .sp-gov p { margin: 4px 0; } .sp-gov p b { display: block; font-size: 13.5px; } .sp-gov p small { display: block; line-height: 1.4; }
+.sp-gov .gov-n a { color: inherit; text-decoration: none; } .sp-gov .gov-n small .chip { margin-right: 4px; font-size: 10.5px; }
