@@ -30,25 +30,34 @@ import ath_red_skip as AR  # noqa: E402
 import light_distribution as LD  # noqa: E402
 
 PILOT = bool(os.environ.get("PILOT"))
+MK = os.environ.get("MARKET", "NSE")          # 22 Nov 2026 ("all triggers worldwide"): US / ASX / UK run the 9/21 part with their own groups
+GP_PATH = {"NSE": None, "US": "data/scan/us/group_pulse.json", "ASX": "data/scan/asx/group_pulse.json", "UK": "data/scan/uk/group_pulse.json"}
 
 
 def main():
-    d, u = load("NSE")
+    d, u = load(MK)
+    if MK != "NSE":
+        from global_universe import MARKETS
+        MC.CFG = MARKETS[MK]
     if PILOT:
         keep = sorted(d.SYMBOL.unique())[:150]; d = d[d.SYMBOL.isin(keep)]
     d = d.sort_values(["SYMBOL", "Date"]).reset_index(drop=True)
     g = d.groupby("SYMBOL").CLOSE
     d["r63"] = g.transform(lambda s: s / s.shift(63) - 1)
     d["gap"] = d.OPEN / g.shift(1) - 1
-    G = json.load(open("data/scan/group_pulse.json"))["nse"]["rows"]
-    s2i = {m["symbol"]: r["basic"] for r in G for m in r["members"]}
-    d["industry"] = d.SYMBOL.str.replace(".NS", "", regex=False).map(s2i)
+    if MK == "NSE":
+        G = json.load(open("data/scan/group_pulse.json"))["nse"]["rows"]
+        s2i = {m["symbol"]: r["basic"] for r in G for m in r["members"]}
+    else:
+        G = json.load(open(GP_PATH[MK]))["rows"]
+        s2i = {m["symbol"]: r["group"] for r in G for m in r["members"]}
+    d["industry"] = d.SYMBOL.str.replace(r"\.(NS|AX|L|BO)$", "", regex=True).map(s2i)
     ig = d.dropna(subset=["industry"]).groupby(["industry", "Date"]).gap.mean()
     d["ind_gap"] = [ig.get((i, dt), np.nan) if isinstance(i, str) else np.nan for i, dt in zip(d.industry, d.Date)]
     d["g_stock"] = d.gap > 0
     d["g_ind"] = d.ind_gap.isna() | (d.ind_gap > 0)                 # no industry mapped -> no veto
     d["g_chase"] = d.gap <= 0.02
-    nif = yf.download("^NSEI", start="2015-01-01", auto_adjust=True, progress=False)["Close"].squeeze().dropna()
+    nif = yf.download({"NSE": "^NSEI", "US": "^GSPC", "ASX": "^AXJO", "UK": "^FTSE"}[MK], start="2015-01-01", auto_adjust=True, progress=False)["Close"].squeeze().dropna()
     nif.index = pd.to_datetime(nif.index).tz_localize(None); bull = nif > nif.rolling(200).mean()
     res = dict(method=__doc__, coverage_industry_pct=round(float(d.industry.notna().mean() * 100), 1), t921={}, ath={})
     print("R| panel", d.SYMBOL.nunique(), "industry coverage", res["coverage_industry_pct"], flush=True)
@@ -57,6 +66,10 @@ def main():
         eq, T = MC.run(d, 10, 0.01, "r63", gate=gate)
         rp = AR.report(eq, bull); rp["trades"] = len(T); rp["avg trade"] = round(float(T.ret.mean() * 100), 2) if len(T) else None
         res["t921"][name] = rp; print(f"R| 9/21 | {name} | {rp}", flush=True)
+    if MK != "NSE":
+        os.makedirs("data/research", exist_ok=True)
+        json.dump(res, open(f"data/research/morning_gap_{MK}" + ("_pilot" if PILOT else "") + ".json", "w"), indent=1, default=str)
+        return
     # ---------------- ATH (events as tools/research/ath_red_skip.py)
     L = LD.light_series(d); days = list(L.index)
     import ath_scan as A
