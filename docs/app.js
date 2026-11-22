@@ -751,11 +751,11 @@ function guardCard(G) {
     <details class="info"><summary>How it works</summary><p>Your account value (cash + shares) is compared with its highest point. Risk per trade is set so that in 95% of 2,000 simulated 10-year histories the fall stayed within your limit. It warns at 75% and 100% of the limit, pauses new buys for 2 weeks after ${G ? G.streak_max : 5} losses in a row, caps one stock at 10%, and never sells for you. The limit is DD_BUDGET_PCT on the server.</p></details></div>`;
 }
 const isStopK = (k) => k === 'ATH_STOP' || k === 'TF_STOP' || k === 'VCP_STOP';
-const KIND_TXT = { MY_GTT: 'Your pick · GTT buy', VCP: 'VCP breakout', VCP_STOP: 'Buy-stop at the VCP pivot', PATTERN: 'Bottom pattern',  ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', TF_BRK: 'Cup breakout (1–2 yr cup)', TF_STOP: 'Buy-stop at the cup high', T921: '9/21 trend entry', RETEST: 'Breakout retest (support)', PATTERN: 'Bottom-pattern breakout' };
+const KIND_TXT = { PR: 'Pulse rotation · weekly pick', MY_GTT: 'Your pick · GTT buy', VCP: 'VCP breakout', VCP_STOP: 'Buy-stop at the VCP pivot', PATTERN: 'Bottom pattern',  ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', TF_BRK: 'Cup breakout (1–2 yr cup)', TF_STOP: 'Buy-stop at the cup high', T921: '9/21 trend entry', RETEST: 'Breakout retest (support)', PATTERN: 'Bottom-pattern breakout' };
 /* Systems as capital buckets (9 Nov 2026): % = the most of your capital a system may hold; all share one cash pool,
    Momentum first, swing buckets keep 15% in cash for Momentum. NSE one-account test 2017-26: Momentum <= 60% + Trend 9/21 <= 40%
    23.1%/yr, worst fall -21.4%; Momentum alone 17.3%, -16.8%. */
-const BK_DEF = { mom: 60, tf: 40, t9: 0, rt: 0, pt: 0, vcp: 0, my: 0, s1: 0, wc: 0, tb: 100 };   // optimised 9 Nov 2026
+const BK_DEF = { mom: 60, tf: 40, t9: 0, rt: 0, pt: 0, vcp: 0, my: 0, s1: 0, wc: 0, tb: 100, pr: 0 };   // optimised 9 Nov 2026; pr = Pulse rotation trial (22 Nov)
 // Angel-style track: stop ── entry ── now ── target, positioned to scale
 function slTrack(o) {
   const { stop, entry, now } = o; if (!(stop > 0 && entry > 0) || stop >= entry) return '';
@@ -772,7 +772,7 @@ function slTrack(o) {
     <div class="slt-lab"><span class="s" style="left:${P(stop)}%">${f(stop)}<small>Stop</small></span>${target ? `<span class="t" style="left:${P(target)}%">${f(target)}<small>${ref ? '2R mark' : 'Target' + (rr ? ' · ' + fmt(rr, 1) + 'R' : '')}</small></span>` : ''}</div>
     ${now ? `<div class="slt-foot"><span>Now ${f(now)} · <b class="${nowUp ? 'up' : 'down'}">${nowUp ? '+' : ''}${fmt((now / entry - 1) * 100, 1)}%</b></span>${!ref ? `<span>Target ${left > 0 ? `<b class="up">▲ ${fmt(left, 1)}%</b> away` : '<b class="up">reached</b>'}</span>` : `<span>Stop ${fmt((1 - stop / now) * 100, 1)}% below</span>`}</div>` : ''}${ref ? `<div class="slt-foot"><span>No fixed target · exit as tested: ${esc(o.exitTxt || 'trailing stop')}</span></div>` : ''}</div>`;
 }
-const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', vcp: 'VCP', my: 'My picks', s1: 'System 1', wc: 'Wealth Creation', tb: 'Top Bottom' };
+const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', vcp: 'VCP', my: 'My picks', s1: 'System 1', wc: 'Wealth Creation', tb: 'Top Bottom', pr: 'Pulse rotation' };
 const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : r.kind === 'PATTERN' ? 'pt' : r.kind === 'T921' ? 't9' : 'tf');
 function lvAlloc(mk, P, S) {
   if (S && S.buckets) return { ...BK_DEF, ...Object.fromEntries(S.buckets.map((b) => [b.key, b.pct])) };
@@ -862,6 +862,7 @@ async function lvCurveCard(box) {
   ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: el.clientWidth })).observe(el);
 }
 const BK_HEAD = {
+  pr: 'Trial system (22 Nov 2026). Each Friday close: NSE industries in the top 10% by Pulse that are also Leading or Improving on rotation; hold the 10 strongest trending stocks of those industries (3-month return), equal weight = your % ÷ 10 a stock; a holding is sold when it drops out of the top 20 or its industry drops out. Buy and sell at Monday\'s open. Safety stop 20% below the buy (not part of the test). Tested NSE 2016–26: 34.5%/yr, worst fall −35.9% (survivor stocks, so likely flattering). Starts at 0% — set a small % in Systems & allocation.',
   tf: 'Monthly breakout after a 1–2 year cup (same trigger as Momentum). Stop for sizing = EMA 21 (at least 4% under the entry); exit when a daily close has EMA 9 below EMA 21 — this tab lists the sell for the next open. NSE 2017–26: 10.5%/yr alone, worst fall −15.6%; tested exits 5-day-low + Supertrend and weekly 9/21 did worse.',
   t9: 'Daily EMA 9 crosses above EMA 21 on a stock in an uptrend; buy next open; stop = 5-day low (max 12%); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle. NSE 2017–26: 20–26%/yr alone, worst fall −24 to −26%.',
   rt: 'First return to an old breakout level, stop 1 ATR under it, 3R target, out after 120 days.',
@@ -1098,11 +1099,11 @@ async function loadLive() {
     + grp((r) => r.tier === 'more').map(([r, i], k) => rowHtml(r, i, k === 0, k + 1)).join('');
   const bkOpen = (k, dflt) => { let o = null; try { o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}')[k]; } catch (e) { /* */ } return (o ?? dflt) ? 'open' : ''; };
   const swCard = (b) => { const L = grp((r) => r.tier === 'swing' && bkOf(r) === b).map(([r, i], k) => rowHtml(r, i, false, k + 1)).join(''); const pe = rows.filter((r) => r.tier === 'swing' && bkOf(r) === b && !r.skip && r.qty > 0);
-    if (!L && b !== 'tf' && b !== 'vcp') return '';
+    if (!L && b !== 'tf' && b !== 'vcp' && b !== 'pr') return '';
     const off = (alN[b] ?? 0) <= 0;
     const nL = rows.filter((r) => r.tier === 'swing' && bkOf(r) === b).length;
     return `<details class="lv-card bkd${off ? ' lv-offbk' : ''}" data-bk="${b}" ${bkOpen(b, false)}><summary class="bk-sum"><b>${BK_NAME[b]} · ${off ? '0% · your call' : `max ${alN[b] ?? 0}%`}</b><span class="muted">${off ? `${nL} setup${nL === 1 ? '' : 's'}` : `${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), 'NSE')}`}</span></summary>
-      ${off ? `<p class="lv-sub lv-offnote">Switched off in your split: ${b === 'my' ? 'your own picks sit outside the tested split' : b === 'vcp' ? 'VCP is a watch bucket (+4.9% a trade, but only +1 point a year added to your mix)' : b === 'pt' ? 'bottom patterns showed no edge in the 2017–26 test' : b === 'rt' ? 'retests lost about 1.3%/yr in the full-account test' : 'not part of the tested mix'}. Sized at the swing risk from your cash so you can decide; protective stop at the plan stop.</p>` : ''}
+      ${off ? `<p class="lv-sub lv-offnote">Switched off in your split: ${b === 'my' ? 'your own picks sit outside the tested split' : b === 'vcp' ? 'VCP is a watch bucket (+4.9% a trade, but only +1 point a year added to your mix)' : b === 'pt' ? 'bottom patterns showed no edge in the 2017–26 test' : b === 'rt' ? 'retests lost about 1.3%/yr in the full-account test' : b === 'pr' ? 'Pulse rotation is a trial: set a small % in Systems & allocation (e.g. 5–10%) to trade it' : 'not part of the tested mix'}. Sized at the swing risk from your cash so you can decide; protective stop at the plan stop.</p>` : ''}
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">${BK_HEAD[b]}</p></details>${b === 'tf' ? lvSwingHead(srNow, S && !S.swing ? Math.max(0, S.cash - 0.15 * S.capital) : idleNow, 'NSE', S && S.swing ? S.swing.open : null) + (S && !S.swing && swRows.length ? '<p class="lv-sub"><b>View only until your server updates</b> (it updates itself at 08:00 IST on weekdays): sized here from your cash; place these in the Angel app, or Send them after the update.</p>' : '') : ''}
       ${L || `<p class="empty">${b === 'vcp' ? 'No VCP setup near its pivot today — the scan checks every evening.' : 'No new signals for the next session.'}</p>`}</details>`; };
   const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span>${pcrChip(e.symbol)}</div>
@@ -1188,7 +1189,7 @@ async function loadLive() {
       ${S && pend.length ? '<p class="lv-sub"><span id="lvqt"></span></p>' : ''}
       ${list || '<p class="empty">No qualifying trades today.</p>'}
       ${S && pend.length ? `<div class="lv-basket" id="lvbk" hidden><div><b id="lvbkn">0 selected</b><div class="lv-sub" id="lvbkv"></div></div><button class="lv-btn" id="lvbkgo">Send basket</button></div>` : ''}</details>
-    ${swCard('my')}${swCard('tf')}${['vcp', 't9', 'rt', 'pt'].filter((b) => (alN[b] ?? 0) > 0).map(swCard).join('')}<div id="wccard"></div>
+    ${swCard('my')}${swCard('tf')}${swCard('pr')}${['vcp', 't9', 'rt', 'pt'].filter((b) => (alN[b] ?? 0) > 0).map(swCard).join('')}<div id="wccard"></div>
     ${(() => { /* 15 Nov 2026 consolidation: buckets switched off in your split and the month-close watch are watch lists that live on
        Trading / Momentum investing; here they stay folded in one place so Send still works if you pick one. */
       const offB = ['vcp', 't9', 'rt', 'pt'].filter((b) => !((alN[b] ?? 0) > 0)); const inner = offB.map(swCard).join('');
@@ -8250,6 +8251,7 @@ async function loadStrat() {
   const [P, PT, X] = await Promise.all([getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null), getJSON(MP + 'patterns.json', 'pat_' + mk).catch(() => null), t3Ctx(mk)]);
   const V = await getJSON(MP + 'vcp.json', mk === 'NSE' ? 'vcp' : 'vcp_' + mk).catch(() => null);
   const FLG = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);   // 22 Nov 2026: flags / pennants / rectangles
+  const PRJ = mk === 'NSE' ? await getJSON(MAIN + 'data/scan/pulse_rot.json', 'pulse_rot').catch(() => null) : null;   // 22 Nov 2026: Pulse rotation trial
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
   const row = (sym, st, extra = {}) => { const ch = X.chain(sym); return { sym, st, ch, s: Pq[ch[1]] + Pq[ch[2]], y: X.yoy(sym), pu: X.pulse ? X.pulse(sym) : null, ...extra }; };
   const pl = (P && (P.top || []).concat(P.swing || [])) || [];
@@ -8262,6 +8264,8 @@ async function loadStrat() {
     { k: 'rt', name: 'Retest', test: 'weak', ok: 0, note: 'Watch only: a small edge per trade, but it lost money as a 10-stock portfolio.', rows: pl.filter((r) => bkOf(r) === 'rt').map((r) => row(r.symbol, 'At old breakout', { r, sc: r.score || 0 })) },
     { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only. Tight flags (range ≤ 8%) where volume dried up, breaking out on 1.5× volume, with room of at least 0.8× the pole before the next old high on the left. Buy near the breakout close, stop under the flag low, sell on the first close below the 21-day average. Tested 2016-26: +2.8% a trade, positive in the last 2 years (buying next day above the breakout high did worse).',
       ord: 1, rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2) + ' on 1.5× volume'} · exit below 21-day avg`, { sc: x.status === 'breakout' ? 2 : 1, fl: x, pri: (x.status === 'breakout' ? 4 : 0) + (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0) })) },
+    { k: 'pr', name: 'Pulse rotation', test: 'trial · 34.5%/yr', ok: 1, note: PRJ ? `Weekly: top-10% Pulse industries that are Leading/Improving → 10 strongest trending stocks, equal weight, rebalanced each Friday (buy/sell Monday open). Industries now: ${(PRJ.industries || []).map((x) => x.name).join(', ') || 'none'}. Forward test since ${PRJ.started}: ${prFwd(PRJ)}.` : 'Weekly picks appear after the first Friday scan.',
+      rows: ((PRJ && PRJ.rows) || []).map((x) => row(x.symbol, `${x.industry || ''} · 3-month ${x.r3m >= 0 ? '+' : ''}${fmt(x.r3m, 0)}%${(PRJ.buys || []).includes(x.symbol) ? ' · NEW this week' : ''}`, { sc: 1 })) },
     { k: 'vcp', name: 'Tight bases', test: 'watch', ok: 0, note: 'Watch only: tested, did not beat ATH or 9/21.', rows: (((V && (V.rows || V)) || []).slice ? ((V.rows || V) || []).slice(0, 30) : []).map((x) => row(x.symbol, 'Squeezing', { sc: 0 })) }];
   SYS.forEach((s) => s.rows.sort((a, b) => pulseSort(a, b) || b.s - a.s || Pq[b.ch[2]] - Pq[a.ch[2]] || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0)));   // quadrant strength first (Amritpal 22 Nov), then breakout / rectangle / established
   const k = state.stratK && SYS.some((s) => s.k === state.stratK) ? state.stratK : 'mom'; const S = SYS.find((s) => s.k === k);
@@ -8909,3 +8913,8 @@ function pulseTier(x) { const p = x.pu; if (!p || p.p == null) return 0; const t
 function pulseSort(a, b) { return pulseTier(b) - pulseTier(a) || ((b.pu && b.pu.p) || 0) - ((a.pu && a.pu.p) || 0); }
 function pulsePill(x) { const p = x.pu; if (!p || p.p == null) return ''; const t = pulseTier(x);
   return `<span class="t3-pill ${t === 3 ? 'ok' : t === 2 ? 'warn' : ''}" title="Industry Pulse: share of the industry's stocks trending (1 month)">Pulse ${fmt(p.p, 0)}${t === 3 ? ' · top 10% + rotation' : t === 2 ? ' · top 10%' : ''}</span>`; }
+
+/* Pulse rotation forward test (22 Nov 2026): equal weight, Friday close to Friday close, no costs - a paper mark */
+function prFwd(P) { const L = (P && P.ledger) || []; if (L.length < 2) return 'started, first result next Friday';
+  const a = L[L.length - 1]; const r = (a.equity - 1) * 100, n = ((a.nifty_eq || 1) - 1) * 100;
+  return `${r >= 0 ? '+' : ''}${fmt(r, 1)}% vs Nifty ${n >= 0 ? '+' : ''}${fmt(n, 1)}% over ${L.length - 1} week${L.length === 2 ? '' : 's'}`; }

@@ -73,9 +73,16 @@ def buckets(mk):
                    else ("US 2008-26: +2.0% a trade (396 trades, 36% win); alone 8.5-8.9%/yr in 2017-26 vs the S&P 500 13.3%, weak 2008-16. "
                          "Weaker than NSE - watch bucket, your call." if mk == "US" else "UK: not backtested yet - watch only." if mk == "UK" else
                          "ASX 2008-26: about 3 setups a year (56 trades, +1.8% a trade) - too few to trust. Watch bucket - your call.")),
+         dict(key="pr", name="Pulse rotation", system="Pulse rotation", status="active", pct=0,
+              rules="Each Friday close: NSE industries in the top 10% by 1-month Pulse AND rotation Leading/Improving; hold the 10 strongest trending "
+                    "stocks of those industries by 3-month return (kept while in the top 20 and the industry stays selected); equal weight "
+                    "(the % you set / 10 a stock); buy and sell at Monday's open. Safety stop 20% below the buy (not in the test).",
+              test="NSE 2016-26 (survivors), Monday-open fills, 0.2% a side: 34.5%/yr, worst fall -35.9%; last 1/2/3 years +20.0/+16.0/+40.0%. "
+                   "Trial: starts at 0% - set a small % to trade it.") if india else None,
          dict(key="s1", name="System 1", status="off", pct=0, rules="Weekly RSI system (rules kept privately).",
               test="Off on NSE: below the Nifty in every version tested; a US paper candidate."),
          dict(key="wc", name="Wealth Creation", status="sip", pct=0, rules="ETF Pie funded by a monthly SIP, outside the systems' capital: Nifty 50, Midcap 150, Gold and US Nasdaq 100 ETFs at fixed weights (Equal, Balanced or Aggressive) rebalanced each quarter, or the monthly rotation (best 2 by 3-month return).", test="2016-26 monthly, price indices, 0.2% per switch: Equal 25% each 18.3%/yr, worst -15.7%; Balanced 30/20/30/20 17.6%, -14.7%; Aggressive 30/30/10/30 18.4%, -20.2%; rotation 17.7%, -12.8%; Nifty 50 11.6%, -29.3%.")]
+    B = [b for b in B if b]
     if india:
         B.append(dict(key="tb", name="Top Bottom", system="Top Bottom", status="active", pct=100, margin=True,
                       rules="Bank Nifty futures on the Top Bottom rules (separate bot, its own card). Uses margin from pledged holdings, "
@@ -393,6 +400,29 @@ def main(mk="NSE"):
         if str(r.get("status", "")).startswith("EXIT"):
             exits.append(dict(id=f"EXIT-T921-{r['symbol']}", symbol=r["symbol"], system="9/21 trend", side="SELL", order="LIMIT",
                               when="next open", ref=num(r.get("close")), why="Supertrend turned red"))
+    # 22 Nov 2026 (Amritpal: "try live too with a small allocation"): Pulse rotation - the week's 10 holdings as buy rows (the
+    # server skips what you already hold and sizes each at your % / 10) and the stocks dropped on Friday as sells
+    if india:
+        try:
+            PRJ = json.load(open("data/scan/pulse_rot.json"))
+            prow = {x["symbol"]: x for x in PRJ.get("rows") or []}
+            for sym in PRJ.get("picks") or []:
+                x = prow.get(sym) or {}; cl = num(x.get("close"))
+                if not cl:
+                    continue
+                swing.append(dict(id=f"PR-{sym}-{PRJ.get('decided')}", symbol=sym, name="", system="Pulse rotation", bucket="pr", kind="PR",
+                                  order="LIMIT", when="next open (Monday after the Friday pick)", side="BUY", price=round(cl * 1.01, 2), ref=cl,
+                                  stop=round(cl * 0.80, 2), exit_rule="sold at the Monday open when it leaves the weekly top 20 or its industry drops out",
+                                  note=f"industry {x.get('industry')} (top-10% Pulse + Leading/Improving), 3-month {x.get('r3m')}%, rank {x.get('rank')}"
+                                       f"{' · NEW this week' if sym in (PRJ.get('buys') or []) else ''}; equal weight; safety stop 20% below",
+                                  score=0, value_cr=None, rank=(x.get("rank") or 99), risk_pct=20.0, lane=None, group=x.get("industry")))
+            for sym in PRJ.get("sells") or []:
+                exits.append(dict(id=f"EXIT-PR-{sym}-{PRJ.get('decided')}", symbol=sym, system="Pulse rotation", side="SELL", order="LIMIT",
+                                  when="next open (Monday)", ref=None, why=f"left the Pulse rotation top 20 / its industry dropped out ({PRJ.get('decided')})"))
+        except FileNotFoundError:
+            pass
+        except Exception as ex:  # noqa: BLE001
+            print("pulse rotation rows failed", ex)
     # 18 Nov 2026: 3-month price change of every candidate - the "strongest 3-month gain" pick for the Best 5 card
     # (concentrated 9/21 test: 5 positions at 1% risk, ranked by 3-month strength = about the 10-position return)
     allc = trades[:30] + swing

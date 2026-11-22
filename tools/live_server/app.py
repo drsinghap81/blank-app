@@ -99,9 +99,10 @@ def swing_risk() -> float:
 # Systems as buckets (9 Nov 2026): each may hold at most alloc% of capital; all share one cash pool (Momentum first,
 # swing buckets keep SWING_RESERVE in cash). NSE 2017-26 one-account test: Momentum <= 60% + Trend 9/21 <= 40% 23.1%/yr,
 # worst fall -21.4%, vs Momentum alone 17.3%, -16.8%. Top Bottom runs on pledge margin (its own bot), not this cash.
-BUCKETS = {"mom": 60, "tf": 40, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "my": 0, "s1": 0, "wc": 0, "tb": 100}   # optimised 9 Nov (trade_plan.buckets)
+BUCKETS = {"mom": 60, "tf": 40, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "my": 0, "s1": 0, "wc": 0, "tb": 100, "pr": 0}   # optimised 9 Nov (trade_plan.buckets); pr = Pulse rotation trial (22 Nov, starts at 0%)
+PR_N = 10          # Pulse rotation: equal weight, your % / 10 a stock
 ALLOC_V = 2
-SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt", "VCP": "vcp", "My pick": "my"}
+SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt", "VCP": "vcp", "My pick": "my", "Pulse rotation": "pr"}
 STOP_KINDS = ("ATH_STOP", "TF_STOP", "VCP_STOP")   # buy-stop rows (stop-limit day orders)
 
 
@@ -394,7 +395,7 @@ def record_exit(sym, sell_px):
 def protect_level(kind, stop):
     if not stop:
         return None
-    return stop if kind in ("T921", "RETEST", "PATTERN", "VCP", "VCP_STOP", "MY_GTT") else stop * (1 - ATH_NET_PCT)
+    return stop if kind in ("T921", "RETEST", "PATTERN", "VCP", "VCP_STOP", "MY_GTT", "PR") else stop * (1 - ATH_NET_PCT)
 
 
 def _slog(e, px, why):
@@ -1132,7 +1133,8 @@ def sized(acc=None):
         b = SYS_BUCKET.get(J[s_].get("system"), "mom"); e_ = J[s_]
         expo[b] = expo.get(b, 0.0) + (held.get(s_, 0) or e_.get("qty") or 0) * float(ltp.get(s_) or e_.get("entry") or 0)
     room = {k: AL[k] / 100 * cap - expo.get(k, 0.0) for k in AL}
-    ath_open = [s for s in sys_open if s not in sw_open]
+    pr_open = [s for s in sys_open if J[s].get("system") == "Pulse rotation"]          # Pulse rotation: its own 10 slots
+    ath_open = [s for s in sys_open if s not in sw_open and s not in pr_open]
     slots = max(0, N - len(ath_open)); sw_slots = max(0, SWING_MAX - len(sw_open))
     cash = acc["cash"]
     rows = []; SV = surv_load()
@@ -1143,6 +1145,10 @@ def sized(acc=None):
             why = "already held"
         elif r["symbol"] in J and J[r["symbol"]].get("state") == "pending":
             why = "order sent - waiting for the fill"
+        elif r.get("bucket") == "pr" and E > 0:          # 22 Nov 2026: equal weight = your Pulse rotation % / 10 a stock
+            q = math.floor(min(AL.get("pr", 0) / 100 * cap / PR_N, MAX_POS_PCT * cap, MAX_ORDER_VALUE) / E)
+            if q <= 0:
+                why = "Pulse rotation is at 0% - set a small % in Systems & allocation to trade it" if AL.get("pr", 0) <= 0 else "too small for one share"
         elif stop and E > stop:
             q = math.floor(min((SR if r["tier"] == "swing" else RK) * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
         rows.append(dict(r, qty=max(0, q), value=round(max(0, q) * E, 0), risk_amt=round(max(0, q) * (E - stop), 0) if stop else None,
@@ -1150,6 +1156,7 @@ def sized(acc=None):
     # each row must fit your actual cash on its own (cut to cash, no token positions); rank order only adds a note
     # when the row would use cash / a slot that the higher-ranked rows would need if you bought them too
     left, used = cash, 0
+    pr_left, pr_used = cash, 0
     sw_cash = max(0.0, cash - SWING_RESERVE * cap); sw_left, sw_used = sw_cash, 0
     for r in rows:
         if r["skip"] or r["qty"] <= 0:
@@ -1157,6 +1164,22 @@ def sized(acc=None):
         sw = r["tier"] == "swing"
         bk = r.get("bucket") or ("tf" if sw else "mom"); r["bucket"] = bk
         E0 = r.get("trigger") or r["price"]
+        if bk == "pr":                                     # own slots (10) and room; no swing reserve / ATH slot rules
+            if len(pr_open) + pr_used >= PR_N:
+                r["skip"] = "Pulse rotation already holds %d stocks" % PR_N; continue
+            if r["value"] > room.get("pr", 0) + 1:
+                q = math.floor(max(0.0, room.get("pr", 0)) / E0)
+                if q <= 0 or q < 0.25 * r["qty"]:
+                    r["skip"] = "bucket full (Pulse rotation max %g%% of capital)" % AL.get("pr", 0); continue
+                r["qty"], r["value"] = q, round(q * E0, 0)
+            if r["value"] > pr_left:
+                q = math.floor(max(0.0, pr_left) / E0)
+                if q <= 0 or q < 0.25 * r["qty"]:
+                    r["skip"] = "not enough cash"; continue
+                r["qty"], r["value"] = q, round(q * E0, 0); r["note"] = r.get("note", "") + " · cut to your cash"
+            r["risk_amt"] = round(r["qty"] * (E0 - r["stop"]), 0); r["pct_cap"] = round(r["qty"] * E0 / cap * 100, 1) if cap else None
+            pr_left -= r["value"]; pr_used += 1; room["pr"] = room.get("pr", 0) - r["value"]
+            continue
         if AL.get(bk, 0) <= 0:
             r["outside"] = True; r["note"] = (r.get("note") or "") + " · outside your split (0% in Systems & allocation): your call"
             if r["value"] > cash:

@@ -1,0 +1,28 @@
+name: pulse-rot
+# Pulse rotation trial (22 Nov 2026): weekly picks every Friday after the NSE close -> data/scan/pulse_rot.json (+ trade plan)
+on:
+  schedule:
+    - cron: "10 15 * * 5"    # Fri 20:40 IST
+  workflow_dispatch:
+    inputs:
+      force: { description: "1 = rebalance even if not a Friday close", required: false, default: "0" }
+permissions:
+  contents: write
+concurrency:
+  group: pulse-rot
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas yfinance requests lxml && FORCE=${{ inputs.force || '0' }} python tools/pulse_rot.py
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add data/scan/pulse_rot.json; git diff --cached --quiet && exit 0
+          git commit -qm "Pulse rotation $(date -u +%F)"
+          for i in 1 2 3; do git pull -q --rebase -X theirs origin main && git push -q && break; sleep 5; done
