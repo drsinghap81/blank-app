@@ -8092,14 +8092,18 @@ async function t3Ctx(mk) {
   const P = MAIN + MKT[mk].path;
   const [GP, F, WR] = await Promise.all([loadGP(mk).catch(() => null), getJSON(P + 'fundamentals.json', 'fund_' + mk).catch(() => null),
     getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null), wkLoad(mk).catch(() => null)]);
-  const ind = {}, grp = {}, mem = {};
+  const ind = {}, grp = {}, mem = {}, pul = {};
+  // 22 Nov 2026 (rotation + Pulse test): industry Pulse per stock and its rank among the market's groups (top 10% = strong)
+  const pv = ((GP && GP.rows) || []).map((g) => g.p1m).filter((v) => v != null).sort((a, b) => a - b);
+  const pctOf = (v) => (v == null || !pv.length ? null : pv.filter((x) => x <= v).length / pv.length);
   ((GP && GP.rows) || []).forEach((g) => { const q = T3Q[(g.rrg || {}).now] || 'N'; mem[g.group] = (g.members || []).map((m) => m.symbol);
-    (g.members || []).forEach((m) => { ind[m.symbol] = q; grp[m.symbol] = g.group; }); });
+    const pp = { p: g.p1m, pct: pctOf(g.p1m), q };
+    (g.members || []).forEach((m) => { ind[m.symbol] = q; grp[m.symbol] = g.group; pul[m.symbol] = pp; }); });
   const S = (F && F.s) || {};
   const peMed = {}; Object.entries(mem).forEach(([g, L]) => { const v = L.map((s) => S[s] && S[s].pe).filter((x) => x > 0 && x < 300).sort((a, b) => a - b); peMed[g] = v.length >= 3 ? v[Math.floor(v.length / 2)] : null; });
   const wq = WR && WR.weekly && WR.weekly[T3W[mk]] ? T3Q[WR.weekly[T3W[mk]].now] || 'N' : 'N';
   const GL = ((GP && GP.rows) || []).filter((g) => (g.rrg || {}).now === 'Leading');
-  return { GP, ind, grp, S, peMed, wq, GL, mk,
+  return { GP, ind, grp, S, peMed, wq, GL, mk, pulse: (sym) => pul[sym] || null,
     chain: (sym) => { const r = rqOf(sym, mk); return [wq, ind[sym] || 'N', r && r.now ? T3Q[r.now] || 'N' : 'N']; },
     yoy: (sym) => { const q = (S[sym] && S[sym].q) || []; const x = q.find((y) => y[2] != null); return x ? x[2] : null; },
     price: (sym) => { const pe = S[sym] && S[sym].pe, m = peMed[grp[sym]]; if (!(pe > 0) || !m) return null; const d = pe / m - 1; return { pe, m, k: d < -0.15 ? 'Cheap' : d > 0.15 ? 'Pricey' : 'Fair' }; } };
@@ -8247,7 +8251,7 @@ async function loadStrat() {
   const V = await getJSON(MP + 'vcp.json', mk === 'NSE' ? 'vcp' : 'vcp_' + mk).catch(() => null);
   const FLG = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);   // 22 Nov 2026: flags / pennants / rectangles
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
-  const row = (sym, st, extra = {}) => { const ch = X.chain(sym); return { sym, st, ch, s: Pq[ch[1]] + Pq[ch[2]], y: X.yoy(sym), ...extra }; };
+  const row = (sym, st, extra = {}) => { const ch = X.chain(sym); return { sym, st, ch, s: Pq[ch[1]] + Pq[ch[2]], y: X.yoy(sym), pu: X.pulse ? X.pulse(sym) : null, ...extra }; };
   const pl = (P && (P.top || []).concat(P.swing || [])) || [];
   const TYP = { DB: 'W bottom', TW: 'Tilted W', TB: 'Triple bottom', IHS: 'Inv H&S' };
   const SYS = [
@@ -8259,15 +8263,15 @@ async function loadStrat() {
     { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only. Tight flags (range ≤ 8%) where volume dried up, breaking out on 1.5× volume, with room of at least 0.8× the pole before the next old high on the left. Buy near the breakout close, stop under the flag low, sell on the first close below the 21-day average. Tested 2016-26: +2.8% a trade, positive in the last 2 years (buying next day above the breakout high did worse).',
       ord: 1, rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2) + ' on 1.5× volume'} · exit below 21-day avg`, { sc: x.status === 'breakout' ? 2 : 1, fl: x, pri: (x.status === 'breakout' ? 4 : 0) + (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0) })) },
     { k: 'vcp', name: 'Tight bases', test: 'watch', ok: 0, note: 'Watch only: tested, did not beat ATH or 9/21.', rows: (((V && (V.rows || V)) || []).slice ? ((V.rows || V) || []).slice(0, 30) : []).map((x) => row(x.symbol, 'Squeezing', { sc: 0 })) }];
-  SYS.forEach((s) => s.rows.sort((a, b) => b.s - a.s || Pq[b.ch[2]] - Pq[a.ch[2]] || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0)));   // quadrant strength first (Amritpal 22 Nov), then breakout / rectangle / established
+  SYS.forEach((s) => s.rows.sort((a, b) => pulseSort(a, b) || b.s - a.s || Pq[b.ch[2]] - Pq[a.ch[2]] || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0)));   // quadrant strength first (Amritpal 22 Nov), then breakout / rectangle / established
   const k = state.stratK && SYS.some((s) => s.k === state.stratK) ? state.stratK : 'mom'; const S = SYS.find((s) => s.k === k);
   const seg = `<div class="t3-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([m, n]) => `<button data-smk="${m}" role="tab" aria-selected="${mk === m}">${n}</button>`).join('')}</div>`;
   el.innerHTML = `<div class="t3">${seg}
     <div class="st-cards" role="group" aria-label="Pick a strategy">${SYS.map((s) => `<button class="st-card" data-sk="${s.k}" aria-pressed="${s.k === k}"><span>${esc(s.name)}</span><span class="st-n"><b>${s.rows.length}</b><em class="${s.ok ? 'ok' : 'warn'}">${esc(s.test)}</em></span></button>`).join('')}</div>
-    <div class="t3-sh"><h2><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg> Strongest top-down first</h2>
+    <div class="t3-sh"><h2><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg> Strongest industry Pulse first</h2>
       <div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((q) => `<span><i style="background:${T3C[q]}"></i>${T3N[q]}</span>`).join('')}</div></div>
     ${S.note ? `<p class="t3-note warn">${esc(S.note)}</p>` : ''}
-    <ol class="st-list">${S.rows.map((x, i) => `<li><button class="st-row" data-si="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.st === 'Buy' ? 'up' : ''}">${esc(x.st)}</small></span>${t3Bars(x.ch, true)}<span class="st-y">${t3Yoy(x.y)}</span></button></li>`).join('') || '<li class="empty">Nothing in this strategy today.</li>'}</ol>
+    <ol class="st-list">${S.rows.map((x, i) => `<li><button class="st-row" data-si="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.st === 'Buy' ? 'up' : ''}">${esc(x.st)}</small></span>${t3Bars(x.ch, true)}<span class="st-y">${pulsePill(x)}${t3Yoy(x.y)}</span></button></li>`).join('') || '<li class="empty">Nothing in this strategy today.</li>'}</ol>
     <p class="t3-foot">Order is for reading only; the systems' own rules decide what gets bought. Old views: <button class="t3-link" data-go4="inv">Invest</button> · <button class="t3-link" data-go4="ath">Momentum</button> · <button class="t3-link" data-go4="trends">Trading</button></p></div>`;
   el.querySelectorAll('[data-sk]').forEach((b) => b.addEventListener('click', () => { state.stratK = b.dataset.sk; loadStrat(); }));
   el.querySelectorAll('[data-smk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.smk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } loadStrat(); }));
@@ -8826,10 +8830,10 @@ async function sysListView(s, mk, q) {
   const [rows, X] = await Promise.all([sysRows(s, mk, q), t3Ctx(mk).catch(() => null)]);
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
   rows.forEach((x) => { const nonStk = (x.fl && x.fl.kind && x.fl.kind !== 'stock') || (x.pt && x.pt.kind && x.pt.kind !== 'stock'); if (nonStk) x.name = x.name || (x.fl ? (x.fl.kind === 'index' ? 'Index' : 'Asset') : '');
-    x.ch = X && !x.etfOnly && !x.fund && !nonStk ? X.chain(x.sym) : null; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
+    x.ch = X && !x.etfOnly && !x.fund && !nonStk ? X.chain(x.sym) : null; x.pu = x.ch && X.pulse ? X.pulse(x.sym) : null; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
   // 22 Nov 2026 (Amritpal: "sort stocks as per quadrant strength"): industry + stock quadrant first (Leading > Improving >
   // Weakening > Lagging), then the stock's own quadrant, then buy / breakout, then the tested order
-  rows.sort((a, b) => b.s - a.s || (b.ch ? Pq[b.ch[2]] : -1) - (a.ch ? Pq[a.ch[2]] : -1) || (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0));
+  rows.sort((a, b) => pulseSort(a, b) || b.s - a.s || (b.ch ? Pq[b.ch[2]] : -1) - (a.ch ? Pq[a.ch[2]] : -1) || (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0));
   const seg = s.nse ? '' : `<div class="t3-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([m, n]) => `<button data-ymk="${m}" role="tab" aria-selected="${mk === m}">${n}</button>`).join('')}</div>`;
   const nBuy = rows.filter((x) => x.buy).length;
   $('#sheet-body').innerHTML = `<div class="t3">${x3Trail([{ t: 'Search', go: () => searchOpen(), done: true }, { t: s.name, on: true }])}
@@ -8837,9 +8841,9 @@ async function sysListView(s, mk, q) {
     ${seg}
     <div class="t3-rules"><div class="t3-rule"><b>${rows.length}</b><small>${s.id === 'rot' || s.id === 'etf' ? 'ETFs' : 'stocks'} on it</small></div><div class="t3-rule"><b class="up">${nBuy}</b><small>buy / breakout now</small></div></div>
     ${rows.some((x) => x.ch) ? `<div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((k) => `<span><i style="background:${T3C[k]}"></i>${T3N[k]}</span>`).join('')}</div>` : ''}
-    <ol class="st-list">${rows.slice(0, 150).map((x, i) => `<li><button class="st-row" data-yi="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.buy ? 'up' : ''}">${esc(x.st)}</small></span>${x.ch ? t3Bars(x.ch, true) : `<span class="muted">${esc(x.name || '')}</span>`}<span class="st-y">${x.ch ? t3Yoy(x.y) : ''}</span></button></li>`).join('') || `<li class="empty">Nothing on ${esc(s.name)} in ${esc(MKT[mk].name)} today.</li>`}</ol>
+    <ol class="st-list">${rows.slice(0, 150).map((x, i) => `<li><button class="st-row" data-yi="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.buy ? 'up' : ''}">${esc(x.st)}</small></span>${x.ch ? t3Bars(x.ch, true) : `<span class="muted">${esc(x.name || '')}</span>`}<span class="st-y">${pulsePill(x)}${x.ch ? t3Yoy(x.y) : ''}</span></button></li>`).join('') || `<li class="empty">Nothing on ${esc(s.name)} in ${esc(MKT[mk].name)} today.</li>`}</ol>
     ${rows.length > 150 ? `<p class="muted">Showing the first 150 of ${rows.length}.</p>` : ''}
-    <p class="t3-foot">From the last nightly scans. Sorted by quadrant strength: industry and stock both Leading first, then Improving, Weakening, Lagging. Order is for reading only.</p></div>`;
+    <p class="t3-foot">From the last nightly scans. Sorted by industry Pulse: top-10% Pulse industries that are also Leading or Improving first (tested best), then the rest by Pulse. Order is for reading only; it does not change what any system buys.</p></div>`;
   const root = $('#sheet-body');
   x3TrailWire(root, [{ t: 'Search', go: () => searchOpen() }, { t: s.name }]);
   root.querySelectorAll('[data-ymk]').forEach((b) => b.addEventListener('click', () => sysListView(s, b.dataset.ymk, q)));
@@ -8897,3 +8901,11 @@ async function bottomView(x, mk) {
   let S = null; try { const r = await fetch(fresh(MAIN + MKT[mk].path + 'pattern_charts/' + fp + '.json')); S = r.ok ? await r.json() : null; } catch (e) { /* */ }
   const box = $('#pcbox'); if (box) box.innerHTML = S && S.t ? patternSvg(S, f) : '<p class="muted">No chart stored yet (it appears after the next scan).</p>';
 }
+
+/* 22 Nov 2026 (Amritpal: "rank by Pulse"; rotation + Pulse test, claude/rotation-plus-pulse-test.md): lists read strongest
+   industry Pulse first. Top tier = industry in the top 10% by Pulse AND Leading / Improving (tested best: 45.6%/yr as a basket vs
+   36.9% for top-10% Pulse alone; strong Pulse while Weakening / Lagging did worse, 28.1%). Display order only. */
+function pulseTier(x) { const p = x.pu; if (!p || p.p == null) return 0; const top = p.pct >= 0.9, li = ['L', 'I'].includes(p.q); return top && li ? 3 : top ? 2 : p.pct >= 0.5 ? 1 : 0; }
+function pulseSort(a, b) { return pulseTier(b) - pulseTier(a) || ((b.pu && b.pu.p) || 0) - ((a.pu && a.pu.p) || 0); }
+function pulsePill(x) { const p = x.pu; if (!p || p.p == null) return ''; const t = pulseTier(x);
+  return `<span class="t3-pill ${t === 3 ? 'ok' : t === 2 ? 'warn' : ''}" title="Industry Pulse: share of the industry's stocks trending (1 month)">Pulse ${fmt(p.p, 0)}${t === 3 ? ' · top 10% + rotation' : t === 2 ? ' · top 10%' : ''}</span>`; }

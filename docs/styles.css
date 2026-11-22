@@ -1639,3 +1639,4 @@ input,select,textarea{font-size:16px!important}
 .pc-svg .pc-halo { paint-order: stroke; stroke: var(--paper); stroke-width: 8px; stroke-linejoin: round; }
 .pc-svg .pc-mk { fill: var(--accent); stroke: var(--paper); stroke-width: 4; }
 .pc-svg .pc-rs { stroke: var(--saffron); stroke-width: 2.5; stroke-dasharray: 3 7; } .pc-svg .pc-rs-t { fill: var(--saffron); font: 800 24px var(--font-body); }
+.st-y { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
