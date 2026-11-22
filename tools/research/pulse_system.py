@@ -106,13 +106,13 @@ def main():
                 keep.append(s)
         return {s: 1.0 for s in keep}
 
-    def sim(mode, fill, gate=None):
+    def sim(mode, fill, gate=None, cash=False):
         val, eq, held, wts, turn = 1.0, [], [], {}, 0.0
         nh = []
         for a, b in zip(weeks[:-1], weeks[1:]):
             new = pick(a, mode, held)
-            if gate is not None and not bool(gate.get(a, True)):        # FII gate off: no new buys, holdings follow their rules
-                new = {s: 1.0 for s in held if s in new}
+            if gate is not None and not bool(gate.get(a, True)):        # gate off: no new buys, holdings follow their rules (cash=True: hold nothing)
+                new = {} if cash else {s: 1.0 for s in held if s in new}
             tot = sum(new.values()) or 1
             nw = {s: v / tot for s, v in new.items()}
             ch = sum(abs(nw.get(s, 0) - wts.get(s, 0)) for s in set(nw) | set(wts)); turn += ch
@@ -143,6 +143,17 @@ def main():
     bull = (nifty > nifty.rolling(200).mean())
     res = dict(method=__doc__, industries=len(mem), stocks=C.shape[1], runs={})
     print("R| industries", len(mem), "stocks", C.shape[1], "weeks", len(weeks), flush=True)
+    if os.environ.get("REDFRI") == "1":     # 23 Nov 2026 (Amritpal: "if Friday's market closes red I want to avoid the basket")
+        up = nifty > nifty.shift(1)                       # decision day (Friday close) green
+        Gu = {d: bool(up.loc[d]) for d in weeks}
+        for nm, gate, cash in (("TOP10 MON (live rule)", None, False), ("Friday red: no new buys that week (holdings stay)", Gu, False),
+                               ("Friday red: no basket that week (all cash)", Gu, True)):
+            e, tpy, avgn = sim("top10", "MON", gate, cash=cash)
+            rp = report(e, bull); rp["turnover_x_per_year"] = tpy; rp["avg_holdings"] = avgn
+            res["runs"][nm] = rp; print(f"R| Pulse rotation | {nm} | {rp}", flush=True)
+        n_red = sum(1 for d in weeks if not Gu[d]); print(f"R| red Fridays {n_red} of {len(weeks)}", flush=True)
+        json.dump(res, open("data/research/fii_pulse_redfri" + ("_pilot" if LIMIT else "") + ".json", "w"), indent=1, default=str)
+        return
     if os.environ.get("FII") == "1":     # 22 Nov 2026: "test all systems against regular FII buying" (tools/research/fii_gate.py)
         import fii_gate as FG
         G = FG.gates(C.index); res["gates"] = FG.NAMES
