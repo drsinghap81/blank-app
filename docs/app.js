@@ -6913,7 +6913,7 @@ async function alertsCard(box, mk, heroBox) {
    Leading + Improving + this week's movers; tap -> Markets > World */
 /* 22 Nov 2026 (Amritpal: "Yes" - INDY / INDA weren't in any scan while India led the world map): under the world map, each
    main market that is Leading or Improving with the ETF to trade it and that ETF's system status (funds.json). Tap -> its chart. */
-const WORLD_ETF = { 'US S&P 500': ['SPY'], Europe: ['VGK'], Japan: ['EWJ'], China: ['MCHI'], 'Hong Kong': ['EWH'], India: ['INDA', 'NIFTYBEES'],
+const WORLD_ETF = { 'US S&P 500': ['SPY'], Europe: ['VGK'], Japan: ['EWJ'], China: ['MCHI'], 'Hong Kong': ['EWH'], India: ['INDY', 'INDA', 'NIFTYBEES'],
   Australia: ['EWA', 'AU:STW'], Korea: ['EWY'], Taiwan: ['EWT'], Brazil: ['EWZ'], Canada: ['EWC'], UK: ['EWU'], Germany: ['EWG'], 'Emerging mkts': ['EEM'] };
 async function wEtfLine(box, mk) {
   if (!box) return;
