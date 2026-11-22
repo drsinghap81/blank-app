@@ -4067,8 +4067,15 @@ async function vwFill(root) {
   els.forEach((e) => { const x = V[e.dataset.vw]; if (!x || x.vwap == null) return;
     e.innerHTML = ` <span class="chip ${x.above ? 'new' : 'exit'}" title="Today's VWAP ${x.vwap} (5-minute candles, ${x.day} ${x.at}). Entry guide: price above VWAP with high PCR. Not backtested.">${x.above ? `Above VWAP${x.since ? ' since ' + x.since : ''}` : 'Below VWAP'}</span>`; });
 }
-async function pcrLoad() { if (state.pcr === undefined) { state.pcr = null; state.pcr = await getJSON(MAIN + 'data/scan/pcr.json', 'pcr').catch(() => null); } return state.pcr; }
-function pcrChip(sym) {
+async function pcrLoad() { if (state.pcr === undefined) { state.pcr = null; const [a, b] = await Promise.all([getJSON(MAIN + 'data/scan/pcr.json', 'pcr').catch(() => null), getJSON(MAIN + 'data/scan/oi_build.json', 'oi_build').catch(() => null)]); state.pcr = a; state.oib = b; } return state.pcr; }
+/* 22 Nov 2026 (Amritpal: "add speculation"): futures OI build-up per F&O stock (tools/opt_charts.py oi_build_file), 5 sessions. Context only. */
+function oiChip(sym) {
+  const x = state.oib && state.oib.rows && state.oib.rows[String(sym || '').toUpperCase()]; if (!x || !x.s5) return '';
+  const cls = { 'long build-up': 'open', 'short covering': 'new', 'short build-up': 'exit', 'long unwinding': 'exit' }[x.s5] || '';
+  return ` <span class="chip ${cls}" title="Futures open interest ${x.oi5 >= 0 ? '+' : ''}${x.oi5}% and price ${x.px5 >= 0 ? '+' : ''}${x.px5}% over 5 sessions (today: ${x.s1 || 'no clear change'}). Who is adding positions - context only; on its own it did not predict returns in our tests.">${x.s5.charAt(0).toUpperCase() + x.s5.slice(1)}</span>`;
+}
+function pcrChip(sym) { return pcrChip0(sym) + oiChip(sym); }
+function pcrChip0(sym) {
   const x = state.pcr && state.pcr.rows && state.pcr.rows[String(sym || '').toUpperCase()]; if (!x) return '';
   const lab = { 5: 'high', 4: 'above avg', 3: 'mid', 2: 'below avg', 1: 'low' }[x.q]; const cls = x.q === 5 ? 'new' : x.q === 4 ? 'open' : x.q === 1 ? 'exit' : '';
   return ` <span class="chip ${cls}" title="Put/call OI ratio ${x.pcr} (${lab} among F&O names today${x.d5 != null ? `, ${x.d5 >= 0 ? '+' : ''}${x.d5} in 5 days` : ''}). Guide only: high PCR stocks did better over the next 10 days in 2020-26.">PCR ${fmt(x.pcr, 2)} ${x.q >= 4 ? '▲' : x.q <= 2 ? '▼' : '·'}</span>`;
@@ -8116,7 +8123,7 @@ const T3TRACK = { mom: { n: 136, win: 44, avg: 23.7, hold: '5 mo', yr: '17%' }, 
 async function t3Ctx(mk) {
   const P = MAIN + MKT[mk].path;
   const [GP, F, WR] = await Promise.all([loadGP(mk).catch(() => null), getJSON(P + 'fundamentals.json', 'fund_' + mk).catch(() => null),
-    getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null), wkLoad(mk).catch(() => null), mk === 'NSE' ? govLoad().catch(() => null) : null]);
+    getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null), wkLoad(mk).catch(() => null), mk === 'NSE' ? govLoad().catch(() => null) : null, mk === 'NSE' ? pcrLoad().catch(() => null) : null]);
   const ind = {}, grp = {}, mem = {}, pul = {};
   // 22 Nov 2026 (rotation + Pulse test): industry Pulse per stock and its rank among the market's groups (top 10% = strong)
   const pv = ((GP && GP.rows) || []).map((g) => g.p1m).filter((v) => v != null).sort((a, b) => a - b);
@@ -8415,8 +8422,9 @@ async function sysActive(mk, sym, S, plan) {   // [{n, c}] c: buy | on | near ; 
 async function stockPage(e, trail) {
   if (!e) return; const mk = e.mk || 'NSE', sym = e.sym; const P = MAIN + MKT[mk].path;
   openPanel('<p class="muted pad">Loading…</p>'); history.pushState({ sheet: 1 }, '');
-  const [S, plan, X] = await Promise.all([sysMap(mk).catch(() => null), getJSON(P + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null), t3Ctx(mk)]);
+  const [S, plan, X] = await Promise.all([sysMap(mk).catch(() => null), getJSON(P + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null), t3Ctx(mk), mk === 'NSE' ? pcrLoad().catch(() => null) : null]);
   const { list, pr } = await sysActive(mk, sym, S, plan);
+  const spec = mk === 'NSE' ? pcrChip(sym) : '';
   const W = state.mxW && state.mxW[mk]; const v = W && W.s && W.s[sym]; const tt = (W && W.t) || [];
   const last = v ? v[v.length - 1] : null; const yr = v && v.length > 52 ? (last / v[v.length - 53] - 1) * 100 : null;
   const Mz = (x, d = 0) => (mk === 'NSE' ? inr(x, d) : `${MKT[mk].cur}${fmt(x, d, MKT[mk].loc)}`);
@@ -8442,6 +8450,7 @@ async function stockPage(e, trail) {
       <section class="sp-t"><div class="sp-th"><h3>Systems on it</h3><b class="${list.length ? 'up' : ''}">${list.length}</b></div><div class="sp-chips">${lit}${off}</div></section>
       <section class="sp-t"><h3>Top-down</h3>${t3Bars(ch)}<small class="${ch[1] === 'L' && ch[2] === 'L' ? 'up' : ''}">${ch.every((q) => q === 'L') ? 'All three leading' : `Industry ${T3N[ch[1]].toLowerCase()} · stock ${T3N[ch[2]].toLowerCase()}`}</small></section>
       ${mk === 'NSE' && govOf(sym) ? (() => { const gv = govOf(sym); return `<section class="sp-t sp-gov"><div class="sp-th"><h3>Govt focus</h3>${gv.msme ? '<b class="up">MSME</b>' : ''}</div>${gv.th.map((t) => `<p><b>${esc(t.name)}</b><small>${esc(t.why)} <span class="muted">(${esc(t.src)})</span></small></p>`).join('')}${gv.nw.slice(0, 5).map((x) => `<p class="gov-n"><a href="${esc(x.url)}" target="_blank" rel="noopener"><b>${esc(x.title)}</b></a><small><span class="chip ${x.official ? 'open' : ''}">${x.official ? 'Official' : 'Report'}</span>${x.neg ? '<span class="chip exit">negative</span>' : ''} ${esc(x.source)} · ${esc(day(x.date))} · ${esc(x.type)}</small></p>`).join('')}<small class="muted">${gv.cr != null ? `Sales last year ${inr(gv.cr, 0)} cr${gv.msme ? ' - MSME-sized (up to 500 cr)' : ''}. ` : ''}A theme, not a buy signal.</small></section>`; })() : ''}
+      ${spec ? `<section class="sp-t"><h3>Speculation (F&O)</h3><div class="sp-chips">${spec}</div><small class="muted">Put/call ratio and who is adding futures positions over 5 sessions. Context, not a buy signal.</small></section>` : ''}
       <section class="sp-t"><h3>Price vs results</h3><div class="t3-duo"><div><b>${px ? px.k : 'n/a'}</b><small>${px ? `P/E ${fmt(px.pe, 1)} vs ${fmt(px.m, 1)}` : 'no P/E'}</small></div><div><b class="${y == null ? '' : y >= 0 ? 'up' : 'down'}">${y == null ? 'n/a' : (y >= 0 ? '+' : '−') + fmt(Math.abs(y), 0) + '%'}</b><small>profit vs a year ago</small></div></div></section>
       ${c ? `<section class="sp-t"><div class="sp-th"><h3>Why?</h3><button class="t3-link" id="spwhy">Open</button></div><div class="sp-why"><div class="ok"><b>5/5</b><small>rules passed</small></div><div class="${(c.late || 0) > 5 ? 'warn' : 'ok'}"><b>${fmt(c.late || 0, 0)}%</b><small>past buy level</small></div><div class="bad"><b>−${fmt(c.stopP, 0)}%</b><small>to the stop</small></div></div></section>` : ''}
       ${peers.length ? `<section class="sp-t"><h3>Same industry</h3><div class="sp-chips">${peers.map((m) => { const q = (rqOf(m.symbol, mk) || {}).now; return `<button class="sp-peer" data-peer="${esc(m.symbol)}" style="border-left-color:${T3C[T3Q[q] || 'N']}">${esc(m.symbol)}</button>`; }).join('')}</div></section>` : ''}
@@ -8474,17 +8483,18 @@ sysCheck = (e) => (e && e.kind && e.kind !== 'stock' ? sysCheckOld(e) : stockPag
       const q = T3Q[(r.rrg || {}).now] || 'N';
       const tiles = await Promise.all((r.members || []).map(async (m) => { const sq = T3Q[(rqOf(m.symbol, mk) || {}).now] || 'N'; const a = await sysActive(mk, m.symbol, S, plan); const top = a.list[0];
         const fh = Math.max(0, Math.min(20, -(m.from_high || 0)));
-        return `<button class="x3-st" data-st="${esc(m.symbol)}" style="border-top-color:${T3C[sq]}"><span class="x3-sth"><b>${esc(m.symbol)}</b><small style="color:${T3C[sq]}">${T3N[sq]}</small></span>
+        return `<button class="x3-st" data-st="${esc(m.symbol)}" data-fk="${a.list.some((x) => x.c === 'buy') ? 'buy' : ''} ${top ? 'sys' : ''} ${['L', 'I'].includes(sq) ? 'li' : ''}" style="border-top-color:${T3C[sq]}"><span class="x3-sth"><b>${esc(m.symbol)}</b><small style="color:${T3C[sq]}">${T3N[sq]}</small></span>
           <span class="x3-fh"><i style="width:${100 - fh / 20 * 100}%"></i></span><small>${fh < 0.5 ? 'At its high' : fmt(fh, 0) + '% below its high'}</small>
           <span class="sp-sys ${top ? top.c : 'off'}">${top ? esc(top.n) : 'No system'}</span></button>`; }));
       const alI = plan ? lvAlloc(mk, plan, null) : {}; const buys = (plan ? (plan.top || []).concat(plan.swing || []) : []).filter((p) => !p.trigger && (r.members || []).some((m) => m.symbol === p.symbol) && ownK(bkOf(p)) && (alI[bkOf(p)] ?? 0) > 0).length;
       const hero = `<section class="x3-hero t3"><div class="t3-hero"><span class="t3-word x3-w" style="color:${T3C[q]}">${T3N[q]}</span><div class="t3-hl"><b>${esc(r.group)}</b><span class="muted">vs ${esc(MX_BENCH[mk])} this week</span></div></div>
         <div class="t3-tiles"><div class="t3-tile"><small>Last month</small><b class="${(r.r1m || 0) >= 0 ? 'up' : 'down'}">${r.r1m != null ? (r.r1m >= 0 ? '+' : '−') + fmt(Math.abs(r.r1m), 0) + '%' : '–'}</b><span>industry, equal weight</span></div>
-          <div class="t3-tile"><small>Trending</small><b>${fmt(r.p1m || 0, 0)}%</b><span>of its stocks</span></div><div class="t3-tile"><small>Buy today</small><b>${buys}</b><span>signals</span></div></div>
+          <button class="t3-tile" data-flt="li"><small>Trending</small><b>${fmt(r.p1m || 0, 0)}%</b><span>of its stocks · tap: leading / improving</span></button><button class="t3-tile" data-flt="buy"><small>Buy today</small><b>${buys}</b><span>signals</span></button></div>
         <h2 class="x3-h">Its stocks</h2><div class="x3-sts">${tiles.join('')}</div></section>`;
       const tr = el.querySelector('.x3-trail'); if (tr) tr.remove();
       x3Fold(el, 'Industry chart and full list'); el.insertAdjacentHTML('afterbegin', hero); el.insertAdjacentHTML('afterbegin', x3Trail(steps)); x3TrailWire(el, steps);
       const fd = el.querySelector('.x3-fold'); if (fd) fd.addEventListener('toggle', () => { if (fd.open) window.dispatchEvent(new Event('resize')); });
+      tileFilter(el.querySelector('.x3-hero') || el);
       el.querySelectorAll('[data-st]').forEach((b) => b.addEventListener('click', () => stockPage({ mk, sym: b.dataset.st, name: b.dataset.st, kind: 'stock' }, [steps[0], steps[1], { t: r.group, go: () => { closeSheet(); mxGo({ lvl: 'industry', grp: r.group }); }, done: true }, { t: b.dataset.st, on: true }])));
     }
   }; }
@@ -8669,17 +8679,28 @@ async function tradeView(tr) {
   const S = await trSeries(tr).catch(() => null); const box = $('#trc'); if (!box) return;
   box.innerHTML = S && S.t && S.t.length > 2 ? tradeSvg(S, tr) : '<p class="muted">No price history stored for this one.</p>';
 }
+/* 22 Nov 2026 (Amritpal: "by clicking numbers I should reach stocks and charts, true for any page"): a count tile with data-flt
+   filters the list below it to the rows it counts (rows carry data-fk keys) and scrolls there; tap again (or the "all" tile) for all. */
+function tileFilter(root) {
+  root.querySelectorAll('[data-flt]').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.flt; const on = k !== 'all' && b.getAttribute('aria-pressed') !== 'true';
+    root.querySelectorAll('[data-flt]').forEach((x) => x.setAttribute('aria-pressed', String(x === b && on)));
+    const rows = [...root.querySelectorAll('[data-fk]')];
+    rows.forEach((li) => { li.style.display = !on || (li.dataset.fk || '').split(' ').includes(k) ? '' : 'none'; });
+    const first = rows.find((li) => li.style.display !== 'none'); if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }));
+}
 function sysTradesView(title, list, src) {
   const money = (v) => lakh(Math.abs(v)); const tot = list.reduce((a, t) => a + (t.pnl || 0), 0); const w = list.filter((t) => t.pnl > 0).length;
   const sorted = list.slice().sort((a, b) => (b.pnl || 0) - (a.pnl || 0)); const mx = Math.max(1, ...list.map((t) => Math.abs(t.pnl || 0)));
   openPanel(`<div class="t3"><div class="t3w-h"><div><h2 style="font-family:var(--font-head);margin:0">${esc(title)}</h2><small class="muted">${esc(src)}</small></div></div>
-    <div class="t3-tiles"><div class="t3-tile"><small>Profit / loss</small><b class="${tot >= 0 ? 'up' : 'down'} pf-mid">${tot >= 0 ? '+' : '−'}${money(tot)}</b><span>${list.length} trades</span></div>
-      <div class="t3-tile"><small>Winning</small><b>${w}</b><span>of ${list.length}</span></div><div class="t3-tile"><small>Open</small><b>${list.filter((t) => !t.x).length}</b><span>not booked</span></div></div>
-    <ol class="st-list">${sorted.map((t, i) => { const o = OUT_TXT[t.out] || ['Open', 'off']; return `<li><button class="st-row tr-row" data-ti="${i}"><span class="st-nm"><b>${esc(t.sym)}</b><small>${t.d0 ? esc(day(t.d0)) : ''}</small></span>
+    <div class="t3-tiles"><button class="t3-tile" data-flt="all"><small>Profit / loss</small><b class="${tot >= 0 ? 'up' : 'down'} pf-mid">${tot >= 0 ? '+' : '−'}${money(tot)}</b><span>${list.length} trades</span></button>
+      <button class="t3-tile" data-flt="win"><small>Winning</small><b>${w}</b><span>of ${list.length}</span></button><button class="t3-tile" data-flt="open"><small>Open</small><b>${list.filter((t) => !t.x).length}</b><span>not booked</span></button></div>
+    <ol class="st-list">${sorted.map((t, i) => { const o = OUT_TXT[t.out] || ['Open', 'off']; return `<li data-fk="${(t.pnl || 0) > 0 ? 'win' : ''} ${!t.x ? 'open' : ''}"><button class="st-row tr-row" data-ti="${i}"><span class="st-nm"><b>${esc(t.sym)}</b><small>${t.d0 ? esc(day(t.d0)) : ''}</small></span>
       <span class="tr-mid"><span class="sp-sys ${o[1]}">${o[0]}</span><span class="pf-bt"><i class="${(t.pnl || 0) >= 0 ? 'up' : 'dn'}" style="width:${Math.max(3, Math.abs(t.pnl || 0) / mx * 100)}%"></i></span></span>
       <b class="${(t.pnl || 0) >= 0 ? 'up' : 'down'}">${(t.pnl || 0) >= 0 ? '+' : '−'}${money(t.pnl || 0)}<small>${t.pct != null ? ' ' + (t.pct >= 0 ? '+' : '') + fmt(t.pct, 1) + '%' : ''}</small></b></button></li>`; }).join('') || '<li class="empty">No trades yet.</li>'}</ol></div>`);
   history.pushState({ sheet: 1 }, '');
-  $('#sheet-body').querySelectorAll('[data-ti]').forEach((b) => b.addEventListener('click', () => tradeView(sorted[+b.dataset.ti])));
+  $('#sheet-body').querySelectorAll('[data-ti]').forEach((b) => b.addEventListener('click', () => tradeView(sorted[+b.dataset.ti]))); tileFilter($('#sheet-body'));
 }
 const dDiff = (a, b) => (a ? Math.round((new Date((b || new Date().toISOString().slice(0, 10)) + 'T00:00:00') - new Date(a + 'T00:00:00')) / 864e5) : null);
 async function pfFwdTrades(key, mk) {   // forward-test trades of one system, normalised
@@ -8896,14 +8917,14 @@ async function sysListView(s, mk, q) {
   $('#sheet-body').innerHTML = `<div class="t3">${x3Trail([{ t: 'Search', go: () => searchOpen(), done: true }, { t: s.name, on: true }])}
     <div class="t3w-h"><div><h2 style="font-family:var(--font-head);margin:0">${esc(s.name)}</h2><small class="muted">${esc(s.d)}${s.ok ? '' : ' · watch only'}</small></div></div>
     ${seg}
-    <div class="t3-rules"><div class="t3-rule"><b>${rows.length}</b><small>${s.id === 'rot' || s.id === 'etf' ? 'ETFs' : 'stocks'} on it</small></div><div class="t3-rule"><b class="up">${nBuy}</b><small>buy / breakout now</small></div></div>
+    <div class="t3-rules"><button class="t3-rule" data-flt="all"><b>${rows.length}</b><small>${s.id === 'rot' || s.id === 'etf' ? 'ETFs' : 'stocks'} on it</small></button><button class="t3-rule" data-flt="buy"><b class="up">${nBuy}</b><small>buy / breakout now · tap to show</small></button></div>
     ${rows.some((x) => x.ch) ? `<div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((k) => `<span><i style="background:${T3C[k]}"></i>${T3N[k]}</span>`).join('')}</div>` : ''}
-    <ol class="st-list">${rows.slice(0, 150).map((x, i) => `<li><button class="st-row" data-yi="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.buy ? 'up' : ''}">${esc(x.st)}</small></span>${x.ch ? t3Bars(x.ch, true) : `<span class="muted">${esc(x.name || '')}</span>`}<span class="st-y">${pulsePill(x)}${x.ch ? t3Yoy(x.y) : ''}</span></button></li>`).join('') || `<li class="empty">Nothing on ${esc(s.name)} in ${esc(MKT[mk].name)} today.</li>`}</ol>
+    <ol class="st-list">${rows.slice(0, 150).map((x, i) => `<li data-fk="${x.buy ? 'buy' : ''}"><button class="st-row" data-yi="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.buy ? 'up' : ''}">${esc(x.st)}</small></span>${x.ch ? t3Bars(x.ch, true) : `<span class="muted">${esc(x.name || '')}</span>`}<span class="st-y">${pulsePill(x)}${x.ch ? t3Yoy(x.y) : ''}</span></button></li>`).join('') || `<li class="empty">Nothing on ${esc(s.name)} in ${esc(MKT[mk].name)} today.</li>`}</ol>
     ${rows.length > 150 ? `<p class="muted">Showing the first 150 of ${rows.length}.</p>` : ''}
     <p class="t3-foot">${s.id === 'gov' ? 'Only stocks on at least one of our systems (type "govt all" to see everyone), most systems first, buy signals first, then industry Pulse. Tested 2016-26 (26,644 signals): 3+ systems won 61% (next 3 months, median +5.3%) vs 54% (+1.9%) for one - but the average return was about the same and the last year was flat for all, so read the order as a tilt. A tight base or flag together with another system helped most; 9/21 with a 52-week base breakout did worse. Govt focus and news are context - the systems decide the buy. ' : ''}From the last nightly scans. Sorted by industry Pulse: top-10% Pulse industries that are also Leading or Improving first (tested best), then the rest by Pulse. Order is for reading only; it does not change what any system buys.</p></div>`;
   const root = $('#sheet-body');
   x3TrailWire(root, [{ t: 'Search', go: () => searchOpen() }, { t: s.name }]);
-  root.querySelectorAll('[data-ymk]').forEach((b) => b.addEventListener('click', () => sysListView(s, b.dataset.ymk, q)));
+  root.querySelectorAll('[data-ymk]').forEach((b) => b.addEventListener('click', () => sysListView(s, b.dataset.ymk, q))); tileFilter(root);
   root.querySelectorAll('[data-yi]').forEach((b) => b.addEventListener('click', () => { const x = rows[+b.dataset.yi];
     if (x.fl) return patternView(x.fl, mk);
     if (x.asset) return window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(tvOf(x.asset.key)) + '&interval=' + (s.id === 'mo' ? '1M' : s.id === 'wk' ? '1W' : 'D'), '_blank', 'noopener');
@@ -8991,7 +9012,7 @@ function govChip(sym, mk) {
   if ((mk || 'NSE') !== 'NSE') return ''; const g = govOf(sym); if (!g) return '';
   return `<span class="chip gov" title="Govt focus: ${esc(g.th.map((t) => t.name).concat(g.nw.slice(0, 2).map((x) => x.title)).join(' | '))}${g.msme ? ` · MSME-sized (sales ${inr(g.cr, 0)} cr)` : ''} - a theme, not a buy signal">Govt focus${g.nw.length ? ' · news' : ''}${g.msme ? ' · MSME' : ''}</span>`;
 }
-{ const PP = pulsePill; pulsePill = (x) => PP(x) + (x && x.sym && x.gmk === 'NSE' ? govChip(x.sym, 'NSE') : ''); }
+{ const PP = pulsePill; pulsePill = (x) => PP(x) + (x && x.sym && x.gmk === 'NSE' ? govChip(x.sym, 'NSE') + oiChip(x.sym) : ''); }
 { const PC = pulseChip; pulseChip = (sym, mk) => PC(sym, mk) + ((mk || AM()) === 'NSE' ? govChip(sym, 'NSE') : ''); }
 
 /* Pulse rotation forward test (22 Nov 2026): equal weight, Friday close to Friday close, no costs - a paper mark */

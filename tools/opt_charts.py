@@ -180,6 +180,36 @@ def main():
     json.dump(charts, open(f"{OUT}/optcharts.json", "w"), separators=(",", ":"))
     print("rows", len(rows), "with signals", sum(1 for r in rows for t in ("ce", "pe") if r.get(t, {}).get("signals")), flush=True)
     pcr_file(X, last)
+    try:
+        oi_build_file(X)
+    except Exception as e:  # noqa: BLE001
+        print("oi build failed", e)
+
+
+def oi_build_file(X):
+    """22 Nov 2026 (Amritpal: "add speculation"): futures positioning per F&O stock / index - the classic OI reading. Futures OI summed
+    over the near two expiries; price = near-future close. Over the last 5 sessions (and today): OI up + price up = long build-up,
+    OI up + price down = short build-up, OI down + price up = short covering, OI down + price down = long unwinding; |OI change| < 3%
+    = no clear change. Earlier tests (quiet-turnover, sector OI, money-flow) found these readings add little on their own - context only."""
+    F = X[X.INST == "FUT"]
+    oi = F.groupby(["SYMBOL", "Date"]).OI.sum().unstack("SYMBOL").sort_index()
+    px = F.sort_values("EXPIRY").groupby(["SYMBOL", "Date"]).CLOSE.first().unstack("SYMBOL").sort_index()
+    if len(oi) < 6:
+        return
+    def lab(dp, do):
+        if abs(do) < 3:
+            return None
+        return ("long build-up" if dp > 0 else "short build-up") if do > 0 else ("short covering" if dp > 0 else "long unwinding")
+    out = {}
+    for sym in oi.columns:
+        o, p = oi[sym].dropna(), px[sym].dropna()
+        if len(o) < 6 or len(p) < 6 or o.iloc[-6] <= 0 or o.iloc[-2] <= 0:
+            continue
+        do5, dp5 = (o.iloc[-1] / o.iloc[-6] - 1) * 100, (p.iloc[-1] / p.iloc[-6] - 1) * 100
+        do1, dp1 = (o.iloc[-1] / o.iloc[-2] - 1) * 100, (p.iloc[-1] / p.iloc[-2] - 1) * 100
+        out[sym] = dict(s5=lab(dp5, do5), oi5=round(float(do5), 1), px5=round(float(dp5), 1), s1=lab(dp1, do1), oi1=round(float(do1), 1), px1=round(float(dp1), 1))
+    json.dump(dict(asof=str(oi.index[-1].date()), rule=oi_build_file.__doc__, rows=out), open(f"{OUT}/oi_build.json", "w"), separators=(",", ":"))
+    print("oi build", len(out), pd.Series([v["s5"] for v in out.values()]).value_counts().to_dict(), flush=True)
 
 
 def pcr_file(X, last):
