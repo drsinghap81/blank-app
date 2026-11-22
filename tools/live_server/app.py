@@ -1800,8 +1800,17 @@ def tb_state(inst: str = "bn", _=Depends(auth)):
     except Exception:  # noqa: BLE001
         pass
     P = _tbr("pending.json", {}, inst); A = _tbr("answers.json", {}, inst)
+    # 22 Nov 2026 (Amritpal: live performance on all systems incl. Top Bottom): the bot's own LIVE trade list (state.json; the dry-run
+    # book is state_dry.json and is not counted). Fills only - nothing here places or changes an order.
+    live_trades = []
+    try:
+        stj = json.load(open(os.path.join(d, "state.json")))
+        live_trades = [dict(entry_date=t.get("EntryDate"), side=t.get("Side"), fill=t.get("Fill"), qty=t.get("Qty"), contract=t.get("Contract"),
+                            exit_date=t.get("ExitDate"), exit_fill=t.get("ExitFill"), reason=t.get("Reason"), pnl=t.get("PnL_fill")) for t in (stj.get("trades") or [])[-60:] if t.get("Fill")]
+    except Exception:  # noqa: BLE001
+        pass
     return dict(inst=inst, installed=os.path.isdir(d), mode="LIVE" if tb_live(inst) else "DRY RUN", auto=tb_auto(inst), status=_tbr("status.json", {}, inst),
-                pending=[dict(key=k, **v) for k, v in P.items()], answers=A, messages=msgs[::-1])
+                pending=[dict(key=k, **v) for k, v in P.items()], answers=A, messages=msgs[::-1], live_trades=live_trades)
 
 
 @app.get("/api/tb/diag")

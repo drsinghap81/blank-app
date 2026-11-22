@@ -8457,3 +8457,83 @@ sysCheck = (e) => (e && e.kind && e.kind !== 'stock' ? sysCheckOld(e) : stockPag
         const m = box.querySelector(`[data-m="${CSS.escape(mk + '|' + x.sym)}"]`); if (m) m.innerHTML = `<span class="wl-bars" role="img" aria-label="${n} systems on">${[0, 1, 2, 3, 4].map((i) => `<i style="background:${i < n ? (buy ? 'var(--rise)' : 'var(--accent)') : 'var(--sel)'}"></i>`).join('')}</span><small>${a.list.length ? esc(a.list.map((z) => z.n).join(' · ')) : 'No system on'}</small>`; } } })();
   };
   const RP2 = renderPortfolio; renderPortfolio = function () { RP2(); try { const el = $('#view-pf'); if (el && !el.querySelector('.x3-wlist')) pf3Hero(); } catch (e) { console.warn('wl', e); } }; }
+
+/* ------------------------------------------------------------------ Performance (22 Nov 2026)
+   Amritpal: "if all signals were executed since the systems went into the app, what is the overall return and on what capital
+   (no capital limit, bought everything, sold on the signal); and my live performance on all systems including Top Bottom".
+   1) Every signal: the app's own setup log (each buy the app showed, followed nightly, closed on its stop or the system's exit),
+      sized the system's way (1% of capital at risk to the stop, at most 20% of capital in one stock) but with no limit on how many
+      trades. Return = profit / the most money that was in trades at one time. Top Bottom = its paper book (every signal, 2 lots).
+   2) Live: your real trades from the server (Angel fills the app sent, plus the Top Bottom bot's LIVE trades). Account data is read
+      on this device only, never written to the repo. */
+function pfCsv(t) { const L = (t || '').trim().split(/\r?\n/); const H = (L.shift() || '').split(','); return L.map((l) => { const v = l.split(','); const o = {}; H.forEach((h, i) => { o[h] = v[i]; }); return o; }); }
+async function perfEvery(mk) {
+  const L = await getJSON(MAIN + MKT[mk].path + 'setup_log.json', 'setuplog_' + mk).catch(() => null);
+  const C = cap(mk) || (mk === 'NSE' ? 2000000 : 20000);
+  const rows = ((L && L.rows) || []).filter((r) => r.st !== 'waiting' && r.st !== 'expired' && r.e)
+    .filter((r) => r.e && r.s && r.e > r.s).map((r) => { const q = Math.floor(Math.min(0.01 * C / (r.e - r.s), 0.2 * C / r.e)); const cost = q * r.e;
+      return { ...r, q, cost, pnl: cost * (r.ret || 0) / 100, open: r.st === 'open' }; }).filter((r) => r.q > 0);
+  const asof = (L && L.asof) || ''; const days = [...new Set(rows.flatMap((r) => [r.d0, r.end].filter(Boolean)).concat(asof ? [asof] : []))].sort();
+  const peak = days.reduce((m, d) => Math.max(m, rows.filter((r) => r.d0 <= d && (!r.end || r.end > d)).reduce((a, r) => a + r.cost, 0)), 0);
+  const by = {}; rows.forEach((r) => { const k = r.b || 'other'; by[k] = by[k] || { n: 0, pnl: 0, cost: 0, w: 0 }; by[k].n++; by[k].pnl += r.pnl; by[k].cost += r.cost; by[k].w += r.pnl > 0; });
+  let tb = null;
+  if (mk === 'NSE') { const t = await getText(fresh(MAIN + 'paper/ledger.csv')); const T = pfCsv(t).filter((x) => x.Net);
+    if (T.length) tb = { n: T.length, pnl: T.reduce((a, x) => a + (+x.Net || 0), 0), open: T.filter((x) => x.Open === 'True').length, w: T.filter((x) => +x.Net > 0).length, since: T[0].EntryDate, notional: 2000000 }; }
+  return { rows, peak, by, tb, since: L && L.since, asof, C };
+}
+const PF_SYS = { mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21 any', vcp: 'Tight base', rt: 'Retest', pt: 'Pattern', tb: 'Top Bottom' };
+/* how each forward-test trade ended (22 Nov 2026: "it should track target hit, SL hit, SL trailed") */
+const PF_OUT = [['target', 'Target hit', 'var(--rise)'], ['trailx', 'Trailed stop hit', 'var(--accent)'], ['exit', 'Exit signal', '#B7A6FF'], ['sl', 'SL hit', 'var(--fall)'],
+  ['trail', 'Open · stop trailed', 'var(--rise-soft)'], ['open', 'Open', 'var(--sel)']];
+function pfOut(r) { return r.st === 'target' ? 'target' : r.st === 'stop' ? (r.trail ? 'trailx' : 'sl') : ['exit', 'done'].includes(r.st) ? 'exit' : r.tr ? 'trail' : 'open'; }
+function perfOutcome(rows) {
+  const n = {}; rows.forEach((r) => { const k = pfOut(r); n[k] = (n[k] || 0) + 1; }); const tot = rows.length || 1;
+  return `<div class="pf-out" role="img" aria-label="${PF_OUT.filter(([k]) => n[k]).map(([k, t]) => `${t} ${n[k]}`).join(', ')}">${PF_OUT.filter(([k]) => n[k]).map(([k, t, c]) => `<span style="flex:${n[k]};background:${c}" title="${t}">${n[k]}</span>`).join('')}</div>
+    <div class="t3-key">${PF_OUT.map(([k, t, c]) => `<span><i style="background:${c}"></i>${t} <b>${n[k] || 0}</b></span>`).join('')}</div>`;
+}
+function perfBars(items, money) {   // [{k, pnl, sub}] -> horizontal bars around zero
+  const mx = Math.max(1, ...items.map((x) => Math.abs(x.pnl)));
+  return `<div class="pf-bars">${items.map((x) => `<div class="pf-bar"><span class="pf-bn">${esc(x.k)}<small>${esc(x.sub || '')}</small></span><span class="pf-bt"><i class="${x.pnl >= 0 ? 'up' : 'dn'}" style="width:${Math.max(2, Math.abs(x.pnl) / mx * 100)}%"></i></span><b class="${x.pnl >= 0 ? 'up' : 'down'}">${x.pnl >= 0 ? '+' : '−'}${money(Math.abs(x.pnl))}</b></div>`).join('')}</div>`;
+}
+async function perfSection(el) {
+  if (!el || el.querySelector('.pf-perf')) return;
+  const mk = state.pfMk || 'NSE'; const money = (v) => (mk === 'NSE' ? lakh(v) : `${MKT[mk].cur}${fmt(v, 0, MKT[mk].loc)}`);
+  const box = document.createElement('section'); box.className = 'pf-perf t3'; box.innerHTML = '<p class="muted">Working out performance…</p>';
+  const anchor = el.querySelector('.x3-wlist') || el.querySelector('.x3-hero'); if (anchor) anchor.after(box); else el.prepend(box);
+  const E = await perfEvery(mk).catch(() => null);
+  const stockP = E ? E.rows.reduce((a, r) => a + r.pnl, 0) : 0; const tbP = E && E.tb ? E.tb.pnl : 0; const tot = stockP + tbP;
+  const capUsed = (E ? E.peak : 0) + (E && E.tb ? E.tb.notional : 0); const pct = capUsed ? tot / capUsed * 100 : null;
+  const n = E ? E.rows.length : 0, w = E ? E.rows.filter((r) => r.pnl > 0).length : 0;
+  const items = E ? Object.entries(E.by).map(([k, v]) => ({ k: PF_SYS[k] || k, pnl: v.pnl, sub: `${v.n} trades · ${v.w} up` })) : [];
+  if (E && E.tb) items.push({ k: 'Top Bottom', pnl: E.tb.pnl, sub: `${E.tb.n} trades · paper, 2 lots` });
+  items.sort((a, b) => b.pnl - a.pnl);
+  const seg = `<div class="t3-mk">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia']].map(([k, nm]) => `<button data-pfm="${k}" aria-selected="${mk === k}">${nm}</button>`).join('')}</div>`;
+  let live = '<div class="pf-live-none"><b>Connect your server</b><small>Live › Connect: your real Angel trades and the Top Bottom bot appear here.</small></div>';
+  const c = lvCfg();
+  if (mk === 'NSE' && c.url && c.token) {
+    try {
+      const [S, TB, TN] = await Promise.all([lvApi('/api/plan').catch(() => null), lvApi('/api/tb?inst=bn').catch(() => null), lvApi('/api/tb?inst=nifty').catch(() => null)]);
+      const P = S && S.perf; const tbl = [...((TB && TB.live_trades) || []).map((t) => ({ ...t, ins: 'Bank Nifty' })), ...((TN && TN.live_trades) || []).map((t) => ({ ...t, ins: 'Nifty' }))];
+      const tbClosed = tbl.filter((t) => t.exit_fill); const tbPnl = tbClosed.reduce((a, t) => a + (t.pnl != null ? +t.pnl : (t.exit_fill - t.fill) * (t.qty || 0) * (t.side === 'SELL' ? -1 : 1)), 0);
+      const sysI = ((P && P.systems) || []).map((x) => ({ k: x.system, pnl: x.pnl, sub: `${x.n} trades${x.pct != null ? ' · ' + (x.pct >= 0 ? '+' : '') + fmt(x.pct, 1) + '%' : ''}` }));
+      if (tbl.length) sysI.push({ k: 'Top Bottom', pnl: tbPnl, sub: `${tbClosed.length} closed${tbl.length > tbClosed.length ? ' · 1 open' : ''} · live fills` });
+      const lt = (P ? P.total_pnl || 0 : 0) + tbPnl;
+      live = P || tbl.length ? `<div class="pf-big"><b class="${lt >= 0 ? 'up' : 'down'}">${lt >= 0 ? '+' : '−'}${lakh(Math.abs(lt))}</b><small>${P && P.total_pct != null ? `${P.total_pct >= 0 ? '+' : ''}${fmt(P.total_pct, 1)}% on the money put in` : ''}${P && P.since ? ' · since ' + esc(day(P.since)) : ''}</small></div>
+        <div class="t3-tiles"><div class="t3-tile"><small>Open</small><b>${P ? P.open.n : 0}</b><span>${P ? (P.open.pnl >= 0 ? '+' : '−') + lakh(Math.abs(P.open.pnl)) : ''}</span></div><div class="t3-tile"><small>Closed</small><b>${P ? P.closed.n : 0}</b><span>${P ? P.closed.wins + ' won' : ''}</span></div><div class="t3-tile"><small>Top Bottom</small><b>${tbl.length}</b><span>${TB ? esc(TB.mode) : ''}</span></div></div>
+        ${perfBars(sysI.sort((a, b) => b.pnl - a.pnl), lakh)}<small class="muted">Trades placed from the app, before costs. Top Bottom counts the bot's LIVE fills; trades you placed by hand in Angel before the bot can't be read back (Angel keeps only today's trade book).</small>`
+        : '<div class="pf-live-none"><b>No live trades yet</b><small>Trades the app sends to Angel show here.</small></div>';
+    } catch (e) { live = `<div class="pf-live-none"><b>Server didn't answer</b><small>${esc(e.message || '')}</small></div>`; }
+  } else if (mk !== 'NSE') live = '<div class="pf-live-none"><b>Journal only</b><small>US / Australia trades are placed by hand (moomoo, Trading 212); the live record is India for now.</small></div>';
+  box.innerHTML = `<div class="t3-sh"><h2>Performance</h2>${seg}</div>
+    <div class="pf-cols"><article class="pf-card"><h3>Forward test · every signal since launch</h3>
+      ${E && (n || E.tb) ? `<div class="pf-big"><b class="${tot >= 0 ? 'up' : 'down'}">${tot >= 0 ? '+' : '−'}${money(Math.abs(tot))}</b><small>${pct != null ? `${pct >= 0 ? '+' : ''}${fmt(pct, 1)}% on ${money(capUsed)}` : ''}</small></div>
+      <div class="t3-tiles"><div class="t3-tile"><small>Most money in trades</small><b class="pf-mid">${money(E.peak)}</b><span>stocks${E.tb ? ' + Top Bottom ' + money(E.tb.notional) : ''}</span></div><div class="t3-tile"><small>Trades</small><b>${n + (E.tb ? E.tb.n : 0)}</b><span>${E.rows.filter((r) => r.open).length + (E.tb ? E.tb.open : 0)} still open</span></div><div class="t3-tile"><small>Winning</small><b>${w + (E.tb ? E.tb.w : 0)}</b><span>of ${n + (E.tb ? E.tb.n : 0)}</span></div></div>
+      ${perfOutcome(E.rows)}
+      ${perfBars(items, money)}
+      <div class="x3-wl" role="img" aria-label="${w} of ${n} stock trades up">${E.rows.map((r) => `<i class="${r.pnl > 0 ? 'w' : ''}" title="${esc(r.sym)} ${fmt(r.ret, 1)}%"></i>`).join('')}</div>
+      <small class="muted">Backtest = the past (2016–26); forward test = the same rules on every signal since launch; live = what you actually traded. Since ${esc(day(E.since || ''))}${E.tb ? ` (Top Bottom since ${esc(day(E.tb.since))})` : ''} · every buy the app showed, sized ${mk === 'NSE' ? lakh(E.C) : money(E.C)} × 1% risk, max 20% each, no limit on how many · closed on its stop or system exit · open trades at the last close · before costs.</small>`
+      : '<p class="muted">The signal log starts filling after the first nights of scans.</p>'}</article>
+      <article class="pf-card"><h3>Live · your real trades</h3>${live}</article></div>`;
+  box.querySelectorAll('[data-pfm]').forEach((b) => b.addEventListener('click', () => { state.pfMk = b.dataset.pfm; box.remove(); perfSection(el); }));
+}
+{ const PH2 = pf3Hero; pf3Hero = function () { PH2(); try { perfSection($('#view-pf')); } catch (e) { console.warn('perf', e); } }; }

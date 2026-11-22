@@ -1584,3 +1584,17 @@ input,select,textarea{font-size:16px!important}
 .wl-bars { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; } .wl-bars i { height: 10px; border-radius: 99px; display: block; }
 .x3-trail button.on:disabled, .x3-trail button.on { color: var(--ink); }
 .x3-sts { grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); }
+/* performance (22 Nov 2026) */
+.pf-perf { margin-top: 16px; }
+.pf-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 14px; }
+.pf-card { background: var(--card); border-radius: 26px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.pf-card h3 { margin: 0; font-family: var(--font-head); font-size: 20px; } .pf-card .t3-tile { background: var(--soft); }
+.pf-big { display: flex; flex-direction: column; } .pf-big b { font-family: var(--font-head); font-weight: 800; font-size: clamp(40px, 7vw, 64px); line-height: 1; } .pf-big small { color: var(--slate); font-size: 15px; font-weight: 600; margin-top: 6px; }
+.pf-mid { font-size: clamp(22px, 3.4vw, 30px) !important; }
+.pf-bars { display: flex; flex-direction: column; gap: 10px; }
+.pf-bar { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) auto; align-items: center; gap: 10px; }
+.pf-bn { display: flex; flex-direction: column; font-weight: 700; font-size: 15px; min-width: 0; } .pf-bn small { color: var(--slate); font-weight: 600; font-size: 12px; }
+.pf-bt { height: 14px; border-radius: 99px; background: var(--soft); overflow: hidden; } .pf-bt i { display: block; height: 100%; border-radius: 99px; } .pf-bt i.up { background: var(--rise); } .pf-bt i.dn { background: var(--fall); }
+.pf-bar b { font-family: var(--font-head); font-size: 16px; white-space: nowrap; }
+.pf-live-none { border: 2px dashed var(--mute-line); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 4px; } .pf-live-none small { color: var(--slate); }
+.pf-out { display: flex; height: 40px; border-radius: 14px; overflow: hidden; gap: 2px; } .pf-out span { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #17142B; min-width: 0; }
