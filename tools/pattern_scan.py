@@ -324,19 +324,20 @@ def flag(x, sym, name):
     if not c[-1] > s200[-1]:
         return None
     best = None
-    for back in range(0, 4):                                   # today forming, or a breakout 1-3 sessions ago
+    for back in range(0, 4):                                   # today forming / breaking out, or a breakout 1-3 sessions ago
         end = n - 1 - back
-        for pk in range(end - FL_MIN_D, end - FL_MAX_D - 1, -1):
-            if pk < FL_POLE_D + 30:
-                break
+        # 22 Nov 2026 (Amritpal: "the pole starts from the previous swing low ~3600 till ~4300"): the pole top is the HIGHEST high of
+        # the window (not the latest candidate) and the pole starts at the swing low before it; target = breakout + that full pole
+        w0 = max(FL_POLE_D + 30, end - FL_MAX_D)
+        for pk in sorted(range(w0, end - FL_MIN_D + 1), key=lambda i: -h[i]):
             top = h[pk]
-            if h[pk + 1:end + 1 if back == 0 else end].max(initial=0) > top or c[pk + 1:end + 1].max(initial=0) > top and back == 0:
+            if h[pk + 1:end].max(initial=0) > top:            # the flag (before the breakout day) never trades above the pole top
                 continue
             lo_i = pk - FL_POLE_D + int(np.argmin(l[pk - FL_POLE_D:pk + 1])); base = l[lo_i]
             pole = top / base - 1
             if pole < FL_POLE:
                 continue
-            pz = slice(pk + 1, end + 1 if back == 0 else end)
+            pz = slice(pk + 1, end)                             # flag = after the top, up to the day before 'end' (end = today / breakout day)
             if pz.stop - pz.start < FL_MIN_D:
                 continue
             plo = l[pz].min(); depth = 1 - plo / top
@@ -356,15 +357,18 @@ def flag(x, sym, name):
             row = dict(symbol=sym, name=name, lane=lane, close=round(float(c[-1]), 2), pole_pct=round(pole * 100, 1),
                        pole_start=D[lo_i], pole_top=D[pk], top=round(float(top), 2), flag_days=pz.stop - pz.start,
                        depth_pct=round(depth * 100, 1), stop=round(float(plo), 2), s200=round(float(s200[-1]), 2))
-            if back == 0:
-                if c[-1] > line(n - 1) and c[-1] > c[-2]:
-                    continue                                    # already through the line today -> caught as a breakout tomorrow
-                row.update(status="forming", trigger=round(trig, 2), to_trigger_pct=round((trig / c[-1] - 1) * 100, 1),
+            bo = end; broke = c[bo] > line(bo) and c[bo] > c[bo - 1]
+            if back == 0 and not broke:
+                if l[end] < plo:
+                    continue
+                plo = min(plo, l[end]); trig = max(min(line(n - 1), float(max(hh.max(), h[end]))), float(c[-1]))
+                row.update(status="forming", trigger=round(trig, 2), to_trigger_pct=round((trig / c[-1] - 1) * 100, 1), stop=round(float(plo), 2),
                            target=round(trig + (top - base), 2), risk_pct=round((1 - plo / trig) * 100, 1))
             else:
-                bo = end
-                if not (c[bo] > line(bo)) or l[bo + 1:].min(initial=1e18) < plo:
+                plo = min(plo, l[bo])                           # stop under the flag including the breakout day's low
+                if not broke or l[bo + 1:].min(initial=1e18) < plo:
                     continue
+                row["stop"] = round(float(plo), 2)
                 e = float(c[bo]); row.update(status="breakout", bo_date=D[bo], entry=round(e, 2), days_since=back,
                                              target=round(e + (top - base), 2), risk_pct=round((1 - plo / e) * 100, 1), ret_pct=round((c[-1] / e - 1) * 100, 1))
             if best is None or (row["status"] == "breakout" and best["status"] != "breakout"):
