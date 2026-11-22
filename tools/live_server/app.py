@@ -532,7 +532,10 @@ def backfill_targets(J, acc):
     Skipped if the price is already at/above the target (that is a decision for you, not an automatic sell)."""
     if not (PROTECT and is_live()):
         return False
-    ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}; today = ist_now().date().isoformat(); ch = False
+    ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
+    # 22 Nov 2026 (Amritpal's Angel screen: invested 19,14,187, gain +11,708 vs the app's -939): open trades use Angel's own average
+    # buy price and quantity when the stock is in holdings, not the plan's order price (fills differ from the limit / trigger)
+    hav = {h["symbol"]: (h.get("avg"), h.get("qty")) for h in acc["holdings"] if h.get("avg")}; today = ist_now().date().isoformat(); ch = False
     for sym, e in J.items():
         if sym.startswith("_") or e.get("state") != "open" or e.get("target") or e.get("auto_tgt") or not e.get("gtt_id") or e.get("oco"):
             continue
@@ -953,6 +956,9 @@ def protect_now(_=Depends(auth)):
 
 def trades_view(J, acc):
     ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
+    # 22 Nov 2026 (Amritpal's Angel screen: invested 19,14,187, gain +11,708 vs the app's -939): open trades use Angel's own average
+    # buy price and quantity when the stock is in holdings, not the plan's order price (fills differ from the limit / trigger)
+    hav = {h["symbol"]: (h.get("avg"), h.get("qty")) for h in acc["holdings"] if h.get("avg")}
     out = []
     for sym, e in J.items():
         if sym.startswith("_"):
@@ -972,6 +978,9 @@ def trades_view(J, acc):
 def perf_view(J, acc):
     """Return on everything sent from the app: open trades at today's price plus closed trades at their exit (before costs)."""
     ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
+    # 22 Nov 2026 (Amritpal's Angel screen: invested 19,14,187, gain +11,708 vs the app's -939): open trades use Angel's own average
+    # buy price and quantity when the stock is in holdings, not the plan's order price (fills differ from the limit / trigger)
+    hav = {h["symbol"]: (h.get("avg"), h.get("qty")) for h in acc["holdings"] if h.get("avg")}
     o = dict(n=0, cost=0.0, value=0.0); c = dict(n=0, cost=0.0, pnl=0.0, wins=0); sysd = {}; first = None
     def add(sy, cost, pnl):
         d = sysd.setdefault(sy or "Other", dict(cost=0.0, pnl=0.0, n=0)); d["cost"] += cost; d["pnl"] += pnl; d["n"] += 1
@@ -979,6 +988,8 @@ def perf_view(J, acc):
         if sym.startswith("_") or e.get("state", "open") != "open" or not (e.get("qty") and e.get("entry")):
             continue
         q, en = e["qty"], e.get("adopt_px") or e["entry"]; px = ltp.get(sym) or en
+        if not e.get("adopt_px") and sym in hav:
+            en = hav[sym][0]; q = min(q, hav[sym][1] or q)
         o["n"] += 1; o["cost"] += q * en; o["value"] += q * px; add(e.get("system"), q * en, q * (px - en))
         first = min(first or e.get("since") or "9", e.get("since") or "9")
     for k, e in (J.get("_done") or {}).items():
