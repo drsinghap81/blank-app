@@ -109,6 +109,8 @@ def main(mk):
            for r in (load(D + "flags.json").get("rows") or []) if r.get("status") == "breakout" and (r.get("days_since") or 0) == 0]
     for x in (P.get("top") or []) + (P.get("swing") or []) + (P.get("more") or []) + pats + flg:
         b = x.get("bucket") or ""
+        if b == "pr":                    # 22 Nov 2026: Pulse rotation has its own weekly ledger (data/scan/pulse_rot.json), not stop/trail rows
+            continue
         if not b or x["symbol"] in open_syms or not x.get("stop"):
             continue
         stopk = x.get("kind") in STOPK
