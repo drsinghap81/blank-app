@@ -1105,7 +1105,8 @@ async function loadLive() {
     return `<details class="lv-card bkd${off ? ' lv-offbk' : ''}" data-bk="${b}" ${bkOpen(b, false)}><summary class="bk-sum"><b>${BK_NAME[b]} · ${off ? '0% · your call' : `max ${alN[b] ?? 0}%`}</b><span class="muted">${off ? `${nL} setup${nL === 1 ? '' : 's'}` : `${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), 'NSE')}`}</span></summary>
       ${off ? `<p class="lv-sub lv-offnote">Switched off in your split: ${b === 'my' ? 'your own picks sit outside the tested split' : b === 'vcp' ? 'VCP is a watch bucket (+4.9% a trade, but only +1 point a year added to your mix)' : b === 'pt' ? 'bottom patterns showed no edge in the 2017–26 test' : b === 'rt' ? 'retests lost about 1.3%/yr in the full-account test' : b === 'pr' ? 'Pulse rotation is a trial: set a small % in Systems & allocation (e.g. 5–10%) to trade it' : 'not part of the tested mix'}. Sized at the swing risk from your cash so you can decide; protective stop at the plan stop.</p>` : ''}
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">${BK_HEAD[b]}</p></details>${b === 'tf' ? lvSwingHead(srNow, S && !S.swing ? Math.max(0, S.cash - 0.15 * S.capital) : idleNow, 'NSE', S && S.swing ? S.swing.open : null) + (S && !S.swing && swRows.length ? '<p class="lv-sub"><b>View only until your server updates</b> (it updates itself at 08:00 IST on weekdays): sized here from your cash; place these in the Angel app, or Send them after the update.</p>' : '') : ''}
-      ${L || `<p class="empty">${b === 'vcp' ? 'No VCP setup near its pivot today — the scan checks every evening.' : 'No new signals for the next session.'}</p>`}</details>`; };
+      ${b === 'pr' && S && pe.length ? `<div class="lv-basket"><div><b>${pe.length} to buy · ${money(pe.reduce((a, r) => a + r.value, 0), 'NSE')}</b><div class="lv-sub">One confirmation sends them all to Angel (each still gets every check and its safety stop)</div></div><button class="lv-btn" id="lvprbk">Send all ${pe.length} as one basket</button></div>` : ''}
+      ${L || `<p class="empty">${b === 'vcp' ? 'No VCP setup near its pivot today — the scan checks every evening.' : b === 'pr' ? 'No Pulse rotation picks yet — they refresh every Friday after the close.' : 'No new signals for the next session.'}</p>`}</details>`; };
   const exits = (S ? S.exits : (P.exits || [])).map((e, i) => `<div class="lv-row"><div class="lv-rank">↘</div><div><div class="lv-sym">${esc(e.symbol)} <span class="chip exit">Sell</span>${pcrChip(e.symbol)}</div>
       <div class="lv-sub">${esc(e.system)}: ${esc(e.why)} · ${S ? `you hold ${e.qty}` : 'matched to your holdings once the server is connected'}</div></div>
       <div>${S && e.qty > 0 ? `<button class="lv-btn sell" data-x="${i}">Sell ${e.qty}</button>` : ''}</div></div>`).join('');
@@ -1293,6 +1294,9 @@ async function loadLive() {
   el.querySelectorAll('input[data-b]').forEach((c) => c.addEventListener('change', () => { const q = el.querySelector(`input[data-bq="${c.dataset.b}"]`).parentElement; q.hidden = !c.checked; bkUpd(); }));
   el.querySelectorAll('input[data-bq]').forEach((c) => c.addEventListener('input', bkUpd));
   const bk = $('#lvbkgo'); if (bk) bk.addEventListener('click', () => lvBasket(pick(), bk));
+  // 22 Nov 2026 (Amritpal: "Angel has a basket order feature"): Pulse rotation's weekly buys in one go (same /api/basket, one confirmation)
+  const prb = el.querySelector('#lvprbk'); if (prb) prb.addEventListener('click', () => lvBasket(rows.filter((r) => r.tier === 'swing' && bkOf(r) === 'pr' && !r.skip && !r.surv && r.qty > 0)
+    .map((r) => { const L = state._lvQ && state._lvQ[r.id]; const E = (L && L.limit_now) || r.price; return { r, q: r.qty, v: r.qty * E }; }), prb));
   state._lvBkUpd = bkUpd;
   if (S) { tbLoad(); tbLoad('nifty'); otrLoad(); tmcxLoad(); }
   state._lvMoreAll = false;
