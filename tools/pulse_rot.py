@@ -129,12 +129,37 @@ def main():
             r_, nr = 0.0, 0.0
         eq = (led[-1]["equity"] if led else 1.0) * (1 + r_); neq = (led[-1].get("nifty_eq", 1.0) if led else 1.0) * (1 + (nr or 0))
         led.append(dict(date=asof, holdings=picks, week_ret=round(r_ * 100, 2), equity=round(eq, 4), nifty_eq=round(neq, 4)))
+    # 23 Nov 2026 (Amritpal: "track as if we entered the basket on last Friday from now on"): paper positions entered at the deciding
+    # Friday's close, sold at the Friday close they drop out (no costs); marked every evening (the workflow now runs daily).
+    px = lambda s_, t: float(C.loc[t, s_]) if s_ in C.columns and t in C.index and np.isfinite(C.loc[t, s_]) else None  # noqa: E731
+    pos = prev.get("pos") or {}; closed = prev.get("closed") or []
+    if not pos and held_prev and prev.get("decided"):                       # first run: seed from last Friday's basket at its close
+        t0 = pd.Timestamp(prev["decided"])
+        pos = {s_: dict(d=prev["decided"], e=px(s_, t0)) for s_ in held_prev if px(s_, t0)}
+    if decided == asof and friday:
+        for s_ in sells:
+            if s_ in pos:
+                x = pos.pop(s_); xp = px(s_, d)
+                if xp and x.get("e"):
+                    closed.append(dict(s=s_, d=x["d"], e=x["e"], xd=asof, x=round(xp, 2), r=round((xp / x["e"] - 1) * 100, 2)))
+        for s_ in buys:
+            if px(s_, d):
+                pos[s_] = dict(d=asof, e=round(px(s_, d), 2))
+    t_start = pd.Timestamp(led[0]["date"]) if led else d
+    last_fri = pd.Timestamp(led[-1]["date"]) if led else d
+    wk = [px(s_, d) / px(s_, last_fri) - 1 for s_ in (led[-1]["holdings"] if led else []) if px(s_, d) and px(s_, last_fri)] if d > last_fri else []
+    eq_now = (led[-1]["equity"] if led else 1.0) * (1 + (float(np.mean(wk)) if wk else 0.0))
+    n_now = (led[-1].get("nifty_eq", 1.0) if led else 1.0) * (float(nifty.loc[d] / nifty.loc[last_fri]) if last_fri in nifty.index and d > last_fri else 1.0)
+    mark = dict(date=asof, since=str(t_start.date()), ret=round((eq_now - 1) * 100, 2), nifty=round((n_now - 1) * 100, 2),
+                week=round(float(np.mean(wk)) * 100, 2) if wk else 0.0, open=len(pos), closed=len(closed),
+                closed_ret=round(float(np.mean([c["r"] for c in closed])), 2) if closed else None)
     rows = [dict(symbol=s, industry=s2i.get(s), close=round(float(C.loc[d, s]), 2), r3m=round(float(r63.loc[d, s]) * 100, 1),
-                 rank=rk.index(s) + 1 if s in rk else None) for s in picks]
+                 rank=rk.index(s) + 1 if s in rk else None, entry=(pos.get(s) or {}).get("e"), entry_d=(pos.get(s) or {}).get("d"),
+                 since=round((float(C.loc[d, s]) / pos[s]["e"] - 1) * 100, 2) if s in pos and pos[s].get("e") else None) for s in picks]
     out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=asof, decided=decided, picks=picks, buys=buys,
                sells=sells, light=lt, red_skip=bool(lt == "RED" and friday), rows=rows, ranked=rk[:BUF], industries=[dict(name=k, pulse=round(float(PW.loc[d, k]), 1), momentum=round(float(mom.loc[d, k]), 2),
                                                                            ratio=round(float(ratio.loc[d, k]), 2)) for k in sel],
-               ledger=led[-160:], started=(led[0]["date"] if led else asof),
+               ledger=led[-160:], started=(led[0]["date"] if led else asof), pos=pos, closed=closed[-300:], mark=mark,
                rule="Each Friday close: NSE industries in the top 10% by 1-month Pulse AND rotation Leading/Improving; hold the 10 strongest trending stocks "
                     "of those industries by 3-month return (a holding stays while it ranks in the top 20 and its industry stays selected); equal weight; "
                     "buy / sell at Monday's open. If the traffic light is RED at the Friday close: no basket that week (all cash).",
@@ -142,6 +167,7 @@ def main():
                     "Same top-10 pick from any industry 18.9%; strong Pulse without rotation 27.8%. ~54x turnover a year. "
                     "With the RED-light skip (cash that week): 37.4%/yr, worst fall -23.0%, last 1/3/5 years +19.7/+40.6/+45.9%.")
     json.dump(out, open(OUT, "w"), indent=1)
+    print("mark", mark)
     print("pulse rotation", asof, "decided", decided, "industries", sel, "picks", picks, "buys", buys, "sells", sells)
 
 

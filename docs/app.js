@@ -8343,7 +8343,7 @@ async function loadStrat() {
     { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only. Tight flags (range ≤ 8%) where volume dried up, breaking out on 1.5× volume, with room of at least 0.8× the pole before the next old high on the left. Buy near the breakout close, stop under the flag low, sell on the first close below the 21-day average. Tested 2016-26: +2.8% a trade, positive in the last 2 years (buying next day above the breakout high did worse).',
       ord: 1, rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2) + ' on 1.5× volume'} · exit below 21-day avg`, { sc: x.status === 'breakout' ? 2 : 1, fl: x, pri: (x.status === 'breakout' ? 4 : 0) + (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0) })) },
     { k: 'pr', name: 'Pulse rotation', test: 'trial · 37.4%/yr', ok: 1, note: PRJ ? `Weekly: top-10% Pulse industries that are Leading/Improving → 10 strongest trending stocks, equal weight, rebalanced each Friday (buy/sell Monday open); RED light at the Friday close = no basket that week${PRJ.red_skip ? ' - RED this Friday: cash this week' : ''}. Industries now: ${(PRJ.industries || []).map((x) => x.name).join(', ') || 'none'}. Forward test since ${PRJ.started}: ${prFwd(PRJ)}.` : 'Weekly picks appear after the first Friday scan.',
-      rows: ((PRJ && PRJ.rows) || []).map((x) => row(x.symbol, `${x.industry || ''} · 3-month ${x.r3m >= 0 ? '+' : ''}${fmt(x.r3m, 0)}%${(PRJ.buys || []).includes(x.symbol) ? ' · NEW this week' : ''}`, { sc: 1 })) },
+      rows: ((PRJ && PRJ.rows) || []).map((x) => row(x.symbol, `${x.since != null ? `${x.since >= 0 ? '+' : ''}${fmt(x.since, 1)}% since ${day(x.entry_d)} (in at ${fmt(x.entry, 2)}) · ` : ''}${x.industry || ''} · 3-month ${x.r3m >= 0 ? '+' : ''}${fmt(x.r3m, 0)}%${(PRJ.buys || []).includes(x.symbol) ? ' · NEW this week' : ''}`, { sc: 1 })) },
     { k: 'vcp', name: 'Tight bases', test: 'watch', ok: 0, note: 'Watch only: tested, did not beat ATH or 9/21.', rows: (((V && (V.rows || V)) || []).slice ? ((V.rows || V) || []).slice(0, 30) : []).map((x) => row(x.symbol, 'Squeezing', { sc: 0 })) }];
   SYS.forEach((s) => s.rows.sort((a, b) => pulseSort(a, b) || b.s - a.s || Pq[b.ch[2]] - Pq[a.ch[2]] || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0)));   // quadrant strength first (Amritpal 22 Nov), then breakout / rectangle / established
   const k = state.stratK && SYS.some((s) => s.k === state.stratK) ? state.stratK : 'mom'; const S = SYS.find((s) => s.k === k);
@@ -9063,7 +9063,9 @@ function govChip(sym, mk) {
 { const PC = pulseChip; pulseChip = (sym, mk) => PC(sym, mk) + ((mk || AM()) === 'NSE' ? govChip(sym, 'NSE') : ''); }
 
 /* Pulse rotation forward test (22 Nov 2026): equal weight, Friday close to Friday close, no costs - a paper mark */
-function prFwd(P) { const L = (P && P.ledger) || []; if (L.length < 2) return 'started, first result next Friday';
+function prFwd(P) { const M = P && P.mark;
+  if (M && M.since) return `paper basket from the ${day(M.since)} close: ${M.ret >= 0 ? '+' : ''}${fmt(M.ret, 1)}% vs Nifty ${M.nifty >= 0 ? '+' : ''}${fmt(M.nifty, 1)}% (marked ${day(M.date)}; this week ${M.week >= 0 ? '+' : ''}${fmt(M.week, 1)}%${M.closed ? ` · ${M.closed} sold, avg ${M.closed_ret >= 0 ? '+' : ''}${fmt(M.closed_ret, 1)}%` : ''})`;
+  const L = (P && P.ledger) || []; if (L.length < 2) return 'started, first result next Friday';
   const a = L[L.length - 1]; const r = (a.equity - 1) * 100, n = ((a.nifty_eq || 1) - 1) * 100;
   return `${r >= 0 ? '+' : ''}${fmt(r, 1)}% vs Nifty ${n >= 0 ? '+' : ''}${fmt(n, 1)}% over ${L.length - 1} week${L.length === 2 ? '' : 's'}`; }
 

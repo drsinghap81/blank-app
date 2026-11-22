@@ -2,7 +2,7 @@ name: pulse-rot
 # Pulse rotation trial (22 Nov 2026): weekly picks every Friday after the NSE close -> data/scan/pulse_rot.json (+ trade plan)
 on:
   schedule:
-    - cron: "10 15 * * 5"    # Fri 20:40 IST
+    - cron: "10 15 * * 1-5"  # 20:40 IST every trading day: Fridays rebalance, other days mark the paper basket (23 Nov 2026)
   workflow_dispatch:
     inputs:
       force: { description: "1 = rebalance even if not a Friday close", required: false, default: "0" }
