@@ -103,6 +103,14 @@ def main():
              "ENTRY + Pulse rising + Pulse above median": entry & up & (PW >= med),
              "in Improving/Leading, Pulse rising": IL & up, "in Improving/Leading, Pulse falling": IL & ~up,
              "in Lagging/Weakening, Pulse rising": Q.isin(["G", "W"]) & up}
+    # 22 Nov 2026 (Amritpal: "if Pulse is strong and it's in Weakening or Lagging, chances of a pullback [buy] may be better")
+    top10 = PW.rank(axis=1, pct=True) >= 0.9; hi = PW >= med
+    for qn, qq in (("Leading", "L"), ("Weakening", "W"), ("Lagging", "G"), ("Improving", "I")):
+        masks[f"top-10% Pulse + {qn}"] = top10 & (Q == qq)
+        masks[f"Pulse above median + {qn}"] = hi & (Q == qq)
+    masks["top-10% Pulse (any quadrant)"] = top10
+    masks["top-10% Pulse + Weakening/Lagging (pullback)"] = top10 & Q.isin(["W", "G"])
+    masks["top-10% Pulse + Leading/Improving"] = top10 & Q.isin(["L", "I"])
     res = dict(method=__doc__, industries=W.shape[1], stocks=C.shape[1], pulse_median=round(float(med), 1), events={}, portfolios={})
     print("R| industries", W.shape[1], "stocks", C.shape[1], "weeks", int(keep.sum()), "Pulse median", round(float(med), 1), flush=True)
     for nm, M in masks.items():
@@ -127,8 +135,8 @@ def main():
             ch = 1.0 if prev is None else (len(set(held) ^ set(prev)) / max(1, len(set(held) | set(prev))))
             val *= (1 + (0 if np.isnan(r_) else r_)) * (1 - COST * ch); prev = held; eq.append((d, val))
         return pd.Series(dict(eq)).shift(1).fillna(1.0)
-    top10 = PW.rank(axis=1, pct=True) >= 0.9
-    P = {"hold Improving/Leading with Pulse rising": IL & up, "hold Leading (earlier test)": Q == "L", "hold top-10% Pulse": top10,
+    P = {"top-10% Pulse, only when Weakening/Lagging (pullback)": top10 & Q.isin(["W", "G"]), "top-10% Pulse, only when Leading/Improving": top10 & Q.isin(["L", "I"]),
+         "top-20% Pulse, only when Weakening/Lagging": (PW.rank(axis=1, pct=True) >= 0.8) & Q.isin(["W", "G"]), "hold Improving/Leading with Pulse rising": IL & up, "hold Leading (earlier test)": Q == "L", "hold top-10% Pulse": top10,
          "hold Improving/Leading with Pulse rising + above median": IL & up & (PW >= med), "all industries": pd.DataFrame(True, index=W.index, columns=W.columns)}
     for nm, sel in P.items():
         rp = report(port(sel.fillna(False)), bull); res["portfolios"][nm] = rp
