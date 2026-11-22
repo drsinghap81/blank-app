@@ -1,99 +1,220 @@
 {
-"generated": "2026-11-17T05:56+00:00",
-"asof": "2026-11-17",
+"generated": "2026-11-22T04:30+00:00",
+"asof": "2026-11-20",
 "market": "ASX",
 "regime": null,
 "rules": "zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
 "backtest": "2008-26, 1,904 signals: 120-day return +2.5% vs +4.8% for a random liquid stock the same day; target before stop 60% vs 60%. Worse than random - watch only.",
 "rows": [
 {
-"symbol": "WES",
-"name": "WESFARMERS LIMITED",
+"symbol": "ALQ",
+"name": "ALS LIMITED",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 19.299999237060547,
+"neck": 21.549999237060547,
+"to_neck_pct": 11.658031548931213,
+"stop": 19.51,
+"stop_pct": -1.1031081087224281,
+"height_pct": 9.335363967811784,
+"fall_pct": 32.11568810290508,
+"lows": [
+[
+"2026-10-23",
+19.709999084472656
+],
+[
+"2026-11-09",
+20.799999237060547
+]
+],
+"peaks": [
+[
+"2026-11-05",
+21.549999237060547
+]
+],
+"rsi_lows": [
+37.5,
+50.6
+],
+"rsi_div": 0.0,
+"rsi_now": 33.3,
+"signal_date": "2026-11-12",
+"days_since": 6,
+"target": 23.39,
+"sl": 20.69,
+"outcome": "sl",
+"outcome_date": "2026-11-17"
+},
+{
+"symbol": "AAI",
+"name": "ALCOA CORPORATION",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 52.29999923706055,
+"neck": 59.310001373291016,
+"to_neck_pct": 13.403445962697225,
+"stop": 53.37,
+"stop_pct": -2.047611142446404,
+"height_pct": 9.996297083426132,
+"fall_pct": 116.70994518211928,
+"lows": [
+[
+"2026-10-23",
+53.91999816894531
+],
+[
+"2026-11-06",
+55.939998626708984
+]
+],
+"peaks": [
+[
+"2026-11-05",
+59.310001373291016
+]
+],
+"rsi_lows": [
+29.6,
+43.2
+],
+"rsi_div": 0.0,
+"rsi_now": 35.5,
+"signal_date": "2026-11-10",
+"days_since": 8,
+"target": 64.7,
+"sl": 56.94,
+"outcome": "sl",
+"outcome_date": "2026-11-17"
+},
+{
+"symbol": "NXG",
+"name": "NEXGEN ENERGY (CANADA) LTD",
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 78.79000091552734,
-"neck": 80.29000091552734,
-"to_neck_pct": 1.903794875707887,
-"stop": 71.57,
-"stop_pct": 9.167280016786794,
-"height_pct": 11.06653741690804,
-"fall_pct": 30.322309989398644,
+"close": 10.1899995803833,
+"neck": 12.550000190734863,
+"to_neck_pct": 23.15996768925077,
+"stop": 11.02,
+"stop_pct": -8.132488390956706,
+"height_pct": 12.153714578646824,
+"fall_pct": 71.07800805265552,
 "lows": [
-[
-"2026-09-16",
-72.29000091552734
-],
-[
-"2026-10-29",
-74.0199966430664
-]
-],
-"peaks": [
 [
 "2026-10-23",
-80.29000091552734
-]
-],
-"rsi_lows": [
-18.1,
-37.4
-],
-"rsi_div": 0.0,
-"rsi_now": 49.1,
-"signal_date": "2026-11-05",
-"days_since": 8,
-"target": 88.29,
-"sl": 77.08
-},
-{
-"symbol": "360",
-"name": "LIFE360 INC.",
-"kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 21.829999923706055,
-"neck": 22.8700008392334,
-"to_neck_pct": 4.764090330563708,
-"stop": 18.41,
-"stop_pct": 15.648188538660769,
-"height_pct": 22.430409344782866,
-"fall_pct": 196.78799636501014,
-"lows": [
-[
-"2026-09-21",
-18.68000030517578
+11.40999984741211
 ],
 [
-"2026-10-15",
-18.93000030517578
-],
-[
-"2026-11-10",
-18.90999984741211
+"2026-11-04",
+11.1899995803833
 ]
 ],
 "peaks": [
 [
-"2026-10-12",
-20.520000457763672
-],
-[
-"2026-11-05",
-22.8700008392334
+"2026-10-29",
+12.550000190734863
 ]
 ],
 "rsi_lows": [
-36.1,
-40.5,
-39.7
+34.4,
+36.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 54.8,
-"signal_date": null,
-"days_since": null,
-"target": 27.06,
-"sl": 21.96
+"rsi_now": 31.6,
+"signal_date": "2026-11-10",
+"days_since": 8,
+"target": 13.91,
+"sl": 12.05,
+"outcome": "sl",
+"outcome_date": "2026-11-12"
+},
+{
+"symbol": "LYC",
+"name": "LYNAS RARE EARTHS LIMITED",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 12.4399995803833,
+"neck": 13.029999732971191,
+"to_neck_pct": 4.742766659882092,
+"stop": 10.6,
+"stop_pct": 14.767681708886304,
+"height_pct": 21.66199520598342,
+"fall_pct": 106.06909072096262,
+"lows": [
+[
+"2026-10-23",
+10.710000038146973
+],
+[
+"2026-11-03",
+11.970000267028809
+]
+],
+"peaks": [
+[
+"2026-10-29",
+13.029999732971191
+]
+],
+"rsi_lows": [
+28.3,
+46.0
+],
+"rsi_div": 0.0,
+"rsi_now": 48.1,
+"signal_date": "2026-11-09",
+"days_since": 9,
+"target": 15.35,
+"sl": 12.51,
+"outcome": "sl",
+"outcome_date": "2026-11-17"
+},
+{
+"symbol": "MIN",
+"name": "MINERAL RESOURCES LIMITED",
+"kind": "stock",
+"typ": "TW",
+"status": "breakout",
+"close": 38.689998626708984,
+"neck": 48.209999084472656,
+"to_neck_pct": 24.605843359197486,
+"stop": 42.78,
+"stop_pct": -10.578577590146509,
+"height_pct": 11.185420677699964,
+"fall_pct": 71.42527856263334,
+"lows": [
+[
+"2026-11-04",
+43.36000061035156
+],
+[
+"2026-11-06",
+46.59000015258789
+]
+],
+"peaks": [
+[
+"2026-11-05",
+48.209999084472656
+]
+],
+"rsi_lows": [
+34.5,
+48.2
+],
+"rsi_div": 0.0,
+"rsi_now": 30.7,
+"signal_date": "2026-11-09",
+"days_since": 9,
+"target": 53.06,
+"sl": 46.28,
+"outcome": "sl",
+"outcome_date": "2026-11-16"
 },
 {
 "symbol": "LNW",
@@ -101,11 +222,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 117.5199966430664,
+"close": 116.8499984741211,
 "neck": 130.0,
-"to_neck_pct": 10.61947218637016,
+"to_neck_pct": 11.253745569189078,
 "stop": 103.81,
-"stop_pct": 11.664905063309627,
+"stop_pct": 11.158406538414045,
 "height_pct": 21.75705168802413,
 "fall_pct": 70.92816871588003,
 "lows": [
@@ -129,51 +250,11 @@
 39.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 44.3,
+"rsi_now": 43.4,
 "signal_date": null,
 "days_since": null,
 "target": 153.23,
 "sl": 124.8
-},
-{
-"symbol": "NAB",
-"name": "NATIONAL AUSTRALIA BANK LIMITED",
-"kind": "stock",
-"typ": "TW",
-"status": "forming",
-"close": 37.77000045776367,
-"neck": 42.849998474121094,
-"to_neck_pct": 13.449822490836706,
-"stop": 35.28,
-"stop_pct": 6.583005114845408,
-"height_pct": 20.095286176063244,
-"fall_pct": 37.61210216973734,
-"lows": [
-[
-"2026-06-11",
-35.68000030517578
-],
-[
-"2026-10-09",
-37.68000030517578
-]
-],
-"peaks": [
-[
-"2026-08-04",
-42.849998474121094
-]
-],
-"rsi_lows": [
-31.6,
-41.2
-],
-"rsi_div": 0.0,
-"rsi_now": 38.2,
-"signal_date": null,
-"days_since": null,
-"target": 50.02,
-"sl": 41.14
 }
 ]
 }

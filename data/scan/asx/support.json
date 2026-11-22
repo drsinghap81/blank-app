@@ -1,25 +1,58 @@
 {
-"generated": "2026-11-17T05:56+00:00",
-"asof": "2026-11-17",
+"generated": "2026-11-22T04:30+00:00",
+"asof": "2026-11-20",
 "market": "ASX",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.13R (3,359) vs +0.15R for a random uptrend stock; old swing lows +0.02R vs +0.10R. Worse than random - watch only.",
 "rows": [
 {
+"symbol": "PME",
+"name": "PRO MEDICUS LIMITED",
+"status": "touched",
+"touch_date": "2026-11-18",
+"days_ago": 2,
+"level": 188.64,
+"level_kind": "old swing low",
+"level_date": "2026-11-04",
+"close": 187.75999450683594,
+"above_pct": -0.46649962132092604,
+"stop": 180.5,
+"risk_pct": 3.8639727768669085,
+"resistance": 190.17,
+"room_r": 0.33218543054316846,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": 11.621301413993157,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "JHX",
 "name": "JAMES HARDIE INDUSTRIES PLC",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 0,
+"days_ago": 3,
 "level": 39.2,
 "level_kind": "old swing low",
 "level_date": "2026-11-06",
-"close": 40.09000015258789,
-"above_pct": 2.2704065620576808,
-"stop": 37.69,
-"risk_pct": 5.993654278377414,
+"close": 39.779998779296875,
+"above_pct": 1.4795867476251834,
+"stop": 37.66,
+"risk_pct": 5.320326766928474,
 "resistance": 41.61,
-"room_r": 0.6325807505114239,
+"room_r": 0.8646661388997011,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
 "sq9_dist_pct": -19.999998442980704,
@@ -39,23 +72,23 @@
 "sq9_match": false
 },
 {
-"symbol": "MND",
-"name": "MONADELPHOUS GROUP LIMITED",
+"symbol": "NEU",
+"name": "NEUREN PHARMACEUTICALS LIMITED",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 0,
-"level": 32.37,
+"days_ago": 3,
+"level": 22.14,
 "level_kind": "breakout retest",
-"level_date": "2026-08-24",
-"close": 33.79999923706055,
-"above_pct": 4.417671771274656,
-"stop": 31.07,
-"risk_pct": 8.064244807863963,
-"resistance": 35.3,
-"room_r": 0.5503143850903339,
+"level_date": "2024-07-17",
+"close": 20.969999313354492,
+"above_pct": -5.284553335809838,
+"stop": 21.12,
+"risk_pct": -0.7102005525373212,
+"resistance": 21.27,
+"room_r": null,
 "sq9": 25,
 "sq9_cross": "5\u00b2",
-"sq9_dist_pct": 29.479995727539055,
+"sq9_dist_pct": -11.44000244140625,
 "sq9_gap_pct": 96.0,
 "sq9_below": [
 [
@@ -65,41 +98,41 @@
 ],
 "sq9_above": [
 [
-49,
-"7\u00b2"
+25,
+"5\u00b2"
 ]
 ],
 "sq9_match": false
 },
 {
-"symbol": "XYZ",
-"name": "BLOCK, INC.",
-"status": "touched",
-"touch_date": "2026-11-13",
-"days_ago": 2,
-"level": 118.15,
-"level_kind": "breakout retest",
-"level_date": "2026-07-15",
-"close": 123.36000061035156,
-"above_pct": 4.409647919751825,
-"stop": 114.39,
-"risk_pct": 7.27313652843502,
-"resistance": 127.09,
-"room_r": 0.415730829130869,
-"sq9": 121,
-"sq9_cross": "11\u00b2",
-"sq9_dist_pct": -2.355370639769494,
-"sq9_gap_pct": 39.66942148760331,
+"symbol": "SOL",
+"name": "WASHINGTON H. SOUL PATTINSON AND COMPANY LIMITED",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 45.06,
+"level_kind": "old swing low",
+"level_date": "2026-10-28",
+"close": 46.65999984741211,
+"above_pct": 3.5508176328407304,
+"stop": 44.21,
+"risk_pct": 5.253808235698065,
+"resistance": 48.33,
+"room_r": 0.6812367007914844,
+"sq9": 49,
+"sq9_cross": "7\u00b2",
+"sq9_dist_pct": -8.040813523895885,
+"sq9_gap_pct": 65.3061224489796,
 "sq9_below": [
 [
-81,
-"9\u00b2"
+25,
+"5\u00b2"
 ]
 ],
 "sq9_above": [
 [
-169,
-"13\u00b2"
+49,
+"7\u00b2"
 ]
 ],
 "sq9_match": false
