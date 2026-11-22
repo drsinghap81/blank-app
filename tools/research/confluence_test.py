@@ -114,7 +114,7 @@ def main():
         T = E[E.b == b]
         o = {"all": st(T)}
         for y in (1, 2, 3, 5):
-            o[f"last {y}y"] = st(T[T.d > end - pd.DateOffset(years=y + 0.5)])   # +6 months so 126-day returns exist
+            o[f"last {y}y"] = st(T[T.d > end - pd.DateOffset(months=12 * y + 6)])   # +6 months so 126-day returns exist
         o["bull"] = st(T[T.bull == True]); o["bear"] = st(T[T.bull == False])  # noqa: E712
         o["ex-Covid"] = st(T[~((T.d >= "2020-02-15") & (T.d <= "2020-12-31"))])
         o["years"] = {str(y): st(T[T.d.dt.year == y]) for y in sorted(T.d.dt.year.unique(), reverse=True)}
