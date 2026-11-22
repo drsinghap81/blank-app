@@ -76,8 +76,9 @@ def buckets(mk):
          dict(key="pr", name="Pulse rotation", system="Pulse rotation", status="active", pct=0,
               rules="Each Friday close: NSE industries in the top 10% by 1-month Pulse AND rotation Leading/Improving; hold the 10 strongest trending "
                     "stocks of those industries by 3-month return (kept while in the top 20 and the industry stays selected); equal weight "
-                    "(the % you set / 10 a stock); buy and sell at Monday's open. Safety stop 20% below the buy (not in the test).",
-              test="NSE 2016-26 (survivors), Monday-open fills, 0.2% a side: 34.5%/yr, worst fall -35.9%; last 1/2/3 years +20.0/+16.0/+40.0%. "
+                    "(the % you set / 10 a stock); buy and sell at Monday's open. RED traffic light at the Friday close: no basket that week (cash). "
+                    "Safety stop 20% below the buy (not in the test).",
+              test="NSE 2016-26 (survivors), Monday-open fills, 0.2% a side, RED-light skip: 37.4%/yr, worst fall -23.0%; last 1/2/3/5 years +19.7/+16.7/+40.6/+45.9% (without the skip 34.5% / -35.9%). "
                    "Trial: starts at 0% - set a small % to trade it.") if india else None,
          dict(key="s1", name="System 1", status="off", pct=0, rules="Weekly RSI system (rules kept privately).",
               test="Off on NSE: below the Nifty in every version tested; a US paper candidate."),

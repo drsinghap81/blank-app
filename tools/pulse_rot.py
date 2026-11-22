@@ -30,6 +30,18 @@ OUT = "data/scan/pulse_rot.json"
 MINVAL, MINPX, N, BUF = 1e7, 50, 10, 20
 
 
+def light():
+    """Traffic light as the app shows it (same as tools/ath_scan.light_level): 9/21 breadth sells > buys over 10 sessions AND Nifty
+    below its 30-week average = RED; one of them = AMBER."""
+    try:
+        br = json.load(open("data/scan/trend_scan.json")).get("breadth") or {}
+        wi = (json.load(open("data/scan/world.json")).get("indices") or {}).get("^NSEI") or {}
+        b = br.get("buys10") is not None and br.get("sells10", 0) > br.get("buys10", 0); i = wi.get("up") is False
+        return "RED" if b and i else "AMBER" if b or i else "GREEN"
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def main():
     G = json.load(open("data/scan/group_pulse.json"))["nse"]["rows"]
     IND = {}
@@ -91,6 +103,7 @@ def main():
         prev = {}
     asof = str(d.date()); friday = d.weekday() == 4 or os.environ.get("FORCE") == "1"
     held_prev = prev.get("picks") or []
+    lt = light()
     if friday and prev.get("decided") != asof:
         top2 = set(rk[:BUF]); keep = [s for s in held_prev if s in top2]
         for s in rk:
@@ -98,6 +111,8 @@ def main():
                 break
             if s not in keep:
                 keep.append(s)
+        if lt == "RED":       # 23 Nov 2026 (tested, claude/pulse-rotation-stock-system-test.md): RED traffic light at the Friday close -> no basket that week
+            keep = []
         picks, buys, sells, decided = keep, [s for s in keep if s not in held_prev], [s for s in held_prev if s not in keep], asof
     else:
         picks, buys, sells, decided = held_prev, prev.get("buys") or [], prev.get("sells") or [], prev.get("decided")
@@ -117,14 +132,15 @@ def main():
     rows = [dict(symbol=s, industry=s2i.get(s), close=round(float(C.loc[d, s]), 2), r3m=round(float(r63.loc[d, s]) * 100, 1),
                  rank=rk.index(s) + 1 if s in rk else None) for s in picks]
     out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=asof, decided=decided, picks=picks, buys=buys,
-               sells=sells, rows=rows, ranked=rk[:BUF], industries=[dict(name=k, pulse=round(float(PW.loc[d, k]), 1), momentum=round(float(mom.loc[d, k]), 2),
+               sells=sells, light=lt, red_skip=bool(lt == "RED" and friday), rows=rows, ranked=rk[:BUF], industries=[dict(name=k, pulse=round(float(PW.loc[d, k]), 1), momentum=round(float(mom.loc[d, k]), 2),
                                                                            ratio=round(float(ratio.loc[d, k]), 2)) for k in sel],
                ledger=led[-160:], started=(led[0]["date"] if led else asof),
                rule="Each Friday close: NSE industries in the top 10% by 1-month Pulse AND rotation Leading/Improving; hold the 10 strongest trending stocks "
                     "of those industries by 3-month return (a holding stays while it ranks in the top 20 and its industry stays selected); equal weight; "
-                    "buy / sell at Monday's open.",
+                    "buy / sell at Monday's open. If the traffic light is RED at the Friday close: no basket that week (all cash).",
                test="NSE 2016-26 (survivors), Monday-open fills, 0.2% a side: 34.5%/yr, worst fall -35.9%; last 1/2/3 years +20.0/+16.0/+40.0%. "
-                    "Same top-10 pick from any industry 18.9%; strong Pulse without rotation 27.8%. ~54x turnover a year.")
+                    "Same top-10 pick from any industry 18.9%; strong Pulse without rotation 27.8%. ~54x turnover a year. "
+                    "With the RED-light skip (cash that week): 37.4%/yr, worst fall -23.0%, last 1/3/5 years +19.7/+40.6/+45.9%.")
     json.dump(out, open(OUT, "w"), indent=1)
     print("pulse rotation", asof, "decided", decided, "industries", sel, "picks", picks, "buys", buys, "sells", sells)
 
