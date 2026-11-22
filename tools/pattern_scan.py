@@ -37,6 +37,7 @@ GLOBAL = {"US": dict(out="data/scan/us", suf="", minval=1e7, minpx=10.0, idx={"^
           "UK": dict(out="data/scan/uk", suf=".L", minval=1e8, minpx=100.0, idx={"^FTSE": "FTSE 100", "^FTMC": "FTSE 250"},
                      bt_pat="UK: not backtested yet - watch only.", bt_sup="UK: not backtested yet - watch only.")}
 THR, FALL, MINVAL, MIN_CLOSE, RECENT = 0.06, 0.20, 2e7, 100.0, 10
+FINE = 0.03   # swing size that decides 'neighbouring' lows
 INDICES = {"^NSEI": "NIFTY 50", "^NSEBANK": "NIFTY BANK", "^CNXIT": "NIFTY IT", "^CNXAUTO": "NIFTY AUTO", "^CNXPHARMA": "NIFTY PHARMA",
            "^CNXMETAL": "NIFTY METAL", "^CNXFMCG": "NIFTY FMCG", "^CNXREALTY": "NIFTY REALTY", "^CNXENERGY": "NIFTY ENERGY",
            "NIFTY_FIN_SERVICE.NS": "NIFTY FIN SERVICE", "^NSEMDCP50": "NIFTY MIDCAP 50"}
@@ -78,15 +79,21 @@ def scan(x, sym, name, kind="stock"):
     c = x.Close.to_numpy(float); lw = x.Low.to_numpy(float); hg = x.High.to_numpy(float); n = len(c); dts = x.index
     if n < 150:
         return None
-    piv = zigzag(c, THR)
+    # 22 Nov 2026 (Amritpal: "some double and triple bottoms are very far lows - it should be consecutive swing lows only, same for
+    # inverse H&S"): patterns are read on the finer swings (3% zigzag on closes), so the lows are NEIGHBOURING swing lows with one
+    # bounce between each pair (a W is two lows and one peak, not two lows months apart with other swings in the middle); the
+    # neckline must still stand >= 6% (THR) above the lowest low so tiny wiggles don't count
+    piv = zigzag(c, FINE)
     rmax = pd.Series(c).rolling(250, min_periods=120).max().shift(1).to_numpy()
     rmin = pd.Series(c).rolling(250, min_periods=120).min().to_numpy()
     best = None
-    for k in range(len(piv) - 1, max(-1, len(piv) - 4), -1):           # the latest few lows only
+    for k in range(len(piv) - 1, max(-1, len(piv) - 6), -1):           # the latest few lows only
         if piv[k][0] != "L":
             continue
         for typ, lows, peaks, neck in patterns_at(piv, k):
             first = lows[0]; i1 = first[1]
+            if neck < min(l_[2] for l_ in lows) * (1 + THR):
+                continue
             if np.isnan(rmax[i1]) or rmax[i1] < first[2] * (1 + FALL) or first[2] > rmin[i1] * 1.05:
                 continue
             last = lows[-1]; sig = None; broke = False
