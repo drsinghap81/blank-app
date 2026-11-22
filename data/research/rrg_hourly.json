@@ -5,8 +5,8 @@
    "name": "Bank",
    "daily_L": 90,
    "weekly_L": 21,
-   "hfast_L": 503,
-   "hday_L": 189,
+   "hfast_L": 505,
+   "hday_L": 190,
    "hfast_per_month": 14.8,
    "hday_per_month": 5.6,
    "lead_fast": [
@@ -43,7 +43,7 @@
     0,
     0,
     0,
-    0,
+    1,
     0,
     0
    ],
@@ -116,7 +116,7 @@
     0,
     0,
     0,
-    3,
+    0,
     0,
     0,
     0,
@@ -146,8 +146,8 @@
    ],
    "pre_signalled_fast": "36/90",
    "pre_signalled_day": "80/90",
-   "follow_fast": "410/503",
-   "follow_day": "176/189"
+   "follow_fast": "412/505",
+   "follow_day": "178/190"
   },
   "IT": {
    "name": "IT",
@@ -248,8 +248,7 @@
     1,
     3,
     2,
-    0,
-    8
+    0
    ],
    "pre_signalled_fast": "14/68",
    "pre_signalled_day": "64/68",
@@ -260,7 +259,7 @@
    "name": "Auto",
    "daily_L": 80,
    "weekly_L": 16,
-   "hfast_L": 502,
+   "hfast_L": 504,
    "hday_L": 176,
    "hfast_per_month": 14.8,
    "hday_per_month": 5.2,
@@ -364,6 +363,7 @@
     0,
     0,
     0,
+    0,
     0
    ],
    "lead_week_from_hday": [
@@ -379,20 +379,20 @@
     2,
     3,
     1,
-    3
+    4
    ],
    "pre_signalled_fast": "23/80",
-   "pre_signalled_day": "75/80",
-   "follow_fast": "402/502",
+   "pre_signalled_day": "76/80",
+   "follow_fast": "404/504",
    "follow_day": "161/176"
   },
   "Pharma": {
    "name": "Pharma",
    "daily_L": 86,
    "weekly_L": 20,
-   "hfast_L": 493,
+   "hfast_L": 495,
    "hday_L": 185,
-   "hfast_per_month": 14.5,
+   "hfast_per_month": 14.6,
    "hday_per_month": 5.4,
    "lead_fast": [
     0,
@@ -492,7 +492,7 @@
     0,
     0,
     0,
-    2,
+    0,
     0,
     0,
     0,
@@ -513,22 +513,23 @@
     0,
     2,
     0,
+    1,
     2,
     4
    ],
    "pre_signalled_fast": "24/86",
    "pre_signalled_day": "81/86",
-   "follow_fast": "414/493",
-   "follow_day": "172/185"
+   "follow_fast": "416/495",
+   "follow_day": "173/185"
   },
   "Metal": {
    "name": "Metal",
    "daily_L": 74,
    "weekly_L": 16,
-   "hfast_L": 466,
-   "hday_L": 147,
-   "hfast_per_month": 13.7,
-   "hday_per_month": 4.3,
+   "hfast_L": 468,
+   "hday_L": 150,
+   "hfast_per_month": 13.8,
+   "hday_per_month": 4.4,
    "lead_fast": [
     0,
     0,
@@ -606,7 +607,7 @@
     0,
     0,
     0,
-    3,
+    0,
     0,
     0,
     0,
@@ -632,16 +633,16 @@
    ],
    "pre_signalled_fast": "18/74",
    "pre_signalled_day": "70/74",
-   "follow_fast": "373/466",
-   "follow_day": "136/147"
+   "follow_fast": "375/468",
+   "follow_day": "139/150"
   },
   "FMCG": {
    "name": "FMCG",
    "daily_L": 70,
    "weekly_L": 17,
-   "hfast_L": 469,
+   "hfast_L": 472,
    "hday_L": 143,
-   "hfast_per_month": 13.8,
+   "hfast_per_month": 13.9,
    "hday_per_month": 4.2,
    "lead_fast": [
     0,
@@ -747,15 +748,15 @@
    ],
    "pre_signalled_fast": "22/70",
    "pre_signalled_day": "66/70",
-   "follow_fast": "345/469",
+   "follow_fast": "346/472",
    "follow_day": "134/143"
   },
   "Realty": {
    "name": "Realty",
    "daily_L": 72,
    "weekly_L": 15,
-   "hfast_L": 499,
-   "hday_L": 152,
+   "hfast_L": 500,
+   "hday_L": 153,
    "hfast_per_month": 14.7,
    "hday_per_month": 4.5,
    "lead_fast": [
@@ -853,6 +854,7 @@
     0,
     0,
     0,
+    0,
     0
    ],
    "lead_week_from_hday": [
@@ -868,17 +870,17 @@
     1
    ],
    "pre_signalled_fast": "27/72",
-   "pre_signalled_day": "66/72",
-   "follow_fast": "395/499",
-   "follow_day": "140/152"
+   "pre_signalled_day": "67/72",
+   "follow_fast": "396/500",
+   "follow_day": "141/153"
   },
   "Energy": {
    "name": "Energy",
    "daily_L": 71,
    "weekly_L": 12,
-   "hfast_L": 462,
-   "hday_L": 131,
-   "hfast_per_month": 13.6,
+   "hfast_L": 467,
+   "hday_L": 132,
+   "hfast_per_month": 13.7,
    "hday_per_month": 3.9,
    "lead_fast": [
     0,
@@ -951,7 +953,8 @@
     0,
     0,
     0,
-    2,
+    0,
+    0,
     0,
     0,
     0,
@@ -974,18 +977,18 @@
     10
    ],
    "pre_signalled_fast": "14/71",
-   "pre_signalled_day": "64/71",
-   "follow_fast": "347/462",
-   "follow_day": "115/131"
+   "pre_signalled_day": "65/71",
+   "follow_fast": "352/467",
+   "follow_day": "116/132"
   },
   "Fin services": {
    "name": "Fin services",
    "daily_L": 84,
    "weekly_L": 20,
-   "hfast_L": 493,
-   "hday_L": 163,
+   "hfast_L": 494,
+   "hday_L": 168,
    "hfast_per_month": 14.5,
-   "hday_per_month": 4.8,
+   "hday_per_month": 4.9,
    "lead_fast": [
     0,
     0,
@@ -999,6 +1002,8 @@
     0,
     0,
     1,
+    0,
+    0,
     0,
     0,
     0,
@@ -1089,6 +1094,8 @@
     0,
     0,
     0,
+    0,
+    0,
     0
    ],
    "lead_week_from_hday": [
@@ -1106,19 +1113,19 @@
     0,
     5
    ],
-   "pre_signalled_fast": "23/84",
-   "pre_signalled_day": "78/84",
-   "follow_fast": "397/493",
-   "follow_day": "150/163"
+   "pre_signalled_fast": "25/84",
+   "pre_signalled_day": "80/84",
+   "follow_fast": "399/494",
+   "follow_day": "154/168"
   },
   "PSU bank": {
    "name": "PSU bank",
    "daily_L": 76,
    "weekly_L": 19,
-   "hfast_L": 465,
-   "hday_L": 141,
+   "hfast_L": 467,
+   "hday_L": 145,
    "hfast_per_month": 13.7,
-   "hday_per_month": 4.1,
+   "hday_per_month": 4.3,
    "lead_fast": [
     0,
     0,
@@ -1203,7 +1210,7 @@
     0,
     0,
     0,
-    3,
+    0,
     0,
     0,
     0,
@@ -1236,16 +1243,16 @@
    ],
    "pre_signalled_fast": "23/76",
    "pre_signalled_day": "72/76",
-   "follow_fast": "365/465",
-   "follow_day": "126/141"
+   "follow_fast": "367/467",
+   "follow_day": "130/145"
   },
   "Infra": {
    "name": "Infra",
    "daily_L": 77,
    "weekly_L": 14,
-   "hfast_L": 492,
+   "hfast_L": 495,
    "hday_L": 154,
-   "hfast_per_month": 14.5,
+   "hfast_per_month": 14.6,
    "hday_per_month": 4.5,
    "lead_fast": [
     0,
@@ -1350,16 +1357,16 @@
    ],
    "pre_signalled_fast": "19/77",
    "pre_signalled_day": "67/77",
-   "follow_fast": "403/492",
+   "follow_fast": "406/495",
    "follow_day": "148/154"
   },
   "RELIANCE": {
    "name": "RELIANCE",
    "daily_L": 80,
    "weekly_L": 11,
-   "hfast_L": 465,
-   "hday_L": 179,
-   "hfast_per_month": 13.7,
+   "hfast_L": 469,
+   "hday_L": 181,
+   "hfast_per_month": 13.8,
    "hday_per_month": 5.3,
    "lead_fast": [
     0,
@@ -1474,16 +1481,16 @@
    ],
    "pre_signalled_fast": "28/80",
    "pre_signalled_day": "71/80",
-   "follow_fast": "344/465",
-   "follow_day": "150/179"
+   "follow_fast": "348/469",
+   "follow_day": "152/181"
   },
   "HDFCBANK": {
    "name": "HDFCBANK",
    "daily_L": 82,
    "weekly_L": 15,
-   "hfast_L": 507,
+   "hfast_L": 509,
    "hday_L": 181,
-   "hfast_per_month": 14.9,
+   "hfast_per_month": 15.0,
    "hday_per_month": 5.3,
    "lead_fast": [
     0,
@@ -1610,7 +1617,7 @@
    ],
    "pre_signalled_fast": "31/82",
    "pre_signalled_day": "75/82",
-   "follow_fast": "407/507",
+   "follow_fast": "407/509",
    "follow_day": "160/181"
   },
   "ICICIBANK": {
@@ -1622,6 +1629,7 @@
    "hfast_per_month": 15.2,
    "hday_per_month": 5.3,
    "lead_fast": [
+    0,
     0,
     0,
     0,
@@ -1723,6 +1731,7 @@
     0,
     0,
     0,
+    0,
     0
    ],
    "lead_week_from_hday": [
@@ -1736,8 +1745,8 @@
     6,
     1
    ],
-   "pre_signalled_fast": "32/83",
-   "pre_signalled_day": "68/83",
+   "pre_signalled_fast": "33/83",
+   "pre_signalled_day": "69/83",
    "follow_fast": "410/517",
    "follow_day": "168/180"
   },
@@ -1745,9 +1754,9 @@
    "name": "INFY",
    "daily_L": 72,
    "weekly_L": 18,
-   "hfast_L": 470,
-   "hday_L": 146,
-   "hfast_per_month": 13.8,
+   "hfast_L": 472,
+   "hday_L": 145,
+   "hfast_per_month": 13.9,
    "hday_per_month": 4.3,
    "lead_fast": [
     0,
@@ -1833,6 +1842,7 @@
     0,
     0,
     0,
+    0,
     0
    ],
    "lead_week_from_hday": [
@@ -1848,17 +1858,17 @@
     5
    ],
    "pre_signalled_fast": "16/72",
-   "pre_signalled_day": "66/72",
-   "follow_fast": "350/470",
-   "follow_day": "123/146"
+   "pre_signalled_day": "67/72",
+   "follow_fast": "352/472",
+   "follow_day": "124/145"
   },
   "TCS": {
    "name": "TCS",
    "daily_L": 62,
    "weekly_L": 12,
-   "hfast_L": 439,
+   "hfast_L": 443,
    "hday_L": 126,
-   "hfast_per_month": 12.9,
+   "hfast_per_month": 13.0,
    "hday_per_month": 3.7,
    "lead_fast": [
     0,
@@ -1931,6 +1941,7 @@
     0,
     0,
     0,
+    0,
     0
    ],
    "lead_week_from_hday": [
@@ -1942,21 +1953,21 @@
     3,
     4,
     1,
-    1,
+    0,
     0
    ],
    "pre_signalled_fast": "15/62",
-   "pre_signalled_day": "54/62",
-   "follow_fast": "292/439",
-   "follow_day": "109/126"
+   "pre_signalled_day": "55/62",
+   "follow_fast": "296/443",
+   "follow_day": "110/126"
   },
   "SBIN": {
    "name": "SBIN",
    "daily_L": 89,
    "weekly_L": 15,
-   "hfast_L": 521,
-   "hday_L": 174,
-   "hfast_per_month": 15.3,
+   "hfast_L": 524,
+   "hday_L": 173,
+   "hfast_per_month": 15.4,
    "hday_per_month": 5.1,
    "lead_fast": [
     0,
@@ -1977,6 +1988,7 @@
     0,
     0,
     1,
+    0,
     0,
     0,
     0,
@@ -2050,6 +2062,7 @@
     0,
     0,
     1,
+    0,
     0,
     0,
     0,
@@ -2081,18 +2094,18 @@
     3,
     3
    ],
-   "pre_signalled_fast": "28/89",
-   "pre_signalled_day": "78/89",
-   "follow_fast": "424/521",
-   "follow_day": "160/174"
+   "pre_signalled_fast": "29/89",
+   "pre_signalled_day": "79/89",
+   "follow_fast": "427/524",
+   "follow_day": "159/173"
   },
   "BHARTIARTL": {
    "name": "BHARTIARTL",
    "daily_L": 88,
    "weekly_L": 26,
-   "hfast_L": 521,
-   "hday_L": 182,
-   "hfast_per_month": 15.3,
+   "hfast_L": 524,
+   "hday_L": 183,
+   "hfast_per_month": 15.4,
    "hday_per_month": 5.4,
    "lead_fast": [
     0,
@@ -2105,6 +2118,7 @@
     0,
     0,
     1,
+    0,
     0,
     0,
     0,
@@ -2193,7 +2207,7 @@
     0,
     0,
     0,
-    4,
+    0,
     0,
     0,
     0,
@@ -2224,19 +2238,19 @@
     0,
     1
    ],
-   "pre_signalled_fast": "26/88",
+   "pre_signalled_fast": "27/88",
    "pre_signalled_day": "78/88",
-   "follow_fast": "443/521",
-   "follow_day": "172/182"
+   "follow_fast": "446/524",
+   "follow_day": "173/183"
   },
   "ITC": {
    "name": "ITC",
    "daily_L": 70,
    "weekly_L": 16,
    "hfast_L": 470,
-   "hday_L": 174,
+   "hday_L": 176,
    "hfast_per_month": 13.8,
-   "hday_per_month": 5.1,
+   "hday_per_month": 5.2,
    "lead_fast": [
     0,
     0,
@@ -2262,6 +2276,7 @@
     0
    ],
    "lead_day": [
+    0,
     0,
     0,
     0,
@@ -2335,18 +2350,18 @@
     2
    ],
    "pre_signalled_fast": "22/70",
-   "pre_signalled_day": "60/70",
+   "pre_signalled_day": "61/70",
    "follow_fast": "351/470",
-   "follow_day": "155/174"
+   "follow_day": "157/176"
   },
   "LT": {
    "name": "LT",
    "daily_L": 76,
    "weekly_L": 23,
    "hfast_L": 522,
-   "hday_L": 176,
+   "hday_L": 175,
    "hfast_per_month": 15.3,
-   "hday_per_month": 5.2,
+   "hday_per_month": 5.1,
    "lead_fast": [
     0,
     0,
@@ -2434,6 +2449,7 @@
     0,
     0,
     0,
+    0,
     0
    ],
    "lead_week_from_hday": [
@@ -2457,18 +2473,18 @@
     5
    ],
    "pre_signalled_fast": "17/76",
-   "pre_signalled_day": "68/76",
-   "follow_fast": "412/522",
-   "follow_day": "158/176"
+   "pre_signalled_day": "69/76",
+   "follow_fast": "411/522",
+   "follow_day": "157/175"
   },
   "AXISBANK": {
    "name": "AXISBANK",
    "daily_L": 84,
    "weekly_L": 16,
    "hfast_L": 524,
-   "hday_L": 198,
+   "hday_L": 200,
    "hfast_per_month": 15.4,
-   "hday_per_month": 5.8,
+   "hday_per_month": 5.9,
    "lead_fast": [
     0,
     0,
@@ -2591,15 +2607,15 @@
    "pre_signalled_fast": "33/84",
    "pre_signalled_day": "72/84",
    "follow_fast": "418/524",
-   "follow_day": "177/198"
+   "follow_day": "177/200"
   },
   "KOTAKBANK": {
    "name": "KOTAKBANK",
    "daily_L": 79,
    "weekly_L": 17,
-   "hfast_L": 559,
+   "hfast_L": 560,
    "hday_L": 206,
-   "hfast_per_month": 16.4,
+   "hfast_per_month": 16.5,
    "hday_per_month": 6.1,
    "lead_fast": [
     0,
@@ -2690,7 +2706,7 @@
     0,
     0,
     0,
-    2,
+    0,
     0,
     0,
     0,
@@ -2715,16 +2731,16 @@
    ],
    "pre_signalled_fast": "23/79",
    "pre_signalled_day": "74/79",
-   "follow_fast": "423/559",
+   "follow_fast": "424/560",
    "follow_day": "189/206"
   },
   "HINDUNILVR": {
    "name": "HINDUNILVR",
    "daily_L": 71,
    "weekly_L": 13,
-   "hfast_L": 515,
+   "hfast_L": 517,
    "hday_L": 153,
-   "hfast_per_month": 15.1,
+   "hfast_per_month": 15.2,
    "hday_per_month": 4.5,
    "lead_fast": [
     0,
@@ -2813,6 +2829,7 @@
     0,
     0,
     0,
+    0,
     0
    ],
    "lead_week_from_hday": [
@@ -2823,11 +2840,11 @@
     2,
     0,
     0,
-    2
+    3
    ],
    "pre_signalled_fast": "27/71",
-   "pre_signalled_day": "58/71",
-   "follow_fast": "366/515",
+   "pre_signalled_day": "59/71",
+   "follow_fast": "368/517",
    "follow_day": "135/153"
   },
   "MARUTI": {
@@ -2835,7 +2852,7 @@
    "daily_L": 82,
    "weekly_L": 14,
    "hfast_L": 507,
-   "hday_L": 170,
+   "hday_L": 171,
    "hfast_per_month": 14.9,
    "hday_per_month": 5.0,
    "lead_fast": [
@@ -2938,6 +2955,7 @@
     0,
     0,
     0,
+    0,
     0
    ],
    "lead_week_from_hday": [
@@ -2949,21 +2967,21 @@
     1,
     3,
     0,
-    4
+    1
    ],
    "pre_signalled_fast": "26/82",
-   "pre_signalled_day": "72/82",
+   "pre_signalled_day": "73/82",
    "follow_fast": "398/507",
-   "follow_day": "157/170"
+   "follow_day": "158/171"
   },
   "SUNPHARMA": {
    "name": "SUNPHARMA",
    "daily_L": 84,
    "weekly_L": 15,
-   "hfast_L": 539,
-   "hday_L": 205,
-   "hfast_per_month": 15.8,
-   "hday_per_month": 6.0,
+   "hfast_L": 541,
+   "hday_L": 207,
+   "hfast_per_month": 15.9,
+   "hday_per_month": 6.1,
    "lead_fast": [
     0,
     0,
@@ -3068,7 +3086,7 @@
     0,
     0,
     0,
-    5,
+    0,
     0,
     0,
     0,
@@ -3092,17 +3110,17 @@
    ],
    "pre_signalled_fast": "34/84",
    "pre_signalled_day": "77/84",
-   "follow_fast": "433/539",
-   "follow_day": "185/205"
+   "follow_fast": "435/541",
+   "follow_day": "186/207"
   },
   "TATASTEEL": {
    "name": "TATASTEEL",
    "daily_L": 79,
    "weekly_L": 16,
-   "hfast_L": 471,
-   "hday_L": 165,
-   "hfast_per_month": 13.8,
-   "hday_per_month": 4.9,
+   "hfast_L": 473,
+   "hday_L": 169,
+   "hfast_per_month": 13.9,
+   "hday_per_month": 5.0,
    "lead_fast": [
     0,
     0,
@@ -3193,7 +3211,7 @@
     0,
     0,
     0,
-    3,
+    0,
     0,
     0,
     0,
@@ -3222,16 +3240,16 @@
    ],
    "pre_signalled_fast": "27/79",
    "pre_signalled_day": "74/79",
-   "follow_fast": "360/471",
-   "follow_day": "154/165"
+   "follow_fast": "362/473",
+   "follow_day": "158/169"
   },
   "M&M": {
    "name": "M&M",
    "daily_L": 70,
    "weekly_L": 22,
-   "hfast_L": 501,
+   "hfast_L": 502,
    "hday_L": 174,
-   "hfast_per_month": 14.7,
+   "hfast_per_month": 14.8,
    "hday_per_month": 5.1,
    "lead_fast": [
     0,
@@ -3239,6 +3257,7 @@
     0,
     0,
     1,
+    0,
     0,
     0,
     0,
@@ -3279,6 +3298,7 @@
     0,
     0,
     2,
+    0,
     0,
     0,
     0,
@@ -3339,18 +3359,18 @@
     3,
     1
    ],
-   "pre_signalled_fast": "19/70",
-   "pre_signalled_day": "64/70",
-   "follow_fast": "378/501",
+   "pre_signalled_fast": "20/70",
+   "pre_signalled_day": "65/70",
+   "follow_fast": "379/502",
    "follow_day": "155/174"
   },
   "BAJFINANCE": {
    "name": "BAJFINANCE",
    "daily_L": 83,
    "weekly_L": 15,
-   "hfast_L": 514,
-   "hday_L": 174,
-   "hfast_per_month": 15.1,
+   "hfast_L": 520,
+   "hday_L": 175,
+   "hfast_per_month": 15.3,
    "hday_per_month": 5.1,
    "lead_fast": [
     0,
@@ -3400,6 +3420,7 @@
     0,
     0,
     1,
+    0,
     0,
     0,
     0,
@@ -3465,18 +3486,18 @@
     2
    ],
    "pre_signalled_fast": "19/83",
-   "pre_signalled_day": "75/83",
-   "follow_fast": "376/514",
-   "follow_day": "157/174"
+   "pre_signalled_day": "76/83",
+   "follow_fast": "382/520",
+   "follow_day": "158/175"
   },
   "TITAN": {
    "name": "TITAN",
    "daily_L": 76,
    "weekly_L": 15,
-   "hfast_L": 524,
-   "hday_L": 164,
-   "hfast_per_month": 15.4,
-   "hday_per_month": 4.8,
+   "hfast_L": 527,
+   "hday_L": 170,
+   "hfast_per_month": 15.5,
+   "hday_per_month": 5.0,
    "lead_fast": [
     0,
     0,
@@ -3593,16 +3614,16 @@
    ],
    "pre_signalled_fast": "27/76",
    "pre_signalled_day": "69/76",
-   "follow_fast": "383/524",
-   "follow_day": "149/164"
+   "follow_fast": "384/527",
+   "follow_day": "154/170"
   },
   "NTPC": {
    "name": "NTPC",
    "daily_L": 69,
    "weekly_L": 16,
-   "hfast_L": 510,
+   "hfast_L": 512,
    "hday_L": 164,
-   "hfast_per_month": 15.0,
+   "hfast_per_month": 15.1,
    "hday_per_month": 4.8,
    "lead_fast": [
     0,
@@ -3705,18 +3726,19 @@
    ],
    "pre_signalled_fast": "19/69",
    "pre_signalled_day": "62/69",
-   "follow_fast": "378/510",
-   "follow_day": "139/164"
+   "follow_fast": "378/512",
+   "follow_day": "140/164"
   },
   "ONGC": {
    "name": "ONGC",
    "daily_L": 78,
    "weekly_L": 15,
-   "hfast_L": 511,
-   "hday_L": 155,
-   "hfast_per_month": 15.0,
+   "hfast_L": 515,
+   "hday_L": 158,
+   "hfast_per_month": 15.1,
    "hday_per_month": 4.6,
    "lead_fast": [
+    0,
     0,
     0,
     0,
@@ -3808,7 +3830,7 @@
     0,
     0,
     0,
-    6,
+    0,
     0,
     0,
     0,
@@ -3832,27 +3854,27 @@
     0,
     2
    ],
-   "pre_signalled_fast": "30/78",
+   "pre_signalled_fast": "31/78",
    "pre_signalled_day": "70/78",
-   "follow_fast": "385/511",
-   "follow_day": "137/155"
+   "follow_fast": "389/515",
+   "follow_day": "140/158"
   }
  },
  "summary": {
   "daily_leading_entries": 2405,
-  "pre_signalled_by_hourly_fast": "742 (31%)",
-  "pre_signalled_by_hourly_day": "2168 (90%)",
+  "pre_signalled_by_hourly_fast": "749 (31%)",
+  "pre_signalled_by_hourly_day": "2183 (91%)",
   "lead_days_hourly_day_vs_daily": {
    "median": 0.0,
-   "mean": 0.1,
+   "mean": 0.0,
    "dist": {
-    "0": 2076,
+    "0": 2101,
     "1": 72,
-    "2": 7,
-    "3": 5,
-    "4": 2,
-    "5": 5,
-    "6": 1,
+    "2": 4,
+    "3": 1,
+    "4": 1,
+    "5": 4,
+    "6": 0,
     "7": 0,
     "8": 0,
     "9": 0,
@@ -3864,149 +3886,157 @@
     "15": 0
    }
   },
+  "lead_hours_fast": {
+   "median": 2.2,
+   "p75": 4.2
+  },
+  "lead_hours_day": {
+   "median": 5.2,
+   "p75": 6.2
+  },
   "lead_days_hourly_day_vs_weekly": {
    "median": 2.0,
    "n": 337
   },
-  "follow_through_hourly_fast_to_daily_leading": "11908/15392 = 77%",
-  "follow_through_hourly_day_to_daily_leading": "4642/5139 = 90%",
-  "follow_through_hourly_fast_I": "7149/12212 = 59%",
-  "follow_through_hourly_day_I": "3832/4781 = 80%",
+  "follow_through_hourly_fast_to_daily_leading": "11964/15456 = 77%",
+  "follow_through_hourly_day_to_daily_leading": "4679/5175 = 90%",
+  "follow_through_hourly_fast_I": "7172/12258 = 59%",
+  "follow_through_hourly_day_I": "3867/4815 = 80%",
   "forward_relative_return": {
    "base": {
     "5d": {
      "n": 21447,
-     "avg": 0.07,
-     "beat": 50
+     "avg": 0.03,
+     "beat": 49
     },
     "10d": {
      "n": 21292,
-     "avg": 0.14,
-     "beat": 50
+     "avg": 0.06,
+     "beat": 49
     },
     "20d": {
      "n": 20982,
-     "avg": 0.27,
-     "beat": 51
+     "avg": 0.11,
+     "beat": 50
     }
    },
    "daily_L": {
     "5d": {
      "n": 2392,
-     "avg": 0.16,
+     "avg": 0.13,
      "beat": 49
     },
     "10d": {
      "n": 2380,
-     "avg": 0.18,
-     "beat": 50
+     "avg": 0.12,
+     "beat": 49
     },
     "20d": {
      "n": 2341,
-     "avg": 0.4,
+     "avg": 0.1,
      "beat": 52
     }
    },
    "weekly_L": {
     "5d": {
      "n": 512,
-     "avg": 0.02,
-     "beat": 50
+     "avg": -0.02,
+     "beat": 49
     },
     "10d": {
      "n": 500,
-     "avg": 0.09,
+     "avg": -0.11,
      "beat": 48
     },
     "20d": {
      "n": 495,
-     "avg": -0.13,
-     "beat": 49
+     "avg": -0.35,
+     "beat": 48
     }
    },
    "hfast_L": {
     "5d": {
-     "n": 15299,
-     "avg": -2.97,
-     "beat": 33
+     "n": 15363,
+     "avg": 0.01,
+     "beat": 49
     },
     "10d": {
-     "n": 15199,
-     "avg": -2.95,
-     "beat": 36
+     "n": 15263,
+     "avg": 0.02,
+     "beat": 49
     },
     "20d": {
-     "n": 14992,
-     "avg": -2.85,
-     "beat": 40
+     "n": 15056,
+     "avg": 0.11,
+     "beat": 50
     }
    },
    "hday_L": {
     "5d": {
-     "n": 5114,
-     "avg": -2.64,
-     "beat": 33
+     "n": 5150,
+     "avg": 0.06,
+     "beat": 49
     },
     "10d": {
-     "n": 5084,
-     "avg": -2.62,
-     "beat": 36
+     "n": 5120,
+     "avg": 0.07,
+     "beat": 49
     },
     "20d": {
-     "n": 5011,
-     "avg": -2.39,
-     "beat": 42
+     "n": 5047,
+     "avg": 0.19,
+     "beat": 52
     }
    },
    "daily_I": {
     "5d": {
      "n": 1819,
-     "avg": 0.17,
-     "beat": 51
+     "avg": 0.13,
+     "beat": 50
     },
     "10d": {
      "n": 1796,
-     "avg": 0.29,
+     "avg": 0.23,
      "beat": 50
     },
     "20d": {
      "n": 1764,
-     "avg": 0.41,
-     "beat": 50
+     "avg": 0.31,
+     "beat": 49
     }
    },
    "hfast_I": {
     "5d": {
-     "n": 12122,
-     "avg": -2.92,
-     "beat": 33
+     "n": 12167,
+     "avg": 0.04,
+     "beat": 49
     },
     "10d": {
-     "n": 12041,
-     "avg": -2.89,
-     "beat": 36
+     "n": 12087,
+     "avg": 0.04,
+     "beat": 49
     },
     "20d": {
-     "n": 11863,
-     "avg": -2.8,
-     "beat": 39
+     "n": 11909,
+     "avg": 0.1,
+     "beat": 50
     }
    },
    "hday_I": {
     "5d": {
-     "n": 4756,
-     "avg": -2.98,
-     "beat": 33
+     "n": 4790,
+     "avg": 0.13,
+     "beat": 50
     },
     "10d": {
-     "n": 4715,
-     "avg": -2.97,
-     "beat": 36
+     "n": 4749,
+     "avg": 0.13,
+     "beat": 49
     },
     "20d": {
-     "n": 4642,
-     "avg": -2.87,
-     "beat": 39
+     "n": 4676,
+     "avg": 0.2,
+     "beat": 49
     }
    }
   }
