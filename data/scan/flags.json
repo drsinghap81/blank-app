@@ -1,0 +1,3297 @@
+{
+"generated": "2026-11-22T03:40+00:00",
+"asof": "2026-11-20",
+"market": "NSE",
+"rules": "Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, no close above the pole top, close above the 200-day average. Early = the pole started within 4% of the 200-day average (fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low; target = trigger + pole.",
+"backtest": "Tested 14 Nov 2026 (769 NSE stocks 2015-26): bull flags in uptrends +3.3% vs the market over 60 days; as a full system 22.2%/yr but -40.9% worst fall (ATH breakout 19.8%, -37%), and it flips sign in several years. Early vs established lanes not tested yet - watch only.",
+"rows": [
+{
+"symbol": "ANTHEM",
+"name": "Anthem Biosciences Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 951.05,
+"pole_pct": 26.3,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-09",
+"top": 989.1,
+"flag_days": 7,
+"depth_pct": 8.2,
+"stop": 907.55,
+"s200": 787.91,
+"base": 783.35,
+"geo": {
+"pole": [
+"2026-10-23",
+783.35,
+"2026-11-09",
+989.1
+],
+"up": [
+"2026-11-11",
+970.24,
+"2026-11-20",
+920.01
+],
+"lo": [
+"2026-11-11",
+944.09,
+"2026-11-20",
+901.11
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 951.05,
+"days_since": 0,
+"target": 1156.8,
+"risk_pct": 4.6,
+"ret_pct": 0.0
+},
+{
+"symbol": "BEML",
+"name": "BEML Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 2052.4,
+"pole_pct": 18.7,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-12",
+"top": 2143.7,
+"flag_days": 5,
+"depth_pct": 6.5,
+"stop": 1998.7,
+"s200": 1823.06,
+"base": 1806.0,
+"geo": {
+"pole": [
+"2026-10-23",
+1806.0,
+"2026-11-12",
+2143.7
+],
+"up": [
+"2026-11-13",
+2134.02,
+"2026-11-20",
+2021.27
+],
+"lo": [
+"2026-11-13",
+2077.92,
+"2026-11-20",
+1981.97
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 2052.4,
+"days_since": 0,
+"target": 2390.1,
+"risk_pct": 2.6,
+"ret_pct": 0.0
+},
+{
+"symbol": "BHARTIARTL",
+"name": "Bharti Airtel Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 2161.7,
+"pole_pct": 16.7,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 2172.3,
+"flag_days": 3,
+"depth_pct": 2.3,
+"stop": 2122.5,
+"s200": 1895.52,
+"base": 1860.7,
+"geo": {
+"pole": [
+"2026-10-23",
+1860.7,
+"2026-11-16",
+2172.3
+],
+"up": [
+"2026-11-17",
+2163.68,
+"2026-11-20",
+2153.33
+],
+"lo": [
+"2026-11-17",
+2131.48,
+"2026-11-20",
+2130.43
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 2161.7,
+"days_since": 0,
+"target": 2473.3,
+"risk_pct": 1.8,
+"ret_pct": 0.0
+},
+{
+"symbol": "CUB",
+"name": "City Union Bank Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 248.8,
+"pole_pct": 15.8,
+"pole_start": "2026-11-02",
+"pole_top": "2026-11-12",
+"top": 239.0,
+"flag_days": 5,
+"depth_pct": 4.2,
+"stop": 228.85,
+"s200": 210.21,
+"base": 206.41,
+"geo": {
+"pole": [
+"2026-11-02",
+206.41,
+"2026-11-12",
+239.0
+],
+"up": [
+"2026-11-13",
+236.94,
+"2026-11-20",
+234.43
+],
+"lo": [
+"2026-11-13",
+231.41,
+"2026-11-20",
+228.23
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 248.8,
+"days_since": 0,
+"target": 281.39,
+"risk_pct": 8.0,
+"ret_pct": 0.0
+},
+{
+"symbol": "DATAPATTNS",
+"name": "Data Patterns (India) Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 4215.0,
+"pole_pct": 19.1,
+"pole_start": "2026-11-09",
+"pole_top": "2026-11-13",
+"top": 4324.4,
+"flag_days": 4,
+"depth_pct": 5.5,
+"stop": 4040.0,
+"s200": 3976.57,
+"base": 3630.5,
+"geo": {
+"pole": [
+"2026-11-09",
+3630.5,
+"2026-11-13",
+4324.4
+],
+"up": [
+"2026-11-16",
+4308.97,
+"2026-11-20",
+4164.85
+],
+"lo": [
+"2026-11-16",
+4185.02,
+"2026-11-20",
+4049.5
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 4215.0,
+"days_since": 0,
+"target": 4908.9,
+"risk_pct": 4.2,
+"ret_pct": 0.0
+},
+{
+"symbol": "JLHL",
+"name": "Jupiter Life Line Hospitals Limited",
+"lane": "early",
+"shape": "Rectangle",
+"close": 317.4,
+"pole_pct": 26.8,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-11",
+"top": 296.0,
+"flag_days": 6,
+"depth_pct": 5.7,
+"stop": 279.0,
+"s200": 271.81,
+"base": 233.4,
+"geo": {
+"pole": [
+"2026-10-23",
+233.4,
+"2026-11-11",
+296.0
+],
+"up": [
+"2026-11-12",
+294.75,
+"2026-11-20",
+294.75
+],
+"lo": [
+"2026-11-12",
+279.0,
+"2026-11-20",
+279.0
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 317.4,
+"days_since": 0,
+"target": 380.0,
+"risk_pct": 12.1,
+"ret_pct": 0.0
+},
+{
+"symbol": "JSWSTEEL",
+"name": "JSW Steel Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 1337.0,
+"pole_pct": 18.3,
+"pole_start": "2026-10-14",
+"pole_top": "2026-11-05",
+"top": 1370.0,
+"flag_days": 9,
+"depth_pct": 4.9,
+"stop": 1284.1,
+"s200": 1255.75,
+"base": 1158.0,
+"geo": {
+"pole": [
+"2026-10-14",
+1158.0,
+"2026-11-05",
+1370.0
+],
+"up": [
+"2026-11-06",
+1368.3,
+"2026-11-20",
+1329.24
+],
+"lo": [
+"2026-11-06",
+1340.6,
+"2026-11-20",
+1305.7
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 1337.0,
+"days_since": 0,
+"target": 1549.0,
+"risk_pct": 4.0,
+"ret_pct": 0.0
+},
+{
+"symbol": "KRBL",
+"name": "KRBL Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 431.0,
+"pole_pct": 30.8,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-13",
+"top": 442.95,
+"flag_days": 4,
+"depth_pct": 8.6,
+"stop": 405.0,
+"s200": 366.89,
+"base": 338.75,
+"geo": {
+"pole": [
+"2026-10-23",
+338.75,
+"2026-11-13",
+442.95
+],
+"up": [
+"2026-11-16",
+429.5,
+"2026-11-20",
+418.9
+],
+"lo": [
+"2026-11-16",
+414.11,
+"2026-11-20",
+402.05
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 431.0,
+"days_since": 0,
+"target": 535.2,
+"risk_pct": 6.0,
+"ret_pct": 0.0
+},
+{
+"symbol": "LODHA",
+"name": "Lodha Developers Limited",
+"lane": "early",
+"shape": "Pennant",
+"close": 1218.7,
+"pole_pct": 32.6,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-13",
+"top": 1242.6,
+"flag_days": 4,
+"depth_pct": 5.4,
+"stop": 1174.5,
+"s200": 1030.7,
+"base": 937.1,
+"geo": {
+"pole": [
+"2026-10-26",
+937.1,
+"2026-11-13",
+1242.6
+],
+"up": [
+"2026-11-16",
+1230.56,
+"2026-11-20",
+1209.8
+],
+"lo": [
+"2026-11-16",
+1175.75,
+"2026-11-20",
+1192.15
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 1218.7,
+"days_since": 0,
+"target": 1524.2,
+"risk_pct": 3.6,
+"ret_pct": 0.0
+},
+{
+"symbol": "MANKIND",
+"name": "Mankind Pharma Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 2665.0,
+"pole_pct": 23.2,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-09",
+"top": 2705.0,
+"flag_days": 7,
+"depth_pct": 4.5,
+"stop": 2584.0,
+"s200": 2343.32,
+"base": 2196.1,
+"geo": {
+"pole": [
+"2026-10-23",
+2196.1,
+"2026-11-09",
+2705.0
+],
+"up": [
+"2026-11-11",
+2692.49,
+"2026-11-20",
+2628.94
+],
+"lo": [
+"2026-11-11",
+2636.84,
+"2026-11-20",
+2585.24
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 2665.0,
+"days_since": 0,
+"target": 3173.9,
+"risk_pct": 3.0,
+"ret_pct": 0.0
+},
+{
+"symbol": "NELCAST",
+"name": "Nelcast Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 146.3,
+"pole_pct": 36.2,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-11",
+"top": 157.15,
+"flag_days": 6,
+"depth_pct": 10.2,
+"stop": 137.96,
+"s200": 128.4,
+"base": 115.39,
+"geo": {
+"pole": [
+"2026-10-23",
+115.39,
+"2026-11-11",
+157.15
+],
+"up": [
+"2026-11-12",
+157.64,
+"2026-11-20",
+144.35
+],
+"lo": [
+"2026-11-12",
+151.1,
+"2026-11-20",
+139.9
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 146.3,
+"days_since": 0,
+"target": 188.06,
+"risk_pct": 5.7,
+"ret_pct": 0.0
+},
+{
+"symbol": "PHOENIXLTD",
+"name": "The Phoenix Mills Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 2285.3,
+"pole_pct": 24.8,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-13",
+"top": 2300.0,
+"flag_days": 4,
+"depth_pct": 5.0,
+"stop": 2185.0,
+"s200": 1850.36,
+"base": 1842.6,
+"geo": {
+"pole": [
+"2026-10-26",
+1842.6,
+"2026-11-13",
+2300.0
+],
+"up": [
+"2026-11-16",
+2266.47,
+"2026-11-20",
+2249.75
+],
+"lo": [
+"2026-11-16",
+2191.05,
+"2026-11-20",
+2192.25
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 2285.3,
+"days_since": 0,
+"target": 2742.7,
+"risk_pct": 4.4,
+"ret_pct": 0.0
+},
+{
+"symbol": "SATIN",
+"name": "Satin Creditcare Network Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 256.16,
+"pole_pct": 29.1,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-13",
+"top": 273.49,
+"flag_days": 4,
+"depth_pct": 7.8,
+"stop": 251.06,
+"s200": 209.85,
+"base": 211.89,
+"geo": {
+"pole": [
+"2026-10-23",
+211.89,
+"2026-11-13",
+273.49
+],
+"up": [
+"2026-11-16",
+264.56,
+"2026-11-20",
+254.46
+],
+"lo": [
+"2026-11-16",
+257.31,
+"2026-11-20",
+250.97
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 256.16,
+"days_since": 0,
+"target": 317.76,
+"risk_pct": 2.0,
+"ret_pct": 0.0
+},
+{
+"symbol": "SMARTWORKS",
+"name": "Smartworks Coworking Spaces Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 520.3,
+"pole_pct": 20.7,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-12",
+"top": 524.0,
+"flag_days": 5,
+"depth_pct": 4.5,
+"stop": 500.55,
+"s200": 465.01,
+"base": 434.0,
+"geo": {
+"pole": [
+"2026-10-23",
+434.0,
+"2026-11-12",
+524.0
+],
+"up": [
+"2026-11-13",
+521.09,
+"2026-11-20",
+517.17
+],
+"lo": [
+"2026-11-13",
+506.07,
+"2026-11-20",
+501.15
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 520.3,
+"days_since": 0,
+"target": 610.3,
+"risk_pct": 3.8,
+"ret_pct": 0.0
+},
+{
+"symbol": "SUDARSCHEM",
+"name": "Sudarshan Chemical Industries Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 1160.4,
+"pole_pct": 20.5,
+"pole_start": "2026-10-30",
+"pole_top": "2026-11-13",
+"top": 1191.0,
+"flag_days": 4,
+"depth_pct": 5.5,
+"stop": 1126.05,
+"s200": 998.95,
+"base": 988.5,
+"geo": {
+"pole": [
+"2026-10-30",
+988.5,
+"2026-11-13",
+1191.0
+],
+"up": [
+"2026-11-16",
+1166.9,
+"2026-11-20",
+1157.48
+],
+"lo": [
+"2026-11-16",
+1135.1,
+"2026-11-20",
+1133.5
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 1160.4,
+"days_since": 0,
+"target": 1362.9,
+"risk_pct": 3.0,
+"ret_pct": 0.0
+},
+{
+"symbol": "TIIL",
+"name": "Technocraft Industries (India) Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 2834.2,
+"pole_pct": 28.4,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 3047.7,
+"flag_days": 3,
+"depth_pct": 9.1,
+"stop": 2749.9,
+"s200": 2599.15,
+"base": 2373.6,
+"geo": {
+"pole": [
+"2026-10-23",
+2373.6,
+"2026-11-16",
+3047.7
+],
+"up": [
+"2026-11-17",
+3005.6,
+"2026-11-20",
+2743.4
+],
+"lo": [
+"2026-11-17",
+2819.75,
+"2026-11-20",
+2744.0
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 2834.2,
+"days_since": 0,
+"target": 3508.3,
+"risk_pct": 3.0,
+"ret_pct": 0.0
+},
+{
+"symbol": "ADANIPOWER",
+"name": "Adani Power Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 211.95,
+"pole_pct": 19.5,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-11",
+"top": 209.49,
+"flag_days": 5,
+"depth_pct": 2.8,
+"stop": 203.55,
+"s200": 196.17,
+"base": 175.31,
+"geo": {
+"pole": [
+"2026-10-23",
+175.31,
+"2026-11-11",
+209.49
+],
+"up": [
+"2026-11-12",
+208.35,
+"2026-11-19",
+208.56
+],
+"lo": [
+"2026-11-12",
+205.09,
+"2026-11-19",
+203.25
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-19",
+"entry": 210.5,
+"days_since": 1,
+"target": 244.68,
+"risk_pct": 3.3,
+"ret_pct": 0.7
+},
+{
+"symbol": "DCI",
+"name": "Dc Infotech And Communication Limited",
+"lane": "early",
+"shape": "Rectangle",
+"close": 382.45,
+"pole_pct": 18.3,
+"pole_start": "2026-10-23",
+"pole_top": "2026-10-26",
+"top": 347.0,
+"flag_days": 16,
+"depth_pct": 7.8,
+"stop": 320.1,
+"s200": 300.81,
+"base": 293.2,
+"geo": {
+"pole": [
+"2026-10-23",
+293.2,
+"2026-10-26",
+347.0
+],
+"up": [
+"2026-10-27",
+343.7,
+"2026-11-19",
+343.7
+],
+"lo": [
+"2026-10-27",
+320.1,
+"2026-11-19",
+320.1
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-19",
+"entry": 365.4,
+"days_since": 1,
+"target": 419.2,
+"risk_pct": 12.4,
+"ret_pct": 4.7
+},
+{
+"symbol": "LTFOODS",
+"name": "LT Foods Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 432.4,
+"pole_pct": 20.9,
+"pole_start": "2026-10-28",
+"pole_top": "2026-11-12",
+"top": 438.8,
+"flag_days": 4,
+"depth_pct": 5.5,
+"stop": 414.75,
+"s200": 405.31,
+"base": 362.95,
+"geo": {
+"pole": [
+"2026-10-28",
+362.95,
+"2026-11-12",
+438.8
+],
+"up": [
+"2026-11-13",
+435.76,
+"2026-11-19",
+414.53
+],
+"lo": [
+"2026-11-13",
+421.65,
+"2026-11-19",
+412.82
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-19",
+"entry": 438.75,
+"days_since": 1,
+"target": 514.6,
+"risk_pct": 5.5,
+"ret_pct": -1.4
+},
+{
+"symbol": "ABCAPITAL",
+"name": "Aditya Birla Capital Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 423.0,
+"pole_pct": 25.6,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-12",
+"top": 420.0,
+"flag_days": 3,
+"depth_pct": 4.2,
+"stop": 402.5,
+"s200": 369.5,
+"base": 334.45,
+"geo": {
+"pole": [
+"2026-10-26",
+334.45,
+"2026-11-12",
+420.0
+],
+"up": [
+"2026-11-13",
+414.41,
+"2026-11-18",
+412.08
+],
+"lo": [
+"2026-11-13",
+405.69,
+"2026-11-18",
+404.27
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-18",
+"entry": 412.4,
+"days_since": 2,
+"target": 497.95,
+"risk_pct": 2.4,
+"ret_pct": 2.6
+},
+{
+"symbol": "GAIL",
+"name": "GAIL (India) Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 191.44,
+"pole_pct": 18.2,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-11",
+"top": 189.9,
+"flag_days": 4,
+"depth_pct": 2.3,
+"stop": 185.52,
+"s200": 167.56,
+"base": 160.7,
+"geo": {
+"pole": [
+"2026-10-23",
+160.7,
+"2026-11-11",
+189.9
+],
+"up": [
+"2026-11-12",
+189.24,
+"2026-11-18",
+187.82
+],
+"lo": [
+"2026-11-12",
+186.3,
+"2026-11-18",
+185.91
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-18",
+"entry": 190.0,
+"days_since": 2,
+"target": 219.2,
+"risk_pct": 2.4,
+"ret_pct": 0.8
+},
+{
+"symbol": "IKIO",
+"name": "IKIO Technologies Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 192.65,
+"pole_pct": 31.2,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-06",
+"top": 208.68,
+"flag_days": 6,
+"depth_pct": 10.3,
+"stop": 187.17,
+"s200": 171.34,
+"base": 159.11,
+"geo": {
+"pole": [
+"2026-10-23",
+159.11,
+"2026-11-06",
+208.68
+],
+"up": [
+"2026-11-09",
+201.51,
+"2026-11-18",
+200.74
+],
+"lo": [
+"2026-11-09",
+196.41,
+"2026-11-18",
+186.15
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-18",
+"entry": 203.56,
+"days_since": 2,
+"target": 253.13,
+"risk_pct": 8.1,
+"ret_pct": -5.4
+},
+{
+"symbol": "LMW",
+"name": "LMW Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 17499.0,
+"pole_pct": 17.7,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-12",
+"top": 18025.0,
+"flag_days": 3,
+"depth_pct": 5.1,
+"stop": 17111.0,
+"s200": 15961.25,
+"base": 15317.0,
+"geo": {
+"pole": [
+"2026-10-23",
+15317.0,
+"2026-11-12",
+18025.0
+],
+"up": [
+"2026-11-13",
+17608.5,
+"2026-11-18",
+17247.0
+],
+"lo": [
+"2026-11-13",
+17259.83,
+"2026-11-18",
+17006.33
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-18",
+"entry": 17705.0,
+"days_since": 2,
+"target": 20413.0,
+"risk_pct": 3.4,
+"ret_pct": -1.2
+},
+{
+"symbol": "FAZE3Q",
+"name": "Faze Three Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 587.65,
+"pole_pct": 47.6,
+"pole_start": "2026-10-14",
+"pole_top": "2026-11-05",
+"top": 585.0,
+"flag_days": 6,
+"depth_pct": 9.0,
+"stop": 532.6,
+"s200": 495.02,
+"base": 396.25,
+"geo": {
+"pole": [
+"2026-10-14",
+396.25,
+"2026-11-05",
+585.0
+],
+"up": [
+"2026-11-06",
+563.09,
+"2026-11-17",
+566.04
+],
+"lo": [
+"2026-11-06",
+533.31,
+"2026-11-17",
+544.49
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-17",
+"entry": 572.1,
+"days_since": 3,
+"target": 760.85,
+"risk_pct": 6.9,
+"ret_pct": 2.7
+},
+{
+"symbol": "ICICIBANK",
+"name": "ICICI Bank Limited",
+"lane": "early",
+"shape": "Rectangle",
+"close": 1640.0,
+"pole_pct": 18.7,
+"pole_start": "2026-10-28",
+"pole_top": "2026-11-11",
+"top": 1616.0,
+"flag_days": 3,
+"depth_pct": 3.1,
+"stop": 1566.1,
+"s200": 1365.95,
+"base": 1361.4,
+"geo": {
+"pole": [
+"2026-10-28",
+1361.4,
+"2026-11-11",
+1616.0
+],
+"up": [
+"2026-11-12",
+1596.6,
+"2026-11-17",
+1596.6
+],
+"lo": [
+"2026-11-12",
+1566.1,
+"2026-11-17",
+1566.1
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-17",
+"entry": 1598.7,
+"days_since": 3,
+"target": 1853.3,
+"risk_pct": 2.0,
+"ret_pct": 2.6
+},
+{
+"symbol": "MARICO",
+"name": "Marico Limited",
+"lane": "early",
+"shape": "Rectangle",
+"close": 917.0,
+"pole_pct": 22.2,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-11",
+"top": 925.0,
+"flag_days": 3,
+"depth_pct": 3.2,
+"stop": 895.25,
+"s200": 811.47,
+"base": 756.85,
+"geo": {
+"pole": [
+"2026-10-23",
+756.85,
+"2026-11-11",
+925.0
+],
+"up": [
+"2026-11-12",
+915.0,
+"2026-11-17",
+915.0
+],
+"lo": [
+"2026-11-12",
+895.25,
+"2026-11-17",
+895.25
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-17",
+"entry": 924.0,
+"days_since": 3,
+"target": 1092.15,
+"risk_pct": 3.1,
+"ret_pct": -0.8
+},
+{
+"symbol": "WESTLIFE",
+"name": "WESTLIFE FOODWORLD LIMITED",
+"lane": "early",
+"shape": "Flag",
+"close": 658.3,
+"pole_pct": 36.0,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-11",
+"top": 696.5,
+"flag_days": 3,
+"depth_pct": 7.5,
+"stop": 644.25,
+"s200": 519.13,
+"base": 512.0,
+"geo": {
+"pole": [
+"2026-10-23",
+512.0,
+"2026-11-11",
+696.5
+],
+"up": [
+"2026-11-12",
+675.64,
+"2026-11-17",
+658.47
+],
+"lo": [
+"2026-11-12",
+649.4,
+"2026-11-17",
+647.15
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-17",
+"entry": 671.7,
+"days_since": 3,
+"target": 856.2,
+"risk_pct": 4.1,
+"ret_pct": -2.0
+},
+{
+"symbol": "ATHERENERG",
+"name": "Ather Energy Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 1935.4,
+"pole_pct": 50.2,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-16",
+"top": 2021.5,
+"flag_days": 3,
+"depth_pct": 7.9,
+"stop": 1861.4,
+"s200": 1168.33,
+"base": 1345.7,
+"geo": {
+"pole": [
+"2026-10-26",
+1345.7,
+"2026-11-16",
+2021.5
+],
+"up": [
+"2026-11-17",
+1973.08,
+"2026-11-20",
+1913.53
+],
+"lo": [
+"2026-11-17",
+1911.8,
+"2026-11-20",
+1844.9
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 1935.4,
+"days_since": 0,
+"target": 2611.2,
+"risk_pct": 3.8,
+"ret_pct": 0.0
+},
+{
+"symbol": "COFORGE",
+"name": "Coforge Limited",
+"lane": "established",
+"shape": "Rectangle",
+"close": 2086.7,
+"pole_pct": 17.4,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-06",
+"top": 2127.9,
+"flag_days": 8,
+"depth_pct": 7.1,
+"stop": 1977.1,
+"s200": 1565.9,
+"base": 1812.2,
+"geo": {
+"pole": [
+"2026-10-26",
+1812.2,
+"2026-11-06",
+2127.9
+],
+"up": [
+"2026-11-09",
+2073.8,
+"2026-11-20",
+2073.8
+],
+"lo": [
+"2026-11-09",
+1977.1,
+"2026-11-20",
+1977.1
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 2086.7,
+"days_since": 0,
+"target": 2402.4,
+"risk_pct": 5.3,
+"ret_pct": 0.0
+},
+{
+"symbol": "CORONA",
+"name": "CORONA Remedies Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 2263.2,
+"pole_pct": 21.3,
+"pole_start": "2026-10-21",
+"pole_top": "2026-11-12",
+"top": 2415.2,
+"flag_days": 5,
+"depth_pct": 8.1,
+"stop": 2220.0,
+"s200": 1885.06,
+"base": 1990.8,
+"geo": {
+"pole": [
+"2026-10-21",
+1990.8,
+"2026-11-12",
+2415.2
+],
+"up": [
+"2026-11-13",
+2400.4,
+"2026-11-20",
+2250.9
+],
+"lo": [
+"2026-11-13",
+2305.2,
+"2026-11-20",
+2200.45
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 2263.2,
+"days_since": 0,
+"target": 2687.6,
+"risk_pct": 1.9,
+"ret_pct": 0.0
+},
+{
+"symbol": "DIVISLAB",
+"name": "Divi's Laboratories Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 11180.5,
+"pole_pct": 34.4,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-09",
+"top": 11824.0,
+"flag_days": 7,
+"depth_pct": 7.4,
+"stop": 10954.0,
+"s200": 7635.09,
+"base": 8797.0,
+"geo": {
+"pole": [
+"2026-10-23",
+8797.0,
+"2026-11-09",
+11824.0
+],
+"up": [
+"2026-11-11",
+11740.73,
+"2026-11-20",
+11054.36
+],
+"lo": [
+"2026-11-11",
+11270.23,
+"2026-11-20",
+10909.86
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 11180.5,
+"days_since": 0,
+"target": 14207.5,
+"risk_pct": 2.0,
+"ret_pct": 0.0
+},
+{
+"symbol": "GLAND",
+"name": "Gland Pharma Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 3331.9,
+"pole_pct": 23.8,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 3429.0,
+"flag_days": 3,
+"depth_pct": 6.4,
+"stop": 3208.7,
+"s200": 2381.81,
+"base": 2769.8,
+"geo": {
+"pole": [
+"2026-10-23",
+2769.8,
+"2026-11-16",
+3429.0
+],
+"up": [
+"2026-11-17",
+3372.92,
+"2026-11-20",
+3226.07
+],
+"lo": [
+"2026-11-17",
+3217.8,
+"2026-11-20",
+3218.1
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 3331.9,
+"days_since": 0,
+"target": 3991.1,
+"risk_pct": 3.7,
+"ret_pct": 0.0
+},
+{
+"symbol": "INDGN",
+"name": "Indegene Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 657.65,
+"pole_pct": 20.6,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-13",
+"top": 677.0,
+"flag_days": 4,
+"depth_pct": 5.2,
+"stop": 640.25,
+"s200": 532.4,
+"base": 561.55,
+"geo": {
+"pole": [
+"2026-10-26",
+561.55,
+"2026-11-13",
+677.0
+],
+"up": [
+"2026-11-16",
+673.28,
+"2026-11-20",
+655.3
+],
+"lo": [
+"2026-11-16",
+655.17,
+"2026-11-20",
+636.05
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 657.65,
+"days_since": 0,
+"target": 773.1,
+"risk_pct": 2.6,
+"ret_pct": 0.0
+},
+{
+"symbol": "KRISHANA",
+"name": "Krishana Phoschem Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 246.17,
+"pole_pct": 33.4,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 254.99,
+"flag_days": 3,
+"depth_pct": 5.8,
+"stop": 240.0,
+"s200": 153.04,
+"base": 191.16,
+"geo": {
+"pole": [
+"2026-10-23",
+191.16,
+"2026-11-16",
+254.99
+],
+"up": [
+"2026-11-17",
+250.23,
+"2026-11-20",
+243.09
+],
+"lo": [
+"2026-11-17",
+241.57,
+"2026-11-20",
+239.5
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 246.17,
+"days_since": 0,
+"target": 310.0,
+"risk_pct": 2.5,
+"ret_pct": 0.0
+},
+{
+"symbol": "LALPATHLAB",
+"name": "Dr. Lal Path Labs Ltd.",
+"lane": "established",
+"shape": "Flag",
+"close": 2006.0,
+"pole_pct": 15.6,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-09",
+"top": 2079.0,
+"flag_days": 7,
+"depth_pct": 6.3,
+"stop": 1940.0,
+"s200": 1677.79,
+"base": 1797.8,
+"geo": {
+"pole": [
+"2026-10-26",
+1797.8,
+"2026-11-09",
+2079.0
+],
+"up": [
+"2026-11-11",
+2061.99,
+"2026-11-20",
+1969.69
+],
+"lo": [
+"2026-11-11",
+2007.93,
+"2026-11-20",
+1931.73
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 2006.0,
+"days_since": 0,
+"target": 2287.2,
+"risk_pct": 3.3,
+"ret_pct": 0.0
+},
+{
+"symbol": "MBAPL",
+"name": "Madhya Bharat Agro Products Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 195.14,
+"pole_pct": 34.4,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 209.0,
+"flag_days": 3,
+"depth_pct": 10.6,
+"stop": 186.94,
+"s200": 131.45,
+"base": 155.5,
+"geo": {
+"pole": [
+"2026-10-23",
+155.5,
+"2026-11-16",
+209.0
+],
+"up": [
+"2026-11-17",
+199.34,
+"2026-11-20",
+193.89
+],
+"lo": [
+"2026-11-17",
+193.81,
+"2026-11-20",
+184.72
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 195.14,
+"days_since": 0,
+"target": 248.64,
+"risk_pct": 4.2,
+"ret_pct": 0.0
+},
+{
+"symbol": "NYKAA",
+"name": "FSN E-Commerce Ventures Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 364.0,
+"pole_pct": 18.3,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 368.3,
+"flag_days": 3,
+"depth_pct": 4.5,
+"stop": 351.75,
+"s200": 299.47,
+"base": 311.4,
+"geo": {
+"pole": [
+"2026-10-23",
+311.4,
+"2026-11-16",
+368.3
+],
+"up": [
+"2026-11-17",
+361.83,
+"2026-11-20",
+356.28
+],
+"lo": [
+"2026-11-17",
+355.71,
+"2026-11-20",
+348.73
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 364.0,
+"days_since": 0,
+"target": 420.9,
+"risk_pct": 3.4,
+"ret_pct": 0.0
+},
+{
+"symbol": "SAILIFE",
+"name": "Sai Life Sciences Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 1800.7,
+"pole_pct": 42.6,
+"pole_start": "2026-10-22",
+"pole_top": "2026-11-13",
+"top": 1954.8,
+"flag_days": 4,
+"depth_pct": 11.1,
+"stop": 1738.0,
+"s200": 1257.97,
+"base": 1371.0,
+"geo": {
+"pole": [
+"2026-10-22",
+1371.0,
+"2026-11-13",
+1954.8
+],
+"up": [
+"2026-11-16",
+1909.15,
+"2026-11-20",
+1749.55
+],
+"lo": [
+"2026-11-16",
+1765.6,
+"2026-11-20",
+1754.6
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 1800.7,
+"days_since": 0,
+"target": 2384.5,
+"risk_pct": 3.5,
+"ret_pct": 0.0
+},
+{
+"symbol": "TFCILTD",
+"name": "Tourism Finance Corporation of India Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 171.85,
+"pole_pct": 21.6,
+"pole_start": "2026-10-22",
+"pole_top": "2026-11-09",
+"top": 172.0,
+"flag_days": 7,
+"depth_pct": 7.6,
+"stop": 158.88,
+"s200": 100.56,
+"base": 141.43,
+"geo": {
+"pole": [
+"2026-10-22",
+141.43,
+"2026-11-09",
+172.0
+],
+"up": [
+"2026-11-11",
+169.79,
+"2026-11-20",
+168.89
+],
+"lo": [
+"2026-11-11",
+162.63,
+"2026-11-20",
+167.0
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 171.85,
+"days_since": 0,
+"target": 202.42,
+"risk_pct": 7.5,
+"ret_pct": 0.0
+},
+{
+"symbol": "THELEELA",
+"name": "Leela Palaces Hotels & Resorts Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 698.1,
+"pole_pct": 25.8,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-05",
+"top": 706.7,
+"flag_days": 9,
+"depth_pct": 8.5,
+"stop": 646.8,
+"s200": 492.47,
+"base": 561.8,
+"geo": {
+"pole": [
+"2026-10-23",
+561.8,
+"2026-11-05",
+706.7
+],
+"up": [
+"2026-11-06",
+682.52,
+"2026-11-20",
+690.71
+],
+"lo": [
+"2026-11-06",
+654.68,
+"2026-11-20",
+676.07
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-20",
+"entry": 698.1,
+"days_since": 0,
+"target": 843.0,
+"risk_pct": 7.3,
+"ret_pct": 0.0
+},
+{
+"symbol": "GABRIEL",
+"name": "Gabriel India Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 1559.8,
+"pole_pct": 23.4,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-13",
+"top": 1610.0,
+"flag_days": 3,
+"depth_pct": 8.7,
+"stop": 1470.1,
+"s200": 1199.24,
+"base": 1305.0,
+"geo": {
+"pole": [
+"2026-10-23",
+1305.0,
+"2026-11-13",
+1610.0
+],
+"up": [
+"2026-11-16",
+1553.42,
+"2026-11-19",
+1487.87
+],
+"lo": [
+"2026-11-16",
+1489.67,
+"2026-11-19",
+1463.57
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-19",
+"entry": 1585.1,
+"days_since": 1,
+"target": 1890.1,
+"risk_pct": 7.3,
+"ret_pct": -1.6
+},
+{
+"symbol": "NEOGEN",
+"name": "Neogen Chemicals Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 2920.2,
+"pole_pct": 42.3,
+"pole_start": "2026-11-02",
+"pole_top": "2026-11-12",
+"top": 2875.0,
+"flag_days": 4,
+"depth_pct": 7.5,
+"stop": 2660.0,
+"s200": 1914.65,
+"base": 2020.1,
+"geo": {
+"pole": [
+"2026-11-02",
+2020.1,
+"2026-11-12",
+2875.0
+],
+"up": [
+"2026-11-13",
+2818.29,
+"2026-11-19",
+2807.45
+],
+"lo": [
+"2026-11-13",
+2727.81,
+"2026-11-19",
+2633.85
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-19",
+"entry": 2888.5,
+"days_since": 1,
+"target": 3743.4,
+"risk_pct": 7.9,
+"ret_pct": 1.1
+},
+{
+"symbol": "PGIL",
+"name": "Pearl Global Industries Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 1435.5,
+"pole_pct": 21.5,
+"pole_start": "2026-10-28",
+"pole_top": "2026-11-09",
+"top": 1413.3,
+"flag_days": 5,
+"depth_pct": 7.8,
+"stop": 1292.7,
+"s200": 989.9,
+"base": 1163.2,
+"geo": {
+"pole": [
+"2026-10-28",
+1163.2,
+"2026-11-09",
+1413.3
+],
+"up": [
+"2026-11-11",
+1395.98,
+"2026-11-18",
+1367.78
+],
+"lo": [
+"2026-11-11",
+1361.8,
+"2026-11-18",
+1284.8
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-18",
+"entry": 1414.7,
+"days_since": 2,
+"target": 1664.8,
+"risk_pct": 8.6,
+"ret_pct": 1.5
+},
+{
+"symbol": "GRWRHITECH",
+"name": "Garware Hi-Tech Films Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 7779.0,
+"pole_pct": 40.5,
+"pole_start": "2026-10-22",
+"pole_top": "2026-11-11",
+"top": 8079.5,
+"flag_days": 3,
+"depth_pct": 9.6,
+"stop": 7305.5,
+"s200": 5861.6,
+"base": 5750.0,
+"geo": {
+"pole": [
+"2026-10-22",
+5750.0,
+"2026-11-11",
+8079.5
+],
+"up": [
+"2026-11-12",
+7847.58,
+"2026-11-17",
+7611.33
+],
+"lo": [
+"2026-11-12",
+7688.25,
+"2026-11-17",
+7116.0
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-17",
+"entry": 7967.0,
+"days_since": 3,
+"target": 10296.5,
+"risk_pct": 8.3,
+"ret_pct": -2.4
+},
+{
+"symbol": "WELSPUNLIV",
+"name": "Welspun Living Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 268.78,
+"pole_pct": 30.6,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-04",
+"top": 267.42,
+"flag_days": 7,
+"depth_pct": 10.3,
+"stop": 239.88,
+"s200": 166.9,
+"base": 204.75,
+"geo": {
+"pole": [
+"2026-10-23",
+204.75,
+"2026-11-04",
+267.42
+],
+"up": [
+"2026-11-05",
+261.99,
+"2026-11-17",
+249.71
+],
+"lo": [
+"2026-11-05",
+246.74,
+"2026-11-17",
+245.36
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-17",
+"entry": 265.62,
+"days_since": 3,
+"target": 328.29,
+"risk_pct": 9.7,
+"ret_pct": 1.2
+},
+{
+"symbol": "ABB",
+"name": "ABB India Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 6934.5,
+"pole_pct": 17.4,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-13",
+"top": 7120.0,
+"flag_days": 4,
+"depth_pct": 5.2,
+"stop": 6750.0,
+"s200": 6830.18,
+"base": 6064.0,
+"geo": {
+"pole": [
+"2026-10-26",
+6064.0,
+"2026-11-13",
+7120.0
+],
+"up": [
+"2026-11-16",
+7088.15,
+"2026-11-20",
+6903.75
+],
+"lo": [
+"2026-11-16",
+6788.8,
+"2026-11-20",
+6795.0
+]
+},
+"status": "forming",
+"trigger": 6934.5,
+"to_trigger_pct": 0.0,
+"target": 7990.5,
+"risk_pct": 2.7
+},
+{
+"symbol": "ADANIPORTS",
+"name": "Adani Ports and Special Economic Zone Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 1917.0,
+"pole_pct": 17.2,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-11",
+"top": 1979.0,
+"flag_days": 6,
+"depth_pct": 5.2,
+"stop": 1875.6,
+"s200": 1689.0,
+"base": 1687.9,
+"geo": {
+"pole": [
+"2026-10-23",
+1687.9,
+"2026-11-11",
+1979.0
+],
+"up": [
+"2026-11-12",
+1933.85,
+"2026-11-20",
+1909.53
+],
+"lo": [
+"2026-11-12",
+1898.75,
+"2026-11-20",
+1883.47
+]
+},
+"status": "forming",
+"trigger": 1917.0,
+"to_trigger_pct": 0.0,
+"target": 2208.1,
+"risk_pct": 2.2
+},
+{
+"symbol": "TVSMOTOR",
+"name": "TVS Motor Company Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 4590.0,
+"pole_pct": 19.6,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-11",
+"top": 4636.1,
+"flag_days": 6,
+"depth_pct": 6.0,
+"stop": 4360.0,
+"s200": 3847.23,
+"base": 3875.1,
+"geo": {
+"pole": [
+"2026-10-26",
+3875.1,
+"2026-11-11",
+4636.1
+],
+"up": [
+"2026-11-12",
+4533.64,
+"2026-11-20",
+4534.19
+],
+"lo": [
+"2026-11-12",
+4442.8,
+"2026-11-20",
+4348.79
+]
+},
+"status": "forming",
+"trigger": 4590.0,
+"to_trigger_pct": 0.0,
+"target": 5351.0,
+"risk_pct": 5.0
+},
+{
+"symbol": "LT",
+"name": "Larsen & Toubro Limited",
+"lane": "early",
+"shape": "Rectangle",
+"close": 4209.1,
+"pole_pct": 18.5,
+"pole_start": "2026-10-22",
+"pole_top": "2026-11-11",
+"top": 4259.0,
+"flag_days": 6,
+"depth_pct": 3.5,
+"stop": 4112.0,
+"s200": 3949.12,
+"base": 3595.0,
+"geo": {
+"pole": [
+"2026-10-22",
+3595.0,
+"2026-11-11",
+4259.0
+],
+"up": [
+"2026-11-12",
+4213.8,
+"2026-11-20",
+4213.8
+],
+"lo": [
+"2026-11-12",
+4112.0,
+"2026-11-20",
+4112.0
+]
+},
+"status": "forming",
+"trigger": 4213.8,
+"to_trigger_pct": 0.1,
+"target": 4877.8,
+"risk_pct": 2.4
+},
+{
+"symbol": "SPARC",
+"name": "Sun Pharma Advanced Research Company Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 190.16,
+"pole_pct": 23.1,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 205.84,
+"flag_days": 3,
+"depth_pct": 8.7,
+"stop": 188.0,
+"s200": 182.12,
+"base": 167.22,
+"geo": {
+"pole": [
+"2026-10-23",
+167.22,
+"2026-11-16",
+205.84
+],
+"up": [
+"2026-11-17",
+198.95,
+"2026-11-20",
+190.62
+],
+"lo": [
+"2026-11-17",
+191.36,
+"2026-11-20",
+185.43
+]
+},
+"status": "forming",
+"trigger": 190.62,
+"to_trigger_pct": 0.2,
+"target": 229.24,
+"risk_pct": 1.4
+},
+{
+"symbol": "MODIS",
+"name": "Modis Navnirman Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 455.3,
+"pole_pct": 28.1,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 464.0,
+"flag_days": 3,
+"depth_pct": 3.0,
+"stop": 450.0,
+"s200": 360.02,
+"base": 362.1,
+"geo": {
+"pole": [
+"2026-10-23",
+362.1,
+"2026-11-16",
+464.0
+],
+"up": [
+"2026-11-17",
+463.21,
+"2026-11-20",
+456.83
+],
+"lo": [
+"2026-11-17",
+451.29,
+"2026-11-20",
+448.97
+]
+},
+"status": "forming",
+"trigger": 456.83,
+"to_trigger_pct": 0.3,
+"target": 558.73,
+"risk_pct": 1.5
+},
+{
+"symbol": "PETRONET",
+"name": "Petronet LNG Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 329.15,
+"pole_pct": 20.4,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-12",
+"top": 336.3,
+"flag_days": 5,
+"depth_pct": 4.1,
+"stop": 322.45,
+"s200": 285.21,
+"base": 279.35,
+"geo": {
+"pole": [
+"2026-10-23",
+279.35,
+"2026-11-12",
+336.3
+],
+"up": [
+"2026-11-13",
+330.5,
+"2026-11-20",
+330.6
+],
+"lo": [
+"2026-11-13",
+323.8,
+"2026-11-20",
+326.35
+]
+},
+"status": "forming",
+"trigger": 330.6,
+"to_trigger_pct": 0.4,
+"target": 387.55,
+"risk_pct": 2.5
+},
+{
+"symbol": "ADANIGREEN",
+"name": "Adani Green Energy Limited",
+"lane": "early",
+"shape": "Rectangle",
+"close": 1435.0,
+"pole_pct": 26.3,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-11",
+"top": 1479.0,
+"flag_days": 6,
+"depth_pct": 6.7,
+"stop": 1380.0,
+"s200": 1256.94,
+"base": 1171.0,
+"geo": {
+"pole": [
+"2026-10-23",
+1171.0,
+"2026-11-11",
+1479.0
+],
+"up": [
+"2026-11-12",
+1442.0,
+"2026-11-20",
+1442.0
+],
+"lo": [
+"2026-11-12",
+1380.0,
+"2026-11-20",
+1380.0
+]
+},
+"status": "forming",
+"trigger": 1442.0,
+"to_trigger_pct": 0.5,
+"target": 1750.0,
+"risk_pct": 4.3
+},
+{
+"symbol": "ISGEC",
+"name": "Isgec Heavy Engineering Limited",
+"lane": "early",
+"shape": "Rectangle",
+"close": 995.4,
+"pole_pct": 17.6,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-12",
+"top": 999.9,
+"flag_days": 5,
+"depth_pct": 3.7,
+"stop": 963.0,
+"s200": 904.13,
+"base": 849.9,
+"geo": {
+"pole": [
+"2026-10-23",
+849.9,
+"2026-11-12",
+999.9
+],
+"up": [
+"2026-11-13",
+999.9,
+"2026-11-20",
+999.9
+],
+"lo": [
+"2026-11-13",
+963.0,
+"2026-11-20",
+963.0
+]
+},
+"status": "forming",
+"trigger": 999.9,
+"to_trigger_pct": 0.5,
+"target": 1149.9,
+"risk_pct": 3.7
+},
+{
+"symbol": "INDIANB",
+"name": "Indian Bank",
+"lane": "early",
+"shape": "Rectangle",
+"close": 950.0,
+"pole_pct": 17.0,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-11",
+"top": 958.85,
+"flag_days": 6,
+"depth_pct": 3.4,
+"stop": 925.9,
+"s200": 869.14,
+"base": 819.3,
+"geo": {
+"pole": [
+"2026-10-26",
+819.3,
+"2026-11-11",
+958.85
+],
+"up": [
+"2026-11-12",
+955.85,
+"2026-11-20",
+955.85
+],
+"lo": [
+"2026-11-12",
+925.9,
+"2026-11-20",
+925.9
+]
+},
+"status": "forming",
+"trigger": 955.85,
+"to_trigger_pct": 0.6,
+"target": 1095.4,
+"risk_pct": 3.1
+},
+{
+"symbol": "GLENMARK",
+"name": "Glenmark Pharmaceuticals Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 2648.0,
+"pole_pct": 29.1,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-09",
+"top": 2714.0,
+"flag_days": 7,
+"depth_pct": 4.2,
+"stop": 2600.2,
+"s200": 2264.6,
+"base": 2101.6,
+"geo": {
+"pole": [
+"2026-10-23",
+2101.6,
+"2026-11-09",
+2714.0
+],
+"up": [
+"2026-11-11",
+2685.56,
+"2026-11-20",
+2666.46
+],
+"lo": [
+"2026-11-11",
+2635.42,
+"2026-11-20",
+2603.47
+]
+},
+"status": "forming",
+"trigger": 2666.46,
+"to_trigger_pct": 0.7,
+"target": 3278.86,
+"risk_pct": 2.5
+},
+{
+"symbol": "MGL",
+"name": "Mahanagar Gas Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 1115.3,
+"pole_pct": 16.0,
+"pole_start": "2026-11-03",
+"pole_top": "2026-11-16",
+"top": 1160.0,
+"flag_days": 3,
+"depth_pct": 6.2,
+"stop": 1088.3,
+"s200": 1092.17,
+"base": 1000.0,
+"geo": {
+"pole": [
+"2026-11-03",
+1000.0,
+"2026-11-16",
+1160.0
+],
+"up": [
+"2026-11-17",
+1126.27,
+"2026-11-20",
+1122.97
+],
+"lo": [
+"2026-11-17",
+1098.93,
+"2026-11-20",
+1089.03
+]
+},
+"status": "forming",
+"trigger": 1122.97,
+"to_trigger_pct": 0.7,
+"target": 1282.97,
+"risk_pct": 3.1
+},
+{
+"symbol": "STARHEALTH",
+"name": "Star Health and Allied Insurance Company Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 556.05,
+"pole_pct": 15.6,
+"pole_start": "2026-10-28",
+"pole_top": "2026-11-13",
+"top": 581.1,
+"flag_days": 4,
+"depth_pct": 6.0,
+"stop": 546.2,
+"s200": 530.73,
+"base": 502.6,
+"geo": {
+"pole": [
+"2026-10-28",
+502.6,
+"2026-11-13",
+581.1
+],
+"up": [
+"2026-11-16",
+575.58,
+"2026-11-20",
+563.07
+],
+"lo": [
+"2026-11-16",
+553.0,
+"2026-11-20",
+548.67
+]
+},
+"status": "forming",
+"trigger": 563.07,
+"to_trigger_pct": 1.3,
+"target": 641.57,
+"risk_pct": 3.0
+},
+{
+"symbol": "WEWORK",
+"name": "WeWork India Management Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 684.95,
+"pole_pct": 16.9,
+"pole_start": "2026-10-27",
+"pole_top": "2026-11-12",
+"top": 709.9,
+"flag_days": 5,
+"depth_pct": 4.6,
+"stop": 677.55,
+"s200": 614.3,
+"base": 607.15,
+"geo": {
+"pole": [
+"2026-10-27",
+607.15,
+"2026-11-12",
+709.9
+],
+"up": [
+"2026-11-13",
+704.82,
+"2026-11-20",
+695.55
+],
+"lo": [
+"2026-11-13",
+686.51,
+"2026-11-20",
+676.83
+]
+},
+"status": "forming",
+"trigger": 695.55,
+"to_trigger_pct": 1.5,
+"target": 798.3,
+"risk_pct": 2.6
+},
+{
+"symbol": "BOROLTD",
+"name": "Borosil Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 327.1,
+"pole_pct": 52.2,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 346.95,
+"flag_days": 3,
+"depth_pct": 7.1,
+"stop": 322.15,
+"s200": 249.73,
+"base": 227.95,
+"geo": {
+"pole": [
+"2026-10-23",
+227.95,
+"2026-11-16",
+346.95
+],
+"up": [
+"2026-11-17",
+340.92,
+"2026-11-20",
+332.37
+],
+"lo": [
+"2026-11-17",
+325.04,
+"2026-11-20",
+323.02
+]
+},
+"status": "forming",
+"trigger": 332.37,
+"to_trigger_pct": 1.6,
+"target": 451.37,
+"risk_pct": 3.1
+},
+{
+"symbol": "METROPOLIS",
+"name": "Metropolis Healthcare Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 566.0,
+"pole_pct": 15.5,
+"pole_start": "2026-10-22",
+"pole_top": "2026-11-05",
+"top": 591.0,
+"flag_days": 9,
+"depth_pct": 5.8,
+"stop": 556.85,
+"s200": 528.03,
+"base": 511.6,
+"geo": {
+"pole": [
+"2026-10-22",
+511.6,
+"2026-11-05",
+591.0
+],
+"up": [
+"2026-11-06",
+581.88,
+"2026-11-20",
+575.25
+],
+"lo": [
+"2026-11-06",
+569.59,
+"2026-11-20",
+557.63
+]
+},
+"status": "forming",
+"trigger": 575.25,
+"to_trigger_pct": 1.6,
+"target": 654.65,
+"risk_pct": 3.2
+},
+{
+"symbol": "ITDC",
+"name": "India Tourism Development Corporation Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 657.65,
+"pole_pct": 24.7,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-13",
+"top": 722.1,
+"flag_days": 4,
+"depth_pct": 9.7,
+"stop": 652.4,
+"s200": 605.05,
+"base": 579.15,
+"geo": {
+"pole": [
+"2026-10-26",
+579.15,
+"2026-11-13",
+722.1
+],
+"up": [
+"2026-11-16",
+683.8,
+"2026-11-20",
+669.1
+],
+"lo": [
+"2026-11-16",
+658.73,
+"2026-11-20",
+654.25
+]
+},
+"status": "forming",
+"trigger": 669.1,
+"to_trigger_pct": 1.7,
+"target": 812.05,
+"risk_pct": 2.5
+},
+{
+"symbol": "PDSL",
+"name": "PDS Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 408.3,
+"pole_pct": 32.7,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-12",
+"top": 424.9,
+"flag_days": 5,
+"depth_pct": 6.0,
+"stop": 399.4,
+"s200": 331.79,
+"base": 320.1,
+"geo": {
+"pole": [
+"2026-10-23",
+320.1,
+"2026-11-12",
+424.9
+],
+"up": [
+"2026-11-13",
+419.03,
+"2026-11-20",
+416.88
+],
+"lo": [
+"2026-11-13",
+407.82,
+"2026-11-20",
+398.22
+]
+},
+"status": "forming",
+"trigger": 416.88,
+"to_trigger_pct": 2.1,
+"target": 521.68,
+"risk_pct": 4.2
+},
+{
+"symbol": "LTTS",
+"name": "L&T Technology Services Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 4082.5,
+"pole_pct": 36.6,
+"pole_start": "2026-10-09",
+"pole_top": "2026-11-02",
+"top": 4347.4,
+"flag_days": 12,
+"depth_pct": 8.0,
+"stop": 4001.0,
+"s200": 3511.55,
+"base": 3182.2,
+"geo": {
+"pole": [
+"2026-10-09",
+3182.2,
+"2026-11-02",
+4347.4
+],
+"up": [
+"2026-11-03",
+4326.85,
+"2026-11-20",
+4185.4
+],
+"lo": [
+"2026-11-03",
+4194.96,
+"2026-11-20",
+4112.58
+]
+},
+"status": "forming",
+"trigger": 4185.4,
+"to_trigger_pct": 2.5,
+"target": 5350.6,
+"risk_pct": 4.4
+},
+{
+"symbol": "BHARATSE",
+"name": "Bharat Seats Limited",
+"lane": "early",
+"shape": "Flag",
+"close": 203.89,
+"pole_pct": 24.8,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-05",
+"top": 221.98,
+"flag_days": 9,
+"depth_pct": 9.2,
+"stop": 201.6,
+"s200": 198.05,
+"base": 177.91,
+"geo": {
+"pole": [
+"2026-10-23",
+177.91,
+"2026-11-05",
+221.98
+],
+"up": [
+"2026-11-06",
+215.86,
+"2026-11-20",
+210.95
+],
+"lo": [
+"2026-11-06",
+210.53,
+"2026-11-20",
+201.99
+]
+},
+"status": "forming",
+"trigger": 210.95,
+"to_trigger_pct": 3.5,
+"target": 255.02,
+"risk_pct": 4.4
+},
+{
+"symbol": "BALUFORGE",
+"name": "Balu Forge Industries Limited",
+"lane": "early",
+"shape": "Pennant",
+"close": 515.7,
+"pole_pct": 35.4,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-13",
+"top": 555.95,
+"flag_days": 4,
+"depth_pct": 8.8,
+"stop": 507.15,
+"s200": 482.62,
+"base": 410.5,
+"geo": {
+"pole": [
+"2026-10-26",
+410.5,
+"2026-11-13",
+555.95
+],
+"up": [
+"2026-11-16",
+551.1,
+"2026-11-20",
+536.2
+],
+"lo": [
+"2026-11-16",
+510.0,
+"2026-11-20",
+532.83
+]
+},
+"status": "forming",
+"trigger": 536.2,
+"to_trigger_pct": 4.0,
+"target": 681.65,
+"risk_pct": 5.4
+},
+{
+"symbol": "HIKAL",
+"name": "Hikal Limited",
+"lane": "early",
+"shape": "Rectangle",
+"close": 220.76,
+"pole_pct": 21.9,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-03",
+"top": 231.0,
+"flag_days": 11,
+"depth_pct": 8.7,
+"stop": 210.8,
+"s200": 205.15,
+"base": 189.45,
+"geo": {
+"pole": [
+"2026-10-23",
+189.45,
+"2026-11-03",
+231.0
+],
+"up": [
+"2026-11-04",
+230.98,
+"2026-11-20",
+230.98
+],
+"lo": [
+"2026-11-04",
+210.8,
+"2026-11-20",
+210.8
+]
+},
+"status": "forming",
+"trigger": 230.98,
+"to_trigger_pct": 4.6,
+"target": 272.53,
+"risk_pct": 8.7
+},
+{
+"symbol": "BOSCHLTD",
+"name": "Bosch Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 49360.0,
+"pole_pct": 20.2,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-05",
+"top": 52475.0,
+"flag_days": 9,
+"depth_pct": 7.8,
+"stop": 48370.0,
+"s200": 40741.72,
+"base": 43650.0,
+"geo": {
+"pole": [
+"2026-10-23",
+43650.0,
+"2026-11-05",
+52475.0
+],
+"up": [
+"2026-11-06",
+51675.89,
+"2026-11-20",
+48795.14
+],
+"lo": [
+"2026-11-06",
+49753.78,
+"2026-11-20",
+48439.03
+]
+},
+"status": "forming",
+"trigger": 49360.0,
+"to_trigger_pct": 0.0,
+"target": 58185.0,
+"risk_pct": 2.0
+},
+{
+"symbol": "CUPID",
+"name": "Cupid Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 365.65,
+"pole_pct": 30.0,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-13",
+"top": 393.0,
+"flag_days": 4,
+"depth_pct": 10.5,
+"stop": 351.85,
+"s200": 196.31,
+"base": 302.3,
+"geo": {
+"pole": [
+"2026-10-23",
+302.3,
+"2026-11-13",
+393.0
+],
+"up": [
+"2026-11-16",
+378.57,
+"2026-11-20",
+364.25
+],
+"lo": [
+"2026-11-16",
+357.51,
+"2026-11-20",
+356.05
+]
+},
+"status": "forming",
+"trigger": 365.65,
+"to_trigger_pct": 0.0,
+"target": 456.35,
+"risk_pct": 3.8
+},
+{
+"symbol": "RATNAVEER",
+"name": "Ratnaveer Precision Engineering Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 370.25,
+"pole_pct": 26.7,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-04",
+"top": 389.9,
+"flag_days": 10,
+"depth_pct": 8.9,
+"stop": 355.1,
+"s200": 218.82,
+"base": 307.8,
+"geo": {
+"pole": [
+"2026-10-23",
+307.8,
+"2026-11-04",
+389.9
+],
+"up": [
+"2026-11-05",
+380.96,
+"2026-11-20",
+370.9
+],
+"lo": [
+"2026-11-05",
+364.19,
+"2026-11-20",
+360.04
+]
+},
+"status": "forming",
+"trigger": 370.9,
+"to_trigger_pct": 0.2,
+"target": 453.0,
+"risk_pct": 4.3
+},
+{
+"symbol": "AUROPHARMA",
+"name": "Aurobindo Pharma Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 1799.0,
+"pole_pct": 20.2,
+"pole_start": "2026-10-22",
+"pole_top": "2026-11-11",
+"top": 1859.9,
+"flag_days": 6,
+"depth_pct": 4.4,
+"stop": 1778.0,
+"s200": 1500.94,
+"base": 1547.7,
+"geo": {
+"pole": [
+"2026-10-22",
+1547.7,
+"2026-11-11",
+1859.9
+],
+"up": [
+"2026-11-12",
+1834.27,
+"2026-11-20",
+1806.79
+],
+"lo": [
+"2026-11-12",
+1791.73,
+"2026-11-20",
+1780.02
+]
+},
+"status": "forming",
+"trigger": 1806.79,
+"to_trigger_pct": 0.4,
+"target": 2118.99,
+"risk_pct": 1.6
+},
+{
+"symbol": "SONACOMS",
+"name": "Sona BLW Precision Forgings Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 892.5,
+"pole_pct": 26.1,
+"pole_start": "2026-10-22",
+"pole_top": "2026-11-13",
+"top": 934.9,
+"flag_days": 4,
+"depth_pct": 5.6,
+"stop": 882.55,
+"s200": 674.4,
+"base": 741.3,
+"geo": {
+"pole": [
+"2026-10-22",
+741.3,
+"2026-11-13",
+934.9
+],
+"up": [
+"2026-11-16",
+923.11,
+"2026-11-20",
+895.75
+],
+"lo": [
+"2026-11-16",
+890.2,
+"2026-11-20",
+885.07
+]
+},
+"status": "forming",
+"trigger": 895.75,
+"to_trigger_pct": 0.4,
+"target": 1089.35,
+"risk_pct": 1.5
+},
+{
+"symbol": "SMSPHARMA",
+"name": "SMS Pharmaceuticals Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 473.25,
+"pole_pct": 26.4,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-16",
+"top": 512.0,
+"flag_days": 3,
+"depth_pct": 8.7,
+"stop": 467.35,
+"s200": 401.89,
+"base": 405.0,
+"geo": {
+"pole": [
+"2026-10-26",
+405.0,
+"2026-11-16",
+512.0
+],
+"up": [
+"2026-11-17",
+499.23,
+"2026-11-20",
+476.73
+],
+"lo": [
+"2026-11-17",
+480.77,
+"2026-11-20",
+460.6
+]
+},
+"status": "forming",
+"trigger": 476.73,
+"to_trigger_pct": 0.7,
+"target": 583.73,
+"risk_pct": 2.0
+},
+{
+"symbol": "JYOTICNC",
+"name": "Jyoti CNC Automation Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 1052.45,
+"pole_pct": 27.3,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-13",
+"top": 1110.2,
+"flag_days": 4,
+"depth_pct": 7.9,
+"stop": 1022.95,
+"s200": 842.21,
+"base": 871.8,
+"geo": {
+"pole": [
+"2026-10-23",
+871.8,
+"2026-11-13",
+1110.2
+],
+"up": [
+"2026-11-16",
+1074.03,
+"2026-11-20",
+1063.67
+],
+"lo": [
+"2026-11-16",
+1043.44,
+"2026-11-20",
+1016.32
+]
+},
+"status": "forming",
+"trigger": 1063.67,
+"to_trigger_pct": 1.1,
+"target": 1302.07,
+"risk_pct": 3.8
+},
+{
+"symbol": "LAURUSLABS",
+"name": "Laurus Labs Limited",
+"lane": "established",
+"shape": "Pennant",
+"close": 2294.6,
+"pole_pct": 26.1,
+"pole_start": "2026-10-23",
+"pole_top": "2026-11-16",
+"top": 2439.0,
+"flag_days": 3,
+"depth_pct": 9.2,
+"stop": 2214.8,
+"s200": 1540.88,
+"base": 1933.5,
+"geo": {
+"pole": [
+"2026-10-23",
+1933.5,
+"2026-11-16",
+2439.0
+],
+"up": [
+"2026-11-17",
+2356.72,
+"2026-11-20",
+2326.87
+],
+"lo": [
+"2026-11-17",
+2239.23,
+"2026-11-20",
+2325.93
+]
+},
+"status": "forming",
+"trigger": 2326.87,
+"to_trigger_pct": 1.4,
+"target": 2832.37,
+"risk_pct": 4.8
+},
+{
+"symbol": "DPEL",
+"name": "Divine Power Energy Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 660.95,
+"pole_pct": 28.8,
+"pole_start": "2026-11-02",
+"pole_top": "2026-11-04",
+"top": 724.0,
+"flag_days": 10,
+"depth_pct": 10.9,
+"stop": 644.95,
+"s200": 505.18,
+"base": 562.05,
+"geo": {
+"pole": [
+"2026-11-02",
+562.05,
+"2026-11-04",
+724.0
+],
+"up": [
+"2026-11-05",
+698.93,
+"2026-11-20",
+671.16
+],
+"lo": [
+"2026-11-05",
+680.88,
+"2026-11-20",
+656.66
+]
+},
+"status": "forming",
+"trigger": 671.16,
+"to_trigger_pct": 1.5,
+"target": 833.11,
+"risk_pct": 3.9
+},
+{
+"symbol": "DIACABS",
+"name": "Diamond Power Infrastructure Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 363.05,
+"pole_pct": 31.5,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-05",
+"top": 398.5,
+"flag_days": 9,
+"depth_pct": 11.7,
+"stop": 352.0,
+"s200": 244.98,
+"base": 303.1,
+"geo": {
+"pole": [
+"2026-10-26",
+303.1,
+"2026-11-05",
+398.5
+],
+"up": [
+"2026-11-06",
+391.45,
+"2026-11-20",
+369.37
+],
+"lo": [
+"2026-11-06",
+373.96,
+"2026-11-20",
+354.01
+]
+},
+"status": "forming",
+"trigger": 369.37,
+"to_trigger_pct": 1.7,
+"target": 464.77,
+"risk_pct": 4.7
+},
+{
+"symbol": "63MOONS",
+"name": "63 moons technologies limited",
+"lane": "established",
+"shape": "Rectangle",
+"close": 925.7,
+"pole_pct": 29.3,
+"pole_start": "2026-10-09",
+"pole_top": "2026-11-02",
+"top": 981.85,
+"flag_days": 12,
+"depth_pct": 10.5,
+"stop": 879.0,
+"s200": 729.22,
+"base": 759.35,
+"geo": {
+"pole": [
+"2026-10-09",
+759.35,
+"2026-11-02",
+981.85
+],
+"up": [
+"2026-11-03",
+969.6,
+"2026-11-20",
+969.6
+],
+"lo": [
+"2026-11-03",
+879.0,
+"2026-11-20",
+879.0
+]
+},
+"status": "forming",
+"trigger": 969.6,
+"to_trigger_pct": 4.7,
+"target": 1192.1,
+"risk_pct": 9.3
+}
+]
+}
