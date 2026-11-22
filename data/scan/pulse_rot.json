@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-22 08:57 UTC",
+ "generated": "2026-11-22 21:30 UTC",
  "asof": "2026-11-20",
  "decided": "2026-11-20",
  "picks": [
@@ -27,76 +27,108 @@
   "CUB"
  ],
  "sells": [],
+ "light": "GREEN",
+ "red_skip": false,
  "rows": [
   {
    "symbol": "KOTAKBANK",
    "industry": "Private Sector Bank",
    "close": 515.8,
    "r3m": 32.2,
-   "rank": 1
+   "rank": 1,
+   "entry": 515.8,
+   "entry_d": "2026-11-20",
+   "since": -0.0
   },
   {
    "symbol": "MEESHO",
    "industry": "E-Retail/ E-Commerce",
    "close": 259.92,
    "r3m": 32.0,
-   "rank": 2
+   "rank": 2,
+   "entry": 259.92,
+   "entry_d": "2026-11-20",
+   "since": 0.0
   },
   {
    "symbol": "SOUTHBANK",
    "industry": "Private Sector Bank",
    "close": 58.62,
    "r3m": 30.3,
-   "rank": 3
+   "rank": 3,
+   "entry": 58.62,
+   "entry_d": "2026-11-20",
+   "since": -0.0
   },
   {
    "symbol": "DCBBANK",
    "industry": "Private Sector Bank",
    "close": 233.53,
    "r3m": 28.4,
-   "rank": 4
+   "rank": 4,
+   "entry": 233.53,
+   "entry_d": "2026-11-20",
+   "since": -0.0
   },
   {
    "symbol": "AXISBANK",
    "industry": "Private Sector Bank",
    "close": 1446.0,
    "r3m": 17.1,
-   "rank": 5
+   "rank": 5,
+   "entry": 1446.0,
+   "entry_d": "2026-11-20",
+   "since": 0.0
   },
   {
    "symbol": "ICICIBANK",
    "industry": "Private Sector Bank",
    "close": 1640.0,
    "r3m": 17.0,
-   "rank": 6
+   "rank": 6,
+   "entry": 1640.0,
+   "entry_d": "2026-11-20",
+   "since": 0.0
   },
   {
    "symbol": "URBANCO",
    "industry": "E-Retail/ E-Commerce",
    "close": 168.95,
    "r3m": 14.3,
-   "rank": 7
+   "rank": 7,
+   "entry": 168.95,
+   "entry_d": "2026-11-20",
+   "since": -0.0
   },
   {
    "symbol": "KARURVYSYA",
    "industry": "Private Sector Bank",
    "close": 377.0,
    "r3m": 13.9,
-   "rank": 8
+   "rank": 8,
+   "entry": 377.0,
+   "entry_d": "2026-11-20",
+   "since": 0.0
   },
   {
    "symbol": "ETERNAL",
    "industry": "E-Retail/ E-Commerce",
    "close": 364.0,
    "r3m": 13.7,
-   "rank": 9
+   "rank": 9,
+   "entry": 364.0,
+   "entry_d": "2026-11-20",
+   "since": 0.0
   },
   {
    "symbol": "CUB",
    "industry": "Private Sector Bank",
    "close": 248.8,
    "r3m": 12.6,
-   "rank": 10
+   "rank": 10,
+   "entry": 248.8,
+   "entry_d": "2026-11-20",
+   "since": 0.0
   }
  ],
  "ranked": [
@@ -153,6 +185,59 @@
   }
  ],
  "started": "2026-11-20",
- "rule": "Each Friday close: NSE industries in the top 10% by 1-month Pulse AND rotation Leading/Improving; hold the 10 strongest trending stocks of those industries by 3-month return (a holding stays while it ranks in the top 20 and its industry stays selected); equal weight; buy / sell at Monday's open.",
- "test": "NSE 2016-26 (survivors), Monday-open fills, 0.2% a side: 34.5%/yr, worst fall -35.9%; last 1/2/3 years +20.0/+16.0/+40.0%. Same top-10 pick from any industry 18.9%; strong Pulse without rotation 27.8%. ~54x turnover a year."
+ "pos": {
+  "KOTAKBANK": {
+   "d": "2026-11-20",
+   "e": 515.8
+  },
+  "MEESHO": {
+   "d": "2026-11-20",
+   "e": 259.92
+  },
+  "SOUTHBANK": {
+   "d": "2026-11-20",
+   "e": 58.62
+  },
+  "DCBBANK": {
+   "d": "2026-11-20",
+   "e": 233.53
+  },
+  "AXISBANK": {
+   "d": "2026-11-20",
+   "e": 1446.0
+  },
+  "ICICIBANK": {
+   "d": "2026-11-20",
+   "e": 1640.0
+  },
+  "URBANCO": {
+   "d": "2026-11-20",
+   "e": 168.95
+  },
+  "KARURVYSYA": {
+   "d": "2026-11-20",
+   "e": 377.0
+  },
+  "ETERNAL": {
+   "d": "2026-11-20",
+   "e": 364.0
+  },
+  "CUB": {
+   "d": "2026-11-20",
+   "e": 248.8
+  }
+ },
+ "closed": [],
+ "mark": {
+  "date": "2026-11-20",
+  "since": "2026-11-20",
+  "ret": 0.0,
+  "nifty": 0.0,
+  "week": 0.0,
+  "open": 10,
+  "closed": 0,
+  "closed_ret": null
+ },
+ "rule": "Each Friday close: NSE industries in the top 10% by 1-month Pulse AND rotation Leading/Improving; hold the 10 strongest trending stocks of those industries by 3-month return (a holding stays while it ranks in the top 20 and its industry stays selected); equal weight; buy / sell at Monday's open. If the traffic light is RED at the Friday close: no basket that week (all cash).",
+ "test": "NSE 2016-26 (survivors), Monday-open fills, 0.2% a side: 34.5%/yr, worst fall -35.9%; last 1/2/3 years +20.0/+16.0/+40.0%. Same top-10 pick from any industry 18.9%; strong Pulse without rotation 27.8%. ~54x turnover a year. With the RED-light skip (cash that week): 37.4%/yr, worst fall -23.0%, last 1/3/5 years +19.7/+40.6/+45.9%."
 }
