@@ -1,7 +1,7 @@
 {
  "method": "Tighter flags with volume (22 Nov 2026, Amritpal: \"These patterns should be tighter ones with volumes drying out and only the\nbreakout candle volume should be high. Then trade when the next day's high crosses the breakout candle's high, with a trailing SL\").\n\nBase detection = the live flag scanner (flag_stops.signals, no look-ahead). Added filters, each tested alone and together:\n  DRY   volume dries up in the flag: average volume over the flag < 0.75 x the pole's average AND < the 50-day average\n        (measured before the pole)\n  BOVOL breakout candle volume >= 1.5 x the 50-day average, and the highest volume of the whole flag\n  TIGHT flag range (highest high - lowest low of the flag) <= 8% of the pole top (scanner allows a 12% pullback)\nEntry: NEXT = buy-stop one tick above the breakout candle's high, valid the next session only (gap -> fill at the open); if it\n       is not crossed the trade is skipped.  CLOSE = buy at the breakout close (the earlier test).\nStop = flag low (incl. the breakout day). Exit = trailing: first daily close below the 21-day EMA, sold next open (the winner of\nthe stop test); stop hit intraday -> out at the stop (or the open on a gap). 0.2% cost a round trip.\nSame portfolio and reporting as flag_stops (Rs 20 L, 1% risk, 10 slots). NSE via Yahoo + bhavcopy, survivors only.\nPILOT env = 150 stocks. Output data/research/flag_volume.json",
  "stocks": 97,
- "signals": 1312,
+ "signals": 1315,
  "nifty": {
   "CAGR": 11.6,
   "max DD": -38.4,
@@ -35,10 +35,10 @@
   "1 scanner now, buy at breakout close": {
    "trades": {
     "all": {
-     "n": 1312,
-     "win": 29,
+     "n": 1315,
+     "win": 28,
      "avg": 3.05,
-     "avgR": 0.62,
+     "avgR": 0.61,
      "stop_hit": 43,
      "tgt_hit": 15,
      "pf": 1.96,
@@ -79,9 +79,9 @@
      "hold": 6.0
     },
     "last 5y": {
-     "n": 702,
+     "n": 703,
      "win": 25,
-     "avg": -0.18,
+     "avg": -0.19,
      "avgR": 0.01,
      "stop_hit": 44,
      "tgt_hit": 11,
@@ -90,7 +90,7 @@
      "hold": 7.0
     },
     "ex_covid": {
-     "n": 1215,
+     "n": 1218,
      "win": 28,
      "avg": 2.06,
      "avgR": 0.47,
@@ -102,89 +102,89 @@
     }
    },
    "port": {
-    "CAGR": 22.9,
-    "max DD": -41.1,
+    "CAGR": 22.1,
+    "max DD": -40.4,
     "1y": 4.3,
     "2y": -1.1,
     "3y": 1.4,
-    "5y": 3.5,
+    "5y": 3.4,
     "years": {
      "2026": 3.4,
      "2025": 1.1,
      "2024": -0.8,
      "2023": 13.1,
-     "2022": 2.6,
+     "2022": 1.9,
      "2021": 113.6,
-     "2020": 74.8,
-     "2019": -10.5,
-     "2018": -21.1,
-     "2017": 63.0,
-     "2016": 67.2
+     "2020": 75.5,
+     "2019": -9.6,
+     "2018": -22.9,
+     "2017": 55.5,
+     "2016": 67.0
     },
     "bull/bear a year": [
-     32.0,
-     -1.2
+     31.4,
+     -2.3
     ],
     "ex-Covid": [
-     18.6,
-     -41.1
+     17.8,
+     -40.4
     ]
    },
    "by_shape": {
     "Flag": {
      "n": 1138,
      "win": 28,
-     "avg": 3.03,
+     "avg": 3.05,
      "avgR": 0.64,
      "stop_hit": 44,
      "tgt_hit": 14,
-     "pf": 1.98,
+     "pf": 1.99,
      "risk": 4.8,
      "hold": 7.0
     },
     "Pennant": {
-     "n": 116,
-     "win": 28,
-     "avg": 2.36,
-     "avgR": 0.61,
+     "n": 118,
+     "win": 27,
+     "avg": 2.23,
+     "avgR": 0.58,
      "stop_hit": 44,
-     "tgt_hit": 20,
-     "pf": 1.62,
+     "tgt_hit": 19,
+     "pf": 1.59,
      "risk": 6.6,
      "hold": 9.0
     },
     "Rectangle": {
-     "n": 58,
+     "n": 59,
      "win": 31,
-     "avg": 4.98,
-     "avgR": 0.17,
+     "avg": 4.67,
+     "avgR": 0.15,
      "stop_hit": 31,
-     "tgt_hit": 26,
-     "pf": 2.45,
-     "risk": 6.6,
+     "tgt_hit": 25,
+     "pf": 2.3,
+     "risk": 6.8,
      "hold": 12.0
     }
    },
    "by_lane": {
     "early": {
-     "n": 794,
+     "n": 793,
      "win": 28,
-     "avg": 2.95,
+     "avg": 2.92,
      "avgR": 0.59,
-     "stop_hit": 40,
+     "stop_hit": 41,
      "tgt_hit": 15,
-     "pf": 1.91,
-     "risk": 5.1,
+     "pf": 1.9,
+     "risk": 5.0,
      "hold": 8.0
     },
     "established": {
-     "n": 518,
-     "win": 29,
-     "avg": 3.22,
-     "avgR": 0.65,
+     "n": 522,
+     "win": 30,
+     "avg": 3.24,
+     "avgR": 0.66,
      "stop_hit": 48,
      "tgt_hit": 16,
-     "pf": 2.05,
+     "pf": 2.06,
      "risk": 4.9,
      "hold": 7.0
     }
@@ -224,92 +224,92 @@
      "hold": 6.0
     },
     "2023": {
-     "n": 141,
+     "n": 142,
      "win": 31,
-     "avg": 1.45,
-     "avgR": 0.24,
+     "avg": 1.38,
+     "avgR": 0.23,
      "stop_hit": 45,
      "tgt_hit": 13,
-     "pf": 1.56,
+     "pf": 1.53,
      "risk": 4.5,
      "hold": 8.0
     },
     "2022": {
      "n": 117,
      "win": 22,
-     "avg": -1.2,
+     "avg": -1.21,
      "avgR": -0.01,
      "stop_hit": 47,
      "tgt_hit": 15,
      "pf": 0.71,
-     "risk": 5.4,
+     "risk": 5.3,
      "hold": 7.0
     },
     "2021": {
-     "n": 210,
-     "win": 39,
-     "avg": 9.15,
-     "avgR": 2.01,
+     "n": 209,
+     "win": 38,
+     "avg": 9.19,
+     "avgR": 2.02,
      "stop_hit": 38,
      "tgt_hit": 26,
-     "pf": 3.99,
+     "pf": 4.0,
      "risk": 5.4,
      "hold": 9.0
     },
     "2020": {
-     "n": 107,
+     "n": 108,
      "win": 30,
-     "avg": 13.69,
-     "avgR": 2.1,
+     "avg": 13.53,
+     "avgR": 2.07,
      "stop_hit": 47,
-     "tgt_hit": 20,
-     "pf": 4.96,
+     "tgt_hit": 19,
+     "pf": 4.91,
      "risk": 6.0,
      "hold": 7.0
     },
     "2019": {
-     "n": 69,
-     "win": 26,
-     "avg": 0.7,
-     "avgR": 0.35,
-     "stop_hit": 41,
+     "n": 67,
+     "win": 27,
+     "avg": 0.87,
+     "avgR": 0.4,
+     "stop_hit": 39,
      "tgt_hit": 10,
-     "pf": 1.19,
+     "pf": 1.24,
      "risk": 4.6,
      "hold": 8.0
     },
     "2018": {
-     "n": 59,
-     "win": 12,
-     "avg": -3.81,
-     "avgR": -0.64,
-     "stop_hit": 54,
+     "n": 61,
+     "win": 11,
+     "avg": -3.74,
+     "avgR": -0.65,
+     "stop_hit": 56,
      "tgt_hit": 5,
      "pf": 0.1,
      "risk": 4.7,
      "hold": 6.0
     },
     "2017": {
-     "n": 118,
-     "win": 37,
-     "avg": 4.8,
-     "avgR": 0.9,
-     "stop_hit": 41,
-     "tgt_hit": 25,
-     "pf": 2.92,
-     "risk": 5.0,
-     "hold": 9.0
+     "n": 119,
+     "win": 38,
+     "avg": 4.81,
+     "avgR": 0.92,
+     "stop_hit": 40,
+     "tgt_hit": 24,
+     "pf": 2.93,
+     "risk": 4.9,
+     "hold": 10.0
     },
     "2016": {
-     "n": 56,
-     "win": 27,
-     "avg": 6.78,
-     "avgR": 1.12,
-     "stop_hit": 52,
+     "n": 57,
+     "win": 26,
+     "avg": 6.65,
+     "avgR": 1.09,
+     "stop_hit": 51,
      "tgt_hit": 16,
-     "pf": 3.24,
+     "pf": 3.22,
      "risk": 4.2,
-     "hold": 7.5
+     "hold": 7.0
     }
    },
    "per_year": 126
@@ -317,13 +317,13 @@
   "2 scanner now, buy above breakout high next day": {
    "trades": {
     "all": {
-     "n": 811,
+     "n": 813,
      "win": 29,
-     "avg": 3.43,
+     "avg": 3.44,
      "avgR": 0.52,
      "stop_hit": 36,
      "tgt_hit": 20,
-     "pf": 1.87,
+     "pf": 1.88,
      "risk": 6.5,
      "hold": 9.0
     },
@@ -361,20 +361,20 @@
      "hold": 8.0
     },
     "last 5y": {
-     "n": 426,
+     "n": 428,
      "win": 26,
      "avg": -1.34,
      "avgR": -0.2,
      "stop_hit": 37,
-     "tgt_hit": 15,
-     "pf": 0.67,
+     "tgt_hit": 14,
+     "pf": 0.66,
      "risk": 6.3,
      "hold": 8.0
     },
     "ex_covid": {
-     "n": 746,
+     "n": 748,
      "win": 29,
-     "avg": 1.88,
+     "avg": 1.89,
      "avgR": 0.32,
      "stop_hit": 36,
      "tgt_hit": 20,
@@ -384,7 +384,7 @@
     }
    },
    "port": {
-    "CAGR": 14.0,
+    "CAGR": 14.1,
     "max DD": -38.5,
     "1y": -10.3,
     "2y": -11.7,
@@ -398,40 +398,40 @@
      "2022": -0.5,
      "2021": 93.6,
      "2020": 80.2,
-     "2019": -4.9,
-     "2018": -18.5,
-     "2017": 50.2,
-     "2016": 38.5
+     "2019": -3.9,
+     "2018": -19.4,
+     "2017": 53.8,
+     "2016": 37.3
     },
     "bull/bear a year": [
-     20.1,
-     -3.0
+     20.7,
+     -4.1
     ],
     "ex-Covid": [
-     9.1,
+     9.2,
      -38.5
     ]
    },
    "by_shape": {
     "Flag": {
-     "n": 705,
+     "n": 706,
      "win": 29,
-     "avg": 3.68,
+     "avg": 3.69,
      "avgR": 0.54,
      "stop_hit": 36,
      "tgt_hit": 19,
-     "pf": 1.97,
+     "pf": 1.98,
      "risk": 6.3,
      "hold": 8.0
     },
     "Pennant": {
-     "n": 73,
-     "win": 32,
-     "avg": 0.09,
-     "avgR": 0.2,
+     "n": 74,
+     "win": 31,
+     "avg": -0.01,
+     "avgR": 0.19,
      "stop_hit": 38,
-     "tgt_hit": 21,
-     "pf": 1.02,
+     "tgt_hit": 20,
+     "pf": 1.0,
      "risk": 8.2,
      "hold": 10.0
     },
@@ -450,23 +450,23 @@
    "by_lane": {
     "early": {
      "n": 492,
-     "win": 29,
-     "avg": 3.52,
+     "win": 28,
+     "avg": 3.49,
      "avgR": 0.52,
      "stop_hit": 34,
      "tgt_hit": 19,
-     "pf": 1.89,
+     "pf": 1.88,
      "risk": 6.5,
      "hold": 9.0
     },
     "established": {
-     "n": 319,
-     "win": 30,
-     "avg": 3.3,
-     "avgR": 0.52,
+     "n": 321,
+     "win": 31,
+     "avg": 3.35,
+     "avgR": 0.53,
      "stop_hit": 39,
-     "tgt_hit": 21,
-     "pf": 1.86,
+     "tgt_hit": 22,
+     "pf": 1.88,
      "risk": 6.5,
      "hold": 8.0
     }
@@ -506,35 +506,35 @@
      "hold": 8.0
     },
     "2023": {
-     "n": 89,
+     "n": 90,
      "win": 29,
-     "avg": 0.05,
+     "avg": 0.02,
      "avgR": -0.09,
      "stop_hit": 40,
-     "tgt_hit": 15,
+     "tgt_hit": 14,
      "pf": 1.01,
      "risk": 6.0,
      "hold": 9.0
     },
     "2022": {
-     "n": 69,
+     "n": 70,
      "win": 20,
-     "avg": -2.16,
+     "avg": -2.15,
      "avgR": -0.14,
      "stop_hit": 39,
      "tgt_hit": 20,
      "pf": 0.6,
-     "risk": 8.0,
+     "risk": 7.9,
      "hold": 7.0
     },
     "2021": {
-     "n": 140,
+     "n": 139,
      "win": 36,
-     "avg": 9.07,
-     "avgR": 1.53,
+     "avg": 9.17,
+     "avgR": 1.55,
      "stop_hit": 35,
      "tgt_hit": 30,
-     "pf": 3.22,
+     "pf": 3.25,
      "risk": 7.2,
      "hold": 9.0
     },
@@ -550,47 +550,47 @@
      "hold": 10.0
     },
     "2019": {
-     "n": 43,
-     "win": 30,
-     "avg": 3.36,
-     "avgR": 0.53,
-     "stop_hit": 26,
-     "tgt_hit": 16,
-     "pf": 2.17,
+     "n": 41,
+     "win": 32,
+     "avg": 3.78,
+     "avgR": 0.6,
+     "stop_hit": 22,
+     "tgt_hit": 17,
+     "pf": 2.37,
      "risk": 5.8,
      "hold": 10.0
     },
     "2018": {
-     "n": 38,
-     "win": 11,
-     "avg": -5.76,
-     "avgR": -0.68,
-     "stop_hit": 42,
+     "n": 40,
+     "win": 10,
+     "avg": -5.7,
+     "avgR": -0.7,
+     "stop_hit": 48,
      "tgt_hit": 8,
-     "pf": 0.06,
-     "risk": 7.7,
-     "hold": 6.5
+     "pf": 0.05,
+     "risk": 7.0,
+     "hold": 6.0
     },
     "2017": {
      "n": 77,
-     "win": 40,
-     "avg": 5.96,
-     "avgR": 0.93,
-     "stop_hit": 32,
+     "win": 42,
+     "avg": 6.12,
+     "avgR": 0.98,
+     "stop_hit": 31,
      "tgt_hit": 34,
-     "pf": 3.06,
+     "pf": 3.16,
      "risk": 6.4,
      "hold": 14.0
     },
     "2016": {
-     "n": 26,
-     "win": 31,
-     "avg": 13.27,
-     "avgR": 1.64,
-     "stop_hit": 38,
-     "tgt_hit": 27,
-     "pf": 4.86,
-     "risk": 6.0,
+     "n": 27,
+     "win": 30,
+     "avg": 12.49,
+     "avgR": 1.54,
+     "stop_hit": 41,
+     "tgt_hit": 26,
+     "pf": 4.47,
+     "risk": 6.1,
      "hold": 8.0
     }
    },
@@ -599,13 +599,13 @@
   "3 + volume dries up in flag": {
    "trades": {
     "all": {
-     "n": 412,
+     "n": 415,
      "win": 28,
-     "avg": 3.25,
-     "avgR": 0.46,
+     "avg": 3.22,
+     "avgR": 0.45,
      "stop_hit": 36,
      "tgt_hit": 19,
-     "pf": 1.88,
+     "pf": 1.87,
      "risk": 6.2,
      "hold": 8.0
     },
@@ -643,10 +643,10 @@
      "hold": 8.0
     },
     "last 5y": {
-     "n": 211,
-     "win": 26,
-     "avg": -1.02,
-     "avgR": -0.21,
+     "n": 213,
+     "win": 25,
+     "avg": -1.03,
+     "avgR": -0.22,
      "stop_hit": 37,
      "tgt_hit": 15,
      "pf": 0.72,
@@ -654,20 +654,20 @@
      "hold": 8.0
     },
     "ex_covid": {
-     "n": 381,
+     "n": 385,
      "win": 28,
-     "avg": 2.02,
-     "avgR": 0.3,
+     "avg": 1.97,
+     "avgR": 0.29,
      "stop_hit": 36,
      "tgt_hit": 19,
-     "pf": 1.55,
+     "pf": 1.53,
      "risk": 6.1,
      "hold": 8.0
     }
    },
    "port": {
-    "CAGR": 7.5,
-    "max DD": -32.6,
+    "CAGR": 7.4,
+    "max DD": -32.7,
     "1y": -6.4,
     "2y": -5.3,
     "3y": -6.6,
@@ -677,32 +677,32 @@
      "2025": -5.1,
      "2024": -8.1,
      "2023": -1.0,
-     "2022": -5.4,
+     "2022": -5.5,
      "2021": 49.3,
-     "2020": 72.6,
-     "2019": 1.5,
-     "2018": -10.9,
-     "2017": 14.8,
+     "2020": 72.5,
+     "2019": 0.4,
+     "2018": -11.5,
+     "2017": 15.3,
      "2016": 3.9
     },
     "bull/bear a year": [
-     11.9,
-     -5.1
+     12.0,
+     -5.8
     ],
     "ex-Covid": [
-     2.6,
-     -32.6
+     2.4,
+     -32.7
     ]
    },
    "by_shape": {
     "Flag": {
-     "n": 369,
+     "n": 372,
      "win": 28,
-     "avg": 3.55,
-     "avgR": 0.48,
+     "avg": 3.5,
+     "avgR": 0.47,
      "stop_hit": 36,
      "tgt_hit": 19,
-     "pf": 2.01,
+     "pf": 2.0,
      "risk": 6.1,
      "hold": 8.0
     },
@@ -731,24 +731,24 @@
    },
    "by_lane": {
     "early": {
-     "n": 220,
-     "win": 27,
-     "avg": 3.78,
-     "avgR": 0.51,
-     "stop_hit": 32,
-     "tgt_hit": 20,
-     "pf": 2.06,
+     "n": 221,
+     "win": 26,
+     "avg": 3.61,
+     "avgR": 0.49,
+     "stop_hit": 33,
+     "tgt_hit": 19,
+     "pf": 2.0,
      "risk": 6.1,
-     "hold": 9.0
+     "hold": 8.0
     },
     "established": {
-     "n": 192,
-     "win": 30,
-     "avg": 2.64,
-     "avgR": 0.4,
+     "n": 194,
+     "win": 31,
+     "avg": 2.77,
+     "avgR": 0.41,
      "stop_hit": 40,
-     "tgt_hit": 19,
-     "pf": 1.68,
+     "tgt_hit": 20,
+     "pf": 1.73,
      "risk": 6.3,
      "hold": 7.0
     }
@@ -788,23 +788,23 @@
      "hold": 10.0
     },
     "2023": {
-     "n": 39,
-     "win": 26,
-     "avg": -0.16,
-     "avgR": -0.09,
-     "stop_hit": 41,
-     "tgt_hit": 13,
-     "pf": 0.95,
+     "n": 40,
+     "win": 25,
+     "avg": -0.21,
+     "avgR": -0.1,
+     "stop_hit": 40,
+     "tgt_hit": 12,
+     "pf": 0.93,
      "risk": 5.7,
      "hold": 9.0
     },
     "2022": {
-     "n": 29,
-     "win": 21,
-     "avg": -0.76,
+     "n": 30,
+     "win": 20,
+     "avg": -0.78,
      "avgR": -0.11,
-     "stop_hit": 45,
-     "tgt_hit": 21,
+     "stop_hit": 43,
+     "tgt_hit": 20,
      "pf": 0.84,
      "risk": 6.7,
      "hold": 5.0
@@ -821,15 +821,15 @@
      "hold": 8.0
     },
     "2020": {
-     "n": 32,
-     "win": 28,
-     "avg": 17.61,
-     "avgR": 2.28,
-     "stop_hit": 38,
-     "tgt_hit": 25,
-     "pf": 5.41,
-     "risk": 7.7,
-     "hold": 6.5
+     "n": 31,
+     "win": 29,
+     "avg": 18.41,
+     "avgR": 2.37,
+     "stop_hit": 39,
+     "tgt_hit": 26,
+     "pf": 5.75,
+     "risk": 7.6,
+     "hold": 6.0
     },
     "2019": {
      "n": 23,
@@ -843,24 +843,24 @@
      "hold": 11.0
     },
     "2018": {
-     "n": 14,
-     "win": 14,
-     "avg": -5.53,
-     "avgR": -0.66,
-     "stop_hit": 50,
+     "n": 16,
+     "win": 12,
+     "avg": -5.61,
+     "avgR": -0.71,
+     "stop_hit": 56,
      "tgt_hit": 0,
-     "pf": 0.09,
+     "pf": 0.08,
      "risk": 6.1,
      "hold": 5.0
     },
     "2017": {
      "n": 40,
      "win": 30,
-     "avg": 3.09,
+     "avg": 3.17,
      "avgR": 0.51,
      "stop_hit": 35,
      "tgt_hit": 28,
-     "pf": 1.94,
+     "pf": 1.99,
      "risk": 6.0,
      "hold": 7.0
     },
@@ -883,9 +883,9 @@
     "all": {
      "n": 208,
      "win": 31,
-     "avg": 3.64,
-     "avgR": 0.36,
-     "stop_hit": 28,
+     "avg": 3.65,
+     "avgR": 0.35,
+     "stop_hit": 29,
      "tgt_hit": 27,
      "pf": 1.69,
      "risk": 10.2,
@@ -938,7 +938,7 @@
     "ex_covid": {
      "n": 193,
      "win": 30,
-     "avg": 0.44,
+     "avg": 0.45,
      "avgR": 0.09,
      "stop_hit": 28,
      "tgt_hit": 27,
@@ -963,9 +963,9 @@
      "2021": 26.5,
      "2020": 24.7,
      "2019": 6.3,
-     "2018": -10.9,
+     "2018": -10.1,
      "2017": 5.9,
-     "2016": -1.7
+     "2016": -2.7
     },
     "bull/bear a year": [
      3.8,
@@ -978,26 +978,26 @@
    },
    "by_shape": {
     "Flag": {
-     "n": 167,
-     "win": 32,
-     "avg": 4.95,
+     "n": 166,
+     "win": 33,
+     "avg": 5.04,
      "avgR": 0.47,
-     "stop_hit": 27,
+     "stop_hit": 28,
      "tgt_hit": 29,
-     "pf": 1.98,
-     "risk": 9.7,
+     "pf": 2.0,
+     "risk": 9.6,
      "hold": 11.0
     },
     "Pennant": {
-     "n": 22,
-     "win": 27,
-     "avg": -2.24,
-     "avgR": -0.05,
-     "stop_hit": 41,
-     "tgt_hit": 18,
-     "pf": 0.71,
-     "risk": 12.2,
-     "hold": 7.5
+     "n": 23,
+     "win": 26,
+     "avg": -2.47,
+     "avgR": -0.07,
+     "stop_hit": 39,
+     "tgt_hit": 17,
+     "pf": 0.68,
+     "risk": 12.3,
+     "hold": 8.0
     },
     "Rectangle": {
      "n": 19,
@@ -1013,26 +1013,26 @@
    },
    "by_lane": {
     "early": {
-     "n": 140,
-     "win": 26,
-     "avg": 4.15,
-     "avgR": 0.42,
-     "stop_hit": 27,
-     "tgt_hit": 23,
+     "n": 137,
+     "win": 25,
+     "avg": 4.17,
+     "avgR": 0.41,
+     "stop_hit": 28,
+     "tgt_hit": 22,
      "pf": 1.75,
      "risk": 10.2,
      "hold": 10.0
     },
     "established": {
-     "n": 68,
-     "win": 41,
-     "avg": 2.58,
-     "avgR": 0.23,
+     "n": 71,
+     "win": 42,
+     "avg": 2.65,
+     "avgR": 0.25,
      "stop_hit": 31,
-     "tgt_hit": 37,
-     "pf": 1.53,
-     "risk": 10.3,
-     "hold": 14.5
+     "tgt_hit": 38,
+     "pf": 1.56,
+     "risk": 9.8,
+     "hold": 15.0
     }
    },
    "by_year": {
@@ -1125,15 +1125,15 @@
      "hold": 10.0
     },
     "2018": {
-     "n": 16,
+     "n": 15,
      "win": 0,
-     "avg": -7.74,
+     "avg": -7.59,
      "avgR": -0.78,
-     "stop_hit": 44,
-     "tgt_hit": 19,
+     "stop_hit": 47,
+     "tgt_hit": 20,
      "pf": 0.0,
-     "risk": 11.1,
-     "hold": 6.5
+     "risk": 11.0,
+     "hold": 6.0
     },
     "2017": {
      "n": 19,
@@ -1147,14 +1147,14 @@
      "hold": 14.0
     },
     "2016": {
-     "n": 6,
-     "win": 17,
-     "avg": -3.17,
-     "avgR": -0.28,
-     "stop_hit": 33,
-     "tgt_hit": 17,
-     "pf": 0.36,
-     "risk": 7.9,
+     "n": 7,
+     "win": 14,
+     "avg": -3.85,
+     "avgR": -0.39,
+     "stop_hit": 43,
+     "tgt_hit": 14,
+     "pf": 0.28,
+     "risk": 7.7,
      "hold": 7.0
     }
    },
@@ -1163,15 +1163,15 @@
   "5 + dry + breakout volume (your rule)": {
    "trades": {
     "all": {
-     "n": 76,
-     "win": 39,
-     "avg": 9.45,
-     "avgR": 1.0,
+     "n": 75,
+     "win": 40,
+     "avg": 9.67,
+     "avgR": 1.02,
      "stop_hit": 21,
      "tgt_hit": 32,
-     "pf": 3.12,
-     "risk": 9.2,
-     "hold": 14.5
+     "pf": 3.19,
+     "risk": 9.1,
+     "hold": 14.0
     },
     "last 1y": {
      "n": 3,
@@ -1231,7 +1231,7 @@
    },
    "port": {
     "CAGR": 6.3,
-    "max DD": -10.8,
+    "max DD": -10.6,
     "1y": 4.4,
     "2y": 3.1,
     "3y": 1.9,
@@ -1243,14 +1243,14 @@
      "2023": -1.6,
      "2022": 2.6,
      "2021": 36.0,
-     "2020": 23.9,
+     "2020": 24.6,
      "2019": 4.8,
      "2018": -5.4,
      "2017": 7.4,
      "2016": -1.2
     },
     "bull/bear a year": [
-     7.4,
+     7.5,
      3.1
     ],
     "ex-Covid": [
@@ -1260,14 +1260,14 @@
    },
    "by_shape": {
     "Flag": {
-     "n": 61,
-     "win": 41,
-     "avg": 11.66,
-     "avgR": 1.22,
+     "n": 60,
+     "win": 42,
+     "avg": 11.97,
+     "avgR": 1.25,
      "stop_hit": 15,
-     "tgt_hit": 34,
-     "pf": 3.94,
-     "risk": 8.7,
+     "tgt_hit": 35,
+     "pf": 4.06,
+     "risk": 8.6,
      "hold": 15.0
     },
     "Pennant": {
@@ -1295,26 +1295,26 @@
    },
    "by_lane": {
     "early": {
-     "n": 42,
-     "win": 36,
-     "avg": 13.04,
+     "n": 40,
+     "win": 32,
+     "avg": 13.17,
      "avgR": 1.47,
-     "stop_hit": 19,
-     "tgt_hit": 29,
-     "pf": 3.95,
-     "risk": 9.2,
-     "hold": 12.0
+     "stop_hit": 20,
+     "tgt_hit": 25,
+     "pf": 3.84,
+     "risk": 9.4,
+     "hold": 11.5
     },
     "established": {
-     "n": 34,
-     "win": 44,
-     "avg": 5.0,
-     "avgR": 0.43,
-     "stop_hit": 24,
-     "tgt_hit": 35,
-     "pf": 2.11,
-     "risk": 9.2,
-     "hold": 15.5
+     "n": 35,
+     "win": 49,
+     "avg": 5.67,
+     "avgR": 0.51,
+     "stop_hit": 23,
+     "tgt_hit": 40,
+     "pf": 2.36,
+     "risk": 8.2,
+     "hold": 16.0
     }
    },
    "by_year": {
@@ -1385,15 +1385,15 @@
      "hold": 17.0
     },
     "2020": {
-     "n": 5,
-     "win": 20,
-     "avg": 48.68,
-     "avgR": 4.79,
-     "stop_hit": 20,
-     "tgt_hit": 40,
-     "pf": 9.02,
-     "risk": 10.6,
-     "hold": 22.0
+     "n": 4,
+     "win": 25,
+     "avg": 62.7,
+     "avgR": 6.1,
+     "stop_hit": 25,
+     "tgt_hit": 50,
+     "pf": 11.93,
+     "risk": 10.4,
+     "hold": 16.5
     },
     "2019": {
      "n": 4,
@@ -1445,15 +1445,15 @@
   "6 + dry + breakout volume + tight <= 8% (your rule, tight)": {
    "trades": {
     "all": {
-     "n": 59,
-     "win": 37,
-     "avg": 9.09,
-     "avgR": 1.05,
+     "n": 58,
+     "win": 38,
+     "avg": 9.38,
+     "avgR": 1.07,
      "stop_hit": 24,
      "tgt_hit": 29,
-     "pf": 3.04,
-     "risk": 8.6,
-     "hold": 15.0
+     "pf": 3.13,
+     "risk": 8.4,
+     "hold": 14.0
     },
     "last 1y": {
      "n": 3,
@@ -1525,14 +1525,14 @@
      "2023": -1.5,
      "2022": 5.1,
      "2021": 27.2,
-     "2020": 25.9,
+     "2020": 26.5,
      "2019": -1.2,
      "2018": -4.9,
      "2017": 5.1,
      "2016": -0.5
     },
     "bull/bear a year": [
-     5.4,
+     5.5,
      5.3
     ],
     "ex-Covid": [
@@ -1542,15 +1542,15 @@
    },
    "by_shape": {
     "Flag": {
-     "n": 46,
-     "win": 39,
-     "avg": 11.4,
-     "avgR": 1.3,
-     "stop_hit": 15,
-     "tgt_hit": 30,
-     "pf": 3.95,
+     "n": 45,
+     "win": 40,
+     "avg": 11.81,
+     "avgR": 1.34,
+     "stop_hit": 16,
+     "tgt_hit": 31,
+     "pf": 4.12,
      "risk": 8.2,
-     "hold": 15.5
+     "hold": 15.0
     },
     "Pennant": {
      "n": 7,
@@ -1588,15 +1588,15 @@
      "hold": 11.5
     },
     "established": {
-     "n": 29,
-     "win": 45,
-     "avg": 2.22,
-     "avgR": 0.25,
-     "stop_hit": 24,
-     "tgt_hit": 34,
-     "pf": 1.52,
+     "n": 28,
+     "win": 46,
+     "avg": 2.56,
+     "avgR": 0.27,
+     "stop_hit": 25,
+     "tgt_hit": 36,
+     "pf": 1.62,
      "risk": 8.2,
-     "hold": 16.0
+     "hold": 15.5
     }
    },
    "by_year": {
@@ -1667,15 +1667,15 @@
      "hold": 15.0
     },
     "2020": {
-     "n": 2,
-     "win": 50,
-     "avg": 133.16,
-     "avgR": 13.11,
+     "n": 1,
+     "win": 100,
+     "avg": 273.73,
+     "avgR": 26.71,
      "stop_hit": 0,
-     "tgt_hit": 50,
-     "pf": 36.97,
-     "risk": 12.7,
-     "hold": 60.5
+     "tgt_hit": 100,
+     "pf": null,
+     "risk": 10.2,
+     "hold": 99.0
     },
     "2019": {
      "n": 3,
@@ -1729,12 +1729,12 @@
     "all": {
      "n": 122,
      "win": 33,
-     "avg": 6.18,
-     "avgR": 0.55,
-     "stop_hit": 38,
+     "avg": 6.17,
+     "avgR": 0.54,
+     "stop_hit": 39,
      "tgt_hit": 20,
-     "pf": 2.58,
-     "risk": 6.7,
+     "pf": 2.57,
+     "risk": 6.6,
      "hold": 10.0
     },
     "last 1y": {
@@ -1782,20 +1782,20 @@
      "hold": 10.0
     },
     "ex_covid": {
-     "n": 118,
+     "n": 119,
      "win": 33,
-     "avg": 4.19,
-     "avgR": 0.32,
-     "stop_hit": 37,
+     "avg": 4.13,
+     "avgR": 0.31,
+     "stop_hit": 38,
      "tgt_hit": 20,
-     "pf": 2.08,
+     "pf": 2.07,
      "risk": 6.5,
      "hold": 10.0
     }
    },
    "port": {
-    "CAGR": 8.8,
-    "max DD": -19.1,
+    "CAGR": 8.9,
+    "max DD": -18.7,
     "1y": 3.7,
     "2y": 8.1,
     "3y": 5.7,
@@ -1807,31 +1807,31 @@
      "2023": 8.6,
      "2022": 4.0,
      "2021": 47.7,
-     "2020": 25.0,
+     "2020": 25.9,
      "2019": -6.7,
      "2018": -5.6,
      "2017": 13.4,
      "2016": -1.8
     },
     "bull/bear a year": [
-     9.5,
+     9.6,
      7.1
     ],
     "ex-Covid": [
-     7.0,
-     -22.9
+     7.1,
+     -22.6
     ]
    },
    "by_shape": {
     "Flag": {
-     "n": 94,
+     "n": 93,
      "win": 30,
-     "avg": 5.05,
-     "avgR": 0.83,
-     "stop_hit": 35,
+     "avg": 5.23,
+     "avgR": 0.84,
+     "stop_hit": 37,
      "tgt_hit": 18,
-     "pf": 2.27,
-     "risk": 6.6,
+     "pf": 2.35,
+     "risk": 6.5,
      "hold": 10.0
     },
     "Pennant": {
@@ -1846,15 +1846,15 @@
      "hold": 17.0
     },
     "Rectangle": {
-     "n": 17,
-     "win": 35,
-     "avg": 4.29,
-     "avgR": -2.21,
-     "stop_hit": 47,
-     "tgt_hit": 18,
-     "pf": 2.37,
-     "risk": 4.8,
-     "hold": 11.0
+     "n": 18,
+     "win": 33,
+     "avg": 3.33,
+     "avgR": -2.14,
+     "stop_hit": 44,
+     "tgt_hit": 17,
+     "pf": 1.91,
+     "risk": 5.1,
+     "hold": 10.5
     }
    },
    "by_lane": {
@@ -1872,13 +1872,13 @@
     "established": {
      "n": 57,
      "win": 42,
-     "avg": 2.17,
-     "avgR": 0.26,
-     "stop_hit": 40,
+     "avg": 2.15,
+     "avgR": 0.24,
+     "stop_hit": 42,
      "tgt_hit": 23,
-     "pf": 1.6,
-     "risk": 6.8,
-     "hold": 11.0
+     "pf": 1.59,
+     "risk": 6.6,
+     "hold": 10.0
     }
    },
    "by_year": {
@@ -1951,13 +1951,13 @@
     "2020": {
      "n": 6,
      "win": 17,
-     "avg": 41.43,
-     "avgR": 4.36,
-     "stop_hit": 67,
+     "avg": 41.29,
+     "avgR": 4.2,
+     "stop_hit": 83,
      "tgt_hit": 17,
-     "pf": 9.25,
-     "risk": 7.9,
-     "hold": 7.0
+     "pf": 9.0,
+     "risk": 5.8,
+     "hold": 5.0
     },
     "2019": {
      "n": 8,
@@ -2005,6 +2005,852 @@
     }
    },
    "per_year": 12
+  },
+  "8 rule 7 + room >= 0.8 x pole to the next resistance": {
+   "trades": {
+    "all": {
+     "n": 51,
+     "win": 37,
+     "avg": 2.81,
+     "avgR": 0.31,
+     "stop_hit": 43,
+     "tgt_hit": 18,
+     "pf": 1.66,
+     "risk": 7.0,
+     "hold": 10.0
+    },
+    "last 1y": {
+     "n": 3,
+     "win": 0,
+     "avg": -7.83,
+     "avgR": -1.02,
+     "stop_hit": 67,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 9.3,
+     "hold": 4.0
+    },
+    "last 2y": {
+     "n": 7,
+     "win": 14,
+     "avg": -5.78,
+     "avgR": -0.74,
+     "stop_hit": 43,
+     "tgt_hit": 0,
+     "pf": 0.04,
+     "risk": 9.3,
+     "hold": 4.0
+    },
+    "last 3y": {
+     "n": 13,
+     "win": 31,
+     "avg": -2.16,
+     "avgR": -0.29,
+     "stop_hit": 38,
+     "tgt_hit": 0,
+     "pf": 0.49,
+     "risk": 8.0,
+     "hold": 10.0
+    },
+    "last 5y": {
+     "n": 27,
+     "win": 33,
+     "avg": 0.22,
+     "avgR": 0.21,
+     "stop_hit": 44,
+     "tgt_hit": 7,
+     "pf": 1.05,
+     "risk": 7.3,
+     "hold": 10.0
+    },
+    "ex_covid": {
+     "n": 51,
+     "win": 37,
+     "avg": 2.81,
+     "avgR": 0.31,
+     "stop_hit": 43,
+     "tgt_hit": 18,
+     "pf": 1.66,
+     "risk": 7.0,
+     "hold": 10.0
+    }
+   },
+   "port": {
+    "CAGR": 1.7,
+    "max DD": -10.0,
+    "1y": -2.9,
+    "2y": -2.5,
+    "3y": -1.2,
+    "5y": 1.6,
+    "years": {
+     "2026": -2.9,
+     "2025": -1.1,
+     "2024": 0.4,
+     "2023": 11.5,
+     "2022": -0.1,
+     "2021": 10.2,
+     "2020": -0.7,
+     "2019": -3.5,
+     "2018": -1.6,
+     "2017": 7.7,
+     "2016": -1.2
+    },
+    "bull/bear a year": [
+     2.1,
+     0.5
+    ],
+    "ex-Covid": [
+     1.9,
+     -10.0
+    ]
+   },
+   "by_shape": {
+    "Flag": {
+     "n": 40,
+     "win": 32,
+     "avg": 1.25,
+     "avgR": -0.07,
+     "stop_hit": 45,
+     "tgt_hit": 15,
+     "pf": 1.31,
+     "risk": 6.5,
+     "hold": 10.0
+    },
+    "Pennant": {
+     "n": 5,
+     "win": 40,
+     "avg": 7.96,
+     "avgR": 0.84,
+     "stop_hit": 60,
+     "tgt_hit": 40,
+     "pf": 2.09,
+     "risk": 11.2,
+     "hold": 7.0
+    },
+    "Rectangle": {
+     "n": 6,
+     "win": 67,
+     "avg": 8.96,
+     "avgR": 2.4,
+     "stop_hit": 17,
+     "tgt_hit": 17,
+     "pf": 3.39,
+     "risk": 6.9,
+     "hold": 17.0
+    }
+   },
+   "by_lane": {
+    "early": {
+     "n": 15,
+     "win": 27,
+     "avg": 1.44,
+     "avgR": 0.46,
+     "stop_hit": 40,
+     "tgt_hit": 20,
+     "pf": 1.25,
+     "risk": 10.0,
+     "hold": 12.0
+    },
+    "established": {
+     "n": 36,
+     "win": 42,
+     "avg": 3.38,
+     "avgR": 0.25,
+     "stop_hit": 44,
+     "tgt_hit": 17,
+     "pf": 1.91,
+     "risk": 6.5,
+     "hold": 9.5
+    }
+   },
+   "by_year": {
+    "2026": {
+     "n": 3,
+     "win": 0,
+     "avg": -7.83,
+     "avgR": -1.02,
+     "stop_hit": 67,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 9.3,
+     "hold": 4.0
+    },
+    "2025": {
+     "n": 3,
+     "win": 33,
+     "avg": -2.94,
+     "avgR": -0.36,
+     "stop_hit": 0,
+     "tgt_hit": 0,
+     "pf": 0.15,
+     "risk": 10.3,
+     "hold": 14.0
+    },
+    "2024": {
+     "n": 7,
+     "win": 43,
+     "avg": 0.6,
+     "avgR": 0.04,
+     "stop_hit": 43,
+     "tgt_hit": 0,
+     "pf": 1.2,
+     "risk": 7.3,
+     "hold": 12.0
+    },
+    "2023": {
+     "n": 8,
+     "win": 38,
+     "avg": 7.65,
+     "avgR": 1.38,
+     "stop_hit": 50,
+     "tgt_hit": 25,
+     "pf": 3.13,
+     "risk": 7.4,
+     "hold": 10.0
+    },
+    "2022": {
+     "n": 4,
+     "win": 50,
+     "avg": -1.65,
+     "avgR": 0.1,
+     "stop_hit": 25,
+     "tgt_hit": 0,
+     "pf": 0.6,
+     "risk": 4.4,
+     "hold": 12.0
+    },
+    "2021": {
+     "n": 12,
+     "win": 58,
+     "avg": 9.71,
+     "avgR": 0.85,
+     "stop_hit": 33,
+     "tgt_hit": 33,
+     "pf": 3.56,
+     "risk": 8.7,
+     "hold": 19.0
+    },
+    "2020": {
+     "n": 2,
+     "win": 0,
+     "avg": -4.78,
+     "avgR": -1.25,
+     "stop_hit": 100,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 3.8,
+     "hold": 5.0
+    },
+    "2019": {
+     "n": 2,
+     "win": 0,
+     "avg": -16.37,
+     "avgR": -1.89,
+     "stop_hit": 100,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 7.1,
+     "hold": 17.0
+    },
+    "2018": {
+     "n": 2,
+     "win": 0,
+     "avg": -7.08,
+     "avgR": -0.85,
+     "stop_hit": 50,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 7.6,
+     "hold": 4.0
+    },
+    "2017": {
+     "n": 5,
+     "win": 60,
+     "avg": 12.7,
+     "avgR": 1.5,
+     "stop_hit": 40,
+     "tgt_hit": 60,
+     "pf": 7.52,
+     "risk": 5.8,
+     "hold": 31.0
+    },
+    "2016": {
+     "n": 3,
+     "win": 0,
+     "avg": -2.23,
+     "avgR": -0.46,
+     "stop_hit": 33,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 4.5,
+     "hold": 8.0
+    }
+   },
+   "per_year": 5
+  },
+  "9 rule 7 + room >= 1 x pole": {
+   "trades": {
+    "all": {
+     "n": 49,
+     "win": 35,
+     "avg": 2.73,
+     "avgR": 0.28,
+     "stop_hit": 45,
+     "tgt_hit": 18,
+     "pf": 1.61,
+     "risk": 7.3,
+     "hold": 10.0
+    },
+    "last 1y": {
+     "n": 3,
+     "win": 0,
+     "avg": -7.83,
+     "avgR": -1.02,
+     "stop_hit": 67,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 9.3,
+     "hold": 4.0
+    },
+    "last 2y": {
+     "n": 7,
+     "win": 14,
+     "avg": -5.78,
+     "avgR": -0.74,
+     "stop_hit": 43,
+     "tgt_hit": 0,
+     "pf": 0.04,
+     "risk": 9.3,
+     "hold": 4.0
+    },
+    "last 3y": {
+     "n": 13,
+     "win": 31,
+     "avg": -2.16,
+     "avgR": -0.29,
+     "stop_hit": 38,
+     "tgt_hit": 0,
+     "pf": 0.49,
+     "risk": 8.0,
+     "hold": 10.0
+    },
+    "last 5y": {
+     "n": 25,
+     "win": 28,
+     "avg": -0.15,
+     "avgR": 0.13,
+     "stop_hit": 48,
+     "tgt_hit": 8,
+     "pf": 0.97,
+     "risk": 8.0,
+     "hold": 9.0
+    },
+    "ex_covid": {
+     "n": 49,
+     "win": 35,
+     "avg": 2.73,
+     "avgR": 0.28,
+     "stop_hit": 45,
+     "tgt_hit": 18,
+     "pf": 1.61,
+     "risk": 7.3,
+     "hold": 10.0
+    }
+   },
+   "port": {
+    "CAGR": 1.5,
+    "max DD": -10.0,
+    "1y": -2.9,
+    "2y": -2.5,
+    "3y": -1.2,
+    "5y": 1.3,
+    "years": {
+     "2026": -2.9,
+     "2025": -1.1,
+     "2024": 0.4,
+     "2023": 11.5,
+     "2022": -1.6,
+     "2021": 10.2,
+     "2020": -0.7,
+     "2019": -3.5,
+     "2018": -1.6,
+     "2017": 7.7,
+     "2016": -1.2
+    },
+    "bull/bear a year": [
+     1.9,
+     0.5
+    ],
+    "ex-Covid": [
+     1.7,
+     -10.0
+    ]
+   },
+   "by_shape": {
+    "Flag": {
+     "n": 40,
+     "win": 32,
+     "avg": 1.25,
+     "avgR": -0.07,
+     "stop_hit": 45,
+     "tgt_hit": 15,
+     "pf": 1.31,
+     "risk": 6.5,
+     "hold": 10.0
+    },
+    "Pennant": {
+     "n": 5,
+     "win": 40,
+     "avg": 7.96,
+     "avgR": 0.84,
+     "stop_hit": 60,
+     "tgt_hit": 40,
+     "pf": 2.09,
+     "risk": 11.2,
+     "hold": 7.0
+    },
+    "Rectangle": {
+     "n": 4,
+     "win": 50,
+     "avg": 10.98,
+     "avgR": 3.01,
+     "stop_hit": 25,
+     "tgt_hit": 25,
+     "pf": 2.96,
+     "risk": 9.2,
+     "hold": 15.5
+    }
+   },
+   "by_lane": {
+    "early": {
+     "n": 15,
+     "win": 27,
+     "avg": 1.44,
+     "avgR": 0.46,
+     "stop_hit": 40,
+     "tgt_hit": 20,
+     "pf": 1.25,
+     "risk": 10.0,
+     "hold": 12.0
+    },
+    "established": {
+     "n": 34,
+     "win": 38,
+     "avg": 3.29,
+     "avgR": 0.2,
+     "stop_hit": 47,
+     "tgt_hit": 18,
+     "pf": 1.84,
+     "risk": 6.7,
+     "hold": 8.5
+    }
+   },
+   "by_year": {
+    "2026": {
+     "n": 3,
+     "win": 0,
+     "avg": -7.83,
+     "avgR": -1.02,
+     "stop_hit": 67,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 9.3,
+     "hold": 4.0
+    },
+    "2025": {
+     "n": 3,
+     "win": 33,
+     "avg": -2.94,
+     "avgR": -0.36,
+     "stop_hit": 0,
+     "tgt_hit": 0,
+     "pf": 0.15,
+     "risk": 10.3,
+     "hold": 14.0
+    },
+    "2024": {
+     "n": 7,
+     "win": 43,
+     "avg": 0.6,
+     "avgR": 0.04,
+     "stop_hit": 43,
+     "tgt_hit": 0,
+     "pf": 1.2,
+     "risk": 7.3,
+     "hold": 12.0
+    },
+    "2023": {
+     "n": 8,
+     "win": 38,
+     "avg": 7.65,
+     "avgR": 1.38,
+     "stop_hit": 50,
+     "tgt_hit": 25,
+     "pf": 3.13,
+     "risk": 7.4,
+     "hold": 10.0
+    },
+    "2022": {
+     "n": 2,
+     "win": 0,
+     "avg": -8.2,
+     "avgR": -0.98,
+     "stop_hit": 50,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 8.9,
+     "hold": 9.5
+    },
+    "2021": {
+     "n": 12,
+     "win": 58,
+     "avg": 9.71,
+     "avgR": 0.85,
+     "stop_hit": 33,
+     "tgt_hit": 33,
+     "pf": 3.56,
+     "risk": 8.7,
+     "hold": 19.0
+    },
+    "2020": {
+     "n": 2,
+     "win": 0,
+     "avg": -4.78,
+     "avgR": -1.25,
+     "stop_hit": 100,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 3.8,
+     "hold": 5.0
+    },
+    "2019": {
+     "n": 2,
+     "win": 0,
+     "avg": -16.37,
+     "avgR": -1.89,
+     "stop_hit": 100,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 7.1,
+     "hold": 17.0
+    },
+    "2018": {
+     "n": 2,
+     "win": 0,
+     "avg": -7.08,
+     "avgR": -0.85,
+     "stop_hit": 50,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 7.6,
+     "hold": 4.0
+    },
+    "2017": {
+     "n": 5,
+     "win": 60,
+     "avg": 12.7,
+     "avgR": 1.5,
+     "stop_hit": 40,
+     "tgt_hit": 60,
+     "pf": 7.52,
+     "risk": 5.8,
+     "hold": 31.0
+    },
+    "2016": {
+     "n": 3,
+     "win": 0,
+     "avg": -2.23,
+     "avgR": -0.46,
+     "stop_hit": 33,
+     "tgt_hit": 0,
+     "pf": 0.0,
+     "risk": 4.5,
+     "hold": 8.0
+    }
+   },
+   "per_year": 5
+  },
+  "10 scanner (no volume rules) + room >= 0.8 x pole": {
+   "trades": {
+    "all": {
+     "n": 528,
+     "win": 27,
+     "avg": 2.41,
+     "avgR": 0.41,
+     "stop_hit": 45,
+     "tgt_hit": 14,
+     "pf": 1.69,
+     "risk": 5.5,
+     "hold": 9.0
+    },
+    "last 1y": {
+     "n": 46,
+     "win": 9,
+     "avg": -3.53,
+     "avgR": -0.65,
+     "stop_hit": 46,
+     "tgt_hit": 4,
+     "pf": 0.06,
+     "risk": 5.0,
+     "hold": 4.0
+    },
+    "last 2y": {
+     "n": 82,
+     "win": 17,
+     "avg": -2.28,
+     "avgR": -0.41,
+     "stop_hit": 45,
+     "tgt_hit": 7,
+     "pf": 0.36,
+     "risk": 5.2,
+     "hold": 6.0
+    },
+    "last 3y": {
+     "n": 183,
+     "win": 21,
+     "avg": -1.83,
+     "avgR": -0.35,
+     "stop_hit": 46,
+     "tgt_hit": 6,
+     "pf": 0.48,
+     "risk": 5.2,
+     "hold": 6.0
+    },
+    "last 5y": {
+     "n": 272,
+     "win": 21,
+     "avg": -1.6,
+     "avgR": -0.29,
+     "stop_hit": 47,
+     "tgt_hit": 8,
+     "pf": 0.56,
+     "risk": 5.3,
+     "hold": 7.0
+    },
+    "ex_covid": {
+     "n": 486,
+     "win": 27,
+     "avg": 1.4,
+     "avgR": 0.31,
+     "stop_hit": 46,
+     "tgt_hit": 13,
+     "pf": 1.4,
+     "risk": 5.4,
+     "hold": 8.5
+    }
+   },
+   "port": {
+    "CAGR": 3.9,
+    "max DD": -39.5,
+    "1y": -20.0,
+    "2y": -10.2,
+    "3y": -12.1,
+    "5y": -7.8,
+    "years": {
+     "2026": -18.8,
+     "2025": 3.6,
+     "2024": -14.6,
+     "2023": 1.7,
+     "2022": -7.9,
+     "2021": 73.4,
+     "2020": 16.2,
+     "2019": 5.1,
+     "2018": -11.0,
+     "2017": 27.2,
+     "2016": -7.4
+    },
+    "bull/bear a year": [
+     9.4,
+     -12.0
+    ],
+    "ex-Covid": [
+     2.5,
+     -39.5
+    ]
+   },
+   "by_shape": {
+    "Flag": {
+     "n": 452,
+     "win": 28,
+     "avg": 2.78,
+     "avgR": 0.44,
+     "stop_hit": 46,
+     "tgt_hit": 13,
+     "pf": 1.83,
+     "risk": 5.3,
+     "hold": 8.0
+    },
+    "Pennant": {
+     "n": 55,
+     "win": 20,
+     "avg": -1.45,
+     "avgR": -0.23,
+     "stop_hit": 47,
+     "tgt_hit": 13,
+     "pf": 0.66,
+     "risk": 7.2,
+     "hold": 9.0
+    },
+    "Rectangle": {
+     "n": 21,
+     "win": 33,
+     "avg": 4.68,
+     "avgR": 1.55,
+     "stop_hit": 19,
+     "tgt_hit": 19,
+     "pf": 2.03,
+     "risk": 7.7,
+     "hold": 13.0
+    }
+   },
+   "by_lane": {
+    "early": {
+     "n": 197,
+     "win": 25,
+     "avg": 1.87,
+     "avgR": 0.26,
+     "stop_hit": 41,
+     "tgt_hit": 11,
+     "pf": 1.49,
+     "risk": 5.6,
+     "hold": 9.0
+    },
+    "established": {
+     "n": 331,
+     "win": 29,
+     "avg": 2.73,
+     "avgR": 0.5,
+     "stop_hit": 48,
+     "tgt_hit": 15,
+     "pf": 1.83,
+     "risk": 5.2,
+     "hold": 8.0
+    }
+   },
+   "by_year": {
+    "2026": {
+     "n": 45,
+     "win": 9,
+     "avg": -3.55,
+     "avgR": -0.64,
+     "stop_hit": 44,
+     "tgt_hit": 4,
+     "pf": 0.06,
+     "risk": 5.1,
+     "hold": 4.0
+    },
+    "2025": {
+     "n": 27,
+     "win": 30,
+     "avg": 0.11,
+     "avgR": 0.02,
+     "stop_hit": 44,
+     "tgt_hit": 15,
+     "pf": 1.04,
+     "risk": 4.7,
+     "hold": 11.0
+    },
+    "2024": {
+     "n": 97,
+     "win": 24,
+     "avg": -1.46,
+     "avgR": -0.32,
+     "stop_hit": 49,
+     "tgt_hit": 5,
+     "pf": 0.59,
+     "risk": 5.3,
+     "hold": 6.0
+    },
+    "2023": {
+     "n": 56,
+     "win": 21,
+     "avg": -0.41,
+     "avgR": -0.29,
+     "stop_hit": 50,
+     "tgt_hit": 7,
+     "pf": 0.87,
+     "risk": 4.8,
+     "hold": 7.0
+    },
+    "2022": {
+     "n": 45,
+     "win": 24,
+     "avg": -2.3,
+     "avgR": 0.0,
+     "stop_hit": 42,
+     "tgt_hit": 13,
+     "pf": 0.53,
+     "risk": 6.1,
+     "hold": 8.0
+    },
+    "2021": {
+     "n": 84,
+     "win": 39,
+     "avg": 11.01,
+     "avgR": 2.22,
+     "stop_hit": 38,
+     "tgt_hit": 26,
+     "pf": 4.49,
+     "risk": 6.4,
+     "hold": 13.5
+    },
+    "2020": {
+     "n": 46,
+     "win": 30,
+     "avg": 12.54,
+     "avgR": 1.36,
+     "stop_hit": 46,
+     "tgt_hit": 17,
+     "pf": 4.86,
+     "risk": 6.0,
+     "hold": 9.0
+    },
+    "2019": {
+     "n": 26,
+     "win": 35,
+     "avg": 6.76,
+     "avgR": 1.77,
+     "stop_hit": 35,
+     "tgt_hit": 19,
+     "pf": 2.7,
+     "risk": 5.0,
+     "hold": 14.5
+    },
+    "2018": {
+     "n": 23,
+     "win": 17,
+     "avg": -3.99,
+     "avgR": -0.57,
+     "stop_hit": 52,
+     "tgt_hit": 9,
+     "pf": 0.14,
+     "risk": 5.6,
+     "hold": 6.0
+    },
+    "2017": {
+     "n": 57,
+     "win": 40,
+     "avg": 3.15,
+     "avgR": 0.47,
+     "stop_hit": 42,
+     "tgt_hit": 25,
+     "pf": 2.23,
+     "risk": 5.6,
+     "hold": 11.0
+    },
+    "2016": {
+     "n": 22,
+     "win": 18,
+     "avg": -3.05,
+     "avgR": -0.7,
+     "stop_hit": 64,
+     "tgt_hit": 0,
+     "pf": 0.18,
+     "risk": 4.3,
+     "hold": 8.0
+    }
+   },
+   "per_year": 51
   }
  }
 }
