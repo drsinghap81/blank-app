@@ -1403,3 +1403,9 @@ input,select,textarea{font-size:16px!important}
 .ld-path{margin:8px 0 2px;font-weight:800}
 .ld-imp{margin-top:6px;align-items:center}.ld-imp>small{font-size:12px;color:var(--muted);margin-right:2px}
 .ld-chip.imp{border-color:#3B82F6;background:rgba(59,130,246,.08);min-height:32px;font-size:12.5px}
+/* 22 Nov 2026: world step - leading markets and their ETFs */
+.tds-etf{margin-top:8px}.tds-etf-h{font-weight:800;font-size:13.5px;margin-bottom:4px}.tds-etf-h small{font-weight:600;color:var(--muted)}
+.tds-etf-r{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 0;border-top:1px solid var(--line)}
+.tds-etf-m{font-weight:800;font-size:13px;min-width:120px}
+.tds-etf-b{all:unset;box-sizing:border-box;cursor:pointer;min-height:36px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:10px;border:1px solid var(--line);font-size:13px}
+.tds-etf-b small{font-size:12px}.tds-etf-b:focus-visible{outline:2px solid var(--accent)}.tds-etf-n{font-size:12.5px;margin:6px 0 0}

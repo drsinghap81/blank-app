@@ -6911,6 +6911,31 @@ async function alertsCard(box, mk, heroBox) {
 }
 /* 21 Nov 2026 (Amritpal: "the world asset chart should be on the main page - top-down"): world markets and asset classes vs MSCI ACWI,
    Leading + Improving + this week's movers; tap -> Markets > World */
+/* 22 Nov 2026 (Amritpal: "Yes" - INDY / INDA weren't in any scan while India led the world map): under the world map, each
+   main market that is Leading or Improving with the ETF to trade it and that ETF's system status (funds.json). Tap -> its chart. */
+const WORLD_ETF = { 'US S&P 500': ['SPY'], Europe: ['VGK'], Japan: ['EWJ'], China: ['MCHI'], 'Hong Kong': ['EWH'], India: ['INDA', 'NIFTYBEES'],
+  Australia: ['EWA', 'AU:STW'], Korea: ['EWY'], Taiwan: ['EWT'], Brazil: ['EWZ'], Canada: ['EWC'], UK: ['EWU'], Germany: ['EWG'], 'Emerging mkts': ['EEM'] };
+async function wEtfLine(box, mk) {
+  if (!box) return;
+  const [R] = await Promise.all([getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null), swLoad()]);
+  if (!state.fund) state.fund = await getJSON(MAIN + 'data/scan/funds.json', 'funds').catch(() => null);
+  if (!R || !R.weekly || !state.fund) { box.innerHTML = ''; return; }
+  const F = {}; (state.fund.rows || []).forEach((r) => { F[r.key] = r; });
+  const W = (state.sw || {}).WORLD || {};
+  const L = Object.entries(R.weekly).filter(([nm, r]) => WORLD_ETF[nm] && (W[nm] || {}).part !== false && ['Leading', 'Improving'].includes(r.now))
+    .sort((a, b) => (a[1].now === 'Leading' ? 0 : 1) - (b[1].now === 'Leading' ? 0 : 1) || b[1].pts.slice(-1)[0][1] - a[1].pts.slice(-1)[0][1]);
+  if (!L.length) { box.innerHTML = '<p class="muted tds-etf-n">No main market is Leading or Improving against world stocks.</p>'; return; }
+  const st = (f) => { if (!f) return ['', 'not scanned'];
+    if (f.ath && f.ath.status === 'open') return ['up', 'in an ATH trade'];
+    if (f.mclose) return ['up', 'month closed above its ATH: buy signal'];
+    if (f.wclose) return ['', 'week closed above its ATH: watch'];
+    const b = f.below_high_pct; return [b != null && b <= 5 ? '' : 'muted', b != null ? `${fmt(b, 1)}% below its high · no buy yet` : 'no buy yet']; };
+  const row = ([nm, r]) => { const ks = WORLD_ETF[nm]; const fs = ks.map((k) => [k.includes(':') ? k.split(':')[1] : k, F[k.includes(':') ? k : (k === 'NIFTYBEES' ? k : 'US:' + k)]]);
+    return `<div class="tds-etf-r"><span class="tds-etf-m" style="color:${RRG_Q[r.now]}">${esc(nm)} · ${esc(r.now)}</span>${fs.map(([k, f]) => { const [c, t] = st(f);
+      return `<button class="tds-etf-b" data-fk="${esc(f ? f.key : '')}" ${f ? '' : 'disabled'}><b>${esc(k)}</b> <small class="${c}">${esc(t)}${f && f.r1m != null ? ` · ${f.r1m >= 0 ? '+' : ''}${fmt(f.r1m, 1)}% 1 m` : ''}</small></button>`; }).join('')}</div>`; };
+  box.innerHTML = `<div class="tds-etf-h">Trade the leaders with an ETF <small>· status in our ETF system (monthly ATH)</small></div>${L.slice(0, 6).map(row).join('')}`;
+  box.querySelectorAll('[data-fk]').forEach((b) => b.addEventListener('click', () => { const f = F[b.dataset.fk]; if (f) fundSelect(f); }));
+}
 async function igWorldMap(box) {
   const m = box.querySelector('.ig-wmap'); if (!m) return;
   const R = await getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null);
@@ -7479,7 +7504,7 @@ async function tdRender2(el) {
   const stp = (n, go, name, cls, word, sub, body) => `<section class="tds"><button class="tds-h" data-go="${go}"><span class="tds-n">${n}</span><span class="tds-t"><b>${name}</b><small>${sub}</small></span><em class="${cls}">${word}</em><i aria-hidden="true">›</i></button>${body || ''}</section>`;
   const steps = () => `<div class="tdsx" id="tdsteps">
     ${stp(1, 'mk', 'World', wl ? (wl.risk_on && !wl.risk_watch ? 'ok' : 'warn') : '', wl ? (wl.risk_on ? (wl.risk_watch ? 'Risk on · watch' : 'Risk on') : 'Risk off') : '–', WI.length ? `${wUp} of ${WI.length} world indices in an uptrend` : '',
-      '<div class="ig-wmap tds-map" role="button" tabindex="0" aria-label="Open the world rotation chart"><div class="ig-map-h"><span>main markets vs world stocks · tap for all assets</span></div><div class="ig-map-c"></div></div>')}
+      '<div class="ig-wmap tds-map" role="button" tabindex="0" aria-label="Open the world rotation chart"><div class="ig-map-h"><span>main markets vs world stocks · tap for all assets</span></div><div class="ig-map-c"></div></div><div class="tds-etf" id="tdwetf"></div>')}
     ${stp(2, 'inv', `${esc(MKT[mk].name)} · ${esc(MX_BENCH[mk])}`, wi ? (ok && !wi.below_now ? 'ok' : 'warn') : '', wi ? (ok ? (wi.below_now ? 'Uptrend · below 30-wk now' : 'Uptrend') : 'Below 30-wk') : '–', wi ? `${fmt(Math.abs(wi.from_high), 1)}% below its high` : '', '<div id="tdhero"></div>')}
     ${stp(3, 'mk', 'Sectors', secL.length ? 'ok' : 'warn', secL.length ? `${secL.length} leading` : 'None leading', secL.length ? 'strongest: ' + secL.slice(0, 3).map(([k]) => esc((sec.names && sec.names[k]) || secName(k))).join(', ') : 'no sector is beating the index',
       '<div class="ig-map tds-map" role="button" tabindex="0" aria-label="Open the full rotation chart"><div class="ig-map-h"><span>sectors vs the index · tap for the full chart</span></div><div class="ig-map-c"></div></div>')}
@@ -7619,6 +7644,7 @@ async function tdRender2(el) {
   el.querySelectorAll('.t2-card').forEach((b) => b.addEventListener('click', () => tdChart(state._tdRows[+b.dataset.i], mk)));
   el.querySelectorAll('.tds-h[data-go]').forEach((b) => b.addEventListener('click', () => { const g = b.dataset.go; if (g === 'ath') { const t = document.getElementById('t2sell'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     if (g === 'inv') { state.athMkt = mk; state.athTabG.inv = 'themes'; } if (g === 'mk') Object.assign(state.mx, b.closest('.tds') === el.querySelector('.tds') ? { lvl: 'world', m: null, sec: null, grp: null } : { lvl: 'market', m: mk, sec: null, grp: null }); show(g); }));
+  wEtfLine($('#tdwetf'), mk);
   { const sb = $('#tdsteps'); if (sb) { igWorldMap(sb); loadGP(mk).then(async (G) => { igMiniMap(sb, G, mk);
       // step 3 text from the SAME weekly rotation as its map (6-month tags said "Pharma strongest" while the map showed it Lagging)
       let data = null; if (mk !== 'UK') { const R = await getJSON(MAIN + MKT[mk].path + 'sector_rrg.json', 'sector_rrg_' + mk).catch(() => null); if (R && R.weekly) data = R.weekly; }
