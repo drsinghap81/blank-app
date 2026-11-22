@@ -46,7 +46,7 @@ def main():
         res["nifty"][nm] = AR.report(eq, bull); print(f"R| Nifty | {nm} | {res['nifty'][nm]}", flush=True)
     # ---------------- 9/21
     for k in FG.NAMES:
-        d["g_" + k] = G[k].reindex(d.Date.values).fillna(True).values
+        d["g_" + k] = G[k].reindex(d.Date.values).fillna(True).astype(bool).values
     for nm, gate in [("baseline (live)", None)] + [(FG.NAMES[k], "g_" + k) for k in FG.NAMES]:
         eq, T = MC.run(d, 10, 0.01, "r63", gate=gate)
         rp = AR.report(eq, bull); rp["trades"] = len(T); rp["avg trade"] = round(float(T.ret.mean() * 100), 2) if len(T) else None
@@ -91,7 +91,7 @@ def main():
     E = pd.DataFrame(evs); E["sma"] = pd.to_numeric(E.sma, errors="coerce")
     E["d"] = [days[min(len(days) - 1, L.index.searchsorted(x))] for x in E.d]
     for k in FG.NAMES:
-        E[k] = G[k].reindex(E.d.values).fillna(True).values
+        E[k] = G[k].reindex(E.d.values).fillna(True).astype(bool).values
     E["ret"] = E.xp / E.entry - 1
     res["ath_events"] = {"all": [len(E), round(float(E.ret.mean() * 100), 2)]}
     for k in FG.NAMES:
