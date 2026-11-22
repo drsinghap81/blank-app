@@ -11,22 +11,14 @@ try:
 except Exception as e:  # noqa: BLE001
     print("R| home", e)
 for u in ["https://nsearchives.nseindia.com/content/fo/fii_stats_20-Nov-2026.xls", "https://archives.nseindia.com/content/fo/fii_stats_20-Nov-2026.xls",
-          "https://nsearchives.nseindia.com/content/fo/fii_stats_20-Nov-2017.xls", "https://nsearchives.nseindia.com/content/fo/fii_stats_02-Jan-2012.xls"]:
+          "https://nsearchives.nseindia.com/content/fo/fii_stats_20-Nov-2017.xls", "https://nsearchives.nseindia.com/content/fo/fii_stats_01-Jun-2016.xls", "https://nsearchives.nseindia.com/content/fo/fii_stats_02-Jan-2015.xls"]:
     try:
         r = S.get(u, timeout=30); print("R|", u, r.status_code, len(r.content), r.headers.get("content-type"))
         if r.status_code == 200:
             for eng in ("xlrd", None):
                 try:
-                    T = pd.read_excel(io.BytesIO(r.content), header=None, engine=eng); print("R| table\n" + T.head(12).to_string()); break
+                    T = pd.read_excel(io.BytesIO(r.content), header=None, engine=eng); [print("R| row", i, list(T.iloc[i])) for i in range(min(14, len(T)))]; break
                 except Exception as e:  # noqa: BLE001
                     print("R| read", eng, e)
-    except Exception as e:  # noqa: BLE001
-        print("R|", u, e)
-for u in ["https://www.nseindia.com/api/fiidiiTradeReact", "https://www.nseindia.com/api/fiidiiTradeNse",
-          "https://www.nseindia.com/api/historical/fii-dii?from=01-10-2026&to=20-11-2026",
-          "https://www.nseindia.com/api/historicalOR/fii-dii?from=01-10-2026&to=20-11-2026",
-          "https://nsearchives.nseindia.com/content/equities/fii_dii_20112026.csv"]:
-    try:
-        r = S.get(u, timeout=30); print("R|", u, r.status_code, r.text[:400].replace("\n", " "))
     except Exception as e:  # noqa: BLE001
         print("R|", u, e)
