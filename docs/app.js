@@ -8259,7 +8259,7 @@ async function loadStrat() {
     { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only. Tight flags (range ≤ 8%) where volume dried up, breaking out on 1.5× volume. Buy near the breakout close, stop under the flag low, sell on the first close below the 21-day average. Tested 2016-26: +2.8% a trade, positive in the last 2 years (buying next day above the breakout high did worse).',
       ord: 1, rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2) + ' on 1.5× volume'} · exit below 21-day avg`, { sc: x.status === 'breakout' ? 2 : 1, fl: x, pri: (x.status === 'breakout' ? 4 : 0) + (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0) })) },
     { k: 'vcp', name: 'Tight bases', test: 'watch', ok: 0, note: 'Watch only: tested, did not beat ATH or 9/21.', rows: (((V && (V.rows || V)) || []).slice ? ((V.rows || V) || []).slice(0, 30) : []).map((x) => row(x.symbol, 'Squeezing', { sc: 0 })) }];
-  SYS.forEach((s) => s.rows.sort((a, b) => (b.pri || 0) - (a.pri || 0) || b.s - a.s || (b.sc || 0) - (a.sc || 0)));   // flags: tested order (breakout, rectangle, established) first
+  SYS.forEach((s) => s.rows.sort((a, b) => b.s - a.s || Pq[b.ch[2]] - Pq[a.ch[2]] || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0)));   // quadrant strength first (Amritpal 22 Nov), then breakout / rectangle / established
   const k = state.stratK && SYS.some((s) => s.k === state.stratK) ? state.stratK : 'mom'; const S = SYS.find((s) => s.k === k);
   const seg = `<div class="t3-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([m, n]) => `<button data-smk="${m}" role="tab" aria-selected="${mk === m}">${n}</button>`).join('')}</div>`;
   el.innerHTML = `<div class="t3">${seg}
@@ -8824,7 +8824,9 @@ async function sysListView(s, mk, q) {
   const [rows, X] = await Promise.all([sysRows(s, mk, q), t3Ctx(mk).catch(() => null)]);
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
   rows.forEach((x) => { x.ch = X && !x.etfOnly && !x.fund ? X.chain(x.sym) : null; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
-  rows.sort((a, b) => (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || (b.pri || 0) - (a.pri || 0) || b.s - a.s || (b.sc || 0) - (a.sc || 0));
+  // 22 Nov 2026 (Amritpal: "sort stocks as per quadrant strength"): industry + stock quadrant first (Leading > Improving >
+  // Weakening > Lagging), then the stock's own quadrant, then buy / breakout, then the tested order
+  rows.sort((a, b) => b.s - a.s || (b.ch ? Pq[b.ch[2]] : -1) - (a.ch ? Pq[a.ch[2]] : -1) || (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0));
   const seg = s.nse ? '' : `<div class="t3-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([m, n]) => `<button data-ymk="${m}" role="tab" aria-selected="${mk === m}">${n}</button>`).join('')}</div>`;
   const nBuy = rows.filter((x) => x.buy).length;
   $('#sheet-body').innerHTML = `<div class="t3">${x3Trail([{ t: 'Search', go: () => searchOpen(), done: true }, { t: s.name, on: true }])}
@@ -8834,7 +8836,7 @@ async function sysListView(s, mk, q) {
     ${rows.some((x) => x.ch) ? `<div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((k) => `<span><i style="background:${T3C[k]}"></i>${T3N[k]}</span>`).join('')}</div>` : ''}
     <ol class="st-list">${rows.slice(0, 150).map((x, i) => `<li><button class="st-row" data-yi="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.buy ? 'up' : ''}">${esc(x.st)}</small></span>${x.ch ? t3Bars(x.ch, true) : `<span class="muted">${esc(x.name || '')}</span>`}<span class="st-y">${x.ch ? t3Yoy(x.y) : ''}</span></button></li>`).join('') || `<li class="empty">Nothing on ${esc(s.name)} in ${esc(MKT[mk].name)} today.</li>`}</ol>
     ${rows.length > 150 ? `<p class="muted">Showing the first 150 of ${rows.length}.</p>` : ''}
-    <p class="t3-foot">From the last nightly scans. Order is for reading only: strongest market, industry and stock first.</p></div>`;
+    <p class="t3-foot">From the last nightly scans. Sorted by quadrant strength: industry and stock both Leading first, then Improving, Weakening, Lagging. Order is for reading only.</p></div>`;
   const root = $('#sheet-body');
   x3TrailWire(root, [{ t: 'Search', go: () => searchOpen() }, { t: s.name }]);
   root.querySelectorAll('[data-ymk]').forEach((b) => b.addEventListener('click', () => sysListView(s, b.dataset.ymk, q)));
