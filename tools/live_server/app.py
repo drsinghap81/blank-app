@@ -1112,6 +1112,89 @@ def equity_log(value, pledge=0.0):
     return sorted((k, v) for k, v in E.items() if not k.startswith("_"))
 
 
+# ------------------------------------------------------------------ morning check (22 Nov 2026)
+# Amritpal: "1, 2 and all triggers worldwide". Tested (claude/morning-check-pulse-rotation-and-systems.md): skipping a new buy when
+# its NSE basic industry OPENS below yesterday's close - 9/21 any stock 28.8%/yr vs 26.6%, worst fall -22.6% vs -26.1%; Pulse rotation
+# worst fall -18.7% vs -35.9% (but -4 to -7 pts in the last 1-3 years). The pre-open auction (09:00-09:08) sets the open, so the
+# check runs from 09:09. Rule rows (morning_rule = 9/21 any stock, Pulse rotation) wait for it and are skipped when the industry
+# opened red, unless you override; every other India buy row only shows the reading. Not tested outside NSE.
+MORNING_FROM, MORNING_UNTIL = (9, 9), (9, 40)
+
+
+def _morning_path():
+    return os.path.join(DATA, "morning.json")
+
+
+def morning_state():
+    try:
+        M = json.load(open(_morning_path()))
+    except Exception:  # noqa: BLE001
+        M = {}
+    return M if M.get("day") == ist_now().date().isoformat() else dict(day=ist_now().date().isoformat(), done=False, rows={}, ind={}, overrides=[])
+
+
+def morning_check(force=False):
+    t = ist_now(); M = morning_state()
+    if M.get("done") and not force:
+        return M
+    hm = (t.hour, t.minute)
+    if not force and (t.weekday() >= 5 or not (MORNING_FROM <= hm <= MORNING_UNTIL)):
+        return M
+    P = plan(); rows = [r for r in plan_rows(P) if r.get("ind_members")]
+    mem = sorted({s for r in rows for s in r["ind_members"]})
+    try:
+        Q = broker.quotes(mem) if mem else {}
+    except Exception as ex:  # noqa: BLE001
+        log("morning_quotes", error=str(ex)[:200]); Q = {}
+    gap = {}
+    for r in rows:
+        if r["ind"] in gap:
+            continue
+        g = []
+        for s_ in r["ind_members"]:
+            q = Q.get(s_) or {}
+            o, pv = q.get("open") or 0, q.get("prev") or 0
+            if o > 0 and pv > 0:
+                g.append(o / pv - 1)
+        if len(g) >= 3:
+            gap[r["ind"]] = round(float(sum(g) / len(g)) * 100, 2)
+    late = hm > MORNING_UNTIL or force
+    if not gap and not late:
+        return M                                           # opening prices not out yet - try again on the next loop
+    out = {}
+    for r in rows:
+        gp = gap.get(r["ind"])
+        out[r["id"]] = dict(symbol=r["symbol"], ind=r["ind"], gap=gp, rule=bool(r.get("morning_rule")),
+                            ok=(gp is None or gp > 0))
+    M.update(done=True, t=t.isoformat(timespec="seconds"), ind=gap, rows=out)
+    json.dump(M, open(_morning_path(), "w"))
+    rule = [x for x in out.values() if x["rule"]]
+    if rule:
+        bad = [x for x in rule if not x["ok"]]; good = [x for x in rule if x["ok"]]
+        txt = (f"Morning check {t.strftime('%H:%M')}: " + (f"skip {len(bad)} - industry opened red: " + ", ".join(f"{x['symbol']} ({x['ind']} {x['gap']:+.2f}%)" for x in bad[:8]) + ". " if bad else "")
+               + (f"OK to buy {len(good)}: " + ", ".join(x["symbol"] for x in good[:10]) + "." if good else ""))
+        alert("morning", "", txt, key="morning:" + M["day"])
+    log("morning_check", n=len(out), ind=len(gap))
+    return M
+
+
+@app.get("/api/morning")
+def morning_get(_=Depends(auth)):
+    return morning_state()
+
+
+class MorningOv(BaseModel):
+    id: str
+
+
+@app.post("/api/morning/override")
+def morning_override(body: MorningOv, _=Depends(auth)):
+    """buy a rule row anyway today (your call against the tested rule)"""
+    M = morning_state(); ov = set(M.get("overrides") or []); ov.add(body.id); M["overrides"] = sorted(ov)
+    json.dump(M, open(_morning_path(), "w")); log("morning_override", id=body.id)
+    return dict(ok=True, overrides=M["overrides"])
+
+
 def sized(acc=None):
     P = plan(); acc = acc or account_cached()
     J = sync(acc)
@@ -1153,6 +1236,23 @@ def sized(acc=None):
             q = math.floor(min((SR if r["tier"] == "swing" else RK) * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
         rows.append(dict(r, qty=max(0, q), value=round(max(0, q) * E, 0), risk_amt=round(max(0, q) * (E - stop), 0) if stop else None,
                          pct_cap=round(max(0, q) * E / cap * 100, 1) if cap else None, skip=why, surv=r["symbol"] in SV))
+    # 22 Nov 2026 morning check: rule rows wait for the 09:09 reading, then skip when their industry opened red (unless overridden)
+    try:
+        M = morning_state(); tn = ist_now(); hmn = (tn.hour, tn.minute)
+        for r in rows:
+            mr = (M.get("rows") or {}).get(r["id"])
+            if mr:
+                r["morning"] = mr
+            if not r.get("morning_rule") or r["skip"] or tn.weekday() >= 5:
+                continue
+            if r["id"] in (M.get("overrides") or []):
+                r["note"] = (r.get("note") or "") + " · morning check overridden by you"
+            elif not M.get("done") and hmn < MORNING_UNTIL and hmn >= (6, 0):
+                r["skip"] = "waiting for the 09:09 morning check (industry's opening price)"
+            elif mr and not mr["ok"]:
+                r["skip"] = f"industry {mr['ind']} opened red ({mr['gap']:+.2f}%) - tested rule: skip today (Override in the row)"
+    except Exception as ex:  # noqa: BLE001
+        log("morning_apply", error=str(ex)[:200])
     # each row must fit your actual cash on its own (cut to cash, no token positions); rank order only adds a note
     # when the row would use cash / a slot that the higher-ranked rows would need if you bought them too
     left, used = cash, 0
@@ -3967,6 +4067,8 @@ def _loop():
             if ((21, 45) <= (t.hour, t.minute) <= (22, 30) or (8, 30) <= (t.hour, t.minute) <= (8, 50)) and t.weekday() < 6 \
                     and t.minute % 10 < 2:
                 exit_alerts()
+            if t.weekday() < 5 and MORNING_FROM <= (t.hour, t.minute) <= (MORNING_UNTIL[0], MORNING_UNTIL[1] + 2):
+                morning_check(force=(t.hour, t.minute) > MORNING_UNTIL)
             if t.minute % 10 < 2:
                 pie_alerts()
                 condor_alerts()

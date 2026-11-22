@@ -1086,7 +1086,7 @@ async function loadLive() {
     const hdr = r.tier === 'more' && (first ?? (i === 0 || rows[i - 1].tier !== 'more'))
       ? `<div class="lv-morehdr" id="lvmorehdr"><b>Next in rank</b> <span class="muted" id="lvmoretxt"></span> <button class="lv-link" id="lvmoreall">Show all ${nMore}</button></div>` : '';
     return `${hdr}<div class="lv-row${r.tier === 'more' ? ' lv-more' : ''}${r.tier === 'swing' ? ' lv-swing' : ''}${!S && !r.picked && r.tier !== 'more' ? ' lv-off' : ''}"><div class="lv-rank">${pos ?? r.rank}${can ? `<label class="lv-pick"><input type="checkbox" data-b="${i}" aria-label="Add ${esc(r.symbol)} to basket"></label>` : ''}${r.tier === 'swing' && (!S || r.local) ? `<label class="lv-pick"><input type="checkbox" data-w="${i}" ${r.want ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}${!S && r.tier !== 'more' && r.tier !== 'swing' ? `<label class="lv-pick"><input type="checkbox" data-s="${i}" ${r.picked ? 'checked' : ''} aria-label="Pick ${esc(r.symbol)}"></label>` : ''}</div><div class="lv-open" role="button" tabindex="0" data-o="${i}"><div class="lv-sym">${esc(r.symbol)} <span class="chip">${KIND_TXT[r.kind] || r.kind}</span>${pcrChip(r.symbol)}<span data-vw="${esc(r.symbol)}"></span>${r.surv ? ' <span class="chip exit" title="Exchange surveillance list: Angel needs your consent in its own app">⚠ Surveillance · place in Angel</span>' : ''} ${strMeter(r)} ${td} ${laneChip(r.lane, r.group_rank ? ` · #${r.group_rank}` : '')}</div>
-      ${r.dupNote ? `<div class="lv-sub">${esc(r.dupNote)}</div>` : ''}<div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} · stop ${fmt(r.stop, 2, 'en-IN')} <span class="muted">(−${fmt(r.risk_pct ?? (E > r.stop ? (1 - r.stop / E) * 100 : null), 0)}%)</span>`}</div>
+      ${r.dupNote ? `<div class="lv-sub">${esc(r.dupNote)}</div>` : ''}${mornChip(r)}<div class="lv-plan">${r.skip ? `<span class="muted">${esc(r.skip)}</span>${/opened red/.test(r.skip) ? ` <button class="lv-btn ghost" data-mov="${esc(r.id)}">Buy anyway</button>` : ''}` : `<b>Buy ${r.qty.toLocaleString('en-IN')}</b> · ${money(r.value, 'NSE')} · stop ${fmt(r.stop, 2, 'en-IN')} <span class="muted">(−${fmt(r.risk_pct ?? (E > r.stop ? (1 - r.stop / E) * 100 : null), 0)}%)</span>`}</div>
       ${r.skip ? '' : slTrack({ stop: r.stop, entry: E, now: r.ltp || null, target: r.target || (+((r.exit_rule || '').match(/R target ([\d.]+)/) || [])[1] || null), entryLab: 'Buy at', exitTxt: r.exit_rule || null })}
       ${S ? `<div class="lv-q" data-q="${esc(r.id)}"></div>` : ''}
       <details class="lv-det"><summary>Details</summary><div class="lv-sub">${ord} · ${fmt(r.pct_cap, 1)}% of capital · risk ${money(r.risk_amt, 'NSE')} · exit: ${esc(r.exit_rule || '')}</div>
@@ -1294,6 +1294,9 @@ async function loadLive() {
   el.querySelectorAll('input[data-b]').forEach((c) => c.addEventListener('change', () => { const q = el.querySelector(`input[data-bq="${c.dataset.b}"]`).parentElement; q.hidden = !c.checked; bkUpd(); }));
   el.querySelectorAll('input[data-bq]').forEach((c) => c.addEventListener('input', bkUpd));
   const bk = $('#lvbkgo'); if (bk) bk.addEventListener('click', () => lvBasket(pick(), bk));
+  el.querySelectorAll('[data-mov]').forEach((b) => b.addEventListener('click', async () => {
+    if (!window.confirm('Buy anyway? The tested rule skips a 9/21 / Pulse rotation buy when its industry opens red.')) return;
+    try { await lvApi('/api/morning/override', { method: 'POST', body: JSON.stringify({ id: b.dataset.mov }) }); loadLive(); } catch (e) { alertMsg('Not saved: ' + e.message); } }));
   // 22 Nov 2026 (Amritpal: "Angel has a basket order feature"): Pulse rotation's weekly buys in one go (same /api/basket, one confirmation)
   const prb = el.querySelector('#lvprbk'); if (prb) prb.addEventListener('click', () => lvBasket(rows.filter((r) => r.tier === 'swing' && bkOf(r) === 'pr' && !r.skip && !r.surv && r.qty > 0)
     .map((r) => { const L = state._lvQ && state._lvQ[r.id]; const E = (L && L.limit_now) || r.price; return { r, q: r.qty, v: r.qty * E }; }), prb));
@@ -8922,3 +8925,9 @@ function pulsePill(x) { const p = x.pu; if (!p || p.p == null) return ''; const 
 function prFwd(P) { const L = (P && P.ledger) || []; if (L.length < 2) return 'started, first result next Friday';
   const a = L[L.length - 1]; const r = (a.equity - 1) * 100, n = ((a.nifty_eq || 1) - 1) * 100;
   return `${r >= 0 ? '+' : ''}${fmt(r, 1)}% vs Nifty ${n >= 0 ? '+' : ''}${fmt(n, 1)}% over ${L.length - 1} week${L.length === 2 ? '' : 's'}`; }
+
+/* 22 Nov 2026 morning check: the industry's opening move (NSE pre-open price vs yesterday's close), read by the server at 09:09.
+   Rule rows (9/21 any stock, Pulse rotation) skip when it is red - tested; for other systems it is information only. */
+function mornChip(r) { const m = r.morning; if (!m || m.gap == null) return '';
+  const up = m.gap > 0;
+  return `<div class="lv-sub"><span class="chip ${up ? 'new' : 'exit'}" title="Industry ${esc(m.ind)}: average opening move of its liquid stocks vs yesterday's close (09:09 pre-open price)">${esc(m.ind)} opened ${m.gap >= 0 ? '+' : ''}${fmt(m.gap, 2)}%${m.rule ? (up ? ' · morning check OK' : ' · morning check: skip') : ' · info (rule not tested for this system)'}</span></div>`; }

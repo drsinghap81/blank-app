@@ -225,7 +225,7 @@ def test_swing_sleeve(tmp_path):
     P = c.get("/api/plan", headers=h).json()
     assert "swing" in P and P["swing"]["risk_pct"] == round(A.RISK * 100, 2)
     sw = [r for r in P["rows"] if r["tier"] == "swing"]
-    assert all(r["kind"] in ("T921", "RETEST", "TF_BRK", "TF_STOP", "PATTERN", "VCP", "VCP_STOP") for r in sw)
+    assert all(r["kind"] in ("T921", "RETEST", "TF_BRK", "TF_STOP", "PATTERN", "VCP", "VCP_STOP", "PR") for r in sw)
     assert A.protect_level("RETEST", 100) == 100 and A.protect_level("T921", 100) == 100 and A.protect_level("ATH_BRK", 100) < 100
     assert not any(r["kind"] == "T921" for r in P["rows"] if r["tier"] != "swing")
     j = c.post("/api/picks", headers=h, json={"n": 5, "swing_risk": 1.0}).json(); assert j["swing_risk_pct"] == 1.0 and j["picks"] == 5
@@ -255,7 +255,7 @@ def test_buckets(tmp_path):
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     P = c.get("/api/plan", headers=h).json()
     B = {b["key"]: b for b in P["buckets"]}; assert B["mom"]["pct"] == 60 and B["tf"]["pct"] == 40 and B["t9"]["pct"] == 0 and B["s1"]["pct"] == 0 and B["tb"]["pct"] == 100
-    assert all(r.get("bucket") in ("mom", "tf", "t9", "rt", "pt", "vcp", "my") for r in P["rows"])
+    assert all(r.get("bucket") in ("mom", "tf", "t9", "rt", "pt", "vcp", "my", "pr") for r in P["rows"])
     j = c.post("/api/picks", headers=h, json={"alloc": {"tf": 1, "rt": 0, "t9": 0, "bogus": 50}}).json()
     assert j["alloc"]["tf"] == 1 and "bogus" not in j["alloc"] and j["picks"] == 10
     P2 = c.get("/api/plan", headers=h).json()
@@ -1207,3 +1207,23 @@ def test_nse_industry_map(tmp_path, monkeypatch):
     j.MIN = 500                                       # a blocked pass (too few rows) is retried after 6 hours, not 6 days
     j.st["asof"] = "2026-11-21T06:00+05:30"
     assert j.due(datetime(2026, 11, 21, 18, 0, tzinfo=M.IST)) and not j.due(datetime(2026, 11, 21, 7, 0, tzinfo=M.IST))
+
+
+def test_morning_check(tmp_path):
+    """22 Nov 2026: a rule row (Pulse rotation / 9/21 any stock) is skipped when its industry opened red, info only for others,
+    and an override lets it through."""
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    P = A.plan(); rows = A.plan_rows(P)
+    rr = [r for r in rows if r.get("morning_rule")]
+    if not rr:
+        return
+    r0 = rr[0]
+    M = A.morning_state(); M.update(done=True, rows={r0["id"]: dict(symbol=r0["symbol"], ind=r0.get("ind"), gap=-0.5, rule=True, ok=False)})
+    import json as _j; _j.dump(M, open(A._morning_path(), "w"))
+    S = c.get("/api/plan", headers=h).json(); x = next(r for r in S["rows"] if r["id"] == r0["id"])
+    if A.ist_now().weekday() < 5:
+        assert "opened red" in (x.get("skip") or "") or x.get("skip")
+    c.post("/api/morning/override", json={"id": r0["id"]}, headers=h)
+    S = c.get("/api/plan", headers=h).json(); x = next(r for r in S["rows"] if r["id"] == r0["id"])
+    assert "opened red" not in (x.get("skip") or "")

@@ -423,6 +423,21 @@ def main(mk="NSE"):
             pass
         except Exception as ex:  # noqa: BLE001
             print("pulse rotation rows failed", ex)
+    # 22 Nov 2026 (Amritpal: morning check "1, 2 and all triggers worldwide"): each India buy row carries its NSE basic industry and
+    # up to 30 liquid members, so the server can read the industry's opening gap at 09:09 (pre-open price) - tested skip rule for
+    # 9/21 any stock (t9) and Pulse rotation (pr); information for the other systems (claude/morning-check-pulse-rotation-and-systems.md)
+    if india:
+        try:
+            GN = json.load(open("data/scan/group_pulse.json"))["nse"]["rows"]
+            S2I = {m["symbol"]: r["basic"] for r in GN for m in r["members"]}
+            I2M = {r["basic"]: [m["symbol"] for m in r["members"] if m.get("liquid")][:30] for r in GN}
+            for c_ in trades[:30] + swing:
+                i_ = S2I.get(c_["symbol"])
+                if i_ and len(I2M.get(i_) or []) >= 3:
+                    c_["ind"] = i_; c_["ind_members"] = I2M[i_]
+                    c_["morning_rule"] = c_.get("bucket") in ("t9", "pr")
+        except Exception as ex:  # noqa: BLE001
+            print("industry members failed", ex)
     # 18 Nov 2026: 3-month price change of every candidate - the "strongest 3-month gain" pick for the Best 5 card
     # (concentrated 9/21 test: 5 positions at 1% risk, ranked by 3-month strength = about the 10-position return)
     allc = trades[:30] + swing
