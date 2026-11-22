@@ -1,289 +1,10 @@
 {
-"generated": "2026-11-22T05:45+00:00",
+"generated": "2026-11-22T05:57+00:00",
 "asof": "2026-11-20",
 "market": "US",
-"rules": "Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, no close above the pole top, close above the 200-day average. Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average (fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
-"backtest": "Tight + volume rules (22 Nov 2026, 2,183 NSE stocks 2016-26): 2,979 trades, buy the breakout close, stop flag low, exit on a close below the 21-day EMA: +2.8% a trade (PF 1.75); last 1 year +0.8% (PF 1.21), last 2 years +0.9% (1.22), 5 years +1.8% (1.45). Buying next day above the breakout high instead: +1.7% (PF 1.37), worse. Earlier, all flags: Tested 22 Nov 2026 (2,421 NSE stocks, 30,360 breakouts 2016-26): flag-low stop + exit on a close below the 21-day EMA +2.2% a trade (profit factor 1.71) vs +1.4% (1.34) selling at the pole target; breakout-day-low stop worse (stopped 81%). Rectangles +7.3% (PF 3.2), pennants +2.3%, flags +2.0%; established uptrends +2.7% vs new +1.9%. Last 2 years -0.6% a trade and portfolio drawdowns of 55-70% - watch only.",
+"rules": "Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, no close above the pole top, close above the 200-day average. Room: the nearest earlier swing high above the entry must be >= 0.8 x the pole away (or none). Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average (fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
+"backtest": "With room >= 0.8 x pole to the next resistance (22 Nov 2026): 1,151 trades, +3.2% a trade (PF 1.79), last 2 years +2.4% (PF 1.67), worst portfolio fall -26%. Tight + volume rules alone (22 Nov 2026, 2,183 NSE stocks 2016-26): 2,979 trades, buy the breakout close, stop flag low, exit on a close below the 21-day EMA: +2.8% a trade (PF 1.75); last 1 year +0.8% (PF 1.21), last 2 years +0.9% (1.22), 5 years +1.8% (1.45). Buying next day above the breakout high instead: +1.7% (PF 1.37), worse. Earlier, all flags: Tested 22 Nov 2026 (2,421 NSE stocks, 30,360 breakouts 2016-26): flag-low stop + exit on a close below the 21-day EMA +2.2% a trade (profit factor 1.71) vs +1.4% (1.34) selling at the pole target; breakout-day-low stop worse (stopped 81%). Rectangles +7.3% (PF 3.2), pennants +2.3%, flags +2.0%; established uptrends +2.7% vs new +1.9%. Last 2 years -0.6% a trade and portfolio drawdowns of 55-70% - watch only.",
 "rows": [
-{
-"symbol": "PLMR",
-"name": "Palomar Holdings Inc. Common stock",
-"lane": "early",
-"shape": "Flag",
-"close": 163.59,
-"pole_pct": 21.9,
-"flag_vol_pct": 89,
-"range_pct": 3.8,
-"pole_start": "2026-10-28",
-"pole_top": "2026-11-16",
-"top": 162.38,
-"flag_days": 3,
-"depth_pct": 4.8,
-"stop": 154.61,
-"s200": 128.54,
-"base": 133.18,
-"geo": {
-"pole": [
-"2026-10-28",
-133.18,
-"2026-11-16",
-162.38
-],
-"up": [
-"2026-11-17",
-160.71,
-"2026-11-20",
-157.36
-],
-"lo": [
-"2026-11-17",
-156.46,
-"2026-11-20",
-153.59
-]
-},
-"bo_vol_x": 1.9,
-"status": "breakout",
-"bo_date": "2026-11-20",
-"entry": 163.59,
-"days_since": 0,
-"target": 192.79,
-"risk_pct": 5.5,
-"ret_pct": 0.0,
-"ema21": 152.31,
-"kind": "stock"
-},
-{
-"symbol": "IPAR",
-"name": "Interparfums Inc. Common Stock",
-"lane": "established",
-"shape": "Rectangle",
-"close": 137.42,
-"pole_pct": 22.3,
-"flag_vol_pct": 92,
-"range_pct": 4.0,
-"pole_start": "2026-10-21",
-"pole_top": "2026-11-10",
-"top": 137.82,
-"flag_days": 7,
-"depth_pct": 5.8,
-"stop": 129.77,
-"s200": 107.18,
-"base": 112.65,
-"geo": {
-"pole": [
-"2026-10-21",
-112.65,
-"2026-11-10",
-137.82
-],
-"up": [
-"2026-11-11",
-135.31,
-"2026-11-20",
-135.31
-],
-"lo": [
-"2026-11-11",
-129.77,
-"2026-11-20",
-129.77
-]
-},
-"status": "forming",
-"trigger": 138.5,
-"to_trigger_pct": 0.8,
-"target": 163.67,
-"risk_pct": 6.3,
-"line_broken": "2026-11-20",
-"need_vol": 350757,
-"ema21": 128.43,
-"kind": "stock"
-},
-{
-"symbol": "SLN",
-"name": "Silence Therapeutics Plc American Depository Share",
-"lane": "early",
-"shape": "Rectangle",
-"close": 19.81,
-"pole_pct": 129.4,
-"flag_vol_pct": 76,
-"range_pct": 0.8,
-"pole_start": "2026-10-16",
-"pole_top": "2026-10-26",
-"top": 19.86,
-"flag_days": 18,
-"depth_pct": 0.8,
-"stop": 19.7,
-"s200": 10.16,
-"base": 8.66,
-"geo": {
-"pole": [
-"2026-10-16",
-8.66,
-"2026-10-26",
-19.86
-],
-"up": [
-"2026-10-27",
-19.85,
-"2026-11-20",
-19.85
-],
-"lo": [
-"2026-10-27",
-19.7,
-"2026-11-20",
-19.7
-]
-},
-"status": "forming",
-"trigger": 19.85,
-"need_vol": 4355310,
-"to_trigger_pct": 0.2,
-"target": 31.06,
-"risk_pct": 0.8,
-"ema21": 18.91,
-"kind": "stock"
-},
-{
-"symbol": "RDY",
-"name": "Dr. Reddy's Laboratories Ltd Common Stock",
-"lane": "early",
-"shape": "Rectangle",
-"close": 14.89,
-"pole_pct": 15.8,
-"flag_vol_pct": 69,
-"range_pct": 2.9,
-"pole_start": "2026-10-19",
-"pole_top": "2026-11-09",
-"top": 15.08,
-"flag_days": 8,
-"depth_pct": 3.1,
-"stop": 14.61,
-"s200": 13.31,
-"base": 13.02,
-"geo": {
-"pole": [
-"2026-10-19",
-13.02,
-"2026-11-09",
-15.08
-],
-"up": [
-"2026-11-10",
-15.05,
-"2026-11-20",
-15.05
-],
-"lo": [
-"2026-11-10",
-14.61,
-"2026-11-20",
-14.61
-]
-},
-"status": "forming",
-"trigger": 15.05,
-"need_vol": 4422378,
-"to_trigger_pct": 1.1,
-"target": 17.11,
-"risk_pct": 2.9,
-"ema21": 14.42,
-"kind": "stock"
-},
-{
-"symbol": "EVER",
-"name": "EverQuote Inc. Class A Common Stock",
-"lane": "early",
-"shape": "Rectangle",
-"close": 29.0,
-"pole_pct": 43.5,
-"flag_vol_pct": 84,
-"range_pct": 7.2,
-"pole_start": "2026-10-27",
-"pole_top": "2026-11-06",
-"top": 30.31,
-"flag_days": 9,
-"depth_pct": 9.9,
-"stop": 27.3,
-"s200": 20.87,
-"base": 21.12,
-"geo": {
-"pole": [
-"2026-10-27",
-21.12,
-"2026-11-06",
-30.31
-],
-"up": [
-"2026-11-09",
-29.47,
-"2026-11-20",
-29.47
-],
-"lo": [
-"2026-11-09",
-27.3,
-"2026-11-20",
-27.3
-]
-},
-"status": "forming",
-"trigger": 29.47,
-"need_vol": 1195572,
-"to_trigger_pct": 1.6,
-"target": 38.66,
-"risk_pct": 7.4,
-"ema21": 26.95,
-"kind": "stock"
-},
-{
-"symbol": "MRSH",
-"name": "Marsh Common Stock",
-"lane": "early",
-"shape": "Rectangle",
-"close": 206.22,
-"pole_pct": 18.1,
-"flag_vol_pct": 77,
-"range_pct": 4.6,
-"pole_start": "2026-10-15",
-"pole_top": "2026-11-05",
-"top": 214.0,
-"flag_days": 10,
-"depth_pct": 5.5,
-"stop": 202.14,
-"s200": 178.86,
-"base": 181.2,
-"geo": {
-"pole": [
-"2026-10-15",
-181.2,
-"2026-11-05",
-214.0
-],
-"up": [
-"2026-11-06",
-212.0,
-"2026-11-20",
-212.0
-],
-"lo": [
-"2026-11-06",
-202.14,
-"2026-11-20",
-202.14
-]
-},
-"status": "forming",
-"trigger": 212.0,
-"need_vol": 3853080,
-"to_trigger_pct": 2.8,
-"target": 244.8,
-"risk_pct": 4.7,
-"ema21": 202.08,
-"kind": "stock"
-},
 {
 "symbol": "HCSG",
 "name": "Healthcare Services Group Inc. Common Stock",
@@ -328,6 +49,8 @@
 "target": 32.45,
 "risk_pct": 5.8,
 "ema21": 24.49,
+"resistance": null,
+"room_x": null,
 "kind": "stock"
 },
 {
@@ -375,6 +98,8 @@
 "line_broken": "2026-11-20",
 "need_vol": 599145,
 "ema21": 308.52,
+"resistance": null,
+"room_x": null,
 "kind": "stock"
 },
 {
@@ -422,6 +147,8 @@
 "line_broken": "2026-11-18",
 "need_vol": 5100099,
 "ema21": 45.6,
+"resistance": null,
+"room_x": null,
 "kind": "stock"
 },
 {
@@ -469,236 +196,8 @@
 "line_broken": "2026-11-18",
 "need_vol": 5395965,
 "ema21": 20.94,
-"kind": "stock"
-},
-{
-"symbol": "ATR",
-"name": "AptarGroup Inc. Common Stock",
-"lane": "early",
-"shape": "Flag",
-"close": 140.08,
-"pole_pct": 15.6,
-"flag_vol_pct": 92,
-"range_pct": 3.6,
-"pole_start": "2026-10-28",
-"pole_top": "2026-11-16",
-"top": 144.45,
-"flag_days": 3,
-"depth_pct": 4.5,
-"stop": 138.0,
-"s200": 128.28,
-"base": 125.0,
-"geo": {
-"pole": [
-"2026-10-28",
-125.0,
-"2026-11-16",
-144.45
-],
-"up": [
-"2026-11-17",
-143.45,
-"2026-11-20",
-139.3
-],
-"lo": [
-"2026-11-17",
-139.87,
-"2026-11-20",
-136.69
-]
-},
-"status": "forming",
-"trigger": 140.08,
-"need_vol": 762204,
-"to_trigger_pct": 0.0,
-"target": 159.53,
-"risk_pct": 1.5,
-"ema21": 138.42,
-"kind": "stock"
-},
-{
-"symbol": "ICE",
-"name": "Intercontinental Exchange Inc. Common Stock",
-"lane": "early",
-"shape": "Flag",
-"close": 170.0,
-"pole_pct": 17.9,
-"flag_vol_pct": 88,
-"range_pct": 6.1,
-"pole_start": "2026-10-28",
-"pole_top": "2026-11-12",
-"top": 181.38,
-"flag_days": 5,
-"depth_pct": 6.7,
-"stop": 169.2,
-"s200": 154.68,
-"base": 153.9,
-"geo": {
-"pole": [
-"2026-10-28",
-153.9,
-"2026-11-12",
-181.38
-],
-"up": [
-"2026-11-13",
-181.07,
-"2026-11-20",
-170.13
-],
-"lo": [
-"2026-11-13",
-177.8,
-"2026-11-20",
-166.41
-]
-},
-"status": "forming",
-"trigger": 170.13,
-"need_vol": 4566771,
-"to_trigger_pct": 0.1,
-"target": 197.61,
-"risk_pct": 0.5,
-"ema21": 170.45,
-"kind": "stock"
-},
-{
-"symbol": "CUBE",
-"name": "CubeSmart Common Shares",
-"lane": "early",
-"shape": "Flag",
-"close": 43.97,
-"pole_pct": 21.4,
-"flag_vol_pct": 69,
-"range_pct": 4.4,
-"pole_start": "2026-10-15",
-"pole_top": "2026-11-05",
-"top": 46.41,
-"flag_days": 10,
-"depth_pct": 5.9,
-"stop": 43.68,
-"s200": 40.08,
-"base": 38.23,
-"geo": {
-"pole": [
-"2026-10-15",
-38.23,
-"2026-11-05",
-46.41
-],
-"up": [
-"2026-11-06",
-45.64,
-"2026-11-20",
-44.52
-],
-"lo": [
-"2026-11-06",
-44.82,
-"2026-11-20",
-43.94
-]
-},
-"status": "forming",
-"trigger": 44.52,
-"need_vol": 3599859,
-"to_trigger_pct": 1.2,
-"target": 52.7,
-"risk_pct": 1.9,
-"ema21": 43.44,
-"kind": "stock"
-},
-{
-"symbol": "EXR",
-"name": "Extra Space Storage Inc Common Stock",
-"lane": "early",
-"shape": "Flag",
-"close": 154.91,
-"pole_pct": 15.3,
-"flag_vol_pct": 80,
-"range_pct": 3.4,
-"pole_start": "2026-10-20",
-"pole_top": "2026-11-10",
-"top": 160.19,
-"flag_days": 7,
-"depth_pct": 3.5,
-"stop": 154.59,
-"s200": 143.58,
-"base": 138.99,
-"geo": {
-"pole": [
-"2026-10-20",
-138.99,
-"2026-11-10",
-160.19
-],
-"up": [
-"2026-11-11",
-160.6,
-"2026-11-20",
-156.81
-],
-"lo": [
-"2026-11-11",
-158.46,
-"2026-11-20",
-154.42
-]
-},
-"status": "forming",
-"trigger": 156.81,
-"need_vol": 2170347,
-"to_trigger_pct": 1.2,
-"target": 178.01,
-"risk_pct": 1.4,
-"ema21": 153.71,
-"kind": "stock"
-},
-{
-"symbol": "SKY",
-"name": "Champion Homes Inc. Common Stock",
-"lane": "early",
-"shape": "Flag",
-"close": 91.31,
-"pole_pct": 31.2,
-"flag_vol_pct": 89,
-"range_pct": 7.2,
-"pole_start": "2026-10-20",
-"pole_top": "2026-11-09",
-"top": 97.56,
-"flag_days": 8,
-"depth_pct": 9.3,
-"stop": 88.52,
-"s200": 82.69,
-"base": 74.36,
-"geo": {
-"pole": [
-"2026-10-20",
-74.36,
-"2026-11-09",
-97.56
-],
-"up": [
-"2026-11-10",
-95.07,
-"2026-11-20",
-92.45
-],
-"lo": [
-"2026-11-10",
-91.91,
-"2026-11-20",
-89.16
-]
-},
-"status": "forming",
-"trigger": 92.45,
-"need_vol": 934536,
-"to_trigger_pct": 1.2,
-"target": 115.65,
-"risk_pct": 4.2,
-"ema21": 89.27,
+"resistance": null,
+"room_x": null,
 "kind": "stock"
 },
 {
@@ -745,284 +244,57 @@
 "target": 68.44,
 "risk_pct": 2.0,
 "ema21": 56.54,
+"resistance": null,
+"room_x": null,
 "kind": "stock"
 },
 {
-"symbol": "CCK",
-"name": "Crown Holdings Inc.",
+"symbol": "EVER",
+"name": "EverQuote Inc. Class A Common Stock",
 "lane": "early",
 "shape": "Flag",
-"close": 117.96,
-"pole_pct": 19.1,
-"flag_vol_pct": 62,
-"range_pct": 6.8,
-"pole_start": "2026-10-20",
-"pole_top": "2026-11-05",
-"top": 126.36,
-"flag_days": 10,
-"depth_pct": 7.9,
-"stop": 116.35,
-"s200": 109.55,
-"base": 106.07,
-"geo": {
-"pole": [
-"2026-10-20",
-106.07,
-"2026-11-05",
-126.36
-],
-"up": [
-"2026-11-06",
-124.33,
-"2026-11-20",
-120.33
-],
-"lo": [
-"2026-11-06",
-121.53,
-"2026-11-20",
-117.28
-]
-},
-"status": "forming",
-"trigger": 120.33,
-"need_vol": 1313019,
-"to_trigger_pct": 2.0,
-"target": 140.62,
-"risk_pct": 3.3,
-"ema21": 119.3,
-"kind": "stock"
-},
-{
-"symbol": "MAS",
-"name": "Masco Corporation Common Stock",
-"lane": "early",
-"shape": "Flag",
-"close": 82.6,
-"pole_pct": 20.4,
-"flag_vol_pct": 83,
-"range_pct": 4.8,
-"pole_start": "2026-10-19",
-"pole_top": "2026-11-09",
-"top": 86.85,
-"flag_days": 8,
-"depth_pct": 5.4,
-"stop": 82.14,
-"s200": 72.02,
-"base": 72.11,
-"geo": {
-"pole": [
-"2026-10-19",
-72.11,
-"2026-11-09",
-86.85
-],
-"up": [
-"2026-11-10",
-85.93,
-"2026-11-20",
-84.62
-],
-"lo": [
-"2026-11-10",
-84.25,
-"2026-11-20",
-82.25
-]
-},
-"status": "forming",
-"trigger": 84.62,
-"need_vol": 3449562,
-"to_trigger_pct": 2.4,
-"target": 99.36,
-"risk_pct": 2.9,
-"ema21": 81.59,
-"kind": "stock"
-},
-{
-"symbol": "CINF",
-"name": "Cincinnati Financial Corporation Common Stock",
-"lane": "early",
-"shape": "Flag",
-"close": 186.54,
-"pole_pct": 17.8,
-"flag_vol_pct": 97,
-"range_pct": 4.1,
-"pole_start": "2026-10-15",
-"pole_top": "2026-11-05",
-"top": 195.72,
-"flag_days": 10,
-"depth_pct": 5.6,
-"stop": 184.69,
-"s200": 170.12,
-"base": 166.13,
-"geo": {
-"pole": [
-"2026-10-15",
-166.13,
-"2026-11-05",
-195.72
-],
-"up": [
-"2026-11-06",
-188.87,
-"2026-11-20",
-191.78
-],
-"lo": [
-"2026-11-06",
-186.05,
-"2026-11-20",
-189.36
-]
-},
-"status": "forming",
-"trigger": 191.78,
-"need_vol": 1030482,
-"to_trigger_pct": 2.8,
-"target": 221.37,
-"risk_pct": 3.7,
-"ema21": 184.8,
-"kind": "stock"
-},
-{
-"symbol": "QNST",
-"name": "QuinStreet Inc. Common Stock",
-"lane": "early",
-"shape": "Flag",
-"close": 18.49,
-"pole_pct": 27.7,
-"flag_vol_pct": 68,
-"range_pct": 5.9,
+"close": 29.0,
+"pole_pct": 43.5,
+"flag_vol_pct": 78,
+"range_pct": 7.2,
 "pole_start": "2026-10-27",
-"pole_top": "2026-11-12",
-"top": 20.09,
-"flag_days": 5,
-"depth_pct": 9.5,
-"stop": 18.19,
-"s200": 14.88,
-"base": 15.73,
+"pole_top": "2026-11-06",
+"top": 30.31,
+"flag_days": 8,
+"depth_pct": 9.9,
+"stop": 27.3,
+"s200": 20.87,
+"base": 21.12,
 "geo": {
 "pole": [
 "2026-10-27",
-15.73,
-"2026-11-12",
-20.09
+21.12,
+"2026-11-06",
+30.31
 ],
 "up": [
-"2026-11-13",
-19.31,
-"2026-11-20",
-19.08
-],
-"lo": [
-"2026-11-13",
-18.89,
-"2026-11-20",
-18.31
-]
-},
-"status": "forming",
-"trigger": 19.08,
-"need_vol": 1456812,
-"to_trigger_pct": 3.2,
-"target": 23.44,
-"risk_pct": 4.7,
-"ema21": 18.38,
-"kind": "stock"
-},
-{
-"symbol": "PENN",
-"name": "PENN Entertainment Inc. Common Stock",
-"lane": "early",
-"shape": "Flag",
-"close": 18.05,
-"pole_pct": 30.5,
-"flag_vol_pct": 84,
-"range_pct": 7.5,
-"pole_start": "2026-10-23",
-"pole_top": "2026-11-09",
-"top": 18.72,
-"flag_days": 6,
-"depth_pct": 8.0,
-"stop": 17.23,
-"s200": 17.13,
-"base": 14.34,
-"geo": {
-"pole": [
-"2026-10-23",
-14.34,
 "2026-11-09",
-18.72
-],
-"up": [
-"2026-11-10",
-18.47,
-"2026-11-18",
-17.84
+29.23,
+"2026-11-19",
+28.65
 ],
 "lo": [
-"2026-11-10",
-17.88,
-"2026-11-18",
-17.2
-]
-},
-"status": "forming",
-"trigger": 18.84,
-"to_trigger_pct": 4.4,
-"target": 23.22,
-"risk_pct": 8.5,
-"line_broken": "2026-11-18",
-"need_vol": 4746783,
-"ema21": 17.32,
-"kind": "stock"
-},
-{
-"symbol": "HOG",
-"name": "Harley-Davidson Inc. Common Stock",
-"lane": "early",
-"shape": "Flag",
-"close": 32.52,
-"pole_pct": 30.1,
-"flag_vol_pct": 93,
-"range_pct": 6.2,
-"pole_start": "2026-10-19",
-"pole_top": "2026-11-09",
-"top": 34.44,
-"flag_days": 5,
-"depth_pct": 6.6,
-"stop": 32.16,
-"s200": 24.96,
-"base": 26.48,
-"geo": {
-"pole": [
-"2026-10-19",
-26.48,
 "2026-11-09",
-34.44
-],
-"up": [
-"2026-11-10",
-34.49,
-"2026-11-17",
-32.82
-],
-"lo": [
-"2026-11-10",
-33.62,
-"2026-11-17",
-31.6
+27.64,
+"2026-11-19",
+27.82
 ]
 },
 "status": "forming",
-"trigger": 34.3,
-"to_trigger_pct": 5.5,
-"target": 42.26,
-"risk_pct": 6.2,
-"line_broken": "2026-11-17",
-"need_vol": 3238125,
-"ema21": 31.95,
+"trigger": 30.0,
+"to_trigger_pct": 3.4,
+"target": 39.19,
+"risk_pct": 9.0,
+"line_broken": "2026-11-19",
+"need_vol": 1195572,
+"ema21": 26.95,
+"resistance": null,
+"room_x": null,
 "kind": "stock"
 }
 ]
