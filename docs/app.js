@@ -8143,7 +8143,7 @@ async function tdRender3(el) {
   const mode = state.t3Mode || 'all';
   const shown = buys.filter((c) => mode === 'all' || (mode === 'inv' ? c.inv : mode === 'tr' ? !c.inv : X.grp[c.r.symbol] === mode));
   const card = (c) => { const i = C.indexOf(c); const r = c.r;
-    return `<article class="t3-card"><div class="t3-ch"><span class="t3-g g${c.g}">${c.g}</span><span class="t3-nm"><b>${esc(r.symbol)}</b><small>${esc(BK_SHORT[bkOf(r)] || r.system)}${r.late_pct != null && r.late_pct > 5 ? ` · ${fmt(r.late_pct, 0)}% late` : ''}</small></span>
+    return `<article class="t3-card"><div class="t3-ch"><span class="t3-g g${c.g}">${c.g}</span><span class="t3-nm" role="button" tabindex="0" data-sp="${i}"><b>${esc(r.symbol)}</b><small>${esc(BK_SHORT[bkOf(r)] || r.system)}${r.late_pct != null && r.late_pct > 5 ? ` · ${fmt(r.late_pct, 0)}% late` : ''}</small></span>
       <span class="t3-amt"><b>${c.z ? Lk(c.z.val) : '–'}</b><small>${c.z ? c.z.q.toLocaleString(MKT[mk].loc) + ' sh' : 'set capital'}</small></span></div>
       ${t3Bars(c.ch)}
       <div class="t3-pills">${t3Px(c.px)}${t3Yoy(c.y)}${t3Pill('bad', `Stop −${fmt(c.stopP, 0)}%`)}</div>
@@ -8172,6 +8172,7 @@ async function tdRender3(el) {
   el.querySelectorAll('[data-go3]').forEach((b) => b.addEventListener('click', () => show(b.dataset.go3)));
   el.querySelectorAll('[data-jump]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.jump); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
   el.querySelectorAll('[data-why]').forEach((b) => b.addEventListener('click', () => t3Why(C[+b.dataset.why], X)));
+  el.querySelectorAll('[data-sp]').forEach((b) => b.addEventListener('click', () => stockPage({ mk, sym: C[+b.dataset.sp].r.symbol, name: C[+b.dataset.sp].r.name, kind: 'stock' })));
   el.querySelectorAll('[data-buy]').forEach((b) => b.addEventListener('click', () => tdChart(C[+b.dataset.buy].r, mk)));
   el.querySelectorAll('[data-sell]').forEach((b) => b.addEventListener('click', () => show('live')));
   $('#t3v2').addEventListener('click', () => { try { localStorage.setItem('td.today3', '0'); } catch (e) { /* */ } tdRender2(el); });
@@ -8264,8 +8265,7 @@ async function loadStrat() {
   el.querySelectorAll('[data-smk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.smk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } loadStrat(); }));
   el.querySelectorAll('[data-go4]').forEach((b) => b.addEventListener('click', () => show(b.dataset.go4)));
   el.querySelectorAll('[data-si]').forEach((b) => b.addEventListener('click', () => { const x = S.rows[+b.dataset.si];
-    if (x.r && ['mom', 'tf'].includes(bkOf(x.r))) { const e = x.r.trigger || x.r.price; const G = t3Grade(null, x.r, X); t3Why({ r: x.r, ...G, e, z: t2Shares(e, x.r.stop, mk), px: X.price(x.sym) }, X); }
-    else if (typeof searchIndex === 'function') sysCheck({ mk, sym: x.sym, name: x.sym, kind: 'stock' }); }));
+    stockPage({ mk, sym: x.sym, name: x.sym, kind: 'stock' }, [{ t: 'Strategies', go: () => closeSheet(), done: true }, { t: S.name, go: () => closeSheet(), done: true }, { t: x.sym, on: true }]); }));
 }
 
 /* ------------------------------------------------------------------ Same infographic on every tab (22 Nov 2026)
@@ -8311,7 +8311,7 @@ async function mk3Hero() {
       <span class="muted">${v.from_high != null ? fmt(Math.abs(v.from_high), 1) + '% below its high · ' : ''}${up ? 'above' : 'below'} its 30-week average</span></div></div>
       <h2 class="x3-h">Industries this week</h2><p class="muted x3-sub">Bar = share of the industry's stocks trending this month. Tap an industry.</p><div class="x3-board">${board}</div></section>`;
     x3Fold(el, 'Sectors, rotation charts and full detail'); el.insertAdjacentHTML('afterbegin', hero);
-    el.querySelectorAll('[data-g3]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'grp', grp: b.dataset.g3 })));
+    el.querySelectorAll('[data-g3]').forEach((b) => b.addEventListener('click', () => { const g = (G.rows || []).find((r) => r.group === b.dataset.g3); mxGo({ lvl: 'industry', sec: g ? g.sector : null, grp: b.dataset.g3 }); }));
   }
 }
 async function lv3Hero() {
@@ -8349,3 +8349,111 @@ function pf3Hero() {
 { const LM = loadMarkets; loadMarkets = async function () { await LM(); try { await mk3Hero(); } catch (e) { console.warn('mk3', e); } };
   const LL = loadLive; loadLive = async function () { await LL(); try { await lv3Hero(); } catch (e) { console.warn('lv3', e); } };
   const RP = renderPortfolio; renderPortfolio = function () { RP(); try { pf3Hero(); } catch (e) { console.warn('pf3', e); } }; }
+
+/* ------------------------------------------------------------------ One stock page + trail + watchlist (22 Nov 2026, canvas I/J/L)
+   Amritpal: "I was not able to navigate properly ... easy navigation with infographics". Every list (search, Today, Strategies,
+   Markets industries, watchlist) opens the same stock page. The system label comes from the plan first, so a 16-month cup
+   shows as Cup 9/21, not ATH. Markets shows a 4-step trail (World > market > industry > stock). Watchlist lives on this device. */
+const WL_KEY = 'td.watch';
+const wlGet = () => { try { return JSON.parse(localStorage.getItem(WL_KEY) || '[]'); } catch (e) { return []; } };
+const wlHas = (mk, sym) => wlGet().some((x) => x.mk === mk && x.sym === sym);
+function wlToggle(mk, sym) { let L = wlGet(); L = wlHas(mk, sym) ? L.filter((x) => !(x.mk === mk && x.sym === sym)) : L.concat([{ mk, sym }]); try { localStorage.setItem(WL_KEY, JSON.stringify(L)); } catch (e) { /* */ } return wlHas(mk, sym); }
+function x3Trail(steps) {   // steps: [{t, go, on}] -> 4-part progress trail
+  return `<nav class="x3-trail" aria-label="You are here">${steps.map((s, i) => `<button ${s.go ? `data-trail="${i}"` : 'disabled'} class="${s.on ? 'on' : s.done ? 'done' : ''}" ${s.on ? 'aria-current="page"' : ''}><i></i><span>${esc(s.t)}</span></button>`).join('')}</nav>`;
+}
+function x3TrailWire(root, steps) { root.querySelectorAll('[data-trail]').forEach((b) => b.addEventListener('click', () => { const s = steps[+b.dataset.trail]; if (s && s.go) s.go(); })); }
+async function sysActive(mk, sym, S, plan) {   // [{n, c}] c: buy | on | near ; plan label first
+  const out = []; const o = (S && S.M[sym]) || {};
+  const pr = plan && (plan.top || []).concat(plan.swing || []).find((r) => r.symbol === sym);
+  const live = pr ? ((lvAlloc(mk, plan, null) || {})[bkOf(pr)] ?? 0) > 0 && ownK(bkOf(pr)) : false;
+  if (pr) out.push({ n: (BK_SHORT[bkOf(pr)] || pr.system) + (!live ? ' · off' : pr.trigger ? ' · waiting' : ' · Buy'), c: !live ? 'on' : pr.trigger ? 'near' : 'buy', k: bkOf(pr) });
+  MXC.forEach(([k, n]) => { const x = o[k]; if (!x) return; if (pr && ((k === 'ath' && ['mom', 'tf'].includes(bkOf(pr))) || (k === 't921' && bkOf(pr) === 't9'))) return;
+    out.push({ n: k === 'ath' ? 'ATH' : n, c: x.lvl === 0 ? 'buy' : x.lvl === 1 ? 'on' : 'near' }); });
+  return { list: out, pr };
+}
+async function stockPage(e, trail) {
+  if (!e) return; const mk = e.mk || 'NSE', sym = e.sym; const P = MAIN + MKT[mk].path;
+  openPanel('<p class="muted pad">Loading…</p>'); history.pushState({ sheet: 1 }, '');
+  const [S, plan, X] = await Promise.all([sysMap(mk).catch(() => null), getJSON(P + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null), t3Ctx(mk)]);
+  const { list, pr } = await sysActive(mk, sym, S, plan);
+  const W = state.mxW && state.mxW[mk]; const v = W && W.s && W.s[sym]; const tt = (W && W.t) || [];
+  const last = v ? v[v.length - 1] : null; const yr = v && v.length > 52 ? (last / v[v.length - 53] - 1) * 100 : null;
+  const Mz = (x, d = 0) => (mk === 'NSE' ? inr(x, d) : `${MKT[mk].cur}${fmt(x, d, MKT[mk].loc)}`);
+  const g = X.grp[sym]; const G = X.GP; const grow = G && (G.rows || []).find((r) => r.group === g);
+  const ch = X.chain(sym); const px = X.price(sym), y = X.yoy(sym);
+  const held = mk === 'NSE' ? (pfLoad().h || []).find((h) => h.s === sym) : null;
+  let c = null; if (pr) { const en = pr.trigger || pr.price; const Gd = t3Grade(null, pr, X); c = { r: pr, ...Gd, e: en, z: t2Shares(en, pr.stop, mk), px }; }
+  const allK = ['ATH', 'Cup 9/21', '9/21', 'Base', 'Bottoming'];
+  const lit = list.map((x) => `<span class="sp-sys ${x.c}">${esc(x.n)}</span>`).join('');
+  const off = allK.filter((k) => !list.some((x) => x.n.startsWith(k) || (k === 'Cup 9/21' && x.k === 'tf') || (k === '9/21' && x.n === '9/21'))).map((k) => `<span class="sp-sys off">${k}</span>`).join('');
+  const peers = grow ? (grow.members || []).filter((m) => m.symbol !== sym).slice(0, 8) : [];
+  const trailSteps = trail || [{ t: 'World', go: () => { closeSheet(); Object.assign(state.mx, { lvl: 'world', m: null, sec: null, grp: null }); show('mk'); }, done: true },
+    { t: MKT[mk].name, go: () => { closeSheet(); Object.assign(state.mx, { lvl: 'market', m: mk, sec: null, grp: null }); show('mk'); }, done: true },
+    { t: g || 'Industry', go: g ? () => { closeSheet(); Object.assign(state.mx, { lvl: 'industry', m: mk, sec: grow ? grow.sector : null, grp: g }); show('mk'); } : null, done: true },
+    { t: sym, on: true }];
+  const chart = v ? t3Svg(v.slice(-53), { hi: null, stop: pr ? pr.stop : Math.min(...v.slice(-53)), t0: tt.length ? myd(tt[Math.max(0, tt.length - 53)]) : '', t1: tt.length ? myd(tt[tt.length - 1]) : '', stopT: pr ? Mz(pr.stop) : '', aria: `${sym} weekly closes, one year` }) : '<p class="muted">No weekly data for this one.</p>';
+  openPanel(`<div class="sp t3">${x3Trail(trailSteps)}
+    <div class="sp-head"><div><h2>${esc(sym)}</h2><small>${esc(e.name && e.name !== sym ? e.name : '')}${g ? ' · ' + esc(g) : ''}</small></div>
+      <div class="sp-px"><b>${last != null ? Mz(last, last < 100 ? 2 : 0) : '–'}</b>${yr != null ? `<small class="${yr >= 0 ? 'up' : 'down'}">${yr >= 0 ? '+' : '−'}${fmt(Math.abs(yr), 0)}% in a year</small>` : ''}</div></div>
+    <div class="sp-chart">${pr ? chart : chart.replace(/<line[^>]*t3-st[^>]*\/>|<text[^>]*t3-stt[^>]*>[^<]*<\/text>/g, '')}
+      <div class="sp-cbar"><a class="sp-tv" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(sym, mk))}">Open in TradingView ↗</a><button class="t3-link" id="spfull">Full chart & plan</button></div></div>
+    <div class="sp-grid">
+      <section class="sp-t"><div class="sp-th"><h3>Systems on it</h3><b class="${list.length ? 'up' : ''}">${list.length}</b></div><div class="sp-chips">${lit}${off}</div></section>
+      <section class="sp-t"><h3>Top-down</h3>${t3Bars(ch)}<small class="${ch[1] === 'L' && ch[2] === 'L' ? 'up' : ''}">${ch.every((q) => q === 'L') ? 'All three leading' : `Industry ${T3N[ch[1]].toLowerCase()} · stock ${T3N[ch[2]].toLowerCase()}`}</small></section>
+      <section class="sp-t"><h3>Price vs results</h3><div class="t3-duo"><div><b>${px ? px.k : 'n/a'}</b><small>${px ? `P/E ${fmt(px.pe, 1)} vs ${fmt(px.m, 1)}` : 'no P/E'}</small></div><div><b class="${y == null ? '' : y >= 0 ? 'up' : 'down'}">${y == null ? 'n/a' : (y >= 0 ? '+' : '−') + fmt(Math.abs(y), 0) + '%'}</b><small>profit vs a year ago</small></div></div></section>
+      ${c ? `<section class="sp-t"><div class="sp-th"><h3>Why?</h3><button class="t3-link" id="spwhy">Open</button></div><div class="sp-why"><div class="ok"><b>5/5</b><small>rules passed</small></div><div class="${(c.late || 0) > 5 ? 'warn' : 'ok'}"><b>${fmt(c.late || 0, 0)}%</b><small>past buy level</small></div><div class="bad"><b>−${fmt(c.stopP, 0)}%</b><small>to the stop</small></div></div></section>` : ''}
+      ${peers.length ? `<section class="sp-t"><h3>Same industry</h3><div class="sp-chips">${peers.map((m) => { const q = (rqOf(m.symbol, mk) || {}).now; return `<button class="sp-peer" data-peer="${esc(m.symbol)}" style="border-left-color:${T3C[T3Q[q] || 'N']}">${esc(m.symbol)}</button>`; }).join('')}</div></section>` : ''}
+      <section class="sp-t ${held ? '' : 'dash'}"><h3>Your position</h3>${held ? `<div class="t3-duo"><div><b>${held.q}</b><small>shares at ${Mz(held.a, 2)}</small></div><div><b class="${last >= held.a ? 'up' : 'down'}">${last ? (last >= held.a ? '+' : '−') + fmt(Math.abs(last / held.a - 1) * 100, 1) + '%' : '–'}</b><small>since you bought</small></div></div>` : '<small>You don\'t hold it.</small>'}</section>
+    </div>
+    <details class="t3-more"><summary>Advanced: every system's status and the facts</summary><div id="spadv"><button class="t3-link" id="spold">Show the full check</button></div></details>
+    <div class="sp-bar"><button class="sp-heart" id="spwl" aria-pressed="${wlHas(mk, sym)}" aria-label="Watchlist">${wlHas(mk, sym) ? '♥' : '♡'}</button>
+      <button class="t3-buy" id="spbuy">${c && c.z ? `Buy ${c.z.q.toLocaleString(MKT[mk].loc)} at ${Mz(c.e)} · stop ${Mz(pr.stop)}` : 'Full chart & plan'}</button></div></div>`);
+  const box = $('#sheet-body'); x3TrailWire(box, trailSteps);
+  const full = () => { if (pr) tdChart(pr, mk); else if (S) mxOpen(sym, mk, S); else lvOpen({ symbol: sym, kind: 'ATH' }, mk); };
+  $('#spfull').addEventListener('click', full); $('#spbuy').addEventListener('click', full);
+  const w = $('#spwhy'); if (w) w.addEventListener('click', () => t3Why(c, X));
+  $('#spwl').addEventListener('click', (ev) => { const on = wlToggle(mk, sym); ev.currentTarget.textContent = on ? '♥' : '♡'; ev.currentTarget.setAttribute('aria-pressed', on); toast(on ? `${sym} added to your watchlist` : `${sym} removed from your watchlist`); });
+  box.querySelectorAll('[data-peer]').forEach((b) => b.addEventListener('click', () => stockPage({ mk, sym: b.dataset.peer, name: b.dataset.peer, kind: 'stock' })));
+  $('#spold').addEventListener('click', () => sysCheckOld(e));
+}
+/* search lens, Strategies rows and Markets industry stocks open the stock page; the earlier check stays under Advanced */
+const sysCheckOld = sysCheck;
+sysCheck = (e) => (e && e.kind && e.kind !== 'stock' ? sysCheckOld(e) : stockPage(e));
+/* Markets: trail + industry page hero */
+{ const MH = mk3Hero; mk3Hero = async function () {
+    await MH(); const el = $('#view-mk'); const x = state.mx; if (!el) return;
+    const steps = [{ t: 'World', go: () => mxGo({ lvl: 'world', m: null, sec: null, grp: null }), on: x.lvl === 'world', done: x.lvl !== 'world' },
+      { t: x.m ? MKT[x.m].name : 'Market', go: x.m ? () => mxGo({ lvl: 'market', sec: null, grp: null }) : null, on: x.lvl === 'market' || x.lvl === 'sector', done: x.lvl === 'industry' },
+      { t: x.grp || 'Industry', on: x.lvl === 'industry' }, { t: 'Stock' }];
+    if (!el.querySelector('.x3-trail')) { el.insertAdjacentHTML('afterbegin', x3Trail(steps)); x3TrailWire(el, steps); }
+    if (x.lvl === 'industry' && !el.querySelector('.x3-hero')) {
+      const mk = x.m; const G = await loadGP(mk).catch(() => null); const r = G && (G.rows || []).find((g) => g.group === x.grp); if (!r) return;
+      await wkLoad(mk).catch(() => null); const S = await sysMap(mk).catch(() => null); const plan = await getJSON(MAIN + MKT[mk].path + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null);
+      const q = T3Q[(r.rrg || {}).now] || 'N';
+      const tiles = await Promise.all((r.members || []).map(async (m) => { const sq = T3Q[(rqOf(m.symbol, mk) || {}).now] || 'N'; const a = await sysActive(mk, m.symbol, S, plan); const top = a.list[0];
+        const fh = Math.max(0, Math.min(20, -(m.from_high || 0)));
+        return `<button class="x3-st" data-st="${esc(m.symbol)}" style="border-top-color:${T3C[sq]}"><span class="x3-sth"><b>${esc(m.symbol)}</b><small style="color:${T3C[sq]}">${T3N[sq]}</small></span>
+          <span class="x3-fh"><i style="width:${100 - fh / 20 * 100}%"></i></span><small>${fh < 0.5 ? 'At its high' : fmt(fh, 0) + '% below its high'}</small>
+          <span class="sp-sys ${top ? top.c : 'off'}">${top ? esc(top.n) : 'No system'}</span></button>`; }));
+      const alI = plan ? lvAlloc(mk, plan, null) : {}; const buys = (plan ? (plan.top || []).concat(plan.swing || []) : []).filter((p) => !p.trigger && (r.members || []).some((m) => m.symbol === p.symbol) && ownK(bkOf(p)) && (alI[bkOf(p)] ?? 0) > 0).length;
+      const hero = `<section class="x3-hero t3"><div class="t3-hero"><span class="t3-word x3-w" style="color:${T3C[q]}">${T3N[q]}</span><div class="t3-hl"><b>${esc(r.group)}</b><span class="muted">vs ${esc(MX_BENCH[mk])} this week</span></div></div>
+        <div class="t3-tiles"><div class="t3-tile"><small>Last month</small><b class="${(r.r1m || 0) >= 0 ? 'up' : 'down'}">${r.r1m != null ? (r.r1m >= 0 ? '+' : '−') + fmt(Math.abs(r.r1m), 0) + '%' : '–'}</b><span>industry, equal weight</span></div>
+          <div class="t3-tile"><small>Trending</small><b>${fmt(r.p1m || 0, 0)}%</b><span>of its stocks</span></div><div class="t3-tile"><small>Buy today</small><b>${buys}</b><span>signals</span></div></div>
+        <h2 class="x3-h">Its stocks</h2><div class="x3-sts">${tiles.join('')}</div></section>`;
+      const tr = el.querySelector('.x3-trail'); if (tr) tr.remove();
+      x3Fold(el, 'Industry chart and full list'); el.insertAdjacentHTML('afterbegin', hero); el.insertAdjacentHTML('afterbegin', x3Trail(steps)); x3TrailWire(el, steps);
+      const fd = el.querySelector('.x3-fold'); if (fd) fd.addEventListener('toggle', () => { if (fd.open) window.dispatchEvent(new Event('resize')); });
+      el.querySelectorAll('[data-st]').forEach((b) => b.addEventListener('click', () => stockPage({ mk, sym: b.dataset.st, name: b.dataset.st, kind: 'stock' }, [steps[0], steps[1], { t: r.group, go: () => { closeSheet(); mxGo({ lvl: 'industry', grp: r.group }); }, done: true }, { t: b.dataset.st, on: true }])));
+    }
+  }; }
+/* Portfolio: watchlist under the holdings header (shows even with no holdings) */
+{ const PH = pf3Hero; pf3Hero = function () { PH(); const el = $('#view-pf'); if (!el || el.querySelector('.x3-wlist')) return;
+    const L = wlGet(); const box = document.createElement('section'); box.className = 'x3-wlist t3';
+    box.innerHTML = `<div class="t3-sh"><h2>Watchlist</h2><small class="muted">Tap ♡ on any stock page to add</small></div><ol class="st-list" id="wlrows">${L.length ? L.map((x) => `<li><button class="st-row" data-wl="${esc(x.mk)}|${esc(x.sym)}"><span class="st-rk">·</span><span class="st-nm"><b>${esc(x.sym)}</b><small>${esc(MKT[x.mk].name)}</small></span><span class="wl-m" data-m="${esc(x.mk)}|${esc(x.sym)}"></span><span></span></button></li>`).join('') : '<li class="empty">Nothing yet. Open any stock (search, Today, Strategies, Markets) and tap ♡.</li>'}</ol>`;
+    const hero = el.querySelector('.x3-hero'); if (hero) hero.after(box); else el.prepend(box);
+    box.querySelectorAll('[data-wl]').forEach((b) => b.addEventListener('click', () => { const [mk, sym] = b.dataset.wl.split('|'); stockPage({ mk, sym, name: sym, kind: 'stock' }); }));
+    (async () => { for (const mk of [...new Set(L.map((x) => x.mk))]) { const S = await sysMap(mk).catch(() => null); const plan = await getJSON(MAIN + MKT[mk].path + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null);
+      for (const x of L.filter((y) => y.mk === mk)) { const a = await sysActive(mk, x.sym, S, plan); const n = Math.min(5, a.list.length); const buy = a.list.some((z) => z.c === 'buy');
+        const m = box.querySelector(`[data-m="${CSS.escape(mk + '|' + x.sym)}"]`); if (m) m.innerHTML = `<span class="wl-bars" role="img" aria-label="${n} systems on">${[0, 1, 2, 3, 4].map((i) => `<i style="background:${i < n ? (buy ? 'var(--rise)' : 'var(--accent)') : 'var(--sel)'}"></i>`).join('')}</span><small>${a.list.length ? esc(a.list.map((z) => z.n).join(' · ')) : 'No system on'}</small>`; } } })();
+  };
+  const RP2 = renderPortfolio; renderPortfolio = function () { RP2(); try { const el = $('#view-pf'); if (el && !el.querySelector('.x3-wlist')) pf3Hero(); } catch (e) { console.warn('wl', e); } }; }
