@@ -101,9 +101,13 @@ def main(mk):
             elif r["n"] >= MAX_DAYS:
                 r.update(st="done", end=asof)
     # 2. log setups shown tonight that are not already being followed
-    for x in (P.get("top") or []) + (P.get("swing") or []):
+    # 22 Nov 2026 (Amritpal: "track all systems very closely - forward testing - even if I haven't executed"): every system's
+    # setups are logged, switched-off ones too (on = False), plus bottom-pattern breakouts from patterns.json
+    pats = [dict(symbol=r["symbol"], bucket="pt", system="Bottom pattern", kind="PATTERN", price=r.get("close"), stop=r.get("stop"), target=r.get("target"))
+            for r in (load(D + "patterns.json").get("rows") or []) if r.get("kind") != "index" and r.get("status") == "breakout" and (r.get("days_since") or 0) <= 1]
+    for x in (P.get("top") or []) + (P.get("swing") or []) + (P.get("more") or []) + pats:
         b = x.get("bucket") or ""
-        if b not in live or x["symbol"] in open_syms or not x.get("stop"):
+        if not b or x["symbol"] in open_syms or not x.get("stop"):
             continue
         stopk = x.get("kind") in STOPK
         e = float(x.get("trigger") or x.get("price") or 0)
@@ -112,7 +116,7 @@ def main(mk):
         rows.append(dict(id=x.get("id"), sym=x["symbol"], sys=x.get("system"), kind=x.get("kind"), b=b, d=asof, s=round(float(x["stop"]), 2),
                          st="waiting" if stopk else "open", trig=round(e, 2) if stopk else None, e=None if stopk else round(e, 2),
                          d0=None if stopk else asof, n=0, ts=round(float(x["stop"]), 2), tr=0,
-                         t=round(float(x["target"]), 2) if x.get("target") else None))
+                         t=round(float(x["target"]), 2) if x.get("target") else None, on=b in live))
         open_syms.add(x["symbol"])
     L.update(asof=asof, since=L.get("since") or asof, generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), rows=rows[-600:])
     # 3. summary for the app
