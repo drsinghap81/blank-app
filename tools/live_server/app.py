@@ -660,6 +660,16 @@ def sync(acc=None):
         elif st == "open" and held.get(sym, 0) <= 0 and (e.get("gtt_id") or e.get("filled", today) < today):
             px = float(e.get("gtt_trigger") or 0) * (1 - GTT_LIMIT_GAP / 2) or e["entry"]
             hit_tgt = False
+            # 22 Nov 2026: an intraday square-off was booked at the crash-guard GTT price (ANGELONE 352 -> 259, -21,367) - use Angel's
+            # real SELL fills from today's trade book when there are any; the GTT price stays only as the fallback estimate
+            real_px = None
+            try:
+                fills = [t for t in broker.trades() if t.get("symbol") == sym and str(t.get("side")).upper() == "SELL" and t.get("exchange") in (None, "NSE")]
+                q_ = sum(t["qty"] for t in fills)
+                if q_ > 0:
+                    real_px = sum(t["qty"] * t["price"] for t in fills) / q_
+            except Exception:  # noqa: BLE001
+                real_px = None
             if e.get("oco") and e.get("target") and e.get("gtt_trigger"):      # which leg of the stop + target GTT filled?
                 try:
                     lt = broker.ltp(sym); hit_tgt = bool(lt) and lt >= (e["target"] + e["gtt_trigger"]) / 2
@@ -667,14 +677,16 @@ def sync(acc=None):
                     pass
                 if hit_tgt:
                     px = e["target"] * 0.9975
+            if real_px:
+                px = round(real_px, 2)
             record_exit(sym, px); log("gone", symbol=sym, assumed_px=px, target=hit_tgt)
             if hit_tgt:
                 alert("sold", sym, f"Target hit: {e.get('qty')} shares sold near ₹{e['target']:,.2f} (your stop + target GTT).", key=f"stop:{sym}:{today}")
             else:
                 alert("stop", sym, f"Stop hit or sold outside the app: {e.get('qty')} shares gone from Angel"
                       + (f" (stop ₹{e['gtt_trigger']:,.2f})" if e.get("gtt_trigger") else "") + ".", key=f"stop:{sym}:{today}")
-            J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="stopped or sold outside the app", exit=px, ended=today); changed = True
-            in_journal_from_app(sym, e, px, today, "target (GTT)" if hit_tgt else "stop (GTT) or sold in Angel", est=True)
+            J.pop(sym); J.setdefault("_done", {})[f"{sym}:{today}"] = dict(e, state="sold (Angel fill)" if real_px else "stopped or sold outside the app", exit=px, ended=today, est=not real_px); changed = True
+            in_journal_from_app(sym, e, px, today, "sold in Angel" if real_px else "target (GTT)" if hit_tgt else "stop (GTT) or sold in Angel", est=not real_px)
     changed = backfill_targets(J, acc) or changed
     changed = gtt_buy_upkeep(J, acc) or changed
     if changed:
@@ -1005,7 +1017,8 @@ def perf_view(J, acc):
             first = min(first or e.get("since") or "9", e.get("since") or "9"); continue
         q, en = e["qty"], e.get("adopt_px") or e["entry"]; pnl = q * (e["exit"] - en)
         c["n"] += 1; c["cost"] += q * en; c["pnl"] += pnl; c["wins"] += pnl > 0; add(e.get("system"), q * en, pnl)
-        closed_list.append(dict(symbol=sym, system=e.get("system"), qty=q, entry=round(en, 2), exit=round(e["exit"], 2), pnl=round(pnl, 2), ended=e.get("ended"), state=e.get("state")))
+        closed_list.append(dict(key=k, symbol=sym, system=e.get("system"), qty=q, entry=round(en, 2), exit=round(e["exit"], 2), pnl=round(pnl, 2), ended=e.get("ended"), state=e.get("state"),
+                                est=bool(e.get("est")) or e.get("state") == "stopped or sold outside the app"))
         first = min(first or e.get("since") or "9", e.get("since") or "9")
     o["pnl"] = o["value"] - o["cost"]; tot = o["pnl"] + c["pnl"]; cost = o["cost"] + c["cost"]
     r2 = lambda x: round(x, 2)
@@ -1197,6 +1210,32 @@ def sized(acc=None):
                 mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,
                 trades=trades, recent=recent, perf=perf_view(J, acc), protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100, trail_gap_pct=TRAIL_GAP * 100),
                 trail=last_trail())
+
+
+class JFix(BaseModel):
+    key: str
+    exit: float | None = None
+    qty: int | None = None
+    remove: bool = False
+
+
+@app.post("/api/journal/fix")
+def journal_fix(body: JFix, _=Depends(auth)):
+    """22 Nov 2026: correct a booked trade the journal got wrong (real sell price / quantity), or drop it when it was not an app trade.
+    Only the app's own journal changes; nothing is sent to Angel."""
+    J = journal(); D = J.get("_done") or {}
+    if body.key not in D:
+        raise HTTPException(404, "no such booked trade")
+    if body.remove:
+        D.pop(body.key); log("journal_fix", key=body.key, removed=True)
+    else:
+        if body.exit is not None and body.exit > 0:
+            D[body.key]["exit"] = round(float(body.exit), 2)
+        if body.qty is not None and body.qty > 0:
+            D[body.key]["qty"] = int(body.qty)
+        D[body.key]["est"] = False; D[body.key]["fixed"] = ist_now().date().isoformat(); log("journal_fix", key=body.key, exit=body.exit, qty=body.qty)
+    J["_done"] = D; save_journal(J)
+    return dict(ok=True)
 
 
 @app.get("/api/plan")

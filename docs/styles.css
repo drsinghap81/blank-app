@@ -1616,3 +1616,5 @@ input,select,textarea{font-size:16px!important}
 .tr-svg .tr-zone.up { fill: var(--rise); fill-opacity: .08; } .tr-svg .tr-zone.dn { fill: var(--fall); fill-opacity: .08; }
 .tr-svg .tr-in { fill: var(--accent); stroke: var(--paper); stroke-width: 4; } .tr-svg .tr-in-t { fill: var(--accent); font: 800 24px var(--font-body); }
 .tr-svg .tr-out.up { fill: var(--rise); } .tr-svg .tr-out.dn { fill: var(--fall); } .tr-svg .tr-out { stroke: var(--paper); stroke-width: 4; } .tr-svg .tr-out-t { fill: var(--ink); font: 800 24px var(--font-body); }
+.pf-bk { border: 0; cursor: pointer; font-family: var(--font-body); }
+.bf-l { display: flex; flex-direction: column; gap: 6px; font-weight: 700; } .bf-l input { font: 600 18px var(--font-body); padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: var(--card); color: var(--ink); }

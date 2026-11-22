@@ -8555,7 +8555,7 @@ async function perfSection(el) {
       live = P || tbl.length ? `<div class="pf-big"><b class="${lt >= 0 ? 'up' : 'down'}">${lt >= 0 ? '+' : '−'}${lakh(Math.abs(lt))}</b><small>${P && P.total_pct != null ? `stocks ${P.total_pct >= 0 ? '+' : ''}${fmt(P.total_pct, 1)}%` : ''}${tbOpenU || tbPnl ? ` · Top Bottom ${tbOpenU + tbPnl >= 0 ? '+' : '−'}${lakh(Math.abs(tbOpenU + tbPnl))}` : ''}${P && P.since ? ' · since ' + esc(day(P.since)) : ''}</small></div>
         <div class="t3-tiles"><div class="t3-tile"><small>Open</small><b>${P ? P.open.n : 0}</b><span>${P ? (P.open.pnl >= 0 ? '+' : '−') + lakh(Math.abs(P.open.pnl)) : ''}</span></div><div class="t3-tile"><small>Closed</small><b>${P ? P.closed.n : 0}</b><span>${P ? P.closed.wins + ' won' : ''}</span></div><div class="t3-tile"><small>Top Bottom</small><b>${tbl.length}</b><span>${TB ? esc(TB.mode) : ''}</span></div></div>
         ${pfSplit(lBooked, lOpen, lakh)}
-        ${P && P.closed && P.closed.trades && P.closed.trades.length ? `<div class="pf-booked"><small class="muted">Booked trades (tap if one is wrong and tell me)</small><div class="sp-chips">${P.closed.trades.map((t) => `<span class="sp-sys ${t.pnl >= 0 ? 'buy' : 'near'}">${esc(t.symbol)} ${t.qty} × ${fmt(t.entry, 0)} → ${fmt(t.exit, 0)} · ${t.pnl >= 0 ? '+' : '−'}${lakh(Math.abs(t.pnl))}</span>`).join('')}</div></div>` : ''}
+        ${P && P.closed && P.closed.trades && P.closed.trades.length ? `<div class="pf-booked"><small class="muted">Booked trades (tap if one is wrong and tell me)</small><div class="sp-chips">${P.closed.trades.map((t, i) => `<button class="sp-sys ${t.pnl >= 0 ? 'buy' : 'near'} pf-bk" data-bk="${i}">${esc(t.symbol)} ${t.qty} × ${fmt(t.entry, 0)} → ${fmt(t.exit, 0)} · ${t.pnl >= 0 ? '+' : '−'}${lakh(Math.abs(t.pnl))}${t.est ? ' · estimated' : ''} ✎</button>`).join('')}</div></div>` : ''}
         ${perfBars(sysI.sort((a, b) => b.pnl - a.pnl), lakh)}<small class="muted">Trades placed from the app, before costs. Top Bottom counts the bot's LIVE fills; trades you placed by hand in Angel before the bot can't be read back (Angel keeps only today's trade book).</small>`
         : '<div class="pf-live-none"><b>No live trades yet</b><small>Trades the app sends to Angel show here.</small></div>';
     } catch (e) { live = `<div class="pf-live-none"><b>Server didn't answer</b><small>${esc(e.message || '')}</small></div>`; }
@@ -8572,6 +8572,7 @@ async function perfSection(el) {
       : '<p class="muted">The signal log starts filling after the first nights of scans.</p>'}</article>
       <article class="pf-card"><h3>Live · your real trades</h3>${live}</article></div>`;
   box.querySelectorAll('[data-pfm]').forEach((b) => b.addEventListener('click', () => { state.pfMk = b.dataset.pfm; box.remove(); perfSection(el); }));
+  box.querySelectorAll('[data-bk]').forEach((b) => b.addEventListener('click', () => { const S0 = (state._pfLive || {}).S; const t = S0 && S0.perf && S0.perf.closed.trades[+b.dataset.bk]; if (t) bookedFix(t, () => { box.remove(); perfSection(el); }); }));
   box.querySelectorAll('[data-pk]').forEach((b) => b.addEventListener('click', async () => { const [w, k] = [b.dataset.pk.slice(0, 1), b.dataset.pk.slice(2)];
     const name = b.querySelector('.pf-bn') ? b.querySelector('.pf-bn').childNodes[0].textContent : k;
     if (w === 'f') sysTradesView(name, await pfFwdTrades(k, mk), 'Forward test · every signal, simulated');
@@ -8664,4 +8665,19 @@ function pfLiveTrades(sys) {   // live trades of one system from the server's pl
   (S.trades || []).filter((t) => (t.system || 'Other') === sys && t.state === 'open' && t.qty && t.entry).forEach((t) => out.push({ sym: t.symbol, mk: 'NSE', sys, src: 'live', d0: t.since, e: t.entry, s: t.stop, ts: t.trail_level, t: t.target, now: t.ltp, pnl: t.ltp ? (t.ltp - t.entry) * t.qty : 0, pct: t.ltp ? (t.ltp / t.entry - 1) * 100 : null, qty: t.qty, out: t.trail_level && t.trail_level > t.stop ? 'trail' : 'open', days: dDiff(t.since) }));
   ((S.perf && S.perf.closed && S.perf.closed.trades) || []).filter((t) => (t.system || 'Other') === sys).forEach((t) => out.push({ sym: t.symbol, mk: 'NSE', sys, src: 'live', e: t.entry, x: t.exit, d1: t.ended, pnl: t.pnl, pct: (t.exit / t.entry - 1) * 100, qty: t.qty, out: t.pnl >= 0 ? 'exit' : 'sl' }));
   return out;
+}
+
+/* correct a booked trade (22 Nov 2026: ANGELONE intraday square-off at 351.55 was booked at the GTT price 259). Changes only the
+   app's journal on your server; nothing goes to Angel. */
+function bookedFix(t, done) {
+  openPanel(`<div class="t3"><h2 style="font-family:var(--font-head);margin:0">${esc(t.symbol)} · booked</h2>
+    <div class="sp-why"><div class="ok"><b>${fmt(t.entry, 2)}</b><small>bought</small></div><div class="${t.pnl >= 0 ? 'ok' : 'bad'}"><b>${fmt(t.exit, 2)}</b><small>sold${t.est ? ' (estimated)' : ''}</small></div><div class="warn"><b>${t.qty}</b><small>shares</small></div></div>
+    <p class="muted">If this is wrong, put Angel's real sell price and quantity (Orders › history), or remove it if the app didn't make this trade.</p>
+    <label class="bf-l">Real sell price <input id="bfx" type="number" inputmode="decimal" step="0.05" value="${t.exit}"></label>
+    <label class="bf-l">Shares sold <input id="bfq" type="number" inputmode="numeric" value="${t.qty}"></label>
+    <button class="t3-buy wide" id="bfsave">Save correction</button><button class="t3-why" id="bfdel" style="width:100%">Remove: not an app trade</button></div>`);
+  history.pushState({ sheet: 1 }, '');
+  const go = async (body) => { try { await lvApi('/api/journal/fix', { method: 'POST', body: JSON.stringify({ key: t.key, ...body }) }); toast('Journal corrected'); history.back(); done && done(); } catch (e) { toast('Could not save: ' + (e.message || e)); } };
+  $('#bfsave').addEventListener('click', () => go({ exit: +$('#bfx').value, qty: +$('#bfq').value }));
+  $('#bfdel').addEventListener('click', () => go({ remove: true }));
 }
