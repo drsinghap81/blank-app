@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-22 11:45 UTC",
+"generated": "2026-11-22 11:47 UTC",
 "method": "News clues: government / regulator actions that can move a whole industry (22 Nov 2026, Amritpal, after the PSU-bank look-back\nfound the 21 Oct \"FDI cap in PSU banks to 49%\" report a week before the rally: \"add all authentic news clues, especially similar\ntypes as for PSU\").\n\nSources (checked from GitHub Actions 22 Nov 2026):\n  official  RBI press releases + notifications (rbi.org.in RSS); government outlets in Google News (PIB, DD News, News On AIR)\n  reports   Google News RSS, India edition, ONLY from named financial / national outlets (OUTLETS) - shown as \"Report\"\nEvent types searched (TYPES): FDI / foreign-ownership caps, Cabinet approvals and outlays, PLI, anti-dumping / safeguard / customs\nduty, export bans / curbs, minimum import price, bank mergers, privatisation / stake sales, GST rate changes, MSP / FRP,\nDefence Acquisition Council approvals, ethanol blending, RBI rule changes, plus \"government plans / considering\" reports.\nEach item is matched to NSE basic industries by keywords (IND_KEYS). Direction is only marked where the words say it\n(denies / no plan / rollback / ban = negative). Nothing here is a tested signal - it tells you a story exists.\nWrites data/scan/news_clues.json (last 60 days, de-duplicated).",
 "items": [
 {
@@ -213,6 +213,19 @@
 "Ship Building & Allied Services",
 "Shipping",
 "Port & Port services"
+],
+"neg": false
+},
+{
+"key": "govtclearscoalindiathreeothersforrareearthmagnetproduction",
+"date": "2026-11-20",
+"title": "Govt clears Coal India & three others for rare earth magnet production",
+"url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxQRjdJMmJMaDFQQWkyNXJpYi1VaGlKOE9hdGpZWWtZam9kbGE1NG9YX3ExOXpJR1NLbElLZ2RqaDZ1S3ZSVGdoSVlRc014ZnBJeElWeEVDamxhWUx1ZjRVUXdxLTEyN1ROZVNqZ2tQeU5XQW02cFlqOENFLXVvdkxaTXExNHJSaVRNZVYwTDMxbjVjaVRGWlFxaGJycHdBQV9pMUdpVDhnOWpWZnBGOTNBWFZnb0dVb1B5cmNVNUxXYW05OEF0TXFJQzZtaW1FRXhnMlBmREN5dkRma1Y5ODZEMTh2OGFoWEhLYzVaWDhMMkV5UdIB9wFBVV95cUxOVF83OUk2Z0FZY2ItWTR2QUQ5Q0oxOWlCX0RDd0paQnhPWWhManZJVnp0MWJNQkVyRWNpd203eTdKNmd2ZU96RU9UUGVuM0dUQnlYZHgybnp2VEc3dkNnVjhxNlh6NUpOeUJFMWo0aXN3b0o5RWtMWmFoajQ0aDJSTlZuY1Z3TE1tQ1B2RzdFSXg3NER2VDFtN1F5a0phOTBrUGZPV1FzWUw5Zi1aN1JlamdYVHJkdzRaTXBQWjZjaWswTlRWZDJUYUd0WjUyc0dSOURhcDFHUFAyUUlRc2RGc1IwakZ2Q1ZDUUVpX3dMMGEtdFdVcFNv?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Coal"
 ],
 "neg": false
 },
@@ -947,6 +960,19 @@
 "neg": true
 },
 {
+"key": "cabinetapproves62370crorefertilisersubsidyforrabiseason",
+"date": "2026-11-12",
+"title": "Cabinet approves \u20b962,370-crore fertiliser subsidy for Rabi season",
+"url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxQNkJEUXpPYlpDUjhOby1PbDVxZUJQR2VmbmN3c29rSHBFUm5mRXVXbGF6UklJU2JsdW5LQU9kRlJLODRJOWRXUkFmMzNyNHNVUUhwcjB4X3VoUkE5OVQ3SXc2SWpYTGNzR202REZHeElGU0VEa0tWN1hsYzBobENnS0FTcU5jajVmbU8zQWo0dFhKWjBQdTVuZFVYU29XTWVqMXdHR0dQVEpJUnZHYW1STjRyZ2hTRDhGbW1fLWdxWkN2ZFg2Y3RjcEZTcXRaNG5taXFyYk1tTlZtUdIB4AFBVV95cUxOU2xyZlhZYWdGdjZ1SGVaQUcwQmVzQkJtYXJ1LXdaalBIXzA5TzlfTzF4ZnlxNjI0UUFfbGp3UGFtQjlPOEhzSkJpYlpSWVlUcnRDc05FQkRlSDkyeFRPdjViMUVtZHA5czlQX2Vza2YwR2l0R0xMS2gteFJ2VHhoVGM2bHNxLUFmeXNFd1FzNEN5RlBGWGM1YlRJcGdhRjZocGxySHdiWjU3T1RRREhLbE5oZ2o4cHF5VGR2YVhVb3gwdExBVnJUTXFNX3h4RnN3UFJuNkhjNWtzTkxUUi1iQQ?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Fertilizers"
+],
+"neg": false
+},
+{
 "key": "cabinetapproves62370crorefertilisersubsidyforrabi202627season",
 "date": "2026-11-11",
 "title": "Cabinet approves \u20b962,370 crore fertiliser subsidy for Rabi 2026-27 season",
@@ -1031,6 +1057,45 @@
 "industries": [
 "Sugar",
 "Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "cabinetapprovesrs62370crorenutrientbasedsubsidyforpkfertilisersforrabi202627",
+"date": "2026-11-11",
+"title": "Cabinet approves Rs 62,370-crore Nutrient-Based Subsidy for P&K fertilisers for Rabi 2026-27",
+"url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPdnZHdjRmNGZXUU5xend6U0tnVkkxYUtZdWwwaWppZDByYTZueUFKdTJzbTMwamtFVzE3Y3pkVzN1ODVnNTdfN3JKaVNjRHFYUUxUbWdfNUlZdTktUU1kaDlhYWJLeVVEYmx3bng0WVRUTnRuNFN6SEV1THVCZk5FV00tZno3ZVBjRkpKX2ZMTTNaXzFoNnJJTUZLMUFJeW42ejE1al9tVTJPUUx4dG5FaUc4eVcwR2c?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Fertilizers"
+],
+"neg": false
+},
+{
+"key": "cabinetapproves62370crsubsidyforpkfertilisersinrabiseason",
+"date": "2026-11-11",
+"title": "Cabinet approves \u20b962,370 cr. subsidy for P&K fertilisers in rabi season",
+"url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOdzBMc1FJZDNIdHI2T1RfVG1xeWdZV09JMHR4dmRhcWhCUzhGbEttdldieEJyMU1sLTAzS0FMeVM4aHNxX0oycTB3OFhyaU9LWFFRYTZILWR4LVJmSzltOEkyc0oxUHM4U1lxb0wzaHRjajVjRXVKS290V2tUanJ1OFFzMGdYTU9rRDVvZ2ppdkpaZm5pMFNvZjk2LUZiV2h3aUN3WXZfamxrdXU5VGRHVjkxM3V2a2tJemV0V0kyV0ppbURu0gHLAUFVX3lxTFA3N0FMRF9UaGtVM3NCeHhNcDVXbVhJdnY2TTF2YTNjaXllWjUtb1liYVVLVzJlXzd6RXU3NThRd3pRcnFvNVlqYmhjWUFZSENUM0JuSEM1Smo0Z2FXd2JrV0V1eDIzYmZCM21fV0o3R29IaHVNV2RUaDNqN1FrN1lqbmZ4N2FoUEUxRDZ5ZEtyOVVhZ2M2QVRickY1WklEWHZSai0xUFBPOThpUjBETnpsak9wbVJVQVlFQWQ3VEJwWWJfNkdyaGJhU2Qw?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Fertilizers"
+],
+"neg": false
+},
+{
+"key": "cabinetapprovesrs62370crorerabifertilisersubsidyrs5000croremudraguaranteefund",
+"date": "2026-11-11",
+"title": "Cabinet approves Rs 62,370 crore rabi fertiliser subsidy, Rs 5,000 crore MUDRA guarantee fund",
+"url": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxOMVp3YmQ2bE8wOHUwQld5VjM1NVhxYjNMLXBsenhvVnV1Q0FaQnpndTJydUJISFRFYlYyUlhkMjJCeEtMZGlzTnlqeXZwQ2VBdUpCUk40bVdqc3ZJSmpZb1lYV2xQNVBUSUpQOHgzMjNMUWhmSDViY3RvUmlXanZ4bWFra3pFZkVMNW9CUkRxT1AyVFJWUGFBY3dCT2tvbnZ4SF9PRkNjaHBjNk83cDVhbmRBMS1SUnJFZ3h2YjRGZGd5M3ZTS1lPQzhUUDE2NUt3ZGZjWU1MMWg3MFkzNlNwRlZnU2tsR2U3eHJtVW1R0gHzAUFVX3lxTE9fU2M2T0FYV0oxNkNhXzd3QlU5T2paT0t3TWRvSnVLbjdaei0yUDlLbHpmbG5aY1VJbGFoS3BPbXFFdjVFT01uS3NYT2pKUm1Xa2VCdzBCMnQ0QWM1aFBmRU5pYW1NS1dtOTJMVUlLa3l1QjV0WDRNME5Vem5pdmhVWU1NTXR2R1RybFpxVjYzdGRBaXdZSkV0cXo5T2JQODlELUF1NjBiTEM1LW1KWndLQ0JxRV9CblVBVGVrTFVXbjcxOWVfNVM3aGVXdnZNUEs2N01EYVIzQkp2YnV6dDBma3NEMVRPRU1vMnd1WHl4V0lKTQ?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Fertilizers"
 ],
 "neg": false
 },
@@ -2263,6 +2328,21 @@
 "neg": false
 },
 {
+"key": "adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint",
+"date": "2026-10-17",
+"title": "Adani Group\u2019s Vizhinjam port stake sale: Keralam Assembly records contradict State\u2019s claim of being kept in the dark",
+"url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxNalFsZGR3Z1U1WlczUmhfTzRPc0pHTEJNZTk2ZDFZcEFJd0lQajkwNm1CVmpicWMtM3o0dXE4c2k0bXQ2eWVidF9KQy1EQVBWcEluaXFYMzU0aXNJRHg0QmdNRE9jb0VPVVBPT1FvOGlXSklETko0QTJvWWkxc3ZmaEM0eTZQSE9IQ3hrVDVIYTJZTjBPQ1FmVnJ3LTZIYklIbXd3OTJEMVozSTJBT1VxNWF2dHdFSUxTZXRfdlM0dXpmWkVxXzYtaGtxYVBYazFkd3NKYy1RZU1pRGl3QlZaRXlNdnRGY1dSLWNILTIzVGNBNHlrbnZRV29R0gGAAkFVX3lxTE5QeUJWenRYdG5rVUVSd0hZdWpHMDRzTzNlZjdYRnBLWU80Y250cjBzVld5eENCRjFRNWt5Q0NqeVNUMUQ1c1dUSGhIcW01N25YVmRvTFh3VURZdkI0Y0g4dmdoZERZMDZTMVU0TmVodE1vNkctd1o2RTFJeEd3QXNGVVFyLTMxOFRUQk1DZjFGOUtsNnE0VU4yTXMzNW0tRTBjRXJNSjN3QllqaGhTTzROdTlaT3ZQLWxoZ2F5clZhaWdTalgyM0Y4anRzal9MSGoxNTdnakJoUlkzLTN1VnZKTkpPWnpIVnhQdExoTGlYNUU3azV5NTFJMEticlBQdTg?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Ship Building & Allied Services",
+"Shipping",
+"Port & Port services"
+],
+"neg": false
+},
+{
 "key": "indiasgoldimportsdrop27aftercustomsdutyhiketo15",
 "date": "2026-10-16",
 "title": "India\u2019s gold imports drop 27% after customs duty hike to 15%",
@@ -2394,6 +2474,35 @@
 "industries": [
 "Sugar",
 "Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "idbibankstakesalepriceasurprisenoruboffonpsustocksanalysts",
+"date": "2026-10-15",
+"title": "IDBI Bank stake sale price a surprise; no rub-off on PSU stocks: Analysts",
+"url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQRGNJeU5pdmxKbnNEZnQxU3BDRTNFc0w3X1hQM1NSYnI3Sm9waXdtTVVqQnROY2lDVzF4Q2JIWmJIN0pwa0ViV3l3WUVqbnRDTnpKRlpMeUxSNWRCQlRqeVAyNEFZT2NTNGFDX3RXRk9zalZMR0xNSVJyM0JVVlN0cHk4TGEzUEhlckVHbTFGUFYyMTZsbTc5dFdMbXdxT2VJd2ZLUHhGM3FUWWF5RHNVcXh3NnhPRzNhYTBpb1c1QTZucTB3WURlOWpoS3lXaWhqaTdradIB2gFBVV95cUxQR2VESlFIVXMzejZEbGFBZURqVVNXNWZILU0wZFZzOXdCQ3FEUUlxT1hEdnF1b1p6N21IU28xeTN1QVliSTFVOWlzVWpoYVNHR3I4aDNSRGtEVFZ5MVFWdXJXN2tGdkszeEVrV3QwdFVGWVN4REtkVTItQ1Exb1N4RUhiOHp6MHNkUi05RXZGVnRWVjF5bHlUNXM3RGJuRUxPVnNjUVRrR01iN1EycGRpb3RIQUtNcmdlSk5MWmxPREpoQm14b3hWb0l0TWppNXVudjAtSHQ1LXk4dw?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Other Agricultural Products",
+"Edible Oil",
+"Packaged Foods"
+],
+"neg": false
+},
+{
+"key": "idbibankacquisitionputsfairfaxscsbbankstakeatacrossroads",
+"date": "2026-10-14",
+"title": "IDBI Bank acquisition puts Fairfax's CSB Bank stake at a crossroads",
+"url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxOUW1NTjB6Y2hZd01mR0tzc1pNYTdiakxPdF84UWNKMTVkMDJ5SWItajliQWFiVWpoSldMNHN6Smxla2xmLTI4bkNWZlZYWU1sRHZ6b0FPMVpzS014RkZ6bll3ajVFOE5SZDZabWpaUG5SamVIMFpqSFZLQmxGenkxLTlUeVdIdzNMQnlqNlpfQU9maldEOEpsUksySzJKWDU3UW5rb1JsWXNEekEtMVRCdHJHeVFNa3pKbHdFTnZtWHhCWHpfS1VkR2VDZVVXbURrZE1adNIB2gFBVV95cUxNSTl0R3lHNnVOdklqMGpBTmFvSWR5QTFUS2JZRnNJYWtobEllRG9sdUJWVkljbXNKSVFGRjlXcHAzTUFlanBfT0lWWVQ3YWNWdWlBMUE1NTVTcVZRUGdKMVpTS3h3VzFPUmVkYWUzZ0RPQmNLWXBHVWFTT3hSb3Z5ZkZzYktnVmRfY19BOC1nSXV1RTM5VVIwcEsxVFZ5WC1kcXBPQkJtOUQtMEo3VDhpamgzLUpQcGV4NERlWFVoY1Zibk13X2V5X19BX3Zfbk1nYnhIMlRzMDdodw?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Civil Construction",
+"Road Assets - Toll Annuity Hybrid-Annuity"
 ],
 "neg": false
 },
@@ -2586,6 +2695,7 @@
 "eushootingitselfinthefootpiyushgoyalwarnseuropeovercbamimportduty",
 "chinaimposesexportcontrolsontunnelboringmachinessoughtbyindiacitingnationalsecurity",
 "indiaraisespetrolexporttaxcutsdieseldutyfromoctober16",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint",
 "indiasgoldimportsdrop27aftercustomsdutyhiketo15",
 "chinaconsidersnewexportcurbsonsolaraibiotech",
 "indiaraisespetrolexportdutyfivefoldtors25litrecutsdiesellevytors85",
@@ -2662,6 +2772,7 @@
 "eushootingitselfinthefootpiyushgoyalwarnseuropeovercbamimportduty",
 "chinaimposesexportcontrolsontunnelboringmachinessoughtbyindiacitingnationalsecurity",
 "indiaraisespetrolexporttaxcutsdieseldutyfromoctober16",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint",
 "indiasgoldimportsdrop27aftercustomsdutyhiketo15",
 "chinaconsidersnewexportcurbsonsolaraibiotech",
 "indiaraisespetrolexportdutyfivefoldtors25litrecutsdiesellevytors85",
@@ -2738,6 +2849,7 @@
 "eushootingitselfinthefootpiyushgoyalwarnseuropeovercbamimportduty",
 "chinaimposesexportcontrolsontunnelboringmachinessoughtbyindiacitingnationalsecurity",
 "indiaraisespetrolexporttaxcutsdieseldutyfromoctober16",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint",
 "indiasgoldimportsdrop27aftercustomsdutyhiketo15",
 "chinaconsidersnewexportcurbsonsolaraibiotech",
 "indiaraisespetrolexportdutyfivefoldtors25litrecutsdiesellevytors85",
@@ -2761,6 +2873,7 @@
 "goldpricesmayhavecrashedgloballybutgoldsmugglinginindiahasjumpedto50tonnesfrom3tonnesi",
 "govtsettotweakmspnormsforperiodicpricehikesofminorforestproducts",
 "indiaextendsdutyfreecottonimportsbytwomonthstoeasedomesticprices",
+"idbibankstakesalepriceasurprisenoruboffonpsustocksanalysts",
 "noplantoreduceimportdutiesonpulsesofficial"
 ],
 "Edible Oil": [
@@ -2774,6 +2887,7 @@
 "goldpricesmayhavecrashedgloballybutgoldsmugglinginindiahasjumpedto50tonnesfrom3tonnesi",
 "govtsettotweakmspnormsforperiodicpricehikesofminorforestproducts",
 "indiaextendsdutyfreecottonimportsbytwomonthstoeasedomesticprices",
+"idbibankstakesalepriceasurprisenoruboffonpsustocksanalysts",
 "noplantoreduceimportdutiesonpulsesofficial"
 ],
 "Packaged Foods": [
@@ -2787,6 +2901,7 @@
 "goldpricesmayhavecrashedgloballybutgoldsmugglinginindiahasjumpedto50tonnesfrom3tonnesi",
 "govtsettotweakmspnormsforperiodicpricehikesofminorforestproducts",
 "indiaextendsdutyfreecottonimportsbytwomonthstoeasedomesticprices",
+"idbibankstakesalepriceasurprisenoruboffonpsustocksanalysts",
 "noplantoreduceimportdutiesonpulsesofficial"
 ],
 "Gems Jewellery And Watches": [
@@ -2808,16 +2923,22 @@
 "Civil Construction": [
 "governmentunveilsroadmapforgreenureaproductionpushes724lakhmtgreenammoniaprocurementundern",
 "explainedwhycouldaweakmonsoonderailindiasambitiousethanolblendingprogramme",
-"anotherroadblockforelonmusksstarlinkgovtmullssecuritysystemforforeignsatcomfirms"
+"anotherroadblockforelonmusksstarlinkgovtmullssecuritysystemforforeignsatcomfirms",
+"idbibankacquisitionputsfairfaxscsbbankstakeatacrossroads"
 ],
 "Road Assets - Toll Annuity Hybrid-Annuity": [
 "governmentunveilsroadmapforgreenureaproductionpushes724lakhmtgreenammoniaprocurementundern",
-"anotherroadblockforelonmusksstarlinkgovtmullssecuritysystemforforeignsatcomfirms"
+"anotherroadblockforelonmusksstarlinkgovtmullssecuritysystemforforeignsatcomfirms",
+"idbibankacquisitionputsfairfaxscsbbankstakeatacrossroads"
 ],
 "Fertilizers": [
 "governmentunveilsroadmapforgreenureaproductionpushes724lakhmtgreenammoniaprocurementundern",
 "fertilizerstocksrallyafterunioncabinetapprovesmassive62370cragrisubsidy",
-"cabinetapproves62370crorefertilisersubsidyforrabi202627season"
+"cabinetapproves62370crorefertilisersubsidyforrabiseason",
+"cabinetapproves62370crorefertilisersubsidyforrabi202627season",
+"cabinetapprovesrs62370crorenutrientbasedsubsidyforpkfertilisersforrabi202627",
+"cabinetapproves62370crsubsidyforpkfertilisersinrabiseason",
+"cabinetapprovesrs62370crorerabifertilisersubsidyrs5000croremudraguaranteefund"
 ],
 "Iron & Steel": [
 "tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
@@ -2898,6 +3019,9 @@
 "sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
 "sugarcanefarmerswelcomepanelbutwontendprotest",
 "governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
+],
+"Coal": [
+"govtclearscoalindiathreeothersforrareearthmagnetproduction"
 ],
 "Industrial Minerals": [
 "biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal",
