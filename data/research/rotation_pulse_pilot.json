@@ -1,0 +1,416 @@
+{
+ "method": "Rotation + Pulse together (22 Nov 2026, Amritpal: \"check that\" - does a group moving into Improving / Leading while its Pulse is\nrising do better than either alone?).\n\nUniverse: NSE official basic industries with 3+ liquid stocks (today's members - survivorship bias in their favour), equal-weight\ndaily index each (daily returns clipped at +-30%), 2015-26 from Yahoo (+ bhavcopy check on recent sessions).\nWeekly at the Friday close:\n  rotation  vs Nifty 50, app formula: RS-ratio = 100 x RS / 10-week avg; RS-momentum = 3-week avg of ratio change (L/W/G/I)\n  Pulse     app formula (tools/group_pulse.py): a stock is 'trending' when its relative performance score > 100, EMA9 > EMA21,\n            Stage 2 (above a rising 150-day SMA), within 25% of its 52-week high and liquid; Pulse = share of the industry's stocks\n            trending, averaged over the last 21 sessions (1-month Pulse). Rising = higher than 4 weeks ago.\nEvents and states, next 1 / 4 / 13 weeks' return of the industry MINUS Nifty (from the Friday close):\n  base (every industry-week) | entry into Improving or Leading | Pulse rising | ENTRY + Pulse rising | ENTRY + Pulse rising + Pulse\n  above the median | state: in Improving/Leading with Pulse rising vs falling\nPortfolios (weekly rebalance, 0.2% on what changes, equal weight): hold every industry in Improving/Leading with Pulse rising |\nhold Leading (earlier test) | hold top-10% Pulse | all industries. Newest first, bull/bear, ex-Covid.\nLIMIT env = pilot (fewer industries). Output data/research/rotation_pulse(_pilot).json",
+ "industries": 30,
+ "stocks": 273,
+ "pulse_median": 34.3,
+ "events": {
+  "every industry-week (base)": {
+   "1w": {
+    "n": 16380,
+    "avg": 0.24,
+    "beat": 51,
+    "last 1y": 0.14,
+    "last 2y": 0.13,
+    "last 3y": 0.19,
+    "last 5y": 0.26
+   },
+   "4w": {
+    "n": 16290,
+    "avg": 0.98,
+    "beat": 53,
+    "last 1y": 0.76,
+    "last 2y": 0.45,
+    "last 3y": 0.83,
+    "last 5y": 1.07
+   },
+   "13w": {
+    "n": 16020,
+    "avg": 3.42,
+    "beat": 57,
+    "last 1y": 4.56,
+    "last 2y": 2.41,
+    "last 3y": 3.18,
+    "last 5y": 4.01
+   }
+  },
+  "entry into Improving/Leading": {
+   "1w": {
+    "n": 2220,
+    "avg": 0.27,
+    "beat": 51,
+    "last 1y": 0.08,
+    "last 2y": 0.08,
+    "last 3y": 0.12,
+    "last 5y": 0.24
+   },
+   "4w": {
+    "n": 2203,
+    "avg": 1.3,
+    "beat": 55,
+    "last 1y": 0.95,
+    "last 2y": 0.68,
+    "last 3y": 0.96,
+    "last 5y": 1.35
+   },
+   "13w": {
+    "n": 2172,
+    "avg": 3.73,
+    "beat": 58,
+    "last 1y": 4.9,
+    "last 2y": 2.97,
+    "last 3y": 3.2,
+    "last 5y": 4.23
+   }
+  },
+  "Pulse rising": {
+   "1w": {
+    "n": 6934,
+    "avg": 0.26,
+    "beat": 51,
+    "last 1y": 0.1,
+    "last 2y": 0.17,
+    "last 3y": 0.2,
+    "last 5y": 0.33
+   },
+   "4w": {
+    "n": 6906,
+    "avg": 1.03,
+    "beat": 54,
+    "last 1y": 0.61,
+    "last 2y": 0.58,
+    "last 3y": 0.95,
+    "last 5y": 1.23
+   },
+   "13w": {
+    "n": 6796,
+    "avg": 3.66,
+    "beat": 58,
+    "last 1y": 3.26,
+    "last 2y": 1.96,
+    "last 3y": 3.06,
+    "last 5y": 4.26
+   }
+  },
+  "ENTRY + Pulse rising": {
+   "1w": {
+    "n": 686,
+    "avg": 0.44,
+    "beat": 51,
+    "last 1y": -0.16,
+    "last 2y": 0.12,
+    "last 3y": 0.16,
+    "last 5y": 0.43
+   },
+   "4w": {
+    "n": 682,
+    "avg": 1.55,
+    "beat": 56,
+    "last 1y": 0.44,
+    "last 2y": 0.48,
+    "last 3y": 1.03,
+    "last 5y": 1.72
+   },
+   "13w": {
+    "n": 670,
+    "avg": 4.56,
+    "beat": 60,
+    "last 1y": 3.78,
+    "last 2y": 2.58,
+    "last 3y": 3.0,
+    "last 5y": 4.92
+   }
+  },
+  "ENTRY + Pulse rising + Pulse above median": {
+   "1w": {
+    "n": 352,
+    "avg": 0.57,
+    "beat": 54,
+    "last 1y": 0.59,
+    "last 2y": 0.59,
+    "last 3y": 0.65,
+    "last 5y": 0.68
+   },
+   "4w": {
+    "n": 352,
+    "avg": 1.79,
+    "beat": 56,
+    "last 1y": 0.97,
+    "last 2y": 0.63,
+    "last 3y": 1.79,
+    "last 5y": 2.04
+   },
+   "13w": {
+    "n": 349,
+    "avg": 5.85,
+    "beat": 64,
+    "last 1y": 6.3,
+    "last 2y": 2.23,
+    "last 3y": 3.77,
+    "last 5y": 5.65
+   }
+  },
+  "in Improving/Leading, Pulse rising": {
+   "1w": {
+    "n": 3725,
+    "avg": 0.37,
+    "beat": 53,
+    "last 1y": 0.06,
+    "last 2y": 0.16,
+    "last 3y": 0.23,
+    "last 5y": 0.4
+   },
+   "4w": {
+    "n": 3717,
+    "avg": 1.03,
+    "beat": 54,
+    "last 1y": 0.48,
+    "last 2y": 0.43,
+    "last 3y": 0.98,
+    "last 5y": 1.25
+   },
+   "13w": {
+    "n": 3663,
+    "avg": 3.87,
+    "beat": 58,
+    "last 1y": 2.5,
+    "last 2y": 1.75,
+    "last 3y": 3.01,
+    "last 5y": 4.56
+   }
+  },
+  "in Improving/Leading, Pulse falling": {
+   "1w": {
+    "n": 4479,
+    "avg": 0.24,
+    "beat": 51,
+    "last 1y": 0.28,
+    "last 2y": 0.16,
+    "last 3y": 0.21,
+    "last 5y": 0.18
+   },
+   "4w": {
+    "n": 4463,
+    "avg": 1.02,
+    "beat": 52,
+    "last 1y": 1.02,
+    "last 2y": 0.55,
+    "last 3y": 0.89,
+    "last 5y": 1.06
+   },
+   "13w": {
+    "n": 4414,
+    "avg": 3.09,
+    "beat": 55,
+    "last 1y": 5.26,
+    "last 2y": 3.35,
+    "last 3y": 3.42,
+    "last 5y": 3.8
+   }
+  },
+  "in Lagging/Weakening, Pulse rising": {
+   "1w": {
+    "n": 3209,
+    "avg": 0.13,
+    "beat": 50,
+    "last 1y": 0.14,
+    "last 2y": 0.18,
+    "last 3y": 0.18,
+    "last 5y": 0.24
+   },
+   "4w": {
+    "n": 3189,
+    "avg": 1.03,
+    "beat": 53,
+    "last 1y": 0.73,
+    "last 2y": 0.73,
+    "last 3y": 0.92,
+    "last 5y": 1.2
+   },
+   "13w": {
+    "n": 3133,
+    "avg": 3.42,
+    "beat": 58,
+    "last 1y": 3.89,
+    "last 2y": 2.17,
+    "last 3y": 3.11,
+    "last 5y": 3.9
+   }
+  }
+ },
+ "portfolios": {
+  "hold Improving/Leading with Pulse rising": {
+   "CAGR": 23.3,
+   "max DD": -39.4,
+   "1y": -5.2,
+   "2y": 1.3,
+   "3y": 11.6,
+   "5y": 19.3,
+   "years": {
+    "2026": -0.8,
+    "2025": 2.3,
+    "2024": 25.3,
+    "2023": 46.3,
+    "2022": 26.1,
+    "2021": 73.2,
+    "2020": 48.7,
+    "2019": 21.0,
+    "2018": -29.0,
+    "2017": 63.2,
+    "2016": 5.3
+   },
+   "bull/bear a year": [
+    42.3,
+    -22.4
+   ],
+   "ex-Covid": [
+    21.1,
+    -39.4
+   ]
+  },
+  "hold Leading (earlier test)": {
+   "CAGR": 23.7,
+   "max DD": -46.7,
+   "1y": 4.3,
+   "2y": 3.0,
+   "3y": 14.1,
+   "5y": 19.2,
+   "years": {
+    "2026": 3.4,
+    "2025": -1.5,
+    "2024": 32.7,
+    "2023": 47.1,
+    "2022": 16.4,
+    "2021": 70.2,
+    "2020": 74.9,
+    "2019": 1.3,
+    "2018": -31.3,
+    "2017": 63.7,
+    "2016": 18.2
+   },
+   "bull/bear a year": [
+    44.5,
+    -25.0
+   ],
+   "ex-Covid": [
+    19.9,
+    -41.6
+   ]
+  },
+  "hold top-10% Pulse": {
+   "CAGR": 25.7,
+   "max DD": -54.7,
+   "1y": 14.9,
+   "2y": 18.2,
+   "3y": 30.5,
+   "5y": 32.3,
+   "years": {
+    "2026": 15.6,
+    "2025": 13.0,
+    "2024": 58.3,
+    "2023": 39.4,
+    "2022": 32.1,
+    "2021": 63.4,
+    "2020": 50.4,
+    "2019": 8.7,
+    "2018": -33.5,
+    "2017": 41.4,
+    "2016": 15.1
+   },
+   "bull/bear a year": [
+    49.9,
+    -28.6
+   ],
+   "ex-Covid": [
+    24.4,
+    -41.8
+   ]
+  },
+  "hold Improving/Leading with Pulse rising + above median": {
+   "CAGR": 29.9,
+   "max DD": -28.5,
+   "1y": -0.0,
+   "2y": 3.9,
+   "3y": 18.0,
+   "5y": 25.6,
+   "years": {
+    "2026": 0.9,
+    "2025": 2.2,
+    "2024": 45.9,
+    "2023": 41.0,
+    "2022": 37.6,
+    "2021": 58.6,
+    "2020": 80.8,
+    "2019": 22.6,
+    "2018": -14.0,
+    "2017": 71.8,
+    "2016": 2.2
+   },
+   "bull/bear a year": [
+    44.5,
+    -7.9
+   ],
+   "ex-Covid": [
+    25.2,
+    -28.5
+   ]
+  },
+  "all industries": {
+   "CAGR": 25.2,
+   "max DD": -40.8,
+   "1y": 6.1,
+   "2y": 10.0,
+   "3y": 19.4,
+   "5y": 23.2,
+   "years": {
+    "2026": 6.9,
+    "2025": 8.5,
+    "2024": 37.5,
+    "2023": 55.2,
+    "2022": 12.5,
+    "2021": 60.8,
+    "2020": 37.6,
+    "2019": 8.0,
+    "2018": -16.1,
+    "2017": 58.5,
+    "2016": 18.7
+   },
+   "bull/bear a year": [
+    42.9,
+    -18.4
+   ],
+   "ex-Covid": [
+    24.3,
+    -26.5
+   ]
+  }
+ },
+ "nifty": {
+  "CAGR": 11.5,
+  "max DD": -34.6,
+  "1y": -1.0,
+  "2y": 3.9,
+  "3y": 9.2,
+  "5y": 8.7,
+  "years": {
+   "2026": -0.9,
+   "2025": 9.4,
+   "2024": 9.6,
+   "2023": 20.0,
+   "2022": 4.3,
+   "2021": 26.2,
+   "2020": 12.3,
+   "2019": 12.8,
+   "2018": 3.1,
+   "2017": 28.6,
+   "2016": -0.4
+  },
+  "bull/bear a year": [
+   24.2,
+   -21.1
+  ],
+  "ex-Covid": [
+   11.1,
+   -16.6
+  ]
+ }
+}
