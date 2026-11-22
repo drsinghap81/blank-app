@@ -345,14 +345,14 @@ def flag(x, sym, name):
                 continue
             idx = np.arange(pz.start, pz.stop); hh = h[pz]; ll = l[pz]
             k_, b_ = np.polyfit(idx, hh, 1) if len(idx) >= 3 else (0.0, float(hh.max()))
-            kl_ = np.polyfit(idx, ll, 1)[0] if len(idx) >= 3 else 0.0
+            kl_, bl_ = np.polyfit(idx, ll, 1) if len(idx) >= 3 else (0.0, float(ll.min()))
             flat = 0.0015 * top
             if k_ > flat:                                      # the pause drifts down or sideways, never up
                 continue
             # 22 Nov 2026 (Amritpal: "bullish flag, pennant, rectangle etc"): name the pause by its shape
             shape = "Pennant" if k_ < -flat and kl_ > flat else "Rectangle" if abs(k_) <= flat and abs(kl_) <= flat else "Flag"
             if shape == "Rectangle":
-                k_, b_ = 0.0, float(hh.max())                  # breakout = above the box top
+                k_, b_ = 0.0, float(hh.max()); kl_, bl_ = 0.0, float(ll.min())   # breakout = above the box top
             line = lambda t: float(k_ * t + b_)                # noqa: E731
             # 22 Nov 2026 (Amritpal: "stock should be in an uptrend making higher highs and higher lows, averages turning up"):
             # swings (zigzag 6% on highs / lows) before the flag: the pole top above the previous swing high, the pole's starting low
@@ -374,7 +374,12 @@ def flag(x, sym, name):
             trig = max(min(line(n - 1), float(hh.max())), float(c[-1]) if back == 0 else 0)
             row = dict(symbol=sym, name=name, lane=lane, shape=shape, close=round(float(c[-1]), 2), pole_pct=round(pole * 100, 1),
                        pole_start=D[lo_i], pole_top=D[pk], top=round(float(top), 2), flag_days=pz.stop - pz.start,
-                       depth_pct=round(depth * 100, 1), stop=round(float(plo), 2), s200=round(float(s200[-1]), 2))
+                       depth_pct=round(depth * 100, 1), stop=round(float(plo), 2), s200=round(float(s200[-1]), 2),
+                       # 22 Nov 2026 (Amritpal: "mark the patterns on the charts"): the drawing - pole (swing low -> top), the pause's
+                       # top and bottom lines from its first day to the breakout / today
+                       base=round(float(base), 2), geo=dict(pole=[D[lo_i], round(float(base), 2), D[pk], round(float(top), 2)],
+                                                            up=[D[pz.start], round(float(k_ * pz.start + b_), 2), D[end], round(float(k_ * end + b_), 2)],
+                                                            lo=[D[pz.start], round(float(kl_ * pz.start + bl_), 2), D[end], round(float(kl_ * end + bl_), 2)]))
             bo = end; broke = c[bo] > line(bo) and c[bo] > c[bo - 1]
             if back == 0 and not broke:
                 if l[end] < plo:

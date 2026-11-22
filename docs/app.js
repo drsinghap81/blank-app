@@ -8252,7 +8252,7 @@ async function loadStrat() {
     { k: 'pt', name: 'Bottoming out', test: 'no edge', ok: 0, note: 'Watch only: W and triple bottoms did no better than a random stock in our tests.', rows: ((PT && PT.rows) || []).filter((x) => x.kind !== 'index').map((x) => row(x.symbol, `${TYP[x.typ] || x.typ} · ${x.status === 'breakout' ? 'broke out' : fmt(x.to_neck_pct, 1) + '% to go'}`, { sc: x.status === 'breakout' ? 1 : 0 })) },
     { k: 'rt', name: 'Retest', test: 'weak', ok: 0, note: 'Watch only: a small edge per trade, but it lost money as a 10-stock portfolio.', rows: pl.filter((r) => bkOf(r) === 'rt').map((r) => row(r.symbol, 'At old breakout', { r, sc: r.score || 0 })) },
     { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only: uptrend (higher high + higher low, 21- and 200-day averages rising), a 15%+ pole, then a tight flag, pennant or box. Earlier test: +3% vs the market in 60 days, but a weak system on its own.',
-      rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2)} · target ${fmt(x.target, 0)}`, { sc: x.status === 'breakout' ? 2 : 1 })) },
+      rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2)} · target ${fmt(x.target, 0)}`, { sc: x.status === 'breakout' ? 2 : 1, fl: x })) },
     { k: 'vcp', name: 'Tight bases', test: 'watch', ok: 0, note: 'Watch only: tested, did not beat ATH or 9/21.', rows: (((V && (V.rows || V)) || []).slice ? ((V.rows || V) || []).slice(0, 30) : []).map((x) => row(x.symbol, 'Squeezing', { sc: 0 })) }];
   SYS.forEach((s) => s.rows.sort((a, b) => b.s - a.s || (b.sc || 0) - (a.sc || 0)));
   const k = state.stratK && SYS.some((s) => s.k === state.stratK) ? state.stratK : 'mom'; const S = SYS.find((s) => s.k === k);
@@ -8267,7 +8267,7 @@ async function loadStrat() {
   el.querySelectorAll('[data-sk]').forEach((b) => b.addEventListener('click', () => { state.stratK = b.dataset.sk; loadStrat(); }));
   el.querySelectorAll('[data-smk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.smk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } loadStrat(); }));
   el.querySelectorAll('[data-go4]').forEach((b) => b.addEventListener('click', () => show(b.dataset.go4)));
-  el.querySelectorAll('[data-si]').forEach((b) => b.addEventListener('click', () => { const x = S.rows[+b.dataset.si];
+  el.querySelectorAll('[data-si]').forEach((b) => b.addEventListener('click', () => { const x = S.rows[+b.dataset.si]; if (x.fl) { patternView(x.fl, mk); return; }
     stockPage({ mk, sym: x.sym, name: x.sym, kind: 'stock' }, [{ t: 'Strategies', go: () => closeSheet(), done: true }, { t: S.name, go: () => closeSheet(), done: true }, { t: x.sym, on: true }]); }));
 }
 
@@ -8683,4 +8683,44 @@ function bookedFix(t, done) {
   const go = async (body) => { try { await lvApi('/api/journal/fix', { method: 'POST', body: JSON.stringify({ key: t.key, ...body }) }); toast('Journal corrected'); history.back(); done && done(); } catch (e) { toast('Could not save: ' + (e.message || e)); } };
   $('#bfsave').addEventListener('click', () => go({ exit: +$('#bfx').value, qty: +$('#bfq').value }));
   $('#bfdel').addEventListener('click', () => go({ remove: true }));
+}
+
+/* ------------------------------------------------------------------ Pattern drawn on the chart (22 Nov 2026)
+   Amritpal: "can you mark the patterns on the charts" - flags / pennants / rectangles: candles, 50 and 200-day averages, the pole
+   (swing low -> top), the pause's top and bottom lines (shaded), the breakout or buy level, stop and target. */
+function patternSvg(S, f) {
+  const g = f.geo || {}; const n = S.t.length; const i0 = Math.max(0, S.t.indexOf((g.pole || [])[0]) - 15); const a = i0 < 0 ? Math.max(0, n - 90) : i0;
+  const T = S.t.slice(a), O = S.o.slice(a), Hh = S.h.slice(a), Ll = S.l.slice(a), Cc = S.c.slice(a); const m = T.length;
+  const extra = 8; const lv = [f.target, f.stop, f.trigger || f.entry, ...Ll, ...Hh].filter((v) => v > 0);
+  const lo = Math.min(...lv) * 0.99, hi = Math.max(...lv) * 1.01; const W = 1000, H = innerWidth < 640 ? 820 : 560;
+  const X = (i) => 30 + i * (W - 150) / Math.max(1, m - 1 + extra), Y = (v) => H - 34 - (v - lo) / ((hi - lo) || 1) * (H - 70);
+  const xi = (d) => { const k = T.indexOf(d); return k < 0 ? m - 1 : k; }; const bw = Math.max(2, (W - 150) / (m + extra) * 0.6);
+  const cand = T.map((_, i) => { const up = Cc[i] >= O[i]; return `<line x1="${X(i)}" x2="${X(i)}" y1="${Y(Hh[i])}" y2="${Y(Ll[i])}" class="pc-w ${up ? 'u' : 'd'}"/><rect x="${X(i) - bw / 2}" y="${Y(Math.max(O[i], Cc[i]))}" width="${bw}" height="${Math.max(1.5, Math.abs(Y(O[i]) - Y(Cc[i])))}" class="pc-b ${up ? 'u' : 'd'}"/>`; }).join('');
+  const ma = (arr, cls) => { if (!arr) return ''; const v = arr.slice(a); const pts = v.map((x, i) => (x == null ? null : `${X(i).toFixed(1)},${Y(x).toFixed(1)}`)).filter(Boolean).join(' '); return pts ? `<polyline points="${pts}" class="${cls}"/>` : ''; };
+  const P = g.pole || [], U = g.up || [], Lo = g.lo || [];
+  const pole = P.length ? `<line x1="${X(xi(P[0]))}" y1="${Y(P[1])}" x2="${X(xi(P[2]))}" y2="${Y(P[3])}" class="pc-pole"/><text x="${(X(xi(P[0])) + X(xi(P[2]))) / 2 - 16}" y="${(Y(P[1]) + Y(P[3])) / 2}" text-anchor="end" class="pc-lab g">Pole +${fmt(f.pole_pct, 0)}%</text><text x="${(X(xi(P[0])) + X(xi(P[2]))) / 2 - 16}" y="${(Y(P[1]) + Y(P[3])) / 2 + 28}" text-anchor="end" class="pc-lab g">₹${fmt(P[3] - P[1], 0)}</text>` : '';
+  const xe = X(m - 1 + 2);
+  const flagPoly = U.length && Lo.length ? `<polygon points="${X(xi(U[0]))},${Y(U[1])} ${X(xi(U[2]))},${Y(U[3])} ${X(xi(Lo[2]))},${Y(Lo[3])} ${X(xi(Lo[0]))},${Y(Lo[1])}" class="pc-flag"/>
+    <line x1="${X(xi(U[0]))}" y1="${Y(U[1])}" x2="${X(xi(U[2]))}" y2="${Y(U[3])}" class="pc-fl"/><line x1="${X(xi(Lo[0]))}" y1="${Y(Lo[1])}" x2="${X(xi(Lo[2]))}" y2="${Y(Lo[3])}" class="pc-fl"/>
+    <text x="${X(xi(U[0]))}" y="${Y(U[1]) - 18}" class="pc-lab a">${esc(f.shape)}</text>` : '';
+  const hl = (v, cls, lab) => (v ? `<line x1="${X(Math.max(0, xi((g.pole || [T[0]])[0])))}" x2="${xe}" y1="${Y(v)}" y2="${Y(v)}" class="${cls}"/><text x="${W - 8}" y="${Y(v) + 7}" text-anchor="end" class="${cls}-t">${esc(lab)}</text>` : '');
+  const bo = f.status === 'breakout' ? (() => { const i = xi(f.bo_date); return `<circle cx="${X(i)}" cy="${Y(Cc[i])}" r="13" class="pc-bo"/><text x="${X(i)}" y="${Y(Cc[i]) + 46}" text-anchor="middle" class="pc-lab g">Breakout</text>`; })() : '';
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" class="t3-svg pc-svg" role="img" aria-label="${esc(f.symbol)} ${esc(f.shape)}: pole, ${esc(f.shape.toLowerCase())} lines, ${f.status === 'breakout' ? 'breakout' : 'buy level'}, stop and target marked">
+    ${ma(S.sma200, 'pc-ma2')}${ma(S.sma50, 'pc-ma1')}${cand}${pole}${flagPoly}
+    ${hl(f.target, 'pc-tg', 'Target ' + fmt(f.target, 0))}${f.status !== 'breakout' ? hl(f.trigger, 'pc-tr', 'Buy above ' + fmt(f.trigger, 0)) : ''}${hl(f.stop, 'pc-st', 'Stop ' + fmt(f.stop, 0))}${bo}
+    <text x="30" y="${H - 8}" class="t3-ax">${esc(day(T[0]))}</text><text x="${X(m - 1)}" y="${H - 8}" text-anchor="end" class="t3-ax">${esc(day(T[m - 1]))}</text></svg>`;
+}
+async function patternView(f, mk) {
+  const Mz = (v) => (mk === 'NSE' ? inr(v, 0) : `${MKT[mk].cur}${fmt(v, 2, MKT[mk].loc)}`);
+  openPanel(`<div class="t3"><div class="t3w-h"><div><h2 style="font-family:var(--font-head);margin:0">${esc(f.symbol)}</h2><small class="muted">${esc(f.shape)} · ${f.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${f.status === 'breakout' ? 'broke out ' + esc(day(f.bo_date)) : 'forming'}</small></div></div>
+    <div id="pcbox" class="sp-chart"><p class="muted">Loading chart…</p></div>
+    <div class="t3-key"><span><i style="background:var(--rise)"></i>Pole</span><span><i style="background:var(--accent)"></i>${esc(f.shape)}</span><span><i style="background:var(--saffron)"></i>50-day</span><span><i style="background:var(--mute-line)"></i>200-day</span></div>
+    <div class="sp-why"><div class="ok"><b>${Mz(f.status === 'breakout' ? f.entry : f.trigger)}</b><small>${f.status === 'breakout' ? 'breakout close' : 'buy above'}</small></div><div class="bad"><b>${Mz(f.stop)}</b><small>stop · −${fmt(f.risk_pct, 1)}%</small></div><div class="ok"><b>${Mz(f.target)}</b><small>target (+ pole)</small></div></div>
+    <div class="t3-rules"><div class="t3-rule"><b>+${fmt(f.pole_pct, 0)}%</b><small>pole · ${esc(day(f.pole_start))} → ${esc(day(f.pole_top))}</small></div><div class="t3-rule"><b>${f.flag_days}</b><small>sessions in the ${esc(f.shape.toLowerCase())}</small></div><div class="t3-rule"><b>−${fmt(f.depth_pct, 1)}%</b><small>pullback from the top</small></div></div>
+    <div class="sp-cbar"><a class="sp-tv" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(f.symbol, mk))}">Open in TradingView ↗</a><button class="t3-link" id="pcsp">Stock page</button></div></div>`);
+  history.pushState({ sheet: 1 }, ''); $('#pcsp').addEventListener('click', () => stockPage({ mk, sym: f.symbol, name: f.name || f.symbol, kind: 'stock' }));
+  const fp = encodeURIComponent(f.symbol.replace(/ /g, '_')); const get = async (u) => { try { const r = await fetch(fresh(u)); return r.ok ? await r.json() : null; } catch (e) { return null; } };
+  let S = await get(MAIN + MKT[mk].path + 'pattern_charts/' + fp + '.json');
+  if (!S || !S.t) { const d = await tdChartData({ symbol: f.symbol, system: 'x', bucket: 'tf' }, mk).catch(() => null); if (d && d.tf === 'Daily') S = d; }
+  const box = $('#pcbox'); if (box) box.innerHTML = S && S.t ? patternSvg(S, f) : '<p class="muted">No daily chart stored for this one yet (it appears after the next scan).</p>';
 }

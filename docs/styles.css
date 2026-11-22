@@ -1618,3 +1618,14 @@ input,select,textarea{font-size:16px!important}
 .tr-svg .tr-out.up { fill: var(--rise); } .tr-svg .tr-out.dn { fill: var(--fall); } .tr-svg .tr-out { stroke: var(--paper); stroke-width: 4; } .tr-svg .tr-out-t { fill: var(--ink); font: 800 24px var(--font-body); }
 .pf-bk { border: 0; cursor: pointer; font-family: var(--font-body); }
 .bf-l { display: flex; flex-direction: column; gap: 6px; font-weight: 700; } .bf-l input { font: 600 18px var(--font-body); padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: var(--card); color: var(--ink); }
+/* pattern chart (22 Nov 2026) */
+.pc-svg .pc-w { stroke-width: 1.6; } .pc-svg .pc-w.u, .pc-svg .pc-b.u { stroke: var(--rise); fill: var(--rise); } .pc-svg .pc-w.d, .pc-svg .pc-b.d { stroke: var(--fall); fill: var(--fall); }
+.pc-svg .pc-ma1 { fill: none; stroke: var(--saffron); stroke-width: 2.5; } .pc-svg .pc-ma2 { fill: none; stroke: var(--mute-line); stroke-width: 3; }
+.pc-svg .pc-pole { stroke: var(--rise); stroke-width: 6; stroke-linecap: round; opacity: .85; }
+.pc-svg .pc-flag { fill: var(--accent); fill-opacity: .18; } .pc-svg .pc-fl { stroke: var(--accent); stroke-width: 4; stroke-linecap: round; }
+.pc-svg .pc-lab { font: 800 24px var(--font-body); } .pc-svg .pc-lab.g { fill: var(--rise); } .pc-svg .pc-lab.a { fill: var(--accent); }
+.pc-svg .pc-tg { stroke: var(--rise); stroke-width: 2.5; stroke-dasharray: 10 8; } .pc-svg .pc-tg-t { fill: var(--rise); font: 800 22px var(--font-body); }
+.pc-svg .pc-tr { stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 6 6; } .pc-svg .pc-tr-t { fill: var(--accent); font: 800 22px var(--font-body); }
+.pc-svg .pc-st { stroke: var(--fall); stroke-width: 2.5; stroke-dasharray: 10 8; } .pc-svg .pc-st-t { fill: var(--fall-ink); font: 800 22px var(--font-body); }
+.pc-svg .pc-bo { fill: var(--rise); stroke: var(--paper); stroke-width: 4; }
+@media (max-width: 640px) { .pc-svg .pc-lab { font-size: 34px; } .pc-svg .pc-tg-t, .pc-svg .pc-tr-t, .pc-svg .pc-st-t { font-size: 30px; } .pc-svg .t3-ax { font-size: 28px; } .pc-svg .pc-pole { stroke-width: 8; } }
