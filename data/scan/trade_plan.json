@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-22 05:58 UTC",
+"generated": "2026-11-22 08:56 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-20",
@@ -66,6 +66,15 @@
 "pct": 0,
 "rules": "Volatility contraction pattern in a Stage 2 uptrend: >= 2 shrinking pullbacks with higher lows, volume drying up; buy-stop above the last pullback's high on 1.4x volume; stop = that pullback's low (max 10%); sell after a daily close below EMA 50.",
 "test": "NSE 2017-26: +4.9% a trade (221 trades, 37% win), robust across rule variants; added to Momentum + Trend it gave 24.2-24.7%/yr vs 23.1% with a similar worst fall and nothing extra in 2022-26, so it is a watch bucket - your call."
+},
+{
+"key": "pr",
+"name": "Pulse rotation",
+"system": "Pulse rotation",
+"status": "active",
+"pct": 0,
+"rules": "Each Friday close: NSE industries in the top 10% by 1-month Pulse AND rotation Leading/Improving; hold the 10 strongest trending stocks of those industries by 3-month return (kept while in the top 20 and the industry stays selected); equal weight (the % you set / 10 a stock); buy and sell at Monday's open. Safety stop 20% below the buy (not in the test).",
+"test": "NSE 2016-26 (survivors), Monday-open fills, 0.2% a side: 34.5%/yr, worst fall -35.9%; last 1/2/3 years +20.0/+16.0/+40.0%. Trial: starts at 0% - set a small % to trade it."
 },
 {
 "key": "s1",
@@ -213,7 +222,7 @@
 "results_ind": "Healthcare Service Provider",
 "rank": 3,
 "risk_pct": 12.9,
-"r3m": 6.6
+"r3m": null
 },
 {
 "id": "ATH-ZYDUSLIFE-2026-11-02",
