@@ -2553,7 +2553,7 @@ function invMcRows() {
 }
 /* 15 Nov 2026: week / day cup closes for indices and other assets (watch only). NSE indices: index_mclose.json; world indices,
    commodities, coins, currencies: assets.json. Index cups need only a 10% (week) / 8% (day) fall; other assets use the stock rules. */
-const wdAssetItems = (rows, kind) => rows.map((x) => ({ g: x.g, sym: x.sym || '', name: x.name, a: x.z, wd: true, cur: '', close: x.close, tv: x.tv }));
+const wdAssetItems = (rows, kind) => rows.map((x) => ({ g: x.g, sym: x.sym || '', name: x.name, a: x.z, wd: true, cur: '', close: x.close, tv: x.tv, key: x.key }));
 function wdListHtml(L, kind) {
   return L.map((r, i) => allMcItem(r, i, L)).join('').replace(/data-i="/g, 'data-j="');
 }
@@ -2568,7 +2568,7 @@ const pxf = (v) => (v == null ? '–' : Math.abs(v) >= 1000 ? fmt(v, 0, 'en-US')
 function shortItems(rows, g, tvf, src = 'stock') { return rows.map((r) => ({ g, sym: r.symbol || '', name: r.symbol ? r.name : (r.index || r.name), z: r, close: r.close, tv: tvf(r), src, key: r._key || r.key, mk: AM() })); }
 function shortItemHtml(x, i, L) {
   const r = x.z; const wk = r.kind === 'WS'; const sp = i === 0 || L[i - 1].g !== x.g ? `<li class="ixsep">${esc(x.g)}</li>` : '';
-  const chips = (r.sector_tag ? secChip(r) : '') + `<span class="chip exit">Broke support ${pxf(r.old_low)} (swing low of ${day(r.low_date)})${r.broke && r.broke !== r.period ? ` on ${day(r.broke)}` : ' this ' + (wk ? 'week' : 'day')} · now ${fmt(r.below_pct, 1)}% below</span>`
+  const chips = cotChip(x.key) + (r.sector_tag ? secChip(r) : '') + `<span class="chip exit">Broke support ${pxf(r.old_low)} (swing low of ${day(r.low_date)})${r.broke && r.broke !== r.period ? ` on ${day(r.broke)}` : ' this ' + (wk ? 'week' : 'day')} · now ${fmt(r.below_pct, 1)}% below</span>`
     + `<span class="chip">rallied ${fmt(r.rally * 100, 0)}% in between</span>${r.long_cup ? '<span class="chip new">Big base</span>' : ''}`
     + `<span class="chip">${r.atl ? 'No older low below · new low' : `next support ${pxf(r.support)} (${fmt(r.room_pct, 0)}% down)`}</span><span class="chip exit">Below a falling 30-wk SMA</span>`;
   const g = r.low_p ? (x.close / r.low_p - 1) * 100 : null;
@@ -3027,6 +3027,7 @@ async function loadTurtle(el) {
   ['#tcur', '#tacct', '#trisk', '#tlotn', '#tlotb'].forEach((id) => $(id).addEventListener('change', save));
 }
 async function loadTrdWorld(el, mkSeg) {
+  if (state.cot === undefined) state.cot = await getJSON(MAIN + 'data/scan/cot.json', 'cot').catch(() => null);
   if (!state.assets) { el.innerHTML = mkSeg + '<p class="muted pad">Loading…</p>'; state.assets = await getJSON(MAIN + 'data/scan/assets.json', 'assets'); }
   const A = ((state.assets && state.assets.rows) || []);
   if (state.athTabG.trd === 'short') {
@@ -3051,7 +3052,7 @@ async function loadTrdWorld(el, mkSeg) {
   }
   const kind = state.athTabG.trd === 'dclose' ? 'dclose' : 'wclose';
   const has = A.some((r) => 'wclose' in r);
-  const L = wdAssetItems(A.filter((r) => r[kind]).sort((a, b) => (a.group < b.group ? -1 : a.group > b.group ? 1 : 0)).map((r) => ({ g: r.group === 'Crypto' ? 'Coins' : r.group, name: r.name, z: r[kind], close: r.close, tv: tvOf(r.key) })), kind);
+  const L = wdAssetItems(A.filter((r) => r[kind]).sort((a, b) => (a.group < b.group ? -1 : a.group > b.group ? 1 : 0)).map((r) => ({ g: r.group === 'Crypto' ? 'Coins' : r.group, name: r.name, z: r[kind], close: r.close, tv: tvOf(r.key), key: r.key })), kind);
   $('#asof').textContent = state.assets ? `Assets to ${day(A[0] && A[0].asof)}${updTxt(state.assets.generated)}` : '';
   el.innerHTML = `${mkSeg}<div class="card"><ul class="list flat" id="athlist"><li class="muted pad">${kind === 'wclose' ? 'Last completed week' : 'Last day'} CLOSED above its cup high: world indices (cup ${kind === 'wclose' ? '10' : '8'}%+ deep), commodities, coins and currencies (same rules as stocks: ${kind === 'wclose' ? '2-year high, 26+ weeks old, 20%+ fall' : '1-year high, 20+ days old, 15%+ fall'}), with room to the next older high at least the cup depth. Watch only, not tested. Tap one for its ${kind === 'wclose' ? 'weekly' : 'daily'} chart in TradingView.</li>
     ${!has ? '<li class="empty">This list appears after the next asset scan (it runs nightly).</li>' : L.length ? wdListHtml(L, kind) : `<li class="empty">None ${kind === 'wclose' ? 'last week' : 'on the last day'}.</li>`}</ul></div>`;
@@ -3978,7 +3979,7 @@ function allMcItem(r, i, L) {
   const a = r.a;
   if (r.wd) {
     const sp = i === 0 || L[i - 1].g !== r.g ? `<li class="ixsep">${esc(r.g)}</li>` : '';
-    return `${sp}<li class="row ${a.ath ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.sym)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${secChip(a) + rsChip('Sector RS', a.sector_rs) + wdChips(a)}</div></div><div></div><div class="num">${wdRight(r.close, a, r.cur)}</div></li>`;
+    return `${sp}<li class="row ${a.ath ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(r.sym)}</div><div class="co">${esc(r.name || '')}</div><div class="tags">${cotChip(r.key) + secChip(a) + rsChip('Sector RS', a.sector_rs) + wdChips(a)}</div></div><div></div><div class="num">${wdRight(r.close, a, r.cur)}</div></li>`;
   }
   const sep = i === 0 || L[i - 1].g !== r.g ? `<li class="ixsep">${esc(r.g)}</li>` : '';
   const chip = (r.sec ? secChip(r.sec) + (r.sec.industry ? `<span class="chip">${esc(r.sec.industry)}</span>` : '') + rsChip('Sector RS', r.sec.sector_rs) : '') + `<span class="chip">Closed ${pct(a.above_pct)} over ATH ${fmt(a.old_ath, 2, 'en-US')} (${mLab(a.ath_month)})</span>${a.long_cup ? '<span class="chip new">Long cup</span>' : ''}<span class="chip ${a.base_months >= 24 ? 'new' : ''}">${baseTxt(a.base_months)}</span>`
@@ -6587,6 +6588,21 @@ async function mxLight(mk, S) {
   return { lvl, br, wi, brBad, idxBad, fii };
 }
 /* 21 Nov 2026 (Amritpal: "Yes"): short-squeeze context from FII positioning (tools/fii_squeeze.py; test tools/research/squeeze_market.py) */
+/* 22 Nov 2026 (Amritpal: "worth adding FII buying and speculative long/short ... in chips"): FII / DII cash flow (tools/fii_squeeze.py
+   cash) and CFTC speculator positioning (tools/cot_positions.py). Both tested: neither works as a buy filter - context only. */
+function cashTxt(c) {
+  if (!c || c.f20 == null) return '';
+  const cr = (v) => `${v < 0 ? '−' : '+'}₹${Math.abs(Math.round(v)).toLocaleString('en-IN')} cr`;
+  const st = c.state === 'heavy selling' ? ' · <b class="down">heavy selling</b> (bottom 20% of the year) - in 2015–26 Nifty did better after this: +4.0% over the next 60 sessions vs +2.6% normally'
+    : c.state === 'heavy buying' ? ' · <b class="up">heavy buying</b> (top 20% of the year) - Nifty was not better after this (+3.0% over 60 sessions)' : '';
+  return `FII cash <b>${cr(c.f20)}</b> in 20 sessions (${cr(c.day)} on ${esc(day(c.asof))})${c.dii20 != null ? ` · DII ${cr(c.dii20)}` : c.dii_day != null ? ` · DII ${cr(c.dii_day)} that day` : ''}${st}. Not a buy filter (it cut every system's returns in tests).`;
+}
+function cotChip(key) {
+  const C = state.cot && state.cot.rows; if (!C || !key) return ''; const r = C[String(key).replace(/:INR$/, '')]; if (!r) return '';
+  const cls = r.state === 'very bearish' ? 'exit' : r.state === 'crowded long' ? 'new' : r.state === 'covering' ? 'open' : '';
+  const t = r.state === 'neutral' ? `Speculators ${fmt(r.long_share, 0)}% long` : `Speculators ${r.state} (${fmt(r.long_share, 0)}% long)`;
+  return `<span class="chip ${cls}" title="CFTC managed money, ${esc(day(r.date))}: ${fmt(r.long_share, 0)}% of their positions long, net ${fmt(r.net_pct, 1)}% of open interest, ${r.rank3y}th percentile of 3 years; 3-week change ${fmt(r.chg3, 1)} pts. Tested 2006-26: no state beat an ordinary week - context only.">${t}</span>`;
+}
 function squeezeTxt(f) {
   if (!f || !f.state) return '';
   return f.state === 'setup' ? '<b>falling market + FIIs very short</b>: in 2016–26 Nifty was higher 60 days later 83% of the time (20 cases, +5.5% vs +3% normally; Covid 2020 the exception). Context, not a signal.'
@@ -6599,6 +6615,7 @@ function lightHTML(L, mk) {
   if (br.buys10 != null) bits.push(`Breadth: <b class="${L.brBad ? 'down' : 'up'}">${Number(br.buys10).toLocaleString(loc)} stocks turned up vs ${Number(br.sells10).toLocaleString(loc)} down</b> (9/21 crosses, last 10 sessions)${br.p50 != null ? ` · ${fmt(br.p50, 0)}% above their 50-day` : ''}`);
   if (wi) bits.push(`${esc(MX_BENCH[mk])} <b class="${L.idxBad ? 'down' : 'up'}">${wi.up ? 'above' : 'below'} its 30-week average</b> at Friday's close${wi.up && wi.below_now ? ' · <b class="down">below it now</b>' : ''}`);
   if (L.fii) bits.push(`FIIs <b>${fmt(L.fii.fii_long, 0)}% long</b> in index futures${squeezeTxt(L.fii) ? ' · ' + squeezeTxt(L.fii) : ''}`);
+  if (L.fii && L.fii.cash) bits.push(cashTxt(L.fii.cash));
   return `<div class="mxl ${lvl}"><i></i><div><b>${head}</b><span>${bits.join('<br>')}</span>
     <small>${LIGHT_TEST}</small></div></div>`;
 }
@@ -6884,7 +6901,7 @@ async function alertsCard(box, mk, heroBox) {
     ['ind', 'Industries moving', cnt(indHtml, /data-gwch/g), 'W, 9 EMA, rotation', indHtml],
     ['fund', 'ETFs & commodities', cnt(fundHtml, /data-(fwch|awch|asv|bk)/g), 'W and ATH crosses', fundHtml],
   ];
-  const sq = L && L.fii && L.fii.state ? `<div class="ig-sq">${squeezeTxt(L.fii)}</div>` : '';
+  const sq = (L && L.fii && L.fii.state ? `<div class="ig-sq">${squeezeTxt(L.fii)}</div>` : '') + (L && L.fii && L.fii.cash && L.fii.cash.state && L.fii.cash.state !== 'normal' ? `<div class="ig-sq">${cashTxt(L.fii.cash)}</div>` : '');
   const hero = lt ? (() => { const [w, ...rest] = lt[1].split(' · '); return `<div class="ig-hero ${lt[0]}"><span class="ig-dot"></span><span class="ig-word">${esc({ GREEN: 'Go', AMBER: 'Careful', RED: 'Pause' }[w] || w)}</span><span class="ig-sub">${esc(rest.join(' · '))}</span></div>`; })() : '';
   /* 21 Nov 2026 (Amritpal: "how a trader browses, readable for a layman"): on Today the light sits alone at the top; the
      maps, baskets and alert tiles move into the "Charts, rotation & alerts" fold. The FII note is one line + Why. */
