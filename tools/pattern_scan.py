@@ -316,6 +316,7 @@ def vcp(x, sym, name):
 
 FL_POLE, FL_POLE_D, FL_MIN_D, FL_MAX_D, FL_DEPTH = 0.15, 15, 3, 25, 0.12
 FL_TIGHT = 0.08   # flag range (high - low) <= 8% of the pole top
+FL_ROOM = 0.8     # room to the next resistance on the left >= 0.8 x the pole
 
 
 def flag(x, sym, name):
@@ -366,6 +367,13 @@ def flag(x, sym, name):
             # swings (zigzag 6% on highs / lows) before the flag: the pole top above the previous swing high, the pole's starting low
             # at or above the previous swing low (2% tolerance), the 21-day average rising over 5 sessions and the 200-day over 20
             Z = [z for z in _zz_hl(h[:lo_i + 1], l[:lo_i + 1], 0.06) if z[1] < lo_i]
+
+            def room_ok(row, Z=Z, top=top, base=base):
+                ent = row.get("entry") or row.get("trigger") or float(c[-1])
+                rs_ = [z[2] for z in Z if z[0] == 1 and z[1] >= n - 750 and z[2] > ent * 1.01]   # a high within 1% = the level being broken
+                res_ = min(rs_) if rs_ else None; room = (res_ - ent) / (top - base) if res_ else None
+                row.update(resistance=round(float(res_), 2) if res_ else None, room_x=round(float(room), 1) if room is not None else None)
+                return room is None or room >= FL_ROOM
             ph = [z[2] for z in Z if z[0] == 1]; pl = [z[2] for z in Z if z[0] == -1]
             # higher high = the pole top clears the previous swing high; higher low = the flag's low holds above the previous swing low
             # (so a shakeout low that starts a new uptrend, like DATAPATTNS 6-9 Nov, counts once the pole and flag make HH + HL)
@@ -420,6 +428,8 @@ def flag(x, sym, name):
                                target=round(fh + (top - base), 2), risk_pct=round((1 - plo / fh) * 100, 1), line_broken=D[bo],
                                need_vol=int(1.5 * v50[-1]) if hasv and np.isfinite(v50[-1]) else None)
                     row["ema21"] = round(float(x.Close.ewm(span=21, adjust=False).mean().iloc[-1]), 2)
+                    if not room_ok(row):
+                        break
                     if best is None:
                         best = row
                     break
@@ -429,6 +439,12 @@ def flag(x, sym, name):
                 e = float(c[bo]); row.update(status="breakout", bo_date=D[bo], entry=round(e, 2), days_since=back,
                                              target=round(e + (top - base), 2), risk_pct=round((1 - plo / e) * 100, 1), ret_pct=round((c[-1] / e - 1) * 100, 1))
             row["ema21"] = round(float(x.Close.ewm(span=21, adjust=False).mean().iloc[-1]), 2)   # tested exit: a daily close below it
+            # 22 Nov 2026 (Amritpal: "keep only those with enough room, almost equal to the pole, before the next resistance from the
+            # left"): nearest earlier swing high (6% zigzag, before the pole, last 3 years) above the entry must be >= 0.8 x the pole
+            # away (none = open sky). Tested with the tight + volume rules: +3.2% a trade vs +2.7%, last 2 years +2.4% vs +0.9%,
+            # worst portfolio fall -26% vs -36%
+            if not room_ok(row):
+                break
             if best is None or (row["status"] == "breakout" and best["status"] != "breakout"):
                 best = row
             break
@@ -589,9 +605,10 @@ def main(mk="NSE"):
     json.dump(dict(generated=out["generated"], asof=out["asof"], market=mk,
                    rules="Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. "
                          "Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, "
-                         "no close above the pole top, close above the 200-day average. Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average "
+                         "no close above the pole top, close above the 200-day average. Room: the nearest earlier swing high above the entry must be >= 0.8 x the pole away (or none). Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average "
                          "(fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
-                   backtest="Tight + volume rules (22 Nov 2026, 2,183 NSE stocks 2016-26): 2,979 trades, buy the breakout close, stop flag low, exit on a "
+                   backtest="With room >= 0.8 x pole to the next resistance (22 Nov 2026): 1,151 trades, +3.2% a trade (PF 1.79), last 2 years +2.4% (PF 1.67), worst portfolio fall -26%. "
+                            "Tight + volume rules alone (22 Nov 2026, 2,183 NSE stocks 2016-26): 2,979 trades, buy the breakout close, stop flag low, exit on a "
                             "close below the 21-day EMA: +2.8% a trade (PF 1.75); last 1 year +0.8% (PF 1.21), last 2 years +0.9% (1.22), 5 years +1.8% (1.45). "
                             "Buying next day above the breakout high instead: +1.7% (PF 1.37), worse. Earlier, all flags: "
                             "Tested 22 Nov 2026 (2,421 NSE stocks, 30,360 breakouts 2016-26): flag-low stop + exit on a close below the 21-day EMA "
