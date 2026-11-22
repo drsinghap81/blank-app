@@ -180,7 +180,7 @@ def main():
         rp = report(portfolio(T, C, days), bull)
         k = f"{sn} | {xm}"; res["runs"][k] = dict(trades=tr, port=rp)
         if sn.startswith("A") or sn.startswith("C"):
-            res["runs"][k]["by_shape"] = {sh: tst(T[T.shape == sh]) for sh in ("Flag", "Pennant", "Rectangle")}
+            res["runs"][k]["by_shape"] = {sh: tst(T[T["shape"] == sh]) for sh in ("Flag", "Pennant", "Rectangle")}
             res["runs"][k]["by_lane"] = {ln: tst(T[T.lane == ln]) for ln in ("early", "established")}
             res["runs"][k]["by_year"] = {str(y): tst(T[T.year == y]) for y in sorted(T.year.unique(), reverse=True)}
         print(f"R| {k} | trades {tr['all']} | last 1y {tr['last 1y']}", flush=True)
