@@ -1,0 +1,306 @@
+{
+ "method": "Pulse rotation: pre-market / first-hour checks on the Monday buys (22 Nov 2026, Amritpal: \"before that, can we check if pre-market and\nthe first 15 mins or half an hour shows a sector in green, the app can alert or reshuffle stocks on top which are moving in the morning\").\nBased on: Strong-Pulse + rotation industries as a STOCK system (22 Nov 2026, Amritpal: \"yes test it\").\n\nEach Friday close, select NSE basic industries in the top 10% by 1-month Pulse AND whose weekly rotation is Leading or Improving\n(tools/research/rotation_pulse.py - best industry basket there, 45.6%/yr). Then hold stocks inside them:\n  BASKET    every liquid stock of the selected industries, equal weight\n  TOP10     the 10 strongest TRENDING stocks (Pulse definition) of the selected industries by 3-month relative strength;\n            a holding stays while it ranks in the top 20 and its industry stays selected (buffer cuts churn); equal weight\n  TOP5      same with 5 / 10\nControls: TOP10 ANY = the 10 strongest trending stocks from ANY industry (does the industry filter add?) | top-10% Pulse only\n(no rotation) TOP10 | all industries equal weight | Nifty 50.\nTrading: decided at the Friday close; filled at that close (FRI) or at Monday's open (MON, realistic); 0.2% cost per side on the\nweight that changes. Survivors only (today's industry members) - flatters every row. Newest first, bull/bear, ex-Covid.\nVariants on the NEW buys of each Monday (holdings kept from last week are not touched):\n  OPEN      buy every new pick at Monday's open (the live rule)\n  GAP_UP    buy a new pick only if the stock opens above Friday's close (pre-market green); else the slot stays cash that week\n  IND_UP    only if the stock's INDUSTRY (equal-weight members) opens above Friday's close\n  NO_CHASE  skip new picks gapping up more than 2%\n  GAP_DOWN  only new picks opening below Friday's close (buy the dip - control)\n  H1 (last ~2 years, hourly bars): buy at the 10:15 price instead of the open; H1_GREEN only if the stock is above its open at 10:15;\n  H1_IND only if its industry is above the open at 10:15.\nLIMIT env = pilot. Output data/research/pulse_morning(_pilot).json",
+ "runs": {
+  "OPEN": {
+   "CAGR": 19.8,
+   "max DD": -29.4,
+   "1y": 2.4,
+   "2y": 2.9,
+   "3y": 14.1,
+   "5y": 21.5,
+   "years": {
+    "2026": -2.5,
+    "2025": -3.7,
+    "2024": 39.6,
+    "2023": 30.5,
+    "2022": 39.5,
+    "2021": 65.6,
+    "2020": 58.5,
+    "2019": 7.7,
+    "2018": -2.9,
+    "2017": 24.2,
+    "2016": -18.8
+   },
+   "bull/bear a year": [
+    36.7,
+    -21.8
+   ],
+   "ex-Covid": [
+    17.0,
+    -29.4
+   ],
+   "avg_holdings": 4.6,
+   "new_picks_skipped_pct": 0
+  },
+  "GAP_UP": {
+   "CAGR": 18.5,
+   "max DD": -25.5,
+   "1y": -0.2,
+   "2y": 4.4,
+   "3y": 10.7,
+   "5y": 21.7,
+   "years": {
+    "2026": -5.0,
+    "2025": 3.1,
+    "2024": 27.0,
+    "2023": 40.3,
+    "2022": 38.6,
+    "2021": 52.0,
+    "2020": 47.7,
+    "2019": 1.5,
+    "2018": 4.1,
+    "2017": 13.6,
+    "2016": -9.7
+   },
+   "bull/bear a year": [
+    31.9,
+    -16.3
+   ],
+   "ex-Covid": [
+    16.2,
+    -25.5
+   ],
+   "avg_holdings": 3.7,
+   "new_picks_skipped_pct": 33
+  },
+  "IND_UP": {
+   "CAGR": 19.3,
+   "max DD": -22.4,
+   "1y": -1.5,
+   "2y": 1.6,
+   "3y": 10.7,
+   "5y": 21.2,
+   "years": {
+    "2026": -6.2,
+    "2025": -2.3,
+    "2024": 30.6,
+    "2023": 44.6,
+    "2022": 37.6,
+    "2021": 48.1,
+    "2020": 52.9,
+    "2019": 7.6,
+    "2018": 6.6,
+    "2017": 21.3,
+    "2016": -15.8
+   },
+   "bull/bear a year": [
+    33.3,
+    -16.7
+   ],
+   "ex-Covid": [
+    17.0,
+    -22.4
+   ],
+   "avg_holdings": 3.9,
+   "new_picks_skipped_pct": 25
+  },
+  "NO_CHASE": {
+   "CAGR": 19.0,
+   "max DD": -29.2,
+   "1y": 1.7,
+   "2y": 2.4,
+   "3y": 13.3,
+   "5y": 19.0,
+   "years": {
+    "2026": -3.2,
+    "2025": -3.9,
+    "2024": 37.6,
+    "2023": 28.1,
+    "2022": 29.5,
+    "2021": 77.5,
+    "2020": 49.9,
+    "2019": 7.9,
+    "2018": -4.6,
+    "2017": 23.3,
+    "2016": -13.6
+   },
+   "bull/bear a year": [
+    35.5,
+    -21.6
+   ],
+   "ex-Covid": [
+    16.9,
+    -29.2
+   ],
+   "avg_holdings": 4.4,
+   "new_picks_skipped_pct": 5
+  },
+  "GAP_DOWN": {
+   "CAGR": 7.7,
+   "max DD": -23.1,
+   "1y": -6.9,
+   "2y": -3.0,
+   "3y": 10.0,
+   "5y": 8.7,
+   "years": {
+    "2026": -6.9,
+    "2025": 1.5,
+    "2024": 27.4,
+    "2023": 1.2,
+    "2022": 9.4,
+    "2021": 22.8,
+    "2020": 27.9,
+    "2019": 7.9,
+    "2018": 7.4,
+    "2017": 4.5,
+    "2016": -14.2
+   },
+   "bull/bear a year": [
+    13.2,
+    -8.2
+   ],
+   "ex-Covid": [
+    6.9,
+    -23.1
+   ],
+   "avg_holdings": 2.2,
+   "new_picks_skipped_pct": 68
+  }
+ },
+ "runs_2y": {
+  "OPEN": {
+   "CAGR": 10.4,
+   "max DD": -29.1,
+   "1y": 2.4,
+   "2y": 2.9,
+   "3y": 10.2,
+   "5y": 6.0,
+   "years": {
+    "2026": -2.5,
+    "2025": -3.7,
+    "2024": 39.6,
+    "2023": 2.0
+   },
+   "bull/bear a year": [
+    44.8,
+    -30.2
+   ],
+   "ex-Covid": [
+    10.4,
+    -29.1
+   ],
+   "avg_holdings": 5.7,
+   "new_picks_skipped_pct": 0
+  },
+  "GAP_UP": {
+   "CAGR": 7.0,
+   "max DD": -20.2,
+   "1y": -0.2,
+   "2y": 4.4,
+   "3y": 6.9,
+   "5y": 4.1,
+   "years": {
+    "2026": -5.0,
+    "2025": 3.1,
+    "2024": 27.0,
+    "2023": -1.9
+   },
+   "bull/bear a year": [
+    34.5,
+    -27.2
+   ],
+   "ex-Covid": [
+    7.0,
+    -20.2
+   ],
+   "avg_holdings": 4.7,
+   "new_picks_skipped_pct": 34
+  },
+  "IND_UP": {
+   "CAGR": 7.0,
+   "max DD": -22.4,
+   "1y": -1.5,
+   "2y": 1.6,
+   "3y": 6.9,
+   "5y": 4.1,
+   "years": {
+    "2026": -6.2,
+    "2025": -2.3,
+    "2024": 30.6,
+    "2023": 2.0
+   },
+   "bull/bear a year": [
+    36.2,
+    -28.7
+   ],
+   "ex-Covid": [
+    7.0,
+    -22.4
+   ],
+   "avg_holdings": 5.0,
+   "new_picks_skipped_pct": 24
+  },
+  "H1": {
+   "CAGR": -29.5,
+   "max DD": -65.4,
+   "1y": -13.2,
+   "2y": -21.5,
+   "3y": -29.0,
+   "5y": -18.6,
+   "years": {
+    "2026": -14.7,
+    "2025": -32.4,
+    "2024": -35.5,
+    "2023": -3.6
+   },
+   "bull/bear a year": [
+    -25.6,
+    -35.4
+   ],
+   "ex-Covid": [
+    -29.4,
+    -65.4
+   ],
+   "avg_holdings": 5.7,
+   "new_picks_skipped_pct": 0
+  },
+  "H1_GREEN": {
+   "CAGR": -23.5,
+   "max DD": -58.0,
+   "1y": -4.3,
+   "2y": -10.1,
+   "3y": -23.0,
+   "5y": -14.5,
+   "years": {
+    "2026": -6.0,
+    "2025": -19.4,
+    "2024": -37.5,
+    "2023": -3.6
+   },
+   "bull/bear a year": [
+    -25.2,
+    -20.2
+   ],
+   "ex-Covid": [
+    -23.4,
+    -58.0
+   ],
+   "avg_holdings": 4.8,
+   "new_picks_skipped_pct": 31
+  },
+  "H1_IND": {
+   "CAGR": -30.0,
+   "max DD": -66.8,
+   "1y": -13.0,
+   "2y": -21.5,
+   "3y": -29.4,
+   "5y": -18.9,
+   "years": {
+    "2026": -14.5,
+    "2025": -30.6,
+    "2024": -38.5,
+    "2023": -3.6
+   },
+   "bull/bear a year": [
+    -29.4,
+    -30.7
+   ],
+   "ex-Covid": [
+    -29.9,
+    -66.8
+   ],
+   "avg_holdings": 5.1,
+   "new_picks_skipped_pct": 21
+  }
+ }
+}
