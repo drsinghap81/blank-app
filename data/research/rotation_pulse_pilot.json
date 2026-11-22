@@ -1,386 +1,792 @@
 {
  "method": "Rotation + Pulse together (22 Nov 2026, Amritpal: \"check that\" - does a group moving into Improving / Leading while its Pulse is\nrising do better than either alone?).\n\nUniverse: NSE official basic industries with 3+ liquid stocks (today's members - survivorship bias in their favour), equal-weight\ndaily index each (daily returns clipped at +-30%), 2015-26 from Yahoo (+ bhavcopy check on recent sessions).\nWeekly at the Friday close:\n  rotation  vs Nifty 50, app formula: RS-ratio = 100 x RS / 10-week avg; RS-momentum = 3-week avg of ratio change (L/W/G/I)\n  Pulse     app formula (tools/group_pulse.py): a stock is 'trending' when its relative performance score > 100, EMA9 > EMA21,\n            Stage 2 (above a rising 150-day SMA), within 25% of its 52-week high and liquid; Pulse = share of the industry's stocks\n            trending, averaged over the last 21 sessions (1-month Pulse). Rising = higher than 4 weeks ago.\nEvents and states, next 1 / 4 / 13 weeks' return of the industry MINUS Nifty (from the Friday close):\n  base (every industry-week) | entry into Improving or Leading | Pulse rising | ENTRY + Pulse rising | ENTRY + Pulse rising + Pulse\n  above the median | state: in Improving/Leading with Pulse rising vs falling\nPortfolios (weekly rebalance, 0.2% on what changes, equal weight): hold every industry in Improving/Leading with Pulse rising |\nhold Leading (earlier test) | hold top-10% Pulse | all industries. Newest first, bull/bear, ex-Covid.\nLIMIT env = pilot (fewer industries). Output data/research/rotation_pulse(_pilot).json",
- "industries": 106,
- "stocks": 1025,
- "pulse_median": 34.5,
+ "industries": 30,
+ "stocks": 273,
+ "pulse_median": 34.3,
  "events": {
   "every industry-week (base)": {
    "1w": {
-    "n": 57876,
-    "avg": 0.26,
-    "beat": 50,
-    "last 1y": 0.19,
-    "last 2y": 0.09,
-    "last 3y": 0.17,
-    "last 5y": 0.27
+    "n": 16380,
+    "avg": 0.24,
+    "beat": 51,
+    "last 1y": 0.14,
+    "last 2y": 0.13,
+    "last 3y": 0.19,
+    "last 5y": 0.26
    },
    "4w": {
-    "n": 57558,
-    "avg": 1.11,
+    "n": 16290,
+    "avg": 0.98,
     "beat": 53,
-    "last 1y": 1.13,
-    "last 2y": 0.33,
-    "last 3y": 0.78,
-    "last 5y": 1.16
+    "last 1y": 0.76,
+    "last 2y": 0.45,
+    "last 3y": 0.83,
+    "last 5y": 1.07
    },
    "13w": {
-    "n": 56604,
-    "avg": 3.95,
+    "n": 16020,
+    "avg": 3.42,
     "beat": 57,
-    "last 1y": 7.13,
-    "last 2y": 2.47,
-    "last 3y": 3.28,
-    "last 5y": 4.44
+    "last 1y": 4.56,
+    "last 2y": 2.41,
+    "last 3y": 3.18,
+    "last 5y": 4.01
    }
   },
   "entry into Improving/Leading": {
    "1w": {
-    "n": 7810,
-    "avg": 0.3,
-    "beat": 50,
-    "last 1y": 0.29,
-    "last 2y": -0.03,
-    "last 3y": 0.05,
-    "last 5y": 0.22
+    "n": 2220,
+    "avg": 0.27,
+    "beat": 51,
+    "last 1y": 0.08,
+    "last 2y": 0.08,
+    "last 3y": 0.12,
+    "last 5y": 0.24
    },
    "4w": {
-    "n": 7759,
-    "avg": 1.37,
+    "n": 2203,
+    "avg": 1.3,
     "beat": 55,
-    "last 1y": 1.59,
-    "last 2y": 0.46,
-    "last 3y": 0.91,
-    "last 5y": 1.36
+    "last 1y": 0.95,
+    "last 2y": 0.68,
+    "last 3y": 0.96,
+    "last 5y": 1.35
    },
    "13w": {
-    "n": 7674,
-    "avg": 4.12,
-    "beat": 57,
-    "last 1y": 7.02,
-    "last 2y": 2.34,
-    "last 3y": 2.74,
-    "last 5y": 4.43
+    "n": 2172,
+    "avg": 3.73,
+    "beat": 58,
+    "last 1y": 4.9,
+    "last 2y": 2.97,
+    "last 3y": 3.2,
+    "last 5y": 4.23
    }
   },
   "Pulse rising": {
    "1w": {
-    "n": 22259,
-    "avg": 0.33,
-    "beat": 52,
-    "last 1y": 0.31,
+    "n": 6934,
+    "avg": 0.26,
+    "beat": 51,
+    "last 1y": 0.1,
     "last 2y": 0.17,
-    "last 3y": 0.22,
-    "last 5y": 0.37
+    "last 3y": 0.2,
+    "last 5y": 0.33
    },
    "4w": {
-    "n": 22186,
-    "avg": 1.21,
+    "n": 6906,
+    "avg": 1.03,
     "beat": 54,
-    "last 1y": 1.38,
-    "last 2y": 0.49,
-    "last 3y": 0.92,
-    "last 5y": 1.32
+    "last 1y": 0.61,
+    "last 2y": 0.58,
+    "last 3y": 0.95,
+    "last 5y": 1.23
    },
    "13w": {
-    "n": 21783,
-    "avg": 4.32,
+    "n": 6796,
+    "avg": 3.66,
     "beat": 58,
-    "last 1y": 6.08,
-    "last 2y": 1.71,
-    "last 3y": 2.99,
-    "last 5y": 4.62
+    "last 1y": 3.26,
+    "last 2y": 1.96,
+    "last 3y": 3.06,
+    "last 5y": 4.26
    }
   },
   "ENTRY + Pulse rising": {
    "1w": {
-    "n": 2188,
-    "avg": 0.47,
-    "beat": 53,
-    "last 1y": 0.13,
+    "n": 686,
+    "avg": 0.44,
+    "beat": 51,
+    "last 1y": -0.16,
     "last 2y": 0.12,
-    "last 3y": 0.2,
-    "last 5y": 0.51
+    "last 3y": 0.16,
+    "last 5y": 0.43
    },
    "4w": {
-    "n": 2176,
-    "avg": 1.6,
+    "n": 682,
+    "avg": 1.55,
     "beat": 56,
-    "last 1y": 1.98,
-    "last 2y": 0.77,
-    "last 3y": 1.04,
-    "last 5y": 1.66
+    "last 1y": 0.44,
+    "last 2y": 0.48,
+    "last 3y": 1.03,
+    "last 5y": 1.72
    },
    "13w": {
-    "n": 2150,
-    "avg": 4.82,
+    "n": 670,
+    "avg": 4.56,
     "beat": 60,
-    "last 1y": 5.45,
-    "last 2y": 1.57,
-    "last 3y": 2.06,
-    "last 5y": 4.65
+    "last 1y": 3.78,
+    "last 2y": 2.58,
+    "last 3y": 3.0,
+    "last 5y": 4.92
    }
   },
   "ENTRY + Pulse rising + Pulse above median": {
    "1w": {
-    "n": 1168,
-    "avg": 0.53,
+    "n": 352,
+    "avg": 0.57,
     "beat": 54,
-    "last 1y": 0.61,
-    "last 2y": 0.29,
-    "last 3y": 0.35,
-    "last 5y": 0.66
+    "last 1y": 0.59,
+    "last 2y": 0.59,
+    "last 3y": 0.65,
+    "last 5y": 0.68
    },
    "4w": {
-    "n": 1165,
-    "avg": 1.8,
-    "beat": 57,
-    "last 1y": 2.2,
-    "last 2y": 0.87,
-    "last 3y": 1.29,
-    "last 5y": 1.91
+    "n": 352,
+    "avg": 1.79,
+    "beat": 56,
+    "last 1y": 0.97,
+    "last 2y": 0.63,
+    "last 3y": 1.79,
+    "last 5y": 2.04
    },
    "13w": {
-    "n": 1154,
-    "avg": 6.21,
+    "n": 349,
+    "avg": 5.85,
     "beat": 64,
-    "last 1y": 3.43,
-    "last 2y": -0.87,
-    "last 3y": 1.67,
-    "last 5y": 5.84
+    "last 1y": 6.3,
+    "last 2y": 2.23,
+    "last 3y": 3.77,
+    "last 5y": 5.65
    }
   },
   "in Improving/Leading, Pulse rising": {
    "1w": {
-    "n": 11981,
-    "avg": 0.44,
+    "n": 3725,
+    "avg": 0.37,
     "beat": 53,
-    "last 1y": 0.42,
-    "last 2y": 0.2,
-    "last 3y": 0.24,
-    "last 5y": 0.43
+    "last 1y": 0.06,
+    "last 2y": 0.16,
+    "last 3y": 0.23,
+    "last 5y": 0.4
    },
    "4w": {
-    "n": 11965,
-    "avg": 1.29,
-    "beat": 55,
-    "last 1y": 1.76,
-    "last 2y": 0.67,
-    "last 3y": 1.05,
-    "last 5y": 1.4
+    "n": 3717,
+    "avg": 1.03,
+    "beat": 54,
+    "last 1y": 0.48,
+    "last 2y": 0.43,
+    "last 3y": 0.98,
+    "last 5y": 1.25
    },
    "13w": {
-    "n": 11754,
-    "avg": 4.71,
-    "beat": 59,
-    "last 1y": 6.9,
-    "last 2y": 2.31,
-    "last 3y": 3.37,
-    "last 5y": 5.13
+    "n": 3663,
+    "avg": 3.87,
+    "beat": 58,
+    "last 1y": 2.5,
+    "last 2y": 1.75,
+    "last 3y": 3.01,
+    "last 5y": 4.56
    }
   },
   "in Improving/Leading, Pulse falling": {
    "1w": {
-    "n": 16931,
-    "avg": 0.26,
-    "beat": 50,
-    "last 1y": 0.42,
-    "last 2y": 0.14,
-    "last 3y": 0.15,
+    "n": 4479,
+    "avg": 0.24,
+    "beat": 51,
+    "last 1y": 0.28,
+    "last 2y": 0.16,
+    "last 3y": 0.21,
     "last 5y": 0.18
    },
    "4w": {
-    "n": 16888,
-    "avg": 1.05,
-    "beat": 51,
-    "last 1y": 1.45,
-    "last 2y": 0.62,
-    "last 3y": 0.95,
-    "last 5y": 1.19
+    "n": 4463,
+    "avg": 1.02,
+    "beat": 52,
+    "last 1y": 1.02,
+    "last 2y": 0.55,
+    "last 3y": 0.89,
+    "last 5y": 1.06
    },
    "13w": {
-    "n": 16679,
-    "avg": 3.88,
-    "beat": 56,
-    "last 1y": 8.9,
-    "last 2y": 4.56,
-    "last 3y": 4.31,
-    "last 5y": 4.74
+    "n": 4414,
+    "avg": 3.09,
+    "beat": 55,
+    "last 1y": 5.26,
+    "last 2y": 3.35,
+    "last 3y": 3.42,
+    "last 5y": 3.8
    }
   },
   "in Lagging/Weakening, Pulse rising": {
    "1w": {
-    "n": 10278,
-    "avg": 0.2,
+    "n": 3209,
+    "avg": 0.13,
     "beat": 50,
-    "last 1y": 0.21,
-    "last 2y": 0.15,
-    "last 3y": 0.19,
-    "last 5y": 0.29
+    "last 1y": 0.14,
+    "last 2y": 0.18,
+    "last 3y": 0.18,
+    "last 5y": 0.24
    },
    "4w": {
-    "n": 10221,
-    "avg": 1.12,
-    "beat": 54,
-    "last 1y": 0.99,
-    "last 2y": 0.31,
-    "last 3y": 0.79,
-    "last 5y": 1.23
+    "n": 3189,
+    "avg": 1.03,
+    "beat": 53,
+    "last 1y": 0.73,
+    "last 2y": 0.73,
+    "last 3y": 0.92,
+    "last 5y": 1.2
    },
    "13w": {
-    "n": 10029,
-    "avg": 3.85,
+    "n": 3133,
+    "avg": 3.42,
     "beat": 58,
+    "last 1y": 3.89,
+    "last 2y": 2.17,
+    "last 3y": 3.11,
+    "last 5y": 3.9
+   }
+  },
+  "top-10% Pulse + Leading": {
+   "1w": {
+    "n": 784,
+    "avg": 0.47,
+    "beat": 54,
+    "last 1y": 0.79,
+    "last 2y": 0.7,
+    "last 3y": 0.68,
+    "last 5y": 0.57
+   },
+   "4w": {
+    "n": 784,
+    "avg": 1.77,
+    "beat": 56,
+    "last 1y": 2.08,
+    "last 2y": 1.76,
+    "last 3y": 2.19,
+    "last 5y": 2.17
+   },
+   "13w": {
+    "n": 775,
+    "avg": 4.92,
+    "beat": 63,
+    "last 1y": 5.57,
+    "last 2y": 3.45,
+    "last 3y": 3.71,
+    "last 5y": 4.97
+   }
+  },
+  "Pulse above median + Leading": {
+   "1w": {
+    "n": 2766,
+    "avg": 0.55,
+    "beat": 55,
+    "last 1y": 0.63,
+    "last 2y": 0.49,
+    "last 3y": 0.56,
+    "last 5y": 0.62
+   },
+   "4w": {
+    "n": 2766,
+    "avg": 1.84,
+    "beat": 59,
+    "last 1y": 2.22,
+    "last 2y": 1.37,
+    "last 3y": 2.02,
+    "last 5y": 2.21
+   },
+   "13w": {
+    "n": 2742,
+    "avg": 5.47,
+    "beat": 63,
     "last 1y": 5.29,
-    "last 2y": 1.09,
-    "last 3y": 2.56,
-    "last 5y": 4.02
+    "last 2y": 2.04,
+    "last 3y": 3.93,
+    "last 5y": 5.48
+   }
+  },
+  "top-10% Pulse + Weakening": {
+   "1w": {
+    "n": 879,
+    "avg": 0.27,
+    "beat": 52,
+    "last 1y": -0.02,
+    "last 2y": 0.03,
+    "last 3y": 0.13,
+    "last 5y": 0.38
+   },
+   "4w": {
+    "n": 875,
+    "avg": 1.26,
+    "beat": 55,
+    "last 1y": 0.76,
+    "last 2y": 0.28,
+    "last 3y": 0.58,
+    "last 5y": 1.38
+   },
+   "13w": {
+    "n": 855,
+    "avg": 4.66,
+    "beat": 64,
+    "last 1y": 6.48,
+    "last 2y": 2.68,
+    "last 3y": 3.71,
+    "last 5y": 4.21
+   }
+  },
+  "Pulse above median + Weakening": {
+   "1w": {
+    "n": 2199,
+    "avg": 0.27,
+    "beat": 52,
+    "last 1y": 0.06,
+    "last 2y": 0.14,
+    "last 3y": 0.07,
+    "last 5y": 0.33
+   },
+   "4w": {
+    "n": 2198,
+    "avg": 1.36,
+    "beat": 56,
+    "last 1y": 1.23,
+    "last 2y": 0.49,
+    "last 3y": 0.74,
+    "last 5y": 1.39
+   },
+   "13w": {
+    "n": 2173,
+    "avg": 4.94,
+    "beat": 63,
+    "last 1y": 7.04,
+    "last 2y": 2.13,
+    "last 3y": 3.41,
+    "last 5y": 4.62
+   }
+  },
+  "top-10% Pulse + Lagging": {
+   "1w": {
+    "n": 332,
+    "avg": 0.24,
+    "beat": 54,
+    "last 1y": 0.43,
+    "last 2y": 0.4,
+    "last 3y": 0.65,
+    "last 5y": 0.41
+   },
+   "4w": {
+    "n": 325,
+    "avg": 0.89,
+    "beat": 54,
+    "last 1y": 0.95,
+    "last 2y": 0.49,
+    "last 3y": 0.96,
+    "last 5y": 0.57
+   },
+   "13w": {
+    "n": 318,
+    "avg": 3.13,
+    "beat": 58,
+    "last 1y": 4.57,
+    "last 2y": 5.29,
+    "last 3y": 5.92,
+    "last 5y": 4.63
+   }
+  },
+  "Pulse above median + Lagging": {
+   "1w": {
+    "n": 1426,
+    "avg": 0.19,
+    "beat": 50,
+    "last 1y": 0.39,
+    "last 2y": 0.16,
+    "last 3y": 0.3,
+    "last 5y": 0.28
+   },
+   "4w": {
+    "n": 1422,
+    "avg": 0.99,
+    "beat": 53,
+    "last 1y": 0.94,
+    "last 2y": 0.2,
+    "last 3y": 1.16,
+    "last 5y": 0.88
+   },
+   "13w": {
+    "n": 1413,
+    "avg": 3.19,
+    "beat": 55,
+    "last 1y": 4.92,
+    "last 2y": 1.97,
+    "last 3y": 3.49,
+    "last 5y": 3.64
+   }
+  },
+  "top-10% Pulse + Improving": {
+   "1w": {
+    "n": 85,
+    "avg": -0.13,
+    "beat": 48,
+    "last 1y": 0.6,
+    "last 2y": -0.26,
+    "last 3y": -0.02,
+    "last 5y": 0.27
+   },
+   "4w": {
+    "n": 84,
+    "avg": 1.45,
+    "beat": 54,
+    "last 1y": null,
+    "last 2y": 3.45,
+    "last 3y": 3.14,
+    "last 5y": 2.48
+   },
+   "13w": {
+    "n": 84,
+    "avg": 5.17,
+    "beat": 62,
+    "last 1y": null,
+    "last 2y": 18.3,
+    "last 3y": 16.57,
+    "last 5y": 12.99
+   }
+  },
+  "Pulse above median + Improving": {
+   "1w": {
+    "n": 294,
+    "avg": 0.68,
+    "beat": 55,
+    "last 1y": 0.71,
+    "last 2y": -0.19,
+    "last 3y": 0.76,
+    "last 5y": 0.81
+   },
+   "4w": {
+    "n": 294,
+    "avg": 1.46,
+    "beat": 53,
+    "last 1y": 3.05,
+    "last 2y": 1.27,
+    "last 3y": 2.07,
+    "last 5y": 1.24
+   },
+   "13w": {
+    "n": 294,
+    "avg": 6.05,
+    "beat": 60,
+    "last 1y": 0.6,
+    "last 2y": 7.78,
+    "last 3y": 7.82,
+    "last 5y": 6.43
+   }
+  },
+  "top-10% Pulse (any quadrant)": {
+   "1w": {
+    "n": 2080,
+    "avg": 0.33,
+    "beat": 53,
+    "last 1y": 0.34,
+    "last 2y": 0.32,
+    "last 3y": 0.42,
+    "last 5y": 0.46
+   },
+   "4w": {
+    "n": 2068,
+    "avg": 1.4,
+    "beat": 55,
+    "last 1y": 1.29,
+    "last 2y": 1.01,
+    "last 3y": 1.39,
+    "last 5y": 1.63
+   },
+   "13w": {
+    "n": 2032,
+    "avg": 4.54,
+    "beat": 63,
+    "last 1y": 5.91,
+    "last 2y": 4.07,
+    "last 3y": 4.46,
+    "last 5y": 4.83
+   }
+  },
+  "top-10% Pulse + Weakening/Lagging (pullback)": {
+   "1w": {
+    "n": 1211,
+    "avg": 0.26,
+    "beat": 52,
+    "last 1y": 0.08,
+    "last 2y": 0.13,
+    "last 3y": 0.26,
+    "last 5y": 0.38
+   },
+   "4w": {
+    "n": 1200,
+    "avg": 1.16,
+    "beat": 54,
+    "last 1y": 0.79,
+    "last 2y": 0.33,
+    "last 3y": 0.67,
+    "last 5y": 1.2
+   },
+   "13w": {
+    "n": 1173,
+    "avg": 4.25,
+    "beat": 62,
+    "last 1y": 6.15,
+    "last 2y": 3.33,
+    "last 3y": 4.23,
+    "last 5y": 4.3
+   }
+  },
+  "top-10% Pulse + Leading/Improving": {
+   "1w": {
+    "n": 869,
+    "avg": 0.42,
+    "beat": 53,
+    "last 1y": 0.79,
+    "last 2y": 0.6,
+    "last 3y": 0.62,
+    "last 5y": 0.55
+   },
+   "4w": {
+    "n": 868,
+    "avg": 1.74,
+    "beat": 56,
+    "last 1y": 2.08,
+    "last 2y": 1.92,
+    "last 3y": 2.26,
+    "last 5y": 2.19
+   },
+   "13w": {
+    "n": 859,
+    "avg": 4.94,
+    "beat": 63,
+    "last 1y": 5.57,
+    "last 2y": 5.0,
+    "last 3y": 4.73,
+    "last 5y": 5.5
    }
   }
  },
  "portfolios": {
-  "hold Improving/Leading with Pulse rising": {
-   "CAGR": 27.5,
-   "max DD": -46.9,
-   "1y": 3.0,
-   "2y": 6.3,
-   "3y": 15.0,
-   "5y": 24.9,
+  "top-10% Pulse, only when Weakening/Lagging (pullback)": {
+   "CAGR": 15.3,
+   "max DD": -48.6,
+   "1y": 15.7,
+   "2y": 12.6,
+   "3y": 18.6,
+   "5y": 17.1,
    "years": {
-    "2026": 5.0,
-    "2025": 3.5,
-    "2024": 33.1,
-    "2023": 58.6,
-    "2022": 25.4,
-    "2021": 110.7,
-    "2020": 25.0,
-    "2019": 7.2,
-    "2018": -20.0,
-    "2017": 79.7,
-    "2016": 8.8
+    "2026": 18.3,
+    "2025": 5.0,
+    "2024": 35.5,
+    "2023": 22.2,
+    "2022": 2.4,
+    "2021": 27.2,
+    "2020": 28.9,
+    "2019": 1.2,
+    "2018": -30.4,
+    "2017": 48.8,
+    "2016": 22.2
    },
    "bull/bear a year": [
-    48.3,
-    -21.6
+    31.5,
+    -24.6
    ],
    "ex-Covid": [
-    28.2,
-    -32.6
+    16.6,
+    -40.6
+   ]
+  },
+  "top-10% Pulse, only when Leading/Improving": {
+   "CAGR": 28.9,
+   "max DD": -34.1,
+   "1y": 20.7,
+   "2y": 21.7,
+   "3y": 33.4,
+   "5y": 29.6,
+   "years": {
+    "2026": 14.5,
+    "2025": 14.2,
+    "2024": 64.9,
+    "2023": 12.0,
+    "2022": 35.4,
+    "2021": 90.4,
+    "2020": 128.3,
+    "2019": 14.0,
+    "2018": -24.6,
+    "2017": 22.0,
+    "2016": -4.3
+   },
+   "bull/bear a year": [
+    48.2,
+    -17.8
+   ],
+   "ex-Covid": [
+    21.7,
+    -34.1
+   ]
+  },
+  "top-20% Pulse, only when Weakening/Lagging": {
+   "CAGR": 14.5,
+   "max DD": -42.5,
+   "1y": 4.5,
+   "2y": 2.6,
+   "3y": 15.4,
+   "5y": 17.0,
+   "years": {
+    "2026": 4.4,
+    "2025": -0.9,
+    "2024": 44.5,
+    "2023": 35.0,
+    "2022": 3.7,
+    "2021": 20.5,
+    "2020": 42.7,
+    "2019": 2.7,
+    "2018": -23.6,
+    "2017": 15.5,
+    "2016": 26.1
+   },
+   "bull/bear a year": [
+    35.7,
+    -33.6
+   ],
+   "ex-Covid": [
+    14.1,
+    -33.4
+   ]
+  },
+  "hold Improving/Leading with Pulse rising": {
+   "CAGR": 23.3,
+   "max DD": -39.4,
+   "1y": -5.2,
+   "2y": 1.3,
+   "3y": 11.6,
+   "5y": 19.3,
+   "years": {
+    "2026": -0.8,
+    "2025": 2.3,
+    "2024": 25.3,
+    "2023": 46.3,
+    "2022": 26.1,
+    "2021": 73.2,
+    "2020": 48.7,
+    "2019": 21.0,
+    "2018": -29.0,
+    "2017": 63.2,
+    "2016": 5.3
+   },
+   "bull/bear a year": [
+    42.3,
+    -22.4
+   ],
+   "ex-Covid": [
+    21.1,
+    -39.4
    ]
   },
   "hold Leading (earlier test)": {
-   "CAGR": 25.4,
-   "max DD": -46.5,
-   "1y": 11.5,
-   "2y": 6.2,
-   "3y": 15.6,
-   "5y": 21.4,
+   "CAGR": 23.7,
+   "max DD": -46.7,
+   "1y": 4.3,
+   "2y": 3.0,
+   "3y": 14.1,
+   "5y": 19.2,
    "years": {
-    "2026": 11.6,
-    "2025": -2.8,
-    "2024": 33.8,
-    "2023": 52.9,
-    "2022": 14.2,
-    "2021": 105.8,
-    "2020": 45.8,
-    "2019": -4.6,
-    "2018": -25.1,
-    "2017": 77.6,
-    "2016": 10.4
+    "2026": 3.4,
+    "2025": -1.5,
+    "2024": 32.7,
+    "2023": 47.1,
+    "2022": 16.4,
+    "2021": 70.2,
+    "2020": 74.9,
+    "2019": 1.3,
+    "2018": -31.3,
+    "2017": 63.7,
+    "2016": 18.2
    },
    "bull/bear a year": [
-    45.0,
-    -21.5
+    44.5,
+    -25.0
    ],
    "ex-Covid": [
-    23.9,
-    -38.2
+    19.9,
+    -41.6
    ]
   },
   "hold top-10% Pulse": {
-   "CAGR": 36.9,
-   "max DD": -42.6,
-   "1y": 12.5,
-   "2y": 13.9,
-   "3y": 28.1,
-   "5y": 34.8,
+   "CAGR": 25.7,
+   "max DD": -54.7,
+   "1y": 14.9,
+   "2y": 18.2,
+   "3y": 30.5,
+   "5y": 32.3,
    "years": {
-    "2026": 13.7,
-    "2025": 7.4,
-    "2024": 59.0,
-    "2023": 74.6,
-    "2022": 20.7,
-    "2021": 95.8,
-    "2020": 61.6,
-    "2019": 4.6,
-    "2018": -7.1,
-    "2017": 86.2,
-    "2016": 14.0
+    "2026": 15.6,
+    "2025": 13.0,
+    "2024": 58.3,
+    "2023": 39.4,
+    "2022": 32.1,
+    "2021": 63.4,
+    "2020": 50.4,
+    "2019": 8.7,
+    "2018": -33.5,
+    "2017": 41.4,
+    "2016": 15.1
    },
    "bull/bear a year": [
-    60.3,
-    -17.7
+    49.9,
+    -28.6
    ],
    "ex-Covid": [
-    35.1,
-    -30.5
+    24.4,
+    -41.8
    ]
   },
   "hold Improving/Leading with Pulse rising + above median": {
-   "CAGR": 30.3,
-   "max DD": -63.2,
-   "1y": 6.8,
-   "2y": 6.8,
-   "3y": 17.6,
-   "5y": 32.9,
+   "CAGR": 29.9,
+   "max DD": -28.5,
+   "1y": -0.0,
+   "2y": 3.9,
+   "3y": 18.0,
+   "5y": 25.6,
    "years": {
-    "2026": 9.2,
-    "2025": -0.1,
-    "2024": 41.5,
-    "2023": 68.2,
-    "2022": 43.2,
-    "2021": 138.1,
-    "2020": 66.4,
-    "2019": -12.6,
-    "2018": -38.4,
-    "2017": 90.4,
-    "2016": 5.5
+    "2026": 0.9,
+    "2025": 2.2,
+    "2024": 45.9,
+    "2023": 41.0,
+    "2022": 37.6,
+    "2021": 58.6,
+    "2020": 80.8,
+    "2019": 22.6,
+    "2018": -14.0,
+    "2017": 71.8,
+    "2016": 2.2
    },
    "bull/bear a year": [
-    51.0,
-    -19.1
+    44.5,
+    -7.9
    ],
    "ex-Covid": [
-    27.2,
-    -57.4
+    25.2,
+    -28.5
    ]
   },
   "all industries": {
-   "CAGR": 26.5,
-   "max DD": -44.5,
-   "1y": 8.5,
-   "2y": 7.4,
-   "3y": 17.7,
-   "5y": 24.0,
+   "CAGR": 25.2,
+   "max DD": -40.8,
+   "1y": 6.1,
+   "2y": 10.0,
+   "3y": 19.4,
+   "5y": 23.2,
    "years": {
-    "2026": 9.6,
-    "2025": 0.8,
-    "2024": 37.4,
-    "2023": 61.9,
-    "2022": 15.1,
-    "2021": 76.7,
-    "2020": 39.3,
-    "2019": 1.1,
-    "2018": -15.2,
-    "2017": 68.3,
-    "2016": 16.7
+    "2026": 6.9,
+    "2025": 8.5,
+    "2024": 37.5,
+    "2023": 55.2,
+    "2022": 12.5,
+    "2021": 60.8,
+    "2020": 37.6,
+    "2019": 8.0,
+    "2018": -16.1,
+    "2017": 58.5,
+    "2016": 18.7
    },
    "bull/bear a year": [
-    45.0,
-    -18.5
+    42.9,
+    -18.4
    ],
    "ex-Covid": [
-    25.7,
-    -28.8
+    24.3,
+    -26.5
    ]
   }
  },
