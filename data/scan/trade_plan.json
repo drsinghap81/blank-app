@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-21 08:18 UTC",
+"generated": "2026-11-22 02:10 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-20",
@@ -1190,7 +1190,7 @@
 "signal_date": "2026-11-06",
 "group": "Insurance - Life",
 "lane": "weak",
-"group_rank": 72
+"group_rank": 73
 },
 {
 "symbol": "KPITTECH",
@@ -1262,7 +1262,7 @@
 "signal_date": "2026-11-20",
 "group": "Other Industrial Metals & Mining",
 "lane": "weak",
-"group_rank": 76
+"group_rank": 77
 }
 ],
 "watch": [
