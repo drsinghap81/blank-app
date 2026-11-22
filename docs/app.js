@@ -8099,7 +8099,7 @@ const T3TRACK = { mom: { n: 136, win: 44, avg: 23.7, hold: '5 mo', yr: '17%' }, 
 async function t3Ctx(mk) {
   const P = MAIN + MKT[mk].path;
   const [GP, F, WR] = await Promise.all([loadGP(mk).catch(() => null), getJSON(P + 'fundamentals.json', 'fund_' + mk).catch(() => null),
-    getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null), wkLoad(mk).catch(() => null)]);
+    getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null), wkLoad(mk).catch(() => null), mk === 'NSE' ? govLoad().catch(() => null) : null]);
   const ind = {}, grp = {}, mem = {}, pul = {};
   // 22 Nov 2026 (rotation + Pulse test): industry Pulse per stock and its rank among the market's groups (top 10% = strong)
   const pv = ((GP && GP.rows) || []).map((g) => g.p1m).filter((v) => v != null).sort((a, b) => a - b);
@@ -8260,7 +8260,7 @@ async function loadStrat() {
   const FLG = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);   // 22 Nov 2026: flags / pennants / rectangles
   const PRJ = mk === 'NSE' ? await getJSON(MAIN + 'data/scan/pulse_rot.json', 'pulse_rot').catch(() => null) : null;   // 22 Nov 2026: Pulse rotation trial
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
-  const row = (sym, st, extra = {}) => { const ch = X.chain(sym); return { sym, st, ch, s: Pq[ch[1]] + Pq[ch[2]], y: X.yoy(sym), pu: X.pulse ? X.pulse(sym) : null, ...extra }; };
+  const row = (sym, st, extra = {}) => { const ch = X.chain(sym); return { sym, st, ch, s: Pq[ch[1]] + Pq[ch[2]], y: X.yoy(sym), pu: X.pulse ? X.pulse(sym) : null, gmk: X.mk, ...extra }; };
   const pl = (P && (P.top || []).concat(P.swing || [])) || [];
   const TYP = { DB: 'W bottom', TW: 'Tilted W', TB: 'Triple bottom', IHS: 'Inv H&S' };
   const SYS = [
@@ -8424,6 +8424,7 @@ async function stockPage(e, trail) {
     <div class="sp-grid">
       <section class="sp-t"><div class="sp-th"><h3>Systems on it</h3><b class="${list.length ? 'up' : ''}">${list.length}</b></div><div class="sp-chips">${lit}${off}</div></section>
       <section class="sp-t"><h3>Top-down</h3>${t3Bars(ch)}<small class="${ch[1] === 'L' && ch[2] === 'L' ? 'up' : ''}">${ch.every((q) => q === 'L') ? 'All three leading' : `Industry ${T3N[ch[1]].toLowerCase()} · stock ${T3N[ch[2]].toLowerCase()}`}</small></section>
+      ${mk === 'NSE' && govOf(sym) ? (() => { const gv = govOf(sym); return `<section class="sp-t sp-gov"><div class="sp-th"><h3>Govt focus</h3>${gv.msme ? '<b class="up">MSME</b>' : ''}</div>${gv.th.map((t) => `<p><b>${esc(t.name)}</b><small>${esc(t.why)} <span class="muted">(${esc(t.src)})</span></small></p>`).join('')}<small class="muted">${gv.cr != null ? `Sales last year ${inr(gv.cr, 0)} cr${gv.msme ? ' - MSME-sized (up to 500 cr)' : ''}. ` : ''}A theme, not a buy signal.</small></section>`; })() : ''}
       <section class="sp-t"><h3>Price vs results</h3><div class="t3-duo"><div><b>${px ? px.k : 'n/a'}</b><small>${px ? `P/E ${fmt(px.pe, 1)} vs ${fmt(px.m, 1)}` : 'no P/E'}</small></div><div><b class="${y == null ? '' : y >= 0 ? 'up' : 'down'}">${y == null ? 'n/a' : (y >= 0 ? '+' : '−') + fmt(Math.abs(y), 0) + '%'}</b><small>profit vs a year ago</small></div></div></section>
       ${c ? `<section class="sp-t"><div class="sp-th"><h3>Why?</h3><button class="t3-link" id="spwhy">Open</button></div><div class="sp-why"><div class="ok"><b>5/5</b><small>rules passed</small></div><div class="${(c.late || 0) > 5 ? 'warn' : 'ok'}"><b>${fmt(c.late || 0, 0)}%</b><small>past buy level</small></div><div class="bad"><b>−${fmt(c.stopP, 0)}%</b><small>to the stop</small></div></div></section>` : ''}
       ${peers.length ? `<section class="sp-t"><h3>Same industry</h3><div class="sp-chips">${peers.map((m) => { const q = (rqOf(m.symbol, mk) || {}).now; return `<button class="sp-peer" data-peer="${esc(m.symbol)}" style="border-left-color:${T3C[T3Q[q] || 'N']}">${esc(m.symbol)}</button>`; }).join('')}</div></section>` : ''}
@@ -8778,6 +8779,7 @@ const SYSX = [
   { id: 'rt', name: 'Support retest', d: 'Back at an old breakout level', a: 'retest support pullback old breakout', ok: 0 },
   { id: 'st', name: 'MA stack', d: 'Close above 20 > 50 > 100 > 200-day averages, all rising', a: 'ma stack moving average averages 20 50 100 200 aligned', ok: 0 },
   { id: 'etf', name: 'ETF ATH system', d: 'ETF month close above its all-time high after a 1-year base', a: 'etf etfs fund funds ath month close investment', ok: 1 },
+  { id: 'gov', name: 'Govt focus', d: 'Industries the government is pushing (PM at FICCI, 19 Nov 2026): APIs, steel, metals, agri, tools, machinery', a: 'govt government focus policy pm modi speech ficci msme make india atmanirbhar self reliant swadeshi export', ok: 1, nse: 1 },
   { id: 'rot', name: 'ETF rotation', d: 'Monthly: hold the strongest of Nifty, Midcap, Gold, Nasdaq or cash', a: 'etf rotation rotate monthly gold nifty nasdaq midcap liquid', ok: 1, nse: 1 }];
 const SYS_STOP = new Set(['system', 'systems', 'stock', 'stocks', 'pattern', 'patterns', 'setup', 'setups', 'list', 'the', 'all', 'in', 'on', 'show', 'me', 'with', 'and', 'of', 'a']);
 const sysNorm = (s) => String(s).toLowerCase().replace(/[^a-z0-9+]+/g, ' ').trim();
@@ -8805,6 +8807,13 @@ async function sysRows(s, mk, q) {
     const P = await getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null);
     return ((P && (P.top || []).concat(P.swing || [], P.more || [])) || []).filter((r) => bkOf(r) === s.id)
       .map((r) => ({ sym: r.symbol, st: s.id === 'rt' ? 'at old breakout' : r.trigger ? `waiting · above ${fmt(r.trigger, 2)}` : 'Buy', sc: r.score || 0, buy: s.id === 'tf' && !r.trigger }));
+  }
+  if (s.id === 'gov') {
+    if (mk !== 'NSE') return []; const G = await govLoad().catch(() => null); const GP = await loadGP('NSE').catch(() => null); if (!G || !GP || !GP.nse) return [];
+    const msme = /msme|small/.test(qn);
+    return GP.nse.rows.flatMap((r) => { const th = govThemes(r.basic); return th.length ? r.members.map((m) => ({ m, th })) : []; })
+      .map(({ m, th }) => { const g = govOf(m.symbol); return { sym: m.symbol, sc: m.liquid ? 1 : 0, st: th.map((t) => t.name).join(' · ') + (g && g.msme ? ' · MSME' : ''), msme: g && g.msme }; })
+      .filter((x) => !msme || x.msme);
   }
   if (s.id === 'fl') {
     const F = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);
@@ -8841,7 +8850,7 @@ async function sysListView(s, mk, q) {
   const [rows, X] = await Promise.all([sysRows(s, mk, q), t3Ctx(mk).catch(() => null)]);
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
   rows.forEach((x) => { const nonStk = (x.fl && x.fl.kind && x.fl.kind !== 'stock') || (x.pt && x.pt.kind && x.pt.kind !== 'stock'); if (nonStk) x.name = x.name || (x.fl ? (x.fl.kind === 'index' ? 'Index' : 'Asset') : '');
-    x.ch = X && !x.etfOnly && !x.fund && !nonStk ? X.chain(x.sym) : null; x.pu = x.ch && X.pulse ? X.pulse(x.sym) : null; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
+    x.ch = X && !x.etfOnly && !x.fund && !nonStk ? X.chain(x.sym) : null; x.pu = x.ch && X.pulse ? X.pulse(x.sym) : null; x.gmk = mk; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
   // 22 Nov 2026 (Amritpal: "sort stocks as per quadrant strength"): industry + stock quadrant first (Leading > Improving >
   // Weakening > Lagging), then the stock's own quadrant, then buy / breakout, then the tested order
   rows.sort((a, b) => pulseSort(a, b) || b.s - a.s || (b.ch ? Pq[b.ch[2]] : -1) - (a.ch ? Pq[a.ch[2]] : -1) || (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0));
@@ -8920,6 +8929,27 @@ function pulseTier(x) { const p = x.pu; if (!p || p.p == null) return 0; const t
 function pulseSort(a, b) { return pulseTier(b) - pulseTier(a) || ((b.pu && b.pu.p) || 0) - ((a.pu && a.pu.p) || 0); }
 function pulsePill(x) { const p = x.pu; if (!p || p.p == null) return ''; const t = pulseTier(x);
   return `<span class="t3-pill ${t === 3 ? 'ok' : t === 2 ? 'warn' : ''}" title="Industry Pulse: share of the industry's stocks trending (1 month)">Pulse ${fmt(p.p, 0)}${t === 3 ? ' · top 10% + rotation' : t === 2 ? ' · top 10%' : ''}</span>`; }
+
+/* 22 Nov 2026 (Amritpal, after the PM's FICCI speech: "link these to stocks and put a chip" -> "Govt focus"): stocks in the industries
+   the government is pushing (data/scan/govt_focus.json, hand-kept, NSE basic industries) get a "Govt focus" chip; "· MSME" when the
+   company's last full-year sales are up to Rs 500 cr (fundamentals). A theme to know about, not a buy signal - nothing here was tested. */
+async function govLoad() {
+  if (state.gov === undefined) { const [G, F] = await Promise.all([getJSON(MAIN + 'data/scan/govt_focus.json', 'govt_focus').catch(() => null), getJSON(MAIN + MKT.NSE.path + 'fundamentals.json', 'fund_NSE').catch(() => null), loadGP('NSE').catch(() => null)]);
+    state.gov = G; state.govF = (F && F.s) || {}; }
+  return state.gov;
+}
+const govThemes = (basic) => ((state.gov && state.gov.themes) || []).filter((t) => (t.industries || []).includes(basic));
+function govOf(sym) {
+  if (!state.gov) return null; const n = nseInd(state.gp.NSE, sym); if (!n) return null; const th = govThemes(n.basic); if (!th.length) return null;
+  const f = (state.govF || {})[sym]; const a = f && f.a && f.a.find((y) => y[3] != null); const cr = a ? a[3] / 1e7 : null;
+  return { th, cr, msme: cr != null && cr <= (state.gov.msme_sales_cr || 500) };
+}
+function govChip(sym, mk) {
+  if ((mk || 'NSE') !== 'NSE') return ''; const g = govOf(sym); if (!g) return '';
+  return `<span class="chip gov" title="Govt focus: ${esc(g.th.map((t) => t.name).join(', '))}${g.msme ? ` · MSME-sized (sales ${inr(g.cr, 0)} cr)` : ''} - a theme, not a buy signal">Govt focus${g.msme ? ' · MSME' : ''}</span>`;
+}
+{ const PP = pulsePill; pulsePill = (x) => PP(x) + (x && x.sym && x.gmk === 'NSE' ? govChip(x.sym, 'NSE') : ''); }
+{ const PC = pulseChip; pulseChip = (sym, mk) => PC(sym, mk) + ((mk || AM()) === 'NSE' ? govChip(sym, 'NSE') : ''); }
 
 /* Pulse rotation forward test (22 Nov 2026): equal weight, Friday close to Friday close, no costs - a paper mark */
 function prFwd(P) { const L = (P && P.ledger) || []; if (L.length < 2) return 'started, first result next Friday';

@@ -1,0 +1,25 @@
+{
+ "updated": "2026-11-22",
+ "note": "Industries the government is pushing, mapped to NSE basic industries. A theme to know about, not a buy signal. MSME = last full-year sales up to Rs 500 cr (the medium-enterprise turnover limit).",
+ "msme_sales_cr": 500,
+ "themes": [
+  {"id": "api", "name": "Pharma ingredients (APIs)", "src": "PM at FICCI, 19 Nov 2026",
+   "why": "India imports billions of dollars of APIs, bulk drugs and intermediates; the PM asked pharma to build plants to make them at home.",
+   "industries": ["Pharmaceuticals", "Biotechnology"]},
+  {"id": "steel", "name": "Special steel grades", "src": "PM at FICCI, 19 Nov 2026",
+   "why": "India exports iron ore but imports finished steel; industry asked to make the imported grades here.",
+   "industries": ["Iron & Steel", "Iron & Steel Products", "Sponge Iron", "Ferro & Silica Manganese"]},
+  {"id": "metals", "name": "Aluminium alloys and minerals value-add", "src": "PM at FICCI, 19 Nov 2026",
+   "why": "Large bauxite reserves but specialised aluminium alloys are imported; more processing of minerals inside India.",
+   "industries": ["Aluminium", "Aluminium Copper & Zinc Products", "Industrial Minerals", "Diversified Metals"]},
+  {"id": "agri", "name": "Agri and food processing exports", "src": "PM at FICCI, 19 Nov 2026",
+   "why": "India's share of world farm exports is only 2-2.5%; companies asked to invest in agriculture, procurement and processed food for export.",
+   "industries": ["Other Agricultural Products", "Packaged Foods", "Other Food Products", "Edible Oil", "Dairy Products", "Seafood", "Sugar", "Tea & Coffee", "Meat Products including Poultry", "Animal Feed"]},
+  {"id": "tools", "name": "Tools and engineering goods", "src": "PM at FICCI, 19 Nov 2026",
+   "why": "India's share of world hand-tool and power-tool exports is small; large firms asked to help small firms build quality and scale.",
+   "industries": ["Abrasives & Bearings", "Castings & Forgings", "Industrial Products", "Other Industrial Products"]},
+  {"id": "machinery", "name": "Machinery for the Global South", "src": "PM at FICCI, 19 Nov 2026",
+   "why": "Packaging equipment, irrigation systems and factory machinery for developing countries.",
+   "industries": ["Compressors Pumps & Diesel Engines", "Plastic Products - Industrial", "Tractors", "Construction Vehicles"]}
+ ]
+}
