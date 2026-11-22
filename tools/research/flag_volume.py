@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.join(HERE, "..")); sys.path.insert(0, HERE)
 import nse_bhav; nse_bhav.install()  # noqa: E402,E702
 from global_universe import symbols  # noqa: E402
 from holy_grail import portfolio, report  # noqa: E402
-from flag_stops import signals, tst  # noqa: E402
+from flag_stops import signals, tst, zz  # noqa: E402
 
 PILOT = bool(os.environ.get("PILOT"))
 COST = 0.002
@@ -77,7 +77,8 @@ def trail(o, h, l, c, e21, j0, e, stop, same_day=True):
 
 VARS = ["1 scanner now, buy at breakout close", "2 scanner now, buy above breakout high next day", "3 + volume dries up in flag",
         "4 + breakout volume high", "5 + dry + breakout volume (your rule)", "6 + dry + breakout volume + tight <= 8% (your rule, tight)",
-        "7 your rule, tight, but buy at breakout close"]
+        "7 your rule, tight, but buy at breakout close", "8 rule 7 + room >= 0.8 x pole to the next resistance",
+        "9 rule 7 + room >= 1 x pole", "10 scanner (no volume rules) + room >= 0.8 x pole"]
 
 
 def main():
@@ -90,6 +91,7 @@ def main():
     for sym, x in P.items():
         o, h, l, c, v = (x[k].to_numpy(float) for k in ("OPEN", "HIGH", "LOW", "CLOSE", "VOL")); D = x.index; n = len(c)
         e21 = pd.Series(c).ewm(span=21, adjust=False).mean().to_numpy(); v50 = pd.Series(v).rolling(50).mean().shift(1).to_numpy()
+        Z = zz(h, l); zh = [(z[1], z[2], z[3]) for z in Z if z[0] == 1]   # swing highs (index, price, confirmed at)
         for s in signals(x):
             t = s["t"]
             if D[t] < pd.Timestamp("2016-06-01") or t + 1 >= n:
@@ -99,14 +101,20 @@ def main():
             dry = bool(fv < 0.75 * pv and fv < base50)
             bvol = bool(v[t] >= 1.5 * v50[t] and v[t] >= v[a:b].max())
             tight = bool((h[a:b].max() - l[a:b].min()) / h[pk] <= 0.08)
+            # room (22 Nov 2026, Amritpal: "enough room almost equal to the pole before the next resistance from the left"): nearest
+            # earlier swing high (6% zigzag, confirmed before the pole began, last 3 years) above the entry; none -> unlimited
+            ent = c[t]; pole_h = h[pk] - l[lo_i]
+            res = [p_ for i_, p_, cf in zh if cf < lo_i and i_ >= t - 750 and p_ > ent]
+            room = (min(res) - ent) / pole_h if res and pole_h > 0 else 9.0
             nxt = None
             if h[t + 1] > h[t]:
                 nxt = max(o[t + 1], h[t] * 1.0005)
-            ok = {VARS[0]: True, VARS[1]: True, VARS[2]: dry, VARS[3]: bvol, VARS[4]: dry and bvol, VARS[5]: dry and bvol and tight, VARS[6]: dry and bvol and tight}
+            ok = {VARS[0]: True, VARS[1]: True, VARS[2]: dry, VARS[3]: bvol, VARS[4]: dry and bvol, VARS[5]: dry and bvol and tight, VARS[6]: dry and bvol and tight,
+                  VARS[7]: dry and bvol and tight and room >= 0.8, VARS[8]: dry and bvol and tight and room >= 1.0, VARS[9]: room >= 0.8}
             for vn, good in ok.items():
                 if not good:
                     continue
-                if vn.startswith("1") or vn.startswith("7"):
+                if vn[:2] in ("1 ", "7 ", "8 ", "9 ", "10"):
                     e, j0 = c[t], t
                     if not stop < e: continue
                     j, r, sp = trail(o, h, l, c, e21, t, e, stop, same_day=False)
