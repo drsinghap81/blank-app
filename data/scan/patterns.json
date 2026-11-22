@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-22T05:06+00:00",
-"asof": "2026-11-20",
+"generated": "2026-11-22T05:41+00:00",
+"asof": "2026-11-22",
 "market": "NSE",
 "regime": {
 "nifty500": 24088.8,
@@ -10,6 +10,95 @@
 "rules": "neighbouring swing lows (zigzag 3% on closes), neckline >= 6% above the low; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
 "backtest": "2016-26, 3,994 signals: 120-day return +3.5% vs +7.4% for a random liquid stock; in market downtrends +10.5% vs +13.6% for any stock; target before stop 63% vs 63% for a random stock; with bullish RSI divergence 66% vs 65%, 120d +4.7%. No edge - watch only.",
 "rows": [
+{
+"symbol": "NIFTY INDIA CONSUMPTION",
+"name": "NIFTY INDIA CONSUMPTION",
+"kind": "index",
+"typ": "TB",
+"status": "breakout",
+"close": 12336.6,
+"neck": 12258.7,
+"to_neck_pct": -0.6314543715448262,
+"stop": 10231.01,
+"stop_pct": 17.067859053547984,
+"height_pct": 18.62090987822167,
+"fall_pct": 22.30135422160078,
+"lows": [
+[
+"2026-03-30",
+10334.35
+],
+[
+"2026-06-11",
+11047.8
+],
+[
+"2026-10-23",
+10726.75
+]
+],
+"peaks": [
+[
+"2026-05-08",
+11638.4
+],
+[
+"2026-08-03",
+12258.7
+]
+],
+"rsi_lows": [
+35.1,
+40.3,
+34.4
+],
+"rsi_div": 0.0,
+"rsi_now": 73.5,
+"signal_date": "2026-11-20",
+"days_since": 0,
+"target": 14183.05,
+"sl": 11768.35
+},
+{
+"symbol": "NIFTY CONSUMER DURABLES",
+"name": "NIFTY CONSUMER DURABLES",
+"kind": "index",
+"typ": "TW",
+"status": "forming",
+"close": 38487.95,
+"neck": 38670.05,
+"to_neck_pct": 0.47313509812814125,
+"stop": 33512.59,
+"stop_pct": 12.92706158680833,
+"height_pct": 14.235726460883114,
+"fall_pct": 20.61469198932975,
+"lows": [
+[
+"2026-10-26",
+33851.1
+],
+[
+"2026-11-18",
+37288.8
+]
+],
+"peaks": [
+[
+"2026-11-12",
+38670.05
+]
+],
+"rsi_lows": [
+22.5,
+52.0
+],
+"rsi_div": 0.0,
+"rsi_now": 59.8,
+"signal_date": null,
+"days_since": null,
+"target": 43489.0,
+"sl": 37123.25
+},
 {
 "symbol": "ASHAPURMIN",
 "name": "Ashapura Minechem Limited",
@@ -2097,6 +2186,48 @@
 "outcome_date": "2026-11-16"
 },
 {
+"symbol": "Orange juice",
+"name": "Orange juice",
+"kind": "asset",
+"typ": "TW",
+"status": "breakout",
+"close": 129.25,
+"neck": 135.4499969482422,
+"to_neck_pct": 4.796902861309227,
+"stop": 114.1,
+"stop_pct": 11.723404255319148,
+"height_pct": 17.425226475950552,
+"fall_pct": 107.71565606675767,
+"lows": [
+[
+"2026-10-30",
+115.3499984741211
+],
+[
+"2026-11-05",
+128.4499969482422
+]
+],
+"peaks": [
+[
+"2026-11-03",
+135.4499969482422
+]
+],
+"rsi_lows": [
+28.6,
+42.7
+],
+"rsi_div": 0.0,
+"rsi_now": 43.2,
+"signal_date": "2026-11-09",
+"days_since": 9,
+"target": 155.55,
+"sl": 130.03,
+"outcome": "sl",
+"outcome_date": "2026-11-18"
+},
+{
 "symbol": "DABUR",
 "name": "Dabur India Limited",
 "kind": "stock",
@@ -2255,6 +2386,46 @@
 "days_since": null,
 "target": 161.71,
 "sl": 136.28
+},
+{
+"symbol": "Live cattle",
+"name": "Live cattle",
+"kind": "asset",
+"typ": "DB",
+"status": "forming",
+"close": 227.6999969482422,
+"neck": 230.4250030517578,
+"to_neck_pct": 1.1967528063406396,
+"stop": 207.48,
+"stop_pct": 8.880434888226517,
+"height_pct": 9.634827979525816,
+"fall_pct": 22.980850410580665,
+"lows": [
+[
+"2026-09-02",
+210.1750030517578
+],
+[
+"2026-11-06",
+214.0500030517578
+]
+],
+"peaks": [
+[
+"2026-10-21",
+230.4250030517578
+]
+],
+"rsi_lows": [
+24.0,
+27.9
+],
+"rsi_div": 0.0,
+"rsi_now": 63.5,
+"signal_date": null,
+"days_since": null,
+"target": 250.68,
+"sl": 221.21
 },
 {
 "symbol": "SRF",
