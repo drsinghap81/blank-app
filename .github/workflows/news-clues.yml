@@ -1,0 +1,30 @@
+# 22 Nov 2026: industry news clues (government / regulator actions) - tools/news_clues.py. Info only, not a tested signal.
+name: news-clues
+on:
+  schedule:
+    - cron: "20 2 * * *"    # 07:50 IST, before the open
+    - cron: "50 13 * * *"   # 19:20 IST, evening
+  workflow_dispatch:
+    inputs:
+      back: { description: "days to look back (first fill: 45)", required: false, default: "3" }
+permissions:
+  contents: write
+concurrency:
+  group: news-clues
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q requests
+      - run: BACK=${{ inputs.back || '3' }} python tools/news_clues.py
+      - run: |
+          git config user.name "trend-desk-bot"; git config user.email "bot@users.noreply.github.com"
+          git add data/scan/news_clues.json
+          git diff --cached --quiet && exit 0
+          git commit -qm "news clues $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -q -X theirs origin main && git push -q && break; sleep 5; done
