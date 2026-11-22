@@ -315,6 +315,7 @@ def vcp(x, sym, name):
 
 
 FL_POLE, FL_POLE_D, FL_MIN_D, FL_MAX_D, FL_DEPTH = 0.15, 15, 3, 25, 0.12
+FL_TIGHT = 0.08   # flag range (high - low) <= 8% of the pole top
 
 
 def flag(x, sym, name):
@@ -378,8 +379,18 @@ def flag(x, sym, name):
             lane = "early" if near200 else "established" if est else None
             if not lane:
                 continue
+            # 22 Nov 2026 (Amritpal: "tighter ones with volumes drying out and only the breakout candle volume high"; tested on
+            # 2,183 NSE stocks 2016-26, research/flag_volume.py): flag range <= 8% of the top, flag volume < 0.75 x the pole's and
+            # < the 50-day average before the pole; breakout candle >= 1.5 x the 50-day average and the flag's biggest volume.
+            # With these, buying the breakout close + trailing below the 21-day EMA: +2.8% a trade (PF 1.75) vs +2.3% (1.72)
+            # without, and positive in the last 1 and 2 years (+0.8%, PF 1.2) where the loose list lost money
+            vv = x.Volume.astype(float).to_numpy(); v50 = pd.Series(vv).rolling(50).mean().shift(1).to_numpy()
+            fv = float(vv[pz].mean()); pv = float(vv[lo_i:pk + 1].mean()); b50 = v50[lo_i] if np.isfinite(v50[lo_i]) else v50[end]
+            if (hh.max() - ll.min()) / top > FL_TIGHT or not (fv < 0.75 * pv and fv < b50):
+                continue
             trig = max(min(line(n - 1), float(hh.max())), float(c[-1]) if back == 0 else 0)
             row = dict(symbol=sym, name=name, lane=lane, shape=shape, close=round(float(c[-1]), 2), pole_pct=round(pole * 100, 1),
+                       flag_vol_pct=round(fv / b50 * 100) if b50 else None, range_pct=round(float((hh.max() - ll.min()) / top * 100), 1),
                        pole_start=D[lo_i], pole_top=D[pk], top=round(float(top), 2), flag_days=pz.stop - pz.start,
                        depth_pct=round(depth * 100, 1), stop=round(float(plo), 2), s200=round(float(s200[-1]), 2),
                        # 22 Nov 2026 (Amritpal: "mark the patterns on the charts"): the drawing - pole (swing low -> top), the pause's
@@ -392,12 +403,15 @@ def flag(x, sym, name):
                 if l[end] < plo:
                     continue
                 plo = min(plo, l[end]); trig = max(min(line(n - 1), float(max(hh.max(), h[end]))), float(c[-1]))
-                row.update(status="forming", trigger=round(trig, 2), to_trigger_pct=round((trig / c[-1] - 1) * 100, 1), stop=round(float(plo), 2),
+                row.update(status="forming", trigger=round(trig, 2), need_vol=int(1.5 * v50[-1]) if np.isfinite(v50[-1]) else None, to_trigger_pct=round((trig / c[-1] - 1) * 100, 1), stop=round(float(plo), 2),
                            target=round(trig + (top - base), 2), risk_pct=round((1 - plo / trig) * 100, 1))
             else:
                 plo = min(plo, l[bo])                           # stop under the flag including the breakout day's low
                 if not broke or l[bo + 1:].min(initial=1e18) < plo:
                     continue
+                if not (vv[bo] >= 1.5 * v50[bo] and vv[bo] >= vv[pz].max()):
+                    continue                                    # breakout without the volume jump: not listed
+                row["bo_vol_x"] = round(float(vv[bo] / v50[bo]), 1)
                 row["stop"] = round(float(plo), 2)
                 e = float(c[bo]); row.update(status="breakout", bo_date=D[bo], entry=round(e, 2), days_since=back,
                                              target=round(e + (top - base), 2), risk_pct=round((1 - plo / e) * 100, 1), ret_pct=round((c[-1] / e - 1) * 100, 1))
@@ -533,9 +547,12 @@ def main(mk="NSE"):
     json.dump(dict(generated=out["generated"], asof=out["asof"], market=mk,
                    rules="Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. "
                          "Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, "
-                         "no close above the pole top, close above the 200-day average. Early = the pole started within 4% of the 200-day average "
+                         "no close above the pole top, close above the 200-day average. Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average "
                          "(fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
-                   backtest="Tested 22 Nov 2026 (2,421 NSE stocks, 30,360 breakouts 2016-26): flag-low stop + exit on a close below the 21-day EMA "
+                   backtest="Tight + volume rules (22 Nov 2026, 2,183 NSE stocks 2016-26): 2,979 trades, buy the breakout close, stop flag low, exit on a "
+                            "close below the 21-day EMA: +2.8% a trade (PF 1.75); last 1 year +0.8% (PF 1.21), last 2 years +0.9% (1.22), 5 years +1.8% (1.45). "
+                            "Buying next day above the breakout high instead: +1.7% (PF 1.37), worse. Earlier, all flags: "
+                            "Tested 22 Nov 2026 (2,421 NSE stocks, 30,360 breakouts 2016-26): flag-low stop + exit on a close below the 21-day EMA "
                             "+2.2% a trade (profit factor 1.71) vs +1.4% (1.34) selling at the pole target; breakout-day-low stop worse (stopped 81%). "
                             "Rectangles +7.3% (PF 3.2), pennants +2.3%, flags +2.0%; established uptrends +2.7% vs new +1.9%. Last 2 years -0.6% a trade "
                             "and portfolio drawdowns of 55-70% - watch only.",
