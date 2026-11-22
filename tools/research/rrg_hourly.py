@@ -71,14 +71,19 @@ def main():
         t0 = rsh.index[0] + pd.Timedelta(days=45)                 # common window once the hourly views have warmed up
         days = rsd.index[rsd.index >= t0.normalize()]
         dpos = {d: i for i, d in enumerate(rsd.index)}
-        def fret(ts, h):                                          # relative return from the close at ts (hourly or daily) to +h trading days
-            d = ts.normalize(); i = rsd.index.searchsorted(d)
-            if i >= len(rsd.index):
+        # 22 Nov 2026 fix: Yahoo's hourly and daily series are adjusted differently -> measure everything on the HOURLY series
+        dl = rsh.groupby(rsh.index.normalize()).tail(1)              # last hourly bar of each day
+        dl_days = dl.index.normalize()
+        def fret(ts, h):                                          # relative return from ts to the close h trading days later
+            i = dl_days.searchsorted(ts.normalize())
+            if i >= len(dl):
                 return None
-            # starting value: hourly RS at ts if intraday, else the daily RS that day
-            base = rsh.asof(ts) if ts != d else rsd.iloc[i]
+            if ts.normalize() == ts:                              # a daily / weekly signal: from that day's close
+                base = dl.iloc[i]
+            else:
+                base = rsh.asof(ts)
             j = i + h
-            return None if j >= len(rsd) or not base else float(rsd.iloc[j] / base - 1)
+            return None if j >= len(dl) or not base else float(dl.iloc[j] / base - 1)
         for d in days:
             for h in H:
                 r_ = fret(d, h)
@@ -104,10 +109,12 @@ def main():
                 cand = [x for x in evh if lo <= x <= end_ts]
                 if cand and qh.asof(end_ts) == "L":
                     x = max(cand); out.append(int(i - rsd.index.searchsorted(x.normalize())))
+                    HRS.append(round(((d + pd.Timedelta(hours=15, minutes=30)) - x).total_seconds() / 3600, 1))
                 else:
                     out.append(None)
             return out
-        lf = lead(eD, eF, qf); ly = lead(eD, eY, qy); lw = lead(eW, eY, qy)
+        HRS = []; lf = lead(eD, eF, qf); hf = HRS[:]; HRS.clear(); ly = lead(eD, eY, qy); hy = HRS[:]; HRS.clear(); lw = lead(eW, eY, qy)
+        agg.setdefault("hrs_fast", []).extend(hf); agg.setdefault("hrs_day", []).extend(hy)
         # follow-through: hourly entry followed by a daily Leading state within 5 trading days
         def follow(evh, k="L"):
             ok = 0
@@ -134,6 +141,8 @@ def main():
         pre_signalled_by_hourly_day=f"{sum(p[1] for p in pre)} ({round(100 * sum(p[1] for p in pre) / max(1, sum(p[2] for p in pre)))}%)",
         lead_days_hourly_day_vs_daily=dict(median=float(np.median(agg["lead_L"])) if agg["lead_L"] else None, mean=round(float(np.mean(agg["lead_L"])), 1) if agg["lead_L"] else None,
                                             dist={k: int(sum(1 for v in agg["lead_L"] if v == k)) for k in range(0, 16)}),
+        lead_hours_fast=dict(median=float(np.median(agg["hrs_fast"])) if agg.get("hrs_fast") else None, p75=float(np.percentile(agg["hrs_fast"], 75)) if agg.get("hrs_fast") else None),
+        lead_hours_day=dict(median=float(np.median(agg["hrs_day"])) if agg.get("hrs_day") else None, p75=float(np.percentile(agg["hrs_day"], 75)) if agg.get("hrs_day") else None),
         lead_days_hourly_day_vs_weekly=dict(median=float(np.median(agg["lead_L_w"])) if agg["lead_L_w"] else None, n=len(agg["lead_L_w"])),
         follow_through_hourly_fast_to_daily_leading=fs(agg["follow_fast"]), follow_through_hourly_day_to_daily_leading=fs(agg["follow_day"]),
         follow_through_hourly_fast_I=fs(agg["follow_fast_I"]), follow_through_hourly_day_I=fs(agg["follow_day_I"]),
