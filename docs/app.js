@@ -8522,10 +8522,14 @@ async function perfSection(el) {
       const [S, TB, TN] = await Promise.all([lvApi('/api/plan').catch(() => null), lvApi('/api/tb?inst=bn').catch(() => null), lvApi('/api/tb?inst=nifty').catch(() => null)]);
       const P = S && S.perf; const tbl = [...((TB && TB.live_trades) || []).map((t) => ({ ...t, ins: 'Bank Nifty' })), ...((TN && TN.live_trades) || []).map((t) => ({ ...t, ins: 'Nifty' }))];
       const tbClosed = tbl.filter((t) => t.exit_fill); const tbPnl = tbClosed.reduce((a, t) => a + (t.pnl != null ? +t.pnl : (t.exit_fill - t.fill) * (t.qty || 0) * (t.side === 'SELL' ? -1 : 1)), 0);
-      const tbOpenU = [[TB, (TB && TB.live_trades) || []], [TN, (TN && TN.live_trades) || []]].reduce((a, [X, L]) => { const o = L.filter((t) => !t.exit_fill).pop(); const lp = X && X.status && X.status.ltp;
-        return a + (o && lp ? (lp - o.fill) * (o.qty || 0) * (o.side === 'SELL' ? -1 : 1) : 0); }, 0);
+      /* open Top Bottom fill at the bot's live price; when the bot is not running (evenings, weekends) the futures' last close
+         from data/futures (same near-month contract Angel shows) - 22 Nov 2026: weekend showed +0 instead of the real +65,968 */
+      const futLast = async (f) => { const t = await getText(fresh(MAIN + 'data/futures/' + f + '.csv')); const L = (t || '').trim().split(/\r?\n/); const v = (L[L.length - 1] || '').split(','); return +v[4] || null; };
+      const [bnC, nfC] = await Promise.all([futLast('BANKNIFTY').catch(() => null), futLast('NIFTY').catch(() => null)]);
+      const tbOpenU = [[TB, (TB && TB.live_trades) || [], bnC], [TN, (TN && TN.live_trades) || [], nfC]].reduce((a, [X, L, cl]) => { const o = L.filter((t) => !t.exit_fill).pop(); const lp = (X && X.status && X.status.ltp) || cl;
+        return a + (o && lp && o.fill ? (lp - o.fill) * (o.qty || 0) * (o.side === 'SELL' ? -1 : 1) : 0); }, 0);
       const sysI = ((P && P.systems) || []).map((x) => ({ k: x.system, pnl: x.pnl, sub: `${x.n} trades${x.pct != null ? ' · ' + (x.pct >= 0 ? '+' : '') + fmt(x.pct, 1) + '%' : ''}` }));
-      sysI.push({ k: 'Top Bottom', pnl: tbPnl, sub: tbl.length ? `${tbClosed.length} closed${tbl.length > tbClosed.length ? ' · 1 open' : ''} · real fills` : `no real order yet · bot ${TB ? esc(TB.mode) : 'not reachable'}` });
+      sysI.push({ k: 'Top Bottom', pnl: tbPnl + tbOpenU, sub: tbl.length ? `${tbClosed.length} closed${tbl.length > tbClosed.length ? ' · 1 open' : ''} · real fills` : `no real order yet · bot ${TB ? esc(TB.mode) : 'not reachable'}` });
       const lt = (P ? P.total_pnl || 0 : 0) + tbPnl + tbOpenU; const lBooked = (P ? P.closed.pnl : 0) + tbPnl, lOpen = (P ? P.open.pnl : 0) + tbOpenU;
       live = P || tbl.length ? `<div class="pf-big"><b class="${lt >= 0 ? 'up' : 'down'}">${lt >= 0 ? '+' : '−'}${lakh(Math.abs(lt))}</b><small>${P && P.total_pct != null ? `${P.total_pct >= 0 ? '+' : ''}${fmt(P.total_pct, 1)}% on the money put in` : ''}${P && P.since ? ' · since ' + esc(day(P.since)) : ''}</small></div>
         <div class="t3-tiles"><div class="t3-tile"><small>Open</small><b>${P ? P.open.n : 0}</b><span>${P ? (P.open.pnl >= 0 ? '+' : '−') + lakh(Math.abs(P.open.pnl)) : ''}</span></div><div class="t3-tile"><small>Closed</small><b>${P ? P.closed.n : 0}</b><span>${P ? P.closed.wins + ' won' : ''}</span></div><div class="t3-tile"><small>Top Bottom</small><b>${tbl.length}</b><span>${TB ? esc(TB.mode) : ''}</span></div></div>
