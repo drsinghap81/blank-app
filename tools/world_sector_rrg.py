@@ -57,14 +57,23 @@ CFG["USTHEME"] = dict(bench=("^GSPC", "S&P 500"), out="data/scan/us/theme_rrg.js
     "IHI": "Medical devices", "ITB": "Homebuilders", "KRE": "Regional banks", "IAI": "Brokers", "KIE": "Insurance", "XRT": "Retail",
     "PEJ": "Leisure", "JETS": "Airlines", "IYT": "Transports", "PAVE": "Infrastructure", "ITA": "Aerospace & defence", "XME": "Metals & mining",
     "XOP": "Oil & gas E&P", "TAN": "Solar", "ICLN": "Clean energy", "URA": "Uranium", "LIT": "Lithium & battery", "GDX": "Gold miners"})
+# 22 Nov 2026 (Amritpal: "add currency pairs to all systems"): currencies on the rotation map - each currency's value in US$ (absolute
+# trend, like coins in US$) and in rupees (what 1 unit costs in Rs, for India).
+CFG["FX"] = dict(bench=("USD", "US$ (absolute)"), out="data/scan/fx_rrg.json", names={
+    "EURUSD=X": "Euro", "GBPUSD=X": "Pound", "JPYUSD=X": "Yen", "AUDUSD=X": "Australian $", "NZDUSD=X": "NZ $", "CADUSD=X": "Canadian $",
+    "CHFUSD=X": "Swiss franc", "CNYUSD=X": "Yuan", "INRUSD=X": "Rupee", "SGDUSD=X": "Singapore $", "KRWUSD=X": "Won", "BRLUSD=X": "Real",
+    "MXNUSD=X": "Mexican peso", "ZARUSD=X": "Rand", "TRYUSD=X": "Lira"})
+CFG["FXINR"] = dict(bench=("INR", "Rupee (absolute)"), out="data/scan/fxinr_rrg.json", names={
+    "USDINR=X": "US dollar", "EURINR=X": "Euro", "GBPINR=X": "Pound", "JPYINR=X": "Yen", "AUDINR=X": "Australian $", "SGDINR=X": "Singapore $",
+    "AEDINR=X": "UAE dirham", "CNYINR=X": "Yuan", "CHFINR=X": "Swiss franc", "CADINR=X": "Canadian $", "NZDINR=X": "NZ $"})
 CFG["WORLDUSD"] = dict(bench=("USD", "US$ (absolute)"), out="data/scan/worldusd_rrg.json", names={"ACWI": "World stocks (ACWI)", **CFG["WORLD"]["names"]})
 
 
 def main(mk, dry=False):
     cf = CFG[mk]; b, bname = cf["bench"]
-    d = yf.download(list(cf["names"]) + ([] if b == "USD" else [b]), period="2y", interval="1d", progress=False, auto_adjust=True, group_by="column", threads=True)["Close"]
+    d = yf.download(list(cf["names"]) + ([] if b in ("USD", "INR") else [b]), period="2y", interval="1d", progress=False, auto_adjust=True, group_by="column", threads=True)["Close"]
     d = d.dropna(how="all").ffill()
-    bench = pd.Series(1.0, index=d.index) if b == "USD" else d.pop(b); C = d[[k for k in cf["names"] if k in d.columns and d[k].notna().sum() > 120]]
+    bench = pd.Series(1.0, index=d.index) if b in ("USD", "INR") else d.pop(b); C = d[[k for k in cf["names"] if k in d.columns and d[k].notna().sum() > 120]]
     print(mk, "got", list(C.columns), "last", C.index[-1].date(), flush=True)
     W = C.resample("W-FRI").last(); BW = bench.resample("W-FRI").last()
     if W.index[-1] > C.index[-1]:
