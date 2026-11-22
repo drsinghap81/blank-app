@@ -8267,3 +8267,85 @@ async function loadStrat() {
     if (x.r && ['mom', 'tf'].includes(bkOf(x.r))) { const e = x.r.trigger || x.r.price; const G = t3Grade(null, x.r, X); t3Why({ r: x.r, ...G, e, z: t2Shares(e, x.r.stop, mk), px: X.price(x.sym) }, X); }
     else if (typeof searchIndex === 'function') sysCheck({ mk, sym: x.sym, name: x.sym, kind: 'stock' }); }));
 }
+
+/* ------------------------------------------------------------------ Same infographic on every tab (22 Nov 2026)
+   Amritpal: "You have only changed layout for today tab yet". Markets, Live and Portfolio open with a Deck picture header
+   (verdict word, coloured tiles, bars). Markets folds the earlier charts and lists under "Charts and full detail";
+   Live and Portfolio keep their working screens right below the header (orders, holdings). Nothing removed. */
+const X3W = [['India', 'NSE'], ['US S&P 500', 'US'], ['US Nasdaq 100'], ['Europe'], ['UK', 'UK'], ['Japan'], ['China'], ['Australia', 'ASX'], ['Korea'], ['Emerging mkts'], ['Gold'], ['Crude oil'], ['US dollar'], ['US long bonds'], ['Bitcoin']];
+function x3Fold(el, title, open) {   // move what the earlier screen drew into one fold
+  const d = document.createElement('details'); d.className = 't3-more x3-fold'; if (open) d.open = true;
+  d.innerHTML = `<summary>${esc(title)}</summary>`; const box = document.createElement('div'); box.className = 'x3-old';
+  while (el.firstChild) box.appendChild(el.firstChild); d.appendChild(box); el.appendChild(d);
+}
+const x3Tile = (q, name, sub, attr = '') => `<button class="x3-tile" ${attr}><i style="background:${T3C[q] || T3C.N}"></i><b>${esc(name)}</b><small>${sub}</small></button>`;
+async function mk3Hero() {
+  const el = $('#view-mk'); const x = state.mx; if (!el || el.querySelector('.x3-hero')) return;
+  if (x.lvl === 'world') {
+    const [WR, W] = [await getJSON(MAIN + 'data/scan/world_rrg.json', 'world_rrg').catch(() => null), state.world];
+    const Wk = (WR && WR.weekly) || {}; const I = (W && W.indices) || {};
+    const on = W && W.risk_on; const word = W ? (on ? (W.risk_watch ? 'Watch' : 'Risk on') : 'Risk off') : '–';
+    const tiles = X3W.filter(([k]) => Wk[k]).map(([k, mk]) => { const v = Wk[k]; const q = T3Q[v.now] || 'N'; const w = T3Q[v.was] || q;
+      return x3Tile(q, k, `${T3N[q]}${w !== q ? ` <em>from ${T3N[w].toLowerCase()}</em>` : ''}`, mk ? `data-m3k="${mk}"` : 'data-rot="1"'); }).join('');
+    const mine = ['NSE', 'US', 'ASX', 'UK'].map((mk) => { const v = I[MX_IDX[mk]] || {}; const up = v.up; const fh = Math.max(0, Math.min(30, -(v.from_high || 0)));
+      return `<button class="x3-mkt ${up ? 'ok' : 'bad'}" data-m3k="${mk}"><span class="x3-mn">${esc(MKT[mk].name)}</span><b>${v.ret_3m != null ? (v.ret_3m >= 0 ? '+' : '−') + fmt(Math.abs(v.ret_3m), 1) + '%' : '–'}</b><small>3 months · ${up ? 'uptrend' : 'below 30-wk'}</small>
+        <span class="x3-fh" role="img" aria-label="${fmt(fh, 1)}% below its high"><i style="width:${100 - fh / 30 * 100}%"></i></span><small>${fmt(fh, 1)}% below high</small></button>`; }).join('');
+    const hero = `<section class="x3-hero t3"><div class="t3-hero ${on ? 'green' : 'red'}"><span class="t3-word x3-w">${word}</span><div class="t3-hl"><b>${on ? 'Most world markets are in uptrends.' : 'World stocks are weak. Be choosy.'}</b><span class="muted">World vs MSCI All-Country, this week. Tap a market.</span></div></div>
+      <div class="x3-mkts">${mine}</div><h2 class="x3-h">Who is leading the world</h2><div class="x3-tiles">${tiles}</div>
+      <div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((q) => `<span><i style="background:${T3C[q]}"></i>${T3N[q]}</span>`).join('')}</div></section>`;
+    x3Fold(el, 'Rotation charts and full detail'); el.insertAdjacentHTML('afterbegin', hero);
+    el.querySelectorAll('.x3-hero [data-m3k]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'market', m: b.dataset.m3k, sec: null, grp: null })));
+    el.querySelectorAll('.x3-hero [data-rot]').forEach((b) => b.addEventListener('click', () => { const f = el.querySelector('.x3-fold'); f.open = true; f.scrollIntoView({ behavior: 'smooth' }); }));
+    return;
+  }
+  if (x.lvl === 'market') {
+    const mk = x.m; const G = await loadGP(mk).catch(() => null); if (!G) return; const W = state.world; const v = (W && W.indices && W.indices[MX_IDX[mk]]) || {};
+    const col = { L: [], I: [], W: [], G: [] };
+    (G.rows || []).forEach((g) => { const q = T3Q[(g.rrg || {}).now]; if (q) col[q].push(g); });
+    Object.values(col).forEach((L) => L.sort((a, b) => (b.p1m || 0) - (a.p1m || 0)));
+    const board = ['L', 'I', 'W', 'G'].map((q) => `<div class="x3-col"><div class="x3-ch" style="border-color:${T3C[q]}"><b>${col[q].length}</b><span>${T3N[q]}</span></div>
+      ${col[q].slice(0, 6).map((g) => `<button class="x3-ind" data-g3="${esc(g.group)}"><span>${esc(g.group)}</span><i style="width:${Math.max(6, Math.min(100, g.p1m || 0))}%;background:${T3C[q]}"></i></button>`).join('')}
+      ${col[q].length > 6 ? `<small class="muted">+${col[q].length - 6} more</small>` : ''}</div>`).join('');
+    const up = v.up; const word = up ? (v.below_now ? 'Careful' : 'Up') : 'Down';
+    const hero = `<section class="x3-hero t3"><div class="t3-hero ${up && !v.below_now ? 'green' : up ? 'amber' : 'red'}"><span class="t3-word x3-w">${word}</span><div class="t3-hl"><b>${esc(MKT[mk].name)} · ${esc(MX_BENCH[mk])} ${v.ret_3m != null ? (v.ret_3m >= 0 ? '+' : '−') + fmt(Math.abs(v.ret_3m), 1) + '% in 3 months' : ''}</b>
+      <span class="muted">${v.from_high != null ? fmt(Math.abs(v.from_high), 1) + '% below its high · ' : ''}${up ? 'above' : 'below'} its 30-week average</span></div></div>
+      <h2 class="x3-h">Industries this week</h2><p class="muted x3-sub">Bar = share of the industry's stocks trending this month. Tap an industry.</p><div class="x3-board">${board}</div></section>`;
+    x3Fold(el, 'Sectors, rotation charts and full detail'); el.insertAdjacentHTML('afterbegin', hero);
+    el.querySelectorAll('[data-g3]').forEach((b) => b.addEventListener('click', () => mxGo({ lvl: 'grp', grp: b.dataset.g3 })));
+  }
+}
+async function lv3Hero() {
+  const el = $('#view-live'); if (!el || el.querySelector('.x3-hero')) return; const mk = state.lvMk || 'NSE';
+  const P = await getJSON(MAIN + MKT[mk].path + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null); if (!P) return;
+  const H = mk === 'NSE' ? tdHeldSet() : new Set(); const al = lvAlloc(mk, P, null);
+  const buys = (P.top || []).concat(P.swing || []).filter((r) => ownK(bkOf(r)) && (al[bkOf(r)] ?? 0) > 0 && !H.has(r.symbol) && r.stop && (r.trigger || r.price) > r.stop);
+  const sells = (P.exits || []).filter((e) => H.has(e.symbol)); const c = lvCfg(); const conn = !!(c.url && c.token);
+  const bks = (P.buckets || []).filter((b) => ['mom', 'tf', 't9', 'rt', 'pt'].includes(b.key) && (al[b.key] ?? 0) > 0);   // stock capital only (Top Bottom is futures notional)
+  const COL = ['var(--accent)', 'var(--rise)', 'var(--saffron)', 'var(--fall)', '#B7A6FF'];
+  const bar = bks.length ? `<div class="x3-alloc" role="img" aria-label="Capital split: ${bks.map((b) => `${b.name} ${al[b.key]}%`).join(', ')}">${bks.map((b, i) => `<span style="flex:${al[b.key]};background:${COL[i % COL.length]}">${al[b.key]}%</span>`).join('')}</div>
+    <div class="t3-key">${bks.map((b, i) => `<span><i style="background:${COL[i % COL.length]}"></i>${esc(b.name)}</span>`).join('')}</div>` : '';
+  const hero = `<section class="x3-hero t3"><div class="x3-row"><span class="x3-conn ${conn ? 'ok' : ''}"><i></i>${conn ? (mk === 'NSE' ? 'Angel bot connected' : 'Plan ready') : 'Server not connected'}</span><span class="muted">${esc(MKT[mk].name)} · plan from ${esc(day(P.asof))}</span></div>
+    <section class="t3-tiles"><div class="t3-tile buy"><small>Orders to place</small><b>${buys.length}</b><span>${buys.filter((r) => r.trigger).length} buy-stops</span></div>
+      <div class="t3-tile sell"><small>Sell</small><b>${sells.length}</b><span>${H.size ? 'from holdings' : 'no holdings loaded'}</span></div>
+      <div class="t3-tile"><small>Holding</small><b>${H.size}</b><span>stocks</span></div></section>
+    ${bar ? `<h2 class="x3-h">How your capital is split</h2>${bar}` : ''}</section>`;
+  el.insertAdjacentHTML('afterbegin', hero);
+}
+function pf3Hero() {
+  const el = $('#view-pf'); if (!el || el.querySelector('.x3-hero') || !state.pf) return; const P = pfLoad(); if (!P.h.length) return;
+  const px = state.pf.px || {}; let inv = 0, val = 0, dayp = 0;
+  const R = P.h.map((h) => { const p = px[h.s]; const ltp = p ? p[0] : null; const v = ltp != null ? h.q * ltp : h.q * h.a; inv += h.q * h.a; val += v; if (ltp != null && p[1]) dayp += h.q * (ltp - p[1]); return { s: h.s, v, pl: ltp != null ? (ltp / h.a - 1) * 100 : 0 }; }).sort((a, b) => b.v - a.v);
+  const pl = val - inv, plp = inv ? pl / inv * 100 : 0; const COL = ['#8B9CFF', '#5FE3B0', '#FFC56B', '#FF8A98', '#B7A6FF', '#7FD1FF'];
+  const top = R.slice(0, 6), rest = R.slice(6).reduce((a, x) => a + x.v, 0);
+  const win = R.filter((x) => x.pl > 0).length;
+  const hero = `<section class="x3-hero t3"><div class="x3-pf"><div><small class="muted">Your holdings</small><b class="x3-big">${lakh(val)}</b></div>
+      <div><small class="muted">Profit</small><b class="x3-big ${pl >= 0 ? 'up' : 'down'}">${pl >= 0 ? '+' : '−'}${lakh(Math.abs(pl))}</b><small class="${pl >= 0 ? 'up' : 'down'}">${pl >= 0 ? '+' : '−'}${fmt(Math.abs(plp), 1)}%</small></div>
+      <div><small class="muted">Today</small><b class="x3-big ${dayp >= 0 ? 'up' : 'down'}">${dayp >= 0 ? '+' : '−'}${lakh(Math.abs(dayp))}</b></div></div>
+    <div class="x3-alloc" role="img" aria-label="Biggest holdings">${top.map((x, i) => `<span style="flex:${x.v};background:${COL[i]}">${x.v / val > 0.07 ? esc(x.s) : ''}</span>`).join('')}${rest ? `<span style="flex:${rest};background:var(--mute-line)">${rest / val > 0.07 ? 'Others' : ''}</span>` : ''}</div>
+    <div class="x3-wl" role="img" aria-label="${win} of ${R.length} holdings in profit">${R.map((x) => `<i class="${x.pl > 0 ? 'w' : ''}" title="${esc(x.s)}"></i>`).join('')}</div>
+    <small class="muted">${win} of ${R.length} holdings in profit · stored only on this device</small></section>`;
+  el.insertAdjacentHTML('afterbegin', hero);
+}
+{ const LM = loadMarkets; loadMarkets = async function () { await LM(); try { await mk3Hero(); } catch (e) { console.warn('mk3', e); } };
+  const LL = loadLive; loadLive = async function () { await LL(); try { await lv3Hero(); } catch (e) { console.warn('lv3', e); } };
+  const RP = renderPortfolio; renderPortfolio = function () { RP(); try { pf3Hero(); } catch (e) { console.warn('pf3', e); } }; }

@@ -1519,3 +1519,32 @@ input,select,textarea{font-size:16px!important}
 .st-rk { font-family: var(--font-head); font-weight: 800; font-size: 20px; color: var(--mute-line); }
 .st-nm { display: flex; flex-direction: column; min-width: 0; } .st-nm b { font-family: var(--font-head); font-size: clamp(15px, 2.2vw, 20px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .st-nm small { font-size: 13px; font-weight: 700; color: var(--slate); } .st-nm small.up { color: var(--rise); }
 @media (max-width: 560px) { .st-row { grid-template-columns: 26px minmax(0, 1fr) minmax(0, 1.2fr); } .st-y { grid-column: 2 / -1; } .t3-xs { grid-template-columns: 1fr; } .t3-hgrid { grid-template-columns: repeat(10, minmax(0, 1fr)); } }
+/* every tab: Deck picture header (22 Nov 2026) */
+.x3-hero { padding-top: 4px; }
+.x3-w { font-size: clamp(64px, 12vw, 128px); }
+.x3-h { margin: 0; font-family: var(--font-head); font-weight: 700; font-size: clamp(22px, 3vw, 30px); }
+.x3-sub { margin: -14px 0 0; font-size: 14px; }
+.x3-mkts { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 12px; }
+.x3-mkt { border: 0; cursor: pointer; text-align: left; background: var(--card); color: var(--ink); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 4px; font-family: var(--font-body); border-top: 6px solid var(--mute-line); }
+.x3-mkt.ok { border-top-color: var(--rise); } .x3-mkt.bad { border-top-color: var(--fall); }
+.x3-mn { font-weight: 700; font-size: 16px; } .x3-mkt b { font-family: var(--font-head); font-size: 30px; } .x3-mkt small { color: var(--slate); font-size: 13px; }
+.x3-fh { display: block; height: 10px; border-radius: 99px; background: var(--fall-soft); overflow: hidden; margin-top: 6px; } .x3-fh i { display: block; height: 100%; background: var(--rise); border-radius: 99px; }
+.x3-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 10px; }
+.x3-tile { border: 0; cursor: pointer; text-align: left; background: var(--card); color: var(--ink); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 6px; font-family: var(--font-body); }
+.x3-tile i { display: block; height: 10px; border-radius: 99px; } .x3-tile b { font-size: 16px; } .x3-tile small { font-size: 13px; color: var(--slate); font-weight: 600; } .x3-tile em { font-style: normal; color: var(--saffron); }
+.x3-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.x3-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.x3-ch { border-top: 6px solid; background: var(--card); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; } .x3-ch b { font-family: var(--font-head); font-size: 30px; } .x3-ch span { font-weight: 700; font-size: 14px; color: var(--slate); }
+.x3-ind { border: 0; cursor: pointer; text-align: left; background: var(--card); color: var(--ink); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 6px; font: 600 13px var(--font-body); min-width: 0; }
+.x3-ind span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .x3-ind i { display: block; height: 6px; border-radius: 99px; }
+@media (max-width: 640px) { .x3-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.x3-fold .x3-old { margin-top: 12px; display: grid; gap: 12px; }
+.x3-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.x3-conn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; background: var(--fall-soft); color: var(--fall-ink); font-weight: 700; font-size: 15px; }
+.x3-conn i { width: 10px; height: 10px; border-radius: 50%; background: currentColor; } .x3-conn.ok { background: var(--rise-soft); color: var(--rise-ink); }
+.x3-alloc { display: flex; height: 48px; border-radius: 16px; overflow: hidden; gap: 2px; }
+.x3-alloc span { display: flex; align-items: center; justify-content: center; color: #17142B; font-weight: 800; font-size: 14px; min-width: 0; overflow: hidden; white-space: nowrap; }
+.x3-pf { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } .x3-pf > div { background: var(--card); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 2px; }
+.x3-big { font-family: var(--font-head); font-size: clamp(22px, 4vw, 36px); }
+@media (max-width: 560px) { .x3-pf { grid-template-columns: 1fr 1fr; } .x3-pf > div:first-child { grid-column: 1 / -1; } }
+.x3-wl { display: flex; flex-wrap: wrap; gap: 5px; } .x3-wl i { width: 18px; height: 18px; border-radius: 5px; background: var(--fall); } .x3-wl i.w { background: var(--rise); }
