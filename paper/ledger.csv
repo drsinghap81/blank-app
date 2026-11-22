@@ -2,3 +2,6 @@ Instrument,EntryDate,Side,Entry,Signal,ExitDate,Exit,Reason,Open,Points,Pct,PnL,
 BANKNIFTY,2026-10-21,BUY,55943.0,Buy above prev top,2026-10-21,55383.57,Entry-day SL,False,-559.43,-1.0,-559.0,0.0,60,-33566.0,1678.0,-35244.0,Closed
 BANKNIFTY,2026-10-27,SELL,54217.2,Sell below prev bottom,2026-10-28,54403.0,System point,False,144.6,-0.343,-186.0,330.40000000000146,60,8676.0,1627.0,7049.0,Closed
 BANKNIFTY,2026-10-28,BUY,54403.0,Reverse at system point,2026-11-20,64556.6,Open position,True,10153.6,18.664,10154.0,0.0,60,609216.0,1632.0,607584.0,OPEN (marked to last close)
+NIFTY,2026-10-21,BUY,23131.2,Buy above prev top,2026-10-21,22899.89,Entry-day SL,False,-231.31,-1.0,-231.0,0.0,65,-15035.0,752.0,-15787.0,Closed
+NIFTY,2026-11-16,BUY,25320.7,Buy above prev top,2026-11-18,25159.0,System point,False,-161.7,-0.639,-162.0,0.0,65,-10510.0,823.0,-11333.0,Closed
+NIFTY,2026-11-19,BUY,25427.3,Buy above prev top,2026-11-20,25775.3,Open position,True,348.0,1.369,348.0,0.0,65,22620.0,826.0,21794.0,OPEN (marked to last close)

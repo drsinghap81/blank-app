@@ -5,5 +5,13 @@ Position: LONG from 54,403.00 (2026-10-28)  (2 lots x 30)
     HOLD long. Stop: Sell below 61,922 — system point (exit & REVERSE)
     Gap > 1% beyond a level at the open: exit only, no new trade (let the market settle)
 
-Paper P&L since 2026-10-19: realised Rs -28,195, open Rs 607,584, trades 3 (W 1/L 1)
+*TOP BOTTOM LEVELS for 23/11/2026*
+
+*NIFTY FUT (23-NOV) - Closing Price 25,775.30*
+Position: LONG from 25,427.30 (2026-11-19)  (1 lot x 65)
+    HOLD long. Stop: Sell below 25,227 — system point (exit & REVERSE)
+    Move SL to breakeven (25,427) once price reaches 25,936
+    Gap > 1% beyond a level at the open: exit only, no new trade (let the market settle)
+
+Paper P&L since 2026-10-19: realised Rs -55,315, open Rs 629,378, trades 6 (W 1/L 3)
 _Paper trading only - not investment advice_
