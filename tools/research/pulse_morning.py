@@ -184,13 +184,22 @@ def main():
             dh = yf.download(ch_, period="730d", interval="60m", progress=False, group_by="column", auto_adjust=True, threads=True)
             if dh is None or not len(dh):
                 continue
-            cl = dh["Close"]; cl.index = pd.to_datetime(cl.index)
-            if cl.index.tz is not None:
-                cl.index = cl.index.tz_convert("Asia/Kolkata").tz_localize(None)
-            first = cl[cl.index.time == pd.Timestamp("09:15").time()]      # the 09:15 bar closes at 10:15
+            cl, op = dh["Close"], dh["Open"]
+            for X_ in (cl, op):
+                X_.index = pd.to_datetime(X_.index)
+                if X_.index.tz is not None:
+                    X_.index = X_.index.tz_convert("Asia/Kolkata").tz_localize(None)
+            m915 = cl.index.time == pd.Timestamp("09:15").time()      # the 09:15 bar closes at 10:15
+            # hourly and daily series are adjusted differently -> keep the first hour's MOVE and apply it to the daily open
+            mv = (cl[m915] / op[m915]).replace([np.inf, -np.inf], np.nan)
             for t in ch_:
-                if t in first.columns:
-                    sr = first[t].dropna(); H1[t[:-3]] = {pd.Timestamp(k.date()): float(v) for k, v in sr.items()}
+                if t in mv.columns:
+                    sr = mv[t].dropna(); sr = sr[(sr > 0.8) & (sr < 1.25)]
+                    o_ = O[t[:-3]] if t[:-3] in O.columns else None
+                    if o_ is None:
+                        continue
+                    H1[t[:-3]] = {pd.Timestamp(k.date()): float(v * o_.get(pd.Timestamp(k.date()), np.nan)) for k, v in sr.items()
+                                  if np.isfinite(o_.get(pd.Timestamp(k.date()), np.nan))}
             time.sleep(2)
         dates = sorted({d_ for v in H1.values() for d_ in v})
         hstart = dates[0] + pd.Timedelta(days=7) if dates else None
