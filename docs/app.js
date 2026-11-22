@@ -8481,13 +8481,22 @@ async function perfEvery(mk) {
     const tr = []; ((TU && TU.rows) || []).forEach((x) => { (x.trades || []).filter((t) => t.entry >= T0).forEach((t) => tr.push({ sym: x.name, R: t.R, open: false }));
       if (x.status === 'in trade' && x.entry_date >= T0) tr.push({ sym: x.name, R: x.open_R || 0, open: true, trailed: (x.trail_stop || 0) > (x.fixed_stop || 0) }); });
     if (tr.length) by.tu = { n: tr.length, pnl: tr.reduce((a, t) => a + t.R * 0.01 * C, 0), cost: 0, w: tr.filter((t) => t.R > 0).length, on: false, R: tr }; }
-  let tb = null;
+  let tb = null, gmF = null, erF = null;
   if (mk === 'NSE') { const t = await getText(fresh(MAIN + 'paper/ledger.csv')); const T = pfCsv(t).filter((x) => x.Net);
-    if (T.length) tb = { n: T.length, pnl: T.reduce((a, x) => a + (+x.Net || 0), 0), openPnl: T.filter((x) => x.Open === 'True').reduce((a, x) => a + (+x.Net || 0), 0), open: T.filter((x) => x.Open === 'True').length, w: T.filter((x) => +x.Net > 0).length, since: T[0].EntryDate, notional: 2000000 }; }
-  return { rows, peak, by, tb, since: L && L.since, asof, C };
+    if (T.length) { const one = (L) => ({ n: L.length, pnl: L.reduce((a, x) => a + (+x.Net || 0), 0), openPnl: L.filter((x) => x.Open === 'True').reduce((a, x) => a + (+x.Net || 0), 0), open: L.filter((x) => x.Open === 'True').length, w: L.filter((x) => +x.Net > 0).length });
+      const bn = T.filter((x) => x.Instrument !== 'NIFTY'), nf = T.filter((x) => x.Instrument === 'NIFTY');
+      tb = { ...one(T), since: T[0].EntryDate, notional: 2000000 + (nf.length ? 1600000 : 0), bn: one(bn), nf: nf.length ? one(nf) : null }; }
+    /* monthly systems (22 Nov 2026): Growth + momentum = its 25 picks from the month-end list (equal weight, return since the list price);
+       ETF rotation = this month's holding return (etf_rotation history) */
+    const [GM, ER] = await Promise.all([getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom').catch(() => null), getJSON(MAIN + 'data/scan/etf_rotation.json', 'etf_rotation').catch(() => null)]);
+    if (GM && GM.picks && GM.picks.length) { const P2 = GM.picks.filter((x) => x.since != null); gmF = { n: P2.length, pct: P2.reduce((a, x) => a + x.since, 0) / P2.length, w: P2.filter((x) => x.since > 0).length, since: GM.price_day }; }
+    if (ER && ER.history) { const H2 = ER.history.filter((x) => x.month >= '2026-11'); if (H2.length) erF = { n: H2.length, pct: (H2.reduce((a, x) => a * (1 + (x.ret_pct || 0) / 100), 1) - 1) * 100, hold: (ER.provisional || ER.current || {}).hold || [], since: H2[0].decided }; } }
+  if (gmF) by.gm = { n: gmF.n, pnl: gmF.pct / 100 * C, cost: C, w: gmF.w, on: false, open: true };
+  if (erF) by.er = { n: erF.n, pnl: erF.pct / 100 * C, cost: C, w: erF.pct > 0 ? 1 : 0, on: false, open: true };
+  return { rows, peak, by, tb, since: L && L.since, asof, C, gmF, erF };
 }
-const PF_SYS = { mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21 any stock', vcp: 'Tight base', rt: 'Retest', pt: 'Bottom pattern', tb: 'Top Bottom', tu: 'Turtle (all markets)' };
-const PF_BT = { mom: '44% win, +24%/trade', t9: '41% win, +7%/trade', tf: '10.5%/yr', rt: '+0.2R/trade', pt: 'no edge', tu: '+0.25R/trade', vcp: 'watch' };
+const PF_SYS = { mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21 any stock', vcp: 'Tight base', rt: 'Retest', pt: 'Bottom pattern', tb: 'Top Bottom', tu: 'Turtle (all markets)', gm: 'Growth + momentum', er: 'ETF rotation' };
+const PF_BT = { mom: '44% win, +24%/trade', t9: '41% win, +7%/trade', tf: '10.5%/yr', rt: '+0.2R/trade', pt: 'no edge', tu: '+0.25R/trade', vcp: 'watch', gm: '24.7%/yr', er: '17.7%/yr' };
 /* how each forward-test trade ended (22 Nov 2026: "it should track target hit, SL hit, SL trailed") */
 const PF_OUT = [['target', 'Target hit', 'var(--rise)'], ['trailx', 'Trailed stop hit', 'var(--accent)'], ['exit', 'Exit signal', '#B7A6FF'], ['sl', 'SL hit', 'var(--fall)'],
   ['trail', 'Open · stop trailed', 'var(--rise-soft)'], ['open', 'Open', 'var(--sel)']];
@@ -8514,11 +8523,15 @@ async function perfSection(el) {
   const box = document.createElement('section'); box.className = 'pf-perf t3'; box.innerHTML = '<p class="muted">Working out performance…</p>';
   const anchor = el.querySelector('.x3-wlist') || el.querySelector('.x3-hero'); if (anchor) anchor.after(box); else el.prepend(box);
   const E = await perfEvery(mk).catch(() => null);
-  const stockP = E ? E.rows.reduce((a, r) => a + r.pnl, 0) : 0; const tbP = E && E.tb ? E.tb.pnl : 0; const TU = E && E.by.tu; const tuP = TU ? TU.pnl : 0; const tuOpen = TU ? TU.R.filter((t) => t.open).reduce((a, t) => a + t.R * 0.01 * E.C, 0) : 0; const tot = stockP + tbP + tuP;
-  const capUsed = (E ? E.peak : 0) + (E && E.tb ? E.tb.notional : 0); const pct = capUsed ? tot / capUsed * 100 : null;
+  const stockP = E ? E.rows.reduce((a, r) => a + r.pnl, 0) : 0; const tbP = E && E.tb ? E.tb.pnl : 0; const TU = E && E.by.tu; const tuP = (TU ? TU.pnl : 0) + (E && E.by.gm ? E.by.gm.pnl : 0) + (E && E.by.er ? E.by.er.pnl : 0); const tuOpen = (TU ? TU.R.filter((t) => t.open).reduce((a, t) => a + t.R * 0.01 * E.C, 0) : 0) + (E && E.by.gm ? E.by.gm.pnl : 0) + (E && E.by.er ? E.by.er.pnl : 0); const tot = stockP + tbP + tuP;
+  const capUsed = (E ? E.peak : 0) + (E && E.tb ? E.tb.notional : 0) + (E && E.by.gm ? E.C : 0) + (E && E.by.er ? E.C : 0); const pct = capUsed ? tot / capUsed * 100 : null;
   const n = E ? E.rows.length : 0, w = E ? E.rows.filter((r) => r.pnl > 0).length : 0;
   const items = E ? Object.entries(E.by).map(([k, v]) => ({ k: (PF_SYS[k] || k) + (v.on ? '' : ' · not traded'), pnl: v.pnl, sub: `${v.n} trades · ${v.w} up${PF_BT[k] ? ' · backtest ' + PF_BT[k] : ''}` })) : [];
-  if (E && E.tb) items.push({ k: 'Top Bottom (paper)', pnl: E.tb.pnl, sub: `${E.tb.n} trades · 2 lots · backtest 33% win` });
+  if (E && E.tb) { items.push({ k: 'Top Bottom · Bank Nifty (paper)', pnl: E.tb.bn.pnl, sub: `${E.tb.bn.n} trades · 2 lots · backtest 33% win` });
+    if (E.tb.nf) items.push({ k: 'Top Bottom · Nifty buy only (paper)', pnl: E.tb.nf.pnl, sub: `${E.tb.nf.n} trades · 1 lot · backtest 40% win` }); }
+  /* option RSI-60 basket: the server's paper trader (every signal, 1 lot), when the server is connected */
+  { const c0 = lvCfg(); if (mk === 'NSE' && c0.url && c0.token) { const O = await lvApi('/api/opt/trader').catch(() => null); const h = O && O.history;
+      if (h && h.trades) items.push({ k: 'Option RSI-60 basket (paper)', pnl: h.pnl || 0, sub: `${h.trades} trades · ${h.up_days}/${h.days} days up · 1 lot each` }); } }
   items.sort((a, b) => b.pnl - a.pnl);
   const seg = `<div class="t3-mk">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia']].map(([k, nm]) => `<button data-pfm="${k}" aria-selected="${mk === k}">${nm}</button>`).join('')}</div>`;
   let live = '<div class="pf-live-none"><b>Connect your server</b><small>Live › Connect: your real Angel trades and the Top Bottom bot appear here.</small></div>';

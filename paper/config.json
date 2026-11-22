@@ -5,6 +5,11 @@
     "BANKNIFTY": {
       "buffer_pts": 25,
       "lots": 2
+    },
+    "NIFTY": {
+      "buffer_pts": 12,
+      "lots": 1,
+      "long_only": true
     }
   },
   "rules": {

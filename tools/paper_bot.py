@@ -151,6 +151,7 @@ def build_ledger(sym: str, h: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, di
     p = tbb.Params(buffer_pts=inst["buffer_pts"], day_sl_pct=rules["day_sl_pct"], max_sl_pct=rules["max_sl_pct"],
                    be_pct=rules["be_pct"], gap_pct=rules["gap_pct"], use_once=rules["use_once"],
                    event_exit=bool(rules.get("event_exit", False)),
+                   long_only=bool(inst.get("long_only", False)),   # 22 Nov 2026: Nifty paper book = the live Nifty bot (buy only)
                    start_flat_on=None if join else cfg["start_date"])
     df = h.copy()
     df.index = pd.to_datetime(df["Date"])
