@@ -99,7 +99,7 @@ def signals(x):
             if not c[t] > k_ * t + b_ or pk in used:
                 break
             used.add(pk); e = c[t]
-            out.append(dict(t=t, e=e, shape=shape, lane=lane, pole=top / base - 1, tgt=e + (top - base), fl=min(plo, l[t]),
+            out.append(dict(t=t, e=e, shape=shape, lane=lane, pole=top / base - 1, tgt=e + (top - base), fl=min(plo, l[t]), pk=pk, lo_i=lo_i, a=a, b=b, depth=depth,
                             sl=min(kl_ * t + bl_, l[t]) if shape != "Rectangle" else min(plo, l[t]), bl=l[t], atr=e - 2 * atr[t]))
             break
     return out
