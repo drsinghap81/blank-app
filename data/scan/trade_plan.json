@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-22 04:26 UTC",
+"generated": "2026-11-22 04:30 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-20",
@@ -490,7 +490,7 @@
 "results_ind": "Pharmaceuticals",
 "rank": 10,
 "risk_pct": 13.2,
-"r3m": null
+"r3m": 18.8
 }
 ],
 "more": [],
