@@ -1,0 +1,136 @@
+{
+ "method": "Strong-Pulse + rotation industries as a STOCK system (22 Nov 2026, Amritpal: \"yes test it\").\n\nEach Friday close, select NSE basic industries in the top 10% by 1-month Pulse AND whose weekly rotation is Leading or Improving\n(tools/research/rotation_pulse.py - best industry basket there, 45.6%/yr). Then hold stocks inside them:\n  BASKET    every liquid stock of the selected industries, equal weight\n  TOP10     the 10 strongest TRENDING stocks (Pulse definition) of the selected industries by 3-month relative strength;\n            a holding stays while it ranks in the top 20 and its industry stays selected (buffer cuts churn); equal weight\n  TOP5      same with 5 / 10\nControls: TOP10 ANY = the 10 strongest trending stocks from ANY industry (does the industry filter add?) | top-10% Pulse only\n(no rotation) TOP10 | all industries equal weight | Nifty 50.\nTrading: decided at the Friday close; filled at that close (FRI) or at Monday's open (MON, realistic); 0.2% cost per side on the\nweight that changes. Survivors only (today's industry members) - flatters every row. Newest first, bull/bear, ex-Covid.\nLIMIT env = pilot. Output data/research/pulse_system(_pilot).json",
+ "industries": 106,
+ "stocks": 1025,
+ "runs": {
+  "TOP10 MON (live rule)": {
+   "CAGR": 34.5,
+   "max DD": -35.9,
+   "1y": 20.0,
+   "2y": 16.0,
+   "3y": 40.0,
+   "5y": 42.5,
+   "years": {
+    "2026": 20.3,
+    "2025": 4.9,
+    "2024": 100.7,
+    "2023": 78.7,
+    "2022": 19.6,
+    "2021": 57.9,
+    "2020": 8.1,
+    "2019": 8.9,
+    "2018": -13.1,
+    "2017": 84.1,
+    "2016": 38.7
+   },
+   "bull/bear a year": [
+    60.4,
+    -23.6
+   ],
+   "ex-Covid": [
+    37.0,
+    -28.8
+   ],
+   "turnover_x_per_year": 53.8,
+   "avg_holdings": 7.3
+  },
+  "only while FII bought regularly (20-day net > 0)": {
+   "CAGR": 17.8,
+   "max DD": -23.9,
+   "1y": -12.3,
+   "2y": -1.8,
+   "3y": 10.8,
+   "5y": 16.9,
+   "years": {
+    "2026": -5.6,
+    "2025": 7.7,
+    "2024": 34.4,
+    "2023": 49.8,
+    "2022": 6.6,
+    "2021": -5.2,
+    "2020": 47.1,
+    "2019": 7.4,
+    "2018": -9.5,
+    "2017": 30.3,
+    "2016": 44.4
+   },
+   "bull/bear a year": [
+    22.2,
+    4.6
+   ],
+   "ex-Covid": [
+    14.9,
+    -23.9
+   ],
+   "turnover_x_per_year": 30.3,
+   "avg_holdings": 4.0
+  },
+  "only while FII bought regularly (60-day net > 0)": {
+   "CAGR": 17.7,
+   "max DD": -25.9,
+   "1y": -12.6,
+   "2y": -8.9,
+   "3y": 9.4,
+   "5y": 13.2,
+   "years": {
+    "2026": -12.6,
+    "2025": -4.9,
+    "2024": 54.4,
+    "2023": 42.5,
+    "2022": 1.9,
+    "2021": 26.8,
+    "2020": 15.4,
+    "2019": 13.9,
+    "2018": -3.5,
+    "2017": 26.3,
+    "2016": 45.9
+   },
+   "bull/bear a year": [
+    26.5,
+    -6.6
+   ],
+   "ex-Covid": [
+    17.7,
+    -25.9
+   ],
+   "turnover_x_per_year": 25.7,
+   "avg_holdings": 3.4
+  },
+  "skip while FII sell heavily (20-day net in its bottom 20%)": {
+   "CAGR": 21.1,
+   "max DD": -36.1,
+   "1y": 19.8,
+   "2y": 14.2,
+   "3y": 26.1,
+   "5y": 24.1,
+   "years": {
+    "2026": 20.1,
+    "2025": 12.2,
+    "2024": 44.8,
+    "2023": 43.7,
+    "2022": 5.2,
+    "2021": 2.4,
+    "2020": 16.7,
+    "2019": 8.9,
+    "2018": -22.1,
+    "2017": 76.1,
+    "2016": 40.5
+   },
+   "bull/bear a year": [
+    37.9,
+    -20.4
+   ],
+   "ex-Covid": [
+    21.2,
+    -38.5
+   ],
+   "turnover_x_per_year": 45.6,
+   "avg_holdings": 5.9
+  }
+ },
+ "gates": {
+  "buy20": "only while FII bought regularly (20-day net > 0)",
+  "buy60": "only while FII bought regularly (60-day net > 0)",
+  "noheavy": "skip while FII sell heavily (20-day net in its bottom 20%)"
+ }
+}
