@@ -1633,3 +1633,5 @@ input,select,textarea{font-size:16px!important}
 .s-sys { border-left: 5px solid var(--accent); }
 .s-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 2px; list-style: none; }
 .s-chips .chip { cursor: pointer; font-size: 14px; padding: 8px 12px; border: 0; }
+.pc-svg .pc-e21 { fill: none; stroke: var(--rise); stroke-width: 2.5; stroke-dasharray: 8 6; opacity: .6; }
+.pc-svg .pc-ex { fill: var(--fall); stroke: var(--paper); stroke-width: 4; } .pc-svg .pc-lab.r { fill: var(--fall); }

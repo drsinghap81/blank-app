@@ -8255,10 +8255,10 @@ async function loadStrat() {
     { k: 't9', name: '9/21 any stock', test: '21%/yr · off', ok: 1, rows: pl.filter((r) => bkOf(r) === 't9').map((r) => row(r.symbol, 'Switched off', { r, sc: r.score || 0 })) },
     { k: 'pt', name: 'Bottoming out', test: 'no edge', ok: 0, note: 'Watch only: W and triple bottoms did no better than a random stock in our tests.', rows: ((PT && PT.rows) || []).filter((x) => x.kind !== 'index').map((x) => row(x.symbol, `${TYP[x.typ] || x.typ} · ${x.status === 'breakout' ? 'broke out' : fmt(x.to_neck_pct, 1) + '% to go'}`, { sc: x.status === 'breakout' ? 1 : 0 })) },
     { k: 'rt', name: 'Retest', test: 'weak', ok: 0, note: 'Watch only: a small edge per trade, but it lost money as a 10-stock portfolio.', rows: pl.filter((r) => bkOf(r) === 'rt').map((r) => row(r.symbol, 'At old breakout', { r, sc: r.score || 0 })) },
-    { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only: uptrend (higher high + higher low, 21- and 200-day averages rising), a 15%+ pole, then a tight flag, pennant or box. Earlier test: +3% vs the market in 60 days, but a weak system on its own.',
-      rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2)} · target ${fmt(x.target, 0)}`, { sc: x.status === 'breakout' ? 2 : 1, fl: x })) },
+    { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only. Tested on 30,360 NSE breakouts (2016-26): stop under the flag low, sell on the first close below the 21-day average: +2.2% a trade (+1.4% selling at the pole target). Rectangles did best (+7.3%), then established uptrends. Last 2 years slightly negative.',
+      ord: 1, rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2)} · exit below 21-day avg`, { sc: x.status === 'breakout' ? 2 : 1, fl: x, pri: (x.status === 'breakout' ? 4 : 0) + (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0) })) },
     { k: 'vcp', name: 'Tight bases', test: 'watch', ok: 0, note: 'Watch only: tested, did not beat ATH or 9/21.', rows: (((V && (V.rows || V)) || []).slice ? ((V.rows || V) || []).slice(0, 30) : []).map((x) => row(x.symbol, 'Squeezing', { sc: 0 })) }];
-  SYS.forEach((s) => s.rows.sort((a, b) => b.s - a.s || (b.sc || 0) - (a.sc || 0)));
+  SYS.forEach((s) => s.rows.sort((a, b) => (b.pri || 0) - (a.pri || 0) || b.s - a.s || (b.sc || 0) - (a.sc || 0)));   // flags: tested order (breakout, rectangle, established) first
   const k = state.stratK && SYS.some((s) => s.k === state.stratK) ? state.stratK : 'mom'; const S = SYS.find((s) => s.k === k);
   const seg = `<div class="t3-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([m, n]) => `<button data-smk="${m}" role="tab" aria-selected="${mk === m}">${n}</button>`).join('')}</div>`;
   el.innerHTML = `<div class="t3">${seg}
@@ -8708,18 +8708,23 @@ function patternSvg(S, f) {
     <line x1="${X(xi(U[0]))}" y1="${Y(U[1])}" x2="${X(xi(U[2]))}" y2="${Y(U[3])}" class="pc-fl"/><line x1="${X(xi(Lo[0]))}" y1="${Y(Lo[1])}" x2="${X(xi(Lo[2]))}" y2="${Y(Lo[3])}" class="pc-fl"/>
     <text x="${X(xi(U[0]))}" y="${Y(U[1]) - 18}" class="pc-lab a">${esc(f.shape)}</text>` : '';
   const hl = (v, cls, lab) => (v ? `<line x1="${X(Math.max(0, xi((g.pole || [T[0]])[0])))}" x2="${xe}" y1="${Y(v)}" y2="${Y(v)}" class="${cls}"/><text x="${W - 8}" y="${Y(v) + 7}" text-anchor="end" class="${cls}-t">${esc(lab)}</text>` : '');
+  // 22 Nov 2026 (tested exit): the 21-day EMA, and the first close below it after the breakout
+  const e21 = (() => { const k = 2 / 22; let v = null; return S.c.map((x) => (v = v == null ? x : v + k * (x - v))); })();
+  const exI = f.status === 'breakout' ? (() => { const s0 = xi(f.bo_date); for (let i = s0 + 1; i < m; i++) if (Cc[i] < e21[a + i]) return i; return -1; })() : -1;
+  const exitDot = exI >= 0 ? `<circle cx="${X(exI)}" cy="${Y(Cc[exI])}" r="12" class="pc-ex"/><text x="${X(exI)}" y="${Y(Cc[exI]) + 44}" text-anchor="middle" class="pc-lab r">Exit</text>` : '';
+  f._exit = exI >= 0 ? T[exI] : null; f._e21 = e21[e21.length - 1];
   const bo = f.status === 'breakout' ? (() => { const i = xi(f.bo_date); return `<circle cx="${X(i)}" cy="${Y(Cc[i])}" r="13" class="pc-bo"/><text x="${X(i)}" y="${Y(Cc[i]) + 46}" text-anchor="middle" class="pc-lab g">Breakout</text>`; })() : '';
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" class="t3-svg pc-svg" role="img" aria-label="${esc(f.symbol)} ${esc(f.shape)}: pole, ${esc(f.shape.toLowerCase())} lines, ${f.status === 'breakout' ? 'breakout' : 'buy level'}, stop and target marked">
-    ${ma(S.sma200, 'pc-ma2')}${ma(S.sma50, 'pc-ma1')}${cand}${pole}${flagPoly}
-    ${hl(f.target, 'pc-tg', 'Target ' + fmt(f.target, 0))}${f.status !== 'breakout' ? hl(f.trigger, 'pc-tr', 'Buy above ' + fmt(f.trigger, 0)) : ''}${hl(f.stop, 'pc-st', 'Stop ' + fmt(f.stop, 0))}${bo}
+    ${ma(S.sma200, 'pc-ma2')}${ma(S.sma50, 'pc-ma1')}${ma(e21, 'pc-e21')}${cand}${pole}${flagPoly}
+    ${hl(f.target, 'pc-tg', 'Pole target ' + fmt(f.target, 0))}${exitDot}${f.status !== 'breakout' ? hl(f.trigger, 'pc-tr', 'Buy above ' + fmt(f.trigger, 0)) : ''}${hl(f.stop, 'pc-st', 'Stop ' + fmt(f.stop, 0))}${bo}
     <text x="30" y="${H - 8}" class="t3-ax">${esc(day(T[0]))}</text><text x="${X(m - 1)}" y="${H - 8}" text-anchor="end" class="t3-ax">${esc(day(T[m - 1]))}</text></svg>`;
 }
 async function patternView(f, mk) {
   const Mz = (v) => (mk === 'NSE' ? inr(v, 0) : `${MKT[mk].cur}${fmt(v, 2, MKT[mk].loc)}`);
   openPanel(`<div class="t3"><div class="t3w-h"><div><h2 style="font-family:var(--font-head);margin:0">${esc(f.symbol)}</h2><small class="muted">${esc(f.shape)} · ${f.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${f.status === 'breakout' ? 'broke out ' + esc(day(f.bo_date)) : 'forming'}</small></div></div>
     <div id="pcbox" class="sp-chart"><p class="muted">Loading chart…</p></div>
-    <div class="t3-key"><span><i style="background:var(--rise)"></i>Pole</span><span><i style="background:var(--accent)"></i>${esc(f.shape)}</span><span><i style="background:var(--saffron)"></i>50-day</span><span><i style="background:var(--mute-line)"></i>200-day</span></div>
-    <div class="sp-why"><div class="ok"><b>${Mz(f.status === 'breakout' ? f.entry : f.trigger)}</b><small>${f.status === 'breakout' ? 'breakout close' : 'buy above'}</small></div><div class="bad"><b>${Mz(f.stop)}</b><small>stop · −${fmt(f.risk_pct, 1)}%</small></div><div class="ok"><b>${Mz(f.target)}</b><small>target (+ pole)</small></div></div>
+    <div class="t3-key"><span><i style="background:var(--rise)"></i>Pole</span><span><i style="background:var(--accent)"></i>${esc(f.shape)}</span><span><i style="background:var(--saffron)"></i>50-day</span><span><i style="background:var(--mute-line)"></i>200-day</span><span><i style="background:var(--rise);opacity:.6"></i>21-day (exit)</span></div>
+    <div class="sp-why"><div class="ok"><b>${Mz(f.status === 'breakout' ? f.entry : f.trigger)}</b><small>${f.status === 'breakout' ? 'breakout close' : 'buy above'}</small></div><div class="bad"><b>${Mz(f.stop)}</b><small>stop · −${fmt(f.risk_pct, 1)}%</small></div><div class="ok" id="pcex"><b>${f.ema21 ? Mz(f.ema21) : '21-day avg'}</b><small>exit on a close below the 21-day avg</small></div></div>
     <div class="t3-rules"><div class="t3-rule"><b>+${fmt(f.pole_pct, 0)}%</b><small>pole · ${esc(day(f.pole_start))} → ${esc(day(f.pole_top))}</small></div><div class="t3-rule"><b>${f.flag_days}</b><small>sessions in the ${esc(f.shape.toLowerCase())}</small></div><div class="t3-rule"><b>−${fmt(f.depth_pct, 1)}%</b><small>pullback from the top</small></div></div>
     <div class="sp-cbar"><a class="sp-tv" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(f.symbol, mk))}">Open in TradingView ↗</a><button class="t3-link" id="pcsp">Stock page</button></div></div>`);
   history.pushState({ sheet: 1 }, ''); $('#pcsp').addEventListener('click', () => stockPage({ mk, sym: f.symbol, name: f.name || f.symbol, kind: 'stock' }));
@@ -8727,6 +8732,8 @@ async function patternView(f, mk) {
   let S = await get(MAIN + MKT[mk].path + 'pattern_charts/' + fp + '.json');
   if (!S || !S.t) { const d = await tdChartData({ symbol: f.symbol, system: 'x', bucket: 'tf' }, mk).catch(() => null); if (d && d.tf === 'Daily') S = d; }
   const box = $('#pcbox'); if (box) box.innerHTML = S && S.t ? patternSvg(S, f) : '<p class="muted">No daily chart stored for this one yet (it appears after the next scan).</p>';
+  const ex = $('#pcex'); if (ex && S && S.t) ex.outerHTML = f._exit ? `<div class="bad" id="pcex"><b>Exit ${esc(day(f._exit))}</b><small>closed below the 21-day avg</small></div>`
+    : `<div class="ok" id="pcex"><b>${Mz(f._e21)}</b><small>21-day avg: sell on a close below it</small></div>`;
 }
 
 /* ------------------------------------------------------------------ Search by system (22 Nov 2026)
@@ -8781,7 +8788,8 @@ async function sysRows(s, mk, q) {
     const F = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);
     const only = /pennant|pendant/.test(qn) ? 'Pennant' : /rectangle|box/.test(qn) ? 'Rectangle' : null;
     return ((F && F.rows) || []).filter((x) => !only || x.shape === only).map((x) => ({ sym: x.symbol, fl: x, buy: x.status === 'breakout', sc: x.status === 'breakout' ? 2 : 1,
-      st: `${x.shape} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2)}` }));
+      pri: (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0),
+      st: `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2)}` }));
   }
   if (s.id === 'pt') {
     const T = await getJSON(MP + 'patterns.json', mk === 'NSE' ? 'patterns' : 'patterns_' + mk).catch(() => null); const TYP = { DB: 'W bottom', TW: 'Tilted W', TB: 'Triple bottom', IHS: 'Inv H&S' };
@@ -8811,7 +8819,7 @@ async function sysListView(s, mk, q) {
   const [rows, X] = await Promise.all([sysRows(s, mk, q), t3Ctx(mk).catch(() => null)]);
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
   rows.forEach((x) => { x.ch = X && !x.etfOnly && !x.fund ? X.chain(x.sym) : null; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
-  rows.sort((a, b) => (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || b.s - a.s || (b.sc || 0) - (a.sc || 0));
+  rows.sort((a, b) => (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || (b.pri || 0) - (a.pri || 0) || b.s - a.s || (b.sc || 0) - (a.sc || 0));
   const seg = s.nse ? '' : `<div class="t3-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([m, n]) => `<button data-ymk="${m}" role="tab" aria-selected="${mk === m}">${n}</button>`).join('')}</div>`;
   const nBuy = rows.filter((x) => x.buy).length;
   $('#sheet-body').innerHTML = `<div class="t3">${x3Trail([{ t: 'Search', go: () => searchOpen(), done: true }, { t: s.name, on: true }])}

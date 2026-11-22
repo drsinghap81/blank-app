@@ -401,6 +401,7 @@ def flag(x, sym, name):
                 row["stop"] = round(float(plo), 2)
                 e = float(c[bo]); row.update(status="breakout", bo_date=D[bo], entry=round(e, 2), days_since=back,
                                              target=round(e + (top - base), 2), risk_pct=round((1 - plo / e) * 100, 1), ret_pct=round((c[-1] / e - 1) * 100, 1))
+            row["ema21"] = round(float(x.Close.ewm(span=21, adjust=False).mean().iloc[-1]), 2)   # tested exit: a daily close below it
             if best is None or (row["status"] == "breakout" and best["status"] != "breakout"):
                 best = row
             break
@@ -492,7 +493,7 @@ def main(mk="NSE"):
     order = {"breakout": 0, "forming": 1}
     rows.sort(key=lambda r: (r["kind"] != "index", order[r["status"]], r["to_neck_pct"] if r["status"] == "forming" else r["days_since"]))
     out = dict(generated=datetime.now(timezone.utc).isoformat(timespec="minutes"), asof=str(asof), market=mk, regime=regime if mk == "NSE" else None,
-               rules="zigzag 6% on closes; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; "
+               rules="neighbouring swing lows (zigzag 3% on closes), neckline >= 6% above the low; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; "
                      "breakout = close above the neckline within 60 days of the last low",
                backtest="2016-26, 3,994 signals: 120-day return +3.5% vs +7.4% for a random liquid stock; in market downtrends +10.5% "
                         "vs +13.6% for any stock; target before stop 63% vs 63% for a random stock; with bullish RSI divergence "
@@ -526,15 +527,18 @@ def main(mk="NSE"):
                              "UK": "UK: not backtested yet - watch only."}.get(mk, ""),
                    rows=vrows), open(f"{OUT}/vcp.json", "w"), indent=0)
     print("vcp", len(vrows), {k: sum(r["status"] == k for r in vrows) for k in VO})
-    frows.sort(key=lambda r: (r["status"] != "breakout", r["lane"] != "early", r.get("days_since") or 0, r.get("to_trigger_pct") or 0))
+    # 22 Nov 2026 (flag stop test, 30,360 NSE breakouts 2016-26): rectangles did best (+7.3% a trade vs flags +2.0%), established
+    # uptrends beat new ones (+2.7% vs +1.9%) -> listed first
+    frows.sort(key=lambda r: (r["status"] != "breakout", r["shape"] != "Rectangle", r["lane"] != "established", r.get("days_since") or 0, r.get("to_trigger_pct") or 0))
     json.dump(dict(generated=out["generated"], asof=out["asof"], market=mk,
                    rules="Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. "
                          "Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, "
                          "no close above the pole top, close above the 200-day average. Early = the pole started within 4% of the 200-day average "
-                         "(fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low; target = trigger + pole.",
-                   backtest="Tested 14 Nov 2026 (769 NSE stocks 2015-26): bull flags in uptrends +3.3% vs the market over 60 days; as a full system "
-                            "22.2%/yr but -40.9% worst fall (ATH breakout 19.8%, -37%), and it flips sign in several years. Early vs established lanes "
-                            "not tested yet - watch only.",
+                         "(fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
+                   backtest="Tested 22 Nov 2026 (2,421 NSE stocks, 30,360 breakouts 2016-26): flag-low stop + exit on a close below the 21-day EMA "
+                            "+2.2% a trade (profit factor 1.71) vs +1.4% (1.34) selling at the pole target; breakout-day-low stop worse (stopped 81%). "
+                            "Rectangles +7.3% (PF 3.2), pennants +2.3%, flags +2.0%; established uptrends +2.7% vs new +1.9%. Last 2 years -0.6% a trade "
+                            "and portfolio drawdowns of 55-70% - watch only.",
                    rows=frows), open(f"{OUT}/flags.json", "w"), indent=0)
     print("flags", len(frows), {k: sum(r["status"] == k for r in frows) for k in ("breakout", "forming")}, {k: sum(r["lane"] == k for r in frows) for k in ("early", "established")}, {k: sum(r["shape"] == k for r in frows) for k in ("Flag", "Pennant", "Rectangle")})
     print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["sq9_match"] for r in srows), "on a Square-of-9 number")
