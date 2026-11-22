@@ -1,0 +1,487 @@
+{
+ "method": "FII cash flows - daily (market) and fortnightly by sector (22 Nov 2026, Amritpal: \"have you considered FII investment into\nindices, stocks, all assets yet?\" -> \"yes do it\").\n\nData (NSDL FPI monitor, public):\n  daily  Archive.aspx, one request per month -> 'Equity / Stock Exchange' net investment (Rs cr) per reporting date. The reporting\n         date covers trades up to the previous session, so a value is used from the NEXT session on (no look-ahead).\n  sector StaticReports/Fortnightly_Sector_wise_FII_Investment_Data/*.html -> equity net investment in the fortnight and equity\n         AUC per sector. Old (to ~2023) GICS-like names are mapped to NSE's macro sectors. Used from 7 calendar days after the\n         fortnight end (publication lag).\nPrices: Nifty 50 (Yahoo); NSE macro-sector indices = turnover-weighted (60-day median value) daily returns of the liquid NSE\nstocks in each macro sector (group_pulse NSE map, today's members -> survivors), 2015-26.\nTests\n  A  Nifty next 5 / 20 / 60 sessions by FII flow state: 5- and 20-day net sums ranked against the past 250 sessions (no\n     look-ahead); heavy selling = bottom 20%, heavy buying = top 20%. Newest first.\n  B  9/21 live book (10 positions, 1% risk, 3-month ranking) skipping new buys while the 20-day FII flow is in its bottom 20%;\n     and while the 5-day flow is negative. (engine: tools/research/morning_check.run, gate = market-wide flow state)\n  C  Sectors: rank by fortnight equity net investment / equity AUC; next 2 / 4 / 8 weeks of the sector index vs the average\n     sector; top-3 minus bottom-3; portfolio holding the top 3 FII-bought sectors (fortnightly) vs all sectors equal weight.\nPILOT env = 2023-26 only, 150 stocks. Output data/research/fii_test(_pilot).json + fii_daily.csv / fii_sector.csv",
+ "A_nifty": {
+  "5-day flow | heavy selling (bottom 20%)": {
+   "5d": {
+    "n": 862,
+    "avg": 0.33,
+    "up": 61,
+    "last 1y": 0.36,
+    "last 2y": 0.32,
+    "last 3y": 0.51,
+    "last 5y": 0.4
+   },
+   "20d": {
+    "n": 862,
+    "avg": 1.41,
+    "up": 63,
+    "last 1y": 3.14,
+    "last 2y": 1.75,
+    "last 3y": 2.16,
+    "last 5y": 1.38
+   },
+   "60d": {
+    "n": 851,
+    "avg": 4.08,
+    "up": 74,
+    "last 1y": 1.64,
+    "last 2y": 0.86,
+    "last 3y": 3.6,
+    "last 5y": 3.18
+   }
+  },
+  "5-day flow | middle": {
+   "5d": {
+    "n": 1524,
+    "avg": 0.21,
+    "up": 56,
+    "last 1y": -0.29,
+    "last 2y": -0.06,
+    "last 3y": 0.03,
+    "last 5y": -0.01
+   },
+   "20d": {
+    "n": 1521,
+    "avg": 0.6,
+    "up": 59,
+    "last 1y": -0.91,
+    "last 2y": -0.09,
+    "last 3y": 0.45,
+    "last 5y": 0.46
+   },
+   "60d": {
+    "n": 1496,
+    "avg": 1.96,
+    "up": 63,
+    "last 1y": -2.0,
+    "last 2y": -0.51,
+    "last 3y": 1.3,
+    "last 5y": 1.4
+   }
+  },
+  "5-day flow | heavy buying (top 20%)": {
+   "5d": {
+    "n": 675,
+    "avg": 0.14,
+    "up": 52,
+    "last 1y": 0.29,
+    "last 2y": 0.04,
+    "last 3y": 0.29,
+    "last 5y": 0.29
+   },
+   "20d": {
+    "n": 663,
+    "avg": 0.82,
+    "up": 65,
+    "last 1y": -3.19,
+    "last 2y": -2.03,
+    "last 3y": -0.62,
+    "last 5y": -0.17
+   },
+   "60d": {
+    "n": 659,
+    "avg": 2.03,
+    "up": 61,
+    "last 1y": -3.41,
+    "last 2y": -2.51,
+    "last 3y": 0.16,
+    "last 5y": 0.87
+   }
+  },
+  "5-day flow | all days": {
+   "5d": {
+    "n": 3061,
+    "avg": 0.23,
+    "up": 57,
+    "last 1y": -0.02,
+    "last 2y": 0.1,
+    "last 3y": 0.19,
+    "last 5y": 0.16
+   },
+   "20d": {
+    "n": 3046,
+    "avg": 0.88,
+    "up": 62,
+    "last 1y": -0.42,
+    "last 2y": 0.09,
+    "last 3y": 0.68,
+    "last 5y": 0.56
+   },
+   "60d": {
+    "n": 3006,
+    "avg": 2.58,
+    "up": 66,
+    "last 1y": -1.59,
+    "last 2y": -0.51,
+    "last 3y": 1.7,
+    "last 5y": 1.57
+   }
+  },
+  "20-day flow | heavy selling (bottom 20%)": {
+   "5d": {
+    "n": 880,
+    "avg": 0.25,
+    "up": 60,
+    "last 1y": 0.56,
+    "last 2y": 0.37,
+    "last 3y": 0.47,
+    "last 5y": 0.39
+   },
+   "20d": {
+    "n": 876,
+    "avg": 1.57,
+    "up": 66,
+    "last 1y": 2.7,
+    "last 2y": 1.14,
+    "last 3y": 2.04,
+    "last 5y": 1.39
+   },
+   "60d": {
+    "n": 865,
+    "avg": 3.95,
+    "up": 72,
+    "last 1y": 0.95,
+    "last 2y": 0.4,
+    "last 3y": 3.67,
+    "last 5y": 3.07
+   }
+  },
+  "20-day flow | middle": {
+   "5d": {
+    "n": 1467,
+    "avg": 0.16,
+    "up": 55,
+    "last 1y": -0.07,
+    "last 2y": 0.03,
+    "last 3y": 0.13,
+    "last 5y": 0.07
+   },
+   "20d": {
+    "n": 1460,
+    "avg": 0.3,
+    "up": 57,
+    "last 1y": -1.01,
+    "last 2y": 0.04,
+    "last 3y": 0.52,
+    "last 5y": 0.55
+   },
+   "60d": {
+    "n": 1440,
+    "avg": 1.52,
+    "up": 62,
+    "last 1y": -1.23,
+    "last 2y": -0.42,
+    "last 3y": 1.13,
+    "last 5y": 1.63
+   }
+  },
+  "20-day flow | heavy buying (top 20%)": {
+   "5d": {
+    "n": 699,
+    "avg": 0.34,
+    "up": 56,
+    "last 1y": -0.63,
+    "last 2y": -0.36,
+    "last 3y": 0.0,
+    "last 5y": 0.07
+   },
+   "20d": {
+    "n": 695,
+    "avg": 1.19,
+    "up": 66,
+    "last 1y": -2.99,
+    "last 2y": -2.21,
+    "last 3y": -1.18,
+    "last 5y": -0.64
+   },
+   "60d": {
+    "n": 686,
+    "avg": 2.95,
+    "up": 65,
+    "last 1y": -3.3,
+    "last 2y": -2.76,
+    "last 3y": -0.46,
+    "last 5y": 0.53
+   }
+  },
+  "20-day flow | all days": {
+   "5d": {
+    "n": 3046,
+    "avg": 0.23,
+    "up": 57,
+    "last 1y": -0.02,
+    "last 2y": 0.1,
+    "last 3y": 0.19,
+    "last 5y": 0.16
+   },
+   "20d": {
+    "n": 3031,
+    "avg": 0.87,
+    "up": 62,
+    "last 1y": -0.42,
+    "last 2y": 0.09,
+    "last 3y": 0.68,
+    "last 5y": 0.56
+   },
+   "60d": {
+    "n": 2991,
+    "avg": 2.55,
+    "up": 65,
+    "last 1y": -1.59,
+    "last 2y": -0.51,
+    "last 3y": 1.7,
+    "last 5y": 1.57
+   }
+  }
+ },
+ "C_sectors": {
+  "forward": {
+   "2w": {
+    "n": 233,
+    "top3": 0.09,
+    "bottom3": -0.04,
+    "spread": 0.13,
+    "rank_corr": 0.011,
+    "top3_beat": 54,
+    "spread last 1y": -0.19,
+    "spread last 2y": -0.02,
+    "spread last 3y": 0.45,
+    "spread last 5y": 0.39
+   },
+   "4w": {
+    "n": 233,
+    "top3": 0.35,
+    "bottom3": 0.04,
+    "spread": 0.31,
+    "rank_corr": 0.025,
+    "top3_beat": 52,
+    "spread last 1y": -0.69,
+    "spread last 2y": -0.5,
+    "spread last 3y": 0.38,
+    "spread last 5y": 0.45
+   },
+   "8w": {
+    "n": 231,
+    "top3": 0.58,
+    "bottom3": 0.05,
+    "spread": 0.52,
+    "rank_corr": 0.01,
+    "top3_beat": 50,
+    "spread last 1y": -0.03,
+    "spread last 2y": -0.21,
+    "spread last 3y": 0.59,
+    "spread last 5y": 1.04
+   }
+  },
+  "portfolio": {
+   "top 3 FII-bought sectors": {
+    "CAGR": 16.5,
+    "max DD": -37.1,
+    "1y": -0.1,
+    "2y": -2.7,
+    "3y": 8.1,
+    "5y": 10.6,
+    "years": {
+     "2026": -0.3,
+     "2025": -11.6,
+     "2024": 34.2,
+     "2023": 29.0,
+     "2022": 8.9,
+     "2021": 56.7,
+     "2020": 5.3,
+     "2019": 7.0,
+     "2018": 12.9,
+     "2017": 37.9,
+     "2016": 15.2,
+     "2015": 14.8
+    }
+   },
+   "bottom 3": {
+    "CAGR": 10.2,
+    "max DD": -42.6,
+    "1y": 0.8,
+    "2y": 0.2,
+    "3y": -2.5,
+    "5y": 2.1,
+    "years": {
+     "2026": -1.3,
+     "2025": 1.8,
+     "2024": -17.2,
+     "2023": 40.4,
+     "2022": -4.2,
+     "2021": 66.8,
+     "2020": 16.0,
+     "2019": 4.7,
+     "2018": -4.5,
+     "2017": 47.7,
+     "2016": 4.5,
+     "2015": -5.7
+    }
+   },
+   "all sectors equal": {
+    "CAGR": 12.1,
+    "max DD": -41.0,
+    "1y": 0.8,
+    "2y": -1.0,
+    "3y": 7.2,
+    "5y": 8.9,
+    "years": {
+     "2026": 0.8,
+     "2025": -5.5,
+     "2024": 19.9,
+     "2023": 33.0,
+     "2022": 2.3,
+     "2021": 48.4,
+     "2020": 13.6,
+     "2019": 0.7,
+     "2018": -1.7,
+     "2017": 39.8,
+     "2016": 2.3,
+     "2015": 3.0
+    }
+   }
+  },
+  "latest": {
+   "fortnight": "2026-11-15",
+   "top": [
+    [
+     "Media Entertainment & Publication",
+     5.36
+    ],
+    [
+     "Construction",
+     2.52
+    ],
+    [
+     "Consumer Services",
+     2.25
+    ],
+    [
+     "Financial Services",
+     2.2
+    ],
+    [
+     "Telecommunication",
+     2.03
+    ]
+   ],
+   "bottom": [
+    [
+     "Forest Materials",
+     -0.94
+    ],
+    [
+     "Capital Goods",
+     -0.84
+    ],
+    [
+     "Textiles",
+     -0.48
+    ],
+    [
+     "Chemicals",
+     -0.33
+    ],
+    [
+     "Diversified",
+     -0.25
+    ]
+   ]
+  }
+ },
+ "B_921": {
+  "baseline (live)": {
+   "CAGR": 26.8,
+   "max drawdown": -27.6,
+   "last 1y": 9.6,
+   "last 1y dd": -14.1,
+   "last 2y": 14.5,
+   "last 2y dd": -19.1,
+   "last 3y": 17.7,
+   "last 3y dd": -20.0,
+   "last 5y": 22.2,
+   "last 5y dd": -20.0,
+   "years": {
+    "2026": 11.8,
+    "2025": 8.1,
+    "2024": 27.6,
+    "2023": 46.6,
+    "2022": -1.7,
+    "2021": 132.7,
+    "2020": 56.5,
+    "2019": 12.5,
+    "2018": -12.0,
+    "2017": 30.4,
+    "2016": 15.2
+   },
+   "bull a year": 40.5,
+   "bear a year": -7.4,
+   "ex-Covid a year": 26.3,
+   "ex-Covid dd": -27.6,
+   "trades": 565,
+   "avg trade": 5.7
+  },
+  "skip while 20-day FII flow in bottom 20%": {
+   "CAGR": 16.3,
+   "max drawdown": -30.0,
+   "last 1y": -11.9,
+   "last 1y dd": -15.2,
+   "last 2y": -0.7,
+   "last 2y dd": -18.1,
+   "last 3y": 5.1,
+   "last 3y dd": -19.5,
+   "last 5y": 6.3,
+   "last 5y dd": -25.0,
+   "years": {
+    "2026": -9.5,
+    "2025": 9.0,
+    "2024": 7.1,
+    "2023": 41.8,
+    "2022": -11.9,
+    "2021": 97.9,
+    "2020": 54.8,
+    "2019": 3.4,
+    "2018": -8.2,
+    "2017": 8.9,
+    "2016": 16.4
+   },
+   "bull a year": 30.5,
+   "bear a year": -19.0,
+   "ex-Covid a year": 14.6,
+   "ex-Covid dd": -30.0,
+   "trades": 523,
+   "avg trade": 4.19
+  },
+  "skip while 5-day FII flow negative": {
+   "CAGR": 10.9,
+   "max drawdown": -30.2,
+   "last 1y": -12.8,
+   "last 1y dd": -17.5,
+   "last 2y": 1.0,
+   "last 2y dd": -19.1,
+   "last 3y": 2.3,
+   "last 3y dd": -25.0,
+   "last 5y": 10.1,
+   "last 5y dd": -25.0,
+   "years": {
+    "2026": -13.2,
+    "2025": 14.7,
+    "2024": 1.0,
+    "2023": 65.9,
+    "2022": 1.4,
+    "2021": 38.0,
+    "2020": 40.9,
+    "2019": -8.6,
+    "2018": -9.6,
+    "2017": -1.5,
+    "2016": 10.7
+   },
+   "bull a year": 22.3,
+   "bear a year": -18.5,
+   "ex-Covid a year": 10.1,
+   "ex-Covid dd": -30.2,
+   "trades": 489,
+   "avg trade": 2.76
+  }
+ }
+}
