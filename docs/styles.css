@@ -1604,3 +1604,15 @@ input,select,textarea{font-size:16px!important}
 .pf-sh i, .pf-sbar span { display: inline-block; } .pf-sh i { width: 12px; height: 12px; border-radius: 4px; }
 .pf-split .bk { background: var(--accent); } .pf-split .op { background: var(--saffron); }
 .pf-sbar { grid-column: 1 / -1; display: flex; height: 14px; border-radius: 99px; overflow: hidden; gap: 2px; }
+/* trade drill-down (22 Nov 2026) */
+.pf-bar.tap { cursor: pointer; border-radius: 14px; padding: 6px; margin: -6px; } .pf-bar.tap:hover { background: var(--hover); }
+.pf-bar.tap .pf-bn::after { content: ' ›'; color: var(--accent); }
+.tr-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto !important; }
+.tr-mid { display: flex; flex-direction: column; gap: 6px; min-width: 0; } .tr-mid .sp-sys { align-self: flex-start; font-size: 12.5px; padding: 5px 9px; }
+.tr-row > b { font-family: var(--font-head); font-size: 16px; text-align: right; } .tr-row > b small { display: block; font-family: var(--font-body); font-size: 12px; }
+.tr-svg .tr-sl { stroke: var(--fall); stroke-width: 3; stroke-dasharray: 10 8; } .tr-svg .tr-sl-t { fill: var(--fall-ink); font: 700 24px var(--font-body); }
+.tr-svg .tr-ts { stroke: var(--fall); stroke-width: 4; } .tr-svg .tr-ts-t { fill: var(--fall-ink); font: 800 24px var(--font-body); }
+.tr-svg .tr-tg { stroke: var(--rise); stroke-width: 3; stroke-dasharray: 10 8; } .tr-svg .tr-tg-t { fill: var(--rise); font: 700 24px var(--font-body); }
+.tr-svg .tr-zone.up { fill: var(--rise); fill-opacity: .08; } .tr-svg .tr-zone.dn { fill: var(--fall); fill-opacity: .08; }
+.tr-svg .tr-in { fill: var(--accent); stroke: var(--paper); stroke-width: 4; } .tr-svg .tr-in-t { fill: var(--accent); font: 800 24px var(--font-body); }
+.tr-svg .tr-out.up { fill: var(--rise); } .tr-svg .tr-out.dn { fill: var(--fall); } .tr-svg .tr-out { stroke: var(--paper); stroke-width: 4; } .tr-svg .tr-out-t { fill: var(--ink); font: 800 24px var(--font-body); }

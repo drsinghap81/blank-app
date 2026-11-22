@@ -8515,7 +8515,7 @@ function pfSplit(booked, open, money) {
 }
 function perfBars(items, money) {   // [{k, pnl, sub}] -> horizontal bars around zero
   const mx = Math.max(1, ...items.map((x) => Math.abs(x.pnl)));
-  return `<div class="pf-bars">${items.map((x) => `<div class="pf-bar"><span class="pf-bn">${esc(x.k)}<small>${esc(x.sub || '')}</small></span><span class="pf-bt"><i class="${x.pnl >= 0 ? 'up' : 'dn'}" style="width:${Math.max(2, Math.abs(x.pnl) / mx * 100)}%"></i></span><b class="${x.pnl >= 0 ? 'up' : 'down'}">${x.pnl >= 0 ? '+' : '−'}${money(Math.abs(x.pnl))}</b></div>`).join('')}</div>`;
+  return `<div class="pf-bars">${items.map((x) => `<div class="pf-bar${x.pk ? ' tap' : ''}" ${x.pk ? `role="button" tabindex="0" data-pk="${esc(x.pk)}"` : ''}><span class="pf-bn">${esc(x.k)}<small>${esc(x.sub || '')}</small></span><span class="pf-bt"><i class="${x.pnl >= 0 ? 'up' : 'dn'}" style="width:${Math.max(2, Math.abs(x.pnl) / mx * 100)}%"></i></span><b class="${x.pnl >= 0 ? 'up' : 'down'}">${x.pnl >= 0 ? '+' : '−'}${money(Math.abs(x.pnl))}</b></div>`).join('')}</div>`;
 }
 async function perfSection(el) {
   if (!el || el.querySelector('.pf-perf')) return;
@@ -8526,9 +8526,10 @@ async function perfSection(el) {
   const stockP = E ? E.rows.reduce((a, r) => a + r.pnl, 0) : 0; const tbP = E && E.tb ? E.tb.pnl : 0; const TU = E && E.by.tu; const tuP = (TU ? TU.pnl : 0) + (E && E.by.gm ? E.by.gm.pnl : 0) + (E && E.by.er ? E.by.er.pnl : 0); const tuOpen = (TU ? TU.R.filter((t) => t.open).reduce((a, t) => a + t.R * 0.01 * E.C, 0) : 0) + (E && E.by.gm ? E.by.gm.pnl : 0) + (E && E.by.er ? E.by.er.pnl : 0); const tot = stockP + tbP + tuP;
   const capUsed = (E ? E.peak : 0) + (E && E.tb ? E.tb.notional : 0) + (E && E.by.gm ? E.C : 0) + (E && E.by.er ? E.C : 0); const pct = capUsed ? tot / capUsed * 100 : null;
   const n = E ? E.rows.length : 0, w = E ? E.rows.filter((r) => r.pnl > 0).length : 0;
-  const items = E ? Object.entries(E.by).map(([k, v]) => ({ k: (PF_SYS[k] || k) + (v.on ? '' : ' · not traded'), pnl: v.pnl, sub: `${v.n} trades · ${v.w} up${PF_BT[k] ? ' · backtest ' + PF_BT[k] : ''}` })) : [];
-  if (E && E.tb) { items.push({ k: 'Top Bottom · Bank Nifty (paper)', pnl: E.tb.bn.pnl, sub: `${E.tb.bn.n} trades · 2 lots · backtest 33% win` });
-    if (E.tb.nf) items.push({ k: 'Top Bottom · Nifty buy only (paper)', pnl: E.tb.nf.pnl, sub: `${E.tb.nf.n} trades · 1 lot · backtest 40% win` }); }
+  if (E) state._pfE = E;
+  const items = E ? Object.entries(E.by).map(([k, v]) => ({ pk: (k === 'er' ? '' : 'f:' + k), k: (PF_SYS[k] || k) + (v.on ? '' : ' · not traded'), pnl: v.pnl, sub: `${v.n} trades · ${v.w} up${PF_BT[k] ? ' · backtest ' + PF_BT[k] : ''}` })) : [];
+  if (E && E.tb) { items.push({ pk: 'f:tb_bn', k: 'Top Bottom · Bank Nifty (paper)', pnl: E.tb.bn.pnl, sub: `${E.tb.bn.n} trades · 2 lots · backtest 33% win` });
+    if (E.tb.nf) items.push({ pk: 'f:tb_nf', k: 'Top Bottom · Nifty buy only (paper)', pnl: E.tb.nf.pnl, sub: `${E.tb.nf.n} trades · 1 lot · backtest 40% win` }); }
   /* option RSI-60 basket: the server's paper trader (every signal, 1 lot), when the server is connected */
   { const c0 = lvCfg(); if (mk === 'NSE' && c0.url && c0.token) { const O = await lvApi('/api/opt/trader').catch(() => null); const h = O && O.history;
       if (h && h.trades) items.push({ k: 'Option RSI-60 basket (paper)', pnl: h.pnl || 0, sub: `${h.trades} trades · ${h.up_days}/${h.days} days up · 1 lot each` }); } }
@@ -8547,8 +8548,9 @@ async function perfSection(el) {
       const [bnC, nfC] = await Promise.all([futLast('BANKNIFTY').catch(() => null), futLast('NIFTY').catch(() => null)]);
       const tbOpenU = [[TB, (TB && TB.live_trades) || [], bnC], [TN, (TN && TN.live_trades) || [], nfC]].reduce((a, [X, L, cl]) => { const o = L.filter((t) => !t.exit_fill).pop(); const lp = (X && X.status && X.status.ltp) || cl;
         return a + (o && lp && o.fill ? (lp - o.fill) * (o.qty || 0) * (o.side === 'SELL' ? -1 : 1) : 0); }, 0);
-      const sysI = ((P && P.systems) || []).map((x) => ({ k: x.system, pnl: x.pnl, sub: `${x.n} trades${x.pct != null ? ' · ' + (x.pct >= 0 ? '+' : '') + fmt(x.pct, 1) + '%' : ''}` }));
-      sysI.push({ k: 'Top Bottom', pnl: tbPnl + tbOpenU, sub: tbl.length ? `${tbClosed.length} closed${tbl.length > tbClosed.length ? ' · 1 open' : ''} · real fills` : `no real order yet · bot ${TB ? esc(TB.mode) : 'not reachable'}` });
+      state._pfLive = { S, tb: tbl.map((t) => ({ ...t, _now: !t.exit_fill ? (((t.ins === 'Nifty' ? TN : TB) || {}).status || {}).ltp || (t.ins === 'Nifty' ? nfC : bnC) : null })) };
+      const sysI = ((P && P.systems) || []).map((x) => ({ pk: 'l:' + x.system, k: x.system, pnl: x.pnl, sub: `${x.n} trades${x.pct != null ? ' · ' + (x.pct >= 0 ? '+' : '') + fmt(x.pct, 1) + '%' : ''}` }));
+      sysI.push({ pk: 'l:Top Bottom', k: 'Top Bottom', pnl: tbPnl + tbOpenU, sub: tbl.length ? `${tbClosed.length} closed${tbl.length > tbClosed.length ? ' · 1 open' : ''} · real fills` : `no real order yet · bot ${TB ? esc(TB.mode) : 'not reachable'}` });
       const lt = (P ? P.total_pnl || 0 : 0) + tbPnl + tbOpenU; const lBooked = (P ? P.closed.pnl : 0) + tbPnl, lOpen = (P ? P.open.pnl : 0) + tbOpenU;
       live = P || tbl.length ? `<div class="pf-big"><b class="${lt >= 0 ? 'up' : 'down'}">${lt >= 0 ? '+' : '−'}${lakh(Math.abs(lt))}</b><small>${P && P.total_pct != null ? `stocks ${P.total_pct >= 0 ? '+' : ''}${fmt(P.total_pct, 1)}%` : ''}${tbOpenU || tbPnl ? ` · Top Bottom ${tbOpenU + tbPnl >= 0 ? '+' : '−'}${lakh(Math.abs(tbOpenU + tbPnl))}` : ''}${P && P.since ? ' · since ' + esc(day(P.since)) : ''}</small></div>
         <div class="t3-tiles"><div class="t3-tile"><small>Open</small><b>${P ? P.open.n : 0}</b><span>${P ? (P.open.pnl >= 0 ? '+' : '−') + lakh(Math.abs(P.open.pnl)) : ''}</span></div><div class="t3-tile"><small>Closed</small><b>${P ? P.closed.n : 0}</b><span>${P ? P.closed.wins + ' won' : ''}</span></div><div class="t3-tile"><small>Top Bottom</small><b>${tbl.length}</b><span>${TB ? esc(TB.mode) : ''}</span></div></div>
@@ -8570,5 +8572,96 @@ async function perfSection(el) {
       : '<p class="muted">The signal log starts filling after the first nights of scans.</p>'}</article>
       <article class="pf-card"><h3>Live · your real trades</h3>${live}</article></div>`;
   box.querySelectorAll('[data-pfm]').forEach((b) => b.addEventListener('click', () => { state.pfMk = b.dataset.pfm; box.remove(); perfSection(el); }));
+  box.querySelectorAll('[data-pk]').forEach((b) => b.addEventListener('click', async () => { const [w, k] = [b.dataset.pk.slice(0, 1), b.dataset.pk.slice(2)];
+    const name = b.querySelector('.pf-bn') ? b.querySelector('.pf-bn').childNodes[0].textContent : k;
+    if (w === 'f') sysTradesView(name, await pfFwdTrades(k, mk), 'Forward test · every signal, simulated');
+    else sysTradesView(name, pfLiveTrades(k), 'Live · your real trades'); }));
 }
 { const PH2 = pf3Hero; pf3Hero = function () { PH2(); try { perfSection($('#view-pf')); } catch (e) { console.warn('perf', e); } }; }
+
+/* ------------------------------------------------------------------ Per-system trade drill-down (22 Nov 2026)
+   Amritpal: "I should be able to see and analyse profit / loss under each system for each stock when I click it, with charts
+   marked with entry, SL, trailed etc. or target". Tap a system line on Performance (forward test or live) -> its trades as
+   cards (outcome, entry -> now / exit, P&L) -> tap one -> chart with Buy and Sold / Now points, the first stop, the trailed
+   stop and the target drawn on it. */
+function tradeSvg(S, m) {   // S: {t[], c[]} ; m: {d0, e, s, ts, t, d1, x, now, side}
+  const W = 1000, H = 460; let i0 = S.t.findIndex((d) => d >= (m.d0 || '')); if (i0 < 0) i0 = S.t.length - 1;
+  const a = Math.max(0, i0 - 25), b = S.t.length; const t = S.t.slice(a, b), c = S.c.slice(a, b);
+  const lv = [m.e, m.s, m.ts, m.t, m.x, m.now].filter((x) => x > 0); const lo = Math.min(...c, ...lv) * 0.985, hi = Math.max(...c, ...lv) * 1.015;
+  const X = (i) => 40 + i * (W - 80) / Math.max(1, t.length - 1), Y = (v) => H - 40 - (v - lo) / ((hi - lo) || 1) * (H - 80);
+  const xi = (d) => { const k = t.findIndex((x) => x >= d); return k < 0 ? t.length - 1 : k; };
+  const ie = xi(m.d0 || t[0]), ix = m.d1 ? xi(m.d1) : t.length - 1;
+  const line = (v, cls, lab, x0) => (v > 0 ? `<line x1="${X(x0)}" x2="${X(ix)}" y1="${Y(v)}" y2="${Y(v)}" class="${cls}"/><text x="${X(ix) - 6}" y="${Y(v) - 10}" text-anchor="end" class="${cls}-t">${esc(lab)}</text>` : '');
+  const pts = c.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  const up = (m.x || m.now || 0) >= m.e === (m.side !== 'SELL');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" class="t3-svg tr-svg" role="img" aria-label="Price with buy, stop, trailed stop and exit marked">
+    <rect x="${X(ie)}" y="20" width="${Math.max(2, X(ix) - X(ie))}" height="${H - 60}" class="tr-zone ${up ? 'up' : 'dn'}"/>
+    ${line(m.s, 'tr-sl', 'First SL ' + fmt(m.s, 0), ie)}${m.ts && m.ts > m.s * 1.001 ? line(m.ts, 'tr-ts', 'SL trailed ' + fmt(m.ts, 0), ie) : ''}${line(m.t, 'tr-tg', 'Target ' + fmt(m.t, 0), ie)}
+    <polyline points="${pts}" class="t3-line"/>
+    <circle cx="${X(ie)}" cy="${Y(m.e)}" r="14" class="tr-in"/><text x="${X(ie)}" y="${Y(m.e) + 44}" text-anchor="middle" class="tr-in-t">${m.side === 'SELL' ? 'Sold short' : 'Buy'} ${fmt(m.e, 0)}</text>
+    <circle cx="${X(ix)}" cy="${Y(m.x || m.now)}" r="14" class="tr-out ${up ? 'up' : 'dn'}"/><text x="${X(ix) - 18}" y="${Y(m.x || m.now) - 22}" text-anchor="end" class="tr-out-t">${m.x ? 'Exit' : 'Now'} ${fmt(m.x || m.now, 0)}</text>
+    <text x="40" y="${H - 8}" class="t3-ax">${esc(myd(t[0]))}</text><text x="${W - 40}" y="${H - 8}" text-anchor="end" class="t3-ax">${esc(myd(t[t.length - 1]))}</text></svg>`;
+}
+const OUT_TXT = { target: ['Target hit', 'buy'], trailx: ['Trailed SL hit', 'on'], exit: ['Exit signal', 'on'], sl: ['SL hit', 'near'], trail: ['Open · SL trailed', 'buy'], open: ['Open', 'off'] };
+async function trSeries(tr) {
+  if (tr.series) return tr.series;
+  if (tr.fut) { const tx = await getText(fresh(MAIN + 'data/futures/' + tr.fut + '.csv')); const L = (tx || '').trim().split(/\r?\n/).slice(1).map((l) => l.split(',')); return { t: L.map((v) => v[0]), c: L.map((v) => +v[4]) }; }
+  const d = await tdChartData({ symbol: tr.sym, system: 'x', bucket: 'tf' }, tr.mk || 'NSE').catch(() => null);
+  if (d && d.t && d.tf === 'Daily') return { t: d.t, c: d.c };
+  await wkLoad(tr.mk || 'NSE'); const W = state.mxW && state.mxW[tr.mk || 'NSE']; const v = W && W.s && W.s[tr.sym];
+  return v ? { t: W.t.slice(-v.length), c: v } : d && d.t ? { t: d.t, c: d.c } : null;
+}
+async function tradeView(tr) {
+  const money = (v) => lakh(Math.abs(v));
+  openPanel(`<div class="t3w"><div class="t3w-h"><span class="t3-g ${tr.pnl >= 0 ? 'gA' : 'gC'} lg">${tr.pnl >= 0 ? '+' : '−'}</span><div><h2>${esc(tr.sym)}</h2><small>${esc(tr.sys)} · ${esc(tr.src)}</small></div></div>
+    <div id="trc"><p class="muted">Loading chart…</p></div>
+    <div class="sp-why"><div class="${tr.pnl >= 0 ? 'ok' : 'bad'}"><b>${tr.pnl >= 0 ? '+' : '−'}${money(tr.pnl)}</b><small>${tr.pct != null ? (tr.pct >= 0 ? '+' : '') + fmt(tr.pct, 1) + '%' : ''} ${tr.x ? 'booked' : 'not booked'}</small></div>
+      <div class="${tr.out === 'sl' || tr.out === 'trailx' ? 'bad' : tr.out === 'target' ? 'ok' : 'warn'}"><b>${esc((OUT_TXT[tr.out] || [tr.out || 'Open'])[0])}</b><small>outcome</small></div>
+      <div class="ok"><b>${tr.days != null ? tr.days : '–'}</b><small>days held</small></div></div>
+    <div class="t3-rules">${[['Buy', tr.e, tr.d0], ['First SL', tr.s], ['SL trailed', tr.ts && tr.ts > (tr.s || 0) * 1.001 ? tr.ts : null], ['Target', tr.t], [tr.x ? 'Exit' : 'Now', tr.x || tr.now, tr.d1]].filter((r) => r[1]).map(([k, v, d]) => `<div class="t3-rule"><b>${fmt(v, v < 100 ? 2 : 0)}</b><small>${k}${d ? ' · ' + esc(day(d)) : ''}</small></div>`).join('')}</div>
+    ${tr.qty ? `<small class="muted">${tr.qty} ${tr.fut ? 'units' : 'shares'}${tr.note ? ' · ' + esc(tr.note) : ''}</small>` : tr.note ? `<small class="muted">${esc(tr.note)}</small>` : ''}
+    ${tr.mk && !tr.fut ? `<button class="t3-buy wide" id="trsp">Open stock page</button>` : ''}</div>`);
+  history.pushState({ sheet: 1 }, '');
+  const b = $('#trsp'); if (b) b.addEventListener('click', () => stockPage({ mk: tr.mk, sym: tr.sym, name: tr.sym, kind: 'stock' }));
+  const S = await trSeries(tr).catch(() => null); const box = $('#trc'); if (!box) return;
+  box.innerHTML = S && S.t && S.t.length > 2 ? tradeSvg(S, tr) : '<p class="muted">No price history stored for this one.</p>';
+}
+function sysTradesView(title, list, src) {
+  const money = (v) => lakh(Math.abs(v)); const tot = list.reduce((a, t) => a + (t.pnl || 0), 0); const w = list.filter((t) => t.pnl > 0).length;
+  const sorted = list.slice().sort((a, b) => (b.pnl || 0) - (a.pnl || 0)); const mx = Math.max(1, ...list.map((t) => Math.abs(t.pnl || 0)));
+  openPanel(`<div class="t3"><div class="t3w-h"><div><h2 style="font-family:var(--font-head);margin:0">${esc(title)}</h2><small class="muted">${esc(src)}</small></div></div>
+    <div class="t3-tiles"><div class="t3-tile"><small>Profit / loss</small><b class="${tot >= 0 ? 'up' : 'down'} pf-mid">${tot >= 0 ? '+' : '−'}${money(tot)}</b><span>${list.length} trades</span></div>
+      <div class="t3-tile"><small>Winning</small><b>${w}</b><span>of ${list.length}</span></div><div class="t3-tile"><small>Open</small><b>${list.filter((t) => !t.x).length}</b><span>not booked</span></div></div>
+    <ol class="st-list">${sorted.map((t, i) => { const o = OUT_TXT[t.out] || ['Open', 'off']; return `<li><button class="st-row tr-row" data-ti="${i}"><span class="st-nm"><b>${esc(t.sym)}</b><small>${t.d0 ? esc(day(t.d0)) : ''}</small></span>
+      <span class="tr-mid"><span class="sp-sys ${o[1]}">${o[0]}</span><span class="pf-bt"><i class="${(t.pnl || 0) >= 0 ? 'up' : 'dn'}" style="width:${Math.max(3, Math.abs(t.pnl || 0) / mx * 100)}%"></i></span></span>
+      <b class="${(t.pnl || 0) >= 0 ? 'up' : 'down'}">${(t.pnl || 0) >= 0 ? '+' : '−'}${money(t.pnl || 0)}<small>${t.pct != null ? ' ' + (t.pct >= 0 ? '+' : '') + fmt(t.pct, 1) + '%' : ''}</small></b></button></li>`; }).join('') || '<li class="empty">No trades yet.</li>'}</ol></div>`);
+  history.pushState({ sheet: 1 }, '');
+  $('#sheet-body').querySelectorAll('[data-ti]').forEach((b) => b.addEventListener('click', () => tradeView(sorted[+b.dataset.ti])));
+}
+const dDiff = (a, b) => (a ? Math.round((new Date((b || new Date().toISOString().slice(0, 10)) + 'T00:00:00') - new Date(a + 'T00:00:00')) / 864e5) : null);
+async function pfFwdTrades(key, mk) {   // forward-test trades of one system, normalised
+  const E = state._pfE; if (!E) return [];
+  if (['tb_bn', 'tb_nf'].includes(key)) { const t = await getText(fresh(MAIN + 'paper/ledger.csv')); const L = pfCsv(t).filter((x) => (key === 'tb_nf') === (x.Instrument === 'NIFTY'));
+    return L.map((x) => { const side = x.Side; const e = +x.Entry; const op = x.Open === 'True';
+      const fav = side === 'SELL' ? e / +x.Exit - 1 : +x.Exit / e - 1;   // Top Bottom moves its stop to breakeven after +2%
+      return { sym: x.Instrument === 'NIFTY' ? 'Nifty futures' : 'Bank Nifty futures', sys: 'Top Bottom (paper)', src: 'forward test', fut: x.Instrument, side, d0: x.EntryDate, e, s: side === 'SELL' ? e * 1.01 : e * 0.99, ts: op && fav >= 0.02 ? e : null,
+        x: op ? null : +x.Exit, now: +x.Exit, d1: op ? null : x.ExitDate, pnl: +x.Net, pct: +x.Points / e * 100, qty: +x.Qty, out: op ? (fav >= 0.02 ? 'trail' : 'open') : /SL/.test(x.Reason) ? 'sl' : 'exit', days: dDiff(x.EntryDate, op ? null : x.ExitDate), note: x.Reason + (op && fav >= 0.02 ? ' · stop at breakeven (+2% rule)' : '') }; }); }
+  if (key === 'tu') { const TU = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); const out = [];
+    ((TU && TU.rows) || []).forEach((r) => { const S = r.chart ? { t: r.chart.t, c: r.chart.c } : null;
+      (r.trades || []).filter((t) => t.entry >= '2026-11-16').forEach((t) => out.push({ sym: r.name, sys: 'Turtle', src: 'forward test', series: S, d0: t.entry, e: t.e, x: t.x, d1: t.exit, pnl: t.R * 0.01 * E.C, pct: (t.x / t.e - 1) * 100, out: t.R > 0 ? 'trailx' : 'sl', days: dDiff(t.entry, t.exit), note: `${fmt(t.R, 1)}R` }));
+      if (r.status === 'in trade' && r.entry_date >= '2026-11-16') out.push({ sym: r.name, sys: 'Turtle', src: 'forward test', series: S, d0: r.entry_date, e: r.entry, s: r.fixed_stop, ts: r.trail_stop, now: r.close, pnl: (r.open_R || 0) * 0.01 * E.C, pct: r.open_pct, out: r.trail_stop > r.fixed_stop ? 'trail' : 'open', days: dDiff(r.entry_date), note: `${fmt(r.open_R, 1)}R open` }); });
+    return out; }
+  if (key === 'gm') { const G = await getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom').catch(() => null); const C = E.C / 25;
+    return ((G && G.picks) || []).map((p) => ({ sym: p.symbol, mk: 'NSE', sys: 'Growth + momentum', src: 'forward test', d0: G.price_day, e: p.close, now: p.close * (1 + (p.since || 0) / 100), pnl: C * (p.since || 0) / 100, pct: p.since, out: 'open', days: dDiff(G.price_day), note: 'equal weight, 1/25 of capital' })); }
+  return E.rows.filter((r) => (r.b || 'other') === key).map((r) => ({ sym: r.sym, mk, sys: PF_SYS[key] || key, src: 'forward test', d0: r.d0, e: r.e, s: r.s, ts: r.ts, t: r.t,
+    x: r.open ? null : r.e * (1 + (r.ret || 0) / 100), now: r.e * (1 + (r.ret || 0) / 100), d1: r.open ? null : r.end, pnl: r.pnl, pct: r.ret, qty: r.q, out: pfOut(r), days: dDiff(r.d0, r.open ? null : r.end) }));
+}
+function pfLiveTrades(sys) {   // live trades of one system from the server's plan + perf
+  const L = state._pfLive || {}; const S = L.S || {}; const out = [];
+  if (sys === 'Top Bottom') return (L.tb || []).map((t) => { const op = !t.exit_fill; const now = op ? t._now : t.exit_fill; const sg = t.side === 'SELL' ? -1 : 1;
+    return { sym: (t.ins || 'Bank Nifty') + ' futures', sys, src: 'live', fut: t.ins === 'Nifty' ? 'NIFTY' : 'BANKNIFTY', side: t.side, d0: t.entry_date, e: t.fill, x: op ? null : t.exit_fill, now, d1: t.exit_date, s: t.fill * (1 - sg * 0.01),
+      pnl: t.pnl != null ? +t.pnl : now ? (now - t.fill) * (t.qty || 0) * sg : 0, pct: now ? (now / t.fill - 1) * 100 * sg : null, qty: t.qty, out: op ? 'open' : /stop|SL/i.test(t.reason || '') ? 'sl' : 'exit', days: dDiff(t.entry_date, t.exit_date) }; });
+  (S.trades || []).filter((t) => (t.system || 'Other') === sys && t.state === 'open' && t.qty && t.entry).forEach((t) => out.push({ sym: t.symbol, mk: 'NSE', sys, src: 'live', d0: t.since, e: t.entry, s: t.stop, ts: t.trail_level, t: t.target, now: t.ltp, pnl: t.ltp ? (t.ltp - t.entry) * t.qty : 0, pct: t.ltp ? (t.ltp / t.entry - 1) * 100 : null, qty: t.qty, out: t.trail_level && t.trail_level > t.stop ? 'trail' : 'open', days: dDiff(t.since) }));
+  ((S.perf && S.perf.closed && S.perf.closed.trades) || []).filter((t) => (t.system || 'Other') === sys).forEach((t) => out.push({ sym: t.symbol, mk: 'NSE', sys, src: 'live', e: t.entry, x: t.exit, d1: t.ended, pnl: t.pnl, pct: (t.exit / t.entry - 1) * 100, qty: t.qty, out: t.pnl >= 0 ? 'exit' : 'sl' }));
+  return out;
+}
