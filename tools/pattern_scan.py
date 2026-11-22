@@ -307,7 +307,7 @@ def vcp(x, sym, name):
     return best
 
 
-FL_POLE, FL_POLE_D, FL_MIN_D, FL_MAX_D, FL_DEPTH = 0.15, 15, 3, 20, 0.12
+FL_POLE, FL_POLE_D, FL_MIN_D, FL_MAX_D, FL_DEPTH = 0.15, 15, 3, 25, 0.12
 
 
 def flag(x, sym, name):
@@ -343,18 +343,36 @@ def flag(x, sym, name):
             plo = l[pz].min(); depth = 1 - plo / top
             if depth > FL_DEPTH or (top - plo) > 0.5 * (top - base):
                 continue
-            idx = np.arange(pz.start, pz.stop); hh = h[pz]
+            idx = np.arange(pz.start, pz.stop); hh = h[pz]; ll = l[pz]
             k_, b_ = np.polyfit(idx, hh, 1) if len(idx) >= 3 else (0.0, float(hh.max()))
-            if k_ > 0.002 * top:                               # a flag drifts down or sideways, not up
+            kl_ = np.polyfit(idx, ll, 1)[0] if len(idx) >= 3 else 0.0
+            flat = 0.0015 * top
+            if k_ > flat:                                      # the pause drifts down or sideways, never up
                 continue
+            # 22 Nov 2026 (Amritpal: "bullish flag, pennant, rectangle etc"): name the pause by its shape
+            shape = "Pennant" if k_ < -flat and kl_ > flat else "Rectangle" if abs(k_) <= flat and abs(kl_) <= flat else "Flag"
+            if shape == "Rectangle":
+                k_, b_ = 0.0, float(hh.max())                  # breakout = above the box top
             line = lambda t: float(k_ * t + b_)                # noqa: E731
+            # 22 Nov 2026 (Amritpal: "stock should be in an uptrend making higher highs and higher lows, averages turning up"):
+            # swings (zigzag 6% on highs / lows) before the flag: the pole top above the previous swing high, the pole's starting low
+            # at or above the previous swing low (2% tolerance), the 21-day average rising over 5 sessions and the 200-day over 20
+            Z = [z for z in _zz_hl(h[:lo_i + 1], l[:lo_i + 1], 0.06) if z[1] < lo_i]
+            ph = [z[2] for z in Z if z[0] == 1]; pl = [z[2] for z in Z if z[0] == -1]
+            # higher high = the pole top clears the previous swing high; higher low = the flag's low holds above the previous swing low
+            # (so a shakeout low that starts a new uptrend, like DATAPATTNS 6-9 Nov, counts once the pole and flag make HH + HL)
+            if not ph or not pl or not (top > ph[-1] and l[pz].min() > pl[-1]):
+                continue
+            s21 = x.Close.rolling(21).mean().to_numpy()
+            if not (s21[end] > s21[end - 5] and s200[end] >= s200[end - 20]):
+                continue
             near200 = bool(np.nanmin(l[max(0, lo_i - 30):lo_i + 1] / s200[max(0, lo_i - 30):lo_i + 1]) <= 1.04)
             est = bool(s50[end] > s200[end] and s50[end] > s50[end - 20] and s200[end] > s200[end - 20])
             lane = "early" if near200 else "established" if est else None
             if not lane:
                 continue
             trig = max(min(line(n - 1), float(hh.max())), float(c[-1]) if back == 0 else 0)
-            row = dict(symbol=sym, name=name, lane=lane, close=round(float(c[-1]), 2), pole_pct=round(pole * 100, 1),
+            row = dict(symbol=sym, name=name, lane=lane, shape=shape, close=round(float(c[-1]), 2), pole_pct=round(pole * 100, 1),
                        pole_start=D[lo_i], pole_top=D[pk], top=round(float(top), 2), flag_days=pz.stop - pz.start,
                        depth_pct=round(depth * 100, 1), stop=round(float(plo), 2), s200=round(float(s200[-1]), 2))
             bo = end; broke = c[bo] > line(bo) and c[bo] > c[bo - 1]
@@ -498,14 +516,15 @@ def main(mk="NSE"):
     print("vcp", len(vrows), {k: sum(r["status"] == k for r in vrows) for k in VO})
     frows.sort(key=lambda r: (r["status"] != "breakout", r["lane"] != "early", r.get("days_since") or 0, r.get("to_trigger_pct") or 0))
     json.dump(dict(generated=out["generated"], asof=out["asof"], market=mk,
-                   rules="Pole: >= 15% rise in <= 15 sessions. Flag: 3-20 sessions, falling or flat highs, pullback <= half the pole and <= 12%, "
+                   rules="Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. "
+                         "Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, "
                          "no close above the pole top, close above the 200-day average. Early = the pole started within 4% of the 200-day average "
                          "(fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low; target = trigger + pole.",
                    backtest="Tested 14 Nov 2026 (769 NSE stocks 2015-26): bull flags in uptrends +3.3% vs the market over 60 days; as a full system "
                             "22.2%/yr but -40.9% worst fall (ATH breakout 19.8%, -37%), and it flips sign in several years. Early vs established lanes "
                             "not tested yet - watch only.",
                    rows=frows), open(f"{OUT}/flags.json", "w"), indent=0)
-    print("flags", len(frows), {k: sum(r["status"] == k for r in frows) for k in ("breakout", "forming")}, {k: sum(r["lane"] == k for r in frows) for k in ("early", "established")})
+    print("flags", len(frows), {k: sum(r["status"] == k for r in frows) for k in ("breakout", "forming")}, {k: sum(r["lane"] == k for r in frows) for k in ("early", "established")}, {k: sum(r["shape"] == k for r in frows) for k in ("Flag", "Pennant", "Rectangle")})
     print("support", len(srows), sum(r["status"] == "touched" for r in srows), "touched;", sum(r["sq9_match"] for r in srows), "on a Square-of-9 number")
 
 

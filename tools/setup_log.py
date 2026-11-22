@@ -105,7 +105,9 @@ def main(mk):
     # setups are logged, switched-off ones too (on = False), plus bottom-pattern breakouts from patterns.json
     pats = [dict(symbol=r["symbol"], bucket="pt", system="Bottom pattern", kind="PATTERN", price=r.get("close"), stop=r.get("stop"), target=r.get("target"))
             for r in (load(D + "patterns.json").get("rows") or []) if r.get("kind") != "index" and r.get("status") == "breakout" and (r.get("days_since") or 0) <= 1]
-    for x in (P.get("top") or []) + (P.get("swing") or []) + (P.get("more") or []) + pats:
+    flg = [dict(symbol=r["symbol"], bucket="fl", system="Flag / pennant", kind="FLAG", price=r.get("entry"), stop=r.get("stop"), target=r.get("target"))
+           for r in (load(D + "flags.json").get("rows") or []) if r.get("status") == "breakout" and (r.get("days_since") or 0) == 0]
+    for x in (P.get("top") or []) + (P.get("swing") or []) + (P.get("more") or []) + pats + flg:
         b = x.get("bucket") or ""
         if not b or x["symbol"] in open_syms or not x.get("stop"):
             continue

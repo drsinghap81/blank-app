@@ -8240,6 +8240,7 @@ async function loadStrat() {
   el.innerHTML = '<p class="muted pad">Loading strategies…</p>';
   const [P, PT, X] = await Promise.all([getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null), getJSON(MP + 'patterns.json', 'pat_' + mk).catch(() => null), t3Ctx(mk)]);
   const V = await getJSON(MP + 'vcp.json', mk === 'NSE' ? 'vcp' : 'vcp_' + mk).catch(() => null);
+  const FLG = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);   // 22 Nov 2026: flags / pennants / rectangles
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
   const row = (sym, st, extra = {}) => { const ch = X.chain(sym); return { sym, st, ch, s: Pq[ch[1]] + Pq[ch[2]], y: X.yoy(sym), ...extra }; };
   const pl = (P && (P.top || []).concat(P.swing || [])) || [];
@@ -8250,6 +8251,8 @@ async function loadStrat() {
     { k: 't9', name: '9/21 any stock', test: '21%/yr · off', ok: 1, rows: pl.filter((r) => bkOf(r) === 't9').map((r) => row(r.symbol, 'Switched off', { r, sc: r.score || 0 })) },
     { k: 'pt', name: 'Bottoming out', test: 'no edge', ok: 0, note: 'Watch only: W and triple bottoms did no better than a random stock in our tests.', rows: ((PT && PT.rows) || []).filter((x) => x.kind !== 'index').map((x) => row(x.symbol, `${TYP[x.typ] || x.typ} · ${x.status === 'breakout' ? 'broke out' : fmt(x.to_neck_pct, 1) + '% to go'}`, { sc: x.status === 'breakout' ? 1 : 0 })) },
     { k: 'rt', name: 'Retest', test: 'weak', ok: 0, note: 'Watch only: a small edge per trade, but it lost money as a 10-stock portfolio.', rows: pl.filter((r) => bkOf(r) === 'rt').map((r) => row(r.symbol, 'At old breakout', { r, sc: r.score || 0 })) },
+    { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only: uptrend (higher high + higher low, 21- and 200-day averages rising), a 15%+ pole, then a tight flag, pennant or box. Earlier test: +3% vs the market in 60 days, but a weak system on its own.',
+      rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2)} · target ${fmt(x.target, 0)}`, { sc: x.status === 'breakout' ? 2 : 1 })) },
     { k: 'vcp', name: 'Tight bases', test: 'watch', ok: 0, note: 'Watch only: tested, did not beat ATH or 9/21.', rows: (((V && (V.rows || V)) || []).slice ? ((V.rows || V) || []).slice(0, 30) : []).map((x) => row(x.symbol, 'Squeezing', { sc: 0 })) }];
   SYS.forEach((s) => s.rows.sort((a, b) => b.s - a.s || (b.sc || 0) - (a.sc || 0)));
   const k = state.stratK && SYS.some((s) => s.k === state.stratK) ? state.stratK : 'mom'; const S = SYS.find((s) => s.k === k);
@@ -8495,7 +8498,7 @@ async function perfEvery(mk) {
   if (erF) by.er = { n: erF.n, pnl: erF.pct / 100 * C, cost: C, w: erF.pct > 0 ? 1 : 0, on: false, open: true };
   return { rows, peak, by, tb, since: L && L.since, asof, C, gmF, erF };
 }
-const PF_SYS = { mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21 any stock', vcp: 'Tight base', rt: 'Retest', pt: 'Bottom pattern', tb: 'Top Bottom', tu: 'Turtle (all markets)', gm: 'Growth + momentum', er: 'ETF rotation' };
+const PF_SYS = { fl: 'Flags & pennants', mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21 any stock', vcp: 'Tight base', rt: 'Retest', pt: 'Bottom pattern', tb: 'Top Bottom', tu: 'Turtle (all markets)', gm: 'Growth + momentum', er: 'ETF rotation' };
 const PF_BT = { mom: '44% win, +24%/trade', t9: '41% win, +7%/trade', tf: '10.5%/yr', rt: '+0.2R/trade', pt: 'no edge', tu: '+0.25R/trade', vcp: 'watch', gm: '24.7%/yr', er: '17.7%/yr' };
 /* how each forward-test trade ended (22 Nov 2026: "it should track target hit, SL hit, SL trailed") */
 const PF_OUT = [['target', 'Target hit', 'var(--rise)'], ['trailx', 'Trailed stop hit', 'var(--accent)'], ['exit', 'Exit signal', '#B7A6FF'], ['sl', 'SL hit', 'var(--fall)'],
