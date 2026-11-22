@@ -1637,3 +1637,4 @@ input,select,textarea{font-size:16px!important}
 .pc-svg .pc-ex { fill: var(--fall); stroke: var(--paper); stroke-width: 4; } .pc-svg .pc-lab.r { fill: var(--fall); }
 .pc-svg .pc-v.u { fill: var(--rise); opacity: .35; } .pc-svg .pc-v.d { fill: var(--fall); opacity: .35; }
 .pc-svg .pc-halo { paint-order: stroke; stroke: var(--paper); stroke-width: 8px; stroke-linejoin: round; }
+.pc-svg .pc-mk { fill: var(--accent); stroke: var(--paper); stroke-width: 4; }

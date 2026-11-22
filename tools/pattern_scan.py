@@ -384,13 +384,14 @@ def flag(x, sym, name):
             # < the 50-day average before the pole; breakout candle >= 1.5 x the 50-day average and the flag's biggest volume.
             # With these, buying the breakout close + trailing below the 21-day EMA: +2.8% a trade (PF 1.75) vs +2.3% (1.72)
             # without, and positive in the last 1 and 2 years (+0.8%, PF 1.2) where the loose list lost money
-            vv = x.Volume.astype(float).to_numpy(); v50 = pd.Series(vv).rolling(50).mean().shift(1).to_numpy()
+            vv = np.nan_to_num(x.Volume.astype(float).to_numpy()); v50 = pd.Series(vv).rolling(50).mean().shift(1).to_numpy()
             fv = float(vv[pz].mean()); pv = float(vv[lo_i:pk + 1].mean()); b50 = v50[lo_i] if np.isfinite(v50[lo_i]) else v50[end]
-            if (hh.max() - ll.min()) / top > FL_TIGHT or not (fv < 0.75 * pv and fv < b50):
+            hasv = bool((vv[max(0, n - 60):] > 0).mean() > 0.9)   # 22 Nov 2026: indices / FX / close-only series have no volume -> volume rules skipped
+            if (hh.max() - ll.min()) / top > FL_TIGHT or (hasv and not (fv < 0.75 * pv and fv < b50)):
                 continue
             trig = max(min(line(n - 1), float(hh.max())), float(c[-1]) if back == 0 else 0)
             row = dict(symbol=sym, name=name, lane=lane, shape=shape, close=round(float(c[-1]), 2), pole_pct=round(pole * 100, 1),
-                       flag_vol_pct=round(fv / b50 * 100) if b50 else None, range_pct=round(float((hh.max() - ll.min()) / top * 100), 1),
+                       flag_vol_pct=round(fv / b50 * 100) if hasv and b50 else None, range_pct=round(float((hh.max() - ll.min()) / top * 100), 1),
                        pole_start=D[lo_i], pole_top=D[pk], top=round(float(top), 2), flag_days=pz.stop - pz.start,
                        depth_pct=round(depth * 100, 1), stop=round(float(plo), 2), s200=round(float(s200[-1]), 2),
                        # 22 Nov 2026 (Amritpal: "mark the patterns on the charts"): the drawing - pole (swing low -> top), the pause's
@@ -403,13 +404,13 @@ def flag(x, sym, name):
                 if l[end] < plo:
                     continue
                 plo = min(plo, l[end]); trig = max(min(line(n - 1), float(max(hh.max(), h[end]))), float(c[-1]))
-                row.update(status="forming", trigger=round(trig, 2), need_vol=int(1.5 * v50[-1]) if np.isfinite(v50[-1]) else None, to_trigger_pct=round((trig / c[-1] - 1) * 100, 1), stop=round(float(plo), 2),
+                row.update(status="forming", trigger=round(trig, 2), need_vol=int(1.5 * v50[-1]) if hasv and np.isfinite(v50[-1]) else None, to_trigger_pct=round((trig / c[-1] - 1) * 100, 1), stop=round(float(plo), 2),
                            target=round(trig + (top - base), 2), risk_pct=round((1 - plo / trig) * 100, 1))
             else:
                 plo = min(plo, l[bo])                           # stop under the flag including the breakout day's low
                 if not broke or l[bo + 1:].min(initial=1e18) < plo:
                     continue
-                if not (vv[bo] >= 1.5 * v50[bo] and vv[bo] >= vv[pz].max()):
+                if hasv and not (vv[bo] >= 1.5 * v50[bo] and vv[bo] >= vv[pz].max()):
                     # 22 Nov 2026 (Amritpal: "DATAPATTNS is still not broken out"): a line break without the volume jump is not a
                     # breakout - keep it as forming, buy above the flag's highest high since it began (needs 1.5x volume)
                     fh = float(h[pz.start:n].max())
@@ -417,12 +418,13 @@ def flag(x, sym, name):
                         continue
                     row.update(status="forming", trigger=round(fh, 2), to_trigger_pct=round((fh / c[-1] - 1) * 100, 1), stop=round(float(plo), 2),
                                target=round(fh + (top - base), 2), risk_pct=round((1 - plo / fh) * 100, 1), line_broken=D[bo],
-                               need_vol=int(1.5 * v50[-1]) if np.isfinite(v50[-1]) else None)
+                               need_vol=int(1.5 * v50[-1]) if hasv and np.isfinite(v50[-1]) else None)
                     row["ema21"] = round(float(x.Close.ewm(span=21, adjust=False).mean().iloc[-1]), 2)
                     if best is None:
                         best = row
                     break
-                row["bo_vol_x"] = round(float(vv[bo] / v50[bo]), 1)
+                if hasv:
+                    row["bo_vol_x"] = round(float(vv[bo] / v50[bo]), 1)
                 row["stop"] = round(float(plo), 2)
                 e = float(c[bo]); row.update(status="breakout", bo_date=D[bo], entry=round(e, 2), days_since=back,
                                              target=round(e + (top - base), 2), risk_pct=round((1 - plo / e) * 100, 1), ret_pct=round((c[-1] / e - 1) * 100, 1))
@@ -464,6 +466,16 @@ def main(mk="NSE"):
     else:
         u = nse_symbols(bse=True); name = dict(zip(u.symbol, u.name)) if "name" in u else {}   # 17 Nov 2026: + SME, liquid BSE-only
         jobs = [(t, s, name.get(s, s), "stock") for t, s in zip(u.ticker, u.symbol)] + [(t, n_, n_, "index") for t, n_ in INDICES.items()]
+        # 22 Nov 2026 (Amritpal: "include all assets including indices in patterns"): world indices, commodities, currencies, crypto,
+        # bond yields (the Markets tab's asset list) - bottoms and flags; NSE sector / theme indices are added after the loop
+        try:
+            import ast   # read the asset list without running asset_scan (it scans on import)
+            _src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "asset_scan.py")).read()
+            _A = next(ast.literal_eval(nd.value) for nd in ast.parse(_src).body if isinstance(nd, ast.Assign) and getattr(nd.targets[0], "id", "") == "A")
+            have = {j[0] for j in jobs}
+            jobs += [(t, n_, n_, "index" if grp == "World indices" else "asset") for grp, d_ in _A.items() for t, n_ in d_.items() if t not in have]
+        except Exception as e:  # noqa: BLE001
+            print("assets unavailable", e)
     rows, srows, vrows, frows, asof = [], [], [], [], None
     for a in range(0, len(jobs), 80):
         chunk = jobs[a:a + 80]; dd = None
@@ -492,11 +504,11 @@ def main(mk="NSE"):
                 except Exception as e:  # noqa: BLE001
                     v_ = None; print("vcp fail", sym, e)
                 try:
-                    f_ = flag(x, sym, nm) if kind == "stock" else None
+                    f_ = flag(x, sym, nm)
                 except Exception as e:  # noqa: BLE001
                     f_ = None; print("flag fail", sym, e)
                 if f_:
-                    frows.append(f_)
+                    f_["kind"] = kind; frows.append(f_)
                 if r:
                     rows.append(r)
                 if s_:
@@ -508,6 +520,25 @@ def main(mk="NSE"):
             except Exception as e:  # noqa: BLE001
                 print("fail", sym, e)
         print(a + len(chunk), "done;", len(rows), "patterns", flush=True)
+    if not g:   # NSE sector / theme indices (closes only, from NSE's index files): bottoms and flags on closes
+        try:
+            from index_w_alert import KEEP as _K
+            hh_ = pd.read_csv(f"{OUT}/sector_hist.csv.gz", index_col=0, parse_dates=True)
+            have = {r["symbol"] for r in rows} | {r["symbol"] for r in frows}
+            for nm in _K:
+                cl = hh_[hh_.INDEX == nm].CLOSE.sort_index().astype(float).tail(750)
+                if len(cl) < 220 or nm in have:
+                    continue
+                x = pd.DataFrame({"Open": cl, "High": cl, "Low": cl, "Close": cl, "Volume": 0.0})
+                r = scan(x, nm, nm, "index"); f_ = flag(x, nm, nm)
+                if f_:
+                    f_["kind"] = "index"; frows.append(f_)
+                if r:
+                    rows.append(r)
+                if r or f_:
+                    json.dump(chart(x), open(f"{CH}/{nm.replace(' ', '_')}.json", "w"))
+        except Exception as e:  # noqa: BLE001
+            print("sector indices unavailable", e)
     regime = None
     try:
         h = pd.read_csv(f"{OUT}/sector_hist.csv.gz", index_col=0, parse_dates=True)

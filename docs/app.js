@@ -8254,7 +8254,7 @@ async function loadStrat() {
     { k: 'mom', name: 'ATH breakout', test: '17%/yr', ok: 1, rows: pl.filter((r) => bkOf(r) === 'mom').map((r) => row(r.symbol, r.trigger ? `Waiting · above ${fmt(r.trigger, 2)}` : 'Buy', { r, sc: r.score || 0 })) },
     { k: 'tf', name: 'Cup 9/21', test: 'in the mix', ok: 1, rows: pl.filter((r) => bkOf(r) === 'tf').map((r) => row(r.symbol, 'Buy', { r, sc: r.score || 0 })) },
     { k: 't9', name: '9/21 any stock', test: '21%/yr · off', ok: 1, rows: pl.filter((r) => bkOf(r) === 't9').map((r) => row(r.symbol, 'Switched off', { r, sc: r.score || 0 })) },
-    { k: 'pt', name: 'Bottoming out', test: 'no edge', ok: 0, note: 'Watch only: W and triple bottoms did no better than a random stock in our tests.', rows: ((PT && PT.rows) || []).filter((x) => x.kind !== 'index').map((x) => row(x.symbol, `${TYP[x.typ] || x.typ} · ${x.status === 'breakout' ? 'broke out' : fmt(x.to_neck_pct, 1) + '% to go'}`, { sc: x.status === 'breakout' ? 1 : 0 })) },
+    { k: 'pt', name: 'Bottoming out', test: 'no edge', ok: 0, note: 'Watch only: W and triple bottoms did no better than a random stock in our tests.', rows: ((PT && PT.rows) || []).map((x) => row(x.symbol, `${x.kind && x.kind !== 'stock' ? (x.kind === 'index' ? 'Index · ' : 'Asset · ') : ''}${TYP[x.typ] || x.typ} · ${x.status === 'breakout' ? 'broke out' : fmt(x.to_neck_pct, 1) + '% to go'}`, { sc: x.status === 'breakout' ? 1 : 0, pt: x })) },
     { k: 'rt', name: 'Retest', test: 'weak', ok: 0, note: 'Watch only: a small edge per trade, but it lost money as a 10-stock portfolio.', rows: pl.filter((r) => bkOf(r) === 'rt').map((r) => row(r.symbol, 'At old breakout', { r, sc: r.score || 0 })) },
     { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only. Tight flags (range ≤ 8%) where volume dried up, breaking out on 1.5× volume. Buy near the breakout close, stop under the flag low, sell on the first close below the 21-day average. Tested 2016-26: +2.8% a trade, positive in the last 2 years (buying next day above the breakout high did worse).',
       ord: 1, rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2) + ' on 1.5× volume'} · exit below 21-day avg`, { sc: x.status === 'breakout' ? 2 : 1, fl: x, pri: (x.status === 'breakout' ? 4 : 0) + (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0) })) },
@@ -8273,6 +8273,7 @@ async function loadStrat() {
   el.querySelectorAll('[data-smk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.smk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } loadStrat(); }));
   el.querySelectorAll('[data-go4]').forEach((b) => b.addEventListener('click', () => show(b.dataset.go4)));
   el.querySelectorAll('[data-si]').forEach((b) => b.addEventListener('click', () => { const x = S.rows[+b.dataset.si]; if (x.fl) { patternView(x.fl, mk); return; }
+    if (x.pt && x.pt.kind && x.pt.kind !== 'stock') { bottomView(x.pt, mk); return; }
     stockPage({ mk, sym: x.sym, name: x.sym, kind: 'stock' }, [{ t: 'Strategies', go: () => closeSheet(), done: true }, { t: S.name, go: () => closeSheet(), done: true }, { t: x.sym, on: true }]); }));
 }
 
@@ -8695,7 +8696,7 @@ function bookedFix(t, done) {
    (swing low -> top), the pause's top and bottom lines (shaded), the breakout or buy level, stop and target. */
 function patternSvg(S, f) {
   const mk0 = (v) => '₹' + fmt(v, 0);   // pole height label (NSE charts)
-  const g = f.geo || {}; const n = S.t.length; const i0 = Math.max(0, S.t.indexOf((g.pole || [])[0]) - 15); const a = i0 < 0 ? Math.max(0, n - 90) : i0;
+  const g = f.geo || {}; const n = S.t.length; const i0 = Math.max(0, S.t.indexOf(f.from || (g.pole || [])[0]) - (f.from ? 25 : 15)); const a = i0 < 0 ? Math.max(0, n - 90) : i0;
   const T = S.t.slice(a), O = S.o.slice(a), Hh = S.h.slice(a), Ll = S.l.slice(a), Cc = S.c.slice(a); const m = T.length;
   const extra = 8; const lv = [f.target, f.stop, f.trigger || f.entry, ...Ll, ...Hh].filter((v) => v > 0);
   const lo = Math.min(...lv) * 0.99, hi = Math.max(...lv) * 1.01; const W = 1000, H = innerWidth < 640 ? 820 : 560;
@@ -8718,10 +8719,11 @@ function patternSvg(S, f) {
   const exI = f.status === 'breakout' ? (() => { const s0 = xi(f.bo_date); for (let i = s0 + 1; i < m; i++) if (Cc[i] < e21[a + i]) return i; return -1; })() : -1;
   const exitDot = exI >= 0 ? `<circle cx="${X(exI)}" cy="${Y(Cc[exI])}" r="12" class="pc-ex"/><text x="${X(exI)}" y="${Y(Cc[exI]) + 44}" text-anchor="middle" class="pc-lab r">Exit</text>` : '';
   f._exit = exI >= 0 ? T[exI] : null; f._e21 = e21[e21.length - 1];
+  const marks = (f.marks || []).map(([d, v, lab]) => { const i = xi(d); return `<circle cx="${X(i)}" cy="${Y(v)}" r="10" class="pc-mk"/><text x="${X(i)}" y="${Y(v) + 40}" text-anchor="middle" class="pc-lab a pc-halo">${esc(lab)}</text>`; }).join('');
   const bo = f.status === 'breakout' ? (() => { const i = xi(f.bo_date); return `<circle cx="${X(i)}" cy="${Y(Cc[i])}" r="13" class="pc-bo"/><text x="${X(i)}" y="${Y(Cc[i]) + 46}" text-anchor="middle" class="pc-lab g">Breakout</text>`; })() : '';
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" class="t3-svg pc-svg" role="img" aria-label="${esc(f.symbol)} ${esc(f.shape)}: pole, ${esc(f.shape.toLowerCase())} lines, ${f.status === 'breakout' ? 'breakout' : 'buy level'}, stop and target marked">
     ${vols}${ma(S.sma200, 'pc-ma2')}${ma(S.sma50, 'pc-ma1')}${ma(e21, 'pc-e21')}${cand}${pole}${flagPoly}
-    ${hl(f.target, 'pc-tg', 'Pole target ' + fmt(f.target, 0))}${exitDot}${f.status !== 'breakout' ? hl(f.trigger, 'pc-tr', 'Buy above ' + fmt(f.trigger, 0)) : ''}${hl(f.stop, 'pc-st', 'Stop ' + fmt(f.stop, 0))}${bo}
+    ${hl(f.target, 'pc-tg', (f.marks ? 'Target ' : 'Pole target ') + fmt(f.target, 0))}${exitDot}${f.status !== 'breakout' ? hl(f.trigger, 'pc-tr', 'Buy above ' + fmt(f.trigger, 0)) : ''}${hl(f.stop, 'pc-st', 'Stop ' + fmt(f.stop, 0))}${marks}${bo}
     <text x="30" y="${H - 8}" class="t3-ax">${esc(day(T[0]))}</text><text x="${X(m - 1)}" y="${H - 8}" text-anchor="end" class="t3-ax">${esc(day(T[m - 1]))}</text></svg>`;
 }
 async function patternView(f, mk) {
@@ -8731,8 +8733,8 @@ async function patternView(f, mk) {
     <div class="t3-key"><span><i style="background:var(--rise)"></i>Pole</span><span><i style="background:var(--accent)"></i>${esc(f.shape)}</span><span><i style="background:var(--saffron)"></i>50-day</span><span><i style="background:var(--mute-line)"></i>200-day</span><span><i style="background:var(--rise);opacity:.6"></i>21-day (exit)</span></div>
     <div class="sp-why"><div class="ok"><b>${Mz(f.status === 'breakout' ? f.entry : f.trigger)}</b><small>${f.status === 'breakout' ? 'breakout close' : 'buy above'}</small></div><div class="bad"><b>${Mz(f.stop)}</b><small>stop · −${fmt(f.risk_pct, 1)}%</small></div><div class="ok" id="pcex"><b>${f.ema21 ? Mz(f.ema21) : '21-day avg'}</b><small>exit on a close below the 21-day avg</small></div></div>
     <div class="t3-rules"><div class="t3-rule"><b>+${fmt(f.pole_pct, 0)}%</b><small>pole · ${esc(day(f.pole_start))} → ${esc(day(f.pole_top))}</small></div><div class="t3-rule"><b>${f.flag_days}</b><small>sessions in the ${esc(f.shape.toLowerCase())}</small></div><div class="t3-rule"><b>${f.range_pct != null ? fmt(f.range_pct, 1) + '%' : '−' + fmt(f.depth_pct, 1) + '%'}</b><small>${f.range_pct != null ? 'flag range (tight ≤ 8%)' : 'pullback from the top'}</small></div>${f.flag_vol_pct != null ? `<div class="t3-rule"><b>${f.flag_vol_pct}%</b><small>flag volume vs normal (dried up)</small></div>` : ''}${f.bo_vol_x ? `<div class="t3-rule"><b>${fmt(f.bo_vol_x, 1)}×</b><small>breakout-day volume</small></div>` : f.need_vol ? `<div class="t3-rule"><b>${(f.need_vol / 1e5 >= 1 ? fmt(f.need_vol / 1e5, 1) + ' L' : f.need_vol.toLocaleString())}</b><small>shares needed on the breakout day (1.5× normal)</small></div>` : ''}</div>
-    <div class="sp-cbar"><a class="sp-tv" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(f.symbol, mk))}">Open in TradingView ↗</a><button class="t3-link" id="pcsp">Stock page</button></div></div>`);
-  history.pushState({ sheet: 1 }, ''); $('#pcsp').addEventListener('click', () => stockPage({ mk, sym: f.symbol, name: f.name || f.symbol, kind: 'stock' }));
+    <div class="sp-cbar"><a class="sp-tv" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(f.symbol, mk))}">Open in TradingView ↗</a>${!f.kind || f.kind === 'stock' ? '<button class="t3-link" id="pcsp">Stock page</button>' : ''}</div></div>`);
+  history.pushState({ sheet: 1 }, ''); const sp_ = $('#pcsp'); if (sp_) sp_.addEventListener('click', () => stockPage({ mk, sym: f.symbol, name: f.name || f.symbol, kind: 'stock' }));
   const fp = encodeURIComponent(f.symbol.replace(/ /g, '_')); const get = async (u) => { try { const r = await fetch(fresh(u)); return r.ok ? await r.json() : null; } catch (e) { return null; } };
   let S = await get(MAIN + MKT[mk].path + 'pattern_charts/' + fp + '.json');
   if (!S || !S.t) { const d = await tdChartData({ symbol: f.symbol, system: 'x', bucket: 'tf' }, mk).catch(() => null); if (d && d.tf === 'Daily') S = d; }
@@ -8793,13 +8795,13 @@ async function sysRows(s, mk, q) {
     const F = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);
     const only = /pennant|pendant/.test(qn) ? 'Pennant' : /rectangle|box/.test(qn) ? 'Rectangle' : null;
     return ((F && F.rows) || []).filter((x) => !only || x.shape === only).map((x) => ({ sym: x.symbol, fl: x, buy: x.status === 'breakout', sc: x.status === 'breakout' ? 2 : 1,
-      pri: (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0),
+      pri: (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0), name: x.kind && x.kind !== 'stock' ? (x.kind === 'index' ? 'Index' : 'Asset') : '',
       st: `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2)}` }));
   }
   if (s.id === 'pt') {
     const T = await getJSON(MP + 'patterns.json', mk === 'NSE' ? 'patterns' : 'patterns_' + mk).catch(() => null); const TYP = { DB: 'W bottom', TW: 'Tilted W', TB: 'Triple bottom', IHS: 'Inv H&S' };
     const only = /triple/.test(qn) ? 'TB' : /inverse|head|ihs/.test(qn) ? 'IHS' : /tilt/.test(qn) ? 'TW' : /\bw\b|double/.test(qn) ? 'DB' : null;
-    return ((T && T.rows) || []).filter((x) => x.kind !== 'index' && (!only || x.typ === only)).map((x) => ({ sym: x.symbol, sc: x.status === 'breakout' ? 1 : 0,
+    return ((T && T.rows) || []).filter((x) => !only || x.typ === only).map((x) => ({ sym: x.symbol, sc: x.status === 'breakout' ? 1 : 0, pt: x, name: x.kind && x.kind !== 'stock' ? (x.kind === 'index' ? 'Index' : 'Asset') : '',
       st: `${TYP[x.typ] || x.typ || x.pattern || ''} · ${x.status === 'breakout' ? 'broke out' : x.to_neck_pct != null ? fmt(x.to_neck_pct, 1) + '% to go' : x.status || ''}` }));
   }
   if (s.id === 'etf') {
@@ -8823,7 +8825,8 @@ async function sysListView(s, mk, q) {
   openPanel('<p class="muted pad">Listing stocks…</p>');
   const [rows, X] = await Promise.all([sysRows(s, mk, q), t3Ctx(mk).catch(() => null)]);
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
-  rows.forEach((x) => { x.ch = X && !x.etfOnly && !x.fund ? X.chain(x.sym) : null; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
+  rows.forEach((x) => { const nonStk = (x.fl && x.fl.kind && x.fl.kind !== 'stock') || (x.pt && x.pt.kind && x.pt.kind !== 'stock'); if (nonStk) x.name = x.name || (x.fl ? (x.fl.kind === 'index' ? 'Index' : 'Asset') : '');
+    x.ch = X && !x.etfOnly && !x.fund && !nonStk ? X.chain(x.sym) : null; x.s = x.ch ? Pq[x.ch[1]] + Pq[x.ch[2]] : 0; x.y = X && !x.fund && !x.etfOnly ? X.yoy(x.sym) : null; });
   // 22 Nov 2026 (Amritpal: "sort stocks as per quadrant strength"): industry + stock quadrant first (Leading > Improving >
   // Weakening > Lagging), then the stock's own quadrant, then buy / breakout, then the tested order
   rows.sort((a, b) => b.s - a.s || (b.ch ? Pq[b.ch[2]] : -1) - (a.ch ? Pq[a.ch[2]] : -1) || (b.buy ? 1 : 0) - (a.buy ? 1 : 0) || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0));
@@ -8842,6 +8845,7 @@ async function sysListView(s, mk, q) {
   root.querySelectorAll('[data-ymk]').forEach((b) => b.addEventListener('click', () => sysListView(s, b.dataset.ymk, q)));
   root.querySelectorAll('[data-yi]').forEach((b) => b.addEventListener('click', () => { const x = rows[+b.dataset.yi];
     if (x.fl) return patternView(x.fl, mk);
+    if (x.pt && x.pt.kind && x.pt.kind !== 'stock') return bottomView(x.pt, mk);
     if (x.fund) return fundSelect(x.fund);
     if (x.etfOnly) return sysCheck({ mk, sym: x.sym, name: x.name || x.sym, kind: 'ETF' });
     stockPage({ mk, sym: x.sym, name: x.name || x.sym, kind: 'stock' }, [{ t: 'Search', go: () => searchOpen(), done: true }, { t: s.name, go: () => sysListView(s, mk, q), done: true }, { t: x.sym, on: true }]); }));
@@ -8874,4 +8878,22 @@ function sheetBack() {
     body.scrollTop = 0; const sh = $('#sheet'); if (sh) sh.scrollTop = 0; return;
   }
   closeSheet();
+}
+
+/* Bottom pattern chart for an index or asset (22 Nov 2026, Amritpal: "include all assets including indices in patterns"):
+   the lows, neckline, stop and the classic target on the same chart as the flags */
+async function bottomView(x, mk) {
+  const TYP = { DB: 'W bottom', TW: 'Tilted W', TB: 'Triple bottom', IHS: 'Inverse H&S' };
+  const f = { symbol: x.symbol, name: x.name, kind: x.kind, shape: TYP[x.typ] || x.typ, status: x.status, trigger: x.neck, stop: x.stop, target: x.target,
+    bo_date: x.signal_date, from: (x.lows[0] || [])[0], geo: {}, marks: (x.lows || []).map((l, i) => [l[0], l[1], x.typ === 'IHS' ? ['Left', 'Head', 'Right'][i] : 'Low ' + (i + 1)]),
+    pole_pct: 0, risk_pct: x.stop_pct, flag_days: (x.lows || []).length, depth_pct: x.height_pct };
+  const Mz = (v) => (mk === 'NSE' ? inr(v, 0) : `${MKT[mk].cur}${fmt(v, 2, MKT[mk].loc)}`).replace('₹', x.kind === 'stock' ? '₹' : '');
+  openPanel(`<div class="t3"><div class="t3w-h"><div><h2 style="font-family:var(--font-head);margin:0">${esc(x.symbol)}</h2><small class="muted">${x.kind === 'index' ? 'Index' : 'Asset'} · ${esc(f.shape)} · ${x.status === 'breakout' ? 'broke above the neckline ' + esc(day(x.signal_date)) : fmt(x.to_neck_pct, 1) + '% below the neckline'}</small></div></div>
+    <div id="pcbox" class="sp-chart"><p class="muted">Loading chart…</p></div>
+    <div class="sp-why"><div class="ok"><b>${Mz(x.neck)}</b><small>neckline (breakout above)</small></div><div class="bad"><b>${Mz(x.stop)}</b><small>below the lows</small></div><div class="ok"><b>${Mz(x.target)}</b><small>target (height added)</small></div></div>
+    <p class="t3-note warn">Watch only: bottom patterns did no better than random in our stock tests; not tested on indices or assets.</p>
+    <div class="sp-cbar"><a class="sp-tv" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(x.symbol)}">Open in TradingView ↗</a></div></div>`);
+  const fp = encodeURIComponent(x.symbol.replace(/ /g, '_'));
+  let S = null; try { const r = await fetch(fresh(MAIN + MKT[mk].path + 'pattern_charts/' + fp + '.json')); S = r.ok ? await r.json() : null; } catch (e) { /* */ }
+  const box = $('#pcbox'); if (box) box.innerHTML = S && S.t ? patternSvg(S, f) : '<p class="muted">No chart stored yet (it appears after the next scan).</p>';
 }
