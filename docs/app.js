@@ -8693,6 +8693,7 @@ function bookedFix(t, done) {
    Amritpal: "can you mark the patterns on the charts" - flags / pennants / rectangles: candles, 50 and 200-day averages, the pole
    (swing low -> top), the pause's top and bottom lines (shaded), the breakout or buy level, stop and target. */
 function patternSvg(S, f) {
+  const mk0 = (v) => '₹' + fmt(v, 0);   // pole height label (NSE charts)
   const g = f.geo || {}; const n = S.t.length; const i0 = Math.max(0, S.t.indexOf((g.pole || [])[0]) - 15); const a = i0 < 0 ? Math.max(0, n - 90) : i0;
   const T = S.t.slice(a), O = S.o.slice(a), Hh = S.h.slice(a), Ll = S.l.slice(a), Cc = S.c.slice(a); const m = T.length;
   const extra = 8; const lv = [f.target, f.stop, f.trigger || f.entry, ...Ll, ...Hh].filter((v) => v > 0);
@@ -8705,7 +8706,7 @@ function patternSvg(S, f) {
   const cand = T.map((_, i) => { const up = Cc[i] >= O[i]; return `<line x1="${X(i)}" x2="${X(i)}" y1="${Y(Hh[i])}" y2="${Y(Ll[i])}" class="pc-w ${up ? 'u' : 'd'}"/><rect x="${X(i) - bw / 2}" y="${Y(Math.max(O[i], Cc[i]))}" width="${bw}" height="${Math.max(1.5, Math.abs(Y(O[i]) - Y(Cc[i])))}" class="pc-b ${up ? 'u' : 'd'}"/>`; }).join('');
   const ma = (arr, cls) => { if (!arr) return ''; const v = arr.slice(a); const pts = v.map((x, i) => (x == null ? null : `${X(i).toFixed(1)},${Y(x).toFixed(1)}`)).filter(Boolean).join(' '); return pts ? `<polyline points="${pts}" class="${cls}"/>` : ''; };
   const P = g.pole || [], U = g.up || [], Lo = g.lo || [];
-  const pole = P.length ? `<line x1="${X(xi(P[0]))}" y1="${Y(P[1])}" x2="${X(xi(P[2]))}" y2="${Y(P[3])}" class="pc-pole"/><text x="${(X(xi(P[0])) + X(xi(P[2]))) / 2 - 16}" y="${(Y(P[1]) + Y(P[3])) / 2}" text-anchor="end" class="pc-lab g">Pole +${fmt(f.pole_pct, 0)}%</text><text x="${(X(xi(P[0])) + X(xi(P[2]))) / 2 - 16}" y="${(Y(P[1]) + Y(P[3])) / 2 + 28}" text-anchor="end" class="pc-lab g">₹${fmt(P[3] - P[1], 0)}</text>` : '';
+  const pole = P.length ? `<line x1="${X(xi(P[0]))}" y1="${Y(P[1])}" x2="${X(xi(P[2]))}" y2="${Y(P[3])}" class="pc-pole"/><text x="${X(xi(P[0]))}" y="${Math.min(H - 60, Y(P[1]) + 34)}" text-anchor="middle" class="pc-lab g pc-halo">Pole +${fmt(f.pole_pct, 0)}% · ${mk0(P[3] - P[1])}</text>` : '';
   const xe = X(m - 1 + 2);
   const flagPoly = U.length && Lo.length ? `<polygon points="${X(xi(U[0]))},${Y(U[1])} ${X(xi(U[2]))},${Y(U[3])} ${X(xi(Lo[2]))},${Y(Lo[3])} ${X(xi(Lo[0]))},${Y(Lo[1])}" class="pc-flag"/>
     <line x1="${X(xi(U[0]))}" y1="${Y(U[1])}" x2="${X(xi(U[2]))}" y2="${Y(U[3])}" class="pc-fl"/><line x1="${X(xi(Lo[0]))}" y1="${Y(Lo[1])}" x2="${X(xi(Lo[2]))}" y2="${Y(Lo[3])}" class="pc-fl"/>
