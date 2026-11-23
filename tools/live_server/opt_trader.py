@@ -251,7 +251,7 @@ class OptTrader:
                 self.log("opt_trader_fast", error=str(ex)[:160])
 
     def watch_fills(self):
-        want = [t for t in self.st.get("trades", []) if t.get("oid") and t.get("live_entry") is None and t["state"] in ("pending", "open")]
+        want = [t for t in self.st.get("trades", []) if t.get("oid") and t.get("live_entry") is None and not t.get("live_rejected") and t["state"] in ("pending", "open")]
         if not want:
             return
         om = self.b.order_map()
@@ -259,10 +259,15 @@ class OptTrader:
             return
         try:
             for t in self.st.get("trades", []):
-                if t.get("oid") and t.get("live_entry") is None and t["state"] in ("pending", "open"):
+                if t.get("oid") and t.get("live_entry") is None and not t.get("live_rejected") and t["state"] in ("pending", "open"):
                     o = om.get(t["oid"]) or {}
                     if str(o.get("status", "")).lower() == "complete":
                         self._live_filled(t, o)
+                    elif str(o.get("status", "")).lower() == "rejected":   # 23 Nov 2026: Angel took the order, then its risk check refused it (e.g. margin)
+                        why = str(o.get("text") or "no reason given")[:140]; t["live_rejected"] = True
+                        t["live_state"] = f"Angel rejected the buy: {why}"
+                        self.alert(f"{t['key']}: Angel rejected the live buy: {why}", key=f"otr:rej2:{t['key']}:{t['signal']}")
+                        self.note(f"{t['key']} live buy rejected by Angel: {why} (paper trade carries on)")
             self._save()
         finally:
             self.lock.release()
