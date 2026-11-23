@@ -21,7 +21,8 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 8                     # 21 Nov 2026: rotation quadrant slices; 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
+VERSION = 9                     # 23 Nov 2026: sector-green + green index slices (Amritpal: "enter after the first 5 minutes with the option trader's conditions" in green sectors)
+# v8: 21 Nov 2026: rotation quadrant slices; 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import gzip
 import json
 import os
@@ -283,6 +284,7 @@ class OptBT:
                 res["Pulse"] = pulse_rows(F, paper)
                 res["Pulse"]["trades with Pulse"] = sum(t.get("pulse") is not None for t in F)
                 res["Rotation"] = quad_rows(F, paper); res["Rotation"]["trades with a quadrant"] = sum(t.get("quad") is not None for t in F)
+                res["Sector green"] = sector_rows(F, paper)
             except Exception as ex:  # noqa: BLE001
                 res["Pulse"] = dict(error=str(ex)[:200])
             res["NIFTY monthly vs weekly"] = nifty_weekly([t for t in trades if t["s"] == "NIFTY" and not t.get("wk")], [t for t in trades if t.get("wk")])
@@ -556,6 +558,30 @@ def pulse_rows(F, paper):
         out[f"{nm}, PE + Pulse top half"] = _agg([t for t in X if t["side"] == "PE" and t.get("pulse") is not None and t["pulse"] > 0.5])
         out[f"{nm}, CE + Pulse top half"] = _agg([t for t in X if t["side"] == "CE" and t.get("pulse") is not None and t["pulse"] >= 0.5])
         out[f"{nm}, CE + Pulse bottom half"] = _agg([t for t in X if t["side"] == "CE" and t.get("pulse") is not None and t["pulse"] < 0.5])
+    return out
+
+
+def sector_rows(F, paper):
+    """23 Nov 2026 (Amritpal: green sectors on a green Nifty / Bank Nifty, option-trader rules after the first 5 minutes): the index
+    filter is already in F (CE only while Nifty AND Bank Nifty are up). Slices by the stock's sector move at the signal bar (average
+    day % of its other F&O stocks, from put-call parity): agrees = CE with the sector up / PE with it down; strong = by more than 0.5%;
+    and by signal time (first 30 minutes vs later)."""
+    out = {}
+    for nm, X in (("Basket 1:3", F), ("Paper-trader rules", paper)):
+        has = [t for t in X if t.get("sec") is not None]
+        ag = lambda t, m=0.0: (t["side"] == "CE" and t["sec"] > m) or (t["side"] == "PE" and t["sec"] < -m)  # noqa: E731
+        out[f"{nm}, all"] = _agg(X)
+        out[f"{nm} + sector agrees (CE sector green, PE sector red)"] = _agg([t for t in has if ag(t)])
+        out[f"{nm} + sector agrees strongly (> 0.5%)"] = _agg([t for t in has if ag(t, 0.5)])
+        out[f"{nm} + sector AGAINST"] = _agg([t for t in has if not ag(t)])
+        out[f"{nm}, CE + sector green"] = _agg([t for t in has if t["side"] == "CE" and t["sec"] > 0])
+        out[f"{nm}, CE + sector red"] = _agg([t for t in has if t["side"] == "CE" and t["sec"] <= 0])
+        out[f"{nm}, no sector (indices / unmapped)"] = _agg([t for t in X if t.get("sec") is None])
+        out[f"{nm}, signal 09:20-09:45"] = _agg([t for t in X if t["t"] <= "09:45"])
+        out[f"{nm}, signal after 09:45"] = _agg([t for t in X if t["t"] > "09:45"])
+        out[f"{nm} + sector agrees, signal 09:20-09:45"] = _agg([t for t in has if ag(t) and t["t"] <= "09:45"])
+    for v in out.values():
+        v.pop("by_day", None); v.pop("by_day_rs", None)
     return out
 
 
