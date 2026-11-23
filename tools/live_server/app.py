@@ -1906,7 +1906,7 @@ def sip(body: Sip, _=Depends(auth)):
 
 @app.post("/api/basket")
 def basket(body: Basket, _=Depends(auth)):
-    """Several plan buys with ONE typed confirmation ("BASKET <n>"). Each item still goes through every check in /api/order
+    """Several plan buys - or system exits (sells) - with ONE typed confirmation ("BASKET <n>"). Each item still goes through every check in /api/order
     (in today's plan, qty <= plan, value/cash limits, once a day, daily order cap); one failing item doesn't stop the rest."""
     items = [i for i in body.items if i.qty > 0]
     if not items:
@@ -1920,13 +1920,14 @@ def basket(body: Basket, _=Depends(auth)):
     except Exception as ex:  # noqa: BLE001
         raise HTTPException(502, f"couldn't read your Angel account: {angel_msg(ex)}")
     rows = {r["id"]: r for r in S["rows"]}
+    exs = {e["id"]: e for e in S.get("exits") or []}       # 23 Nov 2026 (Amritpal: "sells should also be one click"): exits too
     out = []
     for i in items:
-        r = rows.get(i.id)
+        r = rows.get(i.id) or exs.get(i.id); side = "SELL" if i.id in exs and i.id not in rows else "BUY"
         if not r:
             out.append(dict(id=i.id, ok=False, error="not in today's plan")); continue
         try:
-            res = order(Order(id=i.id, qty=i.qty, confirm=f"BUY {i.qty} {r['symbol']}"), True)
+            res = order(Order(id=i.id, qty=i.qty, confirm=f"{side} {i.qty} {r['symbol']}"), True)
             out.append(dict(id=i.id, symbol=r["symbol"], qty=i.qty, ok=True, sent=res.get("sent"), order_id=res.get("order_id"),
                             order=res.get("order"), protect=res.get("protect")))
         except HTTPException as ex:

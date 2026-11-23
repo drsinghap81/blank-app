@@ -145,6 +145,28 @@ def test_basket(tmp_path):
     assert not j2["results"][0]["ok"]
 
 
+def test_basket_sells(tmp_path):
+    """23 Nov 2026: system exits go in one basket too (one typed confirmation), each through /api/order's sell checks."""
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
+    A.broker.hold["ZZA"] = 10; A.broker.hold["ZZB"] = 5
+    sz = A.sized
+    def sized2(*a, **k):
+        S = sz(*a, **k); S = dict(S); S["exits"] = list(S.get("exits") or []) + [
+            dict(id="EXIT-PR-ZZA", symbol="ZZA", qty=10, system="Pulse rotation", why="dropped out", ref=100.0),
+            dict(id="EXIT-PR-ZZB", symbol="ZZB", qty=5, system="Pulse rotation", why="dropped out", ref=50.0)]
+        return S
+    A.sized = sized2
+    items = [{"id": "EXIT-PR-ZZA", "qty": 10}, {"id": "EXIT-PR-ZZB", "qty": 6}]
+    j = c.post("/api/basket", headers=h, json={"items": items, "confirm": "BASKET 2"}).json()
+    res = {x["id"]: x for x in j["results"]}
+    assert res["EXIT-PR-ZZA"]["ok"] and res["EXIT-PR-ZZA"]["sent"]
+    assert not res["EXIT-PR-ZZB"]["ok"] and "hold" in res["EXIT-PR-ZZB"]["error"]          # more than held -> refused
+    assert any(p.get("transactiontype", p.get("side", "")) in ("SELL",) or "SELL" in str(p) for p in A.broker.placed)
+    A.sized = sz
+
+
 def test_quotes(tmp_path):
     A, c = client(tmp_path)
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}

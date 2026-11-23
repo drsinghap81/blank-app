@@ -1199,7 +1199,7 @@ async function loadLive() {
         <p class="lv-sub">Not part of your tested 60/40 split. The same lists live on Trading (VCP, 9/21 any stock, retest, patterns) and Momentum investing (near trigger); they stay here only so you can still Send one if you choose.</p>
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
-    ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
+    ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${S && S.exits.filter((e) => e.qty > 0).length >= 2 ? `<div class="lv-basket"><div><b>${S.exits.filter((e) => e.qty > 0).length} to sell</b><div class="lv-sub">One confirmation sends every sell to Angel (each still gets every check; its stop GTT is cancelled first)</div></div><button class="lv-btn sell" id="lvsellbk">Sell all ${S.exits.filter((e) => e.qty > 0).length} as one basket</button></div>` : ''}${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
     ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>') : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
@@ -1311,6 +1311,7 @@ async function loadLive() {
     b.addEventListener('click', go); b.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
   el.querySelectorAll('.lv-btn[data-x]').forEach((b) => b.addEventListener('click', () => lvSend(S.exits[+b.dataset.x], 'SELL', b)));
+  const sbk = el.querySelector('#lvsellbk'); if (sbk) sbk.addEventListener('click', () => lvSellBasket(S.exits.filter((e) => e.qty > 0), sbk));
 }
 /* tap a Live row -> its chart: ATH rows open the ATH panel (monthly / weekly + 30 SMA), 9/21 rows the trend chart */
 async function lvOpen(r, mk = 'NSE') {
@@ -1744,6 +1745,25 @@ async function lvBasket(B, btn) {
     setTimeout(loadLive, 4000);
   } catch (e) { alertMsg('Not sent: ' + e.message); }
   btn.disabled = false; btn.textContent = btn.dataset.label || 'Send basket';
+}
+
+/* 23 Nov 2026 (Amritpal: "sells should also be one click"): every system exit in one basket - one typed confirmation, the server
+   sends each sell through the same checks as a single Sell (you hold it, the quantity, once a day) and cancels its stop GTT first. */
+async function lvSellBasket(E, btn) {
+  if (!E.length) { alertMsg('Nothing to sell.'); return; }
+  const lines = E.map((e) => `SELL ${e.qty} ${e.symbol} (${e.system})`).join('\n');
+  const typed = window.prompt(`${E.length} sells on Angel One:\n${lines}\n\nType ${E.length} to confirm:`);
+  if (typed === null) return;
+  if (String(typed).trim() !== String(E.length)) { alertMsg('Not sent: the number did not match.'); return; }
+  btn.disabled = true; const lab = btn.textContent; btn.textContent = '…';
+  try {
+    const j = await lvApi('/api/basket', { method: 'POST', body: JSON.stringify({ items: E.map((e) => ({ id: e.id, qty: e.qty })), confirm: `BASKET ${E.length}` }) });
+    const ok = j.results.filter((x) => x.ok); const bad = j.results.filter((x) => !x.ok);
+    alertMsg((j.mode === 'LIVE' ? `Sent ${ok.length} of ${j.results.length} sells: ${ok.map((x) => x.symbol).join(', ')}.` : `Dry run - ${ok.length} of ${j.results.length} sells would be sent: ${ok.map((x) => `${x.qty} ${x.symbol}`).join(', ')}.`)
+      + (bad.length ? ` Not sent: ${bad.map((x) => `${x.symbol || x.id} (${x.error})`).join('; ')}.` : ''), !bad.length);
+    setTimeout(loadLive, 4000);
+  } catch (e) { alertMsg('Not sent: ' + e.message); }
+  btn.disabled = false; btn.textContent = lab;
 }
 
 /* ------------------------------------------------------------------ trends */
