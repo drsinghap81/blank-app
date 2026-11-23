@@ -1181,6 +1181,7 @@ async function loadLive() {
   const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
   el.innerHTML = `${lvSeg()}${S ? '' : head}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
+    ${S && isOwner() ? '<div id="autocard"></div>' : ''}
     ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div><div id="lval"></div>` : ''}${lvHero(S, PF)}${lvBest5(P, S, rows, C0n)}${bookHtml}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
     ${pane('buy', `    ${lvBest5(P, S, rows, C0n)}${S ? '<div id="lvtakeout"></div>' : ''}<details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
@@ -1200,7 +1201,7 @@ async function loadLive() {
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${S && S.exits.filter((e) => e.qty > 0).length >= 2 ? `<div class="lv-basket"><div><b>${S.exits.filter((e) => e.qty > 0).length} to sell</b><div class="lv-sub">One confirmation sends every sell to Angel (each still gets every check; its stop GTT is cancelled first)</div></div><button class="lv-btn sell" id="lvsellbk">Sell all ${S.exits.filter((e) => e.qty > 0).length} as one basket</button></div>` : ''}${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
-    ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>') : ''}
+    ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>' + TB_STOCKS.map((k) => `<div id="tbcard_${k}"></div>`).join('')) : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
     const sym = b.dataset.tgt, E = +b.dataset.e, St = +b.dataset.s, R = E - St;
@@ -1301,7 +1302,7 @@ async function loadLive() {
   const prb = el.querySelector('#lvprbk'); if (prb) prb.addEventListener('click', () => lvBasket(rows.filter((r) => r.tier === 'swing' && bkOf(r) === 'pr' && !r.skip && !r.surv && r.qty > 0)
     .map((r) => { const L = state._lvQ && state._lvQ[r.id]; const E = (L && L.limit_now) || r.price; return { r, q: r.qty, v: r.qty * E }; }), prb));
   state._lvBkUpd = bkUpd;
-  if (S) { tbLoad(); tbLoad('nifty'); otrLoad(); tmcxLoad(); }
+  if (S) { autoLoad(); tbLoad(); tbLoad('nifty'); TB_STOCKS.forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); }
   state._lvMoreAll = false;
   const ma = $('#lvmoreall'); if (ma) ma.addEventListener('click', () => { state._lvMoreAll = !state._lvMoreAll; lvMoreUpd(); });
   lvMoreUpd();
@@ -1664,12 +1665,23 @@ async function otrLoad(box = $('#otrcard')) {
   q('otrflat').addEventListener('click', async () => { if (!window.confirm('Square off every open option trade now (live ones with a sell limit on Angel) and stop for today?')) return; try { await lvApi('/api/opt/trader/flat', { method: 'POST', body: '{}' }); alertMsg('Squared off; no new option trades today.', true); otrLoad(box); } catch (e) { alertMsg(e.message); } });
 }
 
+/* 24 Nov 2026: Top Bottom buy-only stock-future sleeves (server TB_STOCKS); each gets the same card as Nifty */
+const TB_STOCKS = ['bel', 'lt', 'tmpv', 'tcs'];
+const TB_LABEL = { bn: 'Bank Nifty futures', nifty: 'Nifty futures · buy only', bel: 'BEL futures · buy only', lt: 'L&T futures · buy only', tmpv: 'Tata Motors PV futures · buy only', tcs: 'TCS futures · buy only' };
+const TB_SHORT = { bn: 'BN', nifty: 'Nifty', bel: 'BEL', lt: 'L&T', tmpv: 'TMPV', tcs: 'TCS' };
+const tbBoxSel = (inst) => inst === 'bn' ? '#tbcard' : inst === 'nifty' ? '#tbcardn' : '#tbcard_' + inst;
 async function tbLoad(inst = 'bn') {
-  if (!isOwner()) { const b0 = $(inst === 'bn' ? '#tbcard' : '#tbcardn'); if (b0) b0.innerHTML = ''; return; }
-  const bn = inst === 'bn', px = bn ? 'tb' : 'tn';
-  const box = $(bn ? '#tbcard' : '#tbcardn'); if (!box) return;
+  if (!isOwner()) { const b0 = $(tbBoxSel(inst)); if (b0) b0.innerHTML = ''; return; }
+  const bn = inst === 'bn', px = bn ? 'tb' : inst === 'nifty' ? 'tn' : 'ts' + inst;
+  const stk = TB_STOCKS.includes(inst);
+  const box = $(tbBoxSel(inst)); if (!box) return;
   let T; try { T = await lvApi('/api/tb' + (bn ? '' : '?inst=' + inst)); } catch (e) { box.innerHTML = ''; return; }
   if (!bn && T.inst !== inst) { box.innerHTML = ''; return; }          // server not updated yet
+  if (stk && T.installed === false) {
+    box.innerHTML = inst !== TB_STOCKS[0] ? '' : `<div class="lv-card"><b>Top Bottom · stock futures (BEL, L&T, TMPV, TCS) · buy only</b><p class="lv-sub">Not installed yet. Install adds four buy-only bots, 1 lot each, all in Dry run and asking your OK for every level. Keep total futures near 1× your account: the margin watch holds new automatic entries above that.</p><button class="lv-btn" id="tbsinst">Install stock-futures bots…</button></div>`;
+    const ib = box.querySelector('#tbsinst'); if (ib) ib.addEventListener('click', async () => { const pw = window.prompt('App password:'); if (!pw) return; const cf = window.prompt('Type TBSTOCKS to install the four bots (Dry run):'); if (!cf) return;
+      try { const j = await lvApi('/api/admin', { method: 'POST', body: JSON.stringify({ action: 'tbstocks', password: pw, confirm: cf }) }); alertMsg(j.msg, true); } catch (e) { alertMsg(e.message); } });
+    return; }
   if (!bn && T.installed === false) { box.innerHTML = '<div class="lv-card"><b>Top Bottom · Nifty futures · buy only</b><p class="lv-sub">Not installed on your server yet: run <code>sudo bash /opt/trenddesk/repo/tools/live_server/deploy/tb_nifty_setup.sh</code> once. It starts in Dry run.</p></div>'; return; }
   const S = T.status || {}; const live = T.mode === 'LIVE'; const lots = S.lots || 1;
   const pos = S.pos ? `<b class="${S.pos > 0 ? 'up' : 'down'}">${S.pos > 0 ? 'LONG' : 'SHORT'} ${Math.abs(S.qty || 0)} qty</b> ${esc(S.contract || '')} @ ${fmt(S.entry, 2, 'en-IN')} · stop ${fmt(S.stop, 2, 'en-IN')}` : '<b>Flat</b>';
@@ -1680,13 +1692,13 @@ async function tbLoad(inst = 'bn') {
   // 19 Nov 2026: a crash message shows its actual error line (the last line of the traceback), not just "Bot crashed:"
   const mline = (t) => { const L = String(t).split('\n'); if (!/crashed/i.test(L[0])) return L[0]; const e = L.filter((x) => x.trim() && !/backstop stop|^\s+(File|\^)|^Traceback/.test(x)).pop() || ''; return `${L[0]} ${e.trim().slice(0, 160)}`; };
   const msgs = (T.messages || []).slice(0, 6).map((m) => `<li>${new Date(m.t * 1000).toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · ${esc(mline(m.text))}</li>`).join('');
-  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Top Bottom · ${bn ? 'Bank Nifty futures' : 'Nifty futures · buy only'}</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
+  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Top Bottom · ${TB_LABEL[inst] || inst}</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE ORDERS' : 'DRY RUN'}</span></div>
     <div class="lv-seg" role="group" aria-label="Top Bottom mode"><button id="${px}dry" class="${live ? '' : 'on'}">Dry run</button><button id="${px}live" class="${live ? 'on live' : ''}">Live orders</button></div>
     <div id="${px}arm" class="lv-form" hidden><input id="${px}pw" type="password" placeholder="App password"><input id="${px}cf" placeholder="Type LIVE" autocapitalize="characters"><button class="lv-btn sell" id="${px}go">Turn on live</button></div>
     <div class="tb-auto"><span><b>Auto-approve levels</b><small>${T.auto ? (live ? 'ON · entries and reversals go to Angel automatically, within the bot\'s limits' : 'ON · approved automatically (dry run: logged only)') : 'OFF · you get a phone alert for each level and approve it here'}</small></span>
       ${T.auto == null ? '<small class="muted">after your server updates</small>' : `<button class="ad-sy" aria-pressed="${!!T.auto}" id="${px}auto">${T.auto ? 'On' : 'Off'}</button>`}</div>
     <div id="${px}autoarm" class="lv-form" hidden><input id="${px}apw" type="password" placeholder="App password"><input id="${px}acf" placeholder="Type AUTO" autocapitalize="characters"><button class="lv-btn sell" id="${px}ago">Turn on auto</button></div>
-    <p class="lv-sub">${pos}${S.ltp ? ` · ${bn ? 'BN' : 'Nifty'} fut ${fmt(S.ltp, 2, 'en-IN')}` : ''} · ${S.running ? '● bot running' : `bot idle (starts ${bn ? '08:25' : '08:27'} IST on weekdays)`}${S.note ? ' · ' + esc(S.note) : ''}</p>
+    <p class="lv-sub">${pos}${S.ltp ? ` · ${TB_SHORT[inst] || inst} fut ${fmt(S.ltp, 2, 'en-IN')}` : ''} · ${S.running ? '● bot running' : `bot idle (starts ${bn ? '08:25' : inst === 'nifty' ? '08:27' : '08:29'} IST on weekdays)`}${S.note ? ' · ' + esc(S.note) : ''}</p>
     ${`<details class="info" data-tbdiag="${bn ? 'bn' : 'nifty'}"><summary>Diagnostics (the bot's own log)</summary><pre class="lv-sub" style="white-space:pre-wrap;font-size:11px;max-height:260px;overflow:auto">Loading…</pre></details>`}
     ${S.pos ? '' : lvl('BUY', S.buy_lvl) + (bn ? lvl('SELL', S.sell_lvl) : '')}
     ${pend ? `<p class="lv-sub" style="margin-top:8px"><b>Needs your OK</b> — the bot trades only approved levels; no answer = no trade.</p>${pend}` : ''}
@@ -1703,16 +1715,51 @@ async function tbLoad(inst = 'bn') {
       const a = box.querySelector('#' + px + 'autoarm'); a.hidden = !a.hidden; });
     const ag = box.querySelector('#' + px + 'ago'); if (ag) ag.addEventListener('click', async () => {
       try { await lvApi('/api/tb/auto' + q, { method: 'POST', body: JSON.stringify({ on: true, password: box.querySelector('#' + px + 'apw').value, confirm: box.querySelector('#' + px + 'acf').value }) });
-        alertMsg(`Auto-approve on: every Top Bottom ${bn ? 'Bank Nifty' : 'Nifty'} entry and reversal is approved automatically${live ? ' and sent to Angel' : ' (dry run until you switch to Live orders)'}. The bot's lots, stops and daily loss cap still apply.`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } }); }
+        alertMsg(`Auto-approve on: every Top Bottom ${TB_SHORT[inst] || inst} entry and reversal is approved automatically${live ? ' and sent to Angel' : ' (dry run until you switch to Live orders)'}. The bot's lots, stops and daily loss cap still apply.`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } }); }
   const cmd = async (c, msg) => { try { await lvApi('/api/tb/cmd' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ cmd: c }) }); alertMsg(msg, true); setTimeout(() => tbLoad(inst), 4000); } catch (e) { alertMsg(e.message); } };
   const dg = box.querySelector('[data-tbdiag]'); if (dg) dg.addEventListener('toggle', async () => { if (!dg.open) return; const pre = dg.querySelector('pre');
     try { pre.textContent = (await lvApi('/api/tb/diag')).text; } catch (e) { pre.textContent = 'Not available yet: tap Settings › Server › Update now, wait 2 minutes, then reopen this. (' + e.message + ')'; } });
   const st = box.querySelector('#' + px + 'stop'); if (st) st.addEventListener('click', () => cmd('/stop', 'No new Top Bottom trades today; an open position keeps its stop.'));
   const fl = box.querySelector('#' + px + 'flat'); if (fl) fl.addEventListener('click', () => cmd('/flat', 'Square-off requested — approve it in this card.'));
-  const dry = box.querySelector('#' + px + 'dry'); if (dry) dry.addEventListener('click', async () => { if (!live) return; try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: false }) }); alertMsg(`Top Bottom ${bn ? 'Bank Nifty' : 'Nifty'}: dry run from the next start.`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } });
+  const dry = box.querySelector('#' + px + 'dry'); if (dry) dry.addEventListener('click', async () => { if (!live) return; try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: false }) }); alertMsg(`Top Bottom ${TB_SHORT[inst] || inst}: dry run from the next start.`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } });
   const lv = box.querySelector('#' + px + 'live'); if (lv) lv.addEventListener('click', () => { if (!live) { const a = box.querySelector('#' + px + 'arm'); a.hidden = !a.hidden; } });
-  const go = box.querySelector('#' + px + 'go'); if (go) go.addEventListener('click', async () => { try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: true, password: box.querySelector('#' + px + 'pw').value, confirm: box.querySelector('#' + px + 'cf').value }) }); alertMsg(`Top Bottom ${bn ? 'Bank Nifty' : 'Nifty'}: LIVE orders from the bot's next start (${bn ? '08:25' : '08:27'} IST).`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } });
+  const go = box.querySelector('#' + px + 'go'); if (go) go.addEventListener('click', async () => { try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: true, password: box.querySelector('#' + px + 'pw').value, confirm: box.querySelector('#' + px + 'cf').value }) }); alertMsg(`Top Bottom ${TB_SHORT[inst] || inst}: LIVE orders from the bot's next start (${bn ? '08:25' : inst === 'nifty' ? '08:27' : '08:29'} IST).`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } });
 }
+
+/* 24 Nov 2026 (Amritpal: "automate it all - keep emotions out - but I need control to switch to manual anytime"): one bar on every
+   Live tab. MANUAL NOW = one tap, no password: every automatic entry stops (stock buys/sells, Top Bottom auto-approve on all bots,
+   option trader to paper, Turtle disarmed); open positions keep their stops. Turning anything on needs the password + AUTO. */
+async function autoLoad() {
+  const box = $('#autocard'); if (!box) return;
+  let A; try { A = await lvApi('/api/auto'); } catch (e) { box.innerHTML = ''; return; }
+  const tbOn = Object.entries(A.tb || {}).filter(([, v]) => v.auto).map(([k]) => TB_SHORT[k] || k);
+  const parts = [['stock_sell', 'Stock sells', "Each morning 09:16–09:40 IST the plan's system exits are sold (only stocks a system bought or you adopted)."],
+    ['stock_buy', 'Stock buys', `Each morning 09:20–09:45 IST (after the 09:09 industry check) the plan's buys that fit are sent: same checks as the Buy button, ranked order, buckets and slots, keeping ${fmt(A.reserve_pct, 0)}% of the account in cash.`]];
+  const M = A.margin || {}; const mOk = !(M.issues || []).length;
+  const lab = { stock_buy: 'stock buys', stock_sell: 'stock sells', opt_trader: 'option trader', turtle: 'Turtle MCX' };
+  const onTxt = (A.on || []).map((k) => lab[k] || (k.startsWith('tb_') ? 'Top Bottom ' + (TB_SHORT[k.slice(3)] || k.slice(3)) : k)).join(', ');
+  box.innerHTML = `<details class="lv-card au-bar${A.any_on ? ' au-on' : ''}"><summary class="bk-sum"><span><b>Automation ${A.any_on ? 'ON' : 'OFF · manual'}</b>${A.orders_live ? '' : ' <span class="lv-mode dry">DRY RUN</span>'}<small class="muted" style="display:block">${A.any_on ? esc(onTxt) : 'Nothing trades by itself'}${M.at ? ` · margin ${mOk ? 'OK' : '⚠'} (futures ${fmt(M.fut_x || 0, 2)}× account)` : ''}</small></span>
+      ${A.any_on ? '<button class="lv-btn sell" id="aumanual">MANUAL NOW</button>' : (A.snapshot ? '<button class="lv-btn" id="auresume">Resume automation…</button>' : '')}</summary>
+    ${parts.map(([k, n, d]) => `<div class="tb-auto"><span><b>${n}</b><small>${d}</small></span><button class="ad-sy" aria-pressed="${!!A[k]}" data-aup="${k}">${A[k] ? 'On' : 'Off'}</button></div>`).join('')}
+    <div class="tb-auto"><span><b>Top Bottom auto-approve</b><small>${tbOn.length ? 'ON for ' + esc(tbOn.join(', ')) : 'Off on every bot'} · switch per bot in Futures</small></span></div>
+    <div class="tb-auto"><span><b>Option trader</b><small>${A.opt_trader_live ? 'LIVE orders' : 'Paper only'} · switch in Futures</small></span></div>
+    ${A.turtle ? `<div class="tb-auto"><span><b>Turtle MCX</b><small>${A.turtle.live ? 'LIVE' : 'Dry run'} · armed: ${esc((A.turtle.armed || []).join(', ') || 'none')}</small></span></div>` : ''}
+    <div id="auarm" class="lv-form" hidden><input id="aupw" type="password" placeholder="App password"><input id="aucf" placeholder="Type AUTO" autocapitalize="characters"><button class="lv-btn sell" id="augo">Turn on</button></div>
+    <p class="lv-sub"><b>Margin watch</b> ${M.at ? `(${esc(M.at.slice(11, 16))} IST): account ${money(M.account || 0, 'NSE')} · cash ${money(M.cash || 0, 'NSE')} (${fmt(M.reserve_now || 0, 0)}%) · futures ${money(M.fut_value || 0, 'NSE')} = ${fmt(M.fut_x || 0, 2)}× (limit ${fmt(A.fut_cap_x, 1)}×) · cash needed for margin ${money(M.cash_need || 0, 'NSE')}${mOk ? ' · all OK' : ' · <b class="down">' + esc(M.issues.join('; ')) + '</b>. New automatic futures entries wait for your OK.'}` : 'checks every 10 minutes in market hours.'}</p>
+    <p class="lv-sub">MANUAL NOW stops every automatic entry at once, no password. Open positions keep their stops and the bots still manage their exits. Resume brings back exactly what was on.</p></details>`;
+  let want = null;
+  const refresh = () => { autoLoad(); ['bn', 'nifty'].concat(TB_STOCKS).forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); };
+  const mn = box.querySelector('#aumanual'); if (mn) mn.addEventListener('click', async (e) => { e.preventDefault(); e.stopPropagation();
+    try { await lvApi('/api/auto/manual', { method: 'POST', body: '{}' }); alertMsg('MANUAL: no automatic entries. Open positions keep their stops.', true); refresh(); } catch (er) { alertMsg(er.message); } });
+  const rs = box.querySelector('#auresume'); if (rs) rs.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); box.querySelector('details').open = true; want = { part: 'resume' }; box.querySelector('#auarm').hidden = false; });
+  box.querySelectorAll('[data-aup]').forEach((b) => b.addEventListener('click', async () => { const k = b.dataset.aup;
+    if (A[k]) { try { await lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ part: k, on: false }) }); alertMsg(`Automatic ${lab[k]} off.`, true); autoLoad(); } catch (er) { alertMsg(er.message); } return; }
+    want = { part: k }; box.querySelector('#auarm').hidden = false; }));
+  const go = box.querySelector('#augo'); if (go) go.addEventListener('click', async () => { if (!want) return;
+    try { const j = await lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ ...want, on: true, password: box.querySelector('#aupw').value, confirm: box.querySelector('#aucf').value }) });
+      alertMsg(want.part === 'resume' ? 'Automation resumed: ' + ((j.on || []).join(', ') || 'nothing was on') : `Automatic ${lab[want.part]} on${A.orders_live ? '' : ' (dry run: logged only until Live orders is on)'}.`, true); refresh(); } catch (er) { alertMsg(er.message); } });
+}
+
 
 /* show as many next-ranked trades as the top 10 has unavailable ones (held, skipped, or blocked by a live check) */
 function lvMoreUpd() {

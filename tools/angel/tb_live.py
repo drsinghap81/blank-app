@@ -38,6 +38,7 @@ DEFAULT_CFG = {
     "symbol": "BANKNIFTY",
     "lots": 2,
     "buffer_pts": 25,
+    "buffer_pct": None,              # 24 Nov 2026: stock futures use a % buffer (0.05%, as tested) instead of points
     "day_sl_pct": 1.0,
     "max_sl_pct": 2.0,
     "be_pct": 2.0,
@@ -113,6 +114,8 @@ def level_buffer(level: float, last_close: float, cfg: dict) -> float:
     g = cfg.get("glitch_pts") or 0
     if g and abs(level - last_close) < g:
         return level * cfg.get("glitch_buf_pct", 0.5) / 100
+    if cfg.get("buffer_pct"):
+        return level * float(cfg["buffer_pct"]) / 100
     return cfg["buffer_pts"]
 
 
@@ -145,12 +148,12 @@ def init_flat_state(hist: pd.DataFrame, cfg: dict) -> State:
     st = State()
     c = hist["Close"].to_numpy(float); h = hist["High"].to_numpy(float); l = hist["Low"].to_numpy(float)
     T, B, _ = confirmed_swings(c, 0.0)
-    buf = cfg["buffer_pts"]
     n = len(c)
     for arr, is_top in ((T, True), (B, False)):
         v = arr[n - 1]
         if np.isnan(v):
             continue
+        buf = level_buffer(float(v), float(c[-1]), cfg)
         k = int(np.argmax(arr == v))
         seg_h, seg_l = h[k + 1:n], l[k + 1:n]
         if is_top and len(seg_h) and seg_h.max() >= v + buf:

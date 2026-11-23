@@ -1281,3 +1281,51 @@ def test_morning_check(tmp_path):
     c.post("/api/morning/override", json={"id": r0["id"]}, headers=h)
     S = c.get("/api/plan", headers=h).json(); x = next(r for r in S["rows"] if r["id"] == r0["id"])
     assert "opened red" not in (x.get("skip") or "")
+
+
+def test_automation_switch_manual_and_morning(tmp_path):
+    """24 Nov 2026: automation on needs password + AUTO; MANUAL is one tap and stops every automatic entry; resume restores it."""
+    import json as _j
+    from datetime import datetime
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    s = c.get("/api/auto", headers=h).json(); assert s["stock_buy"] is False and s["any_on"] is False
+    assert c.post("/api/auto", headers=h, json={"part": "stock_buy", "on": True, "password": "pw", "confirm": "no"}).status_code == 400
+    assert c.post("/api/auto", headers=h, json={"part": "stock_buy", "on": True, "password": "bad", "confirm": "AUTO"}).status_code == 401
+    assert c.post("/api/auto", headers=h, json={"part": "stock_buy", "on": True, "password": "pw", "confirm": "AUTO"}).json()["stock_buy"] is True
+    assert c.post("/api/auto", headers=h, json={"part": "stock_sell", "on": True, "password": "pw", "confirm": "AUTO"}).json()["stock_sell"] is True
+    os.makedirs(A.TB_DIRS["bn"], exist_ok=True); A._tb_set_auto("bn", True)
+    assert "tb_bn" in c.get("/api/auto", headers=h).json()["on"]
+    # morning: buys go through order() with every check (dry run here), once a day
+    A.ist_now = lambda: datetime(2026, 11, 25, 9, 32, tzinfo=A.IST) if hasattr(A, "IST") else datetime(2026, 11, 25, 9, 32)
+    A.morning_state = lambda: dict(done=True, rows={}, overrides=[])
+    A.margin_block = lambda key="block": ""
+    A.market_open = lambda t=None: True
+    A.auto_trade()
+    L = [_j.loads(x) for x in open(os.path.join(str(tmp_path), "orders.jsonl"))]
+    assert any(x["kind"] == "auto_buy" for x in L)
+    n = sum(1 for x in L if x["kind"] == "auto_buy"); A.auto_trade()
+    assert sum(1 for x in [_j.loads(x) for x in open(os.path.join(str(tmp_path), "orders.jsonl"))] if x["kind"] == "auto_buy") == n   # once a day
+    assert not A.broker.placed                                   # dry run: nothing reached the broker
+    # MANUAL: one tap, no password, everything off; resume brings back exactly what was on
+    m = c.post("/api/auto/manual", headers=h).json()
+    assert m["any_on"] is False and m["stock_buy"] is False and m["tb"]["bn"]["auto"] is False
+    assert set(m["snapshot"]["tb"]) == {"bn"} and m["snapshot"]["stock_buy"] is True
+    m2 = c.post("/api/auto/manual", headers=h).json(); assert m2["snapshot"]["stock_buy"] is True          # 2nd tap keeps the memory
+    assert c.post("/api/auto", headers=h, json={"part": "resume", "on": True, "password": "pw", "confirm": "NO"}).status_code == 400
+    r = c.post("/api/auto", headers=h, json={"part": "resume", "on": True, "password": "pw", "confirm": "AUTO"}).json()
+    assert r["stock_buy"] and r["stock_sell"] and r["tb"]["bn"]["auto"]
+
+
+def test_margin_watch_blocks_auto_tb(tmp_path):
+    A, c = client(tmp_path)
+    A.broker.fo_positions = lambda: [dict(exchange="NFO", tsym="BANKNIFTY25NOVFUT", netqty=90, ltp=62000.0, itype="FUTIDX")]
+    d = A.margin_check(force=True)
+    assert d["fut_x"] > 0 and (d["fut_x"] <= A.FUT_CAP_X or "exposure" in d["block"])
+    big = A._MW["d"]; big = dict(big, block="futures exposure 2.00x the account (limit 1.0x)"); A._MW.update(d=big, t=__import__("time").time())
+    os.makedirs(os.path.join(A.TB_DIRS["nifty"], "app"), exist_ok=True); A._tb_set_auto("nifty", True)
+    A._tbw("pending.json", {"BUY:26000.00": dict(text="BUY 1 lot NIFTY FUT above 26,000")}, "nifty")
+    A.tb_watch()
+    assert A._tbr("answers.json", {}, "nifty").get("BUY:26000.00") is None          # held for your OK, not auto-approved
+    A._MW.update(d=dict(big, block=""), t=__import__("time").time()); A.tb_watch()
+    assert A._tbr("answers.json", {}, "nifty").get("BUY:26000.00") is True

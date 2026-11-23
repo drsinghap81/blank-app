@@ -318,7 +318,7 @@ def admin(body: Admin, request: Request, _=Depends(auth)):
     'restart' = restart the app server; 'tbrestart' = restart the Top Bottom bots (23 Nov 2026: a fresh start re-checks Angel, so a
     position squared off by hand is noticed). Needs the app password + typing the action's name. The root watchdog acts within a minute."""
     act = body.action.lower()
-    if act not in ("update", "restart", "tbrestart"):
+    if act not in ("update", "restart", "tbrestart", "tbstocks"):
         raise HTTPException(400, "unknown action")
     ip = request.client.host if request.client else "?"
     n, t0 = FAILS.get(ip, (0, 0))
@@ -329,6 +329,9 @@ def admin(body: Admin, request: Request, _=Depends(auth)):
     if not check_pw(body.password):
         FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
     open(os.path.join(DATA, "cmd_" + act), "w").write(str(time.time())); log("admin", action=act)
+    if act == "tbstocks":
+        return dict(ok=True, msg="Install requested: within about a minute the four Top Bottom stock-future bots (BEL, L&T, TMPV, TCS, buy only) "
+                    "are set up in Dry run. Their cards appear in Futures; each level waits for your OK until you turn on auto-approve.")
     if act == "tbrestart":
         return dict(ok=True, msg="Top Bottom bot restart requested: within about a minute the bot restarts, re-checks your Angel positions "
                     "and carries on (or stands flat if you closed the position yourself).")
@@ -1947,6 +1950,11 @@ def basket(body: Basket, _=Depends(auth)):
 TB_DIR = ENV.get("TB_STATE_DIR") or os.path.join(DATA, "tb")
 TB_APP = os.path.join(TB_DIR, "app")
 TB_DIRS = {"bn": TB_DIR, "nifty": ENV.get("TB_NIFTY_DIR") or os.path.join(DATA, "tb_nifty")}   # Bank Nifty (buy+sell), Nifty (buy only)
+# 24 Nov 2026 (Amritpal: automate the Top Bottom basket): buy-only stock-future sleeves, best in the instrument screen and in the
+# basket test (claude/top-bottom-basket-smooth-curve.md). Installed by deploy/tb_stocks_setup.sh, each in Dry run until switched.
+TB_STOCKS = {"bel": "BEL", "lt": "LT", "tmpv": "TMPV", "tcs": "TCS"}
+for _k in TB_STOCKS:
+    TB_DIRS[_k] = os.path.join(DATA, "tb_" + _k)
 
 
 def _tbdir(inst):
@@ -2103,7 +2111,7 @@ def tb_auto_set(body: TBAuto, request: Request, inst: str = "bn", _=Depends(auth
     return dict(ok=True, auto=bool(body.on))
 
 
-TB_NAME = {"bn": "Bank Nifty", "nifty": "Nifty"}
+TB_NAME = {"bn": "Bank Nifty", "nifty": "Nifty", "bel": "BEL", "lt": "L&T", "tmpv": "Tata Motors PV", "tcs": "TCS"}
 
 
 def tb_watch():
@@ -2120,6 +2128,10 @@ def tb_watch():
             txt = str(v.get("text") or k).replace("\n", " ")[:160]
             entry = (k.startswith("BUY:") or k.startswith("SELL:")) and not v.get("options")
             if auto and entry:
+                blk = margin_block()
+                if blk and not _tb_holds(inst):
+                    alert("tb", TB_NAME[inst], f"Held for your OK (not auto-approved): {blk}. {txt} — open Live → Futures", key=f"tbblk:{inst}:{k}")
+                    continue
                 A = A if A is not None else _tbr("answers.json", {}, inst)
                 if A.get(k) is None:
                     A[k] = True; log("tb_auto_yes", inst=inst, key=k)
@@ -2130,6 +2142,277 @@ def tb_watch():
             _tbw("answers.json", A, inst)
             P2 = {k: v for k, v in P.items() if not ((k.startswith("BUY:") or k.startswith("SELL:")) and not v.get("options") and A.get(k) is True)}
             _tbw("pending.json", P2, inst)
+
+
+def _tb_holds(inst):
+    """the bot already holds a position (a level then is a stop-and-reverse or exit, never new exposure)."""
+    try:
+        return bool((_tbr("status.json", {}, inst) or {}).get("pos"))
+    except Exception:  # noqa: BLE001
+        return False
+
+
+# ------------------------------------------------------------------ Automation: one switch for everything (24 Nov 2026)
+# Amritpal: "automate stock buying as per our systems, Top Bottom, option trader, Top Bottom basket - keep emotions out, but I
+# need control to switch to manual anytime". Parts:
+#   stock_sell  each morning 09:16-09:40 IST: the plan's system exits for stocks you hold are sold (same checks as the Sell button)
+#   stock_buy   each morning 09:20-09:45 IST (after the 09:09 morning check): the plan's buys that fit - same checks as the Buy
+#               button, ranked order, buckets, slots, cash - keeping AUTO_CASH_RESERVE_PCT of the account in cash
+#   Top Bottom  each instrument's own auto-approve switch (tb/<inst>/auto.json); option trader and Turtle MCX keep their switches
+# MANUAL NOW (one tap, no password): every automatic ENTRY stops at once - stock buys/sells, Top Bottom auto-approve (all bots),
+# option trader back to paper, Turtle markets disarmed. Open positions keep their stops and exits. What was on is remembered,
+# and "Resume automation" (password + AUTO) switches exactly that back on.
+# Margin watchdog (pledged portfolio + futures, claude/pledge-portfolio-plus-top-bottom-stress-test.md): every 10 minutes in
+# market hours; alerts, and blocks NEW automatic futures entries and stock buys while a limit is broken.
+AUTO_RESERVE = float(ENV.get("AUTO_CASH_RESERVE_PCT", "15")) / 100
+FUT_CAP_X = float(ENV.get("FUT_CAP_X", "1.0"))        # futures exposure above this x the account: warning, no new auto futures entries
+FUT_HARD_X = float(ENV.get("FUT_HARD_X", "1.3"))      # above this: red alert
+AUTO_PARTS = ("stock_buy", "stock_sell")
+_MW = dict(t=0, d=None)
+
+
+def _auto_path():
+    return os.path.join(DATA, "automation.json")
+
+
+def auto_cfg() -> dict:
+    try:
+        c = json.load(open(_auto_path()))
+    except Exception:  # noqa: BLE001
+        c = {}
+    for k in AUTO_PARTS:
+        c.setdefault(k, False)
+    c.setdefault("done", {})
+    return c
+
+
+def _auto_save(c):
+    os.makedirs(DATA, exist_ok=True); tmp = _auto_path() + ".tmp"; json.dump(c, open(tmp, "w")); os.replace(tmp, _auto_path())
+
+
+def _tb_set_auto(inst, on):
+    d = TB_DIRS[inst]
+    if os.path.isdir(d):
+        json.dump(dict(on=bool(on), at=time.time()), open(os.path.join(d, "auto.json"), "w"))
+
+
+def auto_status() -> dict:
+    c = auto_cfg(); tb = {}
+    for inst, d in TB_DIRS.items():
+        if os.path.isdir(d):
+            tb[inst] = dict(name=TB_NAME.get(inst, inst), auto=tb_auto(inst), live=tb_live(inst), pos=(_tbr("status.json", {}, inst) or {}).get("pos") or 0)
+    try:
+        otr = bool(otr_job().live())
+    except Exception:  # noqa: BLE001
+        otr = None
+    try:
+        tm = tmcx_job().status(); tml = dict(live=bool(tm.get("live")), armed=sorted((tm.get("armed") or {}).keys()))
+    except Exception:  # noqa: BLE001
+        tml = None
+    on = [k for k in AUTO_PARTS if c.get(k)] + [f"tb_{i}" for i, v in tb.items() if v["auto"]] + (["opt_trader"] if otr else []) \
+        + (["turtle"] if tml and tml["armed"] and tml["live"] else [])
+    return dict(stock_buy=c["stock_buy"], stock_sell=c["stock_sell"], tb=tb, opt_trader_live=otr, turtle=tml, orders_live=is_live(),
+                any_on=bool(on), on=on, manual_at=c.get("manual_at"), snapshot=c.get("snapshot"), reserve_pct=AUTO_RESERVE * 100,
+                fut_cap_x=FUT_CAP_X, margin=_MW.get("d"), done=c.get("done"))
+
+
+@app.get("/api/auto")
+def auto_get(_=Depends(auth)):
+    return auto_status()
+
+
+class AutoSet(BaseModel):
+    part: str                 # stock_buy | stock_sell | resume
+    on: bool = True
+    password: str = ""
+    confirm: str = ""
+
+
+@app.post("/api/auto")
+def auto_set(body: AutoSet, request: Request, _=Depends(auth)):
+    """turning anything ON needs the app password + typing AUTO; OFF is one tap."""
+    if body.part not in AUTO_PARTS + ("resume",):
+        raise HTTPException(400, "unknown part")
+    if body.on:
+        ip = request.client.host if request.client else "?"
+        n, t0 = FAILS.get(ip, (0, 0))
+        if n >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if body.confirm.strip().upper() != "AUTO":
+            raise HTTPException(400, "type AUTO to confirm")
+        if not check_pw(body.password):
+            FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
+    c = auto_cfg()
+    if body.part == "resume":
+        S = c.get("snapshot") or {}
+        for k in AUTO_PARTS:
+            c[k] = bool(S.get(k))
+        for inst in S.get("tb") or []:
+            if inst in TB_DIRS:
+                _tb_set_auto(inst, True)
+        if S.get("opt_trader"):
+            otr_job().set_live(True)
+        for name, a in (S.get("turtle") or {}).items():
+            try:
+                tmcx_job().arm(name, a.get("lots", 1), True, a.get("mult"))
+            except Exception as ex:  # noqa: BLE001
+                log("auto_resume_turtle", name=name, error=str(ex)[:120])
+        c["resumed_at"] = ist_now().isoformat(timespec="minutes"); _auto_save(c); log("auto_resume", snapshot=S)
+        alert("auto", "AUTO", "Automation resumed: " + (", ".join(auto_status()["on"]) or "nothing was on"), key=f"auto:resume:{time.time():.0f}")
+        return auto_status()
+    c[body.part] = bool(body.on); _auto_save(c); log("auto_set", part=body.part, on=body.on)
+    return auto_status()
+
+
+@app.post("/api/auto/manual")
+def auto_manual(_=Depends(auth)):
+    """ONE TAP, no password: stop every automatic entry now. Open positions keep their stops and the bots' exits."""
+    c = auto_cfg(); st = auto_status()
+    snap = dict(stock_buy=c["stock_buy"], stock_sell=c["stock_sell"], tb=[i for i, v in st["tb"].items() if v["auto"]],
+                opt_trader=bool(st.get("opt_trader_live")), turtle={})
+    try:
+        tm = tmcx_job().status(); snap["turtle"] = {k: dict(lots=v.get("lots", 1), mult=v.get("mult")) for k, v in (tm.get("armed") or {}).items()}
+    except Exception:  # noqa: BLE001
+        pass
+    if any([snap["stock_buy"], snap["stock_sell"], snap["tb"], snap["opt_trader"], snap["turtle"]]):
+        c["snapshot"] = snap                               # remember what was on (an empty second tap doesn't wipe it)
+    for k in AUTO_PARTS:
+        c[k] = False
+    for inst in TB_DIRS:
+        try:
+            _tb_set_auto(inst, False)
+        except Exception as ex:  # noqa: BLE001
+            log("auto_manual_tb", inst=inst, error=str(ex)[:120])
+    try:
+        otr_job().set_live(False)
+    except Exception as ex:  # noqa: BLE001
+        log("auto_manual_otr", error=str(ex)[:120])
+    for name in list(snap["turtle"]):
+        try:
+            tmcx_job().arm(name, 1, False)
+        except Exception as ex:  # noqa: BLE001
+            log("auto_manual_turtle", name=name, error=str(ex)[:120])
+    c["manual_at"] = ist_now().isoformat(timespec="minutes"); _auto_save(c); log("auto_manual", snapshot=snap)
+    alert("auto", "MANUAL", "MANUAL mode: no automatic entries. Stock buys/sells, Top Bottom auto-approve, option trader (paper now) and Turtle "
+          "are off. Open positions keep their stops. Resume automation from Live when you want it back.", key=f"auto:manual:{time.time():.0f}")
+    return auto_status()
+
+
+def margin_check(force=False):
+    """futures exposure vs account value, and the SEBI cash half of the F&O margin. Cached 10 minutes."""
+    if not force and _MW["d"] is not None and time.time() - _MW["t"] < 600:
+        return _MW["d"]
+    acc = account_cached(300); rms = acc.get("rms") or {}
+    try:
+        fo = broker.fo_positions()
+    except Exception as ex:  # noqa: BLE001
+        log("margin_check", error=str(ex)[:160]); fo = []
+    fut = [p for p in fo if str(p.get("itype") or "").startswith("FUT")]
+    notional = sum(abs(p["netqty"]) * (p.get("ltp") or 0) for p in fut)
+    value = (acc.get("holdings_value") or 0) + (acc.get("positions_value") or 0) + max(0.0, acc.get("cash") or 0)
+    span = float(rms.get("utilisedspan") or 0)
+    margin = span if span > 0 else 0.12 * notional           # Angel's SPAN when it reports it, else ~12% of the futures value
+    cash = float(acc.get("cash") or 0)
+    x = notional / value if value else 0.0
+    issues = []
+    if cash < 0:
+        issues.append(f"cash is negative ({cash:,.0f}): futures losses are being funded by a debit")
+    elif margin and cash < 0.5 * margin:
+        issues.append(f"cash {cash:,.0f} is below half the F&O margin ({0.5 * margin:,.0f}) - SEBI's cash part; top up or a pledged sale may follow")
+    cash_issue = "; ".join(issues)
+    if x > FUT_HARD_X:
+        issues.append(f"futures exposure {x:.2f}x the account (red line {FUT_HARD_X:.1f}x)")
+    elif x > FUT_CAP_X:
+        issues.append(f"futures exposure {x:.2f}x the account (limit {FUT_CAP_X:.1f}x)")
+    d = dict(at=ist_now().isoformat(timespec="minutes"), account=round(value), cash=round(cash), collateral=round(float(rms.get("collateral") or 0)),
+             fut_value=round(notional), fut_x=round(x, 2), margin=round(margin), cash_need=round(0.5 * margin), n_fut=len(fut),
+             reserve_now=round(cash / value * 100, 1) if value else None, issues=issues, block="; ".join(issues), cash_block=cash_issue)
+    _MW.update(t=time.time(), d=d)
+    if issues:
+        alert("margin", "MARGIN", "Margin watch: " + " · ".join(issues) + ". New automatic futures entries are on hold"
+              + (" and so are automatic stock buys." if cash_issue else "."),
+              key=f"margin:{ist_now().date()}:{'|'.join(i.split(' ')[0] for i in issues)}")
+    return d
+
+
+def margin_block(key="block") -> str:
+    """'block': anything broken (holds new automatic futures entries); 'cash_block': only the cash problems (holds stock buys)."""
+    try:
+        d = _MW.get("d") if _MW.get("d") is not None and time.time() - _MW["t"] < 1800 else margin_check()
+        return (d or {}).get(key) or ""
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+@app.get("/api/margin")
+def margin_get(_=Depends(auth)):
+    return margin_check(force=True)
+
+
+def auto_trade():
+    """the morning automatic sells / buys (once a day each). Same order() path and checks as the app's buttons."""
+    t = ist_now(); c = auto_cfg(); day = t.date().isoformat(); hm = (t.hour, t.minute)
+    if t.weekday() >= 5 or not (c["stock_buy"] or c["stock_sell"]):
+        return
+    done = c.setdefault("done", {})
+    if c["stock_sell"] and (9, 16) <= hm <= (9, 40) and done.get("sell") != day:
+        done["sell"] = day; _auto_save(c)
+        S = sized(account_cached(30)); res = []; J = journal()
+        for e in S.get("exits") or []:
+            if e.get("qty", 0) <= 0:
+                continue
+            if not (J.get(e["symbol"]) or {}).get("system"):       # only stocks the app bought or you handed to a system (Adopt)
+                res.append(f"{e['symbol']} left for you (not bought by a system)"); continue
+            try:
+                r = order(Order(id=e["id"], qty=e["qty"], confirm=f"SELL {e['qty']} {e['symbol']}"), True)
+                res.append(f"{e['symbol']} {e['qty']} {'sent' if r.get('sent') else 'dry run'}")
+            except HTTPException as ex:
+                res.append(f"{e['symbol']} not sent ({ex.detail})")
+            except Exception as ex:  # noqa: BLE001
+                res.append(f"{e['symbol']} error ({angel_msg(ex)})")
+            time.sleep(0.5)
+        log("auto_sell", results=res)
+        if res:
+            alert("auto", "AUTO SELL", "Automatic system sells: " + "; ".join(res), key=f"autosell:{day}")
+    if c["stock_buy"] and (9, 20) <= hm <= (9, 45) and done.get("buy") != day:
+        M = morning_state()
+        if not M.get("done") and hm < (9, 30):
+            return                                          # wait for the 09:09 morning check (industry open) a little longer
+        done["buy"] = day; _auto_save(c)
+        blk = margin_block("cash_block")
+        if blk:
+            alert("auto", "AUTO BUY", f"No automatic buys today: {blk}.", key=f"autobuy:{day}"); return
+        S = sized(account_cached(30)); res = []
+        cash = float(S.get("cash") or 0); keep = AUTO_RESERVE * float(S.get("real_value") or 0)
+        for r_ in S.get("rows") or []:
+            if r_.get("skip") or r_.get("qty", 0) <= 0 or r_.get("reserve") or r_.get("outside") or r_.get("kind") == "MY_GTT" or r_.get("surv"):
+                continue
+            v = float(r_.get("value") or 0)
+            if cash - v < keep:
+                res.append(f"{r_['symbol']} skipped (keeps {AUTO_RESERVE * 100:.0f}% cash reserve)"); continue
+            try:
+                o = order(Order(id=r_["id"], qty=r_["qty"], confirm=f"BUY {r_['qty']} {r_['symbol']}"), True)
+                cash -= v; res.append(f"{r_['symbol']} {r_['qty']} ({r_.get('system')}) {'sent' if o.get('sent') else 'dry run'}")
+            except HTTPException as ex:
+                res.append(f"{r_['symbol']} not sent ({ex.detail})")
+            except Exception as ex:  # noqa: BLE001
+                res.append(f"{r_['symbol']} error ({angel_msg(ex)})")
+            time.sleep(0.5)
+        log("auto_buy", results=res)
+        alert("auto", "AUTO BUY", ("Automatic system buys: " + "; ".join(res)) if res else "Automatic buys: nothing to buy today.", key=f"autobuy:{day}")
+
+
+def _auto_loop():
+    while True:
+        _HB["auto"] = time.time()
+        try:
+            t = ist_now()
+            if t.weekday() < 5 and (9, 15) <= (t.hour, t.minute) <= (15, 30):
+                margin_check()
+            auto_trade()
+        except Exception as ex:  # noqa: BLE001
+            log("auto_loop_error", error=str(ex)[:200])
+        time.sleep(60)
 
 
 def _tb_loop():
@@ -4577,6 +4860,7 @@ def _start():
         import threading
         threading.Thread(target=_loop, daemon=True).start()
         threading.Thread(target=_tb_loop, daemon=True).start()
+        threading.Thread(target=_auto_loop, daemon=True).start()
         _opt_today_load()
         try:
             otr_job().start()

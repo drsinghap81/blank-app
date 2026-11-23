@@ -146,7 +146,7 @@ class AngelBroker:
         rows = json.load(open(path))
         sym = self.cfg["symbol"]
         for x in rows:
-            if x.get("exch_seg") == "NFO" and x.get("name") == sym and x.get("instrumenttype") == "FUTIDX":
+            if x.get("exch_seg") == "NFO" and x.get("name") == sym and x.get("instrumenttype") in ("FUTIDX", "FUTSTK"):   # FUTSTK: stock-future sleeves (24 Nov 2026)
                 self.contracts[x["symbol"]] = dict(
                     token=x["token"], expiry=datetime.strptime(x["expiry"], "%d%b%Y").date(),
                     lot=int(float(x["lotsize"])), tick=float(x.get("tick_size") or 5) / 100)
