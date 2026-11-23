@@ -95,11 +95,11 @@ def main():
     t = tbb.run_live(bn[bn.index >= "2010-01-01"], tbb.Params(buffer_pct=0.05, buffer_pts=0, event_exit=False)); t = t[~t.Open]
     r = t.Pct / 100 - 0.0005; r.index = pd.to_datetime(t.ExitDate); months[("BANKNIFTY", "both sides")] = r.groupby(r.index.to_period("M")).apply(lambda x: np.prod(1 + x) - 1)
     def book(keys, lab):
-        M = pd.DataFrame({k: months[k] for k in keys if k in months}).sort_index()
+        M = pd.DataFrame({f"{k[0]}|{k[1]}": months[k] for k in keys if k in months}).sort_index()
         M = M[M.index >= pd.Period("2011-01", "M")].fillna(0.0); m = M.mean(axis=1); eq = (1 + m).cumprod()
         yrs = len(m) / 12; dd = (eq / eq.cummax() - 1).min()
         w = lambda y: (np.prod(1 + m.iloc[-12 * y:]) - 1) * 100
-        corr = M.corr().where(~np.eye(len(M.columns), dtype=bool)).stack().median() if M.shape[1] > 1 else np.nan
+        C = M.corr().to_numpy(); corr = float(np.median(C[~np.eye(len(C), dtype=bool)])) if M.shape[1] > 1 else float("nan")
         print(f"R| BOOK {lab} ({M.shape[1]} sleeves) | CAGR {(eq.iloc[-1] ** (1 / yrs) - 1) * 100:+.1f}% | monthly DD {dd * 100:+.1f}% | up months {(m > 0).mean() * 100:.0f}% | "
               f"1y {w(1):+.1f} 2y {w(2):+.1f} 3y {w(3):+.1f} 5y {w(5):+.1f} | median corr {corr:.2f}", flush=True)
     book([("BANKNIFTY", "both sides")], "Bank Nifty alone")
