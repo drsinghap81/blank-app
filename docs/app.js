@@ -8391,8 +8391,8 @@ function t3Info(mk, L, X, buys) {
   const G = (X.GP && X.GP.rows) || [];
   const top = G.filter((g) => g.p1m != null && (g.n || 0) >= 3).sort((a, b) => (['Leading', 'Improving'].includes((b.rrg || {}).now) ? 1 : 0) - (['Leading', 'Improving'].includes((a.rrg || {}).now) ? 1 : 0) || b.p1m - a.p1m)[0];
   if (top) { const q = T3Q[(top.rrg || {}).now] || 'N';
-    cards.push(`<button class="ig2-card" data-ig="ind:${esc(top.group)}"><span class="ig2-ic" aria-hidden="true">🔥</span><small>Hottest industry</small><b class="ig2-big">${esc(top.group)}</b>
-      <span class="ig2-meter" role="img" aria-label="Pulse ${fmt(top.p1m, 0)}"><i style="width:${Math.min(100, top.p1m)}%"></i></span><span class="ig2-tag"><i class="ig2-dot" style="background:${T3C[q]}"></i>${T3N[q]} · Pulse ${fmt(top.p1m, 0)}% trending</span></button>`); }
+    cards.push(`<button class="ig2-card" data-ig="ind:${esc(top.group)}"><span class="ig2-ic" aria-hidden="true">🔥</span><small>Strongest last month</small><b class="ig2-big">${esc(top.group)}</b>
+      <span class="ig2-meter" role="img" aria-label="Pulse ${fmt(top.p1m, 0)}"><i style="width:${Math.min(100, top.p1m)}%"></i></span><span class="ig2-tag"><i class="ig2-dot" style="background:${T3C[q]}"></i>${T3N[q]} · Pulse ${fmt(top.p1m, 0)}% trending</span><span class="ig2-tag muted">Past strength, not a forecast: leaders often cool off in the next few weeks</span></button>`); }
   if (mk === 'NSE' && state.gp && state.gp.NSE) {
     const I = groupIndex(state.gp.NSE).filter((g) => g.kind === 'Industry' && g.p1w != null && g.p1m != null && (g.nl || 0) >= 3);
     const up = I.filter((g) => g.p1w - g.p1m >= 5).sort((a, b) => (b.p1w - b.p1m) - (a.p1w - a.p1m)), dn = I.filter((g) => g.p1w - g.p1m <= -5);
