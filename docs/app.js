@@ -8120,16 +8120,29 @@ function groupOpen(g) {
    a quarter (Q), a month (M) and the last week (W). The slope Q → M → W shows the direction; "moving up" = this week at least 5
    points above the month, "moving down" = 5 below. Rank move = places gained this week vs the month ranking. Context, not a signal. */
 // 23 Nov 2026 (Amritpal: "fading to dark green, yellow, red"): heat colour from this week's strength - red (weak) -> yellow -> dark green (strong)
+const sbKind = () => { try { return localStorage.getItem('sb.kind') || 'Index'; } catch (e) { return 'Index'; } };
 function sbHeat(p) {
   const v = Math.max(0, Math.min(100, p || 0)); const h = Math.round(v * 1.25); const l = Math.round(46 - Math.max(0, v - 50) * 0.28);
   return `--sbh:hsl(${h} 72% ${l}%);background:linear-gradient(90deg, hsl(${h} 72% ${l}% / .38), hsl(${h} 72% ${l}% / .08) 70%), var(--card);border-left-color:hsl(${h} 72% ${l}%)`;
 }
 async function strengthBoard(kind = 'Industry', mode = 'all') {
   const G = await loadGP('NSE').catch(() => null); if (!G) { alertMsg('Strength data not loaded yet.'); return; }
-  const all = groupIndex(G).filter((g) => g.kind === kind && g.p1m != null && g.p1w != null && (kind !== 'Industry' || (g.nl || 0) >= 3));
+  let all = groupIndex(G).filter((g) => g.kind === kind && g.p1m != null && g.p1w != null && (kind !== 'Industry' || (g.nl || 0) >= 3));
+  if (kind === 'Index') {    // 23 Nov 2026 (Amritpal: "yes add" - banking visible at a glance): NSE sector indices, strength = relative strength vs Nifty 50
+    const R = await getJSON(MAIN + 'data/scan/sector_rrg.json', 'sector_rrg_NSE').catch(() => null); const W = (R && R.weekly) || {};
+    const heat = (r) => Math.max(0, Math.min(100, (r - 94) / 12 * 100));      // RS-ratio 94 -> 0 (weak), 100 -> 50, 106 -> 100 (strong)
+    const IXM = { 'Bank Nifty': ['Private Sector Bank', 'Public Sector Bank'], 'Pvt Bank': ['Private Sector Bank'], 'PSU Bank': ['Public Sector Bank'], 'Pharma': ['Pharmaceuticals'] };
+    const SXM = { 'Fin Services': 'Financial Services', IT: 'Information Technology', Healthcare: 'Healthcare', FMCG: 'Fast Moving Consumer Goods', Auto: 'Automobile and Auto Components',
+      Metal: 'Metals & Mining', Energy: 'Oil Gas & Consumable Fuels', 'Oil & Gas': 'Oil Gas & Consumable Fuels', Realty: 'Realty', Media: 'Media Entertainment & Publication', 'Cons Durables': 'Consumer Durables', Services: 'Services' };
+    const nr = (G.nse && G.nse.rows) || [];
+    all = Object.entries(W).filter(([, v]) => v && v.pts && v.pts.length >= 3).map(([nm, v]) => { const r = v.pts.map((x) => x[1]); const n = r.length;
+      const mem = IXM[nm] ? nr.filter((x) => IXM[nm].includes(x.basic)).flatMap((x) => x.members.map((m) => m.symbol)) : SXM[nm] ? nr.filter((x) => x.sector === SXM[nm]).flatMap((x) => x.members.map((m) => m.symbol)) : [];
+      return { kind: 'Index', name: nm, sub: v.index || '', members: mem, q: v.now, p1q: heat(r[Math.max(0, n - 5)]), p1m: heat(r[n - 2]), p1w: heat(r[n - 1]), big: fmt(r[n - 1], 1), rsd: r[n - 1] - r[n - 2], r1m: null }; });
+  }
   const rk = (k) => { const L = all.slice().sort((a, b) => (b[k] || 0) - (a[k] || 0)); const m = {}; L.forEach((g, i) => { m[g.name] = i + 1; }); return m; };
   const rM = rk('p1m'), rW = rk('p1w');
-  all.forEach((g) => { g.dW = g.p1w - g.p1m; g.dQ = g.p1q != null ? g.p1m - g.p1q : null; g.mv = (rM[g.name] || 0) - (rW[g.name] || 0); g.dir = g.dW >= 5 ? 'up' : g.dW <= -5 ? 'down' : 'flat'; });
+  all.forEach((g) => { g.dW = g.p1w - g.p1m; g.dQ = g.p1q != null ? g.p1m - g.p1q : null; g.mv = (rM[g.name] || 0) - (rW[g.name] || 0);
+    g.dir = kind === 'Index' ? (g.rsd >= 0.75 ? 'up' : g.rsd <= -0.75 ? 'down' : 'flat') : g.dW >= 5 ? 'up' : g.dW <= -5 ? 'down' : 'flat'; });
   const L = (mode === 'up' ? all.filter((g) => g.dir === 'up').sort((a, b) => b.dW - a.dW) : mode === 'down' ? all.filter((g) => g.dir === 'down').sort((a, b) => a.dW - b.dW) : all.slice().sort((a, b) => b.p1w - a.p1w));
   const upN = all.filter((g) => g.dir === 'up').length, dnN = all.filter((g) => g.dir === 'down').length;
   const slope = (g) => { const pts = [g.p1q ?? g.p1m, g.p1m, g.p1w].map((v) => Math.max(0, Math.min(100, v))); const Y = (v) => 34 - v * 0.3;
@@ -8139,24 +8152,24 @@ async function strengthBoard(kind = 'Industry', mode = 'all') {
   const qcol = { Leading: T3C.L, Improving: T3C.I, Weakening: T3C.W, Lagging: T3C.G };
   openPanel(`<div class="t3 sb">
     <div class="t3w-h"><div><h2 style="font-family:var(--font-head);margin:0">Strength board</h2><small class="muted">Which groups are gaining or losing strength this week · India</small></div></div>
-    <div class="t3-mk" role="tablist">${['Sector', 'Industry', 'Theme'].map((k) => `<button data-sbk="${k}" role="tab" aria-selected="${k === kind}">${k === 'Industry' ? 'Industries' : k + 's'}</button>`).join('')}</div>
+    <div class="t3-mk" role="tablist">${['Index', 'Sector', 'Industry', 'Theme'].map((k) => `<button data-sbk="${k}" role="tab" aria-selected="${k === kind}">${k === 'Industry' ? 'Industries' : k === 'Index' ? 'Indices' : k + 's'}</button>`).join('')}</div>
     <section class="sb-hero">
       <button class="sb-big up" data-sbm="up" aria-pressed="${mode === 'up'}"><b>▲ ${upN}</b><span>moving up</span><small>${top('up').map((g) => esc(g.name)).join(' · ') || '–'}</small></button>
       <button class="sb-big down" data-sbm="down" aria-pressed="${mode === 'down'}"><b>▼ ${dnN}</b><span>moving down</span><small>${top('down').map((g) => esc(g.name)).join(' · ') || '–'}</small></button>
-      <button class="sb-big" data-sbm="all" aria-pressed="${mode === 'all'}"><b>${all.length}</b><span>${kind === 'Industry' ? 'industries' : kind.toLowerCase() + 's'}</span><small>all, strongest this week first</small></button>
+      <button class="sb-big" data-sbm="all" aria-pressed="${mode === 'all'}"><b>${all.length}</b><span>${kind === 'Industry' ? 'industries' : kind === 'Index' ? 'indices' : kind.toLowerCase() + 's'}</span><small>all, strongest this week first</small></button>
     </section>
-    <div class="sb-key"><span>Line = strength over the quarter → month → this week</span><span><i style="background:var(--rise)"></i>moving up</span><span><i style="background:var(--fall)"></i>moving down</span></div>
+    <div class="sb-key"><span>${kind === 'Index' ? 'Index strength = relative strength vs Nifty 50 (100 = in line); line = 4 weeks ago → last week → this week' : 'Line = strength over the quarter → month → this week'}</span><span><i style="background:var(--rise)"></i>moving up</span><span><i style="background:var(--fall)"></i>moving down</span></div>
     <div class="sb-scale" aria-hidden="true"><span>weak</span><i></i><span>strong</span></div>
     <ol class="sb-list">${L.map((g, i) => `<li><button class="sb-row ${g.dir}" data-sbi="${all.indexOf(g)}" style="${sbHeat(g.p1w)}">
-      <span class="sb-nm"><b>${esc(g.name)}</b><small>${g.q ? `<i class="ig2-dot" style="background:${qcol[g.q] || 'var(--muted)'}"></i>${esc(g.q)} · ` : ''}${g.members.length} stocks${g.r1m != null ? ` · 1 m ${g.r1m >= 0 ? '+' : ''}${fmt(g.r1m, 0)}%` : ''}</small></span>
+      <span class="sb-nm"><b>${esc(g.name)}</b><small>${g.q ? `<i class="ig2-dot" style="background:${qcol[g.q] || 'var(--muted)'}"></i>${esc(g.q)} · ` : ''}${kind === 'Index' ? 'vs Nifty 50' : g.members.length + ' stocks'}${g.r1m != null ? ` · 1 m ${g.r1m >= 0 ? '+' : ''}${fmt(g.r1m, 0)}%` : ''}</small></span>
       ${slope(g)}
-      <span class="sb-num"><b>${fmt(g.p1w, 0)}</b><small class="${g.dir === 'up' ? 'up' : g.dir === 'down' ? 'down' : 'muted'}">${g.dir === 'up' ? '▲' : g.dir === 'down' ? '▼' : '•'} ${g.dW >= 0 ? '+' : ''}${fmt(g.dW, 0)}${g.mv ? ` · ${g.mv > 0 ? '↑' : '↓'}${Math.abs(g.mv)}` : ''}</small></span></button></li>`).join('') || '<li class="empty">Nothing in this view today.</li>'}</ol>
+      <span class="sb-num"><b>${g.big || fmt(g.p1w, 0)}</b><small class="${g.dir === 'up' ? 'up' : g.dir === 'down' ? 'down' : 'muted'}">${g.dir === 'up' ? '▲' : g.dir === 'down' ? '▼' : '•'} ${kind === 'Index' ? `${g.rsd >= 0 ? '+' : ''}${fmt(g.rsd, 1)}` : `${g.dW >= 0 ? '+' : ''}${fmt(g.dW, 0)}`}${g.mv ? ` · ${g.mv > 0 ? '↑' : '↓'}${Math.abs(g.mv)}` : ''}</small></span></button></li>`).join('') || '<li class="empty">Nothing in this view today.</li>'}</ol>
     <p class="t3-foot">Strength = Pulse: the share of the group's liquid stocks in a clean uptrend (relative strength &gt; market, 9 EMA &gt; 21 EMA, above a rising 150-day average, within 25% of the high). Big number = this week; ▲/▼ = points vs the month average; ↑/↓ = places moved in the ranking. Tested: top-10% Pulse industries that are Leading/Improving were the best basket (Pulse rotation); a rise in Pulse on its own is context, not a buy signal. Tap a row for its stocks and systems.</p></div>`);
   history.pushState({ sheet: 1 }, '');
   const root = $('#sheet-body');
-  root.querySelectorAll('[data-sbk]').forEach((b) => b.addEventListener('click', () => strengthBoard(b.dataset.sbk, mode)));
+  root.querySelectorAll('[data-sbk]').forEach((b) => b.addEventListener('click', () => { try { localStorage.setItem('sb.kind', b.dataset.sbk); } catch (e) { /* */ } strengthBoard(b.dataset.sbk, mode); }));
   root.querySelectorAll('[data-sbm]').forEach((b) => b.addEventListener('click', () => strengthBoard(kind, b.dataset.sbm === mode ? 'all' : b.dataset.sbm)));
-  root.querySelectorAll('[data-sbi]').forEach((b) => b.addEventListener('click', () => groupOpen(all[+b.dataset.sbi])));
+  root.querySelectorAll('[data-sbi]').forEach((b) => b.addEventListener('click', () => { const g = all[+b.dataset.sbi]; if (g.members && g.members.length) groupOpen(g); else alertMsg(`${g.name}: no stock list mapped for this index - search its industry instead.`); }));
 }
 async function searchOpen() {
   openPanel(`<div class="d-head no-push"><div><h2>Search</h2><div class="co">Any stock or ETF in India, US, Australia or UK, a system name (flag, weekly cup, 9/21, W bottom…), or a sector / industry / theme (PSU bank, pharma, defence…) to list its stocks</div></div></div>
@@ -8169,7 +8182,7 @@ async function searchOpen() {
   const draw = () => { const q = (inp.value || '').trim().toUpperCase();
     if (q.length < 2) { ul.innerHTML = `<li class="empty">${idx.length.toLocaleString()} stocks and ETFs indexed. Type at least 2 letters.</li><li class="s-chips">${['Flag', 'Day cup', 'Week cup', 'Month cup', 'ATH', 'Cup 9/21', 'Tight base', 'W bottom', 'IPO', 'ETF'].map((t) => `<button class="chip" data-sq="${t}">${t}</button>`).join('')}</li>`;
       ul.insertAdjacentHTML('beforeend', '<li><button class="t3-link" id="ssb">Strength board: every sector, industry and theme, moving up or down ›</button></li>');
-      const sb = document.getElementById('ssb'); if (sb) sb.addEventListener('click', () => strengthBoard('Industry'));
+      const sb = document.getElementById('ssb'); if (sb) sb.addEventListener('click', () => strengthBoard(sbKind()));
       ul.querySelectorAll('[data-sq]').forEach((b) => b.addEventListener('click', () => { inp.value = b.dataset.sq; draw(); })); return; }
     const hit = idx.map((e) => ({ e, s: e.sym.toUpperCase() === q ? 0 : e.sym.toUpperCase().startsWith(q) ? 1 : e.name.toUpperCase().includes(q) ? 2 : e.sym.toUpperCase().includes(q) ? 3 : 9 }))
       .filter((x) => x.s < 9).sort((a, b) => a.s - b.s || a.e.sym.length - b.e.sym.length).slice(0, 30);
@@ -8393,7 +8406,7 @@ function fiiView(L) {
 }
 function t3InfoGo(k, mk, X) {
   if (k === 'fii') { fiiView(state._t3L); return; }
-  if (k === 'sb') { strengthBoard('Industry'); return; }
+  if (k === 'sb') { strengthBoard(sbKind()); return; }
   if (k === 'gov') { const s = SYSX.find((x) => x.id === 'gov'); if (s) sysListView(s, 'NSE', 'govt'); return; }
   if (k.startsWith('ind:')) { const g = k.slice(4); const r = ((X.GP && X.GP.rows) || []).find((x) => x.group === g); Object.assign(state.mx, { lvl: 'industry', m: mk, sec: r ? r.sector : null, grp: g }); show('mk'); }
 }

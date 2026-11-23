@@ -1678,6 +1678,6 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .sb-nm b { display: block; font-size: 14.5px; } .sb-nm small { color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .sb-num { text-align: right; } .sb-num b { display: block; font-family: var(--font-head); font-size: 22px; } .sb-num small { font-size: 12px; font-weight: 700; }
 @media (max-width: 420px) { .sb-hero { grid-template-columns: 1fr 1fr; } .sb-hero .sb-big:last-child { grid-column: span 2; } }
-.sb-row { border-left-width: 6px; } .sb-row .sb-num b { color: var(--sbh, var(--ink)); filter: brightness(1.25); }
+.sb-row { border-left-width: 6px; } .sb-row .sb-num b { color: var(--ink); background: var(--card); border: 2px solid var(--sbh, var(--line)); border-radius: 12px; padding: 0 8px; display: inline-block; min-width: 2.2em; text-align: center; }
 .sb-scale { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin: 0 2px 10px; }
 .sb-scale i { flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, hsl(0 72% 46%), hsl(62 72% 46%), hsl(125 72% 32%)); }
