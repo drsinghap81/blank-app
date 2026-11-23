@@ -7,13 +7,9 @@ Signals (NSE stocks, Yahoo daily 2015-26, today's names -> survivors; point in t
   flag   flag / pennant / rectangle breakout (live rule: drying flag volume, 1.5x breakout volume, flag range <= 8%)
   bottom bottom-pattern breakout (tools/pattern_scan.py: W / tilted W / triple bottom / inverse H&S, first close above the neckline)
   tight  tight-base breakout;  base  first 52-week-high breakout after a 6-month base (live 9/21-family rules)
-One event per stock per 20 sessions per system. Trigger = the breakout candle's HIGH. Entry = a buy-stop: the first of the next
-5 sessions whose high trades above the trigger; fill = the trigger + 0.1%, or the open if it gaps above.
-Exits compared:
-  intraday   sell at that day's close (0.10% cost)
-  swing      stop = the breakout candle's low (an intraday low at or under it exits at the stop / the open if it gaps under),
-             else the close after 21 / 63 sessions (0.40% cost)
-  next-open  control: buy the next open after the breakout day regardless (same swing exits)
+One event per stock per 20 sessions per system. Entry = buy-stop at the breakout candle's HIGH + 0.1% (and + 0.2%), valid 5
+sessions; fill at that price or the open if it gaps above. SL = the breakout candle's LOW. Exits: intraday close (0.1% cost); hold
+63 sessions; trail = first close below the 21-day EMA; target 2R (0.4% cost). Control: buy the next open regardless (63 sessions).
 Newest first (last 1 / 2 / 3 / 5 years), each year. PILOT env = 150 stocks. Output data/research/candle_takeout(_pilot).json"""
 import json
 import os
@@ -52,33 +48,42 @@ def bottom_days(sym, x):
 
 
 def trades(sym, x, sig, name):
+    """23 Nov 2026 (Amritpal: "buying only happens if the high is taken out, order 0.1-0.2% higher, SL below the breakout candle low"):
+    buy-stop at the breakout candle's high + BUF (0.1% / 0.2%), valid WIN sessions; fill = that price, or the open if it gaps above.
+    Stop = the breakout candle's low (a low at or under it exits at the stop / the open if it gaps under; on the entry day a low under
+    the stop counts as stopped - conservative). Exits after entry: E1 intraday close; E2 hold 63 sessions; E3 trail = first close below
+    the 21-day EMA (sell next open); E4 target 2R (risk = entry - stop) else 63 sessions."""
     o, h, l, c = (x[k].to_numpy(float) for k in ("OPEN", "HIGH", "LOW", "CLOSE")); D = x.index; n = len(c); rows = []; last = -999
+    e21 = pd.Series(c).ewm(span=21, adjust=False).mean().to_numpy()
     for t in np.where(sig)[0]:
         if t - last < GAP or D[t] < pd.Timestamp("2016-06-01") or t + 1 >= n or c[t] < 30:
             continue
-        last = t; trig, stop = h[t], l[t]
-        r = dict(sys=name, sym=sym, d=D[t], taken=False)
-
-        def swing(j0, e):
-            out = {}
-            for hz in (21, 63):
-                res = None
-                for j in range(j0, min(n, j0 + hz + 1)):
-                    if l[j] <= stop and not (j == j0 and e <= stop):
-                        res = (min(o[j], stop) if j > j0 else stop) / e - 1; break
-                if res is None:
-                    jj = j0 + hz
-                    res = c[jj] / e - 1 if jj < n else np.nan
-                out[hz] = res - 0.004 if np.isfinite(res) else np.nan
-            return out
-        for j in range(t + 1, min(n, t + 1 + WIN)):
-            if h[j] > trig:
-                e = max(o[j], trig * 1.001)
-                if e > h[j]:
-                    e = o[j]
-                r.update(taken=True, lag=j - t, gap=bool(o[j] > trig), intraday=c[j] / e - 1 - 0.001, entry_vs_close=e / c[t] - 1)
-                sw = swing(j, e); r.update(s21=sw[21], s63=sw[63]); break
-        e0 = o[t + 1]; sw0 = swing(t + 1, e0); r.update(n21=sw0[21], n63=sw0[63])
+        last = t; stop = l[t]
+        r = dict(sys=name, sym=sym, d=D[t])
+        for buf in (0.001, 0.002):
+            trig = h[t] * (1 + buf); k = f"{int(buf * 1000)}"
+            r[f"taken{k}"] = False
+            for j in range(t + 1, min(n, t + 1 + WIN)):
+                if h[j] >= trig:
+                    e = o[j] if o[j] > trig else trig
+                    risk = e - stop
+                    r.update({f"taken{k}": True, f"gap{k}": bool(o[j] > trig), f"risk{k}": risk / e, f"intra{k}": c[j] / e - 1 - 0.001})
+                    res = {}
+                    for ex in ("hold", "trail", "2R"):
+                        out = None
+                        for q in range(j, min(n, j + 64)):
+                            if l[q] <= stop:
+                                out = (stop if q == j or o[q] > stop else o[q]) / e - 1; break
+                            if ex == "2R" and h[q] >= e + 2 * risk and q > j:
+                                out = max(e + 2 * risk, o[q]) / e - 1; break
+                            if ex == "trail" and q > j and c[q] < e21[q] and q + 1 < n:
+                                out = o[q + 1] / e - 1; break
+                        if out is None:
+                            qq = min(n - 1, j + 63); out = c[qq] / e - 1 if j + 63 < n else np.nan
+                        res[ex] = out - 0.004 if np.isfinite(out) else np.nan
+                    r.update({f"{ex}{k}": v for ex, v in res.items()}); break
+        e0 = o[t + 1]; qq = t + 1 + 63
+        r["nextopen63"] = c[qq] / e0 - 1 - 0.004 if qq < n else np.nan
         rows.append(r)
     return rows
 
@@ -106,20 +111,26 @@ def main():
             print("R| stocks", k_, "events", len(rows), flush=True)
     E = pd.DataFrame(rows); end = E.d.max(); res = dict(method=__doc__, systems={})
     for nm, T in E.groupby("sys"):
-        tk = T[T.taken]
-        o = dict(signals=int(len(T)), taken_pct=round(float(T.taken.mean()) * 100), gap_pct=round(float(tk.gap.mean()) * 100) if len(tk) else None,
-                 entry_above_signal_close=round(float(tk.entry_vs_close.mean()) * 100, 2) if len(tk) else None,
-                 intraday=st(tk.intraday), takeout_swing21=st(tk.s21), takeout_swing63=st(tk.s63), nextopen_swing21=st(T.n21), nextopen_swing63=st(T.n63),
-                 not_taken_nextopen63=st(T[~T.taken].n63))
+        o = dict(signals=int(len(T)))
+        for k in ("1", "2"):
+            tk = T[T[f"taken{k}"] == True]  # noqa: E712
+            o[f"buy-stop +0.{k}%"] = dict(taken_pct=round(float(T[f"taken{k}"].mean()) * 100), gap_pct=round(float(tk[f"gap{k}"].mean()) * 100) if len(tk) else None,
+                                          risk_pct=round(float(tk[f"risk{k}"].median()) * 100, 1) if len(tk) else None,
+                                          intraday=st(tk[f"intra{k}"]), hold63=st(tk[f"hold{k}"]), trail_ema21=st(tk[f"trail{k}"]), target_2R=st(tk[f"2R{k}"]))
+        tk = T[T.taken1 == True]  # noqa: E712
+        o["never taken out (buy next open, 63d)"] = st(T[T.taken1 != True].nextopen63)  # noqa: E712
+        o["all signals (buy next open, 63d)"] = st(T.nextopen63)
         for y in (1, 2, 3, 5):
-            W = tk[tk.d > end - pd.DateOffset(years=y)]; W0 = T[T.d > end - pd.DateOffset(years=y)]
-            o[f"last {y}y"] = dict(intraday=st(W.intraday), takeout63=st(W.s63), nextopen63=st(W0.n63))
-        o["years"] = {str(yy): dict(intraday=st(g.intraday), takeout63=st(g.s63), nextopen63=st(T[T.d.dt.year == yy].n63))
-                      for yy, g in sorted(tk.groupby(tk.d.dt.year), reverse=True)}
+            W = tk[tk.d > end - pd.DateOffset(years=y)]
+            o[f"last {y}y (+0.1%)"] = dict(n=int(len(W)), intraday=st(W.intra1), hold63=st(W.hold1), trail_ema21=st(W.trail1), target_2R=st(W["2R1"]))
+        o["years (+0.1%)"] = {str(yy): dict(trail_ema21=st(g.trail1), target_2R=st(g["2R1"]), hold63=st(g.hold1)) for yy, g in sorted(tk.groupby(tk.d.dt.year), reverse=True)}
         res["systems"][nm] = o
-        print(f"R| {nm} | signals {o['signals']} taken {o['taken_pct']}% (gap-ups {o['gap_pct']}%, entry {o['entry_above_signal_close']}% above signal close)", flush=True)
-        print(f"R| {nm} | INTRADAY {o['intraday']} | take-out swing 21d {o['takeout_swing21']} 63d {o['takeout_swing63']} | next-open 21d {o['nextopen_swing21']} 63d {o['nextopen_swing63']} | never taken out -> next-open 63d {o['not_taken_nextopen63']}", flush=True)
-        print(f"R| {nm} | last 1y {o['last 1y']} | last 3y {o['last 3y']}", flush=True)
+        for k in ("1", "2"):
+            b = o[f"buy-stop +0.{k}%"]
+            print(f"R| {nm} | +0.{k}% | taken {b['taken_pct']}% gap {b['gap_pct']}% risk {b['risk_pct']}% | intraday {b['intraday']} | hold63 {b['hold63']} | trail EMA21 {b['trail_ema21']} | 2R {b['target_2R']}", flush=True)
+        print(f"R| {nm} | never taken out {o['never taken out (buy next open, 63d)']} | all next-open {o['all signals (buy next open, 63d)']}", flush=True)
+        for y in (1, 2, 3, 5):
+            print(f"R| {nm} | last {y}y {o[f'last {y}y (+0.1%)']}", flush=True)
     os.makedirs("data/research", exist_ok=True)
     json.dump(res, open("data/research/candle_takeout" + ("_pilot" if PILOT else "") + ".json", "w"), indent=1, default=str)
 
