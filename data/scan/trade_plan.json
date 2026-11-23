@@ -1,8 +1,8 @@
 {
-"generated": "2026-11-22 21:30 UTC",
+"generated": "2026-11-23 12:03 UTC",
 "market": "NSE",
 "watch_only": false,
-"asof": "2026-11-20",
+"asof": "2026-11-23",
 "rules": {
 "risk_pct": 1.0,
 "max_pos_pct": 20.0,
@@ -159,7 +159,7 @@
 "IIFLCAPS"
 ],
 "morning_rule": false,
-"r3m": 20.9
+"r3m": 17.0
 },
 {
 "id": "ATH-SAREGAMA-2026-11-04",
@@ -206,7 +206,7 @@
 "PFOCUS"
 ],
 "morning_rule": false,
-"r3m": 31.1
+"r3m": 26.4
 },
 {
 "id": "ATH-LALPATHLAB-2026-11-04",
@@ -257,7 +257,7 @@
 "GAUDIUMIVF"
 ],
 "morning_rule": false,
-"r3m": 6.6
+"r3m": 8.3
 },
 {
 "id": "ATH-ZYDUSLIFE-2026-11-02",
@@ -331,7 +331,7 @@
 "ZYDUSLIFE"
 ],
 "morning_rule": false,
-"r3m": 8.6
+"r3m": 8.3
 },
 {
 "id": "STOP-DCBBANK-244.65",
@@ -392,7 +392,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": 28.4
+"r3m": 26.1
 },
 {
 "id": "ATH-TECHM-2026-10-22",
@@ -463,7 +463,7 @@
 "63MOONS"
 ],
 "morning_rule": false,
-"r3m": 10.7
+"r3m": 12.6
 },
 {
 "id": "ATH-ZIMLAB-2026-10-07",
@@ -537,7 +537,7 @@
 "ZYDUSLIFE"
 ],
 "morning_rule": false,
-"r3m": 25.2
+"r3m": 17.8
 },
 {
 "id": "ATH-GLOBAL-2026-10-01",
@@ -577,7 +577,7 @@
 "results_ind": null,
 "rank": 8,
 "risk_pct": 19.7,
-"r3m": 29.9
+"r3m": 31.4
 },
 {
 "id": "STOP-HONASA-537.9",
@@ -629,7 +629,7 @@
 "GODREJCP"
 ],
 "morning_rule": false,
-"r3m": 10.9
+"r3m": 12.3
 },
 {
 "id": "STOP-DRREDDY-1421.49",
@@ -702,7 +702,7 @@
 "ZYDUSLIFE"
 ],
 "morning_rule": false,
-"r3m": 18.8
+"r3m": 17.0
 }
 ],
 "more": [],
@@ -759,7 +759,7 @@
 "ITDC"
 ],
 "morning_rule": false,
-"r3m": 26.1
+"r3m": 23.1
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-11",
@@ -833,7 +833,7 @@
 "SHRIPISTON"
 ],
 "morning_rule": false,
-"r3m": 21.8
+"r3m": 24.1
 },
 {
 "id": "TF-AGARWALEYE-2026-11-11",
@@ -891,7 +891,50 @@
 "GKSL"
 ],
 "morning_rule": false,
-"r3m": 10.3
+"r3m": 9.4
+},
+{
+"id": "T921-EICHERMOT-2026-11-23",
+"symbol": "EICHERMOT",
+"name": "Eicher Motors Limited",
+"system": "9/21 trend",
+"bucket": "t9",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 8254.23,
+"ref": 8172.5,
+"stop": 7610.5,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-23, stop 7.4% below",
+"score": 3,
+"value_cr": 454.08,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Auto - 2W/3W/EV",
+"lane": "hold",
+"group_pulse": 25.9,
+"group_rank": 23,
+"results_score": 0.75,
+"results_ind": "2/3 Wheelers",
+"rank": 1,
+"risk_pct": 8.5,
+"ind": "2/3 Wheelers",
+"ind_members": [
+"EICHERMOT",
+"ATHERENERG",
+"TVSMOTOR",
+"HEROMOTOCO",
+"BAJAJ-AUTO"
+],
+"morning_rule": true,
+"r3m": 1.6
 },
 {
 "id": "RET-APOLLO-2026-11-20",
@@ -950,7 +993,7 @@
 "KRISHNADEF"
 ],
 "morning_rule": false,
-"r3m": 10.7
+"r3m": null
 },
 {
 "id": "RET-EIMCOELECO-2026-11-20",
@@ -1017,7 +1060,7 @@
 "DEEDEV"
 ],
 "morning_rule": false,
-"r3m": 14.0
+"r3m": 10.5
 },
 {
 "id": "RET-KALYANKJIL-2026-11-20",
@@ -1070,7 +1113,7 @@
 "SHANTIGOLD"
 ],
 "morning_rule": false,
-"r3m": 7.7
+"r3m": 10.0
 },
 {
 "id": "RET-MCX-2026-11-20",
@@ -1110,7 +1153,7 @@
 "MCX"
 ],
 "morning_rule": false,
-"r3m": 19.2
+"r3m": 14.9
 },
 {
 "id": "RET-STEELCAS-2026-11-20",
@@ -1152,7 +1195,7 @@
 "STEELCAS"
 ],
 "morning_rule": false,
-"r3m": 3.7
+"r3m": 2.0
 },
 {
 "id": "RET-RKFORGE-2026-11-19",
@@ -1219,7 +1262,7 @@
 "SHRIPISTON"
 ],
 "morning_rule": false,
-"r3m": -0.2
+"r3m": 0.8
 },
 {
 "id": "TF-ICICIBANK-2026-11-05",
@@ -1281,7 +1324,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": 17.0
+"r3m": 12.3
 },
 {
 "id": "TF-POONAWALLA-2026-11-20",
@@ -1351,63 +1394,7 @@
 "AYE"
 ],
 "morning_rule": false,
-"r3m": 5.1
-},
-{
-"id": "T921-AXISBANK-2026-11-20",
-"symbol": "AXISBANK",
-"name": "Axis Bank Limited",
-"system": "9/21 trend",
-"bucket": "t9",
-"kind": "T921",
-"order": "LIMIT",
-"when": "next open",
-"side": "BUY",
-"price": 1460.46,
-"ref": 1446.0,
-"stop": 1333.1,
-"exit_rule": "Supertrend(10,3) turns red -> sell next open",
-"note": "EMA 9/21 cross 2026-11-20, stop 8.5% below",
-"score": 3,
-"value_cr": 949.13,
-"sector": null,
-"sector_rs": null,
-"theme": null,
-"theme_rs": null,
-"stock_rs": null,
-"aligned": false,
-"td_score": null,
-"group": "Banks - Private Large",
-"lane": "mid",
-"group_pulse": 47.6,
-"group_rank": 3,
-"results_score": 1.06,
-"results_ind": "Private Sector Bank",
-"rank": 1,
-"risk_pct": 9.6,
-"ind": "Private Sector Bank",
-"ind_members": [
-"INDUSINDBK",
-"CUB",
-"AXISBANK",
-"HDFCBANK",
-"KOTAKBANK",
-"FEDERALBNK",
-"RBLBANK",
-"J&KBANK",
-"ICICIBANK",
-"IDFCFIRSTB",
-"IDBI",
-"BANDHANBNK",
-"DCBBANK",
-"KTKBANK",
-"TMB",
-"SOUTHBANK",
-"KARURVYSYA",
-"CSBBANK"
-],
-"morning_rule": true,
-"r3m": 17.1
+"r3m": 4.7
 },
 {
 "id": "RET-MANCREDIT-2026-11-19",
@@ -1470,7 +1457,7 @@
 "AYE"
 ],
 "morning_rule": false,
-"r3m": 17.2
+"r3m": 14.8
 },
 {
 "id": "RET-ENTERO-2026-11-20",
@@ -1503,7 +1490,7 @@
 "group_rank": null,
 "rank": 8,
 "risk_pct": 9.9,
-"r3m": 37.1
+"r3m": 33.7
 },
 {
 "symbol": "BOSCH-HCIL",
@@ -1588,7 +1575,72 @@
 "TTKPRESTIG"
 ],
 "morning_rule": false,
-"r3m": 2.2
+"r3m": -1.2
+},
+{
+"id": "T921-TCS-2026-11-23",
+"symbol": "TCS",
+"name": "Tata Consultancy Services Limited",
+"system": "9/21 trend",
+"bucket": "t9",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 2484.6,
+"ref": 2460.0,
+"stop": 2317.0,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-23, stop 6.2% below",
+"score": 3,
+"value_cr": 864.74,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Information Technology Services",
+"lane": "weak",
+"group_pulse": 25.2,
+"group_rank": 25,
+"results_score": 0.49,
+"results_ind": "Computers - Software & Consulting",
+"rank": 2,
+"risk_pct": 7.2,
+"ind": "Computers - Software & Consulting",
+"ind_members": [
+"DCI",
+"PERSISTENT",
+"SILVERTUC",
+"TATAELXSI",
+"MPHASIS",
+"RATEGAIN",
+"ZENSARTECH",
+"COFORGE",
+"LTM",
+"INTELLECT",
+"BSOFT",
+"TCS",
+"TECHM",
+"WIPRO",
+"HCLTECH",
+"INFY",
+"INFOBEAN",
+"HEXT",
+"FRACTAL",
+"NEWGEN",
+"SONATSOFTW",
+"MASTEK",
+"KPITTECH",
+"AURIONPRO",
+"HAPPSTMNDS",
+"LATENTVIEW",
+"63MOONS"
+],
+"morning_rule": true,
+"r3m": 7.6
 },
 {
 "id": "PR-KOTAKBANK-2026-11-20",
@@ -1633,7 +1685,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 32.2
+"r3m": 26.6
 },
 {
 "id": "PR-MEESHO-2026-11-20",
@@ -1667,7 +1719,7 @@
 "URBANCO"
 ],
 "morning_rule": true,
-"r3m": 32.0
+"r3m": 20.8
 },
 {
 "id": "PR-SOUTHBANK-2026-11-20",
@@ -1712,7 +1764,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 30.3
+"r3m": 30.4
 },
 {
 "id": "PR-DCBBANK-2026-11-20",
@@ -1757,7 +1809,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 28.4
+"r3m": 26.1
 },
 {
 "id": "PR-AXISBANK-2026-11-20",
@@ -1802,7 +1854,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 17.1
+"r3m": 11.0
 },
 {
 "id": "PR-ICICIBANK-2026-11-20",
@@ -1847,7 +1899,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 17.0
+"r3m": 12.3
 },
 {
 "id": "PR-URBANCO-2026-11-20",
@@ -1881,7 +1933,7 @@
 "URBANCO"
 ],
 "morning_rule": true,
-"r3m": 14.3
+"r3m": 15.9
 },
 {
 "id": "PR-KARURVYSYA-2026-11-20",
@@ -1926,7 +1978,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 13.9
+"r3m": 15.0
 },
 {
 "id": "PR-ETERNAL-2026-11-20",
@@ -1960,7 +2012,7 @@
 "URBANCO"
 ],
 "morning_rule": true,
-"r3m": 13.7
+"r3m": 10.4
 },
 {
 "id": "PR-CUB-2026-11-20",
@@ -2005,7 +2057,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 12.6
+"r3m": 11.9
 }
 ],
 "pattern_watch": [
@@ -2238,13 +2290,13 @@
 "group_rank": 60
 },
 {
-"symbol": "ALPEXSOLAR",
-"name": "Alpex Solar Limited",
+"symbol": "LAOPALA",
+"name": "La Opala RG Limited",
 "typ": "TW",
-"close": 602.7999877929688,
-"neck": 747.5499877929688,
-"stop": 651.42,
-"signal_date": "2026-11-11",
+"close": 156.97000122070312,
+"neck": 156.11000061035156,
+"stop": 136.73,
+"signal_date": "2026-11-12",
 "group": null,
 "lane": null,
 "group_rank": null
@@ -2629,6 +2681,16 @@
 "when": "next open",
 "ref": 621.85,
 "why": "weekly close below the 30-week SMA"
+},
+{
+"id": "EXIT-T921-SSWL",
+"symbol": "SSWL",
+"system": "9/21 trend",
+"side": "SELL",
+"order": "LIMIT",
+"when": "next open",
+"ref": 490.45,
+"why": "Supertrend turned red"
 }
 ],
 "missed": [
