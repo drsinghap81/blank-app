@@ -315,9 +315,10 @@ class Admin(BaseModel):
 @app.post("/api/admin")
 def admin(body: Admin, request: Request, _=Depends(auth)):
     """App buttons (Settings -> Server): 'update' = pull the latest code now (even in market hours) and restart;
-    'restart' = restart the app server. Needs the app password + typing UPDATE / RESTART. The root watchdog acts within a minute."""
+    'restart' = restart the app server; 'tbrestart' = restart the Top Bottom bots (23 Nov 2026: a fresh start re-checks Angel, so a
+    position squared off by hand is noticed). Needs the app password + typing the action's name. The root watchdog acts within a minute."""
     act = body.action.lower()
-    if act not in ("update", "restart"):
+    if act not in ("update", "restart", "tbrestart"):
         raise HTTPException(400, "unknown action")
     ip = request.client.host if request.client else "?"
     n, t0 = FAILS.get(ip, (0, 0))
@@ -328,6 +329,9 @@ def admin(body: Admin, request: Request, _=Depends(auth)):
     if not check_pw(body.password):
         FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
     open(os.path.join(DATA, "cmd_" + act), "w").write(str(time.time())); log("admin", action=act)
+    if act == "tbrestart":
+        return dict(ok=True, msg="Top Bottom bot restart requested: within about a minute the bot restarts, re-checks your Angel positions "
+                    "and carries on (or stands flat if you closed the position yourself).")
     return dict(ok=True, msg=f"{'Update' if act == 'update' else 'Restart'} requested: within about a minute the server "
                 f"{'pulls the latest code and ' if act == 'update' else ''}restarts (about 10 seconds offline). Your stops stay on Angel.")
 

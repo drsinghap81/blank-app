@@ -7,8 +7,12 @@
 #     within a minute (update = pull the latest code now, even in market hours, then restart).
 APP=/opt/trenddesk; VAR=$APP/var; LOG=$VAR/watchdog.log; F=$VAR/wd_fail
 log() { echo "$(date -u +%FT%TZ) $*" >> "$LOG"; tail -n 400 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"; }
-for alt in $APP/repo/tools/live_server/var; do for c in cmd_update cmd_restart; do [ -f "$alt/$c" ] && mv -f "$alt/$c" "$VAR/$c"; done; done   # if DATA_DIR isn't set
+for alt in $APP/repo/tools/live_server/var; do for c in cmd_update cmd_restart cmd_tbrestart; do [ -f "$alt/$c" ] && mv -f "$alt/$c" "$VAR/$c"; done; done   # if DATA_DIR isn't set
 if [ -f "$VAR/cmd_update" ]; then rm -f "$VAR/cmd_update"; log "update requested from the app"; bash $APP/repo/tools/live_server/deploy/autoupdate.sh --now; echo 0 > "$F"; exit 0; fi
+# 23 Nov 2026: restart the Top Bottom bots (app button) - only the ones running or due today; a fresh start re-checks Angel's positions
+if [ -f "$VAR/cmd_tbrestart" ]; then rm -f "$VAR/cmd_tbrestart"; log "Top Bottom bot restart requested from the app"
+  [ -f /etc/systemd/system/trenddesk-tb.service ] && systemctl restart trenddesk-tb && log "trenddesk-tb restarted"
+  systemctl is-active -q trenddesk-tb-nifty && systemctl restart trenddesk-tb-nifty && log "trenddesk-tb-nifty restarted"; fi
 if [ -f "$VAR/cmd_restart" ]; then rm -f "$VAR/cmd_restart"; log "restart requested from the app"; systemctl restart trenddesk; echo 0 > "$F"; exit 0; fi
 # 19 Nov 2026: a 1 GB swap file (the server has ~400 MB of RAM; a restart that loads Angel's contract list could freeze it)
 if [ -z "$(swapon --show --noheadings 2>/dev/null)" ] && [ ! -f "$VAR/swap_failed" ]; then

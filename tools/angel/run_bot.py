@@ -40,6 +40,7 @@ from notify import AppChannel, Telegram       # noqa: E402
 IST = ZoneInfo("Asia/Kolkata")
 STATE_DIR = os.environ.get("TB_STATE_DIR") or os.path.join(HERE, "state")
 STATE = os.path.join(STATE_DIR, "state.json")
+OUTSIDE = os.path.join(STATE_DIR, "closed_outside_day")
 HIST = os.path.join(STATE_DIR, "history.csv")
 os.makedirs(STATE_DIR, exist_ok=True)
 LOGF = os.path.join(STATE_DIR, f"log_{datetime.now(ZoneInfo('Asia/Kolkata')).date()}.txt")
@@ -224,6 +225,54 @@ def pnl_today(st, today, ltp):
     return r
 
 
+def account_flat(br: AngelBroker):
+    """True only when Angel answers cleanly and holds none of this symbol's contracts; False when it holds some; None when unsure."""
+    try:
+        r = br.api.position()
+    except Exception as e:  # noqa: BLE001
+        log(f"position check failed {e}"); return None
+    if not isinstance(r, dict) or not r.get("status"):
+        return None
+    for p in r.get("data") or []:
+        if p.get("tradingsymbol") in br.contracts and int(float(p.get("netqty") or 0)):
+            return False
+    return True
+
+
+def manual_fill(br: AngelBroker, st: tl.State):
+    """Average price of today's closing trades in this contract from Angel's trade book (your own square-off), else None."""
+    try:
+        r = br.api.tradeBook(); side = "SELL" if st.qty > 0 else "BUY"; q = v = 0.0
+        for t in (r or {}).get("data") or []:
+            if t.get("tradingsymbol") == st.contract and str(t.get("transactiontype")).upper() == side:
+                n = float(t.get("fillsize") or 0); q += n; v += n * float(t.get("fillprice") or 0)
+        return v / q if q else None
+    except Exception as e:  # noqa: BLE001
+        log(f"trade book check failed {e}"); return None
+
+
+def closed_outside(br: AngelBroker, st: tl.State, tg, ltp=None, where="") -> None:
+    """23 Nov 2026 (Amritpal squared off the Bank Nifty future by hand for margin): the account is FLAT while the bot still holds
+    a position -> cancel the bot's resting backstop stop (else it could open a fresh short / long), book the trade at the last price
+    as 'Closed outside the bot', and stand flat. No order is sent."""
+    if st.backstop_id:
+        try:
+            br.cancel(st.backstop_id); log(f"backstop {st.backstop_id} cancelled (position closed outside the bot)")
+        except Exception as e:  # noqa: BLE001  (Angel often cancels it itself on a manual square-off)
+            log(f"backstop cancel: {e}")
+    px = manual_fill(br, st) or ltp
+    if st.trades and not st.trades[-1].get("ExitDate"):
+        t = st.trades[-1]; sign = 1 if st.qty > 0 else -1
+        t.update(ExitDate=str(date.today()), Exit=round(px, 2) if px else None, ExitFill=round(px, 2) if px else None, Reason="Closed outside the bot",
+                 PnL_fill=round((px - t.get("Fill", st.entry)) * sign * abs(st.qty), 0) if px else None)
+    msg = (f"Position {st.contract} ({st.qty:+d}) was closed outside the bot{where} - backstop stop cancelled, bot now FLAT"
+           + (f" (booked at about {px:,.2f})" if px else "") + ". No order sent. Check Angel's order book for anything else pending.")
+    log(msg); tg.send("⚠️ " + msg)
+    st.pos, st.qty, st.contract, st.backstop_id = 0, 0, None, None
+    st.save(STATE)
+    open(OUTSIDE, "w").write(str(date.today()))      # no new bot trades for the rest of today (e.g. the margin is short)
+
+
 def reconcile(br: AngelBroker, st: tl.State, tg: Telegram) -> bool:
     if br.dry:
         return True
@@ -242,6 +291,9 @@ def reconcile(br: AngelBroker, st: tl.State, tg: Telegram) -> bool:
             st.pos, st.qty, st.contract, st.backstop_id = 0, 0, None, None
             st.save(STATE)
             return True
+    if st.pos != 0 and not held and account_flat(br):   # closed by hand in Angel (e.g. margin) -> cancel the backstop, stand flat
+        closed_outside(br, st, tg, where=" (found at start)")
+        return True
     msg = f"🚨 Position mismatch — Angel shows {held or 'nothing'}, bot expects {expect or 'flat'}. Bot halted; fix in Angel or run --init."
     log(msg); tg.send(msg)
     return False
@@ -304,6 +356,8 @@ def main():
         ask_levels(tg, st, cfg, day.plan, "today")
         app_status(tg, st, cfg, day.plan, note="waiting for the open")
         mode = "DRY RUN (no real orders)" if br.dry else "LIVE"
+        if os.path.exists(OUTSIDE) and open(OUTSIDE).read().strip() == str(date.today()):
+            manage_only = True; log("position was closed outside the bot today -> no new trades today")
         if manage_only:
             day.done_for_day = True
         tg.keyboard(f"Bot running — {mode}, {st.lots} lots" + (" (managing the open position only)" if manage_only else "")
@@ -322,6 +376,7 @@ def main():
             day.late_start(q)
         last_q, stopped = q, False
         loss_hit, flat_key, next_beat = False, None, time.time() + 60 * cfg["heartbeat_minutes"]
+        next_sync, flat_seen = time.time() + 60, 0
         roll_t, close_t = at(cfg["roll_time"]), at(cfg["close_check_time"])
         while now() < at("15:29"):
             for cmd in tg.poll():
@@ -343,6 +398,12 @@ def main():
                 last_q = br.quote(ref)
             except Exception as e:  # noqa: BLE001
                 log(f"quote error {e}"); time.sleep(5); continue
+            if not br.dry and st.pos != 0 and time.time() >= next_sync:      # 23 Nov 2026: notice a square-off done by hand in Angel
+                next_sync = time.time() + 60
+                fl = account_flat(br)
+                flat_seen = (flat_seen + 1) if fl else 0
+                if flat_seen >= 2:                                             # two clean "flat" answers a minute apart - not an API blip
+                    closed_outside(br, st, tg, ltp=last_q["ltp"]); day.done_for_day = True; flat_seen = 0
             if flat_key and tg.get(flat_key) is not None:
                 if tg.get(flat_key) and st.pos != 0:
                     day.exit_position("Manual square-off", last_q["ltp"]); day.done_for_day = True; st.save(STATE)

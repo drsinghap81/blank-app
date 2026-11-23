@@ -1560,18 +1560,19 @@ async function srvCard() {
     ${h && h.update_waiting ? `<p class="lv-sub">🆕 New code ${h.latest ? '(' + esc(h.latest) + ') ' : ''}is waiting: it installs itself after 3:35 pm IST, or now with Update.</p>` : ''}
     ${h && h.loop_age == null ? '<p class="lv-sub">The watchdog and these buttons start working after the server\'s next update.</p>' : ''}
     <p class="lv-sub">A watchdog checks the server every minute and restarts it if it stops answering for ~3 minutes. Your stops are GTTs on Angel, so a restart (~10 s) never leaves a position unprotected.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="lv-btn" id="srvupd">Update now</button><button class="lv-btn ghost" id="srvrst">Restart</button><button class="lv-btn ghost" id="srvchk">Check again</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="lv-btn" id="srvupd">Update now</button><button class="lv-btn ghost" id="srvrst">Restart</button><button class="lv-btn ghost" id="srvtb" title="Restart the Top Bottom bot: it re-checks your Angel positions (use after closing its trade yourself)">Restart Top Bottom bot</button><button class="lv-btn ghost" id="srvchk">Check again</button></div>
     <div id="srvarm" class="lv-form" hidden><input id="srvpw" type="password" placeholder="App password"><input id="srvcf" autocapitalize="characters"><button class="lv-btn" id="srvgo">Confirm</button></div></div>`;
   // 18 Nov 2026: inline form instead of window.prompt (prompts are blocked in some in-app browsers)
   let pend = null; const arm = box.querySelector('#srvarm');
   const act = (a) => { pend = a; arm.hidden = false; const cf = box.querySelector('#srvcf'); cf.value = ''; cf.placeholder = `Type ${a.toUpperCase()}`;
-    box.querySelector('#srvgo').textContent = a === 'update' ? 'Update now (~10 s offline)' : 'Restart (~10 s offline)'; box.querySelector('#srvpw').focus(); };
+    box.querySelector('#srvgo').textContent = a === 'update' ? 'Update now (~10 s offline)' : a === 'tbrestart' ? 'Restart the bot (it re-checks Angel)' : 'Restart (~10 s offline)'; box.querySelector('#srvpw').focus(); };
   box.querySelector('#srvgo').addEventListener('click', async () => { const a = pend; if (!a) return;
     const pw = box.querySelector('#srvpw').value, c = box.querySelector('#srvcf').value;
     try { const j = await lvApi('/api/admin', { method: 'POST', body: JSON.stringify({ action: a, password: pw, confirm: c }), timeout: 30000 }); arm.hidden = true; srvWait(); setTimeout(srvCard, 75000); }
-    catch (e) { alertMsg(/404/.test(e.message) ? 'Your server gets these buttons with its next update (after 3:35 pm IST).' : e.message); } });
+    catch (e) { alertMsg(/404|unknown action/.test(e.message) ? 'Your server needs the new code for this button: tap Update now first, wait about 2 minutes, then try again.' : e.message); } });
   box.querySelector('#srvupd').addEventListener('click', () => act('update'));
   box.querySelector('#srvrst').addEventListener('click', () => act('restart'));
+  box.querySelector('#srvtb').addEventListener('click', () => act('tbrestart'));
   box.querySelector('#srvchk').addEventListener('click', srvCard);
 }
 
