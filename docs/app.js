@@ -8083,13 +8083,44 @@ async function searchIndex() {
   ((state.fund || {}).rows || []).forEach((r) => { const sym = String(r.key).split(':').pop().replace(/\.L$/, ''); add(sym, r.name, FM[r.market] || 'US', r.kind === 'etf' ? 'ETF' : (r.kind || 'fund'), r.key); });
   return (state.sIdx = out);
 }
+/* 23 Nov 2026 (Amritpal: "easy search for a sector, industry or theme - show its stocks with any system active, and the strength or
+   Pulse of the industry or sector"): India groups searchable by name. Sector Pulse = its industries' Pulse weighted by liquid stocks. */
+function groupIndex(G) {
+  if (!G) return []; if (G._gidx) return G._gidx; const out = [];
+  const nr = (G.nse && G.nse.rows) || []; const liqOf = (r) => r.members.filter((m) => m.liquid).map((m) => m.symbol);
+  const rankI = nr.filter((r) => r.p1m != null && (r.n_liquid || 0) >= 3).sort((a, b) => b.p1m - a.p1m).map((r) => r.basic);
+  nr.forEach((r) => out.push({ kind: 'Industry', name: r.basic, members: r.members.map((m) => m.symbol), p1m: r.p1m, q: (r.rrg || {}).now, r1m: r.r1m, r3m: r.r3m,
+    rank: rankI.indexOf(r.basic) + 1 || null, of: rankI.length, sub: r.industry }));
+  ((G.nse && G.nse.sectors) || []).forEach((sx) => { const R = nr.filter((r) => r.sector === sx.sector);
+    const w = R.reduce((a, r) => a + (r.p1m != null ? (r.n_liquid || 1) : 0), 0); const p = w ? R.reduce((a, r) => a + (r.p1m != null ? r.p1m * (r.n_liquid || 1) : 0), 0) / w : null;
+    out.push({ kind: 'Sector', name: sx.sector, members: R.flatMap((r) => r.members.map((m) => m.symbol)), p1m: p, q: (sx.rrg || {}).now, r1m: sx.r1m, r3m: sx.r3m, sub: `${sx.industries} industries` }); });
+  (G.themes || []).forEach((t) => out.push({ kind: 'Theme', name: t.group, members: t.members.map((m) => m.symbol), p1m: t.p1m, q: (t.rrg || {}).now, r1m: null, r3m: null,
+    rank: t.rank, of: (G.themes || []).length, sub: t.index || '' }));
+  (G.rows || []).forEach((r) => out.push({ kind: 'Group', name: r.group, members: (r.members || []).map((m) => m.symbol || m), p1m: r.p1m, q: (r.rrg || {}).now, r1m: r.r1m, r3m: null,
+    rank: r.rank, of: (G.rows || []).length, sub: r.sector || '' }));
+  G._gidx = out; return out;
+}
+function groupHit(G, q) {
+  const w = String(q || '').toLowerCase().replace(/[^a-z0-9& ]+/g, ' ').trim().split(/\s+/).filter((x) => x.length >= 2 && !['and', 'the', 'stocks', 'sector', 'industry', 'theme'].includes(x));
+  if (!w.length) return [];
+  const AL = { psu: ['public sector', 'psu', 'cpse'], psb: ['public sector'], it: ['information technology', 'software', 'it '], fmcg: ['fast moving', 'fmcg'], auto: ['auto'],
+    pvt: ['private'], nbfc: ['non banking', 'nbfc'], realty: ['realty', 'residential'], metal: ['metal', 'steel', 'aluminium'], defence: ['defen'], railway: ['rail'], ev: ['electric vehicle', ' ev'] };
+  return groupIndex(G).filter((g) => { const n = ' ' + (g.name + ' ' + (g.sub || '')).toLowerCase() + ' '; return w.every((x) => n.includes(x) || (AL[x] || []).some((y) => n.includes(y))); })
+    .sort((a, b) => ['Sector', 'Industry', 'Theme', 'Group'].indexOf(a.kind) - ['Sector', 'Industry', 'Theme', 'Group'].indexOf(b.kind) || (b.p1m || 0) - (a.p1m || 0)).slice(0, 8);
+}
+function groupOpen(g) {
+  state._grp = g;
+  const bits = [`${g.kind}${g.sub ? ' (' + g.sub + ')' : ''}`, g.p1m != null ? `Pulse ${fmt(g.p1m, 0)}%${g.rank ? ` · #${g.rank} of ${g.of}` : ''}` : null, g.q ? `rotation ${g.q}` : null,
+    g.r1m != null ? `1 month ${g.r1m >= 0 ? '+' : ''}${fmt(g.r1m, 1)}%` : null, g.r3m != null ? `3 months ${g.r3m >= 0 ? '+' : ''}${fmt(g.r3m, 1)}%` : null].filter(Boolean);
+  sysListView({ id: 'grp', name: g.name, d: bits.join(' · '), ok: 1, nse: 1 }, 'NSE', g.name);
+}
 async function searchOpen() {
-  openPanel(`<div class="d-head no-push"><div><h2>Search</h2><div class="co">Any stock or ETF in India, US, Australia or UK, or a system name (flag, weekly cup, 9/21, W bottom…) to list its stocks</div></div></div>
+  openPanel(`<div class="d-head no-push"><div><h2>Search</h2><div class="co">Any stock or ETF in India, US, Australia or UK, a system name (flag, weekly cup, 9/21, W bottom…), or a sector / industry / theme (PSU bank, pharma, defence…) to list its stocks</div></div></div>
     <label class="search s-lens"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    <input id="sq" type="search" placeholder="Stock, ETF or system: DATAPATTNS, flag, day cup" autocomplete="off" autocapitalize="characters"></label>
+    <input id="sq" type="search" placeholder="Stock, ETF, system or sector: DATAPATTNS, flag, PSU bank, pharma" autocomplete="off" autocapitalize="characters"></label>
     <ul class="list flat" id="sres"><li class="empty">Loading every market's list…</li></ul>`);
   const inp = document.getElementById('sq'); const ul = document.getElementById('sres'); setTimeout(() => inp && inp.focus(), 50);
-  const idx = await searchIndex().catch(() => []);
+  const idx = await searchIndex().catch(() => []); await loadGP('NSE').catch(() => null);
   const MKN = { NSE: 'India', US: 'US', ASX: 'Australia', UK: 'UK' };
   const draw = () => { const q = (inp.value || '').trim().toUpperCase();
     if (q.length < 2) { ul.innerHTML = `<li class="empty">${idx.length.toLocaleString()} stocks and ETFs indexed. Type at least 2 letters.</li><li class="s-chips">${['Flag', 'Day cup', 'Week cup', 'Month cup', 'ATH', 'Cup 9/21', 'Tight base', 'W bottom', 'IPO', 'ETF'].map((t) => `<button class="chip" data-sq="${t}">${t}</button>`).join('')}</li>`;
@@ -8097,8 +8128,12 @@ async function searchOpen() {
     const hit = idx.map((e) => ({ e, s: e.sym.toUpperCase() === q ? 0 : e.sym.toUpperCase().startsWith(q) ? 1 : e.name.toUpperCase().includes(q) ? 2 : e.sym.toUpperCase().includes(q) ? 3 : 9 }))
       .filter((x) => x.s < 9).sort((a, b) => a.s - b.s || a.e.sym.length - b.e.sym.length).slice(0, 30);
     const sx = sysMatch(inp.value || '');
+    const gh = groupHit(state.gp && state.gp.NSE, inp.value || '');
+    const ghh = gh.map((g, i) => `<li class="row s-grp" data-gx="${i}" tabindex="0"><div><div class="sym">${esc(g.name)}</div><div class="co">${esc(g.kind)}${g.sub ? ' · ' + esc(g.sub) : ''} · ${g.members.length} stocks</div></div><div></div>
+      <div class="num"><span class="chip ${g.q === 'Leading' ? 'open' : g.q === 'Improving' ? 'new' : g.q === 'Lagging' ? 'exit' : ''}">${g.p1m != null ? `Pulse ${fmt(g.p1m, 0)}` : ''}${g.q ? ' · ' + esc(g.q) : ''} ›</span></div></li>`).join('');
     const sxh = sx.map((y) => `<li class="row s-sys" data-sx="${y.id}" tabindex="0"><div><div class="sym">${esc(y.name)}</div><div class="co">${esc(y.d)}</div></div><div></div><div class="num"><span class="chip ${y.ok ? 'new' : ''}">System · list stocks ›</span></div></li>`).join('');
-    ul.innerHTML = sxh + (hit.length ? hit.map(({ e }, i) => `<li class="row" data-si="${idx.indexOf(e)}" tabindex="0"><div><div class="sym">${esc(e.sym)}</div><div class="co">${esc(e.name)}</div></div><div></div><div class="num"><span class="chip">${esc(MKN[e.mk])}${e.kind !== 'stock' ? ' · ' + esc(e.kind) : ''}</span></div></li>`).join('') : sx.length ? '' : '<li class="empty">Nothing found in the scanned lists.</li>');
+    ul.innerHTML = sxh + ghh + (hit.length ? hit.map(({ e }, i) => `<li class="row" data-si="${idx.indexOf(e)}" tabindex="0"><div><div class="sym">${esc(e.sym)}</div><div class="co">${esc(e.name)}</div></div><div></div><div class="num"><span class="chip">${esc(MKN[e.mk])}${e.kind !== 'stock' ? ' · ' + esc(e.kind) : ''}</span></div></li>`).join('') : sx.length ? '' : '<li class="empty">Nothing found in the scanned lists.</li>');
+    ul.querySelectorAll('[data-gx]').forEach((li) => { const go = () => groupOpen(gh[+li.dataset.gx]); li.addEventListener('click', go); li.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') go(); }); });
     ul.querySelectorAll('[data-sx]').forEach((li) => { const go = () => sysListView(SYSX.find((y) => y.id === li.dataset.sx), tdMk(), inp.value); li.addEventListener('click', go); li.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') go(); }); });
     ul.querySelectorAll('[data-si]').forEach((li) => { const go = () => sysCheck(idx[+li.dataset.si]); li.addEventListener('click', go); li.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') go(); }); }); };
   let tm; inp.addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(draw, 120); }); draw();
@@ -8941,6 +8976,20 @@ async function sysRows(s, mk, q) {
     return ((P && (P.top || []).concat(P.swing || [], P.more || [])) || []).filter((r) => bkOf(r) === s.id)
       .map((r) => ({ sym: r.symbol, st: s.id === 'rt' ? 'at old breakout' : r.trigger ? `waiting · above ${fmt(r.trigger, 2)}` : 'Buy', sc: r.score || 0, buy: s.id === 'tf' && !r.trigger }));
   }
+  if (s.id === 'grp') {     // 23 Nov 2026: a sector / industry / theme from search - every member, on-system ones first
+    const g = state._grp; if (!g) return [];
+    const [S, plan, FL, PT] = await Promise.all([sysMap('NSE').catch(() => null), getJSON(MP + 'trade_plan.json', 'trade_plan').catch(() => null),
+      getJSON(MP + 'flags.json', 'flags_NSE').catch(() => null), getJSON(MP + 'patterns.json', 'patterns').catch(() => null)]);
+    const fl = {}; ((FL && FL.rows) || []).forEach((x) => { fl[x.symbol] = x; }); const pt = {}; ((PT && PT.rows) || []).forEach((x) => { pt[x.symbol] = x; });
+    const out = [];
+    for (const sym of g.members) {
+      const a = await sysActive('NSE', sym, S, plan); const L = a.list.filter((x) => x.n !== 'Stack' && !/ · off$/.test(x.n));
+      if (fl[sym]) L.push({ n: fl[sym].status === 'breakout' ? 'Flag · broke out' : 'Flag', c: fl[sym].status === 'breakout' ? 'buy' : 'near' });
+      if (pt[sym]) L.push({ n: pt[sym].status === 'breakout' ? 'Bottom · broke out' : 'Bottoming', c: pt[sym].status === 'breakout' ? 'buy' : 'near' });
+      out.push({ sym, nsys: L.length, buy: L.some((x) => x.c === 'buy'), sc: 0, st: L.length ? `${L.length} system${L.length > 1 ? 's' : ''}: ${L.map((x) => x.n).join(', ')}` : 'no system now' });
+    }
+    return /\ball\b/.test(qn) || !out.some((x) => x.nsys) ? out : out.filter((x) => x.nsys).concat(out.filter((x) => !x.nsys).map((x) => ({ ...x, st: 'no system now' })));
+  }
   if (s.id === 'gov') {
     if (mk !== 'NSE') return []; const G = await govLoad().catch(() => null); const GP = await loadGP('NSE').catch(() => null); if (!G || !GP || !GP.nse) return [];
     const msme = /msme|small/.test(qn);
@@ -9009,7 +9058,7 @@ async function sysListView(s, mk, q) {
     ${rows.some((x) => x.ch) ? `<div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((k) => `<span><i style="background:${T3C[k]}"></i>${T3N[k]}</span>`).join('')}</div>` : ''}
     <ol class="st-list">${rows.slice(0, 150).map((x, i) => `<li data-fk="${x.buy ? 'buy' : ''}"><button class="st-row" data-yi="${i}"><span class="st-rk">${i + 1}</span><span class="st-nm"><b>${esc(x.sym)}</b><small class="${x.buy ? 'up' : ''}">${esc(x.st)}</small></span>${x.ch ? t3Bars(x.ch, true) : `<span class="muted">${esc(x.name || '')}</span>`}<span class="st-y">${pulsePill(x)}${x.ch ? t3Yoy(x.y) : ''}</span></button></li>`).join('') || `<li class="empty">Nothing on ${esc(s.name)} in ${esc(MKT[mk].name)} today.</li>`}</ol>
     ${rows.length > 150 ? `<p class="muted">Showing the first 150 of ${rows.length}.</p>` : ''}
-    <p class="t3-foot">${s.id === 'gov' ? 'Only stocks on at least one of our systems (type "govt all" to see everyone), most systems first, buy signals first, then industry Pulse. Tested 2016-26 (26,644 signals): 3+ systems won 61% (next 3 months, median +5.3%) vs 54% (+1.9%) for one - but the average return was about the same and the last year was flat for all, so read the order as a tilt. A tight base or flag together with another system helped most; 9/21 with a 52-week base breakout did worse. Govt focus and news are context - the systems decide the buy. ' : ''}From the last nightly scans. Sorted by industry Pulse: top-10% Pulse industries that are also Leading or Improving first (tested best), then the rest by Pulse. Order is for reading only; it does not change what any system buys.</p></div>`;
+    <p class="t3-foot">${s.id === 'grp' ? 'Stocks on at least one of our systems first (most systems, then buy signals), then the rest of the group. Pulse = share of the group\'s liquid stocks trending (1 month); rotation = the group vs Nifty this week. Context - the systems decide the buy. ' : ''}${s.id === 'gov' ? 'Only stocks on at least one of our systems (type "govt all" to see everyone), most systems first, buy signals first, then industry Pulse. Tested 2016-26 (26,644 signals): 3+ systems won 61% (next 3 months, median +5.3%) vs 54% (+1.9%) for one - but the average return was about the same and the last year was flat for all, so read the order as a tilt. A tight base or flag together with another system helped most; 9/21 with a 52-week base breakout did worse. Govt focus and news are context - the systems decide the buy. ' : ''}From the last nightly scans. Sorted by industry Pulse: top-10% Pulse industries that are also Leading or Improving first (tested best), then the rest by Pulse. Order is for reading only; it does not change what any system buys.</p></div>`;
   const root = $('#sheet-body');
   x3TrailWire(root, [{ t: 'Search', go: () => searchOpen() }, { t: s.name }]);
   root.querySelectorAll('[data-ymk]').forEach((b) => b.addEventListener('click', () => sysListView(s, b.dataset.ymk, q))); tileFilter(root);
