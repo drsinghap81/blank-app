@@ -1,19 +1,41 @@
 {
- "generated": "2026-11-21T22:30+00:00",
- "asof": "2026-11-20",
+ "generated": "2026-11-23T18:45+00:00",
+ "asof": "2026-11-23",
  "market": "ASX",
  "ema": 9,
  "rows": [
   {
-   "symbol": "A-REIT",
+   "symbol": "Communication",
    "index": true,
    "status": "left below",
-   "signal": "2026-10-12",
-   "signal_close": 1514.4,
-   "gain": 5.6,
-   "days": 29,
-   "ema": 1623.69,
-   "close": 1599.5
+   "signal": "2026-10-16",
+   "signal_close": 1536.8,
+   "gain": 5.4,
+   "days": 26,
+   "ema": 1638.1,
+   "close": 1619.8
+  },
+  {
+   "symbol": "Industrials",
+   "index": true,
+   "status": "left below",
+   "signal": "2026-10-19",
+   "signal_close": 8048.5,
+   "gain": 3.1,
+   "days": 25,
+   "ema": 8442.08,
+   "close": 8297.0
+  },
+  {
+   "symbol": "Info Tech",
+   "index": true,
+   "status": "left below",
+   "signal": "2026-11-06",
+   "signal_close": 1783.5,
+   "gain": -4.1,
+   "days": 11,
+   "ema": 1771.04,
+   "close": 1710.6
   },
   {
    "symbol": "Utilities",
@@ -21,69 +43,33 @@
    "status": "riding",
    "signal": "2026-10-09",
    "signal_close": 10151.3,
-   "gain": 6.6,
-   "days": 30,
-   "ema": 10822.18,
-   "close": 10822.7,
-   "low": 10712.1
+   "gain": 6.5,
+   "days": 31,
+   "ema": 10819.06,
+   "close": 10806.6,
+   "low": 10795.2
   },
   {
-   "symbol": "Communication",
-   "index": true,
-   "status": "riding",
-   "signal": "2026-10-16",
-   "signal_close": 1536.8,
-   "gain": 6.0,
-   "days": 25,
-   "ema": 1642.67,
-   "close": 1629.1,
-   "low": 1621.3
-  },
-  {
-   "symbol": "Industrials",
-   "index": true,
-   "status": "riding",
-   "signal": "2026-10-19",
-   "signal_close": 8048.5,
-   "gain": 3.7,
-   "days": 24,
-   "ema": 8478.35,
-   "close": 8344.6,
-   "low": 8329.2
-  },
-  {
-   "symbol": "Info Tech",
-   "index": true,
-   "status": "riding",
-   "signal": "2026-11-06",
-   "signal_close": 1783.5,
-   "gain": -3.2,
-   "days": 10,
-   "ema": 1786.15,
-   "close": 1725.8,
-   "low": 1708.8
-  },
-  {
-   "symbol": "TCL",
+   "symbol": "COH",
    "index": false,
    "status": "left below",
-   "signal": "2026-10-13",
-   "signal_close": 13.51,
-   "gain": 8.8,
-   "days": 28,
-   "ema": 14.91,
-   "close": 14.7
+   "signal": "2026-10-21",
+   "signal_close": 141.47,
+   "gain": 5.6,
+   "days": 23,
+   "ema": 150.95,
+   "close": 149.36
   },
   {
-   "symbol": "GMG",
+   "symbol": "NXT",
    "index": false,
    "status": "left below",
-   "signal": "2026-10-28",
-   "signal_close": 26.68,
-   "gain": 3.3,
-   "days": 17,
-   "ema": 28.3,
-   "close": 27.55
+   "signal": "2026-11-05",
+   "signal_close": 9.85,
+   "gain": -8.6,
+   "days": 12,
+   "ema": 9.33,
+   "close": 9.0
   },
   {
    "symbol": "CHC",
@@ -91,11 +77,11 @@
    "status": "riding",
    "signal": "2026-10-12",
    "signal_close": 18.6,
-   "gain": 17.8,
-   "days": 29,
-   "ema": 21.95,
-   "close": 21.91,
-   "low": 21.76
+   "gain": 17.3,
+   "days": 30,
+   "ema": 21.93,
+   "close": 21.82,
+   "low": 21.56
   },
   {
    "symbol": "BXB",
@@ -103,11 +89,23 @@
    "status": "riding",
    "signal": "2026-09-16",
    "signal_close": 18.9,
-   "gain": 15.5,
-   "days": 47,
-   "ema": 22.04,
-   "close": 21.83,
-   "low": 21.75
+   "gain": 15.6,
+   "days": 48,
+   "ema": 22.0,
+   "close": 21.84,
+   "low": 21.71
+  },
+  {
+   "symbol": "MPL",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-09",
+   "signal_close": 4.64,
+   "gain": 12.5,
+   "days": 31,
+   "ema": 5.28,
+   "close": 5.22,
+   "low": 5.19
   },
   {
    "symbol": "IAG",
@@ -115,11 +113,11 @@
    "status": "riding",
    "signal": "2026-10-09",
    "signal_close": 8.13,
-   "gain": 11.3,
-   "days": 30,
-   "ema": 9.0,
-   "close": 9.05,
-   "low": 8.96
+   "gain": 11.1,
+   "days": 31,
+   "ema": 9.01,
+   "close": 9.03,
+   "low": 9.0
   },
   {
    "symbol": "ORG",
@@ -127,11 +125,11 @@
    "status": "riding",
    "signal": "2026-10-08",
    "signal_close": 11.2,
-   "gain": 11.3,
-   "days": 31,
+   "gain": 10.8,
+   "days": 32,
    "ema": 12.4,
-   "close": 12.46,
-   "low": 12.35
+   "close": 12.41,
+   "low": 12.41
   },
   {
    "symbol": "SIG",
@@ -139,11 +137,11 @@
    "status": "riding",
    "signal": "2026-10-05",
    "signal_close": 2.6,
-   "gain": 11.2,
-   "days": 34,
+   "gain": 10.4,
+   "days": 35,
    "ema": 2.88,
-   "close": 2.89,
-   "low": 2.87
+   "close": 2.87,
+   "low": 2.86
   },
   {
    "symbol": "QAN",
@@ -151,10 +149,10 @@
    "status": "riding",
    "signal": "2026-10-28",
    "signal_close": 8.7,
-   "gain": 10.8,
-   "days": 17,
+   "gain": 9.9,
+   "days": 18,
    "ema": 9.58,
-   "close": 9.64,
+   "close": 9.56,
    "low": 9.54
   },
   {
@@ -163,11 +161,11 @@
    "status": "riding",
    "signal": "2026-10-16",
    "signal_close": 154.38,
-   "gain": 10.1,
-   "days": 25,
-   "ema": 169.86,
-   "close": 169.92,
-   "low": 168.6
+   "gain": 7.6,
+   "days": 26,
+   "ema": 169.11,
+   "close": 166.15,
+   "low": 165.28
   },
   {
    "symbol": "TLS",
@@ -175,23 +173,11 @@
    "status": "riding",
    "signal": "2026-10-22",
    "signal_close": 4.86,
-   "gain": 6.4,
-   "days": 21,
-   "ema": 5.14,
-   "close": 5.17,
-   "low": 5.15
-  },
-  {
-   "symbol": "COH",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-21",
-   "signal_close": 141.47,
    "gain": 6.0,
    "days": 22,
-   "ema": 151.35,
-   "close": 149.99,
-   "low": 147.63
+   "ema": 5.14,
+   "close": 5.15,
+   "low": 5.13
   },
   {
    "symbol": "TLC",
@@ -199,23 +185,11 @@
    "status": "riding",
    "signal": "2026-10-09",
    "signal_close": 5.19,
-   "gain": 5.6,
-   "days": 30,
+   "gain": 5.2,
+   "days": 31,
    "ema": 5.47,
-   "close": 5.48,
-   "low": 5.41
-  },
-  {
-   "symbol": "NXT",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-11-05",
-   "signal_close": 9.85,
-   "gain": -8.5,
-   "days": 11,
-   "ema": 9.41,
-   "close": 9.01,
-   "low": 9.01
+   "close": 5.46,
+   "low": 5.44
   }
  ],
  "test": "Tested 2007\u201326: indices +0.19% a trade vs +0.27% holding any 16 days; top-50 stocks +0.66% vs +0.94%. No edge on the ASX: reference only.",
