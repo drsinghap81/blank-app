@@ -1,7 +1,48 @@
 {
-"generated": "2026-11-22 20:30 UTC",
+"generated": "2026-11-23 10:47 UTC",
 "method": "News clues: government / regulator actions that can move a whole industry (22 Nov 2026, Amritpal, after the PSU-bank look-back\nfound the 21 Oct \"FDI cap in PSU banks to 49%\" report a week before the rally: \"add all authentic news clues, especially similar\ntypes as for PSU\").\n\nSources (checked from GitHub Actions 22 Nov 2026):\n  official  RBI press releases + notifications (rbi.org.in RSS); government outlets in Google News (PIB, DD News, News On AIR)\n  reports   Google News RSS, India edition, ONLY from named financial / national outlets (OUTLETS) - shown as \"Report\"\nEvent types searched (TYPES): FDI / foreign-ownership caps, Cabinet approvals and outlays, PLI, anti-dumping / safeguard / customs\nduty, export bans / curbs, minimum import price, bank mergers, privatisation / stake sales, GST rate changes, MSP / FRP,\nDefence Acquisition Council approvals, ethanol blending, RBI rule changes, plus \"government plans / considering\" reports.\nEach item is matched to NSE basic industries by keywords (IND_KEYS). Direction is only marked where the words say it\n(denies / no plan / rollback / ban = negative). Nothing here is a tested signal - it tells you a story exists.\nWrites data/scan/news_clues.json (last 60 days, de-duplicated).",
 "items": [
+{
+"key": "ciiwantsforeigninvestmentcapinpsubanksraisedto49",
+"date": "2026-11-23",
+"title": "CII wants foreign investment cap in PSU banks raised to 49%",
+"url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQbUtYUFNiZjc0LXF0aWUtMXJQSWhUcGpMMk1IbE9sMU1ydS1qNkFmOGFoeEVqb0FpX09raUNwNzB5LXdPZnZxVzdwWllNcUZhSExUbGRyNk9OcTlmUEg1amIwMDBwbUJ6RFA5aVRscEIxRlFvQktjOFJ6bFF0T2IwTHZ5WmxHZHVMLTE2RVQ5VVhfYWpPM25vTTlkUk04dU9aYnJuSk9mTm5BblIyUHZPNXppb1dlOHUzbWgzRUpHcGVfaWPSAcMBQVVfeXFMUG1LWFBTYmY3NC1xdGllLTFyUEloVHBqTDJNSGxPbDFNcnUtajZBZjhhaHhFam9BaV9Pa2lDcDcweS13T2Z2cVc3cFpZTXFGYUhMVGxkcjZPTnE5ZlBINWpiMDAwcG1CekRQOWlUbHBCMUZRb0JLYzhSemxRdE9iMEx2eVpsR2R1TC0xNkVUOVVYX2FqTzNub005ZFJNOHVPWmJybkpPZk5uQW5SMlB2TzV6aW9XZTh1M21oM0VKR3BlX2lj?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "FDI / foreign cap",
+"industries": [
+"Public Sector Bank"
+],
+"neg": false
+},
+{
+"key": "aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
+"date": "2026-11-23",
+"title": "APL Apollo Stock Tanks 18% On Rs 15,510 Crore Stake Sale Plans, Tata Steel Slides Nearly 5%",
+"url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQZHQzY1FkS0E1T19vMzZDN3FNOXBIaE1aYnVLZU0zSkptSDJWRzUwU3U2RklPOUdlVnA0bnBKN01kZFZ4SHdRSm1PRHh4NTdLQW9OSUU0ZHNTR3F3aEFSVElHX0QzUnJIM3JIbVlveDRDandITzNLdkUtYlBVbWotTndFdG83Y2pReXJ4aGVCX1QyTVFUdU1OLWVzNlA3aElqbkFqbjFHZXhrTWdfZVZBWU9aUEEyUllJVS03Q0FYeHdfbGF5ZW5mMTJRNXZXMmU5alE5edIB3AFBVV95cUxQc2FfVGVWVWhYeDFVb1g0Q25qdWhCcTRKSEJrY2dPZDlrRUE2OEJXaG5ZdC1pUGNJWkptaU1JaTRPYURmYmRsZW9EcDRzQXREeXdNMjRSU0loRDVkY1A3a0FraWs2R3M5UTd5UWJhN2tpMncySDlGMWVOQktLdWhzN0RvcXhCcFRLNlI1dGJhLTdyYkNkcTI4YUFTSHA2OV9WS2hfRktIOE1xbzhLaVhkbVo3TTV3MTFMdDRBcGtnM0RxVVNJZUZxSUVQX3oxUk00UWFvX1F1Umd0cVJh?oc=5",
+"source": "NDTV Profit",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "e20petrolcontroversysureshgopiquestionskarnatakasethanoltests",
+"date": "2026-11-23",
+"title": "E20 petrol controversy: Suresh Gopi questions Karnataka's ethanol tests",
+"url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNem93ZUY4ZGwtYldOamNnTS1EUFZoa1RsMGhFXzNGbTBCTU9lc3NvUGpxSzB5cW1mMVNuM0NReDl0dENXWGp6VUhFYWJKSWJGdGVpWTdxd0VfTTN0NzhTbFNDb2d5aEN4TXNqZHd5QW14WGx4V1pXTy1jSFJxQ09ab3RkOXpYSS1Yd2E0UGJfamhHYlpmNDB2TDJ5SzI3d1JEMFFDOG82bkRsd1Iwc1c1aTZad1llM3UzUHpiV0lrRXB1a00wYUJhTEJET2J3Q3dpQW5mRXBB0gHWAUFVX3lxTE16b3dlRjhkbC1iV05qY2dNLURQVmhrVGwwaEVfM0ZtMEJNT2Vzc29QanFLMHlxbWYxU24zQ1F4OXR0Q1dYanpVSEVhYkpJYkZ0ZWlZN3F3RV9NM3Q3OFNsU0NvZ3loQ3hNc2pkd3lBbXhYbHhXWldPLWNIUnFDT1pvdGQ5elhJLVh3YTRQYl9qaEdiWmY0MHZMMnlLMjd3UkQwUUM4bzZuRGx3UjBzVzVpNlp3WWUzdTNQemJXSWtFcHVrTTBhQmFMQkRPYndDd2lBbmZFcEE?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
 {
 "key": "cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
 "date": "2026-11-22",
@@ -156,6 +197,33 @@
 "neg": false
 },
 {
+"key": "indiasfoodprocessinggrowthneedsbetterstorageandfarmmarketreforms",
+"date": "2026-11-22",
+"title": "India's food processing growth needs better storage and farm market reforms",
+"url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxPd1BObmlfS3ppcGJ0NmZBSDM0aXdUd1ZGWkpQZ1k3a0N2b0stNW1ZdWtMbkxLSVJDaVc2Znh6MGJ6Ykg0OHVRWS1iUHlVYXhrQWJVZUwzUGhvN1NLSkZlZVQ3bHEzcDg3TlNjN096dnU2Um43dFBYOXhjUmtlbThRNkgza0h2N0tMYUZDYV9hamo3WVBZMGU4ckJGS1llY05USWFEeWgxcmxsaWNhMFdlVWRyMk1WaW5BYmR0RXRQWTRWNjU4dUVkY0p4WEkyazcxaU43VXRHdGRwMHBzbUhwenJnNNIB4wFBVV95cUxPd1BObmlfS3ppcGJ0NmZBSDM0aXdUd1ZGWkpQZ1k3a0N2b0stNW1ZdWtMbkxLSVJDaVc2Znh6MGJ6Ykg0OHVRWS1iUHlVYXhrQWJVZUwzUGhvN1NLSkZlZVQ3bHEzcDg3TlNjN096dnU2Um43dFBYOXhjUmtlbThRNkgza0h2N0tMYUZDYV9hamo3WVBZMGU4ckJGS1llY05USWFEeWgxcmxsaWNhMFdlVWRyMk1WaW5BYmR0RXRQWTRWNjU4dUVkY0p4WEkyazcxaU43VXRHdGRwMHBzbUhwenJnNA?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Packaged Foods",
+"Other Food Products"
+],
+"neg": false
+},
+{
+"key": "unionbudget2028aluminiumproductmakersseekdutyfreeimportsforprimarymetal",
+"date": "2026-11-22",
+"title": "Union Budget 2028: Aluminium product makers seek duty-free imports for primary metal",
+"url": "https://news.google.com/rss/articles/CBMihgJBVV95cUxNcGV4bW1sY2xyaWdqN3RoRnR5VWJvbFM5M2FjUm9rZFFZYVNCeURpT2M5NkVTN1dSYS15VTYtSkpaUFRXSEI5M1dFbkppb3RmRDBYYy04S3NQbkVaWWxXYnhCSVNVd012aDVnR1BfVU1OQ2hhclVydDV1cmpSQ0xpSWhTWGJ2dzVNMi1HbVZNSzJPUC1ZQnNjZTRCSFhucWlfWU91VmlVZTlzLVpjX1ZlNGhtc1doNG9ja0ZkbWRlVWREMjE1T2tXaXM3NExLbERVN1dmMkttY2w2ZUx4ZDNibV8xRF9uQmJJS1dBbmJRMTBielB2M2JLenUtX1UtMno5MUNVcmdn0gGLAkFVX3lxTE5ud2lJeDVjQ09UREZTeGdfUlViOERHNkQxNmsxN3N5dC1GMHktLXpqT1E5WERySnpaY3d2ZEVhODFpVWJ4LV9zWGQ0UnJ3cDFmNlplQjR1aW1SaWpXTjhWT0dtSjNxMW5mbGcyZG9IUGZoX2E1WERHR04ydlI3UFBLa1VVYWtSVF9sZDFYMEg1OGEwM21RWjJTQmxLYkR6WHBQLWRPR2Vqc00tSUlxR3UxempKemVtUDB6VEtNUzBheTVOSngzQ2VVQUhEWDVTcHREWUF5bUhPS2dkUE9YNmJPWXAtYXhYMXFnbjNKWTZ0N1NDQ2l2UFpvR1BtUzRqWFNZdlJZNlE5TjNJWQ?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Aluminium"
+],
+"neg": false
+},
+{
 "key": "governmentunveilsroadmapforgreenureaproductionpushes724lakhmtgreenammoniaprocurementundern",
 "date": "2026-11-21",
 "title": "Government unveils roadmap for green urea production, pushes 7.24 lakh MT green ammonia procurement under National Green Hydrogen Mission | DD News",
@@ -205,6 +273,20 @@
 "industries": [
 "Railway Wagons",
 "Civil Construction"
+],
+"neg": false
+},
+{
+"key": "rs7597crorenh63nh563expansiontoboostconnectivitytradeandtourisminnortherntelangana",
+"date": "2026-11-21",
+"title": "Rs 7,597-crore NH-63, NH-563 expansion to boost connectivity, trade and tourism in northern Telangana",
+"url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNZ0MtX1lLWC1mRjBVVjQ1VmplaDZ6Tk82VGoxSkxERnFqOUVheW91YnA0bk54dDNwdWx5TVJBbDhieTl4WU9qZWFVenVGc2thOGdWVXVxYmRaNTRRRzgwVTYzaHNyNHRvYXBmMVhPY09rYjhTeDVJa09uYlBZR3FoTll6bDA5UnhZWFRTMkw2Uk15eUpuNnBCR3RGaUg4SW8zT0ZURmlXZDR4cWRFS2ttaU8yb2hqN01sNkNLYllYdHVRQQ?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Hotels & Resorts",
+"Tour Travel Related Services"
 ],
 "neg": false
 },
@@ -1762,6 +1844,105 @@
 }
 ],
 "by_industry": {
+"Public Sector Bank": [
+"ciiwantsforeigninvestmentcapinpsubanksraisedto49",
+"ciipitches15financialsectorreformsseekshigherforeigninvestmentinpsubanks",
+"psbsseeuptors30000croreinforeigninflowsifinvestmentcapraisedto49",
+"govteyesstakecutsin4psubanksincludingcentralbankucobank2moreinprivatisationplan",
+"afteridbibanksalecentrelooksatcentralbankucobank2otherpsubanksforstakecutschecktermshere",
+"governmentplanstoparestakesin4psubanksto75"
+],
+"Iron & Steel": [
+"aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
+"steelsh2showhingesonpricegainscostpressure",
+"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
+"tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
+"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
+"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
+"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
+"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
+"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
+"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
+"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
+"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
+],
+"Iron & Steel Products": [
+"aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
+"steelsh2showhingesonpricegainscostpressure",
+"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
+"tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
+"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
+"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
+"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
+"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
+"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
+"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
+"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
+"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
+],
+"Sugar": [
+"e20petrolcontroversysureshgopiquestionskarnatakasethanoltests",
+"indiasethanolpolicyneedsrethink",
+"indiaachieves20ethanolblendingmilestonein202526maizeleadssupplies",
+"indiahits1999ethanolblendingin202526grainssupply735",
+"indiahits20ethanolblendinginesy202526grainnowpowersover73ofsuppliesaida",
+"governmentrulesoutimmediatemovebeyonde20reaffirmssafetyandbenefitsofethanolblendedpetrol",
+"indiaachieves20ethanolblendingin202526grainbasedfeedstockshareat74pcaida",
+"indiaachieves20ethanolblendingmilestoneinfy26grainbasedfeedstockaccountsfor74",
+"indiaeffectivelyachieves20ethanolblendingtargetin202526",
+"ethanolblendingtouches20milestoneinfy26",
+"niranidisputesministersclaimsonethanolblending",
+"e20petrolrowkarnatakawritestocentresaysstatenotagainstethanolblendingbutagainst",
+"karnatakatosendlettertocentreonexcessiveethanolblendingonnovember17",
+"eidparryseesethanolmarginsunderpressureconsumerproductstobreakeveninfy28",
+"karnatakacmshivakumaronethanolblendingamidbjpprotests",
+"karnatakatestspetrolsamplesat67locationsoverethanolblendingcomplaintscmshivakumar",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka",
+"aistaseeks35hikeinsugarmspto42kgbackscentrescaneprice",
+"explainedwhycouldaweakmonsoonderailindiasambitiousethanolblendingprogramme",
+"karnatakamsprowfactoryownersunionstomeetassugarcanefarmersturnupheat",
+"indiaputsfoodbeforefuelaselniodentsethanolambitions",
+"karnatakasugarcanefarmersurgerameshchandpaneltofixexfieldpricingforfrp",
+"supremecourtquestionsif100ethanolvehiclesareallowedhowsupplywouldbearrangedamidfarmerempow",
+"nointentiontoincreaseethanolblendinginfuelbeyond20unionministerhardeeppuri",
+"noimmediateplantoraiseethanolblendinginpetrolbeyond20hardeeppuri",
+"sugarcanefarmersthreatentorestartprotestifmspfrpandsapnotrevisednow",
+"sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
+"sugarcanefarmerswelcomepanelbutwontendprotest",
+"governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
+],
+"Breweries & Distilleries": [
+"e20petrolcontroversysureshgopiquestionskarnatakasethanoltests",
+"indiasethanolpolicyneedsrethink",
+"mpcabinetapprovesexcisepolicyfor202627retainsbanonnewliquorshops",
+"indiaachieves20ethanolblendingmilestonein202526maizeleadssupplies",
+"indiahits1999ethanolblendingin202526grainssupply735",
+"indiahits20ethanolblendinginesy202526grainnowpowersover73ofsuppliesaida",
+"governmentrulesoutimmediatemovebeyonde20reaffirmssafetyandbenefitsofethanolblendedpetrol",
+"indiaachieves20ethanolblendingin202526grainbasedfeedstockshareat74pcaida",
+"indiaachieves20ethanolblendingmilestoneinfy26grainbasedfeedstockaccountsfor74",
+"indiaeffectivelyachieves20ethanolblendingtargetin202526",
+"ethanolblendingtouches20milestoneinfy26",
+"niranidisputesministersclaimsonethanolblending",
+"e20petrolrowkarnatakawritestocentresaysstatenotagainstethanolblendingbutagainst",
+"karnatakatosendlettertocentreonexcessiveethanolblendingonnovember17",
+"eidparryseesethanolmarginsunderpressureconsumerproductstobreakeveninfy28",
+"karnatakacmshivakumaronethanolblendingamidbjpprotests",
+"karnatakatestspetrolsamplesat67locationsoverethanolblendingcomplaintscmshivakumar",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka",
+"aistaseeks35hikeinsugarmspto42kgbackscentrescaneprice",
+"explainedwhycouldaweakmonsoonderailindiasambitiousethanolblendingprogramme",
+"karnatakamsprowfactoryownersunionstomeetassugarcanefarmersturnupheat",
+"indiaputsfoodbeforefuelaselniodentsethanolambitions",
+"karnatakasugarcanefarmersurgerameshchandpaneltofixexfieldpricingforfrp",
+"supremecourtquestionsif100ethanolvehiclesareallowedhowsupplywouldbearrangedamidfarmerempow",
+"nointentiontoincreaseethanolblendinginfuelbeyond20unionministerhardeeppuri",
+"noimmediateplantoraiseethanolblendinginpetrolbeyond20hardeeppuri",
+"sugarcanefarmersthreatentorestartprotestifmspfrpandsapnotrevisednow",
+"sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
+"sugarcanefarmerswelcomepanelbutwontendprotest",
+"governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
+],
 "Power Generation": [
 "cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
 "indiassolarmanufacturinghits116gwasplischemeboostsdomesticoutput",
@@ -1786,6 +1967,7 @@
 ],
 "Aluminium": [
 "aluminiumproductmakersseekzeroimportdutyonrawmetalaheadofbudget",
+"unionbudget2028aluminiumproductmakersseekdutyfreeimportsforprimarymetal",
 "indiamayimposedutiesoncheapaluminiumimports5stocksthatcouldbenefit",
 "budgetwishdownstreamaluminiumcompaniesseekbasiccustomsdutyscrapped",
 "dgtrinitiatesantidumpingprobeintoaluminiumextrusionimports"
@@ -1835,13 +2017,6 @@
 "hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
 "adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
 ],
-"Public Sector Bank": [
-"ciipitches15financialsectorreformsseekshigherforeigninvestmentinpsubanks",
-"psbsseeuptors30000croreinforeigninflowsifinvestmentcapraisedto49",
-"govteyesstakecutsin4psubanksincludingcentralbankucobank2moreinprivatisationplan",
-"afteridbibanksalecentrelooksatcentralbankucobank2otherpsubanksforstakecutschecktermshere",
-"governmentplanstoparestakesin4psubanksto75"
-],
 "Passenger Cars & Utility Vehicles": [
 "autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
 "bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
@@ -1872,92 +2047,11 @@
 "indiasfestivecarbuyingjoyridemayhitpricehikebump",
 "gstcouncilproposes5gstoptionforevpassengertransportrentals"
 ],
-"Iron & Steel": [
-"steelsh2showhingesonpricegainscostpressure",
-"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
-"tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
-"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
-"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
-"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
-"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
-"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
-"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
-"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
-"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
+"Packaged Foods": [
+"indiasfoodprocessinggrowthneedsbetterstorageandfarmmarketreforms"
 ],
-"Iron & Steel Products": [
-"steelsh2showhingesonpricegainscostpressure",
-"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
-"tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
-"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
-"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
-"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
-"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
-"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
-"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
-"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
-"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
-],
-"Sugar": [
-"indiasethanolpolicyneedsrethink",
-"indiaachieves20ethanolblendingmilestonein202526maizeleadssupplies",
-"indiahits1999ethanolblendingin202526grainssupply735",
-"indiahits20ethanolblendinginesy202526grainnowpowersover73ofsuppliesaida",
-"governmentrulesoutimmediatemovebeyonde20reaffirmssafetyandbenefitsofethanolblendedpetrol",
-"indiaachieves20ethanolblendingin202526grainbasedfeedstockshareat74pcaida",
-"indiaachieves20ethanolblendingmilestoneinfy26grainbasedfeedstockaccountsfor74",
-"indiaeffectivelyachieves20ethanolblendingtargetin202526",
-"ethanolblendingtouches20milestoneinfy26",
-"niranidisputesministersclaimsonethanolblending",
-"e20petrolrowkarnatakawritestocentresaysstatenotagainstethanolblendingbutagainst",
-"karnatakatosendlettertocentreonexcessiveethanolblendingonnovember17",
-"eidparryseesethanolmarginsunderpressureconsumerproductstobreakeveninfy28",
-"karnatakacmshivakumaronethanolblendingamidbjpprotests",
-"karnatakatestspetrolsamplesat67locationsoverethanolblendingcomplaintscmshivakumar",
-"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka",
-"aistaseeks35hikeinsugarmspto42kgbackscentrescaneprice",
-"explainedwhycouldaweakmonsoonderailindiasambitiousethanolblendingprogramme",
-"karnatakamsprowfactoryownersunionstomeetassugarcanefarmersturnupheat",
-"indiaputsfoodbeforefuelaselniodentsethanolambitions",
-"karnatakasugarcanefarmersurgerameshchandpaneltofixexfieldpricingforfrp",
-"supremecourtquestionsif100ethanolvehiclesareallowedhowsupplywouldbearrangedamidfarmerempow",
-"nointentiontoincreaseethanolblendinginfuelbeyond20unionministerhardeeppuri",
-"noimmediateplantoraiseethanolblendinginpetrolbeyond20hardeeppuri",
-"sugarcanefarmersthreatentorestartprotestifmspfrpandsapnotrevisednow",
-"sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
-"sugarcanefarmerswelcomepanelbutwontendprotest",
-"governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
-],
-"Breweries & Distilleries": [
-"indiasethanolpolicyneedsrethink",
-"mpcabinetapprovesexcisepolicyfor202627retainsbanonnewliquorshops",
-"indiaachieves20ethanolblendingmilestonein202526maizeleadssupplies",
-"indiahits1999ethanolblendingin202526grainssupply735",
-"indiahits20ethanolblendinginesy202526grainnowpowersover73ofsuppliesaida",
-"governmentrulesoutimmediatemovebeyonde20reaffirmssafetyandbenefitsofethanolblendedpetrol",
-"indiaachieves20ethanolblendingin202526grainbasedfeedstockshareat74pcaida",
-"indiaachieves20ethanolblendingmilestoneinfy26grainbasedfeedstockaccountsfor74",
-"indiaeffectivelyachieves20ethanolblendingtargetin202526",
-"ethanolblendingtouches20milestoneinfy26",
-"niranidisputesministersclaimsonethanolblending",
-"e20petrolrowkarnatakawritestocentresaysstatenotagainstethanolblendingbutagainst",
-"karnatakatosendlettertocentreonexcessiveethanolblendingonnovember17",
-"eidparryseesethanolmarginsunderpressureconsumerproductstobreakeveninfy28",
-"karnatakacmshivakumaronethanolblendingamidbjpprotests",
-"karnatakatestspetrolsamplesat67locationsoverethanolblendingcomplaintscmshivakumar",
-"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka",
-"aistaseeks35hikeinsugarmspto42kgbackscentrescaneprice",
-"explainedwhycouldaweakmonsoonderailindiasambitiousethanolblendingprogramme",
-"karnatakamsprowfactoryownersunionstomeetassugarcanefarmersturnupheat",
-"indiaputsfoodbeforefuelaselniodentsethanolambitions",
-"karnatakasugarcanefarmersurgerameshchandpaneltofixexfieldpricingforfrp",
-"supremecourtquestionsif100ethanolvehiclesareallowedhowsupplywouldbearrangedamidfarmerempow",
-"nointentiontoincreaseethanolblendinginfuelbeyond20unionministerhardeeppuri",
-"noimmediateplantoraiseethanolblendinginpetrolbeyond20hardeeppuri",
-"sugarcanefarmersthreatentorestartprotestifmspfrpandsapnotrevisednow",
-"sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
-"sugarcanefarmerswelcomepanelbutwontendprotest",
-"governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
+"Other Food Products": [
+"indiasfoodprocessinggrowthneedsbetterstorageandfarmmarketreforms"
 ],
 "Fertilizers": [
 "governmentunveilsroadmapforgreenureaproductionpushes724lakhmtgreenammoniaprocurementundern",
@@ -1969,6 +2063,12 @@
 ],
 "Civil Construction": [
 "pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
+],
+"Hotels & Resorts": [
+"rs7597crorenh63nh563expansiontoboostconnectivitytradeandtourisminnortherntelangana"
+],
+"Tour Travel Related Services": [
+"rs7597crorenh63nh563expansiontoboostconnectivitytradeandtourisminnortherntelangana"
 ],
 "Coal": [
 "govtclearscoalindiathreeothersforrareearthmagnetproduction"
