@@ -98,6 +98,7 @@ class Params:
     gap_pct: float = 2.0        # gap beyond order level > this -> exit only
     use_once: bool = True       # each top/bottom can trigger only once
     long_only: bool = False
+    short_ok: object = None     # 24 Nov 2026 test: optional bool array (one per bar); shorts only on bars where it is True
     swing_pct: float = 0.0      # optional glitch filter (0 = pure 1-day turns, as validated)
     cost_pts: float = 0.0       # round-trip cost per trade, in points
     lot: float = 1.0            # multiply points by lot size for rupee P&L
@@ -226,7 +227,7 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
                 side = pos
                 reason = "System point" if is_sys else ("Breakeven" if be_on else "Max SL")
                 close_pos(i, px, reason + (" (gap)" if px != prot else ""))
-                if is_sys and not (p.long_only and side > 0):
+                if is_sys and not (p.long_only and side > 0) and not (side > 0 and p.short_ok is not None and not p.short_ok[i]):
                     lvl = sell_lvl if side > 0 else buy_lvl
                     if side > 0:
                         used_B = bot
@@ -249,7 +250,7 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
         if p.event_exit and is_event_day(idx[i], p.event_dates):
             return  # no new trades on the event day itself
         go_l = not np.isnan(buy_lvl) and h[i] >= buy_lvl
-        go_s = (not p.long_only) and not np.isnan(sell_lvl) and l[i] <= sell_lvl
+        go_s = (not p.long_only) and not np.isnan(sell_lvl) and l[i] <= sell_lvl and (p.short_ok is None or bool(p.short_ok[i]))
         if go_l and go_s:  # both levels hit the same day: take the one nearer the open
             go_l = abs(o[i] - buy_lvl) <= abs(o[i] - sell_lvl)
             go_s = not go_l
