@@ -49,7 +49,7 @@ def main():
                              top=[f"{s} {st[s]['mv'] * 100:+.1f}% x{st[s]['rv']:.1f}" for s in top]))
         R = pd.DataFrame(rows).sort_values("mv", ascending=False)
         R["wk_rank"] = R.wk.rank(ascending=False).astype(int); R["today_rank"] = range(1, len(R) + 1)
-        for _, r in pd.concat([R.head(12 if lab == "INDUSTRY" else 8), R.tail(6 if lab == "INDUSTRY" else 5)]).iterrows():
+        for _, r in (pd.concat([R.head(12), R.tail(6)]) if lab == "INDUSTRY" else R).iterrows():
             print(f"R| {lab} | {r.g} | n{r.n} | today {r.mv:+.2f}% | up {r.br:.0f}% | relvol x{r.rv:.2f} | last wk {r.wk:+.1f}% (rank {r.wk_rank}/{len(R)}) | {', '.join(r.top)}", flush=True)
         hv = R[(R.rv >= 1.3) & (R.mv > 0)].sort_values("rv", ascending=False).head(8)
         for _, r in hv.iterrows():
@@ -57,7 +57,7 @@ def main():
         hs = R[(R.rv >= 1.3) & (R.mv < 0)].sort_values("rv", ascending=False).head(6)
         for _, r in hs.iterrows():
             print(f"R| {lab} HEAVY SELLING | {r.g} | today {r.mv:+.2f}% relvol x{r.rv:.2f} up {r.br:.0f}% | last wk rank {r.wk_rank}", flush=True)
-        print(f"R| {lab} rotation: corr(last week rank, today rank) = {R.wk_rank.corr(R.today_rank, method='spearman'):+.2f}", flush=True)
+        print(f"R| {lab} rotation: corr(last week rank, today rank) = {R.wk_rank.corr(R.today_rank):+.2f}", flush=True)
 
 
 if __name__ == "__main__":
