@@ -58,6 +58,8 @@ DEFAULT_CFG = {
     "poll_seconds": 2,
     "close_check_time": "15:20",
     "roll_time": "15:10",
+    "gap_alert_profit_pct": 3.0,     # 23 Nov 2026: alert only (no order) when an open trade was >= this % in profit at the last close ...
+    "gap_alert_pct": 0.5,            # ... and today OPENS >= this % further in its favour ("consider booking"); 0 = off
     "next_month_on_expiry_day": True,
     "dry_run": True,                 # True = real prices, simulated orders (nothing sent to Angel)
     "start_date": None,
@@ -261,7 +263,22 @@ class TradingDay:
         self.log(f"open {self.open_px}")
         if self.st.pos != 0:
             self.place_backstop()
+        self.gap_alert(q)
         self.tick(q)
+
+    def gap_alert(self, q):
+        """23 Nov 2026 (claude/tb-gap-book-test): a message only - the system keeps the trade. Backtest 2007-26: booking on such gaps
+        was roughly neutral (better some years, worse others), so it's the trader's call."""
+        st, c = self.st, self.cfg
+        if st.pos == 0 or not c.get("gap_alert_pct") or not q.get("open") or not st.entry:
+            return
+        lc = float(self.hist["Close"].iloc[-1]); op = float(q["open"])
+        prof = (lc - st.entry) / st.entry * 100 * st.pos; gap = (op - lc) / lc * 100 * st.pos
+        if prof >= c.get("gap_alert_profit_pct", 3.0) and gap >= c["gap_alert_pct"]:
+            now_pts = (op - st.entry) * st.pos
+            self.say(f"💰 Gap in your favour: {'LONG' if st.pos > 0 else 'SHORT'} {st.contract} was {prof:+.1f}% at the last close and opened "
+                     f"{gap:+.1f}% further ({op:,.2f}, {now_pts:+,.0f} pts). Consider booking - the system itself keeps the trade "
+                     f"(stop {self.plan['prot']:,.2f}). To book: 🔴 Square off.")
 
     def late_start(self, q):
         """Bot started after the open: a level that already traded while the bot was off
