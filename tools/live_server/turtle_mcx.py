@@ -179,6 +179,7 @@ class TurtleMCX:
         qty = int(arm["lots"]) * int(c["lotsize"] or 1)
         if live and o.get("entry_oid") and om:
             e = om.get(o["entry_oid"]) or {}
+            o["angel_status"] = e.get("status") or "not in Angel's order book"; o["angel_text"] = str(e.get("text") or "")[:140]   # 23 Nov 2026: shown on the card
             if str(e.get("status", "")).lower() == "complete":
                 px = float(e.get("avg") or L["trigger"]); N = L["N"]
                 pos = dict(contract=c, qty=qty, lots=arm["lots"], entry=px, N=N, fixed=rnd(px - 2 * N, tick), stop=rnd(max(px - 2 * N, L["ll10"]), tick),
