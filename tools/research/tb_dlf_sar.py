@@ -22,8 +22,10 @@ d.columns = [c[0] if isinstance(c, tuple) else c for c in d.columns]; d.index = 
 x = d[["Open", "High", "Low", "Close"]].dropna(); x = x[(x.High >= x.Low) & (x.index >= "2010-01-01")].round(2)
 sar = tbb.run_live(x, tbb.Params(buffer_pct=0.05, buffer_pts=0, day_sl_pct=100, max_sl_pct=100, be_pct=0, gap_pct=100, event_exit=False))
 sheet = tbb.run_sheet(x, tbb.Params(mode="sheet"))
+buyflat = tbb.run_live(x, tbb.Params(buffer_pct=0.05, buffer_pts=0, day_sl_pct=100, max_sl_pct=100, be_pct=0, gap_pct=100, event_exit=False, long_only=True))
+buylive = tbb.run_live(x, tbb.Params(buffer_pct=0.05, buffer_pts=0, day_sl_pct=1.5, max_sl_pct=3.0, be_pct=3.0, gap_pct=1.5, event_exit=False, long_only=True))
 out = {"closes": [[str(i.date()), float(c)] for i, c in x.Close.items()]}
-for nm, t in (("sar", sar), ("sheet", sheet)):
+for nm, t in (("sar", sar), ("sheet", sheet), ("buyflat", buyflat), ("buylive", buylive)):
     t = t.copy(); t["EntryDate"] = pd.to_datetime(t.EntryDate).dt.strftime("%Y-%m-%d"); t["ExitDate"] = pd.to_datetime(t.ExitDate).dt.strftime("%Y-%m-%d")
     t["net"] = (t.Points - (t.Entry + t.Exit) * 0.0005).round(2)
     out[nm] = t[["EntryDate", "Side", "Entry", "ExitDate", "Exit", "Reason", "Points", "net", "Open"]].to_dict("records")
