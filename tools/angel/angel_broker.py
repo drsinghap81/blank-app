@@ -35,16 +35,25 @@ class _Guard:
         if not callable(v):
             return v
 
+        def raw(*a, **k):   # 23 Nov 2026: Angel's "exceeding access rate" refusal means the request was NOT done -> wait and retry
+            for wait in (1.5, 3, 5, 8, None):
+                try:
+                    return getattr(self._own.api._raw, name)(*a, **k)
+                except Exception as e:  # noqa: BLE001
+                    if wait is None or "access rate" not in str(e).lower():
+                        raise
+                    time.sleep(wait)
+
         def call(*a, **k):
             try:
-                r = getattr(self._raw, name)(*a, **k)
+                r = raw(*a, **k)
             except Exception as e:  # noqa: BLE001
                 if any(w in str(e) for w in TOKEN_ERR) and self._own._relogin(f"{name}: {e}"):
-                    return getattr(self._own.api._raw, name)(*a, **k)
+                    return raw(*a, **k)
                 raise
             if isinstance(r, dict) and r.get("status") is False and any(w in f"{r.get('message')} {r.get('errorcode')}" for w in TOKEN_ERR) \
                     and self._own._relogin(f"{name}: {r.get('message')}"):
-                return getattr(self._own.api._raw, name)(*a, **k)
+                return raw(*a, **k)
             return r
         return call
 
