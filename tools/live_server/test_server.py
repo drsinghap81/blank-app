@@ -167,6 +167,24 @@ def test_basket_sells(tmp_path):
     A.sized = sz
 
 
+def test_dcup_alert(tmp_path):
+    """23 Nov 2026: day cup close -> one alert when the live price trades above the breakout-day high."""
+    A, c = client(tmp_path)
+    from datetime import date as _d
+    per = _d.today().isoformat()
+    class R:
+        def json(self):
+            return {"day_close": [{"symbol": "ZZD", "period": per, "high_p": 99.0, "old_ath": 95.0, "close_p": 98.0},
+                                  {"symbol": "ZZE", "period": per, "high_p": 500.0, "old_ath": 90.0, "close_p": 98.0}]}
+    g = A.requests.get; A.requests.get = lambda *a, **k: R()
+    try:
+        A.dcup_alerts(force=True); A.dcup_alerts(force=True)
+    finally:
+        A.requests.get = g
+    items = [x for x in A.alerts_load()["items"] if x["kind"] == "dcup"]
+    assert [x["symbol"] for x in items] == ["ZZD"] and "taken out" in items[0]["text"]       # once, and not ZZE (500 not reached)
+
+
 def test_quotes(tmp_path):
     A, c = client(tmp_path)
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}

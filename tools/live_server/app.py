@@ -4070,6 +4070,8 @@ def _loop():
                 exit_alerts()
             if t.weekday() < 5 and MORNING_FROM <= (t.hour, t.minute) <= (MORNING_UNTIL[0], MORNING_UNTIL[1] + 2):
                 morning_check(force=(t.hour, t.minute) > MORNING_UNTIL)
+            if t.weekday() < 5 and market_open(t):
+                dcup_alerts()
             if t.minute % 10 < 2:
                 pie_alerts()
                 condor_alerts()
@@ -4206,6 +4208,64 @@ def exit_alerts():
         if held.get(sym, 0) > 0:
             alert("exit", sym, f"Sell signal ({e.get('system') or 'system'}): {e.get('why') or 'exit rule met'}. Sell {held[sym]} at the next open.",
                   key=f"exit:{sym}:{P.get('asof')}")
+
+
+_DCUP = {"t": 0, "f": 0}
+DCUP_DAYS = 10            # watch a day cup close for this many sessions after its breakout day
+
+
+def dcup_alerts(force=False):
+    """23 Nov 2026 (Amritpal: "alert me when a daily cup close breakout price is taken out"): a stock whose DAY closed above its cup
+    high (ath.json day_close, the nightly scan) goes on a watch list with its breakout-day high as the trigger. In market hours,
+    every 5 minutes, one alert when the live price trades above that high (once per stock per breakout day). Watched for
+    DCUP_DAYS sessions; dropped if the price falls back below the old cup high. Watch only - day cup closes are not a tested buy."""
+    import numpy as np
+    t = ist_now()
+    if not force and (t.weekday() >= 5 or not market_open(t) or time.time() - _DCUP["t"] < 300):
+        return
+    _DCUP["t"] = time.time()
+    wp = os.path.join(DATA, "dcup_watch.json")
+    try:
+        W = json.load(open(wp))
+    except Exception:  # noqa: BLE001
+        W = {}
+    if time.time() - _DCUP["f"] > 1800 or force:                    # refresh the list from the nightly scan every 30 minutes
+        _DCUP["f"] = time.time()
+        try:
+            A = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/ath.json", timeout=30).json()
+            for r in A.get("day_close") or []:
+                k = f"{r['symbol']}:{r['period']}"
+                if k not in W and r.get("high_p"):
+                    W[k] = dict(symbol=r["symbol"], period=r["period"], trigger=float(r["high_p"]), cup=float(r.get("old_ath") or 0),
+                                close=float(r.get("close_p") or 0), added=t.date().isoformat(), name=r.get("name") or "")
+        except Exception as ex:  # noqa: BLE001
+            log("dcup_fetch", error=str(ex)[:160])
+    today = t.date()
+    for k in list(W):
+        try:
+            age = int(np.busday_count(W[k]["period"], today.isoformat()))
+        except Exception:  # noqa: BLE001
+            age = 0
+        if age > DCUP_DAYS or W[k].get("done"):
+            W.pop(k)
+    live = [x for x in W.values() if not x.get("done")]
+    if live:
+        try:
+            Q = broker.quotes(sorted({x["symbol"] for x in live}))
+        except Exception as ex:  # noqa: BLE001
+            log("dcup_quotes", error=str(ex)[:160]); Q = {}
+        for x in live:
+            q = Q.get(x["symbol"]) or {}; ltp = q.get("ltp") or 0
+            if not ltp:
+                continue
+            if x["cup"] and ltp < x["cup"]:
+                x["done"] = "failed"; continue
+            if ltp > x["trigger"]:
+                alert("dcup", x["symbol"], f"Day cup close breakout taken out: {ltp:,.2f} is above the {x['period']} high {x['trigger']:,.2f} "
+                      f"(that day closed above its cup high {x['cup']:,.2f}). Watch only - day cup closes are not a tested buy; check the chart.",
+                      key=f"dcup:{x['symbol']}:{x['period']}", mk="NSE")
+                x["done"] = "alerted"; x["at"] = t.isoformat(timespec="minutes"); x["ltp"] = ltp
+    json.dump(W, open(wp, "w"))
 
 
 _PIES = {"t": 0}
