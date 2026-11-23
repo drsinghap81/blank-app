@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-23T12:16+00:00",
+"generated": "2026-11-23T19:33+00:00",
 "asof": "2026-11-23",
 "market": "NSE",
 "rules": "Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, no close above the pole top, close above the 200-day average. Room: the nearest earlier swing high above the entry must be >= 0.8 x the pole away (or none). Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average (fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
@@ -743,6 +743,54 @@
 "kind": "stock"
 },
 {
+"symbol": "DPEL",
+"name": "Divine Power Energy Limited",
+"lane": "established",
+"shape": "Flag",
+"close": 661.0,
+"pole_pct": 28.8,
+"flag_vol_pct": 95,
+"range_pct": 7.5,
+"pole_start": "2026-11-02",
+"pole_top": "2026-11-04",
+"top": 724.0,
+"flag_days": 11,
+"depth_pct": 10.9,
+"stop": 644.95,
+"s200": 507.12,
+"base": 562.05,
+"geo": {
+"pole": [
+"2026-11-02",
+562.05,
+"2026-11-04",
+724.0
+],
+"up": [
+"2026-11-05",
+699.09,
+"2026-11-23",
+667.96
+],
+"lo": [
+"2026-11-05",
+680.69,
+"2026-11-23",
+654.74
+]
+},
+"status": "forming",
+"trigger": 667.96,
+"need_vol": 61252,
+"to_trigger_pct": 1.1,
+"target": 829.91,
+"risk_pct": 3.4,
+"ema21": 651.37,
+"resistance": null,
+"room_x": null,
+"kind": "stock"
+},
+{
 "symbol": "GRWRHITECH",
 "name": "Garware Hi-Tech Films Limited",
 "lane": "established",
@@ -835,54 +883,6 @@
 "target": 899.47,
 "risk_pct": 2.4,
 "ema21": 682.83,
-"resistance": null,
-"room_x": null,
-"kind": "stock"
-},
-{
-"symbol": "DPEL",
-"name": "Divine Power Energy Limited",
-"lane": "established",
-"shape": "Flag",
-"close": 660.95,
-"pole_pct": 28.8,
-"flag_vol_pct": 94,
-"range_pct": 7.5,
-"pole_start": "2026-11-02",
-"pole_top": "2026-11-04",
-"top": 724.0,
-"flag_days": 10,
-"depth_pct": 10.9,
-"stop": 644.95,
-"s200": 505.18,
-"base": 562.05,
-"geo": {
-"pole": [
-"2026-11-02",
-562.05,
-"2026-11-04",
-724.0
-],
-"up": [
-"2026-11-05",
-698.93,
-"2026-11-20",
-671.16
-],
-"lo": [
-"2026-11-05",
-680.88,
-"2026-11-20",
-656.66
-]
-},
-"status": "forming",
-"trigger": 671.16,
-"need_vol": 63930,
-"to_trigger_pct": 1.5,
-"target": 833.11,
-"risk_pct": 3.9,
-"ema21": 650.4,
 "resistance": null,
 "room_x": null,
 "kind": "stock"
