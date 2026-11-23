@@ -163,6 +163,7 @@ def main():
             if cash and not LIMIT:   # 23 Nov 2026: monthly equity of the live rule (RED-light all cash) for the portfolio-mix test
                 m = e.resample("ME").last()
                 json.dump({"t": [str(x.date()) for x in m.index], "v": [round(float(v), 5) for v in m.values]}, open("data/research/pulse_monthly.json", "w"))
+                print("R| PULSE_MONTHLY " + json.dumps({"t": [str(x.date()) for x in m.index], "v": [round(float(v), 5) for v in m.values]}), flush=True)
         json.dump(res, open("data/research/fii_pulse_redlight" + ("_pilot" if LIMIT else "") + ".json", "w"), indent=1, default=str)
         return
     if os.environ.get("REDFRI") == "1":     # 23 Nov 2026 (Amritpal: "if Friday's market closes red I want to avoid the basket")
