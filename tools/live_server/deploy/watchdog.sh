@@ -18,6 +18,20 @@ if [ -f "$VAR/cmd_tbrestart" ]; then rm -f "$VAR/cmd_tbrestart"; log "Top Bottom
 for alt in $APP/repo/tools/live_server/var; do [ -f "$alt/cmd_tbstocks" ] && mv -f "$alt/cmd_tbstocks" "$VAR/cmd_tbstocks"; done
 if [ -f "$VAR/cmd_tbstocks" ]; then rm -f "$VAR/cmd_tbstocks"; log "Top Bottom stock-futures bots: install requested from the app"
   bash $APP/repo/tools/live_server/deploy/tb_stocks_setup.sh >> "$LOG" 2>&1 && log "tb_stocks_setup.sh done" || log "tb_stocks_setup.sh failed (exit $?)"; fi
+# 24 Nov 2026: Settings -> Server -> Connect moomoo (OpenD). The app writes cmd_opend.json (download link, moomoo ID, MD5 of the
+# login password - never the password itself) and cmd_opendcode (the SMS code); this root script installs / answers, then deletes them.
+for alt in $APP/repo/tools/live_server/var; do for c in cmd_opend.json cmd_opendcode; do [ -f "$alt/$c" ] && mv -f "$alt/$c" "$VAR/$c"; done; done
+if [ -f "$VAR/cmd_opend.json" ]; then
+  J="$VAR/cmd_opend.json"; U=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['url'])" "$J"); A=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['acc'])" "$J")
+  M=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['md5'])" "$J"); rm -f "$J"; log "moomoo OpenD install requested from the app"
+  OPEND_ACC="$A" OPEND_MD5="$M" bash $APP/repo/tools/live_server/deploy/opend_setup.sh "$U" > "$VAR/opend_setup.txt" 2>&1 && log "opend_setup.sh done" || log "opend_setup.sh failed (exit $?)"
+  unset A M; systemctl restart trenddesk
+fi
+if [ -f "$VAR/cmd_opendcode" ]; then C=$(tr -cd '0-9' < "$VAR/cmd_opendcode" | head -c 8); rm -f "$VAR/cmd_opendcode"
+  [ -n "$C" ] && bash $APP/repo/tools/live_server/deploy/opend_setup.sh code "$C" > /dev/null 2>&1; log "moomoo SMS code passed to OpenD"; sleep 5; systemctl restart trenddesk; fi
+if [ -f /etc/systemd/system/opend.service ]; then
+  { echo "service: $(systemctl is-active opend)  checked: $(date -u +%FT%TZ)"; journalctl -u opend -n 25 --no-pager -o short-iso 2>&1 | tail -n 25; } > "$VAR/opend_status.txt" 2>&1
+  chown trenddesk "$VAR/opend_status.txt" "$VAR/opend_setup.txt" 2>/dev/null; fi
 if [ -f "$VAR/cmd_restart" ]; then rm -f "$VAR/cmd_restart"; log "restart requested from the app"; systemctl restart trenddesk; echo 0 > "$F"; exit 0; fi
 # 19 Nov 2026: a 1 GB swap file (the server has ~400 MB of RAM; a restart that loads Angel's contract list could freeze it)
 if [ -z "$(swapon --show --noheadings 2>/dev/null)" ] && [ ! -f "$VAR/swap_failed" ]; then

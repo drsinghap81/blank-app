@@ -1202,7 +1202,7 @@ async function loadLive() {
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${S && S.exits.filter((e) => e.qty > 0).length >= 2 ? `<div class="lv-basket"><div><b>${S.exits.filter((e) => e.qty > 0).length} to sell</b><div class="lv-sub">One confirmation sends every sell to Angel (each still gets every check; its stop GTT is cancelled first)</div></div><button class="lv-btn sell" id="lvsellbk">Sell all ${S.exits.filter((e) => e.qty > 0).length} as one basket</button></div>` : ''}${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
     ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>' + TB_STOCKS.map((k) => `<div id="tbcard_${k}"></div>`).join('')) : ''}
-    ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
+    ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div><div id="mmcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
     const sym = b.dataset.tgt, E = +b.dataset.e, St = +b.dataset.s, R = E - St;
     const sug = R > 0 ? `2R = ${fmt(E + 2 * R, 2, 'en-IN')} · 3R = ${fmt(E + 3 * R, 2, 'en-IN')}` : '';
@@ -1232,7 +1232,7 @@ async function loadLive() {
   const bud = $('#lvbud'); if (bud) bud.addEventListener('change', () => { lvSave({ budget: +bud.value }); loadLive(); });
   el.querySelectorAll('.lv-pickhelp').forEach((p) => { const sp = p.closest('.lv-card').querySelector('.lv-pick-n > span'); if (sp) p.textContent = sp.textContent; });
   el.querySelectorAll('details.bkd').forEach((d) => d.addEventListener('toggle', () => { try { const o = JSON.parse(localStorage.getItem('td.bkOpen') || '{}'); o[d.dataset.bk] = d.open; localStorage.setItem('td.bkOpen', JSON.stringify(o)); } catch (e) { /* */ } }));
-  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); vwFill(el); perfVsCard($('#pvin'), 'IN'); foCard($('#focard')); usJournalCard($('#inj'), 'IN'); srvCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
+  lvSegWire(el); lvBucketWire(el, 'NSE', S); lvHeroWire(el, P, S); if (S) { lvPerf($('#lvperf'), S); adoptCard(false); vwFill(el); perfVsCard($('#pvin'), 'IN'); foCard($('#focard')); usJournalCard($('#inj'), 'IN'); srvCard(); mmCard(); alCard($('#lval'), 'NSE'); } wcPie($('#wccard'), S);
   { const C0i = S ? S.capital : cap('NSE'); const plan = rows.filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && (r.tier === 'swing' ? r.want !== false : (S ? true : r.picked))).reduce((a, r) => a + r.value, 0);
     const idle = Math.max(0, (S ? S.cash : C0i) - plan - 0.15 * C0i); lvIdleCard($('#lvidle'), idle, !!S); lvCurveCard($('#lvcurves')); }
   if (!S) lvSelWire(el, 'NSE', P.asof, rows, nP, lvSel('NSE', P.asof, P.top || [], nP));
@@ -1575,6 +1575,38 @@ async function srvCard() {
   box.querySelector('#srvrst').addEventListener('click', () => act('restart'));
   box.querySelector('#srvtb').addEventListener('click', () => act('tbrestart'));
   box.querySelector('#srvchk').addEventListener('click', srvCard);
+}
+
+/* 24 Nov 2026 (Amritpal: set up moomoo's API from the phone): Connect moomoo. The server installs moomoo OpenD (its API gateway)
+   from the download link you paste; your moomoo login password goes only to your own server over HTTPS, which keeps just its MD5
+   hash for OpenD. Orders stay on moomoo's PAPER account until you change that on the server yourself. */
+async function mmCard() {
+  const box = $('#mmcard'); if (!box || !isOwner()) return;
+  let M; try { M = await lvApi('/api/moomoo/status'); } catch (e) { box.innerHTML = ''; return; }
+  const ok = M.port_open === true;
+  const stateTxt = M.pending ? 'Install requested: your server picks it up within a minute…' : ok ? '● connected (OpenD running)' : M.installed ? 'installed, not connected yet: see the log below' : 'not set up';
+  box.innerHTML = `<details class="lv-card" ${ok ? '' : 'open'}><summary class="bk-sum"><b>Connect moomoo (API)</b><span class="muted">${esc(stateTxt)}</span></summary>
+    <p class="lv-sub">Before you start: (1) in your phone's browser, log in at moomoo.com/en-us/about/api-disclaimer and finish the API questionnaire and agreement (without it OpenD closes at login); (2) on moomoo's OpenAPI download page, long-press <b>OpenD → Ubuntu (command line)</b> and copy its link.</p>
+    ${ok ? '' : `<div class="lv-form" style="flex-direction:column;align-items:stretch">
+      <input id="mmurl" placeholder="OpenD Ubuntu download link (https://…)" autocapitalize="off" autocorrect="off">
+      <input id="mmacc" placeholder="moomoo ID (as you log in)" autocapitalize="off" autocorrect="off">
+      <input id="mmlpw" type="password" placeholder="moomoo LOGIN password" autocomplete="off">
+      <input id="mmapw" type="password" placeholder="Trend Desk app password">
+      <input id="mmcf" placeholder="Type MOOMOO" autocapitalize="characters">
+      <button class="lv-btn" id="mmgo">Install and connect</button></div>
+      <p class="lv-sub">Your moomoo password goes only to your own server (HTTPS) and is kept there only as a hash inside OpenD's settings. Trading stays on moomoo's <b>paper</b> account; real orders need you to set that on the server yourself later.</p>`}
+    ${M.need_code || (!ok && M.installed) ? `<div class="lv-form"><input id="mmcode" inputmode="numeric" placeholder="SMS code from moomoo"><button class="lv-btn" id="mmcodego">Send code</button></div>` : ''}
+    ${M.need_agreement && !ok ? '<p class="lv-sub down"><b>OpenD says the API questionnaire / agreement isn\'t done.</b> Finish it at moomoo.com/en-us/about/api-disclaimer, then tap Install again.</p>' : ''}
+    ${M.status || M.setup ? `<details class="info"><summary>OpenD log (updates every minute)</summary><pre class="lv-sub" style="white-space:pre-wrap;font-size:11px;max-height:240px;overflow:auto">${esc(M.status || M.setup)}</pre></details>` : ''}
+    <button class="lv-btn ghost" id="mmref" style="margin-top:6px">Check again</button></details>`;
+  box.querySelector('#mmref').addEventListener('click', mmCard);
+  const go = box.querySelector('#mmgo'); if (go) go.addEventListener('click', async () => {
+    const v = (id) => box.querySelector(id).value;
+    try { const j = await lvApi('/api/moomoo/setup', { method: 'POST', body: JSON.stringify({ url: v('#mmurl'), account: v('#mmacc'), login_password: v('#mmlpw'), password: v('#mmapw'), confirm: v('#mmcf') }), timeout: 30000 });
+      box.querySelector('#mmlpw').value = ''; alertMsg(j.msg, true); setTimeout(mmCard, 70000); mmCard(); }
+    catch (e) { alertMsg(/404/.test(e.message) ? 'Your server needs the new code for this: Settings › Server › Update now, wait 2 minutes, then try again.' : e.message); } });
+  const cg = box.querySelector('#mmcodego'); if (cg) cg.addEventListener('click', async () => {
+    try { const j = await lvApi('/api/moomoo/code', { method: 'POST', body: JSON.stringify({ code: box.querySelector('#mmcode').value }) }); alertMsg(j.msg, true); setTimeout(mmCard, 70000); } catch (e) { alertMsg(e.message); } });
 }
 
 /* Research card (11 Nov 2026, owner): the server's intraday tests (ORB, sweeps, SMA cross, base breakouts) — progress, a short

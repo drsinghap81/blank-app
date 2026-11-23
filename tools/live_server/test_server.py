@@ -1329,3 +1329,23 @@ def test_margin_watch_blocks_auto_tb(tmp_path):
     assert A._tbr("answers.json", {}, "nifty").get("BUY:26000.00") is None          # held for your OK, not auto-approved
     A._MW.update(d=dict(big, block=""), t=__import__("time").time()); A.tb_watch()
     assert A._tbr("answers.json", {}, "nifty").get("BUY:26000.00") is True
+
+
+def test_moomoo_connect_form(tmp_path):
+    """24 Nov 2026: Connect moomoo - only moomoo's https link, app password + MOOMOO, and only the MD5 of the login password is written."""
+    import json as _j
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    body = dict(url="https://softwaredownload.moomoo.com/x/OpenD_9.0_Ubuntu.tar.gz", account="12345678", login_password="secretPW!", password="pw", confirm="MOOMOO")
+    assert c.post("/api/moomoo/setup", headers=h, json=dict(body, confirm="x")).status_code == 400
+    assert c.post("/api/moomoo/setup", headers=h, json=dict(body, password="bad")).status_code == 401
+    assert c.post("/api/moomoo/setup", headers=h, json=dict(body, url="https://evil.example.com/moomoo.com.tgz")).status_code == 400
+    assert c.post("/api/moomoo/setup", headers=h, json=dict(body, account="1; rm -rf /")).status_code == 400
+    r = c.post("/api/moomoo/setup", headers=h, json=body); assert r.status_code == 200
+    raw = open(os.path.join(str(tmp_path), "cmd_opend.json")).read()
+    assert "secretPW!" not in raw and _j.loads(raw)["md5"] == __import__("hashlib").md5(b"secretPW!").hexdigest()
+    assert oct(os.stat(os.path.join(str(tmp_path), "cmd_opend.json")).st_mode)[-3:] == "600"
+    assert "secretPW!" not in open(os.path.join(str(tmp_path), "orders.jsonl")).read()
+    assert c.post("/api/moomoo/code", headers=h, json={"code": "12"}).status_code == 400
+    assert c.post("/api/moomoo/code", headers=h, json={"code": "123 456"}).status_code == 200
+    s = c.get("/api/moomoo/status", headers=h).json(); assert s["pending"] is True and s["port_open"] in (True, False)

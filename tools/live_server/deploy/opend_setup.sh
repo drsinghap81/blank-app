@@ -5,6 +5,7 @@
 #   1. download the Ubuntu command-line OpenD .tar.gz link from moomoo's OpenAPI download page
 #   2. sudo bash /opt/trenddesk/repo/tools/live_server/deploy/opend_setup.sh "<that download link>"
 #   3. if OpenD asks for an SMS code:  sudo bash .../opend_setup.sh code 123456
+# From the app (Settings -> Server -> Connect moomoo) the watchdog runs it with OPEND_ACC + OPEND_MD5 set (no prompts).
 set -euo pipefail
 [ "$(id -u)" = 0 ] || { echo "run with sudo"; exit 1; }
 D=/opt/opend; ENVF=/opt/trenddesk/.env
@@ -26,9 +27,12 @@ BIN=$(find . -type f \( -name OpenD -o -name FutuOpenD -o -name MoomooOpenD \) -
 [ -n "$BIN" ] || { echo "OpenD binary not found in the download - is it the Ubuntu command-line version?"; exit 1; }
 DIR=$(dirname "$BIN"); rm -rf $D/app && mv "$DIR" $D/app; cd $D/app
 XML=$(ls OpenD.xml FutuOpenD.xml 2>/dev/null | head -1); [ -n "$XML" ] || { echo "OpenD.xml not found"; exit 1; }
-read -r -p "moomoo ID (login account number, email or phone as you log in): " ACC
-read -r -s -p "moomoo LOGIN password (not shown): " PW; echo
-MD5=$(printf '%s' "$PW" | md5sum | cut -d' ' -f1); unset PW
+if [ -n "${OPEND_ACC:-}" ] && [ -n "${OPEND_MD5:-}" ]; then ACC=$OPEND_ACC; MD5=$OPEND_MD5
+else
+  read -r -p "moomoo ID (login account number, email or phone as you log in): " ACC
+  read -r -s -p "moomoo LOGIN password (not shown): " PW; echo
+  MD5=$(printf '%s' "$PW" | md5sum | cut -d' ' -f1); unset PW
+fi
 setx() { if grep -q "<$1>" "$XML"; then sed -i "s|<$1>[^<]*</$1>|<$1>$2</$1>|" "$XML"; else sed -i "s|</config>|  <$1>$2</$1>\n</config>|" "$XML"; fi; }
 setx login_account "$ACC"; setx login_pwd_md5 "$MD5"; sed -i 's|<login_pwd>[^<]*</login_pwd>|<login_pwd></login_pwd>|' "$XML"
 setx ip 127.0.0.1; setx api_port 11111; setx telnet_ip 127.0.0.1; setx telnet_port 22222; setx lang en; setx log_level info
@@ -50,6 +54,13 @@ systemctl daemon-reload && systemctl enable --now opend >/dev/null
 # app settings: read-only account view now; orders only on moomoo's PAPER account (SIMULATE) and only if MOOMOO_TRADE=1
 for kv in MOOMOO_ENABLED=1 MOOMOO_MARKETS=AU,US MOOMOO_FIRM=FUTUAU MOOMOO_ENV=SIMULATE; do
   k=${kv%%=*}; grep -q "^$k=" $ENVF && sed -i "s|^$k=.*|$kv|" $ENVF || echo "$kv" >> $ENVF; done
+# OpenD + the app need memory: make the swap file 2 GB if it is smaller (the server has little RAM)
+SW=$(swapon --show=SIZE --bytes --noheadings 2>/dev/null | awk '{s+=$1} END{print s+0}')
+if [ "${SW:-0}" -lt 2000000000 ] && [ "$(free -m | awk '/Mem:/{print $2}')" -lt 1900 ]; then
+  swapoff /swapfile 2>/dev/null || true; rm -f /swapfile
+  { fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048; } >/dev/null 2>&1 && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile \
+    && { grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab; } && echo "swap file now 2 GB"
+fi
 sleep 12; journalctl -u opend -n 20 --no-pager
 echo
 echo "If the log asks for a phone verification code:  sudo bash $0 code <code from SMS>"

@@ -339,6 +339,85 @@ def admin(body: Admin, request: Request, _=Depends(auth)):
                 f"{'pulls the latest code and ' if act == 'update' else ''}restarts (about 10 seconds offline). Your stops stay on Angel.")
 
 
+# ------------------------------------------------------------------ Connect moomoo (OpenD) from the app (24 Nov 2026)
+# Amritpal sets up moomoo's API gateway from his phone. The app sends the download link, moomoo ID and LOGIN password to this server
+# over HTTPS; only the MD5 hash of the password is written (var/cmd_opend.json, mode 600) for the root watchdog, which installs
+# OpenD with deploy/opend_setup.sh (paper trading by default) and deletes the file. The plain password is never stored or logged.
+OPEND_HOSTS = ("moomoo.com", "futunn.com", "futuhk.com", "futustatic.com", "moomoo.sg", "futuholdings.com", "moomooapi.com")
+
+
+class OpendSetup(BaseModel):
+    url: str
+    account: str
+    login_password: str
+    password: str = ""        # the app password
+    confirm: str = ""
+
+
+class OpendCode(BaseModel):
+    code: str
+
+
+@app.post("/api/moomoo/setup")
+def opend_setup(body: OpendSetup, request: Request, _=Depends(auth)):
+    ip = request.client.host if request.client else "?"
+    n, t0 = FAILS.get(ip, (0, 0))
+    if n >= 5 and time.time() - t0 < 900:
+        raise HTTPException(429, "too many attempts, wait 15 minutes")
+    if body.confirm.strip().upper() != "MOOMOO":
+        raise HTTPException(400, "type MOOMOO to confirm")
+    if not check_pw(body.password):
+        FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong app password")
+    from urllib.parse import urlparse
+    u = urlparse(body.url.strip()); host = (u.hostname or "").lower()
+    if u.scheme != "https" or not any(host == h or host.endswith("." + h) for h in OPEND_HOSTS):
+        raise HTTPException(400, "the link must be moomoo's own https download link (OpenD, Ubuntu, command line)")
+    acc = body.account.strip()
+    if not acc or len(acc) > 80 or any(ch in acc for ch in "<>&\"'|;$` "):
+        raise HTTPException(400, "check the moomoo ID")
+    if not body.login_password:
+        raise HTTPException(400, "enter your moomoo login password")
+    import hashlib
+    md5 = hashlib.md5(body.login_password.encode()).hexdigest()
+    os.makedirs(DATA, exist_ok=True); path = os.path.join(DATA, "cmd_opend.json")
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w") as f:
+        json.dump(dict(url=body.url.strip(), acc=acc, md5=md5), f)
+    log("opend_setup_requested", host=host)
+    return dict(ok=True, msg="Install requested. Within about a minute your server downloads and starts moomoo OpenD (2-3 minutes in all). "
+                "Watch the status below; if it asks for a phone verification code, enter the SMS code here.")
+
+
+@app.post("/api/moomoo/code")
+def opend_code(body: OpendCode, _=Depends(auth)):
+    c = "".join(ch for ch in body.code if ch.isdigit())
+    if not 4 <= len(c) <= 8:
+        raise HTTPException(400, "enter the code from the SMS (digits only)")
+    open(os.path.join(DATA, "cmd_opendcode"), "w").write(c); log("opend_code_sent")
+    return dict(ok=True, msg="Code sent to OpenD (within a minute). The status below updates every minute.")
+
+
+@app.get("/api/moomoo/status")
+def opend_status(_=Depends(auth)):
+    def rd(n):
+        try:
+            return open(os.path.join(DATA, n)).read()[-4000:]
+        except Exception:  # noqa: BLE001
+            return ""
+    st = rd("opend_status.txt"); setup = rd("opend_setup.txt")
+    low = (st + setup).lower()
+    try:
+        import socket
+        with socket.create_connection(("127.0.0.1", int(ENV.get("MOOMOO_OPEND_PORT", "11111"))), timeout=2):
+            connected = True
+    except Exception:  # noqa: BLE001
+        connected = False
+    need_code = "verify" in low and "code" in low and "success" not in low.split("verify")[-1]
+    need_agree = "questionnaire" in low or "disclaimer" in low or "agreement" in low
+    return dict(installed=bool(st), pending=os.path.exists(os.path.join(DATA, "cmd_opend.json")), port_open=connected,
+                need_code=need_code, need_agreement=need_agree, status=st, setup=setup[-1500:])
+
+
 # ------------------------------------------------------------------ plan + sizing
 _plan = {"t": 0, "d": None}
 
