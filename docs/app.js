@@ -1182,7 +1182,7 @@ async function loadLive() {
   el.innerHTML = `${lvSeg()}${S ? '' : head}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
     ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div><div id="lval"></div>` : ''}${lvHero(S, PF)}${lvBest5(P, S, rows, C0n)}${bookHtml}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
-    ${pane('buy', `    ${lvBest5(P, S, rows, C0n)}<details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
+    ${pane('buy', `    ${lvBest5(P, S, rows, C0n)}${S ? '<div id="lvtakeout"></div>' : ''}<details class="lv-card bkd" data-bk="mom" ${bkOpen('mom', false)}><summary class="bk-sum"><b>Momentum Investing · max ${alN.mom}% · top ${nTop}</b><span class="muted">${pend.length} to buy · ${money(tot, 'NSE')}</span></summary>
       <div class="lv-capline">${capInput('NSE', 'lvcapin')}<span class="lv-sub lv-capnote">${S ? (S.account_value != null ? `Angel ${money(S.account_value, 'NSE')}${S.capital_set ? ` · sizing on ${money(S.capital, 'NSE')}` : ' · sizing on the full account'} · 0 = full account` : (capSet ? `Sizes scaled here to ${money(capSet, 'NSE')} until your server updates (08:00 IST weekdays); 0 = full account.` : 'Set your trading capital; the server updates itself at 08:00 IST on weekdays to use it.')) : 'Trading capital used for the sizes below.'}</span></div>
       ${lvPicker(nP, rP)}<div class="lv-pdfbar">${S ? '' : `<span class="lv-sub"><a href="#" id="lvselreset">Reset to top ${nP}</a></span>`}<button class="lv-btn" id="lvpdf">Export PDF</button></div>
       <details class="info lv-how"><summary>How this works</summary><p class="lv-sub">Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high; stop = weekly close below the 30-week SMA, raised every week. Industry tag = momentum lane of the stock's industry. Among trades with the same score, Building industries come first (their ATH trades averaged +22% vs +15%, 2017–26); it is not a filter — Building-only cut the system's yearly return from 17% to 7%.</p>
@@ -1311,6 +1311,7 @@ async function loadLive() {
     b.addEventListener('click', go); b.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
   el.querySelectorAll('.lv-btn[data-x]').forEach((b) => b.addEventListener('click', () => lvSend(S.exits[+b.dataset.x], 'SELL', b)));
+  if (el.querySelector('#lvtakeout')) lvTakeout(el.querySelector('#lvtakeout'));
   const sbk = el.querySelector('#lvsellbk'); if (sbk) sbk.addEventListener('click', () => lvSellBasket(S.exits.filter((e) => e.qty > 0), sbk));
 }
 /* tap a Live row -> its chart: ATH rows open the ATH panel (monthly / weekly + 30 SMA), 9/21 rows the trend chart */
@@ -1747,6 +1748,26 @@ async function lvBasket(B, btn) {
   btn.disabled = false; btn.textContent = btn.dataset.label || 'Send basket';
 }
 
+/* 23 Nov 2026 (Amritpal: "give me alerts when the high is taken out" + "a provision to send the order"): the server's breakout-candle
+   watch list. "Set buy-stop" adds the stock to My picks with trigger = the breakout candle's high + 0.1% and the pattern's own stop;
+   Send it there to place a GTT buy-stop on Angel (fills only if the high is taken out) - the normal order path with every check. */
+async function lvTakeout(box) {
+  let T; try { T = await lvApi('/api/takeout'); } catch (e) { return; }
+  const R = (T && T.rows) || []; if (!R.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<details class="lv-card bkd" open><summary class="bk-sum"><b>Breakout high take-out · ${R.length}</b><span class="muted">alerts when the high +0.1% trades</span></summary>
+    <p class="lv-sub">Tested 2016–26: waiting for the breakout candle's high to be taken out beat buying the next open, and breakouts never taken out were weak. Don't exit the same day (lost money); use the pattern's own stop below, not the candle low.</p>
+    ${R.map((x, i) => `<div class="lv-row"><div class="lv-rank">${x.done === 'alerted' ? '🔔' : '⏳'}</div><div><div class="lv-sym">${esc(x.symbol)} <span class="chip">${esc(x.src || 'Day cup close')}</span>${x.done === 'alerted' ? '<span class="chip open">taken out</span>' : ''}</div>
+      <div class="lv-sub">Buy-stop ${fmt(x.trigger, 2, 'en-IN')} (${esc(day(x.period))} high ${fmt(x.high || x.trigger, 2, 'en-IN')} + 0.1%) · stop ${x.cup ? fmt(x.cup, 2, 'en-IN') : '–'}${x.cup ? ` (${fmt((1 - x.cup / x.trigger) * 100, 1)}% risk)` : ''}${x.done === 'alerted' && x.ltp ? ` · traded ${fmt(x.ltp, 2, 'en-IN')} at ${esc(String(x.at || '').slice(11, 16))}` : ''}</div></div>
+      <div>${x.picked ? '<span class="chip open">in My picks</span>' : x.cup && x.cup < x.trigger ? `<button class="lv-btn" data-tko="${i}">Set buy-stop</button>` : ''}</div></div>`).join('')}</details>`;
+  box.querySelectorAll('[data-tko]').forEach((b) => b.addEventListener('click', async () => {
+    const x = R[+b.dataset.tko];
+    if (!window.confirm(`Add ${x.symbol} to My picks: buy-stop ${fmt(x.trigger, 2, 'en-IN')}, stop ${fmt(x.cup, 2, 'en-IN')}?\nThen tap Send on it in My picks to place the GTT buy-stop on Angel.`)) return;
+    b.disabled = true;
+    try { await lvApi('/api/mypicks', { method: 'POST', body: JSON.stringify({ symbol: x.symbol, trigger: x.trigger, stop: x.cup, src: 'Take-out', note: `${x.src || 'Breakout'} ${x.period}: high ${x.high} taken out (+0.1%)` }) });
+      alertMsg(`${x.symbol} added to My picks. Tap Send on it there: below the trigger it goes to Angel as a GTT buy-stop (fills only if the high is taken out); already above, it buys as a capped limit.`, true); setTimeout(loadLive, 1500);
+    } catch (e) { alertMsg('Not added: ' + e.message); b.disabled = false; }
+  }));
+}
 /* 23 Nov 2026 (Amritpal: "sells should also be one click"): every system exit in one basket - one typed confirmation, the server
    sends each sell through the same checks as a single Sell (you hold it, the quantity, once a day) and cancels its stop GTT first. */
 async function lvSellBasket(E, btn) {

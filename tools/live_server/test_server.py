@@ -173,16 +173,30 @@ def test_dcup_alert(tmp_path):
     from datetime import date as _d
     per = _d.today().isoformat()
     class R:
+        def __init__(self, u):
+            self.u = u
         def json(self):
-            return {"day_close": [{"symbol": "ZZD", "period": per, "high_p": 99.0, "old_ath": 95.0, "close_p": 98.0},
-                                  {"symbol": "ZZE", "period": per, "high_p": 500.0, "old_ath": 90.0, "close_p": 98.0}]}
-    g = A.requests.get; A.requests.get = lambda *a, **k: R()
+            if self.u.endswith("ath.json"):
+                return {"day_close": [{"symbol": "ZZD", "period": per, "high_p": 99.0, "old_ath": 95.0, "close_p": 98.0},
+                                      {"symbol": "ZZE", "period": per, "high_p": 500.0, "old_ath": 90.0, "close_p": 98.0}]}
+            if self.u.endswith("flags.json"):          # flag breakout: high read from the daily candle (mock candles end ~150)
+                return {"rows": [{"symbol": "ZZF", "status": "breakout", "kind": "stock", "bo_date": per, "stop": 1.0, "shape": "Flag"}]}
+            return {}
+    g = A.requests.get; A.requests.get = lambda u, *a, **k: R(u)
+    A.broker.daily_candles = lambda sym, days=20: [(per, 98.0, 99.0, 97.0, 98.5)]
     try:
         A.dcup_alerts(force=True); A.dcup_alerts(force=True)
     finally:
         A.requests.get = g
     items = [x for x in A.alerts_load()["items"] if x["kind"] == "dcup"]
-    assert [x["symbol"] for x in items] == ["ZZD"] and "taken out" in items[0]["text"]       # once, and not ZZE (500 not reached)
+    assert sorted(x["symbol"] for x in items) == ["ZZD", "ZZF"] and all("taken out" in x["text"] for x in items)   # once each; not ZZE (500 not reached)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    g = A.requests.get; A.requests.get = lambda u, *a, **k: R(u)
+    try:
+        L = c.get("/api/takeout", headers=h).json()["rows"]
+    finally:
+        A.requests.get = g
+    assert {x["symbol"] for x in L} >= {"ZZE"} and all("trigger" in x for x in L)
 
 
 def test_quotes(tmp_path):

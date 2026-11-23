@@ -4211,14 +4211,29 @@ def exit_alerts():
 
 
 _DCUP = {"t": 0, "f": 0}
-DCUP_DAYS = 10            # watch a day cup close for this many sessions after its breakout day
+DCUP_DAYS = 5             # watch a breakout candle for this many sessions after its breakout day (the tested window)
+TAKE_BUF = 0.001          # alert at the breakout candle's high + 0.1% (the tested buy-stop)
 
 
-def dcup_alerts(force=False):
-    """23 Nov 2026 (Amritpal: "alert me when a daily cup close breakout price is taken out"): a stock whose DAY closed above its cup
-    high (ath.json day_close, the nightly scan) goes on a watch list with its breakout-day high as the trigger. In market hours,
-    every 5 minutes, one alert when the live price trades above that high (once per stock per breakout day). Watched for
-    DCUP_DAYS sessions; dropped if the price falls back below the old cup high. Watch only - day cup closes are not a tested buy."""
+def _bo_high(sym, day):
+    """The breakout day's high from Angel's daily candles (cached per symbol and day)."""
+    try:
+        for d_, o_, h_, l_, c_ in broker.daily_candles(sym, days=20):
+            if d_ == day:
+                return float(h_)
+    except Exception as ex:  # noqa: BLE001
+        log("takeout_candle", symbol=sym, error=str(ex)[:120])
+    return None
+
+
+def dcup_alerts(force=False, check=True):
+    """23 Nov 2026 (Amritpal: "alert me when a daily cup close breakout price is taken out" -> after the take-out test,
+    claude/breakout-candle-takeout-test.md: "give me alerts when the high is taken out"). Breakout candles from the nightly scans -
+    day cup closes (ath.json day_close), flag / pennant / rectangle breakouts (flags.json), bottom-pattern breakouts (patterns.json),
+    tight-base breakouts (trend_scan.json bases) - go on a watch list with trigger = the breakout day's high + 0.1%. In market hours,
+    every 5 minutes, one alert when the live price trades above it (once per stock per breakout). Watched DCUP_DAYS sessions; dropped
+    if the price falls under the pattern's stop / cup high. Tested 2016-26: waiting for the take-out beat buying the next open and
+    breakouts never taken out were weak; same-day exits lost money and a stop just under the breakout candle's low halved returns."""
     import numpy as np
     t = ist_now()
     if not force and (t.weekday() >= 5 or not market_open(t) or time.time() - _DCUP["t"] < 300):
@@ -4229,17 +4244,41 @@ def dcup_alerts(force=False):
         W = json.load(open(wp))
     except Exception:  # noqa: BLE001
         W = {}
-    if time.time() - _DCUP["f"] > 1800 or force:                    # refresh the list from the nightly scan every 30 minutes
-        _DCUP["f"] = time.time()
-        try:
-            A = requests.get(PLAN_URL.rsplit("/", 1)[0] + "/ath.json", timeout=30).json()
-            for r in A.get("day_close") or []:
-                k = f"{r['symbol']}:{r['period']}"
-                if k not in W and r.get("high_p"):
-                    W[k] = dict(symbol=r["symbol"], period=r["period"], trigger=float(r["high_p"]), cup=float(r.get("old_ath") or 0),
-                                close=float(r.get("close_p") or 0), added=t.date().isoformat(), name=r.get("name") or "")
-        except Exception as ex:  # noqa: BLE001
-            log("dcup_fetch", error=str(ex)[:160])
+    base = PLAN_URL.rsplit("/", 1)[0]
+    if time.time() - _DCUP["f"] > 1800 or force:                    # refresh the list from the nightly scans every 30 minutes
+        _DCUP["f"] = time.time(); new = []
+        def get(f):
+            try:
+                return requests.get(f"{base}/{f}", timeout=30).json()
+            except Exception as ex:  # noqa: BLE001
+                log("takeout_fetch", file=f, error=str(ex)[:120]); return {}
+        for r in get("ath.json").get("day_close") or []:
+            if r.get("high_p") and not str(r["symbol"]).endswith(".BO"):
+                new.append(dict(symbol=r["symbol"], period=r["period"], src="Day cup close", hi=float(r["high_p"]), floor=float(r.get("old_ath") or 0)))
+        for r in get("flags.json").get("rows") or []:
+            if r.get("status") == "breakout" and (r.get("kind") or "stock") == "stock" and r.get("bo_date"):
+                new.append(dict(symbol=r["symbol"], period=r["bo_date"], src=f"{r.get('shape') or 'Flag'} breakout", hi=None, floor=float(r.get("stop") or 0)))
+        for r in get("patterns.json").get("rows") or []:
+            if r.get("status") == "breakout" and (r.get("kind") or "stock") == "stock" and r.get("signal_date"):
+                nm = {"DB": "W bottom", "TW": "Tilted W", "TB": "Triple bottom", "IHS": "Inverse H&S"}.get(r.get("typ"), "Bottom")
+                new.append(dict(symbol=r["symbol"], period=r["signal_date"], src=f"{nm} breakout", hi=None, floor=float(r.get("sl") or r.get("stop") or 0)))
+        for r in get("trend_scan.json").get("bases") or []:
+            if str(r.get("status", "")).startswith("BREAKOUT") and r.get("breakout_date"):
+                new.append(dict(symbol=r["symbol"], period=r["breakout_date"], src="Tight base breakout", hi=None, floor=float(r.get("stop") or 0)))
+        for x in new:
+            k = f"{x['symbol']}:{x['period']}"
+            if k in W:
+                continue
+            try:
+                if int(np.busday_count(x["period"], t.date().isoformat())) > DCUP_DAYS:
+                    continue
+            except Exception:  # noqa: BLE001
+                pass
+            hi = x["hi"] if x["hi"] else _bo_high(x["symbol"], x["period"])
+            if not hi:
+                continue
+            W[k] = dict(symbol=x["symbol"], period=x["period"], src=x["src"], high=hi, trigger=round(hi * (1 + TAKE_BUF), 2), cup=x["floor"],
+                        added=t.date().isoformat())
     today = t.date()
     for k in list(W):
         try:
@@ -4249,7 +4288,7 @@ def dcup_alerts(force=False):
         if age > DCUP_DAYS or W[k].get("done"):
             W.pop(k)
     live = [x for x in W.values() if not x.get("done")]
-    if live:
+    if live and check:
         try:
             Q = broker.quotes(sorted({x["symbol"] for x in live}))
         except Exception as ex:  # noqa: BLE001
@@ -4258,14 +4297,33 @@ def dcup_alerts(force=False):
             q = Q.get(x["symbol"]) or {}; ltp = q.get("ltp") or 0
             if not ltp:
                 continue
-            if x["cup"] and ltp < x["cup"]:
+            if x.get("cup") and ltp < x["cup"]:
                 x["done"] = "failed"; continue
             if ltp > x["trigger"]:
-                alert("dcup", x["symbol"], f"Day cup close breakout taken out: {ltp:,.2f} is above the {x['period']} high {x['trigger']:,.2f} "
-                      f"(that day closed above its cup high {x['cup']:,.2f}). Watch only - day cup closes are not a tested buy; check the chart.",
+                src = x.get("src") or "Day cup close"
+                alert("dcup", x["symbol"], f"{src} high taken out: {ltp:,.2f} is above the {x['period']} breakout candle high {x.get('high', x['trigger']):,.2f} "
+                      f"(+0.1% = {x['trigger']:,.2f}). Tested: better than buying blind; use the system's own stop, not the candle low. Check the chart.",
                       key=f"dcup:{x['symbol']}:{x['period']}", mk="NSE")
                 x["done"] = "alerted"; x["at"] = t.isoformat(timespec="minutes"); x["ltp"] = ltp
     json.dump(W, open(wp, "w"))
+
+
+@app.get("/api/takeout")
+def takeout_list(_=Depends(auth)):
+    """23 Nov 2026 (Amritpal: "a provision to send the order"): the breakout-candle watch list for the app. Each row can be added
+    to My picks with trigger = high + 0.1% and the pattern's own stop; from there Send places a GTT buy-stop on Angel (fills only
+    if the high is taken out) or, if already above, a capped limit - the normal order path with all its checks."""
+    try:
+        dcup_alerts(force=True, check=False)
+    except Exception as ex:  # noqa: BLE001
+        log("takeout_list", error=str(ex)[:160])
+    try:
+        W = json.load(open(os.path.join(DATA, "dcup_watch.json")))
+    except Exception:  # noqa: BLE001
+        W = {}
+    my = mypicks()
+    rows = [dict(x, picked=x["symbol"] in my) for x in W.values() if x.get("done") != "failed"]
+    return dict(rows=sorted(rows, key=lambda x: (x.get("done") != "alerted", x["period"]), reverse=False), days=DCUP_DAYS, buf=TAKE_BUF)
 
 
 _PIES = {"t": 0}
