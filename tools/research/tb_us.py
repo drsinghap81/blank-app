@@ -49,7 +49,7 @@ for s in ETF + STK:
     rows.append(r)
 D = pd.DataFrame(rows)
 ok = D.dropna(subset=["buy_in_pf", "buy_out_pf"])
-print(f"R| instruments {len(D)} | buy-only: rank corr PF 2010-17 vs 2018-26 {ok.buy_in_pf.corr(ok.buy_out_pf, method='spearman'):+.2f}; both sides {ok.both_in_pf.corr(ok.both_out_pf, method='spearman'):+.2f}", flush=True)
+print(f"R| instruments {len(D)} | buy-only: rank corr PF 2010-17 vs 2018-26 {ok.buy_in_pf.rank().corr(ok.buy_out_pf.rank()):+.2f}; both sides {ok.both_in_pf.rank().corr(ok.both_out_pf.rank()):+.2f}", flush=True)
 q = pd.qcut(ok.buy_in_pf.rank(method="first"), 3, labels=["low", "mid", "high"])
 for i, g in ok.groupby(q):
     print(f"R| buy-only 2018-26 by 2010-17 PF tercile {i}: n{len(g)} median PF {g.buy_out_pf.median():.2f} CAGR {g.buy_out_cagr.median():+.1f}% DD {g.buy_out_dd.median():.0f}% PF>1 {(g.buy_out_pf > 1).mean() * 100:.0f}% | buy&hold {g.bh18.median():+.1f}%", flush=True)
