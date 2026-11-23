@@ -103,6 +103,8 @@ class Params:
     lot: float = 1.0            # multiply points by lot size for rupee P&L
     event_exit: bool = False    # book a profitable position at the close before a major event; no entries on the day
     event_dates: tuple = ()     # ISO dates; default list: EVENT_DATES
+    gap_book_pct: float | None = None    # 23 Nov 2026 test: book at the OPEN when the day gaps this % in the trade's favour ...
+    gap_book_profit_pct: float = 0.0     # ... and the trade was at least this % in profit at the previous close (None = off)
     start_flat_on: str | None = None  # live: be flat from this date and wait for a FRESH signal
                                       # (levels already traded stay used, e.g. "awaiting new top")
 
@@ -205,6 +207,10 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
         sell_lvl = bot - buf(bot) if (not np.isnan(bot) and (not p.use_once or bot != used_B)) else np.nan
 
         # ---- manage an open position (stops set on previous days) ----
+        if pos != 0 and i > ei and p.gap_book_pct is not None:
+            prof, gap = (c[i - 1] - ent) / ent * 100 * pos, (o[i] - c[i - 1]) / c[i - 1] * 100 * pos
+            if prof >= p.gap_book_profit_pct and gap >= p.gap_book_pct:
+                close_pos(i, o[i], "Gap profit booking"); return
         if pos != 0 and i > ei:
             prot = ent * (1 - pos * p.max_sl_pct / 100)
             if pos > 0 and not np.isnan(bot):
