@@ -8125,7 +8125,10 @@ function sbHeat(p) {
   const v = Math.max(0, Math.min(100, p || 0)); const h = Math.round(v * 1.25); const l = Math.round(46 - Math.max(0, v - 50) * 0.28);
   return `--sbh:hsl(${h} 72% ${l}%);background:linear-gradient(90deg, hsl(${h} 72% ${l}% / .38), hsl(${h} 72% ${l}% / .08) 70%), var(--card);border-left-color:hsl(${h} 72% ${l}%)`;
 }
-async function strengthBoard(kind = 'Industry', mode = 'all') {
+async function strengthBoard(kind = 'Industry', mode = 'all', sortBy = null) {
+  // 23 Nov 2026 (Amritpal: "second sort as per Pulse too"): default order = rotation stage vs Nifty (Leading, Improving, Weakening,
+  // Lagging), then Pulse within each stage; or Pulse only. Indices: stage, then strength vs Nifty, then their stocks' Pulse.
+  try { sortBy = sortBy || localStorage.getItem('sb.sort') || 'rot'; } catch (e) { sortBy = sortBy || 'rot'; }
   const G = await loadGP('NSE').catch(() => null); if (!G) { alertMsg('Strength data not loaded yet.'); return; }
   let all = groupIndex(G).filter((g) => g.kind === kind && g.p1m != null && g.p1w != null && (kind !== 'Industry' || (g.nl || 0) >= 3));
   if (kind === 'Index') {    // 23 Nov 2026 (Amritpal: "yes add" - banking visible at a glance): NSE sector indices, strength = relative strength vs Nifty 50
@@ -8137,13 +8140,19 @@ async function strengthBoard(kind = 'Industry', mode = 'all') {
     const nr = (G.nse && G.nse.rows) || [];
     all = Object.entries(W).filter(([, v]) => v && v.pts && v.pts.length >= 3).map(([nm, v]) => { const r = v.pts.map((x) => x[1]); const n = r.length;
       const mem = IXM[nm] ? nr.filter((x) => IXM[nm].includes(x.basic)).flatMap((x) => x.members.map((m) => m.symbol)) : SXM[nm] ? nr.filter((x) => x.sector === SXM[nm]).flatMap((x) => x.members.map((m) => m.symbol)) : [];
-      return { kind: 'Index', name: nm, sub: v.index || '', members: mem, q: v.now, p1q: heat(r[Math.max(0, n - 5)]), p1m: heat(r[n - 2]), p1w: heat(r[n - 1]), big: fmt(r[n - 1], 1), rsd: r[n - 1] - r[n - 2], r1m: null }; });
+      const rows_ = IXM[nm] ? nr.filter((x) => IXM[nm].includes(x.basic)) : SXM[nm] ? nr.filter((x) => x.sector === SXM[nm]) : [];
+      const wl = rows_.reduce((a, x) => a + (x.p1w != null ? (x.n_liquid || 1) : 0), 0); const pul = wl ? rows_.reduce((a, x) => a + (x.p1w != null ? x.p1w * (x.n_liquid || 1) : 0), 0) / wl : null;
+      return { kind: 'Index', name: nm, sub: v.index || '', members: mem, q: v.now, p1q: heat(r[Math.max(0, n - 5)]), p1m: heat(r[n - 2]), p1w: heat(r[n - 1]), big: fmt(r[n - 1], 1), rsd: r[n - 1] - r[n - 2], r1m: null, pulse: pul, rs: r[n - 1] }; });
   }
   const rk = (k) => { const L = all.slice().sort((a, b) => (b[k] || 0) - (a[k] || 0)); const m = {}; L.forEach((g, i) => { m[g.name] = i + 1; }); return m; };
   const rM = rk('p1m'), rW = rk('p1w');
   all.forEach((g) => { g.dW = g.p1w - g.p1m; g.dQ = g.p1q != null ? g.p1m - g.p1q : null; g.mv = (rM[g.name] || 0) - (rW[g.name] || 0);
     g.dir = kind === 'Index' ? (g.rsd >= 0.75 ? 'up' : g.rsd <= -0.75 ? 'down' : 'flat') : g.dW >= 5 ? 'up' : g.dW <= -5 ? 'down' : 'flat'; });
-  const L = (mode === 'up' ? all.filter((g) => g.dir === 'up').sort((a, b) => b.dW - a.dW) : mode === 'down' ? all.filter((g) => g.dir === 'down').sort((a, b) => a.dW - b.dW) : all.slice().sort((a, b) => b.p1w - a.p1w));
+  const QO = { Leading: 0, Improving: 1, Weakening: 2, Lagging: 3 };
+  const pv = (g) => (kind === 'Index' ? (g.pulse ?? -1) : g.p1w);
+  const ord = sortBy === 'pulse' ? (a, b) => pv(b) - pv(a) || b.p1w - a.p1w
+    : (a, b) => (QO[a.q] ?? 9) - (QO[b.q] ?? 9) || (kind === 'Index' ? b.rs - a.rs || pv(b) - pv(a) : b.p1w - a.p1w);
+  const L = (mode === 'up' ? all.filter((g) => g.dir === 'up') : mode === 'down' ? all.filter((g) => g.dir === 'down') : all.slice()).sort(ord);
   const upN = all.filter((g) => g.dir === 'up').length, dnN = all.filter((g) => g.dir === 'down').length;
   const slope = (g) => { const pts = [g.p1q ?? g.p1m, g.p1m, g.p1w].map((v) => Math.max(0, Math.min(100, v))); const Y = (v) => 34 - v * 0.3;
     const c = g.dir === 'up' ? 'var(--rise)' : g.dir === 'down' ? 'var(--fall)' : 'var(--muted)';
@@ -8156,19 +8165,21 @@ async function strengthBoard(kind = 'Industry', mode = 'all') {
     <section class="sb-hero">
       <button class="sb-big up" data-sbm="up" aria-pressed="${mode === 'up'}"><b>▲ ${upN}</b><span>moving up</span><small>${top('up').map((g) => esc(g.name)).join(' · ') || '–'}</small></button>
       <button class="sb-big down" data-sbm="down" aria-pressed="${mode === 'down'}"><b>▼ ${dnN}</b><span>moving down</span><small>${top('down').map((g) => esc(g.name)).join(' · ') || '–'}</small></button>
-      <button class="sb-big" data-sbm="all" aria-pressed="${mode === 'all'}"><b>${all.length}</b><span>${kind === 'Industry' ? 'industries' : kind === 'Index' ? 'indices' : kind.toLowerCase() + 's'}</span><small>all, strongest this week first</small></button>
+      <button class="sb-big" data-sbm="all" aria-pressed="${mode === 'all'}"><b>${all.length}</b><span>${kind === 'Industry' ? 'industries' : kind === 'Index' ? 'indices' : kind.toLowerCase() + 's'}</span><small>${sortBy === 'pulse' ? 'all, highest Pulse first' : 'all, by rotation stage then ' + (kind === 'Index' ? 'strength' : 'Pulse')}</small></button>
     </section>
     <div class="sb-key"><span>${kind === 'Index' ? 'Index strength = relative strength vs Nifty 50 (100 = in line); line = 4 weeks ago → last week → this week' : 'Line = strength over the quarter → month → this week'}</span><span><i style="background:var(--rise)"></i>moving up</span><span><i style="background:var(--fall)"></i>moving down</span></div>
+    <div class="t3-seg sb-sort" role="group" aria-label="Order">${[['rot', 'Rotation stage, then ' + (kind === 'Index' ? 'strength' : 'Pulse')], ['pulse', 'Pulse only']].map(([k, n]) => `<button data-sbs="${k}" aria-pressed="${sortBy === k}">${n}</button>`).join('')}</div>
     <div class="sb-scale" aria-hidden="true"><span>weak</span><i></i><span>strong</span></div>
     <ol class="sb-list">${L.map((g, i) => `<li><button class="sb-row ${g.dir}" data-sbi="${all.indexOf(g)}" style="${sbHeat(g.p1w)}">
-      <span class="sb-nm"><b>${esc(g.name)}</b><small>${g.q ? `<i class="ig2-dot" style="background:${qcol[g.q] || 'var(--muted)'}"></i>${esc(g.q)} · ` : ''}${kind === 'Index' ? 'vs Nifty 50' : g.members.length + ' stocks'}${g.r1m != null ? ` · 1 m ${g.r1m >= 0 ? '+' : ''}${fmt(g.r1m, 0)}%` : ''}</small></span>
+      <span class="sb-nm"><b>${esc(g.name)}</b><small>${g.q ? `<i class="ig2-dot" style="background:${qcol[g.q] || 'var(--muted)'}"></i>${esc(g.q)} · ` : ''}${kind === 'Index' ? `vs Nifty 50${g.pulse != null ? ` · Pulse ${fmt(g.pulse, 0)}` : ''}` : g.members.length + ' stocks'}${g.r1m != null ? ` · 1 m ${g.r1m >= 0 ? '+' : ''}${fmt(g.r1m, 0)}%` : ''}</small></span>
       ${slope(g)}
       <span class="sb-num"><b>${g.big || fmt(g.p1w, 0)}</b><small class="${g.dir === 'up' ? 'up' : g.dir === 'down' ? 'down' : 'muted'}">${g.dir === 'up' ? '▲' : g.dir === 'down' ? '▼' : '•'} ${kind === 'Index' ? `${g.rsd >= 0 ? '+' : ''}${fmt(g.rsd, 1)}` : `${g.dW >= 0 ? '+' : ''}${fmt(g.dW, 0)}`}${g.mv ? ` · ${g.mv > 0 ? '↑' : '↓'}${Math.abs(g.mv)}` : ''}</small></span></button></li>`).join('') || '<li class="empty">Nothing in this view today.</li>'}</ol>
     <p class="t3-foot">Strength = Pulse: the share of the group's liquid stocks in a clean uptrend (relative strength &gt; market, 9 EMA &gt; 21 EMA, above a rising 150-day average, within 25% of the high). Big number = this week; ▲/▼ = points vs the month average; ↑/↓ = places moved in the ranking. Tested: top-10% Pulse industries that are Leading/Improving were the best basket (Pulse rotation); a rise in Pulse on its own is context, not a buy signal. Tap a row for its stocks and systems.</p></div>`);
   history.pushState({ sheet: 1 }, '');
   const root = $('#sheet-body');
   root.querySelectorAll('[data-sbk]').forEach((b) => b.addEventListener('click', () => { try { localStorage.setItem('sb.kind', b.dataset.sbk); } catch (e) { /* */ } strengthBoard(b.dataset.sbk, mode); }));
-  root.querySelectorAll('[data-sbm]').forEach((b) => b.addEventListener('click', () => strengthBoard(kind, b.dataset.sbm === mode ? 'all' : b.dataset.sbm)));
+  root.querySelectorAll('[data-sbm]').forEach((b) => b.addEventListener('click', () => strengthBoard(kind, b.dataset.sbm === mode ? 'all' : b.dataset.sbm, sortBy)));
+  root.querySelectorAll('[data-sbs]').forEach((b) => b.addEventListener('click', () => { try { localStorage.setItem('sb.sort', b.dataset.sbs); } catch (e) { /* */ } strengthBoard(kind, mode, b.dataset.sbs); }));
   root.querySelectorAll('[data-sbi]').forEach((b) => b.addEventListener('click', () => { const g = all[+b.dataset.sbi]; if (g.members && g.members.length) groupOpen(g); else alertMsg(`${g.name}: no stock list mapped for this index - search its industry instead.`); }));
 }
 async function searchOpen() {
