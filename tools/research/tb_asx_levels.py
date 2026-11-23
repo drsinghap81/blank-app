@@ -15,9 +15,9 @@ LIST = ["TECH", "ACDC", "HACK", "MNRS", "ASIA", "OZR", "QRE", "QFN", "NDQ", "ATE
 CFG = dict(tl.DEFAULT_CFG, buffer_pts=0, buffer_pct=0.05, day_sl_pct=1.0, max_sl_pct=2.0, be_pct=2.0, gap_pct=1.0, long_only=True, event_exit=False)
 
 
-def main():
-    for tk in LIST:
-        d = yf.download(tk + ".AX", start="2015-01-01", progress=False, auto_adjust=True)
+def main(lst=None, sfx=".AX"):
+    for tk in (lst or LIST):
+        d = yf.download(tk + sfx, start="2015-01-01", progress=False, auto_adjust=True)
         d.columns = [c[0] if isinstance(c, tuple) else c for c in d.columns]; d.index = pd.to_datetime(d.index).tz_localize(None)
         d = d[["Open", "High", "Low", "Close"]].dropna(); d = d[(d.High >= d.Low) & (d.Low > 0)]
         if len(d) < 300:
