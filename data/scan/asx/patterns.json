@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-22T05:57+00:00",
-"asof": "2026-11-20",
+"generated": "2026-11-23T12:18+00:00",
+"asof": "2026-11-23",
 "market": "ASX",
 "regime": null,
 "rules": "neighbouring swing lows (zigzag 3% on closes), neckline >= 6% above the low; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
@@ -12,11 +12,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 19.299999237060547,
+"close": 16.940000534057617,
 "neck": 21.549999237060547,
-"to_neck_pct": 11.658031548931213,
+"to_neck_pct": 27.21368688114618,
 "stop": 19.51,
-"stop_pct": -1.1031081087224281,
+"stop_pct": -15.188302706351987,
 "height_pct": 9.335363967811784,
 "fall_pct": 32.11568810290508,
 "lows": [
@@ -40,9 +40,9 @@
 50.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 33.3,
+"rsi_now": 21.6,
 "signal_date": "2026-11-12",
-"days_since": 6,
+"days_since": 7,
 "target": 23.39,
 "sl": 20.69,
 "outcome": "sl",
@@ -54,11 +54,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 52.29999923706055,
+"close": 52.040000915527344,
 "neck": 59.310001373291016,
-"to_neck_pct": 13.403445962697225,
+"to_neck_pct": 13.970023693052047,
 "stop": 53.37,
-"stop_pct": -2.047611142446404,
+"stop_pct": -2.557453708678814,
 "height_pct": 9.996297083426132,
 "fall_pct": 116.70994518211928,
 "lows": [
@@ -82,9 +82,9 @@
 43.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 35.5,
+"rsi_now": 35.0,
 "signal_date": "2026-11-10",
-"days_since": 8,
+"days_since": 9,
 "target": 64.7,
 "sl": 56.94,
 "outcome": "sl",
@@ -96,11 +96,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 10.1899995803833,
+"close": 10.140000343322754,
 "neck": 12.550000190734863,
-"to_neck_pct": 23.15996768925077,
+"to_neck_pct": 23.76725607311352,
 "stop": 11.02,
-"stop_pct": -8.132488390956706,
+"stop_pct": -8.665677911464599,
 "height_pct": 12.153714578646824,
 "fall_pct": 71.07800805265552,
 "lows": [
@@ -124,97 +124,13 @@
 36.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 31.6,
+"rsi_now": 31.3,
 "signal_date": "2026-11-10",
-"days_since": 8,
+"days_since": 9,
 "target": 13.91,
 "sl": 12.05,
 "outcome": "sl",
 "outcome_date": "2026-11-12"
-},
-{
-"symbol": "LYC",
-"name": "LYNAS RARE EARTHS LIMITED",
-"kind": "stock",
-"typ": "TW",
-"status": "breakout",
-"close": 12.4399995803833,
-"neck": 13.029999732971191,
-"to_neck_pct": 4.742766659882092,
-"stop": 10.6,
-"stop_pct": 14.767681708886304,
-"height_pct": 21.66199520598342,
-"fall_pct": 106.06909072096262,
-"lows": [
-[
-"2026-10-23",
-10.710000038146973
-],
-[
-"2026-11-03",
-11.970000267028809
-]
-],
-"peaks": [
-[
-"2026-10-29",
-13.029999732971191
-]
-],
-"rsi_lows": [
-28.3,
-46.0
-],
-"rsi_div": 0.0,
-"rsi_now": 48.1,
-"signal_date": "2026-11-09",
-"days_since": 9,
-"target": 15.35,
-"sl": 12.51,
-"outcome": "sl",
-"outcome_date": "2026-11-17"
-},
-{
-"symbol": "MIN",
-"name": "MINERAL RESOURCES LIMITED",
-"kind": "stock",
-"typ": "TW",
-"status": "breakout",
-"close": 38.689998626708984,
-"neck": 48.209999084472656,
-"to_neck_pct": 24.605843359197486,
-"stop": 42.78,
-"stop_pct": -10.578577590146509,
-"height_pct": 11.185420677699964,
-"fall_pct": 71.42527856263334,
-"lows": [
-[
-"2026-11-04",
-43.36000061035156
-],
-[
-"2026-11-06",
-46.59000015258789
-]
-],
-"peaks": [
-[
-"2026-11-05",
-48.209999084472656
-]
-],
-"rsi_lows": [
-34.5,
-48.2
-],
-"rsi_div": 0.0,
-"rsi_now": 30.7,
-"signal_date": "2026-11-09",
-"days_since": 9,
-"target": 53.06,
-"sl": 46.28,
-"outcome": "sl",
-"outcome_date": "2026-11-16"
 },
 {
 "symbol": "LNW",
@@ -222,11 +138,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "forming",
-"close": 116.8499984741211,
+"close": 116.47000122070312,
 "neck": 130.0,
-"to_neck_pct": 11.253745569189078,
+"to_neck_pct": 11.61672416715993,
 "stop": 103.81,
-"stop_pct": 11.158406538414045,
+"stop_pct": 10.868550256531595,
 "height_pct": 21.75705168802413,
 "fall_pct": 70.92816871588003,
 "lows": [
@@ -250,7 +166,7 @@
 39.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 43.4,
+"rsi_now": 42.8,
 "signal_date": null,
 "days_since": null,
 "target": 153.23,

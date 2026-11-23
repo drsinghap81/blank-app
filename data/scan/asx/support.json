@@ -1,25 +1,124 @@
 {
-"generated": "2026-11-22T05:57+00:00",
-"asof": "2026-11-20",
+"generated": "2026-11-23T12:18+00:00",
+"asof": "2026-11-23",
 "market": "ASX",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "2008-26, 3R target vs a stop 1 ATR below the level: breakout retests +0.13R (3,359) vs +0.15R for a random uptrend stock; old swing lows +0.02R vs +0.10R. Worse than random - watch only.",
 "rows": [
 {
+"symbol": "REH",
+"name": "REECE LIMITED",
+"status": "touched",
+"touch_date": "2026-11-23",
+"days_ago": 0,
+"level": 17.49,
+"level_kind": "breakout retest",
+"level_date": "2026-08-12",
+"close": 18.549999237060547,
+"above_pct": 6.060603086415117,
+"stop": 16.97,
+"risk_pct": 8.511742290851975,
+"resistance": 19.4,
+"room_r": 0.5383401342418318,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": -30.040000915527344,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+25,
+"5\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "GYG",
+"name": "GUZMAN Y GOMEZ LIMITED",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 2,
+"level": 25.4,
+"level_kind": "old swing low",
+"level_date": "2026-10-29",
+"close": 26.260000228881836,
+"above_pct": 3.385829225462511,
+"stop": 24.45,
+"risk_pct": 6.893974711454376,
+"resistance": 26.53,
+"room_r": 0.1491420433525256,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": 1.5999984741210893,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "MND",
+"name": "MONADELPHOUS GROUP LIMITED",
+"status": "touched",
+"touch_date": "2026-11-19",
+"days_ago": 2,
+"level": 31.18,
+"level_kind": "breakout retest",
+"level_date": "2026-07-01",
+"close": 30.510000228881836,
+"above_pct": -2.1488135655429286,
+"stop": 29.75,
+"risk_pct": 2.4792808149888046,
+"resistance": 31.06,
+"room_r": 0.7271000196318214,
+"sq9": 25,
+"sq9_cross": "5\u00b2",
+"sq9_dist_pct": 24.720001220703125,
+"sq9_gap_pct": 96.0,
+"sq9_below": [
+[
+9,
+"3\u00b2"
+]
+],
+"sq9_above": [
+[
+49,
+"7\u00b2"
+]
+],
+"sq9_match": false
+},
+{
 "symbol": "PME",
 "name": "PRO MEDICUS LIMITED",
 "status": "touched",
 "touch_date": "2026-11-18",
-"days_ago": 2,
+"days_ago": 3,
 "level": 188.64,
 "level_kind": "old swing low",
 "level_date": "2026-11-04",
-"close": 187.75999450683594,
-"above_pct": -0.46649962132092604,
-"stop": 180.5,
-"risk_pct": 3.8639727768669085,
-"resistance": 190.17,
-"room_r": 0.33218543054316846,
+"close": 189.17999267578125,
+"above_pct": 0.28625598382101547,
+"stop": 180.66,
+"risk_pct": 4.503266629564207,
+"resistance": 201.22,
+"room_r": 1.4132660600247708,
 "sq9": 169,
 "sq9_cross": "13\u00b2",
 "sq9_dist_pct": 11.621301413993157,
@@ -43,16 +142,16 @@
 "name": "JAMES HARDIE INDUSTRIES PLC",
 "status": "touched",
 "touch_date": "2026-11-17",
-"days_ago": 3,
+"days_ago": 4,
 "level": 39.2,
 "level_kind": "old swing low",
 "level_date": "2026-11-06",
-"close": 39.779998779296875,
-"above_pct": 1.4795867476251834,
+"close": 40.439998626708984,
+"above_pct": 3.163259794989215,
 "stop": 37.66,
-"risk_pct": 5.320326766928474,
+"risk_pct": 6.865543681094843,
 "resistance": 41.61,
-"room_r": 0.8646661388997011,
+"room_r": 0.4214058218796618,
 "sq9": 49,
 "sq9_cross": "7\u00b2",
 "sq9_dist_pct": -19.999998442980704,
@@ -72,23 +171,23 @@
 "sq9_match": false
 },
 {
-"symbol": "NEU",
-"name": "NEUREN PHARMACEUTICALS LIMITED",
-"status": "touched",
-"touch_date": "2026-11-17",
-"days_ago": 3,
-"level": 22.14,
+"symbol": "CCP",
+"name": "CREDIT CORP GROUP LIMITED",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 14.33,
 "level_kind": "breakout retest",
-"level_date": "2024-07-17",
-"close": 20.969999313354492,
-"above_pct": -5.284553335809838,
-"stop": 21.12,
-"risk_pct": -0.7102005525373212,
-"resistance": 21.27,
-"room_r": null,
+"level_date": "2026-01-12",
+"close": 14.970000267028809,
+"above_pct": 4.466157339359111,
+"stop": 14.02,
+"risk_pct": 6.343640948643003,
+"resistance": 15.28,
+"room_r": 0.32643787621977194,
 "sq9": 25,
 "sq9_cross": "5\u00b2",
-"sq9_dist_pct": -11.44000244140625,
+"sq9_dist_pct": -42.68000030517578,
 "sq9_gap_pct": 96.0,
 "sq9_below": [
 [
@@ -100,39 +199,6 @@
 [
 25,
 "5\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "SOL",
-"name": "WASHINGTON H. SOUL PATTINSON AND COMPANY LIMITED",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 45.06,
-"level_kind": "old swing low",
-"level_date": "2026-10-28",
-"close": 46.65999984741211,
-"above_pct": 3.5508176328407304,
-"stop": 44.21,
-"risk_pct": 5.253808235698065,
-"resistance": 48.33,
-"room_r": 0.6812367007914844,
-"sq9": 49,
-"sq9_cross": "7\u00b2",
-"sq9_dist_pct": -8.040813523895885,
-"sq9_gap_pct": 65.3061224489796,
-"sq9_below": [
-[
-25,
-"5\u00b2"
-]
-],
-"sq9_above": [
-[
-49,
-"7\u00b2"
 ]
 ],
 "sq9_match": false
