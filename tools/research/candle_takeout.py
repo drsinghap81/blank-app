@@ -81,6 +81,7 @@ def trades(sym, x, sig, name):
                         if out is None:
                             qq = min(n - 1, j + 63); out = c[qq] / e - 1 if j + 63 < n else np.nan
                         res[ex] = out - 0.004 if np.isfinite(out) else np.nan
+                    qq = j + 63; res["nostop"] = c[qq] / e - 1 - 0.004 if qq < n else np.nan      # same entry, no stop (separates entry vs stop)
                     r.update({f"{ex}{k}": v for ex, v in res.items()}); break
         e0 = o[t + 1]; qq = t + 1 + 63
         r["nextopen63"] = c[qq] / e0 - 1 - 0.004 if qq < n else np.nan
@@ -116,18 +117,20 @@ def main():
             tk = T[T[f"taken{k}"] == True]  # noqa: E712
             o[f"buy-stop +0.{k}%"] = dict(taken_pct=round(float(T[f"taken{k}"].mean()) * 100), gap_pct=round(float(tk[f"gap{k}"].mean()) * 100) if len(tk) else None,
                                           risk_pct=round(float(tk[f"risk{k}"].median()) * 100, 1) if len(tk) else None,
-                                          intraday=st(tk[f"intra{k}"]), hold63=st(tk[f"hold{k}"]), trail_ema21=st(tk[f"trail{k}"]), target_2R=st(tk[f"2R{k}"]))
+                                          intraday=st(tk[f"intra{k}"]), hold63=st(tk[f"hold{k}"]), nostop63=st(tk[f"nostop{k}"]), trail_ema21=st(tk[f"trail{k}"]), target_2R=st(tk[f"2R{k}"]))
         tk = T[T.taken1 == True]  # noqa: E712
         o["never taken out (buy next open, 63d)"] = st(T[T.taken1 != True].nextopen63)  # noqa: E712
         o["all signals (buy next open, 63d)"] = st(T.nextopen63)
         for y in (1, 2, 3, 5):
             W = tk[tk.d > end - pd.DateOffset(years=y)]
-            o[f"last {y}y (+0.1%)"] = dict(n=int(len(W)), intraday=st(W.intra1), hold63=st(W.hold1), trail_ema21=st(W.trail1), target_2R=st(W["2R1"]))
+            W0 = T[T.d > end - pd.DateOffset(years=y)]
+            o[f"last {y}y (+0.1%)"] = dict(n=int(len(W)), intraday=st(W.intra1), hold63=st(W.hold1), nostop63=st(W.nostop1), trail_ema21=st(W.trail1),
+                                           target_2R=st(W["2R1"]), all_nextopen63=st(W0.nextopen63), never_taken63=st(W0[W0.taken1 != True].nextopen63))  # noqa: E712
         o["years (+0.1%)"] = {str(yy): dict(trail_ema21=st(g.trail1), target_2R=st(g["2R1"]), hold63=st(g.hold1)) for yy, g in sorted(tk.groupby(tk.d.dt.year), reverse=True)}
         res["systems"][nm] = o
         for k in ("1", "2"):
             b = o[f"buy-stop +0.{k}%"]
-            print(f"R| {nm} | +0.{k}% | taken {b['taken_pct']}% gap {b['gap_pct']}% risk {b['risk_pct']}% | intraday {b['intraday']} | hold63 {b['hold63']} | trail EMA21 {b['trail_ema21']} | 2R {b['target_2R']}", flush=True)
+            print(f"R| {nm} | +0.{k}% | taken {b['taken_pct']}% gap {b['gap_pct']}% risk {b['risk_pct']}% | intraday {b['intraday']} | hold63 {b['hold63']} | no stop 63 {b['nostop63']} | trail EMA21 {b['trail_ema21']} | 2R {b['target_2R']}", flush=True)
         print(f"R| {nm} | never taken out {o['never taken out (buy next open, 63d)']} | all next-open {o['all signals (buy next open, 63d)']}", flush=True)
         for y in (1, 2, 3, 5):
             print(f"R| {nm} | last {y}y {o[f'last {y}y (+0.1%)']}", flush=True)
