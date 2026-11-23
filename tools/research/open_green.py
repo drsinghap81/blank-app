@@ -20,7 +20,7 @@ import yfinance as yf
 
 from cluster_open15 import dl
 
-IDX = {"Nifty 50": "^NSEI", "Nifty Bank": "^NSEBANK", "Midcap 100": "NIFTY_MIDCAP_100.NS", "Smallcap 100": "^CNXSC"}
+IDX = {"Nifty 50": ["^NSEI"], "Nifty Bank": ["^NSEBANK"], "Midcap": ["NIFTY_MIDCAP_100.NS", "^NSEMDCP50", "^CNXMIDCAP"], "Smallcap": ["^CNXSC", "NIFTY_SMLCAP_100.NS", "^CNXSMALLCAP"]}
 
 
 def naive(ix):
@@ -39,9 +39,17 @@ def main():
     for x in I.values():
         x.index = naive(x.index)
     IX15, IXD = {}, {}
-    for nm, tk in IDX.items():
-        a = yf.download(tk, period="60d", interval="15m", progress=False, auto_adjust=True)["Close"].squeeze().dropna(); a.index = naive(a.index); IX15[nm] = a
-        b = yf.download(tk, period="1y", interval="1d", progress=False, auto_adjust=True)["Close"].squeeze().dropna(); b.index = pd.to_datetime(b.index).tz_localize(None); IXD[nm] = b
+    for nm, tks in IDX.items():
+        for tk in tks:
+            try:
+                a = yf.download(tk, period="60d", interval="15m", progress=False, auto_adjust=True)["Close"]
+                b = yf.download(tk, period="1y", interval="1d", progress=False, auto_adjust=True)["Close"]
+                a = a.iloc[:, 0] if isinstance(a, pd.DataFrame) else a; b = b.iloc[:, 0] if isinstance(b, pd.DataFrame) else b
+                a, b = a.dropna(), b.dropna()
+                if len(a) > 100 and len(b) > 100:
+                    a.index = naive(a.index); b.index = pd.to_datetime(b.index).tz_localize(None); IX15[nm] = a; IXD[nm] = b; break
+            except Exception as e:  # noqa: BLE001
+                print("index fail", tk, e)
     print("R| index bars", {k: len(v) for k, v in IX15.items()}, flush=True)
     C = pd.DataFrame({k: v.Close for k, v in D.items()}); C.index = pd.to_datetime(C.index).tz_localize(None)
     e9 = C.ewm(span=9, adjust=False).mean(); e21 = C.ewm(span=21, adjust=False).mean(); s150 = C.rolling(150).mean()
@@ -55,7 +63,7 @@ def main():
         def ixmv(nm, b):
             s15, sd = IX15[nm], IXD[nm]; prev = sd[sd.index < dts]
             return float(s15.at[b] / prev.iloc[-1] - 1) if b in s15.index and len(prev) else None
-        ig = {nm: ixmv(nm, b0) for nm in IDX}; ig1 = {nm: ixmv(nm, b1) for nm in IDX}
+        ig = {nm: ixmv(nm, b0) for nm in IX15}; ig1 = {nm: ixmv(nm, b1) for nm in IX15}
         if ig["Nifty 50"] is None:
             continue
         st = {}
