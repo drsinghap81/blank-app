@@ -1,4 +1,4 @@
 symbol,close,ema9,ema21,ema50,above21_60d,dist21,off_high,r1m,r3m,r6m,slope_yr,r2,rsi,value_cr,stacked,e21_rising,above50,last_date,ticker,name,board,list,tag,score
-CSL,197.29,199.97,198.23,188.49,98,-0.5,-3.5,0.6,13.6,98.8,377,0.92,51.8,192.4,False,True,True,2026-11-20,CSL.AX,CSL LIMITED,ASX,watch,at EMA21,171.0
-ANN,45.91,46.14,45.86,44.31,93,0.1,-2.2,0.3,11.0,68.7,222,0.93,52.9,26.56,False,True,True,2026-11-20,ANN.AX,ANSELL LIMITED,ASX,watch,at EMA21,161.7
-ASX,65.25,66.43,65.71,63.04,77,-0.7,-3.3,-0.1,15.1,41.7,77,0.82,50.9,42.2,False,True,True,2026-11-20,ASX.AX,ASX LIMITED,ASX,watch,at EMA21,128.2
+CSL,199.3,199.84,198.33,188.92,98,0.5,-2.6,1.3,15.6,104.2,368,0.92,56.1,190.99,False,True,True,2026-11-23,CSL.AX,CSL LIMITED,ASX,watch,at EMA21,171.0
+ANN,45.9,46.1,45.86,44.38,93,0.1,-2.2,-0.8,15.9,69.6,217,0.93,52.8,26.22,False,True,True,2026-11-23,ANN.AX,ANSELL LIMITED,ASX,watch,at EMA21,161.2
+ASX,65.17,66.18,65.66,63.12,77,-0.7,-3.4,-1.3,17.5,43.8,76,0.82,50.3,42.34,False,True,True,2026-11-23,ASX.AX,ASX LIMITED,ASX,watch,at EMA21,128.1
