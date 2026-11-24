@@ -1579,7 +1579,7 @@ async function srvCard() {
 
 /* 24 Nov 2026 (Amritpal: set up moomoo's API from the phone): Connect moomoo. The server installs moomoo OpenD (its API gateway)
    from the download link you paste; your moomoo login password goes only to your own server over HTTPS, which keeps just its MD5
-   hash for OpenD. Orders stay on moomoo's PAPER account until you change that on the server yourself. */
+   one-time first login (OpenD remembers it). Orders stay on moomoo's PAPER account until you change that on the server yourself. */
 async function mmCard() {
   const box = $('#mmcard'); if (!box || !isOwner()) return;
   let M; try { M = await lvApi('/api/moomoo/status'); } catch (e) { box.innerHTML = ''; return; }
@@ -1594,7 +1594,7 @@ async function mmCard() {
       <input id="mmapw" type="password" placeholder="Trend Desk app password">
       <input id="mmcf" placeholder="Type MOOMOO" autocapitalize="characters">
       <button class="lv-btn" id="mmgo">Install and connect</button></div>
-      <p class="lv-sub">Your moomoo password goes only to your own server (HTTPS) and is kept there only as a hash inside OpenD's settings. Trading stays on moomoo's <b>paper</b> account; real orders need you to set that on the server yourself later.</p>`}
+      <p class="lv-sub">Your moomoo password goes only to your own server (HTTPS), is used once for OpenD's first login (which then remembers it, as moomoo's own app does) and the temporary copy is deleted. Trading stays on moomoo's <b>paper</b> account until you switch it.</p>`}
     ${M.need_code || (!ok && M.installed) ? `<div class="lv-form"><input id="mmcode" inputmode="numeric" placeholder="SMS code from moomoo"><button class="lv-btn" id="mmcodego">Send code</button></div>` : ''}
     ${M.need_agreement && !ok ? '<p class="lv-sub down"><b>OpenD says the API questionnaire / agreement isn\'t done.</b> Finish it at moomoo.com/en-us/about/api-disclaimer, then tap Install again.</p>' : ''}
     ${M.status || M.setup ? `<details class="info"><summary>OpenD log (updates every minute)</summary><pre class="lv-sub" style="white-space:pre-wrap;font-size:11px;max-height:240px;overflow:auto">${esc(M.status || M.setup)}</pre></details>` : ''}

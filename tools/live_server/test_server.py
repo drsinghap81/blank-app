@@ -1332,7 +1332,7 @@ def test_margin_watch_blocks_auto_tb(tmp_path):
 
 
 def test_moomoo_connect_form(tmp_path):
-    """24 Nov 2026: Connect moomoo - only moomoo's https link, app password + MOOMOO, and only the MD5 of the login password is written."""
+    """24 Nov 2026: Connect moomoo - only moomoo's https link, app password + MOOMOO; the login password goes only to a 600 file, never the log."""
     import json as _j
     A, c = client(tmp_path)
     h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
@@ -1343,7 +1343,7 @@ def test_moomoo_connect_form(tmp_path):
     assert c.post("/api/moomoo/setup", headers=h, json=dict(body, account="1; rm -rf /")).status_code == 400
     r = c.post("/api/moomoo/setup", headers=h, json=body); assert r.status_code == 200
     raw = open(os.path.join(str(tmp_path), "cmd_opend.json")).read()
-    assert "secretPW!" not in raw and _j.loads(raw)["md5"] == __import__("hashlib").md5(b"secretPW!").hexdigest()
+    assert _j.loads(raw)["acc"] == "12345678" and _j.loads(raw)["pw"] == "secretPW!"     # once, for OpenD's first login (file 600)
     assert oct(os.stat(os.path.join(str(tmp_path), "cmd_opend.json")).st_mode)[-3:] == "600"
     assert "secretPW!" not in open(os.path.join(str(tmp_path), "orders.jsonl")).read()
     assert c.post("/api/moomoo/code", headers=h, json={"code": "12"}).status_code == 400

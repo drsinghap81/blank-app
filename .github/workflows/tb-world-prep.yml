@@ -1,0 +1,26 @@
+name: tb-world-prep
+# Top Bottom levels for the moomoo ETFs (US + ASX) for the live server (tools/live_server/mm_tb.py). After each market's close.
+on:
+  schedule:
+    - cron: "25 6 * * 1-5"    # after the ASX close (16:00 Sydney = 05:00/06:00 UTC)
+    - cron: "35 21 * * 1-5"   # after the US close (16:00 New York = 20:00/21:00 UTC)
+  workflow_dispatch:
+  push:
+    paths: ["tools/tb_world_prep.py", ".github/workflows/tb-world-prep.yml"]
+permissions:
+  contents: write
+concurrency: {group: tb-world-prep, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas yfinance && python tools/tb_world_prep.py
+      - run: |
+          git config user.name "tb-world bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/scan/tb_world.json; git diff --cached --quiet && exit 0
+          git commit -qm "Top Bottom world levels $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q && break; sleep $((i*7)); done

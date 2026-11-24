@@ -341,8 +341,9 @@ def admin(body: Admin, request: Request, _=Depends(auth)):
 
 # ------------------------------------------------------------------ Connect moomoo (OpenD) from the app (24 Nov 2026)
 # Amritpal sets up moomoo's API gateway from his phone. The app sends the download link, moomoo ID and LOGIN password to this server
-# over HTTPS; only the MD5 hash of the password is written (var/cmd_opend.json, mode 600) for the root watchdog, which installs
-# OpenD with deploy/opend_setup.sh (paper trading by default) and deletes the file. The plain password is never stored or logged.
+# over HTTPS. OpenD >= 10.10 logs in interactively once and remembers the password, so the root watchdog needs the password once:
+# it is written to var/cmd_opend.json (mode 600), moved by the watchdog into a 600 temp file for deploy/opend_login.py, which reads
+# it and deletes it at once. It is never logged; afterwards OpenD runs with its remembered login.
 OPEND_HOSTS = ("moomoo.com", "futunn.com", "futuhk.com", "futustatic.com", "moomoo.sg", "futuholdings.com", "moomooapi.com")
 
 
@@ -377,15 +378,13 @@ def opend_setup(body: OpendSetup, request: Request, _=Depends(auth)):
         raise HTTPException(400, "check the moomoo ID")
     if not body.login_password:
         raise HTTPException(400, "enter your moomoo login password")
-    import hashlib
-    md5 = hashlib.md5(body.login_password.encode()).hexdigest()
     os.makedirs(DATA, exist_ok=True); path = os.path.join(DATA, "cmd_opend.json")
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "w") as f:
-        json.dump(dict(url=body.url.strip(), acc=acc, md5=md5), f)
+        json.dump(dict(url=body.url.strip(), acc=acc, pw=body.login_password), f)
     log("opend_setup_requested", host=host)
-    return dict(ok=True, msg="Install requested. Within about a minute your server downloads and starts moomoo OpenD (2-3 minutes in all). "
-                "Watch the status below; if it asks for a phone verification code, enter the SMS code here.")
+    return dict(ok=True, msg="Install requested. Within about a minute your server downloads moomoo OpenD and logs in (2-3 minutes in all). "
+                "Watch the log below; when it says WAITING FOR SMS CODE, enter the code moomoo texts you here.")
 
 
 @app.post("/api/moomoo/code")
@@ -412,7 +411,7 @@ def opend_status(_=Depends(auth)):
             connected = True
     except Exception:  # noqa: BLE001
         connected = False
-    need_code = "verify" in low and "code" in low and "success" not in low.split("verify")[-1]
+    need_code = "waiting for sms code" in low.split("sms code passed")[-1] or ("verify" in low and "code" in low and "success" not in low.split("verify")[-1])
     need_agree = "questionnaire" in low or "disclaimer" in low or "agreement" in low
     return dict(installed=bool(st), pending=os.path.exists(os.path.join(DATA, "cmd_opend.json")), port_open=connected,
                 need_code=need_code, need_agreement=need_agree, status=st, setup=setup[-1500:])
