@@ -1889,3 +1889,7 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .bs-arm{display:grid;gap:8px;margin-top:10px;padding:12px;border-radius:12px;background:var(--paper)}.bs-arm small{color:var(--slate)}
 .bs-arm input{padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:16px}
 .bs-arm[hidden]{display:none}
+.bs-st{margin-top:12px}.bs-st p{font-size:12.5px;font-weight:800;color:var(--slate);margin:8px 0 6px}.bs-st>small{display:block;color:var(--slate);font-size:12px;margin-top:6px}
+.bs-chips{display:flex;flex-wrap:wrap;gap:6px}
+.bs-chips span{display:inline-flex;flex-direction:column;padding:5px 9px;border-radius:9px;background:var(--paper);font-weight:800;font-size:13px;line-height:1.15}
+.bs-chips span small{font-weight:600;font-size:10.5px;color:var(--slate)}.bs-chips span.h{box-shadow:inset 0 0 0 1.5px var(--rise)}.bs-chips span.none{font-weight:600;color:var(--slate)}

@@ -2241,6 +2241,19 @@ async function loadBasket() {
   const capNow = S.capital || 0; const L = MKT.NSE.loc;
   const buysN = (S.rows || []).filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && bkOf(r) !== 'my').length;
   const sellsN = (S.exits || []).filter((e) => e.qty > 0).length;
+  /* 24 Nov 2026 (Amritpal: "will it show unique stocks or assets in each basket"): every basket lists its own instruments -
+     what its systems hold now and what they buy at the next open (published plan), one chip per stock */
+  const P0 = await getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan').catch(() => null);
+  const SYS2K = { 'Monthly ATH': 'mom', 'Trend 9/21': 'tf', 'Pulse rotation': 'pr' };
+  const heldBy = (k) => [...new Set((S.trades || []).filter((t) => t.state === 'open' && (SYS2K[t.system] || '') === k).map((t) => t.symbol))];
+  const planBy = (k) => [...new Set(((P0 && (P0.top || []).concat(P0.swing || [])) || []).filter((r) => bkOf(r) === k && r.stop).map((r) => r.symbol))];
+  const NM = { mom: 'Momentum', tf: 'Cup 9/21', pr: 'Pulse' };
+  const list = (b) => { if (!b.al) return '';
+    const ks = ['pr', 'mom', 'tf'].filter((k) => b.al[k] > 0); const H = new Set(); const Bu = new Set(); const tag = {};
+    ks.forEach((k) => { heldBy(k).forEach((x) => { H.add(x); tag[x] = NM[k]; }); planBy(k).forEach((x) => { if (!H.has(x)) { Bu.add(x); tag[x] = tag[x] || NM[k]; } }); });
+    const chips = (L, cls) => [...L].map((x) => `<span class="${cls}" title="${esc(tag[x])}">${esc(x)}<small>${esc(tag[x])}</small></span>`).join('');
+    return `<div class="bs-st">${H.size ? `<p>Holds now · ${H.size}</p><div class="bs-chips">${chips(H, 'h')}</div>` : ''}<p>Buys at the next open · ${Bu.size}</p><div class="bs-chips">${chips(Bu, 'b') || '<span class="none">none today</span>'}</div>
+      <small>${H.size + Bu.size} unique stocks. Sizes come from your capital once the basket is active (Trade Live).</small></div>`; };
   const card = (b, i) => {
     const on = b.al ? isOn(b) : b.tbb ? Object.values(tb).some((x) => x.auto) || !!A.mm_us : false; const bot = b.pie ? false : botOn(b);
     let body = '';
@@ -2260,7 +2273,7 @@ async function loadBasket() {
     const mode = b.pie ? '<span class="bs-m">Manual only</span>' : `<div class="bs-seg" role="group" aria-label="Mode"><button data-mode="${b.id}" data-v="0" aria-pressed="${!bot}">Manual</button><button data-mode="${b.id}" data-v="1" aria-pressed="${bot}">🤖 Bot</button></div>`;
     return `<article class="bs-c${on ? ' act' : ''}"><div class="bs-h"><span class="bs-n">${i + 1}</span><div><b>${esc(b.n)}</b>${on ? '<em>active</em>' : ''}<small>${esc(b.how)}</small></div>
       <span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span></div>
-      ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
+      ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
   el.innerHTML = `<p class="bs-top">India stock baskets (1, 2, 3, 6, 7) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
     ${BASKETS.map(card).join('')}<p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
   el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));
