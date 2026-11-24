@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-24 12:30 UTC",
+"generated": "2026-11-24 23:18 UTC",
 "method": "News clues: government / regulator actions that can move a whole industry (22 Nov 2026, Amritpal, after the PSU-bank look-back\nfound the 21 Oct \"FDI cap in PSU banks to 49%\" report a week before the rally: \"add all authentic news clues, especially similar\ntypes as for PSU\").\n\nSources (checked from GitHub Actions 22 Nov 2026):\n  official  RBI press releases + notifications (rbi.org.in RSS); government outlets in Google News (PIB, DD News, News On AIR)\n  reports   Google News RSS, India edition, ONLY from named financial / national outlets (OUTLETS) - shown as \"Report\"\nEvent types searched (TYPES): FDI / foreign-ownership caps, Cabinet approvals and outlays, PLI, anti-dumping / safeguard / customs\nduty, export bans / curbs, minimum import price, bank mergers, privatisation / stake sales, GST rate changes, MSP / FRP,\nDefence Acquisition Council approvals, ethanol blending, RBI rule changes, plus \"government plans / considering\" reports.\nEach item is matched to NSE basic industries by keywords (IND_KEYS). Direction is only marked where the words say it\n(denies / no plan / rollback / ban = negative). Nothing here is a tested signal - it tells you a story exists.\nWrites data/scan/news_clues.json (last 60 days, de-duplicated).",
 "items": [
 {
@@ -29,6 +29,74 @@
 "Civil Construction"
 ],
 "neg": false
+},
+{
+"key": "blackstonebringsinformerhdfcergoceoriteshkumarforindiainsuranceventure",
+"date": "2026-11-24",
+"title": "Blackstone brings in former HDFC Ergo CEO Ritesh Kumar for India insurance venture",
+"url": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxOVnZ3VW00ek1KOUJKcFRFdmJrdV9BR3puNEozUnRiWGstWWZvSE0xb21kdGdha1J1V1VPXzZpeXBPLVc1ZTNqcG9lQjdMQ05yYjl2NUUxdHRtVFFVdndLQnZEblc4d3AwVndkdmpYQkMxRjZzV1FWMHlLNXB0Nlc2R29La0xjOXQ0cjllWm8zQ0NCc2RJNnlnWTdrS3dQN3lsZ0VUNUtkSGc5OVMtNUZqSDkzVWFnTDNkSUdYVldyT1huVFZSclZ1UkhibXZBOGh6eTFEd3JCSHBzQ2tLLTRueHV4ZkUwWnJTM3JjUzF0a3hwYy1wNTF1V0xnMzbSAYICQVVfeXFMTjZOSDFkbGhNME1aaXFyZ1lWNll6NG9LQWJLY1JwVl8zdGtOalE0Ui1xMVppS3IzNXJSVXIxRXZYRGgtMHRsWHNnLTdsQ1Brb1pUQUhNZzVENVlST2J4dGwwbG8wVW1sOGQ0Xy1IaEJkNUthTkpscG9rRlpnUlBfT0hkMlVFZG9kMGd2Wld5RGRVOXNobUM2S0pzME1MbUFVVG1zeUJJak5Hc3RPZWJYRlY2bjB6SzlqRmxFTW9Cc2FYT3FLZDV1R0QtT0tnTWdtcGJHYmhsTG9FcEdRT3hlVTlodF94aDJvY3VBbmk0VEluekd4NTJEWEw0RHlsWmxiVXJn?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "FDI / foreign cap",
+"industries": [
+"Life Insurance",
+"General Insurance"
+],
+"neg": false
+},
+{
+"key": "autoplipayoutshit4365croresofarinfy27",
+"date": "2026-11-24",
+"title": "Auto PLI payouts hit \u20b94,365 crore so far in FY27",
+"url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQYWlxbUQ3Y2FCYWFkQ29PN24yNEF1WVc2OWdfZE45ZWdtMHJjU05LbXljX29QSGhNTzU4QmVwOGdWQmtuRlAyOHUxcjEwWnhFVjhueUxodUh1YzNKQ2NWaW8zdTVZT3J6MDR0c1cxXzFtZmFldldIMURQRjVUdXUtemRUVjhja19mRVV6QTV0dlhwcFVFZlZuTmNTLW9ZM2MxcUw2RGUtV0o0eXM2bmdkWkhWR2VxemPSAbcBQVVfeXFMUGFpcW1EN2NhQmFhZENvTzduMjRBdVlXNjlnX2ROOWVnbTByY1NOS215Y19vUEhoTU81OEJlcDhnVkJrbkZQMjh1MXIxMFp4RVY4bnlMaHVIdWMzSkNjVmlvM3U1WU9yejA0dHNXMV8xbWZhZXZXSDFEUEY1VHV1LXpkVFY4Y2tfZkVVekE1dHZYcHBVRWZWbk5jUy1vWTNjMXFMNkRlLVdKNHlzNm5nZFpIVkdlcXpj?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "aluminiumbodyseeksimportdutyhikesays4trillionpipelineatrisk",
+"date": "2026-11-24",
+"title": "Aluminium body seeks import duty hike, says \u20b94 trillion pipeline at risk",
+"url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPVEktNzFlS1pZYjVBRk15ZEEzOWlTRlBpdEVxWkhKUVgzRWZRQ3F2VW1uVU5ndldyM0duQVFReU53TkNxUS1KU25xa3FaalRETy1JZWY3TkpEc29tcVVGOVgxWEhQVW1Iamh2YVlTaWRVeHp6b3U0cE5Pd2x4RUhSRXNjTXMwdF80ZGRiUG9FWVY2bVFOTWdtVFNtdlFqbVhySXdEMU5oMkhxV1F1QW1ISWQzNi1wVmg1R1NVendndUw0OURjUjYyS3kzaXd4cmp3dXIyd2530gHbAUFVX3lxTFB0VVhOWTdEVHVGams2OTNTdnl1WTNkd1lza0M2LUNzR0Rtbi10RkJINTJlaWlqaldnRldGdFhpazZpc3JuOV8yajVCSjVzTFdCTG82YTNXUG82NFdDd3VnSERQU25mWWJFc1B5QWtUQ2txTjJKYVJpNEUyQ3plYmk1UjVtVlZqUGRIUjcxbDYtZFhrY2EtVE5DOTQ3R2JLLW9RT3oyOW9qUmZsLXNTc0J0WFZWekNvYmtQajg3Mlo2ZjJIcDVGT2xBdFdWZENaT3VrQ3U4UUszMi01OA?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Aluminium"
+],
+"neg": false
+},
+{
+"key": "indiasnonbasmatiriceexportsurges67inapriloctober",
+"date": "2026-11-24",
+"title": "India\u2019s non-basmati rice export surges 6.7% in April-October",
+"url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxQZmV1RlZ4ekd0andlSW1hN2JLLWVtV3JhRjF0TTBXRFlNME5IUndyZ3VPaWJQLUpsSDhhSmE5SEo2aGRWTTZhVXNZcHRZVTRyNWZtVW1zQnp0ZXM3N2FVZllkVmZLNjVIRFR5dGVvcmRLbzVnOC1Cd19JZXhmMGI3ejJvUERzaVpDUmtmVjlaRWJyT2E3ME4zeVhkX1YtYkdGOW1xbWs0SjVwTGNOc1gzVW9qOUpPNm9ZeDBwTWZUTGMxQUMzZ3JpUWJNcGlIc3hGWnc?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Agricultural Products"
+],
+"neg": false
+},
+{
+"key": "indiaweighswheatexportcurbsamidconcernsoverlowerproduction",
+"date": "2026-11-24",
+"title": "India weighs wheat export curbs amid concerns over lower production",
+"url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNX21vZ2cxWkEyMFBsQkZmSllUelNCanZNMmVwZ2lNYW5LWHYtamlWblhIYWljZzdyYlpYSnBPcXRmUDd2UEpsUGJnaURzNkQzSnJ6R1Q5ZUoyejdVaEpLcXk2STFTbGxPYmYxM20zcUhoTWpvWV9EX0UwZG9EN0tVZGdYV0NVVkFfRGxjb0w3ZmE3OWVLcFdEY2c1MWZRMUZqbXh2ZWQ5ZVNGclNrX3puVWpXM0dlb2pWYWZ4NmhqTkFyRzhBa2VWaFpubXR4TG1UcEVUbHd6MNIB3AFBVV95cUxOSTJaYTZlOTR0bFN4RUR3LWVCeDJFd0Jxb0R3ZUtiSFFmYklfVnQzVVFEcmVDNzBGeWZpNmtUM1VBcWJfNTlzRVlDVkIzODc3LWFuQjJVbXhBUmVtbVVLQ2NTLVpTM0hMRzhGYlVycmF0WXNHVll1VzE2X29WVlduaG9ockFCU0RnekllS3BsU0hWaTJVM1NMMkxNSzBwS1d3WGlpOXZXMWY0UFRLRXdiU3A5M3d3bzZ0T2RBRTNKVGtxaFpPT0Zrem9Sa2k1TWdZaWJfVHRpZWVGbU1T?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "Plans / reports",
+"industries": [
+"Other Agricultural Products"
+],
+"neg": true
 },
 {
 "key": "ciiwantsforeigninvestmentcapinpsubanksraisedto49",
@@ -239,6 +307,20 @@
 "neg": false
 },
 {
+"key": "jupiterwagonsformsjvwithsouthkoreaswoojinformetropropulsionbiz",
+"date": "2026-11-23",
+"title": "Jupiter Wagons forms JV with South Korea's Woojin for metro, propulsion biz",
+"url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxQNkxlX0llOXA2bHJ4dS1YR3ByeDJlQ3VWZnJxMFRPZFNRREpXRjZoRi1NbmlWeUpKWnI0UDFFSlpHeWgzSktERkVmSmZheEZLN3dBU0wwblRTb1RySERxSEJsRzVxY1haam9pUTJ2YVZmNUdjVFBreTdFb1lQWm51blhGLU5FZjRBUFJkU1RLcDNyLU5Xdkc1TmNxMEN1WEh3Q0ZfTDRIc3NReG5rb3paNHJ1M0J0eENRUE44OC1ZdEZzSUYzeU1YSEx4aWhSREREem5HMVAybFVoZ9IB3wFBVV95cUxPclVUalBsWG40MEpzWk44UkdGT05YVFBlbEFvTXZER1NqN01JME82Q25BZjNFYVNnd0V0UlFNSnNzeERfVTRFa0hOUHIwRzN0bDZXdW5IcDVmVFdOQURvdFI1NjVSRko1b0F4ZEdBV3RDbUNFNEZzVndGLVlEbmY5MG1oRElsZW9XVlhPOEl2eUxEc0JWZDlJMURfUWtNeThUeE5mZGNrNkJ6bUpSSkNURHhJY1MyZDZjbVYzZERWdmVRWlJSR01Hd19qOE5JOXJrVS0xTjRBNzM2VmwxNU1z?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Railway Wagons",
+"Civil Construction"
+],
+"neg": false
+},
+{
 "key": "cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
 "date": "2026-11-22",
 "title": "Cabinet approves \u20b91.86 lakh crore PM-DHARA scheme for green energy transmission",
@@ -415,6 +497,35 @@
 "type": "Duty / trade",
 "industries": [
 "Aluminium"
+],
+"neg": false
+},
+{
+"key": "tatasteeltoselltubespipesbusinessandtatasteelcolorstoaplapolloforrs28000crore",
+"date": "2026-11-22",
+"title": "Tata Steel to sell tubes, pipes business and Tata Steel Colors to APL Apollo for Rs 28,000 crore",
+"url": "https://news.google.com/rss/articles/CBMilgJBVV95cUxPMkxid3FtOHhOMUVaNElBaExtVlBjUGJoaVFYUEY2X08zRmM4d0tYTk9INlVBc1R0anVacTNrdTZKc2JTZnRTdGYtalBudi1raGVxQ01lVEVKSXZjd19MaVJjb2tzX1Fha3dnXzZwQzlnQWJMTGJsVHZtcG5EbVVqb3BhSTNQYUdyUXptVnM3RUZGTmZSOU5vaXhLZS1FVndOMXhoX2dUbmlNOV9CbnA5NEZQQWROYzVDTlk4QTZZTzlxcTR3RzhDbzZvS1FfcENhYTNBTk1qV2YybmVwSzZYQU53RS1YQVZWa2d0d2t0X05SanFFVVNVdHdjRVdPRmlTXzFPdlUyYjg5bFJNY0RHak00MUVnQdIBjwJBVV95cUxQNHdCMlg3cU9BY3hvU21RdmdOQVl6VXRySlN0dnVLa0lPNExJQnFaa0plRk1oMDJ4dVAzOE9vT3NRQ1RPa0pDS2lEOHhENFhudFoxWnJjdXVQNGdRb3haTlNFaUtqT0VaV2Q1d1FQSnkzaXU3WFJiWEtJLUhZamJGbXIycUlyVHplMkZDOTZDLWExNEZPa1RRYnUzeUROemRZXzlwMDlLR1lmS21KakgwaFZwM3hkMlRCUTVPQloyMC13TDBOYWl6NmVCbFJCeDBwN1pfd0tpcEpDaWtRNktiVVBmT0ZHNDFWR3VxSzU3Q1lnOG5Cd3VJOU80YmFhNVV2Y3RDNW5oMndwRkFCU2Jv?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
+"date": "2026-11-22",
+"title": "Defence stocks take off! Bharat Dynamics, BEL, Bharat Forge rally; 3 key triggers driving the gains",
+"url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxOQkZwSHZZTEFLSXB4QW9tRWgwQ0ZwMmUzaVloTU5vTVNaYS1fYjJHQWhmWHJpdFZVSXZ1Z3QyTUdLaFF0N0FZbG8wWGFZQzEzQ0NLMzhFbDlndnJMRVhMS1dUdS1yaUFxTEpWYTNEYlc0Vm9xMV9vbnNZT3E3X1R3M1p0SE5MNlN5NmE4emJjOEkyMzZOZXE3dmFiUXVjRTNna0NGa09tTFhTRW5nQ0FtbGxIQUtUeGJrWEpIWHJQek5WNHNSR2NYZnUta21oang2bEFJXzRoeVpONnhMX2Z1dFlqMWVKZU4xaGxlNDBGaXVPcTZs?oc=5",
+"source": "Upstox",
+"official": false,
+"type": "Plans / reports",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
 ],
 "neg": false
 },
@@ -2043,6 +2154,7 @@
 "cabinetapprovestwoflyoversondelhismbroad",
 "tendersfloatedfor4299crorebikkavoluduvvadaraillinestoeasecongestionaroundvisakhapatnam",
 "cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
+"jupiterwagonsformsjvwithsouthkoreaswoojinformetropropulsionbiz",
 "pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
 ],
 "Road Assets - Toll Annuity Hybrid-Annuity": [
@@ -2052,7 +2164,69 @@
 "Railway Wagons": [
 "tendersfloatedfor4299crorebikkavoluduvvadaraillinestoeasecongestionaroundvisakhapatnam",
 "cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
+"jupiterwagonsformsjvwithsouthkoreaswoojinformetropropulsionbiz",
 "pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
+],
+"Life Insurance": [
+"blackstonebringsinformerhdfcergoceoriteshkumarforindiainsuranceventure"
+],
+"General Insurance": [
+"blackstonebringsinformerhdfcergoceoriteshkumarforindiainsuranceventure"
+],
+"Passenger Cars & Utility Vehicles": [
+"autoplipayoutshit4365croresofarinfy27",
+"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"2/3 Wheelers": [
+"autoplipayoutshit4365croresofarinfy27",
+"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"Auto Components & Equipments": [
+"autoplipayoutshit4365croresofarinfy27",
+"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"Aluminium": [
+"aluminiumbodyseeksimportdutyhikesays4trillionpipelineatrisk",
+"aluminiumproductmakersseekzeroimportdutyonrawmetalaheadofbudget",
+"unionbudget2028aluminiumproductmakersseekdutyfreeimportsforprimarymetal",
+"indiamayimposedutiesoncheapaluminiumimports5stocksthatcouldbenefit",
+"budgetwishdownstreamaluminiumcompaniesseekbasiccustomsdutyscrapped",
+"dgtrinitiatesantidumpingprobeintoaluminiumextrusionimports"
+],
+"Other Agricultural Products": [
+"indiasnonbasmatiriceexportsurges67inapriloctober",
+"indiaweighswheatexportcurbsamidconcernsoverlowerproduction",
+"indiaweighs20exportdutyonselectricevarietiestoboostdomesticsupplyreport",
+"indiaconsidersriceexportdutiesasdomesticpricesrisesourcessay",
+"indiaweighscurbsonnonbasmatiriceexportstocooldomesticprices",
+"govtmullscurbsonriceexports",
+"cabinetapprovesrs25530croresarthakpdsschemetomodernisepublicdistributionsystem",
+"amonthafterliftingofbanwheatexportsrisefourfoldshowsdata",
+"noplantoreduceimportdutiesonpulsesofficial"
 ],
 "Public Sector Bank": [
 "ciiwantsforeigninvestmentcapinpsubanksraisedto49",
@@ -2065,6 +2239,7 @@
 "Iron & Steel": [
 "aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
 "steelsh2showhingesonpricegainscostpressure",
+"tatasteeltoselltubespipesbusinessandtatasteelcolorstoaplapolloforrs28000crore",
 "tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
 "tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
 "euimposesantidumpingdutyonsteelimportsfromindia4othernations",
@@ -2079,6 +2254,7 @@
 "Iron & Steel Products": [
 "aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
 "steelsh2showhingesonpricegainscostpressure",
+"tatasteeltoselltubespipesbusinessandtatasteelcolorstoaplapolloforrs28000crore",
 "tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
 "tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
 "euimposesantidumpingdutyonsteelimportsfromindia4othernations",
@@ -2155,48 +2331,6 @@
 "sugarcanefarmerswelcomepanelbutwontendprotest",
 "governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
 ],
-"Passenger Cars & Utility Vehicles": [
-"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
-"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
-"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
-"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
-"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
-"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
-"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
-"indiasfestivecarbuyingjoyridemayhitpricehikebump",
-"gstcouncilproposes5gstoptionforevpassengertransportrentals"
-],
-"2/3 Wheelers": [
-"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
-"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
-"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
-"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
-"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
-"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
-"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
-"indiasfestivecarbuyingjoyridemayhitpricehikebump",
-"gstcouncilproposes5gstoptionforevpassengertransportrentals"
-],
-"Auto Components & Equipments": [
-"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
-"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
-"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
-"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
-"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
-"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
-"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
-"indiasfestivecarbuyingjoyridemayhitpricehikebump",
-"gstcouncilproposes5gstoptionforevpassengertransportrentals"
-],
-"Other Agricultural Products": [
-"indiaweighs20exportdutyonselectricevarietiestoboostdomesticsupplyreport",
-"indiaconsidersriceexportdutiesasdomesticpricesrisesourcessay",
-"indiaweighscurbsonnonbasmatiriceexportstocooldomesticprices",
-"govtmullscurbsonriceexports",
-"cabinetapprovesrs25530croresarthakpdsschemetomodernisepublicdistributionsystem",
-"amonthafterliftingofbanwheatexportsrisefourfoldshowsdata",
-"noplantoreduceimportdutiesonpulsesofficial"
-],
 "Airport & Airport services": [
 "indiasadaniairporttoraise300millionviastakesale",
 "adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
@@ -2215,6 +2349,7 @@
 ],
 "Aerospace & Defense": [
 "dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
+"defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
 "worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
 "planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
 "defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
@@ -2230,6 +2365,7 @@
 "Ship Building & Allied Services": [
 "dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
 "hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
+"defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
 "worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
 "planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
 "defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
@@ -2245,6 +2381,7 @@
 ],
 "Explosives": [
 "dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
+"defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
 "worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
 "planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
 "defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
@@ -2310,13 +2447,6 @@
 "Integrated Power Utilities": [
 "cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
 "biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal"
-],
-"Aluminium": [
-"aluminiumproductmakersseekzeroimportdutyonrawmetalaheadofbudget",
-"unionbudget2028aluminiumproductmakersseekdutyfreeimportsforprimarymetal",
-"indiamayimposedutiesoncheapaluminiumimports5stocksthatcouldbenefit",
-"budgetwishdownstreamaluminiumcompaniesseekbasiccustomsdutyscrapped",
-"dgtrinitiatesantidumpingprobeintoaluminiumextrusionimports"
 ],
 "Shipping": [
 "hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
