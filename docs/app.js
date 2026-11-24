@@ -120,7 +120,7 @@ function parseCSV(t) {
 document.addEventListener('click', (e) => { if (e.target && e.target.id === 'toresults') show('results'); });
 /* 15 Nov 2026 layout: Investment (ETFs, funds, indices: monthly), Momentum investing (monthly ATH stocks), Trading (9/21, cup closes,
    IPO cups, patterns, support). Sub-pages light up their parent button. */
-const NAV_NEW = { score: 'ideas', strat: 'ideas', bot: 'ideas', trd: 'ideas', trends: 'ideas', ath: 'ideas', inv: 'ideas', tb: 'trade', auto: 'trade', live: 'trade' };   // 21 Nov 2026: 5 tabs; 24 Nov: Live -> Trade Live
+const NAV_NEW = { score: 'ideas', strat: 'ideas', bot: 'ideas', trd: 'ideas', trends: 'ideas', ath: 'ideas', inv: 'ideas', tb: 'trade', auto: 'trade', live: 'trade', basket: 'trade' };   // 21 Nov 2026: 5 tabs; 24 Nov: Live -> Trade Live
 const NAV_CLASSIC = { bot: 'trends', trd: 'trends' };                                                    // the 8-tab bar, kept
 /* 21 Nov 2026 (Amritpal: "keep the earlier intact too"): Classic layout = the 8-tab bar and the previous Today, one tap away. */
 const isClassic = () => document.body.classList.contains('classic');
@@ -177,7 +177,7 @@ function show(view) {
   state.view = view;
   { const ib = document.getElementById('ideasbar'); if (ib) { const on = NAV_OF[view] === 'ideas'; ib.hidden = !on;
       if (on) { const k = IDEA_OF[view] || view; try { localStorage.setItem('td.ideas', k); } catch (e) { /* */ } ib.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === k)); } }
-    const lb = document.getElementById('livebar'); if (lb) { const on = !isClassic() && (view === 'live' || view === 'tb' || view === 'auto' || view === 'trade'); lb.hidden = !on; if (on) lb.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === view)); } }
+    const lb = document.getElementById('livebar'); if (lb) { const on = !isClassic() && (view === 'live' || view === 'tb' || view === 'auto' || view === 'trade' || view === 'basket'); lb.hidden = !on; if (on) lb.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === view)); } }
   const navv = NAV_OF[view] || view;
   document.querySelectorAll('.views:not(.bg-nav) button').forEach((b) => (b.dataset.view === navv ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   ['ath', 'inv', 'trd'].forEach((k) => { if (k !== view) { const s = document.getElementById('view-' + k); if (s) s.innerHTML = ''; } }); // one #athlist at a time
@@ -186,7 +186,7 @@ function show(view) {
   if (view !== 'bg') document.body.classList.remove('bg-first');
   if (view !== 'bg') bgNav(document.body.classList.contains('mode-bg') ? 'explore' : '');
   setTimeout(liveTag, 1500); setTimeout(liveTag, 4000); if (view === 'trends' || view === 'ath' || view === 'trd') setTimeout(livePoll, 800);
-  ({ today: loadToday, strat: loadStrat, mk: loadMarkets, live: loadLive, trade: loadTrade, score: loadScore, auto: loadAuto, trends: loadTrends, ath: loadATH, inv: loadInvest, trd: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
+  ({ today: loadToday, strat: loadStrat, mk: loadMarkets, live: loadLive, trade: loadTrade, score: loadScore, basket: loadBasket, auto: loadAuto, trends: loadTrends, ath: loadATH, inv: loadInvest, trd: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
 }
 
 /* ------------------------------------------------------------------ Live hero + pie (9 Nov 2026)
@@ -2205,6 +2205,83 @@ async function loadScore() {
   el.querySelectorAll('.sc-r').forEach((b) => b.addEventListener('click', async () => { const d = b.nextElementSibling; d.hidden = !d.hidden; b.setAttribute('aria-expanded', !d.hidden);
     if (!d.hidden && !state.scST) { state.scST = await getJSON(MAIN + 'data/research/strategy_scorecard_stocks.json', 'scorecard_st').catch(() => null); if (state.scST) { const y = window.scrollY; const i = b.dataset.i; await loadScore(); const nb = el.querySelector(`.sc-r[data-i="${i}"]`); if (nb) nb.click(); window.scrollTo(0, y); } } }));
   el.querySelectorAll('[data-ch]').forEach((b) => b.addEventListener('click', async () => { const S = await sysMap(mk).catch(() => null); if (S) mxOpen(b.dataset.ch, mk, S); else lvOpen({ symbol: b.dataset.ch, kind: 'ATH' }, mk); }));
+}
+
+/* ------------------------------------------------------------------ Baskets (24 Nov 2026)
+   Amritpal: "create automation baskets for the first 7 [best return per drawdown]. I will see whether to run manually or by bot.
+   I don't mind how many stocks or funds I have to buy, either I put capital or reduce size as per capital".
+   Each basket = a tested mix of the app's systems. India stock baskets share the Angel account, so one is active at a time:
+   "Use" writes its capital + system split to the server (/api/picks) - Trade Live then lists exactly that basket's orders.
+   Bot = the server's automatic switches for that basket's parts (one password + AUTO); Manual = switches off, you Send. */
+const BASKETS = [
+  { id: 'c', n: 'Pulse + Momentum + Top Bottom', ret: 41, dd: -11, how: 'Pulse rotation 50% · Momentum 30% · Cup 9/21 20% · plus 1 Bank Nifty Top Bottom lot on margin', note: 'monthly data, so the real worst fall is a little deeper', al: { pr: 50, mom: 30, tf: 20 }, tb: ['bn'] },
+  { id: 'a', n: 'Momentum + Cup 9/21 + Top Bottom', ret: 33, dd: -12, how: 'Momentum 60% · Cup 9/21 40% · plus 1 Bank Nifty Top Bottom lot on margin', note: 'monthly data', al: { pr: 0, mom: 60, tf: 40 }, tb: ['bn'] },
+  { id: 'p', n: 'Pulse rotation', ret: 37, dd: -21, how: '10 strongest trending stocks of the leading industries, equal weight, rebalanced every Friday; all cash on a red-light Friday', note: 'trial system', al: { pr: 100, mom: 0, tf: 0 } },
+  { id: 't', n: 'Top Bottom basket', ret: 22, dd: -14, how: 'Top Bottom on Bank Nifty, Nifty, BEL, L&T, TMPV, TCS futures and US ETFs (QQQ, SMH, XLF, XLE) - 0.06 correlation between them', note: '12.5%/yr, −8% at plain equal weight; 22% needs up to 2× leverage', tbb: true },
+  { id: 'e', n: 'ETF rotation', ret: 18, dd: -13, how: 'Each month-end hold the best 2 of Nifty, Midcap 150, Gold, Nasdaq 100 by 3-month return; cash (LIQUIDBEES) if below cash', note: '5–7 switches a year', pie: true },
+  { id: 'mc', n: 'Momentum + Cup 9/21', ret: 23, dd: -21, how: 'Momentum 60% · Cup 9/21 40%, 1% risk a trade, max 10% a stock', al: { pr: 0, mom: 60, tf: 40 } },
+  { id: 'm', n: 'Momentum', ret: 17, dd: -17, how: 'Monthly all-time-high breakouts after a 2-year cup, exit on a weekly close below the 30-week average', al: { pr: 0, mom: 100, tf: 0 } }];
+async function loadBasket() {
+  $('#title').textContent = 'Baskets'; $('#asof').textContent = 'Best return per worst fall first';
+  const el = $('#view-basket'); if (!el) return;
+  if (!lvCfg().url) { el.innerHTML = '<div class="tr-empty"><b>Connect your server first</b><p>Full view → Settings.</p></div>'; return; }
+  el.innerHTML = '<p class="muted pad">Loading baskets…</p>';
+  let S, A, MT, E;
+  try { [S, A, MT, E] = await Promise.all([lvPlan(), lvApi('/api/auto'), lvApi('/api/mmtb').catch(() => null), getJSON(MAIN + 'data/scan/etf_rotation.json', 'etfrot').catch(() => null)]); }
+  catch (e) { if (/log in again|401/i.test(e.message)) { state.trMk = 'NSE'; show('trade'); return; } el.innerHTML = `<p class="empty">${esc(e.message)}</p>`; return; }
+  const B = Object.fromEntries((S.buckets || []).map((b) => [b.key, b.pct]));
+  const match = (b) => b.al && ['pr', 'mom', 'tf'].every((k) => Math.round(B[k] ?? -1) === b.al[k]);
+  let pick = null; try { pick = localStorage.getItem('td.basket'); } catch (e) { /* */ }
+  const act = (BASKETS.find((b) => b.id === pick && match(b)) || BASKETS.find(match) || {}).id; const isOn = (b) => b.id === act;
+  const tb = A.tb || {};
+  const partsOf = (b) => (b.al ? [{ k: 'part', id: 'stock_sell', on: !!A.stock_sell }, { k: 'part', id: 'stock_buy', on: !!A.stock_buy }] : [])
+    .concat((b.tb || []).filter((i) => tb[i]).map((i) => ({ k: 'tb', id: i, on: !!tb[i].auto })))
+    .concat(b.tbb ? Object.keys(tb).map((i) => ({ k: 'tb', id: i, on: !!tb[i].auto })).concat([{ k: 'part', id: 'mm_us', on: !!A.mm_us }]) : []);
+  const botOn = (b) => { const P = partsOf(b); return P.length > 0 && P.every((x) => x.on); };
+  const capNow = S.capital || 0; const L = MKT.NSE.loc;
+  const buysN = (S.rows || []).filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && bkOf(r) !== 'my').length;
+  const sellsN = (S.exits || []).filter((e) => e.qty > 0).length;
+  const card = (b, i) => {
+    const on = b.al ? isOn(b) : b.tbb ? Object.values(tb).some((x) => x.auto) || !!A.mm_us : false; const bot = b.pie ? false : botOn(b);
+    let body = '';
+    if (b.al) body = on ? `<div class="bs-now"><span><b>${buysN}</b> to buy</span><span><b>${sellsN}</b> to sell</span><span>capital <b>${money(capNow, 'NSE')}</b></span><button class="tr-go" data-trade>Open Trade Live</button></div>`
+      : `<label class="bs-in">Capital ₹ <input type="number" inputmode="numeric" data-cap="${b.id}" value="${Math.round(capNow) || ''}" placeholder="0 = whole Angel account"></label><button class="tr-go" data-use="${b.id}">Use this basket</button>`;
+    if (b.tbb) { const usc = +((((MT || {}).cfg || {}).US || {}).capital || 0);
+      body = `<div class="bs-sl">${Object.keys(TB_SHORT).map((i) => `<span class="${tb[i] ? (tb[i].auto ? 'on' : '') : 'na'}">${TB_SHORT[i]}${tb[i] ? '' : ' ·  not installed'}</span>`).join('')}<span class="${A.mm_us ? 'on' : ''}">US ETFs</span></div>
+        <p class="bs-p">India sleeves trade 1 lot each (about ₹1.5–2 L margin per index lot, more for stock futures). US sleeves use your moomoo capital:</p>
+        <label class="bs-in">US capital US$ <input type="number" inputmode="numeric" data-usc value="${usc || ''}"></label><button class="tr-go" data-usave>Save</button>`; }
+    if (b.pie) { const C = E && E.current; const pv = E && E.provisional; const px = (E && E.prices) || {};
+      const hold = (C && C.hold) || []; const cap = +(state.pieCap || 0);
+      body = `<p class="bs-p">Hold now (decided ${esc((C && C.decided) || '–')}): <b>${hold.map((s) => esc((E.names || {})[s] || s)).join(' + ') || '–'}</b>${pv ? ` · if the month ended today: ${pv.hold.map((s) => esc((E.names || {})[s] || s)).join(' + ')}` : ''}</p>
+        <label class="bs-in">Capital ₹ <input type="number" inputmode="numeric" data-pie value="${cap || ''}"></label>
+        ${cap ? `<div class="bs-ord">${[...new Set(hold)].map((s) => { const n = hold.filter((x) => x === s).length; const amt = cap * n / 2; const p = s === 'LIQUIDBEES' ? 1000 : px[s];
+          return `<span><b>BUY ${p ? Math.floor(amt / p).toLocaleString(L) : '–'} ${esc(s)}</b><small>${money(amt, 'NSE')}${s === 'LIQUIDBEES' ? ' · ~₹1,000 a unit' : p ? ` at ~₹${fmt(p, 2, L)}` : ''}</small></span>`; }).join('')}</div>` : ''}
+        <p class="bs-p">Manual for now: place these in Angel at the next open after month-end. A bot for it can be built (2 orders a month).</p>`; }
+    const mode = b.pie ? '<span class="bs-m">Manual only</span>' : `<div class="bs-seg" role="group" aria-label="Mode"><button data-mode="${b.id}" data-v="0" aria-pressed="${!bot}">Manual</button><button data-mode="${b.id}" data-v="1" aria-pressed="${bot}">🤖 Bot</button></div>`;
+    return `<article class="bs-c${on ? ' act' : ''}"><div class="bs-h"><span class="bs-n">${i + 1}</span><div><b>${esc(b.n)}</b>${on ? '<em>active</em>' : ''}<small>${esc(b.how)}</small></div>
+      <span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span></div>
+      ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
+  el.innerHTML = `<p class="bs-top">India stock baskets (1, 2, 3, 6, 7) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
+    ${BASKETS.map(card).join('')}<p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
+  el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));
+  el.querySelectorAll('[data-use]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.use); const cap = +el.querySelector(`[data-cap="${b.id}"]`).value || 0;
+    if (!window.confirm(`Make "${b.n}" your India basket?\nCapital ${cap ? money(cap, 'NSE') : 'whole account'} · split Pulse ${b.al.pr}% · Momentum ${b.al.mom}% · Cup 9/21 ${b.al.tf}%.\nOpen trades are not sold; new buys follow this basket.`)) return;
+    x.disabled = true; try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ capital: cap, alloc: { ...b.al, t9: 0, rt: 0, pt: 0, vcp: 0 } }) }); state._planC = null; try { localStorage.setItem('td.basket', b.id); } catch (e) { /* */ } alertMsg(`${b.n} is your India basket now.`, true); loadBasket(); } catch (e) { alertMsg(e.message); x.disabled = false; } }));
+  const usv = el.querySelector('[data-usave]'); if (usv) usv.addEventListener('click', async () => { try { await lvApi('/api/mmtb/cfg', { method: 'POST', body: JSON.stringify({ market: 'US', capital: +el.querySelector('[data-usc]').value || 0, risk_pct: +((((MT || {}).cfg || {}).US || {}).risk_pct || 1) }) }); alertMsg('Saved.', true); } catch (e) { alertMsg(e.message); } });
+  const pie = el.querySelector('[data-pie]'); if (pie) pie.addEventListener('change', () => { state.pieCap = +pie.value || 0; loadBasket(); });
+  const call = (x, on, pw, cf) => (x.k === 'tb' ? lvApi('/api/tb/auto' + (x.id === 'bn' ? '' : '?inst=' + x.id), { method: 'POST', body: JSON.stringify({ on, password: pw || '', confirm: cf || '' }) })
+    : lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ part: x.id, on, password: pw || '', confirm: cf || '' }) }));
+  el.querySelectorAll('[data-mode]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.mode); const want = x.dataset.v === '1'; const P = partsOf(b);
+    if (want === botOn(b)) return;
+    if (b.al && want && !isOn(b)) { alertMsg('Tap "Use this basket" first: the bot trades the active basket.'); return; }
+    if (!want) { for (const p of P.filter((q) => q.on)) { try { await call(p, false); } catch (e) { alertMsg(e.message); } } alertMsg(`${b.n}: manual. Nothing trades by itself; open trades keep their stops.`, true); loadBasket(); return; }
+    const arm = el.querySelector(`[data-arm="${b.id}"]`); arm.hidden = false;
+    arm.innerHTML = `<b>Bot ON: ${esc(b.n)}</b><small>Turns on: ${P.map((p) => (p.k === 'tb' ? 'Top Bottom ' + (TB_SHORT[p.id] || p.id) : { stock_buy: 'stock buys 09:20', stock_sell: 'stock sells 09:16', mm_us: 'US ETF Top Bottom' }[p.id] || p.id)).join(', ')}</small>
+      <input type="password" placeholder="App password" autocomplete="current-password"><input placeholder="Type AUTO" autocapitalize="characters"><button class="tr-go">Turn on</button>`;
+    const [pw, cf] = arm.querySelectorAll('input'); pw.focus();
+    arm.querySelector('button').addEventListener('click', async () => { const bad = [];
+      for (const p of P.filter((q) => !q.on)) { try { await call(p, true, pw.value, cf.value); } catch (e) { bad.push(e.message); } }
+      alertMsg(bad.length ? 'Not all switched on: ' + [...new Set(bad)].join('; ') : `${b.n}: bot ON. Check Auto for each part.`, !bad.length); loadBasket(); }); }));
 }
 
 /* ------------------------------------------------------------------ trends */
