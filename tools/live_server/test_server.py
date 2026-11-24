@@ -1438,3 +1438,21 @@ def test_moomoo_tb_paper_limits(tmp_path):
     assert not J.st["pos"]["AU"] and any("paper trading does not cover ASX" in n for n in J.st["notes"])
     assert c.get("/api/mmtb", headers={"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}).json()["au_paper_blocked"] is True
     os.environ.pop("TB_WORLD_FILE", None)
+
+
+def test_moomoo_order_ticket(tmp_path):
+    """24 Nov 2026: manual moomoo orders - typed confirmation, Live orders on, value cap, no short selling, book + cancel."""
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    b = dict(market="US", symbol="qqq", side="BUY", qty=3, price=650.0, kind="LIMIT", confirm="BUY 3 QQQ")
+    assert c.post("/api/mm/order", headers=h, json=dict(b, confirm="BUY 2 QQQ")).status_code == 400
+    assert "Live orders" in c.post("/api/mm/order", headers=h, json=b).json()["detail"]            # dry run: refused
+    A.set_live(True)
+    assert c.post("/api/mm/order", headers=h, json=dict(b, qty=100, confirm="BUY 100 QQQ")).status_code == 400   # above the cap
+    r = c.post("/api/mm/order", headers=h, json=b).json(); assert r["ok"] and r["order_id"] and r["env"] == "SIMULATE"
+    assert A.moomoo.pos["QQQ"] == 3
+    assert "no short selling" in c.post("/api/mm/order", headers=h, json=dict(b, side="SELL", qty=5, confirm="SELL 5 QQQ")).json()["detail"]
+    assert c.post("/api/mm/order", headers=h, json=dict(b, side="SELL", qty=3, confirm="SELL 3 QQQ")).json()["ok"]
+    B = c.get("/api/mm/book?market=US", headers=h).json(); assert B["env"] == "SIMULATE" and len(B["orders"]) == 2
+    A.moomoo.orders["X1"] = dict(sym="QQQ", qty=1, status="SUBMITTED", dealt=0.0, avg=0.0)
+    assert c.post("/api/mm/cancel", headers=h, json={"market": "US", "order_id": "X1"}).json()["ok"]

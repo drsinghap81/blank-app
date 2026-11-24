@@ -653,6 +653,31 @@ class MoomooTrade(MoomooRO):
         finally:
             t.close()
 
+    def orders_today(self, mk="US"):
+        """24 Nov 2026: today's orders in this market (manual order ticket): list of dict(id, sym, side, qty, price, aux, type, status, dealt, avg, time)."""
+        m, t, env = self._t(mk)
+        try:
+            ret, d = t.order_list_query(trd_env=env, acc_id=self.acc if mk == "US" else 0, refresh_cache=True)
+            if ret != m.RET_OK:
+                raise RuntimeError(str(d))
+            return [dict(id=str(r.order_id), sym=str(r.code).split(".", 1)[-1], side="SELL" if "SELL" in str(r.trd_side) else "BUY",
+                         qty=float(r.qty), price=float(r.price or 0), aux=float(getattr(r, "aux_price", 0) or 0), type=str(r.order_type),
+                         status=str(r.order_status), dealt=float(r.dealt_qty or 0), avg=float(r.dealt_avg_price or 0), time=str(r.create_time)[:19])
+                    for r in d.itertuples()]
+        finally:
+            t.close()
+
+    def positions(self, mk="US"):
+        m, t, env = self._t(mk)
+        try:
+            ret, d = t.position_list_query(trd_env=env, acc_id=self.acc if mk == "US" else 0, refresh_cache=True)
+            if ret != m.RET_OK:
+                raise RuntimeError(str(d))
+            return [dict(sym=str(r.code).split(".", 1)[-1], qty=float(r.qty), cost=float(getattr(r, "cost_price", 0) or 0),
+                         price=float(getattr(r, "nominal_price", 0) or 0), pnl=float(getattr(r, "pl_val", 0) or 0)) for r in d.itertuples() if float(r.qty) != 0]
+        finally:
+            t.close()
+
     def cash(self, mk="US"):
         """24 Nov 2026: cash in the market's currency (USD for US, AUD for AU) - for the moomoo Top Bottom sizing check."""
         m, t, env = self._t(mk)
@@ -707,6 +732,13 @@ class MockMoomoo:
 
     def cash(self, mk="US"):
         return 1e6
+
+    def orders_today(self, mk="US"):
+        return [dict(id=k, sym=o["sym"], side="BUY", qty=o["qty"], price=0.0, aux=float(o.get("stop") or 0), type="?", status=o["status"],
+                     dealt=o["dealt"], avg=o["avg"], time="") for k, o in self.orders.items()]
+
+    def positions(self, mk="US"):
+        return [dict(sym=k, qty=float(v), cost=0.0, price=self.px.get(k, 100.0), pnl=0.0) for k, v in self.pos.items() if v]
 
     def order(self, oid, mk="US"):
         o = self.orders.get(oid) or dict(status="UNKNOWN", dealt=0.0, avg=0.0); return dict(status=o["status"], dealt=o["dealt"], avg=o["avg"])

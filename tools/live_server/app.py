@@ -2527,6 +2527,107 @@ def mmtb_cfg(body: MMTBCfg, _=Depends(auth)):
     return mmtb_job().set_cfg(body.market, capital=body.capital, risk_pct=body.risk_pct)
 
 
+# ------------------------------------------------------------------ moomoo order ticket (24 Nov 2026)
+# Amritpal: "provide me provision to send orders like we have for Angel, that way we can check live". Any US / ASX symbol, BUY or SELL,
+# LIMIT (or MARKET), typed confirmation "BUY 3 QQQ", only with Live orders on, value capped (MM_MAX_ORDER_VALUE, local currency),
+# SELL only up to what you hold (no short selling). Goes to the account set on the server: SIMULATE (paper) unless MOOMOO_ENV=REAL.
+MM_MAX_ORDER_VALUE = float(ENV.get("MM_MAX_ORDER_VALUE", "25000"))
+
+
+class MMOrder(BaseModel):
+    market: str
+    symbol: str
+    side: str
+    qty: float
+    price: float = 0.0
+    kind: str = "LIMIT"          # LIMIT | MARKET
+    confirm: str = ""
+
+
+def _mm_ready():
+    if not (getattr(moomoo, "enabled", False) and getattr(moomoo, "trade_on", False)):
+        raise HTTPException(400, "moomoo trading is off on the server (connect moomoo first)")
+
+
+@app.get("/api/mm/book")
+def mm_book(market: str = "US", _=Depends(auth)):
+    _mm_ready()
+    if market not in ("US", "AU"):
+        raise HTTPException(400, "market must be US or AU")
+    out = dict(market=market, env=moomoo.env_name, live=is_live(), max_value=MM_MAX_ORDER_VALUE)
+    for k, fn in (("orders", moomoo.orders_today), ("positions", moomoo.positions)):
+        try:
+            out[k] = fn(market)
+        except Exception as ex:  # noqa: BLE001
+            out[k] = []; out[k + "_error"] = str(ex)[:200]
+    try:
+        out["cash"] = moomoo.cash(market)
+    except Exception as ex:  # noqa: BLE001
+        out["cash_error"] = str(ex)[:200]
+    return out
+
+
+@app.post("/api/mm/order")
+def mm_order(body: MMOrder, _=Depends(auth)):
+    _mm_ready()
+    mk = body.market.upper(); side = body.side.upper(); sym = body.symbol.strip().upper().replace(".AX", "")
+    if mk not in ("US", "AU") or side not in ("BUY", "SELL") or body.kind not in ("LIMIT", "MARKET"):
+        raise HTTPException(400, "check market (US/AU), side (BUY/SELL) and order type (LIMIT/MARKET)")
+    if not sym or len(sym) > 12 or not all(ch.isalnum() or ch in ".-" for ch in sym):
+        raise HTTPException(400, "check the symbol")
+    if body.qty <= 0 or body.qty != int(body.qty):
+        raise HTTPException(400, "quantity must be a whole number of shares")
+    q = int(body.qty)
+    if body.confirm.strip().upper() != f"{side} {q} {sym}":
+        raise HTTPException(400, f'type "{side} {q} {sym}" to confirm')
+    if not is_live():
+        raise HTTPException(400, "Live orders is off (Settings): switch it on to send to moomoo")
+    px = body.price
+    if body.kind == "MARKET" or px <= 0:
+        try:
+            px = float(moomoo.snapshot([sym], mk=mk)[sym]["last"])
+        except Exception as ex:  # noqa: BLE001
+            if body.kind == "MARKET":
+                raise HTTPException(400, f"no price from moomoo for {sym} ({str(ex)[:80]}): send a LIMIT order with your price")
+            raise HTTPException(400, "enter a limit price")
+    if q * px > MM_MAX_ORDER_VALUE:
+        raise HTTPException(400, f"order value {q * px:,.0f} is above the limit {MM_MAX_ORDER_VALUE:,.0f} (MM_MAX_ORDER_VALUE on the server)")
+    if side == "SELL":
+        try:
+            held = sum(p["qty"] for p in moomoo.positions(mk) if p["sym"] == sym)
+        except Exception as ex:  # noqa: BLE001
+            raise HTTPException(502, f"couldn't read your moomoo positions: {str(ex)[:120]}")
+        if q > held:
+            raise HTTPException(400, f"you hold {held:g} {sym} on this account - no short selling from the app")
+    try:
+        oid = moomoo.place(sym, side, q, "MARKET" if body.kind == "MARKET" else "NORMAL", round(px, 3), tif="DAY", mk=mk, remark="trenddesk-manual")
+    except Exception as ex:  # noqa: BLE001
+        log("mm_order_rejected", market=mk, symbol=sym, side=side, qty=q, error=str(ex)[:200])
+        raise HTTPException(400, f"moomoo rejected it: {str(ex)[:200]}")
+    log("mm_order", market=mk, symbol=sym, side=side, qty=q, price=px, order_type=body.kind, env=moomoo.env_name, order_id=oid)
+    st = {}
+    try:
+        time.sleep(1.5); st = moomoo.order(oid, mk=mk)
+    except Exception:  # noqa: BLE001
+        pass
+    return dict(ok=True, order_id=oid, env=moomoo.env_name, status=st.get("status"), dealt=st.get("dealt"), avg=st.get("avg"),
+                msg=f"Sent to moomoo ({'PAPER' if moomoo.env_name == 'SIMULATE' else 'REAL'}): {side} {q} {sym} {body.kind} {round(px, 3)} - order {oid} {st.get('status') or ''}")
+
+
+class MMCancel(BaseModel):
+    market: str
+    order_id: str
+
+
+@app.post("/api/mm/cancel")
+def mm_cancel(body: MMCancel, _=Depends(auth)):
+    _mm_ready()
+    ok = moomoo.cancel(body.order_id, mk=body.market.upper()); log("mm_cancel", market=body.market, order_id=body.order_id, ok=ok)
+    if not ok:
+        raise HTTPException(400, "moomoo did not cancel it (already filled or cancelled?)")
+    return dict(ok=True)
+
+
 def _auto_loop():
     n = 0
     while True:

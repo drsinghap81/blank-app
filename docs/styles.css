@@ -1746,3 +1746,15 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .au2-arm[hidden] { display: none; }
 @media (max-width: 520px) { .au2-grid { grid-template-columns: 1fr 1fr; } .au2-g { grid-template-columns: 96px 1fr auto; } }
 .au2-mm.off { opacity: .7; }
+/* moomoo order ticket */
+.au2-tk { margin-top: 10px; border: 1px solid var(--line); border-radius: 14px; padding: 10px; }
+.au2-tk summary { cursor: pointer; display: flex; gap: 8px; align-items: center; }
+.au2-tkrow { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+.au2-tkrow input { flex: 1 1 90px; min-width: 0; font: inherit; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.au2-tkrow input:disabled { opacity: .4; }
+.au2-tkrow .au2-big { margin-left: 0; }
+.au2-seg { display: inline-flex; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.au2-seg button { font: inherit; font-size: 13px; font-weight: 800; padding: 8px 12px; border: 0; background: var(--card); color: var(--slate); cursor: pointer; }
+.au2-seg button.on { background: var(--ink); color: var(--paper); }
+.au2-seg button.on.buy { background: var(--rise); color: #fff; }
+.au2-seg button.on[data-v="SELL"] { background: var(--fall); color: #fff; }

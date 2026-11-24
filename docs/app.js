@@ -1825,9 +1825,52 @@ async function mmtbBox(el) {
     <p class="au2-foot">${T.enabled ? `● moomoo connected · ${esc(T.env === 'SIMULATE' ? 'paper account' : T.env || '')}` : '○ moomoo not connected'} · levels ${esc(((T.levels || {}).US || {}).asof || '–')}
       <span class="au2-key"><i class="hold"></i>holding <i class="wait"></i>buy-stop today <i></i>next level</span></p>
     ${tr || (T.notes || []).length ? `<details class="info"><summary>moomoo trades & log</summary>${tr ? `<ul class="tb-msgs">${tr}</ul>` : ''}<ul class="tb-msgs">${(T.notes || []).slice(-8).reverse().map((n) => `<li>${esc(n)}</li>`).join('')}</ul></details>` : ''}`;
+  mmTicket(el);
   el.querySelectorAll('[data-mmsave]').forEach((b) => b.addEventListener('click', async () => { const m = b.dataset.mmsave;
     try { await lvApi('/api/mmtb/cfg', { method: 'POST', body: JSON.stringify({ market: m, capital: +el.querySelector('#mmcap' + m).value || 0, risk_pct: +el.querySelector('#mmrisk' + m).value || 1 }) });
       alertMsg(`moomoo ${nm[m]}: capital saved.`, true); mmtbBox(el); } catch (e) { alertMsg(e.message); } }));
+}
+
+/* 24 Nov 2026 (Amritpal: "provision to send orders like we have for Angel, so we can check live"): moomoo order ticket.
+   US or ASX, BUY/SELL, LIMIT or MARKET, typed confirmation; then today's orders (Cancel) and positions, straight from moomoo. */
+function mmTicket(host) {
+  const w = document.createElement('details'); w.className = 'au2-tk'; host.appendChild(w);
+  let mk = 'US', side = 'BUY', kind = 'LIMIT';
+  w.innerHTML = `<summary><b>Send a moomoo order</b> <span class="au2-st" id="tkenv">…</span></summary>
+    <div class="au2-tkrow"><div class="au2-seg" id="tkmk"><button data-v="US" class="on">US</button><button data-v="AU">ASX</button></div>
+      <div class="au2-seg" id="tkside"><button data-v="BUY" class="on buy">BUY</button><button data-v="SELL">SELL</button></div>
+      <div class="au2-seg" id="tkkind"><button data-v="LIMIT" class="on">LIMIT</button><button data-v="MARKET">MARKET</button></div></div>
+    <div class="au2-tkrow"><input id="tksym" placeholder="Symbol (QQQ)" autocapitalize="characters"><input id="tkqty" inputmode="numeric" placeholder="Qty"><input id="tkpx" inputmode="decimal" placeholder="Limit price"></div>
+    <div class="au2-tkrow"><input id="tkcf" placeholder="Type to confirm" autocapitalize="characters"><button class="au2-big" id="tkgo">Send</button></div>
+    <p class="au2-foot" id="tkmsg"></p><div id="tkbook"></div>`;
+  const $w = (q) => w.querySelector(q);
+  const conf = () => `${side} ${(+$w('#tkqty').value || 0)} ${($w('#tksym').value || '').trim().toUpperCase()}`;
+  const hint = () => { $w('#tkcf').placeholder = 'Type: ' + conf(); $w('#tkpx').disabled = kind === 'MARKET'; const g = $w('#tkgo'); g.textContent = `${side} ${mk === 'AU' ? 'ASX' : 'US'}`; g.classList.toggle('stop', side === 'SELL'); };
+  const seg = (id, set) => $w(id).querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { $w(id).querySelectorAll('button').forEach((x) => x.classList.remove('on', 'buy')); b.classList.add('on'); if (b.dataset.v === 'BUY') b.classList.add('buy'); set(b.dataset.v); hint(); }));
+  seg('#tkmk', (v) => { mk = v; book(); }); seg('#tkside', (v) => { side = v; }); seg('#tkkind', (v) => { kind = v; });
+  ['#tksym', '#tkqty'].forEach((q) => $w(q).addEventListener('input', hint)); hint();
+  async function book() {
+    const B = $w('#tkbook'); B.innerHTML = '<small class="muted">loading moomoo…</small>';
+    let D; try { D = await lvApi('/api/mm/book?market=' + mk); } catch (e) { B.innerHTML = `<small class="down">${esc(e.message)}</small>`; return; }
+    const env = $w('#tkenv'); env.textContent = D.env === 'SIMULATE' ? 'PAPER' : 'REAL'; env.classList.toggle('on', D.env !== 'SIMULATE');
+    const cur = mk === 'US' ? 'US$' : 'A$';
+    const ords = (D.orders || []).slice().reverse().map((o) => { const open = /SUBMIT|WAIT|PART/i.test(o.status) && !/CANCEL|FILLED_ALL/i.test(o.status);
+      return `<li><b class="${o.side === 'BUY' ? 'up' : 'down'}">${o.side}</b> ${fmt(o.qty, 0)} ${esc(o.sym)} @ ${fmt(o.price, 2)} · <small>${esc(o.status.replace('OrderStatus.', ''))}${o.dealt ? ` · filled ${fmt(o.dealt, 0)} @ ${fmt(o.avg, 2)}` : ''}</small>${open ? ` <button class="au2-save" data-cx="${esc(o.id)}">Cancel</button>` : ''}</li>`; }).join('');
+    const pos = (D.positions || []).map((p) => `<li>${esc(p.sym)} · ${fmt(p.qty, 0)} @ ${fmt(p.cost, 2)} · <span class="${p.pnl >= 0 ? 'up' : 'down'}">${p.pnl >= 0 ? '+' : ''}${fmt(p.pnl, 2)}</span></li>`).join('');
+    B.innerHTML = `<p class="au2-foot">${D.cash != null ? `Cash ${cur}${Math.round(D.cash).toLocaleString('en-AU')} · ` : ''}max ${cur}${Math.round(D.max_value).toLocaleString('en-AU')} an order${D.live ? '' : ' · <b class="down">Live orders is OFF</b>'}${D.orders_error ? ' · ' + esc(D.orders_error) : ''}</p>
+      <div class="au2-mmrow"><div><b>Today's orders</b><ul class="tb-msgs">${ords || '<li class="muted">none</li>'}</ul></div><div><b>Positions</b><ul class="tb-msgs">${pos || '<li class="muted">none</li>'}</ul></div></div>
+      <button class="au2-save" id="tkref" style="margin-top:6px">Refresh</button>`;
+    B.querySelectorAll('[data-cx]').forEach((b) => b.addEventListener('click', async () => { b.disabled = true;
+      try { await lvApi('/api/mm/cancel', { method: 'POST', body: JSON.stringify({ market: mk, order_id: b.dataset.cx }) }); alertMsg('Cancelled on moomoo.', true); } catch (e) { alertMsg(e.message); } book(); }));
+    B.querySelector('#tkref').addEventListener('click', book);
+  }
+  w.addEventListener('toggle', () => { if (w.open) book(); });
+  $w('#tkgo').addEventListener('click', async () => { const g = $w('#tkgo'); const m = $w('#tkmsg');
+    const body = { market: mk, symbol: $w('#tksym').value, side, qty: +$w('#tkqty').value, price: +$w('#tkpx').value || 0, kind, confirm: $w('#tkcf').value };
+    g.disabled = true; m.textContent = 'Sending to moomoo…';
+    try { const j = await lvApi('/api/mm/order', { method: 'POST', body: JSON.stringify(body), timeout: 30000 }); m.innerHTML = `<b class="up">✓</b> ${esc(j.msg)}`; $w('#tkcf').value = ''; book(); }
+    catch (e) { m.innerHTML = `<b class="down">✗</b> ${esc(e.message)}`; }
+    g.disabled = false; });
 }
 
 /* show as many next-ranked trades as the top 10 has unavailable ones (held, skipped, or blocked by a live check) */
