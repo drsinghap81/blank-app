@@ -38,7 +38,7 @@ def main():
             for i in range(210, n - 61):
                 if lv[i] <= mv[i] * 1.005:
                     if up[i] and cv[i] >= mv[i] * 0.99 and i - last > 10:
-                        T.append(dict(d=D[i], ma=m, rising=bool(rising[m][i]), steep=bool(steep[m][i]), stack=bool(stack[i]),
+                        T.append(dict(sym=sym, d=D[i], ma=m, f120=cv[i + 120] / cv[i] - 1 - 0.004 if i + 120 < n else np.nan, dd60=float(lv[i + 1:i + 61].min() / cv[i] - 1), rising=bool(rising[m][i]), steep=bool(steep[m][i]), stack=bool(stack[i]),
                                       f20=cv[i + 20] / cv[i] - 1 - 0.004, f60=cv[i + 60] / cv[i] - 1 - 0.004))
                     last = i
         piv = zz(cv); r50 = rising["SMA50"]; r20 = rising["EMA20"]
@@ -66,6 +66,21 @@ def main():
         print(f"R| {m:6s} touch, average rising      | {s(X[X.rising])}", flush=True)
         print(f"R| {m:6s} touch, rising steeply >2%/20d | {s(X[X.steep])}", flush=True)
         print(f"R| {m:6s} touch, all averages stacked+rising | {s(X[X["stack"]])}", flush=True)
+    # the standout: touch of a rising 100-SMA with every average stacked and rising - detail
+    for m in ("SMA100", "SMA50"):
+        X = T[(T.ma == m) & T["stack"]].copy(); U2 = U.copy()
+        if len(X) < 10:
+            continue
+        print(f"R| DETAIL {m} stacked touches: n {len(X)} in {X.sym.nunique()} stocks | median 60d {X.f60.median() * 100:+.1f}% | 120d avg {X.f120.mean() * 100:+.1f}% | worst dip in next 60d (median) {X.dd60.median() * 100:.1f}% | "
+              f"60d up {(X.f60 > 0).mean() * 100:.0f}% | top-5% removed 60d avg {X.f60[X.f60 < X.f60.quantile(0.95)].mean() * 100:+.1f}%", flush=True)
+        yr = X.groupby(X.d.dt.year).agg(n=("f60", "size"), f60=("f60", "mean")); uy = U2.groupby(U2.d.dt.year).f60.mean()
+        print(f"R| DETAIL {m} by year (n, 60d vs any uptrend day): " + " | ".join(f"{y}: {int(r.n)} {r.f60 * 100:+.1f}% vs {uy.get(y, float('nan')) * 100:+.1f}%" for y, r in yr.sort_index(ascending=False).iterrows()), flush=True)
+        end = X.d.max()
+        for k in (1, 3, 5):
+            Z = X[X.d > end - pd.DateOffset(years=k)]; UZ = U2[U2.d > end - pd.DateOffset(years=k)]
+            print(f"R| DETAIL {m} last {k}y: n {len(Z)} 60d {Z.f60.mean() * 100:+.1f}% vs any uptrend day {UZ.f60.mean() * 100:+.1f}%", flush=True)
+        xc = X[~((X.d >= "2020-02-15") & (X.d <= "2020-12-31"))]
+        print(f"R| DETAIL {m} ex-Covid: n {len(xc)} 60d {xc.f60.mean() * 100:+.1f}%", flush=True)
     for L in LV:
         X = F[F.lvl == L]
         print(f"R| Fib {L * 100:5.1f}%: all {s(X)}", flush=True)
