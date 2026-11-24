@@ -12,17 +12,23 @@
 {
 "symbol": "TECHM",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 1136.23,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 1777.5,
+"from_start_pct": 56.4
 },
 {
 "symbol": "SAREGAMA",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 307.05,
 "weeks_since_start": 37,
 "legs_done": 3,
 "close": 657.6,
-"from_start_pct": 114.2
+"from_start_pct": 114.2,
+"w3_vs_w1": 5.46
 },
 {
 "symbol": "LALPATHLAB",
@@ -37,22 +43,28 @@
 {
 "symbol": "ZYDUSLIFE",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 785.29,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 1199.5,
+"from_start_pct": 52.7
 },
 {
 "symbol": "DCBBANK",
 "system": "Pulse rotation",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 99.63,
 "weeks_since_start": 90,
 "legs_done": 3,
 "close": 237.93,
-"from_start_pct": 138.8
+"from_start_pct": 138.8,
+"w3_vs_w1": 2.44
 },
 {
 "symbol": "ZIMLAB",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 59.31,
 "weeks_since_start": 34,
 "legs_done": 1,
@@ -72,37 +84,44 @@
 {
 "symbol": "GLOBAL",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
-"start": 81.6,
-"weeks_since_start": 15,
-"legs_done": 1,
+"wave": "Impulse: wave 3 (extending, new highs)",
+"start": 40.22,
+"weeks_since_start": 87,
+"legs_done": 3,
 "close": 139.65,
-"from_start_pct": 71.1
+"from_start_pct": 247.2,
+"w3_vs_w1": 0.72
 },
 {
 "symbol": "DRREDDY",
 "system": "Monthly ATH",
 "wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
-"start": 1062.68,
-"weeks_since_start": 86,
+"start": 1007.18,
+"weeks_since_start": 85,
 "legs_done": 11,
 "close": 1380.1,
-"from_start_pct": 29.9
+"from_start_pct": 37.0
 },
 {
 "symbol": "INDHOTEL",
 "system": "Trend 9/21",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 562.49,
+"weeks_since_start": 34,
+"legs_done": 0,
+"close": 906.0,
+"from_start_pct": 61.1
 },
 {
 "symbol": "EICHERMOT",
 "system": "9/21 trend",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
-"start": 4578.12,
-"weeks_since_start": 93,
+"wave": "Impulse: wave 3 (extending, new highs)",
+"start": 4539.0,
+"weeks_since_start": 92,
 "legs_done": 3,
 "close": 8172.5,
-"from_start_pct": 78.5
+"from_start_pct": 80.1,
+"w3_vs_w1": 2.5
 },
 {
 "symbol": "ASAHIINDIA",
@@ -118,11 +137,11 @@
 "symbol": "AGARWALEYE",
 "system": "Trend 9/21",
 "wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
-"start": 361.1,
-"weeks_since_start": 85,
+"start": 327.0,
+"weeks_since_start": 78,
 "legs_done": 4,
 "close": 550.6,
-"from_start_pct": 52.5
+"from_start_pct": 68.4
 },
 {
 "symbol": "MCX",
@@ -137,18 +156,23 @@
 {
 "symbol": "NEOGEN",
 "system": "Breakout retest",
-"wave": "Impulse: wave 3",
-"start": 1100.67,
-"weeks_since_start": 34,
-"legs_done": 2,
+"wave": "Impulse: wave 5",
+"start": 966.23,
+"weeks_since_start": 50,
+"legs_done": 4,
 "close": 2787.7,
-"from_start_pct": 153.3,
-"w3_vs_w1": 0.46
+"from_start_pct": 188.5,
+"w5_target_eq_w1": 2554.14
 },
 {
 "symbol": "SMSPHARMA",
 "system": "Breakout retest",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 175.66,
+"weeks_since_start": 90,
+"legs_done": 0,
+"close": 466.0,
+"from_start_pct": 165.3
 },
 {
 "symbol": "TINNARUBR",
@@ -174,7 +198,12 @@
 {
 "symbol": "APOLLO",
 "system": "Breakout retest",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1 (extending, new highs)",
+"start": 92.42,
+"weeks_since_start": 100,
+"legs_done": 1,
+"close": 425.35,
+"from_start_pct": 360.2
 },
 {
 "symbol": "EIMCOELECO",
@@ -187,49 +216,60 @@
 "from_start_pct": 86.0
 },
 {
+"symbol": "STEELCAS",
+"system": "Breakout retest",
+"wave": "no clear swings"
+},
+{
 "symbol": "ICICIBANK",
 "system": "Pulse rotation",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 1167.08,
+"weeks_since_start": 96,
+"legs_done": 0,
+"close": 1585.5,
+"from_start_pct": 35.9
 },
 {
 "symbol": "KOTAKBANK",
 "system": "Pulse rotation",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
-"start": 344.9,
-"weeks_since_start": 34,
-"legs_done": 3,
+"wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
+"start": 343.76,
+"weeks_since_start": 97,
+"legs_done": 15,
 "close": 502.85,
-"from_start_pct": 45.8
+"from_start_pct": 46.3
 },
 {
 "symbol": "POONAWALLA",
 "system": "Trend 9/21",
 "wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
-"start": 361.2,
-"weeks_since_start": 34,
-"legs_done": 4,
+"start": 267.2,
+"weeks_since_start": 90,
+"legs_done": 10,
 "close": 517.4,
-"from_start_pct": 43.2
+"from_start_pct": 93.6
 },
 {
 "symbol": "TCS",
 "system": "9/21 trend",
-"wave": "Impulse: turning: wave 1 not yet confirmed",
-"start": 2523.1,
-"weeks_since_start": 41,
+"wave": "Impulse: wave 1",
+"start": 1955.62,
+"weeks_since_start": 21,
 "legs_done": 0,
 "close": 2460.0,
-"from_start_pct": -2.5
+"from_start_pct": 25.8
 },
 {
 "symbol": "SOUTHBANK",
 "system": "Pulse rotation",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 21.79,
 "weeks_since_start": 85,
 "legs_done": 3,
 "close": 58.87,
-"from_start_pct": 170.2
+"from_start_pct": 170.2,
+"w3_vs_w1": 3.19
 },
 {
 "symbol": "AXISBANK",
@@ -244,22 +284,32 @@
 {
 "symbol": "URBANCO",
 "system": "Pulse rotation",
-"wave": "Impulse: wave 1",
-"start": 126.51,
-"weeks_since_start": 5,
-"legs_done": 0,
+"wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
+"start": 100.7,
+"weeks_since_start": 38,
+"legs_done": 4,
 "close": 168.68,
-"from_start_pct": 33.3
+"from_start_pct": 67.5
 },
 {
 "symbol": "KARURVYSYA",
 "system": "Pulse rotation",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 151.91,
+"weeks_since_start": 89,
+"legs_done": 0,
+"close": 384.1,
+"from_start_pct": 152.9
 },
 {
 "symbol": "ETERNAL",
 "system": "Pulse rotation",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 194.8,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 362.1,
+"from_start_pct": 85.9
 },
 {
 "symbol": "CUB",
@@ -274,12 +324,13 @@
 {
 "symbol": "MANAKCOAT",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 72.15,
 "weeks_since_start": 88,
 "legs_done": 3,
 "close": 155.54,
-"from_start_pct": 115.6
+"from_start_pct": 115.6,
+"w3_vs_w1": 1.06
 },
 {
 "symbol": "GUFICBIO",
@@ -305,11 +356,11 @@
 "symbol": "SANATHAN",
 "system": "Monthly ATH",
 "wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
-"start": 335.1,
-"weeks_since_start": 98,
+"start": 286.95,
+"weeks_since_start": 90,
 "legs_done": 10,
 "close": 570.15,
-"from_start_pct": 70.1
+"from_start_pct": 98.7
 },
 {
 "symbol": "MAWANASUG",
@@ -332,19 +383,14 @@
 "from_start_pct": 64.2
 },
 {
-"symbol": "LOKESHMACH",
-"system": "Monthly ATH",
-"wave": "Impulse: wave 1",
-"start": 333.0,
-"weeks_since_start": 5,
-"legs_done": 0,
-"close": 361.8,
-"from_start_pct": 8.6
-},
-{
 "symbol": "OPTIEMUS",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 288.0,
+"weeks_since_start": 34,
+"legs_done": 0,
+"close": 778.55,
+"from_start_pct": 170.3
 },
 {
 "symbol": "DPABHUSHAN",
@@ -364,7 +410,7 @@
 {
 "symbol": "BIRLACABLE",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 103.34,
 "weeks_since_start": 34,
 "legs_done": 1,
@@ -374,17 +420,23 @@
 {
 "symbol": "AARTIPHARM",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 551.15,
+"weeks_since_start": 101,
+"legs_done": 0,
+"close": 1020.65,
+"from_start_pct": 85.2
 },
 {
 "symbol": "BODALCHEM",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 42.81,
 "weeks_since_start": 36,
 "legs_done": 3,
 "close": 140.59,
-"from_start_pct": 228.4
+"from_start_pct": 228.4,
+"w3_vs_w1": 2.13
 },
 {
 "symbol": "BIL",
@@ -394,7 +446,7 @@
 {
 "symbol": "MMP",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 184.26,
 "weeks_since_start": 34,
 "legs_done": 1,
@@ -425,32 +477,38 @@
 {
 "symbol": "RAYMOND",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 320.0,
+"weeks_since_start": 34,
+"legs_done": 0,
+"close": 1205.2,
+"from_start_pct": 276.6
 },
 {
 "symbol": "WELSPUNLIV",
 "system": "Monthly ATH",
 "wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
 "start": 103.5,
-"weeks_since_start": 85,
-"legs_done": 7,
+"weeks_since_start": 91,
+"legs_done": 9,
 "close": 270.76,
 "from_start_pct": 161.6
 },
 {
 "symbol": "TBZ",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 109.75,
 "weeks_since_start": 34,
 "legs_done": 3,
 "close": 534.9,
-"from_start_pct": 387.4
+"from_start_pct": 387.4,
+"w3_vs_w1": 8.86
 },
 {
 "symbol": "FOSECOIND",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 3169.29,
 "weeks_since_start": 91,
 "legs_done": 1,
@@ -460,17 +518,17 @@
 {
 "symbol": "CYIENTDLM",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
-"start": 495.0,
-"weeks_since_start": 96,
+"wave": "Impulse: wave 1 (extending, new highs)",
+"start": 265.2,
+"weeks_since_start": 34,
 "legs_done": 1,
 "close": 776.7,
-"from_start_pct": 56.9
+"from_start_pct": 192.9
 },
 {
 "symbol": "COFORGE",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 1005.76,
 "weeks_since_start": 36,
 "legs_done": 1,
@@ -490,22 +548,24 @@
 {
 "symbol": "KABRAEXTRU",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 180.0,
 "weeks_since_start": 44,
 "legs_done": 3,
 "close": 724.25,
-"from_start_pct": 302.4
+"from_start_pct": 302.4,
+"w3_vs_w1": 6.57
 },
 {
 "symbol": "AVADHSUGAR",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 300.3,
 "weeks_since_start": 44,
 "legs_done": 3,
 "close": 843.8,
-"from_start_pct": 181.0
+"from_start_pct": 181.0,
+"w3_vs_w1": 6.43
 },
 {
 "symbol": "ARIES",
@@ -520,7 +580,7 @@
 {
 "symbol": "KRONOX",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 95.73,
 "weeks_since_start": 34,
 "legs_done": 1,
@@ -540,7 +600,7 @@
 {
 "symbol": "KANPRPLA",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 103.42,
 "weeks_since_start": 85,
 "legs_done": 1,
@@ -551,36 +611,46 @@
 "symbol": "INDSWFTLAB",
 "system": "Monthly ATH",
 "wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
-"start": 81.47,
-"weeks_since_start": 90,
+"start": 68.72,
+"weeks_since_start": 81,
 "legs_done": 5,
 "close": 314.65,
-"from_start_pct": 286.2
+"from_start_pct": 357.9
 },
 {
 "symbol": "MACPOWER",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 625.35,
+"weeks_since_start": 88,
+"legs_done": 0,
+"close": 2032.4,
+"from_start_pct": 225.0
 },
 {
 "symbol": "VSSL",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
-"start": 199.12,
-"weeks_since_start": 95,
+"wave": "Impulse: wave 1 (extending, new highs)",
+"start": 174.33,
+"weeks_since_start": 88,
 "legs_done": 1,
 "close": 380.15,
-"from_start_pct": 90.9
+"from_start_pct": 118.1
 },
 {
 "symbol": "ALIVUS",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 816.09,
+"weeks_since_start": 44,
+"legs_done": 0,
+"close": 1410.3,
+"from_start_pct": 72.8
 },
 {
 "symbol": "KDDL",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 1986.01,
 "weeks_since_start": 34,
 "legs_done": 1,
@@ -602,31 +672,37 @@
 "symbol": "ASKAUTOLTD",
 "system": "Monthly ATH",
 "wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
-"start": 352.77,
-"weeks_since_start": 91,
+"start": 331.16,
+"weeks_since_start": 90,
 "legs_done": 8,
 "close": 623.5,
-"from_start_pct": 76.7
+"from_start_pct": 88.3
 },
 {
 "symbol": "JGCHEM",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 279.37,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 508.6,
+"from_start_pct": 82.1
 },
 {
 "symbol": "SPECTRUM",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 1050.0,
 "weeks_since_start": 45,
 "legs_done": 3,
 "close": 4244.8,
-"from_start_pct": 304.3
+"from_start_pct": 304.3,
+"w3_vs_w1": 5.16
 },
 {
 "symbol": "NAZARA",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 215.7,
 "weeks_since_start": 35,
 "legs_done": 1,
@@ -636,12 +712,22 @@
 {
 "symbol": "REDINGTON",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 169.37,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 331.3,
+"from_start_pct": 95.6
 },
 {
 "symbol": "SONACOMS",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse pullback: wave 2",
+"start": 376.41,
+"weeks_since_start": 85,
+"legs_done": 1,
+"close": 886.0,
+"from_start_pct": 135.4
 },
 {
 "symbol": "FILATEX",
@@ -666,22 +752,27 @@
 {
 "symbol": "VADILALIND",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 3373.83,
+"weeks_since_start": 96,
+"legs_done": 0,
+"close": 6893.0,
+"from_start_pct": 104.3
 },
 {
 "symbol": "DEEPINDS",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
-"start": 330.74,
-"weeks_since_start": 43,
+"wave": "Impulse: wave 1 (extending, new highs)",
+"start": 328.75,
+"weeks_since_start": 37,
 "legs_done": 1,
 "close": 635.4,
-"from_start_pct": 92.1
+"from_start_pct": 93.3
 },
 {
 "symbol": "CNL",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 524.76,
 "weeks_since_start": 34,
 "legs_done": 1,
@@ -691,12 +782,12 @@
 {
 "symbol": "SSWL",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
-"start": 167.82,
-"weeks_since_start": 34,
-"legs_done": 1,
+"wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
+"start": 165.38,
+"weeks_since_start": 88,
+"legs_done": 9,
 "close": 490.45,
-"from_start_pct": 192.2
+"from_start_pct": 196.6
 },
 {
 "symbol": "GNA",
@@ -711,12 +802,22 @@
 {
 "symbol": "SHYAMMETL",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 621.09,
+"weeks_since_start": 98,
+"legs_done": 0,
+"close": 1276.2,
+"from_start_pct": 105.5
 },
 {
 "symbol": "JSWINFRA",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 216.99,
+"weeks_since_start": 92,
+"legs_done": 0,
+"close": 353.55,
+"from_start_pct": 62.9
 },
 {
 "symbol": "CGCL",
@@ -731,7 +832,7 @@
 {
 "symbol": "IOLCP",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 56.73,
 "weeks_since_start": 85,
 "legs_done": 1,
@@ -741,37 +842,53 @@
 {
 "symbol": "UNIVASTU",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 56.02,
+"weeks_since_start": 34,
+"legs_done": 0,
+"close": 145.65,
+"from_start_pct": 160.0
 },
 {
 "symbol": "MADHUSUDAN",
 "system": "Monthly ATH",
 "wave": "Impulse pullback: wave 2",
-"start": 151.1,
-"weeks_since_start": 93,
+"start": 108.6,
+"weeks_since_start": 53,
 "legs_done": 1,
 "close": 246.0,
-"from_start_pct": 62.8
+"from_start_pct": 126.5
 },
 {
 "symbol": "WELENT",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 395.85,
+"weeks_since_start": 91,
+"legs_done": 0,
+"close": 684.7,
+"from_start_pct": 73.0
 },
 {
 "symbol": "BOSCHLTD",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 25407.29,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 48800.0,
+"from_start_pct": 92.1
 },
 {
 "symbol": "IPCALAB",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 1162.54,
 "weeks_since_start": 85,
 "legs_done": 3,
 "close": 1815.9,
-"from_start_pct": 56.2
+"from_start_pct": 56.2,
+"w3_vs_w1": 1.22
 },
 {
 "symbol": "AUROPHARMA",
@@ -786,12 +903,12 @@
 {
 "symbol": "ICIL",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
-"start": 263.07,
-"weeks_since_start": 93,
+"wave": "Impulse: wave 1 (extending, new highs)",
+"start": 210.88,
+"weeks_since_start": 85,
 "legs_done": 1,
 "close": 593.3,
-"from_start_pct": 125.5
+"from_start_pct": 181.3
 },
 {
 "symbol": "DIVISLAB",
@@ -806,22 +923,27 @@
 {
 "symbol": "NUVAMA",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 920.58,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 1758.3,
+"from_start_pct": 91.0
 },
 {
 "symbol": "MENONBE",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
-"start": 100.58,
-"weeks_since_start": 49,
-"legs_done": 3,
+"wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
+"start": 84.0,
+"weeks_since_start": 85,
+"legs_done": 7,
 "close": 293.55,
-"from_start_pct": 191.9
+"from_start_pct": 249.5
 },
 {
 "symbol": "RUBYMILLS",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 168.11,
 "weeks_since_start": 38,
 "legs_done": 1,
@@ -831,7 +953,7 @@
 {
 "symbol": "YASHO",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 1129.82,
 "weeks_since_start": 46,
 "legs_done": 1,
@@ -841,27 +963,42 @@
 {
 "symbol": "CORDSCABLE",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 126.59,
+"weeks_since_start": 34,
+"legs_done": 0,
+"close": 279.45,
+"from_start_pct": 120.7
 },
 {
 "symbol": "PARAS",
 "system": "Monthly ATH",
 "wave": "Impulse pullback: wave 2",
-"start": 500.54,
-"weeks_since_start": 99,
+"start": 404.11,
+"weeks_since_start": 90,
 "legs_done": 1,
 "close": 1257.9,
-"from_start_pct": 151.3
+"from_start_pct": 211.3
 },
 {
 "symbol": "MARINE",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 138.58,
+"weeks_since_start": 90,
+"legs_done": 0,
+"close": 406.95,
+"from_start_pct": 193.7
 },
 {
 "symbol": "MOTHERSON",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 70.99,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 165.76,
+"from_start_pct": 133.5
 },
 {
 "symbol": "SBCL",
@@ -876,47 +1013,65 @@
 {
 "symbol": "SHILPAMED",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 259.34,
+"weeks_since_start": 43,
+"legs_done": 0,
+"close": 857.2,
+"from_start_pct": 230.5
 },
 {
 "symbol": "VIJAYA",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 737.49,
+"weeks_since_start": 92,
+"legs_done": 0,
+"close": 1572.6,
+"from_start_pct": 113.2
 },
 {
 "symbol": "GRWRHITECH",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 2305.04,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 7895.0,
+"from_start_pct": 242.5
 },
 {
 "symbol": "NITINSPIN",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 286.6,
 "weeks_since_start": 90,
 "legs_done": 3,
 "close": 699.2,
-"from_start_pct": 144.0
+"from_start_pct": 144.0,
+"w3_vs_w1": 3.0
 },
 {
 "symbol": "KTKBANK",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 155.31,
 "weeks_since_start": 90,
 "legs_done": 3,
 "close": 341.25,
-"from_start_pct": 119.7
+"from_start_pct": 119.7,
+"w3_vs_w1": 3.7
 },
 {
 "symbol": "SPORTKING",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 68.99,
 "weeks_since_start": 90,
 "legs_done": 3,
 "close": 239.18,
-"from_start_pct": 246.7
+"from_start_pct": 246.7,
+"w3_vs_w1": 2.33
 },
 {
 "symbol": "WHEELS",
@@ -941,47 +1096,60 @@
 {
 "symbol": "INOXINDIA",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 881.7,
+"weeks_since_start": 95,
+"legs_done": 0,
+"close": 2088.0,
+"from_start_pct": 136.8
 },
 {
 "symbol": "AEROFLEX",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 147.65,
 "weeks_since_start": 85,
 "legs_done": 3,
 "close": 464.05,
-"from_start_pct": 214.3
+"from_start_pct": 214.3,
+"w3_vs_w1": 4.46
 },
 {
 "symbol": "AETHER",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
-"start": 891.6,
-"weeks_since_start": 38,
-"legs_done": 1,
+"wave": "Impulse: wave 3 (extending, new highs)",
+"start": 725.0,
+"weeks_since_start": 79,
+"legs_done": 3,
 "close": 1596.9,
-"from_start_pct": 79.1
+"from_start_pct": 120.3,
+"w3_vs_w1": 1.97
 },
 {
 "symbol": "BLISSGVS",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 107.33,
 "weeks_since_start": 85,
 "legs_done": 3,
 "close": 665.25,
-"from_start_pct": 519.8
+"from_start_pct": 519.8,
+"w3_vs_w1": 6.53
 },
 {
 "symbol": "SAKAR",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1 (extending, new highs)",
+"start": 210.1,
+"weeks_since_start": 87,
+"legs_done": 1,
+"close": 997.15,
+"from_start_pct": 374.6
 },
 {
 "symbol": "SWANDEF",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 37.8,
 "weeks_since_start": 96,
 "legs_done": 1,
@@ -991,12 +1159,13 @@
 {
 "symbol": "TMB",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 384.94,
 "weeks_since_start": 85,
 "legs_done": 3,
 "close": 857.9,
-"from_start_pct": 122.9
+"from_start_pct": 122.9,
+"w3_vs_w1": 5.82
 },
 {
 "symbol": "SANSERA",
@@ -1011,7 +1180,12 @@
 {
 "symbol": "CUPID",
 "system": "Monthly ATH",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 11.15,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 362.15,
+"from_start_pct": 3148.0
 },
 {
 "symbol": "LAURUSLABS",
@@ -1026,7 +1200,7 @@
 {
 "symbol": "NAVINFLUOR",
 "system": "Monthly ATH",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 3165.34,
 "weeks_since_start": 99,
 "legs_done": 1,
@@ -1036,7 +1210,7 @@
 {
 "symbol": "GABRIEL",
 "system": "Flag",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
+"wave": "Impulse: wave 1 (extending, new highs)",
 "start": 383.99,
 "weeks_since_start": 95,
 "legs_done": 1,
@@ -1046,27 +1220,43 @@
 {
 "symbol": "PGIL",
 "system": "Flag",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 429.89,
+"weeks_since_start": 85,
+"legs_done": 0,
+"close": 1479.4,
+"from_start_pct": 244.1
 },
 {
 "symbol": "ATHERENERG",
 "system": "Rectangle",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
-"start": 298.2,
-"weeks_since_start": 80,
+"wave": "Impulse: wave 3 (extending, new highs)",
+"start": 288.15,
+"weeks_since_start": 81,
 "legs_done": 3,
 "close": 1979.2,
-"from_start_pct": 563.7
+"from_start_pct": 586.9,
+"w3_vs_w1": 30.6
 },
 {
 "symbol": "ADANIPORTS",
 "system": "Rectangle",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 1001.63,
+"weeks_since_start": 95,
+"legs_done": 0,
+"close": 1919.0,
+"from_start_pct": 91.6
 },
 {
 "symbol": "BHARTIARTL",
 "system": "Rectangle",
-"wave": "no swing low in 2 years"
+"wave": "Impulse: wave 1",
+"start": 1527.35,
+"weeks_since_start": 91,
+"legs_done": 0,
+"close": 2128.5,
+"from_start_pct": 39.4
 },
 {
 "symbol": "GLAND",
@@ -1081,42 +1271,44 @@
 {
 "symbol": "TFCILTD",
 "system": "Flag",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
+"wave": "Impulse: wave 3 (extending, new highs)",
 "start": 24.09,
 "weeks_since_start": 93,
 "legs_done": 3,
 "close": 173.51,
-"from_start_pct": 620.2
+"from_start_pct": 620.2,
+"w3_vs_w1": 2.18
 },
 {
 "symbol": "SHREEJISPG",
 "system": "Flag",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
-"start": 235.41,
-"weeks_since_start": 61,
+"wave": "Impulse: wave 1 (extending, new highs)",
+"start": 221.44,
+"weeks_since_start": 59,
 "legs_done": 1,
 "close": 910.0,
-"from_start_pct": 286.6
+"from_start_pct": 310.9
 },
 {
 "symbol": "DPEL",
 "system": "Flag",
-"wave": "Impulse pullback: turning: wave 4 not yet confirmed",
-"start": 113.05,
-"weeks_since_start": 95,
+"wave": "Impulse: wave 3 (extending, new highs)",
+"start": 92.05,
+"weeks_since_start": 90,
 "legs_done": 3,
 "close": 661.0,
-"from_start_pct": 484.7
+"from_start_pct": 618.1,
+"w3_vs_w1": 7.08
 },
 {
 "symbol": "KMEW",
 "system": "Flag",
-"wave": "Impulse pullback: turning: wave 2 not yet confirmed",
-"start": 197.71,
-"weeks_since_start": 98,
+"wave": "Impulse: wave 1 (extending, new highs)",
+"start": 126.4,
+"weeks_since_start": 85,
 "legs_done": 1,
 "close": 709.4,
-"from_start_pct": 258.8
+"from_start_pct": 461.2
 },
 {
 "symbol": "THELEELA",
@@ -1141,12 +1333,13 @@
 {
 "symbol": "ANTHEM",
 "system": "Flag",
-"wave": "Corrective / overlapping (wave 4 overlapped wave 1)",
-"start": 700.07,
-"weeks_since_start": 70,
-"legs_done": 6,
+"wave": "Impulse: wave 3",
+"start": 577.64,
+"weeks_since_start": 42,
+"legs_done": 2,
 "close": 957.35,
-"from_start_pct": 36.7
+"from_start_pct": 65.7,
+"w3_vs_w1": 0.44
 },
 {
 "symbol": "ABCAPITAL",
