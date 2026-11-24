@@ -15,17 +15,17 @@ if [ "${1:-}" = "code" ]; then
   sleep 3; journalctl -u opend -n 15 --no-pager; exit 0
 fi
 URL="${1:-}"; [ -n "$URL" ] || { echo 'usage: opend_setup.sh "<OpenD Ubuntu .tar.gz link>"'; exit 1; }
-apt-get install -y -q netcat-openbsd >/dev/null 2>&1 || true
+echo "step 1/5: helper package"; timeout 120 apt-get install -y -q -o DPkg::Lock::Timeout=60 netcat-openbsd >/dev/null 2>&1 || echo "  (netcat not installed - only needed for a code entered later)"
 # memory: OpenD + the app on a 1 GB box needs swap (the server froze once on low memory)
 if [ "$(free -m | awk '/Mem:/{print $2}')" -lt 1900 ] && ! swapon --show | grep -q .; then
   fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile && echo '/swapfile none swap sw 0 0' >> /etc/fstab
   echo "added 2 GB swap"
 fi
 mkdir -p $D && cd $D && rm -rf dl && mkdir dl && cd dl
-curl -fsSL "$URL" -o opend.tgz && tar xzf opend.tgz
+echo "step 2/5: downloading OpenD"; curl -fsSL --max-time 600 "$URL" -o opend.tgz; echo "  downloaded $(du -h opend.tgz | cut -f1)"; echo "step 3/5: unpacking"; tar xzf opend.tgz; find . -maxdepth 3 | head -20
 BIN=$(find . -type f \( -name OpenD -o -name FutuOpenD -o -name MoomooOpenD \) -perm -u+x | head -1)
 [ -n "$BIN" ] || { echo "OpenD binary not found in the download - is it the Ubuntu command-line version?"; exit 1; }
-DIR=$(dirname "$BIN"); rm -rf $D/app && mv "$DIR" $D/app; cd $D/app
+DIR=$(dirname "$BIN"); rm -rf $D/app && mv "$DIR" $D/app; cd $D/app; echo "  OpenD: $BIN"
 XML=$(ls OpenD.xml FutuOpenD.xml 2>/dev/null | head -1); [ -n "$XML" ] || { echo "OpenD.xml not found"; exit 1; }
 if [ -n "${OPEND_ACC:-}" ] && [ -n "${OPEND_PWFILE:-}" ]; then ACC=$OPEND_ACC; PWF=$OPEND_PWFILE
 else
@@ -49,6 +49,7 @@ RestartSec=30
 WantedBy=multi-user.target
 UNIT
 systemctl daemon-reload; systemctl stop opend 2>/dev/null || true
+echo "step 5/5: first login"
 # OpenD >= 10.10: first login is interactive (remember password); opend_login.py answers it and waits for the SMS code
 ST=/opt/trenddesk/var/opend_setup.txt; : > $ST; chown trenddesk $ST 2>/dev/null || true
 python3 /opt/trenddesk/repo/tools/live_server/deploy/opend_login.py "$D/app/$(basename "$BIN")" "$D/app/$XML" "$ACC" "$PWF" $ST /opt/trenddesk/var/cmd_opendcode \
@@ -58,6 +59,7 @@ systemctl enable --now opend >/dev/null
 # app settings: read-only account view now; orders only on moomoo's PAPER account (SIMULATE) and only if MOOMOO_TRADE=1
 for kv in MOOMOO_ENABLED=1 MOOMOO_TRADE=1 MOOMOO_MARKETS=AU,US MOOMOO_FIRM=FUTUAU MOOMOO_ENV=SIMULATE; do
   k=${kv%%=*}; grep -q "^$k=" $ENVF && sed -i "s|^$k=.*|$kv|" $ENVF || echo "$kv" >> $ENVF; done
+echo "step 4/5: memory (swap)"
 # OpenD + the app need memory: make the swap file 2 GB if it is smaller (the server has little RAM)
 SW=$(swapon --show=SIZE --bytes --noheadings 2>/dev/null | awk '{s+=$1} END{print s+0}')
 if [ "${SW:-0}" -lt 2000000000 ] && [ "$(free -m | awk '/Mem:/{print $2}')" -lt 1900 ]; then

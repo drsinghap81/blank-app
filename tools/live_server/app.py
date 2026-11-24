@@ -403,7 +403,7 @@ def opend_status(_=Depends(auth)):
             return open(os.path.join(DATA, n)).read()[-4000:]
         except Exception:  # noqa: BLE001
             return ""
-    st = rd("opend_status.txt"); setup = (rd("opend_install.txt")[-1500:] + "\n" + rd("opend_setup.txt")).strip()
+    st = rd("opend_status.txt"); setup = (rd("opend_install.txt")[-1500:] + "\n" + rd("opend_setup.txt") + "\n" + rd("opend_unit.txt")).strip()
     low = (st + setup).lower()
     try:
         import socket

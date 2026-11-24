@@ -35,6 +35,10 @@ if [ -f "$VAR/cmd_opend.json" ] && ! systemctl is-active -q opend-install; then
     bash $APP/repo/tools/live_server/deploy/opend_setup.sh "$U" >/dev/null 2>&1 || log "opend-install unit failed to start"
   unset A P
 fi
+# progress of the install unit for the app's log
+if systemctl list-units --all --no-legend 'opend-install*' 2>/dev/null | grep -q . || [ -f "$VAR/opend_install.txt" ]; then
+  { echo "install job: $(systemctl is-active opend-install 2>/dev/null) ($(date -u +%H:%M:%SZ))"; journalctl -u opend-install -n 8 --no-pager -o cat 2>/dev/null | grep -v '^$' | tail -n 8; } > "$VAR/opend_unit.txt" 2>&1
+  chmod 644 "$VAR/opend_unit.txt"; fi
 # the SMS code: while the first login runs, opend_login.py reads cmd_opendcode itself; otherwise pass it over OpenD's telnet port
 if [ -f "$VAR/cmd_opendcode" ] && ! systemctl is-active -q opend-install; then C=$(tr -cd '0-9' < "$VAR/cmd_opendcode" | head -c 8); rm -f "$VAR/cmd_opendcode"
   [ -n "$C" ] && bash $APP/repo/tools/live_server/deploy/opend_setup.sh code "$C" > /dev/null 2>&1; log "moomoo SMS code passed to OpenD"; fi
