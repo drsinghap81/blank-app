@@ -1,18 +1,22 @@
-"""probe sources for 1990s Indian index history"""
-import io
+"""probe: BSE Sensex 1991-2000 daily tables from bse-1991-2000.blogspot.com (year pages)"""
+import re
 import requests
 import pandas as pd
+from io import StringIO
 U = {"User-Agent": "Mozilla/5.0"}
-for s in ("^snx", "^bse", "^sensex", "^nsei", "^nifty", "^cnx"):
+base = "https://bse-1991-2000.blogspot.com/"
+r = requests.get(base + "p/bse-sensex-historical-prices-in-year_1204.html", headers=U, timeout=30, allow_redirects=True)
+print("R| status", r.status_code, len(r.text), flush=True)
+links = sorted(set(re.findall(r'https?://bse-1991-2000\.blogspot\.com/p/[^"\'#]+\.html', r.text)))
+print("R| links", links, flush=True)
+for u in links:
     try:
-        r = requests.get(f"https://stooq.com/q/d/l/?s={s}&i=w", headers=U, timeout=30)
-        t = r.text[:200].replace("\n", " ")
-        print("R| stooq", s, r.status_code, t, flush=True)
-        if r.ok and "Date" in r.text[:50]:
-            d = pd.read_csv(io.StringIO(r.text)); d["Date"] = pd.to_datetime(d["Date"]); print("R| stooq", s, "from", d.Date.min(), "rows", len(d), flush=True)
-            x = d[(d.Date >= "1993-06-01") & (d.Date <= "1997-12-31")]
-            for _, z in x.iterrows():
-                print(f"R| OLD {s} {z.Date.date()} {z.Close}", flush=True)
-            break
+        t = requests.get(u.replace("http://", "https://"), headers=U, timeout=30).text
+        yr = re.findall(r"year (\d{4})", t[:5000]) or re.findall(r"19\d\d", u)
+        tabs = pd.read_html(StringIO(t))
+        big = max(tabs, key=len)
+        print(f"R| PAGE {u} years {yr[:3]} rows {len(big)} cols {list(big.columns)[:8]}", flush=True)
+        for _, z in big.iterrows():
+            print("R| ROW " + " | ".join(str(v) for v in z.values[:6]), flush=True)
     except Exception as e:  # noqa: BLE001
-        print("R| stooq fail", s, e, flush=True)
+        print("R| fail", u, str(e)[:150], flush=True)
