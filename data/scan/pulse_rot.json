@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-23 12:11 UTC",
+ "generated": "2026-11-24 02:09 UTC",
  "asof": "2026-11-23",
  "decided": "2026-11-20",
  "picks": [
@@ -45,7 +45,7 @@
    "industry": "E-Retail/ E-Commerce",
    "close": 253.11,
    "r3m": 20.8,
-   "rank": 8,
+   "rank": 7,
    "entry": 259.92,
    "entry_d": "2026-11-20",
    "since": -2.62
@@ -55,7 +55,7 @@
    "industry": "Private Sector Bank",
    "close": 58.87,
    "r3m": 30.4,
-   "rank": 2,
+   "rank": 3,
    "entry": 58.62,
    "entry_d": "2026-11-20",
    "since": 0.43
@@ -75,7 +75,7 @@
    "industry": "Private Sector Bank",
    "close": 1388.6,
    "r3m": 11.0,
-   "rank": 17,
+   "rank": 14,
    "entry": 1446.0,
    "entry_d": "2026-11-20",
    "since": -3.97
@@ -85,7 +85,7 @@
    "industry": "Private Sector Bank",
    "close": 1585.5,
    "r3m": 12.3,
-   "rank": 13,
+   "rank": 11,
    "entry": 1640.0,
    "entry_d": "2026-11-20",
    "since": -3.32
@@ -95,7 +95,7 @@
    "industry": "E-Retail/ E-Commerce",
    "close": 168.68,
    "r3m": 15.9,
-   "rank": 10,
+   "rank": 8,
    "entry": 168.95,
    "entry_d": "2026-11-20",
    "since": -0.16
@@ -105,7 +105,7 @@
    "industry": "Private Sector Bank",
    "close": 384.1,
    "r3m": 15.0,
-   "rank": 11,
+   "rank": 9,
    "entry": 377.0,
    "entry_d": "2026-11-20",
    "since": 1.88
@@ -115,7 +115,7 @@
    "industry": "E-Retail/ E-Commerce",
    "close": 362.1,
    "r3m": 10.4,
-   "rank": 19,
+   "rank": 15,
    "entry": 364.0,
    "entry_d": "2026-11-20",
    "since": -0.52
@@ -125,70 +125,64 @@
    "industry": "Private Sector Bank",
    "close": 245.54,
    "r3m": 11.9,
-   "rank": 14,
+   "rank": 12,
    "entry": 248.8,
    "entry_d": "2026-11-20",
    "since": -1.31
   }
  ],
  "ranked": [
-  "ORIENTHOT",
+  "ATHERENERG",
+  "NELCAST",
   "SOUTHBANK",
-  "THELEELA",
   "KOTAKBANK",
   "DCBBANK",
   "PTCIL",
-  "INDHOTEL",
   "MEESHO",
-  "LEMONTREE",
   "URBANCO",
   "KARURVYSYA",
   "ADANIPORTS",
   "ICICIBANK",
   "CUB",
   "GPPL",
-  "EIHOTEL",
   "AXISBANK",
-  "ITCHOTELS",
   "ETERNAL",
-  "AJAXENGG"
+  "NYKAA",
+  "JSWINFRA",
+  "KTKBANK",
+  "TVSMOTOR",
+  "STEELCAS"
  ],
  "industries": [
   {
-   "name": "Private Sector Bank",
-   "pulse": 43.1,
-   "momentum": 101.84,
-   "ratio": 99.7
-  },
-  {
-   "name": "Hotels & Resorts",
-   "pulse": 42.4,
-   "momentum": 100.21,
-   "ratio": 100.87
-  },
-  {
    "name": "Port & Port services",
-   "pulse": 60.3,
-   "momentum": 100.66,
-   "ratio": 98.67
+   "pulse": 58.7,
+   "momentum": 100.32,
+   "ratio": 97.17
+  },
+  {
+   "name": "2/3 Wheelers",
+   "pulse": 39.0,
+   "momentum": 100.12,
+   "ratio": 100.37
   },
   {
    "name": "Castings & Forgings",
-   "pulse": 41.0,
-   "momentum": 101.85,
-   "ratio": 93.67
+   "pulse": 46.8,
+   "momentum": 100.37,
+   "ratio": 94.17
   },
   {
    "name": "E-Retail/ E-Commerce",
    "pulse": 39.5,
-   "momentum": 101.13,
-   "ratio": 95.03
+   "momentum": 100.6,
+   "ratio": 93.53
   },
   {
-   "name": "Construction Vehicles",
-   "pulse": 39.7,
-   "momentum": 101.94,
-   "ratio": 98.1
+   "name": "Private Sector Bank",
+   "pulse": 43.1,
+   "momentum": 101.31,
+   "ratio": 98.12
   }
  ],
  "ledger": [
@@ -259,7 +253,7 @@
   "date": "2026-11-23",
   "since": "2026-11-20",
   "ret": -1.02,
-  "nifty": -1.75,
+  "nifty": 0.0,
   "week": -1.02,
   "open": 10,
   "closed": 0,
