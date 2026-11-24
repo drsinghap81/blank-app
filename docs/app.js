@@ -2254,10 +2254,15 @@ async function loadBasket() {
     const chips = (L, cls) => [...L].map((x) => `<span class="${cls}" title="${esc(tag[x])}">${esc(x)}<small>${esc(tag[x])}</small></span>`).join('');
     return `<div class="bs-st">${H.size ? `<p>Holds now · ${H.size}</p><div class="bs-chips">${chips(H, 'h')}</div>` : ''}<p>Buys at the next open · ${Bu.size}</p><div class="bs-chips">${chips(Bu, 'b') || '<span class="none">none today</span>'}</div>
       <small>${H.size + Bu.size} unique stocks. Sizes come from your capital once the basket is active (Trade Live).</small></div>`; };
+  /* 24 Nov 2026 (Amritpal: "high return low drawdown ones I need to trade on click of a button"): the active basket's orders for
+     today (sells first, then buys; rows the bot sends itself are left out) go in one tap - same typed confirmation and checks as Trade Live */
+  let OD = null; try { const D = await trIndia(); OD = { list: D.sells.concat(D.buys).filter((r) => !r.auto && !r.block) }; } catch (e) { OD = null; }
   const card = (b, i) => {
     const on = b.al ? isOn(b) : b.tbb ? Object.values(tb).some((x) => x.auto) || !!A.mm_us : false; const bot = b.pie ? false : botOn(b);
     let body = '';
-    if (b.al) body = on ? `<div class="bs-now"><span><b>${buysN}</b> to buy</span><span><b>${sellsN}</b> to sell</span><span>capital <b>${money(capNow, 'NSE')}</b></span><button class="tr-go" data-trade>Open Trade Live</button></div>`
+    if (b.al) body = on ? `<div class="bs-now"><span><b>${buysN}</b> to buy</span><span><b>${sellsN}</b> to sell</span><span>capital <b>${money(capNow, 'NSE')}</b></span></div>
+        ${OD && OD.list.length ? `<button class="bs-send" data-sendall>Send today's ${OD.list.length} order${OD.list.length > 1 ? 's' : ''} · ${money(OD.list.reduce((a, r) => a + (r.value || 0), 0), 'NSE')}</button>` : `<p class="bs-p">${bot ? 'The bot sends today\'s orders by itself.' : 'Nothing to send right now.'}</p>`}
+        <button class="t3-link" data-trade>Pick them one by one in Trade Live</button>`
       : `<label class="bs-in">Capital ₹ <input type="number" inputmode="numeric" data-cap="${b.id}" value="${Math.round(capNow) || ''}" placeholder="0 = whole Angel account"></label><button class="tr-go" data-use="${b.id}">Use this basket</button>`;
     if (b.tbb) { const usc = +((((MT || {}).cfg || {}).US || {}).capital || 0);
       body = `<div class="bs-sl">${Object.keys(TB_SHORT).map((i) => `<span class="${tb[i] ? (tb[i].auto ? 'on' : '') : 'na'}">${TB_SHORT[i]}${tb[i] ? '' : ' ·  not installed'}</span>`).join('')}<span class="${A.mm_us ? 'on' : ''}">US ETFs</span></div>
@@ -2276,6 +2281,7 @@ async function loadBasket() {
       ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
   el.innerHTML = `<p class="bs-top">India stock baskets (1, 2, 3, 6, 7) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
     ${BASKETS.map(card).join('')}<p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
+  { const sa = el.querySelector('[data-sendall]'); if (sa) sa.addEventListener('click', () => trSend(OD.list, 'NSE', sa).then(() => setTimeout(loadBasket, 3000))); }
   el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));
   el.querySelectorAll('[data-use]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.use); const cap = +el.querySelector(`[data-cap="${b.id}"]`).value || 0;
     if (!window.confirm(`Make "${b.n}" your India basket?\nCapital ${cap ? money(cap, 'NSE') : 'whole account'} · split Pulse ${b.al.pr}% · Momentum ${b.al.mom}% · Cup 9/21 ${b.al.tf}%.\nOpen trades are not sold; new buys follow this basket.`)) return;

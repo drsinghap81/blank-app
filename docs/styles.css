@@ -1893,3 +1893,5 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .bs-chips{display:flex;flex-wrap:wrap;gap:6px}
 .bs-chips span{display:inline-flex;flex-direction:column;padding:5px 9px;border-radius:9px;background:var(--paper);font-weight:800;font-size:13px;line-height:1.15}
 .bs-chips span small{font-weight:600;font-size:10.5px;color:var(--slate)}.bs-chips span.h{box-shadow:inset 0 0 0 1.5px var(--rise)}.bs-chips span.none{font-weight:600;color:var(--slate)}
+.bs-send{display:block;width:100%;margin:12px 0 6px;padding:15px;border:0;border-radius:14px;background:var(--accent);color:var(--on-accent);font:inherit;font-size:16px;font-weight:800;box-shadow:0 4px 0 rgba(0,0,0,.22);cursor:pointer}
+.bs-send:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.22)}.bs-send:disabled{opacity:.6}
