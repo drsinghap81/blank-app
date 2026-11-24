@@ -1597,7 +1597,7 @@ async function mmCard() {
       <p class="lv-sub">Your moomoo password goes only to your own server (HTTPS), is used once for OpenD's first login (which then remembers it, as moomoo's own app does) and the temporary copy is deleted. Trading stays on moomoo's <b>paper</b> account until you switch it.</p>`}
     ${M.need_code || (!ok && M.installed) ? `<div class="lv-form"><input id="mmcode" inputmode="numeric" placeholder="SMS code from moomoo"><button class="lv-btn" id="mmcodego">Send code</button></div>` : ''}
     ${M.need_agreement && !ok ? '<p class="lv-sub down"><b>OpenD says the API questionnaire / agreement isn\'t done.</b> Finish it at moomoo.com/en-us/about/api-disclaimer, then tap Install again.</p>' : ''}
-    ${M.status || M.setup ? `<details class="info"><summary>OpenD log (updates every minute)</summary><pre class="lv-sub" style="white-space:pre-wrap;font-size:11px;max-height:240px;overflow:auto">${esc(M.status || M.setup)}</pre></details>` : ''}
+    ${M.status || M.setup ? `<details class="info" open><summary>OpenD log (updates every minute)</summary><pre class="lv-sub" style="white-space:pre-wrap;font-size:11px;max-height:260px;overflow:auto">${esc([M.setup, M.status].filter(Boolean).join('\n----\n'))}</pre></details>` : ''}
     <button class="lv-btn ghost" id="mmref" style="margin-top:6px">Check again</button></details>`;
   box.querySelector('#mmref').addEventListener('click', mmCard);
   const go = box.querySelector('#mmgo'); if (go) go.addEventListener('click', async () => {

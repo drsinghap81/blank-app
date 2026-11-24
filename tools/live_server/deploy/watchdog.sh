@@ -21,20 +21,28 @@ if [ -f "$VAR/cmd_tbstocks" ]; then rm -f "$VAR/cmd_tbstocks"; log "Top Bottom s
 # 24 Nov 2026: Settings -> Server -> Connect moomoo (OpenD). The app writes cmd_opend.json (download link, moomoo ID, MD5 of the
 # login password - never the password itself) and cmd_opendcode (the SMS code); this root script installs / answers, then deletes them.
 for alt in $APP/repo/tools/live_server/var; do for c in cmd_opend.json cmd_opendcode; do [ -f "$alt/$c" ] && mv -f "$alt/$c" "$VAR/$c"; done; done
-if [ -f "$VAR/cmd_opend.json" ] && ! pgrep -f opend_login.py >/dev/null; then
+# (24 Nov 2026 fix) the install runs as its own systemd unit: a background job of this script was killed with the watchdog's cgroup.
+# The password goes to $VAR/opend_pw.tmp (600, root) only for opend_login.py, which deletes it; a leftover is removed when no install runs.
+if [ -f "$VAR/opend_pw.tmp" ] && ! systemctl is-active -q opend-install; then rm -f "$VAR/opend_pw.tmp"; fi
+if [ -f "$VAR/cmd_opend.json" ] && ! systemctl is-active -q opend-install; then
   J="$VAR/cmd_opend.json"; U=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['url'])" "$J"); A=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['acc'])" "$J")
-  P=$(mktemp); chmod 600 "$P"; python3 -c "import json,sys;open(sys.argv[2],'w').write(json.load(open(sys.argv[1]))['pw'])" "$J" "$P"; rm -f "$J"
+  P="$VAR/opend_pw.tmp"; ( umask 077; python3 -c "import json,sys;open(sys.argv[2],'w').write(json.load(open(sys.argv[1]))['pw'])" "$J" "$P" ); rm -f "$J"
   log "moomoo OpenD install requested from the app"
-  OPEND_ACC="$A" OPEND_PWFILE="$P" setsid nohup bash $APP/repo/tools/live_server/deploy/opend_setup.sh "$U" > "$VAR/opend_install.txt" 2>&1 < /dev/null &
+  echo "$(date -u +%FT%TZ) install started (download, memory, first login)..." > "$VAR/opend_install.txt"; chown trenddesk "$VAR/opend_install.txt" 2>/dev/null
+  systemctl reset-failed opend-install 2>/dev/null || true
+  systemd-run --unit=opend-install --collect --setenv=OPEND_ACC="$A" --setenv=OPEND_PWFILE="$P" \
+    -p StandardOutput=append:"$VAR/opend_install.txt" -p StandardError=append:"$VAR/opend_install.txt" \
+    bash $APP/repo/tools/live_server/deploy/opend_setup.sh "$U" >/dev/null 2>&1 || log "opend-install unit failed to start"
   unset A P
 fi
 # the SMS code: while the first login runs, opend_login.py reads cmd_opendcode itself; otherwise pass it over OpenD's telnet port
-if [ -f "$VAR/cmd_opendcode" ] && ! pgrep -f opend_login.py >/dev/null; then C=$(tr -cd '0-9' < "$VAR/cmd_opendcode" | head -c 8); rm -f "$VAR/cmd_opendcode"
+if [ -f "$VAR/cmd_opendcode" ] && ! systemctl is-active -q opend-install; then C=$(tr -cd '0-9' < "$VAR/cmd_opendcode" | head -c 8); rm -f "$VAR/cmd_opendcode"
   [ -n "$C" ] && bash $APP/repo/tools/live_server/deploy/opend_setup.sh code "$C" > /dev/null 2>&1; log "moomoo SMS code passed to OpenD"; fi
 if [ -f /etc/systemd/system/opend.service ]; then
   { echo "service: $(systemctl is-active opend)  checked: $(date -u +%FT%TZ)"; journalctl -u opend -n 25 --no-pager -o short-iso 2>&1 | tail -n 25; } > "$VAR/opend_status.txt" 2>&1
   [ -f /etc/trenddesk_opend_restarted ] || { systemctl is-active -q opend && systemctl restart trenddesk && touch /etc/trenddesk_opend_restarted; }
   chown trenddesk "$VAR/opend_status.txt" "$VAR/opend_setup.txt" 2>/dev/null; fi
+chmod 644 "$VAR/opend_install.txt" "$VAR/opend_setup.txt" 2>/dev/null
 if [ -f "$VAR/cmd_restart" ]; then rm -f "$VAR/cmd_restart"; log "restart requested from the app"; systemctl restart trenddesk; echo 0 > "$F"; exit 0; fi
 # 19 Nov 2026: a 1 GB swap file (the server has ~400 MB of RAM; a restart that loads Angel's contract list could freeze it)
 if [ -z "$(swapon --show --noheadings 2>/dev/null)" ] && [ ! -f "$VAR/swap_failed" ]; then

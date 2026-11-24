@@ -403,7 +403,7 @@ def opend_status(_=Depends(auth)):
             return open(os.path.join(DATA, n)).read()[-4000:]
         except Exception:  # noqa: BLE001
             return ""
-    st = rd("opend_status.txt"); setup = rd("opend_setup.txt")
+    st = rd("opend_status.txt"); setup = (rd("opend_install.txt")[-1500:] + "\n" + rd("opend_setup.txt")).strip()
     low = (st + setup).lower()
     try:
         import socket
@@ -413,7 +413,7 @@ def opend_status(_=Depends(auth)):
         connected = False
     need_code = "waiting for sms code" in low.split("sms code passed")[-1] or ("verify" in low and "code" in low and "success" not in low.split("verify")[-1])
     need_agree = "questionnaire" in low or "disclaimer" in low or "agreement" in low
-    return dict(installed=bool(st), pending=os.path.exists(os.path.join(DATA, "cmd_opend.json")), port_open=connected,
+    return dict(installed=bool(st or setup), pending=os.path.exists(os.path.join(DATA, "cmd_opend.json")), port_open=connected,
                 need_code=need_code, need_agreement=need_agree, status=st, setup=setup[-1500:])
 
 
