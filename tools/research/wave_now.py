@@ -38,9 +38,13 @@ def count(x):
     if len(P) < 2:
         return "no clear swings", {}
     lows = [p for p in P if p[2] == "L" and p[0] >= n - 104]
-    if not lows:
-        return "no swing low in 2 years", {}
-    s = min(lows, key=lambda p: p[1]); k = P.index(s); seq = P[k:]
+    j = int(np.argmin(l[max(0, n - 104):])) + max(0, n - 104)          # lowest low of the last 2 years
+    if lows and min(lows, key=lambda p: p[1])[1] <= l[j] * 1.0001:
+        s = min(lows, key=lambda p: p[1]); seq = P[P.index(s):]
+    else:                                                               # low not confirmed as a pivot: start there anyway
+        s = (j, l[j], "L"); seq = [s] + [p for p in P if p[0] > j]
+        if len(seq) > 1 and seq[1][2] == "L":
+            seq = [s] + seq[2:]
     pts = [p[1] for p in seq] + [c[-1]]               # start, pivots..., current close (leg in progress)
     legs = len(pts) - 1                                 # completed legs = len(seq)-1, plus the one in progress
     done = len(seq) - 1
@@ -58,11 +62,13 @@ def count(x):
         return ("5 waves done - correction (A-B-C) likely" if done == 5 else f"Beyond 5 waves ({done} legs) - correction / new cycle"), info
     cur = done + 1                                      # wave in progress
     up = c[-1] > seq[-1][1]
-    if cur in (1, 3, 5) and not up or cur in (2, 4) and up:
-        cur_txt = f"turning: wave {cur} not yet confirmed"
+    if cur in (2, 4) and up:            # above the last swing high: the previous impulse wave is still extending
+        cur -= 1; cur_txt = f"wave {cur} (extending, new highs)"
+    elif cur in (3, 5) and not up:      # below the last swing low: the pullback is still deepening
+        cur -= 1; cur_txt = f"wave {cur} (pullback deepening)"
     else:
         cur_txt = f"wave {cur}"
-    if cur == 3 and done >= 2:
+    if cur == 3 and done >= 2 and len(w) >= 3:
         info["w3_vs_w1"] = round((c[-1] - pts[2]) / max(1e-9, w[0]), 2)     # 1.618 = typical wave 3 target
     if cur == 5 and done >= 4:
         info["w5_target_eq_w1"] = round(pts[4] + w[0], 2)
