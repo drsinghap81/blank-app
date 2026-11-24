@@ -755,7 +755,7 @@ const KIND_TXT = { PR: 'Pulse rotation · weekly pick', MY_GTT: 'Your pick · GT
 /* Systems as capital buckets (9 Nov 2026): % = the most of your capital a system may hold; all share one cash pool,
    Momentum first, swing buckets keep 15% in cash for Momentum. NSE one-account test 2017-26: Momentum <= 60% + Trend 9/21 <= 40%
    23.1%/yr, worst fall -21.4%; Momentum alone 17.3%, -16.8%. */
-const BK_DEF = { mom: 60, tf: 40, t9: 0, rt: 0, pt: 0, vcp: 0, my: 0, s1: 0, wc: 0, tb: 100, pr: 0 };   // optimised 9 Nov 2026; pr = Pulse rotation trial (22 Nov)
+const BK_DEF = { mom: 100, tf: 100, t9: 0, rt: 0, pt: 0, vcp: 0, my: 0, s1: 0, wc: 0, tb: 100, pr: 0 };   // optimised 9 Nov 2026; pr = Pulse rotation trial (22 Nov)
 // Angel-style track: stop ── entry ── now ── target, positioned to scale
 function slTrack(o) {
   const { stop, entry, now } = o; if (!(stop > 0 && entry > 0) || stop >= entry) return '';
@@ -2069,7 +2069,7 @@ async function trIndia() {
   const hold = (S.trades || []).filter((t) => t.state === 'open').map((t) => ({ symbol: t.symbol, qty: t.qty, sys: TR_SYS[{ 'Monthly ATH': 'mom', 'Trend 9/21': 'tf' }[t.system]] || t.system, pnl: t.ltp && t.entry ? (t.ltp / t.entry - 1) * 100 : null }));
   const on = A ? [A.stock_sell && 'stock sells 09:16', A.stock_buy && 'stock buys 09:20'].filter(Boolean).join(', ') : '';
   return { broker: 'Angel One', real: S.mode === 'LIVE', modeTxt: 'dry run: nothing is sent', sells, buys, hold, autoTxt: on, why,
-    sizeTxt: `Sizes: ${fmt(S.risk_pct || 1, 2)}% risk on ${money(S.capital, 'NSE')}, inside your split and cash.` };
+    sizeTxt: `Sizes: ${fmt(S.risk_pct || 1, 2)}% risk on ${money(S.capital, 'NSE')}, within your cash (no split between systems).` };
 }
 /* US / ASX: the evening plan sized on your capital (as Full view), moomoo positions and mode from the server */
 async function trWorld(mk) {

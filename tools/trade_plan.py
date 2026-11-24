@@ -46,11 +46,13 @@ def buckets(mk):
       Breakout retests in the portfolio: -1.3%/yr alone (slots fill with the weak clusters) -> off.
     Systems 1-3 (tested 9 Nov) did not beat the Nifty or duplicated Momentum -> System 2/3 removed, System 1 off."""
     india = mk == "NSE"
-    B = [dict(key="mom", name="Momentum Investing", system="Monthly ATH", status="active", pct=60,
+    # 24 Nov 2026 (Amritpal: "Remove capital split" -> no caps, same systems): Momentum and Trend 9/21 may each use all capital;
+    # each buy is still 1% risk, max 10% a stock, the cash reserve stays; the off systems stay off.
+    B = [dict(key="mom", name="Momentum Investing", system="Monthly ATH", status="active", pct=100,
               rules="Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high. "
                     "Stop: weekly close below the 30-week SMA, raised every week until it triggers.",
               test="NSE 2017-26 alone: 17.3%/yr, worst fall -16.8%." if india else "US/ASX 2008-26: did not beat the index (paper phase)." if mk in ("US", "ASX") else "UK 2008-26: about 1%/yr vs the FTSE 100 2.8% (price) - no edge (paper phase)."),
-         dict(key="tf", name="Trend Following 9/21", system=TF_SYS, status="active", pct=40,
+         dict(key="tf", name="Trend Following 9/21", system=TF_SYS, status="active", pct=100,
               rules="Same monthly breakout with a 1-2 year cup. Stop for sizing: EMA 21 (min 4% under the entry); "
                     "exit when a daily close has EMA 9 below EMA 21 (sell next open).",
               test="NSE 2017-26 alone 10.5%/yr, worst fall -15.6%; with Momentum (60/40, one account) 23.1%/yr, -21.4%." if india

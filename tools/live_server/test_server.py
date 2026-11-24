@@ -308,7 +308,7 @@ def test_buckets(tmp_path):
     A, c = client(tmp_path)
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     P = c.get("/api/plan", headers=h).json()
-    B = {b["key"]: b for b in P["buckets"]}; assert B["mom"]["pct"] == 60 and B["tf"]["pct"] == 40 and B["t9"]["pct"] == 0 and B["s1"]["pct"] == 0 and B["tb"]["pct"] == 100
+    B = {b["key"]: b for b in P["buckets"]}; assert B["mom"]["pct"] == 100 and B["tf"]["pct"] == 100 and B["t9"]["pct"] == 0 and B["s1"]["pct"] == 0 and B["tb"]["pct"] == 100
     assert all(r.get("bucket") in ("mom", "tf", "t9", "rt", "pt", "vcp", "my", "pr") for r in P["rows"])
     j = c.post("/api/picks", headers=h, json={"alloc": {"tf": 1, "rt": 0, "t9": 0, "bogus": 50}}).json()
     assert j["alloc"]["tf"] == 1 and "bogus" not in j["alloc"] and j["picks"] == 10
@@ -321,7 +321,7 @@ def test_buckets(tmp_path):
     assert any(r["kind"] == "PATTERN" and r["id"].startswith("PAT-") and r["qty"] > 0 for r in P2["rows"])
     assert A.protect_level("PATTERN", 100) == 100
     mom = [r for r in P2["rows"] if r["bucket"] == "mom" and not r["skip"]]
-    assert sum(r["value"] for r in mom) <= 0.60 * 2000000 + 1
+    assert sum(r["value"] for r in mom) <= 1.0 * 2000000 + 1          # 24 Nov 2026: no split cap, cash is the limit
     assert A.protect_level("TF_BRK", 100) < 100           # Trend 9/21: safety net only, the system exits on the EMA cross
 
 

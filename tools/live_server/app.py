@@ -99,9 +99,9 @@ def swing_risk() -> float:
 # Systems as buckets (9 Nov 2026): each may hold at most alloc% of capital; all share one cash pool (Momentum first,
 # swing buckets keep SWING_RESERVE in cash). NSE 2017-26 one-account test: Momentum <= 60% + Trend 9/21 <= 40% 23.1%/yr,
 # worst fall -21.4%, vs Momentum alone 17.3%, -16.8%. Top Bottom runs on pledge margin (its own bot), not this cash.
-BUCKETS = {"mom": 60, "tf": 40, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "my": 0, "s1": 0, "wc": 0, "tb": 100, "pr": 0}   # optimised 9 Nov (trade_plan.buckets); pr = Pulse rotation trial (22 Nov, starts at 0%)
+BUCKETS = {"mom": 100, "tf": 100, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "my": 0, "s1": 0, "wc": 0, "tb": 100, "pr": 0}   # optimised 9 Nov (trade_plan.buckets); pr = Pulse rotation trial (22 Nov, starts at 0%)
 PR_N = 10          # Pulse rotation: equal weight, your % / 10 a stock
-ALLOC_V = 2
+ALLOC_V = 3         # 24 Nov 2026 (Amritpal: "Remove capital split"): no caps on Momentum / Trend 9/21; older saved splits are dropped
 SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt", "VCP": "vcp", "My pick": "my", "Pulse rotation": "pr"}
 STOP_KINDS = ("ATH_STOP", "TF_STOP", "VCP_STOP")   # buy-stop rows (stop-limit day orders)
 
