@@ -16,17 +16,24 @@ if [ "${1:-}" = "code" ]; then
 fi
 URL="${1:-}"; [ -n "$URL" ] || { echo 'usage: opend_setup.sh "<OpenD Ubuntu .tar.gz link>"'; exit 1; }
 echo "step 1/5: helper package"; timeout 120 apt-get install -y -q -o DPkg::Lock::Timeout=60 netcat-openbsd >/dev/null 2>&1 || echo "  (netcat not installed - only needed for a code entered later)"
-# memory: OpenD + the app on a 1 GB box needs swap (the server froze once on low memory)
-if [ "$(free -m | awk '/Mem:/{print $2}')" -lt 1900 ] && ! swapon --show | grep -q .; then
-  fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile && echo '/swapfile none swap sw 0 0' >> /etc/fstab
-  echo "added 2 GB swap"
+echo "step 2/5: memory (swap)"
+# OpenD + the app need memory: the server has ~400 MB RAM. Add a second 1 GB swap file (never switch the existing one off).
+SW=$(swapon --show=SIZE --bytes --noheadings 2>/dev/null | awk '{s+=$1} END{print s+0}')
+if [ "${SW:-0}" -lt 1900000000 ] && [ ! -f /swapfile2 ]; then
+  { fallocate -l 1G /swapfile2 || dd if=/dev/zero of=/swapfile2 bs=1M count=1024; } >/dev/null 2>&1 && chmod 600 /swapfile2 && mkswap /swapfile2 >/dev/null \
+    && swapon /swapfile2 && { grep -q '^/swapfile2 ' /etc/fstab || echo '/swapfile2 none swap sw 0 0' >> /etc/fstab; } && echo "  swap now $(free -m | awk '/Swap:/{print $2}') MB" || echo "  (could not add swap - continuing)"
 fi
 mkdir -p $D && cd $D && rm -rf dl && mkdir dl && cd dl
-echo "step 2/5: downloading OpenD"; curl -fsSL --max-time 600 "$URL" -o opend.tgz; echo "  downloaded $(du -h opend.tgz | cut -f1)"; echo "step 3/5: unpacking"; tar xzf opend.tgz; find . -maxdepth 3 | head -20
-BIN=$(find . -type f \( -name OpenD -o -name FutuOpenD -o -name MoomooOpenD \) -perm -u+x | head -1)
-[ -n "$BIN" ] || { echo "OpenD binary not found in the download - is it the Ubuntu command-line version?"; exit 1; }
-DIR=$(dirname "$BIN"); rm -rf $D/app && mv "$DIR" $D/app; cd $D/app; echo "  OpenD: $BIN"
-XML=$(ls OpenD.xml FutuOpenD.xml 2>/dev/null | head -1); [ -n "$XML" ] || { echo "OpenD.xml not found"; exit 1; }
+echo "step 3/5: downloading OpenD"; curl -fsSL --max-time 600 "$URL" -o opend.tgz; echo "  downloaded $(du -h opend.tgz | cut -f1)"
+echo "step 4/5: unpacking"; tar xzf opend.tgz
+find . -maxdepth 3 > files.txt || true; head -n 15 files.txt
+BIN=$(find . -type f -perm -u+x \( -name OpenD -o -name FutuOpenD -o -name MoomooOpenD -o -iname '*opend' \) 2>/dev/null > bins.txt || true; head -n 1 bins.txt)
+[ -n "$BIN" ] || { echo "OpenD program not found in the download - is it the Ubuntu command-line version?"; exit 1; }
+DIR=$(dirname "$BIN"); rm -rf $D/app && mv "$DIR" $D/app; cd $D/app; echo "  OpenD: $(basename "$BIN")"
+XML=""; for x in OpenD.xml FutuOpenD.xml MoomooOpenD.xml; do [ -f "$x" ] && { XML=$x; break; }; done
+[ -n "$XML" ] || { XML=$(find . -maxdepth 1 -name '*.xml' > xml.txt || true; head -n 1 xml.txt); XML=${XML#./}; }
+[ -n "$XML" ] || { echo "OpenD's .xml config file not found"; ls; exit 1; }
+echo "  config: $XML"
 if [ -n "${OPEND_ACC:-}" ] && [ -n "${OPEND_PWFILE:-}" ]; then ACC=$OPEND_ACC; PWF=$OPEND_PWFILE
 else
   read -r -p "moomoo ID (login account number, email or +countrycode phone): " ACC
@@ -59,14 +66,6 @@ systemctl enable --now opend >/dev/null
 # app settings: read-only account view now; orders only on moomoo's PAPER account (SIMULATE) and only if MOOMOO_TRADE=1
 for kv in MOOMOO_ENABLED=1 MOOMOO_TRADE=1 MOOMOO_MARKETS=AU,US MOOMOO_FIRM=FUTUAU MOOMOO_ENV=SIMULATE; do
   k=${kv%%=*}; grep -q "^$k=" $ENVF && sed -i "s|^$k=.*|$kv|" $ENVF || echo "$kv" >> $ENVF; done
-echo "step 4/5: memory (swap)"
-# OpenD + the app need memory: make the swap file 2 GB if it is smaller (the server has little RAM)
-SW=$(swapon --show=SIZE --bytes --noheadings 2>/dev/null | awk '{s+=$1} END{print s+0}')
-if [ "${SW:-0}" -lt 2000000000 ] && [ "$(free -m | awk '/Mem:/{print $2}')" -lt 1900 ]; then
-  swapoff /swapfile 2>/dev/null || true; rm -f /swapfile
-  { fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048; } >/dev/null 2>&1 && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile \
-    && { grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab; } && echo "swap file now 2 GB"
-fi
 sleep 12; journalctl -u opend -n 20 --no-pager
 echo
 echo "If the log asks for a phone verification code:  sudo bash $0 code <code from SMS>"
