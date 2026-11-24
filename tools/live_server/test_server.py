@@ -1412,3 +1412,29 @@ def test_moomoo_tb_entry_day_rule_and_soft_orders(tmp_path):
     clock["t"] = datetime(2026, 11, 25, 9, 40, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
     assert not J.st["pos"]["US"] and J.st["trades"][-1]["why"].startswith("entry-day")
     os.environ.pop("TB_WORLD_FILE", None)
+
+
+def test_moomoo_tb_paper_limits(tmp_path):
+    """24 Nov 2026 (real paper test): moomoo paper refuses STOP_LIMIT ('Paper trading does not support Stop Limit order') and has
+    no ASX through the API -> US goes straight to the watched entry next time; ASX on paper places nothing and says why."""
+    import json as _j
+    from datetime import datetime
+    W = dict(markets=dict(US=dict(asof="2026-11-23", symbols=dict(QQQ=dict(date="2026-11-23", open=650, high=652, low=645, close=651.03,
+             top=659.5, bot=640.0, buy_lvl=659.84, bot_stop=639.68))), AU=dict(asof="2026-11-23", symbols={})))
+    wf = os.path.join(str(tmp_path), "tbw.json"); _j.dump(W, open(wf, "w")); os.environ["TB_WORLD_FILE"] = wf
+    A, c = client(tmp_path)
+    import mm_tb
+    J = A.mmtb_job(); J.live_on = lambda: True; J.auto_on = lambda mk: True
+    orig = A.moomoo.place
+    def place(sym, side, qty, otype, price, aux=None, tif="DAY", mk="US", remark=""):
+        if otype == "STOP_LIMIT":
+            raise RuntimeError("Paper trading does not support Stop Limit order.")
+        return orig(sym, side, qty, otype, price, aux=aux, tif=tif, mk=mk, remark=remark)
+    A.moomoo.place = place
+    J.set_cfg("US", capital=10000); J.set_cfg("AU", capital=10000)
+    J.now = lambda mk: datetime(2026, 11, 24, 9, 10, tzinfo=mm_tb.MKT["US"]["tz"]) if mk == "US" else datetime(2026, 11, 24, 9, 40, tzinfo=mm_tb.MKT["AU"]["tz"])
+    J.step()
+    assert J.st["pos"]["US"]["QQQ"]["state"] == "watch" and "STOP_LIMIT" in J.st["unsupported"]["US"]
+    assert not J.st["pos"]["AU"] and any("paper trading does not cover ASX" in n for n in J.st["notes"])
+    assert c.get("/api/mmtb", headers={"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}).json()["au_paper_blocked"] is True
+    os.environ.pop("TB_WORLD_FILE", None)

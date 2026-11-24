@@ -90,13 +90,22 @@ class MMTB:
         except Exception as ex:  # noqa: BLE001
             L["error"] = str(ex)[:160]
         return dict(cfg=self.st["cfg"], pos=self.st["pos"], trades=self.st["trades"][-40:], notes=self.st["notes"][-20:], levels=L,
+                    unsupported=self.st.get("unsupported", {}), au_paper_blocked=getattr(self.mm, "env_name", "") == "SIMULATE",
                     env=getattr(self.mm, "env_name", "?"), enabled=bool(getattr(self.mm, "enabled", False) and getattr(self.mm, "trade_on", False)))
 
     def _place(self, mk, sym, side, qty, otype, price, aux=None, tif="DAY"):
+        no = self.st.setdefault("unsupported", {}).setdefault(mk, [])
+        if otype in no:
+            raise RuntimeError(f"{otype} not supported on this account (remembered)")
         if not self.live_on():
             self.note(mk, f"DRY RUN (Live orders off): would {side} {qty} {sym} {otype} {price}{' trigger ' + str(aux) if aux else ''}")
             return "DRY"
-        return self.mm.place(sym, side, qty, otype, price, aux=aux, tif=tif, mk=mk, remark="trenddesk-tb")
+        try:
+            return self.mm.place(sym, side, qty, otype, price, aux=aux, tif=tif, mk=mk, remark="trenddesk-tb")
+        except Exception as ex:
+            if otype in ("STOP", "STOP_LIMIT") and "not support" in str(ex).lower():
+                no.append(otype); self.note(mk, f"moomoo: {otype} orders not supported here - the server watches prices and sends limit orders instead")
+            raise
 
     def _order(self, mk, oid):
         if oid == "DRY":
@@ -132,6 +141,12 @@ class MMTB:
             self._monitor(mk, n, hm >= M["close"])
 
     def _preopen(self, mk, n):
+        if mk == "AU" and getattr(self.mm, "env_name", "") == "SIMULATE":
+            if self.st["pos"]["AU"] or self.auto_on("AU"):
+                self.note(mk, "moomoo's paper trading does not cover ASX through the API - ASX runs only on the real account")
+                self.alert("moomoo Top Bottom ASX: moomoo's paper account can't trade ASX through the API - nothing placed (US paper works)",
+                           key=f"mmtb:aupaper:{n.date()}")
+            return
         W = self.levels() or {}; Mk = (W.get("markets") or {}).get(mk) or {}; asof = Mk.get("asof"); S = Mk.get("symbols") or {}
         today = n.date()
         if not asof or date.fromisoformat(asof) >= today or (today - date.fromisoformat(asof)).days > 5:

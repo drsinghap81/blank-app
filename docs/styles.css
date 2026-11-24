@@ -1745,3 +1745,4 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 @media (prefers-reduced-motion: reduce) { .au2-sw, .au2-sw i { transition: none; } }
 .au2-arm[hidden] { display: none; }
 @media (max-width: 520px) { .au2-grid { grid-template-columns: 1fr 1fr; } .au2-g { grid-template-columns: 96px 1fr auto; } }
+.au2-mm.off { opacity: .7; }

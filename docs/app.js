@@ -1817,8 +1817,9 @@ async function mmtbBox(el) {
       if (p) return `<span class="au2-c wait" title="buy-stop for today"><i></i>${esc(s)} <b>buy ▲${fmt(p.trig, 2)}</b> ×${fmt(p.qty, 0)}</span>`;
       if (r.buy_lvl) return `<span class="au2-c" title="next buy level"><i></i>${esc(s)} ▲${fmt(r.buy_lvl, 2)} <small>${fmt((r.buy_lvl / r.close - 1) * 100, 1)}%</small></span>`;
       return `<span class="au2-c off" title="waiting for a new swing top"><i></i>${esc(s)} –</span>`; }).join('');
-    return `<div class="au2-mm"><div class="au2-mmh"><span class="au2-mk">${nm[m]}</span><b>moomoo ETFs</b><label>${cur[m]}<input id="mmcap${m}" inputmode="decimal" placeholder="capital" value="${c.capital || ''}"></label><label>risk %<input id="mmrisk${m}" inputmode="decimal" value="${c.risk_pct || 1}"></label><button class="au2-save" data-mmsave="${m}">Save</button></div>
-      <div class="au2-chips">${chips}</div></div>`; };
+    const blocked = m === 'AU' && T.au_paper_blocked;
+    return `<div class="au2-mm${blocked ? ' off' : ''}"><div class="au2-mmh"><span class="au2-mk">${nm[m]}</span><b>moomoo ETFs</b>${blocked ? '<span class="au2-st">REAL ACCOUNT ONLY</span>' : ''}<label>${cur[m]}<input id="mmcap${m}" inputmode="decimal" placeholder="capital" value="${c.capital || ''}"></label><label>risk %<input id="mmrisk${m}" inputmode="decimal" value="${c.risk_pct || 1}"></label><button class="au2-save" data-mmsave="${m}">Save</button></div>
+      <div class="au2-chips">${chips}</div>${blocked ? '<small class="muted">moomoo\'s paper trading has no ASX through the API, so ASX trades only once you switch to the real account.</small>' : ''}${(T.unsupported || {})[m] && (T.unsupported || {})[m].length ? `<small class="muted">moomoo refuses ${esc(T.unsupported[m].join(' / '))} here: the server watches prices and sends limit orders instead.</small>` : ''}</div>`; };
   const tr = (T.trades || []).slice(-6).reverse().map((t) => `<li class="${t.pct >= 0 ? 'up' : 'down'}">${esc(t.exit_date)} ${esc(t.sym)} ${t.pct >= 0 ? '+' : ''}${fmt(t.pct, 2)}%</li>`).join('');
   el.innerHTML = `<div class="au2-mmrow">${mk('US')}${mk('AU')}</div>
     <p class="au2-foot">${T.enabled ? `● moomoo connected · ${esc(T.env === 'SIMULATE' ? 'paper account' : T.env || '')}` : '○ moomoo not connected'} · levels ${esc(((T.levels || {}).US || {}).asof || '–')}
