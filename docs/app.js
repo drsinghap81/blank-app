@@ -2040,7 +2040,7 @@ async function trIndia() {
   if (P) $('#asof').textContent = `India close ${closeTxt('NSE', P.asof)}`;
   const al = lvAlloc('NSE', P || {}, S); const L = 'en-IN'; const f = (v) => fmt(v, 2, L);
   const sysT = new Set((S.trades || []).filter((t) => t.system).map((t) => t.symbol));
-  const buys = (S.rows || []).filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && r.want !== false && (bkOf(r) === 'my' || (al[bkOf(r)] ?? 0) > 0))
+  const buys = (S.rows || []).filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && r.want !== false && bkOf(r) !== 'my' && r.kind !== 'MY_GTT' && (al[bkOf(r)] ?? 0) > 0)   // 24 Nov: system signals only (Amritpal: "I want to stick to system")
     .map((r) => { const E = r.trigger || r.price;
       return { ...r, src: r, sys: TR_SYS[bkOf(r)] || r.system || '', value: r.value || r.qty * E,
         line: `${isStopK(r.kind) || r.kind === 'MY_GTT' ? `buy above ${f(r.trigger)}` : `limit ${f(r.price)}`} · stop ${f(r.stop)} · risk ${money(r.risk_amt || r.qty * (E - r.stop), 'NSE')}`,
@@ -2064,7 +2064,7 @@ async function trWorld(mk) {
   const top = lvRoomCut((P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
     return { ...r, E, qty: q, value: q * E, risk_amt: q * (E - r.stop), off: !sel.has(r.id) }; }), al, C0).filter((r) => !r.off && r.qty > 0);
   const idle = Math.max(0, C0 * 0.85 - top.reduce((a, r) => a + r.value, 0));
-  const sw = lvRoomCut(lvSwingSize(P.swing || [], C0, idle, lvSR(mk), lvSwSel(mk, P.asof)), al, C0).filter((r) => !r.skip && r.qty > 0 && r.want !== false);
+  const sw = lvRoomCut(lvSwingSize(P.swing || [], C0, idle, lvSR(mk), lvSwSel(mk, P.asof)), al, C0).filter((r) => !r.skip && r.qty > 0 && r.want !== false && bkOf(r) !== 'my');
   const pos = {}; ((B && B.positions) || []).forEach((p) => { pos[p.sym] = (pos[p.sym] || 0) + p.qty; });
   const buys = top.concat(sw).filter((r) => !pos[r.symbol]).map((r) => { const E = r.trigger || r.price; const stopK = isStopK(r.kind) || r.kind === 'MY_GTT';
     return { ...r, src: r, sys: TR_SYS[bkOf(r)] || r.system || '', value: r.qty * E, stopK,
