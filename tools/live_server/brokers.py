@@ -540,9 +540,9 @@ class MoomooTrade(MoomooRO):
     def _q(self):
         m = _mm(); return m, m.OpenQuoteContext(host=self.host, port=self.port)
 
-    def _t(self):
+    def _t(self, mk="US"):
         m = _mm()
-        t = m.OpenSecTradeContext(filter_trdmarket=m.TrdMarket.US, host=self.host, port=self.port, security_firm=getattr(m.SecurityFirm, self.firm))
+        t = m.OpenSecTradeContext(filter_trdmarket=getattr(m.TrdMarket, mk), host=self.host, port=self.port, security_firm=getattr(m.SecurityFirm, self.firm))
         if self.env_name == "REAL":
             ret, d = t.unlock_trade(password=self.pwd)
             if ret != m.RET_OK:
@@ -550,14 +550,14 @@ class MoomooTrade(MoomooRO):
         return m, t, getattr(m.TrdEnv, self.env_name)
 
     @staticmethod
-    def code(sym):
-        return "US." + sym.replace("-", ".")
+    def code(sym, mk="US"):
+        return f"{mk}." + sym.replace("-", ".")
 
-    def snapshot(self, syms):
+    def snapshot(self, syms, mk="US"):
         m, q = self._q(); out = {}
         try:
             for i in range(0, len(syms), 380):
-                ret, d = q.get_market_snapshot([self.code(s) for s in syms[i:i + 380]])
+                ret, d = q.get_market_snapshot([self.code(s, mk) for s in syms[i:i + 380]])
                 if ret != m.RET_OK:
                     raise RuntimeError(f"moomoo snapshot: {d}")
                 for r in d.itertuples():
@@ -620,24 +620,24 @@ class MoomooTrade(MoomooRO):
         finally:
             t.close()
 
-    def place(self, sym, side, qty, otype, price, aux=None, tif="DAY"):
-        m, t, env = self._t()
+    def place(self, sym, side, qty, otype, price, aux=None, tif="DAY", mk="US", remark="trenddesk-rsi2"):
+        m, t, env = self._t(mk)
         try:
-            ret, d = t.place_order(price=float(price), qty=float(qty), code=self.code(sym), trd_side=getattr(m.TrdSide, side),
-                                   order_type=getattr(m.OrderType, otype), trd_env=env, acc_id=self.acc,
-                                   time_in_force=getattr(m.TimeInForce, tif), aux_price=aux, remark="trenddesk-rsi2")
+            ret, d = t.place_order(price=float(price), qty=float(qty), code=self.code(sym, mk), trd_side=getattr(m.TrdSide, side),
+                                   order_type=getattr(m.OrderType, otype), trd_env=env, acc_id=self.acc if mk == "US" else 0,
+                                   time_in_force=getattr(m.TimeInForce, tif), aux_price=aux, remark=remark)
             if ret != m.RET_OK:
                 raise RuntimeError(str(d))
             return str(d["order_id"].iloc[0])
         finally:
             t.close()
 
-    def order(self, oid):
-        m, t, env = self._t()
+    def order(self, oid, mk="US"):
+        m, t, env = self._t(mk); acc = self.acc if mk == "US" else 0
         try:
-            ret, d = t.order_list_query(order_id=oid, trd_env=env, acc_id=self.acc, refresh_cache=True)
+            ret, d = t.order_list_query(order_id=oid, trd_env=env, acc_id=acc, refresh_cache=True)
             if ret == m.RET_OK and d.empty:
-                ret, d = t.history_order_list_query(trd_env=env, acc_id=self.acc); d = d[d.order_id == oid] if ret == m.RET_OK else d
+                ret, d = t.history_order_list_query(trd_env=env, acc_id=acc); d = d[d.order_id == oid] if ret == m.RET_OK else d
             if ret != m.RET_OK or d.empty:
                 return dict(status="UNKNOWN", dealt=0.0, avg=0.0)
             r = d.iloc[0]
@@ -645,11 +645,31 @@ class MoomooTrade(MoomooRO):
         finally:
             t.close()
 
-    def cancel(self, oid):
-        m, t, env = self._t()
+    def cancel(self, oid, mk="US"):
+        m, t, env = self._t(mk)
         try:
-            ret, _ = t.modify_order(m.ModifyOrderOp.CANCEL, oid, 0, 0, trd_env=env, acc_id=self.acc)
+            ret, _ = t.modify_order(m.ModifyOrderOp.CANCEL, oid, 0, 0, trd_env=env, acc_id=self.acc if mk == "US" else 0)
             return ret == m.RET_OK
+        finally:
+            t.close()
+
+    def cash(self, mk="US"):
+        """24 Nov 2026: cash in the market's currency (USD for US, AUD for AU) - for the moomoo Top Bottom sizing check."""
+        m, t, env = self._t(mk)
+        try:
+            ret, d = t.accinfo_query(trd_env=env, acc_id=self.acc if mk == "US" else 0, refresh_cache=True,
+                                     currency=getattr(m.Currency, "USD" if mk == "US" else "AUD"))
+            if ret != m.RET_OK:
+                raise RuntimeError(f"moomoo account: {d}")
+            r = d.iloc[0]
+            for k in ("cash", "power"):
+                try:
+                    v = float(r[k])
+                    if v == v:
+                        return v
+                except (KeyError, TypeError, ValueError):
+                    pass
+            return 0.0
         finally:
             t.close()
 
@@ -663,7 +683,7 @@ class MockMoomoo:
     def account(self):
         return dict(broker="moomoo (mock)", enabled=True, accounts=[])
 
-    def snapshot(self, syms):
+    def snapshot(self, syms, mk="US"):
         return {s: dict(last=self.px.get(s, 100.0), low=self.px.get(s, 100.0), open=self.px.get(s, 100.0), prev=self.prev.get(s, 100.0),
                         ut=datetime.now(ET_TZ).strftime("%Y-%m-%d %H:%M:%S")) for s in syms}
 
@@ -676,17 +696,22 @@ class MockMoomoo:
     def us_deals(self, days=40):
         return list(getattr(self, "deals", []))
 
-    def place(self, sym, side, qty, otype, price, aux=None, tif="DAY"):
+    def place(self, sym, side, qty, otype, price, aux=None, tif="DAY", mk="US", remark=""):
         self.n += 1; oid = f"MM{self.n}"
-        if otype == "STOP":
+        if getattr(self, "reject", None) and otype in self.reject:
+            raise RuntimeError(f"order type {otype} not supported")
+        if otype in ("STOP", "STOP_LIMIT"):
             self.orders[oid] = dict(sym=sym, qty=qty, stop=aux, status="SUBMITTED", dealt=0.0, avg=0.0); return oid
         px = self.px.get(sym, 100.0); self.pos[sym] = self.pos.get(sym, 0) + (qty if side == "BUY" else -qty)
         self.orders[oid] = dict(sym=sym, qty=qty, status="FILLED_ALL", dealt=float(qty), avg=px); return oid
 
-    def order(self, oid):
+    def cash(self, mk="US"):
+        return 1e6
+
+    def order(self, oid, mk="US"):
         o = self.orders.get(oid) or dict(status="UNKNOWN", dealt=0.0, avg=0.0); return dict(status=o["status"], dealt=o["dealt"], avg=o["avg"])
 
-    def cancel(self, oid):
+    def cancel(self, oid, mk="US"):
         if oid in self.orders and self.orders[oid]["status"] == "SUBMITTED":
             self.orders[oid]["status"] = "CANCELLED_ALL"
         return True

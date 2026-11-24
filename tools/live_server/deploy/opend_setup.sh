@@ -56,7 +56,7 @@ python3 /opt/trenddesk/repo/tools/live_server/deploy/opend_login.py "$D/app/$(ba
 rm -f "$PWF"
 systemctl enable --now opend >/dev/null
 # app settings: read-only account view now; orders only on moomoo's PAPER account (SIMULATE) and only if MOOMOO_TRADE=1
-for kv in MOOMOO_ENABLED=1 MOOMOO_MARKETS=AU,US MOOMOO_FIRM=FUTUAU MOOMOO_ENV=SIMULATE; do
+for kv in MOOMOO_ENABLED=1 MOOMOO_TRADE=1 MOOMOO_MARKETS=AU,US MOOMOO_FIRM=FUTUAU MOOMOO_ENV=SIMULATE; do
   k=${kv%%=*}; grep -q "^$k=" $ENVF && sed -i "s|^$k=.*|$kv|" $ENVF || echo "$kv" >> $ENVF; done
 # OpenD + the app need memory: make the swap file 2 GB if it is smaller (the server has little RAM)
 SW=$(swapon --show=SIZE --bytes --noheadings 2>/dev/null | awk '{s+=$1} END{print s+0}')

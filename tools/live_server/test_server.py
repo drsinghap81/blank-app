@@ -1349,3 +1349,65 @@ def test_moomoo_connect_form(tmp_path):
     assert c.post("/api/moomoo/code", headers=h, json={"code": "12"}).status_code == 400
     assert c.post("/api/moomoo/code", headers=h, json={"code": "123 456"}).status_code == 200
     s = c.get("/api/moomoo/status", headers=h).json(); assert s["pending"] is True and s["port_open"] in (True, False)
+
+
+def test_moomoo_top_bottom_engine(tmp_path):
+    """24 Nov 2026: moomoo Top Bottom - pre-open buy-stop only with automation on, fill -> GTC stop, stop raised to breakeven,
+    entry-day rule, stop fill -> trade logged; MANUAL stops new entries but keeps managing open trades."""
+    import json as _j
+    from datetime import datetime
+    W = dict(markets=dict(US=dict(asof="2026-11-23", symbols=dict(QQQ=dict(date="2026-11-23", open=650, high=652, low=645, close=651.03, top=659.5,
+             bot=640.0, buy_lvl=659.84, bot_stop=639.68))), AU=dict(asof="2026-11-23", symbols={})))
+    wf = os.path.join(str(tmp_path), "tbw.json"); _j.dump(W, open(wf, "w")); os.environ["TB_WORLD_FILE"] = wf
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    import mm_tb
+    J = A.mmtb_job(); A.is_live = lambda: True; J.live_on = lambda: True
+    clock = {"t": datetime(2026, 11, 24, 9, 10, tzinfo=mm_tb.MKT["US"]["tz"])}
+    J.now = lambda mk: clock["t"] if mk == "US" else datetime(2026, 11, 22, 12, 0, tzinfo=mm_tb.MKT["AU"]["tz"])
+    assert c.post("/api/mmtb/cfg", headers=h, json={"market": "US", "capital": 3000, "risk_pct": 1.0}).json()["capital"] == 3000
+    J.step()                                                     # automation off -> nothing placed
+    assert not J.st["pos"]["US"]
+    c.post("/api/auto", headers=h, json={"part": "mm_us", "on": True, "password": "pw", "confirm": "AUTO"})
+    J.st["day"]["US"] = None; J.step()
+    p = J.st["pos"]["US"]["QQQ"]; assert p["state"] == "pending" and p["trig"] == 659.84 and p["lim"] == 666.43
+    assert p["qty"] == 1                                         # min(1% x 3000 / (659.84 - 646.64), 3000/4/666.43) -> 1 share
+    o = A.moomoo.orders[p["entry_oid"]]; o.update(status="FILLED_ALL", dealt=1.0, avg=660.0)
+    clock["t"] = datetime(2026, 11, 24, 10, 0, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+    p = J.st["pos"]["US"]["QQQ"]; assert p["state"] == "open" and p["entry"] == 660.0 and p["stop_oid"] and p["stop"] < 660
+    # next morning: +2% seen -> stop to breakeven; MANUAL keeps managing
+    c.post("/api/auto/manual", headers=h)
+    W["markets"]["US"]["asof"] = "2026-11-24"; W["markets"]["US"]["symbols"]["QQQ"].update(date="2026-11-24", high=674.0, close=670.0, bot_stop=650.0)
+    _j.dump(W, open(wf, "w")); clock["t"] = datetime(2026, 11, 25, 9, 10, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+    p = J.st["pos"]["US"]["QQQ"]; assert p["be"] and p["stop"] == 660.0
+    # stop fills -> trade logged, flat
+    A.moomoo.orders[p["stop_oid"]].update(status="FILLED_ALL", dealt=1.0, avg=660.0)
+    clock["t"] = datetime(2026, 11, 25, 11, 0, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+    assert not J.st["pos"]["US"] and J.st["trades"][-1]["sym"] == "QQQ"
+    s = c.get("/api/mmtb", headers=h).json(); assert s["levels"]["US"]["asof"] == "2026-11-24"
+    os.environ.pop("TB_WORLD_FILE", None)
+
+
+def test_moomoo_tb_entry_day_rule_and_soft_orders(tmp_path):
+    import json as _j
+    from datetime import datetime
+    W = dict(markets=dict(US=dict(asof="2026-11-23", symbols=dict(XLF=dict(date="2026-11-23", open=55, high=56, low=55, close=55.6, top=58.68,
+             bot=54.0, buy_lvl=58.71, bot_stop=53.97))), AU=dict(asof="2026-11-23", symbols={})))
+    wf = os.path.join(str(tmp_path), "tbw.json"); _j.dump(W, open(wf, "w")); os.environ["TB_WORLD_FILE"] = wf
+    A, c = client(tmp_path)
+    import mm_tb
+    J = A.mmtb_job(); J.live_on = lambda: True; A.moomoo.reject = {"STOP_LIMIT", "STOP"}     # e.g. a paper account without stop orders
+    clock = {"t": datetime(2026, 11, 24, 9, 10, tzinfo=mm_tb.MKT["US"]["tz"])}
+    J.now = lambda mk: clock["t"] if mk == "US" else datetime(2026, 11, 22, 12, 0, tzinfo=mm_tb.MKT["AU"]["tz"])
+    J.auto_on = lambda mk: mk == "US"; J.set_cfg("US", capital=10000); J.st["cfg"]["US"]["symbols"] = ["XLF"]
+    J.step(); p = J.st["pos"]["US"]["XLF"]; assert p["state"] == "watch"
+    A.moomoo.px["XLF"] = 58.9; clock["t"] = datetime(2026, 11, 24, 10, 0, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+    assert J.st["pos"]["US"]["XLF"]["state"] == "pending"; J.step()                          # limit buy sent, then its fill is seen
+    p = J.st["pos"]["US"]["XLF"]; assert p["state"] == "open" and p["stop_oid"] is None        # limit buy filled (mock), stop watched
+    # entry day closes > 1% below -> sell at the next open
+    W["markets"]["US"]["asof"] = "2026-11-24"; W["markets"]["US"]["symbols"]["XLF"].update(date="2026-11-24", high=59.0, close=58.0)
+    _j.dump(W, open(wf, "w")); clock["t"] = datetime(2026, 11, 25, 9, 10, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+    assert J.st["pos"]["US"]["XLF"]["state"] == "exiting"
+    clock["t"] = datetime(2026, 11, 25, 9, 40, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+    assert not J.st["pos"]["US"] and J.st["trades"][-1]["why"].startswith("entry-day")
+    os.environ.pop("TB_WORLD_FILE", None)

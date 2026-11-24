@@ -2245,7 +2245,7 @@ def _tb_holds(inst):
 AUTO_RESERVE = float(ENV.get("AUTO_CASH_RESERVE_PCT", "15")) / 100
 FUT_CAP_X = float(ENV.get("FUT_CAP_X", "1.0"))        # futures exposure above this x the account: warning, no new auto futures entries
 FUT_HARD_X = float(ENV.get("FUT_HARD_X", "1.3"))      # above this: red alert
-AUTO_PARTS = ("stock_buy", "stock_sell")
+AUTO_PARTS = ("stock_buy", "stock_sell", "mm_us", "mm_au")     # mm_*: Top Bottom on moomoo (US / ASX ETFs), tools/live_server/mm_tb.py
 _MW = dict(t=0, d=None)
 
 
@@ -2480,14 +2480,57 @@ def auto_trade():
         alert("auto", "AUTO BUY", ("Automatic system buys: " + "; ".join(res)) if res else "Automatic buys: nothing to buy today.", key=f"autobuy:{day}")
 
 
+# ------------------------------------------------------------------ Top Bottom on moomoo (24 Nov 2026), tools/live_server/mm_tb.py
+TB_WORLD_URL = ENV.get("TB_WORLD_URL", "https://raw.githubusercontent.com/drsinghap81/blank-app/main/data/scan/tb_world.json")
+_tbw_cache = dict(t=0, d=None); _mmtb = {}
+
+
+def tb_world():
+    if ENV.get("TB_WORLD_FILE"):
+        return json.load(open(ENV["TB_WORLD_FILE"]))
+    if _tbw_cache["d"] is None or time.time() - _tbw_cache["t"] > 600:
+        r = requests.get(TB_WORLD_URL, params=dict(t=int(time.time())), timeout=30); r.raise_for_status(); _tbw_cache.update(t=time.time(), d=r.json())
+    return _tbw_cache["d"]
+
+
+def mmtb_job():
+    if "j" not in _mmtb:
+        import mm_tb
+        _mmtb["j"] = mm_tb.MMTB(moomoo, DATA, tb_world, log=lambda ev, **kw: log(ev, **kw),
+                                alert=lambda text, key=None: alert("mm_tb", "MOOMOO", text, key=key, mk="US"),
+                                auto_on=lambda mk: bool(auto_cfg().get("mm_us" if mk == "US" else "mm_au")), live_on=is_live)
+    return _mmtb["j"]
+
+
+@app.get("/api/mmtb")
+def mmtb_get(_=Depends(auth)):
+    return mmtb_job().status()
+
+
+class MMTBCfg(BaseModel):
+    market: str
+    capital: float | None = None
+    risk_pct: float | None = None
+
+
+@app.post("/api/mmtb/cfg")
+def mmtb_cfg(body: MMTBCfg, _=Depends(auth)):
+    if body.market not in ("US", "AU"):
+        raise HTTPException(400, "market must be US or AU")
+    return mmtb_job().set_cfg(body.market, capital=body.capital, risk_pct=body.risk_pct)
+
+
 def _auto_loop():
+    n = 0
     while True:
-        _HB["auto"] = time.time()
+        _HB["auto"] = time.time(); n += 1
         try:
             t = ist_now()
             if t.weekday() < 5 and (9, 15) <= (t.hour, t.minute) <= (15, 30):
                 margin_check()
             auto_trade()
+            if n % 2 == 0:
+                mmtb_job().step()
         except Exception as ex:  # noqa: BLE001
             log("auto_loop_error", error=str(ex)[:200])
         time.sleep(60)

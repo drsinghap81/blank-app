@@ -1766,9 +1766,11 @@ async function autoLoad() {
   let A; try { A = await lvApi('/api/auto'); } catch (e) { box.innerHTML = ''; return; }
   const tbOn = Object.entries(A.tb || {}).filter(([, v]) => v.auto).map(([k]) => TB_SHORT[k] || k);
   const parts = [['stock_sell', 'Stock sells', "Each morning 09:16–09:40 IST the plan's system exits are sold (only stocks a system bought or you adopted)."],
-    ['stock_buy', 'Stock buys', `Each morning 09:20–09:45 IST (after the 09:09 industry check) the plan's buys that fit are sent: same checks as the Buy button, ranked order, buckets and slots, keeping ${fmt(A.reserve_pct, 0)}% of the account in cash.`]];
+    ['stock_buy', 'Stock buys', `Each morning 09:20–09:45 IST (after the 09:09 industry check) the plan's buys that fit are sent: same checks as the Buy button, ranked order, buckets and slots, keeping ${fmt(A.reserve_pct, 0)}% of the account in cash.`],
+    ['mm_us', 'moomoo Top Bottom · US ETFs', 'Buy only (QQQ, SMH, XLF, XLE). Before the New York open a buy-stop for the day (limit +1%); after a fill a GTC stop on moomoo, raised each morning (breakeven at +2%, last swing bottom). Paper account unless you switch it on the server.'],
+    ['mm_au', 'moomoo Top Bottom · ASX ETFs', 'Buy only (TECH, HACK, OZR, ASIA) in AUD, same rules, before the 10:00 Sydney open.']];
   const M = A.margin || {}; const mOk = !(M.issues || []).length;
-  const lab = { stock_buy: 'stock buys', stock_sell: 'stock sells', opt_trader: 'option trader', turtle: 'Turtle MCX' };
+  const lab = { stock_buy: 'stock buys', stock_sell: 'stock sells', opt_trader: 'option trader', turtle: 'Turtle MCX', mm_us: 'moomoo Top Bottom US', mm_au: 'moomoo Top Bottom ASX' };
   const onTxt = (A.on || []).map((k) => lab[k] || (k.startsWith('tb_') ? 'Top Bottom ' + (TB_SHORT[k.slice(3)] || k.slice(3)) : k)).join(', ');
   box.innerHTML = `<details class="lv-card au-bar${A.any_on ? ' au-on' : ''}"><summary class="bk-sum"><span><b>Automation ${A.any_on ? 'ON' : 'OFF · manual'}</b>${A.orders_live ? '' : ' <span class="lv-mode dry">DRY RUN</span>'}<small class="muted" style="display:block">${A.any_on ? esc(onTxt) : 'Nothing trades by itself'}${M.at ? ` · margin ${mOk ? 'OK' : '⚠'} (futures ${fmt(M.fut_x || 0, 2)}× account)` : ''}</small></span>
       ${A.any_on ? '<button class="lv-btn sell" id="aumanual">MANUAL NOW</button>' : (A.snapshot ? '<button class="lv-btn" id="auresume">Resume automation…</button>' : '')}</summary>
@@ -1778,7 +1780,9 @@ async function autoLoad() {
     ${A.turtle ? `<div class="tb-auto"><span><b>Turtle MCX</b><small>${A.turtle.live ? 'LIVE' : 'Dry run'} · armed: ${esc((A.turtle.armed || []).join(', ') || 'none')}</small></span></div>` : ''}
     <div id="auarm" class="lv-form" hidden><input id="aupw" type="password" placeholder="App password"><input id="aucf" placeholder="Type AUTO" autocapitalize="characters"><button class="lv-btn sell" id="augo">Turn on</button></div>
     <p class="lv-sub"><b>Margin watch</b> ${M.at ? `(${esc(M.at.slice(11, 16))} IST): account ${money(M.account || 0, 'NSE')} · cash ${money(M.cash || 0, 'NSE')} (${fmt(M.reserve_now || 0, 0)}%) · futures ${money(M.fut_value || 0, 'NSE')} = ${fmt(M.fut_x || 0, 2)}× (limit ${fmt(A.fut_cap_x, 1)}×) · cash needed for margin ${money(M.cash_need || 0, 'NSE')}${mOk ? ' · all OK' : ' · <b class="down">' + esc(M.issues.join('; ')) + '</b>. New automatic futures entries wait for your OK.'}` : 'checks every 10 minutes in market hours.'}</p>
+    <div id="mmtbbox"></div>
     <p class="lv-sub">MANUAL NOW stops every automatic entry at once, no password. Open positions keep their stops and the bots still manage their exits. Resume brings back exactly what was on.</p></details>`;
+  mmtbBox(box.querySelector('#mmtbbox'));
   let want = null;
   const refresh = () => { autoLoad(); ['bn', 'nifty'].concat(TB_STOCKS).forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); };
   const mn = box.querySelector('#aumanual'); if (mn) mn.addEventListener('click', async (e) => { e.preventDefault(); e.stopPropagation();
@@ -1792,6 +1796,25 @@ async function autoLoad() {
       alertMsg(want.part === 'resume' ? 'Automation resumed: ' + ((j.on || []).join(', ') || 'nothing was on') : `Automatic ${lab[want.part]} on${A.orders_live ? '' : ' (dry run: logged only until Live orders is on)'}.`, true); refresh(); } catch (er) { alertMsg(er.message); } });
 }
 
+
+/* 24 Nov 2026: moomoo Top Bottom (server mm_tb.py) - capital per market, today's levels, open trades, recent notes */
+async function mmtbBox(el) {
+  if (!el) return; let T; try { T = await lvApi('/api/mmtb'); } catch (e) { el.innerHTML = ''; return; }
+  const cur = { US: 'US$', AU: 'A$' }, nm = { US: 'US ETFs', AU: 'ASX ETFs' };
+  const mk = (m) => { const c = (T.cfg || {})[m] || {}; const L = ((T.levels || {})[m] || {}); const P = (T.pos || {})[m] || {};
+    const rows = (c.symbols || []).map((s) => { const p = P[s]; const r = (L.rows || {})[s] || {};
+      const st = p ? (p.state === 'open' ? `<b class="up">holding ${fmt(p.qty, 0)} @ ${fmt(p.entry, 2)}</b> · stop ${fmt(p.stop, 2)}` : p.state === 'exiting' ? 'selling' : `buy-stop ${fmt(p.qty, 0)} @ ${fmt(p.trig, 2)} today`) : (r.buy_lvl ? `next buy above ${fmt(r.buy_lvl, 2)} (${fmt((r.buy_lvl / r.close - 1) * 100, 1)}% away)` : 'waiting for a new swing top');
+      return `<li>${esc(s)} · ${st}</li>`; }).join('');
+    return `<div class="tb-auto" style="display:block"><b>moomoo Top Bottom · ${nm[m]}</b> <small class="muted">levels as of ${esc(L.asof || '–')} · ${esc(T.env || '')}${T.enabled ? '' : ' · moomoo not connected yet'}</small>
+      <div class="lv-form"><label class="lv-sub" style="flex:1">Capital (${cur[m]})<input id="mmcap${m}" inputmode="decimal" placeholder="0 = no new trades" value="${c.capital || ''}"></label><label class="lv-sub" style="max-width:100px">Risk % a trade<input id="mmrisk${m}" inputmode="decimal" value="${c.risk_pct || 1}"></label><button class="lv-btn ghost" data-mmsave="${m}">Save</button></div>
+      <ul class="tb-msgs">${rows}</ul></div>`; };
+  const tr = (T.trades || []).slice(-5).reverse().map((t) => `<li>${esc(t.exit_date)} ${esc(t.sym)} ${fmt(t.pct, 2)}% (${esc(t.why)})</li>`).join('');
+  el.innerHTML = mk('US') + mk('AU') + (tr ? `<details class="info"><summary>moomoo Top Bottom trades</summary><ul class="tb-msgs">${tr}</ul></details>` : '')
+    + ((T.notes || []).length ? `<details class="info"><summary>moomoo Top Bottom log</summary><ul class="tb-msgs">${T.notes.slice(-10).reverse().map((n) => `<li>${esc(n)}</li>`).join('')}</ul></details>` : '');
+  el.querySelectorAll('[data-mmsave]').forEach((b) => b.addEventListener('click', async () => { const m = b.dataset.mmsave;
+    try { await lvApi('/api/mmtb/cfg', { method: 'POST', body: JSON.stringify({ market: m, capital: +el.querySelector('#mmcap' + m).value || 0, risk_pct: +el.querySelector('#mmrisk' + m).value || 1 }) });
+      alertMsg(`moomoo Top Bottom ${nm[m]}: capital saved. Each trade risks ${el.querySelector('#mmrisk' + m).value || 1}% of it, at most a quarter of it per ETF.`, true); mmtbBox(el); } catch (e) { alertMsg(e.message); } }));
+}
 
 /* show as many next-ranked trades as the top 10 has unavailable ones (held, skipped, or blocked by a live check) */
 function lvMoreUpd() {
