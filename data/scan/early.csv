@@ -1,20 +1,20 @@
 symbol,setup,signal_date,signal_close,stop,rsi_signal,value_cr,supertrend,st_up,close,entry,risk_pct,days,status,gain_pct,R,name,board
-TCS,EMA 9/21 cross,2026-11-23,2460.0,2317.0,57.2,864.74,2332.45,True,2460.0,,6.2,0,NEW - buy next open,,,Tata Consultancy Services Limited,main
+TCS,EMA 9/21 cross,2026-11-23,2460.0,2317.0,57.2,864.76,2332.45,True,2460.0,,6.2,0,NEW - buy next open,,,Tata Consultancy Services Limited,main
 EICHERMOT,52w-high base breakout,2026-11-23,8172.5,7610.5,71.2,454.08,7545.27,True,8172.5,,7.4,0,NEW - buy next open,,,Eicher Motors Limited,main
 SSWL,EMA 9/21 cross,2026-08-31,305.65,287.85,57.6,158.47,587.71,False,490.45,310.0,7.7,56,EXIT next open (Supertrend turned red),58.2,8.15,Steel Strips Wheels Limited,main
 BHARTIARTL,52w-high base breakout,2026-11-16,2153.5,2040.4,73.6,1799.46,2020.18,True,2128.5,2162.5,6.0,5,open,-1.6,-0.28,Bharti Airtel Limited,main
-AXISBANK,52w-high base breakout,2026-11-20,1446.0,1333.1,78.1,975.27,1314.31,True,1388.6,1458.9,9.4,1,open,-4.8,-0.56,Axis Bank Limited,main
-MCX,EMA 9/21 cross,2026-11-03,3490.1,3132.5,64.0,878.13,3356.62,True,3581.6,3400.0,8.5,13,open,5.3,0.68,Multi Commodity Exchange of India Limited,main
+AXISBANK,52w-high base breakout,2026-11-20,1446.0,1333.1,78.1,975.28,1314.31,True,1388.6,1458.9,9.4,1,open,-4.8,-0.56,Axis Bank Limited,main
+MCX,EMA 9/21 cross,2026-11-03,3490.1,3132.5,64.0,878.14,3356.62,True,3581.6,3400.0,8.5,13,open,5.3,0.68,Multi Commodity Exchange of India Limited,main
 ETERNAL,52w-high base breakout,2026-10-30,343.65,313.65,62.2,841.51,345.08,True,362.1,343.3,9.5,15,open,5.5,0.63,ETERNAL LIMITED,main
 ADANIPORTS,EMA 9/21 cross,2026-10-29,1872.0,1687.9,64.8,519.26,1799.26,True,1919.0,1871.0,10.8,16,open,2.6,0.26,Adani Ports and Special Economic Zone Limited,main
-PNB,52w-high base breakout,2026-11-11,138.48,121.86,78.6,514.96,139.63,True,149.75,138.7,13.8,8,open,8.0,0.66,Punjab National Bank,main
+PNB,52w-high base breakout,2026-11-11,138.48,121.86,78.6,514.97,139.63,True,149.75,138.7,13.8,8,open,8.0,0.66,Punjab National Bank,main
 INDHOTEL,EMA 9/21 cross,2026-10-15,741.45,708.1,57.3,443.13,842.9,True,906.0,746.5,5.4,25,open,21.4,4.15,The Indian Hotels Company Limited,main
 LENSKART,EMA 9/21 cross,2026-10-29,681.75,615.2,56.8,422.66,678.18,True,714.5,683.7,11.1,16,open,4.5,0.45,Lenskart Solutions Limited,main
 TECHM,52w-high base breakout,2026-10-16,1790.0,1575.2,75.6,419.91,1683.43,True,1777.5,1760.0,11.7,24,open,1.0,0.09,Tech Mahindra Limited,main
-MEESHO,EMA 9/21 cross,2026-11-05,233.53,216.03,58.5,368.47,234.11,True,253.11,233.78,8.2,11,open,8.3,1.09,Meesho Limited,main
+MEESHO,EMA 9/21 cross,2026-11-05,233.53,216.03,58.5,368.48,234.11,True,253.11,233.78,8.2,11,open,8.3,1.09,Meesho Limited,main
 PERSISTENT,EMA 9/21 cross,2026-10-09,5770.0,5387.5,63.1,367.3,5710.19,True,6282.5,5770.0,7.1,29,open,8.9,1.34,Persistent Systems Limited,main
 UNIONBANK,52w-high base breakout,2026-11-12,204.4,184.25,75.9,313.04,196.65,True,208.2,202.89,10.1,7,open,2.6,0.28,Union Bank of India,main
-MOTILALOFS,52w-high base breakout,2026-11-05,1095.0,963.6,62.9,190.4,1086.11,True,1235.0,1086.35,12.7,11,open,13.7,1.21,Motilal Oswal Financial Services Limited,main
+MOTILALOFS,52w-high base breakout,2026-11-05,1095.0,963.6,62.9,190.41,1086.11,True,1235.0,1086.35,12.7,11,open,13.7,1.21,Motilal Oswal Financial Services Limited,main
 UNOMINDA,52w-high base breakout,2026-11-09,1353.8,1191.34,76.9,186.28,1250.94,True,1356.9,1367.3,14.8,9,open,-0.8,-0.06,UNO Minda Limited,main
 POONAWALLA,52w-high base breakout,2026-11-19,504.75,481.5,67.8,167.07,460.9,True,517.4,493.25,2.4,2,open,4.9,2.06,Poonawalla Fincorp Limited,main
 GLAND,EMA 9/21 cross,2026-10-29,3074.5,2769.8,58.6,140.99,3077.34,True,3297.4,3070.0,10.8,16,open,7.4,0.76,Gland Pharma Limited,main
@@ -28,38 +28,38 @@ KDDL,EMA 9/21 cross,2026-11-05,4009.5,3700.0,60.5,59.71,3889.95,True,4604.0,3981
 SHYAMMETL,EMA 9/21 cross,2026-10-12,1088.5,1019.4,56.6,49.97,1204.58,True,1276.2,1090.1,6.9,28,open,17.1,2.63,Shyam Metalics and Energy Limited,main
 PROTEAN,EMA 9/21 cross,2026-11-04,657.3,600.3,59.0,32.7,616.38,True,691.75,661.05,10.1,12,open,4.6,0.51,Protean eGov Technologies Limited,main
 ASAHIINDIA,52w-high base breakout,2026-11-11,1088.05,957.48,76.8,28.34,1068.1,True,1178.45,1095.0,14.4,8,open,7.6,0.61,Asahi India Glass Limited,main
-MANAKCOAT,52w-high base breakout,2026-10-29,147.84,130.1,71.0,27.51,146.85,True,155.54,149.0,14.5,16,open,4.4,0.35,Manaksia Coated Metals & Industries Limited,main
+MANAKCOAT,52w-high base breakout,2026-10-29,147.84,130.1,71.0,27.59,146.85,True,155.54,149.0,14.5,16,open,4.4,0.35,Manaksia Coated Metals & Industries Limited,main
 MBAPL,EMA 9/21 cross,2026-10-28,168.87,155.5,56.2,22.06,177.44,True,192.2,168.0,8.0,17,open,14.4,1.94,Madhya Bharat Agro Products Limited,main
 NITINSPIN,EMA 9/21 cross,2026-10-14,642.75,591.4,60.8,13.04,633.89,True,699.2,646.75,9.4,26,open,8.1,0.95,Nitin Spinners Limited,main
 KOPRAN,EMA 9/21 cross,2026-11-12,279.86,250.82,61.7,12.93,237.03,True,265.35,279.7,11.5,7,open,-5.1,-0.5,Kopran Limited,main
-YASHHV.BO,EMA 9/21 cross,2026-08-28,986.1,890.0,62.7,11.79,1123.36,True,1225.5,971.0,9.1,57,open,26.2,3.14,Yash Highvoltage Limited,BSE
+YASHHV.BO,EMA 9/21 cross,2026-08-28,986.1,890.0,62.7,12.91,1123.36,True,1267.2,971.0,9.1,56,open,30.5,3.66,Yash Highvoltage Limited,BSE
 SHREEPUSHK,52w-high base breakout,2026-08-31,470.5,424.05,70.1,8.65,490.76,True,514.9,470.0,10.8,56,open,9.6,0.98,Shree Pushkar Chemicals & Fertilisers Limited,main
 SIMPLEXINF,EMA 9/21 cross,2026-11-03,272.7,248.25,59.4,8.25,261.06,True,286.6,276.8,11.5,13,open,3.5,0.34,Simplex Infrastructures Limited,main
 SANGAMIND,EMA 9/21 cross,2026-11-09,619.65,575.1,56.1,7.68,602.48,True,696.1,622.65,8.3,9,open,11.8,1.54,Sangam (India) Limited,main
 BLUSPRING,EMA 9/21 cross,2026-09-23,132.59,121.5,56.4,5.39,133.23,True,153.15,132.59,9.1,40,open,15.5,1.85,Bluspring Enterprises Limited,main
 MANOMAY,52w-high base breakout,2026-11-09,262.36,242.05,74.3,5.0,245.72,True,272.5,262.18,8.3,9,open,3.9,0.51,Manomay Tex India Limited,main
 STEELCAS,EMA 9/21 cross,2026-11-02,364.4,331.3,56.4,3.99,335.47,True,365.4,363.0,9.6,14,open,0.7,0.08,Steelcast Limited,main
-KODYTECH,EMA 9/21 cross,2026-11-05,1550.55,1385.2,55.5,2.58,1606.16,True,1792.35,1550.0,11.9,10,open,15.6,1.47,Kody Technolab Limited,SME
+KODYTECH,EMA 9/21 cross,2026-11-05,1550.55,1385.2,55.5,2.56,1606.16,True,1751.75,1550.0,11.9,11,open,13.0,1.22,Kody Technolab Limited,SME
 PRIMESECU,52w-high base breakout,2026-11-17,310.2,295.5,63.2,2.55,272.5,True,299.9,311.0,5.2,4,open,-3.6,-0.72,Prime Securities Limited,main
 SWANDEF,EMA 9/21 cross,2026-11-09,2852.6,2651.0,58.8,2.26,2535.87,True,2864.6,2838.0,7.1,9,open,0.9,0.14,Swan Defence and Heavy Industries Limited,main
-SIMPLEXCAS.BO,EMA 9/21 cross,2026-11-05,131.6,119.25,56.1,2.1,114.63,True,127.6,131.95,10.6,11,open,-3.3,-0.34,SIMPLEX CASTINGS LTD.,BSE
-BEEZAASAN.BO,EMA 9/21 cross,2026-11-03,725.0,658.0,58.7,0.53,799.25,True,824.1,715.05,8.7,13,open,15.3,1.91,Beezaasan Explotech Limited,BSE
-ICICIBANK,EMA 9/21 cross,2026-08-27,1443.0,1408.0,58.6,2625.27,1527.5,True,1585.5,1435.0,1.9,58,stopped 2026-09-08,-1.9,-1.0,ICICI Bank Limited,main
-ATHERENERG,EMA 9/21 cross,2026-10-27,1674.0,1345.7,66.3,639.61,1757.69,True,1979.2,1679.9,24.8,18,skipped (stop too far / gap below stop),,,Ather Energy Limited,main
-COFORGE,52w-high base breakout,2026-08-28,2014.6,1869.6,77.6,612.25,1915.32,True,2142.3,2015.0,7.8,57,stopped 2026-09-09,-9.9,-1.37,Coforge Limited,main
+SIMPLEXCAS.BO,EMA 9/21 cross,2026-11-05,131.6,119.25,56.1,2.15,114.63,True,133.0,131.95,10.6,10,open,0.8,0.08,SIMPLEX CASTINGS LTD.,BSE
+BEEZAASAN.BO,EMA 9/21 cross,2026-11-03,725.0,658.0,58.7,0.62,799.25,True,838.5,715.05,8.7,12,open,17.3,2.16,Beezaasan Explotech Limited,BSE
+ICICIBANK,EMA 9/21 cross,2026-08-27,1443.0,1408.0,58.6,2625.29,1527.5,True,1585.5,1435.0,1.9,58,stopped 2026-09-08,-1.9,-1.0,ICICI Bank Limited,main
+ATHERENERG,EMA 9/21 cross,2026-10-27,1674.0,1345.7,66.3,639.63,1757.69,True,1979.2,1679.9,24.8,18,skipped (stop too far / gap below stop),,,Ather Energy Limited,main
+COFORGE,52w-high base breakout,2026-08-28,2014.6,1869.6,77.6,612.26,1915.32,True,2142.3,2015.0,7.8,57,stopped 2026-09-09,-9.9,-1.37,Coforge Limited,main
 CUPID,EMA 9/21 cross,2026-09-30,311.65,261.4,66.8,441.28,326.37,True,362.15,313.5,19.9,35,skipped (stop too far / gap below stop),,,Cupid Limited,main
-SUNPHARMA,EMA 9/21 cross,2026-08-31,1984.8,1896.2,64.2,434.39,1776.25,True,1860.0,1963.1,3.5,56,stopped 2026-09-04,-3.4,-1.0,Sun Pharmaceutical Industries Limited,main
+SUNPHARMA,EMA 9/21 cross,2026-08-31,1984.8,1896.2,64.2,434.4,1776.25,True,1860.0,1963.1,3.5,56,stopped 2026-09-04,-3.4,-1.0,Sun Pharmaceutical Industries Limited,main
 TECHM,EMA 9/21 cross,2026-08-28,1640.9,1562.0,61.1,419.91,1683.43,True,1777.5,1640.0,5.0,57,stopped 2026-09-07,-4.8,-1.0,Tech Mahindra Limited,main
-APLAPOLLO,EMA 9/21 cross,2026-10-29,2195.0,1994.1,55.4,413.36,2136.52,False,1670.0,2205.0,10.6,16,stopped 2026-11-23,-11.3,-1.19,APL Apollo Tubes Limited,main
-APLAPOLLO,52w-high base breakout,2026-09-04,2250.0,2136.5,68.7,413.36,2136.52,False,1670.0,2250.0,5.3,52,stopped 2026-09-11,-5.0,-1.0,APL Apollo Tubes Limited,main
-BHEL,EMA 9/21 cross,2026-10-06,452.0,402.6,64.4,371.66,436.3,False,415.7,451.5,12.1,32,skipped (stop too far / gap below stop),,,Bharat Heavy Electricals Limited,main
+APLAPOLLO,EMA 9/21 cross,2026-10-29,2195.0,1994.1,55.4,413.49,2136.52,False,1670.0,2205.0,10.6,16,stopped 2026-11-23,-11.3,-1.19,APL Apollo Tubes Limited,main
+APLAPOLLO,52w-high base breakout,2026-09-04,2250.0,2136.5,68.7,413.49,2136.52,False,1670.0,2250.0,5.3,52,stopped 2026-09-11,-5.0,-1.0,APL Apollo Tubes Limited,main
+BHEL,EMA 9/21 cross,2026-10-06,452.0,402.6,64.4,371.67,436.3,False,415.7,451.5,12.1,32,skipped (stop too far / gap below stop),,,Bharat Heavy Electricals Limited,main
 WELSPUNLIV,EMA 9/21 cross,2026-11-02,242.34,204.8,67.2,311.32,227.48,True,270.76,245.0,19.6,14,skipped (stop too far / gap below stop),,,Welspun Living Limited,main
 SONACOMS,EMA 9/21 cross,2026-10-28,879.45,741.3,67.0,285.2,848.21,True,886.0,879.45,18.6,17,skipped (stop too far / gap below stop),,,Sona BLW Precision Forgings Limited,main
 MRPL,EMA 9/21 cross,2026-10-26,182.61,159.0,57.9,258.86,160.95,True,175.36,180.5,13.5,19,skipped (stop too far / gap below stop),,,Mangalore Refinery and Petrochemicals Limited,main
 CHENNPETRO,EMA 9/21 cross,2026-10-07,1612.3,1325.1,66.6,217.85,1325.35,True,1443.8,1605.0,21.1,31,skipped (stop too far / gap below stop),,,Chennai Petroleum Corporation Limited,main
 AEGISLOG,EMA 9/21 cross,2026-09-11,1353.6,1232.0,56.1,197.79,1354.97,False,1158.6,1365.3,10.8,47,exited 2026-10-26 (Supertrend red),-10.3,-1.05,Aegis Logistics Limited,main
 NYKAA,EMA 9/21 cross,2026-10-07,341.25,316.0,56.1,196.88,332.53,True,357.0,340.85,7.9,31,stopped 2026-10-23,-7.3,-1.0,FSN E-Commerce Ventures Limited,main
-AZAD,EMA 9/21 cross,2026-09-29,2914.2,2667.9,61.2,195.06,2625.84,False,2289.7,2941.0,10.2,36,stopped 2026-10-19,-9.3,-1.0,Azad Engineering Limited,main
+AZAD,EMA 9/21 cross,2026-09-29,2914.2,2667.9,61.2,195.07,2625.84,False,2289.7,2941.0,10.2,36,stopped 2026-10-19,-9.3,-1.0,Azad Engineering Limited,main
 ZYDUSLIFE,EMA 9/21 cross,2026-09-21,1161.0,1086.0,55.9,193.68,1141.89,True,1199.5,1161.0,6.9,42,exited 2026-10-09 (Supertrend red),-4.2,-0.65,Zydus Lifesciences Limited,main
 CGCL,EMA 9/21 cross,2026-08-26,256.35,217.0,67.5,186.84,253.12,False,232.61,254.95,17.5,59,skipped (stop too far / gap below stop),,,Capri Global Capital Limited,main
 GAIL,EMA 9/21 cross,2026-08-31,177.5,170.11,56.8,184.32,179.7,True,185.6,173.41,1.9,56,stopped 2026-09-15,-1.9,-1.0,GAIL (India) Limited,main
@@ -68,16 +68,16 @@ BPCL,EMA 9/21 cross,2026-08-28,319.25,310.0,55.3,169.52,292.82,True,305.35,315.0
 TORNTPHARM,EMA 9/21 cross,2026-08-27,4999.0,4855.0,55.7,163.84,4812.85,False,4763.7,5000.0,3.0,58,stopped 2026-09-04,-2.9,-1.0,Torrent Pharmaceuticals Limited,main
 HFCL,EMA 9/21 cross,2026-10-05,250.27,199.0,63.6,156.43,213.37,False,178.6,262.78,32.1,33,skipped (stop too far / gap below stop),,,HFCL Limited,main
 RRKABEL,EMA 9/21 cross,2026-10-06,2789.7,2440.3,66.7,127.66,2078.35,False,1822.7,2785.0,14.1,32,skipped (stop too far / gap below stop),,,R R Kabel Limited,main
-MARSONS,EMA 9/21 cross,2026-10-30,148.62,116.71,69.3,120.14,132.2,True,158.69,152.0,30.2,15,skipped (stop too far / gap below stop),,,Marsons Limited,main
+MARSONS,EMA 9/21 cross,2026-10-30,148.62,116.71,69.3,120.15,132.2,True,158.69,152.0,30.2,15,skipped (stop too far / gap below stop),,,Marsons Limited,main
 CPPLUS,EMA 9/21 cross,2026-11-05,4170.5,3619.3,60.0,107.83,3788.66,True,4074.1,4335.0,19.8,11,skipped (stop too far / gap below stop),,,Aditya Infotech Limited,main
-STYLEBAAZA,EMA 9/21 cross,2026-11-09,417.9,355.95,64.5,107.42,453.06,True,503.35,429.0,20.5,9,skipped (stop too far / gap below stop),,,Baazar Style Retail Limited,main
+STYLEBAAZA,EMA 9/21 cross,2026-11-09,417.9,355.95,64.5,107.43,453.06,True,503.35,429.0,20.5,9,skipped (stop too far / gap below stop),,,Baazar Style Retail Limited,main
 IIFLCAPS,EMA 9/21 cross,2026-10-28,346.2,333.15,55.9,105.79,346.65,False,318.1,348.0,4.5,17,stopped 2026-11-19,-4.3,-1.0,IIFL Capital Services Limited,main
 PNBHOUSING,EMA 9/21 cross,2026-10-12,1200.0,1087.8,64.0,93.25,1066.63,True,1180.2,1205.0,10.8,28,stopped 2026-10-23,-9.7,-1.0,PNB Housing Finance Limited,main
-HBLENGINE,EMA 9/21 cross,2026-10-16,833.15,701.0,66.1,86.3,753.65,True,770.0,827.4,18.0,24,skipped (stop too far / gap below stop),,,HBL Engineering Limited,main
+HBLENGINE,EMA 9/21 cross,2026-10-16,833.15,701.0,66.1,86.31,753.65,True,770.0,827.4,18.0,24,skipped (stop too far / gap below stop),,,HBL Engineering Limited,main
 HONASA,EMA 9/21 cross,2026-09-23,484.9,458.1,56.1,86.17,479.59,True,539.75,483.6,5.6,40,stopped 2026-09-29,-6.1,-1.16,Honasa Consumer Limited,main
 KTKBANK,EMA 9/21 cross,2026-09-23,343.05,309.85,64.4,83.97,327.47,True,341.25,339.0,9.4,40,stopped 2026-10-23,-8.6,-1.0,The Karnataka Bank Limited,main
-ANANTRAJ,EMA 9/21 cross,2026-09-04,625.45,571.35,57.8,81.65,494.91,False,441.95,622.0,8.9,52,exited 2026-09-17 (Supertrend red),-6.4,-0.79,Anant Raj Limited,main
-EBGNG,EMA 9/21 cross,2026-11-04,728.9,628.55,58.1,81.0,592.22,False,485.15,740.0,17.7,12,skipped (stop too far / gap below stop),,,GNG Electronics Limited,main
+ANANTRAJ,EMA 9/21 cross,2026-09-04,625.45,571.35,57.8,81.66,494.91,False,441.95,622.0,8.9,52,exited 2026-09-17 (Supertrend red),-6.4,-0.79,Anant Raj Limited,main
+EBGNG,EMA 9/21 cross,2026-11-04,728.9,628.55,58.1,81.01,592.22,False,485.15,740.0,17.7,12,skipped (stop too far / gap below stop),,,GNG Electronics Limited,main
 INOXINDIA,EMA 9/21 cross,2026-08-27,2177.9,1880.3,71.2,77.15,1845.04,True,2088.0,2175.0,15.7,58,skipped (stop too far / gap below stop),,,INOX India Limited,main
 EMCURE,EMA 9/21 cross,2026-09-08,1925.8,1838.4,57.4,66.46,2133.34,True,2309.9,1938.1,5.4,50,stopped 2026-10-08,-5.1,-1.0,Emcure Pharmaceuticals Limited,main
 VRLLOG,EMA 9/21 cross,2026-09-18,293.6,280.9,56.8,66.08,291.34,True,336.55,293.55,4.5,43,stopped 2026-10-15,-4.3,-1.0,VRL Logistics Limited,main
@@ -89,7 +89,7 @@ ROLEXRINGS,EMA 9/21 cross,2026-09-23,183.58,168.0,64.9,62.33,185.71,True,193.51,
 FLUOROCHEM,EMA 9/21 cross,2026-10-14,4632.1,4408.0,56.0,57.23,4421.07,True,4895.0,4601.0,4.4,26,stopped 2026-10-16,-4.2,-1.0,Gujarat Fluorochemicals Limited,main
 LUMAXTECH,EMA 9/21 cross,2026-10-29,2058.5,1717.0,60.9,55.94,2038.98,True,2326.3,2062.0,20.1,16,skipped (stop too far / gap below stop),,,Lumax Auto Technologies Limited,main
 DIACABS,EMA 9/21 cross,2026-10-06,368.3,333.65,56.1,53.22,333.29,True,364.05,367.0,10.0,32,stopped 2026-10-21,-9.1,-1.0,Diamond Power Infrastructure Limited,main
-ECLERX,EMA 9/21 cross,2026-10-13,1964.5,1828.8,58.4,49.45,1650.82,False,1511.4,1960.0,7.2,27,stopped 2026-10-29,-6.7,-1.0,eClerx Services Limited,main
+ECLERX,EMA 9/21 cross,2026-10-13,1964.5,1828.8,58.4,49.46,1650.82,False,1511.4,1960.0,7.2,27,stopped 2026-10-29,-6.7,-1.0,eClerx Services Limited,main
 SGFIN,EMA 9/21 cross,2026-10-29,734.95,600.55,66.7,48.88,695.44,True,787.7,731.95,21.9,16,skipped (stop too far / gap below stop),,,SG Finserve Limited,main
 MOBIKWIK,EMA 9/21 cross,2026-10-06,242.14,191.0,75.2,48.46,245.21,False,212.3,260.0,36.1,32,skipped (stop too far / gap below stop),,,One Mobikwik Systems Limited,main
 NEOGEN,EMA 9/21 cross,2026-11-09,2665.2,2120.0,65.6,47.48,2483.46,True,2787.7,2665.2,25.7,9,skipped (stop too far / gap below stop),,,Neogen Chemicals Limited,main
@@ -112,7 +112,7 @@ JAMNAAUTO,52w-high base breakout,2026-10-07,151.77,133.56,71.3,30.11,129.33,True
 INDSWFTLAB,EMA 9/21 cross,2026-10-29,409.8,316.0,64.0,29.68,377.91,False,314.65,417.9,32.2,16,skipped (stop too far / gap below stop),,,Ind-Swift Laboratories Limited,main
 PGIL,EMA 9/21 cross,2026-11-04,1319.9,1170.1,62.9,29.07,1248.62,True,1479.4,1341.3,14.6,12,skipped (stop too far / gap below stop),,,Pearl Global Industries Limited,main
 ASAHIINDIA,EMA 9/21 cross,2026-10-07,976.25,934.65,58.3,28.34,1068.1,True,1178.45,980.05,4.9,31,stopped 2026-10-08,-4.6,-1.0,Asahi India Glass Limited,main
-MANAKCOAT,EMA 9/21 cross,2026-10-28,132.55,115.18,58.2,27.51,146.85,True,155.54,132.96,15.4,17,skipped (stop too far / gap below stop),,,Manaksia Coated Metals & Industries Limited,main
+MANAKCOAT,EMA 9/21 cross,2026-10-28,132.55,115.18,58.2,27.59,146.85,True,155.54,132.96,15.4,17,skipped (stop too far / gap below stop),,,Manaksia Coated Metals & Industries Limited,main
 FILATEX,EMA 9/21 cross,2026-09-11,87.41,74.27,65.7,26.81,92.73,True,108.01,89.5,20.5,47,skipped (stop too far / gap below stop),,,Filatex India Limited,main
 ANTELOPUS,EMA 9/21 cross,2026-10-26,1188.8,962.0,61.8,26.32,980.23,False,817.65,1139.1,18.4,19,skipped (stop too far / gap below stop),,,Antelopus Selan Energy Limited,main
 GNFC,EMA 9/21 cross,2026-09-18,588.9,528.8,57.4,25.12,502.73,False,452.8,588.9,11.4,43,exited 2026-10-21 (Supertrend red),-7.3,-0.71,Gujarat Narmada Valley Fertilizers and Chemicals Limited,main
@@ -126,15 +126,15 @@ WESTLIFE,EMA 9/21 cross,2026-10-27,600.7,512.0,58.8,22.18,610.35,True,652.7,603.
 BLACKBUCK,EMA 9/21 cross,2026-09-11,628.15,572.0,66.0,21.61,567.46,False,511.75,641.0,12.1,47,skipped (stop too far / gap below stop),,,BLACKBUCK LIMITED,main
 AEGISVOPAK,EMA 9/21 cross,2026-09-03,286.85,260.7,59.2,21.59,248.51,True,280.9,286.5,9.9,53,stopped 2026-10-19,-9.0,-1.0,Aegis Vopak Terminals Limited,main
 MENONBE,EMA 9/21 cross,2026-11-03,321.5,241.6,63.2,20.92,283.99,True,293.55,321.0,32.9,13,skipped (stop too far / gap below stop),,,Menon Bearings Limited,main
-CRISIL,EMA 9/21 cross,2026-10-22,4777.2,4381.9,64.4,19.47,4406.33,False,4034.8,4780.0,9.1,21,stopped 2026-11-06,-8.3,-1.0,Crisil Limited,main
+CRISIL,EMA 9/21 cross,2026-10-22,4777.2,4381.9,64.4,19.48,4406.33,False,4034.8,4780.0,9.1,21,stopped 2026-11-06,-8.3,-1.0,Crisil Limited,main
 PCBL,EMA 9/21 cross,2026-09-09,334.95,313.1,61.4,18.89,293.54,False,266.15,335.0,7.0,49,stopped 2026-09-15,-6.5,-1.0,PCBL Chemical Limited,main
 OAL,EMA 9/21 cross,2026-08-27,428.95,332.15,72.2,18.75,389.5,True,528.6,425.0,28.0,58,skipped (stop too far / gap below stop),,,Oriental Aromatics Limited,main
 SATIN,EMA 9/21 cross,2026-10-29,251.18,211.89,67.9,18.66,236.99,True,252.17,249.89,17.9,16,skipped (stop too far / gap below stop),,,Satin Creditcare Network Limited,main
 NORTHARC,EMA 9/21 cross,2026-08-31,311.65,280.45,63.3,18.31,253.93,True,276.5,310.25,10.6,56,stopped 2026-10-08,-9.6,-1.0,Northern Arc Capital Limited,main
 KPIL,EMA 9/21 cross,2026-10-06,1451.5,1345.1,60.4,17.83,1428.53,False,1312.6,1456.9,8.3,32,stopped 2026-10-19,-7.7,-1.0,Kalpataru Projects International Limited,main
 USHAMART,EMA 9/21 cross,2026-09-21,533.9,464.15,66.0,17.61,502.5,False,453.95,541.0,16.6,42,skipped (stop too far / gap below stop),,,Usha Martin Limited,main
+MUFIN,EMA 9/21 cross,2026-10-13,137.53,130.01,58.7,16.46,129.57,True,134.35,137.9,6.1,27,stopped 2026-10-23,-5.7,-1.0,Mufin Green Finance Limited,main
 PARKHOSPS,EMA 9/21 cross,2026-09-23,286.55,271.2,55.9,16.43,228.27,True,241.67,286.55,5.7,40,stopped 2026-09-30,-5.4,-1.0,Park Medi World Limited,main
-MUFIN,EMA 9/21 cross,2026-10-13,137.53,130.01,58.7,16.32,129.57,True,134.35,137.9,6.1,27,stopped 2026-10-23,-5.7,-1.0,Mufin Green Finance Limited,main
 CORONA,EMA 9/21 cross,2026-09-09,2197.2,2041.8,62.5,16.31,2564.34,False,2316.6,2208.2,8.1,49,stopped 2026-09-29,-7.5,-1.0,CORONA Remedies Limited,main
 TBOTEK,EMA 9/21 cross,2026-09-18,1710.6,1600.0,56.2,15.99,1676.32,False,1545.0,1715.0,7.2,43,stopped 2026-10-21,-6.7,-1.0,TBO Tek Limited,main
 EMUDHRA,EMA 9/21 cross,2026-09-15,592.85,489.0,67.9,14.7,411.29,False,360.0,625.0,27.8,46,skipped (stop too far / gap below stop),,,eMudhra Limited,main
@@ -159,33 +159,33 @@ SHREEPUSHK,EMA 9/21 cross,2026-10-28,542.7,426.2,64.3,8.65,490.76,True,514.9,552
 JUSTDIAL,EMA 9/21 cross,2026-09-23,693.55,660.2,55.9,8.5,717.18,False,655.0,693.55,5.1,40,stopped 2026-09-28,-4.8,-1.0,Just Dial Limited,main
 BHAGERIA,EMA 9/21 cross,2026-10-29,370.75,322.5,55.5,8.49,407.97,False,327.4,389.0,20.6,16,skipped (stop too far / gap below stop),,,Bhageria Industries Limited,main
 TATVA,EMA 9/21 cross,2026-09-17,1709.6,1520.0,57.4,7.96,1785.61,False,1594.8,1712.0,12.6,44,skipped (stop too far / gap below stop),,,Tatva Chintan Pharma Chem Limited,main
-SHREEREF.BO,EMA 9/21 cross,2026-09-25,407.6,369.4,57.8,7.68,331.12,False,285.55,413.0,11.8,38,stopped 2026-10-08,-10.6,-1.0,SHREE REFRIGERATIONS LIMITED,BSE
-AIMTRON,EMA 9/21 cross,2026-11-05,1921.25,1534.0,63.7,7.51,1662.53,True,1796.35,1851.0,20.7,10,skipped (stop too far / gap below stop),,,Aimtron Electronics Limited,SME
+SHREEREF.BO,EMA 9/21 cross,2026-09-25,407.6,369.4,57.8,7.64,331.12,False,275.85,413.0,11.8,37,stopped 2026-10-08,-10.6,-1.0,SHREE REFRIGERATIONS LIMITED,BSE
+AIMTRON,EMA 9/21 cross,2026-11-05,1921.25,1534.0,63.7,7.34,1662.53,True,1759.9,1851.0,20.7,11,skipped (stop too far / gap below stop),,,Aimtron Electronics Limited,SME
 SPECTRUM,EMA 9/21 cross,2026-09-07,2486.8,2050.0,64.7,7.13,3905.88,True,4244.8,2611.1,27.4,51,skipped (stop too far / gap below stop),,,Spectrum Electrical Industries Limited,main
 AVADHSUGAR,EMA 9/21 cross,2026-09-28,808.4,719.95,61.9,6.99,964.71,False,843.8,805.2,11.8,37,exited 2026-10-23 (Supertrend red),6.2,0.58,Avadh Sugar & Energy Limited,main
 CNL,EMA 9/21 cross,2026-10-29,1202.4,975.0,61.3,6.76,1186.98,True,1370.0,1219.0,25.0,16,skipped (stop too far / gap below stop),,,Creative Newtech Limited,main
 EIMCOELECO,EMA 9/21 cross,2026-11-05,2517.1,2108.7,66.6,6.72,2271.34,True,2408.4,2510.3,19.0,11,skipped (stop too far / gap below stop),,,Eimco Elecon (India) Limited,main
+TANFACIND.BO,EMA 9/21 cross,2026-10-14,3497.15,2951.0,62.7,6.14,2994.22,True,3375.55,3497.15,18.5,25,skipped (stop too far / gap below stop),,,TANFAC INDUSTRIES LTD.,BSE
 RPGLIFE,EMA 9/21 cross,2026-10-29,3003.8,2558.0,58.2,6.02,2851.94,False,2507.9,2812.0,9.9,16,stopped 2026-10-30,-9.0,-1.0,RPG Life Sciences Limited,main
 SANATHAN,EMA 9/21 cross,2026-11-04,537.65,489.05,59.8,5.77,515.95,True,570.15,587.0,20.0,12,skipped (stop too far / gap below stop),,,Sanathan Textiles Limited,main
 BEPL,EMA 9/21 cross,2026-10-14,130.89,120.42,58.4,5.74,119.84,False,109.61,131.23,9.0,26,stopped 2026-10-19,-8.2,-1.0,Bhansali Engineering Polymers Limited,main
 GARUDA,EMA 9/21 cross,2026-09-23,184.48,174.1,57.8,5.72,135.8,True,150.94,183.39,5.3,40,stopped 2026-09-29,-5.1,-1.0,Garuda Construction and Engineering Limited,main
 DPABHUSHAN,EMA 9/21 cross,2026-09-22,1469.4,1290.0,57.7,5.27,2135.32,False,1833.2,1462.1,13.3,41,skipped (stop too far / gap below stop),,,D. P. Abhushan Limited,main
-TANFACIND.BO,EMA 9/21 cross,2026-10-14,3497.15,2951.0,62.7,5.17,3018.69,True,3404.4,3497.15,18.5,26,skipped (stop too far / gap below stop),,,TANFAC INDUSTRIES LTD.,BSE
 AJAXENGG,EMA 9/21 cross,2026-09-25,607.75,555.0,64.6,5.02,558.43,True,622.25,614.0,10.6,38,stopped 2026-10-16,-9.6,-1.0,Ajax Engineering Limited,main
 ADVANCE,EMA 9/21 cross,2026-10-12,126.52,111.81,61.9,4.8,143.87,False,118.3,126.0,12.7,28,skipped (stop too far / gap below stop),,,Advance Agrolife Limited,main
 JINDALPOLY,EMA 9/21 cross,2026-10-23,739.35,643.1,61.7,4.6,599.17,True,634.9,718.0,11.6,20,stopped 2026-11-16,-10.4,-1.0,Jindal Poly Films Limited,main
 HERITGFOOD,EMA 9/21 cross,2026-10-14,414.8,380.5,59.2,4.49,400.81,False,372.8,416.0,9.3,26,stopped 2026-10-21,-8.5,-1.0,Heritage Foods Limited,main
 LOKESHMACH,EMA 9/21 cross,2026-09-30,365.9,319.0,58.7,4.23,422.87,False,361.8,366.2,14.8,35,skipped (stop too far / gap below stop),,,Lokesh Machines Limited,main
-ZELIO.BO,EMA 9/21 cross,2026-11-13,1127.15,996.8,64.2,4.14,1220.93,True,1415.75,1183.5,18.7,6,skipped (stop too far / gap below stop),,,Zelio E Mobility Limited,BSE
 HATSUN,EMA 9/21 cross,2026-10-16,1162.1,1102.0,56.1,4.01,1115.92,False,1069.35,1165.0,5.7,24,stopped 2026-10-22,-5.4,-1.0,Hatsun Agro Product Limited,main
+ZELIO.BO,EMA 9/21 cross,2026-11-13,1127.15,996.8,64.2,3.92,1148.53,True,1348.35,1183.5,18.7,5,skipped (stop too far / gap below stop),,,Zelio E Mobility Limited,BSE
 SEJALLTD,52w-high base breakout,2026-10-15,966.15,850.21,81.3,3.82,742.87,True,892.5,955.0,12.3,25,stopped 2026-10-19,-11.0,-1.0,Sejal Glass Limited,main
 RACLGEAR,52w-high base breakout,2026-09-09,1633.9,1517.0,70.3,3.72,1393.87,True,1546.7,1643.9,8.4,49,stopped 2026-10-01,-7.7,-1.0,RACL Geartech Limited,main
 MPSLTD,EMA 9/21 cross,2026-09-09,2783.4,2556.1,58.3,3.71,2415.22,False,2105.6,2783.4,8.9,49,stopped 2026-09-15,-8.2,-1.0,MPS Limited,main
 MUKANDLTD,EMA 9/21 cross,2026-09-22,141.41,129.91,59.1,3.58,152.64,False,133.96,141.41,8.9,41,exited 2026-10-22 (Supertrend red),10.3,1.26,Mukand Limited,main
+CFF.BO,EMA 9/21 cross,2026-09-17,1109.2,870.0,69.5,3.44,911.88,True,999.3,1124.95,29.3,43,skipped (stop too far / gap below stop),,,CFF FLUID CONTROL LIMITED,BSE
 DBOL,EMA 9/21 cross,2026-09-30,126.1,112.0,59.6,3.43,124.52,True,142.71,126.1,12.6,35,skipped (stop too far / gap below stop),,,Dhampur Bio Organics Limited,main
-CFF.BO,EMA 9/21 cross,2026-09-17,1109.2,870.0,69.5,3.35,911.88,True,977.9,1124.95,29.3,44,skipped (stop too far / gap below stop),,,CFF FLUID CONTROL LIMITED,BSE
-DPEL,EMA 9/21 cross,2026-11-04,699.45,562.05,74.5,3.16,618.25,True,660.95,698.0,24.2,11,skipped (stop too far / gap below stop),,,Divine Power Energy Limited,SME
 MANCREDIT,EMA 9/21 cross,2026-08-31,242.74,219.25,56.6,3.09,238.88,True,257.0,240.0,9.5,56,stopped 2026-09-08,-8.6,-1.0,Mangal Credit and Fincorp Limited,main
+DPEL,EMA 9/21 cross,2026-11-04,699.45,562.05,74.5,3.09,618.25,True,661.0,698.0,24.2,12,skipped (stop too far / gap below stop),,,Divine Power Energy Limited,SME
 20MICRONS,EMA 9/21 cross,2026-09-21,220.12,194.05,59.1,2.93,195.37,False,180.44,220.0,13.4,42,skipped (stop too far / gap below stop),,,20 Microns Limited,main
 TRANSWORLD,EMA 9/21 cross,2026-11-09,237.39,155.27,77.8,2.88,217.41,False,169.01,231.69,49.2,9,skipped (stop too far / gap below stop),,,TRANSWORLD SHIPPING LINES LIMITED,main
 EMKAY,EMA 9/21 cross,2026-10-27,287.2,249.0,59.7,2.85,248.34,True,253.7,287.2,15.3,18,skipped (stop too far / gap below stop),,,Emkay Global Financial Services Limited,main
@@ -204,9 +204,9 @@ BIL,EMA 9/21 cross,2026-11-02,1049.6,984.85,57.0,1.71,1175.09,False,972.0,1096.0
 BIL,52w-high base breakout,2026-09-09,1108.2,975.22,86.5,1.71,1175.09,False,972.0,1122.6,15.1,49,stopped 2026-09-30,-13.1,-1.0,Bhartiya International Limited,main
 EXPLEOSOL,EMA 9/21 cross,2026-10-16,896.65,854.8,58.0,1.55,853.22,False,770.6,900.0,5.3,24,stopped 2026-10-22,-5.0,-1.0,Expleo Solutions Limited,main
 KILITCH,EMA 9/21 cross,2026-11-16,238.56,190.0,64.1,1.55,191.08,True,215.69,240.99,26.8,5,skipped (stop too far / gap below stop),,,Kilitch Drugs (India) Limited,main
-VINYAS,EMA 9/21 cross,2026-09-22,1589.0,1381.05,58.8,1.54,1630.67,False,1435.9,1605.0,16.2,40,skipped (stop too far / gap below stop),,,Vinyas Innovative Technologies Limited,SME
 MAZDA,EMA 9/21 cross,2026-10-29,291.3,254.05,55.3,1.5,261.16,True,262.35,290.15,14.2,16,skipped (stop too far / gap below stop),,,Mazda Limited,main
-LTELEVATOR.BO,EMA 9/21 cross,2026-10-15,348.7,327.95,59.3,1.42,345.53,False,299.9,355.0,8.2,25,stopped 2026-10-22,-9.1,-1.19,L. T. ELEVATOR LIMITED,BSE
+LTELEVATOR.BO,EMA 9/21 cross,2026-10-15,348.7,327.95,59.3,1.4,351.43,False,305.35,355.0,8.2,24,stopped 2026-10-22,-9.1,-1.19,L. T. ELEVATOR LIMITED,BSE
+VINYAS,EMA 9/21 cross,2026-09-22,1589.0,1381.05,58.8,1.39,1627.48,False,1436.55,1605.0,16.2,41,skipped (stop too far / gap below stop),,,Vinyas Innovative Technologies Limited,SME
 GOCLCORP,EMA 9/21 cross,2026-09-04,427.45,382.55,62.5,1.15,359.65,False,329.9,429.0,12.1,52,skipped (stop too far / gap below stop),,,GOCL Corporation Limited,main
 JUBLCPL,EMA 9/21 cross,2026-09-25,2210.1,2001.0,55.8,0.97,2019.14,False,1759.0,2243.0,12.1,38,skipped (stop too far / gap below stop),,,Jubilant Agri and Consumer Products Limited,main
 CUBEXTUB,52w-high base breakout,2026-09-24,138.4,121.79,91.4,0.79,204.78,True,211.29,147.9,21.4,39,exited 2026-11-02 (Supertrend red),29.0,1.64,Cubex Tubings Limited,main
