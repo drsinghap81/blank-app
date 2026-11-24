@@ -1,12 +1,12 @@
 {
  "asof": "2026-11-23",
- "updated_ist": "2026-11-23 17:50",
+ "updated_ist": "2026-11-24 08:58",
  "start": "2026-10-29",
  "capital": 2000000,
- "equity": 2303460,
- "ret_pct": 15.17,
+ "equity": 2237126,
+ "ret_pct": 11.86,
  "cash": 183473,
- "invested_pct": 79.7,
+ "invested_pct": 82.0,
  "ath": {
   "value": 661726,
   "open": 6,
@@ -18,7 +18,7 @@
   "realised": -49447
  },
  "tb": {
-  "pnl": 285252,
+  "pnl": 218917,
   "qty": 30
  },
  "closed_trades": 3,
