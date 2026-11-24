@@ -1,0 +1,2871 @@
+{
+ "method": "Strategy scorecard + 'how many GOOD systems is this stock on' (24 Nov 2026, Amritpal: \"each stock with a matrix having all\nthese strategies; categorise a backtest score for each; if a stock is scoring overall more I should see it - say KOTAKBANK comes in\n10, 8 backtested good, 2 not good\").\n\nOne uniform test for every price-pattern strategy in the app, NSE stocks (Yahoo 2015-26, today's names -> survivors), point in time:\n  ath      Monthly ATH breakout: high above the high of the all-time-high closing month, base >= 24 months, close above a rising\n           150-day SMA (30 weeks), >= Rs 2 cr/day   (the Momentum system's entry)\n  month    month closed above the highest earlier month close (that high >= 12 months old)        (Month close list)\n  wcup     weekly cup close (tools/cupclose.py: 104-week rim >= 26 weeks old, cup >= 20% deep, room >= depth)\n  dcup     daily cup close  (250-day rim >= 20 days old, cup >= 15% deep, room >= depth)\n  base     first 52-week-high breakout after a 6-month base\n  cup921   9/21 cross within 20 sessions after a day cup close or 52-week base breakout          (Cup 9/21, approx.)\n  921      9/21 cross on any stock (live rule)\n  tight    tight-base breakout\n  flag / pennant / rectangle   breakout with drying flag volume, 1.5x breakout volume, range <= 8% (live rule without room)\n  wbot / tiltw / triple / ihs  bottom patterns, first close above the neckline (tools/pattern_scan.py rules)\n  retest   after a 52-week base breakout, first close back within 3% above the breakout level (10-60 sessions later)\n  emalift  first candle whose low is above a rising EMA 9 (none in the previous 10 sessions)\n  stack    first day of close > SMA 20 > 50 > 100 > 200, all rising (none in the previous 20 sessions)\nOne event per stock per system per 20 sessions. Buy next open, hold 63 (and 126) sessions, 0.4% cost; vs Nifty 50 same days.\nGrade (63 days vs Nifty, win rate):  GOOD >= +2.0 points and >= 55% wins and the last 3 years > 0;  FAIR > 0;  POOR <= 0.\nWalk-forward confluence: grades from 2016-2021 events only, then 2022-26 events bucketed by how many GOOD systems fired on the stock\nin the last 20 sessions (0 / 1 / 2 / 3+) and how many not-good ones.\nPer stock: each system's own past events on that stock (n, avg 63d, win) -> data/research/strategy_scorecard_stocks.json.\nPILOT env = 150 stocks.",
+ "events": 53551,
+ "systems": {
+  "ath": {
+   "name": "Monthly ATH breakout",
+   "all": {
+    "n": 517,
+    "avg": 10.48,
+    "med": 6.48,
+    "win": 64,
+    "vs_nifty": 7.36
+   },
+   "all126": {
+    "n": 511,
+    "avg": 23.59,
+    "med": 16.47,
+    "win": 68,
+    "vs_nifty": 16.32
+   },
+   "last 1y": {
+    "n": 19,
+    "avg": 0.28,
+    "med": 0.21,
+    "win": 53,
+    "vs_nifty": 0.06
+   },
+   "last 3y": {
+    "n": 170,
+    "avg": 7.62,
+    "med": 5.51,
+    "win": 65,
+    "vs_nifty": 4.3
+   },
+   "last 5y": {
+    "n": 301,
+    "avg": 8.86,
+    "med": 5.98,
+    "win": 61,
+    "vs_nifty": 6.98
+   },
+   "bull": {
+    "n": 480,
+    "avg": 10.65,
+    "med": 7.12,
+    "win": 64,
+    "vs_nifty": 7.68
+   },
+   "bear": {
+    "n": 37,
+    "avg": 8.23,
+    "med": 3.7,
+    "win": 59,
+    "vs_nifty": 3.23
+   },
+   "ex-Covid": {
+    "n": 476,
+    "avg": 9.46,
+    "med": 6.03,
+    "win": 62,
+    "vs_nifty": 6.99
+   },
+   "train": {
+    "n": 255,
+    "avg": 12.54,
+    "med": 8.11,
+    "win": 64,
+    "vs_nifty": 8.64
+   },
+   "test": {
+    "n": 262,
+    "avg": 8.47,
+    "med": 6.18,
+    "win": 63,
+    "vs_nifty": 6.12
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 16,
+     "avg": -0.54,
+     "med": -2.16,
+     "win": 50,
+     "vs_nifty": -0.72
+    },
+    "2025": {
+     "n": 19,
+     "avg": -1.13,
+     "med": 0.56,
+     "win": 53,
+     "vs_nifty": -2.72
+    },
+    "2024": {
+     "n": 94,
+     "avg": 5.25,
+     "med": 4.33,
+     "win": 62,
+     "vs_nifty": 2.85
+    },
+    "2023": {
+     "n": 79,
+     "avg": 19.51,
+     "med": 15.8,
+     "win": 84,
+     "vs_nifty": 14.23
+    },
+    "2022": {
+     "n": 54,
+     "avg": 3.99,
+     "med": -3.4,
+     "win": 43,
+     "vs_nifty": 5.07
+    },
+    "2021": {
+     "n": 160,
+     "avg": 15.47,
+     "med": 10.53,
+     "win": 68,
+     "vs_nifty": 10.07
+    },
+    "2020": {
+     "n": 53,
+     "avg": 12.5,
+     "med": 9.07,
+     "win": 66,
+     "vs_nifty": 9.58
+    },
+    "2019": {
+     "n": 11,
+     "avg": -5.04,
+     "med": -4.5,
+     "win": 36,
+     "vs_nifty": 1.3
+    },
+    "2018": {
+     "n": 13,
+     "avg": -1.75,
+     "med": 11.1,
+     "win": 54,
+     "vs_nifty": -1.52
+    },
+    "2017": {
+     "n": 18,
+     "avg": 7.71,
+     "med": 5.26,
+     "win": 56,
+     "vs_nifty": 5.03
+    }
+   }
+  },
+  "month": {
+   "name": "Month close above ATH",
+   "all": {
+    "n": 1059,
+    "avg": 9.26,
+    "med": 5.1,
+    "win": 62,
+    "vs_nifty": 6.62
+   },
+   "all126": {
+    "n": 1018,
+    "avg": 20.09,
+    "med": 11.21,
+    "win": 65,
+    "vs_nifty": 13.75
+   },
+   "last 1y": {
+    "n": 124,
+    "avg": 5.44,
+    "med": 4.34,
+    "win": 64,
+    "vs_nifty": 6.99
+   },
+   "last 3y": {
+    "n": 389,
+    "avg": 8.54,
+    "med": 4.57,
+    "win": 61,
+    "vs_nifty": 6.28
+   },
+   "last 5y": {
+    "n": 602,
+    "avg": 9.15,
+    "med": 4.98,
+    "win": 62,
+    "vs_nifty": 7.38
+   },
+   "bull": {
+    "n": 924,
+    "avg": 9.57,
+    "med": 5.02,
+    "win": 62,
+    "vs_nifty": 6.84
+   },
+   "bear": {
+    "n": 135,
+    "avg": 7.12,
+    "med": 6.79,
+    "win": 63,
+    "vs_nifty": 5.12
+   },
+   "ex-Covid": {
+    "n": 995,
+    "avg": 8.49,
+    "med": 4.57,
+    "win": 61,
+    "vs_nifty": 6.41
+   },
+   "train": {
+    "n": 497,
+    "avg": 9.15,
+    "med": 4.94,
+    "win": 62,
+    "vs_nifty": 5.71
+   },
+   "test": {
+    "n": 562,
+    "avg": 9.35,
+    "med": 5.46,
+    "win": 62,
+    "vs_nifty": 7.42
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 75,
+     "avg": 6.49,
+     "med": 7.09,
+     "win": 67,
+     "vs_nifty": 8.56
+    },
+    "2025": {
+     "n": 85,
+     "avg": 3.04,
+     "med": 0.87,
+     "win": 52,
+     "vs_nifty": 2.78
+    },
+    "2024": {
+     "n": 132,
+     "avg": 3.99,
+     "med": 0.67,
+     "win": 52,
+     "vs_nifty": 2.37
+    },
+    "2023": {
+     "n": 189,
+     "avg": 19.77,
+     "med": 12.99,
+     "win": 78,
+     "vs_nifty": 14.14
+    },
+    "2022": {
+     "n": 81,
+     "avg": 3.07,
+     "med": -0.05,
+     "win": 49,
+     "vs_nifty": 3.79
+    },
+    "2021": {
+     "n": 177,
+     "avg": 12.7,
+     "med": 6.49,
+     "win": 69,
+     "vs_nifty": 5.98
+    },
+    "2020": {
+     "n": 79,
+     "avg": 14.15,
+     "med": 10.55,
+     "win": 71,
+     "vs_nifty": 9.03
+    },
+    "2019": {
+     "n": 58,
+     "avg": 1.54,
+     "med": -0.36,
+     "win": 50,
+     "vs_nifty": 4.33
+    },
+    "2018": {
+     "n": 25,
+     "avg": 1.05,
+     "med": 4.02,
+     "win": 56,
+     "vs_nifty": 1.26
+    },
+    "2017": {
+     "n": 101,
+     "avg": 8.09,
+     "med": 3.44,
+     "win": 59,
+     "vs_nifty": 3.76
+    },
+    "2016": {
+     "n": 57,
+     "avg": 4.38,
+     "med": -3.86,
+     "win": 46,
+     "vs_nifty": 7.12
+    }
+   }
+  },
+  "wcup": {
+   "name": "Weekly cup close",
+   "all": {
+    "n": 478,
+    "avg": 7.46,
+    "med": 3.27,
+    "win": 58,
+    "vs_nifty": 5.27
+   },
+   "all126": {
+    "n": 452,
+    "avg": 14.6,
+    "med": 6.72,
+    "win": 58,
+    "vs_nifty": 10.14
+   },
+   "last 1y": {
+    "n": 90,
+    "avg": 2.86,
+    "med": 2.99,
+    "win": 56,
+    "vs_nifty": 3.54
+   },
+   "last 3y": {
+    "n": 218,
+    "avg": 6.33,
+    "med": 3.29,
+    "win": 59,
+    "vs_nifty": 4.59
+   },
+   "last 5y": {
+    "n": 344,
+    "avg": 7.68,
+    "med": 3.32,
+    "win": 59,
+    "vs_nifty": 6.13
+   },
+   "bull": {
+    "n": 401,
+    "avg": 8.07,
+    "med": 3.2,
+    "win": 59,
+    "vs_nifty": 5.65
+   },
+   "bear": {
+    "n": 77,
+    "avg": 4.26,
+    "med": 4.05,
+    "win": 57,
+    "vs_nifty": 3.3
+   },
+   "ex-Covid": {
+    "n": 449,
+    "avg": 6.42,
+    "med": 2.41,
+    "win": 56,
+    "vs_nifty": 4.97
+   },
+   "train": {
+    "n": 152,
+    "avg": 6.18,
+    "med": 1.81,
+    "win": 55,
+    "vs_nifty": 2.93
+   },
+   "test": {
+    "n": 326,
+    "avg": 8.05,
+    "med": 4.0,
+    "win": 60,
+    "vs_nifty": 6.36
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 62,
+     "avg": 4.17,
+     "med": 4.21,
+     "win": 60,
+     "vs_nifty": 5.75
+    },
+    "2025": {
+     "n": 68,
+     "avg": 1.95,
+     "med": 1.29,
+     "win": 56,
+     "vs_nifty": 0.48
+    },
+    "2024": {
+     "n": 55,
+     "avg": 8.38,
+     "med": 0.89,
+     "win": 51,
+     "vs_nifty": 5.38
+    },
+    "2023": {
+     "n": 88,
+     "avg": 19.91,
+     "med": 13.13,
+     "win": 80,
+     "vs_nifty": 14.96
+    },
+    "2022": {
+     "n": 53,
+     "avg": 0.4,
+     "med": -1.68,
+     "win": 43,
+     "vs_nifty": 1.36
+    },
+    "2021": {
+     "n": 49,
+     "avg": 4.19,
+     "med": -0.28,
+     "win": 47,
+     "vs_nifty": -0.36
+    },
+    "2020": {
+     "n": 36,
+     "avg": 14.1,
+     "med": 20.21,
+     "win": 78,
+     "vs_nifty": 8.12
+    },
+    "2019": {
+     "n": 30,
+     "avg": 6.78,
+     "med": 1.81,
+     "win": 53,
+     "vs_nifty": 5.91
+    },
+    "2018": {
+     "n": 16,
+     "avg": -12.77,
+     "med": -9.94,
+     "win": 12,
+     "vs_nifty": -11.45
+    },
+    "2017": {
+     "n": 21,
+     "avg": 10.84,
+     "med": 8.52,
+     "win": 67,
+     "vs_nifty": 8.41
+    }
+   }
+  },
+  "dcup": {
+   "name": "Daily cup close",
+   "all": {
+    "n": 1325,
+    "avg": 9.62,
+    "med": 4.46,
+    "win": 59,
+    "vs_nifty": 6.39
+   },
+   "all126": {
+    "n": 1287,
+    "avg": 17.48,
+    "med": 7.88,
+    "win": 60,
+    "vs_nifty": 12.32
+   },
+   "last 1y": {
+    "n": 124,
+    "avg": 5.45,
+    "med": 3.11,
+    "win": 56,
+    "vs_nifty": 6.59
+   },
+   "last 3y": {
+    "n": 531,
+    "avg": 8.4,
+    "med": 3.79,
+    "win": 57,
+    "vs_nifty": 5.6
+   },
+   "last 5y": {
+    "n": 814,
+    "avg": 8.58,
+    "med": 3.15,
+    "win": 56,
+    "vs_nifty": 6.76
+   },
+   "bull": {
+    "n": 1170,
+    "avg": 10.08,
+    "med": 4.65,
+    "win": 59,
+    "vs_nifty": 6.89
+   },
+   "bear": {
+    "n": 155,
+    "avg": 6.09,
+    "med": 3.12,
+    "win": 58,
+    "vs_nifty": 2.62
+   },
+   "ex-Covid": {
+    "n": 1258,
+    "avg": 9.02,
+    "med": 3.99,
+    "win": 58,
+    "vs_nifty": 6.35
+   },
+   "train": {
+    "n": 583,
+    "avg": 11.14,
+    "med": 5.39,
+    "win": 63,
+    "vs_nifty": 6.56
+   },
+   "test": {
+    "n": 742,
+    "avg": 8.42,
+    "med": 3.22,
+    "win": 56,
+    "vs_nifty": 6.26
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 93,
+     "avg": 7.05,
+     "med": 3.94,
+     "win": 58,
+     "vs_nifty": 8.77
+    },
+    "2025": {
+     "n": 94,
+     "avg": 3.51,
+     "med": 0.51,
+     "win": 52,
+     "vs_nifty": 1.68
+    },
+    "2024": {
+     "n": 277,
+     "avg": 8.77,
+     "med": 3.09,
+     "win": 55,
+     "vs_nifty": 5.43
+    },
+    "2023": {
+     "n": 137,
+     "avg": 20.07,
+     "med": 17.27,
+     "win": 75,
+     "vs_nifty": 13.77
+    },
+    "2022": {
+     "n": 141,
+     "avg": 0.57,
+     "med": -4.14,
+     "win": 42,
+     "vs_nifty": 1.98
+    },
+    "2021": {
+     "n": 175,
+     "avg": 12.04,
+     "med": 5.64,
+     "win": 62,
+     "vs_nifty": 7.91
+    },
+    "2020": {
+     "n": 69,
+     "avg": 19.9,
+     "med": 19.23,
+     "win": 77,
+     "vs_nifty": 7.51
+    },
+    "2019": {
+     "n": 32,
+     "avg": 1.7,
+     "med": 2.6,
+     "win": 59,
+     "vs_nifty": 0.12
+    },
+    "2018": {
+     "n": 71,
+     "avg": -4.75,
+     "med": -7.77,
+     "win": 34,
+     "vs_nifty": -5.28
+    },
+    "2017": {
+     "n": 181,
+     "avg": 14.66,
+     "med": 6.96,
+     "win": 68,
+     "vs_nifty": 9.48
+    },
+    "2016": {
+     "n": 55,
+     "avg": 11.72,
+     "med": 6.88,
+     "win": 69,
+     "vs_nifty": 10.52
+    }
+   }
+  },
+  "base": {
+   "name": "52-week base breakout",
+   "all": {
+    "n": 1745,
+    "avg": 6.18,
+    "med": 3.74,
+    "win": 58,
+    "vs_nifty": 4.2
+   },
+   "all126": {
+    "n": 1641,
+    "avg": 13.85,
+    "med": 7.42,
+    "win": 62,
+    "vs_nifty": 8.84
+   },
+   "last 1y": {
+    "n": 325,
+    "avg": 2.69,
+    "med": -0.3,
+    "win": 49,
+    "vs_nifty": 4.22
+   },
+   "last 3y": {
+    "n": 687,
+    "avg": 3.91,
+    "med": 1.15,
+    "win": 53,
+    "vs_nifty": 3.04
+   },
+   "last 5y": {
+    "n": 1129,
+    "avg": 6.67,
+    "med": 3.35,
+    "win": 57,
+    "vs_nifty": 5.38
+   },
+   "bull": {
+    "n": 1448,
+    "avg": 6.16,
+    "med": 3.75,
+    "win": 58,
+    "vs_nifty": 4.31
+   },
+   "bear": {
+    "n": 297,
+    "avg": 6.27,
+    "med": 3.39,
+    "win": 59,
+    "vs_nifty": 3.69
+   },
+   "ex-Covid": {
+    "n": 1591,
+    "avg": 5.12,
+    "med": 2.74,
+    "win": 56,
+    "vs_nifty": 4.27
+   },
+   "train": {
+    "n": 653,
+    "avg": 5.03,
+    "med": 4.02,
+    "win": 58,
+    "vs_nifty": 2.06
+   },
+   "test": {
+    "n": 1092,
+    "avg": 6.87,
+    "med": 3.63,
+    "win": 58,
+    "vs_nifty": 5.49
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 225,
+     "avg": 3.57,
+     "med": 0.77,
+     "win": 52,
+     "vs_nifty": 5.51
+    },
+    "2025": {
+     "n": 246,
+     "avg": 2.69,
+     "med": 0.71,
+     "win": 53,
+     "vs_nifty": 2.02
+    },
+    "2024": {
+     "n": 137,
+     "avg": 4.47,
+     "med": 1.93,
+     "win": 53,
+     "vs_nifty": 2.12
+    },
+    "2023": {
+     "n": 327,
+     "avg": 15.15,
+     "med": 9.26,
+     "win": 75,
+     "vs_nifty": 10.58
+    },
+    "2022": {
+     "n": 157,
+     "avg": 3.0,
+     "med": -2.24,
+     "win": 45,
+     "vs_nifty": 3.2
+    },
+    "2021": {
+     "n": 180,
+     "avg": 6.82,
+     "med": 3.43,
+     "win": 61,
+     "vs_nifty": 3.32
+    },
+    "2020": {
+     "n": 191,
+     "avg": 8.63,
+     "med": 9.79,
+     "win": 64,
+     "vs_nifty": 2.53
+    },
+    "2019": {
+     "n": 142,
+     "avg": 0.87,
+     "med": -0.92,
+     "win": 49,
+     "vs_nifty": 1.73
+    },
+    "2018": {
+     "n": 62,
+     "avg": -4.15,
+     "med": -4.21,
+     "win": 37,
+     "vs_nifty": -3.57
+    },
+    "2017": {
+     "n": 78,
+     "avg": 6.93,
+     "med": 5.53,
+     "win": 71,
+     "vs_nifty": 3.11
+    }
+   }
+  },
+  "cup921": {
+   "name": "Cup 9/21",
+   "all": {
+    "n": 103,
+    "avg": 7.98,
+    "med": 4.99,
+    "win": 61,
+    "vs_nifty": 5.83
+   },
+   "all126": {
+    "n": 97,
+    "avg": 17.42,
+    "med": 7.88,
+    "win": 63,
+    "vs_nifty": 12.32
+   },
+   "last 1y": {
+    "n": 15,
+    "avg": -5.64,
+    "med": -6.11,
+    "win": 40,
+    "vs_nifty": -2.94
+   },
+   "last 3y": {
+    "n": 47,
+    "avg": 6.4,
+    "med": 2.46,
+    "win": 60,
+    "vs_nifty": 5.38
+   },
+   "last 5y": {
+    "n": 69,
+    "avg": 4.76,
+    "med": 2.46,
+    "win": 57,
+    "vs_nifty": 4.12
+   },
+   "bull": {
+    "n": 88,
+    "avg": 8.89,
+    "med": 4.94,
+    "win": 60,
+    "vs_nifty": 6.63
+   },
+   "bear": {
+    "n": 15,
+    "avg": 2.66,
+    "med": 5.48,
+    "win": 67,
+    "vs_nifty": 1.16
+   },
+   "ex-Covid": {
+    "n": 97,
+    "avg": 8.2,
+    "med": 5.09,
+    "win": 61,
+    "vs_nifty": 6.64
+   },
+   "train": {
+    "n": 38,
+    "avg": 13.67,
+    "med": 7.79,
+    "win": 68,
+    "vs_nifty": 9.07
+   },
+   "test": {
+    "n": 65,
+    "avg": 4.66,
+    "med": 2.46,
+    "win": 57,
+    "vs_nifty": 3.94
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 10,
+     "avg": -4.5,
+     "med": -3.71,
+     "win": 40,
+     "vs_nifty": -0.71
+    },
+    "2025": {
+     "n": 13,
+     "avg": 3.92,
+     "med": 8.2,
+     "win": 62,
+     "vs_nifty": 3.06
+    },
+    "2024": {
+     "n": 16,
+     "avg": 16.84,
+     "med": 5.17,
+     "win": 62,
+     "vs_nifty": 16.74
+    },
+    "2023": {
+     "n": 18,
+     "avg": 1.28,
+     "med": 2.96,
+     "win": 61,
+     "vs_nifty": -3.31
+    },
+    "2022": {
+     "n": 8,
+     "avg": 0.55,
+     "med": 1.44,
+     "win": 50,
+     "vs_nifty": 1.9
+    },
+    "2021": {
+     "n": 16,
+     "avg": 10.67,
+     "med": 11.5,
+     "win": 69,
+     "vs_nifty": 6.57
+    },
+    "2020": {
+     "n": 6,
+     "avg": 4.48,
+     "med": 4.02,
+     "win": 67,
+     "vs_nifty": -7.28
+    },
+    "2019": {
+     "n": 8,
+     "avg": 8.92,
+     "med": 11.54,
+     "win": 62,
+     "vs_nifty": 9.51
+    },
+    "2018": {
+     "n": 2,
+     "avg": 7.0,
+     "med": 7.0,
+     "win": 100,
+     "vs_nifty": 1.39
+    },
+    "2017": {
+     "n": 5,
+     "avg": 45.89,
+     "med": 11.27,
+     "win": 60,
+     "vs_nifty": 41.29
+    },
+    "2016": {
+     "n": 1,
+     "avg": 6.88,
+     "med": 6.88,
+     "win": 100,
+     "vs_nifty": -2.17
+    }
+   }
+  },
+  "921": {
+   "name": "9/21 any stock",
+   "all": {
+    "n": 3394,
+    "avg": 7.09,
+    "med": 4.12,
+    "win": 58,
+    "vs_nifty": 4.92
+   },
+   "all126": {
+    "n": 3257,
+    "avg": 15.52,
+    "med": 9.75,
+    "win": 64,
+    "vs_nifty": 10.12
+   },
+   "last 1y": {
+    "n": 361,
+    "avg": 1.93,
+    "med": -2.65,
+    "win": 45,
+    "vs_nifty": 3.79
+   },
+   "last 3y": {
+    "n": 1283,
+    "avg": 6.6,
+    "med": 3.23,
+    "win": 56,
+    "vs_nifty": 4.97
+   },
+   "last 5y": {
+    "n": 1862,
+    "avg": 7.57,
+    "med": 3.79,
+    "win": 57,
+    "vs_nifty": 6.2
+   },
+   "bull": {
+    "n": 3042,
+    "avg": 6.97,
+    "med": 4.15,
+    "win": 58,
+    "vs_nifty": 4.94
+   },
+   "bear": {
+    "n": 352,
+    "avg": 8.1,
+    "med": 4.06,
+    "win": 58,
+    "vs_nifty": 4.79
+   },
+   "ex-Covid": {
+    "n": 3175,
+    "avg": 6.51,
+    "med": 3.63,
+    "win": 57,
+    "vs_nifty": 5.17
+   },
+   "train": {
+    "n": 1679,
+    "avg": 6.55,
+    "med": 4.21,
+    "win": 59,
+    "vs_nifty": 3.81
+   },
+   "test": {
+    "n": 1715,
+    "avg": 7.61,
+    "med": 4.07,
+    "win": 57,
+    "vs_nifty": 6.01
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 221,
+     "avg": 4.86,
+     "med": -0.52,
+     "win": 49,
+     "vs_nifty": 7.19
+    },
+    "2025": {
+     "n": 372,
+     "avg": 0.9,
+     "med": -2.41,
+     "win": 43,
+     "vs_nifty": 0.55
+    },
+    "2024": {
+     "n": 474,
+     "avg": 6.51,
+     "med": 3.75,
+     "win": 57,
+     "vs_nifty": 5.35
+    },
+    "2023": {
+     "n": 439,
+     "avg": 18.13,
+     "med": 13.59,
+     "win": 79,
+     "vs_nifty": 12.31
+    },
+    "2022": {
+     "n": 209,
+     "avg": 2.84,
+     "med": -0.41,
+     "win": 48,
+     "vs_nifty": 2.73
+    },
+    "2021": {
+     "n": 489,
+     "avg": 13.14,
+     "med": 8.92,
+     "win": 67,
+     "vs_nifty": 8.51
+    },
+    "2020": {
+     "n": 269,
+     "avg": 8.51,
+     "med": 7.44,
+     "win": 66,
+     "vs_nifty": 1.76
+    },
+    "2019": {
+     "n": 251,
+     "avg": -2.36,
+     "med": -2.68,
+     "win": 45,
+     "vs_nifty": 1.6
+    },
+    "2018": {
+     "n": 152,
+     "avg": -2.42,
+     "med": -4.8,
+     "win": 41,
+     "vs_nifty": -4.15
+    },
+    "2017": {
+     "n": 337,
+     "avg": 8.14,
+     "med": 4.9,
+     "win": 63,
+     "vs_nifty": 4.2
+    },
+    "2016": {
+     "n": 181,
+     "avg": 2.76,
+     "med": 0.45,
+     "win": 51,
+     "vs_nifty": 3.2
+    }
+   }
+  },
+  "tight": {
+   "name": "Tight base",
+   "all": {
+    "n": 5551,
+    "avg": 5.48,
+    "med": 2.52,
+    "win": 56,
+    "vs_nifty": 2.93
+   },
+   "all126": {
+    "n": 5288,
+    "avg": 12.93,
+    "med": 6.51,
+    "win": 60,
+    "vs_nifty": 7.24
+   },
+   "last 1y": {
+    "n": 679,
+    "avg": -1.41,
+    "med": -3.66,
+    "win": 41,
+    "vs_nifty": 0.33
+   },
+   "last 3y": {
+    "n": 2149,
+    "avg": 3.18,
+    "med": 0.35,
+    "win": 51,
+    "vs_nifty": 1.53
+   },
+   "last 5y": {
+    "n": 3317,
+    "avg": 5.0,
+    "med": 1.77,
+    "win": 54,
+    "vs_nifty": 3.49
+   },
+   "bull": {
+    "n": 4854,
+    "avg": 5.68,
+    "med": 2.74,
+    "win": 56,
+    "vs_nifty": 3.19
+   },
+   "bear": {
+    "n": 697,
+    "avg": 4.13,
+    "med": 1.32,
+    "win": 54,
+    "vs_nifty": 1.12
+   },
+   "ex-Covid": {
+    "n": 5196,
+    "avg": 4.71,
+    "med": 1.83,
+    "win": 54,
+    "vs_nifty": 2.88
+   },
+   "train": {
+    "n": 2407,
+    "avg": 5.7,
+    "med": 2.96,
+    "win": 56,
+    "vs_nifty": 2.0
+   },
+   "test": {
+    "n": 3144,
+    "avg": 5.32,
+    "med": 2.28,
+    "win": 55,
+    "vs_nifty": 3.65
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 431,
+     "avg": -0.28,
+     "med": -2.77,
+     "win": 43,
+     "vs_nifty": 1.64
+    },
+    "2025": {
+     "n": 638,
+     "avg": -1.81,
+     "med": -3.8,
+     "win": 39,
+     "vs_nifty": -1.77
+    },
+    "2024": {
+     "n": 702,
+     "avg": 2.69,
+     "med": 1.62,
+     "win": 53,
+     "vs_nifty": 0.55
+    },
+    "2023": {
+     "n": 900,
+     "avg": 17.55,
+     "med": 12.57,
+     "win": 77,
+     "vs_nifty": 12.54
+    },
+    "2022": {
+     "n": 473,
+     "avg": 0.64,
+     "med": -0.81,
+     "win": 48,
+     "vs_nifty": 0.46
+    },
+    "2021": {
+     "n": 657,
+     "avg": 9.4,
+     "med": 4.09,
+     "win": 58,
+     "vs_nifty": 3.59
+    },
+    "2020": {
+     "n": 420,
+     "avg": 10.87,
+     "med": 8.87,
+     "win": 69,
+     "vs_nifty": 3.67
+    },
+    "2019": {
+     "n": 284,
+     "avg": -3.8,
+     "med": -3.68,
+     "win": 44,
+     "vs_nifty": -2.68
+    },
+    "2018": {
+     "n": 288,
+     "avg": -4.25,
+     "med": -5.68,
+     "win": 36,
+     "vs_nifty": -4.32
+    },
+    "2017": {
+     "n": 547,
+     "avg": 8.56,
+     "med": 5.7,
+     "win": 64,
+     "vs_nifty": 3.73
+    },
+    "2016": {
+     "n": 211,
+     "avg": 2.83,
+     "med": -0.43,
+     "win": 48,
+     "vs_nifty": 4.22
+    }
+   }
+  },
+  "flag": {
+   "name": "Flag",
+   "all": {
+    "n": 885,
+    "avg": 11.58,
+    "med": 6.72,
+    "win": 63,
+    "vs_nifty": 8.43
+   },
+   "all126": {
+    "n": 862,
+    "avg": 22.64,
+    "med": 13.35,
+    "win": 66,
+    "vs_nifty": 16.59
+   },
+   "last 1y": {
+    "n": 72,
+    "avg": 6.71,
+    "med": 0.18,
+    "win": 53,
+    "vs_nifty": 7.69
+   },
+   "last 3y": {
+    "n": 343,
+    "avg": 9.97,
+    "med": 5.52,
+    "win": 60,
+    "vs_nifty": 6.87
+   },
+   "last 5y": {
+    "n": 518,
+    "avg": 11.27,
+    "med": 6.61,
+    "win": 63,
+    "vs_nifty": 8.85
+   },
+   "bull": {
+    "n": 790,
+    "avg": 12.07,
+    "med": 6.96,
+    "win": 63,
+    "vs_nifty": 9.13
+   },
+   "bear": {
+    "n": 95,
+    "avg": 7.5,
+    "med": 4.86,
+    "win": 61,
+    "vs_nifty": 2.59
+   },
+   "ex-Covid": {
+    "n": 832,
+    "avg": 10.9,
+    "med": 6.13,
+    "win": 62,
+    "vs_nifty": 8.35
+   },
+   "train": {
+    "n": 398,
+    "avg": 11.82,
+    "med": 6.2,
+    "win": 63,
+    "vs_nifty": 8.07
+   },
+   "test": {
+    "n": 487,
+    "avg": 11.38,
+    "med": 7.19,
+    "win": 63,
+    "vs_nifty": 8.72
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 47,
+     "avg": 8.67,
+     "med": 0.37,
+     "win": 55,
+     "vs_nifty": 10.57
+    },
+    "2025": {
+     "n": 69,
+     "avg": 5.17,
+     "med": 0.05,
+     "win": 51,
+     "vs_nifty": 4.05
+    },
+    "2024": {
+     "n": 161,
+     "avg": 8.5,
+     "med": 5.52,
+     "win": 58,
+     "vs_nifty": 5.14
+    },
+    "2023": {
+     "n": 141,
+     "avg": 23.12,
+     "med": 17.58,
+     "win": 85,
+     "vs_nifty": 16.94
+    },
+    "2022": {
+     "n": 69,
+     "avg": 2.2,
+     "med": 0.03,
+     "win": 51,
+     "vs_nifty": 3.7
+    },
+    "2021": {
+     "n": 118,
+     "avg": 18.47,
+     "med": 9.1,
+     "win": 69,
+     "vs_nifty": 13.46
+    },
+    "2020": {
+     "n": 68,
+     "avg": 13.46,
+     "med": 13.71,
+     "win": 68,
+     "vs_nifty": 8.71
+    },
+    "2019": {
+     "n": 27,
+     "avg": -0.26,
+     "med": 1.34,
+     "win": 56,
+     "vs_nifty": -0.46
+    },
+    "2018": {
+     "n": 45,
+     "avg": -5.1,
+     "med": -3.05,
+     "win": 44,
+     "vs_nifty": -5.69
+    },
+    "2017": {
+     "n": 100,
+     "avg": 15.55,
+     "med": 8.1,
+     "win": 64,
+     "vs_nifty": 9.61
+    },
+    "2016": {
+     "n": 40,
+     "avg": 7.25,
+     "med": 2.91,
+     "win": 60,
+     "vs_nifty": 8.46
+    }
+   }
+  },
+  "pennant": {
+   "name": "Pennant",
+   "all": {
+    "n": 78,
+    "avg": 9.64,
+    "med": 6.11,
+    "win": 59,
+    "vs_nifty": 6.25
+   },
+   "all126": {
+    "n": 75,
+    "avg": 18.12,
+    "med": 7.82,
+    "win": 63,
+    "vs_nifty": 11.38
+   },
+   "last 1y": {
+    "n": 6,
+    "avg": 16.1,
+    "med": 15.44,
+    "win": 83,
+    "vs_nifty": 18.43
+   },
+   "last 3y": {
+    "n": 26,
+    "avg": 8.8,
+    "med": 5.86,
+    "win": 62,
+    "vs_nifty": 5.63
+   },
+   "last 5y": {
+    "n": 41,
+    "avg": 6.6,
+    "med": 0.95,
+    "win": 51,
+    "vs_nifty": 5.23
+   },
+   "bull": {
+    "n": 67,
+    "avg": 9.35,
+    "med": 6.84,
+    "win": 57,
+    "vs_nifty": 6.21
+   },
+   "bear": {
+    "n": 11,
+    "avg": 11.37,
+    "med": 3.52,
+    "win": 73,
+    "vs_nifty": 6.52
+   },
+   "ex-Covid": {
+    "n": 69,
+    "avg": 6.85,
+    "med": 4.71,
+    "win": 57,
+    "vs_nifty": 4.62
+   },
+   "train": {
+    "n": 43,
+    "avg": 11.21,
+    "med": 6.89,
+    "win": 63,
+    "vs_nifty": 6.73
+   },
+   "test": {
+    "n": 35,
+    "avg": 7.71,
+    "med": 2.2,
+    "win": 54,
+    "vs_nifty": 5.66
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 4,
+     "avg": 7.46,
+     "med": 7.98,
+     "win": 75,
+     "vs_nifty": 9.39
+    },
+    "2025": {
+     "n": 5,
+     "avg": 12.36,
+     "med": 8.03,
+     "win": 80,
+     "vs_nifty": 9.12
+    },
+    "2024": {
+     "n": 14,
+     "avg": 4.17,
+     "med": -1.4,
+     "win": 43,
+     "vs_nifty": 0.79
+    },
+    "2023": {
+     "n": 5,
+     "avg": 30.01,
+     "med": 13.02,
+     "win": 80,
+     "vs_nifty": 23.48
+    },
+    "2022": {
+     "n": 7,
+     "avg": -4.32,
+     "med": -14.45,
+     "win": 29,
+     "vs_nifty": -1.91
+    },
+    "2021": {
+     "n": 14,
+     "avg": 1.23,
+     "med": -2.24,
+     "win": 36,
+     "vs_nifty": -1.47
+    },
+    "2020": {
+     "n": 10,
+     "avg": 23.18,
+     "med": 23.79,
+     "win": 70,
+     "vs_nifty": 14.1
+    },
+    "2019": {
+     "n": 3,
+     "avg": -1.58,
+     "med": 1.5,
+     "win": 67,
+     "vs_nifty": -7.07
+    },
+    "2018": {
+     "n": 3,
+     "avg": -15.27,
+     "med": -27.24,
+     "win": 33,
+     "vs_nifty": -14.2
+    },
+    "2017": {
+     "n": 11,
+     "avg": 21.36,
+     "med": 10.69,
+     "win": 91,
+     "vs_nifty": 15.99
+    },
+    "2016": {
+     "n": 2,
+     "avg": 24.28,
+     "med": 24.28,
+     "win": 100,
+     "vs_nifty": 28.48
+    }
+   }
+  },
+  "rectangle": {
+   "name": "Rectangle",
+   "all": {
+    "n": 118,
+    "avg": 7.99,
+    "med": 6.41,
+    "win": 59,
+    "vs_nifty": 5.82
+   },
+   "all126": {
+    "n": 113,
+    "avg": 23.09,
+    "med": 15.37,
+    "win": 69,
+    "vs_nifty": 17.0
+   },
+   "last 1y": {
+    "n": 14,
+    "avg": -4.68,
+    "med": -3.5,
+    "win": 43,
+    "vs_nifty": -2.01
+   },
+   "last 3y": {
+    "n": 41,
+    "avg": 5.01,
+    "med": 8.33,
+    "win": 63,
+    "vs_nifty": 4.12
+   },
+   "last 5y": {
+    "n": 73,
+    "avg": 8.77,
+    "med": 7.5,
+    "win": 62,
+    "vs_nifty": 7.43
+   },
+   "bull": {
+    "n": 106,
+    "avg": 9.18,
+    "med": 6.82,
+    "win": 59,
+    "vs_nifty": 7.15
+   },
+   "bear": {
+    "n": 12,
+    "avg": -2.51,
+    "med": 3.28,
+    "win": 58,
+    "vs_nifty": -5.92
+   },
+   "ex-Covid": {
+    "n": 112,
+    "avg": 7.44,
+    "med": 6.06,
+    "win": 59,
+    "vs_nifty": 5.87
+   },
+   "train": {
+    "n": 47,
+    "avg": 5.7,
+    "med": 5.23,
+    "win": 53,
+    "vs_nifty": 2.42
+   },
+   "test": {
+    "n": 71,
+    "avg": 9.5,
+    "med": 8.33,
+    "win": 63,
+    "vs_nifty": 8.07
+   },
+   "grade": "good",
+   "grade_train": "fair",
+   "years": {
+    "2026": {
+     "n": 10,
+     "avg": -6.44,
+     "med": -3.5,
+     "win": 40,
+     "vs_nifty": -2.19
+    },
+    "2025": {
+     "n": 12,
+     "avg": 6.96,
+     "med": 6.12,
+     "win": 67,
+     "vs_nifty": 4.67
+    },
+    "2024": {
+     "n": 12,
+     "avg": 4.65,
+     "med": 10.83,
+     "win": 67,
+     "vs_nifty": 4.2
+    },
+    "2023": {
+     "n": 28,
+     "avg": 23.26,
+     "med": 15.81,
+     "win": 79,
+     "vs_nifty": 18.41
+    },
+    "2022": {
+     "n": 9,
+     "avg": -5.74,
+     "med": -13.53,
+     "win": 33,
+     "vs_nifty": -2.99
+    },
+    "2021": {
+     "n": 17,
+     "avg": 4.17,
+     "med": 5.6,
+     "win": 59,
+     "vs_nifty": -0.91
+    },
+    "2020": {
+     "n": 8,
+     "avg": 4.37,
+     "med": 2.59,
+     "win": 50,
+     "vs_nifty": 1.38
+    },
+    "2019": {
+     "n": 2,
+     "avg": -16.17,
+     "med": -16.17,
+     "win": 50,
+     "vs_nifty": 3.85
+    },
+    "2018": {
+     "n": 4,
+     "avg": -3.4,
+     "med": -2.4,
+     "win": 0,
+     "vs_nifty": -0.22
+    },
+    "2017": {
+     "n": 13,
+     "avg": 16.44,
+     "med": 8.14,
+     "win": 62,
+     "vs_nifty": 9.94
+    },
+    "2016": {
+     "n": 3,
+     "avg": -1.86,
+     "med": 5.23,
+     "win": 67,
+     "vs_nifty": -5.99
+    }
+   }
+  },
+  "wbot": {
+   "name": "W bottom",
+   "all": {
+    "n": 950,
+    "avg": 4.08,
+    "med": 1.94,
+    "win": 54,
+    "vs_nifty": 1.02
+   },
+   "all126": {
+    "n": 903,
+    "avg": 5.35,
+    "med": 2.0,
+    "win": 54,
+    "vs_nifty": 1.86
+   },
+   "last 1y": {
+    "n": 196,
+    "avg": 3.81,
+    "med": -0.11,
+    "win": 49,
+    "vs_nifty": 4.66
+   },
+   "last 3y": {
+    "n": 427,
+    "avg": 6.13,
+    "med": 3.69,
+    "win": 56,
+    "vs_nifty": 4.2
+   },
+   "last 5y": {
+    "n": 611,
+    "avg": 5.13,
+    "med": 3.23,
+    "win": 56,
+    "vs_nifty": 2.97
+   },
+   "bull": {
+    "n": 511,
+    "avg": -1.25,
+    "med": -2.75,
+    "win": 44,
+    "vs_nifty": -1.43
+   },
+   "bear": {
+    "n": 439,
+    "avg": 10.27,
+    "med": 8.25,
+    "win": 66,
+    "vs_nifty": 3.86
+   },
+   "ex-Covid": {
+    "n": 895,
+    "avg": 2.5,
+    "med": 0.76,
+    "win": 52,
+    "vs_nifty": 0.38
+   },
+   "train": {
+    "n": 342,
+    "avg": 2.2,
+    "med": 0.45,
+    "win": 51,
+    "vs_nifty": -2.48
+   },
+   "test": {
+    "n": 608,
+    "avg": 5.13,
+    "med": 3.27,
+    "win": 56,
+    "vs_nifty": 2.98
+   },
+   "grade": "fair",
+   "grade_train": "poor",
+   "years": {
+    "2026": {
+     "n": 155,
+     "avg": 7.58,
+     "med": 3.23,
+     "win": 55,
+     "vs_nifty": 8.34
+    },
+    "2025": {
+     "n": 216,
+     "avg": 5.82,
+     "med": 5.06,
+     "win": 58,
+     "vs_nifty": 2.31
+    },
+    "2024": {
+     "n": 43,
+     "avg": -1.14,
+     "med": -4.26,
+     "win": 47,
+     "vs_nifty": -2.84
+    },
+    "2023": {
+     "n": 69,
+     "avg": 12.69,
+     "med": 10.09,
+     "win": 78,
+     "vs_nifty": 6.99
+    },
+    "2022": {
+     "n": 125,
+     "avg": -1.1,
+     "med": -1.87,
+     "win": 44,
+     "vs_nifty": -2.71
+    },
+    "2021": {
+     "n": 3,
+     "avg": 3.69,
+     "med": -9.12,
+     "win": 33,
+     "vs_nifty": 1.54
+    },
+    "2020": {
+     "n": 64,
+     "avg": 20.86,
+     "med": 19.43,
+     "win": 81,
+     "vs_nifty": 8.83
+    },
+    "2019": {
+     "n": 123,
+     "avg": -0.83,
+     "med": -0.42,
+     "win": 50,
+     "vs_nifty": -4.93
+    },
+    "2018": {
+     "n": 96,
+     "avg": -5.67,
+     "med": -6.81,
+     "win": 32,
+     "vs_nifty": -5.83
+    },
+    "2017": {
+     "n": 41,
+     "avg": 0.05,
+     "med": -1.8,
+     "win": 46,
+     "vs_nifty": -6.29
+    },
+    "2016": {
+     "n": 15,
+     "avg": 3.33,
+     "med": 1.98,
+     "win": 60,
+     "vs_nifty": 0.53
+    }
+   }
+  },
+  "tiltw": {
+   "name": "Tilted W",
+   "all": {
+    "n": 866,
+    "avg": 2.15,
+    "med": -0.24,
+    "win": 49,
+    "vs_nifty": -0.08
+   },
+   "all126": {
+    "n": 808,
+    "avg": 5.81,
+    "med": 1.98,
+    "win": 53,
+    "vs_nifty": 1.59
+   },
+   "last 1y": {
+    "n": 135,
+    "avg": 2.79,
+    "med": -3.21,
+    "win": 43,
+    "vs_nifty": 4.79
+   },
+   "last 3y": {
+    "n": 349,
+    "avg": 4.45,
+    "med": 1.35,
+    "win": 53,
+    "vs_nifty": 3.41
+   },
+   "last 5y": {
+    "n": 522,
+    "avg": 4.21,
+    "med": 1.68,
+    "win": 53,
+    "vs_nifty": 2.52
+   },
+   "bull": {
+    "n": 547,
+    "avg": -0.99,
+    "med": -2.71,
+    "win": 43,
+    "vs_nifty": -0.7
+   },
+   "bear": {
+    "n": 319,
+    "avg": 7.55,
+    "med": 3.93,
+    "win": 61,
+    "vs_nifty": 0.97
+   },
+   "ex-Covid": {
+    "n": 802,
+    "avg": 1.27,
+    "med": -1.0,
+    "win": 47,
+    "vs_nifty": 0.25
+   },
+   "train": {
+    "n": 344,
+    "avg": -0.96,
+    "med": -3.25,
+    "win": 44,
+    "vs_nifty": -4.04
+   },
+   "test": {
+    "n": 522,
+    "avg": 4.21,
+    "med": 1.68,
+    "win": 53,
+    "vs_nifty": 2.52
+   },
+   "grade": "poor",
+   "grade_train": "poor",
+   "years": {
+    "2026": {
+     "n": 113,
+     "avg": 4.71,
+     "med": -1.27,
+     "win": 45,
+     "vs_nifty": 6.77
+    },
+    "2025": {
+     "n": 180,
+     "avg": 4.63,
+     "med": 3.46,
+     "win": 59,
+     "vs_nifty": 2.56
+    },
+    "2024": {
+     "n": 42,
+     "avg": 3.94,
+     "med": -0.47,
+     "win": 45,
+     "vs_nifty": 0.91
+    },
+    "2023": {
+     "n": 68,
+     "avg": 10.51,
+     "med": 8.75,
+     "win": 68,
+     "vs_nifty": 4.95
+    },
+    "2022": {
+     "n": 119,
+     "avg": -0.41,
+     "med": -1.58,
+     "win": 47,
+     "vs_nifty": -2.39
+    },
+    "2021": {
+     "n": 1,
+     "avg": -10.83,
+     "med": -10.83,
+     "win": 0,
+     "vs_nifty": -21.82
+    },
+    "2020": {
+     "n": 74,
+     "avg": 6.52,
+     "med": 5.14,
+     "win": 66,
+     "vs_nifty": -4.91
+    },
+    "2019": {
+     "n": 130,
+     "avg": -0.74,
+     "med": -3.08,
+     "win": 43,
+     "vs_nifty": -1.99
+    },
+    "2018": {
+     "n": 87,
+     "avg": -8.02,
+     "med": -8.87,
+     "win": 26,
+     "vs_nifty": -7.07
+    },
+    "2017": {
+     "n": 34,
+     "avg": 3.19,
+     "med": 3.21,
+     "win": 53,
+     "vs_nifty": -1.02
+    },
+    "2016": {
+     "n": 18,
+     "avg": -6.43,
+     "med": -8.36,
+     "win": 22,
+     "vs_nifty": -5.38
+    }
+   }
+  },
+  "triple": {
+   "name": "Triple bottom",
+   "all": {
+    "n": 237,
+    "avg": 3.41,
+    "med": 1.88,
+    "win": 55,
+    "vs_nifty": 0.64
+   },
+   "all126": {
+    "n": 226,
+    "avg": 7.31,
+    "med": 2.66,
+    "win": 55,
+    "vs_nifty": 3.95
+   },
+   "last 1y": {
+    "n": 43,
+    "avg": 2.02,
+    "med": -1.51,
+    "win": 49,
+    "vs_nifty": 3.55
+   },
+   "last 3y": {
+    "n": 90,
+    "avg": 4.18,
+    "med": 1.9,
+    "win": 56,
+    "vs_nifty": 2.6
+   },
+   "last 5y": {
+    "n": 144,
+    "avg": 4.54,
+    "med": 2.9,
+    "win": 58,
+    "vs_nifty": 1.98
+   },
+   "bull": {
+    "n": 158,
+    "avg": 0.91,
+    "med": 0.17,
+    "win": 51,
+    "vs_nifty": -0.1
+   },
+   "bear": {
+    "n": 79,
+    "avg": 8.41,
+    "med": 5.58,
+    "win": 63,
+    "vs_nifty": 2.12
+   },
+   "ex-Covid": {
+    "n": 218,
+    "avg": 2.02,
+    "med": 1.02,
+    "win": 53,
+    "vs_nifty": 0.12
+   },
+   "train": {
+    "n": 93,
+    "avg": 1.67,
+    "med": -0.55,
+    "win": 49,
+    "vs_nifty": -1.43
+   },
+   "test": {
+    "n": 144,
+    "avg": 4.54,
+    "med": 2.9,
+    "win": 58,
+    "vs_nifty": 1.98
+   },
+   "grade": "fair",
+   "grade_train": "poor",
+   "years": {
+    "2026": {
+     "n": 34,
+     "avg": 3.37,
+     "med": 0.11,
+     "win": 50,
+     "vs_nifty": 5.16
+    },
+    "2025": {
+     "n": 46,
+     "avg": 3.95,
+     "med": 3.31,
+     "win": 61,
+     "vs_nifty": 0.89
+    },
+    "2024": {
+     "n": 5,
+     "avg": 12.97,
+     "med": 2.09,
+     "win": 60,
+     "vs_nifty": 7.72
+    },
+    "2023": {
+     "n": 29,
+     "avg": 10.28,
+     "med": 7.11,
+     "win": 76,
+     "vs_nifty": 4.21
+    },
+    "2022": {
+     "n": 30,
+     "avg": -0.18,
+     "med": -0.21,
+     "win": 47,
+     "vs_nifty": -3.06
+    },
+    "2020": {
+     "n": 22,
+     "avg": 11.25,
+     "med": 14.68,
+     "win": 68,
+     "vs_nifty": 3.73
+    },
+    "2019": {
+     "n": 37,
+     "avg": -0.57,
+     "med": -0.79,
+     "win": 46,
+     "vs_nifty": -3.08
+    },
+    "2018": {
+     "n": 18,
+     "avg": -6.56,
+     "med": -6.55,
+     "win": 39,
+     "vs_nifty": -5.22
+    },
+    "2017": {
+     "n": 10,
+     "avg": 0.19,
+     "med": -6.71,
+     "win": 40,
+     "vs_nifty": -4.46
+    },
+    "2016": {
+     "n": 6,
+     "avg": 7.45,
+     "med": 3.07,
+     "win": 50,
+     "vs_nifty": 6.16
+    }
+   }
+  },
+  "ihs": {
+   "name": "Inverse H&S",
+   "all": {
+    "n": 101,
+    "avg": 4.3,
+    "med": 0.43,
+    "win": 50,
+    "vs_nifty": 0.2
+   },
+   "all126": {
+    "n": 87,
+    "avg": 12.3,
+    "med": 6.04,
+    "win": 59,
+    "vs_nifty": 4.06
+   },
+   "last 1y": {
+    "n": 19,
+    "avg": -2.93,
+    "med": -3.87,
+    "win": 42,
+    "vs_nifty": -1.44
+   },
+   "last 3y": {
+    "n": 34,
+    "avg": 0.55,
+    "med": -1.84,
+    "win": 47,
+    "vs_nifty": 0.24
+   },
+   "last 5y": {
+    "n": 55,
+    "avg": 3.55,
+    "med": 0.43,
+    "win": 51,
+    "vs_nifty": 2.41
+   },
+   "bull": {
+    "n": 59,
+    "avg": 0.46,
+    "med": -2.05,
+    "win": 41,
+    "vs_nifty": -0.42
+   },
+   "bear": {
+    "n": 42,
+    "avg": 9.7,
+    "med": 6.51,
+    "win": 64,
+    "vs_nifty": 1.07
+   },
+   "ex-Covid": {
+    "n": 81,
+    "avg": 0.99,
+    "med": -1.78,
+    "win": 46,
+    "vs_nifty": 0.1
+   },
+   "train": {
+    "n": 46,
+    "avg": 5.19,
+    "med": 0.73,
+    "win": 50,
+    "vs_nifty": -2.44
+   },
+   "test": {
+    "n": 55,
+    "avg": 3.55,
+    "med": 0.43,
+    "win": 51,
+    "vs_nifty": 2.41
+   },
+   "grade": "fair",
+   "grade_train": "poor",
+   "years": {
+    "2026": {
+     "n": 19,
+     "avg": -2.93,
+     "med": -3.87,
+     "win": 42,
+     "vs_nifty": -1.44
+    },
+    "2025": {
+     "n": 10,
+     "avg": 3.53,
+     "med": -0.6,
+     "win": 50,
+     "vs_nifty": 2.01
+    },
+    "2024": {
+     "n": 2,
+     "avg": -2.04,
+     "med": -2.04,
+     "win": 50,
+     "vs_nifty": -4.93
+    },
+    "2023": {
+     "n": 12,
+     "avg": 15.92,
+     "med": 6.71,
+     "win": 67,
+     "vs_nifty": 12.47
+    },
+    "2022": {
+     "n": 12,
+     "avg": 2.4,
+     "med": 0.49,
+     "win": 50,
+     "vs_nifty": 0.02
+    },
+    "2020": {
+     "n": 21,
+     "avg": 16.58,
+     "med": 11.77,
+     "win": 67,
+     "vs_nifty": 1.5
+    },
+    "2019": {
+     "n": 16,
+     "avg": -4.27,
+     "med": -2.78,
+     "win": 44,
+     "vs_nifty": -5.48
+    },
+    "2018": {
+     "n": 6,
+     "avg": -5.13,
+     "med": -4.58,
+     "win": 33,
+     "vs_nifty": -7.07
+    },
+    "2017": {
+     "n": 2,
+     "avg": -4.31,
+     "med": -4.31,
+     "win": 0,
+     "vs_nifty": -8.21
+    },
+    "2016": {
+     "n": 1,
+     "avg": -1.78,
+     "med": -1.78,
+     "win": 0,
+     "vs_nifty": 2.5
+    }
+   }
+  },
+  "retest": {
+   "name": "Breakout retest",
+   "all": {
+    "n": 973,
+    "avg": 5.85,
+    "med": 2.97,
+    "win": 58,
+    "vs_nifty": 3.92
+   },
+   "all126": {
+    "n": 913,
+    "avg": 13.61,
+    "med": 7.82,
+    "win": 63,
+    "vs_nifty": 7.91
+   },
+   "last 1y": {
+    "n": 169,
+    "avg": 3.74,
+    "med": 2.47,
+    "win": 56,
+    "vs_nifty": 4.64
+   },
+   "last 3y": {
+    "n": 386,
+    "avg": 5.71,
+    "med": 2.18,
+    "win": 56,
+    "vs_nifty": 4.21
+   },
+   "last 5y": {
+    "n": 620,
+    "avg": 6.0,
+    "med": 2.76,
+    "win": 58,
+    "vs_nifty": 4.45
+   },
+   "bull": {
+    "n": 825,
+    "avg": 5.87,
+    "med": 2.93,
+    "win": 59,
+    "vs_nifty": 4.06
+   },
+   "bear": {
+    "n": 148,
+    "avg": 5.71,
+    "med": 3.2,
+    "win": 57,
+    "vs_nifty": 3.13
+   },
+   "ex-Covid": {
+    "n": 880,
+    "avg": 5.02,
+    "med": 2.16,
+    "win": 56,
+    "vs_nifty": 3.94
+   },
+   "train": {
+    "n": 382,
+    "avg": 4.98,
+    "med": 2.58,
+    "win": 58,
+    "vs_nifty": 2.79
+   },
+   "test": {
+    "n": 591,
+    "avg": 6.41,
+    "med": 3.29,
+    "win": 59,
+    "vs_nifty": 4.66
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 108,
+     "avg": 3.58,
+     "med": 1.81,
+     "win": 55,
+     "vs_nifty": 5.06
+    },
+    "2025": {
+     "n": 134,
+     "avg": 3.71,
+     "med": 0.25,
+     "win": 52,
+     "vs_nifty": 2.27
+    },
+    "2024": {
+     "n": 93,
+     "avg": 5.02,
+     "med": 1.39,
+     "win": 57,
+     "vs_nifty": 3.57
+    },
+    "2023": {
+     "n": 177,
+     "avg": 13.85,
+     "med": 8.41,
+     "win": 75,
+     "vs_nifty": 9.08
+    },
+    "2022": {
+     "n": 79,
+     "avg": -0.17,
+     "med": -3.8,
+     "win": 43,
+     "vs_nifty": -0.51
+    },
+    "2021": {
+     "n": 106,
+     "avg": 9.9,
+     "med": 3.33,
+     "win": 59,
+     "vs_nifty": 6.22
+    },
+    "2020": {
+     "n": 115,
+     "avg": 5.79,
+     "med": 9.19,
+     "win": 63,
+     "vs_nifty": 2.45
+    },
+    "2019": {
+     "n": 73,
+     "avg": 1.94,
+     "med": 0.97,
+     "win": 53,
+     "vs_nifty": 3.38
+    },
+    "2018": {
+     "n": 42,
+     "avg": -5.01,
+     "med": -4.19,
+     "win": 33,
+     "vs_nifty": -5.16
+    },
+    "2017": {
+     "n": 46,
+     "avg": 5.54,
+     "med": 3.68,
+     "win": 70,
+     "vs_nifty": 2.02
+    }
+   }
+  },
+  "emalift": {
+   "name": "EMA 9 lift-off",
+   "all": {
+    "n": 26907,
+    "avg": 5.09,
+    "med": 1.94,
+    "win": 54,
+    "vs_nifty": 2.55
+   },
+   "all126": {
+    "n": 25915,
+    "avg": 11.86,
+    "med": 5.54,
+    "win": 58,
+    "vs_nifty": 6.43
+   },
+   "last 1y": {
+    "n": 3693,
+    "avg": 1.14,
+    "med": -2.13,
+    "win": 45,
+    "vs_nifty": 3.43
+   },
+   "last 3y": {
+    "n": 10485,
+    "avg": 4.37,
+    "med": 0.8,
+    "win": 52,
+    "vs_nifty": 3.08
+   },
+   "last 5y": {
+    "n": 16214,
+    "avg": 4.73,
+    "med": 1.24,
+    "win": 53,
+    "vs_nifty": 3.42
+   },
+   "bull": {
+    "n": 20470,
+    "avg": 3.65,
+    "med": 0.45,
+    "win": 51,
+    "vs_nifty": 2.18
+   },
+   "bear": {
+    "n": 6437,
+    "avg": 9.68,
+    "med": 6.8,
+    "win": 65,
+    "vs_nifty": 3.71
+   },
+   "ex-Covid": {
+    "n": 25220,
+    "avg": 4.02,
+    "med": 1.08,
+    "win": 53,
+    "vs_nifty": 2.38
+   },
+   "train": {
+    "n": 11816,
+    "avg": 5.12,
+    "med": 2.34,
+    "win": 55,
+    "vs_nifty": 1.28
+   },
+   "test": {
+    "n": 15091,
+    "avg": 5.07,
+    "med": 1.69,
+    "win": 54,
+    "vs_nifty": 3.54
+   },
+   "grade": "fair",
+   "grade_train": "fair",
+   "years": {
+    "2026": {
+     "n": 2363,
+     "avg": 5.72,
+     "med": 1.63,
+     "win": 54,
+     "vs_nifty": 7.8
+    },
+    "2025": {
+     "n": 3814,
+     "avg": 0.82,
+     "med": -0.93,
+     "win": 48,
+     "vs_nifty": -0.38
+    },
+    "2024": {
+     "n": 3190,
+     "avg": 3.9,
+     "med": -0.67,
+     "win": 49,
+     "vs_nifty": 2.7
+    },
+    "2023": {
+     "n": 2875,
+     "avg": 15.09,
+     "med": 10.98,
+     "win": 75,
+     "vs_nifty": 9.02
+    },
+    "2022": {
+     "n": 2849,
+     "avg": 1.43,
+     "med": -0.97,
+     "win": 47,
+     "vs_nifty": 0.67
+    },
+    "2021": {
+     "n": 2610,
+     "avg": 9.23,
+     "med": 4.13,
+     "win": 59,
+     "vs_nifty": 5.8
+    },
+    "2020": {
+     "n": 1902,
+     "avg": 15.38,
+     "med": 14.5,
+     "win": 74,
+     "vs_nifty": 3.99
+    },
+    "2019": {
+     "n": 2058,
+     "avg": -2.16,
+     "med": -1.7,
+     "win": 47,
+     "vs_nifty": -1.82
+    },
+    "2018": {
+     "n": 2156,
+     "avg": -4.91,
+     "med": -5.63,
+     "win": 34,
+     "vs_nifty": -6.76
+    },
+    "2017": {
+     "n": 2052,
+     "avg": 7.44,
+     "med": 4.08,
+     "win": 60,
+     "vs_nifty": 3.16
+    },
+    "2016": {
+     "n": 1038,
+     "avg": 6.69,
+     "med": 4.48,
+     "win": 61,
+     "vs_nifty": 4.05
+    }
+   }
+  },
+  "stack": {
+   "name": "MA stack",
+   "all": {
+    "n": 6671,
+    "avg": 7.5,
+    "med": 4.22,
+    "win": 59,
+    "vs_nifty": 4.79
+   },
+   "all126": {
+    "n": 6464,
+    "avg": 16.25,
+    "med": 9.32,
+    "win": 63,
+    "vs_nifty": 10.7
+   },
+   "last 1y": {
+    "n": 718,
+    "avg": 2.44,
+    "med": -1.41,
+    "win": 48,
+    "vs_nifty": 3.96
+   },
+   "last 3y": {
+    "n": 2360,
+    "avg": 6.09,
+    "med": 2.48,
+    "win": 55,
+    "vs_nifty": 3.9
+   },
+   "last 5y": {
+    "n": 3754,
+    "avg": 7.01,
+    "med": 3.22,
+    "win": 56,
+    "vs_nifty": 5.44
+   },
+   "bull": {
+    "n": 5930,
+    "avg": 7.44,
+    "med": 4.18,
+    "win": 58,
+    "vs_nifty": 4.87
+   },
+   "bear": {
+    "n": 741,
+    "avg": 7.97,
+    "med": 4.3,
+    "win": 60,
+    "vs_nifty": 4.16
+   },
+   "ex-Covid": {
+    "n": 6164,
+    "avg": 6.51,
+    "med": 3.34,
+    "win": 57,
+    "vs_nifty": 4.61
+   },
+   "train": {
+    "n": 3178,
+    "avg": 7.79,
+    "med": 4.75,
+    "win": 60,
+    "vs_nifty": 4.08
+   },
+   "test": {
+    "n": 3493,
+    "avg": 7.24,
+    "med": 3.69,
+    "win": 57,
+    "vs_nifty": 5.44
+   },
+   "grade": "good",
+   "grade_train": "good",
+   "years": {
+    "2026": {
+     "n": 445,
+     "avg": 4.96,
+     "med": 0.86,
+     "win": 51,
+     "vs_nifty": 7.16
+    },
+    "2025": {
+     "n": 584,
+     "avg": 0.1,
+     "med": -1.97,
+     "win": 46,
+     "vs_nifty": -0.8
+    },
+    "2024": {
+     "n": 917,
+     "avg": 6.53,
+     "med": 3.04,
+     "win": 55,
+     "vs_nifty": 4.1
+    },
+    "2023": {
+     "n": 926,
+     "avg": 16.93,
+     "med": 12.13,
+     "win": 76,
+     "vs_nifty": 11.1
+    },
+    "2022": {
+     "n": 621,
+     "avg": 2.18,
+     "med": -1.12,
+     "win": 47,
+     "vs_nifty": 3.61
+    },
+    "2021": {
+     "n": 839,
+     "avg": 9.97,
+     "med": 5.03,
+     "win": 60,
+     "vs_nifty": 4.75
+    },
+    "2020": {
+     "n": 615,
+     "avg": 11.82,
+     "med": 9.77,
+     "win": 66,
+     "vs_nifty": 5.9
+    },
+    "2019": {
+     "n": 363,
+     "avg": 1.95,
+     "med": 0.86,
+     "win": 53,
+     "vs_nifty": 2.22
+    },
+    "2018": {
+     "n": 315,
+     "avg": -4.52,
+     "med": -6.07,
+     "win": 34,
+     "vs_nifty": -5.33
+    },
+    "2017": {
+     "n": 724,
+     "avg": 10.18,
+     "med": 7.42,
+     "win": 69,
+     "vs_nifty": 5.42
+    },
+    "2016": {
+     "n": 322,
+     "avg": 7.63,
+     "med": 4.06,
+     "win": 62,
+     "vs_nifty": 7.15
+    }
+   }
+  }
+ },
+ "good_train": [
+  "921",
+  "ath",
+  "base",
+  "cup921",
+  "dcup",
+  "flag",
+  "month",
+  "pennant",
+  "retest",
+  "stack",
+  "tight",
+  "wcup"
+ ],
+ "confluence_test_2022_26": {
+  "good 0": {
+   "n": 14795,
+   "r63": {
+    "n": 13817,
+    "avg": 4.84,
+    "med": 1.62,
+    "win": 54,
+    "vs_nifty": 3.25
+   },
+   "r126": {
+    "n": 12937,
+    "avg": 12.32,
+    "med": 5.94,
+    "win": 59,
+    "vs_nifty": 8.23
+   }
+  },
+  "good 1": {
+   "n": 8758,
+   "r63": {
+    "n": 8428,
+    "avg": 6.59,
+    "med": 3.17,
+    "win": 57,
+    "vs_nifty": 4.86
+   },
+   "r126": {
+    "n": 7792,
+    "avg": 15.36,
+    "med": 8.37,
+    "win": 62,
+    "vs_nifty": 11.06
+   }
+  },
+  "good 2": {
+   "n": 4333,
+   "r63": {
+    "n": 4157,
+    "avg": 7.5,
+    "med": 4.11,
+    "win": 58,
+    "vs_nifty": 5.9
+   },
+   "r126": {
+    "n": 3840,
+    "avg": 16.79,
+    "med": 9.44,
+    "win": 63,
+    "vs_nifty": 12.59
+   }
+  },
+  "good 3+": {
+   "n": 2712,
+   "r63": {
+    "n": 2603,
+    "avg": 7.16,
+    "med": 3.27,
+    "win": 58,
+    "vs_nifty": 5.32
+   },
+   "r126": {
+    "n": 2395,
+    "avg": 15.34,
+    "med": 7.52,
+    "win": 61,
+    "vs_nifty": 11.03
+   }
+  },
+  "good 2+ & no poor/fair": {
+   "n": 3468,
+   "r63": {
+    "n": 3371,
+    "avg": 7.99,
+    "med": 4.08,
+    "win": 59,
+    "vs_nifty": 6.35
+   },
+   "r126": {
+    "n": 3102,
+    "avg": 16.57,
+    "med": 8.39,
+    "win": 62,
+    "vs_nifty": 12.32
+   }
+  },
+  "good 2+ with others": {
+   "n": 3577,
+   "r63": {
+    "n": 3389,
+    "avg": 6.76,
+    "med": 3.51,
+    "win": 57,
+    "vs_nifty": 5.01
+   },
+   "r126": {
+    "n": 3133,
+    "avg": 15.9,
+    "med": 8.71,
+    "win": 63,
+    "vs_nifty": 11.67
+   }
+  },
+  "any 3+ systems": {
+   "n": 5499,
+   "r63": {
+    "n": 5249,
+    "avg": 6.59,
+    "med": 3.23,
+    "win": 57,
+    "vs_nifty": 4.87
+   },
+   "r126": {
+    "n": 4815,
+    "avg": 15.22,
+    "med": 7.81,
+    "win": 62,
+    "vs_nifty": 10.97
+   }
+  }
+ }
+}
