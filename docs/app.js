@@ -120,7 +120,7 @@ function parseCSV(t) {
 document.addEventListener('click', (e) => { if (e.target && e.target.id === 'toresults') show('results'); });
 /* 15 Nov 2026 layout: Investment (ETFs, funds, indices: monthly), Momentum investing (monthly ATH stocks), Trading (9/21, cup closes,
    IPO cups, patterns, support). Sub-pages light up their parent button. */
-const NAV_NEW = { strat: 'ideas', bot: 'ideas', trd: 'ideas', trends: 'ideas', ath: 'ideas', inv: 'ideas', tb: 'live' };   // 21 Nov 2026: 5 tabs
+const NAV_NEW = { strat: 'ideas', bot: 'ideas', trd: 'ideas', trends: 'ideas', ath: 'ideas', inv: 'ideas', tb: 'live', auto: 'live' };   // 21 Nov 2026: 5 tabs
 const NAV_CLASSIC = { bot: 'trends', trd: 'trends' };                                                    // the 8-tab bar, kept
 /* 21 Nov 2026 (Amritpal: "keep the earlier intact too"): Classic layout = the 8-tab bar and the previous Today, one tap away. */
 const isClassic = () => document.body.classList.contains('classic');
@@ -177,7 +177,7 @@ function show(view) {
   state.view = view;
   { const ib = document.getElementById('ideasbar'); if (ib) { const on = NAV_OF[view] === 'ideas'; ib.hidden = !on;
       if (on) { const k = IDEA_OF[view] || view; try { localStorage.setItem('td.ideas', k); } catch (e) { /* */ } ib.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === k)); } }
-    const lb = document.getElementById('livebar'); if (lb) { const on = !isClassic() && (view === 'live' || view === 'tb'); lb.hidden = !on; if (on) lb.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === view)); } }
+    const lb = document.getElementById('livebar'); if (lb) { const on = !isClassic() && (view === 'live' || view === 'tb' || view === 'auto'); lb.hidden = !on; if (on) lb.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === view)); } }
   const navv = NAV_OF[view] || view;
   document.querySelectorAll('.views:not(.bg-nav) button').forEach((b) => (b.dataset.view === navv ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   ['ath', 'inv', 'trd'].forEach((k) => { if (k !== view) { const s = document.getElementById('view-' + k); if (s) s.innerHTML = ''; } }); // one #athlist at a time
@@ -186,7 +186,7 @@ function show(view) {
   if (view !== 'bg') document.body.classList.remove('bg-first');
   if (view !== 'bg') bgNav(document.body.classList.contains('mode-bg') ? 'explore' : '');
   setTimeout(liveTag, 1500); setTimeout(liveTag, 4000); if (view === 'trends' || view === 'ath' || view === 'trd') setTimeout(livePoll, 800);
-  ({ today: loadToday, strat: loadStrat, mk: loadMarkets, live: loadLive, trends: loadTrends, ath: loadATH, inv: loadInvest, trd: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
+  ({ today: loadToday, strat: loadStrat, mk: loadMarkets, live: loadLive, auto: loadAuto, trends: loadTrends, ath: loadATH, inv: loadInvest, trd: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
 }
 
 /* ------------------------------------------------------------------ Live hero + pie (9 Nov 2026)
@@ -1758,60 +1758,89 @@ async function tbLoad(inst = 'bn') {
   const go = box.querySelector('#' + px + 'go'); if (go) go.addEventListener('click', async () => { try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: true, password: box.querySelector('#' + px + 'pw').value, confirm: box.querySelector('#' + px + 'cf').value }) }); alertMsg(`Top Bottom ${TB_SHORT[inst] || inst}: LIVE orders from the bot's next start (${bn ? '08:25' : inst === 'nifty' ? '08:27' : '08:29'} IST).`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } });
 }
 
-/* 24 Nov 2026 (Amritpal: "automate it all - keep emotions out - but I need control to switch to manual anytime"; then "less text,
-   infographic, easy 2D switches"): one panel on every Live tab. Tiles with on/off switches, a margin gauge, moomoo ETF chips.
-   MANUAL NOW = one tap, no password: every automatic entry stops; open positions keep their stops. ON needs password + AUTO. */
-async function autoLoad() {
+/* 24 Nov 2026 (Amritpal: "a simple auto trade page where all systems are shown in a column with ON OFF; configuring them should not be
+   on the front; showing all on all markets is confusing"): Live -> Auto trade. One row per system with one switch; tap the row to open its
+   settings. Market pages only show a one-line link here. ON always needs the app password + a typed word; OFF is one tap. */
+async function autoLink() {
   const box = $('#autocard'); if (!box) return;
-  let A, MT = null; try { [A, MT] = await Promise.all([lvApi('/api/auto'), lvApi('/api/mmtb').catch(() => null)]); } catch (e) { box.innerHTML = ''; return; }
-  const tb = A.tb || {}; const tbOn = Object.entries(tb).filter(([, v]) => v.auto).map(([k]) => TB_SHORT[k] || k);
-  const M = A.margin || {}; const mOk = !(M.issues || []).length;
-  const capOf = (m) => +((((MT || {}).cfg || {})[m] || {}).capital || 0);
-  const paper = (MT || {}).env === 'SIMULATE';
-  // one plain word per tile: Automatic (it trades by itself) or Off (nothing happens unless you do it)
-  const T = [
-    { k: 'stock_sell', mk: 'India', n: 'Stock sells', when: 'every morning 09:16 IST', info: "Sells the plan's system exits, only stocks a system bought or you adopted." },
-    { k: 'stock_buy', mk: 'India', n: 'Stock buys', when: 'every morning 09:20 IST', info: `Buys the plan's picks that fit, same checks as the Buy button; keeps ${fmt(A.reserve_pct, 0)}% cash.` },
-    { k: 'mm_us', mk: 'US', n: 'ETF Top Bottom', when: 'moomoo · QQQ SMH XLF XLE', warn: A.mm_us && !capOf('US') ? 'set capital below' : '', info: 'Buys at the breakout level, protects with a stop, raises it each morning.' },
-    { k: 'mm_au', mk: 'ASX', n: 'ETF Top Bottom', when: 'moomoo · TECH HACK OZR ASIA', warn: A.mm_au && paper ? 'can\'t trade on paper' : (A.mm_au && !capOf('AU') ? 'set capital below' : ''), info: 'Same rules in AUD. moomoo\'s paper account can\'t trade ASX, so this only works on the real account.' },
-    { mk: 'India', n: 'Futures Top Bottom', on: tbOn.length > 0, when: tbOn.length ? esc(tbOn.join(' · ')) : 'change it in the Futures tab', ro: true },
-    { mk: 'India', n: 'Option trader', on: !!A.opt_trader_live, when: A.opt_trader_live ? 'real orders · change in Futures' : 'paper only · change in Futures', ro: true },
-    ...(A.turtle ? [{ mk: 'MCX', n: 'Turtle', on: !!(A.turtle.live && (A.turtle.armed || []).length), when: esc((A.turtle.armed || []).join(' · ') || 'nothing armed') + ' · Futures tab', ro: true }] : [])];
-  T.forEach((t) => { if (t.k) t.on = !!A[t.k]; });
-  const nOn = T.filter((t) => t.on).length;
-  const tile = (t) => `<div class="au2-tile${t.on ? ' on' : ''}${t.warn ? ' warn' : ''}">
-      <div class="au2-top"><span class="au2-mk">${t.mk}</span>${t.k ? `<button class="au2-sw${t.on ? ' on' : ''}" role="switch" aria-checked="${t.on}" data-aup="${t.k}" aria-label="${t.n} ${t.mk}: ${t.on ? 'turn off' : 'turn on'}"><i></i></button>` : ''}</div>
-      <b>${t.n}</b><span class="au2-word">${t.on ? '● Automatic' : '○ Off'}</span><small>${t.when}</small>${t.warn ? `<small class="au2-w">⚠ ${t.warn}</small>` : ''}
-      ${t.info ? `<details class="au2-i"><summary aria-label="What it does">ⓘ</summary><small>${t.info}</small></details>` : ''}</div>`;
-  const x = +M.fut_x || 0, cap = +A.fut_cap_x || 1, full = Math.max(1.5, cap * 1.5);
-  const cashPct = M.cash_need ? Math.min(100, (M.cash || 0) / (M.cash_need * 2) * 100) : 100;
-  box.innerHTML = `<section class="lv-card au2${nOn ? ' is-on' : ''}">
-    <div class="au2-head"><div><b class="au2-title">${nOn ? `🤖 ${nOn} of ${T.length} systems trade by themselves` : '✋ Nothing trades by itself'}</b>
-      <small class="au2-sub">${nOn ? 'Green tiles place orders without asking you.' : 'Every order waits for you.'}${A.orders_live ? '' : ' · Live orders is OFF: nothing reaches a broker.'}</small></div>
-      ${nOn ? '<button class="au2-big stop" id="aumanual" title="Stops every automatic order at once. Open positions keep their stops.">⏸ Pause all</button>' : (A.snapshot ? '<button class="au2-big" id="auresume" title="Turns back on what was automatic before">▶ Resume all</button>' : '')}</div>
-    ${nOn ? '<p class="au2-hint">Pause all = stop every automatic order now, no password. Open positions keep their stops.</p>' : ''}
-    <div id="auarm" class="au2-arm" hidden><b id="auarmt"></b><input id="aupw" type="password" placeholder="App password"><input id="aucf" placeholder="Type AUTO" autocapitalize="characters"><button class="au2-big" id="augo">Turn on</button><button class="au2-x" id="aucancel" aria-label="Cancel">✕</button></div>
-    <div class="au2-grid">${T.map(tile).join('')}</div>
-    ${M.at ? `<div class="au2-gauges">
-      <div class="au2-g"><span>Futures vs account</span><div class="au2-bar"><i style="width:${Math.min(100, x / full * 100)}%" class="${x > cap ? 'bad' : ''}"></i><em style="left:${cap / full * 100}%"></em></div><b class="${x > cap ? 'down' : ''}">${fmt(x, 2)}× <small>(limit ${fmt(cap, 1)}×)</small></b></div>
-      <div class="au2-g"><span>Cash for margin</span><div class="au2-bar"><i style="width:${cashPct}%" class="${M.cash_need && (M.cash || 0) < M.cash_need ? 'bad' : ''}"></i><em style="left:50%"></em></div><b>${money(M.cash || 0, 'NSE')}</b></div>
-      ${mOk ? '' : `<p class="au2-warn">⚠ ${esc((M.issues || []).join(' · '))}</p>`}</div>` : '<p class="au2-hint">Margin check: runs every 10 minutes during India market hours.</p>'}
-    <div id="mmtbbox"></div></section>`;
-  mmtbBox(box.querySelector('#mmtbbox'));
-  let want = null; const arm = box.querySelector('#auarm');
-  const lab = { stock_buy: 'Stock buys (India)', stock_sell: 'Stock sells (India)', mm_us: 'ETF Top Bottom (US)', mm_au: 'ETF Top Bottom (ASX)', resume: 'everything that was automatic' };
-  const refresh = () => { autoLoad(); ['bn', 'nifty'].concat(TB_STOCKS).forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); };
-  const open = (p) => { want = { part: p }; arm.hidden = false; box.querySelector('#auarmt').textContent = 'Make automatic: ' + lab[p]; box.querySelector('#aupw').focus(); };
-  const mn = box.querySelector('#aumanual'); if (mn) mn.addEventListener('click', async () => {
-    try { await lvApi('/api/auto/manual', { method: 'POST', body: '{}' }); alertMsg('Paused: nothing trades by itself now. Open positions keep their stops.', true); refresh(); } catch (er) { alertMsg(er.message); } });
-  const rs = box.querySelector('#auresume'); if (rs) rs.addEventListener('click', () => open('resume'));
-  box.querySelector('#aucancel').addEventListener('click', () => { arm.hidden = true; want = null; });
-  box.querySelectorAll('[data-aup]').forEach((b) => b.addEventListener('click', async () => { const k = b.dataset.aup;
-    if (A[k]) { try { await lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ part: k, on: false }) }); alertMsg(`${lab[k]}: Off.`, true); autoLoad(); } catch (er) { alertMsg(er.message); } return; }
-    open(k); }));
-  box.querySelector('#augo').addEventListener('click', async () => { if (!want) return;
-    try { await lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ ...want, on: true, password: box.querySelector('#aupw').value, confirm: box.querySelector('#aucf').value }) });
-      alertMsg(want.part === 'resume' ? 'Resumed.' : `${lab[want.part]}: Automatic.`, true); refresh(); } catch (er) { alertMsg(er.message); } });
+  let A; try { A = await lvApi('/api/auto'); } catch (e) { box.innerHTML = ''; return; }
+  const n = (A.on || []).length;
+  box.innerHTML = `<button class="au3-link${n ? ' on' : ''}" id="aulink"><span>${n ? `🤖 <b>${n} automatic</b> · trading by themselves` : '✋ <b>Nothing automatic</b> · every order waits for you'}</span><i>Auto trade ›</i></button>`;
+  box.querySelector('#aulink').addEventListener('click', () => show('auto'));
+}
+const autoLoad = autoLink;
+
+async function loadAuto() {
+  const el = $('#view-auto'); if (!el) return;
+  $('#title').textContent = 'Auto trade'; $('#asof').textContent = '';
+  if (!isOwner() || !(lvCfg().url && lvCfg().token)) { el.innerHTML = '<p class="empty">Connect your server in Live › Settings first.</p>'; return; }
+  el.innerHTML = '<p class="empty">Loading…</p>';
+  let A, MT, OT; try { [A, MT, OT] = await Promise.all([lvApi('/api/auto'), lvApi('/api/mmtb').catch(() => null), lvApi('/api/opt/trader').catch(() => null)]); } catch (e) { el.innerHTML = `<p class="empty">${esc(e.message)}</p>`; return; }
+  const tb = A.tb || {}; const paper = (MT || {}).env === 'SIMULATE'; const cap = (m) => +((((MT || {}).cfg || {})[m] || {}).capital || 0);
+  const ROWS = [
+    ['India', [
+      { id: 'stock_sell', n: 'Stock sells', s: '09:16 IST · sells system exits', on: !!A.stock_sell, kind: 'part' },
+      { id: 'stock_buy', n: 'Stock buys', s: '09:20 IST · buys the plan\'s picks', on: !!A.stock_buy, kind: 'part' },
+      ...Object.entries(tb).map(([k, v]) => ({ id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k] || k}`, s: `futures${v.live ? '' : ' · dry run (Futures tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k })),
+      { id: 'otr', n: 'Option trader', s: A.opt_trader_live ? '5-min options · real orders' : '5-min options · paper only', on: !!A.opt_trader_live, kind: 'otr' }]],
+    ...(A.turtle ? [['MCX', [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'armed: ' + esc(A.turtle.armed.join(' · ')) : 'nothing armed (Futures tab)', on: !!A.turtle.live, kind: 'turtle' }]]] : []),
+    ['US', [{ id: 'mm_us', n: 'ETF Top Bottom', s: `moomoo · QQQ SMH XLF XLE${paper ? ' · paper' : ''}`, on: !!A.mm_us, kind: 'part', warn: A.mm_us && !cap('US') ? 'set capital in settings' : '', mm: 'US' }]],
+    ['ASX', [{ id: 'mm_au', n: 'ETF Top Bottom', s: 'moomoo · TECH HACK OZR ASIA', on: !!A.mm_au, kind: 'part', warn: paper ? 'paper account can\'t trade ASX' : (A.mm_au && !cap('AU') ? 'set capital in settings' : ''), mm: 'AU' }]]];
+  const all = ROWS.flatMap(([, r]) => r); const nOn = all.filter((r) => r.on).length;
+  const row = (r) => `<div class="au3-row${r.on ? ' on' : ''}" data-row="${r.id}">
+      <button class="au3-main" data-open="${r.id}" aria-expanded="false"><b>${r.n}</b><small>${r.s}</small>${r.warn ? `<small class="au2-w">⚠ ${r.warn}</small>` : ''}</button>
+      <span class="au3-word">${r.on ? 'ON' : 'OFF'}</span>
+      <button class="au2-sw${r.on ? ' on' : ''}" role="switch" aria-checked="${r.on}" data-sw="${r.id}" aria-label="${r.n}: ${r.on ? 'turn off' : 'turn on'}"><i></i></button>
+      <div class="au3-set" id="set-${r.id.replace(':', '-')}" hidden></div></div>`;
+  el.innerHTML = `<div class="au3">
+    <div class="au3-top${nOn ? ' on' : ''}"><div><b>${nOn ? `🤖 ${nOn} of ${all.length} trade by themselves` : '✋ Nothing trades by itself'}</b><small>${nOn ? 'ON rows place orders without asking you.' : 'Every order waits for you.'}${A.orders_live ? '' : ' Live orders is OFF: nothing reaches a broker.'}</small></div>
+      ${nOn ? '<button class="au2-big stop" id="aupause">⏸ Pause all</button>' : (A.snapshot ? '<button class="au2-big" id="auresume">▶ Resume all</button>' : '')}</div>
+    <div id="ausheet" class="au2-arm" hidden><b id="ausheett"></b><input id="aupw" type="password" placeholder="App password"><input id="aucf" autocapitalize="characters"><button class="au2-big" id="augo">Turn on</button><button class="au2-x" id="aucancel" aria-label="Cancel">✕</button></div>
+    ${ROWS.map(([g, rs]) => `<h3 class="au3-h">${g}</h3><div class="au3-list">${rs.map(row).join('')}</div>`).join('')}
+    <p class="au3-foot">ON needs your app password. OFF and Pause all are one tap. Pausing never closes a position: open trades keep their stops. Tap a row for its settings.</p></div>`;
+  const sheet = el.querySelector('#ausheet'); let want = null;
+  const word = (r) => (r.kind === 'otr' || r.kind === 'turtle') ? 'LIVE' : 'AUTO';
+  const call = async (r, on, pw, cf) => {
+    if (r.kind === 'part') return lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ part: r.id, on, password: pw || '', confirm: cf || '' }) });
+    if (r.kind === 'tb') return lvApi('/api/tb/auto' + (r.inst === 'bn' ? '' : '?inst=' + r.inst), { method: 'POST', body: JSON.stringify({ on, password: pw || '', confirm: cf || '' }) });
+    if (r.kind === 'otr') return lvApi('/api/opt/trader/mode', { method: 'POST', body: JSON.stringify({ live: on, password: pw || '', confirm: cf || '' }) });
+    if (r.kind === 'turtle') return lvApi('/api/turtle/mcx/mode', { method: 'POST', body: JSON.stringify({ live: on, password: pw || '', confirm: cf || '' }) });
+    if (r.kind === 'resume') return lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ part: 'resume', on: true, password: pw, confirm: cf }) });
+  };
+  const ask = (r) => { want = r; sheet.hidden = false; el.querySelector('#ausheett').textContent = `Turn ON: ${r.n}${r.kind === 'otr' || r.kind === 'turtle' ? ' (real orders)' : ''}`;
+    const c = el.querySelector('#aucf'); c.value = ''; c.placeholder = 'Type ' + word(r); el.querySelector('#aupw').focus(); sheet.scrollIntoView({ block: 'nearest' }); };
+  el.querySelector('#aucancel').addEventListener('click', () => { sheet.hidden = true; want = null; });
+  el.querySelector('#augo').addEventListener('click', async () => { if (!want) return;
+    try { await call(want, true, el.querySelector('#aupw').value, el.querySelector('#aucf').value); alertMsg(`${want.n}: ON`, true); loadAuto(); } catch (e) { alertMsg(e.message); } });
+  el.querySelectorAll('[data-sw]').forEach((b) => b.addEventListener('click', async () => { const r = all.find((x) => x.id === b.dataset.sw);
+    if (!r.on) return ask(r);
+    try { await call(r, false); alertMsg(`${r.n}: OFF`, true); loadAuto(); } catch (e) { alertMsg(e.message); } }));
+  const pz = el.querySelector('#aupause'); if (pz) pz.addEventListener('click', async () => { try { await lvApi('/api/auto/manual', { method: 'POST', body: '{}' }); alertMsg('Paused: nothing trades by itself. Open trades keep their stops.', true); loadAuto(); } catch (e) { alertMsg(e.message); } });
+  const rs = el.querySelector('#auresume'); if (rs) rs.addEventListener('click', () => ask({ id: 'resume', n: 'everything that was ON before', kind: 'resume' }));
+  // settings, only when a row is opened
+  el.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => { const r = all.find((x) => x.id === b.dataset.open); const box = el.querySelector('#set-' + r.id.replace(':', '-'));
+    const openNow = box.hidden; box.hidden = !openNow; b.setAttribute('aria-expanded', openNow); if (!openNow) return;
+    if (r.mm) return mmSettings(box, r.mm, MT);
+    if (r.kind === 'tb' || r.kind === 'otr' || r.kind === 'turtle') { box.innerHTML = `<p class="lv-sub">${r.kind === 'tb' ? 'Lots, Live / Dry run and levels' : r.kind === 'otr' ? 'Trades, paper vs live and stop for today' : 'Which MCX markets are armed and their lots'} are in the Futures tab.</p><button class="au2-save" data-gofut>Open Futures</button>`;
+      box.querySelector('[data-gofut]').addEventListener('click', () => { state.lvTab = 'fut'; try { sessionStorage.setItem('td.lvTab', 'fut'); } catch (e) { /* */ } state.lvMk = 'NSE'; show('live'); }); return; }
+    if (r.id === 'stock_buy') { box.innerHTML = `<p class="lv-sub">Buys the plan's picks after the 09:09 industry check, with the same checks as the Buy button, in ranked order, within your split and slots, keeping ${fmt(A.reserve_pct, 0)}% of the account in cash. Split and capital: Live › India › Settings.</p>`; return; }
+    if (r.id === 'stock_sell') { box.innerHTML = '<p class="lv-sub">Sells the plan\'s system exits at the open, only stocks a system bought or you adopted. Other holdings are never touched.</p>'; return; }
+  }));
+}
+
+/* settings of one moomoo market: capital, risk, ETF chips, manual order ticket */
+function mmSettings(box, m, T) {
+  T = T || {}; const c = (T.cfg || {})[m] || {}; const L = ((T.levels || {})[m] || {}); const P = (T.pos || {})[m] || {}; const cur = m === 'US' ? 'US$' : 'A$';
+  const chips = (c.symbols || []).map((s) => { const p = P[s]; const r = (L.rows || {})[s] || {};
+    if (p && p.state === 'open') return `<span class="au2-c hold"><i></i>${esc(s)} <b>${fmt(p.qty, 0)} @ ${fmt(p.entry, 2)}</b> stop ${fmt(p.stop, 2)}</span>`;
+    if (p) return `<span class="au2-c wait"><i></i>${esc(s)} <b>buy ▲${fmt(p.trig, 2)}</b> ×${fmt(p.qty, 0)}</span>`;
+    if (r.buy_lvl) return `<span class="au2-c"><i></i>${esc(s)} ▲${fmt(r.buy_lvl, 2)} <small>${fmt((r.buy_lvl / r.close - 1) * 100, 1)}%</small></span>`;
+    return `<span class="au2-c off"><i></i>${esc(s)} –</span>`; }).join('');
+  box.innerHTML = `<div class="au2-mmh"><label>Capital ${cur}<input id="mc${m}" inputmode="decimal" value="${c.capital || ''}" placeholder="0"></label><label>Risk %<input id="mr${m}" inputmode="decimal" value="${c.risk_pct || 1}"></label><button class="au2-save" id="ms${m}">Save</button></div>
+    <div class="au2-chips">${chips}</div><p class="au2-foot"><span class="au2-key"><i class="hold"></i>holding <i class="wait"></i>buy-stop today <i></i>next buy level</span> · levels ${esc(L.asof || '–')}</p>`;
+  box.querySelector('#ms' + m).addEventListener('click', async () => {
+    try { await lvApi('/api/mmtb/cfg', { method: 'POST', body: JSON.stringify({ market: m, capital: +box.querySelector('#mc' + m).value || 0, risk_pct: +box.querySelector('#mr' + m).value || 1 }) }); alertMsg('Saved.', true); loadAuto(); } catch (e) { alertMsg(e.message); } });
+  mmTicket(box, T.env);
 }
 
 /* moomoo Top Bottom (server mm_tb.py): capital per market + one chip per ETF (green holding, amber buy-stop today, grey waiting) */
