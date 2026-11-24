@@ -1685,3 +1685,63 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .au-bar > summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; cursor: pointer; }
 .au-bar.au-on { border-left: 4px solid var(--rise); }
 .au-bar #aumanual { font-weight: 800; white-space: nowrap; }
+/* 24 Nov 2026: Automation panel v2 - tiles with 2D switches, gauges, chips (replaces the text-heavy bar) */
+.au2 { padding: 14px; }
+.au2.is-on { border-left: 4px solid var(--rise); }
+.au2-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.au2-pill { font-weight: 800; font-size: 15px; padding: 6px 12px; border-radius: 999px; background: var(--soft); color: var(--slate); }
+.au2.is-on .au2-pill { background: var(--rise-soft); color: var(--rise-ink); }
+.au2-big { margin-left: auto; font: inherit; font-weight: 800; font-size: 14px; padding: 10px 16px; border-radius: 12px; border: 0; cursor: pointer; background: var(--accent); color: var(--on-accent); box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+.au2-big:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.25); }
+.au2-big.stop { background: var(--fall); color: #fff; }
+.au2-arm { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 10px; padding: 10px; border-radius: 12px; background: var(--soft); }
+.au2-arm b { width: 100%; font-size: 13px; }
+.au2-arm input { flex: 1 1 120px; min-width: 0; font: inherit; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.au2-arm .au2-big { margin-left: 0; }
+.au2-x { border: 0; background: transparent; color: var(--slate); font-size: 18px; cursor: pointer; padding: 6px; }
+.au2-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 12px; }
+.au2-tile { position: relative; padding: 10px 11px 9px; border-radius: 14px; background: var(--soft); border: 1.5px solid transparent; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.au2-tile.on { background: var(--rise-soft); border-color: var(--rise); }
+.au2-tile b { font-size: 14px; line-height: 1.2; }
+.au2-tile small { color: var(--slate); font-size: 11.5px; line-height: 1.3; }
+.au2-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.au2-mk { font-size: 10.5px; font-weight: 800; letter-spacing: .02em; padding: 2px 7px; border-radius: 6px; background: var(--card); color: var(--slate); border: 1px solid var(--line); }
+.au2-sw { width: 48px; height: 28px; border-radius: 999px; border: 0; padding: 0; cursor: pointer; position: relative; background: var(--mute-line); transition: background .15s; flex: none; }
+.au2-sw i { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); transition: left .15s; }
+.au2-sw.on { background: var(--rise); }
+.au2-sw.on i { left: 23px; }
+.au2-sw:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.au2-st { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; background: var(--card); color: var(--slate); border: 1px solid var(--line); white-space: nowrap; max-width: 60%; overflow: hidden; text-overflow: ellipsis; }
+.au2-st.on { background: var(--rise); color: #fff; border-color: var(--rise); }
+.au2-i { margin-top: 2px; }
+.au2-i summary { list-style: none; cursor: pointer; color: var(--slate); font-size: 13px; width: fit-content; }
+.au2-i summary::-webkit-details-marker { display: none; }
+.au2-gauges { display: grid; gap: 8px; margin-top: 12px; }
+.au2-g { display: grid; grid-template-columns: 118px 1fr auto; align-items: center; gap: 8px; font-size: 12.5px; }
+.au2-g span { color: var(--slate); }
+.au2-bar { position: relative; height: 10px; border-radius: 999px; background: var(--soft); overflow: visible; }
+.au2-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--rise); }
+.au2-bar i.bad { background: var(--fall); }
+.au2-bar em { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: .55; }
+.au2-warn { margin: 0; font-size: 12.5px; color: var(--fall-ink); font-weight: 700; }
+.au2-mmrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; margin-top: 12px; }
+.au2-mm { padding: 10px; border-radius: 14px; border: 1px solid var(--line); }
+.au2-mmh { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; }
+.au2-mmh b { margin-right: auto; }
+.au2-mmh label { display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--slate); }
+.au2-mmh input { width: 70px; font: inherit; font-size: 13px; padding: 5px 7px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.au2-mmh label + label input { width: 40px; }
+.au2-save { font: inherit; font-size: 12px; font-weight: 800; padding: 6px 10px; border-radius: 8px; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; }
+.au2-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.au2-c { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 4px 9px; border-radius: 999px; background: var(--soft); }
+.au2-c i, .au2-key i { width: 8px; height: 8px; border-radius: 50%; background: var(--slate); display: inline-block; }
+.au2-c.hold { background: var(--rise-soft); } .au2-c.hold i, .au2-key i.hold { background: var(--rise); }
+.au2-c.wait { background: var(--saffron-soft); } .au2-c.wait i, .au2-key i.wait { background: var(--saffron); }
+.au2-c.off { opacity: .55; }
+.au2-c small { color: var(--slate); }
+.au2-foot { font-size: 11.5px; color: var(--slate); margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+.au2-key { display: inline-flex; gap: 5px; align-items: center; }
+.au2-key i { margin-left: 6px; }
+@media (prefers-reduced-motion: reduce) { .au2-sw, .au2-sw i { transition: none; } }
+.au2-arm[hidden] { display: none; }
+@media (max-width: 520px) { .au2-grid { grid-template-columns: 1fr 1fr; } .au2-g { grid-template-columns: 96px 1fr auto; } }

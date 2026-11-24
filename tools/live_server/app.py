@@ -1461,11 +1461,18 @@ def account(_=Depends(auth)):
         out["angel"] = broker.account()
     except Exception as e:  # noqa: BLE001
         out["angel"] = dict(error=str(e))
-    try:
-        out["moomoo"] = moomoo.account()
-    except Exception as e:  # noqa: BLE001
-        out["moomoo"] = dict(error=str(e))
+    # 24 Nov 2026: moomoo's account view opens a session per market (seconds each) - cached a minute so pages load fast
+    if _MMC.get("acct") and time.time() - _MMC["acct"][0] < 60:
+        out["moomoo"] = _MMC["acct"][1]
+    else:
+        try:
+            out["moomoo"] = moomoo.account(); _MMC["acct"] = (time.time(), out["moomoo"])
+        except Exception as e:  # noqa: BLE001
+            out["moomoo"] = dict(error=str(e))
     return out
+
+
+_MMC = {}
 
 
 @app.get("/api/orders")
@@ -2607,8 +2614,13 @@ def us_plan():
         note = "moomoo trading is off on the server (MOOMOO_ENABLED=1 and MOOMOO_TRADE=1 in .env, with OpenD running)."
     else:
         try:
-            snap = moomoo.snapshot(sorted(set(P["signals"]) | set(P.get("watch", [])) | set(J["pos"])))
-            held = moomoo.us_positions(); outside = {k: v for k, v in held.items() if k not in J["pos"]}
+            syms = sorted(set(P["signals"]) | set(P.get("watch", [])) | set(J["pos"])); key = ",".join(syms)
+            c0 = _MMC.get("usplan")
+            if c0 and c0[1] == key and time.time() - c0[0] < (30 if us_open(t) else 300):   # 24 Nov 2026: cache (page speed)
+                snap, held = c0[2], c0[3]
+            else:
+                snap = moomoo.snapshot(syms); held = moomoo.us_positions(); _MMC["usplan"] = (time.time(), key, snap, held)
+            outside = {k: v for k, v in held.items() if k not in J["pos"]}
         except Exception as ex:  # noqa: BLE001
             note = f"couldn't reach moomoo OpenD: {str(ex)[:160]}"
     live = bool(snap) and us_open(t)
@@ -4328,6 +4340,7 @@ def _us_stop(sym, qty, stop):
 
 @app.post("/api/us/order")
 def us_order(body: USOrder, _=Depends(auth)):
+    _MMC.pop("usplan", None)                      # an order always re-checks with fresh moomoo prices
     P = us_plan(); t = et_now()
     if P["note"]:
         raise HTTPException(400, P["note"])
