@@ -1368,7 +1368,8 @@ def test_moomoo_top_bottom_engine(tmp_path):
     assert c.post("/api/mmtb/cfg", headers=h, json={"market": "US", "capital": 3000, "risk_pct": 1.0}).json()["capital"] == 3000
     J.step()                                                     # automation off -> nothing placed
     assert not J.st["pos"]["US"]
-    c.post("/api/auto", headers=h, json={"part": "mm_us", "on": True, "password": "pw", "confirm": "AUTO"})
+    r = c.post("/api/auto", headers=h, json={"part": "mm_us", "on": True, "password": "pw", "confirm": "AUTO"}).json()
+    assert r["mm_us"] is True and r["mm_au"] is False and c.get("/api/auto", headers=h).json()["mm_us"] is True   # the app's switch shows On
     J.st["day"]["US"] = None; J.step()
     p = J.st["pos"]["US"]["QQQ"]; assert p["state"] == "pending" and p["trig"] == 659.84 and p["lim"] == 666.43
     assert p["qty"] == 1                                         # min(1% x 3000 / (659.84 - 646.64), 3000/4/666.43) -> 1 share

@@ -2289,7 +2289,7 @@ def auto_status() -> dict:
         tml = None
     on = [k for k in AUTO_PARTS if c.get(k)] + [f"tb_{i}" for i, v in tb.items() if v["auto"]] + (["opt_trader"] if otr else []) \
         + (["turtle"] if tml and tml["armed"] and tml["live"] else [])
-    return dict(stock_buy=c["stock_buy"], stock_sell=c["stock_sell"], tb=tb, opt_trader_live=otr, turtle=tml, orders_live=is_live(),
+    return dict(**{k: bool(c.get(k)) for k in AUTO_PARTS}, tb=tb, opt_trader_live=otr, turtle=tml, orders_live=is_live(),
                 any_on=bool(on), on=on, manual_at=c.get("manual_at"), snapshot=c.get("snapshot"), reserve_pct=AUTO_RESERVE * 100,
                 fut_cap_x=FUT_CAP_X, margin=_MW.get("d"), done=c.get("done"))
 
