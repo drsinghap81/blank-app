@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-24 02:36 UTC",
+"generated": "2026-11-24 02:37 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-23",
@@ -402,7 +402,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 8.3
+"r3m": null
 },
 {
 "id": "STOP-DCBBANK-244.65",
