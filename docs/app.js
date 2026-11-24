@@ -941,8 +941,8 @@ async function loadLiveG(mk) {
   const go = (k, c, t, sub) => `<button class="lv-need-i ${c}" data-go="${k}"><b>${t}</b><span>${sub}</span><i>›</i></button>`;
   el.innerHTML = `${lvSeg()}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
-    ${pane('home', `<div class="lv-conn"><span class="lv-dot"></span><span><b>${mk === 'UK' ? 'Your broker' : 'moomoo'}</b> · you place the orders · ${srvOn ? 'server connected' : 'server not connected'}</span><button class="lv-link" data-go="set">Settings</button></div><div id="lval"></div>
-      <div class="lv-card lv-need" data-fold="skip"><div class="lv-need-h"><b>Needs you today</b><span class="lv-mode dry">MANUAL</span></div>
+    ${pane('home', `<div class="lv-conn"><span class="lv-dot"></span><span><b>${mk === 'UK' ? 'Your broker' : 'moomoo'}</b> · ${srvOn ? 'server connected' : 'server not connected'}</span><button class="lv-link" data-go="set">Settings</button></div><div id="lval"></div>${srvOn && isOwner() && mk !== 'UK' ? '<div id="autocard"></div>' : ''}
+      <div class="lv-card lv-need" data-fold="skip"><div class="lv-need-h"><b>Stock systems · you place these</b><span class="lv-mode dry">YOU ORDER</span></div><p class="lv-sub" style="margin:0 0 6px">Momentum and 9/21 tickets for moomoo. The ETF Top Bottom above trades by itself when its tile is green.</p>
         ${nExG ? go('hold', 'sell', `${nExG} to sell`, 'system exit signals for the next open — only if you hold them') : ''}${nBuyG ? go('buy', 'buy', `${nBuyG} to buy`, 'order tickets ready to place on moomoo') : ''}
         ${nExG || nBuyG ? '' : '<p class="lv-sub">✓ Nothing to do — no new signals today.</p>'}</div>
       <div class="lv-card"><b>Paper record</b>${paper}</div>${mk === 'US' ? '<div id="pvus"></div>' : mk === 'ASX' ? '<div id="pvasx"></div>' : ''}`)}
@@ -952,15 +952,15 @@ async function loadLiveG(mk) {
     ${swCardG('my')}${swCardG('tf')}${swCardG('vcp')}${swCardG('t9')}${swCardG('rt')}${swCardG('pt')}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card"><b>Exits for the next open</b>${exits}</div>` : ''}${mk === 'US' ? '<div id="usw"></div><div id="usj"></div>' : mk === 'ASX' ? '<div id="asxw"></div><div id="asxj"></div>' : `<div class="lv-card"><b>Your ${MKT[mk].name} holdings</b><p class="lv-sub">There is no UK broker link, so holdings, the trade journal and you-vs-market are India, US and Australia only for now.</p></div>`}`)}
-    ${pane('set', `<div class="lv-card" style="border-left:5px solid var(--fall)"><b>Paper-trading phase · you place orders yourself on moomoo</b>
-      <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">${mk === 'ASX' ? "moomoo's API for Australian accounts cannot place ASX orders, so ASX stays manual. " : "moomoo's API can trade US shares from your Australian account; automatic orders come only after the paper record below shows the edge holds. "}Nothing here is sent to a broker.</p></div>
+    ${pane('set', `<div class="lv-card" style="border-left:5px solid var(--fall)"><b>Stock systems · you place these orders on moomoo</b>
+      <p class="lv-sub">${WATCH[mk]}</p><p class="lv-sub">The Momentum and 9/21 lists here are tickets for you; nothing from them is sent to a broker. The ETF Top Bottom on Home is different: it is connected to moomoo and trades by itself when its tile is green${mk === 'ASX' ? " (ASX only on the real account: moomoo's paper trading has no ASX)" : ' (paper account for now)'}.</p></div>
     ${lvBucketCard(mk, P, alG, inUseG, null)}`)}`;
   el.querySelectorAll('.lv-tabs [data-tab], .lv-need-i[data-go], .lv-conn [data-go]').forEach((b) => b.addEventListener('click', () => {
     const k = b.dataset.tab || b.dataset.go; state.lvTab = k; try { sessionStorage.setItem('td.lvTab', k); } catch (e) { /* */ }
     el.querySelectorAll('.lv-tabs [data-tab]').forEach((x) => x.setAttribute('aria-selected', x.dataset.tab === k));
     el.querySelectorAll('.lv-pane').forEach((p) => (p.hidden = p.dataset.pane !== k)); window.scrollTo(0, 0); }));
   alCard($('#lval'), mk);
-  lvSegWire(el); lvBucketWire(el, mk, null); wireCap('lvcapg', mk, () => loadLive());
+  lvSegWire(el); lvBucketWire(el, mk, null); wireCap('lvcapg', mk, () => loadLive()); if (srvOn && isOwner() && mk !== 'UK') autoLoad();
   if (mk === 'US') { usWatchCard($('#usw')); perfVsCard($('#pvus'), 'US'); usJournalCard($('#usj')); }
   if (mk === 'ASX') { usWatchCard($('#asxw'), 'ASX'); perfVsCard($('#pvasx'), 'ASX'); usJournalCard($('#asxj'), 'ASX'); }
   const ns = $('#lvn'); if (ns) ns.addEventListener('change', () => { try { localStorage.setItem('td.lvN_' + mk, ns.value); localStorage.removeItem(selKey(mk, P.asof)); } catch (e) { /* private mode */ } lvKeep(); });
