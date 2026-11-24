@@ -1859,3 +1859,4 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .sc-dr small{color:var(--slate);font-size:12px;line-height:1.45}
 .sc-ch{margin-top:8px}
 .sc-how{margin-top:14px}
+.tr-pw{display:block;width:100%;box-sizing:border-box;margin:4px 0 12px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:16px}

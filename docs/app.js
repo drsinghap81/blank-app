@@ -2000,7 +2000,17 @@ async function loadTrade() {
   el.innerHTML = chips + '<p class="muted pad">Loading today\'s list…</p>'; wire();
   if (!lvCfg().url) { el.innerHTML = chips + `<div class="tr-empty"><b>Connect your server first</b><p>Trade Live sends orders through your server. Connect it once in Full view → Settings.</p><button class="tr-go" data-go2="live">Open Full view</button></div>`; wire();
     el.querySelector('[data-go2]').addEventListener('click', () => show('live')); return; }
-  let D; try { D = mk === 'NSE' ? await trIndia() : await trWorld(mk); } catch (e) { el.innerHTML = chips + `<div class="tr-empty"><b>Couldn't load the list</b><p>${esc(e.message)}</p><button class="tr-go" id="trre">Try again</button></div>`; wire(); el.querySelector('#trre').addEventListener('click', loadTrade); return; }
+  let D; try { D = mk === 'NSE' ? await trIndia() : await trWorld(mk); } catch (e) {
+    // 24 Nov 2026: the server's sign-in lasts 12 hours - log in right here instead of an error
+    if (/log in again|401|not connected/i.test(e.message) || !lvCfg().token) {
+      el.innerHTML = chips + `<form class="tr-empty" id="trlog" autocomplete="on"><b>Log in to your server</b><p>Your sign-in lasts 12 hours. Enter the app password to load today's list.</p>
+        <input type="text" name="username" autocomplete="username" value="${esc(lvCfg().url || '')}" hidden><input class="tr-pw" id="trpw" name="password" type="password" placeholder="App password" autocomplete="current-password">
+        <button class="tr-go" type="submit">Log in</button><p class="down" id="trerr"></p></form>`; wire();
+      const f = el.querySelector('#trlog'); f.addEventListener('submit', async (ev) => { ev.preventDefault(); const b = f.querySelector('button'); b.disabled = true; b.textContent = 'Logging in…';
+        try { const j = await lvApi('/api/login', { method: 'POST', body: JSON.stringify({ password: f.querySelector('#trpw').value }), timeout: 45000 }); lvSave({ token: j.token }); state._planC = null; loadTrade(); }
+        catch (x) { f.querySelector('#trerr').textContent = x.message; b.disabled = false; b.textContent = 'Log in'; } });
+      setTimeout(() => { const i = el.querySelector('#trpw'); if (i) i.focus(); }, 50); return; }
+    el.innerHTML = chips + `<div class="tr-empty"><b>Couldn't load the list</b><p>${esc(e.message)}</p><button class="tr-go" id="trre">Try again</button></div>`; wire(); el.querySelector('#trre').addEventListener('click', loadTrade); return; }
   state.trD = D; state.trPick = state.trPick || {};
   const P = state.trPick; const L = MKT[mk].loc;
   const sendable = (r) => !r.auto && !r.block;
@@ -2130,10 +2140,18 @@ const FIX_G = { pr: ['good', '37.4%/yr, worst −23% (own test, 2016–26)'], gm
 async function loadScore() {
   $('#title').textContent = 'Stock score'; const el = $('#view-score'); if (!el) return;
   const mk = 'NSE'; const P = MAIN + MKT[mk].path; el.innerHTML = '<p class="muted pad">Scoring every stock…</p>'; $('#asof').textContent = 'India · grades from the 2016–26 test';
-  const [SC, ST, at, tr, tp, fl, pt, vcp, ipo, gm, sup, tl] = await Promise.all([getJSON(MAIN + 'data/research/strategy_scorecard.json', 'scorecard'), getJSON(MAIN + 'data/research/strategy_scorecard_stocks.json', 'scorecard_st'),
+  /* 24 Nov 2026 (Amritpal: "scoring all stocks taking a lot of time"): files load once per session; the 1.4 MB trendline file only
+     with "+ forming"; each stock's own history (360 kB) only when a row is opened */
+  const watchOn = !!state.scWatch;
+  if (!state.scD || (watchOn && !state.scD.tl)) {
+    if (!state.scD) state.scD = (await Promise.all([getJSON(MAIN + 'data/research/strategy_scorecard.json', 'scorecard'), Promise.resolve(null),
     getJSON(P + 'ath.json', 'ath'), state.data[mk] || getJSON(P + 'trend_scan.json', 'td_' + mk), getJSON(P + 'trade_plan.json', 'trade_plan'), getJSON(P + 'flags.json', 'flags_' + mk),
     getJSON(P + 'patterns.json', 'pat_' + mk), getJSON(P + 'vcp.json', 'vcp'), getJSON(P + 'ipo.json', 'ipo'), getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom'),
-    getJSON(P + 'support.json', 'support'), getJSON(P + 'trendline.json', 'trendline')].map((p) => p.catch(() => null)));
+    getJSON(P + 'support.json', 'support'), Promise.resolve(null)].map((p) => p.catch(() => null))));
+    if (watchOn && !state.scD[11]) state.scD[11] = await getJSON(P + 'trendline.json', 'trendline').catch(() => null);
+    if (state.scD[3]) state.data[mk] = state.data[mk] || state.scD[3];
+  }
+  const [SC, , at, tr, tp, fl, pt, vcp, ipo, gm, sup, tl] = state.scD; const ST = state.scST;
   const gradeOf = (k) => { if (FIX_G[k]) return { g: FIX_G[k][0], why: FIX_G[k][1] };
     const s = SC && SC.systems && SC.systems[k]; if (!s || !s.all || !s.all.n) return { g: 'untested', why: 'not in the test yet' };
     return { g: s.grade === 'untested' ? 'fair' : s.grade, why: `3 months after the signal: ${s.all.avg >= 0 ? '+' : ''}${fmt(s.all.avg, 1)}% avg, ${s.all.win}% won, ${s.edge != null ? `${s.edge >= 0 ? '+' : ''}${fmt(s.edge, 1)} points better than a random stock` : `${s.all.vs_nifty >= 0 ? '+' : ''}${fmt(s.all.vs_nifty, 1)} vs Nifty`} (${s.all.n.toLocaleString('en-IN')} signals)` }; };
@@ -2151,11 +2169,10 @@ async function loadScore() {
   if (gm) (gm.picks || []).forEach((r) => put(r.symbol, 'gm', 1));
   if (sup) (sup.rows || []).forEach((r) => put(r.symbol, 'sup', 1));
   if (tl) (tl.rows || []).filter((r) => r.mk === 'NSE' && r.kind === 'stock' && r.armed && Math.abs(r.dist) <= 2).forEach((r) => put(r.symbol, 'tl', 2));
-  const watchOn = !!state.scWatch;
   const rows = Object.entries(M).map(([sym, o]) => { const ks = Object.keys(o).filter((k) => watchOn || o[k] < 2); const G = ks.map((k) => [k, o[k], gradeOf(k).g]);
     return { sym, G, n: G.length, g: G.filter((x) => x[2] === 'good').length, now: G.filter((x) => x[1] === 0).length }; }).filter((r) => r.n > 0)
     .sort((a, b) => b.g - a.g || b.n - a.n || b.now - a.now || (a.sym < b.sym ? -1 : 1));
-  const hist = (sym, k) => { const h = ST && ST.stocks && ST.stocks[sym] && ST.stocks[sym][k]; return h ? `${h[0]}× on this stock, ${h[1] >= 0 ? '+' : ''}${fmt(h[1], 1)}% avg, ${h[2]}% won` : 'never signalled on this stock in 2016–26'; };
+  const hist = (sym, k) => { if (!ST) return 'loading its history…'; const h = ST && ST.stocks && ST.stocks[sym] && ST.stocks[sym][k]; return h ? `${h[0]}× on this stock, ${h[1] >= 0 ? '+' : ''}${fmt(h[1], 1)}% avg, ${h[2]}% won` : 'never signalled on this stock in 2016–26'; };
   const chip = (k, lvl, g) => `<span class="sc-c ${g}${lvl === 2 ? ' w' : ''}">${esc(SC_NAME[k] || k)}${lvl === 0 ? ' •' : ''}</span>`;
   const top = rows.slice(0, state.scAll ? rows.length : 40);
   const C = SC && SC.confluence_test_2022_26; const cl = (lab) => C && C[lab] && C[lab].r63 && C[lab].r63.n ? `${C[lab].r63.vs_nifty >= 0 ? '+' : ''}${fmt(C[lab].r63.vs_nifty, 1)}` : '–';
@@ -2171,7 +2188,8 @@ async function loadScore() {
       <p class="muted">Does a higher count help? Grades fixed on 2016–21, then checked on 2022–26 (3 months vs Nifty): 0 good ${cl('good 0')}, 1 good ${cl('good 1')}, 2 good ${cl('good 2')}, 3+ good ${cl('good 3+')}. Use it to choose between stocks, not as a buy signal by itself.</p></details>`;
   el.querySelectorAll('#scw button').forEach((b) => b.addEventListener('click', () => { state.scWatch = b.dataset.w === '1'; loadScore(); }));
   const sa = el.querySelector('#scall'); if (sa) sa.addEventListener('click', () => { state.scAll = !state.scAll; loadScore(); });
-  el.querySelectorAll('.sc-r').forEach((b) => b.addEventListener('click', () => { const d = b.nextElementSibling; d.hidden = !d.hidden; b.setAttribute('aria-expanded', !d.hidden); }));
+  el.querySelectorAll('.sc-r').forEach((b) => b.addEventListener('click', async () => { const d = b.nextElementSibling; d.hidden = !d.hidden; b.setAttribute('aria-expanded', !d.hidden);
+    if (!d.hidden && !state.scST) { state.scST = await getJSON(MAIN + 'data/research/strategy_scorecard_stocks.json', 'scorecard_st').catch(() => null); if (state.scST) { const y = window.scrollY; const i = b.dataset.i; await loadScore(); const nb = el.querySelector(`.sc-r[data-i="${i}"]`); if (nb) nb.click(); window.scrollTo(0, y); } } }));
   el.querySelectorAll('[data-ch]').forEach((b) => b.addEventListener('click', async () => { const S = await sysMap(mk).catch(() => null); if (S) mxOpen(b.dataset.ch, mk, S); else lvOpen({ symbol: b.dataset.ch, kind: 'ATH' }, mk); }));
 }
 
