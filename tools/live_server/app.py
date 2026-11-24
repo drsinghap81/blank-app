@@ -2614,7 +2614,7 @@ def us_plan():
         note = "moomoo trading is off on the server (MOOMOO_ENABLED=1 and MOOMOO_TRADE=1 in .env, with OpenD running)."
     else:
         try:
-            syms = sorted(set(P["signals"]) | set(P.get("watch", [])) | set(J["pos"])); key = ",".join(syms)
+            syms = sorted(set(P["signals"]) | set(P.get("watch", [])) | set(J["pos"])); key = t.date().isoformat() + ":" + ",".join(syms)
             c0 = _MMC.get("usplan")
             if c0 and c0[1] == key and time.time() - c0[0] < (30 if us_open(t) else 300):   # 24 Nov 2026: cache (page speed)
                 snap, held = c0[2], c0[3]
