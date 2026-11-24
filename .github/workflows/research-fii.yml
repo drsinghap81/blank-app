@@ -5,6 +5,7 @@ on:
     inputs:
       script: { description: "script name", required: false, default: probe_fii }
       pilot: { description: "1 = pilot", required: false, default: "1" }
+      univ: { description: "universe filter (large / n200)", required: false, default: "" }
 permissions:
   contents: write
 jobs:
@@ -16,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install -q numpy pandas yfinance lxml requests html5lib beautifulsoup4 xlrd
-      - run: FII=1 PILOT=${{ inputs.pilot == '1' && '1' || '' }} LIMIT=${{ inputs.pilot == '1' && '200' || '0' }} python tools/research/${{ inputs.script || 'probe_fii' }}.py 2>&1 | grep --line-buffered "R|\|Error\|Traceback\|File " ; exit ${PIPESTATUS[0]}
+      - run: FII=1 UNIV=${{ inputs.univ || '' }} PILOT=${{ inputs.pilot == '1' && '1' || '' }} LIMIT=${{ inputs.pilot == '1' && '200' || '0' }} python tools/research/${{ inputs.script || 'probe_fii' }}.py 2>&1 | grep --line-buffered "R|\|Error\|Traceback\|File " ; exit ${PIPESTATUS[0]}
       - run: |
           git config user.name "trend-desk-bot"; git config user.email "bot@users.noreply.github.com"
           for f in data/research/fii_*.json data/research/fii_*.csv data/research/confluence_*.json data/research/candle_takeout*.json data/research/cluster_open15*.json data/research/open_green*.json data/research/fii_pulse_red*.json data/research/metals_*.json data/research/pulse_monthly.json data/research/strategy_scorecard*.json data/research/wave_now.json data/research/habit_profile*.json; do [ -e "$f" ] && git add "$f"; done; true

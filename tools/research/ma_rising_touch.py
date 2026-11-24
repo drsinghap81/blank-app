@@ -22,6 +22,14 @@ LV = (0.236, 0.382, 0.45, 0.5, 0.618, 0.70, 0.786, 1.0)
 
 
 def main():
+    U_ = os.environ.get("UNIV", "")                      # 25 Nov 2026: "large" = today's Nifty 50 + Next 50, "n200" = + Midcap 150 top
+    if U_:
+        L = []
+        for f in (["nifty50", "niftynext50"] if U_ == "large" else ["nifty50", "niftynext50", "niftymidcap150"]):
+            L += pd.read_csv(f"data/universe/{f}.csv").Symbol.str.strip().tolist()
+        FV.symbols = lambda mk: pd.DataFrame({"ticker": sorted(set(s_ + ".NS" for s_ in L))})
+        FV.PILOT = False
+        print(f"R| universe {U_}: {len(set(L))} stocks (today's members - survivorship)", flush=True)
     P = FV.load(); T = []; U = []; F = []
     for sym, x in P.items():
         c = x.CLOSE; l = x.LOW; cv = c.to_numpy(float); lv = l.to_numpy(float); D = c.index; n = len(cv)
