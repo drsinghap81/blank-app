@@ -65,7 +65,7 @@ def main():
         print(f"R| {m:6s} touch, average falling/flat | {s(X[~X.rising])}", flush=True)
         print(f"R| {m:6s} touch, average rising      | {s(X[X.rising])}", flush=True)
         print(f"R| {m:6s} touch, rising steeply >2%/20d | {s(X[X.steep])}", flush=True)
-        print(f"R| {m:6s} touch, all averages stacked+rising | {s(X[X.stack])}", flush=True)
+        print(f"R| {m:6s} touch, all averages stacked+rising | {s(X[X["stack"]])}", flush=True)
     for L in LV:
         X = F[F.lvl == L]
         print(f"R| Fib {L * 100:5.1f}%: all {s(X)}", flush=True)
