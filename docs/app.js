@@ -120,7 +120,7 @@ function parseCSV(t) {
 document.addEventListener('click', (e) => { if (e.target && e.target.id === 'toresults') show('results'); });
 /* 15 Nov 2026 layout: Investment (ETFs, funds, indices: monthly), Momentum investing (monthly ATH stocks), Trading (9/21, cup closes,
    IPO cups, patterns, support). Sub-pages light up their parent button. */
-const NAV_NEW = { strat: 'ideas', bot: 'ideas', trd: 'ideas', trends: 'ideas', ath: 'ideas', inv: 'ideas', tb: 'trade', auto: 'trade', live: 'trade' };   // 21 Nov 2026: 5 tabs; 24 Nov: Live -> Trade Live
+const NAV_NEW = { score: 'ideas', strat: 'ideas', bot: 'ideas', trd: 'ideas', trends: 'ideas', ath: 'ideas', inv: 'ideas', tb: 'trade', auto: 'trade', live: 'trade' };   // 21 Nov 2026: 5 tabs; 24 Nov: Live -> Trade Live
 const NAV_CLASSIC = { bot: 'trends', trd: 'trends' };                                                    // the 8-tab bar, kept
 /* 21 Nov 2026 (Amritpal: "keep the earlier intact too"): Classic layout = the 8-tab bar and the previous Today, one tap away. */
 const isClassic = () => document.body.classList.contains('classic');
@@ -173,7 +173,7 @@ const INV_N = { imc: 'Month close', fund: 'ETF & fund signals', themes: 'Indices
 const invStrip = (cur, cnt = {}) => `<div class="seg invstrip" role="tablist" style="flex-wrap:wrap">${ATH_GRP.inv.map((k) => `<button data-t="${k}" aria-selected="${cur === k}">${INV_N[k]}${cnt[k] != null ? ' ' + cnt[k] : ''}</button>`).join('')}</div>`;
 function invStripWire(el) { el.querySelectorAll('.invstrip button').forEach((b) => b.addEventListener('click', () => { state.athTabG.inv = b.dataset.t; state.ath && (state.ath.all = false); loadInvest(); })); }
 function show(view) {
-  if (view === 'ideas') { let v = null; try { v = localStorage.getItem('td.ideas'); } catch (e) { /* */ } view = isClassic() ? (['inv', 'ath', 'trends'].includes(v) ? v : 'ath') : (['strat', 'inv', 'ath', 'trends'].includes(v) ? v : 'strat'); }
+  if (view === 'ideas') { let v = null; try { v = localStorage.getItem('td.ideas'); } catch (e) { /* */ } view = isClassic() ? (['inv', 'ath', 'trends'].includes(v) ? v : 'ath') : (['strat', 'score', 'inv', 'ath', 'trends'].includes(v) ? v : 'strat'); }
   state.view = view;
   { const ib = document.getElementById('ideasbar'); if (ib) { const on = NAV_OF[view] === 'ideas'; ib.hidden = !on;
       if (on) { const k = IDEA_OF[view] || view; try { localStorage.setItem('td.ideas', k); } catch (e) { /* */ } ib.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === k)); } }
@@ -186,7 +186,7 @@ function show(view) {
   if (view !== 'bg') document.body.classList.remove('bg-first');
   if (view !== 'bg') bgNav(document.body.classList.contains('mode-bg') ? 'explore' : '');
   setTimeout(liveTag, 1500); setTimeout(liveTag, 4000); if (view === 'trends' || view === 'ath' || view === 'trd') setTimeout(livePoll, 800);
-  ({ today: loadToday, strat: loadStrat, mk: loadMarkets, live: loadLive, trade: loadTrade, auto: loadAuto, trends: loadTrends, ath: loadATH, inv: loadInvest, trd: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
+  ({ today: loadToday, strat: loadStrat, mk: loadMarkets, live: loadLive, trade: loadTrade, score: loadScore, auto: loadAuto, trends: loadTrends, ath: loadATH, inv: loadInvest, trd: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
 }
 
 /* ------------------------------------------------------------------ Live hero + pie (9 Nov 2026)
@@ -2114,6 +2114,65 @@ async function trSend(L, mk, btn) {
     state.trPick = {}; state._planC = null; setTimeout(loadTrade, 2500);
   } catch (e) { alertMsg('Not sent: ' + e.message); }
   btn.disabled = false; btn.textContent = lab;
+}
+
+/* ------------------------------------------------------------------ Stock score (24 Nov 2026)
+   Amritpal: "each stock with a matrix having all these strategies; categorise a backtest score for each; if a stock is scoring
+   overall more I should see it - say KOTAKBANK comes in 10, 8 backtested good, 2 not good".
+   One row per stock that is in any strategy today; each strategy chip is coloured by its backtest grade from ONE uniform test
+   (tools/research/strategy_scorecard.py: NSE 2016-26, 3 months after the signal vs Nifty -> data/research/strategy_scorecard.json).
+   Strategies tested elsewhere carry their own test's grade (FIX_G). Sorted by the number of GOOD strategies. */
+const SC_NAME = { ath: 'Monthly ATH', month: 'Month close', wcup: 'Week cup', dcup: 'Day cup', base: '52-wk base', cup921: 'Cup 9/21', 921: '9/21',
+  tight: 'Tight base', flag: 'Flag', pennant: 'Pennant', rectangle: 'Rectangle', wbot: 'W bottom', tiltw: 'Tilted W', triple: 'Triple bottom', ihs: 'Inv H&S',
+  retest: 'Retest', emalift: 'EMA lift', stack: 'MA stack', pr: 'Pulse rotation', gm: 'Growth + mom', ipo: 'IPO cup', vcp: 'VCP', sup: 'At support', tl: 'Trendline' };
+const FIX_G = { pr: ['good', '37.4%/yr, worst −23% (own test, 2016–26)'], gm: ['good', '24.7%/yr vs Nifty 11.5% (own test)'], ipo: ['fair', 'beats Nifty modestly, weaker than ATH'],
+  vcp: ['fair', '+4.9% a trade, did not beat ATH or 9/21'], sup: ['fair', 'small edge, from breakout retests only'], tl: ['poor', '3rd touch no better than the 50-day average'] };
+async function loadScore() {
+  $('#title').textContent = 'Stock score'; const el = $('#view-score'); if (!el) return;
+  const mk = 'NSE'; const P = MAIN + MKT[mk].path; el.innerHTML = '<p class="muted pad">Scoring every stock…</p>'; $('#asof').textContent = 'India · grades from the 2016–26 test';
+  const [SC, ST, at, tr, tp, fl, pt, vcp, ipo, gm, sup, tl] = await Promise.all([getJSON(MAIN + 'data/research/strategy_scorecard.json', 'scorecard'), getJSON(MAIN + 'data/research/strategy_scorecard_stocks.json', 'scorecard_st'),
+    getJSON(P + 'ath.json', 'ath'), state.data[mk] || getJSON(P + 'trend_scan.json', 'td_' + mk), getJSON(P + 'trade_plan.json', 'trade_plan'), getJSON(P + 'flags.json', 'flags_' + mk),
+    getJSON(P + 'patterns.json', 'pat_' + mk), getJSON(P + 'vcp.json', 'vcp'), getJSON(P + 'ipo.json', 'ipo'), getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom'),
+    getJSON(P + 'support.json', 'support'), getJSON(P + 'trendline.json', 'trendline')].map((p) => p.catch(() => null)));
+  const gradeOf = (k) => { if (FIX_G[k]) return { g: FIX_G[k][0], why: FIX_G[k][1] };
+    const s = SC && SC.systems && SC.systems[k]; if (!s || !s.all || !s.all.n) return { g: 'untested', why: 'not in the test yet' };
+    return { g: s.grade === 'untested' ? 'fair' : s.grade, why: `3 months after the signal: ${s.all.avg >= 0 ? '+' : ''}${fmt(s.all.avg, 1)}% avg, ${s.all.win}% won, ${s.edge != null ? `${s.edge >= 0 ? '+' : ''}${fmt(s.edge, 1)} points better than a random stock` : `${s.all.vs_nifty >= 0 ? '+' : ''}${fmt(s.all.vs_nifty, 1)} vs Nifty`} (${s.all.n.toLocaleString('en-IN')} signals)` }; };
+  const M = {}; const put = (sym, k, lvl) => { if (!sym) return; M[sym] = M[sym] || {}; const o = M[sym][k]; if (o == null || lvl < o) M[sym][k] = lvl; };   // 0 signal now, 1 in it / on the list, 2 forming / near
+  if (at) { (at.breakouts || []).forEach((r) => put(r.symbol, 'ath', 0)); (at.tracked || []).filter((r) => r.status === 'open').forEach((r) => put(r.symbol, 'ath', 1)); (at.near || []).forEach((r) => put(r.symbol, 'ath', 2));
+    (at.month_close || []).forEach((r) => put(r.symbol, 'month', 1)); (at.week_close || []).forEach((r) => put(r.symbol, 'wcup', 1)); (at.day_close || []).forEach((r) => put(r.symbol, 'dcup', 1)); }
+  if (tr) { (tr.early || []).forEach((r) => { const s = r.status || ''; if (s.startsWith('NEW')) put(r.symbol, '921', 0); else if (s === 'open') put(r.symbol, '921', 1); });
+    (tr.bases || []).forEach((r) => { const s = r.status || ''; put(r.symbol, 'tight', s.startsWith('BREAKOUT') ? 0 : s === 'base forming' ? 2 : 1); });
+    (tr.stack || []).forEach((s) => put(s, 'stack', 1)); }
+  if (tp) (tp.top || []).concat(tp.swing || [], tp.more || []).forEach((r) => { const b = bkOf(r); if (b === 'tf') put(r.symbol, 'cup921', 0); else if (b === 'rt') put(r.symbol, 'retest', 0); else if (b === 'pr') put(r.symbol, 'pr', 1); });
+  if (fl) (fl.rows || []).filter((r) => (r.kind || 'stock') === 'stock').forEach((r) => put(r.symbol, (r.shape || 'flag').toLowerCase(), r.status === 'breakout' ? 0 : 2));
+  if (pt) (pt.rows || []).filter((r) => (r.kind || 'stock') === 'stock').forEach((r) => { const k = { DB: 'wbot', TW: 'tiltw', TB: 'triple', IHS: 'ihs' }[r.typ]; if (k) put(r.symbol, k, r.status === 'breakout' ? 0 : 2); });
+  if (vcp) (vcp.rows || []).forEach((r) => put(r.symbol, 'vcp', 2));
+  if (ipo) { (ipo.breakouts || []).filter((r) => r.status === 'open').forEach((r) => put(r.symbol, 'ipo', 0)); (ipo.near || []).forEach((r) => put(r.symbol, 'ipo', 2)); }
+  if (gm) (gm.picks || []).forEach((r) => put(r.symbol, 'gm', 1));
+  if (sup) (sup.rows || []).forEach((r) => put(r.symbol, 'sup', 1));
+  if (tl) (tl.rows || []).filter((r) => r.mk === 'NSE' && r.kind === 'stock' && r.armed && Math.abs(r.dist) <= 2).forEach((r) => put(r.symbol, 'tl', 2));
+  const watchOn = !!state.scWatch;
+  const rows = Object.entries(M).map(([sym, o]) => { const ks = Object.keys(o).filter((k) => watchOn || o[k] < 2); const G = ks.map((k) => [k, o[k], gradeOf(k).g]);
+    return { sym, G, n: G.length, g: G.filter((x) => x[2] === 'good').length, now: G.filter((x) => x[1] === 0).length }; }).filter((r) => r.n > 0)
+    .sort((a, b) => b.g - a.g || b.n - a.n || b.now - a.now || (a.sym < b.sym ? -1 : 1));
+  const hist = (sym, k) => { const h = ST && ST.stocks && ST.stocks[sym] && ST.stocks[sym][k]; return h ? `${h[0]}× on this stock, ${h[1] >= 0 ? '+' : ''}${fmt(h[1], 1)}% avg, ${h[2]}% won` : 'never signalled on this stock in 2016–26'; };
+  const chip = (k, lvl, g) => `<span class="sc-c ${g}${lvl === 2 ? ' w' : ''}">${esc(SC_NAME[k] || k)}${lvl === 0 ? ' •' : ''}</span>`;
+  const top = rows.slice(0, state.scAll ? rows.length : 40);
+  const C = SC && SC.confluence_test_2022_26; const cl = (lab) => C && C[lab] && C[lab].r63 && C[lab].r63.n ? `${C[lab].r63.vs_nifty >= 0 ? '+' : ''}${fmt(C[lab].r63.vs_nifty, 1)}` : '–';
+  el.innerHTML = `<div class="sc-head"><p>Every stock that is in a strategy today. Each strategy is graded by its own backtest: <span class="sc-c good">Good</span> <span class="sc-c fair">Fair</span> <span class="sc-c poor">Poor</span>. Most good strategies first. • = signal today.</p>
+      <div class="seg" id="scw"><button data-w="0" aria-selected="${!watchOn}">Signals + open</button><button data-w="1" aria-selected="${watchOn}">+ forming</button></div></div>
+    ${SC ? '' : '<p class="tr-none">The backtest grades are still running; chips show grey until they arrive.</p>'}
+    <ol class="sc-list">${top.map((r, i) => `<li><button class="sc-r" data-i="${i}"><span class="sc-n">${i + 1}</span><span class="sc-s"><b>${esc(r.sym)}</b><small>in ${r.n} · <em class="up">${r.g} good</em>${r.n - r.g ? ` · ${r.n - r.g} not` : ''}</small></span>
+        <span class="sc-bar" aria-hidden="true">${r.G.map((x) => `<i class="${x[2]}"></i>`).join('')}</span></button>
+        <div class="sc-d" hidden>${r.G.sort((a, b) => ['good', 'fair', 'poor', 'untested'].indexOf(a[2]) - ['good', 'fair', 'poor', 'untested'].indexOf(b[2])).map(([k, lvl, g]) => `<div class="sc-dr">${chip(k, lvl, g)}<small>${lvl === 0 ? 'signal today' : lvl === 1 ? 'in it / on the list' : 'forming / near'} · ${esc(hist(r.sym, k))}<br>${esc(gradeOf(k).why)}</small></div>`).join('')}
+          <button class="tr-go sc-ch" data-ch="${esc(r.sym)}">Open chart</button></div></li>`).join('')}</ol>
+    ${rows.length > 40 ? `<button class="more" id="scall">${state.scAll ? 'Show top 40' : `Show all ${rows.length}`}</button>` : ''}
+    <details class="info sc-how"><summary>How the grades work</summary><p class="muted">One test for every price strategy: NSE stocks 2016–26, buy the next open after each signal, hold 3 months, 0.4% cost, compared with a random stock bought on any day (the test uses today's listed stocks, which beat Nifty anyway). <b>Good</b> = at least +2 points better than a random stock, 55%+ of trades up and still ahead in the last 3 years; <b>Fair</b> = ahead, but less; <b>Poor</b> = no better than a random stock. Pulse rotation, Growth + momentum, IPO cup, VCP, support and trendline carry their own earlier tests.</p>
+      <p class="muted">Does a higher count help? Grades fixed on 2016–21, then checked on 2022–26 (3 months vs Nifty): 0 good ${cl('good 0')}, 1 good ${cl('good 1')}, 2 good ${cl('good 2')}, 3+ good ${cl('good 3+')}. Use it to choose between stocks, not as a buy signal by itself.</p></details>`;
+  el.querySelectorAll('#scw button').forEach((b) => b.addEventListener('click', () => { state.scWatch = b.dataset.w === '1'; loadScore(); }));
+  const sa = el.querySelector('#scall'); if (sa) sa.addEventListener('click', () => { state.scAll = !state.scAll; loadScore(); });
+  el.querySelectorAll('.sc-r').forEach((b) => b.addEventListener('click', () => { const d = b.nextElementSibling; d.hidden = !d.hidden; b.setAttribute('aria-expanded', !d.hidden); }));
+  el.querySelectorAll('[data-ch]').forEach((b) => b.addEventListener('click', async () => { const S = await sysMap(mk).catch(() => null); if (S) mxOpen(b.dataset.ch, mk, S); else lvOpen({ symbol: b.dataset.ch, kind: 'ATH' }, mk); }));
 }
 
 /* ------------------------------------------------------------------ trends */

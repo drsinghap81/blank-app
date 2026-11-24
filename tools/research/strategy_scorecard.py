@@ -18,7 +18,9 @@ One uniform test for every price-pattern strategy in the app, NSE stocks (Yahoo 
   emalift  first candle whose low is above a rising EMA 9 (none in the previous 10 sessions)
   stack    first day of close > SMA 20 > 50 > 100 > 200, all rising (none in the previous 20 sessions)
 One event per stock per system per 20 sessions. Buy next open, hold 63 (and 126) sessions, 0.4% cost; vs Nifty 50 same days.
-Grade (63 days vs Nifty, win rate):  GOOD >= +2.0 points and >= 55% wins and the last 3 years > 0;  FAIR > 0;  POOR <= 0.
+Baseline (24 Nov, after the first run: Yahoo survivors beat Nifty on ANY day, which flattered every strategy): a random liquid
+stock-day (every 21st session per stock, Rs 1 cr/day, price >= 30), same 63-day hold vs Nifty. Edge = strategy vs Nifty - baseline.
+Grade:  GOOD edge >= +2.0 points, >= 55% wins and the last 3 years' edge > 0;  FAIR edge > 0;  POOR edge <= 0.
 Walk-forward confluence: grades from 2016-2021 events only, then 2022-26 events bucketed by how many GOOD systems fired on the stock
 in the last 20 sessions (0 / 1 / 2 / 3+) and how many not-good ones.
 Per stock: each system's own past events on that stock (n, avg 63d, win) -> data/research/strategy_scorecard_stocks.json.
@@ -139,12 +141,16 @@ def stat(T, hz=63):
                 vs_nifty=round(float(xv.mean()) * 100, 2))
 
 
-def grade(a, a3):
+BASE = {}
+
+
+def grade(a, a3, b="all", b3="last 3y"):
     if not a.get("n") or a["n"] < 30:
         return "untested"
-    if a["vs_nifty"] >= 2.0 and a["win"] >= 55 and (a3.get("vs_nifty") or 0) > 0:
+    e = a["vs_nifty"] - (BASE.get(b, {}).get("vs_nifty") or 0); e3 = (a3.get("vs_nifty") or 0) - (BASE.get(b3, {}).get("vs_nifty") or 0)
+    if e >= 2.0 and a["win"] >= 55 and e3 > 0:
         return "good"
-    return "fair" if a["vs_nifty"] > 0 else "poor"
+    return "fair" if e > 0 else "poor"
 
 
 def main():
@@ -158,7 +164,9 @@ def main():
         except Exception as e:  # noqa: BLE001
             print("skip", sym, e); continue
         o, c = x.OPEN.to_numpy(float), x.CLOSE.to_numpy(float); D = x.index; n = len(c)
-        for k in SYS:
+        vl = ((x.CLOSE * x.VOL).rolling(20).mean() / VALUE_DIV).to_numpy()
+        S["_base"] = np.zeros(n, bool); S["_base"][250::21] = True; S["_base"] &= (vl >= 1)
+        for k in SYS + ("_base",):
             for t in np.where(S[k])[0]:
                 if D[t] < pd.Timestamp("2016-06-01") or t + 1 >= n or c[t] < 30:
                     continue
@@ -170,8 +178,13 @@ def main():
                 r["bull"] = bool(bull.asof(D[t])) if len(bull.loc[:D[t]]) else None
                 rows.append(r)
     E = pd.DataFrame(rows); end = E.d.max()
+    B = E[E.sys == "_base"]; E = E[E.sys != "_base"]
+    for lab, T in [("all", B), ("last 3y", B[B.d > end - pd.DateOffset(months=39)]), ("last 1y", B[B.d > end - pd.DateOffset(months=15)]),
+                   ("train", B[B.d < "2022-01-01"]), ("test", B[B.d >= "2022-01-01"])]:
+        BASE[lab] = stat(T)
+    print("R| baseline random stock-day", BASE, flush=True)
     print("R| events", len(E), E.sys.value_counts().to_dict(), flush=True)
-    res = dict(method=__doc__, events=len(E), systems={})
+    res = dict(method=__doc__, events=len(E), systems={}, baseline=BASE)
     for k in SYS:
         T = E[E.sys == k]
         o = dict(name=NAME[k], all=stat(T), all126=stat(T, 126))
@@ -180,7 +193,8 @@ def main():
         o["bull"] = stat(T[T.bull == True]); o["bear"] = stat(T[T.bull == False])  # noqa: E712
         o["ex-Covid"] = stat(T[~((T.d >= "2020-02-15") & (T.d <= "2020-12-31"))])
         o["train"] = stat(T[T.d < "2022-01-01"]); o["test"] = stat(T[T.d >= "2022-01-01"])
-        o["grade"] = grade(o["all"], o["last 3y"]); o["grade_train"] = grade(o["train"], o["train"])
+        o["grade"] = grade(o["all"], o["last 3y"]); o["grade_train"] = grade(o["train"], o["train"], "train", "train")
+        o["edge"] = round(o["all"]["vs_nifty"] - BASE["all"]["vs_nifty"], 2) if o["all"].get("n") else None
         o["years"] = {str(yy): stat(T[T.d.dt.year == yy]) for yy in sorted(T.d.dt.year.unique(), reverse=True)}
         res["systems"][k] = o
         print(f"R| {k:9s} {o['grade']:8s} all {o['all']} | 126d {o['all126'].get('avg')} | last1y {o['last 1y'].get('vs_nifty')} last3y {o['last 3y'].get('vs_nifty')} | bull {o['bull'].get('vs_nifty')} bear {o['bear'].get('vs_nifty')} | train {o['grade_train']}", flush=True)
