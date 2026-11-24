@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-23 10:47 UTC",
+"generated": "2026-11-24 01:16 UTC",
 "method": "News clues: government / regulator actions that can move a whole industry (22 Nov 2026, Amritpal, after the PSU-bank look-back\nfound the 21 Oct \"FDI cap in PSU banks to 49%\" report a week before the rally: \"add all authentic news clues, especially similar\ntypes as for PSU\").\n\nSources (checked from GitHub Actions 22 Nov 2026):\n  official  RBI press releases + notifications (rbi.org.in RSS); government outlets in Google News (PIB, DD News, News On AIR)\n  reports   Google News RSS, India edition, ONLY from named financial / national outlets (OUTLETS) - shown as \"Report\"\nEvent types searched (TYPES): FDI / foreign-ownership caps, Cabinet approvals and outlays, PLI, anti-dumping / safeguard / customs\nduty, export bans / curbs, minimum import price, bank mergers, privatisation / stake sales, GST rate changes, MSP / FRP,\nDefence Acquisition Council approvals, ethanol blending, RBI rule changes, plus \"government plans / considering\" reports.\nEach item is matched to NSE basic industries by keywords (IND_KEYS). Direction is only marked where the words say it\n(denies / no plan / rollback / ban = negative). Nothing here is a tested signal - it tells you a story exists.\nWrites data/scan/news_clues.json (last 60 days, de-duplicated).",
 "items": [
 {
@@ -40,6 +40,173 @@
 "industries": [
 "Sugar",
 "Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
+"date": "2026-11-23",
+"title": "Cabinet clears Rs 18,662 crore underwater road-rail tunnel under Brahmaputra in Assam",
+"url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPSkNPMWQwT0FJX1lVcG9Oc2I5Q3hoMDAweFV5UzN2dkZEZUZHRWNVdUsteVZ1RDhHaVZoX2JYcW1QR2NDU2dWOXlqYjl1RkRjSmhCMHdKeGlqUWx5N0trazlKX2xvMXlpYktkM013V1ZudnFtcHNqVW1Na3dCRzZKZ3A2ZHI0eWdkVVpjdDdONkNqMlFJcmtGVUlGdWpSYy1uQUV4Y3NtcmZBcVRQbndB?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Railway Wagons",
+"Civil Construction",
+"Road Assets - Toll Annuity Hybrid-Annuity"
+],
+"neg": false
+},
+{
+"key": "indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"date": "2026-11-23",
+"title": "India\u2019s EV ecosystem expands with over 46 lakh vehicles supported under MHI schemes",
+"url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPR042T3RENmluaXhCOHY5VXJLbVZIeU50X1FZVHFybmJQSDFEUURPdy1WbUx5cENmd2ZLc1FPN0c3MEM5aTVFbkRma1JiaDRmSTBSN1dCTm0tR1lPS0dZSmVqZExyRGR4dnh0WkI2Nld2SHppd1dLSUREaVFDR3RNbFlRNkIwRXc1aEstcll0MnpLT05QMkVwYmhDU3o3c2VmVUV5T0dCTkl1dkMx?oc=5",
+"source": "DD News",
+"official": true,
+"type": "PLI / incentive",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "indiaweighs20exportdutyonselectricevarietiestoboostdomesticsupplyreport",
+"date": "2026-11-23",
+"title": "India weighs 20% export duty on select rice varieties to boost domestic supply: Report",
+"url": "https://news.google.com/rss/articles/CBMi_wFBVV95cUxOU21Hc2dEMHUybDFUTkoyTXFGOW5JaWFRclptcl8wSGZMZHZndGNqN0R6a09FWWpreUFpRURhMW9RZU9yVUlnaDU4SU5fRDE4NURZdnhwTmhZNmU5OEZ4ejdhcG9hRXh3OEdINmQ3VmxlN2ZhWnA1bTJ4SFk3RkNFNkM0VlRDN2tyS2E3RldneTVTeWtTRTVpOENMXzVoLWNzWWYyQXBMVkllLWV2ZHJEX0JDeE91bk02c1FiRlB3T044WWxCbmpUZDBHV0dNNVBObGtidHBnR1B5U2ZnZVdZVEhOX0Npb3pJcno2OUJQVnNGV1FFNU1TTHFwblVKbzTSAYQCQVVfeXFMTzV0VTRsTklfWl92ZzFtMGpwRzZHeEtBdDRsRHJxTmt4NzlnaXdycnI1cFJ3ckc1YUNxNlRwTXN0Q0hGSk5kOFk4YmE4cXNWb0pJWE95aHNnOE9aMEdobzJfalJENXdaRkJrR3ZKZjBVcDl5THVTdi1aSWxVdWxCaVBIWHQ1MEVyaUFhWjdtYWhaNGVDSHIyMnJJdHlxTUg3WEJfNkhOZDI4Sk5IcGg5dmpUbV8wWXVKUVRxSTBjZHNhMUtxVDU2S01PZzlfUmg1RWRSbENPVmJVbTFSemJSakMtM2JVeHo5NDU5MkpUUGJXdk44dUtDOVBzMGJrdTFJYnNpZEU?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Agricultural Products"
+],
+"neg": false
+},
+{
+"key": "indiaconsidersriceexportdutiesasdomesticpricesrisesourcessay",
+"date": "2026-11-23",
+"title": "India considers rice export duties as domestic prices rise, sources say",
+"url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOdVFVRlVtNzZDZlUtUU9oVnh5SG92VFJ1b1ZzZWtPeXpfXzV2R1p6SE1CY2lOc1ZtdEhLX2xwOXNCbnN6MmxsR0Zoa3AzQXVrZ3NhUE5pbzhFY1lrVFg2ay1jWmdXZmRiNzJ6a2YtTWpyZTJvOG5qWEFqeUZrcEpYc282MS1MUDBoVjVuSW1IaEZZMjFwaXRtQjBEZWdnc2l4YzgxcEJYLTdwZFBjMGRYcGpybkpsZw?oc=5",
+"source": "Reuters",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Other Agricultural Products"
+],
+"neg": false
+},
+{
+"key": "indiasadaniairporttoraise300millionviastakesale",
+"date": "2026-11-23",
+"title": "India's Adani Airport to raise $300 million via stake sale",
+"url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxORnpXY0J1VmtFWElQWXdjMnIzc1dhWFV1Y0FvMS1vNHNmcDBaSVRXMS1nRFFWLXp3c0RVeTdSMk4wQi1weE5nOHFqTUhzV1VmSHFvVVNTeEZKdGkwOFdmaF9ZNGhJaUVVRGl3ZGU2SjhUd2J1V0lzZUVpVzZ4dEk3U3NKYnlYMVpBZFhYQ2x2MA?oc=5",
+"source": "Reuters",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
+"date": "2026-11-23",
+"title": "Adani Airport Holdings to raise Rs 2,790 crore from 360 ONE Asset at $18 billion valuation",
+"url": "https://news.google.com/rss/articles/CBMimgJBVV95cUxOem1ESjRnZTBadWkzaWpIWmFaMEJRQVZoRHVielFSaEprU3JWT2RxRE9jVUtPRWdwbV9HbWhfYlIxVEJRS09Ob1VNZTh6YlN0U3dfNmxuWFJHcjByVjA0RVgxWXQ1STdfT2tOUXZEb2lRamxkdmlXbjlYSmNQUTBaUnQ0SkpMM2tMVlV2d1NDMHN1MmVNZTVPeWZMcTZUYUFXbkxHc0VSdWVBWkZFanhQb3ZCVEJZUDJlOW9aMmpNeFZQMlExQkQwM01PS3ZyUWlUV1g5ckFEVTk0eG1KcnZDNEFhSVBlZTBCSHc4UGZsQzZnLWpZNFJZMlVmdUhuaFplM2Z3cFNBX0pVNFJTUUVGdzJ5aEhQZFZiSkHSAZoCQVVfeXFMTnptREo0Z2UwWnVpM2lqSFphWjBCUUFWaER1YnpRUmhKa1NyVk9kcURPY1VLT0VncG1fR21oX2JSMVRCUUtPTm9VTWU4emJTdFN3XzZsblhSR3IwclYwNEVYMVl0NUk3X09rTlF2RG9pUWpsZHZpV245WEpjUFEwWlJ0NEpKTDNrTFZVdndTQzBzdTJlTWU1T3lmTHE2VGFBV25MR3NFUnVlQVpGRWp4UG92QlRCWVAyZTlvWjJqTXhWUDJRMUJEMDNNT0t2clFpVFdYOXJBRFU5NHhtSnJ2QzRBYUlQZWUwQkh3OFBmbEM2Zy1qWTRSWTJVZnVIbmhaZTNmd3BTQV9KVTRSU1FFRncyeWhIUGRWYkpB?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Merger / sale",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "highethanolreadingssureshgopiquestionssamplingprocess",
+"date": "2026-11-23",
+"title": "High ethanol readings: Suresh Gopi questions sampling process",
+"url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPQjhxZXh1U2lWeXQwekw0OEtyTHl5RUx1RnQ3S04yYWRXVDYyMGlZdVhmLURac2FqYlVoV0toWUp4eGY5N2NqTE1EOW5RczhGUVFpelFIcklZTFZha1EzVkZVZjdCZW4xbFJuSUJjV0VpOGlOX0l1VnlOemN3azFvWl81UHV3dG9EUmNFWFJSWHg2MGZBeXdUN280SW1YaEtsV0RmeGI0SDdid1NmQmdvVmlvY3JrQTY0anJ0eS1iS2VjTGtwaU90a2xjWdIBywFBVV95cUxPQjhxZXh1U2lWeXQwekw0OEtyTHl5RUx1RnQ3S04yYWRXVDYyMGlZdVhmLURac2FqYlVoV0toWUp4eGY5N2NqTE1EOW5RczhGUVFpelFIcklZTFZha1EzVkZVZjdCZW4xbFJuSUJjV0VpOGlOX0l1VnlOemN3azFvWl81UHV3dG9EUmNFWFJSWHg2MGZBeXdUN280SW1YaEtsV0RmeGI0SDdid1NmQmdvVmlvY3JrQTY0anJ0eS1iS2VjTGtwaU90a2xjWQ?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Prices / support",
+"industries": [
+"Sugar",
+"Breweries & Distilleries"
+],
+"neg": false
+},
+{
+"key": "dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
+"date": "2026-11-23",
+"title": "DAC clears defence acquisition proposals worth Rs 1.10 lakh crore",
+"url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNOWpMNWQ2YjNzdFIydzFSNmV5VlQ1QXdNcVZkTy1nQVB5R2hqSlJQNGE3NTZ2eWk4MElHYkdSUDVfV2dDM0xfWmNDSXUtQktyaXNJZnVJdHJyV3VwS0NwM1hidUZQc3VhSnpWZkN5SHNGU1JZTm1FSjZySVVyWWdmT2pBVW03MFVPdnhZWlBJOERzRXgxSnc?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
+"key": "over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
+"date": "2026-11-23",
+"title": "Over 50.8 lakh LPG cylinders delivered in 24 hours as Government assures fuel stability amid West Asia crisis",
+"url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxQRnpheTRSNmFDN3h4dEd4RkFWcUtmdGFNSlJGTkIxbVdMZjdXVUlBOUFFdTdmR25hcVB6QllVTXA5Mjk4dEI0N3dSTWNBLXQzc29xWHd3bmU0bjZXVkFaM1F0NmUxa0plcDVCUlBNS1Y5Q2pUOGNWeHhXNGxSaWV4Q212aXRBVXNRYnRVTlFGSDZRcVBybWZ6UzRid3djRFBYY2ZJX1plU0FhYmtlYzRfV1JYcHN1Y3J4eHdwTHFFV3pJc3hZenoyT1ZoLXZYSHN1?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Plans / reports",
+"industries": [
+"Oil Exploration & Production",
+"Refineries & Marketing",
+"LPG/CNG/PNG/LNG Supplier"
+],
+"neg": false
+},
+{
+"key": "governorreservebankofindiameetsmanagingdirectorschiefexecutiveofficersofselectnbfcshfcsand",
+"date": "2026-11-23",
+"title": "Governor, Reserve Bank of India meets Managing Directors & Chief Executive Officers of select NBFCs, HFCs and Industry Representatives in Mumbai on November 23, 2026",
+"url": "https://www.rbi.org.in/scripts/BS_PressReleaseDisplay.aspx?prid=64032",
+"source": "Reserve Bank of India",
+"official": true,
+"type": "RBI",
+"industries": [
+"Non Banking Financial Company (NBFC)"
+],
+"neg": false
+},
+{
+"key": "prematureredemptionundersovereigngoldbondsgbschemeredemptionpriceforprematureredemptionofs",
+"date": "2026-11-23",
+"title": "Premature redemption under Sovereign Gold Bond (SGB) Scheme - Redemption Price for premature redemption of SGB 2021-22 Series I due on November 25, 2026",
+"url": "https://www.rbi.org.in/scripts/BS_PressReleaseDisplay.aspx?prid=64030",
+"source": "Reserve Bank of India",
+"official": true,
+"type": "RBI",
+"industries": [
+"Gems Jewellery And Watches"
+],
+"neg": false
+},
+{
+"key": "reservebankofindianonbankingfinancialcompaniessecuritisationtransactionsamendmentdirection",
+"date": "2026-11-23",
+"title": "Reserve Bank of India (Non-Banking Financial Companies - Securitisation Transactions) Amendment Directions, 2026",
+"url": "https://www.rbi.org.in/scripts/NotificationUser.aspx?Id=13755&Mode=0",
+"source": "Reserve Bank of India",
+"official": true,
+"type": "RBI",
+"industries": [
+"Non Banking Financial Company (NBFC)"
 ],
 "neg": false
 },
@@ -1882,6 +2049,7 @@
 ],
 "Sugar": [
 "e20petrolcontroversysureshgopiquestionskarnatakasethanoltests",
+"highethanolreadingssureshgopiquestionssamplingprocess",
 "indiasethanolpolicyneedsrethink",
 "indiaachieves20ethanolblendingmilestonein202526maizeleadssupplies",
 "indiahits1999ethanolblendingin202526grainssupply735",
@@ -1913,6 +2081,7 @@
 ],
 "Breweries & Distilleries": [
 "e20petrolcontroversysureshgopiquestionskarnatakasethanoltests",
+"highethanolreadingssureshgopiquestionssamplingprocess",
 "indiasethanolpolicyneedsrethink",
 "mpcabinetapprovesexcisepolicyfor202627retainsbanonnewliquorshops",
 "indiaachieves20ethanolblendingmilestonein202526maizeleadssupplies",
@@ -1943,6 +2112,151 @@
 "sugarcanefarmerswelcomepanelbutwontendprotest",
 "governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
 ],
+"Railway Wagons": [
+"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
+"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
+],
+"Civil Construction": [
+"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
+"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
+],
+"Road Assets - Toll Annuity Hybrid-Annuity": [
+"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam"
+],
+"Passenger Cars & Utility Vehicles": [
+"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"2/3 Wheelers": [
+"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"Auto Components & Equipments": [
+"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"Other Agricultural Products": [
+"indiaweighs20exportdutyonselectricevarietiestoboostdomesticsupplyreport",
+"indiaconsidersriceexportdutiesasdomesticpricesrisesourcessay",
+"indiaweighscurbsonnonbasmatiriceexportstocooldomesticprices",
+"govtmullscurbsonriceexports",
+"cabinetapprovesrs25530croresarthakpdsschemetomodernisepublicdistributionsystem",
+"amonthafterliftingofbanwheatexportsrisefourfoldshowsdata",
+"noplantoreduceimportdutiesonpulsesofficial"
+],
+"Airport & Airport services": [
+"indiasadaniairporttoraise300millionviastakesale",
+"adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
+"cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
+"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
+"indiaraisesdieselandaviationturbinefuelexportduty",
+"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
+],
+"Airline": [
+"indiasadaniairporttoraise300millionviastakesale",
+"adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
+"cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
+"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
+"indiaraisesdieselandaviationturbinefuelexportduty",
+"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
+],
+"Aerospace & Defense": [
+"dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
+"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
+"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"defenceministryclears212trillioninproposalsforthearmedforces",
+"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
+],
+"Ship Building & Allied Services": [
+"dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
+"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
+"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
+"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"defenceministryclears212trillioninproposalsforthearmedforces",
+"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
+],
+"Explosives": [
+"dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
+"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
+"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"defenceministryclears212trillioninproposalsforthearmedforces",
+"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
+],
+"Oil Exploration & Production": [
+"over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
+],
+"Refineries & Marketing": [
+"over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
+],
+"LPG/CNG/PNG/LNG Supplier": [
+"over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
+],
+"Non Banking Financial Company (NBFC)": [
+"governorreservebankofindiameetsmanagingdirectorschiefexecutiveofficersofselectnbfcshfcsand",
+"reservebankofindianonbankingfinancialcompaniessecuritisationtransactionsamendmentdirection"
+],
+"Gems Jewellery And Watches": [
+"prematureredemptionundersovereigngoldbondsgbschemeredemptionpriceforprematureredemptionofs",
+"thankstopmmodigoldpricedrops65lakhperkgctiwritesopenletteryouradvicehelpedprotectsavings",
+"caitcreditspmmodisappealfornearly40fallingoldimportbill",
+"32billionsqueezewhyindiasmassivegoldimportbillisshrinkingfast",
+"indiasgoldimportsseenfallingto40billioninfy27ashigherdutycurbsshipments",
+"customsdutyhiketakestheshineofforganisedgoldtradesmugglingrises",
+"goldpricesmayhavecrashedgloballybutgoldsmugglinginindiahasjumpedto50tonnesfrom3tonnesi",
+"indiagolddemanddrops29inq3",
+"goldsmugglingintoindiasurgesover1500to50tonnesafterimportdutyhike",
+"indiasgolddemanddown29injulyseptemberat1625tonnesworldgoldcouncil",
+"indiasillegalgoldimportssurge1500toathreeyearhighwhatsbehindthejump",
+"indiasgoldimportroutechangingcourseforabenefitalljewellerswant",
+"indiasgoldimportsdrop27aftercustomsdutyhiketo15",
+"goldsilverimportsbybanksnominatedagenciestoattract3igst"
+],
 "Power Generation": [
 "cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
 "indiassolarmanufacturinghits116gwasplischemeboostsdomesticoutput",
@@ -1972,43 +2286,6 @@
 "budgetwishdownstreamaluminiumcompaniesseekbasiccustomsdutyscrapped",
 "dgtrinitiatesantidumpingprobeintoaluminiumextrusionimports"
 ],
-"Gems Jewellery And Watches": [
-"thankstopmmodigoldpricedrops65lakhperkgctiwritesopenletteryouradvicehelpedprotectsavings",
-"caitcreditspmmodisappealfornearly40fallingoldimportbill",
-"32billionsqueezewhyindiasmassivegoldimportbillisshrinkingfast",
-"indiasgoldimportsseenfallingto40billioninfy27ashigherdutycurbsshipments",
-"customsdutyhiketakestheshineofforganisedgoldtradesmugglingrises",
-"goldpricesmayhavecrashedgloballybutgoldsmugglinginindiahasjumpedto50tonnesfrom3tonnesi",
-"indiagolddemanddrops29inq3",
-"goldsmugglingintoindiasurgesover1500to50tonnesafterimportdutyhike",
-"indiasgolddemanddown29injulyseptemberat1625tonnesworldgoldcouncil",
-"indiasillegalgoldimportssurge1500toathreeyearhighwhatsbehindthejump",
-"indiasgoldimportroutechangingcourseforabenefitalljewellerswant",
-"indiasgoldimportsdrop27aftercustomsdutyhiketo15",
-"goldsilverimportsbybanksnominatedagenciestoattract3igst"
-],
-"Other Agricultural Products": [
-"indiaweighscurbsonnonbasmatiriceexportstocooldomesticprices",
-"govtmullscurbsonriceexports",
-"cabinetapprovesrs25530croresarthakpdsschemetomodernisepublicdistributionsystem",
-"amonthafterliftingofbanwheatexportsrisefourfoldshowsdata",
-"noplantoreduceimportdutiesonpulsesofficial"
-],
-"Ship Building & Allied Services": [
-"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
-"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
-"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
-"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
-"dacclearsdefenceprocurementproposalsworth212lakhcrore",
-"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
-"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
-"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
-"defenceministryclears212trillioninproposalsforthearmedforces",
-"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
-"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
-"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef",
-"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
-],
 "Shipping": [
 "hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
 "adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
@@ -2016,36 +2293,6 @@
 "Port & Port services": [
 "hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
 "adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
-],
-"Passenger Cars & Utility Vehicles": [
-"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
-"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
-"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
-"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
-"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
-"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
-"indiasfestivecarbuyingjoyridemayhitpricehikebump",
-"gstcouncilproposes5gstoptionforevpassengertransportrentals"
-],
-"2/3 Wheelers": [
-"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
-"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
-"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
-"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
-"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
-"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
-"indiasfestivecarbuyingjoyridemayhitpricehikebump",
-"gstcouncilproposes5gstoptionforevpassengertransportrentals"
-],
-"Auto Components & Equipments": [
-"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
-"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
-"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
-"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
-"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
-"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
-"indiasfestivecarbuyingjoyridemayhitpricehikebump",
-"gstcouncilproposes5gstoptionforevpassengertransportrentals"
 ],
 "Packaged Foods": [
 "indiasfoodprocessinggrowthneedsbetterstorageandfarmmarketreforms"
@@ -2058,12 +2305,6 @@
 "fertilizerstocksrallyafterunioncabinetapprovesmassive62370cragrisubsidy",
 "cabinetapproves62370crorefertilisersubsidyforrabi202627season"
 ],
-"Railway Wagons": [
-"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
-],
-"Civil Construction": [
-"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
-],
 "Hotels & Resorts": [
 "rs7597crorenh63nh563expansiontoboostconnectivitytradeandtourisminnortherntelangana"
 ],
@@ -2072,44 +2313,6 @@
 ],
 "Coal": [
 "govtclearscoalindiathreeothersforrareearthmagnetproduction"
-],
-"Airport & Airport services": [
-"cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
-"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
-"indiaraisesdieselandaviationturbinefuelexportduty",
-"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
-],
-"Airline": [
-"cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
-"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
-"indiaraisesdieselandaviationturbinefuelexportduty",
-"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
-],
-"Aerospace & Defense": [
-"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
-"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
-"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
-"dacclearsdefenceprocurementproposalsworth212lakhcrore",
-"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
-"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
-"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
-"defenceministryclears212trillioninproposalsforthearmedforces",
-"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
-"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
-"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
-],
-"Explosives": [
-"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
-"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
-"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
-"dacclearsdefenceprocurementproposalsworth212lakhcrore",
-"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
-"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
-"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
-"defenceministryclears212trillioninproposalsforthearmedforces",
-"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
-"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
-"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
 ],
 "Industrial Minerals": [
 "biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal",
@@ -2151,15 +2354,6 @@
 "govtinvitesfreshapplicationsunderplischemeformedicaldevices",
 "medicaldeviceplischemeextendedby8yearsfocusshiftstocomponents",
 "govtextendsmedicaldevicesplischemetill203536scrapsminimumsalesthreshold"
-],
-"Oil Exploration & Production": [
-"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
-],
-"Refineries & Marketing": [
-"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
-],
-"LPG/CNG/PNG/LNG Supplier": [
-"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
 ],
 "Aluminium Copper & Zinc Products": [
 "vedantahindustanzincgmdcmetalstocksinfocusascabinetapproves2814crorecriticalmineralprocess",
