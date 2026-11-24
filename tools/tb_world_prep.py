@@ -6,6 +6,7 @@ import json
 import os
 import sys
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import yfinance as yf
@@ -13,15 +14,19 @@ import yfinance as yf
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, "angel"))
 import tb_live as tl  # noqa: E402
 
+TZ = {"US": ZoneInfo("America/New_York"), "AU": ZoneInfo("Australia/Sydney")}
 MARKETS = {"US": ("", ["QQQ", "SMH", "XLF", "XLE", "XLK", "SLV"]),
            "AU": (".AX", ["TECH", "HACK", "OZR", "QRE", "ASIA", "ACDC", "ATEC", "MNRS", "QFN"])}
 CFG = dict(tl.DEFAULT_CFG, buffer_pts=0, buffer_pct=0.05, day_sl_pct=1.0, max_sl_pct=2.0, be_pct=2.0, gap_pct=1.0, long_only=True, event_exit=False)
 
 
-def one(tk):
+def one(tk, mk):
     d = yf.download(tk, start="2015-01-01", progress=False, auto_adjust=False)
     d.columns = [c[0] if isinstance(c, tuple) else c for c in d.columns]; d.index = pd.to_datetime(d.index).tz_localize(None)
     d = d[["Open", "High", "Low", "Close"]].dropna(); d = d[(d.High >= d.Low) & (d.Low > 0)]
+    now = datetime.now(TZ[mk])                       # a session that hasn't closed yet (+20 min) is not a finished bar
+    if (now.hour, now.minute) < (16, 20):
+        d = d[d.index.date < now.date()]
     if len(d) < 300:
         return None
     top, bot = tl.levels(d); st = tl.init_flat_state(d, CFG); p = tl.make_plan(d, st, CFG)
@@ -39,7 +44,7 @@ def main():
         rows = {}
         for s in syms:
             try:
-                r = one(s + sfx)
+                r = one(s + sfx, mk)
                 if r:
                     rows[s] = r
             except Exception as ex:  # noqa: BLE001
