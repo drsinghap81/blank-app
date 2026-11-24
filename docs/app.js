@@ -2215,12 +2215,14 @@ async function loadScore() {
    Bot = the server's automatic switches for that basket's parts (one password + AUTO); Manual = switches off, you Send. */
 const BASKETS = [
   { id: 'c', n: 'Pulse + Momentum + Top Bottom', ret: 41, dd: -11, how: 'Pulse rotation 50% · Momentum 30% · Cup 9/21 20% · plus 1 Bank Nifty Top Bottom lot on margin', note: 'monthly data, so the real worst fall is a little deeper', al: { pr: 50, mom: 30, tf: 20 }, tb: ['bn'] },
+  { id: 'b', n: 'Best combination: systems + Top Bottom + gold + dollar', ret: 28.5, dd: -8.6, how: '80% in Momentum 60 / Cup 9/21 40 · 10% gold (GOLDBEES) · 10% US dollar (USDINR futures) · plus 1 Bank Nifty Top Bottom lot on margin', note: 'the smallest worst fall of all tested mixes (hedging backtest, monthly data)', al: { pr: 0, mom: 60, tf: 40 }, tb: ['bn'], hedge: true, share: 0.8 },
   { id: 'a', n: 'Momentum + Cup 9/21 + Top Bottom', ret: 33, dd: -12, how: 'Momentum 60% · Cup 9/21 40% · plus 1 Bank Nifty Top Bottom lot on margin', note: 'monthly data', al: { pr: 0, mom: 60, tf: 40 }, tb: ['bn'] },
   { id: 'p', n: 'Pulse rotation', ret: 37, dd: -21, how: '10 strongest trending stocks of the leading industries, equal weight, rebalanced every Friday; all cash on a red-light Friday', note: 'trial system', al: { pr: 100, mom: 0, tf: 0 } },
   { id: 't', n: 'Top Bottom basket', ret: 22, dd: -14, how: 'Top Bottom on Bank Nifty, Nifty, BEL, L&T, TMPV, TCS futures and US ETFs (QQQ, SMH, XLF, XLE) - 0.06 correlation between them', note: '12.5%/yr, −8% at plain equal weight; 22% needs up to 2× leverage', tbb: true },
   { id: 'e', n: 'ETF rotation', ret: 18, dd: -13, how: 'Each month-end hold the best 2 of Nifty, Midcap 150, Gold, Nasdaq 100 by 3-month return; cash (LIQUIDBEES) if below cash', note: '5–7 switches a year', pie: true },
   { id: 'mc', n: 'Momentum + Cup 9/21', ret: 23, dd: -21, how: 'Momentum 60% · Cup 9/21 40%, 1% risk a trade, max 10% a stock', al: { pr: 0, mom: 60, tf: 40 } },
-  { id: 'm', n: 'Momentum', ret: 17, dd: -17, how: 'Monthly all-time-high breakouts after a 2-year cup, exit on a weekly close below the 30-week average', al: { pr: 0, mom: 100, tf: 0 } }];
+  { id: 'm', n: 'Momentum', ret: 17, dd: -17, how: 'Monthly all-time-high breakouts after a 2-year cup, exit on a weekly close below the 30-week average', al: { pr: 0, mom: 100, tf: 0 } },
+  { id: 'h', n: 'Hedge basket (add to any portfolio)', ret: null, dd: null, how: 'System portfolios: 10% gold + 10% US dollar + 1 Bank Nifty Top Bottom lot per ~₹20 L. Nifty / large-cap holdings: short Nifty futures only while Nifty is below its 50-day average.', note: 'tested: Momentum + Cup 9/21 worst fall −19.6% → −8.6%; a Nifty portfolio −29% → −10% with the 50-day futures rule', hedgeOnly: true, tb: ['bn'] }];
 async function loadBasket() {
   $('#title').textContent = 'Baskets'; $('#asof').textContent = 'Best return per worst fall first';
   const el = $('#view-basket'); if (!el) return;
@@ -2257,6 +2259,19 @@ async function loadBasket() {
   /* 24 Nov 2026 (Amritpal: "high return low drawdown ones I need to trade on click of a button"): the active basket's orders for
      today (sells first, then buys; rows the bot sends itself are left out) go in one tap - same typed confirmation and checks as Trade Live */
   let OD = null; try { const D = await trIndia(); OD = { list: D.sells.concat(D.buys).filter((r) => !r.auto && !r.block) }; } catch (e) { OD = null; }
+  /* 24 Nov 2026 (Amritpal: "create a hedge basket and a portfolio basket best combination"): gold + dollar sleeve orders and
+     the Nifty-below-50-day rule, from the hedging backtest (claude/hedging-backtest.md) */
+  const AS = await getJSON(MAIN + 'data/scan/assets.json', 'assets').catch(() => null);
+  const usdinr = ((AS && AS.rows) || []).find((r) => r.key === 'USDINR=X'); const fx = usdinr ? usdinr.close : null;
+  let NF = null; try { const t = await getText(MAIN + 'data/futures/NIFTY.csv'); const L2 = (t || '').trim().split(/\r?\n/).slice(-60).map((l) => +l.split(',')[4]).filter((v) => v > 0);
+    if (L2.length >= 50) NF = { close: L2[L2.length - 1], s50: L2.slice(-50).reduce((a, v) => a + v, 0) / 50 }; } catch (e) { NF = null; }
+  const gpx = E && E.prices ? E.prices.GOLDBEES : null;
+  const hedgeRows = (cap, gPct, uPct) => { const g = cap * gPct / 100, u = cap * uPct / 100;
+    return `<div class="bs-ord"><span><b>BUY ${gpx ? Math.floor(g / gpx).toLocaleString('en-IN') : '–'} GOLDBEES</b><small>${money(g, 'NSE')}${gpx ? ` at ~₹${fmt(gpx, 2, 'en-IN')}` : ''}</small></span>
+      <span><b>BUY ${fx ? Math.max(0, Math.round(u / (1000 * fx))) : '–'} lot${fx && Math.round(u / (1000 * fx)) === 1 ? '' : 's'} USDINR futures</b><small>${money(u, 'NSE')} · 1 lot = US$1,000${fx ? ` ≈ ${money(1000 * fx, 'NSE')}` : ''}; or hold US$ on moomoo</small></span></div>`; };
+  const niftyRule = (val) => { if (!NF) return '';
+    const below = NF.close < NF.s50; const lots = Math.max(1, Math.round(val / (65 * NF.close)));
+    return `<p class="bs-p">Nifty ${fmt(NF.close, 0, 'en-IN')} vs its 50-day average ${fmt(NF.s50, 0, 'en-IN')}: <b class="${below ? 'down' : 'up'}">${below ? 'BELOW' : 'above'}</b>. ${below ? `For Nifty / large-cap holdings: short ${lots} Nifty futures lot${lots > 1 ? 's' : ''} (65 units each) until it closes back above.` : 'No futures hedge needed now.'}</p>`; };
   const card = (b, i) => {
     const on = b.al ? isOn(b) : b.tbb ? Object.values(tb).some((x) => x.auto) || !!A.mm_us : false; const bot = b.pie ? false : botOn(b);
     let body = '';
@@ -2275,18 +2290,25 @@ async function loadBasket() {
         ${cap ? `<div class="bs-ord">${[...new Set(hold)].map((s) => { const n = hold.filter((x) => x === s).length; const amt = cap * n / 2; const p = s === 'LIQUIDBEES' ? 1000 : px[s];
           return `<span><b>BUY ${p ? Math.floor(amt / p).toLocaleString(L) : '–'} ${esc(s)}</b><small>${money(amt, 'NSE')}${s === 'LIQUIDBEES' ? ' · ~₹1,000 a unit' : p ? ` at ~₹${fmt(p, 2, L)}` : ''}</small></span>`; }).join('')}</div>` : ''}
         <p class="bs-p">Manual for now: place these in Angel at the next open after month-end. A bot for it can be built (2 orders a month).</p>`; }
+    if (b.hedge && on) { const hc = +(state.hedgeCap || 0) || (capNow ? capNow / b.share : 0);
+      body += `<p class="bs-p">Hedge sleeve (10% + 10% of ${money(hc, 'NSE')}), place in Angel:</p>${hedgeRows(hc, 10, 10)}`; }
+    if (b.hedgeOnly) { const hv = +(state.hedgeVal || 0);
+      body = `<label class="bs-in">Portfolio value ₹ <input type="number" inputmode="numeric" data-hval value="${hv || ''}"></label>
+        ${hv ? `${hedgeRows(hv, 10, 10)}<p class="bs-p">Top Bottom: ${Math.max(1, Math.round(hv / 2000000))} Bank Nifty lot${Math.round(hv / 2000000) > 1 ? 's' : ''} (both sides; about ₹1.5–2 L margin a lot). Bot below turns its auto-approval on.</p>${niftyRule(hv)}` : niftyRule(0)}`; }
     const mode = b.pie ? '<span class="bs-m">Manual only</span>' : `<div class="bs-seg" role="group" aria-label="Mode"><button data-mode="${b.id}" data-v="0" aria-pressed="${!bot}">Manual</button><button data-mode="${b.id}" data-v="1" aria-pressed="${bot}">🤖 Bot</button></div>`;
     return `<article class="bs-c${on ? ' act' : ''}"><div class="bs-h"><span class="bs-n">${i + 1}</span><div><b>${esc(b.n)}</b>${on ? '<em>active</em>' : ''}<small>${esc(b.how)}</small></div>
-      <span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span></div>
+      ${b.ret != null ? `<span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span>` : '<span class="bs-r"><b>🛡</b><small>hedge</small></span>'}</div>
       ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
   el.innerHTML = `<p class="bs-top">India stock baskets (1, 2, 3, 6, 7) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
     ${BASKETS.map(card).join('')}<p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
   { const sa = el.querySelector('[data-sendall]'); if (sa) sa.addEventListener('click', () => trSend(OD.list, 'NSE', sa).then(() => setTimeout(loadBasket, 3000))); }
   el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));
-  el.querySelectorAll('[data-use]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.use); const cap = +el.querySelector(`[data-cap="${b.id}"]`).value || 0;
-    if (!window.confirm(`Make "${b.n}" your India basket?\nCapital ${cap ? money(cap, 'NSE') : 'whole account'} · split Pulse ${b.al.pr}% · Momentum ${b.al.mom}% · Cup 9/21 ${b.al.tf}%.\nOpen trades are not sold; new buys follow this basket.`)) return;
+  el.querySelectorAll('[data-use]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.use); const cap0 = +el.querySelector(`[data-cap="${b.id}"]`).value || 0; if (b.hedge && !cap0) { alertMsg('Enter your capital: 80% goes to the stock systems, 10% gold, 10% dollar.'); return; }
+    const cap = b.share ? Math.round(cap0 * b.share) : cap0; if (b.hedge) state.hedgeCap = cap0;
+    if (!window.confirm(`Make "${b.n}" your India basket?\nCapital ${cap ? money(cap, 'NSE') : 'whole account'} · split Pulse ${b.al.pr}% · Momentum ${b.al.mom}% · Cup 9/21 ${b.al.tf}%.${b.hedge ? `\nPlus 10% gold + 10% dollar (${money(cap0 * 0.1, 'NSE')} each), placed by you.` : ''}\nOpen trades are not sold; new buys follow this basket.`)) return;
     x.disabled = true; try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ capital: cap, alloc: { ...b.al, t9: 0, rt: 0, pt: 0, vcp: 0 } }) }); state._planC = null; try { localStorage.setItem('td.basket', b.id); } catch (e) { /* */ } alertMsg(`${b.n} is your India basket now.`, true); loadBasket(); } catch (e) { alertMsg(e.message); x.disabled = false; } }));
   const usv = el.querySelector('[data-usave]'); if (usv) usv.addEventListener('click', async () => { try { await lvApi('/api/mmtb/cfg', { method: 'POST', body: JSON.stringify({ market: 'US', capital: +el.querySelector('[data-usc]').value || 0, risk_pct: +((((MT || {}).cfg || {}).US || {}).risk_pct || 1) }) }); alertMsg('Saved.', true); } catch (e) { alertMsg(e.message); } });
+  const hvi = el.querySelector('[data-hval]'); if (hvi) hvi.addEventListener('change', () => { state.hedgeVal = +hvi.value || 0; loadBasket(); });
   const pie = el.querySelector('[data-pie]'); if (pie) pie.addEventListener('change', () => { state.pieCap = +pie.value || 0; loadBasket(); });
   const call = (x, on, pw, cf) => (x.k === 'tb' ? lvApi('/api/tb/auto' + (x.id === 'bn' ? '' : '?inst=' + x.id), { method: 'POST', body: JSON.stringify({ on, password: pw || '', confirm: cf || '' }) })
     : lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ part: x.id, on, password: pw || '', confirm: cf || '' }) }));
