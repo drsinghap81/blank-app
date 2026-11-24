@@ -1,19 +1,19 @@
 {
- "generated": "2026-11-21T22:29+00:00",
- "asof": "2026-11-20",
+ "generated": "2026-11-24T05:33+00:00",
+ "asof": "2026-11-23",
  "market": "US",
  "ema": 9,
  "rows": [
   {
-   "symbol": "Communication (XLC)",
-   "index": true,
+   "symbol": "CRWD",
+   "index": false,
    "status": "left below",
-   "signal": "2026-11-09",
-   "signal_close": 107.36,
-   "gain": -6.8,
-   "days": 9,
-   "ema": 104.46,
-   "close": 100.03
+   "signal": "2026-11-19",
+   "signal_close": 243.46,
+   "gain": -14.2,
+   "days": 2,
+   "ema": 227.13,
+   "close": 208.97
   },
   {
    "symbol": "PANW",
@@ -21,23 +21,11 @@
    "status": "riding",
    "signal": "2026-11-19",
    "signal_close": 361.73,
-   "gain": -5.1,
-   "days": 1,
-   "ema": 336.67,
-   "close": 343.32,
-   "low": 341.5
-  },
-  {
-   "symbol": "CRWD",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-11-19",
-   "signal_close": 243.46,
-   "gain": -5.8,
-   "days": 1,
-   "ema": 231.67,
-   "close": 229.44,
-   "low": 227.3
+   "gain": -2.3,
+   "days": 2,
+   "ema": 340.02,
+   "close": 353.43,
+   "low": 350.51
   }
  ],
  "test": "Tested 2007\u201326: indices +0.45% a trade vs +0.67% holding any 16 days; top-50 stocks +1.48% vs +1.61%. No edge in the US: shown for reference only.",
