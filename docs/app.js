@@ -120,7 +120,7 @@ function parseCSV(t) {
 document.addEventListener('click', (e) => { if (e.target && e.target.id === 'toresults') show('results'); });
 /* 15 Nov 2026 layout: Investment (ETFs, funds, indices: monthly), Momentum investing (monthly ATH stocks), Trading (9/21, cup closes,
    IPO cups, patterns, support). Sub-pages light up their parent button. */
-const NAV_NEW = { strat: 'ideas', bot: 'ideas', trd: 'ideas', trends: 'ideas', ath: 'ideas', inv: 'ideas', tb: 'live', auto: 'live' };   // 21 Nov 2026: 5 tabs
+const NAV_NEW = { strat: 'ideas', bot: 'ideas', trd: 'ideas', trends: 'ideas', ath: 'ideas', inv: 'ideas', tb: 'trade', auto: 'trade', live: 'trade' };   // 21 Nov 2026: 5 tabs; 24 Nov: Live -> Trade Live
 const NAV_CLASSIC = { bot: 'trends', trd: 'trends' };                                                    // the 8-tab bar, kept
 /* 21 Nov 2026 (Amritpal: "keep the earlier intact too"): Classic layout = the 8-tab bar and the previous Today, one tap away. */
 const isClassic = () => document.body.classList.contains('classic');
@@ -177,7 +177,7 @@ function show(view) {
   state.view = view;
   { const ib = document.getElementById('ideasbar'); if (ib) { const on = NAV_OF[view] === 'ideas'; ib.hidden = !on;
       if (on) { const k = IDEA_OF[view] || view; try { localStorage.setItem('td.ideas', k); } catch (e) { /* */ } ib.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === k)); } }
-    const lb = document.getElementById('livebar'); if (lb) { const on = !isClassic() && (view === 'live' || view === 'tb' || view === 'auto'); lb.hidden = !on; if (on) lb.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === view)); } }
+    const lb = document.getElementById('livebar'); if (lb) { const on = !isClassic() && (view === 'live' || view === 'tb' || view === 'auto' || view === 'trade'); lb.hidden = !on; if (on) lb.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.go === view)); } }
   const navv = NAV_OF[view] || view;
   document.querySelectorAll('.views:not(.bg-nav) button').forEach((b) => (b.dataset.view === navv ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')));
   ['ath', 'inv', 'trd'].forEach((k) => { if (k !== view) { const s = document.getElementById('view-' + k); if (s) s.innerHTML = ''; } }); // one #athlist at a time
@@ -186,7 +186,7 @@ function show(view) {
   if (view !== 'bg') document.body.classList.remove('bg-first');
   if (view !== 'bg') bgNav(document.body.classList.contains('mode-bg') ? 'explore' : '');
   setTimeout(liveTag, 1500); setTimeout(liveTag, 4000); if (view === 'trends' || view === 'ath' || view === 'trd') setTimeout(livePoll, 800);
-  ({ today: loadToday, strat: loadStrat, mk: loadMarkets, live: loadLive, auto: loadAuto, trends: loadTrends, ath: loadATH, inv: loadInvest, trd: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
+  ({ today: loadToday, strat: loadStrat, mk: loadMarkets, live: loadLive, trade: loadTrade, auto: loadAuto, trends: loadTrends, ath: loadATH, inv: loadInvest, trd: loadATH, tb: loadTB, oi: loadOI, ratio: loadRatio, results: loadResults, pf: loadPortfolio, bot: loadBottoms, bg: loadBeginner })[view]();
 }
 
 /* ------------------------------------------------------------------ Live hero + pie (9 Nov 2026)
@@ -1982,6 +1982,140 @@ async function lvSellBasket(E, btn) {
   btn.disabled = false; btn.textContent = lab;
 }
 
+/* ------------------------------------------------------------------ Trade Live (24 Nov 2026)
+   Amritpal: "trading terminal should be noise free: I should see the shortlist, check its chart, make a decision and send".
+   One market at a time: Sell at the open, Buy today, holdings folded. Tap a row = its chart with Add / Skip; one Send button
+   for everything ticked (Angel basket for India, moomoo for US / ASX). Rows a switched-on automatic system will send carry
+   an AUTO tag and no tick box. The earlier Live pages stay as "Full view" (settings, split, paper record, pies). */
+const TR_MK = [['NSE', 'India'], ['US', 'US'], ['ASX', 'ASX']];   // futures: the Futures tab above
+const TR_SYS = { mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21', rt: 'Retest', pt: 'Pattern', vcp: 'VCP', my: 'My pick', pr: 'Pulse', s1: 'RSI', wc: 'Wealth' };
+async function loadTrade() {
+  $('#title').textContent = 'Trade Live'; $('#asof').textContent = '';
+  const el = $('#view-trade'); if (!el) return;
+  let mk = state.trMk; if (!mk) { try { mk = localStorage.getItem('td.trMk') || 'NSE'; } catch (e) { mk = 'NSE'; } state.trMk = mk; }
+  const chips = `<div class="tr-mk" role="tablist" aria-label="Market">${TR_MK.map(([k, n]) => `<button role="tab" data-k="${k}" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
+  const wire = () => el.querySelectorAll('.tr-mk button').forEach((b) => b.addEventListener('click', () => {
+    if (b.dataset.k === 'FUT') { show('tb'); return; }
+    state.trMk = b.dataset.k; state.trPick = {}; try { localStorage.setItem('td.trMk', b.dataset.k); } catch (e) { /* */ } loadTrade(); }));
+  el.innerHTML = chips + '<p class="muted pad">Loading today\'s list…</p>'; wire();
+  if (!lvCfg().url) { el.innerHTML = chips + `<div class="tr-empty"><b>Connect your server first</b><p>Trade Live sends orders through your server. Connect it once in Full view → Settings.</p><button class="tr-go" data-go2="live">Open Full view</button></div>`; wire();
+    el.querySelector('[data-go2]').addEventListener('click', () => show('live')); return; }
+  let D; try { D = mk === 'NSE' ? await trIndia() : await trWorld(mk); } catch (e) { el.innerHTML = chips + `<div class="tr-empty"><b>Couldn't load the list</b><p>${esc(e.message)}</p><button class="tr-go" id="trre">Try again</button></div>`; wire(); el.querySelector('#trre').addEventListener('click', loadTrade); return; }
+  state.trD = D; state.trPick = state.trPick || {};
+  const P = state.trPick; const L = MKT[mk].loc;
+  const sendable = (r) => !r.auto && !r.block;
+  const row = (r, i, side) => `<div class="tr-r ${side}${r.block ? ' off' : ''}" data-i="${i}" data-s="${side}">
+      ${sendable(r) ? `<button class="tr-cb${P[r.id] ? ' on' : ''}" data-cb="${esc(r.id)}" role="checkbox" aria-checked="${!!P[r.id]}" aria-label="Pick ${esc(r.symbol)}"></button>` : '<span class="tr-cb none"></span>'}
+      <button class="tr-open" data-op="${i}" data-s="${side}"><span class="tr-sym"><b>${esc(r.symbol)}</b><em>${esc(r.sys)}</em>${r.auto ? '<em class="auto">AUTO</em>' : ''}</span>
+        <small>${esc(r.block || r.line)}</small></button>
+      <span class="tr-q"><b>${side === 'sell' ? 'SELL' : 'BUY'} ${r.qty.toLocaleString(L)}</b><small>${money(r.value, mk)}</small></span></div>`;
+  const sells = D.sells, buys = D.buys;
+  const nSel = () => sells.concat(buys).filter((r) => P[r.id] && sendable(r));
+  const autoOn = D.autoTxt ? `<p class="tr-auto">⚡ Runs by itself: ${esc(D.autoTxt)}</p>` : '';
+  el.innerHTML = `${chips}
+    <div class="tr-mode"><span class="tr-dot ${D.real ? 'real' : ''}"></span>${esc(D.broker)} · <b>${D.real ? 'real orders' : esc(D.modeTxt)}</b></div>
+    <div class="tr-sum"><div><small>To sell</small><b>${sells.length}</b></div><div><small>To buy</small><b>${buys.length}</b></div><div><small>Holding</small><b>${D.hold.length}</b></div></div>
+    ${autoOn}
+    ${sells.length ? `<h3 class="tr-h">Sell at the open <button data-all="sell">Select all</button></h3><div class="tr-list">${sells.map((r, i) => row(r, i, 'sell')).join('')}</div>` : ''}
+    <h3 class="tr-h">Buy today ${buys.some(sendable) ? '<button data-all="buy">Select all</button>' : ''}</h3>
+    ${buys.length ? `<div class="tr-list">${buys.map((r, i) => row(r, i, 'buy')).join('')}</div>` : `<p class="tr-none">No buy signals today.</p>`}
+    <p class="tr-foot">Tap a stock for its chart. ${esc(D.sizeTxt || '')}</p>
+    <details class="tr-hold"><summary>Holding · ${D.hold.length}</summary>${D.hold.length ? D.hold.map((h) => `<div class="tr-hr"><b>${esc(h.symbol)}</b><span>${h.qty.toLocaleString(L)}${h.sys ? ` · ${esc(h.sys)}` : ''}</span>${h.pnl == null ? '<i></i>' : `<i class="${h.pnl >= 0 ? 'up' : 'down'}">${h.pnl >= 0 ? '+' : ''}${fmt(h.pnl, 1)}%</i>`}</div>`).join('') : '<p class="tr-none">Nothing held.</p>'}</details>
+    <p class="tr-full"><button class="lv-link" id="trfull">Full view · settings, split and records</button></p>
+    <div class="tr-bar"><button id="trsend" disabled>Tick stocks to send</button></div>`;
+  wire();
+  const upd = () => { const S = nSel(); const b = el.querySelector('#trsend'); const v = S.reduce((a, r) => a + r.value, 0);
+    b.disabled = !S.length; b.textContent = S.length ? `Send ${S.length} order${S.length > 1 ? 's' : ''} · ${money(v, mk)}` : 'Tick stocks to send';
+    el.querySelectorAll('[data-cb]').forEach((c) => { const on = !!P[c.dataset.cb]; c.classList.toggle('on', on); c.setAttribute('aria-checked', on); }); };
+  el.querySelectorAll('[data-cb]').forEach((c) => c.addEventListener('click', () => { P[c.dataset.cb] = !P[c.dataset.cb]; upd(); }));
+  el.querySelectorAll('[data-all]').forEach((b) => b.addEventListener('click', () => { const L2 = b.dataset.all === 'sell' ? sells : buys; const all = L2.filter(sendable).every((r) => P[r.id]); L2.filter(sendable).forEach((r) => { P[r.id] = !all; }); upd(); }));
+  el.querySelectorAll('[data-op]').forEach((b) => b.addEventListener('click', () => { const r = (b.dataset.s === 'sell' ? sells : buys)[+b.dataset.op]; trChart(r, mk, sendable(r) ? () => { P[r.id] = true; upd(); } : null, () => { P[r.id] = false; upd(); }); }));
+  el.querySelector('#trfull').addEventListener('click', () => { state.lvMk = mk; show('live'); });
+  el.querySelector('#trsend').addEventListener('click', (ev) => trSend(nSel(), mk, ev.target));
+  upd();
+}
+/* India: the server plan (same rows, sizes and checks as Full view) */
+async function trIndia() {
+  const [S, P, A] = await Promise.all([lvPlan(), getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan'), lvApi('/api/auto').catch(() => null)]);
+  if (P) $('#asof').textContent = `India close ${closeTxt('NSE', P.asof)}`;
+  const al = lvAlloc('NSE', P || {}, S); const L = 'en-IN'; const f = (v) => fmt(v, 2, L);
+  const sysT = new Set((S.trades || []).filter((t) => t.system).map((t) => t.symbol));
+  const buys = (S.rows || []).filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && r.want !== false && (bkOf(r) === 'my' || (al[bkOf(r)] ?? 0) > 0))
+    .map((r) => { const E = r.trigger || r.price;
+      return { ...r, src: r, sys: TR_SYS[bkOf(r)] || r.system || '', value: r.value || r.qty * E,
+        line: `${isStopK(r.kind) || r.kind === 'MY_GTT' ? `buy above ${f(r.trigger)}` : `limit ${f(r.price)}`} · stop ${f(r.stop)} · risk ${money(r.risk_amt || r.qty * (E - r.stop), 'NSE')}`,
+        block: r.surv ? 'Surveillance list: place it in the Angel app' : '',
+        auto: !!(A && A.stock_buy && !r.reserve && !r.outside && r.kind !== 'MY_GTT' && !r.surv) }; });
+  const sells = (S.exits || []).filter((e) => e.qty > 0).map((e) => ({ ...e, src: e, sys: TR_SYS[bkOf(e)] || e.system || '', value: e.value || e.qty * (e.price || e.ltp || e.ref || 0),
+    line: `exit: ${e.why || ''}`, auto: !!(A && A.stock_sell && sysT.has(e.symbol)) }));
+  const hold = (S.trades || []).filter((t) => t.state === 'open').map((t) => ({ symbol: t.symbol, qty: t.qty, sys: TR_SYS[{ 'Monthly ATH': 'mom', 'Trend 9/21': 'tf' }[t.system]] || t.system, pnl: t.ltp && t.entry ? (t.ltp / t.entry - 1) * 100 : null }));
+  const on = A ? [A.stock_sell && 'stock sells 09:16', A.stock_buy && 'stock buys 09:20'].filter(Boolean).join(', ') : '';
+  return { broker: 'Angel One', real: S.mode === 'LIVE', modeTxt: 'dry run: nothing is sent', sells, buys, hold, autoTxt: on,
+    sizeTxt: `Sizes: ${fmt(S.risk_pct || 1, 2)}% risk on ${money(S.capital, 'NSE')}, inside your split and cash.` };
+}
+/* US / ASX: the evening plan sized on your capital (as Full view), moomoo positions and mode from the server */
+async function trWorld(mk) {
+  const mm = mk === 'US' ? 'US' : 'AU';
+  const [P, B, A] = await Promise.all([getJSON(MAIN + MKT[mk].path + 'trade_plan.json', 'tp_' + mk), lvApi('/api/mm/book?market=' + mm).catch(() => null), lvApi('/api/auto').catch(() => null)]);
+  if (!P) throw new Error(`The ${MKT[mk].name} plan appears after its evening run.`);
+  $('#asof').textContent = `${MKT[mk].name} close ${day(P.asof)}`;
+  const C0 = cap(mk); const nP = lvN(mk); const risk = lvRiskN(nP) / 100; const L = MKT[mk].loc; const f = (v) => fmt(v, 2, L);
+  const sel = lvSel(mk, P.asof, P.top || [], nP); const al = lvAlloc(mk, P, null);
+  const top = lvRoomCut((P.top || []).map((r) => { const E = r.trigger || r.price; const q = r.stop && E > r.stop ? Math.floor(Math.min(risk * C0 / (E - r.stop), 0.1 * C0 / E)) : 0;
+    return { ...r, E, qty: q, value: q * E, risk_amt: q * (E - r.stop), off: !sel.has(r.id) }; }), al, C0).filter((r) => !r.off && r.qty > 0);
+  const idle = Math.max(0, C0 * 0.85 - top.reduce((a, r) => a + r.value, 0));
+  const sw = lvRoomCut(lvSwingSize(P.swing || [], C0, idle, lvSR(mk), lvSwSel(mk, P.asof)), al, C0).filter((r) => !r.skip && r.qty > 0 && r.want !== false);
+  const pos = {}; ((B && B.positions) || []).forEach((p) => { pos[p.sym] = (pos[p.sym] || 0) + p.qty; });
+  const buys = top.concat(sw).filter((r) => !pos[r.symbol]).map((r) => { const E = r.trigger || r.price; const stopK = isStopK(r.kind) || r.kind === 'MY_GTT';
+    return { ...r, src: r, sys: TR_SYS[bkOf(r)] || r.system || '', value: r.qty * E, stopK,
+      line: `${stopK ? `buy above ${f(r.trigger)}` : `limit ${f(r.price)}`} · stop ${f(r.stop)} · risk ${money(r.risk_amt || r.qty * (E - r.stop), mk)}`,
+      block: mk === 'ASX' && B && B.env === 'SIMULATE' ? 'moomoo paper has no ASX shares: place it in the moomoo app' : '' }; });
+  const sells = (P.exits || []).filter((e) => pos[e.symbol] > 0).map((e) => ({ ...e, id: 'X-' + e.symbol, qty: pos[e.symbol], sys: TR_SYS[bkOf(e)] || e.system || '', value: pos[e.symbol] * (e.price || e.close || e.ref || 0), line: `exit: ${e.why || ''}`, sell: true }));
+  const hold = ((B && B.positions) || []).filter((p) => p.qty > 0).map((p) => ({ symbol: p.sym, qty: p.qty, pnl: p.cost ? (p.pnl / (p.cost * p.qty)) * 100 : null }));
+  const k = mk === 'US' ? 'mm_us' : 'mm_au';
+  return { broker: 'moomoo', real: !!(B && B.env && B.env !== 'SIMULATE' && B.live), modeTxt: !B ? 'not connected' : B.env === 'SIMULATE' ? 'paper account' : 'Live orders is off', sells, buys, hold,
+    autoTxt: A && A[k] ? 'ETF Top Bottom' : '', sizeTxt: `Sizes: ${fmt(risk * 100, 2)}% risk on ${money(C0, mk)}.` };
+}
+/* chart in the sheet + a decision bar (Add to order / Skip) that stays on top of it */
+async function trChart(r, mk, add, skip) {
+  await lvOpen(r.src || r, mk === 'NSE' ? 'NSE' : mk);
+  const pnl = document.querySelector('#sheet .sheet-panel'); if (!pnl || $('#sheet').hidden) return;
+  const ch = pnl.querySelector('.chart'); if (ch) pnl.scrollTop = Math.max(0, ch.offsetTop - 120);   // open on the chart, not the text above it
+  let bar = $('#trdec'); if (!bar) { bar = document.createElement('div'); bar.id = 'trdec'; bar.className = 'tr-dec'; pnl.appendChild(bar); }
+  bar.innerHTML = `<div><b>${esc(r.symbol)}</b><small>${r.sell ? 'SELL' : 'BUY'} ${r.qty} · ${esc(r.line)}</small></div>
+    ${add ? '<button class="skip" data-d="0">Skip</button><button class="add" data-d="1">Add to order</button>' : `<span class="tr-note">${r.auto ? 'Sent by the automatic system' : esc(r.block || '')}</span>`}`;
+  bar.querySelectorAll('[data-d]').forEach((b) => b.addEventListener('click', () => { (b.dataset.d === '1' ? add : skip)(); history.back(); }));
+}
+async function trSend(L, mk, btn) {
+  if (!L.length) return;
+  const lines = L.map((r) => `${r.sell ? 'SELL' : 'BUY'} ${r.qty} ${r.symbol}`).join('\n');
+  const typed = window.prompt(`${L.length} order${L.length > 1 ? 's' : ''} on ${mk === 'NSE' ? 'Angel One' : 'moomoo'}:\n${lines}\n\nType ${L.length} to confirm:`);
+  if (typed === null) return;
+  if (String(typed).trim() !== String(L.length)) { alertMsg('Not sent: the number did not match.'); return; }
+  const lab = btn.textContent; btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    if (mk === 'NSE') {
+      const j = await lvApi('/api/basket', { method: 'POST', body: JSON.stringify({ items: L.map((r) => ({ id: r.id, qty: r.qty })), confirm: `BASKET ${L.length}` }) });
+      const ok = j.results.filter((x) => x.ok); const bad = j.results.filter((x) => !x.ok);
+      alertMsg((j.mode === 'LIVE' ? `Sent ${ok.length} of ${j.results.length} to Angel: ${ok.map((x) => x.symbol).join(', ')}. Buys get their stop after the fill.` : `Dry run: ${ok.length} of ${j.results.length} would be sent. Nothing went to Angel.`)
+        + (bad.length ? ` Not sent: ${bad.map((x) => `${x.symbol || x.id} (${x.error})`).join('; ')}.` : ''), !bad.length);
+    } else {
+      const mm = mk === 'US' ? 'US' : 'AU'; const out = [];
+      for (const r of L) {
+        const side = r.sell ? 'SELL' : 'BUY'; const sym = r.symbol.replace('.AX', '');
+        const body = r.sell ? { market: mm, symbol: sym, side, qty: r.qty, price: 0, kind: 'LIMIT' }
+          : r.stopK ? { market: mm, symbol: sym, side, qty: r.qty, kind: 'STOP_LIMIT', trigger: +r.trigger, price: +(r.price > r.trigger ? r.price : r.trigger * 1.01).toFixed(2) }
+            : { market: mm, symbol: sym, side, qty: r.qty, price: +r.price, kind: 'LIMIT' };
+        try { await lvApi('/api/mm/order', { method: 'POST', body: JSON.stringify({ ...body, confirm: `${side} ${r.qty} ${sym}` }), timeout: 30000 }); out.push(`✓ ${side} ${r.qty} ${sym}`); }
+        catch (e) { out.push(`✗ ${sym}: ${e.message}`); }
+      }
+      alertMsg(out.join(' · '), !out.some((x) => x.startsWith('✗')));
+    }
+    state.trPick = {}; state._planC = null; setTimeout(loadTrade, 2500);
+  } catch (e) { alertMsg('Not sent: ' + e.message); }
+  btn.disabled = false; btn.textContent = lab;
+}
+
 /* ------------------------------------------------------------------ trends */
 async function loadTrends() {
   await pcrLoad();
@@ -2190,7 +2324,7 @@ const TV_IDX = { 'NIFTY 50': 'NSE:NIFTY', 'NIFTY BANK': 'NSE:BANKNIFTY', 'NIFTY 
 function panelMk() {
   if (state._pMk) return state._pMk;
   const v = state.view;
-  return v === 'today' ? (state._tdMkNow || 'NSE') : v === 'live' ? (state.lvMk || 'NSE') : v === 'bot' ? botMk() : v === 'ath' ? AM() : v === 'trends' ? (state.mkt || 'NSE') : 'NSE';
+  return v === 'today' ? (state._tdMkNow || 'NSE') : v === 'live' ? (state.lvMk || 'NSE') : v === 'trade' ? ((state.trMk === 'FUT' ? 'NSE' : state.trMk) || 'NSE') : v === 'bot' ? botMk() : v === 'ath' ? AM() : v === 'trends' ? (state.mkt || 'NSE') : 'NSE';
 }
 function tvSym(sym, mk) {
   const s = String(sym || '').trim(); if (TV_IDX[s.toUpperCase()]) return TV_IDX[s.toUpperCase()];
@@ -2279,7 +2413,7 @@ function openPanel(html) {
   history.pushState({ sheet: 1 }, '');
 }
 var SH = { stack: [], depth: 0, buf: [], obs: null };   // sheet back-stack (see 'Back steps through sheets')
-function closeSheet() { $('#sheet').hidden = true; document.body.style.overflow = ''; $('#sheet-body').innerHTML = ''; SH.stack = []; SH.depth = 0; SH.buf = []; try { SH.obs && SH.obs.takeRecords(); } catch (e) { /* */ } }
+function closeSheet() { const td = document.getElementById('trdec'); if (td) td.remove(); $('#sheet').hidden = true; document.body.style.overflow = ''; $('#sheet-body').innerHTML = ''; SH.stack = []; SH.depth = 0; SH.buf = []; try { SH.obs && SH.obs.takeRecords(); } catch (e) { /* */ } }
 
 function select(r) {
   state.selected = r.symbol;

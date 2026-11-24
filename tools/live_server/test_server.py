@@ -1453,7 +1453,11 @@ def test_moomoo_order_ticket(tmp_path):
     assert A.moomoo.pos["QQQ"] == 3
     assert "no short selling" in c.post("/api/mm/order", headers=h, json=dict(b, side="SELL", qty=5, confirm="SELL 5 QQQ")).json()["detail"]
     assert c.post("/api/mm/order", headers=h, json=dict(b, side="SELL", qty=3, confirm="SELL 3 QQQ")).json()["ok"]
-    B = c.get("/api/mm/book?market=US", headers=h).json(); assert B["env"] == "SIMULATE" and len(B["orders"]) == 2
+    # 24 Nov 2026: buy-stop from Trade Live (trigger = breakout level, limit just above)
+    assert c.post("/api/mm/order", headers=h, json=dict(b, kind="STOP_LIMIT", trigger=0, price=101)).status_code == 400
+    assert c.post("/api/mm/order", headers=h, json=dict(b, kind="STOP_LIMIT", trigger=101, price=100)).status_code == 400
+    assert c.post("/api/mm/order", headers=h, json=dict(b, kind="STOP_LIMIT", trigger=100, price=101)).json()["ok"]
+    B = c.get("/api/mm/book?market=US", headers=h).json(); assert B["env"] == "SIMULATE" and len(B["orders"]) == 3
     A.moomoo.orders["X1"] = dict(sym="QQQ", qty=1, status="SUBMITTED", dealt=0.0, avg=0.0)
     assert c.post("/api/mm/cancel", headers=h, json={"market": "US", "order_id": "X1"}).json()["ok"]
 

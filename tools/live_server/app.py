@@ -2557,7 +2557,8 @@ class MMOrder(BaseModel):
     side: str
     qty: float
     price: float = 0.0
-    kind: str = "LIMIT"          # LIMIT | MARKET
+    kind: str = "LIMIT"          # LIMIT | MARKET | STOP_LIMIT (buy-stop: trigger = the breakout level, price = the limit)
+    trigger: float = 0.0
     confirm: str = ""
 
 
@@ -2588,8 +2589,10 @@ def mm_book(market: str = "US", _=Depends(auth)):
 def mm_order(body: MMOrder, _=Depends(auth)):
     _mm_ready()
     mk = body.market.upper(); side = body.side.upper(); sym = body.symbol.strip().upper().replace(".AX", "")
-    if mk not in ("US", "AU") or side not in ("BUY", "SELL") or body.kind not in ("LIMIT", "MARKET"):
-        raise HTTPException(400, "check market (US/AU), side (BUY/SELL) and order type (LIMIT/MARKET)")
+    if mk not in ("US", "AU") or side not in ("BUY", "SELL") or body.kind not in ("LIMIT", "MARKET", "STOP_LIMIT"):
+        raise HTTPException(400, "check market (US/AU), side (BUY/SELL) and order type (LIMIT/MARKET/STOP_LIMIT)")
+    if body.kind == "STOP_LIMIT" and not (body.trigger > 0 and body.price > 0 and (body.price >= body.trigger if side == "BUY" else body.price <= body.trigger)):
+        raise HTTPException(400, "a stop-limit needs a trigger and a limit (buy: limit at or above the trigger)")
     if not sym or len(sym) > 12 or not all(ch.isalnum() or ch in ".-" for ch in sym):
         raise HTTPException(400, "check the symbol")
     if body.qty <= 0 or body.qty != int(body.qty):
@@ -2617,7 +2620,8 @@ def mm_order(body: MMOrder, _=Depends(auth)):
         if q > held:
             raise HTTPException(400, f"you hold {held:g} {sym} on this account - no short selling from the app")
     try:
-        oid = moomoo.place(sym, side, q, "MARKET" if body.kind == "MARKET" else "NORMAL", round(px, 3), tif="DAY", mk=mk, remark="trenddesk-manual")
+        oid = moomoo.place(sym, side, q, {"MARKET": "MARKET", "STOP_LIMIT": "STOP_LIMIT"}.get(body.kind, "NORMAL"), round(px, 3),
+                           aux=round(body.trigger, 3) if body.kind == "STOP_LIMIT" else None, tif="DAY", mk=mk, remark="trenddesk-manual")
     except Exception as ex:  # noqa: BLE001
         log("mm_order_rejected", market=mk, symbol=sym, side=side, qty=q, error=str(ex)[:200])
         raise HTTPException(400, f"moomoo rejected it: {str(ex)[:200]}")
