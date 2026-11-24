@@ -1758,3 +1758,13 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .au2-seg button.on { background: var(--ink); color: var(--paper); }
 .au2-seg button.on.buy { background: var(--rise); color: #fff; }
 .au2-seg button.on[data-v="SELL"] { background: var(--fall); color: #fff; }
+/* panel v3 wording */
+.au2-title { font-size: 16px; display: block; }
+.au2-sub, .au2-hint { color: var(--slate); font-size: 12.5px; display: block; }
+.au2-hint { margin: 8px 0 0; }
+.au2-head { align-items: flex-start; }
+.au2-head > div { flex: 1 1 200px; min-width: 0; }
+.au2-word { font-size: 12px; font-weight: 800; color: var(--slate); }
+.au2-tile.on .au2-word { color: var(--rise-ink); }
+.au2-tile.warn { border-color: var(--saffron); }
+.au2-w { color: var(--warn-ink) !important; font-weight: 700; }
