@@ -2162,7 +2162,7 @@ async function loadScore() {
   el.innerHTML = `<div class="sc-head"><p>Every stock that is in a strategy today. Each strategy is graded by its own backtest: <span class="sc-c good">Good</span> <span class="sc-c fair">Fair</span> <span class="sc-c poor">Poor</span>. Most good strategies first. • = signal today.</p>
       <div class="seg" id="scw"><button data-w="0" aria-selected="${!watchOn}">Signals + open</button><button data-w="1" aria-selected="${watchOn}">+ forming</button></div></div>
     ${SC ? '' : '<p class="tr-none">The backtest grades are still running; chips show grey until they arrive.</p>'}
-    <ol class="sc-list">${top.map((r, i) => `<li><button class="sc-r" data-i="${i}"><span class="sc-n">${i + 1}</span><span class="sc-s"><b>${esc(r.sym)}</b><small>in ${r.n} · <em class="up">${r.g} good</em>${r.n - r.g ? ` · ${r.n - r.g} not` : ''}</small></span>
+    <ol class="sc-list">${top.map((r, i) => `<li><button class="sc-r" data-i="${i}"><span class="sc-n">${i + 1}</span><span class="sc-s"><b>${esc(r.sym)}</b><small>in ${r.n} · <em class="up">${r.g} good</em>${r.n - r.g ? ` · ${r.n - r.g} not good` : ''}</small></span>
         <span class="sc-bar" aria-hidden="true">${r.G.map((x) => `<i class="${x[2]}"></i>`).join('')}</span></button>
         <div class="sc-d" hidden>${r.G.sort((a, b) => ['good', 'fair', 'poor', 'untested'].indexOf(a[2]) - ['good', 'fair', 'poor', 'untested'].indexOf(b[2])).map(([k, lvl, g]) => `<div class="sc-dr">${chip(k, lvl, g)}<small>${lvl === 0 ? 'signal today' : lvl === 1 ? 'in it / on the list' : 'forming / near'} · ${esc(hist(r.sym, k))}<br>${esc(gradeOf(k).why)}</small></div>`).join('')}
           <button class="tr-go sc-ch" data-ch="${esc(r.sym)}">Open chart</button></div></li>`).join('')}</ol>
