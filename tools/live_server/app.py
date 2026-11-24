@@ -2297,6 +2297,7 @@ def auto_status() -> dict:
     on = [k for k in AUTO_PARTS if c.get(k)] + [f"tb_{i}" for i, v in tb.items() if v["auto"]] + (["opt_trader"] if otr else []) \
         + (["turtle"] if tml and tml["armed"] and tml["live"] else [])
     return dict(**{k: bool(c.get(k)) for k in AUTO_PARTS}, tb=tb, opt_trader_live=otr, turtle=tml, orders_live=is_live(),
+                turtle_on=bool(tml and tml["armed"] and tml["live"]),
                 any_on=bool(on), on=on, manual_at=c.get("manual_at"), snapshot=c.get("snapshot"), reserve_pct=AUTO_RESERVE * 100,
                 fut_cap_x=FUT_CAP_X, margin=_MW.get("d"), done=c.get("done"))
 
@@ -2316,7 +2317,7 @@ class AutoSet(BaseModel):
 @app.post("/api/auto")
 def auto_set(body: AutoSet, request: Request, _=Depends(auth)):
     """turning anything ON needs the app password + typing AUTO; OFF is one tap."""
-    if body.part not in AUTO_PARTS + ("resume",):
+    if body.part not in AUTO_PARTS + ("resume", "opt_trader", "turtle"):
         raise HTTPException(400, "unknown part")
     if body.on:
         ip = request.client.host if request.client else "?"
@@ -2345,6 +2346,20 @@ def auto_set(body: AutoSet, request: Request, _=Depends(auth)):
         c["resumed_at"] = ist_now().isoformat(timespec="minutes"); _auto_save(c); log("auto_resume", snapshot=S)
         alert("auto", "AUTO", "Automation resumed: " + (", ".join(auto_status()["on"]) or "nothing was on"), key=f"auto:resume:{time.time():.0f}")
         return auto_status()
+    if body.part == "opt_trader":                       # 24 Nov 2026: one switch page - the option trader's LIVE switch
+        otr_job().set_live(bool(body.on)); log("auto_set", part="opt_trader", on=body.on); return auto_status()
+    if body.part == "turtle":                           # Turtle ON = live + its markets armed; OFF = disarm all (remembered for ON)
+        T = tmcx_job(); st = T.status(); armed = {k: dict(lots=v.get("lots", 1), mult=v.get("mult")) for k, v in (st.get("armed") or {}).items()}
+        if body.on:
+            T.set_live(True)
+            for name, a in ({} if armed else (c.get("turtle_last") or (c.get("snapshot") or {}).get("turtle") or {})).items():
+                T.arm(name, a.get("lots", 1), True, a.get("mult"))
+        else:
+            if armed:
+                c["turtle_last"] = armed; _auto_save(c)
+            for name in armed:
+                T.arm(name, 1, False)
+        log("auto_set", part="turtle", on=body.on); return auto_status()
     c[body.part] = bool(body.on); _auto_save(c); log("auto_set", part=body.part, on=body.on)
     return auto_status()
 
@@ -2353,14 +2368,16 @@ def auto_set(body: AutoSet, request: Request, _=Depends(auth)):
 def auto_manual(_=Depends(auth)):
     """ONE TAP, no password: stop every automatic entry now. Open positions keep their stops and the bots' exits."""
     c = auto_cfg(); st = auto_status()
-    snap = dict(stock_buy=c["stock_buy"], stock_sell=c["stock_sell"], tb=[i for i, v in st["tb"].items() if v["auto"]],
+    snap = dict(**{k: bool(c.get(k)) for k in AUTO_PARTS}, tb=[i for i, v in st["tb"].items() if v["auto"]],
                 opt_trader=bool(st.get("opt_trader_live")), turtle={})
     try:
         tm = tmcx_job().status(); snap["turtle"] = {k: dict(lots=v.get("lots", 1), mult=v.get("mult")) for k, v in (tm.get("armed") or {}).items()}
     except Exception:  # noqa: BLE001
         pass
-    if any([snap["stock_buy"], snap["stock_sell"], snap["tb"], snap["opt_trader"], snap["turtle"]]):
-        c["snapshot"] = snap                               # remember what was on (an empty second tap doesn't wipe it)
+    if any([snap[k] for k in AUTO_PARTS] + [snap["tb"], snap["opt_trader"], snap["turtle"]]):
+        c["snapshot"] = snap
+        if snap["turtle"]:
+            c["turtle_last"] = snap["turtle"]                               # remember what was on (an empty second tap doesn't wipe it)
     for k in AUTO_PARTS:
         c[k] = False
     for inst in TB_DIRS:

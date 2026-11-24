@@ -1762,7 +1762,8 @@ async function tbLoad(inst = 'bn') {
    on the front; showing all on all markets is confusing"): Live -> Auto trade. One row per system with one switch; tap the row to open its
    settings. Market pages only show a one-line link here. ON always needs the app password + a typed word; OFF is one tap. */
 async function autoLink() {
-  const box = $('#autocard'); if (!box) return;
+  const box = $('#autocard'); if (box) box.innerHTML = ''; return;   // 24 Nov 2026: the Auto trade tab is the one place (no extra line)
+  // eslint-disable-next-line no-unreachable
   let A; try { A = await lvApi('/api/auto'); } catch (e) { box.innerHTML = ''; return; }
   const n = (A.on || []).length;
   box.innerHTML = `<button class="au3-link${n ? ' on' : ''}" id="aulink"><span>${n ? `🤖 <b>${n} automatic</b> · trading by themselves` : '✋ <b>Nothing automatic</b> · every order waits for you'}</span><i>Auto trade ›</i></button>`;
@@ -1782,8 +1783,8 @@ async function loadAuto() {
       { id: 'stock_sell', n: 'Stock sells', s: '09:16 IST · sells system exits', on: !!A.stock_sell, kind: 'part' },
       { id: 'stock_buy', n: 'Stock buys', s: '09:20 IST · buys the plan\'s picks', on: !!A.stock_buy, kind: 'part' },
       ...Object.entries(tb).map(([k, v]) => ({ id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k] || k}`, s: `futures${v.live ? '' : ' · dry run (Futures tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k })),
-      { id: 'otr', n: 'Option trader', s: A.opt_trader_live ? '5-min options · real orders' : '5-min options · paper only', on: !!A.opt_trader_live, kind: 'otr' }]],
-    ...(A.turtle ? [['MCX', [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'armed: ' + esc(A.turtle.armed.join(' · ')) : 'nothing armed (Futures tab)', on: !!A.turtle.live, kind: 'turtle' }]]] : []),
+      { id: 'opt_trader', n: 'Option trader', s: A.opt_trader_live ? '5-min options · real orders' : '5-min options · paper only', on: !!A.opt_trader_live, kind: 'part', fut: true }]],
+    ...(A.turtle ? [['MCX', [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'markets: ' + esc(A.turtle.armed.join(' · ')) : 'markets set in the Futures tab', on: !!A.turtle_on, kind: 'part', fut: true }]]] : []),
     ['US', [{ id: 'mm_us', n: 'ETF Top Bottom', s: `moomoo · QQQ SMH XLF XLE${paper ? ' · paper' : ''}`, on: !!A.mm_us, kind: 'part', warn: A.mm_us && !cap('US') ? 'set capital in settings' : '', mm: 'US' }]],
     ['ASX', [{ id: 'mm_au', n: 'ETF Top Bottom', s: 'moomoo · TECH HACK OZR ASIA', on: !!A.mm_au, kind: 'part', warn: paper ? 'paper account can\'t trade ASX' : (A.mm_au && !cap('AU') ? 'set capital in settings' : ''), mm: 'AU' }]]];
   const all = ROWS.flatMap(([, r]) => r); const nOn = all.filter((r) => r.on).length;
@@ -1799,15 +1800,13 @@ async function loadAuto() {
     ${ROWS.map(([g, rs]) => `<h3 class="au3-h">${g}</h3><div class="au3-list">${rs.map(row).join('')}</div>`).join('')}
     <p class="au3-foot">ON needs your app password. OFF and Pause all are one tap. Pausing never closes a position: open trades keep their stops. Tap a row for its settings.</p></div>`;
   const sheet = el.querySelector('#ausheet'); let want = null;
-  const word = (r) => (r.kind === 'otr' || r.kind === 'turtle') ? 'LIVE' : 'AUTO';
+  const word = () => 'AUTO';
   const call = async (r, on, pw, cf) => {
     if (r.kind === 'part') return lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ part: r.id, on, password: pw || '', confirm: cf || '' }) });
     if (r.kind === 'tb') return lvApi('/api/tb/auto' + (r.inst === 'bn' ? '' : '?inst=' + r.inst), { method: 'POST', body: JSON.stringify({ on, password: pw || '', confirm: cf || '' }) });
-    if (r.kind === 'otr') return lvApi('/api/opt/trader/mode', { method: 'POST', body: JSON.stringify({ live: on, password: pw || '', confirm: cf || '' }) });
-    if (r.kind === 'turtle') return lvApi('/api/turtle/mcx/mode', { method: 'POST', body: JSON.stringify({ live: on, password: pw || '', confirm: cf || '' }) });
     if (r.kind === 'resume') return lvApi('/api/auto', { method: 'POST', body: JSON.stringify({ part: 'resume', on: true, password: pw, confirm: cf }) });
   };
-  const ask = (r) => { want = r; sheet.hidden = false; el.querySelector('#ausheett').textContent = `Turn ON: ${r.n}${r.kind === 'otr' || r.kind === 'turtle' ? ' (real orders)' : ''}`;
+  const ask = (r) => { want = r; sheet.hidden = false; el.querySelector('#ausheett').textContent = `Turn ON: ${r.n}`;
     const c = el.querySelector('#aucf'); c.value = ''; c.placeholder = 'Type ' + word(r); el.querySelector('#aupw').focus(); sheet.scrollIntoView({ block: 'nearest' }); };
   el.querySelector('#aucancel').addEventListener('click', () => { sheet.hidden = true; want = null; });
   el.querySelector('#augo').addEventListener('click', async () => { if (!want) return;
@@ -1821,7 +1820,7 @@ async function loadAuto() {
   el.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => { const r = all.find((x) => x.id === b.dataset.open); const box = el.querySelector('#set-' + r.id.replace(':', '-'));
     const openNow = box.hidden; box.hidden = !openNow; b.setAttribute('aria-expanded', openNow); if (!openNow) return;
     if (r.mm) return mmSettings(box, r.mm, MT);
-    if (r.kind === 'tb' || r.kind === 'otr' || r.kind === 'turtle') { box.innerHTML = `<p class="lv-sub">${r.kind === 'tb' ? 'Lots, Live / Dry run and levels' : r.kind === 'otr' ? 'Trades, paper vs live and stop for today' : 'Which MCX markets are armed and their lots'} are in the Futures tab.</p><button class="au2-save" data-gofut>Open Futures</button>`;
+    if (r.kind === 'tb' || r.fut) { box.innerHTML = `<p class="lv-sub">${r.kind === 'tb' ? 'Lots, Live / Dry run and levels' : r.id === 'opt_trader' ? 'Trades, paper vs live and stop for today' : 'Which MCX markets trade and their lots'} are in the Futures tab.</p><button class="au2-save" data-gofut>Open Futures</button>`;
       box.querySelector('[data-gofut]').addEventListener('click', () => { state.lvTab = 'fut'; try { sessionStorage.setItem('td.lvTab', 'fut'); } catch (e) { /* */ } state.lvMk = 'NSE'; show('live'); }); return; }
     if (r.id === 'stock_buy') { box.innerHTML = `<p class="lv-sub">Buys the plan's picks after the 09:09 industry check, with the same checks as the Buy button, in ranked order, within your split and slots, keeping ${fmt(A.reserve_pct, 0)}% of the account in cash. Split and capital: Live › India › Settings.</p>`; return; }
     if (r.id === 'stock_sell') { box.innerHTML = '<p class="lv-sub">Sells the plan\'s system exits at the open, only stocks a system bought or you adopted. Other holdings are never touched.</p>'; return; }

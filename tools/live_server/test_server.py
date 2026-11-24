@@ -1456,3 +1456,20 @@ def test_moomoo_order_ticket(tmp_path):
     B = c.get("/api/mm/book?market=US", headers=h).json(); assert B["env"] == "SIMULATE" and len(B["orders"]) == 2
     A.moomoo.orders["X1"] = dict(sym="QQQ", qty=1, status="SUBMITTED", dealt=0.0, avg=0.0)
     assert c.post("/api/mm/cancel", headers=h, json={"market": "US", "order_id": "X1"}).json()["ok"]
+
+
+
+def test_pause_all_turns_every_row_off(tmp_path):
+    """24 Nov 2026: after Pause all nothing counts as automatic (Turtle was still counted: live but disarmed); Resume brings it all back."""
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    on = lambda part: c.post("/api/auto", headers=h, json={"part": part, "on": True, "password": "pw", "confirm": "AUTO"}).json()
+    T = A.tmcx_job(); T.arm("NATGASMINI", 1, True)
+    on("mm_us"); on("opt_trader"); s = on("turtle")
+    assert s["turtle_on"] and s["opt_trader_live"] and s["mm_us"] and set(s["on"]) >= {"mm_us", "opt_trader", "turtle"}
+    m = c.post("/api/auto/manual", headers=h).json()
+    assert m["on"] == [] and m["any_on"] is False and not m["turtle_on"] and not m["opt_trader_live"] and not m["mm_us"]
+    r = c.post("/api/auto", headers=h, json={"part": "resume", "on": True, "password": "pw", "confirm": "AUTO"}).json()
+    assert r["mm_us"] and r["opt_trader_live"] and r["turtle_on"]
+    off = c.post("/api/auto", headers=h, json={"part": "turtle", "on": False}).json(); assert not off["turtle_on"]
+    assert on("turtle")["turtle_on"]                     # ON again re-arms the remembered markets
