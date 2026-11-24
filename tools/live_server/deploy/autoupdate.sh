@@ -35,6 +35,8 @@ UNIT
 fi
 mkdir -p "$(dirname "$LOG")"
 log() { echo "$(date -u +%FT%TZ) $*" >> "$LOG"; }
+# 24 Nov 2026: the moomoo SDK writes its logs under the app user's home; without /home/trenddesk every moomoo call failed
+if [ "$(id -u)" = 0 ] && id trenddesk >/dev/null 2>&1 && [ ! -d /home/trenddesk ]; then mkdir -p /home/trenddesk && chown trenddesk: /home/trenddesk; fi
 # 11 Nov 2026: install the watchdog (every minute) once, automatically
 if [ "$(id -u)" = 0 ] && [ ! -f /etc/systemd/system/trenddesk-watchdog.timer ]; then
   cat > /etc/systemd/system/trenddesk-watchdog.service <<UNIT

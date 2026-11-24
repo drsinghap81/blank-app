@@ -72,6 +72,7 @@ if [ -f $MODEF ] && grep -q '^md5 ' $MODEF; then
   systemctl daemon-reload
 fi
 rm -f $MODEF
+id trenddesk >/dev/null 2>&1 && { mkdir -p /home/trenddesk; chown trenddesk: /home/trenddesk; }   # the moomoo SDK logs under the app user's home
 systemctl enable --now opend >/dev/null
 # app settings: read-only account view now; orders only on moomoo's PAPER account (SIMULATE) and only if MOOMOO_TRADE=1
 for kv in MOOMOO_ENABLED=1 MOOMOO_TRADE=1 MOOMOO_MARKETS=AU,US MOOMOO_FIRM=FUTUAU MOOMOO_ENV=SIMULATE; do
