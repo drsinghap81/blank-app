@@ -1,2870 +1,2921 @@
 {
- "method": "Strategy scorecard + 'how many GOOD systems is this stock on' (24 Nov 2026, Amritpal: \"each stock with a matrix having all\nthese strategies; categorise a backtest score for each; if a stock is scoring overall more I should see it - say KOTAKBANK comes in\n10, 8 backtested good, 2 not good\").\n\nOne uniform test for every price-pattern strategy in the app, NSE stocks (Yahoo 2015-26, today's names -> survivors), point in time:\n  ath      Monthly ATH breakout: high above the high of the all-time-high closing month, base >= 24 months, close above a rising\n           150-day SMA (30 weeks), >= Rs 2 cr/day   (the Momentum system's entry)\n  month    month closed above the highest earlier month close (that high >= 12 months old)        (Month close list)\n  wcup     weekly cup close (tools/cupclose.py: 104-week rim >= 26 weeks old, cup >= 20% deep, room >= depth)\n  dcup     daily cup close  (250-day rim >= 20 days old, cup >= 15% deep, room >= depth)\n  base     first 52-week-high breakout after a 6-month base\n  cup921   9/21 cross within 20 sessions after a day cup close or 52-week base breakout          (Cup 9/21, approx.)\n  921      9/21 cross on any stock (live rule)\n  tight    tight-base breakout\n  flag / pennant / rectangle   breakout with drying flag volume, 1.5x breakout volume, range <= 8% (live rule without room)\n  wbot / tiltw / triple / ihs  bottom patterns, first close above the neckline (tools/pattern_scan.py rules)\n  retest   after a 52-week base breakout, first close back within 3% above the breakout level (10-60 sessions later)\n  emalift  first candle whose low is above a rising EMA 9 (none in the previous 10 sessions)\n  stack    first day of close > SMA 20 > 50 > 100 > 200, all rising (none in the previous 20 sessions)\nOne event per stock per system per 20 sessions. Buy next open, hold 63 (and 126) sessions, 0.4% cost; vs Nifty 50 same days.\nGrade (63 days vs Nifty, win rate):  GOOD >= +2.0 points and >= 55% wins and the last 3 years > 0;  FAIR > 0;  POOR <= 0.\nWalk-forward confluence: grades from 2016-2021 events only, then 2022-26 events bucketed by how many GOOD systems fired on the stock\nin the last 20 sessions (0 / 1 / 2 / 3+) and how many not-good ones.\nPer stock: each system's own past events on that stock (n, avg 63d, win) -> data/research/strategy_scorecard_stocks.json.\nPILOT env = 150 stocks.",
- "events": 53551,
+ "method": "Strategy scorecard + 'how many GOOD systems is this stock on' (24 Nov 2026, Amritpal: \"each stock with a matrix having all\nthese strategies; categorise a backtest score for each; if a stock is scoring overall more I should see it - say KOTAKBANK comes in\n10, 8 backtested good, 2 not good\").\n\nOne uniform test for every price-pattern strategy in the app, NSE stocks (Yahoo 2015-26, today's names -> survivors), point in time:\n  ath      Monthly ATH breakout: high above the high of the all-time-high closing month, base >= 24 months, close above a rising\n           150-day SMA (30 weeks), >= Rs 2 cr/day   (the Momentum system's entry)\n  month    month closed above the highest earlier month close (that high >= 12 months old)        (Month close list)\n  wcup     weekly cup close (tools/cupclose.py: 104-week rim >= 26 weeks old, cup >= 20% deep, room >= depth)\n  dcup     daily cup close  (250-day rim >= 20 days old, cup >= 15% deep, room >= depth)\n  base     first 52-week-high breakout after a 6-month base\n  cup921   9/21 cross within 20 sessions after a day cup close or 52-week base breakout          (Cup 9/21, approx.)\n  921      9/21 cross on any stock (live rule)\n  tight    tight-base breakout\n  flag / pennant / rectangle   breakout with drying flag volume, 1.5x breakout volume, range <= 8% (live rule without room)\n  wbot / tiltw / triple / ihs  bottom patterns, first close above the neckline (tools/pattern_scan.py rules)\n  retest   after a 52-week base breakout, first close back within 3% above the breakout level (10-60 sessions later)\n  emalift  first candle whose low is above a rising EMA 9 (none in the previous 10 sessions)\n  stack    first day of close > SMA 20 > 50 > 100 > 200, all rising (none in the previous 20 sessions)\nOne event per stock per system per 20 sessions. Buy next open, hold 63 (and 126) sessions, 0.4% cost; vs Nifty 50 same days.\nBaseline (24 Nov, after the first run: Yahoo survivors beat Nifty on ANY day, which flattered every strategy): a random liquid\nstock-day (every 21st session per stock, Rs 1 cr/day, price >= 30), same 63-day hold vs Nifty. Edge = strategy vs Nifty - baseline.\nGrade:  GOOD edge >= +2.0 points, >= 55% wins and the last 3 years' edge > 0;  FAIR edge > 0;  POOR edge <= 0.\nWalk-forward confluence: grades from 2016-2021 events only, then 2022-26 events bucketed by how many GOOD systems fired on the stock\nin the last 20 sessions (0 / 1 / 2 / 3+) and how many not-good ones.\nPer stock: each system's own past events on that stock (n, avg 63d, win) -> data/research/strategy_scorecard_stocks.json.\nPILOT env = 150 stocks.",
+ "events": 100150,
  "systems": {
   "ath": {
    "name": "Monthly ATH breakout",
    "all": {
-    "n": 517,
-    "avg": 10.48,
-    "med": 6.48,
-    "win": 64,
-    "vs_nifty": 7.36
+    "n": 1171,
+    "avg": 6.71,
+    "med": 2.65,
+    "win": 54,
+    "vs_nifty": 3.07
    },
    "all126": {
-    "n": 511,
-    "avg": 23.59,
-    "med": 16.47,
-    "win": 68,
-    "vs_nifty": 16.32
+    "n": 1138,
+    "avg": 15.59,
+    "med": 5.79,
+    "win": 57,
+    "vs_nifty": 8.44
    },
    "last 1y": {
-    "n": 19,
-    "avg": 0.28,
-    "med": 0.21,
-    "win": 53,
-    "vs_nifty": 0.06
+    "n": 66,
+    "avg": 3.47,
+    "med": -0.13,
+    "win": 50,
+    "vs_nifty": 3.64
    },
    "last 3y": {
-    "n": 170,
-    "avg": 7.62,
-    "med": 5.51,
-    "win": 65,
-    "vs_nifty": 4.3
+    "n": 420,
+    "avg": 2.95,
+    "med": 0.72,
+    "win": 52,
+    "vs_nifty": -0.19
    },
    "last 5y": {
-    "n": 301,
-    "avg": 8.86,
-    "med": 5.98,
-    "win": 61,
-    "vs_nifty": 6.98
+    "n": 715,
+    "avg": 3.85,
+    "med": 0.42,
+    "win": 51,
+    "vs_nifty": 2.15
    },
    "bull": {
-    "n": 480,
-    "avg": 10.65,
-    "med": 7.12,
-    "win": 64,
-    "vs_nifty": 7.68
+    "n": 1077,
+    "avg": 6.49,
+    "med": 2.54,
+    "win": 54,
+    "vs_nifty": 2.81
    },
    "bear": {
-    "n": 37,
-    "avg": 8.23,
-    "med": 3.7,
-    "win": 59,
-    "vs_nifty": 3.23
+    "n": 94,
+    "avg": 9.23,
+    "med": 3.88,
+    "win": 56,
+    "vs_nifty": 6.11
    },
    "ex-Covid": {
-    "n": 476,
-    "avg": 9.46,
-    "med": 6.03,
-    "win": 62,
-    "vs_nifty": 6.99
+    "n": 1092,
+    "avg": 6.07,
+    "med": 1.67,
+    "win": 53,
+    "vs_nifty": 2.98
    },
    "train": {
-    "n": 255,
-    "avg": 12.54,
-    "med": 8.11,
-    "win": 64,
-    "vs_nifty": 8.64
+    "n": 538,
+    "avg": 10.56,
+    "med": 5.01,
+    "win": 58,
+    "vs_nifty": 5.18
    },
    "test": {
-    "n": 262,
-    "avg": 8.47,
-    "med": 6.18,
-    "win": 63,
-    "vs_nifty": 6.12
+    "n": 633,
+    "avg": 3.45,
+    "med": 0.49,
+    "win": 51,
+    "vs_nifty": 1.28
    },
-   "grade": "good",
+   "grade": "fair",
    "grade_train": "good",
+   "edge": 1.72,
    "years": {
     "2026": {
-     "n": 16,
-     "avg": -0.54,
-     "med": -2.16,
-     "win": 50,
-     "vs_nifty": -0.72
+     "n": 51,
+     "avg": 6.71,
+     "med": 5.72,
+     "win": 57,
+     "vs_nifty": 7.38
     },
     "2025": {
-     "n": 19,
-     "avg": -1.13,
-     "med": 0.56,
-     "win": 53,
-     "vs_nifty": -2.72
+     "n": 41,
+     "avg": -5.93,
+     "med": -7.08,
+     "win": 32,
+     "vs_nifty": -7.62
     },
     "2024": {
-     "n": 94,
-     "avg": 5.25,
-     "med": 4.33,
-     "win": 62,
-     "vs_nifty": 2.85
+     "n": 233,
+     "avg": -0.35,
+     "med": -3.55,
+     "win": 47,
+     "vs_nifty": -2.4
     },
     "2023": {
-     "n": 79,
-     "avg": 19.51,
-     "med": 15.8,
-     "win": 84,
-     "vs_nifty": 14.23
+     "n": 174,
+     "avg": 13.22,
+     "med": 10.75,
+     "win": 70,
+     "vs_nifty": 7.34
     },
     "2022": {
-     "n": 54,
-     "avg": 3.99,
-     "med": -3.4,
-     "win": 43,
-     "vs_nifty": 5.07
+     "n": 134,
+     "avg": -1.02,
+     "med": -6.18,
+     "win": 37,
+     "vs_nifty": 0.2
     },
     "2021": {
-     "n": 160,
-     "avg": 15.47,
-     "med": 10.53,
-     "win": 68,
-     "vs_nifty": 10.07
+     "n": 359,
+     "avg": 12.3,
+     "med": 6.86,
+     "win": 61,
+     "vs_nifty": 5.84
     },
     "2020": {
-     "n": 53,
-     "avg": 12.5,
-     "med": 9.07,
-     "win": 66,
-     "vs_nifty": 9.58
+     "n": 92,
+     "avg": 10.36,
+     "med": 5.36,
+     "win": 59,
+     "vs_nifty": 3.98
     },
     "2019": {
-     "n": 11,
-     "avg": -5.04,
-     "med": -4.5,
-     "win": 36,
-     "vs_nifty": 1.3
+     "n": 14,
+     "avg": -7.58,
+     "med": -4.14,
+     "win": 29,
+     "vs_nifty": -0.8
     },
     "2018": {
-     "n": 13,
-     "avg": -1.75,
-     "med": 11.1,
-     "win": 54,
-     "vs_nifty": -1.52
+     "n": 31,
+     "avg": -2.21,
+     "med": -6.01,
+     "win": 42,
+     "vs_nifty": -2.06
     },
     "2017": {
-     "n": 18,
-     "avg": 7.71,
-     "med": 5.26,
-     "win": 56,
-     "vs_nifty": 5.03
+     "n": 42,
+     "avg": 11.54,
+     "med": 2.03,
+     "win": 50,
+     "vs_nifty": 9.53
     }
    }
   },
   "month": {
    "name": "Month close above ATH",
    "all": {
-    "n": 1059,
-    "avg": 9.26,
-    "med": 5.1,
-    "win": 62,
-    "vs_nifty": 6.62
+    "n": 2345,
+    "avg": 8.2,
+    "med": 3.13,
+    "win": 56,
+    "vs_nifty": 5.08
    },
    "all126": {
-    "n": 1018,
-    "avg": 20.09,
-    "med": 11.21,
-    "win": 65,
-    "vs_nifty": 13.75
+    "n": 2244,
+    "avg": 17.07,
+    "med": 7.71,
+    "win": 59,
+    "vs_nifty": 10.31
    },
    "last 1y": {
-    "n": 124,
-    "avg": 5.44,
-    "med": 4.34,
-    "win": 64,
-    "vs_nifty": 6.99
+    "n": 238,
+    "avg": 5.69,
+    "med": 1.47,
+    "win": 54,
+    "vs_nifty": 6.82
    },
    "last 3y": {
-    "n": 389,
-    "avg": 8.54,
-    "med": 4.57,
-    "win": 61,
-    "vs_nifty": 6.28
+    "n": 879,
+    "avg": 6.68,
+    "med": 2.09,
+    "win": 54,
+    "vs_nifty": 4.04
    },
    "last 5y": {
-    "n": 602,
-    "avg": 9.15,
-    "med": 4.98,
-    "win": 62,
-    "vs_nifty": 7.38
+    "n": 1370,
+    "avg": 6.6,
+    "med": 1.99,
+    "win": 54,
+    "vs_nifty": 4.75
    },
    "bull": {
-    "n": 924,
-    "avg": 9.57,
-    "med": 5.02,
-    "win": 62,
-    "vs_nifty": 6.84
+    "n": 2074,
+    "avg": 8.4,
+    "med": 2.88,
+    "win": 55,
+    "vs_nifty": 5.04
    },
    "bear": {
-    "n": 135,
-    "avg": 7.12,
-    "med": 6.79,
-    "win": 63,
-    "vs_nifty": 5.12
+    "n": 271,
+    "avg": 6.72,
+    "med": 3.9,
+    "win": 56,
+    "vs_nifty": 5.34
    },
    "ex-Covid": {
-    "n": 995,
-    "avg": 8.49,
-    "med": 4.57,
-    "win": 61,
-    "vs_nifty": 6.41
+    "n": 2220,
+    "avg": 6.91,
+    "med": 2.22,
+    "win": 55,
+    "vs_nifty": 4.3
    },
    "train": {
-    "n": 497,
-    "avg": 9.15,
-    "med": 4.94,
-    "win": 62,
-    "vs_nifty": 5.71
+    "n": 1068,
+    "avg": 9.95,
+    "med": 3.48,
+    "win": 57,
+    "vs_nifty": 5.48
    },
    "test": {
-    "n": 562,
-    "avg": 9.35,
-    "med": 5.46,
-    "win": 62,
-    "vs_nifty": 7.42
+    "n": 1277,
+    "avg": 6.74,
+    "med": 2.46,
+    "win": 55,
+    "vs_nifty": 4.74
    },
    "grade": "good",
    "grade_train": "good",
+   "edge": 3.73,
    "years": {
     "2026": {
-     "n": 75,
-     "avg": 6.49,
-     "med": 7.09,
-     "win": 67,
-     "vs_nifty": 8.56
+     "n": 156,
+     "avg": 8.19,
+     "med": 3.84,
+     "win": 58,
+     "vs_nifty": 9.94
     },
     "2025": {
-     "n": 85,
-     "avg": 3.04,
-     "med": 0.87,
-     "win": 52,
-     "vs_nifty": 2.78
+     "n": 145,
+     "avg": 3.68,
+     "med": -1.74,
+     "win": 44,
+     "vs_nifty": 2.97
     },
     "2024": {
-     "n": 132,
-     "avg": 3.99,
-     "med": 0.67,
-     "win": 52,
-     "vs_nifty": 2.37
+     "n": 348,
+     "avg": 0.49,
+     "med": -3.41,
+     "win": 43,
+     "vs_nifty": -0.76
     },
     "2023": {
-     "n": 189,
-     "avg": 19.77,
-     "med": 12.99,
-     "win": 78,
-     "vs_nifty": 14.14
+     "n": 423,
+     "avg": 16.35,
+     "med": 11.15,
+     "win": 73,
+     "vs_nifty": 10.41
     },
     "2022": {
-     "n": 81,
-     "avg": 3.07,
-     "med": -0.05,
-     "win": 49,
-     "vs_nifty": 3.79
+     "n": 205,
+     "avg": -1.4,
+     "med": -4.35,
+     "win": 41,
+     "vs_nifty": -0.3
     },
     "2021": {
-     "n": 177,
-     "avg": 12.7,
-     "med": 6.49,
-     "win": 69,
-     "vs_nifty": 5.98
+     "n": 426,
+     "avg": 11.6,
+     "med": 5.49,
+     "win": 61,
+     "vs_nifty": 4.15
     },
     "2020": {
-     "n": 79,
-     "avg": 14.15,
-     "med": 10.55,
-     "win": 71,
-     "vs_nifty": 9.03
+     "n": 142,
+     "avg": 25.57,
+     "med": 10.04,
+     "win": 67,
+     "vs_nifty": 17.37
     },
     "2019": {
-     "n": 58,
-     "avg": 1.54,
-     "med": -0.36,
-     "win": 50,
-     "vs_nifty": 4.33
+     "n": 82,
+     "avg": 0.55,
+     "med": -1.36,
+     "win": 48,
+     "vs_nifty": 3.02
     },
     "2018": {
-     "n": 25,
-     "avg": 1.05,
-     "med": 4.02,
-     "win": 56,
-     "vs_nifty": 1.26
+     "n": 53,
+     "avg": 0.85,
+     "med": 0.53,
+     "win": 51,
+     "vs_nifty": 1.23
     },
     "2017": {
-     "n": 101,
-     "avg": 8.09,
-     "med": 3.44,
-     "win": 59,
-     "vs_nifty": 3.76
+     "n": 255,
+     "avg": 6.96,
+     "med": 2.74,
+     "win": 56,
+     "vs_nifty": 3.06
     },
     "2016": {
-     "n": 57,
-     "avg": 4.38,
-     "med": -3.86,
-     "win": 46,
-     "vs_nifty": 7.12
+     "n": 110,
+     "avg": 1.66,
+     "med": -4.63,
+     "win": 39,
+     "vs_nifty": 4.77
     }
    }
   },
   "wcup": {
    "name": "Weekly cup close",
    "all": {
-    "n": 478,
-    "avg": 7.46,
-    "med": 3.27,
-    "win": 58,
-    "vs_nifty": 5.27
+    "n": 1104,
+    "avg": 5.6,
+    "med": 1.11,
+    "win": 52,
+    "vs_nifty": 3.41
    },
    "all126": {
-    "n": 452,
-    "avg": 14.6,
-    "med": 6.72,
-    "win": 58,
-    "vs_nifty": 10.14
+    "n": 1047,
+    "avg": 10.72,
+    "med": 1.61,
+    "win": 53,
+    "vs_nifty": 5.68
    },
    "last 1y": {
-    "n": 90,
-    "avg": 2.86,
-    "med": 2.99,
-    "win": 56,
-    "vs_nifty": 3.54
+    "n": 148,
+    "avg": 2.47,
+    "med": 1.77,
+    "win": 54,
+    "vs_nifty": 2.57
    },
    "last 3y": {
-    "n": 218,
-    "avg": 6.33,
-    "med": 3.29,
-    "win": 59,
-    "vs_nifty": 4.59
+    "n": 491,
+    "avg": 4.58,
+    "med": 1.76,
+    "win": 53,
+    "vs_nifty": 2.59
    },
    "last 5y": {
-    "n": 344,
-    "avg": 7.68,
-    "med": 3.32,
-    "win": 59,
-    "vs_nifty": 6.13
+    "n": 788,
+    "avg": 5.39,
+    "med": 1.33,
+    "win": 52,
+    "vs_nifty": 4.0
    },
    "bull": {
-    "n": 401,
-    "avg": 8.07,
-    "med": 3.2,
-    "win": 59,
-    "vs_nifty": 5.65
+    "n": 961,
+    "avg": 6.0,
+    "med": 0.7,
+    "win": 51,
+    "vs_nifty": 3.71
    },
    "bear": {
-    "n": 77,
-    "avg": 4.26,
-    "med": 4.05,
-    "win": 57,
-    "vs_nifty": 3.3
+    "n": 143,
+    "avg": 2.95,
+    "med": 2.83,
+    "win": 56,
+    "vs_nifty": 1.41
    },
    "ex-Covid": {
-    "n": 449,
-    "avg": 6.42,
-    "med": 2.41,
-    "win": 56,
-    "vs_nifty": 4.97
+    "n": 1044,
+    "avg": 4.53,
+    "med": 0.43,
+    "win": 50,
+    "vs_nifty": 3.0
    },
    "train": {
-    "n": 152,
-    "avg": 6.18,
-    "med": 1.81,
-    "win": 55,
-    "vs_nifty": 2.93
+    "n": 341,
+    "avg": 6.1,
+    "med": 0.47,
+    "win": 50,
+    "vs_nifty": 2.26
    },
    "test": {
-    "n": 326,
-    "avg": 8.05,
-    "med": 4.0,
-    "win": 60,
-    "vs_nifty": 6.36
+    "n": 763,
+    "avg": 5.38,
+    "med": 1.49,
+    "win": 53,
+    "vs_nifty": 3.93
    },
-   "grade": "good",
-   "grade_train": "good",
+   "grade": "fair",
+   "grade_train": "fair",
+   "edge": 2.06,
    "years": {
     "2026": {
-     "n": 62,
-     "avg": 4.17,
-     "med": 4.21,
+     "n": 101,
+     "avg": 4.68,
+     "med": 3.77,
      "win": 60,
-     "vs_nifty": 5.75
+     "vs_nifty": 5.7
     },
     "2025": {
-     "n": 68,
-     "avg": 1.95,
-     "med": 1.29,
-     "win": 56,
-     "vs_nifty": 0.48
+     "n": 116,
+     "avg": 1.19,
+     "med": 0.34,
+     "win": 52,
+     "vs_nifty": -0.72
     },
     "2024": {
-     "n": 55,
-     "avg": 8.38,
-     "med": 0.89,
-     "win": 51,
-     "vs_nifty": 5.38
+     "n": 184,
+     "avg": 2.61,
+     "med": -3.32,
+     "win": 45,
+     "vs_nifty": 1.58
     },
     "2023": {
-     "n": 88,
-     "avg": 19.91,
-     "med": 13.13,
-     "win": 80,
-     "vs_nifty": 14.96
+     "n": 215,
+     "avg": 15.43,
+     "med": 9.66,
+     "win": 67,
+     "vs_nifty": 10.68
     },
     "2022": {
-     "n": 53,
-     "avg": 0.4,
-     "med": -1.68,
-     "win": 43,
-     "vs_nifty": 1.36
+     "n": 147,
+     "avg": -2.06,
+     "med": -5.22,
+     "win": 37,
+     "vs_nifty": -0.55
     },
     "2021": {
-     "n": 49,
-     "avg": 4.19,
-     "med": -0.28,
+     "n": 102,
+     "avg": 6.72,
+     "med": -0.98,
      "win": 47,
-     "vs_nifty": -0.36
+     "vs_nifty": 0.43
     },
     "2020": {
-     "n": 36,
-     "avg": 14.1,
-     "med": 20.21,
-     "win": 78,
-     "vs_nifty": 8.12
+     "n": 71,
+     "avg": 16.65,
+     "med": 12.71,
+     "win": 65,
+     "vs_nifty": 9.11
     },
     "2019": {
-     "n": 30,
-     "avg": 6.78,
+     "n": 40,
+     "avg": 6.34,
      "med": 1.81,
-     "win": 53,
-     "vs_nifty": 5.91
+     "win": 52,
+     "vs_nifty": 5.21
     },
     "2018": {
-     "n": 16,
-     "avg": -12.77,
-     "med": -9.94,
-     "win": 12,
-     "vs_nifty": -11.45
+     "n": 39,
+     "avg": -14.16,
+     "med": -18.31,
+     "win": 18,
+     "vs_nifty": -11.73
     },
     "2017": {
-     "n": 21,
-     "avg": 10.84,
-     "med": 8.52,
-     "win": 67,
-     "vs_nifty": 8.41
+     "n": 89,
+     "avg": 5.74,
+     "med": 2.71,
+     "win": 55,
+     "vs_nifty": 3.69
     }
    }
   },
   "dcup": {
    "name": "Daily cup close",
    "all": {
-    "n": 1325,
-    "avg": 9.62,
-    "med": 4.46,
-    "win": 59,
-    "vs_nifty": 6.39
+    "n": 3367,
+    "avg": 6.48,
+    "med": 1.02,
+    "win": 52,
+    "vs_nifty": 3.79
    },
    "all126": {
-    "n": 1287,
-    "avg": 17.48,
-    "med": 7.88,
-    "win": 60,
-    "vs_nifty": 12.32
+    "n": 3299,
+    "avg": 11.67,
+    "med": 2.68,
+    "win": 53,
+    "vs_nifty": 6.77
    },
    "last 1y": {
-    "n": 124,
-    "avg": 5.45,
-    "med": 3.11,
-    "win": 56,
-    "vs_nifty": 6.59
+    "n": 221,
+    "avg": 4.2,
+    "med": 3.07,
+    "win": 53,
+    "vs_nifty": 5.26
    },
    "last 3y": {
-    "n": 531,
-    "avg": 8.4,
-    "med": 3.79,
-    "win": 57,
-    "vs_nifty": 5.6
+    "n": 1331,
+    "avg": 4.72,
+    "med": 0.24,
+    "win": 50,
+    "vs_nifty": 2.05
    },
    "last 5y": {
-    "n": 814,
-    "avg": 8.58,
-    "med": 3.15,
-    "win": 56,
-    "vs_nifty": 6.76
+    "n": 2081,
+    "avg": 5.03,
+    "med": -0.49,
+    "win": 49,
+    "vs_nifty": 3.38
    },
    "bull": {
-    "n": 1170,
-    "avg": 10.08,
-    "med": 4.65,
-    "win": 59,
-    "vs_nifty": 6.89
+    "n": 3039,
+    "avg": 6.74,
+    "med": 0.96,
+    "win": 52,
+    "vs_nifty": 4.1
    },
    "bear": {
-    "n": 155,
-    "avg": 6.09,
-    "med": 3.12,
-    "win": 58,
-    "vs_nifty": 2.62
+    "n": 328,
+    "avg": 4.08,
+    "med": 2.0,
+    "win": 53,
+    "vs_nifty": 0.9
    },
    "ex-Covid": {
-    "n": 1258,
-    "avg": 9.02,
-    "med": 3.99,
-    "win": 58,
-    "vs_nifty": 6.35
+    "n": 3255,
+    "avg": 6.07,
+    "med": 0.72,
+    "win": 51,
+    "vs_nifty": 3.76
    },
    "train": {
-    "n": 583,
-    "avg": 11.14,
-    "med": 5.39,
-    "win": 63,
-    "vs_nifty": 6.56
+    "n": 1460,
+    "avg": 8.4,
+    "med": 2.56,
+    "win": 55,
+    "vs_nifty": 4.72
    },
    "test": {
-    "n": 742,
-    "avg": 8.42,
-    "med": 3.22,
-    "win": 56,
-    "vs_nifty": 6.26
+    "n": 1907,
+    "avg": 5.01,
+    "med": -0.15,
+    "win": 50,
+    "vs_nifty": 3.07
    },
-   "grade": "good",
+   "grade": "fair",
    "grade_train": "good",
+   "edge": 2.44,
    "years": {
     "2026": {
-     "n": 93,
-     "avg": 7.05,
-     "med": 3.94,
-     "win": 58,
-     "vs_nifty": 8.77
+     "n": 157,
+     "avg": 6.95,
+     "med": 6.13,
+     "win": 57,
+     "vs_nifty": 8.74
     },
     "2025": {
-     "n": 94,
-     "avg": 3.51,
-     "med": 0.51,
-     "win": 52,
-     "vs_nifty": 1.68
+     "n": 201,
+     "avg": 0.19,
+     "med": -0.65,
+     "win": 49,
+     "vs_nifty": -1.53
     },
     "2024": {
-     "n": 277,
-     "avg": 8.77,
-     "med": 3.09,
-     "win": 55,
-     "vs_nifty": 5.43
+     "n": 763,
+     "avg": 3.44,
+     "med": -1.99,
+     "win": 47,
+     "vs_nifty": 1.21
     },
     "2023": {
-     "n": 137,
-     "avg": 20.07,
-     "med": 17.27,
-     "win": 75,
-     "vs_nifty": 13.77
+     "n": 412,
+     "avg": 15.39,
+     "med": 9.11,
+     "win": 64,
+     "vs_nifty": 9.12
     },
     "2022": {
-     "n": 141,
-     "avg": 0.57,
-     "med": -4.14,
-     "win": 42,
-     "vs_nifty": 1.98
+     "n": 374,
+     "avg": -1.47,
+     "med": -6.97,
+     "win": 37,
+     "vs_nifty": 0.3
     },
     "2021": {
-     "n": 175,
-     "avg": 12.04,
-     "med": 5.64,
-     "win": 62,
-     "vs_nifty": 7.91
+     "n": 406,
+     "avg": 10.51,
+     "med": 3.54,
+     "win": 55,
+     "vs_nifty": 6.21
     },
     "2020": {
-     "n": 69,
-     "avg": 19.9,
-     "med": 19.23,
-     "win": 77,
-     "vs_nifty": 7.51
+     "n": 121,
+     "avg": 14.8,
+     "med": 11.91,
+     "win": 64,
+     "vs_nifty": 4.11
     },
     "2019": {
-     "n": 32,
-     "avg": 1.7,
-     "med": 2.6,
-     "win": 59,
-     "vs_nifty": 0.12
+     "n": 59,
+     "avg": 1.07,
+     "med": 2.03,
+     "win": 54,
+     "vs_nifty": -0.28
     },
     "2018": {
-     "n": 71,
-     "avg": -4.75,
-     "med": -7.77,
-     "win": 34,
-     "vs_nifty": -5.28
+     "n": 173,
+     "avg": -8.22,
+     "med": -12.18,
+     "win": 29,
+     "vs_nifty": -8.25
     },
     "2017": {
-     "n": 181,
-     "avg": 14.66,
-     "med": 6.96,
-     "win": 68,
-     "vs_nifty": 9.48
+     "n": 508,
+     "avg": 11.55,
+     "med": 4.58,
+     "win": 59,
+     "vs_nifty": 7.07
     },
     "2016": {
-     "n": 55,
-     "avg": 11.72,
-     "med": 6.88,
-     "win": 69,
-     "vs_nifty": 10.52
+     "n": 193,
+     "avg": 8.77,
+     "med": 2.54,
+     "win": 56,
+     "vs_nifty": 8.98
     }
    }
   },
   "base": {
    "name": "52-week base breakout",
    "all": {
-    "n": 1745,
-    "avg": 6.18,
-    "med": 3.74,
-    "win": 58,
-    "vs_nifty": 4.2
+    "n": 3084,
+    "avg": 4.74,
+    "med": 1.86,
+    "win": 53,
+    "vs_nifty": 2.73
    },
    "all126": {
-    "n": 1641,
-    "avg": 13.85,
-    "med": 7.42,
-    "win": 62,
-    "vs_nifty": 8.84
+    "n": 2847,
+    "avg": 10.71,
+    "med": 4.25,
+    "win": 56,
+    "vs_nifty": 5.59
    },
    "last 1y": {
-    "n": 325,
-    "avg": 2.69,
-    "med": -0.3,
-    "win": 49,
-    "vs_nifty": 4.22
+    "n": 588,
+    "avg": 1.6,
+    "med": -1.7,
+    "win": 47,
+    "vs_nifty": 2.94
    },
    "last 3y": {
-    "n": 687,
-    "avg": 3.91,
-    "med": 1.15,
-    "win": 53,
-    "vs_nifty": 3.04
+    "n": 1358,
+    "avg": 2.19,
+    "med": -0.98,
+    "win": 48,
+    "vs_nifty": 1.12
    },
    "last 5y": {
-    "n": 1129,
-    "avg": 6.67,
-    "med": 3.35,
-    "win": 57,
-    "vs_nifty": 5.38
+    "n": 2129,
+    "avg": 4.85,
+    "med": 1.34,
+    "win": 52,
+    "vs_nifty": 3.55
    },
    "bull": {
-    "n": 1448,
-    "avg": 6.16,
-    "med": 3.75,
-    "win": 58,
-    "vs_nifty": 4.31
+    "n": 2561,
+    "avg": 4.62,
+    "med": 1.58,
+    "win": 53,
+    "vs_nifty": 2.53
    },
    "bear": {
-    "n": 297,
-    "avg": 6.27,
-    "med": 3.39,
-    "win": 59,
-    "vs_nifty": 3.69
+    "n": 523,
+    "avg": 5.32,
+    "med": 2.59,
+    "win": 55,
+    "vs_nifty": 3.72
    },
    "ex-Covid": {
-    "n": 1591,
-    "avg": 5.12,
-    "med": 2.74,
-    "win": 56,
-    "vs_nifty": 4.27
+    "n": 2852,
+    "avg": 4.02,
+    "med": 1.02,
+    "win": 52,
+    "vs_nifty": 2.88
    },
    "train": {
-    "n": 653,
-    "avg": 5.03,
-    "med": 4.02,
-    "win": 58,
-    "vs_nifty": 2.06
+    "n": 1005,
+    "avg": 4.27,
+    "med": 2.03,
+    "win": 55,
+    "vs_nifty": 0.96
    },
    "test": {
-    "n": 1092,
-    "avg": 6.87,
-    "med": 3.63,
-    "win": 58,
-    "vs_nifty": 5.49
+    "n": 2079,
+    "avg": 4.96,
+    "med": 1.6,
+    "win": 53,
+    "vs_nifty": 3.59
    },
-   "grade": "good",
-   "grade_train": "good",
+   "grade": "fair",
+   "grade_train": "fair",
+   "edge": 1.38,
    "years": {
     "2026": {
-     "n": 225,
-     "avg": 3.57,
-     "med": 0.77,
-     "win": 52,
-     "vs_nifty": 5.51
+     "n": 425,
+     "avg": 3.84,
+     "med": 0.68,
+     "win": 51,
+     "vs_nifty": 5.58
     },
     "2025": {
-     "n": 246,
-     "avg": 2.69,
-     "med": 0.71,
-     "win": 53,
-     "vs_nifty": 2.02
+     "n": 389,
+     "avg": -0.67,
+     "med": -1.83,
+     "win": 46,
+     "vs_nifty": -1.42
     },
     "2024": {
-     "n": 137,
-     "avg": 4.47,
-     "med": 1.93,
-     "win": 53,
-     "vs_nifty": 2.12
+     "n": 369,
+     "avg": 1.71,
+     "med": -3.53,
+     "win": 43,
+     "vs_nifty": -0.03
     },
     "2023": {
-     "n": 327,
-     "avg": 15.15,
-     "med": 9.26,
-     "win": 75,
-     "vs_nifty": 10.58
+     "n": 598,
+     "avg": 12.95,
+     "med": 8.18,
+     "win": 69,
+     "vs_nifty": 8.33
     },
     "2022": {
-     "n": 157,
-     "avg": 3.0,
-     "med": -2.24,
-     "win": 45,
-     "vs_nifty": 3.2
+     "n": 298,
+     "avg": 1.88,
+     "med": -2.48,
+     "win": 44,
+     "vs_nifty": 2.22
     },
     "2021": {
-     "n": 180,
-     "avg": 6.82,
-     "med": 3.43,
-     "win": 61,
-     "vs_nifty": 3.32
+     "n": 306,
+     "avg": 8.27,
+     "med": 3.6,
+     "win": 60,
+     "vs_nifty": 3.56
     },
     "2020": {
-     "n": 191,
-     "avg": 8.63,
-     "med": 9.79,
-     "win": 64,
-     "vs_nifty": 2.53
+     "n": 286,
+     "avg": 5.76,
+     "med": 6.74,
+     "win": 60,
+     "vs_nifty": 0.21
     },
     "2019": {
-     "n": 142,
-     "avg": 0.87,
-     "med": -0.92,
-     "win": 49,
-     "vs_nifty": 1.73
+     "n": 166,
+     "avg": 0.99,
+     "med": -1.17,
+     "win": 48,
+     "vs_nifty": 1.45
     },
     "2018": {
-     "n": 62,
-     "avg": -4.15,
-     "med": -4.21,
-     "win": 37,
-     "vs_nifty": -3.57
+     "n": 100,
+     "avg": -6.89,
+     "med": -6.51,
+     "win": 30,
+     "vs_nifty": -5.36
     },
     "2017": {
-     "n": 78,
-     "avg": 6.93,
-     "med": 5.53,
-     "win": 71,
-     "vs_nifty": 3.11
+     "n": 147,
+     "avg": 4.35,
+     "med": 2.0,
+     "win": 57,
+     "vs_nifty": 0.78
     }
    }
   },
   "cup921": {
    "name": "Cup 9/21",
    "all": {
-    "n": 103,
-    "avg": 7.98,
-    "med": 4.99,
-    "win": 61,
-    "vs_nifty": 5.83
+    "n": 237,
+    "avg": 1.07,
+    "med": -1.7,
+    "win": 47,
+    "vs_nifty": -0.98
    },
    "all126": {
-    "n": 97,
-    "avg": 17.42,
-    "med": 7.88,
-    "win": 63,
-    "vs_nifty": 12.32
+    "n": 219,
+    "avg": 8.45,
+    "med": 1.27,
+    "win": 52,
+    "vs_nifty": 3.29
    },
    "last 1y": {
-    "n": 15,
-    "avg": -5.64,
-    "med": -6.11,
-    "win": 40,
-    "vs_nifty": -2.94
+    "n": 36,
+    "avg": -9.58,
+    "med": -10.27,
+    "win": 31,
+    "vs_nifty": -8.62
    },
    "last 3y": {
-    "n": 47,
-    "avg": 6.4,
-    "med": 2.46,
-    "win": 60,
-    "vs_nifty": 5.38
+    "n": 118,
+    "avg": -1.6,
+    "med": -6.85,
+    "win": 43,
+    "vs_nifty": -3.15
    },
    "last 5y": {
-    "n": 69,
-    "avg": 4.76,
-    "med": 2.46,
-    "win": 57,
-    "vs_nifty": 4.12
+    "n": 165,
+    "avg": -0.63,
+    "med": -2.88,
+    "win": 45,
+    "vs_nifty": -1.82
    },
    "bull": {
-    "n": 88,
-    "avg": 8.89,
-    "med": 4.94,
-    "win": 60,
-    "vs_nifty": 6.63
+    "n": 203,
+    "avg": 2.03,
+    "med": -1.7,
+    "win": 47,
+    "vs_nifty": -0.05
    },
    "bear": {
-    "n": 15,
-    "avg": 2.66,
-    "med": 5.48,
-    "win": 67,
-    "vs_nifty": 1.16
+    "n": 34,
+    "avg": -4.68,
+    "med": -3.71,
+    "win": 47,
+    "vs_nifty": -6.52
    },
    "ex-Covid": {
-    "n": 97,
-    "avg": 8.2,
-    "med": 5.09,
-    "win": 61,
-    "vs_nifty": 6.64
+    "n": 231,
+    "avg": 0.98,
+    "med": -2.2,
+    "win": 47,
+    "vs_nifty": -0.82
    },
    "train": {
-    "n": 38,
-    "avg": 13.67,
-    "med": 7.79,
-    "win": 68,
-    "vs_nifty": 9.07
+    "n": 80,
+    "avg": 3.97,
+    "med": 0.4,
+    "win": 50,
+    "vs_nifty": 0.39
    },
    "test": {
-    "n": 65,
-    "avg": 4.66,
-    "med": 2.46,
-    "win": 57,
-    "vs_nifty": 3.94
+    "n": 157,
+    "avg": -0.41,
+    "med": -2.73,
+    "win": 46,
+    "vs_nifty": -1.68
    },
-   "grade": "good",
-   "grade_train": "good",
+   "grade": "poor",
+   "grade_train": "poor",
+   "edge": -2.33,
    "years": {
     "2026": {
-     "n": 10,
-     "avg": -4.5,
-     "med": -3.71,
-     "win": 40,
-     "vs_nifty": -0.71
+     "n": 24,
+     "avg": -8.46,
+     "med": -7.93,
+     "win": 33,
+     "vs_nifty": -7.14
     },
     "2025": {
-     "n": 13,
-     "avg": 3.92,
-     "med": 8.2,
-     "win": 62,
-     "vs_nifty": 3.06
+     "n": 27,
+     "avg": -4.11,
+     "med": -10.42,
+     "win": 41,
+     "vs_nifty": -5.15
     },
     "2024": {
-     "n": 16,
-     "avg": 16.84,
-     "med": 5.17,
-     "win": 62,
-     "vs_nifty": 16.74
+     "n": 46,
+     "avg": 1.26,
+     "med": -8.54,
+     "win": 41,
+     "vs_nifty": 1.25
     },
     "2023": {
-     "n": 18,
-     "avg": 1.28,
-     "med": 2.96,
-     "win": 61,
-     "vs_nifty": -3.31
+     "n": 40,
+     "avg": 3.63,
+     "med": 3.91,
+     "win": 60,
+     "vs_nifty": -1.61
     },
     "2022": {
-     "n": 8,
-     "avg": 0.55,
-     "med": 1.44,
+     "n": 20,
+     "avg": 2.29,
+     "med": 0.73,
      "win": 50,
-     "vs_nifty": 1.9
+     "vs_nifty": 2.67
     },
     "2021": {
-     "n": 16,
-     "avg": 10.67,
-     "med": 11.5,
-     "win": 69,
-     "vs_nifty": 6.57
+     "n": 34,
+     "avg": 1.33,
+     "med": -3.4,
+     "win": 41,
+     "vs_nifty": -3.39
     },
     "2020": {
-     "n": 6,
-     "avg": 4.48,
-     "med": 4.02,
-     "win": 67,
-     "vs_nifty": -7.28
+     "n": 8,
+     "avg": -5.63,
+     "med": 0.01,
+     "win": 50,
+     "vs_nifty": -8.01
     },
     "2019": {
-     "n": 8,
-     "avg": 8.92,
-     "med": 11.54,
-     "win": 62,
-     "vs_nifty": 9.51
+     "n": 11,
+     "avg": 5.67,
+     "med": 6.39,
+     "win": 55,
+     "vs_nifty": 5.74
     },
     "2018": {
-     "n": 2,
-     "avg": 7.0,
-     "med": 7.0,
-     "win": 100,
-     "vs_nifty": 1.39
+     "n": 6,
+     "avg": -8.32,
+     "med": 4.81,
+     "win": 67,
+     "vs_nifty": -9.98
     },
     "2017": {
-     "n": 5,
-     "avg": 45.89,
-     "med": 11.27,
-     "win": 60,
-     "vs_nifty": 41.29
+     "n": 17,
+     "avg": 17.57,
+     "med": 1.18,
+     "win": 53,
+     "vs_nifty": 13.04
     },
     "2016": {
-     "n": 1,
-     "avg": 6.88,
-     "med": 6.88,
-     "win": 100,
-     "vs_nifty": -2.17
+     "n": 4,
+     "avg": 1.59,
+     "med": 4.48,
+     "win": 75,
+     "vs_nifty": -3.58
     }
    }
   },
   "921": {
    "name": "9/21 any stock",
    "all": {
-    "n": 3394,
-    "avg": 7.09,
-    "med": 4.12,
-    "win": 58,
-    "vs_nifty": 4.92
+    "n": 6215,
+    "avg": 5.18,
+    "med": 1.48,
+    "win": 53,
+    "vs_nifty": 2.99
    },
    "all126": {
-    "n": 3257,
-    "avg": 15.52,
-    "med": 9.75,
-    "win": 64,
-    "vs_nifty": 10.12
+    "n": 5910,
+    "avg": 12.28,
+    "med": 5.83,
+    "win": 58,
+    "vs_nifty": 6.64
    },
    "last 1y": {
-    "n": 361,
-    "avg": 1.93,
-    "med": -2.65,
-    "win": 45,
-    "vs_nifty": 3.79
+    "n": 698,
+    "avg": -0.43,
+    "med": -4.22,
+    "win": 41,
+    "vs_nifty": 1.18
    },
    "last 3y": {
-    "n": 1283,
-    "avg": 6.6,
-    "med": 3.23,
-    "win": 56,
-    "vs_nifty": 4.97
+    "n": 2597,
+    "avg": 3.08,
+    "med": -1.1,
+    "win": 48,
+    "vs_nifty": 1.47
    },
    "last 5y": {
-    "n": 1862,
-    "avg": 7.57,
-    "med": 3.79,
-    "win": 57,
-    "vs_nifty": 6.2
+    "n": 3706,
+    "avg": 4.43,
+    "med": 0.23,
+    "win": 50,
+    "vs_nifty": 3.14
    },
    "bull": {
-    "n": 3042,
-    "avg": 6.97,
-    "med": 4.15,
-    "win": 58,
-    "vs_nifty": 4.94
+    "n": 5519,
+    "avg": 5.21,
+    "med": 1.43,
+    "win": 53,
+    "vs_nifty": 3.07
    },
    "bear": {
-    "n": 352,
-    "avg": 8.1,
-    "med": 4.06,
-    "win": 58,
-    "vs_nifty": 4.79
+    "n": 696,
+    "avg": 4.98,
+    "med": 1.88,
+    "win": 53,
+    "vs_nifty": 2.37
    },
    "ex-Covid": {
-    "n": 3175,
-    "avg": 6.51,
-    "med": 3.63,
-    "win": 57,
-    "vs_nifty": 5.17
+    "n": 5877,
+    "avg": 4.7,
+    "med": 0.83,
+    "win": 52,
+    "vs_nifty": 3.18
    },
    "train": {
-    "n": 1679,
-    "avg": 6.55,
-    "med": 4.21,
-    "win": 59,
-    "vs_nifty": 3.81
+    "n": 2758,
+    "avg": 6.27,
+    "med": 2.86,
+    "win": 55,
+    "vs_nifty": 3.21
    },
    "test": {
-    "n": 1715,
-    "avg": 7.61,
-    "med": 4.07,
-    "win": 57,
-    "vs_nifty": 6.01
+    "n": 3457,
+    "avg": 4.32,
+    "med": 0.38,
+    "win": 51,
+    "vs_nifty": 2.82
    },
-   "grade": "good",
+   "grade": "fair",
    "grade_train": "good",
+   "edge": 1.64,
    "years": {
     "2026": {
-     "n": 221,
-     "avg": 4.86,
-     "med": -0.52,
-     "win": 49,
-     "vs_nifty": 7.19
+     "n": 445,
+     "avg": 3.65,
+     "med": -1.31,
+     "win": 47,
+     "vs_nifty": 5.41
     },
     "2025": {
-     "n": 372,
-     "avg": 0.9,
-     "med": -2.41,
-     "win": 43,
-     "vs_nifty": 0.55
+     "n": 661,
+     "avg": -3.24,
+     "med": -5.57,
+     "win": 37,
+     "vs_nifty": -3.39
     },
     "2024": {
-     "n": 474,
-     "avg": 6.51,
-     "med": 3.75,
-     "win": 57,
-     "vs_nifty": 5.35
+     "n": 1028,
+     "avg": 2.18,
+     "med": -2.55,
+     "win": 46,
+     "vs_nifty": 1.29
     },
     "2023": {
-     "n": 439,
-     "avg": 18.13,
-     "med": 13.59,
-     "win": 79,
-     "vs_nifty": 12.31
+     "n": 878,
+     "avg": 14.12,
+     "med": 10.18,
+     "win": 71,
+     "vs_nifty": 8.41
     },
     "2022": {
-     "n": 209,
-     "avg": 2.84,
-     "med": -0.41,
-     "win": 48,
-     "vs_nifty": 2.73
+     "n": 445,
+     "avg": 1.81,
+     "med": -2.17,
+     "win": 45,
+     "vs_nifty": 1.96
     },
     "2021": {
-     "n": 489,
-     "avg": 13.14,
-     "med": 8.92,
-     "win": 67,
-     "vs_nifty": 8.51
+     "n": 879,
+     "avg": 13.26,
+     "med": 7.89,
+     "win": 64,
+     "vs_nifty": 8.47
     },
     "2020": {
-     "n": 269,
-     "avg": 8.51,
-     "med": 7.44,
-     "win": 66,
-     "vs_nifty": 1.76
+     "n": 405,
+     "avg": 7.12,
+     "med": 6.02,
+     "win": 62,
+     "vs_nifty": -0.13
     },
     "2019": {
-     "n": 251,
-     "avg": -2.36,
-     "med": -2.68,
-     "win": 45,
-     "vs_nifty": 1.6
+     "n": 312,
+     "avg": -3.84,
+     "med": -3.87,
+     "win": 41,
+     "vs_nifty": 0.82
     },
     "2018": {
-     "n": 152,
-     "avg": -2.42,
-     "med": -4.8,
-     "win": 41,
-     "vs_nifty": -4.15
+     "n": 238,
+     "avg": -4.75,
+     "med": -7.17,
+     "win": 35,
+     "vs_nifty": -6.39
     },
     "2017": {
-     "n": 337,
-     "avg": 8.14,
-     "med": 4.9,
-     "win": 63,
-     "vs_nifty": 4.2
+     "n": 625,
+     "avg": 6.88,
+     "med": 3.06,
+     "win": 57,
+     "vs_nifty": 2.99
     },
     "2016": {
-     "n": 181,
-     "avg": 2.76,
-     "med": 0.45,
-     "win": 51,
-     "vs_nifty": 3.2
+     "n": 299,
+     "avg": 2.59,
+     "med": -0.96,
+     "win": 47,
+     "vs_nifty": 2.89
     }
    }
   },
   "tight": {
    "name": "Tight base",
    "all": {
-    "n": 5551,
-    "avg": 5.48,
-    "med": 2.52,
-    "win": 56,
-    "vs_nifty": 2.93
+    "n": 6575,
+    "avg": 5.07,
+    "med": 1.85,
+    "win": 54,
+    "vs_nifty": 2.46
    },
    "all126": {
-    "n": 5288,
-    "avg": 12.93,
-    "med": 6.51,
-    "win": 60,
-    "vs_nifty": 7.24
+    "n": 6235,
+    "avg": 11.79,
+    "med": 5.47,
+    "win": 58,
+    "vs_nifty": 6.01
    },
    "last 1y": {
-    "n": 679,
-    "avg": -1.41,
-    "med": -3.66,
-    "win": 41,
-    "vs_nifty": 0.33
+    "n": 826,
+    "avg": -0.91,
+    "med": -3.85,
+    "win": 40,
+    "vs_nifty": 0.6
    },
    "last 3y": {
-    "n": 2149,
-    "avg": 3.18,
-    "med": 0.35,
-    "win": 51,
-    "vs_nifty": 1.53
+    "n": 2621,
+    "avg": 2.48,
+    "med": -0.7,
+    "win": 49,
+    "vs_nifty": 0.77
    },
    "last 5y": {
-    "n": 3317,
-    "avg": 5.0,
-    "med": 1.77,
-    "win": 54,
-    "vs_nifty": 3.49
+    "n": 3980,
+    "avg": 4.48,
+    "med": 0.99,
+    "win": 52,
+    "vs_nifty": 2.95
    },
    "bull": {
-    "n": 4854,
-    "avg": 5.68,
-    "med": 2.74,
-    "win": 56,
-    "vs_nifty": 3.19
+    "n": 5748,
+    "avg": 5.1,
+    "med": 1.93,
+    "win": 54,
+    "vs_nifty": 2.5
    },
    "bear": {
-    "n": 697,
-    "avg": 4.13,
-    "med": 1.32,
-    "win": 54,
-    "vs_nifty": 1.12
+    "n": 827,
+    "avg": 4.87,
+    "med": 1.28,
+    "win": 53,
+    "vs_nifty": 2.21
    },
    "ex-Covid": {
-    "n": 5196,
-    "avg": 4.71,
-    "med": 1.83,
-    "win": 54,
-    "vs_nifty": 2.88
+    "n": 6183,
+    "avg": 4.32,
+    "med": 1.17,
+    "win": 52,
+    "vs_nifty": 2.38
    },
    "train": {
-    "n": 2407,
-    "avg": 5.7,
-    "med": 2.96,
-    "win": 56,
-    "vs_nifty": 2.0
+    "n": 2801,
+    "avg": 5.56,
+    "med": 2.47,
+    "win": 55,
+    "vs_nifty": 1.68
    },
    "test": {
-    "n": 3144,
-    "avg": 5.32,
-    "med": 2.28,
-    "win": 55,
-    "vs_nifty": 3.65
+    "n": 3774,
+    "avg": 4.72,
+    "med": 1.44,
+    "win": 53,
+    "vs_nifty": 3.04
    },
-   "grade": "good",
-   "grade_train": "good",
+   "grade": "fair",
+   "grade_train": "fair",
+   "edge": 1.11,
    "years": {
     "2026": {
-     "n": 431,
-     "avg": -0.28,
-     "med": -2.77,
-     "win": 43,
-     "vs_nifty": 1.64
+     "n": 538,
+     "avg": 1.36,
+     "med": -2.44,
+     "win": 44,
+     "vs_nifty": 3.04
     },
     "2025": {
-     "n": 638,
-     "avg": -1.81,
-     "med": -3.8,
-     "win": 39,
-     "vs_nifty": -1.77
+     "n": 762,
+     "avg": -3.16,
+     "med": -4.54,
+     "win": 36,
+     "vs_nifty": -3.17
     },
     "2024": {
-     "n": 702,
-     "avg": 2.69,
-     "med": 1.62,
-     "win": 53,
-     "vs_nifty": 0.55
+     "n": 847,
+     "avg": 1.15,
+     "med": -0.7,
+     "win": 49,
+     "vs_nifty": -0.82
     },
     "2023": {
-     "n": 900,
-     "avg": 17.55,
-     "med": 12.57,
-     "win": 77,
-     "vs_nifty": 12.54
+     "n": 1095,
+     "avg": 16.69,
+     "med": 11.84,
+     "win": 75,
+     "vs_nifty": 11.61
     },
     "2022": {
-     "n": 473,
-     "avg": 0.64,
-     "med": -0.81,
-     "win": 48,
-     "vs_nifty": 0.46
+     "n": 532,
+     "avg": 0.44,
+     "med": -1.3,
+     "win": 46,
+     "vs_nifty": 0.41
     },
     "2021": {
-     "n": 657,
-     "avg": 9.4,
-     "med": 4.09,
-     "win": 58,
-     "vs_nifty": 3.59
+     "n": 796,
+     "avg": 8.87,
+     "med": 3.38,
+     "win": 56,
+     "vs_nifty": 2.7
     },
     "2020": {
-     "n": 420,
-     "avg": 10.87,
-     "med": 8.87,
+     "n": 461,
+     "avg": 11.06,
+     "med": 9.17,
      "win": 69,
-     "vs_nifty": 3.67
+     "vs_nifty": 3.62
     },
     "2019": {
-     "n": 284,
-     "avg": -3.8,
-     "med": -3.68,
-     "win": 44,
-     "vs_nifty": -2.68
+     "n": 308,
+     "avg": -4.06,
+     "med": -3.94,
+     "win": 43,
+     "vs_nifty": -2.83
     },
     "2018": {
-     "n": 288,
-     "avg": -4.25,
-     "med": -5.68,
-     "win": 36,
-     "vs_nifty": -4.32
+     "n": 317,
+     "avg": -5.3,
+     "med": -6.22,
+     "win": 33,
+     "vs_nifty": -5.28
     },
     "2017": {
-     "n": 547,
-     "avg": 8.56,
-     "med": 5.7,
-     "win": 64,
-     "vs_nifty": 3.73
+     "n": 668,
+     "avg": 7.85,
+     "med": 4.99,
+     "win": 61,
+     "vs_nifty": 3.01
     },
     "2016": {
-     "n": 211,
-     "avg": 2.83,
-     "med": -0.43,
-     "win": 48,
-     "vs_nifty": 4.22
+     "n": 251,
+     "avg": 4.34,
+     "med": -0.14,
+     "win": 49,
+     "vs_nifty": 5.73
     }
    }
   },
   "flag": {
    "name": "Flag",
    "all": {
-    "n": 885,
-    "avg": 11.58,
-    "med": 6.72,
-    "win": 63,
-    "vs_nifty": 8.43
+    "n": 2064,
+    "avg": 8.14,
+    "med": 2.97,
+    "win": 56,
+    "vs_nifty": 4.88
    },
    "all126": {
-    "n": 862,
-    "avg": 22.64,
-    "med": 13.35,
-    "win": 66,
-    "vs_nifty": 16.59
+    "n": 2020,
+    "avg": 15.23,
+    "med": 7.02,
+    "win": 58,
+    "vs_nifty": 9.26
    },
    "last 1y": {
-    "n": 72,
-    "avg": 6.71,
-    "med": 0.18,
-    "win": 53,
-    "vs_nifty": 7.69
+    "n": 143,
+    "avg": 4.33,
+    "med": -1.71,
+    "win": 48,
+    "vs_nifty": 5.54
    },
    "last 3y": {
-    "n": 343,
-    "avg": 9.97,
-    "med": 5.52,
-    "win": 60,
-    "vs_nifty": 6.87
+    "n": 769,
+    "avg": 5.01,
+    "med": 0.13,
+    "win": 51,
+    "vs_nifty": 2.03
    },
    "last 5y": {
-    "n": 518,
-    "avg": 11.27,
-    "med": 6.61,
-    "win": 63,
-    "vs_nifty": 8.85
+    "n": 1178,
+    "avg": 6.91,
+    "med": 1.64,
+    "win": 53,
+    "vs_nifty": 4.62
    },
    "bull": {
-    "n": 790,
-    "avg": 12.07,
-    "med": 6.96,
-    "win": 63,
-    "vs_nifty": 9.13
+    "n": 1868,
+    "avg": 8.1,
+    "med": 2.88,
+    "win": 55,
+    "vs_nifty": 4.95
    },
    "bear": {
-    "n": 95,
-    "avg": 7.5,
-    "med": 4.86,
-    "win": 61,
-    "vs_nifty": 2.59
+    "n": 196,
+    "avg": 8.52,
+    "med": 4.31,
+    "win": 59,
+    "vs_nifty": 4.25
    },
    "ex-Covid": {
-    "n": 832,
-    "avg": 10.9,
-    "med": 6.13,
-    "win": 62,
-    "vs_nifty": 8.35
+    "n": 1968,
+    "avg": 7.47,
+    "med": 2.49,
+    "win": 54,
+    "vs_nifty": 4.7
    },
    "train": {
-    "n": 398,
-    "avg": 11.82,
-    "med": 6.2,
-    "win": 63,
-    "vs_nifty": 8.07
+    "n": 958,
+    "avg": 10.16,
+    "med": 4.61,
+    "win": 59,
+    "vs_nifty": 6.06
    },
    "test": {
-    "n": 487,
-    "avg": 11.38,
-    "med": 7.19,
-    "win": 63,
-    "vs_nifty": 8.72
+    "n": 1106,
+    "avg": 6.39,
+    "med": 1.53,
+    "win": 53,
+    "vs_nifty": 3.86
    },
    "grade": "good",
    "grade_train": "good",
+   "edge": 3.53,
    "years": {
     "2026": {
-     "n": 47,
-     "avg": 8.67,
-     "med": 0.37,
-     "win": 55,
-     "vs_nifty": 10.57
+     "n": 100,
+     "avg": 7.43,
+     "med": 0.18,
+     "win": 51,
+     "vs_nifty": 9.45
     },
     "2025": {
-     "n": 69,
-     "avg": 5.17,
-     "med": 0.05,
-     "win": 51,
-     "vs_nifty": 4.05
+     "n": 132,
+     "avg": 3.57,
+     "med": -0.21,
+     "win": 49,
+     "vs_nifty": 2.04
     },
     "2024": {
-     "n": 161,
-     "avg": 8.5,
-     "med": 5.52,
-     "win": 58,
-     "vs_nifty": 5.14
+     "n": 391,
+     "avg": 1.73,
+     "med": -3.07,
+     "win": 45,
+     "vs_nifty": -1.05
     },
     "2023": {
-     "n": 141,
-     "avg": 23.12,
-     "med": 17.58,
-     "win": 85,
-     "vs_nifty": 16.94
+     "n": 310,
+     "avg": 18.22,
+     "med": 13.51,
+     "win": 73,
+     "vs_nifty": 11.8
     },
     "2022": {
-     "n": 69,
-     "avg": 2.2,
-     "med": 0.03,
-     "win": 51,
-     "vs_nifty": 3.7
+     "n": 173,
+     "avg": -2.7,
+     "med": -5.61,
+     "win": 40,
+     "vs_nifty": -1.14
     },
     "2021": {
-     "n": 118,
-     "avg": 18.47,
-     "med": 9.1,
-     "win": 69,
-     "vs_nifty": 13.46
+     "n": 305,
+     "avg": 18.23,
+     "med": 9.39,
+     "win": 67,
+     "vs_nifty": 12.07
     },
     "2020": {
-     "n": 68,
-     "avg": 13.46,
-     "med": 13.71,
+     "n": 121,
+     "avg": 13.69,
+     "med": 8.86,
      "win": 68,
-     "vs_nifty": 8.71
+     "vs_nifty": 8.15
     },
     "2019": {
-     "n": 27,
-     "avg": -0.26,
-     "med": 1.34,
-     "win": 56,
-     "vs_nifty": -0.46
+     "n": 45,
+     "avg": -3.51,
+     "med": 1.09,
+     "win": 51,
+     "vs_nifty": -1.27
     },
     "2018": {
-     "n": 45,
-     "avg": -5.1,
-     "med": -3.05,
-     "win": 44,
-     "vs_nifty": -5.69
+     "n": 118,
+     "avg": -8.7,
+     "med": -13.98,
+     "win": 28,
+     "vs_nifty": -8.78
     },
     "2017": {
-     "n": 100,
-     "avg": 15.55,
-     "med": 8.1,
-     "win": 64,
-     "vs_nifty": 9.61
+     "n": 263,
+     "avg": 11.76,
+     "med": 6.71,
+     "win": 62,
+     "vs_nifty": 6.13
     },
     "2016": {
-     "n": 40,
-     "avg": 7.25,
-     "med": 2.91,
-     "win": 60,
-     "vs_nifty": 8.46
+     "n": 106,
+     "avg": 5.77,
+     "med": 1.39,
+     "win": 54,
+     "vs_nifty": 5.83
     }
    }
   },
   "pennant": {
    "name": "Pennant",
    "all": {
-    "n": 78,
-    "avg": 9.64,
-    "med": 6.11,
-    "win": 59,
-    "vs_nifty": 6.25
+    "n": 195,
+    "avg": 7.65,
+    "med": 1.5,
+    "win": 53,
+    "vs_nifty": 4.39
    },
    "all126": {
-    "n": 75,
-    "avg": 18.12,
-    "med": 7.82,
-    "win": 63,
-    "vs_nifty": 11.38
+    "n": 191,
+    "avg": 19.35,
+    "med": 11.76,
+    "win": 65,
+    "vs_nifty": 11.98
    },
    "last 1y": {
-    "n": 6,
-    "avg": 16.1,
-    "med": 15.44,
-    "win": 83,
-    "vs_nifty": 18.43
+    "n": 14,
+    "avg": 4.34,
+    "med": 1.25,
+    "win": 64,
+    "vs_nifty": 5.55
    },
    "last 3y": {
-    "n": 26,
-    "avg": 8.8,
-    "med": 5.86,
-    "win": 62,
-    "vs_nifty": 5.63
+    "n": 69,
+    "avg": 3.74,
+    "med": -2.01,
+    "win": 46,
+    "vs_nifty": 0.57
    },
    "last 5y": {
-    "n": 41,
-    "avg": 6.6,
-    "med": 0.95,
-    "win": 51,
-    "vs_nifty": 5.23
+    "n": 121,
+    "avg": 3.51,
+    "med": -2.44,
+    "win": 45,
+    "vs_nifty": 1.87
    },
    "bull": {
-    "n": 67,
-    "avg": 9.35,
-    "med": 6.84,
-    "win": 57,
-    "vs_nifty": 6.21
+    "n": 169,
+    "avg": 6.93,
+    "med": 1.5,
+    "win": 53,
+    "vs_nifty": 3.98
    },
    "bear": {
-    "n": 11,
-    "avg": 11.37,
-    "med": 3.52,
-    "win": 73,
-    "vs_nifty": 6.52
+    "n": 26,
+    "avg": 12.34,
+    "med": 1.25,
+    "win": 58,
+    "vs_nifty": 7.07
    },
    "ex-Covid": {
-    "n": 69,
-    "avg": 6.85,
-    "med": 4.71,
-    "win": 57,
-    "vs_nifty": 4.62
+    "n": 178,
+    "avg": 5.28,
+    "med": 1.23,
+    "win": 52,
+    "vs_nifty": 2.95
    },
    "train": {
-    "n": 43,
-    "avg": 11.21,
-    "med": 6.89,
-    "win": 63,
-    "vs_nifty": 6.73
+    "n": 86,
+    "avg": 13.48,
+    "med": 8.14,
+    "win": 64,
+    "vs_nifty": 8.68
    },
    "test": {
-    "n": 35,
-    "avg": 7.71,
-    "med": 2.2,
-    "win": 54,
-    "vs_nifty": 5.66
+    "n": 109,
+    "avg": 3.06,
+    "med": -2.44,
+    "win": 45,
+    "vs_nifty": 1.01
    },
-   "grade": "good",
+   "grade": "fair",
    "grade_train": "good",
+   "edge": 3.04,
    "years": {
     "2026": {
-     "n": 4,
-     "avg": 7.46,
-     "med": 7.98,
-     "win": 75,
-     "vs_nifty": 9.39
+     "n": 9,
+     "avg": 7.39,
+     "med": 1.54,
+     "win": 78,
+     "vs_nifty": 9.4
     },
     "2025": {
-     "n": 5,
-     "avg": 12.36,
-     "med": 8.03,
-     "win": 80,
-     "vs_nifty": 9.12
+     "n": 10,
+     "avg": -3.28,
+     "med": -7.93,
+     "win": 40,
+     "vs_nifty": -6.24
     },
     "2024": {
-     "n": 14,
-     "avg": 4.17,
-     "med": -1.4,
-     "win": 43,
-     "vs_nifty": 0.79
+     "n": 37,
+     "avg": 0.27,
+     "med": -3.24,
+     "win": 35,
+     "vs_nifty": -2.57
     },
     "2023": {
-     "n": 5,
-     "avg": 30.01,
-     "med": 13.02,
-     "win": 80,
-     "vs_nifty": 23.48
+     "n": 28,
+     "avg": 14.5,
+     "med": 9.07,
+     "win": 64,
+     "vs_nifty": 8.89
     },
     "2022": {
-     "n": 7,
-     "avg": -4.32,
-     "med": -14.45,
-     "win": 29,
-     "vs_nifty": -1.91
+     "n": 25,
+     "avg": -4.66,
+     "med": -6.81,
+     "win": 28,
+     "vs_nifty": -2.64
     },
     "2021": {
-     "n": 14,
-     "avg": 1.23,
-     "med": -2.24,
-     "win": 36,
-     "vs_nifty": -1.47
+     "n": 32,
+     "avg": 10.8,
+     "med": 6.6,
+     "win": 59,
+     "vs_nifty": 6.61
     },
     "2020": {
-     "n": 10,
-     "avg": 23.18,
-     "med": 23.79,
-     "win": 70,
-     "vs_nifty": 14.1
+     "n": 18,
+     "avg": 28.03,
+     "med": 8.71,
+     "win": 61,
+     "vs_nifty": 16.85
     },
     "2019": {
-     "n": 3,
-     "avg": -1.58,
-     "med": 1.5,
-     "win": 67,
-     "vs_nifty": -7.07
+     "n": 5,
+     "avg": -17.77,
+     "med": -9.76,
+     "win": 40,
+     "vs_nifty": -15.62
     },
     "2018": {
-     "n": 3,
-     "avg": -15.27,
-     "med": -27.24,
-     "win": 33,
-     "vs_nifty": -14.2
+     "n": 5,
+     "avg": -17.99,
+     "med": -25.32,
+     "win": 20,
+     "vs_nifty": -16.79
     },
     "2017": {
-     "n": 11,
-     "avg": 21.36,
-     "med": 10.69,
-     "win": 91,
-     "vs_nifty": 15.99
+     "n": 19,
+     "avg": 19.67,
+     "med": 15.22,
+     "win": 89,
+     "vs_nifty": 14.44
     },
     "2016": {
-     "n": 2,
-     "avg": 24.28,
-     "med": 24.28,
-     "win": 100,
-     "vs_nifty": 28.48
+     "n": 7,
+     "avg": 16.29,
+     "med": 18.77,
+     "win": 71,
+     "vs_nifty": 17.05
     }
    }
   },
   "rectangle": {
    "name": "Rectangle",
    "all": {
-    "n": 118,
-    "avg": 7.99,
-    "med": 6.41,
-    "win": 59,
-    "vs_nifty": 5.82
+    "n": 265,
+    "avg": 8.75,
+    "med": 5.23,
+    "win": 57,
+    "vs_nifty": 6.08
    },
    "all126": {
-    "n": 113,
-    "avg": 23.09,
-    "med": 15.37,
-    "win": 69,
-    "vs_nifty": 17.0
+    "n": 257,
+    "avg": 20.55,
+    "med": 10.28,
+    "win": 63,
+    "vs_nifty": 14.6
    },
    "last 1y": {
-    "n": 14,
-    "avg": -4.68,
-    "med": -3.5,
-    "win": 43,
-    "vs_nifty": -2.01
+    "n": 24,
+    "avg": 8.6,
+    "med": 6.09,
+    "win": 54,
+    "vs_nifty": 11.32
    },
    "last 3y": {
-    "n": 41,
-    "avg": 5.01,
-    "med": 8.33,
-    "win": 63,
-    "vs_nifty": 4.12
+    "n": 76,
+    "avg": 5.6,
+    "med": 3.51,
+    "win": 57,
+    "vs_nifty": 4.0
    },
    "last 5y": {
-    "n": 73,
-    "avg": 8.77,
-    "med": 7.5,
-    "win": 62,
-    "vs_nifty": 7.43
+    "n": 141,
+    "avg": 5.99,
+    "med": 2.55,
+    "win": 55,
+    "vs_nifty": 4.55
    },
    "bull": {
-    "n": 106,
-    "avg": 9.18,
-    "med": 6.82,
-    "win": 59,
-    "vs_nifty": 7.15
+    "n": 239,
+    "avg": 9.23,
+    "med": 5.48,
+    "win": 56,
+    "vs_nifty": 6.7
    },
    "bear": {
-    "n": 12,
-    "avg": -2.51,
-    "med": 3.28,
+    "n": 26,
+    "avg": 4.39,
+    "med": 3.21,
     "win": 58,
-    "vs_nifty": -5.92
+    "vs_nifty": 0.38
    },
    "ex-Covid": {
-    "n": 112,
-    "avg": 7.44,
-    "med": 6.06,
-    "win": 59,
-    "vs_nifty": 5.87
+    "n": 256,
+    "avg": 8.16,
+    "med": 4.24,
+    "win": 56,
+    "vs_nifty": 5.85
    },
    "train": {
-    "n": 47,
-    "avg": 5.7,
-    "med": 5.23,
-    "win": 53,
-    "vs_nifty": 2.42
+    "n": 133,
+    "avg": 10.62,
+    "med": 6.06,
+    "win": 56,
+    "vs_nifty": 6.99
    },
    "test": {
-    "n": 71,
-    "avg": 9.5,
-    "med": 8.33,
-    "win": 63,
-    "vs_nifty": 8.07
+    "n": 132,
+    "avg": 6.88,
+    "med": 2.94,
+    "win": 57,
+    "vs_nifty": 5.17
    },
    "grade": "good",
-   "grade_train": "fair",
+   "grade_train": "good",
+   "edge": 4.73,
    "years": {
     "2026": {
-     "n": 10,
-     "avg": -6.44,
-     "med": -3.5,
-     "win": 40,
-     "vs_nifty": -2.19
+     "n": 16,
+     "avg": 3.21,
+     "med": 1.23,
+     "win": 50,
+     "vs_nifty": 7.44
     },
     "2025": {
-     "n": 12,
-     "avg": 6.96,
+     "n": 20,
+     "avg": 10.98,
      "med": 6.12,
-     "win": 67,
-     "vs_nifty": 4.67
+     "win": 60,
+     "vs_nifty": 8.62
     },
     "2024": {
-     "n": 12,
-     "avg": 4.65,
-     "med": 10.83,
-     "win": 67,
-     "vs_nifty": 4.2
+     "n": 25,
+     "avg": 0.52,
+     "med": 0.51,
+     "win": 52,
+     "vs_nifty": -0.71
     },
     "2023": {
-     "n": 28,
-     "avg": 23.26,
-     "med": 15.81,
-     "win": 79,
-     "vs_nifty": 18.41
+     "n": 48,
+     "avg": 14.99,
+     "med": 7.92,
+     "win": 71,
+     "vs_nifty": 9.33
     },
     "2022": {
-     "n": 9,
-     "avg": -5.74,
-     "med": -13.53,
-     "win": 33,
-     "vs_nifty": -2.99
+     "n": 23,
+     "avg": -4.17,
+     "med": -9.6,
+     "win": 35,
+     "vs_nifty": -1.71
     },
     "2021": {
-     "n": 17,
-     "avg": 4.17,
-     "med": 5.6,
-     "win": 59,
-     "vs_nifty": -0.91
+     "n": 54,
+     "avg": 14.43,
+     "med": 8.6,
+     "win": 67,
+     "vs_nifty": 8.16
     },
     "2020": {
-     "n": 8,
-     "avg": 4.37,
-     "med": 2.59,
-     "win": 50,
-     "vs_nifty": 1.38
+     "n": 13,
+     "avg": 10.28,
+     "med": 9.11,
+     "win": 54,
+     "vs_nifty": 9.28
     },
     "2019": {
-     "n": 2,
-     "avg": -16.17,
-     "med": -16.17,
+     "n": 8,
+     "avg": -1.65,
+     "med": 3.0,
      "win": 50,
-     "vs_nifty": 3.85
+     "vs_nifty": 6.97
     },
     "2018": {
-     "n": 4,
-     "avg": -3.4,
-     "med": -2.4,
-     "win": 0,
-     "vs_nifty": -0.22
+     "n": 16,
+     "avg": -4.2,
+     "med": -9.4,
+     "win": 19,
+     "vs_nifty": -5.19
     },
     "2017": {
-     "n": 13,
-     "avg": 16.44,
-     "med": 8.14,
-     "win": 62,
-     "vs_nifty": 9.94
+     "n": 28,
+     "avg": 18.6,
+     "med": 15.7,
+     "win": 64,
+     "vs_nifty": 12.29
     },
     "2016": {
-     "n": 3,
-     "avg": -1.86,
-     "med": 5.23,
-     "win": 67,
-     "vs_nifty": -5.99
+     "n": 14,
+     "avg": 4.17,
+     "med": 0.67,
+     "win": 50,
+     "vs_nifty": 3.67
     }
    }
   },
   "wbot": {
    "name": "W bottom",
    "all": {
-    "n": 950,
-    "avg": 4.08,
-    "med": 1.94,
-    "win": 54,
-    "vs_nifty": 1.02
+    "n": 2343,
+    "avg": 1.68,
+    "med": -0.14,
+    "win": 50,
+    "vs_nifty": -0.92
    },
    "all126": {
-    "n": 903,
-    "avg": 5.35,
-    "med": 2.0,
-    "win": 54,
-    "vs_nifty": 1.86
+    "n": 2249,
+    "avg": 1.77,
+    "med": -2.17,
+    "win": 46,
+    "vs_nifty": -1.35
    },
    "last 1y": {
-    "n": 196,
-    "avg": 3.81,
-    "med": -0.11,
-    "win": 49,
-    "vs_nifty": 4.66
+    "n": 470,
+    "avg": 2.54,
+    "med": 0.34,
+    "win": 51,
+    "vs_nifty": 3.67
    },
    "last 3y": {
-    "n": 427,
-    "avg": 6.13,
-    "med": 3.69,
+    "n": 1151,
+    "avg": 4.49,
+    "med": 2.98,
     "win": 56,
-    "vs_nifty": 4.2
+    "vs_nifty": 2.57
    },
    "last 5y": {
-    "n": 611,
-    "avg": 5.13,
-    "med": 3.23,
-    "win": 56,
-    "vs_nifty": 2.97
+    "n": 1536,
+    "avg": 3.97,
+    "med": 2.35,
+    "win": 55,
+    "vs_nifty": 1.82
    },
    "bull": {
-    "n": 511,
-    "avg": -1.25,
-    "med": -2.75,
-    "win": 44,
-    "vs_nifty": -1.43
+    "n": 1306,
+    "avg": -3.39,
+    "med": -5.03,
+    "win": 39,
+    "vs_nifty": -2.98
    },
    "bear": {
-    "n": 439,
-    "avg": 10.27,
-    "med": 8.25,
-    "win": 66,
-    "vs_nifty": 3.86
+    "n": 1037,
+    "avg": 8.07,
+    "med": 6.54,
+    "win": 63,
+    "vs_nifty": 1.68
    },
    "ex-Covid": {
-    "n": 895,
-    "avg": 2.5,
-    "med": 0.76,
-    "win": 52,
-    "vs_nifty": 0.38
+    "n": 2238,
+    "avg": 0.66,
+    "med": -1.01,
+    "win": 48,
+    "vs_nifty": -1.23
    },
    "train": {
-    "n": 342,
-    "avg": 2.2,
-    "med": 0.45,
-    "win": 51,
-    "vs_nifty": -2.48
+    "n": 815,
+    "avg": -2.71,
+    "med": -5.19,
+    "win": 40,
+    "vs_nifty": -6.15
    },
    "test": {
-    "n": 608,
-    "avg": 5.13,
-    "med": 3.27,
-    "win": 56,
-    "vs_nifty": 2.98
+    "n": 1528,
+    "avg": 4.03,
+    "med": 2.45,
+    "win": 55,
+    "vs_nifty": 1.87
    },
-   "grade": "fair",
+   "grade": "poor",
    "grade_train": "poor",
+   "edge": -2.27,
    "years": {
     "2026": {
-     "n": 155,
-     "avg": 7.58,
-     "med": 3.23,
-     "win": 55,
-     "vs_nifty": 8.34
+     "n": 361,
+     "avg": 7.47,
+     "med": 4.47,
+     "win": 60,
+     "vs_nifty": 8.48
     },
     "2025": {
-     "n": 216,
-     "avg": 5.82,
-     "med": 5.06,
-     "win": 58,
-     "vs_nifty": 2.31
+     "n": 610,
+     "avg": 4.34,
+     "med": 3.48,
+     "win": 57,
+     "vs_nifty": 0.56
     },
     "2024": {
-     "n": 43,
-     "avg": -1.14,
-     "med": -4.26,
-     "win": 47,
-     "vs_nifty": -2.84
+     "n": 157,
+     "avg": -3.99,
+     "med": -6.63,
+     "win": 37,
+     "vs_nifty": -4.57
     },
     "2023": {
-     "n": 69,
-     "avg": 12.69,
-     "med": 10.09,
-     "win": 78,
-     "vs_nifty": 6.99
+     "n": 151,
+     "avg": 11.52,
+     "med": 7.32,
+     "win": 72,
+     "vs_nifty": 5.41
     },
     "2022": {
-     "n": 125,
-     "avg": -1.1,
-     "med": -1.87,
-     "win": 44,
-     "vs_nifty": -2.71
+     "n": 249,
+     "avg": -1.19,
+     "med": -2.17,
+     "win": 43,
+     "vs_nifty": -2.62
     },
     "2021": {
-     "n": 3,
-     "avg": 3.69,
-     "med": -9.12,
-     "win": 33,
-     "vs_nifty": 1.54
+     "n": 10,
+     "avg": -1.89,
+     "med": -9.22,
+     "win": 30,
+     "vs_nifty": -3.93
     },
     "2020": {
-     "n": 64,
-     "avg": 20.86,
-     "med": 19.43,
-     "win": 81,
-     "vs_nifty": 8.83
+     "n": 136,
+     "avg": 9.23,
+     "med": 14.33,
+     "win": 67,
+     "vs_nifty": 1.53
     },
     "2019": {
-     "n": 123,
-     "avg": -0.83,
-     "med": -0.42,
-     "win": 50,
-     "vs_nifty": -4.93
+     "n": 288,
+     "avg": -5.13,
+     "med": -6.3,
+     "win": 36,
+     "vs_nifty": -8.3
     },
     "2018": {
-     "n": 96,
-     "avg": -5.67,
-     "med": -6.81,
-     "win": 32,
-     "vs_nifty": -5.83
+     "n": 242,
+     "avg": -9.54,
+     "med": -10.44,
+     "win": 23,
+     "vs_nifty": -9.86
     },
     "2017": {
-     "n": 41,
-     "avg": 0.05,
-     "med": -1.8,
-     "win": 46,
-     "vs_nifty": -6.29
+     "n": 108,
+     "avg": 2.5,
+     "med": 0.46,
+     "win": 51,
+     "vs_nifty": -3.12
     },
     "2016": {
-     "n": 15,
-     "avg": 3.33,
+     "n": 31,
+     "avg": 2.17,
      "med": 1.98,
-     "win": 60,
-     "vs_nifty": 0.53
+     "win": 55,
+     "vs_nifty": -2.14
     }
    }
   },
   "tiltw": {
    "name": "Tilted W",
    "all": {
-    "n": 866,
-    "avg": 2.15,
-    "med": -0.24,
-    "win": 49,
-    "vs_nifty": -0.08
+    "n": 2071,
+    "avg": 1.13,
+    "med": -1.29,
+    "win": 47,
+    "vs_nifty": -0.9
    },
    "all126": {
-    "n": 808,
-    "avg": 5.81,
-    "med": 1.98,
-    "win": 53,
-    "vs_nifty": 1.59
+    "n": 1950,
+    "avg": 1.54,
+    "med": -2.69,
+    "win": 45,
+    "vs_nifty": -2.12
    },
    "last 1y": {
-    "n": 135,
-    "avg": 2.79,
-    "med": -3.21,
-    "win": 43,
-    "vs_nifty": 4.79
+    "n": 332,
+    "avg": 2.05,
+    "med": -4.01,
+    "win": 42,
+    "vs_nifty": 3.88
    },
    "last 3y": {
-    "n": 349,
-    "avg": 4.45,
-    "med": 1.35,
-    "win": 53,
-    "vs_nifty": 3.41
+    "n": 952,
+    "avg": 3.24,
+    "med": -0.23,
+    "win": 49,
+    "vs_nifty": 2.08
    },
    "last 5y": {
-    "n": 522,
-    "avg": 4.21,
-    "med": 1.68,
-    "win": 53,
-    "vs_nifty": 2.52
+    "n": 1316,
+    "avg": 3.25,
+    "med": -0.17,
+    "win": 50,
+    "vs_nifty": 1.63
    },
    "bull": {
-    "n": 547,
-    "avg": -0.99,
-    "med": -2.71,
-    "win": 43,
-    "vs_nifty": -0.7
+    "n": 1340,
+    "avg": -2.02,
+    "med": -4.14,
+    "win": 40,
+    "vs_nifty": -1.6
    },
    "bear": {
-    "n": 319,
-    "avg": 7.55,
-    "med": 3.93,
-    "win": 61,
-    "vs_nifty": 0.97
+    "n": 731,
+    "avg": 6.92,
+    "med": 4.16,
+    "win": 59,
+    "vs_nifty": 0.38
    },
    "ex-Covid": {
-    "n": 802,
-    "avg": 1.27,
-    "med": -1.0,
-    "win": 47,
-    "vs_nifty": 0.25
+    "n": 1954,
+    "avg": 0.41,
+    "med": -2.34,
+    "win": 45,
+    "vs_nifty": -0.72
    },
    "train": {
-    "n": 344,
-    "avg": -0.96,
-    "med": -3.25,
-    "win": 44,
-    "vs_nifty": -4.04
+    "n": 757,
+    "avg": -2.58,
+    "med": -4.31,
+    "win": 41,
+    "vs_nifty": -5.31
    },
    "test": {
-    "n": 522,
-    "avg": 4.21,
-    "med": 1.68,
-    "win": 53,
-    "vs_nifty": 2.52
+    "n": 1314,
+    "avg": 3.28,
+    "med": -0.14,
+    "win": 50,
+    "vs_nifty": 1.64
    },
    "grade": "poor",
    "grade_train": "poor",
+   "edge": -2.25,
    "years": {
     "2026": {
-     "n": 113,
-     "avg": 4.71,
-     "med": -1.27,
-     "win": 45,
-     "vs_nifty": 6.77
+     "n": 275,
+     "avg": 4.65,
+     "med": -2.37,
+     "win": 46,
+     "vs_nifty": 6.42
     },
     "2025": {
-     "n": 180,
-     "avg": 4.63,
-     "med": 3.46,
-     "win": 59,
-     "vs_nifty": 2.56
+     "n": 506,
+     "avg": 3.44,
+     "med": 1.74,
+     "win": 54,
+     "vs_nifty": 1.2
     },
     "2024": {
-     "n": 42,
-     "avg": 3.94,
-     "med": -0.47,
-     "win": 45,
-     "vs_nifty": 0.91
+     "n": 144,
+     "avg": 0.11,
+     "med": -3.9,
+     "win": 40,
+     "vs_nifty": -1.67
     },
     "2023": {
-     "n": 68,
-     "avg": 10.51,
-     "med": 8.75,
-     "win": 68,
-     "vs_nifty": 4.95
+     "n": 155,
+     "avg": 9.52,
+     "med": 5.62,
+     "win": 64,
+     "vs_nifty": 4.25
     },
     "2022": {
-     "n": 119,
-     "avg": -0.41,
-     "med": -1.58,
-     "win": 47,
-     "vs_nifty": -2.39
+     "n": 234,
+     "avg": -0.89,
+     "med": -3.37,
+     "win": 42,
+     "vs_nifty": -2.7
     },
     "2021": {
-     "n": 1,
-     "avg": -10.83,
-     "med": -10.83,
-     "win": 0,
-     "vs_nifty": -21.82
+     "n": 8,
+     "avg": 0.41,
+     "med": -6.12,
+     "win": 25,
+     "vs_nifty": -4.14
     },
     "2020": {
-     "n": 74,
-     "avg": 6.52,
-     "med": 5.14,
-     "win": 66,
-     "vs_nifty": -4.91
+     "n": 160,
+     "avg": 0.2,
+     "med": 2.72,
+     "win": 56,
+     "vs_nifty": -5.38
     },
     "2019": {
-     "n": 130,
-     "avg": -0.74,
-     "med": -3.08,
-     "win": 43,
-     "vs_nifty": -1.99
+     "n": 280,
+     "avg": -2.76,
+     "med": -5.09,
+     "win": 39,
+     "vs_nifty": -5.28
     },
     "2018": {
-     "n": 87,
-     "avg": -8.02,
-     "med": -8.87,
-     "win": 26,
-     "vs_nifty": -7.07
+     "n": 180,
+     "avg": -10.07,
+     "med": -11.1,
+     "win": 23,
+     "vs_nifty": -10.11
     },
     "2017": {
-     "n": 34,
-     "avg": 3.19,
-     "med": 3.21,
-     "win": 53,
-     "vs_nifty": -1.02
+     "n": 84,
+     "avg": 6.19,
+     "med": 4.77,
+     "win": 58,
+     "vs_nifty": 0.84
     },
     "2016": {
-     "n": 18,
-     "avg": -6.43,
-     "med": -8.36,
-     "win": 22,
-     "vs_nifty": -5.38
+     "n": 45,
+     "avg": 1.71,
+     "med": -4.5,
+     "win": 44,
+     "vs_nifty": 2.29
     }
    }
   },
   "triple": {
    "name": "Triple bottom",
    "all": {
-    "n": 237,
-    "avg": 3.41,
-    "med": 1.88,
-    "win": 55,
-    "vs_nifty": 0.64
+    "n": 584,
+    "avg": 2.45,
+    "med": 1.27,
+    "win": 53,
+    "vs_nifty": 0.71
    },
    "all126": {
-    "n": 226,
-    "avg": 7.31,
-    "med": 2.66,
-    "win": 55,
-    "vs_nifty": 3.95
+    "n": 561,
+    "avg": 3.83,
+    "med": -0.64,
+    "win": 49,
+    "vs_nifty": 0.94
    },
    "last 1y": {
-    "n": 43,
-    "avg": 2.02,
-    "med": -1.51,
-    "win": 49,
-    "vs_nifty": 3.55
+    "n": 104,
+    "avg": 5.13,
+    "med": 1.98,
+    "win": 56,
+    "vs_nifty": 6.25
    },
    "last 3y": {
-    "n": 90,
-    "avg": 4.18,
-    "med": 1.9,
-    "win": 56,
-    "vs_nifty": 2.6
+    "n": 290,
+    "avg": 5.49,
+    "med": 3.83,
+    "win": 58,
+    "vs_nifty": 4.01
    },
    "last 5y": {
-    "n": 144,
-    "avg": 4.54,
-    "med": 2.9,
+    "n": 390,
+    "avg": 5.21,
+    "med": 3.57,
     "win": 58,
-    "vs_nifty": 1.98
+    "vs_nifty": 2.98
    },
    "bull": {
-    "n": 158,
-    "avg": 0.91,
-    "med": 0.17,
-    "win": 51,
-    "vs_nifty": -0.1
+    "n": 395,
+    "avg": -0.53,
+    "med": -2.26,
+    "win": 46,
+    "vs_nifty": -0.38
    },
    "bear": {
-    "n": 79,
-    "avg": 8.41,
-    "med": 5.58,
-    "win": 63,
-    "vs_nifty": 2.12
+    "n": 189,
+    "avg": 8.67,
+    "med": 7.09,
+    "win": 66,
+    "vs_nifty": 2.99
    },
    "ex-Covid": {
-    "n": 218,
-    "avg": 2.02,
-    "med": 1.02,
-    "win": 53,
-    "vs_nifty": 0.12
+    "n": 550,
+    "avg": 1.76,
+    "med": 0.81,
+    "win": 51,
+    "vs_nifty": 0.61
    },
    "train": {
-    "n": 93,
-    "avg": 1.67,
-    "med": -0.55,
-    "win": 49,
-    "vs_nifty": -1.43
+    "n": 194,
+    "avg": -3.1,
+    "med": -5.2,
+    "win": 41,
+    "vs_nifty": -3.85
    },
    "test": {
-    "n": 144,
-    "avg": 4.54,
-    "med": 2.9,
+    "n": 390,
+    "avg": 5.21,
+    "med": 3.57,
     "win": 58,
-    "vs_nifty": 1.98
+    "vs_nifty": 2.98
    },
-   "grade": "fair",
+   "grade": "poor",
    "grade_train": "poor",
+   "edge": -0.64,
    "years": {
     "2026": {
-     "n": 34,
-     "avg": 3.37,
-     "med": 0.11,
-     "win": 50,
-     "vs_nifty": 5.16
+     "n": 89,
+     "avg": 6.51,
+     "med": 5.32,
+     "win": 57,
+     "vs_nifty": 7.89
     },
     "2025": {
-     "n": 46,
-     "avg": 3.95,
-     "med": 3.31,
-     "win": 61,
-     "vs_nifty": 0.89
+     "n": 166,
+     "avg": 5.6,
+     "med": 4.93,
+     "win": 60,
+     "vs_nifty": 3.0
     },
     "2024": {
-     "n": 5,
-     "avg": 12.97,
-     "med": 2.09,
-     "win": 60,
-     "vs_nifty": 7.72
+     "n": 26,
+     "avg": -0.28,
+     "med": -1.61,
+     "win": 46,
+     "vs_nifty": -2.64
     },
     "2023": {
-     "n": 29,
-     "avg": 10.28,
-     "med": 7.11,
-     "win": 76,
-     "vs_nifty": 4.21
+     "n": 55,
+     "avg": 8.86,
+     "med": 6.27,
+     "win": 69,
+     "vs_nifty": 2.32
     },
     "2022": {
-     "n": 30,
-     "avg": -0.18,
-     "med": -0.21,
-     "win": 47,
-     "vs_nifty": -3.06
+     "n": 54,
+     "avg": 0.77,
+     "med": -0.11,
+     "win": 48,
+     "vs_nifty": -1.78
     },
     "2020": {
-     "n": 22,
-     "avg": 11.25,
-     "med": 14.68,
-     "win": 68,
-     "vs_nifty": 3.73
+     "n": 49,
+     "avg": -1.73,
+     "med": 0.81,
+     "win": 51,
+     "vs_nifty": -1.64
     },
     "2019": {
-     "n": 37,
-     "avg": -0.57,
-     "med": -0.79,
-     "win": 46,
-     "vs_nifty": -3.08
+     "n": 70,
+     "avg": -3.96,
+     "med": -3.98,
+     "win": 40,
+     "vs_nifty": -5.28
     },
     "2018": {
-     "n": 18,
-     "avg": -6.56,
-     "med": -6.55,
-     "win": 39,
-     "vs_nifty": -5.22
+     "n": 37,
+     "avg": -9.77,
+     "med": -9.54,
+     "win": 27,
+     "vs_nifty": -8.02
     },
     "2017": {
-     "n": 10,
-     "avg": 0.19,
-     "med": -6.71,
-     "win": 40,
-     "vs_nifty": -4.46
+     "n": 26,
+     "avg": 2.51,
+     "med": -5.76,
+     "win": 38,
+     "vs_nifty": -1.88
     },
     "2016": {
-     "n": 6,
-     "avg": 7.45,
-     "med": 3.07,
-     "win": 50,
-     "vs_nifty": 6.16
+     "n": 12,
+     "avg": 4.74,
+     "med": 6.07,
+     "win": 58,
+     "vs_nifty": 4.05
     }
    }
   },
   "ihs": {
    "name": "Inverse H&S",
    "all": {
-    "n": 101,
-    "avg": 4.3,
-    "med": 0.43,
-    "win": 50,
-    "vs_nifty": 0.2
+    "n": 224,
+    "avg": 0.64,
+    "med": -1.42,
+    "win": 48,
+    "vs_nifty": -2.3
    },
    "all126": {
-    "n": 87,
-    "avg": 12.3,
-    "med": 6.04,
-    "win": 59,
-    "vs_nifty": 4.06
+    "n": 190,
+    "avg": 3.42,
+    "med": -0.36,
+    "win": 50,
+    "vs_nifty": -2.65
    },
    "last 1y": {
-    "n": 19,
-    "avg": -2.93,
+    "n": 55,
+    "avg": -2.58,
     "med": -3.87,
     "win": 42,
-    "vs_nifty": -1.44
+    "vs_nifty": -0.57
    },
    "last 3y": {
-    "n": 34,
-    "avg": 0.55,
-    "med": -1.84,
-    "win": 47,
-    "vs_nifty": 0.24
+    "n": 93,
+    "avg": 0.24,
+    "med": -0.14,
+    "win": 49,
+    "vs_nifty": 0.03
    },
    "last 5y": {
-    "n": 55,
-    "avg": 3.55,
-    "med": 0.43,
-    "win": 51,
-    "vs_nifty": 2.41
+    "n": 147,
+    "avg": 1.03,
+    "med": 0.09,
+    "win": 50,
+    "vs_nifty": -0.49
    },
    "bull": {
-    "n": 59,
-    "avg": 0.46,
-    "med": -2.05,
-    "win": 41,
-    "vs_nifty": -0.42
+    "n": 131,
+    "avg": -3.41,
+    "med": -3.95,
+    "win": 39,
+    "vs_nifty": -4.01
    },
    "bear": {
-    "n": 42,
-    "avg": 9.7,
-    "med": 6.51,
-    "win": 64,
-    "vs_nifty": 1.07
+    "n": 93,
+    "avg": 6.36,
+    "med": 4.71,
+    "win": 60,
+    "vs_nifty": 0.11
    },
    "ex-Covid": {
-    "n": 81,
-    "avg": 0.99,
-    "med": -1.78,
-    "win": 46,
-    "vs_nifty": 0.1
+    "n": 198,
+    "avg": -1.32,
+    "med": -2.71,
+    "win": 45,
+    "vs_nifty": -2.41
    },
    "train": {
-    "n": 46,
-    "avg": 5.19,
-    "med": 0.73,
-    "win": 50,
-    "vs_nifty": -2.44
+    "n": 77,
+    "avg": -0.09,
+    "med": -2.74,
+    "win": 43,
+    "vs_nifty": -5.75
    },
    "test": {
-    "n": 55,
-    "avg": 3.55,
-    "med": 0.43,
-    "win": 51,
-    "vs_nifty": 2.41
+    "n": 147,
+    "avg": 1.03,
+    "med": 0.09,
+    "win": 50,
+    "vs_nifty": -0.49
    },
-   "grade": "fair",
+   "grade": "poor",
    "grade_train": "poor",
+   "edge": -3.65,
    "years": {
     "2026": {
-     "n": 19,
-     "avg": -2.93,
-     "med": -3.87,
-     "win": 42,
-     "vs_nifty": -1.44
+     "n": 51,
+     "avg": -0.77,
+     "med": -2.88,
+     "win": 45,
+     "vs_nifty": 0.52
     },
     "2025": {
-     "n": 10,
-     "avg": 3.53,
-     "med": -0.6,
-     "win": 50,
-     "vs_nifty": 2.01
+     "n": 29,
+     "avg": 2.37,
+     "med": 4.47,
+     "win": 55,
+     "vs_nifty": 1.63
     },
     "2024": {
-     "n": 2,
-     "avg": -2.04,
-     "med": -2.04,
-     "win": 50,
-     "vs_nifty": -4.93
+     "n": 6,
+     "avg": -8.85,
+     "med": -10.77,
+     "win": 33,
+     "vs_nifty": -11.52
     },
     "2023": {
-     "n": 12,
-     "avg": 15.92,
-     "med": 6.71,
-     "win": 67,
-     "vs_nifty": 12.47
+     "n": 33,
+     "avg": 6.89,
+     "med": 2.25,
+     "win": 61,
+     "vs_nifty": 1.65
     },
     "2022": {
-     "n": 12,
-     "avg": 2.4,
-     "med": 0.49,
-     "win": 50,
-     "vs_nifty": 0.02
+     "n": 28,
+     "avg": -1.89,
+     "med": -5.01,
+     "win": 46,
+     "vs_nifty": -4.71
     },
     "2020": {
-     "n": 21,
-     "avg": 16.58,
-     "med": 11.77,
-     "win": 67,
-     "vs_nifty": 1.5
+     "n": 31,
+     "avg": 9.54,
+     "med": 3.24,
+     "win": 58,
+     "vs_nifty": -0.89
     },
     "2019": {
-     "n": 16,
-     "avg": -4.27,
-     "med": -2.78,
-     "win": 44,
-     "vs_nifty": -5.48
+     "n": 29,
+     "avg": -5.89,
+     "med": -3.27,
+     "win": 41,
+     "vs_nifty": -8.44
     },
     "2018": {
-     "n": 6,
-     "avg": -5.13,
-     "med": -4.58,
-     "win": 33,
-     "vs_nifty": -7.07
+     "n": 10,
+     "avg": -10.51,
+     "med": -6.26,
+     "win": 20,
+     "vs_nifty": -12.14
     },
     "2017": {
-     "n": 2,
-     "avg": -4.31,
+     "n": 4,
+     "avg": -5.49,
      "med": -4.31,
      "win": 0,
-     "vs_nifty": -8.21
+     "vs_nifty": -10.8
     },
     "2016": {
-     "n": 1,
-     "avg": -1.78,
+     "n": 3,
+     "avg": -1.45,
      "med": -1.78,
-     "win": 0,
-     "vs_nifty": 2.5
+     "win": 33,
+     "vs_nifty": -1.92
     }
    }
   },
   "retest": {
    "name": "Breakout retest",
    "all": {
-    "n": 973,
-    "avg": 5.85,
-    "med": 2.97,
-    "win": 58,
-    "vs_nifty": 3.92
+    "n": 1610,
+    "avg": 4.63,
+    "med": 1.69,
+    "win": 54,
+    "vs_nifty": 2.51
    },
    "all126": {
-    "n": 913,
-    "avg": 13.61,
-    "med": 7.82,
-    "win": 63,
-    "vs_nifty": 7.91
+    "n": 1503,
+    "avg": 10.74,
+    "med": 4.68,
+    "win": 58,
+    "vs_nifty": 5.0
    },
    "last 1y": {
-    "n": 169,
-    "avg": 3.74,
-    "med": 2.47,
-    "win": 56,
-    "vs_nifty": 4.64
+    "n": 275,
+    "avg": 3.05,
+    "med": -0.01,
+    "win": 50,
+    "vs_nifty": 4.0
    },
    "last 3y": {
-    "n": 386,
-    "avg": 5.71,
-    "med": 2.18,
-    "win": 56,
-    "vs_nifty": 4.21
+    "n": 701,
+    "avg": 3.45,
+    "med": -0.27,
+    "win": 49,
+    "vs_nifty": 1.88
    },
    "last 5y": {
-    "n": 620,
-    "avg": 6.0,
-    "med": 2.76,
-    "win": 58,
-    "vs_nifty": 4.45
+    "n": 1090,
+    "avg": 4.63,
+    "med": 1.0,
+    "win": 52,
+    "vs_nifty": 2.99
    },
    "bull": {
-    "n": 825,
-    "avg": 5.87,
-    "med": 2.93,
-    "win": 59,
-    "vs_nifty": 4.06
+    "n": 1359,
+    "avg": 4.67,
+    "med": 1.91,
+    "win": 55,
+    "vs_nifty": 2.54
    },
    "bear": {
-    "n": 148,
-    "avg": 5.71,
-    "med": 3.2,
-    "win": 57,
-    "vs_nifty": 3.13
+    "n": 251,
+    "avg": 4.4,
+    "med": 0.41,
+    "win": 51,
+    "vs_nifty": 2.36
    },
    "ex-Covid": {
-    "n": 880,
-    "avg": 5.02,
-    "med": 2.16,
-    "win": 56,
-    "vs_nifty": 3.94
+    "n": 1487,
+    "avg": 3.99,
+    "med": 0.96,
+    "win": 52,
+    "vs_nifty": 2.58
    },
    "train": {
-    "n": 382,
-    "avg": 4.98,
-    "med": 2.58,
-    "win": 58,
-    "vs_nifty": 2.79
+    "n": 554,
+    "avg": 4.21,
+    "med": 2.32,
+    "win": 56,
+    "vs_nifty": 1.41
    },
    "test": {
-    "n": 591,
-    "avg": 6.41,
-    "med": 3.29,
-    "win": 59,
-    "vs_nifty": 4.66
+    "n": 1056,
+    "avg": 4.84,
+    "med": 1.29,
+    "win": 53,
+    "vs_nifty": 3.09
    },
-   "grade": "good",
-   "grade_train": "good",
+   "grade": "fair",
+   "grade_train": "fair",
+   "edge": 1.16,
    "years": {
     "2026": {
-     "n": 108,
-     "avg": 3.58,
-     "med": 1.81,
-     "win": 55,
-     "vs_nifty": 5.06
+     "n": 186,
+     "avg": 4.2,
+     "med": -0.08,
+     "win": 49,
+     "vs_nifty": 5.53
     },
     "2025": {
-     "n": 134,
-     "avg": 3.71,
-     "med": 0.25,
-     "win": 52,
-     "vs_nifty": 2.27
+     "n": 199,
+     "avg": -0.3,
+     "med": -2.34,
+     "win": 43,
+     "vs_nifty": -1.82
     },
     "2024": {
-     "n": 93,
-     "avg": 5.02,
-     "med": 1.39,
-     "win": 57,
-     "vs_nifty": 3.57
+     "n": 219,
+     "avg": 1.57,
+     "med": -1.61,
+     "win": 47,
+     "vs_nifty": 0.61
     },
     "2023": {
-     "n": 177,
-     "avg": 13.85,
-     "med": 8.41,
-     "win": 75,
-     "vs_nifty": 9.08
+     "n": 314,
+     "avg": 12.86,
+     "med": 8.38,
+     "win": 70,
+     "vs_nifty": 8.0
     },
     "2022": {
-     "n": 79,
-     "avg": -0.17,
-     "med": -3.8,
+     "n": 138,
+     "avg": 0.09,
+     "med": -3.56,
      "win": 43,
-     "vs_nifty": -0.51
+     "vs_nifty": -0.37
     },
     "2021": {
-     "n": 106,
-     "avg": 9.9,
-     "med": 3.33,
-     "win": 59,
-     "vs_nifty": 6.22
+     "n": 171,
+     "avg": 9.75,
+     "med": 3.83,
+     "win": 61,
+     "vs_nifty": 4.68
     },
     "2020": {
-     "n": 115,
-     "avg": 5.79,
-     "med": 9.19,
-     "win": 63,
-     "vs_nifty": 2.45
+     "n": 153,
+     "avg": 4.79,
+     "med": 8.66,
+     "win": 62,
+     "vs_nifty": 0.91
     },
     "2019": {
-     "n": 73,
-     "avg": 1.94,
-     "med": 0.97,
-     "win": 53,
-     "vs_nifty": 3.38
+     "n": 83,
+     "avg": 1.31,
+     "med": 1.27,
+     "win": 54,
+     "vs_nifty": 2.39
     },
     "2018": {
-     "n": 42,
-     "avg": -5.01,
-     "med": -4.19,
-     "win": 33,
-     "vs_nifty": -5.16
+     "n": 70,
+     "avg": -7.2,
+     "med": -5.94,
+     "win": 29,
+     "vs_nifty": -6.27
     },
     "2017": {
-     "n": 46,
-     "avg": 5.54,
-     "med": 3.68,
-     "win": 70,
-     "vs_nifty": 2.02
+     "n": 77,
+     "avg": 4.27,
+     "med": 2.14,
+     "win": 57,
+     "vs_nifty": 1.1
     }
    }
   },
   "emalift": {
    "name": "EMA 9 lift-off",
    "all": {
-    "n": 26907,
-    "avg": 5.09,
-    "med": 1.94,
-    "win": 54,
-    "vs_nifty": 2.55
+    "n": 49638,
+    "avg": 3.47,
+    "med": 0.02,
+    "win": 50,
+    "vs_nifty": 1.06
    },
    "all126": {
-    "n": 25915,
-    "avg": 11.86,
-    "med": 5.54,
-    "win": 58,
-    "vs_nifty": 6.43
+    "n": 47665,
+    "avg": 8.32,
+    "med": 1.64,
+    "win": 52,
+    "vs_nifty": 3.12
    },
    "last 1y": {
-    "n": 3693,
-    "avg": 1.14,
-    "med": -2.13,
-    "win": 45,
-    "vs_nifty": 3.43
+    "n": 7334,
+    "avg": -0.32,
+    "med": -3.93,
+    "win": 42,
+    "vs_nifty": 1.8
    },
    "last 3y": {
-    "n": 10485,
-    "avg": 4.37,
-    "med": 0.8,
-    "win": 52,
-    "vs_nifty": 3.08
+    "n": 22014,
+    "avg": 2.37,
+    "med": -1.45,
+    "win": 47,
+    "vs_nifty": 0.96
    },
    "last 5y": {
-    "n": 16214,
-    "avg": 4.73,
-    "med": 1.24,
-    "win": 53,
-    "vs_nifty": 3.42
+    "n": 32470,
+    "avg": 2.86,
+    "med": -0.79,
+    "win": 48,
+    "vs_nifty": 1.54
    },
    "bull": {
-    "n": 20470,
-    "avg": 3.65,
-    "med": 0.45,
-    "win": 51,
-    "vs_nifty": 2.18
+    "n": 38270,
+    "avg": 2.01,
+    "med": -1.55,
+    "win": 47,
+    "vs_nifty": 0.49
    },
    "bear": {
-    "n": 6437,
-    "avg": 9.68,
-    "med": 6.8,
-    "win": 65,
-    "vs_nifty": 3.71
+    "n": 11368,
+    "avg": 8.39,
+    "med": 5.32,
+    "win": 61,
+    "vs_nifty": 2.97
    },
    "ex-Covid": {
-    "n": 25220,
-    "avg": 4.02,
-    "med": 1.08,
-    "win": 53,
-    "vs_nifty": 2.38
+    "n": 47082,
+    "avg": 2.56,
+    "med": -0.71,
+    "win": 48,
+    "vs_nifty": 0.88
    },
    "train": {
-    "n": 11816,
-    "avg": 5.12,
-    "med": 2.34,
-    "win": 55,
-    "vs_nifty": 1.28
+    "n": 19337,
+    "avg": 4.12,
+    "med": 0.75,
+    "win": 52,
+    "vs_nifty": 0.34
    },
    "test": {
-    "n": 15091,
-    "avg": 5.07,
-    "med": 1.69,
-    "win": 54,
-    "vs_nifty": 3.54
+    "n": 30301,
+    "avg": 3.05,
+    "med": -0.42,
+    "win": 49,
+    "vs_nifty": 1.52
    },
-   "grade": "fair",
-   "grade_train": "fair",
+   "grade": "poor",
+   "grade_train": "poor",
+   "edge": -0.29,
    "years": {
     "2026": {
-     "n": 2363,
-     "avg": 5.72,
-     "med": 1.63,
-     "win": 54,
-     "vs_nifty": 7.8
+     "n": 4668,
+     "avg": 5.71,
+     "med": 1.36,
+     "win": 53,
+     "vs_nifty": 7.66
     },
     "2025": {
-     "n": 3814,
-     "avg": 0.82,
-     "med": -0.93,
-     "win": 48,
-     "vs_nifty": -0.38
+     "n": 7702,
+     "avg": -2.25,
+     "med": -4.26,
+     "win": 41,
+     "vs_nifty": -3.58
     },
     "2024": {
-     "n": 3190,
-     "avg": 3.9,
-     "med": -0.67,
-     "win": 49,
-     "vs_nifty": 2.7
+     "n": 7292,
+     "avg": 1.82,
+     "med": -3.06,
+     "win": 44,
+     "vs_nifty": 0.56
     },
     "2023": {
-     "n": 2875,
-     "avg": 15.09,
-     "med": 10.98,
-     "win": 75,
-     "vs_nifty": 9.02
+     "n": 5541,
+     "avg": 12.94,
+     "med": 8.81,
+     "win": 69,
+     "vs_nifty": 6.89
     },
     "2022": {
-     "n": 2849,
-     "avg": 1.43,
-     "med": -0.97,
-     "win": 47,
-     "vs_nifty": 0.67
+     "n": 5098,
+     "avg": -0.35,
+     "med": -2.86,
+     "win": 43,
+     "vs_nifty": -0.86
     },
     "2021": {
-     "n": 2610,
-     "avg": 9.23,
-     "med": 4.13,
-     "win": 59,
-     "vs_nifty": 5.8
+     "n": 4803,
+     "avg": 9.19,
+     "med": 3.26,
+     "win": 56,
+     "vs_nifty": 5.87
     },
     "2020": {
-     "n": 1902,
-     "avg": 15.38,
-     "med": 14.5,
-     "win": 74,
-     "vs_nifty": 3.99
+     "n": 2855,
+     "avg": 14.91,
+     "med": 13.03,
+     "win": 72,
+     "vs_nifty": 3.41
     },
     "2019": {
-     "n": 2058,
-     "avg": -2.16,
-     "med": -1.7,
-     "win": 47,
-     "vs_nifty": -1.82
+     "n": 2830,
+     "avg": -4.07,
+     "med": -3.55,
+     "win": 43,
+     "vs_nifty": -3.62
     },
     "2018": {
-     "n": 2156,
-     "avg": -4.91,
-     "med": -5.63,
-     "win": 34,
-     "vs_nifty": -6.76
+     "n": 3536,
+     "avg": -7.68,
+     "med": -8.39,
+     "win": 29,
+     "vs_nifty": -9.53
     },
     "2017": {
-     "n": 2052,
-     "avg": 7.44,
-     "med": 4.08,
-     "win": 60,
-     "vs_nifty": 3.16
+     "n": 3589,
+     "avg": 6.35,
+     "med": 2.94,
+     "win": 56,
+     "vs_nifty": 2.09
     },
     "2016": {
-     "n": 1038,
-     "avg": 6.69,
-     "med": 4.48,
-     "win": 61,
-     "vs_nifty": 4.05
+     "n": 1724,
+     "avg": 5.11,
+     "med": 2.53,
+     "win": 56,
+     "vs_nifty": 2.93
     }
    }
   },
   "stack": {
    "name": "MA stack",
    "all": {
-    "n": 6671,
-    "avg": 7.5,
-    "med": 4.22,
-    "win": 59,
-    "vs_nifty": 4.79
+    "n": 13718,
+    "avg": 5.65,
+    "med": 1.71,
+    "win": 53,
+    "vs_nifty": 2.78
    },
    "all126": {
-    "n": 6464,
-    "avg": 16.25,
-    "med": 9.32,
-    "win": 63,
-    "vs_nifty": 10.7
+    "n": 13232,
+    "avg": 12.56,
+    "med": 5.37,
+    "win": 57,
+    "vs_nifty": 6.77
    },
    "last 1y": {
-    "n": 718,
-    "avg": 2.44,
-    "med": -1.41,
-    "win": 48,
-    "vs_nifty": 3.96
+    "n": 1377,
+    "avg": 1.59,
+    "med": -2.97,
+    "win": 45,
+    "vs_nifty": 2.96
    },
    "last 3y": {
-    "n": 2360,
-    "avg": 6.09,
-    "med": 2.48,
-    "win": 55,
-    "vs_nifty": 3.9
+    "n": 5177,
+    "avg": 3.77,
+    "med": -0.29,
+    "win": 49,
+    "vs_nifty": 1.41
    },
    "last 5y": {
-    "n": 3754,
-    "avg": 7.01,
-    "med": 3.22,
-    "win": 56,
-    "vs_nifty": 5.44
+    "n": 8094,
+    "avg": 4.65,
+    "med": 0.58,
+    "win": 51,
+    "vs_nifty": 3.01
    },
    "bull": {
-    "n": 5930,
-    "avg": 7.44,
-    "med": 4.18,
-    "win": 58,
-    "vs_nifty": 4.87
+    "n": 12274,
+    "avg": 5.54,
+    "med": 1.58,
+    "win": 53,
+    "vs_nifty": 2.7
    },
    "bear": {
-    "n": 741,
-    "avg": 7.97,
-    "med": 4.3,
-    "win": 60,
-    "vs_nifty": 4.16
+    "n": 1444,
+    "avg": 6.65,
+    "med": 3.14,
+    "win": 56,
+    "vs_nifty": 3.55
    },
    "ex-Covid": {
-    "n": 6164,
-    "avg": 6.51,
-    "med": 3.34,
-    "win": 57,
-    "vs_nifty": 4.61
+    "n": 12813,
+    "avg": 4.89,
+    "med": 1.08,
+    "win": 52,
+    "vs_nifty": 2.7
    },
    "train": {
-    "n": 3178,
-    "avg": 7.79,
-    "med": 4.75,
-    "win": 60,
-    "vs_nifty": 4.08
+    "n": 6180,
+    "avg": 6.83,
+    "med": 2.69,
+    "win": 56,
+    "vs_nifty": 2.74
    },
    "test": {
-    "n": 3493,
-    "avg": 7.24,
-    "med": 3.69,
-    "win": 57,
-    "vs_nifty": 5.44
+    "n": 7538,
+    "avg": 4.69,
+    "med": 0.81,
+    "win": 51,
+    "vs_nifty": 2.82
    },
-   "grade": "good",
+   "grade": "fair",
    "grade_train": "good",
+   "edge": 1.43,
    "years": {
     "2026": {
-     "n": 445,
-     "avg": 4.96,
-     "med": 0.86,
-     "win": 51,
-     "vs_nifty": 7.16
+     "n": 864,
+     "avg": 6.18,
+     "med": 1.45,
+     "win": 53,
+     "vs_nifty": 8.18
     },
     "2025": {
-     "n": 584,
-     "avg": 0.1,
-     "med": -1.97,
-     "win": 46,
-     "vs_nifty": -0.8
+     "n": 1057,
+     "avg": -3.01,
+     "med": -5.47,
+     "win": 38,
+     "vs_nifty": -3.98
     },
     "2024": {
-     "n": 917,
-     "avg": 6.53,
-     "med": 3.04,
-     "win": 55,
-     "vs_nifty": 4.1
+     "n": 2230,
+     "avg": 2.49,
+     "med": -1.55,
+     "win": 47,
+     "vs_nifty": 0.5
     },
     "2023": {
-     "n": 926,
-     "avg": 16.93,
-     "med": 12.13,
-     "win": 76,
-     "vs_nifty": 11.1
+     "n": 2053,
+     "avg": 13.41,
+     "med": 9.27,
+     "win": 68,
+     "vs_nifty": 7.54
     },
     "2022": {
-     "n": 621,
-     "avg": 2.18,
-     "med": -1.12,
-     "win": 47,
-     "vs_nifty": 3.61
+     "n": 1334,
+     "avg": 0.07,
+     "med": -3.75,
+     "win": 43,
+     "vs_nifty": 1.35
     },
     "2021": {
-     "n": 839,
-     "avg": 9.97,
-     "med": 5.03,
-     "win": 60,
-     "vs_nifty": 4.75
+     "n": 1890,
+     "avg": 10.52,
+     "med": 4.51,
+     "win": 59,
+     "vs_nifty": 4.92
     },
     "2020": {
-     "n": 615,
-     "avg": 11.82,
-     "med": 9.77,
-     "win": 66,
-     "vs_nifty": 5.9
+     "n": 1065,
+     "avg": 10.14,
+     "med": 7.23,
+     "win": 62,
+     "vs_nifty": 3.27
     },
     "2019": {
-     "n": 363,
-     "avg": 1.95,
-     "med": 0.86,
-     "win": 53,
-     "vs_nifty": 2.22
+     "n": 493,
+     "avg": 0.23,
+     "med": -0.76,
+     "win": 48,
+     "vs_nifty": 0.35
     },
     "2018": {
-     "n": 315,
-     "avg": -4.52,
-     "med": -6.07,
-     "win": 34,
-     "vs_nifty": -5.33
+     "n": 572,
+     "avg": -7.89,
+     "med": -9.4,
+     "win": 28,
+     "vs_nifty": -8.4
     },
     "2017": {
-     "n": 724,
-     "avg": 10.18,
-     "med": 7.42,
-     "win": 69,
-     "vs_nifty": 5.42
+     "n": 1517,
+     "avg": 8.39,
+     "med": 4.91,
+     "win": 61,
+     "vs_nifty": 3.73
     },
     "2016": {
-     "n": 322,
-     "avg": 7.63,
-     "med": 4.06,
-     "win": 62,
-     "vs_nifty": 7.15
+     "n": 643,
+     "avg": 5.0,
+     "med": 1.88,
+     "win": 54,
+     "vs_nifty": 4.91
     }
    }
+  }
+ },
+ "baseline": {
+  "all": {
+   "n": 106795,
+   "avg": 3.92,
+   "med": 0.41,
+   "win": 51,
+   "vs_nifty": 1.35
+  },
+  "last 3y": {
+   "n": 45938,
+   "avg": 2.93,
+   "med": -0.83,
+   "win": 48,
+   "vs_nifty": 1.17
+  },
+  "last 1y": {
+   "n": 15531,
+   "avg": 0.12,
+   "med": -3.5,
+   "win": 42,
+   "vs_nifty": 1.58
+  },
+  "train": {
+   "n": 42542,
+   "avg": 4.5,
+   "med": 1.18,
+   "win": 53,
+   "vs_nifty": 0.63
+  },
+  "test": {
+   "n": 64253,
+   "avg": 3.54,
+   "med": -0.09,
+   "win": 50,
+   "vs_nifty": 1.83
   }
  },
  "good_train": [
   "921",
   "ath",
-  "base",
-  "cup921",
   "dcup",
   "flag",
   "month",
   "pennant",
-  "retest",
-  "stack",
-  "tight",
-  "wcup"
+  "rectangle",
+  "stack"
  ],
  "confluence_test_2022_26": {
   "good 0": {
-   "n": 14795,
+   "n": 36526,
    "r63": {
-    "n": 13817,
-    "avg": 4.84,
-    "med": 1.62,
-    "win": 54,
-    "vs_nifty": 3.25
+    "n": 34428,
+    "avg": 3.24,
+    "med": -0.06,
+    "win": 50,
+    "vs_nifty": 1.67
    },
    "r126": {
-    "n": 12937,
-    "avg": 12.32,
-    "med": 5.94,
-    "win": 59,
-    "vs_nifty": 8.23
+    "n": 32041,
+    "avg": 8.25,
+    "med": 1.69,
+    "win": 53,
+    "vs_nifty": 4.23
    }
   },
   "good 1": {
-   "n": 8758,
+   "n": 17649,
    "r63": {
-    "n": 8428,
-    "avg": 6.59,
-    "med": 3.17,
-    "win": 57,
-    "vs_nifty": 4.86
+    "n": 16777,
+    "avg": 4.86,
+    "med": 0.85,
+    "win": 52,
+    "vs_nifty": 3.12
    },
    "r126": {
-    "n": 7792,
-    "avg": 15.36,
-    "med": 8.37,
-    "win": 62,
-    "vs_nifty": 11.06
+    "n": 15488,
+    "avg": 10.98,
+    "med": 4.03,
+    "win": 55,
+    "vs_nifty": 6.63
    }
   },
   "good 2": {
-   "n": 4333,
+   "n": 5690,
    "r63": {
-    "n": 4157,
-    "avg": 7.5,
-    "med": 4.11,
-    "win": 58,
-    "vs_nifty": 5.9
+    "n": 5380,
+    "avg": 4.11,
+    "med": -0.03,
+    "win": 50,
+    "vs_nifty": 2.32
    },
    "r126": {
-    "n": 3840,
-    "avg": 16.79,
-    "med": 9.44,
-    "win": 63,
-    "vs_nifty": 12.59
+    "n": 5043,
+    "avg": 10.62,
+    "med": 3.44,
+    "win": 54,
+    "vs_nifty": 6.23
    }
   },
   "good 3+": {
-   "n": 2712,
+   "n": 1143,
    "r63": {
-    "n": 2603,
-    "avg": 7.16,
-    "med": 3.27,
-    "win": 58,
-    "vs_nifty": 5.32
+    "n": 1083,
+    "avg": 5.52,
+    "med": 1.1,
+    "win": 53,
+    "vs_nifty": 3.31
    },
    "r126": {
-    "n": 2395,
-    "avg": 15.34,
-    "med": 7.52,
-    "win": 61,
-    "vs_nifty": 11.03
+    "n": 1043,
+    "avg": 12.15,
+    "med": 2.03,
+    "win": 53,
+    "vs_nifty": 7.52
    }
   },
   "good 2+ & no poor/fair": {
-   "n": 3468,
+   "n": 2032,
    "r63": {
-    "n": 3371,
-    "avg": 7.99,
-    "med": 4.08,
-    "win": 59,
-    "vs_nifty": 6.35
+    "n": 1951,
+    "avg": 3.9,
+    "med": -0.82,
+    "win": 49,
+    "vs_nifty": 2.07
    },
    "r126": {
-    "n": 3102,
-    "avg": 16.57,
-    "med": 8.39,
-    "win": 62,
-    "vs_nifty": 12.32
+    "n": 1875,
+    "avg": 10.0,
+    "med": 1.54,
+    "win": 52,
+    "vs_nifty": 5.77
    }
   },
   "good 2+ with others": {
-   "n": 3577,
+   "n": 4801,
    "r63": {
-    "n": 3389,
-    "avg": 6.76,
-    "med": 3.51,
-    "win": 57,
-    "vs_nifty": 5.01
+    "n": 4512,
+    "avg": 4.54,
+    "med": 0.66,
+    "win": 51,
+    "vs_nifty": 2.67
    },
    "r126": {
-    "n": 3133,
-    "avg": 15.9,
-    "med": 8.71,
-    "win": 63,
-    "vs_nifty": 11.67
+    "n": 4211,
+    "avg": 11.28,
+    "med": 3.75,
+    "win": 55,
+    "vs_nifty": 6.75
    }
   },
   "any 3+ systems": {
-   "n": 5499,
+   "n": 9708,
    "r63": {
-    "n": 5249,
-    "avg": 6.59,
-    "med": 3.23,
-    "win": 57,
-    "vs_nifty": 4.87
+    "n": 9175,
+    "avg": 4.41,
+    "med": 1.02,
+    "win": 52,
+    "vs_nifty": 2.68
    },
    "r126": {
-    "n": 4815,
-    "avg": 15.22,
-    "med": 7.81,
-    "win": 62,
-    "vs_nifty": 10.97
+    "n": 8409,
+    "avg": 10.8,
+    "med": 4.21,
+    "win": 56,
+    "vs_nifty": 6.42
    }
   }
  }
