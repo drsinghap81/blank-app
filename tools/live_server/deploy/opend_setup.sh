@@ -48,6 +48,7 @@ Description=moomoo OpenD (API gateway for Trend Desk; listens on 127.0.0.1:11111
 After=network-online.target
 Wants=network-online.target
 [Service]
+Environment=HOME=/root
 WorkingDirectory=$D/app
 ExecStart=$D/app/$(basename "$BIN") -cfg_file=$D/app/$XML -login_account=$ACC -login_by_remember=1
 Restart=always
