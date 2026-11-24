@@ -1,5 +1,12 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-MTD,2026-11-18,1737.26,61.8,1696.94,1687.11,3.0,2,-4.1,"Mettler-Toledo International, Inc. Common Stock",watch,142.3,0.88,82,292.86,1666.88,47.9
-ABM,2026-11-18,54.7,60.8,53.59,53.71,1.8,2,-2.0,ABM Industries Incorporated Common Stock,watch,129.0,0.84,78,20.2,53.61,52.5
-GMAB,2026-11-17,51.96,60.4,50.03,50.68,2.5,3,-2.6,Genmab A/S - American Depositary Shares,watch,165.5,0.88,95,317.32,50.6,55.2
-GILD,2026-11-17,170.26,61.8,165.01,165.72,2.7,3,-2.2,"Gilead Sciences, Inc.",watch,143.0,0.91,85,1079.5,166.43,54.4
+GMAB,2026-11-23,53.17,61.8,50.53,50.24,5.8,0,0.0,Genmab A/S - American Depositary Shares,trend,165.1,0.88,95,310.22,53.17,61.8
+TBBB,2026-11-23,66.44,60.7,64.41,64.42,3.1,0,0.0,BBB Foods Inc. Class A Common Shares,watch,161.9,0.9,100,81.88,66.44,60.7
+CON,2026-11-23,43.17,62.0,41.57,40.9,5.6,0,0.0,"Concentra Group Holdings Parent, Inc. Common Stock",trend,152.8,0.92,92,43.98,43.17,62.0
+USPH,2026-11-23,96.85,60.4,94.15,93.2,3.9,0,0.0,"U.S. Physical Therapy, Inc. Common Stock",trend,145.0,0.89,87,21.14,96.85,60.4
+GILD,2026-11-23,170.59,60.5,166.02,164.8,3.5,0,0.0,"Gilead Sciences, Inc.",watch,144.1,0.92,85,1088.18,170.59,60.5
+BIIB,2026-11-23,256.71,60.7,248.84,243.58,5.4,0,0.0,Biogen Inc.,trend,138.4,0.86,90,295.86,256.71,60.7
+UVE,2026-11-23,49.29,60.8,48.02,46.68,5.6,0,0.0,UNIVERSAL INSURANCE HOLDINGS INC Common Stock,watch,124.5,0.77,82,10.9,49.29,60.8
+MTD,2026-11-18,1737.26,61.8,1696.94,1687.11,3.0,3,-0.7,"Mettler-Toledo International, Inc. Common Stock",watch,142.3,0.88,82,290.58,1725.52,56.9
+ABM,2026-11-18,54.7,60.8,53.59,53.71,1.8,3,0.2,ABM Industries Incorporated Common Stock,watch,130.8,0.85,80,19.9,54.79,59.4
+GMAB,2026-11-17,51.96,60.4,50.03,50.68,2.5,4,2.3,Genmab A/S - American Depositary Shares,trend,165.1,0.88,95,310.22,53.17,61.8
+GILD,2026-11-17,170.26,61.8,165.01,165.72,2.7,4,0.2,"Gilead Sciences, Inc.",watch,144.1,0.92,85,1088.18,170.59,60.5
