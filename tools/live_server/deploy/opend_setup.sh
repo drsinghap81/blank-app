@@ -59,9 +59,18 @@ systemctl daemon-reload; systemctl stop opend 2>/dev/null || true
 echo "step 5/5: first login"
 # OpenD >= 10.10: first login is interactive (remember password); opend_login.py answers it and waits for the SMS code
 ST=/opt/trenddesk/var/opend_setup.txt; : > $ST; chown trenddesk $ST 2>/dev/null || true
-python3 /opt/trenddesk/repo/tools/live_server/deploy/opend_login.py "$D/app/$(basename "$BIN")" "$D/app/$XML" "$ACC" "$PWF" $ST /opt/trenddesk/var/cmd_opendcode \
+MODEF=$D/login.mode; rm -f $MODEF
+python3 /opt/trenddesk/repo/tools/live_server/deploy/opend_login.py "$D/app/$(basename "$BIN")" "$D/app/$XML" "$ACC" "$PWF" $ST /opt/trenddesk/var/cmd_opendcode $MODEF \
   && echo "first login OK" || echo "first login not confirmed - check $ST"
 rm -f "$PWF"
+# start the service the way the first login worked: remembered password, or the password hash in a root-only env file
+if [ -f $MODEF ] && grep -q '^md5 ' $MODEF; then
+  ( umask 077; echo "OPEND_PWD_MD5=$(cut -d' ' -f2 $MODEF)" > $D/login.env )
+  sed -i "s|^ExecStart=.*|ExecStart=$D/app/$(basename "$BIN") -cfg_file=$D/app/$XML -login_account=$ACC -login_pwd_md5=\${OPEND_PWD_MD5}|" /etc/systemd/system/opend.service
+  grep -q '^EnvironmentFile=' /etc/systemd/system/opend.service || sed -i "s|^WorkingDirectory=.*|&\nEnvironmentFile=$D/login.env|" /etc/systemd/system/opend.service
+  systemctl daemon-reload
+fi
+rm -f $MODEF
 systemctl enable --now opend >/dev/null
 # app settings: read-only account view now; orders only on moomoo's PAPER account (SIMULATE) and only if MOOMOO_TRADE=1
 for kv in MOOMOO_ENABLED=1 MOOMOO_TRADE=1 MOOMOO_MARKETS=AU,US MOOMOO_FIRM=FUTUAU MOOMOO_ENV=SIMULATE; do
