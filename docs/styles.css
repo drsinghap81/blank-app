@@ -1860,3 +1860,5 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .sc-ch{margin-top:8px}
 .sc-how{margin-top:14px}
 .tr-pw{display:block;width:100%;box-sizing:border-box;margin:4px 0 12px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:16px}
+.scb{font-style:normal;font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--paper);color:var(--slate);box-shadow:inset 0 0 0 1px var(--line);white-space:nowrap}
+.scb.g{background:var(--rise-soft,#E9FBF3);color:var(--rise);box-shadow:none}.scb.in{background:var(--accent);color:var(--on-accent);box-shadow:none}
