@@ -24,6 +24,7 @@ for alt in $APP/repo/tools/live_server/var; do for c in cmd_opend.json cmd_opend
 # (24 Nov 2026 fix) the install runs as its own systemd unit: a background job of this script was killed with the watchdog's cgroup.
 # The password goes to $VAR/opend_pw.tmp (600, root) only for opend_login.py, which deletes it; a leftover is removed when no install runs.
 if [ -f "$VAR/opend_pw.tmp" ] && ! systemctl is-active -q opend-install; then rm -f "$VAR/opend_pw.tmp"; fi
+if [ -f "$VAR/cmd_opend.json" ] && systemctl is-active -q opend-install; then systemctl stop opend-install; sleep 2; log "previous OpenD install stopped for a new request"; fi
 if [ -f "$VAR/cmd_opend.json" ] && ! systemctl is-active -q opend-install; then
   J="$VAR/cmd_opend.json"; U=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['url'])" "$J"); A=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['acc'])" "$J")
   P="$VAR/opend_pw.tmp"; ( umask 077; python3 -c "import json,sys;open(sys.argv[2],'w').write(json.load(open(sys.argv[1]))['pw'])" "$J" "$P" ); rm -f "$J"

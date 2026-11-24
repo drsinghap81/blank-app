@@ -30,8 +30,17 @@ def port_open():
 pid, fd = pty.fork()
 if pid == 0:
     os.chdir(os.path.dirname(BIN)); os.execv(BIN, [BIN, f"-cfg_file={CFG}", "-lang=en"])
-buf = ""; sent = set(); t0 = time.time(); ok = False; code_wait = False
+buf = ""; sent = set(); t0 = time.time(); ok = False; code_wait = False; tries = 0
 note("OpenD started for the first login")
+
+
+def send(txt, what):
+    time.sleep(0.6)                                   # let OpenD finish drawing its prompt
+    for ch in txt:                                    # type it like a person: OpenD's console reads a terminal in raw mode
+        os.write(fd, ch.encode()); time.sleep(0.02)
+    os.write(fd, b"\r"); sent.add(what)              # Enter = carriage return in a terminal (a bare newline was ignored)
+
+
 while time.time() - t0 < 600:
     r, _, _ = select.select([fd], [], [], 1.0)
     if r:
@@ -40,27 +49,30 @@ while time.time() - t0 < 600:
         except OSError:
             break
         buf += chunk
-        for line in chunk.splitlines():
-            ln = line.strip()
-            if ln and pw not in ln:
+        for line in re.split(r"[\r\n]+", chunk):
+            ln = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", line).strip()
+            if ln and ln != ">>>" and pw not in ln:
                 note("OpenD: " + ln[:200])
         low = buf[-600:].lower()
-        if re.search(r"account|moomoo id|user ?id|login id|phone", low) and "acc" not in sent and not re.search(r"pass ?word|pwd", low[-120:]):
-            os.write(fd, (ACC + "\n").encode()); sent.add("acc"); buf = ""; continue
-        if re.search(r"pass ?word|pwd", low) and "pw" not in sent:
-            time.sleep(0.3); os.write(fd, (pw + "\n").encode()); sent.add("pw"); buf = ""; continue
+        if "login failed" in low:
+            tries += 1; buf = ""
+            if tries >= 3:
+                note("LOGIN FAILED 3 times - check the moomoo ID / password and send the form again"); break
+            sent -= {"acc", "pw", "rem"}; continue
+        if re.search(r"enter (your )?(account|moomoo id|user ?id|login id|phone)", low) and "acc" not in sent:
+            buf = ""; send(ACC, "acc"); continue
+        if re.search(r"enter (your )?(login )?pass ?word|enter (your )?pwd", low) and "pw" not in sent:
+            buf = ""; send(pw, "pw"); continue
         if "remember" in low and "rem" not in sent:
-            os.write(fd, b"y\n"); sent.add("rem"); buf = ""; continue
-        if ("verif" in low or "verification code" in low or "sms" in low) and "code" not in sent:
+            buf = ""; send("Y", "rem"); continue
+        if ("verif" in low or "verification code" in low or "sms" in low) and "code" not in sent and not code_wait:
             code_wait = True; note("WAITING FOR SMS CODE: enter it in Trend Desk > Settings > Connect moomoo"); buf = ""
-        if "success" in low and "login" in low:
+        if ("login success" in low or "login successful" in low or "logged in" in low) and "pw" in sent:
             ok = True
     if code_wait and "code" not in sent and os.path.exists(CODEF):
         c = "".join(ch for ch in open(CODEF).read() if ch.isdigit()); os.remove(CODEF)
         if c:
-            os.write(fd, (c + "\n").encode()); sent.add("code"); note("SMS code passed to OpenD")
-    if port_open() and "pw" in sent and time.time() - t0 > 8:
-        ok = True
+            send(c, "code"); note("SMS code passed to OpenD")
     if ok:
         time.sleep(5); break
 pw = None
