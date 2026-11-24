@@ -1,22 +1,17 @@
-"""probe: BSE Sensex 1991-2000 daily tables from bse-1991-2000.blogspot.com (year pages)"""
+"""probe: BSE Sensex 1991-2000 from bse-1991-2000.blogspot.com (text pages)"""
 import re
+import html
 import requests
-import pandas as pd
-from io import StringIO
 U = {"User-Agent": "Mozilla/5.0"}
 base = "https://bse-1991-2000.blogspot.com/"
-r = requests.get(base + "p/bse-sensex-historical-prices-in-year_1204.html", headers=U, timeout=30, allow_redirects=True)
-print("R| status", r.status_code, len(r.text), flush=True)
-links = sorted(set(re.findall(r'https?://bse-1991-2000\.blogspot\.com/p/[^"\'#]+\.html', r.text)))
-print("R| links", links, flush=True)
+r = requests.get(base + "p/bse-sensex-historical-prices-in-year_1204.html", headers=U, timeout=30)
+links = sorted(set(u.replace("http://", "https://") for u in re.findall(r'https?://bse-1991-2000\.blogspot\.com/p/[^"\'#]+\.html', r.text)))
 for u in links:
-    try:
-        t = requests.get(u.replace("http://", "https://"), headers=U, timeout=30).text
-        yr = re.findall(r"year (\d{4})", t[:5000]) or re.findall(r"19\d\d", u)
-        tabs = pd.read_html(StringIO(t))
-        big = max(tabs, key=len)
-        print(f"R| PAGE {u} years {yr[:3]} rows {len(big)} cols {list(big.columns)[:8]}", flush=True)
-        for _, z in big.iterrows():
-            print("R| ROW " + " | ".join(str(v) for v in z.values[:6]), flush=True)
-    except Exception as e:  # noqa: BLE001
-        print("R| fail", u, str(e)[:150], flush=True)
+    t = requests.get(u, headers=U, timeout=30).text
+    m = re.search(r"<h3[^>]*post-title[^>]*>(.*?)</h3>", t, re.S); title = re.sub("<[^>]+>", "", m.group(1)).strip() if m else "?"
+    b = re.search(r"post-body[^>]*>(.*?)<div class=['\"]post-footer", t, re.S); body = b.group(1) if b else t
+    txt = html.unescape(re.sub(r"<br\s*/?>|</p>|</div>|</tr>", "\n", body)); txt = re.sub(r"<[^>]+>", " ", txt)
+    lines = [re.sub(r"\s+", " ", l).strip() for l in txt.split("\n") if re.search(r"\d", l)]
+    print(f"R| PAGE {title} | {u} | lines {len(lines)}", flush=True)
+    for l in lines:
+        print("R| L " + l[:160], flush=True)
