@@ -1,7 +1,35 @@
 {
-"generated": "2026-11-24 01:16 UTC",
+"generated": "2026-11-24 12:30 UTC",
 "method": "News clues: government / regulator actions that can move a whole industry (22 Nov 2026, Amritpal, after the PSU-bank look-back\nfound the 21 Oct \"FDI cap in PSU banks to 49%\" report a week before the rally: \"add all authentic news clues, especially similar\ntypes as for PSU\").\n\nSources (checked from GitHub Actions 22 Nov 2026):\n  official  RBI press releases + notifications (rbi.org.in RSS); government outlets in Google News (PIB, DD News, News On AIR)\n  reports   Google News RSS, India edition, ONLY from named financial / national outlets (OUTLETS) - shown as \"Report\"\nEvent types searched (TYPES): FDI / foreign-ownership caps, Cabinet approvals and outlays, PLI, anti-dumping / safeguard / customs\nduty, export bans / curbs, minimum import price, bank mergers, privatisation / stake sales, GST rate changes, MSP / FRP,\nDefence Acquisition Council approvals, ethanol blending, RBI rule changes, plus \"government plans / considering\" reports.\nEach item is matched to NSE basic industries by keywords (IND_KEYS). Direction is only marked where the words say it\n(denies / no plan / rollback / ban = negative). Nothing here is a tested signal - it tells you a story exists.\nWrites data/scan/news_clues.json (last 60 days, de-duplicated).",
 "items": [
+{
+"key": "cabinetapprovestwoflyoversondelhismbroad",
+"date": "2026-11-24",
+"title": "Cabinet approves two flyovers on Delhi\u2019s MB Road",
+"url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNMkEwNUlQcWU2dzFnN2U4OHlXRF80QU5yb3RBOVVnTmh6aldUVTJRckdmM2JiM2kzdGlsV25FM1FfSTJZZVdRWXh0aVFkREZvLTNhOHkyai1FQzZxQWRPM0xMU3BKR1UzbFF2ZUh3a0QzNS1FaVZIM2dBWXhTb3M0WW9wbWh1VlpRM2pvZzRKTnFpc1BTc2ZzblF3eWV0eGE1WXVxZGI4NVdNU3VDM3hSTUZ4WERFMnNYTTVMeVVMSTJWUdIBwgFBVV95cUxNMkEwNUlQcWU2dzFnN2U4OHlXRF80QU5yb3RBOVVnTmh6aldUVTJRckdmM2JiM2kzdGlsV25FM1FfSTJZZVdRWXh0aVFkREZvLTNhOHkyai1FQzZxQWRPM0xMU3BKR1UzbFF2ZUh3a0QzNS1FaVZIM2dBWXhTb3M0WW9wbWh1VlpRM2pvZzRKTnFpc1BTc2ZzblF3eWV0eGE1WXVxZGI4NVdNU3VDM3hSTUZ4WERFMnNYTTVMeVVMSTJWUQ?oc=5",
+"source": "ET Infra",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Civil Construction",
+"Road Assets - Toll Annuity Hybrid-Annuity"
+],
+"neg": false
+},
+{
+"key": "tendersfloatedfor4299crorebikkavoluduvvadaraillinestoeasecongestionaroundvisakhapatnam",
+"date": "2026-11-24",
+"title": "Tenders floated for \u20b94,299-crore Bikkavolu-Duvvada rail lines to ease congestion around Visakhapatnam",
+"url": "https://news.google.com/rss/articles/CBMihgJBVV95cUxPZWtqNThTbUt1Ul9mbW1kVFNlX0FvQm9sMGh1Ri1tc2hObjJXQmc4TlJIUUo0bEF5X0NiTVdYVWp3QUlrQ1czWDZXR2xmTTJac2pza0RQVndQRlAxVjNHRE9kRjlFZ3BLOVhSNmxjYU8yazFiLXBUU0N0MXBhZUlHYmxUZlNnX1pHaWdfM1J6WmsxN3pnd1AycEFQWkdWa0dDY0ZyRU9hNU1DTEVhQzVFUjhpTWtpSHZTQVdEMlRyLWhTb09HNDZFdXlSQ05wczNSNzZQM29ZOWJzeFlZX0lxU1Etb3JDVFAzZjRGNTVOdEVIZWtISUZnaTlQWGZTTF9VWVV5SjB30gGGAkFVX3lxTE9la2o1OFNtS3VSX2ZtbWRUU2VfQW9Cb2wwaHVGLW1zaE5uMldCZzhOUkhRSjRsQXlfQ2JNV1hVandBSWtDVzNYNldHbGZNMlpzanNrRFBWd1BGUDFWM0dET2RGOUVncEs5WFI2bGNhTzJrMWItcFRTQ3QxcGFlSUdibFRmU2dfWkdpZ18zUnpaazE3emd3UDJwQVBaR1ZrR0NjRnJFT2E1TUNMRWFDNUVSOGlNa2lIdlNBV0QyVHItaFNvT0c0NkV1eVJDTnBzM1I3NlAzb1k5YnN4WVlfSXFTUS1vckNUUDNmNEY1NU50RUhla0hJRmdpOVBYZlNMX1VZVXlKMHc?oc=5",
+"source": "The Hindu",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Railway Wagons",
+"Civil Construction"
+],
+"neg": false
+},
 {
 "key": "ciiwantsforeigninvestmentcapinpsubanksraisedto49",
 "date": "2026-11-23",
@@ -2011,6 +2039,21 @@
 }
 ],
 "by_industry": {
+"Civil Construction": [
+"cabinetapprovestwoflyoversondelhismbroad",
+"tendersfloatedfor4299crorebikkavoluduvvadaraillinestoeasecongestionaroundvisakhapatnam",
+"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
+"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
+],
+"Road Assets - Toll Annuity Hybrid-Annuity": [
+"cabinetapprovestwoflyoversondelhismbroad",
+"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam"
+],
+"Railway Wagons": [
+"tendersfloatedfor4299crorebikkavoluduvvadaraillinestoeasecongestionaroundvisakhapatnam",
+"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
+"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
+],
 "Public Sector Bank": [
 "ciiwantsforeigninvestmentcapinpsubanksraisedto49",
 "ciipitches15financialsectorreformsseekshigherforeigninvestmentinpsubanks",
@@ -2111,17 +2154,6 @@
 "sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
 "sugarcanefarmerswelcomepanelbutwontendprotest",
 "governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
-],
-"Railway Wagons": [
-"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
-"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
-],
-"Civil Construction": [
-"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
-"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
-],
-"Road Assets - Toll Annuity Hybrid-Annuity": [
-"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam"
 ],
 "Passenger Cars & Utility Vehicles": [
 "indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
