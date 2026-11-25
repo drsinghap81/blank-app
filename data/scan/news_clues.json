@@ -1,7 +1,142 @@
 {
-"generated": "2026-11-24 23:18 UTC",
+"generated": "2026-11-25 11:20 UTC",
 "method": "News clues: government / regulator actions that can move a whole industry (22 Nov 2026, Amritpal, after the PSU-bank look-back\nfound the 21 Oct \"FDI cap in PSU banks to 49%\" report a week before the rally: \"add all authentic news clues, especially similar\ntypes as for PSU\").\n\nSources (checked from GitHub Actions 22 Nov 2026):\n  official  RBI press releases + notifications (rbi.org.in RSS); government outlets in Google News (PIB, DD News, News On AIR)\n  reports   Google News RSS, India edition, ONLY from named financial / national outlets (OUTLETS) - shown as \"Report\"\nEvent types searched (TYPES): FDI / foreign-ownership caps, Cabinet approvals and outlays, PLI, anti-dumping / safeguard / customs\nduty, export bans / curbs, minimum import price, bank mergers, privatisation / stake sales, GST rate changes, MSP / FRP,\nDefence Acquisition Council approvals, ethanol blending, RBI rule changes, plus \"government plans / considering\" reports.\nEach item is matched to NSE basic industries by keywords (IND_KEYS). Direction is only marked where the words say it\n(denies / no plan / rollback / ban = negative). Nothing here is a tested signal - it tells you a story exists.\nWrites data/scan/news_clues.json (last 60 days, de-duplicated).",
 "items": [
+{
+"key": "unioncabinetapprovesprudentialsfdiproposalinbhartilifeinsurance",
+"date": "2026-11-25",
+"title": "Union Cabinet approves Prudential's FDI proposal in Bharti Life Insurance",
+"url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNcjRTcGlEY3BUdTVQRXFubk9ub2p0dkNUREJQVWNNaTltV2Noc0RRczJ5cXhqMlFCYVU1WU1OWDNDeHFTbjQxMms5a09Zd1pMUzF3WktxZDFCMkNIWnJRN1pXMzFVOTlESlN0QVZxQ0hfSGJfcE5LTmtjdDNIY1lxeHRyWTE0bGFnOERNUnZVZW16R3ZmZmtoNk40c1RxSkFyU1BJQVNqZGhLZm00V09LdUZubEpoVFRRT1lMQmtzM1Z1dm1IUlRwSEVKbXVoYXJUTXV5VtIB2gFBVV95cUxNZF9IZUZ4cjVtQm50NEtEc3plTkp3S2xLZzR0Mm1DWGtVRi15OUJONFJZQTRTcVhWTjNYZXpIbmNGSTY2Sy03UVdtc191UzkzdHBEeVJjQVFaRHFTYm9zdi1BLVhIQ1VrRHktSDdxb01CTlIzVUpTTzVqSmFhYjZaQngtcUxqRzZzUUVTS2JfcVlwUTdrNGJSOFg2cFZPbUxPV2RlZ2dQaTZxX1liVnVSSkt6ZzhJUVlMOWtfQWgzTDNGSV9KU3V0eDBMQU03aExXd0VBR3lSc01BQQ?oc=5",
+"source": "Moneycontrol.com",
+"official": false,
+"type": "FDI / foreign cap",
+"industries": [
+"Life Insurance",
+"General Insurance"
+],
+"neg": false
+},
+{
+"key": "cabinetapprovesrs4288croresecondcontainerterminalatkamarajarportintamilnadu",
+"date": "2026-11-25",
+"title": "Cabinet approves Rs 4,288-crore second container terminal at Kamarajar Port in Tamil Nadu",
+"url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxObk41cHhNNHZUOEhqaEcxT3NHbjR0eTNFdWI0VDZZa1ppVVVKRmhZYUg3WndxemM1Ylk4WjlIeGtpbUFpLWZ1aHlmcExGdmFYSGM4SnRVTFQ5VzUwLUwxMDNBLUs5ZG5oQWZyZ3pSNF9WNHptMldJTHBVNi1BSTR6MkNWLTJaMzhCamtIM21ZQkFOS2tPeVlsUW5xTlhWOXJ6Q3JGeFl3SzNycG1OR1lzU29aQWM?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Ship Building & Allied Services",
+"Shipping",
+"Port & Port services"
+],
+"neg": false
+},
+{
+"key": "cabinetapprovesrs4288crsecondcontainerterminalinkamarajarportandrs2014crsilcharairport",
+"date": "2026-11-25",
+"title": "Cabinet approves Rs 4,288 cr second container terminal in Kamarajar Port and Rs 2,014 cr Silchar airport",
+"url": "https://news.google.com/rss/articles/CBMikwJBVV95cUxQdlhEeHdKVk1GLVFOdG1pS2RPMWhGVVJXUUpiTmtqVGJSXzJFdDB1ZUR5QTItQ01PYVhsVVVYSmdaLWhUdnJHS245UDV6QklFZFkyQTdZTDRzd1o3aGtRZHN5LVRqWDE5S1Y0dkpMV1VEYnlEMUtRRjhWaENicGVpeEx1ZmtEby1ZMnlVTDItbWtDNXBGODB3TzRuZmlucUxvSTRlWXpFMW5GeGNzSUduQjYwLVFORTVKbGhkdGdiSjBNdEpvVEk4SUlZbjQ0YmRfT1Izc0YzajJpcFdFWTBPWVhHQjRJWFlnZDVMZ25hcUpDeE1WNXNjOXctNUZCWkdaRnBwNzlWMDZrZkJqa1A5d1hpa9IBjAJBVV95cUxNRVI4c1JJSTZONlpsNHh0d005X0ZkdU9XSF9yeEZkdE1uX0MzTlhXQ3piVmlSbEVLeTl0M3NzT3ZZMXVObVM1ekFleUFOb2tYLW1INnVsSnFfaF9mQmd1WElNRG9seE4yejRGd1l6b0FFWXppMWRxWlBPZjVOdnZMLUpkQWswWEVHMF8zZDV5bzlreTl3eGJBRXJxRzFLYVdYWE1wOE9UMWFwS0pycUJEcnNlXzhBemZXR0FOcGlmbGtxb2ExZEtMQnQweGdmTTdjRTJKX2pYWUdsWUc0ejZIRWZfaThKZThDQW43LUEtZHl3Z0YwRXpjQmxaSWdTTVZ3Z1BZOFVuVFQ5Nm91?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Airport & Airport services",
+"Airline",
+"Ship Building & Allied Services",
+"Shipping",
+"Port & Port services"
+],
+"neg": false
+},
+{
+"key": "newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
+"date": "2026-11-25",
+"title": "New Assam airport to Tamil Nadu port expansion, Cabinet clears \u20b918,000-crore infrastructure projects",
+"url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPTHVqX1gxRXJvNFVIdWtpbDljeUlydjVfWXFVVTVUWmdBNWt1eE5YRGNBbzZ6VVJJdVg1SnVCVW0tamhsb2lydk8zUkdRZV80bE5sVVA3alRjNHR4S2FRTVBVZ1N2ei1uT2VrSFZ5NEtEaGV5UXNGd0F4UE5vUXdFaDBFLTlVYWpra3Q3M3B5WnVRbTNOU2hxdVBwUVhiNU5Db2gtNkNSeTdGTTdORVZZMTczUHhBX3hFQV9CTVNjNGlGOS1DOGtxZGFVdUxkcjRoNElhVlhB0gHjAUFVX3lxTFAzU3Njam56U0lxbWMtM09FNTJaUFBmRzhIcmE3Zmt5QXZiX3I2ejF2VHZ2dEtsOW5TRHI1cEtaTXdMbmkteGMxajIyXzVvUlNQbFVKUi1TWldBUjFCV01ETjlhZklOV0VfdUkyS0FyWGRHNVo4SzJWSjhQZ1ItaXMzQ0NGYXR0UkpjV3ZCYi1CbF9mZHRvRW82MVFuSXRILXAtMnJVai10ZUMyUVFDaXZvdTNwd01qQ3VNYnQyRWdkdWlTQXF3Qi0yN1BlSkFGdi1OVHEwZ0ptTzRDMk1POUpObDBN?oc=5",
+"source": "Fortune India",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Airport & Airport services",
+"Airline",
+"Ship Building & Allied Services",
+"Shipping",
+"Port & Port services"
+],
+"neg": false
+},
+{
+"key": "cabinetapprovesrs2014croregreenfieldairportatdolootoboostairconnectivityinsouthassam",
+"date": "2026-11-25",
+"title": "Cabinet approves Rs 2,014 crore Greenfield Airport at Doloo to boost air connectivity in south Assam",
+"url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQYzlPelllTE9ScTNlOG1mZG5FZWF2S2o5V2hrcFJIenFXZ3hIcmY1c1BNUXplejNoTEFtTHFPb1JWUkVaQlk2ams1T2Uzb3hNbUlUTENySWEtWUdCMFN2enhsa0xBOHdCU0NTd2FxUTd1VzlqODBzczlTV3Z1NVdzNGJHMkh2Ui03Y0lkZDF2cl9hMWt3UHFwV3JFb3UxQnRxNW1Ra3R5TVR2OWRQR203SEVzb1M2ZGM5RXU2aWdmQVFHVVE?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "fromcieschemetonewsilcharairportcabinetapprovesprojectsworthnearlyrs20000crore",
+"date": "2026-11-25",
+"title": "From CIE Scheme To New Silchar Airport: Cabinet Approves Projects Worth Nearly Rs 20,000 Crore",
+"url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxPZXNpUkFVQXExS0lmX3RGaFpUbnJPaGZLSGxVOXlhSVB0akd0UWNSVWY1QlhUZEs5ckZqTWJjWS0ybEVUZU1Xczc1RHhmSEJiVnI0TG0xSUJaYXNaV2dmQWZESnl2dVJWUGlFZHNTMGd6ZElSdGt4MjVPTHEtdmhXWkViQ21FNW5TY1dybE1ITldsNWxUSVBvVF9oWXdzcEU1VEQ5aEpvRHktNUJCMmhJVENldi1tUHBDWXZ3d0xYOXpzZ0NlckxjenNGRTBKRDRRZW9qSdIB3AFBVV95cUxOZUZrSkpaejFqMHZGUmxYZURCYW1fbGtsUzk0UlNxWDF4SnlyamJSTXBlUVNZWkZ3cVBjLTh1MkxTRmZKY2xydUtWSFR2ZE5HeHdXOUtNeFE4eS1wLVJXWEt2MW1SMlBvbmNlSU8xaXY4S28wM2t2Tkd2Ym1DU0xiMzJuTTZHcEFxakxGZ0xGZ3dFNDJ1TnItRG83R0VfUDZkMElVWURJcDBZYTFRY3k4Q0wwaWt2SWVjLUI5V0x4ZnZLRGVLVVRCZ09mbmhGNndpeXpIMmlEeWNvVG9t?oc=5",
+"source": "NDTV Profit",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "tatasteeljswsteelsailjindalsteelcheckfreshtargetsonmetalstocksamidmeltdown",
+"date": "2026-11-25",
+"title": "Tata Steel, JSW Steel, SAIL, Jindal Steel: Check fresh targets on metal stocks amid meltdown",
+"url": "https://news.google.com/rss/articles/CBMi_gFBVV95cUxNUUl4UFVidDdYVndoVU9wLW42MFhuN3FfZEo1ZEZJYXg4VkRZbHFqdWNZbVpCMUpqYlBmd3p3aWdzUk5LeVF2eXZjWkdkRnZCWU5EUlE1a2EzOU1Qb2dzZFQ3dlZIME9TSkhzLWhPZHJ2S1BkclNxaWN1eXFxRkMtanhWaHozU1kxWkk3UHBWYXZ1SldCLVNGX3J3YkdyZTVONy1JU1dEckltYTBRbldIUlpmalVzZUF1NnVKc3pvT2tZOHdkTnFVRE5GblRIMlhXdERhZG1jMTJUOG5DQXhjQk9mSWYxRmU3anlSUTF0U1ZSZlN2amtRc1VaM0xuZ9IB_gFBVV95cUxNUUl4UFVidDdYVndoVU9wLW42MFhuN3FfZEo1ZEZJYXg4VkRZbHFqdWNZbVpCMUpqYlBmd3p3aWdzUk5LeVF2eXZjWkdkRnZCWU5EUlE1a2EzOU1Qb2dzZFQ3dlZIME9TSkhzLWhPZHJ2S1BkclNxaWN1eXFxRkMtanhWaHozU1kxWkk3UHBWYXZ1SldCLVNGX3J3YkdyZTVONy1JU1dEckltYTBRbldIUlpmalVzZUF1NnVKc3pvT2tZOHdkTnFVRE5GblRIMlhXdERhZG1jMTJUOG5DQXhjQk9mSWYxRmU3anlSUTF0U1ZSZlN2amtRc1VaM0xuZw?oc=5",
+"source": "Business Today",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "pmmodisremarksonhiringwagesechoinaluminiumindustryspleaformsmedutyrelief",
+"date": "2026-11-25",
+"title": "PM Modi's remarks on hiring, wages echo in aluminium industry's plea for MSME duty relief",
+"url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxPRjN0cjhVVTZVMVAxT29vc215b3Jpb0EwMkhadVBOWDFwdG95VnZIV1BLQzlQRjBTUWlORHpTZ3Nnbi1pM3hQXy1aWTY5NzFwanljc25tcWpyMG96UmIxN001eFNrRFBYejdYTU9pWWNIMk56MG5ITHRWVFJmLTBmM0JSdFNwVnNlM3NBVjROM3V1NlJjeDlmTy1adGdLQkZ4cTZkRm5FVkFDTGloT25KX3lQVE9sVHdwQ2h3em9aR0YxR3lrT1JQRFZDVThtdmZqM29weDJ2WG5SU0JNaDEtZFk0MmZrYjdOLWM5eC1USUdUOXPSAfgBQVVfeXFMT1E4eFNWMWxGc2hQOXE1QjRzUFJ0bF9DYnNrM0o2d3FGeEJIYzNoTl9UdXlpVkxxR0MyVkRyXzhpVEx3aXBiMzdfbEdPNjdlSlNUTm43emRqMnNfakRpVHc2SEZSNlJnUnBhREZOOWxIXzFHeVhibXpIVFdla0dXRC05cUtRUXhfUXNrcWZjQ3E2Y29SLWFGQ3ViQzlhNDhNWmZnNERNdDdJZ2tGbTh3MlREVWtDR1FnRm5MWkpDcFFNUTRZMkFzeU9GUzUxR3JHclAwMXlUa0NRQTVNTy1XZjVzUmV6YXp2V2hUcjZDV2xRQXFzaHZKdlk?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Aluminium"
+],
+"neg": false
+},
+{
+"key": "carbikeinsurancerulesmaychangegovtplanshigherpremiumsnofuelwithoutinsuranceaspartofmaj",
+"date": "2026-11-25",
+"title": "Car, bike insurance rules may change: Govt plans higher premiums, no fuel without insurance as part of maj",
+"url": "https://news.google.com/rss/articles/CBMiqwJBVV95cUxNcGk3RFlOaGU5VVpjbG56Y0UteUVMQWFtVEEtMWZqeUgtYm5FU3RIUF9SaExoNlVZVEZkQmFjZEFRdko3SjJZd3Q0TTJNenlmV3BIWlpEQlcwSHZ1N2VvTWFuOUY5UGpfaUx4QWJTTkZ6ajMwcHZzX0ZEQTdUdXZBNEpRMEswc09PR2NaTnkwY2VXLVlxNGROWnZwX0N6cjJtTEozN0kta2hVcjF6S3BGRTdWSVFRT3dxTndTaS1IUkdFQ2xUaE5GTFdvMm1yOHB0SEtCMzZhOGhTSjc2NUs1Rk9rQV9wTDBKb1FWNmIwRDZJeU5Fb01SNGhHTTRHZXhjY3prSW5LeVlHYWFReGJLeldkcmx4UUZNNml0UmVCNWdtSFVlRk01UTlHONIBsAJBVV95cUxNYXFpVThlYjJQVV8wc1QzSFZOdzJGalNxQjd0LUEtV3RWaFJpMkhXbGM2ejhjRTNzODk2Z2s4WG1KYlJLcC1halQyZ1JrblFLWDJyc0VHcUFsb2hmUjlzcUxZZkhKS2ZFdko3eXJWSGg3SkQ1MjVOa2RFT0JMMkIxU2s0bnJfaXRZSmxnSHQ4VDgwQlRiVmRTc2Qxc1VLZlJXb2FxS1EtN1FTdllwbUU3UnRJd2xVT1RVak9ZTDNoc0NpaWVmQjNFaDBObnB4YWJqbC1nUUhraU5TZDNCMWNhVTVFcUdGbXRrdlNhTGQxcTV4SC1aNEg5WHp5TnJwTmxwSVdUWjB0LVlES0xQWGQzcEJHcXRfTWw2VHVNX2RILWxGZVJ6dnphZHFxNnRDYzls?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "Plans / reports",
+"industries": [
+"Life Insurance",
+"General Insurance",
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
 {
 "key": "cabinetapprovestwoflyoversondelhismbroad",
 "date": "2026-11-24",
@@ -2150,6 +2285,154 @@
 }
 ],
 "by_industry": {
+"Life Insurance": [
+"unioncabinetapprovesprudentialsfdiproposalinbhartilifeinsurance",
+"carbikeinsurancerulesmaychangegovtplanshigherpremiumsnofuelwithoutinsuranceaspartofmaj",
+"blackstonebringsinformerhdfcergoceoriteshkumarforindiainsuranceventure"
+],
+"General Insurance": [
+"unioncabinetapprovesprudentialsfdiproposalinbhartilifeinsurance",
+"carbikeinsurancerulesmaychangegovtplanshigherpremiumsnofuelwithoutinsuranceaspartofmaj",
+"blackstonebringsinformerhdfcergoceoriteshkumarforindiainsuranceventure"
+],
+"Ship Building & Allied Services": [
+"cabinetapprovesrs4288croresecondcontainerterminalatkamarajarportintamilnadu",
+"cabinetapprovesrs4288crsecondcontainerterminalinkamarajarportandrs2014crsilcharairport",
+"newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
+"dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
+"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
+"defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
+"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
+"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"defenceministryclears212trillioninproposalsforthearmedforces",
+"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
+],
+"Shipping": [
+"cabinetapprovesrs4288croresecondcontainerterminalatkamarajarportintamilnadu",
+"cabinetapprovesrs4288crsecondcontainerterminalinkamarajarportandrs2014crsilcharairport",
+"newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
+"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
+],
+"Port & Port services": [
+"cabinetapprovesrs4288croresecondcontainerterminalatkamarajarportintamilnadu",
+"cabinetapprovesrs4288crsecondcontainerterminalinkamarajarportandrs2014crsilcharairport",
+"newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
+"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
+"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
+],
+"Airport & Airport services": [
+"cabinetapprovesrs4288crsecondcontainerterminalinkamarajarportandrs2014crsilcharairport",
+"newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
+"cabinetapprovesrs2014croregreenfieldairportatdolootoboostairconnectivityinsouthassam",
+"fromcieschemetonewsilcharairportcabinetapprovesprojectsworthnearlyrs20000crore",
+"indiasadaniairporttoraise300millionviastakesale",
+"adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
+"cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
+"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
+"indiaraisesdieselandaviationturbinefuelexportduty",
+"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
+],
+"Airline": [
+"cabinetapprovesrs4288crsecondcontainerterminalinkamarajarportandrs2014crsilcharairport",
+"newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
+"cabinetapprovesrs2014croregreenfieldairportatdolootoboostairconnectivityinsouthassam",
+"fromcieschemetonewsilcharairportcabinetapprovesprojectsworthnearlyrs20000crore",
+"indiasadaniairporttoraise300millionviastakesale",
+"adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
+"cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
+"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
+"indiaraisesdieselandaviationturbinefuelexportduty",
+"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
+],
+"Iron & Steel": [
+"tatasteeljswsteelsailjindalsteelcheckfreshtargetsonmetalstocksamidmeltdown",
+"aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
+"steelsh2showhingesonpricegainscostpressure",
+"tatasteeltoselltubespipesbusinessandtatasteelcolorstoaplapolloforrs28000crore",
+"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
+"tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
+"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
+"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
+"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
+"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
+"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
+"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
+"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
+"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
+],
+"Iron & Steel Products": [
+"tatasteeljswsteelsailjindalsteelcheckfreshtargetsonmetalstocksamidmeltdown",
+"aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
+"steelsh2showhingesonpricegainscostpressure",
+"tatasteeltoselltubespipesbusinessandtatasteelcolorstoaplapolloforrs28000crore",
+"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
+"tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
+"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
+"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
+"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
+"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
+"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
+"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
+"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
+"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
+],
+"Aluminium": [
+"pmmodisremarksonhiringwagesechoinaluminiumindustryspleaformsmedutyrelief",
+"aluminiumbodyseeksimportdutyhikesays4trillionpipelineatrisk",
+"aluminiumproductmakersseekzeroimportdutyonrawmetalaheadofbudget",
+"unionbudget2028aluminiumproductmakersseekdutyfreeimportsforprimarymetal",
+"indiamayimposedutiesoncheapaluminiumimports5stocksthatcouldbenefit",
+"budgetwishdownstreamaluminiumcompaniesseekbasiccustomsdutyscrapped",
+"dgtrinitiatesantidumpingprobeintoaluminiumextrusionimports"
+],
+"Passenger Cars & Utility Vehicles": [
+"carbikeinsurancerulesmaychangegovtplanshigherpremiumsnofuelwithoutinsuranceaspartofmaj",
+"autoplipayoutshit4365croresofarinfy27",
+"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"2/3 Wheelers": [
+"carbikeinsurancerulesmaychangegovtplanshigherpremiumsnofuelwithoutinsuranceaspartofmaj",
+"autoplipayoutshit4365croresofarinfy27",
+"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
+"Auto Components & Equipments": [
+"carbikeinsurancerulesmaychangegovtplanshigherpremiumsnofuelwithoutinsuranceaspartofmaj",
+"autoplipayoutshit4365croresofarinfy27",
+"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
+"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
+"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
+"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
+"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
+"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
+"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
+"indiasfestivecarbuyingjoyridemayhitpricehikebump",
+"gstcouncilproposes5gstoptionforevpassengertransportrentals"
+],
 "Civil Construction": [
 "cabinetapprovestwoflyoversondelhismbroad",
 "tendersfloatedfor4299crorebikkavoluduvvadaraillinestoeasecongestionaroundvisakhapatnam",
@@ -2166,56 +2449,6 @@
 "cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
 "jupiterwagonsformsjvwithsouthkoreaswoojinformetropropulsionbiz",
 "pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
-],
-"Life Insurance": [
-"blackstonebringsinformerhdfcergoceoriteshkumarforindiainsuranceventure"
-],
-"General Insurance": [
-"blackstonebringsinformerhdfcergoceoriteshkumarforindiainsuranceventure"
-],
-"Passenger Cars & Utility Vehicles": [
-"autoplipayoutshit4365croresofarinfy27",
-"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
-"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
-"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
-"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
-"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
-"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
-"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
-"indiasfestivecarbuyingjoyridemayhitpricehikebump",
-"gstcouncilproposes5gstoptionforevpassengertransportrentals"
-],
-"2/3 Wheelers": [
-"autoplipayoutshit4365croresofarinfy27",
-"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
-"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
-"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
-"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
-"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
-"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
-"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
-"indiasfestivecarbuyingjoyridemayhitpricehikebump",
-"gstcouncilproposes5gstoptionforevpassengertransportrentals"
-],
-"Auto Components & Equipments": [
-"autoplipayoutshit4365croresofarinfy27",
-"indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
-"autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
-"bajajautotopsautoplipayoutsinfy26aheadoftatamotorsolareport",
-"whyindiasblackmassexportbanmattersforitsevbatteryambitions",
-"indiaslithiumionbatteryblackmassexportbanwhatitmeansforrecyclersandevmakers",
-"samvat2083canautostocksbeatthegsthangoverafteran82rallyand35crash",
-"navratricarsalesfall22aslastyearsgstcuteffectfadesevsalesrise27",
-"indiasfestivecarbuyingjoyridemayhitpricehikebump",
-"gstcouncilproposes5gstoptionforevpassengertransportrentals"
-],
-"Aluminium": [
-"aluminiumbodyseeksimportdutyhikesays4trillionpipelineatrisk",
-"aluminiumproductmakersseekzeroimportdutyonrawmetalaheadofbudget",
-"unionbudget2028aluminiumproductmakersseekdutyfreeimportsforprimarymetal",
-"indiamayimposedutiesoncheapaluminiumimports5stocksthatcouldbenefit",
-"budgetwishdownstreamaluminiumcompaniesseekbasiccustomsdutyscrapped",
-"dgtrinitiatesantidumpingprobeintoaluminiumextrusionimports"
 ],
 "Other Agricultural Products": [
 "indiasnonbasmatiriceexportsurges67inapriloctober",
@@ -2235,36 +2468,6 @@
 "govteyesstakecutsin4psubanksincludingcentralbankucobank2moreinprivatisationplan",
 "afteridbibanksalecentrelooksatcentralbankucobank2otherpsubanksforstakecutschecktermshere",
 "governmentplanstoparestakesin4psubanksto75"
-],
-"Iron & Steel": [
-"aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
-"steelsh2showhingesonpricegainscostpressure",
-"tatasteeltoselltubespipesbusinessandtatasteelcolorstoaplapolloforrs28000crore",
-"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
-"tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
-"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
-"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
-"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
-"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
-"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
-"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
-"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
-"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
-],
-"Iron & Steel Products": [
-"aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
-"steelsh2showhingesonpricegainscostpressure",
-"tatasteeltoselltubespipesbusinessandtatasteelcolorstoaplapolloforrs28000crore",
-"tatasteelsharesslidenearly2aseuantidumpingdutyandbearishtechnicalsweigh",
-"tatasteelsharepricestockfallsnearly2oneuantidumpingduty",
-"euimposesantidumpingdutyonsteelimportsfromindia4othernations",
-"eus95antidumpingdutyaddstotradebarriersforindiansteelmakersjswsteelceojayantacharya",
-"euimposes95dutyonindiancoldrolledsteelwhatitmeansforexporters",
-"euimposes95antidumpingdutyonsteelimportsfromindiafourothers",
-"euslapsantidumpingdutiesonsteelimportsfromindia4othercountries",
-"indiansteelassociationcallseusantidumpingdutyassessmentunfair",
-"indiancoldrolledsteelfaces95antidumpingdutyineuropeanunion",
-"euimposes95antidumpingdutyoncoldrolledsteelimportsfromindia"
 ],
 "Sugar": [
 "e20petrolcontroversysureshgopiquestionskarnatakasethanoltests",
@@ -2331,22 +2534,6 @@
 "sugarcanefarmerswelcomepanelbutwontendprotest",
 "governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
 ],
-"Airport & Airport services": [
-"indiasadaniairporttoraise300millionviastakesale",
-"adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
-"cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
-"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
-"indiaraisesdieselandaviationturbinefuelexportduty",
-"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
-],
-"Airline": [
-"indiasadaniairporttoraise300millionviastakesale",
-"adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
-"cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
-"centreraisesexportdutyondieselaviationfuelpetrolunchanged",
-"indiaraisesdieselandaviationturbinefuelexportduty",
-"govtraisesexportdutyondieselaviationfuelscrapspetrollevy"
-],
 "Aerospace & Defense": [
 "dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
 "defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
@@ -2361,23 +2548,6 @@
 "rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
 "dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
 "bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
-],
-"Ship Building & Allied Services": [
-"dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
-"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
-"defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
-"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
-"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
-"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
-"dacclearsdefenceprocurementproposalsworth212lakhcrore",
-"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
-"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
-"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
-"defenceministryclears212trillioninproposalsforthearmedforces",
-"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
-"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
-"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef",
-"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
 ],
 "Explosives": [
 "dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
@@ -2447,14 +2617,6 @@
 "Integrated Power Utilities": [
 "cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
 "biharcabinetapproveseauctionofmineralblocksadanitransmissiondeal"
-],
-"Shipping": [
-"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
-"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
-],
-"Port & Port services": [
-"hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
-"adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
 ],
 "Packaged Foods": [
 "indiasfoodprocessinggrowthneedsbetterstorageandfarmmarketreforms"
