@@ -103,7 +103,7 @@ BUCKETS = {"mom": 100, "tf": 100, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "my": 0, 
 PR_N = 10          # Pulse rotation: equal weight, your % / 10 a stock
 ALLOC_V = 3         # 24 Nov 2026 (Amritpal: "Remove capital split"): no caps on Momentum / Trend 9/21; older saved splits are dropped
 SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt", "VCP": "vcp", "My pick": "my", "Pulse rotation": "pr"}
-STOP_KINDS = ("ATH_STOP", "TF_STOP", "VCP_STOP")   # buy-stop rows (stop-limit day orders)
+STOP_KINDS = ("ATH_STOP", "TF_STOP", "VCP_STOP", "PAT_STOP")   # buy-stop rows (stop-limit day orders); PAT_STOP 25 Nov 2026
 
 
 def alloc() -> dict:
@@ -480,7 +480,7 @@ def record_exit(sym, sell_px):
 def protect_level(kind, stop):
     if not stop:
         return None
-    return stop if kind in ("T921", "RETEST", "PATTERN", "VCP", "VCP_STOP", "MY_GTT", "PR") else stop * (1 - ATH_NET_PCT)
+    return stop if kind in ("T921", "RETEST", "PATTERN", "PAT_STOP", "VCP", "VCP_STOP", "MY_GTT", "PR") else stop * (1 - ATH_NET_PCT)
 
 
 def _slog(e, px, why):
@@ -543,13 +543,13 @@ def auto_target(e, row=None):
         return None
     entry, stop = float(e.get("entry") or 0), float(e.get("stop") or 0)
     kind, sysn = e.get("kind"), e.get("system")
-    if row and row.get("target") and kind in ("RETEST", "PATTERN"):
+    if row and row.get("target") and kind in ("RETEST", "PATTERN", "PAT_STOP"):
         return round(float(row["target"]), 2)
     if not (entry > stop > 0):
         return None
     if kind == "RETEST" or sysn == "Breakout retest":
         return round(entry + TESTED_R["RETEST"] * (entry - stop), 2)
-    if kind == "PATTERN" or sysn == "Bottom pattern":
+    if kind in ("PATTERN", "PAT_STOP") or sysn == "Bottom pattern":
         return round(float(e["plan_target"]), 2) if e.get("plan_target") else None
     if kind == "MY_GTT" or sysn == "My pick":
         return round(entry + MY_TARGET_R * (entry - stop), 2)
@@ -1627,7 +1627,7 @@ def order(body: Order, _=Depends(auth)):
     if side == "BUY":
         J[sym] = dict(since=t.date().isoformat(), system=row.get("system"), kind=row.get("kind"), stop=row.get("stop"),
                       entry=float(p["price"]), qty=body.qty, order_id=str(oid), state="pending")
-        if row.get("kind") == "PATTERN" and row.get("target"):
+        if row.get("kind") in ("PATTERN", "PAT_STOP") and row.get("target"):
             J[sym]["plan_target"] = float(row["target"])
         tg = auto_target(J[sym], row)
         if tg:

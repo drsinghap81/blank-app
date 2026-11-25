@@ -120,7 +120,9 @@ def scan(x, sym, name, kind="stock"):
                        lows=[[str(dts[l_[1]].date()), float(l_[2])] for l_ in lows], peaks=[[str(dts[p_[1]].date()), float(p_[2])] for p_ in peaks],
                        rsi_lows=[round(float(rv[i_]), 1) for i_ in li], rsi_div=round(dv, 1), rsi_now=round(float(rv[-1]), 1),
                        signal_date=str(dts[sig].date()) if sig is not None else None,
-                       days_since=int(n - 1 - sig) if sig is not None else None)
+                       days_since=int(n - 1 - sig) if sig is not None else None,
+                       bo_high=round(float(hg[sig]), 2) if sig is not None else None,
+                       takeout=round(float(hg[sig]) * 1.0015, 2) if sig is not None else None)
             # 17 Nov 2026: classic neckline rule after the breakout close - target = neckline + height (low to neckline),
             # SL = daily close 4% under the neckline (6% for an inverse H&S); which came first since the breakout
             low0 = min(l_[2] for l_ in lows); tgt = neck + (neck - low0); sl = neck * (0.94 if typ == "IHS" else 0.96)
@@ -284,21 +286,35 @@ def vcp(x, sym, name):
                    setup_date=D[ct], base_start=D[seq[0][1]], dry=round(dry, 2), ema50=round(float(e50[-1]), 2),
                    contractions=[dict(h_date=D[hi[1]], h=round(float(hi[2]), 2), l_date=D[lo[1]], l=round(float(lo[2]), 2),
                                       depth=round((1 - lo[2] / hi[2]) * 100, 1)) for hi, lo in pairs])
-        bo = None
+        # 25 Nov 2026 (Amritpal: "apply to all breakout systems"): the breakout is a daily CLOSE above the pivot on >= 1.4x
+        # volume; the buy is the NEXT session above that candle's high + 0.15% (tight-base take-out test, claude/
+        # breakout-candle-takeout-test.md: +5.55% a trade vs +5.09% buying the next open; never-taken-out breakouts -0.69%)
+        bo = None; cf = None
         for t in range(ct + 1, min(n, ct + VCP_WAIT + 1)):
             if l[t] < stp:
                 bo = -1; break
-            if h[t] > piv:
-                bo = t; break
+            if c[t] > piv and vr[t] >= VCP_VOL and st2[t - 1]:
+                cf = t; tk = h[t] * 1.0015
+                if t == n - 1:
+                    bo = -2; break                          # confirmed at the last close: buy-stop for the next session
+                if h[t + 1] > tk:
+                    bo = t + 1; break                       # taken out the next session
+                # not taken out: lapses; a later close above the pivot on volume can confirm again
         if bo == -1:
             continue
-        if bo is None:                                   # still forming: a buy-stop above the pivot is live
+        if bo == -2:
+            if c[-1] <= stp or 1 - stp / (h[-1] * 1.0015) > VCP_RISK:
+                continue
+            row.update(status="confirm", trigger=round(float(h[-1] * 1.0015), 2), bo_high=round(float(h[-1]), 2), bo_vol=round(float(vr[-1]), 2),
+                       to_pivot_pct=round((h[-1] * 1.0015 / c[-1] - 1) * 100, 1), risk_pct=round((1 - stp / (h[-1] * 1.0015)) * 100, 1))
+            return row
+        if bo is None:                                   # still forming: waiting for a close above the pivot on volume
             if n - 1 > ct + VCP_WAIT or not st2[-1] or c[-1] <= stp or 1 - stp / piv > VCP_RISK:
                 continue
             row.update(status="forming", to_pivot_pct=round((piv / c[-1] - 1) * 100, 1), risk_pct=round((1 - stp / piv) * 100, 1))
             return row
-        e = max(o[bo], piv)
-        if not st2[bo - 1] or e > piv * 1.03 or 1 - stp / e > VCP_RISK or not (vr[bo] >= VCP_VOL):
+        e = max(o[bo], h[cf] * 1.0015)
+        if e > piv * 1.06 or 1 - stp / e > VCP_RISK:
             continue
         row.update(bo_date=D[bo], bo_vol=round(float(vr[bo]), 2), entry=round(float(e), 2), days_since=n - 1 - bo,
                    risk_pct=round((1 - stp / e) * 100, 1), ret_pct=round((c[-1] / e - 1) * 100, 1))
@@ -437,6 +453,7 @@ def flag(x, sym, name):
                     row["bo_vol_x"] = round(float(vv[bo] / v50[bo]), 1)
                 row["stop"] = round(float(plo), 2)
                 e = float(c[bo]); row.update(status="breakout", bo_date=D[bo], entry=round(e, 2), days_since=back,
+                                             bo_high=round(float(h[bo]), 2), takeout=round(float(h[bo]) * 1.0015, 2),
                                              target=round(e + (top - base), 2), risk_pct=round((1 - plo / e) * 100, 1), ret_pct=round((c[-1] / e - 1) * 100, 1))
             row["ema21"] = round(float(x.Close.ewm(span=21, adjust=False).mean().iloc[-1]), 2)   # tested exit: a daily close below it
             # 22 Nov 2026 (Amritpal: "keep only those with enough room, almost equal to the pole, before the next resistance from the
@@ -583,7 +600,7 @@ def main(mk="NSE"):
                             "old swing lows +0.10R, random uptrend stock the same day +0.09R. Trades with 1:3 room to the next resistance: no better. "
                             "Within 1% of an odd square: no better (breakout retests +0.15R vs +0.21R away from one; swing lows +0.04R vs +0.09R). Watch only." if not g else g["bt_sup"],
                    rows=srows), open(f"{OUT}/support.json", "w"), indent=0)
-    VO = {"forming": 1, "breakout": 0, "exit": 2, "holding": 3}
+    VO = {"confirm": 0, "forming": 1, "breakout": 0, "exit": 2, "holding": 3}
     vrows.sort(key=lambda r: (VO[r["status"]], r.get("to_pivot_pct") or 0, r.get("days_since") or 0))
     json.dump(dict(generated=out["generated"], asof=out["asof"], market=mk,
                    rules="Stage 2 uptrend (close > EMA 50/150/200 stacked, EMA 200 rising, >= 30% above the 52-week low, within 25% of the high). "

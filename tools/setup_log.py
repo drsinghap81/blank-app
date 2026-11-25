@@ -19,7 +19,7 @@ import sys
 from datetime import datetime, timezone
 
 DIR = {"NSE": "data/scan/", "US": "data/scan/us/", "ASX": "data/scan/asx/", "UK": "data/scan/uk/"}
-STOPK = ("ATH_STOP", "TF_STOP", "VCP_STOP")
+STOPK = ("ATH_STOP", "TF_STOP", "VCP_STOP", "PAT_STOP")
 HZ = (1, 5, 20, 60)
 MAX_DAYS, WAIT_DAYS = 120, 20
 
@@ -82,7 +82,7 @@ def main(mk):
                 r["wd"] = r.get("wd", 0) + 1
                 if c >= r["trig"]:
                     r.update(st="open", e=r["trig"], d0=asof, n=0)
-                elif r["wd"] >= WAIT_DAYS:
+                elif r["wd"] >= r.get("wmax", WAIT_DAYS):   # 25 Nov 2026: next-session-only buy-stops lapse after one session
                     r["st"] = "expired"; continue
                 else:
                     continue
@@ -103,8 +103,10 @@ def main(mk):
     # 2. log setups shown tonight that are not already being followed
     # 22 Nov 2026 (Amritpal: "track all systems very closely - forward testing - even if I haven't executed"): every system's
     # setups are logged, switched-off ones too (on = False), plus bottom-pattern breakouts from patterns.json
-    pats = [dict(symbol=r["symbol"], bucket="pt", system="Bottom pattern", kind="PATTERN", price=r.get("close"), stop=r.get("stop"), target=r.get("target"))
-            for r in (load(D + "patterns.json").get("rows") or []) if r.get("kind") != "index" and r.get("status") == "breakout" and (r.get("days_since") or 0) <= 1]
+    # 25 Nov 2026: bottom patterns are bought only when the breakout candle's high is taken out the next session (+0.15%)
+    pats = [dict(symbol=r["symbol"], bucket="pt", system="Bottom pattern", kind="PAT_STOP", trigger=r.get("takeout"), when="next session only",
+                 price=r.get("close"), stop=r.get("stop"), target=r.get("target"))
+            for r in (load(D + "patterns.json").get("rows") or []) if r.get("kind") != "index" and r.get("status") == "breakout" and (r.get("days_since") or 0) == 0 and r.get("takeout")]
     flg = [dict(symbol=r["symbol"], bucket="fl", system="Flag / pennant", kind="FLAG", price=r.get("entry"), stop=r.get("stop"), target=r.get("target"))
            for r in (load(D + "flags.json").get("rows") or []) if r.get("status") == "breakout" and (r.get("days_since") or 0) == 0]
     for x in (P.get("top") or []) + (P.get("swing") or []) + (P.get("more") or []) + pats + flg:
@@ -120,7 +122,8 @@ def main(mk):
         rows.append(dict(id=x.get("id"), sym=x["symbol"], sys=x.get("system"), kind=x.get("kind"), b=b, d=asof, s=round(float(x["stop"]), 2),
                          st="waiting" if stopk else "open", trig=round(e, 2) if stopk else None, e=None if stopk else round(e, 2),
                          d0=None if stopk else asof, n=0, ts=round(float(x["stop"]), 2), tr=0,
-                         t=round(float(x["target"]), 2) if x.get("target") else None, on=b in live))
+                         t=round(float(x["target"]), 2) if x.get("target") else None, on=b in live,
+                         **({"wmax": 1} if stopk and str(x.get("when") or "").startswith("next session only") else {})))
         open_syms.add(x["symbol"])
     L.update(asof=asof, since=L.get("since") or asof, generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), rows=rows[-600:])
     # 3. summary for the app

@@ -750,8 +750,8 @@ function guardCard(G) {
     : `<label class="lv-sub" style="display:block;margin-top:6px">Worst fall you can sit through: <select id="lvbud">${opts}</select></label>`}
     <details class="info"><summary>How it works</summary><p>Your account value (cash + shares) is compared with its highest point. Risk per trade is set so that in 95% of 2,000 simulated 10-year histories the fall stayed within your limit. It warns at 75% and 100% of the limit, pauses new buys for 2 weeks after ${G ? G.streak_max : 5} losses in a row, caps one stock at 10%, and never sells for you. The limit is DD_BUDGET_PCT on the server.</p></details></div>`;
 }
-const isStopK = (k) => k === 'ATH_STOP' || k === 'TF_STOP' || k === 'VCP_STOP';
-const KIND_TXT = { PR: 'Pulse rotation · weekly pick', MY_GTT: 'Your pick · GTT buy', VCP: 'VCP breakout', VCP_STOP: 'Buy-stop at the VCP pivot', PATTERN: 'Bottom pattern',  ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', TF_BRK: 'Cup breakout (1–2 yr cup)', TF_STOP: 'Buy-stop at the cup high', T921: '9/21 trend entry', RETEST: 'Breakout retest (support)', PATTERN: 'Bottom-pattern breakout' };
+const isStopK = (k) => k === 'ATH_STOP' || k === 'TF_STOP' || k === 'VCP_STOP' || k === 'PAT_STOP';
+const KIND_TXT = { PR: 'Pulse rotation · weekly pick', MY_GTT: 'Your pick · GTT buy', VCP: 'VCP breakout', VCP_STOP: 'Buy-stop: VCP closed above its pivot, next session above that day\'s high', PAT_STOP: 'Buy-stop: bottom pattern, next session above the breakout day\'s high', PATTERN: 'Bottom pattern',  ATH_BRK: 'Monthly ATH breakout', ATH_STOP: 'Buy-stop at ATH trigger', TF_BRK: 'Cup breakout (1–2 yr cup)', TF_STOP: 'Buy-stop at the cup high', T921: '9/21 trend entry', RETEST: 'Breakout retest (support)', PATTERN: 'Bottom-pattern breakout' };
 /* Systems as capital buckets (9 Nov 2026): % = the most of your capital a system may hold; all share one cash pool,
    Momentum first, swing buckets keep 15% in cash for Momentum. NSE one-account test 2017-26: Momentum <= 60% + Trend 9/21 <= 40%
    23.1%/yr, worst fall -21.4%; Momentum alone 17.3%, -16.8%. */
@@ -773,7 +773,7 @@ function slTrack(o) {
     ${now ? `<div class="slt-foot"><span>Now ${f(now)} · <b class="${nowUp ? 'up' : 'down'}">${nowUp ? '+' : ''}${fmt((now / entry - 1) * 100, 1)}%</b></span>${!ref ? `<span>Target ${left > 0 ? `<b class="up">▲ ${fmt(left, 1)}%</b> away` : '<b class="up">reached</b>'}</span>` : `<span>Stop ${fmt((1 - stop / now) * 100, 1)}% below</span>`}</div>` : ''}${ref ? `<div class="slt-foot"><span>No fixed target · exit as tested: ${esc(o.exitTxt || 'trailing stop')}</span></div>` : ''}</div>`;
 }
 const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', vcp: 'VCP', my: 'My picks', s1: 'System 1', wc: 'Wealth Creation', tb: 'Top Bottom', pr: 'Pulse rotation' };
-const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : r.kind === 'PATTERN' ? 'pt' : r.kind === 'T921' ? 't9' : 'tf');
+const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : (r.kind === 'PATTERN' || r.kind === 'PAT_STOP') ? 'pt' : r.kind === 'T921' ? 't9' : 'tf');
 function lvAlloc(mk, P, S) {
   if (S && S.buckets) return { ...BK_DEF, ...Object.fromEntries(S.buckets.map((b) => [b.key, b.pct])) };
   let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc2_' + mk) || '{}'); } catch (e) { /* private mode */ }
@@ -1033,7 +1033,7 @@ async function loadLive() {
   { const have = new Set(rows.map((r) => r.id)); const C0n = cap('NSE');
     rows = rows.concat(myLocal('NSE').map((x) => myRow(x, 'NSE', C0n, 1)).filter((r) => !have.has(r.id))
       .map((r) => ({ ...r, skip: S ? 'not on your server yet — reopen Live' : 'connect your server to Send the GTT' }))); }
-  if (!rows.some((r) => r.kind === 'PATTERN')) rows = rows.concat((P.pattern_watch || []).filter((x) => x.close && x.stop && x.stop < x.close).map((x, k) => ({
+  if (!rows.some((r) => r.kind === 'PATTERN' || r.kind === 'PAT_STOP')) rows = rows.concat((P.pattern_watch || []).filter((x) => x.close && x.stop && x.stop < x.close).map((x, k) => ({
     ...x, id: `PAT-${x.symbol}-${x.signal_date || ''}`, system: 'Bottom pattern', bucket: 'pt', kind: 'PATTERN', tier: 'swing', price: x.close, ref: x.close, rank: k + 1,
     risk_pct: (1 - x.stop / x.close) * 100, qty: 0, value: 0, local: true, exit_rule: 'pattern stop only (no tested exit)', when: 'next open',
     note: `${PAT_NM[x.typ] || x.typ} broke its neckline ${fmt(x.neck, 2, 'en-IN')} on ${x.signal_date || ''}`,
@@ -1319,7 +1319,7 @@ async function loadLive() {
 async function lvOpen(r, mk = 'NSE') {
   const MP = MAIN + MKT[mk].path, tag = mk === 'NSE' ? '' : '_' + mk;
   if (bkOf(r) === 'vcp') { vcpSelect(r, mk); return; }
-  if (r.kind === 'PATTERN') {                      // bottom-pattern picks: the pattern chart from the Bottoms scan
+  if (r.kind === 'PATTERN' || r.kind === 'PAT_STOP') {                      // bottom-pattern picks: the pattern chart from the Bottoms scan
     state.botMk = mk; state.patC = state.patC || {};
     if (state.patC[mk] === undefined) state.patC[mk] = await getJSON(MP + 'patterns.json', 'pat_' + mk);
     state.pat = state.patC[mk]; const row = ((state.pat || {}).rows || []).find((x) => x.symbol === r.symbol);

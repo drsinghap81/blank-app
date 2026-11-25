@@ -329,19 +329,21 @@ def main(mk="NSE"):
                                      group=g, lane=ln, group_pulse=gp, group_rank=gr)
         PN = {"DB": "double bottom", "TW": "tilted W", "TB": "triple bottom", "IHS": "inverse H&S"}
         for r in pat.get("rows") or []:
-            if r.get("kind") != "stock" or r.get("status") != "breakout" or (r.get("days_since") or 0) > 3 or r["symbol"] in best:
+            # 25 Nov 2026: only the breakout of the last close, bought next session above that candle's high + 0.15%
+            if r.get("kind") != "stock" or r.get("status") != "breakout" or (r.get("days_since") or 0) > 0 or not r.get("takeout") or r["symbol"] in best:
                 continue
             close, stop, neck = num(r.get("close")), num(r.get("stop")), num(r.get("neck"))
             if not close or not stop or not neck or close <= stop or close < MINPX[mk]:
                 continue
-            E = round(close * 1.01, 2); tgt = round(neck * (1 + (r.get("height_pct") or 0) / 100), 2)
+            TK = num(r.get("takeout")); E = round(TK * 1.01, 2); tgt = round(neck * (1 + (r.get("height_pct") or 0) / 100), 2)
             if (E - stop) / E > 0.20 or (tgt - E) < (E - stop):          # skip stops > 20% away and targets under 1R
                 continue
             g, ln, gp, gr = lane_of(r["symbol"])
             if ln in ("weak", "fade", "bounce"):
                 continue
             best[r["symbol"]] = dict(id=f"PAT-{r['symbol']}-{r.get('signal_date')}", symbol=r["symbol"], name=r.get("name", ""), system="Bottom pattern", bucket="pt",
-                                     kind="PATTERN", order="LIMIT", when="next open", side="BUY", price=E, ref=close, stop=round(stop, 2), target=tgt,
+                                     kind="PAT_STOP", order="STOPLOSS_LIMIT", when="next session only (lapses if not triggered)", side="BUY", trigger=TK,
+                                     price=E, ref=close, stop=round(stop, 2), target=tgt,
                                      exit_rule=f"measured-move target {tgt:.2f} or the stop, max 120 days", experimental=True,
                                      note=f"{PN.get(r.get('typ'), r.get('typ'))} broke the neckline {neck:.2f} on {r.get('signal_date')} · experimental: worse than random in the {mk} backtest",
                                      score=0, value_cr=None, sector=None, sector_rs=None, theme=None, theme_rs=None, stock_rs=None, aligned=False, td_score=None,
@@ -392,18 +394,22 @@ def main(mk="NSE"):
                     exit_rule="sell after a daily close below EMA 50, or the stop", pivot=piv, contractions=r.get("contractions"),
                     score=0, value_cr=None, sector=None, sector_rs=None, theme=None, theme_rs=None, stock_rs=None, aligned=False, td_score=None,
                     group=None, lane=None, group_pulse=None, group_rank=None)
-        if r.get("status") == "forming" and (r.get("to_pivot_pct") or 99) <= 5:
-            T = round(piv * 1.001, 2)
-            best[sym] = dict(base, id=f"VCP-{sym}-{r.get('setup_date')}", kind="VCP_STOP", order="STOPLOSS_LIMIT", when="day order, re-place each morning",
+        if r.get("status") == "confirm":   # 25 Nov 2026: closed above the pivot on volume -> buy-stop for the NEXT session only
+            T = num(r.get("trigger"))
+            best[sym] = dict(base, id=f"VCP-{sym}-{r.get('setup_date')}-c", kind="VCP_STOP", order="STOPLOSS_LIMIT", when="next session only (lapses if not triggered)",
                              side="BUY", trigger=T, price=round(T * 1.01, 2), ref=close,
-                             note=f"VCP {cs}, pivot {piv:,.2f} ({r.get('to_pivot_pct')}% above the close); buy-stop needs 1.4x volume on the day as tested")
+                             note=f"VCP {cs}: closed above the pivot {piv:,.2f} on {r.get('bo_vol')}x volume; buy above that day's high + 0.15% = {T:,.2f}")
+        elif r.get("status") == "forming" and (r.get("to_pivot_pct") or 99) <= 5:   # 25 Nov 2026: watch until a close above the pivot
+            best[sym] = dict(base, id=f"VCP-{sym}-{r.get('setup_date')}", kind="WATCH", order=None, when="daily close", side="BUY",
+                             price=round(piv, 2), ref=close, score=-99,
+                             note=f"VCP {cs}: waiting for a daily CLOSE above the pivot {piv:,.2f} on 1.4x volume ({r.get('to_pivot_pct')}% above), then buy next session above that day's high + 0.15%")
         elif r.get("status") == "breakout" and (r.get("days_since") or 0) <= 1 and close <= num(r.get("entry")) * 1.03:
             best[sym] = dict(base, id=f"VCP-{sym}-{r.get('bo_date')}", kind="VCP", order="LIMIT", when="next open", side="BUY",
                              price=round(close * 1.01, 2), ref=close,
                              note=f"VCP {cs} broke the pivot {piv:,.2f} on {r.get('bo_date')} on {r.get('bo_vol')}x volume")
     trades = [c for c in best.values() if c.get("bucket") == "mom"]
     trades.sort(key=lambda c: C.index(c))
-    KORD = {"TF_BRK": 0, "TF_STOP": 0, "T921": 1, "RETEST": 2, "PATTERN": 3, "VCP": 4, "VCP_STOP": 4}
+    KORD = {"TF_BRK": 0, "TF_STOP": 0, "T921": 1, "RETEST": 2, "PATTERN": 3, "PAT_STOP": 3, "VCP": 4, "VCP_STOP": 4}
     swing = sorted([c for c in best.values() if c["kind"] in KORD],
                    key=lambda c: (LANE_ORD[c["lane"]], KORD[c["kind"]], -(c["value_cr"] or 0)))
     if india:   # every Trend 9/21 signal, the best 8 retests
@@ -412,7 +418,7 @@ def main(mk="NSE"):
         swing = [c for c in swing if id(c) in keep]
     else:   # keep all 9/21, the best 8 retests and 6 patterns, then order the lot top-down (industry lane, then 9/21 > retest > pattern)
         keep = {id(x) for x in [c for c in swing if c["kind"] in ("T921", "TF_BRK", "TF_STOP")] + [c for c in swing if c["kind"] == "RETEST"][:8]
-                + [c for c in swing if c["kind"] == "PATTERN"][:6] + [c for c in swing if c["bucket"] == "vcp"][:12]}
+                + [c for c in swing if c["kind"] in ("PATTERN", "PAT_STOP")][:6] + [c for c in swing if c["bucket"] == "vcp"][:12]}
         swing = [c for c in swing if id(c) in keep]
     seen = {}
     for L in (trades, swing):
