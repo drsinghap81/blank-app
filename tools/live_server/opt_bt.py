@@ -21,7 +21,8 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 13                    # 26 Nov 2026: index 5-minute bars fetched in 20-day pieces (v12 got none for the longer window) + a run-debug block in the results.
+VERSION = 14                    # 26 Nov 2026: v12/v13 ran after midnight IST when Angel returned no bars (and empties were cached): never cache or accept empty index data; wait for the next close and retry.
+# v13: 26 Nov 2026: index 5-minute bars fetched in 20-day pieces (v12 got none for the longer window) + a run-debug block in the results.
 # v12: 26 Nov 2026: index + daily-close cache keys include the start date (v11 reused v10's files, which began on ~19 Nov).
 # v11: 26 Nov 2026: reuse cached 5-minute bars of EXPIRED monthly contracts, so the test keeps the weeks before the last expiry (v10 ran on 1 day after the 24 Nov expiry).
 # v10: 23 Nov 2026: sector-green + green index slices (Amritpal: "enter after the first 5 minutes with the option trader's conditions" in green sectors)
@@ -151,12 +152,15 @@ class OptBT:
     def _cached(self, key, exchange, token, interval, d0, d1):
         p = os.path.join(self.dir, key + ".json.gz")
         if os.path.exists(p):
-            return json.load(gzip.open(p, "rt"))
+            got = json.load(gzip.open(p, "rt"))
+            if got:                 # v14: an empty file (a failed night-time download) is fetched again
+                return got
         try:
             B = self._get(exchange, token, interval, d0, d1)
         except Exception as ex:  # noqa: BLE001
             self.st["errors"] = self.st.get("errors", 0) + 1; self.log("optbt_fetch_error", key=key, error=str(ex)[:120]); return []
-        json.dump(B, gzip.open(p, "wt"))
+        if B:                      # v14: never cache an empty answer
+            json.dump(B, gzip.open(p, "wt"))
         return B
 
     def _chain(self, seg="NFO"):
@@ -181,7 +185,15 @@ class OptBT:
             self._run_once()
             if self.st.get("state") == "done":
                 return
-            time.sleep(600)
+            if "NO_INDEX_BARS" in str(self.st.get("progress", "")):      # v14: wait for the next India close (fresh Angel login that day)
+                self.st["progress"] = "no data from Angel overnight - retrying after the next close"; self._save()
+                while True:
+                    t = _ist()
+                    if t.weekday() < 5 and (15, 46) <= (t.hour, t.minute) <= (23, 0):
+                        break
+                    time.sleep(600)
+            else:
+                time.sleep(600)
 
     def _run_once(self):
         try:
@@ -206,6 +218,8 @@ class OptBT:
                         bars[x[0]] = x
                     a = b_ + timedelta(days=1)
                 idx[nm] = [bars[k] for k in sorted(bars)]
+                if not idx[nm]:
+                    raise RuntimeError(f"NO_INDEX_BARS {nm}: Angel returned no 5-minute bars (session expired at night?) - retry after the next close")
             days = sorted({b[0][:10] for b in idx["NIFTY"]})
             trades = []; self.syn = {}; self.trail = []; self.sym_err = []
             for k, r in enumerate(rows):
