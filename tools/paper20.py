@@ -76,7 +76,7 @@ def download(syms):
 
 
 # ---------------------------------------------------------------- Pulse rotation (same formulas as tools/pulse_rot.py)
-def pulse_picks(C, V, nifty, IND):
+def pulse_picks(C, V, nifty, IND, since=None):
     ret = C.pct_change(fill_method=None).clip(-0.3, 0.3)
     liq = ((C * V).rolling(60, min_periods=40).median() >= MINVAL) & (C >= MINPX)
     rpi = lambda k: 100 * (C / C.shift(k)).div(nifty / nifty.shift(k), axis=0)  # noqa: E731
@@ -98,7 +98,7 @@ def pulse_picks(C, V, nifty, IND):
     W = idx.loc[fri]; NW = nifty.loc[fri]; PW = pul.loc[fri]
     RS = 100 * W.div(NW, axis=0); ratio = 100 * RS / RS.rolling(10).mean(); mom = (100 * ratio / ratio.shift(1)).rolling(3).mean()
     out, held = {}, []
-    for d in [f for f in fri if f >= START - pd.Timedelta(days=4) and f.weekday() == 4]:
+    for d in [f for f in fri if f >= (since or START) - pd.Timedelta(days=4) and f.weekday() == 4]:
         pct = PW.loc[d].rank(pct=True)
         sel = [k for k in PW.columns if pct.get(k, 0) >= 0.9 and np.isfinite(mom.loc[d, k]) and mom.loc[d, k] >= 100]
         cand = [s for k in sel for s in mem[k] if bool(tr.loc[d, s])]
@@ -118,7 +118,7 @@ TB_SET = [("BANKNIFTY", {}, 0.12), ("NIFTY", dict(buffer_pts=12, long_only=True)
     [(x, dict(long_only=True, buffer_pts=0, buffer_pct=0.05, glitch_pts=0, use_once=True, gap_pct=1.5), 0.20) for x in ("BEL", "LT", "TMPV", "TCS")]
 
 
-def top_bottom(sym, over):
+def top_bottom(sym, over, start=None):
     """one Top Bottom bot (the live settings: Bank Nifty buy + sell; Nifty and the stock futures buy only) replayed from START"""
     import sim_check as sc
     import tb_live as tl
@@ -126,8 +126,9 @@ def top_bottom(sym, over):
     lot = int(float(raw["Lot"].dropna().iloc[-1])) if "Lot" in raw and raw["Lot"].notna().any() else 30
     df = raw[["Open", "High", "Low", "Close"]].dropna()
     cfg = dict(tl.DEFAULT_CFG, entry_day_sl="intraday", dry_run=True, lots=1, **over)
-    st = tl.init_flat_state(df[df.index < START], cfg); br = sc.FakeBroker(); daily = {}; log = []
-    for d in df.index[df.index >= START]:
+    start = start or START
+    st = tl.init_flat_state(df[df.index < start], cfg); br = sc.FakeBroker(); daily = {}; log = []
+    for d in df.index[df.index >= start]:
         bar = df.loc[d]
         day = tl.TradingDay(d.date(), df[df.index < d], st, cfg, br, sc.Quiet(), sc.AutoYes(), log=lambda *a: None)
         day.start(); hi = lo = None; first = True

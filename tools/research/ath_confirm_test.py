@@ -26,6 +26,7 @@ import yfinance as yf
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(HERE, ".."))
 from global_universe import symbols  # noqa: E402
 
+KEEP_OPEN = False
 COST = 0.004; BUF = 0.0015; COVID = (pd.Timestamp("2020-02-15"), pd.Timestamp("2020-12-31"))
 
 
@@ -128,9 +129,12 @@ def trades_for(sym, x, reg):
             done[(v, am)] = True
             ex = exit_after(jj, sysk)
             if ex is None:
-                continue
+                if not KEEP_OPEN:
+                    continue
+                ex = (n - 1, c[n - 1])            # 26 Nov 2026 (combo_compare): still open -> marked at the last close
             k, xp = ex
-            out.append(dict(sym=sym, v=v, sys=sysk, d=D[jj], dx=D[k], ret=xp / px - 1 - COST, hold=k - jj, bull=bool(reg.get(D[jj], True)), base=base))
+            out.append(dict(sym=sym, v=v, sys=sysk, d=D[jj], dx=D[k], ret=xp / px - 1 - COST, hold=k - jj, bull=bool(reg.get(D[jj], True)), base=base,
+                            e=float(px), x=float(xp), open=ex[0] == n - 1 and KEEP_OPEN))
         # set up next-day orders from today's close
         if ("C", am) not in done and "C" not in pend and c[j] > trig:
             pend["C"] = (h[j] * (1 + BUF), j + 1, am, sysk)
