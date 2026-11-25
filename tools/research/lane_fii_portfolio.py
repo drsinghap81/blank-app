@@ -55,6 +55,10 @@ def main():
     T = PF.build()
     if PF.AC.MKT != "NSE":   # 25 Nov 2026: US / ASX - lane filter only (no FII sleeve)
         base = T[["sym", "sys", "d", "dx", "ret", "lane"]]; keep = ~base.lane.isin(["weak", "fade", "bounce"])
+        for sk in ("tf", "mom"):
+            X = base[base.sys == sk]
+            print(f"R| {sk} per trade by lane: " + " | ".join(f"{k} n {len(g)} {g.ret.mean() * 100:+.1f}%" for k, g in X.groupby("lane"))
+                  + f" | kept {X[keep].ret.mean() * 100:+.2f}% (n {keep[X.index].sum()}) vs all {X.ret.mean() * 100:+.2f}% (n {len(X)})", flush=True)
         return report({f"A now ({PF.AC.MKT} Cup + Momentum)": base, "B lanes (skip Weak/Fading/Turning)": base[keep]})
     B = bn_trades()
     print(f"R| Bank Nifty FII trades: {len(B)}, avg {B.ret.mean() * 100:+.2f}%, newest: " + ", ".join(f"{r.d.date()} {r.ret * 100:+.1f}%" for r in B.iloc[::-1].head(8).itertuples()), flush=True)
