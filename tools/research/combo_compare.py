@@ -342,7 +342,8 @@ def allocation(curves, tb_overlay, lab_days):
     import itertools
     ix = sorted(set.intersection(*[set(v.dropna().index) for v in curves.values()]))
     ix = [d for d in ix if d >= pd.Timestamp("2017-01-02")]
-    R = pd.DataFrame({k: v.reindex(ix).ffill().pct_change().fillna(0) for k, v in curves.items()})
+    # daily returns clipped to +-15%: Yahoo series carry unadjusted splits (GOLDBEES 2019) that would read as a -99% day
+    R = pd.DataFrame({k: v.reindex(ix).ffill().pct_change().fillna(0).clip(-0.15, 0.15) for k, v in curves.items()})
     tb = (tb_overlay.reindex(sorted(set(tb_overlay.index) | set(ix))).ffill().reindex(ix).fillna(0).diff().fillna(0) / CAP) if tb_overlay is not None else pd.Series(0.0, index=ix)
     names = list(R.columns); grid = []
     for w in itertools.product(range(0, 11), repeat=len(names)):
