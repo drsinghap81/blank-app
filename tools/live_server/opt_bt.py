@@ -21,7 +21,8 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 12                    # 26 Nov 2026: index + daily-close cache keys include the start date (v11 reused v10's files, which began on ~19 Nov).
+VERSION = 13                    # 26 Nov 2026: index 5-minute bars fetched in 20-day pieces (v12 got none for the longer window) + a run-debug block in the results.
+# v12: 26 Nov 2026: index + daily-close cache keys include the start date (v11 reused v10's files, which began on ~19 Nov).
 # v11: 26 Nov 2026: reuse cached 5-minute bars of EXPIRED monthly contracts, so the test keeps the weeks before the last expiry (v10 ran on 1 day after the 24 Nov expiry).
 # v10: 23 Nov 2026: sector-green + green index slices (Amritpal: "enter after the first 5 minutes with the option trader's conditions" in green sectors)
 # v8: 21 Nov 2026: rotation quadrant slices; 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
@@ -197,16 +198,23 @@ class OptBT:
             start = min((m[0] for m in monthly.values() if m), default=today) - timedelta(days=40)
             start = min(start, prev_expiry(min((m[0] for m in monthly.values() if m), default=today)) - timedelta(days=40))   # v11: expired month too
             idx = {}
-            for nm in ("NIFTY", "BANKNIFTY"):
-                idx[nm] = self._cached(f"idx5_{nm}_{start}_{last}", "NSE", IDXTOK[nm], "FIVE_MINUTE", start, last)
+            for nm in ("NIFTY", "BANKNIFTY"):        # v13: 20-day pieces (one long 5-minute request came back empty in v12)
+                bars, a = {}, start
+                while a <= last:
+                    b_ = min(a + timedelta(days=19), last)
+                    for x in self._cached(f"idx5_{nm}_{a}_{b_}", "NSE", IDXTOK[nm], "FIVE_MINUTE", a, b_):
+                        bars[x[0]] = x
+                    a = b_ + timedelta(days=1)
+                idx[nm] = [bars[k] for k in sorted(bars)]
             days = sorted({b[0][:10] for b in idx["NIFTY"]})
-            trades = []; self.syn = {}; self.trail = []
+            trades = []; self.syn = {}; self.trail = []; self.sym_err = []
             for k, r in enumerate(rows):
                 sym = r["symbol"]; self.st["progress"] = f"{k + 1}/{len(rows)} {sym}"; self._save()
                 try:
                     trades += self._symbol(sym, r.get("kind"), ch.get(sym) or {}, monthly.get(sym) or [], days, idx, last, r.get("lot") or 0)
                 except Exception as ex:  # noqa: BLE001
                     self.log("optbt_symbol_error", symbol=sym, error=str(ex)[:160])
+                    self.sym_err = (getattr(self, "sym_err", []) + [f"{sym}: {str(ex)[:120]}"])[:5]
             # 18 Nov 2026 (Amritpal: "weekly options for indices?"): Nifty again on its nearest WEEKLY expiry (>= 2 days left);
             # kept apart from the main results and compared with Nifty on the monthly
             try:
@@ -295,6 +303,10 @@ class OptBT:
             res["SENSEX debug"] = getattr(self, "sx_debug", None)
             res["SENSEX monthly vs weekly"] = nifty_weekly([t for t in trades if t.get("sx") == "monthly"], [t for t in trades if t.get("sx") == "weekly"])
             res["SMA-20 trail version"] = trail_summary(self.trail)
+            res["run debug"] = dict(start=str(start), last=str(last), days=len(days), first_day=days[0] if days else None, last_day=days[-1] if days else None,
+                                    idx_bars={nm: len(v) for nm, v in idx.items()}, symbols=len(rows), trades=len(trades),
+                                    fetch_errors=self.st.get("errors", 0), symbol_errors=getattr(self, "sym_err", []),
+                                    trade_days=sorted({t["d"] for t in trades})[:40])
             json.dump(self.trail, gzip.open(os.path.join(self.dir, "trail.json.gz"), "wt"))
             res.update(method=__doc__, built=_ist().isoformat(timespec="minutes"), version=VERSION)
             json.dump(res, open(os.path.join(self.dir, "results.json"), "w"))
