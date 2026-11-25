@@ -2254,6 +2254,10 @@ async function loadScore() {
    "Use" writes its capital + system split to the server (/api/picks) - Trade Live then lists exactly that basket's orders.
    Bot = the server's automatic switches for that basket's parts (one password + AUTO); Manual = switches off, you Send. */
 const BASKETS = [
+  /* 26 Nov 2026 (Amritpal: "give me a full basket to push in, it should auto update when a new stock comes on strength"): the New mix
+     from the combination test (claude/system-combinations-and-allocation.md), every part the server can run. New signals come from
+     the evening scan each day, so the bot buys new strength by itself at 09:20 and sells on each system's exit at 09:16. */
+  { id: 'nm', n: 'New mix: everything that tested best', ret: 35.7, dd: -14, how: 'Momentum 25% · Cup 9/21 15% · Flags 20% · Pulse 10% · Gold 10% · plus the 6 Top Bottom bots (BN, Nifty, BEL, L&T, TMPV, TCS) on margin and the US Top Bottom ETFs on moomoo', note: 'since 2017, fresh ₹20 L, survivor stocks (real results lower); since 2025 31%/yr. US RSI(2) (10% in the test) still needs your tap per trade', al: { pr: 10, mom: 25, tf: 15, fl: 20, gd: 10 }, tb: ['bn', 'nifty', 'bel', 'lt', 'tmpv', 'tcs'], us: true },
   { id: 'c', n: 'Pulse + Momentum + Top Bottom', ret: 41, dd: -11, how: 'Pulse rotation 50% · Momentum 30% · Cup 9/21 20% · plus 1 Bank Nifty Top Bottom lot on margin', note: 'monthly data, so the real worst fall is a little deeper', al: { pr: 50, mom: 30, tf: 20 }, tb: ['bn'] },
   { id: 'b', n: 'Best combination: systems + Top Bottom + gold + dollar', ret: 28.5, dd: -8.6, how: '80% in Momentum 60 / Cup 9/21 40 · 10% gold (GOLDBEES) · 10% US dollar (USDINR futures) · plus 1 Bank Nifty Top Bottom lot on margin', note: 'the smallest worst fall of all tested mixes (hedging backtest, monthly data)', al: { pr: 0, mom: 60, tf: 40 }, tb: ['bn'], hedge: true, share: 0.8 },
   { id: 'a', n: 'Momentum + Cup 9/21 + Top Bottom', ret: 33, dd: -12, how: 'Momentum 60% · Cup 9/21 40% · plus 1 Bank Nifty Top Bottom lot on margin', note: 'monthly data', al: { pr: 0, mom: 60, tf: 40 }, tb: ['bn'] },
@@ -2272,13 +2276,13 @@ async function loadBasket() {
   try { [S, A, MT, E] = await Promise.all([lvPlan(), lvApi('/api/auto'), lvApi('/api/mmtb').catch(() => null), getJSON(MAIN + 'data/scan/etf_rotation.json', 'etfrot').catch(() => null)]); }
   catch (e) { if (/log in again|401/i.test(e.message)) { state.trMk = 'NSE'; show('trade'); return; } el.innerHTML = `<p class="empty">${esc(e.message)}</p>`; return; }
   const B = Object.fromEntries((S.buckets || []).map((b) => [b.key, b.pct]));
-  const match = (b) => b.al && ['pr', 'mom', 'tf'].every((k) => Math.round(B[k] ?? -1) === b.al[k]);
+  const AK = ['pr', 'mom', 'tf', 'fl', 'gd']; const match = (b) => b.al && AK.every((k) => Math.round(B[k] ?? 0) === (b.al[k] || 0));
   let pick = null; try { pick = localStorage.getItem('td.basket'); } catch (e) { /* */ }
   const act = (BASKETS.find((b) => b.id === pick && match(b)) || BASKETS.find(match) || {}).id; const isOn = (b) => b.id === act;
   const tb = A.tb || {};
   const partsOf = (b) => (b.al ? [{ k: 'part', id: 'stock_sell', on: !!A.stock_sell }, { k: 'part', id: 'stock_buy', on: !!A.stock_buy }] : [])
     .concat((b.tb || []).filter((i) => tb[i]).map((i) => ({ k: 'tb', id: i, on: !!tb[i].auto })))
-    .concat(b.tbb ? Object.keys(tb).map((i) => ({ k: 'tb', id: i, on: !!tb[i].auto })).concat([{ k: 'part', id: 'mm_us', on: !!A.mm_us }]) : []);
+    .concat(b.us ? [{ k: 'part', id: 'mm_us', on: !!A.mm_us }] : []).concat(b.tbb ? Object.keys(tb).map((i) => ({ k: 'tb', id: i, on: !!tb[i].auto })).concat([{ k: 'part', id: 'mm_us', on: !!A.mm_us }]) : []);
   const botOn = (b) => { const P = partsOf(b); return P.length > 0 && P.every((x) => x.on); };
   const capNow = S.capital || 0; const L = MKT.NSE.loc;
   const buysN = (S.rows || []).filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && bkOf(r) !== 'my').length;
@@ -2286,12 +2290,12 @@ async function loadBasket() {
   /* 24 Nov 2026 (Amritpal: "will it show unique stocks or assets in each basket"): every basket lists its own instruments -
      what its systems hold now and what they buy at the next open (published plan), one chip per stock */
   const P0 = await getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan').catch(() => null);
-  const SYS2K = { 'Monthly ATH': 'mom', 'Trend 9/21': 'tf', 'Pulse rotation': 'pr' };
+  const SYS2K = { 'Monthly ATH': 'mom', 'Trend 9/21': 'tf', 'Pulse rotation': 'pr', 'Flag breakout': 'fl', Gold: 'gd' };
   const heldBy = (k) => [...new Set((S.trades || []).filter((t) => t.state === 'open' && (SYS2K[t.system] || '') === k).map((t) => t.symbol))];
   const planBy = (k) => [...new Set(((P0 && (P0.top || []).concat(P0.swing || [])) || []).filter((r) => bkOf(r) === k && r.stop).map((r) => r.symbol))];
-  const NM = { mom: 'Momentum', tf: 'Cup 9/21', pr: 'Pulse' };
+  const NM = { mom: 'Momentum', tf: 'Cup 9/21', pr: 'Pulse', fl: 'Flags', gd: 'Gold' };
   const list = (b) => { if (!b.al) return '';
-    const ks = ['pr', 'mom', 'tf'].filter((k) => b.al[k] > 0); const H = new Set(); const Bu = new Set(); const tag = {};
+    const ks = AK.filter((k) => b.al[k] > 0); const H = new Set(); const Bu = new Set(); const tag = {};
     ks.forEach((k) => { heldBy(k).forEach((x) => { H.add(x); tag[x] = NM[k]; }); planBy(k).forEach((x) => { if (!H.has(x)) { Bu.add(x); tag[x] = tag[x] || NM[k]; } }); });
     const chips = (L, cls) => [...L].map((x) => `<span class="${cls}" title="${esc(tag[x])}">${esc(x)}<small>${esc(tag[x])}</small></span>`).join('');
     return `<div class="bs-st">${H.size ? `<p>Holds now · ${H.size}</p><div class="bs-chips">${chips(H, 'h')}</div>` : ''}<p>Buys at the next open · ${Bu.size}</p><div class="bs-chips">${chips(Bu, 'b') || '<span class="none">none today</span>'}</div>
@@ -2339,14 +2343,14 @@ async function loadBasket() {
     return `<article class="bs-c${on ? ' act' : ''}"><div class="bs-h"><span class="bs-n">${i + 1}</span><div><b>${esc(b.n)}</b>${on ? '<em>active</em>' : ''}<small>${esc(b.how)}</small></div>
       ${b.ret != null ? `<span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span>` : '<span class="bs-r"><b>🛡</b><small>hedge</small></span>'}</div>
       ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
-  el.innerHTML = `<p class="bs-top">India stock baskets (1, 2, 3, 6, 7) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
+  el.innerHTML = `<p class="bs-top">India stock baskets (1, 2, 3, 4, 7, 8) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
     ${BASKETS.map(card).join('')}<p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
   { const sa = el.querySelector('[data-sendall]'); if (sa) sa.addEventListener('click', () => trSend(OD.list, 'NSE', sa).then(() => setTimeout(loadBasket, 3000))); }
   el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));
   el.querySelectorAll('[data-use]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.use); const cap0 = +el.querySelector(`[data-cap="${b.id}"]`).value || 0; if (b.hedge && !cap0) { alertMsg('Enter your capital: 80% goes to the stock systems, 10% gold, 10% dollar.'); return; }
     const cap = b.share ? Math.round(cap0 * b.share) : cap0; if (b.hedge) state.hedgeCap = cap0;
-    if (!window.confirm(`Make "${b.n}" your India basket?\nCapital ${cap ? money(cap, 'NSE') : 'whole account'} · split Pulse ${b.al.pr}% · Momentum ${b.al.mom}% · Cup 9/21 ${b.al.tf}%.${b.hedge ? `\nPlus 10% gold + 10% dollar (${money(cap0 * 0.1, 'NSE')} each), placed by you.` : ''}\nOpen trades are not sold; new buys follow this basket.`)) return;
-    x.disabled = true; try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ capital: cap, alloc: { ...b.al, t9: 0, rt: 0, pt: 0, vcp: 0 } }) }); state._planC = null; try { localStorage.setItem('td.basket', b.id); } catch (e) { /* */ } alertMsg(`${b.n} is your India basket now.`, true); loadBasket(); } catch (e) { alertMsg(e.message); x.disabled = false; } }));
+    if (!window.confirm(`Make "${b.n}" your India basket?\nCapital ${cap ? money(cap, 'NSE') : 'whole account'} · split ${AK.filter((k) => b.al[k] > 0).map((k) => `${NM[k]} ${b.al[k]}%`).join(' · ')}.${b.hedge ? `\nPlus 10% gold + 10% dollar (${money(cap0 * 0.1, 'NSE')} each), placed by you.` : ''}\nOpen trades are not sold; new buys follow this basket.`)) return;
+    x.disabled = true; try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ capital: cap, alloc: { fl: 0, gd: 0, ...b.al, t9: 0, rt: 0, pt: 0, vcp: 0 } }) }); state._planC = null; try { localStorage.setItem('td.basket', b.id); } catch (e) { /* */ } alertMsg(`${b.n} is your India basket now.`, true); loadBasket(); } catch (e) { alertMsg(e.message); x.disabled = false; } }));
   const usv = el.querySelector('[data-usave]'); if (usv) usv.addEventListener('click', async () => { try { await lvApi('/api/mmtb/cfg', { method: 'POST', body: JSON.stringify({ market: 'US', capital: +el.querySelector('[data-usc]').value || 0, risk_pct: +((((MT || {}).cfg || {}).US || {}).risk_pct || 1) }) }); alertMsg('Saved.', true); } catch (e) { alertMsg(e.message); } });
   const hvi = el.querySelector('[data-hval]'); if (hvi) hvi.addEventListener('change', () => { state.hedgeVal = +hvi.value || 0; loadBasket(); });
   const pie = el.querySelector('[data-pie]'); if (pie) pie.addEventListener('change', () => { state.pieCap = +pie.value || 0; loadBasket(); });
