@@ -1848,7 +1848,14 @@ function mmSettings(box, m, T) {
     if (r.buy_lvl) return `<span class="au2-c"><i></i>${esc(s)} ▲${fmt(r.buy_lvl, 2)} <small>${fmt((r.buy_lvl / r.close - 1) * 100, 1)}%</small></span>`;
     return `<span class="au2-c off"><i></i>${esc(s)} –</span>`; }).join('');
   box.innerHTML = `<div class="au2-mmh"><label>Capital ${cur}<input id="mc${m}" inputmode="decimal" value="${c.capital || ''}" placeholder="0"></label><label>Risk %<input id="mr${m}" inputmode="decimal" value="${c.risk_pct || 1}"></label><button class="au2-save" id="ms${m}">Save</button></div>
-    <div class="au2-chips">${chips}</div><p class="au2-foot"><span class="au2-key"><i class="hold"></i>holding <i class="wait"></i>buy-stop today <i></i>next buy level</span> · levels ${esc(L.asof || '–')}</p>`;
+    <div class="au2-chips">${chips}</div><p class="au2-foot"><span class="au2-key"><i class="hold"></i>holding <i class="wait"></i>buy-stop today <i></i>next buy level</span> · levels ${esc(L.asof || '–')}</p>
+    ${m === 'US' && T.enabled ? `<div class="au2-env${T.env === 'REAL' ? ' real' : ''}">${T.env === 'REAL'
+      ? '<b>REAL money account</b><span>Orders use your real moomoo money.</span><button class="t3-link" id="mmenvback">Back to paper</button>'
+      : `<b>Paper account</b><details open><summary>Switch to real money</summary><div class="au2-tkrow"><input id="mmenvpw" type="password" placeholder="App password" autocomplete="current-password"><input id="mmenvcf" placeholder="Type REAL" autocapitalize="characters"><button class="au2-big stop" id="mmenvgo">Use real money</button></div></details>`}</div>` : ''}`;
+  /* 26 Nov 2026 (Amritpal: "where is that"): the paper / real switch lives in the US card of the Auto page too */
+  const envGo = async (body) => { try { const r = await lvApi('/api/mm/env', { method: 'POST', body: JSON.stringify(body) }); alertMsg(r.msg, true); loadAuto(); } catch (e) { alertMsg(e.message); } };
+  { const eg = box.querySelector('#mmenvgo'); if (eg) eg.addEventListener('click', () => envGo({ env: 'REAL', password: box.querySelector('#mmenvpw').value, confirm: box.querySelector('#mmenvcf').value })); }
+  { const eb = box.querySelector('#mmenvback'); if (eb) eb.addEventListener('click', () => envGo({ env: 'SIMULATE' })); }
   box.querySelector('#ms' + m).addEventListener('click', async () => {
     try { await lvApi('/api/mmtb/cfg', { method: 'POST', body: JSON.stringify({ market: m, capital: +box.querySelector('#mc' + m).value || 0, risk_pct: +box.querySelector('#mr' + m).value || 1 }) }); alertMsg('Saved.', true); loadAuto(); } catch (e) { alertMsg(e.message); } });
   mmTicket(box, T.env);
