@@ -21,8 +21,10 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 10                    # 23 Nov 2026: sector-green + green index slices (Amritpal: "enter after the first 5 minutes with the option trader's conditions" in green sectors)
+VERSION = 11                    # 26 Nov 2026: reuse cached 5-minute bars of EXPIRED monthly contracts, so the test keeps the weeks before the last expiry (v10 ran on 1 day after the 24 Nov expiry).
+# v10: 23 Nov 2026: sector-green + green index slices (Amritpal: "enter after the first 5 minutes with the option trader's conditions" in green sectors)
 # v8: 21 Nov 2026: rotation quadrant slices; 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
+import glob
 import gzip
 import json
 import os
@@ -192,6 +194,7 @@ class OptBT:
                     by_m[(e.year, e.month)] = max(by_m.get((e.year, e.month), e), e)
                 monthly[n] = sorted(by_m.values())
             start = min((m[0] for m in monthly.values() if m), default=today) - timedelta(days=40)
+            start = min(start, prev_expiry(min((m[0] for m in monthly.values() if m), default=today)) - timedelta(days=40))   # v11: expired month too
             idx = {}
             for nm in ("NIFTY", "BANKNIFTY"):
                 idx[nm] = self._cached(f"idx5_{nm}_{last}", "NSE", IDXTOK[nm], "FIVE_MINUTE", start, last)
@@ -310,6 +313,25 @@ class OptBT:
             D = self._cached(f"d_{sym}_{last}", "NSE", t["token"], "ONE_DAY", date.fromisoformat(days[0]) - timedelta(days=10), last)
         closes = {b[0][:10]: b[4] for b in D}
         dl = sorted(closes)
+        # v11 (26 Nov 2026): 5-minute bars of expired monthly contracts that earlier runs saved in the cache
+        # (Angel no longer serves them), as {expiry: {strike: {"CE": path, "PE": path}}} - only strikes with both sides
+        old = {}
+        if not weekly:
+            for f in glob.glob(os.path.join(self.dir, f"o_{sym}_*.json.gz")):
+                try:
+                    pre, ex_s, k_s, typ, _l = os.path.basename(f)[:-8].rsplit("_", 4)
+                    if pre != f"o_{sym}":
+                        continue
+                    ex_d = date.fromisoformat(ex_s)
+                    if months and ex_d >= months[0]:
+                        continue
+                    cur = old.setdefault(ex_d, {}).setdefault(float(k_s), {})
+                    if typ not in cur or os.path.getmtime(f) > os.path.getmtime(cur[typ]):
+                        cur[typ] = f
+                except Exception:  # noqa: BLE001
+                    continue
+            old = {e: {k: v for k, v in K.items() if "CE" in v and "PE" in v} for e, K in old.items()}
+            old = {e: K for e, K in old.items() if K}
         # which contract on which day
         plan = {}
         for d in days:
@@ -321,6 +343,9 @@ class OptBT:
                 continue
             # Angel serves live contracts only: skip days whose near monthly (the previous month's) has already expired
             if not months or dd <= (months[0] - timedelta(days=7) if weekly else prev_expiry(months[0])):
+                oe = next((e for e in sorted(old) if (e - dd).days >= 3 and dd > prev_expiry(e)), None) if not weekly else None
+                if oe is not None:       # v11: an expired contract whose bars are cached
+                    pc = closes[prev[-1]]; plan[d] = (oe, min(old[oe], key=lambda s_: abs(s_ - pc)))
                 continue
             ex = next((e for e in months if (e - dd).days >= (2 if weekly else 3)), None)
             if ex is None:
@@ -334,6 +359,13 @@ class OptBT:
         need = sorted(set(plan.values())); self._last_plan_days = len(plan)
         series = {}
         for ex, k in need:
+            if ex in old and k in old[ex]:        # v11: expired contract, bars from the cache only
+                for typ in ("CE", "PE"):
+                    try:
+                        series[(ex, k, typ)] = json.load(gzip.open(old[ex][k][typ], "rt"))
+                    except Exception:  # noqa: BLE001
+                        pass
+                continue
             for typ in ("CE", "PE"):
                 tk = self.b.opt_token(sym, ex, k, typ, exchange=seg)
                 if not tk:
