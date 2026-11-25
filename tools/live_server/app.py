@@ -1747,7 +1747,7 @@ def order(body: Order, _=Depends(auth)):
             mp0 = mypicks().get(sym) or {}; R0 = float(row["trigger"]) - float(row.get("stop") or 0)
             J[sym] = dict(since=t.date().isoformat(), system="My pick", kind="MY_GTT", stop=row.get("stop"), entry=float(row["trigger"]),
                           qty=body.qty, order_id=None, gtt_buy_id=gid, state="pending",
-                          target=None if str(mp0.get("src", "")).startswith("Turtle") and not mp0.get("target")
+                          target=None if str(mp0.get("src", "")).startswith(("Turtle", "Cup")) and not mp0.get("target")
                           else round(float(mp0.get("target") or (float(row["trigger"]) + MY_TARGET_R * R0)), 2))
             msg = "GTT buy placed on Angel (good for a year). When it fills, the protective GTT stop goes in at your stop."
         else:
@@ -1898,7 +1898,7 @@ def add_mypick(body: MyPick, _=Depends(auth)):
         raise HTTPException(400, "target must be above the buy trigger")
     d[sym] = dict(symbol=sym, trigger=round(body.trigger, 2), stop=round(body.stop, 2), note=body.note[:120], src=body.src[:40],
                   name=body.name[:60], added=ist_now().date().isoformat(),
-                  target=None if body.src.startswith("Turtle") and not body.target   # 19 Nov 2026: Turtle has no target (trail only)
+                  target=None if body.src.startswith(("Turtle", "Cup")) and not body.target   # 19 Nov 2026: Turtle has no target (trail only); 26 Nov: Cup basket too (targets cut the cup winners in the test)
                   else round(body.target if body.target else body.trigger + MY_TARGET_R * (body.trigger - body.stop), 2))
     _save_mypicks(d); log("mypick_add", **d[sym])
     return dict(ok=True, rows=list(d.values()))

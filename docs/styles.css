@@ -1968,3 +1968,13 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .p20-d { margin-top: 8px; } .p20-d summary { cursor: pointer; font-weight: 600; padding: 6px 0; }
 .p20-log { display: grid; grid-template-columns: 70px 1fr; gap: 8px; font-size: 12.5px; padding: 4px 0; border-bottom: 1px solid var(--line); }
 .p20-log small { color: var(--slate); }
+
+/* 26 Nov 2026: long-cup basket on the Baskets page */
+.cb-seg{margin:10px 0 4px}
+.cb-l{list-style:none;margin:0;padding:0}
+.cb-r{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.cb-r>div:first-child{min-width:0}.cb-r b{font-weight:800}.cb-r small{display:block;color:var(--slate);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:46vw}
+.cb-t{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.cb-t i{font-style:normal;font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:6px;background:var(--paper)}
+.cb-t i.w{background:color-mix(in srgb,var(--fall) 18%,transparent);color:var(--fall)}
+.cb-a{display:flex;align-items:center;gap:8px;text-align:right;flex-shrink:0}.cb-a span{font-size:12.5px}.cb-a small{max-width:none}
+.cb-none{color:var(--slate);font-size:13px;padding:6px 0}

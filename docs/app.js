@@ -2274,6 +2274,37 @@ const BASKETS = [
   { id: 'mc', n: 'Momentum + Cup 9/21', ret: 23, dd: -21, how: 'Momentum 60% · Cup 9/21 40%, 1% risk a trade, max 10% a stock', al: { pr: 0, mom: 60, tf: 40 } },
   { id: 'm', n: 'Momentum', ret: 17, dd: -17, how: 'Monthly all-time-high breakouts after a 2-year cup, exit on a weekly close below the 30-week average', al: { pr: 0, mom: 100, tf: 0 } },
   { id: 'h', n: 'Hedge basket (add to any portfolio)', ret: null, dd: null, how: 'System portfolios: 10% gold + 10% US dollar + 1 Bank Nifty Top Bottom lot per ~₹20 L. Nifty / large-cap holdings: short Nifty futures only while Nifty is below its 50-day average.', note: 'tested: Momentum + Cup 9/21 worst fall −19.6% → −8.6%; a Nifty portfolio −29% → −10% with the 50-day futures rule', hedgeOnly: true, tb: ['bn'] }];
+/* 26 Nov 2026 (Amritpal: "make a basket of such long cups daily, weekly, monthly to watch and provide me an option to trade"):
+   long cups from the evening scan (ath.json cup_watch) - breakouts first (buy above the breakout candle's high, stop under its
+   wick), then cups within a few % of their rim; longest cups first. Trade = an Angel GTT buy at the trigger with the stop
+   (My picks, no fixed target: in the test a target cut the winners; the 9/21 exit did best). */
+const CUP_TF = { D: 'Daily', W: 'Weekly', M: 'Monthly' };
+const cupLen = (d) => (d >= 250 ? `${fmt(d / 250, 1)} yr` : `${Math.round(d / 21)} mo`);
+async function cupBasket(box) {
+  if (!box) return;
+  const A = await getJSON(MAIN + 'data/scan/ath.json', 'ath').catch(() => null);
+  const R = (A && A.cup_watch) || [];
+  const tf = state.cupTf || 'all'; const L = R.filter((r) => tf === 'all' || r.tf === tf);
+  const bo = L.filter((r) => r.status === 'breakout'), nr = L.filter((r) => r.status === 'near');
+  const f2 = (v) => fmt(v, 2, 'en-IN'); const weak = { weak: 'Weak industry', fade: 'Fading industry', bounce: 'Turning industry' };
+  const row = (r) => `<li class="cb-r"><div><b>${esc(r.symbol)}</b><small>${esc(r.name || '')}</small>
+      <span class="cb-t"><i>${CUP_TF[r.tf]}</i><i>${cupLen(r.cup_days)} cup</i><i>${fmt(Math.abs(r.depth) * 100, 0)}% deep</i>${r.ath ? '<i>all-time high</i>' : ''}${weak[r.lane] ? `<i class="w">${weak[r.lane]}</i>` : ''}</span></div>
+    ${r.status === 'breakout' ? `<div class="cb-a"><span>Buy above <b>${f2(r.trigger)}</b><small>stop ${f2(r.stop)} · risk ${fmt(r.risk_pct, 1)}%</small></span><button class="tr-go" data-cup="${esc(r.symbol)}|${r.tf}">Trade</button></div>`
+      : `<div class="cb-a"><span>Rim <b>${f2(r.rim)}</b><small>${fmt(r.to_trigger_pct, 1)}% away · waits for a ${CUP_TF[r.tf].toLowerCase()} close above</small></span></div>`}</li>`;
+  box.innerHTML = `<article class="bs-c"><div class="bs-h"><span class="bs-n">◡</span><div><b>Long cups · watch & trade</b><small>Daily cups of 6+ months, weekly of 1+ year, monthly of 2+ years. Longest first.</small></div></div>
+    <div class="seg cb-seg" role="tablist">${[['all', 'All'], ['D', 'Daily'], ['W', 'Weekly'], ['M', 'Monthly']].map(([k, n]) => `<button data-cbt="${k}" aria-selected="${tf === k}">${n} ${k === 'all' ? R.length : R.filter((r) => r.tf === k).length}</button>`).join('')}</div>
+    <p class="bs-p"><b>Broke out · ${bo.length}</b></p><ul class="cb-l">${bo.map(row).join('') || '<li class="cb-none">None right now</li>'}</ul>
+    <p class="bs-p"><b>Near the rim · ${nr.length}</b></p><ul class="cb-l">${nr.slice(0, 40).map(row).join('') || '<li class="cb-none">None right now</li>'}</ul>
+    <p class="bs-note">Trade = Angel GTT buy at the trigger, stop under the breakout candle, no fixed target. ${A ? 'Scan ' + esc(A.asof || '') : ''}</p></article>`;
+  box.querySelectorAll('[data-cbt]').forEach((b) => b.addEventListener('click', () => { state.cupTf = b.dataset.cbt; cupBasket(box); }));
+  box.querySelectorAll('[data-cup]').forEach((b) => b.addEventListener('click', async () => {
+    const [sym, t] = b.dataset.cup.split('|'); const r = R.find((x) => x.symbol === sym && x.tf === t); if (!r) return;
+    if (!window.confirm(`Trade ${sym} (${CUP_TF[t]} cup, ${cupLen(r.cup_days)})?\nGTT buy above ${f2(r.trigger)}, stop ${f2(r.stop)} (${fmt(r.risk_pct, 1)}% risk).\nIt goes to Trade Live → My picks, sized at your swing risk; you send it there.`)) return;
+    b.disabled = true;
+    try { const w = await pushPick('NSE', { symbol: sym, name: r.name || '', trigger: r.trigger, stop: r.stop, src: `Cup basket ${CUP_TF[t]}`, note: `${CUP_TF[t]} cup ${cupLen(r.cup_days)}, ${fmt(Math.abs(r.depth) * 100, 0)}% deep, broke out ${r.signal}` });
+      alertMsg(w === 'server' ? `${sym} is in Trade Live → My picks. Send it there to place the GTT buy.` : `${sym} saved on this phone (connect your server to send it).`, true); b.textContent = 'Added';
+    } catch (e) { alertMsg(e.message); b.disabled = false; } }));
+}
 async function loadBasket() {
   $('#title').textContent = 'Baskets'; $('#asof').textContent = 'Best return per worst fall first';
   const el = $('#view-basket'); if (!el) return;
@@ -2352,7 +2383,8 @@ async function loadBasket() {
       ${b.ret != null ? `<span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span>` : '<span class="bs-r"><b>🛡</b><small>hedge</small></span>'}</div>
       ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
   el.innerHTML = `<p class="bs-top">India stock baskets (1, 2, 3, 4, 7, 8) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
-    ${BASKETS.map(card).join('')}<p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
+    ${BASKETS.map(card).join('')}<div id="cupb"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
+  cupBasket(el.querySelector('#cupb'));
   { const sa = el.querySelector('[data-sendall]'); if (sa) sa.addEventListener('click', () => trSend(OD.list, 'NSE', sa).then(() => setTimeout(loadBasket, 3000))); }
   el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));
   el.querySelectorAll('[data-use]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.use); const cap0 = +el.querySelector(`[data-cap="${b.id}"]`).value || 0; if (b.hedge && !cap0) { alertMsg('Enter your capital: 80% goes to the stock systems, 10% gold, 10% dollar.'); return; }

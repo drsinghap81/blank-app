@@ -54,6 +54,49 @@ CONF_BUF = 0.0015
 WSHORT, DSHORT = [], []   # 15 Nov 2026: reverse cup closes under a falling 30-week SMA (watch only; shorts lost in tests)
 WCLOSE, DCLOSE = [], []   # 15 Nov 2026: week / day CLOSED above the all-time high (cup >= 26 weeks & 20% / >= 20 days & 15%)
 WK_MIN, WK_DEP, DY_MIN, DY_DEP, WK_K, DY_K = 26, -0.20, 20, -0.15, 104, 250
+# 26 Nov 2026 (Amritpal: "make a basket of such long cups daily, weekly, monthly to watch and give me the option to trade"):
+# long cups only - (window bars, min age bars, max depth, near %, breakout within bars, trading days a bar)
+CUPW = []
+CUPW_RULES = {"D": (250, 120, -0.15, 0.05, 3, 1), "W": (104, 52, -0.20, 0.07, 2, 5), "M": (10_000, 24, -0.25, 0.10, 1, 21)}
+
+
+def cup_state(H, L, C, K, B, D, near, recent):
+    """completed bars -> a long-cup row: 'breakout' (first close above the rim within `recent` bars and the breakout candle's
+    low not broken since: buy above that candle's high + 0.15%, stop under its low) or 'near' (close within `near` below the
+    rim). Room to the next older peak must be at least the cup depth (or none above = all-time high)."""
+    n = len(C)
+
+    def room_ok(i, a, dep, lvl=None):
+        lvl = C[i] if lvl is None else lvl                  # near a rim: room is measured from the rim, not today's close
+        above = np.flatnonzero(H[:a] > lvl)
+        if not len(above):
+            return True, None
+        j = int(above[-1]); res = float(np.nanmax(H[max(0, j - B):min(a, j + B + 1)]))
+        return res / lvl - 1 >= -dep, res
+    for back in range(recent):
+        i = n - 1 - back
+        if i < B + 3:
+            break
+        lo = max(0, i - K); a = lo + int(np.nanargmax(H[lo:i])); rim = float(H[a]); age = i - a
+        if C[i] > rim and C[i - 1] <= rim and age >= B:
+            dep = float(np.nanmin(C[a + 1:i]) / rim - 1)
+            if dep > D or (i + 1 < n and np.nanmin(L[i + 1:n]) < L[i]):
+                break
+            ok, res = room_ok(i, a, dep)
+            if not ok:
+                break
+            return dict(status="breakout", bars_ago=back, rim=rim, a=a, i=i, age=age, depth=dep, trigger=float(H[i]) * 1.0015, stop=float(L[i]), resistance=res)
+    i = n - 1
+    if i < B + 3:
+        return None
+    lo = max(0, i - K); a = lo + int(np.nanargmax(H[lo:i])); rim = float(H[a]); age = i - a
+    if not (C[i] < rim and C[i] >= rim * (1 - near) and age >= B):
+        return None
+    dep = float(np.nanmin(C[a + 1:i + 1]) / rim - 1)
+    if dep > D:
+        return None
+    ok, res = room_ok(i, a, dep, rim)
+    return dict(status="near", bars_ago=0, rim=rim, a=a, i=i, age=age, depth=dep, trigger=rim * 1.0015, stop=None, resistance=res) if ok else None
 MCLOSE = []   # month-end list (15 Nov 2026): last completed month CLOSED above the old all-time closing high
 NEAR = 0.05
 
@@ -356,6 +399,26 @@ def analyse(sym, x, today, lookback_days=550):
                     lists = True
     except Exception as e:  # noqa: BLE001
         print("w/d close fail", sym, str(e)[:60])
+    try:
+        if float(val20.iloc[-1]) >= MINVAL and float(x.Close.iloc[-1]) >= MIN_CLOSE:
+            Md = M[done]
+            for tf, (H_, L_, C_, idx) in (("D", (x.High.to_numpy(float), x.Low.to_numpy(float), x.Close.to_numpy(float), [str(d.date()) for d in x.index])),
+                                         ("W", (Wc.h.to_numpy(float), Wc.l.to_numpy(float), Wc.c.to_numpy(float), [str(p.end_time.date()) for p in Wc.index])),
+                                         ("M", (Md.h.to_numpy(float), Md.l.to_numpy(float), Md.c.to_numpy(float), [str(p) for p in Md.index]))):
+                K_, B_, D_, nr, rc, td = CUPW_RULES[tf]
+                z = cup_state(H_, L_, C_, K_, B_, D_, nr, rc)
+                if not z:
+                    continue
+                cl = float(x.Close.iloc[-1])
+                CUPW.append(dict(symbol=sym, tf=tf, status=z["status"], bars_ago=z["bars_ago"], cup_bars=int(z["age"]), cup_days=int(z["age"] * td),
+                                 depth=round(z["depth"], 4), rim=round(z["rim"], 2), rim_date=idx[z["a"]], signal=idx[z["i"]],
+                                 trigger=round(z["trigger"], 2), stop=round(z["stop"], 2) if z["stop"] else None,
+                                 risk_pct=round((1 - z["stop"] / z["trigger"]) * 100, 1) if z["stop"] else None,
+                                 to_trigger_pct=round((z["trigger"] / cl - 1) * 100, 1), resistance=z["resistance"], ath=z["resistance"] is None,
+                                 close=cl, value_cr=float(val20.iloc[-1]) / UNIT))
+                lists = True
+    except Exception as e:  # noqa: BLE001
+        print("cup watch fail", sym, str(e)[:60])
     Mc = M.tail(240); Wt = W.tail(260)
     chart = dict(m=dict(t=[str(p) for p in Mc.index], o=Mc.o.round(2).tolist(), h=Mc.h.round(2).tolist(),
                         l=Mc.l.round(2).tolist(), c=Mc.c.round(2).tolist()),
@@ -539,7 +602,19 @@ def main():
         return D_.sort_values(["_o", "_r", "long_cup", base_col], ascending=[True, False, False, False]).drop(columns=["_o", "_r"])
     MC = tagsort(MCLOSE, "base_months"); WC = tagsort(WCLOSE, "base"); DC = tagsort(DCLOSE, "base")
     WS_ = tagsort(WSHORT, "base", True); DS_ = tagsort(DSHORT, "base", True)
-    keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set()) | (set(MC.symbol) if len(MC) else set()) | (set(WC.symbol) if len(WC) else set()) | (set(DC.symbol) if len(DC) else set()) | (set(WS_.symbol) if len(WS_) else set()) | (set(DS_.symbol) if len(DS_) else set())
+    CW = tagsort(CUPW, "cup_days")
+    if len(CW):
+        try:                                               # industry lane (same as the trade plan's) - weak lanes are flagged, not dropped
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from trade_plan import lanes as _lanes
+            G_ = json.load(open(f"{OUT}/group_pulse.json")); LN_ = _lanes(G_); GS_ = G_.get("stock") or {}
+            CW["group"] = [(GS_.get(s_) or [None])[0] for s_ in CW.symbol]
+            CW["lane"] = [(LN_.get(g_) or [None])[0] if g_ else None for g_ in CW.group]
+        except Exception as e:  # noqa: BLE001
+            print("cup watch lanes", str(e)[:80])
+        CW["_s"] = CW.status.map({"breakout": 0, "near": 1})
+        CW = CW.sort_values(["_s", "cup_days"], ascending=[True, False]).drop(columns=["_s"])   # breakouts first, longest cups first
+    keep = (set(E.symbol) if len(E) else set()) | (set(N.symbol) if len(N) else set()) | (set(MC.symbol) if len(MC) else set()) | (set(WC.symbol) if len(WC) else set()) | (set(DC.symbol) if len(DC) else set()) | (set(WS_.symbol) if len(WS_) else set()) | (set(DS_.symbol) if len(DS_) else set()) | (set(CW.symbol) if len(CW) else set())
     for f in os.listdir(CH):
         if f[:-5] not in keep:
             os.remove(os.path.join(CH, f))
@@ -555,6 +630,8 @@ def main():
                month_close=clean(MC.to_dict("records")) if len(MC) else [],
                week_close=clean(WC.to_dict("records")) if len(WC) else [], day_close=clean(DC.to_dict("records")) if len(DC) else [],
                week_short=clean(WS_.to_dict("records")) if len(WS_) else [], day_short=clean(DS_.to_dict("records")) if len(DS_) else [],
+               cup_watch=clean(CW.to_dict("records")) if len(CW) else [],
+               cup_watch_rules={k: dict(window=v[0], min_age=v[1], depth=v[2], near_pct=v[3] * 100, breakout_bars=v[4]) for k, v in CUPW_RULES.items()},
                wd_rules=dict(week_min=WK_MIN, week_depth=WK_DEP, week_window=WK_K, day_min=DY_MIN, day_depth=DY_DEP, day_window=DY_K))
     json.dump(out, open(f"{OUT}/ath.json", "w"), indent=0, allow_nan=False)
     print("breakouts", len(brk), "near", len(N), "tracked", len(E))
