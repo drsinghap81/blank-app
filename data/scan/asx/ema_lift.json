@@ -1,20 +1,56 @@
 {
- "generated": "2026-11-24T18:18+00:00",
- "asof": "2026-11-24",
+ "generated": "2026-11-25T01:54+00:00",
+ "asof": "2026-11-25",
  "market": "ASX",
  "ema": 9,
  "rows": [
+  {
+   "symbol": "Utilities",
+   "index": true,
+   "status": "riding",
+   "signal": "2026-10-09",
+   "signal_close": 10151.3,
+   "gain": 7.2,
+   "days": 32,
+   "ema": 10830.99,
+   "close": 10878.7,
+   "low": 10832.7
+  },
+  {
+   "symbol": "CSL",
+   "index": false,
+   "status": "lift-off today",
+   "signal": "2026-11-25",
+   "signal_close": 209.24,
+   "gain": 0.0,
+   "days": 0,
+   "ema": 202.45,
+   "close": 209.24,
+   "low": 205.44
+  },
+  {
+   "symbol": "SCG",
+   "index": false,
+   "status": "lift-off today",
+   "signal": "2026-11-25",
+   "signal_close": 3.6,
+   "gain": 0.0,
+   "days": 0,
+   "ema": 3.56,
+   "close": 3.6,
+   "low": 3.58
+  },
   {
    "symbol": "CHC",
    "index": false,
    "status": "riding",
    "signal": "2026-10-12",
    "signal_close": 18.6,
-   "gain": 19.7,
-   "days": 31,
-   "ema": 21.99,
-   "close": 22.26,
-   "low": 21.96
+   "gain": 18.5,
+   "days": 32,
+   "ema": 22.0,
+   "close": 22.05,
+   "low": 21.85
   },
   {
    "symbol": "BXB",
@@ -22,11 +58,11 @@
    "status": "riding",
    "signal": "2026-09-16",
    "signal_close": 18.9,
-   "gain": 18.0,
-   "days": 49,
-   "ema": 22.06,
-   "close": 22.3,
-   "low": 21.87
+   "gain": 17.6,
+   "days": 50,
+   "ema": 22.09,
+   "close": 22.22,
+   "low": 22.16
   },
   {
    "symbol": "MPL",
@@ -34,11 +70,11 @@
    "status": "riding",
    "signal": "2026-10-09",
    "signal_close": 4.64,
-   "gain": 13.8,
-   "days": 32,
+   "gain": 14.5,
+   "days": 33,
    "ema": 5.28,
-   "close": 5.28,
-   "low": 5.22
+   "close": 5.32,
+   "low": 5.27
   },
   {
    "symbol": "IAG",
@@ -46,11 +82,11 @@
    "status": "riding",
    "signal": "2026-10-09",
    "signal_close": 8.13,
-   "gain": 13.0,
-   "days": 32,
-   "ema": 9.04,
-   "close": 9.19,
-   "low": 9.02
+   "gain": 13.5,
+   "days": 33,
+   "ema": 9.08,
+   "close": 9.23,
+   "low": 9.15
   },
   {
    "symbol": "QAN",
@@ -58,23 +94,11 @@
    "status": "riding",
    "signal": "2026-10-28",
    "signal_close": 8.7,
-   "gain": 12.1,
-   "days": 19,
-   "ema": 9.61,
-   "close": 9.75,
-   "low": 9.67
-  },
-  {
-   "symbol": "ORG",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-08",
-   "signal_close": 11.2,
-   "gain": 11.8,
-   "days": 33,
-   "ema": 12.42,
-   "close": 12.52,
-   "low": 12.34
+   "gain": 12.4,
+   "days": 20,
+   "ema": 9.64,
+   "close": 9.77,
+   "low": 9.66
   },
   {
    "symbol": "SIG",
@@ -82,11 +106,23 @@
    "status": "riding",
    "signal": "2026-10-05",
    "signal_close": 2.6,
-   "gain": 11.5,
-   "days": 36,
-   "ema": 2.88,
-   "close": 2.9,
-   "low": 2.88
+   "gain": 12.1,
+   "days": 37,
+   "ema": 2.89,
+   "close": 2.91,
+   "low": 2.89
+  },
+  {
+   "symbol": "ORG",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-08",
+   "signal_close": 11.2,
+   "gain": 11.7,
+   "days": 34,
+   "ema": 12.44,
+   "close": 12.51,
+   "low": 12.43
   },
   {
    "symbol": "CBA",
@@ -94,11 +130,11 @@
    "status": "riding",
    "signal": "2026-10-16",
    "signal_close": 154.38,
-   "gain": 9.6,
-   "days": 27,
-   "ema": 169.13,
-   "close": 169.18,
-   "low": 166.51
+   "gain": 9.2,
+   "days": 28,
+   "ema": 169.02,
+   "close": 168.61,
+   "low": 167.23
   },
   {
    "symbol": "TLS",
@@ -106,23 +142,11 @@
    "status": "riding",
    "signal": "2026-10-22",
    "signal_close": 4.86,
-   "gain": 7.0,
-   "days": 23,
-   "ema": 5.15,
-   "close": 5.2,
-   "low": 5.12
-  },
-  {
-   "symbol": "TLC",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-09",
-   "signal_close": 5.19,
-   "gain": 6.9,
-   "days": 32,
-   "ema": 5.48,
-   "close": 5.55,
-   "low": 5.47
+   "gain": 8.0,
+   "days": 24,
+   "ema": 5.17,
+   "close": 5.25,
+   "low": 5.21
   }
  ],
  "test": "Tested 2007\u201326: indices +0.19% a trade vs +0.27% holding any 16 days; top-50 stocks +0.66% vs +0.94%. No edge on the ASX: reference only.",
