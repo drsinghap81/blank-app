@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-25 05:50 UTC",
+"generated": "2026-11-25 09:08 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-23",
@@ -149,59 +149,7 @@
 "PFOCUS"
 ],
 "morning_rule": false,
-"r3m": 21.0
-},
-{
-"id": "CONF-HONASA-543.81",
-"symbol": "HONASA",
-"name": "Honasa Consumer Limited",
-"system": "Monthly ATH",
-"bucket": "mom",
-"kind": "ATH_STOP",
-"order": "STOPLOSS_LIMIT",
-"when": "next session only (lapses if not triggered)",
-"side": "BUY",
-"trigger": 543.81,
-"price": 549.25,
-"ref": 539.75,
-"stop": 444.84,
-"exit_rule": "weekly close below the 30-week SMA",
-"note": "closed above the ATH-month high 537.90; buy above today's high + 0.15% = 543.81, base 27 m",
-"base_months": 27,
-"score": 4,
-"value_cr": 86.1667,
-"sector": "Fmcg",
-"sector_rs": -10.3083,
-"theme": "",
-"theme_rs": null,
-"stock_rs": 108.1404,
-"aligned": false,
-"td_score": 1,
-"rs_rating": 91,
-"sector_pct": 10.0,
-"theme_pct": null,
-"group": "Household & Personal Products",
-"lane": "bounce",
-"group_pulse": 18.3,
-"group_rank": 37,
-"results_score": 0.51,
-"results_ind": "Personal Care",
-"rank": 2,
-"risk_pct": 22.2,
-"ind": "Personal Care",
-"ind_members": [
-"HONASA",
-"PGHH",
-"DABUR",
-"GILLETTE",
-"COLPAL",
-"GODREJCP",
-"CUPID",
-"BAJAJCON",
-"EMAMILTD"
-],
-"morning_rule": false,
-"r3m": 12.6
+"r3m": 21.7
 },
 {
 "id": "ATH-GLOBAL-2026-10-01",
@@ -239,9 +187,9 @@
 "group_rank": null,
 "results_score": null,
 "results_ind": null,
-"rank": 3,
+"rank": 2,
 "risk_pct": 19.6,
-"r3m": 29.0
+"r3m": 29.9
 },
 {
 "id": "WAIT-DCBBANK",
@@ -276,7 +224,7 @@
 "group_rank": 8,
 "results_score": 1.06,
 "results_ind": "Private Sector Bank",
-"rank": 4,
+"rank": 3,
 "risk_pct": 24.0,
 "ind": "Private Sector Bank",
 "ind_members": [
@@ -300,7 +248,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": false,
-"r3m": 16.3
+"r3m": 18.7
 },
 {
 "id": "WAIT-LALPATHLAB",
@@ -335,7 +283,7 @@
 "group_rank": 15,
 "results_score": 0.9,
 "results_ind": "Healthcare Service Provider",
-"rank": 5,
+"rank": 4,
 "risk_pct": 13.8,
 "ind": "Healthcare Service Provider",
 "ind_members": [
@@ -348,7 +296,7 @@
 "GAUDIUMIVF"
 ],
 "morning_rule": false,
-"r3m": 7.9
+"r3m": 8.0
 },
 {
 "id": "WAIT-ANGELONE",
@@ -383,7 +331,7 @@
 "group_rank": 10,
 "results_score": 0.85,
 "results_ind": "Stockbroking & Allied",
-"rank": 6,
+"rank": 5,
 "risk_pct": 11.6,
 "ind": "Stockbroking & Allied",
 "ind_members": [
@@ -402,7 +350,7 @@
 "SMCGLOBAL"
 ],
 "morning_rule": false,
-"r3m": 21.5
+"r3m": 21.4
 },
 {
 "id": "WAIT-ZYDUSLIFE",
@@ -437,7 +385,7 @@
 "group_rank": 17,
 "results_score": 0.85,
 "results_ind": "Pharmaceuticals",
-"rank": 7,
+"rank": 6,
 "risk_pct": 12.1,
 "ind": "Pharmaceuticals",
 "ind_members": [
@@ -473,7 +421,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 9.4
+"r3m": 8.9
 },
 {
 "id": "WAIT-DRREDDY",
@@ -508,7 +456,7 @@
 "group_rank": 17,
 "results_score": 0.85,
 "results_ind": "Pharmaceuticals",
-"rank": 8,
+"rank": 7,
 "risk_pct": 13.2,
 "ind": "Pharmaceuticals",
 "ind_members": [
@@ -544,7 +492,60 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 18.8
+"r3m": 19.0
+},
+{
+"id": "CONF-HONASA-543.81",
+"symbol": "HONASA",
+"name": "Honasa Consumer Limited",
+"system": "Monthly ATH",
+"bucket": "mom",
+"kind": "WATCH",
+"order": null,
+"when": "next session only (lapses if not triggered)",
+"side": "BUY",
+"trigger": 543.81,
+"price": 549.25,
+"ref": 539.75,
+"stop": 444.84,
+"exit_rule": "weekly close below the 30-week SMA",
+"note": "not bought: its industry (Household & Personal Products) is in the Turning / weak-bouncing lane - the test skips these. closed above the ATH-month high 537.90; buy above today's high + 0.15% = 543.81, base 27 m",
+"base_months": 27,
+"score": -99,
+"value_cr": 86.1667,
+"sector": "Fmcg",
+"sector_rs": -10.3083,
+"theme": "",
+"theme_rs": null,
+"stock_rs": 108.1404,
+"aligned": false,
+"td_score": 1,
+"rs_rating": 91,
+"sector_pct": 10.0,
+"theme_pct": null,
+"group": "Household & Personal Products",
+"lane": "bounce",
+"group_pulse": 18.3,
+"group_rank": 37,
+"lane_skip": true,
+"results_score": 0.51,
+"results_ind": "Personal Care",
+"rank": 8,
+"risk_pct": 22.2,
+"ind": "Personal Care",
+"ind_members": [
+"HONASA",
+"PGHH",
+"DABUR",
+"GILLETTE",
+"COLPAL",
+"GODREJCP",
+"CUPID",
+"BAJAJCON",
+"EMAMILTD"
+],
+"morning_rule": false,
+"r3m": 11.7
 }
 ],
 "more": [],
@@ -601,7 +602,7 @@
 "THELEELA"
 ],
 "morning_rule": false,
-"r3m": 24.9
+"r3m": 23.7
 },
 {
 "id": "T921-EICHERMOT-2026-11-23",
@@ -644,7 +645,7 @@
 "TVSMOTOR"
 ],
 "morning_rule": true,
-"r3m": 4.1
+"r3m": 4.0
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-12",
@@ -718,7 +719,7 @@
 "LUMAXIND"
 ],
 "morning_rule": false,
-"r3m": 23.1
+"r3m": 23.7
 },
 {
 "id": "RET-MCX-2026-11-23",
@@ -758,7 +759,7 @@
 "IEX"
 ],
 "morning_rule": false,
-"r3m": 11.9
+"r3m": 11.0
 },
 {
 "id": "RET-NEOGEN-2026-11-23",
@@ -825,7 +826,7 @@
 "YASHO"
 ],
 "morning_rule": false,
-"r3m": 23.1
+"r3m": 22.4
 },
 {
 "id": "RET-SMSPHARMA-2026-11-23",
@@ -892,7 +893,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 31.1
+"r3m": 32.5
 },
 {
 "id": "RET-TINNARUBR-2026-11-23",
@@ -932,7 +933,7 @@
 "TINNARUBR"
 ],
 "morning_rule": false,
-"r3m": -13.9
+"r3m": -14.0
 },
 {
 "id": "RET-UNIMECH-2026-11-23",
@@ -991,7 +992,7 @@
 "CENTUM"
 ],
 "morning_rule": false,
-"r3m": 18.1
+"r3m": 16.3
 },
 {
 "id": "RET-APOLLO-2026-11-20",
@@ -1050,7 +1051,7 @@
 "CENTUM"
 ],
 "morning_rule": false,
-"r3m": 9.8
+"r3m": 9.5
 },
 {
 "id": "RET-EIMCOELECO-2026-11-20",
@@ -1116,7 +1117,7 @@
 "ANUP"
 ],
 "morning_rule": false,
-"r3m": 15.4
+"r3m": 15.2
 },
 {
 "id": "RET-STEELCAS-2026-11-20",
@@ -1159,7 +1160,7 @@
 "BALUFORGE"
 ],
 "morning_rule": false,
-"r3m": 0.4
+"r3m": 2.0
 },
 {
 "id": "TF-ICICIBANK-2026-11-09",
@@ -1221,7 +1222,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": false,
-"r3m": 16.1
+"r3m": 14.9
 },
 {
 "id": "T921-TCS-2026-11-23",
@@ -1286,7 +1287,7 @@
 "DCI"
 ],
 "morning_rule": true,
-"r3m": 10.0
+"r3m": 9.3
 },
 {
 "id": "PR-KOTAKBANK-2026-11-20",
@@ -1331,7 +1332,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 27.3
+"r3m": 26.2
 },
 {
 "id": "PR-MEESHO-2026-11-20",
@@ -1365,7 +1366,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 25.3
+"r3m": 22.0
 },
 {
 "id": "PR-SOUTHBANK-2026-11-20",
@@ -1410,7 +1411,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 31.4
+"r3m": 30.8
 },
 {
 "id": "PR-DCBBANK-2026-11-20",
@@ -1455,7 +1456,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 16.3
+"r3m": 18.7
 },
 {
 "id": "PR-AXISBANK-2026-11-20",
@@ -1500,7 +1501,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 15.8
+"r3m": 14.2
 },
 {
 "id": "PR-ICICIBANK-2026-11-20",
@@ -1545,7 +1546,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 16.1
+"r3m": 14.9
 },
 {
 "id": "PR-URBANCO-2026-11-20",
@@ -1579,7 +1580,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 5.7
+"r3m": 5.3
 },
 {
 "id": "PR-KARURVYSYA-2026-11-20",
@@ -1624,7 +1625,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 12.7
+"r3m": 12.8
 },
 {
 "id": "PR-ETERNAL-2026-11-20",
@@ -1658,7 +1659,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 13.8
+"r3m": 13.4
 },
 {
 "id": "PR-CUB-2026-11-20",
@@ -1703,7 +1704,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 11.8
+"r3m": 13.4
 }
 ],
 "pattern_watch": [
@@ -2015,7 +2016,7 @@
 "group_rank": 8,
 "results_score": 1.06,
 "results_ind": "Private Sector Bank",
-"rank": 4,
+"rank": 3,
 "risk_pct": 24.0,
 "ind": "Private Sector Bank",
 "ind_members": [
@@ -2039,7 +2040,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": false,
-"r3m": 16.3
+"r3m": 18.7
 },
 {
 "id": "WAIT-UNOMINDA",
@@ -2108,7 +2109,7 @@
 "group_rank": 15,
 "results_score": 0.9,
 "results_ind": "Healthcare Service Provider",
-"rank": 5,
+"rank": 4,
 "risk_pct": 13.8,
 "ind": "Healthcare Service Provider",
 "ind_members": [
@@ -2121,7 +2122,7 @@
 "GAUDIUMIVF"
 ],
 "morning_rule": false,
-"r3m": 7.9
+"r3m": 8.0
 },
 {
 "id": "WAIT-ANGELONE",
@@ -2156,7 +2157,7 @@
 "group_rank": 10,
 "results_score": 0.85,
 "results_ind": "Stockbroking & Allied",
-"rank": 6,
+"rank": 5,
 "risk_pct": 11.6,
 "ind": "Stockbroking & Allied",
 "ind_members": [
@@ -2175,7 +2176,7 @@
 "SMCGLOBAL"
 ],
 "morning_rule": false,
-"r3m": 21.5
+"r3m": 21.4
 },
 {
 "id": "WAIT-ZYDUSLIFE",
@@ -2210,7 +2211,7 @@
 "group_rank": 17,
 "results_score": 0.85,
 "results_ind": "Pharmaceuticals",
-"rank": 7,
+"rank": 6,
 "risk_pct": 12.1,
 "ind": "Pharmaceuticals",
 "ind_members": [
@@ -2246,7 +2247,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 9.4
+"r3m": 8.9
 },
 {
 "id": "WAIT-DRREDDY",
@@ -2281,7 +2282,7 @@
 "group_rank": 17,
 "results_score": 0.85,
 "results_ind": "Pharmaceuticals",
-"rank": 8,
+"rank": 7,
 "risk_pct": 13.2,
 "ind": "Pharmaceuticals",
 "ind_members": [
@@ -2317,7 +2318,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 18.8
+"r3m": 19.0
 },
 {
 "id": "WATCH-360ONE",
@@ -2517,6 +2518,59 @@
 "group_rank": 9,
 "results_score": 0.51,
 "results_ind": "Hospital"
+},
+{
+"id": "CONF-HONASA-543.81",
+"symbol": "HONASA",
+"name": "Honasa Consumer Limited",
+"system": "Monthly ATH",
+"bucket": "mom",
+"kind": "WATCH",
+"order": null,
+"when": "next session only (lapses if not triggered)",
+"side": "BUY",
+"trigger": 543.81,
+"price": 549.25,
+"ref": 539.75,
+"stop": 444.84,
+"exit_rule": "weekly close below the 30-week SMA",
+"note": "not bought: its industry (Household & Personal Products) is in the Turning / weak-bouncing lane - the test skips these. closed above the ATH-month high 537.90; buy above today's high + 0.15% = 543.81, base 27 m",
+"base_months": 27,
+"score": -99,
+"value_cr": 86.1667,
+"sector": "Fmcg",
+"sector_rs": -10.3083,
+"theme": "",
+"theme_rs": null,
+"stock_rs": 108.1404,
+"aligned": false,
+"td_score": 1,
+"rs_rating": 91,
+"sector_pct": 10.0,
+"theme_pct": null,
+"group": "Household & Personal Products",
+"lane": "bounce",
+"group_pulse": 18.3,
+"group_rank": 37,
+"lane_skip": true,
+"results_score": 0.51,
+"results_ind": "Personal Care",
+"rank": 8,
+"risk_pct": 22.2,
+"ind": "Personal Care",
+"ind_members": [
+"HONASA",
+"PGHH",
+"DABUR",
+"GILLETTE",
+"COLPAL",
+"GODREJCP",
+"CUPID",
+"BAJAJCON",
+"EMAMILTD"
+],
+"morning_rule": false,
+"r3m": 11.7
 },
 {
 "id": "WATCH-PERSISTENT",
