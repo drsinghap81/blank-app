@@ -52,12 +52,20 @@ def curve(X):
 
 
 def main():
-    T = PF.build(); B = bn_trades()
+    T = PF.build()
+    if PF.AC.MKT != "NSE":   # 25 Nov 2026: US / ASX - lane filter only (no FII sleeve)
+        base = T[["sym", "sys", "d", "dx", "ret", "lane"]]; keep = ~base.lane.isin(["weak", "fade", "bounce"])
+        return report({f"A now ({PF.AC.MKT} Cup + Momentum)": base, "B lanes (skip Weak/Fading/Turning)": base[keep]})
+    B = bn_trades()
     print(f"R| Bank Nifty FII trades: {len(B)}, avg {B.ret.mean() * 100:+.2f}%, newest: " + ", ".join(f"{r.d.date()} {r.ret * 100:+.1f}%" for r in B.iloc[::-1].head(8).itertuples()), flush=True)
     base = T[["sym", "sys", "d", "dx", "ret", "lane"]]
     keep = ~base.lane.isin(["weak", "fade", "bounce"])
     V = {"A now (all Cup + Momentum)": base, "B lanes (skip Weak/Fading/Turning)": base[keep],
          "C lanes + Bank Nifty FII trade": pd.concat([base[keep], B]), "D now + Bank Nifty FII trade": pd.concat([base, B])}
+    report(V)
+
+
+def report(V):
     for nm, X in V.items():
         e = curve(X); e = e[e.index >= "2008-01-01"]
         yrs = (e.index[-1] - e.index[0]).days / 365.25; dd = (e / e.cummax() - 1).min() * 100

@@ -16,6 +16,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE); sys
 import ath_confirm_test as AC  # noqa: E402
 import yfinance as yf  # noqa: E402
 
+FLOOR = {"NSE": (2e7, 50), "US": (1e7, 5), "ASX": (1e6, 10), "UK": (1e8, 100)}   # group_pulse.CFG liquidity floors
 SPLIT = {
     "Banks - PSU": ["SBIN", "BANKBARODA", "PNB", "CANBK", "UNIONBANK", "INDIANB", "BANKINDIA", "CENTRALBK", "IOB", "UCOBANK", "MAHABANK", "PSB", "IDBI"],
     "Banks - Private Large": ["HDFCBANK", "ICICIBANK", "KOTAKBANK", "AXISBANK", "INDUSINDBK"],
@@ -28,13 +29,13 @@ SPLIT = {
 
 
 def build():
-    nif = yf.download("^NSEI", start="2000-01-01", auto_adjust=True, progress=False)["Close"].squeeze()
+    nif = yf.download(AC.BENCH, start="2000-01-01", auto_adjust=True, progress=False)["Close"].squeeze()
     reg = (nif > nif.rolling(200).mean()).to_dict()
     P = AC.load()
     C = pd.DataFrame({s: x.C for s, x in P.items()}).sort_index()
     V = pd.DataFrame({s: x.V for s, x in P.items()}).reindex(C.index)
     B = nif.reindex(C.index).ffill()
-    liq = ((C * V).rolling(60, min_periods=40).median() >= 2e7) & (C >= 50)
+    liq = ((C * V).rolling(60, min_periods=40).median() >= FLOOR[AC.MKT][0]) & (C >= FLOOR[AC.MKT][1])
     rpi = lambda k: 100 * (C / C.shift(k)).div(B / B.shift(k), axis=0)  # noqa: E731
     w = (rpi(10) + rpi(63) + rpi(126)) / 3
     e9 = C.ewm(span=9, adjust=False).mean(); e21 = C.ewm(span=21, adjust=False).mean(); s150 = C.rolling(150).mean()
@@ -42,11 +43,18 @@ def build():
     tr = ((w > 100) & (e9 > e21) & (C > s150) & (s150 > s150.shift(20)) & (C >= 0.75 * hi52) & liq).astype(float)
     S1w, S1m, S1q = (tr.rolling(n).mean() for n in (5, 21, 63))
     R63 = C / C.shift(63) - 1
-    u = pd.read_csv("data/universe/nse_industry.csv")
-    grp = dict(zip(u.symbol, u.basic_industry))
-    for g, L in SPLIT.items():
-        for s in L:
-            grp[s] = g
+    if AC.MKT == "NSE":
+        u = pd.read_csv("data/universe/nse_industry.csv")
+        grp = dict(zip(u.symbol, u.basic_industry))
+        for g, L in SPLIT.items():
+            for s in L:
+                grp[s] = g
+    else:   # 25 Nov 2026: US / ASX Pulse groups = Yahoo industry (data/universe/<mkt>_meta.csv), as tools/group_pulse.py
+        u = pd.read_csv(f"data/universe/{AC.MKT.lower()}_meta.csv")
+        grp = {}
+        for a, b in zip(u.symbol, u.industry):
+            if isinstance(b, str):
+                grp[str(a)] = b; grp[str(a) + ".AX"] = b; grp[str(a).replace(".", "-")] = b   # Yahoo keys: XXX.AX (ASX), BRK-B (US)
     groups = {}
     for s in C.columns:
         if isinstance(grp.get(s), str):
