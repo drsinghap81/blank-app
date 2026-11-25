@@ -5369,13 +5369,13 @@ async function p20Box() {
   const J = await getJSON(MAIN + 'data/scan/paper20.json', 'paper20').catch(() => null);
   if (!J || !J.books) { box.innerHTML = '<div class="p20-h"><b>Paper ₹20 L · all systems</b></div><p class="muted">First run after tonight\'s scans.</p>'; return; }
   const k = state.p20 || 'plain'; const B = J.books[k] || J.books.plain; const S = B.summary; const E = B.equity; const last = E[E.length - 1];
-  const L = (v) => '₹' + (Math.abs(v) >= 1e5 ? fmt(v / 1e5, 2) + ' L' : Math.round(v).toLocaleString('en-IN'));
+  const L = (v) => (v < 0 ? '−₹' : '₹') + (Math.abs(v) >= 1e5 ? fmt(Math.abs(v) / 1e5, 2) + ' L' : Math.round(Math.abs(v)).toLocaleString('en-IN'));
   const sg = (v, d = 1) => `${v >= 0 ? '+' : ''}${fmt(v, d)}%`;
   const NM = { pulse: 'Pulse rotation', ath: 'Momentum + Cup 9/21', gold: 'Gold', usd: 'US dollar', top_bottom: 'Top Bottom (pledge)', options: 'Option trader', reserve: 'Cash reserve' };
   const COL = { pulse: '#14B8A6', ath: '#3B82F6', gold: '#E8A33D', usd: '#9CA3AF', top_bottom: '#A855F7', options: '#F472B6', reserve: '#475569' };
   const w = 320, h = 80, vs = E.map((x) => x.v).concat(E.map((x) => x.nifty)); const lo = Math.min(...vs), hi = Math.max(...vs) || 1;
   const pts = (f) => E.map((x, i) => `${(i / Math.max(1, E.length - 1) * w).toFixed(1)},${(h - (f(x) - lo) / (hi - lo || 1) * (h - 6) - 3).toFixed(1)}`).join(' ');
-  const sv = last.sleeves; const pos = Object.entries(sv).filter(([, v]) => v > 0); const tot = pos.reduce((a, [, v]) => a + v, 0) || 1;
+  const sv = Object.fromEntries(Object.entries(last.sleeves).filter(([s_]) => (B.weights || {})[s_] != null || ['top_bottom', 'options', 'reserve'].includes(s_))); const pos = Object.entries(sv).filter(([, v]) => v > 0); const tot = pos.reduce((a, [, v]) => a + v, 0) || 1;
   box.innerHTML = `<div class="p20-h"><b>Paper ₹20 L · all systems</b><div class="t3-seg">${[['plain', 'No hedge'], ['hedged', 'Hedged']].map(([a, n]) => `<button data-p20="${a}" aria-pressed="${k === a}">${n}</button>`).join('')}</div></div>
     <div class="p20-tiles"><div><small>Value</small><b>${L(S.value)}</b><span class="${S.ret_pct >= 0 ? 'up' : 'down'}">${sg(S.ret_pct, 2)}</span></div>
       <div><small>Nifty same money</small><b>${L(last.nifty)}</b><span class="${S.nifty_pct >= 0 ? 'up' : 'down'}">${sg(S.nifty_pct, 2)}</span></div>
@@ -5383,7 +5383,7 @@ async function p20Box() {
     <svg class="p20-ch" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Paper portfolio vs Nifty"><polyline points="${pts((x) => x.nifty)}" fill="none" stroke="var(--slate)" stroke-width="1.5" stroke-dasharray="3 3"/><polyline points="${pts((x) => x.v)}" fill="none" stroke="#14B8A6" stroke-width="2.2"/></svg>
     <div class="p20-bar">${pos.map(([s, v]) => `<i style="flex:${v / tot};background:${COL[s]}" title="${esc(NM[s])} ${L(v)}"></i>`).join('')}</div>
     <div class="p20-sl">${Object.entries(sv).map(([s, v]) => { const pl = (S.sleeve_pnl || {})[s] || 0;
-      return `<button class="p20-s" data-p20s="${s}"><i style="background:${COL[s]}"></i><span>${esc(NM[s] || s)}</span><b>${L(v)}</b><em class="${pl >= 0 ? 'up' : 'down'}">${pl ? (pl >= 0 ? '+' : '−') + L(Math.abs(pl)).slice(1) : ''}</em></button>`; }).join('')}</div>
+      return `<button class="p20-s" data-p20s="${s}"><i style="background:${COL[s]}"></i><span>${esc(NM[s] || s)}</span><b>${L(v)}</b><em class="${pl >= 0 ? 'up' : 'down'}">${pl && !['top_bottom', 'options'].includes(s) ? (pl >= 0 ? '+' : '−') + L(Math.abs(pl)).slice(1) : ''}</em></button>`; }).join('')}</div>
     <div class="p20-m ${last.margin_ok ? '' : 'down'}">Pledge ${L(last.pledge)} · Top Bottom margin ${last.margin ? L(last.margin) : 'none (flat)'}${last.margin_ok ? '' : ' · short'}</div>
     <details class="p20-d" id="p20pos"><summary>Holdings (${B.positions.length})</summary>${B.positions.map((p) => `<button class="p20-r" data-p20sym="${esc(p.sym)}"><span><b>${esc(p.sym)}</b><small>${esc(p.sys)}${p.d ? ' · ' + esc(day(p.d)) : ''}</small></span><span>${p.value ? L(p.value) : ''}</span><em class="${p.pct >= 0 ? 'up' : 'down'}">${sg(p.pct)}</em></button>`).join('')}</details>
     <details class="p20-d"><summary>Closed trades (${B.closed.length})</summary>${B.closed.slice().reverse().map((c) => `<div class="p20-r"><span><b>${esc(c.sym)}</b><small>${esc(c.sys)} · ${esc(c.dx ? day(c.dx) : '')} · ${esc(c.why || '')}</small></span><span></span><em class="${c.pnl >= 0 ? 'up' : 'down'}">${c.pnl >= 0 ? '+' : '−'}${L(Math.abs(c.pnl)).slice(1)}</em></div>`).join('') || '<p class="muted">None yet.</p>'}</details>
