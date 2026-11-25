@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-25 00:08 UTC",
+"generated": "2026-11-25 00:09 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-23",
@@ -277,7 +277,7 @@
 "PFOCUS"
 ],
 "morning_rule": false,
-"r3m": 26.4
+"r3m": null
 },
 {
 "id": "ATH-LALPATHLAB-2026-11-04",
