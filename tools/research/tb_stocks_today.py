@@ -12,7 +12,7 @@ import tb_live as T  # noqa: E402
 
 IST = timezone(timedelta(hours=5, minutes=30)); today = datetime.now(IST).date()
 cfg = dict(T.DEFAULT_CFG); cfg.update(long_only=True, buffer_pts=0, buffer_pct=0.05, glitch_pts=0, use_once=True)
-for s in ("BEL", "LT", "TMPV", "TCS"):
+def one(s):
     x = yf.download(s + ".NS", period="2y", interval="1d", auto_adjust=False, progress=False)
     x.columns = [c[0] if isinstance(c, tuple) else c for c in x.columns]
     x = x.dropna(); live = x.iloc[-1] if x.index[-1].date() == today else None; hist = x.iloc[:-1] if live is not None else x
@@ -31,3 +31,10 @@ for s in ("BEL", "LT", "TMPV", "TCS"):
         else:
             txt += f" | not triggered: today high {h:,.2f}, now {float(live.Close):,.2f}" + (f" ({(bl / float(live.Close) - 1) * 100:.1f}% below the level)" if bl else "")
     print(txt, flush=True)
+
+
+for s in ("BEL", "LT", "TMPV", "TCS"):
+    try:
+        one(s)
+    except Exception as e:  # noqa: BLE001
+        print(f"R| {s} failed: {type(e).__name__}: {str(e)[:200]}", flush=True)
