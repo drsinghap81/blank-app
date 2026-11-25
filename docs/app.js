@@ -2299,11 +2299,12 @@ async function loadBasket() {
   const P0 = await getJSON(MAIN + 'data/scan/trade_plan.json', 'trade_plan').catch(() => null);
   const SYS2K = { 'Monthly ATH': 'mom', 'Trend 9/21': 'tf', 'Pulse rotation': 'pr', 'Flag breakout': 'fl', Gold: 'gd' };
   const heldBy = (k) => [...new Set((S.trades || []).filter((t) => t.state === 'open' && (SYS2K[t.system] || '') === k).map((t) => t.symbol))];
-  const planBy = (k) => [...new Set(((P0 && (P0.top || []).concat(P0.swing || [])) || []).filter((r) => bkOf(r) === k && r.stop).map((r) => r.symbol))];
+  const planBy = (k) => [...new Set(((P0 && (P0.top || []).concat(P0.swing || [])) || []).filter((r) => bkOf(r) === k && r.stop && r.kind !== 'WATCH').map((r) => r.symbol))];   // 26 Nov 2026: WATCH rows (not confirmed / skipped lane) are not buys
   const NM = { mom: 'Momentum', tf: 'Cup 9/21', pr: 'Pulse', fl: 'Flags', gd: 'Gold' };
   const list = (b) => { if (!b.al) return '';
     const ks = AK.filter((k) => b.al[k] > 0); const H = new Set(); const Bu = new Set(); const tag = {};
-    ks.forEach((k) => { heldBy(k).forEach((x) => { H.add(x); tag[x] = NM[k]; }); planBy(k).forEach((x) => { if (!H.has(x)) { Bu.add(x); tag[x] = tag[x] || NM[k]; } }); });
+    ks.forEach((k) => { heldBy(k).forEach((x) => { H.add(x); tag[x] = NM[k]; }); }); const own = new Set((S.holdings || []).filter((h) => h.qty > 0).map((h) => h.symbol));   // 26 Nov 2026: held stocks never listed as buys
+    ks.forEach((k) => { planBy(k).forEach((x) => { if (!H.has(x) && !own.has(x)) { Bu.add(x); tag[x] = tag[x] || NM[k]; } }); });
     const chips = (L, cls) => [...L].map((x) => `<span class="${cls}" title="${esc(tag[x])}">${esc(x)}<small>${esc(tag[x])}</small></span>`).join('');
     return `<div class="bs-st">${H.size ? `<p>Holds now · ${H.size}</p><div class="bs-chips">${chips(H, 'h')}</div>` : ''}<p>Buys at the next open · ${Bu.size}</p><div class="bs-chips">${chips(Bu, 'b') || '<span class="none">none today</span>'}</div>
       <small>${H.size + Bu.size} unique stocks. Sizes come from your capital once the basket is active (Trade Live).</small></div>`; };
