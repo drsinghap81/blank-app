@@ -344,7 +344,14 @@ def allocation(curves, tb_overlay, lab_days):
     ix = [d for d in ix if d >= pd.Timestamp("2017-01-02")]
     # daily returns clipped to +-15%: Yahoo series carry unadjusted splits (GOLDBEES 2019) that would read as a -99% day
     R = pd.DataFrame({k: v.reindex(ix).ffill().pct_change().fillna(0).clip(-0.15, 0.15) for k, v in curves.items()})
-    tb = (tb_overlay.reindex(sorted(set(tb_overlay.index) | set(ix))).ffill().reindex(ix).fillna(0).diff().fillna(0) / CAP) if tb_overlay is not None else pd.Series(0.0, index=ix)
+    # 26 Nov 2026: the Top Bottom overlay is ONE set of lots (fixed Rupee P&L), not lots that grow with the book - so it is added to
+    # the money each day, not as a percentage (a percentage would silently add lots as the book grows and inflate the return)
+    tbr = (tb_overlay.reindex(sorted(set(tb_overlay.index) | set(ix))).ffill().reindex(ix).fillna(0).diff().fillna(0)).values if tb_overlay is not None else np.zeros(len(ix))
+
+    def path(w, tbon):
+        r = R.values @ w; P = np.cumprod(1 + r)
+        E = P * (CAP + (np.cumsum(tbr / P) if tbon else 0.0))
+        return pd.Series(np.r_[0.0, E[1:] / E[:-1] - 1], index=ix)
     names = list(R.columns); grid = []
     for w in itertools.product(range(0, 11), repeat=len(names)):
         if sum(w) == 10:
@@ -358,18 +365,18 @@ def allocation(curves, tb_overlay, lab_days):
     res = []
     for tbon in (False, True):
         for w in grid:
-            rr = pd.Series(R.values @ w + (tb.values if tbon else 0), index=ix)
+            rr = path(w, tbon)
             ins = ev(rr, pd.Timestamp("2017-01-01"), pd.Timestamp("2023-01-01"))
             res.append((w, tbon, ins))
     ok = [x for x in res if x[2] and x[2]["dd"] >= -20]
     best = sorted(ok, key=lambda x: -x[2]["cagr"])[:5]
     calm = sorted([x for x in res if x[2]], key=lambda x: -(x[2]["cagr"] / max(1, -x[2]["dd"])))[:3]
     def show(tag, x):
-        w, tbon, ins = x; rr = pd.Series(R.values @ w + (tb.values if tbon else 0), index=ix)
+        w, tbon, ins = x; rr = path(w, tbon)
         oos = ev(rr, pd.Timestamp("2023-01-01"), pd.Timestamp("2100-01-01")); nov = ev(rr, pd.Timestamp("2026-11-09"), pd.Timestamp("2100-01-01"))
-        y26 = ev(rr, pd.Timestamp("2026-01-01"), pd.Timestamp("2100-01-01"))
+        y26 = ev(rr, pd.Timestamp("2026-01-01"), pd.Timestamp("2100-01-01")); y25 = ev(rr, pd.Timestamp("2025-01-01"), pd.Timestamp("2100-01-01"))
         mix = ", ".join(f"{n} {int(round(v * 100))}%" for n, v in zip(names, w) if v > 0) + (" + India Top Bottom (pledge)" if tbon else "")
-        print(f"R| {tag}: {mix} | 2017-22 {ins['cagr']}%/yr DD {ins['dd']}% | 2023-26 {oos['cagr']}%/yr DD {oos['dd']}% | 2026 {y26['ret']:+.1f}% | since 9 Nov {nov['ret'] if nov else '-'}%", flush=True)
+        print(f"R| {tag}: {mix} | 2017-22 {ins['cagr']}%/yr DD {ins['dd']}% | 2023-26 {oos['cagr']}%/yr DD {oos['dd']}% | since 2025 {y25['cagr']}%/yr DD {y25['dd']}% | 2026 {y26['ret']:+.1f}% | since 9 Nov {nov['ret'] if nov else '-'}%", flush=True)
     print("R| ===== ALLOCATION (weights chosen on 2017-2022, worst fall <= 20%; checked on 2023-26) =====", flush=True)
     for k in names:
         one = np.array([1.0 if n == k else 0.0 for n in names]); rr = pd.Series(R.values @ one, index=ix)
