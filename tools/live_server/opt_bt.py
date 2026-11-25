@@ -21,7 +21,7 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 9                     # 23 Nov 2026: sector-green + green index slices (Amritpal: "enter after the first 5 minutes with the option trader's conditions" in green sectors)
+VERSION = 10                    # 23 Nov 2026: sector-green + green index slices (Amritpal: "enter after the first 5 minutes with the option trader's conditions" in green sectors)
 # v8: 21 Nov 2026: rotation quadrant slices; 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import gzip
 import json
@@ -365,7 +365,9 @@ class OptBT:
             self.syn.setdefault(sym, {})[d] = synp
             for side, A, B in (("CE", C, P), ("PE", P, C)):
                 rs = rsi_series([x[4] for x in A])
-                bbu = bb_upper([x[4] for x in A]); sm20 = sma([x[4] for x in A], 20); em5 = ema([x[4] for x in A], 5)
+                bbu = bb_upper([x[4] for x in A]); sm20 = sma([x[4] for x in A], 20); em5 = ema([x[4] for x in A], 5); em3 = ema([x[4] for x in A], 3)
+                trA = [max(x[2] - x[3], abs(x[2] - A[q - 1][4]), abs(x[3] - A[q - 1][4])) if q else x[2] - x[3] for q, x in enumerate(A)]
+                atr14 = [sum(trA[max(0, q - 13):q + 1]) / len(trA[max(0, q - 13):q + 1]) for q in range(len(trA))]
                 ia = [i for i, x in enumerate(A) if x[0][:10] == d]
                 if len(ia) < 3:
                     continue
@@ -424,6 +426,16 @@ class OptBT:
                             alt[str(tr_)] = dict(R=round(Ra - COST * ea / ra, 3), pct=round((xa / ea - 1 - COST) * 100, 2), how=ha,
                                                  inv=round(ea * lot) if lot else None, pnl=round((xa - ea - COST * ea) * lot) if lot else None)
                     alt["short_13"] = short_other(fi, j, how)
+                    # 25 Nov 2026 (Amritpal: CE trades "gave up most of the gains after triggering" - "test all"): exit variants
+                    # on the same fills, 1% cost; the live trader = "ema5" (close below the 5 EMA, stop at the signal low)
+                    OA, HA, LA, CA = [b[1] for b in A], [b[2] for b in A], [b[3] for b in A], [b[4] for b in A]
+                    for mode in ("x_be1", "x_half15", "x_prevlow", "x_be1_prevlow", "x_ema3", "x_atr2", "x_t15_be"):
+                        xr = exit_sim(OA, HA, LA, CA, i, ia[-1], mode, em3=em3, em5=em5, atr=atr14)
+                        if xr:
+                            ea, ra, ha, xa = xr
+                            Ra = (xa - ea) / ra
+                            alt[mode] = dict(R=round(Ra - COST * ea / ra, 3), pct=round((xa / ea - 1 - COST) * 100, 2), how=ha,
+                                             inv=round(ea * lot) if lot else None, pnl=round((xa - ea - COST * ea) * lot) if lot else None)
                     out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], alt=alt, xt=A[j][0][11:16], real=real, vol_lots=round(x[5] / lot, 1) if lot else None, bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
                                     inv=round(e * lot) if lot else None, pnl=round((exitp - e - COST * e) * lot) if lot else None,
@@ -604,6 +616,47 @@ def sector_map():
     return out
 
 
+def exit_sim(o, h, l, c, i, last, mode, em3=None, em5=None, atr=None):
+    """25 Nov 2026: the paper trader's entry (buy-stop above the signal high, stop at the signal low >= 3%), other exits:
+      x_be1        5-EMA close exit; stop to the entry once the high reaches +1R
+      x_half15     half off at +1.5R, the rest on the 5-EMA close exit with the stop at the entry (blended exit price)
+      x_prevlow    stop trails under the previous 5-min candle's low (from the candle after the fill)
+      x_be1_prevlow  breakeven at +1R, then the previous-candle-low trail
+      x_ema3       close below the 3 EMA instead of the 5 EMA
+      x_atr2       stop trails 2 x ATR(14, 5-min) under the highest high since the fill
+      x_t15_be     fixed target +1.5R, stop to the entry at +1R
+    Same-bar order: the stop first. Out at bar `last` (15:15) otherwise. Returns (entry, risk, how, blended exit price) or None."""
+    base = entry_sim(o, h, l, c, i, last, trail=em5)
+    if base is None:
+        return None
+    e, risk, _, _, _, f = base
+    sl = e - risk; hi = h[f]; half = None
+    if l[f] <= sl:
+        return e, risk, "SL", sl
+    for k in range(f + 1, last + 1):
+        st = sl
+        if mode in ("x_be1", "x_be1_prevlow", "x_t15_be") and hi >= e + risk:
+            st = max(st, e)
+        if mode == "x_half15" and half is not None:
+            st = max(st, e)
+        if mode in ("x_prevlow", "x_be1_prevlow"):
+            st = max(st, l[k - 1]) if (mode == "x_prevlow" or hi >= e + risk) else st
+        if mode == "x_atr2" and atr is not None:
+            st = max(st, hi - 2 * atr[k - 1])
+        if l[k] <= st:
+            px = min(o[k], st) if o[k] < st else st
+            return (e, risk, "stop", (half + px) / 2) if half is not None else (e, risk, "SL" if st <= sl else "stop", px)
+        if mode == "x_half15" and half is None and h[k] >= e + 1.5 * risk:
+            half = e + 1.5 * risk
+        if mode == "x_t15_be" and h[k] >= e + 1.5 * risk:
+            return e, risk, "target", e + 1.5 * risk
+        trail = em3 if mode == "x_ema3" else em5 if mode in ("x_be1", "x_half15") else None
+        if trail is not None and trail[k] is not None and c[k] < trail[k]:
+            return (e, risk, "trail", (half + c[k]) / 2) if half is not None else (e, risk, "trail", c[k])
+        hi = max(hi, h[k])
+    return (e, risk, "close", (half + c[last]) / 2) if half is not None else (e, risk, "close", c[last])
+
+
 def _agg(T):
     if not T:
         return dict(n=0)
@@ -769,5 +822,9 @@ def summarise(T):
             "SELL opposite, basket, 5 EMA exits": money_agg([dict(t, **t["alt"]["short_ema5"]) for t in F if (t.get("alt") or {}).get("short_ema5")]),
             "SELL opposite, 5 EMA exits, no entries 11:00-14:30": money_agg([dict(t, **t["alt"]["short_ema5"]) for t in F if (t.get("alt") or {}).get("short_ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30")]),
             "SELL opposite, 5 EMA exits, no lull + PCR + BB": money_agg([dict(t, **t["alt"]["short_ema5"]) for t in F if (t.get("alt") or {}).get("short_ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30") and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]),
+            **{f"PAPER TRADER rules, exit {nm_}": _agg([dict(t, **t["alt"][m_]) for t in F if (t.get("alt") or {}).get(m_) and not ("11:00" <= t.get("et", t["t"]) < "14:30") and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))])
+               for m_, nm_ in (("ema5", "5 EMA close (live)"), ("x_be1", "5 EMA + breakeven at 1R"), ("x_half15", "half at 1.5R + 5 EMA"),
+                               ("x_prevlow", "previous candle low trail"), ("x_be1_prevlow", "breakeven 1R then prev-low trail"),
+                               ("x_ema3", "3 EMA close"), ("x_atr2", "2 ATR trail"), ("x_t15_be", "target 1.5R, breakeven at 1R"), ("1.5", "target 1.5R"), ("2.0", "target 2R"))},
             "BUY, 5 EMA exits, no lull + PCR + BB (the paper trader)": _agg([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30") and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]),
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
