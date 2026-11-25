@@ -8957,6 +8957,12 @@ async function tdRender3(el) {
       return `<details class="t3-old t3-nod"><summary>Also signalled by the systems, not for you today (${srvNo.length}) · why</summary>
         <p class="t3-lbl">The systems fired on these too, but your account can't take them now. Nothing to do: they come back if the reason clears.</p>
         <div class="t3-nolist">${Object.entries(G).map(([w, L]) => `<div class="t3-no"><span class="t3-nw">${esc(w)}</span><span class="t3-ns">${L.map((x) => `<b>${esc(x.sym)}</b>${x.sys ? ` <small>${esc(x.sys)}</small>` : ''}`).join(', ')}</span></div>`).join('')}</div></details>`; })() : ''}
+    ${(() => { /* 25 Nov 2026 (Amritpal: "be in the right sector"): Cup 9/21 / Momentum signals the plan skipped because the industry is Weak / Fading / Turning */
+      const seenL = new Set(); const L = ['top', 'more', 'swing', 'watch'].flatMap((k) => P[k] || []).filter((r) => r.lane_skip && !seenL.has(r.symbol) && seenL.add(r.symbol));
+      const LN = { weak: 'Weak', fade: 'Fading', bounce: 'Turning' };
+      return L.length ? `<details class="t3-old t3-nod"><summary>Skipped · weak industry (${L.length})</summary>
+        <p class="t3-lbl">Cup 9/21 and Momentum signals whose industry is in a Weak, Fading or Turning lane are not bought. Tested NSE 2008–26: 20.5%/yr vs 17.9% taking every signal.</p>
+        <div class="t3-nolist">${L.map((r) => `<div class="t3-no"><span class="t3-nw"><b>${esc(r.symbol)}</b> <small>${esc(r.system || '')}</small></span><span class="t3-ns">${esc(r.group || '')} · ${LN[r.lane] || esc(r.lane || '')}</span></div>`).join('')}</div></details>` : ''; })()}
     <details class="t3-more"><summary>More (information, not buys): rotation maps, leading now, watch lists, is it working?</summary><div id="t3old"></div></details>
     <p class="t3-foot"><button class="t3-link" id="t3v2">Old Today view</button> · <button class="t3-link" id="t3cls">Classic 8-tab layout</button></p></div>`;
   wireMk(); const ab = $('#t3allb'); if (ab) ab.addEventListener('click', () => { state.t3All = true; tdRender3(el); });
