@@ -1920,5 +1920,6 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .t3-src{margin:4px 0 10px;padding:8px 12px;border-radius:10px;font-size:13px;line-height:1.45;background:rgba(255,190,80,.12);border:1px solid rgba(255,190,80,.35)}
 .t3-src.ok{background:rgba(40,200,140,.10);border-color:rgba(40,200,140,.35)}
 .t3-nolist{display:flex;flex-direction:column;gap:6px}
-.t3-no{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:8px 12px;border-radius:10px;background:var(--sel, rgba(127,127,127,.1))}
-.t3-no b{grid-row:span 2}.t3-no small{color:var(--muted)}.t3-no span{grid-column:2;font-size:13px}
+.t3-no{display:flex;flex-direction:column;gap:3px;padding:8px 12px;border-radius:10px;background:var(--sel, rgba(127,127,127,.1))}
+.t3-nw{font-size:13px;color:var(--muted)}.t3-ns{font-size:13px;line-height:1.5}.t3-ns small{color:var(--muted)}
+.t3-nod{margin-top:14px}
