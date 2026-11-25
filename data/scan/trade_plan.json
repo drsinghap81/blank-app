@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-25 09:08 UTC",
+"generated": "2026-11-25 10:12 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-23",
@@ -19,8 +19,8 @@
 "system": "Monthly ATH",
 "status": "active",
 "pct": 100,
-"rules": "Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high. Stop: weekly close below the 30-week SMA, raised every week until it triggers.",
-"test": "NSE 2017-26 alone: 17.3%/yr, worst fall -16.8%."
+"rules": "Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high. Stop: weekly close below the 30-week SMA, raised every week until it triggers. Entry needs a daily close above that high, then a buy-stop next session at that day's high + 0.15%; skipped when the stock's industry is in a Weak, Fading or Turning Pulse lane.",
+"test": "NSE 2017-26 alone: 17.3%/yr, worst fall -16.8%. With close confirmation + industry-lane skip (2008-26, shared with Trend 9/21): 20.5%/yr vs 17.9%."
 },
 {
 "key": "tf",
@@ -28,7 +28,7 @@
 "system": "Trend 9/21",
 "status": "active",
 "pct": 100,
-"rules": "Same monthly breakout with a 1-2 year cup. Stop for sizing: EMA 21 (min 4% under the entry); exit when a daily close has EMA 9 below EMA 21 (sell next open).",
+"rules": "Same monthly breakout with a 1-2 year cup. Stop for sizing: EMA 21 (min 4% under the entry); exit when a daily close has EMA 9 below EMA 21 (sell next open). Entry needs a daily close above the highest wick so far, then a buy-stop next session at that day's high + 0.15%; skipped when the industry is in a Weak, Fading or Turning Pulse lane.",
 "test": "NSE 2017-26 alone 10.5%/yr, worst fall -15.6%; with Momentum (60/40, one account) 23.1%/yr, -21.4%."
 },
 {
@@ -149,7 +149,7 @@
 "PFOCUS"
 ],
 "morning_rule": false,
-"r3m": 21.7
+"r3m": 22.5
 },
 {
 "id": "ATH-GLOBAL-2026-10-01",
@@ -189,7 +189,7 @@
 "results_ind": null,
 "rank": 2,
 "risk_pct": 19.6,
-"r3m": 29.9
+"r3m": 35.8
 },
 {
 "id": "WAIT-DCBBANK",
@@ -296,7 +296,7 @@
 "GAUDIUMIVF"
 ],
 "morning_rule": false,
-"r3m": 8.0
+"r3m": 7.3
 },
 {
 "id": "WAIT-ANGELONE",
@@ -350,7 +350,7 @@
 "SMCGLOBAL"
 ],
 "morning_rule": false,
-"r3m": 21.4
+"r3m": 21.9
 },
 {
 "id": "WAIT-ZYDUSLIFE",
@@ -421,7 +421,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 8.9
+"r3m": 10.4
 },
 {
 "id": "WAIT-DRREDDY",
@@ -545,7 +545,7 @@
 "EMAMILTD"
 ],
 "morning_rule": false,
-"r3m": 11.7
+"r3m": 12.0
 }
 ],
 "more": [],
@@ -602,7 +602,7 @@
 "THELEELA"
 ],
 "morning_rule": false,
-"r3m": 23.7
+"r3m": 23.8
 },
 {
 "id": "T921-EICHERMOT-2026-11-23",
@@ -645,7 +645,7 @@
 "TVSMOTOR"
 ],
 "morning_rule": true,
-"r3m": 4.0
+"r3m": 4.1
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-12",
@@ -719,7 +719,7 @@
 "LUMAXIND"
 ],
 "morning_rule": false,
-"r3m": 23.7
+"r3m": 24.0
 },
 {
 "id": "RET-MCX-2026-11-23",
@@ -759,7 +759,7 @@
 "IEX"
 ],
 "morning_rule": false,
-"r3m": 11.0
+"r3m": 12.2
 },
 {
 "id": "RET-NEOGEN-2026-11-23",
@@ -893,7 +893,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 32.5
+"r3m": 32.8
 },
 {
 "id": "RET-TINNARUBR-2026-11-23",
@@ -933,7 +933,7 @@
 "TINNARUBR"
 ],
 "morning_rule": false,
-"r3m": -14.0
+"r3m": -14.1
 },
 {
 "id": "RET-UNIMECH-2026-11-23",
@@ -992,7 +992,7 @@
 "CENTUM"
 ],
 "morning_rule": false,
-"r3m": 16.3
+"r3m": 15.5
 },
 {
 "id": "RET-APOLLO-2026-11-20",
@@ -1051,7 +1051,7 @@
 "CENTUM"
 ],
 "morning_rule": false,
-"r3m": 9.5
+"r3m": 9.3
 },
 {
 "id": "RET-EIMCOELECO-2026-11-20",
@@ -1117,7 +1117,7 @@
 "ANUP"
 ],
 "morning_rule": false,
-"r3m": 15.2
+"r3m": 15.8
 },
 {
 "id": "RET-STEELCAS-2026-11-20",
@@ -1160,7 +1160,7 @@
 "BALUFORGE"
 ],
 "morning_rule": false,
-"r3m": 2.0
+"r3m": 0.3
 },
 {
 "id": "TF-ICICIBANK-2026-11-09",
@@ -1222,7 +1222,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": false,
-"r3m": 14.9
+"r3m": 15.5
 },
 {
 "id": "T921-TCS-2026-11-23",
@@ -1287,7 +1287,7 @@
 "DCI"
 ],
 "morning_rule": true,
-"r3m": 9.3
+"r3m": 9.9
 },
 {
 "id": "PR-KOTAKBANK-2026-11-20",
@@ -1332,7 +1332,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 26.2
+"r3m": 26.4
 },
 {
 "id": "PR-MEESHO-2026-11-20",
@@ -1366,7 +1366,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 22.0
+"r3m": 22.7
 },
 {
 "id": "PR-SOUTHBANK-2026-11-20",
@@ -1411,7 +1411,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 30.8
+"r3m": 30.7
 },
 {
 "id": "PR-DCBBANK-2026-11-20",
@@ -1501,7 +1501,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 14.2
+"r3m": 13.8
 },
 {
 "id": "PR-ICICIBANK-2026-11-20",
@@ -1546,7 +1546,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 14.9
+"r3m": 15.5
 },
 {
 "id": "PR-URBANCO-2026-11-20",
@@ -1580,7 +1580,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 5.3
+"r3m": 3.9
 },
 {
 "id": "PR-KARURVYSYA-2026-11-20",
@@ -1625,7 +1625,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 12.8
+"r3m": 12.9
 },
 {
 "id": "PR-ETERNAL-2026-11-20",
@@ -1659,7 +1659,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 13.4
+"r3m": 13.3
 },
 {
 "id": "PR-CUB-2026-11-20",
@@ -1704,7 +1704,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 13.4
+"r3m": 13.7
 }
 ],
 "pattern_watch": [
@@ -2122,7 +2122,7 @@
 "GAUDIUMIVF"
 ],
 "morning_rule": false,
-"r3m": 8.0
+"r3m": 7.3
 },
 {
 "id": "WAIT-ANGELONE",
@@ -2176,7 +2176,7 @@
 "SMCGLOBAL"
 ],
 "morning_rule": false,
-"r3m": 21.4
+"r3m": 21.9
 },
 {
 "id": "WAIT-ZYDUSLIFE",
@@ -2247,7 +2247,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 8.9
+"r3m": 10.4
 },
 {
 "id": "WAIT-DRREDDY",
@@ -2570,7 +2570,7 @@
 "EMAMILTD"
 ],
 "morning_rule": false,
-"r3m": 11.7
+"r3m": 12.0
 },
 {
 "id": "WATCH-PERSISTENT",
