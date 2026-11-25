@@ -127,6 +127,8 @@ def num(v):
 
 
 LANE_ORD = {"build": 0, "hold": 1, "mid": 2, None: 3, "bounce": 4, "fade": 5, "weak": 6}
+LANE_SKIP = ("weak", "fade", "bounce")
+LANE_NAME = {"weak": "Weak", "fade": "Fading", "bounce": "Turning / weak-bouncing"}
 
 
 def lanes(G):
@@ -273,6 +275,12 @@ def main(mk="NSE"):
     for c in best.values():   # industry lane (tag + tiebreak only: as a filter it cut ATH returns in the 2017-26 test)
         g = GS.get(c["symbol"]); x = LN.get(g[0]) if g else None
         c.update(group=g[0] if g else None, lane=x[0] if x else None, group_pulse=x[1] if x else None, group_rank=x[2] if x else None)
+        # 25 Nov 2026 (Amritpal: "be in the right sector", OK after the portfolio check): India Cup 9/21 + Momentum buys skip industries
+        # in the Weak / Fading / Weak-bouncing ("Turning") lanes. Test NSE 2008-26 with the close-confirm entries, one 10-slot pool:
+        # 20.5%/yr vs 17.9%, 2021-26 39.2% vs 31.4%, max DD -20.9% vs -18.2% (claude/pulse-lane-filter-close-confirm-test.md).
+        if india and c.get("bucket") in ("tf", "mom") and c.get("kind") != "WATCH" and c["lane"] in LANE_SKIP:
+            c.update(kind="WATCH", order=None, score=-99, lane_skip=True,
+                     note=f"not bought: its industry ({c['group']}) is in the {LANE_NAME[c['lane']]} lane - the test skips these. " + c.get("note", ""))
     if india:
         # 21 Nov 2026 (Amritpal: "All 3"): first tiebreak after the score = the industry's latest results season
         # (share of its stocks with profit > 20% y/y + half the share accelerating; data/scan/results_season.json).
