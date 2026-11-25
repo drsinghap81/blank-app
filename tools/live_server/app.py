@@ -5173,6 +5173,28 @@ def otr_status(_=Depends(auth)):
     return otr_job().status()
 
 
+@app.get("/api/public/opt_paper")
+def otr_paper_public():
+    """26 Nov 2026 (paper Rs 20 L portfolio, tools/paper20.py): the option trader's PAPER result per day only - trades, paper P&L (Rs, at
+    the lots set), wins. No live fills, no account data. Readable without login so the nightly GitHub job can use it."""
+    D = otr_job().status().get("history") or {}
+    try:
+        import opt_trader as _ot
+        allD = {}
+        for line in open(otr_job().hp):
+            try:
+                h = json.loads(line)
+            except Exception:  # noqa: BLE001
+                continue
+            d = allD.setdefault(h["day"], dict(day=h["day"], n=0, pnl=0, wins=0))
+            d["n"] += 1; d["pnl"] += h.get("pnl") or 0; d["wins"] += (h.get("pnl") or 0) > 0
+        days = sorted(allD.values(), key=lambda x: x["day"])
+        lots = (getattr(_ot, "CFG", {}) or {}).get("lots")
+    except Exception:  # noqa: BLE001
+        days = [dict(day=x["day"], n=x["n"], pnl=x["pnl"], wins=x["wins"]) for x in D.get("by_day") or []]; lots = None
+    return dict(days=days, lots=lots)
+
+
 @app.post("/api/opt/trader/mode")
 def otr_mode(body: Mode, request: Request, _=Depends(auth)):
     """paper is always on; LIVE (real orders on Angel) needs the app password + typing LIVE. Turning it off is one tap."""

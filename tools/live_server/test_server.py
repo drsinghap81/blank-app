@@ -1549,3 +1549,12 @@ def test_mm_env_switch(tmp_path):
     assert c.get("/api/mmtb", headers=h).json()["env"] == "REAL"
     r = c.post("/api/mm/env", headers=h, json={"env": "SIMULATE"})
     assert r.status_code == 200 and A.moomoo.env_name == "SIMULATE"
+
+
+def test_opt_paper_public(tmp_path):
+    """public paper-only summary of the option trader: no login, no live fields"""
+    A, c = client(tmp_path)
+    r = c.get("/api/public/opt_paper")
+    assert r.status_code == 200
+    j = r.json(); assert "days" in j
+    assert all(set(d) <= {"day", "n", "pnl", "wins"} for d in j["days"])
