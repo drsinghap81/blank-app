@@ -8972,7 +8972,6 @@ async function tdRender3(el) {
       <div class="t3-grid">${state.t3All ? extraB.filter((c) => mode === 'all' || (mode === 'inv' ? c.inv : mode === 'tr' ? !c.inv : X.grp[c.r.symbol] === mode)).map(card).join('') : ''}</div>
       ${extraB.length && !state.t3All ? `<button class="t3-link" id="t3allb">+ ${extraB.length} more signals beyond today's slots</button>` : ''}</section>
     ${swap && swap.length ? `<section class="t3-sec t3-swap"><h2>Swap to make room</h2>
-      <p class="t3-lbl">Slots or cash full. Sell the weaker stock no system manages, then buy.</p>
       ${swap.map(({ c, h }) => `<div class="t3-swr"><div><span class="t3-swk down">Sell</span><b>${esc(h.symbol)}</b><small>${h.pnl == null ? '' : `${h.pnl >= 0 ? '+' : ''}${fmt(h.pnl, 1)}% · `}${esc(h.grp || 'industry n/a')}${h.lane ? ' · ' + esc(LANE_TXT[h.lane] || h.lane) : ''} · no system</small></div>
         <div><span class="t3-swk up">Buy</span><b>${esc(c.r.symbol)}</b><small>${esc(BK_SHORT[bkOf(c.r)] || c.r.system || '')}${c.r.trigger ? ` · buy above ${fmt(c.r.trigger, 2)}${/next session only/.test(c.r.when || '') ? ' (today only)' : ''}` : ''}${c.r.lane ? ' · ' + esc(LANE_TXT[c.r.lane] || c.r.lane) : ''}</small></div></div>`).join('')}
       <button class="t3-link" data-go3="trade">Open Trade Live → Not in any system</button></section>` : ''}
