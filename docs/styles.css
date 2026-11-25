@@ -1923,3 +1923,7 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .t3-no{display:flex;flex-direction:column;gap:3px;padding:8px 12px;border-radius:10px;background:var(--sel, rgba(127,127,127,.1))}
 .t3-nw{font-size:13px;color:var(--muted)}.t3-ns{font-size:13px;line-height:1.5}.t3-ns small{color:var(--muted)}
 .t3-nod{margin-top:14px}
+
+/* 25 Nov 2026: not-in-any-system holdings with tick boxes */
+.tr-hr.tr-ock{display:flex;align-items:center;gap:10px;cursor:pointer;grid-template-columns:none}.tr-ock input{flex:none;width:18px;height:18px;margin:0;accent-color:var(--accent)}.tr-ock b{flex:0 0 auto;min-width:6.5em;text-align:left}.tr-ock span{flex:1;text-align:left}.tr-ock i{flex:none}
+.tr-oth .tr-pw{display:flex;gap:6px;flex-wrap:wrap}.tr-oth .tr-pw input{flex:1;min-width:120px}

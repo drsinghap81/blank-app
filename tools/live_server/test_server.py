@@ -1501,3 +1501,29 @@ def test_opt_trader_user_cfg(tmp_path):
         assert c.get("/api/opt/trader", headers=h).json()["cfg"]["lots"] == 1
     finally:
         O.CFG.clear(); O.CFG.update(base)
+
+
+def test_cleanup_sell(tmp_path):
+    """25 Nov 2026: 'Sell the holdings no system owns' - password + SELL n, system-owned stocks refused, dry run unless live."""
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    A.broker.hold.update(PFC=265, RECLTD=297, KOTAKBANK=129)
+    J = A.journal(); J["KOTAKBANK"] = dict(system="Trend 9/21", state="open", qty=129); A.save_journal(J) if hasattr(A, "save_journal") else None
+    A.market_open = lambda t=None: True; A._acc["d"] = None
+    r = c.post("/api/cleanup/sell", json={"symbols": ["PFC", "RECLTD"], "password": "pw", "confirm": "SELL 1"}, headers=h)
+    assert r.status_code == 400                                         # wrong count typed
+    assert c.post("/api/cleanup/sell", json={"symbols": ["PFC"], "password": "no", "confirm": "SELL 1"}, headers=h).status_code == 401
+    r = c.post("/api/cleanup/sell", json={"symbols": ["PFC", "RECLTD", "XYZ"], "password": "pw", "confirm": "SELL 3"}, headers=h).json()
+    R = {x["symbol"]: x for x in r["results"]}
+    assert r["mode"] == "DRY RUN" and R["PFC"]["ok"] and R["PFC"]["qty"] == 265 and not R["PFC"]["sent"] and R["RECLTD"]["ok"]
+    assert not R["XYZ"]["ok"]
+
+
+def test_cleanup_sell_refuses_system_stock(tmp_path):
+    A, c = client(tmp_path)
+    h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+    A.broker.hold.update(KOTAKBANK=129)
+    J = A.journal(); J["KOTAKBANK"] = dict(system="Trend 9/21", state="open", qty=129); A.save_journal(J)
+    A.market_open = lambda t=None: True; A._acc["d"] = None
+    r = c.post("/api/cleanup/sell", json={"symbols": ["KOTAKBANK"], "password": "pw", "confirm": "SELL 1"}, headers=h).json()
+    assert not r["results"][0]["ok"] and "system" in r["results"][0]["msg"]

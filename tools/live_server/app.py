@@ -1490,6 +1490,68 @@ class Order(BaseModel):
     confirm: str
 
 
+class Cleanup(BaseModel):
+    symbols: list[str]
+    password: str = ""
+    confirm: str = ""
+
+
+@app.post("/api/cleanup/sell")
+def cleanup_sell(body: Cleanup, request: Request, _=Depends(auth)):
+    """25 Nov 2026 (Amritpal: square off the holdings no system owns and start clean - "give me that option in app itself"):
+    sells the WHOLE holding of each ticked stock that no system manages (journal open / pending / exiting = a system's, left alone).
+    Market hours: limit 0.5% under the live price; 15:45-08:57 IST: AMO limit 2% under the last price. Needs the app password and
+    typing SELL <n>. Dry run unless Live orders is on. Each sale is logged; the daily order limit applies."""
+    ip = request.client.host if request.client else "?"
+    n, t0 = FAILS.get(ip, (0, 0))
+    if n >= 5 and time.time() - t0 < 900:
+        raise HTTPException(429, "too many attempts, wait 15 minutes")
+    syms = [x.strip().upper() for x in body.symbols if x.strip()]
+    if not syms:
+        raise HTTPException(400, "tick at least one stock")
+    if body.confirm.strip().upper() != f"SELL {len(syms)}":
+        raise HTTPException(400, f'type "SELL {len(syms)}" to confirm')
+    if not check_pw(body.password):
+        FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
+    t = ist_now(); mo = market_open(t); amo = amo_window(t) and not mo
+    if not mo and not amo:
+        raise HTTPException(400, "send in market hours, or between 15:45 and 08:57 IST as an after-market order")
+    try:
+        acc = account_cached(30)
+    except Exception as ex:  # noqa: BLE001
+        raise HTTPException(502, f"couldn't read your Angel account: {angel_msg(ex)}")
+    held = {h["symbol"]: h for h in acc["holdings"] if h["qty"] > 0}
+    J = journal(); owned = {k for k, e in J.items() if not k.startswith("_") and e.get("state") in ("open", "pending", "exiting")}
+    done = today_log(); left = MAX_ORDERS_DAY - len([r for r in done if r.get("kind") == "order"])
+    res = []
+    for sym in syms:
+        h = held.get(sym)
+        if not h:
+            res.append(dict(symbol=sym, ok=False, msg="not in your holdings")); continue
+        if sym in owned:
+            res.append(dict(symbol=sym, ok=False, msg="a system manages it - it sells on the system's exit (or Release it first)")); continue
+        if left <= 0:
+            res.append(dict(symbol=sym, ok=False, msg=f"daily limit of {MAX_ORDERS_DAY} orders reached")); continue
+        try:
+            px = broker.ltp(sym) if mo else (h.get("ltp") or h.get("close"))
+        except Exception:  # noqa: BLE001
+            px = h.get("ltp")
+        if not px:
+            res.append(dict(symbol=sym, ok=False, msg="no price from Angel right now")); continue
+        p = broker.params(sym, "SELL", int(h["qty"]), px * (0.995 if mo else 0.98), amo=amo)
+        rec = dict(id=f"CLEAN-{sym}-{t.date().isoformat()}", symbol=sym, side="SELL", qty=int(h["qty"]), params=p, ist_date=t.date().isoformat(), cleanup=True)
+        if not is_live():
+            log("dry", **rec); res.append(dict(symbol=sym, ok=True, sent=False, qty=int(h["qty"]), price=p["price"], msg="dry run")); continue
+        try:
+            oid = broker.place(p)
+        except Exception as ex:  # noqa: BLE001
+            log("order_error", error=str(ex)[:200], **rec); res.append(dict(symbol=sym, ok=False, msg=f"Angel rejected it: {angel_msg(ex)}")); continue
+        log("order", order_id=oid, **rec); left -= 1
+        res.append(dict(symbol=sym, ok=True, sent=True, qty=int(h["qty"]), price=p["price"], order_id=oid, msg="sent" + (" (AMO)" if amo else "")))
+    _acc["d"] = None
+    return dict(mode="LIVE" if is_live() else "DRY RUN", results=res)
+
+
 @app.post("/api/order")
 def order(body: Order, _=Depends(auth)):
     try:

@@ -2047,9 +2047,24 @@ async function loadTrade() {
     <p class="tr-foot">Tap a stock for its chart. ${mk === 'NSE' ? '"2 of 5 good" = the stock is on 5 strategies today and 2 of them tested Good; buys are sorted by it. ' : ''}${esc(D.sizeTxt || '')}</p>
     ${(D.why || []).length ? `<details class="tr-hold"><summary>On Today but not sendable · ${D.why.length}</summary>${D.why.map((w) => `<div class="tr-hr"><b>${esc(w.symbol)}</b><span>${esc(w.why)}</span><i>${esc(w.sys)}</i></div>`).join('')}</details>` : ''}
     <details class="tr-hold"><summary>Holding · ${D.hold.length}</summary>${D.hold.length ? D.hold.map((h) => `<div class="tr-hr"><b>${esc(h.symbol)}</b><span>${h.qty.toLocaleString(L)}${h.sys ? ` · ${esc(h.sys)}` : ''}</span>${h.pnl == null ? '<i></i>' : `<i class="${h.pnl >= 0 ? 'up' : 'down'}">${h.pnl >= 0 ? '+' : ''}${fmt(h.pnl, 1)}%</i>`}</div>`).join('') : '<p class="tr-none">Nothing held.</p>'}</details>
+    ${(D.other || []).length ? `<details class="tr-hold tr-oth"><summary>Not in any system · ${D.other.length} · ${money(D.other.reduce((a, h) => a + (h.value || 0), 0), mk)}</summary>
+      <p class="tr-none">Holdings no system manages: no system stop and no exit signal. Tick the ones to square off (ETFs start unticked), or keep them as long-term holdings. Stocks a system manages are not listed here.</p>
+      ${D.other.map((h, i) => `<label class="tr-hr tr-ock"><input type="checkbox" data-oth="${i}" ${h.etf ? '' : 'checked'}><b>${esc(h.symbol)}</b><span>${h.qty.toLocaleString(L)} · ${money(h.value || 0, mk)}</span>${h.pnl == null ? '<i></i>' : `<i class="${h.pnl >= 0 ? 'up' : 'down'}">${h.pnl >= 0 ? '+' : ''}${fmt(h.pnl, 1)}%</i>`}</label>`).join('')}
+      <div class="tr-pw" style="margin-top:8px"><input id="othpw" type="password" placeholder="App password"><input id="othcf" placeholder="Type SELL n" autocapitalize="characters"><button class="lv-btn sell" id="othgo">Sell ticked</button></div>
+      <p class="tr-none">Sells the whole holding of each ticked stock: in market hours a limit 0.5% under the live price; after 3:45 pm IST an after-market order 2% under the last price. ${D.real ? '<b>Real orders on Angel.</b>' : 'Dry run: nothing is sent.'}</p></details>` : ''}
     <p class="tr-full"><button class="lv-link" id="trfull">Full view · settings, split and records</button></p>
     <div class="tr-bar"><button id="trsend" disabled>Tick stocks to send</button></div>`;
   wire();
+  { const og = el.querySelector('#othgo'); if (og) {
+      const cnt = () => el.querySelectorAll('[data-oth]:checked').length;
+      const hint = () => { const f = el.querySelector('#othcf'); if (f) f.placeholder = `Type SELL ${cnt()}`; };
+      el.querySelectorAll('[data-oth]').forEach((c) => c.addEventListener('change', hint)); hint();
+      og.addEventListener('click', async () => { const L2 = [...el.querySelectorAll('[data-oth]:checked')].map((c) => D.other[+c.dataset.oth].symbol);
+        if (!L2.length) { alertMsg('Tick at least one stock.'); return; }
+        og.disabled = true; og.textContent = 'Sending…';
+        try { const r = await lvApi('/api/cleanup/sell', { method: 'POST', body: JSON.stringify({ symbols: L2, password: el.querySelector('#othpw').value, confirm: el.querySelector('#othcf').value }) });
+          alertMsg(`${r.mode === 'LIVE' ? 'Sent to Angel' : 'Dry run'}:\n` + r.results.map((x) => `${x.symbol}: ${x.ok ? `${x.qty} @ ${x.price} · ${x.msg}` : x.msg}`).join('\n'), true);
+          state._trD = null; loadTrade(); } catch (e) { alertMsg(e.message); og.disabled = false; og.textContent = 'Sell ticked'; } }); } }
   const upd = () => { const S = nSel(); const b = el.querySelector('#trsend'); const v = S.reduce((a, r) => a + r.value, 0);
     b.disabled = !S.length; b.textContent = S.length ? `Send ${S.length} order${S.length > 1 ? 's' : ''} · ${money(v, mk)}` : 'Tick stocks to send';
     el.querySelectorAll('[data-cb]').forEach((c) => { const on = !!P[c.dataset.cb]; c.classList.toggle('on', on); c.setAttribute('aria-checked', on); }); };
@@ -2077,8 +2092,12 @@ async function trIndia() {
   const why = (S.rows || []).filter((r) => r.tier !== 'more' && !r.local && bkOf(r) !== 'my' && r.kind !== 'MY_GTT' && (r.skip || !(r.qty > 0) || !((al[bkOf(r)] ?? 0) > 0)))
     .map((r) => ({ symbol: r.symbol, sys: TR_SYS[bkOf(r)] || r.system || '', why: r.skip || (!((al[bkOf(r)] ?? 0) > 0) ? 'system switched off in your split' : 'too small for your capital at this risk') }));
   const hold = (S.trades || []).filter((t) => t.state === 'open').map((t) => ({ symbol: t.symbol, qty: t.qty, sys: TR_SYS[{ 'Monthly ATH': 'mom', 'Trend 9/21': 'tf' }[t.system]] || t.system, pnl: t.ltp && t.entry ? (t.ltp / t.entry - 1) * 100 : null }));
+  /* 25 Nov 2026 (Amritpal: square off what no system owns and restart, "give me that option in app itself") */
+  const sysAll = new Set((S.trades || []).filter((t) => ['open', 'pending', 'exiting'].includes(t.state)).map((t) => t.symbol));
+  const other = (S.holdings || []).filter((h) => h.qty > 0 && !sysAll.has(h.symbol))
+    .map((h) => ({ ...h, pnl: h.avg && h.ltp ? (h.ltp / h.avg - 1) * 100 : null, etf: /BEES$|ETF$|IETF$/i.test(h.symbol) }));
   const on = A ? [A.stock_sell && 'stock sells 09:16', A.stock_buy && 'stock buys 09:20'].filter(Boolean).join(', ') : '';
-  return { broker: 'Angel One', real: S.mode === 'LIVE', modeTxt: 'dry run: nothing is sent', sells, buys, hold, autoTxt: on, why,
+  return { broker: 'Angel One', real: S.mode === 'LIVE', modeTxt: 'dry run: nothing is sent', sells, buys, hold, other, autoTxt: on, why,
     sizeTxt: `Sizes: ${fmt(S.risk_pct || 1, 2)}% risk on ${money(S.capital, 'NSE')}, within your cash (no split between systems).` };
 }
 /* US / ASX: the evening plan sized on your capital (as Full view), moomoo positions and mode from the server */
