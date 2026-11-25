@@ -27,7 +27,7 @@ SPLIT = {
 }
 
 
-def main():
+def build():
     nif = yf.download("^NSEI", start="2000-01-01", auto_adjust=True, progress=False)["Close"].squeeze()
     reg = (nif > nif.rolling(200).mean()).to_dict()
     P = AC.load()
@@ -78,6 +78,11 @@ def main():
     up = (T.wk > T.m) & (T.m > T.q) & ((T.wk - T.q) * 100 >= 10); dn = (T.wk < T.m) & (T.m < T.q) & ((T.q - T.wk) * 100 >= 10)
     T["lane"] = np.where(T.pq >= 60, np.where(up, "build", np.where(dn, "fade", "hold")), np.where(T.pq <= 40, np.where(up, "bounce", "weak"), "mid"))
     T.loc[T.pq.isna(), "lane"] = "none"
+    return T
+
+
+def main():
+    T = build()
     print(f"R| signals with a Pulse group: {T.g.notna().mean() * 100:.0f}%; agreement Pulse-q top half vs return top half: "
           f"{((T.pq >= 50) == (T.pr >= 50))[T.pq.notna() & T.pr.notna()].mean() * 100:.0f}%", flush=True)
     F = {"all (live rules)": T.index == T.index,
