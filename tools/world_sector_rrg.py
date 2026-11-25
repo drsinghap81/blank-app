@@ -75,10 +75,10 @@ def main(mk, dry=False):
     d = d.dropna(how="all").ffill()
     bench = pd.Series(1.0, index=d.index) if b in ("USD", "INR") else d.pop(b); C = d[[k for k in cf["names"] if k in d.columns and d[k].notna().sum() > 120]]
     print(mk, "got", list(C.columns), "last", C.index[-1].date(), flush=True)
-    W = C.resample("W-FRI").last(); BW = bench.resample("W-FRI").last()
-    if W.index[-1] > C.index[-1]:
+    W = C.resample("W-FRI").last(); BW = bench.resample("W-FRI").last(); part = bool(W.index[-1] > C.index[-1])
+    if part:
         W.index = list(W.index[:-1]) + [C.index[-1]]; BW.index = W.index
-    out = dict(asof=str(C.index[-1].date()), bench=bname, weekly=view(W, BW, 10, 1, 3, 8, cf["names"]), daily=view(C, bench, 50, 10, 5, 10, cf["names"]),
+    out = dict(asof=str(C.index[-1].date()), bench=bname, weekly=view(W, BW, 10, 1, 3, 8, cf["names"], partial=part), daily=view(C, bench, 50, 10, 5, 10, cf["names"]),
                method=__doc__)
     for v in ("weekly", "daily"):
         print(mk, v, {q: [k for k, r in out[v].items() if r["now"] == q] for q in ("Leading", "Improving", "Weakening", "Lagging")}, flush=True)
