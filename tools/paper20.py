@@ -5,10 +5,11 @@ Start from when we finalised all systems. I want to see how you allocate capital
 Two books, both Rs 20 L on Mon 9 Nov 2026 (the India mix was finalised on 9 Nov; tested mix "C" in portfolio-mix-pulse-ath-921-tb.md):
   plain  : Pulse rotation 50% + Momentum / Cup 9/21 50% of the investable money
   hedged : Pulse rotation 40% + Momentum / Cup 9/21 40% + gold (GOLDBEES) 10% + US dollar (USD/INR) 10%   (hedging-backtest.md)
-  both   : + Top Bottom Bank Nifty, 1 lot futures on margin from PLEDGED holdings (no capital of its own)
+  both   : + Top Bottom, 1 lot each of the six live bots - Bank Nifty (buy + sell), Nifty, BEL, L&T, Tata Motors PV, TCS (buy only) -
+             on margin from PLEDGED holdings (no capital of their own)
            + the 5-minute option trader (its paper P&L at the lots set in the app)
-  reserves (kept in cash, not invested): Rs 1.2 L for Top Bottom (exchanges want half the margin in cash; the rest comes from the
-           pledge) and its daily losses, Rs 1 L for option premiums. Investable = Rs 17.8 L.
+  reserves (kept in cash, not invested): Rs 3 L for Top Bottom (exchanges want half the margin in cash; the rest comes from the
+           pledge) and its daily losses, Rs 1 L for option premiums. Investable = Rs 16 L.
 Sleeves (forward record only - nothing here is a backtest):
   Momentum / Cup 9/21 : the setups the app logged night by night (data/scan/setup_log.json, systems 'Monthly ATH' and 'Trend 9/21'),
            at the logged entry, stop and exit; size = 1% of the book's value at risk to the stop, max 10% of the book a stock, max
@@ -16,12 +17,13 @@ Sleeves (forward record only - nothing here is a backtest):
   Pulse rotation : the live rule replayed each Friday from 6 Nov (top-10% Pulse industries that are Leading / Improving, the 10
            strongest trending stocks by 3-month return, kept while in the top 20), equal weight, bought / sold at Monday's open,
            0.2% a side. (The traffic-light RED skip is not replayed; the light was not RED in this period.)
-  Top Bottom : the live bot's rules replayed tick-path on the daily Bank Nifty future (tools/angel/sim_check.py, real 1% entry-day
-           stop), started flat on 9 Nov, 1 lot = 30, 0.03% of notional a round trip.
+  Top Bottom : each live bot's rules replayed tick-path on its daily near-month future (tools/angel/sim_check.py, real 1% entry-day
+           stop), started flat on 9 Nov, 1 lot (the lot size in data/futures), 0.03% of notional a round trip. Margin ~12% of the
+           notional for index futures, ~20% for stock futures.
   Option trader : its paper result per day from the server's public summary (/api/public/opt_paper); started 19 Nov.
   Gold / USD : bought on 9 Nov, held (rebalanced to 10% each at the start of each month).
-Pledge: stock holdings count at 80% of value, GOLDBEES at 90% (typical haircuts); the Top Bottom margin is ~12% of the lot's notional,
-half of it from the cash reserve. A shortfall is flagged.
+Pledge: stock holdings count at 80% of value, GOLDBEES at 90% (typical haircuts); half of the Top Bottom margin must be cash (the reserve plus
+Top Bottom's own gains), the other half from the pledge. A shortfall is flagged.
 Output: data/scan/paper20.json (equity per day, sleeves, positions, closed trades, a log of what was done and why). Nightly."""
 import json
 import math
@@ -40,8 +42,8 @@ import nse_bhav; nse_bhav.install()  # noqa: E402,E702
 
 OUT = "data/scan/paper20.json"
 START = pd.Timestamp("2026-11-09"); CAP = 2_000_000.0
-RES_TB, RES_OPT = 120_000.0, 100_000.0
-COST = 0.002; TB_LOT = 30; TB_COST = 0.0003; TB_MARGIN = 0.12; HAIR = {"stock": 0.8, "gold": 0.9}
+RES_TB, RES_OPT = 300_000.0, 100_000.0
+COST = 0.002; TB_COST = 0.0003; HAIR = {"stock": 0.8, "gold": 0.9}
 BOOKS = {"plain": {"pulse": 0.5, "ath": 0.5}, "hedged": {"pulse": 0.4, "ath": 0.4, "gold": 0.1, "usd": 0.1}}
 OPT_URL = os.environ.get("OPT_PAPER_URL", "https://13-126-118-48.sslip.io/api/public/opt_paper")
 MINVAL, MINPX, N, BUF = 1e7, 50, 10, 20
@@ -112,11 +114,18 @@ def pulse_picks(C, V, nifty, IND):
 
 
 # ---------------------------------------------------------------- Top Bottom Bank Nifty (live bot logic, tick paths)
-def top_bottom(days):
+TB_SET = [("BANKNIFTY", {}, 0.12), ("NIFTY", dict(buffer_pts=12, long_only=True), 0.12)] + \
+    [(x, dict(long_only=True, buffer_pts=0, buffer_pct=0.05, glitch_pts=0, use_once=True, gap_pct=1.5), 0.20) for x in ("BEL", "LT", "TMPV", "TCS")]
+
+
+def top_bottom(sym, over):
+    """one Top Bottom bot (the live settings: Bank Nifty buy + sell; Nifty and the stock futures buy only) replayed from START"""
     import sim_check as sc
     import tb_live as tl
-    df = pd.read_csv(os.path.join("data/futures/BANKNIFTY.csv"), index_col=0, parse_dates=True)[["Open", "High", "Low", "Close"]]
-    cfg = dict(tl.DEFAULT_CFG, entry_day_sl="intraday", dry_run=True, lots=1)
+    raw = pd.read_csv(os.path.join(f"data/futures/{sym}.csv"), index_col=0, parse_dates=True)
+    lot = int(float(raw["Lot"].dropna().iloc[-1])) if "Lot" in raw and raw["Lot"].notna().any() else 30
+    df = raw[["Open", "High", "Low", "Close"]].dropna()
+    cfg = dict(tl.DEFAULT_CFG, entry_day_sl="intraday", dry_run=True, lots=1, **over)
     st = tl.init_flat_state(df[df.index < START], cfg); br = sc.FakeBroker(); daily = {}; log = []
     for d in df.index[df.index >= START]:
         bar = df.loc[d]
@@ -131,15 +140,17 @@ def top_bottom(days):
                 day.tick(q)
         day.before_close(dict(ltp=bar.Close, open=bar.Open, high=bar.High, low=bar.Low))
         day.end_of_day(dict(Open=bar.Open, High=bar.High, Low=bar.Low, Close=bar.Close))
-        real = sum((t.get("Points") or 0) for t in st.trades if t.get("ExitDate")) * TB_LOT - sum(1 for t in st.trades if t.get("ExitDate")) * TB_COST * bar.Close * TB_LOT
-        opn = (st.pos * (bar.Close - st.entry) * TB_LOT) if st.pos else 0.0
-        daily[d.normalize()] = dict(pnl=real + opn, pos=int(st.pos), entry=float(st.entry or 0), close=float(bar.Close))
+        cl = [t for t in st.trades if t.get("ExitDate")]
+        real = sum((t.get("Points") or 0) for t in cl) * lot - sum(TB_COST * (t.get("Exit") or bar.Close) * lot for t in cl)
+        opn = (st.pos * (bar.Close - st.entry) * lot) if st.pos else 0.0
+        daily[d.normalize()] = dict(pnl=real + opn, pos=int(st.pos), entry=float(st.entry or 0), close=float(bar.Close), lot=lot)
+    nm = {"BANKNIFTY": "Bank Nifty", "NIFTY": "Nifty"}.get(sym, sym)
     for t in st.trades:
-        log.append((str(t["EntryDate"])[:10], f"Top Bottom: {'bought' if t.get('Side') == 'BUY' else 'sold short'} 1 Bank Nifty lot at {t.get('Entry', 0):,.0f} - {t.get('Signal', '')}"))
+        log.append((str(t["EntryDate"])[:10], f"Top Bottom {nm}: {'bought' if t.get('Side') == 'BUY' else 'sold short'} 1 lot ({lot}) at {t.get('Entry', 0):,.2f} - {t.get('Signal', '')}"))
         if t.get("ExitDate"):
-            log.append((str(t["ExitDate"])[:10], f"Top Bottom: closed {t.get('Points', 0):+.0f} pts (Rs {(t.get('Points') or 0) * TB_LOT:+,.0f}) - {t.get('Reason', '')}"))
-    trades = [dict(t) for t in st.trades if t.get("ExitDate")]
-    return daily, trades, log, dict(pos=int(st.pos), entry=float(st.entry or 0))
+            log.append((str(t["ExitDate"])[:10], f"Top Bottom {nm}: closed {t.get('Points', 0):+,.2f} pts (Rs {(t.get('Points') or 0) * lot:+,.0f}) - {t.get('Reason', '')}"))
+    trades = [dict(t, sym=sym, lot=lot) for t in st.trades if t.get("ExitDate")]
+    return daily, trades, log, dict(pos=int(st.pos), entry=float(st.entry or 0), lot=lot)
 
 
 def opt_paper(prev):
@@ -165,18 +176,33 @@ def main():
     syms = sorted({s for v in IND.values() for s in v} | {r["sym"] for r in rows})
     C, O, V = download([s + ".NS" for s in syms] + ["GOLDBEES.NS", "INR=X", "^NSEI"])
     C.columns = [c.replace(".NS", "") for c in C.columns]; O.columns = C.columns; V.columns = [c.replace(".NS", "") for c in V.columns]
-    nifty = C["^NSEI"].ffill(); days = [d for d in C.index[C.index >= START] if not np.isnan(nifty.get(d, np.nan))]
+    ok = C["^NSEI"].notna(); C, O, V = C[ok], O[ok], V[ok]        # Indian sessions only (FX rows on NSE holidays break the rolling windows)
+    nifty = C["^NSEI"]; days = list(C.index[C.index >= START])
     if not days:
         raise SystemExit("no trading days since the start")
     stock_cols = [s for s in syms if s in C.columns]
     PP = pulse_picks(C[stock_cols], V.reindex(columns=stock_cols), nifty, IND)
     print("pulse industries", len(IND), "stocks", len(stock_cols), "decisions", {str(k.date()): v["picks"] for k, v in PP.items()})
-    TBd, TBtr, TBlog, TBnow = top_bottom(days)
-    last_tb = {}
-    for d in days:                                     # the futures file can lag a session: carry the last known mark forward
-        k_ = max([x for x in TBd if x <= d], default=None)
-        last_tb[d] = TBd[k_] if k_ is not None else {}
-    TBd = last_tb
+    TBall = {}
+    for sym, over, mpct in TB_SET:
+        try:
+            dly, trs, lg, now = top_bottom(sym, over)
+            TBall[sym] = (dly, trs, lg, now, mpct)
+        except Exception as ex:  # noqa: BLE001
+            print("top bottom", sym, ex)
+    TBd = {}; TBtr = []; TBlog = []; TBopen = []
+    for sym, (dly, trs, lg, now, mpct) in TBall.items():
+        TBtr += trs; TBlog += lg
+        for d in days:                                 # the futures file can lag a session: carry the last known mark forward
+            k_ = max([x for x in dly if x <= d], default=None); x = dly.get(k_, {}) if k_ is not None else {}
+            agg = TBd.setdefault(d, dict(pnl=0.0, margin=0.0))
+            agg["pnl"] += x.get("pnl", 0.0)
+            if x.get("pos"):
+                agg["margin"] += mpct * x["close"] * x["lot"]
+        if now["pos"]:
+            last = [dly[k] for k in sorted(dly)][-1]
+            TBopen.append(dict(sym=f"{sym} FUT", sleeve="top_bottom", sys="Top Bottom", qty=now["lot"] * now["pos"], e=now["entry"], last=last["close"], value=None,
+                               pnl=round(now["pos"] * (last["close"] - now["entry"]) * now["lot"]), pct=round(now["pos"] * (last["close"] / now["entry"] - 1) * 100, 2), d=None, stop=None))
     OPd, OPlots, OPok = opt_paper(prev)
     usd = C["INR=X"].ffill(); gold = C["GOLDBEES"].ffill()
     res = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(days[-1].date()), start=str(START.date()),
@@ -264,21 +290,16 @@ def main():
             tot = sum(sv.values()); nif0 = nif0 or float(nifty[d])
             stocks = sum(h["qty"] * h["last"] for h in hold.values())
             pledge = HAIR["stock"] * stocks + HAIR["gold"] * sv["gold"]
-            tbpos = TBd.get(d, {}).get("pos", 0); need = TB_MARGIN * TBd.get(d, {}).get("close", 0) * TB_LOT if tbpos else 0.0
+            need = TBd.get(d, {}).get("margin", 0.0)
             eq.append(dict(d=ds, v=round(tot), nifty=round(CAP * float(nifty[d]) / nif0), sleeves={k: round(v) for k, v in sv.items()},
-                           pledge=round(pledge), margin=round(need), margin_ok=bool(need <= pledge + cash["reserve"] - RES_OPT)))
+                           pledge=round(pledge), margin=round(need), margin_ok=bool(need / 2 <= cash["reserve"] - RES_OPT + max(0, sv["top_bottom"]) and need / 2 <= pledge)))
         for x in TBlog:
             log.append(x)
         for t in TBtr:
-            closed.append(dict(sym="BANKNIFTY FUT", sleeve="top_bottom", sys="Top Bottom", d=str(pd.Timestamp(t.get("EntryDate")).date()) if t.get("EntryDate") else None,
-                               dx=str(pd.Timestamp(t.get("ExitDate")).date()) if t.get("ExitDate") else None, e=t.get("Entry"), x=t.get("Exit"), qty=TB_LOT,
-                               pnl=round((t.get("Points") or 0) * TB_LOT), why=t.get("Reason") or t.get("Side") or ""))
+            closed.append(dict(sym=f"{t['sym']} FUT", sleeve="top_bottom", sys="Top Bottom", d=str(t.get("EntryDate"))[:10], dx=str(t.get("ExitDate"))[:10],
+                               e=t.get("Entry"), x=t.get("Exit"), qty=t["lot"], pnl=round((t.get("Points") or 0) * t["lot"]), why=t.get("Reason") or ""))
         pos = [dict(sym=s, sleeve=h["sleeve"], sys=h["sys"], qty=h["qty"], e=h["e"], last=round(h["last"], 2), d=h["d"], value=round(h["qty"] * h["last"]),
-                    pnl=round(h["qty"] * (h["last"] - h["e"])), pct=round((h["last"] / h["e"] - 1) * 100, 2), stop=h.get("s")) for s, h in hold.items()]
-        if TBnow["pos"]:
-            last = TBd[days[-1]].get("close") or TBnow["entry"]
-            pos.append(dict(sym="BANKNIFTY FUT", sleeve="top_bottom", sys="Top Bottom", qty=TB_LOT * TBnow["pos"], e=TBnow["entry"], last=last, value=None,
-                            pnl=round(TBnow["pos"] * (last - TBnow["entry"]) * TB_LOT), pct=round(TBnow["pos"] * (last / TBnow["entry"] - 1) * 100, 2), d=None, stop=None))
+                    pnl=round(h["qty"] * (h["last"] - h["e"])), pct=round((h["last"] / h["e"] - 1) * 100, 2), stop=h.get("s")) for s, h in hold.items()] + TBopen
         V0 = eq[-1]["v"]; peak = 0; dd = 0.0
         for x in eq:
             peak = max(peak, x["v"]); dd = min(dd, x["v"] / peak - 1)
