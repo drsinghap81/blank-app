@@ -8,8 +8,11 @@ F=/opt/trenddesk/.env
 read -rsp "moomoo trading password (hidden): " P; echo
 read -rsp "again: " P2; echo
 [ -n "$P" ] && [ "$P" = "$P2" ] || { echo "did not match - nothing changed"; exit 1; }
+case "$P" in *"'"*) echo "a ' in the password can't be stored safely here - change the trading password in moomoo"; exit 1;; esac
 sed -i '/^MOOMOO_TRADE_PWD=/d' "$F"
-printf 'MOOMOO_TRADE_PWD=%s\n' "$P" >> "$F"
+# 26 Nov 2026: single quotes so systemd's EnvironmentFile keeps \ " $ # and spaces exactly as typed
+printf "MOOMOO_TRADE_PWD='%s'\n" "$P" >> "$F"
+N=${#P}
 chown trenddesk "$F" 2>/dev/null || true; chmod 600 "$F"; unset P P2
 systemctl restart trenddesk
-echo "Saved. Server restarted. Now in the app: Automation -> moomoo -> Switch to real money."
+echo "Saved ($N characters). Server restarted. Now in the app: Automation -> moomoo -> Switch to real money."
