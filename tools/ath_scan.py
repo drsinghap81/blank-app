@@ -410,7 +410,7 @@ def analyse(sym, x, today, lookback_days=550):
                 if not z:
                     continue
                 cl = float(x.Close.iloc[-1])
-                CUPW.append(dict(symbol=sym, tf=tf, status=z["status"], bars_ago=z["bars_ago"], cup_bars=int(z["age"]), cup_days=int(z["age"] * td),
+                CUPW.append(dict(symbol=sym, tf=tf, status=z["status"], long_cup=True, bars_ago=z["bars_ago"], cup_bars=int(z["age"]), cup_days=int(z["age"] * td),
                                  depth=round(z["depth"], 4), rim=round(z["rim"], 2), rim_date=idx[z["a"]], signal=idx[z["i"]],
                                  trigger=round(z["trigger"], 2), stop=round(z["stop"], 2) if z["stop"] else None,
                                  risk_pct=round((1 - z["stop"] / z["trigger"]) * 100, 1) if z["stop"] else None,
