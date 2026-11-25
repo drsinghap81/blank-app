@@ -21,7 +21,8 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 11                    # 26 Nov 2026: reuse cached 5-minute bars of EXPIRED monthly contracts, so the test keeps the weeks before the last expiry (v10 ran on 1 day after the 24 Nov expiry).
+VERSION = 12                    # 26 Nov 2026: index + daily-close cache keys include the start date (v11 reused v10's files, which began on ~19 Nov).
+# v11: 26 Nov 2026: reuse cached 5-minute bars of EXPIRED monthly contracts, so the test keeps the weeks before the last expiry (v10 ran on 1 day after the 24 Nov expiry).
 # v10: 23 Nov 2026: sector-green + green index slices (Amritpal: "enter after the first 5 minutes with the option trader's conditions" in green sectors)
 # v8: 21 Nov 2026: rotation quadrant slices; 20 Nov 2026: Pulse slices (puts on weak-Pulse stocks, calls on strong) | bump to re-run the backtest after a server update (18 Nov 2026: sell-the-opposite variants)
 import glob
@@ -197,7 +198,7 @@ class OptBT:
             start = min(start, prev_expiry(min((m[0] for m in monthly.values() if m), default=today)) - timedelta(days=40))   # v11: expired month too
             idx = {}
             for nm in ("NIFTY", "BANKNIFTY"):
-                idx[nm] = self._cached(f"idx5_{nm}_{last}", "NSE", IDXTOK[nm], "FIVE_MINUTE", start, last)
+                idx[nm] = self._cached(f"idx5_{nm}_{start}_{last}", "NSE", IDXTOK[nm], "FIVE_MINUTE", start, last)
             days = sorted({b[0][:10] for b in idx["NIFTY"]})
             trades = []; self.syn = {}; self.trail = []
             for k, r in enumerate(rows):
@@ -307,10 +308,10 @@ class OptBT:
         if kind == "index" or sym in IDXTOK:
             if sym not in IDXTOK:
                 return []
-            D = self._cached(f"d_{sym}_{last}", IDXEX.get(sym, "NSE"), IDXTOK[sym], "ONE_DAY", date.fromisoformat(days[0]) - timedelta(days=10), last)
+            D = self._cached(f"d_{sym}_{days[0]}_{last}", IDXEX.get(sym, "NSE"), IDXTOK[sym], "ONE_DAY", date.fromisoformat(days[0]) - timedelta(days=10), last)
         else:
             _, t = self.b._ts(sym)
-            D = self._cached(f"d_{sym}_{last}", "NSE", t["token"], "ONE_DAY", date.fromisoformat(days[0]) - timedelta(days=10), last)
+            D = self._cached(f"d_{sym}_{days[0]}_{last}", "NSE", t["token"], "ONE_DAY", date.fromisoformat(days[0]) - timedelta(days=10), last)
         closes = {b[0][:10]: b[4] for b in D}
         dl = sorted(closes)
         # v11 (26 Nov 2026): 5-minute bars of expired monthly contracts that earlier runs saved in the cache
