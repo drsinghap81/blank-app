@@ -1,9 +1,22 @@
 {
- "generated": "2026-11-25T01:53+00:00",
+ "generated": "2026-11-25T04:37+00:00",
  "asof": "2026-11-24",
  "market": "US",
  "ema": 9,
- "rows": [],
+ "rows": [
+  {
+   "symbol": "PANW",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-11-19",
+   "signal_close": 361.73,
+   "gain": -2.4,
+   "days": 3,
+   "ema": 342.61,
+   "close": 352.99,
+   "low": 346.44
+  }
+ ],
  "test": "Tested 2007\u201326: indices +0.45% a trade vs +0.67% holding any 16 days; top-50 stocks +1.48% vs +1.61%. No edge in the US: shown for reference only.",
  "rule": "EMA 9 lift-off alert (19 Nov 2026, Amritpal: \"can an alert be generated if a candle leaves a rising EMA\").\nINFORMATION ONLY. Tested in tools/research/ema_liftoff.py (project doc ema-liftoff-candle-test), daily futures 2007-26:\n  lift-off = first candle whose LOW is above a RISING EMA 9 (EMA above its value 3 sessions ago), none in the previous 10 sessions\n  ride until the first candle whose HIGH is below EMA 9 (\"left below\") -> out next open\n  Bank Nifty: 5 trades/yr, 42% win, avg +1.95% (median -0.6%), profit factor 2.1; 2017-26 avg +0.94%. Nifty avg +0.96%, PF 2.0.\n  53 F&O stocks: avg +1.46%, PF 1.6. The candle alone does not predict direction (10-day return = any day); the gain comes from\n  riding the few big trends. Short side (candle fully below a falling EMA) LOST money - not alerted as a short."
 }
