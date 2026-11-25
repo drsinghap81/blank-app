@@ -8919,6 +8919,22 @@ async function tdRender3(el) {
     srvNo = C.filter((c) => !c.srv).map((c) => ({ sym: c.r.symbol, sys: BK_SHORT[bkOf(c.r)] || c.r.system || '', why: wm[c.r.symbol] || 'not in your account plan (already held, already ordered, or set aside by the server)' }));
     (SV.why || []).forEach((w) => { if (!srvNo.some((x) => x.sym === w.symbol) && !C.some((c) => c.srv && c.r.symbol === w.symbol)) srvNo.push({ sym: w.symbol, sys: w.sys, why: w.why }); });
   }
+  /* 26 Nov 2026 (Amritpal: "give me a replacement option - a stronger system buy for a non-system, weaker stock"): when system buys
+     are blocked only by slots or cash, pair each with the weakest holding no system manages (Weak / Turning / Fading industry first,
+     then the biggest loss). Selling goes through the "Not in any system" card on Trade Live (password + typed SELL n). */
+  let swap = null;
+  if (srvOn && mk === 'NSE') {
+    const blocked = srvNo.filter((x) => /slot|cash/i.test(x.why || '')).map((x) => C.find((c) => c.r.symbol === x.sym)).filter(Boolean);
+    const oth = (SV.other || []).filter((h) => !h.etf && h.qty > 0);
+    if (blocked.length && oth.length) {
+      const GP = await loadGP('NSE').catch(() => null); const rowsG = ((GP && GP.rows) || []).map((r) => ({ ...r })); if (rowsG.length) gpShift(rowsG);
+      const shOf = {}; rowsG.forEach((r) => { shOf[r.group] = r.shift; }); const stk = (GP && GP.stock) || {};
+      const W = { weak: 0, turn: 1, bounce: 1, fade: 2, mid: 3, hold: 4, build: 5 };
+      const weak = oth.map((h) => { const g = (stk[h.symbol] || [])[0]; const sh = g ? shOf[g] : null; return { ...h, grp: g, lane: sh, w: sh ? W[sh] : 3 }; })
+        .sort((a, b) => ((a.w <= 2) ? 0 : 1) - ((b.w <= 2) ? 0 : 1) || ((a.pnl ?? 0) - (b.pnl ?? 0)));   // Weak / Turning / Fading industry first, then the biggest loss
+      swap = blocked.slice(0, 3).map((c, i) => ({ c, h: weak[i] })).filter((x) => x.h);
+    }
+  }
   /* same slots as the plan: up to 6 Momentum + 4 Trader buys a day; the rest fold under "more signals" */
   const ready = srvOn ? C.filter((c) => c.srv) : C.filter((c) => !c.wait), waits = srvOn ? [] : C.filter((c) => c.wait);
   const buys = srvOn ? ready.slice() : ready.filter((c) => c.inv).slice(0, 6).concat(ready.filter((c) => !c.inv).slice(0, 4)).sort((a, b) => C.indexOf(a) - C.indexOf(b));
@@ -8966,6 +8982,11 @@ async function tdRender3(el) {
       return `<details class="t3-old t3-nod"><summary>Also signalled by the systems, not for you today (${srvNo.length}) · why</summary>
         <p class="t3-lbl">The systems fired on these too, but your account can't take them now. Nothing to do: they come back if the reason clears.</p>
         <div class="t3-nolist">${Object.entries(G).map(([w, L]) => `<div class="t3-no"><span class="t3-nw">${esc(w)}</span><span class="t3-ns">${L.map((x) => `<b>${esc(x.sym)}</b>${x.sys ? ` <small>${esc(x.sys)}</small>` : ''}`).join(', ')}</span></div>`).join('')}</div></details>`; })() : ''}
+    ${swap && swap.length ? `<section class="t3-sec t3-swap"><h2>Swap to make room</h2>
+      <p class="t3-lbl">These system buys are blocked only because your slots or cash are full. Each is paired with your weakest holding that no system manages (weak industry first, then the biggest loss). Sell it on Trade Live, then the buy can go.</p>
+      ${swap.map(({ c, h }) => `<div class="t3-swr"><div><span class="t3-swk down">Sell</span><b>${esc(h.symbol)}</b><small>${h.pnl == null ? '' : `${h.pnl >= 0 ? '+' : ''}${fmt(h.pnl, 1)}% · `}${esc(h.grp || 'industry n/a')}${h.lane ? ' · ' + esc(LANE_TXT[h.lane] || h.lane) : ''} · no system</small></div>
+        <div><span class="t3-swk up">Buy</span><b>${esc(c.r.symbol)}</b><small>${esc(BK_SHORT[bkOf(c.r)] || c.r.system || '')}${c.r.trigger ? ` · buy above ${fmt(c.r.trigger, 2)}${/next session only/.test(c.r.when || '') ? ' (today only)' : ''}` : ''}${c.r.lane ? ' · ' + esc(LANE_TXT[c.r.lane] || c.r.lane) : ''}</small></div></div>`).join('')}
+      <button class="t3-link" data-go3="trade">Open Trade Live → Not in any system</button></section>` : ''}
     ${(() => { /* 25 Nov 2026 (Amritpal: "be in the right sector"): Cup 9/21 / Momentum signals the plan skipped because the industry is Weak / Fading / Turning */
       const seenL = new Set(); const L = ['top', 'more', 'swing', 'watch'].flatMap((k) => P[k] || []).filter((r) => r.lane_skip && !seenL.has(r.symbol) && seenL.add(r.symbol));
       const LN = { weak: 'Weak', fade: 'Fading', bounce: 'Turning' };
