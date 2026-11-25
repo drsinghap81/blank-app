@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-25 05:32 UTC",
+"generated": "2026-11-25 05:37 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-23",
@@ -149,7 +149,7 @@
 "PFOCUS"
 ],
 "morning_rule": false,
-"r3m": 21.5
+"r3m": 21.3
 },
 {
 "id": "CONF-HONASA-543.81",
@@ -300,7 +300,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": false,
-"r3m": 17.3
+"r3m": 17.2
 },
 {
 "id": "WAIT-LALPATHLAB",
@@ -348,7 +348,7 @@
 "GAUDIUMIVF"
 ],
 "morning_rule": false,
-"r3m": 7.7
+"r3m": 7.8
 },
 {
 "id": "WAIT-ANGELONE",
@@ -402,7 +402,7 @@
 "SMCGLOBAL"
 ],
 "morning_rule": false,
-"r3m": 20.8
+"r3m": 21.0
 },
 {
 "id": "WAIT-ZYDUSLIFE",
@@ -544,7 +544,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 19.4
+"r3m": 19.2
 }
 ],
 "more": [],
@@ -644,7 +644,7 @@
 "TVSMOTOR"
 ],
 "morning_rule": true,
-"r3m": 4.3
+"r3m": 4.0
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-12",
@@ -758,7 +758,7 @@
 "IEX"
 ],
 "morning_rule": false,
-"r3m": 11.5
+"r3m": 11.6
 },
 {
 "id": "RET-NEOGEN-2026-11-23",
@@ -825,7 +825,7 @@
 "YASHO"
 ],
 "morning_rule": false,
-"r3m": 23.1
+"r3m": 22.5
 },
 {
 "id": "RET-SMSPHARMA-2026-11-23",
@@ -892,7 +892,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 31.9
+"r3m": 31.5
 },
 {
 "id": "RET-TINNARUBR-2026-11-23",
@@ -932,7 +932,7 @@
 "TINNARUBR"
 ],
 "morning_rule": false,
-"r3m": -14.0
+"r3m": -13.9
 },
 {
 "id": "RET-UNIMECH-2026-11-23",
@@ -991,7 +991,7 @@
 "CENTUM"
 ],
 "morning_rule": false,
-"r3m": 18.1
+"r3m": 17.7
 },
 {
 "id": "RET-APOLLO-2026-11-20",
@@ -1050,7 +1050,7 @@
 "CENTUM"
 ],
 "morning_rule": false,
-"r3m": 9.0
+"r3m": 9.4
 },
 {
 "id": "RET-EIMCOELECO-2026-11-20",
@@ -1116,7 +1116,7 @@
 "ANUP"
 ],
 "morning_rule": false,
-"r3m": 15.2
+"r3m": 14.9
 },
 {
 "id": "RET-STEELCAS-2026-11-20",
@@ -1159,7 +1159,7 @@
 "BALUFORGE"
 ],
 "morning_rule": false,
-"r3m": 0.9
+"r3m": 0.6
 },
 {
 "id": "TF-ICICIBANK-2026-11-09",
@@ -1286,7 +1286,7 @@
 "DCI"
 ],
 "morning_rule": true,
-"r3m": 9.3
+"r3m": 9.6
 },
 {
 "id": "PR-KOTAKBANK-2026-11-20",
@@ -1331,7 +1331,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 27.0
+"r3m": 27.1
 },
 {
 "id": "PR-MEESHO-2026-11-20",
@@ -1365,7 +1365,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 25.3
+"r3m": 25.2
 },
 {
 "id": "PR-SOUTHBANK-2026-11-20",
@@ -1410,7 +1410,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 31.6
+"r3m": 31.5
 },
 {
 "id": "PR-DCBBANK-2026-11-20",
@@ -1455,7 +1455,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 17.3
+"r3m": 17.2
 },
 {
 "id": "PR-AXISBANK-2026-11-20",
@@ -1500,7 +1500,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 15.4
+"r3m": 15.6
 },
 {
 "id": "PR-ICICIBANK-2026-11-20",
@@ -1703,7 +1703,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 11.3
+"r3m": 11.4
 }
 ],
 "pattern_watch": [
@@ -2039,7 +2039,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": false,
-"r3m": 17.3
+"r3m": 17.2
 },
 {
 "id": "WAIT-UNOMINDA",
@@ -2121,7 +2121,7 @@
 "GAUDIUMIVF"
 ],
 "morning_rule": false,
-"r3m": 7.7
+"r3m": 7.8
 },
 {
 "id": "WAIT-ANGELONE",
@@ -2175,7 +2175,7 @@
 "SMCGLOBAL"
 ],
 "morning_rule": false,
-"r3m": 20.8
+"r3m": 21.0
 },
 {
 "id": "WAIT-ZYDUSLIFE",
@@ -2317,7 +2317,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 19.4
+"r3m": 19.2
 },
 {
 "id": "WATCH-360ONE",
