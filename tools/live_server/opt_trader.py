@@ -102,10 +102,40 @@ class OptTrader:
         self.dir = data_dir
         self.sp = os.path.join(data_dir, "opt_trader.json"); self.mp = os.path.join(data_dir, "opt_trader_mode.json")
         self.hp = os.path.join(data_dir, "opt_trader_hist.jsonl")
+        self.cp = os.path.join(data_dir, "opt_trader_cfg.json"); self._load_cfg()
         self.st = self._load()
         self.uni = None; self.uni_day = None; self.pcr = {}
         self.lock = threading.Lock(); self.thread = None; self.last_cycle = None; self.last_error = None
         self.stage = "starting"; self.stage_at = None; self.fast = None; self.hlock = threading.Lock()
+
+    # ------------------------------------------------------------------ user settings (25 Nov 2026, Amritpal: "lots and SL should be
+    # user defined"): lots per trade, the daily stop (paper P&L, Rs) and how many trades may be open at once. Saved in
+    # DATA/opt_trader_cfg.json; a change applies to NEW entries (open trades keep their size and stops).
+    LIM = dict(lots=(1, 10), day_loss=(1000.0, 200000.0), max_open=(1, 10))
+
+    def _load_cfg(self):
+        try:
+            c = json.load(open(self.cp))
+            for k, (lo, hi) in self.LIM.items():
+                if k in c:
+                    CFG[k] = type(lo)(min(hi, max(lo, c[k])))
+        except Exception:  # noqa: BLE001
+            pass
+
+    def set_cfg(self, **kw):
+        c = {}
+        for k, (lo, hi) in self.LIM.items():
+            v = kw.get(k)
+            if v is None:
+                continue
+            v = type(lo)(v)
+            if not lo <= v <= hi:
+                raise ValueError(f"{k} must be between {lo:g} and {hi:g}")
+            c[k] = v
+        old = {k: CFG[k] for k in self.LIM}
+        CFG.update(c); json.dump({k: CFG[k] for k in self.LIM}, open(self.cp, "w"))
+        self.log("opt_trader_cfg", old=old, new={k: CFG[k] for k in self.LIM})
+        return {k: CFG[k] for k in self.LIM}
 
     # ------------------------------------------------------------------ state
     def _load(self):

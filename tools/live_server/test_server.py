@@ -1477,3 +1477,27 @@ def test_pause_all_turns_every_row_off(tmp_path):
     assert r["mm_us"] and r["opt_trader_live"] and r["turtle_on"]
     off = c.post("/api/auto", headers=h, json={"part": "turtle", "on": False}).json(); assert not off["turtle_on"]
     assert on("turtle")["turtle_on"]                     # ON again re-arms the remembered markets
+
+
+def test_opt_trader_user_cfg(tmp_path):
+    """25 Nov 2026: lots, daily stop and max open are set from the app; raising risk needs the password, lowering doesn't;
+    the values are saved and reloaded; out-of-range values are refused."""
+    import json
+    A, c = client(tmp_path)
+    import opt_trader as O
+    base = dict(O.CFG)
+    try:
+        h = {"Authorization": "Bearer " + c.post("/api/login", json={"password": "pw"}).json()["token"]}
+        assert c.post("/api/opt/trader/cfg", json={"lots": 2}, headers=h).status_code == 401          # raising needs the password
+        r = c.post("/api/opt/trader/cfg", json={"lots": 2, "day_loss": 20000, "password": "pw"}, headers=h)
+        assert r.status_code == 200 and r.json()["cfg"]["lots"] == 2 and O.CFG["day_loss"] == 20000
+        assert c.post("/api/opt/trader/cfg", json={"lots": 1}, headers=h).status_code == 200              # lowering: no password
+        assert O.CFG["lots"] == 1
+        assert c.post("/api/opt/trader/cfg", json={"lots": 50, "password": "pw"}, headers=h).status_code == 400
+        saved = json.load(open(os.path.join(str(tmp_path), "opt_trader_cfg.json")))
+        assert saved == {"lots": 1, "day_loss": 20000.0, "max_open": 3}
+        O.CFG.update(lots=9); O.OptTrader(None, str(tmp_path), lambda: [], lambda: {})                     # reload from file
+        assert O.CFG["lots"] == 1
+        assert c.get("/api/opt/trader", headers=h).json()["cfg"]["lots"] == 1
+    finally:
+        O.CFG.clear(); O.CFG.update(base)

@@ -5065,6 +5065,35 @@ def otr_mode(body: Mode, request: Request, _=Depends(auth)):
     return dict(ok=True, live=bool(body.live))
 
 
+class OtrCfg(BaseModel):
+    lots: int | None = None
+    day_loss: float | None = None
+    max_open: int | None = None
+    password: str = ""
+
+
+@app.post("/api/opt/trader/cfg")
+def otr_cfg(body: OtrCfg, request: Request, _=Depends(auth)):
+    """25 Nov 2026 (Amritpal: "lots and SL should be user defined"): lots per trade (1-10), daily stop in Rs (1,000-2,00,000) and max
+    trades open (1-10). Anything that RAISES risk (more lots, a bigger daily stop, more open) needs the app password; lowering is one tap.
+    Applies to new entries; open trades keep their size and stops."""
+    import opt_trader as _ot
+    cur = {k: _ot.CFG[k] for k in ("lots", "day_loss", "max_open")}
+    up = any(v is not None and v > cur[k] for k, v in (("lots", body.lots), ("day_loss", body.day_loss), ("max_open", body.max_open)))
+    if up:
+        ip = request.client.host if request.client else "?"
+        n, t0 = FAILS.get(ip, (0, 0))
+        if n >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if not check_pw(body.password):
+            FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "raising lots, the daily stop or open trades needs your app password")
+    try:
+        new = otr_job().set_cfg(lots=body.lots, day_loss=body.day_loss, max_open=body.max_open)
+    except ValueError as ex:
+        raise HTTPException(400, str(ex))
+    return dict(ok=True, cfg=new)
+
+
 @app.post("/api/opt/trader/stop")
 def otr_stop(_=Depends(auth)):
     otr_job().stop_today(); return dict(ok=True)
