@@ -92,8 +92,48 @@ def years(X):
     return " | ".join(f"{k}: {int(r['size'])} {r['mean'] * 100:+.2f}%" for k, r in y.iterrows())
 
 
+MKT = os.environ.get("UNIV", "").upper()          # 25 Nov 2026: "" = NSE, or US / ASX / UK (other markets)
+WORLD = {"SPY": "SPY", "QQQ": "QQQ", "IWM": "IWM small caps", "DIA": "DIA Dow", "XLK": "XLK tech", "XLF": "XLF financials", "XLE": "XLE energy",
+         "XLV": "XLV health", "XLI": "XLI industrials", "XLY": "XLY discretionary", "XLP": "XLP staples", "XLU": "XLU utilities", "XLB": "XLB materials",
+         "GLD": "GLD gold", "TLT": "TLT bonds", "EFA": "EFA developed", "EEM": "EEM emerging",
+         "^FTSE": "FTSE 100", "^GDAXI": "DAX", "^FCHI": "CAC 40", "^STOXX50E": "Euro Stoxx 50", "^N225": "Nikkei 225", "^HSI": "Hang Seng",
+         "^AXJO": "ASX 200", "^KS11": "Kospi", "^TWII": "Taiwan", "^BVSP": "Brazil", "^GSPTSE": "Canada TSX"}
+ASXE = {"STW.AX": "STW ASX200 ETF", "IOZ.AX": "IOZ ASX200 ETF", "VAS.AX": "VAS ASX300 ETF", "NDQ.AX": "NDQ Nasdaq ETF", "IVV.AX": "IVV S&P500 ETF"}
+REG = {"US": "^GSPC", "ASX": "^AXJO", "UK": "^FTSE"}
+COSTM = {"US": 0.001, "ASX": 0.002, "UK": 0.006}      # UK has 0.5% stamp duty on buys
+
+
+def load_mkt(m):
+    from global_universe import symbols
+    tick = list(symbols(m).ticker)
+    if FV.PILOT:
+        tick = sorted(tick)[:150]
+    out = {}
+    for i in range(0, len(tick), 200):
+        ch = tick[i:i + 200]
+        try:
+            d = yf.download(ch, start="2009-01-01", auto_adjust=True, progress=False, group_by="column", threads=True)
+        except Exception:  # noqa: BLE001
+            continue
+        for t in ch:
+            try:
+                x = pd.DataFrame({"OPEN": d["Open"][t], "HIGH": d["High"][t], "LOW": d["Low"][t], "CLOSE": d["Close"][t], "VOL": d["Volume"][t]}).dropna()
+            except Exception:  # noqa: BLE001
+                continue
+            x = x[(x.CLOSE > 0) & (x.OPEN > 0)]
+            tv = (x.CLOSE * x.VOL).rolling(20).mean()
+            if len(x) < 300 or tv.max() < (2e7 if m == "US" else 2e6) or x.CLOSE.iloc[-1] < (5 if m == "US" else 0.2):
+                continue
+            x.index = pd.to_datetime(x.index).tz_localize(None); x.attrs["tv"] = float(tv.median()); out[t] = x
+        print("R| loaded", i + len(ch), len(out), flush=True)
+    return out
+
+
 def main():
-    nif = yf.download("^NSEI", start="2010-01-01", auto_adjust=True, progress=False)["Close"].squeeze()
+    global IDX
+    if MKT:
+        IDX = WORLD if MKT == "US" else ASXE if MKT == "ASX" else {}
+    nif = yf.download(REG.get(MKT, "^NSEI"), start="2008-01-01", auto_adjust=True, progress=False)["Close"].squeeze()
     reg = (nif > nif.rolling(200).mean()).to_dict()
     T = []
     # indices / ETFs first
@@ -104,16 +144,18 @@ def main():
         x.columns = [c[0] if isinstance(c, tuple) else c for c in x.columns]
         x = x.rename(columns={"Open": "OPEN", "High": "HIGH", "Low": "LOW", "Close": "CLOSE"}).dropna()
         x.index = pd.to_datetime(x.index).tz_localize(None)
-        if t in ("SPY", "QQQ"):
-            r_ = (x.CLOSE > x.CLOSE.rolling(200).mean()).to_dict()
-        else:
-            r_ = reg
+        r_ = reg if (not MKT and t.endswith(".NS") or t.startswith("^NSE")) or (MKT == "ASX") else (x.CLOSE > x.CLOSE.rolling(200).mean()).to_dict()
         T += [dict(r, grp="index", nm=nm) for r in trades(nm, x, r_)]
         print(f"R| loaded {nm}: {x.index[0].date()} to {x.index[-1].date()}", flush=True)
-    big = set()
-    for f in ("nifty50", "niftynext50"):
-        big |= set(pd.read_csv(f"data/universe/{f}.csv").Symbol.str.strip())
-    P = FV.load()
+    if MKT:
+        P = load_mkt(MKT); tv = pd.Series({k: v.attrs["tv"] for k, v in P.items()}).sort_values(ascending=False)
+        big = set(tv.index[:500 if MKT == "US" else 100])      # "large" = most-traded 500 (US) / 100 (ASX, UK)
+        print(f"R| market {MKT}: {len(P)} liquid stocks; LARGE = top {len(big)} by turnover; cost used {COSTM[MKT] * 100:.1f}%", flush=True)
+    else:
+        big = set()
+        for f in ("nifty50", "niftynext50"):
+            big |= set(pd.read_csv(f"data/universe/{f}.csv").Symbol.str.strip())
+        P = FV.load()
     for sym, x in P.items():
         T += [dict(r, grp="stock", nm=sym, big=sym in big) for r in trades(sym, x, reg)]
     T = pd.DataFrame(T); T["big"] = T.get("big", False).fillna(False).astype(bool)
@@ -126,18 +168,24 @@ def main():
                 if len(X):
                     print(f"R| {nm:11s} {v:12s} {s(X, 0.001)}", flush=True)
         for v in vs:
-            X = T[(T.grp == "index") & (T.side == side) & (T.v == v) & T.nm.isin(["Nifty 50", "Bank Nifty"])]
+            X = T[(T.grp == "index") & (T.side == side) & (T.v == v)]
             if len(X) >= 30:
-                print(f"R| Nifty+BankNifty {v} by year: {years(X)}", flush=True)
+                print(f"R| ALL INDEX/ETF {v} {s(X, 0.001)}", flush=True)
+                print(f"R| ALL INDEX/ETF {v} by year: {years(X)}", flush=True)
         for v in vs:
             X = T[(T.grp == "stock") & (T.side == side) & (T.v == v)]
-            print(f"R| ALL STOCKS  {v:12s} {s(X, 0.004)}", flush=True)
+            sc = COSTM.get(MKT, 0.004)
+            print(f"R| ALL STOCKS  {v:12s} {s(X, sc)}", flush=True)
             Z = X[X.big]
-            print(f"R| LARGE CAPS  {v:12s} {s(Z, 0.004)}", flush=True)
+            print(f"R| LARGE CAPS  {v:12s} {s(Z, sc)}", flush=True)
         for v in vs:
             Z = T[(T.grp == "stock") & (T.side == side) & (T.v == v) & T.big]
             if len(Z) >= 30:
                 print(f"R| LARGE CAPS {v} by year: {years(Z)}", flush=True)
+            X = T[(T.grp == "stock") & (T.side == side) & (T.v == v)]
+            if len(X) >= 30 and side == "L":
+                xb = X[X.d >= "2021-07-01"]
+                print(f"R| ALL STOCKS {v} by year: {years(X)} | 2021-26 avg {xb.g.mean() * 100:+.2f}%", flush=True)
 
 
 if __name__ == "__main__":
