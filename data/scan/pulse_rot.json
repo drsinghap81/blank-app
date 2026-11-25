@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-24 23:52 UTC",
- "asof": "2026-11-23",
+ "generated": "2026-11-25 23:36 UTC",
+ "asof": "2026-11-25",
  "decided": "2026-11-20",
  "picks": [
   "KOTAKBANK",
@@ -33,162 +33,168 @@
   {
    "symbol": "KOTAKBANK",
    "industry": "Private Sector Bank",
-   "close": 502.85,
-   "r3m": 26.6,
-   "rank": 5,
+   "close": 509.0,
+   "r3m": 26.4,
+   "rank": 4,
    "entry": 515.8,
    "entry_d": "2026-11-20",
-   "since": -2.51
+   "since": -1.32
   },
   {
    "symbol": "MEESHO",
    "industry": "E-Retail/ E-Commerce",
-   "close": 253.11,
-   "r3m": 20.8,
-   "rank": 9,
+   "close": 252.34,
+   "r3m": 22.7,
+   "rank": 7,
    "entry": 259.92,
    "entry_d": "2026-11-20",
-   "since": -2.62
+   "since": -2.92
   },
   {
    "symbol": "SOUTHBANK",
    "industry": "Private Sector Bank",
-   "close": 58.87,
-   "r3m": 30.4,
-   "rank": 3,
+   "close": 58.77,
+   "r3m": 30.7,
+   "rank": 1,
    "entry": 58.62,
    "entry_d": "2026-11-20",
-   "since": 0.43
+   "since": 0.26
   },
   {
    "symbol": "DCBBANK",
    "industry": "Private Sector Bank",
-   "close": 237.93,
-   "r3m": 26.1,
-   "rank": 6,
+   "close": 241.64,
+   "r3m": 18.7,
+   "rank": 9,
    "entry": 233.53,
    "entry_d": "2026-11-20",
-   "since": 1.88
+   "since": 3.47
   },
   {
    "symbol": "AXISBANK",
    "industry": "Private Sector Bank",
-   "close": 1388.6,
-   "r3m": 11.0,
-   "rank": 18,
+   "close": 1418.1,
+   "r3m": 13.8,
+   "rank": 13,
    "entry": 1446.0,
    "entry_d": "2026-11-20",
-   "since": -3.97
+   "since": -1.93
   },
   {
    "symbol": "ICICIBANK",
    "industry": "Private Sector Bank",
-   "close": 1585.5,
-   "r3m": 12.3,
-   "rank": 14,
+   "close": 1640.0,
+   "r3m": 15.5,
+   "rank": 11,
    "entry": 1640.0,
    "entry_d": "2026-11-20",
-   "since": -3.32
+   "since": 0.0
   },
   {
    "symbol": "URBANCO",
    "industry": "E-Retail/ E-Commerce",
-   "close": 168.68,
-   "r3m": 15.9,
-   "rank": 11,
+   "close": 164.85,
+   "r3m": 3.9,
+   "rank": 29,
    "entry": 168.95,
    "entry_d": "2026-11-20",
-   "since": -0.16
+   "since": -2.43
   },
   {
    "symbol": "KARURVYSYA",
    "industry": "Private Sector Bank",
-   "close": 384.1,
-   "r3m": 15.0,
-   "rank": 12,
+   "close": 378.75,
+   "r3m": 12.9,
+   "rank": 18,
    "entry": 377.0,
    "entry_d": "2026-11-20",
-   "since": 1.88
+   "since": 0.46
   },
   {
    "symbol": "ETERNAL",
    "industry": "E-Retail/ E-Commerce",
-   "close": 362.1,
-   "r3m": 10.4,
-   "rank": 20,
+   "close": 371.7,
+   "r3m": 13.3,
+   "rank": 15,
    "entry": 364.0,
    "entry_d": "2026-11-20",
-   "since": -0.52
+   "since": 2.12
   },
   {
    "symbol": "CUB",
    "industry": "Private Sector Bank",
-   "close": 245.54,
-   "r3m": 11.9,
-   "rank": 15,
+   "close": 247.0,
+   "r3m": 13.7,
+   "rank": 14,
    "entry": 248.8,
    "entry_d": "2026-11-20",
-   "since": -1.31
+   "since": -0.72
   }
  ],
  "ranked": [
-  "NELCAST",
-  "ORIENTHOT",
   "SOUTHBANK",
-  "THELEELA",
+  "ORIENTHOT",
+  "ATHERENERG",
   "KOTAKBANK",
-  "DCBBANK",
-  "PTCIL",
+  "NELCAST",
   "INDHOTEL",
   "MEESHO",
-  "LEMONTREE",
-  "URBANCO",
-  "KARURVYSYA",
-  "ADANIPORTS",
+  "THELEELA",
+  "DCBBANK",
+  "PTCIL",
   "ICICIBANK",
-  "CUB",
-  "GPPL",
-  "EIHOTEL",
+  "LEMONTREE",
   "AXISBANK",
+  "CUB",
+  "ETERNAL",
+  "ADANIPORTS",
   "ITCHOTELS",
-  "ETERNAL"
+  "KARURVYSYA",
+  "EIHOTEL",
+  "GPPL"
  ],
  "industries": [
   {
-   "name": "Port & Port services",
-   "pulse": 58.7,
-   "momentum": 100.86,
-   "ratio": 98.73
-  },
-  {
-   "name": "Construction Vehicles",
-   "pulse": 39.7,
-   "momentum": 101.94,
-   "ratio": 98.1
-  },
-  {
-   "name": "Hotels & Resorts",
-   "pulse": 42.4,
-   "momentum": 100.21,
-   "ratio": 100.87
-  },
-  {
-   "name": "Castings & Forgings",
-   "pulse": 46.8,
-   "momentum": 100.91,
-   "ratio": 95.68
-  },
-  {
-   "name": "E-Retail/ E-Commerce",
-   "pulse": 39.5,
-   "momentum": 101.13,
-   "ratio": 95.03
+   "name": "2/3 Wheelers",
+   "pulse": 42.9,
+   "momentum": 100.92,
+   "ratio": 102.78
   },
   {
    "name": "Private Sector Bank",
-   "pulse": 43.1,
-   "momentum": 101.84,
-   "ratio": 99.7
+   "pulse": 45.5,
+   "momentum": 102.07,
+   "ratio": 100.37
+  },
+  {
+   "name": "Port & Port services",
+   "pulse": 63.5,
+   "momentum": 100.98,
+   "ratio": 99.07
+  },
+  {
+   "name": "Hotels & Resorts",
+   "pulse": 44.8,
+   "momentum": 100.32,
+   "ratio": 101.2
+  },
+  {
+   "name": "Construction Vehicles",
+   "pulse": 44.4,
+   "momentum": 101.91,
+   "ratio": 98.02
+  },
+  {
+   "name": "E-Retail/ E-Commerce",
+   "pulse": 42.2,
+   "momentum": 100.89,
+   "ratio": 94.35
+  },
+  {
+   "name": "Castings & Forgings",
+   "pulse": 48.4,
+   "momentum": 100.65,
+   "ratio": 94.93
   }
  ],
  "ledger": [
@@ -256,11 +262,11 @@
  },
  "closed": [],
  "mark": {
-  "date": "2026-11-23",
+  "date": "2026-11-25",
   "since": "2026-11-20",
-  "ret": -1.02,
+  "ret": -0.3,
   "nifty": -1.75,
-  "week": -1.02,
+  "week": -0.3,
   "open": 10,
   "closed": 0,
   "closed_ret": null
