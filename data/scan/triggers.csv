@@ -1,8 +1,9 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-AEROPLANE,2026-11-20,242.7,60.4,230.43,226.8,7.0,1,-2.9,Amir Chand Jagdish Kumar (Exports) Limited,watch,147.0,0.81,80,14.01,235.55,55.0
-INDGN,2026-11-20,657.65,63.5,628.76,640.25,2.7,1,-0.9,Indegene Limited,watch,126.4,0.81,77,44.53,651.8,60.7
-NAZARA,2026-11-19,425.55,60.6,411.23,413.1,3.0,2,-3.7,Nazara Technologies Limited,watch,155.7,0.94,93,48.53,409.95,51.0
-GLAND,2026-11-19,3292.9,61.0,3177.67,3208.7,2.6,2,0.1,Gland Pharma Limited,trend,147.0,0.9,88,140.99,3297.4,60.0
-SANSERA,2026-11-19,4720.9,61.6,4460.3,4423.0,6.7,2,-2.2,Sansera Engineering Limited,watch,144.9,0.89,75,98.19,4619.3,56.0
-63MOONS,2026-11-17,958.9,61.0,911.0,901.0,6.4,4,-4.8,63 moons technologies limited,watch,126.6,0.79,70,38.36,912.6,50.5
-PGIL,2026-11-17,1368.2,61.9,1300.83,1303.2,5.0,4,8.1,Pearl Global Industries Limited,watch,126.6,0.84,72,29.07,1479.4,71.4
+CUPID,2026-11-25,366.35,60.8,352.12,357.75,2.4,0,0.0,Cupid Limited,watch,159.0,0.89,80,429.9,366.35,60.8
+SHYAMMETL,2026-11-25,1292.1,60.4,1260.82,1260.3,2.5,0,0.0,Shyam Metalics and Energy Limited,watch,129.7,0.78,87,49.57,1292.1,60.4
+ETERNAL,2026-11-25,371.7,65.3,355.85,360.35,3.1,0,0.0,ETERNAL LIMITED,watch,128.6,0.83,70,844.33,371.7,65.3
+LGEINDIA,2026-11-25,1818.4,63.0,1731.13,1706.0,6.6,0,0.0,LG Electronics India Limited,watch,112.1,0.72,73,132.32,1818.4,63.0
+AEROPLANE,2026-11-20,242.7,60.4,230.43,226.8,7.0,3,-2.6,Amir Chand Jagdish Kumar (Exports) Limited,watch,146.4,0.8,82,13.39,236.41,55.5
+INDGN,2026-11-20,657.65,63.5,628.76,640.25,2.7,3,-0.6,Indegene Limited,watch,127.5,0.82,77,46.83,653.55,61.3
+GLAND,2026-11-19,3292.9,61.0,3177.67,3208.7,2.6,4,1.7,Gland Pharma Limited,trend,147.0,0.9,88,137.6,3348.4,63.0
+SANSERA,2026-11-19,4720.9,61.6,4460.3,4423.0,6.7,4,-0.3,Sansera Engineering Limited,watch,144.9,0.89,75,96.35,4708.5,58.7
