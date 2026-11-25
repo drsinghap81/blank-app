@@ -1930,3 +1930,10 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 
 /* 25 Nov 2026: size-leadership chip on Today */
 .t3-chip.warn{background:rgba(255,190,80,.18);border:1px solid rgba(255,190,80,.5);color:#FFD08A;opacity:1}
+/* 25 Nov 2026: moomoo paper / real account switch (Automation panel) */
+.au2-env { margin-top: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 13px; }
+.au2-env > span { color: var(--slate); flex: 1 1 200px; }
+.au2-env details { flex: 1 1 100%; }
+.au2-env summary { cursor: pointer; font-weight: 600; }
+.au2-env.real { border-color: var(--down, #c0392b); }
+.au2-env.real > b { color: var(--down, #c0392b); }

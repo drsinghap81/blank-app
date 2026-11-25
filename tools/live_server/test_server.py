@@ -1527,3 +1527,25 @@ def test_cleanup_sell_refuses_system_stock(tmp_path):
     A.market_open = lambda t=None: True; A._acc["d"] = None
     r = c.post("/api/cleanup/sell", json={"symbols": ["KOTAKBANK"], "password": "pw", "confirm": "SELL 1"}, headers=h).json()
     assert not r["results"][0]["ok"] and "system" in r["results"][0]["msg"]
+
+
+def test_mm_env_switch(tmp_path):
+    """moomoo paper <-> real from the app: REAL needs password + REAL typed; refused while moomoo trades are open; stored on disk."""
+    A, c = client(tmp_path, live="1")
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    assert A.moomoo.env_name == "SIMULATE"
+    assert c.post("/api/mm/env", headers=h, json={"env": "REAL", "password": "pw", "confirm": "yes"}).status_code == 400
+    assert c.post("/api/mm/env", headers=h, json={"env": "REAL", "password": "bad", "confirm": "REAL"}).status_code == 401
+    A.mmtb_job().st["unsupported"] = {"US": ["STOP_LIMIT"]}
+    J = A.mmtb_job(); J.st["pos"]["US"]["QQQ"] = dict(state="open")
+    r = c.post("/api/mm/env", headers=h, json={"env": "REAL", "password": "pw", "confirm": "REAL"})
+    assert r.status_code == 409 and "QQQ" in r.text
+    del J.st["pos"]["US"]["QQQ"]
+    r = c.post("/api/mm/env", headers=h, json={"env": "REAL", "password": "pw", "confirm": "REAL"})
+    assert r.status_code == 200 and r.json()["env"] == "REAL" and A.moomoo.env_name == "REAL"
+    assert J.st["unsupported"] == {}
+    import json as _j
+    assert _j.load(open(tmp_path / "mm_env.json"))["env"] == "REAL"
+    assert c.get("/api/mmtb", headers=h).json()["env"] == "REAL"
+    r = c.post("/api/mm/env", headers=h, json={"env": "SIMULATE"})
+    assert r.status_code == 200 and A.moomoo.env_name == "SIMULATE"

@@ -133,6 +133,10 @@ PW_HASH = ENV.get("APP_PASSWORD_HASH", "")               # scrypt$<salt hex>$<ha
 
 broker = MockBroker() if ENV.get("MOCK_BROKER") == "1" else AngelEquity(ENV, DATA)
 moomoo = MockMoomoo() if ENV.get("MOCK_BROKER") == "1" else MoomooTrade(ENV)
+try:   # 25 Nov 2026: the paper / real choice made in the app (var/mm_env.json) overrides MOOMOO_ENV in .env
+    moomoo.env_name = "REAL" if json.load(open(os.path.join(DATA, "mm_env.json")))["env"] == "REAL" else "SIMULATE"
+except Exception:  # noqa: BLE001
+    pass
 app = FastAPI(title="Trend Desk live server")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in ENV.get("ALLOW_ORIGIN", "https://drsinghap81.github.io").split(",")],
                    allow_methods=["GET", "POST"], allow_headers=["Authorization", "Content-Type"])
@@ -2604,6 +2608,57 @@ class MMTBCfg(BaseModel):
     market: str
     capital: float | None = None
     risk_pct: float | None = None
+
+
+class MMEnv(BaseModel):
+    env: str
+    password: str = ""
+    confirm: str = ""
+
+
+@app.post("/api/mm/env")
+def mm_env(body: MMEnv, request: Request, _=Depends(auth)):
+    """25 Nov 2026 (Amritpal: "I thought you already have this in app"): moomoo paper <-> real from the app. REAL needs the app password,
+    the word REAL typed, and MOOMOO_TRADE_PWD already in the server's .env (typed there by the user - never through the app); the
+    unlock is tested before switching. Either way is refused while the server has moomoo trades or orders open (Top Bottom or RSI(2)),
+    so paper positions are never managed on the real account or the other way round. Stored in var/mm_env.json."""
+    want = "REAL" if body.env.strip().upper() == "REAL" else "SIMULATE"
+    if want == moomoo.env_name:
+        return dict(ok=True, env=want, msg="already on the " + ("real" if want == "REAL" else "paper") + " account")
+    J = mmtb_job(); busy = [f"{mk} {s} ({p.get('state')})" for mk, P in J.st["pos"].items() for s, p in P.items() if p.get("state") in ("open", "pending", "watch")]
+    busy += [f"US {s} (RSI2)" for s in (us_journal().get("pos") or {})]
+    if busy:
+        raise HTTPException(409, "close these first, they belong to the " + ("paper" if moomoo.env_name == "SIMULATE" else "real") + " account: " + ", ".join(busy[:8]))
+    if want == "REAL":
+        if not ALLOW_APP_LIVE:
+            raise HTTPException(403, "switching to real from the app is turned off on the server (ALLOW_APP_LIVE=0)")
+        ip = request.client.host if request.client else "?"
+        n, t0 = FAILS.get(ip, (0, 0))
+        if n >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if body.confirm.strip().upper() != "REAL":
+            raise HTTPException(400, "type REAL to confirm")
+        if not check_pw(body.password):
+            FAILS[ip] = (n + 1, time.time()); log("mm_env_fail", ip=ip)
+            raise HTTPException(401, "wrong password")
+        FAILS.pop(ip, None)
+        if not getattr(moomoo, "pwd", "x"):
+            raise HTTPException(400, "first type your moomoo TRADING password into the server's .env (MOOMOO_TRADE_PWD=...) and restart - it never goes through the app")
+        old = moomoo.env_name; moomoo.env_name = "REAL"
+        try:
+            if hasattr(moomoo, "_t"):
+                m, t, _e = moomoo._t("US"); t.close()        # unlock test
+        except Exception as ex:  # noqa: BLE001
+            moomoo.env_name = old
+            raise HTTPException(400, f"moomoo would not unlock the real account: {str(ex)[:160]}")
+    else:
+        moomoo.env_name = "SIMULATE"
+    with J.lock:
+        J.st["unsupported"] = {}; J._save()                   # order types refused on one account may work on the other
+    os.makedirs(DATA, exist_ok=True)
+    json.dump(dict(env=moomoo.env_name, at=time.time()), open(os.path.join(DATA, "mm_env.json"), "w"))
+    log("mm_env", env=moomoo.env_name)
+    return dict(ok=True, env=moomoo.env_name, msg="moomoo now on the " + ("REAL money" if moomoo.env_name == "REAL" else "paper") + " account")
 
 
 @app.post("/api/mmtb/cfg")

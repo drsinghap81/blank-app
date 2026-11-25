@@ -1869,8 +1869,17 @@ async function mmtbBox(el) {
   el.innerHTML = `<div class="au2-mmrow">${mk('US')}${mk('AU')}</div>
     <p class="au2-foot">${T.enabled ? `● moomoo connected · ${esc(T.env === 'SIMULATE' ? 'paper account' : T.env || '')}` : '○ moomoo not connected'} · levels ${esc(((T.levels || {}).US || {}).asof || '–')}
       <span class="au2-key"><i class="hold"></i>holding <i class="wait"></i>buy-stop today <i></i>next level</span></p>
+    ${T.enabled ? `<div class="au2-env${T.env === 'REAL' ? ' real' : ''}">${T.env === 'REAL'
+      ? '<b>REAL money account</b><span>Orders above use your real moomoo money.</span><button class="t3-link" id="mmenvback">Back to paper</button>'
+      : `<b>Paper account</b><span>Practice money. Real needs your moomoo trading password typed once into the server's .env (MOOMOO_TRADE_PWD).</span><details><summary>Switch to real money</summary>
+        <div class="au2-tkrow"><input id="mmenvpw" type="password" placeholder="App password" autocomplete="current-password"><input id="mmenvcf" placeholder="Type REAL" autocapitalize="characters"><button class="au2-big stop" id="mmenvgo">Use real money</button></div>
+        <small class="muted">Refused while the server has moomoo trades open. Checks the real account unlocks before switching.</small></details>`}</div>` : ''}
     ${tr || (T.notes || []).length ? `<details class="info"><summary>moomoo trades & log</summary>${tr ? `<ul class="tb-msgs">${tr}</ul>` : ''}<ul class="tb-msgs">${(T.notes || []).slice(-8).reverse().map((n) => `<li>${esc(n)}</li>`).join('')}</ul></details>` : ''}`;
   mmTicket(el, T.env);
+  // 25 Nov 2026 (Amritpal: "I thought you already have this in app"): moomoo paper <-> real from the app (server: /api/mm/env)
+  const envGo = async (body) => { try { const r = await lvApi('/api/mm/env', { method: 'POST', body: JSON.stringify(body) }); alertMsg(r.msg, true); mmtbBox(el); } catch (e) { alertMsg(e.message); } };
+  const eg = el.querySelector('#mmenvgo'); if (eg) eg.addEventListener('click', () => envGo({ env: 'REAL', password: el.querySelector('#mmenvpw').value, confirm: el.querySelector('#mmenvcf').value }));
+  const eb = el.querySelector('#mmenvback'); if (eb) eb.addEventListener('click', () => envGo({ env: 'SIMULATE' }));
   el.querySelectorAll('[data-mmsave]').forEach((b) => b.addEventListener('click', async () => { const m = b.dataset.mmsave;
     try { await lvApi('/api/mmtb/cfg', { method: 'POST', body: JSON.stringify({ market: m, capital: +el.querySelector('#mmcap' + m).value || 0, risk_pct: +el.querySelector('#mmrisk' + m).value || 1 }) });
       alertMsg(`moomoo ${nm[m]}: capital saved.`, true); mmtbBox(el); } catch (e) { alertMsg(e.message); } }));
