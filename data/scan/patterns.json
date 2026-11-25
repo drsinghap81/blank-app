@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-24T19:09+00:00",
+"generated": "2026-11-25T00:08+00:00",
 "asof": "2026-11-24",
 "market": "NSE",
 "regime": {
@@ -2235,11 +2235,11 @@
 "kind": "asset",
 "typ": "DB",
 "status": "forming",
-"close": 229.77499389648438,
+"close": 229.9250030517578,
 "neck": 230.4250030517578,
-"to_neck_pct": 0.28288942336618383,
+"to_neck_pct": 0.2174622130536319,
 "stop": 207.48,
-"stop_pct": 9.703295619613439,
+"stop_pct": 9.76220757859264,
 "height_pct": 9.634827979525816,
 "fall_pct": 22.980850410580665,
 "lows": [
@@ -2263,7 +2263,7 @@
 27.9
 ],
 "rsi_div": 0.0,
-"rsi_now": 67.6,
+"rsi_now": 67.8,
 "signal_date": null,
 "days_since": null,
 "target": 250.68,
@@ -3226,6 +3226,46 @@
 "sl": 551.76
 },
 {
+"symbol": "XRP",
+"name": "XRP",
+"kind": "asset",
+"typ": "DB",
+"status": "forming",
+"close": 0.9395989775657654,
+"neck": 0.9829199910163879,
+"to_neck_pct": 4.610585418351021,
+"stop": 0.88,
+"stop_pct": 6.857715070330195,
+"height_pct": 8.047973736156377,
+"fall_pct": 72.14750532669876,
+"lows": [
+[
+"2026-11-14",
+0.9130309820175171
+],
+[
+"2026-11-20",
+0.9097070097923279
+]
+],
+"peaks": [
+[
+"2026-11-17",
+0.9829199910163879
+]
+],
+"rsi_lows": [
+16.3,
+25.7
+],
+"rsi_div": 9.5,
+"rsi_now": 31.6,
+"signal_date": null,
+"days_since": null,
+"target": 1.06,
+"sl": 0.94
+},
+{
 "symbol": "IRCON",
 "name": "Ircon International Limited",
 "kind": "stock",
@@ -3678,46 +3718,6 @@
 "days_since": null,
 "target": 336.55,
 "sl": 276.91
-},
-{
-"symbol": "XRP",
-"name": "XRP",
-"kind": "asset",
-"typ": "DB",
-"status": "forming",
-"close": 0.9187999963760376,
-"neck": 0.9829199910163879,
-"to_neck_pct": 6.978667271795236,
-"stop": 0.88,
-"stop_pct": 4.749242454024694,
-"height_pct": 8.047973736156377,
-"fall_pct": 72.14750532669876,
-"lows": [
-[
-"2026-11-14",
-0.9130309820175171
-],
-[
-"2026-11-20",
-0.9097070097923279
-]
-],
-"peaks": [
-[
-"2026-11-17",
-0.9829199910163879
-]
-],
-"rsi_lows": [
-16.3,
-25.7
-],
-"rsi_div": 9.5,
-"rsi_now": 29.8,
-"signal_date": null,
-"days_since": null,
-"target": 1.06,
-"sl": 0.94
 },
 {
 "symbol": "LATENTVIEW",
