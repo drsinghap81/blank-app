@@ -8873,6 +8873,18 @@ async function tdRender3(el) {
   if (!P) { el.innerHTML = `<div class="t3">${seg}<p class="empty">Today's plan appears after the evening scan.</p></div>`; wireMk(); return; }
   const [X, L] = await Promise.all([t3Ctx(mk), S0 ? mxLight(mk, S0).catch(() => null) : null]);
   const H = mk === 'NSE' ? tdHeldSet() : new Set();
+  /* 25 Nov 2026 (Amritpal: "was the app not tracking large cap over midcap?"): size leadership on the hero - Midcap 150 and
+     Smallcap 250 vs the Nifty 50 on the weekly rotation (last completed week), and for how many weeks in a row */
+  let sizeChip = '';
+  if (mk === 'NSE') { const SR = await getJSON(MAIN + MKT[mk].path + 'sector_rrg.json', 'sector_rrg_' + mk).catch(() => null);
+    const w = SR && SR.weekly; const m = w && w['Midcap 150'], sm = w && w['Smallcap 250'];
+    if (m && sm) { const done = (r) => (r.partial ? r.pts.slice(0, -1) : r.pts);
+      const run = (r, f) => { let k = 0; const P2 = done(r); for (let i = P2.length - 1; i >= 0 && f(P2[i][1]); i--) k++; return k; };
+      const lag = (r) => run(r, (x) => x < 100), led = (r) => run(r, (x) => x >= 100);
+      const nl = Math.min(lag(m), lag(sm)), nu = Math.min(led(m), led(sm));
+      sizeChip = nl ? `<button class="t3-chip warn" data-go3="mk">Large caps lead · Midcap & Smallcap lagging Nifty ${nl}${nl >= 8 ? '+' : ''} wk</button>`
+        : nu ? `<button class="t3-chip ok" data-go3="mk">Mid & small caps lead the Nifty · ${nu}${nu >= 8 ? '+' : ''} wk</button>`
+          : '<button class="t3-chip" data-go3="mk">Size: mixed (Midcap and Smallcap split)</button>'; } }
   const Mz = (v, d = 0) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
   const Lk = (v) => (mk === 'NSE' ? lakh(v) : Mz(v));
   const al = lvAlloc(mk, P, null); const seen = new Set();
@@ -8924,7 +8936,7 @@ async function tdRender3(el) {
     <div class="t3-top">${seg}<span class="muted">${P.asof ? 'Plan from the ' + esc(new Date(P.asof + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })) + ' close' : ''}</span></div>
     <section class="t3-hero ${LV}"><span class="t3-word">${word}</span><div class="t3-hl"><b>${line}</b>
       <small class="t3-lbl in">Where money is moving · information, not buys</small>
-      <div class="t3-path">${chip(X.wq === 'L' ? 'ok' : X.wq === 'G' ? 'bad' : '', `World · ${esc(MKT[mk].name)} ${T3N[X.wq].toLowerCase()}`, 'data-go3="mk"')}${arrow}
+      <div class="t3-path">${chip(X.wq === 'L' ? 'ok' : X.wq === 'G' ? 'bad' : '', `World · ${esc(MKT[mk].name)} ${T3N[X.wq].toLowerCase()}`, 'data-go3="mk"')}${arrow}${sizeChip}${sizeChip ? arrow : ''}
         ${lead.length ? lead.map((x) => chip(x.n ? 'ok on' : '', `${esc(x.g)} leads${x.n ? ` · ${x.n} buy${x.n > 1 ? 's' : ''}` : ' · no buy yet'}`, x.n ? `data-ind3="${esc(x.g)}"` : 'data-go3="mk"')).join(arrow) : chip('', 'No industry leading', 'data-go3="mk"')}</div></div></section>
     ${t3Info(mk, L, X, buys)}
     <section class="t3-tiles"><button class="t3-tile buy" data-show3="t3buys" aria-pressed="${state.t3Show === 't3buys'}"><small>Buy</small><b>${buys.length}</b><span>${buys.filter((c) => c.isNew).length} new · ${tot ? Lk(tot) : 'today'}</span></button>

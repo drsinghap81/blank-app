@@ -1927,3 +1927,6 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 /* 25 Nov 2026: not-in-any-system holdings with tick boxes */
 .tr-hr.tr-ock{display:flex;align-items:center;gap:10px;cursor:pointer;grid-template-columns:none}.tr-ock input{flex:none;width:18px;height:18px;margin:0;accent-color:var(--accent)}.tr-ock b{flex:0 0 auto;min-width:6.5em;text-align:left}.tr-ock span{flex:1;text-align:left}.tr-ock i{flex:none}
 .tr-oth .tr-pw{display:flex;gap:6px;flex-wrap:wrap}.tr-oth .tr-pw input{flex:1;min-width:120px}
+
+/* 25 Nov 2026: size-leadership chip on Today */
+.t3-chip.warn{background:rgba(255,190,80,.18);border:1px solid rgba(255,190,80,.5);color:#FFD08A;opacity:1}
