@@ -9364,13 +9364,43 @@ async function perfSection(el) {
       <div class="x3-wl" role="img" aria-label="${w} of ${n} stock trades up">${E.rows.map((r) => `<i class="${r.pnl > 0 ? 'w' : ''}" title="${esc(r.sym)} ${fmt(r.ret, 1)}%"></i>`).join('')}</div>
       <small class="muted">Backtest = the past (2016–26); forward test = the same rules on every signal since launch; live = what you actually traded. Since ${esc(day(E.since || ''))}${E.tb ? ` (Top Bottom since ${esc(day(E.tb.since))})` : ''} · every buy the app showed, sized ${mk === 'NSE' ? lakh(E.C) : money(E.C)} × 1% risk, max 20% each, no limit on how many · closed on its stop or system exit · open trades at the last close · before costs.</small>`
       : '<p class="muted">The signal log starts filling after the first nights of scans.</p>'}</article>
-      <article class="pf-card"><h3>Live · your real trades</h3>${live}</article></div>`;
+      <article class="pf-card"><h3>Live · your real trades</h3>${live}</article></div>${mk === 'NSE' ? '<div class="tc-wrap"></div>' : ''}`;
+  if (mk === 'NSE') todayCalls(box.querySelector('.tc-wrap')).catch((e) => console.warn('today calls', e));
   box.querySelectorAll('[data-pfm]').forEach((b) => b.addEventListener('click', () => { state.pfMk = b.dataset.pfm; box.remove(); perfSection(el); }));
   box.querySelectorAll('[data-bk]').forEach((b) => b.addEventListener('click', () => { const S0 = (state._pfLive || {}).S; const t = S0 && S0.perf && S0.perf.closed.trades[+b.dataset.bk]; if (t) bookedFix(t, () => { box.remove(); perfSection(el); }); }));
   box.querySelectorAll('[data-pk]').forEach((b) => b.addEventListener('click', async () => { const [w, k] = [b.dataset.pk.slice(0, 1), b.dataset.pk.slice(2)];
     const name = b.querySelector('.pf-bn') ? b.querySelector('.pf-bn').childNodes[0].textContent : k;
     if (w === 'f') sysTradesView(name, await pfFwdTrades(k, mk), 'Forward test · every signal, simulated');
     else sysTradesView(name, pfLiveTrades(k), 'Live · your real trades'); }));
+}
+/* 25 Nov 2026 (Amritpal: "are you tracking each day the stocks coming out of the system in the Today tab vs how they actually perform
+   that day... banks leading on Friday but they fell, now marine stocks"). tools/today_calls.py records each close what Today showed for the
+   next session (top groups, groups moved into Leading, Leading sectors, top themes, the buy list) and fills the equal-weight return over the
+   next 1 / 3 / 5 sessions, close to close, next to Nifty. Backfilled from the saved daily files (6 Nov 2026 onwards). */
+const TC_K = [['top', 'Top 5 groups'], ['newlead', 'Moved into Leading'], ['sector', 'Leading sectors'], ['theme', 'Top themes'], ['buy', 'Buy list']];
+async function todayCalls(box) {
+  if (!box) return;
+  const D = await getJSON(fresh(MAIN + 'data/scan/today_calls.json'), 'today_calls').catch(() => null);
+  if (!D || !D.calls || !D.calls.length) { box.innerHTML = ''; return; }
+  const sg = (v) => (v == null ? '–' : `${v >= 0 ? '+' : ''}${fmt(v, 2)}%`);
+  const cls = (v) => (v == null ? '' : v >= 0 ? 'up' : 'down');
+  const S = D.summary || {};
+  const head = `<tr><th></th>${['Next day', '3 days', '5 days'].map((h) => `<th>${h}</th>`).join('')}</tr>`;
+  const body = TC_K.filter(([k]) => S[k]).map(([k, nm]) => `<tr><th>${nm}</th>${['1', '3', '5'].map((h) => { const x = S[k][h];
+    return x ? `<td><b class="${cls(x.avg)}">${sg(x.avg)}</b><small>${x.vs != null ? `${x.vs >= 0 ? '+' : ''}${fmt(x.vs, 2)} vs Nifty · beat ${x.beat}%` : ''} · n ${x.n}</small></td>` : '<td>–</td>'; }).join('')}</tr>`).join('');
+  const days = [...D.days].reverse().slice(0, 15);
+  const dayRow = (d) => {
+    const C = D.calls.filter((c) => c.d === d); if (!C.length) return '';
+    const nx = C.find((c) => c.out['1']); const nf = nx ? nx.out['1'].nifty : null; const to = nx ? nx.out['1'].to : null;
+    const grp = TC_K.map(([k, nm]) => { const L = C.filter((c) => c.kind === k); if (!L.length) return '';
+      return `<div class="tc-k"><small>${nm}</small><span>${L.map((c) => { const o = c.out['1']; return `<i class="tc-c ${o ? cls(o.r) : 'wait'}" title="${esc(c.note || '')}${o ? ` · ${o.up}% of ${c.n} stocks up` : ''}">${esc(c.name)} <b>${o ? sg(o.r) : 'waiting'}</b></i>`; }).join('')}</span></div>`; }).join('');
+    return `<details class="tc-day"${d === days[0] || d === days[1] ? ' open' : ''}><summary><b>${esc(day(d))}</b> → ${to ? esc(day(to)) : 'next session'} <span class="${cls(nf)}">Nifty ${nf != null ? sg(nf) : to ? 'n/a' : 'waiting'}</span></summary>${grp}</details>`;
+  };
+  box.innerHTML = `<article class="pf-card tc"><h3>Today's calls · how they did</h3>
+    <p class="muted td-rs">What Today showed after each close, and how it moved in the next session (equal weight, close to close), against Nifty. Recorded nightly; since ${esc(day(D.days[0]))}.</p>
+    <div class="tc-tbl"><table>${head}${body}</table></div>
+    <div class="tc-days">${days.map(dayRow).join('')}</div>
+    <small class="muted">Groups and the buy list are information, not trades: the buy list is entered at the next open, so the real trade result is in the forward test above. Leading = weekly rotation, so it says where money has been moving, not what tomorrow does.</small></article>`;
 }
 { const PH2 = pf3Hero; pf3Hero = function () { PH2(); try { perfSection($('#view-pf')); } catch (e) { console.warn('perf', e); } }; }
 

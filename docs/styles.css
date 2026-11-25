@@ -1895,3 +1895,19 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .bs-chips span small{font-weight:600;font-size:10.5px;color:var(--slate)}.bs-chips span.h{box-shadow:inset 0 0 0 1.5px var(--rise)}.bs-chips span.none{font-weight:600;color:var(--slate)}
 .bs-send{display:block;width:100%;margin:12px 0 6px;padding:15px;border:0;border-radius:14px;background:var(--accent);color:var(--on-accent);font:inherit;font-size:16px;font-weight:800;box-shadow:0 4px 0 rgba(0,0,0,.22);cursor:pointer}
 .bs-send:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.22)}.bs-send:disabled{opacity:.6}
+
+/* Today's calls tracker (25 Nov 2026) */
+.tc-wrap{margin-top:12px}
+.tc-tbl{overflow-x:auto;margin:8px 0}
+.tc-tbl table{border-collapse:collapse;width:100%;min-width:420px;font-size:13px}
+.tc-tbl th,.tc-tbl td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--line, rgba(127,127,127,.2));vertical-align:top}
+.tc-tbl td b{display:block;font-size:14px}
+.tc-tbl td small{color:var(--muted);font-size:11px}
+.tc-day{border-top:1px solid var(--line, rgba(127,127,127,.2));padding:6px 0}
+.tc-day summary{cursor:pointer;display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+.tc-k{display:flex;gap:8px;margin:4px 0 0;align-items:baseline}
+.tc-k>small{min-width:118px;color:var(--muted)}
+.tc-k>span{display:flex;flex-wrap:wrap;gap:4px}
+.tc-c{font-style:normal;font-size:12px;padding:2px 7px;border-radius:10px;background:var(--sel, rgba(127,127,127,.12))}
+.tc-c.up b{color:var(--rise)}.tc-c.down b{color:var(--fall)}.tc-c.wait b{color:var(--muted);font-weight:400}
+@media (max-width:520px){.tc-k{flex-direction:column;gap:2px}.tc-k>small{min-width:0}}
