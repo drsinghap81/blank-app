@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-25 01:57 UTC",
+"generated": "2026-11-25 04:58 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-23",
@@ -159,7 +159,7 @@
 "SMCGLOBAL"
 ],
 "morning_rule": false,
-"r3m": 17.0
+"r3m": 20.5
 },
 {
 "id": "ATH-TECHM-2026-10-22",
@@ -230,7 +230,7 @@
 "DCI"
 ],
 "morning_rule": false,
-"r3m": 12.6
+"r3m": 13.6
 },
 {
 "id": "ATH-SAREGAMA-2026-11-04",
@@ -277,7 +277,7 @@
 "PFOCUS"
 ],
 "morning_rule": false,
-"r3m": 26.4
+"r3m": 20.3
 },
 {
 "id": "ATH-LALPATHLAB-2026-11-04",
@@ -328,7 +328,7 @@
 "GAUDIUMIVF"
 ],
 "morning_rule": false,
-"r3m": 8.3
+"r3m": 8.8
 },
 {
 "id": "ATH-ZYDUSLIFE-2026-11-02",
@@ -402,7 +402,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 8.3
+"r3m": 8.9
 },
 {
 "id": "STOP-DCBBANK-244.65",
@@ -463,7 +463,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": false,
-"r3m": 26.1
+"r3m": 16.2
 },
 {
 "id": "ATH-ZIMLAB-2026-10-07",
@@ -537,7 +537,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 17.8
+"r3m": 18.8
 },
 {
 "id": "ATH-HONASA-2026-11-23",
@@ -590,7 +590,7 @@
 "EMAMILTD"
 ],
 "morning_rule": false,
-"r3m": 12.3
+"r3m": 12.9
 },
 {
 "id": "ATH-GLOBAL-2026-10-01",
@@ -630,7 +630,7 @@
 "results_ind": null,
 "rank": 9,
 "risk_pct": 19.6,
-"r3m": 31.4
+"r3m": 30.0
 },
 {
 "id": "STOP-DRREDDY-1421.49",
@@ -703,7 +703,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 17.0
+"r3m": 18.7
 }
 ],
 "more": [],
@@ -760,7 +760,7 @@
 "THELEELA"
 ],
 "morning_rule": false,
-"r3m": 23.1
+"r3m": 25.3
 },
 {
 "id": "T921-EICHERMOT-2026-11-23",
@@ -803,7 +803,7 @@
 "TVSMOTOR"
 ],
 "morning_rule": true,
-"r3m": 1.6
+"r3m": 3.1
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-11",
@@ -877,7 +877,7 @@
 "LUMAXIND"
 ],
 "morning_rule": false,
-"r3m": 24.1
+"r3m": 22.6
 },
 {
 "id": "TF-AGARWALEYE-2026-11-11",
@@ -935,7 +935,7 @@
 "FORTIS"
 ],
 "morning_rule": false,
-"r3m": 9.4
+"r3m": 14.8
 },
 {
 "id": "RET-MCX-2026-11-23",
@@ -975,7 +975,7 @@
 "IEX"
 ],
 "morning_rule": false,
-"r3m": 14.9
+"r3m": 12.0
 },
 {
 "id": "RET-NEOGEN-2026-11-23",
@@ -1042,7 +1042,7 @@
 "YASHO"
 ],
 "morning_rule": false,
-"r3m": 23.4
+"r3m": 23.3
 },
 {
 "id": "RET-SMSPHARMA-2026-11-23",
@@ -1109,7 +1109,7 @@
 "BLUEJET"
 ],
 "morning_rule": false,
-"r3m": 30.8
+"r3m": 31.2
 },
 {
 "id": "RET-TINNARUBR-2026-11-23",
@@ -1149,7 +1149,7 @@
 "TINNARUBR"
 ],
 "morning_rule": false,
-"r3m": -12.5
+"r3m": -13.1
 },
 {
 "id": "RET-UNIMECH-2026-11-23",
@@ -1208,7 +1208,7 @@
 "CENTUM"
 ],
 "morning_rule": false,
-"r3m": 16.0
+"r3m": 17.4
 },
 {
 "id": "RET-APOLLO-2026-11-20",
@@ -1267,7 +1267,7 @@
 "CENTUM"
 ],
 "morning_rule": false,
-"r3m": 10.0
+"r3m": 9.0
 },
 {
 "id": "RET-EIMCOELECO-2026-11-20",
@@ -1317,7 +1317,6 @@
 "WALCHANNAG",
 "SYRMA",
 "HIRECT",
-"KENNAMET",
 "DYNAMATECH",
 "HONAUT",
 "MACPOWER",
@@ -1334,7 +1333,7 @@
 "ANUP"
 ],
 "morning_rule": false,
-"r3m": 10.5
+"r3m": 14.8
 },
 {
 "id": "RET-STEELCAS-2026-11-20",
@@ -1377,7 +1376,7 @@
 "BALUFORGE"
 ],
 "morning_rule": false,
-"r3m": 2.0
+"r3m": 1.2
 },
 {
 "id": "TF-ICICIBANK-2026-11-05",
@@ -1439,7 +1438,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": false,
-"r3m": 12.3
+"r3m": 15.8
 },
 {
 "id": "TF-KOTAKBANK-2026-10-30",
@@ -1501,7 +1500,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": false,
-"r3m": 26.6
+"r3m": 27.0
 },
 {
 "id": "TF-POONAWALLA-2026-11-20",
@@ -1571,7 +1570,7 @@
 "SGFIN"
 ],
 "morning_rule": false,
-"r3m": 4.7
+"r3m": 4.3
 },
 {
 "id": "T921-TCS-2026-11-23",
@@ -1636,7 +1635,7 @@
 "DCI"
 ],
 "morning_rule": true,
-"r3m": 7.6
+"r3m": 9.4
 },
 {
 "id": "PR-KOTAKBANK-2026-11-20",
@@ -1681,7 +1680,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 26.6
+"r3m": 27.0
 },
 {
 "id": "PR-MEESHO-2026-11-20",
@@ -1715,7 +1714,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 20.8
+"r3m": 25.6
 },
 {
 "id": "PR-SOUTHBANK-2026-11-20",
@@ -1760,7 +1759,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 30.4
+"r3m": 31.6
 },
 {
 "id": "PR-DCBBANK-2026-11-20",
@@ -1805,7 +1804,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 26.1
+"r3m": 16.2
 },
 {
 "id": "PR-AXISBANK-2026-11-20",
@@ -1850,7 +1849,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 11.0
+"r3m": 14.4
 },
 {
 "id": "PR-ICICIBANK-2026-11-20",
@@ -1895,7 +1894,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 12.3
+"r3m": 15.8
 },
 {
 "id": "PR-URBANCO-2026-11-20",
@@ -1929,7 +1928,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 15.9
+"r3m": 6.3
 },
 {
 "id": "PR-KARURVYSYA-2026-11-20",
@@ -1974,7 +1973,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 15.0
+"r3m": 12.1
 },
 {
 "id": "PR-ETERNAL-2026-11-20",
@@ -2008,7 +2007,7 @@
 "MEESHO"
 ],
 "morning_rule": true,
-"r3m": 10.4
+"r3m": 12.7
 },
 {
 "id": "PR-CUB-2026-11-20",
@@ -2053,7 +2052,7 @@
 "INDUSINDBK"
 ],
 "morning_rule": true,
-"r3m": 11.9
+"r3m": 11.4
 }
 ],
 "pattern_watch": [
