@@ -145,6 +145,8 @@ def top_bottom(days):
 def opt_paper(prev):
     try:
         j = requests.get(OPT_URL, timeout=40).json()
+        if "days" not in j:
+            raise RuntimeError(f"no days in the answer: {str(j)[:120]}")
         days = {d["day"]: d for d in j.get("days") or [] if d.get("day") >= str(START.date())}
         return days, j.get("lots"), True
     except Exception as ex:  # noqa: BLE001
@@ -168,7 +170,13 @@ def main():
         raise SystemExit("no trading days since the start")
     stock_cols = [s for s in syms if s in C.columns]
     PP = pulse_picks(C[stock_cols], V.reindex(columns=stock_cols), nifty, IND)
+    print("pulse industries", len(IND), "stocks", len(stock_cols), "decisions", {str(k.date()): v["picks"] for k, v in PP.items()})
     TBd, TBtr, TBlog, TBnow = top_bottom(days)
+    last_tb = {}
+    for d in days:                                     # the futures file can lag a session: carry the last known mark forward
+        k_ = max([x for x in TBd if x <= d], default=None)
+        last_tb[d] = TBd[k_] if k_ is not None else {}
+    TBd = last_tb
     OPd, OPlots, OPok = opt_paper(prev)
     usd = C["INR=X"].ffill(); gold = C["GOLDBEES"].ffill()
     res = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(days[-1].date()), start=str(START.date()),
@@ -192,7 +200,7 @@ def main():
             if di == 0:
                 for k, ser in (("gold", gold), ("usd", usd)):
                     if k in Wt and np.isfinite(ser.get(d, np.nan)):
-                        units[k] = cash[k] / float(op.get("GOLDBEES" if k == "gold" else "INR=X") or ser[d]); cash[k] = 0.0
+                        units[k] = cash[k] / float(ser[d]); cash[k] = 0.0          # at the day's close (the open of ETFs / FX is unreliable on Yahoo)
                         log.append((ds, f"{'Gold (GOLDBEES)' if k == 'gold' else 'US dollar'}: put Rs {Wt[k] * inv:,.0f} in ({Wt[k] * 100:.0f}% hedge)"))
             # Pulse rotation: trade at this open the picks decided at the previous Friday
             dec = [f for f in PP if f < d]
@@ -229,7 +237,7 @@ def main():
                     if e <= s_ or nopen >= 10:
                         log.append((ds, f"{SYS_OK[r['sys']]}: {key} skipped - {'10 positions open' if nopen >= 10 else 'bad stop'}")); continue
                     q = math.floor(min(0.01 * book_val / (e - s_), 0.10 * book_val / e, cash["ath"] / (e * (1 + COST))))
-                    if q <= 0:
+                    if q <= 0 or q * e < 0.03 * book_val:            # no token positions: at least 3% of the book
                         log.append((ds, f"{SYS_OK[r['sys']]}: {key} skipped - sleeve full (no cash)")); continue
                     cash["ath"] -= q * e * (1 + COST)
                     hold[key] = dict(sleeve="ath", sys=SYS_OK[r["sys"]], qty=q, e=round(e * (1 + COST), 2), d=ds, s=s_, last=e, row=r["id"])
@@ -268,7 +276,7 @@ def main():
         pos = [dict(sym=s, sleeve=h["sleeve"], sys=h["sys"], qty=h["qty"], e=h["e"], last=round(h["last"], 2), d=h["d"], value=round(h["qty"] * h["last"]),
                     pnl=round(h["qty"] * (h["last"] - h["e"])), pct=round((h["last"] / h["e"] - 1) * 100, 2), stop=h.get("s")) for s, h in hold.items()]
         if TBnow["pos"]:
-            last = TBd[max(TBd)]["close"]
+            last = TBd[days[-1]].get("close") or TBnow["entry"]
             pos.append(dict(sym="BANKNIFTY FUT", sleeve="top_bottom", sys="Top Bottom", qty=TB_LOT * TBnow["pos"], e=TBnow["entry"], last=last, value=None,
                             pnl=round(TBnow["pos"] * (last - TBnow["entry"]) * TB_LOT), pct=round(TBnow["pos"] * (last / TBnow["entry"] - 1) * 100, 2), d=None, stop=None))
         V0 = eq[-1]["v"]; peak = 0; dd = 0.0
