@@ -71,6 +71,12 @@ def run(lab, x):
     show("L4 long: ADX crosses above 25 while green, exit red", trades(x, c25 & (hist > 0), r), x)
     show("L5 long: ADX turns up (> 20) while green, exit red", trades(x, rise & ~rise.shift(fill_value=False) & (a > 20) & (hist > 0), r), x)
     show("S3 short: ADX crosses above 20 while red, cover green", trades(x, c20 & (hist < 0), g, side=-1), x)
+    # 25 Nov 2026, Amritpal: "first histogram green and ADX rising" (no ADX level)
+    both = (hist > 0) & rise
+    show("G1 long: first green bar AND ADX rising that day", trades(x, g & rise, r), x)
+    show("G2 long: first day green AND ADX rising together", trades(x, both & ~both.shift(fill_value=False), r), x)
+    show("G3 G2, exit when ADX turns down", trades(x, both & ~both.shift(fill_value=False), (~rise) | (hist < 0)), x)
+    show("G4 short: first red bar AND ADX rising (mirror)", trades(x, r & rise, g, side=-1), x)
     show("F  9/21 long, all", trades(x, up, dn), x)
     show("F  9/21 long, only if ADX > 20 and histogram green", trades(x, up & (a > 20) & (hist > 0), dn), x)
     L = pd.DataFrame({"pdi": pdi, "mdi": mdi, "adx": a}).round(1).tail(8)
