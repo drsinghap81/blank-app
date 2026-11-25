@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-24T03:20+00:00",
+"generated": "2026-11-25T01:23+00:00",
 "asof": "2026-11-23",
 "market": "UK",
 "rules": "Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, no close above the pole top, close above the 200-day average. Room: the nearest earlier swing high above the entry must be >= 0.8 x the pole away (or none). Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average (fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
