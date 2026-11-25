@@ -77,6 +77,13 @@ def run(lab, x):
     show("G2 long: first day green AND ADX rising together", trades(x, both & ~both.shift(fill_value=False), r), x)
     show("G3 G2, exit when ADX turns down", trades(x, both & ~both.shift(fill_value=False), (~rise) | (hist < 0)), x)
     show("G4 short: first red bar AND ADX rising (mirror)", trades(x, r & rise, g, side=-1), x)
+    # 25 Nov 2026, Amritpal: "ADX crosses 20 from below, red histogram bar turns green" - both events, the later one is the signal
+    for k in (1, 3, 5, 10):
+        rc, gc = c20.rolling(k).max().astype(bool), g.rolling(k).max().astype(bool)
+        sig = ((c20 & gc) | (g & rc)) & (hist > 0) & (a > 20)
+        show(f"X{k} ADX crosses 20 + histogram turns green, within {k}d", trades(x, sig, r), x)
+    rc, gc = c20.rolling(5).max().astype(bool), r.rolling(5).max().astype(bool)
+    show("X5 short mirror: ADX crosses 20 + turns red within 5d", trades(x, ((c20 & gc) | (r & rc)) & (hist < 0) & (a > 20), g, side=-1), x)
     show("F  9/21 long, all", trades(x, up, dn), x)
     show("F  9/21 long, only if ADX > 20 and histogram green", trades(x, up & (a > 20) & (hist > 0), dn), x)
     L = pd.DataFrame({"pdi": pdi, "mdi": mdi, "adx": a}).round(1).tail(8)
