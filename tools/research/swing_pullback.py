@@ -23,7 +23,8 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.join(HERE, "..")); sys.path.insert(0, HERE)
 import flag_volume as FV  # noqa: E402
 
-COST = 0.004; COVID = (pd.Timestamp("2020-02-15"), pd.Timestamp("2020-12-31"))
+MKT = os.environ.get("UNIV", "").upper()          # 25 Nov 2026: "" = NSE, or US / ASX / UK
+COST = {"US": 0.001, "ASX": 0.002, "UK": 0.006}.get(MKT, 0.004); COVID = (pd.Timestamp("2020-02-15"), pd.Timestamp("2020-12-31"))
 
 
 def sim(o, h, l, c, i, trig, stop, mode, ex, tgt=None, wait=3, hold=15):
@@ -74,10 +75,16 @@ def rsi(c, p=2):
 
 
 def main():
-    big = set(); fno = set(pd.read_csv("data/universe/fno_stocks.csv").Symbol.str.strip())
-    for f in ("nifty50", "niftynext50"):
-        big |= set(pd.read_csv(f"data/universe/{f}.csv").Symbol.str.strip())
-    P = FV.load()
+    if MKT:
+        from connors_mr import load_mkt
+        P = load_mkt(MKT); tv = pd.Series({k: v.attrs["tv"] for k, v in P.items()}).sort_values(ascending=False)
+        big = set(tv.index[:500 if MKT == "US" else 100]); fno = set(tv.index[:1000 if MKT == "US" else 200])
+        print(f"R| market {MKT}: large caps = top {len(big)} by turnover, 'F&O' line = top {len(fno)}; cost {COST * 100:.1f}%", flush=True)
+    else:
+        big = set(); fno = set(pd.read_csv("data/universe/fno_stocks.csv").Symbol.str.strip())
+        for f in ("nifty50", "niftynext50"):
+            big |= set(pd.read_csv(f"data/universe/{f}.csv").Symbol.str.strip())
+        P = FV.load()
     br = pd.concat({s: (x.CLOSE > x.CLOSE.rolling(200).mean()).astype(float).where(x.CLOSE.rolling(200).mean().notna()) for s, x in P.items()}, axis=1).mean(axis=1)
     print(f"R| {len(P)} stocks loaded; bull = more than half of stocks above their 200-SMA", flush=True)
     T = []; rng = np.random.default_rng(7)
