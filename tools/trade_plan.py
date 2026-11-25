@@ -200,6 +200,35 @@ def main(mk="NSE"):
         if not trig or not stop or trig <= stop:
             continue
         t = td(r)
+        if r.get("kind") == "wait":   # 25 Nov 2026: traded near/above the level but no confirming daily close yet -> watch only
+            lvl = num(r.get("level")) or trig; wick_rule = (r.get("base_months") or 0) < BASE_MAIN
+            C.append(dict(id=f"WAIT-{r['symbol']}", symbol=r["symbol"], name=r.get("name", ""), system=TF_SYS if wick_rule else "Monthly ATH",
+                          bucket="tf" if wick_rule else "mom", kind="WATCH", order=None, when="daily close", side="BUY", price=round(lvl, 2), ref=close,
+                          stop=round(stop, 2), note=(f"waiting for a daily CLOSE above {lvl:.2f} ({'the highest wick so far' if wick_rule else 'the ATH-month high'}), "
+                                                      f"then buy next session above that day's high + 0.15%"),
+                          base_months=r.get("base_months"), score=-99, value_cr=num(r.get("value_cr")), **t))
+            continue
+        if r.get("kind") == "confirm":   # 25 Nov 2026: confirmed at the last close -> buy-stop for the NEXT session only
+            sc = 3 + (1 if r.get("main") else 0)
+            if india:
+                sc += (2 if t["aligned"] else 0) + (1 if (t["theme_rs"] or 0) > 0 else 0) - (3 if t["stock_rs"] is not None and t["stock_rs"] <= 0 else 0)
+            lvl = num(r.get("level")) or trig
+            if (r.get("base_months") or 0) < BASE_MAIN:
+                s9 = min(num(r.get("ema21")) or trig * 0.96, trig * 0.96)
+                C.append(dict(id=f"TFCONF-{r['symbol']}-{trig}", symbol=r["symbol"], name=r.get("name", ""), system=TF_SYS, bucket="tf",
+                              kind="TF_STOP", order="STOPLOSS_LIMIT", when="next session only (lapses if not triggered)", side="BUY",
+                              trigger=round(trig, 2), price=round(trig * 1.01, 2), ref=close, stop=round(s9, 2),
+                              exit_rule="daily close with EMA 9 below EMA 21 -> sell next open",
+                              note=f"closed above the wick high {lvl:.2f}; buy above today's high + 0.15% = {trig:.2f}, cup {r.get('base_months')} m; stop = EMA 21 (min 4%)",
+                              base_months=r.get("base_months"), score=sc, value_cr=num(r.get("value_cr")), **t))
+            else:
+                C.append(dict(id=f"CONF-{r['symbol']}-{trig}", symbol=r["symbol"], name=r.get("name", ""), system="Monthly ATH", bucket="mom",
+                              kind="ATH_STOP", order="STOPLOSS_LIMIT", when="next session only (lapses if not triggered)", side="BUY",
+                              trigger=round(trig, 2), price=round(trig * 1.01, 2), ref=close, stop=round(stop, 2),
+                              exit_rule="weekly close below the 30-week SMA",
+                              note=f"closed above the ATH-month high {lvl:.2f}; buy above today's high + 0.15% = {trig:.2f}, base {r.get('base_months')} m",
+                              base_months=r.get("base_months"), score=sc, value_cr=num(r.get("value_cr")), **t))
+            continue
         if r.get("kind") == "close":
             C.append(dict(id=f"WATCH-{r['symbol']}", symbol=r["symbol"], name=r.get("name", ""), system="Monthly ATH", kind="WATCH",
                           order=None, when="month close", side="BUY", price=trig, ref=close, stop=round(stop, 2),

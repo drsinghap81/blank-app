@@ -45,6 +45,12 @@ BOARD = {}      # symbol -> main / SME / BSE (NSE run)
 MIN_CLOSE = {"NSE": 100.0, "US": 10.0, "ASX": 10.0, "UK": 100.0}[MARKET]   # no penny stocks (30 Oct 2026); US / ASX $30 -> $10 (20 Nov 2026, Amritpal: many ETFs / funds trade $10-30)
 MCL_MIN = {"ASX": 1.0}.get(MARKET, MIN_CLOSE)   # 15 Nov 2026: month-close list only goes down to A$1 on the ASX (A$1 m/day still applies)
 BASE_MAIN, BASE_MIN = 24, 12
+# 25 Nov 2026 (Amritpal on AGARWALEYE: "close above the wick I will prefer"; tools/research/ath_confirm_test.py, NSE 2007-26):
+# entries wait for a daily CLOSE - Momentum (base >= 24 m): above the ATH-month high (10-slot CAGR 17.7% vs 12.6%, max DD -32%
+# vs -45%); Cup 9/21 (12-23 m): above every earlier intraday high (the wicks) (+8.8% a trade vs +5.7%, DD -12.8% vs -18.5%) -
+# then buy the NEXT session only, above that candle's high + 0.15%. NSE only (US/ASX keep the intraday trigger until tested).
+CONFIRM = MARKET == "NSE"
+CONF_BUF = 0.0015
 WSHORT, DSHORT = [], []   # 15 Nov 2026: reverse cup closes under a falling 30-week SMA (watch only; shorts lost in tests)
 WCLOSE, DCLOSE = [], []   # 15 Nov 2026: week / day CLOSED above the all-time high (cup >= 26 weeks & 20% / >= 20 days & 15%)
 WK_MIN, WK_DEP, DY_MIN, DY_DEP, WK_K, DY_K = 26, -0.20, 20, -0.15, 104, 250
@@ -142,6 +148,24 @@ def analyse(sym, x, today, lookback_days=550):
     first = cross & (cross.groupby(d.mon).cumsum() == 1)
     ev = d[first & (d.above == True) & (d.val >= MINVAL) & (d.age >= BASE_MIN)]  # noqa: E712
     sig = [(dt, max(r.o, r.trig), r.trig, r.age, r.ath_month, "high") for dt, r in ev.iterrows()]
+    pending = None
+    if CONFIRM:   # 25 Nov 2026: daily-close confirmation, then the next session above that candle's high + 0.15%
+        wick = x.High.cummax().shift(1)
+        ctx = (d.hist_ok == True) & (d.above == True) & (d.val >= MINVAL) & (d.age >= BASE_MIN) & d.trig.notna()  # noqa: E712
+        d["lvl"] = np.where(d.age >= BASE_MAIN, d.trig, np.maximum(d.trig, wick.values))
+        cv = (ctx & (d.c > d.lvl)).to_numpy(); ctxv = ctx.to_numpy(); hv = d.h.to_numpy(); ov = d.o.to_numpy()
+        amv = d.ath_month.astype(str).to_numpy(); used = set(); sig = []; idx = d.index
+        for i in np.where(cv)[0]:
+            if i + 1 >= len(idx) or amv[i] in used:
+                continue
+            j = i + 1; lv = hv[i] * (1 + CONF_BUF)
+            if ctxv[j] and amv[j] == amv[i] and hv[j] > lv:
+                used.add(amv[i])
+                sig.append((idx[j], max(ov[j], lv), float(d.lvl.iloc[i]), d.age.iloc[j], d.ath_month.iloc[j], "wick close" if d.age.iloc[i] < BASE_MAIN else "close confirm"))
+        i = len(idx) - 1
+        if cv[i] and amv[i] not in used:
+            pending = dict(level=float(d.lvl.iloc[i]), high=float(hv[i]), buy_above=round(float(hv[i]) * (1 + CONF_BUF), 2), close=float(d.c.iloc[i]),
+                           age=int(d.age.iloc[i]), ath_month=d.ath_month.iloc[i], depth=d.depth.iloc[i], trig=float(d.trig.iloc[i]))
     # close breakout (5 Nov 2026): a completed month CLOSES above the old ATH close without trading above the trigger
     # (the old ATH month had a long upper wick) after a base >= BASE_MIN -> buy the next month's first open.
     # NSE 2017-26 backtest at 1% risk: 16.0-17.3%/yr vs 14.8-15.4% without (132 extra trades, avg +16.6%).
@@ -229,6 +253,25 @@ def analyse(sym, x, today, lookback_days=550):
                         base_months=int(d.age.iloc[-1]), depth=d.depth.iloc[-1], sma30=float(lastw.sma), kind="high",
                         main=bool(d.age.iloc[-1] >= BASE_MAIN), value_cr=float(val20.iloc[-1]) / UNIT,
                         ema21=float(e21.iloc[-1]) if np.isfinite(e21.iloc[-1]) else None, ema9=float(e9.iloc[-1]) if np.isfinite(e9.iloc[-1]) else None)
+    if CONFIRM:
+        lastw_ = W.loc[last_complete]
+        common = dict(sma30=float(lastw_.sma) if np.isfinite(lastw_.sma) else None, value_cr=float(val20.iloc[-1]) / UNIT,
+                      ema21=float(e21.iloc[-1]) if np.isfinite(e21.iloc[-1]) else None, ema9=float(e9.iloc[-1]) if np.isfinite(e9.iloc[-1]) else None)
+        in_trade = any(e_["status"] != "exited" for e_ in events)
+        if pending and not in_trade:
+            near = dict(symbol=sym, kind="confirm", trigger=pending["buy_above"], level=pending["level"], candle_high=pending["high"],
+                        close=pending["close"], gap_pct=(pending["buy_above"] / pending["close"] - 1) * 100, ath_month=pending["ath_month"],
+                        base_months=pending["age"], depth=pending["depth"], main=bool(pending["age"] >= BASE_MAIN), ath_high=pending["trig"], **common)
+        elif near and near.get("kind") == "high":
+            lvl_now = float(d.lvl.iloc[-1]) if np.isfinite(d.lvl.iloc[-1]) else float(near["trigger"])
+            near = dict(near, kind="wait", level=lvl_now, ath_high=float(near["trigger"]), trigger=lvl_now,
+                        gap_pct=(lvl_now / float(near["close"]) - 1) * 100)
+        elif not near and not in_trade and np.isfinite(d.lvl.iloc[-1]) and bool(ctx.iloc[-1]):
+            c_ = float(x.Close.iloc[-1]); lvl_now = float(d.lvl.iloc[-1])
+            if (1 - NEAR) * lvl_now <= c_ <= lvl_now:      # traded above the trigger but no confirming close yet (e.g. AGARWALEYE 25 Nov)
+                near = dict(symbol=sym, kind="wait", trigger=lvl_now, level=lvl_now, ath_high=float(d.trig.iloc[-1]), close=c_,
+                            gap_pct=(lvl_now / c_ - 1) * 100, ath_month=d.ath_month.iloc[-1], base_months=int(d.age.iloc[-1]),
+                            depth=d.depth.iloc[-1], main=bool(d.age.iloc[-1] >= BASE_MAIN), **common)
     # month-end close list (15 Nov 2026): the last COMPLETED month closed above the old all-time closing high after a base
     # >= BASE_MIN months. Long cup = base >= 36 m and a fall of >= 30% inside the base. NSE 2017-26 (buy next month's open,
     # weekly SMA30 exit, 10 stocks): base >= 24 m 26.7%/yr -40% (equal wt) / 21.4% -39% (2% risk); long cups 24.4% -27% /
