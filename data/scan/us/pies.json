@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-24 07:04 UTC",
-"asof": "2026-11-23",
+"generated": "2026-11-25 05:39 UTC",
+"asof": "2026-11-24",
 "broker": "Trading 212 (Australia)",
 "note": "Rebalance on the first trading day after the month-end decision. FX fee 0.15% each way on Trading 212 AU. Pies have no stop-loss: the month-end check is the exit.",
 "pies": [
@@ -111,6 +111,11 @@
 "2026-11-23",
 0.95409,
 0.66409
+],
+[
+"2026-11-24",
+0.9495,
+0.66297
 ]
 ]
 },
@@ -149,8 +154,12 @@
 ],
 "provisional": [
 {
+"ticker": "XBI",
+"pct": 33.3
+},
+{
 "ticker": "SGOV",
-"pct": 100.0
+"pct": 66.7
 }
 ],
 "record": [],
@@ -234,6 +243,11 @@
 "2026-11-23",
 0.95008,
 0.66409
+],
+[
+"2026-11-24",
+0.96762,
+0.66297
 ]
 ]
 }
@@ -354,6 +368,11 @@
 "2026-11-23",
 0.95409,
 0.66409
+],
+[
+"2026-11-24",
+0.9495,
+0.66297
 ]
 ]
 },
@@ -400,8 +419,14 @@
 ],
 "provisional": [
 {
+"ticker": "BTEK",
+"pct": 33.3,
+"us": "XBI",
+"name": "iShares Nasdaq US Biotechnology UCITS (close twin)"
+},
+{
 "ticker": "CSH2",
-"pct": 100.0,
+"pct": 66.7,
 "us": "SGOV",
 "name": "Amundi Smart Overnight Return GBP (cash)"
 }
@@ -487,6 +512,11 @@
 "2026-11-23",
 0.95008,
 0.66409
+],
+[
+"2026-11-24",
+0.96762,
+0.66297
 ]
 ]
 }
