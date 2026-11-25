@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-25 11:20 UTC",
+"generated": "2026-11-25 22:50 UTC",
 "method": "News clues: government / regulator actions that can move a whole industry (22 Nov 2026, Amritpal, after the PSU-bank look-back\nfound the 21 Oct \"FDI cap in PSU banks to 49%\" report a week before the rally: \"add all authentic news clues, especially similar\ntypes as for PSU\").\n\nSources (checked from GitHub Actions 22 Nov 2026):\n  official  RBI press releases + notifications (rbi.org.in RSS); government outlets in Google News (PIB, DD News, News On AIR)\n  reports   Google News RSS, India edition, ONLY from named financial / national outlets (OUTLETS) - shown as \"Report\"\nEvent types searched (TYPES): FDI / foreign-ownership caps, Cabinet approvals and outlays, PLI, anti-dumping / safeguard / customs\nduty, export bans / curbs, minimum import price, bank mergers, privatisation / stake sales, GST rate changes, MSP / FRP,\nDefence Acquisition Council approvals, ethanol blending, RBI rule changes, plus \"government plans / considering\" reports.\nEach item is matched to NSE basic industries by keywords (IND_KEYS). Direction is only marked where the words say it\n(denies / no plan / rollback / ban = negative). Nothing here is a tested signal - it tells you a story exists.\nWrites data/scan/news_clues.json (last 60 days, de-duplicated).",
 "items": [
 {
@@ -138,6 +138,249 @@
 "neg": false
 },
 {
+"key": "cabinetapprovesindiasingaporemouonaviationmrosector",
+"date": "2026-11-25",
+"title": "Cabinet approves India-Singapore MoU on aviation MRO sector",
+"url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNU2dBMDdMb2xrS3k4dWhwT2w1d1RWa3dMcDRwMmpOV2NSVDNpNElIclpGSVNpRTRDbWl4c2RNZkw3enIzLW5rdkVFc3VMTGd2bG5NWV9IbFA3ck4tSXRWeTB1eUtEakJQcFVqS3Y2ZTJlalNHTkJSd2RMMEJCYk81NXFoWWtkdERTRlNIRkpR?oc=5",
+"source": "News On AIR",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "cabinetapproves2014croregreenfieldairportatsilchar",
+"date": "2026-11-25",
+"title": "Cabinet approves \u20b92,014-crore greenfield airport at Silchar",
+"url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOZUdScjBBcWpfRlo1bkdjQWJ0WUlMczYzQUhMQ2ZyNDBFMzFIdXFoTk1hRlVHc3V3eUJ1bnFSQU5RM0tJTkd6RmhqS3IyTXBqZ0hXUjVQcG5oT1RoYmZiMVlvY3Y5eXo2cmlLUWFIVHVJclZ2T3ZBRWtycjFXLVNMZ1lrakwtamRIRE1wdGJjVkhOSGk5U0M0VG5IWlJUX1d2WnBoUmhFS3JrMjlnVXlSWkwwVEVEamIyRzZhN0NFUdIBxgFBVV95cUxPUy05c0UtNkdsX1dCYXR3UVk1UE50VGl2ZEJpcFlfamU1YTV3UUFlYWFDOFZlOTVmdWRsVUlVZzJrQ3JMWDZia2QxejRqZEVpWVlqMlVoak1kemp3d2E3MXFfaW83UnB3TkpoeF9XZmQyWG5JTl96NDg0OS1CeVRIRjRJTWVDUV9YcUhxUG9MbGdtUjVVc0JRZkFUeVJKd29TdGhPR3pNTVR4ajV6WGJoTHdEZVZsQmZkWnlKUmxobXk1LVY0cGc?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "cabinetapprovesfourrailwaymultitrackingprojectsworthrs9450crore",
+"date": "2026-11-25",
+"title": "Cabinet approves four railway multitracking projects worth Rs 9,450 crore",
+"url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQNE5vX09QUmZCRVdWRlZQRzhBbTQ2VXBoVG5NbmM0dnBBUHBBczc3YUJpdGhMSHo0Q1poSGhTNGJuYmdSeUhCSW12V1d2MVNIZWUxREFnMXNoQ2wycTVUZUdSc25ULWN6cUFPT0RXdkMtOFZNeHRjNmhNcHVBTlpRUmtDVUV0emM4alJ3aUJiZDZ1MFB6MjRiZXhjc1Uxb2s?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Railway Wagons",
+"Civil Construction"
+],
+"neg": false
+},
+{
+"key": "cabinetapprovesrailwaymultitrackingprojectsworthrs18509croreacrossfourstates",
+"date": "2026-11-25",
+"title": "Cabinet approves railway multitracking projects worth Rs 18,509 crore across four states",
+"url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOcFh0TVhfcUZOcGpPS2dJc0l5eFJrOVlLSkgzSEMxZUluSDdEcjE2YWZQZUhDMko4cHptcEZrWnByVlBMbzN4Sjg3MU5WVlJnMkR2blhxcU1IeWRMdnFmVVo3MUNVWjBwUWxpdWRNcjNWSzZpaEtOaWwydTVTY05ETG9YdXVqajRjcksyM0ZXMkg4ZHEzMDJ2QWJrRVljU3FIeG9tMk10d2UyVEtWNnZjLWJraw?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Railway Wagons",
+"Civil Construction"
+],
+"neg": false
+},
+{
+"key": "cabinetapprovesrs62370crorenutrientbasedsubsidyforpkfertilisersforrabi202627",
+"date": "2026-11-25",
+"title": "Cabinet approves Rs 62,370-crore Nutrient-Based Subsidy for P&K fertilisers for Rabi 2026-27",
+"url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPdnZHdjRmNGZXUU5xend6U0tnVkkxYUtZdWwwaWppZDByYTZueUFKdTJzbTMwamtFVzE3Y3pkVzN1ODVnNTdfN3JKaVNjRHFYUUxUbWdfNUlZdTktUU1kaDlhYWJLeVVEYmx3bng0WVRUTnRuNFN6SEV1THVCZk5FV00tZno3ZVBjRkpKX2ZMTTNaXzFoNnJJTUZLMUFJeW42ejE1al9tVTJPUUx4dG5FaUc4eVcwR2c?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Fertilizers"
+],
+"neg": false
+},
+{
+"key": "cabinetapprovesrs3630crorerevisedcostforconnectivitycorridortojewarinternationalairport",
+"date": "2026-11-25",
+"title": "Cabinet approves Rs 3,630 crore revised cost for connectivity corridor to Jewar International Airport",
+"url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOdmlsd1RseGNRSldEUjZHVGEtZzZxTFIwa0p5WEQ1c2s3TnlFT2d0aDRiOXc2cExLejFLOVVxeEVhUEZxN2d4MmYtYVhCUUllREdYTklmbktIc2NlbFhnR1FTNnU4eWFGM0VNVmdIRnFjaHAyUjR4OUdVeTlsSkdUYTR5Nm05SU5VcFBRRTI1bG9BeWZXMVh6aGRaamNaWkE3aVI0SmhkNXVBVzRMMnBRWThPTzlzc0ttX3pZMmt2MTg5eFFz?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Cabinet approval",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "cabinetapproves2014croregreenfieldairportatdolooinassam",
+"date": "2026-11-25",
+"title": "Cabinet approves \u20b92,014 crore greenfield airport at Doloo in Assam",
+"url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPb3FUQmFTN0ZQNFF5WWFrczMxeWtyaWxCYzRRVG4yR3pCUzQwWXhGeVBXTFFjUzAwYndOeGpsUDl2RFJ2clFwWDhnUHdxaFM0MU5sMk5INjJoM0ozV3FDX2pKZURLSEVCU1F2a0xWNEM0VVZFdFN6bjNVTGM3U2RST2JLRlhJdm1aOHJ1ZENaTmFsQ054enVVYzlGZWZnRFNqRThrWk0xM3AzdEpvZkVqb2gzVXRFbzgyTzRMcjRxNU5NZUdhN1pZOVNWc9IB0AFBVV95cUxNYVE0ZnkzM0ZYbVNpRmZ4OHhfZjFNUHFmdm5fWHo0N19mc1hFVnZKQWpJaTZ0RjhmbHZ2blprYlNFTTdsT3otU1pUeVhrRVdOalFMLWVmaUtwQkduLTRTNXFnXzZXM2lkSmhNUFV2bUt1X0p3WGJhazI4MG80cmY3ZGFiNzV0bGpHelY2RVNhVGNyazZOTl9LUGxIRWcwdVVIQ2piaFB6N0JCUGgyRXpwb0NyXzFVMF84TF9BSVJVV3FWaktkYVV0d1ZrbmdoMDZj?oc=5",
+"source": "ET Infra",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "cabinetapproves4288crorecontainerterminalprojectatkamarajarport",
+"date": "2026-11-25",
+"title": "Cabinet approves \u20b94,288 crore container terminal project at Kamarajar Port",
+"url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxPZXI4YU5UMThTTnNFNTJ4TGlNdEx4N1UxRWwyWlB4d3FiNVJoaEtuZU5CYTZCRmtndDJodnUxTFBseFpkUWRmOXBJZnBWS2gwYnA3STZTNUpUUFdiSGZkX2NqcFE4X2JtNTFNRWZoZno2dGw1d3liX2N6SXJ1d2hpRlNMLWZ2cVJDWUFHT1pYYnZ1UUlBYnpWMUVBSFFrWVNkTVZoeWhYTHoyS1BEVXFEVjFxNG5IcllTRTV2eVV4NEtlRTZ2alROaTRVV05XVURLQ3NpS2VMWjLSAd4BQVVfeXFMT3Y2djIzYmdMUmdhUnVvS0xWTXNRTUJBa2N1NFVkOFFXcm1WUlYzOVdfcVZqckowUV82MHE4YWF6T0RwWjVNcXBBSG1ud25EamxqbnNBNDF0TjlMQ1ZQbjBvUXhlS1ZWYW5PYzhKVWdEQjJBckUxSkh1UGJnNmZOMkpRWWNDaEJ4R0xXdTdjQjF1N3djaUZuQm9aYnZHOGpoTHZLNURtODhXOV9raGdIc0JZdUtjVWIya2Z2UENnRDBoTjdXVWxrLWJ3bEc2WVlMT0MwR01zSW8tQ3hZV05n?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Ship Building & Allied Services",
+"Shipping",
+"Port & Port services"
+],
+"neg": false
+},
+{
+"key": "modicabinetapproves2014croregreenfieldairportinassamssilchar",
+"date": "2026-11-25",
+"title": "Modi Cabinet Approves \u20b92,014 Crore Greenfield Airport in Assam\u2019s Silchar",
+"url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxPTWZ2T1o4RkVNTjZ2dUtWTy1LTWltQjhXUnFwcGloZXEyWDEyRnQ4UzhWZUVaS1UyQVZQQjZPbXlCa1VZa2s4dkIxNEV2NlA4LUZlVFcydXdFX2pSWmlxRTNCUC1sMHVRRmkyWG1BN1VnRnRzNVpWTDhVbVg4Vld3dUJrRGdqWUw1LWUwNVZWaWVhT052N25SVUdHTVpWZlJXcUh3ZHRjR1p3NzQzd3VTdzNZZHY0dG1tUVBLOVlka1Exb3R2eVdQcEZ6YmJvZG8xa2s2dkZNZkfSAd4BQVVfeXFMTmpCMjBrVVZCbmRjOVdPVEJvRWhpMU9FbmlneV9nTzBseXFIZE1nMXRYOHNkSXZFNWxfUWdkNUM3SVZmV1MydlFaMUFpY29SeUEtQWtBTW9JX1J1VXVfN1BVTFMzY1lmZE1jbzhDOFJFMVY0aklFTlhZNnRQRDBGTEladjBmWURTSy1IMmN2MVdqXzFUMmJRMnVmTGI3bkVpNWxUd09xTHo2NXZycEJScXBraV9sN2JjUHVFa3l0VUxwNzd2eno0ZWxmYXVmTWVZNE1fLUxuZkRkSVJUbzlB?oc=5",
+"source": "The Times of India",
+"official": false,
+"type": "Cabinet approval",
+"industries": [
+"Airport & Airport services",
+"Airline"
+],
+"neg": false
+},
+{
+"key": "autoplischemedisburses4385croreinfirsteightmonthsoffy27",
+"date": "2026-11-25",
+"title": "Auto PLI scheme disburses \u20b94,385 crore in first eight months of FY27",
+"url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxQWVpxNjkta3JtQk1JV0cxNkY5LVJDNVI3Rld5Vmk4c2hJbjR6WV8zQW0xQ3V4QWZtbGRZQUFzSDNCYVNxRl9vS3pma1J2cGhWV0Jmak1RdFNiNndZN2tYQ3lHZDd1bW1vYTQzMFlXcmF6VWlYbDFPa3VKa0JFUldnaXM2RkV0S1BMaXZTYkdBaGhUUERjbEdPWmtSbEZ0MmxINjNaeE1kNnZFTTE3VHpkelcyWW9mWGgzUDlpRktkbFZUWEplaWJyZjYwaWNVRTVs0gHWAUFVX3lxTFB2SUJNekhEVXdmLWVhRHRkamNaVC1aVmZjaHpZTGVSTmVJWURUU2NHR2trTGJWUFcyamZkcmliODlIdll3cVQxVE1vSGpMUE1TYjFvQzlRMUtvbzZ4Qm0xcTh0NDhfS3hPb0ozRzBMS09HSEg5OTdaWDFUc0lvVUwtTzl5WGtWem1ySlo5Qjd4aDlFS3pDRlVZeEhQNElpZjI4RE15cUVsalZyM0xpU2RQZXRReDU1UWZBS0YyOHRUR0FPcTFZNnFGTW9WLTIzOTZJSzJrM1E?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "pliautodisbursementssurgeto4385croreinfy27",
+"date": "2026-11-25",
+"title": "PLI Auto disbursements surge to \u20b94,385 crore in FY27",
+"url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOcE9Td09PM05lc0FPWmRVMWVEU2x5aWhQTjB0X2xadHBldU05QU9aT05NUzVIVnBjZWEzX2NWZjVoTVp6b0h5QUl4cmFXd0g0ZkpwWlVhcHRnVmhJUFBEVWNmMms4amhUZ3JLQ2dyOXRxYjRZMW10Q1hJTkNTRFZBb2p5MW0xMDBtSEdka0xJNXRfcmdWOHNIU3ZZZUdRMG01b1JB0gGoAUFVX3lxTFBpcUV1UXJPcV90M3ZULWxyOEQ1RXFvd0FVbEZaUXBJWEViX1JMT1dOZUF6dzVoaDJBWkpoZEZlX01NZ2lNOWpQNFh6ZWRQeFdwbERaMlQwNG9xRHlHUE5KZFRscEZ4ZU9XeWtVaW1KSVFKa2xwUmNvdm1IenJvLS1aVFZodTRfVGwwb2Q5UmZOb1pqYURwdHh0bUtBRF9BdkozRlNTb185cA?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "autoplischemedisburses4385croreinfy27investmentsexceedtargetby24",
+"date": "2026-11-25",
+"title": "Auto PLI scheme disburses \u20b94,385 crore in FY27; investments exceed target by 24%",
+"url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxQYmNWc2h1b1cxS1hobE4yY201TktwUDJlT2J5SWxYcmhkREVkUjdseXhxcmo4UTF4aS1mMEhQRk5CVW5QaEx6VTZlRUpXdjNlUFhkcm5fVnZPVW5FTHpzNzRFUl9SVzJGbnlKSU5zV1M0NU9vY01jUUlwVmxVUm0yc3lDVFZ0X1VEckNBRjl2a1lpMEtLeGs5V25hc1ljbVgwT3QyQmsxczdGMDN4N0t4aE53cGRpV0hsQkhZcno3MVVuVEHSAcgBQVVfeXFMTTZnMUJadVQ0OFN5dzF1WkNGMEhwMFliQkQ0S2V6dmFnVmNxYmFpcTI5U2FVbGNrN3MxMlpvZ2J4NXQtZ2xmWDBRRHd2QWRoc2NGb2FvLWhvMWkyVHEtME81UHRlM3dHcnUybUhSWFlCMGsxYUpHMm02MWxGSEtQTC1JQ2gtelpHSzZxSGxRMXpQTkZmRThBWUlZd1dha0JrNjRndm9VbjkzOWlZbGtTYUdOaFhsekdBWlI0OW1uNllNNjBsWXZIcDc?oc=5",
+"source": "CNBC TV18",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "pliautoschemerecordsrs4385crincentivedisbursementincurrentfiscalgovt",
+"date": "2026-11-25",
+"title": "PLI Auto Scheme records Rs 4,385 cr incentive disbursement in current fiscal: Govt",
+"url": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxNQ3oxSWdvVXN6a2xnclk5cEg0ajJvUE1pa2c4R0dHblo3X2NQb20yQzdtS2dQNVUxTE5KMy1iU0dpNUJac3czQjBBaXE4MjNDR3lsb1c2UUtmM0E3c0xpd1hnb0FOcWZ0OVVKZC1aU3J1Q2w0VUNyZlFtbEtlMnpIZTBFeGJ0UGRXLTRsTnlGSWprSUlhV2E5SWZuci1Za1BCY09EWWNGSVIxUnNSYWxGb1RQQWtIX091bmRPMU5JSUxjTzZpQVpicTVSWlZ0Ml9XaEJvWUlMSjZ6UkhkdnJ1SnE5YWpULU43TTlLMGp6cWp2WEFEMEhUQndnNNIB9AFBVV95cUxOZzY5cWpGdVFvMW9DZ2t6Y1hUMnAtX3FQUllnc1p0UkxSUDAtRmhKNFNQMEZCNVZhdGFYdG50d0NWT2s4NHN1bEpDNWlwUTFhTU5QMTluaHRUZ2JUY3Fac05vVFJISlQ5UjRhNnp2WGdsNXczMUxteFdIVGwzRU5Dckl1VGpGWF91dzd6MWFFNURpWVhnWXdQc1ZCYjRad3BFY1Mxel84b1EyV0kzOWstZTdRS2p6Rk5wVUtUbFhobzdFNjNfNHZZSDc1OGtSZUEyUXhTU1Y4bUV6U1VYcE84NFEtY25hSFVLMmFpajM0QldNZU84?oc=5",
+"source": "The Economic Times",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "pliautoschemeincentivedisbursementsreachrs4385croreinvestmentssurpasstarget",
+"date": "2026-11-25",
+"title": "PLI auto scheme: Incentive disbursements reach Rs 4,385 crore, investments surpass target",
+"url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOVTNEanFYWTlyWkFxdE1nUU1TSlp1M2VMX3RxRldHcTZ3T2lIa3FoT2ltMU5lM3d5WkEzS0k3MmZ2b2EzcFVfOGpLX1VkYWhPazA0dW5Id1JmZ1VJdXdGZkNsc3d1TUFZSnhTVElfMGVGV2llODdfOTl6cEl4TEN0WVlIRjVVV093b21KaHlHWXpQX2pTcEZ2S0ltY2puQmhzVTRNNjZSRjZSNlF1OGliNVFzN2ZZZjNMVHBRNjE3Vzl0YW81MDdndVAxcFc1Ynd4YjFoeThKSnh0S05tUW5B0gHmAUFVX3lxTE9oWHRZbkw1NGZwbDdZVzlxcXBuRS1kdXFGcFI5Uzc1R0NLTnJjbloyQWRicGpBVS05ZHFfSk9jdFV3aktLWWs4eThXdElhSlF6Y2xWN2lCODVDQnNXZEc5ellETW9FeGNMenpGc1BkRXBpbGlNalAxN0Etd0ZqaWNRaTNyOFR2c29QXzRKVjZWODBXdjVqVlh1Y3lFbEZJMXBJbnktNzFPV29RaHRSVGNXNC15TTVwLWF6Vzcwdi1PbklVQ2hjMk0wWWVjWFRUb3dVblFsT0tKSHpXMXF1dWVyTGZyMkVn?oc=5",
+"source": "The Financial Express",
+"official": false,
+"type": "PLI / incentive",
+"industries": [
+"Passenger Cars & Utility Vehicles",
+"2/3 Wheelers",
+"Auto Components & Equipments"
+],
+"neg": false
+},
+{
+"key": "steelpricesnearfouryearhighswhyanalystsexpecttherallytocoolinq4fy27",
+"date": "2026-11-25",
+"title": "Steel prices near four-year highs: Why analysts expect the rally to cool in Q4FY27",
+"url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxPWEdzcWdtZURTSkNySVNRN1BRTWpSU1kyLVJRRTA0cHZQUmtKMkxNUng4UVFtblUxYU1XdC1VRmNVSnY1LVRnM3ZSMmZxLU5qdnpJR3c1OHNrelBLd0RYVHppMV82WHJsbGxWVVFGZ1hRSUlrOTYta2FvRjZDcURoV2t6VnRuLXZiWFNSazVITmx4VVlWUDFFdmFiNHZReTM0M3k3bVVWUGJPVDdFU0xJOE9kY3ZJcnRkVUZ0c25icld2eXlMREU4YlVhUkR6a3dYNTBlTHZpQlnSAd8BQVVfeXFMTkZLUDBoUU5ORTRjeWk0Ql9OUFBqYkVEa281WC1jM3ZocDhDUFNpMFp0UjBXQlVBTU9ZS1Nld0w0SmxMd2NZTHlHcVRTdUlNOFdqNkVtTTNWbWpzV0tZTElKTVZNLTVtUDA3OXhZck1HNFNkNGpyVmNrME5rcjRHSEZFZ2tPNjNzdVpJTGJQM3ZIemZwTzV5MDBNUW5UMGE0WUlRbTJMeGpMVWRBVFZvU21EYmt0a2ZmQTVqN3loZTFrMHB1ajVXdUZyWEQwa3c3bnVGY1VlV0JNX282R3R3cw?oc=5",
+"source": "The Financial Express",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Iron & Steel",
+"Iron & Steel Products"
+],
+"neg": false
+},
+{
+"key": "indianaluminiumbodyurgesgovernmenttohikeimportdutyto10regulatescrapconsignments",
+"date": "2026-11-25",
+"title": "Indian aluminium body urges government to hike import duty to 10%, regulate scrap consignments",
+"url": "https://news.google.com/rss/articles/CBMi_gFBVV95cUxQZmNMakVwRkxtdWNpclB0N2NWSDJfSlNrcjdtRUNfOE1WZFh4dTJOTG1NYnZQSUY5UE9KWFNCMUVzUXVMYloxU0V0ZGpSVHg2alUxM0pSeFZmeHJ3S1dhczlwV25nTS1QQXA5WDRWTlVEdlhyNGNETXVEWEVWSS1ZM1Y2NmRtLTAzRVJmZVVUT1Z3Q2xYY1BkVGJRa0hjcXJMd2tjSHFjdWRFdlhFc0FablhFRi1UVjl0OVRYNHR3RUdaUlRRcWpCVkVKaEZBMFdNOTBQT2JhdXM0a3Y1UDZWSmxtbFV5enFjbHI0dXFhVUVXUjhMNXBGOWMxaW9Fd9IBhAJBVV95cUxPclZwazN0MWIwNTFobnpUYTlsZC1xYUNqam5CSWQteTN4Nl9td0xpbEtoOGs1Ql9QTWRaZm1jeGwwd2xHOVJBSzdQdU4xY2g3d2VvSUtSOWxRb0xYRmxPRzdsMEpsV2FPbERtN29xTklRMC1UdmRDdzFfMkptUTZGTlhYTXFOaTdBZU5GMEZ2bkQwNkhPSmxRelRPZFhrUFU0dkpHaUpxZVdFQUxpUFBLOERhLUxSd2R3cnNxZ3VTblpfU21CSjlja0xRNGdIdU8xa3BoeHJiQjlNSGlzZFpIRGVJdXVXVVhOY0E2U01mQUN3ZDU4Q3AxNFhjeXVYYzBWdHJJaw?oc=5",
+"source": "BusinessLine",
+"official": false,
+"type": "Duty / trade",
+"industries": [
+"Aluminium"
+],
+"neg": true
+},
+{
+"key": "indiaclearsdefenceacquisitionproposalsworthrs360lakhcrore",
+"date": "2026-11-25",
+"title": "India clears defence acquisition proposals worth Rs 3.60 lakh crore",
+"url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOQU5RQmhoS1d5TXFHZ1pabjlwNERLckpTS3lHNWJKNC1XQ1B0REdnYkdoTGlIbDBzNEtvSzJMZC10bFdITk01TndUbXAxSGdtM3BlNDNIRWU1QWxUTXBJODRJa0RKbzM4a3dBTHJPbkdXM3NkNmt4WW1MOFpzM2NHeG54eG9WakQ2ZmswNVBxMkstZmpEY296aA?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Defence",
+"industries": [
+"Aerospace & Defense",
+"Ship Building & Allied Services",
+"Explosives"
+],
+"neg": false
+},
+{
 "key": "cabinetapprovestwoflyoversondelhismbroad",
 "date": "2026-11-24",
 "title": "Cabinet approves two flyovers on Delhi\u2019s MB Road",
@@ -232,6 +475,19 @@
 "Other Agricultural Products"
 ],
 "neg": true
+},
+{
+"key": "indiamayreviewwheatexportpolicyamidconcernsoverloweracreage",
+"date": "2026-11-24",
+"title": "India may review wheat export policy amid concerns over lower acreage",
+"url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNX21vZ2cxWkEyMFBsQkZmSllUelNCanZNMmVwZ2lNYW5LWHYtamlWblhIYWljZzdyYlpYSnBPcXRmUDd2UEpsUGJnaURzNkQzSnJ6R1Q5ZUoyejdVaEpLcXk2STFTbGxPYmYxM20zcUhoTWpvWV9EX0UwZG9EN0tVZGdYV0NVVkFfRGxjb0w3ZmE3OWVLcFdEY2c1MWZRMUZqbXh2ZWQ5ZVNGclNrX3puVWpXM0dlb2pWYWZ4NmhqTkFyRzhBa2VWaFpubXR4TG1UcEVUbHd6MNIB3AFBVV95cUxOSTJaYTZlOTR0bFN4RUR3LWVCeDJFd0Jxb0R3ZUtiSFFmYklfVnQzVVFEcmVDNzBGeWZpNmtUM1VBcWJfNTlzRVlDVkIzODc3LWFuQjJVbXhBUmVtbVVLQ2NTLVpTM0hMRzhGYlVycmF0WXNHVll1VzE2X29WVlduaG9ockFCU0RnekllS3BsU0hWaTJVM1NMMkxNSzBwS1d3WGlpOXZXMWY0UFRLRXdiU3A5M3d3bzZ0T2RBRTNKVGtxaFpPT0Zrem9Sa2k1TWdZaWJfVHRpZWVGbU1T?oc=5",
+"source": "Livemint",
+"official": false,
+"type": "Plans / reports",
+"industries": [
+"Other Agricultural Products"
+],
+"neg": false
 },
 {
 "key": "ciiwantsforeigninvestmentcapinpsubanksraisedto49",
@@ -2299,6 +2555,8 @@
 "cabinetapprovesrs4288croresecondcontainerterminalatkamarajarportintamilnadu",
 "cabinetapprovesrs4288crsecondcontainerterminalinkamarajarportandrs2014crsilcharairport",
 "newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
+"cabinetapproves4288crorecontainerterminalprojectatkamarajarport",
+"indiaclearsdefenceacquisitionproposalsworthrs360lakhcrore",
 "dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
 "hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
 "defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
@@ -2319,6 +2577,7 @@
 "cabinetapprovesrs4288croresecondcontainerterminalatkamarajarportintamilnadu",
 "cabinetapprovesrs4288crsecondcontainerterminalinkamarajarportandrs2014crsilcharairport",
 "newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
+"cabinetapproves4288crorecontainerterminalprojectatkamarajarport",
 "hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
 "adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
 ],
@@ -2326,6 +2585,7 @@
 "cabinetapprovesrs4288croresecondcontainerterminalatkamarajarportintamilnadu",
 "cabinetapprovesrs4288crsecondcontainerterminalinkamarajarportandrs2014crsilcharairport",
 "newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
+"cabinetapproves4288crorecontainerterminalprojectatkamarajarport",
 "hyundaisamsungeyeindiasshipbuildingpushascentrelinesuprs69725crorepackage",
 "adanigroupsvizhinjamportstakesalekeralamassemblyrecordscontradictstatesclaimofbeingkeptint"
 ],
@@ -2334,6 +2594,11 @@
 "newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
 "cabinetapprovesrs2014croregreenfieldairportatdolootoboostairconnectivityinsouthassam",
 "fromcieschemetonewsilcharairportcabinetapprovesprojectsworthnearlyrs20000crore",
+"cabinetapprovesindiasingaporemouonaviationmrosector",
+"cabinetapproves2014croregreenfieldairportatsilchar",
+"cabinetapprovesrs3630crorerevisedcostforconnectivitycorridortojewarinternationalairport",
+"cabinetapproves2014croregreenfieldairportatdolooinassam",
+"modicabinetapproves2014croregreenfieldairportinassamssilchar",
 "indiasadaniairporttoraise300millionviastakesale",
 "adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
 "cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
@@ -2346,6 +2611,11 @@
 "newassamairporttotamilnaduportexpansioncabinetclears18000croreinfrastructureprojects",
 "cabinetapprovesrs2014croregreenfieldairportatdolootoboostairconnectivityinsouthassam",
 "fromcieschemetonewsilcharairportcabinetapprovesprojectsworthnearlyrs20000crore",
+"cabinetapprovesindiasingaporemouonaviationmrosector",
+"cabinetapproves2014croregreenfieldairportatsilchar",
+"cabinetapprovesrs3630crorerevisedcostforconnectivitycorridortojewarinternationalairport",
+"cabinetapproves2014croregreenfieldairportatdolooinassam",
+"modicabinetapproves2014croregreenfieldairportinassamssilchar",
 "indiasadaniairporttoraise300millionviastakesale",
 "adaniairportholdingstoraisers2790crorefrom360oneassetat18billionvaluation",
 "cabinetapprovesmodifiedudanschemetodevelop100airportsatcostofover28000croreinnext10years",
@@ -2355,6 +2625,7 @@
 ],
 "Iron & Steel": [
 "tatasteeljswsteelsailjindalsteelcheckfreshtargetsonmetalstocksamidmeltdown",
+"steelpricesnearfouryearhighswhyanalystsexpecttherallytocoolinq4fy27",
 "aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
 "steelsh2showhingesonpricegainscostpressure",
 "tatasteeltoselltubespipesbusinessandtatasteelcolorstoaplapolloforrs28000crore",
@@ -2371,6 +2642,7 @@
 ],
 "Iron & Steel Products": [
 "tatasteeljswsteelsailjindalsteelcheckfreshtargetsonmetalstocksamidmeltdown",
+"steelpricesnearfouryearhighswhyanalystsexpecttherallytocoolinq4fy27",
 "aplapollostocktanks18onrs15510crorestakesaleplanstatasteelslidesnearly5",
 "steelsh2showhingesonpricegainscostpressure",
 "tatasteeltoselltubespipesbusinessandtatasteelcolorstoaplapolloforrs28000crore",
@@ -2387,6 +2659,7 @@
 ],
 "Aluminium": [
 "pmmodisremarksonhiringwagesechoinaluminiumindustryspleaformsmedutyrelief",
+"indianaluminiumbodyurgesgovernmenttohikeimportdutyto10regulatescrapconsignments",
 "aluminiumbodyseeksimportdutyhikesays4trillionpipelineatrisk",
 "aluminiumproductmakersseekzeroimportdutyonrawmetalaheadofbudget",
 "unionbudget2028aluminiumproductmakersseekdutyfreeimportsforprimarymetal",
@@ -2396,6 +2669,11 @@
 ],
 "Passenger Cars & Utility Vehicles": [
 "carbikeinsurancerulesmaychangegovtplanshigherpremiumsnofuelwithoutinsuranceaspartofmaj",
+"autoplischemedisburses4385croreinfirsteightmonthsoffy27",
+"pliautodisbursementssurgeto4385croreinfy27",
+"autoplischemedisburses4385croreinfy27investmentsexceedtargetby24",
+"pliautoschemerecordsrs4385crincentivedisbursementincurrentfiscalgovt",
+"pliautoschemeincentivedisbursementsreachrs4385croreinvestmentssurpasstarget",
 "autoplipayoutshit4365croresofarinfy27",
 "indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
 "autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
@@ -2409,6 +2687,11 @@
 ],
 "2/3 Wheelers": [
 "carbikeinsurancerulesmaychangegovtplanshigherpremiumsnofuelwithoutinsuranceaspartofmaj",
+"autoplischemedisburses4385croreinfirsteightmonthsoffy27",
+"pliautodisbursementssurgeto4385croreinfy27",
+"autoplischemedisburses4385croreinfy27investmentsexceedtargetby24",
+"pliautoschemerecordsrs4385crincentivedisbursementincurrentfiscalgovt",
+"pliautoschemeincentivedisbursementsreachrs4385croreinvestmentssurpasstarget",
 "autoplipayoutshit4365croresofarinfy27",
 "indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
 "autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
@@ -2422,6 +2705,11 @@
 ],
 "Auto Components & Equipments": [
 "carbikeinsurancerulesmaychangegovtplanshigherpremiumsnofuelwithoutinsuranceaspartofmaj",
+"autoplischemedisburses4385croreinfirsteightmonthsoffy27",
+"pliautodisbursementssurgeto4385croreinfy27",
+"autoplischemedisburses4385croreinfy27investmentsexceedtargetby24",
+"pliautoschemerecordsrs4385crincentivedisbursementincurrentfiscalgovt",
+"pliautoschemeincentivedisbursementsreachrs4385croreinvestmentssurpasstarget",
 "autoplipayoutshit4365croresofarinfy27",
 "indiasevecosystemexpandswithover46lakhvehiclessupportedundermhischemes",
 "autoplireportcardinvestmenthits104oftargetsalesjust23industryflagslocalisationcompliance",
@@ -2433,26 +2721,69 @@
 "indiasfestivecarbuyingjoyridemayhitpricehikebump",
 "gstcouncilproposes5gstoptionforevpassengertransportrentals"
 ],
+"Railway Wagons": [
+"cabinetapprovesfourrailwaymultitrackingprojectsworthrs9450crore",
+"cabinetapprovesrailwaymultitrackingprojectsworthrs18509croreacrossfourstates",
+"tendersfloatedfor4299crorebikkavoluduvvadaraillinestoeasecongestionaroundvisakhapatnam",
+"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
+"jupiterwagonsformsjvwithsouthkoreaswoojinformetropropulsionbiz",
+"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
+],
 "Civil Construction": [
+"cabinetapprovesfourrailwaymultitrackingprojectsworthrs9450crore",
+"cabinetapprovesrailwaymultitrackingprojectsworthrs18509croreacrossfourstates",
 "cabinetapprovestwoflyoversondelhismbroad",
 "tendersfloatedfor4299crorebikkavoluduvvadaraillinestoeasecongestionaroundvisakhapatnam",
 "cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
 "jupiterwagonsformsjvwithsouthkoreaswoojinformetropropulsionbiz",
 "pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
+],
+"Fertilizers": [
+"cabinetapprovesrs62370crorenutrientbasedsubsidyforpkfertilisersforrabi202627",
+"governmentunveilsroadmapforgreenureaproductionpushes724lakhmtgreenammoniaprocurementundern",
+"fertilizerstocksrallyafterunioncabinetapprovesmassive62370cragrisubsidy",
+"cabinetapproves62370crorefertilisersubsidyforrabi202627season"
+],
+"Aerospace & Defense": [
+"indiaclearsdefenceacquisitionproposalsworthrs360lakhcrore",
+"dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
+"defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
+"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
+"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"defenceministryclears212trillioninproposalsforthearmedforces",
+"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
+],
+"Explosives": [
+"indiaclearsdefenceacquisitionproposalsworthrs360lakhcrore",
+"dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
+"defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
+"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
+"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
+"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
+"dacclearsdefenceprocurementproposalsworth212lakhcrore",
+"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
+"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
+"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
+"defenceministryclears212trillioninproposalsforthearmedforces",
+"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
+"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
+"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
 ],
 "Road Assets - Toll Annuity Hybrid-Annuity": [
 "cabinetapprovestwoflyoversondelhismbroad",
 "cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam"
 ],
-"Railway Wagons": [
-"tendersfloatedfor4299crorebikkavoluduvvadaraillinestoeasecongestionaroundvisakhapatnam",
-"cabinetclearsrs18662croreunderwaterroadrailtunnelunderbrahmaputrainassam",
-"jupiterwagonsformsjvwithsouthkoreaswoojinformetropropulsionbiz",
-"pmmodiapplaudsmajorrailwayprojectsboostingconnectivityacrosssixindianstates"
-],
 "Other Agricultural Products": [
 "indiasnonbasmatiriceexportsurges67inapriloctober",
 "indiaweighswheatexportcurbsamidconcernsoverlowerproduction",
+"indiamayreviewwheatexportpolicyamidconcernsoverloweracreage",
 "indiaweighs20exportdutyonselectricevarietiestoboostdomesticsupplyreport",
 "indiaconsidersriceexportdutiesasdomesticpricesrisesourcessay",
 "indiaweighscurbsonnonbasmatiriceexportstocooldomesticprices",
@@ -2534,36 +2865,6 @@
 "sugarcanefarmerswelcomepanelbutwontendprotest",
 "governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
 ],
-"Aerospace & Defense": [
-"dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
-"defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
-"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
-"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
-"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
-"dacclearsdefenceprocurementproposalsworth212lakhcrore",
-"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
-"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
-"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
-"defenceministryclears212trillioninproposalsforthearmedforces",
-"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
-"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
-"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
-],
-"Explosives": [
-"dacclearsdefenceacquisitionproposalsworthrs110lakhcrore",
-"defencestockstakeoffbharatdynamicsbelbharatforgerally3keytriggersdrivingthegains",
-"worldairforcesdirectoryindiarafaleactivefighterjetsinventoryreducedto32from35defenceminist",
-"planforbiggerheavierstealthynextgenerationdestroyersgetsdefencecouncilsapproval",
-"defenceministryclears212lakhcroremilitaryacquisitionsincluding200helicopters",
-"dacclearsdefenceprocurementproposalsworth212lakhcrore",
-"defenceacquisitioncouncilclearscapitalacquisitionproposalswortharound212lakhcrore",
-"dronesgunsandmissileshieldsdacclearsrs212lakhcroredefenceproposalsforarmedforces",
-"dacclearsdefenceacquisitionproposalsworth212lakhcrore82tobesourceddomestically",
-"defenceministryclears212trillioninproposalsforthearmedforces",
-"rajnathleddefencecouncilclearsrs21lakhcrproposalsforchoppersairdefencesystemsdronesra",
-"dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
-"bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
-],
 "Oil Exploration & Production": [
 "over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
 "notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
@@ -2623,11 +2924,6 @@
 ],
 "Other Food Products": [
 "indiasfoodprocessinggrowthneedsbetterstorageandfarmmarketreforms"
-],
-"Fertilizers": [
-"governmentunveilsroadmapforgreenureaproductionpushes724lakhmtgreenammoniaprocurementundern",
-"fertilizerstocksrallyafterunioncabinetapprovesmassive62370cragrisubsidy",
-"cabinetapproves62370crorefertilisersubsidyforrabi202627season"
 ],
 "Hotels & Resorts": [
 "rs7597crorenh63nh563expansiontoboostconnectivitytradeandtourisminnortherntelangana"
