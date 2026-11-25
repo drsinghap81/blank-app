@@ -176,8 +176,14 @@ def main():
     syms = sorted({s for v in IND.values() for s in v} | {r["sym"] for r in rows})
     C, O, V = download([s + ".NS" for s in syms] + ["GOLDBEES.NS", "INR=X", "^NSEI"])
     C.columns = [c.replace(".NS", "") for c in C.columns]; O.columns = C.columns; V.columns = [c.replace(".NS", "") for c in V.columns]
-    ok = C["^NSEI"].notna(); C, O, V = C[ok], O[ok], V[ok]        # Indian sessions only (FX rows on NSE holidays break the rolling windows)
-    nifty = C["^NSEI"]; days = list(C.index[C.index >= START])
+    stk = [c for c in C.columns if c not in ("^NSEI", "INR=X", "GOLDBEES")]
+    ok = C[stk].notna().mean(axis=1) > 0.5; C, O, V = C[ok], O[ok], V[ok]   # Indian sessions only (FX rows on NSE holidays break the rolling windows)
+    try:                                                                       # Yahoo's Nifty can lag a day: NSE's own close fills it
+        ix = pd.read_csv("data/scan/index_ohlcv.csv.gz", parse_dates=["Date"]); ix = ix[ix.INDEX == "NIFTY 50"].set_index("Date").Close
+        C["^NSEI"] = C["^NSEI"].fillna(ix.reindex(C.index))
+    except Exception as ex:  # noqa: BLE001
+        print("nifty fill", ex)
+    nifty = C["^NSEI"].ffill(); days = list(C.index[C.index >= START])
     if not days:
         raise SystemExit("no trading days since the start")
     stock_cols = [s for s in syms if s in C.columns]
@@ -219,9 +225,9 @@ def main():
         for di, d in enumerate(days):
             ds = str(d.date()); px = C.loc[d]; op = O.loc[d]
 
-            def val(s):
-                v = px.get(s)
-                return float(v) if v is not None and np.isfinite(v) else hold[s]["last"]
+            def val(k_):                                     # holdings are keyed "sleeve:SYMBOL" (a stock can sit in two sleeves)
+                v = px.get(k_.split(":", 1)[-1])
+                return float(v) if v is not None and np.isfinite(v) else hold[k_]["last"]
             # gold / usd: buy on day one at the open
             if di == 0:
                 for k, ser in (("gold", gold), ("usd", usd)):
@@ -232,16 +238,16 @@ def main():
             dec = [f for f in PP if f < d]
             if dec and (pulse_next is None or dec[-1] != pulse_next):
                 pulse_next = dec[-1]; want = PP[pulse_next]["picks"]
-                cur = [s for s, h in hold.items() if h["sleeve"] == "pulse"]
+                cur = [k_[6:] for k_, h in hold.items() if h["sleeve"] == "pulse"]
                 for s in cur:
                     if s not in want:
-                        h = hold.pop(s); p = float(op.get(s) or val(s)) * (1 - COST); cash["pulse"] += h["qty"] * p
+                        h = hold.pop("pulse:" + s); p = float(op.get(s) or val("pulse:" + s)) * (1 - COST); cash["pulse"] += h["qty"] * p
                         closed.append(dict(sym=s, sleeve="pulse", sys="Pulse rotation", d=h["d"], dx=ds, e=h["e"], x=round(p, 2), qty=h["qty"],
                                            pnl=round(h["qty"] * (p - h["e"])), why="left the top 20 / its industry dropped out"))
                         log.append((ds, f"Pulse rotation: sold {s} at the open ({(p / h['e'] - 1) * 100:+.1f}%) - left the weekly list"))
-                new = [s for s in want if s not in hold]
+                new = [s for s in want if "pulse:" + s not in hold]
                 if new:
-                    slot = (cash["pulse"] + sum(hold[s]["qty"] * val(s) for s in hold if hold[s]["sleeve"] == "pulse")) / N
+                    slot = (cash["pulse"] + sum(hold[k_]["qty"] * val(k_) for k_ in hold if hold[k_]["sleeve"] == "pulse")) / N
                     for s in new:
                         p = float(op.get(s)) if op.get(s) is not None and np.isfinite(op.get(s)) else None
                         if not p:
@@ -250,14 +256,14 @@ def main():
                         if q <= 0:
                             log.append((ds, f"Pulse rotation: no cash left for {s}")); continue
                         cash["pulse"] -= q * p * (1 + COST)
-                        hold[s] = dict(sleeve="pulse", sys="Pulse rotation", qty=q, e=round(p * (1 + COST), 2), d=ds, s=None, last=p)
+                        hold["pulse:" + s] = dict(sleeve="pulse", sys="Pulse rotation", qty=q, e=round(p * (1 + COST), 2), d=ds, s=None, last=p)
                     log.append((ds, f"Pulse rotation (decided {pulse_next.date()}): bought {', '.join(new)}; holding {len([1 for h in hold.values() if h['sleeve'] == 'pulse'])}"))
             # Momentum / Cup 9/21 from the forward log
             book_val = sum(cash.values()) + sum(h["qty"] * val(s) for s, h in hold.items()) + units["gold"] * float(gold.get(d, 0) or 0) \
                 + units["usd"] * float(usd.get(d, 0) or 0) + (TBd.get(d, {}).get("pnl", 0)) + opt_cum
             for r in rows:
                 key = r["sym"]
-                if r["d0"] == ds and key not in hold and not any(c_["sym"] == key and c_["sleeve"] == "ath" and c_["d"] == ds for c_ in closed):
+                if r["d0"] == ds and "ath:" + key not in hold and not any(c_["sym"] == key and c_["sleeve"] == "ath" and c_["d"] == ds for c_ in closed):
                     e, s_ = float(r["e"]), float(r["s"])
                     nopen = len([1 for h in hold.values() if h["sleeve"] == "ath"])
                     if e <= s_ or nopen >= 10:
@@ -266,14 +272,15 @@ def main():
                     if q <= 0 or q * e < 0.03 * book_val:            # no token positions: at least 3% of the book
                         log.append((ds, f"{SYS_OK[r['sys']]}: {key} skipped - sleeve full (no cash)")); continue
                     cash["ath"] -= q * e * (1 + COST)
-                    hold[key] = dict(sleeve="ath", sys=SYS_OK[r["sys"]], qty=q, e=round(e * (1 + COST), 2), d=ds, s=s_, last=e, row=r["id"])
+                    hold["ath:" + key] = dict(sleeve="ath", sys=SYS_OK[r["sys"]], qty=q, e=round(e * (1 + COST), 2), d=ds, s=s_, last=e, row=r["id"])
                     log.append((ds, f"{SYS_OK[r['sys']]}: bought {q} {key} at {e:,.2f}, stop {s_:,.2f} (risk {q * (e - s_) / book_val * 100:.2f}% of the book)"))
-            for s, h in list(hold.items()):
+            for k_, h in list(hold.items()):
                 if h["sleeve"] != "ath":
                     continue
+                s = k_[4:]
                 r = next((x for x in rows if x["id"] == h.get("row")), None)
                 if r and r.get("st") in ("stop", "exit", "target") and r.get("end") == ds:
-                    p = float(r["e"]) * (1 + float(r.get("ret") or 0) / 100) * (1 - COST); cash["ath"] += h["qty"] * p; hold.pop(s)
+                    p = float(r["e"]) * (1 + float(r.get("ret") or 0) / 100) * (1 - COST); cash["ath"] += h["qty"] * p; hold.pop(k_)
                     closed.append(dict(sym=s, sleeve="ath", sys=h["sys"], d=h["d"], dx=ds, e=h["e"], x=round(p, 2), qty=h["qty"],
                                        pnl=round(h["qty"] * (p - h["e"])), why={"stop": "stop hit", "exit": "system exit", "target": "target"}[r["st"]]))
                     log.append((ds, f"{h['sys']}: sold {s} ({(p / h['e'] - 1) * 100:+.1f}%) - {closed[-1]['why']}"))
@@ -299,7 +306,7 @@ def main():
             closed.append(dict(sym=f"{t['sym']} FUT", sleeve="top_bottom", sys="Top Bottom", d=str(t.get("EntryDate"))[:10], dx=str(t.get("ExitDate"))[:10],
                                e=t.get("Entry"), x=t.get("Exit"), qty=t["lot"], pnl=round((t.get("Points") or 0) * t["lot"]), why=t.get("Reason") or ""))
         pos = [dict(sym=s, sleeve=h["sleeve"], sys=h["sys"], qty=h["qty"], e=h["e"], last=round(h["last"], 2), d=h["d"], value=round(h["qty"] * h["last"]),
-                    pnl=round(h["qty"] * (h["last"] - h["e"])), pct=round((h["last"] / h["e"] - 1) * 100, 2), stop=h.get("s")) for s, h in hold.items()] + TBopen
+                    pnl=round(h["qty"] * (h["last"] - h["e"])), pct=round((h["last"] / h["e"] - 1) * 100, 2), stop=h.get("s")) for s, h in ((k_.split(":", 1)[1], h) for k_, h in hold.items())] + TBopen
         V0 = eq[-1]["v"]; peak = 0; dd = 0.0
         for x in eq:
             peak = max(peak, x["v"]); dd = min(dd, x["v"] / peak - 1)
