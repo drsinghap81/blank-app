@@ -9,7 +9,8 @@ under the breakout candle's low, longer cups first, Rs 5 L, 1% risk, 20% max a s
     W2y  weekly 104-week rim >= 26 weeks old, >= 20% deep (the app's weekly cup)
   quick exits (all keep the wick stop):
     t10    out at the 10th session's close
-    2R     target 2 x risk, else out at the 10th session's close
+    2R     target 2 x risk (1:2), else out at the 10th session's close
+    2R15   1:2 target, at most 15 sessions; 3R15  1:3 target, at most 15 sessions (Amritpal: "1:2 or 1:3 trades")
     e9     a daily close below EMA 9 -> next open, at most 15 sessions
     pl     after +1R the stop trails the previous day's low, at most 15 sessions
     921    reference: EMA 9 < EMA 21 (no time limit)
@@ -27,18 +28,19 @@ import cup_swing_test as CS  # noqa: E402
 
 SETS = {"D1y": ("D", 250, 20, -0.15, -0.08), "D6m": ("D", 125, 15, -0.10, -0.06), "D3m": ("D", 63, 10, -0.08, -0.05),
         "W1y": ("W", 52, 8, -0.12, -0.08), "W2y": ("W", 104, 26, -0.20, -0.10)}
-EXITS = ("t10", "2R", "e9", "pl", "921")
+EXITS = ("t10", "2R", "2R15", "3R15", "e9", "pl", "921")
 
 
 def walk(o, h, l, c, e9, e21, j0, e, stop, xr):
-    n = len(c); R = e - stop; st = stop; lim = {"t10": 9, "2R": 9, "e9": 14, "pl": 14}.get(xr)
+    n = len(c); R = e - stop; st = stop; lim = {"t10": 9, "2R": 9, "2R15": 14, "3R15": 14, "e9": 14, "pl": 14}.get(xr)
+    k = {"2R": 2, "2R15": 2, "3R15": 3}.get(xr)
     for j in range(j0, n):
         if j > j0 and o[j] <= st:
             return j, o[j], "stop"
         if l[j] <= st:
             return j, st, "stop"
-        if xr == "2R":
-            t = e + 2 * R
+        if k:
+            t = e + k * R
             if j > j0 and o[j] >= t:
                 return j, o[j], "target"
             if h[j] >= t:
