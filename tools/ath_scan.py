@@ -48,8 +48,8 @@ BASE_MAIN, BASE_MIN = 24, 12
 # 25 Nov 2026 (Amritpal on AGARWALEYE: "close above the wick I will prefer"; tools/research/ath_confirm_test.py, NSE 2007-26):
 # entries wait for a daily CLOSE - Momentum (base >= 24 m): above the ATH-month high (10-slot CAGR 17.7% vs 12.6%, max DD -32%
 # vs -45%); Cup 9/21 (12-23 m): above every earlier intraday high (the wicks) (+8.8% a trade vs +5.7%, DD -12.8% vs -18.5%) -
-# then buy the NEXT session only, above that candle's high + 0.15%. NSE only (US/ASX keep the intraday trigger until tested).
-CONFIRM = MARKET == "NSE"
+# then buy the NEXT session only, above that candle's high + 0.15%. 25 Nov 2026 (Amritpal: "Apply it all across"): every market.
+CONFIRM = True
 CONF_BUF = 0.0015
 WSHORT, DSHORT = [], []   # 15 Nov 2026: reverse cup closes under a falling 30-week SMA (watch only; shorts lost in tests)
 WCLOSE, DCLOSE = [], []   # 15 Nov 2026: week / day CLOSED above the all-time high (cup >= 26 weeks & 20% / >= 20 days & 15%)

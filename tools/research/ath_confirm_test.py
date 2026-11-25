@@ -29,8 +29,14 @@ from global_universe import symbols  # noqa: E402
 COST = 0.004; BUF = 0.0015; COVID = (pd.Timestamp("2020-02-15"), pd.Timestamp("2020-12-31"))
 
 
+MKT = (os.environ.get("UNIV") or "NSE").upper()
+MINV = {"NSE": 2e7, "US": 5e6, "ASX": 1e6, "UK": 1e8}[MKT]
+COST = {"NSE": 0.004, "US": 0.001, "ASX": 0.002, "UK": 0.006}[MKT]
+BENCH = {"NSE": "^NSEI", "US": "^GSPC", "ASX": "^AXJO", "UK": "^FTSE"}[MKT]
+
+
 def load():
-    tick = list(symbols("NSE").ticker)
+    tick = list(symbols(MKT).ticker)
     if os.environ.get("PILOT"):
         tick = sorted(tick)[:150]
     out = {}
@@ -102,7 +108,7 @@ def trades_for(sym, x, reg):
             continue
         base = mk - am
         w = wk_idx[j]
-        if w < 30 or not bool(wk_ok.iloc[w]) or not (val[j] >= 2e7) or base < 12:
+        if w < 30 or not bool(wk_ok.iloc[w]) or not (val[j] >= MINV) or base < 12:
             pend.clear(); continue
         sysk = "tf" if base < 24 else "mom"
         trig = mh[am]
@@ -151,7 +157,8 @@ def port(X):
 
 
 def main():
-    nif = yf.download("^NSEI", start="2005-01-01", auto_adjust=True, progress=False)["Close"].squeeze()
+    print(f"R| market {MKT}, cost {COST * 100:.1f}%, min traded {MINV:,.0f}/day", flush=True)
+    nif = yf.download(BENCH, start="2005-01-01", auto_adjust=True, progress=False)["Close"].squeeze()
     reg = (nif > nif.rolling(200).mean()).to_dict()
     P = load(); T = []
     for s, x in P.items():
