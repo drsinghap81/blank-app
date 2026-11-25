@@ -195,7 +195,7 @@ function show(view) {
    system holds now (buckets.used), idle ETFs from your holdings, the rest as other holdings and cash. */
 const PIE_COL = { mom: 'var(--accent)', tf: '#7C8CFF', t9: '#A78BFA', rt: '#F472B6', pt: '#FB923C', s1: '#38BDF8', wc: '#FACC15', idle: '#2BB3A3', other: '#F2A93B', cash: 'var(--mute-line)' };
 const BK_SYS = { mom: 'Monthly ATH', tf: 'Trend 9/21', t9: '9/21 trend', rt: 'Breakout retest', pt: 'Bottom pattern' };
-const BK_SHORT = { mom: 'Momentum', tf: 'Trend 9/21', t9: '9/21 any', rt: 'Retest', pt: 'Pattern', s1: 'Weekly RSI', wc: 'Wealth' };
+const BK_SHORT = { mom: 'Momentum', tf: 'Trend 9/21', t9: '9/21 any', rt: 'Retest', pt: 'Pattern', s1: 'Weekly RSI', wc: 'Wealth', fl: 'Flags', gd: 'Gold', pr: 'Pulse' };
 const lakh = (v) => (Math.abs(v) >= 1e7 ? `₹${fmt(v / 1e7, 2)} Cr` : Math.abs(v) >= 1e5 ? `₹${fmt(v / 1e5, 1)} L` : `₹${fmt(v, 0, 'en-IN')}`);
 const IDLE_ETF = new Set(['LIQUIDBEES', 'LIQUIDCASE', 'NIFTYBEES', 'MID150BEES', 'GOLDBEES', 'MON100', 'MAFANG', 'JUNIORBEES', 'BANKBEES']);
 function donut(slices, size, w) {
@@ -755,7 +755,7 @@ const KIND_TXT = { PR: 'Pulse rotation · weekly pick', MY_GTT: 'Your pick · GT
 /* Systems as capital buckets (9 Nov 2026): % = the most of your capital a system may hold; all share one cash pool,
    Momentum first, swing buckets keep 15% in cash for Momentum. NSE one-account test 2017-26: Momentum <= 60% + Trend 9/21 <= 40%
    23.1%/yr, worst fall -21.4%; Momentum alone 17.3%, -16.8%. */
-const BK_DEF = { mom: 100, tf: 100, t9: 0, rt: 0, pt: 0, vcp: 0, my: 0, s1: 0, wc: 0, tb: 100, pr: 0 };   // optimised 9 Nov 2026; pr = Pulse rotation trial (22 Nov)
+const BK_DEF = { mom: 100, tf: 100, t9: 0, rt: 0, pt: 0, vcp: 0, my: 0, s1: 0, wc: 0, tb: 100, pr: 0, fl: 0, gd: 0 };   // optimised 9 Nov 2026; pr = Pulse rotation trial (22 Nov)
 // Angel-style track: stop ── entry ── now ── target, positioned to scale
 function slTrack(o) {
   const { stop, entry, now } = o; if (!(stop > 0 && entry > 0) || stop >= entry) return '';
@@ -772,8 +772,8 @@ function slTrack(o) {
     <div class="slt-lab"><span class="s" style="left:${P(stop)}%">${f(stop)}<small>Stop</small></span>${target ? `<span class="t" style="left:${P(target)}%">${f(target)}<small>${ref ? '2R mark' : 'Target' + (rr ? ' · ' + fmt(rr, 1) + 'R' : '')}</small></span>` : ''}</div>
     ${now ? `<div class="slt-foot"><span>Now ${f(now)} · <b class="${nowUp ? 'up' : 'down'}">${nowUp ? '+' : ''}${fmt((now / entry - 1) * 100, 1)}%</b></span>${!ref ? `<span>Target ${left > 0 ? `<b class="up">▲ ${fmt(left, 1)}%</b> away` : '<b class="up">reached</b>'}</span>` : `<span>Stop ${fmt((1 - stop / now) * 100, 1)}% below</span>`}</div>` : ''}${ref ? `<div class="slt-foot"><span>No fixed target · exit as tested: ${esc(o.exitTxt || 'trailing stop')}</span></div>` : ''}</div>`;
 }
-const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', vcp: 'VCP', my: 'My picks', s1: 'System 1', wc: 'Wealth Creation', tb: 'Top Bottom', pr: 'Pulse rotation' };
-const bkOf = (r) => r.bucket || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : (r.kind === 'PATTERN' || r.kind === 'PAT_STOP') ? 'pt' : r.kind === 'T921' ? 't9' : 'tf');
+const BK_NAME = { mom: 'Momentum Investing', tf: 'Trend Following 9/21', t9: '9/21 Trend (any stock)', rt: 'Breakout retest', pt: 'Bottom pattern', vcp: 'VCP', my: 'My picks', s1: 'System 1', wc: 'Wealth Creation', tb: 'Top Bottom', pr: 'Pulse rotation', fl: 'Flags', gd: 'Gold' };
+const bkOf = (r) => r.bucket || (r.system === 'Flag breakout' ? 'fl' : r.system === 'Gold' ? 'gd' : null) || (r.system === 'Monthly ATH' ? 'mom' : r.kind === 'RETEST' ? 'rt' : (r.kind === 'PATTERN' || r.kind === 'PAT_STOP') ? 'pt' : r.kind === 'T921' ? 't9' : 'tf');
 function lvAlloc(mk, P, S) {
   if (S && S.buckets) return { ...BK_DEF, ...Object.fromEntries(S.buckets.map((b) => [b.key, b.pct])) };
   let o = {}; try { o = JSON.parse(localStorage.getItem('td.alloc2_' + mk) || '{}'); } catch (e) { /* private mode */ }
@@ -862,6 +862,8 @@ async function lvCurveCard(box) {
   ch.timeScale().fitContent(); new ResizeObserver(() => ch.applyOptions({ width: el.clientWidth })).observe(el);
 }
 const BK_HEAD = {
+  fl: 'Flag, pennant or rectangle breakout on the last close (tight pause, volume dried up, 1.5× breakout volume, room to the next resistance). Buy next open, stop at the flag low, sell after a daily close below the 21-day EMA. New mix: 20%.',
+  gd: 'GOLDBEES held at your % of capital as a hedge, no stop, topped up when under 85% of the target, never sold by the app. New mix: 10%.',
   pr: 'Trial system (22 Nov 2026). Each Friday close: NSE industries in the top 10% by Pulse that are also Leading or Improving on rotation; hold the 10 strongest trending stocks of those industries (3-month return), equal weight = your % ÷ 10 a stock; a holding is sold when it drops out of the top 20 or its industry drops out. Buy and sell at Monday\'s open. If the traffic light is RED at the Friday close there is no basket that week (all sold, cash). Safety stop 20% below the buy (not part of the test). Tested NSE 2016–26 with the RED skip: 37.4%/yr, worst fall −23.0% (without it 34.5% / −35.9%; survivor stocks, so likely flattering). Starts at 0% — set a small % in Systems & allocation.',
   tf: 'Monthly breakout after a 1–2 year cup (same trigger as Momentum). Stop for sizing = EMA 21 (at least 4% under the entry); exit when a daily close has EMA 9 below EMA 21 — this tab lists the sell for the next open. NSE 2017–26: 10.5%/yr alone, worst fall −15.6%; tested exits 5-day-low + Supertrend and weekly 9/21 did worse.',
   t9: 'Daily EMA 9 crosses above EMA 21 on a stock in an uptrend; buy next open; stop = 5-day low (max 12%); exit when price closes below Supertrend(10,3). Uses the cash the other systems leave idle. NSE 2017–26: 20–26%/yr alone, worst fall −24 to −26%.',
@@ -2008,7 +2010,7 @@ async function lvSellBasket(E, btn) {
    an AUTO tag and no tick box. The earlier Live pages stay as "Full view" (settings, split, paper record, pies). */
 const scBadge = (x) => (x ? `<em class="scb ${x.g ? 'g' : ''}" title="On ${x.n} strategies today, ${x.g} graded Good in the backtest">${x.g} of ${x.n} good</em>` : '');
 const TR_MK = [['NSE', 'India'], ['US', 'US'], ['ASX', 'ASX']];   // futures: the Futures tab above
-const TR_SYS = { mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21', rt: 'Retest', pt: 'Pattern', vcp: 'VCP', my: 'My pick', pr: 'Pulse', s1: 'RSI', wc: 'Wealth' };
+const TR_SYS = { mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21', rt: 'Retest', pt: 'Pattern', vcp: 'VCP', my: 'My pick', pr: 'Pulse', s1: 'RSI', wc: 'Wealth', fl: 'Flags', gd: 'Gold' };
 async function loadTrade() {
   $('#title').textContent = 'Trade Live'; $('#asof').textContent = '';
   const el = $('#view-trade'); if (!el) return;
@@ -2093,7 +2095,7 @@ async function trIndia() {
   const buys = (S.rows || []).filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && r.want !== false && bkOf(r) !== 'my' && r.kind !== 'MY_GTT' && (al[bkOf(r)] ?? 0) > 0)   // 24 Nov: system signals only (Amritpal: "I want to stick to system")
     .map((r) => { const E = r.trigger || r.price;
       return { ...r, src: r, sys: TR_SYS[bkOf(r)] || r.system || '', value: r.value || r.qty * E,
-        line: `${isStopK(r.kind) || r.kind === 'MY_GTT' ? `buy above ${f(r.trigger)}` : `limit ${f(r.price)}`} · stop ${f(r.stop)} · risk ${money(r.risk_amt || r.qty * (E - r.stop), 'NSE')}`,
+        line: r.kind === 'GOLD' ? `limit ${f(r.price)} · hedge, no stop` : `${isStopK(r.kind) || r.kind === 'MY_GTT' ? `buy above ${f(r.trigger)}` : `limit ${f(r.price)}`} · stop ${f(r.stop)} · risk ${money(r.risk_amt || r.qty * (E - r.stop), 'NSE')}`,
         block: r.surv ? 'Surveillance list: place it in the Angel app' : '',
         auto: !!(A && A.stock_buy && !r.reserve && !r.outside && r.kind !== 'MY_GTT' && !r.surv) }; });
   const sells = (S.exits || []).filter((e) => e.qty > 0).map((e) => ({ ...e, src: e, sys: TR_SYS[bkOf(e)] || e.system || '', value: e.value || e.qty * (e.price || e.ltp || e.ref || 0),
@@ -9168,7 +9170,7 @@ async function loadStrat() {
     { k: 't9', name: '9/21 any stock', test: '21%/yr · off', ok: 1, rows: pl.filter((r) => bkOf(r) === 't9').map((r) => row(r.symbol, 'Switched off', { r, sc: r.score || 0 })) },
     { k: 'pt', name: 'Bottoming out', test: 'no edge', ok: 0, note: 'Watch only: W and triple bottoms did no better than a random stock in our tests.', rows: ((PT && PT.rows) || []).map((x) => row(x.symbol, `${x.kind && x.kind !== 'stock' ? (x.kind === 'index' ? 'Index · ' : 'Asset · ') : ''}${TYP[x.typ] || x.typ} · ${x.status === 'breakout' ? 'broke out' : fmt(x.to_neck_pct, 1) + '% to go'}`, { sc: x.status === 'breakout' ? 1 : 0, pt: x })) },
     { k: 'rt', name: 'Retest', test: 'weak', ok: 0, note: 'Watch only: a small edge per trade, but it lost money as a 10-stock portfolio.', rows: pl.filter((r) => bkOf(r) === 'rt').map((r) => row(r.symbol, 'At old breakout', { r, sc: r.score || 0 })) },
-    { k: 'fl', name: 'Flags & pennants', test: 'watch', ok: 0, note: 'Watch only. Tight flags (range ≤ 8%) where volume dried up, breaking out on 1.5× volume, with room of at least 0.8× the pole before the next old high on the left. Buy near the breakout close, stop under the flag low, sell on the first close below the 21-day average. Tested 2016-26: +2.8% a trade, positive in the last 2 years (buying next day above the breakout high did worse).',
+    { k: 'fl', name: 'Flags & pennants', test: '+3.2%/trade', ok: 1, note: 'Trades at your Flags % in Systems & allocation (starts at 0%; New mix 20%), breakouts on the last close only. Tight flags (range ≤ 8%) where volume dried up, breaking out on 1.5× volume, with room of at least 0.8× the pole before the next old high on the left. Buy near the breakout close, stop under the flag low, sell on the first close below the 21-day average. Tested 2016-26: +2.8% a trade, positive in the last 2 years (buying next day above the breakout high did worse).',
       ord: 1, rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2) + ' on 1.5× volume'} · exit below 21-day avg`, { sc: x.status === 'breakout' ? 2 : 1, fl: x, pri: (x.status === 'breakout' ? 4 : 0) + (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0) })) },
     { k: 'pr', name: 'Pulse rotation', test: 'trial · 37.4%/yr', ok: 1, note: PRJ ? `Weekly: top-10% Pulse industries that are Leading/Improving → 10 strongest trending stocks, equal weight, rebalanced each Friday (buy/sell Monday open); RED light at the Friday close = no basket that week${PRJ.red_skip ? ' - RED this Friday: cash this week' : ''}. Industries now: ${(PRJ.industries || []).map((x) => x.name).join(', ') || 'none'}. Forward test since ${PRJ.started}: ${prFwd(PRJ)}.` : 'Weekly picks appear after the first Friday scan.',
       rows: ((PRJ && PRJ.rows) || []).map((x) => row(x.symbol, `${x.since != null ? `${x.since >= 0 ? '+' : ''}${fmt(x.since, 1)}% since ${day(x.entry_d)} (in at ${fmt(x.entry, 2)}) · ` : ''}${x.industry || ''} · 3-month ${x.r3m >= 0 ? '+' : ''}${fmt(x.r3m, 0)}%${(PRJ.buys || []).includes(x.symbol) ? ' · NEW this week' : ''}`, { sc: 1 })) },

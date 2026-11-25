@@ -86,6 +86,17 @@ def buckets(mk):
                     "Safety stop 20% below the buy (not in the test).",
               test="NSE 2016-26 (survivors), Monday-open fills, 0.2% a side, RED-light skip: 37.4%/yr, worst fall -23.0%; last 1/2/3/5 years +19.7/+16.7/+40.6/+45.9% (without the skip 34.5% / -35.9%). "
                    "Trial: starts at 0% - set a small % to trade it.") if india else None,
+         dict(key="fl", name="Flags", system="Flag breakout", status="active", pct=0,
+              rules="Flag, pennant or rectangle after a 15%+ pole in an uptrend: tight pause (<= 8%), volume drying up, breakout close on 1.5x volume "
+                    "with room >= 0.8 x the pole to the next resistance. Buy next open (within 3% of the breakout close); stop the flag low; "
+                    "sell next open after a daily close below the 21-day EMA.",
+              test="NSE 2016-26: +3.2% a trade (1,151 trades, PF 1.79); in the New mix (Mom+Cup 40, Flags 20, Pulse 10, gold 10, US 20) "
+                   "since 2017 35.7%/yr with Top Bottom, worst fall -14%. Weak in 2025-26. Starts at 0% - set 20% for the New mix.") if india else None,
+         dict(key="gd", name="Gold", system="Gold", status="active", pct=0,
+              rules="GOLDBEES held at your % of capital as a hedge, no stop. Topped up when it is more than 15% under the target "
+                    "(buy next open). Never sold by the app.",
+              test="Gold moves against stocks; 10% gold in the New mix cut the worst fall since 2017 (-14% vs -22.6% for the old mix). "
+                   "Starts at 0% - set 10% for the New mix.") if india else None,
          dict(key="s1", name="System 1", status="off", pct=0, rules="Weekly RSI system (rules kept privately).",
               test="Off on NSE: below the Nifty in every version tested; a US paper candidate."),
          dict(key="wc", name="Wealth Creation", status="sip", pct=0, rules="ETF Pie funded by a monthly SIP, outside the systems' capital: Nifty 50, Midcap 150, Gold and US Nasdaq 100 ETFs at fixed weights (Equal, Balanced or Aggressive) rebalanced each quarter, or the monthly rotation (best 2 by 3-month return).", test="2016-26 monthly, price indices, 0.2% per switch: Equal 25% each 18.3%/yr, worst -15.7%; Balanced 30/20/30/20 17.6%, -14.7%; Aggressive 30/30/10/30 18.4%, -20.2%; rotation 17.7%, -12.8%; Nifty 50 11.6%, -29.3%.")]
@@ -361,6 +372,24 @@ def main(mk="NSE"):
                                      score=0, value_cr=None, sector=None, sector_rs=None, theme=None, theme_rs=None, stock_rs=None, aligned=False, td_score=None,
                                      group=g, lane=ln, group_pulse=gp, group_rank=gr)
     if india:
+        # 26 Nov 2026 (Amritpal: "Yes" - make Flags automatable so live matches the tested New mix, Flags 20%): the live flag rule
+        # (tight <= 8%, volume dries up, breakout candle >= 1.5x the 50-day average, room >= 0.8 x pole) on the LAST close only.
+        # Tested: buy the breakout close, stop the flag low, sell after a daily close below the 21-day EMA (+3.2% a trade, 1,151
+        # trades 2016-26). Live: a limit at the next open, at most 3% over that close (the app's chase rule). Starts at 0%.
+        for r in load(D + "flags.json").get("rows") or []:
+            if r.get("kind", "stock") != "stock" or r.get("status") != "breakout" or (r.get("days_since") or 0) > 0 or r["symbol"] in best:
+                continue
+            close, stop = num(r.get("close")), num(r.get("stop"))
+            if not close or not stop or close <= stop or close < MINPX[mk] or (close - stop) / close > 0.20:
+                continue
+            g0 = GS.get(r["symbol"]); x0 = LN.get(g0[0]) if g0 else None
+            g, ln, gp, gr = (g0[0] if g0 else None, x0[0] if x0 else None, x0[1] if x0 else None, x0[2] if x0 else None)
+            best[r["symbol"]] = dict(id=f"FL-{r['symbol']}-{r.get('bo_date')}", symbol=r["symbol"], name=r.get("name", ""), system="Flag breakout", bucket="fl",
+                                     kind="FLAG", order="LIMIT", when="next open", side="BUY", price=round(close * 1.01, 2), ref=close, stop=round(stop, 2),
+                                     target=num(r.get("target")), exit_rule="sell next open after a daily close below the 21-day EMA; stop at the flag low",
+                                     note=f"{r.get('shape') or 'Flag'} breakout {r.get('bo_date')} on {r.get('bo_vol_x')}x volume, pole +{r.get('pole_pct')}%",
+                                     score=1, value_cr=None, sector=None, sector_rs=None, theme=None, theme_rs=None, stock_rs=None, aligned=False, td_score=None,
+                                     group=g, lane=ln, group_pulse=gp, group_rank=gr)
         sup, pat = load(D + "support.json"), load(D + "patterns.json")
         for r in sup.get("rows") or []:
             if r.get("status") != "touched" or r.get("level_kind") != "breakout retest" or (r.get("days_ago") or 0) > 1:
@@ -421,11 +450,11 @@ def main(mk="NSE"):
                              note=f"VCP {cs} broke the pivot {piv:,.2f} on {r.get('bo_date')} on {r.get('bo_vol')}x volume")
     trades = [c for c in best.values() if c.get("bucket") == "mom"]
     trades.sort(key=lambda c: C.index(c))
-    KORD = {"TF_BRK": 0, "TF_STOP": 0, "T921": 1, "RETEST": 2, "PATTERN": 3, "PAT_STOP": 3, "VCP": 4, "VCP_STOP": 4}
+    KORD = {"TF_BRK": 0, "TF_STOP": 0, "T921": 1, "FLAG": 1, "RETEST": 2, "PATTERN": 3, "PAT_STOP": 3, "VCP": 4, "VCP_STOP": 4}
     swing = sorted([c for c in best.values() if c["kind"] in KORD],
                    key=lambda c: (LANE_ORD[c["lane"]], KORD[c["kind"]], -(c["value_cr"] or 0)))
     if india:   # every Trend 9/21 signal, the best 8 retests
-        keep = {id(x) for x in [c for c in swing if c["bucket"] in ("tf", "t9")] + [c for c in swing if c["kind"] == "RETEST"][:8]
+        keep = {id(x) for x in [c for c in swing if c["bucket"] in ("tf", "t9", "fl")] + [c for c in swing if c["kind"] == "RETEST"][:8]
                 + [c for c in swing if c["bucket"] == "vcp"][:12]}
         swing = [c for c in swing if id(c) in keep]
     else:   # keep all 9/21, the best 8 retests and 6 patterns, then order the lot top-down (industry lane, then 9/21 > retest > pattern)

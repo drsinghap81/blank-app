@@ -1558,3 +1558,48 @@ def test_opt_paper_public(tmp_path):
     assert r.status_code == 200
     j = r.json(); assert "days" in j
     assert all(set(d) <= {"day", "n", "pnl", "wins"} for d in j["days"])
+
+
+def test_flags_and_gold_sleeves(tmp_path):
+    """26 Nov 2026: Flags (stop at the flag low, exit on a close below EMA 21) and the Gold hedge (top-up to its %, no stop)."""
+    import json as _j
+    P0 = _j.load(open(os.path.join(HERE, "..", "..", "data", "scan", "trade_plan.json")))
+    P0["swing"] = [dict(id="FL-FLAGCO-2026-11-25", symbol="FLAGCO", name="Flag Co", system="Flag breakout", bucket="fl", kind="FLAG", order="LIMIT",
+                        when="next open", side="BUY", price=101.0, ref=100.0, stop=92.0, target=130.0, note="test", score=1, lane=None)] + (P0.get("swing") or [])
+    pf = tmp_path / "plan.json"; pf.write_text(_j.dumps(P0)); os.environ["PLAN_FILE"] = str(pf)
+    try:
+        A, c = client(tmp_path, live="1")
+        os.environ["PLAN_FILE"] = str(pf); A.ENV["PLAN_FILE"] = str(pf); A._plan.update(t=0, d=None)
+    finally:
+        pass
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.market_open = lambda t=None: False; A.amo_window = lambda t=None: True
+    A.chart_read = lambda sym: dict(close=100.0, ema21=90.0, ema9=95.0, sma30=None, week_close=None, n=200)
+    P = c.get("/api/plan", headers=h).json()
+    f = next(r for r in P["rows"] if r["symbol"] == "FLAGCO")
+    assert f.get("outside") and not any(r["symbol"] == "GOLDBEES" for r in P["rows"])          # both start at 0%
+    c.post("/api/picks", headers=h, json={"alloc": {"fl": 20, "gd": 10}})
+    P = c.get("/api/plan", headers=h).json()
+    f = next(r for r in P["rows"] if r["symbol"] == "FLAGCO"); g = next(r for r in P["rows"] if r["symbol"] == "GOLDBEES")
+    assert not f.get("outside") and f["qty"] > 0 and f["bucket"] == "fl"
+    assert g["kind"] == "GOLD" and not g["skip"] and g["qty"] * g["price"] <= 0.10 * 2000000 + g["price"] and g["qty"] * g["price"] > 0.09 * 2000000
+    assert A.protect_level("FLAG", 92.0) == 92.0 and A.protect_level("GOLD", 50.0) is None
+    j = c.post("/api/order", headers=h, json={"id": f["id"], "qty": f["qty"], "confirm": f"BUY {f['qty']} FLAGCO"}).json()
+    assert j["sent"] and j["protect"]["trigger"] == 92.0
+    jg = c.post("/api/order", headers=h, json={"id": g["id"], "qty": g["qty"], "confirm": f"BUY {g['qty']} GOLDBEES"}).json()
+    assert jg["sent"] and jg["protect"] is None
+    P2 = c.get("/api/plan", headers=h).json()
+    tg = next(t for t in P2["trades"] if t["symbol"] == "GOLDBEES"); assert tg["state"] == "open" and not tg.get("gtt_id")
+    assert not any(r["symbol"] == "GOLDBEES" and not r["skip"] for r in P2["rows"])            # at target: no new gold row
+    # top-up: the target doubles -> a new row; the fill adds to the same trade
+    c.post("/api/picks", headers=h, json={"alloc": {"gd": 20}}); A.MAX_POS_PCT = 0.2
+    g2 = next(r for r in c.get("/api/plan", headers=h).json()["rows"] if r["symbol"] == "GOLDBEES")
+    q0 = tg["qty"]; A.today_log = lambda: []
+    c.post("/api/order", headers=h, json={"id": g2["id"], "qty": g2["qty"], "confirm": f"BUY {g2['qty']} GOLDBEES"})
+    A.sync(); assert A.journal()["GOLDBEES"]["qty"] == q0 + g2["qty"] and "topup" not in A.journal()["GOLDBEES"]
+    assert not any(e["symbol"] == "FLAGCO" for e in c.get("/api/plan", headers=h).json()["exits"])   # above EMA 21: hold
+    # Flag exit: a daily close below EMA 21
+    A._ADC.clear(); A.chart_read = lambda sym: dict(close=90.0, ema21=95.0, ema9=94.0, sma30=None, week_close=None, n=200)
+    ex = next(e for e in c.get("/api/plan", headers=h).json()["exits"] if e["symbol"] == "FLAGCO")
+    assert ex["id"] == "EXIT-FL-FLAGCO" and ex["qty"] == f["qty"] and "21-day EMA" in ex["why"]
+    os.environ["PLAN_FILE"] = os.path.join(HERE, "..", "..", "data", "scan", "trade_plan.json")

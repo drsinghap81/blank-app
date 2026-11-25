@@ -99,10 +99,12 @@ def swing_risk() -> float:
 # Systems as buckets (9 Nov 2026): each may hold at most alloc% of capital; all share one cash pool (Momentum first,
 # swing buckets keep SWING_RESERVE in cash). NSE 2017-26 one-account test: Momentum <= 60% + Trend 9/21 <= 40% 23.1%/yr,
 # worst fall -21.4%, vs Momentum alone 17.3%, -16.8%. Top Bottom runs on pledge margin (its own bot), not this cash.
-BUCKETS = {"mom": 100, "tf": 100, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "my": 0, "s1": 0, "wc": 0, "tb": 100, "pr": 0}   # optimised 9 Nov (trade_plan.buckets); pr = Pulse rotation trial (22 Nov, starts at 0%)
+BUCKETS = {"mom": 100, "tf": 100, "t9": 0, "rt": 0, "pt": 0, "vcp": 0, "my": 0, "s1": 0, "wc": 0, "tb": 100, "pr": 0, "fl": 0, "gd": 0}   # optimised 9 Nov (trade_plan.buckets); pr = Pulse rotation trial (22 Nov, starts at 0%); fl / gd = Flags / Gold (26 Nov, start at 0%)
 PR_N = 10          # Pulse rotation: equal weight, your % / 10 a stock
 ALLOC_V = 3         # 24 Nov 2026 (Amritpal: "Remove capital split"): no caps on Momentum / Trend 9/21; older saved splits are dropped
-SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt", "VCP": "vcp", "My pick": "my", "Pulse rotation": "pr"}
+SYS_BUCKET = {"Monthly ATH": "mom", "Trend 9/21": "tf", "9/21 trend": "t9", "Breakout retest": "rt", "Bottom pattern": "pt", "VCP": "vcp", "My pick": "my", "Pulse rotation": "pr", "Flag breakout": "fl", "Gold": "gd"}
+GOLD_SYM = ENV.get("GOLD_SYM", "GOLDBEES")
+GOLD_BAND = 0.85     # 26 Nov 2026: the Gold sleeve is topped up when it is under 85% of its target (your % of capital)
 STOP_KINDS = ("ATH_STOP", "TF_STOP", "VCP_STOP", "PAT_STOP")   # buy-stop rows (stop-limit day orders); PAT_STOP 25 Nov 2026
 
 
@@ -484,7 +486,9 @@ def record_exit(sym, sell_px):
 def protect_level(kind, stop):
     if not stop:
         return None
-    return stop if kind in ("T921", "RETEST", "PATTERN", "PAT_STOP", "VCP", "VCP_STOP", "MY_GTT", "PR") else stop * (1 - ATH_NET_PCT)
+    if kind == "GOLD":
+        return None                                      # 26 Nov 2026: the gold hedge has no stop (as tested)
+    return stop if kind in ("T921", "RETEST", "PATTERN", "PAT_STOP", "VCP", "VCP_STOP", "MY_GTT", "PR", "FLAG") else stop * (1 - ATH_NET_PCT)
 
 
 def _slog(e, px, why):
@@ -700,6 +704,15 @@ def sync(acc=None):
               key=f"restored:{today}:{names}")
     for sym, e in list(J.items()):
         st = e.get("state", "open")
+        tu = e.get("topup") if isinstance(e, dict) else None
+        if tu and book.get(str(tu.get("order_id"))):     # 26 Nov 2026: a Gold top-up order -> add the filled units to the trade
+            o_ = book[str(tu["order_id"])]; s_ = str(o_.get("status", "")).lower(); f_ = int(o_.get("filled") or 0)
+            if s_ in ("complete", "cancelled", "rejected"):
+                if f_ > 0:
+                    q0 = int(e.get("qty") or 0); a_ = float(o_.get("avg") or tu.get("price") or 0)
+                    e["entry"] = round((q0 * float(e.get("entry") or a_) + f_ * a_) / (q0 + f_), 2) if q0 + f_ else a_
+                    e["qty"] = q0 + f_; log("topup_filled", symbol=sym, qty=f_, total=e["qty"])
+                e.pop("topup", None); changed = True
         o = book.get(str(e.get("order_id"))) if st in ("pending", "exiting") else None
         stat = str((o or {}).get("status", "")).lower()
         if st == "open" and e.get("qty") and 0 < held.get(sym, 0) < e["qty"]:
@@ -1033,6 +1046,56 @@ def adopt_release(body: Release, _=Depends(auth)):
     return dict(ok=True, released=sym)
 
 
+def flag_exits(J, held):
+    """26 Nov 2026: Flags' tested exit - a daily close below the 21-day EMA -> sell next open. The nightly plan doesn't know
+    who holds what, so the server checks its own Flag trades on Angel's daily candles."""
+    out = []
+    for sym, e in J.items():
+        if sym.startswith("_") or e.get("system") != "Flag breakout" or e.get("state") != "open" or held.get(sym, 0) <= 0:
+            continue
+        try:
+            r = chart_read(sym)
+        except Exception:  # noqa: BLE001
+            continue
+        if r.get("close") and r.get("ema21") and r["close"] < r["ema21"]:
+            out.append(dict(id=f"EXIT-FL-{sym}", symbol=sym, system="Flag breakout", side="SELL", order="LIMIT", when="next open", ref=r["close"],
+                            why=f"daily close {r['close']:,.2f} below the 21-day EMA {r['ema21']:,.2f}"))
+    return out
+
+
+def gold_row(J, AL, cap, ltp):
+    """26 Nov 2026 (Amritpal: "Yes" - make gold automatable, New mix gold 10%): a buy row for GOLDBEES when the Gold sleeve (the
+    app's own Gold trade, not ETFs you hold yourself) is under GOLD_BAND of your % of capital; sized up to the target. No stop."""
+    pct = float(AL.get("gd", 0) or 0)
+    if pct <= 0 or not cap:
+        return None
+    e = J.get(GOLD_SYM) or {}
+    mine = e.get("system") == "Gold"
+    if e and not mine and e.get("state") in ("open", "pending", "exiting"):
+        return None                                      # GOLDBEES is already in another system's trade
+    px = float(ltp.get(GOLD_SYM) or 0)
+    if not px:
+        try:
+            px = float(chart_read(GOLD_SYM).get("close") or 0)
+        except Exception:  # noqa: BLE001
+            px = 0.0
+    if px <= 0:
+        return None
+    tgt = pct / 100 * cap; cur = (int(e.get("qty") or 0) * px) if mine and e.get("state") == "open" else 0.0
+    base = dict(id=f"GD-{GOLD_SYM}-{ist_now().date().isoformat()}", symbol=GOLD_SYM, name="Gold ETF", system="Gold", bucket="gd", kind="GOLD",
+                side="BUY", order="LIMIT", when="next open", tier="swing", price=round(px * 1.01, 2), ref=round(px, 2), stop=None, risk_pct=None,
+                exit_rule="held as a hedge at your % of capital; topped up below 85% of it; never sold by the app",
+                note=f"Gold {pct:g}% of capital = {tgt:,.0f}; the sleeve holds {cur:,.0f}", score=0, surv=False, risk_amt=None)
+    if mine and (e.get("state") in ("pending", "exiting") or e.get("topup")):
+        return dict(base, qty=0, value=0, skip="order sent - waiting for the fill")
+    if cur >= GOLD_BAND * tgt:
+        return None
+    q = math.floor(min(tgt - cur, MAX_ORDER_VALUE, MAX_POS_PCT * cap) / (px * 1.01))
+    if q <= 0:
+        return None
+    return dict(base, qty=q, value=round(q * px * 1.01, 0), skip="")
+
+
 def adopted_exits(J, held):
     """sell signals for adopted holdings (the nightly plan only knows the scan's own stocks)."""
     out = []
@@ -1305,7 +1368,7 @@ def sized(acc=None):
         app_cap = 0.0
     cap = min(app_cap, acct) if app_cap > 0 and acct else acct      # capital set in the app, never above the account value
     N = picks(); RK = risk_now(); SR = swing_risk()
-    sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Trend 9/21", "Breakout retest", "Bottom pattern", "VCP", "My pick")]
+    sw_open = [s for s in sys_open if J[s].get("system") in ("9/21 trend", "Trend 9/21", "Breakout retest", "Bottom pattern", "VCP", "My pick", "Flag breakout")]
     AL = alloc(); ltp = {h["symbol"]: h.get("ltp") for h in acc["holdings"]}
     expo = {k: 0.0 for k in AL}
     for s_ in sys_open:
@@ -1332,6 +1395,9 @@ def sized(acc=None):
             q = math.floor(min((SR if r["tier"] == "swing" else RK) * cap / (E - stop), MAX_POS_PCT * cap / E, MAX_ORDER_VALUE / E))
         rows.append(dict(r, qty=max(0, q), value=round(max(0, q) * E, 0), risk_amt=round(max(0, q) * (E - stop), 0) if stop else None,
                          pct_cap=round(max(0, q) * E / cap * 100, 1) if cap else None, skip=why, surv=r["symbol"] in SV))
+    g_ = gold_row(J, AL, cap, ltp)
+    if g_:
+        rows.append(g_)
     # 22 Nov 2026 morning check: rule rows wait for the 09:09 reading, then skip when their industry opened red (unless overridden)
     try:
         M = morning_state(); tn = ist_now(); hmn = (tn.hour, tn.minute)
@@ -1360,6 +1426,14 @@ def sized(acc=None):
         sw = r["tier"] == "swing"
         bk = r.get("bucket") or ("tf" if sw else "mom"); r["bucket"] = bk
         E0 = r.get("trigger") or r["price"]
+        if bk == "gd":                                     # 26 Nov 2026: the gold hedge - its own target, no slot; cash only
+            if r["value"] > left:
+                q = math.floor(max(0.0, left) / E0)
+                if q <= 0 or q < 0.25 * r["qty"]:
+                    r["skip"] = "not enough cash"; continue
+                r["qty"], r["value"] = q, round(q * E0, 0); r["note"] = r.get("note", "") + " · cut to your cash"
+            r["pct_cap"] = round(r["qty"] * E0 / cap * 100, 1) if cap else None
+            left -= r["value"]; continue
         if bk == "pr":                                     # own slots (10) and room; no swing reserve / ATH slot rules
             if len(pr_open) + pr_used >= PR_N:
                 r["skip"] = "Pulse rotation already holds %d stocks" % PR_N; continue
@@ -1414,6 +1488,8 @@ def sized(acc=None):
           and (e["symbol"] not in J or not J[e["symbol"]].get("system") or J[e["symbol"]]["system"] == e.get("system"))]
     have = {x["symbol"] for x in ex}
     ex += [dict(x, qty=held.get(x["symbol"], 0)) for x in adopted_exits(J, held) if x["symbol"] not in have]
+    have = {x["symbol"] for x in ex}
+    ex += [dict(x, qty=min(held.get(x["symbol"], 0), int(J[x["symbol"]].get("qty") or 0) or held.get(x["symbol"], 0))) for x in flag_exits(J, held) if x["symbol"] not in have]
     if G["status"] == "paused":
         for r in rows:
             if not r["skip"]:
@@ -1697,7 +1773,9 @@ def order(body: Order, _=Depends(auth)):
         surv_mark(sym, False)
     log("order", order_id=oid, **rec)
     J = journal()
-    if side == "BUY":
+    if side == "BUY" and row.get("kind") == "GOLD" and (J.get(sym) or {}).get("system") == "Gold" and J[sym].get("state") == "open":
+        J[sym]["topup"] = dict(order_id=str(oid), qty=body.qty, price=float(p["price"]), day=t.date().isoformat())   # 26 Nov 2026: added on the fill (sync)
+    elif side == "BUY":
         J[sym] = dict(since=t.date().isoformat(), system=row.get("system"), kind=row.get("kind"), stop=row.get("stop"),
                       entry=float(p["price"]), qty=body.qty, order_id=str(oid), state="pending")
         if row.get("kind") in ("PATTERN", "PAT_STOP") and row.get("target"):
