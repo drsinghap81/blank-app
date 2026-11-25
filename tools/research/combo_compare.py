@@ -389,6 +389,32 @@ def allocation(curves, tb_overlay, lab_days):
     cur = [x for x in res if x[1] and abs(x[0][names.index("pulse")] - 0.5) < 1e-9 and abs(x[0][names.index("momcup")] - 0.5) < 1e-9]
     if cur:
         show("current paper book (Pulse 50 / Mom+Cup 50 + TB)", cur[0])
+    # 26 Nov 2026 (Amritpal: "Yes" to testing the proposed middle-path split): fixed candidates, each started FRESH with Rs 20 L in
+    # every window (so the one set of Top Bottom lots is sized to that money), newest window first
+    CANDS = [("Proposed: Mom+Cup 40, Flags 20, Pulse 10, gold 10, US RSI2 10, US TB 10", dict(momcup=.4, flags=.2, pulse=.1, gold=.1, us_rsi2=.1, us_tb_etf=.1)),
+             ("More US: Mom+Cup 30, Flags 20, Pulse 10, gold 10, US RSI2 15, US TB 15", dict(momcup=.3, flags=.2, pulse=.1, gold=.1, us_rsi2=.15, us_tb_etf=.15)),
+             ("No Pulse: Mom+Cup 50, Flags 20, gold 10, US TB 20", dict(momcup=.5, flags=.2, gold=.1, us_tb_etf=.2)),
+             ("Spread-out (optimiser): Mom+Cup 10, Flags 30, gold 20, US RSI2 20, US TB 20", dict(momcup=.1, flags=.3, gold=.2, us_rsi2=.2, us_tb_etf=.2)),
+             ("Paper book now: Pulse 50, Mom+Cup 50", dict(pulse=.5, momcup=.5))]
+    tbs = pd.Series(tbr, index=ix).cumsum()
+    print("R| ===== CANDIDATES, each window fresh with Rs 20 L (with / without India Top Bottom) =====", flush=True)
+    for nm, wd in CANDS:
+        w = np.array([wd.get(n, 0.0) for n in names])
+        if abs(w.sum() - 1) > 1e-6 or any(k not in names for k in wd):
+            print(f"R| {nm}: skipped (a sleeve is missing)", flush=True); continue
+        out = []
+        for wn, ws in WINDOWS:
+            m = np.array([d >= pd.Timestamp(ws) for d in ix])
+            if m.sum() < 3:
+                continue
+            r = R.values[m] @ w; P = np.cumprod(1 + r); r[0] = 0.0; P = np.cumprod(1 + r)
+            d_ = np.r_[0.0, np.diff(tbs.values[m])]
+            for tbon in (True, False):
+                E = P * (CAP + (np.cumsum(d_ / P) if tbon else 0.0))
+                yrs = (np.array(ix)[m][-1] - np.array(ix)[m][0]).days / 365.25; tot = E[-1] / CAP - 1
+                dd = float((E / np.maximum.accumulate(E) - 1).min())
+                out.append(f"{wn}{' +TB' if tbon else ''} {tot * 100:+.1f}%" + (f" ({((1 + tot) ** (1 / yrs) - 1) * 100:.1f}%/yr)" if yrs >= 0.9 else "") + f" DD {dd * 100:.1f}%")
+        print(f"R| {nm} | " + " | ".join(out), flush=True)
 
 
 if __name__ == "__main__":
