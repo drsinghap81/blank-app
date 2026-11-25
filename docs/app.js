@@ -8903,7 +8903,7 @@ async function tdRender3(el) {
   const red = L && L.lvl === 'red';
   const C = rows.map((r) => { const G = t3Grade(null, r, X); const e = r.trigger || r.price; const z = t2Shares(e, r.stop, mk);
     const sd = ((r.id || '').match(/(\d{4}-\d{2}-\d{2})$/) || [])[1] || null;   // 22 Nov 2026: signal date from the plan id
-    return { r, ...G, e, z, wait: !!r.trigger || (red && bkOf(r) === 'mom'), inv: bkOf(r) === 'mom', px: X.price(r.symbol), sd, isNew: !!sd && sd >= P.asof }; })
+    return { r, ...G, e, z, wait: !!r.trigger || (red && bkOf(r) === 'mom'), inv: bkOf(r) === 'mom', px: X.price(r.symbol), sd, isNew: (!!sd && sd >= P.asof) || /next session only/.test(r.when || '') }; })
     .sort((a, b) => (a.wait - b.wait) || (gOf(b.r.symbol) - gOf(a.r.symbol)) || ('ABC'.indexOf(a.g) - 'ABC'.indexOf(b.g)) || ((b.r.score || 0) - (a.r.score || 0)));
   /* 25 Nov 2026 (Amritpal: "how will a newcomer see information that is consistent with what you actually trade"): one source of
      truth. With the server connected, Today shows the server's own list (the one Trade Live sends): same stocks, same quantities,
@@ -8913,18 +8913,22 @@ async function tdRender3(el) {
   if (srvOn) {
     SV.buys.forEach((b) => { const r0 = b.src || b; let c = C.find((x) => x.r.symbol === b.symbol);
       if (!c) { const G = t3Grade(null, r0, X); const sd = ((r0.id || '').match(/(\d{4}-\d{2}-\d{2})$/) || [])[1] || null;
-        c = { r: r0, ...G, e: r0.trigger || r0.price, inv: bkOf(r0) === 'mom', px: X.price(r0.symbol), sd, isNew: !!sd && sd >= P.asof }; C.push(c); }
+        c = { r: r0, ...G, e: r0.trigger || r0.price, inv: bkOf(r0) === 'mom', px: X.price(r0.symbol), sd, isNew: (!!sd && sd >= P.asof) || /next session only/.test(r0.when || '') }; C.push(c); }
       c.srv = b; c.z = { q: b.qty, val: b.value }; c.wait = false; });
     const wm = {}; (SV.why || []).forEach((w) => { wm[w.symbol] = w.why; });
     srvNo = C.filter((c) => !c.srv).map((c) => ({ sym: c.r.symbol, sys: BK_SHORT[bkOf(c.r)] || c.r.system || '', why: wm[c.r.symbol] || 'not in your account plan (already held, already ordered, or set aside by the server)' }));
     (SV.why || []).forEach((w) => { if (!srvNo.some((x) => x.sym === w.symbol) && !C.some((c) => c.srv && c.r.symbol === w.symbol)) srvNo.push({ sym: w.symbol, sys: w.sys, why: w.why }); });
+    /* 26 Nov 2026 (Amritpal: "don't limit showing stocks with no buy due to capital"): signals blocked only by slots or cash stay in
+       Buy today as cards, marked, instead of folding away */
+    srvNo.forEach((x) => { if (/slot|cash/i.test(x.why || '')) { const c = C.find((q) => q.r.symbol === x.sym); if (c) c.room = /cash/i.test(x.why) ? 'Needs cash' : 'No free slot'; } });
+    srvNo = srvNo.filter((x) => !/slot|cash/i.test(x.why || '') || !C.some((q) => q.r.symbol === x.sym));
   }
   /* 26 Nov 2026 (Amritpal: "give me a replacement option - a stronger system buy for a non-system, weaker stock"): when system buys
      are blocked only by slots or cash, pair each with the weakest holding no system manages (Weak / Turning / Fading industry first,
      then the biggest loss). Selling goes through the "Not in any system" card on Trade Live (password + typed SELL n). */
   let swap = null;
   if (srvOn && mk === 'NSE') {
-    const blocked = srvNo.filter((x) => /slot|cash/i.test(x.why || '')).map((x) => C.find((c) => c.r.symbol === x.sym)).filter(Boolean);
+    const blocked = C.filter((c) => c.room && !c.srv);
     const oth = (SV.other || []).filter((h) => !h.etf && h.qty > 0);
     if (blocked.length && oth.length) {
       const GP = await loadGP('NSE').catch(() => null); const rowsG = ((GP && GP.rows) || []).map((r) => ({ ...r })); if (rowsG.length) gpShift(rowsG);
@@ -8936,7 +8940,7 @@ async function tdRender3(el) {
     }
   }
   /* same slots as the plan: up to 6 Momentum + 4 Trader buys a day; the rest fold under "more signals" */
-  const ready = srvOn ? C.filter((c) => c.srv) : C.filter((c) => !c.wait), waits = srvOn ? [] : C.filter((c) => c.wait);
+  const ready = srvOn ? C.filter((c) => c.srv || c.room) : C.filter((c) => !c.wait), waits = srvOn ? [] : C.filter((c) => c.wait);
   const buys = srvOn ? ready.slice() : ready.filter((c) => c.inv).slice(0, 6).concat(ready.filter((c) => !c.inv).slice(0, 4)).sort((a, b) => C.indexOf(a) - C.indexOf(b));
   const extraB = srvOn ? [] : ready.filter((c) => !buys.includes(c));
   const sells = srvOn ? (SV.sells || []).map((x) => ({ symbol: x.symbol, why: x.line || '' })) : (P.exits || []).filter((e) => H.has(e.symbol));
@@ -8956,7 +8960,7 @@ async function tdRender3(el) {
       <span class="t3-amt"><b>${c.z ? Lk(c.z.val) : '–'}</b><small>${c.z ? c.z.q.toLocaleString(MKT[mk].loc) + ' sh' : 'set capital'}</small></span></div>
       ${t3Bars(c.ch)}
       <div class="t3-pills">${SDt && SDt.by[r.symbol] ? t3Pill(SDt.by[r.symbol].g ? 'ok' : '', `${SDt.by[r.symbol].g} of ${SDt.by[r.symbol].n} tested good`) : ''}${c.isNew ? t3Pill('ok', 'New today') : c.sd ? t3Pill('', 'Signal ' + esc(day(c.sd))) : ''}${t3Px(c.px)}${t3Yoy(c.y)}${t3Pill('bad', `Stop −${fmt(c.stopP, 0)}%`)}${mk === 'NSE' ? govChip(r.symbol, 'NSE') : ''}</div>
-      <div class="t3-act"><button class="t3-why" data-why="${i}">Why?</button>${c.srv ? `<button class="t3-buy" data-go3="trade">Send ${c.z.q.toLocaleString(MKT[mk].loc)} ${r.trigger ? 'above' : 'at'} ${Mz(c.e, 0)} on Trade Live</button>` : `<button class="t3-buy" data-buy="${i}">${c.z ? `Buy ${c.z.q.toLocaleString(MKT[mk].loc)} at ${Mz(c.e, mk === 'NSE' ? 0 : 2)}` : 'Chart & plan'}</button>`}</div></article>`; };
+      <div class="t3-act"><button class="t3-why" data-why="${i}">Why?</button>${c.room && !c.srv ? `<button class="t3-buy off" data-go3="trade">${c.room}${r.trigger ? ` · buy above ${Mz(c.e, 0)}` : ''} · swap below</button>` : c.srv ? `<button class="t3-buy" data-go3="trade">Send ${c.z.q.toLocaleString(MKT[mk].loc)} ${r.trigger ? 'above' : 'at'} ${Mz(c.e, 0)} on Trade Live</button>` : `<button class="t3-buy" data-buy="${i}">${c.z ? `Buy ${c.z.q.toLocaleString(MKT[mk].loc)} at ${Mz(c.e, mk === 'NSE' ? 0 : 2)}` : 'Chart & plan'}</button>`}</div></article>`; };
   el.innerHTML = `<div class="t3">
     <div class="t3-top">${seg}<span class="muted">${P.asof ? 'Plan from the ' + esc(new Date(P.asof + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })) + ' close' : ''}</span></div>
     <section class="t3-tiles"><button class="t3-tile buy" data-show3="t3buys" aria-pressed="${state.t3Show === 't3buys'}"><small>Buy</small><b>${buys.length}</b><span>${buys.filter((c) => c.isNew).length} new · ${tot ? Lk(tot) : 'today'}</span></button>
@@ -8967,7 +8971,7 @@ async function tdRender3(el) {
       ${mk !== 'NSE' ? '' : srvOn ? `<p class="t3-src ok">✓ Your account${SV.real ? ' · real orders' : ' · dry run'}</p>` : `<p class="t3-src">Plan only · <button class="t3-link" data-go3="trade">log in on Trade Live</button> for your exact list${SV && SV.err ? ` <small>(${esc(SV.err)})</small>` : ''}</p>`}
       ${mode !== 'all' && mode !== 'inv' && mode !== 'tr' ? `<p class="t3-note">${esc(mode)} only · <button class="t3-link" data-m3="all">show all</button></p>` : ''}
       ${red ? '<p class="t3-note bad">Pause light: Momentum buys wait (tested: skipping red-light buys helped).</p>' : ''}
-      <div class="t3-grid">${shown.filter((c) => c.isNew).map(card).join('') || `<p class="empty">No new buy for you${shown.length ? ' · earlier ones below are still valid' : ''}${srvNo.length ? ` · ${srvNo.length} system signal${srvNo.length > 1 ? 's' : ''} blocked (${swap && swap.length ? 'see Swap below' : 'reasons at the bottom'})` : ''}.</p>`}</div>
+      <div class="t3-grid">${shown.filter((c) => c.isNew).map(card).join('') || `<p class="empty">No new buy${shown.length ? ' · earlier ones below' : ''}.</p>`}</div>
       ${shown.some((c) => !c.isNew) ? `<details class="t3-old" ${shown.every((c) => !c.isNew) ? 'open' : ''}><summary>Still valid from earlier days (${shown.filter((c) => !c.isNew).length})</summary><div class="t3-grid">${shown.filter((c) => !c.isNew).map(card).join('')}</div></details>` : ''}
       <div class="t3-grid">${state.t3All ? extraB.filter((c) => mode === 'all' || (mode === 'inv' ? c.inv : mode === 'tr' ? !c.inv : X.grp[c.r.symbol] === mode)).map(card).join('') : ''}</div>
       ${extraB.length && !state.t3All ? `<button class="t3-link" id="t3allb">+ ${extraB.length} more signals beyond today's slots</button>` : ''}</section>
