@@ -766,6 +766,13 @@ def sync(acc=None):
             if real_px:
                 px = round(real_px, 2)
             record_exit(sym, px); log("gone", symbol=sym, assumed_px=px, target=hit_tgt)
+            # 25 Nov 2026 (Amritpal: "when I sell in Angel will the GTT be cancelled automatically?"): sold by hand -> the app's stop
+            # GTT is still waiting on Angel; cancel it (a GTT that already fired is simply gone - the cancel error is ignored)
+            if e.get("gtt_id") and real_px:
+                try:
+                    broker.gtt_cancel(e["gtt_id"], sym); log("gtt_cancel", symbol=sym, gtt_id=e["gtt_id"], why="sold in Angel")
+                except Exception as ex:  # noqa: BLE001
+                    log("gtt_cancel_error", symbol=sym, error=str(ex)[:160])
             if hit_tgt:
                 alert("sold", sym, f"Target hit: {e.get('qty')} shares sold near ₹{e['target']:,.2f} (your stop + target GTT).", key=f"stop:{sym}:{today}")
             else:
