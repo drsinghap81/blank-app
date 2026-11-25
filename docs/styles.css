@@ -1943,3 +1943,7 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .t3-swr small { color: var(--slate); }
 .t3-swk { font-size: 11px; font-weight: 700; }
 .t3-swk.down { color: var(--down, #d64545); } .t3-swk.up { color: var(--up, #0a7a55); }
+/* 26 Nov 2026: Today review - actions first, market context below */
+.t3-ctxh { font-size: 15px; margin: 22px 0 6px; display: flex; align-items: baseline; gap: 8px; }
+.t3-ctxh small { font-weight: 400; color: var(--slate); font-size: 12px; }
+.t3-src { font-size: 12.5px; padding: 6px 10px; margin: 4px 0 8px; }
