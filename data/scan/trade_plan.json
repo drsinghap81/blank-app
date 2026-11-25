@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-25 22:07 UTC",
+"generated": "2026-11-25 23:19 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-25",
@@ -477,7 +477,7 @@
 "BAJAJCON"
 ],
 "morning_rule": false,
-"r3m": 12.0
+"r3m": null
 }
 ],
 "more": [],
@@ -730,7 +730,7 @@
 "r3m": 15.2
 },
 {
-"id": "T921-EICHERMOT-2026-11-23",
+"id": "T921-EICHERMOT-2026-11-25",
 "symbol": "EICHERMOT",
 "name": "Eicher Motors Limited",
 "system": "9/21 trend",
@@ -739,13 +739,13 @@
 "order": "LIMIT",
 "when": "next open",
 "side": "BUY",
-"price": 8254.23,
-"ref": 8172.5,
-"stop": 7610.5,
+"price": 8419.36,
+"ref": 8336.0,
+"stop": 7670.0,
 "exit_rule": "Supertrend(10,3) turns red -> sell next open",
-"note": "EMA 9/21 cross 2026-11-23, stop 7.4% below",
+"note": "EMA 9/21 cross 2026-11-25, stop 8.7% below",
 "score": 3,
-"value_cr": 454.08,
+"value_cr": 479.57,
 "sector": null,
 "sector_rs": null,
 "theme": null,
@@ -760,7 +760,7 @@
 "results_score": 0.75,
 "results_ind": "2/3 Wheelers",
 "rank": 1,
-"risk_pct": 8.5,
+"risk_pct": 9.8,
 "ind": "2/3 Wheelers",
 "ind_members": [
 "HEROMOTOCO",
@@ -1229,22 +1229,22 @@
 "r3m": 15.5
 },
 {
-"id": "T921-TCS-2026-11-23",
-"symbol": "TCS",
-"name": "Tata Consultancy Services Limited",
+"id": "T921-MPHASIS-2026-11-25",
+"symbol": "MPHASIS",
+"name": "MphasiS Limited",
 "system": "9/21 trend",
 "bucket": "t9",
 "kind": "T921",
 "order": "LIMIT",
 "when": "next open",
 "side": "BUY",
-"price": 2484.6,
-"ref": 2460.0,
-"stop": 2317.0,
+"price": 2558.23,
+"ref": 2532.9,
+"stop": 2333.0,
 "exit_rule": "Supertrend(10,3) turns red -> sell next open",
-"note": "EMA 9/21 cross 2026-11-23, stop 6.2% below",
+"note": "EMA 9/21 cross 2026-11-25, stop 8.6% below",
 "score": 3,
-"value_cr": 864.76,
+"value_cr": 194.5,
 "sector": null,
 "sector_rs": null,
 "theme": null,
@@ -1259,7 +1259,7 @@
 "results_score": 0.49,
 "results_ind": "Computers - Software & Consulting",
 "rank": 2,
-"risk_pct": 7.2,
+"risk_pct": 9.7,
 "ind": "Computers - Software & Consulting",
 "ind_members": [
 "INTELLECT",
@@ -1291,7 +1291,66 @@
 "DCI"
 ],
 "morning_rule": true,
-"r3m": 9.9
+"r3m": 4.2
+},
+{
+"id": "T921-CYIENT-2026-11-25",
+"symbol": "CYIENT",
+"name": "Cyient Limited",
+"system": "9/21 trend",
+"bucket": "t9",
+"kind": "T921",
+"order": "LIMIT",
+"when": "next open",
+"side": "BUY",
+"price": 1162.71,
+"ref": 1151.2,
+"stop": 1065.8,
+"exit_rule": "Supertrend(10,3) turns red -> sell next open",
+"note": "EMA 9/21 cross 2026-11-25, stop 8.0% below",
+"score": 3,
+"value_cr": 57.48,
+"sector": null,
+"sector_rs": null,
+"theme": null,
+"theme_rs": null,
+"stock_rs": null,
+"aligned": false,
+"td_score": null,
+"group": "Conglomerates",
+"lane": "weak",
+"group_pulse": 10.5,
+"group_rank": 58,
+"results_score": 0.42,
+"results_ind": "IT Enabled Services",
+"rank": 3,
+"risk_pct": 9.1,
+"ind": "IT Enabled Services",
+"ind_members": [
+"DATAMATICS",
+"IKS",
+"EXCELSOFT",
+"AFFLE",
+"AMAGI",
+"BBOX",
+"E2E",
+"AURUM",
+"EMUDHRA",
+"BLSE",
+"CYIENT",
+"LTTS",
+"IZMO",
+"PROTEAN",
+"CEINSYS",
+"SASKEN",
+"ZAGGLE",
+"GENESYS",
+"TATATECH",
+"DSSL",
+"NETWEB"
+],
+"morning_rule": true,
+"r3m": 30.3
 },
 {
 "id": "PR-KOTAKBANK-2026-11-20",
@@ -2477,7 +2536,7 @@
 "BAJAJCON"
 ],
 "morning_rule": false,
-"r3m": 12.0
+"r3m": null
 },
 {
 "id": "WATCH-PARAGMILK",
@@ -2513,18 +2572,7 @@
 "results_ind": "Dairy Products"
 }
 ],
-"exits": [
-{
-"id": "EXIT-T921-SSWL",
-"symbol": "SSWL",
-"system": "9/21 trend",
-"side": "SELL",
-"order": "LIMIT",
-"when": "next open",
-"ref": 490.45,
-"why": "Supertrend turned red"
-}
-],
+"exits": [],
 "missed": [
 {
 "symbol": "BIRLACABLE",
