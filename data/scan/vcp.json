@@ -1,43 +1,39 @@
 {
-"generated": "2026-11-25T04:57+00:00",
+"generated": "2026-11-25T05:49+00:00",
 "asof": "2026-11-24",
 "market": "NSE",
 "rules": "Stage 2 uptrend (close > EMA 50/150/200 stacked, EMA 200 rising, >= 30% above the 52-week low, within 25% of the high). Base from the highest swing high of the last 250 days; >= 2 contractions (zigzag 6% on highs/lows), each shallower with a higher low, the last <= 12%, volume drying up in the last one. Buy-stop just above the last contraction's high (pivot) on 1.4x volume; stop = the last contraction's low (max 10% away); sell after a daily close below EMA 50.",
 "backtest": "NSE 2017-26 (all stocks incl. delisted, costs): 221 trades, +4.9% a trade, 37% win; robust across 11 rule variants. Added to Momentum + Trend in one account: 24.2-24.7%/yr vs 23.1%, worst fall about the same, nothing extra in 2022-26. Watch bucket - your call.",
 "rows": [
 {
-"symbol": "CUPID",
-"name": "Cupid Limited",
-"close": 362.15,
-"pivot": 352.85,
-"stop": 329.6,
-"setup_date": "2026-11-11",
-"base_start": "2026-10-12",
-"dry": 0.63,
-"ema50": 325.88,
+"symbol": "ARTEMISMED",
+"name": "Artemis Medicare Services Limited",
+"close": 327.15,
+"pivot": 304.1,
+"stop": 280.35,
+"setup_date": "2026-11-04",
+"base_start": "2026-09-25",
+"dry": 0.46,
+"ema50": 316.02,
 "contractions": [
 {
-"h_date": "2026-10-12",
-"h": 368.95,
-"l_date": "2026-10-23",
-"l": 302.3,
-"depth": 18.1
+"h_date": "2026-09-25",
+"h": 378.8,
+"l_date": "2026-10-26",
+"l": 276.0,
+"depth": 27.1
 },
 {
-"h_date": "2026-11-03",
-"h": 352.85,
-"l_date": "2026-11-04",
-"l": 329.6,
-"depth": 6.6
+"h_date": "2026-10-27",
+"h": 304.1,
+"l_date": "2026-11-02",
+"l": 280.35,
+"depth": 7.8
 }
 ],
-"bo_date": "2026-11-12",
-"bo_vol": 3.5,
-"entry": 360.0,
-"days_since": 7,
-"risk_pct": 8.4,
-"ret_pct": 0.6,
-"status": "holding"
+"status": "forming",
+"to_pivot_pct": -7.0,
+"risk_pct": 7.8
 },
 {
 "symbol": "ADANIPORTS",
@@ -65,47 +61,83 @@
 "depth": 8.2
 }
 ],
-"bo_date": "2026-10-29",
-"bo_vol": 2.38,
-"entry": 1824.0,
-"days_since": 16,
-"risk_pct": 8.2,
-"ret_pct": 5.2,
-"status": "holding"
+"status": "forming",
+"to_pivot_pct": -5.0,
+"risk_pct": 8.2
 },
 {
-"symbol": "COFORGE",
-"name": "Coforge Limited",
-"close": 2142.3,
-"pivot": 1841.0,
-"stop": 1722.0,
-"setup_date": "2026-10-01",
-"base_start": "2026-08-31",
-"dry": 0.58,
-"ema50": 1947.22,
+"symbol": "SWANDEF",
+"name": "Swan Defence and Heavy Industries Limited",
+"close": 2864.6,
+"pivot": 2884.0,
+"stop": 2689.0,
+"setup_date": "2026-11-17",
+"base_start": "2026-10-13",
+"dry": 0.61,
+"ema50": 2736.37,
 "contractions": [
 {
-"h_date": "2026-08-31",
-"h": 2021.2,
-"l_date": "2026-09-16",
-"l": 1717.0,
-"depth": 15.1
+"h_date": "2026-10-13",
+"h": 3020.0,
+"l_date": "2026-10-30",
+"l": 2535.6,
+"depth": 16.0
 },
 {
-"h_date": "2026-09-18",
-"h": 1841.0,
-"l_date": "2026-09-29",
-"l": 1722.0,
+"h_date": "2026-11-11",
+"h": 2884.0,
+"l_date": "2026-11-16",
+"l": 2689.0,
+"depth": 6.8
+}
+],
+"status": "forming",
+"to_pivot_pct": 0.7,
+"risk_pct": 6.8
+},
+{
+"symbol": "BOSCH-HCIL",
+"name": "BOSCH HOME COMFORT INDIA LIMITED",
+"close": 1751.6,
+"pivot": 1820.0,
+"stop": 1701.1,
+"setup_date": "2026-11-20",
+"base_start": "2026-10-08",
+"dry": 0.67,
+"ema50": 1739.56,
+"contractions": [
+{
+"h_date": "2026-10-08",
+"h": 2037.0,
+"l_date": "2026-10-26",
+"l": 1585.0,
+"depth": 22.2
+},
+{
+"h_date": "2026-10-27",
+"h": 1742.7,
+"l_date": "2026-11-03",
+"l": 1601.1,
+"depth": 8.1
+},
+{
+"h_date": "2026-11-05",
+"h": 1760.0,
+"l_date": "2026-11-06",
+"l": 1640.4,
+"depth": 6.8
+},
+{
+"h_date": "2026-11-13",
+"h": 1820.0,
+"l_date": "2026-11-16",
+"l": 1701.1,
 "depth": 6.5
 }
 ],
-"bo_date": "2026-10-05",
-"bo_vol": 1.42,
-"entry": 1842.3,
-"days_since": 33,
-"risk_pct": 6.5,
-"ret_pct": 16.3,
-"status": "holding"
+"status": "forming",
+"to_pivot_pct": 3.9,
+"risk_pct": 6.5
 }
 ]
 }
