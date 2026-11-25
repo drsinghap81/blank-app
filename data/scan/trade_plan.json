@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-25 23:37 UTC",
+"generated": "2026-11-25 23:48 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-25",
@@ -179,7 +179,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": null
+"r3m": 18.7
 },
 {
 "id": "WAIT-LALPATHLAB",
@@ -1474,7 +1474,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 30.7
+"r3m": null
 },
 {
 "id": "PR-DCBBANK-2026-11-20",
@@ -1519,7 +1519,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": null
+"r3m": 18.7
 },
 {
 "id": "PR-AXISBANK-2026-11-20",
@@ -2103,7 +2103,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": null
+"r3m": 18.7
 },
 {
 "id": "WAIT-UNOMINDA",
