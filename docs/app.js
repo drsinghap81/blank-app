@@ -8880,6 +8880,7 @@ async function tdRender3(el) {
   el.innerHTML = `<div class="t3">
     <div class="t3-top">${seg}<span class="muted">${P.asof ? 'Plan from the ' + esc(new Date(P.asof + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })) + ' close' : ''}</span></div>
     <section class="t3-hero ${LV}"><span class="t3-word">${word}</span><div class="t3-hl"><b>${line}</b>
+      <small class="t3-lbl in">Where money is moving · information, not buys</small>
       <div class="t3-path">${chip(X.wq === 'L' ? 'ok' : X.wq === 'G' ? 'bad' : '', `World · ${esc(MKT[mk].name)} ${T3N[X.wq].toLowerCase()}`, 'data-go3="mk"')}${arrow}
         ${lead.length ? lead.map((x) => chip(x.n ? 'ok on' : '', `${esc(x.g)} leads${x.n ? ` · ${x.n} buy${x.n > 1 ? 's' : ''}` : ' · no buy yet'}`, x.n ? `data-ind3="${esc(x.g)}"` : 'data-go3="mk"')).join(arrow) : chip('', 'No industry leading', 'data-go3="mk"')}</div></div></section>
     ${t3Info(mk, L, X, buys)}
@@ -8888,6 +8889,7 @@ async function tdRender3(el) {
       <button class="t3-tile" data-show3="t3wait" aria-pressed="${state.t3Show === 't3wait'}"><small>Waiting</small><b>${waits.length}</b><span>orders set</span></button></section>
     ${sells.length ? `<section id="t3sells" class="t3-sec"><h2>Sell first</h2><div class="t3-sells">${sells.map((s) => `<button class="t3-sell" data-sell="${esc(s.symbol)}"><b>${esc(s.symbol)}</b><small>${esc(s.why || '')}</small></button>`).join('')}</div></section>` : ''}
     <section id="t3buys" class="t3-sec"><div class="t3-sh"><h2>Buy today</h2><div class="t3-seg" role="group" aria-label="Show">${[['all', 'All'], ['inv', 'Investor'], ['tr', 'Trader']].map(([k, n]) => `<button data-m3="${k}" aria-pressed="${mode === k}">${n}</button>`).join('')}</div></div>
+      <p class="t3-lbl">System signals · the only list you trade. Trade Live sends the ones your cash, holdings and slots allow; the rest show there under "not sendable".</p>
       ${mode !== 'all' && mode !== 'inv' && mode !== 'tr' ? `<p class="t3-note">${esc(mode)} only · <button class="t3-link" data-m3="all">show all</button></p>` : ''}
       ${red ? '<p class="t3-note bad">Pause light: Momentum buys wait (tested: skipping red-light buys helped).</p>' : ''}
       <div class="t3-grid">${shown.filter((c) => c.isNew).map(card).join('') || `<p class="empty">No new signal at the last close${shown.length ? ' - the ones below are still valid' : ''}.</p>`}</div>
@@ -8896,7 +8898,7 @@ async function tdRender3(el) {
       ${extraB.length && !state.t3All ? `<button class="t3-link" id="t3allb">+ ${extraB.length} more signals beyond today's slots</button>` : ''}</section>
     ${waits.length ? `<section id="t3wait" class="t3-sec"><h2>Waiting</h2><div class="t3-waits">${waits.map((c) => `<button class="t3-wt" data-why="${C.indexOf(c)}"><span class="t3-g g${c.g} sm">${c.g}</span><b>${esc(c.r.symbol)}</b><small>${c.r.trigger ? 'buys above ' + Mz(c.r.trigger, 2) : 'after the pause'}</small></button>`).join('')}</div></section>` : ''}
     <div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((q) => `<span><i style="background:${T3C[q]}"></i>${T3N[q]}</span>`).join('')}<span>· A/B/C = strength, not a rule</span></div>
-    <details class="t3-more"><summary>More: rotation maps, leading now, watch lists, is it working?</summary><div id="t3old"></div></details>
+    <details class="t3-more"><summary>More (information, not buys): rotation maps, leading now, watch lists, is it working?</summary><div id="t3old"></div></details>
     <p class="t3-foot"><button class="t3-link" id="t3v2">Old Today view</button> · <button class="t3-link" id="t3cls">Classic 8-tab layout</button></p></div>`;
   wireMk(); const ab = $('#t3allb'); if (ab) ab.addEventListener('click', () => { state.t3All = true; tdRender3(el); });
   el.querySelectorAll('[data-m3]').forEach((b) => b.addEventListener('click', () => { state.t3Mode = b.dataset.m3; tdRender3(el); }));
@@ -8945,7 +8947,7 @@ function t3Info(mk, L, X, buys) {
     cards.push(`<button class="ig2-card" data-ig="gov"><span class="ig2-ic" aria-hidden="true">🏛</span><small>Govt focus</small><b class="ig2-big">${gb}<span> of today's ${buys.length} buys</span></b>
       <span class="ig2-tag">Tap for every Govt focus stock on our systems</span></button>`);
   }
-  return cards.length ? `<section class="ig2" aria-label="Today at a glance">${cards.join('')}</section>` : '';
+  return cards.length ? `<section class="ig2" aria-label="Today at a glance: information, not buys">${cards.join('')}</section>` : '';
 }
 function fiiView(L) {
   const c = L && L.fii && L.fii.cash; if (!c) return; const H = (c.hist || []).slice(-60); const mx = Math.max(1, ...H.map((x) => Math.abs(x[1])));
