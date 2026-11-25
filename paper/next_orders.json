@@ -1,29 +1,29 @@
 {
   "BANKNIFTY": {
-    "date": "2026-11-23 00:00:00",
-    "close": 62600.8,
+    "date": "2026-11-25 00:00:00",
+    "close": 63946.8,
     "prev_top": 64556.6,
-    "prev_bottom": 61946.8,
+    "prev_bottom": 62600.8,
     "position": "LONG from 54,403.00 (2026-10-28)",
     "orders": [
-      "HOLD long. Stop: Sell below 61,922 \u2014 system point (exit & REVERSE)",
+      "HOLD long. Stop: Sell below 62,576 \u2014 system point (exit & REVERSE)",
       "Gap > 1% beyond a level at the open: exit only, no new trade (let the market settle)"
     ],
     "lines": {
       "Entry": 54403.0,
-      "Stop-loss (reverse)": 61921.8
+      "Stop-loss (reverse)": 62575.8
     },
-    "open_pnl": 8197.8,
+    "open_pnl": 9543.8,
     "breakeven_active": "True",
-    "futures_contract_expiry": "2026-11-23",
+    "futures_contract_expiry": "2026-12-29",
     "lot_size": 30,
-    "spot_close": 62585.35
+    "spot_close": 63703.25
   },
   "NIFTY": {
-    "date": "2026-11-23 00:00:00",
-    "close": 25369.5,
+    "date": "2026-11-25 00:00:00",
+    "close": 25937.0,
     "prev_top": 25775.3,
-    "prev_bottom": 25239.3,
+    "prev_bottom": 25369.5,
     "position": "LONG from 25,427.30 (2026-11-19)",
     "orders": [
       "HOLD long. Stop: Sell below 25,427 \u2014 breakeven SL (exit only)",
@@ -33,10 +33,10 @@
       "Entry": 25427.3,
       "Stop-loss": 25427.3
     },
-    "open_pnl": -57.8,
+    "open_pnl": 509.7,
     "breakeven_active": "True",
-    "futures_contract_expiry": "2026-11-23",
+    "futures_contract_expiry": "2026-12-29",
     "lot_size": 65,
-    "spot_close": 25349.65
+    "spot_close": 25819.25
   }
 }
