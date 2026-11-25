@@ -19,7 +19,15 @@ Systems (live rules, NSE, Yahoo daily checked against the bhavcopy, today's name
   pulse               Pulse rotation (weekly, tools/paper20.pulse_picks; the RED-light skip not replayed)
   +TB                 the six Top Bottom bots, 1 lot each on pledge margin (tools/paper20.top_bottom), added on top
 Book: equal slots of 10% of the book (a 50/50 book: 10 slots of 5% in each half), max 10 positions per sleeve, first come by
-entry date; costs inside each system's returns (0.4% / 0.2% / 0.4% a round trip). PILOT env = 150 stocks."""
+entry date; costs inside each system's returns (0.4% / 0.2% / 0.4% a round trip). PILOT env = 150 stocks.
+
+ALLOCATION (26 Nov 2026, Amritpal: "optimise and come out with a better allocation that makes return, US market also"):
+standalone daily curves 2017 -> now for each sleeve - Pulse rotation, Momentum + Cup (close confirm + lane), Flags, Bottoms, gold
+(GOLDBEES), US RSI(2) dip-buys (+2.5-ATR stretch, the moomoo bot's rules, S&P 500 members, 10 slots, in Rupees), US Top Bottom
+ETFs (QQQ / SMH / XLF / XLE, buy only, rules 1/2/2, equal weight, in Rupees) - plus the India Top Bottom six bots as an overlay on
+pledge (on / off). Weights in 10% steps (daily constant mix, a stand-in for monthly rebalancing). Chosen on 2017-2022 only
+(highest yearly return with a worst fall no deeper than -20%), then checked untouched on 2023-26 and since 9 Nov 2026.
+Survivor lists flatter every sleeve's absolute numbers; the comparison between sleeves is the useful part."""
 import json
 import os
 import sys
@@ -258,6 +266,121 @@ def main():
             st = stats(e, tbw); res.setdefault(wn, {})[nm] = st
             print(f"R| {nm:50s} return {st['ret']:+7.2f}% | {'CAGR ' + format(st['cagr'], '+.1f') + '%' if st['cagr'] is not None else '':12s} | worst fall {st['dd']:.1f}% | trades {sum(len(X) for _, X in sl2)}", flush=True)
     json.dump(res, open("data/research/combo_compare.json", "w"), indent=1)
+    days = [d for d in C.index if d >= pd.Timestamp("2017-01-02")]
+    curves = {"pulse": book([(1.0, PT[pd.to_datetime(PT.d) >= days[0]])], days, C),
+              "momcup": book([(1.0, sel("mom", "cup", lane=True))], days, C),
+              "flags": book([(1.0, sel("flag"))], days, C), "bottoms": book([(1.0, sel("bottom"))], days, C)}
+    try:
+        g = yf.download("GOLDBEES.NS", start="2016-06-01", auto_adjust=True, progress=False)["Close"].squeeze(); g.index = pd.to_datetime(g.index).tz_localize(None)
+        curves["gold"] = g
+    except Exception as ex:  # noqa: BLE001
+        print("gold", ex)
+    try:
+        ru, tu = us_curves(); curves["us_rsi2"] = ru; curves["us_tb_etf"] = tu
+    except Exception as ex:  # noqa: BLE001
+        print("R| US curves failed:", ex)
+    allocation(curves, TBs, days)
+
+
+# ---------------------------------------------------------------- allocation: sleeve curves and a walk-forward weight search
+def us_curves():
+    import io
+    import urllib.request
+    import topbottom_backtest as tbb
+    req = urllib.request.Request("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies", headers={"User-Agent": "Mozilla/5.0"})
+    tick = pd.read_html(io.StringIO(urllib.request.urlopen(req).read().decode()))[0].Symbol.str.replace(".", "-", regex=False).tolist()
+    if os.environ.get("PILOT"):
+        tick = tick[:120]
+    D = yf.download(tick + ["SPY", "QQQ", "SMH", "XLF", "XLE", "INR=X"], start="2015-01-01", auto_adjust=True, progress=False, threads=True)
+    stocks = [t for t in tick if t in D["Close"].columns]
+    O, H, L, Cc, Vv = (D[f][stocks] for f in ("Open", "High", "Low", "Close", "Volume"))
+    d_ = Cc.diff(); up = d_.clip(lower=0).ewm(alpha=0.5, adjust=False).mean(); dn = (-d_.clip(upper=0)).ewm(alpha=0.5, adjust=False).mean()
+    R2 = 100 - 100 / (1 + up / dn); S200 = Cc.rolling(200).mean(); S5 = Cc.rolling(5).mean(); E20 = Cc.ewm(span=20, adjust=False).mean()
+    TR = np.maximum(H - L, np.maximum((H - Cc.shift()).abs(), (L - Cc.shift()).abs())); ATR = TR.rolling(14).mean()
+    LIQ = (Vv.rolling(50).mean() > 2e6) & (Cc > S200); SR = (LIQ & (R2 < 10)).values; SS = (LIQ & ((E20 - Cc) / ATR > 2.5)).values
+    o, l, c, s5, a, r2, st = O.values, L.values, Cc.values, S5.values, ATR.values, R2.values, ((E20 - Cc) / ATR).values
+    cash, pos, eq = 1.0, {}, []
+    for t in range(210, len(Cc)):
+        for j in list(pos):
+            p = pos[j]; px = None
+            if np.isnan(c[t, j]):
+                continue
+            if l[t, j] <= p["st"]:
+                px = min(o[t, j], p["st"])
+            elif c[t, j] > s5[t, j] or t - p["t"] >= 7:
+                px = c[t, j]
+            if px is not None:
+                cash += p["q"] * px * 0.9995; del pos[j]
+        val = cash + sum(p["q"] * c[t, j] for j, p in pos.items() if np.isfinite(c[t, j])); eq.append(val)
+        cand = [(-st[t, j], 0, j) for j in np.where(SS[t])[0] if j not in pos] + [(r2[t, j], 1, j) for j in np.where(SR[t] & ~SS[t])[0] if j not in pos]
+        for _, _, j in sorted(cand, key=lambda x: (x[1], x[0])):
+            if len(pos) >= 10:
+                break
+            amt = min(val / 10, cash)
+            if amt < val / 20:
+                break
+            pos[j] = dict(q=amt / c[t, j], st=c[t, j] - 3 * a[t, j], t=t); cash -= amt * 1.0005
+    fx = D["Close"]["INR=X"].ffill()
+    rsi = pd.Series(eq, index=Cc.index[210:]); rsi.index = pd.to_datetime(rsi.index).tz_localize(None)
+    fx.index = pd.to_datetime(fx.index).tz_localize(None)
+    rsi_inr = rsi * fx.reindex(rsi.index).ffill()
+    etf = []
+    for s_ in ("QQQ", "SMH", "XLF", "XLE"):
+        x = pd.DataFrame({k: D[k][s_] for k in ("Open", "High", "Low", "Close")}).dropna(); x.index = pd.to_datetime(x.index).tz_localize(None)
+        t_ = tbb.run_live(x, tbb.Params(buffer_pct=0.05, buffer_pts=0, event_exit=False, long_only=True, day_sl_pct=1.0, max_sl_pct=2.0, be_pct=2.0, gap_pct=1.0))
+        inpos = pd.Series(0.0, index=x.index)
+        for r in t_.itertuples():
+            inpos[(x.index > pd.Timestamp(r.EntryDate)) & (x.index <= pd.Timestamp(r.ExitDate))] = 1.0
+        etf.append((1 + x.Close.pct_change().fillna(0) * inpos).cumprod())
+    tb_us = pd.concat(etf, axis=1).ffill().mean(axis=1)
+    tb_inr = tb_us * fx.reindex(tb_us.index).ffill()
+    return rsi_inr, tb_inr
+
+
+def allocation(curves, tb_overlay, lab_days):
+    """curves: name -> daily value series (any scale). tb_overlay: Rs P&L series for the India Top Bottom bots (on Rs 20 L)."""
+    import itertools
+    ix = sorted(set.intersection(*[set(v.dropna().index) for v in curves.values()]))
+    ix = [d for d in ix if d >= pd.Timestamp("2017-01-02")]
+    R = pd.DataFrame({k: v.reindex(ix).ffill().pct_change().fillna(0) for k, v in curves.items()})
+    tb = (tb_overlay.reindex(sorted(set(tb_overlay.index) | set(ix))).ffill().reindex(ix).fillna(0).diff().fillna(0) / CAP) if tb_overlay is not None else pd.Series(0.0, index=ix)
+    names = list(R.columns); grid = []
+    for w in itertools.product(range(0, 11), repeat=len(names)):
+        if sum(w) == 10:
+            grid.append(np.array(w) / 10)
+    def ev(rr, a, b):
+        x = rr[(rr.index >= a) & (rr.index < b)]
+        if len(x) < 5:
+            return None
+        e = (1 + x).cumprod(); yrs = (x.index[-1] - x.index[0]).days / 365.25
+        return dict(ret=round((e.iloc[-1] - 1) * 100, 2), cagr=round((e.iloc[-1] ** (1 / yrs) - 1) * 100, 1) if yrs >= 0.9 else None, dd=round(((e / e.cummax()) - 1).min() * 100, 1))
+    res = []
+    for tbon in (False, True):
+        for w in grid:
+            rr = pd.Series(R.values @ w + (tb.values if tbon else 0), index=ix)
+            ins = ev(rr, pd.Timestamp("2017-01-01"), pd.Timestamp("2023-01-01"))
+            res.append((w, tbon, ins))
+    ok = [x for x in res if x[2] and x[2]["dd"] >= -20]
+    best = sorted(ok, key=lambda x: -x[2]["cagr"])[:5]
+    calm = sorted([x for x in res if x[2]], key=lambda x: -(x[2]["cagr"] / max(1, -x[2]["dd"])))[:3]
+    def show(tag, x):
+        w, tbon, ins = x; rr = pd.Series(R.values @ w + (tb.values if tbon else 0), index=ix)
+        oos = ev(rr, pd.Timestamp("2023-01-01"), pd.Timestamp("2100-01-01")); nov = ev(rr, pd.Timestamp("2026-11-09"), pd.Timestamp("2100-01-01"))
+        y26 = ev(rr, pd.Timestamp("2026-01-01"), pd.Timestamp("2100-01-01"))
+        mix = ", ".join(f"{n} {int(round(v * 100))}%" for n, v in zip(names, w) if v > 0) + (" + India Top Bottom (pledge)" if tbon else "")
+        print(f"R| {tag}: {mix} | 2017-22 {ins['cagr']}%/yr DD {ins['dd']}% | 2023-26 {oos['cagr']}%/yr DD {oos['dd']}% | 2026 {y26['ret']:+.1f}% | since 9 Nov {nov['ret'] if nov else '-'}%", flush=True)
+    print("R| ===== ALLOCATION (weights chosen on 2017-2022, worst fall <= 20%; checked on 2023-26) =====", flush=True)
+    for k in names:
+        one = np.array([1.0 if n == k else 0.0 for n in names]); rr = pd.Series(R.values @ one, index=ix)
+        a_, b_ = ev(rr, pd.Timestamp("2017-01-01"), pd.Timestamp("2023-01-01")), ev(rr, pd.Timestamp("2023-01-01"), pd.Timestamp("2100-01-01"))
+        print(f"R| sleeve alone {k:22s} 2017-22 {a_['cagr']}%/yr DD {a_['dd']}% | 2023-26 {b_['cagr']}%/yr DD {b_['dd']}% | since 9 Nov {(ev(rr, pd.Timestamp('2026-11-09'), pd.Timestamp('2100-01-01')) or {}).get('ret')}%", flush=True)
+    for i, x in enumerate(best):
+        show(f"best #{i + 1}", x)
+    for i, x in enumerate(calm):
+        show(f"best return per unit of fall #{i + 1}", x)
+    cur = [x for x in res if x[1] and abs(x[0][names.index("pulse")] - 0.5) < 1e-9 and abs(x[0][names.index("momcup")] - 0.5) < 1e-9]
+    if cur:
+        show("current paper book (Pulse 50 / Mom+Cup 50 + TB)", cur[0])
 
 
 if __name__ == "__main__":
