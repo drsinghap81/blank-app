@@ -1,0 +1,27 @@
+name: paper20
+# Paper portfolio (Rs 20 L, every live system, with and without hedge) - tools/paper20.py -> data/scan/paper20.json
+on:
+  workflow_run:
+    workflows: ["trade-plan"]
+    types: [completed]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: paper20
+  cancel-in-progress: true
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -q numpy pandas yfinance requests lxml && python tools/paper20.py
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add data/scan/paper20.json; git diff --cached --quiet && exit 0
+          git commit -qm "Paper Rs 20 L portfolio $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 8; done
