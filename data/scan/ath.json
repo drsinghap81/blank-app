@@ -2,8 +2,8 @@
 "market": "NSE",
 "asof": "2026-11-25",
 "scan_date": "2026-11-26",
-"generated": "2026-11-25 19:03 UTC",
-"scanned": 2056,
+"generated": "2026-11-25 23:33 UTC",
+"scanned": 2054,
 "rules": {
 "base_main": 24,
 "base_min": 12,
