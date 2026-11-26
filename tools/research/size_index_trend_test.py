@@ -64,6 +64,21 @@ def main():
             T += AC.trades_for(s, x, reg)
         except Exception as e:  # noqa: BLE001
             print("err", s, e)
+    # 26 Nov 2026 (Amritpal: "apply these 4 rules, or at least 2, 3, 4, to all levels of top down"): the stock itself on the 4 Pulse
+    # rules, and the industry as an equal-weight index of its liquid members on rules 2-4 (and rule 1 vs the Nifty 500)
+    n5 = n500.reindex(C.index).ffill()
+    rpi = lambda X, k: 100 * (X / X.shift(k)).div(n5 / n5.shift(k), axis=0)      # noqa: E731
+    W_ = (rpi(C, 10) + rpi(C, 63) + rpi(C, 126)) / 3
+    e9_, e21_, s150_ = C.ewm(span=9, adjust=False).mean(), C.ewm(span=21, adjust=False).mean(), C.rolling(150).mean()
+    s234 = (e9_ > e21_) & (C > s150_) & (s150_ > s150_.shift(20)) & (C >= 0.75 * C.rolling(250, min_periods=120).max())
+    S4 = s234 & (W_ > 100)
+    R1d = (C / C.shift(1) - 1).clip(-0.2, 0.2)
+    liq = (C * Vv).rolling(60, min_periods=40).median() >= 2e7
+    IXI = pd.DataFrame({g: (1 + R1d[m].where(liq[m].shift(1, fill_value=False)).median(axis=1).fillna(0)).cumprod() for g, m in IND.items()})
+    I234 = {}; I4 = {}
+    for g in IXI.columns:
+        a_, _ = trend(IXI[g]); I234[g] = a_
+        I4[g] = a_ & ((IXI[g] / IXI[g].shift(63)) > (n5 / n5.shift(63)))
     T = pd.DataFrame(T); T = T[(T.d >= "2017-01-01") & (((T.sys == "tf") & (T.v == "B")) | ((T.sys == "mom") & (T.v == "C")))].copy().reset_index(drop=True)
 
     def prev(S, d):
@@ -85,6 +100,10 @@ def main():
     T["has_th"] = [bool(th_of.get(s)) for s in T.sym]
     T["th_tr"] = [any(on(TRI, t, d) for t in th_of[s]) if h else None for s, d, h in zip(T.sym, T.d, T.has_th)]
     T["lane"] = [(LN[ind_of[s]].iloc[max(LN.index.searchsorted(d) - 1, 0)] if s in ind_of and ind_of[s] in LN.columns else "none") for d, s in zip(T.d, T.sym)]
+    T["stk4"] = [bool(prev(S4[s], d)) if s in S4.columns else False for d, s in zip(T.d, T.sym)]
+    T["stk234"] = [bool(prev(s234[s], d)) if s in s234.columns else False for d, s in zip(T.d, T.sym)]
+    T["ind234"] = [bool(prev(I234[ind_of[s]], d)) if ind_of.get(s) in I234 else None for d, s in zip(T.d, T.sym)]
+    T["ind4"] = [bool(prev(I4[ind_of[s]], d)) if ind_of.get(s) in I4 else None for d, s in zip(T.d, T.sym)]
     lane_ok = ~T.lane.isin(["weak", "fade", "bounce"]); lane_strong = T.lane.isin(["build", "hold"])
     yes = lambda c: T[c].fillna(True).astype(bool)          # noqa: E731  no sector / theme index known -> not blocked
     F = {"all (old rules)": T.index == T.index,
@@ -101,6 +120,14 @@ def main():
          "ALL, sector/size also beating market": lane_ok & yes("mkt") & yes("size_rs") & yes("sec_rs") & yes("th_tr"),
          "ALL, Stage 2 only (softer)": lane_ok & yes("mkt_s2") & yes("size_s2") & yes("sec_s2"),
          "lane + sector": lane_ok & yes("sec_tr"),
+         "stock passes all 4 rules": T.stk4,
+         "stock passes rules 2-4": T.stk234,
+         "industry index rules 2-4": yes("ind234"),
+         "industry index all 4 rules": yes("ind4"),
+         "CHAIN 2-4: market+size+sector+industry+theme+stock": yes("mkt") & yes("size_tr") & yes("sec_tr") & yes("ind234") & yes("th_tr") & T.stk234,
+         "CHAIN 1-4 (beat market at size/sector/industry/stock)": yes("mkt") & yes("size_rs") & yes("sec_rs") & yes("ind4") & yes("th_tr") & T.stk4,
+         "CHAIN 2-4 + lane": lane_ok & yes("mkt") & yes("size_tr") & yes("sec_tr") & yes("ind234") & yes("th_tr") & T.stk234,
+         "lane + market + size + stock 4 rules": lane_ok & yes("mkt") & yes("size_tr") & T.stk4,
          "skipped by ALL (lane OK but some index not trending)": lane_ok & ~(yes("mkt") & yes("size_tr") & yes("sec_tr") & yes("th_tr"))}
     T["all_ok"] = F["ALL: lane + market + size + sector + theme"]
     for sysk, lab in (("tf", "CUP 9/21 (wick close)"), ("mom", "MOMENTUM (close confirm)")):
