@@ -1,5 +1,5 @@
 {
-"cash": 183472.92579978763,
+"cash": 397.3254251217477,
 "pos": {
 "ath:KOTAKBANK:2026-10-29": {
 "engine": "ATH",
@@ -131,6 +131,28 @@
 "last": 550.6,
 "stop_note": "weekly close < 30-wk SMA (489.4517)",
 "added": false
+},
+"ath:ICICIBANK:2026-11-09": {
+"engine": "ATH",
+"symbol": "ICICIBANK",
+"date": "2026-11-09",
+"sh": 106,
+"avg": 1577.0,
+"cost": 167622.00892875,
+"last": 1640.0,
+"stop_note": "weekly close < 30-wk SMA (1385.1367)",
+"added": false
+},
+"ath:ASAHIINDIA:2026-11-12": {
+"engine": "ATH",
+"symbol": "ASAHIINDIA",
+"date": "2026-11-12",
+"sh": 14,
+"avg": 1100.7987,
+"cost": 15453.591445915878,
+"last": 1195.3,
+"stop_note": "weekly close < 30-wk SMA (925.2117)",
+"added": false
 }
 },
 "done": [
@@ -152,6 +174,7 @@
 "921:SIMPLEXCAS.BO:2026-11-05",
 "921:SIMPLEXINF:2026-11-03",
 "921:SWANDEF:2026-11-09",
+"921:TCS:2026-11-23",
 "ath:ANGELONE:2026-11-13",
 "ath:ASAHIINDIA:2026-11-11",
 "ath:DCBBANK:2026-11-12",
@@ -159,12 +182,15 @@
 "ath:GUFICBIO:2026-11-09",
 "ath:HEGAM:2026-11-05",
 "ath:HONASA:2026-11-23",
+"ath:HONASA:2026-11-25",
 "ath:INDHOTEL:2026-11-06",
 "ath:INDHOTEL:2026-11-09",
+"ath:INDHOTEL:2026-11-23",
 "ath:KOTAKBANK:2026-10-30",
 "ath:LALPATHLAB:2026-11-04",
 "ath:MANAKCOAT:2026-11-12",
 "ath:POONAWALLA:2026-11-20",
+"ath:SAREGAMA:2026-11-16",
 "ath:ZYDUSLIFE:2026-11-02"
 ],
 "trades": [
@@ -205,5 +231,5 @@
 "why": "stop"
 }
 ],
-"tb_total": 218916.9230769231
+"tb_total": 260226.0
 }
