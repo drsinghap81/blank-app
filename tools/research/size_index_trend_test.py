@@ -149,6 +149,44 @@ def main():
          "lane + market + size + stock 4 rules": lane_ok & yes("mkt") & yes("size_tr") & T.stk4,
          "skipped by ALL (lane OK but some index not trending)": lane_ok & ~(yes("mkt") & yes("size_tr") & yes("sec_tr") & yes("th_tr"))}
     T["all_ok"] = F["ALL: lane + market + size + sector + theme"]
+    # 26 Nov 2026 (Amritpal: "I will rotate when the 9/21 signal goes away"): exit early when a top-down level's EMA 9 closes below
+    # EMA 21 - sold at the next day's close (stand-in for the next open), or the system's own exit if that comes first.
+    # New return = old return scaled by close(new exit) / close(old exit day) (exit prices approximated by closes).
+    Cn = C.ffill()
+
+    def early(row, series):
+        if series is None:
+            return row.dx, row.ret
+        s_ = series.loc[(series.index > row.d) & (series.index < row.dx)]
+        bad = s_[~s_.astype(bool)]
+        if not len(bad):
+            return row.dx, row.ret
+        i = Cn.index.searchsorted(bad.index[0]) + 1
+        if i >= len(Cn.index) or Cn.index[i] >= row.dx or row.sym not in Cn.columns:
+            return row.dx, row.ret
+        dn = Cn.index[i]; c0 = Cn.at[row.dx, row.sym] if row.dx in Cn.index else np.nan; c1 = Cn.at[dn, row.sym]
+        if not (np.isfinite(c0) and np.isfinite(c1) and c0 > 0):
+            return row.dx, row.ret
+        return dn, (1 + row.ret + AC.COST) * c1 / c0 - 1 - AC.COST
+
+    def any_down(row):
+        ks = [E9["NIFTY 500"], E9[SZ[row.size]]] + ([E9[sec_of[row.sym]]] if row.has_sec else []) + ([IE9[ind_of[row.sym]]] if ind_of.get(row.sym) in IE9 else [])
+        return pd.concat(ks, axis=1).reindex(Cn.index).ffill().fillna(True).astype(bool).all(axis=1)
+    ESER = {"size index 9/21 down": lambda r: E9[SZ[r.size]].reindex(Cn.index).ffill(),
+            "sector 9/21 down": lambda r: E9[sec_of[r.sym]].reindex(Cn.index).ffill() if r.has_sec else None,
+            "industry 9/21 down": lambda r: IE9[ind_of[r.sym]] if ind_of.get(r.sym) in IE9 else None,
+            "market 9/21 down": lambda r: E9["NIFTY 500"].reindex(Cn.index).ffill(),
+            "any level 9/21 down": any_down}
+    for sysk, lab in (("tf", "CUP 9/21"), ("mom", "MOMENTUM")):
+        for en, m in (("lane (live)", lane_ok), ("lane + 9/21 every level", lane_ok & yes("e_mkt") & yes("e_size") & yes("e_sec") & yes("e_ind") & yes("e_th") & T.e_stk)):
+            base = T[(T.sys == sysk) & m]
+            for xn, fn in ESER.items():
+                if len(base) < 20:
+                    continue
+                Y = base.copy(); nd = [early(r, fn(r)) for r in Y.itertuples()]
+                Y["dx"] = [z[0] for z in nd]; Y["ret"] = [z[1] for z in nd]
+                cg, dd = AC.port(Y); xr = Y[Y.d >= "2024-01-01"]
+                print(f"R| ROTATE {lab:8s} entry {en:24s} exit {xn:22s} n {len(Y):4d} | avg {Y.ret.mean() * 100:+6.2f}% | hold {((Y.dx - Y.d).dt.days).mean():4.0f}d | 2024+ {xr.ret.mean() * 100:+6.2f}% | 10-slot CAGR {cg:+.1f}% maxDD {dd:.1f}%", flush=True)
     for sysk, lab in (("tf", "CUP 9/21 (wick close)"), ("mom", "MOMENTUM (close confirm)")):
         print(f"R| ===== {lab} =====", flush=True)
         for nm, m in F.items():
