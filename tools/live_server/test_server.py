@@ -1621,8 +1621,14 @@ def test_momentum_index_gate(tmp_path):
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     g = next(r for r in c.get("/api/plan", headers=h).json()["rows"] if r["symbol"] == "GATECO")
     assert "index gate" not in (g["skip"] or "")
-    assert c.post("/api/picks", headers=h, json={"idx_gate": True}).json()["idx_gate"] is True
+    assert c.post("/api/picks", headers=h, json={"idx_gate": True}).json()["idx_gate"] == "trend"
     P = c.get("/api/plan", headers=h).json(); g = next(r for r in P["rows"] if r["symbol"] == "GATECO")
-    assert g["skip"].startswith("index gate") and "Midcap 150" in g["skip"] and P["idx_gate"] is True
-    assert c.post("/api/picks", headers=h, json={"n": 10}).json()["idx_gate"] is True          # other saves keep it
+    assert g["skip"].startswith("index gate") and "Midcap 150" in g["skip"] and P["idx_gate"] == "trend"
+    assert c.post("/api/picks", headers=h, json={"n": 10}).json()["idx_gate"] == "trend"       # other saves keep it
+    # 26 Nov 2026: RSI mode uses rsi_ok, not idx_ok
+    P0["top"][0].update(idx_ok=True, rsi_ok=False, rsi_why="Nifty Midcap 150 weekly RSI 55 (needs 60)"); pf.write_text(_j.dumps(P0)); A._plan.update(t=0, d=None)
+    assert not next(r for r in c.get("/api/plan", headers=h).json()["rows"] if r["symbol"] == "GATECO")["skip"].startswith(("index gate", "RSI gate"))
+    assert c.post("/api/picks", headers=h, json={"idx_gate": "rsi60"}).json()["idx_gate"] == "rsi60"
+    g = next(r for r in c.get("/api/plan", headers=h).json()["rows"] if r["symbol"] == "GATECO"); assert g["skip"].startswith("RSI gate") and "55" in g["skip"]
+    assert c.post("/api/picks", headers=h, json={"idx_gate": "off"}).json()["idx_gate"] == "off"
     os.environ["PLAN_FILE"] = os.path.join(HERE, "..", "..", "data", "scan", "trade_plan.json")

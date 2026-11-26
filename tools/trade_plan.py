@@ -500,6 +500,25 @@ def main(mk="NSE"):
                 ix_ = {"large": "NIFTY 50", "mid": "NIFTY MIDCAP 150", "small": "NIFTY SMALLCAP 250"}[sz]
                 bad = [k for k in ("NIFTY 500", ix_) if not idx_gate[k]["ok"]]
                 c_.update(size=sz, size_index=ix_, idx_ok=not bad, idx_why=(" and ".join(b_.title() for b_ in bad) + " not trending") if bad else "")
+            # 26 Nov 2026 (Amritpal: "Yes" to weekly RSI >= 60 as a gate mode): weekly RSI(14) of the last week COMPLETED before the
+            # signal day's week, on the Nifty 500, the stock's size index and its sector index (no sector index -> not blocked).
+            # NSE 2017-26 with the lane: Momentum 19.0%/yr, worst fall -5.6% vs 28.9% / -30.0% (tools/research/size_index_trend_test.py)
+            asof_ = pd.Timestamp(Hh.index[-1]); wk_end = asof_ + pd.Timedelta(days=(4 - asof_.weekday()) % 7)
+
+            def wrsi(k):
+                w_ = Hh[k].dropna().resample("W-FRI").last(); d_ = w_.diff()
+                up_ = d_.clip(lower=0).ewm(alpha=1 / 14, adjust=False).mean(); dn_ = (-d_.clip(upper=0)).ewm(alpha=1 / 14, adjust=False).mean()
+                r_ = (100 - 100 / (1 + up_ / dn_)); r_ = r_[r_.index < wk_end].dropna()
+                return round(float(r_.iloc[-1]), 1) if len(r_) else None
+            wr = {k: wrsi(k) for k in Hh.columns}
+            for k in idx_gate:
+                idx_gate[k]["wrsi"] = wr.get(k)
+            SECJ = load(D + "sectors.json"); s_ind, i_ix = SECJ.get("symbols") or {}, SECJ.get("industries") or {}
+            for c_ in trades:
+                sx = i_ix.get(s_ind.get(c_["symbol"]))
+                chk = [("NIFTY 500", wr.get("NIFTY 500")), (c_["size_index"], wr.get(c_["size_index"]))] + ([(sx, wr.get(sx))] if sx and wr.get(sx) is not None else [])
+                bad = [f"{k.title()} weekly RSI {v:.0f}" for k, v in chk if v is None or v < 60]
+                c_.update(sector_index=sx, rsi_ok=not bad, rsi_why=(", ".join(bad) + " (needs 60)") if bad else "")
         except Exception as ex:  # noqa: BLE001
             print("index gate failed", ex)
     exits = list(vexits)

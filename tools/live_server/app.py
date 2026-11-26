@@ -237,7 +237,15 @@ class Picks(BaseModel):
     swing_risk: float | None = None
     capital: float | None = None     # trading capital set in the app; 0 = use the account value; never above the account value
     alloc: dict | None = None        # bucket -> max % of capital it may hold (Live "Systems & allocation")
-    idx_gate: bool | None = None     # 26 Nov 2026: Momentum buys only while the Nifty 500 and the stock's size index trend
+    idx_gate: bool | str | None = None   # 26 Nov 2026: Momentum gate - "off", "trend" (Nifty 500 + size index trend) or "rsi60" (weekly RSI >= 60: market, size, sector)
+
+
+def gate_mode(v) -> str:
+    """26 Nov 2026: the Momentum index gate mode. True (the first version's tick box) = "trend"."""
+    if v is True:
+        return "trend"
+    v = str(v or "off").lower()
+    return v if v in ("trend", "rsi60") else "off"
 
 
 @app.post("/api/picks")
@@ -251,7 +259,7 @@ def set_picks(body: Picks, _=Depends(auth)):
     for k, v in (body.alloc or {}).items():
         if k in BUCKETS:
             al[k] = max(0.0, min(100.0, float(v)))
-    ig = bool(cfg.get("idx_gate")) if body.idx_gate is None else bool(body.idx_gate)
+    ig = gate_mode(cfg.get("idx_gate")) if body.idx_gate is None else gate_mode(body.idx_gate)
     json.dump(dict(n=n, swing_risk=sr, capital=capv, alloc=al, alloc_v=ALLOC_V, idx_gate=ig, at=time.time()), open(os.path.join(DATA, "picks.json"), "w"))
     log("picks", n=n, swing_risk=sr, capital=capv, alloc=al, idx_gate=ig)
     return dict(picks=n, risk_pct=round(risk_now() * 100, 2), swing_risk_pct=round(swing_risk() * 100, 2), capital=capv, alloc=alloc(), idx_gate=ig)
@@ -1383,16 +1391,18 @@ def sized(acc=None):
     cash = acc["cash"]
     rows = []; SV = surv_load()
     try:
-        IG = bool(_picks_cfg().get("idx_gate"))
+        IG = gate_mode(_picks_cfg().get("idx_gate"))
     except Exception:  # noqa: BLE001
-        IG = False
+        IG = "off"
     for r in plan_rows(P):
         E = r.get("trigger") or r["price"]; stop = r["stop"]
         q = 0; why = ""
         if r["symbol"] in held:
             why = "already held"
-        elif IG and r.get("bucket") == "mom" and r.get("idx_ok") is False:
+        elif IG == "trend" and r.get("bucket") == "mom" and r.get("idx_ok") is False:
             why = f"index gate: {r.get('idx_why') or 'market / size index not trending'}"
+        elif IG == "rsi60" and r.get("bucket") == "mom" and r.get("rsi_ok") is False:
+            why = f"RSI gate: {r.get('rsi_why') or 'weekly RSI under 60'}"
         elif r["symbol"] in J and J[r["symbol"]].get("state") == "pending":
             why = "order sent - waiting for the fill"
         elif r.get("bucket") == "pr" and E > 0:          # 22 Nov 2026: equal weight = your Pulse rotation % / 10 a stock
