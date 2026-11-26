@@ -1093,7 +1093,7 @@ def test_opt_trader_paper_and_live(tmp_path):
             dict(symbol="ABC", kind="stock", strike=100, expiry="2026-11-23", lot=500, atm_vol5=5)]
     T = O.OptTrader(b, str(tmp_path), lambda: rows, lambda: {"rows": {"ABC": {"q": 5}, "NIFTY": {"q": 4}, "BANKNIFTY": {"q": 3}}}, log=lambda *a, **k: None)
     lull, now0 = O.CFG["lull"], O.now_ist
-    O.CFG["lull"] = ("23:00", "23:30"); T.set_live(True)
+    O.CFG["lull"] = ("23:00", "23:30"); T.set_live(True); ex0 = O.CFG["exit"]; O.CFG["exit"] = "atr2"
     try:
         for upto in range(10, 26):
             T._bars = lambda token, u=upto: data[token[:-2]][token[-2:].lower()][:75 + u]
@@ -1133,7 +1133,7 @@ def test_opt_trader_paper_and_live(tmp_path):
         H = T.status()["history"]
         assert H["compare"]["n"] == 2 and H["compare"]["entry_slip_pct"] == 0 and H["live_pnl"] == H["compare"]["live"]
     finally:
-        O.CFG["lull"] = lull; O.now_ist = now0
+        O.CFG["lull"] = lull; O.now_ist = now0; O.CFG["exit"] = ex0
 
 
 def test_opt_trader_fetches_earlier_days_once(tmp_path):
@@ -1670,3 +1670,27 @@ def test_opt_live_exit_sell_first():
     t = dict(key="X|CE", signal="s", tsym="X26CE", token="1", lot=50, exit=10.0, live_entry=9.0, live_stop_oid="S1")
     T._live_exit(t, T.b.order_map())
     assert calls == ["sell", "alert"] and not t.get("stop_cancelled") and t["live_state"].startswith("SELL FAILED - stop kept")
+
+
+def test_opt_half_at_1r():
+    """27 Nov 2026 (Amritpal: "start with 2 lots and book 1 lot at 1R"): 2 lots - at entry + 1R half is sold (live: SELL first, then the
+    stop for the rest at the entry), the rest leaves on a close below the 5 EMA; P&L adds both parts."""
+    import opt_trader as O
+    calls = []
+
+    class B:
+        def ltp_ex(self, *a): return 120.0
+        def nfo_order(self, tsym, token, side, qty, price, trigger=None, tick=0.05):
+            calls.append((side, qty, trigger)); return f"O{len(calls)}"
+        def cancel_order(self, oid, v="NORMAL"): calls.append(("cancel", oid))
+    T = O.OptTrader.__new__(O.OptTrader); T.b = B(); T.alert = lambda *a, **k: None; T.note = lambda *a, **k: None
+    t = dict(key="X|CE", signal="s", tsym="X26CE", token="1", lot=100, lot1=50, lots_n=2, entry=100.0, stop=90.0, stop0=90.0,
+             state="open", live_entry=100.0, live_stop_oid="S1", live_stop=90.0)
+    T._book_half(t, 110.0, "2026-11-27T10:00")
+    assert t["half"]["qty"] == 50 and t["lot"] == 50 and t["stop"] == 100.0
+    assert calls[0] == ("SELL", 50, None) and calls[1] == ("cancel", "S1") and calls[2] == ("SELL", 50, 100.0)
+    T._hist = lambda t: None
+    T._close(t, 104.0, "2026-11-27T10:30", "close below 5 EMA")
+    assert t["pnl"] == round((104 - 100 - 1) * 50) + round((110 - 100 - 1) * 50)
+    t1 = dict(key="Y|CE", signal="s", tsym="Y", token="2", lot=50, lot1=50, lots_n=1, entry=100.0, stop=90.0, stop0=90.0, state="open")
+    T._book_half(t1, 110.0, "x"); assert not t1.get("half")

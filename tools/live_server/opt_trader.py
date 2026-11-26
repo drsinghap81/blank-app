@@ -26,7 +26,11 @@ from datetime import date, datetime, timedelta, timezone
 
 IST = timezone(timedelta(hours=5, minutes=30))
 CFG = dict(max_open=3, lots=1, day_loss=10000.0, lull=("11:00", "14:30"), last_entry="15:00", eod="15:15", trig_bars=3,
-           limit_pct=0.01, top=30, tick=0.05, asx_metal=0.005, exit="atr2", restop_pct=0.01)
+           limit_pct=0.01, top=30, tick=0.05, asx_metal=0.005, exit="ema5_half1", restop_pct=0.01)
+# 27 Nov 2026 (Amritpal: "Yes, but start with 2 lots and book 1 lot at 1R"; option backtest v15, 304 trades: the 5-EMA close beat the
+# 2 ATR trail, +2.0% vs +1.1% of premium a trade): exit "ema5_half1" = with 2+ lots, sell half the lots at entry + 1R (R = entry - first
+# stop), move the rest's stop to the entry, then out on a 5-minute close below the 5 EMA (or the stop, or 15:15). With 1 lot: 5 EMA only.
+# "atr2" (26 Nov) is still available.
 # 20 Nov 2026 (Amritpal "Yes" after tools/research/asx_metal_filter.py, 2016-26, 12 metal F&O stocks, 32k stock-days): when ASX
 # 200 Materials lags the ASX 200 by > 0.5% that day, Indian metal stocks rose open->close on only 38% of days (avg -0.49%); when it
 # leads by > 0.5%, 52% (+0.18%) vs 45% (-0.12%) on all days. So: no CE on a metal stock on a weak-ASX-materials day, no PE on a strong one.
@@ -531,7 +535,7 @@ class OptTrader:
         if self.day_pnl() <= -CFG["day_loss"]:
             self.st["stopped"] = True; self.note("daily loss limit reached: no new entries today"); return
         trig = rnd(A[i][2] + CFG["tick"], up=True); lim = rnd(trig * (1 + CFG["limit_pct"]), up=True)
-        t = dict(key=key, symbol=u["symbol"], side=side.upper(), tsym=info["tsym"], token=info["token"], lot=lot, signal=A[i][0],
+        t = dict(key=key, symbol=u["symbol"], side=side.upper(), tsym=info["tsym"], token=info["token"], lot=lot, lot1=u["lot"], lots_n=CFG["lots"], signal=A[i][0],
                  sig_low=A[i][3], trigger=trig, limit=lim, state="pending", bars_waited=0, pcr_q=q, nf=round(nf, 2), bn=round(bn, 2),
                  live=self.live())
         if t["live"]:
@@ -588,18 +592,54 @@ class OptTrader:
                     if ns > t["stop"]:
                         t["stop"] = ns
                 if x[3] <= t["stop"]:
-                    self._close(t, min(t["stop"], x[1]), x[0], "2 ATR trail stop" if t["stop"] > t.get("stop0", t["stop"]) else "stop"); break
+                    why = ("2 ATR trail stop" if CFG.get("exit") == "atr2" else "breakeven stop") if t["stop"] > t.get("stop0", t["stop"]) else "stop"
+                    self._close(t, min(t["stop"], x[1]), x[0], why); break
+                if CFG.get("exit") == "ema5_half1" and not t.get("half") and (t.get("lots_n") or 1) >= 2:
+                    tg = rnd(t["entry"] + (t["entry"] - t.get("stop0", t["stop"])))
+                    if x[2] >= tg:
+                        self._book_half(t, max(tg, x[1]), x[0])
                 if CFG.get("exit") != "atr2" and x[4] < e5[k]:
                     self._close(t, x[4], x[0], "close below 5 EMA"); break
                 t["hi"] = max(t["hi"], x[2])
                 if x[0][11:16] >= CFG["eod"]:
                     self._close(t, x[4], x[0], "15:15 square-off"); break
             if t["state"] == "open":
-                t["now"] = A[last][4]; t["upnl"] = round((A[last][4] - t["entry"] - 0.01 * t["entry"]) * t["lot"])
+                t["now"] = A[last][4]; t["upnl"] = round((A[last][4] - t["entry"] - 0.01 * t["entry"]) * t["lot"]) + int((t.get("half") or {}).get("pnl") or 0)
                 self._live_restop(t, A[last][4])
             # a live stop that filled on Angel closes the live side even if the candles have not shown it yet
             if live_o is not None and t.get("live_stop_oid") and om and str((om.get(t["live_stop_oid"]) or {}).get("status", "")).lower() == "complete":
                 t["live_exit"] = (om[t["live_stop_oid"]].get("avg") or t["stop"]); t["live_state"] = "stopped on Angel"
+
+    def _book_half(self, t, px, at):
+        """27 Nov 2026: 1R reached - book half the lots (paper at the 1R price), the rest's stop moves to the entry. Live: SELL the half
+        first (limit 2% under the last price), then replace the Angel stop with one for the remaining lots at the entry. A refused sell
+        keeps the full stop and alerts; nothing more is sold."""
+        n = int(t.get("lots_n") or 1); ls = int(t.get("lot1") or (t["lot"] // max(1, n))); qh = (n // 2) * ls
+        if qh <= 0 or qh >= t["lot"]:
+            return
+        pnl = round((px - t["entry"] - 0.01 * t["entry"]) * qh)
+        t["half"] = dict(qty=qh, px=round(px, 2), at=at, pnl=pnl); t["lot"] -= qh
+        t["stop"] = max(t["stop"], t["entry"])
+        self.note(f"{t['key']} 1R reached: booked {qh} at {round(px, 2)} (paper {'+' if pnl >= 0 else '-'}Rs {abs(pnl):,}); stop on the rest -> entry {t['entry']}")
+        if t.get("live_entry") is None or t.get("live_exit") is not None:
+            return
+        try:
+            ltp = self.b.ltp_ex("NFO", t["tsym"], t["token"]) or px
+            oid = self.b.nfo_order(t["tsym"], t["token"], "SELL", qh, rnd(ltp * 0.98))
+            t["half"].update(live_oid=oid); t["live_state"] = f"booked {qh} on Angel · rest running"
+        except Exception as ex:  # noqa: BLE001
+            t["half"]["live_error"] = str(ex)[:100]
+            self.alert(f"{t['key']}: the 1R booking SELL of {qh} failed ({str(ex)[:80]}) - the full stop stays on Angel", key=f"otr:half:{t['key']}:{t['signal']}")
+            return
+        so = t.get("live_stop_oid")
+        try:
+            if so:
+                self.b.cancel_order(so, "STOPLOSS")
+            t["live_stop_oid"] = self.b.nfo_order(t["tsym"], t["token"], "SELL", t["lot"], rnd(t["stop"] * 0.95), trigger=t["stop"])
+            t["live_stop"] = t["stop"]
+        except Exception as ex:  # noqa: BLE001
+            t["live_stop_oid"] = None; t["live_state"] = "NO STOP on Angel for the rest"
+            self.alert(f"{t['key']}: half booked, but the new stop for the rest ({t['lot']} at {t['stop']}) was NOT placed - put it in Angel now", key=f"otr:nostop3:{t['key']}:{t['signal']}")
 
     def _live_restop(self, t, px):
         """26 Nov 2026: move the Angel stop up to the trailed 2-ATR stop (cancel + new stop-limit), only when it rose at least
@@ -632,7 +672,7 @@ class OptTrader:
 
     def _close(self, t, px, at, why):
         t.update(state="closed", exit=round(px, 2), exit_at=at, why=why, upnl=None)
-        t["pnl"] = round((t["exit"] - t["entry"] - 0.01 * t["entry"]) * t["lot"])
+        t["pnl"] = round((t["exit"] - t["entry"] - 0.01 * t["entry"]) * t["lot"]) + int((t.get("half") or {}).get("pnl") or 0)
         if t.get("oid") and t.get("live_entry") is None:            # the live buy never filled: withdraw it
             try:
                 self.b.cancel_order(t["oid"], "STOPLOSS"); t["live_state"] = "live buy not filled - cancelled"
@@ -649,7 +689,7 @@ class OptTrader:
         try:
             with open(self.hp, "a") as f:
                 f.write(json.dumps({k: t.get(k) for k in ("key", "symbol", "side", "signal", "filled_at", "entry", "exit", "exit_at", "why",
-                                                           "pnl", "lot", "live", "live_entry", "live_exit", "pcr_q")} | {"day": self.st["day"]}) + "\n")
+                                                           "pnl", "lot", "live", "live_entry", "live_exit", "pcr_q", "half")} | {"day": self.st["day"]}) + "\n")
         except Exception:  # noqa: BLE001
             pass
 
@@ -759,6 +799,9 @@ class OptTrader:
                 cmp["unfilled"] += 1
             if h.get("live_entry") is not None and h.get("live_exit") is not None:
                 lot = h.get("lot") or 0; lp = round((h["live_exit"] - h["live_entry"]) * lot); pp = round((h["exit"] - h["entry"]) * lot)
+                hf = h.get("half") or {}                                 # 27 Nov 2026: the half booked at 1R (live fill not tracked: paper price)
+                if hf.get("qty"):
+                    lp += round((hf["px"] - h["live_entry"]) * hf["qty"]); pp += round((hf["px"] - h["entry"]) * hf["qty"])
                 d["live_pnl"] += lp; d["live_n"] += 1; d["paper_on_live"] += pp
                 cmp["n"] += 1; cmp["paper"] += pp; cmp["live"] += lp
                 if h.get("entry"):
