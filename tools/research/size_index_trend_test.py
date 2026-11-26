@@ -38,6 +38,7 @@ def main():
     TRI, STI = {}, {}
     for k in H.columns:
         TRI[k], STI[k] = trend(H[k])
+    E9 = {k: H[k].ewm(span=9, adjust=False).mean() > H[k].ewm(span=21, adjust=False).mean() for k in H.columns}   # 26 Nov: 9/21 only
     RS = {k: (H[k] / H[k].shift(63)) > (n500 / n500.shift(63)) for k in H.columns}         # beating the market over 3 months
     SEC = json.load(open("data/scan/sectors.json")); ind_ix = SEC.get("industries") or {}
     sec_of = {s: ind_ix.get(i) for s, i in (SEC.get("symbols") or {}).items()}
@@ -100,6 +101,13 @@ def main():
     T["has_th"] = [bool(th_of.get(s)) for s in T.sym]
     T["th_tr"] = [any(on(TRI, t, d) for t in th_of[s]) if h else None for s, d, h in zip(T.sym, T.d, T.has_th)]
     T["lane"] = [(LN[ind_of[s]].iloc[max(LN.index.searchsorted(d) - 1, 0)] if s in ind_of and ind_of[s] in LN.columns else "none") for d, s in zip(T.d, T.sym)]
+    T["e_mkt"] = [on(E9, "NIFTY 500", d) for d in T.d]
+    T["e_size"] = [on(E9, SZ[z], d) for z, d in zip(T["size"], T.d)]
+    T["e_sec"] = [on(E9, sec_of[s], d) if h else None for s, d, h in zip(T.sym, T.d, T.has_sec)]
+    T["e_th"] = [any(on(E9, t, d) for t in th_of[s]) if h else None for s, d, h in zip(T.sym, T.d, T.has_th)]
+    IE9 = {g: IXI[g].ewm(span=9, adjust=False).mean() > IXI[g].ewm(span=21, adjust=False).mean() for g in IXI.columns}
+    T["e_ind"] = [bool(prev(IE9[ind_of[s]], d)) if ind_of.get(s) in IE9 else None for d, s in zip(T.d, T.sym)]
+    T["e_stk"] = [bool(prev((e9_ > e21_)[s], d)) if s in C.columns else False for d, s in zip(T.d, T.sym)]
     T["stk4"] = [bool(prev(S4[s], d)) if s in S4.columns else False for d, s in zip(T.d, T.sym)]
     T["stk234"] = [bool(prev(s234[s], d)) if s in s234.columns else False for d, s in zip(T.d, T.sym)]
     T["ind234"] = [bool(prev(I234[ind_of[s]], d)) if ind_of.get(s) in I234 else None for d, s in zip(T.d, T.sym)]
@@ -127,6 +135,15 @@ def main():
          "CHAIN 2-4: market+size+sector+industry+theme+stock": yes("mkt") & yes("size_tr") & yes("sec_tr") & yes("ind234") & yes("th_tr") & T.stk234,
          "CHAIN 1-4 (beat market at size/sector/industry/stock)": yes("mkt") & yes("size_rs") & yes("sec_rs") & yes("ind4") & yes("th_tr") & T.stk4,
          "CHAIN 2-4 + lane": lane_ok & yes("mkt") & yes("size_tr") & yes("sec_tr") & yes("ind234") & yes("th_tr") & T.stk234,
+         "9/21 market": yes("e_mkt"),
+         "9/21 size index": yes("e_size"),
+         "9/21 sector": yes("e_sec"),
+         "9/21 industry index": yes("e_ind"),
+         "9/21 theme": yes("e_th"),
+         "9/21 stock": T.e_stk,
+         "9/21 at every level": yes("e_mkt") & yes("e_size") & yes("e_sec") & yes("e_ind") & yes("e_th") & T.e_stk,
+         "lane + 9/21 market + size": lane_ok & yes("e_mkt") & yes("e_size"),
+         "lane + 9/21 every level": lane_ok & yes("e_mkt") & yes("e_size") & yes("e_sec") & yes("e_ind") & yes("e_th") & T.e_stk,
          "lane + own size index only (no market check)": lane_ok & yes("size_tr"),
          "lane + own size index Stage 2 only": lane_ok & yes("size_s2"),
          "lane + market + size + stock 4 rules": lane_ok & yes("mkt") & yes("size_tr") & T.stk4,
