@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-26 00:03 UTC",
+"generated": "2026-11-26 00:32 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-25",
@@ -11,6 +11,36 @@
 "max_below_pct": 5.0,
 "top": 10,
 "limit_buffer_pct": 1.0
+},
+"index_gate": {
+"NIFTY 500": {
+"ok": true,
+"e921": true,
+"stage2": true,
+"from_high": -0.3,
+"asof": "2026-11-25"
+},
+"NIFTY 50": {
+"ok": true,
+"e921": true,
+"stage2": true,
+"from_high": -1.9,
+"asof": "2026-11-25"
+},
+"NIFTY MIDCAP 150": {
+"ok": true,
+"e921": true,
+"stage2": true,
+"from_high": -4.0,
+"asof": "2026-11-25"
+},
+"NIFTY SMALLCAP 250": {
+"ok": true,
+"e921": true,
+"stage2": true,
+"from_high": -4.8,
+"asof": "2026-11-25"
+}
 },
 "buckets": [
 {
@@ -157,6 +187,10 @@
 "results_ind": "Private Sector Bank",
 "rank": 1,
 "risk_pct": 24.0,
+"size": "small",
+"size_index": "NIFTY SMALLCAP 250",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Private Sector Bank",
 "ind_members": [
 "J&KBANK",
@@ -216,6 +250,10 @@
 "results_ind": "Healthcare Service Provider",
 "rank": 2,
 "risk_pct": 13.8,
+"size": "small",
+"size_index": "NIFTY SMALLCAP 250",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Healthcare Service Provider",
 "ind_members": [
 "VIJAYA",
@@ -264,6 +302,10 @@
 "results_ind": "Stockbroking & Allied",
 "rank": 3,
 "risk_pct": 11.6,
+"size": "small",
+"size_index": "NIFTY SMALLCAP 250",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Stockbroking & Allied",
 "ind_members": [
 "IIFLCAPS",
@@ -318,6 +360,10 @@
 "results_ind": "Pharmaceuticals",
 "rank": 4,
 "risk_pct": 12.1,
+"size": "large",
+"size_index": "NIFTY 50",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Pharmaceuticals",
 "ind_members": [
 "KOPRAN",
@@ -389,6 +435,10 @@
 "results_ind": "Pharmaceuticals",
 "rank": 5,
 "risk_pct": 13.2,
+"size": "large",
+"size_index": "NIFTY 50",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Pharmaceuticals",
 "ind_members": [
 "KOPRAN",
@@ -464,6 +514,10 @@
 "results_ind": "Personal Care",
 "rank": 6,
 "risk_pct": 21.8,
+"size": "small",
+"size_index": "NIFTY SMALLCAP 250",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Personal Care",
 "ind_members": [
 "DABUR",
@@ -2081,6 +2135,10 @@
 "results_ind": "Private Sector Bank",
 "rank": 1,
 "risk_pct": 24.0,
+"size": "small",
+"size_index": "NIFTY SMALLCAP 250",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Private Sector Bank",
 "ind_members": [
 "J&KBANK",
@@ -2174,6 +2232,10 @@
 "results_ind": "Healthcare Service Provider",
 "rank": 2,
 "risk_pct": 13.8,
+"size": "small",
+"size_index": "NIFTY SMALLCAP 250",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Healthcare Service Provider",
 "ind_members": [
 "VIJAYA",
@@ -2222,6 +2284,10 @@
 "results_ind": "Stockbroking & Allied",
 "rank": 3,
 "risk_pct": 11.6,
+"size": "small",
+"size_index": "NIFTY SMALLCAP 250",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Stockbroking & Allied",
 "ind_members": [
 "IIFLCAPS",
@@ -2276,6 +2342,10 @@
 "results_ind": "Pharmaceuticals",
 "rank": 4,
 "risk_pct": 12.1,
+"size": "large",
+"size_index": "NIFTY 50",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Pharmaceuticals",
 "ind_members": [
 "KOPRAN",
@@ -2347,6 +2417,10 @@
 "results_ind": "Pharmaceuticals",
 "rank": 5,
 "risk_pct": 13.2,
+"size": "large",
+"size_index": "NIFTY 50",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Pharmaceuticals",
 "ind_members": [
 "KOPRAN",
@@ -2523,6 +2597,10 @@
 "results_ind": "Personal Care",
 "rank": 6,
 "risk_pct": 21.8,
+"size": "small",
+"size_index": "NIFTY SMALLCAP 250",
+"idx_ok": true,
+"idx_why": "",
 "ind": "Personal Care",
 "ind_members": [
 "DABUR",
