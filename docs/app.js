@@ -2286,6 +2286,7 @@ const BASKETS = [
   { id: 'a', n: 'Momentum + Cup 9/21 + Top Bottom', ret: 33, dd: -12, how: 'Momentum 60% · Cup 9/21 40% · plus 1 Bank Nifty Top Bottom lot on margin', note: 'monthly data', al: { pr: 0, mom: 60, tf: 40 }, tb: ['bn'] },
   { id: 'p', n: 'Pulse rotation', ret: 37, dd: -21, how: '10 strongest trending stocks of the leading industries, equal weight, rebalanced every Friday; all cash on a red-light Friday', note: 'trial system', al: { pr: 100, mom: 0, tf: 0 } },
   { id: 't', n: 'Top Bottom basket', ret: 22, dd: -14, how: 'Top Bottom on Bank Nifty, Nifty, BEL, L&T, TMPV, TCS futures and US ETFs (QQQ, SMH, XLF, XLE) - 0.06 correlation between them', note: '12.5%/yr, −8% at plain equal weight; 22% needs up to 2× leverage', tbb: true },
+  { id: 'x', n: 'MCX minis: crude, silver, natural gas, gold', ret: 16.8, dd: -16, how: 'Top Bottom on MCX mini / micro futures, equal money each: crude oil mini both sides · silver micro and natural gas mini buy only above the 200-day · gold petal buy only. Almost no link to stocks or Bank Nifty', note: '2011–26 on MCX-equivalent prices (COMEX × USD/INR), monthly; last 1y +42%, 3y +104%. With 1 Bank Nifty lot added: 16.3%/yr, −11%', tb: TB_MCX, tbm: true },
   { id: 'e', n: 'ETF rotation', ret: 18, dd: -13, how: 'Each month-end hold the best 2 of Nifty, Midcap 150, Gold, Nasdaq 100 by 3-month return; cash (LIQUIDBEES) if below cash', note: '5–7 switches a year', pie: true },
   { id: 'mc', n: 'Momentum + Cup 9/21', ret: 23, dd: -21, how: 'Momentum 60% · Cup 9/21 40%, 1% risk a trade, max 10% a stock', al: { pr: 0, mom: 60, tf: 40 } },
   { id: 'm', n: 'Momentum', ret: 17, dd: -17, how: 'Monthly all-time-high breakouts after a 2-year cup, exit on a weekly close below the 30-week average', al: { pr: 0, mom: 100, tf: 0 } },
@@ -2336,7 +2337,7 @@ async function loadBasket() {
   const tb = A.tb || {};
   const partsOf = (b) => (b.al ? [{ k: 'part', id: 'stock_sell', on: !!A.stock_sell }, { k: 'part', id: 'stock_buy', on: !!A.stock_buy }] : [])
     .concat((b.tb || []).filter((i) => tb[i]).map((i) => ({ k: 'tb', id: i, on: !!tb[i].auto })))
-    .concat(b.us ? [{ k: 'part', id: 'mm_us', on: !!A.mm_us }] : []).concat(b.tbb ? Object.keys(tb).map((i) => ({ k: 'tb', id: i, on: !!tb[i].auto })).concat([{ k: 'part', id: 'mm_us', on: !!A.mm_us }]) : []);
+    .concat(b.us ? [{ k: 'part', id: 'mm_us', on: !!A.mm_us }] : []).concat(b.tbb ? Object.keys(tb).filter((i) => !TB_MCX.includes(i)).map((i) => ({ k: 'tb', id: i, on: !!tb[i].auto })).concat([{ k: 'part', id: 'mm_us', on: !!A.mm_us }]) : []);
   const botOn = (b) => { const P = partsOf(b); return P.length > 0 && P.every((x) => x.on); };
   const capNow = S.capital || 0; const L = MKT.NSE.loc;
   const buysN = (S.rows || []).filter((r) => r.tier !== 'more' && !r.skip && r.qty > 0 && !r.local && bkOf(r) !== 'my').length;
@@ -2381,16 +2382,17 @@ async function loadBasket() {
     const below = NF.close < NF.s50; const lots = Math.max(1, Math.round(val / (65 * NF.close)));
     return `<p class="bs-p">Nifty ${fmt(NF.close, 0, 'en-IN')} vs its 50-day average ${fmt(NF.s50, 0, 'en-IN')}: <b class="${below ? 'down' : 'up'}">${below ? 'BELOW' : 'above'}</b>. ${below ? `For Nifty / large-cap holdings: short ${lots} Nifty futures lot${lots > 1 ? 's' : ''} (65 units each) until it closes back above.` : 'No futures hedge needed now.'}</p>`; };
   const card = (b, i) => {
-    const on = b.al ? isOn(b) : b.tbb ? Object.values(tb).some((x) => x.auto) || !!A.mm_us : false; const bot = b.pie ? false : botOn(b);
+    const on = b.al ? isOn(b) : b.tbb ? Object.entries(tb).some(([k, x]) => !TB_MCX.includes(k) && x.auto) || !!A.mm_us : b.tbm ? TB_MCX.some((k) => tb[k] && tb[k].auto) : false; const bot = b.pie ? false : botOn(b);
     let body = '';
     if (b.al) body = on ? `<div class="bs-now"><span><b>${buysN}</b> to buy</span><span><b>${sellsN}</b> to sell</span><span>capital <b>${money(capNow, 'NSE')}</b></span></div>
         ${OD && OD.list.length ? `<button class="bs-send" data-sendall>Send today's ${OD.list.length} order${OD.list.length > 1 ? 's' : ''} · ${money(OD.list.reduce((a, r) => a + (r.value || 0), 0), 'NSE')}</button>` : `<p class="bs-p">${bot ? 'The bot sends today\'s orders by itself.' : 'Nothing to send right now.'}</p>`}
         <button class="t3-link" data-trade>Pick them one by one in Trade Live</button>`
       : `<label class="bs-in">Capital ₹ <input type="number" inputmode="numeric" data-cap="${b.id}" value="${Math.round(capNow) || ''}" placeholder="0 = whole Angel account"></label><button class="tr-go" data-use="${b.id}">Use this basket</button>`;
     if (b.tbb) { const usc = +((((MT || {}).cfg || {}).US || {}).capital || 0);
-      body = `<div class="bs-sl">${Object.keys(TB_SHORT).map((i) => `<span class="${tb[i] ? (tb[i].auto ? 'on' : '') : 'na'}">${TB_SHORT[i]}${tb[i] ? '' : ' ·  not installed'}</span>`).join('')}<span class="${A.mm_us ? 'on' : ''}">US ETFs</span></div>
+      body = `<div class="bs-sl">${Object.keys(TB_SHORT).filter((i) => !TB_MCX.includes(i)).map((i) => `<span class="${tb[i] ? (tb[i].auto ? 'on' : '') : 'na'}">${TB_SHORT[i]}${tb[i] ? '' : ' ·  not installed'}</span>`).join('')}<span class="${A.mm_us ? 'on' : ''}">US ETFs</span></div>
         <p class="bs-p">India sleeves trade 1 lot each (about ₹1.5–2 L margin per index lot, more for stock futures). US sleeves use your moomoo capital:</p>
         <label class="bs-in">US capital US$ <input type="number" inputmode="numeric" data-usc value="${usc || ''}"></label><button class="tr-go" data-usave>Save</button>`; }
+    if (b.tbm) body = `<div class="bs-mcx" data-mcx><p class="bs-p">${TB_MCX.some((k) => tb[k]) ? 'Loading the four bots…' : 'Install the four MCX bots first: Full view › Futures › Install MCX bots (Dry run).'}</p></div>`;
     if (b.pie) { const C = E && E.current; const pv = E && E.provisional; const px = (E && E.prices) || {};
       const hold = (C && C.hold) || []; const cap = +(state.pieCap || 0);
       body = `<p class="bs-p">Hold now (decided ${esc((C && C.decided) || '–')}): <b>${hold.map((s) => esc((E.names || {})[s] || s)).join(' + ') || '–'}</b>${pv ? ` · if the month ended today: ${pv.hold.map((s) => esc((E.names || {})[s] || s)).join(' + ')}` : ''}</p>
@@ -2407,7 +2409,7 @@ async function loadBasket() {
     return `<article class="bs-c${on ? ' act' : ''}"><div class="bs-h"><span class="bs-n">${i + 1}</span><div><b>${esc(b.n)}</b>${on ? '<em>active</em>' : ''}<small>${esc(b.how)}</small></div>
       ${b.ret != null ? `<span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span>` : '<span class="bs-r"><b>🛡</b><small>hedge</small></span>'}</div>
       ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${b.hedgeOnly ? '' : paperLine(b.id)}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
-  el.innerHTML = `<p class="bs-top">India stock baskets (1, 2, 3, 4, 7, 8) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
+  el.innerHTML = `<p class="bs-top">India stock baskets (${BASKETS.map((b, i) => b.al ? i + 1 : 0).filter(Boolean).join(', ')}) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
     ${BASKETS.map(card).join('')}<div id="cupb" data-pl="${esc(paperLine('lc'))}"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
   cupBasket(el.querySelector('#cupb'));
   { const sa = el.querySelector('[data-sendall]'); if (sa) sa.addEventListener('click', () => trSend(OD.list, 'NSE', sa).then(() => setTimeout(loadBasket, 3000))); }
@@ -2416,6 +2418,30 @@ async function loadBasket() {
     const cap = b.share ? Math.round(cap0 * b.share) : cap0; if (b.hedge) state.hedgeCap = cap0;
     if (!window.confirm(`Make "${b.n}" your India basket?\nCapital ${cap ? money(cap, 'NSE') : 'whole account'} · split ${AK.filter((k) => b.al[k] > 0).map((k) => `${NM[k]} ${b.al[k]}%`).join(' · ')}.${b.hedge ? `\nPlus 10% gold + 10% dollar (${money(cap0 * 0.1, 'NSE')} each), placed by you.` : ''}\nOpen trades are not sold; new buys follow this basket.`)) return;
     x.disabled = true; try { await lvApi('/api/picks', { method: 'POST', body: JSON.stringify({ capital: cap, alloc: { fl: 0, gd: 0, ...b.al, t9: 0, rt: 0, pt: 0, vcp: 0 } }) }); state._planC = null; try { localStorage.setItem('td.basket', b.id); } catch (e) { /* */ } alertMsg(`${b.n} is your India basket now.`, true); loadBasket(); } catch (e) { alertMsg(e.message); x.disabled = false; } }));
+  /* 26 Nov 2026 (Amritpal: "build one basket for mini or micro futures to trade in Angel"): the MCX basket card - each bot's last price,
+     contract value and lots; a capital box sizes equal money per commodity (about 1x the capital in contract value) */
+  const mx = el.querySelector('[data-mcx]'); if (mx && TB_MCX.some((k) => tb[k])) (async () => {
+    const UNIT = { crude: 10, silver: 1, natgas: 250, gold: 1 };   // CRUDEOILM 10 bbl · SILVERMIC 1 kg · NATGASMINI 250 mmBtu · GOLDPETAL 1 g
+    const R = await Promise.all(TB_MCX.map((k) => tb[k] ? lvApi('/api/tb?inst=' + k).catch(() => null) : null));
+    let cap = 0; try { cap = +(localStorage.getItem('td.mcxcap') || 0); } catch (e) { /* */ }
+    const draw = () => {
+      const rows = TB_MCX.map((k, i) => { const T = R[i]; const S = (T && T.status) || {}; const px = S.ltp || 0; const cv = px * UNIT[k];
+        const want = cap && cv ? Math.max(1, Math.round(cap / TB_MCX.length / cv)) : null;
+        return { k, T, S, cv, want, lots: (T && T.lots_cfg) || 1 }; });
+      mx.innerHTML = `<div class="bs-ord">${rows.map((r) => `<span><b>${TB_SHORT[r.k]} · ${r.T ? `${r.lots} lot${r.lots > 1 ? 's' : ''}` : 'not installed'}${r.want && r.want !== r.lots ? ` → ${r.want}` : ''}</b><small>${r.cv ? `1 lot ≈ ${money(r.cv, 'NSE')}` : 'price after the bot\'s first run'}${r.T ? ` · ${r.T.mode === 'LIVE' ? 'live' : 'dry run'}${r.T.auto ? ' · auto' : ''}${r.S.pos ? ` · ${r.S.pos > 0 ? 'long' : 'short'} now` : ''}` : ''}</small></span>`).join('')}</div>
+        <label class="bs-in">Capital ₹ <input type="number" inputmode="numeric" data-mcxcap value="${cap || ''}" placeholder="money for this basket"></label>
+        <button class="tr-go" data-mcxset ${rows.some((r) => r.T && r.want && r.want !== r.lots) ? '' : 'disabled'}>Set lots</button>
+        <p class="bs-p">Equal money in each commodity, about 1× the capital in contract value (MCX margin is roughly 10–20% of that). Lots change from each bot's next start while it is flat. Bot below turns on auto-approve for all four; each stays in Dry run until you switch it to Live orders in Futures.</p>`;
+      mx.querySelector('[data-mcxcap]').addEventListener('change', (e) => { cap = +e.target.value || 0; try { localStorage.setItem('td.mcxcap', String(cap)); } catch (er) { /* */ } draw(); });
+      const sb = mx.querySelector('[data-mcxset]'); if (sb) sb.addEventListener('click', async () => {
+        const ch = rows.filter((r) => r.T && r.want && r.want !== r.lots); if (!ch.length) return;
+        let pw = ''; if (ch.some((r) => r.want > r.lots)) { pw = window.prompt('App password (raising lots):') || ''; if (!pw) return; }
+        const out = [];
+        for (const r of ch) { try { await lvApi('/api/tb/lots?inst=' + r.k, { method: 'POST', body: JSON.stringify({ lots: r.want, password: pw }) }); out.push(`${TB_SHORT[r.k]} ${r.want}`); r.T.lots_cfg = r.want; } catch (e) { out.push(`${TB_SHORT[r.k]}: ${e.message}`); } }
+        alertMsg('Lots: ' + out.join(' · '), true); draw(); });
+    };
+    draw();
+  })();
   const usv = el.querySelector('[data-usave]'); if (usv) usv.addEventListener('click', async () => { try { await lvApi('/api/mmtb/cfg', { method: 'POST', body: JSON.stringify({ market: 'US', capital: +el.querySelector('[data-usc]').value || 0, risk_pct: +((((MT || {}).cfg || {}).US || {}).risk_pct || 1) }) }); alertMsg('Saved.', true); } catch (e) { alertMsg(e.message); } });
   const hvi = el.querySelector('[data-hval]'); if (hvi) hvi.addEventListener('change', () => { state.hedgeVal = +hvi.value || 0; loadBasket(); });
   const pie = el.querySelector('[data-pie]'); if (pie) pie.addEventListener('change', () => { state.pieCap = +pie.value || 0; loadBasket(); });

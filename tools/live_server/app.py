@@ -2267,7 +2267,11 @@ def tb_state(inst: str = "bn", _=Depends(auth)):
                             exit_date=t.get("ExitDate"), exit_fill=t.get("ExitFill"), reason=t.get("Reason"), pnl=t.get("PnL_fill")) for t in (stj.get("trades") or [])[-60:] if t.get("Fill")]
     except Exception:  # noqa: BLE001
         pass
-    return dict(inst=inst, installed=os.path.isdir(d), mode="LIVE" if tb_live(inst) else "DRY RUN", auto=tb_auto(inst), status=_tbr("status.json", {}, inst),
+    try:
+        lots_cfg = int(json.load(open(os.path.join(d, "config.json"))).get("lots") or 1)
+    except Exception:  # noqa: BLE001
+        lots_cfg = None
+    return dict(inst=inst, installed=os.path.isdir(d), mode="LIVE" if tb_live(inst) else "DRY RUN", auto=tb_auto(inst), lots_cfg=lots_cfg, status=_tbr("status.json", {}, inst),
                 pending=[dict(key=k, **v) for k, v in P.items()], answers=A, messages=msgs[::-1], live_trades=live_trades)
 
 
@@ -2336,6 +2340,39 @@ def tb_mode(body: Mode, request: Request, inst: str = "bn", _=Depends(auth)):
     json.dump(dict(live=bool(body.live), at=time.time()), open(os.path.join(d, "mode.json"), "w"))
     log("tb_mode", inst=inst, live=body.live)
     return dict(ok=True, mode="LIVE" if body.live else "DRY RUN")
+
+
+class TBLots(BaseModel):
+    lots: int
+    password: str = ""
+
+
+@app.post("/api/tb/lots")
+def tb_lots(body: TBLots, request: Request, inst: str = "crude", _=Depends(auth)):
+    """26 Nov 2026 (Amritpal: "build one basket for mini or micro futures"): lots per MCX bot, set from the MCX basket's capital.
+    Raising needs the app password; lowering is one tap. Applies from the bot's next start while it is flat (an open position keeps
+    its lots)."""
+    if inst not in TB_MCX:
+        raise HTTPException(400, "lots can be set here for the MCX bots only")
+    d = _tbdir(inst); p = os.path.join(d, "config.json")
+    try:
+        cfg = json.load(open(p))
+    except Exception:  # noqa: BLE001
+        raise HTTPException(404, "bot not installed")
+    n = int(body.lots)
+    if not 1 <= n <= 100:
+        raise HTTPException(400, "lots must be 1-100")
+    if n > int(cfg.get("lots") or 1):
+        ip = request.client.host if request.client else "?"
+        k, t0 = FAILS.get(ip, (0, 0))
+        if k >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if not check_pw(body.password):
+            FAILS[ip] = (k + 1, time.time()); raise HTTPException(401, "wrong password")
+    cfg.update(lots=n, max_lots=n)
+    tmp = p + ".tmp"; json.dump(cfg, open(tmp, "w"), indent=2); os.replace(tmp, p)
+    log("tb_lots", inst=inst, lots=n)
+    return dict(ok=True, inst=inst, lots=n)
 
 
 class TBAuto(BaseModel):

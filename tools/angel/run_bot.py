@@ -379,6 +379,8 @@ def main():
             log(f"state initialised FLAT (spent levels: top {st.used_T}, bottom {st.used_B})")
         st = tl.State.load(STATE)
         st.lots = min(int(st.lots or cfg["lots"]), int(cfg["lots"]), int(cfg["max_lots"]))
+        if st.pos == 0:                       # 26 Nov 2026: flat -> take the lots set in the app (MCX basket sizing)
+            st.lots = min(int(cfg["lots"]), int(cfg["max_lots"]))
         if st.halted and "--resume" not in args:
             tg.send("Bot is HALTED from an earlier problem. Check Angel, then run with --resume."); log("halted"); return
         st.halted = False
