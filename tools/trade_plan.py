@@ -23,6 +23,7 @@ import sys
 from datetime import datetime, timezone
 
 import numpy as np
+import pandas as pd
 
 DIR = {"NSE": "data/scan/", "US": "data/scan/us/", "ASX": "data/scan/asx/", "UK": "data/scan/uk/"}
 MINPX = {"NSE": 100, "US": 10, "ASX": 20, "UK": 100}   # UK in pence   # no penny stocks (ASX A$20 floor, Amritpal 10 Nov 2026)
@@ -467,6 +468,30 @@ def main(mk="NSE"):
             b = c.get("bucket") if L is swing else "mom"; seen[b] = seen.get(b, 0) + 1
             c["rank"] = seen[b]                          # rank within its system
             c["risk_pct"] = round((c.get("trigger") or c["price"]) / c["stop"] * 100 - 100, 1) if c["stop"] else None
+    # 26 Nov 2026 (Amritpal: market + size index gate, "check as per size"; tools/research/size_index_trend_test.py): each Momentum row
+    # carries whether the Nifty 500 AND its own size index (Nifty 50 for Nifty 100 stocks, Midcap 150, else Smallcap 250) pass the
+    # Pulse trend rules 2-4 (EMA 9 > EMA 21, above a rising 150-day average, within 25% of the 52-week high). The server skips the
+    # failing ones only when the Momentum index gate is switched on (Live > Systems & allocation). NSE 2017-26: Momentum 23.4%/yr,
+    # worst fall -12.8% with the gate vs 28.9% / -30.0% without.
+    idx_gate = {}
+    if india:
+        try:
+            Hh = pd.read_csv(D + "sector_hist.csv.gz", parse_dates=["Date"]).pivot_table(index="Date", columns="INDEX", values="CLOSE").sort_index().ffill()
+            for k in ("NIFTY 500", "NIFTY 50", "NIFTY MIDCAP 150", "NIFTY SMALLCAP 250"):
+                x_ = Hh[k].dropna(); e9_ = x_.ewm(span=9, adjust=False).mean(); e21_ = x_.ewm(span=21, adjust=False).mean(); s150_ = x_.rolling(150).mean()
+                hi_ = x_.rolling(250, min_periods=120).max()
+                idx_gate[k] = dict(ok=bool(e9_.iloc[-1] > e21_.iloc[-1] and x_.iloc[-1] > s150_.iloc[-1] and s150_.iloc[-1] > s150_.iloc[-21] and x_.iloc[-1] >= 0.75 * hi_.iloc[-1]),
+                                   e921=bool(e9_.iloc[-1] > e21_.iloc[-1]), stage2=bool(x_.iloc[-1] > s150_.iloc[-1] and s150_.iloc[-1] > s150_.iloc[-21]),
+                                   from_high=round(float(x_.iloc[-1] / hi_.iloc[-1] - 1) * 100, 1), asof=str(x_.index[-1].date()))
+            big = set(pd.read_csv("data/universe/nifty50.csv").Symbol) | set(pd.read_csv("data/universe/niftynext50.csv").Symbol)
+            mid = set(pd.read_csv("data/universe/niftymidcap150.csv").Symbol)
+            for c_ in trades:
+                sz = "large" if c_["symbol"] in big else "mid" if c_["symbol"] in mid else "small"
+                ix_ = {"large": "NIFTY 50", "mid": "NIFTY MIDCAP 150", "small": "NIFTY SMALLCAP 250"}[sz]
+                bad = [k for k in ("NIFTY 500", ix_) if not idx_gate[k]["ok"]]
+                c_.update(size=sz, size_index=ix_, idx_ok=not bad, idx_why=(" and ".join(b_.title() for b_ in bad) + " not trending") if bad else "")
+        except Exception as ex:  # noqa: BLE001
+            print("index gate failed", ex)
     exits = list(vexits)
     for r in ath.get("tracked") or []:
         if r.get("status") == "exit next open":   # all bases: holdings bought as Monthly ATH before the 9 Nov split keep this exit
@@ -543,7 +568,7 @@ def main(mk="NSE"):
                asof=max(str(ath.get("asof") or ""), str(tr.get("asof") or "")),
                rules=dict(risk_pct=1.0, max_pos_pct=20.0, max_positions=10, max_late_pct=MAX_LATE * 100, max_below_pct=MAX_BELOW * 100, top=TOP,
                           limit_buffer_pct=1.0),
-               buckets=buckets(mk), top=trades[:TOP], more=trades[TOP:30], swing=swing, pattern_watch=pat_watch[:20], watch=[c for c in C if c["kind"] == "WATCH"], exits=exits,
+               index_gate=idx_gate, buckets=buckets(mk), top=trades[:TOP], more=trades[TOP:30], swing=swing, pattern_watch=pat_watch[:20], watch=[c for c in C if c["kind"] == "WATCH"], exits=exits,
                missed=sorted(missed, key=lambda x: -abs(x["late_pct"]))[:15])
     json.dump(out, open(OUT, "w"), indent=0, default=str)
     print("trade plan:", len(trades), "ATH +", len(swing), "swing, top", [(c["symbol"], c["kind"], c["score"]) for c in trades[:TOP]], "exits", len(exits))

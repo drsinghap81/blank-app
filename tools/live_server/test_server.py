@@ -1603,3 +1603,22 @@ def test_flags_and_gold_sleeves(tmp_path):
     ex = next(e for e in c.get("/api/plan", headers=h).json()["exits"] if e["symbol"] == "FLAGCO")
     assert ex["id"] == "EXIT-FL-FLAGCO" and ex["qty"] == f["qty"] and "21-day EMA" in ex["why"]
     os.environ["PLAN_FILE"] = os.path.join(HERE, "..", "..", "data", "scan", "trade_plan.json")
+
+
+def test_momentum_index_gate(tmp_path):
+    """26 Nov 2026: with the index gate on, Momentum rows whose market / size index isn't trending are skipped; off = unchanged."""
+    import json as _j
+    P0 = _j.load(open(os.path.join(HERE, "..", "..", "data", "scan", "trade_plan.json")))
+    r0 = dict(id="ATH-GATECO-2026-11-25", symbol="GATECO", name="Gate Co", system="Monthly ATH", bucket="mom", kind="ATH", order="LIMIT",
+              when="next open", side="BUY", price=101.0, ref=100.0, stop=80.0, score=1, lane=None, idx_ok=False, idx_why="Nifty Midcap 150 not trending")
+    P0["top"] = [r0] + (P0.get("top") or [])
+    pf = tmp_path / "plan.json"; pf.write_text(_j.dumps(P0))
+    A, c = client(tmp_path); A.ENV["PLAN_FILE"] = str(pf); A._plan.update(t=0, d=None)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    g = next(r for r in c.get("/api/plan", headers=h).json()["rows"] if r["symbol"] == "GATECO")
+    assert "index gate" not in (g["skip"] or "")
+    assert c.post("/api/picks", headers=h, json={"idx_gate": True}).json()["idx_gate"] is True
+    P = c.get("/api/plan", headers=h).json(); g = next(r for r in P["rows"] if r["symbol"] == "GATECO")
+    assert g["skip"].startswith("index gate") and "Midcap 150" in g["skip"] and P["idx_gate"] is True
+    assert c.post("/api/picks", headers=h, json={"n": 10}).json()["idx_gate"] is True          # other saves keep it
+    os.environ["PLAN_FILE"] = os.path.join(HERE, "..", "..", "data", "scan", "trade_plan.json")

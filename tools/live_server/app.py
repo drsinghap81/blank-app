@@ -237,6 +237,7 @@ class Picks(BaseModel):
     swing_risk: float | None = None
     capital: float | None = None     # trading capital set in the app; 0 = use the account value; never above the account value
     alloc: dict | None = None        # bucket -> max % of capital it may hold (Live "Systems & allocation")
+    idx_gate: bool | None = None     # 26 Nov 2026: Momentum buys only while the Nifty 500 and the stock's size index trend
 
 
 @app.post("/api/picks")
@@ -250,9 +251,10 @@ def set_picks(body: Picks, _=Depends(auth)):
     for k, v in (body.alloc or {}).items():
         if k in BUCKETS:
             al[k] = max(0.0, min(100.0, float(v)))
-    json.dump(dict(n=n, swing_risk=sr, capital=capv, alloc=al, alloc_v=ALLOC_V, at=time.time()), open(os.path.join(DATA, "picks.json"), "w"))
-    log("picks", n=n, swing_risk=sr, capital=capv, alloc=al)
-    return dict(picks=n, risk_pct=round(risk_now() * 100, 2), swing_risk_pct=round(swing_risk() * 100, 2), capital=capv, alloc=alloc())
+    ig = bool(cfg.get("idx_gate")) if body.idx_gate is None else bool(body.idx_gate)
+    json.dump(dict(n=n, swing_risk=sr, capital=capv, alloc=al, alloc_v=ALLOC_V, idx_gate=ig, at=time.time()), open(os.path.join(DATA, "picks.json"), "w"))
+    log("picks", n=n, swing_risk=sr, capital=capv, alloc=al, idx_gate=ig)
+    return dict(picks=n, risk_pct=round(risk_now() * 100, 2), swing_risk_pct=round(swing_risk() * 100, 2), capital=capv, alloc=alloc(), idx_gate=ig)
 
 
 @app.post("/api/mode")
@@ -1380,11 +1382,17 @@ def sized(acc=None):
     slots = max(0, N - len(ath_open)); sw_slots = max(0, SWING_MAX - len(sw_open))
     cash = acc["cash"]
     rows = []; SV = surv_load()
+    try:
+        IG = bool(_picks_cfg().get("idx_gate"))
+    except Exception:  # noqa: BLE001
+        IG = False
     for r in plan_rows(P):
         E = r.get("trigger") or r["price"]; stop = r["stop"]
         q = 0; why = ""
         if r["symbol"] in held:
             why = "already held"
+        elif IG and r.get("bucket") == "mom" and r.get("idx_ok") is False:
+            why = f"index gate: {r.get('idx_why') or 'market / size index not trending'}"
         elif r["symbol"] in J and J[r["symbol"]].get("state") == "pending":
             why = "order sent - waiting for the fill"
         elif r.get("bucket") == "pr" and E > 0:          # 22 Nov 2026: equal weight = your Pulse rotation % / 10 a stock
@@ -1504,7 +1512,7 @@ def sized(acc=None):
                 swing=dict(risk_pct=round(SR * 100, 2), slots=sw_slots, max=SWING_MAX, open=len(sw_open), idle_cash=round(sw_cash), reserve_pct=SWING_RESERVE * 100),
                 mode="LIVE" if is_live() else "DRY RUN", rows=rows, exits=ex, watch=P.get("watch") or [], held=held,
                 trades=trades, recent=recent, perf=perf_view(J, acc), protect=dict(on=PROTECT, ath_net_pct=ATH_NET_PCT * 100, trail_gap_pct=TRAIL_GAP * 100),
-                trail=last_trail())
+                trail=last_trail(), idx_gate=IG, index_gate=P.get("index_gate") or {})
 
 
 class JFix(BaseModel):
