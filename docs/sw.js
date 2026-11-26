@@ -1,11 +1,14 @@
 /* App shell cached for offline start (network first); scan data always fetched fresh (falls back to the last copy in the page). */
-const SHELL = 'td-shell-v4';
+const SHELL = 'td-shell-v5';
 const FILES = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js'];
 self.addEventListener('install', (e) => e.waitUntil(caches.open(SHELL).then((c) => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener('activate', (e) => e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== SHELL).map((k) => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', (e) => {
   const u = new URL(e.request.url);
+  // 26 Nov 2026: calls to your server (POST, other hosts) go straight to the network - when one failed, the cache fallback returned
+  // nothing and the phone showed "FetchEvent.respondWith received an error: Returned response is null" instead of the real error
+  if (e.request.method !== 'GET' || (u.origin !== location.origin && u.hostname !== 'raw.githubusercontent.com' && u.hostname !== 'unpkg.com')) return;
   if (u.hostname === 'raw.githubusercontent.com') {
     e.respondWith(fetch(e.request).then((r) => { const cp = r.clone(); caches.open('td-data').then((c) => c.put(e.request, cp)); return r; })
       .catch(() => caches.match(e.request)));
