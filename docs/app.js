@@ -612,6 +612,7 @@ function lvSave(o) { try { localStorage.setItem(LV_KEY, JSON.stringify({ ...lvCf
 function lvPlan(fresh) {
   const c = state._planC; if (!fresh && c && Date.now() - c.t < 60000) return c.p;
   const p = lvApi('/api/plan', { timeout: 60000 }); state._planC = { t: Date.now(), p }; p.catch(() => { state._planC = null; });
+  p.then((F) => { if (F && F.rows) { state._planLast = { t: Date.now(), S: F }; try { localStorage.setItem('td.planLast', JSON.stringify(state._planLast)); } catch (e) { /* too big or blocked */ } } }).catch(() => {});
   p.then((F) => { if (F && F.holdings) try { localStorage.setItem('td.heldSyms', JSON.stringify(F.holdings.filter((h) => h.qty > 0).map((h) => h.symbol))); } catch (e) { /* */ } }).catch(() => {});
   return p;
 }
@@ -1034,7 +1035,17 @@ async function loadLive() {
   if (!P) { el.innerHTML = '<p class="empty">The trade plan appears after the evening scans (about 21:15 IST).</p>'; return; }
   $('#asof').textContent = `India close ${closeTxt('NSE', P.asof)}${updTxt(P.generated)}`;
   const c = lvCfg(); let S = null; let err = '';
-  if (c.url && c.token) { try { S = await lvPlan(!!state._lvFresh); } catch (e) { err = e.message; } state._lvFresh = false; }
+  /* 26 Nov 2026 (Amritpal: "do something about this long wait"): /api/plan reads Angel live (slow after a server restart). If it takes
+     over 2.5 s, draw the last copy at once (marked), and redraw when the fresh one lands. Orders are re-checked by the server anyway. */
+  let stale = null;
+  if (c.url && c.token) {
+    const fresh = !!state._lvFresh; state._lvFresh = false; const pr = lvPlan(fresh);
+    let last = state._planLast; if (!last) { try { last = JSON.parse(localStorage.getItem('td.planLast') || 'null'); } catch (e) { last = null; } }
+    const w = last && !fresh ? await Promise.race([pr.then((x) => ({ x }), (e) => ({ e })), new Promise((r) => setTimeout(() => r(null), 2500))]) : null;
+    if (w) { S = w.x || null; if (w.e) err = w.e.message; }
+    else if (last && !fresh) { S = last.S; stale = last.t; const v0 = state.view; pr.then(() => { if (state.view === v0 && $('#view-live') && $('#view-live').dataset.stale === String(stale)) loadLive(); }).catch(() => {}); }
+    else { try { S = await pr; } catch (e) { err = e.message; } }
+  }
   if (S && myLocal('NSE').length) {          // picks pushed before Live was connected move to the server
     for (const x of myLocal('NSE')) { try { await lvApi('/api/mypicks', { method: 'POST', body: JSON.stringify(x) }); } catch (e) { /* keep it local */ continue; } mySaveLocal('NSE', myLocal('NSE').filter((y) => y.symbol !== x.symbol)); }
     try { S = await lvApi('/api/plan'); } catch (e) { /* keep the first copy */ }
@@ -1189,7 +1200,8 @@ async function loadLive() {
       ${other.length ? `<p class="lv-sub">Not in a system: ${other.map((h) => esc(h.symbol)).join(', ')} — Adopt them in Holdings to give them a system and a stop.</p>` : ''}</div>`;
   })();
   const pane = (k, html) => `<section class="lv-pane" data-pane="${k}" ${tab === k ? '' : 'hidden'}>${html}</section>`;
-  el.innerHTML = `${lvSeg()}${S ? '' : head}
+  el.dataset.stale = stale ? String(stale) : '';
+  el.innerHTML = `${stale ? `<p class="lv-sub" style="margin:8px 16px">⟳ Showing your account as of ${new Date(stale).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })} · refreshing from Angel…</p>` : ''}${lvSeg()}${S ? '' : head}
     <nav class="lv-tabs" role="tablist">${TABS.map(([k, n, c]) => `<button role="tab" data-tab="${k}" aria-selected="${tab === k}">${n}${c ? `<em>${c}</em>` : ''}</button>`).join('')}</nav>
     ${S && isOwner() ? '<div id="autocard"></div>' : ''}
     ${pane('home', `${S ? `<div class="lv-conn"><span class="lv-dot ${live ? 'on' : ''}"></span><span><b>Angel One</b> · connected · ${live ? 'live orders' : 'dry run'}</span><button class="lv-link" data-go="set">Settings</button><a href="#" class="lv-link" id="lvout2">Log out</a></div><div id="lval"></div>` : ''}${lvHero(S, PF)}${lvBest5(P, S, rows, C0n)}${bookHtml}${needHtml}${S ? '<div id="lvperf"></div>' : ''}${guardCard(S ? S.guard : null)}`)}
