@@ -86,4 +86,8 @@ CFG
     TB_STATE_DIR=$D TB_CHANNEL=app TB_CONFIG=$D/config.json TB_SESSION_FROM=$M/session.json $V/bin/python $R/tools/angel/run_bot.py --init --check --no-pull 2>&1 | tail -n 4) \
     || echo "$k: init check failed (it retries at the next morning start)"
 done
+# 26 Nov 2026 (Amritpal: "can we trade now"): installed during the MCX session -> start the bots now (late start; they still need
+# the Bank Nifty bot's Angel session of today and every level waits for your OK). Outside the session the 08:31 IST timer starts them.
+H=$(TZ=Asia/Kolkata date +%H)
+if [ "$H" -ge 9 ] && [ "$H" -lt 23 ]; then for k in crude silver natgas gold; do systemctl start --no-block trenddesk-tbm@$k.service || true; done; fi
 echo "TB_MCX__SETUP__DONE  timers: $(systemctl list-timers 'trenddesk-tbm@*' --no-legend | wc -l)"
