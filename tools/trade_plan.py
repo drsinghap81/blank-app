@@ -148,6 +148,14 @@ LANE_SKIP = ("weak", "fade", "bounce")
 LANE_NAME = {"weak": "Weak", "fade": "Fading", "bounce": "Turning / weak-bouncing"}
 
 
+def wk_rsi_last(c, before):
+    """weekly RSI(14) (Wilder, Friday closes) of the last week completed before `before` (a week-end date), or None"""
+    w_ = c.dropna().resample("W-FRI").last(); d_ = w_.diff()
+    up_ = d_.clip(lower=0).ewm(alpha=1 / 14, adjust=False).mean(); dn_ = (-d_.clip(upper=0)).ewm(alpha=1 / 14, adjust=False).mean()
+    r_ = (100 - 100 / (1 + up_ / dn_)); r_ = r_[r_.index < before].dropna()
+    return round(float(r_.iloc[-1]), 1) if len(r_) else None
+
+
 def lanes(G):
     """Industry momentum-shift lane per group (same rule as the app): strong/weak = quarter Pulse top/bottom 40%;
     rising = week > month > quarter by 10+ pts. Building beat other groups by +1.7% over 3 months (2017-26)."""
@@ -574,25 +582,56 @@ def main(mk="NSE"):
     # 18 Nov 2026: 3-month price change of every candidate - the "strongest 3-month gain" pick for the Best 5 card
     # (concentrated 9/21 test: 5 positions at 1% risk, ranked by 3-month strength = about the 10-position return)
     allc = trades[:30] + swing
-    r3 = {r["symbol"]: num(r.get("r3m")) for r in (tr.get("rows") or [])}
+    r3 = {r["symbol"]: num(r.get("r3m")) for r in (tr.get("rows") or [])}; srsi = {}
     if india:
         try:
             import yfinance as yf
             import nse_bhav; nse_bhav.install()  # noqa: E402,E702  20 Nov 2026 (Amritpal: always use bhavcopy): recent NSE sessions from NSE's bhavcopy
             syms = sorted({c["symbol"] for c in allc})
             tick = {s_: s_ + (".BO" if (c_.get("board") == "BSE") else ".NS") for c_ in allc for s_ in [c_["symbol"]]}
-            Y = yf.download([tick[s_] for s_ in syms], period="6mo", auto_adjust=True, progress=False, group_by="column", threads=True)["Close"]
+            Y = yf.download([tick[s_] for s_ in syms], period="1y", auto_adjust=True, progress=False, group_by="column", threads=True)["Close"]
             for s_ in syms:
                 try:
                     c_ = Y[tick[s_]].dropna() if hasattr(Y, "columns") and tick[s_] in Y.columns else Y.dropna()
                     if len(c_) > 63:
                         r3[s_] = round(float(c_.iloc[-1] / c_.iloc[-64] - 1) * 100, 1)
+                    if len(c_) > 100:
+                        c_.index = pd.to_datetime(c_.index).tz_localize(None) if getattr(c_.index, "tz", None) else pd.to_datetime(c_.index)
+                        lw_ = c_.index[-1]; srsi[s_] = wk_rsi_last(c_, lw_ + pd.Timedelta(days=(4 - lw_.weekday()) % 7))
                 except Exception:  # noqa: BLE001
                     pass
         except Exception as ex:  # noqa: BLE001
             print("r3m download failed", ex)
     for c_ in allc:
         c_["r3m"] = r3.get(c_["symbol"])
+    # 26 Nov 2026 (Amritpal: "can you sort buys as per momentum then"): top-down momentum = the mean weekly RSI(14) of the stock, its size
+    # index and its sector index (last completed week). Buy rows are ranked by it, strongest first - this is also the order in which
+    # the server's automatic buys take cash. A ranking, not a tested filter (the RSI 60 gate is the tested part).
+    if india:
+        try:
+            wr_ = {k: v.get("wrsi") for k, v in (idx_gate or {}).items()}
+            Hh2 = pd.read_csv(D + "sector_hist.csv.gz", parse_dates=["Date"]).pivot_table(index="Date", columns="INDEX", values="CLOSE").sort_index().ffill()
+            a2 = pd.Timestamp(Hh2.index[-1]); we2 = a2 + pd.Timedelta(days=(4 - a2.weekday()) % 7)
+            SECJ2 = load(D + "sectors.json"); s_ind2, i_ix2 = SECJ2.get("symbols") or {}, SECJ2.get("industries") or {}
+            big2 = set(pd.read_csv("data/universe/nifty50.csv").Symbol) | set(pd.read_csv("data/universe/niftynext50.csv").Symbol)
+            mid2 = set(pd.read_csv("data/universe/niftymidcap150.csv").Symbol)
+            for c_ in allc:
+                szi = c_.get("size_index") or ("NIFTY 50" if c_["symbol"] in big2 else "NIFTY MIDCAP 150" if c_["symbol"] in mid2 else "NIFTY SMALLCAP 250")
+                sx = c_.get("sector_index") or i_ix2.get(s_ind2.get(c_["symbol"]))
+                for k in (szi, sx):
+                    if k and k not in wr_ and k in Hh2.columns:
+                        wr_[k] = wk_rsi_last(Hh2[k], we2)
+                parts = dict(stock=srsi.get(c_["symbol"]), size=wr_.get(szi), sector=wr_.get(sx) if sx else None)
+                vals = [v for v in parts.values() if v is not None]
+                c_.update(size_index=szi, sector_index=sx, mom_parts=parts, mom_score=round(sum(vals) / len(vals), 1) if vals else None)
+            mk_ = lambda c_: (c_.get("kind") == "WATCH", -(c_.get("mom_score") or 0))  # noqa: E731
+            trades.sort(key=mk_); swing.sort(key=mk_)
+            seen2 = {}
+            for L_ in (trades, swing):
+                for c_ in L_:
+                    b_ = c_.get("bucket") if L_ is swing else "mom"; seen2[b_] = seen2.get(b_, 0) + 1; c_["rank"] = seen2[b_]
+        except Exception as ex:  # noqa: BLE001
+            print("momentum ranking failed", ex)
     out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), market=mk, watch_only=not india,
                asof=max(str(ath.get("asof") or ""), str(tr.get("asof") or "")),
                rules=dict(risk_pct=1.0, max_pos_pct=20.0, max_positions=10, max_late_pct=MAX_LATE * 100, max_below_pct=MAX_BELOW * 100, top=TOP,

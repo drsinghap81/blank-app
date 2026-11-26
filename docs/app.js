@@ -9000,7 +9000,7 @@ async function tdRender3(el) {
   const C = rows.map((r) => { const G = t3Grade(null, r, X); const e = r.trigger || r.price; const z = t2Shares(e, r.stop, mk);
     const sd = ((r.id || '').match(/(\d{4}-\d{2}-\d{2})$/) || [])[1] || null;   // 22 Nov 2026: signal date from the plan id
     return { r, ...G, e, z, wait: !!r.trigger || (red && bkOf(r) === 'mom'), inv: bkOf(r) === 'mom', px: X.price(r.symbol), sd, isNew: (!!sd && sd >= P.asof) || /next session only/.test(r.when || '') }; })
-    .sort((a, b) => (a.wait - b.wait) || (gOf(b.r.symbol) - gOf(a.r.symbol)) || ('ABC'.indexOf(a.g) - 'ABC'.indexOf(b.g)) || ((b.r.score || 0) - (a.r.score || 0)));
+    .sort((a, b) => (a.wait - b.wait) || ((b.r.mom_score || 0) - (a.r.mom_score || 0)) || (gOf(b.r.symbol) - gOf(a.r.symbol)) || ('ABC'.indexOf(a.g) - 'ABC'.indexOf(b.g)) || ((b.r.score || 0) - (a.r.score || 0)));
   /* 25 Nov 2026 (Amritpal: "how will a newcomer see information that is consistent with what you actually trade"): one source of
      truth. With the server connected, Today shows the server's own list (the one Trade Live sends): same stocks, same quantities,
      and every other signal under "Not today" with the server's reason. Without the server: the plan only, clearly labelled. */
@@ -9055,7 +9055,7 @@ async function tdRender3(el) {
     return `<article class="t3-card"><div class="t3-ch"><span class="t3-g g${c.g}">${c.g}</span><span class="t3-nm" role="button" tabindex="0" data-sp="${i}"><b>${esc(r.symbol)}</b><small>${esc(BK_SHORT[bkOf(r)] || r.system)}${r.late_pct != null && r.late_pct > 5 ? ` · ${fmt(r.late_pct, 0)}% late` : ''}</small></span>
       <span class="t3-amt"><b>${c.z ? Lk(c.z.val) : '–'}</b><small>${c.z ? c.z.q.toLocaleString(MKT[mk].loc) + ' sh' : 'set capital'}</small></span></div>
       ${t3Bars(c.ch)}
-      <div class="t3-pills">${SDt && SDt.by[r.symbol] ? t3Pill(SDt.by[r.symbol].g ? 'ok' : '', `${SDt.by[r.symbol].g} of ${SDt.by[r.symbol].n} tested good`) : ''}${c.isNew ? t3Pill('ok', 'New today') : c.sd ? t3Pill('', 'Signal ' + esc(day(c.sd))) : ''}${t3Px(c.px)}${t3Yoy(c.y)}${t3Pill('bad', `Stop −${fmt(c.stopP, 0)}%`)}${mk === 'NSE' ? govChip(r.symbol, 'NSE') : ''}</div>
+      <div class="t3-pills">${r.mom_score != null ? t3Pill(r.mom_score >= 60 ? 'ok' : '', `Momentum ${fmt(r.mom_score, 0)}`) : ''}${SDt && SDt.by[r.symbol] ? t3Pill(SDt.by[r.symbol].g ? 'ok' : '', `${SDt.by[r.symbol].g} of ${SDt.by[r.symbol].n} tested good`) : ''}${c.isNew ? t3Pill('ok', 'New today') : c.sd ? t3Pill('', 'Signal ' + esc(day(c.sd))) : ''}${t3Px(c.px)}${t3Yoy(c.y)}${t3Pill('bad', `Stop −${fmt(c.stopP, 0)}%`)}${mk === 'NSE' ? govChip(r.symbol, 'NSE') : ''}</div>
       <div class="t3-act"><button class="t3-why" data-why="${i}">Why?</button>${c.room && !c.srv ? `<button class="t3-buy off" data-go3="trade">${c.room}${r.trigger ? ` · buy above ${Mz(c.e, 0)}` : ''} · swap below</button>` : c.srv ? `<button class="t3-buy" data-go3="trade">Send ${c.z.q.toLocaleString(MKT[mk].loc)} ${r.trigger ? 'above' : 'at'} ${Mz(c.e, 0)} on Trade Live</button>` : `<button class="t3-buy" data-buy="${i}">${c.z ? `Buy ${c.z.q.toLocaleString(MKT[mk].loc)} at ${Mz(c.e, mk === 'NSE' ? 0 : 2)}` : 'Chart & plan'}</button>`}</div></article>`; };
   el.innerHTML = `<div class="t3">
     <div class="t3-top">${seg}<span class="muted">${P.asof ? 'Plan from the ' + esc(new Date(P.asof + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })) + ' close' : ''}</span></div>
