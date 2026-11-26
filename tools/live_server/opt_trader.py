@@ -11,7 +11,10 @@ Rules (claude/option-rsi60-basket-test.md, best version):
   entry    : buy STOP-LIMIT just above the signal candle's high (limit 1% above the trigger), valid for the next 3 candles;
              cancelled if a candle breaks the signal low first.
   stop     : the signal candle's low (at least 3% under the entry) - a stop-limit sell is placed on Angel right after the fill.
-  exit     : a completed 5-minute close below the 5 EMA, or 15:15 - limit sell 2% under the last price (re-priced if unfilled).
+  exit     : 26 Nov 2026 (Amritpal: "for option trader put 2 ATR stop loss"; claude/option-exit-rules-test, 25 + 20 Nov: 2 ATR trail
+             +Rs 5,590 vs 5 EMA -Rs 23,861 on 30 trades): the stop trails 2 x ATR(14, 5-min) under the highest high since the fill,
+             raised after each completed candle (never lowered); the Angel stop order is moved up with it. Or 15:15 - limit sell 2%
+             under the last price (re-priced if unfilled). CFG exit="ema5" restores the old close-below-5-EMA exit.
   limits   : 1 lot, at most 3 positions open (pending buys count), stop for the day after -Rs 10,000 (paper P&L), "Stop today" button.
 Paper and live share one book: every trade is simulated on the candles (paper result); when LIVE is on the same trade is also sent
 to Angel and its real fills are recorded beside the paper prices. Live is off by default; switching it on needs the app password."""
@@ -23,7 +26,7 @@ from datetime import date, datetime, timedelta, timezone
 
 IST = timezone(timedelta(hours=5, minutes=30))
 CFG = dict(max_open=3, lots=1, day_loss=10000.0, lull=("11:00", "14:30"), last_entry="15:00", eod="15:15", trig_bars=3,
-           limit_pct=0.01, top=30, tick=0.05, asx_metal=0.005)
+           limit_pct=0.01, top=30, tick=0.05, asx_metal=0.005, exit="atr2", restop_pct=0.01)
 # 20 Nov 2026 (Amritpal "Yes" after tools/research/asx_metal_filter.py, 2016-26, 12 metal F&O stocks, 32k stock-days): when ASX
 # 200 Materials lags the ASX 200 by > 0.5% that day, Indian metal stocks rose open->close on only 38% of days (avg -0.49%); when it
 # leads by > 0.5%, 52% (+0.18%) vs 45% (-0.12%) on all days. So: no CE on a metal stock on a weak-ASX-materials day, no PE on a strong one.
@@ -485,9 +488,11 @@ class OptTrader:
             return
         last = today[-1]; info = u[side]; lot = u["lot"] * CFG["lots"]
         e5 = ema(c, 5)
+        tr_ = [max(x[2] - x[3], abs(x[2] - A[q - 1][4]), abs(x[3] - A[q - 1][4])) if q else x[2] - x[3] for q, x in enumerate(A)]
+        atr = [sum(tr_[max(0, q - 13):q + 1]) / len(tr_[max(0, q - 13):q + 1]) for q in range(len(tr_))]     # ATR(14) as in opt_bt
         mine = [t for t in self.st["trades"] if t["key"] == key and t["state"] in ("pending", "open")]
         for t in mine:
-            self._manage(t, A, e5, last, info, lot, om)
+            self._manage(t, A, e5, last, info, lot, om, atr)
         if mine or self.st.get("stopped"):
             return
         # signal on the newest completed candle only (a cycle sees each candle once)
@@ -539,7 +544,7 @@ class OptTrader:
         self.st["trades"].append(t)
         self.note(f"{key} signal {hm}: buy above {trig}{' (LIVE order sent)' if t.get('oid') else ''}")
 
-    def _manage(self, t, A, e5, last, info, lot, om):
+    def _manage(self, t, A, e5, last, info, lot, om, atr=None):
         idx_of = {x[0]: k for k, x in enumerate(A)}
         s = idx_of.get(t["signal"])
         if s is None:
@@ -573,19 +578,48 @@ class OptTrader:
         if t["state"] == "open":
             if live_o and t.get("live_entry") is None and str(live_o.get("status", "")).lower() == "complete":
                 self._live_filled(t, live_o)
-            for k in range(max(t.get("fill_bar", s), t.get("walked", 0)) + 1, last + 1):
+            fb = t.get("fill_bar", s)
+            if t.get("hi") is None:
+                t["hi"] = A[fb][2] if fb < len(A) else t["entry"]; t.setdefault("stop0", t["stop"])
+            for k in range(max(fb, t.get("walked", 0)) + 1, last + 1):
                 t["walked"] = k; x = A[k]
+                if CFG.get("exit") == "atr2" and atr and k >= 1:
+                    ns = rnd(t["hi"] - 2 * atr[k - 1])                 # 2 x ATR under the highest high so far, never lowered
+                    if ns > t["stop"]:
+                        t["stop"] = ns
                 if x[3] <= t["stop"]:
-                    self._close(t, min(t["stop"], x[1]), x[0], "stop"); break
-                if x[4] < e5[k]:
+                    self._close(t, min(t["stop"], x[1]), x[0], "2 ATR trail stop" if t["stop"] > t.get("stop0", t["stop"]) else "stop"); break
+                if CFG.get("exit") != "atr2" and x[4] < e5[k]:
                     self._close(t, x[4], x[0], "close below 5 EMA"); break
+                t["hi"] = max(t["hi"], x[2])
                 if x[0][11:16] >= CFG["eod"]:
                     self._close(t, x[4], x[0], "15:15 square-off"); break
             if t["state"] == "open":
                 t["now"] = A[last][4]; t["upnl"] = round((A[last][4] - t["entry"] - 0.01 * t["entry"]) * t["lot"])
+                self._live_restop(t, A[last][4])
             # a live stop that filled on Angel closes the live side even if the candles have not shown it yet
             if live_o is not None and t.get("live_stop_oid") and om and str((om.get(t["live_stop_oid"]) or {}).get("status", "")).lower() == "complete":
                 t["live_exit"] = (om[t["live_stop_oid"]].get("avg") or t["stop"]); t["live_state"] = "stopped on Angel"
+
+    def _live_restop(self, t, px):
+        """26 Nov 2026: move the Angel stop up to the trailed 2-ATR stop (cancel + new stop-limit), only when it rose at least
+        restop_pct of the entry and is still under the price. A failure keeps the old stop and alerts."""
+        old = t.get("live_stop")
+        if not t.get("live_stop_oid") or old is None or t.get("live_exit") is not None or not (t["stop"] < px):
+            return
+        if t["stop"] < old + max(CFG["tick"], CFG["restop_pct"] * t["entry"]):
+            return
+        try:
+            self.b.cancel_order(t["live_stop_oid"], "STOPLOSS")
+        except Exception as ex:  # noqa: BLE001
+            self.alert(f"{t['key']}: could not move the stop on Angel ({str(ex)[:80]}); the old stop {old} stays", key=f"otr:restop:{t['key']}:{t['stop']}")
+            return
+        try:
+            t["live_stop_oid"] = self.b.nfo_order(t["tsym"], t["token"], "SELL", t["lot"], rnd(t["stop"] * 0.95), trigger=t["stop"])
+            t["live_stop"] = t["stop"]; self.note(f"{t['key']} stop on Angel raised {old} -> {t['stop']} (2 ATR trail)")
+        except Exception as ex:  # noqa: BLE001
+            t["live_stop_oid"] = None; t["live_state"] = "NO STOP on Angel"
+            self.alert(f"{t['key']}: old stop cancelled but the new stop {t['stop']} was NOT placed - put it in Angel now", key=f"otr:nostop2:{t['key']}:{t['stop']}")
 
     def _cancel(self, t, why):
         t["state"] = "cancelled"; t["why"] = why
@@ -620,7 +654,7 @@ class OptTrader:
             pass
 
     def _live_exit(self, t, om):
-        """the paper trade closed (5 EMA close / 15:15 / stop): sell the live lot with a limit 2% under the last price, re-priced each
+        """the paper trade closed (2 ATR trail / 15:15 / stop): sell the live lot with a limit 2% under the last price, re-priced each
         cycle until Angel fills it. Never places a second sell while an earlier one may still be working (no accidental short)."""
         if t.get("live_exit") is not None:
             return

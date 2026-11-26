@@ -1104,6 +1104,10 @@ def test_opt_trader_paper_and_live(tmp_path):
         keys = sorted(t["key"] for t in T.st["trades"])
         assert keys == ["ABC|CE", "NIFTY|CE"]                          # BANKNIFTY's PCR fifth (3) does not agree
         assert all(t["state"] == "open" and t["entry"] == 104.1 and t.get("live_stop_oid") for t in T.st["trades"])
+        # 26 Nov 2026: the stop trails 2 x ATR under the highest high, and the Angel stop order moves up with it
+        assert all(t["stop"] > t["stop0"] and t["live_stop"] == t["stop"] for t in T.st["trades"])
+        assert all(b.nfo[t["live_stop_oid"]]["trigger"] == t["stop"] for t in T.st["trades"])
+        assert sum(1 for o in b.nfo.values() if o["side"] == "SELL" and o["trigger"] and o["status"] == "cancelled") >= 2
         T.flat_all()
         assert all(t["state"] == "closed" for t in T.st["trades"]) and T.st["stopped"]
         assert sum(1 for o in b.nfo.values() if o["side"] == "SELL" and o["trigger"] is None) == 2

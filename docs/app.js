@@ -1632,7 +1632,7 @@ async function resCard() {
 }
 /* Top Bottom (Bank Nifty futures) bot: approve each level here; the bot on the server trades only approved levels */
 /* 18 Nov 2026: the 5-minute option trader (tools/live_server/opt_trader.py) - paper always, live orders only after the password +
-   LIVE; 1 lot, max 3 open, -Rs 10,000 daily stop; 5 EMA trail + PCR + BB rules from the 28 Oct - 18 Nov backtest. */
+   LIVE; 1 lot, max 3 open, -Rs 10,000 daily stop; 2 ATR trail (26 Nov; was 5 EMA) + PCR + BB rules from the 28 Oct - 18 Nov backtest. */
 /* 19 Nov 2026: Turtle 20/10 on MCX futures, orders on Angel (tools/live_server/turtle_mcx.py) */
 async function tmcxLoad(box = $('#tmcxcard')) {
   if (!box || !isOwner()) return;
@@ -1674,7 +1674,7 @@ async function otrLoad(box = $('#otrcard')) {
   box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Option trader · 5-minute</b><span class="lv-mode ${live ? 'live' : 'dry'}">${live ? 'LIVE + PAPER' : 'PAPER'}</span></div>
     <div class="lv-seg" role="group" aria-label="Option trader mode"><button id="otrdry" class="${live ? '' : 'on'}">Paper only</button><button id="otrlive" class="${live ? 'on live' : ''}">Live orders</button></div>
     <div id="otrarm" class="lv-form" hidden><input id="otrpw" type="password" placeholder="App password"><input id="otrcf" placeholder="Type LIVE" autocapitalize="characters"><button class="lv-btn sell" id="otrgo">Turn on live</button></div>
-    <p class="lv-sub">ATM CE/PE of the 4 indices + 30 most liquid stocks. Buy on a break of the signal candle's high (RSI 60 cross, close above the upper BB, VWAP, Nifty + Bank Nifty agree, PCR agrees, not 11:00–14:30); stop at the signal low; out on a close below the 5 EMA or 15:15. <b>${T.cfg.lots} lot${T.cfg.lots > 1 ? 's' : ''}</b> a trade, max ${T.cfg.max_open} open, stops for the day at <b>−₹${fmt(T.cfg.day_loss, 0, 'en-IN')}</b>.</p>
+    <p class="lv-sub">ATM CE/PE of the 4 indices + 30 most liquid stocks. Buy on a break of the signal candle's high (RSI 60 cross, close above the upper BB, VWAP, Nifty + Bank Nifty agree, PCR agrees, not 11:00–14:30); stop at the signal low, then trailed 2 × ATR under the highest high (moved up on Angel too); out at the stop or 15:15. <b>${T.cfg.lots} lot${T.cfg.lots > 1 ? 's' : ''}</b> a trade, max ${T.cfg.max_open} open, stops for the day at <b>−₹${fmt(T.cfg.day_loss, 0, 'en-IN')}</b>.</p>
     <details class="info" id="otrset"><summary>Your settings · lots, daily stop, max open</summary>
       <div class="lv-form" style="flex-wrap:wrap;gap:8px;align-items:flex-end">
         <label class="lv-sub">Lots a trade<br><input id="otrlots" type="number" min="1" max="10" step="1" value="${T.cfg.lots}" style="width:6em"></label>
