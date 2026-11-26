@@ -22,7 +22,10 @@ jobs:
         run: |
           pip install -q numpy pandas yfinance
           M="${{ github.event.inputs.market }}"
-          if [ -z "$M" ]; then if [ "$(date -u +%H)" -lt 6 ]; then M=US; else M=ASX; fi; fi
+          # 27 Nov 2026: pick the market by WHICH schedule fired - GitHub starts scheduled runs hours late, so the old "hour < 6 UTC = US"
+          # test turned every US run into an ASX run and the US plan stayed on 17 Nov
+          S="${{ github.event.schedule }}"
+          if [ -z "$M" ]; then if [ "$S" = "40 0 * * 2-6" ]; then M=US; elif [ -n "$S" ]; then M=ASX; else M=both; fi; fi
           [ "$M" = both ] && M="US ASX"
           python tools/trade_plan.py $M
           python tools/setup_log.py $M
