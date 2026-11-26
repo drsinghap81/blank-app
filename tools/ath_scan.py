@@ -207,8 +207,11 @@ def analyse(sym, x, today, lookback_days=550):
                 sig.append((idx[j], max(ov[j], lv), float(d.lvl.iloc[i]), d.age.iloc[j], d.ath_month.iloc[j], "wick close" if d.age.iloc[i] < BASE_MAIN else "close confirm"))
         i = len(idx) - 1
         if cv[i] and amv[i] not in used:
+            # 26 Nov 2026 (Amritpal: "breakout candle volume should be extraordinary"): the confirm candle's volume / the 50 sessions before
+            vv_ = x.Volume.to_numpy(float); v50_ = float(np.nanmean(vv_[max(0, i - 50):i])) if i >= 20 else float("nan")
             pending = dict(level=float(d.lvl.iloc[i]), high=float(hv[i]), buy_above=round(float(hv[i]) * (1 + CONF_BUF), 2), close=float(d.c.iloc[i]),
-                           age=int(d.age.iloc[i]), ath_month=d.ath_month.iloc[i], depth=d.depth.iloc[i], trig=float(d.trig.iloc[i]))
+                           age=int(d.age.iloc[i]), ath_month=d.ath_month.iloc[i], depth=d.depth.iloc[i], trig=float(d.trig.iloc[i]),
+                           vol_x=round(float(vv_[i]) / v50_, 2) if np.isfinite(v50_) and v50_ > 0 else None)
     # close breakout (5 Nov 2026): a completed month CLOSES above the old ATH close without trading above the trigger
     # (the old ATH month had a long upper wick) after a base >= BASE_MIN -> buy the next month's first open.
     # NSE 2017-26 backtest at 1% risk: 16.0-17.3%/yr vs 14.8-15.4% without (132 extra trades, avg +16.6%).
@@ -304,7 +307,8 @@ def analyse(sym, x, today, lookback_days=550):
         if pending and not in_trade:
             near = dict(symbol=sym, kind="confirm", trigger=pending["buy_above"], level=pending["level"], candle_high=pending["high"],
                         close=pending["close"], gap_pct=(pending["buy_above"] / pending["close"] - 1) * 100, ath_month=pending["ath_month"],
-                        base_months=pending["age"], depth=pending["depth"], main=bool(pending["age"] >= BASE_MAIN), ath_high=pending["trig"], **common)
+                        base_months=pending["age"], depth=pending["depth"], main=bool(pending["age"] >= BASE_MAIN), ath_high=pending["trig"],
+                        vol_x=pending.get("vol_x"), **common)
         elif near and near.get("kind") == "high":
             lvl_now = float(d.lvl.iloc[-1]) if np.isfinite(d.lvl.iloc[-1]) else float(near["trigger"])
             near = dict(near, kind="wait", level=lvl_now, ath_high=float(near["trigger"]), trigger=lvl_now,

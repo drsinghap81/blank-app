@@ -52,7 +52,7 @@ def buckets(mk):
     B = [dict(key="mom", name="Momentum Investing", system="Monthly ATH", status="active", pct=100,
               rules="Monthly close at an all-time high after a cup of 2+ years; buy when price crosses that month's high. "
                     "Stop: weekly close below the 30-week SMA, raised every week until it triggers."
-                    + (" Entry needs a daily close above that high, then a buy-stop next session at that day's high + 0.15%; "
+                    + (" Entry needs a daily close above that high on at least 1.5x the 50-day volume, then a buy-stop next session at that day's high + 0.15%; "
                        "skipped when the stock's industry is in a Weak, Fading or Turning Pulse lane." if india else ""),
               test="NSE 2017-26 alone: 17.3%/yr, worst fall -16.8%. With close confirmation + industry-lane skip (2008-26, shared with Trend 9/21): 20.5%/yr vs 17.9%." if india else "US/ASX 2008-26: did not beat the index (paper phase)." if mk in ("US", "ASX") else "UK 2008-26: about 1%/yr vs the FTSE 100 2.8% (price) - no edge (paper phase)."),
          dict(key="tf", name="Trend Following 9/21", system=TF_SYS, status="active", pct=100,
@@ -142,6 +142,7 @@ def num(v):
         return None
 
 
+MOM_VOL_X = 1.5     # 26 Nov 2026: Momentum breakout candle must trade >= 1.5x its 50-day average volume
 LANE_ORD = {"build": 0, "hold": 1, "mid": 2, None: 3, "bounce": 4, "fade": 5, "weak": 6}
 LANE_SKIP = ("weak", "fade", "bounce")
 LANE_NAME = {"weak": "Weak", "fade": "Fading", "bounce": "Turning / weak-bouncing"}
@@ -239,6 +240,15 @@ def main(mk="NSE"):
                               exit_rule="daily close with EMA 9 below EMA 21 -> sell next open",
                               note=f"closed above the wick high {lvl:.2f}; buy above today's high + 0.15% = {trig:.2f}, cup {r.get('base_months')} m; stop = EMA 21 (min 4%)",
                               base_months=r.get("base_months"), score=sc, value_cr=num(r.get("value_cr")), **t))
+            elif india and r.get("vol_x") is not None and float(r["vol_x"]) < MOM_VOL_X:
+                # 26 Nov 2026 (Amritpal: "breakout candle volume should be extraordinary"; tools/research/breakout_volume_test.py):
+                # Momentum confirms on less than 1.5x the 50-day volume are skipped. NSE 2017-26 with the lane: 31.0%/yr, worst fall
+                # -23.4% vs 28.9% / -30.0%; since 2024 +7.0% a trade vs +3.0%. Cup 9/21 keeps no volume rule (it lowered its return).
+                C.append(dict(id=f"CONF-{r['symbol']}-{trig}", symbol=r["symbol"], name=r.get("name", ""), system="Monthly ATH", kind="WATCH",
+                              order=None, when="daily close", side="BUY", price=round(trig, 2), ref=close, stop=round(stop, 2), vol_skip=True,
+                              note=f"closed above the ATH-month high {lvl:.2f} on only {float(r['vol_x']):.1f}x the 50-day volume - "
+                                   f"skipped (Momentum needs {MOM_VOL_X:g}x on the breakout candle)",
+                              base_months=r.get("base_months"), score=-99, value_cr=num(r.get("value_cr")), **t))
             else:
                 C.append(dict(id=f"CONF-{r['symbol']}-{trig}", symbol=r["symbol"], name=r.get("name", ""), system="Monthly ATH", bucket="mom",
                               kind="ATH_STOP", order="STOPLOSS_LIMIT", when="next session only (lapses if not triggered)", side="BUY",
