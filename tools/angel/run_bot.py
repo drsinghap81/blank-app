@@ -94,7 +94,21 @@ def load_cfg():
             cfg["dry_run"] = not bool(json.load(open(m)).get("live"))
         except Exception:  # noqa: BLE001
             cfg["dry_run"] = True
+    # 26 Nov 2026 (MCX sleeves): the session follows the exchange. MCX closes 23:30 IST while the US is on summer time, else 23:55.
+    if cfg.get("session_close") == "auto":
+        from zoneinfo import ZoneInfo as _Z
+        cfg["session_close"] = "23:30" if datetime.now(_Z("America/New_York")).dst() else "23:55"
+    if cfg.get("exchange") == "MCX":
+        cl = datetime.strptime(cfg["session_close"], "%H:%M")
+        cfg["close_check_time"] = (cl - timedelta(minutes=10)).strftime("%H:%M")
+        cfg["roll_time"] = (cl - timedelta(minutes=20)).strftime("%H:%M")
     return cfg
+
+
+def sess(cfg, which, minutes=0, seconds=0):
+    """IST time of the session open / close (+ offset)."""
+    return at(cfg.get("session_open" if which == "open" else "session_close") or ("09:15" if which == "open" else "15:30")) \
+        + timedelta(minutes=minutes, seconds=seconds)
 
 
 def app_status(tg, st, cfg, plan=None, running=True, q=None, note=""):
@@ -153,6 +167,8 @@ def load_history(br: AngelBroker, today: date, git_pull: bool) -> pd.DataFrame:
             subprocess.run(["git", "-C", REPO, "pull", "-q", "--ff-only"], timeout=60, check=False)
         except Exception as e:  # noqa: BLE001
             log(f"git pull skipped: {e}")
+    if br.cfg.get("exchange") == "MCX":
+        return mcx_history(br, today)
     repo = pd.read_csv(os.path.join(REPO, "data/futures", br.cfg["symbol"] + ".csv"), index_col=0, parse_dates=True)
     repo = repo[["Open", "High", "Low", "Close"]]
     if os.path.exists(HIST):
@@ -169,6 +185,31 @@ def load_history(br: AngelBroker, today: date, git_pull: bool) -> pd.DataFrame:
             add = pd.DataFrame([b[1:] for b in bars], index=pd.to_datetime([b[0] for b in bars]), columns=["Open", "High", "Low", "Close"])
             hist = pd.concat([hist, add]).sort_index()
             log(f"filled {len(add)} missing day(s) from Angel: {', '.join(str(d.date()) for d in add.index)}")
+    return hist
+
+
+def mcx_history(br: AngelBroker, today: date) -> pd.DataFrame:
+    """26 Nov 2026 (MCX sleeves): no bhavcopy file for MCX, and Angel only serves LIVE contracts. History = the reference contract's
+    own daily candles since it listed (real MCX prices, the levels the bot trades), with the bars this bot recorded itself
+    (history.csv) for any older days. Levels jump at a roll as on any near-month series."""
+    ref = br.reference_contract(today)
+    bars = []
+    for k in range(3):                                   # Angel's daily candles: up to ~2000 days a request; 3 x 600 days back
+        e = today - timedelta(days=1 + 600 * k); s0 = e - timedelta(days=599)
+        got = [b for b in br.daily_bars(ref, s0, e) if b[0] < today]
+        bars = got + bars
+        if len(got) < 300:
+            break
+        time.sleep(0.5)
+    hist = pd.DataFrame([b[1:] for b in bars], index=pd.to_datetime([b[0] for b in bars]), columns=["Open", "High", "Low", "Close"])
+    hist = hist[~hist.index.duplicated()].sort_index()
+    if os.path.exists(HIST):
+        own = pd.read_csv(HIST, index_col=0, parse_dates=True)[["Open", "High", "Low", "Close"]]
+        own = own[(own.index < (hist.index[0] if len(hist) else pd.Timestamp(today))) & (own.index < pd.Timestamp(today))]
+        hist = pd.concat([own, hist]).sort_index()
+    log(f"MCX history: {len(hist)} days for {ref} ({hist.index[0].date() if len(hist) else '-'} -> {hist.index[-1].date() if len(hist) else '-'})")
+    if len(hist) < 30:
+        raise RuntimeError(f"only {len(hist)} days of {ref} history from Angel - too few to set levels")
     return hist
 
 
@@ -348,10 +389,10 @@ def main():
             print(tl.describe_plan(day.plan, st, cfg))
             ask_levels(tg, st, cfg, day.plan, "next session"); app_status(tg, st, cfg, day.plan, running=False, note="checked")
             return
-        if now() >= at("15:30"):
+        if now() >= sess(cfg, "close"):
             log("market already closed"); return
         app_status(tg, st, cfg, day.plan, note="waiting for 08:55 IST")
-        wait_until(at("08:55"), tg)
+        wait_until(sess(cfg, "open", minutes=-20), tg)
         day.start()
         ask_levels(tg, st, cfg, day.plan, "today")
         app_status(tg, st, cfg, day.plan, note="waiting for the open")
@@ -362,7 +403,7 @@ def main():
             day.done_for_day = True
         tg.keyboard(f"Bot running — {mode}, {st.lots} lots" + (" (managing the open position only)" if manage_only else "")
                     + ".\nUse the buttons below any time: 📊 Status · ⛔ Stop new trades · 🔴 Square off")
-        wait_until(at("09:15") + timedelta(seconds=5), tg)
+        wait_until(sess(cfg, "open", seconds=5), tg)
         ref = day.ref
         q = br.quote(ref)
         tries = 0
@@ -370,7 +411,7 @@ def main():
             time.sleep(10); tries += 1; q = br.quote(ref)
         if q["open"] <= 0 or not br.traded_today(ref):
             log("no trading today (holiday?)"); tg.send("No trading today (exchange holiday?)."); return
-        if now() < at("09:17"):
+        if now() < sess(cfg, "open", minutes=2):
             day.on_open(q)
         else:
             day.late_start(q)
@@ -378,7 +419,7 @@ def main():
         loss_hit, flat_key, next_beat = False, None, time.time() + 60 * cfg["heartbeat_minutes"]
         next_sync, flat_seen = time.time() + 60, 0
         roll_t, close_t = at(cfg["roll_time"]), at(cfg["close_check_time"])
-        while now() < at("15:29"):
+        while now() < sess(cfg, "close", minutes=-1):
             for cmd in tg.poll():
                 if cmd == "/status":
                     tg.send(f"{tl.describe_plan(day.plan, st, cfg)}\nLTP {last_q['ltp']:,.2f}  H {last_q['high']:,.2f}  L {last_q['low']:,.2f}"
@@ -433,7 +474,7 @@ def main():
                 break
             time.sleep(cfg["poll_seconds"])
         # ---- after the close: record today's bar
-        wait_until(at("15:35"), tg)
+        wait_until(sess(cfg, "close", minutes=5), tg)
         bars = [b for b in br.daily_bars(ref, today, today) if b[0] == today]
         if bars:
             b = bars[-1]; bar = dict(Open=b[1], High=b[2], Low=b[3], Close=b[4])

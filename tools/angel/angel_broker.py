@@ -65,6 +65,7 @@ class AngelBroker:
         self.cache_dir = cache_dir
         self.api = None
         self.contracts = {}          # tradingsymbol -> dict(token, expiry: date, lot, tick)
+        self.ex = cfg.get("exchange") or "NFO"   # 26 Nov 2026: "MCX" for the commodity sleeves
         self._dry_n = 0
 
     # ------------------------------------------------------------ session
@@ -145,8 +146,8 @@ class AngelBroker:
             open(path, "wb").write(r.content)
         rows = json.load(open(path))
         sym = self.cfg["symbol"]
-        for x in rows:
-            if x.get("exch_seg") == "NFO" and x.get("name") == sym and x.get("instrumenttype") in ("FUTIDX", "FUTSTK"):   # FUTSTK: stock-future sleeves (24 Nov 2026)
+        for x in rows:   # FUTSTK: stock-future sleeves (24 Nov 2026); FUTCOM: MCX commodity sleeves (26 Nov 2026)
+            if x.get("exch_seg") == self.ex and x.get("name") == sym and x.get("instrumenttype") in ("FUTIDX", "FUTSTK", "FUTCOM"):
                 self.contracts[x["symbol"]] = dict(
                     token=x["token"], expiry=datetime.strptime(x["expiry"], "%d%b%Y").date(),
                     lot=int(float(x["lotsize"])), tick=float(x.get("tick_size") or 5) / 100)
@@ -159,7 +160,9 @@ class AngelBroker:
         return sorted(self.contracts, key=lambda k: self.contracts[k]["expiry"])
 
     def reference_contract(self, today: date) -> str:
-        """near month = earliest expiry on/after today (same rule as the backtest series)."""
+        """near month = earliest expiry on/after today (same rule as the backtest series). MCX (26 Nov 2026): roll_days ahead -
+        brokers close physically settled MCX contracts before the tender period, so the bot moves to the next one early."""
+        today = today + timedelta(days=int(self.cfg.get("roll_days") or 0))
         for k in self._by_expiry():
             if self.contracts[k]["expiry"] >= today:
                 return k
@@ -185,7 +188,7 @@ class AngelBroker:
         c = self.contracts[con]
         for attempt in range(3):
             try:
-                r = self.api.ltpData("NFO", con, c["token"])
+                r = self.api.ltpData(self.ex, con, c["token"])
                 d = r["data"]
                 return dict(ltp=float(d["ltp"]), open=float(d["open"]), high=float(d["high"]),
                             low=float(d["low"]), prev_close=float(d["close"]))
@@ -197,8 +200,8 @@ class AngelBroker:
     def daily_bars(self, con: str, start: date, end: date):
         """[(date, o, h, l, c), ...] daily candles of one contract."""
         c = self.contracts[con]
-        r = self.api.getCandleData({"exchange": "NFO", "symboltoken": c["token"], "interval": "ONE_DAY",
-                                    "fromdate": f"{start} 09:15", "todate": f"{end} 15:30"})
+        r = self.api.getCandleData({"exchange": self.ex, "symboltoken": c["token"], "interval": "ONE_DAY",
+                                    "fromdate": f"{start} 09:00", "todate": f"{end} {self.cfg.get('session_close') or '15:30'}"})
         out = []
         for row in (r or {}).get("data") or []:
             ts = datetime.fromisoformat(row[0][:19]).date()
@@ -209,8 +212,9 @@ class AngelBroker:
         """holiday check: any 1-minute candle today?"""
         c = self.contracts[con]
         t = date.today()
-        r = self.api.getCandleData({"exchange": "NFO", "symboltoken": c["token"], "interval": "ONE_MINUTE",
-                                    "fromdate": f"{t} 09:15", "todate": f"{t} 09:30"})
+        o = self.cfg.get("session_open") or "09:15"; o2 = (datetime.strptime(o, "%H:%M") + timedelta(minutes=15)).strftime("%H:%M")
+        r = self.api.getCandleData({"exchange": self.ex, "symboltoken": c["token"], "interval": "ONE_MINUTE",
+                                    "fromdate": f"{t} {o}", "todate": f"{t} {o2}"})
         return bool((r or {}).get("data"))
 
     def net_qty(self) -> dict:
@@ -228,7 +232,7 @@ class AngelBroker:
     def _params(self, con, side, qty, price, kind="LIMIT", trig=None, oid=None):
         c = self.contracts[con]
         p = {"variety": "STOPLOSS" if kind == "SL" else "NORMAL", "tradingsymbol": con, "symboltoken": c["token"],
-             "transactiontype": side, "exchange": "NFO", "ordertype": "STOPLOSS_LIMIT" if kind == "SL" else "LIMIT",
+             "transactiontype": side, "exchange": self.ex, "ordertype": "STOPLOSS_LIMIT" if kind == "SL" else "LIMIT",
              "producttype": "CARRYFORWARD", "duration": "DAY", "price": f"{price:.2f}", "quantity": str(int(qty)),
              "ordertag": "topbottom"}
         if trig is not None:

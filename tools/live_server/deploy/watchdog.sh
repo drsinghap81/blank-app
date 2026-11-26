@@ -13,11 +13,15 @@ if [ -f "$VAR/cmd_update" ]; then rm -f "$VAR/cmd_update"; log "update requested
 if [ -f "$VAR/cmd_tbrestart" ]; then rm -f "$VAR/cmd_tbrestart"; log "Top Bottom bot restart requested from the app"
   [ -f /etc/systemd/system/trenddesk-tb.service ] && systemctl restart trenddesk-tb && log "trenddesk-tb restarted"
   systemctl is-active -q trenddesk-tb-nifty && systemctl restart trenddesk-tb-nifty && log "trenddesk-tb-nifty restarted"
-  for u in $(systemctl list-units 'trenddesk-tbs@*.service' --state=active --no-legend --plain | awk '{print $1}'); do systemctl restart "$u" && log "$u restarted"; done; fi
+  for u in $(systemctl list-units 'trenddesk-tbs@*.service' 'trenddesk-tbm@*.service' --state=active --no-legend --plain | awk '{print $1}'); do systemctl restart "$u" && log "$u restarted"; done; fi
 # 24 Nov 2026: the app's "Install stock-futures bots" button (Top Bottom BEL / L&T / TMPV / TCS, buy only, Dry run)
 for alt in $APP/repo/tools/live_server/var; do [ -f "$alt/cmd_tbstocks" ] && mv -f "$alt/cmd_tbstocks" "$VAR/cmd_tbstocks"; done
 if [ -f "$VAR/cmd_tbstocks" ]; then rm -f "$VAR/cmd_tbstocks"; log "Top Bottom stock-futures bots: install requested from the app"
   bash $APP/repo/tools/live_server/deploy/tb_stocks_setup.sh >> "$LOG" 2>&1 && log "tb_stocks_setup.sh done" || log "tb_stocks_setup.sh failed (exit $?)"; fi
+# 26 Nov 2026: the app's "Install MCX bots" button (Top Bottom CRUDEOILM / SILVERMIC / NATGASMINI / GOLDPETAL, Dry run)
+for alt in $APP/repo/tools/live_server/var; do [ -f "$alt/cmd_tbmcx" ] && mv -f "$alt/cmd_tbmcx" "$VAR/cmd_tbmcx"; done
+if [ -f "$VAR/cmd_tbmcx" ]; then rm -f "$VAR/cmd_tbmcx"; log "Top Bottom MCX bots: install requested from the app"
+  bash $APP/repo/tools/live_server/deploy/tb_mcx_setup.sh >> "$LOG" 2>&1 && log "tb_mcx_setup.sh done" || log "tb_mcx_setup.sh failed (exit $?)"; fi
 # 24 Nov 2026: Settings -> Server -> Connect moomoo (OpenD). The app writes cmd_opend.json (download link, moomoo ID, MD5 of the
 # login password - never the password itself) and cmd_opendcode (the SMS code); this root script installs / answers, then deletes them.
 for alt in $APP/repo/tools/live_server/var; do for c in cmd_opend.json cmd_opendcode; do [ -f "$alt/$c" ] && mv -f "$alt/$c" "$VAR/$c"; done; done

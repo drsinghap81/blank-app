@@ -65,6 +65,12 @@ DEFAULT_CFG = {
     "dry_run": True,                 # True = real prices, simulated orders (nothing sent to Angel)
     "start_date": None,
     "long_only": False,              # buy only (Nifty): no short entries; a long stopped at the system point just exits
+    # 26 Nov 2026 (MCX commodity sleeves, claude/top-bottom-mcx-minis-test.md)
+    "exchange": "NFO",               # "MCX" for commodities
+    "session_open": "09:15",         # MCX: 09:00
+    "session_close": "15:30",        # MCX: "auto" = 23:30 while the US is on summer time, else 23:55
+    "roll_days": 0,                  # MCX: move to the next contract this many days before expiry (tender period)
+    "trend_200d": False,             # buy only while the last close is above its 200-day average (silver, natural gas)
 }
 
 
@@ -208,6 +214,14 @@ class TradingDay:
         self.event_eve = any((pd.Timestamp(e) - pd.offsets.BDay(1)).date() == today for e in ev)
         if self.event_today:
             self.done_for_day = True
+        # 26 Nov 2026: trend filter (MCX silver / natural gas: buy only while above the 200-day average, as tested)
+        self.trend_ok = True
+        if cfg.get("trend_200d"):
+            cl = hist["Close"]
+            if len(cl) >= 200:
+                self.trend_ok = bool(cl.iloc[-1] > cl.iloc[-200:].mean())
+            else:
+                self.log(f"trend filter: only {len(cl)} days of history (needs 200) - not applied today")
 
     # ---- helpers
     def save(self):
@@ -244,8 +258,10 @@ class TradingDay:
         self.say(describe_plan(p, st, c))
         # approval keys name the LEVEL, not the day: an approval given the evening before (or on an earlier day for the
         # same, still unused level) stays valid until that level is used
+        if st.pos == 0 and not self.trend_ok:
+            self.say(f"{c['symbol']}: last close is under its 200-day average - no buys today (trend filter).")
         if st.pos == 0:
-            if p["buy_lvl"]:
+            if p["buy_lvl"] and self.trend_ok:
                 self.keys["BUY"] = f"BUY:{p['buy_lvl']:.2f}"
                 if c["confirm_entries"]:
                     self.ap.ask(self.keys["BUY"], f"Approve BUY {st.lots} lots {c['symbol']} FUT above {p['buy_lvl']:,.2f} today?")
@@ -353,7 +369,7 @@ class TradingDay:
     def check_entries(self, hi, lo, ltp):
         st, p, c = self.st, self.plan, self.cfg
         o = self.open_px
-        go_l = p["buy_lvl"] is not None and hi >= p["buy_lvl"] and not same(p["top"], st.used_T)
+        go_l = self.trend_ok and p["buy_lvl"] is not None and hi >= p["buy_lvl"] and not same(p["top"], st.used_T)
         go_s = (not c.get("long_only")) and p["sell_lvl"] is not None and lo <= p["sell_lvl"] and not same(p["bot"], st.used_B)
         if go_l and go_s:
             go_l = abs(o - p["buy_lvl"]) <= abs(o - p["sell_lvl"])
@@ -458,7 +474,8 @@ class TradingDay:
 
     def roll(self):
         st = self.st
-        if self.rolled or st.pos == 0 or self.br.expiry(st.contract) != self.today:
+        rd = int(self.cfg.get("roll_days") or 0)        # MCX: roll rd days before expiry (NFO: on expiry day)
+        if self.rolled or st.pos == 0 or self.br.expiry(st.contract) - timedelta(days=rd) > self.today:
             return
         self.rolled = True
         new = self.br.next_contract(st.contract)

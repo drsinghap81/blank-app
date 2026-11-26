@@ -334,7 +334,7 @@ def admin(body: Admin, request: Request, _=Depends(auth)):
     'restart' = restart the app server; 'tbrestart' = restart the Top Bottom bots (23 Nov 2026: a fresh start re-checks Angel, so a
     position squared off by hand is noticed). Needs the app password + typing the action's name. The root watchdog acts within a minute."""
     act = body.action.lower()
-    if act not in ("update", "restart", "tbrestart", "tbstocks"):
+    if act not in ("update", "restart", "tbrestart", "tbstocks", "tbmcx"):
         raise HTTPException(400, "unknown action")
     ip = request.client.host if request.client else "?"
     n, t0 = FAILS.get(ip, (0, 0))
@@ -348,6 +348,10 @@ def admin(body: Admin, request: Request, _=Depends(auth)):
     if act == "tbstocks":
         return dict(ok=True, msg="Install requested: within about a minute the four Top Bottom stock-future bots (BEL, L&T, TMPV, TCS, buy only) "
                     "are set up in Dry run. Their cards appear in Futures; each level waits for your OK until you turn on auto-approve.")
+    if act == "tbmcx":
+        return dict(ok=True, msg="Install requested: within about a minute four Top Bottom MCX bots are set up in Dry run - crude mini "
+                    "(both sides), silver micro and natural gas mini (buy only above the 200-day), gold petal (buy only). Their cards "
+                    "appear in Futures; each level waits for your OK.")
     if act == "tbrestart":
         return dict(ok=True, msg="Top Bottom bot restart requested: within about a minute the bot restarts, re-checks your Angel positions "
                     "and carries on (or stands flat if you closed the position yourself).")
@@ -2210,7 +2214,9 @@ TB_DIRS = {"bn": TB_DIR, "nifty": ENV.get("TB_NIFTY_DIR") or os.path.join(DATA, 
 # 24 Nov 2026 (Amritpal: automate the Top Bottom basket): buy-only stock-future sleeves, best in the instrument screen and in the
 # basket test (claude/top-bottom-basket-smooth-curve.md). Installed by deploy/tb_stocks_setup.sh, each in Dry run until switched.
 TB_STOCKS = {"bel": "BEL", "lt": "LT", "tmpv": "TMPV", "tcs": "TCS"}
-for _k in TB_STOCKS:
+# 26 Nov 2026: MCX mini commodity sleeves (claude/top-bottom-mcx-minis-test.md), deploy/tb_mcx_setup.sh, Dry run until switched
+TB_MCX = {"crude": "CRUDEOILM", "silver": "SILVERMIC", "natgas": "NATGASMINI", "gold": "GOLDPETAL"}
+for _k in list(TB_STOCKS) + list(TB_MCX):
     TB_DIRS[_k] = os.path.join(DATA, "tb_" + _k)
 
 

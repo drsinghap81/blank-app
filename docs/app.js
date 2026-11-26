@@ -1211,7 +1211,7 @@ async function loadLive() {
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${S && S.exits.filter((e) => e.qty > 0).length >= 2 ? `<div class="lv-basket"><div><b>${S.exits.filter((e) => e.qty > 0).length} to sell</b><div class="lv-sub">One confirmation sends every sell to Angel (each still gets every check; its stop GTT is cancelled first)</div></div><button class="lv-btn sell" id="lvsellbk">Sell all ${S.exits.filter((e) => e.qty > 0).length} as one basket</button></div>` : ''}${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
-    ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>' + TB_STOCKS.map((k) => `<div id="tbcard_${k}"></div>`).join('')) : ''}
+    ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>' + TB_STOCKS.concat(TB_MCX).map((k) => `<div id="tbcard_${k}"></div>`).join('')) : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div><div id="mmcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
     const sym = b.dataset.tgt, E = +b.dataset.e, St = +b.dataset.s, R = E - St;
@@ -1312,7 +1312,7 @@ async function loadLive() {
   const prb = el.querySelector('#lvprbk'); if (prb) prb.addEventListener('click', () => lvBasket(rows.filter((r) => r.tier === 'swing' && bkOf(r) === 'pr' && !r.skip && !r.surv && r.qty > 0)
     .map((r) => { const L = state._lvQ && state._lvQ[r.id]; const E = (L && L.limit_now) || r.price; return { r, q: r.qty, v: r.qty * E }; }), prb));
   state._lvBkUpd = bkUpd;
-  if (S) { autoLoad(); tbLoad(); tbLoad('nifty'); TB_STOCKS.forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); }
+  if (S) { autoLoad(); tbLoad(); tbLoad('nifty'); TB_STOCKS.concat(TB_MCX).forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); }
   state._lvMoreAll = false;
   const ma = $('#lvmoreall'); if (ma) ma.addEventListener('click', () => { state._lvMoreAll = !state._lvMoreAll; lvMoreUpd(); });
   lvMoreUpd();
@@ -1719,8 +1719,11 @@ async function otrLoad(box = $('#otrcard')) {
 
 /* 24 Nov 2026: Top Bottom buy-only stock-future sleeves (server TB_STOCKS); each gets the same card as Nifty */
 const TB_STOCKS = ['bel', 'lt', 'tmpv', 'tcs'];
-const TB_LABEL = { bn: 'Bank Nifty futures', nifty: 'Nifty futures · buy only', bel: 'BEL futures · buy only', lt: 'L&T futures · buy only', tmpv: 'Tata Motors PV futures · buy only', tcs: 'TCS futures · buy only' };
-const TB_SHORT = { bn: 'BN', nifty: 'Nifty', bel: 'BEL', lt: 'L&T', tmpv: 'TMPV', tcs: 'TCS' };
+/* 26 Nov 2026: Top Bottom MCX mini commodity sleeves (server TB_MCX, deploy/tb_mcx_setup.sh) */
+const TB_MCX = ['crude', 'silver', 'natgas', 'gold'];
+const TB_LABEL = { bn: 'Bank Nifty futures', nifty: 'Nifty futures · buy only', bel: 'BEL futures · buy only', lt: 'L&T futures · buy only', tmpv: 'Tata Motors PV futures · buy only', tcs: 'TCS futures · buy only',
+  crude: 'MCX crude oil mini · both sides', silver: 'MCX silver micro · buy only above 200-day', natgas: 'MCX natural gas mini · buy only above 200-day', gold: 'MCX gold petal · buy only' };
+const TB_SHORT = { bn: 'BN', nifty: 'Nifty', bel: 'BEL', lt: 'L&T', tmpv: 'TMPV', tcs: 'TCS', crude: 'Crude', silver: 'Silver', natgas: 'Nat gas', gold: 'Gold' };
 const tbBoxSel = (inst) => inst === 'bn' ? '#tbcard' : inst === 'nifty' ? '#tbcardn' : '#tbcard_' + inst;
 async function tbLoad(inst = 'bn') {
   if (!isOwner()) { const b0 = $(tbBoxSel(inst)); if (b0) b0.innerHTML = ''; return; }
@@ -1733,6 +1736,11 @@ async function tbLoad(inst = 'bn') {
     box.innerHTML = inst !== TB_STOCKS[0] ? '' : `<div class="lv-card"><b>Top Bottom · stock futures (BEL, L&T, TMPV, TCS) · buy only</b><p class="lv-sub">Not installed yet. Install adds four buy-only bots, 1 lot each, all in Dry run and asking your OK for every level. Keep total futures near 1× your account: the margin watch holds new automatic entries above that.</p><button class="lv-btn" id="tbsinst">Install stock-futures bots…</button></div>`;
     const ib = box.querySelector('#tbsinst'); if (ib) ib.addEventListener('click', async () => { const pw = window.prompt('App password:'); if (!pw) return; const cf = window.prompt('Type TBSTOCKS to install the four bots (Dry run):'); if (!cf) return;
       try { const j = await lvApi('/api/admin', { method: 'POST', body: JSON.stringify({ action: 'tbstocks', password: pw, confirm: cf }) }); alertMsg(j.msg, true); } catch (e) { alertMsg(e.message); } });
+    return; }
+  if (TB_MCX.includes(inst) && T.installed === false) {
+    box.innerHTML = inst !== TB_MCX[0] ? '' : `<div class="lv-card"><b>Top Bottom · MCX commodities (crude, silver, natural gas, gold minis)</b><p class="lv-sub">Not installed yet. Install adds four bots on the real MCX contracts, 1 lot each, all in Dry run and asking your OK for every level: crude both sides; silver and natural gas buy only above their 200-day; gold buy only. MCX hours 09:00–23:30/23:55 IST.</p><button class="lv-btn" id="tbminst">Install MCX bots…</button></div>`;
+    const ib = box.querySelector('#tbminst'); if (ib) ib.addEventListener('click', async () => { const pw = window.prompt('App password:'); if (!pw) return; const cf = window.prompt('Type TBMCX to install the four MCX bots (Dry run):'); if (!cf) return;
+      try { const j = await lvApi('/api/admin', { method: 'POST', body: JSON.stringify({ action: 'tbmcx', password: pw, confirm: cf }) }); alertMsg(j.msg, true); } catch (e) { alertMsg(e.message); } });
     return; }
   if (!bn && T.installed === false) { box.innerHTML = '<div class="lv-card"><b>Top Bottom · Nifty futures · buy only</b><p class="lv-sub">Not installed on your server yet: run <code>sudo bash /opt/trenddesk/repo/tools/live_server/deploy/tb_nifty_setup.sh</code> once. It starts in Dry run.</p></div>'; return; }
   const S = T.status || {}; const live = T.mode === 'LIVE'; const lots = S.lots || 1;
@@ -1750,7 +1758,7 @@ async function tbLoad(inst = 'bn') {
     <div class="tb-auto"><span><b>Auto-approve levels</b><small>${T.auto ? (live ? 'ON · entries and reversals go to Angel automatically, within the bot\'s limits' : 'ON · approved automatically (dry run: logged only)') : 'OFF · you get a phone alert for each level and approve it here'}</small></span>
       ${T.auto == null ? '<small class="muted">after your server updates</small>' : `<button class="ad-sy" aria-pressed="${!!T.auto}" id="${px}auto">${T.auto ? 'On' : 'Off'}</button>`}</div>
     <div id="${px}autoarm" class="lv-form" hidden><input id="${px}apw" type="password" placeholder="App password"><input id="${px}acf" placeholder="Type AUTO" autocapitalize="characters"><button class="lv-btn sell" id="${px}ago">Turn on auto</button></div>
-    <p class="lv-sub">${pos}${S.ltp ? ` · ${TB_SHORT[inst] || inst} fut ${fmt(S.ltp, 2, 'en-IN')}` : ''} · ${S.running ? '● bot running' : `bot idle (starts ${bn ? '08:25' : inst === 'nifty' ? '08:27' : '08:29'} IST on weekdays)`}${S.note ? ' · ' + esc(S.note) : ''}</p>
+    <p class="lv-sub">${pos}${S.ltp ? ` · ${TB_SHORT[inst] || inst} fut ${fmt(S.ltp, 2, 'en-IN')}` : ''} · ${S.running ? '● bot running' : `bot idle (starts ${bn ? '08:25' : inst === 'nifty' ? '08:27' : TB_MCX.includes(inst) ? '08:31' : '08:29'} IST on weekdays)`}${S.note ? ' · ' + esc(S.note) : ''}</p>
     ${`<details class="info" data-tbdiag="${bn ? 'bn' : 'nifty'}"><summary>Diagnostics (the bot's own log)</summary><pre class="lv-sub" style="white-space:pre-wrap;font-size:11px;max-height:260px;overflow:auto">Loading…</pre></details>`}
     ${S.pos ? '' : lvl('BUY', S.buy_lvl) + (bn ? lvl('SELL', S.sell_lvl) : '')}
     ${pend ? `<p class="lv-sub" style="margin-top:8px"><b>Needs your OK</b> — the bot trades only approved levels; no answer = no trade.</p>${pend}` : ''}
