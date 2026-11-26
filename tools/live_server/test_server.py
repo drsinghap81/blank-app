@@ -1113,9 +1113,15 @@ def test_opt_trader_paper_and_live(tmp_path):
         assert all(t["stop"] > t["stop0"] and t["live_stop"] == t["stop"] for t in T.st["trades"])
         assert all(b.nfo[t["live_stop_oid"]]["trigger"] == t["stop"] for t in T.st["trades"])
         assert sum(1 for o in b.nfo.values() if o["side"] == "SELL" and o["trigger"] and o["status"] == "cancelled") >= 2
+        # 26 Nov 2026: one lot sold by hand in Angel first -> the square-off cancels its stop but sends NO sell (no short)
+        t0 = T.st["trades"][0]; hand = dict(id="H1", symbol=t0["tsym"], side="SELL", qty=t0["lot"], price=1, trigger="by hand", status="complete", avg=1, filled=t0["lot"])
+        b.nfo["H1"] = hand
         T.flat_all()
         assert all(t["state"] == "closed" for t in T.st["trades"]) and T.st["stopped"]
-        assert sum(1 for o in b.nfo.values() if o["side"] == "SELL" and o["trigger"] is None) == 2
+        assert t0["live_state"].startswith("already closed in Angel") and not t0.get("live_exit_oid")
+        hand["status"] = "cancelled"; t0.update(live_exit=None, live_state=None, live_exit_manual=None)
+        T.flat_all()
+        assert sum(1 for o in b.nfo.values() if o["side"] == "SELL" and o["trigger"] is None and o["status"] != "cancelled") == 2
         # 19 Nov 2026: the live sells are re-checked each cycle (no second sell while one is working) and the paper-vs-live record is written
         T.cycle()
         assert sum(1 for o in b.nfo.values() if o["side"] == "SELL" and o["trigger"] is None and o["status"] != "cancelled") == 2
@@ -1637,3 +1643,30 @@ def test_momentum_index_gate(tmp_path):
     g = next(r for r in c.get("/api/plan", headers=h).json()["rows"] if r["symbol"] == "GATECO"); assert g["skip"].startswith("RSI gate") and "55" in g["skip"]
     assert c.post("/api/picks", headers=h, json={"idx_gate": "off"}).json()["idx_gate"] == "off"
     os.environ["PLAN_FILE"] = os.path.join(HERE, "..", "..", "data", "scan", "trade_plan.json")
+
+
+def test_opt_live_exit_sell_first():
+    """26 Nov 2026 (Amritpal: "square off all should first square off position and then cancel order"): the sell goes first, the
+    stop is cancelled only after Angel accepted it; a refused sell keeps the stop."""
+    import opt_trader as O
+    calls = []
+
+    class B:
+        fail = False
+        def order_map(self): return {"S1": dict(status="trigger pending")}
+        def fo_positions(self): return [dict(tsym="X26CE", netqty=50)]
+        def ltp_ex(self, *a): return 10.0
+        def nfo_order(self, *a, **k):
+            calls.append("sell")
+            if self.fail:
+                raise RuntimeError("RMS rejected")
+            return "E1"
+        def cancel_order(self, oid, v="NORMAL"): calls.append("cancel " + oid)
+    T = O.OptTrader.__new__(O.OptTrader); T.b = B(); T.alert = lambda *a, **k: calls.append("alert"); T._hist = lambda t: None
+    t = dict(key="X|CE", signal="s", tsym="X26CE", token="1", lot=50, exit=10.0, live_entry=9.0, live_stop_oid="S1")
+    T._live_exit(t, T.b.order_map())
+    assert calls[:2] == ["sell", "cancel S1"] and t["live_exit_oid"] == "E1" and t["stop_cancelled"]
+    calls.clear(); T.b.fail = True
+    t = dict(key="X|CE", signal="s", tsym="X26CE", token="1", lot=50, exit=10.0, live_entry=9.0, live_stop_oid="S1")
+    T._live_exit(t, T.b.order_map())
+    assert calls == ["sell", "alert"] and not t.get("stop_cancelled") and t["live_state"].startswith("SELL FAILED - stop kept")

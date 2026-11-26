@@ -780,7 +780,13 @@ class MockBroker(AngelEquity):
         return list(self.fills)
 
     def fo_positions(self):
-        return list(getattr(self, "fo", []))
+        if hasattr(self, "fo"):
+            return list(self.fo)
+        net = {}                                             # 26 Nov 2026: net option quantity from the filled fake NFO orders
+        for o in getattr(self, "nfo", {}).values():
+            if o["status"] == "complete":
+                net[o["symbol"]] = net.get(o["symbol"], 0) + (o["qty"] if o["side"] == "BUY" else -o["qty"])
+        return [dict(exchange="NFO", tsym=k, netqty=v) for k, v in net.items() if v]
 
     def fut_for(self, exchange, name, min_expiry):
         return getattr(self, "fut", None)

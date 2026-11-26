@@ -654,8 +654,14 @@ class OptTrader:
             pass
 
     def _live_exit(self, t, om):
-        """the paper trade closed (2 ATR trail / 15:15 / stop): sell the live lot with a limit 2% under the last price, re-priced each
-        cycle until Angel fills it. Never places a second sell while an earlier one may still be working (no accidental short)."""
+        """the paper trade closed (2 ATR trail / 15:15 / stop / Square off all): sell the live lot with a limit 2% under the last price,
+        re-priced each cycle until Angel fills it.
+        26 Nov 2026 (Amritpal: "square off all should first square off position and then cancel order immediately" - the old order
+        cancelled the stop first, the sell did not go through, and the lot sat on Angel with no stop):
+          1. the SELL goes first, while the stop is still on Angel; 2. only once Angel has accepted that sell is the stop cancelled
+          (same call, a second later); 3. a sell Angel refuses leaves the stop in place and alerts.
+        Sells only what Angel's position book still holds (a lot closed by hand gets no sell: no accidental short); position book
+        unreadable -> nothing sent this cycle. If the stop filled in the moment between the two, the app alerts to buy back."""
         if t.get("live_exit") is not None:
             return
         so, eo = t.get("live_stop_oid"), t.get("live_exit_oid")
@@ -663,26 +669,55 @@ class OptTrader:
         for oid, how, px in ((so, "stopped on Angel", t.get("stop")), (eo, "sold on Angel", t.get("exit"))):
             if oid and st(oid) == "complete":
                 t["live_exit"] = (om[oid].get("avg") or px); t["live_state"] = how
+                if so and oid == eo and not t.get("stop_cancelled") and st(so) not in ("cancelled", "rejected"):
+                    try:
+                        self.b.cancel_order(so, "STOPLOSS"); t["stop_cancelled"] = True
+                    except Exception as ex:  # noqa: BLE001
+                        self.alert(f"{t['key']}: sold, but the old stop could not be cancelled - cancel it in Angel: {str(ex)[:60]}", key=f"otr:stopleft:{t['key']}:{t['signal']}")
                 if t.get("hist_due"):
                     self._hist(t)
                 return
         if (so or eo) and om is None:                       # order book not visible: wait, never risk a double sell
             return
-        try:
-            if so and not t.get("stop_cancelled") and st(so) not in ("cancelled", "rejected"):
-                self.b.cancel_order(so, "STOPLOSS")
-            if so:
-                t["stop_cancelled"] = True
-            if eo and st(eo) not in ("cancelled", "rejected"):
+        if eo and st(eo) not in ("cancelled", "rejected"):  # earlier sell still working: withdraw it before re-pricing
+            try:
                 self.b.cancel_order(eo, "NORMAL")
+            except Exception as ex:  # noqa: BLE001
+                t["live_state"] = f"could not re-price the sell - check Angel: {str(ex)[:80]}"; return
+        try:
+            held = sum(int(p.get("netqty") or 0) for p in (self.b.fo_positions() or []) if str(p.get("tsym")) == str(t["tsym"]))
         except Exception as ex:  # noqa: BLE001
-            t["live_state"] = f"could not cancel the earlier order - check Angel: {str(ex)[:80]}"; return
+            t["live_state"] = f"position book unreadable - not selling this cycle: {str(ex)[:60]}"
+            self.alert(f"{t['key']}: could not read Angel positions, live sell held back - check Angel", key=f"otr:posfail:{t['key']}:{t['signal']}")
+            return
+        if held <= 0:
+            t["live_exit"] = t.get("exit"); t["live_state"] = "already closed in Angel (no sell sent)"; t["live_exit_manual"] = True
+            if so and not t.get("stop_cancelled") and st(so) not in ("cancelled", "rejected", "complete"):
+                try:
+                    self.b.cancel_order(so, "STOPLOSS"); t["stop_cancelled"] = True
+                except Exception:  # noqa: BLE001
+                    pass
+            if t.get("hist_due"):
+                self._hist(t)
+            return
         try:
             ltp = self.b.ltp_ex("NFO", t["tsym"], t["token"]) or t["exit"]
-            t["live_exit_oid"] = self.b.nfo_order(t["tsym"], t["token"], "SELL", t["lot"], rnd(ltp * 0.98)); t["live_state"] = "sell order on Angel"
+            t["live_exit_oid"] = self.b.nfo_order(t["tsym"], t["token"], "SELL", min(t["lot"], held), rnd(ltp * 0.98)); t["live_state"] = "sell order on Angel"
         except Exception as ex:  # noqa: BLE001
-            t["live_state"] = f"SELL FAILED - close it in Angel: {str(ex)[:80]}"
-            self.alert(f"{t['key']}: the live SELL failed - close it in Angel: {str(ex)[:80]}", key=f"otr:sellfail:{t['key']}:{t['signal']}")
+            t["live_state"] = f"SELL FAILED - stop kept on Angel; close it in Angel: {str(ex)[:80]}"
+            self.alert(f"{t['key']}: the live SELL failed (stop still on Angel) - close it in Angel: {str(ex)[:80]}", key=f"otr:sellfail:{t['key']}:{t['signal']}")
+            return
+        if so and not t.get("stop_cancelled") and st(so) not in ("cancelled", "rejected", "complete"):
+            try:
+                self.b.cancel_order(so, "STOPLOSS"); t["stop_cancelled"] = True
+            except Exception as ex:  # noqa: BLE001
+                self.alert(f"{t['key']}: sell sent, but the stop could not be cancelled - cancel it in Angel now: {str(ex)[:60]}", key=f"otr:stopleft:{t['key']}:{t['signal']}")
+            try:                                             # the stop filled in the second between the two: both may fill -> short
+                om2 = self.b.order_map()
+                if str((om2.get(so) or {}).get("status", "")).lower() == "complete":
+                    self.alert(f"{t['key']}: the stop filled while the square-off sell was going in - check Angel, buy back any short", key=f"otr:double:{t['key']}:{t['signal']}")
+            except Exception:  # noqa: BLE001
+                pass
 
     # ------------------------------------------------------------------ app
     def stop_today(self):
