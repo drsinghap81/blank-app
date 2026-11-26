@@ -8995,7 +8995,7 @@ async function tdRender3(el) {
   const al = lvAlloc(mk, P, null); const seen = new Set();
   const SDt = mk === 'NSE' ? await scoreData(false).catch(() => null) : null; const gOf = (sym) => (SDt && SDt.by[sym] ? SDt.by[sym].g : 0);   // 24 Nov 2026: Stock score
   const rows = (P.top || []).concat(P.swing || []).filter((r) => { const b = bkOf(r); if (!ownK(b) || seen.has(r.symbol) || H.has(r.symbol)) return false;
-    if (!((al[b] ?? 0) > 0) || r.lane_skip || r.vol_skip) return false;   /* 26 Nov 2026: skipped rows live only in the folded Skipped list */ seen.add(r.symbol); return r.stop && (r.trigger || r.price) > r.stop; });
+    if (!((al[b] ?? 0) > 0) || r.lane_skip || r.vol_skip || r.kind === 'WATCH') return false;   /* 26 Nov 2026: skipped rows live in the folded Skipped list, waiting ones under "Close above to buy" */ seen.add(r.symbol); return r.stop && (r.trigger || r.price) > r.stop; });
   const red = L && L.lvl === 'red';
   const C = rows.map((r) => { const G = t3Grade(null, r, X); const e = r.trigger || r.price; const z = t2Shares(e, r.stop, mk);
     const sd = ((r.id || '').match(/(\d{4}-\d{2}-\d{2})$/) || [])[1] || null;   // 22 Nov 2026: signal date from the plan id
@@ -9018,6 +9018,7 @@ async function tdRender3(el) {
        Buy today as cards, marked, instead of folding away */
     srvNo.forEach((x) => { if (/slot|cash/i.test(x.why || '')) { const c = C.find((q) => q.r.symbol === x.sym); if (c) c.room = /cash/i.test(x.why) ? 'Needs cash' : 'No free slot'; } });
     srvNo = srvNo.filter((x) => !/slot|cash/i.test(x.why || '') || !C.some((q) => q.r.symbol === x.sym));
+    srvNo = srvNo.filter((x) => !/^watch only/i.test(x.why || ''));   // 26 Nov 2026: shown under "Close above to buy" / "Skipped" instead
   }
   /* 26 Nov 2026 (Amritpal: "give me a replacement option - a stronger system buy for a non-system, weaker stock"): when system buys
      are blocked only by slots or cash, pair each with the weakest holding no system manages (Weak / Turning / Fading industry first,
@@ -9076,6 +9077,11 @@ async function tdRender3(el) {
         <div><span class="t3-swk up">Buy</span><b>${esc(c.r.symbol)}</b><small>${esc(BK_SHORT[bkOf(c.r)] || c.r.system || '')}${c.r.trigger ? ` · buy above ${fmt(c.r.trigger, 2)}${/next session only/.test(c.r.when || '') ? ' (today only)' : ''}` : ''}${c.r.lane ? ' · ' + esc(LANE_TXT[c.r.lane] || c.r.lane) : ''}</small></div></div>`).join('')}
       <button class="t3-link" data-go3="trade">Open Trade Live → Not in any system</button></section>` : ''}
     ${waits.length ? `<section id="t3wait" class="t3-sec"><h2>Waiting</h2><div class="t3-waits">${waits.map((c) => `<button class="t3-wt" data-why="${C.indexOf(c)}"><span class="t3-g g${c.g} sm">${c.g}</span><b>${esc(c.r.symbol)}</b><small>${c.r.trigger ? 'buys above ' + Mz(c.r.trigger, 2) : 'after the pause'}</small></button>`).join('')}</div></section>` : ''}
+    ${(() => { /* 26 Nov 2026 (Amritpal: "can't see in app"): Momentum / Cup 9/21 stocks waiting for a daily close above their level -
+         they become buys the morning after that close. Strongest top-down momentum first. */
+      const seenW = new Set(); const W = ['top', 'more', 'swing'].flatMap((k) => P[k] || []).filter((r) => r.kind === 'WATCH' && !r.lane_skip && !r.vol_skip && !H.has(r.symbol)
+        && (al[bkOf(r)] ?? 0) > 0 && !seenW.has(r.symbol) && seenW.add(r.symbol)).sort((a, b) => (b.mom_score || 0) - (a.mom_score || 0));
+      return W.length ? `<section class="t3-sec"><h2>Close above to buy</h2><div class="t3-nolist">${W.map((r) => `<div class="t3-no"><span class="t3-nw"><b>${esc(r.symbol)}</b> <small>${esc(BK_SHORT[bkOf(r)] || r.system || '')}${r.mom_score != null ? ` · momentum ${fmt(r.mom_score, 0)}` : ''}</small></span><span class="t3-ns">daily close above <b>${Mz(r.price, 2)}</b>${r.ref ? ` · ${fmt((r.price / r.ref - 1) * 100, 1)}% away` : ''}</span></div>`).join('')}</div></section>` : ''; })()}
     ${srvOn && srvNo.length ? (() => { const G = {}; srvNo.forEach((x) => { (G[x.why] = G[x.why] || []).push(x); });
       return `<details class="t3-old t3-nod"><summary>Also signalled by the systems, not for you today (${srvNo.length}) · why</summary>
         <p class="t3-lbl">The systems fired on these too, but your account can't take them now. Nothing to do: they come back if the reason clears.</p>
