@@ -561,7 +561,7 @@ class MoomooTrade(MoomooRO):
                 if ret != m.RET_OK:
                     raise RuntimeError(f"moomoo snapshot: {d}")
                 for r in d.itertuples():
-                    out[r.code[3:].replace(".", "-")] = dict(last=float(r.last_price), low=float(r.low_price), open=float(r.open_price),
+                    out[r.code[3:].replace(".", "-")] = dict(last=float(r.last_price), low=float(r.low_price), high=float(r.high_price), open=float(r.open_price),
                                                              prev=float(r.prev_close_price), ut=str(r.update_time))
         finally:
             q.close()

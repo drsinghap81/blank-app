@@ -1716,3 +1716,27 @@ def test_alert_review(tmp_path):
     C = {x["category"]: x for x in R["categories"]}
     assert C["Trend line touch (support)"]["avg1"] > 0 and C["Trend line touch (support)"]["hit5"] == 100
     assert C["Trend line broken"]["avg5"] < 0 and C["Buy filled"]["n"] == 1
+
+
+def test_moomoo_tb_late_switch_on(tmp_path):
+    """27 Nov 2026: automation switched on after the pre-open check -> today's buy-stops are still placed during the session for ETFs
+    still under their level; one already traded above it is skipped (not chased)."""
+    import json as _j
+    from datetime import datetime
+    W = dict(markets=dict(US=dict(asof="2026-11-23", symbols={}), AU=dict(asof="2026-11-26", symbols=dict(
+        TECH=dict(date="2026-11-26", open=120, high=122, low=120, close=121.73, top=123.18, bot=119.62, buy_lvl=123.2416, bot_stop=119.56),
+        ASIA=dict(date="2026-11-26", open=16, high=16.4, low=15.9, close=16.4, top=16.88, bot=16.07, buy_lvl=16.8884, bot_stop=16.062)))))
+    wf = os.path.join(str(tmp_path), "tbw.json"); _j.dump(W, open(wf, "w")); os.environ["TB_WORLD_FILE"] = wf
+    A, c = client(tmp_path)
+    import mm_tb
+    J = A.mmtb_job(); J.live_on = lambda: True; A.moomoo.env_name = "REAL"
+    clock = {"t": datetime(2026, 11, 27, 9, 40, tzinfo=mm_tb.MKT["AU"]["tz"])}
+    J.now = lambda mk: clock["t"] if mk == "AU" else datetime(2026, 11, 22, 12, 0, tzinfo=mm_tb.MKT["US"]["tz"])
+    on = {"v": False}; J.auto_on = lambda mk: mk == "AU" and on["v"]
+    J.set_cfg("AU", capital=19500); J.st["cfg"]["AU"]["symbols"] = ["TECH", "ASIA"]
+    J.step(); assert not J.st["pos"]["AU"]                     # pre-open with automation off
+    on["v"] = True; A.moomoo.px.update(TECH=122.0, ASIA=17.0)   # ASIA already above its level
+    clock["t"] = datetime(2026, 11, 27, 10, 10, tzinfo=mm_tb.MKT["AU"]["tz"]); J.step()
+    P = J.st["pos"]["AU"]; assert "TECH" in P and P["TECH"]["state"] in ("pending", "watch") and "ASIA" not in P
+    J.step(); assert len(J.st["pos"]["AU"]) == 1                # once a day
+    os.environ.pop("TB_WORLD_FILE", None)

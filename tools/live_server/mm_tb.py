@@ -137,6 +137,12 @@ class MMTB:
             return
         if M["pre"] <= hm < M["open"] and self.st["day"].get(mk) != today:
             self.st["day"][mk] = today; self._preopen(mk, n)
+        # 27 Nov 2026 (Amritpal switched ASX on at 09:51, after the 09:35 check had already passed with it off): automation turned on
+        # later in the day still places today's buy-stops while the market is open - only for ETFs still BELOW their buy level
+        # (a level already crossed today is skipped, not chased), up to an hour before the close.
+        if M["pre"] <= hm < (M["close"][0] - 1, M["close"][1]) and self.st.setdefault("ent", {}).get(mk) != today and self.auto_on(mk) \
+                and self.st["day"].get(mk) == today:
+            self._entries(mk, n, late=hm >= M["open"])
         if M["open"] <= hm <= (M["close"][0], M["close"][1] + 10) and self.st["pos"][mk]:
             self._monitor(mk, n, hm >= M["close"])
 
@@ -186,9 +192,26 @@ class MMTB:
                     except Exception as ex:  # noqa: BLE001
                         self.note(mk, f"{sym}: stop order refused ({str(ex)[:80]}) - the server watches {ns} itself")
                 self.note(mk, f"{sym}: stop raised {old} -> {ns}{' (breakeven)' if p['be'] and ns >= e else ''}")
-        # 2. new entries (only with this market's automation on)
-        if not self.auto_on(mk):
-            return
+        if self.auto_on(mk):
+            self._entries(mk, n, late=False)
+
+    def _entries(self, mk, n, late=False):
+        """2. new entries (only with this market's automation on). late = placed during the session: skip ETFs already at / above
+        their level today (the rule doesn't chase)."""
+        W = self.levels() or {}; Mk = (W.get("markets") or {}).get(mk) or {}; S = Mk.get("symbols") or {}; asof = Mk.get("asof")
+        if not asof or date.fromisoformat(asof) >= n.date() or (n.date() - date.fromisoformat(asof)).days > 5:
+            return                                                   # stale levels: the pre-open check already said so
+        P = self.st["pos"][mk]; cfg = self.st["cfg"][mk]
+        cap = float(cfg.get("capital") or 0); syms = cfg.get("symbols") or []
+        if cap <= 0 or not syms:
+            self.note(mk, "automation on but no capital set - nothing placed"); return
+        self.st.setdefault("ent", {})[mk] = n.date().isoformat()
+        snap = {}
+        if late:
+            try:
+                snap = self.mm.snapshot([x for x in syms if x not in P], mk=mk) or {}
+            except Exception as ex:  # noqa: BLE001
+                self.note(mk, f"price check failed ({str(ex)[:80]}) - no late entries"); return
         cap = float(cfg.get("capital") or 0); syms = cfg.get("symbols") or []
         if cap <= 0 or not syms:
             self.note(mk, "automation on but no capital set - nothing placed"); return
@@ -203,6 +226,12 @@ class MMTB:
             bar = S[sym]; lv = bar.get("buy_lvl")
             if not lv:
                 continue
+            if late:
+                q0 = snap.get(sym) or {}; hi = q0.get("high") or q0.get("last")
+                if not hi:
+                    self.note(mk, f"{sym}: no price - not placed"); continue
+                if hi >= lv:
+                    self.note(mk, f"{sym}: already traded at/above {lv} today ({hi}) - level skipped, not chased"); continue
             trig = up(lv, mk); lim = down(lv * (1 + GAP), mk); st0 = max(lv * (1 - MAX_SL), bar.get("bot_stop") or 0.0)
             if st0 >= trig * 0.995:
                 st0 = trig * (1 - MAX_SL)
