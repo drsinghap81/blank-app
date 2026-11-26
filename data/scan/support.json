@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-26T04:12+00:00",
-"asof": "2026-11-25",
+"generated": "2026-11-26T17:56+00:00",
+"asof": "2026-11-26",
 "market": "NSE",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "2016-26, 16,908 first touches, 3R target vs stop (1 ATR below the level): breakout retests +0.20R per trade, old swing lows +0.10R, random uptrend stock the same day +0.09R. Trades with 1:3 room to the next resistance: no better. Within 1% of an odd square: no better (breakout retests +0.15R vs +0.21R away from one; swing lows +0.04R vs +0.09R). Watch only.",
@@ -9,20 +9,20 @@
 "symbol": "ADANIENSOL",
 "name": "Adani Energy Solutions Limited",
 "status": "touched",
-"touch_date": "2026-11-25",
+"touch_date": "2026-11-26",
 "days_ago": 0,
-"level": 1365.9,
-"level_kind": "breakout retest",
-"level_date": "2026-10-16",
-"close": 1408.0,
-"above_pct": 3.082215010867828,
-"stop": 1317.09,
-"risk_pct": 6.456979528650065,
+"level": 1347.5,
+"level_kind": "old swing low",
+"level_date": "2026-09-15",
+"close": 1382.0,
+"above_pct": 2.560296846011134,
+"stop": 1299.45,
+"risk_pct": 5.973227585498186,
 "resistance": 1435.8,
-"room_r": 0.30578311071418424,
+"room_r": 0.6517267767239373,
 "sq9": 1369,
 "sq9_cross": "37\u00b2",
-"sq9_dist_pct": -0.22644087552501357,
+"sq9_dist_pct": -1.570489408327247,
 "sq9_gap_pct": 11.10299488677866,
 "sq9_below": [
 [
@@ -36,23 +36,386 @@
 "39\u00b2"
 ]
 ],
+"sq9_match": false
+},
+{
+"symbol": "COFORGE",
+"name": "Coforge Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 1977.9,
+"level_kind": "breakout retest",
+"level_date": "2025-12-05",
+"close": 2000.0,
+"above_pct": 1.1173454326886212,
+"stop": 1896.89,
+"risk_pct": 5.155357142857142,
+"resistance": 2142.3,
+"room_r": 1.380118242877554,
+"sq9": 2025,
+"sq9_cross": "45\u00b2",
+"sq9_dist_pct": -2.3259247202932154,
+"sq9_gap_pct": 9.086419753086417,
+"sq9_below": [
+[
+1849,
+"43\u00b2"
+]
+],
+"sq9_above": [
+[
+2025,
+"45\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "HINDOILEXP",
+"name": "Hindustan Oil Exploration Company Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 205.78,
+"level_kind": "breakout retest",
+"level_date": "2024-12-10",
+"close": 213.00999450683594,
+"above_pct": 3.513458922357837,
+"stop": 190.56,
+"risk_pct": 10.540415570762296,
+"resistance": 216.35,
+"room_r": 0.14876140095059567,
+"sq9": 225,
+"sq9_cross": "15\u00b2",
+"sq9_dist_pct": -8.542222764756946,
+"sq9_gap_pct": 28.44444444444445,
+"sq9_below": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "IGIL",
+"name": "International Gemological Institute Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 402.45,
+"level_kind": "breakout retest",
+"level_date": "2025-04-03",
+"close": 423.20001220703125,
+"above_pct": 5.155919833672562,
+"stop": 383.49,
+"risk_pct": 9.384283258168791,
+"resistance": 450.6,
+"room_r": 0.689927865999737,
+"sq9": 441,
+"sq9_cross": "21\u00b2",
+"sq9_dist_pct": -8.741493830605162,
+"sq9_gap_pct": 19.95464852607709,
+"sq9_below": [
+[
+361,
+"19\u00b2"
+]
+],
+"sq9_above": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "PARAGMILK",
+"name": "Parag Milk Foods Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 311.8,
+"level_kind": "breakout retest",
+"level_date": "2026-10-07",
+"close": 315.44000244140625,
+"above_pct": 1.167419753349841,
+"stop": 293.32,
+"risk_pct": 7.0124310121105875,
+"resistance": 320.0,
+"room_r": 0.20614805471244446,
+"sq9": 289,
+"sq9_cross": "17\u00b2",
+"sq9_dist_pct": 7.889269132515131,
+"sq9_gap_pct": 24.913494809688586,
+"sq9_below": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_above": [
+[
+361,
+"19\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "SANATHAN",
+"name": "Sanathan Textiles Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 533.75,
+"level_kind": "breakout retest",
+"level_date": "2025-09-17",
+"close": 547.7999877929688,
+"above_pct": 2.632316214139352,
+"stop": 505.47,
+"risk_pct": 7.727009410183694,
+"resistance": 554.05,
+"room_r": 0.14765445602629673,
+"sq9": 529,
+"sq9_cross": "23\u00b2",
+"sq9_dist_pct": 0.8979206049149369,
+"sq9_gap_pct": 18.14744801512287,
+"sq9_below": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_above": [
+[
+625,
+"25\u00b2"
+]
+],
 "sq9_match": true
+},
+{
+"symbol": "SGMART",
+"name": "SG Mart Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 842.3,
+"level_kind": "breakout retest",
+"level_date": "2026-08-26",
+"close": 881.0499877929688,
+"above_pct": 4.6004987013634535,
+"stop": 760.21,
+"risk_pct": 13.71577802677143,
+"resistance": 1097.05,
+"room_r": 1.7874457779965485,
+"sq9": 841,
+"sq9_cross": "29\u00b2",
+"sq9_dist_pct": 0.1545764319820231,
+"sq9_gap_pct": 14.26872770511296,
+"sq9_below": [
+[
+729,
+"27\u00b2"
+]
+],
+"sq9_above": [
+[
+961,
+"31\u00b2"
+]
+],
+"sq9_match": true
+},
+{
+"symbol": "SONACOMS",
+"name": "Sona BLW Precision Forgings Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 833.0,
+"level_kind": "breakout retest",
+"level_date": "2026-09-23",
+"close": 881.5,
+"above_pct": 5.82232893157264,
+"stop": 808.65,
+"risk_pct": 8.264727925145355,
+"resistance": 934.9,
+"room_r": 0.7329773891975172,
+"sq9": 841,
+"sq9_cross": "29\u00b2",
+"sq9_dist_pct": -0.9512485136741966,
+"sq9_gap_pct": 14.26872770511296,
+"sq9_below": [
+[
+729,
+"27\u00b2"
+]
+],
+"sq9_above": [
+[
+961,
+"31\u00b2"
+]
+],
+"sq9_match": true
+},
+{
+"symbol": "SUNTV",
+"name": "Sun TV Network Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 616.3,
+"level_kind": "breakout retest",
+"level_date": "2026-03-24",
+"close": 651.0999755859375,
+"above_pct": 5.646598812631964,
+"stop": 581.32,
+"risk_pct": 10.717026317044754,
+"resistance": 662.65,
+"room_r": 0.16552433203382394,
+"sq9": 625,
+"sq9_cross": "25\u00b2",
+"sq9_dist_pct": -1.3920019531249994,
+"sq9_gap_pct": 16.64000000000001,
+"sq9_below": [
+[
+529,
+"23\u00b2"
+]
+],
+"sq9_above": [
+[
+729,
+"27\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "TIPSMUSIC",
+"name": "Tips Music Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 724.35,
+"level_kind": "breakout retest",
+"level_date": "2025-02-05",
+"close": 777.75,
+"above_pct": 7.372130353268314,
+"stop": 691.7,
+"risk_pct": 11.063510957661759,
+"resistance": 829.7,
+"room_r": 0.6037437721006318,
+"sq9": 729,
+"sq9_cross": "27\u00b2",
+"sq9_dist_pct": -0.6378634312842912,
+"sq9_gap_pct": 15.36351165980796,
+"sq9_below": [
+[
+625,
+"25\u00b2"
+]
+],
+"sq9_above": [
+[
+841,
+"29\u00b2"
+]
+],
+"sq9_match": true
+},
+{
+"symbol": "WINDMACHIN",
+"name": "Windsor Machines Limited",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 305.99,
+"level_kind": "breakout retest",
+"level_date": "2026-04-17",
+"close": 308.25,
+"above_pct": 0.7385894433651119,
+"stop": 288.24,
+"risk_pct": 6.4914859386767105,
+"resistance": 320.1,
+"room_r": 0.5922040430823472,
+"sq9": 289,
+"sq9_cross": "17\u00b2",
+"sq9_dist_pct": 5.878889354455019,
+"sq9_gap_pct": 24.913494809688586,
+"sq9_below": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_above": [
+[
+361,
+"19\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "MODINSU.BO",
+"name": "MODERN INSULATORS LTD.",
+"status": "touched",
+"touch_date": "2026-11-26",
+"days_ago": 0,
+"level": 541.5,
+"level_kind": "breakout retest",
+"level_date": "2026-07-10",
+"close": 552.1500244140625,
+"above_pct": 1.9667635113688853,
+"stop": 512.75,
+"risk_pct": 7.136393658982798,
+"resistance": 571.5,
+"room_r": 0.4910712705128436,
+"sq9": 529,
+"sq9_cross": "23\u00b2",
+"sq9_dist_pct": 2.3629489603024467,
+"sq9_gap_pct": 18.14744801512287,
+"sq9_below": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_above": [
+[
+625,
+"25\u00b2"
+]
+],
+"sq9_match": false
 },
 {
 "symbol": "ADANIGREEN",
 "name": "Adani Green Energy Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 1334.5,
 "level_kind": "breakout retest",
 "level_date": "2026-09-18",
-"close": 1364.5,
-"above_pct": 2.248032971150238,
-"stop": 1288.98,
-"risk_pct": 5.5347342981141745,
-"resistance": 1479.0,
-"room_r": 1.5161255611676807,
+"close": 1348.800048828125,
+"above_pct": 1.071566041822769,
+"stop": 1291.09,
+"risk_pct": 4.278940790289399,
+"resistance": 1448.9,
+"room_r": 1.7344034213487425,
 "sq9": 1369,
 "sq9_cross": "37\u00b2",
 "sq9_dist_pct": -2.5200876552227913,
@@ -76,16 +439,16 @@
 "name": "Alicon Castalloy Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 989.7,
 "level_kind": "old swing low",
 "level_date": "2024-12-30",
-"close": 1009.6,
-"above_pct": 2.0107090580500087,
-"stop": 929.7,
-"risk_pct": 7.914024147481058,
-"resistance": 1055.65,
-"room_r": 0.5763458254009257,
+"close": 983.9000244140625,
+"above_pct": -0.5860349319421365,
+"stop": 926.91,
+"risk_pct": 5.792546619761241,
+"resistance": 1014.55,
+"room_r": 0.5377859487748446,
 "sq9": 961,
 "sq9_cross": "31\u00b2",
 "sq9_dist_pct": 2.98647369480034,
@@ -109,16 +472,16 @@
 "name": "Amanta Healthcare Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 207.08,
 "level_kind": "breakout retest",
 "level_date": "2026-10-07",
-"close": 218.4,
-"above_pct": 5.466485449512737,
-"stop": 188.52,
-"risk_pct": 13.681971591408493,
+"close": 215.1699981689453,
+"above_pct": 3.906700920589534,
+"stop": 189.59,
+"risk_pct": 11.88694466976572,
 "resistance": 239.08,
-"room_r": 0.6920687741527968,
+"room_r": 0.934819332592354,
 "sq9": 225,
 "sq9_cross": "15\u00b2",
 "sq9_dist_pct": -7.964443630642359,
@@ -142,16 +505,16 @@
 "name": "Apollo Micro Systems Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 403.95,
 "level_kind": "breakout retest",
 "level_date": "2026-08-06",
-"close": 419.8999938964844,
-"above_pct": 3.9485038265770545,
-"stop": 378.75,
-"risk_pct": 9.800799316982689,
-"resistance": 425.4,
-"room_r": 0.13364580294286707,
+"close": 428.79998779296875,
+"above_pct": 6.151745224654537,
+"stop": 380.1,
+"risk_pct": 11.356438470019226,
+"resistance": 437.0,
+"room_r": 0.16839049840431164,
 "sq9": 441,
 "sq9_cross": "21\u00b2",
 "sq9_dist_pct": -8.401357776183394,
@@ -175,16 +538,16 @@
 "name": "Dc Infotech And Communication Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 345.2,
 "level_kind": "breakout retest",
 "level_date": "2026-10-08",
-"close": 352.6,
-"above_pct": 2.143681208368764,
-"stop": 329.76,
-"risk_pct": 6.4784040791841075,
-"resistance": 380.4,
-"room_r": 1.217010596720488,
+"close": 336.1499938964844,
+"above_pct": -2.621673809536018,
+"stop": 328.6,
+"risk_pct": 2.2449559878555236,
+"resistance": 345.2,
+"room_r": 1.1992466640765955,
 "sq9": 361,
 "sq9_cross": "19\u00b2",
 "sq9_dist_pct": -4.376727920489953,
@@ -208,16 +571,16 @@
 "name": "Knowledge Marine & Engineering Works Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 669.14,
 "level_kind": "breakout retest",
 "level_date": "2026-10-12",
-"close": 683.8,
-"above_pct": 2.190869628274239,
-"stop": 625.53,
-"risk_pct": 8.521079068715254,
+"close": 693.7999877929688,
+"above_pct": 3.6853233411078268,
+"stop": 626.99,
+"risk_pct": 9.629368072726107,
 "resistance": 738.1,
-"room_r": 0.93191422856238,
+"room_r": 0.6630885537910141,
 "sq9": 625,
 "sq9_cross": "25\u00b2",
 "sq9_dist_pct": 7.062402343749996,
@@ -241,16 +604,16 @@
 "name": "Mangal Credit and Fincorp Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 245.33,
 "level_kind": "breakout retest",
 "level_date": "2026-07-03",
-"close": 254.75999450683594,
-"above_pct": 3.8437992114291664,
-"stop": 233.58,
-"risk_pct": 8.312863229106092,
-"resistance": 257.36,
-"room_r": 0.12276934893237851,
+"close": 255.10000610351562,
+"above_pct": 3.9823927768887435,
+"stop": 232.94,
+"risk_pct": 8.686510873610898,
+"resistance": 291.5,
+"room_r": 1.642651649774187,
 "sq9": 225,
 "sq9_cross": "15\u00b2",
 "sq9_dist_pct": 9.035556369357645,
@@ -274,16 +637,16 @@
 "name": "Mold-Tek Packaging Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 319.98,
 "level_kind": "old swing low",
 "level_date": "2026-09-22",
-"close": 339.8500061035156,
-"above_pct": 6.211422648920961,
-"stop": 304.99,
-"risk_pct": 10.256626920930422,
-"resistance": 354.5,
-"room_r": 0.42028665757893324,
+"close": 330.1000061035156,
+"above_pct": 3.164309651337094,
+"stop": 305.3,
+"risk_pct": 7.513957991399522,
+"resistance": 340.35,
+"room_r": 0.41324686760954055,
 "sq9": 289,
 "sq9_cross": "17\u00b2",
 "sq9_dist_pct": 10.717995191527896,
@@ -307,16 +670,16 @@
 "name": "Neogen Chemicals Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 2672.3,
 "level_kind": "old swing low",
 "level_date": "2026-11-16",
-"close": 2729.8,
-"above_pct": 2.1517026576821197,
-"stop": 2520.01,
-"risk_pct": 7.685017698796292,
+"close": 2750.5,
+"above_pct": 2.926316272237761,
+"stop": 2525.65,
+"risk_pct": 8.174873871349696,
 "resistance": 2856.3,
-"room_r": 0.602996778156829,
+"room_r": 0.4705363270528694,
 "sq9": 2601,
 "sq9_cross": "51\u00b2",
 "sq9_dist_pct": 2.741255241373519,
@@ -340,16 +703,16 @@
 "name": "Piramal Pharma Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 226.62,
 "level_kind": "breakout retest",
 "level_date": "2026-09-08",
-"close": 232.5399932861328,
-"above_pct": 2.6123017811751525,
-"stop": 218.41,
-"risk_pct": 6.075144490410212,
-"resistance": 235.31,
-"room_r": 0.196076782473421,
+"close": 235.60000610351562,
+"above_pct": 3.962585464572288,
+"stop": 218.25,
+"risk_pct": 7.365090315615442,
+"resistance": 239.3,
+"room_r": 0.2132298452263629,
 "sq9": 225,
 "sq9_cross": "15\u00b2",
 "sq9_dist_pct": 0.7199978298611187,
@@ -369,53 +732,20 @@
 "sq9_match": true
 },
 {
-"symbol": "RKFORGE",
-"name": "Ramkrishna Forgings Limited",
-"status": "touched",
-"touch_date": "2026-11-25",
-"days_ago": 0,
-"level": 713.8,
-"level_kind": "old swing low",
-"level_date": "2025-04-07",
-"close": 745.75,
-"above_pct": 4.476045496416847,
-"stop": 684.79,
-"risk_pct": 8.173940602027564,
-"resistance": 755.0,
-"room_r": 0.15174590959447454,
-"sq9": 729,
-"sq9_cross": "27\u00b2",
-"sq9_dist_pct": -2.0850496854638245,
-"sq9_gap_pct": 15.36351165980796,
-"sq9_below": [
-[
-625,
-"25\u00b2"
-]
-],
-"sq9_above": [
-[
-841,
-"29\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "ROLEXRINGS",
 "name": "Rolex Rings Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 185.82,
 "level_kind": "breakout retest",
 "level_date": "2026-08-20",
-"close": 192.02000427246094,
-"above_pct": 3.3365604907249935,
-"stop": 175.68,
-"risk_pct": 8.511389334770325,
+"close": 191.02000427246094,
+"above_pct": 2.7984053079759263,
+"stop": 176.87,
+"risk_pct": 7.410217449892542,
 "resistance": 196.36,
-"room_r": 0.2655476309196,
+"room_r": 0.37725165733483396,
 "sq9": 169,
 "sq9_cross": "13\u00b2",
 "sq9_dist_pct": 9.95266705575073,
@@ -439,16 +769,16 @@
 "name": "Shyam Metalics and Energy Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 1226.6,
 "level_kind": "breakout retest",
 "level_date": "2026-10-19",
-"close": 1292.0999755859375,
-"above_pct": 5.3399642347711,
-"stop": 1179.17,
-"risk_pct": 8.739925204112852,
+"close": 1293.0,
+"above_pct": 5.413339779527049,
+"stop": 1181.38,
+"risk_pct": 8.632750190327732,
 "resistance": 1381.9,
-"room_r": 0.795193348256642,
+"room_r": 0.7964420501682519,
 "sq9": 1225,
 "sq9_cross": "35\u00b2",
 "sq9_dist_pct": 0.1306102519132546,
@@ -472,16 +802,16 @@
 "name": "Spectrum Electrical Industries Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 3915.9,
 "level_kind": "breakout retest",
 "level_date": "2026-10-06",
-"close": 4032.6,
-"above_pct": 2.980160386285724,
-"stop": 3653.54,
-"risk_pct": 9.399822632763954,
+"close": 3878.60009765625,
+"above_pct": -0.9525219136774954,
+"stop": 3658.63,
+"risk_pct": 5.671418534310657,
 "resistance": 4678.2,
-"room_r": 1.703173332232644,
+"room_r": 3.635014405360881,
 "sq9": 3969,
 "sq9_cross": "63\u00b2",
 "sq9_dist_pct": -1.3378709412005585,
@@ -494,30 +824,30 @@
 ],
 "sq9_above": [
 [
-4225,
-"65\u00b2"
+3969,
+"63\u00b2"
 ]
 ],
 "sq9_match": false
 },
 {
-"symbol": "SUNTV",
-"name": "Sun TV Network Limited",
+"symbol": "TANLA",
+"name": "Tanla Platforms Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
-"level": 614.35,
+"days_ago": 1,
+"level": 632.1,
 "level_kind": "breakout retest",
-"level_date": "2026-02-10",
-"close": 616.25,
-"above_pct": 0.30927394637727534,
-"stop": 581.94,
-"risk_pct": 5.567665226112006,
-"resistance": 634.55,
-"room_r": 0.5333603826837595,
+"level_date": "2026-08-10",
+"close": 624.7000122070312,
+"above_pct": -1.1706950901313795,
+"stop": 597.81,
+"risk_pct": 4.30378657613214,
+"resistance": 632.1,
+"room_r": 0.27523732569778836,
 "sq9": 625,
 "sq9_cross": "25\u00b2",
-"sq9_dist_pct": -1.7040039062499956,
+"sq9_dist_pct": 1.1359960937499913,
 "sq9_gap_pct": 16.64000000000001,
 "sq9_below": [
 [
@@ -534,53 +864,20 @@
 "sq9_match": false
 },
 {
-"symbol": "TANLA",
-"name": "Tanla Platforms Limited",
-"status": "touched",
-"touch_date": "2026-11-25",
-"days_ago": 0,
-"level": 632.1,
-"level_kind": "breakout retest",
-"level_date": "2026-08-10",
-"close": 649.5,
-"above_pct": 2.7527329672704326,
-"stop": 598.75,
-"risk_pct": 7.813157807688609,
-"resistance": 672.1,
-"room_r": 0.4453507811842248,
-"sq9": 625,
-"sq9_cross": "25\u00b2",
-"sq9_dist_pct": 1.1359960937499913,
-"sq9_gap_pct": 16.64000000000001,
-"sq9_below": [
-[
-529,
-"23\u00b2"
-]
-],
-"sq9_above": [
-[
-729,
-"27\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "TVSSCS",
 "name": "TVS Supply Chain Solutions Limited",
 "status": "touched",
 "touch_date": "2026-11-25",
-"days_ago": 0,
+"days_ago": 1,
 "level": 124.39,
 "level_kind": "old swing low",
 "level_date": "2026-09-02",
-"close": 127.18000030517578,
-"above_pct": 2.242946321422301,
-"stop": 117.96,
-"risk_pct": 7.252939006433367,
+"close": 126.2300033569336,
+"above_pct": 1.4792217833536458,
+"stop": 118.3,
+"risk_pct": 6.281621294949313,
 "resistance": 129.67,
-"room_r": 0.2699393063314037,
+"room_r": 0.43383385868289287,
 "sq9": 121,
 "sq9_cross": "11\u00b2",
 "sq9_dist_pct": 2.8016523881392086,
@@ -600,67 +897,34 @@
 "sq9_match": false
 },
 {
-"symbol": "BALUFORGE",
-"name": "Balu Forge Industries Limited",
+"symbol": "UDS",
+"name": "Updater Services Limited",
 "status": "touched",
-"touch_date": "2026-11-23",
+"touch_date": "2026-11-25",
 "days_ago": 1,
-"level": 488.95,
+"level": 196.82,
 "level_kind": "old swing low",
-"level_date": "2026-10-01",
-"close": 506.15,
-"above_pct": 3.5177395160153724,
-"stop": 466.14,
-"risk_pct": 7.905617610285232,
-"resistance": 511.55,
-"room_r": 0.13495150521234553,
-"sq9": 529,
-"sq9_cross": "23\u00b2",
-"sq9_dist_pct": -7.57088616124173,
-"sq9_gap_pct": 18.14744801512287,
+"level_date": "2026-11-03",
+"close": 210.63999938964844,
+"above_pct": 7.021639849176631,
+"stop": 187.94,
+"risk_pct": 10.778711120566964,
+"resistance": 218.11,
+"room_r": 0.3290129524059149,
+"sq9": 225,
+"sq9_cross": "15\u00b2",
+"sq9_dist_pct": -12.524441189236112,
+"sq9_gap_pct": 28.44444444444445,
 "sq9_below": [
 [
-441,
-"21\u00b2"
+169,
+"13\u00b2"
 ]
 ],
 "sq9_above": [
 [
-529,
-"23\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "MCX",
-"name": "Multi Commodity Exchange of India Limited",
-"status": "touched",
-"touch_date": "2026-11-23",
-"days_ago": 1,
-"level": 3390.0,
-"level_kind": "breakout retest",
-"level_date": "2026-10-12",
-"close": 3565.0,
-"above_pct": 5.162241887905594,
-"stop": 3250.88,
-"risk_pct": 8.811259681489181,
-"resistance": 3774.0,
-"room_r": 0.6653478397630865,
-"sq9": 3481,
-"sq9_cross": "59\u00b2",
-"sq9_dist_pct": -2.6141913243320936,
-"sq9_gap_pct": 6.894570525711008,
-"sq9_below": [
-[
-3249,
-"57\u00b2"
-]
-],
-"sq9_above": [
-[
-3721,
-"61\u00b2"
+225,
+"15\u00b2"
 ]
 ],
 "sq9_match": false
@@ -670,16 +934,16 @@
 "name": "Nilkamal Limited",
 "status": "touched",
 "touch_date": "2026-11-23",
-"days_ago": 1,
+"days_ago": 2,
 "level": 1980.15,
 "level_kind": "breakout retest",
 "level_date": "2024-11-07",
-"close": 1943.8,
-"above_pct": -1.8357207265049857,
-"stop": 1883.8,
-"risk_pct": 3.0867363317996888,
-"resistance": 1964.05,
-"room_r": 0.3375009217038157,
+"close": 1946.4000244140625,
+"above_pct": -1.7044163110816246,
+"stop": 1889.04,
+"risk_pct": 2.9468322101161903,
+"resistance": 1980.15,
+"room_r": 0.588418430884184,
 "sq9": 2025,
 "sq9_cross": "45\u00b2",
 "sq9_dist_pct": -2.214813609182098,
@@ -703,16 +967,16 @@
 "name": "SMS Pharmaceuticals Limited",
 "status": "touched",
 "touch_date": "2026-11-23",
-"days_ago": 1,
+"days_ago": 2,
 "level": 450.5,
 "level_kind": "breakout retest",
 "level_date": "2026-10-16",
-"close": 473.1499938964844,
-"above_pct": 5.027745593004296,
-"stop": 428.99,
-"risk_pct": 9.332588882741133,
-"resistance": 483.35,
-"room_r": 0.23099347796618072,
+"close": 485.8500061035156,
+"above_pct": 7.846838202778161,
+"stop": 430.27,
+"risk_pct": 11.440188288954579,
+"resistance": 525.5,
+"room_r": 0.7133583348775465,
 "sq9": 441,
 "sq9_cross": "21\u00b2",
 "sq9_dist_pct": 2.154195011337867,
@@ -736,16 +1000,16 @@
 "name": "Steel Strips Wheels Limited",
 "status": "touched",
 "touch_date": "2026-11-23",
-"days_ago": 1,
+"days_ago": 2,
 "level": 486.95,
 "level_kind": "old swing low",
 "level_date": "2026-11-02",
-"close": 494.2,
-"above_pct": 1.4888566816353865,
-"stop": 459.07,
-"risk_pct": 7.108169575953827,
+"close": 474.25,
+"above_pct": -2.6080730852578227,
+"stop": 459.03,
+"risk_pct": 3.2088262415926883,
 "resistance": 532.25,
-"room_r": 1.0831638071032075,
+"room_r": 3.8113115710528103,
 "sq9": 529,
 "sq9_cross": "23\u00b2",
 "sq9_dist_pct": -7.948957994890127,
@@ -769,16 +1033,16 @@
 "name": "Unimech Aerospace and Manufacturing Limited",
 "status": "touched",
 "touch_date": "2026-11-23",
-"days_ago": 1,
+"days_ago": 2,
 "level": 1691.5,
 "level_kind": "breakout retest",
 "level_date": "2026-10-27",
-"close": 1723.1,
-"above_pct": 1.8681643511675894,
-"stop": 1595.11,
-"risk_pct": 7.42764286957891,
+"close": 1759.4000244140625,
+"above_pct": 4.014190033346887,
+"stop": 1604.23,
+"risk_pct": 8.819566574968729,
 "resistance": 1873.1,
-"room_r": 1.1720056134630688,
+"room_r": 0.7327375392103892,
 "sq9": 1681,
 "sq9_cross": "41\u00b2",
 "sq9_dist_pct": 0.6246281975014867,
@@ -802,16 +1066,16 @@
 "name": "Union Bank of India",
 "status": "touched",
 "touch_date": "2026-11-23",
-"days_ago": 1,
+"days_ago": 2,
 "level": 202.27,
 "level_kind": "breakout retest",
 "level_date": "2026-02-27",
-"close": 213.5,
-"above_pct": 5.551982741055395,
-"stop": 196.33,
-"risk_pct": 8.041149048790885,
+"close": 210.1999969482422,
+"above_pct": 3.92049859508552,
+"stop": 196.22,
+"risk_pct": 6.649446240451162,
 "resistance": 219.72,
-"room_r": 0.3623051258242508,
+"room_r": 0.6811126694644251,
 "sq9": 225,
 "sq9_cross": "15\u00b2",
 "sq9_dist_pct": -10.102220323350696,
@@ -831,86 +1095,20 @@
 "sq9_match": false
 },
 {
-"symbol": "UTTAMSUGAR",
-"name": "Uttam Sugar Mills Limited",
-"status": "touched",
-"touch_date": "2026-11-23",
-"days_ago": 1,
-"level": 327.25,
-"level_kind": "old swing low",
-"level_date": "2026-10-30",
-"close": 346.15,
-"above_pct": 5.775401069518704,
-"stop": 308.75,
-"risk_pct": 10.805597512126363,
-"resistance": 357.4,
-"room_r": 0.30077321912162963,
-"sq9": 361,
-"sq9_cross": "19\u00b2",
-"sq9_dist_pct": -9.349030470914133,
-"sq9_gap_pct": 22.160664819944607,
-"sq9_below": [
-[
-289,
-"17\u00b2"
-]
-],
-"sq9_above": [
-[
-361,
-"19\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "TITANBIO.BO",
-"name": "TITAN BIOTECH LTD.",
-"status": "touched",
-"touch_date": "2026-11-20",
-"days_ago": 1,
-"level": 378.04,
-"level_kind": "breakout retest",
-"level_date": "2026-05-25",
-"close": 379.8500061035156,
-"above_pct": 0.4787846570950105,
-"stop": 355.15,
-"risk_pct": 6.50331765820531,
-"resistance": 394.64,
-"room_r": 0.5987166272387088,
-"sq9": 361,
-"sq9_cross": "19\u00b2",
-"sq9_dist_pct": 4.720223973662563,
-"sq9_gap_pct": 22.160664819944607,
-"sq9_below": [
-[
-289,
-"17\u00b2"
-]
-],
-"sq9_above": [
-[
-441,
-"21\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "EIMCOELECO",
 "name": "Eimco Elecon (India) Limited",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 2,
+"days_ago": 3,
 "level": 2425.4,
 "level_kind": "breakout retest",
 "level_date": "2025-08-07",
-"close": 2527.4,
-"above_pct": 4.205496073356141,
-"stop": 2288.91,
-"risk_pct": 9.43629541762463,
+"close": 2547.60009765625,
+"above_pct": 5.038352446308481,
+"stop": 2295.3,
+"risk_pct": 9.903444858969412,
 "resistance": 2615.1,
-"room_r": 0.3677261942928824,
+"room_r": 0.26753846325047426,
 "sq9": 2401,
 "sq9_cross": "49\u00b2",
 "sq9_dist_pct": 1.0162391646709734,
@@ -934,16 +1132,16 @@
 "name": "Entero Healthcare Solutions Limited",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 2,
+"days_ago": 3,
 "level": 1852.2,
 "level_kind": "breakout retest",
 "level_date": "2026-09-24",
-"close": 1898.0,
-"above_pct": 2.472737827206384,
-"stop": 1737.17,
-"risk_pct": 8.473583418400942,
-"resistance": 2114.9,
-"room_r": 1.3486400082580143,
+"close": 1832.0999755859375,
+"above_pct": -1.0851946936517476,
+"stop": 1738.11,
+"risk_pct": 5.129945770672006,
+"resistance": 1852.2,
+"room_r": 0.21386198172081414,
 "sq9": 1849,
 "sq9_cross": "43\u00b2",
 "sq9_dist_pct": 0.173063881659008,
@@ -956,41 +1154,41 @@
 ],
 "sq9_above": [
 [
-2025,
-"45\u00b2"
+1849,
+"43\u00b2"
 ]
 ],
 "sq9_match": true
 },
 {
-"symbol": "IGIL",
-"name": "International Gemological Institute Limited",
+"symbol": "GALAPREC",
+"name": "Gala Precision Engineering Limited",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 2,
-"level": 417.1,
-"level_kind": "breakout retest",
-"level_date": "2025-07-30",
-"close": 432.5,
-"above_pct": 3.692158636090359,
-"stop": 398.97,
-"risk_pct": 7.75309580795831,
-"resistance": 450.6,
-"room_r": 0.5397808324756727,
-"sq9": 441,
-"sq9_cross": "21\u00b2",
-"sq9_dist_pct": -5.419499749769696,
-"sq9_gap_pct": 19.95464852607709,
+"days_ago": 3,
+"level": 1139.6,
+"level_kind": "old swing low",
+"level_date": "2026-07-14",
+"close": 1127.5,
+"above_pct": -1.0617739421867056,
+"stop": 1070.84,
+"risk_pct": 5.025659898885404,
+"resistance": 1143.2,
+"room_r": 0.2770694584792663,
+"sq9": 1089,
+"sq9_cross": "33\u00b2",
+"sq9_dist_pct": 4.646462404585638,
+"sq9_gap_pct": 12.488521579430678,
 "sq9_below": [
 [
-361,
-"19\u00b2"
+961,
+"31\u00b2"
 ]
 ],
 "sq9_above": [
 [
-441,
-"21\u00b2"
+1225,
+"35\u00b2"
 ]
 ],
 "sq9_match": false
@@ -1000,16 +1198,16 @@
 "name": "Kalyan Jewellers India Limited",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 2,
+"days_ago": 3,
 "level": 615.2,
 "level_kind": "breakout retest",
 "level_date": "2026-09-10",
-"close": 636.3499755859375,
-"above_pct": 3.437900350981904,
-"stop": 575.84,
-"risk_pct": 9.509026823790611,
+"close": 639.7999877929688,
+"above_pct": 3.9986955620636255,
+"stop": 576.71,
+"risk_pct": 9.860780531264812,
 "resistance": 706.05,
-"room_r": 1.1518627924234663,
+"room_r": 1.0500992836444052,
 "sq9": 625,
 "sq9_cross": "25\u00b2",
 "sq9_dist_pct": -1.5679980468749966,
@@ -1033,16 +1231,16 @@
 "name": "Manaksia Coated Metals & Industries Limited",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 2,
+"days_ago": 3,
 "level": 152.5,
 "level_kind": "old swing low",
 "level_date": "2025-10-31",
-"close": 153.4,
-"above_pct": 0.5901639344262355,
-"stop": 142.9,
-"risk_pct": 6.8425227943402,
-"resistance": 161.66,
-"room_r": 0.786934575704084,
+"close": 160.4600067138672,
+"above_pct": 5.219676533683404,
+"stop": 142.78,
+"risk_pct": 11.020552686787466,
+"resistance": 162.94,
+"room_r": 0.14024285728813785,
 "sq9": 169,
 "sq9_cross": "13\u00b2",
 "sq9_dist_pct": -9.763313609467462,
@@ -1062,23 +1260,23 @@
 "sq9_match": false
 },
 {
-"symbol": "STEELCAS",
-"name": "Steelcast Limited",
+"symbol": "TITANBIO.BO",
+"name": "TITAN BIOTECH LTD.",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 2,
-"level": 358.7,
+"days_ago": 3,
+"level": 378.04,
 "level_kind": "breakout retest",
-"level_date": "2026-08-20",
-"close": 356.7,
-"above_pct": -0.5575723833198265,
-"stop": 339.56,
-"risk_pct": 4.803953362129976,
-"resistance": 377.2,
-"room_r": 1.1963333999657628,
+"level_date": "2026-05-25",
+"close": 398.1000061035156,
+"above_pct": 5.3063160261277,
+"stop": 353.09,
+"risk_pct": 11.307099817469467,
+"resistance": 413.55,
+"room_r": 0.3432294613338468,
 "sq9": 361,
 "sq9_cross": "19\u00b2",
-"sq9_dist_pct": -0.6371157321243048,
+"sq9_dist_pct": 4.720223973662563,
 "sq9_gap_pct": 22.160664819944607,
 "sq9_below": [
 [
@@ -1088,93 +1286,60 @@
 ],
 "sq9_above": [
 [
-361,
-"19\u00b2"
-]
-],
-"sq9_match": true
-},
-{
-"symbol": "PRIZOR",
-"name": "Prizor Viztech Limited",
-"status": "touched",
-"touch_date": "2026-11-20",
-"days_ago": 2,
-"level": 1338.9,
-"level_kind": "breakout retest",
-"level_date": "2026-10-27",
-"close": 1424.95,
-"above_pct": 6.426915678308043,
-"stop": 1227.95,
-"risk_pct": 13.82529468060909,
-"resistance": 1620.7,
-"room_r": 0.9936367366728077,
-"sq9": 1369,
-"sq9_cross": "37\u00b2",
-"sq9_dist_pct": -2.198683388308076,
-"sq9_gap_pct": 11.10299488677866,
-"sq9_below": [
-[
-1225,
-"35\u00b2"
-]
-],
-"sq9_above": [
-[
-1521,
-"39\u00b2"
+441,
+"21\u00b2"
 ]
 ],
 "sq9_match": false
 },
 {
-"symbol": "SANATHAN",
-"name": "Sanathan Textiles Limited",
+"symbol": "RKFORGE",
+"name": "Ramkrishna Forgings Limited",
 "status": "touched",
 "touch_date": "2026-11-19",
-"days_ago": 3,
-"level": 556.65,
+"days_ago": 4,
+"level": 732.65,
 "level_kind": "breakout retest",
-"level_date": "2026-10-16",
-"close": 558.15,
-"above_pct": 0.26946474807332255,
-"stop": 527.96,
-"risk_pct": 5.409447770096687,
-"resistance": 605.0,
-"room_r": 1.5516927616837874,
-"sq9": 529,
-"sq9_cross": "23\u00b2",
-"sq9_dist_pct": 5.226847715323735,
-"sq9_gap_pct": 18.14744801512287,
+"level_date": "2026-10-06",
+"close": 787.8499755859375,
+"above_pct": 7.534286403118773,
+"stop": 701.68,
+"risk_pct": 10.937084322180112,
+"resistance": 797.65,
+"room_r": 0.11373212487697212,
+"sq9": 729,
+"sq9_cross": "27\u00b2",
+"sq9_dist_pct": 0.5006892200360102,
+"sq9_gap_pct": 15.36351165980796,
 "sq9_below": [
-[
-441,
-"21\u00b2"
-]
-],
-"sq9_above": [
 [
 625,
 "25\u00b2"
 ]
 ],
-"sq9_match": false
+"sq9_above": [
+[
+841,
+"29\u00b2"
+]
+],
+"sq9_match": true
 },
 {
 "symbol": "TASTYBITE",
 "name": "Tasty Bite Eatables Limited",
 "status": "touched",
 "touch_date": "2026-11-19",
-"days_ago": 3,
+"days_ago": 4,
 "level": 10392.0,
 "level_kind": "breakout retest",
 "level_date": "2026-08-19",
-"close": 9864.5,
-"above_pct": -5.076020015396454,
-"stop": 9710.64,
-"risk_pct": 1.5597054372461172,
+"close": 9980.5,
+"above_pct": -3.959776751347188,
+"stop": 9761.57,
+"risk_pct": 2.1935631624524943,
 "resistance": 10245.45,
-"room_r": 2.475999412430358,
+"room_r": 1.210212963907019,
 "sq9": 10201,
 "sq9_cross": "101\u00b2",
 "sq9_dist_pct": 1.8723654543672197,
@@ -1194,204 +1359,6 @@
 "sq9_match": false
 },
 {
-"symbol": "TECHM",
-"name": "Tech Mahindra Limited",
-"status": "touched",
-"touch_date": "2026-11-19",
-"days_ago": 3,
-"level": 1669.0,
-"level_kind": "breakout retest",
-"level_date": "2026-07-30",
-"close": 1801.199951171875,
-"above_pct": 7.92090779939334,
-"stop": 1624.91,
-"risk_pct": 9.787520352071844,
-"resistance": 1834.7,
-"room_r": 0.19002476424017994,
-"sq9": 1681,
-"sq9_cross": "41\u00b2",
-"sq9_dist_pct": -0.713860797144561,
-"sq9_gap_pct": 9.994051160023787,
-"sq9_below": [
-[
-1521,
-"39\u00b2"
-]
-],
-"sq9_above": [
-[
-1849,
-"43\u00b2"
-]
-],
-"sq9_match": true
-},
-{
-"symbol": "BEML",
-"name": "BEML Limited",
-"status": "touched",
-"touch_date": "2026-11-18",
-"days_ago": 4,
-"level": 1953.2,
-"level_kind": "old swing low",
-"level_date": "2026-11-06",
-"close": 2041.199951171875,
-"above_pct": 4.5054271042348715,
-"stop": 1867.44,
-"risk_pct": 8.512499768262561,
-"resistance": 2105.6,
-"room_r": 0.3706330920948407,
-"sq9": 2025,
-"sq9_cross": "45\u00b2",
-"sq9_dist_pct": -3.5456814236111134,
-"sq9_gap_pct": 9.086419753086417,
-"sq9_below": [
-[
-1849,
-"43\u00b2"
-]
-],
-"sq9_above": [
-[
-2209,
-"47\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "GABRIEL",
-"name": "Gabriel India Limited",
-"status": "touched",
-"touch_date": "2026-11-18",
-"days_ago": 4,
-"level": 1437.9,
-"level_kind": "breakout retest",
-"level_date": "2026-08-31",
-"close": 1501.800048828125,
-"above_pct": 4.443982427783988,
-"stop": 1361.86,
-"risk_pct": 9.318341844751,
-"resistance": 1587.7,
-"room_r": 0.6138212473738712,
-"sq9": 1369,
-"sq9_cross": "37\u00b2",
-"sq9_dist_pct": 5.032872491896456,
-"sq9_gap_pct": 11.10299488677866,
-"sq9_below": [
-[
-1225,
-"35\u00b2"
-]
-],
-"sq9_above": [
-[
-1521,
-"39\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "KTKBANK",
-"name": "The Karnataka Bank Limited",
-"status": "touched",
-"touch_date": "2026-11-18",
-"days_ago": 4,
-"level": 340.1,
-"level_kind": "breakout retest",
-"level_date": "2026-09-04",
-"close": 339.79998779296875,
-"above_pct": -0.08821473247947464,
-"stop": 327.05,
-"risk_pct": 3.751150118597213,
-"resistance": 368.8,
-"room_r": 2.275150835237302,
-"sq9": 361,
-"sq9_cross": "19\u00b2",
-"sq9_dist_pct": -5.789471993485973,
-"sq9_gap_pct": 22.160664819944607,
-"sq9_below": [
-[
-289,
-"17\u00b2"
-]
-],
-"sq9_above": [
-[
-361,
-"19\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "PRINCEPIPE",
-"name": "Prince Pipes And Fittings Limited",
-"status": "touched",
-"touch_date": "2026-11-18",
-"days_ago": 4,
-"level": 292.4,
-"level_kind": "breakout retest",
-"level_date": "2026-06-24",
-"close": 281.1,
-"above_pct": -3.8645670767300966,
-"stop": 278.3,
-"risk_pct": 0.9948179889889719,
-"resistance": 286.7,
-"room_r": 2.0025552094390786,
-"sq9": 289,
-"sq9_cross": "17\u00b2",
-"sq9_dist_pct": 1.1764684762921807,
-"sq9_gap_pct": 24.913494809688586,
-"sq9_below": [
-[
-225,
-"15\u00b2"
-]
-],
-"sq9_above": [
-[
-289,
-"17\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "COFORGE",
-"name": "Coforge Limited",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 1977.9,
-"level_kind": "breakout retest",
-"level_date": "2025-12-05",
-"close": 2060.0,
-"above_pct": 4.1508657956692785,
-"stop": 1905.09,
-"risk_pct": 7.520111126311113,
-"resistance": 2185.6,
-"room_r": 0.8107715453702724,
-"sq9": 2025,
-"sq9_cross": "45\u00b2",
-"sq9_dist_pct": -2.3259247202932154,
-"sq9_gap_pct": 9.086419753086417,
-"sq9_below": [
-[
-1849,
-"43\u00b2"
-]
-],
-"sq9_above": [
-[
-2209,
-"47\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "LICHSGFIN",
 "name": "LIC Housing Finance Limited",
 "status": "near",
@@ -1400,12 +1367,12 @@
 "level": 572.5,
 "level_kind": "breakout retest",
 "level_date": "2026-09-23",
-"close": 598.0,
-"above_pct": 4.454148471615715,
-"stop": 552.47,
-"risk_pct": 7.614068889298952,
+"close": 596.25,
+"above_pct": 4.148471615720517,
+"stop": 552.94,
+"risk_pct": 7.263849697701397,
 "resistance": 613.7,
-"room_r": 0.3448117083889387,
+"room_r": 0.4029029931845153,
 "sq9": 529,
 "sq9_cross": "23\u00b2",
 "sq9_dist_pct": 8.223062381852554,
@@ -1425,34 +1392,232 @@
 "sq9_match": false
 },
 {
-"symbol": "KPRMILL",
-"name": "K.P.R. Mill Limited",
+"symbol": "WESTLIFE",
+"name": "WESTLIFE FOODWORLD LIMITED",
 "status": "near",
 "touch_date": null,
 "days_ago": null,
-"level": 1121.2,
+"level": 598.7,
 "level_kind": "breakout retest",
-"level_date": "2026-10-14",
-"close": 1173.0,
-"above_pct": 4.620054502676685,
-"stop": 1081.14,
-"risk_pct": 7.830963673682789,
-"resistance": 1186.3,
-"room_r": 0.1447904820150966,
-"sq9": 1089,
-"sq9_cross": "33\u00b2",
-"sq9_dist_pct": 2.956836654901296,
-"sq9_gap_pct": 12.488521579430678,
+"level_date": "2026-09-23",
+"close": 623.8499755859375,
+"above_pct": 4.20076212896574,
+"stop": 570.02,
+"risk_pct": 8.62844293879701,
+"resistance": 684.2,
+"room_r": 1.1211531569473498,
+"sq9": 625,
+"sq9_cross": "25\u00b2",
+"sq9_dist_pct": -4.2079980468749945,
+"sq9_gap_pct": 16.64000000000001,
 "sq9_below": [
 [
-961,
-"31\u00b2"
+529,
+"23\u00b2"
 ]
 ],
 "sq9_above": [
 [
-1225,
-"35\u00b2"
+625,
+"25\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "ORIENTELEC",
+"name": "Orient Electric Limited",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 180.63,
+"level_kind": "old swing low",
+"level_date": "2026-10-30",
+"close": 188.30999755859375,
+"above_pct": 4.251781247951469,
+"stop": 172.98,
+"risk_pct": 8.143482371564769,
+"resistance": 190.68,
+"room_r": 0.15454818635733147,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": 6.881659693971898,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "APLLTD",
+"name": "Alembic Pharmaceuticals Limited",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 976.6,
+"level_kind": "old swing low",
+"level_date": "2025-07-11",
+"close": 1018.7999877929688,
+"above_pct": 4.321115427195488,
+"stop": 936.03,
+"risk_pct": 8.12405446151071,
+"resistance": 1036.0,
+"room_r": 0.20781026583039772,
+"sq9": 961,
+"sq9_cross": "31\u00b2",
+"sq9_dist_pct": 1.6233065125845547,
+"sq9_gap_pct": 13.319458896982317,
+"sq9_below": [
+[
+841,
+"29\u00b2"
+]
+],
+"sq9_above": [
+[
+1089,
+"33\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "KARURVYSYA",
+"name": "Karur Vysya Bank Limited",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 354.35,
+"level_kind": "breakout retest",
+"level_date": "2026-08-26",
+"close": 370.0,
+"above_pct": 4.416535523330167,
+"stop": 340.56,
+"risk_pct": 7.957527425758615,
+"resistance": 397.85,
+"room_r": 0.9459004378999379,
+"sq9": 361,
+"sq9_cross": "19\u00b2",
+"sq9_dist_pct": -1.84210357243334,
+"sq9_gap_pct": 22.160664819944607,
+"sq9_below": [
+[
+289,
+"17\u00b2"
+]
+],
+"sq9_above": [
+[
+441,
+"21\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "PNB",
+"name": "Punjab National Bank",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 141.05,
+"level_kind": "breakout retest",
+"level_date": "2024-04-30",
+"close": 147.5,
+"above_pct": 4.572844245792318,
+"stop": 135.83,
+"risk_pct": 7.912346052488461,
+"resistance": 156.49,
+"room_r": 0.7703049055215976,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": -16.538459732687684,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+169,
+"13\u00b2"
+]
+],
+"sq9_match": false
+},
+{
+"symbol": "LGEINDIA",
+"name": "LG Electronics India Limited",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 1679.7,
+"level_kind": "old swing low",
+"level_date": "2026-11-18",
+"close": 1758.0999755859375,
+"above_pct": 4.667501737995838,
+"stop": 1614.26,
+"risk_pct": 8.181317767625007,
+"resistance": 1780.3,
+"room_r": 0.1543432276724493,
+"sq9": 1681,
+"sq9_cross": "41\u00b2",
+"sq9_dist_pct": -0.077337824397683,
+"sq9_gap_pct": 9.994051160023787,
+"sq9_below": [
+[
+1521,
+"39\u00b2"
+]
+],
+"sq9_above": [
+[
+1849,
+"43\u00b2"
+]
+],
+"sq9_match": true
+},
+{
+"symbol": "KDDL",
+"name": "KDDL Limited",
+"status": "near",
+"touch_date": null,
+"days_ago": null,
+"level": 4297.5,
+"level_kind": "breakout retest",
+"level_date": "2026-11-11",
+"close": 4511.10009765625,
+"above_pct": 4.970333860529386,
+"stop": 4014.24,
+"risk_pct": 11.014103031536592,
+"resistance": 4876.8,
+"room_r": 0.7360257590083874,
+"sq9": 4225,
+"sq9_cross": "65\u00b2",
+"sq9_dist_pct": 1.7159763313609577,
+"sq9_gap_pct": 6.248520710059169,
+"sq9_below": [
+[
+3969,
+"63\u00b2"
+]
+],
+"sq9_above": [
+[
+4761,
+"69\u00b2"
 ]
 ],
 "sq9_match": false
