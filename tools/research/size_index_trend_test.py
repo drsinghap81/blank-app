@@ -127,6 +127,8 @@ def main():
          "CHAIN 2-4: market+size+sector+industry+theme+stock": yes("mkt") & yes("size_tr") & yes("sec_tr") & yes("ind234") & yes("th_tr") & T.stk234,
          "CHAIN 1-4 (beat market at size/sector/industry/stock)": yes("mkt") & yes("size_rs") & yes("sec_rs") & yes("ind4") & yes("th_tr") & T.stk4,
          "CHAIN 2-4 + lane": lane_ok & yes("mkt") & yes("size_tr") & yes("sec_tr") & yes("ind234") & yes("th_tr") & T.stk234,
+         "lane + own size index only (no market check)": lane_ok & yes("size_tr"),
+         "lane + own size index Stage 2 only": lane_ok & yes("size_s2"),
          "lane + market + size + stock 4 rules": lane_ok & yes("mkt") & yes("size_tr") & T.stk4,
          "skipped by ALL (lane OK but some index not trending)": lane_ok & ~(yes("mkt") & yes("size_tr") & yes("sec_tr") & yes("th_tr"))}
     T["all_ok"] = F["ALL: lane + market + size + sector + theme"]
@@ -139,6 +141,14 @@ def main():
             xb = X[X.d >= "2021-07-01"]; xr = X[X.d >= "2024-01-01"]; xc = X[~X.d.between(*AC.COVID)]; cg, dd = AC.port(X)
             print(f"R| {nm:52s} n {len(X):4d} | win {(X.ret > 0).mean() * 100:3.0f}% | avg {X.ret.mean() * 100:+6.2f}% | 2024+ {xr.ret.mean() * 100:+6.2f}% (n {len(xr)})"
                   f" | Jul21+ {xb.ret.mean() * 100:+6.2f}% | ex-Covid {xc.ret.mean() * 100:+.2f}% | 10-slot CAGR {cg:+.1f}% maxDD {dd:.1f}%", flush=True)
+        for sz in ("large", "mid", "small"):                     # 26 Nov 2026 (Amritpal: "check as per size")
+            for nm, m in (("lane (live)", lane_ok), ("lane + size index", lane_ok & yes("size_tr")), ("lane + market + size", lane_ok & yes("mkt") & yes("size_tr")),
+                          ("skipped by size index (lane OK)", lane_ok & ~yes("size_tr"))):
+                X = T[(T.sys == sysk) & (T["size"] == sz) & m]
+                if len(X) < 15:
+                    print(f"R| size {sz:5s} {nm:34s} n {len(X)}", flush=True); continue
+                cg, dd = AC.port(X); xr = X[X.d >= "2024-01-01"]
+                print(f"R| size {sz:5s} {nm:34s} n {len(X):4d} | win {(X.ret > 0).mean() * 100:3.0f}% | avg {X.ret.mean() * 100:+6.2f}% | 2024+ {xr.ret.mean() * 100:+6.2f}% (n {len(xr)}) | 10-slot CAGR {cg:+.1f}% maxDD {dd:.1f}%", flush=True)
         X = T[T.sys == sysk]
         y = X.groupby(X.d.dt.year).apply(lambda g: f"lane {len(g[g.lane.isin(['build', 'hold', 'mid', 'none'])])} {g[~g.lane.isin(['weak', 'fade', 'bounce'])].ret.mean() * 100:+.1f}% / ALL {int(g.all_ok.sum())} {g[g.all_ok].ret.mean() * 100:+.1f}%")
         print(f"R| {sysk} by year (newest first): " + " | ".join(f"{k}: {v}" for k, v in sorted(y.items(), reverse=True)[:10]), flush=True)
