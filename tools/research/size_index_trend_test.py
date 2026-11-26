@@ -26,6 +26,18 @@ def trend(ix):
     return (e9 > e21) & (ix > s150) & (s150 > s150.shift(20)) & (ix >= 0.75 * hi), (ix > s150) & (s150 > s150.shift(20))
 
 
+def rsi(df, n=14):
+    """Wilder RSI(14) of each column (Series or DataFrame)"""
+    d = df.diff(); up = d.clip(lower=0).ewm(alpha=1 / n, adjust=False).mean(); dn = (-d.clip(upper=0)).ewm(alpha=1 / n, adjust=False).mean()
+    return 100 - 100 / (1 + up / dn)
+
+
+def wk_rsi(df, n=14):
+    """weekly RSI(14) on Friday closes, carried to the following days (last COMPLETED week only)"""
+    w = df.resample("W-FRI").last(); r = rsi(w, n).shift(1)
+    return r.reindex(df.index, method="ffill")
+
+
 def main():
     nif = yf.download("^NSEI", start="2005-01-01", auto_adjust=True, progress=False)["Close"].squeeze()
     nif.index = pd.to_datetime(nif.index).tz_localize(None)
@@ -108,6 +120,18 @@ def main():
     IE9 = {g: IXI[g].ewm(span=9, adjust=False).mean() > IXI[g].ewm(span=21, adjust=False).mean() for g in IXI.columns}
     T["e_ind"] = [bool(prev(IE9[ind_of[s]], d)) if ind_of.get(s) in IE9 else None for d, s in zip(T.d, T.sym)]
     T["e_stk"] = [bool(prev((e9_ > e21_)[s], d)) if s in C.columns else False for d, s in zip(T.d, T.sym)]
+    # 26 Nov 2026 (Amritpal: "there should be some momentum in indices top down till stock - RSI crossed 60 and above"): daily and
+    # weekly RSI(14) >= 60 at each level on the day before the fill
+    RI = rsi(H); RIW = wk_rsi(H); RS_ = rsi(C); RSW = wk_rsi(C); RII = rsi(IXI); RIIW = wk_rsi(IXI)
+    def r60(D_, k, d):
+        return bool(prev(D_[k], d) >= 60) if k in D_.columns else None
+    for tag, A_, Ai, As in (("d", RI, RII, RS_), ("w", RIW, RIIW, RSW)):
+        T[f"r{tag}_mkt"] = [r60(A_, "NIFTY 500", d) for d in T.d]
+        T[f"r{tag}_size"] = [r60(A_, SZ[z], d) for z, d in zip(T["size"], T.d)]
+        T[f"r{tag}_sec"] = [r60(A_, sec_of[s], d) if h else None for s, d, h in zip(T.sym, T.d, T.has_sec)]
+        T[f"r{tag}_th"] = [any(r60(A_, t, d) for t in th_of[s]) if h else None for s, d, h in zip(T.sym, T.d, T.has_th)]
+        T[f"r{tag}_ind"] = [r60(Ai, ind_of[s], d) if ind_of.get(s) in Ai.columns else None for s, d in zip(T.sym, T.d)]
+        T[f"r{tag}_stk"] = [bool(r60(As, s, d)) for s, d in zip(T.sym, T.d)]
     T["stk4"] = [bool(prev(S4[s], d)) if s in S4.columns else False for d, s in zip(T.d, T.sym)]
     T["stk234"] = [bool(prev(s234[s], d)) if s in s234.columns else False for d, s in zip(T.d, T.sym)]
     T["ind234"] = [bool(prev(I234[ind_of[s]], d)) if ind_of.get(s) in I234 else None for d, s in zip(T.d, T.sym)]
@@ -144,6 +168,14 @@ def main():
          "9/21 at every level": yes("e_mkt") & yes("e_size") & yes("e_sec") & yes("e_ind") & yes("e_th") & T.e_stk,
          "lane + 9/21 market + size": lane_ok & yes("e_mkt") & yes("e_size"),
          "lane + 9/21 every level": lane_ok & yes("e_mkt") & yes("e_size") & yes("e_sec") & yes("e_ind") & yes("e_th") & T.e_stk,
+         **{f"RSI{w_} >= 60: {lv}": yes(f"r{w_[0].lower()}_{k}") for w_ in ("D", "W") for lv, k in (("market", "mkt"), ("size index", "size"), ("sector", "sec"), ("industry", "ind"), ("theme", "th"))},
+         "RSI daily >= 60: stock": T.rd_stk, "RSI weekly >= 60: stock": T.rw_stk,
+         "RSI daily >= 60 at every level": yes("rd_mkt") & yes("rd_size") & yes("rd_sec") & yes("rd_ind") & yes("rd_th") & T.rd_stk,
+         "RSI weekly >= 60 at every level": yes("rw_mkt") & yes("rw_size") & yes("rw_sec") & yes("rw_ind") & yes("rw_th") & T.rw_stk,
+         "lane + RSI daily >= 60 every level": lane_ok & yes("rd_mkt") & yes("rd_size") & yes("rd_sec") & yes("rd_ind") & yes("rd_th") & T.rd_stk,
+         "lane + RSI weekly >= 60 every level": lane_ok & yes("rw_mkt") & yes("rw_size") & yes("rw_sec") & yes("rw_ind") & yes("rw_th") & T.rw_stk,
+         "lane + RSI weekly >= 60 market + size + sector": lane_ok & yes("rw_mkt") & yes("rw_size") & yes("rw_sec"),
+         "lane + RSI daily >= 60 market + size + sector": lane_ok & yes("rd_mkt") & yes("rd_size") & yes("rd_sec"),
          "lane + own size index only (no market check)": lane_ok & yes("size_tr"),
          "lane + own size index Stage 2 only": lane_ok & yes("size_s2"),
          "lane + market + size + stock 4 rules": lane_ok & yes("mkt") & yes("size_tr") & T.stk4,
