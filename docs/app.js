@@ -618,13 +618,23 @@ function liveBar() {
 
 /* ------------------------------------------------------------------ Live trades */
 const LV_KEY = 'td_live';
-function lvCfg() { try { return JSON.parse(localStorage.getItem(LV_KEY) || '{}'); } catch (e) { return {}; } }
-function lvSave(o) { try { localStorage.setItem(LV_KEY, JSON.stringify({ ...lvCfg(), ...o })); } catch (e) { /* storage off */ } }
+function lvCfg() { try { return JSON.parse(localStorage.getItem(LV_KEY) || state._lvMem || '{}'); } catch (e) { try { return JSON.parse(state._lvMem || '{}'); } catch (e2) { return {}; } } }
+/* 27 Nov 2026 (Amritpal: "not able to login ... I entered the right password"): the phone's storage was full of multi-MB data copies
+   from older versions, so the new sign-in token could not be saved and the login form came straight back. Free big cached copies and
+   retry; keep the token in memory as a last resort. */
+function lsTrim(max = 300000) {
+  try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k !== LV_KEY && (localStorage.getItem(k) || '').length > max) localStorage.removeItem(k); } } catch (e) { /* */ }
+}
+function lvSave(o) {
+  const v = JSON.stringify({ ...lvCfg(), ...o }); state._lvMem = v;
+  try { localStorage.setItem(LV_KEY, v); } catch (e) { lsTrim(); try { localStorage.setItem(LV_KEY, v); } catch (e2) { lsTrim(20000); try { localStorage.setItem(LV_KEY, v); } catch (e3) { /* memory only */ } } }
+}
+lsTrim();   // once at start: drop data copies over 300 KB left by older versions
 /* 11 Nov 2026: one /api/plan answer is shared for 60 s (Today's risk card and Live asked the server separately) */
 function lvPlan(fresh) {
   const c = state._planC; if (!fresh && c && Date.now() - c.t < 60000) return c.p;
   const p = lvApi('/api/plan', { timeout: 60000 }); state._planC = { t: Date.now(), p }; p.catch(() => { state._planC = null; });
-  p.then((F) => { if (F && F.rows) { state._planLast = { t: Date.now(), S: F }; try { localStorage.setItem('td.planLast', JSON.stringify(state._planLast)); } catch (e) { /* too big or blocked */ } } }).catch(() => {});
+  p.then((F) => { if (F && F.rows) { state._planLast = { t: Date.now(), S: F }; try { const v = JSON.stringify(state._planLast); if (v.length < 250000) localStorage.setItem('td.planLast', v); } catch (e) { /* too big or blocked */ } } }).catch(() => {});
   p.then((F) => { if (F && F.holdings) try { localStorage.setItem('td.heldSyms', JSON.stringify(F.holdings.filter((h) => h.qty > 0).map((h) => h.symbol))); } catch (e) { /* */ } }).catch(() => {});
   return p;
 }
