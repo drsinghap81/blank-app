@@ -1810,9 +1810,11 @@ async function loadAuto() {
     ['India', [
       { id: 'stock_sell', n: 'Stock sells', s: '09:16 IST · sells system exits', on: !!A.stock_sell, kind: 'part' },
       { id: 'stock_buy', n: 'Stock buys', s: '09:20 IST · buys the plan\'s picks', on: !!A.stock_buy, kind: 'part' },
-      ...Object.entries(tb).map(([k, v]) => ({ id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k] || k}`, s: `futures${v.live ? '' : ' · dry run (Futures tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k })),
+      ...Object.entries(tb).filter(([k]) => !TB_MCX.includes(k)).map(([k, v]) => ({ id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k] || k}`, s: `futures${v.live ? '' : ' · dry run (Futures tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k })),
       { id: 'opt_trader', n: 'Option trader', s: A.opt_trader_live ? '5-min options · real orders' : '5-min options · paper only', on: !!A.opt_trader_live, kind: 'part', fut: true }]],
-    ...(A.turtle ? [['MCX', [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'markets: ' + esc(A.turtle.armed.join(' · ')) : 'markets set in the Futures tab', on: !!A.turtle_on, kind: 'part', fut: true }]]] : []),
+    /* 26 Nov 2026: the Top Bottom MCX minis bots sit with Turtle under MCX (installed from Futures) */
+    ...((A.turtle || TB_MCX.some((k) => tb[k])) ? [['MCX', [...TB_MCX.filter((k) => tb[k]).map((k) => { const v = tb[k]; return { id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k]}`, s: `MCX ${{ crude: 'CRUDEOILM · both sides', silver: 'SILVERMIC · buy only', natgas: 'NATGASMINI · buy only', gold: 'GOLDPETAL · buy only' }[k]}${v.live ? '' : ' · dry run (Futures tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k }; }),
+      ...(A.turtle ? [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'markets: ' + esc(A.turtle.armed.join(' · ')) : 'markets set in the Futures tab', on: !!A.turtle_on, kind: 'part', fut: true }] : [])]]] : []),
     ['US', [{ id: 'mm_us', n: 'ETF Top Bottom', s: `moomoo · QQQ SMH XLF XLE${paper ? ' · paper' : ''}`, on: !!A.mm_us, kind: 'part', warn: A.mm_us && !cap('US') ? 'set capital in settings' : '', mm: 'US' }]],
     ['ASX', [{ id: 'mm_au', n: 'ETF Top Bottom', s: 'moomoo · TECH HACK OZR ASIA', on: !!A.mm_au, kind: 'part', warn: paper ? 'paper account can\'t trade ASX' : (A.mm_au && !cap('AU') ? 'set capital in settings' : ''), mm: 'AU' }]]];
   const all = ROWS.flatMap(([, r]) => r); const nOn = all.filter((r) => r.on).length;

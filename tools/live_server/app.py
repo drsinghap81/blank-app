@@ -2411,7 +2411,7 @@ def tb_auto_set(body: TBAuto, request: Request, inst: str = "bn", _=Depends(auth
     return dict(ok=True, auto=bool(body.on))
 
 
-TB_NAME = {"bn": "Bank Nifty", "nifty": "Nifty", "bel": "BEL", "lt": "L&T", "tmpv": "Tata Motors PV", "tcs": "TCS"}
+TB_NAME = {"bn": "Bank Nifty", "nifty": "Nifty", "bel": "BEL", "lt": "L&T", "tmpv": "Tata Motors PV", "tcs": "TCS", "crude": "Crude mini", "silver": "Silver micro", "natgas": "Nat gas mini", "gold": "Gold petal"}
 
 
 def tb_watch():
