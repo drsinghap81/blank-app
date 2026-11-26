@@ -2293,7 +2293,7 @@ async function cupBasket(box) {
       <span class="cb-t"><i>${CUP_TF[r.tf]}</i><i>${cupLen(r.cup_days)} cup</i><i>${fmt(Math.abs(r.depth) * 100, 0)}% deep</i>${r.ath ? '<i>all-time high</i>' : ''}${weak[r.lane] ? `<i class="w">${weak[r.lane]}</i>` : ''}</span></div>
     ${r.status === 'breakout' ? `<div class="cb-a"><span>Buy above <b>${f2(r.trigger)}</b><small>stop ${f2(r.stop)} · risk ${fmt(r.risk_pct, 1)}%</small></span><button class="tr-go" data-cup="${esc(r.symbol)}|${r.tf}">Trade</button></div>`
       : `<div class="cb-a"><span>Rim <b>${f2(r.rim)}</b><small>${fmt(r.to_trigger_pct, 1)}% away · waits for a ${CUP_TF[r.tf].toLowerCase()} close above</small></span></div>`}</li>`;
-  box.innerHTML = `<article class="bs-c"><div class="bs-h"><span class="bs-n">◡</span><div><b>Long cups · watch & trade</b><small>Daily cups of 6+ months, weekly of 1+ year, monthly of 2+ years. Longest first.</small></div></div>
+  box.innerHTML = `<article class="bs-c"><div class="bs-h"><span class="bs-n">◡</span><div><b>Long cups · watch & trade</b><small>Daily cups of 6+ months, weekly of 1+ year, monthly of 2+ years. Longest first.</small></div></div>${box.dataset.pl || ''}
     <div class="seg cb-seg" role="tablist">${[['all', 'All'], ['D', 'Daily'], ['W', 'Weekly'], ['M', 'Monthly']].map(([k, n]) => `<button data-cbt="${k}" aria-selected="${tf === k}">${n} ${k === 'all' ? R.length : R.filter((r) => r.tf === k).length}</button>`).join('')}</div>
     <p class="bs-p"><b>Broke out · ${bo.length}</b></p><ul class="cb-l">${bo.map(row).join('') || '<li class="cb-none">None right now</li>'}</ul>
     <p class="bs-p"><b>Near the rim · ${nr.length}</b></p><ul class="cb-l">${nr.slice(0, 40).map(row).join('') || '<li class="cb-none">None right now</li>'}</ul>
@@ -2347,6 +2347,15 @@ async function loadBasket() {
   /* 24 Nov 2026 (Amritpal: "create a hedge basket and a portfolio basket best combination"): gold + dollar sleeve orders and
      the Nifty-below-50-day rule, from the hedging backtest (claude/hedging-backtest.md) */
   const AS = await getJSON(MAIN + 'data/scan/assets.json', 'assets').catch(() => null);
+  /* 26 Nov 2026 (Amritpal: "track these as paper trades from today as if we are trading live"): each basket's own paper book
+     (paper20.json baskets, built nightly from 26 Nov with today's live rules) */
+  const PJ = await getJSON(MAIN + 'data/scan/paper20.json', 'paper20').catch(() => null); const PBK = (PJ && PJ.baskets) || {};
+  const paperLine = (id) => { const B = (PBK.books || {})[id];
+    if (!B) return PBK.start ? `<p class="bs-pp">Paper since ${esc(PBK.start)}: first marks after the next close</p>` : '';
+    const S = B.summary || {}; const up = (S.ret_pct || 0) >= 0;
+    return `<details class="bs-pp"><summary>Paper since ${esc(B.start)} · <b class="${up ? 'up' : 'down'}">${money(S.value, 'NSE')} (${up ? '+' : ''}${fmt(S.ret_pct, 2)}%)</b> · Nifty ${(S.nifty_pct || 0) >= 0 ? '+' : ''}${fmt(S.nifty_pct, 2)}% · ${S.open || 0} open</summary>
+      ${(B.positions || []).length ? `<div class="bs-chips">${B.positions.map((p) => `<span class="${p.pnl >= 0 ? 'h' : ''}">${esc(p.sym)}<small>${esc(p.sys)} ${p.pct >= 0 ? '+' : ''}${fmt(p.pct, 1)}%</small></span>`).join('')}</div>` : ''}
+      <ul class="bs-log">${(B.log || []).slice(0, 8).map((l) => `<li><small>${esc(l.d)}</small> ${esc(l.t)}</li>`).join('')}</ul></details>`; };
   const usdinr = ((AS && AS.rows) || []).find((r) => r.key === 'USDINR=X'); const fx = usdinr ? usdinr.close : null;
   let NF = null; try { const t = await getText(MAIN + 'data/futures/NIFTY.csv'); const L2 = (t || '').trim().split(/\r?\n/).slice(-60).map((l) => +l.split(',')[4]).filter((v) => v > 0);
     if (L2.length >= 50) NF = { close: L2[L2.length - 1], s50: L2.slice(-50).reduce((a, v) => a + v, 0) / 50 }; } catch (e) { NF = null; }
@@ -2383,9 +2392,9 @@ async function loadBasket() {
     const mode = b.pie ? '<span class="bs-m">Manual only</span>' : `<div class="bs-seg" role="group" aria-label="Mode"><button data-mode="${b.id}" data-v="0" aria-pressed="${!bot}">Manual</button><button data-mode="${b.id}" data-v="1" aria-pressed="${bot}">🤖 Bot</button></div>`;
     return `<article class="bs-c${on ? ' act' : ''}"><div class="bs-h"><span class="bs-n">${i + 1}</span><div><b>${esc(b.n)}</b>${on ? '<em>active</em>' : ''}<small>${esc(b.how)}</small></div>
       ${b.ret != null ? `<span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span>` : '<span class="bs-r"><b>🛡</b><small>hedge</small></span>'}</div>
-      ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
+      ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${b.hedgeOnly ? '' : paperLine(b.id)}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
   el.innerHTML = `<p class="bs-top">India stock baskets (1, 2, 3, 4, 7, 8) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
-    ${BASKETS.map(card).join('')}<div id="cupb"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
+    ${BASKETS.map(card).join('')}<div id="cupb" data-pl="${esc(paperLine('lc'))}"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
   cupBasket(el.querySelector('#cupb'));
   { const sa = el.querySelector('[data-sendall]'); if (sa) sa.addEventListener('click', () => trSend(OD.list, 'NSE', sa).then(() => setTimeout(loadBasket, 3000))); }
   el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));

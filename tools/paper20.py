@@ -170,6 +170,9 @@ REC = {"momcup": 0.40, "flags": 0.20, "pulse": 0.10, "gold": 0.10, "us_rsi2": 0.
 REC_NM = {"momcup": "Momentum + Cup 9/21", "flags": "Flags", "pulse": "Pulse rotation", "gold": "Gold", "us_rsi2": "US RSI(2)", "us_tb_etf": "US Top Bottom ETFs"}
 
 
+_CACHE = {}
+
+
 def rec_book(days, PP, Cp, Op, gold, TBd, OPd, TBtr, TBopen, TBlog, nifty):
     """26 Nov 2026 (Amritpal: "Yes" to switching the paper book to the tested split): Momentum + Cup with TODAY's rules (close
     confirmation + industry-lane skip), Flags (live rule), Pulse rotation, gold, US RSI(2) dip-buys and US Top Bottom ETFs (both in Rupees,
@@ -181,7 +184,7 @@ def rec_book(days, PP, Cp, Op, gold, TBd, OPd, TBtr, TBopen, TBlog, nifty):
     AC = CC.AC; AC.KEEP_OPEN = True
     nif = yf.download("^NSEI", start="2005-01-01", auto_adjust=True, progress=False)["Close"].squeeze(); nif.index = pd.to_datetime(nif.index).tz_localize(None)
     reg = (nif > nif.rolling(200).mean()).to_dict()
-    P = AC.load()
+    P = _CACHE.get("P") or AC.load(); _CACHE["P"] = P
     C = pd.DataFrame({s: x.C for s, x in P.items()}).sort_index(); V = pd.DataFrame({s: x.V for s, x in P.items()}).reindex(C.index)
     ok = C.notna().mean(axis=1) > 0.3; C, V = C[ok], V[ok]
     G = load("data/scan/group_pulse.json"); IND = {}
@@ -190,7 +193,7 @@ def rec_book(days, PP, Cp, Op, gold, TBd, OPd, TBtr, TBopen, TBlog, nifty):
         if len(m) >= 3:
             IND[r["basic"]] = m
     ind_of = {s: k for k, v in IND.items() for s in v}
-    LN = CC.lanes(C, V, nif.reindex(C.index).ffill(), IND)
+    LN = CC.lanes(C, V, nif.reindex(C.index).ffill(), IND); _CACHE.update(LN=LN, ind_of=ind_of, reg=reg, Call=C)
     T = []
     since = START - pd.Timedelta(days=400)
     for sym, x in P.items():
@@ -226,6 +229,7 @@ def rec_book(days, PP, Cp, Op, gold, TBd, OPd, TBtr, TBopen, TBlog, nifty):
         ru, tu = CC.us_curves()
     except Exception as ex:  # noqa: BLE001
         print("us curves", ex); ru = tu = None
+    _CACHE["us"] = (ru, tu)
     inv = CAP - RES_TB - RES_OPT
     cash = {k: REC[k] * inv for k in ("momcup", "flags", "pulse")}; cash["reserve"] = RES_TB + RES_OPT
     ext = {}
@@ -301,6 +305,236 @@ def rec_book(days, PP, Cp, Op, gold, TBd, OPd, TBtr, TBopen, TBlog, nifty):
                 closed=sorted(closed, key=lambda c_: c_.get("dx") or ""), log=[dict(d=a, t=b) for a, b in sorted(log, key=lambda x: x[0], reverse=True)][:250],
                 summary=dict(value=V0, ret_pct=round((V0 / CAP - 1) * 100, 2), nifty_pct=round((eq[-1]["nifty"] / CAP - 1) * 100, 2), max_dd_pct=round(dd * 100, 2), days=len(eq),
                              sleeve_pnl={k: round(eq[-1]["sleeves"][k] - (start_alloc.get(k, 0) if k in REC else (RES_TB + RES_OPT if k == "reserve" else 0))) for k in eq[-1]["sleeves"]}))
+
+
+# ---------------------------------------------------------------- the Baskets page, each as its own paper book (26 Nov 2026)
+# Amritpal: "can you track these as paper trades from today as if we are trading live". Every basket card on Baskets starts with Rs 20 L
+# on 26 Nov 2026 and follows today's live rules: Momentum (close confirm + lane + breakout volume >= 1.5x), Cup 9/21 (wick close + lane),
+# Flags, Pulse rotation (this week's list bought at the next open), gold / US dollar at the close, US RSI(2) and US Top Bottom ETFs (in
+# Rupees, as sleeve values), the Top Bottom bots replayed from the same day, ETF rotation (the monthly pick in etf_rotation.json).
+# Equal slots: a sleeve's money / 10 a stock, max 10 open per sleeve. Long cups: its own Rs 5 L, 1% risk a trade, max 20% a stock, 10 open,
+# daily 6m+ and weekly 1y+ cup breakouts bought above the breakout candle's high, stop under its wick, out on a 9/21 close.
+B_START = pd.Timestamp("2026-11-26"); B_CAP = 2_000_000.0; LC_CAP = 500_000.0
+TB6 = ["BANKNIFTY", "NIFTY", "BEL", "LT", "TMPV", "TCS"]
+BASKET_DEF = [("nm", "New mix", dict(mom=.25, cup=.15, flags=.20, pulse=.10, gold=.10, us_tb_etf=.10), TB6),
+              ("c", "Pulse + Momentum + Top Bottom", dict(pulse=.50, mom=.30, cup=.20), ["BANKNIFTY"]),
+              ("b", "Systems + Top Bottom + gold + dollar", dict(mom=.48, cup=.32, gold=.10, usd=.10), ["BANKNIFTY"]),
+              ("a", "Momentum + Cup 9/21 + Top Bottom", dict(mom=.60, cup=.40), ["BANKNIFTY"]),
+              ("p", "Pulse rotation", dict(pulse=1.0), []),
+              ("t", "Top Bottom basket", dict(us_tb_etf=.50), TB6),
+              ("e", "ETF rotation", dict(etf_rot=1.0), []),
+              ("mc", "Momentum + Cup 9/21", dict(mom=.60, cup=.40), []),
+              ("m", "Momentum", dict(mom=1.0), [])]
+EXT = ("gold", "usd", "us_rsi2", "us_tb_etf", "etf_rot")
+SLNM = {"mom": "Momentum", "cup": "Cup 9/21", "flags": "Flags", "pulse": "Pulse rotation", "gold": "Gold", "usd": "US dollar", "us_rsi2": "US RSI(2)",
+        "us_tb_etf": "US Top Bottom ETFs", "etf_rot": "ETF rotation", "top_bottom": "Top Bottom", "lc": "Long cups"}
+
+
+def _etf_rot_series(days):
+    """value of Rs 1 in the ETF rotation from B_START: the month's 2 picks (etf_rotation.json history + current), LIQUIDBEES ~6.5%/yr"""
+    R = load("data/scan/etf_rotation.json")
+    months = {h["month"]: h["hold"] for h in R.get("history") or []}
+    if R.get("current"):
+        months[R["current"]["month"]] = R["current"]["hold"]
+    syms = sorted({x for v in months.values() for x in v if x != "LIQUIDBEES"})
+    Cx = download([s_ + ".NS" for s_ in syms])[0] if syms else pd.DataFrame()
+    Cx.columns = [c_.replace(".NS", "") for c_ in Cx.columns]
+    val, out, prev = 1.0, {}, None
+    for d in days:
+        hold = months.get(d.strftime("%Y-%m")) or ["LIQUIDBEES", "LIQUIDBEES"]
+        if prev is not None:
+            r = 0.0
+            for x in hold:
+                if x == "LIQUIDBEES" or x not in Cx.columns:
+                    r += 0.065 / 252 / len(hold)
+                else:
+                    a_, b_ = Cx[x].asof(prev), Cx[x].asof(d)
+                    r += ((b_ / a_ - 1) if a_ and np.isfinite(a_) and np.isfinite(b_) else 0.0) / len(hold)
+            val *= 1 + r
+        out[d] = val; prev = d
+    return pd.Series(out)
+
+
+def basket_trades(days):
+    """Momentum / Cup / Flags / long-cup trades starting on or after B_START, with today's live filters"""
+    sys.path.insert(0, os.path.join(HERE, "research"))
+    import combo_compare as CC
+    import cup_swing2 as CS2
+    AC = CC.AC; AC.KEEP_OPEN = True
+    P = _CACHE.get("P") or AC.load(); _CACHE["P"] = P
+    reg, LN, ind_of = _CACHE.get("reg") or {}, _CACHE.get("LN"), _CACHE.get("ind_of") or {}
+    CS2.SETS = {"D": ("D", 250, 120, -0.15, -0.08), "W": ("W", 104, 52, -0.20, -0.10)}     # the Long-cups basket's cups
+    CS2.EXITS = ("921",)
+    T, LC = [], []
+    for sym, x in P.items():
+        try:
+            v50 = x.V.rolling(50).mean().shift(1)
+            for t in AC.trades_for(sym, x, reg):
+                if t["d"] < B_START or not ((t["sys"] == "tf" and t["v"] == "B") or (t["sys"] == "mom" and t["v"] == "C")):
+                    continue
+                g = ind_of.get(sym); lane = "none"
+                if LN is not None and g in LN.columns:
+                    i = LN.index.searchsorted(t["d"]) - 1; lane = LN[g].iloc[i] if i >= 0 else "none"
+                why = "industry lane " + lane if lane in ("weak", "fade", "bounce") else ""
+                if t["sys"] == "mom" and not why:
+                    j = x.index.searchsorted(t["d"]) - 1
+                    vx = float(x.V.iloc[j] / v50.iloc[j]) if j >= 0 and v50.iloc[j] > 0 else None
+                    if vx is not None and vx < 1.5:
+                        why = f"breakout volume {vx:.1f}x (needs 1.5x)"
+                T.append(dict(sym=sym, sl="mom" if t["sys"] == "mom" else "cup", sys=SLNM["mom" if t["sys"] == "mom" else "cup"], d=t["d"], dx=t["dx"],
+                              e=t["e"], x=t["x"], open=t["open"], skip=why))
+            for t in CC.flags(sym, x):
+                if t["d"] >= B_START:
+                    T.append(dict(sym=sym, sl="flags", sys="Flags", d=t["d"], dx=t["dx"], e=t["e"], x=t["x"], open=t["open"], skip=""))
+            for t in CS2.trades_for(sym, x, False, lambda s_, d_: "none"):
+                if t["d"] >= B_START:
+                    LC.append(dict(sym=sym, sl="lc", sys=f"Long cup ({'daily' if t['set'] == 'D' else 'weekly'})", d=t["d"], dx=t["dx"], e=t["e"], x=t["x"],
+                                   stop=t["stop"], open=t["open"], skip="", age=t["age"]))
+        except Exception as ex:  # noqa: BLE001
+            print("basket trades", sym, ex)
+    return T, LC
+
+
+def run_book(name, W, tbs, cap, days, T, PP, Cp, Op, ext_series, TBb, nifty, risk_mode=False):
+    """one paper book from B_START; same engine as rec_book (equal slots) or 1% risk sizing for Long cups"""
+    res_tb = 50_000.0 * len(tbs)
+    inv = cap - res_tb
+    cash = {k: W[k] * inv for k in W if k not in EXT}; cash["reserve"] = res_tb
+    if sum(W.values()) < 0.999:
+        cash["cash"] = (1 - sum(W.values())) * inv                       # the unallocated part stays in cash (e.g. US RSI(2), tap-only)
+    units, hold, closed, log, eq = {}, {}, [], [], []
+    for k in W:
+        if k in EXT:
+            sr = ext_series.get(k)
+            if sr is not None and len(sr.dropna()):
+                base = sr.reindex([days[0]], method="ffill").iloc[0]
+                if np.isfinite(base) and base > 0:
+                    units[k] = W[k] * inv / float(base); log.append((str(days[0].date()), f"{SLNM[k]}: put Rs {W[k] * inv:,.0f} in ({W[k] * 100:.0f}%)")); continue
+            cash[k] = W[k] * inv; log.append((str(days[0].date()), f"{SLNM[k]}: no prices yet - kept in cash"))
+    if "pulse" in W:                                          # Pulse holdings as trades: this week's list bought at the next open
+        cur = {}
+        fs = sorted(PP); f0 = max([f for f in fs if f < days[0]], default=None)
+        for f in [f for f in fs if f0 is None or f >= f0]:                  # only the latest list decided before the start, then each new week
+            nxt = [d for d in days if d > f]
+            if not nxt:
+                continue
+            dd = nxt[0]; want = set(PP[f]["picks"])
+            for s_ in list(cur):
+                if s_ not in want:
+                    e, d0 = cur.pop(s_); xp = Op.at[dd, s_] if s_ in Op.columns and np.isfinite(Op.at[dd, s_]) else Cp.at[dd, s_]
+                    T = T + [dict(sym=s_, sl="pulse", sys="Pulse rotation", d=d0, dx=dd, e=e * (1 + COST), x=float(xp) * (1 - COST), open=False, skip="")]
+            for s_ in want:
+                if s_ not in cur and s_ in Op.columns and np.isfinite(Op.at[dd, s_]):
+                    cur[s_] = (float(Op.at[dd, s_]), dd)
+        T = T + [dict(sym=s_, sl="pulse", sys="Pulse rotation", d=d0, dx=days[-1] + pd.Timedelta(days=1), e=e * (1 + COST), x=None, open=True, skip="")
+                 for s_, (e, d0) in cur.items()]
+    T = sorted([t for t in T if t["sl"] in W or (risk_mode and t["sl"] == "lc")], key=lambda t: (pd.Timestamp(t["d"]), t["sl"], -t.get("age", 0), t["sym"]))
+    tb_pnl = lambda d: sum(TBb.get(s_, {}).get(d, 0.0) for s_ in tbs)  # noqa: E731
+    nif0 = None
+    for d in days:
+        ds = str(d.date())
+
+        def px(s_):
+            v = Cp.at[d, s_] if s_ in Cp.columns and d in Cp.index else np.nan
+            return float(v) if v is not None and np.isfinite(v) else None
+        for k_ in [k_ for k_, h in hold.items() if h["dx"] <= d and not h["open"]]:
+            h = hold.pop(k_); cash[h["sl"]] += h["q"] * h["x"]
+            closed.append(dict(sym=h["sym"], sleeve=h["sl"], sys=h["sys"], d=h["d"], dx=ds, e=round(h["e"], 2), x=round(h["x"], 2), qty=h["q"], pnl=round(h["q"] * (h["x"] - h["e"]))))
+            log.append((ds, f"{h['sys']}: sold {h['sym']} ({(h['x'] / h['e'] - 1) * 100:+.1f}%)"))
+        val = sum(cash.values()) + sum(h["q"] * h["last"] for h in hold.values()) + tb_pnl(d) + \
+            sum(u * float(ext_series[k].reindex([d], method="ffill").iloc[0]) for k, u in units.items())
+        for t in [t for t in T if pd.Timestamp(t["d"]).normalize() == d]:
+            if t["skip"]:
+                log.append((ds, f"{t['sys']}: {t['sym']} skipped - {t['skip']}")); continue
+            sl = t["sl"]; key = f"{sl}:{t['sym']}"
+            if key in hold:
+                continue
+            if len([1 for h in hold.values() if h["sl"] == sl]) >= 10:
+                log.append((ds, f"{t['sys']}: {t['sym']} skipped - 10 positions open")); continue
+            if risk_mode:
+                amt = min(0.01 * val / max(t["e"] - t["stop"], 1e-9) * t["e"], 0.20 * val, cash[sl])
+                full = min(0.01 * val / max(t["e"] - t["stop"], 1e-9) * t["e"], 0.20 * val)
+            else:
+                amt = min(W[sl] * val / 10, cash[sl]); full = W[sl] * val / 10
+            if amt < 0.5 * full:
+                log.append((ds, f"{t['sys']}: {t['sym']} skipped - no cash left")); continue
+            q = math.floor(amt / t["e"])
+            if q <= 0:
+                continue
+            cash[sl] -= q * t["e"]
+            hold[key] = dict(sym=t["sym"], sl=sl, sys=t["sys"], q=q, e=t["e"], x=t["x"] if t["x"] is not None else t["e"], dx=pd.Timestamp(t["dx"]).normalize(),
+                             d=ds, last=t["e"], open=bool(t["open"]), stop=t.get("stop"))
+            log.append((ds, f"{t['sys']}: bought {q} {t['sym']} at {t['e']:,.2f}"))
+        for h in hold.values():
+            v = px(h["sym"])
+            if v:
+                h["last"] = v
+        sv = {k: cash.get(k, 0) + sum(h["q"] * h["last"] for h in hold.values() if h["sl"] == k) for k in W if k not in EXT}
+        if risk_mode:
+            sv["lc"] = cash["lc"] + sum(h["q"] * h["last"] for h in hold.values())
+        for k, u in units.items():
+            sv[k] = u * float(ext_series[k].reindex([d], method="ffill").iloc[0])
+        for k in W:
+            if k in EXT and k not in units:
+                sv[k] = cash.get(k, 0.0)
+        if tbs:
+            sv["top_bottom"] = tb_pnl(d); sv["reserve"] = cash["reserve"]
+        if "cash" in cash:
+            sv["cash"] = cash["cash"]
+        tot = sum(sv.values()); nif0 = nif0 or float(nifty[d])
+        eq.append(dict(d=ds, v=round(tot), nifty=round(cap * float(nifty[d]) / nif0), sleeves={k: round(v) for k, v in sv.items()}))
+    pos = [dict(sym=h["sym"], sleeve=h["sl"], sys=h["sys"], qty=h["q"], e=round(h["e"], 2), last=round(h["last"], 2), d=h["d"], value=round(h["q"] * h["last"]),
+                pnl=round(h["q"] * (h["last"] - h["e"])), pct=round((h["last"] / h["e"] - 1) * 100, 2), stop=h.get("stop")) for h in hold.values()]
+    V0 = eq[-1]["v"]; peak = 0; dd = 0.0
+    for x in eq:
+        peak = max(peak, x["v"]); dd = min(dd, x["v"] / peak - 1)
+    return dict(name=name, start=str(B_START.date()), capital=cap, weights=W, top_bottom=tbs, equity=eq, positions=pos,
+                closed=sorted(closed, key=lambda c_: c_["dx"]), log=[dict(d=a, t=b) for a, b in sorted(log, key=lambda x: x[0], reverse=True)][:150],
+                summary=dict(value=V0, ret_pct=round((V0 / cap - 1) * 100, 2), nifty_pct=round((eq[-1]["nifty"] / cap - 1) * 100, 2), max_dd_pct=round(dd * 100, 2),
+                             days=len(eq), open=len(pos), closed=len(closed)))
+
+
+def basket_books(C, O, nifty, PP):
+    days = [d for d in C.index if d >= B_START]
+    if not days:
+        return dict(start=str(B_START.date()), pending=True, books={})
+    T, LC = basket_trades(days)
+    ru, tu = _CACHE.get("us") or (None, None)
+    if ru is None and tu is None:
+        try:
+            sys.path.insert(0, os.path.join(HERE, "research")); import combo_compare as CC
+            ru, tu = CC.us_curves()
+        except Exception as ex:  # noqa: BLE001
+            print("us curves", ex)
+
+    def nidx(sr):
+        if sr is None:
+            return None
+        sr = sr.copy(); sr.index = pd.to_datetime(sr.index); sr.index = sr.index.tz_localize(None) if getattr(sr.index, "tz", None) else sr.index
+        return sr
+    ext = dict(gold=C["GOLDBEES"].ffill(), usd=C["INR=X"].ffill(), us_rsi2=nidx(ru), us_tb_etf=nidx(tu))
+    try:
+        ext["etf_rot"] = _etf_rot_series(days)
+    except Exception as ex:  # noqa: BLE001
+        print("etf rotation", ex)
+    TBb = {}
+    for sym, over, _m in TB_SET:
+        try:
+            dly = top_bottom(sym, over, start=B_START)[0]
+            TBb[sym] = {d: dly[max([k for k in dly if k <= d])]["pnl"] for d in days if any(k <= d for k in dly)}
+        except Exception as ex:  # noqa: BLE001
+            print("basket top bottom", sym, ex)
+    out = {}
+    for bid, nm, W, tbs in BASKET_DEF:
+        try:
+            out[bid] = run_book(nm, W, tbs, B_CAP, days, list(T), PP, _CACHE.get("Call", C), O, ext, TBb, nifty)
+        except Exception as ex:  # noqa: BLE001
+            import traceback; traceback.print_exc(); print("basket", bid, ex)
+    try:
+        out["lc"] = run_book("Long cups", {"lc": 1.0}, [], LC_CAP, days, list(LC), {}, _CACHE.get("Call", C), O, ext, TBb, nifty, risk_mode=True)
+    except Exception as ex:  # noqa: BLE001
+        import traceback; traceback.print_exc(); print("basket lc", ex)
+    return dict(start=str(B_START.date()), pending=False, books=out)
 
 
 def main():
@@ -460,6 +694,10 @@ def main():
         res["default_book"] = "recommended"
     except Exception as ex:  # noqa: BLE001
         import traceback; traceback.print_exc(); print("recommended book failed:", ex)
+    try:
+        res["baskets"] = basket_books(C, O, nifty, PP)
+    except Exception as ex:  # noqa: BLE001
+        import traceback; traceback.print_exc(); print("baskets failed:", ex)
     json.dump(res, open(OUT, "w"), separators=(",", ":"), default=str)
     for bk, B in res["books"].items():
         print(bk, B["summary"])
