@@ -21,7 +21,8 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 14                    # 26 Nov 2026: v12/v13 ran after midnight IST when Angel returned no bars (and empties were cached): never cache or accept empty index data; wait for the next close and retry.
+VERSION = 15                    # 26 Nov 2026 (Amritpal: "can we add 1:2 or 1:3 target"): 2 ATR trail + 2R / 3R target, and a 1.5 ATR trail
+# v14 (26 Nov 2026: v12/v13 ran after midnight IST when Angel returned no bars (and empties were cached): never cache or accept empty index data; wait for the next close and retry.
 # v13: 26 Nov 2026: index 5-minute bars fetched in 20-day pieces (v12 got none for the longer window) + a run-debug block in the results.
 # v12: 26 Nov 2026: index + daily-close cache keys include the start date (v11 reused v10's files, which began on ~19 Nov).
 # v11: 26 Nov 2026: reuse cached 5-minute bars of EXPIRED monthly contracts, so the test keeps the weeks before the last expiry (v10 ran on 1 day after the 24 Nov expiry).
@@ -488,7 +489,7 @@ class OptBT:
                     # 25 Nov 2026 (Amritpal: CE trades "gave up most of the gains after triggering" - "test all"): exit variants
                     # on the same fills, 1% cost; the live trader = "ema5" (close below the 5 EMA, stop at the signal low)
                     OA, HA, LA, CA = [b[1] for b in A], [b[2] for b in A], [b[3] for b in A], [b[4] for b in A]
-                    for mode in ("x_be1", "x_half15", "x_prevlow", "x_be1_prevlow", "x_ema3", "x_atr2", "x_t15_be"):
+                    for mode in ("x_be1", "x_half15", "x_prevlow", "x_be1_prevlow", "x_ema3", "x_atr2", "x_t15_be", "x_atr15", "x_atr2_t2", "x_atr2_t3", "x_atr2_lock"):
                         xr = exit_sim(OA, HA, LA, CA, i, ia[-1], mode, em3=em3, em5=em5, atr=atr14)
                         if xr:
                             ea, ra, ha, xa = xr
@@ -684,6 +685,9 @@ def exit_sim(o, h, l, c, i, last, mode, em3=None, em5=None, atr=None):
       x_ema3       close below the 3 EMA instead of the 5 EMA
       x_atr2       stop trails 2 x ATR(14, 5-min) under the highest high since the fill
       x_t15_be     fixed target +1.5R, stop to the entry at +1R
+      x_atr15      stop trails 1.5 x ATR under the highest high (26 Nov 2026)
+      x_atr2_t2 / x_atr2_t3   the 2 ATR trail plus a fixed target at +2R / +3R (26 Nov 2026: "can we add 1:2 or 1:3 target")
+      x_atr2_lock  the 2 ATR trail, and the stop steps up: entry at +1R, +1R at +2R, +2R at +3R ... ("or trail the SL")
     Same-bar order: the stop first. Out at bar `last` (15:15) otherwise. Returns (entry, risk, how, blended exit price) or None."""
     base = entry_sim(o, h, l, c, i, last, trail=em5)
     if base is None:
@@ -700,8 +704,8 @@ def exit_sim(o, h, l, c, i, last, mode, em3=None, em5=None, atr=None):
             st = max(st, e)
         if mode in ("x_prevlow", "x_be1_prevlow"):
             st = max(st, l[k - 1]) if (mode == "x_prevlow" or hi >= e + risk) else st
-        if mode == "x_atr2" and atr is not None:
-            st = max(st, hi - 2 * atr[k - 1])
+        if mode in ("x_atr2", "x_atr2_t2", "x_atr2_t3", "x_atr15", "x_atr2_lock") and atr is not None:
+            st = max(st, hi - (1.5 if mode == "x_atr15" else 2) * atr[k - 1])
         if l[k] <= st:
             px = min(o[k], st) if o[k] < st else st
             return (e, risk, "stop", (half + px) / 2) if half is not None else (e, risk, "SL" if st <= sl else "stop", px)
@@ -709,6 +713,11 @@ def exit_sim(o, h, l, c, i, last, mode, em3=None, em5=None, atr=None):
             half = e + 1.5 * risk
         if mode == "x_t15_be" and h[k] >= e + 1.5 * risk:
             return e, risk, "target", e + 1.5 * risk
+        if mode == "x_atr2_lock" and hi >= e + risk:
+            st = max(st, e + (int((hi - e) / risk) - 1) * risk)
+        tg = {"x_atr2_t2": 2, "x_atr2_t3": 3}.get(mode)
+        if tg and h[k] >= e + tg * risk:
+            return e, risk, "target", max(o[k], e + tg * risk)
         trail = em3 if mode == "x_ema3" else em5 if mode in ("x_be1", "x_half15") else None
         if trail is not None and trail[k] is not None and c[k] < trail[k]:
             return (e, risk, "trail", (half + c[k]) / 2) if half is not None else (e, risk, "trail", c[k])
@@ -884,6 +893,6 @@ def summarise(T):
             **{f"PAPER TRADER rules, exit {nm_}": _agg([dict(t, **t["alt"][m_]) for t in F if (t.get("alt") or {}).get(m_) and not ("11:00" <= t.get("et", t["t"]) < "14:30") and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))])
                for m_, nm_ in (("ema5", "5 EMA close (live)"), ("x_be1", "5 EMA + breakeven at 1R"), ("x_half15", "half at 1.5R + 5 EMA"),
                                ("x_prevlow", "previous candle low trail"), ("x_be1_prevlow", "breakeven 1R then prev-low trail"),
-                               ("x_ema3", "3 EMA close"), ("x_atr2", "2 ATR trail"), ("x_t15_be", "target 1.5R, breakeven at 1R"), ("1.5", "target 1.5R"), ("2.0", "target 2R"))},
+                               ("x_ema3", "3 EMA close"), ("x_atr2", "2 ATR trail (live)"), ("x_atr15", "1.5 ATR trail"), ("x_atr2_t2", "2 ATR trail + target 1:2"), ("x_atr2_t3", "2 ATR trail + target 1:3"), ("x_atr2_lock", "2 ATR trail + stop steps up 1R per R"), ("x_t15_be", "target 1.5R, breakeven at 1R"), ("1.5", "target 1.5R"), ("2.0", "target 2R"))},
             "BUY, 5 EMA exits, no lull + PCR + BB (the paper trader)": _agg([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30") and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]),
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
