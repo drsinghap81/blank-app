@@ -286,6 +286,7 @@ class OptBT:
                 for t in trades:
                     prev = [x for x in hd if x < t["d"]]
                     t["pcrq"] = H[prev[-1]].get(t["s"]) if prev else None
+                    t["pcrq2"] = H[prev[-2]].get(t["s"]) if len(prev) >= 2 else None      # v15: the session before
             except Exception as ex:  # noqa: BLE001
                 self.log("optbt_pcr_error", error=str(ex)[:120])
             try:                                                   # Pulse rank of the stock's NSE industry, previous session
@@ -447,9 +448,9 @@ class OptBT:
                 for x in B:
                     if x[0][:10] == d:
                         pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]; bmap[x[0]] = (x[4], pv / vv if vv else x[4])
-                pv = vv = 0.0; busy = -1
+                pv = vv = 0.0; busy = -1; vwh = {}
                 for i in ia:
-                    x = A[i]; pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]; vw = pv / vv if vv else x[4]
+                    x = A[i]; pv += (x[2] + x[3] + x[4]) / 3 * x[5]; vv += x[5]; vw = pv / vv if vv else x[4]; vwh[i] = vw
                     if x[0][11:16] >= "15:00" or i <= busy or rs[i] is None or rs[i - 1] is None or not (rs[i] > 60 >= rs[i - 1]):
                         continue
                     o = bmap.get(x[0])
@@ -499,7 +500,10 @@ class OptBT:
                     out.append(dict(s=sym, d=d, t=x[0][11:16], et=A[fi][0][11:16], alt=alt, xt=A[j][0][11:16], real=real, vol_lots=round(x[5] / lot, 1) if lot else None, bb=bool(bbu[i] is not None and x[4] > bbu[i]), side=side, e=e, risk_pct=round(risk / e * 100, 1), how=how,
                                     R=round(R - COST * e / risk, 3), pct=round((exitp / e - 1 - COST) * 100, 2),
                                     inv=round(e * lot) if lot else None, pnl=round((exitp - e - COST * e) * lot) if lot else None,
-                                    nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index"))
+                                    nf=None if nfp is None else round(nfp, 2), bn=None if bnp is None else round(bnp, 2), idx=kind == "index",
+                                    # v15 (26 Nov 2026, Amritpal's KOTAKBANK PE loss vs ADANIENT / SWIGGY wins): slope filters at the signal
+                                    e5up=bool(i >= 3 and em5[i] is not None and em5[i - 3] is not None and em5[i] > em5[i - 3]),
+                                    vwup=bool((i - 3) in vwh and vw > vwh[i - 3]), e5vw=bool(em5[i] is not None and em5[i] > vw), nbar=i - ia[0]))
         # 18 Nov 2026 (Amritpal's chart): TREND version - RSI(14) crosses above 60 with the close above a RISING 20-bar SMA;
         # buy at the next candle's open, hold (overnight too) until a candle CLOSES below the 20 SMA -> sell at that close.
         # On 5- and 15-minute bars of the day's ATM CE/PE; a position stays in its contract until 2 days before expiry.
@@ -800,6 +804,32 @@ def one_at_a_time(T):
     return out
 
 
+def entry_filters(F):
+    """v15 (26 Nov 2026, Amritpal: "any observation on rising or flat 5 ema, vwap, pcr" / "10 am block won't stop the initial rush"):
+    the paper trader's trades (no 11:00-14:30, BB, PCR agrees) with the live 2 ATR trail exit, then one extra entry filter at a time."""
+    agree = lambda t, q: q is not None and ((t["side"] == "CE" and q >= 4) or (t["side"] == "PE" and q <= 2))  # noqa: E731
+    B = [dict(t, **t["alt"]["x_atr2"]) for t in F if (t.get("alt") or {}).get("x_atr2") and not ("11:00" <= t.get("et", t["t"]) < "14:30")
+         and t.get("bb") and agree(t, t.get("pcrq"))]
+    tests = [("as live (2 ATR trail)", lambda t: True),
+             ("+ 5 EMA rising (above 3 candles ago)", lambda t: t.get("e5up")),
+             ("+ VWAP rising", lambda t: t.get("vwup")),
+             ("+ 5 EMA above VWAP", lambda t: t.get("e5vw")),
+             ("+ 5 EMA rising, VWAP rising, EMA above VWAP", lambda t: t.get("e5up") and t.get("vwup") and t.get("e5vw")),
+             ("+ VWAP counted only from the 4th candle (09:30 on)", lambda t: (t.get("nbar") or 0) >= 3),
+             ("+ PCR agreed 2 sessions", lambda t: agree(t, t.get("pcrq2"))),
+             ("+ signal candle >= 20 lots", lambda t: (t.get("vol_lots") or 0) >= 20),
+             ("+ no entry before 09:45", lambda t: t["t"] >= "09:45"),
+             ("+ no entry before 10:00", lambda t: t["t"] >= "10:00"),
+             ("+ slopes + 4th candle + 20 lots", lambda t: t.get("e5up") and t.get("vwup") and t.get("e5vw") and (t.get("nbar") or 0) >= 3 and (t.get("vol_lots") or 0) >= 20),
+             ("+ all of the above except the time blocks", lambda t: t.get("e5up") and t.get("vwup") and t.get("e5vw") and (t.get("nbar") or 0) >= 3
+              and (t.get("vol_lots") or 0) >= 20 and agree(t, t.get("pcrq2")))]
+    out = {}
+    for nm, f in tests:
+        out[nm] = _agg([t for t in B if f(t)])
+        out[nm + " - the trades it removes"] = _agg([t for t in B if not f(t)])
+    return out
+
+
 def money_agg(T):
     """rupee view for the option-SELLING variants: profit, win rate, most margin tied up at once, return on it."""
     if not T:
@@ -894,5 +924,6 @@ def summarise(T):
                for m_, nm_ in (("ema5", "5 EMA close (live)"), ("x_be1", "5 EMA + breakeven at 1R"), ("x_half15", "half at 1.5R + 5 EMA"),
                                ("x_prevlow", "previous candle low trail"), ("x_be1_prevlow", "breakeven 1R then prev-low trail"),
                                ("x_ema3", "3 EMA close"), ("x_atr2", "2 ATR trail (live)"), ("x_atr15", "1.5 ATR trail"), ("x_atr2_t2", "2 ATR trail + target 1:2"), ("x_atr2_t3", "2 ATR trail + target 1:3"), ("x_atr2_lock", "2 ATR trail + stop steps up 1R per R"), ("x_t15_be", "target 1.5R, breakeven at 1R"), ("1.5", "target 1.5R"), ("2.0", "target 2R"))},
+            "ENTRY FILTERS (v15), paper trader rules, 2 ATR trail exit": entry_filters(F),
             "BUY, 5 EMA exits, no lull + PCR + BB (the paper trader)": _agg([dict(t, **t["alt"]["ema5"]) for t in F if (t.get("alt") or {}).get("ema5") and not ("11:00" <= t.get("et", t["t"]) < "14:30") and t.get("bb") and t.get("pcrq") and ((t["side"] == "CE" and t["pcrq"] >= 4) or (t["side"] == "PE" and t["pcrq"] <= 2))]),
             "all signals by PCR quintile": {f"{side} q{q}": _agg([t for t in T if t["side"] == side and t.get("pcrq") == q]) for side in ("CE", "PE") for q in range(1, 6)}}
