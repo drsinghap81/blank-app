@@ -1,16 +1,16 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-CRVL,2026-11-24,89.0,63.3,85.24,85.66,3.9,0,0.0,CorVel Corp.,trend,155.6,0.92,98,17.54,89.0,63.3
-MCK,2026-11-24,1078.09,60.3,1051.28,1043.0,3.4,0,0.0,McKesson Corporation Common Stock,watch,138.4,0.89,78,785.96,1078.09,60.3
-SN,2026-11-24,228.93,61.1,216.83,211.74,8.1,0,0.0,"SharkNinja, Inc. Ordinary Shares",watch,138.0,0.85,72,368.12,228.93,61.1
-ABBV,2026-11-24,300.28,64.1,289.41,284.45,5.6,0,0.0,AbbVie Inc. Common Stock,watch,132.0,0.83,85,1622.2,300.28,64.1
-TBBB,2026-11-23,66.44,60.7,64.41,64.42,3.1,1,-1.2,BBB Foods Inc. Class A Common Shares,watch,162.0,0.9,100,84.14,65.65,57.6
-CON,2026-11-23,43.17,62.0,41.57,40.9,5.6,1,0.2,"Concentra Group Holdings Parent, Inc. Common Stock",trend,154.1,0.93,93,44.32,43.25,62.3
-GMAB,2026-11-23,53.17,61.8,50.53,50.24,5.8,1,6.4,Genmab A/S - American Depositary Shares,trend,153.9,0.88,95,314.86,56.57,68.5
-USPH,2026-11-23,96.85,60.4,94.15,93.2,3.9,1,1.2,"U.S. Physical Therapy, Inc. Common Stock",trend,145.4,0.89,88,20.84,98.05,62.8
-GILD,2026-11-23,170.59,60.5,166.02,164.8,3.5,1,4.5,"Gilead Sciences, Inc.",trend,141.0,0.92,85,1131.56,178.29,68.8
-BIIB,2026-11-23,256.71,60.7,248.84,243.58,5.4,1,4.8,Biogen Inc.,trend,133.7,0.86,90,296.94,269.11,69.0
-UVE,2026-11-23,49.29,60.8,48.02,46.68,5.6,1,-0.5,UNIVERSAL INSURANCE HOLDINGS INC Common Stock,watch,124.4,0.77,82,10.56,49.02,58.6
-DIS,2026-11-23,120.27,60.8,116.74,117.46,2.4,1,1.9,Walt Disney Company (The) Common Stock,watch,118.1,0.74,78,1208.62,122.51,64.5
-MTD,2026-11-18,1737.26,61.8,1696.94,1687.11,3.0,4,-1.9,"Mettler-Toledo International, Inc. Common Stock",watch,142.3,0.88,82,292.18,1704.0,53.2
-ABM,2026-11-18,54.7,60.8,53.59,53.71,1.8,4,0.1,ABM Industries Incorporated Common Stock,watch,132.7,0.86,82,19.98,54.77,59.2
-DIS,2026-11-18,122.36,69.6,115.83,116.13,5.4,4,0.1,Walt Disney Company (The) Common Stock,watch,118.1,0.74,78,1208.62,122.51,64.5
+ABM,2026-11-25,55.14,61.3,53.94,53.36,3.3,0,0.0,ABM Industries Incorporated Common Stock,watch,133.2,0.86,83,20.1,55.14,61.3
+CRVL,2026-11-24,89.0,63.3,85.24,85.66,3.9,1,2.8,CorVel Corp.,trend,152.6,0.92,98,17.78,91.51,67.9
+MCK,2026-11-24,1078.09,60.3,1051.28,1043.0,3.4,1,-0.1,McKesson Corporation Common Stock,watch,138.5,0.89,78,779.26,1077.32,60.1
+SN,2026-11-24,228.93,61.1,216.83,211.74,8.1,1,1.6,"SharkNinja, Inc. Ordinary Shares",watch,136.5,0.85,73,374.46,232.5,63.0
+ABBV,2026-11-24,300.28,64.1,289.41,284.45,5.6,1,-1.9,AbbVie Inc. Common Stock,watch,132.0,0.83,85,1668.52,294.48,56.6
+ZIM,2026-11-24,30.49,60.6,29.34,29.09,4.8,1,1.3,ZIM Integrated Shipping Services Ltd. Ordinary Shares,watch,111.1,0.7,70,47.62,30.88,63.1
+TBBB,2026-11-23,66.44,60.7,64.41,64.42,3.1,2,-1.3,BBB Foods Inc. Class A Common Shares,watch,162.2,0.9,100,85.02,65.58,57.4
+GMAB,2026-11-23,53.17,61.8,50.53,50.24,5.8,2,6.8,Genmab A/S - American Depositary Shares,trend,155.3,0.88,95,238.62,56.8,68.9
+CON,2026-11-23,43.17,62.0,41.57,40.9,5.6,2,-0.3,"Concentra Group Holdings Parent, Inc. Common Stock",trend,154.8,0.93,95,44.74,43.06,60.9
+USPH,2026-11-23,96.85,60.4,94.15,93.2,3.9,2,1.8,"U.S. Physical Therapy, Inc. Common Stock",trend,146.3,0.89,90,20.6,98.58,63.9
+GILD,2026-11-23,170.59,60.5,166.02,164.8,3.5,2,3.6,"Gilead Sciences, Inc.",trend,144.1,0.92,85,1146.54,176.74,65.8
+BIIB,2026-11-23,256.71,60.7,248.84,243.58,5.4,2,1.8,Biogen Inc.,trend,138.6,0.86,90,282.98,261.44,60.5
+ALRM,2026-11-23,66.84,62.8,64.83,64.6,3.5,2,-1.2,"Alarm.com Holdings, Inc.",watch,125.7,0.8,70,33.16,66.07,58.3
+UVE,2026-11-23,49.29,60.8,48.02,46.68,5.6,2,-2.7,UNIVERSAL INSURANCE HOLDINGS INC Common Stock,watch,123.3,0.77,80,10.76,47.95,50.8
+DIS,2026-11-23,120.27,60.8,116.74,117.46,2.4,2,4.4,Walt Disney Company (The) Common Stock,watch,115.4,0.74,78,1277.3,125.6,68.9
