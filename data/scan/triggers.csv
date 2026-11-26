@@ -1,9 +1,6 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-CUPID,2026-11-25,366.35,60.8,352.12,357.75,2.4,0,0.0,Cupid Limited,watch,159.0,0.89,80,429.9,366.35,60.8
-SHYAMMETL,2026-11-25,1292.1,60.4,1260.82,1260.3,2.5,0,0.0,Shyam Metalics and Energy Limited,watch,129.7,0.78,87,49.57,1292.1,60.4
-ETERNAL,2026-11-25,371.7,65.3,355.85,360.35,3.1,0,0.0,ETERNAL LIMITED,watch,128.6,0.83,70,844.33,371.7,65.3
-LGEINDIA,2026-11-25,1818.4,63.0,1731.13,1706.0,6.6,0,0.0,LG Electronics India Limited,watch,112.1,0.72,73,132.32,1818.4,63.0
-AEROPLANE,2026-11-20,242.7,60.4,230.43,226.8,7.0,3,-2.6,Amir Chand Jagdish Kumar (Exports) Limited,watch,146.4,0.8,82,13.39,236.41,55.5
-INDGN,2026-11-20,657.65,63.5,628.76,640.25,2.7,3,-0.6,Indegene Limited,watch,127.5,0.82,77,46.83,653.55,61.3
-GLAND,2026-11-19,3292.9,61.0,3177.67,3208.7,2.6,4,1.7,Gland Pharma Limited,trend,147.0,0.9,88,137.6,3348.4,63.0
-SANSERA,2026-11-19,4720.9,61.6,4460.3,4423.0,6.7,4,-0.3,Sansera Engineering Limited,watch,144.9,0.89,75,96.35,4708.5,58.7
+CUPID,2026-11-25,366.35,60.8,352.12,357.75,2.4,1,1.3,Cupid Limited,watch,159.0,0.89,80,424.23,371.1,62.8
+SHYAMMETL,2026-11-25,1292.1,60.4,1260.82,1260.3,2.5,1,0.1,Shyam Metalics and Energy Limited,watch,129.9,0.78,87,49.65,1293.0,60.5
+ETERNAL,2026-11-25,371.7,65.3,355.85,360.35,3.1,1,-1.1,ETERNAL LIMITED,watch,128.5,0.83,70,842.54,367.7,61.5
+AEROPLANE,2026-11-20,242.7,60.4,230.43,226.8,7.0,4,-3.7,Amir Chand Jagdish Kumar (Exports) Limited,watch,146.2,0.8,83,12.22,233.64,53.4
+INDGN,2026-11-20,657.65,63.5,628.76,640.25,2.7,4,-0.0,Indegene Limited,watch,127.6,0.82,77,46.35,657.6,62.5
