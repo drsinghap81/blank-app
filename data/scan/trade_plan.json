@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-26 03:39 UTC",
+"generated": "2026-11-26 04:13 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-25",
@@ -185,8 +185,8 @@
 "theme_pct": 48.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 31.8,
-"group_rank": 16,
+"group_pulse": 31.5,
+"group_rank": 15,
 "results_score": 0.85,
 "results_ind": "Pharmaceuticals",
 "rank": 1,
@@ -232,7 +232,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 17.5,
+"r3m": 17.1,
 "mom_parts": {
 "stock": 69.6,
 "size": 65.7,
@@ -269,8 +269,8 @@
 "theme_pct": 52.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 31.8,
-"group_rank": 16,
+"group_pulse": 31.5,
+"group_rank": 15,
 "results_score": 0.85,
 "results_ind": "Pharmaceuticals",
 "rank": 2,
@@ -316,7 +316,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 12.0,
+"r3m": 11.7,
 "mom_parts": {
 "stock": 59.2,
 "size": 65.7,
@@ -354,7 +354,7 @@
 "group": "Diagnostics & Research",
 "lane": "hold",
 "group_pulse": 33.3,
-"group_rank": 14,
+"group_rank": 13,
 "results_score": 0.9,
 "results_ind": "Healthcare Service Provider",
 "rank": 3,
@@ -377,7 +377,7 @@
 "KRSNAA"
 ],
 "morning_rule": false,
-"r3m": 7.9,
+"r3m": 9.1,
 "mom_parts": {
 "stock": 65.8,
 "size": 53.4,
@@ -449,7 +449,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": 21.0,
+"r3m": 19.8,
 "mom_parts": {
 "stock": 63.3,
 "size": 53.4,
@@ -516,7 +516,7 @@
 "ALGOQUANT"
 ],
 "morning_rule": false,
-"r3m": 22.7,
+"r3m": 25.6,
 "mom_parts": {
 "stock": 63.0,
 "size": 53.4,
@@ -583,7 +583,7 @@
 "BAJAJCON"
 ],
 "morning_rule": false,
-"r3m": 10.0,
+"r3m": 9.8,
 "mom_parts": {
 "stock": 66.5,
 "size": 53.4,
@@ -625,9 +625,9 @@
 "sector_pct": 74.0,
 "theme_pct": 71.0,
 "group": "Banks - Private Large",
-"lane": "build",
-"group_pulse": 51.4,
-"group_rank": 3,
+"lane": "mid",
+"group_pulse": 50.5,
+"group_rank": 4,
 "results_score": 1.06,
 "results_ind": "Private Sector Bank",
 "rank": 1,
@@ -654,7 +654,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": 15.9,
+"r3m": 14.8,
 "size_index": "NIFTY 50",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "mom_parts": {
@@ -707,7 +707,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 15.9,
+"r3m": 14.8,
 "size_index": "NIFTY 50",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "mom_parts": {
@@ -760,7 +760,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 26.8,
+"r3m": 26.0,
 "size_index": "NIFTY 50",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "mom_parts": {
@@ -813,7 +813,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 14.7,
+"r3m": 14.9,
 "size_index": "NIFTY 50",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "mom_parts": {
@@ -855,7 +855,7 @@
 "CARTRADE"
 ],
 "morning_rule": true,
-"r3m": 13.6,
+"r3m": 12.5,
 "size_index": "NIFTY 50",
 "sector_index": "NIFTY INDIA CONSUMPTION",
 "mom_parts": {
@@ -917,7 +917,7 @@
 "LEMONTREE"
 ],
 "morning_rule": false,
-"r3m": 24.0,
+"r3m": 23.1,
 "size_index": "NIFTY MIDCAP 150",
 "sector_index": "NIFTY INDIA CONSUMPTION",
 "mom_parts": {
@@ -959,7 +959,7 @@
 "CARTRADE"
 ],
 "morning_rule": true,
-"r3m": 23.1,
+"r3m": 22.6,
 "size_index": "NIFTY MIDCAP 150",
 "sector_index": "NIFTY INDIA CONSUMPTION",
 "mom_parts": {
@@ -1000,7 +1000,7 @@
 "group_rank": 2,
 "rank": 1,
 "risk_pct": 10.4,
-"r3m": 26.0,
+"r3m": 27.0,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY SERVICES SECTOR",
 "mom_parts": {
@@ -1021,7 +1021,7 @@
 "when": "next open",
 "side": "BUY",
 "price": 234.87,
-"ref": 232.54,
+"ref": 232.5399932861328,
 "stop": 218.41,
 "target": 284.25,
 "exit_rule": "3R target 284.25 or the stop, max 120 days (as tested)",
@@ -1037,8 +1037,8 @@
 "td_score": null,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 31.8,
-"group_rank": 16,
+"group_pulse": 31.5,
+"group_rank": 15,
 "rank": 2,
 "risk_pct": 7.5,
 "ind": "Pharmaceuticals",
@@ -1075,7 +1075,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 10.1,
+"r3m": 10.2,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY PHARMA",
 "mom_parts": {
@@ -1128,7 +1128,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 30.1,
+"r3m": 30.6,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "mom_parts": {
@@ -1179,7 +1179,7 @@
 "ATHERENERG"
 ],
 "morning_rule": true,
-"r3m": 3.6,
+"r3m": 2.2,
 "size_index": "NIFTY 50",
 "sector_index": "NIFTY AUTO",
 "mom_parts": {
@@ -1261,7 +1261,7 @@
 "GABRIEL"
 ],
 "morning_rule": false,
-"r3m": 24.5,
+"r3m": 23.9,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY AUTO",
 "mom_parts": {
@@ -1314,7 +1314,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 12.0,
+"r3m": 12.2,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "mom_parts": {
@@ -1367,7 +1367,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 16.4,
+"r3m": 16.7,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "mom_parts": {
@@ -1405,7 +1405,7 @@
 "group": "Financial Data & Stock Exchanges",
 "lane": "hold",
 "group_pulse": 28.6,
-"group_rank": 23,
+"group_rank": 22,
 "rank": 3,
 "risk_pct": 10.8,
 "ind": "Exchange and Data Platform",
@@ -1415,7 +1415,7 @@
 "MCX"
 ],
 "morning_rule": false,
-"r3m": 9.4,
+"r3m": 12.8,
 "size_index": "NIFTY MIDCAP 150",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "mom_parts": {
@@ -1468,7 +1468,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 21.0,
+"r3m": 19.8,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY FINANCIAL SERVICES",
 "mom_parts": {
@@ -1506,7 +1506,7 @@
 "group": "Aerospace & Defense",
 "lane": "hold",
 "group_pulse": 20.6,
-"group_rank": 36,
+"group_rank": 35,
 "rank": 4,
 "risk_pct": 9.1,
 "ind": "Aerospace & Defense",
@@ -1535,7 +1535,7 @@
 "ROSSTECH"
 ],
 "morning_rule": false,
-"r3m": 14.9,
+"r3m": 16.2,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY INFRASTRUCTURE",
 "mom_parts": {
@@ -1577,7 +1577,7 @@
 "CARTRADE"
 ],
 "morning_rule": true,
-"r3m": -2.4,
+"r3m": -0.0,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY INDIA CONSUMPTION",
 "mom_parts": {
@@ -1642,7 +1642,7 @@
 "INDRAMEDCO"
 ],
 "morning_rule": false,
-"r3m": 15.7,
+"r3m": 18.2,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": null,
 "mom_parts": {
@@ -1680,7 +1680,7 @@
 "group": "Electronics & Computer Distribution",
 "lane": "build",
 "group_pulse": 51.2,
-"group_rank": 4,
+"group_rank": 3,
 "rank": 5,
 "risk_pct": 8.0,
 "ind": "Computers - Software & Consulting",
@@ -1714,7 +1714,7 @@
 "DCI"
 ],
 "morning_rule": false,
-"r3m": -7.5,
+"r3m": -10.0,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": null,
 "mom_parts": {
@@ -1735,7 +1735,7 @@
 "when": "next open",
 "side": "BUY",
 "price": 424.1,
-"ref": 419.9,
+"ref": 419.8999938964844,
 "stop": 378.75,
 "target": 560.15,
 "exit_rule": "3R target 560.15 or the stop, max 120 days (as tested)",
@@ -1752,7 +1752,7 @@
 "group": "Aerospace & Defense",
 "lane": "hold",
 "group_pulse": 20.6,
-"group_rank": 36,
+"group_rank": 35,
 "rank": 6,
 "risk_pct": 12.0,
 "ind": "Aerospace & Defense",
@@ -1781,7 +1781,7 @@
 "ROSSTECH"
 ],
 "morning_rule": false,
-"r3m": 9.1,
+"r3m": 13.2,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY INFRASTRUCTURE",
 "mom_parts": {
@@ -1818,7 +1818,7 @@
 "group": "Conglomerates",
 "lane": "weak",
 "group_pulse": 10.5,
-"group_rank": 58,
+"group_rank": 59,
 "results_score": 0.42,
 "results_ind": "IT Enabled Services",
 "rank": 2,
@@ -1848,7 +1848,7 @@
 "NETWEB"
 ],
 "morning_rule": true,
-"r3m": 27.9,
+"r3m": 30.4,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": "NIFTY IT",
 "mom_parts": {
@@ -1869,7 +1869,7 @@
 "when": "next open",
 "side": "BUY",
 "price": 193.94,
-"ref": 192.02,
+"ref": 192.02000427246094,
 "stop": 175.68,
 "target": 248.72,
 "exit_rule": "3R target 248.72 or the stop, max 120 days (as tested)",
@@ -1885,7 +1885,7 @@
 "td_score": null,
 "group": "Metal Fabrication",
 "lane": "hold",
-"group_pulse": 27.8,
+"group_pulse": 27.5,
 "group_rank": 24,
 "rank": 7,
 "risk_pct": 10.4,
@@ -1923,7 +1923,7 @@
 "GABRIEL"
 ],
 "morning_rule": false,
-"r3m": 6.0,
+"r3m": 5.2,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": null,
 "mom_parts": {
@@ -1944,7 +1944,7 @@
 "when": "next open",
 "side": "BUY",
 "price": 477.88,
-"ref": 473.15,
+"ref": 473.1499938964844,
 "stop": 428.99,
 "target": 624.55,
 "exit_rule": "3R target 624.55 or the stop, max 120 days (as tested)",
@@ -1960,8 +1960,8 @@
 "td_score": null,
 "group": "Drug Manufacturers - General",
 "lane": "hold",
-"group_pulse": 35.4,
-"group_rank": 13,
+"group_pulse": 31.4,
+"group_rank": 16,
 "rank": 8,
 "risk_pct": 11.4,
 "ind": "Pharmaceuticals",
@@ -1998,7 +1998,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 33.7,
+"r3m": 36.4,
 "size_index": "NIFTY SMALLCAP 250",
 "sector_index": null,
 "mom_parts": {
@@ -2071,7 +2071,7 @@
 "DCI"
 ],
 "morning_rule": true,
-"r3m": 4.4,
+"r3m": 4.8,
 "size_index": "NIFTY MIDCAP 150",
 "sector_index": "NIFTY IT",
 "mom_parts": {
@@ -2087,7 +2087,7 @@
 "symbol": "JMFINANCIL",
 "name": "JM Financial Limited",
 "typ": "TB",
-"close": 109.67,
+"close": 109.66999816894531,
 "neck": 114.01000213623047,
 "stop": 103.55,
 "signal_date": "2026-11-11",
@@ -2159,13 +2159,13 @@
 "symbol": "BEL",
 "name": "Bharat Electronics Limited",
 "typ": "TB",
-"close": 404.3,
+"close": 404.29998779296875,
 "neck": 398.5,
 "stop": 351.0,
 "signal_date": "2026-11-11",
 "group": "Aerospace & Defense",
 "lane": "hold",
-"group_rank": 36
+"group_rank": 35
 },
 {
 "symbol": "BLS",
@@ -2177,25 +2177,25 @@
 "signal_date": "2026-11-11",
 "group": "Specialty Business Services",
 "lane": "hold",
-"group_rank": 15
+"group_rank": 14
 },
 {
 "symbol": "TIRUMALCHM",
 "name": "Thirumalai Chemicals Limited",
 "typ": "DB",
-"close": 119.51,
+"close": 119.51000213623047,
 "neck": 125.30000305175781,
 "stop": 112.12,
 "signal_date": "2026-11-11",
 "group": "Specialty Chemicals",
 "lane": "hold",
-"group_rank": 48
+"group_rank": 49
 },
 {
 "symbol": "INDIAMART",
 "name": "Indiamart Intermesh Limited",
 "typ": "TW",
-"close": 1520.4,
+"close": 1520.4000244140625,
 "neck": 1591.300048828125,
 "stop": 1450.75,
 "signal_date": "2026-11-12",
@@ -2207,37 +2207,49 @@
 "symbol": "ITI",
 "name": "ITI Limited",
 "typ": "IHS",
-"close": 257.6,
+"close": 257.6000061035156,
 "neck": 261.95001220703125,
 "stop": 211.47,
 "signal_date": "2026-11-13",
 "group": "Communication Equipment",
 "lane": "hold",
-"group_rank": 57
-},
-{
-"symbol": "CRAMC",
-"name": "Canara Robeco Asset Management Company Limited",
-"typ": "TW",
-"close": 226.46,
-"neck": 233.5,
-"stop": 197.27,
-"signal_date": "2026-11-12",
-"group": "Asset Management",
-"lane": "mid",
-"group_rank": 35
+"group_rank": 56
 },
 {
 "symbol": "TATACHEM",
 "name": "Tata Chemicals Limited",
 "typ": "DB",
-"close": 663.1,
+"close": 663.0999755859375,
 "neck": 637.6500244140625,
 "stop": 564.35,
 "signal_date": "2026-11-17",
 "group": "Chemicals",
-"lane": "mid",
+"lane": "hold",
 "group_rank": 51
+},
+{
+"symbol": "HEMIPROP",
+"name": "Hemisphere Properties India Limited",
+"typ": "TB",
+"close": 105.96,
+"neck": 112.55999755859375,
+"stop": 99.9,
+"signal_date": "2026-11-11",
+"group": "Real Estate - Diversified",
+"lane": "mid",
+"group_rank": 12
+},
+{
+"symbol": "CRAMC",
+"name": "Canara Robeco Asset Management Company Limited",
+"typ": "TW",
+"close": 226.4600067138672,
+"neck": 233.5,
+"stop": 197.27,
+"signal_date": "2026-11-12",
+"group": "Asset Management",
+"lane": "mid",
+"group_rank": 36
 },
 {
 "symbol": "FORTIS",
@@ -2249,7 +2261,7 @@
 "signal_date": "2026-11-20",
 "group": "Medical Care Facilities",
 "lane": "mid",
-"group_rank": 50
+"group_rank": 52
 },
 {
 "symbol": "NH",
@@ -2261,7 +2273,7 @@
 "signal_date": "2026-11-20",
 "group": "Medical Care Facilities",
 "lane": "mid",
-"group_rank": 50
+"group_rank": 52
 },
 {
 "symbol": "JWL",
@@ -2273,13 +2285,13 @@
 "signal_date": "2026-11-25",
 "group": "Railroads",
 "lane": "mid",
-"group_rank": 70
+"group_rank": 71
 },
 {
 "symbol": "LAOPALA",
 "name": "La Opala RG Limited",
 "typ": "TW",
-"close": 158.8,
+"close": 158.8000030517578,
 "neck": 156.11000061035156,
 "stop": 136.73,
 "signal_date": "2026-11-12",
@@ -2307,18 +2319,6 @@
 "neck": 491.3500061035156,
 "stop": 446.24,
 "signal_date": "2026-11-12",
-"group": null,
-"lane": null,
-"group_rank": null
-},
-{
-"symbol": "RUSTOMJEE",
-"name": "Keystone Realtors Limited",
-"typ": "TW",
-"close": 370.6,
-"neck": 360.0,
-"stop": 325.81,
-"signal_date": "2026-11-13",
 "group": null,
 "lane": null,
 "group_rank": null
@@ -2422,7 +2422,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": 21.0,
+"r3m": 19.8,
 "mom_parts": {
 "stock": 63.3,
 "size": 53.4,
@@ -2494,7 +2494,7 @@
 "group": "Diagnostics & Research",
 "lane": "hold",
 "group_pulse": 33.3,
-"group_rank": 14,
+"group_rank": 13,
 "results_score": 0.9,
 "results_ind": "Healthcare Service Provider",
 "rank": 3,
@@ -2517,7 +2517,7 @@
 "KRSNAA"
 ],
 "morning_rule": false,
-"r3m": 7.9,
+"r3m": 9.1,
 "mom_parts": {
 "stock": 65.8,
 "size": 53.4,
@@ -2584,7 +2584,7 @@
 "ALGOQUANT"
 ],
 "morning_rule": false,
-"r3m": 22.7,
+"r3m": 25.6,
 "mom_parts": {
 "stock": 63.0,
 "size": 53.4,
@@ -2621,8 +2621,8 @@
 "theme_pct": 52.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 31.8,
-"group_rank": 16,
+"group_pulse": 31.5,
+"group_rank": 15,
 "results_score": 0.85,
 "results_ind": "Pharmaceuticals",
 "rank": 2,
@@ -2668,7 +2668,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 12.0,
+"r3m": 11.7,
 "mom_parts": {
 "stock": 59.2,
 "size": 65.7,
@@ -2705,8 +2705,8 @@
 "theme_pct": 48.0,
 "group": "Drug Manufacturers - Specialty & Generic",
 "lane": "hold",
-"group_pulse": 31.8,
-"group_rank": 16,
+"group_pulse": 31.5,
+"group_rank": 15,
 "results_score": 0.85,
 "results_ind": "Pharmaceuticals",
 "rank": 1,
@@ -2752,7 +2752,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 17.5,
+"r3m": 17.1,
 "mom_parts": {
 "stock": 69.6,
 "size": 65.7,
@@ -2856,10 +2856,43 @@
 "theme_pct": null,
 "group": "Specialty Industrial Machinery",
 "lane": "hold",
-"group_pulse": 18.7,
-"group_rank": 39,
+"group_pulse": 18.2,
+"group_rank": 40,
 "results_score": 0.64,
 "results_ind": "Compressors Pumps & Diesel Engines"
+},
+{
+"id": "WATCH-PARAGMILK",
+"symbol": "PARAGMILK",
+"name": "Parag Milk Foods Limited",
+"system": "Monthly ATH",
+"kind": "WATCH",
+"order": null,
+"when": "month close",
+"side": "BUY",
+"price": 340.95,
+"ref": 338.4,
+"stop": 247.37,
+"note": "signal = a month CLOSE above 340.95 (old ATH close), then buy next month's open",
+"base_months": 102,
+"score": -99,
+"value_cr": 102.8765,
+"sector": "",
+"sector_rs": null,
+"theme": "",
+"theme_rs": null,
+"stock_rs": -5.6586,
+"aligned": false,
+"td_score": 0,
+"rs_rating": 50,
+"sector_pct": null,
+"theme_pct": null,
+"group": "Dairy",
+"lane": "hold",
+"group_pulse": 24.8,
+"group_rank": 30,
+"results_score": 0.58,
+"results_ind": "Dairy Products"
 },
 {
 "id": "ATH-HONASA-2026-11-25",
@@ -2920,46 +2953,13 @@
 "BAJAJCON"
 ],
 "morning_rule": false,
-"r3m": 10.0,
+"r3m": 9.8,
 "mom_parts": {
 "stock": 66.5,
 "size": 53.4,
 "sector": 55.3
 },
 "mom_score": 58.4
-},
-{
-"id": "WATCH-PARAGMILK",
-"symbol": "PARAGMILK",
-"name": "Parag Milk Foods Limited",
-"system": "Monthly ATH",
-"kind": "WATCH",
-"order": null,
-"when": "month close",
-"side": "BUY",
-"price": 340.95,
-"ref": 338.4,
-"stop": 247.37,
-"note": "signal = a month CLOSE above 340.95 (old ATH close), then buy next month's open",
-"base_months": 102,
-"score": -99,
-"value_cr": 102.8765,
-"sector": "",
-"sector_rs": null,
-"theme": "",
-"theme_rs": null,
-"stock_rs": -5.6586,
-"aligned": false,
-"td_score": 0,
-"rs_rating": 50,
-"sector_pct": null,
-"theme_pct": null,
-"group": "Dairy",
-"lane": "hold",
-"group_pulse": 24.8,
-"group_rank": 30,
-"results_score": 0.4,
-"results_ind": "Dairy Products"
 }
 ],
 "exits": [],
