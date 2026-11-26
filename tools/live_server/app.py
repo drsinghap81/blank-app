@@ -319,7 +319,7 @@ def health():
     return dict(ok=True, mode="LIVE" if is_live() else "DRY RUN", market_open=market_open(), amo=amo_window(), ist=ist_now().isoformat(timespec="minutes"),
                 uptime=int(now - _HB["start"]), loop_age=int(now - _HB["loop"]), tb_age=int(now - _HB["tb"]),
                 version=up.get("version"), latest=up.get("latest"), update_waiting=bool(up.get("waiting")), load=la,
-                mem_mb=round(mem.get("MemTotal", 0) / 1024), mem_free_mb=round(mem.get("MemAvailable", 0) / 1024))
+                mem_mb=round(mem.get("MemTotal", 0) / 1024), mem_free_mb=round(mem.get("MemAvailable", 0) / 1024), plan_ms=_HB.get("plan_ms"))
 
 
 class Admin(BaseModel):
@@ -673,6 +673,9 @@ def _gone_confirmed(e):
     return time.time() - e["gone_seen"] >= 1200
 
 
+_OB = {"d": None, "t": 0.0}
+
+
 def sync(acc=None):
     """Match journal entries to Angel's order book and holdings:
     pending buy -> filled (real price/qty, then the GTT stop) / rejected / cancelled;
@@ -680,8 +683,10 @@ def sync(acc=None):
     J = journal()
     if not J:
         return J
-    try:
-        book = {str(o.get("id")): o for o in broker.orders()}
+    try:                          # 26 Nov 2026: order book reused for 20 s (each page view used to read it again)
+        if _OB["d"] is None or time.time() - _OB["t"] > 20:
+            _OB.update(d=broker.orders(), t=time.time())
+        book = {str(o.get("id")): o for o in _OB["d"]}
     except Exception as ex:  # noqa: BLE001
         log("sync_error", error=str(ex)[:200]); return J
     acc = acc or broker.account()
@@ -1368,10 +1373,15 @@ def morning_override(body: MorningOv, _=Depends(auth)):
     return dict(ok=True, overrides=M["overrides"])
 
 
+_SZ_T = {}
+
+
 def sized(acc=None):
-    P = plan(); acc = acc or account_cached()
-    J = sync(acc)
-    G = guard(acc)
+    _t = time.time()
+    P = plan(); _SZ_T["plan"] = int((time.time() - _t) * 1000); _t = time.time()
+    acc = acc or account_cached()
+    J = sync(acc); _SZ_T["sync"] = int((time.time() - _t) * 1000); _t = time.time()
+    G = guard(acc); _SZ_T["guard"] = int((time.time() - _t) * 1000)
     held = {h["symbol"]: h["qty"] for h in acc["holdings"] if h["qty"] > 0}
     held = held_map(acc, held)
     sys_open = [s for s in J if not s.startswith("_") and (held.get(s, 0) > 0 or J[s].get("state") == "pending")]
@@ -1560,8 +1570,14 @@ def journal_fix(body: JFix, _=Depends(auth)):
 
 @app.get("/api/plan")
 def get_plan(_=Depends(auth)):
+    """26 Nov 2026 (Amritpal: "how to reduce this time"): the page view uses an account read up to 90 s old (the background loop keeps
+    it warm for 15 minutes after the app was opened); every ORDER still reads Angel fresh. Step times go to /api/health (plan_ms)."""
+    t0 = time.time(); _HB["plan_seen"] = t0
     try:
-        return sized()
+        acc = account_cached(90); t1 = time.time()
+        out = sized(acc)
+        _HB["plan_ms"] = dict(total=int((time.time() - t0) * 1000), account=int((t1 - t0) * 1000), at=ist_now().strftime("%H:%M"), **_SZ_T)
+        return out
     except Exception as e:  # noqa: BLE001
         raise HTTPException(502, f"plan/broker error: {e}")
 
@@ -1660,7 +1676,7 @@ def cleanup_sell(body: Cleanup, request: Request, _=Depends(auth)):
             log("order_error", error=str(ex)[:200], **rec); res.append(dict(symbol=sym, ok=False, msg=f"Angel rejected it: {angel_msg(ex)}")); continue
         log("order", order_id=oid, **rec); left -= 1
         res.append(dict(symbol=sym, ok=True, sent=True, qty=int(h["qty"]), price=p["price"], order_id=oid, msg="sent" + (" (AMO)" if amo else "")))
-    _acc["d"] = None
+    _acc["d"] = None; _OB["d"] = None
     return dict(mode="LIVE" if is_live() else "DRY RUN", results=res)
 
 
@@ -1762,7 +1778,7 @@ def order(body: Order, _=Depends(auth)):
         try:
             gid, gp = broker.gtt_buy(sym, body.qty, row["trigger"], row["price"])
         except Exception as e:  # noqa: BLE001
-            log("order_error", error=str(e), **rec); _acc["d"] = None
+            log("order_error", error=str(e), **rec); _acc["d"] = None; _OB["d"] = None
             if is_surv_err(e):
                 surv_mark(sym)
             raise HTTPException(502, f"Angel rejected the GTT for {sym}: {angel_msg(e)}")
@@ -1789,11 +1805,11 @@ def order(body: Order, _=Depends(auth)):
         oid = broker.place(p)
     except Exception as e:  # noqa: BLE001
         log("order_error", error=str(e), **rec)
-        _acc["d"] = None
+        _acc["d"] = None; _OB["d"] = None
         if is_surv_err(e):
             surv_mark(sym)
         raise HTTPException(502, f"Angel rejected {sym}: {angel_msg(e)}")
-    _acc["d"] = None
+    _acc["d"] = None; _OB["d"] = None
     if sym in surv_load():
         surv_mark(sym, False)
     log("order", order_id=oid, **rec)
@@ -2168,7 +2184,7 @@ def sip(body: Sip, _=Depends(auth)):
         except Exception as e:  # noqa: BLE001
             log("sip_error", symbol=o["symbol"], qty=o["qty"], error=str(e)[:200])
             res.append(dict(symbol=o["symbol"], qty=o["qty"], ok=False, error=angel_msg(e)))
-    _acc["d"] = None
+    _acc["d"] = None; _OB["d"] = None
     return dict(ok=any(r["ok"] for r in res), mode="LIVE", sent=True, total=round(total), results=res)
 
 
@@ -4869,6 +4885,13 @@ def _loop():
         _HB["loop"] = time.time()
         try:
             t = ist_now()
+            # 26 Nov 2026: keep the Angel account read warm while the app is in use (opened in the last 15 minutes), so the next
+            # page view doesn't wait for Angel
+            if time.time() - _HB.get("plan_seen", 0) < 900 and time.time() - _acc["t"] > 60:
+                try:
+                    account_cached(60)
+                except Exception as ex:  # noqa: BLE001
+                    log("warm_error", error=str(ex)[:120])
             if t.weekday() < 5 and (9, 0) <= (t.hour, t.minute) <= (16, 0) and any(not k.startswith("_") for k in journal()):
                 sync()
             if t.weekday() < 5 and (8, 40) <= (t.hour, t.minute) <= (9, 10) and (last_trail() or {}).get("day") != t.date().isoformat() \
