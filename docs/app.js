@@ -2088,7 +2088,7 @@ async function loadTrade() {
   el.innerHTML = `${chips}
     <div class="tr-mode"><span class="tr-dot ${D.real ? 'real' : ''}"></span>${esc(D.broker)} · <b>${D.real ? 'real orders' : esc(D.modeTxt)}</b></div>
     <div class="tr-sum"><div><small>To sell</small><b>${sells.length}</b></div><div><small>To buy</small><b>${buys.length}</b></div><div><small>Holding</small><b>${D.hold.length}</b></div></div>
-    ${autoOn}
+    ${autoOn}<div id="tral"></div>
     ${sells.length ? `<h3 class="tr-h">Sell at the open <button data-all="sell">Select all</button></h3><div class="tr-list">${sells.map((r, i) => row(r, i, 'sell')).join('')}</div>` : ''}
     <h3 class="tr-h">Buy today ${buys.some(sendable) ? '<button data-all="buy">Select all</button>' : ''}</h3>
     ${buys.length ? `<div class="tr-list">${buys.map((r, i) => row(r, i, 'buy')).join('')}</div>` : `<p class="tr-none">No buy signals today.</p>`}
@@ -2102,7 +2102,7 @@ async function loadTrade() {
       <p class="tr-none">Sells the whole holding of each ticked stock: in market hours a limit 0.5% under the live price; after 3:45 pm IST an after-market order 2% under the last price. ${D.real ? '<b>Real orders on Angel.</b>' : 'Dry run: nothing is sent.'}</p></details>` : ''}
     <p class="tr-full"><button class="lv-link" id="trfull">Full view · settings, split and records</button></p>
     <div class="tr-bar"><button id="trsend" disabled>Tick stocks to send</button></div>`;
-  wire();
+  wire(); alCard($('#tral'), mk);   // 27 Nov 2026: the alerts ticker (and "How alerts worked") on the Trade page too
   { const og = el.querySelector('#othgo'); if (og) {
       const cnt = () => el.querySelectorAll('[data-oth]:checked').length;
       const hint = () => { const f = el.querySelector('#othcf'); if (f) f.placeholder = `Type SELL ${cnt()}`; };
