@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-26 01:37 UTC",
+"generated": "2026-11-26 01:44 UTC",
 "market": "NSE",
 "watch_only": false,
 "asof": "2026-11-25",
@@ -213,7 +213,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": 26.1
+"r3m": 18.7
 },
 {
 "id": "WAIT-LALPATHLAB",
@@ -265,7 +265,7 @@
 "KRSNAA"
 ],
 "morning_rule": false,
-"r3m": 8.3
+"r3m": 7.3
 },
 {
 "id": "WAIT-ANGELONE",
@@ -323,7 +323,7 @@
 "ALGOQUANT"
 ],
 "morning_rule": false,
-"r3m": 17.0
+"r3m": 21.9
 },
 {
 "id": "WAIT-ZYDUSLIFE",
@@ -398,7 +398,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 8.3
+"r3m": 10.4
 },
 {
 "id": "WAIT-DRREDDY",
@@ -473,7 +473,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 17.0
+"r3m": 19.0
 },
 {
 "id": "ATH-HONASA-2026-11-25",
@@ -531,7 +531,7 @@
 "BAJAJCON"
 ],
 "morning_rule": false,
-"r3m": 12.3
+"r3m": 12.0
 }
 ],
 "more": [],
@@ -596,7 +596,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": 12.3
+"r3m": 15.5
 },
 {
 "id": "TF-INDHOTEL-2026-11-23",
@@ -650,7 +650,7 @@
 "LEMONTREE"
 ],
 "morning_rule": false,
-"r3m": 23.1
+"r3m": 23.8
 },
 {
 "id": "TF-ASAHIINDIA-2026-11-12",
@@ -724,7 +724,7 @@
 "GABRIEL"
 ],
 "morning_rule": false,
-"r3m": 24.1
+"r3m": 24.0
 },
 {
 "id": "TFCONF-AGARWALEYE-580.92",
@@ -781,7 +781,7 @@
 "INDRAMEDCO"
 ],
 "morning_rule": false,
-"r3m": 9.4
+"r3m": 15.2
 },
 {
 "id": "T921-EICHERMOT-2026-11-25",
@@ -824,7 +824,7 @@
 "ATHERENERG"
 ],
 "morning_rule": true,
-"r3m": 1.6
+"r3m": 4.1
 },
 {
 "id": "RET-DCI-2026-11-25",
@@ -888,7 +888,7 @@
 "DCI"
 ],
 "morning_rule": false,
-"r3m": -1.5
+"r3m": -7.5
 },
 {
 "id": "RET-KMEW-2026-11-25",
@@ -921,7 +921,7 @@
 "group_rank": 2,
 "rank": 2,
 "risk_pct": 10.4,
-"r3m": 31.8
+"r3m": 25.4
 },
 {
 "id": "RET-APOLLO-2026-11-25",
@@ -980,7 +980,7 @@
 "ROSSTECH"
 ],
 "morning_rule": false,
-"r3m": 10.0
+"r3m": 9.3
 },
 {
 "id": "RET-PPLPHARMA-2026-11-25",
@@ -1047,7 +1047,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 9.3
+"r3m": 8.8
 },
 {
 "id": "RET-ROLEXRINGS-2026-11-25",
@@ -1114,7 +1114,7 @@
 "GABRIEL"
 ],
 "morning_rule": false,
-"r3m": 4.1
+"r3m": 4.7
 },
 {
 "id": "RET-MCX-2026-11-23",
@@ -1154,7 +1154,7 @@
 "MCX"
 ],
 "morning_rule": false,
-"r3m": 14.9
+"r3m": 12.2
 },
 {
 "id": "RET-SMSPHARMA-2026-11-23",
@@ -1221,7 +1221,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 30.8
+"r3m": 32.8
 },
 {
 "id": "RET-UNIMECH-2026-11-23",
@@ -1280,7 +1280,7 @@
 "ROSSTECH"
 ],
 "morning_rule": false,
-"r3m": 16.0
+"r3m": 15.5
 },
 {
 "id": "T921-MPHASIS-2026-11-25",
@@ -1345,7 +1345,7 @@
 "DCI"
 ],
 "morning_rule": true,
-"r3m": 1.6
+"r3m": 4.2
 },
 {
 "id": "T921-CYIENT-2026-11-25",
@@ -1404,7 +1404,7 @@
 "NETWEB"
 ],
 "morning_rule": true,
-"r3m": 29.8
+"r3m": 30.3
 },
 {
 "id": "PR-KOTAKBANK-2026-11-20",
@@ -1449,7 +1449,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 26.6
+"r3m": 26.4
 },
 {
 "id": "PR-MEESHO-2026-11-20",
@@ -1483,7 +1483,7 @@
 "CARTRADE"
 ],
 "morning_rule": true,
-"r3m": 20.8
+"r3m": 22.7
 },
 {
 "id": "PR-SOUTHBANK-2026-11-20",
@@ -1528,7 +1528,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 30.4
+"r3m": 30.7
 },
 {
 "id": "PR-DCBBANK-2026-11-20",
@@ -1573,7 +1573,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 26.1
+"r3m": 18.7
 },
 {
 "id": "PR-AXISBANK-2026-11-20",
@@ -1618,7 +1618,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 11.0
+"r3m": 13.8
 },
 {
 "id": "PR-ICICIBANK-2026-11-20",
@@ -1663,7 +1663,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 12.3
+"r3m": 15.5
 },
 {
 "id": "PR-URBANCO-2026-11-20",
@@ -1697,7 +1697,7 @@
 "CARTRADE"
 ],
 "morning_rule": true,
-"r3m": 15.9
+"r3m": 3.9
 },
 {
 "id": "PR-KARURVYSYA-2026-11-20",
@@ -1742,7 +1742,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 15.0
+"r3m": 12.9
 },
 {
 "id": "PR-ETERNAL-2026-11-20",
@@ -1776,7 +1776,7 @@
 "CARTRADE"
 ],
 "morning_rule": true,
-"r3m": 10.4
+"r3m": 13.3
 },
 {
 "id": "PR-CUB-2026-11-20",
@@ -1821,7 +1821,7 @@
 "CSBBANK"
 ],
 "morning_rule": true,
-"r3m": 11.9
+"r3m": 13.7
 }
 ],
 "pattern_watch": [
@@ -2161,7 +2161,7 @@
 "CSBBANK"
 ],
 "morning_rule": false,
-"r3m": 26.1
+"r3m": 18.7
 },
 {
 "id": "WAIT-UNOMINDA",
@@ -2247,7 +2247,7 @@
 "KRSNAA"
 ],
 "morning_rule": false,
-"r3m": 8.3
+"r3m": 7.3
 },
 {
 "id": "WAIT-ANGELONE",
@@ -2305,7 +2305,7 @@
 "ALGOQUANT"
 ],
 "morning_rule": false,
-"r3m": 17.0
+"r3m": 21.9
 },
 {
 "id": "WAIT-ZYDUSLIFE",
@@ -2380,7 +2380,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 8.3
+"r3m": 10.4
 },
 {
 "id": "WAIT-DRREDDY",
@@ -2455,7 +2455,7 @@
 "SMSPHARMA"
 ],
 "morning_rule": false,
-"r3m": 17.0
+"r3m": 19.0
 },
 {
 "id": "WATCH-ORIENTHOT",
@@ -2614,7 +2614,7 @@
 "BAJAJCON"
 ],
 "morning_rule": false,
-"r3m": 12.3
+"r3m": 12.0
 },
 {
 "id": "WATCH-PARAGMILK",
