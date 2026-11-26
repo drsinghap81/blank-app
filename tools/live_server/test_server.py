@@ -1694,3 +1694,25 @@ def test_opt_half_at_1r():
     assert t["pnl"] == round((104 - 100 - 1) * 50) + round((110 - 100 - 1) * 50)
     t1 = dict(key="Y|CE", signal="s", tsym="Y", token="2", lot=50, lot1=50, lots_n=1, entry=100.0, stop=90.0, stop0=90.0, state="open")
     T._book_half(t1, 110.0, "x"); assert not t1.get("half")
+
+
+def test_alert_review(tmp_path):
+    """27 Nov 2026: alerts sorted into categories; direction alerts measured on later daily closes (+ = moved as the alert pointed)."""
+    A, c = client(tmp_path)
+    tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
+    A.alert("setup", "ABC", "ABC (stock): 2nd time at its rising trend line (swing lows ...). Watch only, not a tested buy.", key="k1", mk="NSE")
+    A.alert("exit", "XYZ", "XYZ: closed 90, below its rising trend line 95 (lows). Trend line broken.", key="k2", mk="NSE")
+    A.alert("filled", "ABC", "Bought 10 ABC", key="k3")
+    import datetime as _d
+    today = A.ist_now().date()
+    days = [(today - _d.timedelta(days=k)).isoformat() for k in range(20, -1, -1)]
+    A.broker.daily_candles = lambda sym, days_=None, **kw: [(d, 100, 101, 99, 100 + i) for i, d in enumerate(days)]
+    AL = A.alerts_load()
+    for it in AL["items"]:
+        it["t"] = days[5] + "T05:00:00+00:00"
+    __import__("json").dump(AL, open(A._alerts_path(), "w"))
+    A._al_review_build()
+    R = c.get("/api/alerts/review", headers=h).json()
+    C = {x["category"]: x for x in R["categories"]}
+    assert C["Trend line touch (support)"]["avg1"] > 0 and C["Trend line touch (support)"]["hit5"] == 100
+    assert C["Trend line broken"]["avg5"] < 0 and C["Buy filled"]["n"] == 1

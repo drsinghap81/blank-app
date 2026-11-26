@@ -6817,8 +6817,25 @@ async function alCard(box, mk) {
       <span class="al-n">${L.length || ''}</span></summary>
     <div class="al-list">${L.length ? L.map((x) => { const [ic, lab] = AL_KIND[x.kind] || ['•', x.kind]; return `<div class="td-card td-raise"><span class="td-av" style="background:${red(x) ? 'var(--fall)' : 'var(--rise)'}">${ic}</span><span class="td-nm"><b>${esc(x.symbol || lab)}</b><small>${esc(x.text)}</small><small>${when(x)}</small></span></div>`; }).join('')
       : '<p class="muted td-rs">You get an alert when a stop is hit, a buy fills, a stock is sold, a sell signal fires or a stop is raised.</p>'}
-      <button class="bg-ghost sm" id="alon">${on ? 'Phone alerts on ✓' : '🔔 Turn on phone alerts'}</button></div></details>`;
+      <button class="bg-ghost sm" id="alon">${on ? 'Phone alerts on ✓' : '🔔 Turn on phone alerts'}</button> <button class="bg-ghost sm" id="alrev">How alerts worked</button><div id="alrevbox"></div></div></details>`;
   box.querySelector('#alon').addEventListener('click', (e) => alPush(e.target));
+  box.querySelector('#alrev').addEventListener('click', () => alReview(box.querySelector('#alrevbox')));
+}
+/* 27 Nov 2026 (Amritpal: "categorise every alert the app has sent and tell me how they worked"): the server sorts all stored
+   alerts and, for India stock alerts that point a direction, measures the close 1 / 5 / 10 sessions later (+ = went the alerted way) */
+async function alReview(el, tries = 0) {
+  if (!el) return; el.innerHTML = '<p class="muted td-rs">Reading every alert and the prices after it…</p>';
+  let R; try { R = await lvApi('/api/alerts/review', { timeout: 30000 }); } catch (e) { el.innerHTML = `<p class="muted td-rs">${esc(e.message)}</p>`; return; }
+  if (!R.ready) { if (tries < 30) setTimeout(() => alReview(el, tries + 1), 8000); el.innerHTML = '<p class="muted td-rs">Building the review (about a minute: one price read per stock)…</p>'; return; }
+  const pc = (v) => v == null ? '–' : `<b class="${v >= 0 ? 'up' : 'down'}">${v >= 0 ? '+' : ''}${fmt(v, 1)}%</b>`;
+  const dir = (d) => d > 0 ? 'expects a rise' : d < 0 ? 'expects a fall' : 'information';
+  const sig = R.categories.filter((c) => c.direction), inf = R.categories.filter((c) => !c.direction);
+  el.innerHTML = `<p class="muted td-rs">${R.total} alerts since ${esc(R.since || '–')} · built ${esc((R.built || '').slice(11, 16))} IST. Moves are close of the alert day → 1 / 5 / 10 sessions later, India stocks; + means the price went the way the alert pointed.</p>
+    <table class="mini"><tr><th>Signal alerts</th><th>Sent</th><th>Right after 5 days</th><th>1 day</th><th>5 days</th><th>10 days</th></tr>
+    ${sig.map((c) => `<tr><td><b>${esc(c.category)}</b><br><small class="muted">${dir(c.direction)} · ${c.symbols} stocks · ${esc(c.first)} → ${esc(c.last)}</small></td><td>${c.n}</td><td>${c.hit5 == null ? '–' : c.hit5 + '% of ' + c.n5}</td><td>${pc(c.avg1)}</td><td>${pc(c.avg5)}</td><td>${pc(c.avg10)}</td></tr>`).join('')}</table>
+    <table class="mini"><tr><th>Information alerts</th><th>Sent</th><th>Period</th></tr>${inf.map((c) => `<tr><td>${esc(c.category)}</td><td>${c.n}</td><td><small>${esc(c.first)} → ${esc(c.last)}</small></td></tr>`).join('')}</table>
+    <button class="bg-ghost sm" id="alrevf">Rebuild now</button>`;
+  el.querySelector('#alrevf').addEventListener('click', async () => { try { await lvApi('/api/alerts/review?fresh=1'); } catch (e) { /* */ } setTimeout(() => alReview(el), 4000); });
 }
 async function alPoll() {
   const c = lvCfg(); if (!c.url || !c.token) return;

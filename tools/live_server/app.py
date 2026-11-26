@@ -5192,6 +5192,92 @@ def alerts_list(mk: str = "", _=Depends(auth)):
     return dict(items=L[:50], push=len(A.get("subs", [])))
 
 
+# 27 Nov 2026 (Amritpal: "whatever notifications or alerts have been generated till date ... categorise them and tell me how they
+# worked"): every stored alert (last 1,000) sorted into categories; for India stock alerts that predict a direction, the price move
+# after the alert from Angel daily candles: close of the alert day -> 1, 5 and 10 sessions later, signed so + = moved the way the
+# alert pointed. Built in the background (Angel allows ~3 candle calls a second), cached 6 hours.
+AL_CATS = [  # (category, expected direction: +1 up, -1 down, 0 = information only, test)
+    ("Trend line touch (support)", 1, lambda x: x["kind"] == "setup" and "rising trend line" in x["text"] and "resistance" not in x["text"]),
+    ("Support level (swing low)", 1, lambda x: x["kind"] == "setup" and "Support level" in x["text"]),
+    ("Resistance line / level", -1, lambda x: x["kind"] == "setup" and ("resistance line" in x["text"] or "Resistance level" in x["text"])),
+    ("Iron condor setup", 0, lambda x: x["kind"] == "setup" and str(x.get("id", "")).startswith("condor:")),
+    ("Trend line broken", -1, lambda x: x["kind"] == "exit" and "Trend line broken" in x["text"]),
+    ("Daily cup high taken out", 1, lambda x: x["kind"] == "dcup"),
+    ("Sell signal (system exit)", -1, lambda x: x["kind"] == "exit" and "sell signal" in x["text"].lower()),
+    ("Near the stop (within 3%)", -1, lambda x: x["kind"] == "exit" and "within 3% of the stop" in x["text"]),
+    ("F&O exit / expiry", 0, lambda x: x["kind"] == "exit" and ("exit signal" in x["text"] or "days to expiry" in x["text"])),
+    ("Stop hit / missing stop", 0, lambda x: x["kind"] in ("stop", "nostop", "stop_missing")),
+    ("Buy filled", 0, lambda x: x["kind"] == "filled"),
+    ("Sold / stop raised", 0, lambda x: x["kind"] in ("sold", "raised") or (x["kind"] == "exit" and x["text"].startswith(("Sold", "US ")) and "sold" in x["text"])),
+    ("Bots (auto, Top Bottom, option trader, Turtle, moomoo)", 0, lambda x: x["kind"] in ("auto", "tb", "opt_trader", "turtle_mcx", "mm_tb")),
+    ("Morning check / margin / info", 0, lambda x: x["kind"] in ("morning", "margin", "info", "pie", "setup")),
+]
+_ALR = {"t": 0.0, "d": None, "busy": False}
+
+
+def _al_cat(x):
+    for nm, dirn, f in AL_CATS:
+        try:
+            if f(x):
+                return nm, dirn
+        except Exception:  # noqa: BLE001
+            pass
+    return ("Other", 0)
+
+
+def _al_review_build():
+    try:
+        A = alerts_load(); items = [x for x in A.get("items", []) if x.get("kind") != "test"]
+        cats = {}; cand = {}
+        for x in items:
+            nm, dirn = _al_cat(x)
+            c = cats.setdefault(nm, dict(category=nm, direction=dirn, n=0, first=x["t"][:10], last=x["t"][:10], symbols=set(), measured=[]))
+            c["n"] += 1; c["first"] = min(c["first"], x["t"][:10]); c["last"] = max(c["last"], x["t"][:10]); c["symbols"].add(x.get("symbol") or "")
+            if dirn and alMk_(x) == "NSE" and x.get("symbol") and " (index)" not in x.get("text", ""):
+                cand.setdefault(x["symbol"], []).append((x, nm, dirn))
+        ist = lambda t: (datetime.fromisoformat(t.replace("Z", "+00:00")).astimezone(timezone(timedelta(hours=5, minutes=30)))).date().isoformat()  # noqa: E731
+        for sym, L in list(cand.items())[:150]:
+            try:
+                C = broker.daily_candles(sym, days=120)
+            except Exception:  # noqa: BLE001
+                continue
+            D = [c[0] for c in C]
+            for x, nm, dirn in L:
+                d = ist(x["t"]); i = next((k for k, dd in enumerate(D) if dd >= d), None)
+                if i is None:
+                    continue
+                c0 = C[i][4]; mv = {}
+                for h in (1, 5, 10):
+                    if i + h < len(C):
+                        mv[h] = round(dirn * (C[i + h][4] / c0 - 1) * 100, 2)
+                cats[nm]["measured"].append(dict(symbol=sym, date=d, **{f"d{h}": v for h, v in mv.items()}))
+        out = []
+        for c in cats.values():
+            M = c.pop("measured"); c["symbols"] = len(c["symbols"] - {""})
+            for h in (1, 5, 10):
+                v = [m[f"d{h}"] for m in M if f"d{h}" in m]
+                c[f"n{h}"] = len(v); c[f"avg{h}"] = round(sum(v) / len(v), 2) if v else None; c[f"hit{h}"] = round(sum(1 for z in v if z > 0) / len(v) * 100) if v else None
+            c["examples"] = sorted(M, key=lambda m: m["date"], reverse=True)[:8]
+            out.append(c)
+        out.sort(key=lambda c: (c["direction"] == 0, -c["n"]))
+        _ALR.update(t=time.time(), d=dict(built=ist_now().isoformat(timespec="minutes"), total=len(items), since=min((x["t"][:10] for x in items), default=None), categories=out))
+    except Exception as ex:  # noqa: BLE001
+        log("alert_review_error", error=str(ex)[:200])
+    finally:
+        _ALR["busy"] = False
+
+
+def alMk_(x):
+    return "US" if (str(x.get("text", "")).startswith("US ") or x.get("kind") == "pie") else (x.get("mk") or "NSE")
+
+
+@app.get("/api/alerts/review")
+def alerts_review(fresh: int = 0, _=Depends(auth)):
+    if (fresh or _ALR["d"] is None or time.time() - _ALR["t"] > 6 * 3600) and not _ALR["busy"]:
+        _ALR["busy"] = True; threading.Thread(target=_al_review_build, daemon=True).start()
+    return dict(ready=_ALR["d"] is not None, building=_ALR["busy"], **(_ALR["d"] or {}))
+
+
 @app.get("/api/push/key")
 def push_key(_=Depends(auth)):
     return dict(key=_vapid()["public"])
