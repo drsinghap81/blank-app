@@ -1397,7 +1397,10 @@ def sized(acc=None):
     for r in plan_rows(P):
         E = r.get("trigger") or r["price"]; stop = r["stop"]
         q = 0; why = ""
-        if r["symbol"] in held:
+        if r.get("kind") == "WATCH" or not (r.get("order") or r.get("kind") in ("MY_GTT", "PR", "GOLD")):
+            # 26 Nov 2026: watch-only plan rows (industry-lane skip, low breakout volume, waiting for a close) are never bought
+            why = "watch only: " + (r.get("note") or "not a buy signal")[:140]
+        elif r["symbol"] in held:
             why = "already held"
         elif IG == "trend" and r.get("bucket") == "mom" and r.get("idx_ok") is False:
             why = f"index gate: {r.get('idx_why') or 'market / size index not trending'}"

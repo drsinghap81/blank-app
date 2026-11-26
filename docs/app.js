@@ -8995,7 +8995,7 @@ async function tdRender3(el) {
   const al = lvAlloc(mk, P, null); const seen = new Set();
   const SDt = mk === 'NSE' ? await scoreData(false).catch(() => null) : null; const gOf = (sym) => (SDt && SDt.by[sym] ? SDt.by[sym].g : 0);   // 24 Nov 2026: Stock score
   const rows = (P.top || []).concat(P.swing || []).filter((r) => { const b = bkOf(r); if (!ownK(b) || seen.has(r.symbol) || H.has(r.symbol)) return false;
-    if (!((al[b] ?? 0) > 0)) return false; seen.add(r.symbol); return r.stop && (r.trigger || r.price) > r.stop; });
+    if (!((al[b] ?? 0) > 0) || r.lane_skip || r.vol_skip) return false;   /* 26 Nov 2026: skipped rows live only in the folded Skipped list */ seen.add(r.symbol); return r.stop && (r.trigger || r.price) > r.stop; });
   const red = L && L.lvl === 'red';
   const C = rows.map((r) => { const G = t3Grade(null, r, X); const e = r.trigger || r.price; const z = t2Shares(e, r.stop, mk);
     const sd = ((r.id || '').match(/(\d{4}-\d{2}-\d{2})$/) || [])[1] || null;   // 22 Nov 2026: signal date from the plan id

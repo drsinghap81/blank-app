@@ -259,7 +259,12 @@ def test_tb_approvals(tmp_path):
 
 
 def test_picks(tmp_path):
-    A, c = client(tmp_path)
+    import json as _j                       # 26 Nov 2026: a real Momentum buy row (the day's plan may hold only watch rows)
+    P0 = _j.load(open(os.path.join(HERE, "..", "..", "data", "scan", "trade_plan.json")))
+    P0["top"] = [dict(id="ATH-PICKCO-1", symbol="PICKCO", name="Pick Co", system="Monthly ATH", bucket="mom", kind="ATH", order="LIMIT", when="next open",
+                      side="BUY", price=101.0, ref=100.0, stop=80.0, score=1, lane=None)] + (P0.get("top") or [])
+    pf = tmp_path / "plan.json"; pf.write_text(_j.dumps(P0))
+    A, c = client(tmp_path); A.ENV["PLAN_FILE"] = str(pf); A._plan.update(t=0, d=None)
     tok = c.post("/api/login", json={"password": "pw"}).json()["token"]; h = {"Authorization": "Bearer " + tok}
     P10 = c.get("/api/plan", headers=h).json(); assert P10["picks"] == 10
     j = c.post("/api/picks", headers=h, json={"n": 5}).json()
