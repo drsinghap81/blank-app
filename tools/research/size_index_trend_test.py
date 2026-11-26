@@ -177,6 +177,33 @@ def main():
             "industry 9/21 down": lambda r: IE9[ind_of[r.sym]] if ind_of.get(r.sym) in IE9 else None,
             "market 9/21 down": lambda r: E9["NIFTY 500"].reindex(Cn.index).ffill(),
             "any level 9/21 down": any_down}
+    # 26 Nov 2026 (Amritpal: "cup breakout in ICICIBANK - enter on the breakout candle high if Bank Nifty / Pvt Bank index is 9/21
+    # trending, exit when it's not"): the stock's own NARROW index - a real NSE index where one matches the basic industry, else the
+    # sector index - as BOTH the entry gate and the exit
+    NARROW = {"Private Sector Bank": "NIFTY PRIVATE BANK", "Public Sector Bank": "NIFTY PSU BANK", "Pharmaceuticals": "NIFTY PHARMA",
+              "Computers - Software & Consulting": "NIFTY IT", "Iron & Steel": "NIFTY METAL", "Diversified Metals": "NIFTY METAL",
+              "Cement & Cement Products": "NIFTY COMMODITIES", "Diversified FMCG": "NIFTY FMCG", "Residential, Commercial Projects": "NIFTY REALTY",
+              "Passenger Cars & Utility Vehicles": "NIFTY AUTO", "Auto Components & Equipments": "NIFTY AUTO", "2/3 Wheelers": "NIFTY AUTO",
+              "Depositories Clearing Houses and Other Intermediaries": "NIFTY CAPITAL MARKETS", "Stockbroking & Allied": "NIFTY CAPITAL MARKETS",
+              "Aerospace & Defense": "NIFTY INDIA DEFENCE", "Oil Exploration & Production": "NIFTY OIL & GAS", "Refineries & Marketing": "NIFTY OIL & GAS"}
+    nar_of = {s_: (NARROW.get(ind_of.get(s_)) if NARROW.get(ind_of.get(s_)) in H.columns else sec_of.get(s_) if sec_of.get(s_) in H.columns else None) for s_ in T.sym.unique()}
+    T["e_nar"] = [on(E9, nar_of[s_], d) if nar_of.get(s_) else None for s_, d in zip(T.sym, T.d)]
+    nar_x = lambda r: E9[nar_of[r.sym]].reindex(Cn.index).ffill() if nar_of.get(r.sym) else None          # noqa: E731
+    sec_x = lambda r: E9[sec_of[r.sym]].reindex(Cn.index).ffill() if r.has_sec else None                   # noqa: E731
+    ind_x = lambda r: IE9[ind_of[r.sym]] if ind_of.get(r.sym) in IE9 else None                            # noqa: E731
+    PAIRS = [("9/21 narrow index (in & out)", yes("e_nar"), nar_x), ("lane + 9/21 narrow index (in & out)", lane_ok & yes("e_nar"), nar_x),
+             ("9/21 sector index (in & out)", yes("e_sec"), sec_x), ("lane + 9/21 sector (in & out)", lane_ok & yes("e_sec"), sec_x),
+             ("lane + 9/21 industry index (in & out)", lane_ok & yes("e_ind"), ind_x),
+             ("lane + 9/21 narrow in, own exit", lane_ok & yes("e_nar"), lambda r: None)]
+    for sysk, lab in (("tf", "CUP 9/21"), ("mom", "MOMENTUM")):
+        for en, m, fn in PAIRS:
+            Y = T[(T.sys == sysk) & m].copy()
+            if len(Y) < 20:
+                continue
+            nd = [early(r, fn(r)) for r in Y.itertuples()]
+            Y["dx"] = [z[0] for z in nd]; Y["ret"] = [z[1] for z in nd]
+            cg, dd = AC.port(Y); xr = Y[Y.d >= "2024-01-01"]; xb = Y[Y.d >= "2021-07-01"]
+            print(f"R| SECTOR-RULE {lab:8s} {en:38s} n {len(Y):4d} | win {(Y.ret > 0).mean() * 100:3.0f}% | avg {Y.ret.mean() * 100:+6.2f}% | hold {((Y.dx - Y.d).dt.days).mean():4.0f}d | 2024+ {xr.ret.mean() * 100:+6.2f}% | Jul21+ {xb.ret.mean() * 100:+6.2f}% | 10-slot CAGR {cg:+.1f}% maxDD {dd:.1f}%", flush=True)
     for sysk, lab in (("tf", "CUP 9/21"), ("mom", "MOMENTUM")):
         for en, m in (("lane (live)", lane_ok), ("lane + 9/21 every level", lane_ok & yes("e_mkt") & yes("e_size") & yes("e_sec") & yes("e_ind") & yes("e_th") & T.e_stk)):
             base = T[(T.sys == sysk) & m]
