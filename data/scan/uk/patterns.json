@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-25T01:23+00:00",
-"asof": "2026-11-23",
+"generated": "2026-11-26T01:00+00:00",
+"asof": "2026-11-24",
 "market": "UK",
 "regime": null,
 "rules": "neighbouring swing lows (zigzag 3% on closes), neckline >= 6% above the low; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
@@ -12,11 +12,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 952.0,
+"close": 940.2000122070312,
 "neck": 965.2000122070312,
-"to_neck_pct": 1.3865559040999287,
+"to_neck_pct": 2.6590086870255325,
 "stop": 863.08,
-"stop_pct": 9.340127319848845,
+"stop_pct": 8.202299860746109,
 "height_pct": 9.582200906421967,
 "fall_pct": 38.510446969574666,
 "lows": [
@@ -40,9 +40,11 @@
 50.1
 ],
 "rsi_div": 0.0,
-"rsi_now": 54.6,
+"rsi_now": 50.4,
 "signal_date": "2026-11-16",
-"days_since": 5,
+"days_since": 6,
+"bo_high": 977.0,
+"takeout": 978.47,
 "target": 1049.6,
 "sl": 926.59
 },
@@ -52,11 +54,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 149.0,
+"close": 148.4499969482422,
 "neck": 156.1999969482422,
-"to_neck_pct": 4.832212716941076,
+"to_neck_pct": 5.220613108333083,
 "stop": 143.75,
-"stop_pct": 3.524834242443109,
+"stop_pct": 3.1673964743305416,
 "height_pct": 7.133054649383275,
 "fall_pct": 49.99999476721921,
 "lows": [
@@ -80,13 +82,57 @@
 48.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 44.2,
+"rsi_now": 43.3,
 "signal_date": "2026-11-13",
-"days_since": 6,
+"days_since": 7,
+"bo_high": 160.85,
+"takeout": 161.09,
 "target": 166.6,
 "sl": 149.95,
 "outcome": "sl",
 "outcome_date": "2026-11-20"
+},
+{
+"symbol": "GSK",
+"name": "GSK plc",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 1900.5,
+"neck": 1929.5,
+"to_neck_pct": 1.5259142330965592,
+"stop": 1772.1,
+"stop_pct": 6.756116811365431,
+"height_pct": 6.3671444321940385,
+"fall_pct": 25.02756339581036,
+"lows": [
+[
+"2026-10-29",
+1814.0
+],
+[
+"2026-11-19",
+1827.0
+]
+],
+"peaks": [
+[
+"2026-11-16",
+1929.5
+]
+],
+"rsi_lows": [
+45.0,
+43.2
+],
+"rsi_div": 0.0,
+"rsi_now": 55.0,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 2045.0,
+"sl": 1852.32
 },
 {
 "symbol": "MRO",
@@ -94,11 +140,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 481.70001220703125,
+"close": 474.1000061035156,
 "neck": 489.3999938964844,
-"to_neck_pct": 1.5985014520082164,
+"to_neck_pct": 3.227164647964198,
 "stop": 445.2,
-"stop_pct": 7.5767073276269965,
+"stop_pct": 6.09512627009865,
 "height_pct": 8.130797016505586,
 "fall_pct": 50.64073764882628,
 "lows": [
@@ -122,60 +168,13 @@
 42.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 52.8,
+"rsi_now": 49.4,
 "signal_date": null,
 "days_since": null,
+"bo_high": null,
+"takeout": null,
 "target": 526.2,
 "sl": 469.82
-},
-{
-"symbol": "JMAT",
-"name": "Johnson Matthey",
-"kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 2440.0,
-"neck": 2522.0,
-"to_neck_pct": 3.3606557377049207,
-"stop": 2255.22,
-"stop_pct": 7.572950819672142,
-"height_pct": 10.03490401396161,
-"fall_pct": 38.91797556719023,
-"lows": [
-[
-"2026-09-18",
-2292.0
-],
-[
-"2026-10-30",
-2388.0
-],
-[
-"2026-11-18",
-2320.0
-]
-],
-"peaks": [
-[
-"2026-10-16",
-2522.0
-],
-[
-"2026-11-04",
-2460.0
-]
-],
-"rsi_lows": [
-43.7,
-44.9,
-37.2
-],
-"rsi_div": 0.0,
-"rsi_now": 54.8,
-"signal_date": null,
-"days_since": null,
-"target": 2752.0,
-"sl": 2421.12
 },
 {
 "symbol": "SHC",
@@ -183,11 +182,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 146.89999389648438,
+"close": 147.10000610351562,
 "neck": 152.8000030517578,
-"to_neck_pct": 4.016344043847253,
+"to_neck_pct": 3.874912788399909,
 "stop": 128.01,
-"stop_pct": 12.861124343243624,
+"stop_pct": 12.97960726720805,
 "height_pct": 17.53846388596756,
 "fall_pct": 23.999997652493988,
 "lows": [
@@ -220,11 +219,106 @@
 37.4
 ],
 "rsi_div": 5.9,
-"rsi_now": 52.6,
+"rsi_now": 53.3,
 "signal_date": null,
 "days_since": null,
+"bo_high": null,
+"takeout": null,
 "target": 175.6,
 "sl": 146.69
+},
+{
+"symbol": "JMAT",
+"name": "Johnson Matthey",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 2414.0,
+"neck": 2522.0,
+"to_neck_pct": 4.473902236951122,
+"stop": 2255.22,
+"stop_pct": 6.577464788732401,
+"height_pct": 10.03490401396161,
+"fall_pct": 38.91797556719023,
+"lows": [
+[
+"2026-09-18",
+2292.0
+],
+[
+"2026-10-30",
+2388.0
+],
+[
+"2026-11-18",
+2320.0
+]
+],
+"peaks": [
+[
+"2026-10-16",
+2522.0
+],
+[
+"2026-11-04",
+2460.0
+]
+],
+"rsi_lows": [
+43.7,
+44.9,
+37.2
+],
+"rsi_div": 0.0,
+"rsi_now": 51.3,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 2752.0,
+"sl": 2421.12
+},
+{
+"symbol": "GEN",
+"name": "Genuit Group",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 256.79998779296875,
+"neck": 274.79998779296875,
+"to_neck_pct": 7.009346127582972,
+"stop": 240.77,
+"stop_pct": 6.242987373945641,
+"height_pct": 12.163260323660708,
+"fall_pct": 52.77777777777777,
+"lows": [
+[
+"2026-10-22",
+252.0
+],
+[
+"2026-11-20",
+245.0
+]
+],
+"peaks": [
+[
+"2026-11-04",
+274.79998779296875
+]
+],
+"rsi_lows": [
+37.2,
+32.1
+],
+"rsi_div": 0.0,
+"rsi_now": 44.2,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 304.6,
+"sl": 263.81
 },
 {
 "symbol": "INCH",
@@ -272,97 +366,10 @@
 "rsi_now": 45.0,
 "signal_date": null,
 "days_since": null,
+"bo_high": null,
+"takeout": null,
 "target": 757.0,
 "sl": 663.84
-},
-{
-"symbol": "GEN",
-"name": "Genuit Group",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 256.0,
-"neck": 274.79998779296875,
-"to_neck_pct": 7.343745231628418,
-"stop": 240.77,
-"stop_pct": 5.950001180171971,
-"height_pct": 12.163260323660708,
-"fall_pct": 52.77777777777777,
-"lows": [
-[
-"2026-10-22",
-252.0
-],
-[
-"2026-11-20",
-245.0
-]
-],
-"peaks": [
-[
-"2026-11-04",
-274.79998779296875
-]
-],
-"rsi_lows": [
-37.2,
-32.1
-],
-"rsi_div": 0.0,
-"rsi_now": 43.4,
-"signal_date": null,
-"days_since": null,
-"target": 304.6,
-"sl": 263.81
-},
-{
-"symbol": "STJ",
-"name": "St. James's Place",
-"kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 1070.0,
-"neck": 1196.5,
-"to_neck_pct": 11.822429906542054,
-"stop": 1001.38,
-"stop_pct": 6.412616822429906,
-"height_pct": 17.303921568627455,
-"fall_pct": 47.41338395823447,
-"lows": [
-[
-"2026-07-31",
-1053.5
-],
-[
-"2026-09-16",
-1085.0
-],
-[
-"2026-10-08",
-1020.0
-]
-],
-"peaks": [
-[
-"2026-08-24",
-1196.5
-],
-[
-"2026-09-21",
-1120.5
-]
-],
-"rsi_lows": [
-35.3,
-33.4,
-28.3
-],
-"rsi_div": 0.0,
-"rsi_now": 43.4,
-"signal_date": null,
-"days_since": null,
-"target": 1373.0,
-"sl": 1148.64
 },
 {
 "symbol": "HLN",
@@ -370,11 +377,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 342.20001220703125,
+"close": 350.70001220703125,
 "neck": 382.70001220703125,
-"to_neck_pct": 11.83518368067662,
+"to_neck_pct": 9.124607609397284,
 "stop": 307.39,
-"stop_pct": 10.170955863664377,
+"stop_pct": 12.348163872166252,
 "height_pct": 20.45955225133651,
 "fall_pct": 23.097665944594038,
 "lows": [
@@ -407,11 +414,64 @@
 28.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 47.5,
+"rsi_now": 54.2,
 "signal_date": null,
 "days_since": null,
+"bo_high": null,
+"takeout": null,
 "target": 447.7,
 "sl": 367.39
+},
+{
+"symbol": "STJ",
+"name": "St. James's Place",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 1051.0,
+"neck": 1196.5,
+"to_neck_pct": 13.843958135109414,
+"stop": 1001.38,
+"stop_pct": 4.720742150333013,
+"height_pct": 17.303921568627455,
+"fall_pct": 47.41338395823447,
+"lows": [
+[
+"2026-07-31",
+1053.5
+],
+[
+"2026-09-16",
+1085.0
+],
+[
+"2026-10-08",
+1020.0
+]
+],
+"peaks": [
+[
+"2026-08-24",
+1196.5
+],
+[
+"2026-09-21",
+1120.5
+]
+],
+"rsi_lows": [
+35.3,
+33.4,
+28.3
+],
+"rsi_div": 0.0,
+"rsi_now": 40.5,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 1373.0,
+"sl": 1148.64
 }
 ]
 }
