@@ -95,13 +95,25 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2600); }
 
 const fresh = (url) => (url.startsWith(REPO) ? url + (url.includes('?') ? '&' : '?') + 't=' + Date.now() : url);   // GitHub's raw CDN caches ~5 min
-async function getJSON(url, key) {
+/* 27 Nov 2026 (Amritpal: "app pages are taking a lot of time to load"): Today alone fetched ~7 MB a visit - every page re-downloaded
+   every data file (cache-buster each time), some twice at once, and wrote multi-MB copies to localStorage on the main thread. Now: one
+   download per file per 5 minutes per session (shared while in flight; the ↻ button reloads everything), and only files under
+   300 KB are kept for offline use, written when the phone is idle. */
+const _JC = {};
+function getJSON(url, key) {
+  const c = _JC[url];
+  if (c && Date.now() - c.t < 300000) return c.p;
+  const p = _getJSON(url, key); _JC[url] = { t: Date.now(), p };
+  p.then((j) => { if (j == null) delete _JC[url]; });
+  return p;
+}
+async function _getJSON(url, key) {
   try {
     const r = await fetch(fresh(url), { cache: 'no-cache' });
     state.loadedAt = state.loadedAt || {}; state.loadedAt[key] = new Date();
     if (!r.ok) throw new Error(r.status);
-    const j = await r.json();
-    try { localStorage.setItem(key, JSON.stringify(j)); } catch (e) { /* storage unavailable */ }
+    const txt = await r.text(); const j = JSON.parse(txt);
+    if (txt.length < 300000) { const w = () => { try { localStorage.setItem(key, txt); } catch (e) { /* storage full */ } }; if (window.requestIdleCallback) requestIdleCallback(w, { timeout: 5000 }); else setTimeout(w, 1500); }
     return j;
   } catch (e) {
     try { const j = JSON.parse(localStorage.getItem(key)); if (j) { toast('Offline: showing the last data you loaded'); return j; } } catch (e2) { /* none */ }
