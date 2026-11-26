@@ -123,8 +123,8 @@ def main():
     # 26 Nov 2026 (Amritpal: "there should be some momentum in indices top down till stock - RSI crossed 60 and above"): daily and
     # weekly RSI(14) >= 60 at each level on the day before the fill
     RI = rsi(H); RIW = wk_rsi(H); RS_ = rsi(C); RSW = wk_rsi(C); RII = rsi(IXI); RIIW = wk_rsi(IXI)
-    def r60(D_, k, d):
-        return bool(prev(D_[k], d) >= 60) if k in D_.columns else None
+    def r60(D_, k, d, th=60):
+        return bool(prev(D_[k], d) >= th) if k in D_.columns else None
     for tag, A_, Ai, As in (("d", RI, RII, RS_), ("w", RIW, RIIW, RSW)):
         T[f"r{tag}_mkt"] = [r60(A_, "NIFTY 500", d) for d in T.d]
         T[f"r{tag}_size"] = [r60(A_, SZ[z], d) for z, d in zip(T["size"], T.d)]
@@ -132,6 +132,13 @@ def main():
         T[f"r{tag}_th"] = [any(r60(A_, t, d) for t in th_of[s]) if h else None for s, d, h in zip(T.sym, T.d, T.has_th)]
         T[f"r{tag}_ind"] = [r60(Ai, ind_of[s], d) if ind_of.get(s) in Ai.columns else None for s, d in zip(T.sym, T.d)]
         T[f"r{tag}_stk"] = [bool(r60(As, s, d)) for s, d in zip(T.sym, T.d)]
+        # 26 Nov 2026 (Amritpal: "first test 50 and above")
+        T[f"q{tag}_mkt"] = [r60(A_, "NIFTY 500", d, 50) for d in T.d]
+        T[f"q{tag}_size"] = [r60(A_, SZ[z], d, 50) for z, d in zip(T["size"], T.d)]
+        T[f"q{tag}_sec"] = [r60(A_, sec_of[s], d, 50) if h else None for s, d, h in zip(T.sym, T.d, T.has_sec)]
+        T[f"q{tag}_th"] = [any(r60(A_, t, d, 50) for t in th_of[s]) if h else None for s, d, h in zip(T.sym, T.d, T.has_th)]
+        T[f"q{tag}_ind"] = [r60(Ai, ind_of[s], d, 50) if ind_of.get(s) in Ai.columns else None for s, d in zip(T.sym, T.d)]
+        T[f"q{tag}_stk"] = [bool(r60(As, s, d, 50)) for s, d in zip(T.sym, T.d)]
     T["stk4"] = [bool(prev(S4[s], d)) if s in S4.columns else False for d, s in zip(T.d, T.sym)]
     T["stk234"] = [bool(prev(s234[s], d)) if s in s234.columns else False for d, s in zip(T.d, T.sym)]
     T["ind234"] = [bool(prev(I234[ind_of[s]], d)) if ind_of.get(s) in I234 else None for d, s in zip(T.d, T.sym)]
@@ -176,6 +183,14 @@ def main():
          "lane + RSI weekly >= 60 every level": lane_ok & yes("rw_mkt") & yes("rw_size") & yes("rw_sec") & yes("rw_ind") & yes("rw_th") & T.rw_stk,
          "lane + RSI weekly >= 60 market + size + sector": lane_ok & yes("rw_mkt") & yes("rw_size") & yes("rw_sec"),
          "lane + RSI daily >= 60 market + size + sector": lane_ok & yes("rd_mkt") & yes("rd_size") & yes("rd_sec"),
+         **{f"RSI{w_} >= 50: {lv}": yes(f"q{w_[0].lower()}_{k}") for w_ in ("D", "W") for lv, k in (("market", "mkt"), ("size index", "size"), ("sector", "sec"), ("industry", "ind"), ("theme", "th"))},
+         "RSI weekly >= 50: stock": T.qw_stk,
+         "RSI daily >= 50 at every level": yes("qd_mkt") & yes("qd_size") & yes("qd_sec") & yes("qd_ind") & yes("qd_th") & T.qd_stk,
+         "RSI weekly >= 50 at every level": yes("qw_mkt") & yes("qw_size") & yes("qw_sec") & yes("qw_ind") & yes("qw_th") & T.qw_stk,
+         "lane + RSI daily >= 50 every level": lane_ok & yes("qd_mkt") & yes("qd_size") & yes("qd_sec") & yes("qd_ind") & yes("qd_th") & T.qd_stk,
+         "lane + RSI weekly >= 50 every level": lane_ok & yes("qw_mkt") & yes("qw_size") & yes("qw_sec") & yes("qw_ind") & yes("qw_th") & T.qw_stk,
+         "lane + RSI weekly >= 50 market + size + sector": lane_ok & yes("qw_mkt") & yes("qw_size") & yes("qw_sec"),
+         "lane + RSI daily >= 50 market + size + sector": lane_ok & yes("qd_mkt") & yes("qd_size") & yes("qd_sec"),
          "lane + own size index only (no market check)": lane_ok & yes("size_tr"),
          "lane + own size index Stage 2 only": lane_ok & yes("size_s2"),
          "lane + market + size + stock 4 rules": lane_ok & yes("mkt") & yes("size_tr") & T.stk4,
