@@ -1,2 +1,1 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-KGF,2026-11-18,381.6,64.5,365.18,366.5,4.1,4,-2.8,Kingfisher plc,watch,126.0,0.79,77,21.39,371.0,53.3

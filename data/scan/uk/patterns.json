@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-26T01:00+00:00",
-"asof": "2026-11-24",
+"generated": "2026-11-27T01:02+00:00",
+"asof": "2026-11-25",
 "market": "UK",
 "regime": null,
 "rules": "neighbouring swing lows (zigzag 3% on closes), neckline >= 6% above the low; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
@@ -12,11 +12,11 @@
 "kind": "stock",
 "typ": "TW",
 "status": "breakout",
-"close": 940.2000122070312,
+"close": 927.7999877929688,
 "neck": 965.2000122070312,
-"to_neck_pct": 2.6590086870255325,
+"to_neck_pct": 4.031043857095629,
 "stop": 863.08,
-"stop_pct": 8.202299860746109,
+"stop_pct": 6.975425816924141,
 "height_pct": 9.582200906421967,
 "fall_pct": 38.510446969574666,
 "lows": [
@@ -40,9 +40,9 @@
 50.1
 ],
 "rsi_div": 0.0,
-"rsi_now": 50.4,
+"rsi_now": 46.4,
 "signal_date": "2026-11-16",
-"days_since": 6,
+"days_since": 7,
 "bo_high": 977.0,
 "takeout": 978.47,
 "target": 1049.6,
@@ -54,11 +54,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "breakout",
-"close": 148.4499969482422,
+"close": 145.1999969482422,
 "neck": 156.1999969482422,
-"to_neck_pct": 5.220613108333083,
+"to_neck_pct": 7.575757734981936,
 "stop": 143.75,
-"stop_pct": 3.1673964743305416,
+"stop_pct": 0.9999999999999898,
 "height_pct": 7.133054649383275,
 "fall_pct": 49.99999476721921,
 "lows": [
@@ -82,9 +82,9 @@
 48.7
 ],
 "rsi_div": 0.0,
-"rsi_now": 43.3,
+"rsi_now": 38.3,
 "signal_date": "2026-11-13",
-"days_since": 7,
+"days_since": 8,
 "bo_high": 160.85,
 "takeout": 161.09,
 "target": 166.6,
@@ -98,11 +98,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 1900.5,
+"close": 1919.5,
 "neck": 1929.5,
-"to_neck_pct": 1.5259142330965592,
+"to_neck_pct": 0.5209690023443514,
 "stop": 1772.1,
-"stop_pct": 6.756116811365431,
+"stop_pct": 7.6790830945558834,
 "height_pct": 6.3671444321940385,
 "fall_pct": 25.02756339581036,
 "lows": [
@@ -126,7 +126,7 @@
 43.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 55.0,
+"rsi_now": 57.6,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
@@ -135,58 +135,16 @@
 "sl": 1852.32
 },
 {
-"symbol": "MRO",
-"name": "Melrose Industries",
-"kind": "stock",
-"typ": "DB",
-"status": "forming",
-"close": 474.1000061035156,
-"neck": 489.3999938964844,
-"to_neck_pct": 3.227164647964198,
-"stop": 445.2,
-"stop_pct": 6.09512627009865,
-"height_pct": 8.130797016505586,
-"fall_pct": 50.64073764882628,
-"lows": [
-[
-"2026-10-23",
-452.6000061035156
-],
-[
-"2026-11-20",
-460.79998779296875
-]
-],
-"peaks": [
-[
-"2026-11-12",
-489.3999938964844
-]
-],
-"rsi_lows": [
-40.4,
-42.6
-],
-"rsi_div": 0.0,
-"rsi_now": 49.4,
-"signal_date": null,
-"days_since": null,
-"bo_high": null,
-"takeout": null,
-"target": 526.2,
-"sl": 469.82
-},
-{
 "symbol": "SHC",
 "name": "Shaftesbury Capital",
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 147.10000610351562,
+"close": 147.1999969482422,
 "neck": 152.8000030517578,
-"to_neck_pct": 3.874912788399909,
+"to_neck_pct": 3.804352051369042,
 "stop": 128.01,
-"stop_pct": 12.97960726720805,
+"stop_pct": 13.038718970728326,
 "height_pct": 17.53846388596756,
 "fall_pct": 23.999997652493988,
 "lows": [
@@ -219,7 +177,7 @@
 37.4
 ],
 "rsi_div": 5.9,
-"rsi_now": 53.3,
+"rsi_now": 53.6,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
@@ -228,55 +186,46 @@
 "sl": 146.69
 },
 {
-"symbol": "JMAT",
-"name": "Johnson Matthey",
+"symbol": "MRO",
+"name": "Melrose Industries",
 "kind": "stock",
-"typ": "TB",
+"typ": "DB",
 "status": "forming",
-"close": 2414.0,
-"neck": 2522.0,
-"to_neck_pct": 4.473902236951122,
-"stop": 2255.22,
-"stop_pct": 6.577464788732401,
-"height_pct": 10.03490401396161,
-"fall_pct": 38.91797556719023,
+"close": 466.6000061035156,
+"neck": 489.3999938964844,
+"to_neck_pct": 4.886409664536218,
+"stop": 445.2,
+"stop_pct": 4.585725190455248,
+"height_pct": 8.130797016505586,
+"fall_pct": 50.64073764882628,
 "lows": [
 [
-"2026-09-18",
-2292.0
+"2026-10-23",
+452.6000061035156
 ],
 [
-"2026-10-30",
-2388.0
-],
-[
-"2026-11-18",
-2320.0
+"2026-11-20",
+460.79998779296875
 ]
 ],
 "peaks": [
 [
-"2026-10-16",
-2522.0
-],
-[
-"2026-11-04",
-2460.0
+"2026-11-12",
+489.3999938964844
 ]
 ],
 "rsi_lows": [
-43.7,
-44.9,
-37.2
+40.4,
+42.6
 ],
 "rsi_div": 0.0,
-"rsi_now": 51.3,
+"rsi_now": 46.2,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
 "takeout": null,
-"target": 2752.0,
-"sl": 2421.12
+"target": 526.2,
+"sl": 469.82
 },
 {
 "symbol": "GEN",
@@ -284,11 +233,11 @@
 "kind": "stock",
 "typ": "DB",
 "status": "forming",
-"close": 256.79998779296875,
+"close": 258.6000061035156,
 "neck": 274.79998779296875,
-"to_neck_pct": 7.009346127582972,
+"to_neck_pct": 6.264493931592718,
 "stop": 240.77,
-"stop_pct": 6.242987373945641,
+"stop_pct": 6.8955950131021515,
 "height_pct": 12.163260323660708,
 "fall_pct": 52.77777777777777,
 "lows": [
@@ -312,7 +261,7 @@
 32.1
 ],
 "rsi_div": 0.0,
-"rsi_now": 44.2,
+"rsi_now": 45.8,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
@@ -326,11 +275,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 645.5,
+"close": 647.5,
 "neck": 691.5,
-"to_neck_pct": 7.126258714175049,
+"to_neck_pct": 6.795366795366786,
 "stop": 598.46,
-"stop_pct": 7.288148721920984,
+"stop_pct": 7.574517374517365,
 "height_pct": 10.463258785942497,
 "fall_pct": 33.935289691497374,
 "lows": [
@@ -363,7 +312,7 @@
 32.5
 ],
 "rsi_div": 5.8,
-"rsi_now": 45.0,
+"rsi_now": 46.2,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
@@ -372,16 +321,67 @@
 "sl": 663.84
 },
 {
+"symbol": "JMAT",
+"name": "Johnson Matthey",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 2360.0,
+"neck": 2522.0,
+"to_neck_pct": 6.864406779661025,
+"stop": 2255.22,
+"stop_pct": 4.439830508474585,
+"height_pct": 10.03490401396161,
+"fall_pct": 38.91797556719023,
+"lows": [
+[
+"2026-09-18",
+2292.0
+],
+[
+"2026-10-30",
+2388.0
+],
+[
+"2026-11-18",
+2320.0
+]
+],
+"peaks": [
+[
+"2026-10-16",
+2522.0
+],
+[
+"2026-11-04",
+2460.0
+]
+],
+"rsi_lows": [
+43.7,
+44.9,
+37.2
+],
+"rsi_div": 0.0,
+"rsi_now": 44.8,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 2752.0,
+"sl": 2421.12
+},
+{
 "symbol": "HLN",
 "name": "Haleon",
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 350.70001220703125,
+"close": 356.8999938964844,
 "neck": 382.70001220703125,
-"to_neck_pct": 9.124607609397284,
+"to_neck_pct": 7.228920916717629,
 "stop": 307.39,
-"stop_pct": 12.348163872166252,
+"stop_pct": 13.870830692937153,
 "height_pct": 20.45955225133651,
 "fall_pct": 23.097665944594038,
 "lows": [
@@ -414,7 +414,7 @@
 28.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 54.2,
+"rsi_now": 58.3,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
@@ -428,11 +428,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 1051.0,
+"close": 1034.5,
 "neck": 1196.5,
-"to_neck_pct": 13.843958135109414,
+"to_neck_pct": 15.659739004349937,
 "stop": 1001.38,
-"stop_pct": 4.720742150333013,
+"stop_pct": 3.2010633156114077,
 "height_pct": 17.303921568627455,
 "fall_pct": 47.41338395823447,
 "lows": [
@@ -465,7 +465,7 @@
 28.3
 ],
 "rsi_div": 0.0,
-"rsi_now": 40.5,
+"rsi_now": 38.0,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
