@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-27T08:43:40Z",
+ "updated": "2026-11-27T18:28:22Z",
  "start": "2026-11-27",
  "capital": 10000.0,
  "rules": "index 1/2/2, buffer 0.05%, cost 0.1%",
  "note": "Paper only - no orders. Daily UTC candles; trades from completed days.",
  "coins": {
   "BTC": {
-   "price": 61699.18,
+   "price": 59781.98,
    "last_day": "2026-11-26",
    "both": {
     "equity": 10000.0,
@@ -34,7 +34,7 @@
    }
   },
   "ETH": {
-   "price": 1729.17,
+   "price": 1665.97,
    "last_day": "2026-11-26",
    "both": {
     "equity": 10000.0,
