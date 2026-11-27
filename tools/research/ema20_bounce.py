@@ -40,6 +40,7 @@ def events(x, mode="touch"):
     (valid 10 sessions; cancelled if the touch low breaks first). 28 Nov 2026 v2 (Amritpal: "if only such a clean rising chart I
     enter on breakout of previous swing high")."""
     o, h, l, c = (x[k].to_numpy(float) for k in ("OPEN", "HIGH", "LOW", "CLOSE")); n = len(c); C = x.CLOSE
+    vv = x.VOL.to_numpy(float); v20 = x.VOL.rolling(20).mean().shift(1).to_numpy()
     m = C.ewm(span=20, adjust=False).mean().to_numpy(); s50 = C.rolling(50).mean().to_numpy()
     e9 = C.ewm(span=9, adjust=False).mean().to_numpy(); e21 = C.ewm(span=21, adjust=False).mean().to_numpy()
     val = (C * x.VOL).rolling(20).mean().to_numpy() / 1e7
@@ -55,15 +56,30 @@ def events(x, mode="touch"):
         clean = bool(t >= 70 and m[t] > m[w0] and all(m[k] > m[k - 10] for k in range(w0 + 10, t + 1, 10))
                      and (c[w0:t] >= m[w0:t] * 0.99).all()
                      and sum(1 for k in range(w0, t - 2) if l[k] <= m[k] * 1.005 and c[k] >= m[k] and l[k] < l[k - 1] and l[k] <= l[k + 1]) >= 2)
+        shs = [k for k in range(max(2, t - 40), t - 1) if h[k] >= h[k - 1] and h[k] >= h[k - 2] and h[k] >= h[k + 1] and h[k] >= h[k + 2]]
+        t0 = t                                                   # the trigger search starts after this bar
         if mode == "swing":
-            shs = [k for k in range(max(2, t - 40), t - 1) if h[k] >= h[k - 1] and h[k] >= h[k - 2] and h[k] >= h[k + 1] and h[k] >= h[k + 2]]
             if not shs:
                 continue
             trig = h[shs[-1]] * (1 + BUF); win = 11
+        elif mode == "swingvol":
+            # 28 Nov 2026 (Amritpal): a BREAKOUT CANDLE that closes above the previous swing high on >= 1.5x volume (within 10
+            # sessions of the touch, touch low not broken first); entry above that candle's high (3 sessions); SL below the swing low
+            if not shs:
+                continue
+            sh = h[shs[-1]]; bk = None
+            for k in range(t + 1, min(n - 1, t + 11)):
+                if l[k] < l[t]:
+                    break
+                if c[k] > sh and v20[k] and vv[k] >= 1.5 * v20[k]:
+                    bk = k; break
+            if bk is None:
+                continue
+            trig = h[bk] * (1 + BUF); win = 4; t0 = bk
         else:
             trig = h[t] * (1 + BUF); win = 5
         stop = l[t]; j = None
-        for k in range(t + 1, min(n, t + win)):
+        for k in range(t0 + 1, min(n, t0 + win)):
             hit = h[k] >= trig; brk = l[k] < stop
             if brk and not hit:
                 break
@@ -76,7 +92,7 @@ def events(x, mode="touch"):
         if j is None:
             hist.append((t, False, t + 4)); continue
         e = max(o[j], trig)
-        if stop >= e or (e - stop) / e > 0.12:
+        if stop >= e or (e - stop) / e > 0.12 or (e - stop) / e < 0.01:      # v2: stops under 1% gave absurd R values
             hist.append((t, False, j)); continue
         R = e - stop; worked = False; rd = min(n - 1, j + 10)
         for k in range(j, min(n, j + 11)):
@@ -96,9 +112,9 @@ def events(x, mode="touch"):
 
 def main():
     P = FV.load()
-    for mode in ("swing", "touch"):
+    for mode in ("swingvol", "swing", "touch"):
         D = pd.DataFrame([dict(e, s=s_) for s_, x in P.items() for e in events(x, mode)])
-        print(f"R| ===== entry above the {'PREVIOUS SWING HIGH' if mode == 'swing' else 'touch candle high'}: entries {len(D)}", flush=True)
+        print(f"R| ===== entry: {dict(swingvol='above the high of a HIGH-VOLUME candle that closed above the previous swing high', swing='above the previous swing high', touch='above the touch candle high')[mode]}: entries {len(D)}", flush=True)
         end = D.d.max()
         for nm, msk in (("all touches", D.index == D.index), ("CLEAN rising chart", D.clean), ("not clean", ~D.clean)):
             Z = D[msk]
@@ -106,9 +122,9 @@ def main():
                             ("2021+ ex-Covid", pd.Timestamp("2021-01-01")), ("2016+", pd.Timestamp("2016-01-01"))):
                 z = Z[Z.d >= st]
                 if len(z) < 15:
-                    print(f"R| {mode:5s} {nm:20s} {lab:15s} n {len(z)} (too few)", flush=True); continue
+                    print(f"R| {mode:8s} {nm:20s} {lab:15s} n {len(z)} (too few)", flush=True); continue
                 parts = [f"{r} {z[r + 'R'].mean():+.2f}R (win {(z[r + 'R'] > 0).mean() * 100:3.0f}%)" for r in ("2R", "3R", "921", "t10")]
-                print(f"R| {mode:5s} {nm:20s} {lab:15s} n {len(z):6d} risk {z.risk.median():.1f}% | " + " | ".join(parts), flush=True)
+                print(f"R| {mode:8s} {nm:20s} {lab:15s} n {len(z):6d} risk {z.risk.median():.1f}% | " + " | ".join(parts), flush=True)
 
 
 if __name__ == "__main__":
