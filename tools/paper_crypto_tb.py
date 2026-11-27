@@ -1,7 +1,7 @@
 """Top Bottom PAPER trading on Bitcoin and Ether (27 Nov 2026, Amritpal: "meanwhile can you start paper trading on BTC and ETH top bottom").
 No exchange, no account: Yahoo BTC-USD / ETH-USD daily candles (UTC days, 7 a week) through the same engine as the backtest
 (tools/topbottom_backtest.run_live, index rules 1/2/2, buffer 0.05%, entry-day stop on the close, 0.1% cost a round trip).
-Paper starts FLAT on 28 Nov 2026 (UTC): only trades entered from then count. Two books per coin:
+Paper starts FLAT on 27 Nov 2026 (UTC): only trades entered from then count. Two books per coin:
   both sides (what futures would trade)  and  buy only (what spot would trade).
 Notional US$10,000 per book, compounded per trade. Trades come from COMPLETED daily candles only; the running day is used just for
 the live price / open P&L. Writes paper/crypto_tb.json (read by the app's Bots tab). Run every few hours by .github/workflows/paper-crypto-tb.yml."""
@@ -17,7 +17,7 @@ import yfinance as yf
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import topbottom_backtest as tbb  # noqa: E402
 
-START = pd.Timestamp("2026-11-28")
+START = pd.Timestamp("2026-11-27")
 RULES = dict(day_sl_pct=1.0, max_sl_pct=2.0, be_pct=2.0, gap_pct=1.0)
 COST = 0.001
 CAP = 10000.0
