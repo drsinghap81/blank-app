@@ -406,6 +406,13 @@ def analyse(sym, x, today, lookback_days=550):
     try:
         if float(val20.iloc[-1]) >= MINVAL and float(x.Close.iloc[-1]) >= MIN_CLOSE:
             Md = M[done]
+            # 28 Nov 2026 (Amritpal: "a watch on cup closes breaking high with 9/21 momentum"): daily EMA 9 above EMA 21 now, and
+            # how many sessions since it crossed up (watch-list information; the 9/21 exit is what the cup basket test used)
+            _e9 = x.Close.ewm(span=9, adjust=False).mean().to_numpy(float); _e21 = x.Close.ewm(span=21, adjust=False).mean().to_numpy(float)
+            m921 = bool(_e9[-1] > _e21[-1]); m921_days = None
+            if m921:
+                _dn = np.flatnonzero(_e9 <= _e21)
+                m921_days = int(len(_e9) - 1 - _dn[-1]) if len(_dn) else None
             for tf, (H_, L_, C_, idx) in (("D", (x.High.to_numpy(float), x.Low.to_numpy(float), x.Close.to_numpy(float), [str(d.date()) for d in x.index])),
                                          ("W", (Wc.h.to_numpy(float), Wc.l.to_numpy(float), Wc.c.to_numpy(float), [str(p.end_time.date()) for p in Wc.index])),
                                          ("M", (Md.h.to_numpy(float), Md.l.to_numpy(float), Md.c.to_numpy(float), [str(p) for p in Md.index]))):
@@ -415,6 +422,7 @@ def analyse(sym, x, today, lookback_days=550):
                     continue
                 cl = float(x.Close.iloc[-1])
                 CUPW.append(dict(symbol=sym, tf=tf, status=z["status"], long_cup=True, bars_ago=z["bars_ago"], cup_bars=int(z["age"]), cup_days=int(z["age"] * td),
+                                 e921=m921, e921_days=m921_days,
                                  depth=round(z["depth"], 4), rim=round(z["rim"], 2), rim_date=idx[z["a"]], signal=idx[z["i"]],
                                  trigger=round(z["trigger"], 2), stop=round(z["stop"], 2) if z["stop"] else None,
                                  risk_pct=round((1 - z["stop"] / z["trigger"]) * 100, 1) if z["stop"] else None,

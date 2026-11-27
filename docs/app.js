@@ -2369,21 +2369,30 @@ const CUP_TF = { D: 'Daily', W: 'Weekly', M: 'Monthly' };
 const cupLen = (d) => (d >= 250 ? `${fmt(d / 250, 1)} yr` : `${Math.round(d / 21)} mo`);
 async function cupBasket(box) {
   if (!box) return;
-  const A = await getJSON(MAIN + 'data/scan/ath.json', 'ath').catch(() => null);
-  const R = (A && A.cup_watch) || [];
+  // 28 Nov 2026 (Amritpal: "I need a watch on cup closes breaking high with 9/21 momentum"): India / US / Australia, and a
+  // "9/21 momentum" filter (daily EMA 9 above EMA 21). US / ASX are WATCH ONLY: cup closes there didn't beat the index in tests.
+  const cmk = state.cupMk || 'NSE'; const n921 = state.cup921 !== false;
+  const A = await getJSON(MAIN + MKT[cmk].path + 'ath.json', cmk === 'NSE' ? 'ath' : 'ath_' + cmk).catch(() => null);
+  const R0 = (A && A.cup_watch) || []; const has921 = R0.some((r) => 'e921' in r);
+  const R = n921 && has921 ? R0.filter((r) => r.e921) : R0;
   const tf = state.cupTf || 'all'; const L = R.filter((r) => tf === 'all' || r.tf === tf);
   const bo = L.filter((r) => r.status === 'breakout'), nr = L.filter((r) => r.status === 'near');
   const f2 = (v) => fmt(v, 2, 'en-IN'); const weak = { weak: 'Weak industry', fade: 'Fading industry', bounce: 'Turning industry' };
   const row = (r) => `<li class="cb-r"><div><b>${esc(r.symbol)}</b><small>${esc(r.name || '')}</small>
-      <span class="cb-t"><i>${CUP_TF[r.tf]}</i><i>${cupLen(r.cup_days)} cup</i><i>${fmt(Math.abs(r.depth) * 100, 0)}% deep</i>${r.ath ? '<i>all-time high</i>' : ''}${weak[r.lane] ? `<i class="w">${weak[r.lane]}</i>` : ''}</span></div>
-    ${r.status === 'breakout' ? `<div class="cb-a"><span>Buy above <b>${f2(r.trigger)}</b><small>stop ${f2(r.stop)} · risk ${fmt(r.risk_pct, 1)}%</small></span><button class="tr-go" data-cup="${esc(r.symbol)}|${r.tf}">Trade</button></div>`
+      <span class="cb-t"><i>${CUP_TF[r.tf]}</i><i>${cupLen(r.cup_days)} cup</i><i>${fmt(Math.abs(r.depth) * 100, 0)}% deep</i>${r.ath ? '<i>all-time high</i>' : ''}${r.e921 ? `<i>9/21 up${r.e921_days != null ? ' · ' + r.e921_days + 'd' : ''}</i>` : ('e921' in r ? '<i class="w">9/21 down</i>' : '')}${weak[r.lane] ? `<i class="w">${weak[r.lane]}</i>` : ''}</span></div>
+    ${r.status === 'breakout' ? `<div class="cb-a"><span>Buy above <b>${f2(r.trigger)}</b><small>stop ${f2(r.stop)} · risk ${fmt(r.risk_pct, 1)}%</small></span>${cmk === 'NSE' ? `<button class="tr-go" data-cup="${esc(r.symbol)}|${r.tf}">Trade</button>` : '<small class="muted">watch only</small>'}</div>`
       : `<div class="cb-a"><span>Rim <b>${f2(r.rim)}</b><small>${fmt(r.to_trigger_pct, 1)}% away · waits for a ${CUP_TF[r.tf].toLowerCase()} close above</small></span></div>`}</li>`;
-  box.innerHTML = `<article class="bs-c"><div class="bs-h"><span class="bs-n">◡</span><div><b>Long cups · watch & trade</b><small>Daily cups of 6+ months, weekly of 1+ year, monthly of 2+ years. Longest first.</small></div></div>${box.dataset.pl || ''}
+  box.innerHTML = `<article class="bs-c"><div class="bs-h"><span class="bs-n">◡</span><div><b>Long cups · watch & trade</b><small>Daily cups of 6+ months, weekly of 1+ year, monthly of 2+ years. Longest first.</small></div></div>${cmk === 'NSE' ? (box.dataset.pl || '') : ''}
+    <div class="seg cb-seg" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia']].map(([k, n]) => `<button data-cbm="${k}" aria-selected="${cmk === k}">${n}</button>`).join('')}</div>
+    ${cmk === 'NSE' ? '' : '<p class="bs-note"><b>Watch only.</b> In the US and Australia, weekly / daily / monthly cup closes did not beat holding the index in our tests (US weekly 6.9%/yr vs S&P 12.2% since 2021).</p>'}
+    <label class="bs-note" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="cb921" ${n921 ? 'checked' : ''}> Only with 9/21 momentum (daily EMA 9 above EMA 21)${has921 ? ` · ${R.length} of ${R0.length}` : ' · appears after the next evening scan'}</label>
     <div class="seg cb-seg" role="tablist">${[['all', 'All'], ['D', 'Daily'], ['W', 'Weekly'], ['M', 'Monthly']].map(([k, n]) => `<button data-cbt="${k}" aria-selected="${tf === k}">${n} ${k === 'all' ? R.length : R.filter((r) => r.tf === k).length}</button>`).join('')}</div>
     <p class="bs-p"><b>Broke out · ${bo.length}</b></p><ul class="cb-l">${bo.map(row).join('') || '<li class="cb-none">None right now</li>'}</ul>
     <p class="bs-p"><b>Near the rim · ${nr.length}</b></p><ul class="cb-l">${nr.slice(0, 40).map(row).join('') || '<li class="cb-none">None right now</li>'}</ul>
     <p class="bs-note">Trade = Angel GTT buy at the trigger, stop under the breakout candle, no fixed target. ${A ? 'Scan ' + esc(A.asof || '') : ''}</p></article>`;
   box.querySelectorAll('[data-cbt]').forEach((b) => b.addEventListener('click', () => { state.cupTf = b.dataset.cbt; cupBasket(box); }));
+  box.querySelectorAll('[data-cbm]').forEach((b) => b.addEventListener('click', () => { state.cupMk = b.dataset.cbm; cupBasket(box); }));
+  const c9 = box.querySelector('#cb921'); if (c9) c9.addEventListener('change', () => { state.cup921 = c9.checked; cupBasket(box); });
   box.querySelectorAll('[data-cup]').forEach((b) => b.addEventListener('click', async () => {
     const [sym, t] = b.dataset.cup.split('|'); const r = R.find((x) => x.symbol === sym && x.tf === t); if (!r) return;
     if (!window.confirm(`Trade ${sym} (${CUP_TF[t]} cup, ${cupLen(r.cup_days)})?\nGTT buy above ${f2(r.trigger)}, stop ${f2(r.stop)} (${fmt(r.risk_pct, 1)}% risk).\nIt goes to Trade Live → My picks, sized at your swing risk; you send it there.`)) return;
