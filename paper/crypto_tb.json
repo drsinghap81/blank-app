@@ -1,0 +1,65 @@
+{
+ "updated": "2026-11-27T08:30:20Z",
+ "start": "2026-11-28",
+ "capital": 10000.0,
+ "rules": "index 1/2/2, buffer 0.05%, cost 0.1%",
+ "note": "Paper only - no orders. Daily UTC candles; trades from completed days.",
+ "coins": {
+  "BTC": {
+   "price": 61759.15,
+   "last_day": "2026-11-26",
+   "both": {
+    "equity": 10000.0,
+    "ret_pct": 0.0,
+    "n": 0,
+    "wins": 0,
+    "trades": [],
+    "pos": null,
+    "buy_lvl": 61241.59,
+    "sell_lvl": 59717.89,
+    "top": 61210.98,
+    "bot": 59747.77
+   },
+   "buy": {
+    "equity": 10000.0,
+    "ret_pct": 0.0,
+    "n": 0,
+    "wins": 0,
+    "trades": [],
+    "pos": null,
+    "buy_lvl": 61241.59,
+    "sell_lvl": null,
+    "top": 61210.98,
+    "bot": 59747.77
+   }
+  },
+  "ETH": {
+   "price": 1732.33,
+   "last_day": "2026-11-26",
+   "both": {
+    "equity": 10000.0,
+    "ret_pct": 0.0,
+    "n": 0,
+    "wins": 0,
+    "trades": [],
+    "pos": null,
+    "buy_lvl": 1691.61,
+    "sell_lvl": 1676.86,
+    "top": 1690.77,
+    "bot": 1677.69
+   },
+   "buy": {
+    "equity": 10000.0,
+    "ret_pct": 0.0,
+    "n": 0,
+    "wins": 0,
+    "trades": [],
+    "pos": null,
+    "buy_lvl": 1691.61,
+    "sell_lvl": null,
+    "top": 1690.77,
+    "bot": 1677.69
+   }
+  }
+ }
+}
