@@ -150,13 +150,13 @@ function setClassic(on, quiet) {
 }
 try { if (localStorage.getItem('td.classic') === '1') setClassic(true, true); } catch (e) { /* */ }
 const IDEA_OF = { bot: 'trends', trd: 'trends' };
-const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 'fund', 'themes', 'top', 'pie'], trd: ['wclose', 'dclose', 'ipo', 'short', 'turtle', 'opt'] };
+const ATH_GRP = { mom: ['brk', 'near', 'mclose', 'gm', 'tracked'], inv: ['imc', 'fund', 'themes', 'top', 'pie'], trd: ['wclose', 'dclose', 'ipo', 'short', 'opt'] };
 const athGrp = () => (state.view === 'inv' ? 'inv' : state.view === 'trd' ? 'trd' : 'mom');
 const grpOfTab = (t) => (ATH_GRP.inv.includes(t) ? 'inv' : ATH_GRP.trd.includes(t) ? 'trd' : 'mom');
 state.athTabG = { mom: 'brk', inv: 'imc', trd: 'wclose' };
 try { const g = JSON.parse(sessionStorage.getItem('td.tabg') || 'null'); if (g) { Object.assign(state.athTabG, g); sessionStorage.removeItem('td.tabg'); } } catch (e) { /* */ }
 function tradeStrip(cur) {
-  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['turtle', 'Turtle Trading System'], ['opt', 'ATM option charts'], ['pat', 'Bottom patterns'], ['sup', 'At support']];
+  const B = [['t921', '9/21 trend'], ['wclose', 'Week cup close'], ['dclose', 'Day cup close'], ['ipo', 'IPO cups'], ['short', 'Short watch'], ['opt', 'ATM option charts']];
   return `<div class="seg trdstrip" style="margin:10px 16px 0;flex-wrap:wrap">${B.map(([k, n]) => `<button data-tk="${k}" aria-selected="${cur === k}">${n}</button>`).join('')}</div>`;
 }
 function tradeStripWire(el) {
@@ -1685,6 +1685,8 @@ async function tmcxLoad(box = $('#tmcxcard')) {
   if (!box || !isOwner()) return;
   let T; try { T = await lvApi('/api/turtle/mcx'); } catch (e) { box.innerHTML = /404/.test(e.message) ? '' : `<div class="lv-card"><b>Turtle · MCX</b><p class="lv-sub">${esc(e.message)}</p></div>`; return; }
   const live = T.live; const names = [...new Set(Object.keys(T.armed || {}).concat(Object.keys(T.pos || {})))];
+  // 28 Nov 2026 clean-up: Turtle is archived - its card shows only while something is still armed or open (the server keeps managing it)
+  if (!names.length) { box.innerHTML = ''; return; }
   const inr2 = (v) => fmt(v, 2, 'en-IN');
   const row = (n) => { const a = (T.armed || {})[n], p = (T.pos || {})[n], o = (T.orders || {})[n] || {}, L = (T.plan || {})[n] || {}, m = (a && a.mult) || (p && p.mult) || 0, lots = (a && a.lots) || (p && p.lots) || 1;
     const risk = L.N && m ? 2 * L.N * m * lots : null;
@@ -1873,7 +1875,7 @@ async function loadAuto() {
       { id: 'opt_trader', n: 'Option trader', s: A.opt_trader_live ? '5-min options · real orders' : '5-min options · paper only', on: !!A.opt_trader_live, kind: 'part', fut: true }]],
     /* 26 Nov 2026: the Top Bottom MCX minis bots sit with Turtle under MCX (installed from Futures) */
     ...((A.turtle || TB_MCX.some((k) => tb[k])) ? [['MCX', [...TB_MCX.filter((k) => tb[k]).map((k) => { const v = tb[k]; return { id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k]}`, s: `MCX ${{ crude: 'CRUDEOILM · both sides', silver: 'SILVERMIC · buy only', natgas: 'NATGASMINI · buy only', gold: 'GOLDPETAL · buy only' }[k]}${v.live ? '' : ' · dry run (Bots tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k }; }),
-      ...(A.turtle ? [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'markets: ' + esc(A.turtle.armed.join(' · ')) : 'markets set in the Bots tab', on: !!A.turtle_on, kind: 'part', fut: true }] : [])]]] : []),
+      ...(A.turtle && (A.turtle_on || (A.turtle.armed || []).length) ? [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'markets: ' + esc(A.turtle.armed.join(' · ')) : 'markets set in the Bots tab', on: !!A.turtle_on, kind: 'part', fut: true }] : [])]]] : []),
     ['US', [{ id: 'mm_us', n: 'ETF Top Bottom', s: `moomoo · QQQ SMH XLF XLE${paper ? ' · paper' : ''}`, on: !!A.mm_us, kind: 'part', warn: A.mm_us && !cap('US') ? 'set capital in settings' : '', mm: 'US' }]],
     /* 27 Nov 2026: BTC / ETH Top Bottom paper (no exchange yet) - a row with no switch, opens its card */
     ['Crypto', [{ id: 'crypto_paper', n: 'Top Bottom · BTC / ETH', s: 'paper only · no exchange connected yet · updates every 4 h', on: false, kind: 'paper' }]],
@@ -5499,7 +5501,7 @@ async function pfUS(box) {
   if (!box) return; let loc = []; try { loc = JSON.parse(localStorage.getItem('td.uswLocal') || '[]'); } catch (e) { /* */ }
   const c = lvCfg(); let W = null;
   if (c.url && c.token) { try { W = await lvApi('/api/us/watch', { timeout: 30000 }); } catch (e) { W = null; } }
-  const items = W && W.items.length ? W.items : loc.map((x) => ({ ...x, system: (USW_SYS.find((k) => k[0] === x.system) || [0, x.system])[1], price: null, pnl: null }));
+  const items = W && (W.items || []).length ? W.items : loc.map((x) => ({ ...x, system: (USW_SYS.find((k) => k[0] === x.system) || [0, x.system])[1], price: null, pnl: null }));
   if (!items.length) { box.innerHTML = ''; return; }
   const $f = (v) => `${v < 0 ? '−' : ''}$${fmt(Math.abs(v), 2, 'en-US')}`;
   const cost = items.reduce((a, r) => a + r.qty * r.entry, 0); const priced = items.every((r) => r.price);
@@ -6725,13 +6727,11 @@ async function bgActTiles(box, P, rows, mk = 'NSE') {
   else if (mk === 'US') { try { held = JSON.parse(localStorage.getItem('td.uswLocal') || '[]').map((x) => x.symbol); } catch (e) { /* */ }
     try { const W = await lvApi('/api/us/watch', { timeout: 15000 }); held = (W.items || []).map((x) => x.symbol); } catch (e) { /* phone copy */ } }
   const H = new Set(held); const sells = ((P && P.exits) || []).filter((e) => H.has(e.symbol));
-  if (!state.turtle) state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null);
-  const TU = tuFor((state.turtle && state.turtle.rows) || [], mk); const tu = TU.filter((r) => (r.status === 'in trade' && r.new) || r.status === 'exited today').length || TU.filter((r) => r.status === 'in trade').length;
   const known = held.length > 0;
   box.innerHTML = `<div class="bg-act">
       <button class="bg-actt sell" data-go="sell"><b>${known ? sells.length : '–'}</b><span>to sell</span></button>
       <button class="bg-actt buy" data-go="buy"><b>${rows.length}</b><span>to buy</span></button>
-      ${mk === 'NSE' ? `<button class="bg-actt tur" data-go="tur"><b>${tu}</b><span>Turtle</span></button>` : ''}</div>
+      </div>
     ${sells.length ? `<div class="bg-sells" id="bgsells"><b>Sell at the next open</b>${sells.map((e) => `<div class="td-card td-raise"><span class="td-av" style="background:var(--fall)">↓</span><span class="td-nm"><b>Sell ${esc(e.symbol)}</b><small>${esc(e.system || '')} · ${esc(e.why || 'exit rule met')}</small></span></div>`).join('')}</div>` : ''}`;
   box.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => {
     const g = b.dataset.go;
@@ -6813,7 +6813,7 @@ async function bgProof(el) {
 function bgExplore(el) {
   $('#asof').textContent = 'Everything the Pro mode has';
   const items = [['mk', 'Markets', 'Sectors & strength'], ['trends', 'Trends', 'Stocks in a trend'], ['live', 'Live trading', 'All setups · Angel One'], ['ath', 'All-time highs', 'New-high breakouts'],
-    ['bot', 'Bottoms', 'Patterns & support'], ['tb', 'Top Bottom', 'Bank Nifty futures'], ['pf', 'Portfolio', 'Holdings · SIP · ETFs']].filter(([k]) => k !== 'tb' || isOwner());
+    ['tb', 'Top Bottom', 'Bank Nifty futures'], ['pf', 'Portfolio', 'Holdings · SIP · ETFs']].filter(([k]) => k !== 'tb' || isOwner());
   el.innerHTML = `<div class="bg-wrap"><div class="bg-explore">${items.map(([k, t, d]) => `<button data-v="${k}"><b>${t}</b><span>${d}</span></button>`).join('')}</div></div>`;
   el.querySelectorAll('[data-v]').forEach((b) => b.addEventListener('click', () => { show(b.dataset.v); bgNav('explore'); }));
 }
@@ -8104,10 +8104,10 @@ async function tdRender2c(el) {
     getJSON(MP + 'sectors.json', mk === 'NSE' ? 'sectors' : 'sectors_' + mk), getJSON(MAIN + 'data/scan/world.json', 'world'),
     state.fund || getJSON(MAIN + 'data/scan/funds.json', 'funds'), state.assets || getJSON(MAIN + 'data/scan/assets.json', 'assets'),
     mk === 'NSE' ? getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose') : null, mk === 'NSE' ? getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom') : null,
-    mk === 'NSE' ? getJSON(MP + 'vcp.json', 'vcp') : null, getJSON(MP + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'US' ? getJSON(MP + 'rsi2.json', 'rsi2') : null,
-    getJSON(MP + 'patterns.json', 'pat_' + mk)]);
+    null, getJSON(MP + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'US' ? getJSON(MP + 'rsi2.json', 'rsi2') : null,
+    null]);   // 28 Nov 2026 clean-up: VCP + chart patterns archived (not downloaded)
   if (fund) state.fund = fund; if (assets) state.assets = assets;
-  if (!state.turtle || Date.now() - (state.turtleAt || 0) > 600000) { state.turtleAt = Date.now(); state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); }
+  state.turtle = state.turtle || { rows: [] };   // 28 Nov 2026 clean-up: Turtle archived (no download)
   const TU = tuFor((state.turtle && state.turtle.rows) || [], mk); const tuNew = TU.filter((r) => r.status === 'in trade' && r.new), tuEx = TU.filter((r) => r.status === 'exited today'), tuIn = TU.filter((r) => r.status === 'in trade');
   const seg = `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
   if (!P) { el.innerHTML = `<div class="td-wrap">${seg}<p class="empty">Today's plan appears after the evening scan.</p></div>`; el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); })); return; }
@@ -8197,9 +8197,7 @@ async function tdRender2c(el) {
     { n: ((assets && assets.rows) || []).filter((r) => r.mclose && /Metals|Energy|Agri|Crypto|rupees/.test(r.group)).length, name: 'Commodities & coins: month close above ATH', sub: 'Gold, oil, Bitcoin… with their distance from the high', go: () => goAth('WORLD', 'assets', true) },
     { n: null, name: 'Other markets: month close above ATH', sub: 'US, UK, Australia, Japan, Taiwan, Europe, Korea, Canada', go: () => goAth('WORLD', 'all', true) }];
   const trdRows = [
-    ...(mk === 'NSE' ? [{ n: vcp ? (vcp.rows || []).length : null, name: 'VCP setups', sub: 'Tightening bases, pivot buy points', go: () => show('trends') }] : []),
     { n: ipo ? ((ipo.breakouts || []).filter((r) => r.status === 'open').length + (ipo.near || []).length) : null, name: 'IPO cups', sub: 'First base after listing', go: () => goAth(mk, 'ipo') },
-    { n: pat ? (pat.rows || []).filter((r) => r.kind === 'stock' && patPlan(r).out !== 'target').length : null, name: 'Chart patterns', sub: 'Double bottoms, inverse H&S… (tested: watch only)', go: () => show('bot') },
     ...(mk === 'NSE' ? [{ n: null, name: 'Top Bottom · Bank Nifty futures', sub: 'On pledged holdings · dry run until you switch', go: () => show('tb') }] : [])];
   /* 20 Nov 2026 (Amritpal: gold "13.1% away" showed in the Turtle list): flat markets only when close to their buy-stop (within 3%) */
   const tuShow = [...tuNew, ...tuEx, ...tuIn.filter((r) => !r.new), ...TU.filter((r) => r.status === 'flat' && r.dist_pct <= 3).sort((a, b) => a.dist_pct - b.dist_pct).slice(0, 3)];
@@ -8211,8 +8209,7 @@ async function tdRender2c(el) {
     const line = r.status === 'in trade' ? `Sell-stop <b>${p2(r.stop)}</b> · since ${day(r.entry_date)} at ${p2(r.entry)}` : r.status === 'exited today' ? `Stopped at ~${p2(r.trades[r.trades.length - 1].x)}` : `Buy-stop <b>${p2(r.buy_stop)}</b> · stop if filled ${p2(r.fixed_stop_if_filled)}`;
     return `<div class="t2-wcard" role="button" tabindex="0" data-tu="${i}"><span class="t2-ch"><span><b>${esc(r.name)}</b><small>${esc(r._where || r.contract)}</small></span>${head}</span><span class="t2-line">${line}</span><span class="t2-line" style="font-size:12.5px">${r._where ? `Trade the ETF: buy when the futures trigger · stop ${fmt((1 - (r.status === 'in trade' ? r.stop / r.entry : r.fixed_stop_if_filled / r.buy_stop)) * 100, 1)}% below your ETF entry` : sz.replace(/^MCX: /, 'MCX ')}</span></div>`; }).join('') : '<p class="t2-empty">No Turtle data yet.</p>');
   const tiles = `<div class="t2-tiles t2-tiles5"><div class="t2-tile sell" data-go="t2sell" role="button" tabindex="0"><b>${knowHeld ? sells.length : '–'}</b><span>to sell</span></div><div class="t2-tile both" data-go="${bothAll.length ? 't2both' : 't2mom'}" role="button" tabindex="0"><b>${bothAll.length}</b><span>in both</span></div>
-    <div class="t2-tile buy" data-go="t2mom" role="button" tabindex="0"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add" data-go="${knowHeld && adds.length ? 't2adds' : 't2mom'}" role="button" tabindex="0"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div>
-    <div class="t2-tile fut" data-go="t2tur" role="button" tabindex="0"><b>${tuNew.length + tuEx.length || tuIn.length}</b><span>Turtle Trading System</span></div></div>`;
+    <div class="t2-tile buy" data-go="t2mom" role="button" tabindex="0"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add" data-go="${knowHeld && adds.length ? 't2adds' : 't2mom'}" role="button" tabindex="0"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div></div>`;
   el.innerHTML = `<div class="td-wrap t2">
     <div id="tdal"></div>
     <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div><div id="tdalert"></div>
@@ -8242,8 +8239,7 @@ async function tdRender2c(el) {
       ${restT.length ? `<details class="t2-more"><summary>${restT.length} more 9/21 setups</summary><div class="t2-list">${restT.map((r) => card(r, idxOf(r))).join('')}</div></details>` : ''}
       ${wdCards.length ? `<div class="t2-lbl"><b>Watch · week and day cup closes</b><small>see only</small></div><div class="t2-hs">${wdCards.map(wdCard).join('')}</div>` : ''}
       <details class="t2-more t2-wd"><summary>Watch lists (${trdRows.length}) · weekly and daily charts</summary>${t2Watch(trdRows)}</details>${mk === 'US' ? '<div id="tdrsi2"></div>' : ''}
-      <div class="t2-lbl" id="t2tur"><b>Turtle Trading System · 20/10 daily long</b><small>paper · 24%/yr tested</small></div>
-      <div class="t2-hs">${tuCards()}</div></section>
+      </section>
     <div id="tdmx"></div>
     ${(P.missed || []).length ? `<details class="td-risk td-miss"><summary><span><b>Missed or failing (${P.missed.length})</b><small>Breakouts outside the tested buy zone: skip them</small></span></summary>
       ${P.missed.map((m) => `<div class="td-ml"><b>${esc(m.symbol)}</b><span>${esc(m.system === 'Monthly ATH' ? 'Momentum' : m.system)} · breakout ${day(m.date)} at ${Mz(m.entry, 0)} · now ${m.late_pct > 0 ? '+' : ''}${fmt(m.late_pct, 1)}%</span><small>${esc(m.why)}. It comes back to the list only with a new signal.</small></div>`).join('')}</details>` : ''}
@@ -8332,10 +8328,10 @@ async function tdRender2(el) {
     getJSON(MP + 'sectors.json', mk === 'NSE' ? 'sectors' : 'sectors_' + mk), getJSON(MAIN + 'data/scan/world.json', 'world'),
     state.fund || getJSON(MAIN + 'data/scan/funds.json', 'funds'), state.assets || getJSON(MAIN + 'data/scan/assets.json', 'assets'),
     mk === 'NSE' ? getJSON(MAIN + 'data/scan/index_mclose.json', 'index_mclose') : null, mk === 'NSE' ? getJSON(MAIN + 'data/scan/growth_mom.json', 'growthmom') : null,
-    mk === 'NSE' ? getJSON(MP + 'vcp.json', 'vcp') : null, getJSON(MP + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'US' ? getJSON(MP + 'rsi2.json', 'rsi2') : null,
-    getJSON(MP + 'patterns.json', 'pat_' + mk)]);
+    null, getJSON(MP + 'ipo.json', mk === 'NSE' ? 'ipo' : 'ipo_' + mk), mk === 'US' ? getJSON(MP + 'rsi2.json', 'rsi2') : null,
+    null]);   // 28 Nov 2026 clean-up: VCP + chart patterns archived (not downloaded)
   if (fund) state.fund = fund; if (assets) state.assets = assets;
-  if (!state.turtle || Date.now() - (state.turtleAt || 0) > 600000) { state.turtleAt = Date.now(); state.turtle = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); }
+  state.turtle = state.turtle || { rows: [] };   // 28 Nov 2026 clean-up: Turtle archived (no download)
   const TU = tuFor((state.turtle && state.turtle.rows) || [], mk); const tuNew = TU.filter((r) => r.status === 'in trade' && r.new), tuEx = TU.filter((r) => r.status === 'exited today'), tuIn = TU.filter((r) => r.status === 'in trade');
   const seg = `<div class="seg mk td-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([k, n]) => `<button data-tdmk="${k}" role="tab" aria-selected="${mk === k}">${n}</button>`).join('')}</div>`;
   if (!P) { el.innerHTML = `<div class="td-wrap">${seg}<p class="empty">Today's plan appears after the evening scan.</p></div>`; el.querySelectorAll('[data-tdmk]').forEach((b) => b.addEventListener('click', () => { state.tdMk = b.dataset.tdmk; try { localStorage.setItem('td.tdMk', state.tdMk); } catch (e) { /* */ } tdRender2(el); })); return; }
@@ -8436,9 +8432,7 @@ async function tdRender2(el) {
     { n: ((assets && assets.rows) || []).filter((r) => r.mclose && /Metals|Energy|Agri|Crypto|rupees/.test(r.group)).length, name: 'Commodities & coins: month close above ATH', sub: 'Gold, oil, Bitcoin… with their distance from the high', go: () => goAth('WORLD', 'assets', true) },
     { n: null, name: 'Other markets: month close above ATH', sub: 'US, UK, Australia, Japan, Taiwan, Europe, Korea, Canada', go: () => goAth('WORLD', 'all', true) }];
   const trdRows = [
-    ...(mk === 'NSE' ? [{ n: vcp ? (vcp.rows || []).length : null, name: 'VCP setups', sub: 'Tightening bases, pivot buy points', go: () => show('trends') }] : []),
     { n: ipo ? ((ipo.breakouts || []).filter((r) => r.status === 'open').length + (ipo.near || []).length) : null, name: 'IPO cups', sub: 'First base after listing', go: () => goAth(mk, 'ipo') },
-    { n: pat ? (pat.rows || []).filter((r) => r.kind === 'stock' && patPlan(r).out !== 'target').length : null, name: 'Chart patterns', sub: 'Double bottoms, inverse H&S… (tested: watch only)', go: () => show('bot') },
     ...(mk === 'NSE' ? [{ n: null, name: 'Top Bottom · Bank Nifty futures', sub: 'On pledged holdings · dry run until you switch', go: () => show('tb') }] : [])];
   /* 20 Nov 2026 (Amritpal: gold "13.1% away" showed in the Turtle list): flat markets only when close to their buy-stop (within 3%) */
   const tuShow = [...tuNew, ...tuEx, ...tuIn.filter((r) => !r.new), ...TU.filter((r) => r.status === 'flat' && r.dist_pct <= 3).sort((a, b) => a.dist_pct - b.dist_pct).slice(0, 3)];
@@ -8450,8 +8444,7 @@ async function tdRender2(el) {
     const line = r.status === 'in trade' ? `Sell-stop <b>${p2(r.stop)}</b> · since ${day(r.entry_date)} at ${p2(r.entry)}` : r.status === 'exited today' ? `Stopped at ~${p2(r.trades[r.trades.length - 1].x)}` : `Buy-stop <b>${p2(r.buy_stop)}</b> · stop if filled ${p2(r.fixed_stop_if_filled)}`;
     return `<div class="t2-wcard" role="button" tabindex="0" data-tu="${i}"><span class="t2-ch"><span><b>${esc(r.name)}</b><small>${esc(r._where || r.contract)}</small></span>${head}</span><span class="t2-line">${line}</span><span class="t2-line" style="font-size:12.5px">${r._where ? `Trade the ETF: buy when the futures trigger · stop ${fmt((1 - (r.status === 'in trade' ? r.stop / r.entry : r.fixed_stop_if_filled / r.buy_stop)) * 100, 1)}% below your ETF entry` : sz.replace(/^MCX: /, 'MCX ')}</span></div>`; }).join('') : '<p class="t2-empty">No Turtle data yet.</p>');
   const tiles = `<div class="t2-tiles t2-tiles5"><div class="t2-tile sell" data-go="t2sell" role="button" tabindex="0"><b>${knowHeld ? sells.length : '–'}</b><span>to sell</span></div><div class="t2-tile both" data-go="${bothAll.length ? 't2both' : 't2mom'}" role="button" tabindex="0"><b>${bothAll.length}</b><span>in both</span></div>
-    <div class="t2-tile buy" data-go="t2mom" role="button" tabindex="0"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add" data-go="${knowHeld && adds.length ? 't2adds' : 't2mom'}" role="button" tabindex="0"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div>
-    <div class="t2-tile fut" data-go="t2tur" role="button" tabindex="0"><b>${tuNew.length + tuEx.length || tuIn.length}</b><span>Turtle Trading System</span></div></div>`;
+    <div class="t2-tile buy" data-go="t2mom" role="button" tabindex="0"><b>${nBuy}</b><span>to buy</span></div><div class="t2-tile add" data-go="${knowHeld && adds.length ? 't2adds' : 't2mom'}" role="button" tabindex="0"><b>${knowHeld ? adds.length : '–'}</b><span>to add</span></div></div>`;
   el.innerHTML = `<div class="td-wrap t2">
     <div id="tdal"></div>
     <div class="t2-head"><div class="t2-top"><span class="t2-k">Today</span>${seg}</div>
@@ -8493,8 +8486,7 @@ async function tdRender2(el) {
       <details class="t2-more t2-wd"><summary>Watch lists (${invRows.length}) · monthly charts</summary>${t2Watch(invRows)}</details>${mk === 'US' ? '<details class="t2-more t2-wd"><summary>Trading 212 pies</summary><div id="tdpies"></div></details>' : ''}</section>
     </details>
     <details class="t2-fold" id="t2f-tur"><summary><span><b>Turtle futures (paper)</b><small>Nifty, Bank Nifty, MCX · 20/10 daily</small></span></summary>
-    <section class="t2-sec trd">      <div class="t2-lbl" id="t2tur"><b>Turtle Trading System · 20/10 daily long</b><small>paper · 24%/yr tested</small></div>
-      <div class="t2-hs">${tuCards()}</div></section>
+    <section class="t2-sec trd">      </section>
     </details>
     <details class="t2-fold" id="t2f-mx"><summary><span><b>All stocks in 2+ systems</b><small>one table: score, results, rotation, flow, system ticks</small></span></summary>
     <div id="tdmx"></div>
@@ -9342,8 +9334,7 @@ async function t3Why(c, X) {
 async function loadStrat() {
   $('#title').textContent = 'Strategies'; const el = $('#view-strat'); const mk = tdMk(); const MP = MAIN + MKT[mk].path;
   el.innerHTML = '<p class="muted pad">Loading strategies…</p>';
-  const [P, PT, X] = await Promise.all([getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null), getJSON(MP + 'patterns.json', 'pat_' + mk).catch(() => null), t3Ctx(mk)]);
-  const V = await getJSON(MP + 'vcp.json', mk === 'NSE' ? 'vcp' : 'vcp_' + mk).catch(() => null);
+  const [P, X] = await Promise.all([getJSON(MP + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null), t3Ctx(mk)]);   // 28 Nov 2026 clean-up: only the systems in the New mix (archived ones: branch archive/before-cleanup-2026-11-28)
   const FLG = await getJSON(MP + 'flags.json', 'flags_' + mk).catch(() => null);   // 22 Nov 2026: flags / pennants / rectangles
   const PRJ = mk === 'NSE' ? await getJSON(MAIN + 'data/scan/pulse_rot.json', 'pulse_rot').catch(() => null) : null;   // 22 Nov 2026: Pulse rotation trial
   const Pq = { L: 3, I: 2, W: 1, G: 0, N: -1 };
@@ -9353,14 +9344,10 @@ async function loadStrat() {
   const SYS = [
     { k: 'mom', name: 'ATH breakout', test: '17%/yr', ok: 1, rows: pl.filter((r) => bkOf(r) === 'mom').map((r) => row(r.symbol, r.trigger ? `Waiting · above ${fmt(r.trigger, 2)}` : 'Buy', { r, sc: r.score || 0 })) },
     { k: 'tf', name: 'Cup 9/21', test: 'in the mix', ok: 1, rows: pl.filter((r) => bkOf(r) === 'tf').map((r) => row(r.symbol, 'Buy', { r, sc: r.score || 0 })) },
-    { k: 't9', name: '9/21 any stock', test: '21%/yr · off', ok: 1, rows: pl.filter((r) => bkOf(r) === 't9').map((r) => row(r.symbol, 'Switched off', { r, sc: r.score || 0 })) },
-    { k: 'pt', name: 'Bottoming out', test: 'no edge', ok: 0, note: 'Watch only: W and triple bottoms did no better than a random stock in our tests.', rows: ((PT && PT.rows) || []).map((x) => row(x.symbol, `${x.kind && x.kind !== 'stock' ? (x.kind === 'index' ? 'Index · ' : 'Asset · ') : ''}${TYP[x.typ] || x.typ} · ${x.status === 'breakout' ? 'broke out' : fmt(x.to_neck_pct, 1) + '% to go'}`, { sc: x.status === 'breakout' ? 1 : 0, pt: x })) },
-    { k: 'rt', name: 'Retest', test: 'weak', ok: 0, note: 'Watch only: a small edge per trade, but it lost money as a 10-stock portfolio.', rows: pl.filter((r) => bkOf(r) === 'rt').map((r) => row(r.symbol, 'At old breakout', { r, sc: r.score || 0 })) },
     { k: 'fl', name: 'Flags & pennants', test: '+3.2%/trade', ok: 1, note: 'Trades at your Flags % in Systems & allocation (starts at 0%; New mix 20%), breakouts on the last close only. Tight flags (range ≤ 8%) where volume dried up, breaking out on 1.5× volume, with room of at least 0.8× the pole before the next old high on the left. Buy near the breakout close, stop under the flag low, sell on the first close below the 21-day average. Tested 2016-26: +2.8% a trade, positive in the last 2 years (buying next day above the breakout high did worse).',
       ord: 1, rows: ((FLG && FLG.rows) || []).map((x) => row(x.symbol, `${x.shape} · ${x.lane === 'early' ? 'new uptrend' : 'uptrend'} · ${x.status === 'breakout' ? 'broke out' + (x.days_since ? ' ' + x.days_since + 'd ago' : ' today') : 'buy above ' + fmt(x.trigger, 2) + ' on 1.5× volume'} · exit below 21-day avg`, { sc: x.status === 'breakout' ? 2 : 1, fl: x, pri: (x.status === 'breakout' ? 4 : 0) + (x.shape === 'Rectangle' ? 2 : 0) + (x.lane === 'established' ? 1 : 0) })) },
     { k: 'pr', name: 'Pulse rotation', test: 'trial · 37.4%/yr', ok: 1, note: PRJ ? `Weekly: top-10% Pulse industries that are Leading/Improving → 10 strongest trending stocks, equal weight, rebalanced each Friday (buy/sell Monday open); RED light at the Friday close = no basket that week${PRJ.red_skip ? ' - RED this Friday: cash this week' : ''}. Industries now: ${(PRJ.industries || []).map((x) => x.name).join(', ') || 'none'}. Forward test since ${PRJ.started}: ${prFwd(PRJ)}.` : 'Weekly picks appear after the first Friday scan.',
-      rows: ((PRJ && PRJ.rows) || []).map((x) => row(x.symbol, `${x.since != null ? `${x.since >= 0 ? '+' : ''}${fmt(x.since, 1)}% since ${day(x.entry_d)} (in at ${fmt(x.entry, 2)}) · ` : ''}${x.industry || ''} · 3-month ${x.r3m >= 0 ? '+' : ''}${fmt(x.r3m, 0)}%${(PRJ.buys || []).includes(x.symbol) ? ' · NEW this week' : ''}`, { sc: 1 })) },
-    { k: 'vcp', name: 'Tight bases', test: 'watch', ok: 0, note: 'Watch only: tested, did not beat ATH or 9/21.', rows: (((V && (V.rows || V)) || []).slice ? ((V.rows || V) || []).slice(0, 30) : []).map((x) => row(x.symbol, 'Squeezing', { sc: 0 })) }];
+      rows: ((PRJ && PRJ.rows) || []).map((x) => row(x.symbol, `${x.since != null ? `${x.since >= 0 ? '+' : ''}${fmt(x.since, 1)}% since ${day(x.entry_d)} (in at ${fmt(x.entry, 2)}) · ` : ''}${x.industry || ''} · 3-month ${x.r3m >= 0 ? '+' : ''}${fmt(x.r3m, 0)}%${(PRJ.buys || []).includes(x.symbol) ? ' · NEW this week' : ''}`, { sc: 1 })) }];
   SYS.forEach((s) => s.rows.sort((a, b) => pulseSort(a, b) || b.s - a.s || Pq[b.ch[2]] - Pq[a.ch[2]] || (b.pri || 0) - (a.pri || 0) || (b.sc || 0) - (a.sc || 0)));   // quadrant strength first (Amritpal 22 Nov), then breakout / rectangle / established
   const k = state.stratK && SYS.some((s) => s.k === state.stratK) ? state.stratK : 'mom'; const S = SYS.find((s) => s.k === k);
   const seg = `<div class="t3-mk" role="tablist" aria-label="Market">${[['NSE', 'India'], ['US', 'US'], ['ASX', 'Australia'], ['UK', 'UK']].map(([m, n]) => `<button data-smk="${m}" role="tab" aria-selected="${mk === m}">${n}</button>`).join('')}</div>`;
@@ -9592,7 +9579,7 @@ async function perfEvery(mk) {
   const peak = days.reduce((m, d) => Math.max(m, rows.filter((r) => r.d0 <= d && (!r.end || r.end > d)).reduce((a, r) => a + r.cost, 0)), 0);
   const by = {}; rows.forEach((r) => { const k = r.b || 'other'; by[k] = by[k] || { n: 0, pnl: 0, cost: 0, w: 0, on: false }; by[k].n++; by[k].pnl += r.pnl; by[k].cost += r.cost; by[k].w += r.pnl > 0; by[k].on = by[k].on || r.on !== false; });
   /* Turtle (all markets, daily 20/10 long): forward test from the Turtle page's own trade list since it went into the app; 1R = 1% of capital */
-  if (mk === 'NSE') { const TU = await getJSON(MAIN + 'data/scan/turtle.json', 'turtle').catch(() => null); const T0 = '2026-11-16';
+  if (mk === 'NSE') { const TU = null; const T0 = '2026-11-16';   // 28 Nov 2026 clean-up: Turtle archived (no 316 KB download)
     const tr = []; ((TU && TU.rows) || []).forEach((x) => { (x.trades || []).filter((t) => t.entry >= T0).forEach((t) => tr.push({ sym: x.name, R: t.R, open: false }));
       if (x.status === 'in trade' && x.entry_date >= T0) tr.push({ sym: x.name, R: x.open_R || 0, open: true, trailed: (x.trail_stop || 0) > (x.fixed_stop || 0) }); });
     if (tr.length) by.tu = { n: tr.length, pnl: tr.reduce((a, t) => a + t.R * 0.01 * C, 0), cost: 0, w: tr.filter((t) => t.R > 0).length, on: false, R: tr }; }
