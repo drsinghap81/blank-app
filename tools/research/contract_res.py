@@ -102,13 +102,13 @@ def portfolio(T, C, days, rule, cap0=1_000_000):
         for p in [p for p in pos if p["exit"] <= d]:
             cash += p["q"] * p["e"] * (1 + p["ret"]); pos.remove(p)
         if d in byday:
-            for r in byday[d].itertuples():
-                if len(pos) >= 10 or any(p["sym"] == r.sym for p in pos):
+            for r in byday[d].to_dict("records"):
+                if len(pos) >= 10 or any(p["sym"] == r["sym"] for p in pos):
                     continue
-                E = cash + sum(p["q"] * p["last"] for p in pos); amt = min(0.01 * E / r.risk, 0.10 * E, cash)
+                E = cash + sum(p["q"] * p["last"] for p in pos); amt = min(0.01 * E / r["risk"], 0.10 * E, cash)
                 if amt < 0.01 * E:
                     continue
-                cash -= amt; pos.append(dict(sym=r.sym, q=amt / r.e, e=r.e, ret=getattr(r, rule + "ret"), exit=getattr(r, rule + "x"), last=r.e))
+                cash -= amt; pos.append(dict(sym=r["sym"], q=amt / r["e"], e=r["e"], ret=r[rule + "ret"], exit=r[rule + "x"], last=r["e"]))
         for p in pos:
             px = C.get(p["sym"], {}).get(d)
             if px is not None and np.isfinite(px):
