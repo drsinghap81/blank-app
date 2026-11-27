@@ -21,7 +21,8 @@ Rules (exactly the basket checked live on 18 Nov):
 Data: Angel 5-minute candles. Angel only serves LIVE contracts, so the history reaches back to the day after the previous monthly
 expiry (about 3-4 weeks) - a short sample. Downloads only outside market hours (~1-2 requests a second); resumable.
 Output: DATA/research/optbt/results.json"""
-VERSION = 16                    # 27 Nov 2026: the new live exit, half at 1R + 5 EMA
+VERSION = 17                    # 27 Nov 2026: a candle touching both the trigger and the signal low = filled then checked for the stop (was: no fill)
+# v16                    # 27 Nov 2026: the new live exit, half at 1R + 5 EMA
 # v15                    # 26 Nov 2026 (Amritpal: "can we add 1:2 or 1:3 target"): 2 ATR trail + 2R / 3R target, and a 1.5 ATR trail
 # v14 (26 Nov 2026: v12/v13 ran after midnight IST when Angel returned no bars (and empties were cached): never cache or accept empty index data; wait for the next close and retry.
 # v13: 26 Nov 2026: index 5-minute bars fetched in 20-day pieces (v12 got none for the longer window) + a run-debug block in the results.
@@ -549,14 +550,16 @@ TRIG_BARS = 3          # the buy-stop above the signal candle's high stays for t
 def entry_sim(o, h, l, c, i, last, limit=None, tgt_r=3.0, trail=None):
     """18 Nov 2026 (Amritpal: "entry when the high of the signal candle is breached, or low"): after the signal candle i, a
     buy-stop just above its high; filled at max(high, that bar's open) on the first of the next TRIG_BARS candles to trade above it,
-    cancelled if a candle breaks the signal low first (or touches both: no fill). Stop = the signal candle's low (at least 3% under
+    cancelled if a candle breaks the signal low first (v17: a candle touching both = filled, then the stop applies). Stop = the signal candle's low (at least 3% under
     the entry), target = entry + 3 x risk; stop first if both in one bar; else out at bar `last`'s close.
     limit (18 Nov 2026, "limit orders, spreads"): a buy STOP-LIMIT - the order may pay at most high x (1 + limit); a candle that
     opens above that fills only if it trades back down to the limit (filled at the limit), otherwise no fill on that candle.
     Returns (entry, risk, how, exit price, exit index, fill index) or None (no fill)."""
     hi, lo = h[i], l[i]; e = f = None
     for k in range(i + 1, min(last, i + TRIG_BARS) + 1):
-        if l[k] < lo:
+        # v17 (27 Nov 2026): a candle touching BOTH the trigger and the signal low used to count as "no fill" - live, the buy-stop can
+        # fill first and then be stopped, so those losses were dropped. Now: filled, then the stop is checked on that candle.
+        if l[k] < lo and not h[k] > hi:
             return None
         if h[k] > hi:
             e = max(hi, o[k])
