@@ -16,7 +16,7 @@ import threading
 import time
 from datetime import datetime, timedelta
 
-VERSION = 1
+VERSION = 2
 STOCKS = ["RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS", "SBIN", "BHARTIARTL", "ITC", "LT", "KOTAKBANK", "AXISBANK", "HINDUNILVR",
           "BAJFINANCE", "MARUTI", "SUNPHARMA", "TATASTEEL", "NTPC", "POWERGRID", "M&M", "TITAN"]
 SYN = ["NIFTY", "BANKNIFTY", "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "SBIN"]
@@ -65,19 +65,32 @@ class ArbBT:
     def _get(self, exchange, token, d0, d1):
         while not _quiet():
             self.st["progress"] = "paused for market hours"; self._save(); time.sleep(300)
-        api = self.b._session()
-        r = self.b._call(api.getCandleData, dict(exchange=exchange, symboltoken=str(token), interval="ONE_MINUTE",
-                                                 fromdate=d0.strftime("%Y-%m-%d 09:15"), todate=d1.strftime("%Y-%m-%d 15:30")), tries=4) or {}
-        time.sleep(0.45)
-        return {str(x[0])[:16]: float(x[4]) for x in (self.b._data(r) or [])}
+        # v2 (27 Nov 2026): the first run died on "Access denied because of exceeding access rate" (it overlapped the option
+        # backtest) - slower requests, and a rate-limit answer waits and retries instead of ending the run
+        for wait in (20, 60, 120, 300, 0):
+            try:
+                api = self.b._session()
+                r = self.b._call(api.getCandleData, dict(exchange=exchange, symboltoken=str(token), interval="ONE_MINUTE",
+                                                         fromdate=d0.strftime("%Y-%m-%d 09:15"), todate=d1.strftime("%Y-%m-%d 15:30")), tries=4) or {}
+                time.sleep(1.2)
+                return {str(x[0])[:16]: float(x[4]) for x in (self.b._data(r) or [])}
+            except Exception as ex:  # noqa: BLE001
+                if "rate" not in str(ex).lower() or not wait:
+                    raise
+                self.st["progress"] = f"Angel rate limit - waiting {wait} s"; self._save(); time.sleep(wait)
+        return {}
 
     def _run(self):
         while not _quiet():
             self.st["progress"] = "waiting for the market to close"; self._save(); time.sleep(300)
-        try:
-            self._run_once()
-        except Exception as ex:  # noqa: BLE001
-            self.st.update(state="error", progress=str(ex)[:200]); self._save(); self.log("arb_bt_error", error=str(ex)[:200])
+        for attempt in range(3):
+            try:
+                self._run_once(); return
+            except Exception as ex:  # noqa: BLE001
+                self.st.update(state="error", progress=f"try {attempt + 1}: {str(ex)[:180]}"); self._save(); self.log("arb_bt_error", error=str(ex)[:200])
+                time.sleep(900)
+                while not _quiet():
+                    time.sleep(300)
 
     def _run_once(self):
         today = _ist().date(); d1 = today if _ist().hour >= 16 else today - timedelta(days=1); d0 = d1 - timedelta(days=14)
