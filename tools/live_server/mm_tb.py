@@ -211,7 +211,9 @@ class MMTB:
             try:
                 snap = self.mm.snapshot([x for x in syms if x not in P], mk=mk) or {}
             except Exception as ex:  # noqa: BLE001
-                self.note(mk, f"price check failed ({str(ex)[:80]}) - retrying next minute"); return
+                # 27 Nov 2026: moomoo gives no ASX quotes to this account ("Unsupported quote market"). Place the day's stop-limits
+                # anyway: one only fills between the level and level + 1% - the same window the pre-open order allows.
+                snap = None; self.note(mk, f"no live price from moomoo ({str(ex)[:60]}) - placing the stop-limits without the price check")
         self.st.setdefault("ent", {})[mk] = n.date().isoformat()
         cap = float(cfg.get("capital") or 0); syms = cfg.get("symbols") or []
         if cap <= 0 or not syms:
@@ -227,7 +229,7 @@ class MMTB:
             bar = S[sym]; lv = bar.get("buy_lvl")
             if not lv:
                 continue
-            if late:
+            if late and snap is not None:
                 q0 = snap.get(sym) or {}; hi = q0.get("high") or q0.get("last")
                 if not hi:
                     self.note(mk, f"{sym}: no price - not placed"); continue
