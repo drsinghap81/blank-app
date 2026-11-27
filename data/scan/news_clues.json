@@ -1,7 +1,35 @@
 {
-"generated": "2026-11-26 22:39 UTC",
+"generated": "2026-11-27 10:53 UTC",
 "method": "News clues: government / regulator actions that can move a whole industry (22 Nov 2026, Amritpal, after the PSU-bank look-back\nfound the 21 Oct \"FDI cap in PSU banks to 49%\" report a week before the rally: \"add all authentic news clues, especially similar\ntypes as for PSU\").\n\nSources (checked from GitHub Actions 22 Nov 2026):\n  official  RBI press releases + notifications (rbi.org.in RSS); government outlets in Google News (PIB, DD News, News On AIR)\n  reports   Google News RSS, India edition, ONLY from named financial / national outlets (OUTLETS) - shown as \"Report\"\nEvent types searched (TYPES): FDI / foreign-ownership caps, Cabinet approvals and outlays, PLI, anti-dumping / safeguard / customs\nduty, export bans / curbs, minimum import price, bank mergers, privatisation / stake sales, GST rate changes, MSP / FRP,\nDefence Acquisition Council approvals, ethanol blending, RBI rule changes, plus \"government plans / considering\" reports.\nEach item is matched to NSE basic industries by keywords (IND_KEYS). Direction is only marked where the words say it\n(denies / no plan / rollback / ban = negative). Nothing here is a tested signal - it tells you a story exists.\nWrites data/scan/news_clues.json (last 60 days, de-duplicated).",
 "items": [
+{
+"key": "waareerenewablesharepricerallies14aftersecuring120mwpepcorder",
+"date": "2026-11-27",
+"title": "Waaree Renewable share price rallies 14% after securing 120-MWp EPC order",
+"url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNM3NBS3ZvMkNGdDhFVUlQdEFrVjhQRjdILUptUVhMVnpsbFh1TXVqY2k4cHNlblkzdmhNanVGN3ozY1JQVGZvYUdxYjd4a1FoVHBvRDV4M0FOVmUtRU04TnRLSC04T2dZZWRieHdfSkozbkttVmJWeHNpM1ppRjFNVExTdTRpUXFqZHluM2IyN2VIVmdlM2k4ajdNSC1uNUNRbVVUekpNRkthMnJZOTJJMWhoc0RaU0FpSlNNRmtzb1JVRk1wRTFQUDJZWmRBZ0lremNJWmFB0gHbAUFVX3lxTFBVSkc5clFqSTRQanZRS0g2eU1EdlVwT0VnOGRwR2dBTmtqNHp5dzlnLTl5c2g3RU04dzdOOFZRaGE5Vk5mNWd6ZU1oZnAzZmVQSXdacldjMk1fRkxLR1dLNE1vTTNfSWg1R2l3T0FWdHZvdjRPdHRINjJnRGxRSE5iZ2JNOGpjMXVtbWxJTmVzUVdvZVZGT0VLSUd3b1NFUzhNcFZIUmVreU1GWXRGTDY0Q25OYU1JM2VCQ3BranptR0NIaVNVaWFLWnQ4NDZWc04tc3VjZS1MOEVuRQ?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Defence",
+"industries": [
+"Power Generation",
+"Other Electrical Equipment"
+],
+"neg": false
+},
+{
+"key": "jefferiesseestelecomtariffhikeinaprilnextyearairteltoppick",
+"date": "2026-11-27",
+"title": "Jefferies sees telecom tariff hike in April next year; Airtel top pick",
+"url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxPcGdJYnpQcjhfeS1RZHpXUVZ4eUtCUFAweXBHZU1PcHlfX1pKU0xTZHZuR2g0Ymk4V1VEYUVidmpHSWxJZzRSX3BPM2xOVnNBejVCVVZBOTBUMjR0bHp0bmVITmlmY0ZsRWJOYnkwcjkwU3FyVkpLazk4a2xJYUlRTEZEZ2dsQ01EdUIySWNId1VpLWhJSFdJc3VxbVJWUGxaMjZpbE93Rlo1emlvVC1uR3N1RjZuWEd1MXBtdkV1RjI2cjNmREYteUZKX3dGZFFzSXfSAdcBQVVfeXFMT2JqZmFZd094T1ZoX3V5cVJPbnIzZ1YwOEFXaTZnTEwtYXpSbTh3TVNtZzlvdHl6QlhVWmFsUktjcFVNRl9VbWlLLS0zWFBqLUZtX3JLNFI1NXdUWHZmTlVRQTdHa1FfdDI5QzBDam83VVlwOHRvTnhoRW1XajBOUC11b1hodi1MSVV2c1FrNDc1NXpmbTFZYUJ2SXhhZ3ZYN0VmdU5VcExsU1BBcjU0MXZJRkdqWV9YdTJzOVFIRG5IOVpiSU9GbG1CRDhlMElES0x2U2RSTEE?oc=5",
+"source": "Business Standard",
+"official": false,
+"type": "Defence",
+"industries": [
+"Telecom - Cellular & Fixed line services",
+"Telecom - Equipment & Accessories"
+],
+"neg": false
+},
 {
 "key": "cabinetapprovesindiasingaporemoutoboostaviationmroskillsandinfrastructure",
 "date": "2026-11-26",
@@ -115,6 +143,21 @@
 "Aerospace & Defense",
 "Ship Building & Allied Services",
 "Explosives"
+],
+"neg": false
+},
+{
+"key": "over67000lpgcylindersseizedamidwestasiacrisisgovtassuresfuelsupplyboostssupportforkeysecto",
+"date": "2026-11-26",
+"title": "Over 67,000 LPG cylinders seized amid West Asia crisis; govt assures fuel supply, boosts support for key sectors",
+"url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxQMlg1OE1wSEZYbU1KV2xfd3RwXzFFeUwxTlFjY1cyZ1lzeG1jWXpGZV92SUxwZFhnVTNrbmdEMnU1WklBYjdlMlBLVTJoZjlpY1ZWV1Nva2tiMHFfR1ZObkVRVTFrYjNJaTEyN3JxbTQ2TENYR2R2T1ZWOWh6eUhDdXRTTjBCUmJmanlqMFFiX0k5Y3V2SGJsX1NOcXdXLTFJY3hpbHFOUmJndnc0eXlMWjlmR18tM0NXQmhDRzNOTEk4ZTRybGxOdWxuLWltNjhT?oc=5",
+"source": "DD News",
+"official": true,
+"type": "Plans / reports",
+"industries": [
+"Oil Exploration & Production",
+"Refineries & Marketing",
+"LPG/CNG/PNG/LNG Supplier"
 ],
 "neg": false
 },
@@ -2759,6 +2802,28 @@
 }
 ],
 "by_industry": {
+"Power Generation": [
+"waareerenewablesharepricerallies14aftersecuring120mwpepcorder",
+"cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
+"indiassolarmanufacturinghits116gwasplischemeboostsdomesticoutput",
+"chinaconsidersnewexportcurbsonsolaraibiotech"
+],
+"Other Electrical Equipment": [
+"waareerenewablesharepricerallies14aftersecuring120mwpepcorder",
+"cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
+"indiassolarmanufacturinghits116gwasplischemeboostsdomesticoutput",
+"chinaconsidersnewexportcurbsonsolaraibiotech"
+],
+"Telecom - Cellular & Fixed line services": [
+"jefferiesseestelecomtariffhikeinaprilnextyearairteltoppick",
+"plischemetohelptelecommanufacturersremaincompetitivescindia",
+"nitiaayogpraisesmobilephoneproductionlinkedincentivessayslaptopschemelosttimeindianews"
+],
+"Telecom - Equipment & Accessories": [
+"jefferiesseestelecomtariffhikeinaprilnextyearairteltoppick",
+"plischemetohelptelecommanufacturersremaincompetitivescindia",
+"nitiaayogpraisesmobilephoneproductionlinkedincentivessayslaptopschemelosttimeindianews"
+],
 "Airport & Airport services": [
 "cabinetapprovesindiasingaporemoutoboostaviationmroskillsandinfrastructure",
 "2014crorefornewassamgreenfieldairport4000croreboosttotamilnaduportunioncabinetsbigdecision",
@@ -2882,14 +2947,6 @@
 "dronesgunshelicoptersdacclearsrs212lakhcroredefencebuys",
 "bigupdatefordefencestocksdacclearsrs212lakhcroreproposalshereswhyhalbelbdlotherscouldbenef"
 ],
-"Telecom - Cellular & Fixed line services": [
-"plischemetohelptelecommanufacturersremaincompetitivescindia",
-"nitiaayogpraisesmobilephoneproductionlinkedincentivessayslaptopschemelosttimeindianews"
-],
-"Telecom - Equipment & Accessories": [
-"plischemetohelptelecommanufacturersremaincompetitivescindia",
-"nitiaayogpraisesmobilephoneproductionlinkedincentivessayslaptopschemelosttimeindianews"
-],
 "Other Agricultural Products": [
 "explainerwhyindianeedstogoslowonriceexports",
 "indiasnonbasmatiriceexportsurges67inapriloctober",
@@ -2973,6 +3030,21 @@
 "sugarcanefarmersprotestoverdelayinincreasingfrpobjecttoabsenceoffarmersrepresentativeinram",
 "sugarcanefarmerswelcomepanelbutwontendprotest",
 "governmentallows5841tonnesofsugarexporttoeuunderquotabaseddutyconcessionscheme"
+],
+"Oil Exploration & Production": [
+"over67000lpgcylindersseizedamidwestasiacrisisgovtassuresfuelsupplyboostssupportforkeysecto",
+"over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
+],
+"Refineries & Marketing": [
+"over67000lpgcylindersseizedamidwestasiacrisisgovtassuresfuelsupplyboostssupportforkeysecto",
+"over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
+],
+"LPG/CNG/PNG/LNG Supplier": [
+"over67000lpgcylindersseizedamidwestasiacrisisgovtassuresfuelsupplyboostssupportforkeysecto",
+"over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
+"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
 ],
 "Life Insurance": [
 "unioncabinetapprovesprudentialsfdiproposalinbhartilifeinsurance",
@@ -3133,18 +3205,6 @@
 "afteridbibanksalecentrelooksatcentralbankucobank2otherpsubanksforstakecutschecktermshere",
 "governmentplanstoparestakesin4psubanksto75"
 ],
-"Oil Exploration & Production": [
-"over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
-"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
-],
-"Refineries & Marketing": [
-"over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
-"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
-],
-"LPG/CNG/PNG/LNG Supplier": [
-"over508lakhlpgcylindersdeliveredin24hoursasgovernmentassuresfuelstabilityamidwestasiacrisi",
-"notsupportedbytestspetroleumministryrejectsover20ethanolblendinginkarnataka"
-],
 "Non Banking Financial Company (NBFC)": [
 "governorreservebankofindiameetsmanagingdirectorschiefexecutiveofficersofselectnbfcshfcsand",
 "reservebankofindianonbankingfinancialcompaniessecuritisationtransactionsamendmentdirection"
@@ -3164,16 +3224,6 @@
 "indiasgoldimportroutechangingcourseforabenefitalljewellerswant",
 "indiasgoldimportsdrop27aftercustomsdutyhiketo15",
 "goldsilverimportsbybanksnominatedagenciestoattract3igst"
-],
-"Power Generation": [
-"cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
-"indiassolarmanufacturinghits116gwasplischemeboostsdomesticoutput",
-"chinaconsidersnewexportcurbsonsolaraibiotech"
-],
-"Other Electrical Equipment": [
-"cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
-"indiassolarmanufacturinghits116gwasplischemeboostsdomesticoutput",
-"chinaconsidersnewexportcurbsonsolaraibiotech"
 ],
 "Heavy Electrical Equipment": [
 "cabinetapproves186lakhcrorepmdharaschemeforgreenenergytransmission",
