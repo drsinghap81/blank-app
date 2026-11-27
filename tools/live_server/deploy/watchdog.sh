@@ -12,8 +12,9 @@ if [ -f "$VAR/cmd_update" ]; then rm -f "$VAR/cmd_update"; log "update requested
 # 23 Nov 2026: restart the Top Bottom bots (app button) - only the ones running or due today; a fresh start re-checks Angel's positions
 if [ -f "$VAR/cmd_tbrestart" ]; then rm -f "$VAR/cmd_tbrestart"; log "Top Bottom bot restart requested from the app"
   [ -f /etc/systemd/system/trenddesk-tb.service ] && systemctl restart trenddesk-tb && log "trenddesk-tb restarted"
-  systemctl is-active -q trenddesk-tb-nifty && systemctl restart trenddesk-tb-nifty && log "trenddesk-tb-nifty restarted"
-  for u in $(systemctl list-units 'trenddesk-tbs@*.service' 'trenddesk-tbm@*.service' --state=active --no-legend --plain | awk '{print $1}'); do systemctl restart "$u" && log "$u restarted"; done; fi
+  systemctl is-active -q trenddesk-tb-nifty && sleep 20 && systemctl restart trenddesk-tb-nifty && log "trenddesk-tb-nifty restarted"
+  # 27 Nov 2026: one at a time, 20 s apart - restarting ~10 bots at once ran the 512 MB server out of memory and took the app down
+  for u in $(systemctl list-units 'trenddesk-tbs@*.service' 'trenddesk-tbm@*.service' --state=active --no-legend --plain | awk '{print $1}'); do sleep 20; systemctl restart "$u" && log "$u restarted"; done; fi
 # 24 Nov 2026: the app's "Install stock-futures bots" button (Top Bottom BEL / L&T / TMPV / TCS, buy only, Dry run)
 for alt in $APP/repo/tools/live_server/var; do [ -f "$alt/cmd_tbstocks" ] && mv -f "$alt/cmd_tbstocks" "$VAR/cmd_tbstocks"; done
 if [ -f "$VAR/cmd_tbstocks" ]; then rm -f "$VAR/cmd_tbstocks"; log "Top Bottom stock-futures bots: install requested from the app"
