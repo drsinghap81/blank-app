@@ -80,9 +80,16 @@ class ArbBT:
                 self.st["progress"] = f"Angel rate limit - waiting {wait} s"; self._save(); time.sleep(wait)
         return {}
 
+    def _optbt_busy(self):
+        try:
+            return json.load(open(os.path.join(os.path.dirname(self.dir), "optbt", "state.json"))).get("state") == "running"
+        except Exception:  # noqa: BLE001
+            return False
+
     def _run(self):
-        while not _quiet():
-            self.st["progress"] = "waiting for the market to close"; self._save(); time.sleep(300)
+        while not _quiet() or self._optbt_busy():        # v2: never alongside the option backtest (shared Angel rate limit)
+            self.st["progress"] = "waiting for the market to close" if not _quiet() else "waiting for the option backtest to finish"
+            self._save(); time.sleep(300)
         for attempt in range(3):
             try:
                 self._run_once(); return
