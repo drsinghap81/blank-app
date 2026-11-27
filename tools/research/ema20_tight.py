@@ -64,10 +64,10 @@ def events(x):
         if stop >= e or not 0.01 <= (e - stop) / e <= 0.12:
             continue
         R = e - stop
-        row = dict(d=x.index[bk], clean=clean, gap=bk - t, rng=rng * 100, near=near * 100, held=held, risk=R / e * 100)
+        row = dict(d=x.index[bk], td=x.index[t], fd=x.index[j], sh=sh, e=e, stop=stop, clean=clean, gap=bk - t, rng=rng * 100, near=near * 100, held=held, risk=R / e * 100)
         for rule in ("2R", "3R", "921", "t10"):
-            px, _ = walk(o, h, l, c, e9, e21, j, e, stop, rule)
-            row[rule + "R"] = (px / e - 1 - COST) / (R / e)
+            px, kx = walk(o, h, l, c, e9, e21, j, e, stop, rule)
+            row[rule + "R"] = (px / e - 1 - COST) / (R / e); row[rule + "x"] = x.index[kx]
         out.append(row)
     return out
 
@@ -98,5 +98,17 @@ def main():
             print(f"R| {nm:34s} {lab:15s} n {len(z):5d} risk {z.risk.median():.1f}% | " + " | ".join(parts), flush=True)
 
 
+def show():
+    """SHOW env: print the clean + tight <=5% trades of the last year with their daily bars (for charts)."""
+    import json
+    P = FV.load(); D = pd.DataFrame([dict(e, s=s_) for s_, x in P.items() for e in events(x)])
+    end = D.d.max(); Z = D[D.clean & (D.gap <= 10) & (D.rng <= 5) & D.held & (D.d >= end - pd.DateOffset(years=1))]
+    for r in Z.to_dict("records"):
+        x = P[r["s"]]; i0 = max(0, x.index.get_loc(r["td"]) - 70); i1 = min(len(x), x.index.get_loc(r["fd"]) + 25); y = x.iloc[i0:i1]
+        print("R|T " + json.dumps(dict(s=r["s"], touch=str(r["td"].date()), bo=str(r["d"].date()), fill=str(r["fd"].date()),
+              sh=round(r["sh"], 2), e=round(r["e"], 2), stop=round(r["stop"], 2), rng=round(r["rng"], 1),
+              res={k: [round(r[k + "R"], 2), str(r[k + "x"].date())] for k in ("2R", "3R", "921")},
+              bars=[[str(d.date()), *[round(float(v), 2) for v in row]] for d, row in zip(y.index, y[["OPEN", "HIGH", "LOW", "CLOSE", "VOL"]].to_numpy())])), flush=True)
+
 if __name__ == "__main__":
-    main()
+    show() if os.environ.get("SHOW") else main()
