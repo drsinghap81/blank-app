@@ -19,9 +19,9 @@
 "sh": 109,
 "avg": 1871.0,
 "cost": 204500.21463562502,
-"last": 1919.0,
+"last": 1926.300048828125,
 "stop": 1687.9,
-"checked": "2026-11-23",
+"checked": "2026-11-25",
 "sell_next": false,
 "stop_note": "stop 1687.9, then Supertrend red"
 },
@@ -32,9 +32,9 @@
 "sh": 291,
 "avg": 683.7,
 "cost": 199504.20396881254,
-"last": 714.5,
+"last": 720.5499877929688,
 "stop": 615.2,
-"checked": "2026-11-23",
+"checked": "2026-11-25",
 "sell_next": false,
 "stop_note": "stop 615.2, then Supertrend red"
 },
@@ -45,9 +45,9 @@
 "sh": 66,
 "avg": 3070.0,
 "cost": 203177.5849125,
-"last": 3297.39990234375,
+"last": 3348.39990234375,
 "stop": 2769.8,
-"checked": "2026-11-23",
+"checked": "2026-11-25",
 "sell_next": false,
 "stop_note": "stop 2769.8, then Supertrend red"
 },
@@ -69,9 +69,9 @@
 "sh": 955,
 "avg": 303.9,
 "cost": 291023.1615459375,
-"last": 326.04998779296875,
+"last": 327.0,
 "stop": 283.25,
-"checked": "2026-11-23",
+"checked": "2026-11-25",
 "sell_next": false,
 "stop_note": "stop 283.25, then Supertrend red"
 },
@@ -82,9 +82,9 @@
 "sh": 621,
 "avg": 363.0,
 "cost": 226043.335918125,
-"last": 365.3999938964844,
+"last": 356.70001220703125,
 "stop": 331.3,
-"checked": "2026-11-23",
+"checked": "2026-11-25",
 "sell_next": false,
 "stop_note": "stop 331.3, then Supertrend red"
 },
@@ -139,7 +139,7 @@
 "sh": 106,
 "avg": 1577.0,
 "cost": 167622.00892875,
-"last": 1640.0,
+"last": 1611.0,
 "stop_note": "weekly close < 30-wk SMA (1385.1367)",
 "added": false
 },
@@ -150,7 +150,7 @@
 "sh": 14,
 "avg": 1100.7987,
 "cost": 15453.591445915878,
-"last": 1195.3,
+"last": 1189.85,
 "stop_note": "weekly close < 30-wk SMA (925.2117)",
 "added": false
 }
@@ -160,6 +160,7 @@
 "921:APLAPOLLO:2026-10-29",
 "921:BEEZAASAN.BO:2026-11-03",
 "921:BIL:2026-11-02",
+"921:CYIENT:2026-11-25",
 "921:KDDL:2026-11-05",
 "921:KODYTECH:2026-11-05",
 "921:KOPRAN:2026-11-12",
@@ -167,6 +168,7 @@
 "921:LGEINDIA:2026-11-05",
 "921:MCX:2026-11-03",
 "921:MEESHO:2026-11-05",
+"921:MPHASIS:2026-11-25",
 "921:PROTEAN:2026-11-04",
 "921:RPGLIFE:2026-10-29",
 "921:SANGAMIND:2026-11-02",
@@ -175,6 +177,7 @@
 "921:SIMPLEXINF:2026-11-03",
 "921:SWANDEF:2026-11-09",
 "921:TCS:2026-11-23",
+"ath:AGARWALEYE:2026-11-26",
 "ath:ANGELONE:2026-11-13",
 "ath:ASAHIINDIA:2026-11-11",
 "ath:DCBBANK:2026-11-12",
@@ -231,5 +234,5 @@
 "why": "stop"
 }
 ],
-"tb_total": 260226.0
+"tb_total": 260544.46153846156
 }
