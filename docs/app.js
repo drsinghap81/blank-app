@@ -642,7 +642,14 @@ async function lvApi(path, opt = {}) {
   const c = lvCfg(); if (!c.url) throw new Error('not connected');
   if (opt.method && opt.method !== 'GET') state._planC = null;     // any change on the server: next /api/plan is fresh
   const ac = opt.timeout ? new AbortController() : null; if (ac) setTimeout(() => ac.abort(), opt.timeout);
-  const r = await fetch(c.url.replace(/\/$/, '') + path, { ...opt, ...(ac ? { signal: ac.signal } : {}), headers: { 'Content-Type': 'application/json', ...(c.token ? { Authorization: 'Bearer ' + c.token } : {}), ...(opt.headers || {}) } });
+  const go = () => fetch(c.url.replace(/\/$/, '') + path, { ...opt, ...(ac ? { signal: ac.signal } : {}), headers: { 'Content-Type': 'application/json', ...(c.token ? { Authorization: 'Bearer ' + c.token } : {}), ...(opt.headers || {}) } });
+  /* 27 Nov 2026 (Amritpal: raising lots said "Load failed"): a dropped connection (phone network, server restarting) is retried once
+     after 2 s - only for reads and settings that are safe to send twice, never for orders */
+  const safe = !opt.method || opt.method === 'GET' || /\/(cfg|mode|auto|lots|login|picks)(\?|$)/.test(path);
+  let r; try { r = await go(); } catch (e) {
+    if (!safe || (ac && ac.signal.aborted)) throw new Error(/load failed|failed to fetch|network/i.test(e.message) ? 'no answer from your server (connection dropped or it is restarting) - try again in a minute' : e.message);
+    await new Promise((ok) => setTimeout(ok, 2000));
+    try { r = await go(); } catch (e2) { throw new Error('no answer from your server (connection dropped or it is restarting) - try again in a minute'); } }
   const j = await r.json().catch(() => ({}));
   if (r.status === 401) { lvSave({ token: null }); }
   if (!r.ok) throw new Error(j.detail || `server error ${r.status}`);
