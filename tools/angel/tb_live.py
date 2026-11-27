@@ -169,6 +169,10 @@ def init_flat_state(hist: pd.DataFrame, cfg: dict) -> State:
     return st
 
 
+def entry_day_stop(st, cfg):
+    return st.entry * (1 - st.pos * cfg["day_sl_pct"] / 100)
+
+
 def describe_plan(plan: dict, st: State, cfg: dict) -> str:
     f = lambda x: f"{x:,.2f}"
     L = [f"TOP BOTTOM {cfg['symbol']} FUT — plan for the session after {plan['date']}",
@@ -184,8 +188,11 @@ def describe_plan(plan: dict, st: State, cfg: dict) -> str:
     else:
         side = "LONG" if st.pos > 0 else "SHORT"
         L.append(f"Position: {side} {st.lots} lots from {f(st.entry)} ({st.entry_date}) in {st.contract}")
-        L.append(f"Stop {f(plan['prot'])}" + ((" = system point → exit (buy only)" if cfg.get("long_only") and st.pos > 0 else " = system point → reverse")
-                                               if plan["prot_is_sys"] else (" (breakeven)" if st.be_on else "")))
+        if st.entry_date == str(plan.get("today") or date.today()):     # 27 Nov 2026: entry day - plan made while flat has no prot
+            L.append(f"Entry-day stop {f(entry_day_stop(st, cfg))} ({cfg['day_sl_pct']}% from entry, {cfg['entry_day_sl']})")
+        if plan.get("prot") is not None:
+            L.append(f"Stop {f(plan['prot'])}" + ((" = system point → exit (buy only)" if cfg.get("long_only") and st.pos > 0 else " = system point → reverse")
+                                                   if plan["prot_is_sys"] else (" (breakeven)" if st.be_on else "")))
     L.append(f"Open beyond a level by > {cfg['gap_pct']}%: no new trade")
     return "\n".join(L)
 

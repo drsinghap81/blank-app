@@ -117,7 +117,7 @@ def app_status(tg, st, cfg, plan=None, running=True, q=None, note=""):
     tg.status(dict(running=running, mode="LIVE" if not cfg.get("dry_run", True) else "DRY RUN", lots=st.lots or cfg["lots"],
                    pos=st.pos, qty=st.qty, contract=st.contract, entry=st.entry, entry_date=st.entry_date,
                    plan=tl.describe_plan(plan, st, cfg) if plan else None,
-                   buy_lvl=(plan or {}).get("buy_lvl"), sell_lvl=(plan or {}).get("sell_lvl"), stop=(plan or {}).get("prot"),
+                   buy_lvl=(plan or {}).get("buy_lvl"), sell_lvl=(plan or {}).get("sell_lvl"), stop=(tl.entry_day_stop(st, cfg) if st.pos and st.entry_date == str(date.today()) else (plan or {}).get("prot")),
                    ltp=(q or {}).get("ltp"), high=(q or {}).get("high"), low=(q or {}).get("low"), note=note,
                    trades=st.trades[-8:]))
 
