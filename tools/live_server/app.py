@@ -4978,6 +4978,11 @@ def alert(kind, symbol, text, key=None, mk=None):
     A.setdefault("items", []).append(item); A["items"] = A["items"][-1000:]
     A.setdefault("seen", []).append(key); A["seen"] = A["seen"][-1000:]
     json.dump(A, open(_alerts_path(), "w")); log("alert", akind=kind, symbol=symbol, text=text)
+    try:                      # 27 Nov 2026 (forward test of the alerts): a permanent, never-trimmed record of every alert sent
+        with open(os.path.join(DATA, "alerts_log.jsonl"), "a", encoding="utf-8") as f:
+            f.write(json.dumps(item) + "\n")
+    except Exception:  # noqa: BLE001
+        pass
     threading.Thread(target=_send_alert, args=(item, list(A.get("subs", []))), daemon=True).start()
     return True
 
@@ -5227,7 +5232,19 @@ def _al_cat(x):
 
 def _al_review_build():
     try:
-        A = alerts_load(); items = [x for x in A.get("items", []) if x.get("kind") != "test"]
+        A = alerts_load(); seen = set(); items = []
+        try:                  # the permanent record first (27 Nov 2026), then the app's last-1,000 list
+            for ln in open(os.path.join(DATA, "alerts_log.jsonl"), encoding="utf-8"):
+                try:
+                    x = json.loads(ln)
+                except Exception:  # noqa: BLE001
+                    continue
+                if x.get("id") not in seen:
+                    seen.add(x.get("id")); items.append(x)
+        except FileNotFoundError:
+            pass
+        items += [x for x in A.get("items", []) if x.get("id") not in seen]
+        items = [x for x in items if x.get("kind") != "test"]
         cats = {}; cand = {}
         for x in items:
             nm, dirn = _al_cat(x)
