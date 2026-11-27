@@ -1901,6 +1901,8 @@ function mmSettings(box, m, T) {
     return `<span class="au2-c off"><i></i>${esc(s)} –</span>`; }).join('');
   box.innerHTML = `<div class="au2-mmh"><label>Capital ${cur}<input id="mc${m}" inputmode="decimal" value="${c.capital || ''}" placeholder="0"></label><label>Risk %<input id="mr${m}" inputmode="decimal" value="${c.risk_pct || 1}"></label><button class="au2-save" id="ms${m}">Save</button></div>
     <div class="au2-chips">${chips}</div><p class="au2-foot"><span class="au2-key"><i class="hold"></i>holding <i class="wait"></i>buy-stop today <i></i>next buy level</span> · levels ${esc(L.asof || '–')}</p>
+    ${(() => { const nm = m === 'US' ? 'US:' : 'ASX:'; const N = (T.notes || []).filter((x) => x.includes(nm)).slice(-6).reverse();   // 27 Nov 2026: what the bot did and why
+      return N.length ? `<details class="info"><summary>Bot log (${m === 'US' ? 'US' : 'ASX'})</summary><ul class="lv-sub">${N.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></details>` : ''; })()}
     ${m === 'US' && T.enabled ? `<div class="au2-env${T.env === 'REAL' ? ' real' : ''}">${T.env === 'REAL'
       ? '<b>REAL money account</b><span>Orders use your real moomoo money.</span><button class="t3-link" id="mmenvback">Back to paper</button>'
       : `<b>Paper account</b><details open><summary>Switch to real money</summary><div class="au2-tkrow"><input id="mmenvpw" type="password" placeholder="App password" autocomplete="current-password"><input id="mmenvcf" placeholder="Type REAL" autocapitalize="characters"><button class="au2-big stop" id="mmenvgo">Use real money</button></div></details>`}</div>` : ''}`;

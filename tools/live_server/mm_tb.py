@@ -135,8 +135,9 @@ class MMTB:
         n = self.now(mk); hm = (n.hour, n.minute); today = n.date().isoformat(); M = MKT[mk]
         if n.weekday() >= 5:
             return
-        if M["pre"] <= hm < M["open"] and self.st["day"].get(mk) != today:
-            self.st["day"][mk] = today; self._preopen(mk, n)
+        if M["pre"] <= hm < (M["close"][0] - 1, M["close"][1]) and self.st["day"].get(mk) != today:
+            # 27 Nov 2026: also when the server was down / restarting through the pre-open window - run it late (no chasing)
+            self.st["day"][mk] = today; self._preopen(mk, n, late=hm >= M["open"])
         # 27 Nov 2026 (Amritpal switched ASX on at 09:51, after the 09:35 check had already passed with it off): automation turned on
         # later in the day still places today's buy-stops while the market is open - only for ETFs still BELOW their buy level
         # (a level already crossed today is skipped, not chased), up to an hour before the close.
@@ -146,7 +147,7 @@ class MMTB:
         if M["open"] <= hm <= (M["close"][0], M["close"][1] + 10) and self.st["pos"][mk]:
             self._monitor(mk, n, hm >= M["close"])
 
-    def _preopen(self, mk, n):
+    def _preopen(self, mk, n, late=False):
         if mk == "AU" and getattr(self.mm, "env_name", "") == "SIMULATE":
             if self.st["pos"]["AU"] or self.auto_on("AU"):
                 self.note(mk, "moomoo's paper trading does not cover ASX through the API - ASX runs only on the real account")
@@ -193,7 +194,7 @@ class MMTB:
                         self.note(mk, f"{sym}: stop order refused ({str(ex)[:80]}) - the server watches {ns} itself")
                 self.note(mk, f"{sym}: stop raised {old} -> {ns}{' (breakeven)' if p['be'] and ns >= e else ''}")
         if self.auto_on(mk):
-            self._entries(mk, n, late=False)
+            self._entries(mk, n, late=late)
 
     def _entries(self, mk, n, late=False):
         """2. new entries (only with this market's automation on). late = placed during the session: skip ETFs already at / above
@@ -205,13 +206,13 @@ class MMTB:
         cap = float(cfg.get("capital") or 0); syms = cfg.get("symbols") or []
         if cap <= 0 or not syms:
             self.note(mk, "automation on but no capital set - nothing placed"); return
-        self.st.setdefault("ent", {})[mk] = n.date().isoformat()
         snap = {}
         if late:
             try:
                 snap = self.mm.snapshot([x for x in syms if x not in P], mk=mk) or {}
             except Exception as ex:  # noqa: BLE001
-                self.note(mk, f"price check failed ({str(ex)[:80]}) - no late entries"); return
+                self.note(mk, f"price check failed ({str(ex)[:80]}) - retrying next minute"); return
+        self.st.setdefault("ent", {})[mk] = n.date().isoformat()
         cap = float(cfg.get("capital") or 0); syms = cfg.get("symbols") or []
         if cap <= 0 or not syms:
             self.note(mk, "automation on but no capital set - nothing placed"); return
