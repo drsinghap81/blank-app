@@ -1,5 +1,5 @@
 {
-"generated": "2026-11-26T17:56+00:00",
+"generated": "2026-11-27T00:01+00:00",
 "asof": "2026-11-26",
 "market": "NSE",
 "rules": "Uptrend: the pole top is a higher high (above the previous swing high, zigzag 6%) and the flag low a higher low (above the previous swing low); 21-day average rising, 200-day average rising. Pole: >= 15% rise in <= 15 sessions from the swing low to the highest high. Pause (3-25 sessions): Flag = highs and lows drifting down, Pennant = highs falling and lows rising, Rectangle = flat box;  falling or flat highs, pullback <= half the pole and <= 12%, no close above the pole top, close above the 200-day average. Room: the nearest earlier swing high above the entry must be >= 0.8 x the pole away (or none). Tight: flag range <= 8%; volume dries up in the flag (< 0.75 x the pole, < the 50-day average); breakout candle >= 1.5 x the 50-day average volume and the flag's biggest. Early = the pole started within 4% of the 200-day average (fresh uptrend); established = 50 > 200-day average, both rising. Trigger = the flag's top line; stop = flag low (incl. the breakout day); exit = first daily close below the 21-day EMA (pole target shown for reference).",
@@ -110,62 +110,11 @@
 "kind": "stock"
 },
 {
-"symbol": "NIFTY CAPITAL MARKETS",
-"name": "NIFTY CAPITAL MARKETS",
-"lane": "early",
-"shape": "Flag",
-"close": 5752.35,
-"pole_pct": 17.5,
-"flag_vol_pct": null,
-"range_pct": 0.8,
-"pole_start": "2026-10-26",
-"pole_top": "2026-11-17",
-"top": 5898.65,
-"flag_days": 4,
-"depth_pct": 2.7,
-"stop": 5740.05,
-"s200": 5204.32,
-"base": 5018.6,
-"geo": {
-"pole": [
-"2026-10-26",
-5018.6,
-"2026-11-17",
-5898.65
-],
-"up": [
-"2026-11-18",
-5793.42,
-"2026-11-25",
-5739.43
-],
-"lo": [
-"2026-11-18",
-5793.42,
-"2026-11-25",
-5739.43
-]
-},
-"status": "breakout",
-"bo_date": "2026-11-25",
-"entry": 5752.35,
-"days_since": 0,
-"bo_high": 5752.35,
-"takeout": 5760.98,
-"target": 6632.4,
-"risk_pct": 0.2,
-"ret_pct": 0.0,
-"ema21": 5625.33,
-"resistance": null,
-"room_x": null,
-"kind": "index"
-},
-{
 "symbol": "NIFTY PHARMA",
 "name": "NIFTY PHARMA",
 "lane": "early",
 "shape": "Flag",
-"close": 29090.85,
+"close": 28961.9,
 "pole_pct": 15.5,
 "flag_vol_pct": 99,
 "range_pct": 2.8,
@@ -175,7 +124,7 @@
 "flag_days": 6,
 "depth_pct": 3.2,
 "stop": 27987.5,
-"s200": 24989.39,
+"s200": 24951.69,
 "base": 25024.15,
 "geo": {
 "pole": [
@@ -201,13 +150,64 @@
 "status": "breakout",
 "bo_date": "2026-11-25",
 "entry": 28961.9,
-"days_since": 1,
+"days_since": 0,
 "bo_high": 28966.25,
 "takeout": 29009.7,
 "target": 32840.2,
 "risk_pct": 3.4,
-"ret_pct": 0.4,
-"ema21": 27963.4,
+"ret_pct": 0.0,
+"ema21": 27850.66,
+"resistance": null,
+"room_x": null,
+"kind": "index"
+},
+{
+"symbol": "NIFTY CAPITAL MARKETS",
+"name": "NIFTY CAPITAL MARKETS",
+"lane": "early",
+"shape": "Flag",
+"close": 5974.6,
+"pole_pct": 17.5,
+"flag_vol_pct": null,
+"range_pct": 0.8,
+"pole_start": "2026-10-26",
+"pole_top": "2026-11-17",
+"top": 5898.65,
+"flag_days": 5,
+"depth_pct": 2.7,
+"stop": 5740.05,
+"s200": 5211.65,
+"base": 5018.6,
+"geo": {
+"pole": [
+"2026-10-26",
+5018.6,
+"2026-11-17",
+5898.65
+],
+"up": [
+"2026-11-18",
+5790.84,
+"2026-11-26",
+5736.27
+],
+"lo": [
+"2026-11-18",
+5790.84,
+"2026-11-26",
+5736.27
+]
+},
+"status": "breakout",
+"bo_date": "2026-11-26",
+"entry": 5974.6,
+"days_since": 0,
+"bo_high": 5974.6,
+"takeout": 5983.56,
+"target": 6854.65,
+"risk_pct": 3.9,
+"ret_pct": 0.0,
+"ema21": 5657.08,
 "resistance": null,
 "room_x": null,
 "kind": "index"
