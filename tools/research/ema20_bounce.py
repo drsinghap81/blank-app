@@ -35,7 +35,10 @@ def walk(o, h, l, c, e9, e21, j, e, stop, rule):
     k = min(n - 1, j + lim); return c[k], k
 
 
-def events(x):
+def events(x, mode="touch"):
+    """mode touch = buy above the touch candle's high (4 sessions); swing = buy above the previous swing high before the touch
+    (valid 10 sessions; cancelled if the touch low breaks first). 28 Nov 2026 v2 (Amritpal: "if only such a clean rising chart I
+    enter on breakout of previous swing high")."""
     o, h, l, c = (x[k].to_numpy(float) for k in ("OPEN", "HIGH", "LOW", "CLOSE")); n = len(c); C = x.CLOSE
     m = C.ewm(span=20, adjust=False).mean().to_numpy(); s50 = C.rolling(50).mean().to_numpy()
     e9 = C.ewm(span=9, adjust=False).mean().to_numpy(); e21 = C.ewm(span=21, adjust=False).mean().to_numpy()
@@ -47,8 +50,20 @@ def events(x):
         if t - last < 5:
             continue
         last = t
-        trig = h[t] * (1 + BUF); stop = l[t]; j = None
-        for k in range(t + 1, min(n, t + 5)):
+        # structural clean chart: 20 EMA rising over the last 60 sessions, no close > 1% below it, >= 2 earlier held touches
+        w0 = max(0, t - 60)
+        clean = bool(t >= 70 and m[t] > m[w0] and all(m[k] > m[k - 10] for k in range(w0 + 10, t + 1, 10))
+                     and (c[w0:t] >= m[w0:t] * 0.99).all()
+                     and sum(1 for k in range(w0, t - 2) if l[k] <= m[k] * 1.005 and c[k] >= m[k] and l[k] < l[k - 1] and l[k] <= l[k + 1]) >= 2)
+        if mode == "swing":
+            shs = [k for k in range(max(2, t - 40), t - 1) if h[k] >= h[k - 1] and h[k] >= h[k - 2] and h[k] >= h[k + 1] and h[k] >= h[k + 2]]
+            if not shs:
+                continue
+            trig = h[shs[-1]] * (1 + BUF); win = 11
+        else:
+            trig = h[t] * (1 + BUF); win = 5
+        stop = l[t]; j = None
+        for k in range(t + 1, min(n, t + win)):
             hit = h[k] >= trig; brk = l[k] < stop
             if brk and not hit:
                 break
@@ -70,7 +85,7 @@ def events(x):
             if h[k] >= e + 2 * R:
                 worked = True; rd = k; break
         hist.append((t, worked, rd))
-        row = dict(d=x.index[t], nprev=len(prev), share=(sum(prev) / len(prev)) if prev else None,
+        row = dict(d=x.index[t], clean=clean, nprev=len(prev), share=(sum(prev) / len(prev)) if prev else None,
                    last3=bool(len(prev) >= 3 and all(prev[-3:])), risk=R / e * 100)
         for rule in ("2R", "3R", "921", "t10"):
             px, _ = walk(o, h, l, c, e9, e21, j, e, stop, rule)
@@ -81,26 +96,19 @@ def events(x):
 
 def main():
     P = FV.load()
-    D = pd.DataFrame([dict(e, s=s) for s, x in P.items() for e in events(x)])
-    print(f"R| stocks {len(P)} entries {len(D)}", flush=True)
-    end = D.d.max()
-    groups = {
-        "all touches": D.index == D.index,
-        "no history (<3 earlier)": D.nprev < 3,
-        "clean 0-33% worked": (D.nprev >= 3) & (D.share < 0.34),
-        "clean 34-66% worked": (D.nprev >= 3) & (D.share >= 0.34) & (D.share < 0.67),
-        "CLEAN >= 67% worked": (D.nprev >= 3) & (D.share >= 0.67),
-        "CLEAN last 3 all worked": D.last3,
-    }
-    for nm, msk in groups.items():
-        Z = D[msk]
-        for lab, st in (("last 1y", end - pd.DateOffset(years=1)), ("last 3y", end - pd.DateOffset(years=3)),
-                        ("2021+ ex-Covid", pd.Timestamp("2021-01-01")), ("2016+", pd.Timestamp("2016-01-01"))):
-            z = Z[Z.d >= st]
-            if len(z) < 15:
-                print(f"R| {nm:26s} {lab:15s} n {len(z)} (too few)", flush=True); continue
-            parts = [f"{r} {z[r + 'R'].mean():+.2f}R (win {(z[r + 'R'] > 0).mean() * 100:3.0f}%)" for r in ("2R", "3R", "921", "t10")]
-            print(f"R| {nm:26s} {lab:15s} n {len(z):6d} risk {z.risk.median():.1f}% | " + " | ".join(parts), flush=True)
+    for mode in ("swing", "touch"):
+        D = pd.DataFrame([dict(e, s=s_) for s_, x in P.items() for e in events(x, mode)])
+        print(f"R| ===== entry above the {'PREVIOUS SWING HIGH' if mode == 'swing' else 'touch candle high'}: entries {len(D)}", flush=True)
+        end = D.d.max()
+        for nm, msk in (("all touches", D.index == D.index), ("CLEAN rising chart", D.clean), ("not clean", ~D.clean)):
+            Z = D[msk]
+            for lab, st in (("last 1y", end - pd.DateOffset(years=1)), ("last 3y", end - pd.DateOffset(years=3)),
+                            ("2021+ ex-Covid", pd.Timestamp("2021-01-01")), ("2016+", pd.Timestamp("2016-01-01"))):
+                z = Z[Z.d >= st]
+                if len(z) < 15:
+                    print(f"R| {mode:5s} {nm:20s} {lab:15s} n {len(z)} (too few)", flush=True); continue
+                parts = [f"{r} {z[r + 'R'].mean():+.2f}R (win {(z[r + 'R'] > 0).mean() * 100:3.0f}%)" for r in ("2R", "3R", "921", "t10")]
+                print(f"R| {mode:5s} {nm:20s} {lab:15s} n {len(z):6d} risk {z.risk.median():.1f}% | " + " | ".join(parts), flush=True)
 
 
 if __name__ == "__main__":
