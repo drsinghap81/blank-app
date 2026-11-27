@@ -1711,6 +1711,8 @@ def test_alert_review(tmp_path):
     for it in AL["items"]:
         it["t"] = days[5] + "T05:00:00+00:00"
     __import__("json").dump(AL, open(A._alerts_path(), "w"))
+    lp = os.path.join(A.DATA, "alerts_log.jsonl")
+    open(lp, "w").write("".join(__import__("json").dumps(x) + "\n" for x in AL["items"]))
     A._al_review_build()
     R = c.get("/api/alerts/review", headers=h).json()
     C = {x["category"]: x for x in R["categories"]}
