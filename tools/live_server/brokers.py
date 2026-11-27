@@ -543,10 +543,17 @@ class MoomooTrade(MoomooRO):
     def _t(self, mk="US"):
         m = _mm()
         t = m.OpenSecTradeContext(filter_trdmarket=getattr(m.TrdMarket, mk), host=self.host, port=self.port, security_firm=getattr(m.SecurityFirm, self.firm))
-        if self.env_name == "REAL":
-            ret, d = t.unlock_trade(password=self.pwd)
-            if ret != m.RET_OK:
-                t.close(); raise RuntimeError(f"moomoo unlock failed: {d}")
+        # 28 Nov 2026: OpenD keeps trading unlocked once unlocked, but this unlocked on EVERY call - sending 5 orders (each with its
+        # status checks) hit moomoo's "Maximum 10 times per 30 seconds" and ACGL was refused. Now: unlock at most every 10 minutes,
+        # and on a rate-limit answer wait and retry instead of failing the order.
+        if self.env_name == "REAL" and time.time() - getattr(self, "_unl_at", 0) > 600:
+            for wait in (4, 8, 16, 0):
+                ret, d = t.unlock_trade(password=self.pwd)
+                if ret == m.RET_OK:
+                    self._unl_at = time.time(); break
+                if "frequency" not in str(d).lower() or not wait:
+                    t.close(); raise RuntimeError(f"moomoo unlock failed: {d}")
+                time.sleep(wait)
         return m, t, getattr(m.TrdEnv, self.env_name)
 
     @staticmethod
@@ -620,17 +627,21 @@ class MoomooTrade(MoomooRO):
         finally:
             t.close()
 
-    def place(self, sym, side, qty, otype, price, aux=None, tif="DAY", mk="US", remark="trenddesk-rsi2"):
+    def place(self, sym, side, qty, otype, price, aux=None, tif="DAY", mk="US", remark="trenddesk-rsi2", _again=True):
         m, t, env = self._t(mk)
         try:
             ret, d = t.place_order(price=float(price), qty=float(qty), code=self.code(sym, mk), trd_side=getattr(m.TrdSide, side),
                                    order_type=getattr(m.OrderType, otype), trd_env=env, acc_id=self.acc if mk == "US" else 0,
                                    time_in_force=getattr(m.TimeInForce, tif), aux_price=aux, remark=remark)
             if ret != m.RET_OK:
+                if _again and "unlock" in str(d).lower():        # OpenD lost the unlock (e.g. restarted): unlock again, once
+                    self._unl_at = 0; t.close(); t = None
+                    return self.place(sym, side, qty, otype, price, aux=aux, tif=tif, mk=mk, remark=remark, _again=False)
                 raise RuntimeError(str(d))
             return str(d["order_id"].iloc[0])
         finally:
-            t.close()
+            if t is not None:
+                t.close()
 
     def order(self, oid, mk="US"):
         m, t, env = self._t(mk); acc = self.acc if mk == "US" else 0
