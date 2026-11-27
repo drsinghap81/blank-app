@@ -16,7 +16,17 @@ import threading
 import time
 from datetime import datetime, timedelta
 
-VERSION = 2
+VERSION = 3
+# v3 (28 Nov 2026): the server's scrip master keeps only F&O rows (memory), so no NSE / BSE equity token was found and part A never
+# ran - equity tokens are now fixed here (from Angel's public master, 28 Nov 2026). Part B adds samples of the biggest gaps
+# (future, CE, PE) and the median gap per day, to check the large synthetic gaps of v2 (likely stale or re-used option tokens).
+NSE_TOK = {"NTPC": "11630", "BHARTIARTL": "10604", "HDFCBANK": "1333", "POWERGRID": "14977", "INFY": "1594", "TCS": "11536", "RELIANCE": "2885",
+           "ITC": "1660", "KOTAKBANK": "1922", "M&M": "2031", "BAJFINANCE": "317", "SUNPHARMA": "3351", "TATASTEEL": "3499", "AXISBANK": "5900",
+           "MARUTI": "10999", "HINDUNILVR": "1394", "LT": "11483", "TITAN": "3506", "ICICIBANK": "4963", "SBIN": "3045"}
+BSE_TOK = {"TITAN": "500114", "M&M": "500520", "BAJFINANCE": "500034", "KOTAKBANK": "500247", "TATASTEEL": "500470", "SBIN": "500112",
+           "INFY": "500209", "HDFCBANK": "500180", "LT": "500510", "RELIANCE": "500325", "HINDUNILVR": "500696", "ITC": "500875",
+           "MARUTI": "532500", "AXISBANK": "532215", "TCS": "532540", "POWERGRID": "532898", "SUNPHARMA": "524715", "BHARTIARTL": "532454",
+           "ICICIBANK": "532174", "NTPC": "532555"}
 STOCKS = ["RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS", "SBIN", "BHARTIARTL", "ITC", "LT", "KOTAKBANK", "AXISBANK", "HINDUNILVR",
           "BAJFINANCE", "MARUTI", "SUNPHARMA", "TATASTEEL", "NTPC", "POWERGRID", "M&M", "TITAN"]
 SYN = ["NIFTY", "BANKNIFTY", "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "SBIN"]
@@ -121,6 +131,10 @@ class ArbBT:
                     fut.setdefault(nm, []).append((e, x["token"], int(float(x.get("lotsize") or 0))))
                 else:
                     opt.setdefault((nm, e), {}).setdefault(round(float(x.get("strike") or 0) / 100, 2), {})[sym[-2:]] = x["token"]
+        for k, v in NSE_TOK.items():
+            eq_nse.setdefault(k, v)
+        for k, v in BSE_TOK.items():
+            eq_bse.setdefault(k, v)
         res = dict(version=VERSION, method=__doc__, built=None, window=f"{d0} -> {d1}", nse_bse={}, synthetic={})
         # ---- A) NSE vs BSE
         for i, nm in enumerate(STOCKS):
@@ -163,12 +177,18 @@ class ArbBT:
                 for t in tt:
                     T = max((e - datetime.strptime(t[:10], "%Y-%m-%d").date()).days, 0) / 365
                     g.append(fb[t] - (K + (ce[t] - pe[t]) * math.exp(RATE * T)))
+                byd = {}
+                for t, x in zip(tt, g):
+                    byd.setdefault(t[:10], []).append(x)
+                top = sorted(range(len(g)), key=lambda q: -abs(g[q]))[:3]
+                diag = dict(by_day_median={d: round(sorted(v)[len(v) // 2], 1) for d, v in byd.items()},
+                            biggest=[dict(t=tt[q], fut=fb[tt[q]], ce=ce[tt[q]], pe=pe[tt[q]], gap=round(g[q], 1)) for q in top])
                 over = [abs(x) > cost for x in g]
                 runs = sum(1 for j in range(2, len(over)) if over[j] and over[j - 1] and over[j - 2] and not (j > 2 and over[j - 3]))
                 ag = sorted(abs(x) for x in g); allg += g
                 per[str(K)] = dict(minutes=len(tt), median_gap_pts=round(sorted(g)[len(g) // 2], 2), median_abs_pts=round(ag[len(ag) // 2], 2),
                                    p95_abs_pts=round(ag[int(len(ag) * 0.95)], 2), max_abs_pts=round(ag[-1], 2), minutes_over_cost=sum(over),
-                                   runs_3min_over_cost=runs, best_rs_per_lot=round((ag[-1] - cost) * lot, 0))
+                                   runs_3min_over_cost=runs, best_rs_per_lot=round((ag[-1] - cost) * lot, 0), **diag)
             sg = sorted(abs(x) for x in allg) if allg else [0]
             res["synthetic"][nm] = dict(expiry=str(e), lot=lot, future_last=fl, cost_pts=round(cost, 2), strikes=per,
                                         all_median_abs_pts=round(sg[len(sg) // 2], 2), all_p99_abs_pts=round(sg[int(len(sg) * 0.99)], 2),
