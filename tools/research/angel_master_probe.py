@@ -1,18 +1,15 @@
-"""probe the public Angel One scrip master: BSE equity rows and NIFTY Dec-29 option rows (arb_bt token matching)."""
-import collections
+"""probe the public Angel One scrip master: NSE -EQ and BSE equity tokens for the arbitrage pilot's 20 stocks."""
 import json
 
 import requests
 
+S = ["RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS", "SBIN", "BHARTIARTL", "ITC", "LT", "KOTAKBANK", "AXISBANK", "HINDUNILVR",
+     "BAJFINANCE", "MARUTI", "SUNPHARMA", "TATASTEEL", "NTPC", "POWERGRID", "M&M", "TITAN"]
 M = requests.get("https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json", timeout=120).json()
-print("R| rows", len(M), "segments", collections.Counter(x.get("exch_seg") for x in M).most_common(12))
-for nm in ("RELIANCE", "HDFCBANK", "M&M"):
-    rows = [x for x in M if x.get("exch_seg") == "BSE" and (nm in str(x.get("name", "")) or str(x.get("symbol", "")).startswith(nm))][:4]
-    for x in rows:
-        print("R| BSE", nm, json.dumps(x))
-rows = [x for x in M if x.get("exch_seg") == "NFO" and x.get("name") == "NIFTY" and "29DEC26" in str(x.get("symbol", "")) and str(x.get("strike", "")).startswith(("2560000", "2575000"))]
-for x in rows:
-    print("R| NFO", json.dumps(x))
-rows = [x for x in M if x.get("exch_seg") == "NFO" and x.get("name") == "NIFTY" and str(x.get("instrumenttype")) == "FUTIDX"]
-for x in rows:
-    print("R| FUT", json.dumps(x))
+nse = {x["name"]: x["token"] for x in M if x.get("exch_seg") == "NSE" and str(x.get("symbol", "")).endswith("-EQ") and x.get("name") in S}
+bse = {}
+for x in M:
+    if x.get("exch_seg") == "BSE" and not x.get("instrumenttype") and x.get("symbol") in S:
+        bse.setdefault(x["symbol"], x["token"])
+print("R| NSE " + json.dumps(nse)); print("R| BSE " + json.dumps(bse))
+print("R| missing", [s for s in S if s not in nse], [s for s in S if s not in bse])
