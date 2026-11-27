@@ -61,7 +61,8 @@ def events(x):
             if not m[i] > m[i - 10] or len(lows) < 3:
                 continue
             a, b, z = lows[-3:]
-            if not (l[a] < m[a] and l[b] < m[b] and l[z] < m[z] and c[z] >= 0.998 * m[z] and m[z] > m[z - 5]):
+            if not (l[a] < m[a] and l[b] < m[b] and l[z] < m[z] and c[z] >= 0.998 * m[z]
+                    and all(m[k] > m[k - 5] and c[k] > s50[k] * 0.98 for k in (a, b, z))):
                 continue
             # base top breakout
             top = h[a:i].max()
