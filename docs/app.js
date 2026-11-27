@@ -2389,6 +2389,50 @@ async function emaBounce(box) {
   box.querySelectorAll('[data-eb]').forEach((b) => b.addEventListener('click', () => { const r = R[+b.dataset.eb];
     stockPage({ mk: 'NSE', sym: r.symbol, name: r.symbol, kind: 'stock' }, [{ t: 'Baskets', go: () => closeSheet(), done: true }, { t: '20 EMA bounce', go: () => closeSheet(), done: true }, { t: r.symbol, on: true }]); }));
 }
+function triSvg(r) {
+  // marked daily chart: flat top, touches, rising lows, pullback %, buy / stop (28 Nov 2026, Amritpal: "markings on chart")
+  const B = r.bars || []; if (B.length < 10) return '';
+  const W = 340, H = 190, pl = 4, pr = 52, pt = 10, pb = 18, n = B.length;
+  const lv = [...B.map((b) => b[1]), ...B.map((b) => b[2]), r.trigger || r.resistance, r.stop || r.stop_if_breaks].filter((v) => v > 0);
+  const lo = Math.min(...lv) * 0.995, hi = Math.max(...lv) * 1.005;
+  const X = (i) => pl + (i + 0.5) * (W - pl - pr) / n, Y = (v) => pt + (hi - v) / (hi - lo) * (H - pt - pb);
+  const ix = {}; B.forEach((b, i) => { ix[b[0]] = i; });
+  let g = B.map((b, i) => `<line x1="${X(i)}" x2="${X(i)}" y1="${Y(b[1])}" y2="${Y(b[2])}" stroke="${i && b[3] < B[i - 1][3] ? '#ef5350' : '#26a69a'}" stroke-width="1.6"/>`).join('');
+  const t0 = ix[(r.touches || [])[0]] ?? 0, tR = Y(r.resistance);
+  g += `<line x1="${X(t0)}" x2="${X(n - 1)}" y1="${tR}" y2="${tR}" stroke="#d81b60" stroke-width="2"/><text x="${W - pr + 3}" y="${tR + 4}" font-size="10" fill="#d81b60">${fmt(r.resistance, 0, 'en-IN')}</text>`;
+  (r.touches || []).forEach((d) => { if (d in ix) g += `<text x="${X(ix[d])}" y="${tR - 4}" font-size="10" text-anchor="middle" fill="#d81b60">▼</text>`; });
+  const L = (r.lows || []).filter((p) => p[0] in ix);
+  if (L.length > 1) g += `<polyline points="${L.map((p) => `${X(ix[p[0]])},${Y(p[1])}`).join(' ')}" fill="none" stroke="#a78bfa" stroke-width="1.4" stroke-dasharray="4 3"/>`;
+  L.forEach((p, k) => { const d = (r.pullbacks || [])[k]; if (d != null) g += `<text x="${X(ix[p[0]])}" y="${Y(p[1]) + 12}" font-size="9.5" text-anchor="middle" fill="#d81b60" font-weight="700">-${d}%</text>`; });
+  const lvl = (v, col, t) => v ? `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="${col}" stroke-width="1" stroke-dasharray="${t === 'stop' ? '3 3' : ''}"/><text x="${W - pr + 3}" y="${Y(v) + 4}" font-size="10" fill="${col}">${t} ${fmt(v, 0, 'en-IN')}</text>` : '';
+  g += r.status === 'forming' ? lvl(r.stop_if_breaks, '#ff8a98', 'stop') : lvl(r.trigger, '#5fe3b0', 'buy') + lvl(r.stop, '#ff8a98', 'stop');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(r.symbol)} triangle chart" style="display:block;max-width:520px">${g}
+    <text x="${pl}" y="${H - 4}" font-size="9" fill="currentColor" opacity=".6">${esc(B[0][0])}</text><text x="${W - pr}" y="${H - 4}" font-size="9" text-anchor="end" fill="currentColor" opacity=".6">${esc(B[n - 1][0])}</text></svg>`;
+}
+async function triangleWatch(box) {
+  // 28 Nov 2026 (Amritpal: "Usha Martin type and the reel type are good ascending triangles that can be added as scans"): watch only
+  if (!box) return;
+  const J = await getJSON(MAIN + 'data/scan/triangle.json', 'triangle').catch(() => null);
+  const f2 = (v) => fmt(v, 2, 'en-IN');
+  if (!J) { box.innerHTML = '<article class="bs-c"><div class="bs-h"><span class="bs-n">◺</span><div><b>Ascending triangle · watch</b><small>The first list appears after tonight\'s scan (21:25 IST).</small></div></div></article>'; return; }
+  const R = J.rows || [], rec = J.record || {};
+  const pb = (r) => (r.pullbacks || []).map((p) => p + '%').join(' → ');
+  const row = (r, i) => `<li class="cb-r" data-tw="${i}" role="button" tabindex="0" style="flex-wrap:wrap"><div><b>${esc(r.symbol)}</b><small>flat top ${f2(r.resistance)} · ${(r.touches || []).length} touches</small>
+      <span class="cb-t"><i>pullbacks ${pb(r)}</i>${r.status === 'breakout' ? '<i>broke out today</i>' : r.status === 'pending' ? '<i>broke out · not triggered yet</i>' : `<i class="w">${fmt(r.to_line_pct, 1)}% under the line</i>`}</span></div>
+    <div class="cb-a">${r.status === 'forming' ? `<span>Needs a close above <b>${f2(r.resistance)}</b><small>stop would be under ${f2(r.stop_if_breaks)}</small></span>`
+      : `<span>Buy above <b>${f2(r.trigger)}</b><small>stop ${f2(r.stop)} · risk ${fmt(r.risk_pct, 1)}% · 2R ${f2(r.target_2r)} · ${r.valid_sessions_left} session${r.valid_sessions_left === 1 ? '' : 's'} left</small></span>`}</div></li>`;
+  const act = R.filter((r) => r.status !== 'forming'), fm = R.filter((r) => r.status === 'forming');
+  box.innerHTML = `<article class="bs-c"><div class="bs-h"><span class="bs-n">◺</span><div><b>Ascending triangle · watch</b><small>Flat top touched 3+ times, lows rising step by step (each pullback smaller), a tight range under the line, then a close above it. Tap a stock for its marked chart.</small></div></div>
+    <p class="bs-note"><b>Watch only.</b> Rare: about 2 a year. Backtest since 2016: 23 cases, -0.28R a trade with a 2R target (Usha Martin won, JSW Steel and Prudent failed) - judge each chart yourself. Forward record: ${rec.n ? `${rec.n} setups, ${rec.closed} closed${rec.closed ? `, ${rec.won} won, avg ${rec.avg_R >= 0 ? '+' : ''}${fmt(rec.avg_R, 2)}R` : ''}` : 'starts tonight'}.</p>
+    <p class="bs-p"><b>Broke out · ${act.length}</b></p><ul class="cb-l">${act.map((r) => row(r, R.indexOf(r))).join('') || '<li class="cb-none">None right now</li>'}</ul>
+    <p class="bs-p"><b>Forming · testing the line · ${fm.length}</b></p><ul class="cb-l">${fm.map((r) => row(r, R.indexOf(r))).join('') || '<li class="cb-none">None right now</li>'}</ul>
+    <p class="bs-note">Scan ${esc(J.asof || '')}.</p></article>`;
+  box.querySelectorAll('[data-tw]').forEach((b) => b.addEventListener('click', (ev) => {
+    const r = R[+b.dataset.tw];
+    if (ev.target.closest('[data-twp]')) { stockPage({ mk: 'NSE', sym: r.symbol, name: r.symbol, kind: 'stock' }, [{ t: 'Baskets', go: () => closeSheet(), done: true }, { t: 'Ascending triangle', go: () => closeSheet(), done: true }, { t: r.symbol, on: true }]); return; }
+    const open = b.querySelector('.tw-ch'); if (open) { open.remove(); return; }
+    b.insertAdjacentHTML('beforeend', `<div class="tw-ch" style="width:100%;margin-top:8px">${triSvg(r) || '<small class="muted">Chart appears after the next evening scan.</small>'}<button class="t3-link" data-twp>Stock page ↗</button></div>`); }));
+}
 async function cupBasket(box) {
   if (!box) return;
   // 28 Nov 2026 (Amritpal: "I need a watch on cup closes breaking high with 9/21 momentum"): India / US / Australia, and a
@@ -2511,8 +2555,8 @@ async function loadBasket() {
       ${b.ret != null ? `<span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span>` : '<span class="bs-r"><b>🛡</b><small>hedge</small></span>'}</div>
       ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${b.hedgeOnly ? '' : paperLine(b.id)}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
   el.innerHTML = `<p class="bs-top">India stock baskets (${BASKETS.map((b, i) => b.al ? i + 1 : 0).filter(Boolean).join(', ')}) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
-    ${BASKETS.map(card).join('')}<div id="cupb" data-pl="${esc(paperLine('lc'))}"></div><div id="emab"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
-  cupBasket(el.querySelector('#cupb')); emaBounce(el.querySelector('#emab'));
+    ${BASKETS.map(card).join('')}<div id="cupb" data-pl="${esc(paperLine('lc'))}"></div><div id="emab"></div><div id="triw"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
+  cupBasket(el.querySelector('#cupb')); emaBounce(el.querySelector('#emab')); triangleWatch(el.querySelector('#triw'));
   { const sa = el.querySelector('[data-sendall]'); if (sa) sa.addEventListener('click', () => trSend(OD.list, 'NSE', sa).then(() => setTimeout(loadBasket, 3000))); }
   el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));
   el.querySelectorAll('[data-use]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.use); const cap0 = +el.querySelector(`[data-cap="${b.id}"]`).value || 0; if (b.hedge && !cap0) { alertMsg('Enter your capital: 80% goes to the stock systems, 10% gold, 10% dollar.'); return; }
