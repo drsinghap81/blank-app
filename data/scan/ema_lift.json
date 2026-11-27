@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-27T00:33+00:00",
- "asof": "2026-11-26",
+ "generated": "2026-11-27T22:19+00:00",
+ "asof": "2026-11-27",
  "ema": 9,
  "rows": [
   {
@@ -9,11 +9,11 @@
    "status": "riding",
    "signal": "2026-11-03",
    "signal_close": 55564.6,
-   "gain": 14.9,
-   "days": 15,
-   "ema": 62590.63,
-   "close": 63858.2,
-   "low": 63516.0
+   "gain": 13.9,
+   "days": 16,
+   "ema": 62728.74,
+   "close": 63281.2,
+   "low": 63222.0
   },
   {
    "symbol": "NIFTY",
@@ -21,11 +21,22 @@
    "status": "riding",
    "signal": "2026-10-16",
    "signal_close": 23119.2,
-   "gain": 12.6,
-   "days": 26,
-   "ema": 25516.56,
-   "close": 26029.4,
-   "low": 25834.4
+   "gain": 11.2,
+   "days": 27,
+   "ema": 25553.11,
+   "close": 25699.3,
+   "low": 25681.0
+  },
+  {
+   "symbol": "ASIANPAINT",
+   "index": false,
+   "status": "left below",
+   "signal": "2026-11-02",
+   "signal_close": 2334.1,
+   "gain": 8.7,
+   "days": 17,
+   "ema": 2569.5,
+   "close": 2538.0
   },
   {
    "symbol": "MAXHEALTH",
@@ -33,35 +44,11 @@
    "status": "riding",
    "signal": "2026-10-29",
    "signal_close": 857.95,
-   "gain": 27.0,
-   "days": 18,
-   "ema": 1042.48,
-   "close": 1089.45,
-   "low": 1066.6
-  },
-  {
-   "symbol": "MARUTI",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-29",
-   "signal_close": 11503.0,
-   "gain": 22.7,
-   "days": 18,
-   "ema": 13563.13,
-   "close": 14119.0,
-   "low": 13951.0
-  },
-  {
-   "symbol": "KOTAKBANK",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-01",
-   "signal_close": 421.65,
-   "gain": 21.2,
-   "days": 36,
-   "ema": 500.78,
-   "close": 511.2,
-   "low": 506.0
+   "gain": 25.0,
+   "days": 19,
+   "ema": 1048.47,
+   "close": 1072.4,
+   "low": 1070.25
   },
   {
    "symbol": "INDIGO",
@@ -69,11 +56,35 @@
    "status": "riding",
    "signal": "2026-10-29",
    "signal_close": 4702.5,
-   "gain": 20.4,
-   "days": 18,
-   "ema": 5565.69,
-   "close": 5664.0,
-   "low": 5629.3
+   "gain": 20.2,
+   "days": 19,
+   "ema": 5583.14,
+   "close": 5652.9,
+   "low": 5631.1
+  },
+  {
+   "symbol": "MARUTI",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-29",
+   "signal_close": 11503.0,
+   "gain": 19.9,
+   "days": 19,
+   "ema": 13609.1,
+   "close": 13793.0,
+   "low": 13771.0
+  },
+  {
+   "symbol": "KOTAKBANK",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-01",
+   "signal_close": 421.65,
+   "gain": 19.3,
+   "days": 37,
+   "ema": 501.2,
+   "close": 502.9,
+   "low": 501.65
   },
   {
    "symbol": "ICICIBANK",
@@ -81,11 +92,11 @@
    "status": "riding",
    "signal": "2026-10-08",
    "signal_close": 1352.6,
-   "gain": 20.1,
-   "days": 32,
-   "ema": 1603.47,
-   "close": 1624.2,
-   "low": 1615.6
+   "gain": 18.5,
+   "days": 33,
+   "ema": 1603.36,
+   "close": 1602.9,
+   "low": 1598.0
   },
   {
    "symbol": "HDFCBANK",
@@ -93,11 +104,11 @@
    "status": "riding",
    "signal": "2026-11-03",
    "signal_close": 726.0,
-   "gain": 19.2,
-   "days": 15,
-   "ema": 826.91,
-   "close": 865.1,
-   "low": 849.05
+   "gain": 18.4,
+   "days": 16,
+   "ema": 833.44,
+   "close": 859.55,
+   "low": 857.8
   },
   {
    "symbol": "M&M",
@@ -105,11 +116,11 @@
    "status": "riding",
    "signal": "2026-11-04",
    "signal_close": 2963.4,
-   "gain": 18.1,
-   "days": 14,
-   "ema": 3433.01,
-   "close": 3499.1,
-   "low": 3473.4
+   "gain": 16.5,
+   "days": 15,
+   "ema": 3436.69,
+   "close": 3451.4,
+   "low": 3442.1
   },
   {
    "symbol": "SBIN",
@@ -117,23 +128,11 @@
    "status": "riding",
    "signal": "2026-10-19",
    "signal_close": 976.0,
-   "gain": 17.2,
-   "days": 25,
-   "ema": 1122.73,
-   "close": 1144.3,
-   "low": 1136.0
-  },
-  {
-   "symbol": "BAJFINANCE",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-11-02",
-   "signal_close": 960.2,
-   "gain": 15.2,
-   "days": 16,
-   "ema": 1101.76,
-   "close": 1106.5,
-   "low": 1100.0
+   "gain": 16.0,
+   "days": 26,
+   "ema": 1124.52,
+   "close": 1131.7,
+   "low": 1130.55
   },
   {
    "symbol": "ITC",
@@ -141,35 +140,11 @@
    "status": "riding",
    "signal": "2026-10-30",
    "signal_close": 268.1,
-   "gain": 15.2,
-   "days": 17,
-   "ema": 299.06,
-   "close": 308.85,
-   "low": 307.2
-  },
-  {
-   "symbol": "ULTRACEMCO",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-26",
-   "signal_close": 11112.0,
-   "gain": 15.1,
-   "days": 21,
-   "ema": 12561.04,
-   "close": 12790.0,
-   "low": 12693.0
-  },
-  {
-   "symbol": "BHARTIARTL",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-07",
-   "signal_close": 1837.2,
-   "gain": 14.8,
-   "days": 33,
-   "ema": 2120.28,
-   "close": 2109.0,
-   "low": 2104.2
+   "gain": 14.2,
+   "days": 18,
+   "ema": 300.47,
+   "close": 306.1,
+   "low": 305.45
   },
   {
    "symbol": "HINDUNILVR",
@@ -177,11 +152,47 @@
    "status": "riding",
    "signal": "2026-11-02",
    "signal_close": 1879.3,
-   "gain": 14.3,
-   "days": 16,
-   "ema": 2058.79,
-   "close": 2148.0,
-   "low": 2128.8
+   "gain": 13.5,
+   "days": 17,
+   "ema": 2073.49,
+   "close": 2132.3,
+   "low": 2126.1
+  },
+  {
+   "symbol": "ULTRACEMCO",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-26",
+   "signal_close": 11112.0,
+   "gain": 13.2,
+   "days": 22,
+   "ema": 12564.83,
+   "close": 12580.0,
+   "low": 12525.0
+  },
+  {
+   "symbol": "BAJFINANCE",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-11-02",
+   "signal_close": 960.2,
+   "gain": 12.9,
+   "days": 17,
+   "ema": 1098.24,
+   "close": 1084.15,
+   "low": 1081.4
+  },
+  {
+   "symbol": "BHARTIARTL",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-07",
+   "signal_close": 1837.2,
+   "gain": 12.9,
+   "days": 34,
+   "ema": 2111.24,
+   "close": 2075.1,
+   "low": 2068.0
   },
   {
    "symbol": "APOLLOHOSP",
@@ -189,11 +200,11 @@
    "status": "riding",
    "signal": "2026-10-29",
    "signal_close": 8214.0,
-   "gain": 13.3,
-   "days": 18,
-   "ema": 9020.58,
-   "close": 9303.5,
-   "low": 9272.0
+   "gain": 11.8,
+   "days": 19,
+   "ema": 9052.47,
+   "close": 9180.0,
+   "low": 9169.0
   },
   {
    "symbol": "ETERNAL",
@@ -201,83 +212,11 @@
    "status": "riding",
    "signal": "2026-10-27",
    "signal_close": 330.7,
-   "gain": 11.6,
-   "days": 20,
-   "ema": 366.57,
-   "close": 369.05,
-   "low": 364.05
-  },
-  {
-   "symbol": "BAJAJFINSV",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-11-03",
-   "signal_close": 1718.2,
-   "gain": 10.2,
-   "days": 15,
-   "ema": 1879.44,
-   "close": 1893.6,
-   "low": 1889.6
-  },
-  {
-   "symbol": "ASIANPAINT",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-11-02",
-   "signal_close": 2334.1,
-   "gain": 10.0,
-   "days": 16,
-   "ema": 2577.37,
-   "close": 2566.4,
-   "low": 2557.3
-  },
-  {
-   "symbol": "AXISBANK",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-11-05",
-   "signal_close": 1287.3,
-   "gain": 9.9,
-   "days": 13,
-   "ema": 1385.59,
-   "close": 1414.6,
-   "low": 1408.9
-  },
-  {
-   "symbol": "HDFCLIFE",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-11-05",
-   "signal_close": 547.15,
-   "gain": 9.6,
-   "days": 13,
-   "ema": 587.59,
-   "close": 599.65,
-   "low": 598.25
-  },
-  {
-   "symbol": "LT",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-28",
-   "signal_close": 3830.5,
-   "gain": 8.6,
-   "days": 19,
-   "ema": 4148.77,
-   "close": 4161.6,
-   "low": 4128.3
-  },
-  {
-   "symbol": "CIPLA",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-26",
-   "signal_close": 1347.9,
-   "gain": 8.0,
+   "gain": 10.1,
    "days": 21,
-   "ema": 1421.04,
-   "close": 1456.3,
-   "low": 1437.1
+   "ema": 366.08,
+   "close": 364.1,
+   "low": 363.1
   },
   {
    "symbol": "SBILIFE",
@@ -285,23 +224,11 @@
    "status": "riding",
    "signal": "2026-11-04",
    "signal_close": 1707.1,
-   "gain": 7.9,
-   "days": 14,
-   "ema": 1807.67,
-   "close": 1842.7,
-   "low": 1818.0
-  },
-  {
-   "symbol": "SUNPHARMA",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-30",
-   "signal_close": 1791.2,
-   "gain": 7.1,
-   "days": 17,
-   "ema": 1887.07,
-   "close": 1918.1,
-   "low": 1901.6
+   "gain": 8.5,
+   "days": 15,
+   "ema": 1816.49,
+   "close": 1851.8,
+   "low": 1833.1
   },
   {
    "symbol": "BEL",
@@ -309,35 +236,71 @@
    "status": "riding",
    "signal": "2026-11-03",
    "signal_close": 381.05,
-   "gain": 6.9,
-   "days": 15,
-   "ema": 400.8,
-   "close": 407.3,
-   "low": 404.5
+   "gain": 8.2,
+   "days": 16,
+   "ema": 403.09,
+   "close": 412.25,
+   "low": 405.1
   },
   {
-   "symbol": "NESTLEIND",
+   "symbol": "AXISBANK",
    "index": false,
    "status": "riding",
-   "signal": "2026-11-04",
-   "signal_close": 1246.5,
-   "gain": 6.9,
+   "signal": "2026-11-05",
+   "signal_close": 1287.3,
+   "gain": 8.0,
    "days": 14,
-   "ema": 1310.41,
-   "close": 1332.8,
-   "low": 1329.2
+   "ema": 1386.53,
+   "close": 1390.3,
+   "low": 1388.3
   },
   {
-   "symbol": "JIOFIN",
+   "symbol": "BAJAJFINSV",
    "index": false,
    "status": "riding",
    "signal": "2026-11-03",
-   "signal_close": 214.55,
-   "gain": 6.5,
-   "days": 15,
-   "ema": 225.53,
-   "close": 228.56,
-   "low": 223.8
+   "signal_close": 1718.2,
+   "gain": 7.9,
+   "days": 16,
+   "ema": 1874.29,
+   "close": 1853.7,
+   "low": 1848.3
+  },
+  {
+   "symbol": "HDFCLIFE",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-11-05",
+   "signal_close": 547.15,
+   "gain": 7.9,
+   "days": 14,
+   "ema": 588.11,
+   "close": 590.2,
+   "low": 589.15
+  },
+  {
+   "symbol": "LT",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-28",
+   "signal_close": 3830.5,
+   "gain": 7.6,
+   "days": 20,
+   "ema": 4143.41,
+   "close": 4122.0,
+   "low": 4115.3
+  },
+  {
+   "symbol": "CIPLA",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-26",
+   "signal_close": 1347.9,
+   "gain": 7.1,
+   "days": 22,
+   "ema": 1425.61,
+   "close": 1443.9,
+   "low": 1441.3
   },
   {
    "symbol": "JSWSTEEL",
@@ -345,11 +308,47 @@
    "status": "riding",
    "signal": "2026-10-19",
    "signal_close": 1242.5,
-   "gain": 5.6,
-   "days": 25,
-   "ema": 1317.66,
-   "close": 1312.1,
-   "low": 1304.0
+   "gain": 6.4,
+   "days": 26,
+   "ema": 1318.45,
+   "close": 1321.6,
+   "low": 1313.0
+  },
+  {
+   "symbol": "SUNPHARMA",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-30",
+   "signal_close": 1791.2,
+   "gain": 6.2,
+   "days": 18,
+   "ema": 1889.93,
+   "close": 1901.4,
+   "low": 1898.1
+  },
+  {
+   "symbol": "NESTLEIND",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-11-04",
+   "signal_close": 1246.5,
+   "gain": 5.9,
+   "days": 15,
+   "ema": 1312.29,
+   "close": 1319.8,
+   "low": 1317.0
+  },
+  {
+   "symbol": "JIOFIN",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-11-03",
+   "signal_close": 214.55,
+   "gain": 4.1,
+   "days": 16,
+   "ema": 225.11,
+   "close": 223.43,
+   "low": 222.99
   },
   {
    "symbol": "TCS",
@@ -357,23 +356,11 @@
    "status": "riding",
    "signal": "2026-11-25",
    "signal_close": 2529.2,
-   "gain": 5.2,
-   "days": 1,
-   "ema": 2484.34,
-   "close": 2659.7,
-   "low": 2536.9
-  },
-  {
-   "symbol": "ADANIPORTS",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-29",
-   "signal_close": 1869.0,
-   "gain": 3.2,
-   "days": 18,
-   "ema": 1916.73,
-   "close": 1928.3,
-   "low": 1900.0
+   "gain": 2.0,
+   "days": 2,
+   "ema": 2503.58,
+   "close": 2580.5,
+   "low": 2575.0
   },
   {
    "symbol": "ADANIENT",
@@ -381,11 +368,23 @@
    "status": "riding",
    "signal": "2026-11-02",
    "signal_close": 2618.4,
-   "gain": 2.3,
-   "days": 16,
-   "ema": 2689.64,
-   "close": 2678.2,
-   "low": 2658.0
+   "gain": 1.1,
+   "days": 17,
+   "ema": 2681.17,
+   "close": 2647.3,
+   "low": 2633.7
+  },
+  {
+   "symbol": "ADANIPORTS",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-10-29",
+   "signal_close": 1869.0,
+   "gain": 1.1,
+   "days": 19,
+   "ema": 1911.43,
+   "close": 1890.2,
+   "low": 1884.1
   },
   {
    "symbol": "NTPC",
@@ -393,11 +392,11 @@
    "status": "riding",
    "signal": "2026-11-02",
    "signal_close": 320.8,
-   "gain": 0.6,
-   "days": 16,
-   "ema": 320.41,
-   "close": 322.8,
-   "low": 318.55
+   "gain": -0.2,
+   "days": 17,
+   "ema": 320.35,
+   "close": 320.1,
+   "low": 319.55
   }
  ],
  "rule": "EMA 9 lift-off alert (19 Nov 2026, Amritpal: \"can an alert be generated if a candle leaves a rising EMA\").\nINFORMATION ONLY. Tested in tools/research/ema_liftoff.py (project doc ema-liftoff-candle-test), daily futures 2007-26:\n  lift-off = first candle whose LOW is above a RISING EMA 9 (EMA above its value 3 sessions ago), none in the previous 10 sessions\n  ride until the first candle whose HIGH is below EMA 9 (\"left below\") -> out next open\n  Bank Nifty: 5 trades/yr, 42% win, avg +1.95% (median -0.6%), profit factor 2.1; 2017-26 avg +0.94%. Nifty avg +0.96%, PF 2.0.\n  53 F&O stocks: avg +1.46%, PF 1.6. The candle alone does not predict direction (10-day return = any day); the gain comes from\n  riding the few big trends. Short side (candle fully below a falling EMA) LOST money - not alerted as a short."

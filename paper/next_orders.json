@@ -1,7 +1,7 @@
 {
   "BANKNIFTY": {
-    "date": "2026-11-26 00:00:00",
-    "close": 63858.2,
+    "date": "2026-11-27 00:00:00",
+    "close": 63281.2,
     "prev_top": 63946.8,
     "prev_bottom": 62600.8,
     "position": "LONG from 54,403.00 (2026-10-28)",
@@ -13,16 +13,16 @@
       "Entry": 54403.0,
       "Stop-loss (reverse)": 62575.8
     },
-    "open_pnl": 9455.2,
+    "open_pnl": 8878.2,
     "breakeven_active": "True",
     "futures_contract_expiry": "2026-12-29",
     "lot_size": 30,
-    "spot_close": 63535.3
+    "spot_close": 63040.9
   },
   "NIFTY": {
-    "date": "2026-11-26 00:00:00",
-    "close": 26029.4,
-    "prev_top": 25775.3,
+    "date": "2026-11-27 00:00:00",
+    "close": 25699.3,
+    "prev_top": 26029.4,
     "prev_bottom": 25369.5,
     "position": "LONG from 25,427.30 (2026-11-19)",
     "orders": [
@@ -33,10 +33,10 @@
       "Entry": 25427.3,
       "Stop-loss": 25427.3
     },
-    "open_pnl": 602.1,
+    "open_pnl": 272.0,
     "breakeven_active": "True",
     "futures_contract_expiry": "2026-12-29",
     "lot_size": 65,
-    "spot_close": 25884.5
+    "spot_close": 25607.2
   }
 }
