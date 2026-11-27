@@ -308,6 +308,18 @@ class AngelBroker:
             self.log("⚠️ backstop order rejected")
         return oid
 
+    def modify_stop(self, oid, con, side, qty, trig):
+        """27 Nov 2026: move a resting backstop in place (no moment without a stop). True when Angel accepted it."""
+        if self.dry or not oid or str(oid).startswith("DRY"):
+            return False
+        trig = self._round(con, trig, side == "BUY")
+        price = self._round(con, trig * (1.01 if side == "BUY" else 0.99), side == "BUY")
+        r = self.api.modifyOrder(self._params(con, side, qty, price, kind="SL", trig=trig, oid=oid))
+        ok = bool(r) and (not isinstance(r, dict) or r.get("status") in (True, "true", "SUCCESS") or r.get("data"))
+        if not ok:
+            self.log(f"backstop modify refused: {r}")
+        return ok
+
     def cancel(self, oid, variety="STOPLOSS"):
         if not oid or str(oid).startswith("DRY"):
             return

@@ -1742,3 +1742,93 @@ def test_moomoo_tb_late_switch_on(tmp_path):
     P = J.st["pos"]["AU"]; assert "TECH" in P and P["TECH"]["state"] in ("pending", "watch") and "ASIA" not in P
     J.step(); assert len(J.st["pos"]["AU"]) == 1                # once a day
     os.environ.pop("TB_WORLD_FILE", None)
+
+
+def _mmtb_open(tmp_path, **mock):
+    """27 Nov 2026 helper: XLF bought by the US Top Bottom bot with a resting GTC STOP on moomoo."""
+    import json as _j
+    from datetime import datetime
+    W = dict(markets=dict(US=dict(asof="2026-11-23", symbols=dict(XLF=dict(date="2026-11-23", open=55, high=56, low=55, close=55.6, top=58.68,
+             bot=54.0, buy_lvl=58.71, bot_stop=53.97))), AU=dict(asof="2026-11-23", symbols={})))
+    wf = os.path.join(str(tmp_path), "tbw.json"); _j.dump(W, open(wf, "w")); os.environ["TB_WORLD_FILE"] = wf
+    A, c = client(tmp_path)
+    import mm_tb
+    J = A.mmtb_job(); J.live_on = lambda: True; A.moomoo.reject = {"STOP_LIMIT"}
+    for k, v in mock.items():
+        setattr(A.moomoo, k, v)
+    clock = {"t": datetime(2026, 11, 24, 9, 10, tzinfo=mm_tb.MKT["US"]["tz"])}
+    J.now = lambda mk: clock["t"] if mk == "US" else datetime(2026, 11, 22, 12, 0, tzinfo=mm_tb.MKT["AU"]["tz"])
+    J.auto_on = lambda mk: mk == "US"; J.set_cfg("US", capital=10000); J.st["cfg"]["US"]["symbols"] = ["XLF"]
+    J.step()
+    A.moomoo.px["XLF"] = 58.9; clock["t"] = datetime(2026, 11, 24, 10, 0, tzinfo=mm_tb.MKT["US"]["tz"]); J.step(); J.step()
+    p = J.st["pos"]["US"]["XLF"]; assert p["state"] == "open" and p["stop_oid"], p
+    assert A.moomoo.orders[p["stop_oid"]]["status"] == "SUBMITTED"
+    return A, J, W, wf, clock, mm_tb
+
+
+def _mmtb_entry_day_fail(J, W, wf, clock, mm_tb):
+    import json as _j
+    from datetime import datetime
+    W["markets"]["US"]["asof"] = "2026-11-24"; W["markets"]["US"]["symbols"]["XLF"].update(date="2026-11-24", high=59.0, close=58.0)
+    _j.dump(W, open(wf, "w")); clock["t"] = datetime(2026, 11, 25, 9, 10, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+
+
+def _mmtb_open_hours(J, clock, mm_tb):
+    from datetime import datetime
+    clock["t"] = datetime(2026, 11, 25, 9, 40, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+
+
+def test_moomoo_tb_exit_sells_before_cancelling_stop(tmp_path):
+    A, J, W, wf, clock, mm_tb = _mmtb_open(tmp_path)
+    stop = J.st["pos"]["US"]["XLF"]["stop_oid"]
+    _mmtb_entry_day_fail(J, W, wf, clock, mm_tb)
+    p = J.st["pos"]["US"]["XLF"]; assert p["state"] == "exiting"
+    assert A.moomoo.orders[stop]["status"] == "SUBMITTED"                    # stop still resting while the sell works
+    _mmtb_open_hours(J, clock, mm_tb)
+    assert not J.st["pos"]["US"] and A.moomoo.orders[stop]["status"] == "CANCELLED_ALL" and A.moomoo.pos["XLF"] == 0
+    os.environ.pop("TB_WORLD_FILE", None)
+
+
+def test_moomoo_tb_exit_when_stop_locks_shares(tmp_path):
+    A, J, W, wf, clock, mm_tb = _mmtb_open(tmp_path, lock_by_stop=True)
+    _mmtb_entry_day_fail(J, W, wf, clock, mm_tb)
+    p = J.st["pos"]["US"]["XLF"]; assert p["state"] == "exiting" and p["stop_oid"] is None    # stop cancelled only because moomoo required it
+    _mmtb_open_hours(J, clock, mm_tb); assert not J.st["pos"]["US"] and A.moomoo.pos["XLF"] == 0
+    os.environ.pop("TB_WORLD_FILE", None)
+
+
+def test_moomoo_tb_double_fill_bought_back(tmp_path):
+    A, J, W, wf, clock, mm_tb = _mmtb_open(tmp_path)
+    stop = J.st["pos"]["US"]["XLF"]["stop_oid"]
+    _mmtb_entry_day_fail(J, W, wf, clock, mm_tb)
+    A.moomoo.trigger(stop, 57.5)                                             # the stop fires too
+    assert A.moomoo.pos["XLF"] < 0
+    _mmtb_open_hours(J, clock, mm_tb)
+    assert A.moomoo.pos["XLF"] == 0 and not J.st["pos"]["US"]
+    os.environ.pop("TB_WORLD_FILE", None)
+
+
+def test_moomoo_tb_stop_first_drops_our_sell(tmp_path):
+    A, J, W, wf, clock, mm_tb = _mmtb_open(tmp_path)
+    p = J.st["pos"]["US"]["XLF"]; stop = p["stop_oid"]
+    A.moomoo.trigger(stop, 57.0); J.step()
+    assert not J.st["pos"]["US"] and J.st["trades"][-1]["why"] == "stop" and A.moomoo.pos["XLF"] == 0
+    os.environ.pop("TB_WORLD_FILE", None)
+
+
+def test_moomoo_tb_stop_raised_in_place(tmp_path):
+    import json as _j
+    from datetime import datetime
+    A, J, W, wf, clock, mm_tb = _mmtb_open(tmp_path)
+    p = J.st["pos"]["US"]["XLF"]; stop = p["stop_oid"]
+    W["markets"]["US"]["asof"] = "2026-11-24"; W["markets"]["US"]["symbols"]["XLF"].update(date="2026-11-24", high=59.5, close=59.4, bot_stop=58.2)
+    _j.dump(W, open(wf, "w")); clock["t"] = datetime(2026, 11, 25, 9, 10, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+    p = J.st["pos"]["US"]["XLF"]
+    assert p["stop_oid"] == stop and A.moomoo.orders[stop]["stop"] == p["stop"] == p["stop_rest"] and p["stop"] >= 58.0
+    # modify refused -> new stop placed first, old one cancelled after
+    A.moomoo.refuse_modify = True
+    W["markets"]["US"]["asof"] = "2026-11-25"; W["markets"]["US"]["symbols"]["XLF"].update(date="2026-11-25", high=60.5, close=60.4, bot_stop=59.0)
+    _j.dump(W, open(wf, "w")); clock["t"] = datetime(2026, 11, 26, 9, 10, tzinfo=mm_tb.MKT["US"]["tz"]); J.step()
+    p = J.st["pos"]["US"]["XLF"]
+    assert p["stop_oid"] != stop and A.moomoo.orders[stop]["status"] == "CANCELLED_ALL" and A.moomoo.orders[p["stop_oid"]]["status"] == "SUBMITTED"
+    os.environ.pop("TB_WORLD_FILE", None)

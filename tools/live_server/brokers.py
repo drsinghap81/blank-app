@@ -653,6 +653,18 @@ class MoomooTrade(MoomooRO):
         finally:
             t.close()
 
+    def modify(self, oid, qty, price, aux=None, mk="US"):
+        """27 Nov 2026: move a resting stop in place (no moment without one). Raises when moomoo refuses."""
+        m, t, env = self._t(mk)
+        try:
+            ret, d = t.modify_order(m.ModifyOrderOp.NORMAL, oid, float(qty), float(price), trd_env=env,
+                                    acc_id=self.acc if mk == "US" else 0, aux_price=aux)
+            if ret != m.RET_OK:
+                raise RuntimeError(str(d))
+            return True
+        finally:
+            t.close()
+
     def orders_today(self, mk="US"):
         """24 Nov 2026: today's orders in this market (manual order ticket): list of dict(id, sym, side, qty, price, aux, type, status, dealt, avg, time)."""
         m, t, env = self._t(mk)
@@ -727,6 +739,9 @@ class MockMoomoo:
             raise RuntimeError(f"order type {otype} not supported")
         if otype in ("STOP", "STOP_LIMIT"):
             self.orders[oid] = dict(sym=sym, qty=qty, stop=aux, status="SUBMITTED", dealt=0.0, avg=0.0); return oid
+        if side == "SELL" and getattr(self, "lock_by_stop", False) and any(o["sym"] == sym and o["status"] == "SUBMITTED" and o.get("stop") is not None
+                                                                         for o in self.orders.values()):
+            raise RuntimeError("insufficient sellable quantity")
         px = self.px.get(sym, 100.0); self.pos[sym] = self.pos.get(sym, 0) + (qty if side == "BUY" else -qty)
         self.orders[oid] = dict(sym=sym, qty=qty, status="FILLED_ALL", dealt=float(qty), avg=px); return oid
 
@@ -747,6 +762,15 @@ class MockMoomoo:
         if oid in self.orders and self.orders[oid]["status"] == "SUBMITTED":
             self.orders[oid]["status"] = "CANCELLED_ALL"
         return True
+
+    def modify(self, oid, qty, price, aux=None, mk="US"):
+        if getattr(self, "refuse_modify", False):
+            raise RuntimeError("modify refused")
+        self.orders[oid]["stop"] = aux; return True
+
+    def trigger(self, oid, px):
+        """test helper: a resting stop fires and fills at px."""
+        o = self.orders[oid]; o.update(status="FILLED_ALL", dealt=float(o["qty"]), avg=px); self.pos[o["sym"]] = self.pos.get(o["sym"], 0) - o["qty"]
 
 
 class MockBroker(AngelEquity):

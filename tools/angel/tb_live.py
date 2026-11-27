@@ -424,14 +424,37 @@ class TradingDay:
         self.place_backstop(stop)
 
     def exit_position(self, why, sys_px):
+        """27 Nov 2026 (Amritpal: real money - be very accurate): SELL FIRST, cancel the resting backstop only after the exit has
+        filled. If the backstop had already filled, book that instead of selling again; if both filled in the same moment, the
+        extra is bought back at once. Sells only what Angel shows held (a hand square-off is never doubled into a short)."""
         st = self.st
-        self.cancel_backstop()
         side = "SELL" if st.qty > 0 else "BUY"
-        fill = self.br.execute(st.contract, side, abs(st.qty), why, must_fill=True)
+        bs = self._order_state(st.backstop_id)
+        if bs and bs["status"] == "complete" and bs["filled"] >= abs(st.qty):
+            st.backstop_id = None
+            self._book_exit(why + " (exchange stop filled first)", sys_px, bs["avg"] or sys_px)
+            return
+        qty = abs(st.qty)
+        held = self._held(st.contract)
+        if held is not None:
+            held = held * (1 if st.qty > 0 else -1)                 # same direction as the bot's position, else 0
+            qty = max(0, min(qty, held))
+        if qty == 0:
+            self.cancel_backstop()
+            self.say(f"⚠️ {why}: Angel shows no {st.contract} position - nothing sold, backstop cancelled. Bot now FLAT.")
+            self._book_exit(why + " (already flat in Angel)", sys_px, sys_px)
+            return
+        fill = self.br.execute(st.contract, side, qty, why, must_fill=True)
         if fill is None:
             st.halted = True
-            self.say(f"🚨 EXIT {why} NOT FILLED for {st.contract} — bot halted, close it manually in Angel!")
+            self.say(f"🚨 EXIT {why} NOT FILLED for {st.contract} — the exchange stop is still in place. Bot halted, close it in Angel!")
+            self.save()
             return
+        self._drop_backstop_after_exit(st.contract, side)
+        self._book_exit(why, sys_px, fill)
+
+    def _book_exit(self, why, sys_px, fill):
+        st = self.st
         sign = 1 if st.qty > 0 else -1
         pts_sys = (sys_px - st.entry) * sign
         last = st.trades[-1] if st.trades else {}
@@ -441,19 +464,73 @@ class TradingDay:
                  f"fill P&L ₹{last['PnL_fill']:,.0f}")
         st.pos, st.qty, st.contract, st.be_on = 0, 0, None, False
 
+    def _order_state(self, oid):
+        if not oid or str(oid).startswith(("DRY", "BS")) or not hasattr(self.br, "order"):
+            return None
+        try:
+            return self.br.order(oid)
+        except Exception as e:  # noqa: BLE001
+            self.log(f"order status {oid} failed: {e}")
+            return None
+
+    def _held(self, con):
+        """signed qty Angel holds in this contract, or None when it can't be read (dry run / API error)."""
+        if getattr(self.br, "dry", True) or not hasattr(self.br, "net_qty"):
+            return None
+        try:
+            return int(self.br.net_qty().get(con, 0))
+        except Exception as e:  # noqa: BLE001
+            self.log(f"positions read failed: {e}")
+            return None
+
+    def _drop_backstop_after_exit(self, con, exit_side):
+        """after the bot's own exit filled: cancel the backstop; if it filled too, buy / sell the extra straight back."""
+        oid = self.st.backstop_id
+        self.cancel_backstop()
+        if not oid or getattr(self.br, "dry", True):
+            return
+        time.sleep(1)
+        o = self._order_state(oid)
+        if o and o["filled"] > 0:
+            back = "BUY" if exit_side == "SELL" else "SELL"
+            px = self.br.execute(con, back, o["filled"], "Undo double fill", must_fill=True)
+            self.say(f"🚨 The exchange stop ALSO filled ({o['filled']} @ {o['avg']:,.2f}) as the bot exited - "
+                     + (f"{back} {o['filled']} placed back @ {px:,.2f}. Check Angel shows no {con} position." if px is not None
+                        else f"{back} {o['filled']} to undo it FAILED - close the extra {con} position in Angel NOW!"))
+
     def place_backstop(self, stop=None):
-        """resting exchange stop just beyond the bot stop (protection if the bot dies)."""
+        """resting exchange stop just beyond the bot stop (protection if the bot dies). 27 Nov 2026: an existing stop is MODIFIED
+        (no moment without one); if that fails the new one is placed first and the old one cancelled after."""
         st, c = self.st, self.cfg
         if st.pos == 0:
             return
-        self.cancel_backstop()
         stop = stop if stop is not None else self.plan["prot"]
         if stop is None:
             return
         k = c["backstop_pct"] / 100
         trig = stop * (1 - k) if st.pos > 0 else stop * (1 + k)
-        st.backstop_id = self.br.stop_limit(st.contract, "SELL" if st.pos > 0 else "BUY", abs(st.qty), trig)
-        self.log(f"backstop {st.backstop_id} trigger {trig:,.2f}")
+        side = "SELL" if st.pos > 0 else "BUY"
+        old = st.backstop_id
+        if old and hasattr(self.br, "modify_stop"):
+            o = self._order_state(old)
+            if o is None or o["status"] not in ("complete", "cancelled", "rejected"):
+                try:
+                    if self.br.modify_stop(old, st.contract, side, abs(st.qty), trig):
+                        self.log(f"backstop {old} moved to trigger {trig:,.2f}")
+                        self.save()
+                        return
+                except Exception as e:  # noqa: BLE001
+                    self.log(f"backstop modify failed: {e}")
+        new = self.br.stop_limit(st.contract, side, abs(st.qty), trig)
+        if not new:
+            self.say(f"⚠️ New exchange stop at {trig:,.2f} was refused - " + ("the old one stays in place." if old else
+                     "NO exchange stop on Angel; the bot still watches its stop while it runs. Place an SL in Angel."))
+            self.save()
+            return
+        if old:
+            self.br.cancel(old)
+        st.backstop_id = new
+        self.log(f"backstop {new} trigger {trig:,.2f}")
         self.save()
 
     def cancel_backstop(self):
@@ -487,12 +564,14 @@ class TradingDay:
         self.rolled = True
         new = self.br.next_contract(st.contract)
         side = "BUY" if st.qty > 0 else "SELL"
-        self.cancel_backstop()
-        out = self.br.execute(st.contract, "SELL" if st.qty > 0 else "BUY", abs(st.qty), "Roll out", must_fill=True)
+        out_side = "SELL" if st.qty > 0 else "BUY"
+        out = self.br.execute(st.contract, out_side, abs(st.qty), "Roll out", must_fill=True)   # old contract's stop stays until this fills
         if out is None:
             st.halted = True
-            self.say("🚨 Rollover exit failed — bot halted, check Angel!")
+            self.say("🚨 Rollover exit failed — the old contract's exchange stop is still in place. Bot halted, check Angel!")
+            self.save()
             return
+        self._drop_backstop_after_exit(st.contract, out_side)
         qty = self.lots_qty(new, st.lots)
         inn = self.br.execute(new, side, qty, "Roll in", must_fill=True)
         if inn is None:

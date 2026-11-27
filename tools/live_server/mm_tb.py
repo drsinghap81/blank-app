@@ -20,6 +20,7 @@ import json
 import math
 import os
 import threading
+import time
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -192,14 +193,10 @@ class MMTB:
                 continue
             e = p["entry"]; p["hi"] = max(p.get("hi") or e, bar["high"]); p["be"] = p.get("be") or p["hi"] >= e * (1 + BE)
             if p.get("entry_date") == bar["date"] and bar["close"] < e * (1 - DAY_SL):
-                self._cancel(mk, p.get("stop_oid")); px = down(bar["close"] * 0.97, mk)
-                try:
-                    p["exit_oid"] = self._place(mk, sym, "SELL", p["qty"], "NORMAL", px)
-                    p["state"] = "exiting"; p["why"] = "entry-day close more than 1% below entry"
+                px = down(bar["close"] * 0.97, mk)
+                if self._sell_keep_stop(mk, sym, p, px, "entry-day close more than 1% below entry"):
                     self.note(mk, f"{sym}: entry day closed {bar['close']} < {e * (1 - DAY_SL):.3f} -> sell {p['qty']} at the open")
                     self.alert(f"moomoo {sym}: entry-day rule - selling {p['qty']} at the open", key=f"mmtb:eds:{mk}:{sym}:{today}")
-                except Exception as ex:  # noqa: BLE001
-                    self.note(mk, f"{sym}: exit order refused ({str(ex)[:100]}) - sell it in moomoo")
                 continue
             ns = max(e * (1 - MAX_SL), bar.get("bot_stop") or 0.0)
             if p["be"]:
@@ -208,11 +205,7 @@ class MMTB:
             if ns > (p.get("stop") or 0) + tick(ns, mk) / 2:
                 old = p.get("stop"); p["stop"] = ns
                 if p.get("stop_oid"):
-                    self._cancel(mk, p["stop_oid"]); p["stop_oid"] = None
-                    try:
-                        p["stop_oid"] = self._place(mk, sym, "SELL", p["qty"], "STOP", ns, aux=ns, tif="GTC")
-                    except Exception as ex:  # noqa: BLE001
-                        self.note(mk, f"{sym}: stop order refused ({str(ex)[:80]}) - the server watches {ns} itself")
+                    self._move_stop(mk, sym, p, ns)
                 self.note(mk, f"{sym}: stop raised {old} -> {ns}{' (breakeven)' if p['be'] and ns >= e else ''}")
         if self.auto_on(mk):
             self._entries(mk, n, late=late)
@@ -319,25 +312,91 @@ class MMTB:
                 if p.get("stop_oid"):
                     o = self._order(mk, p["stop_oid"])
                     if o["dealt"] >= p["qty"] - 1e-9 and o["dealt"] > 0:
-                        self._closed(mk, sym, p, o["avg"], "stop", n)
-                else:
+                        self._closed(mk, sym, p, o["avg"], "stop", n); continue
+                rest = p.get("stop_rest", p.get("stop")) if p.get("stop_oid") else None
+                if rest is None or rest < p["stop"] - tick(p["stop"], mk) / 2:
                     last = ((snap or {}).get(sym) or {}).get("last")
-                    if last and last <= p["stop"]:
-                        try:
-                            p["exit_oid"] = self._place(mk, sym, "SELL", p["qty"], "NORMAL", down(last * 0.99, mk)); p["state"] = "exiting"
-                            p["why"] = "stop (watched by the server)"; self.note(mk, f"{sym}: {last} at/below stop {p['stop']} -> sell")
-                        except Exception as ex:  # noqa: BLE001
-                            self.note(mk, f"{sym}: sell refused ({str(ex)[:80]}) - sell it in moomoo")
+                    if last and last <= p["stop"] and not after_close:
+                        if self._sell_keep_stop(mk, sym, p, down(last * 0.99, mk), "stop (watched by the server)"):
+                            self.note(mk, f"{sym}: {last} at/below stop {p['stop']} -> sell")
             elif st == "exiting":
                 o = self._order(mk, p.get("exit_oid"))
+                so = self._order(mk, p["stop_oid"]) if p.get("stop_oid") else None
+                if so and so["dealt"] > 0 and o["dealt"] <= 0:          # the resting stop got there first: drop our sell
+                    self._cancel(mk, p.get("exit_oid")); time.sleep(0 if self.mock else 1)
+                    o = self._order(mk, p.get("exit_oid"))
+                    if o["dealt"] <= 0:
+                        p["stop_oid"] = None; self._closed(mk, sym, p, so["avg"], "stop", n); continue
                 if o["dealt"] >= p["qty"] - 1e-9 and o["dealt"] > 0:
+                    self._after_exit(mk, sym, p)
                     self._closed(mk, sym, p, o["avg"], p.get("why") or "exit", n)
+
+    @property
+    def mock(self):
+        return type(self.mm).__name__ == "MockMoomoo"
+
+    # 27 Nov 2026 (Amritpal: real money - be very accurate): a position is never left without a stop
+    def _sell_keep_stop(self, mk, sym, p, px, why):
+        """place the exit sell while the resting stop stays. If moomoo refuses (shares locked by the stop), cancel the stop, sell,
+        and if that is refused too put the stop straight back. True when a sell order is working."""
+        try:
+            p["exit_oid"] = self._place(mk, sym, "SELL", p["qty"], "NORMAL", px)
+        except Exception as ex:  # noqa: BLE001
+            if not p.get("stop_oid"):
+                self.note(mk, f"{sym}: sell refused ({str(ex)[:80]}) - sell it in moomoo"); return False
+            self._cancel(mk, p["stop_oid"]); old = p["stop_oid"]; p["stop_oid"] = None
+            try:
+                p["exit_oid"] = self._place(mk, sym, "SELL", p["qty"], "NORMAL", px)
+                self.note(mk, f"{sym}: sell needed the stop {old} cancelled first (moomoo: {str(ex)[:60]})")
+            except Exception as ex2:  # noqa: BLE001
+                try:
+                    p["stop_oid"] = self._place(mk, sym, "SELL", p["qty"], "STOP", p["stop"], aux=p["stop"], tif="GTC"); p["stop_rest"] = p["stop"]
+                    self.note(mk, f"{sym}: sell refused ({str(ex2)[:80]}) - stop put back at {p['stop']}; sell it in moomoo")
+                except Exception as ex3:  # noqa: BLE001
+                    self.note(mk, f"{sym}: sell AND stop refused ({str(ex3)[:60]}) - NO STOP, sell it in moomoo now")
+                    self.alert(f"moomoo {sym}: exit and stop both refused - sell it in moomoo now", key=f"mmtb:nostop:{mk}:{sym}")
+                return False
+        p["state"] = "exiting"; p["why"] = why
+        return True
+
+    def _after_exit(self, mk, sym, p):
+        """our sell filled: cancel the resting stop; if it filled as well, buy the extra straight back."""
+        oid = p.get("stop_oid")
+        if not oid:
+            return
+        self._cancel(mk, oid); p["stop_oid"] = None
+        if not self.mock:
+            time.sleep(1)
+        o = self._order(mk, oid)
+        if o["dealt"] > 0:
+            try:
+                self._place(mk, sym, "BUY", o["dealt"], "MARKET" if mk == "US" else "NORMAL",
+                            0 if mk == "US" else round(float(o["avg"]) * 1.02, 2))
+                self.note(mk, f"{sym}: the stop ALSO filled ({o['dealt']:g}) - bought the extra back")
+                self.alert(f"moomoo {sym}: stop and exit both filled - extra {o['dealt']:g} bought back; check moomoo", key=f"mmtb:dbl:{mk}:{sym}")
+            except Exception as ex:  # noqa: BLE001
+                self.alert(f"moomoo {sym}: stop and exit both filled - buy back {o['dealt']:g} in moomoo NOW ({str(ex)[:60]})", key=f"mmtb:dbl:{mk}:{sym}")
+
+    def _move_stop(self, mk, sym, p, ns):
+        """raise the resting stop in place; if moomoo won't modify it, place the new one first and cancel the old one after."""
+        oid = p["stop_oid"]
+        if oid != "DRY":
+            try:
+                self.mm.modify(oid, p["qty"], ns, aux=ns, mk=mk); p["stop_rest"] = ns; return
+            except Exception as ex:  # noqa: BLE001
+                self.note(mk, f"{sym}: stop modify refused ({str(ex)[:60]}) - placing a new one")
+        try:
+            new = self._place(mk, sym, "SELL", p["qty"], "STOP", ns, aux=ns, tif="GTC")
+        except Exception as ex:  # noqa: BLE001
+            self.note(mk, f"{sym}: new stop refused ({str(ex)[:60]}) - the old stop stays at {p.get('stop_rest')}; the server watches {ns}")
+            return
+        self._cancel(mk, oid); p["stop_oid"] = new; p["stop_rest"] = ns
 
     def _opened(self, mk, sym, p, avg, qty, n):
         p.update(state="open", entry=round(float(avg), 4), qty=float(qty), entry_date=n.date().isoformat(), hi=float(avg), be=False)
         st0 = min(p.get("stop0") or avg * (1 - MAX_SL), down(avg * 0.999, mk)); p["stop"] = st0
         try:
-            p["stop_oid"] = self._place(mk, sym, "SELL", qty, "STOP", st0, aux=st0, tif="GTC")
+            p["stop_oid"] = self._place(mk, sym, "SELL", qty, "STOP", st0, aux=st0, tif="GTC"); p["stop_rest"] = st0
         except Exception as ex:  # noqa: BLE001
             p["stop_oid"] = None; self.note(mk, f"{sym}: stop order refused ({str(ex)[:80]}) - the server watches {st0} itself")
         self.note(mk, f"{sym}: BOUGHT {qty:g} @ {avg} - stop {st0}")
