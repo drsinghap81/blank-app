@@ -151,6 +151,20 @@ def signals(sym, x, rs, nif, n50ok):
                 H = h[p]; pole = H / l[p - 30:p + 1].min() - 1
                 if pole >= 0.25 and l[p:t].min() >= H * 0.88 and c[t] > H and c[t - 1] <= H:
                     out.append(("Flag breakout", t, "chand", l[p:t].min()))
+        # episodic pivot: up >= 5% in a day on >= 3x the 50-day volume (any RS; RS >= 60 variant), buy next close
+        if dch >= 0.05 and v[t] >= 3 * v50[t]:
+            out.append(("Episodic pivot (5% day, 3x vol)", t, "chand", l[t]))
+            if r >= 70:
+                out.append(("Episodic pivot, RS >= 70", t, "chand", l[t]))
+        # volume breakout: close above the prior 50-day high on >= 2x volume, within 15% of the 52-week high, RS >= 70
+        if r >= 70 and c[t] > h[t - 50:t].max() and c[t - 1] <= h[t - 51:t - 1].max() and v[t] >= 2 * v50[t] and c[t] >= hh252[t] * 0.85:
+            out.append(("Volume breakout (50-day high, 2x vol)", t, "chand", None))
+        # tight weeks: 3+ weekly closes within 1.5% (here: closes 5, 10, 15 sessions apart), above the 50-day; buy on a close
+        # above the tight area's high, RS >= 70
+        if r >= 70 and t >= 20 and c[t] > s50[t]:
+            wk = [c[t - 1], c[t - 6], c[t - 11]]
+            if max(wk) / min(wk) - 1 <= 0.015 and c[t] > h[t - 15:t].max() and c[t - 1] <= h[t - 16:t - 1].max():
+                out.append(("Tight weeks breakout", t, "chand", l[t - 15:t].min()))
         # 10 EMA box: 4-15 closes at/above the 10 EMA, range <= 10%, uptrend at box start, breakout close above the box high
         k = t - 1; m = 0
         while k > 0 and c[k] >= e10[k] and m < 15:
