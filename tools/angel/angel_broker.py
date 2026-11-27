@@ -186,16 +186,21 @@ class AngelBroker:
     # ------------------------------------------------------------ market data
     def quote(self, con: str) -> dict:
         c = self.contracts[con]
-        for attempt in range(3):
+        # 27 Nov 2026: a short Angel blip (or the shared session being renewed - at most one re-login a minute) crashed the bots with
+        # "quote failed 3 times" inside 6 s; now ~1 minute of retries before giving up
+        waits = (2, 4, 8, 15, 30)
+        for attempt in range(len(waits) + 1):
             try:
                 r = self.api.ltpData(self.ex, con, c["token"])
                 d = r["data"]
                 return dict(ltp=float(d["ltp"]), open=float(d["open"]), high=float(d["high"]),
                             low=float(d["low"]), prev_close=float(d["close"]))
             except Exception as e:  # noqa: BLE001
+                if attempt == len(waits):
+                    break
                 self.log(f"quote failed ({e}), retrying")
-                time.sleep(1 + attempt)
-        raise RuntimeError("quote failed 3 times")
+                time.sleep(waits[attempt])
+        raise RuntimeError(f"quote failed {len(waits) + 1} times")
 
     def daily_bars(self, con: str, start: date, end: date):
         """[(date, o, h, l, c), ...] daily candles of one contract."""

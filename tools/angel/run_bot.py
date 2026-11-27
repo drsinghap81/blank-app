@@ -476,12 +476,21 @@ def main():
                 break
             time.sleep(cfg["poll_seconds"])
         # ---- after the close: record today's bar
-        wait_until(sess(cfg, "close", minutes=5), tg)
-        bars = [b for b in br.daily_bars(ref, today, today) if b[0] == today]
+        # 27 Nov 2026: MCX closes 23:55 IST in winter - close + 5 min was past midnight, when Angel's session has ended, and every MCX
+        # bot crashed ("quote failed") before saving the day. Record the day by 23:58 IST, and fall back to the last live quote.
+        wait_until(min(sess(cfg, "close", minutes=5), at("23:58")), tg)
+        try:
+            bars = [b for b in br.daily_bars(ref, today, today) if b[0] == today]
+        except Exception as e:  # noqa: BLE001
+            log(f"daily bar read failed: {e}"); bars = []
         if bars:
             b = bars[-1]; bar = dict(Open=b[1], High=b[2], Low=b[3], Close=b[4])
         else:
-            q = br.quote(ref); bar = dict(Open=q["open"], High=q["high"], Low=q["low"], Close=q["ltp"])
+            try:
+                q = br.quote(ref)
+            except Exception as e:  # noqa: BLE001
+                log(f"closing quote failed ({e}) - using the last price seen"); q = last_q
+            bar = dict(Open=q["open"], High=q["high"], Low=q["low"], Close=q["ltp"])
         new_hist = day.end_of_day(bar)
         own = pd.read_csv(HIST, index_col=0, parse_dates=True) if os.path.exists(HIST) else pd.DataFrame(columns=["Open", "High", "Low", "Close"])
         own.loc[pd.Timestamp(today)] = [bar["Open"], bar["High"], bar["Low"], bar["Close"]]

@@ -2292,10 +2292,12 @@ def tb_state(inst: str = "bn", _=Depends(auth)):
 
 
 @app.get("/api/tb/diag")
-def tb_diag(_=Depends(auth)):
-    """18 Nov 2026: what systemd says about the Top Bottom bot (written every minute by the watchdog)."""
+def tb_diag(inst: str = "bn", _=Depends(auth)):
+    """18 Nov 2026: what systemd says about the Top Bottom bot (written every minute by the watchdog).
+    27 Nov 2026: per bot - tb_diag_<inst>.txt (every card had shown the Bank Nifty bot's log)."""
+    _tbdir(inst)
     try:
-        t = open(os.path.join(DATA, "tb_diag.txt")).read()[-6000:]
+        t = open(os.path.join(DATA, "tb_diag.txt" if inst == "bn" else f"tb_diag_{inst}.txt")).read()[-6000:]
         # 19 Nov 2026: Angel's library prints request headers on errors - hide the API key, session token and IPs
         t = re.sub(r"('Authorization': 'Bearer )[^']+", r"\1[hidden]", t)
         t = re.sub(r"('X-PrivateKey': ')[^']+", r"\1[hidden]", t)

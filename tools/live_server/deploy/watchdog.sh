@@ -87,6 +87,27 @@ fi
   echo "--- setup / watchdog notes"; grep -n -A25 "Top Bottom\|tb_setup\|TB__SETUP" "$LOG" 2>/dev/null | grep -v "health\|restart" | tail -n 40
 } > "$VAR/tb_diag.txt" 2>&1
 chown trenddesk "$VAR/tb_diag.txt" 2>/dev/null
+# 27 Nov 2026: each bot's own log for its card (every card showed the Bank Nifty bot's): tb_diag_<inst>.txt
+for pair in "nifty:trenddesk-tb-nifty" $(for k in bel lt tmpv tcs; do echo "$k:trenddesk-tbs@$k"; done) $(for k in crude silver natgas gold; do echo "$k:trenddesk-tbm@$k"; done); do
+  k=${pair%%:*}; u=${pair#*:}
+  [ -f /etc/systemd/system/${u%@*}@.service ] || [ -f /etc/systemd/system/$u.service ] || continue
+  { echo "service: $(systemctl is-active $u)  checked: $(date -u +%FT%TZ)"; journalctl -u $u -n 25 --no-pager -o short-iso 2>&1 | tail -n 25; } > "$VAR/tb_diag_$k.txt" 2>&1
+  chown trenddesk "$VAR/tb_diag_$k.txt" 2>/dev/null
+done
+# 27 Nov 2026: after a reboot / crash the stock and MCX bots stayed down for the day (only Bank Nifty was started again). Start ONE
+# missing bot per minute (memory: 512 MB) inside its session, once a day each: stocks 08:29-15:20 IST, MCX 08:31-23:00 IST.
+if [ "$dow" -le 5 ]; then
+  for pair in $(for k in bel lt tmpv tcs; do echo "trenddesk-tbs@$k:0829:1520"; done) $(for k in crude silver natgas gold; do echo "trenddesk-tbm@$k:0831:2300"; done); do
+    u=${pair%%:*}; r=${pair#*:}; a=${r%%:*}; b=${r#*:}
+    systemctl is-enabled -q "${u%@*}@.service" 2>/dev/null || [ -f "/etc/systemd/system/${u%@*}@.service" ] || continue
+    [ -d "$VAR/tb_${u#*@}" ] || continue
+    if [ "$hm" -ge "$a" ] && [ "$hm" -lt "$b" ] && [ "$(cat "$VAR/tb_started_${u#*@}" 2>/dev/null)" != "$day" ] && ! systemctl is-active -q "$u"; then
+      echo "$day" > "$VAR/tb_started_${u#*@}"
+      systemctl start "$u" && log "$u started for today (was not running)" || log "$u start failed"
+      break
+    fi
+  done
+fi
 H=$(curl -s -m 10 http://127.0.0.1:8000/api/health || true)
 n=$(cat "$F" 2>/dev/null || echo 0)
 if echo "$H" | grep -q '"ok":true'; then
