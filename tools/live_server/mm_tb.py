@@ -141,6 +141,8 @@ class MMTB:
         # 27 Nov 2026 (Amritpal switched ASX on at 09:51, after the 09:35 check had already passed with it off): automation turned on
         # later in the day still places today's buy-stops while the market is open - only for ETFs still BELOW their buy level
         # (a level already crossed today is skipped, not chased), up to an hour before the close.
+        if self.st.get("ent_v") != 2:                # 27 Nov 2026: the first late-entry version marked the day done after a failed
+            self.st["ent_v"] = 2; self.st["ent"] = {}  # price read - let today's entries run once more
         if M["pre"] <= hm < (M["close"][0] - 1, M["close"][1]) and self.st.setdefault("ent", {}).get(mk) != today and self.auto_on(mk) \
                 and self.st["day"].get(mk) == today:
             self._entries(mk, n, late=hm >= M["open"])
