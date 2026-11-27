@@ -1766,8 +1766,8 @@ const TB_LABEL = { bn: 'Bank Nifty futures', nifty: 'Nifty futures · buy only',
   crude: 'MCX crude oil mini · both sides', silver: 'MCX silver micro · buy only above 200-day', natgas: 'MCX natural gas mini · buy only above 200-day', gold: 'MCX gold petal · buy only' };
 const TB_SHORT = { bn: 'BN', nifty: 'Nifty', bel: 'BEL', lt: 'L&T', tmpv: 'TMPV', tcs: 'TCS', crude: 'Crude', silver: 'Silver', natgas: 'Nat gas', gold: 'Gold' };
 // 27 Nov 2026 (Amritpal: "start paper trading on BTC and ETH top bottom"): paper/crypto_tb.json, written every 4 h by GitHub
-async function cryptoPaperLoad() {
-  const box = $('#cryptopaper'); if (!box) return;
+async function cryptoPaperLoad(boxIn = null) {
+  const box = boxIn || $('#cryptopaper'); if (!box) return;
   const J = await getJSON(MAIN + 'paper/crypto_tb.json', 'crypto_tb');
   if (!J || !J.coins) { box.innerHTML = '<div class="lv-card"><b>Top Bottom · BTC / ETH · paper</b><p class="lv-sub">Starting: the first update arrives within 4 hours.</p></div>'; return; }
   const usd = (v) => (v == null ? '–' : '$' + fmt(v, v >= 1000 ? 0 : 2, 'en-US'));
@@ -1875,12 +1875,14 @@ async function loadAuto() {
     ...((A.turtle || TB_MCX.some((k) => tb[k])) ? [['MCX', [...TB_MCX.filter((k) => tb[k]).map((k) => { const v = tb[k]; return { id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k]}`, s: `MCX ${{ crude: 'CRUDEOILM · both sides', silver: 'SILVERMIC · buy only', natgas: 'NATGASMINI · buy only', gold: 'GOLDPETAL · buy only' }[k]}${v.live ? '' : ' · dry run (Bots tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k }; }),
       ...(A.turtle ? [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'markets: ' + esc(A.turtle.armed.join(' · ')) : 'markets set in the Bots tab', on: !!A.turtle_on, kind: 'part', fut: true }] : [])]]] : []),
     ['US', [{ id: 'mm_us', n: 'ETF Top Bottom', s: `moomoo · QQQ SMH XLF XLE${paper ? ' · paper' : ''}`, on: !!A.mm_us, kind: 'part', warn: A.mm_us && !cap('US') ? 'set capital in settings' : '', mm: 'US' }]],
+    /* 27 Nov 2026: BTC / ETH Top Bottom paper (no exchange yet) - a row with no switch, opens its card */
+    ['Crypto', [{ id: 'crypto_paper', n: 'Top Bottom · BTC / ETH', s: 'paper only · no exchange connected yet · updates every 4 h', on: false, kind: 'paper' }]],
     ['ASX', [{ id: 'mm_au', n: 'ETF Top Bottom', s: 'moomoo · TECH HACK OZR ASIA', on: !!A.mm_au, kind: 'part', warn: paper ? 'paper account can\'t trade ASX' : (A.mm_au && !cap('AU') ? 'set capital in settings' : ''), mm: 'AU' }]]];
-  const all = ROWS.flatMap(([, r]) => r); const nOn = all.filter((r) => r.on).length;
+  const all = ROWS.flatMap(([, r]) => r).filter((r) => r.kind !== 'paper'); const rowsAll = ROWS.flatMap(([, r]) => r); const nOn = all.filter((r) => r.on).length;
   const row = (r) => `<div class="au3-row${r.on ? ' on' : ''}" data-row="${r.id}">
       <button class="au3-main" data-open="${r.id}" aria-expanded="false"><b>${r.n}</b><small>${r.s}</small>${r.warn ? `<small class="au2-w">⚠ ${r.warn}</small>` : ''}</button>
-      <span class="au3-word">${r.on ? 'ON' : 'OFF'}</span>
-      <button class="au2-sw${r.on ? ' on' : ''}" role="switch" aria-checked="${r.on}" data-sw="${r.id}" aria-label="${r.n}: ${r.on ? 'turn off' : 'turn on'}"><i></i></button>
+      ${r.kind === 'paper' ? '<span class="au3-word">PAPER</span>' : `<span class="au3-word">${r.on ? 'ON' : 'OFF'}</span>
+      <button class="au2-sw${r.on ? ' on' : ''}" role="switch" aria-checked="${r.on}" data-sw="${r.id}" aria-label="${r.n}: ${r.on ? 'turn off' : 'turn on'}"><i></i></button>`}
       <div class="au3-set" id="set-${r.id.replace(':', '-')}" hidden></div></div>`;
   el.innerHTML = `<div class="au3">
     <div class="au3-top${nOn ? ' on' : ''}"><div><b>${nOn ? `🤖 ${nOn} of ${all.length} trade by themselves` : '✋ Nothing trades by itself'}</b><small>${nOn ? 'ON rows place orders without asking you.' : 'Every order waits for you.'}${A.orders_live ? '' : ' Live orders is OFF: nothing reaches a broker.'}</small></div>
@@ -1906,12 +1908,13 @@ async function loadAuto() {
   const pz = el.querySelector('#aupause'); if (pz) pz.addEventListener('click', async () => { try { await lvApi('/api/auto/manual', { method: 'POST', body: '{}' }); alertMsg('Paused: nothing trades by itself. Open trades keep their stops.', true); loadAuto(); } catch (e) { alertMsg(e.message); } });
   const rs = el.querySelector('#auresume'); if (rs) rs.addEventListener('click', () => ask({ id: 'resume', n: 'everything that was ON before', kind: 'resume' }));
   // settings, only when a row is opened
-  el.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => { const r = all.find((x) => x.id === b.dataset.open); const box = el.querySelector('#set-' + r.id.replace(':', '-'));
+  el.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => { const r = rowsAll.find((x) => x.id === b.dataset.open); const box = el.querySelector('#set-' + r.id.replace(':', '-'));
     const openNow = box.hidden; box.hidden = !openNow; b.setAttribute('aria-expanded', openNow); if (!openNow) return;
     if (r.mm) return mmSettings(box, r.mm, MT);
     /* 27 Nov 2026 (Amritpal: "put settings in the Auto list for each"): the bot's own card opens right here (was a link to Futures) */
     if (r.kind === 'tb') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; tbLoad(r.inst, box); return; }
     if (r.id === 'opt_trader') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; otrLoad(box); return; }
+    if (r.id === 'crypto_paper') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; cryptoPaperLoad(box); return; }
     if (r.id === 'turtle') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; tmcxLoad(box); return; }
     if (r.id === 'stock_buy') { box.innerHTML = `<p class="lv-sub">Buys the plan's picks after the 09:09 industry check, with the same checks as the Buy button, in ranked order, within your split and slots, keeping ${fmt(A.reserve_pct, 0)}% of the account in cash. Split and capital: Live › India › Settings.</p>`; return; }
     if (r.id === 'stock_sell') { box.innerHTML = '<p class="lv-sub">Sells the plan\'s system exits at the open, only stocks a system bought or you adopted. Other holdings are never touched.</p>'; return; }
