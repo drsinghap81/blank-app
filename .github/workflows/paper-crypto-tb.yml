@@ -1,0 +1,25 @@
+name: paper-crypto-tb
+# 27 Nov 2026: Top Bottom paper trading on BTC / ETH (tools/paper_crypto_tb.py) - every 4 hours, 7 days a week
+on:
+  schedule:
+    - cron: "17 0,4,8,12,16,20 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: {group: paper-crypto-tb, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: |
+          pip install -q yfinance pandas numpy
+          python tools/paper_crypto_tb.py 2>&1 | grep -v -i "warn\|^\[" | tail -5
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add paper/crypto_tb.json; git diff --cached --quiet && exit 0
+          git commit -qm "Crypto Top Bottom paper $(date -u +%F' '%H:%M)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done

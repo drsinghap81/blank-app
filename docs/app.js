@@ -1252,7 +1252,7 @@ async function loadLive() {
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${S && S.exits.filter((e) => e.qty > 0).length >= 2 ? `<div class="lv-basket"><div><b>${S.exits.filter((e) => e.qty > 0).length} to sell</b><div class="lv-sub">One confirmation sends every sell to Angel (each still gets every check; its stop GTT is cancelled first)</div></div><button class="lv-btn sell" id="lvsellbk">Sell all ${S.exits.filter((e) => e.qty > 0).length} as one basket</button></div>` : ''}${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
-    ${S && isOwner() ? pane('fut', '<div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>' + TB_STOCKS.concat(TB_MCX).map((k) => `<div id="tbcard_${k}"></div>`).join('')) : ''}
+    ${S && isOwner() ? pane('fut', '<div id="cryptopaper"></div><div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>' + TB_STOCKS.concat(TB_MCX).map((k) => `<div id="tbcard_${k}"></div>`).join('')) : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div><div id="mmcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
     const sym = b.dataset.tgt, E = +b.dataset.e, St = +b.dataset.s, R = E - St;
@@ -1353,7 +1353,7 @@ async function loadLive() {
   const prb = el.querySelector('#lvprbk'); if (prb) prb.addEventListener('click', () => lvBasket(rows.filter((r) => r.tier === 'swing' && bkOf(r) === 'pr' && !r.skip && !r.surv && r.qty > 0)
     .map((r) => { const L = state._lvQ && state._lvQ[r.id]; const E = (L && L.limit_now) || r.price; return { r, q: r.qty, v: r.qty * E }; }), prb));
   state._lvBkUpd = bkUpd;
-  if (S) { autoLoad(); tbLoad(); tbLoad('nifty'); TB_STOCKS.concat(TB_MCX).forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); }
+  if (S) { autoLoad(); tbLoad(); tbLoad('nifty'); TB_STOCKS.concat(TB_MCX).forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); cryptoPaperLoad(); }
   state._lvMoreAll = false;
   const ma = $('#lvmoreall'); if (ma) ma.addEventListener('click', () => { state._lvMoreAll = !state._lvMoreAll; lvMoreUpd(); });
   lvMoreUpd();
@@ -1765,6 +1765,23 @@ const TB_MCX = ['crude', 'silver', 'natgas', 'gold'];
 const TB_LABEL = { bn: 'Bank Nifty futures', nifty: 'Nifty futures · buy only', bel: 'BEL futures · buy only', lt: 'L&T futures · buy only', tmpv: 'Tata Motors PV futures · buy only', tcs: 'TCS futures · buy only',
   crude: 'MCX crude oil mini · both sides', silver: 'MCX silver micro · buy only above 200-day', natgas: 'MCX natural gas mini · buy only above 200-day', gold: 'MCX gold petal · buy only' };
 const TB_SHORT = { bn: 'BN', nifty: 'Nifty', bel: 'BEL', lt: 'L&T', tmpv: 'TMPV', tcs: 'TCS', crude: 'Crude', silver: 'Silver', natgas: 'Nat gas', gold: 'Gold' };
+// 27 Nov 2026 (Amritpal: "start paper trading on BTC and ETH top bottom"): paper/crypto_tb.json, written every 4 h by GitHub
+async function cryptoPaperLoad() {
+  const box = $('#cryptopaper'); if (!box) return;
+  const J = await getJSON(MAIN + 'paper/crypto_tb.json', 'crypto_tb');
+  if (!J || !J.coins) { box.innerHTML = '<div class="lv-card"><b>Top Bottom · BTC / ETH · paper</b><p class="lv-sub">Starting: the first update arrives within 4 hours.</p></div>'; return; }
+  const usd = (v) => (v == null ? '–' : '$' + fmt(v, v >= 1000 ? 0 : 2, 'en-US'));
+  const bk = (nm, lab, b) => {
+    const p = b.pos;
+    const st = p ? `<b class="${p.side === 'BUY' ? 'up' : 'down'}">${p.side === 'BUY' ? 'LONG' : 'SHORT'}</b> from ${usd(p.entry)} (${esc(p.entry_date)}) · stop ${usd(p.stop)} · <b class="${p.open_pct >= 0 ? 'up' : 'down'}">${p.open_pct >= 0 ? '+' : ''}${fmt(p.open_pct, 2)}%</b>`
+      : `Flat · ${b.buy_lvl ? 'buy above ' + usd(b.buy_lvl) : 'no buy level'}${b.sell_lvl ? ' · sell below ' + usd(b.sell_lvl) : ''}`;
+    const last = (b.trades || [])[0];
+    return `<div class="tb-lvl" style="display:block"><div><b>${nm} · ${lab}</b> <span class="muted">${b.n} closed · ${b.n ? b.wins + ' won · ' : ''}<b class="${b.ret_pct >= 0 ? 'up' : 'down'}">${b.ret_pct >= 0 ? '+' : ''}${fmt(b.ret_pct, 2)}%</b> (${usd(b.equity)})</span></div>
+      <div class="lv-sub">${st}</div>${last ? `<div class="lv-sub muted">Last: ${last.side === 'BUY' ? 'long' : 'short'} ${esc(last.entry_date)} → ${esc(last.exit_date)} ${last.pct >= 0 ? '+' : ''}${fmt(last.pct, 2)}% (${esc(last.why)})</div>` : ''}</div>`; };
+  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Top Bottom · BTC / ETH</b><span class="lv-mode dry">PAPER</span></div>
+    <p class="lv-sub">No orders anywhere. Same rules as the backtest (1/2/2, daily UTC candles), started flat on ${esc(J.start)}; US$${fmt(J.capital, 0, 'en-US')} per book. Updated ${new Date(J.updated).toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.</p>
+    ${Object.entries(J.coins).map(([nm, c]) => `<p class="lv-sub" style="margin-top:10px"><b>${nm}</b> ${usd(c.price)}</p>${bk(nm, 'both sides (futures)', c.both)}${bk(nm, 'buy only (spot)', c.buy)}`).join('')}</div>`;
+}
 const tbBoxSel = (inst) => inst === 'bn' ? '#tbcard' : inst === 'nifty' ? '#tbcardn' : '#tbcard_' + inst;
 async function tbLoad(inst = 'bn', boxIn = null) {
   if (!isOwner()) { const b0 = $(tbBoxSel(inst)); if (b0) b0.innerHTML = ''; return; }
