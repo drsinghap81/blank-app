@@ -23,6 +23,25 @@ import threading
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
+
+def yahoo_snap(syms, mk):
+    """27 Nov 2026: moomoo's API has no ASX quotes ("Unsupported quote market"). Yahoo's chart API instead - about 20 minutes delayed
+    for ASX: fine for a daily rule's "has the level traded" check; the order's own limit (level + 1%) caps the price paid."""
+    import requests
+    out = {}
+    for s_ in syms:
+        t = s_ + (".AX" if mk == "AU" else "")
+        try:
+            r = requests.get(f"https://query1.finance.yahoo.com/v8/finance/chart/{t}", params=dict(interval="5m", range="1d"),
+                             headers={"User-Agent": "Mozilla/5.0"}, timeout=15).json()
+            res = r["chart"]["result"][0]; m = res["meta"]; q = res["indicators"]["quote"][0]
+            hi = max([h for h in (q.get("high") or []) if h is not None] or [m.get("regularMarketPrice") or 0])
+            lo = min([v for v in (q.get("low") or []) if v is not None] or [m.get("regularMarketPrice") or 0])
+            out[s_] = dict(last=float(m["regularMarketPrice"]), high=float(hi), low=float(lo), open=None, prev=m.get("chartPreviousClose"), src="yahoo")
+        except Exception:  # noqa: BLE001
+            continue
+    return out
+
 MKT = {
     "US": dict(tz=ZoneInfo("America/New_York"), pre=(9, 5), open=(9, 30), close=(16, 0), cur="USD", name="US"),
     "AU": dict(tz=ZoneInfo("Australia/Sydney"), pre=(9, 35), open=(10, 0), close=(16, 0), cur="AUD", name="ASX"),
@@ -211,7 +230,7 @@ class MMTB:
         snap = {}
         if late:
             try:
-                snap = self.mm.snapshot([x for x in syms if x not in P], mk=mk) or {}
+                snap = self._snap([x for x in syms if x not in P], mk) or {}
             except Exception as ex:  # noqa: BLE001
                 # 27 Nov 2026: moomoo gives no ASX quotes to this account ("Unsupported quote market"). Place the day's stop-limits
                 # anyway: one only fills between the level and level + 1% - the same window the pre-open order allows.
@@ -258,12 +277,24 @@ class MMTB:
             self.alert(f"moomoo Top Bottom {MKT[mk]['name']}: {n_new} buy-stop(s) for today: " + ", ".join(
                 f"{s} {p['qty']} @ {p['trig']}" for s, p in P.items() if p["state"] in ("pending", "watch")), key=f"mmtb:pre:{mk}:{n.date()}")
 
+    def _snap(self, syms, mk):
+        """moomoo quotes; for ASX (no API quotes) Yahoo's, ~20 min delayed."""
+        try:
+            return self.mm.snapshot(syms, mk=mk)
+        except Exception as ex:  # noqa: BLE001
+            if "Unsupported quote market" not in str(ex):
+                raise
+        y = yahoo_snap(syms, mk)
+        if not y:
+            raise RuntimeError("no price: moomoo has no ASX quotes and Yahoo did not answer")
+        return y
+
     def _monitor(self, mk, n, after_close):
         P = self.st["pos"][mk]; snap = None
         soft = [s for s, p in P.items() if p["state"] == "watch" or (p["state"] == "open" and not p.get("stop_oid"))]
         if soft:
             try:
-                snap = self.mm.snapshot(soft, mk=mk)
+                snap = self._snap(soft, mk)
             except Exception as ex:  # noqa: BLE001
                 self.note(mk, f"price check failed: {str(ex)[:80]}")
         for sym, p in list(P.items()):
