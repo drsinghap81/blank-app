@@ -1191,7 +1191,7 @@ async function loadLive() {
   const nNoStop = S && S.trades ? S.trades.filter((t) => t.state === 'open' && !t.gtt_id).length : 0;
   const nBuy = pend.length + swRows.filter((r) => !r.skip && !r.dupOf && r.qty > 0 && (alN[bkOf(r)] ?? 0) > 0).length;
   const nHold = S && S.trades ? S.trades.filter((t) => t.state === 'open').length : 0;
-  const TABS = [['home', 'Home', ''], ['buy', 'Buy', nBuy || ''], ['hold', 'Holdings', nExit || nHold || ''], ...(S && isOwner() ? [['fut', 'Futures', '']] : []), ['set', 'Settings', '']];
+  const TABS = [['home', 'Home', ''], ['buy', 'Buy', nBuy || ''], ['hold', 'Holdings', nExit || nHold || ''], ...(S && isOwner() ? [['fut', 'Bots', '']] : []), ['set', 'Settings', '']];
   let tab = state.lvTab; if (!tab) { try { tab = sessionStorage.getItem('td.lvTab'); } catch (e) { /* */ } }
   if (!TABS.some((t) => t[0] === tab)) tab = S ? 'home' : 'set';
   const need = [];
@@ -1766,11 +1766,11 @@ const TB_LABEL = { bn: 'Bank Nifty futures', nifty: 'Nifty futures · buy only',
   crude: 'MCX crude oil mini · both sides', silver: 'MCX silver micro · buy only above 200-day', natgas: 'MCX natural gas mini · buy only above 200-day', gold: 'MCX gold petal · buy only' };
 const TB_SHORT = { bn: 'BN', nifty: 'Nifty', bel: 'BEL', lt: 'L&T', tmpv: 'TMPV', tcs: 'TCS', crude: 'Crude', silver: 'Silver', natgas: 'Nat gas', gold: 'Gold' };
 const tbBoxSel = (inst) => inst === 'bn' ? '#tbcard' : inst === 'nifty' ? '#tbcardn' : '#tbcard_' + inst;
-async function tbLoad(inst = 'bn') {
+async function tbLoad(inst = 'bn', boxIn = null) {
   if (!isOwner()) { const b0 = $(tbBoxSel(inst)); if (b0) b0.innerHTML = ''; return; }
   const bn = inst === 'bn', px = bn ? 'tb' : inst === 'nifty' ? 'tn' : 'ts' + inst;
   const stk = TB_STOCKS.includes(inst);
-  const box = $(tbBoxSel(inst)); if (!box) return;
+  const box = boxIn || $(tbBoxSel(inst)); if (!box) return;
   let T; try { T = await lvApi('/api/tb' + (bn ? '' : '?inst=' + inst)); } catch (e) { box.innerHTML = ''; return; }
   if (!bn && T.inst !== inst) { box.innerHTML = ''; return; }          // server not updated yet
   if (stk && T.installed === false) {
@@ -1808,23 +1808,23 @@ async function tbLoad(inst = 'bn') {
   box.querySelectorAll('[data-tbk]').forEach((b) => b.addEventListener('click', async () => {
     const yes = b.dataset.v === '1'; let confirm = '';
     if (yes && live) { confirm = window.prompt('LIVE: approve this Top Bottom trade on Angel?\nType YES to confirm:') || ''; if (confirm.trim().toUpperCase() !== 'YES') { alertMsg('Not approved.'); return; } }
-    try { await lvApi('/api/tb/answer' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ key: b.dataset.tbk, value: yes, confirm }) }); alertMsg(yes ? 'Approved — the bot will trade this level if it comes.' : 'Skipped — this level will not be traded.', true); tbLoad(inst); } catch (e) { alertMsg(e.message); }
+    try { await lvApi('/api/tb/answer' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ key: b.dataset.tbk, value: yes, confirm }) }); alertMsg(yes ? 'Approved — the bot will trade this level if it comes.' : 'Skipped — this level will not be traded.', true); tbLoad(inst, boxIn); } catch (e) { alertMsg(e.message); }
   }));
   { const au = box.querySelector('#' + px + 'auto'); const q = bn ? '' : '?inst=' + inst;
     if (au) au.addEventListener('click', async () => {
-      if (T.auto) { try { await lvApi('/api/tb/auto' + q, { method: 'POST', body: JSON.stringify({ on: false }) }); alertMsg('Auto-approve off: each level now waits for your OK (you get a phone alert).', true); tbLoad(inst); } catch (e) { alertMsg(e.message); } return; }
+      if (T.auto) { try { await lvApi('/api/tb/auto' + q, { method: 'POST', body: JSON.stringify({ on: false }) }); alertMsg('Auto-approve off: each level now waits for your OK (you get a phone alert).', true); tbLoad(inst, boxIn); } catch (e) { alertMsg(e.message); } return; }
       const a = box.querySelector('#' + px + 'autoarm'); a.hidden = !a.hidden; });
     const ag = box.querySelector('#' + px + 'ago'); if (ag) ag.addEventListener('click', async () => {
       try { await lvApi('/api/tb/auto' + q, { method: 'POST', body: JSON.stringify({ on: true, password: box.querySelector('#' + px + 'apw').value, confirm: box.querySelector('#' + px + 'acf').value }) });
-        alertMsg(`Auto-approve on: every Top Bottom ${TB_SHORT[inst] || inst} entry and reversal is approved automatically${live ? ' and sent to Angel' : ' (dry run until you switch to Live orders)'}. The bot's lots, stops and daily loss cap still apply.`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } }); }
-  const cmd = async (c, msg) => { try { await lvApi('/api/tb/cmd' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ cmd: c }) }); alertMsg(msg, true); setTimeout(() => tbLoad(inst), 4000); } catch (e) { alertMsg(e.message); } };
+        alertMsg(`Auto-approve on: every Top Bottom ${TB_SHORT[inst] || inst} entry and reversal is approved automatically${live ? ' and sent to Angel' : ' (dry run until you switch to Live orders)'}. The bot's lots, stops and daily loss cap still apply.`, true); tbLoad(inst, boxIn); } catch (e) { alertMsg(e.message); } }); }
+  const cmd = async (c, msg) => { try { await lvApi('/api/tb/cmd' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ cmd: c }) }); alertMsg(msg, true); setTimeout(() => tbLoad(inst, boxIn), 4000); } catch (e) { alertMsg(e.message); } };
   const dg = box.querySelector('[data-tbdiag]'); if (dg) dg.addEventListener('toggle', async () => { if (!dg.open) return; const pre = dg.querySelector('pre');
     try { pre.textContent = (await lvApi('/api/tb/diag')).text; } catch (e) { pre.textContent = 'Not available yet: tap Settings › Server › Update now, wait 2 minutes, then reopen this. (' + e.message + ')'; } });
   const st = box.querySelector('#' + px + 'stop'); if (st) st.addEventListener('click', () => cmd('/stop', 'No new Top Bottom trades today; an open position keeps its stop.'));
   const fl = box.querySelector('#' + px + 'flat'); if (fl) fl.addEventListener('click', () => cmd('/flat', 'Square-off requested — approve it in this card.'));
-  const dry = box.querySelector('#' + px + 'dry'); if (dry) dry.addEventListener('click', async () => { if (!live) return; try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: false }) }); alertMsg(`Top Bottom ${TB_SHORT[inst] || inst}: dry run from the next start.`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } });
+  const dry = box.querySelector('#' + px + 'dry'); if (dry) dry.addEventListener('click', async () => { if (!live) return; try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: false }) }); alertMsg(`Top Bottom ${TB_SHORT[inst] || inst}: dry run from the next start.`, true); tbLoad(inst, boxIn); } catch (e) { alertMsg(e.message); } });
   const lv = box.querySelector('#' + px + 'live'); if (lv) lv.addEventListener('click', () => { if (!live) { const a = box.querySelector('#' + px + 'arm'); a.hidden = !a.hidden; } });
-  const go = box.querySelector('#' + px + 'go'); if (go) go.addEventListener('click', async () => { try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: true, password: box.querySelector('#' + px + 'pw').value, confirm: box.querySelector('#' + px + 'cf').value }) }); alertMsg(`Top Bottom ${TB_SHORT[inst] || inst}: LIVE orders from the bot's next start (${bn ? '08:25' : inst === 'nifty' ? '08:27' : TB_MCX.includes(inst) ? '08:31' : '08:29'} IST${TB_MCX.includes(inst) ? ', or now with Settings › Server › Restart Top Bottom bots' : ''}).`, true); tbLoad(inst); } catch (e) { alertMsg(e.message); } });
+  const go = box.querySelector('#' + px + 'go'); if (go) go.addEventListener('click', async () => { try { await lvApi('/api/tb/mode' + (bn ? '' : '?inst=' + inst), { method: 'POST', body: JSON.stringify({ live: true, password: box.querySelector('#' + px + 'pw').value, confirm: box.querySelector('#' + px + 'cf').value }) }); alertMsg(`Top Bottom ${TB_SHORT[inst] || inst}: LIVE orders from the bot's next start (${bn ? '08:25' : inst === 'nifty' ? '08:27' : TB_MCX.includes(inst) ? '08:31' : '08:29'} IST${TB_MCX.includes(inst) ? ', or now with Settings › Server › Restart Top Bottom bots' : ''}).`, true); tbLoad(inst, boxIn); } catch (e) { alertMsg(e.message); } });
 }
 
 /* 24 Nov 2026 (Amritpal: "a simple auto trade page where all systems are shown in a column with ON OFF; configuring them should not be
@@ -1851,11 +1851,11 @@ async function loadAuto() {
     ['India', [
       { id: 'stock_sell', n: 'Stock sells', s: '09:16 IST · sells system exits', on: !!A.stock_sell, kind: 'part' },
       { id: 'stock_buy', n: 'Stock buys', s: '09:20 IST · buys the plan\'s picks', on: !!A.stock_buy, kind: 'part' },
-      ...Object.entries(tb).filter(([k]) => !TB_MCX.includes(k)).map(([k, v]) => ({ id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k] || k}`, s: `futures${v.live ? '' : ' · dry run (Futures tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k })),
+      ...Object.entries(tb).filter(([k]) => !TB_MCX.includes(k)).map(([k, v]) => ({ id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k] || k}`, s: `futures${v.live ? '' : ' · dry run (Bots tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k })),
       { id: 'opt_trader', n: 'Option trader', s: A.opt_trader_live ? '5-min options · real orders' : '5-min options · paper only', on: !!A.opt_trader_live, kind: 'part', fut: true }]],
     /* 26 Nov 2026: the Top Bottom MCX minis bots sit with Turtle under MCX (installed from Futures) */
-    ...((A.turtle || TB_MCX.some((k) => tb[k])) ? [['MCX', [...TB_MCX.filter((k) => tb[k]).map((k) => { const v = tb[k]; return { id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k]}`, s: `MCX ${{ crude: 'CRUDEOILM · both sides', silver: 'SILVERMIC · buy only', natgas: 'NATGASMINI · buy only', gold: 'GOLDPETAL · buy only' }[k]}${v.live ? '' : ' · dry run (Futures tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k }; }),
-      ...(A.turtle ? [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'markets: ' + esc(A.turtle.armed.join(' · ')) : 'markets set in the Futures tab', on: !!A.turtle_on, kind: 'part', fut: true }] : [])]]] : []),
+    ...((A.turtle || TB_MCX.some((k) => tb[k])) ? [['MCX', [...TB_MCX.filter((k) => tb[k]).map((k) => { const v = tb[k]; return { id: 'tb:' + k, n: `Top Bottom · ${TB_SHORT[k]}`, s: `MCX ${{ crude: 'CRUDEOILM · both sides', silver: 'SILVERMIC · buy only', natgas: 'NATGASMINI · buy only', gold: 'GOLDPETAL · buy only' }[k]}${v.live ? '' : ' · dry run (Bots tab)'}${v.pos ? ` · ${v.pos > 0 ? 'long' : 'short'} now` : ''}`, on: !!v.auto, kind: 'tb', inst: k }; }),
+      ...(A.turtle ? [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'markets: ' + esc(A.turtle.armed.join(' · ')) : 'markets set in the Bots tab', on: !!A.turtle_on, kind: 'part', fut: true }] : [])]]] : []),
     ['US', [{ id: 'mm_us', n: 'ETF Top Bottom', s: `moomoo · QQQ SMH XLF XLE${paper ? ' · paper' : ''}`, on: !!A.mm_us, kind: 'part', warn: A.mm_us && !cap('US') ? 'set capital in settings' : '', mm: 'US' }]],
     ['ASX', [{ id: 'mm_au', n: 'ETF Top Bottom', s: 'moomoo · TECH HACK OZR ASIA', on: !!A.mm_au, kind: 'part', warn: paper ? 'paper account can\'t trade ASX' : (A.mm_au && !cap('AU') ? 'set capital in settings' : ''), mm: 'AU' }]]];
   const all = ROWS.flatMap(([, r]) => r); const nOn = all.filter((r) => r.on).length;
@@ -1891,8 +1891,10 @@ async function loadAuto() {
   el.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => { const r = all.find((x) => x.id === b.dataset.open); const box = el.querySelector('#set-' + r.id.replace(':', '-'));
     const openNow = box.hidden; box.hidden = !openNow; b.setAttribute('aria-expanded', openNow); if (!openNow) return;
     if (r.mm) return mmSettings(box, r.mm, MT);
-    if (r.kind === 'tb' || r.fut) { box.innerHTML = `<p class="lv-sub">${r.kind === 'tb' ? 'Lots, Live / Dry run and levels' : r.id === 'opt_trader' ? 'Trades, paper vs live and stop for today' : 'Which MCX markets trade and their lots'} are in the Futures tab.</p><button class="au2-save" data-gofut>Open Futures</button>`;
-      box.querySelector('[data-gofut]').addEventListener('click', () => { state.lvTab = 'fut'; try { sessionStorage.setItem('td.lvTab', 'fut'); } catch (e) { /* */ } state.lvMk = 'NSE'; show('live'); }); return; }
+    /* 27 Nov 2026 (Amritpal: "put settings in the Auto list for each"): the bot's own card opens right here (was a link to Futures) */
+    if (r.kind === 'tb') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; tbLoad(r.inst, box); return; }
+    if (r.id === 'opt_trader') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; otrLoad(box); return; }
+    if (r.id === 'turtle') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; tmcxLoad(box); return; }
     if (r.id === 'stock_buy') { box.innerHTML = `<p class="lv-sub">Buys the plan's picks after the 09:09 industry check, with the same checks as the Buy button, in ranked order, within your split and slots, keeping ${fmt(A.reserve_pct, 0)}% of the account in cash. Split and capital: Live › India › Settings.</p>`; return; }
     if (r.id === 'stock_sell') { box.innerHTML = '<p class="lv-sub">Sells the plan\'s system exits at the open, only stocks a system bought or you adopted. Other holdings are never touched.</p>'; return; }
   }));
@@ -2077,7 +2079,7 @@ async function lvSellBasket(E, btn) {
    for everything ticked (Angel basket for India, moomoo for US / ASX). Rows a switched-on automatic system will send carry
    an AUTO tag and no tick box. The earlier Live pages stay as "Full view" (settings, split, paper record, pies). */
 const scBadge = (x) => (x ? `<em class="scb ${x.g ? 'g' : ''}" title="On ${x.n} strategies today, ${x.g} graded Good in the backtest">${x.g} of ${x.n} good</em>` : '');
-const TR_MK = [['NSE', 'India'], ['US', 'US'], ['ASX', 'ASX']];   // futures: the Futures tab above
+const TR_MK = [['NSE', 'India'], ['US', 'US'], ['ASX', 'ASX']];   // futures: the Bots tab above
 const TR_SYS = { mom: 'Momentum', tf: 'Cup 9/21', t9: '9/21', rt: 'Retest', pt: 'Pattern', vcp: 'VCP', my: 'My pick', pr: 'Pulse', s1: 'RSI', wc: 'Wealth', fl: 'Flags', gd: 'Gold' };
 async function loadTrade() {
   $('#title').textContent = 'Trade Live'; $('#asof').textContent = '';
@@ -2437,7 +2439,7 @@ async function loadBasket() {
       body = `<div class="bs-sl">${Object.keys(TB_SHORT).filter((i) => !TB_MCX.includes(i)).map((i) => `<span class="${tb[i] ? (tb[i].auto ? 'on' : '') : 'na'}">${TB_SHORT[i]}${tb[i] ? '' : ' ·  not installed'}</span>`).join('')}<span class="${A.mm_us ? 'on' : ''}">US ETFs</span></div>
         <p class="bs-p">India sleeves trade 1 lot each (about ₹1.5–2 L margin per index lot, more for stock futures). US sleeves use your moomoo capital:</p>
         <label class="bs-in">US capital US$ <input type="number" inputmode="numeric" data-usc value="${usc || ''}"></label><button class="tr-go" data-usave>Save</button>`; }
-    if (b.tbm) body = `<div class="bs-mcx" data-mcx><p class="bs-p">${TB_MCX.some((k) => tb[k]) ? 'Loading the four bots…' : 'Install the four MCX bots first: Full view › Futures › Install MCX bots (Dry run).'}</p></div>`;
+    if (b.tbm) body = `<div class="bs-mcx" data-mcx><p class="bs-p">${TB_MCX.some((k) => tb[k]) ? 'Loading the four bots…' : 'Install the four MCX bots first: Full view › Bots › Install MCX bots (Dry run).'}</p></div>`;
     if (b.pie) { const C = E && E.current; const pv = E && E.provisional; const px = (E && E.prices) || {};
       const hold = (C && C.hold) || []; const cap = +(state.pieCap || 0);
       body = `<p class="bs-p">Hold now (decided ${esc((C && C.decided) || '–')}): <b>${hold.map((s) => esc((E.names || {})[s] || s)).join(' + ') || '–'}</b>${pv ? ` · if the month ended today: ${pv.hold.map((s) => esc((E.names || {})[s] || s)).join(' + ')}` : ''}</p>
@@ -3683,7 +3685,7 @@ function turLive(r) {
   }
   if (r.key.startsWith('MCX:') && r.buy_stop) {      // 19 Nov 2026: real MCX contract, orders on Angel (dry run until Live is on)
     return `<div style="margin-top:8px"><button class="lv-btn" data-turmcx="${esc(r.key)}" data-mult="${r.mult || 0}">Push to Live · MCX buy-stop on Angel</button>
-      <div class="muted small">Uses the real MCX contract's 20-day high (the level here is an estimate from the US price). Starts in dry run; manage it in Live › Futures › Turtle · MCX.</div></div>`;
+      <div class="muted small">Uses the real MCX contract's 20-day high (the level here is an estimate from the US price). Starts in dry run; manage it in Live › Bots › Turtle · MCX.</div></div>`;
   }
   const exp = r.key.startsWith('MCX:') ? 'MCX' : (r.key === '^NSEI' || r.key === '^NSEBANK') ? 'NFO' : null;
   if (exp && r.buy_stop) {
@@ -3778,7 +3780,7 @@ async function loadTurtle(el) {
   el.querySelectorAll('[data-turmcx]').forEach((b) => b.addEventListener('click', async () => {
     if (!(lvCfg().url && lvCfg().token)) { alertMsg('Connect your server in Live › Settings first.'); return; }
     try { await lvApi('/api/turtle/mcx/arm', { method: 'POST', body: JSON.stringify({ name: b.dataset.turmcx, lots: 1, on: true, mult: +b.dataset.mult || 0 }) });
-      alertMsg(`${b.dataset.turmcx.replace('MCX:', '')} armed with 1 lot. Check the planned order in Live › Futures › Turtle · MCX (dry run until you switch Live on).`, true); b.textContent = 'Armed ✓'; b.disabled = true;
+      alertMsg(`${b.dataset.turmcx.replace('MCX:', '')} armed with 1 lot. Check the planned order in Live › Bots › Turtle · MCX (dry run until you switch Live on).`, true); b.textContent = 'Armed ✓'; b.disabled = true;
     } catch (e) { alertMsg(/404|not found/i.test(e.message) ? 'Your server gets this after today\'s market close (it updates itself after 3:35 pm IST). Tap Push to Live again after that.' : e.message); } }));
   tradeStripWire(el);
   el.querySelectorAll('.row[data-tk]').forEach((li) => li.addEventListener('click', (e) => { if (e.target.closest('a,summary,details')) return; turtleSelect(D.rows.find((r) => r.key === li.dataset.tk)); }));
