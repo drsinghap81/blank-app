@@ -71,7 +71,27 @@ def events(x, nif):
             k += 1
         if xr is None:
             xr = c[min(n - 1, i + 120)] / e - 1 - COST
-        out.append(dict(d=x.index[i], kinds=kinds, r21=fw[21], r63=fw[63], x21=fw["x21"], x63=fw["x63"], tr=xr, hold=k - i))
+        # short-term views (27 Nov 2026, "it's a short term system"): 3 / 5 / 10-session closes, and a swing trade with the stop
+        # under the trigger day's low and a 2R / 3R target, max 10 sessions (stop first if both touched in a day)
+        st_ = {}
+        for H in (3, 5, 10):
+            st_[f"r{H}"] = c[min(i + H, n - 1)] / e - 1 - COST
+        risk = e - l[i]
+        for T in (2, 3):
+            res_ = None
+            if risk > 0:
+                for k2 in range(i + 1, min(n, i + 11)):
+                    if l[k2] <= l[i]:
+                        res_ = (min(o[k2], l[i]) if k2 > i + 1 else l[i]) / e - 1 - COST; break
+                    if h[k2] >= e + T * risk:
+                        res_ = (max(o[k2], e + T * risk) if k2 > i + 1 else e + T * risk) / e - 1 - COST; break
+                if res_ is None:
+                    res_ = c[min(n - 1, i + 10)] / e - 1 - COST
+                st_[f"t{T}"] = res_; st_[f"t{T}R"] = (res_ + COST) * e / risk
+            else:
+                st_[f"t{T}"] = np.nan; st_[f"t{T}R"] = np.nan
+        st_["riskpct"] = risk / e * 100
+        out.append(dict(d=x.index[i], kinds=kinds, r21=fw[21], r63=fw[63], x21=fw["x21"], x63=fw["x63"], tr=xr, hold=k - i, **st_))
     return out
 
 
@@ -97,6 +117,11 @@ def main():
                 continue
             row = dict(n=len(z), r21=z.r21.mean() * 100, r63=z.r63.mean() * 100, med63=z.r63.median() * 100, win63=(z.r63 > 0).mean() * 100,
                        x63=z.x63.mean() * 100, tr=z.tr.mean() * 100, trmed=z.tr.median() * 100, trwin=(z.tr > 0).mean() * 100, hold=z.hold.median())
+            row.update(r3=z.r3.mean() * 100, r5=z.r5.mean() * 100, r10=z.r10.mean() * 100, w5=(z.r5 > 0).mean() * 100,
+                       t2=z.t2.mean() * 100, t2R=z.t2R.mean(), t2w=(z.t2 > 0).mean() * 100, t3=z.t3.mean() * 100, t3R=z.t3R.mean(), risk=z.riskpct.median())
+            print(f"R| {kind:11s} {lab:15s} SHORT | 3d {row['r3']:+5.2f}% 5d {row['r5']:+5.2f}% (win {row['w5']:3.0f}%) 10d {row['r10']:+5.2f}% | "
+                  f"stop=trigger low, 2R target <=10d: {row['t2']:+5.2f}% ({row['t2R']:+.2f}R, win {row['t2w']:3.0f}%) | 3R: {row['t3']:+5.2f}% "
+                  f"({row['t3R']:+.2f}R) | risk {row['risk']:.1f}%", flush=True)
             res[kind][lab] = row
             print(f"R| {kind:11s} {lab:15s} n {row['n']:5d} | 21d {row['r21']:+5.1f}% | 63d avg {row['r63']:+5.1f}% med {row['med63']:+5.1f}% "
                   f"win {row['win63']:3.0f}% vs Nifty {row['x63']:+5.1f} | TRADE (exit close < 20 SMA) avg {row['tr']:+5.1f}% med {row['trmed']:+5.1f}% "
