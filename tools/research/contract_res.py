@@ -75,6 +75,19 @@ def events(sym, x):
                     kinds.append(("contracting + vol", stop))
                 if c[t] > s200[t]:
                     kinds.append(("contracting + above 200d", stop))
+        # v2 (28 Nov 2026, Amritpal: "a VCP is like an ascending triangle"): flat top = >= 3 touches within 1% of R, >= 10 sessions
+        # apart; lows rising GRADUALLY - each pullback 30-80% of the one before; last <= 6%; base >= 30 sessions
+        tc = []
+        for k in range(t - 150, t - 2):
+            if sh[k] and h[k] >= R * 0.99 and (not tc or k - tc[-1] >= 10):
+                tc.append(k)
+        if len(tc) >= 3 and t - tc[0] >= 30:
+            ends = tc[1:] + [t]
+            d2 = [1 - l[a:b].min() / R for a, b in zip(tc, ends)]
+            if all(0.3 <= d2[i + 1] / d2[i] <= 0.8 for i in range(len(d2) - 1) if d2[i] > 0) and d2[-1] <= 0.06 and d2[0] >= 0.06:
+                st2_ = l[tc[-1]:t].min()
+                info = dict(R=float(R), touches=[str(x.index[k].date()) for k in tc], depths=[round(z * 100, 1) for z in d2])
+                kinds.append(("triangle", st2_))
         for kind, stop in kinds:
             trig = h[t] * (1 + BUF); j = None
             for k in range(t + 1, min(n, t + 4)):
@@ -127,7 +140,7 @@ def main():
     print(f"R| stocks {len(P)} entries {len(D)}", flush=True)
     wins = (("last 1y", end - pd.DateOffset(years=1)), ("last 3y", end - pd.DateOffset(years=3)),
             ("2021+ ex-Covid", pd.Timestamp("2021-01-01")), ("2016+", pd.Timestamp("2016-01-01")))
-    for kind in ("control", "contracting", "contracting + vol", "contracting + above 200d"):
+    for kind in ("control", "contracting", "triangle"):
         Z = D[D.kind == kind]
         print(f"R| ===== {kind}: {len(Z)} trades ({len(Z) / 10:.0f}/yr), median risk {Z.risk.median() * 100:.1f}%", flush=True)
         for lab, st in wins:
@@ -145,7 +158,7 @@ def show():
     """print the last 6 'contracting' trades with daily bars (charts for Amritpal)."""
     import json
     P = FV.load(); D = pd.DataFrame([e for s, x in P.items() for e in events(s, x)])
-    Z = D[D.kind == "contracting"].sort_values("d").tail(6)
+    Z = D[D.kind == os.environ.get("KIND", "triangle")].sort_values("d").tail(6)
     for r in Z.to_dict("records"):
         x = P[r["sym"]]; i0 = max(0, x.index.get_loc(pd.Timestamp(r["touches"][0])) - 30); i1 = min(len(x), x.index.get_loc(r["entry"]) + 40)
         y = x.iloc[i0:i1]
