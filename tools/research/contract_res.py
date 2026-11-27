@@ -55,7 +55,7 @@ def events(sym, x):
         R = hh[t]
         if not (c[t] > R and c[t - 1] <= R):
             continue
-        kinds = []
+        kinds = []; info = {}
         if t - last_ctl >= 10:
             kinds.append(("control", l[t - 10:t].min())); last_ctl = t
         tch = []
@@ -69,6 +69,7 @@ def events(sym, x):
             if (all(d[i + 1] < d[i] for i in range(len(d) - 1)) and d[0] >= 0.10 and d[0] >= 2 * d[-1] and d[-1] <= 0.06
                     and h[t - 5:t].max() / tight - 1 <= 0.06 and (c[t - 5:t] <= R).all()):
                 stop = l[tch[-1]:t].min()
+                info = dict(R=float(R), touches=[str(x.index[k].date()) for k in tch], depths=[round(z * 100, 1) for z in d])
                 kinds.append(("contracting", stop))
                 if v20[t] and v[t] >= 1.5 * v20[t]:
                     kinds.append(("contracting + vol", stop))
@@ -88,7 +89,7 @@ def events(sym, x):
             e = max(o[j], trig)
             if stop >= e or not 0.01 <= (e - stop) / e <= 0.12:
                 continue
-            row = dict(sym=sym, kind=kind, d=x.index[t], entry=x.index[j], e=e, risk=(e - stop) / e)
+            row = dict(sym=sym, kind=kind, d=x.index[t], entry=x.index[j], e=e, risk=(e - stop) / e, stop=stop, **(info if kind != "control" else {}))
             for rule in ("2R", "3R", "921", "ema30"):
                 px, k = walk(o, h, l, c, e9, e21, e30, j, e, stop, rule)
                 row[rule + "R"] = (px / e - 1 - COST) / ((e - stop) / e); row[rule + "ret"] = px / e - 1 - COST; row[rule + "x"] = x.index[k]
@@ -140,5 +141,18 @@ def main():
                   f" || portfolio 2R {pc[0][0]:+.1f}%/yr ({pc[0][1]:.0f}%), 30 EMA {pc[1][0]:+.1f}%/yr ({pc[1][1]:.0f}%)", flush=True)
 
 
+def show():
+    """print the last 6 'contracting' trades with daily bars (charts for Amritpal)."""
+    import json
+    P = FV.load(); D = pd.DataFrame([e for s, x in P.items() for e in events(s, x)])
+    Z = D[D.kind == "contracting"].sort_values("d").tail(6)
+    for r in Z.to_dict("records"):
+        x = P[r["sym"]]; i0 = max(0, x.index.get_loc(pd.Timestamp(r["touches"][0])) - 30); i1 = min(len(x), x.index.get_loc(r["entry"]) + 40)
+        y = x.iloc[i0:i1]
+        print("R|T " + json.dumps(dict(s=r["sym"], R=r["R"], touches=r["touches"], depths=r["depths"], bo=str(r["d"].date()), entry=str(r["entry"].date()),
+              e=round(r["e"], 2), stop=round(r["stop"], 2), res={k: [round(r[k + "R"], 2), str(r[k + "x"].date())] for k in ("2R", "ema30")},
+              bars=[[str(d.date()), *[round(float(v), 2) for v in row]] for d, row in zip(y.index, y[["OPEN", "HIGH", "LOW", "CLOSE", "VOL"]].to_numpy())])), flush=True)
+
+
 if __name__ == "__main__":
-    main()
+    show() if os.environ.get("SHOW") else main()
