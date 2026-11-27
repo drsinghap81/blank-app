@@ -6,7 +6,7 @@ jobs:
     steps:
       - run: |
           mkdir out
-          for u in health opt/today_basket research/optbt/summary ; do
+          for u in health opt/today_basket research/optbt/summary public/opt_paper ; do
             f=out/$(echo $u | tr / _).json
             curl -sS -m 30 "https://13-126-118-48.sslip.io/api/$u" -o "$f" -w "== $u HTTP %{http_code} in %{time_total}s, %{size_download} bytes\n"; done
           head -c 600 out/health.json; echo
@@ -14,7 +14,7 @@ jobs:
           curl -sS -m 20 -X POST -H 'Content-Type: application/json' -d '{"password":"x"}' -w "\nHTTP %{http_code}\n" https://13-126-118-48.sslip.io/api/login | head -c 500
           python3 - <<'PY'
           import json
-          for f in ("out/opt_today_basket.json", "out/research_optbt_summary.json"):
+          for f in ("out/opt_today_basket.json", "out/research_optbt_summary.json", "out/public_opt_paper.json"):
               try:
                   d = json.load(open(f))
               except Exception as e:
