@@ -1,0 +1,25 @@
+{
+"generated": "2026-11-27 20:00 UTC",
+"asof": "2026-11-27",
+"rows": [
+{
+"symbol": "TFCILTD",
+"touch": "2026-11-13",
+"touch_low": 158.88,
+"swing_high": 172.0,
+"ema20": 166.58,
+"close": 173.97,
+"date": "2026-11-27",
+"status": "watch",
+"needs": "close above 172.00 on >= 1.5x volume",
+"vol20": 10564033.0
+}
+],
+"record": {
+"n": 0,
+"closed": 0,
+"avg_R": null,
+"won": 0
+},
+"note": "Watch only, not a tested system: ~20 setups a year; backtest +0.11R a trade (2R target) since 2021, 53% won; last 3 years about flat."
+}
