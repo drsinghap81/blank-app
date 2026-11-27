@@ -2367,6 +2367,28 @@ const BASKETS = [
    (My picks, no fixed target: in the test a target cut the winners; the 9/21 exit did best). */
 const CUP_TF = { D: 'Daily', W: 'Weekly', M: 'Monthly' };
 const cupLen = (d) => (d >= 250 ? `${fmt(d / 250, 1)} yr` : `${Math.round(d / 21)} mo`);
+/* 28 Nov 2026 (Amritpal: clean rising 20 EMA charts - "can I see such charts and decide" -> "Yes"): data/scan/ema_bounce.json,
+   nightly. WATCH ONLY (about 20 setups a year; backtest +0.11R a trade, last 3 years about flat) with its own forward record. */
+async function emaBounce(box) {
+  if (!box) return;
+  const J = await getJSON(MAIN + 'data/scan/ema_bounce.json', 'ema_bounce').catch(() => null);
+  const f2 = (v) => fmt(v, 2, 'en-IN');
+  if (!J) { box.innerHTML = '<article class="bs-c"><div class="bs-h"><span class="bs-n">〰</span><div><b>Clean 20 EMA bounce · watch</b><small>The first list appears after tonight\'s scan (21:25 IST).</small></div></div></article>'; return; }
+  const R = J.rows || [], rec = J.record || {};
+  const tag = { breakout: '<i>broke out today</i>', pending: '<i>broke out · not triggered yet</i>', watch: '<i class="w">waiting for the volume breakout</i>' };
+  const row = (r, i) => `<li class="cb-r" data-eb="${i}" role="button" tabindex="0"><div><b>${esc(r.symbol)}</b><small>touched the rising 20 EMA ${esc(day(r.touch))} · low ${f2(r.touch_low)}</small>
+      <span class="cb-t">${tag[r.status] || ''}${r.vol_x ? `<i>${fmt(r.vol_x, 1)}× volume</i>` : ''}</span></div>
+    <div class="cb-a">${r.status === 'watch' ? `<span>Needs a close above <b>${f2(r.swing_high)}</b><small>on 1.5× volume · stop would be ${f2(r.touch_low)}</small></span>`
+      : `<span>Buy above <b>${f2(r.trigger)}</b><small>stop ${f2(r.stop)} · risk ${fmt(r.risk_pct, 1)}% · 2R ${f2(r.target_2r)} · ${r.valid_sessions_left} session${r.valid_sessions_left === 1 ? '' : 's'} left</small></span>`}</div></li>`;
+  const act = R.filter((r) => r.status !== 'watch'), wt = R.filter((r) => r.status === 'watch');
+  box.innerHTML = `<article class="bs-c"><div class="bs-h"><span class="bs-n">〰</span><div><b>Clean 20 EMA bounce · watch</b><small>Rising 20 EMA held for 60 days, a swing low touches it, then a high-volume close above the last swing high. Tap a stock for its chart.</small></div></div>
+    <p class="bs-note"><b>Watch only.</b> About 20 setups a year. Backtest since 2021: +0.11R a trade with a 2R target (53% won); last 3 years about flat. Forward record: ${rec.n ? `${rec.n} setups, ${rec.closed} closed${rec.closed ? `, ${rec.won} won, avg ${rec.avg_R >= 0 ? '+' : ''}${fmt(rec.avg_R, 2)}R` : ''}` : 'starts tonight'}.</p>
+    <p class="bs-p"><b>Broke out · ${act.length}</b></p><ul class="cb-l">${act.map((r) => row(r, R.indexOf(r))).join('') || '<li class="cb-none">None right now</li>'}</ul>
+    <p class="bs-p"><b>Waiting for the breakout · ${wt.length}</b></p><ul class="cb-l">${wt.map((r) => row(r, R.indexOf(r))).join('') || '<li class="cb-none">None right now</li>'}</ul>
+    <p class="bs-note">Scan ${esc(J.asof || '')}.</p></article>`;
+  box.querySelectorAll('[data-eb]').forEach((b) => b.addEventListener('click', () => { const r = R[+b.dataset.eb];
+    stockPage({ mk: 'NSE', sym: r.symbol, name: r.symbol, kind: 'stock' }, [{ t: 'Baskets', go: () => closeSheet(), done: true }, { t: '20 EMA bounce', go: () => closeSheet(), done: true }, { t: r.symbol, on: true }]); }));
+}
 async function cupBasket(box) {
   if (!box) return;
   // 28 Nov 2026 (Amritpal: "I need a watch on cup closes breaking high with 9/21 momentum"): India / US / Australia, and a
@@ -2489,8 +2511,8 @@ async function loadBasket() {
       ${b.ret != null ? `<span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span>` : '<span class="bs-r"><b>🛡</b><small>hedge</small></span>'}</div>
       ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${b.hedgeOnly ? '' : paperLine(b.id)}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
   el.innerHTML = `<p class="bs-top">India stock baskets (${BASKETS.map((b, i) => b.al ? i + 1 : 0).filter(Boolean).join(', ')}) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
-    ${BASKETS.map(card).join('')}<div id="cupb" data-pl="${esc(paperLine('lc'))}"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
-  cupBasket(el.querySelector('#cupb'));
+    ${BASKETS.map(card).join('')}<div id="cupb" data-pl="${esc(paperLine('lc'))}"></div><div id="emab"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
+  cupBasket(el.querySelector('#cupb')); emaBounce(el.querySelector('#emab'));
   { const sa = el.querySelector('[data-sendall]'); if (sa) sa.addEventListener('click', () => trSend(OD.list, 'NSE', sa).then(() => setTimeout(loadBasket, 3000))); }
   el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));
   el.querySelectorAll('[data-use]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.use); const cap0 = +el.querySelector(`[data-cap="${b.id}"]`).value || 0; if (b.hedge && !cap0) { alertMsg('Enter your capital: 80% goes to the stock systems, 10% gold, 10% dollar.'); return; }

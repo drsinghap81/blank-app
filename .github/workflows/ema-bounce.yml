@@ -1,0 +1,25 @@
+name: ema-bounce
+# 28 Nov 2026: clean rising 20 EMA bounce watch list + forward record (tools/ema_bounce_scan.py) - NSE, after the close
+on:
+  schedule:
+    - cron: "55 15 * * 1-5"   # 21:25 IST on trading days
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: {group: ema-bounce, cancel-in-progress: false}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: |
+          pip install -q yfinance pandas numpy requests lxml html5lib beautifulsoup4 xlrd
+          python tools/ema_bounce_scan.py 2>&1 | grep -v -i "warn\|delisted\|failed download\|^\[" | tail -5
+      - run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898499+github-actions[bot]@users.noreply.github.com"
+          git add data/scan/ema_bounce.json data/scan/ema_bounce_log.json; git diff --cached --quiet && exit 0
+          git commit -qm "EMA bounce watch $(date -u +%F)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
