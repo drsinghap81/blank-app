@@ -1,8 +1,8 @@
 {
 "market": "US",
 "asof": "2026-11-25",
-"scan_date": "2026-11-25",
-"generated": "2026-11-26 04:39 UTC",
+"scan_date": "2026-11-26",
+"generated": "2026-11-27 04:46 UTC",
 "scanned": 3329,
 "rules": {
 "base_main": 24,
@@ -1422,7 +1422,7 @@
 "level": 352.79,
 "ath_high": 346.27,
 "rs_bench": "XLF",
-"stock_rs": 1.2425,
+"stock_rs": 1.2424,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -1695,7 +1695,7 @@
 "level": 36.19,
 "ath_high": 34.5,
 "rs_bench": "XLF",
-"stock_rs": 8.5768,
+"stock_rs": 8.5767,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -1734,7 +1734,7 @@
 "level": 223.6478,
 "ath_high": 223.6478,
 "rs_bench": "XLV",
-"stock_rs": 23.1186,
+"stock_rs": 23.1187,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -2007,7 +2007,7 @@
 "level": 66.4,
 "ath_high": 63.759,
 "rs_bench": "XLF",
-"stock_rs": 21.8584,
+"stock_rs": 21.8583,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -5011,7 +5011,7 @@
 "sma30": 94.79,
 "value_cr": 95.5147,
 "rs_bench": "XLF",
-"stock_rs": 29.5956,
+"stock_rs": 29.5955,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -5804,7 +5804,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "sector_rs_up": true,
 "theme": null,
 "theme_rs": null,
@@ -5843,7 +5843,7 @@
 "sma30": 255.5587,
 "value_cr": 1585.6546,
 "rs_bench": "XLV",
-"stock_rs": 11.9599,
+"stock_rs": 11.96,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -6415,7 +6415,7 @@
 "sma30": 44.0887,
 "value_cr": 40.7387,
 "rs_bench": "XLV",
-"stock_rs": 76.3162,
+"stock_rs": 76.3163,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -7039,7 +7039,7 @@
 "sma30": 40.8307,
 "value_cr": 19.3971,
 "rs_bench": "XLF",
-"stock_rs": -4.5117,
+"stock_rs": -4.5118,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -8079,7 +8079,7 @@
 "sma30": 30.4873,
 "value_cr": 45.5697,
 "rs_bench": "XLRE",
-"stock_rs": -25.1438,
+"stock_rs": -25.1439,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -8183,7 +8183,7 @@
 "sma30": 47.868,
 "value_cr": 10.1533,
 "rs_bench": "XLF",
-"stock_rs": 11.3692,
+"stock_rs": 11.3691,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -9223,7 +9223,7 @@
 "sma30": 39.7237,
 "value_cr": 9.5678,
 "rs_bench": "XLF",
-"stock_rs": 28.8987,
+"stock_rs": 28.8986,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -9483,7 +9483,7 @@
 "sma30": 81.2327,
 "value_cr": 21.2841,
 "rs_bench": "XLC",
-"stock_rs": 296.2165,
+"stock_rs": 296.2166,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -10211,7 +10211,7 @@
 "sma30": 232.46,
 "value_cr": 1058.969,
 "rs_bench": "XLK",
-"stock_rs": -9.4729,
+"stock_rs": -9.4728,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -10380,7 +10380,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "sector_rs_up": true,
 "theme": null,
 "theme_rs": null,
@@ -10523,7 +10523,7 @@
 "sma30": 48.5067,
 "value_cr": 22.7417,
 "rs_bench": "XLK",
-"stock_rs": 10.8354,
+"stock_rs": 10.8355,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -10679,7 +10679,7 @@
 "sma30": 55.1193,
 "value_cr": 62.3945,
 "rs_bench": "XLK",
-"stock_rs": 65.2091,
+"stock_rs": 65.2092,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -10887,7 +10887,7 @@
 "sma30": 78.601,
 "value_cr": 350.4559,
 "rs_bench": "XLK",
-"stock_rs": 146.7794,
+"stock_rs": 146.7795,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -11563,7 +11563,7 @@
 "sma30": 30.4527,
 "value_cr": 8.2341,
 "rs_bench": "XLF",
-"stock_rs": 43.8006,
+"stock_rs": 43.8005,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -12655,7 +12655,7 @@
 "sma30": 72.9207,
 "value_cr": 449.6906,
 "rs_bench": "XLK",
-"stock_rs": 177.3016,
+"stock_rs": 177.3017,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -13188,7 +13188,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "sector_rs_up": true,
 "theme": null,
 "theme_rs": null,
@@ -13782,7 +13782,7 @@
 "status": "exited",
 "exit_date": "2026-08-31",
 "exit_price": 25.64,
-"close": 14.03,
+"close": 14.04,
 "ret": 0.2338,
 "peak": 0.6183,
 "weeks": 26,
@@ -13794,12 +13794,12 @@
 "add_price": null,
 "add_sma": null,
 "test_week": "2026-07-17",
-"ema9": 14.5132,
-"ema21": 16.3676,
+"ema9": 14.5152,
+"ema21": 16.3686,
 "sma30": 25.8825,
 "value_cr": 13.1934,
 "rs_bench": "XLC",
-"stock_rs": 22.2786,
+"stock_rs": 22.3658,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -14839,7 +14839,7 @@
 "sma30": 123.9607,
 "value_cr": 206.3358,
 "rs_bench": "XLK",
-"stock_rs": 27.1195,
+"stock_rs": 27.1196,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -16503,7 +16503,7 @@
 "sma30": 81.2103,
 "value_cr": 21.8747,
 "rs_bench": "XLF",
-"stock_rs": -8.1544,
+"stock_rs": -8.1545,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -16763,7 +16763,7 @@
 "sma30": 109.8493,
 "value_cr": 136.3164,
 "rs_bench": "XLF",
-"stock_rs": 18.8944,
+"stock_rs": 18.8943,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -17907,7 +17907,7 @@
 "sma30": 93.4997,
 "value_cr": 51.1276,
 "rs_bench": "XLK",
-"stock_rs": -4.8968,
+"stock_rs": -4.8967,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -19259,7 +19259,7 @@
 "sma30": 47.0967,
 "value_cr": 91.5578,
 "rs_bench": "XLRE",
-"stock_rs": -5.6219,
+"stock_rs": -5.622,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -19727,7 +19727,7 @@
 "sma30": 53.1993,
 "value_cr": 7.2872,
 "rs_bench": "XLF",
-"stock_rs": 14.6173,
+"stock_rs": 14.6172,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -20520,7 +20520,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "sector_rs_up": true,
 "theme": null,
 "theme_rs": null,
@@ -21235,7 +21235,7 @@
 "sma30": 73.8067,
 "value_cr": 62.7866,
 "rs_bench": "XLK",
-"stock_rs": 11.0401,
+"stock_rs": 11.0402,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -21859,7 +21859,7 @@
 "sma30": 460.9833,
 "value_cr": 585.0783,
 "rs_bench": "XLK",
-"stock_rs": 56.5075,
+"stock_rs": 56.5076,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "Nasdaq",
@@ -22015,7 +22015,7 @@
 "sma30": 169.9553,
 "value_cr": 73.9443,
 "rs_bench": "XLF",
-"stock_rs": 17.7579,
+"stock_rs": 17.7578,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -24511,7 +24511,7 @@
 "sma30": 208.7377,
 "value_cr": 256.1947,
 "rs_bench": "XLK",
-"stock_rs": -14.7296,
+"stock_rs": -14.7295,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "board": "NYSE",
@@ -25267,7 +25267,7 @@
 {
 "symbol": "APLD",
 "close": 12.29,
-"value_cr": 441.5986,
+"value_cr": 441.7775,
 "first": "2022-04-13",
 "kind": "WS",
 "period": "2026-11-20",
@@ -25298,7 +25298,7 @@
 {
 "symbol": "HUBB",
 "close": 428.74,
-"value_cr": 267.9619,
+"value_cr": 268.0059,
 "first": "1972-06-05",
 "kind": "WS",
 "period": "2026-11-20",
@@ -25315,7 +25315,7 @@
 "atl": false,
 "long_cup": true,
 "rs_bench": "XLK",
-"stock_rs": -9.33,
+"stock_rs": -9.3299,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "name": "Hubbell Inc Common Stock",
@@ -25391,7 +25391,7 @@
 {
 "symbol": "AMAT",
 "close": 311.18,
-"value_cr": 3235.625,
+"value_cr": 3235.9144,
 "first": "1980-03-17",
 "kind": "WS",
 "period": "2026-11-20",
@@ -25484,7 +25484,7 @@
 {
 "symbol": "LRCX",
 "close": 185.01,
-"value_cr": 3097.8235,
+"value_cr": 3098.1296,
 "first": "1984-05-04",
 "kind": "WS",
 "period": "2026-11-20",
@@ -25670,7 +25670,7 @@
 {
 "symbol": "INOD",
 "close": 31.89,
-"value_cr": 57.3506,
+"value_cr": 57.383,
 "first": "1993-08-10",
 "kind": "WS",
 "period": "2026-11-20",
@@ -25732,7 +25732,7 @@
 {
 "symbol": "IONQ",
 "close": 23.54,
-"value_cr": 671.8149,
+"value_cr": 672.001,
 "first": "2021-01-04",
 "kind": "WS",
 "period": "2026-11-20",
@@ -25811,7 +25811,7 @@
 "atl": false,
 "long_cup": true,
 "rs_bench": "XLK",
-"stock_rs": -4.8968,
+"stock_rs": -4.8967,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "name": "Mercury Systems Inc",
@@ -25887,7 +25887,7 @@
 {
 "symbol": "PINS",
 "close": 19.71,
-"value_cr": 289.3765,
+"value_cr": 289.3953,
 "first": "2019-04-18",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26042,7 +26042,7 @@
 {
 "symbol": "AXTI",
 "close": 31.98,
-"value_cr": 532.3405,
+"value_cr": 532.5536,
 "first": "1998-05-21",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26059,7 +26059,7 @@
 "atl": false,
 "long_cup": false,
 "rs_bench": "XLK",
-"stock_rs": 177.3016,
+"stock_rs": 177.3017,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "name": "AXT Inc",
@@ -26104,7 +26104,7 @@
 {
 "symbol": "MSTR",
 "close": 79.96,
-"value_cr": 2273.7035,
+"value_cr": 2275.2783,
 "first": "1998-06-11",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26135,7 +26135,7 @@
 {
 "symbol": "ORCL",
 "close": 103.88,
-"value_cr": 4855.8354,
+"value_cr": 4856.7023,
 "first": "1986-03-12",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26166,7 +26166,7 @@
 {
 "symbol": "GOOG",
 "close": 270.98,
-"value_cr": 8425.6832,
+"value_cr": 8426.8267,
 "first": "2004-08-19",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26197,7 +26197,7 @@
 {
 "symbol": "GOOGL",
 "close": 273.1,
-"value_cr": 12832.3356,
+"value_cr": 12833.9632,
 "first": "2004-08-19",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26259,7 +26259,7 @@
 {
 "symbol": "NBIS",
 "close": 84.99,
-"value_cr": 3933.0829,
+"value_cr": 3935.574,
 "first": "2024-10-21",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26290,7 +26290,7 @@
 {
 "symbol": "NVDA",
 "close": 149.3,
-"value_cr": 57470.5287,
+"value_cr": 57494.3763,
 "first": "1999-01-22",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26538,7 +26538,7 @@
 {
 "symbol": "INTC",
 "close": 54.47,
-"value_cr": 9626.694,
+"value_cr": 9628.5264,
 "first": "1980-03-17",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26879,7 +26879,7 @@
 {
 "symbol": "RIVN",
 "close": 11.71,
-"value_cr": 421.2213,
+"value_cr": 421.3272,
 "first": "2021-11-10",
 "kind": "WS",
 "period": "2026-11-20",
@@ -26972,7 +26972,7 @@
 {
 "symbol": "HL",
 "close": 11.28,
-"value_cr": 414.9104,
+"value_cr": 414.9239,
 "first": "1980-03-17",
 "kind": "WS",
 "period": "2026-11-20",
@@ -27034,7 +27034,7 @@
 {
 "symbol": "AA",
 "close": 35.07,
-"value_cr": 179.9074,
+"value_cr": 179.9258,
 "first": "1962-01-02",
 "kind": "WS",
 "period": "2026-11-20",
@@ -27468,7 +27468,7 @@
 {
 "symbol": "GLW",
 "close": 100.24,
-"value_cr": 1159.1589,
+"value_cr": 1159.2697,
 "first": "1981-12-31",
 "kind": "WS",
 "period": "2026-11-20",
@@ -27685,7 +27685,7 @@
 {
 "symbol": "F",
 "close": 12.17,
-"value_cr": 559.3486,
+"value_cr": 559.3557,
 "first": "1972-06-01",
 "kind": "WS",
 "period": "2026-11-20",
@@ -28725,7 +28725,7 @@
 "atl": false,
 "long_cup": true,
 "rs_bench": "XLC",
-"stock_rs": -13.8888,
+"stock_rs": -13.8887,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "name": "Telephone and Data Systems, Inc. Common Shares",
@@ -28738,8 +28738,8 @@
 },
 {
 "symbol": "ADEA",
-"close": 14.03,
-"value_cr": 28.97,
+"close": 14.04,
+"value_cr": 28.9713,
 "first": "2003-11-13",
 "kind": "WS",
 "period": "2026-11-20",
@@ -28756,7 +28756,7 @@
 "atl": false,
 "long_cup": true,
 "rs_bench": "XLC",
-"stock_rs": 22.2786,
+"stock_rs": 22.3658,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "name": "Adeia Inc.",
@@ -28987,7 +28987,7 @@
 {
 "symbol": "ASTS",
 "close": 26.02,
-"value_cr": 621.7176,
+"value_cr": 622.0038,
 "first": "2019-11-01",
 "kind": "WS",
 "period": "2026-11-20",
@@ -29607,7 +29607,7 @@
 {
 "symbol": "BABA",
 "close": 86.26,
-"value_cr": 1277.9319,
+"value_cr": 1278.3386,
 "first": "2014-09-19",
 "kind": "WS",
 "period": "2026-11-20",
@@ -29824,7 +29824,7 @@
 {
 "symbol": "NFLX",
 "close": 59.41,
-"value_cr": 2487.862,
+"value_cr": 2488.0488,
 "first": "2002-05-23",
 "kind": "WS",
 "period": "2026-11-20",
@@ -30599,7 +30599,7 @@
 {
 "symbol": "PAAS",
 "close": 32.56,
-"value_cr": 236.381,
+"value_cr": 236.4183,
 "first": "1995-06-12",
 "kind": "WS",
 "period": "2026-11-20",
@@ -30971,7 +30971,7 @@
 {
 "symbol": "B",
 "close": 34.52,
-"value_cr": 390.7454,
+"value_cr": 390.7715,
 "first": "1985-02-13",
 "kind": "WS",
 "period": "2026-11-20",
@@ -31095,7 +31095,7 @@
 {
 "symbol": "AG",
 "close": 11.23,
-"value_cr": 194.4609,
+"value_cr": 194.5009,
 "first": "2006-11-28",
 "kind": "WS",
 "period": "2026-11-20",
@@ -31126,7 +31126,7 @@
 {
 "symbol": "KGC",
 "close": 18.42,
-"value_cr": 216.628,
+"value_cr": 216.6537,
 "first": "1981-03-17",
 "kind": "WS",
 "period": "2026-11-20",
@@ -31188,7 +31188,7 @@
 {
 "symbol": "COIN",
 "close": 103.72,
-"value_cr": 1236.881,
+"value_cr": 1237.2419,
 "first": "2021-04-14",
 "kind": "WS",
 "period": "2026-11-20",
@@ -31312,7 +31312,7 @@
 {
 "symbol": "IREN",
 "close": 12.85,
-"value_cr": 1530.2231,
+"value_cr": 1530.9794,
 "first": "2021-11-17",
 "kind": "WS",
 "period": "2026-11-20",
@@ -31484,7 +31484,7 @@
 "atl": false,
 "long_cup": true,
 "rs_bench": "XLF",
-"stock_rs": -8.1544,
+"stock_rs": -8.1545,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "name": "Pathward Financial, Inc.",
@@ -31498,7 +31498,7 @@
 {
 "symbol": "WULF",
 "close": 10.03,
-"value_cr": 621.8111,
+"value_cr": 621.8631,
 "first": "1994-04-05",
 "kind": "WS",
 "period": "2026-11-20",
@@ -31870,7 +31870,7 @@
 {
 "symbol": "BAC",
 "close": 48.54,
-"value_cr": 1816.5573,
+"value_cr": 1816.5832,
 "first": "1973-02-21",
 "kind": "WS",
 "period": "2026-11-20",
@@ -31980,7 +31980,7 @@
 "atl": false,
 "long_cup": false,
 "rs_bench": "XLF",
-"stock_rs": -13.0532,
+"stock_rs": -13.0533,
 "stock_rs_up": true,
 "stock_rs_days": 250,
 "name": "Nelnet, Inc. Common Stock",
@@ -32304,7 +32304,7 @@
 {
 "symbol": "CRCL",
 "close": 48.27,
-"value_cr": 652.341,
+"value_cr": 652.6219,
 "first": "2025-06-05",
 "kind": "WS",
 "period": "2026-11-20",
@@ -32366,7 +32366,7 @@
 {
 "symbol": "HOOD",
 "close": 65.78,
-"value_cr": 1519.2027,
+"value_cr": 1519.8155,
 "first": "2021-07-29",
 "kind": "WS",
 "period": "2026-11-20",
@@ -32428,7 +32428,7 @@
 {
 "symbol": "NU",
 "close": 12.36,
-"value_cr": 852.5912,
+"value_cr": 852.6705,
 "first": "2021-12-09",
 "kind": "WS",
 "period": "2026-11-20",
@@ -32862,7 +32862,7 @@
 {
 "symbol": "BE",
 "close": 152.89,
-"value_cr": 3251.6377,
+"value_cr": 3252.8539,
 "first": "2018-07-25",
 "kind": "WS",
 "period": "2026-11-20",
@@ -33259,7 +33259,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 9
 },
 {
@@ -33290,7 +33290,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 39
 },
 {
@@ -33321,7 +33321,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 78
 },
 {
@@ -33352,7 +33352,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 19
 },
 {
@@ -33383,7 +33383,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 25
 },
 {
@@ -34212,7 +34212,7 @@
 "atl": false,
 "long_cup": false,
 "rs_bench": "XLV",
-"stock_rs": -72.7585,
+"stock_rs": -72.7584,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "name": "Janux Therapeutics, Inc.",
@@ -34412,7 +34412,7 @@
 {
 "symbol": "HIMS",
 "close": 14.65,
-"value_cr": 342.6763,
+"value_cr": 342.7302,
 "first": "2019-09-13",
 "kind": "WS",
 "period": "2026-11-20",
@@ -34817,7 +34817,7 @@
 {
 "symbol": "MSTR",
 "close": 79.96,
-"value_cr": 2273.7035,
+"value_cr": 2275.2783,
 "first": "1998-06-11",
 "kind": "DS",
 "period": "2026-11-25",
@@ -35436,25 +35436,25 @@
 },
 {
 "symbol": "ADEA",
-"close": 14.03,
-"value_cr": 28.97,
+"close": 14.04,
+"value_cr": 28.9713,
 "first": "2003-11-13",
 "kind": "DS",
 "period": "2026-11-25",
 "broke": "2026-11-19",
-"close_p": 14.03,
-"low_p": 12.765,
+"close_p": 14.04,
+"low_p": 12.75,
 "old_low": 14.66,
 "low_date": "2026-11-05",
 "base": 10,
 "rally": 0.1681,
-"below_pct": 4.3,
+"below_pct": 4.23,
 "support": 12.32,
-"room_pct": 12.19,
+"room_pct": 12.25,
 "atl": false,
 "long_cup": false,
 "rs_bench": "XLC",
-"stock_rs": 22.2786,
+"stock_rs": 22.3658,
 "stock_rs_up": false,
 "stock_rs_days": 250,
 "name": "Adeia Inc.",
@@ -35902,7 +35902,7 @@
 {
 "symbol": "NEM",
 "close": 101.44,
-"value_cr": 864.0145,
+"value_cr": 864.12,
 "first": "1980-03-17",
 "kind": "DS",
 "period": "2026-11-25",
@@ -36212,7 +36212,7 @@
 {
 "symbol": "SOFI",
 "close": 13.07,
-"value_cr": 807.5717,
+"value_cr": 807.7173,
 "first": "2021-01-04",
 "kind": "DS",
 "period": "2026-11-25",
@@ -36671,7 +36671,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 26
 },
 {
@@ -36702,7 +36702,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 33
 },
 {
@@ -36733,7 +36733,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 25
 },
 {
@@ -36764,7 +36764,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 28
 },
 {
@@ -36795,7 +36795,7 @@
 "industry": "Consumer Staples",
 "sector_index": "XLP",
 "sector_tag": "leading",
-"sector_rs": 16.6789,
+"sector_rs": 16.679,
 "rs_rating": 82
 },
 {
@@ -37013,7 +37013,7 @@
 "sector_rs": 16.8834,
 "rs_rating": 63,
 "group": "Property-Casualty Insurers",
-"lane": "build"
+"lane": "hold"
 },
 {
 "symbol": "QLYS",
@@ -37283,7 +37283,7 @@
 "sector_rs": 16.8834,
 "rs_rating": 81,
 "group": "Property-Casualty Insurers",
-"lane": "build"
+"lane": "hold"
 },
 {
 "symbol": "HZN",
@@ -37304,7 +37304,7 @@
 "resistance": null,
 "ath": true,
 "close": 81.37,
-"value_cr": 180.6866,
+"value_cr": 180.6865,
 "name": "Bright Horizon Energy Corporation Common Stock",
 "size": "Mid",
 "industry": null,
@@ -37492,8 +37492,8 @@
 "sector_tag": "mixed",
 "sector_rs": 1.7854,
 "rs_rating": 58,
-"group": null,
-"lane": null
+"group": "Business Services",
+"lane": "hold"
 },
 {
 "symbol": "IQV",
@@ -37552,8 +37552,8 @@
 "sector_tag": "weak",
 "sector_rs": -0.7627,
 "rs_rating": 55,
-"group": null,
-"lane": null
+"group": "Biotechnology: Laboratory Analytical Instruments",
+"lane": "fade"
 },
 {
 "symbol": "CPK",
@@ -37613,7 +37613,7 @@
 "sector_rs": -0.7627,
 "rs_rating": 74,
 "group": "Containers/Packaging",
-"lane": "hold"
+"lane": "mid"
 },
 {
 "symbol": "CNI",
@@ -37792,8 +37792,8 @@
 "sector_tag": "mixed",
 "sector_rs": 16.8834,
 "rs_rating": 78,
-"group": null,
-"lane": null
+"group": "Property-Casualty Insurers",
+"lane": "hold"
 },
 {
 "symbol": "FTV",
@@ -37853,7 +37853,7 @@
 "sector_rs": -0.7627,
 "rs_rating": 75,
 "group": "Fluid Controls",
-"lane": "mid"
+"lane": "weak"
 },
 {
 "symbol": "SDRL",
@@ -37973,7 +37973,7 @@
 "sector_rs": 16.8834,
 "rs_rating": 64,
 "group": "Property-Casualty Insurers",
-"lane": "build"
+"lane": "hold"
 },
 {
 "symbol": "MAS",
@@ -38002,8 +38002,8 @@
 "sector_tag": "weak",
 "sector_rs": -0.7627,
 "rs_rating": 81,
-"group": null,
-"lane": null
+"group": "Industrial Specialties",
+"lane": "bounce"
 },
 {
 "symbol": "VLTO",
@@ -38123,7 +38123,7 @@
 "sector_rs": 16.8834,
 "rs_rating": 80,
 "group": "Property-Casualty Insurers",
-"lane": "build"
+"lane": "hold"
 },
 {
 "symbol": "RSG",
@@ -38174,7 +38174,7 @@
 "resistance": 187.58,
 "ath": false,
 "close": 125.6,
-"value_cr": 1277.3053,
+"value_cr": 1277.3731,
 "name": "Walt Disney Company (The) Common Stock",
 "size": "Large",
 "industry": "Consumer Discretionary",
@@ -38183,7 +38183,7 @@
 "sector_rs": 1.7854,
 "rs_rating": 68,
 "group": "Services-Misc. Amusement & Recreation",
-"lane": "build"
+"lane": "hold"
 },
 {
 "symbol": "WTW",
@@ -38243,7 +38243,7 @@
 "sector_rs": 29.2522,
 "rs_rating": 54,
 "group": "Biotechnology: Pharmaceutical Preparations",
-"lane": "mid"
+"lane": "hold"
 },
 {
 "symbol": "ESQ",
@@ -38333,7 +38333,7 @@
 "sector_rs": 1.7854,
 "rs_rating": 62,
 "group": "Homebuilding",
-"lane": "weak"
+"lane": "bounce"
 },
 {
 "symbol": "FSV",
@@ -38474,7 +38474,7 @@
 "resistance": null,
 "ath": true,
 "close": 131.94,
-"value_cr": 3180.3377,
+"value_cr": 3180.4466,
 "name": "Walmart Inc.",
 "size": "Large",
 "industry": "Consumer Discretionary",
