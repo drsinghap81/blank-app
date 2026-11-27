@@ -5550,6 +5550,25 @@ def optbt_summary():
                 results={k: v for k, v in r.items() if k not in ("method", "built")})
 
 
+# 27 Nov 2026: arbitrage pilot (NSE vs BSE, synthetic vs future) - arb_bt.py, once, outside market hours
+_arb = {}
+
+
+def arb_job():
+    if "j" not in _arb:
+        import arb_bt
+        _arb["j"] = arb_bt.ArbBT(broker, DATA, log=lambda ev, **kw: log(ev, **kw))
+    return _arb["j"]
+
+
+@app.get("/api/research/arb/summary")
+def arb_summary():
+    """pilot statistics only (no account data) - readable without the password so it can be checked from GitHub Actions."""
+    st = arb_job().status(); r = st.get("results") or {}
+    return dict(state=st.get("state"), progress=st.get("progress"), running=st.get("running"), built=r.get("built"), window=r.get("window"),
+                nse_bse=r.get("nse_bse"), synthetic=r.get("synthetic"))
+
+
 @app.post("/api/research/optbt")
 def optbt_start(_=Depends(auth)):
     return dict(started=optbt_job().start(), **{k: v for k, v in optbt_job().status().items() if k != "results"})
@@ -5583,6 +5602,13 @@ def _start():
                 j.start()          # waits for the market to close before it downloads anything
         except Exception as ex:  # noqa: BLE001
             log("optbt_error", error=str(ex)[:200])
+        try:
+            j = arb_job()
+            import arb_bt as _ab
+            if j.st.get("state") in ("idle", "running", "error") or ((j.status().get("results") or {}).get("version") or 0) < _ab.VERSION:
+                j.start()          # waits for the market to close
+        except Exception as ex:  # noqa: BLE001
+            log("arb_bt_error", error=str(ex)[:200])
         if ENV.get("RESEARCH_AUTO", "0") == "1":          # 11 Nov 2026: research test removed at Amritpal's request (off unless RESEARCH_AUTO=1)
             try:
                 j = research_job()
