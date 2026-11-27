@@ -1,50 +1,20 @@
 {
-"generated": "2026-11-27T04:17+00:00",
-"asof": "2026-11-26",
+"generated": "2026-11-27T17:42+00:00",
+"asof": "2026-11-27",
 "market": "NSE",
 "rules": "Stage 2 uptrend (close > EMA 50/150/200 stacked, EMA 200 rising, >= 30% above the 52-week low, within 25% of the high). Base from the highest swing high of the last 250 days; >= 2 contractions (zigzag 6% on highs/lows), each shallower with a higher low, the last <= 12%, volume drying up in the last one. Buy-stop just above the last contraction's high (pivot) on 1.4x volume; stop = the last contraction's low (max 10% away); sell after a daily close below EMA 50.",
 "backtest": "NSE 2017-26 (all stocks incl. delisted, costs): 221 trades, +4.9% a trade, 37% win; robust across 11 rule variants. Added to Momentum + Trend in one account: 24.2-24.7%/yr vs 23.1%, worst fall about the same, nothing extra in 2022-26. Watch bucket - your call.",
 "rows": [
 {
-"symbol": "ADANIPORTS",
-"name": "Adani Ports and Special Economic Zone Limited",
-"close": 1911.3,
-"pivot": 1824.0,
-"stop": 1674.2,
-"setup_date": "2026-10-12",
-"base_start": "2026-07-03",
-"dry": 0.96,
-"ema50": 1831.87,
-"contractions": [
-{
-"h_date": "2026-07-03",
-"h": 1891.1,
-"l_date": "2026-08-31",
-"l": 1593.1,
-"depth": 15.8
-},
-{
-"h_date": "2026-09-18",
-"h": 1824.0,
-"l_date": "2026-10-08",
-"l": 1674.2,
-"depth": 8.2
-}
-],
-"status": "forming",
-"to_pivot_pct": -4.6,
-"risk_pct": 8.2
-},
-{
 "symbol": "ARTEMISMED",
 "name": "Artemis Medicare Services Limited",
-"close": 318.7,
+"close": 326.4,
 "pivot": 304.1,
 "stop": 280.35,
 "setup_date": "2026-11-04",
 "base_start": "2026-09-25",
 "dry": 0.46,
-"ema50": 316.4,
+"ema50": 316.79,
 "contractions": [
 {
 "h_date": "2026-09-25",
@@ -62,19 +32,19 @@
 }
 ],
 "status": "forming",
-"to_pivot_pct": -4.6,
+"to_pivot_pct": -6.8,
 "risk_pct": 7.8
 },
 {
 "symbol": "FEDERALBNK",
 "name": "The Federal Bank  Limited",
-"close": 356.85,
+"close": 360.0,
 "pivot": 355.5,
 "stop": 329.5,
 "setup_date": "2026-11-11",
 "base_start": "2026-08-03",
 "dry": 0.98,
-"ema50": 346.32,
+"ema50": 346.86,
 "contractions": [
 {
 "h_date": "2026-08-03",
@@ -92,19 +62,19 @@
 }
 ],
 "status": "forming",
-"to_pivot_pct": -0.4,
+"to_pivot_pct": -1.2,
 "risk_pct": 7.3
 },
 {
 "symbol": "SWANDEF",
 "name": "Swan Defence and Heavy Industries Limited",
-"close": 2810.9,
+"close": 2791.2,
 "pivot": 2884.0,
 "stop": 2689.0,
 "setup_date": "2026-11-17",
 "base_start": "2026-10-13",
 "dry": 0.61,
-"ema50": 2743.9,
+"ema50": 2745.75,
 "contractions": [
 {
 "h_date": "2026-10-13",
@@ -122,7 +92,7 @@
 }
 ],
 "status": "forming",
-"to_pivot_pct": 2.6,
+"to_pivot_pct": 3.3,
 "risk_pct": 6.8
 }
 ]
