@@ -1,32 +1,56 @@
 {
- "generated": "2026-11-26T00:59+00:00",
- "asof": "2026-11-24",
+ "generated": "2026-11-27T01:00+00:00",
+ "asof": "2026-11-25",
  "market": "UK",
  "ema": 9,
  "rows": [
+  {
+   "symbol": "EXPN",
+   "index": false,
+   "status": "lift-off today",
+   "signal": "2026-11-25",
+   "signal_close": 3000.0,
+   "gain": 0.0,
+   "days": 0,
+   "ema": 2916.37,
+   "close": 3000.0,
+   "low": 2945.0
+  },
+  {
+   "symbol": "CCH",
+   "index": false,
+   "status": "lift-off today",
+   "signal": "2026-11-25",
+   "signal_close": 4326.0,
+   "gain": 0.0,
+   "days": 0,
+   "ema": 4308.27,
+   "close": 4326.0,
+   "low": 4312.0
+  },
   {
    "symbol": "RTO",
    "index": false,
    "status": "riding",
    "signal": "2026-10-14",
    "signal_close": 306.5,
-   "gain": 22.3,
-   "days": 29,
-   "ema": 364.64,
-   "close": 375.0,
-   "low": 372.3
+   "gain": 21.9,
+   "days": 30,
+   "ema": 366.41,
+   "close": 373.5,
+   "low": 373.5
   },
   {
    "symbol": "MKS",
    "index": false,
    "status": "riding",
    "signal": "2026-09-28",
-   "signal_close": 377.6,
-   "gain": 19.8,
-   "days": 41,
-   "ema": 455.55,
-   "close": 452.3,
-   "low": 450.1
+   "signal_close": 377.59,
+   "gain": 17.8,
+   "days": 42,
+   "ema": 453.36,
+   "close": 444.69,
+   "low": 441.89
   },
   {
    "symbol": "NXT",
@@ -34,11 +58,11 @@
    "status": "riding",
    "signal": "2026-10-13",
    "signal_close": 14800.0,
-   "gain": 6.1,
-   "days": 30,
-   "ema": 15863.38,
-   "close": 15700.0,
-   "low": 15505.0
+   "gain": 6.5,
+   "days": 31,
+   "ema": 15843.7,
+   "close": 15765.0,
+   "low": 15730.0
   },
   {
    "symbol": "IAG",
@@ -46,11 +70,11 @@
    "status": "riding",
    "signal": "2026-11-04",
    "signal_close": 436.3,
-   "gain": 2.6,
-   "days": 14,
-   "ema": 447.04,
-   "close": 447.6,
-   "low": 447.6
+   "gain": 0.1,
+   "days": 15,
+   "ema": 444.99,
+   "close": 436.8,
+   "low": 436.0
   }
  ],
  "test": "Tested 2007\u201326: indices +0.30% vs +0.32% holding any 16 days; top-50 stocks +0.03% vs +0.40%. No edge in the UK: reference only.",
