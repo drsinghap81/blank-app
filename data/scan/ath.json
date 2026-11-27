@@ -2,7 +2,7 @@
 "market": "NSE",
 "asof": "2026-11-27",
 "scan_date": "2026-11-28",
-"generated": "2026-11-27 19:17 UTC",
+"generated": "2026-11-27 23:15 UTC",
 "scanned": 2050,
 "rules": {
 "base_main": 24,
@@ -814,7 +814,7 @@
 "theme_rs": -3.5459,
 "td_score": 1,
 "aligned": false,
-"rs_rating": 65,
+"rs_rating": 64,
 "sector_pct": 94.0,
 "theme_pct": 47.0
 },
@@ -7792,7 +7792,7 @@
 "theme_rs": 2.4676,
 "td_score": 2,
 "aligned": false,
-"rs_rating": 74,
+"rs_rating": 73,
 "sector_pct": 61.0,
 "theme_pct": 73.0
 },
@@ -8676,7 +8676,7 @@
 "theme_rs": null,
 "td_score": 0,
 "aligned": false,
-"rs_rating": 29,
+"rs_rating": 30,
 "sector_pct": null,
 "theme_pct": null
 },
@@ -8936,7 +8936,7 @@
 "theme_rs": null,
 "td_score": 0,
 "aligned": false,
-"rs_rating": 41,
+"rs_rating": 42,
 "sector_pct": null,
 "theme_pct": null
 },
@@ -10392,7 +10392,7 @@
 "theme_rs": null,
 "td_score": 0,
 "aligned": false,
-"rs_rating": 47,
+"rs_rating": 48,
 "sector_pct": 61.0,
 "theme_pct": null
 },
@@ -10893,7 +10893,7 @@
 "sector_index": "NIFTY INFRASTRUCTURE",
 "sector_tag": "uptrend",
 "sector_rs": -5.4771,
-"rs_rating": 46
+"rs_rating": 47
 },
 {
 "symbol": "ASTRAL",
@@ -11141,7 +11141,7 @@
 "sector_index": "NIFTY PHARMA",
 "sector_tag": "leading",
 "sector_rs": 9.7255,
-"rs_rating": 36
+"rs_rating": 37
 },
 {
 "symbol": "ORIANA",
