@@ -4152,9 +4152,10 @@ function fundRows() {
   const P = state.fund; if (!P) return [];
   const k = state.fundK || 'all'; const z = state.fundZ || 'all'; const cat = state.fundC || ''; const q = (state.fundQ || '').toLowerCase(); const mk = state.fundM || 'IN';
   return (P.rows || []).filter((r) => (r.market || 'IN') === mk && (mk !== 'IN' || k === 'all' || (k === 'etf' ? r.kind !== 'fund' : r.kind === 'fund'))
-    && (z === 'all' || (z === 'topup' ? r.topup : z === 'mid' ? r.below_high_pct >= 10 && r.below_high_pct < 20 : z === 'pat' ? !!r.pattern : z === 'b200' ? !r.above_200 : true))
+    && (z === 'all' || (z === 'topup' ? r.topup : z === 'mid' ? r.below_high_pct >= 10 && r.below_high_pct < 20 : z === 'pat' ? !!r.pattern : z === 'b200' ? !r.above_200 : z === 'mbo' ? !!(r.mbo && r.mbo.status === 'crossed') : z === 'mbo2' ? !!(r.mbo && r.mbo.status !== 'crossed') : true))
     && (mk !== 'IN' || !cat || r.category === cat) && (!q || r.name.toLowerCase().includes(q) || r.key.toLowerCase().includes(q)));
 }
+const ymTxt = (ym) => { const [y, m] = String(ym || '').split('-'); return m ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m - 1] + ' ' + y.slice(2) : ym; };
 const fundName = (r) => (r.kind === 'fund' ? r.name : `${r.symbol || r.key} · ${r.name}`);
 const FUND_MK = { IN: 'India', US: 'US', AU: 'Australia', UK: 'UK & Europe' };
 function fundItem(r, i) {
@@ -4162,6 +4163,7 @@ function fundItem(r, i) {
   const chip = `${r.topup ? `<span class="chip new">${(r.market || 'IN') === 'IN' ? 'Top-up zone' : '20%+ below high'}</span>` : ''}<span class="chip ${r.below_high_pct >= 10 ? 'open' : ''}">${r.below_high_pct < 0.5 ? 'at its high' : `${fmt(r.below_high_pct, 1)}% below high`}</span>`
     + `<span class="chip">${r.above_200 ? 'above' : 'below'} 200-day</span><span class="chip">RSI ${fmt(r.rsi, 0)}</span>`
     + (r.pattern ? `<span class="chip open">${PAT_NM[r.pattern.typ]} ${r.pattern.status === 'breakout' ? 'breakout' : 'forming'}</span>` : '')
+    + (r.mbo ? `<span class="chip ${r.mbo.status === 'crossed' ? 'new' : r.mbo.status === 'above' ? 'open' : ''}">${r.mbo.status === 'crossed' ? `Crossed ${esc(ymTxt(r.mbo.month))} breakout high ${r.mbo.sessions_ago ? r.mbo.sessions_ago + 'd ago' : 'today'}` : r.mbo.status === 'above' ? `${fmt(r.mbo.now_pct, 1)}% above ${esc(ymTxt(r.mbo.month))} breakout high` : `${fmt(-r.mbo.now_pct, 1)}% under ${esc(ymTxt(r.mbo.month))} breakout high`}</span>` : '')
     + `<span class="chip">${r.kind === 'fund' ? esc(r.category) : r.kind === 'debt' ? 'Bond/cash ETF' : 'ETF'}</span>`;
   return `<li class="row ${r.topup ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(fundName(r))}</div>
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${(r.r1y || 0) >= 0 ? 'up' : 'down'}">1y ${pc(r.r1y)}</span></div></li>`;
@@ -4187,13 +4189,15 @@ async function loadFunds() {
     <div class="status exit watch" style="margin:10px 16px">${banner}</div>
     <div class="card">
       ${mk === 'IN' ? seg('fundk', state.fundK || 'all', [['all', `All ${R.length}`], ['etf', `ETFs ${ne}`], ['fund', `Funds ${R.length - ne}`]]) : ''}
-      ${seg('fundz', state.fundZ || 'all', [['all', 'Any level'], ['topup', `${mk === 'IN' ? 'Top-up zone' : '20%+ below high'} ${nt}`], ['mid', '10–20% below'], ['b200', 'Below 200-day'], ['pat', 'Bottom pattern']])}
+      ${seg('fundz', state.fundZ || 'all', [['all', 'Any level'], ['topup', `${mk === 'IN' ? 'Top-up zone' : '20%+ below high'} ${nt}`], ['mid', '10–20% below'], ['b200', 'Below 200-day'], ['mbo', `Crossed monthly breakout high ${R.filter((r) => r.mbo && r.mbo.status === 'crossed').length}`], ['mbo2', `Breakout high: above / near ${R.filter((r) => r.mbo && r.mbo.status !== 'crossed').length}`], ['pat', 'Bottom pattern']])}
       ${mk === 'IN' && (state.fundK || 'all') !== 'etf' ? `<label class="search"><select id="fundc"><option value="">All fund categories</option>${cats.map((c) => `<option ${state.fundC === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></label>` : ''}
       <details class="info"><summary>How to read this</summary><p>Below high = how far the latest price or NAV is under its all-time high (ETFs: Yahoo history; funds: AMFI NAV history). Top-up zone = ${P.topup_pct}%+ below the high (not shown for gold, silver, debt and international ETFs — international ETFs trade at a changing premium to the overseas index). 200-day = the price or NAV against its 200-day average. RSI(14) on daily closes. Bottom pattern = the same double bottom / tilted W / triple bottom / inverse H&S rules as the Bottom patterns list, on the closing line. Funds: open-ended equity and index funds, direct plan, growth option, with a NAV in the last 10 days and at least a year of history. Updated nightly.</p></details>
       <label class="search"><input id="fundq" type="search" placeholder="Search ETF, fund or AMC" value="${esc(state.fundQ || '')}" autocomplete="off"></label>
       <ul class="list flat" id="fundlist"></ul></div>`;
   const list = () => {
-    const L = fundRows(); const S_ = L.slice(0, 200);
+    const L = fundRows(); const zz = state.fundZ || 'all';
+    if (zz === 'mbo' || zz === 'mbo2') L.sort((a, b) => ((a.mbo.sessions_ago ?? 99) - (b.mbo.sessions_ago ?? 99)) || (Math.abs(a.mbo.now_pct) - Math.abs(b.mbo.now_pct)));
+    const S_ = L.slice(0, 200);
     $('#fundlist').innerHTML = (S_.length ? S_.map(fundItem).join('') : '<li class="empty">Nothing matches.</li>') + (L.length > 200 ? `<li class="empty">Showing 200 of ${L.length}, deepest below their high first. Search or pick a category to narrow.</li>` : '');
     $('#fundlist').querySelectorAll('.row').forEach((r) => { const go = () => fundSelect(S_[+r.dataset.i]); r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
   };

@@ -142,6 +142,38 @@ def mclose_state(x):
                 above_pct=round(float((mc.iloc[i] / old - 1) * 100), 2), sma_rising=rising, long_cup=bool(base >= 36 and dep <= -0.30))
 
 
+def mbo_state(x):
+    """monthly breakout candle: the last COMPLETED month whose close beat the highest high of all earlier months, with >= 12 months
+    since that earlier high; trigger = the breakout month's high. Status (looked at for the 2 months after the breakout month):
+      crossed  - the first daily close above the trigger came in the last 5 sessions
+      above    - crossed earlier and still above
+      waiting  - not crossed yet (within 5% below)
+    """
+    d = x.dropna(); c = d.Close; last = c.index[-1]
+    m = d.resample("ME").agg({"High": "max", "Close": "last"}).dropna()
+    m = m[m.index.to_period("M") < last.to_period("M")]
+    if len(m) < 14:
+        return None
+    hi = m.High.to_numpy(float); cl = m.Close.to_numpy(float)
+    for i in range(len(m) - 1, max(len(m) - 4, 12) - 1, -1):          # breakout month in the last 3 completed months
+        prior = hi[:i]; a = int(np.argmax(prior))
+        if cl[i] > prior[a] and i - a >= 12:
+            trig = float(hi[i]); after = c[c.index > m.index[i]]
+            if not len(after):
+                return None
+            up = after > trig; first = after.index[up.to_numpy().argmax()] if up.any() else None
+            days = int((after.index > first).sum()) if first is not None else None
+            now = float(c.iloc[-1])
+            st = "crossed" if first is not None and days <= 4 and now > trig else "above" if first is not None and now > trig else \
+                 "waiting" if now >= trig * 0.95 else None
+            if st is None:
+                return None
+            return dict(status=st, month=str(m.index[i].strftime("%Y-%m")), trigger=round(trig, 4), close_month=round(float(cl[i]), 4),
+                        crossed_on=str(first.date()) if first is not None else None, sessions_ago=days, now_pct=round((now / trig - 1) * 100, 2),
+                        base_months=int(i - a), old_high=round(float(prior[a]), 4))
+    return None
+
+
 def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
     s = s.dropna(); s = s[s > 0]
     if len(s) < 60:                       # 28 Nov 2026: young funds too (was 260 sessions); long-period figures stay empty
@@ -196,6 +228,12 @@ def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
                 row["w"] = {k: wr.get(k) for k in ("status", "stage", "low1", "low2", "broke_on", "days_ago", "since", "line_now", "dist_pct", "low1_close", "chart")}
         except Exception as e:  # noqa: BLE001
             print("w fail", key, str(e)[:80])
+    # 28 Nov 2026 (Amritpal: "shortlist those that have just crossed the monthly breakout candle high"): the latest month that CLOSED
+    # above the highest high of all earlier months (base >= 12 months), and whether the daily close has since crossed that month's high
+    try:
+        row["mbo"] = None if kind == "debt" else mbo_state(x)
+    except Exception as e:  # noqa: BLE001
+        row["mbo"] = None; print("mbo fail", key, str(e)[:80])
     # 28 Nov 2026 (Amritpal: "can I see candlestick chart also"): weekly candles - real OHLC for ETFs, NAV-built for funds
     # (open = first NAV of the week, high / low = highest / lowest NAV, close = last NAV)
     wk = x.resample("W-FRI").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna().tail(260)
