@@ -4163,7 +4163,7 @@ function fundItem(r, i) {
   const chip = `${r.topup ? `<span class="chip new">${(r.market || 'IN') === 'IN' ? 'Top-up zone' : '20%+ below high'}</span>` : ''}<span class="chip ${r.below_high_pct >= 10 ? 'open' : ''}">${r.below_high_pct < 0.5 ? 'at its high' : `${fmt(r.below_high_pct, 1)}% below high`}</span>`
     + `<span class="chip">${r.above_200 ? 'above' : 'below'} 200-day</span><span class="chip">RSI ${fmt(r.rsi, 0)}</span>`
     + (r.pattern ? `<span class="chip open">${PAT_NM[r.pattern.typ]} ${r.pattern.status === 'breakout' ? 'breakout' : 'forming'}</span>` : '')
-    + (r.mbo ? `<span class="chip ${r.mbo.status === 'crossed' ? 'new' : r.mbo.status === 'above' ? 'open' : ''}">${r.mbo.status === 'crossed' ? `Crossed ${esc(ymTxt(r.mbo.month))} breakout high ${r.mbo.sessions_ago ? r.mbo.sessions_ago + 'd ago' : 'today'}` : r.mbo.status === 'above' ? `${fmt(r.mbo.now_pct, 1)}% above ${esc(ymTxt(r.mbo.month))} breakout high` : `${fmt(-r.mbo.now_pct, 1)}% under ${esc(ymTxt(r.mbo.month))} breakout high`}</span>` : '')
+    + (r.mbo ? `<span class="chip ${r.mbo.status === 'crossed' ? 'new' : r.mbo.status === 'above' ? 'open' : ''}">${r.mbo.status === 'crossed' ? `Crossed ${esc(ymTxt(r.mbo.month))} breakout high ${r.mbo.sessions_ago ? r.mbo.sessions_ago + 'd ago' : 'today'}` : r.mbo.status === 'above' ? `${fmt(r.mbo.now_pct, 1)}% above ${esc(ymTxt(r.mbo.month))} breakout high` : `${fmt(-r.mbo.now_pct, 1)}% under ${esc(ymTxt(r.mbo.month))} breakout high`}</span><span class="chip ${r.mbo.base_months >= 36 ? 'new' : r.mbo.base_months >= 24 ? 'open' : ''}">${r.mbo.base_months >= 24 ? fmt(r.mbo.base_months / 12, 1) + '-year' : r.mbo.base_months + '-month'} base</span>` : '')
     + `<span class="chip">${r.kind === 'fund' ? esc(r.category) : r.kind === 'debt' ? 'Bond/cash ETF' : 'ETF'}</span>`;
   return `<li class="row ${r.topup ? 'main' : ''}" tabindex="0" data-i="${i}"><div><div class="sym">${esc(fundName(r))}</div>
     <div class="tags">${chip}</div></div><div></div><div class="num"><b>${fmt(r.close, 2, 'en-IN')}</b><span class="${(r.r1y || 0) >= 0 ? 'up' : 'down'}">1y ${pc(r.r1y)}</span></div></li>`;
@@ -4196,7 +4196,7 @@ async function loadFunds() {
       <ul class="list flat" id="fundlist"></ul></div>`;
   const list = () => {
     const L = fundRows(); const zz = state.fundZ || 'all';
-    if (zz === 'mbo' || zz === 'mbo2') L.sort((a, b) => ((a.mbo.sessions_ago ?? 99) - (b.mbo.sessions_ago ?? 99)) || (Math.abs(a.mbo.now_pct) - Math.abs(b.mbo.now_pct)));
+    if (zz === 'mbo' || zz === 'mbo2') L.sort((a, b) => ((b.mbo.base_months || 0) - (a.mbo.base_months || 0)) || ((a.mbo.sessions_ago ?? 99) - (b.mbo.sessions_ago ?? 99)));   /* Amritpal: the longer the base the better */
     const S_ = L.slice(0, 200);
     $('#fundlist').innerHTML = (S_.length ? S_.map(fundItem).join('') : '<li class="empty">Nothing matches.</li>') + (L.length > 200 ? `<li class="empty">Showing 200 of ${L.length}, deepest below their high first. Search or pick a category to narrow.</li>` : '');
     $('#fundlist').querySelectorAll('.row').forEach((r) => { const go = () => fundSelect(S_[+r.dataset.i]); r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
