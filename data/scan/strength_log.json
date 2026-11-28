@@ -1,0 +1,183 @@
+[
+{
+"symbol": "DIACABS",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "MENONBE",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "ROSSTECH",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "MARINE",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "ACMESOLAR",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "PARAS",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "QPOWER",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "ASTRAMICRO",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "BEML",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "BALRAMCHIN",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "BHEL",
+"list": "leaders",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "AVADHSUGAR",
+"list": "leaders",
+"day": "2026-11-26",
+"gate": true,
+"result": "open",
+"entry_day": "2026-11-27",
+"entry": 875.3,
+"now_pct": -0.5
+},
+{
+"symbol": "KROSS",
+"list": "leaders",
+"day": "2026-11-26",
+"gate": true,
+"result": "open",
+"entry_day": "2026-11-27",
+"entry": 273.75,
+"now_pct": -0.5
+},
+{
+"symbol": "PAYTM",
+"list": "leaders",
+"day": "2026-11-26",
+"gate": true,
+"result": "open",
+"entry_day": "2026-11-27",
+"entry": 1741.9,
+"now_pct": -0.5
+},
+{
+"symbol": "PNB",
+"list": "leaders",
+"day": "2026-11-26",
+"gate": true,
+"result": "open",
+"entry_day": "2026-11-27",
+"entry": 146.5,
+"now_pct": -0.5
+},
+{
+"symbol": "DHAMPURSUG",
+"list": "leaders",
+"day": "2026-11-26",
+"gate": true,
+"result": "open",
+"entry_day": "2026-11-27",
+"entry": 195.46,
+"now_pct": -0.5
+},
+{
+"symbol": "SHAILY",
+"list": "leaders",
+"day": "2026-11-26",
+"gate": true,
+"result": "open",
+"entry_day": "2026-11-27",
+"entry": 3350.5,
+"now_pct": -0.5
+},
+{
+"symbol": "AETHER",
+"list": "leaders",
+"day": "2026-11-25",
+"gate": true,
+"result": "open",
+"entry_day": "2026-11-26",
+"entry": 1700.8,
+"now_pct": 3.06
+},
+{
+"symbol": "ISGEC",
+"list": "leaders",
+"day": "2026-11-25",
+"gate": true,
+"result": "open",
+"entry_day": "2026-11-26",
+"entry": 1028.3,
+"now_pct": -1.66
+},
+{
+"symbol": "SWARAJ",
+"list": "tight",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "JAGRAN",
+"list": "tight",
+"day": "2026-11-27",
+"gate": true,
+"result": "waiting"
+},
+{
+"symbol": "SWARAJ",
+"list": "tight",
+"day": "2026-11-26",
+"gate": true,
+"result": "open",
+"entry_day": "2026-11-27",
+"entry": 397.5,
+"now_pct": -0.5
+}
+]
