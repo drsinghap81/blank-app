@@ -1,16 +1,22 @@
 symbol,trigger_date,trigger_close,trigger_rsi,ema21_then,stop,risk_pct,days_ago,move_since,name,list,score,r2,above21_60d,value_cr,close,rsi
-ABM,2026-11-25,55.14,61.3,53.94,53.36,3.3,0,0.0,ABM Industries Incorporated Common Stock,watch,133.2,0.86,83,20.1,55.14,61.3
-CRVL,2026-11-24,89.0,63.3,85.24,85.66,3.9,1,2.8,CorVel Corp.,trend,152.6,0.92,98,17.78,91.51,67.9
-MCK,2026-11-24,1078.09,60.3,1051.28,1043.0,3.4,1,-0.1,McKesson Corporation Common Stock,watch,138.5,0.89,78,779.26,1077.32,60.1
-SN,2026-11-24,228.93,61.1,216.83,211.74,8.1,1,1.6,"SharkNinja, Inc. Ordinary Shares",watch,136.5,0.85,73,374.46,232.5,63.0
-ABBV,2026-11-24,300.28,64.1,289.41,284.45,5.6,1,-1.9,AbbVie Inc. Common Stock,watch,132.0,0.83,85,1668.52,294.48,56.6
-ZIM,2026-11-24,30.49,60.6,29.34,29.09,4.8,1,1.3,ZIM Integrated Shipping Services Ltd. Ordinary Shares,watch,111.1,0.7,70,47.62,30.88,63.1
-TBBB,2026-11-23,66.44,60.7,64.41,64.42,3.1,2,-1.3,BBB Foods Inc. Class A Common Shares,watch,162.2,0.9,100,85.02,65.58,57.4
-GMAB,2026-11-23,53.17,61.8,50.53,50.24,5.8,2,6.8,Genmab A/S - American Depositary Shares,trend,155.3,0.88,95,238.62,56.8,68.9
-CON,2026-11-23,43.17,62.0,41.57,40.9,5.6,2,-0.3,"Concentra Group Holdings Parent, Inc. Common Stock",trend,154.8,0.93,95,44.74,43.06,60.9
-USPH,2026-11-23,96.85,60.4,94.15,93.2,3.9,2,1.8,"U.S. Physical Therapy, Inc. Common Stock",trend,146.3,0.89,90,20.6,98.58,63.9
-GILD,2026-11-23,170.59,60.5,166.02,164.8,3.5,2,3.6,"Gilead Sciences, Inc.",trend,144.1,0.92,85,1146.54,176.74,65.8
-BIIB,2026-11-23,256.71,60.7,248.84,243.58,5.4,2,1.8,Biogen Inc.,trend,138.6,0.86,90,282.98,261.44,60.5
-ALRM,2026-11-23,66.84,62.8,64.83,64.6,3.5,2,-1.2,"Alarm.com Holdings, Inc.",watch,125.7,0.8,70,33.16,66.07,58.3
-UVE,2026-11-23,49.29,60.8,48.02,46.68,5.6,2,-2.7,UNIVERSAL INSURANCE HOLDINGS INC Common Stock,watch,123.3,0.77,80,10.76,47.95,50.8
-DIS,2026-11-23,120.27,60.8,116.74,117.46,2.4,2,4.4,Walt Disney Company (The) Common Stock,watch,115.4,0.74,78,1277.38,125.6,68.9
+TBBB,2026-11-27,67.3,62.1,64.86,64.31,4.6,0,0.0,BBB Foods Inc. Class A Common Shares,trend,162.5,0.9,100,86.02,67.3,62.1
+AMPH,2026-11-27,30.2,63.4,28.55,28.88,4.6,0,0.0,"Amphastar Pharmaceuticals, Inc.",trend,153.0,0.9,95,15.14,30.2,63.4
+SAIC,2026-11-27,151.22,61.1,146.24,142.38,6.2,0,0.0,Science Applications International Corporation,watch,139.3,0.89,80,60.6,151.22,61.1
+ALRM,2026-11-27,67.57,63.7,65.33,65.62,3.0,0,0.0,"Alarm.com Holdings, Inc.",watch,125.7,0.8,70,32.22,67.57,63.7
+AAPL,2026-11-27,358.54,60.2,349.72,345.13,3.9,0,0.0,Apple Inc.,watch,122.6,0.74,88,17580.82,358.54,60.2
+ABM,2026-11-25,55.14,61.3,53.94,53.36,3.3,2,0.3,ABM Industries Incorporated Common Stock,trend,134.2,0.86,85,19.72,55.3,62.1
+CRVL,2026-11-24,89.0,63.3,85.24,85.66,3.9,3,5.0,CorVel Corp.,trend,150.1,0.92,98,17.88,93.47,70.9
+MCK,2026-11-24,1078.09,60.3,1051.28,1043.0,3.4,3,-0.2,McKesson Corporation Common Stock,watch,138.5,0.89,78,756.38,1075.66,59.5
+SN,2026-11-24,228.93,61.1,216.83,211.74,8.1,3,3.5,"SharkNinja, Inc. Ordinary Shares",watch,134.8,0.85,75,357.62,236.98,65.3
+ABBV,2026-11-24,300.28,64.1,289.41,284.45,5.6,3,-2.8,AbbVie Inc. Common Stock,watch,131.9,0.83,85,1666.38,291.88,53.6
+BRK.A,2026-11-24,865490.0,60.8,853038.66,849696.0,1.9,3,0.8,Berkshire Hathaway Inc. Common Stock,watch,115.4,0.7,83,189.72,872790.0,63.8
+ZIM,2026-11-24,30.49,60.6,29.34,29.09,4.8,3,0.4,ZIM Integrated Shipping Services Ltd. Ordinary Shares,watch,111.1,0.7,70,48.88,30.62,60.3
+TBBB,2026-11-23,66.44,60.7,64.41,64.42,3.1,4,1.3,BBB Foods Inc. Class A Common Shares,trend,162.5,0.9,100,86.02,67.3,62.1
+CON,2026-11-23,43.17,62.0,41.57,40.9,5.6,4,1.0,"Concentra Group Holdings Parent, Inc. Common Stock",trend,154.6,0.93,95,42.6,43.59,63.4
+GMAB,2026-11-23,53.17,61.8,50.53,50.24,5.8,4,8.6,Genmab A/S - American Depositary Shares,trend,154.1,0.88,95,225.56,57.75,70.5
+AMPH,2026-11-23,29.7,62.5,28.19,27.79,6.9,4,1.7,"Amphastar Pharmaceuticals, Inc.",trend,153.0,0.9,95,15.14,30.2,63.4
+GILD,2026-11-23,170.59,60.5,166.02,164.8,3.5,4,3.8,"Gilead Sciences, Inc.",trend,145.7,0.93,85,1103.64,177.0,66.1
+USPH,2026-11-23,96.85,60.4,94.15,93.2,3.9,4,4.7,"U.S. Physical Therapy, Inc. Common Stock",trend,143.9,0.89,90,20.66,101.36,68.8
+BIIB,2026-11-23,256.71,60.7,248.84,243.58,5.4,4,2.9,Biogen Inc.,trend,138.7,0.86,90,274.82,264.2,62.3
+ALRM,2026-11-23,66.84,62.8,64.83,64.6,3.5,4,1.1,"Alarm.com Holdings, Inc.",watch,125.7,0.8,70,32.22,67.57,63.7
+DIS,2026-11-23,120.27,60.8,116.74,117.46,2.4,4,5.8,Walt Disney Company (The) Common Stock,watch,115.4,0.75,78,1287.82,127.24,70.9
