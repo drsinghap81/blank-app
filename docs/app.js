@@ -2555,8 +2555,8 @@ async function loadBasket() {
       ${b.ret != null ? `<span class="bs-r"><b class="up">${b.ret}%</b><small>a year</small><b class="down">${b.dd}%</b><small>worst fall</small></span>` : '<span class="bs-r"><b>🛡</b><small>hedge</small></span>'}</div>
       ${b.note ? `<p class="bs-note">${esc(b.note)}</p>` : ''}${b.hedgeOnly ? '' : paperLine(b.id)}${list(b)}${body}<div class="bs-f">${mode}</div><div class="bs-arm" data-arm="${b.id}" hidden></div></article>`; };
   el.innerHTML = `<p class="bs-top">India stock baskets (${BASKETS.map((b, i) => b.al ? i + 1 : 0).filter(Boolean).join(', ')}) share your Angel account, so one is active at a time. <b>Use</b> sets its capital and split on your server, and Trade Live then lists that basket's orders. <b>Bot</b> lets the server place them; <b>Manual</b> means you Send them.</p>
-    ${BASKETS.map(card).join('')}<div id="cupb" data-pl="${esc(paperLine('lc'))}"></div><div id="emab"></div><div id="triw"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
-  cupBasket(el.querySelector('#cupb')); emaBounce(el.querySelector('#emab')); triangleWatch(el.querySelector('#triw'));
+    ${BASKETS.map(card).join('')}<div id="cupb" data-pl="${esc(paperLine('lc'))}"></div><div id="emab"></div><div id="triw"></div><div id="stw"></div><p class="bs-top">Figures are backtests (NSE 2017–26, US ETFs 2011–26), before tax.</p>`;
+  cupBasket(el.querySelector('#cupb')); emaBounce(el.querySelector('#emab')); triangleWatch(el.querySelector('#triw')); stWatch(el.querySelector('#stw'));
   { const sa = el.querySelector('[data-sendall]'); if (sa) sa.addEventListener('click', () => trSend(OD.list, 'NSE', sa).then(() => setTimeout(loadBasket, 3000))); }
   el.querySelectorAll('[data-trade]').forEach((x) => x.addEventListener('click', () => { state.trMk = 'NSE'; show('trade'); }));
   el.querySelectorAll('[data-use]').forEach((x) => x.addEventListener('click', async () => { const b = BASKETS.find((y) => y.id === x.dataset.use); const cap0 = +el.querySelector(`[data-cap="${b.id}"]`).value || 0; if (b.hedge && !cap0) { alertMsg('Enter your capital: 80% goes to the stock systems, 10% gold, 10% dollar.'); return; }
@@ -9155,6 +9155,74 @@ const t3Bars = (ch, small) => `<span class="t3-bars${small ? ' sm' : ''}" role="
 const t3Pill = (cls, t) => `<span class="t3-pill ${cls}">${t}</span>`;
 const t3Yoy = (y) => (y == null ? t3Pill('', 'Profit n/a') : t3Pill(y >= 0 ? 'ok' : 'bad', `Profit ${y >= 0 ? '+' : '−'}${y >= 999 ? '999+' : fmt(Math.abs(y), 0)}%`));
 const t3Px = (p) => (p ? t3Pill(p.k === 'Cheap' ? 'ok' : p.k === 'Pricey' ? 'warn' : '', p.k === 'Fair' ? 'Fair price' : p.k) : '');
+/* ------------------------------------------------------------------ Strength scan (28 Nov 2026, Amritpal: "go with the website features
+   but use slightly different names"): Strength score 1-99, Uptrend health x/8, Phase, vs-Nifty line, Market breadth, Breakout check,
+   Nearest to buy, and two watch lists. Data: data/scan/strength.json (tools/strength_scan.py, 21:25 IST). Display only - no system changes. */
+const PHASE = { 1: 'Basing', 2: 'Rising', 3: 'Topping', 4: 'Falling' };
+async function stLoad() { if (state.stg === undefined) state.stg = await getJSON(MAIN + 'data/scan/strength.json', 'strength').catch(() => null); return state.stg; }
+function stOf(sym) { const S = state.stg; const a = S && S.s && S.s[sym]; return a ? { sc: a[0], h: a[1], ph: a[2], hi: a[3], sc1: a[4], c: a[5] } : null; }
+function stPills(sym) {
+  const o = stOf(sym); if (!o) return '';
+  return (o.sc != null ? t3Pill(o.sc >= 80 ? 'ok' : o.sc < 50 ? 'warn' : '', `Strength ${o.sc}`) : '') + t3Pill(o.h >= 7 ? 'ok' : o.h <= 4 ? 'warn' : '', `Uptrend ${o.h}/8`)
+    + (o.ph && o.ph !== 2 ? t3Pill(o.ph === 4 ? 'bad' : 'warn', PHASE[o.ph]) : '');
+}
+function stDist(r, lvl) {   // Nearest to buy: % the last close must still rise to reach the buy level
+  const o = stOf(r.symbol); if (!o || !o.c || !lvl) return null; return (lvl / o.c - 1) * 100;
+}
+function stCheck(r) {   // Breakout check on a buy card: holding above the breakout level, slipped back under it, or stopped
+  const o = stOf(r.symbol); if (!o || !o.c) return '';
+  if (r.trigger) { const d = stDist(r, r.trigger); return d == null ? '' : t3Pill(d <= 2 ? 'ok' : '', d <= 0 ? 'At the buy level' : `${fmt(d, 1)}% to buy`); }
+  const lv = r.entry0 || null; if (!lv) return '';
+  if (r.stop && o.c <= r.stop) return t3Pill('bad', 'Breakout check: stopped');
+  return o.c >= lv ? t3Pill('ok', `Holding +${fmt((o.c / lv - 1) * 100, 1)}% over breakout`) : t3Pill('warn', 'Slipped back under breakout');
+}
+function stBreadth() {
+  const S = state.stg; const b = S && S.breadth; if (!b) return '';
+  const mood = b.above50 >= 60 ? ['ok', 'Broad'] : b.above50 >= 40 ? ['', 'Mixed'] : ['bad', 'Narrow'];
+  return `<section class="t3-sec st-br"><div class="st-brh"><h3>Market breadth</h3><span class="t3-pill ${mood[0]}">${mood[1]}</span></div>
+    <div class="st-brg"><div><b>${fmt(b.above50, 0)}%</b><small>above 50-day${b.above50_month_ago != null ? ` (${fmt(b.above50_month_ago, 0)}% a month ago)` : ''}</small></div>
+      <div><b>${fmt(b.above200, 0)}%</b><small>above 200-day</small></div><div><b>${b.highs} / ${b.lows}</b><small>52-week highs / lows</small></div>
+      <div><b>${b.up} / ${b.down}</b><small>up / down today</small></div></div>
+    <small class="muted">${b.n} liquid NSE stocks · ${esc(S.asof || '')} close · context, not a buy rule</small></section>`;
+}
+function vsNiftySvg(sym) {   // the stock / Nifty line over the last year (weekly), 100 at the start; dot = 52-week high
+  const S = state.stg; const W = state.mxW && state.mxW.NSE; const v = W && W.s && W.s[sym]; const N = S && S.nifty_w && S.nifty_w.c;
+  if (!v || !N || v.length < 20 || N.length < 20) return '';
+  const k = Math.min(53, v.length, N.length); const a = v.slice(-k), b = N.slice(-k);
+  const r = a.map((x, i) => (x && b[i] ? x / b[i] : null)); const f = r.find((x) => x); if (!f) return '';
+  const y = r.map((x) => (x ? (x / f) * 100 : null)); const ok = y.filter((x) => x != null); const lo = Math.min(...ok), hi = Math.max(...ok);
+  const Wd = 340, Hh = 70, X = (i) => (i / (k - 1)) * Wd, Y = (q) => 4 + (hi - q) / ((hi - lo) || 1) * (Hh - 8);
+  const path = y.map((q, i) => (q == null ? '' : `${i && y[i - 1] != null ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(q).toFixed(1)}`)).join(' ');
+  const last = y[y.length - 1]; const top = last != null && last >= hi - 1e-9;
+  return `<svg viewBox="0 0 ${Wd} ${Hh}" width="100%" height="${Hh}" preserveAspectRatio="none" aria-label="${esc(sym)} versus Nifty 50, one year"><path d="${path}" fill="none" stroke="var(--accent, #8b9cff)" stroke-width="2"/>${top ? `<circle cx="${X(k - 1)}" cy="${Y(last)}" r="4" fill="#5fe3b0"/>` : ''}</svg>
+    <small class="muted">vs Nifty 50, one year: ${last != null ? `<b class="${last >= 100 ? 'up' : 'down'}">${last >= 100 ? '+' : '−'}${fmt(Math.abs(last - 100), 0)}%</b>` : ''}${top ? ' · <b class="up">at a 52-week high</b>' : ''}</small>`;
+}
+function stSection(sym) {
+  const o = stOf(sym); if (!o) return '';
+  const dots = Array.from({ length: 8 }, (_, i) => `<i class="${i < o.h ? 'on' : ''}"></i>`).join('');
+  const ch = o.sc != null && o.sc1 != null ? o.sc - o.sc1 : null;
+  return `<section class="sp-t st-sp"><h3>Strength</h3><div class="st-row"><div><b>${o.sc ?? '–'}</b><small>Strength score 1–99${ch != null ? ` · ${ch >= 0 ? '+' : '−'}${Math.abs(ch)} in a month` : ''}</small></div>
+      <div><b>${o.h}/8</b><small>Uptrend health</small><span class="st-dots" aria-hidden="true">${dots}</span></div><div><b>${PHASE[o.ph] || '–'}</b><small>Phase</small></div></div>
+    ${vsNiftySvg(sym)}<small class="muted">Strength = 1-year return (last 3 months count double) ranked against every liquid NSE stock. Uptrend health = 8 trend checks (above rising 50/150/200-day averages, near the high, well off the low, strength 70+).</small></section>`;
+}
+async function stWatch(box) {
+  if (!box) return; const S = await stLoad();
+  if (!S) { box.innerHTML = '<article class="bs-c"><div class="bs-h"><span class="bs-n">▲</span><div><b>Strength watch lists</b><small>The first lists appear after tonight\'s scan (21:25 IST).</small></div></div></article>'; return; }
+  const tab = state.stTab || 'leaders'; const R = (S.rows || []).filter((r) => r.list === tab); const rec = (S.record || {})[tab] || {};
+  const f2 = (v) => fmt(v, 2, 'en-IN');
+  const info = { leaders: ['Healthy uptrend leaders', 'Uptrend health just turned 8/8 with a Strength score of 80+.', 'Tested since 2021: +26.9%/yr, worst fall −33% (Nifty +11.0%, −17%).'],
+    tight: ['Tight range breakout', 'A strong stock (Strength 70+) near its high closed above a tight 20-day range (15% or less) on 1.5× volume.', 'Tested since 2021: +21.2%/yr, worst fall −26%.'] }[tab];
+  const row = (r) => `<li class="cb-r" data-stw="${esc(r.symbol)}" role="button" tabindex="0"><div><b>${esc(r.symbol)}</b><small>${esc(r.why)}</small>
+      <span class="cb-t"><i>${r.age ? `${r.age} session${r.age > 1 ? 's' : ''} ago` : 'today'}</i><i>Strength ${r.strength ?? '–'}</i></span></div>
+    <div class="cb-a"><span>Close <b>${f2(r.close)}</b><small>trail stop ${f2(r.stop)} (3× ATR)</small></span></div></li>`;
+  box.innerHTML = `<article class="bs-c"><div class="bs-h"><span class="bs-n">▲</span><div><b>Strength watch lists</b><small>Two scans that held up in our test. Tap a stock for its page.</small></div></div>
+    <div class="seg cb-seg" role="tablist">${[['leaders', 'Healthy uptrend leaders'], ['tight', 'Tight range breakout']].map(([k, n]) => `<button data-stt="${k}" aria-selected="${tab === k}">${n} ${(S.rows || []).filter((r) => r.list === k).length}</button>`).join('')}</div>
+    <p class="bs-note"><b>Watch only.</b> ${info[1]} ${info[2]} The test bought at the next close and sold on a close 3× ATR under the highest close, or after 40 sessions.${S.gate ? '' : ' <b>Nifty is below its 50-day average: the test took no new trades now.</b>'} Forward record: ${rec.n ? `${rec.n} signals, ${rec.closed} closed${rec.closed ? `, ${rec.won} won, avg ${rec.avg_pct >= 0 ? '+' : ''}${fmt(rec.avg_pct, 1)}%` : ''}` : 'starts tonight'}.</p>
+    <ul class="cb-l">${R.map(row).join('') || '<li class="cb-none">None in the last 3 sessions</li>'}</ul><p class="bs-note">Scan ${esc(S.asof || '')}.</p></article>`;
+  box.querySelectorAll('[data-stt]').forEach((b) => b.addEventListener('click', () => { state.stTab = b.dataset.stt; stWatch(box); }));
+  box.querySelectorAll('[data-stw]').forEach((b) => b.addEventListener('click', () => { const sym = b.dataset.stw;
+    stockPage({ mk: 'NSE', sym, name: sym, kind: 'stock' }, [{ t: 'Baskets', go: () => closeSheet(), done: true }, { t: info[0], go: () => closeSheet(), done: true }, { t: sym, on: true }]); }));
+}
 async function tdRender3(el) {
   const mk = tdMk(); const MP = MAIN + MKT[mk].path;
   el.innerHTML = '<p class="muted pad">Loading today…</p>';
@@ -9179,6 +9247,7 @@ async function tdRender3(el) {
   const Mz = (v, d = 0) => (mk === 'NSE' ? inr(v, d) : `${MKT[mk].cur}${fmt(v, d, MKT[mk].loc)}`);
   const Lk = (v) => (mk === 'NSE' ? lakh(v) : Mz(v));
   const al = lvAlloc(mk, P, null); const seen = new Set();
+  if (mk === 'NSE') await stLoad();
   const SDt = mk === 'NSE' ? await scoreData(false).catch(() => null) : null; const gOf = (sym) => (SDt && SDt.by[sym] ? SDt.by[sym].g : 0);   // 24 Nov 2026: Stock score
   const rows = (P.top || []).concat(P.swing || []).filter((r) => { const b = bkOf(r); if (!ownK(b) || seen.has(r.symbol) || H.has(r.symbol)) return false;
     if (!((al[b] ?? 0) > 0) || r.lane_skip || r.vol_skip || r.kind === 'WATCH') return false;   /* 26 Nov 2026: skipped rows live in the folded Skipped list, waiting ones under "Close above to buy" */ seen.add(r.symbol); return r.stop && (r.trigger || r.price) > r.stop; });
@@ -9242,7 +9311,7 @@ async function tdRender3(el) {
     return `<article class="t3-card"><div class="t3-ch"><span class="t3-g g${c.g}">${c.g}</span><span class="t3-nm" role="button" tabindex="0" data-sp="${i}"><b>${esc(r.symbol)}</b><small>${esc(BK_SHORT[bkOf(r)] || r.system)}${r.late_pct != null && r.late_pct > 5 ? ` · ${fmt(r.late_pct, 0)}% late` : ''}</small></span>
       <span class="t3-amt"><b>${c.z ? Lk(c.z.val) : '–'}</b><small>${c.z ? c.z.q.toLocaleString(MKT[mk].loc) + ' sh' : 'set capital'}</small></span></div>
       ${t3Bars(c.ch)}
-      <div class="t3-pills">${r.mom_score != null ? t3Pill(r.mom_score >= 60 ? 'ok' : '', `Momentum ${fmt(r.mom_score, 0)}`) : ''}${SDt && SDt.by[r.symbol] ? t3Pill(SDt.by[r.symbol].g ? 'ok' : '', `${SDt.by[r.symbol].g} of ${SDt.by[r.symbol].n} tested good`) : ''}${c.isNew ? t3Pill('ok', 'New today') : c.sd ? t3Pill('', 'Signal ' + esc(day(c.sd))) : ''}${t3Px(c.px)}${t3Yoy(c.y)}${t3Pill('bad', `Stop −${fmt(c.stopP, 0)}%`)}${mk === 'NSE' ? govChip(r.symbol, 'NSE') : ''}</div>
+      <div class="t3-pills">${mk === 'NSE' ? stCheck(r) + stPills(r.symbol) : ''}${r.mom_score != null ? t3Pill(r.mom_score >= 60 ? 'ok' : '', `Momentum ${fmt(r.mom_score, 0)}`) : ''}${SDt && SDt.by[r.symbol] ? t3Pill(SDt.by[r.symbol].g ? 'ok' : '', `${SDt.by[r.symbol].g} of ${SDt.by[r.symbol].n} tested good`) : ''}${c.isNew ? t3Pill('ok', 'New today') : c.sd ? t3Pill('', 'Signal ' + esc(day(c.sd))) : ''}${t3Px(c.px)}${t3Yoy(c.y)}${t3Pill('bad', `Stop −${fmt(c.stopP, 0)}%`)}${mk === 'NSE' ? govChip(r.symbol, 'NSE') : ''}</div>
       <div class="t3-act"><button class="t3-why" data-why="${i}">Why?</button>${c.room && !c.srv ? `<button class="t3-buy off" data-go3="trade">${c.room}${r.trigger ? ` · buy above ${Mz(c.e, 0)}` : ''} · swap below</button>` : c.srv ? `<button class="t3-buy" data-go3="trade">Send ${c.z.q.toLocaleString(MKT[mk].loc)} ${r.trigger ? 'above' : 'at'} ${Mz(c.e, 0)} on Trade Live</button>` : `<button class="t3-buy" data-buy="${i}">${c.z ? `Buy ${c.z.q.toLocaleString(MKT[mk].loc)} at ${Mz(c.e, mk === 'NSE' ? 0 : 2)}` : 'Chart & plan'}</button>`}</div></article>`; };
   el.innerHTML = `<div class="t3">
     <div class="t3-top">${seg}<span class="muted">${P.asof ? 'Plan from the ' + esc(new Date(P.asof + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })) + ' close' : ''}</span></div>
@@ -9262,12 +9331,12 @@ async function tdRender3(el) {
       ${swap.map(({ c, h }) => `<div class="t3-swr"><div><span class="t3-swk down">Sell</span><b>${esc(h.symbol)}</b><small>${h.pnl == null ? '' : `${h.pnl >= 0 ? '+' : ''}${fmt(h.pnl, 1)}% · `}${esc(h.grp || 'industry n/a')}${h.lane ? ' · ' + esc(LANE_TXT[h.lane] || h.lane) : ''} · no system</small></div>
         <div><span class="t3-swk up">Buy</span><b>${esc(c.r.symbol)}</b><small>${esc(BK_SHORT[bkOf(c.r)] || c.r.system || '')}${c.r.trigger ? ` · buy above ${fmt(c.r.trigger, 2)}${/next session only/.test(c.r.when || '') ? ' (today only)' : ''}` : ''}${c.r.lane ? ' · ' + esc(LANE_TXT[c.r.lane] || c.r.lane) : ''}</small></div></div>`).join('')}
       <button class="t3-link" data-go3="trade">Open Trade Live → Not in any system</button></section>` : ''}
-    ${waits.length ? `<section id="t3wait" class="t3-sec"><h2>Waiting</h2><div class="t3-waits">${waits.map((c) => `<button class="t3-wt" data-why="${C.indexOf(c)}"><span class="t3-g g${c.g} sm">${c.g}</span><b>${esc(c.r.symbol)}</b><small>${c.r.trigger ? 'buys above ' + Mz(c.r.trigger, 2) : 'after the pause'}</small></button>`).join('')}</div></section>` : ''}
+    ${waits.length ? `<section id="t3wait" class="t3-sec"><h2>Waiting <small class="muted">nearest to buy first</small></h2><div class="t3-waits">${waits.slice().sort((a, b) => (stDist(a.r, a.r.trigger) ?? 99) - (stDist(b.r, b.r.trigger) ?? 99)).map((c) => `<button class="t3-wt" data-why="${C.indexOf(c)}"><span class="t3-g g${c.g} sm">${c.g}</span><b>${esc(c.r.symbol)}</b><small>${c.r.trigger ? 'buys above ' + Mz(c.r.trigger, 2) + (stDist(c.r, c.r.trigger) != null ? ` · ${fmt(Math.max(0, stDist(c.r, c.r.trigger)), 1)}% to go` : '') : 'after the pause'}</small></button>`).join('')}</div></section>` : ''}
     ${(() => { /* 26 Nov 2026 (Amritpal: "can't see in app"): Momentum / Cup 9/21 stocks waiting for a daily close above their level -
          they become buys the morning after that close. Strongest top-down momentum first. */
       const seenW = new Set(); const W = ['top', 'more', 'swing'].flatMap((k) => P[k] || []).filter((r) => r.kind === 'WATCH' && !r.lane_skip && !r.vol_skip && !H.has(r.symbol)
-        && (al[bkOf(r)] ?? 0) > 0 && !seenW.has(r.symbol) && seenW.add(r.symbol)).sort((a, b) => (b.mom_score || 0) - (a.mom_score || 0));
-      return W.length ? `<section class="t3-sec"><h2>Close above to buy</h2><div class="t3-nolist">${W.map((r) => `<div class="t3-no"><span class="t3-nw"><b>${esc(r.symbol)}</b> <small>${esc(BK_SHORT[bkOf(r)] || r.system || '')}${r.mom_score != null ? ` · momentum ${fmt(r.mom_score, 0)}` : ''}</small></span><span class="t3-ns">daily close above <b>${Mz(r.price, 2)}</b>${r.ref ? ` · ${fmt((r.price / r.ref - 1) * 100, 1)}% away` : ''}</span></div>`).join('')}</div></section>` : ''; })()}
+        && (al[bkOf(r)] ?? 0) > 0 && !seenW.has(r.symbol) && seenW.add(r.symbol)).sort((a, b) => ((stDist(a, a.price) ?? 99) - (stDist(b, b.price) ?? 99)) || ((b.mom_score || 0) - (a.mom_score || 0)));   /* 28 Nov 2026: nearest to buy first */
+      return W.length ? `<section class="t3-sec"><h2>Close above to buy <small class="muted">nearest first</small></h2><div class="t3-nolist">${W.map((r) => `<div class="t3-no"><span class="t3-nw"><b>${esc(r.symbol)}</b> <small>${esc(BK_SHORT[bkOf(r)] || r.system || '')}${r.mom_score != null ? ` · momentum ${fmt(r.mom_score, 0)}` : ''}</small></span><span class="t3-ns">daily close above <b>${Mz(r.price, 2)}</b>${r.ref ? ` · ${fmt((r.price / r.ref - 1) * 100, 1)}% away` : ''}</span></div>`).join('')}</div></section>` : ''; })()}
     ${srvOn && srvNo.length ? (() => { const G = {}; srvNo.forEach((x) => { (G[x.why] = G[x.why] || []).push(x); });
       return `<details class="t3-old t3-nod"><summary>Also signalled by the systems, not for you today (${srvNo.length}) · why</summary>
         <p class="t3-lbl">The systems fired on these too, but your account can't take them now. Nothing to do: they come back if the reason clears.</p>
@@ -9282,6 +9351,7 @@ async function tdRender3(el) {
     <section class="t3-hero ${LV}"><span class="t3-word">${word}</span><div class="t3-hl"><b>${line}</b>
       <div class="t3-path">${chip(X.wq === 'L' ? 'ok' : X.wq === 'G' ? 'bad' : '', `World · ${esc(MKT[mk].name)} ${T3N[X.wq].toLowerCase()}`, 'data-go3="mk"')}${arrow}${sizeChip}${sizeChip ? arrow : ''}
         ${lead.length ? lead.map((x) => chip(x.n ? 'ok on' : '', `${esc(x.g)} leads${x.n ? ` · ${x.n} buy${x.n > 1 ? 's' : ''}` : ' · no buy yet'}`, x.n ? `data-ind3="${esc(x.g)}"` : 'data-go3="mk"')).join(arrow) : chip('', 'No industry leading', 'data-go3="mk"')}</div></div></section>
+    ${mk === 'NSE' ? stBreadth() : ''}
     ${t3Info(mk, L, X, buys)}
     <div class="t3-key" aria-hidden="true">${['L', 'I', 'W', 'G'].map((q) => `<span><i style="background:${T3C[q]}"></i>${T3N[q]}</span>`).join('')}<span>· A/B/C = strength, not a rule</span></div>
     <details class="t3-more"><summary>More (information, not buys): rotation maps, leading now, watch lists, is it working?</summary><div id="t3old"></div></details>
@@ -9549,6 +9619,7 @@ async function stockPage(e, trail) {
   openPanel('<p class="muted pad">Loading…</p>'); history.pushState({ sheet: 1 }, '');
   const [S, plan, X] = await Promise.all([sysMap(mk).catch(() => null), getJSON(P + 'trade_plan.json', mk === 'NSE' ? 'trade_plan' : 'tp_' + mk).catch(() => null), t3Ctx(mk), mk === 'NSE' ? pcrLoad().catch(() => null) : null]);
   const { list, pr } = await sysActive(mk, sym, S, plan);
+  if (mk === 'NSE') await stLoad();
   const spec = mk === 'NSE' ? pcrChip(sym) : '';
   const W = state.mxW && state.mxW[mk]; const v = W && W.s && W.s[sym]; const tt = (W && W.t) || [];
   const last = v ? v[v.length - 1] : null; const yr = v && v.length > 52 ? (last / v[v.length - 53] - 1) * 100 : null;
@@ -9573,6 +9644,7 @@ async function stockPage(e, trail) {
       <div class="sp-cbar"><a class="sp-tv" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(sym, mk))}">Open in TradingView ↗</a><button class="t3-link" id="spfull">Full chart & plan</button></div></div>
     <div class="sp-grid">
       <section class="sp-t"><div class="sp-th"><h3>Systems on it</h3><b class="${list.length ? 'up' : ''}">${list.length}</b></div><div class="sp-chips">${lit}${off}</div></section>
+      ${mk === 'NSE' ? stSection(sym) : ''}
       <section class="sp-t"><h3>Top-down</h3>${t3Bars(ch)}<small class="${ch[1] === 'L' && ch[2] === 'L' ? 'up' : ''}">${ch.every((q) => q === 'L') ? 'All three leading' : `Industry ${T3N[ch[1]].toLowerCase()} · stock ${T3N[ch[2]].toLowerCase()}`}</small></section>
       ${mk === 'NSE' && govOf(sym) ? (() => { const gv = govOf(sym); return `<section class="sp-t sp-gov"><div class="sp-th"><h3>Govt focus</h3>${gv.msme ? '<b class="up">MSME</b>' : ''}</div>${gv.th.map((t) => `<p><b>${esc(t.name)}</b><small>${esc(t.why)} <span class="muted">(${esc(t.src)})</span></small></p>`).join('')}${gv.nw.slice(0, 5).map((x) => `<p class="gov-n"><a href="${esc(x.url)}" target="_blank" rel="noopener"><b>${esc(x.title)}</b></a><small><span class="chip ${x.official ? 'open' : ''}">${x.official ? 'Official' : 'Report'}</span>${x.neg ? '<span class="chip exit">negative</span>' : ''} ${esc(x.source)} · ${esc(day(x.date))} · ${esc(x.type)}</small></p>`).join('')}<small class="muted">${gv.cr != null ? `Sales last year ${inr(gv.cr, 0)} cr${gv.msme ? ' - MSME-sized (up to 500 cr)' : ''}. ` : ''}A theme, not a buy signal.</small></section>`; })() : ''}
       ${spec ? `<section class="sp-t"><h3>Speculation (F&O)</h3><div class="sp-chips">${spec}</div><small class="muted">Put/call ratio and who is adding futures positions over 5 sessions. Context, not a buy signal.</small></section>` : ''}

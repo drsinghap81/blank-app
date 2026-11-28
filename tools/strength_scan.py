@@ -91,7 +91,7 @@ def main():
         ph = held_phase(phase_raw(C[s].iloc[-80:], s150[s].iloc[-80:]))
         r = RS.at[d0, s]
         S[s] = [None if pd.isna(r) else int(r), int(H.at[d0, s]), ph, int(bool(rslhi.at[d0, s])),
-                None if pd.isna(RS[s].iloc[-22]) else int(RS[s].iloc[-22])]
+                None if pd.isna(RS[s].iloc[-22]) else int(RS[s].iloc[-22]), round(float(cl[s]), 2)]
     # ---- watch lists (signals of the last 3 sessions)
     rows = []
     for s in syms:
@@ -148,7 +148,7 @@ def main():
                        avg_pct=round(float(np.mean([r["ret_pct"] for r in z])), 2) if z else None)
     wk = nif.resample("W-FRI").last().iloc[-62:]
     out = dict(generated=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), asof=str(d0.date()), gate=gate, breadth=breadth,
-               keys=["strength", "health", "phase", "vs_nifty_high", "strength_month_ago"], s=S,
+               keys=["strength", "health", "phase", "vs_nifty_high", "strength_month_ago", "close"], s=S,
                nifty_w=dict(t=[str(d.date()) for d in wk.index], c=[round(float(v), 2) for v in wk]), rows=rows, record=rec,
                note="Watch only. Tested 2021+: Healthy uptrend leaders +26.9%/yr (worst fall -33%), Tight range breakout +21.2%/yr (-26%); Nifty 11.0%/yr (-17%).")
     json.dump(out, open(OUT, "w"), separators=(",", ":"))

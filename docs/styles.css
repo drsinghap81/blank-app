@@ -1981,3 +1981,12 @@ button.t3-tile[aria-pressed="true"], button.t3-rule[aria-pressed="true"] { outli
 .lv-ig{display:flex;gap:10px;align-items:flex-start;margin:10px 0;padding:10px;border-radius:12px;background:var(--paper);cursor:pointer}.lv-ig input{margin-top:3px;width:18px;height:18px}.lv-ig small{display:block;color:var(--slate);font-size:12px;line-height:1.4}
 .bs-pp{margin:8px 0;padding:8px 10px;border-radius:10px;background:var(--paper);font-size:13px}.bs-pp summary{cursor:pointer}.bs-pp .bs-chips{margin:8px 0}.bs-log{list-style:none;margin:6px 0 0;padding:0;font-size:12px;color:var(--slate)}.bs-log li{padding:2px 0}.bs-log small{font-weight:700;margin-right:6px}
 .lv-ig{flex-wrap:wrap}.lv-ig>span{flex:1 1 220px;min-width:0}.lv-igs{flex:0 0 auto;align-self:center}
+
+/* 28 Nov 2026: strength scan (breadth strip, stock page strength block) */
+.st-br .st-brh { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.st-br h3 { margin: 0; font-size: 16px; }
+.st-brg, .st-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 10px 0 6px; }
+.st-brg b, .st-row b { display: block; font-size: 20px; font-family: var(--display, inherit); }
+.st-brg small, .st-row small { display: block; color: var(--slate); font-size: 12px; }
+.st-dots { display: flex; gap: 3px; margin-top: 4px; } .st-dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); } .st-dots i.on { background: var(--rise, #5fe3b0); }
+.st-sp svg { margin-top: 8px; }
