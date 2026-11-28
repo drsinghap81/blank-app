@@ -16,7 +16,9 @@ import threading
 import time
 from datetime import datetime, timedelta
 
-VERSION = 3
+VERSION = 4
+# v4 (28 Nov 2026): the v3 run (Saturday 04:19 IST) got no candles at all from Angel - an empty run now raises so it is retried
+# (3 tries, 15 minutes apart) instead of saving an empty result.
 # v3 (28 Nov 2026): the server's scrip master keeps only F&O rows (memory), so no NSE / BSE equity token was found and part A never
 # ran - equity tokens are now fixed here (from Angel's public master, 28 Nov 2026). Part B adds samples of the biggest gaps
 # (future, CE, PE) and the median gap per day, to check the large synthetic gaps of v2 (likely stale or re-used option tokens).
@@ -194,6 +196,8 @@ class ArbBT:
                                         all_median_abs_pts=round(sg[len(sg) // 2], 2), all_p99_abs_pts=round(sg[int(len(sg) * 0.99)], 2),
                                         all_minutes_over_cost=sum(1 for x in allg if abs(x) > cost), all_minutes=len(allg))
             self.log("arb_synthetic", name=nm, **{k: v for k, v in res["synthetic"][nm].items() if k != "strikes"})
+        if not any("minutes" in v for v in res["nse_bse"].values()) and not any("strikes" in v for v in res["synthetic"].values()):
+            raise RuntimeError("Angel returned no candles for any symbol - will retry")
         res["built"] = _ist().isoformat(timespec="minutes")
         json.dump(res, open(os.path.join(self.dir, "results.json"), "w"), indent=1)
         self.st.update(state="done", progress="done"); self._save()
