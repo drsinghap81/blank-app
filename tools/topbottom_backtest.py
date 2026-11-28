@@ -107,6 +107,8 @@ class Params:
     gap_book_pct: float | None = None    # 23 Nov 2026 test: book at the OPEN when the day gaps this % in the trade's favour ...
     gap_book_profit_pct: float = 0.0     # ... and the trade was at least this % in profit at the previous close (None = off)
     start_flat_on: str | None = None  # live: be flat from this date and wait for a FRESH signal
+    vbuf_leg_pct: float | None = None   # 28 Nov 2026 ("proper V", read from the course's live record 2019-22): when the move INTO a
+    vbuf_pct: float = 0.5               # top / bottom (from the previous opposite turn) is under vbuf_leg_pct %, add vbuf_pct % to the buffer
     day_sl_fill: str = "stop"   # 28 Nov 2026 test: entry-day stop - "stop" = checked on the close, booked at the stop level (as validated);
                                 # "close" = checked on the close, exit AT the close; "intraday" = resting stop order, hit when the
                                 # day's low/high touches it (assumes the touch came after the entry - pessimistic)
@@ -167,8 +169,17 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
     pos, ent, ei, be_on = 0, 0.0, 0, False
     trades: list[dict] = []
 
+    leg = {}
+    if p.vbuf_leg_pct is not None:
+        _, _, pv = confirmed_swings(c, p.swing_pct)
+        for k in range(1, len(pv)):
+            leg[pv[k][3]] = abs(pv[k][3] / pv[k - 1][3] - 1) * 100
+
     def buf(x):
-        return x * p.buffer_pct / 100 if p.buffer_pct is not None else p.buffer_pts
+        b = x * p.buffer_pct / 100 if p.buffer_pct is not None else p.buffer_pts
+        if p.vbuf_leg_pct is not None and leg.get(x, 99) < p.vbuf_leg_pct:
+            b += x * p.vbuf_pct / 100
+        return b
 
     def close_pos(i, px, why):
         nonlocal pos
