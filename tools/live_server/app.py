@@ -5574,6 +5574,65 @@ def optbt_start(_=Depends(auth)):
     return dict(started=optbt_job().start(), **{k: v for k, v in optbt_job().status().items() if k != "results"})
 
 
+# 29 Nov 2026: Top Bottom on BTC / ETH with CoinDCX futures prices - paper books always, LIVE per coin (crypto_tb.py)
+_ctb = {}
+
+
+def ctb_job():
+    if "j" not in _ctb:
+        import crypto_tb
+        _ctb["j"] = crypto_tb.CryptoTB(DATA, log=lambda ev, **kw: log(ev, **kw),
+                                       alert=lambda text, key=None: alert("crypto_tb", "CRYPTO", text, key=key, mk="CRYPTO"))
+    return _ctb["j"]
+
+
+@app.get("/api/crypto_tb")
+def ctb_status(_=Depends(auth)):
+    return ctb_job().status()
+
+
+@app.get("/api/public/crypto_tb")
+def ctb_public():
+    """paper books only (levels, paper trades, paper P&L) - no keys, no CoinDCX account data - so a GitHub job can check the trial."""
+    st = ctb_job().status()
+    return dict(start=st["start"], last_run=st["last_run"], last_error=st["last_error"], coins=st["coins"], notes=[n for n in st["notes"] if "LIVE" not in n])
+
+
+class CtbLive(BaseModel):
+    coin: str
+    live: bool
+    book: str | None = None
+    inr: int | None = None
+    lev: int | None = None
+    password: str = ""
+    confirm: str = ""
+
+
+@app.post("/api/crypto_tb/live")
+def ctb_live(body: CtbLive, request: Request, _=Depends(auth)):
+    """LIVE on CoinDCX for one coin. Turning ON, or raising the size / leverage, needs the app password + typing LIVE; OFF is one tap."""
+    coin = body.coin.upper()
+    if coin not in ("BTC", "ETH"):
+        raise HTTPException(400, "coin BTC or ETH")
+    cur = (ctb_job().st.get("live") or {}).get(coin) or {}
+    up = body.live or (body.inr or 0) > cur.get("inr", 0) or (body.lev or 0) > cur.get("lev", 1)
+    if up:
+        ip = request.client.host if request.client else "?"
+        n, t0 = FAILS.get(ip, (0, 0))
+        if n >= 5 and time.time() - t0 < 900:
+            raise HTTPException(429, "too many attempts, wait 15 minutes")
+        if body.live and body.confirm.strip().upper() != "LIVE":
+            raise HTTPException(400, "type LIVE to confirm")
+        if not check_pw(body.password):
+            FAILS[ip] = (n + 1, time.time()); raise HTTPException(401, "wrong password")
+    try:
+        c = ctb_job().set_live(coin, body.live, book=body.book, inr=body.inr, lev=body.lev)
+    except ValueError as ex:
+        raise HTTPException(400, str(ex))
+    log("crypto_tb_live", coin=coin, on=body.live, book=c.get("book"), inr=c.get("inr"), lev=c.get("lev"))
+    return dict(ok=True, cfg=c)
+
+
 @app.on_event("startup")
 def _start():
     if ENV.get("MOCK_BROKER") != "1":
@@ -5590,6 +5649,10 @@ def _start():
             tmcx_job().start()
         except Exception as ex:  # noqa: BLE001
             log("turtle_mcx_error", error=str(ex)[:200])
+        try:
+            ctb_job().start()
+        except Exception as ex:  # noqa: BLE001
+            log("crypto_tb_error", error=str(ex)[:200])
         try:
             threading.Thread(target=nind_job().loop, daemon=True).start()      # weekly NSE industry map, outside market hours
         except Exception as ex:  # noqa: BLE001

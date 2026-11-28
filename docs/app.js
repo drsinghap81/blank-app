@@ -1288,7 +1288,7 @@ async function loadLive() {
         ${inner}${watch ? `<div class="lv-card"><b>Watch: a month close would trigger</b><p class="lv-sub">${watch}</p></div>` : ''}</details>` : ''; })()}
     <details class="info" style="margin:0 16px 80px"><summary>moomoo order types used</summary><p>Limit (Day) for next-open buys; Stop Limit (Day) for buy-stops at the ATH-month high; Stop (GTC) sells as the protective stop. Leave extended-hours (pre/post-market) filling switched off on these orders so they fill in the regular session, as the backtest assumed. moomoo AU charges US trades in USD — keep USD cash or the currency conversion fee applies to every trade.</p></details>`)}
     ${pane('hold', `${exits ? `<div class="lv-card" data-fold="skip"><b>Exits for the next open</b>${S && S.exits.filter((e) => e.qty > 0).length >= 2 ? `<div class="lv-basket"><div><b>${S.exits.filter((e) => e.qty > 0).length} to sell</b><div class="lv-sub">One confirmation sends every sell to Angel (each still gets every check; its stop GTT is cancelled first)</div></div><button class="lv-btn sell" id="lvsellbk">Sell all ${S.exits.filter((e) => e.qty > 0).length} as one basket</button></div>` : ''}${exits}</div>` : ''}${tradesCard}${S ? '<div id="pvin"></div><div id="adoptcard"></div><div id="focard"></div><div id="inj"></div>' : ''}`)}
-    ${S && isOwner() ? pane('fut', '<div id="cryptopaper"></div><div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>' + TB_STOCKS.concat(TB_MCX).map((k) => `<div id="tbcard_${k}"></div>`).join('')) : ''}
+    ${S && isOwner() ? pane('fut', '<div id="ctbcard"></div><div id="cryptopaper"></div><div id="otrcard"></div><div id="tmcxcard"></div><div id="tbcard"></div><div id="tbcardn"></div>' + TB_STOCKS.concat(TB_MCX).map((k) => `<div id="tbcard_${k}"></div>`).join('')) : ''}
     ${pane('set', `${S ? head : ''}${S ? '<div id="srvcard"></div><div id="mmcard"></div>' : ''}${lvHero(S, PF, 'pie')}${lvBucketCard('NSE', P, alN, inUseN, S)}<div id="lvidle"></div><div id="lvcurves"></div>`)}`;
   el.querySelectorAll('[data-tgt]').forEach((b) => b.addEventListener('click', async () => {
     const sym = b.dataset.tgt, E = +b.dataset.e, St = +b.dataset.s, R = E - St;
@@ -1389,7 +1389,7 @@ async function loadLive() {
   const prb = el.querySelector('#lvprbk'); if (prb) prb.addEventListener('click', () => lvBasket(rows.filter((r) => r.tier === 'swing' && bkOf(r) === 'pr' && !r.skip && !r.surv && r.qty > 0)
     .map((r) => { const L = state._lvQ && state._lvQ[r.id]; const E = (L && L.limit_now) || r.price; return { r, q: r.qty, v: r.qty * E }; }), prb));
   state._lvBkUpd = bkUpd;
-  if (S) { autoLoad(); tbLoad(); tbLoad('nifty'); TB_STOCKS.concat(TB_MCX).forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); cryptoPaperLoad(); }
+  if (S) { autoLoad(); tbLoad(); tbLoad('nifty'); TB_STOCKS.concat(TB_MCX).forEach((k) => tbLoad(k)); otrLoad(); tmcxLoad(); ctbLoad(); cryptoPaperLoad(); }
   state._lvMoreAll = false;
   const ma = $('#lvmoreall'); if (ma) ma.addEventListener('click', () => { state._lvMoreAll = !state._lvMoreAll; lvMoreUpd(); });
   lvMoreUpd();
@@ -1803,11 +1803,51 @@ const TB_MCX = ['crude', 'silver', 'natgas', 'gold'];
 const TB_LABEL = { bn: 'Bank Nifty futures', nifty: 'Nifty futures · buy only', bel: 'BEL futures · buy only', lt: 'L&T futures · buy only', tmpv: 'Tata Motors PV futures · buy only', tcs: 'TCS futures · buy only',
   crude: 'MCX crude oil mini · both sides', silver: 'MCX silver micro · buy only above 200-day', natgas: 'MCX natural gas mini · buy only above 200-day', gold: 'MCX gold petal · buy only' };
 const TB_SHORT = { bn: 'BN', nifty: 'Nifty', bel: 'BEL', lt: 'L&T', tmpv: 'TMPV', tcs: 'TCS', crude: 'Crude', silver: 'Silver', natgas: 'Nat gas', gold: 'Gold' };
+// 29 Nov 2026 (Amritpal: "connect BTC ETH bots to coin dcx and do a trial paper run" + "Live also as an option to me in app"):
+// the server's crypto_tb.py - CoinDCX futures prices minute by minute, two paper books per coin, LIVE per coin on CoinDCX.
+async function ctbLoad(boxIn = null) {
+  const box = boxIn || $('#ctbcard'); if (!box || !isOwner()) return;
+  let T; try { T = await lvApi('/api/crypto_tb'); } catch (e) { box.innerHTML = `<div class="lv-card"><b>Top Bottom · BTC / ETH · CoinDCX</b><p class="lv-sub">${/404/.test(e.message) ? 'Arrives with your server\'s next update.' : esc(e.message)}</p></div>`; return; }
+  const usd = (v) => (v == null ? '–' : '$' + fmt(v, v >= 1000 ? 1 : 2, 'en-US'));
+  const rs = (v) => `${v >= 0 ? '+' : '−'}₹${fmt(Math.abs(v || 0), 0, 'en-IN')}`;
+  const L = T.live || {}, LP = T.lpos || {};
+  const anyLive = Object.values(L).some((c) => c && c.on);
+  const book = (coin, nm, b) => {
+    if (!b) return '';
+    const p = b.pos;
+    const st = p ? `<b class="${p.side === 'BUY' ? 'up' : 'down'}">${p.side === 'BUY' ? 'LONG' : 'SHORT'}</b> from ${usd(p.entry)} (${esc(p.entry_day)}) · stop ${usd(p.stop)}${p.be ? ' (breakeven)' : ''} · <b class="${p.open_pct >= 0 ? 'up' : 'down'}">${p.open_pct >= 0 ? '+' : ''}${fmt(p.open_pct, 2)}%</b>`
+      : `Flat · ${b.buy ? 'buy above <b>' + usd(b.buy) + '</b>' : 'no buy level (waiting for a new top)'}${nm === 'both' ? (b.sell ? ' · sell below <b>' + usd(b.sell) + '</b>' : ' · no sell level (waiting for a new bottom)') : ''}`;
+    const tr = (b.trades || []).map((t) => `${esc(t.entry_day)} ${t.side === 'BUY' ? 'long' : 'short'} ${usd(t.entry)} → ${esc(t.exit_day)} ${usd(t.exit)} (${esc(t.why_out)}) <b class="${t.pct >= 0 ? 'up' : 'down'}">${t.pct >= 0 ? '+' : ''}${fmt(t.pct, 2)}%</b> ${rs(t.pnl)}`).join('<br>');
+    return `<div class="tb-lvl" style="display:block"><div><b>${nm === 'both' ? 'Both sides (futures)' : 'Buy only'}</b> <span class="muted">${b.n} closed${b.n ? ' · ' + b.wins + ' won' : ''} · <b class="${b.ret_pct >= 0 ? 'up' : 'down'}">${b.ret_pct >= 0 ? '+' : ''}${fmt(b.ret_pct, 2)}%</b> (₹${fmt(b.equity, 0, 'en-IN')})</span></div>
+      <div class="lv-sub">${st}</div>${tr ? `<details class="info"><summary>Paper trades</summary><p class="lv-sub">${tr}</p></details>` : ''}</div>`; };
+  const liveBox = (coin) => { const c = L[coin] || { on: false, book: 'both', inr: 10000, lev: 1 }, lp = LP[coin];
+    return `<div class="tb-auto" style="margin-top:6px"><span><b>Live on CoinDCX · ${coin}</b><small>${c.on ? `ON · follows the ${c.book === 'both' ? 'both-sides' : 'buy-only'} book · ₹${fmt(c.inr, 0, 'en-IN')} a trade · ${c.lev}x${lp ? ` · in a ${lp.side > 0 ? 'long' : 'short'} of ${lp.qty} ${coin}, CoinDCX stop ${usd(lp.stop)}` : ' · joins at the next entry'}` : 'OFF · paper only'}</small></span>
+      <button class="ad-sy" aria-pressed="${!!c.on}" data-ctbl="${coin}">${c.on ? 'On' : 'Off'}</button></div>
+      <div class="lv-form" data-ctbf="${coin}" hidden>
+        ${T.keys ? '' : '<p class="lv-sub down">No CoinDCX API key on the server yet. Make one on CoinDCX (trade only, no withdrawals, bound to 13.126.118.48), then in Lightsail\'s browser SSH run <code>sudo bash /opt/trenddesk/repo/tools/live_server/deploy/coindcx_keys.sh</code>.</p>'}
+        <label class="lv-sub">Follow <select data-ctbb><option value="both" ${c.book === 'both' ? 'selected' : ''}>Both sides (long + short)</option><option value="buy" ${c.book === 'buy' ? 'selected' : ''}>Buy only</option></select></label>
+        <label class="lv-sub">₹ per trade <input data-ctbi type="number" min="1000" max="500000" step="1000" value="${c.inr}"></label>
+        <label class="lv-sub">Leverage <input data-ctbv type="number" min="1" max="5" step="1" value="${c.lev}"></label>
+        <input data-ctbp type="password" placeholder="App password"><input data-ctbc placeholder="Type LIVE" autocapitalize="characters">
+        <button class="lv-btn sell" data-ctbgo="${coin}">Turn on live for ${coin}</button></div>`; };
+  const coins = Object.entries(T.coins || {});
+  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Top Bottom · BTC / ETH · CoinDCX</b><span class="lv-mode ${anyLive ? 'live' : 'dry'}">${anyLive ? 'LIVE + PAPER' : 'PAPER'}</span></div>
+    <p class="lv-sub">CoinDCX futures prices, checked minute by minute on your server. Same rules as the backtest and the Bank Nifty bot (1/2/2, entry-day stop live all day, daily UTC candles = 5:30 am IST). Paper started flat on ${esc(T.start || '')}; ₹${fmt(T.capital, 0, 'en-IN')} notional per book, ${fmt(T.cost_pct, 2)}% cost a round trip.</p>
+    ${coins.length ? coins.map(([coin, C]) => `<p class="lv-sub" style="margin-top:10px"><b>${coin}</b> ${usd(C.price)}${C.day && C.day.h ? ` <span class="muted">today ${usd(C.day.l)} – ${usd(C.day.h)}</span>` : ''}</p>${book(coin, 'both', C.books.both)}${book(coin, 'buy', C.books.buy)}${liveBox(coin)}`).join('') : '<p class="lv-sub">Starting: the first check runs within a minute of the server update.</p>'}
+    ${(T.notes || []).length ? `<details class="info"><summary>Log</summary><p class="lv-sub" style="white-space:pre-line">${T.notes.slice().reverse().map(esc).join('\n')}</p></details>` : ''}
+    ${T.last_error ? `<p class="lv-sub down">Last error: ${esc(T.last_error)}</p>` : ''}${T.last_run ? `<p class="lv-sub muted">Last check ${esc(T.last_run)} IST</p>` : ''}</div>`;
+  box.querySelectorAll('[data-ctbl]').forEach((b) => b.addEventListener('click', async () => { const coin = b.dataset.ctbl, c = L[coin] || {};
+    if (c.on) { try { await lvApi('/api/crypto_tb/live', { method: 'POST', body: JSON.stringify({ coin, live: false }) }); alertMsg(`${coin}: live OFF. No new CoinDCX orders; an open CoinDCX position keeps its stop there.`, true); ctbLoad(boxIn); } catch (e) { alertMsg(e.message); } return; }
+    const f = box.querySelector(`[data-ctbf="${coin}"]`); f.hidden = !f.hidden; }));
+  box.querySelectorAll('[data-ctbgo]').forEach((b) => b.addEventListener('click', async () => { const coin = b.dataset.ctbgo, f = box.querySelector(`[data-ctbf="${coin}"]`);
+    const body = { coin, live: true, book: f.querySelector('[data-ctbb]').value, inr: +f.querySelector('[data-ctbi]').value || 10000, lev: +f.querySelector('[data-ctbv]').value || 1, password: f.querySelector('[data-ctbp]').value, confirm: f.querySelector('[data-ctbc]').value };
+    try { await lvApi('/api/crypto_tb/live', { method: 'POST', body: JSON.stringify(body) }); alertMsg(`${coin}: LIVE on CoinDCX from the next entry. ₹${fmt(body.inr, 0, 'en-IN')} a trade, ${body.lev}x.`, true); ctbLoad(boxIn); } catch (e) { alertMsg(e.message); } }));
+}
 // 27 Nov 2026 (Amritpal: "start paper trading on BTC and ETH top bottom"): paper/crypto_tb.json, written every 4 h by GitHub
 async function cryptoPaperLoad(boxIn = null) {
   const box = boxIn || $('#cryptopaper'); if (!box) return;
   const J = await getJSON(MAIN + 'paper/crypto_tb.json', 'crypto_tb');
-  if (!J || !J.coins) { box.innerHTML = '<div class="lv-card"><b>Top Bottom · BTC / ETH · paper</b><p class="lv-sub">Starting: the first update arrives within 4 hours.</p></div>'; return; }
+  if (!J || !J.coins) { box.innerHTML = '<div class="lv-card"><b>Top Bottom · BTC / ETH · Yahoo paper</b><p class="lv-sub">Starting: the first update arrives within 4 hours.</p></div>'; return; }
   const usd = (v) => (v == null ? '–' : '$' + fmt(v, v >= 1000 ? 0 : 2, 'en-US'));
   const bk = (nm, lab, b) => {
     const p = b.pos;
@@ -1816,7 +1856,7 @@ async function cryptoPaperLoad(boxIn = null) {
     const last = (b.trades || [])[0];
     return `<div class="tb-lvl" style="display:block"><div><b>${nm} · ${lab}</b> <span class="muted">${b.n} closed · ${b.n ? b.wins + ' won · ' : ''}<b class="${b.ret_pct >= 0 ? 'up' : 'down'}">${b.ret_pct >= 0 ? '+' : ''}${fmt(b.ret_pct, 2)}%</b> (${usd(b.equity)})</span></div>
       <div class="lv-sub">${st}</div>${last ? `<div class="lv-sub muted">Last: ${last.side === 'BUY' ? 'long' : 'short'} ${esc(last.entry_date)} → ${esc(last.exit_date)} ${last.pct >= 0 ? '+' : ''}${fmt(last.pct, 2)}% (${esc(last.why)})</div>` : ''}</div>`; };
-  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Top Bottom · BTC / ETH</b><span class="lv-mode dry">PAPER</span></div>
+  box.innerHTML = `<div class="lv-card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Top Bottom · BTC / ETH · Yahoo paper (earlier book)</b><span class="lv-mode dry">PAPER</span></div>
     <p class="lv-sub">No orders anywhere. Same rules as the backtest (1/2/2, daily UTC candles), started flat on ${esc(J.start)}; US$${fmt(J.capital, 0, 'en-US')} per book. A level crossed today is booked when the UTC day closes (11 am Melbourne). Updated ${new Date(J.updated).toLocaleString('en-AU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.</p>
     ${Object.entries(J.coins).map(([nm, c]) => `<p class="lv-sub" style="margin-top:10px"><b>${nm}</b> ${usd(c.price)}</p>${bk(nm, 'both sides (futures)', c.both)}${bk(nm, 'buy only (spot)', c.buy)}`).join('')}</div>`;
 }
@@ -1901,7 +1941,7 @@ async function loadAuto() {
   $('#title').textContent = 'Auto trade'; $('#asof').textContent = '';
   if (!isOwner() || !(lvCfg().url && lvCfg().token)) { el.innerHTML = '<p class="empty">Connect your server in Live › Settings first.</p>'; return; }
   el.innerHTML = '<p class="empty">Loading…</p>';
-  let A, MT, OT; try { [A, MT, OT] = await Promise.all([lvApi('/api/auto'), lvApi('/api/mmtb').catch(() => null), lvApi('/api/opt/trader').catch(() => null)]); } catch (e) { el.innerHTML = `<p class="empty">${esc(e.message)}</p>`; return; }
+  let A, MT, OT, CT; try { [A, MT, OT, CT] = await Promise.all([lvApi('/api/auto'), lvApi('/api/mmtb').catch(() => null), lvApi('/api/opt/trader').catch(() => null), lvApi('/api/crypto_tb').catch(() => null)]); } catch (e) { el.innerHTML = `<p class="empty">${esc(e.message)}</p>`; return; }
   const tb = A.tb || {}; const paper = (MT || {}).env === 'SIMULATE'; const cap = (m) => +((((MT || {}).cfg || {})[m] || {}).capital || 0);
   const ROWS = [
     ['India', [
@@ -1914,7 +1954,7 @@ async function loadAuto() {
       ...(A.turtle && (A.turtle_on || (A.turtle.armed || []).length) ? [{ id: 'turtle', n: 'Turtle', s: (A.turtle.armed || []).length ? 'markets: ' + esc(A.turtle.armed.join(' · ')) : 'markets set in the Bots tab', on: !!A.turtle_on, kind: 'part', fut: true }] : [])]]] : []),
     ['US', [{ id: 'mm_us', n: 'ETF Top Bottom', s: `moomoo · QQQ SMH XLF XLE${paper ? ' · paper' : ''}`, on: !!A.mm_us, kind: 'part', warn: A.mm_us && !cap('US') ? 'set capital in settings' : '', mm: 'US' }]],
     /* 27 Nov 2026: BTC / ETH Top Bottom paper (no exchange yet) - a row with no switch, opens its card */
-    ['Crypto', [{ id: 'crypto_paper', n: 'Top Bottom · BTC / ETH', s: 'paper only · no exchange connected yet · updates every 4 h', on: false, kind: 'paper' }]],
+    ['Crypto', [{ id: 'crypto_dcx', n: 'Top Bottom · BTC / ETH · CoinDCX', s: CT && Object.values(CT.live || {}).some((c) => c && c.on) ? 'LIVE on CoinDCX: ' + Object.entries(CT.live).filter(([, c]) => c.on).map(([k]) => k).join(', ') + ' · paper books too' : 'paper · CoinDCX prices, checked every minute · Live switch inside', on: false, kind: 'paper' }, { id: 'crypto_paper', n: 'Top Bottom · BTC / ETH · Yahoo paper', s: 'earlier paper book on Yahoo prices (since 27 Nov) · updates every 4 h', on: false, kind: 'paper' }]],
     ['ASX', [{ id: 'mm_au', n: 'ETF Top Bottom', s: 'moomoo · TECH HACK OZR ASIA', on: !!A.mm_au, kind: 'part', warn: paper ? 'paper account can\'t trade ASX' : (A.mm_au && !cap('AU') ? 'set capital in settings' : ''), mm: 'AU' }]]];
   const all = ROWS.flatMap(([, r]) => r).filter((r) => r.kind !== 'paper'); const rowsAll = ROWS.flatMap(([, r]) => r); const nOn = all.filter((r) => r.on).length;
   const row = (r) => `<div class="au3-row${r.on ? ' on' : ''}" data-row="${r.id}">
@@ -1952,6 +1992,7 @@ async function loadAuto() {
     /* 27 Nov 2026 (Amritpal: "put settings in the Auto list for each"): the bot's own card opens right here (was a link to Futures) */
     if (r.kind === 'tb') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; tbLoad(r.inst, box); return; }
     if (r.id === 'opt_trader') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; otrLoad(box); return; }
+    if (r.id === 'crypto_dcx') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; ctbLoad(box); return; }
     if (r.id === 'crypto_paper') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; cryptoPaperLoad(box); return; }
     if (r.id === 'turtle') { box.innerHTML = '<p class="lv-sub">Loading…</p>'; tmcxLoad(box); return; }
     if (r.id === 'stock_buy') { box.innerHTML = `<p class="lv-sub">Buys the plan's picks after the 09:09 industry check, with the same checks as the Buy button, in ranked order, within your split and slots, keeping ${fmt(A.reserve_pct, 0)}% of the account in cash. Split and capital: Live › India › Settings.</p>`; return; }
