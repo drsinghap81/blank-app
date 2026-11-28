@@ -5574,6 +5574,24 @@ def optbt_start(_=Depends(auth)):
     return dict(started=optbt_job().start(), **{k: v for k, v in optbt_job().status().items() if k != "results"})
 
 
+# 29 Nov 2026: Bank Nifty / Nifty Top Bottom replayed on Angel 1-minute index bars, as the live bot trades (tb_min_bt.py) - once
+_tbm = {}
+
+
+def tbmin_job():
+    if "j" not in _tbm:
+        import tb_min_bt
+        _tbm["j"] = tb_min_bt.TbMinBT(broker, DATA, log=lambda ev, **kw: log(ev, **kw))
+    return _tbm["j"]
+
+
+@app.get("/api/research/tbmin/summary")
+def tbmin_summary():
+    """backtest statistics only (no account data) - readable without the password so it can be checked from GitHub Actions."""
+    st = tbmin_job().status()
+    return dict(state=st.get("state"), progress=st.get("progress"), running=st.get("running"), fetched=st.get("fetched"), results=st.get("results"))
+
+
 # 29 Nov 2026: Top Bottom on BTC / ETH with CoinDCX futures prices - paper books always, LIVE per coin (crypto_tb.py)
 _ctb = {}
 
@@ -5653,6 +5671,13 @@ def _start():
             ctb_job().start()
         except Exception as ex:  # noqa: BLE001
             log("crypto_tb_error", error=str(ex)[:200])
+        try:
+            j = tbmin_job()
+            import tb_min_bt as _tm
+            if j.st.get("state") in ("idle", "running", "error") or j.st.get("version", 0) < _tm.VERSION:
+                j.start()          # downloads only outside market hours
+        except Exception as ex:  # noqa: BLE001
+            log("tbmin_error", error=str(ex)[:200])
         try:
             threading.Thread(target=nind_job().loop, daemon=True).start()      # weekly NSE industry map, outside market hours
         except Exception as ex:  # noqa: BLE001
