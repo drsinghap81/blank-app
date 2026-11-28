@@ -1,56 +1,31 @@
 {
- "generated": "2026-11-27T01:00+00:00",
- "asof": "2026-11-25",
+ "generated": "2026-11-28T00:31+00:00",
+ "asof": "2026-11-26",
  "market": "UK",
  "ema": 9,
  "rows": [
   {
-   "symbol": "EXPN",
+   "symbol": "BA",
    "index": false,
    "status": "lift-off today",
-   "signal": "2026-11-25",
-   "signal_close": 3000.0,
+   "signal": "2026-11-26",
+   "signal_close": 1896.0,
    "gain": 0.0,
    "days": 0,
-   "ema": 2916.37,
-   "close": 3000.0,
-   "low": 2945.0
-  },
-  {
-   "symbol": "CCH",
-   "index": false,
-   "status": "lift-off today",
-   "signal": "2026-11-25",
-   "signal_close": 4326.0,
-   "gain": 0.0,
-   "days": 0,
-   "ema": 4308.27,
-   "close": 4326.0,
-   "low": 4312.0
-  },
-  {
-   "symbol": "RTO",
-   "index": false,
-   "status": "riding",
-   "signal": "2026-10-14",
-   "signal_close": 306.5,
-   "gain": 21.9,
-   "days": 30,
-   "ema": 366.41,
-   "close": 373.5,
-   "low": 373.5
+   "ema": 1863.47,
+   "close": 1896.0,
+   "low": 1865.5
   },
   {
    "symbol": "MKS",
    "index": false,
-   "status": "riding",
+   "status": "left below",
    "signal": "2026-09-28",
    "signal_close": 377.59,
-   "gain": 17.8,
-   "days": 42,
-   "ema": 453.36,
-   "close": 444.69,
-   "low": 441.89
+   "gain": 17.6,
+   "days": 43,
+   "ema": 451.53,
+   "close": 444.2
   },
   {
    "symbol": "NXT",
@@ -58,11 +33,35 @@
    "status": "riding",
    "signal": "2026-10-13",
    "signal_close": 14800.0,
-   "gain": 6.5,
-   "days": 31,
-   "ema": 15843.7,
-   "close": 15765.0,
-   "low": 15730.0
+   "gain": 7.8,
+   "days": 32,
+   "ema": 15864.96,
+   "close": 15950.0,
+   "low": 15880.0
+  },
+  {
+   "symbol": "BRBY",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-11-05",
+   "signal_close": 1127.5,
+   "gain": 6.3,
+   "days": 15,
+   "ema": 1160.65,
+   "close": 1199.0,
+   "low": 1178.0
+  },
+  {
+   "symbol": "EXPN",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-11-25",
+   "signal_close": 3000.0,
+   "gain": 1.4,
+   "days": 1,
+   "ema": 2941.49,
+   "close": 3042.0,
+   "low": 2989.0
   },
   {
    "symbol": "IAG",
@@ -70,11 +69,23 @@
    "status": "riding",
    "signal": "2026-11-04",
    "signal_close": 436.3,
-   "gain": 0.1,
-   "days": 15,
-   "ema": 444.99,
-   "close": 436.8,
-   "low": 436.0
+   "gain": 1.2,
+   "days": 16,
+   "ema": 444.27,
+   "close": 441.4,
+   "low": 438.2
+  },
+  {
+   "symbol": "CCH",
+   "index": false,
+   "status": "riding",
+   "signal": "2026-11-25",
+   "signal_close": 4326.0,
+   "gain": 0.9,
+   "days": 1,
+   "ema": 4319.42,
+   "close": 4364.0,
+   "low": 4284.0
   }
  ],
  "test": "Tested 2007\u201326: indices +0.30% vs +0.32% holding any 16 days; top-50 stocks +0.03% vs +0.40%. No edge in the UK: reference only.",
