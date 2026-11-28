@@ -144,14 +144,15 @@ def mclose_state(x):
 
 def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
     s = s.dropna(); s = s[s > 0]
-    if len(s) < 260:
+    if len(s) < 60:                       # 28 Nov 2026: young funds too (was 260 sessions); long-period figures stay empty
         return None, None
     c = s.to_numpy(float); hi_i = int(np.argmax(c)); last = s.index[-1]
     ret = lambda d: float((c[-1] / s.loc[:last - pd.Timedelta(days=d)].iloc[-1] - 1) * 100) if s.index[0] <= last - pd.Timedelta(days=d) else None
-    sma200 = float(pd.Series(c).rolling(200).mean().iloc[-1])
+    sma200 = float(pd.Series(c).rolling(200).mean().iloc[-1]) if len(c) >= 200 else float("nan")
     below = float((1 - c[-1] / c[hi_i]) * 100)
     row = dict(key=key, name=name, kind=kind, category=cat, close=float(c[-1]), asof=str(last.date()), high=float(c[hi_i]), high_date=str(s.index[hi_i].date()),
-               below_high_pct=round(below, 2), low_52w=float(s.loc[last - pd.Timedelta(days=365):].min()), above_200=bool(c[-1] > sma200), sma200=round(sma200, 2),
+               below_high_pct=round(below, 2), low_52w=float(s.loc[last - pd.Timedelta(days=365):].min()), above_200=bool(c[-1] > sma200) if sma200 == sma200 else None,
+               sma200=round(sma200, 2) if sma200 == sma200 else None,
                rsi=round(rsi(c), 1), r1m=ret(30), r3m=ret(91), r1y=ret(365), r3y_cagr=None,
                topup=bool(below >= TOPUP and key not in no_topup and kind != "debt"), intl=market == "IN" and key in INTL, market=market, pattern=None)
     if s.index[0] <= last - pd.Timedelta(days=3 * 365):
@@ -349,20 +350,40 @@ def main():
         extra_etfs(rows, {r["key"] for r in rows})
     except Exception as e:  # noqa: BLE001
         print("extra ETFs fail", str(e)[:120])
-    # mutual funds (equity + index, direct growth)
-    u = universe(); print("funds in universe", len(u), flush=True); n0 = len(rows)
+    # mutual funds: 28 Nov 2026 (Amritpal: "add all funds first") - every open-ended Direct-Growth scheme (equity, index, hybrid, debt,
+    # solution-oriented, fund of funds). Charts go to one small file per fund (data/scan/fund_charts/<code>.json), loaded on demand.
+    u = universe(all_funds=True); print("funds in universe", len(u), u.group.value_counts().to_dict(), flush=True); n0 = len(rows)
+    fdir = f"{OUT}/fund_charts"; os.makedirs(fdir, exist_ok=True)
     def one(r):
-        h = hist(int(r.code)); time.sleep(0.1)
+        h = hist(int(r.code)); time.sleep(0.15)
         if h is None:
-            return None
+            return "fail", r
         s = h.set_index("Date").nav.sort_index(); s = s[~s.index.duplicated(keep="last")]
         if s.index[-1] < pd.Timestamp.now() - pd.Timedelta(days=10):
-            return None
-        return metrics(s, str(int(r.code)), r.name, "fund", r.category)
-    with cf.ThreadPoolExecutor(4) as ex:
-        for res in ex.map(one, u.itertuples()):
-            if res and res[0]:
-                rows.append(res[0]); charts[res[0]["key"]] = res[1]
+            return "stale", r
+        kind = "debt" if r.group == "Debt" else "fund"
+        res = metrics(s, str(int(r.code)), r.name, kind, r.category)
+        if res and res[0]:
+            res[0]["group"] = r.group; res[0]["amc"] = r.amc
+            if kind == "debt":                   # a debt MUTUAL FUND: listed with the funds (the app's "debt" kind means bond / cash ETFs)
+                res[0]["kind"] = "fund"; res[0]["debt"] = True
+        return res, r
+    fails = []
+    def take(out):
+        res, r = out
+        if res == "fail":
+            fails.append(r); return
+        if isinstance(res, tuple) and res[0]:
+            rows.append(res[0]); json.dump(res[1], open(f"{fdir}/{res[0]['key']}.json", "w"), separators=(",", ":"))
+    with cf.ThreadPoolExecutor(3) as ex:
+        for out in ex.map(one, u.itertuples()):
+            take(out)
+    print("funds first pass", len(rows) - n0, "failed", len(fails), flush=True)
+    for attempt in range(2):                     # retry failed downloads slowly (mfapi rate limits dropped big funds before)
+        again, fails[:] = list(fails), []
+        for r in again:
+            time.sleep(1.0); take(one(r))
+        print("funds retry", attempt + 1, "still failing", len(fails), flush=True)
     print("funds", len(rows) - n0, flush=True)
     for r in rows:
         for k, v in list(r.items()):

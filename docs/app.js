@@ -4241,7 +4241,10 @@ async function drawFund(r) {
   const box = $('#fundc_'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
   let c = null;
   if (r.extra) { try { const res = await fetch(MAIN + 'data/scan/etf_charts/' + encodeURIComponent(r.key.replace(/[:/]/g, '_')) + '.json'); if (res.ok) c = await res.json(); } catch (e) { /* */ } }
-  else {
+  else if (/^\d+$/.test(r.key)) {   // 28 Nov 2026: every Indian fund has its own small chart file (all Direct-Growth schemes)
+    try { const res = await fetch(MAIN + 'data/scan/fund_charts/' + r.key + '.json'); if (res.ok) c = await res.json(); } catch (e) { /* */ }
+    if (!c) { if (!state.fundCh) { try { const res = await fetch(MAIN + 'data/scan/fund_charts.json'); if (res.ok) state.fundCh = await res.json(); } catch (e) { /* */ } } c = state.fundCh && state.fundCh[r.key]; }
+  } else {
     if (!state.fundCh) { try { const res = await fetch(MAIN + 'data/scan/fund_charts.json'); if (!res.ok) throw 0; state.fundCh = await res.json(); } catch (e) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; } }
     c = state.fundCh[r.key];
   }
@@ -4254,7 +4257,7 @@ async function drawFund(r) {
   ch.addLineSeries({ color: '#3B82F6', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
     .setData(c.t.map((t, i) => (sm[i] == null ? { time: t } : { time: t, value: sm[i] })));
   s.createPriceLine({ price: r.high, color: C.saffron, lineWidth: 1, lineStyle: 0, axisLabelVisible: true, title: 'high' });
-  s.createPriceLine({ price: r.high * 0.8, color: '#0A7A55', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'top-up' });
+  if (r.kind !== 'debt') s.createPriceLine({ price: r.high * 0.8, color: '#0A7A55', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'top-up' });
   if (r.pattern) s.createPriceLine({ price: r.pattern.neck, color: '#9CA3AF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'neckline' });
   ch.timeScale().fitContent();
   new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);

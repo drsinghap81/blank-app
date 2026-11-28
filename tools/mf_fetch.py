@@ -16,7 +16,9 @@ S = requests.Session()
 S.headers["User-Agent"] = "Mozilla/5.0 (trend-desk research)"
 
 
-def universe():
+def universe(all_funds=False):
+    """all_funds (28 Nov 2026, Amritpal: "add all funds first"): every open-ended Direct-Growth scheme - equity, index, hybrid, debt,
+    solution-oriented and fund-of-funds - for the app's fund list. Default (research): equity + index only, as before."""
     txt = ""
     for url in ("https://portal.amfiindia.com/spages/NAVAll.txt", "https://www.amfiindia.com/spages/NAVAll.txt",
                 "https://portal.amfiindia.com/spages/NAVOpen.txt"):
@@ -47,13 +49,15 @@ def universe():
         rows.append(dict(code=int(p[0]), name=p[3].strip(), plan=plan, option=opt, category=cat, amc=amc))
     print("parsed rows", len(rows), "sample cats", sorted({r["category"] for r in rows})[:40], flush=True)
     u = pd.DataFrame(rows)
-    keep_cat = u.category.str.contains(r"Open Ended Schemes\s*\(\s*(?:Equity Scheme|Other Scheme\s*-\s*Index Funds)", regex=True)
+    keep_cat = (u.category.str.contains(r"Open Ended Schemes", regex=True) & ~u.category.str.contains(r"ETF", regex=True)) if all_funds else \
+        u.category.str.contains(r"Open Ended Schemes\s*\(\s*(?:Equity Scheme|Other Scheme\s*-\s*Index Funds)", regex=True)
     n = (u.name + " " + u.plan + " " + u.option).str.lower()     # new AMFI layout has Plan / Option columns
     direct = n.str.contains("direct")
     growth = n.str.contains("growth") & ~n.str.contains(r"idcw|dividend|bonus|payout|reinvest", regex=True)
     u = u[keep_cat & direct & growth].copy()
-    u["category"] = u.category.str.extract(r"\((.*)\)")[0].str.strip().str.replace("Equity Scheme - ", "", regex=False).str.replace("Other Scheme - ", "", regex=False)
-    return u.drop_duplicates("code")[["code", "name", "category", "amc"]]
+    u["group"] = u.category.str.extract(r"\(\s*([A-Za-z ]+?) Scheme")[0].fillna("Other").str.strip()
+    u["category"] = u.category.str.extract(r"\((.*)\)")[0].str.strip().str.replace(r"^(Equity|Other|Debt|Hybrid|Solution Oriented) Scheme\s*-\s*", "", regex=True)
+    return u.drop_duplicates("code")[["code", "name", "category", "amc", "group"]]
 
 
 def hist(code):
