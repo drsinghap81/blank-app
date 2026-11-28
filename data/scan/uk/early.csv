@@ -1,50 +1,54 @@
 symbol,setup,signal_date,signal_close,stop,rsi_signal,value_cr,supertrend,st_up,close,entry,risk_pct,days,status,gain_pct,R,name,board
-IMB,EMA 9/21 cross,2026-11-25,3030.0,2742.0,63.6,76.42,2722.44,True,3030.0,,10.5,0,NEW - buy next open,,,Imperial Brands,FTSE 100
-CVSG,52w-high base breakout,2026-11-25,1369.0,1330.0,54.5,5.23,1317.11,True,1369.0,,2.9,0,NEW - buy next open,,,CVS Group,FTSE 250
-AVON,EMA 9/21 cross,2026-09-30,1844.0,1716.0,58.4,2.92,2570.33,False,2175.0,1884.0,9.8,40,EXIT next open (Supertrend turned red),15.4,1.73,Avon Technologies,FTSE 250
-GSK,EMA 9/21 cross,2026-11-24,1900.5,1820.5,55.0,108.07,1794.01,True,1919.5,1914.0,5.1,1,open,0.3,0.06,GSK plc,FTSE 100
-SGE,EMA 9/21 cross,2026-10-09,1071.5,982.6,65.6,31.23,1104.16,True,1140.5,1071.5,9.0,33,open,6.4,0.78,Sage Group,FTSE 100
-KGF,52w-high base breakout,2026-11-04,377.3,347.7,72.1,21.67,356.16,True,374.3,382.9,10.1,15,open,-2.2,-0.24,Kingfisher plc,FTSE 100
-DCC,EMA 9/21 cross,2026-09-17,6390.0,6325.0,62.6,20.75,6426.15,True,6460.0,6365.0,0.6,49,open,1.5,2.38,DCC Energy,FTSE 100
-SVT,EMA 9/21 cross,2026-11-24,3294.0,3172.0,55.1,16.19,3178.65,True,3306.0,3296.0,3.9,1,open,0.3,0.08,Severn Trent,FTSE 100
-BPT,EMA 9/21 cross,2026-09-29,321.6,296.0,59.0,9.44,368.53,True,389.2,322.0,8.8,41,open,20.9,2.58,Bridgepoint Group,FTSE 250
-DRX,EMA 9/21 cross,2026-10-26,807.0,772.0,55.3,6.73,796.98,True,858.5,788.0,2.1,22,open,8.9,4.41,Drax Group,FTSE 250
-FRAS,EMA 9/21 cross,2026-09-28,807.0,779.5,55.1,4.53,882.73,True,926.0,808.0,3.7,42,open,14.6,4.14,Frasers Group,FTSE 250
-3IN,EMA 9/21 cross,2026-10-13,394.5,378.0,59.4,3.83,391.86,True,406.5,392.0,3.7,31,open,3.7,1.04,3i Infrastructure,FTSE 250
-ALFA,EMA 9/21 cross,2026-11-13,169.0,155.44,55.6,1.86,156.73,True,166.6,169.0,8.7,8,open,-1.4,-0.18,Alfa Financial Software,FTSE 250
-BP,52w-high base breakout,2026-10-13,610.0,558.6,72.3,271.42,586.24,False,545.2,610.0,9.2,31,exited 2026-11-05 (Supertrend red),-8.2,-0.97,BP,FTSE 100
-NWG,EMA 9/21 cross,2026-09-16,702.2,673.2,56.0,122.98,629.17,False,574.2,704.6,4.7,50,stopped 2026-10-01,-4.5,-1.0,NatWest Group,FTSE 100
-BT-A,EMA 9/21 cross,2026-09-14,204.7,197.0,57.2,50.73,220.92,False,203.9,203.7,3.4,52,stopped 2026-09-18,-3.3,-1.0,BT Group,FTSE 100
-BT-A,52w-high base breakout,2026-11-05,231.8,221.1,73.6,50.73,220.92,False,203.9,229.4,3.8,14,stopped 2026-11-06,-3.6,-1.0,BT Group,FTSE 100
-AV,EMA 9/21 cross,2026-09-17,726.0,702.4,58.3,43.53,723.71,True,734.8,723.8,3.0,49,stopped 2026-09-23,-3.0,-1.0,Aviva,FTSE 100
-INF,EMA 9/21 cross,2026-09-04,911.2,868.6,55.7,40.45,892.42,False,837.0,904.8,4.2,58,stopped 2026-09-10,-4.0,-1.0,Informa,FTSE 100
-IMI,EMA 9/21 cross,2026-09-18,3094.0,2948.0,55.6,34.95,2971.46,False,2714.0,3078.0,4.4,48,stopped 2026-10-15,-4.2,-1.0,IMI,FTSE 100
-SMIN,52w-high base breakout,2026-09-22,2783.0,2526.0,70.7,24.21,2702.26,False,2483.0,2702.0,7.0,46,exited 2026-10-16 (Supertrend red),-0.9,-0.14,Smiths Group,FTSE 100
-SVT,52w-high base breakout,2026-10-30,3306.0,3184.0,69.9,16.19,3178.65,True,3306.0,3290.0,3.3,18,stopped 2026-11-19,-3.2,-1.0,Severn Trent,FTSE 100
-EMG,EMA 9/21 cross,2026-09-15,311.6,297.8,57.5,14.01,326.7,False,286.4,310.4,4.2,51,exited 2026-10-02 (Supertrend red),1.4,0.33,Man Group,FTSE 250
-ABF,EMA 9/21 cross,2026-09-04,2072.0,2015.0,55.3,13.49,1930.64,True,2034.0,2051.0,1.8,58,stopped 2026-09-10,-11.3,-6.42,Associated British Foods,FTSE 100
-BWY,EMA 9/21 cross,2026-09-28,2282.0,2026.0,67.2,11.63,2080.17,True,2204.0,2274.0,12.2,42,skipped (stop too far / gap below stop),,,Bellway,FTSE 250
-KLR,EMA 9/21 cross,2026-11-02,3244.0,3026.0,55.6,8.96,3178.03,False,2718.0,3386.0,11.9,17,stopped 2026-11-05,-10.6,-1.0,Keller Group,FTSE 250
-ATT,EMA 9/21 cross,2026-09-17,721.0,678.0,58.2,8.32,662.17,False,555.0,721.0,6.3,49,exited 2026-10-16 (Supertrend red),0.3,0.05,Allianz Technology Trust,FTSE 250
-FCIT,EMA 9/21 cross,2026-09-22,345.8,338.4,57.5,6.04,340.0,False,317.4,348.6,3.0,46,stopped 2026-10-20,-2.9,-1.0,F & C Investment Trust,FTSE 100
-HILS,EMA 9/21 cross,2026-09-21,3100.0,2795.0,66.0,5.83,3063.08,False,2755.0,3100.0,10.9,47,exited 2026-10-21 (Supertrend red),-4.5,-0.46,Hill & Smith,FTSE 250
-CVSG,EMA 9/21 cross,2026-09-17,1318.0,1253.0,57.7,5.23,1317.11,True,1369.0,1318.0,5.2,49,stopped 2026-09-24,-4.9,-1.0,CVS Group,FTSE 250
-ITH,EMA 9/21 cross,2026-10-09,285.4,269.8,55.9,4.77,256.05,False,228.8,283.0,4.9,33,stopped 2026-11-04,-4.7,-1.0,Ithaca Energy,FTSE 100
-LRE,52w-high base breakout,2026-10-13,680.0,626.0,71.4,4.76,705.96,False,652.5,687.0,9.7,31,exited 2026-11-13 (Supertrend red),-4.9,-0.56,Lancashire Holdings,FTSE 250
-KIE,EMA 9/21 cross,2026-09-16,287.2,240.0,75.9,3.95,290.74,True,299.8,287.4,19.7,50,skipped (stop too far / gap below stop),,,Kier Group,FTSE 250
-SVS,EMA 9/21 cross,2026-09-22,1032.0,996.0,55.1,3.88,1130.3,False,1038.0,1036.0,4.0,46,stopped 2026-10-01,-3.9,-1.0,Savills,FTSE 250
-CKN,EMA 9/21 cross,2026-09-17,5140.0,4840.0,61.0,3.46,4972.34,False,4438.0,5125.0,5.9,49,exited 2026-11-05 (Supertrend red),-5.4,-0.96,Clarkson,FTSE 250
-PETS,EMA 9/21 cross,2026-09-22,215.6,204.0,56.3,3.42,252.25,True,286.2,217.0,6.4,46,stopped 2026-10-06,-6.0,-1.0,Pets at Home,FTSE 250
-DSCV,EMA 9/21 cross,2026-09-21,809.0,747.0,59.4,2.97,844.08,False,732.0,800.0,7.1,47,exited 2026-11-06 (Supertrend red),-1.0,-0.15,discoverIE,FTSE 250
-PAGE,EMA 9/21 cross,2026-11-18,247.8,201.2,70.1,2.12,204.64,True,239.8,244.6,21.6,5,skipped (stop too far / gap below stop),,,Michael Page,FTSE 250
-MTRO,EMA 9/21 cross,2026-09-04,178.4,163.4,58.0,1.83,162.07,True,167.0,179.0,9.5,58,stopped 2026-10-05,-9.5,-1.09,Metro Bank,FTSE 250
-ATR,EMA 9/21 cross,2026-09-21,728.0,680.0,62.0,1.64,644.68,False,580.0,730.0,7.4,47,stopped 2026-10-15,-9.3,-1.36,Schroder Asian Total Return Investment Company,FTSE 250
-SOI,EMA 9/21 cross,2026-09-21,463.0,439.0,59.7,1.63,439.31,False,382.0,462.0,5.2,47,stopped 2026-10-14,-5.0,-1.0,Schroder Oriental Income Fund,FTSE 250
-FEML,EMA 9/21 cross,2026-09-21,1498.0,1430.0,55.9,1.62,1223.67,False,1060.0,1492.0,4.3,47,stopped 2026-10-15,-4.2,-1.0,Fidelity Emerging Markets,FTSE 250
-PHI,EMA 9/21 cross,2026-09-21,1144.0,1066.0,59.3,1.5,980.29,False,866.0,1146.0,7.5,47,stopped 2026-10-13,-7.0,-1.0,Pacific Horizon Investment Trust,FTSE 250
-FOUR,EMA 9/21 cross,2026-10-13,4520.0,4210.12,57.8,1.41,4524.68,False,3984.0,4418.0,4.9,31,stopped 2026-11-10,-4.7,-1.0,4imprint,FTSE 250
-WKP,EMA 9/21 cross,2026-09-29,368.6,346.0,55.3,1.37,334.6,False,290.8,369.6,6.8,41,stopped 2026-10-13,-6.4,-1.0,Workspace Group,FTSE 250
-GDWN,EMA 9/21 cross,2026-09-04,20050.0,17300.0,62.2,1.24,15719.72,False,14140.0,19020.0,9.9,58,stopped 2026-09-08,-9.0,-1.0,Goodwin,FTSE 250
-SDP,EMA 9/21 cross,2026-09-21,854.0,810.0,58.8,1.11,763.36,False,680.0,848.0,4.7,47,stopped 2026-10-14,-4.5,-1.0,Schroder AsiaPacific Fund,FTSE 250
-CORD,EMA 9/21 cross,2026-09-16,125.0,122.0,55.2,1.01,125.13,False,118.5,124.0,1.6,50,stopped 2026-10-02,-1.6,-1.0,Cordiant Digital Infrastructure,FTSE 250
-HSL,EMA 9/21 cross,2026-10-26,973.0,945.0,57.2,0.44,977.09,False,912.0,966.0,2.2,22,stopped 2026-11-20,-2.2,-1.0,Henderson Smaller Companies Investment Trust,FTSE 250
+IMB,52w-high base breakout,2026-11-26,3432.0,3020.16,77.8,94.49,2849.99,True,3432.0,,13.6,0,NEW - buy next open,,,Imperial Brands,FTSE 100
+LMP,EMA 9/21 cross,2026-11-26,186.8,179.5,56.6,12.71,181.39,True,186.8,,4.1,0,NEW - buy next open,,,LondonMetric Property,FTSE 100
+THRL,EMA 9/21 cross,2026-11-26,118.4,113.0,56.9,1.87,112.47,True,118.4,,4.8,0,NEW - buy next open,,,Target Healthcare REIT,FTSE 250
+GSK,EMA 9/21 cross,2026-11-24,1900.5,1820.5,55.0,103.23,1805.04,True,1945.0,1914.0,5.1,2,open,1.6,0.33,GSK plc,FTSE 100
+IMB,EMA 9/21 cross,2026-11-25,3030.0,2742.0,63.6,94.49,2849.99,True,3432.0,2933.0,7.0,1,open,17.0,2.61,Imperial Brands,FTSE 100
+SGE,EMA 9/21 cross,2026-10-09,1071.5,982.6,65.6,32.31,1104.16,True,1157.0,1071.5,9.0,34,open,8.0,0.96,Sage Group,FTSE 100
+KGF,52w-high base breakout,2026-11-04,377.3,347.7,72.1,21.5,356.16,True,382.2,382.9,10.1,16,open,-0.2,-0.02,Kingfisher plc,FTSE 100
+DCC,EMA 9/21 cross,2026-09-17,6390.0,6325.0,62.6,20.1,6426.15,True,6475.0,6365.0,0.6,50,open,1.7,2.75,DCC Energy,FTSE 100
+SVT,EMA 9/21 cross,2026-11-24,3294.0,3172.0,55.1,15.72,3178.65,True,3266.0,3296.0,3.9,2,open,-0.9,-0.24,Severn Trent,FTSE 100
+BPT,EMA 9/21 cross,2026-09-29,321.6,296.0,59.0,8.53,368.53,True,405.6,322.0,8.8,42,open,26.0,3.22,Bridgepoint Group,FTSE 250
+DRX,EMA 9/21 cross,2026-10-26,807.0,772.0,55.3,6.85,796.98,True,870.0,788.0,2.1,23,open,10.4,5.12,Drax Group,FTSE 250
+CVSG,52w-high base breakout,2026-11-25,1369.0,1330.0,54.5,5.19,1317.11,True,1391.0,1360.0,2.3,1,open,2.3,1.03,CVS Group,FTSE 250
+FRAS,EMA 9/21 cross,2026-09-28,807.0,779.5,55.1,4.62,882.73,True,939.5,808.0,3.7,43,open,16.3,4.61,Frasers Group,FTSE 250
+3IN,EMA 9/21 cross,2026-10-13,394.5,378.0,59.4,3.89,391.86,True,405.0,392.0,3.7,32,open,3.3,0.93,3i Infrastructure,FTSE 250
+ALFA,EMA 9/21 cross,2026-11-13,169.0,155.44,55.6,1.83,156.73,True,169.0,169.0,8.7,9,open,0.0,0.0,Alfa Financial Software,FTSE 250
+BP,52w-high base breakout,2026-10-13,610.0,558.6,72.3,274.65,586.24,False,551.7,610.0,9.2,32,exited 2026-11-05 (Supertrend red),-8.2,-0.97,BP,FTSE 100
+NWG,EMA 9/21 cross,2026-09-16,702.2,673.2,56.0,120.23,629.17,False,591.2,704.6,4.7,51,stopped 2026-10-01,-4.5,-1.0,NatWest Group,FTSE 100
+BT-A,EMA 9/21 cross,2026-09-14,204.7,197.0,57.2,50.76,218.65,False,203.1,203.7,3.4,53,stopped 2026-09-18,-3.3,-1.0,BT Group,FTSE 100
+BT-A,52w-high base breakout,2026-11-05,231.8,221.1,73.6,50.76,218.65,False,203.1,229.4,3.8,15,stopped 2026-11-06,-3.6,-1.0,BT Group,FTSE 100
+AV,EMA 9/21 cross,2026-09-17,726.0,702.4,58.3,42.1,723.71,True,746.0,723.8,3.0,50,stopped 2026-09-23,-3.0,-1.0,Aviva,FTSE 100
+INF,EMA 9/21 cross,2026-09-04,911.2,868.6,55.7,40.65,892.42,False,851.6,904.8,4.2,59,stopped 2026-09-10,-4.0,-1.0,Informa,FTSE 100
+IMI,EMA 9/21 cross,2026-09-18,3094.0,2948.0,55.6,35.02,2971.46,False,2780.0,3078.0,4.4,49,stopped 2026-10-15,-4.2,-1.0,IMI,FTSE 100
+SMIN,52w-high base breakout,2026-09-22,2783.0,2526.0,70.7,24.01,2702.26,False,2549.0,2702.0,7.0,47,exited 2026-10-16 (Supertrend red),-0.9,-0.14,Smiths Group,FTSE 100
+SVT,52w-high base breakout,2026-10-30,3306.0,3184.0,69.9,15.72,3178.65,True,3266.0,3290.0,3.3,19,stopped 2026-11-19,-3.2,-1.0,Severn Trent,FTSE 100
+EMG,EMA 9/21 cross,2026-09-15,311.6,297.8,57.5,14.04,326.7,False,295.6,310.4,4.2,52,exited 2026-10-02 (Supertrend red),1.4,0.33,Man Group,FTSE 250
+ABF,EMA 9/21 cross,2026-09-04,2072.0,2015.0,55.3,13.09,1930.64,True,2048.0,2051.0,1.8,59,stopped 2026-09-10,-11.3,-6.42,Associated British Foods,FTSE 100
+BWY,EMA 9/21 cross,2026-09-28,2282.0,2026.0,67.2,11.44,2080.17,True,2250.0,2274.0,12.2,43,skipped (stop too far / gap below stop),,,Bellway,FTSE 250
+KLR,EMA 9/21 cross,2026-11-02,3244.0,3026.0,55.6,8.48,3147.73,False,2758.0,3386.0,11.9,18,stopped 2026-11-05,-10.6,-1.0,Keller Group,FTSE 250
+ATT,EMA 9/21 cross,2026-09-17,721.0,678.0,58.2,8.2,662.17,False,583.0,721.0,6.3,50,exited 2026-10-16 (Supertrend red),0.3,0.05,Allianz Technology Trust,FTSE 250
+FCIT,EMA 9/21 cross,2026-09-22,345.8,338.4,57.5,6.08,340.0,False,325.8,348.6,3.0,47,stopped 2026-10-20,-2.9,-1.0,F & C Investment Trust,FTSE 100
+HILS,EMA 9/21 cross,2026-09-21,3100.0,2795.0,66.0,6.04,3063.08,False,2855.0,3100.0,10.9,48,exited 2026-10-21 (Supertrend red),-4.5,-0.46,Hill & Smith,FTSE 250
+CVSG,EMA 9/21 cross,2026-09-17,1318.0,1253.0,57.7,5.19,1317.11,True,1391.0,1318.0,5.2,50,stopped 2026-09-24,-4.9,-1.0,CVS Group,FTSE 250
+ITH,EMA 9/21 cross,2026-10-09,285.4,269.8,55.9,4.71,256.05,False,233.8,283.0,4.9,34,stopped 2026-11-04,-4.7,-1.0,Ithaca Energy,FTSE 100
+LRE,52w-high base breakout,2026-10-13,680.0,626.0,71.4,4.71,705.96,False,659.5,687.0,9.7,32,exited 2026-11-13 (Supertrend red),-4.9,-0.56,Lancashire Holdings,FTSE 250
+SVS,EMA 9/21 cross,2026-09-22,1032.0,996.0,55.1,4.01,1129.48,False,1058.0,1036.0,4.0,47,stopped 2026-10-01,-3.9,-1.0,Savills,FTSE 250
+KIE,EMA 9/21 cross,2026-09-16,287.2,240.0,75.9,3.89,290.74,True,306.6,287.4,19.7,51,skipped (stop too far / gap below stop),,,Kier Group,FTSE 250
+PETS,EMA 9/21 cross,2026-09-22,215.6,204.0,56.3,3.64,255.92,True,286.4,217.0,6.4,47,stopped 2026-10-06,-6.0,-1.0,Pets at Home,FTSE 250
+CKN,EMA 9/21 cross,2026-09-17,5140.0,4840.0,61.0,3.43,4915.71,False,4518.0,5125.0,5.9,50,exited 2026-11-05 (Supertrend red),-5.4,-0.96,Clarkson,FTSE 250
+DSCV,EMA 9/21 cross,2026-09-21,809.0,747.0,59.4,2.88,844.08,False,751.0,800.0,7.1,48,exited 2026-11-06 (Supertrend red),-1.0,-0.15,discoverIE,FTSE 250
+AVON,EMA 9/21 cross,2026-09-30,1844.0,1716.0,58.4,2.84,2570.33,False,2215.0,1884.0,9.8,41,exited 2026-11-26 (Supertrend red),16.8,1.88,Avon Technologies,FTSE 250
+PAGE,EMA 9/21 cross,2026-11-18,247.8,201.2,70.1,2.12,205.21,True,242.2,244.6,21.6,6,skipped (stop too far / gap below stop),,,Michael Page,FTSE 250
+MTRO,EMA 9/21 cross,2026-09-04,178.4,163.4,58.0,1.82,162.07,True,171.4,179.0,9.5,59,stopped 2026-10-05,-9.5,-1.09,Metro Bank,FTSE 250
+SOI,EMA 9/21 cross,2026-09-21,463.0,439.0,59.7,1.66,439.31,False,395.5,462.0,5.2,48,stopped 2026-10-14,-5.0,-1.0,Schroder Oriental Income Fund,FTSE 250
+ATR,EMA 9/21 cross,2026-09-21,728.0,680.0,62.0,1.62,644.68,False,592.0,730.0,7.4,48,stopped 2026-10-15,-9.3,-1.36,Schroder Asian Total Return Investment Company,FTSE 250
+FEML,EMA 9/21 cross,2026-09-21,1498.0,1430.0,55.9,1.57,1223.67,False,1102.0,1492.0,4.3,48,stopped 2026-10-15,-4.2,-1.0,Fidelity Emerging Markets,FTSE 250
+PHI,EMA 9/21 cross,2026-09-21,1144.0,1066.0,59.3,1.49,980.29,False,889.0,1146.0,7.5,48,stopped 2026-10-13,-7.0,-1.0,Pacific Horizon Investment Trust,FTSE 250
+FOUR,EMA 9/21 cross,2026-10-13,4520.0,4210.12,57.8,1.41,4524.68,False,4056.0,4418.0,4.9,32,stopped 2026-11-10,-4.7,-1.0,4imprint,FTSE 250
+WKP,EMA 9/21 cross,2026-09-29,368.6,346.0,55.3,1.41,334.6,False,296.6,369.6,6.8,42,stopped 2026-10-13,-6.4,-1.0,Workspace Group,FTSE 250
+GDWN,EMA 9/21 cross,2026-09-04,20050.0,17300.0,62.2,1.25,15719.72,False,14500.0,19020.0,9.9,59,stopped 2026-09-08,-9.0,-1.0,Goodwin,FTSE 250
+SDP,EMA 9/21 cross,2026-09-21,854.0,810.0,58.8,1.13,763.36,False,702.0,848.0,4.7,48,stopped 2026-10-14,-4.5,-1.0,Schroder AsiaPacific Fund,FTSE 250
+CORD,EMA 9/21 cross,2026-09-16,125.0,122.0,55.2,0.97,125.13,False,119.0,124.0,1.6,51,stopped 2026-10-02,-1.6,-1.0,Cordiant Digital Infrastructure,FTSE 250
+EWG,EMA 9/21 cross,2026-11-10,107.0,99.4,57.9,0.52,95.06,True,101.0,111.0,11.7,12,stopped 2026-11-18,-10.5,-1.0,Eurowag,FTSE 250
+HSL,EMA 9/21 cross,2026-10-26,973.0,945.0,57.2,0.43,977.09,False,936.0,966.0,2.2,23,stopped 2026-11-20,-2.2,-1.0,Henderson Smaller Companies Investment Trust,FTSE 250

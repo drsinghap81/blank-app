@@ -1,108 +1,22 @@
 {
-"generated": "2026-11-27T01:02+00:00",
-"asof": "2026-11-25",
+"generated": "2026-11-28T00:31+00:00",
+"asof": "2026-11-26",
 "market": "UK",
 "regime": null,
 "rules": "neighbouring swing lows (zigzag 3% on closes), neckline >= 6% above the low; after a 20%+ fall; DB +-3%, tilted W +3..12%, TB within 4%, IHS head 3% below shoulders; breakout = close above the neckline within 60 days of the last low",
 "backtest": "UK: not backtested yet - watch only.",
 "rows": [
 {
-"symbol": "PRU",
-"name": "Prudential plc",
-"kind": "stock",
-"typ": "TW",
-"status": "breakout",
-"close": 927.7999877929688,
-"neck": 965.2000122070312,
-"to_neck_pct": 4.031043857095629,
-"stop": 863.08,
-"stop_pct": 6.975425816924141,
-"height_pct": 9.582200906421967,
-"fall_pct": 38.510446969574666,
-"lows": [
-[
-"2026-10-23",
-880.7999877929688
-],
-[
-"2026-11-06",
-922.5999755859375
-]
-],
-"peaks": [
-[
-"2026-11-04",
-965.2000122070312
-]
-],
-"rsi_lows": [
-34.1,
-50.1
-],
-"rsi_div": 0.0,
-"rsi_now": 46.4,
-"signal_date": "2026-11-16",
-"days_since": 7,
-"bo_high": 977.0,
-"takeout": 978.47,
-"target": 1049.6,
-"sl": 926.59
-},
-{
-"symbol": "CNA",
-"name": "Centrica",
-"kind": "stock",
-"typ": "DB",
-"status": "breakout",
-"close": 145.1999969482422,
-"neck": 156.1999969482422,
-"to_neck_pct": 7.575757734981936,
-"stop": 143.75,
-"stop_pct": 0.9999999999999898,
-"height_pct": 7.133054649383275,
-"fall_pct": 49.99999476721921,
-"lows": [
-[
-"2026-10-07",
-145.8000030517578
-],
-[
-"2026-11-02",
-149.89999389648438
-]
-],
-"peaks": [
-[
-"2026-10-28",
-156.1999969482422
-]
-],
-"rsi_lows": [
-39.4,
-48.7
-],
-"rsi_div": 0.0,
-"rsi_now": 38.3,
-"signal_date": "2026-11-13",
-"days_since": 8,
-"bo_high": 160.85,
-"takeout": 161.09,
-"target": 166.6,
-"sl": 149.95,
-"outcome": "sl",
-"outcome_date": "2026-11-20"
-},
-{
 "symbol": "GSK",
 "name": "GSK plc",
 "kind": "stock",
 "typ": "DB",
-"status": "forming",
-"close": 1919.5,
+"status": "breakout",
+"close": 1945.0,
 "neck": 1929.5,
-"to_neck_pct": 0.5209690023443514,
+"to_neck_pct": -0.7969151670951136,
 "stop": 1772.1,
-"stop_pct": 7.6790830945558834,
+"stop_pct": 8.889460154241647,
 "height_pct": 6.3671444321940385,
 "fall_pct": 25.02756339581036,
 "lows": [
@@ -126,76 +40,111 @@
 43.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 57.6,
-"signal_date": null,
-"days_since": null,
-"bo_high": null,
-"takeout": null,
+"rsi_now": 60.8,
+"signal_date": "2026-11-26",
+"days_since": 0,
+"bo_high": 1946.0,
+"takeout": 1948.92,
 "target": 2045.0,
 "sl": 1852.32
 },
 {
-"symbol": "SHC",
-"name": "Shaftesbury Capital",
+"symbol": "PRU",
+"name": "Prudential plc",
 "kind": "stock",
-"typ": "TB",
-"status": "forming",
-"close": 147.1999969482422,
-"neck": 152.8000030517578,
-"to_neck_pct": 3.804352051369042,
-"stop": 128.01,
-"stop_pct": 13.038718970728326,
-"height_pct": 17.53846388596756,
-"fall_pct": 23.999997652493988,
+"typ": "TW",
+"status": "breakout",
+"close": 949.0,
+"neck": 965.2000122070312,
+"to_neck_pct": 1.7070613495291154,
+"stop": 863.08,
+"stop_pct": 9.053531305053841,
+"height_pct": 9.582200906421967,
+"fall_pct": 38.510446969574666,
 "lows": [
 [
-"2026-06-08",
-130.0
+"2026-10-23",
+880.7999877929688
 ],
 [
-"2026-09-14",
-136.3000030517578
-],
-[
-"2026-10-08",
-134.10000610351562
+"2026-11-06",
+922.5999755859375
 ]
 ],
 "peaks": [
 [
-"2026-08-25",
-152.8000030517578
-],
-[
-"2026-09-22",
-141.3000030517578
+"2026-11-04",
+965.2000122070312
 ]
 ],
 "rsi_lows": [
-43.6,
-31.5,
-37.4
+34.1,
+50.1
 ],
-"rsi_div": 5.9,
-"rsi_now": 53.6,
-"signal_date": null,
-"days_since": null,
-"bo_high": null,
-"takeout": null,
-"target": 175.6,
-"sl": 146.69
+"rsi_div": 0.0,
+"rsi_now": 53.3,
+"signal_date": "2026-11-16",
+"days_since": 8,
+"bo_high": 977.0,
+"takeout": 978.47,
+"target": 1049.6,
+"sl": 926.59
+},
+{
+"symbol": "CNA",
+"name": "Centrica",
+"kind": "stock",
+"typ": "DB",
+"status": "breakout",
+"close": 147.5,
+"neck": 156.1999969482422,
+"to_neck_pct": 5.898303015757422,
+"stop": 143.75,
+"stop_pct": 2.5437308618577847,
+"height_pct": 7.133054649383275,
+"fall_pct": 49.99999476721921,
+"lows": [
+[
+"2026-10-07",
+145.8000030517578
+],
+[
+"2026-11-02",
+149.89999389648438
+]
+],
+"peaks": [
+[
+"2026-10-28",
+156.1999969482422
+]
+],
+"rsi_lows": [
+39.4,
+48.7
+],
+"rsi_div": 0.0,
+"rsi_now": 43.3,
+"signal_date": "2026-11-13",
+"days_since": 9,
+"bo_high": 160.85,
+"takeout": 161.09,
+"target": 166.6,
+"sl": 149.95,
+"outcome": "sl",
+"outcome_date": "2026-11-20"
 },
 {
 "symbol": "MRO",
 "name": "Melrose Industries",
 "kind": "stock",
-"typ": "DB",
+"typ": "TB",
 "status": "forming",
-"close": 466.6000061035156,
+"close": 487.3999938964844,
 "neck": 489.3999938964844,
-"to_neck_pct": 4.886409664536218,
+"to_neck_pct": 0.41034058782216665,
 "stop": 445.2,
-"stop_pct": 4.585725190455248,
+"stop_pct": 8.657567160430734,
 "height_pct": 8.130797016505586,
 "fall_pct": 50.64073764882628,
 "lows": [
@@ -206,20 +155,29 @@
 [
 "2026-11-20",
 460.79998779296875
+],
+[
+"2026-11-25",
+466.6000061035156
 ]
 ],
 "peaks": [
 [
 "2026-11-12",
 489.3999938964844
+],
+[
+"2026-11-23",
+481.70001220703125
 ]
 ],
 "rsi_lows": [
 40.4,
-42.6
+42.6,
+46.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 46.2,
+"rsi_now": 54.9,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
@@ -228,46 +186,46 @@
 "sl": 469.82
 },
 {
-"symbol": "GEN",
-"name": "Genuit Group",
+"symbol": "TRY",
+"name": "TR Property Investment Trust",
 "kind": "stock",
-"typ": "DB",
+"typ": "TW",
 "status": "forming",
-"close": 258.6000061035156,
-"neck": 274.79998779296875,
-"to_neck_pct": 6.264493931592718,
-"stop": 240.77,
-"stop_pct": 6.8955950131021515,
-"height_pct": 12.163260323660708,
-"fall_pct": 52.77777777777777,
+"close": 290.5,
+"neck": 292.5,
+"to_neck_pct": 0.688468158347666,
+"stop": 264.82,
+"stop_pct": 8.838209982788303,
+"height_pct": 8.93854748603351,
+"fall_pct": 34.63687150837988,
 "lows": [
 [
-"2026-10-22",
-252.0
+"2026-10-08",
+268.5
 ],
 [
 "2026-11-20",
-245.0
+279.5
 ]
 ],
 "peaks": [
 [
-"2026-11-04",
-274.79998779296875
+"2026-11-10",
+292.5
 ]
 ],
 "rsi_lows": [
-37.2,
-32.1
+20.9,
+39.0
 ],
 "rsi_div": 0.0,
-"rsi_now": 45.8,
+"rsi_now": 59.7,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
 "takeout": null,
-"target": 304.6,
-"sl": 263.81
+"target": 316.5,
+"sl": 280.8
 },
 {
 "symbol": "INCH",
@@ -275,11 +233,11 @@
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 647.5,
+"close": 680.5,
 "neck": 691.5,
-"to_neck_pct": 6.795366795366786,
+"to_neck_pct": 1.6164584864070575,
 "stop": 598.46,
-"stop_pct": 7.574517374517365,
+"stop_pct": 12.056576047024237,
 "height_pct": 10.463258785942497,
 "fall_pct": 33.935289691497374,
 "lows": [
@@ -312,7 +270,7 @@
 32.5
 ],
 "rsi_div": 5.8,
-"rsi_now": 46.2,
+"rsi_now": 60.9,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
@@ -321,16 +279,328 @@
 "sl": 663.84
 },
 {
+"symbol": "IGG",
+"name": "IG Group",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 952.0,
+"neck": 973.7000122070312,
+"to_neck_pct": 2.2794130469570684,
+"stop": 887.04,
+"stop_pct": 6.8235294117647065,
+"height_pct": 7.000001341432016,
+"fall_pct": 107.05128205128207,
+"lows": [
+[
+"2026-11-06",
+936.0
+],
+[
+"2026-11-23",
+910.0
+]
+],
+"peaks": [
+[
+"2026-11-16",
+973.7000122070312
+]
+],
+"rsi_lows": [
+35.4,
+34.3
+],
+"rsi_div": 0.0,
+"rsi_now": 46.9,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 1037.4,
+"sl": 934.75
+},
+{
+"symbol": "SHC",
+"name": "Shaftesbury Capital",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 149.10000610351562,
+"neck": 152.8000030517578,
+"to_neck_pct": 2.481553854312657,
+"stop": 128.01,
+"stop_pct": 14.146882775867342,
+"height_pct": 17.53846388596756,
+"fall_pct": 23.999997652493988,
+"lows": [
+[
+"2026-06-08",
+130.0
+],
+[
+"2026-09-14",
+136.3000030517578
+],
+[
+"2026-10-08",
+134.10000610351562
+]
+],
+"peaks": [
+[
+"2026-08-25",
+152.8000030517578
+],
+[
+"2026-09-22",
+141.3000030517578
+]
+],
+"rsi_lows": [
+43.6,
+31.5,
+37.4
+],
+"rsi_div": 5.9,
+"rsi_now": 59.9,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 175.6,
+"sl": 146.69
+},
+{
+"symbol": "SDP",
+"name": "Schroder AsiaPacific Fund",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 702.0,
+"neck": 721.0,
+"to_neck_pct": 2.7065527065527117,
+"stop": 667.26,
+"stop_pct": 4.948717948717951,
+"height_pct": 6.4992614475627875,
+"fall_pct": 31.166912850812412,
+"lows": [
+[
+"2026-11-20",
+677.0
+],
+[
+"2026-11-25",
+680.0
+]
+],
+"peaks": [
+[
+"2026-11-23",
+721.0
+]
+],
+"rsi_lows": [
+27.9,
+35.0
+],
+"rsi_div": 0.0,
+"rsi_now": 41.1,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 765.0,
+"sl": 692.16
+},
+{
+"symbol": "HFEL",
+"name": "Henderson Far East Income",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 235.5,
+"neck": 243.0,
+"to_neck_pct": 3.1847133757961776,
+"stop": 222.77,
+"stop_pct": 5.405603299475015,
+"height_pct": 6.578947368421062,
+"fall_pct": 21.95652173913043,
+"lows": [
+[
+"2026-11-20",
+230.0
+],
+[
+"2026-11-25",
+228.0
+]
+],
+"peaks": [
+[
+"2026-11-23",
+243.0
+]
+],
+"rsi_lows": [
+29.2,
+35.1
+],
+"rsi_div": 5.9,
+"rsi_now": 42.5,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 258.0,
+"sl": 233.28
+},
+{
+"symbol": "PSH",
+"name": "Pershing Square Holdings",
+"kind": "stock",
+"typ": "TB",
+"status": "forming",
+"close": 3850.0,
+"neck": 3996.0,
+"to_neck_pct": 3.7922077922077913,
+"stop": 3546.38,
+"stop_pct": 7.886337193080362,
+"height_pct": 10.325786858089447,
+"fall_pct": 40.53009387078963,
+"lows": [
+[
+"2026-09-24",
+3622.0
+],
+[
+"2026-11-05",
+3850.0
+],
+[
+"2026-11-20",
+3710.0
+]
+],
+"peaks": [
+[
+"2026-11-04",
+3996.0
+],
+[
+"2026-11-12",
+3988.0
+]
+],
+"rsi_lows": [
+31.3,
+53.5,
+39.6
+],
+"rsi_div": 0.0,
+"rsi_now": 51.2,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 4370.0,
+"sl": 3836.16
+},
+{
+"symbol": "HWDN",
+"name": "Howdens Joinery",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 826.5,
+"neck": 858.5,
+"to_neck_pct": 3.8717483363581273,
+"stop": 731.61,
+"stop_pct": 11.48094373865699,
+"height_pct": 14.77272727272727,
+"fall_pct": 29.679144385026746,
+"lows": [
+[
+"2026-10-08",
+748.0
+],
+[
+"2026-11-24",
+802.0
+]
+],
+"peaks": [
+[
+"2026-11-05",
+858.5
+]
+],
+"rsi_lows": [
+42.8,
+43.0
+],
+"rsi_div": 0.0,
+"rsi_now": 52.7,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 969.0,
+"sl": 824.16
+},
+{
+"symbol": "GEN",
+"name": "Genuit Group",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 264.3999938964844,
+"neck": 274.79998779296875,
+"to_neck_pct": 3.933431972981083,
+"stop": 240.77,
+"stop_pct": 8.937971809098011,
+"height_pct": 12.163260323660708,
+"fall_pct": 52.77777777777777,
+"lows": [
+[
+"2026-10-22",
+252.0
+],
+[
+"2026-11-20",
+245.0
+]
+],
+"peaks": [
+[
+"2026-11-04",
+274.79998779296875
+]
+],
+"rsi_lows": [
+37.2,
+32.1
+],
+"rsi_div": 0.0,
+"rsi_now": 51.0,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 304.6,
+"sl": 263.81
+},
+{
 "symbol": "JMAT",
 "name": "Johnson Matthey",
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 2360.0,
+"close": 2420.0,
 "neck": 2522.0,
-"to_neck_pct": 6.864406779661025,
+"to_neck_pct": 4.214876033057857,
 "stop": 2255.22,
-"stop_pct": 4.439830508474585,
+"stop_pct": 6.80909090909092,
 "height_pct": 10.03490401396161,
 "fall_pct": 38.91797556719023,
 "lows": [
@@ -363,7 +633,7 @@
 37.2
 ],
 "rsi_div": 0.0,
-"rsi_now": 44.8,
+"rsi_now": 52.0,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
@@ -372,16 +642,58 @@
 "sl": 2421.12
 },
 {
+"symbol": "BYG",
+"name": "Big Yellow Group",
+"kind": "stock",
+"typ": "TW",
+"status": "forming",
+"close": 916.0,
+"neck": 967.5,
+"to_neck_pct": 5.622270742358082,
+"stop": 787.54,
+"stop_pct": 14.023471615720528,
+"height_pct": 21.62162162162162,
+"fall_pct": 48.33438089252042,
+"lows": [
+[
+"2026-10-08",
+795.5
+],
+[
+"2026-11-24",
+886.5
+]
+],
+"peaks": [
+[
+"2026-11-05",
+967.5
+]
+],
+"rsi_lows": [
+37.0,
+40.9
+],
+"rsi_div": 0.0,
+"rsi_now": 52.0,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 1139.5,
+"sl": 928.8
+},
+{
 "symbol": "HLN",
 "name": "Haleon",
 "kind": "stock",
 "typ": "TB",
 "status": "forming",
-"close": 356.8999938964844,
+"close": 360.20001220703125,
 "neck": 382.70001220703125,
-"to_neck_pct": 7.228920916717629,
+"to_neck_pct": 6.246529494026709,
 "stop": 307.39,
-"stop_pct": 13.870830692937153,
+"stop_pct": 14.65991405260716,
 "height_pct": 20.45955225133651,
 "fall_pct": 23.097665944594038,
 "lows": [
@@ -414,7 +726,7 @@
 28.4
 ],
 "rsi_div": 0.0,
-"rsi_now": 58.3,
+"rsi_now": 60.4,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
@@ -423,55 +735,88 @@
 "sl": 367.39
 },
 {
-"symbol": "STJ",
-"name": "St. James's Place",
+"symbol": "SAFE",
+"name": "Safestore",
 "kind": "stock",
-"typ": "TB",
+"typ": "TW",
 "status": "forming",
-"close": 1034.5,
-"neck": 1196.5,
-"to_neck_pct": 15.659739004349937,
-"stop": 1001.38,
-"stop_pct": 3.2010633156114077,
-"height_pct": 17.303921568627455,
-"fall_pct": 47.41338395823447,
+"close": 542.5,
+"neck": 577.5,
+"to_neck_pct": 6.451612903225801,
+"stop": 481.73,
+"stop_pct": 11.20110487696212,
+"height_pct": 17.092454522807678,
+"fall_pct": 69.70802499669269,
 "lows": [
 [
-"2026-07-31",
-1053.5
-],
-[
-"2026-09-16",
-1085.0
-],
-[
 "2026-10-08",
-1020.0
+493.20001220703125
+],
+[
+"2026-11-24",
+517.0
 ]
 ],
 "peaks": [
 [
-"2026-08-24",
-1196.5
-],
-[
-"2026-09-21",
-1120.5
+"2026-11-05",
+577.5
 ]
 ],
 "rsi_lows": [
-35.3,
-33.4,
-28.3
+26.2,
+34.5
 ],
 "rsi_div": 0.0,
-"rsi_now": 38.0,
+"rsi_now": 50.6,
 "signal_date": null,
 "days_since": null,
 "bo_high": null,
 "takeout": null,
-"target": 1373.0,
-"sl": 1148.64
+"target": 661.8,
+"sl": 554.4
+},
+{
+"symbol": "STJ",
+"name": "St. James's Place",
+"kind": "stock",
+"typ": "DB",
+"status": "forming",
+"close": 1066.0,
+"neck": 1174.5,
+"to_neck_pct": 10.178236397748597,
+"stop": 1021.18,
+"stop_pct": 4.2040337711069515,
+"height_pct": 13.53310778153698,
+"fall_pct": 49.32692307692308,
+"lows": [
+[
+"2026-10-30",
+1040.0
+],
+[
+"2026-11-25",
+1034.5
+]
+],
+"peaks": [
+[
+"2026-11-16",
+1174.5
+]
+],
+"rsi_lows": [
+40.2,
+38.0
+],
+"rsi_div": 0.0,
+"rsi_now": 44.9,
+"signal_date": null,
+"days_since": null,
+"bo_high": null,
+"takeout": null,
+"target": 1314.5,
+"sl": 1127.52
 }
 ]
 }

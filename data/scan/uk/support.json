@@ -1,6 +1,6 @@
 {
-"generated": "2026-11-27T01:02+00:00",
-"asof": "2026-11-25",
+"generated": "2026-11-28T00:31+00:00",
+"asof": "2026-11-26",
 "market": "UK",
 "rules": "Uptrend (close > SMA50 > SMA200, SMA200 rising over 20 days). Level = old swing (zigzag 6% on closes, last 3 years) that price moved 8%+ above. 'Touched' = first return since: low within 3% of the level, close at or above it (last 5 sessions). 'Near' = close 0-5% above a level not yet revisited. Stop = level - 1 ATR(14). Square of 9: odd squares (1, 9, 25, 49, 81, 121 ...); 'on Sq9' = the level is within 1% of an odd square.",
 "backtest": "UK: not backtested yet - watch only.",
@@ -10,16 +10,16 @@
 "name": "Autotrader Group",
 "status": "touched",
 "touch_date": "2026-11-24",
-"days_ago": 1,
+"days_ago": 2,
 "level": 516.4,
 "level_kind": "breakout retest",
 "level_date": "2026-07-16",
-"close": 532.2000122070312,
-"above_pct": 3.0596411785410504,
-"stop": 500.52,
-"risk_pct": 5.952915737687114,
+"close": 538.2000122070312,
+"above_pct": 4.221531131355838,
+"stop": 501.47,
+"risk_pct": 6.824863240767131,
 "resistance": 549.2,
-"room_r": 0.5365921389104131,
+"room_r": 0.299471176414385,
 "sq9": 529,
 "sq9_cross": "23\u00b2",
 "sq9_dist_pct": -2.38184793685019,
@@ -39,86 +39,20 @@
 "sq9_match": false
 },
 {
-"symbol": "DOM",
-"name": "Domino's Pizza",
-"status": "touched",
-"touch_date": "2026-11-24",
-"days_ago": 1,
-"level": 216.6,
-"level_kind": "old swing low",
-"level_date": "2026-10-22",
-"close": 227.1999969482422,
-"above_pct": 4.8938091163583275,
-"stop": 210.67,
-"risk_pct": 7.274895944200576,
-"resistance": 237.4,
-"room_r": 0.6171133403490384,
-"sq9": 225,
-"sq9_cross": "15\u00b2",
-"sq9_dist_pct": -3.733330620659725,
-"sq9_gap_pct": 28.44444444444445,
-"sq9_below": [
-[
-169,
-"13\u00b2"
-]
-],
-"sq9_above": [
-[
-289,
-"17\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "CLDN",
-"name": "Caledonia Investments",
-"status": "touched",
-"touch_date": "2026-11-23",
-"days_ago": 2,
-"level": 375.0,
-"level_kind": "breakout retest",
-"level_date": "2026-05-14",
-"close": 389.0,
-"above_pct": 3.733333333333344,
-"stop": 365.52,
-"risk_pct": 6.035439459401104,
-"resistance": 400.0,
-"room_r": 0.46852652821151075,
-"sq9": 361,
-"sq9_cross": "19\u00b2",
-"sq9_dist_pct": 3.878116343490312,
-"sq9_gap_pct": 22.160664819944607,
-"sq9_below": [
-[
-289,
-"17\u00b2"
-]
-],
-"sq9_above": [
-[
-441,
-"21\u00b2"
-]
-],
-"sq9_match": false
-},
-{
 "symbol": "FRAS",
 "name": "Frasers Group",
 "status": "touched",
 "touch_date": "2026-11-23",
-"days_ago": 2,
+"days_ago": 3,
 "level": 882.0,
 "level_kind": "breakout retest",
 "level_date": "2024-09-19",
-"close": 926.0,
-"above_pct": 4.9886621315192725,
-"stop": 855.69,
-"risk_pct": 7.593088406024617,
-"resistance": 938.0,
-"room_r": 0.17066788360656096,
+"close": 939.5,
+"above_pct": 6.519274376417239,
+"stop": 850.69,
+"risk_pct": 9.45311321338882,
+"resistance": 981.5,
+"room_r": 0.4729090735852884,
 "sq9": 841,
 "sq9_cross": "29\u00b2",
 "sq9_dist_pct": 4.875148632580251,
@@ -138,34 +72,34 @@
 "sq9_match": false
 },
 {
-"symbol": "PCGH",
-"name": "Polar Capital Global Healthcare Trust",
+"symbol": "TBCG",
+"name": "TBC Bank",
 "status": "touched",
 "touch_date": "2026-11-23",
-"days_ago": 2,
-"level": 437.0,
+"days_ago": 3,
+"level": 5070.0,
 "level_kind": "breakout retest",
-"level_date": "2026-01-22",
-"close": 467.0,
-"above_pct": 6.864988558352403,
-"stop": 423.54,
-"risk_pct": 9.30546071778091,
-"resistance": 488.0,
-"room_r": 0.4832418452933588,
-"sq9": 441,
-"sq9_cross": "21\u00b2",
-"sq9_dist_pct": -0.9070294784580546,
-"sq9_gap_pct": 19.95464852607709,
+"level_date": "2025-08-07",
+"close": 5130.0,
+"above_pct": 1.183431952662728,
+"stop": 4862.22,
+"risk_pct": 5.219910806747762,
+"resistance": 5415.0,
+"room_r": 1.064300859005848,
+"sq9": 5041,
+"sq9_cross": "71\u00b2",
+"sq9_dist_pct": 0.5752826820075274,
+"sq9_gap_pct": 5.713152152350731,
 "sq9_below": [
 [
-361,
-"19\u00b2"
+4761,
+"69\u00b2"
 ]
 ],
 "sq9_above": [
 [
-529,
-"23\u00b2"
+5329,
+"73\u00b2"
 ]
 ],
 "sq9_match": true
@@ -175,16 +109,16 @@
 "name": "Funding Circle",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 3,
+"days_ago": 4,
 "level": 230.5,
 "level_kind": "breakout retest",
 "level_date": "2026-07-22",
-"close": 226.5,
-"above_pct": -1.7353579175705014,
-"stop": 216.81,
-"risk_pct": 4.276253740255931,
-"resistance": 230.5,
-"room_r": 0.41297933244376245,
+"close": 236.5,
+"above_pct": 2.6030368763557465,
+"stop": 216.57,
+"risk_pct": 8.426457263666565,
+"resistance": 245.5,
+"room_r": 0.4516129032258067,
 "sq9": 225,
 "sq9_cross": "15\u00b2",
 "sq9_dist_pct": 2.444444444444449,
@@ -208,16 +142,16 @@
 "name": "MONY Group",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 3,
+"days_ago": 4,
 "level": 196.5,
 "level_kind": "old swing low",
 "level_date": "2026-07-31",
-"close": 202.60000610351562,
-"above_pct": 3.104328805860379,
-"stop": 188.84,
-"risk_pct": 6.793120263892904,
-"resistance": 205.2,
-"room_r": 0.18891352915122173,
+"close": 206.1999969482422,
+"above_pct": 4.936385215390415,
+"stop": 189.37,
+"risk_pct": 8.16405484026208,
+"resistance": 208.8,
+"room_r": 0.1544471147620798,
 "sq9": 225,
 "sq9_cross": "15\u00b2",
 "sq9_dist_pct": -12.666666666666671,
@@ -237,20 +171,53 @@
 "sq9_match": false
 },
 {
+"symbol": "MTRO",
+"name": "Metro Bank",
+"status": "touched",
+"touch_date": "2026-11-20",
+"days_ago": 4,
+"level": 168.6,
+"level_kind": "breakout retest",
+"level_date": "2026-10-27",
+"close": 171.39999389648438,
+"above_pct": 1.6607281682122998,
+"stop": 159.58,
+"risk_pct": 6.895893162528499,
+"resistance": 174.0,
+"room_r": 0.21997485544277115,
+"sq9": 169,
+"sq9_cross": "13\u00b2",
+"sq9_dist_pct": -0.23668277898484247,
+"sq9_gap_pct": 33.136094674556205,
+"sq9_below": [
+[
+121,
+"11\u00b2"
+]
+],
+"sq9_above": [
+[
+225,
+"15\u00b2"
+]
+],
+"sq9_match": true
+},
+{
 "symbol": "PAGE",
 "name": "Michael Page",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 3,
+"days_ago": 4,
 "level": 227.8,
 "level_kind": "old swing low",
 "level_date": "2025-11-20",
-"close": 239.8000030517578,
-"above_pct": 5.2677786827217465,
-"stop": 214.51,
-"risk_pct": 10.547480090466642,
-"resistance": 242.4,
-"room_r": 0.10279545664715671,
+"close": 242.1999969482422,
+"above_pct": 6.321331739935321,
+"stop": 214.98,
+"risk_pct": 11.239233200209387,
+"resistance": 247.8,
+"room_r": 0.20572055373361142,
 "sq9": 225,
 "sq9_cross": "15\u00b2",
 "sq9_dist_pct": 1.2444458007812464,
@@ -274,16 +241,16 @@
 "name": "WPP",
 "status": "touched",
 "touch_date": "2026-11-20",
-"days_ago": 3,
+"days_ago": 4,
 "level": 384.2,
 "level_kind": "old swing low",
 "level_date": "2026-10-28",
-"close": 400.0,
-"above_pct": 4.112438128829288,
-"stop": 373.61,
-"risk_pct": 6.596871512276792,
-"resistance": 411.4,
-"room_r": 0.43202273514305084,
+"close": 407.70001220703125,
+"above_pct": 6.116605740068715,
+"stop": 374.34,
+"risk_pct": 8.182223438025405,
+"resistance": 412.7,
+"room_r": 0.1498849215544131,
 "sq9": 361,
 "sq9_cross": "19\u00b2",
 "sq9_dist_pct": 6.426596179233024,
@@ -298,105 +265,6 @@
 [
 441,
 "21\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "WWH",
-"name": "Worldwide Healthcare Trust",
-"status": "touched",
-"touch_date": "2026-11-19",
-"days_ago": 4,
-"level": 371.0,
-"level_kind": "breakout retest",
-"level_date": "2024-07-16",
-"close": 391.0,
-"above_pct": 5.39083557951483,
-"stop": 361.67,
-"risk_pct": 7.501223490627562,
-"resistance": 397.0,
-"room_r": 0.20457020859827338,
-"sq9": 361,
-"sq9_cross": "19\u00b2",
-"sq9_dist_pct": 2.7700831024930705,
-"sq9_gap_pct": 22.160664819944607,
-"sq9_below": [
-[
-289,
-"17\u00b2"
-]
-],
-"sq9_above": [
-[
-441,
-"21\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "RMV",
-"name": "Rightmove",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 508.6,
-"level_kind": "old swing low",
-"level_date": "2026-10-28",
-"close": 533.0,
-"above_pct": 4.797482029820932,
-"stop": 487.79,
-"risk_pct": 8.482980434199948,
-"resistance": 559.6,
-"room_r": 0.5883090966874012,
-"sq9": 529,
-"sq9_cross": "23\u00b2",
-"sq9_dist_pct": -3.8563315494299366,
-"sq9_gap_pct": 18.14744801512287,
-"sq9_below": [
-[
-441,
-"21\u00b2"
-]
-],
-"sq9_above": [
-[
-625,
-"25\u00b2"
-]
-],
-"sq9_match": false
-},
-{
-"symbol": "ELM",
-"name": "Elementis",
-"status": "near",
-"touch_date": null,
-"days_ago": null,
-"level": 176.6,
-"level_kind": "breakout retest",
-"level_date": "2025-08-04",
-"close": 185.39999389648438,
-"above_pct": 4.983005373063554,
-"stop": 171.76,
-"risk_pct": 7.356173327903903,
-"resistance": 199.8,
-"room_r": 1.0558472644486212,
-"sq9": 169,
-"sq9_cross": "13\u00b2",
-"sq9_dist_pct": 4.497045031666058,
-"sq9_gap_pct": 33.136094674556205,
-"sq9_below": [
-[
-121,
-"11\u00b2"
-]
-],
-"sq9_above": [
-[
-225,
-"15\u00b2"
 ]
 ],
 "sq9_match": false
