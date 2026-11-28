@@ -94,7 +94,11 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2600); }
 
-const fresh = (url) => (url.startsWith(REPO) ? url + (url.includes('?') ? '&' : '?') + 't=' + Date.now() : url);   // GitHub's raw CDN caches ~5 min
+/* 28 Nov 2026 (Amritpal: "phone app is very slow"): no cache-buster by default - the phone asks GitHub "changed since last time?"
+   (ETag) and gets a tiny "not modified" for the many data files that change only once a night, instead of re-downloading ~4 MB on
+   every open. The ↻ button still forces fresh copies (GitHub's CDN can lag up to 5 minutes after a scan). */
+let _bust = 0; try { _bust = +sessionStorage.getItem('td.bust') || 0; sessionStorage.removeItem('td.bust'); } catch (e) { /* */ }
+const fresh = (url) => (url.startsWith(REPO) && _bust ? url + (url.includes('?') ? '&' : '?') + 't=' + _bust : url);
 /* 27 Nov 2026 (Amritpal: "app pages are taking a lot of time to load"): Today alone fetched ~7 MB a visit - every page re-downloaded
    every data file (cache-buster each time), some twice at once, and wrote multi-MB copies to localStorage on the main thread. Now: one
    download per file per 5 minutes per session (shared while in flight; the ↻ button reloads everything), and only files under
@@ -8937,7 +8941,7 @@ setTimeout(tdVerCheck, 4000);
 { const b = document.getElementById('btn-refresh');
   if (b) b.addEventListener('click', async () => {
     b.classList.add('spin'); b.disabled = true;
-    try { sessionStorage.setItem('td.reopen', state.view || 'today'); sessionStorage.setItem('td.tabg', JSON.stringify(state.athTabG)); } catch (e) { /* */ }
+    try { sessionStorage.setItem('td.reopen', state.view || 'today'); sessionStorage.setItem('td.tabg', JSON.stringify(state.athTabG)); sessionStorage.setItem('td.bust', String(Date.now())); } catch (e) { /* */ }
     try { const r = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration() : null; if (r) await Promise.race([r.update(), new Promise((ok) => setTimeout(ok, 3000))]); } catch (e) { /* offline: reload anyway */ }
     location.reload();
   });

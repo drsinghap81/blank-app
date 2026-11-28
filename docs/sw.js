@@ -1,5 +1,5 @@
 /* App shell cached for offline start (network first); scan data always fetched fresh (falls back to the last copy in the page). */
-const SHELL = 'td-shell-v5';
+const SHELL = 'td-shell-v6';
 const FILES = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js'];
 self.addEventListener('install', (e) => e.waitUntil(caches.open(SHELL).then((c) => c.addAll(FILES)).then(() => self.skipWaiting())));
@@ -10,7 +10,8 @@ self.addEventListener('fetch', (e) => {
   // nothing and the phone showed "FetchEvent.respondWith received an error: Returned response is null" instead of the real error
   if (e.request.method !== 'GET' || (u.origin !== location.origin && u.hostname !== 'raw.githubusercontent.com' && u.hostname !== 'unpkg.com')) return;
   if (u.hostname === 'raw.githubusercontent.com') {
-    e.respondWith(fetch(e.request).then((r) => { const cp = r.clone(); caches.open('td-data').then((c) => c.put(e.request, cp)); return r; })
+    // 28 Nov 2026 ("phone app is very slow"): keep offline copies of small files only - writing ~4 MB to the cache on every open cost time
+    e.respondWith(fetch(e.request).then((r) => { const n = +r.headers.get('content-length') || 0; if (r.ok && n && n < 400000) { const cp = r.clone(); caches.open('td-data').then((c) => c.put(e.request, cp)); } return r; })
       .catch(() => caches.match(e.request)));
     return;
   }
