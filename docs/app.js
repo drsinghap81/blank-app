@@ -4217,10 +4217,12 @@ function fundSelect(r) {
     ['Bottom pattern', r.pattern ? `${PAT_NM[r.pattern.typ]}, ${r.pattern.status === 'breakout' ? `broke the neckline ${fmt(r.pattern.neck, 2, 'en-IN')}` : `${fmt(r.pattern.to_neck_pct, 1)}% below the neckline ${fmt(r.pattern.neck, 2, 'en-IN')}`}` : 'none'],
     ['Type', r.kind === 'fund' ? `Mutual fund · ${esc(r.category)} · AMFI code ${esc(r.key)}` : `${r.kind === 'debt' ? 'Bond/cash ETF' : 'ETF'} · ${{ IN: 'NSE (₹)', US: 'US-listed (US$)', AU: 'ASX (A$)' }[r.market || 'IN']}`]];
   openPanel(`<div class="d-head"><div><h2>${esc(r.kind === 'fund' ? r.name : (r.symbol || r.key))}</h2><div class="co">${esc(r.kind === 'fund' ? r.category : r.name)}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
-    ${st}<div class="chart" id="fundc_"></div>
+    ${st}<div class="seg cb-seg" role="group" aria-label="Chart type" id="fundct">${[['line', 'Line'], ['candle', 'Candles'], ['month', 'Monthly candles']].map(([k, n]) => `<button data-fct="${k}" aria-selected="${(state.fundCt || 'line') === k}">${n}</button>`).join('')}</div><div class="chart" id="fundc_"></div>
     <p class="muted" style="margin:4px 16px">Weekly closes, last 5 years · blue = 40-week average (≈ 200 days) · gold = all-time high · green dashed = top-up level (20% below the high)${r.pattern ? ' · grey = pattern neckline' : ''}.</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>${fundPlan(r)}`);
   drawFund(r);
+  document.querySelectorAll('#fundct [data-fct]').forEach((b) => b.addEventListener('click', () => { state.fundCt = b.dataset.fct;
+    document.querySelectorAll('#fundct [data-fct]').forEach((x) => x.setAttribute('aria-selected', String(x === b))); drawFund(r); }));
 }
 function fundPlan(r) {
   const a = r.ath; if (!a || r.kind === 'debt' || !['breakout', 'open', 'near'].includes(a.status) || !a.sma30) return '';
@@ -4238,7 +4240,7 @@ function fundPlan(r) {
     <p class="muted" style="font-size:12.5px">No fixed target: like stocks, the trade runs until the exit rule fires. Same sizing as stocks (risk ${riskPct('ath')}% to the 30-week average, max 10% of capital ${money(cap(m), m)}); the ATH system was tested on stocks, not separately on funds.</p></div>`;
 }
 async function drawFund(r) {
-  const box = $('#fundc_'); box.innerHTML = '<p class="muted pad">Loading chart…</p>';
+  const box = $('#fundc_'); box.innerHTML = '<p class="muted pad">Loading chart…</p>'; const nt = $('#fundcnote'); if (nt) nt.remove();
   let c = null;
   if (r.extra) { try { const res = await fetch(MAIN + 'data/scan/etf_charts/' + encodeURIComponent(r.key.replace(/[:/]/g, '_')) + '.json'); if (res.ok) c = await res.json(); } catch (e) { /* */ } }
   else if (/^\d+$/.test(r.key)) {   // 28 Nov 2026: every Indian fund has its own small chart file (all Direct-Growth schemes)
@@ -4251,8 +4253,20 @@ async function drawFund(r) {
   if (!c) { box.innerHTML = '<p class="muted pad">Chart not available.</p>'; return; }
   box.innerHTML = '';
   const ch = window.LightweightCharts.createChart(box, { ...chartBase(), height: box.clientHeight, width: box.clientWidth });
-  const s = ch.addLineSeries({ color: C.ink || '#1F2937', lineWidth: 2, priceLineVisible: false });
-  s.setData(c.t.map((t, i) => ({ time: t, value: c.c[i] })));
+  const ct = state.fundCt || 'line'; const hasO = c.o && c.o.length === c.c.length;
+  let s;
+  if (ct !== 'line' && hasO) {   // 28 Nov 2026: weekly or monthly candles (funds: built from daily NAVs)
+    let bars = c.t.map((t, i) => ({ time: t, open: c.o[i], high: c.h[i], low: c.l[i], close: c.c[i] }));
+    if (ct === 'month') { const M = []; bars.forEach((b) => { const k = b.time.slice(0, 7); const m = M[M.length - 1];
+      if (m && m.k === k) { m.high = Math.max(m.high, b.high); m.low = Math.min(m.low, b.low); m.close = b.close; m.time = b.time; } else M.push({ k, ...b }); });
+      bars = M.map(({ k, ...b }) => b); }
+    s = ch.addCandlestickSeries({ upColor: '#26a69a', downColor: '#ef5350', borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350', priceLineVisible: false });
+    s.setData(bars);
+  } else {
+    if (ct !== 'line' && !hasO) box.insertAdjacentHTML('beforebegin', '<p class="muted" id="fundcnote" style="font-size:12px">Candles appear after the next fund scan.</p>');
+    s = ch.addLineSeries({ color: C.ink || '#1F2937', lineWidth: 2, priceLineVisible: false });
+    s.setData(c.t.map((t, i) => ({ time: t, value: c.c[i] })));
+  }
   const sm = c.c.map((_, i) => (i >= 39 ? c.c.slice(i - 39, i + 1).reduce((a, b) => a + b, 0) / 40 : null));
   ch.addLineSeries({ color: '#3B82F6', lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false })
     .setData(c.t.map((t, i) => (sm[i] == null ? { time: t } : { time: t, value: sm[i] })));

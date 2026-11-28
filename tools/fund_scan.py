@@ -196,8 +196,11 @@ def metrics(s, key, name, kind, cat, ohlc=None, market="IN", no_topup=NO_TOPUP):
                 row["w"] = {k: wr.get(k) for k in ("status", "stage", "low1", "low2", "broke_on", "days_ago", "since", "line_now", "dist_pct", "low1_close", "chart")}
         except Exception as e:  # noqa: BLE001
             print("w fail", key, str(e)[:80])
-    w = s.resample("W-FRI").last().dropna().tail(260)
-    return row, dict(t=[str(d.date()) for d in w.index], c=[round(float(v), 4) for v in w])
+    # 28 Nov 2026 (Amritpal: "can I see candlestick chart also"): weekly candles - real OHLC for ETFs, NAV-built for funds
+    # (open = first NAV of the week, high / low = highest / lowest NAV, close = last NAV)
+    wk = x.resample("W-FRI").agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"}).dropna().tail(260)
+    r4 = lambda v: [round(float(q), 4) for q in v]  # noqa: E731
+    return row, dict(t=[str(d.date()) for d in wk.index], c=r4(wk.Close), o=r4(wk.Open), h=r4(wk.High), l=r4(wk.Low))
 
 # 15 Nov 2026: all liquid ETFs (NSE list, US listings) + UK/European UCITS ETFs, for the month-close and ATH lists.
 # Charts for these go to data/scan/etf_charts/<key>.json (one small file each) to keep fund_charts.json light.
