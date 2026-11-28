@@ -22,7 +22,7 @@ import threading
 import time
 from datetime import date, datetime, timedelta
 
-VERSION = 1
+VERSION = 2   # v2: v1's analysis died saving numpy year keys to JSON
 HERE = os.path.dirname(os.path.abspath(__file__))
 INST = {"BANKNIFTY": dict(tok="99926009", buf=25.0, long_only=False), "NIFTY": dict(tok="99926000", buf=12.0, long_only=True)}
 DAY_SL, MAX_SL, BE, GAP = 1.0, 2.0, 2.0, 1.0
@@ -167,11 +167,11 @@ def analyse(dirp):
             for k in list(y):
                 if isinstance(y[k], float):
                     y[k] = round(y[k], 1)
-        res["avg_close"] = {y: round(float(v), 0) for y, v in df.Close.groupby(df.index.year).mean().items()}
+        res["avg_close"] = {str(int(y)): round(float(v), 0) for y, v in df.Close.groupby(df.index.year).mean().items()}
         res["last_trades"] = [dict(entry_day=t[0], side="BUY" if t[1] > 0 else "SELL", entry=round(t[2], 2), exit_day=t[3], exit=round(t[4], 2),
                                    why=t[5], pts=round(t[1] * (t[4] - t[2]), 1)) for t in tr[-40:]]
         out["inst"][name] = res
-    return out
+    return json.loads(json.dumps(out, default=lambda o: o.item() if hasattr(o, "item") else str(o)))   # numpy -> plain numbers
 
 
 # ------------------------------------------------------------------ server job
@@ -260,9 +260,11 @@ class TbMinBT:
             cmd = [sys.executable, "-c", code]
             if os.name == "posix":
                 cmd = ["nice", "-n", "19"] + cmd
-            subprocess.run(cmd, check=True, timeout=3 * 3600)
+            r = subprocess.run(cmd, timeout=3 * 3600, capture_output=True, text=True)
+            if r.returncode != 0:
+                raise RuntimeError(f"analysis failed (exit {r.returncode}): " + (r.stderr or "")[-600:])
             os.replace(out, os.path.join(self.dir, "results.json"))
             self.st.update(state="done", finished=_ist().isoformat(timespec="minutes"), progress="done", version=VERSION)
         except Exception as ex:  # noqa: BLE001
-            self.st.update(state="error", progress=str(ex)[:300]); self.log("tbmin_error", error=str(ex)[:200])
+            self.st.update(state="error", progress=str(ex)[:800]); self.log("tbmin_error", error=str(ex)[:200])
         self._save()
