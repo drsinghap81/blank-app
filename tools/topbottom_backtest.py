@@ -107,6 +107,9 @@ class Params:
     gap_book_pct: float | None = None    # 23 Nov 2026 test: book at the OPEN when the day gaps this % in the trade's favour ...
     gap_book_profit_pct: float = 0.0     # ... and the trade was at least this % in profit at the previous close (None = off)
     start_flat_on: str | None = None  # live: be flat from this date and wait for a FRESH signal
+    day_sl_fill: str = "stop"   # 28 Nov 2026 test: entry-day stop - "stop" = checked on the close, booked at the stop level (as validated);
+                                # "close" = checked on the close, exit AT the close; "intraday" = resting stop order, hit when the
+                                # day's low/high touches it (assumes the touch came after the entry - pessimistic)
                                       # (levels already traded stay used, e.g. "awaiting new top")
 
     @classmethod
@@ -180,8 +183,11 @@ def run_live(df: pd.DataFrame, p: Params) -> pd.DataFrame:
 
     def day_stop_check(i, side, px):
         stop = px * (1 - side * p.day_sl_pct / 100)
-        if (side > 0 and c[i] <= stop) or (side < 0 and c[i] >= stop):
-            close_pos(i, stop, "Entry-day SL")
+        if p.day_sl_fill == "intraday":
+            if (side > 0 and l[i] <= stop) or (side < 0 and h[i] >= stop):
+                close_pos(i, stop, "Entry-day SL")
+        elif (side > 0 and c[i] <= stop) or (side < 0 and c[i] >= stop):
+            close_pos(i, c[i] if p.day_sl_fill == "close" else stop, "Entry-day SL")
 
     sf = pd.Timestamp(p.start_flat_on) if p.start_flat_on else None
     flat_done = False
