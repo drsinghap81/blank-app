@@ -20,7 +20,7 @@ import topbottom_backtest as tbb  # noqa: E402
 
 IDX = dict(day_sl_pct=1.0, max_sl_pct=2.0, be_pct=2.0, gap_pct=1.0)
 STK = dict(day_sl_pct=1.5, max_sl_pct=3.0, be_pct=3.0, gap_pct=1.5)
-SWINGS = (0.0, 0.2, 0.3, 0.5, 1.0)
+SWINGS = tuple(float(x) for x in os.environ.get("SWINGS", "0,0.2,0.3,0.5,1.0").split(","))
 MCX = {"CRUDE": ("CL=F", 1.0), "SILVER": ("SI=F", 32.1507), "NATGAS": ("NG=F", 1.0), "GOLD": ("GC=F", 10 / 31.1035)}
 
 
@@ -42,7 +42,7 @@ def mcx(name):
 
 
 def trades(df, rules, side, trend, buf_pts, sw):
-    p = tbb.Params(buffer_pct=0.0 if buf_pts else 0.05, buffer_pts=buf_pts, event_exit=False, long_only=side == "buy", swing_pct=sw, **rules)
+    p = tbb.Params(buffer_pct=0.0 if buf_pts else 0.05, buffer_pts=buf_pts, event_exit=False, long_only=side == "buy", swing_pct=sw, day_sl_fill=os.environ.get("FILL", "stop"), **rules)
     t = tbb.run_live(df, p); t = t[~t.Open] if "Open" in t else t
     if trend and len(t):
         above = (df.Close > df.Close.rolling(200).mean()).to_numpy(); ix = df.index.get_indexer(pd.to_datetime(t.EntryDate))
