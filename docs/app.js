@@ -111,12 +111,25 @@ function getJSON(url, key) {
   p.then((j) => { if (j == null) delete _JC[url]; });
   return p;
 }
+/* 28 Nov 2026 (Amritpal: "fundamentals don't change daily"): slow-changing files (company fundamentals ~1 MB, govt
+   themes) are kept on the phone for 7 days and reused without asking the network; the ↻ button refreshes them. */
+const SLOW_DAYS = (key) => (/^fund_(NSE|US|ASX)$/.test(key) || key === 'govt_focus' ? 7 : 0);
+async function slowGet(url, key) {
+  const days = SLOW_DAYS(key); if (!days || _bust || !('caches' in window)) return null;
+  try { const c = await caches.open('td-slow'); const m = await c.match(url); if (!m) return null;
+    if (Date.now() - (+m.headers.get('x-saved') || 0) > days * 864e5) return null; return await m.json(); } catch (e) { return null; }
+}
+function slowPut(url, key, txt) {
+  if (!SLOW_DAYS(key) || !('caches' in window)) return;
+  caches.open('td-slow').then((c) => c.put(url, new Response(txt, { headers: { 'content-type': 'application/json', 'x-saved': String(Date.now()) } }))).catch(() => {});
+}
 async function _getJSON(url, key) {
+  const sl = await slowGet(url, key); if (sl) return sl;
   try {
     const r = await fetch(fresh(url), { cache: 'no-cache' });
     state.loadedAt = state.loadedAt || {}; state.loadedAt[key] = new Date();
     if (!r.ok) throw new Error(r.status);
-    const txt = await r.text(); const j = JSON.parse(txt);
+    const txt = await r.text(); const j = JSON.parse(txt); slowPut(url, key, txt);
     if (txt.length < 300000) { const w = () => { try { localStorage.setItem(key, txt); } catch (e) { /* storage full */ } }; if (window.requestIdleCallback) requestIdleCallback(w, { timeout: 5000 }); else setTimeout(w, 1500); }
     return j;
   } catch (e) {
