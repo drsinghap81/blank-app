@@ -2,7 +2,7 @@ name: paper-crypto-tb
 # 27 Nov 2026: Top Bottom paper trading on BTC / ETH (tools/paper_crypto_tb.py) - every 4 hours, 7 days a week
 on:
   schedule:
-    - cron: "17 0,4,8,12,16,20 * * *"
+    - cron: "17 0,1,2,4,8,12,16,20 * * *"
   workflow_dispatch:
 permissions:
   contents: write

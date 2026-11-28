@@ -27,7 +27,21 @@ OUT = os.path.join(os.path.dirname(HERE), "paper", "crypto_tb.json")
 def bars(t):
     d = yf.download(t, start="2014-01-01", progress=False, auto_adjust=False, interval="1d")
     d.columns = [c[0] if isinstance(c, tuple) else c for c in d.columns]; d.index = pd.to_datetime(d.index).tz_localize(None)
-    x = d[["Open", "High", "Low", "Close"]].dropna(); return x[(x.High >= x.Low) & (x.Low > 0)]
+    x = d[["Open", "High", "Low", "Close"]].dropna(); x = x[(x.High >= x.Low) & (x.Low > 0)]
+    # 28 Nov 2026: Yahoo's daily series skipped 27 Nov for both coins (went 26 -> 28). Fill any missing recent UTC day from
+    # Yahoo's hourly bars (open of the first hour, high/low across the day, close of the last hour; only full 24-hour days).
+    try:
+        h = yf.download(t, period="15d", interval="1h", progress=False, auto_adjust=False)
+        h.columns = [c[0] if isinstance(c, tuple) else c for c in h.columns]
+        h.index = (pd.to_datetime(h.index).tz_convert("UTC") if pd.to_datetime(h.index).tz is not None else pd.to_datetime(h.index)).tz_localize(None)
+        g = h.groupby(h.index.floor("D")).agg(Open=("Open", "first"), High=("High", "max"), Low=("Low", "min"), Close=("Close", "last"), n=("Close", "size"))
+        g = g[(g.n >= 24) & (g.index > x.index[-15]) & (~g.index.isin(x.index))]
+        if len(g):
+            print(t, "filled from hourly:", [str(i.date()) for i in g.index], flush=True)
+            x = pd.concat([x, g[["Open", "High", "Low", "Close"]]]).sort_index()
+    except Exception as ex:  # noqa: BLE001
+        print(t, "hourly fill failed", str(ex)[:80], flush=True)
+    return x
 
 
 def book(df_done, last_px, both):
