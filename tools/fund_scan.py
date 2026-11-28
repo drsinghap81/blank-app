@@ -358,11 +358,16 @@ def main():
     u = universe(all_funds=True); print("funds in universe", len(u), u.group.value_counts().to_dict(), flush=True); n0 = len(rows)
     fdir = f"{OUT}/fund_charts"; os.makedirs(fdir, exist_ok=True)
     def one(r):
+        try:
+            return one_(r)
+        except Exception as e:  # noqa: BLE001
+            print("fund fail", r.code, str(e)[:80]); return "fail", r
+    def one_(r):
         h = hist(int(r.code)); time.sleep(0.15)
         if h is None:
             return "fail", r
         s = h.set_index("Date").nav.sort_index(); s = s[~s.index.duplicated(keep="last")]
-        if s.index[-1] < pd.Timestamp.now() - pd.Timedelta(days=10):
+        if not len(s) or s.index[-1] < pd.Timestamp.now() - pd.Timedelta(days=10):
             return "stale", r
         kind = "debt" if r.group == "Debt" else "fund"
         res = metrics(s, str(int(r.code)), r.name, kind, r.category)
