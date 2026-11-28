@@ -75,7 +75,7 @@ def rep(name, D, end):
                 continue
             for kind, stop in (("inside", "tight"), ("inside", "mother"), ("ctrl", "tight")):
                 for mode in ("2R", "ema"):
-                    z = D[m & (D.kind == kind) & (D.stop == stop) & (D.mode == mode) & (D.side == side)]
+                    z = D[m & (D.kind == kind) & (D["stop"] == stop) & (D["mode"] == mode) & (D.side == side)]
                     row = []
                     for lab, st in W:
                         y = z[z.d >= st]
