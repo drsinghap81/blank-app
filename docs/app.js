@@ -2894,6 +2894,7 @@ function pushForm(root, sym, mk) {
 }
 function addTvLink(root) {
   if (!root) return;
+  if (root.querySelector('[data-notv]')) return;   // 28 Nov 2026: mutual funds - TradingView has no Indian fund NAVs
   if (root.querySelector('a[href*="tradingview.com"]')) { addPushBtn(root); return; }
   const h = root.querySelector('.d-head h2'); if (!h) return;
   const a = document.createElement('a'); a.className = 'tv-btn'; a.target = '_blank'; a.rel = 'noopener';
@@ -4241,7 +4242,7 @@ function fundSelect(r) {
     ...(r.ath ? [['Monthly ATH system', `${{ breakout: 'Breakout', open: 'In trade', 'exit next open': 'Sell at the next open', near: `Near: ${fmt(r.ath.gap_pct, 1)}% below the trigger`, exited: `Exited ${day(r.ath.exit_date)} at ${fmt(r.ath.exit_price, 2, 'en-IN')}` }[r.ath.status]} · trigger ${fmt(r.ath.trigger, 2, 'en-IN')} (ATH month ${esc(r.ath.ath_month)}, ${baseTxt(r.ath.base_months)}${r.ath.depth != null ? `, cup ${fmt(r.ath.depth * 100, 0)}%` : ''})${r.ath.entry ? ` · entry ${fmt(r.ath.entry, 2, 'en-IN')} on ${day(r.ath.date)} · ${r.ath.ret >= 0 ? '+' : ''}${fmt(r.ath.ret * 100, 1)}%` : ''}${r.ath.sma30 ? ` · 30-week SMA ${fmt(r.ath.sma30, 2, 'en-IN')}` : ''}`]] : []),
     ['Bottom pattern', r.pattern ? `${PAT_NM[r.pattern.typ]}, ${r.pattern.status === 'breakout' ? `broke the neckline ${fmt(r.pattern.neck, 2, 'en-IN')}` : `${fmt(r.pattern.to_neck_pct, 1)}% below the neckline ${fmt(r.pattern.neck, 2, 'en-IN')}`}` : 'none'],
     ['Type', r.kind === 'fund' ? `Mutual fund · ${esc(r.category)} · AMFI code ${esc(r.key)}` : `${r.kind === 'debt' ? 'Bond/cash ETF' : 'ETF'} · ${{ IN: 'NSE (₹)', US: 'US-listed (US$)', AU: 'ASX (A$)' }[r.market || 'IN']}`]];
-  openPanel(`<div class="d-head"><div><h2>${esc(r.kind === 'fund' ? r.name : (r.symbol || r.key))}</h2><div class="co">${esc(r.kind === 'fund' ? r.category : r.name)}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
+  openPanel(`<div class="d-head" ${r.kind === 'fund' ? 'data-notv="1"' : ''}><div><h2>${esc(r.kind === 'fund' ? r.name : (r.symbol || r.key))}</h2><div class="co">${esc(r.kind === 'fund' ? r.category : r.name)}</div></div><div class="d-price"><b>${fmt(r.close, 2, 'en-IN')}</b></div></div>
     ${st}<div class="seg cb-seg" role="group" aria-label="Chart type" id="fundct">${[['line', 'Line'], ['candle', 'Candles'], ['month', 'Monthly candles']].map(([k, n]) => `<button data-fct="${k}" aria-selected="${(state.fundCt || 'line') === k}">${n}</button>`).join('')}</div><div class="chart" id="fundc_"></div>
     <p class="muted" style="margin:4px 16px">Weekly closes, last 5 years · blue = 40-week average (≈ 200 days) · gold = all-time high · green dashed = top-up level (20% below the high)${r.pattern ? ' · grey = pattern neckline' : ''}.</p>
     <div class="facts">${f.map(([k, v]) => `<div class="fact"><span>${k}</span><b>${v}</b></div>`).join('')}</div>${fundPlan(r)}`);
@@ -4297,6 +4298,16 @@ async function drawFund(r) {
     .setData(c.t.map((t, i) => (sm[i] == null ? { time: t } : { time: t, value: sm[i] })));
   s.createPriceLine({ price: r.high, color: C.saffron, lineWidth: 1, lineStyle: 0, axisLabelVisible: true, title: 'high' });
   if (r.kind !== 'debt') s.createPriceLine({ price: r.high * 0.8, color: '#0A7A55', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'top-up' });
+  /* 28 Nov 2026 (Amritpal: "horizontal line exactly joining the previous ATH and the monthly breakout candle level"): the old all-time
+     high drawn from its own month to today (the breakout-candle line was dropped at his request) */
+  if (r.mbo && r.mbo.old_high && r.mbo.trigger) {
+    const T = (ct !== 'line' && hasO && ct === 'month') ? null : c.t; const times = T || c.t;
+    const at = (ym) => times.find((t) => t.slice(0, 7) >= ym) || times[0]; const last = times[times.length - 1];
+    const seg = (ym, v, col, style, title) => { const t0 = at(ym); if (!t0 || t0 >= last) return;
+      ch.addLineSeries({ color: col, lineWidth: 2, lineStyle: style, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title })
+        .setData([{ time: t0, value: v }, { time: last, value: v }]); };
+    seg(mboOldYm(r.mbo), r.mbo.old_high, '#f5b942', 0, `old ATH ${ymTxt(mboOldYm(r.mbo))}`);
+  }
   if (r.pattern) s.createPriceLine({ price: r.pattern.neck, color: '#9CA3AF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'neckline' });
   ch.timeScale().fitContent();
   new ResizeObserver(() => ch.applyOptions({ width: box.clientWidth })).observe(box);
