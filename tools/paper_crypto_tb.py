@@ -75,6 +75,7 @@ def main():
     for tk, nm in (("BTC-USD", "BTC"), ("ETH-USD", "ETH")):
         df = bars(tk)
         done = df[df.index < today]
+        print(nm, 'last rows:', [(str(i.date()), round(float(c), 2)) for i, c in df.Close.tail(3).items()], flush=True)
         last = float(df.Close.iloc[-1])
         out["coins"][nm] = dict(price=round(last, 2), last_day=str(done.index[-1].date()),
                                 both=book(done, last, True), buy=book(done, last, False))
