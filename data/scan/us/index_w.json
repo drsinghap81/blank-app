@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-27T03:50+00:00",
- "asof": "2026-11-25",
+ "generated": "2026-11-28T03:36+00:00",
+ "asof": "2026-11-27",
  "market": "US",
  "rows": [
   {
@@ -15,13 +15,13 @@
    "mid": 44.12,
    "mid_date": "2026-11-16",
    "rsi_div": false,
-   "close": 43.61,
-   "asof": "2026-11-25",
+   "close": 43.73,
+   "asof": "2026-11-27",
    "neckline": 44.12,
    "status": "forming",
    "stage": "2nd low done",
-   "line_now": 44.0,
-   "dist_pct": 0.9,
+   "line_now": 43.98,
+   "dist_pct": 0.6,
    "chart": "xlu"
   },
   {
@@ -36,13 +36,13 @@
    "mid": 108.69,
    "mid_date": "2026-11-13",
    "rsi_div": true,
-   "close": 105.38,
-   "asof": "2026-11-25",
+   "close": 107.48,
+   "asof": "2026-11-27",
    "neckline": 108.69,
    "status": "forming",
    "stage": "2nd low done",
-   "line_now": 108.14,
-   "dist_pct": 2.6,
+   "line_now": 108.08,
+   "dist_pct": 0.6,
    "chart": "xlc"
   },
   {
@@ -57,13 +57,13 @@
    "mid": 74.13,
    "mid_date": "2026-11-04",
    "rsi_div": false,
-   "close": 69.83,
-   "asof": "2026-11-25",
+   "close": 70.35,
+   "asof": "2026-11-27",
    "neckline": 74.13,
    "status": "forming",
    "stage": "2nd low done",
-   "line_now": 73.19,
-   "dist_pct": 4.8,
+   "line_now": 73.13,
+   "dist_pct": 3.9,
    "chart": "kre"
   }
  ],
