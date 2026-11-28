@@ -104,13 +104,32 @@ const fresh = (url) => (url.startsWith(REPO) && _bust ? url + (url.includes('?')
    download per file per 5 minutes per session (shared while in flight; the ↻ button reloads everything), and only files under
    300 KB are kept for offline use, written when the phone is idle. */
 const _JC = {};
+/* 28 Nov 2026 (Amritpal: "app still takes time loading each page, I need it in a flash"): a page opened for the first time waited
+   1-1.4 s on a phone for its 6-7 data files. The app now remembers which nightly scan files you open (on this phone) and, once Today
+   is up and the phone is idle, loads them quietly in the background - so those pages open instantly. Nightly files (main branch) are
+   reused for 30 minutes in a session (they change once a night); live files keep 5 minutes; ↻ reloads everything. */
+const _isNightly = (url) => url.startsWith(MAIN) && !url.includes('?');
+let _seen = {}; try { _seen = JSON.parse(localStorage.getItem('td.seen')) || {}; } catch (e) { /* */ }
+function noteSeen(url, key) {
+  if (!_isNightly(url) || /charts?\//.test(url)) return;          // skip per-stock chart files
+  const s = _seen[url] || { n: 0 }; s.n++; s.t = Date.now(); s.k = key; _seen[url] = s;
+  clearTimeout(noteSeen.w); noteSeen.w = setTimeout(() => { try { localStorage.setItem('td.seen', JSON.stringify(_seen)); } catch (e) { /* */ } }, 3000);
+}
+function warmUp() {
+  if (warmUp.done || (navigator.connection && navigator.connection.saveData)) return; warmUp.done = 1;
+  const old = Date.now() - 21 * 864e5;
+  const q = Object.entries(_seen).filter(([u, s]) => s.t > old && !_JC[u]).sort((a, b) => b[1].n - a[1].n).slice(0, 30);
+  const next = () => { const it = q.shift(); if (!it) return; (warmUp.on = 1, getJSON(it[0], it[1].k)).finally(() => setTimeout(next, 30)); };
+  next(); next();                                                  // two at a time, so your own taps still come first
+}
 function getJSON(url, key) {
-  const c = _JC[url];
-  if (c && Date.now() - c.t < 300000) return c.p;
+  const c = _JC[url]; if (!warmUp.on) noteSeen(url, key); warmUp.on = 0;
+  if (c && Date.now() - c.t < (_isNightly(url) ? 1800000 : 300000)) return c.p;
   const p = _getJSON(url, key); _JC[url] = { t: Date.now(), p };
   p.then((j) => { if (j == null) delete _JC[url]; });
   return p;
 }
+window.addEventListener('load', () => setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(warmUp, { timeout: 4000 }) : warmUp()), 2500));
 /* 28 Nov 2026 (Amritpal: "fundamentals don't change daily"): slow-changing files (company fundamentals ~1 MB, govt
    themes) are kept on the phone for 7 days and reused without asking the network; the ↻ button refreshes them. */
 const SLOW_DAYS = (key) => (/^fund_(NSE|US|ASX)$/.test(key) || key === 'govt_focus' ? 7 : 0);
