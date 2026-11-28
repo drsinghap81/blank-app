@@ -36,6 +36,21 @@ from topbottom_backtest import confirmed_swings  # noqa: E402
 
 PAIRS = {"BTC": "B-BTC_USDT", "ETH": "B-ETH_USDT"}
 BUF, DAY_SL, MAX_SL, BE, GAP = 0.0005, 1.0, 2.0, 2.0, 1.0
+SWING = 0.0            # 29 Nov 2026 "proper V" tests: a top / bottom counts only after the close turned this % (0 = every 1-day turn, live)
+VLEG, VBUF = None, 0.005   # course V rule: when the move INTO a turn is under VLEG %, add VBUF to the buffer (None = off, live)
+
+
+def _swings(c):
+    T, B, pv = confirmed_swings(np.asarray(c, float), SWING)
+    leg = {}
+    if VLEG is not None:
+        for k in range(1, len(pv)):
+            leg[pv[k][3]] = abs(pv[k][3] / pv[k - 1][3] - 1) * 100
+    return T, B, leg
+
+
+def bufx(v, leg):
+    return BUF + (VBUF if VLEG is not None and leg.get(v, 99) < VLEG else 0.0)
 COST = 0.0015
 CAP = 100000.0
 QSTEP = 0.001                                                     # CoinDCX quantity step and minimum, BTC and ETH
@@ -160,18 +175,19 @@ def same(a, b):
 
 def plan_for(closes, highs, lows, bk):
     """levels from completed days (closes) + the book's stop for today."""
-    T, B, _ = confirmed_swings(np.asarray(closes, float), 0.0)
+    T, B, leg = _swings(closes)
     top = None if np.isnan(T[-1]) else float(T[-1]); bot = None if np.isnan(B[-1]) else float(B[-1])
-    buy = top * (1 + BUF) if top is not None and not same(top, bk["used_T"]) else None
-    sell = bot * (1 - BUF) if bot is not None and not same(bot, bk["used_B"]) else None
+    bt = bufx(top, leg) if top is not None else 0; bb = bufx(bot, leg) if bot is not None else 0
+    buy = top * (1 + bt) if top is not None and not same(top, bk["used_T"]) else None
+    sell = bot * (1 - bb) if bot is not None and not same(bot, bk["used_B"]) else None
     P = dict(top=top, bot=bot, buy=buy, sell=sell, prot=None, sys=False)
     if bk["pos"]:
         e, s = bk["entry"], bk["pos"]
         prot = e * (1 - s * MAX_SL / 100)
         if s > 0 and bot is not None:
-            prot = max(prot, bot * (1 - BUF))
+            prot = max(prot, bot * (1 - bb))
         if s < 0 and top is not None:
-            prot = min(prot, top * (1 + BUF))
+            prot = min(prot, top * (1 + bt))
         if bk["be_on"]:
             prot = max(prot, e) if s > 0 else min(prot, e)
         P["prot"] = prot
@@ -182,15 +198,15 @@ def plan_for(closes, highs, lows, bk):
 def init_used(closes, highs, lows, bk):
     """start flat: a top / bottom price has already broken since it formed is spent (run_live start_flat_on)."""
     c = np.asarray(closes, float); h = np.asarray(highs, float); l = np.asarray(lows, float)
-    T, B, _ = confirmed_swings(c, 0.0); n = len(c)
+    T, B, leg = _swings(c); n = len(c)
     for arr, is_top in ((T, True), (B, False)):
         v = arr[n - 1]
         if np.isnan(v):
             continue
         k = int(np.argmax(arr == v))
-        if is_top and len(h[k + 1:]) and h[k + 1:].max() >= v * (1 + BUF):
+        if is_top and len(h[k + 1:]) and h[k + 1:].max() >= v * (1 + bufx(float(v), leg)):
             bk["used_T"] = float(v)
-        if not is_top and len(l[k + 1:]) and l[k + 1:].min() <= v * (1 - BUF):
+        if not is_top and len(l[k + 1:]) and l[k + 1:].min() <= v * (1 - bufx(float(v), leg)):
             bk["used_B"] = float(v)
 
 
