@@ -22,7 +22,7 @@ import threading
 import time
 from datetime import date, datetime, timedelta
 
-VERSION = 2   # v2: v1's analysis died saving numpy year keys to JSON
+VERSION = 3   # v3: + stop-and-reverse variants (sar1 / sar2); v2: v1's analysis died saving numpy year keys to JSON
 HERE = os.path.dirname(os.path.abspath(__file__))
 INST = {"BANKNIFTY": dict(tok="99926009", buf=25.0, long_only=False), "NIFTY": dict(tok="99926000", buf=12.0, long_only=True)}
 DAY_SL, MAX_SL, BE, GAP = 1.0, 2.0, 2.0, 1.0
@@ -58,8 +58,11 @@ def load_minutes(path):
     return {d: v for d, v in days.items() if len(v) >= 60}         # drop special short sessions
 
 
-def minute_engine(days, buf, long_only):
-    """days: {date: [(time, o, h, l, c), ...]} in order. Returns closed trades (entry_day, side, entry, exit_day, exit, why)."""
+def minute_engine(days, buf, long_only, sar=0):
+    """days: {date: [(time, o, h, l, c), ...]} in order. Returns closed trades (entry_day, side, entry, exit_day, exit, why).
+    sar = 0: live rules (reverse only at the system point). sar = N (29 Nov 2026, Amritpal: "It's stop and reverse with 1% SL", as the
+    course's live record): ANY stop (entry-day 1%, max 2%, breakeven) also reverses at the stop price, at most N reversals a day; the
+    new trade gets the 1% entry-day stop. Both-sides only."""
     import numpy as np
     sys.path.insert(0, os.path.dirname(HERE))
     from topbottom_backtest import confirmed_swings
@@ -85,7 +88,7 @@ def minute_engine(days, buf, long_only):
             if be_on:
                 prot = max(prot, ent) if pos > 0 else min(prot, ent)
             sys_ = (pos > 0 and sell is not None and abs(prot - sell) < 1e-6) or (pos < 0 and buy is not None and abs(prot - buy) < 1e-6)
-        entered = False; done = False; since = None; dh, dl = -1e18, 1e18; stopped = False
+        entered = False; done = False; since = None; dh, dl = -1e18, 1e18; stopped = False; nrev = 0
         for (_, bo, bh, bl, bc) in bars:
             dh = max(dh, bh); dl = min(dl, bl)
             if done:
@@ -107,13 +110,21 @@ def minute_engine(days, buf, long_only):
                         if not gapped:
                             pos, ent, ent_i, be_on = -side, px, i, False; cur = (D[i], -side, px); entered = True; since = [px, px]
                             continue
+                    elif sar and not long_only and nrev < sar:
+                        nrev += 1; pos, ent, ent_i, be_on = -side, px, i, False; cur = (D[i], -side, px); entered = True; since = [px, px]
+                        continue
                     done = True
                 continue
             if pos and entered:
                 since = [max(since[0], bh), min(since[1], bl)]
                 stop = ent * (1 - pos * DAY_SL / 100)
                 if (pos > 0 and since[1] <= stop) or (pos < 0 and since[0] >= stop):
-                    tr.append((*cur, D[i], stop, "Entry-day SL")); pos = 0; done = True
+                    side = pos
+                    tr.append((*cur, D[i], stop, "Entry-day SL")); pos = 0
+                    if sar and not long_only and nrev < sar:
+                        nrev += 1; pos, ent, ent_i, be_on = -side, stop, i, False; cur = (D[i], -side, stop); since = [stop, stop]
+                        continue
+                    done = True
                 continue
             if not pos:
                 go_l = buy is not None and dh >= buy
@@ -158,6 +169,13 @@ def analyse(dirp):
                 y[lab] = y.get(lab, 0) + pts; y[lab + "_n"] = y.get(lab + "_n", 0) + 1
                 y[lab + "_w"] = y.get(lab + "_w", 0) + (pts > 0)
         add("minute", [(t[0], t[3], t[1] * (t[4] - t[2])) for t in tr])
+        if not cfg["long_only"]:
+            for nr in (1, 2):
+                tr2, _ = minute_engine(days, cfg["buf"], False, sar=nr)
+                add(f"sar{nr}", [(t[0], t[3], t[1] * (t[4] - t[2])) for t in tr2])
+                if nr == 1:
+                    res["sar1_last"] = [dict(entry_day=t[0], side="BUY" if t[1] > 0 else "SELL", entry=round(t[2], 2), exit_day=t[3], exit=round(t[4], 2),
+                                             why=t[5], pts=round(t[1] * (t[4] - t[2]), 1)) for t in tr2[-40:]]
         for fill in ("stop", "close", "intraday"):
             t = tbb.run_live(df, tbb.Params(buffer_pts=cfg["buf"], buffer_pct=None, day_sl_fill=fill, event_exit=False, gap_pct=GAP,
                                             long_only=cfg["long_only"]))
