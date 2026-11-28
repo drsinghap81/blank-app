@@ -19,9 +19,9 @@
 "sh": 109,
 "avg": 1871.0,
 "cost": 204500.21463562502,
-"last": 1926.300048828125,
+"last": 1911.300048828125,
 "stop": 1687.9,
-"checked": "2026-11-25",
+"checked": "2026-11-26",
 "sell_next": false,
 "stop_note": "stop 1687.9, then Supertrend red"
 },
@@ -45,9 +45,9 @@
 "sh": 66,
 "avg": 3070.0,
 "cost": 203177.5849125,
-"last": 3348.39990234375,
+"last": 3370.800048828125,
 "stop": 2769.8,
-"checked": "2026-11-25",
+"checked": "2026-11-26",
 "sell_next": false,
 "stop_note": "stop 2769.8, then Supertrend red"
 },
@@ -69,9 +69,9 @@
 "sh": 955,
 "avg": 303.9,
 "cost": 291023.1615459375,
-"last": 327.0,
+"last": 326.45001220703125,
 "stop": 283.25,
-"checked": "2026-11-25",
+"checked": "2026-11-26",
 "sell_next": false,
 "stop_note": "stop 283.25, then Supertrend red"
 },
@@ -82,9 +82,9 @@
 "sh": 621,
 "avg": 363.0,
 "cost": 226043.335918125,
-"last": 356.70001220703125,
+"last": 354.5,
 "stop": 331.3,
-"checked": "2026-11-25",
+"checked": "2026-11-26",
 "sell_next": false,
 "stop_note": "stop 331.3, then Supertrend red"
 },
@@ -139,8 +139,8 @@
 "sh": 106,
 "avg": 1577.0,
 "cost": 167622.00892875,
-"last": 1611.0,
-"stop_note": "weekly close < 30-wk SMA (1385.1367)",
+"last": 1593.4,
+"stop_note": "weekly close < 30-wk SMA (1396.1367)",
 "added": false
 },
 "ath:ASAHIINDIA:2026-11-12": {
@@ -150,8 +150,8 @@
 "sh": 14,
 "avg": 1100.7987,
 "cost": 15453.591445915878,
-"last": 1189.85,
-"stop_note": "weekly close < 30-wk SMA (925.2117)",
+"last": 1158.2,
+"stop_note": "weekly close < 30-wk SMA (935.9433)",
 "added": false
 }
 },
@@ -161,6 +161,8 @@
 "921:BEEZAASAN.BO:2026-11-03",
 "921:BIL:2026-11-02",
 "921:CYIENT:2026-11-25",
+"921:HCLTECH:2026-11-26",
+"921:INFY:2026-11-26",
 "921:KDDL:2026-11-05",
 "921:KODYTECH:2026-11-05",
 "921:KOPRAN:2026-11-12",
@@ -182,6 +184,7 @@
 "ath:ASAHIINDIA:2026-11-11",
 "ath:DCBBANK:2026-11-12",
 "ath:DRREDDY:2026-11-13",
+"ath:GREAVESCOT:2026-11-27",
 "ath:GUFICBIO:2026-11-09",
 "ath:HEGAM:2026-11-05",
 "ath:HONASA:2026-11-23",
@@ -234,5 +237,5 @@
 "why": "stop"
 }
 ],
-"tb_total": 260544.46153846156
+"tb_total": 234663.23076923078
 }
