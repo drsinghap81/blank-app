@@ -4819,8 +4819,21 @@ function fundAthRows(countOnly) {
     const q0 = (state.ath.q || '').toLowerCase(); if (q0) M = M.filter((r) => r.name.toLowerCase().includes(q0) || r.key.toLowerCase().includes(q0));
     return M.sort((a, b) => (b.mclose.long_cup - a.mclose.long_cup) || (b.mclose.base_months - a.mclose.base_months));
   }
+  /* 28 Nov 2026 (Amritpal: "ETF list still has those which have not closed monthly ATH and trading below high of breakout candle"):
+     the default list is the Momentum rule - a MONTH CLOSED above the all-time high (12+ month base) and the price is now above that
+     breakout candle's high (fund_scan mbo: crossed / above). The older trigger-cross list stays under "Show all". */
+  if (!state.athFundAll && !state.athFundNear && !countOnly) {
+    let B = (F.rows || []).filter((r) => (r.market || 'IN') === m && r.mbo && ['crossed', 'above'].includes(r.mbo.status) && mboLong(r.mbo));
+    const qb = (state.ath.q || '').toLowerCase(); if (qb) B = B.filter((r) => r.name.toLowerCase().includes(qb) || r.key.toLowerCase().includes(qb));
+    return B.map((r) => ({ ...r, _mbo: true })).sort((a, b) => ((b.mbo.base_months || 0) - (a.mbo.base_months || 0)) || ((a.mbo.sessions_ago ?? 99) - (b.mbo.sessions_ago ?? 99)));
+  }
+  if (state.athFundNear && !countOnly) {
+    let B = (F.rows || []).filter((r) => (r.market || 'IN') === m && ((r.mbo && r.mbo.status === 'waiting') || (r.ath && r.ath.status === 'near')));
+    return B.map((r) => ({ ...r, _mbo: !!r.mbo })).sort((a, b) => (a.below_high_pct ?? 99) - (b.below_high_pct ?? 99));
+  }
+  if (countOnly && !state.athFundAll) return (F.rows || []).filter((r) => (r.market || 'IN') === m && r.mbo && ['crossed', 'above'].includes(r.mbo.status) && mboLong(r.mbo));
   const cupOK = (r) => r.kind !== 'debt' && r.ath.depth != null && r.ath.depth <= -0.15;
-  let L = (F.rows || []).filter((r) => (r.market || 'IN') === m && r.ath && (state.athFundAll || (r.ath.status !== 'exited' && cupOK(r))));
+  let L = (F.rows || []).filter((r) => (r.market || 'IN') === m && r.ath && (state.athFundAll || (r.ath.status !== 'exited' && cupOK(r))) && (state.athFundAll || state.athFundNear || r.ath.status !== 'near'));   /* 28 Nov 2026: 'near' (no ATH month close yet) only on request */
   if (countOnly) return L.filter((r) => r.ath.status !== 'exited');
   const q = (state.ath.q || '').toLowerCase();
   if (q) L = L.filter((r) => r.name.toLowerCase().includes(q) || r.key.toLowerCase().includes(q));
@@ -5062,8 +5075,13 @@ function athList() {
     }
   }
   if (tab === 'imc') {
-    const W = all;
-    $('#athlist').innerHTML = W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : `<li class="empty">${state.mcAll ? 'No ETF or index closed last month above an all-time high at least a year old.' : 'Loading…'}</li>`;
+    /* 28 Nov 2026 (Amritpal: "ETF list still has those which have not closed monthly ATH and trading below high of breakout candle"):
+       by default only the ones that closed last month above the ATH AND now trade above that month's high (the buy level) */
+    const ab = (r) => !!(r.a && r.a.high_m && r.close > r.a.high_m); const allOn = !!state.imcAll;
+    const W = allOn ? all : all.filter(ab);
+    $('#athlist').innerHTML = `<li><div class="seg" id="imcab" style="margin:6px 0"><button data-k="0" aria-selected="${!allOn}">Above breakout candle high ${all.filter(ab).length}</button><button data-k="1" aria-selected="${allOn}">All month closes ${all.length}</button></div></li>`
+      + (W.length ? W.map((r, i) => allMcItem(r, i, W)).join('') : `<li class="empty">${state.mcAll ? (allOn ? 'No ETF or index closed last month above an all-time high at least a year old.' : 'None of last month\'s ATH closes is trading above its breakout candle high right now.') : 'Loading…'}</li>`);
+    $('#athlist').querySelectorAll('#imcab button').forEach((b) => b.addEventListener('click', () => { state.imcAll = b.dataset.k === '1'; athList(); }));
     $('#athlist').querySelectorAll('.row').forEach((el) => el.addEventListener('click', () => { const r = W[+el.dataset.i]; if (r.tv) window.open('https://www.tradingview.com/chart/?symbol=' + encodeURIComponent(r.tv) + '&interval=1M', '_blank', 'noopener'); }));
     return;
   }
@@ -5107,12 +5125,12 @@ function athList() {
     const mcN = ((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[AM()]) && r.mclose).length;
     const MC = !!state.athFundMC && state.view !== 'inv'; // Investment has its own Month close tab
     const EV = !!state.athFundEvery; const nEv = ((state.fund && state.fund.rows) || []).filter((r) => (r.market || 'IN') === ({ NSE: 'IN', US: 'US', ASX: 'AU', UK: 'UK' }[AM()]) && r.kind !== 'fund').length;
-    $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!MC && !EV && !state.athFundAll}">Cup + trend only</button><button data-k="1" aria-selected="${!MC && !EV && !!state.athFundAll}">Show all (incl. exited, shallow bases)</button><button data-k="3" aria-selected="${EV}">Every ETF ${nEv}</button>${state.view === 'inv' ? '' : `<button data-k="2" aria-selected="${MC}">Month close ${mcN}</button>`}</div></li>`
+    $('#athlist').innerHTML = `<li><div class="seg" id="athfa" style="margin:6px 0"><button data-k="0" aria-selected="${!MC && !EV && !state.athFundAll && !state.athFundNear}">Month closed above ATH · now above candle high</button><button data-k="1" aria-selected="${!MC && !EV && !!state.athFundAll}">Show all (incl. exited, shallow bases)</button><button data-k="4" aria-selected="${!MC && !EV && !state.athFundAll && !!state.athFundNear}">+ Near (not closed above ATH yet)</button><button data-k="3" aria-selected="${EV}">Every ETF ${nEv}</button>${state.view === 'inv' ? '' : `<button data-k="2" aria-selected="${MC}">Month close ${mcN}</button>`}</div></li>`
       + (MC ? '<li class="muted pad">Last completed month CLOSED above the all-time high (highest price of earlier months, wicks included) after a base of 1+ years (bold = 2+ years). Long cup = base of 3+ years with a 30%+ fall inside it. Not tested for ETFs and funds (the ATH system itself did not beat buy-and-hold on mutual funds); a month-end check only.</li>' : '')
       + (EV ? '<li class="muted pad">Every ETF in this market, signal or not, nearest to its all-time high first. Type India in the search box for the India ETFs.</li>' : '')
-      + (L.length ? L.map(EV ? fundEveryItem : MC ? fundMcItem : fundAthItem).join('') : `<li class="empty">${MC ? 'No ETF or fund closed last month above an all-time high that was at least a year old.' : state.athFundAll ? 'No ETF or fund signals in the last 18 months.' : 'None right now with a real cup (15%+ dip during the base) and an uptrend.'}</li>`)
+      + (L.length ? L.map(EV ? fundEveryItem : MC ? fundMcItem : (r, i) => (r._mbo || !r.ath ? fundItem(r, i) : fundAthItem(r, i))).join('') : `<li class="empty">${MC ? 'No ETF or fund closed last month above an all-time high that was at least a year old.' : state.athFundAll ? 'No ETF or fund signals in the last 18 months.' : 'None right now: no ETF or fund closed a month above its all-time high and trades above that breakout candle\'s high.'}</li>`)
       + (all.length > L.length ? '<li><button class="more" id="athall">Show all ' + all.length + '</button></li>' : '');
-    $('#athlist').querySelectorAll('#athfa button').forEach((b) => b.addEventListener('click', () => { state.athFundAll = b.dataset.k === '1'; state.athFundMC = b.dataset.k === '2'; state.athFundEvery = b.dataset.k === '3'; loadATH(); }));
+    $('#athlist').querySelectorAll('#athfa button').forEach((b) => b.addEventListener('click', () => { state.athFundAll = b.dataset.k === '1'; state.athFundMC = b.dataset.k === '2'; state.athFundEvery = b.dataset.k === '3'; state.athFundNear = b.dataset.k === '4'; loadATH(); }));
     $('#athlist').querySelectorAll('.row').forEach((r) => { const go = () => fundSelect(L[+r.dataset.i]); r.addEventListener('click', go); r.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }); });
     const b = $('#athall'); if (b) b.addEventListener('click', () => { state.ath.all = true; athList(); });
     return;
